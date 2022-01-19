@@ -2,59 +2,64 @@
 layout: default
 ---
 
-<style>
-input[type=text] { width: 100%; box-sizing: border-box; padding: 10px; display: block; }
-button { background: royalblue; color: white; padding: 10px; margin: 5px 0; border: none; }
-.mint-buttons { margin-top: 20px; }
-</style>
-<h2>Vending Macine</h2>
-<label for="contract">Contract address</label>
-<input id='contract' type='text' name='contract' placeholder='contract address' value="0xEBe70667fF075aC505f08e7BCcC210f54dE1f24b"><br>
-<label for="count">How many to mint</label>
-<input id='count' type='text' name='count' placeholder='how many to mint' value="3"><br>
-<div class='mint-buttons'>
-  <button id='mint'>Mint</button>
-</div>8
-<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@3.0.0/dist/web3.min.js"></script>
-<script src="https://testnet.factoria.app/f0/token_abi.js"></script>
-<script src="https://unpkg.com/invitelist@0.0.2/dist/invitelist.js"></script>
-<script src="https://unpkg.com/ipfsh@0.0.2/dist/ipfsh.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="style.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+<script src="https://unpkg.com/f0js@0.0.12/dist/f0.js"></script>
+<script id="template" type="text/x-handlebars-template">
+  <img src="{{image}}">
+  <h1>{{title}}</h1>
+  <table class='invites'>
+  <tr>
+    <th>mint price</th>
+    <th>mint limit</th>
+    <th>Invite</th>
+  </tr>
+  {{#each items}}
+    <tr>
+      <td>{{eth}} ETH</td>
+      <td>{{limit}}</td>
+      <td><a class='btn' href="mint#address={{address}}&key={{key}}">Go</td</a></td>
+    </tr>
+  {{/each}}
+  </table>
+</script>
 <script>
-var web3 = new Web3(window.ethereum);
-class Vendingmachine {
-  constructor () {
-    document.querySelector("#contract").addEventListener("input", async (e) => {
-      await this.build()
+const f0 = new F0()
+const web3= new Web3(window.ethereum)
+const template = Handlebars.compile(document.querySelector("#template").innerHTML);
+document.addEventListener("DOMContentLoaded", async () => {
+  let config = await fetch("box.json").then((r) => {
+    return r.json()
+  })
+  let net = await web3.eth.getChainId()
+  console.log("net = ", net)
+  await window.ethereum.send('eth_requestAccounts');
+  try {
+    await f0.init({
+      web3: web3,
+      contract: config.contract,
+      network: config.network
     })
-    document.querySelector("#mint").addEventListener("click", async (e) => {
-      let publicInviteKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
-      let invite = await this.collection.methods.invite(publicInviteKey).call()
-      console.log("invite", invite)
-      let count = parseInt(document.querySelector("#count").value)
-      let cost = parseInt(invite.price) * count;
-      await this.mint(
-        { key: publicInviteKey, proof: [] },
-        count,
-        cost
-      );
-    })  
-  }
-  async account () {
-    let _res = await window.ethereum.send('eth_requestAccounts');
-    return _res.result[0];
-  }
-  async build () {
-    let contract_address = document.querySelector("#contract").value
-    this.collection = new web3.eth.Contract(token_abi, contract_address);
-  }
-  async mint (auth, count, cost) {
-    let account_address = await this.account();
-    let tx = await this.collection.methods.mint(auth, count).send({
-      from: account_address,
-      value: "" + cost
+    const name = await f0.name()
+    const symbol = await f0.symbol()
+    const placeholder = await f0.placeholder()
+    const invites = await f0.myInvites()
+    document.querySelector(".box").innerHTML = template({
+      title: `${name} (${symbol}) Invite List`,
+      image: placeholder.converted.image,
+      items: Object.keys(invites).map((key, index) => {
+        return {
+          index: index,
+          address: config.contract,
+          key: key,
+          eth: invites[key].condition.converted.eth,
+          limit: invites[key].condition.converted.limit
+        }
+      })
     })
-    console.log("tx")
+  } catch (e) {
+    document.querySelector(".box").innerHTML = `<h1>${e.message.toLowerCase()}</h1>`
   }
-}
-const machine = new Vendingmachine()
-machine.build()
+})
