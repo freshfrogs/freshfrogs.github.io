@@ -2,10 +2,8 @@
 layout: default
 ---
 
-<html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link href="style.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
 <script src="https://unpkg.com/f0js@0.0.12/dist/f0.js"></script>
@@ -70,4 +68,4 @@ document.addEventListener("DOMContentLoaded", async () => {
 <body>
 <div class='box'></div>
 </body>
-</html>
+
