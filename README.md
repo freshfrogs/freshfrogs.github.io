@@ -1,37 +1,32 @@
-## Welcome to GitHub Pages
+# Skinnerbox
 
-You can use the [editor on GitHub](https://github.com/NF7UOS/NF7UOS.github.io/edit/main/README.md) to maintain and preview the content for your website in Markdown files.
+> A dead simple forkable NFT vending machine
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+![box.png](box.png)
 
-### Markdown
+# Usage
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+Here's an example walkthrough of how it's used:
 
-```markdown
-Syntax highlighted code block
+![skinnerbox.gif](skinnerbox.gif)
 
-# Header 1
-## Header 2
-### Header 3
+You can try it out here: https://factoria-org.github.io/skinnerbox
 
-- Bulleted
-- List
+> NOTE: This demo works on Rinkeby (so it's easy to test). Make sure to switch the wallet network to Rinkeby testnet first. (But this repository works both on mainnet and testnet automatically. When you fork this repo and add your own mainnet address, it should automatically work on mainnet too)
 
-1. Numbered
-2. List
+# How to use
 
-**Bold** and _Italic_ and `Code` text
+1. Go deploy an NFT contract with [Factoria](https://factoria.app/)
+2. Fork this repository
+3. Update the [box.json](box.json) to set your own contract address from step 1, as well as set the network ("rinkeby" or "main")
+4. (optional) Customize style by changing the [style.css](style.css)
+5. Create github pages ([tutorial](https://dev.to/byteslash/getting-started-with-github-pages-4jpf))
 
-[Link](url) and ![Image](src)
-```
+# Advanced
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+For those of you who want to hack on it to build custom features. Here are the relevant files:
 
-### Jekyll Themes
+1. [index.html](index.html): This is the main landing page, which displays the currently signed in user's invite lists
+2. [mint.html](mint.html): This is the minting app
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/NF7UOS/NF7UOS.github.io/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+The code is super simple because it's powered by **[f0.js](f0.js)**, which abstracts away most of the web3, ipfs, and merkle proof handling into one liner methods.
