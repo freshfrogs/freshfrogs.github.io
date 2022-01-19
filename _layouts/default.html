@@ -25,26 +25,24 @@
 
         <p class="view"><a href="{{ site.github.owner_url }}">View My GitHub Profile</a></p>
 
-        <ul class="downloads">
-          <li><script id="template" type="text/x-handlebars-template">
-            <img src="{{image}}">
-            <h1>{{title}}</h1>
-            <table class='invites'>
+        <script id="template" type="text/x-handlebars-template">
+          <img src="{{image}}">
+          <h1>{{title}}</h1>
+          <ul class="downloads"><table class='invites'>
+          <tr>
+            <li>mint price</li>
+            <li>mint limit</li>
+            <li>Invite</li>
+          </tr>
+          {{#each items}}
             <tr>
-              <th>mint price</th>
-              <th>mint limit</th>
-              <th>Invite</th>
+              <li>{{eth}} ETH</li>
+              <li>{{limit}}</li>
+              <li><a class='btn' href="mint#address={{address}}&key={{key}}">Go</li></a></li>
             </tr>
-            {{#each items}}
-              <tr>
-                <td>{{eth}} ETH</td>
-                <td>{{limit}}</td>
-                <td><a class='btn' href="mint#address={{address}}&key={{key}}">Go</td</a></td>
-              </tr>
-            {{/each}}
-            </table>
-          </script></li>
-        </ul>
+          {{/each}}
+          </table></ul>
+        </script>
       </header>
       <section>
 
