@@ -28,20 +28,16 @@
         <script id="template" type="text/x-handlebars-template">
           <img src="{{image}}">
           <h1>{{title}}</h1>
-          <ul class="downloads"><table class='invites'>
-          <tr>
+          <ul class="invites">
             <li>mint price</li>
             <li>mint limit</li>
             <li>Invite</li>
-          </tr>
-          {{#each items}}
-            <tr>
+            <li>{{#each items}}</li>
               <li>{{eth}} ETH</li>
               <li>{{limit}}</li>
               <li><a class='btn' href="mint#address={{address}}&key={{key}}">Go</li></a></li>
-            </tr>
-          {{/each}}
-          </table></ul>
+            <li>{{/each}}</li>
+          </ul>
         </script>
       </header>
       <section>
