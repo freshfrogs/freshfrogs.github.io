@@ -64,7 +64,7 @@
         const web3= new Web3(window.ethereum)
         const template = Handlebars.compile(document.querySelector("#template").innerHTML);
         document.addEventListener("DOMContentLoaded", async () => {
-          let config = await fetch("box.json").then((r) => {
+          let config = await fetch("../box.json").then((r) => {
             return r.json()
           })
           let net = await web3.eth.getChainId()
