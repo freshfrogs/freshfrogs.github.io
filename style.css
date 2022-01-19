@@ -6,7 +6,7 @@ body {
   align-items: center;
   background: rgb(74, 133, 77);
   background-image: linear-gradient(to right top, #e4e4e4, #ffffff, #ffffff, #ffffff, #ffffff, #ffffff, #ffffff, #ffffff, #ffffff, #ffffff, #fafafa, #ffffff);
-  color: white;
+  color: rgb(128, 223, 160);
 }
 .box {
   max-width: 300px;
