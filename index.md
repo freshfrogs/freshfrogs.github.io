@@ -103,6 +103,7 @@ end
 
 ### Definition lists can be used with HTML syntax.
 
+<html>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
 <script src="https://unpkg.com/f0js/dist/f0.js"></script>
 <script>
@@ -120,6 +121,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 })
 </script>
+</html>
 
 ```
 Long, single-line code blocks should not wrap. They should horizontally scroll if they are too long. This line should be long enough to demonstrate this.
