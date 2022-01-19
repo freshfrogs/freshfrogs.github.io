@@ -31,6 +31,24 @@
           <input id='count' type='text' name='count' placeholder='how many to mint' value="3"></li>
           <li><a href="{{ site.github.tar_url }}">Download <strong>TAR Ball</strong></a></li>
           <li><a href="{{ site.github.repository_url }}">View On <strong>GitHub</strong></a></li>
+          <script id="template" type="text/x-handlebars-template">
+            <img src="{{image}}">
+            <h1>{{title}}</h1>
+            <table class='invites'>
+            <tr>
+              <li>mint price</li>
+              <li>mint limit</li>
+              <li>Invite</li>
+            </tr>
+            {{#each items}}
+              <tr>
+                <li>{{eth}} ETH</li>
+                <li>{{limit}}</li>
+                <li><a class='btn' href="mint#address={{address}}&key={{key}}">Go</td</a></li>
+              </tr>
+            {{/each}}
+            </table>
+          </script>
         </ul>
       </header>
       <section>
@@ -46,51 +64,48 @@
       </footer>
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
-    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@3.0.0/dist/web3.min.js"></script>
-    <script src="https://testnet.factoria.app/f0/token_abi.js"></script>
-    <script src="https://unpkg.com/invitelist@0.0.2/dist/invitelist.js"></script>
-    <script src="https://unpkg.com/ipfsh@0.0.2/dist/ipfsh.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+    <script src="https://unpkg.com/f0js@0.0.12/dist/f0.js"></script>
     <script>
-      var web3 = new Web3(window.ethereum);
-      var contract = "0xEBe70667fF075aC505f08e7BCcC210f54dE1f24b";
-      class Vendingmachine {
-        constructor () {
-          document.querySelector("#contract").addEventListener("input", async (e) => {
-            await this.build()
+    const f0 = new F0()
+    const web3= new Web3(window.ethereum)
+    const template = Handlebars.compile(document.querySelector("#template").innerHTML);
+    document.addEventListener("DOMContentLoaded", async () => {
+      let config = await fetch("box.json").then((r) => {
+        return r.json()
+      })
+      let net = await web3.eth.getChainId()
+      console.log("net = ", net)
+      await window.ethereum.send('eth_requestAccounts');
+      try {
+        await f0.init({
+          web3: web3,
+          contract: config.contract,
+          network: config.network
+        })
+        const name = await f0.name()
+        const symbol = await f0.symbol()
+        const placeholder = await f0.placeholder()
+        const invites = await f0.myInvites()
+        document.querySelector(".box").innerHTML = template({
+          title: `${name} (${symbol}) Invite List`,
+          image: placeholder.converted.image,
+          items: Object.keys(invites).map((key, index) => {
+            return {
+              index: index,
+              address: config.contract,
+              key: key,
+              eth: invites[key].condition.converted.eth,
+              limit: invites[key].condition.converted.limit
+            }
           })
-          document.querySelector("#mint").addEventListener("click", async (e) => {
-            let publicInviteKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
-            let invite = await this.collection.methods.invite(publicInviteKey).call()
-            console.log("invite", invite)
-            let count = parseInt(document.querySelector("#count").value)
-            let cost = parseInt(invite.price) * count;
-            await this.mint(
-              { key: publicInviteKey, proof: [] },
-              count,
-              cost
-            );
-          })  
-        }
-        async account () {
-          let _res = await window.ethereum.send('eth_requestAccounts');
-          return _res.result[0];
-        }
-        async build () {
-          let contract_address = document.querySelector("#contract").value
-          this.collection = new web3.eth.Contract(token_abi, contract_address);
-        }
-        async mint (auth, count, cost) {
-          let account_address = await this.account();
-          let tx = await this.collection.methods.mint(auth, count).send({
-            from: account_address,
-            value: "" + cost
-          })
-          console.log("tx")
-        }
+        })
+      } catch (e) {
+        document.querySelector(".box").innerHTML = `<h1>${e.message.toLowerCase()}</h1>`
       }
-      const machine = new Vendingmachine()
-      machine.build()
-      </script>
+    })
+    </script>
 
   </body>
 </html>
