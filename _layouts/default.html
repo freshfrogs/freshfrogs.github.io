@@ -18,7 +18,7 @@
         <h1><a href="{{ "/" | absolute_url }}">{{ site.title | default: site.github.repository_name }}</a></h1>
 
         {% if site.logo %}
-          <img src="{{site.logo | relative_url}}" alt="Logo" />
+          <img src="preview.gif" alt="Logo" />
         {% endif %}
 
         <p>{{ site.description | default: site.github.project_tagline }}</p>
@@ -31,13 +31,11 @@
         <p class="view"><a href="{{ site.github.owner_url }}">View My GitHub Profile</a></p>
         {% endif %}
 
-        {% if site.show_downloads %}
         <ul class="downloads">
           <li><a href="{{ site.github.zip_url }}">Download <strong>ZIP File</strong></a></li>
           <li><a href="{{ site.github.tar_url }}">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="{{ site.github.repository_url }}">View On <strong>GitHub</strong></a></li>
+          <li><div class='mint-buttons'><button id='mint'><strong>Mint</strong></button></div></li>
         </ul>
-        {% endif %}
       </header>
       <section>
 
@@ -53,4 +51,48 @@
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
   </body>
+<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@3.0.0/dist/web3.min.js"></script>
+<script src="https://testnet.factoria.app/f0/token_abi.js"></script>
+<script src="https://unpkg.com/invitelist@0.0.2/dist/invitelist.js"></script>
+<script src="https://unpkg.com/ipfsh@0.0.2/dist/ipfsh.min.js"></script>
+<script>
+var web3 = new Web3(window.ethereum);
+class Vendingmachine {
+  constructor () {
+    document.querySelector("0xEBe70667fF075aC505f08e7BCcC210f54dE1f24b").addEventListener("input", async (e) => {
+      await this.build()
+    })
+    document.querySelector("#mint").addEventListener("click", async (e) => {
+      let publicInviteKey = "0x0000000000000000000000000000000000000000000000000000000000000000"
+      let invite = await this.collection.methods.invite(publicInviteKey).call()
+      console.log("invite", invite)
+      let count = parseInt(document.querySelector("#count").value)
+      let cost = parseInt(invite.price) * count;
+      await this.mint(
+        { key: publicInviteKey, proof: [] },
+        count,
+        cost
+      );
+    })  
+  }
+  async account () {
+    let _res = await window.ethereum.send('eth_requestAccounts');
+    return _res.result[0];
+  }
+  async build () {
+    let contract_address = document.querySelector("#contract").value
+    this.collection = new web3.eth.Contract(token_abi, contract_address);
+  }
+  async mint (auth, count, cost) {
+    let account_address = await this.account();
+    let tx = await this.collection.methods.mint(auth, count).send({
+      from: account_address,
+      value: "" + cost
+    })
+    console.log("tx")
+  }
+}
+const machine = new Vendingmachine()
+machine.build()
+</script>
 </html>
