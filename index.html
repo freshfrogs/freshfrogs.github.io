@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="{{ site.lang | default: "en-US" }}">
-  <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
@@ -13,7 +13,7 @@
   <h1>{{title}}</h1>
   <table class='invites'>
   <tr>
-    <th>mint price</th>
+    <th>mintt price</th>
     <th>mint limit</th>
     <th>Invite</th>
   </tr>
@@ -21,7 +21,7 @@
     <tr>
       <td>{{eth}} ETH</td>
       <td>{{limit}}</td>
-      <td><a class='btn' href="mint#address={{address}}&key={{key}}">Go</td</a></td>
+      <td><a class='btn' href="mint#address={{address}}&key={{key}}">Go</td></a></td>
     </tr>
   {{/each}}
   </table>
