@@ -5,7 +5,7 @@ body {
   justify-content: center;
   align-items: center;
   background: rgb(131,58,180);
-  background-image: linear-gradient(to right top, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1, #8aa7ec, #79b3f4, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
+  background-image: linear-gradient(to right top, #1b642b, #85cf85, #04c77c, #c0f5be, #9a9ae1, #02b911, #aeaff8, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
   color: white;
 }
 .box {
