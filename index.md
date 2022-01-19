@@ -1,123 +1,117 @@
----
-layout: default
----
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: "en-US" }}">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-Text can be **bold**, _italic_, or ~~strikethrough~~.
+{% seo %}
+    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+    {% include head-custom.html %}
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+        <script src="https://unpkg.com/f0js@0.0.12/dist/f0.js"></script>
+        <script id="template" type="text/x-handlebars-template">
+          <img src="{{image}}">
+          <h1>{{title}}</h1>
+          <table class='invites'>
+          <tr>
+            <th>mint price</th>
+            <th>mint limit</th>
+            <th>Invite</th>
+          </tr>
+          {{#each items}}
+            <tr>
+              <td>{{eth}} ETH</td>
+              <td>{{limit}}</td>
+              <td><a class='btn' href="mint#address={{address}}&key={{key}}">Go</td</a></td>
+            </tr>
+          {{/each}}
+          </table>
+        </script>
+        <script>
+        const f0 = new F0()
+        const web3= new Web3(window.ethereum)
+        const template = Handlebars.compile(document.querySelector("#template").innerHTML);
+        document.addEventListener("DOMContentLoaded", async () => {
+          let config = await fetch("box.json").then((r) => {
+            return r.json()
+          })
+          let net = await web3.eth.getChainId()
+          console.log("net = ", net)
+          await window.ethereum.send('eth_requestAccounts');
+          try {
+            await f0.init({
+              web3: web3,
+              contract: config.contract,
+              network: config.network
+            })
+            const name = await f0.name()
+            const symbol = await f0.symbol()
+            const placeholder = await f0.placeholder()
+            const invites = await f0.myInvites()
+            document.querySelector(".box").innerHTML = template({
+              title: `${name} (${symbol}) Invite List`,
+              image: placeholder.converted.image,
+              items: Object.keys(invites).map((key, index) => {
+                return {
+                  index: index,
+                  address: config.contract,
+                  key: key,
+                  eth: invites[key].condition.converted.eth,
+                  limit: invites[key].condition.converted.limit
+                }
+              })
+            })
+          } catch (e) {
+            document.querySelector(".box").innerHTML = `<h1>${e.message.toLowerCase()}</h1>`
+          }
+        })
+        </script>
+        <div class='box'></div>
+        <h1><a href="{{ "/" | absolute_url }}">{{ site.title | default: site.github.repository_name }}</a></h1>
 
-[Link to another page](./another-page.html).
+        {% if site.logo %}
+          <img src="{{site.logo | relative_url}}" alt="Logo" />
+        {% endif %}
 
-There should be whitespace between paragraphs.
+        <p>{{ site.description | default: site.github.project_tagline }}</p>
 
-There should be whitespace between paragraphs. We recommend including a README, or a file with information about your project.
+        {% if site.github.is_project_page %}
+        <p class="view"><a href="{{ site.github.repository_url }}">View the Project on GitHub <small>{{ site.github.repository_nwo }}</small></a></p>
+        {% endif %}
 
-# Header 1
+        {% if site.github.is_user_page %}
+        <p class="view"><a href="{{ site.github.owner_url }}">View My GitHub Profile</a></p>
+        {% endif %}
 
-This is a normal paragraph following a header. GitHub is a code hosting platform for version control and collaboration. It lets you and others work together on projects from anywhere.
+        {% if site.show_downloads %}
+        <ul class="downloads">
+          <li><a href="{{ site.github.zip_url }}">Download <strong>ZIP File</strong></a></li>
+          <li><a href="{{ site.github.tar_url }}">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="{{ site.github.repository_url }}">View On <strong>GitHub</strong></a></li>
+        </ul>
+        {% endif %}
+      </header>
+      <section>
 
-## Header 2
+      {{ content }}
 
-> This is a blockquote following a header.
->
-> When something is important enough, you do it even if the odds are not in your favor.
-
-### Header 3
-
-```js
-// Javascript code with syntax highlighting.
-var fun = function lang(l) {
-  dateformat.i18n = require('./lang/' + l)
-  return true;
-}
-```
-
-```ruby
-# Ruby code with syntax highlighting
-GitHubPages::Dependencies.gems.each do |gem, version|
-  s.add_dependency(gem, "= #{version}")
-end
-```
-
-#### Header 4
-
-*   This is an unordered list following a header.
-*   This is an unordered list following a header.
-*   This is an unordered list following a header.
-
-##### Header 5
-
-1.  This is an ordered list following a header.
-2.  This is an ordered list following a header.
-3.  This is an ordered list following a header.
-
-###### Header 6
-
-| head1        | head two          | three |
-|:-------------|:------------------|:------|
-| ok           | good swedish fish | nice  |
-| out of stock | good and plenty   | nice  |
-| ok           | good `oreos`      | hmm   |
-| ok           | good `zoute` drop | yumm  |
-
-### There's a horizontal rule below this.
-
-* * *
-
-### Here is an unordered list:
-
-*   Item foo
-*   Item bar
-*   Item baz
-*   Item zip
-
-### And an ordered list:
-
-1.  Item one
-1.  Item two
-1.  Item three
-1.  Item four
-
-### And a nested list:
-
-- level 1 item
-  - level 2 item
-  - level 2 item
-    - level 3 item
-    - level 3 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-
-### Small image
-
-![Octocat](https://github.githubassets.com/images/icons/emoji/octocat.png)
-
-### Large image
-
-![Branching](https://guides.github.com/activities/hello-world/branching.png)
-
-
-### Definition lists can be used with HTML syntax.
-
-<dl>
-<dt>Name</dt>
-<dd>Godzilla</dd>
-<dt>Born</dt>
-<dd>1952</dd>
-<dt>Birthplace</dt>
-<dd>Japan</dd>
-<dt>Color</dt>
-<dd>Green</dd>
-</dl>
-
-```
-Long, single-line code blocks should not wrap. They should horizontally scroll if they are too long. This line should be long enough to demonstrate this.
-```
-
-```
-The final element.
-```
+      </section>
+      <footer>
+        {% if site.github.is_project_page %}
+        <p>This project is maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></p>
+        {% endif %}
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
+  </body>
+</html>
