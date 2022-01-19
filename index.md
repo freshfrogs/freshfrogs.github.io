@@ -2,6 +2,8 @@
 layout: default
 ---
 
+<html>
+<head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="style.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
@@ -63,3 +65,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.querySelector(".box").innerHTML = `<h1>${e.message.toLowerCase()}</h1>`
   }
 })
+</script>
+</head>
+<body>
+<div class='box'></div>
+</body>
+</html>
