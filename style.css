@@ -1,7 +1,7 @@
 ---
 ---
 
-@import "jekyll-theme-minimal";
+@import "{{ site.theme }}";
 
 body {
   font-family: Sans-serif;
@@ -9,9 +9,9 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgba(105, 75, 126, 0);
-  background-image: linear-gradient(to right top, #d16ba500, #c777b800);
-  color: rgba(255, 255, 255, 0);
+  background: rgb(131,58,180);
+  background-image: linear-gradient(to right top, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1, #8aa7ec, #79b3f4, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
+  color: white;
 }
 .box {
   max-width: 300px;
