@@ -1,0 +1,68 @@
+<html>
+<head>
+<style>
+.collection {
+  display: flex;
+  flex-wrap: wrap;
+}
+img {
+  width: 100px;
+  margin: 5px;
+}
+</style>
+</head>
+<body>
+<script src="https://testnet.factoria.app/f0/token_abi.js"></script>
+<label for='contract'>enter contract address</label>
+<input id='contract' name='contract' type='text' placeholder='contract address' value="0x20036432fe4e10899b87a45bcfdd73fbcedb768b"><br>
+<pre id='tokenURI'></pre>
+<pre id='parsedURI'></pre>
+<div class='collection'></div>
+<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@3.0.0/dist/web3.min.js"></script>
+<script src="https://testnet.factoria.app/token_abi.js"></script>
+<script>
+class View {
+  constructor () {
+    document.querySelector("#contract").addEventListener("input", (e) => {
+      this.init()
+    })
+  }
+  async init () {
+    this.web3 = new Web3(window.ethereum);
+    this.address = document.querySelector("#contract").value
+    this.collection = new this.web3.eth.Contract(token_abi, this.address);
+    await this.renderCollection()
+  }
+  async parseTokenURI (tokenURI) {
+    let cid = tokenURI.replace("ipfs://", "")
+    let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
+    return {
+      cid,
+      tokenURI,
+      ipfsGatewayURI
+    }
+  }
+  async getMetadata (ipfsGatewayURI) {
+    let metadata = await fetch(ipfsGatewayURI).then((res) => {
+      return res.json()
+    })
+    return metadata
+  }
+  async renderCollection () {
+    const config = await this.collection.methods.config().call()
+    for(let tokenId=1; tokenId<=100; tokenId++) {
+      const tokenURI = config.base + tokenId + ".json"
+      const parsedURI = await view.parseTokenURI(tokenURI)
+      const metadata = await view.getMetadata(parsedURI.ipfsGatewayURI)
+      let imageURL = "https://ipfs.io/ipfs/" + metadata.image.replace("ipfs://", "")
+      let img = document.createElement('img');
+      img.src = imageURL;
+      document.querySelector(".collection").appendChild(img);
+    }
+  }
+};
+const view = new View()
+view.init()
+</script>
+</body>
+</html>
