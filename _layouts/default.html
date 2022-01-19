@@ -34,15 +34,6 @@
       </header>
       <section>
 
-        <html>
-          <head>
-          <style>
-          input[type=text] { width: 100%; box-sizing: border-box; padding: 10px; display: block; }
-          button { background: royalblue; color: white; padding: 10px; margin: 5px 0; border: none; }
-          .mint-buttons { margin-top: 20px; }
-          </style>
-          </head>
-          <body>
           <h2>Vending Macine</h2>
           <label for="contract">Contract address</label>
           <input id='contract' type='text' name='contract' placeholder='contract address' value="0xEBe70667fF075aC505f08e7BCcC210f54dE1f24b"><br>
@@ -95,8 +86,8 @@
           const machine = new Vendingmachine()
           machine.build()
           </script>
-          </body>
-          </html>
+
+      {{ content }}
 
       </section>
     </div>
