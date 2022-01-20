@@ -28,13 +28,11 @@
       document.querySelector("img").setAttribute("alt", "logo")
       document.querySelector("img").setAttribute("style", "width:512px;height:512px")
 
-      document.addEventListener("DOMContentLoaded", async () => {
-        document.querySelector("#mint").addEventListener("click", async (e) => {
-          document.querySelector("pre").innerHTML = "minting. please sign the transaction and wait..."
-          // Mint 2 with public invite
-          let tokens = await f0.mint(null, 1)
-          document.querySelector("pre").innerHTML = JSON.stringify(tokens, null, 1)
-        })
+      document.querySelector("#mint").addEventListener("click", async (e) => {
+        document.querySelector("pre").innerHTML = "minting. please sign the transaction and wait..."
+        // Mint 2 with public invite
+        let tokens = await f0.mint(null, 1)
+        document.querySelector("pre").innerHTML = JSON.stringify(tokens, null, 1)
       })
     })
     </script>
