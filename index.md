@@ -8,22 +8,24 @@ layout: default
   <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
   <script src="https://unpkg.com/f0js@0.0.12/dist/f0.js"></script>
   <script id="template" type="text/x-handlebars-template">
-    <img src="{{image}}">
-    <h1>{{title}}</h1>
-    <table class='invites'>
-    <tr>
-      <th>mintt price</th>
-      <th>mint limit</th>
-      <th>Invite</th>
-    </tr>
-    {{#each items}}
-      <tr>
-        <td>{{eth}} ETH</td>
-        <td>{{limit}}</td>
-        <td><a class='btn' href="mint#address={{address}}&key={{key}}">Go</td></a></td>
-      </tr>
-    {{/each}}
-    </table>
+    <div class="wrapper">
+      <img src="{{image}}">
+      <h1>{{title}}</h1>
+      <table class='invites'>
+        <tr>
+          <th>mintt price</th>
+          <th>mint limit</th>
+          <th>Invite</th>
+        </tr>
+        {{#each items}}
+          <tr>
+            <td>{{eth}} ETH</td>
+            <td>{{limit}}</td>
+            <td><a class='btn' href="mint#address={{address}}&key={{key}}">Go</td></a></td>
+          </tr>
+        {{/each}}
+      </table>
+    </div>
   </script>
   <script>
   const f0 = new F0()
