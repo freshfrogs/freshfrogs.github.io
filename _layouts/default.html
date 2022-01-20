@@ -17,23 +17,7 @@
       <header>
         <h1><a href="{{ "/" | absolute_url }}">{{ site.title | default: site.github.repository_name }}</a></h1>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
-        <script src="https://unpkg.com/f0js/dist/f0.js"></script>
-        <script>
-        document.addEventListener("DOMContentLoaded", async () => {
-          const web3 = new Web3(window.ethereum)
-          const f0 = new F0();
-          await f0.init({
-            web3: web3,
-            contract: "0x9500aEe4F34681D38D2f53C634b36b9CCc236d10",
-          })
-          let edition = Math.floor((Math.random() * 4040) + 1);
-          let token = await f0.get(edition);
-          let el = document.createElement("img")
-          el.src= token.converted.image
-          document.body.appendChild(el)
-        })
-        </script>
+        <img>
 
         <p>{{ site.description | default: site.github.project_tagline }}</p>
 
@@ -66,5 +50,21 @@
       </footer>
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+    <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const web3 = new Web3(window.ethereum)
+      const f0 = new F0();
+      await f0.init({
+        web3: web3,
+        contract: "0x9500aEe4F34681D38D2f53C634b36b9CCc236d10",
+      })
+      let edition = Math.floor((Math.random() * 4040) + 1);
+      let token = await f0.get(edition);
+      console.log(token)
+      document.querySelector("img").setAttribute("src", token.converted.image)
+    })
+    </script>
   </body>
 </html>
