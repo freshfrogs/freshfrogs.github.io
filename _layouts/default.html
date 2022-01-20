@@ -27,10 +27,11 @@
             web3: web3,
             contract: "0x9500aEe4F34681D38D2f53C634b36b9CCc236d10",
           })
-          let token = await f0.nextId();
-          console.log(token)
-          document.querySelector("pre").innerHTML = JSON.stringify(token, null, 2)
-          document.querySelector("img").setAttribute("src", token.converted.image)
+          let edition = Math.floor((Math.random() * 4040) + 1);
+          let token = await f0.get(edition);
+          let el = document.createElement("img")
+          el.src= token.converted.image
+          document.body.appendChild(el)
         })
         </script>
 
