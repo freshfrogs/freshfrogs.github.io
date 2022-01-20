@@ -11,20 +11,16 @@ layout: default
     <div class="wrapper">
       <img src="{{image}}">
       <h1>{{title}}</h1>
-      <table>
-        <tr>
-          <th>mintt price</th>
-          <th>mint limit</th>
-          <th>Invite</th>
-        </tr>
+      <ul class="downloads">
+          <li>mintt price</li>
+          <li>mint limit</li>
+          <li>Invite</li>
         {{#each items}}
-          <tr>
-            <td>{{eth}} ETH</td>
-            <td>{{limit}}</td>
-            <td><a href="mint#address={{address}}&key={{key}}">Go</td></a></td>
-          </tr>
+            <li><strong>{{eth}}</strong> ETH</li>
+            <li><strong>{{limit}}</strong></li>
+            <li><a href="mint#address={{address}}&key={{key}}"><strong>Go</strong></a></li>
         {{/each}}
-      </table>
+      </ul>
     </div>
   </script>
   <script>
