@@ -27,7 +27,7 @@
         console.log(token)
         document.querySelector("img").setAttribute("src", token.converted.image)
         document.querySelector("img").setAttribute("alt", "logo")
-        document.querySelector("id").innerHTML = nextId
+        document.querySelector("id").innerHTML = (""+nextId+/4,040)
         document.querySelector("#mint").addEventListener("click", async (e) => {
           document.querySelector("pre").innerHTML = "minting. please sign the transaction and wait..."
           // Mint 2 with public invite
@@ -57,8 +57,8 @@
 
         {% if site.show_downloads %}
         <ul class="downloads">
-          <li><a>0.04 Eth <button class ="downloads" id="mint"><strong>MINT</strong></button></a></li>
-          <li><a href="{{ site.github.tar_url }}">Frog<strong> #<id></id></strong></a></li>
+          <li><a><button class ="downloads" id="mint"><strong>MINT</strong></button> </a></li>
+          <li><a href="{{ site.github.tar_url }}"><id></id><strong>0.04 ETH</strong></a></li>
           <li><a href="{{ site.github.repository_url }}">View On <strong>Opensea</strong></a></li>
         </ul>
         {% endif %}
