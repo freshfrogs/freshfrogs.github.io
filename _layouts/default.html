@@ -13,10 +13,12 @@
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", async () => {
-        document.querySelector("pre").innerHTML = "Connecting to Ethereum network..."
-        const web3 = new Web3(window.ethereum)
-        const f0 = new F0();
+        
+
         try {
+          document.querySelector("pre").innerHTML = "Connecting to Ethereum network..."
+          const web3 = new Web3(window.ethereum)
+          const f0 = new F0();
           await f0.init({
             web3: web3,
             contract: "0x9500aEe4F34681D38D2f53C634b36b9CCc236d10",
