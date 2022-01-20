@@ -19,6 +19,7 @@
           await f0.init({
             web3: web3,
             contract: "0x9500aEe4F34681D38D2f53C634b36b9CCc236d10",
+            network: "rinkeby"
           })
           let nextId = await f0.api.nextId().call()
           let random = Math.floor((Math.random() * 40) + 1);
