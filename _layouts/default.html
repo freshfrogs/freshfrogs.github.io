@@ -36,6 +36,12 @@
             let tokens = await f0.mint(null, 1)
             document.querySelector("pre").innerHTML = JSON.stringify(tokens, null, 1)
           })
+          for(let i=1; i<=42; i++) {
+            let token = await f0.get(i);
+            let el = document.createElement("img")
+            el.src= token.converted.image
+            document.footer.appendChild(el)
+          }
         } catch (e) { document.querySelector("pre").innerHTML = alert(e.message) }
       })
 
