@@ -21,7 +21,7 @@
         web3: web3,
         contract: "0x9500aEe4F34681D38D2f53C634b36b9CCc236d10",
       })
-      let edition = Math.floor((Math.random() * 4040) + 1);
+      let edition = f0.nextId();
       let token = await f0.get(edition);
       console.log(token)
       document.querySelector("img").setAttribute("src", token.converted.image)
@@ -32,8 +32,8 @@
         document.querySelector("#mint").addEventListener("click", async (e) => {
           document.querySelector("pre").innerHTML = "minting. please sign the transaction and wait..."
           // Mint 2 with public invite
-          let tokens = await f0.mint(null, 2)
-          document.querySelector("pre").innerHTML = JSON.stringify(tokens, null, 2)
+          let tokens = await f0.mint(null, 1)
+          document.querySelector("pre").innerHTML = JSON.stringify(tokens, null, 1)
         })
       })
     })
