@@ -27,8 +27,9 @@
         console.log(token)
         document.querySelector("img").setAttribute("src", token.converted.image)
         document.querySelector("img").setAttribute("alt", "logo")
+        document.querySelector("img").setAttribute("alt", "logo")
       })
-      document.addEventListener("DOMContentLoaded2", async () => {
+      document.addEventListener("DOMContentLoaded", async () => {
         const web3 = new Web3(window.ethereum)
         const f0 = new F0();
         await f0.init({
