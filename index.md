@@ -22,7 +22,7 @@ layout: default
     <tr>
       <td>{{eth}} ETH</td>
       <td>{{limit}}</td>
-      <td><a class='btn' href="mint#address={{address}}&key={{key}}">Go</td</a></td>
+      <td><a class='btn' href="mint#address={{address}}&key={{key}}">Go</td></a></td>
     </tr>
   {{/each}}
   </table>
