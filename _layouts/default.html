@@ -23,10 +23,9 @@
         })
         let nextId = await f0.api.nextId().call()
         let random = Math.floor((Math.random() * 4040) + 1);
-        let token = await f0.get(random);
+        let token = await f0.get(nextId);
         console.log(token)
         document.querySelector("img").setAttribute("src", token.converted.image)
-        document.querySelector("img").setAttribute("alt", "logo")
         document.querySelector("img").setAttribute("alt", "logo")
 
         document.querySelector("#mint").addEventListener("click", async (e) => {
@@ -58,7 +57,7 @@
 
         {% if site.show_downloads %}
         <ul class="downloads">
-          <li><button class ="downloads" id="mint">FROG <strong>MINT</strong></button></li>
+          <li><button class ="downloads" id="mint">FROG #<script>document.write(nextId)</script><strong>MINT</strong></button></li>
           <li><a href="{{ site.github.tar_url }}">Download <strong>TAR Ball</strong></a></li>
           <li><a href="{{ site.github.repository_url }}">View On <strong>GitHub</strong></a></li>
         </ul>
