@@ -38,11 +38,11 @@
           })
           for(let i=1; i<=42; i++) {
             let token = await f0.get(i);
-            let el = document.createElement("img")
+            let el = document.footer.createElement("img")
             el.src= token.converted.image
             document.footer.appendChild(el)
           }
-        } catch (e) { document.querySelector("pre").innerHTML = alert(e.message) }
+        } catch (e) { document.querySelector("pre").innerHTML = e.message }
       })
 
     </script>
