@@ -11,7 +11,7 @@ layout: default
     <div class="wrapper">
       <img src="{{image}}">
       <h1>{{title}}</h1>
-      <table class='invites'>
+      <table>
         <tr>
           <th>mintt price</th>
           <th>mint limit</th>
@@ -21,7 +21,7 @@ layout: default
           <tr>
             <td>{{eth}} ETH</td>
             <td>{{limit}}</td>
-            <td><a class='btn' href="mint#address={{address}}&key={{key}}">Go</td></a></td>
+            <td><a href="mint#address={{address}}&key={{key}}">Go</td></a></td>
           </tr>
         {{/each}}
       </table>
