@@ -2,25 +2,9 @@
 layout: default
 ---
 
-Text can be **bold**, _italic_, or ~~strikethrough~~.
+# Forest Frogs NFT Collection
 
-[Link to another page](./another-page.html).
-
-There should be whitespace between paragraphs.
-
-There should be whitespace between paragraphs. We recommend including a README, or a file with information about your project.
-
-# Header 1
-
-This is a normal paragraph following a header. GitHub is a code hosting platform for version control and collaboration. It lets you and others work together on projects from anywhere.
-
-## Forest Frogs NFT Collection
-
-> **Forest Frogs is a NFT collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more! Unbelievably,
-> over 200,000 acres of rainforest are burned every day. That is over 150 acres lost every minute of every day, and 78 million acres are lost every year! A portion of every initial
-> sale will be donated to [The Rainforest Foundation](https://rainforestfoundation.org/) via a direct transfer to their Ethereum wallet. For every 1.00 ETH donated, two and a half
-> acres of rainforest will be saved! As many as 80 different frog species can be found in a single acre of lowland rainforest section alone! So I hope that every FROG owner will be
-> reminded of one of the many species they helped save. Available for mint at [NF7UOS.github.io](htttps://NF7UOS.github.io) #NFT #NotForestTermination**
+Forest Frogs is a NFT collection of **4,040** randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more! Unbelievably, over 200,000 acres of rainforest are burned every day. That is over 150 acres lost every minute of every day, and 78 million acres are lost every year! A portion of every initial sale will be donated to [The Rainforest Foundation](https://rainforestfoundation.org/) via a direct transfer to their Ethereum wallet. For every 1.00 ETH donated, two and a half acres of rainforest will be saved! As many as 80 different frog species can be found in a single acre of lowland rainforest section alone! So I hope that every FROG owner will be reminded of one of the many species they helped save. Available for mint at [NF7UOS.github.io](htttps://NF7UOS.github.io) #NFT #NotForestTermination
 
 ```js
 ```
