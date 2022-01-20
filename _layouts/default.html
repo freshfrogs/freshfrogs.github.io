@@ -5,7 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-{% seo %}
     <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -45,23 +44,12 @@
 
         <img>
 
-        <p>{{ site.description | default: site.github.project_tagline }}</p>
-
-        {% if site.github.is_project_page %}
-        <p class="view"><a href="{{ site.github.repository_url }}">View the Project on GitHub <small>{{ site.github.repository_nwo }}</small></a></p>
-        {% endif %}
-
-        {% if site.github.is_user_page %}
-        <p class="view"><a href="{{ site.github.owner_url }}">View My GitHub Profile</a></p>
-        {% endif %}
-
-        {% if site.show_downloads %}
         <ul class="downloads">
           <li><a> <button class ="downloads" id="mint"><strong>MINT</strong></button> </a></li>
           <li><a><strong>0.04 ETH</strong>plus gas</a></li>
           <li><a><strong><id></id></strong>available</a></li>
         </ul>
-        {% endif %}
+        <p>25% of every sale is donated to https://rainforestfoundation.org</p>
       </header>
       <section>
 
