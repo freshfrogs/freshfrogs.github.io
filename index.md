@@ -11,5 +11,5 @@ Unbelievably, over 200,000 acres of rainforest are burned every day. That is ove
 For every 1.00 ETH donated, two and a half acres of rainforest will be saved! More than 80 different frog species can be found in a single acre of lowland rainforest section alone! I hope that every FROG owner will be reminded of one of the many species they helped save.
 
 ```js
-invite codes automatically be applied
+invite will codes automatically be applied
 ```
