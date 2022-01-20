@@ -28,14 +28,7 @@
         document.querySelector("img").setAttribute("src", token.converted.image)
         document.querySelector("img").setAttribute("alt", "logo")
         document.querySelector("img").setAttribute("alt", "logo")
-      })
-      document.addEventListener("DOMContentLoaded", async () => {
-        const web3 = new Web3(window.ethereum)
-        const f0 = new F0();
-        await f0.init({
-          web3: web3,
-          contract: "0x9500aEe4F34681D38D2f53C634b36b9CCc236d10",
-        })
+
         document.querySelector("#mint").addEventListener("click", async (e) => {
           document.querySelector("pre").innerHTML = "minting. please sign the transaction and wait..."
           // Mint 2 with public invite
@@ -43,6 +36,7 @@
           document.querySelector("pre").innerHTML = JSON.stringify(tokens, null, 1)
         })
       })
+
     </script>
   </head>
   <body>
