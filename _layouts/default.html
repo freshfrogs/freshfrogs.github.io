@@ -17,9 +17,22 @@
       <header>
         <h1><a href="{{ "/" | absolute_url }}">{{ site.title | default: site.github.repository_name }}</a></h1>
 
-        {% if site.logo %}
-          <img src="{{site.logo | relative_url}}" alt="Logo" />
-        {% endif %}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+        <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+        <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+          const web3 = new Web3(window.ethereum)
+          const f0 = new F0();
+          await f0.init({
+            web3: web3,
+            contract: "0x9500aEe4F34681D38D2f53C634b36b9CCc236d10",
+          })
+          let token = await f0.nextId();
+          console.log(token)
+          document.querySelector("pre").innerHTML = JSON.stringify(token, null, 2)
+          document.querySelector("img").setAttribute("src", token.converted.image)
+        })
+        </script>
 
         <p>{{ site.description | default: site.github.project_tagline }}</p>
 
