@@ -21,8 +21,8 @@
         web3: web3,
         contract: "0x9500aEe4F34681D38D2f53C634b36b9CCc236d10",
       })
-
-      let token = await f0.get(f0.nextId());
+      let edition = Math.floor((Math.random() * 4040) + 1);
+      let token = await f0.get(edition);
       console.log(token)
       document.querySelector("img").setAttribute("src", token.converted.image)
       document.querySelector("img").setAttribute("alt", "logo")
