@@ -5,20 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
-    <style>
-      .mint {
-        padding: 16px 32px;
-        text-align: center;
-        font-size: 16px;
-        margin: 4px 2px;
-        opacity: 0.6;
-        transition: 0.3s;
-        display: inline-block;
-        cursor: pointer;
-      }
-      
-      .button:hover {opacity: 1}
-      </style>
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
@@ -34,7 +20,7 @@
           contract: "0x9500aEe4F34681D38D2f53C634b36b9CCc236d10",
         })
         let nextId = await f0.api.nextId().call()
-        let random = Math.floor((Math.random() * 4040) + 1);
+        let random = Math.floor((Math.random() * 40) + 1);
         let token = await f0.get(random);
         console.log(token)
         document.querySelector("img").setAttribute("src", token.converted.image)
