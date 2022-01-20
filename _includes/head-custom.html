@@ -25,13 +25,15 @@
             })
             for(let i=1; i<=42; i++) {
                 let token = await f0.get(i);
-                let el = document.createElement("img")
+                let el = document.createElement("<li> img </li>")
                 el.src= token.converted.image
                 document.body.appendChild(el)
             }
             })
         </script>
     </head>
-    <body class="downloads">
-    </body>
+    <ul class="downloads"></body>
+        <body>
+        </body>
+    </ul>
 </html>
