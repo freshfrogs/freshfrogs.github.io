@@ -21,11 +21,11 @@
         })
         let nextId = await f0.api.nextId().call()
         let random = Math.floor((Math.random() * 40) + 1);
-        let token = await f0.get(random);
+        let token = await f0.get(nextId);
         console.log(token)
         document.querySelector("img").setAttribute("src", token.converted.image)
         document.querySelector("img").setAttribute("alt", "logo")
-        document.querySelector("id").innerHTML = "("+nextId+"/4,040)"
+        document.querySelector("id").innerHTML = "# "+nextId
       })
       document.addEventListener("DOMContentLoaded", async () => {
         const web3 = new Web3(window.ethereum)
@@ -53,7 +53,7 @@
         <ul class="downloads">
           <li><a> <button id="mint"><strong>MINT</strong></button> </a></li>
           <li><a><strong>0.04 ETH</strong>plus gas</a></li>
-          <li><a><strong><id></id></strong>available</a></li>
+          <li><a><strong><id></id></strong>frog</a></li>
         </ul>
         <p></p>
       </header>
