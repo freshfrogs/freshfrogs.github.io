@@ -29,9 +29,9 @@
           document.querySelector("img").setAttribute("src", token.converted.image)
           document.querySelector("img").setAttribute("alt", "logo")
           document.querySelector("id").innerHTML = "# "+nextId
-          document.querySelector("pre").innerHTML = "Invite code automatically applied"
+          document.querySelector("pre").innerHTML = "Invite codes are automatically applied"
           document.querySelector("#mint").addEventListener("click", async (e) => {
-            document.querySelector("pre").innerHTML = "minting. please sign the transaction and wait..."
+            document.querySelector("pre").innerHTML = "Minting. Please sign the transaction and wait..."
             // Mint 2 with public invite
             let tokens = await f0.mint(null, 1)
             document.querySelector("pre").innerHTML = JSON.stringify(tokens, null, 1)
