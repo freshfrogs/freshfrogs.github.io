@@ -25,7 +25,7 @@
             })
             for(let i=1; i<=42; i++) {
                 let token = await f0.get(i);
-                let el = document.createElement("<li> img </li>")
+                let el = document.createElement("img")
                 el.src= token.converted.image
                 document.body.appendChild(el)
             }
