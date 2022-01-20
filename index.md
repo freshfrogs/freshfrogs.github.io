@@ -2,7 +2,7 @@
 layout: default
 ---
 
-# Forest Frogs NFT Collection
+# **Forest Frogs NFT Collection**
 
 Forest Frogs is a NFT collection of **4,040** randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more! 
 
