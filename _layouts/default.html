@@ -39,7 +39,7 @@
           document.querySelector("id").innerHTML = "# "+nextId
           document.querySelector("id2").innerHTML = "\n["+userAcc+"]\n"
           var x = document.querySelector("pre").innerHTML;
-          document.querySelector("pre").innerHTML = x+" [ Connected ]\nYou can now mint to account... [ "+userAcc+" ]\nInvite codes automatically applied."
+          document.querySelector("pre").innerHTML = x+" [ Connected ]\nMinting linked to account... [ "+userAcc+" ]\nInvite codes automatically applied."
           document.querySelector("#mint").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
             document.querySelector("pre").innerHTML = x+"\nMinting. Please sign the transaction and wait..."
@@ -60,7 +60,7 @@
         <img src="/assets/preview.gif">
 
         <ul class="downloads">
-          <li><a id="mint"><strong>MINT</strong>click here<id2>link wallet</id></button></a></li>
+          <li><a id="mint"><strong>MINT</strong>click here<id2>link wallet</id2></a></li>
           <li><a><strong>0.04 ETH</strong>plus gas</a></li>
           <li><a><strong><id>4,040</id></strong>frog</a></li>
         </ul>
