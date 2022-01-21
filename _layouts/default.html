@@ -35,7 +35,7 @@
           document.querySelector("img").setAttribute("alt", "logo")
           document.querySelector("id").innerHTML = "# "+nextId
           var x = document.querySelector("pre").innerHTML;
-          document.querySelector("pre").innerHTML = x+" [ Connected ]</br>Able mint to account ending in..."+userAcc.slice(-4)+"</br>Invite codes automatically applied."
+          document.querySelector("pre").innerHTML = x+" [ Connected ]</br>Able mint to account ending in..."+userAcc+"</br>Invite codes automatically applied."
           document.querySelector("#mint").addEventListener("click", async (e) => {
             document.querySelector("pre").innerHTML = x+"</br>Minting. Please sign the transaction and wait..."
             // Mint 2 with public invite
