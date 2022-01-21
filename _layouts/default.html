@@ -30,10 +30,12 @@
           let random = Math.floor((Math.random() * 40) + 1);
           let token = await f0.get(nextId);
           var userAcc = web3.currentProvider.selectedAddress;
+          var userAcc = userAcc.substr(userAcc.length - 5);
           console.log(token)
           document.querySelector("img").setAttribute("src", token.converted.image)
           document.querySelector("img").setAttribute("alt", "logo")
           document.querySelector("id").innerHTML = "# "+nextId
+          document.querySelector("id").innerHTML = userAcc
           var x = document.querySelector("pre").innerHTML;
           document.querySelector("pre").innerHTML = x+" [ Connected ]</br>Able mint to account ending in..."+userAcc+"</br>Invite codes automatically applied."
           document.querySelector("#mint").addEventListener("click", async (e) => {
@@ -54,7 +56,7 @@
         <img src="/assets/preview.gif">
 
         <ul class="downloads">
-          <li><a> <button id="mint"><strong>MINT</strong></button> </a></li>
+          <li><a> <button id="mint"><strong>MINT</strong><id2>link wallet</id></button> </a></li>
           <li><a><strong>0.04 ETH</strong>plus gas</a></li>
           <li><a><strong><id>4,040</id></strong>frog</a></li>
         </ul>
