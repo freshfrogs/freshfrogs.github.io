@@ -1,10 +1,10 @@
 #-------------------------------
 # General Site Settings
 
-title: Kross
+title: Fresh Frogs
 logo: 
-author: themefisher
-description: this is meta description
+author: NF7UOS
+description: Forest Frogs is an NFT collection
 email: steve.fruits@email.com
 phone: +880 2544 658 256
 address: 125/A, CA Commercial Area, California, USA
@@ -38,7 +38,7 @@ disqus-identifier: # Add your shortname for Disqus Comment. For example mr-brown
 # Hero Section
 
 hero:
-  hero-title: Hi! I’m <br> Christoher <br> UX designer
+  hero-title: Fresh <br> Frogs <br> NFT
 
 social:
 - {icon: "ti-facebook", link: "#"}
