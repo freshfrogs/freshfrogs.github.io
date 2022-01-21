@@ -17,7 +17,6 @@
       
       document.addEventListener("DOMContentLoaded", async () => {
         document.querySelector("pre").innerHTML = "Please connect to Ethereum network..."
-        document.querySelector("pre").appendChild("test")
         let net = await web3.eth.getChainId()
         console.log("net = ", net)
         await window.ethereum.send('eth_requestAccounts');
