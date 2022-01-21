@@ -39,10 +39,10 @@
           document.querySelector("id").innerHTML = "# "+nextId
         //  document.querySelector("id2").innerHTML = "\n["+userAcc+"]\n"
           var x = document.querySelector("pre").innerHTML;
-          document.querySelector("pre").innerHTML = x+" [ Connected ]\nYou can now mint to account... [ "+userAcc+" ]\n"//Invite codes automatically applied."
+          document.querySelector("pre").innerHTML = x+" [ Connected ]\nYou can now mint to account... [ "+userAcc+" ]"//Invite codes automatically applied."
           document.querySelector("#mint").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
-            document.querySelector("pre").innerHTML = x+"\nMinting... Please sign the transaction and wait..."
+            document.querySelector("pre").innerHTML = x+"\nMinting... please sign the transaction and wait..."
             // Mint 2 with public invite
             let tokens = await f0.mint(null, 1)
             document.querySelector("pre").innerHTML = JSON.stringify(tokens, null, 1)
