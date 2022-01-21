@@ -1,72 +1,116 @@
-<div align="center">
-	<h1>kross-jekyll-portfolio-template</h1>
-	<p> Kross jekyll Creative Portfolio Template ported from https://themefisher.com/products/kross-creative-portfolio-template/</p>
-	<a href="http://demo.themefisher.com/kross" >Live Preview</a>
-	<p>More free Bootstrap templates from <a href="https://themefisher.com/free-bootstrap-templates">Here</a>
-	<img src="https://user-images.githubusercontent.com/37659754/58154256-00627500-7c93-11e9-90c1-c145cb396902.gif"  width="100%" alt="kross portfolio template by themefisher">
-</div>
+# The Minimal theme
 
-## Demo
+[![.github/workflows/ci.yaml](https://github.com/pages-themes/minimal/actions/workflows/ci.yaml/badge.svg)](https://github.com/pages-themes/minimal/actions/workflows/ci.yaml) [![Gem Version](https://badge.fury.io/rb/jekyll-theme-minimal.svg)](https://badge.fury.io/rb/jekyll-theme-minimal)
 
-| Homepage  | About  | Blog  | Portfolio  | Contact  |
-|---|---|---|---|---|
-| ![Homepage](https://user-images.githubusercontent.com/37659754/58154295-1a9c5300-7c93-11e9-992c-ad8d2ff8d99f.png) | ![About](https://user-images.githubusercontent.com/37659754/58154317-28ea6f00-7c93-11e9-914b-b7e5f1cdab0e.png) | ![Blog](https://user-images.githubusercontent.com/37659754/58154339-369ff480-7c93-11e9-9568-53b7ebdc6b2d.png) | ![portfolio](https://user-images.githubusercontent.com/37659754/58154368-491a2e00-7c93-11e9-8900-f5a6abe0a61d.png) | ![contact](https://user-images.githubusercontent.com/37659754/58154403-57684a00-7c93-11e9-9cea-ea28253a6f6a.png) |
+*Minimal is a Jekyll theme for GitHub Pages. You can [preview the theme to see what it looks like](http://pages-themes.github.io/minimal), or even [use it today](#usage).*
 
-[Live Preview](http://demo.themefisher.com/kross).
+![Thumbnail of Minimal](thumbnail.png)
 
+## Usage
 
-## Setup
+To use the Minimal theme:
 
-To start your project, fork this repository
-After forking the repo, your site will be live immediately on your personal Github Pages account, e.g. `https://yourusername.github.io/your-repo-name/`.
+1. Add the following to your site's `_config.yml`:
 
-Make sure GitHub Pages is enabled for your repo. It might take some time for the site to propagate entirely.
+    ```yml
+    remote_theme: pages-themes/minimal@v0.2.0
+    plugins:
+    - jekyll-remote-theme # add this line to the plugins list if you already have one
+    ```
 
-## Customize
+2. Optionally, if you'd like to preview your site on your computer, add the following to your site's `Gemfile`:
 
-Things you can customise in `_data/settings.yml` (no HTML/CSS):
-- Theme General Settings ( name, logo, email, phone, address )
-- Hero Section
-- About Section
-- Team Section
-- Skills Section
-- Exprerience Section
-- Education Section
-- Services Section
-- Portfolio Section
-- Testimonials Section
-- Client Slider Section
-- Contact Section
+    ```ruby
+    gem "github-pages", group: :jekyll_plugins
+    ```
 
-## Deployment
+## Customizing
 
-To run the theme locally, navigate to the theme directory and run `bundle install` to install the dependencies, then run `jekyll serve` or `bundle exec jekyll serve` to start the Jekyll server.
-I would recommend checking the [Deployment Methods](https://jekyllrb.com/docs/deployment-methods/) page on Jekyll website.
+### Configuration variables
 
-## Reporting Issues
+Minimal will respect the following variables, if set in your site's `_config.yml`:
 
-We use GitHub Issues as the official bug tracker for the **Kross Theme**. Please Search [existing issues](https://github.com/themefisher/kross-jekyll-portfolio-template/issues). It’s possible someone has already reported the same problem.
-If your problem or idea is not addressed yet, [open a new issue](https://github.com/themefisher/kross-jekyll-portfolio-template/issues/new)
+```yml
+title: [The title of your site]
+description: [A short description of your site's purpose]
+```
 
-## Technical Support or Questions
+Additionally, you may choose to set the following optional variables:
 
-If you have questions or need help integrating the product please [contact us](mailto:themefisher@gmail.com) instead of opening an issue.
+```yml
+show_downloads: ["true" or "false" (unquoted) to indicate whether to provide a download URL]
+google_analytics: [Your Google Analytics tracking ID]
+```
 
-## Licensing
+### Stylesheet
 
-- Copyright 2019 Themefisher (https://themefisher.com/)
-- Licensed under MIT (https://github.com/themefisher/kross-jekyll-portfolio-template/blob/master/LICENSE.txt)
+If you'd like to add your own custom styles:
 
-## Donate Us (Author) 
-This project needs you! If you would like to support this project's further development, the creator of this project or the continuous maintenance of this project, feel free to donate. Your donation is highly appreciated . Thank you!
+1. Create a file called `/assets/css/style.scss` in your site
+2. Add the following content to the top of the file, exactly as shown:
+    ```scss
+    ---
+    ---
 
-* **[Donate $10](https://www.paypal.me/themefisher/10USD)**: Thank's for creating this project, here's a tea (or some juice) for you!
-* **[Donate $20](https://www.paypal.me/themefisher/20USD)**: Wow, I am stunned. Let me take you to the movies!
-* **[Donate $30](https://www.paypal.me/themefisher/30USD)**: I really appreciate your work, let's grab some lunch!
-* **[Donate $40](https://www.paypal.me/themefisher/40USD)**: That's some awesome stuff you did right there, dinner is on me!
-* **[Donate $50](https://www.paypal.me/themefisher/50USD)**: I really really want to support this project, great job!
-* **[Donate $100](https://www.paypal.me/themefisher/100USD)**: You are the man! This project saved me hours (if not days) of struggle and hard work, simply awesome!
-* **[Donate $1500](https://www.paypal.me/themefisher/1500USD)**: Go buddy, buy Macbook Pro for yourself!
+    @import "{{ site.theme }}";
+    ```
+3. Add any custom CSS (or Sass, including imports) you'd like immediately after the `@import` line
 
-Of course, you can also choose what you want to donate, all donations are awesome !
+*Note: If you'd like to change the theme's Sass variables, you must set new values before the `@import` line in your stylesheet.*
 
+### Layouts
+
+If you'd like to change the theme's HTML layout:
+
+1. For some changes such as a custom `favicon`, you can add custom files in your local `_includes` folder. The files [provided with the theme](https://github.com/pages-themes/minimal/tree/master/_includes) provide a starting point and are included by the [original layout template](https://github.com/pages-themes/minimal/blob/master/_layouts/default.html).
+2. For more extensive changes, [copy the original template](https://github.com/pages-themes/minimal/blob/master/_layouts/default.html) from the theme's repository<br />(*Pro-tip: click "raw" to make copying easier*)
+3. Create a file called `/_layouts/default.html` in your site
+4. Paste the default layout content copied in the first step
+5. Customize the layout as you'd like
+
+### Customizing Google Analytics code
+
+Google has released several iterations to their Google Analytics code over the years since this theme was first created. If you would like to take advantage of the latest code, paste it into `_includes/head-custom-google-analytics.html` in your Jekyll site.
+
+### Overriding GitHub-generated URLs
+
+Templates often rely on URLs supplied by GitHub such as links to your repository or links to download your project. If you'd like to override one or more default URLs:
+
+1. Look at [the template source](https://github.com/pages-themes/minimal/blob/master/_layouts/default.html) to determine the name of the variable. It will be in the form of `{{ site.github.zip_url }}`.
+2. Specify the URL that you'd like the template to use in your site's `_config.yml`. For example, if the variable was `site.github.url`, you'd add the following:
+    ```yml
+    github:
+      zip_url: http://example.com/download.zip
+      another_url: another value
+    ```
+3. When your site is built, Jekyll will use the URL you specified, rather than the default one provided by GitHub.
+
+*Note: You must remove the `site.` prefix, and each variable name (after the `github.`) should be indent with two space below `github:`.*
+
+For more information, see [the Jekyll variables documentation](https://jekyllrb.com/docs/variables/).
+
+## Roadmap
+
+See the [open issues](https://github.com/pages-themes/minimal/issues) for a list of proposed features (and known issues).
+
+## Project philosophy
+
+The Minimal theme is intended to make it quick and easy for GitHub Pages users to create their first (or 100th) website. The theme should meet the vast majority of users' needs out of the box, erring on the side of simplicity rather than flexibility, and provide users the opportunity to opt-in to additional complexity if they have specific needs or wish to further customize their experience (such as adding custom CSS or modifying the default layout). It should also look great, but that goes without saying.
+
+## Contributing
+
+Interested in contributing to Minimal? We'd love your help. Minimal is an open source project, built one contribution at a time by users like you. See [the CONTRIBUTING file](docs/CONTRIBUTING.md) for instructions on how to contribute.
+
+### Previewing the theme locally
+
+If you'd like to preview the theme locally (for example, in the process of proposing a change):
+
+1. Clone down the theme's repository (`git clone https://github.com/pages-themes/minimal`)
+2. `cd` into the theme's directory
+3. Run `script/bootstrap` to install the necessary dependencies
+4. Run `bundle exec jekyll serve` to start the preview server
+5. Visit [`localhost:4000`](http://localhost:4000) in your browser to preview the theme
+
+### Running tests
+
+The theme contains a minimal test suite, to ensure a site with the theme would build successfully. To run the tests, simply run `script/cibuild`. You'll need to run `script/bootstrap` once before the test script will work.
