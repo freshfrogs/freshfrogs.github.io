@@ -29,7 +29,7 @@
           let nextId = await f0.api.nextId().call()
           let random = Math.floor((Math.random() * 40) + 1);
           let token = await f0.get(nextId);
-          let userAcc = web3.eth.accounts[0];
+          var userAcc = web3.currentProvider.selectedAddress;
           console.log(token)
           document.querySelector("img").setAttribute("src", token.converted.image)
           document.querySelector("img").setAttribute("alt", "logo")
