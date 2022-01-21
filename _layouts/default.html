@@ -15,11 +15,12 @@
       const web3 = new Web3(window.ethereum)
 
       document.addEventListener("DOMContentLoaded", async () => {
-        document.querySelector("pre").innerHTML = "Please connect to Ethereum network..."
+        document.querySelector("pre").innerHTML = "Please connect your Ethereum wallet..."
         let net = await web3.eth.getChainId()
         console.log("net = ", net)
         await window.ethereum.send('eth_requestAccounts');
         try {
+          document.querySelector("pre").innerHTML = "Connecting to Ethereum blockchain..."
           await f0.init({
             web3: web3,
             contract: "0x9500aEe4F34681D38D2f53C634b36b9CCc236d10",
@@ -33,10 +34,10 @@
           document.querySelector("img").setAttribute("alt", "logo")
           document.querySelector("id").innerHTML = "# "+nextId
           var x = document.querySelector("pre").innerHTML;
-          document.querySelector("pre").innerHTML = x+"</br>Connected."
-          document.querySelector("pre").innerHtmL = "Connected."
+          document.querySelector("pre").innerHTML = x+"Done."
           document.querySelector("#mint").addEventListener("click", async (e) => {
-            document.querySelector("pre").innerHTML = "Minting. Please sign the transaction and wait..."
+            var x = document.querySelector("pre").innerHTML;
+            document.querySelector("pre").innerHTML = x+"</br>Minting. Please sign the transaction and wait..."
             // Mint 2 with public invite
             let tokens = await f0.mint(null, 1)
             document.querySelector("pre").innerHTML = JSON.stringify(tokens, null, 1)
