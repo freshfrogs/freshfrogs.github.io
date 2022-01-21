@@ -1,15 +1,15 @@
 ---
-layout: home
-permalink: /
-permalink_name: /home
-title: jekyll-shell-theme
-
-detail_image: assets/theme_logo.svg
-
+layout: default
 ---
 
-# jekyll-shell-theme
+# **Forest Frogs NFT Collection**
 
-**Jekyll Shell Theme** is an open source light-weight customizable jekyll theme for your site! You can use it to spice up your personal profiles, project pages or just about anything!
+Forest Frogs is a NFT collection of **4,040** randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more! 
 
-No prior web-dev knowledge is required to use the theme to make a website, just follow the instructions in [/read-me](read-me) to set up your web page and start filling it with hackery content! You can see sone features of the theme in [/preview](preview).
+Unbelievably, over 200,000 acres of rainforest are burned every day. That is over 150 acres lost every minute of every day, and 78 million acres are lost every year! A portion of every initial sale will be donated to [The Rainforest Foundation](https://rainforestfoundation.org/) via a direct transfer to their Ethereum wallet.
+
+For every 1.00 ETH donated, two and a half acres of rainforest will be saved! More than 80 different frog species can be found in a single acre of lowland rainforest section alone! I hope that every FROG owner will be reminded of one of the many species they helped save.
+
+```js
+Please connect your Ethereum wallet...
+```
