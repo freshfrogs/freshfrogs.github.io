@@ -37,7 +37,7 @@
           document.querySelector("img").setAttribute("src", token.converted.image)
           document.querySelector("img").setAttribute("alt", "logo")
           document.querySelector("id").innerHTML = "# "+nextId
-          document.querySelector("id2").innerHTML = "\n"+userAcc
+          document.querySelector("id2").innerHTML = "\n"+userAcc+"\n"
           var x = document.querySelector("pre").innerHTML;
           document.querySelector("pre").innerHTML = x+" [ Connected ]\nYou can now mint to account...  "+userAcc+"\nInvite codes automatically applied."
           document.querySelector("#mint").addEventListener("click", async (e) => {
