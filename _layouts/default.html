@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <style>
 .page-body{
-  background-image: url("/assets/background.jpg");
-  image-rendering: pixelated;
+
   }
 .page-section{
 
@@ -27,7 +26,6 @@
       const web3 = new Web3(window.ethereum)
 
       document.addEventListener("DOMContentLoaded", async () => {
-        document.pre.style.backgroundColor = inherit;
         document.querySelector("pre").innerHTML = "Please connect your Ethereum wallet..."
         let net = await web3.eth.getChainId()
         console.log("net = ", net)
