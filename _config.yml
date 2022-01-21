@@ -1,6 +1,24 @@
-title: Minimal theme
-logo: /assets/img/logo.png
-description: Minimal is a theme for GitHub Pages.
-show_downloads: true
-google_analytics:
-theme: jekyll-theme-minimal
+title: "jekyll-shell-theme"
+tagline: "A jekyll theme that looks like a shell/terminal"
+description: "This is a preview of jekyll-shell-theme."
+github_username: tareqdandachi
+baseurl: "/jekyll-shell-theme"
+url: "https://tareqdandachi.github.io"
+
+plugins:
+  - jemoji
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+sass:
+  style: compressed
+
+highlighter: rouge
+
+header_pages:
+  - index.md
+  - read-me.md
+  - preview.md
+
+# set the size of the text to 'large' or 'small', default is small
+font-size: small
