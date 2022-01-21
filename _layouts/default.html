@@ -8,7 +8,6 @@
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
     <script>
@@ -17,7 +16,6 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
         document.querySelector("pre").innerHTML = "Please connect to Ethereum network..."
-
         let net = await web3.eth.getChainId()
         console.log("net = ", net)
         await window.ethereum.send('eth_requestAccounts');
@@ -31,6 +29,9 @@
           let random = Math.floor((Math.random() * 40) + 1);
           let token = await f0.get(nextId);
           console.log(token)
+          var paragraph = document.getElementById("p");
+          var text = document.createTextNode("This just got added");
+          paragraph.appendChild(text);
           document.querySelector("img").setAttribute("src", token.converted.image)
           document.querySelector("img").setAttribute("alt", "logo")
           document.querySelector("id").innerHTML = "# "+nextId
@@ -61,7 +62,6 @@
       <section>
  
         {{ content }}
-        <konsole>Please connect your Ethereum wallet...</konsole>>
       
       </section>
       <footer>
