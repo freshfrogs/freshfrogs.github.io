@@ -29,11 +29,9 @@
           let random = Math.floor((Math.random() * 40) + 1);
           let token = await f0.get(nextId);
           console.log(token)
-          var paragraph = document.getElementById("p");
-          var text = document.createTextNode("This just got added");
-          paragraph.appendChild(text);
           document.querySelector("img").setAttribute("src", token.converted.image)
           document.querySelector("img").setAttribute("alt", "logo")
+          document.querySelector("p").createTextNode("Test");
           document.querySelector("id").innerHTML = "# "+nextId
           document.querySelector("pre").innerHTML = "Connected to Ethereum blockchain..."
           document.querySelector("#mint").addEventListener("click", async (e) => {
