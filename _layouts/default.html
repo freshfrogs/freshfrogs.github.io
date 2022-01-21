@@ -36,14 +36,12 @@
           var x = document.querySelector("pre").innerHTML;
           document.querySelector("pre").innerHTML = x+" [ Connected ]</br>You are now able to mint.</br>Invite codes have automatically been applied."
           document.querySelector("#mint").addEventListener("click", async (e) => {
-            var x = document.querySelector("pre").innerHTML;
             document.querySelector("pre").innerHTML = x+"</br>Minting. Please sign the transaction and wait..."
             // Mint 2 with public invite
             let tokens = await f0.mint(null, 1)
             document.querySelector("pre").innerHTML = JSON.stringify(tokens, null, 1)
           })
         } catch (e) { 
-          var x = document.querySelector("pre").innerHTML;
           document.querySelector("pre").innerHTML = x+"</br>"+e.message }
       })
     </script>
