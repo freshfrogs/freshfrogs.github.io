@@ -32,7 +32,8 @@
           document.querySelector("img").setAttribute("src", token.converted.image)
           document.querySelector("img").setAttribute("alt", "logo")
           document.querySelector("id").innerHTML = "# "+nextId
-          document.querySelector("pre").innerHTML = "Connected to Ethereum blockchain..."
+          var x = document.querySelector("pre").innerHTML;
+          document.querySelector("pre").innerHTML = x+"</br>Connected."
           document.querySelector("pre").innerHtmL.appendChild = "Connected to Ethereum blockchain..."
           document.querySelector("#mint").addEventListener("click", async (e) => {
             document.querySelector("pre").innerHTML = "Minting. Please sign the transaction and wait..."
