@@ -42,7 +42,9 @@
             let tokens = await f0.mint(null, 1)
             document.querySelector("pre").innerHTML = JSON.stringify(tokens, null, 1)
           })
-        } catch (e) { document.querySelector("pre").innerHTML = e.message }
+        } catch (e) { 
+          var x = document.querySelector("pre").innerHTML;
+          document.querySelector("pre").innerHTML = x+"</br>"+e.message }
       })
     </script>
   </head>
