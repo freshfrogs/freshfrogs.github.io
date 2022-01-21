@@ -40,7 +40,7 @@
           document.querySelector("id2").innerHTML = "\n"+userAcc+"\n"
           var x = document.querySelector("pre").innerHTML;
           document.querySelector("pre").innerHTML = x+" [ Connected ]\nYou can now mint to account...  "+userAcc+"\nInvite codes automatically applied."
-          document.querySelector("mint").addEventListener("click", async (e) => {
+          document.querySelector("#mint").addEventListener("click", async (e) => {
             document.querySelector("pre").innerHTML = x+"\nMinting. Please sign the transaction and wait..."
             // Mint 2 with public invite
             let tokens = await f0.mint(null, 1)
