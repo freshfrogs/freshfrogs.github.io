@@ -32,7 +32,7 @@
           var userAcc = web3.currentProvider.selectedAddress;
           var last5 = userAcc.substr(userAcc.length - 5);
           var first5 = userAcc.substr(userAcc.length + 5)
-          userAcc = first5+"..."+last5
+          var userAcc = first5+"..."+last5
           console.log(token)
           document.querySelector("img").setAttribute("src", token.converted.image)
           document.querySelector("img").setAttribute("alt", "logo")
