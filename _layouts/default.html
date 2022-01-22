@@ -66,7 +66,8 @@ img {
          // document.querySelector("img").setAttribute("src", token.converted.image)
          // document.querySelector("img").setAttribute("alt", "logo")
           for(let i=1; i<=6; i++) {
-            let token = await f0.get(i);
+            let i2 = nextId+i
+            let token = await f0.get(i2);
             let el = document.createElement("img")
             el.src = token.converted.image
             document.getElementById("test").appendChild(el)
