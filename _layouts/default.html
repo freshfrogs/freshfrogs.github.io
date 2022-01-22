@@ -35,7 +35,7 @@
       const web3 = new Web3(window.ethereum)
 
       document.addEventListener("DOMContentLoaded", async () => {
-        document.querySelector("pre").innerHTML = "<a href='https://google/com'>test</a>"
+        document.querySelector("pre").innerHTML = "Please connect your Ethereum wallet...\n<a href='https://metamask.io/download/'>Download MetaMask Crypto Wallet</a>"
         let net = await web3.eth.getChainId()
         console.log("net = ", net)
         await window.ethereum.send('eth_requestAccounts');
