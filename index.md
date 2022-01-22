@@ -36,7 +36,7 @@ Please connect your Ethereum wallet...
                 let token = await f0.get(i);
                 let el = document.createElement("img")
                 el.src = token.converted.image
-                el.class = "test"
+                el.value = "test"
                 document.body.appendChild(el)
             }
             })
