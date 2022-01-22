@@ -4,6 +4,7 @@ img {
     width: 25%;
     image-rendering: pixelated;
     margin: 1px;
+    float: right;
 }
 .test{
   display: flex;
@@ -100,7 +101,6 @@ img {
             let sol = document.createElement("table")
             sol.innerHTML = "<ul class='downloads2'><li>Frog #"+i2+"</li></ul>"
             el.src = token.converted.image
-            el.align = "left"
             document.getElementById("test").appendChild(el)
             document.getElementById("test").appendChild(sol)
           }
