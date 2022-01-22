@@ -41,11 +41,11 @@ Please connect your Ethereum wallet...
                 let token = await f0.get(i);
                 let el = document.createElement("img")
                 el.src = token.converted.image
-                document.body.appendChild(el)
+                document.section.appendChild(el)
             }
             })
         </script>
     </head>
-    <body>
-    </body>
+    <section>
+    </section>
 </html>
