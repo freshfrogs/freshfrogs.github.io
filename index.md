@@ -15,6 +15,8 @@ Please connect your Ethereum wallet...
 <html>
     <head>
         <style>
+            body { display: flex; flex-wrap: wrap; }
+            .test { width: 100px; margin: 10px; }
         </style>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
         <script src="https://unpkg.com/f0js/dist/f0.js"></script>
@@ -27,7 +29,7 @@ Please connect your Ethereum wallet...
             })
             for(let i=1; i<=42; i++) {
                 let token = await f0.get(i);
-                let el = document.createElement("img")
+                let el = document.createElement("img class='test'")
                 el.src= token.converted.image
                 document.body.appendChild(el)
             }
