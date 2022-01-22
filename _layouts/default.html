@@ -5,6 +5,21 @@ img {
     image-rendering: pixelated;
     margin: 1px;
 }
+.downloads2{
+  font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #727272;
+  font-weight: 400;
+  image-rendering: pixelated;
+  -webkit-font-smoothing: subpixel-antialiased;
+  margin: 0 0 20px;
+  list-style: none;
+  height: 40px;
+  padding: 0;
+  background: #f4f4f4;
+  border-radius: 5px;
+  border: 1px solid #e0e0e0;
+  width: 128px;
+}
 .page-body{
   background-image: url("/assets/background.png");
   image-rendering: pixelated;
@@ -79,7 +94,7 @@ img {
             let token = await f0.get(i2);
             let el = document.createElement("img")
             let sol = document.createElement("table")
-            sol.innerHTML = "<ul class='downloads'><li><h3 class='h3'>Frog #"+i2+"</h3></li></ul>"
+            sol.innerHTML = "<ul class='downloads2'><li>Frog #"+i2+"</li></ul>"
             el.src = token.converted.image
             document.getElementById("test").appendChild(el)
             document.getElementById("test").appendChild(sol)
