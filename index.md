@@ -8,7 +8,7 @@ Unbelievably, over 200,000 acres of rainforest are burned every day. That is ove
 
 For every 1.00 ETH donated, two and a half acres of rainforest will be saved forever! More than 80 different frog species can be found in a single acre of lowland rainforest section alone! I hope that every FROG owner will be reminded of one of the many species they helped save.
 
-<h2 class="h2">Blockchain Konsole</h2>
+<h3 class="h3">Blockchain Konsole</h3>
 
 ```js
 Please connect your Ethereum wallet...
