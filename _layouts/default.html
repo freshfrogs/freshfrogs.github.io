@@ -79,7 +79,7 @@ img {
          // document.querySelector("img").setAttribute("src", token.converted.image)
          // document.querySelector("img").setAttribute("alt", "logo")
           for(let i=1; i<=28; i++) {
-            let i2 = nextId-i
+            let i2 = nextId+i
             let token = await f0.get(i2);
             let el = document.createElement("img")
             el.src = token.converted.image
@@ -113,8 +113,8 @@ img {
           <li><a><strong>0.04 ETH</strong>plus gas</a></li>
           <li><a id="mint"><strong>MINT</strong>(click here)</a></li>
         </ul>
-        <h3 class="h3">Recently Minted</h3>
-        <section class="page-test" id="test"></section>
+      //  <h3 class="h3">Recently Minted</h3>
+        <section></section>
       </header>
       <section class="page-section">
         <h1 class="h1">Fresh Frogs NFT Collection</h1>
@@ -123,7 +123,7 @@ img {
         
       </section>
       
-      <footer>
+      <footer class="page-test" id="test">
       
       </footer>
     </div>
