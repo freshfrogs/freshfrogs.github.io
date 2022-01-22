@@ -20,7 +20,7 @@ Please connect your Ethereum wallet...
                 border: 1px solid #ddd;
                 border-radius: 4px;
                 padding: 5px;
-                width: 150px;
+                width: 15px;
             }
         </style>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
@@ -36,7 +36,7 @@ Please connect your Ethereum wallet...
                 let token = await f0.get(i);
                 let el = document.createElement("img")
                 el.src = token.converted.image
-                el.value = "test"
+                el.setAttributeNode(width: 15px;)
                 document.body.appendChild(el)
             }
             })
