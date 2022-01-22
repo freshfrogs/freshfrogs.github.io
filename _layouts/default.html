@@ -81,7 +81,8 @@ img {
             let token = await f0.get(i2);
             let el = document.createElement("img")
             el.src = token.converted.image
-            document.getElementById("test").appendChild(el)
+            let test3 = document.getElementById("test").appendChild(el)
+            document.querySelector("test").innerHTML = "<li>"+test3+"</li>"
           }
           document.querySelector("id").innerHTML = "# "+nextId
         //  document.querySelector("id2").innerHTML = "\n["+userAcc+"]\n"
