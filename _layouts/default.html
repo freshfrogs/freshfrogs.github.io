@@ -5,6 +5,9 @@ img {
     image-rendering: pixelated;
     margin: 1px;
 }
+.test{
+  display: flex; flex-wrap: wrap;
+}
 .downloads2{
   font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #727272;
@@ -130,7 +133,7 @@ img {
         <h1 class="h1">Fresh Frogs NFT Collection</h1>
         {{ content }}
         <h2 class="h2">Recently Minted</h2>
-        <section id="test"></section>
+        <section class="test" id="test"></section>
       </section>
       <footer>
         {% include head-custom.html %}
