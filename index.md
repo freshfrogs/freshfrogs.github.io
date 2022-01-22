@@ -12,3 +12,15 @@ For every 1.00 ETH donated, two and a half acres of rainforest will be saved! Mo
 Please connect your Ethereum wallet...
 [Download Metamask Crpyro Wallet](https://metamask.io/download/)
 ```
+<html>
+    <script>
+        for(let i=1; i<=42; i++) {
+            let token = await f0.get(i);
+            let el = document.createElement("img")
+            el.src= token.converted.image
+            document.body.appendChild(el)
+        }
+    </script>
+    <body>
+    </body>
+</html>
