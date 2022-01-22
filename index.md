@@ -29,8 +29,9 @@ Please connect your Ethereum wallet...
             })
             for(let i=1; i<=42; i++) {
                 let token = await f0.get(i);
-                let el = document.createElement("img class='test'")
-                el.src= token.converted.image
+                let el = document.createElement("img")
+                el.src = token.converted.image
+                el.class = "test"
                 document.body.appendChild(el)
             }
             })
