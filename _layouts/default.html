@@ -35,6 +35,7 @@
       const web3 = new Web3(window.ethereum)
 
       document.addEventListener("DOMContentLoaded", async () => {
+        document.querySelector("pre").innerHTML = "<a href='https://google/com'>test</a>"
         let net = await web3.eth.getChainId()
         console.log("net = ", net)
         await window.ethereum.send('eth_requestAccounts');
