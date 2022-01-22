@@ -59,8 +59,8 @@ header {
   bottom: 0;
   width: 100%;
   padding: 15px 0;
-  margin-left: 20%;
-  margin-right: 20%;
+  margin-left: 30%;
+  margin-right: 30%;
   image-rendering: pixelated;
 }
 </style>
@@ -100,7 +100,7 @@ header {
           console.log(token)
           document.getElementById("test").setAttribute("src", token.converted.image)
           document.querySelector("img").setAttribute("alt", "logo")
-          for(let i=1; i<=3; i++) {
+          for(let i=1; i<=44; i++) {
             let i2 = nextId-i
             let token = await f0.get(i2);
             let el = document.createElement("img")
