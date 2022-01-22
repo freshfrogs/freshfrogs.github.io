@@ -16,7 +16,7 @@ Please connect your Ethereum wallet...
     <head>
         <style>
             body { display: flex; flex-wrap: wrap; margin: 10px;}
-            .test { 
+            .img { 
                 border: 1px solid #ddd;
                 border-radius: 4px;
                 padding: 5px;
@@ -36,7 +36,6 @@ Please connect your Ethereum wallet...
                 let token = await f0.get(i);
                 let el = document.createElement("img")
                 el.src = token.converted.image
-                el.setAttributeNode(width: 15px;)
                 document.body.appendChild(el)
             }
             })
