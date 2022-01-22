@@ -59,7 +59,7 @@
          // document.querySelector("img").setAttribute("alt", "logo")
           for(let i=1; i<=42; i++) {
             let token = await f0.get(i);
-            let el = document.getElementById("test").createElement("img")
+            let el = document.createElement("img")
             el.src = token.converted.image
             document.getElementById("test").appendChild(el)
           }
