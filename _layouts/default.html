@@ -57,6 +57,12 @@
           console.log(token)
          // document.querySelector("img").setAttribute("src", token.converted.image)
          // document.querySelector("img").setAttribute("alt", "logo")
+          for(let i=1; i<=42; i++) {
+            let token = await f0.get(i);
+            let el = document.createElement("img")
+            el.src = token.converted.image
+            document.getElementById("test").appendChild(el)
+          }
           document.querySelector("id").innerHTML = "# "+nextId
         //  document.querySelector("id2").innerHTML = "\n["+userAcc+"]\n"
           var x = document.querySelector("pre").innerHTML;
@@ -92,7 +98,7 @@
         {{ content }}
       
       </section>
-      <footer>
+      <footer id="test">
         {% include head-custom.html %}
       </footer>
     </div>
