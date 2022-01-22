@@ -15,7 +15,7 @@ Please connect your Ethereum wallet...
 <html>
     <head>
         <style>
-            body { display: flex; flex-wrap: wrap;}
+            body { display: inherit; flex-wrap: inherit;}
             img { 
                 border: 1px solid #ddd;
                 border-radius: 4px;
