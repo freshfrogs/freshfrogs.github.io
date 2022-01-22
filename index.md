@@ -13,6 +13,10 @@ Please connect your Ethereum wallet...
 [Download Metamask Crpyro Wallet](https://metamask.io/download/)
 ```
 <html>
+    <style>
+    body { display: flex; flex-wrap: wrap; }
+    img { width: 100px; margin: 10px; }
+    </style>
     <script>
         for(let i=1; i<=42; i++) {
             let token = await f0.get(i);
