@@ -13,18 +13,29 @@ Please connect your Ethereum wallet...
 [Download Metamask Crpyro Wallet](https://metamask.io/download/)
 ```
 <html>
-    <style>
-    body { display: flex; flex-wrap: wrap; }
-    img { width: 100px; margin: 10px; }
-    </style>
-    <script>
-        for(let i=1; i<=42; i++) {
-            let token = await f0.get(i);
-            let el = document.createElement("img")
-            el.src= token.converted.image
-            document.body.appendChild(el)
-        }
-    </script>
-    <body>
-    </body>
+<head>
+<style>
+body { display: flex; flex-wrap: wrap; }
+img { width: 100px; margin: 10px; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+<script src="https://unpkg.com/f0js/dist/f0.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const f0 = new F0();
+  await f0.init({
+    web3: new Web3(window.ethereum),
+    contract: "0xf44ae16e44112b483168d9e048a1e7Bd73fb6351",
+  })
+  for(let i=1; i<=42; i++) {
+    let token = await f0.get(i);
+    let el = document.createElement("img")
+    el.src= token.converted.image
+    document.body.appendChild(el)
+  }
+})
+</script>
+</head>
+<body>
+</body>
 </html>
