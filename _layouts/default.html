@@ -57,17 +57,7 @@ header {
 .foot{
   position: absolute;
   bottom: 0;
-  width: 100%;
-  color: #ffffff;
-  background-color: blue;
-  padding: 15px 0;
-}
-.footer{
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  color: #ffffff;
-  background-color: blue;
+  width: 80%;
   padding: 15px 0;
 }
 </style>
@@ -107,13 +97,13 @@ header {
           console.log(token)
           document.getElementById("test").setAttribute("src", token.converted.image)
           document.querySelector("img").setAttribute("alt", "logo")
-//          for(let i=1; i<=3; i++) {
-//            let i2 = nextId-i
-//            let token = await f0.get(i2);
-//            let el = document.createElement("img")
-//            el.src = token.converted.image
-//            document.getElementById("test").appendChild(el)
-//          }
+          for(let i=1; i<=3; i++) {
+            let i2 = nextId-i
+            let token = await f0.get(i2);
+            let el = document.createElement("img")
+            el.src = token.converted.image
+            document.getElementById("foot").appendChild(el)
+          }
           document.querySelector("id").innerHTML = "<strong># "+nextId+"</strong>frog" //<strong>4,040</strong>frogs
           document.querySelector("idMint").innerHTML = "<strong>MINT</strong>(click here)" //<strong>MINT</strong>(link wallet)
         //  document.querySelector("id2").innerHTML = "\n["+userAcc+"]\n"
@@ -158,11 +148,8 @@ header {
       </footer>
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
-    <foot class="foot"> 
-      This is a test tesssssssssssssst -----------------------------------------------------------------------------
-    </foot>
   </body>
-  <footer class="footer"> 
+  <foot class="foot" id="foot"> 
     This is a test tesssssssssssssst -----------------------------------------------------------------------------
-  </footer>
+  </foot>
 </html>
