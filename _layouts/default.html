@@ -107,6 +107,7 @@ header {
           var userAcc = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
           console.log(token)
           document.getElementById("test").setAttribute("src", token.converted.image)
+          document.getElementById("test").setAttribute("class", "test pixelated")
           document.querySelector("img").setAttribute("alt", "logo")
           for(let i=1; i<=28; i++) {
             let i2 = nextId+i
