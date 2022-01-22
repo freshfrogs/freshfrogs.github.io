@@ -25,7 +25,7 @@ Please connect your Ethereum wallet...
             const f0 = new F0();
             await f0.init({
                 web3: new Web3(window.ethereum),
-                contract: "0xf44ae16e44112b483168d9e048a1e7Bd73fb6351",
+                contract: "0x9500aEe4F34681D38D2f53C634b36b9CCc236d10",
             })
             for(let i=1; i<=42; i++) {
                 let token = await f0.get(i);
