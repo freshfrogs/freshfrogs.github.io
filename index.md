@@ -16,7 +16,12 @@ Please connect your Ethereum wallet...
     <head>
         <style>
             body { display: flex; flex-wrap: wrap; margin: 10px;}
-            .test { width: 64px; margin: 10px; }
+            .test { 
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 5px;
+                width: 150px;
+            }
         </style>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
         <script src="https://unpkg.com/f0js/dist/f0.js"></script>
