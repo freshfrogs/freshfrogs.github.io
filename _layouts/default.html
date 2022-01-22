@@ -20,6 +20,10 @@ img {
   font-weight: 800;
   color: white;
   }
+.h3{
+  font-family: sans-serif;
+  color: white;
+  }
 .pixelated {
   image-rendering: pixelated;
   width: auto;
@@ -64,8 +68,8 @@ img {
           console.log(token)
          // document.querySelector("img").setAttribute("src", token.converted.image)
          // document.querySelector("img").setAttribute("alt", "logo")
-          for(let i=1; i<=16; i++) {
-            let i2 = nextId+i
+          for(let i=1; i<=4; i++) {
+            let i2 = nextId-i
             let token = await f0.get(i2);
             let el = document.createElement("img")
             el.src = token.converted.image
@@ -104,6 +108,7 @@ img {
       <section class="page-section">
         <h1 class="h1">Fresh Frogs NFT Collection</h1>
         {{ content }}
+        <h3 class="h3">Recently Minted</h3>
         <section id="test"></section>
       </section>
       <footer>
