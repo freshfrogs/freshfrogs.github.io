@@ -74,12 +74,12 @@ img {
           console.log(token)
           document.querySelector("img").setAttribute("src", token.converted.image)
           document.querySelector("img").setAttribute("alt", "logo")
-          for(let i=1; i<=28; i++) {
-            let i2 = nextId+i
+          for(let i=1; i<=3; i++) {
+            let i2 = nextId-i
             let token = await f0.get(i2);
             let el = document.createElement("img")
             el.src = token.converted.image
-            document.getElementById("test").appendChild(el)
+            document.getElementById("recentlyMinted").appendChild(el)
           }
           document.querySelector("id").innerHTML = "# "+nextId
         //  document.querySelector("id2").innerHTML = "\n["+userAcc+"]\n"
@@ -107,7 +107,7 @@ img {
           <li><a><strong>0.04 ETH</strong>plus gas</a></li>
           <li><a id="mint"><strong>MINT</strong>(click here)</a></li>
         </ul>
-        <section id="test"></section>
+        <section id="recentlyMinted"></section>
         <ul class="downloads">
           <li><a><strong><id>4,040</id></strong>frog</a></li>
           <li><a><strong>0.04 ETH</strong>plus gas</a></li>
