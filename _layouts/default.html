@@ -78,8 +78,8 @@ img {
           console.log(token)
          // document.querySelector("img").setAttribute("src", token.converted.image)
          // document.querySelector("img").setAttribute("alt", "logo")
-          for(let i=1; i<=40; i++) {
-            let i2 = nextId+i
+          for(let i=1; i<=28; i++) {
+            let i2 = nextId-i
             let token = await f0.get(i2);
             let el = document.createElement("img")
             el.src = token.converted.image
