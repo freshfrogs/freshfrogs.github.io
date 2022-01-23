@@ -133,7 +133,7 @@ header {
           //
           document.querySelector("#gasEst").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
-            document.querySelector("pre").innerHTML = x+"\nCalculating estimated mint cost..."+JSON.stringify(estimate, null, 2)
+            document.querySelector("pre").innerHTML = x+"\nCalculating estimated gas cost..."+JSON.stringify(estimate, null, 1)
           })
           //
           document.querySelector("#mint").addEventListener("click", async (e) => {
