@@ -6,6 +6,9 @@ img {
     margin: 2px;
     filter: blur(0px);
 }
+.hrBlack{
+  border: 1px solid black;
+}
 .pixelated2 { 
     width: 80px;
     image-rendering: pixelated;
@@ -95,7 +98,7 @@ header {
       const f0 = new F0();
       const web3 = new Web3(window.ethereum)
       document.addEventListener("DOMContentLoaded", async () => { // https://nf7uos.github.io/
-        document.querySelector("pre").innerHTML = "<h2 class='h2'>Minting Process</h2>"+"\nFirst please connect your Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b>"+"\nDon't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b>"
+        document.querySelector("pre").innerHTML = "<h2 class='h2'>Minting Process</h2><hr class='hrBlack'>"+"\nFirst please connect your Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b>"+"\nDon't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b>"
        // document.querySelector("pre").innerHTML = ""
         let net = await web3.eth.getChainId()
         console.log("net = ", net)
