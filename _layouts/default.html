@@ -140,7 +140,7 @@ header {
             const testReturn = Object.keys(estimateI).map((key) => { 
               return `${JSON.stringify(estimateI[key].condition.converted.eth, null, 1)}`
             }).join("")
-            document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... ΞEth"+testReturn+"</b>"+JSON.stringify(estimate.eth.safeLow, null, 1) //JSON.stringify(estimate[key].condition.converted.eth, null, 1)
+            document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... <b>ΞEth "+testReturn+" + "+JSON.stringify(estimate.eth.safeLow, null, 1)+"</b>" //JSON.stringify(estimate[key].condition.converted.eth, null, 1)
           })
           //
           document.querySelector("#mint").addEventListener("click", async (e) => {
