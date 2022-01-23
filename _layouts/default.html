@@ -133,7 +133,7 @@ header {
           //
           document.querySelector("#gasEst").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
-            document.querySelector("pre").innerHTML = x+"\nCalculating minting cost, low gas estimate... ΞEth(<b>"+JSON.stringify(estimate.eth.average, null, 1).slice(6)+"</b> USD$(<b>"+JSON.stringify(estimate.usd.average, null, 1).slice(6)+"</b>"
+            document.querySelector("pre").innerHTML = x+"\nCalculating minting cost... ΞEth(<b>"+JSON.stringify(estimate.eth.average, null, 1).slice(6)+"</b> USD$(<b>"+JSON.stringify(estimate.usd.average, null, 1).slice(6)+"</b>"
           })
           //
           document.querySelector("#mint").addEventListener("click", async (e) => {
