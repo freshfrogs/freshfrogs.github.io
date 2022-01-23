@@ -128,7 +128,7 @@ header {
           document.querySelector("id").innerHTML = "<strong>FROG #"+nextId+"</strong>available mint" //<strong>4,040</strong>frogs
           document.querySelector("idMint").innerHTML = "<pointer class='pointer'><strong>MINT</strong>(transact)</pointer>" //<strong>MINT</strong>(link wallet)
         //  document.querySelector("id2").innerHTML = "\n["+userAcc+"]\n"
-          document.querySelector("pre").innerHTML = "<h2>Minting Process</h2>"+"Please connect an Ethereum wallet... <b><i>"+userAcc+"</i></b>\nInvite(s) automatically applied... <a href=''><b>See Invites</b></a>\n<b><i><strong>FROG #"+token+"</strong></b></i> is now available to mint..."
+          document.querySelector("pre").innerHTML = "<h2>Minting Process</h2>"+"Please connect an Ethereum wallet... <b><i>"+userAcc+"</i></b>\nInvite(s) automatically applied... <a href=''><b>See Invites</b></a>\n<b><i><strong>FROG #"+token+"</strong></b></i> is now available for mint..."
           document.querySelector("#mint").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
             document.querySelector("pre").innerHTML = x+"\n<i><b>Minting FROG #"+nextId+"...</b> please sign the transaction... </i>"
