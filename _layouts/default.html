@@ -111,7 +111,7 @@ header {
           let random = Math.floor((Math.random() * 40) + 1);
           let token = await f0.get(nextId);
           let estimate = await f0.mintCost(null, 2)
-          var userAcc = web3.currentProvider.selectedAddress;
+          let userAcc = web3.currentProvider.selectedAddress;
           console.log(estimate)
         //  var last5 = userAcc.substring(0, 5); //0xF01e067d442f4254cd7c89A5D42d90ad554616E8 42
         //  var first5 = userAcc.substring(0, -5);
@@ -133,9 +133,9 @@ header {
           //
           document.querySelector("#gasEst").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
-            var ethEstJson = JSON.stringify(estimate.eth.average, null, 2)
+            let ethEstJson = JSON.stringify(estimate.eth.average, null, 2)
             var ethEst = Math.round(ethEstJson * 100) / 100
-            var usdEstJson = JSON.stringify(estimate.usd.average, null, 2)
+            let usdEstJson = JSON.stringify(estimate.usd.average, null, 2)
             var usdEst = Math.round(usdEstJson * 100) / 100
             document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... ΞEth(<b>"+ethEst+"</b>) USD$(<b>"+JSON.stringify(estimate.usd.average, null, 1)+"</b>)"
           })
