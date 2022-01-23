@@ -134,10 +134,10 @@ header {
           //
           document.querySelector("#gasEst").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
-            var ethEstRounded = Math.round(JSON.stringify(estimate.condition.converted.eth, null, 1) * 100) / 100
-            var gasEstRounded = Math.round(JSON.stringify(gasEstimate.eth.safeLow, null, 1) * 100) / 100
-            var estimateNew = Math.add(ethEstRounded, gasEstRounded)
-            document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... ΞEth(<b>"+estimateNew+"</b>)"
+           // var ethEstRounded = Math.round(JSON.stringify(estimate.condition.converted.eth, null, 1) * 100) / 100
+           // var gasEstRounded = Math.round(JSON.stringify(gasEstimate.eth.safeLow, null, 1) * 100) / 100
+           // var estimateNew = Math.add(ethEstRounded, gasEstRounded)
+            document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... ΞEth(<b>"+JSON.stringify(estimate, null, 1)+"</b>)"
           })
           //
           document.querySelector("#mint").addEventListener("click", async (e) => {
