@@ -111,9 +111,7 @@ header {
           let random = Math.floor((Math.random() * 40) + 1);
           let token = await f0.get(nextId);
           let estimate = await f0.mintCost(null, 1)
-          let mintEstimate = await f0.api.mint({
-            key: "0x0000000000000000000000000000000000000000000000000000000000000000", proof: []
-          }, 1).estimate({
+          let mintEstimate = await f0.api.mint(null, 1).estimate({
             from: f0.account,
             value: "420000000000000000"
           })
