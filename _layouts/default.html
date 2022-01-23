@@ -134,10 +134,10 @@ header {
           document.querySelector("#gasEst").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
             var ethEstJson = JSON.stringify(estimate.eth.safeLow, null, 1)
-            var ethEst = Math.round(ethEstJson * 100) / 100
+            var ethEst = Math.round(ethEstJson * 1000) / 1000
             var usdEstJson = JSON.stringify(estimate.usd.safeLow, null, 1)
-            var usdEst = Math.round(usdEstJson * 100) / 100
-            document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... ΞEth(<b>"+ethEst+"</b>) USD$(<b>"+usdEst+"</b>)"
+            var usdEst = Math.round(usdEstJson * 1000) / 1000
+            document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... ΞEth(<b>"+ethEstJson+"</b>) USD$(<b>"+usdEstJson+"</b>)"
           })
           //
           document.querySelector("#mint").addEventListener("click", async (e) => {
