@@ -110,7 +110,6 @@ header {
           let nextId = await f0.api.nextId().call()
           let random = Math.floor((Math.random() * 40) + 1);
           let token = await f0.get(nextId);
-          let estimate = await f0.mintCost(null, 1)
           let mintEstimate = await f0.api.mint(null, 1).estimate({
             from: f0.account,
             value: "420000000000000000"
@@ -137,11 +136,11 @@ header {
          // document.querySelector("pre").innerHTML = "\nEstimated minting cost... ΞEth(<b>"+JSON.stringify(estimate.eth.average, null, 1)+"</b>) USD$(<b>"+JSON.stringify(estimate.usd.average, null, 1)+"</b>)"
           document.querySelector("#gasEst").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
-            var ethEstJson = JSON.stringify(mintEstimate.eth.safeLow, null, 1)
+            var ethEstJson = JSON.stringify(mintEstimate, null, 1)
             var ethEst = Math.round(ethEstJson * 100) / 100
-            var usdEstJson = JSON.stringify(mintEstimate.usd.safeLow, null, 1)
+            var usdEstJson = JSON.stringify(mintEstimate, null, 1)
             var usdEst = Math.round(usdEstJson * 100) / 100
-            document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... ΞEth(<b>"+ethEst+"</b>) USD$(<b>"+usdEst+"</b>)"
+            document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... ΞEth(<b>"+JSON.stringify(mintEstimate, null, 1)+"</b>) USD$(<b>"+mintEstimate+"</b>)"
           })
           //
           document.querySelector("#mint").addEventListener("click", async (e) => {
