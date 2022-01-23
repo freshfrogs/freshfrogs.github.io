@@ -140,7 +140,7 @@ header {
             const testReturn = Object.keys(estimate).map((key) => { 
               return 
                 `
-                  ${JSON.stringify(estimate[key].condition.converted.eth, null, 1)}
+                  ${JSON.stringify(estimate[key].condition.converted, null, 2)}
                 `
             }).join("")
             document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... ΞEth(<b>"+testReturn+"</b>)"
