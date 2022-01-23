@@ -133,7 +133,7 @@ header {
           document.querySelector("#gasEst").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
            // var gasEstRounded = Math.round(JSON.stringify(gasEstimate.eth.safeLow, null, 1) * 100) / 100
-            document.querySelector("pre").innerHTML = x+"\nEstimated minting gas fee... <b>ΞEth "+Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 100) / 100+" <a href='https://www.investopedia.com/terms/g/gas-ethereum.asp#:~:text=Gas%20fees%20are%20payments%20made,spend%20on%20a%20particular%20transaction.'>What is Gas?</a></b>" //JSON.stringify(estimate[key].condition.converted.eth, null, 1)
+            document.querySelector("pre").innerHTML = x+"\nEstimated minting gas fee... <b>ΞEth "+Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 100) / 100+" <a href='https://www.investopedia.com/terms/g/gas-ethereum.asp#:~:text=Gas%20fees%20are%20payments%20made,spend%20on%20a%20particular%20transaction.'>Gas Fees?</a></b>" //JSON.stringify(estimate[key].condition.converted.eth, null, 1)
           })
           //
           document.querySelector("#mint").addEventListener("click", async (e) => {
