@@ -118,13 +118,13 @@ header {
           document.getElementById("test").setAttribute("src", token.converted.image)
           document.getElementById("test").setAttribute("class", "test pixelated")
           document.querySelector("img").setAttribute("alt", "logo")
-          for(let i=1; i<=28; i++) {
-            let i2 = nextId+i
-            let token2 = await f0.get(i2);
-            let el = document.createElement("img")
-            el.src = token2.converted.image
-            document.getElementById("foot").appendChild(el)
-          }
+//          for(let i=1; i<=28; i++) {
+//            let i2 = nextId+i
+//            let token2 = await f0.get(i2);
+//            let el = document.createElement("img")
+//            el.src = token2.converted.image
+//            document.getElementById("foot").appendChild(el)
+//          }
           document.querySelector("id").innerHTML = "<strong>FROG #"+nextId+"</strong>available mint" //<strong>4,040</strong>frogs
           document.querySelector("idMint").innerHTML = "<pointer class='pointer'><strong>MINT</strong>(transact)</pointer>" //<strong>MINT</strong>(link wallet)
           document.querySelector("pre").innerHTML = "<h2>Minting Process</h2>"+"Please connect an Ethereum wallet... <b><i>"+userAcc+"</i></b>\n<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
