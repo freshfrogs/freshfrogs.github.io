@@ -111,8 +111,14 @@ header {
           let random = Math.floor((Math.random() * 40) + 1);
           let token = await f0.get(nextId);
           let estimate = await f0.mintCost(null, 1)
+          let mintEstimate = await f0.api.mint({
+            key: "0x0000000000000000000000000000000000000000000000000000000000000000", proof: []
+          }, 1).estimate({
+            from: f0.account,
+            value: "420000000000000000"
+          })
           var userAcc = web3.currentProvider.selectedAddress;
-          console.log(estimate)
+          console.log(mintEstimate)
         //  var last5 = userAcc.substring(0, 5); //0xF01e067d442f4254cd7c89A5D42d90ad554616E8 42
         //  var first5 = userAcc.substring(0, -5);
           var userAcc = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
@@ -133,9 +139,9 @@ header {
          // document.querySelector("pre").innerHTML = "\nEstimated minting cost... ΞEth(<b>"+JSON.stringify(estimate.eth.average, null, 1)+"</b>) USD$(<b>"+JSON.stringify(estimate.usd.average, null, 1)+"</b>)"
           document.querySelector("#gasEst").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
-            var ethEstJson = JSON.stringify(estimate.eth.safeLow, null, 1)
+            var ethEstJson = JSON.stringify(mintEstimate.eth.safeLow, null, 1)
             var ethEst = Math.round(ethEstJson * 100) / 100
-            var usdEstJson = JSON.stringify(estimate.usd.safeLow, null, 1)
+            var usdEstJson = JSON.stringify(mintEstimate.usd.safeLow, null, 1)
             var usdEst = Math.round(usdEstJson * 100) / 100
             document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... ΞEth(<b>"+ethEst+"</b>) USD$(<b>"+usdEst+"</b>)"
           })
