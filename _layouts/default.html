@@ -111,7 +111,7 @@ header {
           let random = Math.floor((Math.random() * 40) + 1);
           let token = await f0.get(nextId);
           var userAcc = web3.currentProvider.selectedAddress;
-          let estimate = f0.mintCost(null, 1); //f0.myInvites()
+          let estimate = await f0.mintCost(null, 1); //f0.myInvites()
           console.log(estimate);
         //  var last5 = userAcc.substring(0, 5); //0xF01e067d442f4254cd7c89A5D42d90ad554616E8 42
         //  var first5 = userAcc.substring(0, -5);
@@ -134,7 +134,7 @@ header {
           document.querySelector("#gasEst").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
            // var gasEstRounded = Math.round(JSON.stringify(gasEstimate.eth.safeLow, null, 1) * 100) / 100
-            document.querySelector("pre").innerHTML = x+"\nEstimated minting gas fee... <b>ΞEth "+JSON.stringify(estimate, null, 1)+" <a href='https://www.investopedia.com/terms/g/gas-ethereum.asp#:~:text=Gas%20fees%20are%20payments%20made,spend%20on%20a%20particular%20transaction.'>Gas Fees?</a></b>" //JSON.stringify(estimate[key].condition.converted.eth, null, 1)
+            document.querySelector("pre").innerHTML = x+"\nEstimated minting gas fee... <b>ΞEth "+JSON.stringify(estimate.eth.safeLow, null, 1)+" <a href='https://www.investopedia.com/terms/g/gas-ethereum.asp#:~:text=Gas%20fees%20are%20payments%20made,spend%20on%20a%20particular%20transaction.'>Gas Fees?</a></b>" //JSON.stringify(estimate[key].condition.converted.eth, null, 1)
           })
           //
           document.querySelector("#mint").addEventListener("click", async (e) => {
