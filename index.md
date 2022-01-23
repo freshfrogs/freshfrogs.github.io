@@ -11,9 +11,6 @@ For every 1.00 ETH donated, two and a half acres of rainforest will be saved for
 
 <h2 class="h2">Minting Process</h2>
 <hr>
-←----{ To mint a FROG, link your wallet and then click '*<b>MINT</b> (transact)*'
-Invite codes will automatically be applied during mint, gas fees included.
-
 ```js
 block chain console_
 ```
