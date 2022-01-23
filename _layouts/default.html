@@ -111,11 +111,11 @@ header {
           let random = Math.floor((Math.random() * 40) + 1);
           let token = await f0.get(nextId);
           let mintEstimate = await f0.api.mint({
-              key: "0x0000000000000000000000000000000000000000000000000000000000000000", proof: []
-            }, 1).estimate({
-              from: f0.account,
-              value: "420000000000000000"
-            })
+            key: "0x0000000000000000000000000000000000000000000000000000000000000000", proof: []
+          }, 1).estimate({
+            from: f0.account,
+            value: "420000000000000000"
+          })
           var userAcc = web3.currentProvider.selectedAddress;
           console.log(mintEstimate)
         //  var last5 = userAcc.substring(0, 5); //0xF01e067d442f4254cd7c89A5D42d90ad554616E8 42
