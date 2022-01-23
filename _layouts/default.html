@@ -137,7 +137,7 @@ header {
             var ethEst = Math.round(ethEstJson * 1000) / 1000
             var usdEstJson = JSON.stringify(estimate.usd.safeLow, null, 1)
             var usdEst = Math.round(usdEstJson * 1000) / 1000
-            document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... ΞEth(<b>"+ethEstJson+"</b>) USD$(<b>"+usdEstJson+"</b>)"
+            document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... ΞEth(<b>"+estimate+"</b>) USD$(<b>"+usdEstJson+"</b>)"
           })
           //
           document.querySelector("#mint").addEventListener("click", async (e) => {
