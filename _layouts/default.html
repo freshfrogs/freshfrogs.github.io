@@ -137,7 +137,7 @@ header {
            // var ethEstRounded = Math.round(JSON.stringify(estimate.condition.converted.eth, null, 1) * 100) / 100
            // var gasEstRounded = Math.round(JSON.stringify(gasEstimate.eth.safeLow, null, 1) * 100) / 100
            // var estimateNew = Math.add(ethEstRounded, gasEstRounded)
-            const testReturn = Object.keys(estimateI).map((key) => { 
+            const testReturn = Object.keys(estimate).map((key) => { 
               return `${JSON.stringify(estimate[key].condition.converted.eth, null, 1)}`
             }).join("")
             document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... <b>ΞEth "+testReturn+" + "+JSON.stringify(estimate.eth.safeLow, null, 1)+"</b>" //JSON.stringify(estimate[key].condition.converted.eth, null, 1)
