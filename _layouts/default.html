@@ -139,7 +139,7 @@ header {
           //
           document.querySelector("#mint").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
-            document.querySelector("pre").innerHTML = x+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction..."
+            document.querySelector("pre").innerHTML = x+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction...\n"
             // Mint 2 with public invite
             let tokens = await f0.mint(null, 1)
             var openseaTest = tokens.map((token) => {
