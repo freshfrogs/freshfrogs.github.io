@@ -142,15 +142,11 @@ header {
             document.querySelector("pre").innerHTML = x+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction..."
             // Mint 2 with public invite
             let tokens = await f0.mint(null, 1)
-            tokens.map((token) => {
-            return {
-              opensea: token.links.opensea,
-              rarible: token.links.rarible,
-              tokenId: token.tokenId
-            }
-          })
+            var openseaTest = tokens.map((token) => {
+              return token.links.opensea
+            })
             var x = document.querySelector("pre").innerHTML;
-            document.querySelector("pre").innerHTML = x+"<b>FROG #"+nextId+" has been minted!"+x+JSON.stringify(token.links.opensea, null, 1)+"View on Opensea</b>"
+            document.querySelector("pre").innerHTML = x+"<b>FROG #"+nextId+" has been minted!<a href='"+openseaTest+"'>View on Opensea</a></b>"
           })
         } catch (e) { 
           var x = document.querySelector("pre").innerHTML;
