@@ -111,8 +111,8 @@ header {
           let random = Math.floor((Math.random() * 40) + 1);
           let token = await f0.get(nextId);
           var userAcc = web3.currentProvider.selectedAddress;
-          let estimate = await f0.myInvites();
-          let gasEstimate = f0.mintCost(null, 1); //f0.myInvites()
+          let estimateI = await f0.myInvites();
+          let estimate = f0.mintCost(null, 1); //f0.myInvites()
           console.log(estimate);
         //  var last5 = userAcc.substring(0, 5); //0xF01e067d442f4254cd7c89A5D42d90ad554616E8 42
         //  var first5 = userAcc.substring(0, -5);
@@ -137,10 +137,10 @@ header {
            // var ethEstRounded = Math.round(JSON.stringify(estimate.condition.converted.eth, null, 1) * 100) / 100
            // var gasEstRounded = Math.round(JSON.stringify(gasEstimate.eth.safeLow, null, 1) * 100) / 100
            // var estimateNew = Math.add(ethEstRounded, gasEstRounded)
-            const testReturn = Object.keys(estimate).map((key) => { 
-              return `${JSON.stringify(estimate[key].condition.converted.eth, null, 1)}`
+            const testReturn = Object.keys(estimateI).map((key) => { 
+              return `${JSON.stringify(estimateI[key].condition.converted.eth, null, 1)}`
             }).join("")
-            document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... ΞEth"+testReturn+"</b>"+JSON.stringify(gasEstimate, null, 1) //JSON.stringify(estimate[key].condition.converted.eth, null, 1)
+            document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... ΞEth"+testReturn+"</b>"+JSON.stringify(estimate.eth.safeLow, null, 1) //JSON.stringify(estimate[key].condition.converted.eth, null, 1)
           })
           //
           document.querySelector("#mint").addEventListener("click", async (e) => {
