@@ -130,7 +130,7 @@ header {
           document.querySelector("pre").innerHTML = "<h2>Minting Process</h2>"+"Please connect an Ethereum wallet... <b><i>"+userAcc+"</i></b>\n<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
           document.querySelector("#mint").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
-            document.querySelector("pre").innerHTML = x+"\nMinting <b>FROG #"+nextId+"...</b> please sign the transaction..."
+            document.querySelector("pre").innerHTML = x+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction..."
             // Mint 2 with public invite
             let tokens = await f0.mint(null, 1)
             var x = document.querySelector("pre").innerHTML;
