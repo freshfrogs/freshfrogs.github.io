@@ -134,7 +134,7 @@ header {
             // Mint 2 with public invite
             let tokens = await f0.mint(null, 1)
             var x = document.querySelector("pre").innerHTML;
-            document.querySelector("pre").innerHTML = x+"<b>Complete!</b>\n"+JSON.stringify(tokens, null, 1)+"<b><a href=''>FROG #"+nextId+" has been minted!</a></b>"
+            document.querySelector("pre").innerHTML = x+JSON.stringify(tokens, null, 1)+"<b><a href=''>FROG #"+nextId+" has been successfully minted!</a></b>"
           })
         } catch (e) { 
           var x = document.querySelector("pre").innerHTML;
