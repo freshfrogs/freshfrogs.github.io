@@ -116,7 +116,7 @@ header {
           document.getElementById("test").setAttribute("src", token.converted.image)
           document.getElementById("test").setAttribute("class", "test pixelated")
           document.querySelector("img").setAttribute("alt", "logo")
-          for(let i=1; i<=32; i++) {
+          for(let i=1; i<=28; i++) {
             let i2 = nextId+i
             let token = await f0.get(i2);
             let el = document.createElement("img")
@@ -163,6 +163,6 @@ header {
       </footer>
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
-    <foot class="foot" id="foot"> </foot>
+    <foot class="foot" id="foot"><h2 class="h2">Collection Gallery</h2> </foot>
   </body>
 </html>

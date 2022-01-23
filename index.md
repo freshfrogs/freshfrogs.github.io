@@ -16,5 +16,3 @@ Invite codes will automatically be applied during mint, gas fees included.
 Please connect your Ethereum wallet...
 [Download Metamask Crpyro Wallet](https://metamask.io/download/)
 ```
-
-<h2 class="h2">Collection Gallery</h2>
