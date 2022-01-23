@@ -128,7 +128,7 @@ header {
 //            document.getElementById("foot").appendChild(el)
 //          }
           document.querySelector("id").innerHTML = "<strong>FROG #"+nextId+"</strong>available mint" //<strong>4,040</strong>frogs
-          document.querySelector("idMint").innerHTML = "<pointer class='pointer'><strong>MINT</strong>(transact)</pointer>" //<strong>MINT</strong>(link wallet)
+          document.querySelector("idMint").innerHTML = "<strong>MINT</strong>(transact)" //<strong>MINT</strong>(link wallet)
           document.querySelector("pre").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>\n<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
           document.querySelector("#gasEst").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
@@ -160,7 +160,7 @@ header {
         <ul class="downloads">
           <li><a class="help"><id><strong>4,040</strong>frogs</id></a></li>
           <li><a id="gasEst" class="help" id="gas"><strong>0.04 ΞEth</strong>plus gas</a></li>
-          <li><a id="mint"><idMint href="https://nf7uos.github.io"><pointer class="pointer"><strong>Connect</strong>(link wallet)</pointer></idMint></a></li>
+          <li><a id="mint" class="pointer" href="https://nf7uos.github.io"><idMint><strong>Connect</strong>(link wallet)</idMint></a></li>
         </ul>
         <section class="page-section"></section>
         <section id=""></section>
