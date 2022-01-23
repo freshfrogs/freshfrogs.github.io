@@ -127,12 +127,11 @@ header {
           }
           document.querySelector("id").innerHTML = "<strong>FROG #"+nextId+"</strong>available mint" //<strong>4,040</strong>frogs
           document.querySelector("idMint").innerHTML = "<pointer class='pointer'><strong>MINT</strong>(transact)</pointer>" //<strong>MINT</strong>(link wallet)
-          document.querySelector("pre").innerHTML = "<h2>Minting Process</h2>"+"Please connect an Ethereum wallet... <b><i>"+userAcc+"</i></b>\nInvite(s) automatically applied... <a href=''><b>See Invites</b></a>\n<b><i><strong>FROG #"+token+"</strong></b></i> is now available for mint..."
+          document.querySelector("pre").innerHTML = "<h2>Minting Process</h2>"+"Please connect an Ethereum wallet... <b><i>"+userAcc+"</i></b>\nInvite(s) automatically applied... <a href=''><b>See Invites</b></a>\n<b><strong>FROG #"+nextId+"</strong></b> is now available for mint..."
           document.querySelector("#mint").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
-            document.querySelector("pre").innerHTML = x+"\n<i><b>Minting FROG #"+nextId+"...</b> please sign the transaction... </i>"
+            document.querySelector("pre").innerHTML = x+"\nMinting <b>FROG #"+nextId+"...</b> please sign the transaction..."
             // Mint 2 with public invite
-            let nextId = await f0.api.nextId().call()
             let tokens = await f0.mint(null, 1)
             var x = document.querySelector("pre").innerHTML;
             document.querySelector("pre").innerHTML = x+"<b>Complete!</b>\n"+JSON.stringify(tokens, null, 1)+"<b><a href=''>FROG #"+nextId+" has been minted!</a></b>"
