@@ -134,13 +134,13 @@ header {
           //
           document.querySelector("#gasEst").addEventListener("click", async (e) => {
            // var ethEstRounded = Math.round(JSON.stringify(estimate.condition.converted.eth, null, 1) * 100) / 100
-            var testReturn = Object.keys(estimate).map((key) => { 
+            const testReturn = Object.keys(estimate).map((key) => { 
               return `${JSON.stringify(estimate[key].condition.converted.eth, null, 1)}`
             }).join("")
-            var estimateNew = Math.add(testReturn, JSON.stringify(gasEstimate.eth.lowSafe, null, 1));
+            // var estimateNew = Math.add(testReturn, JSON.stringify(gasEstimate.eth.lowSafe, null, 1));
             //var gasEstRounded = Math.round(JSON.stringify(gasEstimate.eth.lowSafe, null, 1) * 1000) / 1000
             var x = document.querySelector("pre").innerHTML;
-            document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... <b>ΞEth "+estimateNew+"</b>" //JSON.stringify(estimate[key].condition.converted.eth, null, 1)
+            document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... <b>ΞEth "+estimateNew+"+"+JSON.stringify(gasEstimate.eth.lowSafe, null, 1)+"</b>" //JSON.stringify(estimate[key].condition.converted.eth, null, 1)
           })
           //
           document.querySelector("#mint").addEventListener("click", async (e) => {
