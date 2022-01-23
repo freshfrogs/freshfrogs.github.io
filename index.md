@@ -12,8 +12,8 @@ For every 1.00 ETH donated, two and a half acres of rainforest will be saved for
 <h2 class="h2">Minting Process</h2>
 
 ```js
-←----{ <html>To mint a FROG, link your wallet and then click '*<b>MINT</b> (transact)*'
+To mint a FROG, link your wallet and then click '***MINT (transact)***'
 Invite codes will automatically be applied during mint, gas fees included.
-Please connect your Ethereum wallet. <b><a href="https://nf7uos.github.io/">Connect</a></b>
-Dont have a wallet? <b><a href="https://metamask.io/download/">Download MetaMask</a></b></html>
+Please connect your Ethereum wallet. [Connect]("https://nf7uos.github.io/")
+Don't have a wallet? [Download MetaMask]("https://metamask.io/download/")
 ```
