@@ -111,7 +111,7 @@ header {
           let random = Math.floor((Math.random() * 40) + 1);
           let token = await f0.get(nextId);
           var userAcc = web3.currentProvider.selectedAddress;
-          let estimate = await f0.api.mintCost(null, 1).call()
+          let estimate = await f0.mintCost(null, 1).call()
           console.log(estimate)
         //  var last5 = userAcc.substring(0, 5); //0xF01e067d442f4254cd7c89A5D42d90ad554616E8 42
         //  var first5 = userAcc.substring(0, -5);
