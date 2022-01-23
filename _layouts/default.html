@@ -137,7 +137,7 @@ header {
            // var ethEstRounded = Math.round(JSON.stringify(estimate.condition.converted.eth, null, 1) * 100) / 100
            // var gasEstRounded = Math.round(JSON.stringify(gasEstimate.eth.safeLow, null, 1) * 100) / 100
            // var estimateNew = Math.add(ethEstRounded, gasEstRounded)
-            document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... ΞEth(<b>"+JSON.stringify(estimate.condition.converted.eth, null, 1)+"</b>)"
+            document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... ΞEth(<b>"+JSON.stringify(estimate[0x0000000000000000000000000000000000000000000000000000000000000000].condition.converted.eth, null, 1)+"</b>)"
           })
           //
           document.querySelector("#mint").addEventListener("click", async (e) => {
