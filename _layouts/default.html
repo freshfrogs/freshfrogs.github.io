@@ -133,9 +133,9 @@ header {
           //
           document.querySelector("#gasEst").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
-            let ethEstJson = JSON.stringify(estimate.eth.average, null, 2)
+            var ethEstJson = JSON.stringify(estimate.eth.average, null, 2)
             var ethEst = Math.round(ethEstJson * 100) / 100
-            let usdEstJson = JSON.stringify(estimate.usd.average, null, 2)
+            var usdEstJson = JSON.stringify(estimate.usd.average, null, 2)
             var usdEst = Math.round(usdEstJson * 100) / 100
             document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... ΞEth(<b>"+ethEst+"</b>) USD$(<b>"+JSON.stringify(estimate.usd.average, null, 2)+"</b>)"
           })
