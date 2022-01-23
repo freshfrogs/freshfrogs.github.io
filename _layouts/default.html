@@ -137,7 +137,7 @@ header {
             var ethEst = Math.round(ethEstJson * 100) / 100
             let usdEstJson = JSON.stringify(estimate.usd.average, null, 2)
             var usdEst = Math.round(usdEstJson * 100) / 100
-            document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... ΞEth(<b>"+ethEst+"</b>) USD$(<b>"+JSON.stringify(estimate.usd.average, null, 1)+"</b>)"
+            document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... ΞEth(<b>"+ethEst+"</b>) USD$(<b>"+JSON.stringify(estimate.usd.average, null, 2)+"</b>)"
           })
           //
           document.querySelector("#mint").addEventListener("click", async (e) => {
