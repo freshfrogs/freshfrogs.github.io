@@ -132,6 +132,7 @@ header {
             var x = document.querySelector("pre").innerHTML;
             document.querySelector("pre").innerHTML = x+"\n<i><b>Minting FROG #"+nextId+"...</b> please sign the transaction... </i>"
             // Mint 2 with public invite
+            let nextId = await f0.api.nextId().call()
             let tokens = await f0.mint(null, 1)
             var x = document.querySelector("pre").innerHTML;
             document.querySelector("pre").innerHTML = x+"<b>Complete!</b>\n"+JSON.stringify(tokens, null, 1)+"<b><a href=''>FROG #"+nextId+" has been minted!</a></b>"
