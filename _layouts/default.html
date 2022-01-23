@@ -131,11 +131,11 @@ header {
           document.querySelector("pre").innerHTML = "<h2>Minting Process</h2>"+"Please connect an Ethereum wallet... <b><i>"+userAcc+"</i></b>\nInvite(s) automatically applied... <a href=''><b>See Invites</b></a>\n<b><i><strong>FROG #"+token+"</strong></b></i> is now available to mint..."
           document.querySelector("#mint").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
-            document.querySelector("pre").innerHTML = x+"\n<i><b>Minting FROG #"+token+"...</b> please sign the transaction... </i>"
+            document.querySelector("pre").innerHTML = x+"\n<i><b>Minting FROG #"+nextId+"...</b> please sign the transaction... </i>"
             // Mint 2 with public invite
             let tokens = await f0.mint(null, 1)
             var x = document.querySelector("pre").innerHTML;
-            document.querySelector("pre").innerHTML = x+"<b>Complete!</b>\n"+JSON.stringify(tokens, null, 1)+"<b><a href=''>FROG #"+token+" has been minted!</a></b>"
+            document.querySelector("pre").innerHTML = x+"<b>Complete!</b>\n"+JSON.stringify(tokens, null, 1)+"<b><a href=''>FROG #"+nextId+" has been minted!</a></b>"
           })
         } catch (e) { 
           var x = document.querySelector("pre").innerHTML;
