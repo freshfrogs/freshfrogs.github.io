@@ -2,7 +2,6 @@
 layout: default
 ---
 <h1 class="h1">Fresh Frogs NFT</h1>
-<h3 class="h3"><b><a href="https://testnets.opensea.io/collection/forestfrog2">View Collection</a></b></h3>
 <hr>
 Fresh Frogs is a NFT collection of *4,040* randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more! 
 
