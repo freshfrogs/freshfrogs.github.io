@@ -111,7 +111,6 @@ header {
           let random = Math.floor((Math.random() * 40) + 1);
           let token = await f0.get(nextId);
           var userAcc = web3.currentProvider.selectedAddress;
-          let estimateI = await f0.myInvites();
           let estimate = f0.mintCost(null, 1); //f0.myInvites()
           console.log(estimate);
         //  var last5 = userAcc.substring(0, 5); //0xF01e067d442f4254cd7c89A5D42d90ad554616E8 42
@@ -131,16 +130,10 @@ header {
           document.querySelector("id").innerHTML = "<strong>FROG #"+nextId+"</strong>available mint" //<strong>4,040</strong>frogs
           document.querySelector("idMint").innerHTML = "<pointer class='pointer'><strong>MINT</strong>(transact)</pointer>" //<strong>MINT</strong>(link wallet)
           document.querySelector("pre").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>\n<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
-          //
           document.querySelector("#gasEst").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
-           // var ethEstRounded = Math.round(JSON.stringify(estimate.condition.converted.eth, null, 1) * 100) / 100
            // var gasEstRounded = Math.round(JSON.stringify(gasEstimate.eth.safeLow, null, 1) * 100) / 100
-           // var estimateNew = Math.add(ethEstRounded, gasEstRounded)
-            const testReturn = Object.keys(estimateI).map((key) => { 
-              return `${JSON.stringify(estimate[key].condition.converted.eth, null, 1)}`
-            }).join("")
-            document.querySelector("pre").innerHTML = x+"\nEstimated minting cost... <b>ΞEth "+testReturn+" + "+JSON.stringify(estimate.eth.safeLow, null, 1)+"</b>" //JSON.stringify(estimate[key].condition.converted.eth, null, 1)
+            document.querySelector("pre").innerHTML = x+"\nEstimated minting gas fee... <b>ΞEth "+Math.round(JSON.stringify(gasEstimate.eth.safeLow, null, 1) * 100) / 100+"</b>" //JSON.stringify(estimate[key].condition.converted.eth, null, 1)
           })
           //
           document.querySelector("#mint").addEventListener("click", async (e) => {
