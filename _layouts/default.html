@@ -49,12 +49,14 @@ header {
   }
 .h2 {
   font-family: sans-serif;
+  font-weight: 800;
   color: white;
   text-align: center;
   image-rendering: pixelated;
   }
 .h3 {
   font-family: sans-serif;
+  font-weight: 800;
   color: white;
   text-align: center;
   image-rendering: pixelated;
@@ -94,8 +96,8 @@ header {
       const f0 = new F0();
       const web3 = new Web3(window.ethereum)
       document.addEventListener("DOMContentLoaded", async () => { // https://nf7uos.github.io/
-        document.querySelector("pre").innerHTML = "First please connect your Ethereum wallet...<b><a href='https://nf7uos.github.io/'>Connect</a></b>"+"\nThen click '<strong>MINT</strong> (transact)'..."+"\nInvite codes will be applied automatically..."+"\nDon't have a wallet?...<b><a href='https://metamask.io/download/'>Download MetaMask</a></b>"
-        document.querySelector("pre").innerHTML
+        document.querySelector("pre").innerHTML = "First please connect your Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b>"+"\nDon't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b>"
+       // document.querySelector("pre").innerHTML = ""
         let net = await web3.eth.getChainId()
         console.log("net = ", net)
         await window.ethereum.send('eth_requestAccounts');
@@ -128,7 +130,7 @@ header {
           document.querySelector("idMint").innerHTML = "<pointer class='pointer'><strong>MINT</strong>(transact)</pointer>" //<strong>MINT</strong>(link wallet)
         //  document.querySelector("id2").innerHTML = "\n["+userAcc+"]\n"
           var x = document.querySelector("pre").innerHTML;
-          document.querySelector("pre").innerHTML = x+" <b> Connected </b>\nYou can now mint to your account... <b> "+userAcc+" </b>"//Invite codes automatically applied."
+          document.querySelector("pre").innerHTML = x+" <b> Connected </b>\nYou can now mint to your account... <b> "+userAcc+" </b>\nTo mint the next available FROG, click on ''<b><strong>MINT</strong></b> (transact)''\nInvite automatically applied... <a><b>See Invites</b></a>"
           document.querySelector("#mint").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
             document.querySelector("pre").innerHTML = x+"\n<b>Minting... please sign the transaction and wait.</b>"
