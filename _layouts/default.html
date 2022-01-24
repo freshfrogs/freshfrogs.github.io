@@ -193,7 +193,7 @@ pre{
           console.log(token)
           document.getElementById("nextMint").setAttribute("src", token.converted.image)
           document.querySelector("img").setAttribute("alt", "logo")
-          for(let i=1; i<=9; i++) {
+          for(let i=1; i<=3; i++) {
             let token2 = await f0.get(nextId-i);
             let el = document.createElement("img")
             el.src = token2.converted.image
