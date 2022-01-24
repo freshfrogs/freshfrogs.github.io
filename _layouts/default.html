@@ -100,13 +100,13 @@ pre{
       const f0 = new F0();
       const web3 = new Web3(window.ethereum)
       document.addEventListener("DOMContentLoaded", async () => { // https://nf7uos.github.io/
-        document.querySelector("pre").innerHTML = "<br><h2 class='h2'>Minting Station</h2><hr>"+"Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b>"+"\nDon't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b>"
+        document.querySelector("pre").innerHTML = "Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b>"+"\nDon't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b>"
        // document.querySelector("pre").innerHTML = ""
         let net = await web3.eth.getChainId()
         console.log("net = ", net)
         await window.ethereum.send('eth_requestAccounts');
         try {
-          document.querySelector("pre").innerHTML = "<br><h2 class='h2'>Minting Station</h2><hr>"+"Please connect an Ethereum wallet... <b>Connecting...</b>"+"\nDon't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b>"
+          document.querySelector("pre").innerHTML = "Please connect an Ethereum wallet... <b>Connecting...</b>"+"\nDon't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b>"
           await f0.init({
             web3: web3,
             contract: "0x9500aEe4F34681D38D2f53C634b36b9CCc236d10",
@@ -135,7 +135,7 @@ pre{
           document.querySelector("id").innerHTML = "<strong>FROG #"+nextId+"</strong>available mint" //<strong>4,040</strong>frogs
           document.querySelector("idMint").innerHTML = "<strong>MINT</strong>(transact)" //<strong>MINT</strong>(link wallet)
           document.querySelector("#mint").removeAttribute("href")
-          document.querySelector("pre").innerHTML = "<br><h2 class='h2'>Minting Station</h2><hr>"+"Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>\n<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
+          document.querySelector("pre").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>\n<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
           document.querySelector("#gasEst").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
            // var gasEstRounded = Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 100) / 100
