@@ -9,7 +9,7 @@ img {
 }
 .collectionImg { 
   transition: transform .2s;
-  width: 96px;
+  width: 128px;
   vertical-align: center;
   margin-top: 0px;
   margin-bottom: 0px;
@@ -162,7 +162,7 @@ pre{
         document.querySelector("pre").innerHTML = "<h3 class='h3'>Minting Process</h3>"+"「 <b><a id='loadFrogs' class='pointer'>View FROGS</a></b> 」「 <b><a href='https://testnets.opensea.io/collection/forestfrog2'>Opensea</a></b> 」「 <b><a href=''>Rarible</a></b> 」"+"<hr>Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b>"+"\nDon't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b>"
        // document.querySelector("pre").innerHTML = ""
         document.querySelector("#loadFrogs").addEventListener("click", async (e) => {
-          for(let frog=1; frog<=12; frog++) {
+          for(let frog=1; frog<=8; frog++) {
             let whichFrog = Math.floor(Math.random() * 4039)+frog;
             let frogSource = "https://gateway.pinata.cloud/ipfs/QmcdUZdPeUieekmTgZv7rHnuZhojRktAKN3tDn2pZSHMvF/"+whichFrog+".png";
             let frogCreate = document.createElement("img")
