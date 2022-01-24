@@ -159,14 +159,17 @@ pre{
       const f0 = new F0();
       const web3 = new Web3(window.ethereum)
       document.addEventListener("DOMContentLoaded", async () => { // https://nf7uos.github.io/
-        for(let frog=1; frog<=54; frog++) {
-          let frogSource = "https://gateway.pinata.cloud/ipfs/QmcdUZdPeUieekmTgZv7rHnuZhojRktAKN3tDn2pZSHMvF/"+frog+".png";
-          let frogCreate = document.createElement("img")
-          frogCreate.src = frogSource
-          frogCreate.className = "collectionImg"
-          document.getElementById("collection").appendChild(frogCreate)
-        }
-        document.querySelector("pre").innerHTML = "Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b>"+"\nDon't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b>"
+        document.querySelector("#loadFrogs").addEventListener("click", async (e) => {
+          document.getElementById("collection").innerHTML = "<hr>"
+          for(let frog=1; frog<=54; frog++) {
+            let frogSource = "https://gateway.pinata.cloud/ipfs/QmcdUZdPeUieekmTgZv7rHnuZhojRktAKN3tDn2pZSHMvF/"+frog+".png";
+            let frogCreate = document.createElement("img")
+            frogCreate.src = frogSource
+            frogCreate.className = "collectionImg"
+            document.getElementById("collection").appendChild(frogCreate)
+          }
+        })
+        document.querySelector("pre").innerHTML = "View Collection... <b><a id='loadFrogs' href=''>Locally</a></b> / <b><a href='https://testnets.opensea.io/collection/forestfrog2'>Opensea</a></b> / <b><a href=''>Rarible</a></b>"+"Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b>"+"\nDon't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b>"
        // document.querySelector("pre").innerHTML = ""
         let net = await web3.eth.getChainId()
         console.log("net = ", net)
@@ -243,7 +246,6 @@ pre{
       </header>
       <section class="page-section">
         {{ content }}
-        <div class= "collection" id="collection"></div>
       </section>
       <footer>
       </footer>
