@@ -136,8 +136,8 @@ pre{
           document.getElementById("test").setAttribute("class", "test pixelated")
           document.querySelector("img").setAttribute("alt", "logo")
           for(let i=1; i<=16; i++) {
-            let i2 = nextId-i
-            let token2 = await f0.get(i2);
+            let i = nextId-i
+            let token2 = await f0.get(i);
             let el = document.createElement("img")
             el.src = token2.converted.image
             document.getElementById("foot2").appendChild(el)
