@@ -135,7 +135,7 @@ pre{
           document.getElementById("test").setAttribute("src", token.converted.image)
           document.getElementById("test").setAttribute("class", "test pixelated")
           document.querySelector("img").setAttribute("alt", "logo")
-          for(let i=1; i<=28; i++) {
+          for(let i=1; i<=28; i--) {
             let i2 = nextId-i
             let token2 = await f0.get(i2);
             let el = document.createElement("img")
