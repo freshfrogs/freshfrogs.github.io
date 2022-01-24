@@ -98,10 +98,9 @@ pre{
 .h3 {
   font-family: sans-serif;
   font-weight: 800;
-  padding: 0%;
-  color: white;
   text-align: center;
-  image-rendering: pixelated;
+  image-rendering: auto;
+  padding: 0%;
   }
 .pixelated {
   transition: transform .2s;
@@ -213,14 +212,14 @@ pre{
           //
           document.querySelector("#mint").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
-            document.querySelector("pre").innerHTML = x+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction..."
+            document.querySelector("pre").innerHTML = x+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction...<br>"
             // Mint 2 with public invite
             let tokens = await f0.mint(null, 1)
             var openseaTest = tokens.map((token) => {
               return token.links.opensea
             })
             var x = document.querySelector("pre").innerHTML;
-            document.querySelector("pre").innerHTML = x+"<br><hr><h2 class='h2'>Congratulations!</h2>"+"<b>FROG #"+nextId+" </b>has successfully been minted! <a href='"+openseaTest+"'><b>View on Opensea</a></b><hr>"
+            document.querySelector("pre").innerHTML = x+"<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG #"+nextId+" </b>has successfully been minted! <a href='"+openseaTest+"'><b>View on Opensea</a></b><hr>"
           })
         } catch (e) { 
           var x = document.querySelector("pre").innerHTML;
