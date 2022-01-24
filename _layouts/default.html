@@ -212,6 +212,18 @@ pre{
            // var gasEstRounded = Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 100) / 100
             document.querySelector("pre").innerHTML = x+"\nEstimated gas fee... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 1000) / 1000+" ΞEth ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>" //JSON.stringify(estimate[key].condition.converted.eth, null, 1)
           })
+//
+           document.querySelector("#loadFrogs").addEventListener("click", async (e) => {
+            for(let frog=1; frog<=8; frog++) {
+              let whichFrog = Math.floor(Math.random() * 4039)+frog;
+              let frogSource = "https://gateway.pinata.cloud/ipfs/QmcdUZdPeUieekmTgZv7rHnuZhojRktAKN3tDn2pZSHMvF/"+whichFrog+".png";
+              let frogCreate = document.createElement("img")
+              frogCreate.src = frogSource
+              frogCreate.className = "collectionImg"
+              document.getElementById("collection").appendChild(frogCreate)
+            }
+            document.getElementById("collection").innerHTML = document.getElementById("collection").innerHTML+"<hr>"
+          })
           //
           document.querySelector("#mint").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
