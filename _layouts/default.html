@@ -136,6 +136,9 @@ pre{
           console.log(token)
           document.getElementById("test").setAttribute("src", token.converted.image)
           document.getElementById("test").setAttribute("class", "test pixelated")
+          //
+          document.querySelector("foot2").innerHTML = "<ul class='downloads'>\n<li><a class='pointer'><strong><av id='remaining'></av></strong>remaining</a></li>\n<li><a class='pointer'><strong>Recently Minted</strong></a></li>\n<li><a class='pointer'><strong>4,040</strong>total supply</a></li>\n</ul>"
+          //
           document.querySelector("img").setAttribute("alt", "logo")
           document.getElementById("remaining").appendChild(remaining);
           for(let i=1; i<=9; i++) {
@@ -183,11 +186,6 @@ pre{
           <li><a id="mint" class="pointer" href="https://nf7uos.github.io/"><idMint><strong>Connect</strong>(link wallet)</idMint></a></li>
         </ul>
         <foot class="foot2" id="foot2"></foot>
-        <ul class="downloads">
-          <li><a class="pointer"><strong><av id="remaining"></av></strong>remaining</a></li>
-          <li><a class="pointer"><strong>Recently Minted</strong></a></li>
-          <li><a class="pointer"><strong>4,040</strong>total supply</a></li>
-        </ul>
       </header>
       <section class="page-section">
         {{ content }}
