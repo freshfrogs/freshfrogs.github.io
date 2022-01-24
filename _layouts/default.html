@@ -6,9 +6,12 @@ img {
     margin: 0px;
     padding: 0px;
     border-radius: 2%;
+    transition: transform .2s;
 }
 img:hover{
-  transform: scale(1.5);
+  -ms-transform: scale(1.5); /* IE 9 */
+  -webkit-transform: scale(1.5); /* Safari 3-8 */
+  transform: scale(1.5); 
 }
 .pixelated2 { 
     width: 80px;
@@ -72,13 +75,18 @@ pre{
   image-rendering: pixelated;
   }
 .pixelated {
+  transition: transform .2s;
   image-rendering: pixelated;
   width: auto;
   margin-left: auto;
   margin-right: auto;
   display: block;
   border-radius: 2%;
-  transform: scale(1.10);
+}
+.pixelated:hover{
+  -ms-transform: scale(1.1); /* IE 9 */
+  -webkit-transform: scale(1.1); /* Safari 3-8 */
+  transform: scale(1.1); 
 }
 .foot{
   position: absolute;
