@@ -168,7 +168,7 @@ pre{
         document.querySelector("pre").innerHTML = "<h3 class='h3'>Minting Process</h3>"+"「 <b><a id='loadFrogs' class='pointer'>View FROGS</a></b> 」「 <b><a href='https://testnets.opensea.io/collection/forestfrog2'>Opensea</a></b> 」「 <b><a href=''>Rarible</a></b> 」"+"<hr>Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b>"+"\nDon't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b>"
         // document.querySelector("pre").innerHTML = ""
         document.querySelector("#loadFrogs").addEventListener("click", async (e) => {
-          for(let frog=1; frog<=10; frog++) {
+          for(let frog=1; frog<=5; frog++) {
             let whichFrog = Math.floor(Math.random() * 4039)+frog;
             let frogSource = "https://gateway.pinata.cloud/ipfs/QmcdUZdPeUieekmTgZv7rHnuZhojRktAKN3tDn2pZSHMvF/"+whichFrog+".png";
             let frogCreate = document.createElement("img")
@@ -209,7 +209,7 @@ pre{
           document.querySelector("id").innerHTML = "<strong>FROG #"+nextId+"</strong>available mint" //<strong>4,040</strong>frogs
           document.querySelector("idMint").innerHTML = "<strong>MINT</strong>(transact)" //<strong>MINT</strong>(link wallet)
           document.querySelector("#mint").removeAttribute("href")
-          document.querySelector("pre").innerHTML = "<h3 class='h3'>Minting Process</h3>"+"「 <b><a id='loadFrogs2' class='pointer'>View FROGS</a></b> 」「 <b><a href='https://testnets.opensea.io/collection/forestfrog2'>Opensea</a></b> 」「 <b><a href=''>Rarible</a></b> 」"+"<hr>Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>\n<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
+          document.querySelector("pre").innerHTML = "<h3 class='h3'>Minting Process</h3>"+"<div class= 'collection' id='collection'></div>"+"「 <b><a id='loadFrogs2' class='pointer'>View FROGS</a></b> 」「 <b><a href='https://testnets.opensea.io/collection/forestfrog2'>Opensea</a></b> 」「 <b><a href=''>Rarible</a></b> 」"+"<hr>Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>\n<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
           document.querySelector("#gasEst").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
            // var gasEstRounded = Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 100) / 100
@@ -217,7 +217,7 @@ pre{
           })
 //
           document.querySelector("#loadFrogs2").addEventListener("click", async (e) => {
-            for(let frog2=1; frog2<=10; frog2++) {
+            for(let frog2=1; frog2<=5; frog2++) {
               let whichFrog2 = Math.floor(Math.random() * 4039)+frog2;
               let frogSource2 = "https://gateway.pinata.cloud/ipfs/QmcdUZdPeUieekmTgZv7rHnuZhojRktAKN3tDn2pZSHMvF/"+whichFrog2+".png";
               let frogCreate2 = document.createElement("img")
