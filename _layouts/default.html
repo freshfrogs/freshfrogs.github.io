@@ -29,6 +29,9 @@ header {
 .pointerOff{
   cursor: wait;
 }
+.noPointer{
+  cursor: none;
+}
 .test {
   filter: blur(0px);
   border-radius: 0%;
@@ -170,7 +173,7 @@ pre{
             document.getElementById("foot2").appendChild(el)
           }
           //
-          document.getElementById("ul2").innerHTML = "<ul class='downloads'>"+"<li><a class='pointer'><strong>"+remaining+"</strong>remaining</a></li>\n<li><a class='pointer'><strong>Recently Minted</strong></a></li>\n<li><a class='pointer'><strong>View</strong>see collection</a></li></ul>"
+          document.getElementById("ul2").innerHTML = "<ul class='downloads'>"+"<li><a class='pointer'><strong>"+remaining+"</strong>remaining</a></li>\n<li><a class='noPointer'><strong>Recently Minted</strong></a></li>\n<li><a class='pointer'><strong>View</strong>see collection</a></li></ul>"
           //
           document.querySelector("id").innerHTML = "<strong>FROG #"+nextId+"</strong>available mint" //<strong>4,040</strong>frogs
           document.querySelector("idMint").innerHTML = "<strong>MINT</strong>(transact)" //<strong>MINT</strong>(link wallet)
@@ -202,7 +205,7 @@ pre{
   <body class="page-body">
     <div class="wrapper">
       <header>
-        <img class="os pixelated" src="openseaLogoW.png" href="https://testnets.opensea.io/collection/forestfrog2"><a href="https://testnets.opensea.io/collection/forestfrog2"><h2 class="h2">View Collection</h2></a>
+        <img class="os pixelated pointer" src="openseaLogoW.png" href="https://testnets.opensea.io/collection/forestfrog2"><a href="https://testnets.opensea.io/collection/forestfrog2"><h2 class="h2">View Collection</h2></a>
 
         <img id="nextMint" class="test pixelated" src="/assets/preview.gif">
         <ul class="downloads">
