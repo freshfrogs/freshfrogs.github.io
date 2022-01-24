@@ -162,7 +162,6 @@ pre{
         document.querySelector("pre").innerHTML = "View Collection... [ <b><a id='loadFrogs'>Locally</a></b> ][ <b><a href='https://testnets.opensea.io/collection/forestfrog2'>Opensea</a></b> ][ <b><a href=''>Rarible</a></b> ]"+"\nPlease connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b>"+"\nDon't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b>"
        // document.querySelector("pre").innerHTML = ""
         document.querySelector("#loadFrogs").addEventListener("click", async (e) => {
-          document.getElementById("collection").innerHTML = "<hr>"
           for(let frog=1; frog<=54; frog++) {
             let frogSource = "https://gateway.pinata.cloud/ipfs/QmcdUZdPeUieekmTgZv7rHnuZhojRktAKN3tDn2pZSHMvF/"+frog+".png";
             let frogCreate = document.createElement("img")
@@ -170,6 +169,7 @@ pre{
             frogCreate.className = "collectionImg"
             document.getElementById("collection").appendChild(frogCreate)
           }
+          document.getElementById("collection").innerHTML = "<hr>"
         })
         let net = await web3.eth.getChainId()
         console.log("net = ", net)
