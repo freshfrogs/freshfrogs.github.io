@@ -127,6 +127,7 @@ pre{
           let token = await f0.get(nextId);
           var userAcc = web3.currentProvider.selectedAddress;
           let estimate = await f0.mintCost(null, 1); //f0.myInvites()
+          var remaining = Math.substract(4040, nextId)
           console.log(estimate);
         //  var last5 = userAcc.substring(0, 5); //0xF01e067d442f4254cd7c89A5D42d90ad554616E8 42
         //  var first5 = userAcc.substring(0, -5);
@@ -135,6 +136,7 @@ pre{
           document.getElementById("test").setAttribute("src", token.converted.image)
           document.getElementById("test").setAttribute("class", "test pixelated")
           document.querySelector("img").setAttribute("alt", "logo")
+          document.getElementById("remaining").appendChild(remaining);
           for(let i=1; i<=9; i++) {
             let token2 = await f0.get(nextId-i);
             let el = document.createElement("img")
@@ -181,9 +183,9 @@ pre{
         </ul>
         <foot class="foot2" id="foot2"></foot>
         <ul class="downloads">
-          <li><a class="pointer"><strong>4,040</strong>total frogs</a></li>
-          <li><a class="pointer"><strong>View Collection</strong></a></li>
-          <li><a class="pointer"><strong>Connect</strong>(link wallet)</a></li>
+          <li><a class="pointer"><strong><av id="remaining"></av></strong>remaining</a></li>
+          <li><a class="pointer"><strong>Recently Minted</strong></a></li>
+          <li><a class="pointer"><strong>4,040</strong>total supply</a></li>
         </ul>
       </header>
       <section class="page-section">
