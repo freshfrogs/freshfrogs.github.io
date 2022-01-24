@@ -84,6 +84,18 @@ pre{
   flex-wrap: wrap;
   background-color: blur(4px);
 }
+.foot2{
+  position: absolute;
+  top: 60%;
+  width: 50%;
+  padding: 15px 0;
+  margin-left: 25%;
+  margin-right: 25%;
+  image-rendering: pixelated;
+  display: flex;
+  flex-wrap: wrap;
+  background-color: blur(4px);
+}
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <head>
@@ -125,13 +137,13 @@ pre{
           document.getElementById("test").setAttribute("src", token.converted.image)
           document.getElementById("test").setAttribute("class", "test pixelated")
           document.querySelector("img").setAttribute("alt", "logo")
-//          for(let i=1; i<=28; i++) {
-//            let i2 = nextId+i
-//            let token2 = await f0.get(i2);
-//            let el = document.createElement("img")
-//            el.src = token2.converted.image
-//            document.getElementById("foot").appendChild(el)
-//          }
+          for(let i=1; i<=28; i++) {
+            let i2 = nextId+i
+            let token2 = await f0.get(i2);
+            let el = document.createElement("img")
+            el.src = token2.converted.image
+            document.getElementById("foot2").appendChild(el)
+          }
           document.querySelector("id").innerHTML = "<strong>FROG #"+nextId+"</strong>available mint" //<strong>4,040</strong>frogs
           document.querySelector("idMint").innerHTML = "<strong>MINT</strong>(transact)" //<strong>MINT</strong>(link wallet)
           document.querySelector("#mint").removeAttribute("href")
@@ -171,6 +183,7 @@ pre{
           <li><a id="mint" class="pointer" href="https://nf7uos.github.io/"><idMint><strong>Connect</strong>(link wallet)</idMint></a></li>
         </ul>
         <h3 class="h3"><b><a href="https://testnets.opensea.io/collection/forestfrog2">View Collection</a></b></h3>
+        <foot class="foot2" id="foot2"></foot>
       </header>
       <section class="page-section">
         {{ content }}
@@ -179,6 +192,5 @@ pre{
       </footer>
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
-    <foot class="foot" id="foot"></foot>
   </body>
 </html>
