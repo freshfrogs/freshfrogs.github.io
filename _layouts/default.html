@@ -8,12 +8,10 @@ img {
   border-radius: 1%;
 }
 .collectionImg { 
-  width: 10px;
-  border-radius: 10%;
-}
-.collection {
   transition: transform .2s;
   width: 64px;
+}
+.collection {
   image-rendering: pixelated;
   display: flex;
   flex-wrap: wrap;
@@ -158,7 +156,7 @@ pre{
           let frogSource = "https://gateway.pinata.cloud/ipfs/QmcdUZdPeUieekmTgZv7rHnuZhojRktAKN3tDn2pZSHMvF/"+frog+".png";
           let frogCreate = document.createElement("img")
           frogCreate.src = frogSource
-          frogCreate.className = "collection"
+          frogCreate.className = "collectionImg"
           document.getElementById("collection").appendChild(frogCreate)
         }
         document.querySelector("pre").innerHTML = "Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b>"+"\nDon't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b>"
@@ -239,7 +237,7 @@ pre{
       <section class="page-section">
         {{ content }}
         <hr>
-        <div id="collection"></div>
+        <div class= "collection" id="collection"></div>
       </section>
       <footer>
       </footer>
