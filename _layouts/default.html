@@ -144,7 +144,7 @@ pre{
             document.getElementById("foot2").appendChild(el)
           }
           //
-          document.getElementById("ul2").innerHTML = "<li><a class='pointer'><strong>"+remaining+"</strong>remaining</a></li>\n<li><a class='pointer'><strong>Recently Minted</strong></a></li>\n<li><a class='pointer'><strong>View</strong>see collection</a></li>"
+          document.getElementById("ul2").innerHTML = "<ul class='downloads'>"+"<li><a class='pointer'><strong>"+remaining+"</strong>remaining</a></li>\n<li><a class='pointer'><strong>Recently Minted</strong></a></li>\n<li><a class='pointer'><strong>View</strong>see collection</a></li></ul>"
           //
           document.querySelector("id").innerHTML = "<strong>FROG #"+nextId+"</strong>available mint" //<strong>4,040</strong>frogs
           document.querySelector("idMint").innerHTML = "<strong>MINT</strong>(transact)" //<strong>MINT</strong>(link wallet)
@@ -182,10 +182,10 @@ pre{
         <ul class="downloads">
           <li><a class="help"><id><strong>4,040</strong>frogs</id></a></li>
           <li><a id="gasEst" class="help" id="gas"><strong>0.04 ΞEth</strong>plus gas</a></li>
-          <li><a id="mint" class="pointer" href="https://nf7uos.github.io/"><idMint><strong>Connect</strong>(link wallet)</idMint></a></li>
+          <li><a id="mint" class="pointer" href="https://nf7uos.github.io/"><idMint><strong><strike>Mint</strike></strong>connect wallet!</idMint></a></li>
         </ul>
         <foot class="foot2" id="foot2"></foot>
-        <ul id="ul2" class="downloads"><li><a class="pointer"><strong>Collection</strong>view on opensea</a></li></ul>
+        <div id="ul2"></div>
       </header>
       <section class="page-section">
         {{ content }}
