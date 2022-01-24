@@ -13,12 +13,10 @@ img {
 .collection {
   transition: transform .2s;
   image-rendering: pixelated;
-  margin-left: auto;
-  margin-right: auto;
   border-radius: 1%;
   display: flex;
   flex-wrap: wrap;
-  width: 32px;
+  width: 64px;
 }
 img:hover{
   -ms-transform: scale(1.5); /* IE 9 */
@@ -236,7 +234,7 @@ pre{
       <section class="page-section">
         {{ content }}
         <hr>
-        <div class="collection page-body" id="collection"></div>
+        <div id="collection"></div>
       </section>
       <footer>
       </footer>
