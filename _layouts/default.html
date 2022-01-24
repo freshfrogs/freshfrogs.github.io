@@ -163,8 +163,7 @@ pre{
         //  var first5 = userAcc.substring(0, -5);
           var userAcc = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
           console.log(token)
-          document.getElementById("test").setAttribute("src", token.converted.image)
-          document.getElementById("test").setAttribute("class", "test pixelated")
+          document.getElementById("nextMint").setAttribute("src", token.converted.image)
           document.querySelector("img").setAttribute("alt", "logo")
           for(let i=1; i<=9; i++) {
             let token2 = await f0.get(nextId-i);
@@ -205,8 +204,8 @@ pre{
   <body class="page-body">
     <div class="wrapper">
       <header>
-        <img id="test" class="os pixelated" src="opensealogo.png"><h2 class="h2" href="https://testnets.opensea.io/collection/forestfrog2">View Collection</h2>
-        <img id="test" class="test pixelated" src="/assets/preview.gif">
+        <img class="os pixelated" src="opensealogo.png"><h2 class="h2" href="https://testnets.opensea.io/collection/forestfrog2">View Collection</h2>
+        <img id="nextMint" class="test pixelated" src="/assets/preview.gif">
         <br>
         <ul class="downloads">
           <li><a class="help"><id><strong>4,040</strong>frogs</id></a></li>
