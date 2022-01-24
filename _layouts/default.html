@@ -153,7 +153,7 @@ pre{
             contract: "0x9500aEe4F34681D38D2f53C634b36b9CCc236d10",
             network: "rinkeby"
           })
-          let nextId = f0.api.nextId().call()
+          let nextId = await f0.api.nextId().call()
           let random = Math.floor((Math.random() * 40) + 1);
           let token = await f0.get(nextId);
           var userAcc = web3.currentProvider.selectedAddress;
@@ -167,7 +167,7 @@ pre{
           document.getElementById("nextMint").setAttribute("src", token.converted.image)
           document.querySelector("img").setAttribute("alt", "logo")
           for(let i=1; i<=9; i++) {
-            let token2 = f0.get(nextId-i);
+            let token2 = await f0.get(nextId-i);
             let el = document.createElement("img")
             el.src = token2.converted.image
             document.getElementById("foot2").appendChild(el)
@@ -211,7 +211,7 @@ pre{
         <ul class="downloads">
           <li><a class="help"><id><strong>4,040</strong>frogs</id></a></li>
           <li><a id="gasEst" class="help" id="gas"><strong>0.04 ΞEth</strong>plus gas</a></li>
-          <li><a id="mint" class="pointer" href="https://nf7uos.github.io/"><idMint><strike><strong> Mint </strong></strike>connect wallet!</idMint></a></li>
+          <li><a id="mint" class="pointer" href="https://nf7uos.github.io/"><idMint><strike><strong>Mint</strong></strike>connect wallet!</idMint></a></li>
         </ul>
         <foot class="foot2" id="foot2"></foot>
         <div id="ul2"></div>
