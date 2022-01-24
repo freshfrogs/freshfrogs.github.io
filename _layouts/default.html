@@ -9,7 +9,7 @@ img {
   transition: transform .2s;
 }
 .collectionImg { 
-  width: 10%;
+  width: 10px;
   border-radius: 10%;
 }
 .collection{
@@ -18,7 +18,7 @@ img {
   display: flex;
   flex-wrap: wrap;
   border-radius: 1%;
-  width: 10%;
+  width: 10px;
 }
 img:hover{
   -ms-transform: scale(1.5); /* IE 9 */
@@ -159,7 +159,7 @@ pre{
           let frogSource = "https://gateway.pinata.cloud/ipfs/QmcdUZdPeUieekmTgZv7rHnuZhojRktAKN3tDn2pZSHMvF/"+frog+".png";
           let frogCreate = document.createElement("img")
           frogCreate.src = frogSource
-          frogCreate.width = 5%
+          frogCreate.class = "collection"
           document.getElementById("collection").appendChild(frogCreate)
         }
         document.querySelector("pre").innerHTML = "Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b>"+"\nDon't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b>"
