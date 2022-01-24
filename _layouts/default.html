@@ -182,7 +182,7 @@ pre{
           document.querySelector("#gasEst").addEventListener("click", async (e) => {
             var x = document.querySelector("pre").innerHTML;
            // var gasEstRounded = Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 100) / 100
-            document.querySelector("pre").innerHTML = x+"\nEstimated gas fee... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 100) / 100+" ΞEth ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>" //JSON.stringify(estimate[key].condition.converted.eth, null, 1)
+            document.querySelector("pre").innerHTML = x+"\nEstimated gas fee... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 1000) / 1000+" ΞEth ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>" //JSON.stringify(estimate[key].condition.converted.eth, null, 1)
           })
           //
           document.querySelector("#mint").addEventListener("click", async (e) => {
