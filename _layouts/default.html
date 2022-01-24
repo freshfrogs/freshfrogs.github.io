@@ -153,7 +153,7 @@ pre{
             contract: "0x9500aEe4F34681D38D2f53C634b36b9CCc236d10",
             network: "rinkeby"
           })
-          let nextId = await f0.api.nextId().call()
+          let nextId = f0.api.nextId().call()
           let random = Math.floor((Math.random() * 40) + 1);
           let token = await f0.get(nextId);
           var userAcc = web3.currentProvider.selectedAddress;
