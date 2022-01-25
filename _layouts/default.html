@@ -121,6 +121,7 @@
           let frogCreate = document.createElement("img")
           frogCreate.src = frogSource
           frogCreate.className = "collectionImg"
+          frogCreate.id = frog
           document.getElementById("collection").appendChild(frogCreate)
         }
         //
@@ -145,6 +146,14 @@
           var remaining = 4040 - nextId;
           console.log(estimate);
           console.log(token)
+          //
+          // Next frogs generated
+          //
+          for(let i=1; i<=3; i++) {
+            let token = await f0.get(nextId+i);
+            document.getElementById(i).setAttribute("src", token.converted.image)
+          }
+          //
 
           // Update website layout with set variables
           document.getElementById("nextTokenImg").setAttribute("src", token.converted.image) // Set preview image to next token ID
