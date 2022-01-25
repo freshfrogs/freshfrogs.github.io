@@ -53,9 +53,9 @@
           
           let nextId = await f0.api.nextId().call()
           let token = await f0.get(nextId);
-          var remaining = 4040 - nextId;
+          
           let estimateGas = await f0.mintCost(null, 1);
-
+          var remaining = 4040 - nextId;
           console.log(estimateGas);
           console.log(token)
 
@@ -92,10 +92,10 @@
         <img id="nextTokenImg" class="" src="/assets/preview.gif">
         <ul class="downloads">
             <li>
-                <a id="totalValue" class="pointerOff"><strong>4,040</strong>frogs</a>
+                <a id="nextToken" class="pointerOff"><strong>4,040</strong>frogs</a>
             </li>
             <li>
-                <a id="gasEstimate" class="pointerOff"><strong>0.04 ΞEth</strong>plus gas</a>
+                <a id="gasEst" class="pointerOff"><strong>0.04 ΞEth</strong>plus gas</a>
             </li>
             <li>
                 <a id="mintTransact" class="pointer" href="https://nf7uos.github.io/"><b><strike><strong>Mint</strong></strike></b>link wallet!</a>
