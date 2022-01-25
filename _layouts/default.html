@@ -35,7 +35,6 @@
     <script> // Script begins -- call variables and link web3
       const f0 = new F0();
       const web3 = new Web3(window.ethereum)
-      var currentStuff = "yrdy"
       // Load images inside <pre>
       for(let frog=1; frog<=5; frog++) {
         let whichFrog = Math.floor(Math.random() * 4035)+frog;
@@ -73,23 +72,23 @@
           document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>(transact)" // Update Mint button
           document.getElementById("mintTransact").removeAttribute("href") // Removes mint button link
           document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>"
-          document.getElementById("pre").innerHTML = currentStuff+"<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
+          document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
 
           // Event listeners
           document.querySelector("#gasEst").addEventListener("click", async (e) => { // Gas estimate button
-            document.querySelector("pre").innerHTML = currentStuff+"\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 1000) / 1000+" ΞEth ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>"
+            document.querySelector("pre").innerHTML = document.getElementById("pre").innerHTML+"\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 1000) / 1000+" ΞEth ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>"
           })
           document.querySelector("#mint").addEventListener("click", async (e) => { // Mint button
-            document.getElementById("pre").innerHTML = currentStuff+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait...<br>"
+            document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait...<br>"
             // Runs mint function through web3/f0
             let tokens = await f0.mint(null, 1)
             var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
               return token.links.opensea
             })
-            document.getElementById("pre").innerHTML = currentStuff+"<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG #"+nextId+" </b>has successfully been minted! <a href='"+openseaTest+"'><b>View on Opensea</a></b><hr>"
+            document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG #"+nextId+" </b>has successfully been minted! <a href='"+openseaTest+"'><b>View on Opensea</a></b><hr>"
           })
         } catch (e) { // Catch and return errors
-          document.querySelector("pre").innerHTML = currentStuff+"\n<b>"+e.message+"! <a href='https://nf7uos.github.io/'>Refresh</a></b>" }
+          document.querySelector("pre").innerHTML = document.getElementById("pre").innerHTML+"\n<b>"+e.message+"! <a href='https://nf7uos.github.io/'>Refresh</a></b>" }
       })
     </script>
   </head>
