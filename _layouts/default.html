@@ -65,9 +65,9 @@
           let nextId = await f0.api.nextId().call()
           let token = await f0.get(nextId);
           
-          let estimateGas = await f0.mintCost(null, 1);
+          let estimate = await f0.mintCost(null, 1);
           var remaining = 4040 - nextId;
-          console.log(estimateGas);
+          console.log(estimate);
           console.log(token)
 
           // Update website layout with set variables
@@ -80,7 +80,7 @@
 
           // Event listeners
           document.querySelector("#gasEst").addEventListener("click", async (e) => { // Gas estimate button
-            document.querySelector("pre").innerHTML = document.getElementById("pre").innerHTML+"\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimateGas.eth.safeLow, null, 1) * 1000) / 1000+" ΞEth ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>"
+            document.querySelector("pre").innerHTML = document.getElementById("pre").innerHTML+"\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 1000) / 1000+" ΞEth ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>"
           })
           document.querySelector("#mint").addEventListener("click", async (e) => { // Mint button
             document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait...<br>"
