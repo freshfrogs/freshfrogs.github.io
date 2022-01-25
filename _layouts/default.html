@@ -37,6 +37,7 @@
     font-size: small;
     border-radius: 1%;
     text-align: center;
+    image-rendering: pixelated;
   }
   .h1 {
     font-family: sans-serif;
@@ -89,6 +90,9 @@
     -ms-transform: scale(2.5); /* IE 9 */
     -webkit-transform: scale(2.5); /* Safari 3-8 */
     transform: scale(2.5); 
+  }
+  .pixelated{
+    image-rendering: pixelated;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -170,7 +174,7 @@
   </head>
   <body class="page-body"> <!-- Main Body -->
     <div class="wrapper">
-      <header> <!-- Left Side Header / Opensea Link / Preview Image -->
+      <header class="pixelated"> <!-- Left Side Header / Opensea Link / Preview Image -->
         <img class="os pixelated pointer" src="openseaLogoW.png" href="https://testnets.opensea.io/collection/forestfrog2"><a href="https://testnets.opensea.io/collection/forestfrog2"><h2 class="h2">View Collection</h2></a>
         <img id="nextTokenImg" class="nextTokenImg" src="/assets/preview.gif">
         <ul class="downloads">
