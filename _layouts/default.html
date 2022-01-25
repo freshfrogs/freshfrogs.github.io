@@ -143,7 +143,7 @@
 
           var userAcc = web3.currentProvider.selectedAddress;
           var userAcc = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
-          
+          var mintCount = 1;
           let nextId = await f0.api.nextId().call()
           let token = await f0.get(nextId);
           
@@ -169,6 +169,27 @@
           document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>"
           document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"\n<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
 
+          //
+          document.querySelector("#1").addEventListener("click", async (e) => {
+            tokenOne = document.createElement("img")
+            tokenOne.src = document.getElementById("1").getAttribute('src')
+            document.getElementById("nextTokenImgCont").innerHTML = tokenOne;
+            var mintCount = 1;
+          })
+          //
+          document.querySelector("#2").addEventListener("click", async (e) => {
+            tokenTwo = document.createElement("img")
+            tokenTwo.src = document.getElementById("2").getAttribute('src')
+            document.getElementById("nextTokenImgCont").innerHTML = tokenTwo;
+            var mintCount = 2;
+          })
+          //
+          document.querySelector("#3").addEventListener("click", async (e) => {
+            tokenThree = document.createElement("img")
+            tokenThree.src = document.getElementById("3").getAttribute('src')
+            document.getElementById("nextTokenImgCont").innerHTML = tokenThree;
+            var mintCount = 1;
+          })
           // Event listeners
           document.querySelector("#gasEst").addEventListener("click", async (e) => { // Gas estimate button
             document.querySelector("pre").innerHTML = document.querySelector("pre").innerHTML+"\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 1000) / 1000+" ΞEth ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>"
@@ -176,7 +197,7 @@
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
             document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait..."
             // Runs mint function through web3/f0
-            let tokens = await f0.mint(null, 1)
+            let tokens = await f0.mint(null, mintCount)
             var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
               return token.links.opensea
             })
@@ -191,7 +212,7 @@
     <div class="wrapper">
       <header class="pixelated"> <!-- Left Side Header / Opensea Link / Preview Image -->
         <img class="os pixelated pointer" src="opensea.jpg" href="https://testnets.opensea.io/collection/forestfrog2"><a href="https://testnets.opensea.io/collection/forestfrog2"><h2 class="h2">View Collection</h2></a>
-        <img id="nextTokenImg" class="nextTokenImg" src="/assets/preview.gif">
+        <div class="nextTokenImgCont" id="nextTokenImgCont"><img id="nextTokenImg" class="nextTokenImg" src="/assets/preview.gif"></div>
         <ul class="downloads">
             <li>
                 <a id="nextToken" class="pointerOff"><strong>4,040</strong>frogs</a>
