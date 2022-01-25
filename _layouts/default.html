@@ -82,7 +82,7 @@
           document.querySelector("#gasEst").addEventListener("click", async (e) => { // Gas estimate button
             document.querySelector("pre").innerHTML = document.querySelector("pre").innerHTML+"\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 1000) / 1000+" ΞEth ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>"
           })
-          document.querySelector("#mint").addEventListener("click", async (e) => { // Mint button
+          document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
             document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait...<br>"
             // Runs mint function through web3/f0
             let tokens = await f0.mint(null, 1)
