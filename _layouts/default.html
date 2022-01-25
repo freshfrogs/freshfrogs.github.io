@@ -166,56 +166,55 @@
           document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>"
           document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"\n<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
 
-          //
+          // FIRST FROG
           document.querySelector("#frog1").addEventListener("click", async (e) => {
             //
             let tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
             let tokenOne = await f0.get(tokenOneThis);
-            let tokenOneCreate = document.createElement("img")
-            tokenOneCreate.src = tokenOne.converted.image;
-            tokenOneCreate.alt = tokenOneThis
-            document.getElementById("nextTokenImgCont").appendChild(tokenOneCreate);
+            document.getElementById("nextTokenImg").setAttribute("src", tokenOne.converted.image);
+            document.getElementById("nextTokenImg").setAttribute("alt", tokenOneThis);
+            //
+            document.getElementById("nextTokenImg2").removeAttribute("src");
+            document.getElementById("nextTokenImg2").removeAttribute("alt");
+            document.getElementById("nextTokenImg3").removeAttribute("src");
+            document.getElementById("nextTokenImg3").removeAttribute("alt");
             //
             var mintCount = 1;
           })
-          //
+          // SECOND FROG
           document.querySelector("#frog2").addEventListener("click", async (e) => {
-            tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
-            tokenOne = await f0.get(tokenOneThis);
-            tokenOneCreate = document.createElement("img")
-            tokenOneCreate.src = tokenOne.converted.image;
-            tokenOneCreate.alt = tokenOneThis
             //
-            tokenTwoThis = document.getElementById("frogImg2").getAttribute('alt')
-            tokenTwo = await f0.get(tokenTwoThis);
-            tokenTwoCreate = document.createElement("img")
-            tokenTwoCreate.src = tokenTwo.converted.image;
-            tokenTwoCreate.alt = tokenTwoThis
+            let tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
+            let tokenOne = await f0.get(tokenOneThis);
+            document.getElementById("nextTokenImg").setAttribute("src", tokenOne.converted.image);
+            document.getElementById("nextTokenImg").setAttribute("alt", tokenOneThis);
             //
-            document.getElementById("nextTokenImgCont").innerHTML = tokenOneCreate+tokenTwoCreate;
+            let tokenTwoThis = document.getElementById("frogImg2").getAttribute('alt')
+            let tokenTwo = await f0.get(tokenTwoThis);
+            document.getElementById("nextTokenImg2").setAttribute("src", tokenTwo.converted.image);
+            document.getElementById("nextTokenImg2").setAttribute("alt", tokenTwoThis);
+            //
+            document.getElementById("nextTokenImg3").removeAttribute("src");
+            document.getElementById("nextTokenImg3").removeAttribute("alt");
             //
             var mintCount = 2;
           })
-          //
+          // THIRD FROG
           document.querySelector("#frog3").addEventListener("click", async (e) => {
-            tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
-            tokenOne = await f0.get(tokenOneThis);
-            tokenOneCreate = document.createElement("img")
-            tokenOneCreate.src = tokenOne.converted.image;
-            tokenOneCreate.alt = tokenOneThis
+            let tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
+            let tokenOne = await f0.get(tokenOneThis);
+            document.getElementById("nextTokenImg").setAttribute("src", tokenOne.converted.image);
+            document.getElementById("nextTokenImg").setAttribute("alt", tokenOneThis);
             //
-            tokenTwoThis = document.getElementById("frogImg2").getAttribute('alt')
-            tokenTwo = await f0.get(tokenTwoThis);
-            tokenTwoCreate = document.createElement("img")
-            tokenTwoCreate.src = tokenTwo.converted.image;
-            tokenTwoCreate.alt = tokenTwoThis
+            let tokenTwoThis = document.getElementById("frogImg2").getAttribute('alt')
+            let tokenTwo = await f0.get(tokenTwoThis);
+            document.getElementById("nextTokenImg2").setAttribute("src", tokenTwo.converted.image);
+            document.getElementById("nextTokenImg2").setAttribute("alt", tokenTwoThis);
             //
-            tokenThreeThis = document.getElementById("frogImg3").getAttribute('alt')
-            tokenThree = await f0.get(tokenThreeThis);
-            tokenThreeCreate = document.createElement("img")
-            tokenThreeCreate.src = tokenThree.converted.image;
-            tokenThreeCreate.alt = tokenThreeThis
-            document.getElementById("nextTokenImgCont").innerHTML = tokenOneCreate+tokenTwoCreate+tokenThreeCreate;
+            let tokenThreeThis = document.getElementById("frogImg3").getAttribute('alt')
+            let tokenThree = await f0.get(tokenThreeThis);
+            document.getElementById("nextTokenImg3").setAttribute("src", tokenThree.converted.image);
+            document.getElementById("nextTokenImg3").setAttribute("alt", tokenThreeThis);
             //
             var mintCount = 3;
           })
@@ -241,7 +240,7 @@
     <div class="wrapper">
       <header class="pixelated"> <!-- Left Side Header / Opensea Link / Preview Image -->
         <img class="os pixelated pointer" src="opensea.jpg" href="https://testnets.opensea.io/collection/forestfrog2"><a href="https://testnets.opensea.io/collection/forestfrog2"><h2 class="h2">View Collection</h2></a>
-        <div class="nextTokenImgCont" id="nextTokenImgCont"><img id="nextTokenImg" class="nextTokenImg" src="/assets/preview.gif"></div>
+        <div class="nextTokenImgCont" id="nextTokenImgCont"><img id="nextTokenImg" class="nextTokenImg" src="/assets/preview.gif"><img id="nextTokenImg2" class="nextTokenImg" src=""><img id="nextTokenImg3" class="nextTokenImg" src=""></div>
         <ul class="downloads">
             <li>
                 <a id="nextToken" class="pointerOff"><strong>4,040</strong>frogs</a>
