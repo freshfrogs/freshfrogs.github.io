@@ -151,7 +151,7 @@
           //
           for(let i=0; i<=2; i++) {
             let nextToken = await f0.get(nextId)+i;
-            document.getElementById(i).setAttribute("src", nextToken.converted.image)
+            document.getElementById(i+1).setAttribute("src", nextToken.converted.image)
           }
           //
 
