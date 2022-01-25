@@ -1,149 +1,88 @@
 <!DOCTYPE html>
 <style>
- img { 
-  width: 90px;
-  image-rendering: pixelated;
-  padding: 0px;
-  transition: transform .2s;
-  border-radius: 1%;
+  .pointer {
+      cursor: pointer;
+  }
+  .pointerOff {
+      cursor: pointer;
+  }
+  .process {
+    cursor: pointer;
+  }
+  .processImages{
+    cursor: pointer;
+  }
+  .collection{
+    cursor: pointer;
+  }
+  .collectionImg{
+    cursor: pointer;
+  }
 
-  display: inline-block;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-  vertical-align: center;
-}
-.collectionImg { 
-  transition: transform .2s;
-  width: 90px;
-  vertical-align: center;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  border-radius: 1%;
-  text-align: center;
-}
-.collection {
-  image-rendering: pixelated;
-}
-.collectionImg:hover{
-  -ms-transform: scale(2.5); /* IE 9 */
-  -webkit-transform: scale(2.5); /* Safari 3-8 */
-  transform: scale(2.5); 
-}
-img:hover{
-  -ms-transform: scale(2.5); /* IE 9 */
-  -webkit-transform: scale(2.5); /* Safari 3-8 */
-  transform: scale(2.5); 
-}
-.pixelated2 { 
-    width: 80px;
+  .page-body {
+    background-image: url("/assets/background.png");
     image-rendering: pixelated;
-    margin: 0px;
-    filter: blur(0px);
-    padding: 0px;
-}
-header {
-  text-rendering: pixelated;
-}
-.pointer{
-  cursor: pointer;
-}
-.pointerOff{
-  cursor: wait;
-}
-.noPointer{
-  cursor: default;
-}
-.test {
-  filter: blur(0px);
-  border-radius: 1%;
-}
-.help{
-  cursor: help;
-}
-.page-body {
-  background-image: url("/assets/background.png");
-  image-rendering: pixelated;
   }
-.page-section {
-  font-family: monospace;
-  font-weight: 550;
-  color: rgba(126, 183, 128, 1);;
-  font-size: medium;
-  image-rendering: pixelated;
-  text-align: center;
+  .page-section {
+    font-family: monospace;
+    font-weight: 550;
+    color: rgba(126, 183, 128, 1);;
+    font-size: medium;
+    image-rendering: pixelated;
+    text-align: center;
   }
-pre{
-  font-size: small;
-  border-radius: 1%;
-}
-.h1 {
-  font-family: sans-serif;
-  font-weight: 800;
-  color: white;
-  text-align: center;
-  image-rendering: pixelated;
-  padding: 0%;
+  .pre {
+    font-size: small;
+    border-radius: 1%;
   }
-.h2 {
-  font-family: sans-serif;
-  font-weight: 800;
-  color: white;
-  text-align: center;
-  image-rendering: auto;
-  padding: 0%;
-  height: 50px;
-  line-height: 50px;
-  vertical-align: middle;
+  .h1 {
+    font-family: sans-serif;
+    font-weight: 800;
+    color: white;
+    text-align: center;
+    image-rendering: pixelated;
+    padding: 0%;
   }
-.h3 {
-  font-family: sans-serif;
-  font-weight: 800;
-  text-align: center;
-  image-rendering: auto;
-  padding: 0%;
+  .h2 {
+    font-family: sans-serif;
+    font-weight: 800;
+    color: white;
+    text-align: center;
+    image-rendering: auto;
+    padding: 0%;
+    height: 50px;
+    line-height: 50px;
+    vertical-align: middle;
   }
-.pixelated {
-  transition: transform .2s;
-  image-rendering: pixelated;
-  width: auto;
-  margin-left: auto;
-  margin-right: auto;
-  display: block;
-  border-radius: 1%;
-}
-.pixelated:hover{
-  -ms-transform: scale(1.1); /* IE 9 */
-  -webkit-transform: scale(1.1); /* Safari 3-8 */
-  transform: scale(1.1); 
-}
-.downloads:hover{
-  -ms-transform: scale(1.1); /* IE 9 */
-  -webkit-transform: scale(1.1); /* Safari 3-8 */
-  transform: scale(1.1); 
-}
-.foot{
-  position: absolute;
-  top: 60%;
-  width: 50%;
-  padding: 0px;
-  image-rendering: pixelated;
-  display: flex;
-  flex-wrap: wrap;
-  border-radius: 1%;
-  margin-left: auto;
-  margin-right: auto;
-}
-.os{
-  float: left;
-  width: 20%;
-  image-rendering: auto;
-}
-.foot2{
-  image-rendering: pixelated;
-  display: flex;
-  flex-wrap: wrap;
-}
+  .h3 {
+    font-family: sans-serif;
+    font-weight: 800;
+    text-align: center;
+    image-rendering: auto;
+    padding: 0%;
+  }
+  .os{
+    float: left;
+    width: 20%;
+    image-rendering: auto;
+  }
+  .collectionImg { 
+    transition: transform .2s;
+    width: 90px;
+    vertical-align: center;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    border-radius: 1%;
+    text-align: center;
+  }
+  .collection {
+    image-rendering: pixelated;
+  }
+  .collectionImg:hover{
+    -ms-transform: scale(2.5); /* IE 9 */
+    -webkit-transform: scale(2.5); /* Safari 3-8 */
+    transform: scale(2.5); 
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <head>
