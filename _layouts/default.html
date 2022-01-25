@@ -1,91 +1,154 @@
 <!DOCTYPE html>
 <style>
-  .pointer {
-      cursor: pointer;
-  }
-  .pointerOff {
-      cursor: pointer;
-  }
-  .process {
-    cursor: pointer;
-  }
-  .processImages{
-    cursor: pointer;
-  }
-  .collection{
-    cursor: pointer;
-  }
-  .collectionImg{
-    cursor: pointer;
-  }
-  .nextTokenImg{
-    width: auto;
-  }
-  .page-body {
-    background-image: url("/assets/background.png");
+img { 
+  width: 90px;
+  image-rendering: pixelated;
+  padding: 0px;
+  transition: transform .2s;
+  border-radius: 1%;
+
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  vertical-align: center;
+}
+.collectionImg { 
+  transition: transform .2s;
+  width: 90px;
+  vertical-align: center;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  border-radius: 1%;
+  text-align: center;
+}
+.collection {
+  image-rendering: pixelated;
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  vertical-align: center;
+}
+.collectionImg:hover{
+  -ms-transform: scale(2.5); /* IE 9 */
+  -webkit-transform: scale(2.5); /* Safari 3-8 */
+  transform: scale(2.5); 
+}
+img:hover{
+  -ms-transform: scale(2.5); /* IE 9 */
+  -webkit-transform: scale(2.5); /* Safari 3-8 */
+  transform: scale(2.5); 
+}
+.pixelated2 { 
+    width: 80px;
     image-rendering: pixelated;
+    margin: 0px;
+    filter: blur(0px);
+    padding: 0px;
+}
+header {
+  text-rendering: pixelated;
+}
+.pointer{
+  cursor: pointer;
+}
+.pointerOff{
+  cursor: wait;
+}
+.noPointer{
+  cursor: default;
+}
+.test {
+  filter: blur(0px);
+  border-radius: 1%;
+}
+.help{
+  cursor: help;
+}
+.page-body {
+  background-image: url("/assets/background.png");
+  image-rendering: pixelated;
   }
-  .page-section {
-    font-family: monospace;
-    font-weight: 550;
-    color: rgba(126, 183, 128, 1);;
-    font-size: medium;
-    image-rendering: pixelated;
-    text-align: center;
+.page-section {
+  font-family: monospace;
+  font-weight: 550;
+  color: rgba(126, 183, 128, 1);;
+  font-size: medium;
+  image-rendering: pixelated;
+  text-align: center;
   }
-  .pre {
-    font-size: small;
-    border-radius: 1%;
-    text-align: center;
+pre{
+  font-size: small;
+  border-radius: 1%;
+}
+.h1 {
+  font-family: sans-serif;
+  font-weight: 800;
+  color: white;
+  text-align: center;
+  image-rendering: pixelated;
+  padding: 0%;
   }
-  .h1 {
-    font-family: sans-serif;
-    font-weight: 800;
-    color: white;
-    text-align: center;
-    image-rendering: pixelated;
-    padding: 0%;
+.h2 {
+  font-family: sans-serif;
+  font-weight: 800;
+  color: white;
+  text-align: center;
+  image-rendering: auto;
+  padding: 0%;
+  height: 50px;
+  line-height: 50px;
+  vertical-align: middle;
   }
-  .h2 {
-    font-family: sans-serif;
-    font-weight: 800;
-    color: white;
-    text-align: center;
-    image-rendering: auto;
-    padding: 0%;
-    height: 50px;
-    line-height: 50px;
-    vertical-align: middle;
+.h3 {
+  font-family: sans-serif;
+  font-weight: 800;
+  text-align: center;
+  image-rendering: auto;
+  padding: 0%;
   }
-  .h3 {
-    font-family: sans-serif;
-    font-weight: 800;
-    text-align: center;
-    image-rendering: auto;
-    padding: 0%;
-  }
-  .os{
-    float: left;
-    width: 20%;
-    image-rendering: auto;
-  }
-  .collectionImg { 
-    transition: transform .2s;
-    width: 90px;
-    vertical-align: center;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    border-radius: 1%;
-    text-align: center;
-  }
-  .collection {
-    image-rendering: pixelated;
-  }
-  .collectionImg:hover{
-    -ms-transform: scale(2.5); /* IE 9 */
-    -webkit-transform: scale(2.5); /* Safari 3-8 */
-    transform: scale(2.5); 
-  }
+.pixelated {
+  transition: transform .2s;
+  image-rendering: pixelated;
+  width: auto;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  border-radius: 1%;
+}
+.pixelated:hover{
+  -ms-transform: scale(1.1); /* IE 9 */
+  -webkit-transform: scale(1.1); /* Safari 3-8 */
+  transform: scale(1.1); 
+}
+.downloads:hover{
+  -ms-transform: scale(1.1); /* IE 9 */
+  -webkit-transform: scale(1.1); /* Safari 3-8 */
+  transform: scale(1.1); 
+}
+.foot{
+  position: absolute;
+  top: 60%;
+  width: 50%;
+  padding: 0px;
+  image-rendering: pixelated;
+  display: flex;
+  flex-wrap: wrap;
+  border-radius: 1%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.os{
+  float: left;
+  width: 20%;
+  image-rendering: auto;
+}
+.foot2{
+  image-rendering: pixelated;
+  display: flex;
+  flex-wrap: wrap;
+}
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <head>
@@ -96,96 +159,109 @@
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
-
-    <!-- ----------------------------------- Begin Script f0 / Call all web3 variables ------------------------------------ -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
-    <script> // Script begins -- call variables and link web3
+    <script>
       const f0 = new F0();
       const web3 = new Web3(window.ethereum)
-      document.addEventListener("DOMContentLoaded", async () => {
-        //
-        // Load images inside <pre>
-        // Load images inside <pre>
+      document.addEventListener("DOMContentLoaded", async () => { // https://nf7uos.github.io/
+        document.querySelector("pre").innerHTML = "<h3 class='h3'>Minting Process</h3>"+"<div class= 'collection' id='collection'></div>"+"\n「 <b><a id='loadFrogs' class='pointer'>View FROGS</a></b> 」「 <b><a href='https://testnets.opensea.io/collection/forestfrog2'>Opensea</a></b> 」「 <b><a href=''>Rarible</a></b> 」"+"<hr>Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b>"+"\nDon't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b>"
+        // document.querySelector("pre").innerHTML = ""
+
         for(let frog=1; frog<=5; frog++) {
-          let whichFrog = Math.floor(Math.random() * 4035)+frog;
+          let whichFrog = Math.floor(Math.random() * 4039)+frog;
           let frogSource = "https://gateway.pinata.cloud/ipfs/QmcdUZdPeUieekmTgZv7rHnuZhojRktAKN3tDn2pZSHMvF/"+whichFrog+".png";
           let frogCreate = document.createElement("img")
           frogCreate.src = frogSource
           frogCreate.className = "collectionImg"
           document.getElementById("collection").appendChild(frogCreate)
         }
-        //
-        //
-        //
+
         try {
           await f0.init({
             web3: web3,
             contract: "0x9500aEe4F34681D38D2f53C634b36b9CCc236d10",
             network: "rinkeby"
           })
-          // connecting message
-          document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>connecting...</i></b>"
-
-          var userAcc = web3.currentProvider.selectedAddress;
-          var userAcc = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
-          
+          document.querySelector("pre").innerHTML = "<h3 class='h3'>Minting Process</h3>"+"<div class= 'collection' id='collection'></div>"+"\n「 <b><a id='loadFrogs2' class='pointer'>View FROGS</a></b> 」「 <b><a href='https://testnets.opensea.io/collection/forestfrog2'>Opensea</a></b> 」「 <b><a href=''>Rarible</a></b> 」"+"<hr>Please connect an Ethereum wallet... <b>Connecting...</b>"+"\nDon't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b>"
           let nextId = await f0.api.nextId().call()
+          let random = Math.floor((Math.random() * 40) + 1);
           let token = await f0.get(nextId);
-          
-          let estimate = await f0.mintCost(null, 1);
+          var userAcc = web3.currentProvider.selectedAddress;
+          let estimate = await f0.mintCost(null, 1); //f0.myInvites()
           var remaining = 4040 - nextId;
           console.log(estimate);
+        //  var last5 = userAcc.substring(0, 5); //0xF01e067d442f4254cd7c89A5D42d90ad554616E8 42
+        //  var first5 = userAcc.substring(0, -5);
+          var userAcc = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
           console.log(token)
-
-          // Update website layout with set variables
-          document.getElementById("nextTokenImg").setAttribute("src", token.converted.image) // Set preview image to next token ID
-          document.getElementById("nextToken").innerHTML = "<strong>FROG #"+nextId+"</strong>available mint" // Update next token ID
-          document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>(transact)" // Update Mint button
-          document.getElementById("mintTransact").removeAttribute("href") // Removes mint button link
-          document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>"
-          document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"\n<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
-
-          // Event listeners
-          document.querySelector("#gasEst").addEventListener("click", async (e) => { // Gas estimate button
-            document.querySelector("pre").innerHTML = document.querySelector("pre").innerHTML+"\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 1000) / 1000+" ΞEth ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>"
+          document.getElementById("nextMint").setAttribute("src", token.converted.image)
+          document.querySelector("img").setAttribute("alt", "logo")
+          for(let i=1; i<=3; i++) {
+            let token2 = await f0.get(nextId-i);
+            let el = document.createElement("img")
+            el.src = token2.converted.image
+            document.getElementById("foot2").appendChild(el)
+          }
+          //
+          document.getElementById("ul2").innerHTML = "<ul class='downloads'>"+"<li><a class='pointer'><strong>"+remaining+"</strong>remaining</a></li>\n<li><a class='noPointer'><strong>Recent Mints</strong></a></li>\n<li><a class='pointer'><strong>View</strong>see collection</a></li></ul>"
+          //
+          document.querySelector("id").innerHTML = "<strong>FROG #"+nextId+"</strong>available mint" //<strong>4,040</strong>frogs
+          document.querySelector("idMint").innerHTML = "<strong>MINT</strong>(transact)" //<strong>MINT</strong>(link wallet)
+          document.querySelector("#mint").removeAttribute("href")
+          document.querySelector("pre").innerHTML = "<h3 class='h3'>Minting Process</h3>"+"<div class= 'collection' id='collection'></div>"+"\n「 <b><a id='loadFrogs2' class='pointer'>View FROGS</a></b> 」「 <b><a href='https://testnets.opensea.io/collection/forestfrog2'>Opensea</a></b> 」「 <b><a href=''>Rarible</a></b> 」"+"<hr>Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>\n<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
+          document.querySelector("#gasEst").addEventListener("click", async (e) => {
+            var x = document.querySelector("pre").innerHTML;
+           // var gasEstRounded = Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 100) / 100
+            document.querySelector("pre").innerHTML = x+"\nEstimated gas fee... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 1000) / 1000+" ΞEth ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>" //JSON.stringify(estimate[key].condition.converted.eth, null, 1)
           })
-          document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
-            document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait..."
-            // Runs mint function through web3/f0
+//
+          document.querySelector("#loadFrogs2").addEventListener("click", async (e) => {
+            for(let frog2=1; frog2<=5; frog2++) {
+              let whichFrog2 = Math.floor(Math.random() * 4039)+frog2;
+              let frogSource2 = "https://gateway.pinata.cloud/ipfs/QmcdUZdPeUieekmTgZv7rHnuZhojRktAKN3tDn2pZSHMvF/"+whichFrog2+".png";
+              let frogCreate2 = document.createElement("img")
+              frogCreate2.src = frogSource2
+              frogCreate2.className = "collectionImg"
+              document.getElementById("collection").appendChild(frogCreate2)
+            }
+          })
+          //
+          document.querySelector("#mint").addEventListener("click", async (e) => {
+            var x = document.querySelector("pre").innerHTML;
+            document.querySelector("pre").innerHTML = x+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction...<br>"
+            // Mint 2 with public invite
             let tokens = await f0.mint(null, 1)
-            var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
+            var openseaTest = tokens.map((token) => {
               return token.links.opensea
             })
-            document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG #"+nextId+" </b>has successfully been minted! <a href='"+openseaTest+"'><b>View on Opensea</a></b><hr>"
+            var x = document.querySelector("pre").innerHTML;
+            document.querySelector("pre").innerHTML = x+"<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG #"+nextId+" </b>has successfully been minted! <a href='"+openseaTest+"'><b>View on Opensea</a></b><hr>"
           })
-        } catch (e) { // Catch and return errors
-          document.querySelector("pre").innerHTML = document.getElementById("pre").innerHTML+"\n<b>"+e.message+"! <a href='https://nf7uos.github.io/'>Refresh</a></b>" }
+        } catch (e) { 
+          var x = document.querySelector("pre").innerHTML;
+          document.querySelector("pre").innerHTML = x+"\n<b>"+e.message+"! <a href='https://nf7uos.github.io/'>Refresh</a></b>" }
       })
     </script>
   </head>
-  <body class="page-body"> <!-- Main Body -->
+  <body class="page-body">
     <div class="wrapper">
-      <header> <!-- Left Side Header / Opensea Link / Preview Image -->
+      <header>
         <img class="os pixelated pointer" src="openseaLogoW.png" href="https://testnets.opensea.io/collection/forestfrog2"><a href="https://testnets.opensea.io/collection/forestfrog2"><h2 class="h2">View Collection</h2></a>
-        <img id="nextTokenImg" class="nextTokenImg" src="/assets/preview.gif">
+
+        <img id="nextMint" class="test pixelated" src="/assets/preview.gif">
         <ul class="downloads">
-            <li>
-                <a id="nextToken" class="pointerOff"><strong>4,040</strong>frogs</a>
-            </li>
-            <li>
-                <a id="gasEst" class="pointerOff"><strong>0.04 ΞEth</strong>plus gas</a>
-            </li>
-            <li>
-                <a id="mintTransact" class="pointer" href="https://nf7uos.github.io/"><b><strike><strong>Mint</strong></strike></b>link wallet!</a>
-            </li>
+          <li><a class="help"><id><strong>4,040</strong>frogs</id></a></li>
+          <li><a id="gasEst" class="help" id="gas"><strong>0.04 ΞEth</strong>plus gas</a></li>
+          <li><a id="mint" class="pointer" href="https://nf7uos.github.io/"><idMint><b><strike><strong>Mint</strong></strike></b>link wallet!</idMint></a></li>
         </ul>
+        <foot class="foot2" id="foot2"></foot>
+        <div id="ul2"></div>
       </header>
-      <section class="page-section"> <!-- Main Content Layout / Index.md -->
+      <section class="page-section">
         {{ content }}
-        <pre id="pre" class="pre"><h3 class="h3">Minting Process</h3><br><div class= "collection" id="collection"></div><br><b><a href='https://nf7uos.github.io/'>Link1</a></b> - <b><a href='https://nf7uos.github.io/'>Link2</a></b> - <b><a href='https://nf7uos.github.io/'>Link3</a></b><hr><netStatus id="netStatus">Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b><br>Don't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b></netStatus></pre>
       </section>
-      <footer> <!-- Footer? -->
+      <footer>
       </footer>
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
