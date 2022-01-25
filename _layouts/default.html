@@ -166,14 +166,14 @@
           document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"\n<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
 
           //
-          document.getElementById("#frog1").addEventListener("click", async (e) => {
+          document.querySelector("#frog1").addEventListener("click", async (e) => {
             tokenOne = document.createElement("img")
             tokenOne.src = document.getElementById("frogImg1").getAttribute('src')
             document.getElementById("nextTokenImgCont").innerHTML = tokenOne;
             var mintCount = 1;
           })
           //
-          document.getElementById("#frog2").addEventListener("click", async (e) => {
+          document.querySelector("#frog2").addEventListener("click", async (e) => {
             tokenOne = document.createElement("img")
             tokenOne.src = document.getElementById("frogImg1").getAttribute('src')
             tokenTwo = document.createElement("img")
@@ -182,7 +182,7 @@
             var mintCount = 2;
           })
           //
-          document.getElementById("#frog3").addEventListener("click", async (e) => {
+          document.querySelector("#frog3").addEventListener("click", async (e) => {
             tokenOne = document.createElement("img")
             tokenOne.src = document.getElementById("frogImg1").getAttribute('src')
             tokenTwo = document.createElement("img")
