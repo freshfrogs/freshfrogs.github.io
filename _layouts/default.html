@@ -169,9 +169,9 @@
           //
           document.querySelector("#frog1").addEventListener("click", async (e) => {
             //
-            tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
-            tokenOne = await f0.get(tokenOneThis);
-            tokenOneCreate = document.createElement("img")
+            let tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
+            let tokenOne = await f0.get(tokenOneThis);
+            let tokenOneCreate = document.createElement("img")
             tokenOneCreate.src = tokenOne.converted.image;
             tokenOneCreate.alt = tokenOneThis
             document.getElementById("nextTokenImgCont").innerHTML = tokenOneCreate;
