@@ -79,7 +79,7 @@
           document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
 
           // Event listeners
-          document.getElementById("gasEst").addEventListener("click", async (e) => { // Gas estimate button
+          document.querySelector("#gasEst").addEventListener("click", async (e) => { // Gas estimate button
             document.querySelector("pre").innerHTML = document.querySelector("pre").innerHTML+"\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 1000) / 1000+" ΞEth ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>"
           })
           document.querySelector("#mint").addEventListener("click", async (e) => { // Mint button
