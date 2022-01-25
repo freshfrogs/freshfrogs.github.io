@@ -151,7 +151,7 @@
             document.querySelector("pre").innerHTML = document.querySelector("pre").innerHTML+"\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 1000) / 1000+" ΞEth ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>"
           })
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
-            document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait...<br>"
+            document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait..."
             // Runs mint function through web3/f0
             let tokens = await f0.mint(null, 1)
             var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
@@ -187,8 +187,7 @@
             <h3 class="h3">Minting Process</h3>
             <div class= "collection" id="collection"></div> <!-- Collection Images -->
             「 <b><a href='https://nf7uos.github.io/'>Link1</a></b> 」「 <b><a href='https://nf7uos.github.io/'>Link2</a></b> 」「 <b><a href='https://nf7uos.github.io/'>Link3</a></b> 」
-            <hr><netStatus id="netStatus">
-            Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b>
+            <hr><netStatus id="netStatus">Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b>
             Don't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b></netStatus>
         </pre>
       </section>
