@@ -123,10 +123,6 @@
         for(let frog=1; frog<=3; frog++) {
           let whichFrog = Math.floor(Math.random() * 4035)+frog;
           let frogSource = "https://gateway.pinata.cloud/ipfs/QmcdUZdPeUieekmTgZv7rHnuZhojRktAKN3tDn2pZSHMvF/"+whichFrog+".png";
-          let frogCreate = document.createElement("img")
-          frogCreate.src = frogSource
-          frogCreate.className = "collectionImg"
-          frogCreate.id = frog
           document.getElementById("collection").innerHTML = document.getElementById("collection").innerHTML+"<a id='"+frog+"'><img src='"+frogSource+"' id='"+frog+"' class='collectionImg'></a>"
         }
         //
@@ -215,7 +211,7 @@
         <div class="nextTokenImgCont" id="nextTokenImgCont"><img id="nextTokenImg" class="nextTokenImg" src="/assets/preview.gif"></div>
         <ul class="downloads">
             <li>
-                <a id="nextToken" class="pointerOff"><strong>4,040</strong>frogs</a><a id="1"></a><a id="2"></a><a id="3"></a>
+                <a id="nextToken" class="pointerOff"><strong>4,040</strong>frogs</a>
             </li>
             <li>
                 <a id="gasEst" class="pointerOff"><strong>0.04 ΞEth</strong>plus gas</a>
