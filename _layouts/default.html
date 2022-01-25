@@ -59,6 +59,28 @@
     width: 20%;
     image-rendering: auto;
   }
+  .collectionImg { 
+  transition: transform .2s;
+  width: 90px;
+  vertical-align: center;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  border-radius: 1%;
+  text-align: center;
+  }
+  .collection {
+    image-rendering: pixelated;
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    vertical-align: center;
+  }
+  .collectionImg:hover{
+    -ms-transform: scale(2.5); /* IE 9 */
+    -webkit-transform: scale(2.5); /* Safari 3-8 */
+    transform: scale(2.5); 
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <head>
