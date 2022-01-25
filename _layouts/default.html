@@ -150,8 +150,8 @@
           // Next frogs generated
           //
           for(let i=0; i<=2; i++) {
-            let token = await f0.get(nextId+i);
-            document.getElementById(i).setAttribute("src", token.converted.image)
+            let nextToken = await f0.get(nextId)+i;
+            document.getElementById(i).setAttribute("src", nextToken.converted.image)
           }
           //
 
