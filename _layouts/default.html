@@ -151,9 +151,9 @@
           // Next frogs generated
           //
           for(let i=0; i<=2; i++) {
-            let nextTokenInit = nextId + i;
+            let nextTokenInit = parseInt(nextId) + i;
             let nextToken = await f0.get(nextTokenInit);
-            document.getElementById("frog"+(i+1)).setAttribute("src", nextToken.converted.image)
+            document.getElementById("frogImg"+(i+1)).setAttribute("src", nextToken.converted.image)
           }
           //
 
@@ -169,7 +169,7 @@
           document.querySelector("#frog1").addEventListener("click", async (e) => {
             tokenOne = document.createElement("img")
             tokenOne.src = document.getElementById("frogImg1").getAttribute('src')
-            document.getElementById("nextTokenImgCont").innerHTML = tokenOne;
+            document.getElementById("nextTokenImgCont").innerHTML = tokenOne.converted.image;
             var mintCount = 1;
           })
           //
@@ -178,7 +178,7 @@
             tokenOne.src = document.getElementById("frogImg1").getAttribute('src')
             tokenTwo = document.createElement("img")
             tokenTwo.src = document.getElementById("frogImg2").getAttribute('src')
-            document.getElementById("nextTokenImgCont").innerHTML = tokenOne+tokenTwo;
+            document.getElementById("nextTokenImgCont").innerHTML = tokenOne.converted.image+tokenTwo.converted.image;
             var mintCount = 2;
           })
           //
@@ -189,7 +189,7 @@
             tokenTwo.src = document.getElementById("frogImg2").getAttribute('src')
             tokenThree = document.createElement("img")
             tokenThree.src = document.getElementById("frogImg3").getAttribute('src')
-            document.getElementById("nextTokenImgCont").innerHTML = tokenOne+tokenTwo+tokenThree;
+            document.getElementById("nextTokenImgCont").innerHTML = tokenOne.converted.image+tokenTwo.converted.image+tokenThree.converted.image;
             var mintCount = 3;
           })
           // Event listeners
