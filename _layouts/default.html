@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <style>
     .pointer {
-        cursor: default;
+        cursor: pointer;
     }
     .pointerOff {
-        cursor: default;
+        cursor: pointer;
     }
     .process {
-      cursor: default;
+      cursor: pointer;
     }
     .processImages{
-      cursor: default;
+      cursor: pointer;
     }
     .collection{
-      cursor: default;
+      cursor: pointer;
     }
     .collectionImg{
-      cursor: default;
+      cursor: pointer;
     }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -79,8 +79,8 @@
           document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
 
           // Event listeners
-          document.querySelector("#gasEst").addEventListener("click", async (e) => { // Gas estimate button
-            document.querySelector("pre").innerHTML = "\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 1000) / 1000+" ΞEth ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>"
+          document.getElementById("gasEst").addEventListener("click", async (e) => { // Gas estimate button
+            document.querySelector("pre").innerHTML = document.querySelector("pre").innerHTML+"\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 1000) / 1000+" ΞEth ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>"
           })
           document.querySelector("#mint").addEventListener("click", async (e) => { // Mint button
             document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait...<br>"
