@@ -144,7 +144,7 @@
           document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>(transact)" // Update Mint button
           document.getElementById("mintTransact").removeAttribute("href") // Removes mint button link
           document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>"
-          document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
+          document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"\n<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
 
           // Event listeners
           document.querySelector("#gasEst").addEventListener("click", async (e) => { // Gas estimate button
@@ -187,7 +187,7 @@
             <h3 class="h3">Minting Process</h3>
             <div class= "collection" id="collection"></div>
             <b><a href='https://nf7uos.github.io/'>Link1</a></b> - <b><a href='https://nf7uos.github.io/'>Link2</a></b> - <b><a href='https://nf7uos.github.io/'>Link3</a></b>
-            <netStatus id="netStatus">Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b>Don't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b></netStatus>
+            <netStatus id="netStatus">Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b><br>Don't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b></netStatus>
         </pre>
       </section>
       <footer> <!-- Footer? -->
