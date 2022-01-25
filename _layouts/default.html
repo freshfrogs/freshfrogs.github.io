@@ -154,6 +154,7 @@
             let nextTokenInit = parseInt(nextId) + i;
             let nextToken = await f0.get(nextTokenInit);
             document.getElementById("frogImg"+(i+1)).setAttribute("src", nextToken.converted.image)
+            document.getElementById("frogImg"+(i+1)).setAttribute("alt", nextTokenInit)
           }
           //
 
@@ -167,29 +168,55 @@
 
           //
           document.querySelector("#frog1").addEventListener("click", async (e) => {
-            tokenOne = document.createElement("img")
-            tokenOne.src = document.getElementById("frogImg1").getAttribute('src')
-            document.getElementById("nextTokenImgCont").innerHTML = tokenOne.converted.image;
+            //
+            tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
+            tokenOne = await f0.get(tokenOneThis);
+            tokenOneCreate = document.createElement("img")
+            tokenOneCreate.src = tokenOne.converted.image;
+            tokenOneCreate.alt = tokenOneThis
+            document.getElementById("nextTokenImgCont").innerHTML = tokenOneCreate;
+            //
             var mintCount = 1;
           })
           //
           document.querySelector("#frog2").addEventListener("click", async (e) => {
-            tokenOne = document.createElement("img")
-            tokenOne.src = document.getElementById("frogImg1").getAttribute('src')
-            tokenTwo = document.createElement("img")
-            tokenTwo.src = document.getElementById("frogImg2").getAttribute('src')
-            document.getElementById("nextTokenImgCont").innerHTML = tokenOne.converted.image+tokenTwo.converted.image;
+            tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
+            tokenOne = await f0.get(tokenOneThis);
+            tokenOneCreate = document.createElement("img")
+            tokenOneCreate.src = tokenOne.converted.image;
+            tokenOneCreate.alt = tokenOneThis
+            //
+            tokenTwoThis = document.getElementById("frogImg2").getAttribute('alt')
+            tokenTwo = await f0.get(tokenTwoThis);
+            tokenTwoCreate = document.createElement("img")
+            tokenTwoCreate.src = tokenTwo.converted.image;
+            tokenTwoCreate.alt = tokenTwoThis
+            //
+            document.getElementById("nextTokenImgCont").innerHTML = tokenOneCreate+tokenTwoCreate;
+            //
             var mintCount = 2;
           })
           //
           document.querySelector("#frog3").addEventListener("click", async (e) => {
-            tokenOne = document.createElement("img")
-            tokenOne.src = document.getElementById("frogImg1").getAttribute('src')
-            tokenTwo = document.createElement("img")
-            tokenTwo.src = document.getElementById("frogImg2").getAttribute('src')
-            tokenThree = document.createElement("img")
-            tokenThree.src = document.getElementById("frogImg3").getAttribute('src')
-            document.getElementById("nextTokenImgCont").innerHTML = tokenOne.converted.image+tokenTwo.converted.image+tokenThree.converted.image;
+            tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
+            tokenOne = await f0.get(tokenOneThis);
+            tokenOneCreate = document.createElement("img")
+            tokenOneCreate.src = tokenOne.converted.image;
+            tokenOneCreate.alt = tokenOneThis
+            //
+            tokenTwoThis = document.getElementById("frogImg2").getAttribute('alt')
+            tokenTwo = await f0.get(tokenTwoThis);
+            tokenTwoCreate = document.createElement("img")
+            tokenTwoCreate.src = tokenTwo.converted.image;
+            tokenTwoCreate.alt = tokenTwoThis
+            //
+            tokenThreeThis = document.getElementById("frogImg3").getAttribute('alt')
+            tokenThree = await f0.get(tokenThreeThis);
+            tokenThreeCreate = document.createElement("img")
+            tokenThreeCreate.src = tokenThree.converted.image;
+            tokenThreeCreate.alt = tokenThreeThis
+            document.getElementById("nextTokenImgCont").innerHTML = tokenOneCreate+tokenTwoCreate+tokenThreeCreate;
+            //
             var mintCount = 3;
           })
           // Event listeners
