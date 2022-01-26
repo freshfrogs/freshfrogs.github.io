@@ -99,39 +99,41 @@
   .nextTokenImgCont{
     vertical-align: center;
     display: inline-flex;
+  }
+  .nextTokenImg {
+    image-rendering: pixelated;
+    vertical-align: center;
+    border-radius: 1%;
+  }
+  .sizeOne{
     width: 100%;
     transition: transform .2s;
-    border-radius: 1%;
   }
-  .nextTokenImgCont2{
-    vertical-align: center;
-    display: inline-flex;
+  .sizeOne:hover{
+    -ms-transform: scale(1.0); /* IE 9 */
+    -webkit-transform: scale(1.0); /* Safari 3-8 */
+    transform: scale(1.0);
+    box-shadow: none;
+  }
+  .sizeTwo{
     width: calc(100% / 2);
     transition: transform .2s;
-    border-radius: 1%;
   }
-  .nextTokenImgCont2:hover{
+  .sizeTwo:hover{
     -ms-transform: scale(2.0); /* IE 9 */
     -webkit-transform: scale(2.0); /* Safari 3-8 */
     transform: scale(2.0);
     box-shadow: none;
   }
-  .nextTokenImgCont3{
-    vertical-align: center;
-    display: inline-flex;
+  .sizeThree{
     width: calc(100% / 3);
     transition: transform .2s;
-    border-radius: 1%;
   }
-  .nextTokenImgCont3:hover{
+  .sizeThree:hover{
     -ms-transform: scale(3.0); /* IE 9 */
     -webkit-transform: scale(3.0); /* Safari 3-8 */
     transform: scale(3.0);
     box-shadow: none;
-  }
-  .nextTokenImg{
-    image-rendering: pixelated;
-    vertical-align: center;
   }
 
 </style>
@@ -209,7 +211,7 @@
             document.getElementById("nextTokenImg").setAttribute("src", tokenOne.converted.image);
             document.getElementById("nextTokenImg").setAttribute("alt", tokenOneThis);
             //
-            document.getElementById("nextTokenImgCont").setAttribute("class", "nextTokenImgCont")
+            document.getElementById("nextTokenImgCont").setAttribute("class", "nextTokenImgCont sizeOne")
             //
             document.getElementById("nextTokenImg2").removeAttribute("src");
             document.getElementById("nextTokenImg2").removeAttribute("alt");
@@ -236,7 +238,7 @@
             document.getElementById("nextTokenImg3").removeAttribute("src");
             document.getElementById("nextTokenImg3").removeAttribute("alt");
             //
-            document.getElementById("nextTokenImgCont").setAttribute("class", "nextTokenImgCont2")
+            document.getElementById("nextTokenImgCont").setAttribute("class", "nextTokenImgCont sizeTwo")
             //
             document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+", "+tokenTwoThis+"</strong>FROG" // Update next token ID
             //
@@ -259,7 +261,7 @@
             document.getElementById("nextTokenImg3").setAttribute("src", tokenThree.converted.image);
             document.getElementById("nextTokenImg3").setAttribute("alt", tokenThreeThis);
             //
-            document.getElementById("nextTokenImgCont").setAttribute("class", "nextTokenImgCont3")
+            document.getElementById("nextTokenImgCont").setAttribute("class", "nextTokenImgCont sizeThree")
             //
             document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+", "+tokenTwoThis+", "+tokenThreeThis+"</strong>FROG" // Update next token ID
             //
@@ -288,7 +290,7 @@
     <div class="wrapper">
       <header class="pixelated"> <!-- Left Side Header / Opensea Link / Preview Image -->
         <img class="os pixelated pointer" src="opensea.jpg" href="https://testnets.opensea.io/collection/forestfrog2"><a href="https://testnets.opensea.io/collection/forestfrog2"><h2 class="h2">View Collection</h2></a>
-        <div class="nextTokenImgCont" id="nextTokenImgCont"><img id="nextTokenImg" class="nextTokenImg" src="/assets/preview.gif"><img id="nextTokenImg2" class="nextTokenImg2" src=""><br><img id="nextTokenImg3" class="nextTokenImg3" src=""></div>
+        <div class="nextTokenImgCont" id="nextTokenImgCont"><img id="nextTokenImg" class="nextTokenImg" src="/assets/preview.gif"><img id="nextTokenImg2" class="nextTokenImg" src=""><br><img id="nextTokenImg3" class="nextTokenImg" src=""></div>
         <ul class="downloads">
             <li>
                 <a id="nextToken" class="pointerOff"><strong>4,040</strong>frogs</a>
