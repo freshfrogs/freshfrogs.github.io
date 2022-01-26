@@ -158,7 +158,7 @@
 
           var userAcc = web3.currentProvider.selectedAddress;
           var userAcc = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
-          var mintNumber = 1;
+          var mintNumber = 3;
           let nextId = await f0.api.nextId().call()
           let token = await f0.get(nextId);
           
