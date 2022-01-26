@@ -176,7 +176,7 @@
 
           // Update website layout with set variables
           document.getElementById("nextTokenImg").setAttribute("src", token.converted.image) // Set preview image to next token ID
-          document.getElementById("nextToken").innerHTML = "<strong>FROG #"+nextId+"</strong>available mint" // Update next token ID
+          document.getElementById("nextToken").innerHTML = "<strong> #"+nextId+"</strong>FROG" // Update next token ID
           document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>(transact)" // Update Mint button
           document.getElementById("mintTransact").removeAttribute("href") // Removes mint button link
           document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>"
@@ -197,6 +197,8 @@
             document.getElementById("nextTokenImg3").removeAttribute("src");
             document.getElementById("nextTokenImg3").removeAttribute("alt");
             //
+
+            //
             var mintCount = 1;
           })
           // SECOND FROG
@@ -216,6 +218,9 @@
             document.getElementById("nextTokenImg3").removeAttribute("alt");
             //
             document.getElementById("nextTokenImgCont").setAttribute("class", "nextTokenImgCont2")
+            //
+            document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+", "+tokenTwoThis+"</strong>FROG" // Update next token ID
+            //
             var mintCount = 2;
           })
           // THIRD FROG
@@ -236,6 +241,9 @@
             document.getElementById("nextTokenImg3").setAttribute("alt", tokenThreeThis);
             //
             document.getElementById("nextTokenImgCont").setAttribute("class", "nextTokenImgCont3")
+            //
+            document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+", "+tokenTwoThis+", "+tokenThreeThis+"</strong>FROG" // Update next token ID
+            //
             var mintCount = 3;
           })
           // Event listeners
