@@ -101,7 +101,12 @@
   }
   .nextTokenImgCont{
     max-width: 100%;
-    max-height: 128px;
+  }
+  .nextTokenImgCont2{
+    max-width: 100% / 2;
+  }
+  .nextTokenImgCont3{
+    max-width: 100% / 3;
   }
   .nextTokenImg{
     display: flex;
@@ -182,6 +187,8 @@
             document.getElementById("nextTokenImg").setAttribute("src", tokenOne.converted.image);
             document.getElementById("nextTokenImg").setAttribute("alt", tokenOneThis);
             //
+            document.getElementById("nextTokenImgCont").setAttribute("class", "nextTokenImgCont")
+            //
             document.getElementById("nextTokenImg2").removeAttribute("src");
             document.getElementById("nextTokenImg2").removeAttribute("alt");
             document.getElementById("nextTokenImg3").removeAttribute("src");
@@ -205,6 +212,7 @@
             document.getElementById("nextTokenImg3").removeAttribute("src");
             document.getElementById("nextTokenImg3").removeAttribute("alt");
             //
+            document.getElementById("nextTokenImgCont").setAttribute("class", "nextTokenImgCont2")
             var mintCount = 2;
           })
           // THIRD FROG
@@ -224,6 +232,7 @@
             document.getElementById("nextTokenImg3").setAttribute("src", tokenThree.converted.image);
             document.getElementById("nextTokenImg3").setAttribute("alt", tokenThreeThis);
             //
+            document.getElementById("nextTokenImgCont").setAttribute("class", "nextTokenImgCont3")
             var mintCount = 3;
           })
           // Event listeners
