@@ -83,6 +83,7 @@
     border-radius: 1%;
     text-align: center;
     box-shadow: 5px 10px rgba(211, 211, 211, 0.329);
+    border-radius: 1%;
   }
   .collection {
     image-rendering: pixelated;
@@ -211,7 +212,7 @@
             document.getElementById("nextTokenImg").setAttribute("src", tokenOne.converted.image);
             document.getElementById("nextTokenImg").setAttribute("alt", tokenOneThis);
             //
-            document.getElementById("nextTokenImgCont").setAttribute("class", "nextTokenImgCont sizeOne")
+            document.getElementById("nextTokenImg").setAttribute("class", "nextTokenImg sizeOne")
             //
             document.getElementById("nextTokenImg2").removeAttribute("src");
             document.getElementById("nextTokenImg2").removeAttribute("alt");
@@ -238,7 +239,8 @@
             document.getElementById("nextTokenImg3").removeAttribute("src");
             document.getElementById("nextTokenImg3").removeAttribute("alt");
             //
-            document.getElementById("nextTokenImgCont").setAttribute("class", "nextTokenImgCont sizeTwo")
+            document.getElementById("nextTokenImg").setAttribute("class", "nextTokenImg sizeTwo")
+            document.getElementById("nextTokenImg2").setAttribute("class", "nextTokenImg sizeTwo")
             //
             document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+", "+tokenTwoThis+"</strong>FROG" // Update next token ID
             //
@@ -261,7 +263,9 @@
             document.getElementById("nextTokenImg3").setAttribute("src", tokenThree.converted.image);
             document.getElementById("nextTokenImg3").setAttribute("alt", tokenThreeThis);
             //
-            document.getElementById("nextTokenImgCont").setAttribute("class", "nextTokenImgCont sizeThree")
+            document.getElementById("nextTokenImg").setAttribute("class", "nextTokenImg sizeThree")
+            document.getElementById("nextTokenImg2").setAttribute("class", "nextTokenImg sizeThree")
+            document.getElementById("nextTokenImg3").setAttribute("class", "nextTokenImg sizeThree")
             //
             document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+", "+tokenTwoThis+", "+tokenThreeThis+"</strong>FROG" // Update next token ID
             //
