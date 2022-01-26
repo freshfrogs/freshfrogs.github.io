@@ -217,6 +217,8 @@
             document.getElementById("nextTokenImg2").removeAttribute("alt");
             document.getElementById("nextTokenImg3").removeAttribute("src");
             document.getElementById("nextTokenImg3").removeAttribute("alt");
+            document.getElementById("nextTokenImg4").removeAttribute("src");
+            document.getElementById("nextTokenImg4").removeAttribute("alt");
             //
             document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+"</strong>FROG" // Update next token ID
             //
@@ -237,6 +239,8 @@
             //
             document.getElementById("nextTokenImg3").removeAttribute("src");
             document.getElementById("nextTokenImg3").removeAttribute("alt");
+            document.getElementById("nextTokenImg4").removeAttribute("src");
+            document.getElementById("nextTokenImg4").removeAttribute("alt");
             //
             document.getElementById("nextTokenImg").setAttribute("class", "nextTokenImg sizeTwo")
             document.getElementById("nextTokenImg2").setAttribute("class", "nextTokenImg sizeTwo")
@@ -261,6 +265,9 @@
             let tokenThree = await f0.get(tokenThreeThis);
             document.getElementById("nextTokenImg3").setAttribute("src", tokenThree.converted.image);
             document.getElementById("nextTokenImg3").setAttribute("alt", tokenThreeThis);
+            //
+            document.getElementById("nextTokenImg4").removeAttribute("src");
+            document.getElementById("nextTokenImg4").removeAttribute("alt");
             //
             document.getElementById("nextTokenImg").setAttribute("class", "nextTokenImg sizeTwo")
             document.getElementById("nextTokenImg2").setAttribute("class", "nextTokenImg sizeTwo")
