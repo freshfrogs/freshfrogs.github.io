@@ -207,7 +207,7 @@
             //
             document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+"</strong>FROG" // Update next token ID
             //
-            let mintNumber = 1;
+            mintNumber = 1;
           })
           // SECOND FROG
           document.querySelector("#frog2").addEventListener("click", async (e) => {
@@ -229,7 +229,7 @@
             //
             document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+", "+tokenTwoThis+"</strong>FROG" // Update next token ID
             //
-            let mintNumber = 2;
+            mintNumber = 2;
           })
           // THIRD FROG
           document.querySelector("#frog3").addEventListener("click", async (e) => {
@@ -252,7 +252,7 @@
             //
             document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+", "+tokenTwoThis+", "+tokenThreeThis+"</strong>FROG" // Update next token ID
             //
-            let mintNumber = 3;
+            mintNumber = 3;
           })
           // Event listeners
           document.querySelector("#gasEst").addEventListener("click", async (e) => { // Gas estimate button
@@ -262,7 +262,7 @@
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
             document.getElementById("pre2").innerHTML = document.getElementById("pre2").innerHTML+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait..."
             // Runs mint function through web3/f0
-            let tokens = await f0.mint(null, parseInt(mintNumber))
+            let tokens = await f0.mint(null, mintNumber)
             var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
               return token.links.opensea
             })
