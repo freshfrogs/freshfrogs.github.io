@@ -158,7 +158,7 @@
 
           var userAcc = web3.currentProvider.selectedAddress;
           var userAcc = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
-          var mintNumber = 3;
+          let mintNumber = 3;
           let nextId = await f0.api.nextId().call()
           let token = await f0.get(nextId);
           
@@ -200,7 +200,7 @@
             document.getElementById("nextTokenImg3").removeAttribute("src");
             document.getElementById("nextTokenImg3").removeAttribute("alt");
             //
-            var mintNumber = 1;
+            let mintNumber = 1;
           })
           // SECOND FROG
           document.querySelector("#frog2").addEventListener("click", async (e) => {
@@ -222,7 +222,7 @@
             //
             document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+", "+tokenTwoThis+"</strong>FROG" // Update next token ID
             //
-            var mintNumber = 2;
+            let mintNumber = 2;
           })
           // THIRD FROG
           document.querySelector("#frog3").addEventListener("click", async (e) => {
@@ -245,16 +245,17 @@
             //
             document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+", "+tokenTwoThis+", "+tokenThreeThis+"</strong>FROG" // Update next token ID
             //
-            var mintNumber = 3;
+            let mintNumber = 3;
           })
           // Event listeners
           document.querySelector("#gasEst").addEventListener("click", async (e) => { // Gas estimate button
+            let estimate = await f0.mintCost(null, mintNumber);
             document.querySelector("pre").innerHTML = document.querySelector("pre").innerHTML+"\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, mintNumber) * 1000) / 1000+" ΞEth ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>"
           })
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
             document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait..."
             // Runs mint function through web3/f0
-            let tokens = await f0.mint(null, parseInt(mintNumber))
+            let tokens = await f0.mint(null, mintNumber)
             var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
               return token.links.opensea
             })
