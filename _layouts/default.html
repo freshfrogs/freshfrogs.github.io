@@ -262,7 +262,7 @@
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
             document.getElementById("pre2").innerHTML = document.getElementById("pre2").innerHTML+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait..."
             // Runs mint function through web3/f0
-            let tokens = await f0.mint(null, mintNumber)
+            let tokens = await f0.mint(null, parseInt(mintNumber))
             var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
               return token.links.opensea
             })
