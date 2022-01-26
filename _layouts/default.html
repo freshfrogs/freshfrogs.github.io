@@ -260,9 +260,9 @@
             document.querySelector("pre2").innerHTML = document.querySelector("pre2").innerHTML+"\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, mintNumber) * 1000) / 1000+" ΞEth ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>"
           })
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
-            document.getElementById("pre2").innerHTML = document.getElementById("pre2").innerHTML+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait..."
+            document.querySelector("pre2").innerHTML = document.querySelector("pre2").innerHTML+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait..."
             // Runs mint function through web3/f0
-            let tokens = await f0.mint(null, parseInt(mintNumber))
+            let tokens = await f0.mint(null, mintNumber)
             var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
               return token.links.opensea
             })
