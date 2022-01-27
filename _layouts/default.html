@@ -383,16 +383,15 @@
             document.querySelector("pre2").appendChild(newLine)
           })
           document.querySelector("#seeInvites").addEventListener("click", async (e) => { // Gas estimate button
-
+            //
+            newLine = document.createElement("div")
+            newLine.innerHTML = "\nListing available invite codes...\n"+bodyMarkup
+            document.querySelector("pre2").appendChild(newLine)
             newKeyLine = document.createElement("a")
             newKeyLine.id = "setInviteKey"
             newKeyLine.class = "pointer"
             newKeyLine.innerHTML = key
             document.querySelector("pre2").appendChild(newKeyLine)
-            //
-            newLine = document.createElement("div")
-            newLine.innerHTML = "\nListing available invite codes...\n"+bodyMarkup
-            document.querySelector("pre2").appendChild(newLine)
           })
           document.querySelector("#setInviteKey").addEventListener("click", async (e) => { // Gas estimate button
             inviteKeyFinal = document.querySelector("setInviteKey").innerHTML
