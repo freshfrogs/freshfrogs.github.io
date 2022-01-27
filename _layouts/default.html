@@ -241,11 +241,10 @@
           const myInvites = await f0.myInvites()
           const bodyMarkup = Object.keys(myInvites).map((key) => { 
             return `
-              <tr>
-                <td>${key}</td>
-                <td>${JSON.stringify(myInvites[key].condition.converted, null, 1)}</td>
-                <td>${myInvites[key].list.join("\n\n")}</td>
-              </tr>`
+                <b><a id="thisIsATest">${key}</a><b>
+                <b>Mint Cost</b>${JSON.stringify(myInvites[key].condition.converted.eth, null, 1)}
+                <b>Maximum Ammount</b>${JSON.stringify(myInvites[key].condition.converted.limit, null, 1)}
+              `
           }).join("")
 
           let estimate = await f0.mintCost(null, 1);
