@@ -215,7 +215,7 @@
 
         for(let frog=1; frog<=4; frog++) {
           let whichFrog = Math.floor(Math.random() * 40)+frog;
-          let frogSource = "/assets/frrogs/"+whichFrog+".png";
+          let frogSource = "./assets/frogs/"+whichFrog+".png";
           document.getElementById("frog"+frog).innerHTML = "<img src='"+frogSource+"' id='frogImg"+frog+"' class='collectionImg' alt='"+whichFrog+"'></a>"
         }
 
