@@ -241,6 +241,9 @@
           
           const myInvites = await f0.myInvites()
           const bodyMarkup = Object.keys(myInvites).map((key) => { 
+            //
+            document.createElement("div")
+            //
             return `<b><a id="setInviteKey" class="pointer">${key}</a><b><br><b><strong>Mint Cost: ${JSON.stringify(myInvites[key].condition.converted.eth, null, 1)} ΞETH</strong></b><b><strong>Max Ammount: ${JSON.stringify(myInvites[key].condition.converted.limit, null, 1)}</strong></b><br>`
           }).join("")
 
@@ -380,6 +383,13 @@
             document.querySelector("pre2").appendChild(newLine)
           })
           document.querySelector("#seeInvites").addEventListener("click", async (e) => { // Gas estimate button
+
+            newKeyLine = document.createElement("a")
+            newKeyLine.id = "setInviteKey"
+            newKeyLine.class = "pointer"
+            newKeyLine.innerHTML = key
+            document.querySelector("pre2").appendChild(newKeyLine)
+            //
             newLine = document.createElement("div")
             newLine.innerHTML = "\nListing available invite codes...\n"+bodyMarkup
             document.querySelector("pre2").appendChild(newLine)
