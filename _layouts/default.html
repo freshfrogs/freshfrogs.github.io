@@ -370,7 +370,7 @@
           // Event listeners
           document.querySelector("#gasEst").addEventListener("click", async (e) => { // Gas estimate button
             let estimate = await f0.mintCost(null, mintNumber);
-            document.querySelector("pre2").innerHTML = document.querySelector("pre2").innerHTML+"\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, mintNumber) * 1000) / 1000+" ΞEth ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>"
+            document.querySelector("pre2").innerHTML = document.querySelector("pre2").innerHTML+"\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, mintNumber) * 1000) / 1000+" ΞETH ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>"
           })
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
             document.querySelector("pre2").innerHTML = document.querySelector("pre2").innerHTML+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait..."
@@ -398,7 +398,7 @@
                 <a id="nextToken" class="pointerOff"><strong>4,040</strong>frogs</a>
             </li>
             <li>
-                <a id="gasEst" class="pointerOff"><strong>0.04 ΞEth</strong>plus gas</a>
+                <a id="gasEst" class="pointerOff"><strong>0.04 ΞETH</strong>plus gas</a>
             </li>
             <li>
                 <a id="mintTransact" class="pointer" href="https://nf7uos.github.io/"><b><strike><strong>Mint</strong></strike></b>link wallet!</a>
