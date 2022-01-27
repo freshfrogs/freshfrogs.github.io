@@ -234,7 +234,7 @@
 
           var userAcc = web3.currentProvider.selectedAddress;
           var userAcc = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
-          let mintNumber = 3;
+          let mintNumber = 1;
           let nextId = await f0.api.nextId().call()
           let token = await f0.get(nextId);
           
@@ -314,7 +314,7 @@
             //
             document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+","+tokenTwoThis+"</strong>FROG" // Update next token ID
             //
-            let mintNumber = 2;
+            mintNumber = 2;
           })
           // THIRD FROG
           document.querySelector("#frog3").addEventListener("click", async (e) => {
@@ -342,7 +342,7 @@
             //
             document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+","+tokenTwoThis+","+tokenThreeThis+"</strong>FROG" // Update next token ID
             //
-            let mintNumber = 3;
+            mintNumber = 3;
           })
           // FOURTH FROG
           document.querySelector("#frog4").addEventListener("click", async (e) => {
@@ -374,7 +374,7 @@
             //
             document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+","+tokenTwoThis+","+tokenThreeThis+","+tokenFourThis+"</strong>FROG" // Update next token ID
             //
-            let mintNumber = 4;
+            mintNumber = 4;
           })
           // Event listeners // inviteKeys
           document.querySelector("#gasEst").addEventListener("click", async (e) => { // Gas estimate button
