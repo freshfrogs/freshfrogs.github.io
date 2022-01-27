@@ -394,7 +394,7 @@
             newLine.innerHTML = "\nListing available invite codes...\n"+bodyMarkup
             document.querySelector("pre2").appendChild(newLine)
           })
-          document.getElementById("#setInviteKey").addEventListener("click", async (e) => { // Gas estimate button
+          document.querySelector("#setInviteKey").addEventListener("click", async (e) => { // Gas estimate button
             inviteKeyFinal = document.querySelector("setInviteKey").innerHTML
             newLine = document.createElement("div")
             newLine.innerHTML = "\nInvite key has applied...\n"+inviteKeyFinal
