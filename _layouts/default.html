@@ -380,7 +380,7 @@
           document.querySelector("#seeInvites").addEventListener("click", async (e) => { // Gas estimate button
             document.querySelector("pre2").innerHTML = document.querySelector("pre2").innerHTML+"\nListing available invite codes...\n"+bodyMarkup
           })
-          document.querySelector("setInviteKey").addEventListener("click", async (e) => { // Gas estimate button
+          document.getElementById("#setInviteKey").addEventListener("click", async (e) => { // Gas estimate button
             inviteKeyFinal = document.querySelector("setInviteKey").innerHTML
             document.querySelector("pre2").innerHTML = document.querySelector("pre2").innerHTML+"\nInvite key has applied...\n"+inviteKeyFinal
           })
