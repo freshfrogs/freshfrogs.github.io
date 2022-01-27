@@ -18,10 +18,6 @@
   .collectionImg{
     cursor: pointer;
   }
-  body {
-    background-image: url("/assets/background.png");
-    image-rendering: pixelated;
-  }
   .page-section {
     font-family: monospace;
     font-weight: 550;
@@ -139,25 +135,31 @@
   .repoHeader{
     margin-left: auto;
     margin-right: auto;
-    width: 50%
+    width: 50%;
+    position: relative;
   }
   .repoHeader2{
     margin-left: auto;
     right: 50%;
     width: 25%;
     float: none;
-    position: static;
+    position: relative;
   }
   .repoPre{
     margin-right: auto;
     left: 50%;
     width: 25%;
-    position: static;
+    position: relative;
   }
   .wrapper2{
     margin-top: 1%;
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
+  }
+  body {
+    background-image: url("/assets/background.png");
+    image-rendering: pixelated;
+    position: relative;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
