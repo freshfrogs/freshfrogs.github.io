@@ -216,12 +216,12 @@
 
         setTimeout(function(){
           for(let frog=1; frog<=4; frog++) {
-            let whichFrog = frog;
+            let whichFrog = Math.floor(Math.random() * 4035)+frog;;
             let frogSource = "https://gateway.pinata.cloud/ipfs/QmcdUZdPeUieekmTgZv7rHnuZhojRktAKN3tDn2pZSHMvF/"+whichFrog+".png";
             document.getElementById("frog"+frog).innerHTML = "<img src='"+frogSource+"' id='frogImg"+frog+"' class='collectionImg' alt='"+whichFrog+"'></a>"
           }
 
-        }, 500); 
+        }, 50); 
 
 
         // Load images inside <pre>
