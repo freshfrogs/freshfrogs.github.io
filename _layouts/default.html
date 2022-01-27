@@ -139,14 +139,12 @@
   .repoHeader{
     margin-left: auto;
     margin-right: auto;
-    margin-top: 10%;
-    height: 5%;
-    width: 50%;
   }
   .repoHeader2{
     margin-left: auto;
     right: 50%;
     width: 25%;
+    float: none;
   }
   .repoPre{
     margin-right: auto;
@@ -351,29 +349,32 @@
     </script>
   </head>
   <body class="page-body"> <!-- Main Body -->
-      <section class="page-section repoHeader"> <!-- Main Content Layout / Index.md -->
-        {{ content }}
-      </section>
-      <div class="wrapper">
-        <header class="pixelated repoHeader"> <!-- Left Side Header / Opensea Link / Preview Image -->
-          <img class="os pixelated pointer" src="opensea.jpg" href="https://testnets.opensea.io/collection/forestfrog2"><a href="https://testnets.opensea.io/collection/forestfrog2"><h2 class="h2">View Collection</h2></a>
-          <div class="nextTokenImgCont" id="nextTokenImgCont"><img id="nextTokenImg" class="nextTokenImg" src="/assets/preview.gif"><img id="nextTokenImg2" class="nextTokenImg" src=""></div><div class="nextTokenImgCont" id="nextTokenImgCont2"><img id="nextTokenImg3" class="nextTokenImg" src=""><img id="nextTokenImg4" class="nextTokenImg" src=""></div>
-          <ul class="downloads">
-              <li>
-                  <a id="nextToken" class="pointerOff"><strong>4,040</strong>frogs</a>
-              </li>
-              <li>
-                  <a id="gasEst" class="pointerOff"><strong>0.04 ΞEth</strong>plus gas</a>
-              </li>
-              <li>
-                  <a id="mintTransact" class="pointer" href="https://nf7uos.github.io/"><b><strike><strong>Mint</strong></strike></b>link wallet!</a>
-              </li>
-          </ul>
-        </header>
-        <pre id="pre" class="pre repoPre"><br><h2 class="h3">Minting Station</h2><div class= "collection" id="collection"><a id="frog1"></a><a id="frog2"></a><a id="frog3"></a><a id="frog4"></a></div><br><hr><netStatus id="netStatus">Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b><br>Don't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b> <br><hr></netStatus><pre2></pre2></pre>
-      </div>
-      <footer> <!-- Footer? -->
-      </footer>
+    <section class="page-section repoHeader"> <!-- Main Content Layout / Index.md -->
+      {{ content }}
+    </section>
+
+    <div class="wrapper">
+      <header class="pixelated repoHeader"> <!-- Left Side Header / Opensea Link / Preview Image -->
+        <img class="os pixelated pointer" src="opensea.jpg" href="https://testnets.opensea.io/collection/forestfrog2"><a href="https://testnets.opensea.io/collection/forestfrog2"><h2 class="h2">View Collection</h2></a>
+        <div class="nextTokenImgCont" id="nextTokenImgCont"><img id="nextTokenImg" class="nextTokenImg" src="/assets/preview.gif"><img id="nextTokenImg2" class="nextTokenImg" src=""></div><div class="nextTokenImgCont" id="nextTokenImgCont2"><img id="nextTokenImg3" class="nextTokenImg" src=""><img id="nextTokenImg4" class="nextTokenImg" src=""></div>
+        <ul class="downloads">
+            <li>
+                <a id="nextToken" class="pointerOff"><strong>4,040</strong>frogs</a>
+            </li>
+            <li>
+                <a id="gasEst" class="pointerOff"><strong>0.04 ΞEth</strong>plus gas</a>
+            </li>
+            <li>
+                <a id="mintTransact" class="pointer" href="https://nf7uos.github.io/"><b><strike><strong>Mint</strong></strike></b>link wallet!</a>
+            </li>
+        </ul>
+      </header>
+      <pre id="pre" class="pre repoPre"><br><h2 class="h3">Minting Station</h2><div class= "collection" id="collection"><a id="frog1"></a><a id="frog2"></a><a id="frog3"></a><a id="frog4"></a></div><br><hr><netStatus id="netStatus">Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b><br>Don't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b> <br><hr></netStatus><pre2></pre2></pre>
+    </div>
+    
+    <footer> <!-- Footer? -->
+    </footer>
+
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
   </body>
 </html>
