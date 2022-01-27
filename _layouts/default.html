@@ -372,10 +372,10 @@
             mintNumber = 4;
           })
           // Event listeners // inviteKeys
-          document.querySelector("#gasEst").addEventListener("click", async (e) => { // Gas estimate button
+          function myTestFunction() { // Gas estimate button
             let estimate = await f0.mintCost(null, mintNumber);
             document.querySelector("pre2").appendChild("\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, mintNumber) * 1000) / 1000+" ΞETH ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>")
-          })
+          }
           document.querySelector("#seeInvites").addEventListener("click", async (e) => { // Gas estimate button
             document.querySelector("pre2").appendChild("\nListing available invite codes...\n"+bodyMarkup)
           })
@@ -409,7 +409,7 @@
                 <a id="nextToken" class="pointerOff"><strong>4,040</strong>frogs</a>
             </li>
             <li>
-                <a id="gasEst" class="pointerOff"><strong>0.04 ΞETH</strong>plus gas</a>
+                <a id="gasEst" class="pointerOff" onclick="myTestFunction()"><strong>0.04 ΞETH</strong>plus gas</a>
             </li>
             <li>
                 <a id="mintTransact" class="pointer" href="https://nf7uos.github.io/"><b><strike><strong>Mint</strong></strike></b>link wallet!</a>
