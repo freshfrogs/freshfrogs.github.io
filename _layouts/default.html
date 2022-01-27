@@ -369,32 +369,31 @@
             document.getElementById("nextTokenImg4").setAttribute("class", "nextTokenImg sizeTwo")
             //
             document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+","+tokenTwoThis+","+tokenThreeThis+","+tokenFourThis+"</strong>FROG" // Update next token ID
-            //
             mintNumber = 4;
           })
           // Event listeners // inviteKeys
           document.querySelector("#gasEst").addEventListener("click", async (e) => { // Gas estimate button
             let estimate = await f0.mintCost(null, mintNumber);
-            document.querySelector("pre2").innerHTML = document.querySelector("pre2").innerHTML+"\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, mintNumber) * 1000) / 1000+" ΞETH ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>"
+            document.querySelector("pre2").appendChild("\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, mintNumber) * 1000) / 1000+" ΞETH ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>")
           })
           document.querySelector("#seeInvites").addEventListener("click", async (e) => { // Gas estimate button
-            document.querySelector("pre2").innerHTML = document.querySelector("pre2").innerHTML+"\nListing available invite codes...\n"+bodyMarkup
+            document.querySelector("pre2").appendChild("\nListing available invite codes...\n"+bodyMarkup)
           })
           document.querySelector("#setInviteKey").addEventListener("click", async (e) => { // Gas estimate button
             inviteKeyFinal = document.querySelector("setInviteKey").innerHTML
-            document.querySelector("pre2").innerHTML = document.querySelector("pre2").innerHTML+"\nInvite key has applied...\n"+inviteKeyFinal
+            document.querySelector("pre2").appendChild("\nInvite key has applied...\n"+inviteKeyFinal)
           })
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
-            document.querySelector("pre2").innerHTML = document.querySelector("pre2").innerHTML+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait..."
+            document.querySelector("pre2").appendChild("\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait...")
             // Runs mint function through web3/f0
             let tokens = await f0.mint(inviteKeyFinal, mintNumber)
             var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
               return token.links.opensea
             })
-            document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG #"+nextId+" </b>has successfully been minted! <a href='"+openseaTest+"'><b>View on Opensea</a></b><hr>"
+            document.getElementById("pre").appendChild("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG #"+nextId+" </b>has successfully been minted! <a href='"+openseaTest+"'><b>View on Opensea</a></b><hr>")
           })
         } catch (e) { // Catch and return errors
-          document.querySelector("pre").innerHTML = document.getElementById("pre").innerHTML+"\n<b>"+e.message+"! <a href='https://nf7uos.github.io/'>Refresh</a></b>" }
+          document.querySelector("pre").appendChild("\n<b>"+e.message+"! <a href='https://nf7uos.github.io/'>Refresh</a></b>") }
       })
     </script>
   </head>
@@ -418,7 +417,7 @@
         </ul>
         <div class="nextTokenImgCont" id="nextTokenImgCont"><img id="nextTokenImg" class="nextTokenImg" src="/assets/frogs/FR0G.png"><img id="nextTokenImg2" class="nextTokenImg" src=""></div><div class="nextTokenImgCont" id="nextTokenImgCont2"><img id="nextTokenImg3" class="nextTokenImg" src=""><img id="nextTokenImg4" class="nextTokenImg" src=""></div>
       </header>
-      <pre id="pre" class="pre repoPre"><br><h2 class="h3">How to Mint</h2><div class= "collection" id="collection"><a id="frog1"></a><a id="frog2"></a><a id="frog3"></a><a id="frog4"></a></div><br><hr><a class= "pointer" id="setInviteKey"></a><netStatus id="netStatus">Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b><br>Don't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b><hr></netStatus><br><pre2></pre2></pre>
+      <pre id="pre" class="pre repoPre"><br><h2 class="h3">How to Mint</h2><div class= "collection" id="collection"><a id="frog1"></a><a id="frog2"></a><a id="frog3"></a><a id="frog4"></a></div><br><hr><netStatus id="netStatus">Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b><br>Don't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b><hr></netStatus><br><pre2></pre2></pre>
     </div>
     
     <footer> <!-- Footer? -->
