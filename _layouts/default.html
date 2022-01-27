@@ -18,7 +18,7 @@
   .collectionImg{
     cursor: pointer;
   }
-  .page-body {
+  body {
     background-image: url("/assets/background.png");
     image-rendering: pixelated;
   }
@@ -159,9 +159,6 @@
     display: flex;
     flex-wrap: nowrap;
     position: absolute;
-  }
-  body {
-    width: 100%
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -355,7 +352,7 @@
       })
     </script>
   </head>
-  <body class="page-body"> <!-- Main Body -->
+  <body> <!-- Main Body -->
     <section class="page-section repoHeader"> <!-- Main Content Layout / Index.md -->
       {{ content }}
     </section>
