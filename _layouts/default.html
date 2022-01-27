@@ -238,8 +238,16 @@
           let nextId = await f0.api.nextId().call()
           let token = await f0.get(nextId);
           
-          const invites = await f0.myInvites()
+          const myInvites = await f0.myInvites()
           const inviteKeys = Object.keys(invites)
+          const bodyMarkup = Object.keys(myInvites).map((key) => { 
+            return `
+              <tr>
+                <td>${key}</td>
+                <td><pre>${JSON.stringify(myInvites[key].condition.converted, null, 2)}</pre></td>
+                <td><pre>${myInvites[key].list.join("\n\n")}</pre></td>
+              </tr>`
+          }).join("")
 
           let estimate = await f0.mintCost(null, 1);
           var remaining = 4040 - nextId;
@@ -376,7 +384,7 @@
             document.querySelector("pre2").innerHTML = document.querySelector("pre2").innerHTML+"\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, mintNumber) * 1000) / 1000+" ΞETH ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>"
           })
           document.querySelector("#seeInvites").addEventListener("click", async (e) => { // Gas estimate button
-            document.querySelector("pre2").innerHTML = document.querySelector("pre2").innerHTML+"\nListing available invite codes...\n"+invites
+            document.querySelector("pre2").innerHTML = document.querySelector("pre2").innerHTML+"\nListing available invite codes...\n"+bodyMarkup
           })
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
             document.querySelector("pre2").innerHTML = document.querySelector("pre2").innerHTML+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait..."
