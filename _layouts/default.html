@@ -374,26 +374,47 @@
           // Event listeners // inviteKeys
           document.querySelector("#gasEst").addEventListener("click", async (e) => { // Gas estimate button
             let estimate = await f0.mintCost(null, mintNumber);
-            document.querySelector("pre2").appendChild("\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, mintNumber) * 1000) / 1000+" ΞETH ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>")
+            
+            newLine = document.createElement("div")
+            newLine.innerHTML = "\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, mintNumber) * 1000) / 1000+" ΞETH ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>"
+            document.querySelector("pre2").appendChild(newLine)
           })
           document.querySelector("#seeInvites").addEventListener("click", async (e) => { // Gas estimate button
-            document.querySelector("pre2").appendChild("\nListing available invite codes...\n"+bodyMarkup)
+            newLine = document.createElement("div")
+            newLine.innerHTML = "\nListing available invite codes...\n"+bodyMarkup
+            document.querySelector("pre2").appendChild(newLine)
           })
           document.querySelector("#setInviteKey").addEventListener("click", async (e) => { // Gas estimate button
             inviteKeyFinal = document.querySelector("setInviteKey").innerHTML
-            document.querySelector("pre2").appendChild("\nInvite key has applied...\n"+inviteKeyFinal)
+            newLine = document.createElement("div")
+            newLine.innerHTML = "\nInvite key has applied...\n"+inviteKeyFinal
+            document.querySelector("pre2").appendChild(newLine)
+            //
           })
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
-            document.querySelector("pre2").appendChild("\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait...")
+            //
+
+            //
+            newLine = document.createElement("div")
+            newLine.innerHTML = "\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait..."
+            document.querySelector("pre2").appendChild(newLine)
+            //
             // Runs mint function through web3/f0
             let tokens = await f0.mint(inviteKeyFinal, mintNumber)
             var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
               return token.links.opensea
             })
-            document.getElementById("pre").appendChild("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG #"+nextId+" </b>has successfully been minted! <a href='"+openseaTest+"'><b>View on Opensea</a></b><hr>")
+
+            //
+            newLine = document.createElement("div")
+            newLine.innerHTML = "<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG #"+nextId+" </b>has successfully been minted! <a href='"+openseaTest+"'><b>View on Opensea</a></b><hr>"
+            document.querySelector("pre2").appendChild(newLine)
           })
         } catch (e) { // Catch and return errors
-          document.querySelector("pre").appendChild("\n<b>"+e.message+"! <a href='https://nf7uos.github.io/'>Refresh</a></b>") }
+          newLine = document.createElement("div")
+          newLine.innerHTML = "\n<b>"+e.message+"! <a href='https://nf7uos.github.io/'>Refresh</a></b>"
+          document.querySelector("pre2").appendChild(newLine)
+        }
       })
     </script>
   </head>
