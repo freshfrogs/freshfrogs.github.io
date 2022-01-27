@@ -243,7 +243,7 @@
             return `
               <tr>
                 <td>${key}</td>
-                <td><pre>${JSON.stringify(myInvites[key].condition.converted, null, 2)}</pre></td>
+                <td><pre>${JSON.stringify(myInvites[key].condition.converted, null, 1)}</pre></td>
                 <td><pre>${myInvites[key].list.join("\n\n")}</pre></td>
               </tr>`
           }).join("")
