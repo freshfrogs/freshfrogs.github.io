@@ -239,7 +239,6 @@
           let token = await f0.get(nextId);
           
           const myInvites = await f0.myInvites()
-          const inviteKeys = Object.keys(invites)
           const bodyMarkup = Object.keys(myInvites).map((key) => { 
             return `
               <tr>
