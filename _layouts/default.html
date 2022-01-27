@@ -219,10 +219,7 @@
           document.getElementById("frog"+frog).innerHTML = "<img src='"+frogSource+"' id='frogImg"+frog+"' class='collectionImg' alt='"+whichFrog+"'></a>"
         }
 
-        // Load images inside <pre>
-        //
-        //
-        //
+
         try {
           await f0.init({
             web3: web3,
@@ -240,20 +237,12 @@
           let token = await f0.get(nextId);
           
           const myInvites = await f0.myInvites()
-          const bodyMarkup = Object.keys(myInvites).map((key) => { 
-            //
-            document.createElement("div")
-            //
-            return `<b><a id="setInviteKey" class="pointer">${key}</a><b><br><b><strong>Mint Cost: ${JSON.stringify(myInvites[key].condition.converted.eth, null, 1)} ΞETH</strong></b><b><strong>Max Ammount: ${JSON.stringify(myInvites[key].condition.converted.limit, null, 1)}</strong></b><br>`
-          }).join("")
 
           let estimate = await f0.mintCost(null, 1);
           var remaining = 4040 - nextId;
           console.log(estimate);
           console.log(token)
-          //
-          // Next frogs generated
-          //
+
           for(let i=0; i<=3; i++) {
             let nextTokenInit = parseInt(nextId) + i;
             let nextToken = await f0.get(nextTokenInit);
@@ -393,13 +382,7 @@
             newKeyLine.innerHTML = key
             document.querySelector("pre2").appendChild(newKeyLine)
           })
-          document.querySelector("#setInviteKey").addEventListener("click", async (e) => { // Gas estimate button
-            inviteKeyFinal = document.querySelector("setInviteKey").innerHTML
-            newLine = document.createElement("div")
-            newLine.innerHTML = "\nInvite key has applied...\n"+inviteKeyFinal
-            document.querySelector("pre2").appendChild(newLine)
-            //
-          })
+
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
             //
 
