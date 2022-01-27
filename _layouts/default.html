@@ -268,8 +268,7 @@
           document.getElementById("nextToken").innerHTML = "<strong> #"+nextId+"</strong>FROG" // Update next token ID
           document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>(transact)" // Update Mint button
           document.getElementById("mintTransact").removeAttribute("href") // Removes mint button link
-          document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>"
-          document.getElementById("pre2").innerHTML = document.getElementById("pre2").innerHTML+"\n<b><strong>FROGS #"+nextId+" - "+"</strong></b> are now available for mint... "+"<b><a id='seeInvites' class='pointer'>See Invites</a></b>"
+          document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>"+"\n<b><strong>FROGS #"+nextId+" - "+"</strong></b> are now available for mint... "+"<b><a id='seeInvites' class='pointer'>See Invites</a></b>"
 
           // FIRST FROG
           document.querySelector("#frog1").addEventListener("click", async (e) => {
