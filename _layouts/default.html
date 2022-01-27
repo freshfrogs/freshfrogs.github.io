@@ -238,6 +238,9 @@
           let nextId = await f0.api.nextId().call()
           let token = await f0.get(nextId);
           
+          const invites = await f0.myInvites()
+          const inviteKeys = Object.keys(invites)
+
           let estimate = await f0.mintCost(null, 1);
           var remaining = 4040 - nextId;
           console.log(estimate);
@@ -259,7 +262,7 @@
           document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>(transact)" // Update Mint button
           document.getElementById("mintTransact").removeAttribute("href") // Removes mint button link
           document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>"
-          document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"\n<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>"
+          document.getElementById("pre").innerHTML = document.getElementById("pre").innerHTML+"\n<b><strong>FROG #"+nextId+"</strong></b> is now available for mint... <a href=''><b>See Invites</b></a>\n"+inviteKeys
 
           // FIRST FROG
           document.querySelector("#frog1").addEventListener("click", async (e) => {
