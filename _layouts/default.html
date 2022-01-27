@@ -235,13 +235,14 @@
           var userAcc = web3.currentProvider.selectedAddress;
           var userAcc = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
           let mintNumber = 1;
+          let inviteKeyFinal = null;
           let nextId = await f0.api.nextId().call()
           let token = await f0.get(nextId);
           
           const myInvites = await f0.myInvites()
           const bodyMarkup = Object.keys(myInvites).map((key) => { 
             return `
-                <b><a id="thisIsATest">${key}</a><b>
+                <b><a id="setInviteKey">${key}</a><b>
                 <b>Mint Cost</b>${JSON.stringify(myInvites[key].condition.converted.eth, null, 1)}
                 <b>Maximum Ammount</b>${JSON.stringify(myInvites[key].condition.converted.limit, null, 1)}
               `
@@ -383,10 +384,14 @@
           document.querySelector("#seeInvites").addEventListener("click", async (e) => { // Gas estimate button
             document.querySelector("pre2").innerHTML = document.querySelector("pre2").innerHTML+"\nListing available invite codes...\n"+bodyMarkup
           })
+          document.querySelector("#setInviteKey").addEventListener("click", async (e) => { // Gas estimate button
+            inviteKeyFinal = document.querySelector("setInviteKey").innerHTML
+            document.querySelector("pre2").innerHTML = document.querySelector("pre2").innerHTML+"\nInvite key has applied...\n"+inviteKeyFinal
+          })
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
             document.querySelector("pre2").innerHTML = document.querySelector("pre2").innerHTML+"\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait..."
             // Runs mint function through web3/f0
-            let tokens = await f0.mint(null, mintNumber)
+            let tokens = await f0.mint(inviteKeyFinal, mintNumber)
             var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
               return token.links.opensea
             })
