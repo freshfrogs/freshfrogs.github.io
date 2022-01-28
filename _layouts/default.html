@@ -404,7 +404,7 @@
           })
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
             newLine = document.createElement("div")
-            newLine.innerHTML = "[ ! ] Minting <b>FROG(s) #"+frogBundle+"</b>... please sign the transaction and wait...\n [ ! ] Please do not close or refresh the page!\n [ ! ] Gas prices are extremely volatile and estimates are not exact."+JSON.stringify(myInvites[inviteKeyFinal].invited, inviteKeyFinal, 1)
+            newLine.innerHTML = "[ ! ] Minting <b>FROG(s) #"+frogBundle+"</b>... please sign the transaction and wait...\n [ ! ] Please do not close or refresh the page!\n [ ! ] Gas prices are extremely volatile and estimates are not exact."+JSON.stringify(myInvites[1].invited, inviteKeyFinal, 1)
             document.querySelector("pre2").appendChild(newLine)
             //
             // Runs mint function through web3/f0
