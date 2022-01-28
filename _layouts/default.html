@@ -234,6 +234,7 @@
           let mintNumber = 1;
           let nextId = await f0.api.nextId().call()
           let frogBundle = parseInt(nextId)
+          let frogPrice = 0.04;
           let token = await f0.get(nextId);
           let inviteKeyFinal = null
           const myInvites = await f0.myInvites()
@@ -385,9 +386,10 @@
           // Event listeners // inviteKeys
           document.querySelector("#gasEst").addEventListener("click", async (e) => { // Gas estimate button
             let estimate = await f0.mintCost(null, mintNumber);
-            
+            frogGas = Math.round(JSON.stringify(estimate.eth.safeLow, inviteKeyFinal, mintNumber) * 1000) / 1000
+            frogCostTotal = frogGas+(frogPrice*mintNumber)
             newLine = document.createElement("div")
-            newLine.innerHTML = "Estimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, inviteKeyFinal, mintNumber) * 1000) / 1000+" ΞETH ($"+Math.round(JSON.stringify(estimate.usd.safeLow, inviteKeyFinal, 1) * 100) / 100+")</b>"
+            newLine.innerHTML = "Estimated cost to mint <b>"+mintNumber+" FROG(s)... "+(frogPrice*mintNumber)+" ΞETH + GAS ("+frogGas+")"
             document.querySelector("pre2").appendChild(newLine)
           })
           // Event listeners // inviteKeys
@@ -402,7 +404,7 @@
           })
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
             newLine = document.createElement("div")
-            newLine.innerHTML = "Minting <b>FROG #"+nextId+"</b>... please sign the transaction and wait..."
+            newLine.innerHTML = "Minting <b>FROG(s) #"+frogBundle+"</b>... please sign the transaction and wait..."
             document.querySelector("pre2").appendChild(newLine)
             //
             // Runs mint function through web3/f0
@@ -413,7 +415,7 @@
 
             //
             newLine = document.createElement("div")
-            newLine.innerHTML = "<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG #"+nextId+" </b>has successfully been minted! <a href='"+openseaTest+"'><b>View on Opensea</a></b><hr>"
+            newLine.innerHTML = "<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+frogBundle+" </b>have successfully been minted! <a href='"+openseaTest+"'><b>View on Opensea</a></b><hr>"
             document.querySelector("pre2").appendChild(newLine)
           })
         } catch (e) { // Catch and return errors
