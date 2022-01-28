@@ -233,6 +233,8 @@
           var userAcc = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
           let mintNumber = 1;
           let nextId = await f0.api.nextId().call()
+          let frogBundle = parseInt(nextId)
+          frogBundle = parseInt(nextId)+", "+(parseInt(nextId)+1)+", "+(parseInt(nextId)+2)+", & "+(parseInt(nextId)+3)
           let token = await f0.get(nextId);
           let inviteKeyFinal = null
           const myInvites = await f0.myInvites()
@@ -269,7 +271,7 @@
           document.getElementById("nextToken").innerHTML = "<strong> #"+nextId+"</strong>FROG" // Update next token ID
           document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>(transact)" // Update Mint button
           document.getElementById("mintTransact").removeAttribute("href") // Removes mint button link
-          document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>"+"\n<b><strong>FROG #"+parseInt(nextId)+", "+(parseInt(nextId)+1)+", "+(parseInt(nextId)+2)+", & "+(parseInt(nextId)+3)+"</strong></b> are now available for mint... "
+          document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>"+"\n<b><strong>FROG #"+frogBundle+"</strong></b> are now available for mint... "
 
           // FIRST FROG
           document.querySelector("#frog1").addEventListener("click", async (e) => {
@@ -288,9 +290,11 @@
             document.getElementById("nextTokenImg4").removeAttribute("src");
             document.getElementById("nextTokenImg4").removeAttribute("alt");
             //
-            document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+"</strong>FROG" // Update next token ID
+
             //
+            frogBundle = parseInt(nextId)
             mintNumber = 1;
+            document.getElementById("nextToken").innerHTML = "<strong> #"+frogBundle+"</strong>FROG(s)"
           })
           // SECOND FROG
           document.querySelector("#frog2").addEventListener("click", async (e) => {
@@ -313,9 +317,9 @@
             document.getElementById("nextTokenImg").setAttribute("class", "nextTokenImg sizeTwo")
             document.getElementById("nextTokenImg2").setAttribute("class", "nextTokenImg sizeTwo")
             //
-            document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+","+tokenTwoThis+"</strong>FROG" // Update next token ID
-            //
+            frogBundle = parseInt(nextId)+", "+(parseInt(nextId)+1)
             mintNumber = 2;
+            document.getElementById("nextToken").innerHTML = "<strong> #"+frogBundle+"</strong>FROG(s)"
           })
           // THIRD FROG
           document.querySelector("#frog3").addEventListener("click", async (e) => {
@@ -341,8 +345,9 @@
             document.getElementById("nextTokenImg2").setAttribute("class", "nextTokenImg sizeTwo")
             document.getElementById("nextTokenImg3").setAttribute("class", "nextTokenImg sizeTwo")
             //
-            document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+","+tokenTwoThis+","+tokenThreeThis+"</strong>FROG" // Update next token ID
-            //
+             // Update next token ID
+            frogBundle = parseInt(nextId)+", "+(parseInt(nextId)+1)+", "+(parseInt(nextId)+2)
+            document.getElementById("nextToken").innerHTML = "<strong> #"+frogBundle+"</strong>FROG(s)"
             mintNumber = 3;
           })
           // FOURTH FROG
@@ -374,6 +379,7 @@
             document.getElementById("nextTokenImg4").setAttribute("class", "nextTokenImg sizeTwo")
             //
             document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+","+tokenTwoThis+","+tokenThreeThis+","+tokenFourThis+"</strong>FROG" // Update next token ID
+            frogBundle = parseInt(nextId)+", "+(parseInt(nextId)+1)+", "+(parseInt(nextId)+2)+", & "+(parseInt(nextId)+3)
             mintNumber = 4;
           })
           // Event listeners // inviteKeys
