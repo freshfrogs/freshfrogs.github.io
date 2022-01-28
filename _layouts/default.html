@@ -391,7 +391,7 @@
             newLine = document.createElement("div")
             frogPrice = JSON.stringify(myInvites[inviteKeyFinal].condition.converted.eth, null, 2)
             frogLimit = JSON.stringify(myInvites[inviteKeyFinal].condition.converted.limit, null, 2)
-            newLine.innerHTML = "Invite code has been applied... "+frogPrice+" FROG(s) @ "+frogLimit
+            newLine.innerHTML = "Invite code has been applied... "+frogLimit+" FROG(s) @ "+frogPrice+" ΞETH"
             document.querySelector("pre2").appendChild(newLine)
           })
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
