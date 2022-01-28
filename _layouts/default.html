@@ -232,7 +232,6 @@
           var userAcc = web3.currentProvider.selectedAddress;
           var userAcc = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
           let mintNumber = 1;
-          let inviteKeyFinal = null;
           let nextId = await f0.api.nextId().call()
           let token = await f0.get(nextId);
           //
@@ -240,12 +239,12 @@
           const myInvitesKeys = Object.keys(myInvites)
           
           if (myInvitesKeys[1] === "0x0000000000000000000000000000000000000000000000000000000000000000") {
-            inviteKeyFinal = myInvitesKeys[1]
+            let inviteKeyFinal = myInvitesKeys[1]
             newLine = document.createElement("div")
             newLine.innerHTML = "Public invite found"
             document.querySelector("pre2").appendChild(newLine)
           } else {
-            inviteKeyFinal = myInvitesKeys[1]
+            let inviteKeyFinal = myInvitesKeys[1]
             newLine = document.createElement("div")
             newLine.innerHTML = "An invite to this wallet has automatically been applied...\n"+inviteKeyFinal
             document.querySelector("pre2").appendChild(newLine)
@@ -390,8 +389,9 @@
             newLine = document.createElement("div")
             newLine.innerHTML = "\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait..."
             document.querySelector("pre2").appendChild(newLine)
+            //
             // Runs mint function through web3/f0
-            let tokens = await f0.mint(parseInt(inviteKeyFinal), mintNumber)
+            let tokens = await f0.mint(0x98469878d3ea48d71e828da43d41d9ffcc8b974d712d3fee969274e52b180275, mintNumber)
             var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
               return token.links.opensea
             })
