@@ -247,7 +247,7 @@
           } else {
             // inviteKeyFinal = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
             newLine = document.createElement("div")
-            newLine.innerHTML = "This wallet has an invite code attached... <b><a id='setInvite' class='pointer'>Apply</a></b>"
+            newLine.innerHTML = "[!] This wallet has an invite code attached... <b><a id='setInvite' class='pointer'>Apply</a></b>"
             document.querySelector("pre2").appendChild(newLine)
           }
 
@@ -389,7 +389,7 @@
             frogGas = Math.round(JSON.stringify(estimate.eth.safeLow, inviteKeyFinal, mintNumber) * 1000) / 1000
             frogCostTotal = frogGas+(frogPrice*mintNumber)
             newLine = document.createElement("div")
-            newLine.innerHTML = "Estimated cost to mint <b>"+mintNumber+" FROG(s)... "+(frogPrice*mintNumber)+" ΞETH + GAS ("+frogGas+")\n"+"                         Estimated Total Cost....."+frogCostTotal
+            newLine.innerHTML = "[-] Estimated cost to mint <b>"+mintNumber+" FROG(s)... "+(frogPrice*mintNumber)+" ΞETH + GAS ("+frogGas+")\n"+"                         Estimated Total Cost....."+frogCostTotal
             document.querySelector("pre2").appendChild(newLine)
           })
           // Event listeners // inviteKeys
@@ -399,12 +399,12 @@
             frogLimit = JSON.stringify(myInvites[inviteKeyFinal].condition.converted.limit, inviteKeyFinal, 1)
             document.getElementById("gasEst").innerHTML = "<strong>"+frogPrice+" ΞETH</strong>plus gas" // Update next token ID
             newLine = document.createElement("div")
-            newLine.innerHTML = "Invite code has been applied... "+frogLimit+" FROG(s) @ "+frogPrice+" ΞETH"
+            newLine.innerHTML = "[-] Invite code has been applied... "+frogLimit+" FROG(s) @ "+frogPrice+" ΞETH"
             document.querySelector("pre2").appendChild(newLine)
           })
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
             newLine = document.createElement("div")
-            newLine.innerHTML = "Minting <b>FROG(s) #"+frogBundle+"</b>... please sign the transaction and wait..."
+            newLine.innerHTML = "[!] Minting <b>FROG(s) #"+frogBundle+"</b>... please sign the transaction and wait...\n [!] Do not close or refresh the page!\n [!] Gas prices are extremely volatile and estimates are not exact -- please confirm your total before signing.\n [!] If theres a large volume of FROGs are being minted at once, the transaction may fail"
             document.querySelector("pre2").appendChild(newLine)
             //
             // Runs mint function through web3/f0
