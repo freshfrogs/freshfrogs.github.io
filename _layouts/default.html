@@ -235,8 +235,18 @@
           let inviteKeyFinal = null;
           let nextId = await f0.api.nextId().call()
           let token = await f0.get(nextId);
-          
+          //
           const myInvites = await f0.myInvites()
+          const myInvitesKeys = Object.keys(MyInvites)
+          
+          if (myInvitesKeys[1] === "0x0000000000000000000000000000000000000000000000000000000000000000") {
+            inviteKeyFinal = myInvitesKeys[1]
+            newLine = document.createElement("div")
+            newLine.innerHTML = "An invite to this wallet has automatically been applied..."
+            document.querySelector("pre2").appendChild(newLine)
+          }
+
+          //
 
           let estimate = await f0.mintCost(null, 1);
           var remaining = 4040 - nextId;
