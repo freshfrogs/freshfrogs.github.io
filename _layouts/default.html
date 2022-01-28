@@ -246,12 +246,12 @@
           if (myInvitesKeys[1] === "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550") {
             inviteKeyFinal = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
             newLine = document.createElement("div")
-            newLine.innerHTML = "[ ! ] An invite code was found coupled with this address... <b><a id='setInvite' class='pointer'>Apply</a></b><br>"
+            newLine.innerHTML = "[ ! ] An invite code was found coupled with this address... <b><a id='setInvite' class='setInvite pointer'>Apply</a></b><br>"
             document.querySelector("pre2").appendChild(newLine)
           } else { 
             inviteKeyFinal = null
             newLine = document.createElement("div")
-            newLine.innerHTML = "<a id='setInvite' class='pointer'></a>"
+            newLine.innerHTML = "Public Invite Found"
             document.querySelector("pre2").appendChild(newLine)
           }
 
@@ -397,7 +397,7 @@
             document.querySelector("pre2").appendChild(newLine)
           })
           // Event listeners // inviteKeys
-          document.querySelector("#setInvite").addEventListener("click", async (e) => { // Gas estimate button
+          document.querySelectorAll(".setInvite").addEventListener("click", async (e) => { // Gas estimate button
             frogPrice = JSON.stringify(myInvites[inviteKeyFinal].condition.converted.eth, inviteKeyFinal, 1)
             frogLimit = JSON.stringify(myInvites[inviteKeyFinal].condition.converted.limit, inviteKeyFinal, 1)
             document.getElementById("gasEst").innerHTML = "<strong>"+frogPrice+" ΞETH</strong>plus gas" // Update next token ID
@@ -405,6 +405,8 @@
             newLine.innerHTML = "[-] Invite code has been applied... "+frogLimit+" FROG(s) @ "+frogPrice+" ΞETH"
             document.querySelector("pre2").appendChild(newLine)
           })
+          // ----------------
+          // -----------------
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
             newLine = document.createElement("div")
             newLine.innerHTML = "[ ! ] Minting <b>FROG(s) #"+frogBundle+"</b>... please sign the transaction and wait...\n [ ! ] Please do not close or refresh the page!\n [ ! ] Gas prices are extremely volatile and estimates are not exact."
