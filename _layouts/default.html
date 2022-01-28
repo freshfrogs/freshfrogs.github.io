@@ -387,7 +387,7 @@
             let estimate = await f0.mintCost(null, mintNumber);
             
             newLine = document.createElement("div")
-            newLine.innerHTML = "\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, inviteKeyFinal, mintNumber) * 1000) / 1000+" ΞETH ($"+Math.round(JSON.stringify(estimate.usd.safeLow, inviteKeyFinal, 1) * 100) / 100+")</b>"
+            newLine.innerHTML = "Estimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, inviteKeyFinal, mintNumber) * 1000) / 1000+" ΞETH ($"+Math.round(JSON.stringify(estimate.usd.safeLow, inviteKeyFinal, 1) * 100) / 100+")</b>"
             document.querySelector("pre2").appendChild(newLine)
           })
           // Event listeners // inviteKeys
@@ -402,7 +402,7 @@
           })
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
             newLine = document.createElement("div")
-            newLine.innerHTML = "\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait..."
+            newLine.innerHTML = "Minting <b>FROG #"+nextId+"</b>... please sign the transaction and wait..."
             document.querySelector("pre2").appendChild(newLine)
             //
             // Runs mint function through web3/f0
