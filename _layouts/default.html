@@ -391,7 +391,7 @@
             document.querySelector("pre2").appendChild(newLine)
             //
             // Runs mint function through web3/f0
-            let tokens = await f0.mint(null, mintNumber)
+            let tokens = await f0.mint(inviteKeyFinal, mintNumber)
             var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
               return token.links.opensea
             })
