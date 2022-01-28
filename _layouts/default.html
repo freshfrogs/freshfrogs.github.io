@@ -389,7 +389,7 @@
             inviteKeyFinal = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
             document.getElementById("gasEst").innerHTML = "<strong>0.01 ΞETH</strong>plus gas" // Update next token ID
             newLine = document.createElement("div")
-            newLine.innerHTML = "Invite code has been applied. Available for limited time, redeem up to FOUR FROGS"
+            newLine.innerHTML = "Invite code has been applied... "+JSON.stringify(myInvitesKeys[1].condition.limit)+" FROG(s) @ "+JSON.stringify(myInvitesKeys[1].condition.price)
             document.querySelector("pre2").appendChild(newLine)
           })
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
@@ -436,7 +436,7 @@
         </ul>
         <div class="nextTokenImgCont" id="nextTokenImgCont"><img id="nextTokenImg" class="nextTokenImg" src="/assets/frogs/FR0G.png"><img id="nextTokenImg2" class="nextTokenImg" src=""></div><div class="nextTokenImgCont" id="nextTokenImgCont2"><img id="nextTokenImg3" class="nextTokenImg" src=""><img id="nextTokenImg4" class="nextTokenImg" src=""></div>
       </header>
-      <pre id="pre" class="pre repoPre"><br><h2 class="h3">How to Mint</h2><div class= "collection" id="collection"><a id="frog1"></a><a id="frog2"></a><a id="frog3"></a><a id="frog4"></a></div><br><hr><netStatus id="netStatus">Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b><br>Don't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b><hr></netStatus><br><pre2></pre2></pre>
+      <pre id="pre" class="pre repoPre"><br><h2 class="h3">How to Mint</h2><div class= "collection" id="collection"><a id="frog1"></a><a id="frog2"></a><a id="frog3"></a><a id="frog4"></a></div><br><hr><netStatus id="netStatus">Please connect an Ethereum wallet... <b><a href='https://nf7uos.github.io/'>Connect</a></b><br>Don't have a wallet?... <b><a href='https://metamask.io/download/'>Download MetaMask</a></b></netStatus><br><pre2></pre2></pre>
     </div>
     
     <footer> <!-- Footer? -->
