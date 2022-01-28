@@ -346,7 +346,7 @@
             document.getElementById("nextTokenImg3").setAttribute("class", "nextTokenImg sizeTwo")
             //
              // Update next token ID
-            frogBundle = parseInt(nextId)+", "+(parseInt(nextId)+1)+", "+(parseInt(nextId)+2)
+            frogBundle = parseInt(nextId)+"-"+(parseInt(nextId)+2)
             document.getElementById("nextToken").innerHTML = "<strong> #"+frogBundle+"</strong>FROG(s)"
             mintNumber = 3;
           })
@@ -377,9 +377,9 @@
             document.getElementById("nextTokenImg2").setAttribute("class", "nextTokenImg sizeTwo")
             document.getElementById("nextTokenImg3").setAttribute("class", "nextTokenImg sizeTwo")
             document.getElementById("nextTokenImg4").setAttribute("class", "nextTokenImg sizeTwo")
-            //
-            document.getElementById("nextToken").innerHTML = "<strong> #"+tokenOneThis+","+tokenTwoThis+","+tokenThreeThis+","+tokenFourThis+"</strong>FROG" // Update next token ID
-            frogBundle = parseInt(nextId)+", "+(parseInt(nextId)+1)+", "+(parseInt(nextId)+2)+", & "+(parseInt(nextId)+3)
+            frogBundle = parseInt(nextId)+"-"+(parseInt(nextId)+2)
+            document.getElementById("nextToken").innerHTML = "<strong> #"+frogBundle+"</strong>FROG" // Update next token ID
+            
             mintNumber = 4;
           })
           // Event listeners // inviteKeys
