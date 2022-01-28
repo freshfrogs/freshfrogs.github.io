@@ -242,12 +242,12 @@
           if (myInvitesKeys[1] === "0x0000000000000000000000000000000000000000000000000000000000000000") {
             inviteKeyFinal = myInvitesKeys[1]
             newLine = document.createElement("div")
-            newLine.innerHTML = "An invite to this wallet has automatically been applied...\n"+inviteKeyFinal+"\n"+JSON.stringify(myInvitesKeys[1].condition.converted, null, 1)
+            newLine.innerHTML = "Public invite found"
             document.querySelector("pre2").appendChild(newLine)
-          } else{
+          } else {
             inviteKeyFinal = myInvitesKeys[1]
             newLine = document.createElement("div")
-            newLine.innerHTML = inviteKeyFinal
+            newLine.innerHTML = "An invite to this wallet has automatically been applied...\n"+inviteKeyFinal+"\n"+JSON.stringify(myInvitesKeys[1].condition.converted, null, 1)
             document.querySelector("pre2").appendChild(newLine)
           }
 
