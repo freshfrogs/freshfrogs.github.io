@@ -243,9 +243,9 @@
             newLine.innerHTML = "Public invite found"
             document.querySelector("pre2").appendChild(newLine)
           } else {
-            inviteKeyFinal = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
+            // inviteKeyFinal = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
             newLine = document.createElement("div")
-            newLine.innerHTML = "An invite to this wallet has automatically been applied...\n"+inviteKeyFinal
+            newLine.innerHTML = "This wallet has an invite code attached... <a id='setInvite' class='pointer'>Apply</a>"
             document.querySelector("pre2").appendChild(newLine)
           }
 
@@ -382,6 +382,14 @@
             
             newLine = document.createElement("div")
             newLine.innerHTML = "\nEstimated gas fees... <b>< "+Math.round(JSON.stringify(estimate.eth.safeLow, null, mintNumber) * 1000) / 1000+" ΞETH ($"+Math.round(JSON.stringify(estimate.usd.safeLow, null, 1) * 100) / 100+")</b>"
+            document.querySelector("pre2").appendChild(newLine)
+          })
+          // Event listeners // inviteKeys
+          document.querySelector("#setInvite").addEventListener("click", async (e) => { // Gas estimate button
+            inviteKeyFinal = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
+            document.getElementById("nextToken").innerHTML = "<strong>0.01 ΞETH</strong>plus gas" // Update next token ID
+            newLine = document.createElement("div")
+            newLine.innerHTML = "Invite code has been applied. Available for limited time, redeem up to FOUR FROGS"
             document.querySelector("pre2").appendChild(newLine)
           })
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
