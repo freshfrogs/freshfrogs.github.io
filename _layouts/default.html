@@ -244,7 +244,7 @@
           const myInvitesKeys = Object.keys(myInvites)
           
           if (myInvitesKeys[1] === "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550") {
-            inviteKeyFinal = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
+            inviteKeyFinalPreSet = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
             newLine = document.createElement("div")
             newLine.innerHTML = "[ ! ] An invite code was found coupled with this address... <b><a id='setInvite' class='pointer'>Apply</a></b><br>"
             document.querySelector("pre2").appendChild(newLine)
@@ -398,6 +398,7 @@
           })
           // Event listeners // inviteKeys
           document.querySelector("#setInvite").addEventListener("click", async (e) => { // Gas estimate button
+            inviteKeyFinal = inviteKeyFinalPreSet
             frogPrice = JSON.stringify(myInvites[inviteKeyFinal].condition.converted.eth, inviteKeyFinal, 1)
             frogLimit = JSON.stringify(myInvites[inviteKeyFinal].condition.converted.limit, inviteKeyFinal, 1)
             document.getElementById("gasEst").innerHTML = "<strong>"+frogPrice+" ΞETH</strong>plus gas" // Update next token ID
