@@ -389,7 +389,7 @@
             frogGas = Math.round(JSON.stringify(estimate.eth.safeLow, inviteKeyFinal, mintNumber) * 1000) / 1000
             frogCostTotal = frogGas+(frogPrice*mintNumber)
             newLine = document.createElement("div")
-            newLine.innerHTML = "[-] Estimated cost to mint <b>"+mintNumber+" FROG(s)... "+(frogPrice*mintNumber)+" ΞETH + GAS ("+frogGas+")\n"+"                         Estimated Total Cost....."+frogCostTotal
+            newLine.innerHTML = "[-] Estimated cost to mint <b>"+mintNumber+" FROG(s)... "+(frogPrice*mintNumber)+" ΞETH + GAS ("+frogGas+")\n"+"                    Estimated Total Cost..... "+frogCostTotal+" ΞETH"
             document.querySelector("pre2").appendChild(newLine)
           })
           // Event listeners // inviteKeys
