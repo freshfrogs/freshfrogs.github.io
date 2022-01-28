@@ -390,9 +390,8 @@
             newLine = document.createElement("div")
             newLine.innerHTML = "\nMinting <b>FROG #"+nextId+"</b>... please sign the transaction and wait..."
             document.querySelector("pre2").appendChild(newLine)
-            //
             // Runs mint function through web3/f0
-            let tokens = await f0.mint(inviteKeyFinal, mintNumber)
+            let tokens = await f0.mint(parseInt(inviteKeyFinal), mintNumber)
             var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
               return token.links.opensea
             })
