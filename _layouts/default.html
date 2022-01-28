@@ -389,7 +389,9 @@
             inviteKeyFinal = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
             document.getElementById("gasEst").innerHTML = "<strong>0.01 ΞETH</strong>plus gas" // Update next token ID
             newLine = document.createElement("div")
-            newLine.innerHTML = "Invite code has been applied... "+JSON.stringify(myInvitesKeys[1].condition.converted.limit, inviteKeyFinal, 1)+" FROG(s) @ "+JSON.stringify(myInvitesKeys[1].condition.converted.eth, inviteKeyFinal, 1)
+            frogPrice = JSON.stringify(myInvites[1].condition.converted.eth, null, 2)
+            frogLimit = JSON.stringify(myInvites[1].condition.converted.limit, null, 2)
+            newLine.innerHTML = "Invite code has been applied... "+frogPrice+" FROG(s) @ "+frogLimit
             document.querySelector("pre2").appendChild(newLine)
           })
           document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
