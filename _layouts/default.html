@@ -245,6 +245,7 @@
             newLine.innerHTML = "An invite to this wallet has automatically been applied...\n"+inviteKeyFinal+"\n"+JSON.stringify(myInvitesKeys[1].condition.converted, null, 1)
             document.querySelector("pre2").appendChild(newLine)
           } else{
+            inviteKeyFinal = myInvitesKeys[1]
             newLine = document.createElement("div")
             newLine.innerHTML = inviteKeyFinal
             document.querySelector("pre2").appendChild(newLine)
