@@ -239,10 +239,10 @@
           const myInvites = await f0.myInvites()
           const myInvitesKeys = Object.keys(myInvites)
           
-          if (myInvitesKeys[0] === "0x0000000000000000000000000000000000000000000000000000000000000000") {
-            inviteKeyFinal = myInvitesKeys[0]
+          if (myInvitesKeys[1] === "0x0000000000000000000000000000000000000000000000000000000000000000") {
+            inviteKeyFinal = myInvitesKeys[1]
             newLine = document.createElement("div")
-            newLine.innerHTML = "An invite to this wallet has automatically been applied...\n"+inviteKeyFinal+"\n"+JSON.stringify(myInvitesKeys[0].condition.converted.eth, null, 1)
+            newLine.innerHTML = "An invite to this wallet has automatically been applied...\n"+inviteKeyFinal+"\n"+JSON.stringify(myInvitesKeys[1].condition.converted, null, 1)
             document.querySelector("pre2").appendChild(newLine)
           } else{
             newLine = document.createElement("div")
