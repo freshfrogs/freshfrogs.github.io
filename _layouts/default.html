@@ -234,17 +234,16 @@
           let mintNumber = 1;
           let nextId = await f0.api.nextId().call()
           let token = await f0.get(nextId);
-          //
+          let inviteKeyFinal = null
           const myInvites = await f0.myInvites()
           const myInvitesKeys = Object.keys(myInvites)
           
           if (myInvitesKeys[1] === "0x0000000000000000000000000000000000000000000000000000000000000000") {
-            let inviteKeyFinal = myInvitesKeys[1]
             newLine = document.createElement("div")
             newLine.innerHTML = "Public invite found"
             document.querySelector("pre2").appendChild(newLine)
           } else {
-            let inviteKeyFinal = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
+            inviteKeyFinal = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
             newLine = document.createElement("div")
             newLine.innerHTML = "An invite to this wallet has automatically been applied...\n"+inviteKeyFinal
             document.querySelector("pre2").appendChild(newLine)
@@ -391,7 +390,7 @@
             document.querySelector("pre2").appendChild(newLine)
             //
             // Runs mint function through web3/f0
-            let tokens = await f0.mint(null, mintNumber)
+            let tokens = await f0.mint(inviteKeyFinal, mintNumber)
             var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
               return token.links.opensea
             })
