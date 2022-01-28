@@ -398,7 +398,6 @@
           })
           // Event listeners // inviteKeys
           document.querySelector("#setInvite").addEventListener("click", async (e) => { // Gas estimate button
-            inviteKeyFinal = "null"
             frogPrice = JSON.stringify(myInvites[inviteKeyFinal].condition.converted.eth, inviteKeyFinal, 1)
             frogLimit = JSON.stringify(myInvites[inviteKeyFinal].condition.converted.limit, inviteKeyFinal, 1)
             document.getElementById("gasEst").innerHTML = "<strong>"+frogPrice+" ΞETH</strong>plus gas" // Update next token ID
