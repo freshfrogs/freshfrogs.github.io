@@ -229,9 +229,10 @@
 
       let nextId = await f0.api.nextId().call()
       let nextToken = await f0.get(nextId);
-      
+
       // ----------------------------------------------------------------------------------------------------------------------- >
-      document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)
+      document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
+      document.getElementById("nextToken").innerHTML = "<strong> #"+nextId+"</strong>FROG"              // Update next token ID on preview
       document.getElementById("pre2").innerHTML = "Connected Account Address : "+addressCut
 
       // Update preview images with live ones after web3 connection
