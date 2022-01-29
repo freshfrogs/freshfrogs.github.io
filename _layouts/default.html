@@ -223,8 +223,7 @@
       document.getElementById("pre2").innerHTML = "Account Address : "+addressCut+"\n"+JSON.stringify(nextId, null, 1)
       for(let i=0; i<=3; i++) {
         nextToken = await f0.get(42);
-        document.getElementById("frogImg"+(i+1)).setAttribute("src", nextToken.converted.image)
-        document.getElementById("frogImg"+(i+1)).setAttribute("alt", nextTokenInit)
+        document.getElementById("frogImg1").setAttribute("src", nextToken.converted.image)
       }
     })
     </script>
