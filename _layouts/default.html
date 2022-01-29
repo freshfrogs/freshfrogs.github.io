@@ -229,6 +229,7 @@
       let frogPrice = "0.02"
       let nextId = await f0.api.nextId().call()
       let nextToken = await f0.get(nextId);
+      let mintNumber = 1 // number to mint
 
       // ----------------------------------------------------------------------------------------------------------------------- >
       document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
@@ -250,7 +251,10 @@
       // ------------------------------------------------------------------------------------------------------------------------ >
       // EVENT LISTENER -- MINT, GAS EST, SETINVITE
       document.querySelector("#gasEstimate").addEventListener("click", async (e) => {
-        consoleOutput("test");
+        let estimate = await f0.mintCost(null, mintNumber);
+        frogGas = Math.round(JSON.stringify(estimate.eth.safeLow, inviteKeyFinal, mintNumber) * 1000) / 1000
+        frogCostTotal = frogGas+(frogPrice*mintNumber)
+        consoleOutput("[-] Estimated cost to mint <b>"+mintNumber+" FROG(s)... "+(frogPrice*mintNumber)+" ΞETH + GAS ("+frogGas+")</b>\n"+"             Estimated <b>Max</b> Total Cost... <b>"+frogCostTotal+" ΞETH</b>")
       })
       document.querySelector("#mintTransact").addEventListener("click", async (e) => {
         consoleOutput("[ ! ] Minting <b>FROG(s) #");
