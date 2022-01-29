@@ -242,6 +242,7 @@
       }
     })
     // TESTING MINT BUTTON
+    document.getElementById("mintTransact").removeAttribute("href")
     document.getElementById("mintTransact").addEventListener("click", async (e) => { // Mint button
       newLine = document.createElement("div")
       newLine.innerHTML = "[ ! ] Minting <b>FROG(s) #"
