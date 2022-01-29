@@ -222,13 +222,11 @@
           document.getElementById("frog"+frog).innerHTML = "<img src='"+frogSource+"' id='frogImg"+frog+"' class='collectionImg' alt='"+whichFrog+"'></a>"
         }
 
-
-        try { // 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524 NEW // OLD
-          await f0.init({
-            web3: web3,
-            contract: "0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524",
-            network: "rinkeby"
-          })
+        await f0.init({
+          web3: web3,
+          contract: "0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524",
+          network: "rinkeby"
+        })
           // connecting message
           document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>connecting...</i></b>"
 
@@ -262,6 +260,7 @@
           document.getElementById("mintTransact").removeAttribute("href") // Removes mint button link
           document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>"+"\n<b><strong>FROG(s) #"+parseInt(nextId)+"-"+(parseInt(nextId)+3)+"</strong></b> are now available to mint for... "+frogPrice+" ΞETH"
           document.getElementById("gasEst").innerHTML = "<strong>"+frogPrice+" ΞETH</strong>plus gas"
+      })
           // FIRST FROG
           document.querySelector("#frog1").addEventListener("click", async (e) => {
             //
@@ -408,12 +407,7 @@
             newLine.innerHTML = "<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+frogBundle+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>"
             document.querySelector("pre2").appendChild(newLine)
           })
-        } catch (e) { // Catch and return errors
-          newLine = document.createElement("div")
-          newLine.innerHTML = "\n<b>"+e.message+"! <a href='https://freshfrogs.github.io/'>Refresh</a></b>"
-          document.querySelector("pre2").appendChild(newLine)
-        }
-      })
+
     </script>
   </head>
   <body> <!-- Main Body -->
