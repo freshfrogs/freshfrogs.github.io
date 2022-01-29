@@ -249,6 +249,9 @@
 
       // ------------------------------------------------------------------------------------------------------------------------ >
       // EVENT LISTENER -- MINT, GAS EST, SETINVITE
+      document.querySelector("#gasEstimate").addEventListener("click", async (e) => {
+        consoleOutput("test");
+      })
       document.querySelector("#mintTransact").addEventListener("click", async (e) => {
         consoleOutput("[ ! ] Minting <b>FROG(s) #");
         try {
@@ -260,9 +263,6 @@
       })
       document.querySelector("#setInvite").addEventListener("click", async (e) => {
         // set invite code 
-      })
-      document.querySelector("#gasEstimate").addEventListener("click", async (e) => {
-        consoleOutput("gas estimate test");
       })
     })
 
@@ -287,7 +287,7 @@
                 <a id="nextToken" class="pointerOff"><strong>4,040</strong>frogs</a>
             </li>
             <li>
-                <a id="gasEstimate" class="pointerOff"><strong>0.04 ΞETH</strong>plus gas</a>
+                <a id="gasEstimate" class="pointerOff" href=""><strong>0.04 ΞETH</strong>plus gas</a>
             </li>
             <li>
                 <a id="mintTransact" class="pointer" href="https://freshfrogs.github.io/"><b><strike><strong>Mint</strong></strike></b>link wallet!</a>
