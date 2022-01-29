@@ -205,201 +205,58 @@
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
+
     <!-- ----------------------------------- Begin Script f0 / Call all web3 variables ------------------------------------ -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", async () => {
-        for(let frog=1; frog<=4; frog++) {
-          let whichFrog = Math.floor(Math.random() * 40)+frog;
-          let frogSource = "./assets/frogs/"+whichFrog+".png";
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Display images with stale ones until web3 connection
+      for(let frog=1; frog<=4; frog++) {
+          whichFrog = Math.floor(Math.random() * 40)+frog;
+          frogSource = "./assets/frogs/"+whichFrog+".png";
           document.getElementById("frog"+frog).innerHTML = "<img src='"+frogSource+"' id='frogImg"+frog+"' class='collectionImg' alt='"+whichFrog+"'></a>"
         }
-        const f0 = new F0();
-        const web3 = new Web3(window.ethereum)
-        try { // Init F0
-          await f0.init({
-            web3: web3,
-            contract: "0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524",
-            network: "rinkeby"
-          })
-        } catch (e) {
-          newLine = document.createElement("div")
-          newLine.innerHTML = "\n<b>"+e.message+"! <a href='https://freshfrogs.github.io/'>Refresh</a></b>"
-          document.querySelector("pre2").appendChild(newLine)
-        }
-        document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>connecting...</i></b>"
-        let userAcc = web3.currentProvider.selectedAddress;
-        let userAcc = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
-        let mintNumber = 1;
-        let nextId = await f0.api.nextId().call()
-        let frogBundle = parseInt(nextId)
-        let frogPrice = 0.02;
-        let token = await f0.get(nextId);
-        let inviteKeyFinal = null
 
-        let estimate = await f0.mintCost(null, 1);
-        var remaining = 4040 - nextId;
-        console.log(estimate);
-        console.log(token)
-        for(let i=0; i<=3; i++) {
-            let nextTokenInit = parseInt(nextId) + i;
-            let nextToken = await f0.get(nextTokenInit);
-            document.getElementById("frogImg"+(i+1)).setAttribute("src", nextToken.converted.image)
-            document.getElementById("frogImg"+(i+1)).setAttribute("alt", nextTokenInit)
-        }
-        document.getElementById("nextTokenImg").setAttribute("src", token.converted.image) // Set preview image to next token ID
-        document.getElementById("nextToken").innerHTML = "<strong> #"+nextId+"</strong>FROG" // Update next token ID
-        document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>(transact)" // Update Mint button
-        document.getElementById("mintTransact").removeAttribute("href") // Removes mint button link
-        document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>"+"\n<b><strong>FROG(s) #"+parseInt(nextId)+"-"+(parseInt(nextId)+3)+"</strong></b> are now available to mint for... "+frogPrice+" ΞETH"
-        document.getElementById("gasEst").innerHTML = "<strong>"+frogPrice+" ΞETH</strong>plus gas"
-        // -------------------------------------------------------------------------------------------------------
-        // FIRST FROG
-        document.querySelector("#frog1").addEventListener("click", async (e) => {
-            //
-            let tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
-            let tokenOne = await f0.get(tokenOneThis);
-            document.getElementById("nextTokenImg").setAttribute("src", tokenOne.converted.image);
-            document.getElementById("nextTokenImg").setAttribute("alt", tokenOneThis);
-            //
-            document.getElementById("nextTokenImg").setAttribute("class", "nextTokenImg sizeOne")
-            //
-            document.getElementById("nextTokenImg2").removeAttribute("src");
-            document.getElementById("nextTokenImg2").removeAttribute("alt");
-            document.getElementById("nextTokenImg3").removeAttribute("src");
-            document.getElementById("nextTokenImg3").removeAttribute("alt");
-            document.getElementById("nextTokenImg4").removeAttribute("src");
-            document.getElementById("nextTokenImg4").removeAttribute("alt");
-            //
-
-            //
-            frogBundle = parseInt(nextId)
-            mintNumber = 1;
-            document.getElementById("nextToken").innerHTML = "<strong> #"+frogBundle+"</strong>FROG(s)"
-        })
-        // SECOND FROG
-        document.querySelector("#frog2").addEventListener("click", async (e) => {
-            //
-            let tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
-            let tokenOne = await f0.get(tokenOneThis);
-            document.getElementById("nextTokenImg").setAttribute("src", tokenOne.converted.image);
-            document.getElementById("nextTokenImg").setAttribute("alt", tokenOneThis);
-            //
-            let tokenTwoThis = document.getElementById("frogImg2").getAttribute('alt')
-            let tokenTwo = await f0.get(tokenTwoThis);
-            document.getElementById("nextTokenImg2").setAttribute("src", tokenTwo.converted.image);
-            document.getElementById("nextTokenImg2").setAttribute("alt", tokenTwoThis);
-            //
-            document.getElementById("nextTokenImg3").removeAttribute("src");
-            document.getElementById("nextTokenImg3").removeAttribute("alt");
-            document.getElementById("nextTokenImg4").removeAttribute("src");
-            document.getElementById("nextTokenImg4").removeAttribute("alt");
-            //
-            document.getElementById("nextTokenImg").setAttribute("class", "nextTokenImg sizeTwo")
-            document.getElementById("nextTokenImg2").setAttribute("class", "nextTokenImg sizeTwo")
-            //
-            frogBundle = parseInt(nextId)+", "+(parseInt(nextId)+1)
-            mintNumber = 2;
-            document.getElementById("nextToken").innerHTML = "<strong> #"+frogBundle+"</strong>FROG(s)"
-        })
-        // THIRD FROG
-        document.querySelector("#frog3").addEventListener("click", async (e) => {
-            let tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
-            let tokenOne = await f0.get(tokenOneThis);
-            document.getElementById("nextTokenImg").setAttribute("src", tokenOne.converted.image);
-            document.getElementById("nextTokenImg").setAttribute("alt", tokenOneThis);
-            //
-            let tokenTwoThis = document.getElementById("frogImg2").getAttribute('alt')
-            let tokenTwo = await f0.get(tokenTwoThis);
-            document.getElementById("nextTokenImg2").setAttribute("src", tokenTwo.converted.image);
-            document.getElementById("nextTokenImg2").setAttribute("alt", tokenTwoThis);
-            //
-            let tokenThreeThis = document.getElementById("frogImg3").getAttribute('alt')
-            let tokenThree = await f0.get(tokenThreeThis);
-            document.getElementById("nextTokenImg3").setAttribute("src", tokenThree.converted.image);
-            document.getElementById("nextTokenImg3").setAttribute("alt", tokenThreeThis);
-            //
-            document.getElementById("nextTokenImg4").removeAttribute("src");
-            document.getElementById("nextTokenImg4").removeAttribute("alt");
-            document.getElementById("nextTokenImg4").removeAttribute("class");
-            //
-            document.getElementById("nextTokenImg").setAttribute("class", "nextTokenImg sizeTwo")
-            document.getElementById("nextTokenImg2").setAttribute("class", "nextTokenImg sizeTwo")
-            document.getElementById("nextTokenImg3").setAttribute("class", "nextTokenImg sizeTwo")
-            //
-            // Update next token ID
-            frogBundle = parseInt(nextId)+"-"+(parseInt(nextId)+2)
-            document.getElementById("nextToken").innerHTML = "<strong> #"+frogBundle+"</strong>FROG(s)"
-            mintNumber = 3;
-        })
-        // FOURTH FROG
-        document.querySelector("#frog4").addEventListener("click", async (e) => {
-            // load 1
-            let tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
-            let tokenOne = await f0.get(tokenOneThis);
-            document.getElementById("nextTokenImg").setAttribute("src", tokenOne.converted.image);
-            document.getElementById("nextTokenImg").setAttribute("alt", tokenOneThis);
-            // load 2
-            let tokenTwoThis = document.getElementById("frogImg2").getAttribute('alt')
-            let tokenTwo = await f0.get(tokenTwoThis);
-            document.getElementById("nextTokenImg2").setAttribute("src", tokenTwo.converted.image);
-            document.getElementById("nextTokenImg2").setAttribute("alt", tokenTwoThis);
-            // load 3
-            let tokenThreeThis = document.getElementById("frogImg3").getAttribute('alt')
-            let tokenThree = await f0.get(tokenThreeThis);
-            document.getElementById("nextTokenImg3").setAttribute("src", tokenThree.converted.image);
-            document.getElementById("nextTokenImg3").setAttribute("alt", tokenThreeThis);
-            // load 4
-            let tokenFourThis = document.getElementById("frogImg4").getAttribute('alt')
-            let tokenFour = await f0.get(tokenFourThis);
-            document.getElementById("nextTokenImg4").setAttribute("src", tokenFour.converted.image);
-            document.getElementById("nextTokenImg4").setAttribute("alt", tokenFourThis);
-            //
-            document.getElementById("nextTokenImg").setAttribute("class", "nextTokenImg sizeTwo")
-            document.getElementById("nextTokenImg2").setAttribute("class", "nextTokenImg sizeTwo")
-            document.getElementById("nextTokenImg3").setAttribute("class", "nextTokenImg sizeTwo")
-            document.getElementById("nextTokenImg4").setAttribute("class", "nextTokenImg sizeTwo")
-            frogBundle = parseInt(nextId)+"-"+(parseInt(nextId)+3)
-            document.getElementById("nextToken").innerHTML = "<strong> #"+frogBundle+"</strong>FROG(s)" // Update next token ID
-            
-            mintNumber = 4;
-        })
-        // Event listeners // inviteKeys
-        document.querySelector("#gasEst").addEventListener("click", async (e) => { // Gas estimate button
-            let estimate = await f0.mintCost(null, mintNumber);
-            frogGas = Math.round(JSON.stringify(estimate.eth.safeLow, inviteKeyFinal, mintNumber) * 1000) / 1000
-            frogCostTotal = frogGas+(frogPrice*mintNumber)
-            newLine = document.createElement("div")
-            newLine.innerHTML = "[-] Estimated cost to mint <b>"+mintNumber+" FROG(s)... "+(frogPrice*mintNumber)+" ΞETH + GAS ("+frogGas+")</b>\n"+"             Estimated <b>Max</b> Total Cost... <b>"+frogCostTotal+" ΞETH</b>"
-            document.querySelector("pre2").appendChild(newLine)
-        })
-        // Event listeners // inviteKeys
-
-        // ----------------
-        document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
-            try {
-                newLine = document.createElement("div")
-                newLine.innerHTML = "[ ! ] Minting <b>FROG(s) #"+frogBundle+"</b>... please sign the transaction and wait...\n [ ! ] Please do not close or refresh the page!\n [ ! ] Gas prices are extremely volatile and estimates are not exact."
-                document.querySelector("pre2").appendChild(newLine)
-                //
-                // Runs mint function through web3/f0
-                let tokens = await f0.mint(inviteKeyFinal, mintNumber)
-                var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
-                    return token.links.opensea
-                })
-
-                //
-                newLine = document.createElement("div")
-                newLine.innerHTML = "<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+frogBundle+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>"
-                document.querySelector("pre2").appendChild(newLine)
-            } catch (e) {
-                newLine = document.createElement("div")
-                newLine.innerHTML = "\n<b>"+e.message+"! <a href='https://freshfrogs.github.io/'>Refresh</a></b>"
-                document.querySelector("pre2").appendChild(newLine)
-            }
-        })
+      const web3 = new Web3(window.ethereum)
+      const f0 = new F0();
+      await f0.init({
+        web3: web3,
+        contract: "0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524",
       })
+      let userAcc = web3.currentProvider.selectedAddress;
+      let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
+
+      let nextId = await f0.api.nextId().call()
+      let nextToken = await f0.get(nextId);
+      console.log(nextToken)
+      
+      document.getElementById("pre2").innerHTML = "Connected Account Address : "+addressCut
+
+      // Update preview images with live ones after web3 connection
+      for(let i=0; i<=3; i++) {
+        nextTokenInit = parseInt(nextId) + i;
+        nextToken = await f0.get(nextTokenInit);
+        document.getElementById("frogImg"+(i+1)).setAttribute("src", nextToken.converted.image)
+        document.getElementById("frogImg"+(i+1)).setAttribute("alt", nextTokenInit)
+      }
+      document.getElementById("mintTransact").removeAttribute("href")
+      document.getElementById("mintTransact").innerHTML = "<b><strong>Mint</strong></b>"
+      document.querySelector("#mintTransact").addEventListener("click", async (e) => {
+        newLine = document.createElement("div")
+        newLine.innerHTML = "[ ! ] Minting <b>FROG(s) #"
+        document.getElementById("pre2").appendChild(newLine)
+        try {
+          let tx = await f0.mint(null, 1)
+        } catch (e) {
+          alert(e.message)
+        }
+        //
+      })
+    })
+    
+
+    // TESTING MINT BUTTON
     </script>
   </head>
   <body> <!-- Main Body -->
