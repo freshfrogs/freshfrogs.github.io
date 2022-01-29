@@ -220,14 +220,7 @@
       let userAcc = web3.currentProvider.selectedAddress;
       let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
       let nextId = await f0.api.nextId().call()
-
-      for(let i=0; i<=3; i++) {
-        let nextTokenInit = parseInt(nextId) + i;
-        let nextToken = await f0.get(nextTokenInit);
-        document.getElementById("frogImg"+(i+1)).setAttribute("src", nextToken.converted.image)
-        document.getElementById("frogImg"+(i+1)).setAttribute("alt", nextTokenInit)
-      }
-
+      
       document.getElementById("pre2").innerHTML = "Account Address : "+addressCut+"\n"+JSON.stringify(nextId, null, 1)
     })
     </script>
