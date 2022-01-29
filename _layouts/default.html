@@ -256,7 +256,7 @@
         let estimate = await f0.mintCost(mintInvite, mintAmmount);
         frogGas = Math.round(JSON.stringify(estimate.eth.safeLow, mintInvite, mintAmmount) * 1000) / 1000
         frogCostTotal = frogGas+(frogPrice*mintAmmount)
-        consoleOutput("[-] Estimated cost to mint <b>"+mintAmmount+" FROG(s)... "+(frogPrice*mintAmmount)+" ΞETH + GAS ("+frogGas+")</b>\n"+"             Estimated <b>Max</b> Total Cost... <b>"+frogCostTotal+" ΞETH</b>")
+        consoleOutput("[-] Estimated cost to mint <b>")
       })
       document.querySelector("#mintTransact").addEventListener("click", async (e) => {
         consoleOutput("[ ! ] Minting <b>FROG(s) #");
@@ -293,7 +293,7 @@
                 <a id="nextToken" class="pointerOff"><strong>4,040</strong>frogs</a>
             </li>
             <li>
-                <a id="gasEstimate" class="pointerOff" href="https://freshfrogs.github.io/"><strong>0.04 ΞETH</strong>plus gas</a>
+                <a id="gasEstimate" class="pointerOff" href=""><strong>0.04 ΞETH</strong>plus gas</a>
             </li>
             <li>
                 <a id="mintTransact" class="pointer" href="https://freshfrogs.github.io/"><b><strike><strong>Mint</strong></strike></b>link wallet!</a>
