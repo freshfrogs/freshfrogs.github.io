@@ -236,7 +236,7 @@
       document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>(transact)"                 // Update Mint button
       document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
       //
-      document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>"+"\n<b><strong>FROG(s) #"+parseInt(nextId)+"-"+(parseInt(nextId)+3)+"</strong></b> are now available to mint for... "+frogPrice+" ΞETH"
+      document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+addressCut+" ✓</i></b>"+"\n<b><strong>FROG(s) #"+parseInt(nextId)+"-"+(parseInt(nextId)+3)+"</strong></b> are now available to mint for... "+frogPrice+" ΞETH each"
       document.getElementById("gasEst").innerHTML = "<strong>"+frogPrice+" ΞETH</strong>plus gas"
       // Update preview images with live ones after web3 connection
       for(let i=0; i<=3; i++) {
@@ -263,6 +263,12 @@
       })
       document.querySelector("#gasEstimate").addEventListener("click", async (e) => {
         // set gas esitmate
+        mintNumber = 1
+        estimate = await f0.mintCost(null, mintNumber);
+        frogGas = Math.round(JSON.stringify(estimate.eth.safeLow, null, mintNumber) * 1000) / 1000
+        frogCostTotal = frogGas+(frogPrice*mintNumber)
+        consoleOutput("[-] Estimated cost to mint <b>"+mintNumber+" FROG(s)... "+(frogPrice*mintNumber)+" ΞETH + GAS ("+frogGas+")</b>\n"+"             Estimated <b>Max</b> Total Cost... <b>"+frogCostTotal+" ΞETH</b>")
+        //
       })
     })
 
