@@ -407,28 +407,29 @@
             document.querySelector("pre2").appendChild(newLine)
           })
           // ----------------
-          document.getElementById("mintTransact").addEventListener("click", function() { // Mint button
-            newLine = document.createElement("div")
-            newLine.innerHTML = "[ ! ] Minting <b>FROG(s) #"+frogBundle+"</b>... please sign the transaction and wait...\n [ ! ] Please do not close or refresh the page!\n [ ! ] Gas prices are extremely volatile and estimates are not exact."
-            document.querySelector("pre2").appendChild(newLine)
-            //
-            // Runs mint function through web3/f0
-            let tokens = await f0.mint(inviteKeyFinal, mintNumber)
-            var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
-              return token.links.opensea
-            })
 
-            //
-            newLine = document.createElement("div")
-            newLine.innerHTML = "<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+frogBundle+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>"
-            document.querySelector("pre2").appendChild(newLine)
-          })
           //
         } catch (e) { // Catch and return errors
           newLine = document.createElement("div")
           newLine.innerHTML = "\n<b>"+e.message+"! <a href='https://freshfrogs.github.io/'>Refresh</a></b>"
           document.querySelector("pre2").appendChild(newLine)
         }
+        document.getElementById("mintTransact").addEventListener("click", function() { // Mint button
+          newLine = document.createElement("div")
+          newLine.innerHTML = "[ ! ] Minting <b>FROG(s) #"+frogBundle+"</b>... please sign the transaction and wait...\n [ ! ] Please do not close or refresh the page!\n [ ! ] Gas prices are extremely volatile and estimates are not exact."
+          document.querySelector("pre2").appendChild(newLine)
+          //
+          // Runs mint function through web3/f0
+          let tokens = await f0.mint(inviteKeyFinal, mintNumber)
+          var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
+            return token.links.opensea
+          })
+
+          //
+          newLine = document.createElement("div")
+          newLine.innerHTML = "<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+frogBundle+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>"
+          document.querySelector("pre2").appendChild(newLine)
+        })
       })
     </script>
   </head>
