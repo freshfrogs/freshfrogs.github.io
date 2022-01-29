@@ -230,6 +230,7 @@
         const placeholder = await f0.placeholder()
         const invites = await f0.myInvites()
         const nextId = await f0.api.nextId().call()
+        const token = await f0.get(nextId)
       } catch (e) {
         // return Error
         newLine = document.createElement("div")
@@ -240,7 +241,7 @@
       // Connected
       // PART TWO -- Load variables into website UI
       // Update website layout with set variables
-      document.getElementById("nextTokenImg").setAttribute("src", await f0.get(nextId).converted.image) // Set preview image to next token ID
+      document.getElementById("nextTokenImg").setAttribute("src", token.converted.image) // Set preview image to next token ID
       document.getElementById("nextToken").innerHTML = "<strong> #"+nextId+"</strong>FROG" // Update next token ID
       document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>(transact)" // Update Mint button
       document.getElementById("mintTransact").removeAttribute("href") // Removes mint button link
