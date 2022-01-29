@@ -210,7 +210,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
     <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", async () => {
       const web3 = new Web3(window.ethereum)
       const f0 = new F0();
       await f0.init({
@@ -219,7 +219,6 @@
         network: "rinkeby",
       })
       let token = await f0.get(42);
-      console.log(token)
       document.querySelector("pre2").innerHTML = JSON.stringify(token, null, 2)
     })
     </script>
