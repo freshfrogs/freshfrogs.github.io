@@ -231,11 +231,7 @@
           })
           // connecting message
           document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>connecting...</i></b>"
-        } catch (e) { // Catch and return errors
-          newLine = document.createElement("div")
-          newLine.innerHTML = "\n<b>"+e.message+"! <a href='https://freshfrogs.github.io/'>Refresh</a></b>"
-          document.querySelector("pre2").appendChild(newLine)
-        }
+
           var userAcc = web3.currentProvider.selectedAddress;
           var userAcc = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
           let mintNumber = 1;
@@ -427,6 +423,11 @@
             newLine.innerHTML = "<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+frogBundle+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>"
             document.querySelector("pre2").appendChild(newLine)
           })
+        } catch (e) { // Catch and return errors
+          newLine = document.createElement("div")
+          newLine.innerHTML = "\n<b>"+e.message+"! <a href='https://freshfrogs.github.io/'>Refresh</a></b>"
+          document.querySelector("pre2").appendChild(newLine)
+        }
       })
     </script>
   </head>
