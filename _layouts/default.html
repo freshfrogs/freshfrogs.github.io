@@ -407,7 +407,7 @@
             document.querySelector("pre2").appendChild(newLine)
           })
           // ----------------
-          document.querySelector("#mintTransact").addEventListener("click", function() { // Mint button
+          document.getElementById("mintTransact").addEventListener("click", function() { // Mint button
             newLine = document.createElement("div")
             newLine.innerHTML = "[ ! ] Minting <b>FROG(s) #"+frogBundle+"</b>... please sign the transaction and wait...\n [ ! ] Please do not close or refresh the page!\n [ ! ] Gas prices are extremely volatile and estimates are not exact."
             document.querySelector("pre2").appendChild(newLine)
