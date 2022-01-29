@@ -212,6 +212,7 @@
     <script> // Script begins -- call variables and link web3
       const f0 = new F0();
       const web3 = new Web3(window.ethereum)
+      document.addEventListener("DOMContentLoaded", async () => {
         //
         // Load images inside <pre>
 
@@ -427,6 +428,7 @@
           newLine.innerHTML = "\n<b>"+e.message+"! <a href='https://freshfrogs.github.io/'>Refresh</a></b>"
           document.querySelector("pre2").appendChild(newLine)
         }
+      })
     </script>
   </head>
   <body> <!-- Main Body -->
