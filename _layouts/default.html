@@ -245,12 +245,12 @@
         // Connected
         // PART TWO -- Load variables into website UI
         // Update website layout with set variables
-        document.getElementById("nextTokenImg").setAttribute("src", token.converted.image) // Set preview image to next token ID
-        document.getElementById("nextToken").innerHTML = "<strong> #"+nextId+"</strong>FROG" // Update next token ID
-        document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>(transact)" // Update Mint button
-        document.getElementById("mintTransact").removeAttribute("href") // Removes mint button link
+//        document.getElementById("nextTokenImg").setAttribute("src", token.converted.image) // Set preview image to next token ID
+//        document.getElementById("nextToken").innerHTML = "<strong> #"+nextId+"</strong>FROG" // Update next token ID
+//        document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>(transact)" // Update Mint button
+//        document.getElementById("mintTransact").removeAttribute("href") // Removes mint button link
         document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>"+"\n<b><strong>FROG(s) #"+parseInt(nextId)+"-"+(parseInt(nextId)+3)+"</strong></b> are now available to mint for... "+frogPrice+" ΞETH"
-        document.getElementById("gasEst").innerHTML = "<strong>"+frogPrice+" ΞETH</strong>plus gas"
+//        document.getElementById("gasEst").innerHTML = "<strong>"+frogPrice+" ΞETH</strong>plus gas"
         // Load next available frogs
         for(let i=0; i<=3; i++) {
           let nextTokenInit = parseInt(nextId) + i;
