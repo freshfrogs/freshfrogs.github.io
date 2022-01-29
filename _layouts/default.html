@@ -230,7 +230,8 @@
       let nextId = await f0.api.nextId().call()
       let nextToken = await f0.get(nextId);
       console.log(nextToken)
-      
+      // ----------------------------------------------------------------------------------------------------------------------- >
+      document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)
       document.getElementById("pre2").innerHTML = "Connected Account Address : "+addressCut
 
       // Update preview images with live ones after web3 connection
