@@ -216,14 +216,14 @@
         //
         // Load images inside <pre>
 
-        for(let frog=1; frog<=4; frog++) {
-          let whichFrog = Math.floor(Math.random() * 40)+frog;
-          let frogSource = "./assets/frogs/"+whichFrog+".png";
-          document.getElementById("frog"+frog).innerHTML = "<img src='"+frogSource+"' id='frogImg"+frog+"' class='collectionImg' alt='"+whichFrog+"'></a>"
-        }
+          for(let frog=1; frog<=4; frog++) {
+            let whichFrog = Math.floor(Math.random() * 40)+frog;
+            let frogSource = "./assets/frogs/"+whichFrog+".png";
+            document.getElementById("frog"+frog).innerHTML = "<img src='"+frogSource+"' id='frogImg"+frog+"' class='collectionImg' alt='"+whichFrog+"'></a>"
+          }
 
 
-        try { // 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b // 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524 NEW // OLD
+     //   try { // 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b // 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524 NEW // OLD
           await f0.init({
             web3: web3,
             contract: "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b",
@@ -247,12 +247,12 @@
             inviteKeyFinalPreSet = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
             newLine = document.createElement("div")
             newLine.innerHTML = "[ ! ] An invite code was found coupled with this address... <b><a id='setInvite' class='pointer'>Apply</a></b><br>"
-            document.querySelector("pre2").appendChild(newLine)
+            document.getElementById("pre2").appendChild(newLine)
           } else { 
             inviteKeyFinal = null
             newLine = document.createElement("div")
             newLine.innerHTML = "<a id='setInvite' class='pointer'></a>"
-            document.querySelector("pre2").appendChild(newLine)
+            document.getElementById("pre2").appendChild(newLine)
           }
 
           //
@@ -277,8 +277,14 @@
           document.getElementById("mintTransact").removeAttribute("href") // Removes mint button link
           document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>"+"\n<b><strong>FROG(s) #"+parseInt(nextId)+"-"+(parseInt(nextId)+3)+"</strong></b> are now available to mint for... "+frogPrice+" ΞETH"
           document.getElementById("gasEst").innerHTML = "<strong>"+frogPrice+" ΞETH</strong>plus gas"
+          
+          
+          
+          //
           // FIRST FROG
-          document.querySelector("#frog1").addEventListener("click", async (e) => {
+          
+          //
+          document.getElementById("#frog1").addEventListener("click", function(){
             //
             let tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
             let tokenOne = await f0.get(tokenOneThis);
@@ -301,7 +307,7 @@
             document.getElementById("nextToken").innerHTML = "<strong> #"+frogBundle+"</strong>FROG(s)"
           })
           // SECOND FROG
-          document.querySelector("#frog2").addEventListener("click", async (e) => {
+          document.getElementById("#frog2").addEventListener("click", function(){
             //
             let tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
             let tokenOne = await f0.get(tokenOneThis);
@@ -326,7 +332,7 @@
             document.getElementById("nextToken").innerHTML = "<strong> #"+frogBundle+"</strong>FROG(s)"
           })
           // THIRD FROG
-          document.querySelector("#frog3").addEventListener("click", async (e) => {
+          document.getElementById("#frog3").addEventListener("click", function(){
             let tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
             let tokenOne = await f0.get(tokenOneThis);
             document.getElementById("nextTokenImg").setAttribute("src", tokenOne.converted.image);
@@ -356,7 +362,7 @@
             mintNumber = 3;
           })
           // FOURTH FROG
-          document.querySelector("#frog4").addEventListener("click", async (e) => {
+          document.getElementById("#frog4").addEventListener("click", function(){
             // load 1
             let tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
             let tokenOne = await f0.get(tokenOneThis);
@@ -388,29 +394,29 @@
             mintNumber = 4;
           })
           // Event listeners // inviteKeys
-          document.querySelector("#gasEst").addEventListener("click", async (e) => { // Gas estimate button
+          document.getElementById("#gasEst").addEventListener("click", function(){ // Gas estimate button
             let estimate = await f0.mintCost(null, mintNumber);
             frogGas = Math.round(JSON.stringify(estimate.eth.safeLow, inviteKeyFinal, mintNumber) * 1000) / 1000
             frogCostTotal = frogGas+(frogPrice*mintNumber)
             newLine = document.createElement("div")
             newLine.innerHTML = "[-] Estimated cost to mint <b>"+mintNumber+" FROG(s)... "+(frogPrice*mintNumber)+" ΞETH + GAS ("+frogGas+")</b>\n"+"                    Estimated Total Cost... <b>"+frogCostTotal+" ΞETH</b>"
-            document.querySelector("pre2").appendChild(newLine)
+            document.getElementById("pre2").appendChild(newLine)
           })
           // Event listeners // inviteKeys
-          document.querySelector("#setInvite").addEventListener("click", async (e) => { // Gas estimate button
+          document.getElementById("#setInvite").addEventListener("click", function(){ // Gas estimate button
             inviteKeyFinal = inviteKeyFinalPreSet
             frogPrice = JSON.stringify(myInvites[inviteKeyFinal].condition.converted.eth, inviteKeyFinal, 1)
             frogLimit = JSON.stringify(myInvites[inviteKeyFinal].condition.converted.limit, inviteKeyFinal, 1)
             document.getElementById("gasEst").innerHTML = "<strong>"+frogPrice+" ΞETH</strong>plus gas" // Update next token ID
             newLine = document.createElement("div")
             newLine.innerHTML = "[-] Invite code has been applied... "+frogLimit+" FROG(s) @ "+frogPrice+" ΞETH"
-            document.querySelector("pre2").appendChild(newLine)
+            document.getElementById("pre2").appendChild(newLine)
           })
           // ----------------
-          document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
+          document.getElementById("#mintTransact").addEventListener("click", function(){ // Mint button
             newLine = document.createElement("div")
             newLine.innerHTML = "[ ! ] Minting <b>FROG(s) #"+frogBundle+"</b>... please sign the transaction and wait...\n [ ! ] Please do not close or refresh the page!\n [ ! ] Gas prices are extremely volatile and estimates are not exact."
-            document.querySelector("pre2").appendChild(newLine)
+            document.getElementById("pre2").appendChild(newLine)
             //
             // Runs mint function through web3/f0
             let tokens = await f0.mint(inviteKeyFinal, mintNumber)
@@ -421,13 +427,13 @@
             //
             newLine = document.createElement("div")
             newLine.innerHTML = "<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+frogBundle+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>"
-            document.querySelector("pre2").appendChild(newLine)
+            document.getElementById("pre2").appendChild(newLine)
           })
-        } catch (e) { // Catch and return errors
-          newLine = document.createElement("div")
-          newLine.innerHTML = "\n<b>"+e.message+"! <a href='https://freshfrogs.github.io/'>Refresh</a></b>"
-          document.querySelector("pre2").appendChild(newLine)
-        }
+   //     } catch (e) { // Catch and return errors
+   //       newLine = document.createElement("div")
+   //       newLine.innerHTML = "\n<b>"+e.message+"! <a href='https://freshfrogs.github.io/'>Refresh</a></b>"
+   //       document.getElementById("pre2").appendChild(newLine)
+   //     }
       })
     </script>
   </head>
