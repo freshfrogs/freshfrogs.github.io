@@ -237,8 +237,6 @@
         let frogPrice = 0.02;
         let token = await f0.get(nextId);
         let inviteKeyFinal = null
-        const myInvites = await f0.myInvites()
-        const myInvitesKeys = Object.keys(myInvites)
 
         let estimate = await f0.mintCost(null, 1);
         var remaining = 4040 - nextId;
@@ -377,15 +375,7 @@
             document.querySelector("pre2").appendChild(newLine)
         })
         // Event listeners // inviteKeys
-        document.querySelector("#setInvite").addEventListener("click", async (e) => { // Gas estimate button
-            frogPrice = JSON.stringify(myInvites[inviteKeyFinal].condition.converted.eth, inviteKeyFinal, 1)
-            frogLimit = JSON.stringify(myInvites[inviteKeyFinal].condition.converted.limit, inviteKeyFinal, 1)
-            document.getElementById("gasEst").innerHTML = "<strong>"+frogPrice+" ΞETH</strong>plus gas" // Update next token ID
-            newLine = document.createElement("div")
-            newLine.innerHTML = "[-] Invite code has been applied... "+frogLimit+" FROG(s) @ "+frogPrice+" ΞETH"
-            document.querySelector("pre2").appendChild(newLine)
-            document.getElementById("setInvite").innerHTML = ""
-        })
+
         // ----------------
         document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
             try {
