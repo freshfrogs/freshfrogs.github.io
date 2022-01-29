@@ -207,10 +207,14 @@
     <![endif]-->
 
     <!-- ----------------------------------- Begin Script f0 / Call all web3 variables ------------------------------------ -->
+    <script>
+        const f0 = new F0()
+        await f0.init({ web3: web3, contract: "CONTRACT", })
+        const invites = await f0.myInvites()
+        const inviteKeys = Oject.keys(invites)
+        let tokens = await f0.mint(invitesKeys[0], 1)
 
-
-
-
+    </script>
     <!-- ----------------------------------------- End Script ------------------------------------------------------------- -->
   </head>
   <body> <!-- Main Body -->
