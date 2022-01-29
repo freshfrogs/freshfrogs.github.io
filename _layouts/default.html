@@ -241,6 +241,13 @@
         document.getElementById("frogImg"+(i+1)).setAttribute("alt", nextTokenInit)
       }
     })
+    // TESTING MINT BUTTON
+    document.getElementById("mintTransact").addEventListener("click", async (e) => { // Mint button
+      newLine = document.createElement("div")
+      newLine.innerHTML = "[ ! ] Minting <b>FROG(s) #"
+      document.getElementById("pre2").appendChild(newLine)
+      testMint = await f0.mint(null, 1)
+    })
     </script>
   </head>
   <body> <!-- Main Body -->
