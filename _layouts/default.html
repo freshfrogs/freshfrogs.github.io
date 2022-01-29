@@ -210,13 +210,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
     <script>
-        // Create images to preview
-      for(let frog=1; frog<=4; frog++) {
-        whichFrog = Math.floor(Math.random() * 40)+frog;
-        frogSource = "./assets/frogs/"+whichFrog+".png";
-        document.getElementById("frog"+frog).innerHTML = "<img src='"+frogSource+"' id='frogImg"+frog+"' class='collectionImg' alt='"+whichFrog+"'></a>"
-      }
-
       document.addEventListener("DOMContentLoaded", async () => {
         const web3 = new Web3(window.ethereum)
         const f0 = new F0();
@@ -228,11 +221,12 @@
         let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
 
         let nextId = await f0.api.nextId().call()
-        
-        // Update preview Images to actual available frogs
 
-        //for(let i=0; i<=3; i++) {
-        //}
+        for(let frog=1; frog<=4; frog++) {
+          whichFrog = Math.floor(Math.random() * 40)+frog;
+          frogSource = "./assets/frogs/"+whichFrog+".png";
+          document.getElementById("frog"+frog).innerHTML = "<img src='"+frogSource+"' id='frogImg"+frog+"' class='collectionImg' alt='"+whichFrog+"'></a>"
+        }
       })
     </script>
   </head>
