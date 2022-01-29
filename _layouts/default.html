@@ -242,8 +242,9 @@
       }
       document.getElementById("mintTransact").removeAttribute("href")
       document.getElementById("mintTransact").innerHTML = "<b><strong>Mint</strong></b>"
+      document.getElementById("mintTransact").addEventListener("click", myFunction());
     })
-    document.getElementById("mintTransact").addEventListener("click", myFunction());
+    
     function myFunction(){
       newLine = document.createElement("div")
       newLine.innerHTML = "[ ! ] Minting <b>FROG(s) #"
