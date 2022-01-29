@@ -209,6 +209,7 @@
     <!-- ----------------------------------- Begin Script f0 / Call all web3 variables ------------------------------------ -->
     <script>
         document.getElementById("connect").addEventListener("click", function() {
+          document.getElementById("pre2").innerHTML = "<b>Trying to connect</b>"
           const f0 = new F0()
           await f0.init({ web3: web3, contract: "0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524", network: "rinkeby", }) // Rinkeby test
           const invites = await f0.myInvites()
