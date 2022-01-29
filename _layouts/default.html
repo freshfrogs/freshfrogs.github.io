@@ -246,7 +246,12 @@
         newLine = document.createElement("div")
         newLine.innerHTML = "[ ! ] Minting <b>FROG(s) #"
         document.getElementById("pre2").appendChild(newLine)
-        let tokens = await f0.mint(null, 1)
+        try {
+          let tx = await f0.mint(null, 1)
+        } catch (e) {
+          alert(e.message)
+        }
+        //
       })
     })
     
