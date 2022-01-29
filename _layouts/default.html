@@ -230,12 +230,6 @@
         let nextId = await f0.api.nextId().call()
         
         // Update preview Images to actual available frogs
-        for(let i=0; i<=3; i++) {
-          let nextTokenInit = parseInt(nextId) + i;
-          let nextToken = await f0.get(nextTokenInit);
-          document.getElementById("frogImg"+(i+1)).setAttribute("src", nextToken.converted.image)
-          document.getElementById("frogImg"+(i+1)).setAttribute("alt", nextTokenInit)
-        }
 
         //for(let i=0; i<=3; i++) {
         //}
