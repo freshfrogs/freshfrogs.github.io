@@ -231,6 +231,9 @@
           const invites = await f0.myInvites()
           const nextId = await f0.api.nextId().call()
           const token = await f0.get(nextId)
+          const userAcc = web3.currentProvider.selectedAddress;
+          const userAcc = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
+          let frogPrice = 0.02;
         } catch (e) {
           // return Error
           newLine = document.createElement("div")
