@@ -231,14 +231,12 @@
           const invites = await f0.myInvites()
           const userAcc = web3.currentProvider.selectedAddress;
           const userAcc = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
+          document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>"+"\n<b><strong>FROG(s) #"+parseInt(nextId)+"-"+(parseInt(nextId)+3)+"</strong></b> are now available to mint for... "+frogPrice+" ΞETH"
         } catch (e) {
-          // return Error
           newLine = document.createElement("div")
           newLine.innerHTML = "\n<b>"+e.message+"! <a href='https://freshfrogs.github.io/'>Refresh</a></b>"
           document.querySelector("pre2").appendChild(newLine)
-          //
         }
-        document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+userAcc+" ✓</i></b>"+"\n<b><strong>FROG(s) #"+parseInt(nextId)+"-"+(parseInt(nextId)+3)+"</strong></b> are now available to mint for... "+frogPrice+" ΞETH"
       })
     </script>
   </head>
