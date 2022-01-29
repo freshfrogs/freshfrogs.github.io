@@ -265,10 +265,9 @@
         try{
           let estimate = await f0.mintCost(null, 1);
         } catch (e) {
-            alert(e.message)
+          alert(e.message)
         }
-        frogGas = Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 1000) / 1000
-        consoleOutput(frogGas)
+        consoleOutput("test")
         //
       })
     })
