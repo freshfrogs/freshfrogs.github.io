@@ -253,10 +253,7 @@
       // ------------------------------------------------------------------------------------------------------------------------ >
       // EVENT LISTENER -- MINT, GAS EST, SETINVITE
       document.querySelector("#gasEstimate").addEventListener("click", async (e) => {
-        let estimate = await f0.mintCost(mintInvite, mintAmmount);
-        frogGas = Math.round(JSON.stringify(estimate.eth.safeLow, mintInvite, mintAmmount) * 1000) / 1000
-        frogCostTotal = frogGas+(frogPrice*mintAmmount)
-        consoleOutput("[-] Estimated cost to mint <b>")
+        consoleOutput("[-] Estimated cost to mint")
       })
       document.querySelector("#mintTransact").addEventListener("click", async (e) => {
         consoleOutput("[ ! ] Minting <b>FROG(s) #");
