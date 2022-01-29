@@ -413,7 +413,7 @@
           document.querySelector("pre2").appendChild(newLine)
         }
       })
-      document.querySelector("#mintTransact").addEventListener("click", async (e) => { // Mint button
+      document.querySelector("#mintTransact").addEventListener("click", function()) { // Mint button
         newLine = document.createElement("div")
         newLine.innerHTML = "[ ! ] Minting <b>FROG(s) #"+frogBundle+"</b>... please sign the transaction and wait...\n [ ! ] Please do not close or refresh the page!\n [ ! ] Gas prices are extremely volatile and estimates are not exact."
         document.querySelector("pre2").appendChild(newLine)
@@ -428,7 +428,7 @@
         newLine = document.createElement("div")
         newLine.innerHTML = "<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+frogBundle+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>"
         document.querySelector("pre2").appendChild(newLine)
-      })
+      }
     </script>
   </head>
   <body> <!-- Main Body -->
