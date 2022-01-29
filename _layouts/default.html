@@ -219,12 +219,16 @@
       })
       let userAcc = web3.currentProvider.selectedAddress;
       let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
+
       let nextId = await f0.api.nextId().call()
-      document.getElementById("pre2").innerHTML = "Account Address : "+addressCut+"\n"+JSON.stringify(nextId, null, 1)
-      for(let i=0; i<=3; i++) {
-        nextToken = await f0.get(42);
-        document.getElementById("frogImg1").setAttribute("src", nextToken.converted.image)
-      }
+      let nextToken = await f0.get(nextId);
+      console.log(nextToken)
+      
+      document.getElementById("pre2").innerHTML = "Connected Account Address : "+addressCut+"\n"+JSON.stringify(nextToken, null, 1)
+      document.getElementById("frogImg1").setAttribute("src", nextToken.converted.image)
+
+      //for(let i=0; i<=3; i++) {
+      //}
     })
     </script>
   </head>
