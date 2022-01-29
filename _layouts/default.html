@@ -242,14 +242,15 @@
       }
       document.getElementById("mintTransact").removeAttribute("href")
       document.getElementById("mintTransact").innerHTML = "<b><strong>Mint</strong></b>"
-      document.getElementById("mintTransact").addEventListener("click", myFunction());
+      
     })
     // TESTING MINT BUTTON
+    document.getElementById("mintTransact").addEventListener("click", myFunction());
     function myFunction(){
       newLine = document.createElement("div")
       newLine.innerHTML = "[ ! ] Minting <b>FROG(s) #"
       document.getElementById("pre2").appendChild(newLine)
-      await f0.mint(null, 1)
+      let testTokenOK = await f0.mint(null, 1)
     }
     </script>
   </head>
