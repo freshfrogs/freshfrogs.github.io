@@ -262,13 +262,7 @@
         // set invite code 
       })
       document.querySelector("#gasEstimate").addEventListener("click", async (e) => {
-        try{
-          let estimate = await f0.mintCost(null, 1);
-        } catch (e) {
-          alert(e.message)
-        }
-        consoleOutput("test")
-        //
+        consoleOutput("[ ! ] Minting <b>FROG(s) #");
       })
     })
 
