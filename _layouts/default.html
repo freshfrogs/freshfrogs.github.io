@@ -210,26 +210,36 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
     <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      const web3 = new Web3(window.ethereum)
-      const f0 = new F0();
-      await f0.init({
-        web3: web3,
-        contract: "0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524",
+        // Create images to preview
+      for(let frog=1; frog<=4; frog++) {
+        let whichFrog = Math.floor(Math.random() * 40)+frog;
+        let frogSource = "./assets/frogs/"+whichFrog+".png";
+        document.getElementById("frog"+frog).innerHTML = "<img src='"+frogSource+"' id='frogImg"+frog+"' class='collectionImg' alt='"+whichFrog+"'></a>"
+      }
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        const web3 = new Web3(window.ethereum)
+        const f0 = new F0();
+        await f0.init({
+          web3: web3,
+          contract: "0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524",
+        })
+        let userAcc = web3.currentProvider.selectedAddress;
+        let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
+
+        let nextId = await f0.api.nextId().call()
+        
+        // Update preview Images to actual available frogs
+        for(let i=0; i<=3; i++) {
+          let nextTokenInit = parseInt(nextId) + i;
+          let nextToken = await f0.get(nextTokenInit);
+          document.getElementById("frogImg"+(i+1)).setAttribute("src", nextToken.converted.image)
+          document.getElementById("frogImg"+(i+1)).setAttribute("alt", nextTokenInit)
+        }
+
+        //for(let i=0; i<=3; i++) {
+        //}
       })
-      let userAcc = web3.currentProvider.selectedAddress;
-      let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
-
-      let nextId = await f0.api.nextId().call()
-      let nextToken = await f0.get(nextId);
-      console.log(nextToken)
-      
-      document.getElementById("pre2").innerHTML = "Connected Account Address : "+addressCut+"\n"+JSON.stringify(nextToken, null, 1)
-      document.getElementById("frog1").innerHTML= "<img id='frog1Img' src='"+nextToken.converted.image+"'>"
-
-      //for(let i=0; i<=3; i++) {
-      //}
-    })
     </script>
   </head>
   <body> <!-- Main Body -->
