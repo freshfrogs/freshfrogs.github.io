@@ -254,13 +254,20 @@
       // EVENT LISTENER -- MINT, GAS EST, SETINVITE
       document.querySelector("#gasEstimate").addEventListener("click", async (e) => {
         try {
-          let estimate = f0.api.mintCost(null, 1).call();
+          //
+          let mintEstimate = await f0.api.mint({
+            key: "0x0000000000000000000000000000000000000000000000000000000000000000", proof: []
+          }, 1).estimate({
+            from: f0.account,
+            value: "420000000000000000"
+          })
+          //
           
         } catch (e) {
           alert(e.message)
         }
-        let frogGas = Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 1000) / 1000
-        consoleOutput("[-] Estimated cost to mint"+frogGas)
+        let frogGas = Math.round(JSON.stringify(mintEstimate.eth.safeLow, null, 1) * 1000) / 1000
+        consoleOutput(frogGas)
       })
       document.querySelector("#mintTransact").addEventListener("click", async (e) => {
         consoleOutput("[ ! ] Minting <b>FROG(s) #");
