@@ -255,14 +255,15 @@
       document.querySelector("#gasEstimate").addEventListener("click", async (e) => {
         try {
           //
-          let estimate = await f0.estimate(242946)
+          let estimate = await f0.estimate("242946")
           //
           
         } catch (e) {
           alert(e.message)
         }
-
-        consoleOutput(JSON.stringify(estimate.eth.safeLow, null, 2))
+        //JSON.stringify(cost.eth.safeLow, null, 2)
+        let frogGas = JSON.stringify(estimate.eth.safeLow, null, 1)
+        consoleOutput(frogGas)
       })
       document.querySelector("#mintTransact").addEventListener("click", async (e) => {
         consoleOutput("[ ! ] Minting <b>FROG(s) #");
