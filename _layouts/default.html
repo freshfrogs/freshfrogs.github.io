@@ -242,7 +242,7 @@
       // ----------------------------------------------------------------------------------------------------------------------- >
       if (myInvitesKeys[1] === "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550") {
         myInviteFound = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
-        consoleOutput("[ ! ] An invite code was found coupled with this address... <a id='setInvite' class='pointer' href=''>Apply</a>")
+        consoleOutput("[ ! ] An invite code was found coupled with this address... <b><a id='setInvite' class='pointer' href=''>Apply</a></b>")
       } else { 
         myInviteFound = null
         consoleOutput("<a id='setInvite' class='pointer'></a>")
@@ -254,7 +254,7 @@
       document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
       document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
       //
-      document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+addressCut+" ✓</i></b>\n"+"\n[-] <b><strong>FROG(s) #"+parseInt(nextId)+", "+(parseInt(nextId)+1)+", "+(parseInt(nextId)+2)+", and "+(parseInt(nextId)+3)+"</strong></b> are now available to mint... <b><a id='listPrices' class='pointer'>See Prices</a></b>"
+      document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+addressCut+" ✓</i></b>\n"+"\n[ - ] <b><strong>FROG(s) #"+parseInt(nextId)+", "+(parseInt(nextId)+1)+", "+(parseInt(nextId)+2)+", and "+(parseInt(nextId)+3)+"</strong></b> are now available to mint... <b><a id='listPrices' class='pointer'>See Pricing</a></b>"
       document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
       document.getElementById("gasEstimate").removeAttribute("href")
       // Update preview images with live ones after web3 connection
@@ -364,9 +364,9 @@
       })
       //
       document.querySelector("#listPrices").addEventListener("click", async (e) => {
-        consoleOutput("[-] 404 Frogs Available @ 0.00 ΞETH [1 per Wallet with Invite Code]")
-        consoleOutput("[-] 808 Frogs Available @ 0.02 ΞETH [4 per Wallet]")
-        consoleOutput("[-] 2,828 Frogs Available @ 0.04 ΞETH [4 per wallet] ")
+        consoleOutput("[ - ] 404 Frogs Available @ 0.00 ΞETH [1 per Wallet with Invite Code]")
+        consoleOutput("[ - ] 808 Frogs Available @ 0.02 ΞETH [4 per Wallet]")
+        consoleOutput("[ - ] 2,828 Frogs Available @ 0.04 ΞETH [4 per wallet] ")
         consoleOutput("[ - ] Maximum mint per wallet: 8")
       })
       //
@@ -386,7 +386,7 @@
         mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
         mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
         mintInviteCode = myInviteFound
-        consoleOutput("[-] Invite code has been applied... "+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH")
+        consoleOutput("[ - ] Invite code has been applied... "+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH")
         document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
       })
     })
