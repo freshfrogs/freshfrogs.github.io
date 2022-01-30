@@ -226,11 +226,12 @@
       })
       let userAcc = web3.currentProvider.selectedAddress;
       let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
-      let frogPrice = "0.02"
+      let mintPrice = "0.02"
       let nextId = await f0.api.nextId().call()
       let nextToken = await f0.get(nextId);
       let mintAmmount = 1 // number to mint
       let mintInvite = null // invite code to mint from
+      let mintList = parseInt(nextId)
 
       // ----------------------------------------------------------------------------------------------------------------------- >
       document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
@@ -238,8 +239,8 @@
       document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>(transact)"                 // Update Mint button
       document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
       //
-      document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+addressCut+" ✓</i></b>"+"\n<b><strong>FROG(s) #"+parseInt(nextId)+"-"+(parseInt(nextId)+3)+"</strong></b> are now available to mint for... "+frogPrice+" ΞETH each"
-      document.getElementById("gasEstimate").innerHTML = "<strong>"+frogPrice+" ΞETH</strong>plus gas"
+      document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+addressCut+" ✓</i></b>"+"\n<b><strong>FROG(s) #"+parseInt(nextId)+"-"+(parseInt(nextId)+3)+"</strong></b> are now available to mint for... "+mintPrice+" ΞETH each"
+      document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
       document.getElementById("gasEstimate").removeAttribute("href")
       // Update preview images with live ones after web3 connection
       for(let i=0; i<=3; i++) {
@@ -262,9 +263,9 @@
         document.getElementById("nextTokenImg3").removeAttribute("alt");
         document.getElementById("nextTokenImg4").removeAttribute("src");
         document.getElementById("nextTokenImg4").removeAttribute("alt");
-        frogBundle = parseInt(nextId)
-        mintNumber = 1;
-        document.getElementById("nextToken").innerHTML = "<strong> #"+frogBundle+"</strong>FROG"
+        mintList = parseInt(nextId)
+        mintAmmount = 1;
+        document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG"
       })
       // SECOND FROG
       document.querySelector("#frog2").addEventListener("click", async (e) => {
@@ -282,9 +283,9 @@
         document.getElementById("nextTokenImg4").removeAttribute("alt");
         document.getElementById("nextTokenImg").setAttribute("class", "nextTokenImg sizeTwo")
         document.getElementById("nextTokenImg2").setAttribute("class", "nextTokenImg sizeTwo")
-        frogBundle = parseInt(nextId)+", "+(parseInt(nextId)+1)
-        mintNumber = 2;
-        document.getElementById("nextToken").innerHTML = "<strong> #"+frogBundle+"</strong>FROG(s)"
+        mintList = parseInt(nextId)+", "+(parseInt(nextId)+1)
+        mintAmmount = 2;
+        document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG(s)"
       })
       // THIRD FROG
       document.querySelector("#frog3").addEventListener("click", async (e) => {
@@ -306,9 +307,9 @@
         document.getElementById("nextTokenImg").setAttribute("class", "nextTokenImg sizeTwo")
         document.getElementById("nextTokenImg2").setAttribute("class", "nextTokenImg sizeTwo")
         document.getElementById("nextTokenImg3").setAttribute("class", "nextTokenImg sizeTwo")
-        frogBundle = parseInt(nextId)+"-"+(parseInt(nextId)+2)
-        document.getElementById("nextToken").innerHTML = "<strong> #"+frogBundle+"</strong>FROG(s)"
-        mintNumber = 3;
+        mintList = parseInt(nextId)+"-"+(parseInt(nextId)+2)
+        document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG(s)"
+        mintAmmount = 3;
       })
       // FOURTH FROG
       document.querySelector("#frog4").addEventListener("click", async (e) => {
@@ -332,9 +333,9 @@
         document.getElementById("nextTokenImg2").setAttribute("class", "nextTokenImg sizeTwo")
         document.getElementById("nextTokenImg3").setAttribute("class", "nextTokenImg sizeTwo")
         document.getElementById("nextTokenImg4").setAttribute("class", "nextTokenImg sizeTwo")
-        frogBundle = parseInt(nextId)+"-"+(parseInt(nextId)+3)
-        document.getElementById("nextToken").innerHTML = "<strong> #"+frogBundle+"</strong>FROG(s)" // Update next token ID
-        mintNumber = 4;
+        mintList = parseInt(nextId)+"-"+(parseInt(nextId)+3)
+        document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG(s)" // Update next token ID
+        mintAmmount = 4;
       })
       // ------------------------------------------------------------------------------------------------------------------------ >
       // EVENT LISTENER -- MINT, GAS EST, SETINVITE
@@ -347,12 +348,16 @@
         }
       })
       document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-        consoleOutput("[ ! ] Transaction confirmed. Minting...");
+        consoleOutput("[ ! ] Minting <b>FROG(s) #"+mintList+"</b>... please sign the transaction and wait...\n [ ! ] Please do not close or refresh the page!\n [ ! ] Gas prices are extremely volatile and estimates are not exact.")
         try {
-          // code
+          let tokens = await f0.mint(mintInvite, mintAmmount)
+          var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
+            return token.links.opensea
+          })
         } catch (e) {
           alert(e.message)
         }
+        consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>")
       })
       document.querySelector("#setInvite").addEventListener("click", async (e) => {
         consoleOutput("[ ! ] Invite code applied...");
