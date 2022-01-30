@@ -372,9 +372,9 @@
       })
       document.querySelector("#setInvite").addEventListener("click", async (e) => {
         consoleOutput("testing set invite")
-        mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, mintInviteFound, 1)
-        mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, mintInviteFound, 1)
-        let mintInvite = mintInviteFound
+        mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
+        mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
+        let mintInvite = myInviteFound
         document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas" // Update next token ID
         newLine = document.createElement("div")
         consoleOutput("[-] Invite code has been applied... "+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH")
