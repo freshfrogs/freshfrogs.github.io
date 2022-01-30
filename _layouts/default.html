@@ -254,7 +254,8 @@
       // EVENT LISTENER -- MINT, GAS EST, SETINVITE
       document.querySelector("#gasEstimate").addEventListener("click", async (e) => {
         try {
-          let estimate = await f0.mintCost(null, 1);
+          let estimate = f0.api.mintCost(null, 1).call();
+          
         } catch (e) {
           alert(e.message)
         }
