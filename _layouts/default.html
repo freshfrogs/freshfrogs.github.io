@@ -255,13 +255,13 @@
       document.querySelector("#gasEstimate").addEventListener("click", async (e) => {
         try {
           //
-          let mintEstimate = await f0.api.mint(null, 1).estimate()
+          let estimate = await f0.estimate(gas)
           //
           
         } catch (e) {
           alert(e.message)
         }
-        let frogGas = Math.round(JSON.stringify(mintEstimate.eth.safeLow, null, 1) * 1000) / 1000
+        let frogGas = Math.round(JSON.stringify(estimate.eth.safeLow, null, 1) * 1000) / 1000
         consoleOutput(frogGas)
       })
       document.querySelector("#mintTransact").addEventListener("click", async (e) => {
