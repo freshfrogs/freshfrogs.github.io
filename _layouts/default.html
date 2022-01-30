@@ -235,8 +235,8 @@
       let mintList = parseInt(nextId)
       let mintLimit = 1
 
-      let myInvites = await f0.myInvites()
-      let myInvitesKeys = Object.keys(myInvites)
+      const myInvites = await f0.myInvites()
+      const myInvitesKeys = Object.keys(myInvites)
       let myInviteFound = null
 
       // ----------------------------------------------------------------------------------------------------------------------- >
