@@ -227,7 +227,7 @@
           network: "main"
         })
         } catch (e) {
-          consoleOutput(e.message)
+          consoleOutput("\n<strong><b>Error: "+e.message+"</b></strong>")
         }
 
       const userAcc = web3.currentProvider.selectedAddress;
