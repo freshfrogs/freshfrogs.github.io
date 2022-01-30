@@ -232,7 +232,19 @@
       let mintAmmount = 1 // number to mint
       let mintInvite = null // invite code to mint from
       let mintList = parseInt(nextId)
-
+      let mintLimit = 1
+      const myInvites = await f0.myInvites()
+      const myInvitesKeys = Object.keys(myInvites)
+      // ----------------------------------------------------------------------------------------------------------------------- >
+      if (myInvitesKeys[1] === "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550") {
+        let mintInviteFound = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
+        consoleOutput("[ ! ] An invite code was found coupled with this address... <a id='setInvite'>Apply</a>")
+      } else { 
+        let mintInvite = null
+        newLine = document.createElement("div")
+        newLine.innerHTML = "public invite found"
+        document.querySelector("pre2").appendChild(newLine)
+      }
       // ----------------------------------------------------------------------------------------------------------------------- >
       document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
       document.getElementById("nextToken").innerHTML = "<strong> #"+nextId+"</strong>FROG"                  // Update next token ID on preview
@@ -360,12 +372,13 @@
         consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>")
       })
       document.querySelector("#setInvite").addEventListener("click", async (e) => {
-        consoleOutput("[ ! ] Invite code applied...");
-        try {
-          // code
-        } catch (e) {
-          alert(e.message)
-        }
+        
+        mintPrice = JSON.stringify(myInvites[1].condition.converted.eth, mintInviteFound, 1)
+        mintLimit = JSON.stringify(myInvites[1].condition.converted.limit, mintInviteFound, 1)
+        let mintInvite = mintInviteFound
+        document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas" // Update next token ID
+        newLine = document.createElement("div")
+        consoleOutput("[-] Invite code has been applied... "+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH")
       })
     })
 
