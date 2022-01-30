@@ -224,19 +224,20 @@
         web3: web3,
         contract: "0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524",
       })
-      let userAcc = web3.currentProvider.selectedAddress;
-      let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
-      let mintPrice = "0.02"
+      const userAcc = web3.currentProvider.selectedAddress;
+      const addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
+      const myInvites = await f0.myInvites()
+      const myInvitesKeys = Object.keys(myInvites)
+
       let nextId = await f0.api.nextId().call()
       let nextToken = await f0.get(nextId);
-
+      let mintPrice = "0.02"
       let mintAmmount = 1 // number to mint
       let mintInviteCode = null // invite code to mint from
       let mintList = parseInt(nextId)
       let mintLimit = 1
 
-      const myInvites = await f0.myInvites()
-      const myInvitesKeys = Object.keys(myInvites)
+
 
       // ----------------------------------------------------------------------------------------------------------------------- >
       if (myInvitesKeys[1] === "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550") {
