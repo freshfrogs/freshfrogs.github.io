@@ -255,12 +255,7 @@
       document.querySelector("#gasEstimate").addEventListener("click", async (e) => {
         try {
           //
-          let mintEstimate = await f0.api.mint({
-            key: "0x0000000000000000000000000000000000000000000000000000000000000000", proof: []
-          }, 1).estimate({
-            from: f0.account,
-            value: "420000000000000000"
-          })
+          let mintEstimate = await f0.api.mint(null, 1).estimate()
           //
           
         } catch (e) {
