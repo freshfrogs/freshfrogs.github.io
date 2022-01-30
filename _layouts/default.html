@@ -237,14 +237,13 @@
 
       const myInvites = await f0.myInvites()
       const myInvitesKeys = Object.keys(myInvites)
-      let myInviteFound = null
 
       // ----------------------------------------------------------------------------------------------------------------------- >
       if (myInvitesKeys[1] === "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550") {
-        let myInviteFound = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
+        myInviteFound = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
         consoleOutput("[ ! ] An invite code was found coupled with this address... <a id='setInvite' class='pointer' href=''>Apply</a>")
       } else { 
-        let myInviteFound = null
+        myInviteFound = null
         consoleOutput("<a id='setInvite' class='pointer'></a>")
       }
       // ----------------------------------------------------------------------------------------------------------------------- >
