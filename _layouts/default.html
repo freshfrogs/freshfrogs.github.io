@@ -242,7 +242,6 @@
       // ----------------------------------------------------------------------------------------------------------------------- >
       if (myInvitesKeys[1] === "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550") {
         let myInviteFound = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
-        let thisIsATest = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
         consoleOutput("[ ! ] An invite code was found coupled with this address... <a id='setInvite' class='pointer' href=''>Apply</a>"+thisIsATest)
       } else { 
         let myInviteFound = null
@@ -376,13 +375,10 @@
         consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>")
       })
       document.querySelector("#setInvite").addEventListener("click", async (e) => {
-        consoleOutput("testing set invite...")
-
-        mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
-        mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
-        mintInviteCode = myInviteFound
-    //    document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas" // Update next token ID
-        consoleOutput("[-] Invite code has been applied... "+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH")
+        let thisIsATest = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
+        let thisIsATest2 = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
+        consoleOutput(thisIsATest+" - "+thisIsATest2)
+     //   consoleOutput("[-] Invite code has been applied... "+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH")
       })
     })
 
