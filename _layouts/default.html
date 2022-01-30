@@ -235,6 +235,7 @@
       let mintLimit = 1
       const myInvites = await f0.myInvites()
       const myInvitesKeys = Object.keys(myInvites)
+      let myInviteFound = null
       // ----------------------------------------------------------------------------------------------------------------------- >
       if (myInvitesKeys[1] === "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550") {
         let myInviteFound = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
@@ -372,8 +373,8 @@
       })
       document.querySelector("#setInvite").addEventListener("click", async (e) => {
         consoleOutput("testing set invite")
-        mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
-        mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
+        mintPrice = JSON.stringify(myInvites[1].condition.converted.eth, myInviteFound, 1)
+        mintLimit = JSON.stringify(myInvites[1].condition.converted.limit, myInviteFound, 1)
         let mintInvite = myInviteFound
         document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas" // Update next token ID
         newLine = document.createElement("div")
