@@ -373,13 +373,13 @@
         consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>")
       })
       document.querySelector("#setInvite").addEventListener("click", async (e) => {
-        
-        mintPrice = JSON.stringify(myInvites[1].condition.converted.eth, mintInviteFound, 1)
-        mintLimit = JSON.stringify(myInvites[1].condition.converted.limit, mintInviteFound, 1)
-        let mintInvite = mintInviteFound
-        document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas" // Update next token ID
-        newLine = document.createElement("div")
-        consoleOutput("[-] Invite code has been applied... "+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH")
+        consoleOutput("testing set invite")
+//        mintPrice = JSON.stringify(myInvites[1].condition.converted.eth, mintInviteFound, 1)
+//        mintLimit = JSON.stringify(myInvites[1].condition.converted.limit, mintInviteFound, 1)
+//        let mintInvite = mintInviteFound
+//        document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas" // Update next token ID
+//        newLine = document.createElement("div")
+//        consoleOutput("[-] Invite code has been applied... "+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH")
       })
     })
 
