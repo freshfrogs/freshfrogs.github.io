@@ -254,7 +254,7 @@
       document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
       document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
       //
-      document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+addressCut+" ✓</i></b>\n"+"\n<b><strong>FROG(s) #"+parseInt(nextId)+", "+(parseInt(nextId)+1)+", "+(parseInt(nextId)+2)+", and "+(parseInt(nextId)+3)+"</strong></b> are now available to mint"
+      document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i>"+addressCut+" ✓</i></b>\n"+"\n[-] <b><strong>FROG(s) #"+parseInt(nextId)+", "+(parseInt(nextId)+1)+", "+(parseInt(nextId)+2)+", and "+(parseInt(nextId)+3)+"</strong></b> are now available to mint... <b><a id='listPrices' class='pointer'>See Prices</a></b>"
       document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
       document.getElementById("gasEstimate").removeAttribute("href")
       // Update preview images with live ones after web3 connection
@@ -362,6 +362,14 @@
           alert(e.message)
         }
       })
+      //
+      document.querySelector("#listPrices").addEventListener("click", async (e) => {
+        consoleOutput("[-] 404 Frogs Available @ 0.00 ΞETH [1 per Wallet with Invite Code]")
+        consoleOutput("[-] 808 Frogs Available @ 0.02 ΞETH [4 per Wallet]")
+        consoleOutput("[-] 2,828 Frogs Available @ 0.04 ΞETH [4 per wallet] ")
+        consoleOutput("[ - ] Maximum mint per wallet: 8")
+      })
+      //
       document.querySelector("#mintTransact").addEventListener("click", async (e) => {
         consoleOutput("[ ! ] Minting <b>FROG(s) #"+mintList+"</b>... please sign the transaction and wait...\n [ ! ] Please do not close or refresh the page!\n [ ! ] Gas prices are extremely volatile and estimates are not exact.")
         try {
