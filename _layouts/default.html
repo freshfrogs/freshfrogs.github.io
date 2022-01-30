@@ -282,6 +282,7 @@
         mintList = parseInt(nextId)
         mintAmmount = 1;
         document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG"
+        document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice*mintAmmount+" ΞETH</strong>plus gas"
       })
       // SECOND FROG
       document.querySelector("#frog2").addEventListener("click", async (e) => {
@@ -302,6 +303,7 @@
         mintList = parseInt(nextId)+", #"+(parseInt(nextId)+1)
         mintAmmount = 2;
         document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG(s)"
+        document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice*mintAmmount+" ΞETH</strong>plus gas"
       })
       // THIRD FROG
       document.querySelector("#frog3").addEventListener("click", async (e) => {
@@ -326,6 +328,7 @@
         mintList = parseInt(nextId)+" - #"+(parseInt(nextId)+2)
         document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG(s)"
         mintAmmount = 3;
+        document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice*mintAmmount+" ΞETH</strong>plus gas"
       })
       // FOURTH FROG
       document.querySelector("#frog4").addEventListener("click", async (e) => {
@@ -352,11 +355,12 @@
         mintList = parseInt(nextId)+" - #"+(parseInt(nextId)+3)
         document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG(s)" // Update next token ID
         mintAmmount = 4;
+        document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice*mintAmmount+" ΞETH</strong>plus gas"
       })
       // ------------------------------------------------------------------------------------------------------------------------ >
       // EVENT LISTENER -- MINT, GAS EST, SETINVITE
       document.querySelector("#gasEstimate").addEventListener("click", async (e) => {
-        consoleOutput("[ - ] Estimated gas cost to mint...");
+        consoleOutput("[ - ] A 'gas' fee is required when minting ANY NFT onto the blockchain");
         try {
           // code
         } catch (e) {
