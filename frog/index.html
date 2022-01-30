@@ -1,18 +1,18 @@
 <html>
-<style>
-    .frog{
-        width: 25%
-    }
-</style>
-<script>
-document.addEventListener("DOMContentLoaded", async () => {
-  for(let i=1; i<=42; i++) {
-    let token = await f0.get(i);
-    let el = document.createElement("img")
-    el.src= i+".png"
-    document.body.appendChild(el)
-  }
-})
-</script>
-<body></body>
+    <style>
+        .frog{
+            width: 25%
+        }
+    </style>
+    <script>
+        function myFunction() {
+            for(let i=1; i<=42; i++) {
+                let token = await f0.get(i);
+                let el = document.createElement("img")
+                el.src= i+".png"
+                document.body.appendChild(el)
+            }
+        }
+    </script>
+    <body onload="myFunction()"></body>
 <html>
