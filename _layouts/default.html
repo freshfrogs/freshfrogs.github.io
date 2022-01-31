@@ -251,7 +251,11 @@
         document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>"+"\nAn invite code was found coupled with this wallet... <b><a id='setInvite' class='pointer' href=''>Apply</a></b>\n"
       } else { 
         myInviteFound = null
+        mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
+        mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
+        document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
         document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>\n<a id='setInvite' class='pointer'></a>"
+        consoleOutput("\nPublic minting price has been applied... Valid for <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>")
       }
       // ----------------------------------------------------------------------------------------------------------------------- >
       document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
