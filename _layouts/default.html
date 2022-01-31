@@ -243,17 +243,20 @@
       let mintList = parseInt(nextId)
       let mintLimit = 1
 
+      
       // Load public invite first
       myInviteFound = "0x0000000000000000000000000000000000000000000000000000000000000000"
       mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
       mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
+      consoleOutput("<b><strong>FROG(s) #"+parseInt(nextId)+" - #"+(parseInt(nextId)+3)+"</strong></b> are now available to mint... <b><a id='listPrices' class='pointer'>See Pricing</a></b>")
+      document.getElementById("gasEstimate").removeAttribute("href")
       document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
       document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"
       consoleOutput("Public minting price has been applied... Valid for <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>")
 
       // ----------------------------------------------------------------------------------------------------------------------- >
-      if (myInvitesKeys[1] === "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d000") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550
-        myInviteFound = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d000"
+      if (myInvitesKeys[1] === "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550
+        myInviteFound = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
         document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>"+"\nAn invite code was found coupled with this wallet... <b><a id='setInvite' class='pointer' href=''>Apply</a></b>\n"
       } else { 
         document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>\n<a id='setInvite' class='pointer'></a>"
@@ -266,9 +269,6 @@
       document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
       //
       
-      consoleOutput("<b><strong>FROG(s) #"+parseInt(nextId)+" - #"+(parseInt(nextId)+3)+"</strong></b> are now available to mint... <b><a id='listPrices' class='pointer'>See Pricing</a></b>")
-      document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
-      document.getElementById("gasEstimate").removeAttribute("href")
       // Update preview images with live ones after web3 connection
       for(let i=0; i<=3; i++) {
         nextTokenInit = parseInt(nextId) + i;
