@@ -251,7 +251,6 @@
       let mintList = parseInt(nextId)
       let mintLimit = 1
 
-      
       // Load public invite first
       myInviteFound = "0x0000000000000000000000000000000000000000000000000000000000000000"
       mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
@@ -269,6 +268,7 @@
       } else { 
         document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>\n<a id='setInvite' class='pointer'></a>"
       }
+      
       // ----------------------------------------------------------------------------------------------------------------------- >
       document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
       document.getElementById("nextToken").innerHTML = "<strong> #"+nextId+"</strong>FROG"                  // Update next token ID on preview
