@@ -8,4 +8,4 @@ Unbelievably, over 200,000 acres of rainforest are burned every day. That is ove
 
 For every 1.00 ETH donated, 2 1/2 acres of rainforest will be saved forever! More than 80 different frog species can be found in a single acre of lowland rainforest section alone! I hope that every FROG owner will be reminded of one of the many species they helped save.
 <hr>
-<a href="https://twitter.com/intent/tweet?button_hashtag=LoveTwitter&ref_src=twsrc%5Etfw" class="twitter-hashtag-button" data-show-count="false">Tweet #LoveTwitter</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<a class="twitter-timeline" href="https://twitter.com/FreshFrogs_NFTref_src=twsrc%5Etfw">Tweets by Fresh Frogs NFT</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
