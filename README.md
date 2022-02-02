@@ -17,7 +17,7 @@ To use the Minimal theme:
     plugins:
     - jekyll-remote-theme # add this line to the plugins list if you already have one
     ```
-
+stupid fucking github refresh damn it
 2. Optionally, if you'd like to preview your site on your computer, add the following to your site's `Gemfile`:
 
     ```ruby
