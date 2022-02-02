@@ -269,7 +269,7 @@
       myInviteFound = "0x0000000000000000000000000000000000000000000000000000000000000000"
       mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
       mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
-      consoleOutput("<b><strong>FROG(s) #"+parseInt(nextId)+" - #"+(parseInt(nextId)+3)+"</strong></b> are now available to mint... <b><a id='listPrices' class='pointer'>See Pricing</a></b>")
+//      consoleOutput("<b><strong>FROG(s) #"+parseInt(nextId)+" - #"+(parseInt(nextId)+3)+"</strong></b> are now available to mint... <b><a id='listPrices' class='pointer'>See Pricing</a></b>")
       document.getElementById("gasEstimate").removeAttribute("href")
       document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
       document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"
@@ -408,7 +408,8 @@
         consoleOutput("<b><strong>2828</strong></b> Frogs available at... <b><strong>0.04 ΞETH</strong></b> (Public)")
       })
       
-//      document.querySelector("#mintTransact").addEventListener("click", async (e) => {
+      document.querySelector("#mintTransact").addEventListener("click", async (e) => {
+        consoleOutput("Minting has not started yet. Follow twitter and discord for more info!")
 //        document.getElementById("pre2").innerHTML = "\n<strong>Minting FROG(s) #"+mintList+"... please sign the transaction and wait...\nDo Not Leave This Page"
 //        try {
 //          let tokens = await f0.mint(mintInviteCode, mintAmmount)
@@ -419,7 +420,7 @@
 //          consoleOutput("\n<strong><b>Error:</b></strong> Something went wrong. You have either minted too many times or insufficient funds available. \nIf you believe this not to be the case, report it here: <b><a href='https://discord.gg/t84NyjpS3H'>Discord</a></b>")
 //        }
 //        consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>")
-//      })
+      })
       document.querySelector("#setInvite").addEventListener("click", async (e) => {
         mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
         mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
