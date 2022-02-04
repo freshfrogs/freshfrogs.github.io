@@ -411,8 +411,8 @@
         try {
           // code
           let cost = await f0.cost()
-          let estimate = await f0.estimate("1000")
-          consoleOutput(JSON.stringify(cost, null, 1))
+          let estimate = await f0.estimate(cost.safeLow)
+          consoleOutput(JSON.stringify(cost.safeLow, null, 1))
           consoleOutput(JSON.stringify(estimate))
         } catch (e) {
           alert(e.message)
