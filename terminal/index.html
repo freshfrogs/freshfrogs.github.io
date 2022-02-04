@@ -1,4 +1,224 @@
-<html lang="{{ site.lang | default: "en-US" }}">
+<!DOCTYPE html>
+<style>
+  .pointer {
+    cursor: pointer;
+  }
+  .pointerOff {
+    cursor: pointer;
+  }
+  .process {
+    cursor: pointer;
+  }
+  .processImages{
+    cursor: pointer;
+  }
+  .collection{
+    cursor: pointer;
+  }
+  .collectionImg{
+    cursor: pointer;
+  }
+  .page-section {
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    font-weight: 500;
+    color: rgba(126, 183, 128, 1);
+    font-size: small;
+    image-rendering: pixelated;
+    text-align: center;
+  }
+  .pre {
+    font-size: small;
+    border-radius: 0%;
+    text-align: center;
+    image-rendering: pixelated;
+  }
+  .h1 {
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    font-weight: 800;
+    color: white;
+    text-align: center;
+    image-rendering: pixelated;
+    padding: 0%;
+    font-size: xx-large;
+  }
+  .h2 {
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    font-weight: 800;
+    color: white;
+    text-align: center;
+    image-rendering: pixelated;
+    font-size: large;
+    padding: 0%;
+    height: 300%;
+    line-height: 300%;
+    vertical-align: middle;
+  }
+  .h3 {
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    text-align: center;
+    image-rendering: pixelated;
+    padding: 0%;
+    font-size: x-large;
+  }
+  .os{
+    float: left;
+    width: 20%;
+    image-rendering: pixelated;
+    vertical-align: middle;
+    padding: 0px;
+    margin: -5px;
+    border-radius: 100%;
+  }
+  .collectionImg { 
+    transition: transform .2s;
+    width: 20%;
+    vertical-align: center;
+    margin-left: 8px;
+    margin-right: 8px;
+    text-align: center;
+    box-shadow: 5px 10px rgba(211, 211, 211, 0.329);
+  }
+  .collection {
+    image-rendering: pixelated;
+  }
+  .collectionImg:hover{
+    -ms-transform: scale(2.0); /* IE 9 */
+    -webkit-transform: scale(2.0); /* Safari 3-8 */
+    transform: scale(2.0);
+    box-shadow: none;
+  }
+  .pixelated{
+    image-rendering: pixelated;
+  }
+  .nextTokenImgCont{
+    vertical-align: center;
+    display: flex;
+    padding: 0px;
+    margin: 0px;
+  }
+  .nextTokenImg {
+    image-rendering: pixelated;
+    vertical-align: center;
+    border-radius: 0%;
+    box-shadow: 5px 10px rgba(211, 211, 211, 0.329);
+  }
+  .sizeOne{
+    width: 100%;
+    transition: transform .2s;
+  }
+  .sizeOne:hover{
+    -ms-transform: scale(1.0); /* IE 9 */
+    -webkit-transform: scale(1.0); /* Safari 3-8 */
+    transform: scale(1.0);
+    box-shadow: none;
+  }
+  .sizeTwo{
+    width: calc(100% / 2);
+    transition: transform .2s;
+  }
+  .sizeTwo:hover{
+    -ms-transform: scale(2.0); /* IE 9 */
+    -webkit-transform: scale(2.0); /* Safari 3-8 */
+    transform: scale(2.0);
+    box-shadow: none;
+  }
+  .sizeThree{
+    width: calc(100% / 3);
+    transition: transform .2s;
+  }
+  .sizeThree:hover{
+    -ms-transform: scale(3.0); /* IE 9 */
+    -webkit-transform: scale(3.0); /* Safari 3-8 */
+    transform: scale(3.0);
+    box-shadow: none;
+  }
+  .repoHeader{
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    position: unset;
+    float: unset;
+  }
+  .repoHeader2{
+    margin-left: auto;
+    margin-right: 8px;
+    right: 50%;
+    width: 15%;
+    height: 10%;
+    text-align: center;
+    float: unset;
+    position: unset;
+    background-color: white;
+    border: 8px outset rgba(126, 183, 128, 1);
+    border-radius: 0%;
+    padding: 16px;
+  }
+  .repoPre{
+    margin-right: auto;
+    left: 50%;
+    height: 33%;
+    width: 33%;
+    padding: 16px;
+    border: 8px outset rgba(126, 183, 128, 1);
+    text-align: center;
+    float: unset;
+    position: unset;
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    font-weight: 500;
+  }
+  .wrapper2{
+    display: flex;
+    flex-wrap: wrap;
+    float: unset;
+    position: unset;
+    height: 100%;
+  }
+  .repoDownloads{
+    position: unset;
+    float: unset;
+    position: unset;
+    padding: 0px;
+    margin-top: 0px;
+    margin-bottom: 16px;
+    border-radius: 0%;
+    box-shadow: 5px 10px rgba(211, 211, 211, 0.329);
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    font-weight: 500;
+    width: 50%;
+  }
+  body {
+    background-image: url("/assets/background.png");
+    image-rendering: pixelated;
+    position: unset;
+    float: unset;
+  }
+  .headLine{
+    color: white;
+    image-rendering: crisp-edges;
+  }
+  .headLineImg{
+    image-rendering: auto;
+    width: 5%;
+    vertical-align: center;
+    border-radius: 100%;
+    padding: 4px;
+    transition: transform .2s;
+    margin-left: 32px;
+    margin-right: 32px;
+    box-shadow: 5px 10px rgba(211, 211, 211, 0.329);
+  }
+  .headLineImg:hover{
+    -ms-transform: scale(1.1); /* IE 9 */
+    -webkit-transform: scale(1.1); /* Safari 3-8 */
+    transform: scale(1.1);
+    box-shadow: none;
+  }
+  .social{
+    display: flex;
+    margin-left: 32px;
+    margin-right: 32px;
+  }
+</style>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
