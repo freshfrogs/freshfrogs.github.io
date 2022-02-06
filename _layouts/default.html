@@ -283,7 +283,7 @@
       myInviteFound = "0x0000000000000000000000000000000000000000000000000000000000000000"
       mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
       mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
-//      consoleOutput("<b><strong>FROG(s) #"+parseInt(nextId)+" - #"+(parseInt(nextId)+3)+"</strong></b> are now available to mint... <b><a id='listPrices' class='pointer'>See Pricing</a></b>")
+      consoleOutput("<b><strong>FROG(s) #"+parseInt(nextId)+" - #"+(parseInt(nextId)+3)+"</strong></b> are now available to mint... <b><a id='listPrices' class='pointer'>See Pricing</a></b>")
       document.getElementById("gasEstimate").removeAttribute("href")
       document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
       document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"
