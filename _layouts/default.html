@@ -287,11 +287,11 @@
       document.getElementById("gasEstimate").removeAttribute("href")
       document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
       document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"
-      consoleOutput("<b>Minting begins Sunday, 02/06/2022. \nJoin discord and follow on twitter to get on the FREE mint whitelist<b>")//"Public minting price has been applied... Valid for <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>")
+      consoleOutput("Public minting price has been applied... Valid for <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>") //("<b>Minting begins Sunday, 02/06/2022. \nJoin discord and follow on twitter to get on the FREE mint whitelist<b>")
       
       // ----------------------------------------------------------------------------------------------------------------------- >
-      if (myInvitesKeys[1] === "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550
-        myInviteFound = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
+      if (myInvitesKeys[1] === "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550
+        myInviteFound = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4"
         document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>"+"\nAn invite code was found coupled with this address... <b><a id='setInvite' class='pointer' href=''>Apply</a></b>\n"
       } else { 
         document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>\n<a id='setInvite' class='pointer'></a>"
@@ -427,16 +427,16 @@
       
       document.querySelector("#mintTransact").addEventListener("click", async (e) => {
         consoleOutput("Minting has not started yet. Follow twitter and discord for more info!")
-//        document.getElementById("pre2").innerHTML = "\n<strong>Minting FROG(s) #"+mintList+"... please sign the transaction and wait...\nDo Not Leave This Page"
-//        try {
-//          let tokens = await f0.mint(mintInviteCode, mintAmmount)
-//          var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
-//            return token.links.opensea
-//          })
-//        } catch (e) {
-//          consoleOutput("\n<strong><b>Error:</b></strong> Something went wrong. You have either minted too many times or insufficient funds available. \nIf you believe this not to be the case, report it here: <b><a href='https://discord.gg/t84NyjpS3H'>Discord</a></b>")
-//        }
-//        consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>")
+        document.getElementById("pre2").innerHTML = "\n<strong>Minting FROG(s) #"+mintList+"... please sign the transaction and wait...\nDo Not Leave This Page"
+        try {
+          let tokens = await f0.mint(mintInviteCode, mintAmmount)
+          var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
+            return token.links.opensea
+          })
+        } catch (e) {
+          consoleOutput("\n<strong><b>Error:</b></strong> Something went wrong. You have either minted too many times or insufficient funds available. \nIf you believe this not to be the case, report it here: <b><a href='https://discord.gg/t84NyjpS3H'>Discord</a></b>")
+        }
+        consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>")
       })
       document.querySelector("#setInvite").addEventListener("click", async (e) => {
         mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
