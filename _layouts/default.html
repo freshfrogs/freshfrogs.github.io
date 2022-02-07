@@ -420,7 +420,7 @@
           let safeLowWei = safeLowGwei * Math.pow(10, 9)
           //consoleOutput(safeLowWei)
           //
-          consoleOutput("<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
+          consoleOutput("<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.average)+" (ETHΞ "+JSON.stringify(estimate.eth.average)+")")
         } catch (e) {
           alert(e.message)
         }
