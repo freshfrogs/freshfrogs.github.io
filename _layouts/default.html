@@ -418,7 +418,7 @@
           //
           consoleOutput("<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
         } catch (e) {
-          consoleOutput("[ ! ] It looks like your wallet doesn't have enough funds!\n"+"<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
+          consoleOutput(e)//"[ ! ] It looks like your wallet doesn't have enough funds!\n"+"<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
         }
       })
       //
