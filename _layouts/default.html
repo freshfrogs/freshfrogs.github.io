@@ -411,7 +411,7 @@
         try {
           // code
           let cost = await f0.cost()
-          let safeLowGwei = cost.gas.safeLow / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
+          let safeLowGwei = parseInt(cost.gas.safeLow) / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
           let safeLowWei = safeLowGwei * Math.pow(10, 9)
           let estimate = await f0.estimate(safeLowWei)
           //
