@@ -427,7 +427,7 @@
       
       document.querySelector("#mintTransact").addEventListener("click", async (e) => {
 //        consoleOutput("Minting has not started yet. Follow twitter and discord for more info!")
-        consoleOutput("\n<strong>Minting"+mintAmmount+" FROG(s) #"+mintList+"... please sign the transaction and wait...\nDo Not Leave This Page")
+        consoleOutput("\n<strong>Minting "+mintAmmount+" FROG(s) #"+mintList+"... please sign the transaction and wait...\nDo Not Leave This Page")
         try {
           let tokens = await f0.mint(mintInviteCode, mintAmmount)
           var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
