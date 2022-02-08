@@ -430,10 +430,6 @@
         consoleOutput("\n<strong>Minting "+mintAmmount+" FROG(s) #"+mintList+"... please sign the transaction and wait...\nDo Not Leave This Page")
         try {
           let tokens = await f0.mint(mintInviteCode, mintAmmount)
-          let tokens = await f0.mint(mintInviteCode, mintAmmount, {
-            gasPrice: "" + safeLowWei  // the gasPrice must be a string value of the number
-          })
-          //
           var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
             return token.links.opensea
           })
