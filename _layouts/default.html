@@ -410,13 +410,8 @@
         consoleOutput("[ - ] A 'gas' fee is required when minting ANY NFT onto the blockchain");
         try {
           // code
-          let cost = await f0.cost()
-          let safeLowGwei = parseInt(cost.gas.safeLow) / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
-          let safeLowWei = safeLowGwei * Math.pow(10, 9)
-          let estimate = await f0.estimate(safeLowWei)
-          //
+          let estimate = await f0.estimate(242946)
           //let estimate = await f0.mintCost(mintInviteCode, mintAmmount)
-
           //
           consoleOutput("<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
         } catch (e) {
