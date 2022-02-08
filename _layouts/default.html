@@ -411,12 +411,12 @@
         try {
           // code
           let cost = await f0.cost()
-          let estimate = await f0.estimate(cost.gas.safeLow)
+          let estimate = cost.gas.safeLow
           //
           //let estimate = await f0.mintCost(mintInviteCode, mintAmmount)
 
           //
-          consoleOutput("<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
+          consoleOutput("<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate)+" (ETHΞ "+JSON.stringify(estimate)+")")
         } catch (e) {
           consoleOutput(JSON.stringify(e.message))//"[ ! ] It looks like your wallet doesn't have enough funds!\n"+"<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
         }
