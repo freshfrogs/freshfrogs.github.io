@@ -410,8 +410,12 @@
         consoleOutput("[ - ] A 'gas' fee is required when minting ANY NFT onto the blockchain");
         try {
           // code
-          let cost = await f0.cost()
-          let estimate = await f0.estimate(cost)
+          let estimate = await f0.api.mint({
+            key: mintInviteCode, proof: []
+          }, mintAmmount).estimate({
+            from: f0.account,
+            value: "420000000000000000"
+          })
           //let estimate = await f0.mintCost(mintInviteCode, mintAmmount)
           //
           consoleOutput("<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
