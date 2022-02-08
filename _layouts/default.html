@@ -410,7 +410,7 @@
         consoleOutput("[ - ] A 'gas' fee is required when minting ANY NFT onto the blockchain");
         try {
           // code
-          let gasEstimate = await contract.methods.mint.estimateGas()
+          let gasEstimate = await f0.api.mint.estimateGas()
           let estimate = await f0.estimate(gasEstimate)
           //let estimate = await f0.mintCost(mintInviteCode, mintAmmount)
           //
