@@ -266,8 +266,8 @@
           consoleOutput("\n<strong><b>Error: "+e.message+"</b></strong>")
         }
 
-      //let name = await api.name().call()
-      //let symbol = await api.symbol().call()
+      let name = await f0.api.name().call()
+      let symbol = await f0.api.symbol().call()
       let userAcc = web3.currentProvider.selectedAddress;
       let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
       let myInvites = await f0.myInvites()
