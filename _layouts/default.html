@@ -414,8 +414,6 @@
         try {
           let cost = await f0.cost()
           let estimate = await f0.estimate(cost.gas.average)
-          //
-    //      consoleOutput(JSON.stringify(mintEstimate))
           consoleOutput("<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow, )+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
         } catch (e) {
           consoleOutput(JSON.stringify(e.message))//"[ ! ] It looks like your wallet doesn't have enough funds!\n"+"<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
@@ -445,7 +443,7 @@
             return token.links.opensea
           })
         } catch (e) {
-          consoleOutput(e.message)//"\n<strong><b>Error:</b></strong> Something went wrong. You have either minted too many times or insufficient funds available. \nIf you believe this not to be the case, report it here: <b><a href='https://discord.gg/t84NyjpS3H'>Discord</a></b>")
+          consoleOutput("\n<strong><b>Error:</b></strong> Something went wrong. You have either minted too many times or insufficient funds available. \nIf you believe this not to be the case, report it here: <b><a href='https://discord.gg/t84NyjpS3H'>Discord</a></b>")
         }
         consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>")
       })
