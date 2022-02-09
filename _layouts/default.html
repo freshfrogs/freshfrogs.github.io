@@ -266,14 +266,15 @@
           consoleOutput("\n<strong><b>Error: "+e.message+"</b></strong>")
         }
 
-      let name = await f0.api.name().call()
-      let symbol = await f0.api.symbol().call()
       let userAcc = web3.currentProvider.selectedAddress;
       let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
       let myInvites = await f0.myInvites()
       let myInvitesKeys = Object.keys(myInvites)
 
+      let name = await f0.api.name().call()
+      let symbol = await f0.api.symbol().call()
       let nextId = await f0.api.nextId().call()
+
       let nextToken = await f0.get(nextId);
       let mintPrice = "0.02"
       let mintAmmount = 1 // number to mint
