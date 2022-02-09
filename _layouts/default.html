@@ -411,7 +411,7 @@
       document.querySelector("#gasEstimate").addEventListener("click", async (e) => {
         consoleOutput("[ - ] A 'gas' fee is required when minting ANY NFT onto the blockchain");
         try {
-          let mintEstimate = await f0.api.mint({
+          let estimate = await f0.api.mint({
             key: mintInviteCode, proof: []
           }, mintAmmount).estimate({
             from: f0.account,
