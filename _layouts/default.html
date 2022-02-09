@@ -417,12 +417,9 @@
           let safeLowWei = safeLowGwei * Math.pow(10, 9)
           let estimate = await f0.estimate(cost.gas.safeLow)
           //
-          let mintEstimate = await f0.api.mint({
-            key: "0x0000000000000000000000000000000000000000000000000000000000000000", proof: []
-          }, 1).estimate({
-            from: f0.account,
-            value: "420000000000000000"
-          })
+          let mintEstimate = await f0.api.mintmint(mintInviteCode, mintAmmount, {
+            gasPrice: "" + safeLowWei  // the gasPrice must be a string value of the number
+          }).estimate()
           //
           consoleOutput(JSON.stringify(mintEstimate))
           consoleOutput("<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
