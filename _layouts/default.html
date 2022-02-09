@@ -410,13 +410,13 @@
       // EVENT LISTENER -- MINT, GAS EST, SETINVITE
       document.querySelector("#gasEstimate").addEventListener("click", async (e) => {
         consoleOutput("[ - ] A 'gas' fee is required when minting ANY NFT onto the blockchain");
-//        try {
-//          let cost = await f0.cost()
-//          let estimate = await f0.estimate(cost.gas.safeLow)
-//          consoleOutput("<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
-//        } catch (e) {
-//          consoleOutput(JSON.stringify(e.message))//"[ ! ] It looks like your wallet doesn't have enough funds!\n"+"<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
-//        }
+        try {
+          let cost = await f0.cost()
+          let estimate = await f0.estimate(cost.gas.safeLow)
+          consoleOutput("<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
+        } catch (e) {
+          consoleOutput(JSON.stringify(e.message))//"[ ! ] It looks like your wallet doesn't have enough funds!\n"+"<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
+        }
       })
       //
       document.querySelector("#listPrices").addEventListener("click", async (e) => {
