@@ -432,10 +432,13 @@
         try {
 
           let cost = await f0.cost()
+          consoleOutput(cost)
           let safeLowGwei = cost.gas.safeLow / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
+          consoleOutput(safeLowGwei)
           let safeLowWei = safeLowGwei * Math.pow(10, 9)
+          consoleOutput(safeLowWei)
           let tokens = await f0.mint(mintInviteCode, mintAmmount, {
-            gasPrice: "" + cost.gas.safeLow  // the gasPrice must be a string value of the number
+            gasPrice: "" + safeLowWei  // the gasPrice must be a string value of the number
           })
           //let tokens = await f0.mint(mintInviteCode, mintAmmount)
           var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
