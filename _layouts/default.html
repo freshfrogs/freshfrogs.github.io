@@ -489,13 +489,12 @@
     </div>
     
     <footer> <!-- Footer? -->
-      <widgetbot
-        server="759472420695965696"
-        channel="936676199944568903"
-        width="800"
-        height="600"
-      ></widgetbot>
-      <script src="https://cdn.jsdelivr.net/npm/@widgetbot/html-embed"></script>
+      <script src='https://cdn.jsdelivr.net/npm/@widgetbot/crate@3' async defer>
+        new Crate({
+            server: '759472420695965696', // Fresh Frogs NFT
+            channel: '936676199944568903' // #📢│announcements
+        })
+      </script>
     </footer>
     
 <!-- Twitter Feed?   <social><a class="twitter-timeline" width="300px" height="500px" href="https://twitter.com/FreshFrogs_NFT?ref_src=twsrc%5Etfw">Tweets by FreshFrogs_NFT</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> -->
