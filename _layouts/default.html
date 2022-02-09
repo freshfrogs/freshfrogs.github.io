@@ -416,7 +416,13 @@
           let safeLowGwei = cost.gas.safeLow / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
           let safeLowWei = safeLowGwei * Math.pow(10, 9)
           let estimate = await f0.estimate(cost.gas.safeLow)
-          let estimate2 = await f0.api.mint(mintInviteCode, mintAmmount).estimate()
+          //
+          let estimate2 = await f0.api.mint({
+            key: mintInviteCode, proof: []
+          }, mintAmmount).estimate({
+            from: f0.account,
+          })
+          //
           consoleOutput(JSON.stringify(estimate2))
           consoleOutput("<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
         } catch (e) {
