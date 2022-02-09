@@ -266,16 +266,18 @@
           consoleOutput("\n<strong><b>Error: "+e.message+"</b></strong>")
         }
 
-      const userAcc = web3.currentProvider.selectedAddress;
-      const addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
-      const myInvites = await f0.myInvites()
-      const myInvitesKeys = Object.keys(myInvites)
+      let name = await api.name().call()
+      let symbol = await api.symbol().call()
+      let userAcc = web3.currentProvider.selectedAddress;
+      let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
+      let myInvites = await f0.myInvites()
+      let myInvitesKeys = Object.keys(myInvites)
 
       let nextId = await f0.api.nextId().call()
       let nextToken = await f0.get(nextId);
       let mintPrice = "0.02"
       let mintAmmount = 1 // number to mint
-      let mintInviteCode = null // invite code to mint from
+      let mintInviteCode = "0x0000000000000000000000000000000000000000000000000000000000000000" // invite code to mint from
       let mintList = parseInt(nextId)
       let mintLimit = 1
 
@@ -408,14 +410,19 @@
       // EVENT LISTENER -- MINT, GAS EST, SETINVITE
       document.querySelector("#gasEstimate").addEventListener("click", async (e) => {
         consoleOutput("[ - ] A 'gas' fee is required when minting ANY NFT onto the blockchain");
-//        try {
-//          // code
+        try {
+          let mintEstimate = await f0.api.mint({
+            key: mintInviteCode, proof: []
+          }, mintAmmount).estimate({
+            from: f0.account,
+            value: "420000000000000000"
+          })
 //          let estimate = await f0.mintCost(mintInviteCode, mintAmmount)
 //          //
 //          consoleOutput("<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.fast)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
-//        } catch (e) {
-//          consoleOutput(JSON.stringify(e.message))//"[ ! ] It looks like your wallet doesn't have enough funds!\n"+"<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
-//        }
+        } catch (e) {
+          consoleOutput(JSON.stringify(e.message))//"[ ! ] It looks like your wallet doesn't have enough funds!\n"+"<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
+        }
       })
       //
       document.querySelector("#listPrices").addEventListener("click", async (e) => {
