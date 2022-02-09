@@ -414,7 +414,7 @@
       // ------------------------------------------------------------------------------------------------------------------------ >
       // EVENT LISTENER -- MINT, GAS EST, SETINVITE
       document.querySelector("#gasEstimate").addEventListener("click", async (e) => {
-        consoleOutput("[ - ] A 'gas' fee is required when minting any NFT onto Ethereum. \nIt is recommended have have 0.005 - 0.01 ΞETH in your wallet to cover gas fees.");
+        consoleOutput("[ - ] A 'gas' fee is required when minting any NFT onto Ethereum. \nIt is recommended to have 0.01 ΞETH in your wallet to cover gas fees.");
     //    try {
     //      let cost = await f0.cost()
     //      let estimate = await f0.estimate(cost.gas.safeLow)
@@ -447,7 +447,7 @@
             return token.links.opensea
           })
         } catch (e) {
-          consoleOutput("\n<strong><b>Error:</b></strong> Something went wrong! \nYou have either minted too many times or insufficient funds available. \nIt is recommended have 0.005 - 0.01 ΞETH in your wallet to cover gas fees. \nIf you believe this to be an error, please <b><a href='https://discord.gg/t84NyjpS3H'>Report it Here</a></b>")
+          consoleOutput("\n<strong><b>Error:</b></strong> Something went wrong! \nYou have either minted too many times or insufficient funds available. \nIf you believe this to be an error, please <b><a href='https://discord.gg/t84NyjpS3H'>Report it Here</a></b>"+"\nError Message: "+e.message)
         }
         consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>")
       })
