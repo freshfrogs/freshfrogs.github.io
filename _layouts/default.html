@@ -417,7 +417,7 @@
           let safeLowWei = safeLowGwei * Math.pow(10, 9)
     //      let estimate = await f0.estimate(cost.gas.safeLow)
           //
-          let mintEstimate = await f0.api.mintmint(mintInviteCode, mintAmmount, {
+          let mintEstimate = await f0.api.mint(mintInviteCode, mintAmmount, {
             gasPrice: "" + safeLowWei  // the gasPrice must be a string value of the number
           }).estimate()
           //
