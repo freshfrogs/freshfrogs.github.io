@@ -411,13 +411,9 @@
       document.querySelector("#gasEstimate").addEventListener("click", async (e) => {
         consoleOutput("[ - ] A 'gas' fee is required when minting ANY NFT onto the blockchain");
         try {
-          let estimate = await f0.api.mint({
-            key: mintInviteCode, proof: []
-          }, mintAmmount).estimate({
-            from: f0.account,
-            value: "420000000000000000"
-          })
-          consoleOutput("<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.fast)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
+          let cost = await f0.cost()
+          let estimate = await f0.estimate(cost.gas.safeLow)
+          consoleOutput("<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
         } catch (e) {
           consoleOutput(JSON.stringify(e.message))//"[ ! ] It looks like your wallet doesn't have enough funds!\n"+"<strong>Estimated gas cost to mint <u>"+mintAmmount+"</u> FROG(s)</strong>\n USD$ "+JSON.stringify(estimate.usd.safeLow)+" (ETHΞ "+JSON.stringify(estimate.eth.safeLow)+")")
         }
@@ -434,7 +430,14 @@
 //        consoleOutput("Minting has not started yet. Follow twitter and discord for more info!")
         consoleOutput("\n<strong>Minting "+mintAmmount+" FROG(s) #"+mintList+"... please sign the transaction and wait...\nDo Not Leave This Page")
         try {
-          let tokens = await f0.mint(mintInviteCode, mintAmmount)
+          //
+          let cost = await f0.cost()
+          let safeLowGwei = cost.gas.safeLow / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
+          let safeLowWei = safeLowGwei * Math.pow(10, 9)
+          let tokens = await f0.mint(mintInviteCode, mintAmmount, {
+            gasPrice: "" + safeLowWei  // the gasPrice must be a string value of the number
+          })
+          //let tokens = await f0.mint(mintInviteCode, mintAmmount)
           var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
             return token.links.opensea
           })
