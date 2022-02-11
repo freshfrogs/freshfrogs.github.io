@@ -441,7 +441,7 @@
       
       document.querySelector("#mintTransact").addEventListener("click", async (e) => {
 //        consoleOutput("⚠️ Minting has not started yet. Follow twitter and discord for more info!")
-        consoleOutput("\n<strong>Minting "+mintAmmount+" FROG(s) #"+mintList+"... please sign the transaction and wait...\nDo Not Leave This Page")
+        consoleOutput("\n<strong>Minting x"+mintAmmount+" FROG(s) #"+mintList+"... please sign the transaction and wait...\nDo Not Leave This Page")
         try {
           if (highPriority === 1) {
             let cost = await f0.cost()
