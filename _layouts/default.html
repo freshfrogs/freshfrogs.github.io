@@ -278,7 +278,7 @@
       let name = await f0.api.name().call()
       let symbol = await f0.api.symbol().call()
       let nextId = await f0.api.nextId().call()
-      let highPriority = 0
+      let highPriority = 0 // low gas or high gas? low gas = 0 / high gas = 1
 
       let nextToken = await f0.get(nextId);
       let mintPrice = "0.02"
@@ -445,10 +445,10 @@
 
           let cost = await f0.cost()
           if (highPriority === 1) {
-            let fastGwei = cost.gas.fast / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
-            let fastWei = safeLowGwei * Math.pow(10, 9)
+            let fastestGwei = cost.gas.fastest / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
+            let fastestWei = safeLowGwei * Math.pow(10, 9)
             let tokens = await f0.mint(mintInviteCode, mintAmmount, {
-              gasPrice: "" + fastLowWei  // the gasPrice must be a string value of the number
+              gasPrice: "" + fastestLowWei  // the gasPrice must be a string value of the number
             })
           } else {
             let safeLowGwei = cost.gas.safeLow / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
