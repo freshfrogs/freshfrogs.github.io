@@ -234,17 +234,6 @@
     <script>
     document.addEventListener("DOMContentLoaded", async () => {
       // Check for mobile device
-      function detectmob() {
-        if(window.innerWidth <= 800 || window.innerHeight <= 600) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-
-      if (detectmob()){
-        top.location.href="mobile";
-      }
       // ------------------------------------------------------------------------------------------------------------------------ >
       for(let frog=1; frog<=4; frog++) {
           whichFrog = Math.floor(Math.random() * 40)+frog;
