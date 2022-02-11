@@ -233,7 +233,6 @@
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
     <script>
     document.addEventListener("DOMContentLoaded", async () => {
-      // Check for mobile device
       // ------------------------------------------------------------------------------------------------------------------------ >
       for(let frog=1; frog<=4; frog++) {
           whichFrog = Math.floor(Math.random() * 40)+frog;
@@ -423,7 +422,7 @@
       })
       
       document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-        consoleOutput("⚠️ Minting has not started yet. Follow twitter and discord for more info!")
+//        consoleOutput("⚠️ Minting has not started yet. Follow twitter and discord for more info!")
         consoleOutput("\n<strong>Minting x"+mintAmmount+" FROG(s) #"+mintList+"... please sign the transaction and wait...\nDo Not Leave This Page")
         try {
           if (highPriority === 1) {
