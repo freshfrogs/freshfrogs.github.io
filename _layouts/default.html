@@ -295,8 +295,9 @@
       document.getElementById("gasEstimate").removeAttribute("href")
       document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
       document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"
-      consoleOutput("Public minting price has been applied... Valid for <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>") //("<b>Minting begins Sunday, 02/06/2022. \nJoin discord and follow on twitter to get on the FREE mint whitelist<b>")
-      consoleOutput("[ ? ] What is (HTP) High Traffic Priority?... <b><a id='HTP' class='pointer'>Learn More</a></b><a id='setPriority' class='pointer'></a>")
+      consoleOutput("\nIn the event of high volume traffic; we can not garuntee a succesful transaction")
+      consoleOutput("You can increase the maximum gas fee to increase likelyhood... <b><a id='HTP' class='pointer'>Learn More</a></b>")
+      consoleOutput("\nPublic minting price has been applied... Valid for <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>") //("<b>Minting begins Sunday, 02/06/2022. \nJoin discord and follow on twitter to get on the FREE mint whitelist<b>")
       // ----------------------------------------------------------------------------------------------------------------------- >
       if (myInvitesKeys[1] === "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550
         myInviteFound = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4"
@@ -433,12 +434,7 @@
       })
 
       document.querySelector("#HTP").addEventListener("click", async (e) => {
-        consoleOutput("\nIn the event of high volume traffic; we can not garuntee you will get the FROG(s) displayed")
-        consoleOutput("You can increase the maximum gas fee to increase your likelyhood... <b><a id='setPriority' class='pointer'>Set Priority</a></b>")
-      })
-
-      document.querySelector("#setPriority").addEventListener("click", async (e) => {
-        consoleOutput("Maximum gas fee increased! High priority has been set!")
+        consoleOutput("Maximum gas fee increased! High traffic priority has been set!")
         let highPriority = 1;
       })
       
