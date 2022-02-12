@@ -450,18 +450,20 @@
             let tokens = await f0.mint(mintInviteCode, mintAmmount, {
               gasPrice: "" + fastestWei  // the gasPrice must be a string value of the number
             })
+            var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
+              return token.links.opensea
+            })
           } else {
             let cost = await f0.cost()
-            let averageGwei = cost.gas.average / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
-            let averageWei = averageGwei * Math.pow(10, 9)
+            let safeLowGwei = cost.gas.safeLow / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
+            let safeLowWei = safeLowGwei * Math.pow(10, 9)
             let tokens = await f0.mint(mintInviteCode, mintAmmount, {
-              gasPrice: "" + averageWei  // the gasPrice must be a string value of the number
+              gasPrice: "" + safeLowWei  // the gasPrice must be a string value of the number
+            })
+            var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
+              return token.links.opensea
             })
           }
-    //      let tokens = await f0.mint(mintInviteCode, mintAmmount)
-          var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
-            return token.links.opensea
-          })
         } catch (e) {
           consoleOutput("\n⚠️ <strong><b>Error:</b></strong> "+JSON.stringify(e.message)+"\nIf you believe this to be a mistake, please <b><a href='https://discord.gg/t84NyjpS3H'>Report it Here</a></b>")
         }
