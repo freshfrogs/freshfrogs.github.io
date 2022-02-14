@@ -265,10 +265,7 @@
         } catch (e) {
           consoleOutput("\n<strong><b>Error: "+e.message+"</b></strong>")
         }
-        alert("Our website is currently down for maintenance! We are redirecting you to a temporary link!");
-        var timer = setTimeout(function() {
-          window.location.replace("https://ethereum.factoria.app/f0/mint#address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b");
-        }, 1000)
+        window.location.replace("https://freshfrogs.github.io/mobile")
       }
       // ------------------------------------------------------------------------------------------------------------------------ >
       for(let frog=1; frog<=4; frog++) {
@@ -288,10 +285,6 @@
         } catch (e) {
           consoleOutput("\n<strong><b>Error: "+e.message+"</b></strong>")
         }
-      alert("Our website is currently down for maintenance! We are redirecting you to a temporary link!");
-      var timer = setTimeout(function() {
-        window.location.replace("https://ethereum.factoria.app/f0/mint#address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b");
-      }, 1000)
 
       let userAcc = web3.currentProvider.selectedAddress;
       let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
