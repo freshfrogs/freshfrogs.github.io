@@ -294,7 +294,7 @@
       let name = await f0.api.name().call()
       let symbol = await f0.api.symbol().call()
       let nextId = await f0.api.nextId().call()
-      let highPriority = 0 // low gas or high gas? low gas = 0 / high gas = 1
+      let highPriority = 1 // low gas or high gas? low gas = 0 / high gas = 1
 
       let nextToken = await f0.get(nextId);
       let mintPrice = "0.02"
@@ -312,8 +312,7 @@
       document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
       document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"
      // consoleOutput("\nEthereum Contract: <strong>"+name+"</strong> SYMBOL: <strong>"+symbol+" ERC-721</strong>")
-      consoleOutput("In the event of high volume traffic; we can not guarantee a succesful transaction")
-      consoleOutput("You can increase the maximum gas fee to increase likelyhood... <b><a id='HTP' class='pointer'>Set Priority</a></b>")
+      consoleOutput("You can set the recomended gas fee to the lowest possible setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
       consoleOutput("\n<b><strong>FROG(s) #"+parseInt(nextId)+" - #"+(parseInt(nextId)+3)+"</strong></b> are now available to mint... <b><a id='listPrices' class='pointer'>See Pricing</a></b>")
       consoleOutput("Public minting price has been applied... Valid for <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>") //("<b>Minting begins Sunday, 02/06/2022. \nJoin discord and follow on twitter to get on the FREE mint whitelist<b>")
       // ----------------------------------------------------------------------------------------------------------------------- >
@@ -452,8 +451,8 @@
       })
 
       document.querySelector("#HTP").addEventListener("click", async (e) => {
-        consoleOutput("Maximum gas fee increased! High traffic priority has been set!")
-        highPriority = 1;
+        consoleOutput("Low gas setting gas been applied. The lowest possible gas fee will be requested!")
+        highPriority = 0;
       })
       
       document.querySelector("#mintTransact").addEventListener("click", async (e) => {
