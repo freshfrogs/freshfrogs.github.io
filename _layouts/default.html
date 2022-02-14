@@ -450,7 +450,8 @@
       })
       
       document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-//        consoleOutput("⚠️ Minting has not started yet. Follow twitter and discord for more info!")
+        consoleOutput("⚠️ Minting is currently paused. Join discord for more info! "+"<b><a href='https://discord.gg/t84NyjpS3H'>Join Discord</a></b>")
+/*
         consoleOutput("\n<strong>Minting x"+mintAmmount+" FROG(s) #"+mintList+"... please sign the transaction and wait...\nDo Not Leave This Page")
         try {
           if (highPriority === 1) {
@@ -478,7 +479,8 @@
           consoleOutput("\n⚠️ <strong><b>Error:</b></strong> "+JSON.stringify(e.message)+"\nIf you believe this to be a mistake, please <b><a href='https://discord.gg/t84NyjpS3H'>Report it Here</a></b>")
         }
         consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>")
-      })
+*/    })
+      
       document.querySelector("#setInvite").addEventListener("click", async (e) => {
         mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
         mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
