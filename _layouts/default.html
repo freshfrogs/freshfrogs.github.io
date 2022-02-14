@@ -271,7 +271,7 @@
       for(let frog=1; frog<=4; frog++) {
           whichFrog = Math.floor(Math.random() * 40)+frog;
           frogSource = "./assets/frogs/"+whichFrog+".png";
-          document.getElementById("frog"+frog).innerHTML = "<img src='"+frogSource+"' id='frogImg"+frog+"' class='collectionImg' alt='"+whichFrog+"'></a>"
+          document.getElementById("frog"+frog).innerHTML = "<img src='"+frogSource+"' id='frogImg"+frog+"' class='collectionImg' alt='"+whichFrog+"'></a><figcaption>"+whichFrog+"</figcaption>"
         }
       // ------------------------------------------------------------------------------------------------------------------------ >
       const web3 = new Web3(window.ethereum)
