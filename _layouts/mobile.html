@@ -241,7 +241,7 @@
       // ------------------------------------------------------------------------------------------------------------------------ >
       for(let frog=1; frog<=4; frog++) {
           whichFrog = Math.floor(Math.random() * 40)+frog;
-          frogSource = "../assets/frogs/"+whichFrog+".png";
+          frogSource = "./assets/frogs/"+whichFrog+".png";
           document.getElementById("frog"+frog).innerHTML = "<img src='"+frogSource+"' id='frogImg"+frog+"' class='collectionImg' alt='"+whichFrog+"'></a>"
         }
       // ------------------------------------------------------------------------------------------------------------------------ >
@@ -253,9 +253,9 @@
           contract: "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b", // 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b NEW MAIN // 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524 TESTNET
           network: "main"
         })
-      } catch (e) {
-        consoleOutput("\n<strong><b>Error: "+e.message+"</b></strong>")
-      }
+        } catch (e) {
+          consoleOutput("\n<strong><b>Error: "+e.message+"</b></strong>")
+        }
 
       let userAcc = web3.currentProvider.selectedAddress;
       let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
@@ -265,7 +265,7 @@
       let name = await f0.api.name().call()
       let symbol = await f0.api.symbol().call()
       let nextId = await f0.api.nextId().call()
-      let highPriority = 0 // low gas or high gas? low gas = 0 / high gas = 1
+      let highPriority = 1 // low gas or high gas? low gas = 0 / high gas = 1
 
       let nextToken = await f0.get(nextId);
       let mintPrice = "0.02"
@@ -283,10 +283,10 @@
       document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
       document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"
      // consoleOutput("\nEthereum Contract: <strong>"+name+"</strong> SYMBOL: <strong>"+symbol+" ERC-721</strong>")
-      consoleOutput("In the event of high volume traffic; we can not guarantee a succesful transaction")
-      consoleOutput("You can increase the maximum gas fee to increase likelyhood... <b><a id='HTP' class='pointer'>Set Priority</a></b>")
-      consoleOutput("\n<b><strong>FROG(s) #"+parseInt(nextId)+" - #"+(parseInt(nextId)+3)+"</strong></b> are now available to mint... <b><a id='listPrices' class='pointer'>See Pricing</a></b>")
+      consoleOutput("<b><strong>FROG(s) #"+parseInt(nextId)+" - #"+(parseInt(nextId)+3)+"</strong></b> are now available to mint... <b><a id='listPrices' class='pointer'>See Pricing</a></b>")
       consoleOutput("Public minting price has been applied... Valid for <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>") //("<b>Minting begins Sunday, 02/06/2022. \nJoin discord and follow on twitter to get on the FREE mint whitelist<b>")
+      consoleOutput("\nYou can set the recommended gas fee to the lowest possible setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
+      consoleOutput("It is recommended to have at least 0.01 ΞETH in your wallet to cover gas fees.")
       // ----------------------------------------------------------------------------------------------------------------------- >
       if (myInvitesKeys[1] === "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550
         myInviteFound = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4"
@@ -423,18 +423,17 @@
       })
 
       document.querySelector("#HTP").addEventListener("click", async (e) => {
-        consoleOutput("Maximum gas fee increased! High traffic priority has been set!")
-        highPriority = 1;
+        consoleOutput("Low gas setting applied... The lowest possible gas fee will be requested!")
+        highPriority = 0;
       })
       
       document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-//        consoleOutput("⚠️ Minting has not started yet. Follow twitter and discord for more info!")
+//        consoleOutput("⚠️ Minting is currently paused for maintenance. Join discord for a temporary link! "+"<b><a href='https://discord.gg/t84NyjpS3H'>Join Discord</a></b>")
+
         consoleOutput("\n<strong>Minting x"+mintAmmount+" FROG(s) #"+mintList+"... please sign the transaction and wait...\nDo Not Leave This Page")
         try {
           if (highPriority === 1) {
-//            let cost = await f0.cost()
-//            let fastestGwei = cost.gas.fastest / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
-//            let fastestWei = fastestGwei * Math.pow(10, 9)
+            consoleOutput("test")
             let tokens = await f0.mint(mintInviteCode, mintAmmount)
             var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
               return token.links.opensea
@@ -454,7 +453,8 @@
           consoleOutput("\n⚠️ <strong><b>Error:</b></strong> "+JSON.stringify(e.message)+"\nIf you believe this to be a mistake, please <b><a href='https://discord.gg/t84NyjpS3H'>Report it Here</a></b>")
         }
         consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>")
-      })
+    })
+      
       document.querySelector("#setInvite").addEventListener("click", async (e) => {
         mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
         mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
@@ -480,7 +480,7 @@
 
     <div class="wrapper2">
       <header class="pixelated repoHeader2"> <!-- Left Side Header / Opensea Link / Preview Image -->
-        <ul class="downloads repoDownloads">
+        <ul class="repoDownloads downloads">
             <li>
                 <a id="nextToken" class="pointerOff"><strong>4,040</strong>frogs</a>
             </li>
@@ -493,7 +493,7 @@
         </ul>
         <div class="nextTokenImgCont1" id="nextTokenImgCont"><img id="nextTokenImg" class="nextTokenImg" src="/assets/preview2.gif"><img id="nextTokenImg2" class="nextTokenImg" src=""></div><div class="nextTokenImgCont" id="nextTokenImgCont2"><img id="nextTokenImg3" class="nextTokenImg" src=""><img id="nextTokenImg4" class="nextTokenImg" src=""></div>
       </header>
-      <pre id="pre" class="pre repoPre"><h2 class="h3"><strong><b>Ξ Minting Terminal Ξ</b></strong></h2><div class= "collection" id="collection"><a id="frog1"></a><a id="frog2"></a><a id="frog3"></a><a id="frog4"></a></div><br><hr><netStatus id="netStatus">Please connect an Ethereum wallet... <b><a href="https://freshfrogs.github.io/">Connect</a></b><br>Don't have a wallet?... <b><a href="https://metamask.io/download/" target="_blank">Download MetaMask</a></b></netStatus><br><pre2 id="pre2"></pre2><br><hr><headline><strong><a href="https://discord.gg/t84NyjpS3H" target="_blank"><img class="headLineImg" src="../assets/img/discord.png"></a><a href="https://twitter.com/FreshFrogs_NFT" target="_blank"><img class="headLineImg" src="../assets/img/twitter.png"></a><a href="https://opensea.io/collection/fresh-frogs" target="_blank"><img class="headLineImg" src="../assets/opensea.png"></a><a href="https://nftcalendar.io/event/fresh-frogs-nft-collection-release/" target="_blank"><img class="headLineImg" src="../assets/nftCalendar.png"></a></strong></headline></pre>
+      <pre id="pre" class="pre repoPre"><h2 class="h3"><strong><b>Ξ Minting Terminal Ξ</b></strong></h2><div class= "collection" id="collection"><a id="frog1"></a><a id="frog2"></a><a id="frog3"></a><a id="frog4"></a></div><br><hr><netStatus id="netStatus">Please connect an Ethereum wallet... <b><a href="https://freshfrogs.github.io/">Connect</a></b><br>Don't have a wallet?... <b><a href="https://metamask.io/download/" target="_blank">Download MetaMask</a></b></netStatus><br><pre2 id="pre2"></pre2><br><hr><headline><strong><a href="https://discord.gg/t84NyjpS3H" target="_blank"><img class="headLineImg" src="./assets/img/discord.png"></a><a href="https://twitter.com/FreshFrogs_NFT" target="_blank"><img class="headLineImg" src="./assets/img/twitter.png"></a><a href="https://opensea.io/collection/fresh-frogs" target="_blank"><img class="headLineImg" src="./assets/opensea.png"></a><a href="https://nftcalendar.io/event/fresh-frogs-nft-collection-release/" target="_blank"><img class="headLineImg" src="./assets/nftCalendar.png"></a></strong></headline></pre>
     </div>
     
     <footer> <!-- Footer? -->
