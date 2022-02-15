@@ -397,13 +397,6 @@
       }
       // ------------------------------------------------------------------------------------------------------------------------ >
       // Popup window
-
-      setTimeout(showPopup,4000)
-
-      function showPopup(){
-        var popup = document.getElementById("myPopup");
-        popup.classList.toggle("show");
-      }
       
       // FIRST FROG
       document.querySelector("#frog1").addEventListener("click", async (e) => {
@@ -556,7 +549,12 @@
         document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
       })
     })
+    setTimeout(showPopup,4000)
 
+    function showPopup(){
+      var popup = document.getElementById("myPopup");
+      popup.classList.toggle("show");
+    }
     // ------------------------------------------------------------------------------------------------------------------------ >
     function consoleOutput(output) {
       newLine = document.createElement("div")
