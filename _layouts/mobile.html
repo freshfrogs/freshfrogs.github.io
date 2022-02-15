@@ -1,5 +1,61 @@
 <!DOCTYPE html>
 <style>
+/* Popup container - can be anything you want */
+  .popup {
+    position: absolute;
+    display: inline-block;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* The actual popup */
+  .popup .popuptext {
+    visibility: hidden;
+    width: 160px;
+    background-color: rgba(85, 85, 85, 0.863);
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -80px;
+  }
+
+  /* Popup arrow */
+  .popup .popuptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+  }
+
+  /* Toggle this class - hide and show the popup */
+  .popup .show {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s;
+  }
+
+  /* Add animation (fade in the popup) */
+  @-webkit-keyframes fadeIn {
+    from {opacity: 0;} 
+    to {opacity: 1;}
+  }
+
+  @keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity:1 ;}
+  }
   .pointer {
     cursor: pointer;
   }
@@ -238,6 +294,27 @@
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
     <script>
     document.addEventListener("DOMContentLoaded", async () => {
+      // Check for mobile device
+      function detectmob() {
+        if(window.innerWidth <= 800 || window.innerHeight <= 600) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      if (detectmob()){
+        try {
+          await f0.init({
+            web3: web3,
+            contract: "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b", // 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b NEW MAIN // 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524 TESTNET
+            network: "main"
+          })
+        } catch (e) {
+          consoleOutput("\n<strong><b>Error: "+e.message+"</b></strong>")
+        }
+        window.location.replace("https://freshfrogs.github.io/mobile")
+      }
       // ------------------------------------------------------------------------------------------------------------------------ >
       for(let frog=1; frog<=4; frog++) {
           whichFrog = Math.floor(Math.random() * 40)+frog;
@@ -255,7 +332,7 @@
         })
         } catch (e) {
           consoleOutput("\n<strong><b>Error: "+e.message+"</b></strong>")
-        }
+      }
 
       let userAcc = web3.currentProvider.selectedAddress;
       let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
@@ -298,7 +375,7 @@
       // ----------------------------------------------------------------------------------------------------------------------- >
       document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
       document.getElementById("nextToken").innerHTML = "<strong> #"+nextId+"</strong>FROG"                  // Update next token ID on preview
-      document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>(transact)"                 // Update Mint button
+      document.getElementById("mintTransact").innerHTML = "<div class='popup'><span class='popuptext show' id='myPopup'>Up to FOUR FROGs per transaction</span></div><strong>MINT</strong>(transact)"                 // Update Mint button
       document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
       document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
       //
@@ -311,6 +388,8 @@
         document.getElementById("frogImg"+(i+1)).setAttribute("alt", nextTokenInit)
       }
       // ------------------------------------------------------------------------------------------------------------------------ >
+      // Popup window
+      
       // FIRST FROG
       document.querySelector("#frog1").addEventListener("click", async (e) => {
         let tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
@@ -433,7 +512,6 @@
         consoleOutput("\n<strong>Minting x"+mintAmmount+" FROG(s) #"+mintList+"... please sign the transaction and wait...\nDo Not Leave This Page")
         try {
           if (highPriority === 1) {
-            consoleOutput("test")
             let tokens = await f0.mint(mintInviteCode, mintAmmount)
             var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
               return token.links.opensea
@@ -463,7 +541,12 @@
         document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
       })
     })
+    setTimeout(showPopup,12000)
 
+    function showPopup(){
+      var popup = document.getElementById("myPopup");
+      popup.classList.toggle("show");
+    }
     // ------------------------------------------------------------------------------------------------------------------------ >
     function consoleOutput(output) {
       newLine = document.createElement("div")
@@ -488,7 +571,7 @@
                 <a id="gasEstimate" class="pointerOff" href=""><strong>0.04 ΞETH</strong>plus gas</a>
             </li>
             <li>
-                <a id="mintTransact" class="pointer" href="https://freshfrogs.github.io/"><b><strike><strong>Mint</strong></strike></b>link wallet!</a>
+                <a id="mintTransact" class="pointer" href="https://freshfrogs.github.io/"><div class="popup"><span class="popuptext show" id="myPopup">Please link Ethereum wallet via web3!</span></div><b><strike><strong>Mint</strong></strike></b>link wallet!</a>
             </li>
         </ul>
         <div class="nextTokenImgCont1" id="nextTokenImgCont"><img id="nextTokenImg" class="nextTokenImg" src="/assets/preview2.gif"><img id="nextTokenImg2" class="nextTokenImg" src=""></div><div class="nextTokenImgCont" id="nextTokenImgCont2"><img id="nextTokenImg3" class="nextTokenImg" src=""><img id="nextTokenImg4" class="nextTokenImg" src=""></div>
