@@ -297,7 +297,6 @@
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
     <script>
     document.addEventListener("DOMContentLoaded", async () => {
-      alert("You have been redirected to our mobile site; Please make sure you are using your wallet's in app browser")
       // ------------------------------------------------------------------------------------------------------------------------ >
       for(let frog=1; frog<=4; frog++) {
           whichFrog = Math.floor(Math.random() * 40)+frog;
@@ -316,7 +315,7 @@
         } catch (e) {
           consoleOutput("\n<strong><b>Error: "+e.message+"</b></strong>")
       }
-
+      alert("You have been redirected to our mobile site; Please make sure you are using your wallet's in app browser")
       let userAcc = web3.currentProvider.selectedAddress;
       let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
       let myInvites = await f0.myInvites()
