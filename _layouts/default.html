@@ -1,5 +1,61 @@
 <!DOCTYPE html>
 <style>
+/* Popup container - can be anything you want */
+  .popup {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* The actual popup */
+  .popup .popuptext {
+    visibility: hidden;
+    width: 160px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -80px;
+  }
+
+  /* Popup arrow */
+  .popup .popuptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+  }
+
+  /* Toggle this class - hide and show the popup */
+  .popup .show {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s;
+  }
+
+  /* Add animation (fade in the popup) */
+  @-webkit-keyframes fadeIn {
+    from {opacity: 0;} 
+    to {opacity: 1;}
+  }
+
+  @keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity:1 ;}
+  }
   .pointer {
     cursor: pointer;
   }
@@ -340,6 +396,17 @@
         document.getElementById("frogImg"+(i+1)).setAttribute("alt", nextTokenInit)
       }
       // ------------------------------------------------------------------------------------------------------------------------ >
+      // Popup window
+      //
+
+      window.onload=function(){setTimeout(showPopup,4000)};
+
+      function showPopup(){
+        var popup = document.getElementById("myPopup");
+        popup.classList.toggle("show");
+      }
+
+      //
       // FIRST FROG
       document.querySelector("#frog1").addEventListener("click", async (e) => {
         let tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
@@ -521,7 +588,7 @@
         </ul>
         <div class="nextTokenImgCont1" id="nextTokenImgCont"><img id="nextTokenImg" class="nextTokenImg" src="/assets/preview2.gif"><img id="nextTokenImg2" class="nextTokenImg" src=""></div><div class="nextTokenImgCont" id="nextTokenImgCont2"><img id="nextTokenImg3" class="nextTokenImg" src=""><img id="nextTokenImg4" class="nextTokenImg" src=""></div>
       </header>
-      <pre id="pre" class="pre repoPre"><h2 class="h3"><strong><b>Ξ Minting Terminal Ξ</b></strong></h2><div class= "collection" id="collection"><a id="frog1"></a><a id="frog2"></a><a id="frog3"></a><a id="frog4"></a></div><br><hr><netStatus id="netStatus">Please connect an Ethereum wallet... <b><a href="https://freshfrogs.github.io/">Connect</a></b><br>Don't have a wallet?... <b><a href="https://metamask.io/download/" target="_blank">Download MetaMask</a></b></netStatus><br><pre2 id="pre2"></pre2><br><hr><headline><strong><a href="https://discord.gg/t84NyjpS3H" target="_blank"><img class="headLineImg" src="./assets/img/discord.png"></a><a href="https://twitter.com/FreshFrogs_NFT" target="_blank"><img class="headLineImg" src="./assets/img/twitter.png"></a><a href="https://opensea.io/collection/fresh-frogs" target="_blank"><img class="headLineImg" src="./assets/opensea.png"></a><a href="https://nftcalendar.io/event/fresh-frogs-nft-collection-release/" target="_blank"><img class="headLineImg" src="./assets/nftCalendar.png"></a></strong></headline></pre>
+      <pre id="pre" class="pre repoPre"><h2 class="h3"><strong><b>Ξ Minting Terminal Ξ</b></strong></h2><div class= "collection" id="collection"><a id="frog1"></a><a id="frog2"></a><a id="frog3"></a><a id="frog4"><span class="popuptext" id="myPopup">A Simple Popup!</span></a></div><br><hr><netStatus id="netStatus">Please connect an Ethereum wallet... <b><a href="https://freshfrogs.github.io/">Connect</a></b><br>Don't have a wallet?... <b><a href="https://metamask.io/download/" target="_blank">Download MetaMask</a></b></netStatus><br><pre2 id="pre2"></pre2><br><hr><headline><strong><a href="https://discord.gg/t84NyjpS3H" target="_blank"><img class="headLineImg" src="./assets/img/discord.png"></a><a href="https://twitter.com/FreshFrogs_NFT" target="_blank"><img class="headLineImg" src="./assets/img/twitter.png"></a><a href="https://opensea.io/collection/fresh-frogs" target="_blank"><img class="headLineImg" src="./assets/opensea.png"></a><a href="https://nftcalendar.io/event/fresh-frogs-nft-collection-release/" target="_blank"><img class="headLineImg" src="./assets/nftCalendar.png"></a></strong></headline></pre>
     </div>
     
     <footer> <!-- Footer? -->
