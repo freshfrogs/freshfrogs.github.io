@@ -394,9 +394,9 @@
       // Update preview images with live ones after web3 connection
       for(let i=0; i<=3; i++) {
         nextTokenInit = parseInt(nextId) + i;
-        nextToken = await f0.get(nextTokenInit);
-        document.getElementById("frogImg"+(i+1)).setAttribute("src", nextToken.converted.image)
-        document.getElementById("frogImg"+(i+1)).setAttribute("alt", nextTokenInit)
+        //nextToken = await f0.get(nextTokenInit);
+        document.getElementById("frogImg"+(i+1)).setAttribute("src", "https://freshfrogs.github.io/frog/"+nextTokenInit+".png")
+        document.getElementById("frogImg"+(i+1)).setAttribute("alt", "FROG #"+nextTokenInit)
       }
       // ------------------------------------------------------------------------------------------------------------------------ >
       // Popup window
