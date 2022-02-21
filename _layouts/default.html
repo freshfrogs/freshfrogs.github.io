@@ -289,6 +289,26 @@
     margin-left: 32px;
     margin-right: 32px;
   }
+  div.gallery {
+  margin: 5px;
+  border: 1px solid #ccc;
+  float: left;
+  width: 180px;
+}
+
+div.gallery:hover {
+  border: 1px solid #777;
+}
+
+div.gallery img {
+  width: 100%;
+  height: auto;
+}
+
+div.desc {
+  padding: 15px;
+  text-align: center;
+}
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <meta charset="UTF-8">
@@ -576,6 +596,13 @@
     <section class="page-section repoHeader"> <!-- Main Content Layout / Index.md -->
       {{ content }}
     </section>
+
+    <div class="gallery">
+      <a target="_blank" href="./frog/69.png">
+        <img src="./frog/69.png" alt="Cinque Terre" width="256" height="256">
+      </a>
+      <div class="desc">FROG #69</div>
+    </div>
 
     <div class="wrapper2">
       <header class="pixelated repoHeader2"> <!-- Left Side Header / Opensea Link / Preview Image -->
