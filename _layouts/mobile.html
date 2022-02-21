@@ -226,7 +226,7 @@
     font-weight: 500;
     margin-left: auto;
     margin-right: auto;
-    width: 100%;
+    width: auto;
   }
   .wrapper2{
     float: unset;
@@ -317,7 +317,7 @@
         } catch (e) {
           consoleOutput("\n<strong><b>Error: "+e.message+"</b></strong>")
       }
-      alert("You have been redirected to our mobile site; Please make sure you are using your wallet's in app browser")
+      
       let userAcc = web3.currentProvider.selectedAddress;
       let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
       let myInvites = await f0.myInvites()
