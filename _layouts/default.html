@@ -141,6 +141,9 @@
     text-align: center;
     box-shadow: 5px 10px rgba(211, 211, 211, 0.329);
   }
+  .selected {
+    border-color: aquamarine;
+  }
   .collection {
     image-rendering: pixelated;
   }
@@ -418,17 +421,12 @@ div.desc {
       
       // FIRST FROG
       document.querySelector("#frog1").addEventListener("click", async (e) => {
-        let tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
-        let tokenOneSrc = document.getElementById("frogImg1").getAttribute('src')
-        document.getElementById("nextTokenImg").setAttribute("src", tokenOneSrc);
-        document.getElementById("nextTokenImg").setAttribute("alt", tokenOneThis);
-        document.getElementById("nextTokenImg").setAttribute("class", "nextTokenImg sizeOne")
-        document.getElementById("nextTokenImg2").removeAttribute("src");
-        document.getElementById("nextTokenImg2").removeAttribute("alt");
-        document.getElementById("nextTokenImg3").removeAttribute("src");
-        document.getElementById("nextTokenImg3").removeAttribute("alt");
-        document.getElementById("nextTokenImg4").removeAttribute("src");
-        document.getElementById("nextTokenImg4").removeAttribute("alt");
+        //
+        document.getElementById("frogImg1").setAttribute("class", "collectionImg Selected");
+        document.getElementById("frogImg2").setAttribute("class", "collectionImg");
+        document.getElementById("frogImg3").setAttribute("class", "collectionImg");
+        document.getElementById("frogImg4").setAttribute("class", "collectionImg");
+        //
         mintList = parseInt(nextId)
         mintAmmount = 1;
         document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG"
@@ -606,7 +604,6 @@ div.desc {
     <footer> <!-- Footer? -->
 
     </footer>
-    <div class="nextTokenImgCont1" id="nextTokenImgCont"><img id="nextTokenImg" class="nextTokenImg" src="/assets/preview2.gif"><img id="nextTokenImg2" class="nextTokenImg" src=""></div><div class="nextTokenImgCont" id="nextTokenImgCont2"><img id="nextTokenImg3" class="nextTokenImg" src=""><img id="nextTokenImg4" class="nextTokenImg" src=""></div>
 <!-- Twitter Feed?   <social><a class="twitter-timeline" width="300px" height="500px" href="https://twitter.com/FreshFrogs_NFT?ref_src=twsrc%5Etfw">Tweets by FreshFrogs_NFT</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> -->
 <!-- Discord Feed?   <iframe src="https://discord.com/widget?id=759472420695965696&theme=dark" width="300px" height="500px" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe></social> -->
 
