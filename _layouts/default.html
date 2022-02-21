@@ -423,7 +423,7 @@ div.desc {
       // FIRST FROG
       document.querySelector("#frog1").addEventListener("click", async (e) => {
         //
-        document.getElementById("frogImg1").setAttribute("class", "collectionImg selected");
+        document.getElementById("frogImg1").setAttribute("class", "selected collectionImg");
         document.getElementById("frogImg2").setAttribute("class", "collectionImg");
         document.getElementById("frogImg3").setAttribute("class", "collectionImg");
         document.getElementById("frogImg4").setAttribute("class", "collectionImg");
@@ -435,12 +435,6 @@ div.desc {
       })
       // SECOND FROG
       document.querySelector("#frog2").addEventListener("click", async (e) => {
-        //
-        document.getElementById("frogImg1").setAttribute("class", "collectionImg selected");
-        document.getElementById("frogImg2").setAttribute("class", "collectionImg");
-        document.getElementById("frogImg3").setAttribute("class", "collectionImg");
-        document.getElementById("frogImg4").setAttribute("class", "collectionImg");
-        //
         mintList = parseInt(nextId)+", #"+(parseInt(nextId)+1)
         mintAmmount = 2;
         document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG(s)"
@@ -448,12 +442,6 @@ div.desc {
       })
       // THIRD FROG
       document.querySelector("#frog3").addEventListener("click", async (e) => {
-        //
-        document.getElementById("frogImg1").setAttribute("class", "collectionImg selected");
-        document.getElementById("frogImg2").setAttribute("class", "collectionImg");
-        document.getElementById("frogImg3").setAttribute("class", "collectionImg");
-        document.getElementById("frogImg4").setAttribute("class", "collectionImg");
-        //
         mintList = parseInt(nextId)+" - #"+(parseInt(nextId)+2)
         document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG(s)"
         mintAmmount = 3;
@@ -461,12 +449,6 @@ div.desc {
       })
       // FOURTH FROG
       document.querySelector("#frog4").addEventListener("click", async (e) => {
-        //
-        document.getElementById("frogImg1").setAttribute("class", "collectionImg selected");
-        document.getElementById("frogImg2").setAttribute("class", "collectionImg");
-        document.getElementById("frogImg3").setAttribute("class", "collectionImg");
-        document.getElementById("frogImg4").setAttribute("class", "collectionImg");
-        //
         mintList = parseInt(nextId)+" - #"+(parseInt(nextId)+3)
         document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG(s)" // Update next token ID
         mintAmmount = 4;
