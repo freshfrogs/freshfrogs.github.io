@@ -32,6 +32,8 @@
 
   /* Popup arrow */
   .popup .popuptext::after {
+    display: flex;
+    flex-wrap: wrap;
     content: "";
     position: absolute;
     top: 100%;
@@ -47,8 +49,6 @@
     visibility: visible;
     -webkit-animation: fadeIn 1s;
     animation: fadeIn 1s;
-    display: flex;
-    flex-wrap: wrap;
   }
 
   /* Add animation (fade in the popup) */
