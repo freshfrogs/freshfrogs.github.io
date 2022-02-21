@@ -425,6 +425,9 @@ div.desc {
         //
         //document.getElementById("frog1").setAttribute("class", ".selected");
         document.getElementById("frogImg1").style.border = "2px solid orange";
+        document.getElementById("frogImg2").style.border = "none";
+        document.getElementById("frogImg3").style.border = "none";
+        document.getElementById("frogImg4").style.border = "none";
         //
         mintList = parseInt(nextId)
         mintAmmount = 1;
@@ -433,6 +436,11 @@ div.desc {
       })
       // SECOND FROG
       document.querySelector("#frog2").addEventListener("click", async (e) => {
+        document.getElementById("frogImg1").style.border = "2px solid orange";
+        document.getElementById("frogImg2").style.border = "2px solid orange";
+        document.getElementById("frogImg3").style.border = "none";
+        document.getElementById("frogImg4").style.border = "none";
+        //
         mintList = parseInt(nextId)+", #"+(parseInt(nextId)+1)
         mintAmmount = 2;
         document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG(s)"
@@ -440,6 +448,11 @@ div.desc {
       })
       // THIRD FROG
       document.querySelector("#frog3").addEventListener("click", async (e) => {
+        document.getElementById("frogImg1").style.border = "2px solid orange";
+        document.getElementById("frogImg2").style.border = "2px solid orange";
+        document.getElementById("frogImg3").style.border = "2px solid orange";
+        document.getElementById("frogImg4").style.border = "none";
+        //
         mintList = parseInt(nextId)+" - #"+(parseInt(nextId)+2)
         document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG(s)"
         mintAmmount = 3;
@@ -447,6 +460,11 @@ div.desc {
       })
       // FOURTH FROG
       document.querySelector("#frog4").addEventListener("click", async (e) => {
+        document.getElementById("frogImg1").style.border = "2px solid orange";
+        document.getElementById("frogImg2").style.border = "2px solid orange";
+        document.getElementById("frogImg3").style.border = "2px solid orange";
+        document.getElementById("frogImg4").style.border = "2px solid orange";
+        //
         mintList = parseInt(nextId)+" - #"+(parseInt(nextId)+3)
         document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG(s)" // Update next token ID
         mintAmmount = 4;
