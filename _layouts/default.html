@@ -140,9 +140,7 @@
     margin-right: 8px;
     text-align: center;
     box-shadow: 5px 10px rgba(211, 211, 211, 0.329);
-    -webkit-animation:glide 2s ease-in-out alternate infinite;
   }
-
   .selected {
     border-color: aquamarine;
     border-width: 4px;
@@ -426,7 +424,7 @@ div.desc {
       document.querySelector("#frog1").addEventListener("click", async (e) => {
         //
         //document.getElementById("frog1").setAttribute("class", ".selected");
-        document.getElementById("frogImg1").style.border = "2px solid orange";
+        document.getElementById("frogImg1").style.border = "4px outset rgba(126, 183, 128, 1)";
         document.getElementById("frogImg2").style.border = "none";
         document.getElementById("frogImg3").style.border = "none";
         document.getElementById("frogImg4").style.border = "none";
@@ -438,8 +436,8 @@ div.desc {
       })
       // SECOND FROG
       document.querySelector("#frog2").addEventListener("click", async (e) => {
-        document.getElementById("frogImg1").style.border = "2px solid orange";
-        document.getElementById("frogImg2").style.border = "2px solid orange";
+        document.getElementById("frogImg1").style.border = "4px outset rgba(126, 183, 128, 1)";
+        document.getElementById("frogImg2").style.border = "4px outset rgba(126, 183, 128, 1)";
         document.getElementById("frogImg3").style.border = "none";
         document.getElementById("frogImg4").style.border = "none";
         //
@@ -450,9 +448,9 @@ div.desc {
       })
       // THIRD FROG
       document.querySelector("#frog3").addEventListener("click", async (e) => {
-        document.getElementById("frogImg1").style.border = "2px solid orange";
-        document.getElementById("frogImg2").style.border = "2px solid orange";
-        document.getElementById("frogImg3").style.border = "2px solid orange";
+        document.getElementById("frogImg1").style.border = "4px outset rgba(126, 183, 128, 1)";
+        document.getElementById("frogImg2").style.border = "4px outset rgba(126, 183, 128, 1)";
+        document.getElementById("frogImg3").style.border = "4px outset rgba(126, 183, 128, 1)";
         document.getElementById("frogImg4").style.border = "none";
         //
         mintList = parseInt(nextId)+" - #"+(parseInt(nextId)+2)
@@ -462,10 +460,10 @@ div.desc {
       })
       // FOURTH FROG
       document.querySelector("#frog4").addEventListener("click", async (e) => {
-        document.getElementById("frogImg1").style.border = "2px solid orange";
-        document.getElementById("frogImg2").style.border = "2px solid orange";
-        document.getElementById("frogImg3").style.border = "2px solid orange";
-        document.getElementById("frogImg4").style.border = "2px solid orange";
+        document.getElementById("frogImg1").style.border = "4px outset rgba(126, 183, 128, 1)";
+        document.getElementById("frogImg2").style.border = "4px outset rgba(126, 183, 128, 1)";
+        document.getElementById("frogImg3").style.border = "4px outset rgba(126, 183, 128, 1)";
+        document.getElementById("frogImg4").style.border = "4px outset rgba(126, 183, 128, 1)";
         //
         mintList = parseInt(nextId)+" - #"+(parseInt(nextId)+3)
         document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG(s)" // Update next token ID
