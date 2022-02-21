@@ -3,7 +3,7 @@
 /* Popup container - can be anything you want */
   .popup {
     position: absolute;
-    display: inline-flex;
+    display: flex;
     flex-wrap: wrap;
     cursor: pointer;
     -webkit-user-select: none;
@@ -33,8 +33,6 @@
 
   /* Popup arrow */
   .popup .popuptext::after {
-    display: inline-flex;
-    flex-wrap: wrap;
     content: "";
     position: absolute;
     top: 100%;
