@@ -436,22 +436,11 @@ div.desc {
       // SECOND FROG
       document.querySelector("#frog2").addEventListener("click", async (e) => {
         //
-        let tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
-        let tokenOneSrc = document.getElementById("frogImg1").getAttribute('src')
-        document.getElementById("nextTokenImg").setAttribute("src", tokenOneSrc);
-        document.getElementById("nextTokenImg").setAttribute("alt", tokenOneThis);
+        document.getElementById("frogImg1").setAttribute("class", "collectionImg selected");
+        document.getElementById("frogImg2").setAttribute("class", "collectionImg");
+        document.getElementById("frogImg3").setAttribute("class", "collectionImg");
+        document.getElementById("frogImg4").setAttribute("class", "collectionImg");
         //
-        let tokenTwoThis = document.getElementById("frogImg2").getAttribute('alt')
-        let tokenTwoSrc = document.getElementById("frogImg2").getAttribute('src')
-        document.getElementById("nextTokenImg2").setAttribute("src", tokenTwoSrc);
-        document.getElementById("nextTokenImg2").setAttribute("alt", tokenTwoThis);
-        //
-        document.getElementById("nextTokenImg3").removeAttribute("src");
-        document.getElementById("nextTokenImg3").removeAttribute("alt");
-        document.getElementById("nextTokenImg4").removeAttribute("src");
-        document.getElementById("nextTokenImg4").removeAttribute("alt");
-        document.getElementById("nextTokenImg").setAttribute("class", "nextTokenImg sizeTwo")
-        document.getElementById("nextTokenImg2").setAttribute("class", "nextTokenImg sizeTwo")
         mintList = parseInt(nextId)+", #"+(parseInt(nextId)+1)
         mintAmmount = 2;
         document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG(s)"
@@ -460,27 +449,11 @@ div.desc {
       // THIRD FROG
       document.querySelector("#frog3").addEventListener("click", async (e) => {
         //
-        let tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
-        let tokenOneSrc = document.getElementById("frogImg1").getAttribute('src')
-        document.getElementById("nextTokenImg").setAttribute("src", tokenOneSrc);
-        document.getElementById("nextTokenImg").setAttribute("alt", tokenOneThis);
+        document.getElementById("frogImg1").setAttribute("class", "collectionImg selected");
+        document.getElementById("frogImg2").setAttribute("class", "collectionImg");
+        document.getElementById("frogImg3").setAttribute("class", "collectionImg");
+        document.getElementById("frogImg4").setAttribute("class", "collectionImg");
         //
-        let tokenTwoThis = document.getElementById("frogImg2").getAttribute('alt')
-        let tokenTwoSrc = document.getElementById("frogImg2").getAttribute('src')
-        document.getElementById("nextTokenImg2").setAttribute("src", tokenTwoSrc);
-        document.getElementById("nextTokenImg2").setAttribute("alt", tokenTwoThis);
-        //
-        let tokenThreeThis = document.getElementById("frogImg3").getAttribute('alt')
-        let tokenThreeSrc = document.getElementById("frogImg3").getAttribute('src')
-        document.getElementById("nextTokenImg3").setAttribute("src", tokenThreeSrc);
-        document.getElementById("nextTokenImg3").setAttribute("alt", tokenThreeThis);
-        //
-        document.getElementById("nextTokenImg4").removeAttribute("src");
-        document.getElementById("nextTokenImg4").removeAttribute("alt");
-        document.getElementById("nextTokenImg4").removeAttribute("class");
-        document.getElementById("nextTokenImg").setAttribute("class", "nextTokenImg sizeTwo")
-        document.getElementById("nextTokenImg2").setAttribute("class", "nextTokenImg sizeTwo")
-        document.getElementById("nextTokenImg3").setAttribute("class", "nextTokenImg sizeTwo")
         mintList = parseInt(nextId)+" - #"+(parseInt(nextId)+2)
         document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG(s)"
         mintAmmount = 3;
@@ -489,29 +462,11 @@ div.desc {
       // FOURTH FROG
       document.querySelector("#frog4").addEventListener("click", async (e) => {
         //
-        let tokenOneThis = document.getElementById("frogImg1").getAttribute('alt')
-        let tokenOneSrc = document.getElementById("frogImg1").getAttribute('src')
-        document.getElementById("nextTokenImg").setAttribute("src", tokenOneSrc);
-        document.getElementById("nextTokenImg").setAttribute("alt", tokenOneThis);
+        document.getElementById("frogImg1").setAttribute("class", "collectionImg selected");
+        document.getElementById("frogImg2").setAttribute("class", "collectionImg");
+        document.getElementById("frogImg3").setAttribute("class", "collectionImg");
+        document.getElementById("frogImg4").setAttribute("class", "collectionImg");
         //
-        let tokenTwoThis = document.getElementById("frogImg2").getAttribute('alt')
-        let tokenTwoSrc = document.getElementById("frogImg2").getAttribute('src')
-        document.getElementById("nextTokenImg2").setAttribute("src", tokenTwoSrc);
-        document.getElementById("nextTokenImg2").setAttribute("alt", tokenTwoThis);
-        //
-        let tokenThreeThis = document.getElementById("frogImg3").getAttribute('alt')
-        let tokenThreeSrc = document.getElementById("frogImg3").getAttribute('src')
-        document.getElementById("nextTokenImg3").setAttribute("src", tokenThreeSrc);
-        document.getElementById("nextTokenImg3").setAttribute("alt", tokenThreeThis);
-        //
-        let tokenFourThis = document.getElementById("frogImg4").getAttribute('alt')
-        let tokenFourSrc = document.getElementById("frogImg4").getAttribute('src')
-        document.getElementById("nextTokenImg4").setAttribute("src", tokenFourSrc);
-        document.getElementById("nextTokenImg4").setAttribute("alt", tokenFourThis);
-        document.getElementById("nextTokenImg").setAttribute("class", "nextTokenImg sizeTwo")
-        document.getElementById("nextTokenImg2").setAttribute("class", "nextTokenImg sizeTwo")
-        document.getElementById("nextTokenImg3").setAttribute("class", "nextTokenImg sizeTwo")
-        document.getElementById("nextTokenImg4").setAttribute("class", "nextTokenImg sizeTwo")
         mintList = parseInt(nextId)+" - #"+(parseInt(nextId)+3)
         document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG(s)" // Update next token ID
         mintAmmount = 4;
