@@ -341,15 +341,6 @@ div.desc {
   <script>
   document.addEventListener("DOMContentLoaded", async () => {
     if (detectmob()){
-      try {
-        await f0.init({
-          web3: web3,
-          contract: "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b", // 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b NEW MAIN // 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524 TESTNET
-          network: "main"
-        })
-      } catch (e) {
-        consoleOutput("\n<strong><b>Error: "+e.message+"</b></strong>")
-      }
       window.location.replace("https://freshfrogs.github.io/mobile")
     }
     // ------------------------------------------------------------------------------------------------------------------------ >
