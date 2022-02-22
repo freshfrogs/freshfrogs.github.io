@@ -413,13 +413,6 @@ div.desc {
       document.getElementById("mintTransact").innerHTML = "<div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div><strong>MINT</strong>(transact)"                 // Update Mint button
       document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
       document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
-      //
-      if (detectmob()){
-        alert("You have been redirected to our mobile site; Please make sure you are using your wallet's in app browser")
-        //window.location.replace("https://freshfrogs.github.io/mobile")
-        document.getElementById("pre").classList.add('mobile');
-        document.getElementById("repoHeader").classList.add('mobile');
-      }
       // Update preview images with live ones after web3 connection
       for(let i=0; i<=3; i++) {
         nextTokenInit = parseInt(nextId) + i;
@@ -429,7 +422,13 @@ div.desc {
       }
       // ------------------------------------------------------------------------------------------------------------------------ >
       // Popup window
-      
+      //
+      if (detectmob()){
+        alert("You have been redirected to our mobile site; Please make sure you are using your wallet's in app browser")
+        //window.location.replace("https://freshfrogs.github.io/mobile")
+        document.getElementById("pre").style.margin = "0%"
+        document.getElementById("repoHeader").style.margin = "0%"
+      }
       // FIRST FROG
       document.querySelector("#frog1").addEventListener("click", async (e) => {
         //
