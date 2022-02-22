@@ -244,6 +244,10 @@
     font-family: "Trebuchet MS", Helvetica, sans-serif;
     font-weight: 500;
   }
+  .mobile{
+    margin-right: auto;
+    margin-left: auto;
+  }
   .wrapper2{
     display: inline-flex;
     flex-wrap: wrap;
@@ -348,7 +352,7 @@ div.desc {
       if (detectmob()){
         alert("You have been redirected to our mobile site; Please make sure you are using your wallet's in app browser")
         //window.location.replace("https://freshfrogs.github.io/mobile")
-        document.getElementsByClassName("repoPre").style.margin = "0%";
+        document.getElementById("pre").classList.add = "mobile";
       }
       // ------------------------------------------------------------------------------------------------------------------------ >
       for(let frog=1; frog<=4; frog++) {
