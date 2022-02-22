@@ -340,6 +340,15 @@ div.desc {
   <script src="https://unpkg.com/f0js/dist/f0.js"></script>
   <script>
   document.addEventListener("DOMContentLoaded", async () => {
+    // Check for mobile device
+    function detectmob() {
+      if(window.innerWidth <= 800 || window.innerHeight <= 600) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
     if (detectmob()){
       window.location.replace("https://freshfrogs.github.io/mobile")
     }
@@ -528,7 +537,6 @@ div.desc {
     })
   })
   setTimeout(showPopup,12000)
-
   function showPopup(){
     var popup = document.getElementById("myPopup");
     popup.classList.toggle("show");
