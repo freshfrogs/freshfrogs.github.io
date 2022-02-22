@@ -340,19 +340,6 @@ div.desc {
   <script src="https://unpkg.com/f0js/dist/f0.js"></script>
   <script>
   document.addEventListener("DOMContentLoaded", async () => {
-    // Check for mobile device
-    function detectmob() {
-      if(window.innerWidth <= 1000 || window.innerHeight <= 600) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-    //
-    if (detectmob()){
-      alert("You have been redirected to our mobile site; Please make sure you are using your wallet's in app browser")
-      window.location.replace("https://freshfrogs.github.io/mobile")
-    }
     // ------------------------------------------------------------------------------------------------------------------------ >
     for(let frog=1; frog<=4; frog++) {
         whichFrog = Math.floor(Math.random() * 40)+frog;
@@ -537,6 +524,19 @@ div.desc {
       document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
     })
   })
+    // Check for mobile device
+    function detectmob() {
+      if(window.innerWidth <= 1000 || window.innerHeight <= 600) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    //
+    if (detectmob()){
+      alert("You have been redirected to our mobile site; Please make sure you are using your wallet's in app browser")
+      window.location.replace("https://freshfrogs.github.io/mobile")
+    }
   setTimeout(showPopup,12000)
 
   function showPopup(){
