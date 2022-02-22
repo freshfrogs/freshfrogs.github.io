@@ -329,12 +329,20 @@ div.desc {
   padding: 15px;
   text-align: center;
 }
+.downloads a {
+  line-height: 1;
+  /* font-size: 11px; */
+  color: #676767;
+  display: block;
+  text-align: center;
+  padding-top: 6px;
+  height: 34px;
+}
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
   <!--[if lt IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
   <![endif]-->
@@ -363,7 +371,7 @@ div.desc {
         consoleOutput("\n<strong><b>Error: "+e.message+"</b></strong>")
     }
 
-    let userAcc = web3.currentProvider.selectedAddress;
+    let userAcc = web3.currentProvider.selectedAddress;1
     let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
     let myInvites = await f0.myInvites()
     let myInvitesKeys = Object.keys(myInvites)
