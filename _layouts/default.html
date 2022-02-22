@@ -349,6 +349,8 @@ div.desc {
   }
   //
   if (detectmob()){
+    alert("You have been redirected to our mobile site; Please make sure you are using your wallet's in app browser")
+    window.location.replace("https://freshfrogs.github.io/mobile")
     const web3 = new Web3(window.ethereum)
     const f0 = new F0();
     try {
@@ -360,8 +362,6 @@ div.desc {
       } catch (e) {
         consoleOutput("\n<strong><b>Error: "+e.message+"</b></strong>")
     }
-    alert("You have been redirected to our mobile site; Please make sure you are using your wallet's in app browser")
-    window.location.replace("https://freshfrogs.github.io/mobile")
   }
   document.addEventListener("DOMContentLoaded", async () => {
     // ------------------------------------------------------------------------------------------------------------------------ >
