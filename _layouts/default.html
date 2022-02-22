@@ -349,12 +349,6 @@ div.desc {
         }
       }
 
-      if (detectmob()){
-        alert("You have been redirected to our mobile site; Please make sure you are using your wallet's in app browser")
-        //window.location.replace("https://freshfrogs.github.io/mobile")
-        document.getElementById("pre").classList.add('mobile');
-        document.getElementById("repoHeader").classList.add('mobile');
-      }
       // ------------------------------------------------------------------------------------------------------------------------ >
       for(let frog=1; frog<=4; frog++) {
           whichFrog = Math.floor(Math.random() * 40)+frog;
@@ -554,7 +548,12 @@ div.desc {
       newLine.innerHTML = output
       document.getElementById("pre2").appendChild(newLine)
     }
-
+    if (detectmob()){
+        alert("You have been redirected to our mobile site; Please make sure you are using your wallet's in app browser")
+        //window.location.replace("https://freshfrogs.github.io/mobile")
+        document.getElementById("pre").classList.add('mobile');
+        document.getElementById("repoHeader").classList.add('mobile');
+      }
     </script>
   </head>
   <body> <!-- Main Body -->
