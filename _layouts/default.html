@@ -88,8 +88,8 @@
         // consoleOutput("\nEthereum Contract: <strong>"+name+"</strong> SYMBOL: <strong>"+symbol+" ERC-721</strong>")
         consoleOutput("<b><strong>FROG(s) #"+nextIdC+" - #"+(nextIdC+3)+"</strong></b> are now available to mint... <b><a id='listPrices' class='pointer'>See Pricing</a></b>")
 //        consoleOutput("Public minting price has been applied... Valid for <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>") //("<b>Minting begins Sunday, 02/06/2022. \nJoin discord and follow on twitter to get on the FREE mint whitelist<b>")
-        consoleOutput("\nYou can set the recommended gas fee to the lowest possible setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
-        consoleOutput("<u>It is recommended to have at least 0.01 ΞETH in your wallet to cover gas fees.</u>")
+        consoleOutput("\nSet gas fee to the lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
+        consoleOutput("<u>It is recommended to have at least 0.01 ΞETH to cover gas fees.</u>")
         //
 
         document.querySelector("#addFrog").addEventListener("click", async (e) => {
@@ -141,11 +141,11 @@
       </header>
       <section>
 
-      <div id="pre" class="pre">
+      <pre id="pre" class="pre">
         <div id="netStatus">
 
         </div>
-      </div>
+      </pre>
 
       </section>
       <footer>
