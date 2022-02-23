@@ -187,7 +187,7 @@
         consoleOutput("\nSet gas fee to the lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
         consoleOutput("<u>It is recommended to have at least 0.01 ΞETH to cover gas fees.</u>")
         //
-        document.getElementById("mintTransact").innerHTML = "<div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div><strong>MINT</strong>(transact)"                 // Update Mint button
+        document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>(transact)"                 // Update Mint button //<div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         document.querySelector("#addFrog").addEventListener("click", async (e) => {
 //          if (frogCount === 1) {
