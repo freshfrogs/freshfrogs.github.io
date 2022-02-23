@@ -1,15 +1,82 @@
 <!DOCTYPE html>
+<style>
+  .container{
+    width: 512px;
+    margin: 10px;
+    background-color: #000;
+
+    display: -webkit-box;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+
+    display: -moz-box;
+    -moz-box-orient: horizontal;
+    -moz-box-pack: center;
+    -moz-box-align: center;
+
+    display: box;
+    box-orient: horizontal;
+    box-pack: center;
+    box-align: center;
+    border: 1px solid red;
+}
+
+.imgWrapper {
+    -webkit-box-flex: 13;
+    -moz-box-flex: 1;
+    box-flex: 1;
+}
+
+.frogImg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+</style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-{% seo %}
     <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+    <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        const web3 = new Web3(window.ethereum)
+        const f0 = new F0();
+        try {
+          await f0.init({
+            web3: web3,
+            contract: "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b", // 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b MAIN // 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524 RINKEBY
+            network: "main"
+          })
+          } catch (e) {
+            alert("\n<strong><b>Error: "+e.message+"</b></strong>")
+        }
+
+        let nextId = await f0.api.nextId().call()
+        let nextIdC = parseInt(nextId)
+        let frogCount = 1;
+        
+        document.querySelector("#addFrog").addEventListener("click", async (e) => {
+          if (frogCount === 1) {
+            document.getElementById("frogContainer").innerHTML = "";
+          } 
+          newFrog = document.createElement("div")
+          newFrog.className = "imgWrapper"
+          newFrog.innerHTML = "<img class='frogImg' src='https://freshfrogs.github.io/frog/"+nextIdC+".png'/>"
+          document.getElementById("container").appendChild(newFrog)
+          frogCount = frogCount + 1
+        })
+      })
+    </script>
+
     {% include head-custom.html %}
   </head>
   <body>
@@ -17,9 +84,9 @@
       <header>
         <h1><a href="{{ "/" | absolute_url }}">{{ site.title | default: site.github.repository_name }}</a></h1>
 
-        {% if site.logo %}
-          <img src="{{site.logo | relative_url}}" alt="Logo" />
-        {% endif %}
+        <div id="frogContainer" class="container">
+          <div class="imgWrapper"><img class="frogImg" src="https://freshfrogs.github.io/frog/preview.gif" /></div>
+        </div>
 
         <p>{{ site.description | default: site.github.project_tagline }}</p>
 
