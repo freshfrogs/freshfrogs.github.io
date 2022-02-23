@@ -216,7 +216,7 @@
           document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
         })
         document.querySelector("#addFrog").addEventListener("click", async (e) => {
-          if (frogCount >= 4) {
+          if (frogCount <= 4) {
             newFrog = document.createElement("div")
             newFrog.className = "imgWrapper"
             newFrog.innerHTML = "<img class='frogImg' src='https://freshfrogs.github.io/frog/"+(nextIdC+frogCount)+".png'/>"
@@ -224,7 +224,7 @@
             mintList = nextIdC+" - "+(nextIdC+frogCount)
             frogCount = frogCount + 1
             document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG"
-          } else {
+          } else if (frogCount <= 8) {
             newFrog = document.createElement("div")
             newFrog.className = "imgWrapper"
             newFrog.innerHTML = "<img class='frogImg' src='https://freshfrogs.github.io/frog/"+(nextIdC+frogCount)+".png'/>"
