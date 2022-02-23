@@ -198,8 +198,8 @@
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
-        consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>")
-        consoleOutput("\n⚠️ <strong><b>Error:</b></strong> "+JSON.stringify(e.message)+"\nIf you believe this to be a mistake, please <b><a href='https://discord.gg/t84NyjpS3H'>Report it Here</a></b>")
+        consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+"'><b>View on Opensea</a></b><hr>")
+        consoleOutput("\n⚠️ <strong><b>Error:</b></strong> "+"\nIf you believe this to be a mistake, please <b><a href='https://discord.gg/t84NyjpS3H'>Report it Here</a></b>")
         document.querySelector("#HTP").addEventListener("click", async (e) => {
           consoleOutput("The lowest possible gas fee will be requested!")
           highPriority = 0;
