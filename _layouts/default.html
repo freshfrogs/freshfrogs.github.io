@@ -3,11 +3,12 @@
   html {
     background-image: url("/assets/background.png");
   }
-  body {
-    background-color: rgba(255, 255, 255, 0);
+  .bodyb {
+    background-color: transparent;
   }
   .wrapperb{
-    background-color: rgba(255, 255, 255, 0);
+    background-color: white;
+    border-radius: 2%;
   }
   .container {
     width: auto;
@@ -121,7 +122,7 @@
     </script>
 
   </head>
-  <body>
+  <body class="bodyb">
     <div class="wrapper wrapperb">
       <header>
         <h1><a href="{{ "/" | absolute_url }}">{{ site.title | default: site.github.repository_name }}</a></h1>
