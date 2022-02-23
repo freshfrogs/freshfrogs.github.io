@@ -216,16 +216,23 @@
           document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
         })
         document.querySelector("#addFrog").addEventListener("click", async (e) => {
-//          if (frogCount === 1) {
-//            document.getElementById("frogContainer").innerHTML = "";
-//          } 
-          newFrog = document.createElement("div")
-          newFrog.className = "imgWrapper"
-          newFrog.innerHTML = "<img class='frogImg' src='https://freshfrogs.github.io/frog/"+(nextIdC+frogCount)+".png'/>"
-          document.getElementById("frogContainer").appendChild(newFrog)
-          mintList = nextIdC+" - "+(nextIdC+frogCount)
-          frogCount = frogCount + 1
-          document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG"
+          if (frogCount >= 4) {
+            newFrog = document.createElement("div")
+            newFrog.className = "imgWrapper"
+            newFrog.innerHTML = "<img class='frogImg' src='https://freshfrogs.github.io/frog/"+(nextIdC+frogCount)+".png'/>"
+            document.getElementById("frogContainer2").appendChild(newFrog)
+            mintList = nextIdC+" - "+(nextIdC+frogCount)
+            frogCount = frogCount + 1
+            document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG"
+          } else if (frogCount >= 8) {
+            newFrog = document.createElement("div")
+            newFrog.className = "imgWrapper"
+            newFrog.innerHTML = "<img class='frogImg' src='https://freshfrogs.github.io/frog/"+(nextIdC+frogCount)+".png'/>"
+            document.getElementById("frogContainer").appendChild(newFrog)
+            mintList = nextIdC+" - "+(nextIdC+frogCount)
+            frogCount = frogCount + 1
+            document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG"
+          }
         })
       })
       function consoleOutput(output) {
@@ -243,6 +250,8 @@
 
         <div id="frogContainer" class="container">
           <div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.github.io/frog/preview.gif" /></div>
+        </div>
+        <div id="frogContainer2" class="container">
         </div>
 
         <ul class="downloads">
