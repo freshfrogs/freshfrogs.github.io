@@ -198,7 +198,7 @@
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
-        
+
         document.querySelector("#HTP").addEventListener("click", async (e) => {
           consoleOutput("The lowest possible gas fee will be requested!")
           highPriority = 0;
@@ -218,7 +218,7 @@
         })
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           if (parseInt(nextId) >= 425) {
-            consoleOutput("⚠️ Our FREE Mint has ended! Join discord for more info! "+"<b><a href='https://discord.gg/t84NyjpS3H'>Join Discord</a></b>")
+            consoleOutput("⚠️Minting closed! Join discord for more info! "+"<b><a href='https://discord.gg/t84NyjpS3H'>Join Discord</a></b>")
           } else {
             consoleOutput("\n<strong>Minting x"+frogCount+" FROG(s) #"+mintList+"... please sign the transaction and wait...\nDo Not Leave This Page")
             try {
@@ -295,7 +295,7 @@
 
         <ul class="downloads">
           <li><a id="nextToken" href="">4040 <strong>FROGS</strong></a></li>
-          <li><a id="mintTransact" href="">Transact <strong>MINT</strong></a></li>
+          <li><a id="mintTransact" class="pointer" href="">Transact <strong>MINT</strong></a></li>
           <li><a id="addFrog" class="pointer">Click to Add <strong>ADD FROG</strong></a></li>
         </ul>
         
