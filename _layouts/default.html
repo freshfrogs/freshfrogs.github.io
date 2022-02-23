@@ -223,8 +223,8 @@
           newFrog.className = "imgWrapper"
           newFrog.innerHTML = "<img class='frogImg' src='https://freshfrogs.github.io/frog/"+(nextIdC+frogCount)+".png'/>"
           document.getElementById("frogContainer").appendChild(newFrog)
-          frogCount = frogCount + 1
           mintList = nextIdC+" - #"+(nextIdC+frogCount)
+          frogCount = frogCount + 1
           document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG"
         })
       })
