@@ -72,7 +72,7 @@
 //          } 
           newFrog = document.createElement("div")
           newFrog.className = "imgWrapper"
-          newFrog.innerHTML = "<img class='frogImg' src='https://freshfrogs.github.io/frog/"+(nextIdC+1)+".png'/>"
+          newFrog.innerHTML = "<img class='frogImg' src='https://freshfrogs.github.io/frog/"+(nextIdC+(frogCount-1))+".png'/>"
           document.getElementById("frogContainer").appendChild(newFrog)
           frogCount = frogCount + 1
         })
