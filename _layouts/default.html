@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <style>
-  .container{
+  .container {
     width: auto;
     margin: 10px;
     background-color: #000;
@@ -19,19 +19,30 @@
     box-orient: horizontal;
     box-pack: center;
     box-align: center;
-}
+  }
 
-.imgWrapper {
+  .imgWrapper {
     -webkit-box-flex: 13;
     -moz-box-flex: 1;
     box-flex: 1;
-}
+  }
 
-.frogImg {
+  .frogImg {
     max-width: 100%;
     height: auto;
     display: block;
-}
+  }
+
+  .pre {
+    font-size: small;
+    border-radius: 0%;
+    text-align: center;
+    image-rendering: pixelated;
+    padding: 0px;
+    margin: 0px;
+    width: 100%;
+    height: 100%;
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <head>
@@ -128,9 +139,13 @@
         </ul>
         {% endif %}
       </header>
-      <section id="pre">
+      <section>
 
-        <div id="netStatus"></div>
+      <pre id="pre">
+        <div id="netStatus">
+
+        </div>
+      </pre>
 
       </section>
       <footer>
