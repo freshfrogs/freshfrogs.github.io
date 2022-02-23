@@ -217,6 +217,34 @@
           consoleOutput("\n[ ! ] Invite code has been applied... Valid for <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>")
           document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
         })
+        document.querySelector("#mintTransact").addEventListener("click", async (e) => {
+          if (parseInt(nextId) >= 425) {
+            consoleOutput("⚠️ Our FREE Mint has ended! Join discord for more info! "+"<b><a href='https://discord.gg/t84NyjpS3H'>Join Discord</a></b>")
+          } else {
+            consoleOutput("\n<strong>Minting x"+frogCount+" FROG(s) #"+mintList+"... please sign the transaction and wait...\nDo Not Leave This Page")
+            try {
+              if (highPriority === 1) {
+                let tokens = await f0.mint(mintInviteCode, frogCount)
+                var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
+                  return token.links.opensea
+                })
+              } else {
+                let cost = await f0.cost()
+                let averageGwei = cost.gas.average / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
+                let averageWei = averageGwei * Math.pow(10, 9)
+                let tokens = await f0.mint(mintInviteCode, frogCount, {
+                  gasPrice: "" + averageWei  // the gasPrice must be a string value of the number
+                })
+                var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
+                  return token.links.opensea
+                })
+              }
+            } catch (e) {
+              consoleOutput("\n⚠️ <strong><b>Error:</b></strong> "+JSON.stringify(e.message)+"\nIf you believe this to be a mistake, please <b><a href='https://discord.gg/t84NyjpS3H'>Report it Here</a></b>")
+            }
+            consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>")
+          }
+        })
         document.querySelector("#addFrog").addEventListener("click", async (e) => {
           if (frogCount <= 2) {
             newFrog = document.createElement("div")
