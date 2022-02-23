@@ -278,6 +278,7 @@
             frogCount = frogCount + 1
             document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG"
           }
+          document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>("+(frogCount*mintPrice)+")"
         })
       })
       function consoleOutput(output) {
