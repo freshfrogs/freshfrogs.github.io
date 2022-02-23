@@ -65,6 +65,7 @@
     padding: 0.5%;
   }
   .downloads {
+    margin-top: 10px;
     margin-left: auto;
     margin-right: auto;
     box-shadow: 3px 6px rgba(211, 211, 211, 0.329);
@@ -72,6 +73,7 @@
   .container {
     width: auto;
     margin: 10px;
+    margin-bottom: 0px;
     background-color: #000;
 
     display: -webkit-box;
@@ -224,7 +226,7 @@
             mintList = nextIdC+" - "+(nextIdC+frogCount)
             frogCount = frogCount + 1
             document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>FROG"
-          } else if (frogCount <= 6) {
+          } else if (frogCount <= 5) {
             newFrog = document.createElement("div")
             newFrog.className = "imgWrapper"
             newFrog.innerHTML = "<img class='frogImg' src='https://freshfrogs.github.io/frog/"+(nextIdC+frogCount)+".png'/>"
