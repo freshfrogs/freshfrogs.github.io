@@ -189,7 +189,7 @@
         // ----------------------------------------------------------------------------------------------------------------------- >
         //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
         document.getElementById("nextToken").innerHTML = "<strong>SELECT</strong>FROG(s)"                  // Update next token ID on preview
-        document.getElementById("mintTransact").innerHTML = "<div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div><strong>MINT</strong>(transact)"                 // Update Mint button
+        document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>(transact)"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
         
@@ -200,6 +200,13 @@
           consoleOutput("<b><strong>404</strong></b> Frogs available at... <b><strong>0.00 ΞETH</strong></b> (Initial)")
           consoleOutput("<b><strong>808</strong></b> Frogs available at... <b><strong>0.02 ΞETH</strong></b> (Secondary)")
           consoleOutput("<b><strong>2828</strong></b> Frogs available at... <b><strong>0.04 ΞETH</strong></b> (Final)")
+        })
+        document.querySelector("#setInvite").addEventListener("click", async (e) => {
+          mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
+          mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
+          mintInviteCode = myInviteFound
+          consoleOutput("\n[ ! ] Invite code has been applied... Valid for <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>")
+          document.getElementById("gasEstimate").innerHTML = "<strong>"+mintPrice+" ΞETH</strong>plus gas"
         })
         document.querySelector("#addFrog").addEventListener("click", async (e) => {
 //          if (frogCount === 1) {
