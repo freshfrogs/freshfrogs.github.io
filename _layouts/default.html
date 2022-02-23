@@ -165,6 +165,18 @@
         let mintList = parseInt(nextId)
         let mintLimit = 1
         
+
+        // Load public invite first
+        myInviteFound = "0x0000000000000000000000000000000000000000000000000000000000000000"
+        mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
+        mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
+
+        if (myInvitesKeys[1] === "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550
+          myInviteFound = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4"
+          document.getElementById("netStatus").innerHTML = "<h3><b><a href='https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b' target='_blank'>"+name+" ("+symbol+") </a></b></h3>"+"Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>"+"\nAn invite code was found coupled with this address... <b><a id='setInvite' class='pointer' href=''>Apply</a></b>\n"
+        } else { 
+          document.getElementById("netStatus").innerHTML = "<h3><b><a href='https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b' target='_blank'>"+name+" ("+symbol+") </a></b></h3>"+"Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>\n<a id='setInvite' class='pointer'></a>"
+        }
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
 
         //
