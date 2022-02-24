@@ -60,6 +60,17 @@
     font-family: monospace;
     color: #333;
   }
+  section {
+    border: 8px outset rgba(126, 183, 128, 1);
+    font-family: monospace;
+    color: #333;
+    background-color: white;
+    text-align: center;
+    border-radius: 0%;
+    padding: 1.5%;
+    width: auto;
+    overflow: visible;
+  }
   header {
     border: 8px outset rgba(126, 183, 128, 1);
 
@@ -351,9 +362,11 @@
           <div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.github.io/frog/preview.gif" /></div>
         </div>
       </header>
-      <section id="pre" class="downloads pre">
+      <section>
         <h2><strong><a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank">🐸 Fresh Frogs NFT (FROG)</a></strong></h2><hr>
-        <div id="netStatus">Please connect an Ethereum wallet... <b><a href="https://freshfrogs.github.io/">Connect</a></b><br>Don't have a wallet?... <b><a href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b></div>
+        <div id="pre" class="downloads pre">
+          <div id="netStatus">Please connect an Ethereum wallet... <b><a href="https://freshfrogs.github.io/">Connect</a></b><br>Don't have a wallet?... <b><a href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b></div>
+        </div>
       </section>
     </div><script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
   </body>
