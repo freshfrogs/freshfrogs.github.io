@@ -221,7 +221,7 @@
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
-        document.getElementById("addFrog").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
+     //   document.getElementById("addFrog").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
         document.querySelector("#HTP").addEventListener("click", async (e) => {
           consoleOutput("The lowest possible gas fee will be requested!")
           highPriority = 0;
@@ -267,6 +267,21 @@
             consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>")
           }
         })
+        document.querySelector("#removeFrog").addEventListener("click", async (e) => {
+          if (frogCount <= 2) {
+            var select = document.getElementById("frogContainer3");
+            select.removeChild(select.lastChild);
+          }
+          if (frogCount <= 5) {
+            var select = document.getElementById("frogContainer2");
+            select.removeChild(select.lastChild);
+          }
+          if (frogCount <= 8) {
+            var select = document.getElementById("frogContainer");
+            select.removeChild(select.lastChild);
+          }
+          frogCount = frogCount - 1
+        })
         document.querySelector("#addFrog").addEventListener("click", async (e) => {
           if (frogCount <= 2) {
             newFrog = document.createElement("div")
@@ -294,7 +309,7 @@
 
           }
           document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
-          document.getElementById("addFrog").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
+          //document.getElementById("addFrog").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
           document.getElementById("mintTransact").innerHTML = "<strong><u>MINT</u></strong>"+frogCount+"FROG(s)"
         })
       })
@@ -316,7 +331,7 @@
         <ul class="downloads">
           <li><a id="mintTransact" href="" class="pointer"><strong>LINK WALLET</strong></a></li>
           <li><a id="mintTotal"><strong>0.00 ΞETH</strong>Plus gas</a></li>
-          <li><a id="addFrog" class="pointer"><strong> <u>-</u> 1 <u>+</u></strong>Quantity</a></li>
+          <li><a><strong><u id="removeFrog" class="pointer">-</u> 1 <u id="addFrog" class="pointer">+</u></strong>Quantity</a></li>
         </ul>
         <hr>
         <div id="frogContainer" class="container">
