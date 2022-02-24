@@ -208,8 +208,8 @@
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
-        document.getElementById("nextToken").innerHTML = "<strong> #"+nextIdC+"</strong>reset"
-        document.getElementById("addFrog").innerHTML = "Click to Add <strong>(+) FROG</strong>"
+        document.getElementById("nextToken").innerHTML = "<strong><u>-</u></strong>reset"
+        document.getElementById("addFrog").innerHTML = "<strong><u>+</u></strong>"
         document.querySelector("#HTP").addEventListener("click", async (e) => {
           consoleOutput("The lowest possible gas fee will be requested!")
           highPriority = 0;
@@ -281,7 +281,7 @@
             frogCount = frogCount + 1
             document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>reset"
           }
-          document.getElementById("mintTransact").innerHTML = "<strong>MINT("+frogCount+")</strong>("+(frogCount*mintPrice)+" ΞETH)"
+          document.getElementById("mintTransact").innerHTML = "<strong><u>MINT</u></strong>("+(frogCount*mintPrice)+" ΞETH)"
         })
       })
       function consoleOutput(output) {
@@ -300,7 +300,7 @@
       <header>
 
         <ul class="downloads">
-          <li><a id="nextToken" href=""><strong><u>-</u> 1 <u>+</u></strong>quantity</a></li>
+          <li><a id="removeFrog" href=""><strong><u>-</u> 1 <u>+</u></strong>quantity</a></li>
           <li><a id="mintTransact" class="pointer" href=""><strong><u>Mint</u></strong>0 Eth</a></li>
           <li><a id="addFrog" class="pointer"><strong>0.00 ΞETH</strong>+ gas fees</a></li>
         </ul>
