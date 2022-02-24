@@ -271,16 +271,18 @@
           if (frogCount <= 2) {
             var select = document.getElementById("frogContainer3");
             select.removeChild(select.lastChild);
+            frogCount = frogCount - 1
           }
           if (frogCount <= 5) {
             var select = document.getElementById("frogContainer2");
             select.removeChild(select.lastChild);
+            frogCount = frogCount - 1
           }
           if (frogCount <= 8) {
             var select = document.getElementById("frogContainer");
             select.removeChild(select.lastChild);
+            frogCount = frogCount - 1
           }
-          frogCount = frogCount - 1
         })
         document.querySelector("#addFrog").addEventListener("click", async (e) => {
           if (frogCount <= 2) {
