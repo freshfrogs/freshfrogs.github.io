@@ -289,7 +289,7 @@
             mintList = nextIdC+" - "+(nextIdC+frogCount)
           }
           document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
-          document.getElementById("frogQuant").innerHTML = frogCount
+          document.getElementById("frogQuant").innerHTML = "  "+frogCount+"  "
           document.getElementById("mintTransact").innerHTML = "<strong><u>MINT</u></strong>"+frogCount+"FROG(s)"
         })
         document.querySelector("#addFrog").addEventListener("click", async (e) => {
@@ -319,7 +319,7 @@
 
           }
           document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
-          document.getElementById("frogQuant").innerHTML = frogCount
+          document.getElementById("frogQuant").innerHTML = "  "+frogCount+"  "
           document.getElementById("mintTransact").innerHTML = "<strong><u>MINT</u></strong>"+frogCount+"FROG(s)"
         })
       })
@@ -341,7 +341,7 @@
         <ul class="downloads">
           <li><a id="mintTransact" href="" class="pointer"><strong>⛔LINK WALLET</strong></a></li>
           <li><a id="mintTotal"><strong>0.00 ΞETH</strong>Plus gas</a></li>
-          <li><a><strong><u id="removeFrog" class="pointer">ᐊ</u><frogQuant id="frogQuant"> 1 </frogQuant><u id="addFrog" class="pointer">ᐅ</u></strong>Quantity</a></li>
+          <li><a><strong><u id="removeFrog" class="pointer">ᐊ</u><frogQuant id="frogQuant">  1  </frogQuant><u id="addFrog" class="pointer">ᐅ</u></strong>Quantity</a></li>
         </ul>
         <hr>
         <div id="frogContainer" class="container">
