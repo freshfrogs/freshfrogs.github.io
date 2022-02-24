@@ -203,12 +203,11 @@
 
         // ----------------------------------------------------------------------------------------------------------------------- >
         //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
-        document.getElementById("nextToken").innerHTML = "<strong>SELECT</strong>FROG(s)"                  // Update next token ID on preview
         document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
+        document.getElementById("mintTransact").innerHTML = "<strong><u>MINT</u></strong>"+frogCount+"FROG(s)"
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
-        document.getElementById("nextToken").innerHTML = "<strong><u>-</u></strong>"
         document.getElementById("addFrog").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
         document.querySelector("#HTP").addEventListener("click", async (e) => {
           consoleOutput("The lowest possible gas fee will be requested!")
@@ -301,7 +300,7 @@
       <header>
 
         <ul class="downloads">
-          <li><a id="mintTransact" href=""><strong><u>MINT</u></strong>FROG(s)</a></li>
+          <li><a id="mintTransact" href=""><strong><u>LINK WALLET</u></strong>ETHEREUM</a></li>
           <li><a id="mintTotal" class="pointer"><strong>0.00 ΞETH</strong>PLUS GAS</a></li>
           <li><a id="addFrog" class="pointer"><strong> <u>-</u> 1 <u>+</u></strong>QUANTITY</a></li>
         </ul>
