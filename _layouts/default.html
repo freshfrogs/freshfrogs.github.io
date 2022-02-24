@@ -209,7 +209,7 @@
         document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
         document.getElementById("nextToken").innerHTML = "<strong><u>-</u></strong>"
-        document.getElementById("addFrog").innerHTML = "<strong><u>+</u></strong>"
+        document.getElementById("addFrog").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
         document.querySelector("#HTP").addEventListener("click", async (e) => {
           consoleOutput("The lowest possible gas fee will be requested!")
           highPriority = 0;
@@ -263,7 +263,7 @@
             document.getElementById("frogContainer3").appendChild(newFrog)
             mintList = nextIdC+" - "+(nextIdC+frogCount)
             frogCount = frogCount + 1
-            document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>reset"
+
           } else if (frogCount <= 5) {
             newFrog = document.createElement("div")
             newFrog.className = "imgWrapper"
@@ -271,7 +271,7 @@
             document.getElementById("frogContainer2").appendChild(newFrog)
             mintList = nextIdC+" - "+(nextIdC+frogCount)
             frogCount = frogCount + 1
-            document.getElementById("nextToken").innerHTML = "<strong> #"+mintList+"</strong>reset"
+
           } else if (frogCount <= 8) {
             newFrog = document.createElement("div")
             newFrog.className = "imgWrapper"
@@ -279,10 +279,10 @@
             document.getElementById("frogContainer").appendChild(newFrog)
             mintList = nextIdC+" - "+(nextIdC+frogCount)
             frogCount = frogCount + 1
-            document.getElementById("nextToken").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
+
           }
           document.getElementById("mintTransact").innerHTML = "<strong><u>"+(frogCount*mintPrice)+" ΞETH</u></strong>plus gas"
-          document.getElementById("nextToken").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
+          document.getElementById("addFrog").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
         })
       })
       function consoleOutput(output) {
