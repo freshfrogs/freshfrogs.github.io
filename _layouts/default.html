@@ -279,9 +279,10 @@
             document.getElementById("frogContainer").appendChild(newFrog)
             mintList = nextIdC+" - "+(nextIdC+frogCount)
             frogCount = frogCount + 1
-            document.getElementById("nextToken").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>reset"
+            document.getElementById("nextToken").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
           }
-          document.getElementById("mintTransact").innerHTML = "<strong><u>MINT</u></strong>("+(frogCount*mintPrice)+" ΞETH)"
+          document.getElementById("mintTransact").innerHTML = "<strong><u>"+(frogCount*mintPrice)+" ΞETH</u></strong>plus gas"
+          document.getElementById("nextToken").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
         })
       })
       function consoleOutput(output) {
