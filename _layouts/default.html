@@ -110,8 +110,8 @@
   }
 
   .frogImg {
-    transition: width 2s;
-    transition: height 2s;
+    transition: transform .2s;
+    max-width: 100%;
     height: auto;
     display: block;
     image-rendering: pixelated;
@@ -127,11 +127,11 @@
     transform: scale(1.1);
   }
   .frogImg:hover{
-    width: 512px;
-    height: 512px;
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Safari 3-8 */
+    transform: scale(1.5);
     box-shadow: none;
     border: none;
-    position: absolute;
   }
   hr{
     margin-left: 20%;
