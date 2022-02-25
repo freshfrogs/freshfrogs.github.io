@@ -284,7 +284,7 @@
           if (parseInt(nextId) >= 2820) {
             consoleOutput("⚠️Minting closed! Join discord for more info! "+"<b><a href='https://discord.gg/t84NyjpS3H'>Join Discord</a></b>")
           } else {
-            consoleOutput("\n<strong>Minting x"+frogCount+" FROG(s) #"+mintList+"... \nPlease sign the transaction and wait...\nDo Not Leave This Page")
+            consoleOutput("\n<strong>Minting x"+frogCount+" FROG(s) #"+mintList+"... <br>\nPlease sign the transaction and wait...<br>\nDo Not Leave This Page")
             try {
               if (highPriority === 1) {
                 let tokens = await f0.mint(mintInviteCode, frogCount)
