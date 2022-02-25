@@ -104,6 +104,7 @@
   .pointer {
     transition: transform .2s;
     cursor: pointer;
+    font-size: small;
   }
   .pointer:hover{
     -ms-transform: scale(1.1); /* IE 9 */
@@ -334,7 +335,7 @@
   <body class="bodyb">
     <div class="wrapper">
       <header>
-        <div class="downloads pre" width="100%">
+        <div class="downloads pre">
           <ul class="downloads">
             <li><a id="mintTransact" href="" class="pointer"><strong>⛔LINK WALLET</strong></a></li>
             <li><a id="mintTotal"><strong>0.00 ΞETH</strong>Plus gas</a></li>
@@ -352,7 +353,7 @@
       <section>
         <div id="pre" class="downloads pre">
           <h2><strong><a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank">🐸 Fresh Frogs NFT (FROG)</a></strong></h2><hr>
-          <div id="netStatus">Please connect an Ethereum wallet... <b><a href="https://freshfrogs.github.io/">Connect</a></b><br>Don't have a wallet?... <b><a href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b></div>
+          <div id="netStatus">Please connect an Ethereum wallet... <b><a href="https://freshfrogs.github.io/">Connect</a></b><br>Don't have a wallet?... <b><a class="pointer" href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b></div>
         </div>
       </section>
     </div><script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
