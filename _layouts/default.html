@@ -21,20 +21,12 @@
     text-align: center;
     max-width: 1000px;
   }
-  .smallContainer{
-    border-radius: 5px;
-    border: 1px solid #e0e0e0;
-    overflow: hidden;
-    background-color: transparent;
-    box-shadow: 2px 4px rgba(122, 122, 122, 0.33);
-    width: 128px;
-  }
   .bigContainer{
     border-radius: 5px;
     border: 1px solid #e0e0e0;
     overflow: hidden;
     background-color: transparent;
-    box-shadow: 2px 4px rgba(122, 122, 122, 0.33);
+    box-shadow: 4px 6px rgba(122, 122, 122, 0.33);
   }
   .headLine{
     color: white;
@@ -54,7 +46,7 @@
     transition: transform .2s;
     margin-left: 8%;
     margin-right: 8%;
-    box-shadow: 2px 4px rgba(122, 122, 122, 0.33);
+    box-shadow: 2px 3px rgba(122, 122, 122, 0.33);
   }
   .headLineImg:hover{
     -ms-transform: scale(1.5); /* IE 9 */
@@ -109,7 +101,7 @@
     margin-left: auto;
     margin-right: auto;
     padding: 2%;
-    box-shadow: 2px 4px rgba(122, 122, 122, 0.33);
+    box-shadow: 4px 6px rgba(122, 122, 122, 0.33);
   }
   .downloads a{
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
@@ -152,7 +144,7 @@
     height: auto;
     display: block;
     image-rendering: pixelated;
-    box-shadow: 2% 4% rgba(122, 122, 122, 0.33);
+    box-shadow: 3px 6px rgba(122, 122, 122, 0.33);
   }
   .pointer {
     transition: transform .2s;
@@ -381,7 +373,7 @@
     <div class="wrapper">
       <header>
         <div class="downloads pre">
-          <h2 class="supply" id="supply"><u>4,040 Total Supply</u></h2>
+          <h2 class="supply" id="supply"><strong><u>4,040 Total Supply</u></strong></h2>
           <ul class="downloads">
             <li><a id="mintTransact" href="" class="pointer"><strong>⛔LINK WALLET</strong></a></li>
             <li><a id="mintTotal"><strong>0.00 ΞETH</strong>Plus gas</a></li>
@@ -408,12 +400,6 @@
           <a href="https://discord.gg/t84NyjpS3H" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/discord.png"></a><a href="https://opensea.io/collection/fresh-frogs" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/opensea.png"></a><a href="https://nftcalendar.io/event/fresh-frogs-nft-collection-release/" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/nftCalendar.png"></a>
         </headline>
       </section>
-      <div class="smallContainer">
-        <a target="_blank" href="/frog/1.png">
-          <img src="/frog/1.png" alt="Forest" width="128px">
-        </a>
-        <div class="desc">FROG #1</div>
-      </div>
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
   </body>
