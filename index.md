@@ -1,7 +1,7 @@
 ---
 layout: default
 ---
-<title>Fresh Frogs NFT</title>
+<title>Fresh Frogs NFT #Ethereum</title>
 <h1 class="h1">Fresh Frogs NFT</h1><hr>
 Fresh Frogs NFT is a collection of *4,040* randomly generated frogs living on the ethereum blockchain; each are unique with thousands of different color combinations, traits, accessories, attributes, and more!
 
