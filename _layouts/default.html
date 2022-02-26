@@ -243,6 +243,7 @@
         let mintLimit = 1
         let nextIdC = parseInt(nextId)
         let frogCount = 1;
+        let mintProgress = 0;
 
         // Load public invite first
         myInviteFound = "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -251,9 +252,9 @@
         
         document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"
 //        consoleOutput("\nEthereum Contract: <strong>"+name+"</strong> SYMBOL: <strong>"+symbol+" ERC-721</strong>")
-        consoleOutput("<b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint... <b><a id='listPrices' class='pointer'><u>See Pricing</u></a></b>")
         consoleOutput("Public minting price... <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>") //("<b>Minting begins Sunday, 02/06/2022. \nJoin discord and follow on twitter to get on the FREE mint whitelist<b>")
         consoleOutput("\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'><u>Set safeLow</u></a></b>")
+        consoleOutput("<b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint... <b><a id='listPrices' class='pointer'><u>See Pricing</u></a></b>")
         // ----------------------------------------------------------------------------------------------------------------------- >
         if (myInvitesKeys[1] === "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550
           myInviteFound = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4"
@@ -292,28 +293,33 @@
           if (parseInt(nextId) >= 2820) {
             consoleOutput("⚠️Minting closed! Join discord for more info! "+"<b><a href='https://discord.gg/t84NyjpS3H'>Join Discord</a></b>")
           } else {
-            consoleOutput("\n<strong>Minting x"+frogCount+" FROG(s) #"+mintList+"... <br>\nPlease sign the transaction and wait...<br>\nDo Not Leave This Page")
-            try {
-              if (highPriority === 1) {
-                let tokens = await f0.mint(mintInviteCode, frogCount)
-                var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
-                  return token.links.opensea
-                })
-              } else {
-                let cost = await f0.cost()
-                let averageGwei = cost.gas.average / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
-                let averageWei = averageGwei * Math.pow(10, 9)
-                let tokens = await f0.mint(mintInviteCode, frogCount, {
-                  gasPrice: "" + averageWei  // the gasPrice must be a string value of the number
-                })
-                var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
-                  return token.links.opensea
-                })
+            if (mintProgress == 1) {
+              consoleOutput("To prevent duplicate transactions the mint button is locked out after one use. Please refresh the page!")
+            } else {
+              mintProgress = 1;
+              consoleOutput("\n<strong>Minting x"+frogCount+" FROG(s) #"+mintList+"... <br>\nPlease sign the transaction and wait...<br>\nDo Not Leave This Page")
+              try {
+                if (highPriority === 1) {
+                  let tokens = await f0.mint(mintInviteCode, frogCount)
+                  var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
+                    return token.links.opensea
+                  })
+                } else {
+                  let cost = await f0.cost()
+                  let averageGwei = cost.gas.average / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
+                  let averageWei = averageGwei * Math.pow(10, 9)
+                  let tokens = await f0.mint(mintInviteCode, frogCount, {
+                    gasPrice: "" + averageWei  // the gasPrice must be a string value of the number
+                  })
+                  var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
+                    return token.links.opensea
+                  })
+                }
+              } catch (e) {
+                consoleOutput("<br>\n⚠️ <strong><b>Transaction Error:</b></strong> <br>\n"+JSON.stringify(e.message)+"<br>\n<u>If you believe this to be a mistake, please <b><a href='https://discord.gg/t84NyjpS3H'>Report it Here</u></a></b>")
               }
-            } catch (e) {
-              consoleOutput("<br>\n⚠️ <strong><b>Transaction Error:</b></strong> <br>\n"+JSON.stringify(e.message)+"<br>\n<u>If you believe this to be a mistake, please <b><a href='https://discord.gg/t84NyjpS3H'>Report it Here</u></a></b>")
+              consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>")
             }
-            consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>")
           }
         })
         document.querySelector("#removeFrog").addEventListener("click", async (e) => {
