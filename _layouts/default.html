@@ -297,7 +297,6 @@
         consoleOutput("\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'><u>Set safeLow</u></a></b>")
         consoleOutput("<b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint... <b><a id='listPrices' class='pointer'><u>See Pricing</u></a></b>")
         // Update recently minted FROGs
-        //recentlyMinted(nextIdC);
         // Update recent
         // ----------------------------------------------------------------------------------------------------------------------- >
         if (myInvitesKeys[1] === "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550
@@ -316,6 +315,8 @@
         document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
      //   document.getElementById("addFrog").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
+        recentlyMinted(nextIdC);
+     // EVENTS -------------------------------------------------------------------------------------------------------
         document.querySelector("#HTP").addEventListener("click", async (e) => {
           consoleOutput("<br>"+"The lowest possible gas fee will now be requested!")
           highPriority = 0;
@@ -425,13 +426,13 @@
       }
       function recentlyMinted(mostRecent) {
         for(let i=1; i<=9; i++) {
-          mostRecent = mostRecent - i
+          mostRecent2 = mostRecent - i
           mostRecentDesc = "frog"+i+"Desc"
           mostRecentLink = "frog"+i+"Link"
           mostRecentFrog = "frog"+i
           newFrog = document.createElement("div")
           newFrog.className = "smallContainer2"
-          newFrog.innerHTML = '<a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+mostRecent+'" id="'+mostRecentLink+'" target="_blank"><img class="frogImg2" src="/frog/'+mostRecent+'.png" alt="Frog '+mostRecent+'" id="frog'+i+'"><div class="desc" id="'+mostRecentDesc+'"><strong>FROG #'+mostRecent+'</strong></div></a>'
+          newFrog.innerHTML = '<a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+mostRecent2+'" id="'+mostRecentLink+'" target="_blank"><img class="frogImg2" src="/frog/'+mostRecent2+'.png" alt="Frog '+mostRecent2+'" id="frog'+i+'"><div class="desc" id="'+mostRecentDesc+'"><strong>FROG #'+mostRecent2+'</strong></div></a>'
           document.getElementById("recentMints").appendChild(newFrog)
         }
       }
