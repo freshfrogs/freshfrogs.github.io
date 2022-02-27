@@ -289,20 +289,7 @@
         consoleOutput("Public minting price... <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>") //("<b>Minting begins Sunday, 02/06/2022. \nJoin discord and follow on twitter to get on the FREE mint whitelist<b>")
         consoleOutput("\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'><u>Set safeLow</u></a></b>")
         consoleOutput("<b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint... <b><a id='listPrices' class='pointer'><u>See Pricing</u></a></b>")
-        // Update recently minted FROGs
-        document.getElementById("frog1").setAttribute("src", "https://freshfrogs.github.io/frog/"+(nextIdC-1)+".png")
-        document.getElementById("frog1Link").setAttribute("href", "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+(nextIdC-1)) //https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/235
-        document.getElementById("frog1Desc").innerHTML = "<strong>FROG #"+(nextIdC-1)+"</strong>"
-        document.getElementById("frog2").setAttribute("src", "https://freshfrogs.github.io/frog/"+(nextIdC-2)+".png")
-        document.getElementById("frog2Link").setAttribute("href", "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+(nextIdC-2))
-        document.getElementById("frog2Desc").innerHTML = "<strong>FROG #"+(nextIdC-2)+"</strong>"
-        document.getElementById("frog3").setAttribute("src", "https://freshfrogs.github.io/frog/"+(nextIdC-3)+".png")
-        document.getElementById("frog3Link").setAttribute("href", "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+(nextIdC-3))
-        document.getElementById("frog3Desc").innerHTML = "<strong>FROG #"+(nextIdC-3)+"</strong>"
-        document.getElementById("frog4").setAttribute("src", "https://freshfrogs.github.io/frog/"+(nextIdC-4)+".png")
-        document.getElementById("frog4Link").setAttribute("href", "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+(nextIdC-4))
-        document.getElementById("frog4Desc").innerHTML = "<strong>FROG #"+(nextIdC-4)+"</strong>"
-        // Update recent
+
         // ----------------------------------------------------------------------------------------------------------------------- >
         if (myInvitesKeys[1] === "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550
           myInviteFound = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4"
@@ -463,38 +450,7 @@
         </headline><br>
         <hr>
         <h3>Recently Minted</h3>
-        <div class="smallContainer2">
-          <a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/500" id="frog1Link" target="_blank">
-            <img class="frogImg2" src="/frog/500.png" alt="Frog 500" width="96px" id="frog1">
-            <div class="desc" id="frog1Desc">
-              <strong>FROG #500</strong>
-            </div>
-          </a>
-        </div>
-        <div class="smallContainer2">
-          <a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/501" id="frog2Link" target="_blank">
-            <img class="frogImg2" src="/frog/501.png" alt="Frog 501" width="96px" id="frog2">
-            <div class="desc" id="frog2Desc">
-              <strong>FROG #501</strong>
-            </div>
-          </a>
-        </div>
-        <div class="smallContainer2">
-          <a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/502" id="frog3Link" target="_blank">
-            <img class="frogImg2" src="/frog/502.png" alt="Frog 502" width="96px" id="frog3">
-            <div class="desc" id="frog3Desc">
-              <strong>FROG #502</strong>
-            </div>
-          </a>
-        </div>
-        <div class="smallContainer2">
-          <a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/503" id="frog4Link" target="_blank">
-            <img class="frogImg2" src="/frog/503.png" alt="Frog 503" width="96px" id="frog4">
-            <div class="desc" id="frog4Desc">
-              <strong>FROG #502</strong>
-            </div>
-          </a>
-        </div>
+
       </section>
     </div>
     
