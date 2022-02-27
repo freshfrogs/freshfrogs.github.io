@@ -321,6 +321,9 @@
           consoleOutput("<br>"+"The lowest possible gas fee will now be requested!")
           highPriority = 0;
         })
+        document.querySelector("#loadRecentMints").addEventListener("click", async (e) => {
+          recentlyMinted(mostRecent2);
+        })
         document.querySelector("#listPrices").addEventListener("click", async (e) => {
           consoleOutput("<br>"+"\n<strong><u>Maximum of ["+mintLimit+symbol+"] per Wallet</u></strong>")
           consoleOutput("📌 <b><strong>404</strong></b> Frogs available at... <b><strong>0.00 ΞETH</strong></b>")
@@ -468,7 +471,7 @@
         </div>
         <br>
         <div id="recentMints">
-          <h3>Recently Minted</h3><b><a class="pointer" id="loadRecentMints">Load More</a></b>
+          <h3>Recently Minted</h3><b><a class="pointer" id="loadRecentMints">See More</a></b>
         </div>
         <br>
         <hr>
