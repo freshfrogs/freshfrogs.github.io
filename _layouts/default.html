@@ -322,11 +322,11 @@
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
      //   document.getElementById("addFrog").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
         document.querySelector("#HTP").addEventListener("click", async (e) => {
-          consoleOutput("<br>"+"The lowest possible gas fee will now be requested!")
+          consoleOutput("The lowest possible gas fee will now be requested!")
           highPriority = 0;
         })
         document.querySelector("#listPrices").addEventListener("click", async (e) => {
-          consoleOutput("<br>"+"\n<strong><u>Maximum of ["+mintLimit+symbol+"] per Wallet</u></strong>")
+          consoleOutput("\n<strong><u>Maximum of ["+mintLimit+symbol+"] per Wallet</u></strong>")
           consoleOutput("📌 <b><strong>404</strong></b> Frogs available at... <b><strong>0.00 ΞETH</strong></b>")
           consoleOutput("📌 <b><strong>808</strong></b> Frogs available at... <b><strong>0.02 ΞETH</strong></b>")
           consoleOutput("📌 <b><strong>2828</strong></b> Frogs available at... <b><strong>0.04 ΞETH</strong></b>")
@@ -335,7 +335,7 @@
           mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
           mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
           mintInviteCode = myInviteFound
-          consoleOutput("<br>"+"\n[ ! ] Invite code applied... Valid for <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>")
+          consoleOutput("\n[ ! ] Invite code applied... Valid for <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>")
           document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
         })
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
