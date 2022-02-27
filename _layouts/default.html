@@ -297,18 +297,7 @@
         consoleOutput("\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'><u>Set safeLow</u></a></b>")
         consoleOutput("<b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint... <b><a id='listPrices' class='pointer'><u>See Pricing</u></a></b>")
         // Update recently minted FROGs
-        document.getElementById("frog1").setAttribute("src", "https://freshfrogs.github.io/frog/"+(nextIdC-1)+".png")
-        document.getElementById("frog1Link").setAttribute("href", "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+(nextIdC-1)) //https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/235
-        document.getElementById("frog1Desc").innerHTML = "<strong>FROG #"+(nextIdC-1)+"</strong>"
-        document.getElementById("frog2").setAttribute("src", "https://freshfrogs.github.io/frog/"+(nextIdC-2)+".png")
-        document.getElementById("frog2Link").setAttribute("href", "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+(nextIdC-2))
-        document.getElementById("frog2Desc").innerHTML = "<strong>FROG #"+(nextIdC-2)+"</strong>"
-        document.getElementById("frog3").setAttribute("src", "https://freshfrogs.github.io/frog/"+(nextIdC-3)+".png")
-        document.getElementById("frog3Link").setAttribute("href", "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+(nextIdC-3))
-        document.getElementById("frog3Desc").innerHTML = "<strong>FROG #"+(nextIdC-3)+"</strong>"
-        document.getElementById("frog4").setAttribute("src", "https://freshfrogs.github.io/frog/"+(nextIdC-4)+".png")
-        document.getElementById("frog4Link").setAttribute("href", "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+(nextIdC-4))
-        document.getElementById("frog4Desc").innerHTML = "<strong>FROG #"+(nextIdC-4)+"</strong>"
+        recentlyMinted(nextIdC);
         // Update recent
         // ----------------------------------------------------------------------------------------------------------------------- >
         if (myInvitesKeys[1] === "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550
@@ -433,6 +422,17 @@
         newLine = document.createElement("div")
         newLine.innerHTML = output
         document.getElementById("pre").appendChild(newLine)
+      }
+      function recentlyMinted(mostRecent) {
+        for(let i=0; i<=4; i++) {
+          mostRecent = mostRecent - i
+          mostRecentDesc = "frog"+i+"Desc"
+          mostRecentLink = "frog"+i+"Link"
+          mostRecentFrog = "frog"+i
+          document.getElementById(mostRecentFrog).setAttribute("src", "https://freshfrogs.github.io/frog/"+mostRecent+".png")
+          document.getElementById(mostRecentLink).setAttribute("href", "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+mostRecent) //https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/235
+          document.getElementById(mostRecentDesc).innerHTML = "<strong>FROG #"+mostRecent+"</strong>"
+        }
       }
       //    {% include head-custom.html %}
     </script>
