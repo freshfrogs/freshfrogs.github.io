@@ -3,7 +3,7 @@ layout: default
 ---
 <title>Fresh Frogs NFT (FROG)</title>
 <h1 class="h1">Fresh Frogs NFT</h1><hr>
-Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more! Available for mint at https://freshfrogs.github.io/
+Fresh Frogs NFT is a collection on the #Ethereum blockchain of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!
 
 A portion of every initial sale will be donated to [The Rainforest Foundation](https://rainforestfoundation.org/)
 
