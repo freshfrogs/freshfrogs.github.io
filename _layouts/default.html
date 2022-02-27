@@ -425,7 +425,7 @@
         document.getElementById("pre").appendChild(newLine)
       }
       function recentlyMinted(mostRecent) {
-        for(let i=1; i<=9; i++) {
+        for(let i=1; i<=3; i++) {
           mostRecent2 = mostRecent - i
           mostRecentDesc = "frog"+i+"Desc"
           mostRecentLink = "frog"+i+"Link"
@@ -468,7 +468,7 @@
         </div>
         <br>
         <div id="recentMints">
-          <h3>Recently Minted</h3>
+          <h3>Recently Minted</h3><b><a class="pointer" id="loadRecentMints">Load More</a></b>
         </div>
         <br>
         <hr>
