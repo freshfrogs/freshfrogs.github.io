@@ -264,6 +264,7 @@
         consoleOutput("Public minting price... <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>") //("<b>Minting begins Sunday, 02/06/2022. \nJoin discord and follow on twitter to get on the FREE mint whitelist<b>")
         consoleOutput("\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'><u>Set safeLow</u></a></b>")
         consoleOutput("<b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint... <b><a id='listPrices' class='pointer'><u>See Pricing</u></a></b>")
+        updateRecentMints()
         // ----------------------------------------------------------------------------------------------------------------------- >
         if (myInvitesKeys[1] === "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550
           myInviteFound = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4"
@@ -387,6 +388,12 @@
         newLine = document.createElement("div")
         newLine.innerHTML = output
         document.getElementById("pre").appendChild(newLine)
+      }
+      function updateRecentMints(){
+        document.getElementById("frog1").setAttribute("src", "./frog/"+nextIdC+".png")
+        document.getElementById("frog2").setAttribute("src", "./frog/"+(nextIdC+1)+".png")
+        document.getElementById("frog3").setAttribute("src", "./frog/"+(nextIdC+2)+".png")
+        document.getElementById("frog4").setAttribute("src", "./frog/"+(nextIdC+3)+".png")
       }
       //    {% include head-custom.html %}
     </script>
