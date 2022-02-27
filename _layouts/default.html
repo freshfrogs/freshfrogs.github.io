@@ -431,22 +431,9 @@
           mostRecentFrog = "frog"+i
           newFrog = document.createElement("div")
           newFrog.className = "smallContainer2"
-          newFrog.innerHTML = '<a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"'+mostRecent+' id="'+mostRecentLink+'" target="_blank"><img class="frogImg2" src="/frog/'+mostRecent+'.png" alt="Frog '+mostRecent+'" id="frog'+i+'"><div class="desc" id="'+mostRecentDesc+'"><strong>FROG #'+mostRecent+'</strong></div></a>'
+          newFrog.innerHTML = '<a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+mostRecent+'" id="'+mostRecentLink+'" target="_blank"><img class="frogImg2" src="/frog/'+mostRecent+'.png" alt="Frog '+mostRecent+'" id="frog'+i+'"><div class="desc" id="'+mostRecentDesc+'"><strong>FROG #'+mostRecent+'</strong></div></a>'
           document.getElementById("recentMints").appendChild(newFrog)
         }
-
-        //
-
-      /*
-        <div class="smallContainer2">
-          <a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/500" id="frog1Link" target="_blank">
-            <img class="frogImg2" src="/frog/500.png" alt="Frog 500" id="frog1">
-            <div class="desc" id="frog1Desc">
-              <strong>FROG #500</strong>
-            </div>
-          </a>
-        </div>
-      */
       }
       //    {% include head-custom.html %}
     </script>
