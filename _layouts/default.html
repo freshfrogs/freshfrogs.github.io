@@ -329,7 +329,10 @@
         })
         document.querySelector("#loadRecentMints").addEventListener("click", async (e) => {
           recentlyMinted(mostRecent2);
-        })
+        }) //location.reload()
+        document.querySelector("#reload").addEventListener("click", async (e) => {
+          location.reload()
+        }) //location.reload()
         document.querySelector("#listPrices").addEventListener("click", async (e) => {
           consoleOutput("<br>"+"\n<strong>❯</strong> <strong><u>Maximum of ["+mintLimit+symbol+"] per Wallet</u></strong>")
           consoleOutput("📌 <b><strong>404</strong></b> Frogs available at... <b><strong>0.00 ΞETH</strong></b>")
@@ -478,7 +481,7 @@
         <h2><strong><a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank">🐸 Fresh Frogs NFT (FROG)</a></strong></h2>
         <div class="downloads pre">
           <div id="pre">
-            <div id="netStatus">Please connect an Ethereum wallet... <b><a class="pointer" href="https://freshfrogs.github.io/">Connect</a></b><br>Don't have a wallet?... <b><a class="pointer" href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b><br></div>
+            <div id="netStatus">Please connect an Ethereum wallet... <b><a class="pointer" id="reload">Connect</a></b><br>Don't have a wallet?... <b><a class="pointer" href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b><br></div>
           </div>
           <br>
           <div>
