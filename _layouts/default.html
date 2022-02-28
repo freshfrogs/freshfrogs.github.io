@@ -319,6 +319,7 @@
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
      //   document.getElementById("addFrog").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
         document.getElementById("recentMints").innerHTML = ""
+        document.getElementById("loadRecentMints").removeAttribute("href")
         recentlyMinted(nextIdC);
      // EVENTS -------------------------------------------------------------------------------------------------------
         document.querySelector("#HTP").addEventListener("click", async (e) => {
@@ -478,7 +479,7 @@
           <div id="pre">
             <div id="netStatus">Please connect an Ethereum wallet... <b><a class="pointer" href="https://freshfrogs.github.io/">Connect</a></b><br>Don't have a wallet?... <b><a class="pointer" href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b><br></div>
           </div>
-          <b><u><a class="pointer" id="loadRecentMints">Recently Minted</a></u></b>
+          <b><u><a class="pointer" id="loadRecentMints" href="https://opensea.io/collection/fresh-frogs">Recently Minted</a></u></b>
           <div id="recentMints">
           </div>
           <br>
