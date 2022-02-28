@@ -346,7 +346,7 @@
         })
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           if (parseInt(nextId) >= 568) {
-            consoleOutput("<strong>❯ ⚠️Minting closed! Join discord for more info! </strong>"+"<b><a href='https://discord.gg/t84NyjpS3H'>Join Discord</a></b>")
+            consoleOutput("<strong>❯ ⚠️Minting closed! Join discord for more info! </strong>"+"<b><a class='pointer' href='https://discord.gg/t84NyjpS3H'>Join Discord</a></b>")
           } else {
             if (mintProgress == 1) {
               consoleOutput("<strong>❯</strong> To prevent duplicate transactions the mint button is locked out after one use. <a href='https://freshfrogs.github.io' class='pointer'>Please refresh the page!</a>")
