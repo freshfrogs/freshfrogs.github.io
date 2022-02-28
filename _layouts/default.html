@@ -326,6 +326,7 @@
         recentlyMinted(nextIdC);
 
         let tokenOwner = await collection.methods.ownerOf(66).call()
+        consoleOutput(tokenOwner)
         if (tokenOwner == userAcc) {
           consoleOutput("Owner of FROG #66 "+addressCut)
         }
