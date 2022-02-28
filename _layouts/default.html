@@ -256,6 +256,7 @@
           document.getElementById("pre").style.fontSize = "x-small"
         }
 */
+        recentlyMinted(552)
         const web3 = new Web3(window.ethereum)
         const f0 = new F0();
         try {
@@ -317,6 +318,7 @@
         document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
      //   document.getElementById("addFrog").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
+        document.getElementById("recentMints").innerHTML = ""
         recentlyMinted(nextIdC);
      // EVENTS -------------------------------------------------------------------------------------------------------
         document.querySelector("#HTP").addEventListener("click", async (e) => {
