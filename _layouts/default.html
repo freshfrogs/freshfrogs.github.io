@@ -324,6 +324,12 @@
         document.getElementById("recentMints").innerHTML = ""
         document.getElementById("loadRecentMints").removeAttribute("href")
         recentlyMinted(nextIdC);
+
+        let tokenOwner = await collection.methods.ownerOf(66).call()
+        if (tokenOwner == userAcc) {
+          consoleOutput("Owner of FROG #66 "+addressCut)
+        }
+        //
      // EVENTS -------------------------------------------------------------------------------------------------------
         document.querySelector("#HTP").addEventListener("click", async (e) => {
           consoleOutput("<br>"+"<strong>❯</strong> The lowest possible gas fee will now be requested!")
