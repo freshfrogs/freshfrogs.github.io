@@ -325,9 +325,11 @@
         document.getElementById("loadRecentMints").removeAttribute("href")
         recentlyMinted(nextIdC);
 
-        let tokenOwner = await collection.methods.ownerOf(66).call()
+        let tokenOwner = await collection.methods.ownerOf().call()
         consoleOutput("test "+tokenOwner)
-
+        if (tokenOwner === userAcc) {
+          consoleOutput("Owner of FROG #66 "+addressCut)
+        }
         //
      // EVENTS -------------------------------------------------------------------------------------------------------
         document.querySelector("#HTP").addEventListener("click", async (e) => {
