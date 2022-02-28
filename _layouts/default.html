@@ -326,11 +326,7 @@
           highPriority = 0;
         })
         document.querySelector("#loadRecentMints").addEventListener("click", async (e) => {
-          if (mostRecent2 === null) {
-            recentlyMinted(548);
-          } else {
-            recentlyMinted(mostRecent2);
-          }
+          recentlyMinted(mostRecent2);
         })
         document.querySelector("#listPrices").addEventListener("click", async (e) => {
           consoleOutput("<br>"+"\n<strong><u>Maximum of ["+mintLimit+symbol+"] per Wallet</u></strong>")
