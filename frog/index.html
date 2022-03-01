@@ -27,13 +27,19 @@
                     } catch (e) {
                         alert(e.message)
                 }
-
                 let userAcc = web3.currentProvider.selectedAddress;
                 ownedFrogs(userAcc)
+                consoleOutput(userAcc)
             })
+            function consoleOutput(output) {
+                newLine = document.createElement("div")
+                newLine.innerHTML = output
+                document.getElementById("pre").appendChild(newLine)
+            }
             function ownedFrogs(frogOwner) {
                 for(let i=1; i<=100; i++) {
                     tokenOwner = await collection.methods.ownerOf(i).call()
+                    consoleOutput(tokenOwner)
                     if (tokenOwner === frogOwner) {
                         consoleOutput("OWNED FROGS "+addressCut)
                         let el = document.createElement("img")
@@ -44,5 +50,5 @@
             }
         </script>
     </head>
-    <body></body>
+    <body id="pre"></body>
 </html>
