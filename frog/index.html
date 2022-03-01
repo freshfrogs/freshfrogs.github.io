@@ -28,8 +28,9 @@
                         alert(e.message)
                 }
                 let userAcc = web3.currentProvider.selectedAddress;
-                ownedFrogs(userAcc)
+                tokenOwner = await collection.methods.ownerOf(66).call()
                 consoleOutput(userAcc)
+                consoleOutput(tokenOwner)
             })
             function consoleOutput(output) {
                 newLine = document.createElement("div")
