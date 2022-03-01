@@ -32,7 +32,7 @@
                     tokenOwner = await collection.methods.ownerOf(i).call()
                     consoleOutput(tokenOwner)
                     if (tokenOwner === userAcc) {
-                        consoleOutput("OWNED FROGS "+addressCut)
+                        consoleOutput("OWNED FROGS ")
                         let el = document.createElement("img")
                         el.src= i+".png"
                         document.body.appendChild(el)
