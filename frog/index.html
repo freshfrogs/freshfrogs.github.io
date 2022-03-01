@@ -9,7 +9,6 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        
         <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
         <script src="https://unpkg.com/f0js/dist/f0.js"></script>
         <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
@@ -28,10 +27,17 @@
                     } catch (e) {
                         alert(e.message)
                 }
-                let tokenOwner = await collection.methods.ownerOf(1).call()
                 let userAcc = web3.currentProvider.selectedAddress;
-                consoleOutput(userAcc)
-                consoleOutput(tokenOwner)
+                for(let i=1; i<=67; i++) {
+                    tokenOwner = await collection.methods.ownerOf(i).call()
+                    consoleOutput(tokenOwner)
+                    if (tokenOwner === userAcc) {
+                        consoleOutput("OWNED FROGS "+addressCut)
+                        let el = document.createElement("img")
+                        el.src= i+".png"
+                        document.body.appendChild(el)
+                    }
+                }
             })
             function consoleOutput(output) {
                 newLine = document.createElement("div")
