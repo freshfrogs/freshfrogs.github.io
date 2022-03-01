@@ -28,9 +28,10 @@
                     } catch (e) {
                         alert(e.message)
                 }
-                let tokenOwner = await collection.methods.ownerOf(66).call()
+                let tokenOwner = await collection.methods.ownerOf(1).call()
                 let userAcc = web3.currentProvider.selectedAddress;
                 consoleOutput(userAcc)
+                consoleOutput(tokenOwner)
             })
             function consoleOutput(output) {
                 newLine = document.createElement("div")
