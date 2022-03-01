@@ -28,7 +28,16 @@
                     } catch (e) {
                         alert(e.message)
                 }
+          //      let tokenOwner = await collection.methods.ownerOf(66).call()
                 let userAcc = web3.currentProvider.selectedAddress;
+                ownedFrogs(userAcc)
+            })
+            function consoleOutput(output) {
+                newLine = document.createElement("div")
+                newLine.innerHTML = output
+                document.getElementById("pre").appendChild(newLine)
+            }
+            function ownedFrogs(frogOwner) {
                 for(let i=1; i<=100; i++) {
                     tokenOwner = await collection.methods.ownerOf(i).call()
                     consoleOutput(tokenOwner)
@@ -39,7 +48,7 @@
                         document.body.appendChild(el)
                     }
                 }
-            })
+            }
         </script>
     </head>
     <body id="pre"></body>
