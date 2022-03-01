@@ -25,6 +25,7 @@
                     } catch (e) {
                         alert(e.message)
                 }
+                let tokenOwner = await collection.methods.ownerOf(i).call()
                 let userAcc = web3.currentProvider.selectedAddress;
                 consoleOutput(userAcc)
                 consoleOutput(tokenOwner)
