@@ -32,9 +32,9 @@
                 collection.defaultAccount = userAcc
                 const freshFrogs = await collection.methods.balanceOf(userAcc).call()
                 consoleOutput(freshFrogs)
-                for(let i = 0; i < freshFrogs; i++) {
-                    const tokenId = await collection.methods.tokenOfOwnerByIndex(userAcc, i).call()
-                    consoleOutput(tokenId)
+                for (let i = 0; i < freshFrogs; i++) {
+                    const frog = await collection.methods.tokenOfOwnerByIndex(userAcc, i).call()
+                    consoleOutput(frog)
                     //let tokenMetadataURI = await contract.methods.tokenURI(tokenId).call()
 
                     //if (tokenMetadataURI.startsWith("ipfs://")) {
