@@ -270,7 +270,7 @@
         //
         collection.defaultAccount = userAcc
         let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
-        incomingTokenTransferEvents.forEach( (event) => consoleOutput("<img src='"+event.returnValues.tokenId+".png'>"));
+        incomingTokenTransferEvents.forEach( (event) => consoleOutput("<img width ='64px' src='../frog/"+event.returnValues.tokenId+".png'>"));
 
       })
       function consoleOutput(output) {
