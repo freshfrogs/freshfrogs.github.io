@@ -35,7 +35,7 @@
                 for (let i = 0; i < freshFrogs; i++) {
                     consoleOutput("\ntest")
                     var frog = await collection.methods.tokenOfOwnerByIndex(userAcc, i).call()
-                    consoleOutput("\n- "+parseInt(frog))
+                    consoleOutput("\n- "+frog)
                     //let tokenMetadataURI = await contract.methods.tokenURI(tokenId).call()
 
                     //if (tokenMetadataURI.startsWith("ipfs://")) {
