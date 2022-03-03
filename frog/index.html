@@ -33,7 +33,7 @@
                 const freshFrogs = await collection.methods.balanceOf(userAcc).call()
                 consoleOutput("FROGS OWNED: "+freshFrogs)
                 for (let i = 0; i < freshFrogs; i++) {
-                    var frog = await collection.methods.tokenOfOwnerByIndex(userAcc, i).call()
+                    frog = await collection.methods.tokenOfOwnerByIndex(userAcc, i).call()
                     consoleOutput("\n- "+frog)
                     //let tokenMetadataURI = await contract.methods.tokenURI(tokenId).call()
 
