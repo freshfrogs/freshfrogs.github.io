@@ -32,25 +32,10 @@
                 collection.defaultAccount = userAcc
                 const freshFrogs = await collection.methods.balanceOf(userAcc).call()
                 consoleOutput("FROGS OWNED: "+freshFrogs)
-                for (let i = 0; i < freshFrogs; i++) {
-                    const frog = await collection.methods.tokenOfOwnerByIndex(userAcc, i).call()
-                    let tokenMetadataURI = await collection.methods.tokenURI(frog).call()
-                    consoleOutput(tokenMetadataURI)
-                    //if (tokenMetadataURI.startsWith("ipfs://")) {
-                    //    tokenMetadataURI = `https://ipfs.io/ipfs/${tokenMetadataURI.split("ipfs://")[1]}`
-                    //}
-
-                    //const tokenMetadata = await fetch(tokenMetadataURI).then((response) => response.json())
-
-                    //const spacePunkTokenElement = document.getElementById("nft_template").content.cloneNode(true)
-                    //spacePunkTokenElement.querySelector("h1").innerText = tokenMetadata["name"]
-                    //spacePunkTokenElement.querySelector("a").href = `https://opensea.io/assets/0x45db714f24f5a313569c41683047f1d49e78ba07/${tokenId}`
-                    //spacePunkTokenElement.querySelector("img").src = tokenMetadata["image"]
-                    //spacePunkTokenElement.querySelector("img").alt = tokenMetadata["description"]
-
-                    //document.getElementById("nfts").append(spacePunkTokenElement)
-                }
-                //
+                let toAddr = userAcc;
+                let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': toAddr}, fromBlock: 0, toBlock: 'latest'})
+                incomingTokenTransferEvents.forEach( (event) => console.log(event.returnValues.tokenId));
+                consoleOutput(event.returnValues.tokenId)
             })
             function consoleOutput(output) {
                 newLine = document.createElement("div")
