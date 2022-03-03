@@ -29,8 +29,8 @@
                         alert(e.message)
                 }
                 let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
-                incomingTokenTransferEvents.forEach( (event) => console.log(event.returnValues.tokenId));
-                consoleOutput(event.returnValues.tokenId)
+                incomingTokenTransferEvents.forEach( (event) => consoleOutput(event.returnValues.tokenId));
+                //consoleOutput(event.returnValues.tokenId)
             })
             function consoleOutput(output) {
                 newLine = document.createElement("div")
