@@ -34,7 +34,7 @@
                 consoleOutput(freshFrogs)
                 for(let i = 0; i < freshFrogs; i++) {
                     const tokenId = await collection.methods.tokenOfOwnerByIndex(userAcc, i).call()
-                    consoleOutput('${tokenId}')
+                    consoleOutput(tokenId)
                     //let tokenMetadataURI = await contract.methods.tokenURI(tokenId).call()
 
                     //if (tokenMetadataURI.startsWith("ipfs://")) {
