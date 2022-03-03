@@ -28,12 +28,7 @@
                     } catch (e) {
                         alert(e.message)
                 }
-                //
-                collection.defaultAccount = userAcc
-                const freshFrogs = await collection.methods.balanceOf(userAcc).call()
-                consoleOutput("FROGS OWNED: "+freshFrogs)
-                let toAddr = userAcc;
-                let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': toAddr}, fromBlock: 0, toBlock: 'latest'})
+                let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
                 incomingTokenTransferEvents.forEach( (event) => console.log(event.returnValues.tokenId));
                 consoleOutput(event.returnValues.tokenId)
             })
