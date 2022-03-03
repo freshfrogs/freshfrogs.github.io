@@ -14,9 +14,10 @@
         <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
         <script>
             document.addEventListener("DOMContentLoaded", async () => {
-                var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
                 var web3 = new Web3(window.ethereum);
+                var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
                 var collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
+                let userAcc = web3.currentProvider.selectedAddress;
                 const f0 = new F0();
                 try {
                     await f0.init({
@@ -27,10 +28,30 @@
                     } catch (e) {
                         alert(e.message)
                 }
-                let toAddr = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
-                let incomingTokenTransferEvents = await book.getPastEvents('Transfer', { filter: {'to': toAddr}, fromBlock: 0, toBlock: 'latest'})
-                incomingTokenTransferEvents.forEach( (event) => console.log(event.returnValues.tokenId));
-                consoleOutput(event.returnValues.tokenId)
+                //
+                collection.defaultAccount = userAcc
+                const freshFrogs = await collection.methods.balanceOf(userAcc).call()
+
+                for(let i = 0; i < freshFrogs; i++) {
+                    const tokenId = await collection.methods.tokenOfOwnerByIndex(userAcc, i).call()
+                    consoleOutput(tokenId)
+                    //let tokenMetadataURI = await contract.methods.tokenURI(tokenId).call()
+
+                    //if (tokenMetadataURI.startsWith("ipfs://")) {
+                    //    tokenMetadataURI = `https://ipfs.io/ipfs/${tokenMetadataURI.split("ipfs://")[1]}`
+                    //}
+
+                    //const tokenMetadata = await fetch(tokenMetadataURI).then((response) => response.json())
+
+                    //const spacePunkTokenElement = document.getElementById("nft_template").content.cloneNode(true)
+                    //spacePunkTokenElement.querySelector("h1").innerText = tokenMetadata["name"]
+                    //spacePunkTokenElement.querySelector("a").href = `https://opensea.io/assets/0x45db714f24f5a313569c41683047f1d49e78ba07/${tokenId}`
+                    //spacePunkTokenElement.querySelector("img").src = tokenMetadata["image"]
+                    //spacePunkTokenElement.querySelector("img").alt = tokenMetadata["description"]
+
+                    //document.getElementById("nfts").append(spacePunkTokenElement)
+                }
+                //
             })
             function consoleOutput(output) {
                 newLine = document.createElement("div")
