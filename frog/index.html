@@ -33,10 +33,9 @@
                 const freshFrogs = await collection.methods.balanceOf(userAcc).call()
                 consoleOutput("FROGS OWNED: "+freshFrogs)
                 for (let i = 0; i < freshFrogs; i++) {
-                    frog = await collection.methods.tokenOfOwnerByIndex(userAcc, i).call()
-                    consoleOutput("\n- "+frog)
-                    //let tokenMetadataURI = await contract.methods.tokenURI(tokenId).call()
-
+                    const frog = await collection.methods.tokenOfOwnerByIndex(userAcc, i).call()
+                    let tokenMetadataURI = await collection.methods.tokenURI(frog).call()
+                    consoleOutput(tokenMetadataURI)
                     //if (tokenMetadataURI.startsWith("ipfs://")) {
                     //    tokenMetadataURI = `https://ipfs.io/ipfs/${tokenMetadataURI.split("ipfs://")[1]}`
                     //}
