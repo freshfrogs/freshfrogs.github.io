@@ -244,7 +244,6 @@
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", async () => {
-        recentlyMinted(575)
         var web3 = new Web3(window.ethereum);
         var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
         var collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
