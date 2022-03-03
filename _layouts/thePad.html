@@ -272,13 +272,26 @@
         //
         collection.defaultAccount = userAcc
         let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
-        incomingTokenTransferEvents.forEach( (event) => consoleOutput("<img width ='64px' src='../frog/"+event.returnValues.tokenId+".png'>"));
+        incomingTokenTransferEvents.forEach( (event) => renderFrog(event.returnValues.tokenId));
 
       })
       function consoleOutput(output) {
         newLine = document.createElement("div")
         newLine.innerHTML = output
         document.getElementById("pre").appendChild(newLine)
+      }
+      function renderFrog(whichFrog) {
+          mostRecentDesc = "frog"+whichFrog+"Desc"
+          mostRecentLink = "frog"+whichFrog+"Link"
+          mostRecentFrog = "frog"+whichFrog
+          // <a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+mostRecent2+'" id="'+mostRecentLink+'" target="_blank">
+          newFrog = document.createElement("a")
+          newFrog.href = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+whichFrog
+          newFrog.id = mostRecentLink
+          newFrog.target = "_blank"
+          newFrog.className = "smallContainer2"
+          newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+whichFrog+'.png" alt="Frog '+whichFrog+'" id="frog'+i+'"><div class="desc" id="'+mostRecentDesc+'">\n<strong>#'+whichFrog+'</strong>\n</div>'
+          document.getElementById("recentMints").appendChild(newFrog)
       }
     </script>
   <div class="top">{{ content }}</div>
