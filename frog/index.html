@@ -27,13 +27,10 @@
                     } catch (e) {
                         alert(e.message)
                 }
-                let userAcc = web3.currentProvider.selectedAddress;
-                for(let i=1; i<=67; i++) {
-                    tokenOwner = await collection.methods.ownerOf(i).call()
-                    if (str(tokenOwner) === str(userAcc)) {
-                        consoleOutput("OWNED: "+i)
-                    }
-                }
+                let toAddr = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
+                let incomingTokenTransferEvents = await book.getPastEvents('Transfer', { filter: {'to': toAddr}, fromBlock: 0, toBlock: 'latest'})
+                incomingTokenTransferEvents.forEach( (event) => console.log(event.returnValues.tokenId));
+                consoleOutput(event.returnValues.tokenId)
             })
             function consoleOutput(output) {
                 newLine = document.createElement("div")
