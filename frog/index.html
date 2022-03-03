@@ -28,6 +28,7 @@
                     } catch (e) {
                         alert(e.message)
                 }
+                contract.defaultAccount = userAcc
                 let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
                 incomingTokenTransferEvents.forEach( (event) => consoleOutput("<img src='"+event.returnValues.tokenId+".png'>"));
                 //consoleOutput(event.returnValues.tokenId)
