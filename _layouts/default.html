@@ -279,7 +279,7 @@
         let nextIdC = parseInt(nextId)
         let frogCount = 1;
         let mintProgress = 0;
-        let mint = 1;
+        let mint = 0;
         let ownedFrogs = await collection.methods.balanceOf(userAcc).call()
 
         // Load public invite first
@@ -296,9 +296,9 @@
         
         // Mint Open
         if (mint === 1) {
-          consoleOutput("\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'><u>Set safeLow</u></a></b>")
           consoleOutput("Public minting price... <strong>"+(mintLimit-ownedFrogs)+" FROG(s) @ "+mintPrice+" ΞETH</strong>") //("<b>Minting begins Sunday, 02/06/2022. \nJoin discord and follow on twitter to get on the FREE mint whitelist<b>")
-          consoleOutput("<b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint... <b><a id='listPrices' class='pointer'><u>See Pricing</u></a></b>")
+          consoleOutput("\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'><u>Set safeLow</u></a></b>")
+          consoleOutput("<b><strong><h4>4040 Total Supply</h4></strong></b><br>"+"<b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint... <b><a id='listPrices' class='pointer'><u>See Pricing</u></a></b>")
           if (myInvitesKeys[1] === "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550
             myInviteFound = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4"
             document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>"+"<br>\nAn invite was found coupled with this address... <b><a id='setInvite' class='pointer' href=''><u>Apply</u></a></b>"
@@ -320,10 +320,8 @@
      //   document.getElementById("addFrog").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
         document.getElementById("recentMints").innerHTML = ""
         document.getElementById("loadRecentMints").removeAttribute("href")
-        // FROG Holdings
-        collection.defaultAccount = userAcc
-        let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
-        incomingTokenTransferEvents.forEach( (event) => renderFrog(event.returnValues.tokenId));
+        recentlyMinted(nextIdC);
+
         //
      // EVENTS -------------------------------------------------------------------------------------------------------
         document.querySelector("#HTP").addEventListener("click", async (e) => {
@@ -331,7 +329,7 @@
           highPriority = 0;
         })
         document.querySelector("#loadRecentMints").addEventListener("click", async (e) => {
-          //recentlyMinted(mostRecent2);
+          recentlyMinted(mostRecent2);
         })
         document.querySelector("#listPrices").addEventListener("click", async (e) => {
           consoleOutput("<br>"+"\n<strong>❯</strong> <strong><u>Maximum of ["+mintLimit+symbol+"] per Wallet</u></strong>")
@@ -448,17 +446,6 @@
           document.getElementById("recentMints").appendChild(newFrog)
         }
       }
-      function renderFrog(whichFrog) {
-        // <a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+mostRecent2+'" id="'+mostRecentLink+'" target="_blank">
-        //consoleOutput(whichFrog)
-        newFrog = document.createElement("a")
-        newFrog.href = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+whichFrog
-        newFrog.id = "FROG"+whichFrog
-        newFrog.target = "_blank"
-        newFrog.className = "smallContainer2"
-        newFrog.innerHTML = '<img class="frogImg2" src="https://freshfrogs.github.io/frog/'+whichFrog+'.png" alt="Frog '+whichFrog+'" id="FROGimg'+whichFrog+'"><div class="desc" id="FROGdesc'+whichFrog+'">\n<strong></strong>\n</div>'
-        document.getElementById("recentMints").appendChild(newFrog)
-      }
       //    {% include head-custom.html %}
     </script>
   <div class="top">{{ content }}</div>
@@ -491,7 +478,7 @@
           </div>
           <br>
           <div>
-            <b><u><a class="pointer" id="loadRecentMints" href="https://opensea.io/collection/fresh-frogs" target="_blank">FROG Holdings</a></u></b>
+            <b><u><a class="pointer" id="loadRecentMints" href="https://opensea.io/collection/fresh-frogs" target="_blank">Recently Minted</a></u></b>
             <div id="recentMints">
             </div>
           </div>
