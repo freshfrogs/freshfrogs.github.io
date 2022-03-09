@@ -344,7 +344,9 @@
             if (mint === 0) {
               consoleOutput("<strong>❯ Minting closed! Join discord for more info! </strong>"+"<b><u><a class='pointer' href='https://discord.gg/t84NyjpS3H'>Join Discord</b></u></a>")
             }
-            consoleOutput("<strong>❯</strong> To prevent duplicate transactions the mint button is locked out after one use. <a href='https://freshfrogs.github.io' class='pointer'>Please refresh the page!</a>")
+            if (mintProgress === 1) {
+              consoleOutput("<strong>❯</strong> To prevent duplicate transactions the mint button is locked out after one use. <a href='https://freshfrogs.github.io' class='pointer'>Please refresh the page!</a>")
+            }
           } else {
             mintProgress = 1;
             consoleOutput("\n<strong>❯</strong> <strong>Minting x"+frogCount+" FROG(s) #"+mintList+"... <br>\nPlease sign the transaction and wait...<br>\nDo Not Leave This Page")
