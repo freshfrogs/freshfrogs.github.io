@@ -345,7 +345,10 @@
           document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
         })
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-          if (mintProgress == 1) {
+          if (mintProgress == 1 || mint === 0 ) {
+            if (mint === 0) {
+              consoleOutput("<strong>❯</strong> The minting terminal is currently closed. See discord for updates! <a href='https://freshfrogs.github.io/discord' class='pointer'>Join Discord!</a>")
+            }
             consoleOutput("<strong>❯</strong> To prevent duplicate transactions the mint button is locked out after one use. <a href='https://freshfrogs.github.io' class='pointer'>Please refresh the page!</a>")
           } else {
             mintProgress = 1;
