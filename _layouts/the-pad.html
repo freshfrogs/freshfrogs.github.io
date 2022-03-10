@@ -282,7 +282,7 @@
         let ownedFrogs = await collection.methods.balanceOf(userAcc).call()
         consoleOutput(nextIdC)
         consoleOutput("test")
-        let tokenURI = await collection.methods.tokenURI(nextIdC).call()
+        let tokenURI = await collection.methods.tokenURI(1).call()
        // return tokenURI
         consoleOutput(tokenURI)
         let cid = tokenURI.replace("ipfs://", "")
@@ -305,7 +305,6 @@
         var metadata2;
         (async () => {
           metadata2 = await get()
-          //console.log(tags)
           document.getElementById("pre").innerHTML = JSON.stringify(metadata2.attributes);
         })()
 
