@@ -250,9 +250,7 @@
       document.addEventListener("DOMContentLoaded", async () => {
         const web3 = new Web3(window.ethereum)
         const f0 = new F0();
-        let nextId = await f0.api.nextId().call()
-        let nextIdC = parseInt(nextId)
-        recentlyMinted(nextIdC)
+        recentlyMinted(580)
         recentlyMinted(mostRecent2);
         var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
         var collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
@@ -274,8 +272,8 @@
 
         let name = await f0.api.name().call()
         let symbol = await f0.api.symbol().call()
-        //let nextId = await f0.api.nextId().call()
-        //let nextIdC = parseInt(nextId)
+        let nextId = await f0.api.nextId().call()
+        let nextIdC = parseInt(nextId)
         let highPriority = 1 // low gas or high gas? low gas = 0 / high gas = 1
 
         let nextToken = await f0.get(nextId);
