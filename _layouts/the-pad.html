@@ -294,7 +294,7 @@
     //    }
         consoleOutput(ipfsGatewayURI)
         let metadata = await fetch(ipfsGatewayURI).then((res) => {
-      //    return res.json()
+          consoleOutput(res.json())
         })
     //    return metadata
         consoleOutput(metadata)
