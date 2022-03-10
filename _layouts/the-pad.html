@@ -284,9 +284,9 @@
 
         //
         let tokenId = 1;
-        consoleOutput(tokenId)
+        consoleOutput(nextIdC)
         consoleOutput("test")
-        tokenURI = await collection.methods.tokenURI(tokenId).call()
+        tokenURI = await collection.methods.tokenURI(nextIdC).call()
         return tokenURI
         consoleOutput(tokenURI)
         let cid = tokenURI.replace("ipfs://", "")
