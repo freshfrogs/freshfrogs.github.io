@@ -296,13 +296,23 @@
         let metadata = await fetch(ipfsGatewayURI).then((res) => {
           consoleOutput(res.json())
         })
-        metadata = await (await fetch(ipfsGatewayURI)).json();
+
+        async function get() {
+          let metadata = await (await fetch(ipfsGatewayURI)).json();
+          //console.log(obj);
+          return metadata;
+        }
+        var metadata2;
+        (async () => {
+          metadata2 = await get()
+          //console.log(tags)
+          document.getElementById("pre").innerHTML = JSON.stringify(metadata2);
+        })()
+
     //    return metadata
         consoleOutput(metadata)
         consoleOutput("metadata = " + JSON.stringify(res))
     //    document.getElementById("pre").innerHTML = "metadata = " + JSON.stringify(metadata, null, 2); // Display Metadata
-        //
-        //
       })
       function consoleOutput(output) {
         newLine = document.createElement("div")
