@@ -285,6 +285,7 @@
         //
         let tokenId = 1;
         consoleOutput(tokenId)
+        consoleOutput("test")
         tokenURI = await collection.methods.tokenURI(tokenId).call()
         return tokenURI
         consoleOutput(tokenURI)
