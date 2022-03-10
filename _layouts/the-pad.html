@@ -289,7 +289,7 @@
 
         // Messages Sent to Terminal
         document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>\n<a id='setInvite' class='pointer'></a>"
-        loadFrog(1)
+        loadFrog("1")
         //
         //
       })
@@ -300,20 +300,20 @@
       }
       //
       function loadFrog(tokenId) {
-          tokenURI = await collection.methods.tokenURI(tokenId).call()
-          return tokenURI
-          let cid = tokenURI.replace("ipfs://", "")
-          let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
-          return {
-            cid,
-            tokenURI,
-            ipfsGatewayURI
-          }
-          metadata = await fetch(ipfsGatewayURI).then((res) => {
-            return res.json()
-          })
-          return metadata
-          document.querySelector("pre").innerHTML = "metadata = " + JSON.stringify(metadata, null, 2); // Display Metadata
+        tokenURI = await collection.methods.tokenURI(tokenId).call()
+        return tokenURI
+        let cid = tokenURI.replace("ipfs://", "")
+        let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
+        return {
+          cid,
+          tokenURI,
+          ipfsGatewayURI
+        }
+        metadata = await fetch(ipfsGatewayURI).then((res) => {
+          return res.json()
+        })
+        return metadata
+        document.getElementById("pre").innerHTML = "metadata = " + JSON.stringify(metadata, null, 2); // Display Metadata
 //          let tokenId = parseInt(document.querySelector("#tokenid").value)
 //          const tokenURI = await view.getTokenURI(tokenId)
 //          document.querySelector("#tokenURI").innerHTML = "tokenURI = " + tokenURI;
