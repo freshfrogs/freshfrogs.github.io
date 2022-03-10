@@ -281,27 +281,7 @@
         let mintProgress = 0;
         let mint = 0;
         let ownedFrogs = await collection.methods.balanceOf(userAcc).call()
-        consoleOutput(nextIdC)
         consoleOutput("test")
-        tokenURI = await collection.methods.tokenURI(nextIdC).call()
-        return tokenURI
-        consoleOutput(tokenURI)
-        let cid = tokenURI.replace("ipfs://", "")
-        let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
-        return {
-          cid,
-          tokenURI,
-          ipfsGatewayURI
-        }
-        consoleOutput(ipfsGatewayURI)
-        metadata = await fetch(ipfsGatewayURI).then((res) => {
-          return res.json()
-        })
-        return metadata
-        consoleOutput(metadata)
-        document.getElementById("pre").innerHTML = "metadata = " + JSON.stringify(metadata, null, 2); // Display Metadata
-        //
-        //
       })
       function consoleOutput(output) {
         newLine = document.createElement("div")
