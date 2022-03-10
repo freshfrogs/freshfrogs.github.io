@@ -255,7 +255,6 @@
             contract: CONTRACT_ADDRESS, // 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b MAIN // 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524 RINKEBY
             network: "main"
           })
-          document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <strong>❯ Connecting...</strong>"
           } catch (e) {
             consoleOutput("<br>"+"\n<strong><b>Error: "+e.message+"</b></strong>")
         }
@@ -281,9 +280,6 @@
         let mintProgress = 0;
         let mint = 0;
         let ownedFrogs = await collection.methods.balanceOf(userAcc).call()
-
-        //
-        let tokenId = 1;
         consoleOutput(nextIdC)
         consoleOutput("test")
         tokenURI = await collection.methods.tokenURI(nextIdC).call()
@@ -339,13 +335,6 @@
         <h2><strong><a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank">🐸 Fresh Frogs NFT (FROG)</a></strong></h2>
         <div class="downloads pre">
           <div id="pre">
-            <div id="netStatus">Please connect an Ethereum wallet... <b><a class="pointer" href="https://freshfrogs.github.io/">Connect</a></b><br>Don't have a wallet?... <b><a class="pointer" href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b><br></div>
-          </div>
-          <br>
-          <div>
-            <b><u><a class="pointer" id="loadRecentMints" href="https://opensea.io/collection/fresh-frogs" target="_blank">Recently Minted</a></u></b>
-            <div id="recentMints">
-            </div>
           </div>
           <br>
           <hr>
