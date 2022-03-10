@@ -6,6 +6,20 @@
   html,h1,h2,h3 {
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
   }
+  .desc{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    transition: .5s ease;
+  }
+  .container:hover .desc {
+    opacity: 1;
+  }
   .wrapper {
     margin-left: auto;
     margin-right: auto;
@@ -442,7 +456,7 @@
           newFrog.id = mostRecentLink
           newFrog.target = "_blank"
           newFrog.className = "smallContainer2"
-          newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+mostRecent2+'.png" alt="Frog '+mostRecent2+'" id="frog'+i+'"><div class="desc" id="'+mostRecentDesc+'">\n<strong></strong>\n</div>'
+          newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+mostRecent2+'.png" alt="Frog '+mostRecent2+'" id="frog'+i+'"><div class="desc" id="'+mostRecentDesc+'">\n<strong>Test</strong>\n</div>'
           document.getElementById("recentMints").appendChild(newFrog)
         }
       }
