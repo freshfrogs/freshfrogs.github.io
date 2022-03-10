@@ -296,6 +296,7 @@
         let metadata = await fetch(ipfsGatewayURI).then((res) => {
           consoleOutput(res.json())
         })
+        metadata = await (await fetch(ipfsGatewayURI)).json();
     //    return metadata
         consoleOutput(metadata)
         consoleOutput("metadata = " + JSON.stringify(res))
