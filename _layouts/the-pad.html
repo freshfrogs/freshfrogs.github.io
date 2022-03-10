@@ -282,13 +282,6 @@
         let mint = 0;
         let ownedFrogs = await collection.methods.balanceOf(userAcc).call()
 
-        // Load public invite first
-        myInviteFound = "0x0000000000000000000000000000000000000000000000000000000000000000"
-        mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
-        mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
-
-        // Messages Sent to Terminal
-        document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>\n<a id='setInvite' class='pointer'></a>"
         //
         tokenId = 1;
         consoleOutput(tokenId)
