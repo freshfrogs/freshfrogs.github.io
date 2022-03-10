@@ -293,11 +293,12 @@
     //      ipfsGatewayURI
     //    }
         consoleOutput(ipfsGatewayURI)
-        let metadata = await fetch(tokenURI).then((res) => {
+        let metadata = await fetch(ipfsGatewayURI).then((res) => {
           consoleOutput(res.json())
         })
     //    return metadata
         consoleOutput(metadata)
+        consoleOutput("metadata = " + JSON.stringify(metadata, null, 2))
     //    document.getElementById("pre").innerHTML = "metadata = " + JSON.stringify(metadata, null, 2); // Display Metadata
         //
         //
