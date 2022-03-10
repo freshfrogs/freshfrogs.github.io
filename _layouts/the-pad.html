@@ -305,8 +305,7 @@
         var metadata2;
         (async () => {
           metadata2 = await get()
-          test = metadata2.attributes
-          document.getElementById("pre").innerHTML = JSON.stringify(test.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', '')); // JSON.stringify(metadata2.attributes.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', ''));
+          document.getElementById("pre").innerHTML = JSON.stringify(metadata2.attributes.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', '')); // JSON.stringify(metadata2.attributes.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', ''));
         })()
 
       })
