@@ -307,7 +307,7 @@
           metadata2 = await get()
           //console.log(tags)
           let metadataFinal = metadata2.attributes.replace('[{"trait_type":"',' ') //[{"trait_type":" == ","value":" == }, == "}]
-          document.getElementById("pre").innerHTML = JSON.stringify(metadata2.attributes);
+          document.getElementById("pre").innerHTML = JSON.stringify(metadataFinal);
         })()
 
       })
