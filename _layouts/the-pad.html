@@ -283,15 +283,15 @@
         consoleOutput(nextIdC)
         consoleOutput("test")
         let tokenURI = await collection.methods.tokenURI(nextIdC).call()
-        return tokenURI
+       // return tokenURI
         consoleOutput(tokenURI)
         let cid = tokenURI.replace("ipfs://", "")
         let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
-        return {
-          cid,
-          tokenURI,
-          ipfsGatewayURI
-        }
+    //    return {
+    //      cid,
+    //      tokenURI,
+    //      ipfsGatewayURI
+    //    }
         consoleOutput(ipfsGatewayURI)
         let metadata = await fetch(ipfsGatewayURI).then((res) => {
           return res.json()
