@@ -286,14 +286,7 @@
 
         let cid = tokenURI.replace("ipfs://", "")
         let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
-        loadAttribute("Eyes", "shades")
-        loadAttribute("Eyes", "shadesPurple")
-        loadAttribute("Eyes", "shadesThreeD")
-        loadAttribute("Eyes", "shadesWhite")
-        loadAttribute("Eyes", "circleGlasses")
-        loadAttribute("Eyes", "circleNightVision")
-        loadAttribute("Eyes", "circleShadesPurple")
-        loadAttribute("Eyes", "circleShadesRed")
+        loadEyes()
 /*      async function get() {
           let metadata = await (await fetch(ipfsGatewayURI)).json();
           //console.log(obj);
@@ -320,6 +313,16 @@
         newAttribute.className = "smallContainer2"
         newAttribute.innerHTML = '<img class="frogImg2" src="./'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><div class="desc" id="'+attribute+'"><strong>'+attribute+'</strong></div>'
         document.getElementById("recentMints").appendChild(newAttribute)
+      }
+      function loadEyes() {
+        loadAttribute("Eyes", "shades")
+        loadAttribute("Eyes", "shadesPurple")
+        loadAttribute("Eyes", "shadesThreeD")
+        loadAttribute("Eyes", "shadesWhite")
+        loadAttribute("Eyes", "circleGlasses")
+        loadAttribute("Eyes", "circleNightVision")
+        loadAttribute("Eyes", "circleShadesPurple")
+        loadAttribute("Eyes", "circleShadesRed")
       }
       //
     </script>
