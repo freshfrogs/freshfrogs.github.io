@@ -299,6 +299,7 @@
         newAttribute.id = "FrogButton"
         newAttribute.target = "_blank"
         newAttribute.className = "smallContainer2"
+        newAttribute.onClick = "loadFrogs()"
         newAttribute.innerHTML = '<img class="frogImg2" src="./Frog/unknown.png" alt="Frogs" id="Frog">Frogs'
         document.getElementById("pre").appendChild(newAttribute)
         //
@@ -367,6 +368,36 @@
         newAttribute.className = "smallContainer2"
         newAttribute.innerHTML = '<img class="frogImg2" src="./'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><div class="desc" id="'+attribute+'">'+attribute+'</div>'
         document.getElementById("pre").appendChild(newAttribute)
+      }
+      function loadFrogs() {
+        // FROG
+        document.getElementById("pre").innerHTML = ""
+        consoleOutput("\n<br><hr><h2>\nFrog</h2>")
+        loadAttribute("Frog", "blueDartFrog")
+        loadAttribute("Frog", "blueTreeFrog")
+        loadAttribute("Frog", "brownTreeFrog")
+        loadAttribute("Frog", "cyanTreeFrog")
+        loadAttribute("Frog", "goldenDartFrog")
+        loadAttribute("Frog", "goldenTreeFrog")
+        loadAttribute("Frog", "grayTreeFrog")
+        loadAttribute("Frog", "greenTreeFrog")
+        loadAttribute("Frog", "lightBrownTreeFrog")
+        loadAttribute("Frog", "orangeTreeFrog")
+        loadAttribute("Frog", "pinkTreeFrog")
+        loadAttribute("Frog", "purpleTreeFrog")
+        loadAttribute("Frog", "redEyedTreeFrog")
+        loadAttribute("Frog", "splendidLeafFrog")
+        loadAttribute("Frog", "stawberryDartFrog")
+        loadAttribute("Frog", "tomatoFrog")
+        loadAttribute("Frog", "treeFrog(1)")
+        loadAttribute("Frog", "treeFrog(2)")
+        loadAttribute("Frog", "treeFrog(3)")
+        loadAttribute("Frog", "treeFrog(4)")
+        loadAttribute("Frog", "treeFrog(5)")
+        loadAttribute("Frog", "treeFrog(6)")
+        loadAttribute("Frog", "treeFrog(7)")
+        loadAttribute("Frog", "treeFrog(8)")
+        loadAttribute("Frog", "unknown")
       }
       function loadAllAttributes() {
 /*        consoleOutput("<hr><h2>Eyes</h2>")
