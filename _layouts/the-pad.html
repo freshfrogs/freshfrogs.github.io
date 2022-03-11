@@ -287,25 +287,25 @@
         let cid = tokenURI.replace("ipfs://", "")
         let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
 
-        if (ownedFrogs => 1){
-          let snapshot = []
-          let i = 1;
-          consoleOutput("Tokens Held")
-          while(true) {
-            try {
-              let owner = await collection.methods.ownerOf(i++).call()
-              if (userAcc == owner) {
-                consoleOutput(i)
-              }
-            } catch (e) {
-              break;
+        let snapshot = []
+        let i = 1;
+        consoleOutput("Tokens Held")
+        while(true) {
+          try {
+            let owner = await collection.methods.ownerOf(i++).call()
+            if (userAcc === owner) {
+              consoleOutput(i)
             }
+          } catch (e) {
+            break;
           }
+        }
+
+        if (ownedFrogs => 1){
           loadAllAttributes()
         } else {
           consoleOutput("This content is only available to FROG holders at this time...")
         }
-        
 /*      async function get() {
           let metadata = await (await fetch(ipfsGatewayURI)).json();
           //console.log(obj);
