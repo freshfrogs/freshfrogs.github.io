@@ -257,7 +257,6 @@
         const web3 = new Web3(window.ethereum)
         const f0 = new F0();
         recentlyMinted(580)
-        recentlyMinted(mostRecent2);
         var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
         var collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
         try {
@@ -328,7 +327,6 @@
         document.getElementById("recentMints").innerHTML = ""
         document.getElementById("loadRecentMints2").removeAttribute("href")
         recentlyMinted(nextIdC);
-        recentlyMinted(mostRecent2);
 
         //
      // EVENTS -------------------------------------------------------------------------------------------------------
