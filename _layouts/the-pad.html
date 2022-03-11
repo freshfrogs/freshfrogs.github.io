@@ -295,7 +295,7 @@
         while(true) {
           try {
             let owner = await collection.methods.ownerOf(i++).call()
-            if (stringify(userAcc) === stringify(owner)) {
+            if (parseInt(userAcc) === parseInt(owner)) {
               consoleOutput(i)
             }
           } catch (e) {
