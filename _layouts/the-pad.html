@@ -286,8 +286,8 @@
 
         let cid = tokenURI.replace("ipfs://", "")
         let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
-        let tokenNumber = await collection.methods.balanceOf().call()
-        if (tokenNumber => 1){
+
+        if (ownedFrogs => 1){
           loadAllAttributes()
         } else {
           consoleOutput("This content is only available to FROG holders at this time...")
