@@ -287,7 +287,7 @@
         let cid = tokenURI.replace("ipfs://", "")
         let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
         
-        let snapshot = []
+     /*   let snapshot = []
         let i = 1;
         consoleOutput(userAcc+" Tokens Held")
         while(true) {
@@ -301,7 +301,7 @@
             consoleOutput("done")
           }
         }
-
+        */
         if (ownedFrogs => 1){
           loadAllAttributes()
         } else {
@@ -333,7 +333,7 @@
         newAttribute.target = "_blank"
         newAttribute.className = "smallContainer2"
         newAttribute.innerHTML = '<img class="frogImg2" src="./'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><div class="desc" id="'+attribute+'"><b>'+attribute+'</b></div>'
-        document.getElementById("recentMints").appendChild(newAttribute)
+        document.getElementById("pre").appendChild(newAttribute)
       }
       function loadAllAttributes() {
         //consoleOutput("<h2>Eyes</h2>")
