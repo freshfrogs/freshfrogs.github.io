@@ -291,6 +291,26 @@
 
         let cid = tokenURI.replace("ipfs://", "")
         let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
+
+
+        //
+        newAttribute = document.createElement("a")
+        newAttribute.href = ""
+        newAttribute.id = attribute
+        newAttribute.target = "_blank"
+        newAttribute.className = "smallContainer2"
+        newAttribute.innerHTML = '<img class="frogImg2" src="./Frog/unknown.png" alt="Frogs" id="Frogs">Frogs'
+        document.getElementById("pre").appendChild(newAttribute)
+        //
+        //
+        newAttribute = document.createElement("a")
+        newAttribute.href = ""
+        newAttribute.id = attribute
+        newAttribute.target = "_blank"
+        newAttribute.className = "smallContainer2"
+        newAttribute.innerHTML = '<img class="frogImg2" src="./Eyes/shades.png" alt="Eyes" id="Frogs">Eyes'
+        document.getElementById("pre").appendChild(newAttribute)
+        //
         
      /*   let snapshot = []
         let i = 1;
