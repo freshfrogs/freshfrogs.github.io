@@ -286,7 +286,7 @@
 
         let cid = tokenURI.replace("ipfs://", "")
         let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
-        loadEyes()
+        loadAllAttributes()
 /*      async function get() {
           let metadata = await (await fetch(ipfsGatewayURI)).json();
           //console.log(obj);
@@ -314,7 +314,8 @@
         newAttribute.innerHTML = '<img class="frogImg2" src="./'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><div class="desc" id="'+attribute+'"><b>'+attribute+'</b></div>'
         document.getElementById("recentMints").appendChild(newAttribute)
       }
-      function loadEyes() {
+      function loadAllAttributes() {
+        consoleOutput("<h2>Eyes</h2>")
         loadAttribute("Eyes", "shades")
         loadAttribute("Eyes", "shadesPurple")
         loadAttribute("Eyes", "shadesThreeD")
@@ -325,12 +326,14 @@
         loadAttribute("Eyes", "circleShadesRed")
 
         //goldChain
+        consoleOutput("<h2>Accessory</h2>")
         loadAttribute("Accessory", "goldChain")
         loadAttribute("Accessory", "goldDollarChain")
         loadAttribute("Accessory", "silverChain")
         loadAttribute("Accessory", "silverEthChain")
-
+        
         // FROG
+        consoleOutput("<h2>Frog</h2>")
         loadAttribute("Frog", "blueDartFrog")
         loadAttribute("Frog", "blueTreeFrog")
         loadAttribute("Frog", "brownTreeFrog")
