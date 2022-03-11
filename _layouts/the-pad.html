@@ -286,6 +286,7 @@
 
         let cid = tokenURI.replace("ipfs://", "")
         let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
+        loadAttribute("Eyes", "shades")
 /*      async function get() {
           let metadata = await (await fetch(ipfsGatewayURI)).json();
           //console.log(obj);
@@ -303,6 +304,17 @@
         newLine.innerHTML = output
         document.getElementById("pre").appendChild(newLine)
       }
+      //
+      function loadAttribute(trait, attribute) {
+        newAttribute = document.createElement("a")
+        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
+        newAttribute.id = attribute
+        newAttribute.target = "_blank"
+        newAttribute.className = "smallContainer2"
+        newAttribute.innerHTML = '<img class="frogImg2" src="/'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><div class="desc" id="'+attribute+'"><strong>'+attribute+'</strong></div>'
+        document.getElementById("recentMints").appendChild(newAttribute)
+      }
+      //
     </script>
   <div class="top">{{ content }}</div>
   </head>
