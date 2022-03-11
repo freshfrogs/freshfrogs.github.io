@@ -292,10 +292,9 @@
         consoleOutput(userAcc+" Tokens Held")
         while(true) {
           try {
-            i = i-1
             let owner = await collection.methods.ownerOf(i++).call()
             if (userAcc === owner.toLowerCase()) {
-              consoleOutput(i)
+              consoleOutput(i-1)
             }
           } catch (e) {
             break;
