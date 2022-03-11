@@ -288,6 +288,19 @@
         let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
 
         if (ownedFrogs => 1){
+          let snapshot = []
+          let i = 1;
+          consoleOutput("Tokens Held")
+          while(true) {
+            try {
+              let owner = await collection.methods.ownerOf(i++).call()
+              if (userAcc = owner) {
+                consoleOutput(i)
+              }
+            } catch (e) {
+              break;
+            }
+          }
           loadAllAttributes()
         } else {
           consoleOutput("This content is only available to FROG holders at this time...")
@@ -311,19 +324,6 @@
         document.getElementById("pre").appendChild(newLine)
       }
       //
-      let snapshot = []
-      let i = 1;
-      consoleOutput("Tokens Held")
-      while(true) {
-        try {
-          let owner = await collection.methods.ownerOf(i++).call()
-          if (userAcc = owner) {
-            consoleOutput(i)
-          }
-        } catch (e) {
-          break;
-        }
-      }
       //
       function loadAttribute(trait, attribute) {
         newAttribute = document.createElement("a")
