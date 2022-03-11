@@ -311,6 +311,20 @@
         document.getElementById("pre").appendChild(newLine)
       }
       //
+      let snapshot = []
+      let i = 1;
+      consoleOutput("Tokens Held")
+      while(true) {
+        try {
+          let owner = await collection.methods.ownerOf(i++).call()
+          if (userAcc = owner) {
+            consoleOutput(i)
+          }
+        } catch (e) {
+          break;
+        }
+      }
+      //
       function loadAttribute(trait, attribute) {
         newAttribute = document.createElement("a")
         newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
