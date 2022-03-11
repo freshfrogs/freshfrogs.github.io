@@ -286,7 +286,7 @@
 
         let cid = tokenURI.replace("ipfs://", "")
         let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
-        async function get() {
+/*      async function get() {
           let metadata = await (await fetch(ipfsGatewayURI)).json();
           //console.log(obj);
           return metadata;
@@ -295,9 +295,9 @@
         (async () => {
           metadata2 = await get()
           document.getElementById("pre").innerHTML = JSON.stringify(metadata2.attributes); // JSON.stringify(metadata2.attributes.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', ''));
-        })()
+        })() */
 
-      })
+      }) 
       function consoleOutput(output) {
         newLine = document.createElement("div")
         newLine.innerHTML = output
