@@ -296,27 +296,27 @@
         //
         newAttribute = document.createElement("a")
         newAttribute.id = "FrogButton"
-        newAttribute.className = "smallContainer2 pointer"
+        newAttribute.className = "smallContainer2"
         newAttribute.onClick = "loadFrogs()"
-        newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogImg2 pointer" src="./Frog/unknown.png" alt="Frogs" id="Frog">Frogs'
+        newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogImg2" src="./Frog/unknown.png" alt="Frogs" id="Frog">Frogs'
         document.getElementById("pre").appendChild(newAttribute)
         //
         //
         newAttribute = document.createElement("a")
         newAttribute.href = ""
         newAttribute.id = "SpecialFrogButton"
-        newAttribute.target = "_blank"
+        newAttribute.target = ""
         newAttribute.className = "smallContainer2"
-        newAttribute.innerHTML = '<img class="frogImg2" src="./SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs">SpecialFrogs'
+        newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogImg2" src="./SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs">SpecialFrogs'
         document.getElementById("pre").appendChild(newAttribute)
         //
         //
         newAttribute = document.createElement("a")
         newAttribute.href = ""
         newAttribute.id = "AttributesButton"
-        newAttribute.target = "_blank"
+        newAttribute.target = ""
         newAttribute.className = "smallContainer2"
-        newAttribute.innerHTML = '<img class="frogImg2 lower" src="./Hat/witchBlack.png" alt="Attributes" id="Attributes">Attributes'
+        newAttribute.innerHTML = '<img onclick="loadAttributes()" class="frogImg2 lower" src="./Hat/witchBlack.png" alt="Attributes" id="Attributes">Attributes'
         document.getElementById("pre").appendChild(newAttribute)
         //
         
@@ -396,8 +396,16 @@
         loadAttribute("Frog", "treeFrog(8)")
         loadAttribute("Frog", "unknown")
       }
-      function loadAllAttributes() {
-/*        consoleOutput("<hr><h2>Eyes</h2>")
+      function loadSpecialFrogs() {
+        consoleOutput("\n")
+        loadAttribute("SpecialFrog", "closedEyes")
+        loadAttribute("SpecialFrog", "croaking")
+        loadAttribute("SpecialFrog", "inversedEyes")
+        loadAttribute("SpecialFrog", "peace")
+        loadAttribute("SpecialFrog", "thirdEye")
+      }
+      function loadAttributes() {
+        consoleOutput("\n")
         loadAttribute("Eyes", "shades")
         loadAttribute("Eyes", "shadesPurple")
         loadAttribute("Eyes", "shadesThreeD")
@@ -409,42 +417,14 @@
         
 
         //goldChain
-        consoleOutput("\n<br><hr><h2>\nAccessory</h2>")
+        consoleOutput("\n")
         loadAttribute("Accessory", "goldChain")
         loadAttribute("Accessory", "goldDollarChain")
         loadAttribute("Accessory", "silverChain")
         loadAttribute("Accessory", "silverEthChain")
         
-        // FROG
-        consoleOutput("\n<br><hr><h2>\nFrog</h2>")
-        loadAttribute("Frog", "blueDartFrog")
-        loadAttribute("Frog", "blueTreeFrog")
-        loadAttribute("Frog", "brownTreeFrog")
-        loadAttribute("Frog", "cyanTreeFrog")
-        loadAttribute("Frog", "goldenDartFrog")
-        loadAttribute("Frog", "goldenTreeFrog")
-        loadAttribute("Frog", "grayTreeFrog")
-        loadAttribute("Frog", "greenTreeFrog")
-        loadAttribute("Frog", "lightBrownTreeFrog")
-        loadAttribute("Frog", "orangeTreeFrog")
-        loadAttribute("Frog", "pinkTreeFrog")
-        loadAttribute("Frog", "purpleTreeFrog")
-        loadAttribute("Frog", "redEyedTreeFrog")
-        loadAttribute("Frog", "splendidLeafFrog")
-        loadAttribute("Frog", "stawberryDartFrog")
-        loadAttribute("Frog", "tomatoFrog")
-        loadAttribute("Frog", "treeFrog(1)")
-        loadAttribute("Frog", "treeFrog(2)")
-        loadAttribute("Frog", "treeFrog(3)")
-        loadAttribute("Frog", "treeFrog(4)")
-        loadAttribute("Frog", "treeFrog(5)")
-        loadAttribute("Frog", "treeFrog(6)")
-        loadAttribute("Frog", "treeFrog(7)")
-        loadAttribute("Frog", "treeFrog(8)")
-        loadAttribute("Frog", "unknown")
-        
         //Hat
-        consoleOutput("\n<br><hr><h2>\nHat</h2>")
+        consoleOutput("\n")
         loadAttribute("Hat", "baseballCapBlue")
         loadAttribute("Hat", "baseballCapRed")
         loadAttribute("Hat", "baseballCapWhite")
@@ -462,7 +442,7 @@
         loadAttribute("Hat", "witchStraw")
         
         //Mouth
-        consoleOutput("\n<br><hr><h2>\nMouth</h2>")
+        consoleOutput("\n")
         loadAttribute("Mouth", "bandannaBlue")
         loadAttribute("Mouth", "bandannaRed")
         loadAttribute("Mouth", "mask")
@@ -474,15 +454,7 @@
         loadAttribute("Mouth", "tongueSpider")
         loadAttribute("Mouth", "tongueSpiderRed")
         
-        //SpecialFrog
-        consoleOutput("\n<br><hr><h2>\nSpecialFrog</h2><br>")
-        loadAttribute("SpecialFrog", "closedEyes")
-        loadAttribute("SpecialFrog", "croaking")
-        loadAttribute("SpecialFrog", "inversedEyes")
-        loadAttribute("SpecialFrog", "peace")
-        loadAttribute("SpecialFrog", "thirdEye")
-        
-        //Trait
+/*        //Trait
         consoleOutput("\n<br><hr><h2>\nTrait</h2>")
         loadAttribute("Trait", "blue")
         loadAttribute("Trait", "blue(2)")
