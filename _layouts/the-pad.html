@@ -293,7 +293,7 @@
         while(true) {
           try {
             let owner = await collection.methods.ownerOf(i++).call()
-            if (userAcc === ownertoLowerCase()) {
+            if (userAcc === owner.toLowerCase()) {
               consoleOutput(i)
             }
           } catch (e) {
