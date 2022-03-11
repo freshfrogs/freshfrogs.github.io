@@ -288,10 +288,11 @@
         let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
         
         let snapshot = []
-        let i = 0;
+        let i = 1;
         consoleOutput(userAcc+" Tokens Held")
         while(true) {
           try {
+            i = i-1
             let owner = await collection.methods.ownerOf(i++).call()
             if (userAcc === owner.toLowerCase()) {
               consoleOutput(i)
