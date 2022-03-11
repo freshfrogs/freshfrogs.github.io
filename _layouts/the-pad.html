@@ -295,12 +295,10 @@
 
         //
         newAttribute = document.createElement("a")
-        newAttribute.href = ""
         newAttribute.id = "FrogButton"
-        newAttribute.target = "_blank"
         newAttribute.className = "smallContainer2"
         newAttribute.onClick = "loadFrogs()"
-        newAttribute.innerHTML = '<img class="frogImg2" src="./Frog/unknown.png" alt="Frogs" id="Frog">Frogs'
+        newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogImg2" src="./Frog/unknown.png" alt="Frogs" id="Frog">Frogs'
         document.getElementById("pre").appendChild(newAttribute)
         //
         //
