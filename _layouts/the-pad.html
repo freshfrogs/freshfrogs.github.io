@@ -286,14 +286,14 @@
 
         let cid = tokenURI.replace("ipfs://", "")
         let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
-
+        
         let snapshot = []
         let i = 1;
         consoleOutput(userAcc+" Tokens Held")
         while(true) {
           try {
             let owner = await collection.methods.ownerOf(i++).call()
-            if (userAcc === owner) {
+            if (stringify(userAcc) === stringify(owner)) {
               consoleOutput(i)
             }
           } catch (e) {
