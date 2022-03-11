@@ -294,7 +294,7 @@
           while(true) {
             try {
               let owner = await collection.methods.ownerOf(i++).call()
-              if (userAcc = owner) {
+              if (userAcc == owner) {
                 consoleOutput(i)
               }
             } catch (e) {
