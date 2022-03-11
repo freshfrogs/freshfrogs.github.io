@@ -289,7 +289,7 @@
 
         let snapshot = []
         let i = 1;
-        consoleOutput("Tokens Held")
+        consoleOutput(userAcc+" Tokens Held")
         while(true) {
           try {
             let owner = await collection.methods.ownerOf(i++).call()
@@ -298,6 +298,7 @@
             }
           } catch (e) {
             break;
+            consoleOutput("done")
           }
         }
 
