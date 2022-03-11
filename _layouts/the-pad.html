@@ -290,12 +290,10 @@
         let snapshot = []
         let i = 1;
         consoleOutput(userAcc+" Tokens Held")
-        let test = await collection.methods.ownerOf(66).call()
-        consoleOutput(test)
         while(true) {
           try {
             let owner = await collection.methods.ownerOf(i++).call()
-            if (parseInt(userAcc) === parseInt(owner)) {
+            if (userAcc === ownertoLowerCase()) {
               consoleOutput(i)
             }
           } catch (e) {
