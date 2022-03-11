@@ -326,7 +326,7 @@
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
      //   document.getElementById("addFrog").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
         document.getElementById("recentMints").innerHTML = ""
-        document.getElementById("loadRecentMints").removeAttribute("href")
+        document.getElementById("loadRecentMints2").removeAttribute("href")
         recentlyMinted(nextIdC);
         recentlyMinted(mostRecent2);
 
@@ -336,7 +336,7 @@
           consoleOutput("<br>"+"<strong>❯</strong> The lowest possible gas fee will now be requested!")
           highPriority = 0;
         })
-        document.querySelector("#loadRecentMints").addEventListener("click", async (e) => {
+        document.querySelector("#loadRecentMints2").addEventListener("click", async (e) => {
           recentlyMinted(mostRecent2);
         })
         document.querySelector("#listPrices").addEventListener("click", async (e) => {
@@ -501,6 +501,7 @@
             <b><u><a class="pointer" id="loadRecentMints" href="https://opensea.io/collection/fresh-frogs" target="_blank">Recently Minted</a></u></b>
             <div id="recentMints">
             </div>
+            <b><u><a class="pointer" id="loadRecentMints2" href="https://opensea.io/collection/fresh-frogs" target="_blank">Load More</a></u></b>
           </div>
           <br>
           <hr>
