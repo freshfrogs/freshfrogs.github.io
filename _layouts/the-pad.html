@@ -199,6 +199,33 @@
     box-shadow: 2% 4% rgba(122, 122, 122, 0.33);
     overflow: hidden;
   }
+
+  .headLineImg2 {
+    transition: transform .2s;
+    width: 128px;
+    display: block;
+    box-shadow: none;
+    border: none;
+
+    float: none;
+    image-rendering: crisp-edges;
+    height: 32px;
+    border-radius: 100%;
+    padding: 0%;
+    transition: transform .2s;
+    margin-left: 6%;
+    margin-right: 6%;
+    margin-bottom: 0%;
+    box-shadow: 2px 4px rgba(122, 122, 122, 0.33);
+  }
+  .headLineImg2:hover{
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Safari 3-8 */
+    transform: scale(1.5);
+    box-shadow: none;
+    border: none;
+  }
+
   .frogImg2 {
     transition: transform .2s;
     width: 128px;
@@ -339,7 +366,7 @@
         newAttribute.href = ""
         newAttribute.target = "_blank"
         newAttribute.className = "smallContainer2 pointer"
-        newAttribute.innerHTML = '<img class="headLineImg" src="OpenSea.png" alt="LooksRare" id="LooksRare"><b>View on LooksRare</b>'
+        newAttribute.innerHTML = '<img class="headLineImg2" src="OpenSea.png" alt="LooksRare" id="LooksRare"><b>View on LooksRare</b>'
         document.getElementById("pre").appendChild(newAttribute)
         //
         /*
