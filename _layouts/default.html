@@ -385,9 +385,9 @@
           document.getElementById("pre").appendChild(newAttribute)
           //
           //
-          consoleOutput("<b><strong>> 808 Frogs</strong></b> available at... <b><strong>0.00 ΞETH</strong></b>")
-          consoleOutput("<b><strong>> 1212 Frogs</strong></b> available at... <b><strong>0.02 ΞETH</strong></b>")
-          consoleOutput("<b><strong>> 2020 Frogs</strong></b> available at... <b><strong>0.04 ΞETH</strong></b>")
+          //consoleOutput("<b><strong>> 808 Frogs</strong></b> available at... <b><strong>0.00 ΞETH</strong></b>")
+          //consoleOutput("<b><strong>> 1212 Frogs</strong></b> available at... <b><strong>0.02 ΞETH</strong></b>")
+          //consoleOutput("<b><strong>> 2020 Frogs</strong></b> available at... <b><strong>0.04 ΞETH</strong></b>")
         })
         document.querySelector("#setInvite").addEventListener("click", async (e) => {
           mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
@@ -495,7 +495,7 @@
         newAttribute.id = attribute
         newAttribute.target = "_blank"
         newAttribute.className = "frogType2 pointer"
-        newAttribute.innerHTML = '<img class="frogType" src="./'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><b>'+attribute+'</b>'
+        newAttribute.innerHTML = '<img class="frogType" src="./the-pad/'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><b>'+attribute+'</b>'
         document.getElementById("pre").appendChild(newAttribute)
       }
       function loadFrogs() {
