@@ -257,7 +257,7 @@
       document.addEventListener("DOMContentLoaded", async () => {
         const web3 = new Web3(window.ethereum)
         const f0 = new F0();
-        recentlyMinted(580)
+        //recentlyMinted(580)
         var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
         var collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
         try {
@@ -327,7 +327,7 @@
      //   document.getElementById("addFrog").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
         document.getElementById("recentMints").innerHTML = ""
         document.getElementById("loadRecentMints2").removeAttribute("href")
-        recentlyMinted(nextIdC);
+        //recentlyMinted(nextIdC);
 
         //
      // EVENTS -------------------------------------------------------------------------------------------------------
@@ -486,9 +486,7 @@
       </header>
       <section>
         <h2><strong><a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank">🐸 Fresh Frogs NFT (FROG)</a></strong></h2>
-        <headline class="headLine2">
-          <a href="https://twitter.com/FreshFrogs_NFT" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/twitter.png"></a><a href="https://discord.gg/t84NyjpS3H" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/discord.png"></a><a href="https://opensea.io/collection/fresh-frogs" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/opensea.png"></a><a href="https://nftcalendar.io/event/fresh-frogs-nft-collection-release/" target="_blank" style="display: inline !important;"><img background="white" class="headLineImg" src="./assets/nftCalendar.png"></a>
-        </headline>
+
         <div></div>
         <br>
         <hr>
@@ -505,6 +503,9 @@
           <br>
           <hr>
           <b><u><a class="pointer" id="loadRecentMints2" href="https://opensea.io/collection/fresh-frogs" target="_blank">Load More</a></u></b>
+          <headline class="headLine2">
+            <a href="https://twitter.com/FreshFrogs_NFT" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/twitter.png"></a><a href="https://discord.gg/t84NyjpS3H" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/discord.png"></a><a href="https://opensea.io/collection/fresh-frogs" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/opensea.png"></a><a href="https://nftcalendar.io/event/fresh-frogs-nft-collection-release/" target="_blank" style="display: inline !important;"><img background="white" class="headLineImg" src="./assets/nftCalendar.png"></a>
+          </headline>
         </div>
       </section>
     </div>
