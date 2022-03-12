@@ -239,6 +239,37 @@
     height: 100%;
     box-shadow: none;
   }
+  .frogType {
+    transition: transform .2s;
+    width: 128px;
+    display: block;
+    image-rendering: pixelated;
+    box-shadow: none;
+    border: none;
+  }
+  .frogType:hover{
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Safari 3-8 */
+    transform: scale(1.5);
+    box-shadow: none;
+    border: none;
+  }
+  .frogType2 {
+    border-radius: 5px;
+    border: 0px solid #e0e0e0;
+    overflow: hidden;
+    background-color: transparent;
+
+    width: 128px;
+    padding-top: 0px !important;
+    height: 100% !important;
+    display: inline-block !important;
+    margin-left: 0%;
+    margin-right: 0%;
+    margin-top: 2%;
+    margin-bottom: 0px;
+
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="./assets/logo.png">
@@ -341,16 +372,16 @@
           //
           newAttribute = document.createElement("a")
           newAttribute.id = "FrogButton"
-          newAttribute.className = "smallContainer2 pointer"
+          newAttribute.className = "frogType2 pointer"
           newAttribute.onClick = "loadFrogs()"
-          newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogImg2" src="./the-pad/Frog/unknown.png" alt="Frogs" id="Frog"><b>Frogs</b>'
+          newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogType" src="./the-pad/Frog/unknown.png" alt="Frogs" id="Frog"><b>Frogs</b>'
           document.getElementById("pre").appendChild(newAttribute)
           //
           //
           newAttribute = document.createElement("a")
           newAttribute.id = "SpecialFrogButton"
-          newAttribute.className = "smallContainer2 pointer"
-          newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogImg2" src="./the-pad/SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs"><b>SpecialFrogs</b>'
+          newAttribute.className = "frogType2 pointer"
+          newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogType" src="./the-pad/SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs"><b>SpecialFrogs</b>'
           document.getElementById("pre").appendChild(newAttribute)
           //
           //
@@ -463,13 +494,13 @@
         newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
         newAttribute.id = attribute
         newAttribute.target = "_blank"
-        newAttribute.className = "smallContainer2 pointer"
-        newAttribute.innerHTML = '<img class="frogImg2" src="./'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><b>'+attribute+'</b>'
+        newAttribute.className = "frogType2 pointer"
+        newAttribute.innerHTML = '<img class="frogType" src="./'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><b>'+attribute+'</b>'
         document.getElementById("pre").appendChild(newAttribute)
       }
       function loadFrogs() {
         // FROG
-        document.getElementById("pre").innerHTML = ""
+        //document.getElementById("pre").innerHTML = ""
         consoleOutput("\n")
         loadAttribute("Frog", "blueDartFrog")
         loadAttribute("Frog", "blueTreeFrog")
