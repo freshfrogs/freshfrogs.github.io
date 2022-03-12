@@ -369,25 +369,9 @@
         })
         document.querySelector("#listPrices").addEventListener("click", async (e) => {
          // consoleOutput("<br>"+"\n<strong>❯</strong> <strong><u>Maximum of ["+mintLimit+symbol+"] per Wallet</u></strong>")
-          //
-          newAttribute = document.createElement("a")
-          newAttribute.id = "FrogButton"
-          newAttribute.className = "frogType2 pointer"
-          newAttribute.onClick = "loadFrogs()"
-          newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogType" src="./the-pad/Frog/unknown.png" alt="Frogs" id="Frog"><b>Frogs</b>'
-          document.getElementById("pre").appendChild(newAttribute)
-          //
-          //
-          newAttribute = document.createElement("a")
-          newAttribute.id = "SpecialFrogButton"
-          newAttribute.className = "frogType2 pointer"
-          newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogType" src="./the-pad/SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs"><b>SpecialFrogs</b>'
-          document.getElementById("pre").appendChild(newAttribute)
-          //
-          //
-          //consoleOutput("<b><strong>> 808 Frogs</strong></b> available at... <b><strong>0.00 ΞETH</strong></b>")
-          //consoleOutput("<b><strong>> 1212 Frogs</strong></b> available at... <b><strong>0.02 ΞETH</strong></b>")
-          //consoleOutput("<b><strong>> 2020 Frogs</strong></b> available at... <b><strong>0.04 ΞETH</strong></b>")
+          consoleOutput("<b><strong>> 808 Frogs</strong></b> available at... <b><strong>0.00 ΞETH</strong></b>")
+          consoleOutput("<b><strong>> 1212 Frogs</strong></b> available at... <b><strong>0.02 ΞETH</strong></b>")
+          consoleOutput("<b><strong>> 2020 Frogs</strong></b> available at... <b><strong>0.04 ΞETH</strong></b>")
         })
         document.querySelector("#setInvite").addEventListener("click", async (e) => {
           mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
@@ -536,6 +520,9 @@
         loadAttribute("SpecialFrog", "inversedEyes")
         loadAttribute("SpecialFrog", "peace")
         loadAttribute("SpecialFrog", "thirdEye")
+      }
+      function loadFrogMenu(){
+
       }
 //
       function recentlyMinted(mostRecent) {
