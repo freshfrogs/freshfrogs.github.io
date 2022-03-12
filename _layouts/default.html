@@ -357,7 +357,7 @@
         }
 
         //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
-        document.getElementById("supply").innerHTML = "<h3><b><strong><a href='https://opensea.io/collection/fresh-frogs'>ℹ️ ("+nextIdC+"/4040) Total Supply</a></strong></b></h3>"
+        document.getElementById("supply").innerHTML = "<h3><b><strong><a style='color: #222 !important;' href='https://opensea.io/collection/fresh-frogs' target='_blank'>ℹ️ ("+nextIdC+"/4040) Total Supply</a></strong></b></h3>"
         document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
         document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
