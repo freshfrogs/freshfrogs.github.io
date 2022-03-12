@@ -380,9 +380,9 @@
         })
         document.querySelector("#listPrices").addEventListener("click", async (e) => {
          // consoleOutput("<br>"+"\n<strong>❯</strong> <strong><u>Maximum of ["+mintLimit+symbol+"] per Wallet</u></strong>")
-          consoleOutput("<b><strong>❯ 808 Frogs</strong></b> available at... <b><strong>0.00 ΞETH</strong></b>")
+          consoleOutput("<br>"+"<b><strong>❯ 808 Frogs</strong></b> available at... <b><strong>0.00 ΞETH</strong></b>")
           consoleOutput("<b><strong>❯ 1212 Frogs</strong></b> available at... <b><strong>0.02 ΞETH</strong></b>")
-          consoleOutput("<b><strong>❯ 2020 Frogs</strong></b> available at... <b><strong>0.04 ΞETH</strong></b>")
+          consoleOutput("<b><strong>❯ 2020 Frogs</strong></b> available at... <b><strong>0.04 ΞETH</strong></b>"+"<br>")
         })
         document.querySelector("#setInvite").addEventListener("click", async (e) => {
           mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
