@@ -456,6 +456,57 @@
         newLine.innerHTML = output
         document.getElementById("pre").appendChild(newLine)
       }
+//
+      //
+      function loadAttribute(trait, attribute) {
+        newAttribute = document.createElement("a")
+        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
+        newAttribute.id = attribute
+        newAttribute.target = "_blank"
+        newAttribute.className = "smallContainer2 pointer"
+        newAttribute.innerHTML = '<img class="frogImg2" src="./'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><b>'+attribute+'</b>'
+        document.getElementById("pre").appendChild(newAttribute)
+      }
+      function loadFrogs() {
+        // FROG
+        document.getElementById("pre").innerHTML = ""
+        consoleOutput("\n")
+        loadAttribute("Frog", "blueDartFrog")
+        loadAttribute("Frog", "blueTreeFrog")
+        loadAttribute("Frog", "brownTreeFrog")
+        loadAttribute("Frog", "cyanTreeFrog")
+        loadAttribute("Frog", "goldenDartFrog")
+        loadAttribute("Frog", "goldenTreeFrog")
+        loadAttribute("Frog", "grayTreeFrog")
+        loadAttribute("Frog", "greenTreeFrog")
+        loadAttribute("Frog", "lightBrownTreeFrog")
+        loadAttribute("Frog", "orangeTreeFrog")
+        loadAttribute("Frog", "pinkTreeFrog")
+        loadAttribute("Frog", "purpleTreeFrog")
+        loadAttribute("Frog", "redEyedTreeFrog")
+        loadAttribute("Frog", "splendidLeafFrog")
+        loadAttribute("Frog", "stawberryDartFrog")
+        loadAttribute("Frog", "tomatoFrog")
+        loadAttribute("Frog", "treeFrog(1)")
+        loadAttribute("Frog", "treeFrog(2)")
+        loadAttribute("Frog", "treeFrog(3)")
+        loadAttribute("Frog", "treeFrog(4)")
+        loadAttribute("Frog", "treeFrog(5)")
+        loadAttribute("Frog", "treeFrog(6)")
+        loadAttribute("Frog", "treeFrog(7)")
+        loadAttribute("Frog", "treeFrog(8)")
+        loadAttribute("Frog", "unknown")
+      }
+      function loadSpecialFrogs() {
+        document.getElementById("pre").innerHTML = ""
+        consoleOutput("\n")
+        loadAttribute("SpecialFrog", "closedEyes")
+        loadAttribute("SpecialFrog", "croaking")
+        loadAttribute("SpecialFrog", "inversedEyes")
+        loadAttribute("SpecialFrog", "peace")
+        loadAttribute("SpecialFrog", "thirdEye")
+      }
+//
       function recentlyMinted(mostRecent) {
         for(let i=1; i<=4; i++) {
           mostRecent2 = mostRecent - i
