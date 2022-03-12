@@ -298,14 +298,14 @@
         newAttribute.id = "FrogButton"
         newAttribute.className = "smallContainer2 pointer"
         newAttribute.onClick = "loadFrogs()"
-        newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogImg2" src="./Frog/unknown.png" alt="Frogs" id="Frog"><b><u>Frogs</b></u>'
+        newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogImg2" src="./Frog/unknown.png" alt="Frogs" id="Frog"><b>Frogs</b>'
         document.getElementById("pre").appendChild(newAttribute)
         //
         //
         newAttribute = document.createElement("a")
         newAttribute.id = "SpecialFrogButton"
         newAttribute.className = "smallContainer2 pointer"
-        newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogImg2" src="./SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs"><b><u>SpecialFrogs</b></u>'
+        newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogImg2" src="./SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs"><b>SpecialFrogs</b>'
         document.getElementById("pre").appendChild(newAttribute)
         //
         /*
@@ -360,7 +360,7 @@
         newAttribute.id = attribute
         newAttribute.target = "_blank"
         newAttribute.className = "smallContainer2 pointer"
-        newAttribute.innerHTML = '<img class="frogImg2" src="./'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><b><u>'+attribute+'</b></u>'
+        newAttribute.innerHTML = '<img class="frogImg2" src="./'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><b>'+attribute+'</b>'
         document.getElementById("pre").appendChild(newAttribute)
       }
       function loadFrogs() {
