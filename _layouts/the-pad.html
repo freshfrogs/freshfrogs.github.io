@@ -359,8 +359,8 @@
         newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
         newAttribute.id = attribute
         newAttribute.target = "_blank"
-        newAttribute.className = "smallContainer2"
-        newAttribute.innerHTML = '<img class="frogImg2" src="./'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><div class="desc" id="'+attribute+'">'+attribute+'</div>'
+        newAttribute.className = "smallContainer2 pointer"
+        newAttribute.innerHTML = '<img class="frogImg2" src="./'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><div class="desc" id="'+attribute+'"><b><u>'+attribute+'</b></u></div>'
         document.getElementById("pre").appendChild(newAttribute)
       }
       function loadFrogs() {
