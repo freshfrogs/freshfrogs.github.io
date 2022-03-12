@@ -362,6 +362,10 @@
         //recentlyMinted(nextIdC);
 
         //
+        loadFrogMenu();
+
+
+    // END OF LOADING PAGE ----------------------------------------->
      // EVENTS -------------------------------------------------------------------------------------------------------
         document.querySelector("#HTP").addEventListener("click", async (e) => {
           consoleOutput("<br>"+"<strong>❯</strong> The lowest possible gas fee will now be requested!")
@@ -522,7 +526,22 @@
         loadAttribute("SpecialFrog", "thirdEye")
       }
       function loadFrogMenu(){
-
+        //
+        newAttribute = document.createElement("a")
+        newAttribute.id = "FrogButton"
+        newAttribute.className = "frogType2 pointer"
+        newAttribute.onClick = "loadFrogs()"
+        newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogType" src="./the-pad/Frog/unknown.png" alt="Frogs" id="Frog"><b>Frogs</b>'
+        document.getElementById("pre").appendChild(newAttribute)
+        //
+        //
+        newAttribute = document.createElement("a")
+        newAttribute.id = "SpecialFrogButton"
+        newAttribute.className = "frogType2 pointer"
+        newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogType" src="./the-pad/SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs"><b>SpecialFrogs</b>'
+        document.getElementById("pre").appendChild(newAttribute)
+        //
+        //
       }
 //
       function recentlyMinted(mostRecent) {
