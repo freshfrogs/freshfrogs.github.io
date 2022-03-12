@@ -1,5 +1,5 @@
 ---
-layout: the-pad
+layout: road-map
 ---
 <title>Fresh Frogs NFT (FROG)</title>
 <h1 class="h1">Fresh Frogs NFT</h1><hr>
