@@ -397,7 +397,10 @@
                   for (var key in obj){
                     var value = obj[key];
                     //document.write("<br> - " + key + ": " + value);
-                    consoleOutput("<br> - " + key + ": " + value);
+                    //consoleOutput("<br> - " + key + ": " + value);
+                    //
+                    var result = obj.map(a => a.value);
+                    consoleOutput(result)
                   }
                 }
                 //
