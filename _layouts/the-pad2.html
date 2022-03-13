@@ -390,12 +390,15 @@
               var metadata2;
               (async () => {
                 metadata2 = await get()
-                //
-                //var mycars = [{name:'Susita'}, {name:'BMW'}];
-                for (var trait of metadata2) 
-                {
-                  consoleOutput(trait.attribute.trait_type + "<br />");
-                  consoleOutput(trait.attribute.value + "<br />");
+                for (var i = 0; i < metadata2.length; i++){
+                  //document.write("<br><br>array index: " + i);
+                  consoleOutput("<br><br>array index: " + i);
+                  var obj = metadata2[i];
+                  for (var key in obj){
+                    var value = obj[key];
+                    //document.write("<br> - " + key + ": " + value);
+                    consoleOutput("<br> - " + key + ": " + value);
+                  }
                 }
                 //
                 //consoleOutput(JSON.stringify(metadata2.attributes)); // JSON.stringify(metadata2.attributes.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', ''));
