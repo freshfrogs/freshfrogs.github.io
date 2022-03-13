@@ -397,7 +397,7 @@
                   //consoleOutput("<br><br>array index: " + i);
                   var data = metadata2.attributes[i]
                   //consoleOutput(data.trait_type+": <b>"+data.value+"</b>")
-                  loadAttribute(data.trait_type, data.value, 'OwnedFrog #'+metadata2.name)
+                  loadAttribute(data.trait_type, data.value, metadata2.name)
                   //
                 }
                 //
@@ -617,7 +617,7 @@
       function loadFreshFrog(freshFrog) {
         newFrog = document.createElement("a")
         newFrog.href = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+freshFrog
-        newFrog.id = "OwnedFrog #"+freshFrog
+        newFrog.id = "Frog #"+freshFrog
         newFrog.target = "_blank"
         newFrog.className = "smallContainer2"
         //newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+freshFrog+'.png" alt="Frog '+freshFrog+'" id="frog'+freshFrog+'">'
