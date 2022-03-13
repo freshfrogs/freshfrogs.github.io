@@ -390,10 +390,10 @@
               var metadata2;
               (async () => {
                 metadata2 = await get()
-                for (var i = 0; i < metadata2.length; i++){
+                for (var i = 0; i < metadata2.attributes.length; i++){
                   //document.write("<br><br>array index: " + i);
                   consoleOutput("<br><br>array index: " + i);
-                  var obj = metadata2[i];
+                  var obj = metadata2.attributes[i];
                   for (var key in obj){
                     var value = obj[key];
                     //document.write("<br> - " + key + ": " + value);
