@@ -56,12 +56,10 @@
     overflow: hidden;
     background-color: transparent;
     box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
-    padding: 1%;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: auto;
-    margin-bottom: auto;
-    width: 270px;
+    margin-left: 2%;
+    margin-right: 2%;
+    margin-top: 2%;
+    margin-bottom: 2%;
   }
   .headLine{
     color: transparent;
@@ -113,18 +111,6 @@
   .supply{
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
     color: #333;
-    height: 40px;
-    padding: 0;
-    background: #f4f4f4;
-    border-radius: 5px;
-    border: 1px solid #e0e0e0;
-    width: 270px;
-    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
-    margin-top: 6%;
-    margin-bottom: 4%;
-    margin-left: auto;
-    margin-right: auto;
-    vertical-align: center;
   }
   section {
     border: 4px solid white;
@@ -207,13 +193,10 @@
   .frogImg {
     transition: transform .2s;
     height: auto;
-    width: 101%;
     display: block;
     image-rendering: pixelated;
     box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
     overflow: hidden;
-    border-radius: 5px;
-    background-color: transparent;
   }
   .frogImg2 {
     transition: transform .2s;
@@ -373,7 +356,7 @@
         //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
         document.getElementById("supply").innerHTML = "<h3><b><strong><a style='color: #222 !important;' href='https://opensea.io/collection/fresh-frogs' target='_blank'>ℹ️ ("+nextIdC+"/4040) Total Supply</a></strong></b></h3>"
         document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
-        document.getElementById("mintTransact").innerHTML = "<strong>⛔MINT CLOSED</strong>" // ⛔LINK WALLET "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
+        document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
@@ -592,6 +575,7 @@
     <div class="wrapper">
       <header>
         <div class="downloads pre">
+          <div class="supply" id="supply"><h3><b><strong><a style="color: #222 !important;" href="https://opensea.io/collection/fresh-frogs" target="_blank">ℹ️ 4040 Total Supply</a></b></strong></h3></div>
           <ul class="downloads">
             <li><a id="mintTransact" href="" class="pointer"><strong>⛔LINK WALLET</strong></a></li>
             <li><a id="mintTotal"><strong>0.02 ΞETH</strong>Plus gas</a></li>
@@ -606,7 +590,6 @@
               <div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.github.io/assets/frogs/preview2.gif" /></div>
             </div>
           </div>
-          <div class="supply" id="supply"><b><strong><a style="color: #222 !important;" href="https://opensea.io/collection/fresh-frogs" target="_blank">ℹ️ 4040 Total Supply</a></b></strong></div>
         </div>
       </header>
       <section>
