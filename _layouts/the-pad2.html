@@ -274,6 +274,7 @@
     image-rendering: pixelated;
     box-shadow: none;
     border: none;
+    position: absolute;
   }
   .frogType:hover{
     -ms-transform: scale(1.25); /* IE 9 */
@@ -395,7 +396,8 @@
                   //document.write("<br><br>array index: " + i);
                   //consoleOutput("<br><br>array index: " + i);
                   var data = metadata2.attributes[i]
-                  consoleOutput(data.trait_type+": <b>"+data.value+"</b>")
+                  //consoleOutput(data.trait_type+": <b>"+data.value+"</b>")
+                  loadAttribute(data.trait_type, data.value, 'OwnedFrog #'+metadata2.name)
                   //
                 }
                 //
@@ -542,14 +544,14 @@
         document.getElementById("pre").appendChild(newLine)
       }
       // Load attribute
-      function loadAttribute(trait, attribute) {
+      function loadAttribute(trait, attribute, where) {
         newAttribute = document.createElement("a")
         newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
         newAttribute.id = attribute
         newAttribute.target = "_blank"
         newAttribute.className = "frogType2 pointer"
         newAttribute.innerHTML = '<img class="frogType" src="./the-pad/'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><b>'+attribute+'</b>'
-        document.getElementById("pre").appendChild(newAttribute)
+        document.getElementById(where).appendChild(newAttribute)
       }
       // Load FROG Types
       function loadFrogs() {
@@ -617,7 +619,7 @@
         newFrog.id = "OwnedFrog #"+freshFrog
         newFrog.target = "_blank"
         newFrog.className = "smallContainer2"
-        newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+freshFrog+'.png" alt="Frog '+freshFrog+'" id="frog'+freshFrog+'">'
+        //newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+freshFrog+'.png" alt="Frog '+freshFrog+'" id="frog'+freshFrog+'">'
         document.getElementById("pre").appendChild(newFrog)
       }
       // Load recent mints
