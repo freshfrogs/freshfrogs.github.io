@@ -589,24 +589,6 @@
       function randomNumber(min, max) {
         return Math.random() * (max - min) + min;
       }
-      //
-      // Load Owned Frogs
-      function loadOwnedFrogs() {
-        let snapshot = []
-        let i = 1;
-        consoleOutput(userAcc+" Tokens Held")
-        while(true) {
-          try {
-            let owner = await collection.methods.ownerOf(i++).call()
-            if (userAcc === owner.toLowerCase()) {
-              consoleOutput(i-1)
-            }
-          } catch (e) {
-            break;
-            consoleOutput("done")
-          }
-        }
-      }
       // Load Certain FROG
       function loadFreshFrog(freshFrog) {
         newFrog = document.createElement("a")
