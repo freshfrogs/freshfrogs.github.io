@@ -394,14 +394,8 @@
                   //document.write("<br><br>array index: " + i);
                   //consoleOutput("<br><br>array index: " + i);
                   var obj = metadata2.attributes[i];
-                  for (var key in obj){
-                    var value = obj[key];
-                    //document.write("<br> - " + key + ": " + value);
-                    //consoleOutput("<br> - " + key + ": " + value);
-                    //
-                    var result = obj.map(a => a.value);
+                  var result = obj.map(a => a.value);
                     consoleOutput(result)
-                  }
                 }
                 //
                 //consoleOutput(JSON.stringify(metadata2.attributes)); // JSON.stringify(metadata2.attributes.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', ''));
