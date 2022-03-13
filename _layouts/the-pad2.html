@@ -378,7 +378,7 @@
             if (userAcc === owner.toLowerCase()) {
               //consoleOutput(i-1)
               loadFreshFrog(i-1)
-              //
+              //Load Metadata
               let tokenURI = await collection.methods.tokenURI(i-1).call()
               let cid = tokenURI.replace("ipfs://", "")
               let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
@@ -390,7 +390,14 @@
               var metadata2;
               (async () => {
                 metadata2 = await get()
-                consoleOutput(JSON.stringify(metadata2.attributes)); // JSON.stringify(metadata2.attributes.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', ''));
+                //
+                //var mycars = [{name:'Susita'}, {name:'BMW'}];
+                for (var trait of metadata2) 
+                {
+                  consoleOutput(trait.attribute.trait_type + "<br />");
+                }
+                //
+                //consoleOutput(JSON.stringify(metadata2.attributes)); // JSON.stringify(metadata2.attributes.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', ''));
               })()
             }
           } catch (e) {
