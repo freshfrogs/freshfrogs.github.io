@@ -599,7 +599,7 @@
           try {
             let owner = await collection.methods.ownerOf(i++).call()
             if (userAcc === owner.toLowerCase()) {
-              loadFreshFrog(i-1)
+              consoleOutput(i-1)
             }
           } catch (e) {
             break;
