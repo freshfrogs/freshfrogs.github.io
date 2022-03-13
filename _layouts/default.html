@@ -566,7 +566,8 @@
           newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+mostRecent2+'.png" alt="Frog '+mostRecent2+'" id="frog'+i+'">FROG #'+mostRecent2
           document.getElementById("pre").appendChild(newFrog)
         }
-        consoleOutput("<a id='loadRecentMints' class='pointer'><u>Load More</u></a></b>");
+        consoleOutput("<a id='loadRecentMints' class='pointer' href=''><u>Load More</u></a></b>");
+        document.getElementById("loadRecentMints").removeAttribute('href');
       }
       //    {% include head-custom.html %}
     </script>
