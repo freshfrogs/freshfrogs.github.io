@@ -379,10 +379,11 @@
           highPriority = 0;
         })
         document.querySelector("#listPrices").addEventListener("click", async (e) => {
+          recentlyMinted(nextIdC-1);
          // consoleOutput("<br>"+"\n<strong>❯</strong> <strong><u>Maximum of ["+mintLimit+symbol+"] per Wallet</u></strong>")
-          consoleOutput("<br>"+"<strong>❯ 808 Frogs</strong> available at... <strong>0.00 ΞETH</strong>")
-          consoleOutput("<strong>❯ 1212 Frogs</strong> available at... <strong>0.02 ΞETH</strong>")
-          consoleOutput("<strong>❯ 2020 Frogs</strong> available at... <strong>0.04 ΞETH</strong>"+"<br>")
+          //consoleOutput("<br>"+"<strong>❯ 808 Frogs</strong> available at... <strong>0.00 ΞETH</strong>")
+          //consoleOutput("<strong>❯ 1212 Frogs</strong> available at... <strong>0.02 ΞETH</strong>")
+          //consoleOutput("<strong>❯ 2020 Frogs</strong> available at... <strong>0.04 ΞETH</strong>"+"<br>")
         })
         document.querySelector("#setInvite").addEventListener("click", async (e) => {
           mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
@@ -552,6 +553,7 @@
       }
 //
       function recentlyMinted(mostRecent) {
+        document.getElementById("pre").innerHTML = ""
         for(let i=1; i<=4; i++) {
           mostRecent2 = mostRecent - i
           mostRecentDesc = "frog"+i+"Desc"
@@ -564,7 +566,7 @@
           newFrog.target = "_blank"
           newFrog.className = "smallContainer2"
           newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+mostRecent2+'.png" alt="Frog '+mostRecent2+'" id="frog'+i+'"><div class="desc" id="'+mostRecentDesc+'"><strong>Frog #'+mostRecent2+'</strong></div>'
-          //document.getElementById("recentMints").appendChild(newFrog)
+          document.getElementById("pre").appendChild(newFrog)
         }
       }
       //    {% include head-custom.html %}
