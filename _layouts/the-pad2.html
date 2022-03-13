@@ -288,16 +288,11 @@
     border: 0px solid #e0e0e0;
     overflow: hidden;
     background-color: transparent;
-
     width: 128px;
     padding-top: 0px !important;
     height: 100% !important;
     display: inline-block !important;
-    margin-left: 0%;
-    margin-right: 0%;
-    margin-top: 2%;
-    margin-bottom: 0px;
-
+    position: absolute;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -553,47 +548,6 @@
         newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
         newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
-      }
-      // Load FROG Types
-      function loadFrogs() {
-        // FROG
-        document.getElementById("pre").innerHTML = "<h2>Frog Types</h2>"
-        //consoleOutput("\n")
-        loadAttribute("Frog", "blueDartFrog")
-        loadAttribute("Frog", "blueTreeFrog")
-        loadAttribute("Frog", "brownTreeFrog")
-        loadAttribute("Frog", "cyanTreeFrog")
-        loadAttribute("Frog", "goldenDartFrog")
-        loadAttribute("Frog", "goldenTreeFrog")
-        loadAttribute("Frog", "grayTreeFrog")
-        loadAttribute("Frog", "greenTreeFrog")
-        loadAttribute("Frog", "lightBrownTreeFrog")
-        loadAttribute("Frog", "orangeTreeFrog")
-        loadAttribute("Frog", "pinkTreeFrog")
-        loadAttribute("Frog", "purpleTreeFrog")
-        loadAttribute("Frog", "redEyedTreeFrog")
-        loadAttribute("Frog", "splendidLeafFrog")
-        loadAttribute("Frog", "stawberryDartFrog")
-        loadAttribute("Frog", "tomatoFrog")
-        loadAttribute("Frog", "treeFrog(1)")
-        loadAttribute("Frog", "treeFrog(2)")
-        loadAttribute("Frog", "treeFrog(3)")
-        loadAttribute("Frog", "treeFrog(4)")
-        loadAttribute("Frog", "treeFrog(5)")
-        loadAttribute("Frog", "treeFrog(6)")
-        loadAttribute("Frog", "treeFrog(7)")
-        loadAttribute("Frog", "treeFrog(8)")
-        loadAttribute("Frog", "unknown")
-      }
-      // Load special FROG Types
-      function loadSpecialFrogs() {
-        document.getElementById("pre").innerHTML = "<h2>Special Frogs</h2>"
-        //consoleOutput("\n")
-        loadAttribute("SpecialFrog", "closedEyes")
-        loadAttribute("SpecialFrog", "croaking")
-        loadAttribute("SpecialFrog", "inversedEyes")
-        loadAttribute("SpecialFrog", "peace")
-        loadAttribute("SpecialFrog", "thirdEye")
       }
       // Load FROG Menu
       function loadFrogMenu(){
