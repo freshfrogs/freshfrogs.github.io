@@ -596,7 +596,7 @@
           try {
             let owner = await collection.methods.ownerOf(i++).call()
             if (userAcc === owner.toLowerCase()) {
-              consoleOutput(i-1)
+              loadFreshFrog(i-1)
             }
           } catch (e) {
             break;
@@ -604,6 +604,15 @@
           }
         }
       }
+      // Load Certain FROG
+      function loadFreshFrog(freshFrog) {
+        newFrog = document.createElement("a")
+        newFrog.href = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+freshFrog
+        newFrog.id = mostRecentLink
+        newFrog.target = "_blank"
+        newFrog.className = "smallContainer2"
+        newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+freshFrog+'.png" alt="Frog '+freshFrog+'" id="frog'+freshFrog+'">'
+        document.getElementById("pre").appendChild(newFrog)
       // Load recent mints
       function recentlyMinted(mostRecent) {
         for(let i=1; i<=24; i++) {
@@ -617,7 +626,6 @@
           newFrog.id = mostRecentLink
           newFrog.target = "_blank"
           newFrog.className = "smallContainer2"
-          newFrog.width = randomNumber(64, 128)+"px"
           newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+mostRecent2+'.png" alt="Frog '+mostRecent2+'" id="frog'+i+'">'
           document.getElementById("pre").appendChild(newFrog)
         }
