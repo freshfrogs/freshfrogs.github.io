@@ -291,12 +291,10 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-6PB0WKB4SH');
       document.addEventListener("DOMContentLoaded", async () => {
         const web3 = new Web3(window.ethereum)
         const f0 = new F0();
-        //recentlyMinted(580)
         var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
         var collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
         try {
@@ -382,11 +380,7 @@
 
         // View Collection -- Load Recent Mints
         document.querySelector("#loadRecentMints").addEventListener("click", async (e) => {
-          if (mostRecent2 !== 'undefined') {
-            recentlyMinted(mostRecent2);
-          } else {
-            recentlyMinted(nextIdC-1)
-          }
+          recentlyMinted(nextIdC-1)
         })
         // Apply -- Apply Invite
         document.querySelector("#setInvite").addEventListener("click", async (e) => {
