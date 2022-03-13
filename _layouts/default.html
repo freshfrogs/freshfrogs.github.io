@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <style>
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&display=swap");
+
 .containerTimeline {
   min-height: 100vh;
   width: 100%;
@@ -9,7 +11,6 @@
   padding: 100px 0;
   background-color: transparent;
   margin: 0;
-  margin-top: 0px !important;
   padding: 0;
   box-sizing: border-box;
 }
@@ -32,7 +33,8 @@
 }
 .timeline ul li {
   padding: 20px;
-  background-color: transparent;
+  background-color: rgb(150, 146, 146);
+  color: #1e1f22;
   border-radius: 10px;
   margin-bottom: 20px;
   margin: 0;
@@ -46,6 +48,8 @@
   box-sizing: border-box;
 }
 .timeline-content h1 {
+  font-weight: 500;
+  font-size: 25px;
   line-height: 30px;
   margin-bottom: 10px;
   margin: 0;
@@ -53,12 +57,16 @@
   box-sizing: border-box;
 }
 .timeline-content p {
+  font-size: 16px;
   line-height: 30px;
+  font-weight: 300;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 .timeline-content .date {
+  font-size: 12px;
+  font-weight: 300;
   margin-bottom: 10px;
   letter-spacing: 2px;
   margin: 0;
@@ -74,7 +82,7 @@
     transform: translateX(-50%);
     width: 2px;
     height: 100%;
-    background-color: black;
+    background-color: gray;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -111,7 +119,7 @@
     height: 20px;
     width: 20px;
     border-radius: 50%;
-    background-color: black;
+    background-color: gray;
     top: 0px;
     margin: 0;
     padding: 0;
@@ -746,35 +754,27 @@
             <div id="netStatus">Please connect an Ethereum wallet... <b><a class="pointer" href="https://freshfrogs.github.io/">Connect</a></b><br>Don't have a wallet?... <b><a class="pointer" href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b></div>
           </div>
           <br>
+          <div>
+            <div id="recentMints">
+            </div>
+          </div>
+          <br>
+
           <div class="containerTimeline">
             <div class="timeline">
               <ul>
                 <li>
                   <div class="timeline-content">
-                    <h3 class="date">20th may, 2010</h3>
-                    <h1>Heading 1</h1>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consectetur tempora ab laudantium voluptatibus aut eos placeat laborum, quibusdam exercitationem labore.</p>
+                    <h3 class="date">11th Febuary, 2022</h3>
+                    <h1>Phase I</h1>
+                    <p>Free Mint. We had over 580 Frogs minted with over 100 different owners!</p>
                   </div>
                 </li>
                 <li>
                   <div class="timeline-content">
-                    <h3 class="date">20th may, 2010</h3>
-                    <h1>Heading 2</h1>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consectetur tempora ab laudantium voluptatibus aut eos placeat laborum, quibusdam exercitationem labore.</p>
-                  </div>
-                </li>
-                <li>
-                  <div class="timeline-content">
-                    <h3 class="date">20th may, 2010</h3>
-                    <h1>Heading 3</h1>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consectetur tempora ab laudantium voluptatibus aut eos placeat laborum, quibusdam exercitationem labore.</p>
-                  </div>
-                </li>
-                <li>
-                  <div class="timeline-content">
-                    <h3 class="date">20th may, 2010</h3>
-                    <h1>Heading 4</h1>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consectetur tempora ab laudantium voluptatibus aut eos placeat laborum, quibusdam exercitationem labore.</p>
+                    <h3 class="date">18th March, 2022</h3>
+                    <h1>Phase II</h1>
+                    <p>Secondary release; 1,212 Frogs available at 0.02 Eth</p>
                   </div>
                 </li>
               </ul>
