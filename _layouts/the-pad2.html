@@ -317,6 +317,7 @@
         consoleOutput("test")
         const web3 = new Web3(window.ethereum)
         const f0 = new F0();
+        var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
         consoleOutput("test")
         try {
           await f0.init({
@@ -329,11 +330,9 @@
             consoleOutput("<br>"+"\n<strong><b>Error: "+e.message+"</b></strong>")
         }
         consoleOutput("test")
-        var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
-        var collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
         let userAcc = web3.currentProvider.selectedAddress;
         let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
-
+        let collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
         let name = await f0.api.name().call()
         let symbol = await f0.api.symbol().call()
         let nextId = await f0.api.nextId().call()
