@@ -378,10 +378,19 @@
             if (userAcc === owner.toLowerCase()) {
               //consoleOutput(i-1)
               loadFreshFrog(i-1)
-              var metadataFinal;
+              //
+              let tokenURI = await collection.methods.tokenURI(i-1).call()
+              let cid = tokenURI.replace("ipfs://", "")
+              let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
+              async function get() {
+                let metadata = await (await fetch(ipfsGatewayURI)).json();
+                //console.log(obj);
+                return metadata;
+              }
+              var metadata2;
               (async () => {
-                metadataFinal = await getFrogData(i-1)
-                consoleOutput(JSON.stringify(metadataFinal.attributes)); // JSON.stringify(metadata2.attributes.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', ''));
+                metadata2 = await get()
+                consoleOutput(JSON.stringify(metadata2.attributes)); // JSON.stringify(metadata2.attributes.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', ''));
               })()
             }
           } catch (e) {
@@ -591,14 +600,6 @@
       // Random Number
       function randomNumber(min, max) {
         return Math.random() * (max - min) + min;
-      }
-      // Load metadata
-      async function getFrogData(tokenId) {
-        let tokenURI = await collection.methods.tokenURI(tokenId).call()
-        let cid = tokenURI.replace("ipfs://", "")
-        let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
-        let metadata = await (await fetch(ipfsGatewayURI)).json();
-        return metadata;
       }
       // Load Certain FROG
       function loadFreshFrog(freshFrog) {
