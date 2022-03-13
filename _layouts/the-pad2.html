@@ -394,8 +394,9 @@
                   //document.write("<br><br>array index: " + i);
                   //consoleOutput("<br><br>array index: " + i);
                   var obj = metadata2.attributes[i];
-                  var result = obj.map(a => a.value);
-                    consoleOutput(result)
+                  var value = obj.map(a => a.value);
+                  var trait = obj.map(a => a.trait_type);
+                  consoleOutput(trait+": "+value)
                 }
                 //
                 //consoleOutput(JSON.stringify(metadata2.attributes)); // JSON.stringify(metadata2.attributes.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', ''));
