@@ -552,7 +552,6 @@
       }
       // Load recent mints
       function recentlyMinted(mostRecent) {
-        document.getElementById("pre").innerHTML = "<h2>Recent Mints</h2><b><a id='loadRecentMints' class='pointer'><u>Load More</u></a></b>"
         for(let i=1; i<=12; i++) {
           mostRecent2 = mostRecent - i
           mostRecentDesc = "frog"+i+"Desc"
@@ -567,6 +566,7 @@
           newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+mostRecent2+'.png" alt="Frog '+mostRecent2+'" id="frog'+i+'">FROG #'+mostRecent2
           document.getElementById("pre").appendChild(newFrog)
         }
+        consoleOutput("<a id='loadRecentMints' class='pointer'><u>Load More</u></a></b>");
       }
       //    {% include head-custom.html %}
     </script>
