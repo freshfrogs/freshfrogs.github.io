@@ -369,6 +369,7 @@
         document.getElementById("mintTransact").innerHTML = "<strong>⛔MINT CLOSED</strong>" // "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
+        loadOwnedFrogs();
      //   document.getElementById("addFrog").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
         //document.getElementById("recentMints").innerHTML = ""
         //document.getElementById("loadRecentMints2").removeAttribute("href")
@@ -586,6 +587,33 @@
       // Random Number
       function randomNumber(min, max) {
         return Math.random() * (max - min) + min;
+      }
+      //
+      // Load Owned Frogs
+      function loadOwnedFrogs() {
+        let i = 1;
+        consoleOutput(userAcc+" Tokens Held")
+        while(true) {
+          try {
+            let owner = await collection.methods.ownerOf(i++).call()
+            if (userAcc === owner.toLowerCase()) {
+              loadFreshFrog(i-1)
+            }
+          } catch (e) {
+            break;
+            consoleOutput("done")
+          }
+        }
+      }
+      // Load Certain FROG
+      function loadFreshFrog(freshFrog) {
+        newFrog = document.createElement("a")
+        newFrog.href = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+freshFrog
+        newFrog.id = mostRecentLink
+        newFrog.target = "_blank"
+        newFrog.className = "smallContainer2"
+        newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+freshFrog+'.png" alt="Frog '+freshFrog+'" id="frog'+freshFrog+'">'
+        document.getElementById("pre").appendChild(newFrog)
       }
       // Load recent mints
       function recentlyMinted(mostRecent) {
