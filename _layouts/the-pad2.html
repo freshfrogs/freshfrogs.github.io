@@ -584,10 +584,6 @@
         newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogType" src="./the-pad/SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs"><b>SpecialFrogs</b>'
         document.getElementById("pre").appendChild(newAttribute)
       }
-      // Random Number
-      function randomNumber(min, max) {
-        return Math.random() * (max - min) + min;
-      }
       // Load Owned Frogs
       function loadOwnedFrogs() {
         let i = 1;
@@ -613,6 +609,7 @@
         newFrog.className = "smallContainer2"
         newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+freshFrog+'.png" alt="Frog '+freshFrog+'" id="frog'+freshFrog+'">'
         document.getElementById("pre").appendChild(newFrog)
+      }
       // Load recent mints
       function recentlyMinted(mostRecent) {
         for(let i=1; i<=24; i++) {
