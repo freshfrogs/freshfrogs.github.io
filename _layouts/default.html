@@ -318,7 +318,7 @@
         let nextId = await f0.api.nextId().call()
         let nextIdC = parseInt(nextId)
         let highPriority = 1 // low gas or high gas? low gas = 0 / high gas = 1
-
+        let mostRecent2 = nextIdC - 1
         let nextToken = await f0.get(nextId);
         let mintPrice = "0.02"
         let mintAmmount = 1 // number to mint
@@ -380,7 +380,7 @@
 
         // View Collection -- Load Recent Mints
         document.querySelector("#loadRecentMints").addEventListener("click", async (e) => {
-          recentlyMinted(nextIdC-1)
+          recentlyMinted(mostRecent2)
         })
         // Apply -- Apply Invite
         document.querySelector("#setInvite").addEventListener("click", async (e) => {
