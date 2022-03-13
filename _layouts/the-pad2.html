@@ -395,10 +395,7 @@
                   //consoleOutput("<br><br>array index: " + i);
                   metadata2 = await get()
                   var data = metadata2.attributes[i]
-                  consoleOutput(data)
-                  var trait = data.map(a => a.trait_type);
-                  var value = data.map(a => a.value);
-                  consoleOutput(trait+": "+value)
+                  consoleOutput(data.trait_type+": "+data.value)
                   //
                 }
                 //
