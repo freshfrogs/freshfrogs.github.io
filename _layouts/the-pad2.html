@@ -390,10 +390,17 @@
               var metadata2;
               (async () => {
                 metadata2 = await get()
-                var data = metadata2.attributes
-                var trait = data.map(a => a.trait_type);
-                var value = data.map(a => a.value);
-                consoleOutput(trait+": "+value)
+                for (var i = 0; i < metadata2.attributes.length; i++){
+                  //document.write("<br><br>array index: " + i);
+                  //consoleOutput("<br><br>array index: " + i);
+                  metadata2 = await get()
+                  var data = metadata2.attributes
+                  var trait = data.map(a => a.trait_type[i]);
+                  var value = data.map(a => a.value[i]);
+                  consoleOutput(trait+": "+value)
+                  //
+                }
+                //
                 //consoleOutput(JSON.stringify(metadata2.attributes)); // JSON.stringify(metadata2.attributes.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', ''));
               })()
             }
