@@ -545,12 +545,8 @@
       }
       // Load attribute
       function loadAttribute(trait, attribute, where) {
-        newAttribute = document.createElement("a")
-        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
-        newAttribute.id = attribute
-        newAttribute.target = "_blank"
-        newAttribute.className = "frogType2 pointer"
-        newAttribute.innerHTML = '<img class="frogType" src="https://freshfrogs.github.io/the-pad/'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><b>'+attribute+'</b>'
+        documentPlace = document.getElementById(where)
+        documentPlace.innerHTML = '<img class="frogType" src="https://freshfrogs.github.io/the-pad/'+trait+'/'+attribute+'.png" alt="'+attribute+'"">'
         document.getElementById(where).appendChild(newAttribute)
       }
       // Load FROG Types
