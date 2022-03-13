@@ -380,7 +380,7 @@
         })
         
         document.querySelector("#loadRecentMints").addEventListener("click", async (e) => {
-          if (typeof mostRecent2 !== 'undefined') {
+          if (mostRecent2 !== 'undefined') {
             recentlyMinted(nextIdC-1)
           } else {
             recentlyMinted(mostRecent2);
