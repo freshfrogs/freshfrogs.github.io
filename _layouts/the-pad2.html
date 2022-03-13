@@ -378,7 +378,7 @@
             if (userAcc === owner.toLowerCase()) {
               //consoleOutput(i-1)
               loadFreshFrog(i-1)
-              var metadata;
+              var metadataFinal;
               (async () => {
                 metadataFinal = await getFrogData(i-1)
                 consoleOutput(JSON.stringify(metadataFinal.attributes)); // JSON.stringify(metadata2.attributes.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', ''));
