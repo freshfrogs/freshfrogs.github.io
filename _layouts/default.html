@@ -373,12 +373,14 @@
 
 
     // END OF LOADING PAGE ----------------------------------------->
-     // EVENTS -------------------------------------------------------------------------------------------------------
+     // EVENTS ------------------------------------------------------------------------------------------------------->
+        // Set safeLow -- Set suggested gas fee to lowest setting
         document.querySelector("#HTP").addEventListener("click", async (e) => {
           consoleOutput("<br>"+"<strong>❯</strong> The lowest possible gas fee will now be requested!")
           highPriority = 0;
         })
-        
+
+        // View Collection -- Load Recent Mints
         document.querySelector("#loadRecentMints").addEventListener("click", async (e) => {
           if (mostRecent2 !== 'undefined') {
             recentlyMinted(mostRecent2);
@@ -386,6 +388,7 @@
             recentlyMinted(nextIdC-1)
           }
         })
+        // Apply -- Apply Invite
         document.querySelector("#setInvite").addEventListener("click", async (e) => {
           mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
           mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
@@ -393,6 +396,7 @@
           consoleOutput("<br>"+"\n<strong>❯</strong> [ ! ] Invite code applied... Valid for <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>")
           document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
         })
+        // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           if (mintProgress == 1 || mint === 0 ) {
             if (mint === 0) {
@@ -427,6 +431,7 @@
             consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>")
           }
         })
+        // Remove FROG from minting tray
         document.querySelector("#removeFrog").addEventListener("click", async (e) => {
           if (frogCount >= 7) {
             var select = document.getElementById("frogContainer");
@@ -448,6 +453,7 @@
           document.getElementById("frogQuant").innerHTML = "  "+frogCount+"  "
           document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
         })
+        // ADD FROG to minting tray
         document.querySelector("#addFrog").addEventListener("click", async (e) => {
           if (frogCount <= 2) {
             newFrog = document.createElement("div")
@@ -479,13 +485,13 @@
           document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
         })
       })
+      // Output to minting terminal
       function consoleOutput(output) {
         newLine = document.createElement("div")
         newLine.innerHTML = output
         document.getElementById("pre").appendChild(newLine)
       }
-//
-      //
+      // Load attribute
       function loadAttribute(trait, attribute) {
         newAttribute = document.createElement("a")
         newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
@@ -495,6 +501,7 @@
         newAttribute.innerHTML = '<img class="frogType" src="./the-pad/'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><b>'+attribute+'</b>'
         document.getElementById("pre").appendChild(newAttribute)
       }
+      // Load FROG Types
       function loadFrogs() {
         // FROG
         document.getElementById("pre").innerHTML = "<h2>Frog Types</h2>"
@@ -525,6 +532,7 @@
         loadAttribute("Frog", "treeFrog(8)")
         loadAttribute("Frog", "unknown")
       }
+      // Load special FROG Types
       function loadSpecialFrogs() {
         document.getElementById("pre").innerHTML = "<h2>Special Frogs</h2>"
         //consoleOutput("\n")
@@ -534,25 +542,21 @@
         loadAttribute("SpecialFrog", "peace")
         loadAttribute("SpecialFrog", "thirdEye")
       }
+      // Load FROG Menu
       function loadFrogMenu(){
-        //
         newAttribute = document.createElement("a")
         newAttribute.id = "FrogButton"
         newAttribute.className = "frogType2 pointer"
         newAttribute.onClick = "loadFrogs()"
         newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogType" src="./the-pad/Frog/unknown.png" alt="Frogs" id="Frog"><b>Frogs</b>'
         document.getElementById("pre").appendChild(newAttribute)
-        //
-        //
         newAttribute = document.createElement("a")
         newAttribute.id = "SpecialFrogButton"
         newAttribute.className = "frogType2 pointer"
         newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogType" src="./the-pad/SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs"><b>SpecialFrogs</b>'
         document.getElementById("pre").appendChild(newAttribute)
-        //
-        //
       }
-//
+      // Load recent mints
       function recentlyMinted(mostRecent) {
         document.getElementById("pre").innerHTML = "<h3>Recently Minted</h3><a id='loadRecentMints' class='pointer' href=''><u>Load More</u></a>"
         for(let i=1; i<=12; i++) {
