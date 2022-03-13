@@ -186,7 +186,6 @@
     -moz-box-flex: 1;
     box-flex: 1;
   }
-
   .frogImg {
     transition: transform .2s;
     height: auto;
@@ -559,7 +558,7 @@
           newFrog.id = mostRecentLink
           newFrog.target = "_blank"
           newFrog.className = "smallContainer2"
-          newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+mostRecent2+'.png" alt="Frog '+mostRecent2+'" id="frog'+i+'"><p><strong>FROG #'+mostRecent2+'</strong></p>'
+          newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+mostRecent2+'.png" alt="Frog '+mostRecent2+'" id="frog'+i+'"><a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+mostRecent2+'"><strong>FROG #'+mostRecent2+'</strong></a>'
           document.getElementById("pre").appendChild(newFrog)
         }
         consoleOutput("<a id='loadRecentMints2' class='pointer' onclick='recentlyMinted("+mostRecent2+")'><u>Load More</u></a></b>");
