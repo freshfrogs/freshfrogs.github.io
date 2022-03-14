@@ -385,7 +385,7 @@
         while(true) {
           try {
             let owner = await collection.methods.ownerOf(i++).call()
-            document.getElementById("progress").innerHTML = i
+            document.getElementById("progress").innerHTML = (i/nextIdC)+"%"
             if (userAcc === owner.toLowerCase()) {
               //consoleOutput(i-1)
               let thisFrogRender = i-1
