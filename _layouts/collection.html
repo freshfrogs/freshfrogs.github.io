@@ -387,6 +387,9 @@
               let owner = await collection.methods.ownerOf(i++).call()
               //consoleOutput(i-1)
               let thisFrogRender = i-1
+              if (thisFrogRender >= 10){
+                break;
+              }
               loadFreshFrog(thisFrogRender)
               //Load Metadata
               let tokenURI = await collection.methods.tokenURI(i-1).call()
