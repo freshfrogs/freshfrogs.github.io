@@ -417,8 +417,13 @@
               })()
             }
           } catch (e) {
-            document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"+"Compiling Tokens... Done ✅ "+ownedFrogs+" FROGs found!"
-            break;
+            if (ownedFrogs >= 1) { // FROGS!
+              document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"+"Compiling Tokens... Done ✅ "+ownedFrogs+" FROGs found!"
+              break;
+            } else { // ❌ No FROGS
+              document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"+"Compiling Tokens... Done ❌ "+ownedFrogs+" FROGs found!"
+              break;
+            }
           }
         }
        // loadOwnedFrogs();
