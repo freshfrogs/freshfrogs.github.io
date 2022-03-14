@@ -384,7 +384,7 @@
         //consoleOutput("Scanning Tokens... Please wait... ⌛")
         while(true) {
           try {
-            let owner = await collection.methods.ownerOf(i++).call()
+              let owner = await collection.methods.ownerOf(i++).call()
               //consoleOutput(i-1)
               let thisFrogRender = i-1
               loadFreshFrog(thisFrogRender)
@@ -400,7 +400,11 @@
               var metadata2;
               (async () => {
                 metadata2 = await get()
-                consoleOutput("<strong><u>"+metadata2.name+"</u></strong> ✅\n");
+                if (userAcc === owner.toLowerCase()) {
+                  consoleOutput("<strong><u>"+metadata2.name+"</u></strong> ✅\n");
+                } else {
+                  consoleOutput("<strong><u>"+metadata2.name+"</u></strong>\n");
+                }
                 openseaLink = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+thisFrogRender+""
                 consoleOutput('<a target="_blank" href="'+openseaLink+'">View on OpenSea ↗️</a><hr class="hr2">')
                 for (var i = 0; i < metadata2.attributes.length; i++){
