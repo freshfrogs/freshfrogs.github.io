@@ -472,7 +472,7 @@
         while(true) {
           try {
               let owner = await collection.methods.ownerOf(i++).call()
-              document.getElementById("progress").innerHTML = " "+i+"/"+nextIdC+" "
+              document.getElementById("progress").innerHTML = " "+i+" / "+nextIdC+" "
               //consoleOutput(i-1)
               let thisFrogRender = i-1
               loadFreshFrog(thisFrogRender)
