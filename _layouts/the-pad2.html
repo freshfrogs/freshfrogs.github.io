@@ -512,27 +512,47 @@
         document.getElementById(where).innerHTML = ""
         // Generate Frog
         Frog = Math.floor((Math.random() * 25) + 1);
-        
+        if (Frog => 90){
+
+        } else {
+
+        }
+
         loadAttribute("Generate/Frog", Frog, where)
 
         // Generate Trait
-        Trait = Math.floor((Math.random() * 18) + 0);
+        Trait = Math.floor((Math.random() * 100) + 0); // 18
+        if (Trait => 19){
+          Trait = 0;
+        }
         loadAttribute("Generate/Trait", Trait, where)
 
         //Generate Accessory
-        Accessory = Math.floor((Math.random() * 4) + 0);
+        Accessory = Math.floor((Math.random() * 100) + 0); // 4
+        if (Accessory => 5){
+          Accessory = 0;
+        }
         loadAttribute("Generate/Accessory", Accessory, where)
 
         // Generate Eyes
-        Eyes = Math.floor((Math.random() * 8) + 0);
+        Eyes = Math.floor((Math.random() * 100) + 0); // 8
+        if (Eyes => 9){
+          Eyes = 0;
+        }
         loadAttribute("Generate/Eyes", Eyes, where)
 
         // Generate Hat
-        Hat = Math.floor((Math.random() * 15) + 0);
+        Hat = Math.floor((Math.random() * 100) + 0); // 15
+        if (Hat => 16){
+          Hat = 0;
+        }
         loadAttribute("Generate/Hat", Hat, where)
 
         // Generate Mouth
-        Mouth = Math.floor((Math.random() * 10) + 0);
+        Mouth = Math.floor((Math.random() * 100) + 0); // 10
+        if (Mouth => 11){
+          Mouth = 0;
+        }
         loadAttribute("Generate/Mouth", Mouth, where)
       }
       // Load recent mints
