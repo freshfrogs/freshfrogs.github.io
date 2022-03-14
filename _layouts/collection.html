@@ -484,7 +484,7 @@
         while(true) {
           try {
               let owner = await collection.methods.ownerOf(i++).call()
-              document.getElementById("progress").innerHTML = " "+i+" / "+nextIdC+"<a href='https://freshfrogs.github.io/' class='pointer'><b><u>Cancel</u></b>🛑</a>"
+              document.getElementById("progress").innerHTML = " "+i+" / "+nextIdC+" "
               //consoleOutput(i-1)
               let thisFrogRender = i-1
               loadFreshFrog(thisFrogRender)
