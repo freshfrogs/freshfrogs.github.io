@@ -395,14 +395,14 @@
               var metadata2;
               (async () => {
                 metadata2 = await get()
-                consoleOutput("<strong>"+metadata2.name+"</strong>\n");
+                consoleOutput("<strong><u>"+metadata2.name+"</u></strong>\n");
                 openseaLink = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+thisFrogRender+""
                 consoleOutput('<a target="_blank" href="'+openseaLink+'">View on OpenSea ↗️</a>')
                 for (var i = 0; i < metadata2.attributes.length; i++){
                   //document.write("<br><br>array index: " + i);
                   //consoleOutput("<br><br>array index: " + i);
                   var data = metadata2.attributes[i]
-                  consoleOutput(data.trait_type+": "+data.value+"")
+                  consoleOutput(data.trait_type+": <b>"+data.value+"</b>")
                   loadAttribute(data.trait_type, data.value, metadata2.name)
                   //
                 }
