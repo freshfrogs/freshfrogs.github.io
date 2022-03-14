@@ -365,7 +365,7 @@
 
 
         // Messages Sent to Terminal
-        document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"
+        document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"+"<br>Scanning Tokens... Please wait... ⌛"
 
         //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
         //document.getElementById("supply").innerHTML = "<b><strong><a style='color: #222 !important;' href='https://opensea.io/collection/fresh-frogs' target='_blank'>ℹ️ ("+nextIdC+"/4040) Total Supply</a></strong></b>"
@@ -375,7 +375,7 @@
         //document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
         let snapshot = []
         let i = 1;
-        consoleOutput("Scanning Tokens... Please wait... ⌛")
+        //consoleOutput("Scanning Tokens... Please wait... ⌛")
         while(true) {
           try {
             let owner = await collection.methods.ownerOf(i++).call()
@@ -411,7 +411,7 @@
               })()
             }
           } catch (e) {
-            consoleOutput("done")
+            document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"+"<br>Scanning Tokens... Done ✅ "+ownedFrogs+" FROGs found!"
             break;
           }
         }
