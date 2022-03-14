@@ -385,8 +385,8 @@
         while(true) {
           try {
             let owner = await collection.methods.ownerOf(i++).call()
-            Prog1 = parseInt(i/nextIdC)
-            Prog = parseInt(Prog1*100)
+            Prog = parseInt(i/nextIdC)
+            //Prog = parseInt(Prog1*100)
             document.getElementById("progress").innerHTML = Prog+"%"
             if (userAcc === owner.toLowerCase()) {
               //consoleOutput(i-1)
