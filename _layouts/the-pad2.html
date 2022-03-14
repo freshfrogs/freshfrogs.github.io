@@ -530,21 +530,21 @@
 
         // Generate Eyes
         Eyes = Math.floor((Math.random() * 100) + 0); // 8
-        if (Eyes => 9){
+        if (Eyes >= 9){
           Eyes = 0;
         }
         loadAttribute("Generate/Eyes", Eyes, where)
 
         // Generate Hat
         Hat = Math.floor((Math.random() * 100) + 0); // 15
-        if (Hat => 16){
+        if (Hat >= 16){
           Hat = 0;
         }
         loadAttribute("Generate/Hat", Hat, where)
 
         // Generate Mouth
         Mouth = Math.floor((Math.random() * 100) + 0); // 10
-        if (Mouth => 11){
+        if (Mouth >= 11){
           Mouth = 0;
         }
         loadAttribute("Generate/Mouth", Mouth, where)
