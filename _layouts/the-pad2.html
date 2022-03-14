@@ -448,38 +448,7 @@
         // Set safeLow -- Set suggested gas fee to lowest setting
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-          if (mintProgress == 1 || mint === 0 ) {
-            if (mint === 0) {
-              consoleOutput("<strong>❯ Minting closed! Join discord for more info! </strong>"+"<b><u><a class='pointer' href='https://discord.gg/t84NyjpS3H'>Join Discord</b></u></a>")
-            }
-            if (mintProgress === 1) {
-              consoleOutput("<strong>❯</strong> To prevent duplicate transactions the mint button is locked out after one use. <a href='https://freshfrogs.github.io' class='pointer'>Please refresh the page!</a>")
-            }
-          } else {
-            mintProgress = 1;
-            consoleOutput("\n<strong>❯</strong> <strong>Minting x"+frogCount+" FROG(s) #"+mintList+"... <br>\nPlease sign the transaction and wait...<br>\nDo Not Leave This Page")
-            try {
-              if (highPriority === 1) {
-                let tokens = await f0.mint(mintInviteCode, frogCount)
-                var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
-                  return token.links.opensea
-                })
-              } else {
-                let cost = await f0.cost()
-                let averageGwei = cost.gas.average / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
-                let averageWei = averageGwei * Math.pow(10, 9)
-                let tokens = await f0.mint(mintInviteCode, frogCount, {
-                  gasPrice: "" + averageWei  // the gasPrice must be a string value of the number
-                })
-                var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
-                  return token.links.opensea
-                })
-              }
-            } catch (e) {
-              consoleOutput("<br>\n<strong>❯</strong> ⚠️ <strong><b>Transaction Error:</b></strong> <br>\n"+JSON.stringify(e.message)+"<br>\n<u>If you believe this to be a mistake, please <b><a href='https://discord.gg/t84NyjpS3H'>Report it Here</u></a></b>")
-            }
-            consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>")
-          }
+          generateRandomFROG();
         })
         // Remove FROG from minting tray
         document.querySelector("#removeFrog").addEventListener("click", async (e) => {
