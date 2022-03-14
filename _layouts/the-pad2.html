@@ -558,27 +558,28 @@
       function generateRandomFROG() {
         where = "randomFrogWhere"
         // Generate Frog
-        Frog = randomNumber(1, 25);
+        Frog = Math.floor((Math.random() * 25) + 1);
+        
         loadAttribute("Generate/Frog", Frog, where)
 
         // Generate Trait
-        Trait = randomNumber(0, 18);
+        Trait = Math.floor((Math.random() * 18) + 0);
         loadAttribute("Generate/Trait", Trait, where)
 
         //Generate Accessory
-        Accessory = randomNumber(0, 4);
+        Accessory = Math.floor((Math.random() * 4) + 0);
         loadAttribute("Generate/Accessory", Accessory, where)
 
         // Generate Eyes
-        Eyes = randomNumber(0, 8);
+        Eyes = Math.floor((Math.random() * 8) + 0);
         loadAttribute("Generate/Eyes", Eyes, where)
 
         // Generate Hat
-        Hat = randomNumber(0, 15);
+        Hat = Math.floor((Math.random() * 15) + 0);
         loadAttribute("Generate/Hat", Hat, where)
 
         // Generate Mouth
-        Mouth = randomNumber(0, 10);
+        Mouth = Math.floor((Math.random() * 10) + 0);
         loadAttribute("Generate/Mouth", Mouth, where)
       }
       // Load recent mints
