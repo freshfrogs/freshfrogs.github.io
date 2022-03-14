@@ -389,6 +389,7 @@
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
+        consoleOutput("<strong>❯ Minting closed! Join discord for more info! </strong>"+"<b><u><a class='pointer' href='https://freshfrogs.github/discord'>Join Discord</b></u></a>")
      //   document.getElementById("addFrog").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
         //document.getElementById("recentMints").innerHTML = ""
         //document.getElementById("loadRecentMints2").removeAttribute("href")
@@ -422,7 +423,7 @@
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           if (mintProgress == 1 || mint === 0 ) {
             if (mint === 0) {
-              consoleOutput("<strong>❯ Minting closed! Join discord for more info! </strong>"+"<b><u><a class='pointer' href='https://discord.gg/t84NyjpS3H'>Join Discord</b></u></a>")
+              consoleOutput("<strong>❯ Minting closed! Join discord for more info! </strong>"+"<b><u><a class='pointer' href='https://freshfrogs.github/discord'>Join Discord</b></u></a>")
             }
             if (mintProgress === 1) {
               consoleOutput("<strong>❯</strong> To prevent duplicate transactions the mint button is locked out after one use. <a href='https://freshfrogs.github.io' class='pointer'>Please refresh the page!</a>")
