@@ -369,7 +369,7 @@
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
         let snapshot = []
         let i = 1;
-        consoleOutput("<strong>Scanning for FROG Tokens... Please wait... ⌛</strong>")
+        consoleOutput("Scanning Tokens... Please wait... ⌛")
         while(true) {
           try {
             let owner = await collection.methods.ownerOf(i++).call()
@@ -402,8 +402,8 @@
               })()
             }
           } catch (e) {
-            break;
             consoleOutput("done")
+            break;
           }
         }
        // loadOwnedFrogs();
