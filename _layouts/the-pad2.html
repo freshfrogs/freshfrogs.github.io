@@ -321,6 +321,10 @@
       document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("mintTransact").removeAttribute("href");
         generateRandomFROG();
+        document.querySelector("#mintTransact").addEventListener("click", async (e) => {
+          consoleOutput("Generating Random Frog...")
+          generateRandomFROG();
+        })
         const web3 = new Web3(window.ethereum)
         const f0 = new F0();
         var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
@@ -448,10 +452,6 @@
      // EVENTS ------------------------------------------------------------------------------------------------------->
         // Set safeLow -- Set suggested gas fee to lowest setting
         // MINT -- Send the transaction to mint!
-        document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-          consoleOutput("Generating Random Frog...")
-          generateRandomFROG();
-        })
       })
       // Output to minting terminal
       function consoleOutput(output) {
@@ -467,7 +467,7 @@
         newAttribute.target = "_blank"
         newAttribute.className = "frogImg2 pointer"
         newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
-        newAttribute.alt = attribute
+        //newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
       }
       // Load FROG Menu
@@ -508,28 +508,28 @@
         where = "randomFrogWhere"
         //document.getElementById(where).innerHTML = ""
         // Generate Frog
-        Frog = Math.floor((Math.random() * 25) + 1);
+        Frog = Math.floor((Math.random() * 100) + 1);
         
         loadAttribute("Generate/Frog", Frog, where)
 
         // Generate Trait
-        Trait = Math.floor((Math.random() * 18) + 0);
+        Trait = Math.floor((Math.random() * 100) + 0);
         loadAttribute("Generate/Trait", Trait, where)
 
         //Generate Accessory
-        Accessory = Math.floor((Math.random() * 4) + 0);
+        Accessory = Math.floor((Math.random() * 100) + 0);
         loadAttribute("Generate/Accessory", Accessory, where)
 
         // Generate Eyes
-        Eyes = Math.floor((Math.random() * 8) + 0);
+        Eyes = Math.floor((Math.random() * 100) + 0);
         loadAttribute("Generate/Eyes", Eyes, where)
 
         // Generate Hat
-        Hat = Math.floor((Math.random() * 15) + 0);
+        Hat = Math.floor((Math.random() * 100) + 0);
         loadAttribute("Generate/Hat", Hat, where)
 
         // Generate Mouth
-        Mouth = Math.floor((Math.random() * 10) + 0);
+        Mouth = Math.floor((Math.random() * 100) + 0);
         loadAttribute("Generate/Mouth", Mouth, where)
       }
       // Load recent mints
