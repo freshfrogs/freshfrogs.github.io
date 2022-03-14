@@ -472,7 +472,7 @@
         while(true) {
           try {
               let owner = await collection.methods.ownerOf(i++).call()
-              document.getElementById("progress").innerHTML = "("+i+"/"+nextIdC+") "+parseInt((i/nextIdC)*100)+"%"
+              document.getElementById("progress").innerHTML = " "+i+"/"+nextIdC+" "
               //consoleOutput(i-1)
               let thisFrogRender = i-1
               loadFreshFrog(thisFrogRender)
@@ -508,10 +508,10 @@
               })()
           } catch (e) {
             if (ownedFrogs >= 1) { // FROGS!
-              document.getElementById("netStatus").innerHTML = 'Connect to view collection... <b><i><strong>'+addressCut+' ✓</strong></i></b><br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'+'Compiling Tokens... Done ✅ '+ownedFrogs+' FROGs Owned!'
+              document.getElementById("netStatus").innerHTML = 'Connect to view collection... <b><i><strong>'+addressCut+' ✓</strong></i></b><br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'+'Loading collection... Done ✅ '+ownedFrogs+' FROGs Owned!'
               break;
             } else { // ❌ No FROGS
-              document.getElementById("netStatus").innerHTML = 'Connect to view collection... <b><i><strong>'+addressCut+' ✓</strong></i></b><br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'+'Compiling Tokens... Done ❌ '+ownedFrogs+' FROGs Owned!'
+              document.getElementById("netStatus").innerHTML = 'Connect to view collection... <b><i><strong>'+addressCut+' ✓</strong></i></b><br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'+'Loading collection... Done ❌ '+ownedFrogs+' FROGs Owned!'
               break;
             }
           }
