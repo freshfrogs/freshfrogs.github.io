@@ -391,7 +391,7 @@
               let owner = await collection.methods.ownerOf(thisFrogRender).call()
               loadFreshFrog(thisFrogRender)
               //Load Metadata
-              let tokenURI = await collection.methods.tokenURI(thisFrogRender-1).call()
+              let tokenURI = await collection.methods.tokenURI(thisFrogRender).call()
               let cid = tokenURI.replace("ipfs://", "")
               let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
               async function get() {
