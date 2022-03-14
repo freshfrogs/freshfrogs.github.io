@@ -315,7 +315,7 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
     <script>
       document.getElementById("mintTransact").removeAttribute("href");
-      generateRandomFROG()
+      generateRandomFROG();
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
@@ -506,7 +506,7 @@
       function generateRandomFROG() {
 
         where = "randomFrogWhere"
-        document.getElementById(where).innerHTML = ""
+        //document.getElementById(where).innerHTML = ""
         // Generate Frog
         Frog = Math.floor((Math.random() * 25) + 1);
         
