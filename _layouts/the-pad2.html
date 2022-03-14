@@ -512,7 +512,6 @@
         document.getElementById(where).innerHTML = ""
         // Generate Frog
         Frog = Math.floor((Math.random() * 30) + 1);
-        loadAttribute("Generate/Frog", Frog, where)
         
         if (Frog >= 26){
           // Load special Frog
@@ -548,6 +547,7 @@
           loadAttribute("Generate/Mouth", Mouth, where)
 
         } else {
+          loadAttribute("Generate/Frog", Frog, where)
           // Generate Trait
           Trait = Math.floor((Math.random() * 75) + 1); // 18
           if (Trait >= 19){
