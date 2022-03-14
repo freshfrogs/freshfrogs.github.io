@@ -387,12 +387,12 @@
               var metadata2;
               (async () => {
                 metadata2 = await get()
-                //consoleOutput("<strong>"+metadata2.name+"</strong>\n");
+                consoleOutput("<strong>"+metadata2.name+"</strong>\n");
                 for (var i = 0; i < metadata2.attributes.length; i++){
                   //document.write("<br><br>array index: " + i);
                   //consoleOutput("<br><br>array index: " + i);
                   var data = metadata2.attributes[i]
-                  //consoleOutput(data.trait_type+": <b>"+data.value+"</b>")
+                  consoleOutput(data.trait_type+": <b>"+data.value+"</b>")
                   loadAttribute(data.trait_type, data.value, metadata2.name)
                   //
                 }
