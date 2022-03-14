@@ -384,14 +384,11 @@
         //consoleOutput("Scanning Tokens... Please wait... ⌛")
         while(true) {
           try {
-              thisFrogRender = i
-              if (thisFrogRender >= nextIdC){
-                break;
-              }
-              let owner = await collection.methods.ownerOf(thisFrogRender++).call()
+              let owner = await collection.methods.ownerOf(i++).call()
+              //consoleOutput(i-1)
               loadFreshFrog(thisFrogRender)
               //Load Metadata
-              let tokenURI = await collection.methods.tokenURI(thisFrogRender-1).call()
+              let tokenURI = await collection.methods.tokenURI(i-1).call()
               let cid = tokenURI.replace("ipfs://", "")
               let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
               async function get() {
