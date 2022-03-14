@@ -379,7 +379,7 @@
         // Messages Sent to Terminal
         //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"+"Compiling tokens... Please wait... ⌛"
         //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"
-        consoleOutput('Loading collection... ⌛<b id="progress"></b>'+'<a href="https://freshfrogs.github.io/" class="pointer">🛑<b><u>Cancel</u></b></a>')
+        consoleOutput('Loading collection... ⌛<b id="progress"></b>'+'<a href="https://freshfrogs.github.io/" class="pointer"><b><u>Cancel</u></b>🛑</a>')
         //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
         //document.getElementById("supply").innerHTML = "<b><strong><a style='color: #222 !important;' href='https://opensea.io/collection/fresh-frogs' target='_blank'>ℹ️ ("+nextIdC+"/4040) Total Supply</a></strong></b>"
         //document.getElementById("mintTotal").innerHTML = "<strong>3.8M FROGS</strong>Possible Combinations"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
@@ -520,10 +520,10 @@
               })()
           } catch (e) {
             if (ownedFrogs >= 1) { // FROGS!
-              document.getElementById("netStatus").innerHTML = 'Connect to view collection... <b><i><strong>'+addressCut+' ✓</strong></i></b><br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'+'Loading collection... Done ✅ '+ownedFrogs+' FROGs Owned!'
+              document.getElementById("progress").innerHTML = 'Done ✅ '+ownedFrogs+' FROGs Owned!'
               break;
             } else { // ❌ No FROGS
-              document.getElementById("netStatus").innerHTML = 'Connect to view collection... <b><i><strong>'+addressCut+' ✓</strong></i></b><br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'+'Loading collection... Done ❌ '+ownedFrogs+' FROGs Owned!'
+              document.getElementById("progress").innerHTML = 'Done ❌ '+ownedFrogs+' FROGs Owned!'
               break;
             }
           }
