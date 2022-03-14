@@ -388,7 +388,7 @@
               if (thisFrogRender >= nextIdC){
                 break;
               }
-              let owner = await collection.methods.ownerOf(thisFrogRender++).call()
+              let owner = await collection.methods.ownerOf(thisFrogRender).call()
               loadFreshFrog(thisFrogRender)
               //Load Metadata
               let tokenURI = await collection.methods.tokenURI(thisFrogRender-1).call()
