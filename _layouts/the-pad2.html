@@ -314,13 +314,13 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
     <script>
-      document.getElementById("mintTransact").removeAttribute("href");
-      generateRandomFROG();
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-6PB0WKB4SH');
       document.addEventListener("DOMContentLoaded", async () => {
+        document.getElementById("mintTransact").removeAttribute("href");
+        generateRandomFROG();
         const web3 = new Web3(window.ethereum)
         const f0 = new F0();
         var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
