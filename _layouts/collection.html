@@ -377,7 +377,11 @@
         //document.getElementById("supply").innerHTML = "<b><strong><a style='color: #222 !important;' href='https://opensea.io/collection/fresh-frogs' target='_blank'>ℹ️ ("+nextIdC+"/4040) Total Supply</a></strong></b>"
         //document.getElementById("mintTotal").innerHTML = "<strong>3.8M FROGS</strong>Possible Combinations"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
         //document.getElementById("mintTransact").innerHTML = "<strong>⛔MINT CLOSED</strong>" // "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
-        
+        document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
+        document.getElementById("mintTransact").innerHTML = "<strong>⛔MINT CLOSED</strong>" // "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
+        document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
+        //document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
+        document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
         //document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
         let snapshot = []
         let i = 1;
@@ -428,46 +432,94 @@
             }
           }
         }
-       // loadOwnedFrogs();
-     //   document.getElementById("addFrog").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
-        //document.getElementById("recentMints").innerHTML = ""
-        //document.getElementById("loadRecentMints2").removeAttribute("href")
-        //recentlyMinted(nextIdC);
-
-        //
-        //loadFrogMenu();
-
-        /*
-        newAttribute = document.createElement("a")
-        newAttribute.id = "AttributesButton"
-        newAttribute.className = "smallContainer2"
-        newAttribute.innerHTML = '<img onclick="loadAttributes()" class="frogImg2 lower" src="./Hat/witchBlack.png" alt="Attributes" id="Attributes">Attributes'
-        document.getElementById("pre").appendChild(newAttribute)
-        */
-
-        /*
-        if (ownedFrogs => 1){
-          loadAllAttributes()
-        } else {
-          consoleOutput("This content is only available to FROG holders at this time...")
-        }
-        */
-/*      async function get() {
-          let metadata = await (await fetch(ipfsGatewayURI)).json();
-          //console.log(obj);
-          return metadata;
-        }
-        var metadata2;
-        (async () => {
-          metadata2 = await get()
-          document.getElementById("pre").innerHTML = JSON.stringify(metadata2.attributes); // JSON.stringify(metadata2.attributes.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', ''));
-        })() */
-
-        
-    // END OF LOADING PAGE ----------------------------------------->
-     // EVENTS ------------------------------------------------------------------------------------------------------->
-        // Set safeLow -- Set suggested gas fee to lowest setting
         // MINT -- Send the transaction to mint!
+        document.querySelector("#mintTransact").addEventListener("click", async (e) => {
+          if (mintProgress == 1 || mint === 0 ) {
+            if (mint === 0) {
+              consoleOutput("<strong>❯ Minting closed!</strong> Join discord for more info! "+"<b><u><a class='pointer' href='https://freshfrogs.github.io/discord'>Join Discord</b></u></a>")
+            }
+            if (mintProgress === 1) {
+              consoleOutput("<strong>❯</strong> To prevent duplicate transactions the mint button is locked out after one use. <a href='https://freshfrogs.github.io' class='pointer'>Please refresh the page!</a>")
+            }
+          } else {
+            mintProgress = 1;
+            consoleOutput("\n<strong>❯</strong> <strong>Minting x"+frogCount+" FROG(s) #"+mintList+"... <br>\nPlease sign the transaction and wait...<br>\nDo Not Leave This Page")
+            try {
+              if (highPriority === 1) {
+                let tokens = await f0.mint(mintInviteCode, frogCount)
+                var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
+                  return token.links.opensea
+                })
+              } else {
+                let cost = await f0.cost()
+                let averageGwei = cost.gas.average / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
+                let averageWei = averageGwei * Math.pow(10, 9)
+                let tokens = await f0.mint(mintInviteCode, frogCount, {
+                  gasPrice: "" + averageWei  // the gasPrice must be a string value of the number
+                })
+                var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
+                  return token.links.opensea
+                })
+              }
+            } catch (e) {
+              consoleOutput("<br>\n<strong>❯</strong> ⚠️ <strong><b>Transaction Error:</b></strong> <br>\n"+JSON.stringify(e.message)+"<br>\n<u>If you believe this to be a mistake, please <b><a href='https://discord.gg/t84NyjpS3H'>Report it Here</u></a></b>")
+            }
+            consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='"+openseaTest[0]+"'><b>View on Opensea</a></b><hr>")
+          }
+        })
+        // Remove FROG from minting tray
+        document.querySelector("#removeFrog").addEventListener("click", async (e) => {
+          if (frogCount >= 7) {
+            var select = document.getElementById("frogContainer");
+            select.removeChild(select.lastChild);
+            frogCount = frogCount - 1
+            mintList = nextIdC+" - "+(nextIdC+frogCount)
+          } else if (frogCount >= 4) {
+            var select = document.getElementById("frogContainer2");
+            select.removeChild(select.lastChild);
+            frogCount = frogCount - 1
+            mintList = nextIdC+" - "+(nextIdC+frogCount)
+          } else if (frogCount >= 2) {
+            var select = document.getElementById("frogContainer3");
+            select.removeChild(select.lastChild);
+            frogCount = frogCount - 1
+            mintList = nextIdC+" - "+(nextIdC+frogCount)
+          }
+          document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
+          document.getElementById("frogQuant").innerHTML = "  "+frogCount+"  "
+          document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
+        })
+        // ADD FROG to minting tray
+        document.querySelector("#addFrog").addEventListener("click", async (e) => {
+          if (frogCount <= 2) {
+            newFrog = document.createElement("div")
+            newFrog.className = "imgWrapper"
+            newFrog.innerHTML = "<img class='frogImg' src='https://freshfrogs.github.io/frog/"+(nextIdC+frogCount)+".png'/>"
+            document.getElementById("frogContainer3").appendChild(newFrog)
+            mintList = nextIdC+" - "+(nextIdC+frogCount)
+            frogCount = frogCount + 1
+
+          } else if (frogCount <= 5) {
+            newFrog = document.createElement("div")
+            newFrog.className = "imgWrapper"
+            newFrog.innerHTML = "<img class='frogImg' src='https://freshfrogs.github.io/frog/"+(nextIdC+frogCount)+".png'/>"
+            document.getElementById("frogContainer2").appendChild(newFrog)
+            mintList = nextIdC+" - "+(nextIdC+frogCount)
+            frogCount = frogCount + 1
+
+          } else if (frogCount <= 8) {
+            newFrog = document.createElement("div")
+            newFrog.className = "imgWrapper"
+            newFrog.innerHTML = "<img class='frogImg' src='https://freshfrogs.github.io/frog/"+(nextIdC+frogCount)+".png'/>"
+            document.getElementById("frogContainer").appendChild(newFrog)
+            mintList = nextIdC+" - "+(nextIdC+frogCount)
+            frogCount = frogCount + 1
+
+          }
+          document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
+          document.getElementById("frogQuant").innerHTML = "  "+frogCount+"  "
+          document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
+        })
       })
       // Output to minting terminal
       function consoleOutput(output) {
