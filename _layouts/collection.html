@@ -379,34 +379,49 @@
         //document.getElementById("mintTransact").innerHTML = "<strong>⛔MINT CLOSED</strong>" // "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
         
         //document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
-        // Loop FROGS 1 - NextID
-        for(let i=1; i<=2; i++) {
-          // Load Owner
-          let thisFrogRender = i
-          let owner = await collection.methods.ownerOf(thisFrogRender).call()
-          loadFreshFrog(thisFrogRender)
-          //Load Metadata
-          let tokenURI = await collection.methods.tokenURI(thisFrogRender).call()
-          let cid = tokenURI.replace("ipfs://", "")
-          let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
-          async function get() {
-            let metadata = await (await fetch(ipfsGatewayURI)).json();
-            //console.log(obj);
-            return metadata;
-          var metadata2;
-          (async () => {
-            metadata2 = await get()
-            consoleOutput("<strong><u>"+metadata2.name+"</u></strong> ✅\n");
-            openseaLink = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+thisFrogRender+""
-            consoleOutput('<a target="_blank" href="'+openseaLink+'">View on OpenSea ↗️</a><hr class="hr2">')
-              for (var i = 0; i < metadata2.attributes.length; i++){
-                //document.write("<br><br>array index: " + i);
-                //consoleOutput("<br><br>array index: " + i);
-                var data = metadata2.attributes[i]
-                consoleOutput(data.trait_type+": <b>"+data.value+"</b>")
-                loadAttribute(data.trait_type, data.value, metadata2.name)
+        let snapshot = []
+        let i = 1;
+        //consoleOutput("Scanning Tokens... Please wait... ⌛")
+        while(true) {
+          try {
+            let owner = await collection.methods.ownerOf(i++).call()
+              //consoleOutput(i-1)
+              let thisFrogRender = i-1
+              loadFreshFrog(thisFrogRender)
+              //Load Metadata
+              let tokenURI = await collection.methods.tokenURI(i-1).call()
+              let cid = tokenURI.replace("ipfs://", "")
+              let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
+              async function get() {
+                let metadata = await (await fetch(ipfsGatewayURI)).json();
+                //console.log(obj);
+                return metadata;
               }
-            })()
+              var metadata2;
+              (async () => {
+                metadata2 = await get()
+                consoleOutput("<strong><u>"+metadata2.name+"</u></strong> ✅\n");
+                openseaLink = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+thisFrogRender+""
+                consoleOutput('<a target="_blank" href="'+openseaLink+'">View on OpenSea ↗️</a><hr class="hr2">')
+                for (var i = 0; i < metadata2.attributes.length; i++){
+                  //document.write("<br><br>array index: " + i);
+                  //consoleOutput("<br><br>array index: " + i);
+                  var data = metadata2.attributes[i]
+                  consoleOutput(data.trait_type+": <b>"+data.value+"</b>")
+                  loadAttribute(data.trait_type, data.value, metadata2.name)
+                  //
+                }
+                //
+                //consoleOutput(JSON.stringify(metadata2.attributes)); // JSON.stringify(metadata2.attributes.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', ''));
+              })()
+          } catch (e) {
+            if (ownedFrogs >= 1) { // FROGS!
+              document.getElementById("netStatus").innerHTML = 'Connect to view holdings... <b><i><strong>'+addressCut+' ✓</strong></i></b><br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'+'Compiling Tokens... Done ✅ '+ownedFrogs+' FROGs found!'
+              break;
+            } else { // ❌ No FROGS
+              document.getElementById("netStatus").innerHTML = 'Connect to view holdings... <b><i><strong>'+addressCut+' ✓</strong></i></b><br><br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'+'Compiling Tokens... Done ❌ '+ownedFrogs+' FROGs found!'
+              break;
+            }
           }
         }
        // loadOwnedFrogs();
