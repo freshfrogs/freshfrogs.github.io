@@ -385,9 +385,6 @@
         while(true) {
           try {
               let thisFrogRender = i-1
-              if (thisFrogRender >= 10){
-                break;
-              }
               let owner = await collection.methods.ownerOf(i++).call()
               loadFreshFrog(thisFrogRender)
               //Load Metadata
