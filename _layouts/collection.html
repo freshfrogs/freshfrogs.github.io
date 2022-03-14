@@ -364,7 +364,10 @@
         let mint = 0;
         let ownedFrogs = await collection.methods.balanceOf(userAcc).call()
 
-
+        consoleOutput("Mint a FROG onto the <b><strong>Ethereum Blockchain</b></strong>\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'><u>Set safeLow</u></a></b><br>")
+        consoleOutput("Public minting price... <strong> FROG(s) @ "+mintPrice+" ΞETH</strong>") //("<b>Minting begins Sunday, 02/06/2022. \nJoin discord and follow on twitter to get on the FREE mint whitelist<b>")
+        consoleOutput("<b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint... <b><a href='https://freshfrogs.github.io/collection' class='pointer'><u>View Collection</u></a></b>")
+        
         // Messages Sent to Terminal
         //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"+"Compiling tokens... Please wait... ⌛"
         document.getElementById("netStatus").innerHTML = 'Connect to view collection... <b><i><strong>'+addressCut+' ✓</strong></i></b><br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'+'Loading collection... ⌛<b id="progress"></b>'
