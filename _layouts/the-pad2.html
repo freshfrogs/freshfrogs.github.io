@@ -314,6 +314,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
     <script>
+      generateRandomFROG()
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
@@ -578,6 +579,37 @@
         newFrog.className = "smallContainer2"
         //newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+freshFrog+'.png" alt="Frog '+freshFrog+'" id="frog'+freshFrog+'">'
         document.getElementById("pre").appendChild(newFrog)
+        /*
+          <a id="" class="smallContainer2">
+          </a>
+        */
+      }
+      // Function FROG Generator
+      function generateRandomFROG() {
+        where = "randomFrogWhere"
+        // Generate Frog
+        Frog = randomNumber(1, 25);
+        loadAttribute("Frog", Frog, where)
+
+        // Generate Trait
+        Trait = randomNumber(0, 18);
+        loadAttribute("Trait", Trait, where)
+
+        //Generate Accessory
+        Accessory = randomNumber(0, 4);
+        loadAttribute("Accessory", Accessory, where)
+
+        // Generate Eyes
+        Eyes = randomNumber(0, 8);
+        loadAttribute("Eyes", Eyes, where)
+
+        // Generate Hat
+        Hat = randomNumber(0, 15);
+        loadAttribute("Hat", Hat, where)
+
+        // Generate Mouth
+        Mouth = randomNumber(0, 10);
+        loadAttribute("Mouth", Mouth, where)
       }
       // Load recent mints
       function recentlyMinted(mostRecent) {
@@ -612,14 +644,7 @@
             <li><a id="mintTotal"><strong>0.02 ΞETH</strong>Plus gas</a></li>
             <li><a class="pointer"><strong><u id="removeFrog" class="pointer">⇦</u><frogQuant id="frogQuant">  1  </frogQuant><u id="addFrog" class="pointer">⇨</u></strong>Quantity</a></li>
           </ul>
-          <div class="bigContainer">
-            <div id="frogContainer" class="container">
-            </div>
-            <div id="frogContainer2" class="container">
-            </div>
-            <div id="frogContainer3" class="container">
-              <div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.github.io/assets/frogs/preview2.gif" /></div>
-            </div>
+          <div class="smallContainer2" id="randomFrogWhere">
           </div>
         </div>
       </header>
