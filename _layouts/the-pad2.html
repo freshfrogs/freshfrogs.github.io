@@ -513,17 +513,17 @@
         // Generate Frog
         Frog = Math.floor((Math.random() * 25) + 1);
         loadAttribute("Generate/Frog", Frog, where)
-
+        
         // Generate Trait
         Trait = Math.floor((Math.random() * 100) + 1); // 18
-        if (Trait => 19){
+        if (Trait >= 19){
           Trait = 0;
         }
         loadAttribute("Generate/Trait", Trait, where)
 
         //Generate Accessory
         Accessory = Math.floor((Math.random() * 100) + 1); // 4
-        if (Accessory => 5){
+        if (Accessory >= 5){
           Accessory = 0;
         }
         loadAttribute("Generate/Accessory", Accessory, where)
