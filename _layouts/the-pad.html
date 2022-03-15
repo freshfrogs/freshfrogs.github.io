@@ -389,7 +389,7 @@
             if (userAcc === owner.toLowerCase()) {
               //consoleOutput(i-1)
               let thisFrogRender = i-1
-              consoleOutput("<hr>")
+              consoleOutput("<br><hr>")
               loadFreshFrog(thisFrogRender)
               //Load Metadata
               let tokenURI = await collection.methods.tokenURI(i-1).call()
