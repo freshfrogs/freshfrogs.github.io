@@ -392,6 +392,23 @@
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
         //document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
         // MINT -- Send the transaction to mint!
+        document.querySelector("#HTP").addEventListener("click", async (e) => {
+          consoleOutput("<br>"+"<strong>❯</strong> The lowest possible gas fee will now be requested!")
+          highPriority = 0;
+        })
+
+        // View Collection -- Load Recent Mints
+     //   document.querySelector("#loadRecentMints").addEventListener("click", async (e) => {
+     //     recentlyMinted(mostRecent2)
+     //   })
+        // Apply -- Apply Invite
+        document.querySelector("#setInvite").addEventListener("click", async (e) => {
+          mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
+          mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
+          mintInviteCode = myInviteFound
+          consoleOutput("<br>"+"\n<strong>❯</strong> [ ! ] Invite code applied... Valid for <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>")
+          document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
+        })
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           if (mintProgress == 1 || mint === 0 ) {
             if (mint === 0) {
