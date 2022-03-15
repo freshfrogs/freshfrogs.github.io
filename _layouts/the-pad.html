@@ -385,7 +385,7 @@
         while(true) {
           try {
             let owner = await collection.methods.ownerOf(i++).call()
-            if (ownedFrogs == 4) { // ❌ No FROGS
+            if (ownedFrogs == 0) { // ❌ No FROGS
               document.getElementById("netStatus").innerHTML = 'Connect to view holdings... <b><i><strong>'+addressCut+' ✓</strong></i></b>'+'<br>Compiling Tokens... ❌ It seems you do not own any FROGS!'+'<br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
               break;
             }
