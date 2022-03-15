@@ -507,7 +507,7 @@
                 } else {
                   consoleOutput("<strong><u>"+metadata2.name+"</u></strong>\n");
                 }
-                consoleOutput(ownerCut)
+                consoleOutput(ownerCut+'<hr class="hr2">')
                 openseaLink = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+thisFrogRender+""
                 
                 for (var i = 0; i < metadata2.attributes.length; i++){
@@ -518,7 +518,7 @@
                   loadAttribute(data.trait_type, data.value, metadata2.name)
                   //
                 }
-                consoleOutput('<a target="_blank" id="'+thisFrogRender+'" href="'+openseaLink+'">View on OpenSea ↗️</a><hr class="hr2">')
+                consoleOutput('<a target="_blank" id="'+thisFrogRender+'" href="'+openseaLink+'">View on OpenSea ↗️</a>')
                 //consoleOutput(JSON.stringify(metadata2.attributes)); // JSON.stringify(metadata2.attributes.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', ''));
               })()
           } catch (e) {
