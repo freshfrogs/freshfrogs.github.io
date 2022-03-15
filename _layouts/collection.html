@@ -390,6 +390,7 @@
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
+        loadSpecialFrogs();
         //document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
         // MINT -- Send the transaction to mint!
         document.querySelector("#HTP").addEventListener("click", async (e) => {
@@ -673,6 +674,16 @@
           }
           loadAttribute("Generate/Mouth", Mouth, where)
         }
+      }
+      // Special Frog Menu
+      function loadSpecialFrogs() {
+        document.getElementById("pre").innerHTML = "<h2>Special Frogs</h2>"
+        //consoleOutput("\n")
+        loadAttribute("SpecialFrog", "closedEyes", "pre")
+        loadAttribute("SpecialFrog", "croaking", "pre")
+        loadAttribute("SpecialFrog", "inversedEyes", "pre")
+        loadAttribute("SpecialFrog", "peace", "pre")
+        loadAttribute("SpecialFrog", "thirdEye", "pre")
       }
       // Load recent mints
       function recentlyMinted(mostRecent) {
