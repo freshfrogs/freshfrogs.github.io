@@ -555,8 +555,7 @@
         frogID = document.getElementById("frogIndex");
         // FIND FROG
         alert(stringify(frogID));
-        document.getElementById(frogID).scrollIntoView();
-        document.getElementById(parseInt(frogID)).scrollIntoView();
+        document.getElementById(stringify(frogID)).scrollIntoView();
       }
       // Output to minting terminal
       function consoleOutput(output) {
