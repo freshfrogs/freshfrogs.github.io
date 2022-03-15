@@ -540,15 +540,22 @@
               })()
           } catch (e) {
             if (ownedFrogs >= 1) { // FROGS!
-              document.getElementById("progress").innerHTML = 'Complete ✅ '+'<a href="https://freshfrogs.github.io/the-pad" class="pointer"><b><u>View Your FROGS</u></b></a>'
+              document.getElementById("progress").innerHTML = 'Complete ✅ '+'<a href="https://freshfrogs.github.io/the-pad" class="pointer"><b><u>View Your FROGS</u></b></a>'+'<input type="text" id="frogIndex" onkeyup="frogIndex()" placeholder="TokenID" title="Search by TokenID">'
               break;
             } else { // ❌ No FROGS
-              document.getElementById("progress").innerHTML = 'Complete ✅ '
+              document.getElementById("progress").innerHTML = 'Complete ✅ '+'<input type="text" id="frogIndex" onkeyup="frogIndex()" placeholder="TokenID" title="Search by TokenID">'
               break;
             }
           }
         }
       })
+      // Function Scroll to Frog 
+      function frogIndex() {
+        var frogID, filter, ul, li, a, i, txtValue;
+        frogID = document.getElementById("frogIndex");
+        // FIND FROG
+        document.getElementById("FROG #"+frogID).scrollIntoView();
+      }
       // Output to minting terminal
       function consoleOutput(output) {
         newLine = document.createElement("div")
