@@ -552,10 +552,10 @@
       // Function Scroll to Frog 
       function frogIndexer() {
         var frogID;
-        frogID = document.getElementById("frogIndex");
+        frogID = document.getElementById("frogIndex").innerText;
         // FIND FROG
-        alert(stringify(frogID));
-        document.getElementById(stringify(frogID)).scrollIntoView();
+        alert(frogID);
+        document.getElementById(frogID).scrollIntoView();
       }
       // Output to minting terminal
       function consoleOutput(output) {
