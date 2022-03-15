@@ -520,9 +520,9 @@
               (async () => {
                 metadata2 = await get()
                 if (userAcc === owner.toLowerCase()) {
-                  consoleOutput("<strong><u>"+metadata2.name+"</u></strong> ✅(You!)\n");
+                  consoleOutput("<strong><u>"+metadata2.name+"</u></strong> ✅[ You! ]\n");
                 } else {
-                  consoleOutput("<strong><u>"+metadata2.name+"</u></strong> ("+ownerCut+")\n");
+                  consoleOutput("<strong><u>"+metadata2.name+"</u></strong> ["+ownerCut+"]\n");
                 }
                 //consoleOutput(ownerCut)
                 openseaLink = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+thisFrogRender+""
