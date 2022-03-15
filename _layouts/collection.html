@@ -504,7 +504,7 @@
               let owner = await collection.methods.ownerOf(i++).call()
               let ownerCut = owner.substring(0, 5)+"..."+owner.slice(-4);
               document.getElementById("progress").innerHTML = " "+i+" / "+nextIdC+" "
-              consoleOutput("<br><hr>")
+              consoleOutput("<br>\n<br><hr>")
               let thisFrogRender = i-1
               loadFreshFrog(thisFrogRender)
               //Load Metadata
