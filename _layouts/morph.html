@@ -392,7 +392,6 @@
       }
       // Select subFrog
       async function selectSubFrog(selectedSub){
-        // <div class="smallContainer2" id="baseDisplay"></div>
         let subFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedSub+".json")).json();
         for (var i = 0; i < subFrogmetadata.attributes.length; i++){
           var data = subFrogmetadata.attributes[i]
@@ -402,7 +401,6 @@
       }
       // Select baseFrog
       async function selectBaseFrog(selectedBase){
-        // <div class="smallContainer2" id="baseDisplay"></div>
         let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedBase+".json")).json();
         for (var i = 0; i < baseFrogmetadata.attributes.length; i++){
           var data = baseFrogmetadata.attributes[i]
