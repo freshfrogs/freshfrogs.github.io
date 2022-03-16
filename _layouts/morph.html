@@ -438,8 +438,9 @@
             //loadAttribute("Trait", baseFrog_Trait, thisPlace)   // Load trait from baseFrog
             consoleOutput("Trait: "+baseFrog_Trait); // Test Trait
           }
-          
-          consoleOutput(baseFrog_Accessory)
+          if (typeof baseFrog_Accessory === 'undefined') {
+            consoleOutput('undefined')
+          }
           consoleOutput("<br>done with traits...<br>")
           // Accessory
           if (baseFrog_Accessory != null) {                             // Check for Accessory from baseFrog
