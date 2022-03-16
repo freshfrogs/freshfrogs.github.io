@@ -223,9 +223,9 @@
   .frogImg {
     transition: transform .2s;
     height: auto;
+    width: auto;
     display: block;
     image-rendering: pixelated;
-    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
     overflow: hidden;
   }
   .frogImg2 {
@@ -318,19 +318,12 @@
     <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-6PB0WKB4SH');
       document.addEventListener("DOMContentLoaded", async () => {
-        document.getElementById("mintTransact").removeAttribute("href");
-        generateRandomFROG();
-        document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-          //consoleOutput("Generating Random Frog...")
-          generateRandomFROG();
-        })
         const web3 = new Web3(window.ethereum)
         const f0 = new F0();
         var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
@@ -368,17 +361,18 @@
         let mintProgress = 0;
         let mint = 0;
         let ownedFrogs = await collection.methods.balanceOf(userAcc).call()
-
+        baseFrog = 'undefined';
+        subFrog = 'undefined';
 
         // Messages Sent to Terminal
         //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"+"Compiling tokens... Please wait... ⌛"
         document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... Please wait... ⌛<b id="progress"></b>'+'<br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
-        //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
-        //document.getElementById("supply").innerHTML = "<b><strong><a style='color: #222 !important;' href='https://opensea.io/collection/fresh-frogs' target='_blank'>ℹ️ ("+nextIdC+"/4040) Total Supply</a></strong></b>"
-        //document.getElementById("mintTotal").innerHTML = "<strong>3.8M FROGS</strong>Possible Combinations"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
-        //document.getElementById("mintTransact").innerHTML = "<strong>⛔MINT CLOSED</strong>" // "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
-        
-        //document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
+        document.querySelector("#morphFrogs").addEventListener("click", async (e) => {
+          if (baseFrog !== 'undefined' && subFrog !== 'undefined') { 
+            //alert("Morph "+baseFrog+" + "+subFrog);
+            combineTokens(baseFrog, subFrog);
+          }
+        })
         let snapshot = []
         let i = 1;
         //consoleOutput("Scanning Tokens... Please wait... ⌛")
@@ -428,52 +422,47 @@
             break;
           }
         }
-       // loadOwnedFrogs();
-     //   document.getElementById("addFrog").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
-        //document.getElementById("recentMints").innerHTML = ""
-        //document.getElementById("loadRecentMints2").removeAttribute("href")
-        //recentlyMinted(nextIdC);
-
-        //
-        //loadFrogMenu();
-
-        /*
-        newAttribute = document.createElement("a")
-        newAttribute.id = "AttributesButton"
-        newAttribute.className = "smallContainer2"
-        newAttribute.innerHTML = '<img onclick="loadAttributes()" class="frogImg2 lower" src="./Hat/witchBlack.png" alt="Attributes" id="Attributes">Attributes'
-        document.getElementById("pre").appendChild(newAttribute)
-        */
-
-        /*
-        if (ownedFrogs => 1){
-          loadAllAttributes()
-        } else {
-          consoleOutput("This content is only available to FROG holders at this time...")
-        }
-        */
-/*      async function get() {
-          let metadata = await (await fetch(ipfsGatewayURI)).json();
-          //console.log(obj);
-          return metadata;
-        }
-        var metadata2;
-        (async () => {
-          metadata2 = await get()
-          document.getElementById("pre").innerHTML = JSON.stringify(metadata2.attributes); // JSON.stringify(metadata2.attributes.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', ''));
-        })() */
-
-        
-    // END OF LOADING PAGE ----------------------------------------->
-     // EVENTS ------------------------------------------------------------------------------------------------------->
-        // Set safeLow -- Set suggested gas fee to lowest setting
-        // MINT -- Send the transaction to mint!
       })
       // Output to minting terminal
       function consoleOutput(output) {
         newLine = document.createElement("div")
         newLine.innerHTML = output
         document.getElementById("pre").appendChild(newLine)
+      }
+      // Load Certain FROG
+      function loadFreshFrog(freshFrog) {
+        newFrog = document.createElement("a")
+        newFrog.onclick = function() {applyFrogOwned(freshFrog)};
+        newFrog.id = "Frog #"+freshFrog
+        newFrog.className = "smallContainer2"
+        //newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+freshFrog+'.png" alt="Frog '+freshFrog+'" id="frog'+freshFrog+'">'
+        document.getElementById("pre").appendChild(newFrog)
+        /*
+          <a id="" class="smallContainer2">
+          </a>
+        */
+      }
+      // Function apply Owned Frog
+      function applyFrogOwned(ownedFrog) {
+        //alert(ownedFrog);
+        if (baseFrog == 'undefined') { // baseFrog 
+          document.getElementById("frogContainer").innerHTML = ""
+          selectBaseFrog(ownedFrog);
+          baseFrog = ownedFrog;
+          subFrog = 'undefined'
+          document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
+        } else if (subFrog == 'undefined') { // subFrog
+          baseFrog !== ownedFrog;
+          selectSubFrog(ownedFrog);
+          subFrog = ownedFrog;
+        } else {
+          // Reset Morph
+          document.getElementById("frogContainer").innerHTML = ""
+          selectBaseFrog(ownedFrog);
+          baseFrog = ownedFrog;
+          subFrog = 'undefined'
+          document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
+        }
       }
       // Load attribute
       function loadAttribute(trait, attribute, where) {
@@ -486,134 +475,181 @@
         //newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
       }
-      // Load FROG Menu
-      function loadFrogMenu(){
-        newAttribute = document.createElement("a")
-        newAttribute.id = "FrogButton"
-        newAttribute.className = "frogType2 pointer"
-        newAttribute.onClick = "loadFrogs()"
-        newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogType" src="./the-pad/Frog/unknown.png" alt="Frogs" id="Frog"><b>Frogs</b>'
-        document.getElementById("pre").appendChild(newAttribute)
-        newAttribute = document.createElement("a")
-        newAttribute.id = "SpecialFrogButton"
-        newAttribute.className = "frogType2 pointer"
-        newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogType" src="./the-pad/SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs"><b>SpecialFrogs</b>'
-        document.getElementById("pre").appendChild(newAttribute)
+      // Select subFrog
+      async function selectSubFrog(selectedSub){
+        //
+        newFrog = document.createElement("div")
+        newFrog.className = "imgWrapper"
+        newFrog.innerHTML = "<div class='frogImg'><div style='float: right !important;' class='smallContainer2' id='subDisplay'></div></div>"
+        document.getElementById("frogContainer").appendChild(newFrog)
+        //
+        let subFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedSub+".json")).json();
+        for (var i = 0; i < subFrogmetadata.attributes.length; i++){
+          var data = subFrogmetadata.attributes[i]
+          loadAttribute(data.trait_type, data.value, 'subDisplay')
+        }
+        document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>"+subFrogmetadata.name
       }
-      // Random Number
-      function randomNumber(min, max) {
-        return Math.random() * (max - min) + min;
+      // Select baseFrog
+      async function selectBaseFrog(selectedBase){
+        //
+        newFrog = document.createElement("div")
+        newFrog.className = "imgWrapper"
+        newFrog.innerHTML = "<div class='frogImg'><div style='float: left !important;' class='smallContainer2' id='baseDisplay'></div></div>"
+        document.getElementById("frogContainer").appendChild(newFrog)
+        //
+        let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedBase+".json")).json();
+        for (var i = 0; i < baseFrogmetadata.attributes.length; i++){
+          var data = baseFrogmetadata.attributes[i]
+          loadAttribute(data.trait_type, data.value, 'baseDisplay')
+        }
+        document.getElementById("selectBase").innerHTML = "<strong>Base</strong>"+baseFrogmetadata.name
       }
-      // Load Certain FROG
-      function loadFreshFrog(freshFrog) {
-        newFrog = document.createElement("a")
-        newFrog.href = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+freshFrog
-        newFrog.id = "Frog #"+freshFrog
-        newFrog.target = "_blank"
-        newFrog.className = "smallContainer2"
-        //newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+freshFrog+'.png" alt="Frog '+freshFrog+'" id="frog'+freshFrog+'">'
-        document.getElementById("pre").appendChild(newFrog)
-        /*
-          <a id="" class="smallContainer2">
-          </a>
-        */
-      }
-      // Function FROG Generator
-      function generateRandomFROG() {
-
-        where = "randomFrogWhere"
-        document.getElementById(where).innerHTML = ""
-        // Generate Frog
-        Frog = Math.floor((Math.random() * 30) + 1);
-        
-        if (Frog >= 26){
-          // Load special Frog
-          SpecialFrog = Math.floor((Math.random() * 5) + 1);
-          loadAttribute("Generate/SpecialFrog", SpecialFrog, where)
-
-          //Generate Accessory
-          Accessory = Math.floor((Math.random() * 40) + 1); // 4
-          if (Accessory >= 5){
-            Accessory = 0;
+      // Select otherFrog
+      // Function combine tokens
+      async function combineTokens(baseFrog, otherFrog) {
+        // baseFrog = Dominate trait(s)
+        // frogType, and attributes.
+        var baseFrog_Frog, baseFrog_SpecialFrog, baseFrog_Trait, baseFrog_Accessory, baseFrog_Eyes, baseFrog_Hat, baseFrog_Mouth = undefined;
+        var otherFrog_Frog, otherFrog_SpecialFrog, otherFrog_Trait, otherFrog_Accessory, otherFrog_Eyes, otherFrog_Hat, otherFrog_Mouth = undefined;
+        // Inherits trait; and additional attirbutes from otherFrog
+        // 1. Get metadata from baseFrog
+        document.getElementById("frogContainer").innerHTML = "<div id='comboFrog' class='smallContainer2'></div>"
+        let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+baseFrog+".json")).json();
+        //consoleOutput("<img width='128px' src='https://freshfrogs.github.io/frog/"+baseFrog+".png'>");
+        //consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
+        for (var baseFrogi = 0; baseFrogi < baseFrogmetadata.attributes.length; baseFrogi++){
+          var data = baseFrogmetadata.attributes[baseFrogi]
+          //consoleOutput(data.trait_type+": "+data.value)
+          if (data.trait_type == "Frog") {
+            baseFrog_Frog = data.value;
+          } else if (data.trait_type == "SpecialFrog") {
+            baseFrog_SpecialFrog = data.value;
+          } else if (data.trait_type == "Trait") {
+            baseFrog_Trait = data.value;
+          } else if (data.trait_type == "Accessory") {
+            baseFrog_Accessory = data.value;
+          } else if (data.trait_type == "Eyes") {
+            baseFrog_Eyes = data.value;
+          } else if (data.trait_type == "Hat") {
+            baseFrog_Hat = data.value;
+          } else if (data.trait_type == "Mouth") {
+            baseFrog_Mouth = data.value;
           }
-          loadAttribute("Generate/Accessory", Accessory, where)
-
-          // Generate Eyes
-          Eyes = Math.floor((Math.random() * 40) + 0); // 8
-          if (Eyes >= 9){
-            Eyes = 0;
+        }
+        // 2. Get metadata from otherFrog
+        // otherFrog MetaData
+        let otherFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+otherFrog+".json")).json();
+        //consoleOutput("<img width='128px' src='https://freshfrogs.github.io/frog/"+otherFrog+".png'>");
+        //consoleOutput("<br>otherFrog:"+otherFrogmetadata.name)
+        for (var otherFrogi = 0; otherFrogi < otherFrogmetadata.attributes.length; otherFrogi++){
+          var data2 = otherFrogmetadata.attributes[otherFrogi]
+          //consoleOutput(data2.trait_type+": "+data2.value)
+          if (data2.trait_type == "Frog") {
+            otherFrog_Frog = data2.value;
+          } else if (data2.trait_type == "SpecialFrog") {
+            otherFrog_SpecialFrog = data2.value;
+          } else if (data2.trait_type == "Trait") {
+            otherFrog_Trait = data2.value;
+          } else if (data2.trait_type == "Accessory") {
+            otherFrog_Accessory = data2.value;
+          } else if (data2.trait_type == "Eyes") {
+            otherFrog_Eyes = data2.value;
+          } else if (data2.trait_type == "Hat") {
+            otherFrog_Hat = data2.value;
+          } else if (data2.trait_type == "Mouth") {
+            otherFrog_Mouth = data2.value;
           }
-          loadAttribute("Generate/Eyes", Eyes, where)
-
-          // Generate Hat
-          Hat = Math.floor((Math.random() * 40) + 0); // 15
-          if (Hat >= 16){
-            Hat = 0;
+        }
+      // Check first attribute. Is it a Frog or specialFrog?
+      //consoleOutput("<div id='newFrog' class='smallContainer2'></div>");
+      thisPlace = 'comboFrog';
+      //consoleOutput("<br>\n<br>New Frog:<br>");
+      if (typeof baseFrog_Frog !== 'undefined') {                              // Load Frog Type
+          loadAttribute("Frog", baseFrog_Frog, thisPlace)       // Load Frog Type from baseFrog
+          //consoleOutput("Frog: "+baseFrog_Frog); // Test Frog
+          // Trait
+          if (typeof otherFrog_Trait !== 'undefined') {                        // Check for trait from otherfrog
+            loadAttribute("Trait", otherFrog_Trait, thisPlace)  // Load Trait from otherFrog
+            //consoleOutput("Trait: "+otherFrog_Trait); // Test Trait
+          } else if (typeof baseFrog_Trait !== 'undefined') {                  // If otherFrog has no trait; check baseFrog
+            loadAttribute("Trait", baseFrog_Trait, thisPlace)   // Load trait from baseFrog
+            //consoleOutput("Trait: "+baseFrog_Trait); // Test Trait
           }
-          loadAttribute("Generate/Hat", Hat, where)
-
-          // Generate Mouth
-          Mouth = Math.floor((Math.random() * 40) + 0); // 10
-          if (Mouth >= 11){
-            Mouth = 0;
+          // Accessory
+          if (typeof baseFrog_Accessory !== 'undefined') {                             // Check for Accessory from baseFrog
+            loadAttribute("Accessory", baseFrog_Accessory, thisPlace)   // Load Accessory from baseFrog
+            //consoleOutput("Accessory: "+baseFrog_Accessory); // Test Accessory
+          } else if (typeof otherFrog_Accessory !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
+            loadAttribute("Accessory", otherFrog_Accessory, thisPlace)      // Load Accessory from otherFrog
+            //consoleOutput("Accessory: "+otherFrog_Accessory); // Test Trait
           }
-          loadAttribute("Generate/Mouth", Mouth, where)
-
-        } else {
-          loadAttribute("Generate/Frog", Frog, where)
-          // Generate Trait
-          Trait = Math.floor((Math.random() * 18) + 0); // 18
-          loadAttribute("Generate/Trait", Trait, where)
-
-          //Generate Accessory
-          Accessory = Math.floor((Math.random() * 40) + 1); // 4
-          if (Accessory >= 5){
-            Accessory = 0;
+          // Eyes
+          if (typeof baseFrog_Eyes !== 'undefined') {                             // Check for Accessory from baseFrog
+            loadAttribute("Eyes", baseFrog_Eyes, thisPlace)        // Load Accessory from baseFrog
+            //consoleOutput("Eyes: "+baseFrog_Eyes); // Test Trait
+          } else if (typeof otherFrog_Eyes !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
+            loadAttribute("Eyes", otherFrog_Eyes, thisPlace)      // Load Accessory from otherFrog
+            //consoleOutput("Eyes: "+otherFrog_Eyes);
           }
-          loadAttribute("Generate/Accessory", Accessory, where)
-
-          // Generate Eyes
-          Eyes = Math.floor((Math.random() * 40) + 0); // 8
-          if (Eyes >= 9){
-            Eyes = 0;
+          // Hat
+          if (typeof baseFrog_Hat !== 'undefined') {                             // Check for Accessory from baseFrog
+            loadAttribute("Hat", baseFrog_Hat, thisPlace)         // Load Accessory from baseFrog
+            //consoleOutput("Hat: "+baseFrog_Hat);
+          } else if (typeof otherFrog_Hat !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
+            loadAttribute("Hat", otherFrog_Hat, thisPlace)      // Load Accessory from otherFrog
+            //consoleOutput("Hat: "+otherFrog_Hat);
           }
-          loadAttribute("Generate/Eyes", Eyes, where)
-
-          // Generate Hat
-          Hat = Math.floor((Math.random() * 40) + 0); // 15
-          if (Hat >= 16){
-            Hat = 0;
+          // Mouth
+          if (typeof baseFrog_Mouth !== 'undefined') {                             // Check for Accessory from baseFrog
+            loadAttribute("Mouth", baseFrog_Mouth, thisPlace)       // Load Accessory from baseFrog
+            //consoleOutput("Mouth: "+baseFrog_Mouth);
+          } else if (typeof otherFrog_Mouth !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
+            loadAttribute("Mouth", otherFrog_Mouth, thisPlace)      // Load Accessory from otherFrog
+            //consoleOutput("Mouth: "+otherFrog_Mouth);
           }
-          loadAttribute("Generate/Hat", Hat, where)
-
-          // Generate Mouth
-          Mouth = Math.floor((Math.random() * 40) + 0); // 10
-          if (Mouth >= 11){
-            Mouth = 0;
+          //consoleOutput("Done")
+          
+        } else if (typeof baseFrog_SpecialFrog !== 'undefined') { // Load SpecialFrog Type
+          loadAttribute("SpecialFrog", baseFrog_SpecialFrog, thisPlace)
+          //consoleOutput("SpecialFrog Found: "+baseFrog_SpecialFrog)
+          //
+          // Accessory
+          if (typeof baseFrog_Accessory !== 'undefined') {                             // Check for Accessory from baseFrog
+            loadAttribute("Accessory", baseFrog_Accessory, thisPlace)   // Load Accessory from baseFrog
+            //consoleOutput("Accessory: "+baseFrog_Accessory); // Test Accessory
+          } else if (typeof otherFrog_Accessory !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
+            loadAttribute("Accessory", otherFrog_Accessory, thisPlace)      // Load Accessory from otherFrog
+            //consoleOutput("Accessory: "+otherFrog_Accessory); // Test Trait
           }
-          loadAttribute("Generate/Mouth", Mouth, where)
+          // Eyes
+          if (typeof baseFrog_Eyes !== 'undefined') {                             // Check for Accessory from baseFrog
+            loadAttribute("Eyes", baseFrog_Eyes, thisPlace)        // Load Accessory from baseFrog
+            //consoleOutput("Eyes: "+baseFrog_Eyes); // Test Trait
+          } else if (typeof otherFrog_Eyes !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
+            loadAttribute("Eyes", otherFrog_Eyes, thisPlace)      // Load Accessory from otherFrog
+            //consoleOutput("Eyes: "+otherFrog_Eyes);
+          }
+          // Hat
+          if (typeof baseFrog_Hat !== 'undefined') {                             // Check for Accessory from baseFrog
+            loadAttribute("Hat", baseFrog_Hat, thisPlace)         // Load Accessory from baseFrog
+            //consoleOutput("Hat: "+baseFrog_Hat);
+          } else if (typeof otherFrog_Hat !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
+            loadAttribute("Hat", otherFrog_Hat, thisPlace)      // Load Accessory from otherFrog
+            //consoleOutput("Hat: "+otherFrog_Hat);
+          }
+          // Mouth
+          if (typeof baseFrog_Mouth !== 'undefined') {                             // Check for Accessory from baseFrog
+            loadAttribute("Mouth", baseFrog_Mouth, thisPlace)       // Load Accessory from baseFrog
+            //consoleOutput("Mouth: "+baseFrog_Mouth);
+          } else if (typeof otherFrog_Mouth !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
+            loadAttribute("Mouth", otherFrog_Mouth, thisPlace)      // Load Accessory from otherFrog
+            //consoleOutput("Mouth: "+otherFrog_Mouth);
+          }
+          //consoleOutput("Done")
+          //
         }
       }
-      // Load recent mints
-      function recentlyMinted(mostRecent) {
-        for(let i=1; i<=24; i++) {
-          mostRecent2 = mostRecent - i
-          mostRecentDesc = "frog"+i+"Desc"
-          mostRecentLink = "frog"+i+"Link"
-          mostRecentFrog = "frog"+i
-          // <a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+mostRecent2+'" id="'+mostRecentLink+'" target="_blank">
-          newFrog = document.createElement("a")
-          newFrog.href = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+mostRecent2
-          newFrog.id = mostRecentLink
-          newFrog.target = "_blank"
-          newFrog.className = "smallContainer2"
-          newFrog.width = randomNumber(64, 128)+"px"
-          newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+mostRecent2+'.png" alt="Frog '+mostRecent2+'" id="frog'+i+'">'
-          document.getElementById("pre").appendChild(newFrog)
-        }
-        consoleOutput("<a id='loadRecentMints2' class='pointer' onclick='recentlyMinted("+mostRecent2+")'><u>Load More</u></a></b>");
-      }
-      //    {% include head-custom.html %}
     </script>
   <div class="top">{{ content }}</div>
   </head>
@@ -623,11 +659,12 @@
         <div class="downloads pre">
           <a class="pointer" style="margin-top: 2%;" href="https://freshfrogs.github.io/"><b><u>Minting Terminal</u> ↗️</b></a>
           <ul class="downloads2">
-            <li><a id="mintTransact" href="" class="pointer"><strong>🐸Random Generator</strong></a></li>
-            <li><a id="mintTotal"><strong>2.8 Million</strong>Combinations</a></li>
-            <li><a class="pointer"><strong>Notice</strong>Not real NFT</a></li>
+            <li><a id="morphFrogs" class="pointer"><strong>🐸Morph FROGS</strong></a></li>
+            <li><a id="selectBase" class="pointer"><strong>Base</strong>Select FROG</a></li>
+            <li><a id="selectSub" class="pointer"><strong>Sub</strong>Select FROG</a></li>
           </ul>
-          <div class="smallContainer2" id="randomFrogWhere">
+          <div class="bigContainer">
+            <div id="frogContainer" class="container"><div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.github.io/assets/frogs/preview2.gif" /></div></div>
           </div>
         </div>
       </header>
