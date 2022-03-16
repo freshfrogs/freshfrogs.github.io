@@ -548,18 +548,18 @@
       }
       // Save results
       $(function() { 
-          $("#morphFrogs").click(function() { 
-              html2canvas($("#share"), {
-                  onrendered: function(canvas) {
-                      theCanvas = canvas;
-                      document.body.appendChild(canvas);
+        $("#morphFrogs").click(function() { 
+          html2canvas($("#share"), {
+            onrendered: function(canvas) {
+              theCanvas = canvas;
+              document.body.appendChild(canvas);
 
-                      canvas.toBlob(function(blob) {
+              canvas.toBlob(function(blob) {
                 saveAs(blob, "Dashboard.png"); 
               });
-                  }
-              });
+            }
           });
+        });
       });
       // Select otherFrog
       // Function combine tokens
