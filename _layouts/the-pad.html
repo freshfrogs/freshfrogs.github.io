@@ -379,7 +379,7 @@
             combineTokens(baseFrog, subFrog);
           }
         })
-        consoleOutput('<hr class="hr2"><b>🍄Morph FROGS</b><br> FROG token combinations!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p class="learnMoreFM" id="learnMoreFM"></p><hr class="hr2">')
+        consoleOutput('<hr class="hr2"><b>🍄Morph FROGS</b><br> FROG token combinations!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p><hr class="hr2">')
         let snapshot = []
         let i = 1;
         let loadedFrogs = 0;
@@ -444,6 +444,7 @@
       }
       // Function Learn More Frog Morph
       function learnMore() {
+        document.getElementById("learnMoreFM").className = "learnMoreFM"
         document.getElementById("learnMoreFM").innerHTML = "<b>Does this make a brand new NFT? Or does it change the current ones?</b>"+"<br>Not at the moment! But once all 4,040 FROGS have been minted; this will be A released feature that DOES generate a NEW FROG TOKEN onto Ethereum!"
       }
       // Function Scroll to Frog 
