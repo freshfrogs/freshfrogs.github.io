@@ -443,21 +443,18 @@
       }
       // Function apply Owned Frog
       function applyFrogOwned(ownedFrog) {
-        if (baseFrogApplied != 1) { // baseFrog not set
+        if (baseFrog == 'undefined') { // baseFrog 
           selectBaseFrog(ownedFrog);
-          baseFrogApplied = 1;
           baseFrog = ownedFrog;
-        } else if (subFrogApplied != 1) { // baseFrog is set AND subFrog is NOT SET
+          subFrog = 'undefined'
+        } else if (subFrog == 'undefined') { // subFrog
           selectSubFrog(ownedFrog);
-          subFrogApplied = 1;
           subFrog = ownedFrog;
         } else {
-          document.getElementById("frogContainer").innerHTML = ""
+          // Reset Morph
           selectBaseFrog(ownedFrog);
-          baseFrogApplied = 1;
-          subFrogApplied = 0;
-          subFrog = 'undefined'
           baseFrog = ownedFrog;
+          subFrog = 'undefined'
         }
       }
       // Load attribute
