@@ -428,11 +428,11 @@
         // 1. Get metadata from baseFrog
         document.getElementById("frogContainer").innerHTML = "<div id='comboFrog' class='smallContainer2'></div>"
         let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+baseFrog+".json")).json();
-        consoleOutput("<img width='128px' src='https://freshfrogs.github.io/frog/"+baseFrog+".png'>");
-        consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
+        //consoleOutput("<img width='128px' src='https://freshfrogs.github.io/frog/"+baseFrog+".png'>");
+        //consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
         for (var baseFrogi = 0; baseFrogi < baseFrogmetadata.attributes.length; baseFrogi++){
           var data = baseFrogmetadata.attributes[baseFrogi]
-          consoleOutput(data.trait_type+": "+data.value)
+          //consoleOutput(data.trait_type+": "+data.value)
           if (data.trait_type == "Frog") {
             baseFrog_Frog = data.value;
           } else if (data.trait_type == "SpecialFrog") {
@@ -452,11 +452,11 @@
         // 2. Get metadata from otherFrog
         // otherFrog MetaData
         let otherFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+otherFrog+".json")).json();
-        consoleOutput("<img width='128px' src='https://freshfrogs.github.io/frog/"+otherFrog+".png'>");
-        consoleOutput("<br>otherFrog:"+otherFrogmetadata.name)
+        //consoleOutput("<img width='128px' src='https://freshfrogs.github.io/frog/"+otherFrog+".png'>");
+        //consoleOutput("<br>otherFrog:"+otherFrogmetadata.name)
         for (var otherFrogi = 0; otherFrogi < otherFrogmetadata.attributes.length; otherFrogi++){
           var data2 = otherFrogmetadata.attributes[otherFrogi]
-          consoleOutput(data2.trait_type+": "+data2.value)
+          //consoleOutput(data2.trait_type+": "+data2.value)
           if (data2.trait_type == "Frog") {
             otherFrog_Frog = data2.value;
           } else if (data2.trait_type == "SpecialFrog") {
@@ -476,7 +476,7 @@
       // Check first attribute. Is it a Frog or specialFrog?
       //consoleOutput("<div id='newFrog' class='smallContainer2'></div>");
       thisPlace = 'comboFrog';
-      consoleOutput("<br>\n<br>New Frog:<br>");
+      //consoleOutput("<br>\n<br>New Frog:<br>");
       if (typeof baseFrog_Frog !== 'undefined') {                              // Load Frog Type
           loadAttribute("Frog", baseFrog_Frog, thisPlace)       // Load Frog Type from baseFrog
           //consoleOutput("Frog: "+baseFrog_Frog); // Test Frog
