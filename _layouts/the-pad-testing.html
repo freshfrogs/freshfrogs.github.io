@@ -508,9 +508,6 @@
         newAttribute.target = "_blank"
         newAttribute.className = "frogImg2 pointer"
         newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
-        if (trait == "Frog" || trait == "SpecialFrog") {
-          loadAttribute("Frog", "frog", where);
-        }
         //newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
       }
@@ -611,6 +608,7 @@
       //consoleOutput("<br>\n<br>New Frog:<br>");
       if (typeof baseFrog_Frog !== 'undefined') {                              // Load Frog Type
           loadAttribute("Frog", baseFrog_Frog, thisPlace)       // Load Frog Type from baseFrog
+          loadAttribute("Frog", "frog", thisPlace);
           //consoleOutput("Frog: "+baseFrog_Frog); // Test Frog
           // Trait
           if (typeof otherFrog_Trait !== 'undefined') {                        // Check for trait from otherfrog
@@ -656,6 +654,7 @@
           
         } else if (typeof baseFrog_SpecialFrog !== 'undefined') { // Load SpecialFrog Type
           loadAttribute("SpecialFrog", baseFrog_SpecialFrog, thisPlace)
+          loadAttribute("Frog", "frog", thisPlace);
           //consoleOutput("SpecialFrog Found: "+baseFrog_SpecialFrog)
           //
           // Accessory
