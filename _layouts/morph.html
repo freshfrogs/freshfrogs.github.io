@@ -379,11 +379,11 @@
         // Inherits trait; and additional attirbutes from otherFrog
         // 1. Get metadata from baseFrog
         // baseFrog Metadata
-        let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+baseFrog+".json")).json();
+        baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+baseFrog+".json")).json();
         consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
         // 2. Get metadata from otherFrog
         // otherFrog MetaData
-        let otherFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+otherFrog+".json")).json();
+        otherFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+otherFrog+".json")).json();
         consoleOutput("<br>otherFrog:"+otherFrogmetadata.name)
       // Check first attribute. Is it a Frog or specialFrog?
       }
