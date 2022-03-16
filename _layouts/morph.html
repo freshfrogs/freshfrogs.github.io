@@ -396,7 +396,7 @@
         newFrog.id = 'baseFrogCont'
         newFrog.className = "imgWrapper"
         document.getElementById("frogContainer").appendChild(newFrog)
-        let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+baseFrog+".json")).json();
+        let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedBase+".json")).json();
         for (var i = 0; i < baseFrogmetadata.attributes.length; i++){
           var data = baseFrogmetadata.attributes[i]
           loadAttribute(data.trait_type, data.value, 'baseFrogCont')
