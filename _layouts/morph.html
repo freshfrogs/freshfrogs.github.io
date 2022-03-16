@@ -449,34 +449,34 @@
           }
           consoleOutput("<br>done with acc...<br>")
           // Eyes
-          if (baseFrog_Eyes !== 'undefined') {                             // Check for Accessory from baseFrog
+          if (typeof baseFrog_Eyes !== 'undefined') {                             // Check for Accessory from baseFrog
             //loadAttribute("Eyes", baseFrog_Eyes, thisPlace)        // Load Accessory from baseFrog
             consoleOutput("Eyes: "+baseFrog_Eyes); // Test Trait
-          } else if (otherFrog_Eyes !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
+          } else if (typeof otherFrog_Eyes !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
             //loadAttribute("Eyes", otherFrog_Eyes, thisPlace)      // Load Accessory from otherFrog
             consoleOutput("Eyes: "+otherFrog_Eyes);
           }
           consoleOutput("<br>done with eyes...<br>")
           // Hat
-          if (baseFrog_Hat !== 'undefined') {                             // Check for Accessory from baseFrog
+          if (typeof baseFrog_Hat !== 'undefined') {                             // Check for Accessory from baseFrog
             //loadAttribute("Hat", baseFrog_Hat, thisPlace)         // Load Accessory from baseFrog
             consoleOutput("Hat: "+baseFrog_Hat);
-          } else if (otherFrog_Hat !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
+          } else if (typeof otherFrog_Hat !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
             //loadAttribute("Hat", otherFrog_Hat, thisPlace)      // Load Accessory from otherFrog
             consoleOutput("Hat: "+otherFrog_Hat);
           }
           consoleOutput("<br>done with hats...<br>")
           // Mouth
-          if (baseFrog_Mouth !== 'undefined') {                             // Check for Accessory from baseFrog
+          if (typeof baseFrog_Mouth !== 'undefined') {                             // Check for Accessory from baseFrog
             //loadAttribute("Mouth", baseFrog_Mouth, thisPlace)       // Load Accessory from baseFrog
             consoleOutput("Mouth: "+baseFrog_Mouth);
-          } else if (otherFrog_Mouth !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
+          } else if (typeof otherFrog_Mouth !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
             //loadAttribute("Mouth", otherFrog_Mouth, thisPlace)      // Load Accessory from otherFrog
             consoleOutput("Mouth: "+otherFrog_Mouth);
           }
           consoleOutput("Done")
           
-        } else if (baseFrog_SpecialFrog !== 'undefined') { // Load SpecialFrog Type
+        } else if (typeof baseFrog_SpecialFrog !== 'undefined') { // Load SpecialFrog Type
           //loadAttribute("SpecialFrog", baseFrog_SpecialFrog, thisPlace)
           consoleOutput("SpecialFrog Found: "+baseFrog_SpecialFrog)
         }
