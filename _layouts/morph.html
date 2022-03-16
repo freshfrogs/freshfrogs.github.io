@@ -410,8 +410,7 @@
         //
         newFrog = document.createElement("div")
         newFrog.className = "smallContainer2"
-        newFrog.innerHTML = "<div class='frogImg'></div>"
-        newFrog.id = 'baseDisplay'
+        newFrog.innerHTML = "<div class='imgWrapper' id='baseDisplay'></div>"
         document.getElementById("frogContainer").appendChild(newFrog)
         //
         let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedBase+".json")).json();
