@@ -393,7 +393,7 @@
         // Inherits trait; and additional attirbutes from otherFrog
         // 1. Get metadata from baseFrog
         let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+baseFrog+".json")).json();
-        consoleOutput("<img width='64px' src='https://freshfrogs.github.io/frog/"+baseFrog+".png'>");
+        consoleOutput("<img width='128px' src='https://freshfrogs.github.io/frog/"+baseFrog+".png'>");
         consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
         for (var baseFrogi = 0; baseFrogi < baseFrogmetadata.attributes.length; baseFrogi++){
           var data = baseFrogmetadata.attributes[baseFrogi]
@@ -417,7 +417,7 @@
         // 2. Get metadata from otherFrog
         // otherFrog MetaData
         let otherFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+otherFrog+".json")).json();
-        consoleOutput("<img width='64px' src='https://freshfrogs.github.io/frog/"+otherFrog+".png'>");
+        consoleOutput("<img width='128px' src='https://freshfrogs.github.io/frog/"+otherFrog+".png'>");
         consoleOutput("<br>otherFrog:"+otherFrogmetadata.name)
         for (var otherFrogi = 0; otherFrogi < otherFrogmetadata.attributes.length; otherFrogi++){
           var data2 = otherFrogmetadata.attributes[otherFrogi]
