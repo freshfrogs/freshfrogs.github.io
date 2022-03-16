@@ -361,7 +361,8 @@
         let mintProgress = 0;
         let mint = 0;
         let ownedFrogs = await collection.methods.balanceOf(userAcc).call()
-
+        baseFrogApplied = 0;
+        subFrogApplied = 0;
 
         // Messages Sent to Terminal
         //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"+"Compiling tokens... Please wait... ⌛"
