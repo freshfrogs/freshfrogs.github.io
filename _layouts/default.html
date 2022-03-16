@@ -367,6 +367,7 @@
         mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
 
         // Messages Sent to Terminal
+        document.getElementById("supply").innerHTML = "<strong>"+nextIdC+" / 4,040 Total Supply</strong>"
         document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"
         
 //        if (nextIdC >= 575) {
@@ -613,7 +614,7 @@
     <div class="wrapper">
       <header>
         <div class="downloads pre">
-          <strong>4,040 FROG Total Supply</strong>
+          <strong id="supply">4,040 Total Supply</strong>
           <a class="pointer" style="margin-top: 2%;" href="https://freshfrogs.github.io/the-pad"><b><u>View Owned Frogs</u> ↗️</b></a>
           <ul class="downloads2">
             <li><a id="mintTransact" href="" class="pointer"><strong>⛔LINK WALLET</strong></a></li>
