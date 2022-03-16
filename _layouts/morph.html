@@ -392,6 +392,12 @@
       }
       // Select subFrog
       async function selectSubFrog(selectedSub){
+        //
+        newFrog = document.createElement("div")
+        newFrog.className = "imgWrapper"
+        newFrog.innerHTML = "<div style='float: left !important;' class='frogImg'><div class='smallContainer2' id='subDisplay'></div></div>"
+        document.getElementById("frogContainer").appendChild(newFrog)
+        //
         let subFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedSub+".json")).json();
         for (var i = 0; i < subFrogmetadata.attributes.length; i++){
           var data = subFrogmetadata.attributes[i]
@@ -401,6 +407,12 @@
       }
       // Select baseFrog
       async function selectBaseFrog(selectedBase){
+        //
+        newFrog = document.createElement("div")
+        newFrog.className = "imgWrapper"
+        newFrog.innerHTML = "<div style='float: right !important;' class='frogImg'><div class='smallContainer2' id='baseDisplay'></div></div>"
+        document.getElementById("frogContainer").appendChild(newFrog)
+        //
         let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedBase+".json")).json();
         for (var i = 0; i < baseFrogmetadata.attributes.length; i++){
           var data = baseFrogmetadata.attributes[i]
@@ -529,10 +541,7 @@
             <li><a id="selectSub" class="pointer" onclick="selectSubFrog(2)"><strong>Sub</strong>Select FROG</a></li>
           </ul>
           <div class="bigContainer">
-            <div id="frogContainer" class="container">
-              <div class="imgWrapper"><div class="smallContainer2" id="baseDisplay"></div>
-              <div class="smallContainer2" id="subDisplay"></div></div>
-            </div>
+            <div id="frogContainer" class="container"></div>
           </div>
         </div>
       </header>
