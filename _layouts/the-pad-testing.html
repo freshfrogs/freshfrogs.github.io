@@ -542,7 +542,7 @@
         newFrog.className = "imgWrapper"
         newFrog.innerHTML = "<div class='frogImg'><div style='float: right !important;' class='smallContainer2' id='subDisplay'></div></div>"
         document.getElementById("frogContainer").appendChild(newFrog)
-        let openseaLinkSub = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+subFrog+""
+        openseaLinkSub = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+subFrog+""
         //
         let subFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedSub+".json")).json();
         for (var i = 0; i < subFrogmetadata.attributes.length; i++){
@@ -559,7 +559,7 @@
         newFrog.className = "imgWrapper"
         newFrog.innerHTML = "<div class='frogImg'><div style='float: left !important;' class='smallContainer2' id='baseDisplay'></div></div>"
         document.getElementById("frogContainer").appendChild(newFrog)
-        let openseaLinkBase = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+baseFrog+""
+        openseaLinkBase = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+baseFrog+""
         //
         let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedBase+".json")).json();
         for (var i = 0; i < baseFrogmetadata.attributes.length; i++){
