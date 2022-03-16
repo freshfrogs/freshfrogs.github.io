@@ -551,6 +551,7 @@
         $("#morphFrogs").click(function() { 
           html2canvas($("#share"), {
             onrendered: function(canvas) {
+              alert("Test");
               theCanvas = canvas;
               document.body.appendChild(canvas);
 
