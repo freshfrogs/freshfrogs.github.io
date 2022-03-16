@@ -394,8 +394,8 @@
       async function selectSubFrog(selectedSub){
         //
         newFrog = document.createElement("div")
-        newFrog.className = "smallContainer2"
-        newFrog.innerHTML = "<div class='imgWrapper' id='subDisplay'></div>"
+        newFrog.className = "imgWrapper"
+        newFrog.innerHTML = "<div class='frogImg'><div class='smallContainer2' id='subDisplay'></div></div>"
         document.getElementById("frogContainer").appendChild(newFrog)
         //
         let subFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedSub+".json")).json();
