@@ -378,6 +378,8 @@
         // frogType, and attributes.
         // Inherits trait; and additional attirbutes from otherFrog
         // 1. Get metadata from baseFrog
+        let CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
+        let collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
         let baseFrogTokenURI = await collection.methods.tokenURI(baseFrog).call()
         let baseFrogCID = baseFrogTokenURI.replace("ipfs://", "")
         let baseFrogIpfsGatewayURI = "https://ipfs.io/ipfs/" + baseFrogCID
