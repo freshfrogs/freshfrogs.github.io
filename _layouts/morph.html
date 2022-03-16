@@ -318,12 +318,7 @@
     <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-6PB0WKB4SH');
       document.addEventListener("DOMContentLoaded", async () => {
         consoleOutput("test")
         const web3 = new Web3(window.ethereum)
@@ -389,8 +384,8 @@
         // baseFrog Metadata
         let baseFrogmetadata = await (await fetch(baseFrogIpfsGatewayURI)).json();
         consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
-        for (var baseFrogi = 0; baseFrogi < baseFrogmetadata.attributes.length; baseFrogi++){
-          var data = baseFrogmetadata.attributes[baseFrogi]
+        for (baseFrogi = 0; baseFrogi < baseFrogmetadata.attributes.length; baseFrogi++){
+          data = baseFrogmetadata.attributes[baseFrogi]
           consoleOutput(data.trait_type+": "+data.value)
           if (data.trait_type == "Frog") {
             baseFrog.Frog = data.value;
@@ -415,8 +410,8 @@
         // otherFrog MetaData
         let otherFrogmetadata = await (await fetch(otherFrogIpfsGatewayURI)).json();
         consoleOutput("<br>otherFrog:"+otherFrogmetadata.name)
-        for (var otherFrogi = 0; otherFrogi < otherFrogmetadata.attributes.length; otherFrogi++){
-          var data = otherFrogmetadata.attributes[otherFrogi]
+        for (otherFrogi = 0; otherFrogi < otherFrogmetadata.attributes.length; otherFrogi++){
+          data = otherFrogmetadata.attributes[otherFrogi]
           consoleOutput(data.trait_type+": "+data.value)
           if (data.trait_type == "Frog") {
             otherFrog.Frog = data.value;
