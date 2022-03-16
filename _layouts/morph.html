@@ -389,19 +389,18 @@
           consoleOutput(data.trait_type+": "+data.value)
           if (data.trait_type == "Frog") {
             baseFrog_Frog = data.value;
-            consoleOutput(baseFrog_Frog)
           } else if (data.trait_type == "SpecialFrog") {
-            baseFrog.SpecialFrog = data.value;
+            baseFrog_SpecialFrog = data.value;
           } else if (data.trait_type == "Trait") {
-            baseFrog.Trait = data.value;
+            baseFrog_Trait = data.value;
           } else if (data.trait_type == "Accessory") {
-            baseFrog.Accessory = data.value;
+            baseFrog_Accessory = data.value;
           } else if (data.trait_type == "Eyes") {
-            baseFrog.Eyes = data.value;
+            baseFrog_Eyes = data.value;
           } else if (data.trait_type == "Hat") {
-            baseFrog.Hat = data.value;
+            baseFrog_Hat = data.value;
           } else if (data.trait_type == "Mouth") {
-            baseFrog.Mouth = data.value;
+            baseFrog_Mouth = data.value;
           }
         }
         // 2. Get metadata from otherFrog
@@ -412,69 +411,69 @@
           var data = otherFrogmetadata.attributes[otherFrogi]
           consoleOutput(data.trait_type+": "+data.value)
           if (data.trait_type == "Frog") {
-            otherFrog.Frog = data.value;
+            otherFrog_Frog = data.value;
           } else if (data.trait_type == "SpecialFrog") {
-            otherFrog.SpecialFrog = data.value;
+            otherFrog_SpecialFrog = data.value;
           } else if (data.trait_type == "Trait") {
-            otherFrog.Trait = data.value;
+            otherFrog_Trait = data.value;
           } else if (data.trait_type == "Accessory") {
-            otherFrog.Accessory = data.value;
+            otherFrog_Accessory = data.value;
           } else if (data.trait_type == "Eyes") {
-            otherFrog.Eyes = data.value;
+            otherFrog_Eyes = data.value;
           } else if (data.trait_type == "Hat") {
-            otherFrog.Hat = data.value;
+            otherFrog_Hat = data.value;
           } else if (data.trait_type == "Mouth") {
-            otherFrog.Mouth = data.value;
+            otherFrog_Mouth = data.value;
           }
         }
       // Check first attribute. Is it a Frog or specialFrog?
-      if (baseFrog.Frog != null) {                              // Load Frog Type
-          //loadAttribute("Frog", baseFrog.Frog, thisPlace)       // Load Frog Type from baseFrog
-          consoleOutput("Frog: "+baseFrog.Frog); // Test Frog
+      if (baseFrog_Frog != null) {                              // Load Frog Type
+          //loadAttribute("Frog", baseFrog_Frog, thisPlace)       // Load Frog Type from baseFrog
+          consoleOutput("Frog: "+baseFrog_Frog); // Test Frog
           // Trait
-          if (otherFrog.Trait != null) {                        // Check for trait from otherfrog
-            //loadAttribute("Trait", otherFrog.Trait, thisPlace)  // Load Trait from otherFrog
-            consoleOutput("Trait: "+otherFrog.Trait); // Test Trait
-          } else if (baseFrog.Trait != null) {                  // If otherFrog has no trait; check baseFrog
-            //loadAttribute("Trait", baseFrog.Trait, thisPlace)   // Load trait from baseFrog
-            consoleOutput("Trait: "+baseFrog.Trait); // Test Trait
+          if (otherFrog_Trait != null) {                        // Check for trait from otherfrog
+            //loadAttribute("Trait", otherFrog_Trait, thisPlace)  // Load Trait from otherFrog
+            consoleOutput("Trait: "+otherFrog_Trait); // Test Trait
+          } else if (baseFrog_Trait != null) {                  // If otherFrog has no trait; check baseFrog
+            //loadAttribute("Trait", baseFrog_Trait, thisPlace)   // Load trait from baseFrog
+            consoleOutput("Trait: "+baseFrog_Trait); // Test Trait
           }
           // Accessory
-          if (baseFrog.Accessory != null) {                             // Check for Accessory from baseFrog
-            //loadAttribute("Accessory", baseFrog.Accessory, thisPlace)   // Load Accessory from baseFrog
-            consoleOutput("Accessory: "+baseFrog.Accessory); // Test Accessory
-          } else if (otherFrog.Accessory != null) {                     // If baseFrog has no Accessory; check otherFrog
-            //loadAttribute("Accessory", otherFrog.Accessory, thisPlace)      // Load Accessory from otherFrog
-            consoleOutput("Accessory: "+otherFrog.Accessory); // Test Trait
+          if (baseFrog_Accessory != null) {                             // Check for Accessory from baseFrog
+            //loadAttribute("Accessory", baseFrog_Accessory, thisPlace)   // Load Accessory from baseFrog
+            consoleOutput("Accessory: "+baseFrog_Accessory); // Test Accessory
+          } else if (otherFrog_Accessory != null) {                     // If baseFrog has no Accessory; check otherFrog
+            //loadAttribute("Accessory", otherFrog_Accessory, thisPlace)      // Load Accessory from otherFrog
+            consoleOutput("Accessory: "+otherFrog_Accessory); // Test Trait
           }
           // Eyes
-          if (baseFrog.Eyes != null) {                             // Check for Accessory from baseFrog
-            //loadAttribute("Eyes", baseFrog.Eyes, thisPlace)        // Load Accessory from baseFrog
-            consoleOutput("Eyes: "+baseFrog.Eyes); // Test Trait
-          } else if (otherFrog.Eyes != null) {                     // If baseFrog has no Accessory; check otherFrog
-            //loadAttribute("Eyes", otherFrog.Eyes, thisPlace)      // Load Accessory from otherFrog
-            consoleOutput("Eyes: "+otherFrog.Eyes);
+          if (baseFrog_Eyes != null) {                             // Check for Accessory from baseFrog
+            //loadAttribute("Eyes", baseFrog_Eyes, thisPlace)        // Load Accessory from baseFrog
+            consoleOutput("Eyes: "+baseFrog_Eyes); // Test Trait
+          } else if (otherFrog_Eyes != null) {                     // If baseFrog has no Accessory; check otherFrog
+            //loadAttribute("Eyes", otherFrog_Eyes, thisPlace)      // Load Accessory from otherFrog
+            consoleOutput("Eyes: "+otherFrog_Eyes);
           }
           // Hat
-          if (baseFrog.Hat != null) {                             // Check for Accessory from baseFrog
-            //loadAttribute("Hat", baseFrog.Hat, thisPlace)         // Load Accessory from baseFrog
-            consoleOutput("Hat: "+baseFrog.Hat);
-          } else if (otherFrog.Hat != null) {                     // If baseFrog has no Accessory; check otherFrog
-            //loadAttribute("Hat", otherFrog.Hat, thisPlace)      // Load Accessory from otherFrog
-            consoleOutput("Hat: "+otherFrog.Hat);
+          if (baseFrog_Hat != null) {                             // Check for Accessory from baseFrog
+            //loadAttribute("Hat", baseFrog_Hat, thisPlace)         // Load Accessory from baseFrog
+            consoleOutput("Hat: "+baseFrog_Hat);
+          } else if (otherFrog_Hat != null) {                     // If baseFrog has no Accessory; check otherFrog
+            //loadAttribute("Hat", otherFrog_Hat, thisPlace)      // Load Accessory from otherFrog
+            consoleOutput("Hat: "+otherFrog_Hat);
           }
           // Mouth
-          if (baseFrog.Mouth != null) {                             // Check for Accessory from baseFrog
-            //loadAttribute("Mouth", baseFrog.Mouth, thisPlace)       // Load Accessory from baseFrog
-            consoleOutput("Mouth: "+baseFrog.Mouth);
-          } else if (otherFrog.Mouth != null) {                     // If baseFrog has no Accessory; check otherFrog
-            //loadAttribute("Mouth", otherFrog.Mouth, thisPlace)      // Load Accessory from otherFrog
-            consoleOutput("Mouth: "+otherFrog.Mouth);
+          if (baseFrog_Mouth != null) {                             // Check for Accessory from baseFrog
+            //loadAttribute("Mouth", baseFrog_Mouth, thisPlace)       // Load Accessory from baseFrog
+            consoleOutput("Mouth: "+baseFrog_Mouth);
+          } else if (otherFrog_Mouth != null) {                     // If baseFrog has no Accessory; check otherFrog
+            //loadAttribute("Mouth", otherFrog_Mouth, thisPlace)      // Load Accessory from otherFrog
+            consoleOutput("Mouth: "+otherFrog_Mouth);
           }
           
-        } else if (baseFrog.SpecialFrog != null) { // Load SpecialFrog Type
-          //loadAttribute("SpecialFrog", baseFrog.SpecialFrog, thisPlace)
-          consoleOutput("SpecialFrog Found: "+baseFrog.SpecialFrog)
+        } else if (baseFrog_SpecialFrog != null) { // Load SpecialFrog Type
+          //loadAttribute("SpecialFrog", baseFrog_SpecialFrog, thisPlace)
+          consoleOutput("SpecialFrog Found: "+baseFrog_SpecialFrog)
         }
       }
     </script>
