@@ -394,7 +394,7 @@
         while(true) {
           try {
             let owner = await collection.methods.ownerOf(i++).call()
-            if (ownedFrogs <= 0) { // ❌ No FROGS
+            if (ownedFrogs <= 4) { // ❌ No FROGS
               document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>❌ It seems you do not own any FROGS!'+'<br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
               break;
             }
@@ -546,22 +546,6 @@
         document.getElementById("selectBase").innerHTML = "<strong># Base</strong>"+baseFrogmetadata.name
         document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" / "
       }
-      // Save results
-      $(function() { 
-        $("#morphFrogs").click(function() { 
-          html2canvas($("#share"), {
-            onrendered: function(canvas) {
-              alert("Test");
-              theCanvas = canvas;
-              document.body.appendChild(canvas);
-
-              canvas.toBlob(function(blob) {
-                saveAs(blob, "Dashboard.png"); 
-              });
-            }
-          });
-        });
-      });
       // Select otherFrog
       // Function combine tokens
       async function combineTokens(baseFrog, otherFrog) {
@@ -722,7 +706,7 @@
             <li><a id="selectBase" class="pointer"><strong># Base</strong>Select FROG</a></li>
             <li><a id="selectSub" class="pointer"><strong># Sub</strong>Select FROG</a></li>
           </ul>
-          <div id="share" class="bigContainer">
+          <div class="bigContainer">
             <div id="frogContainer" class="container"><div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.github.io/assets/frogs/FR0G.png" /></div></div>
           </div>
         </div>
