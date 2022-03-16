@@ -389,19 +389,21 @@
         applyFrogOwned(67)
         //
         document.querySelector("#selectBase").addEventListener("click", async (e) => {
-          if (openseaLinkBase !== 'undefined') { 
+          if (baseFrog !== 'undefined') { 
             // Opensea collection link
             window.location.replace("https://opensea.io/collection/fresh-frogs");
           } else {
             // Token ID Link
+            openseaLinkBase = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+baseFrog+""
             window.location.replace(openseaLinkBase);
           }
         })
         document.querySelector("#selectSub").addEventListener("click", async (e) => {
-          if (openseaLinkSub !== 'undefined') { 
+          if (subFrog !== 'undefined') { 
             // Opensea collection link
             window.location.replace("https://opensea.io/collection/fresh-frogs");
           } else {
+            openseaLinkSub = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+subFrog+""
             // Token ID Link
             alert(openseaLinkSub);
             window.location.replace(openseaLinkSub);
@@ -542,7 +544,6 @@
         newFrog.className = "imgWrapper"
         newFrog.innerHTML = "<div class='frogImg'><div style='float: right !important;' class='smallContainer2' id='subDisplay'></div></div>"
         document.getElementById("frogContainer").appendChild(newFrog)
-        openseaLinkSub = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+subFrog+""
         //
         let subFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedSub+".json")).json();
         for (var i = 0; i < subFrogmetadata.attributes.length; i++){
