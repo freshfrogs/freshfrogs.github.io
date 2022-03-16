@@ -426,7 +426,7 @@
         // frogType, and attributes.
         // Inherits trait; and additional attirbutes from otherFrog
         // 1. Get metadata from baseFrog
-        document.getElementById("frogContainer").innerHTML = ""
+        document.getElementById("frogContainer").innerHTML = "<div id='comboFrog' class='smallContainer2'></div>"
         let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+baseFrog+".json")).json();
         consoleOutput("<img width='128px' src='https://freshfrogs.github.io/frog/"+baseFrog+".png'>");
         consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
@@ -475,7 +475,7 @@
         }
       // Check first attribute. Is it a Frog or specialFrog?
       //consoleOutput("<div id='newFrog' class='smallContainer2'></div>");
-      thisPlace = 'frogContainer';
+      thisPlace = 'comboFrog';
       consoleOutput("<br>\n<br>New Frog:<br>");
       if (typeof baseFrog_Frog !== 'undefined') {                              // Load Frog Type
           loadAttribute("Frog", baseFrog_Frog, thisPlace)       // Load Frog Type from baseFrog
