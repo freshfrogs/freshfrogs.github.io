@@ -395,7 +395,7 @@
         //
         newFrog = document.createElement("div")
         newFrog.className = "imgWrapper"
-        newFrog.innerHTML = "<div style='float: right !important;' class='frogImg'><div class='smallContainer2' id='subDisplay'></div></div>"
+        newFrog.innerHTML = "<div style='margin-left: 5%;float: right !important;' class='frogImg'><div class='smallContainer2' id='subDisplay'></div></div>"
         document.getElementById("frogContainer").appendChild(newFrog)
         //
         let subFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedSub+".json")).json();
