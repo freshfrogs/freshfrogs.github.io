@@ -463,9 +463,8 @@
       // Load attribute
       function loadAttribute(trait, attribute, where) {
         newAttribute = document.createElement("img")
-        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
+        newAttribute.onclick = "applyFrogOwned("+freshFrog+")"
         newAttribute.id = attribute
-        newAttribute.target = "_blank"
         newAttribute.className = "frogImg2 pointer"
         newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
         //newAttribute.alt = attribute
