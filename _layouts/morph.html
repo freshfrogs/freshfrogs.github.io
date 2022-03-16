@@ -390,13 +390,19 @@
         //newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
       }
+      // Select subFrog
+      async function selectBaseFrog(selectedSub){
+        // <div class="smallContainer2" id="baseDisplay"></div>
+        let subFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedSub+".json")).json();
+        for (var i = 0; i < subFrogmetadata.attributes.length; i++){
+          var data = subFrogmetadata.attributes[i]
+          loadAttribute(data.trait_type, data.value, 'subDisplay')
+        }
+        document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>"+subFrogmetadata.name
+      }
       // Select baseFrog
       async function selectBaseFrog(selectedBase){
         // <div class="smallContainer2" id="baseDisplay"></div>
-        newFrog = document.createElement("div")
-        newFrog.id = 'baseDisplay'
-        newFrog.className = "smallContainer2"
-        document.getElementById("bigDisplay").appendChild(newFrog)
         let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedBase+".json")).json();
         for (var i = 0; i < baseFrogmetadata.attributes.length; i++){
           var data = baseFrogmetadata.attributes[i]
@@ -525,6 +531,8 @@
             <li><a class="selectSub"><strong>Sub</strong>Select FROG</a></li>
           </ul>
           <div class="bigContainer" id="bigDisplay">
+            <div class="smallContainer2" id="baseDisplay"></div>
+            <div class="smallContainer2" id="subDisplay"></div>
           </div>
         </div>
       </header>
