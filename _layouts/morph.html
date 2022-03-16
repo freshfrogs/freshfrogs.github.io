@@ -392,7 +392,6 @@
       }
       // Select baseFrog
       async function selectBaseFrog(selectedBase){
-        //
         newFrog = document.createElement("div")
         newFrog.id = 'baseFrogCont'
         newFrog.className = "imgWrapper"
@@ -521,7 +520,7 @@
           <a class="pointer" style="margin-top: 2%;" href="https://freshfrogs.github.io/"><b><u>Minting Terminal</u> ↗️</b></a>
           <ul class="downloads2">
             <li><a id="morphFrogs" href="" class="pointer"><strong>🐸Morph FROGS</strong></a></li>
-            <li><a id="selectBase"><strong>Base</strong>Select FROG</a></li>
+            <li><a id="selectBase" onclick="selectBaseFrog(1)"><strong>Base</strong>Select FROG</a></li>
             <li><a class="selectSub"><strong>Sub</strong>Select FROG</a></li>
           </ul>
           <div class="bigContainer" id="frogDisplay">
