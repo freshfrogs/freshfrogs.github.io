@@ -399,7 +399,7 @@
               break;
             }
             if (ownedFrogs == loadedFrogs) {
-              document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ✅ '+ownedFrogs+' FROG(s) found!'+'<br>\n<br><input type="text" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by Token ID">'+'<br>\n<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
+              document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ✅ '+ownedFrogs+' FROG(s) found!'+'<br>\n<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
               break;
             }
             document.getElementById("progress").innerHTML = parseInt((i/nextIdC)*100)+"%"
@@ -437,7 +437,7 @@
               })()
             }
           } catch (e) {
-            document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ✅ '+ownedFrogs+' FROG(s) found!'+'<br>\n<br><input type="text" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by Token ID">'+'<br>\n<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
+            document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ✅ '+ownedFrogs+' FROG(s) found!'+'<br>\n<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
             altert(e.message+"\nREFRESH THE PAGE");
             break;
           }
