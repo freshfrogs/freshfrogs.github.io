@@ -509,22 +509,22 @@
         let otherFrogmetadata = await (await fetch(otherFrogIpfsGatewayURI)).json();
         consoleOutput("<br>otherFrog:"+otherFrogmetadata.name)
         for (var otherFrogi = 0; otherFrogi < otherFrogmetadata.attributes.length; otherFrogi++){
-          var data = otherFrogmetadata.attributes[otherFrogi]
-          consoleOutput(data.trait_type+": "+data.value)
-          if (data.trait_type == "Frog") {
-            otherFrog.Frog = data.value;
-          } else if (data.trait_type == "SpecialFrog") {
-            otherFrog.SpecialFrog = data.value;
-          } else if (data.trait_type == "Trait") {
-            otherFrog.Trait = data.value;
-          } else if (data.trait_type == "Accessory") {
-            otherFrog.Accessory = data.value;
-          } else if (data.trait_type == "Eyes") {
-            otherFrog.Eyes = data.value;
-          } else if (data.trait_type == "Hat") {
-            otherFrog.Hat = data.value;
-          } else if (data.trait_type == "Mouth") {
-            otherFrog.Mouth = data.value;
+          var data2 = otherFrogmetadata.attributes[otherFrogi]
+          consoleOutput(data2.trait_type+": "+data2.value)
+          if (data2.trait_type == "Frog") {
+            otherFrog.Frog = data2.value;
+          } else if (data2.trait_type == "SpecialFrog") {
+            otherFrog.SpecialFrog = data2.value;
+          } else if (data2.trait_type == "Trait") {
+            otherFrog.Trait = data2.value;
+          } else if (data2.trait_type == "Accessory") {
+            otherFrog.Accessory = data2.value;
+          } else if (data2.trait_type == "Eyes") {
+            otherFrog.Eyes = data2.value;
+          } else if (data2.trait_type == "Hat") {
+            otherFrog.Hat = data2.value;
+          } else if (data2.trait_type == "Mouth") {
+            otherFrog.Mouth = data2.value;
           }
         }
       // Check first attribute. Is it a Frog or specialFrog?
