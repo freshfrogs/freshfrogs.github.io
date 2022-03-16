@@ -302,6 +302,11 @@
     height: 100% !important;
     display: inline-block !important;
   }
+  .learnMoreFM {
+    background-color: #e0e0e0;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -373,7 +378,7 @@
             combineTokens(baseFrog, subFrog);
           }
         })
-        consoleOutput('<hr class="hr2"><b>🍄Morph FROGS</b><br> FROG token combinations!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p><hr class="hr2">')
+        consoleOutput('<hr class="hr2"><b>🍄Morph FROGS</b><br> FROG token combinations!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p class="learnMoreFM" id="learnMoreFM"></p><hr class="hr2">')
         let snapshot = []
         let i = 1;
         let loadedFrogs = 0;
