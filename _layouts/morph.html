@@ -424,7 +424,6 @@
             otherFrog_Hat = data2.value;
           } else if (data2.trait_type == "Mouth") {
             otherFrog_Mouth = data2.value;
-            consoleOutput("Test "+otherFrog_Mouth)
           }
         }
       // Check first attribute. Is it a Frog or specialFrog?
@@ -472,6 +471,7 @@
             //loadAttribute("Mouth", otherFrog_Mouth, thisPlace)      // Load Accessory from otherFrog
             consoleOutput("Mouth: "+otherFrog_Mouth);
           }
+          consoleOutput("Test "+otherFrog_Mouth)
           
         } else if (baseFrog_SpecialFrog != null) { // Load SpecialFrog Type
           //loadAttribute("SpecialFrog", baseFrog_SpecialFrog, thisPlace)
