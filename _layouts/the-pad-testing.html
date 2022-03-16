@@ -508,6 +508,9 @@
         newAttribute.target = "_blank"
         newAttribute.className = "frogImg2 pointer"
         newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
+        if (trait == "Frog" || trait == "SpecialFrog") {
+          loadAttribute("Frog", "frog", where);
+        }
         //newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
       }
