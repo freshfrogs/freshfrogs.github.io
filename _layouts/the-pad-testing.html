@@ -528,7 +528,7 @@
           loadAttribute(data.trait_type, data.value, 'subDisplay')
         }
         openseaLink = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+subFrog+""
-        document.getElementById("selectSub").innerHTML = "<strong><a href='"+openseaLink+"'># Sub</a></strong>"+subFrogmetadata.name
+        document.getElementById("selectSub").innerHTML = "<strong><a target='_blank' href='"+openseaLink+"'># Sub</a></strong>"+subFrogmetadata.name
         document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" / #"+subFrog
       }
       // Select baseFrog
@@ -545,7 +545,7 @@
           loadAttribute(data.trait_type, data.value, 'baseDisplay')
         }
         openseaLink = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+baseFrog+""
-        document.getElementById("selectBase").innerHTML = "<strong><a href='"+openseaLink+"'># Base</a></strong>"+baseFrogmetadata.name
+        document.getElementById("selectBase").innerHTML = "<strong><a target='_blank' href='"+openseaLink+"'># Base</a></strong>"+baseFrogmetadata.name
         document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" / "
       }
       // Select otherFrog
