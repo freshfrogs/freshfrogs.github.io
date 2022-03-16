@@ -398,7 +398,7 @@
                 metadata2 = await get()
                 consoleOutput("<strong><u>"+metadata2.name+"</u></strong> ✅ [ Owned ]\n");
                 openseaLink = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+thisFrogRender+""
-                consoleOutput('<a target="_blank" onclick="applyFrogOwned('+thisFrogRender+')" href="'+openseaLink+'">View on OpenSea ↗️</a><hr class="hr2">')
+                consoleOutput('<a target="_blank" href="'+openseaLink+'">View on OpenSea ↗️</a><hr class="hr2">')
                 for (var i = 0; i < metadata2.attributes.length; i++){
                   //document.write("<br><br>array index: " + i);
                   //consoleOutput("<br><br>array index: " + i);
@@ -428,6 +428,19 @@
         newLine = document.createElement("div")
         newLine.innerHTML = output
         document.getElementById("pre").appendChild(newLine)
+      }
+      // Load Certain FROG
+      function loadFreshFrog(freshFrog) {
+        newFrog = document.createElement("a")
+        newFrog.onclick = "applyFrogOwned("+freshFrog+")"
+        newFrog.id = "Frog #"+freshFrog
+        newFrog.className = "smallContainer2"
+        //newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+freshFrog+'.png" alt="Frog '+freshFrog+'" id="frog'+freshFrog+'">'
+        document.getElementById("pre").appendChild(newFrog)
+        /*
+          <a id="" class="smallContainer2">
+          </a>
+        */
       }
       // Function apply Owned Frog
       function applyFrogOwned(ownedFrog) {
