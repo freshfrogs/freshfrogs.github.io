@@ -375,7 +375,6 @@
         })
         let snapshot = []
         let i = 1;
-        let loadedFrogs = 0;
         //consoleOutput("Scanning Tokens... Please wait... ⌛")
         while(true) {
           try {
@@ -384,13 +383,9 @@
               document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>❌ It seems you do not own any FROGS!'+'<br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
               break;
             }
-            if (ownedFrogs == loadedFrogs) {
-              document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ✅ '+ownedFrogs+' FROG(s) found!'+'<hr class="hr2"><input type="text" id="frogIndex" onkeyup="frogIndexer()" placeholder="TokenID" title="Search by TokenID">'+'<br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
-              break;
-            }
+            //
             document.getElementById("progress").innerHTML = parseInt((i/nextIdC)*100)+"%"
             if (userAcc === owner.toLowerCase()) {
-              loadedFrogs = loadedFrogs + 1;
               //consoleOutput(i-1)
               let thisFrogRender = i-1
               consoleOutput("<br>\n<br><hr>")
@@ -423,8 +418,7 @@
               })()
             }
           } catch (e) {
-            document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ✅ '+ownedFrogs+' FROG(s) found!'+'<br><input type="text" id="frogIndex" onkeyup="frogIndexer()" placeholder="TokenID" title="Search by TokenID">'+'<br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
-            consoleOutput(e);
+            document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ✅ '+ownedFrogs+' FROG(s) found!'+'<br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
             break;
           }
         }
@@ -434,14 +428,6 @@
         newLine = document.createElement("div")
         newLine.innerHTML = output
         document.getElementById("pre").appendChild(newLine)
-      }
-      // Function Scroll to Frog 
-      function frogIndexer() {
-        var frogID;
-        frogID = document.getElementById("frogIndex").value;
-        // FIND FROG
-        //alert(frogID);
-        document.getElementById("Frog #"+frogID).scrollIntoView();
       }
       // Load Certain FROG
       function loadFreshFrog(freshFrog) {
