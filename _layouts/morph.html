@@ -382,11 +382,11 @@
         // frogType, and attributes.
         // Inherits trait; and additional attirbutes from otherFrog
         // 1. Get metadata from baseFrog
-        let baseFrogTokenURI = await collection.methods.tokenURI(baseFrog).call()
-        let baseFrogCID = baseFrogTokenURI.replace("ipfs://", "")
-        let baseFrogIpfsGatewayURI = "https://ipfs.io/ipfs/" + baseFrogCID
+        baseFrogTokenURI = await collection.methods.tokenURI(baseFrog).call()
+        baseFrogCID = baseFrogTokenURI.replace("ipfs://", "")
+        baseFrogIpfsGatewayURI = "https://ipfs.io/ipfs/" + baseFrogCID
         // baseFrog Metadata
-        let baseFrogmetadata = await (await fetch(baseFrogIpfsGatewayURI)).json();
+        baseFrogmetadata = await (await fetch(baseFrogIpfsGatewayURI)).json();
         consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
         for (var baseFrogi = 0; baseFrogi < baseFrogmetadata.attributes.length; baseFrogi++){
           var data = baseFrogmetadata.attributes[baseFrogi]
@@ -408,11 +408,11 @@
           }
         }
         // 2. Get metadata from otherFrog
-        let otherFrogTokenURI = await collection.methods.tokenURI(otherFrog).call()
-        let otherFrogCID = otherFrogTokenURI.replace("ipfs://", "")
-        let otherFrogIpfsGatewayURI = "https://ipfs.io/ipfs/" + otherFrogCID
+        otherFrogTokenURI = await collection.methods.tokenURI(otherFrog).call()
+        otherFrogCID = otherFrogTokenURI.replace("ipfs://", "")
+        otherFrogIpfsGatewayURI = "https://ipfs.io/ipfs/" + otherFrogCID
         // otherFrog MetaData
-        let otherFrogmetadata = await (await fetch(otherFrogIpfsGatewayURI)).json();
+        otherFrogmetadata = await (await fetch(otherFrogIpfsGatewayURI)).json();
         consoleOutput("<br>otherFrog:"+otherFrogmetadata.name)
         for (var otherFrogi = 0; otherFrogi < otherFrogmetadata.attributes.length; otherFrogi++){
           var data = otherFrogmetadata.attributes[otherFrogi]
