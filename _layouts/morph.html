@@ -427,6 +427,7 @@
         // frogType, and attributes.
         // Inherits trait; and additional attirbutes from otherFrog
         // 1. Get metadata from baseFrog
+        document.getElementById("frogContainer").innerHTML = ""
         let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+baseFrog+".json")).json();
         consoleOutput("<img width='128px' src='https://freshfrogs.github.io/frog/"+baseFrog+".png'>");
         consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
@@ -474,8 +475,8 @@
           }
         }
       // Check first attribute. Is it a Frog or specialFrog?
-      consoleOutput("<div id='newFrog' class='smallContainer2'></div>");
-      thisPlace = 'newFrog';
+      //consoleOutput("<div id='newFrog' class='smallContainer2'></div>");
+      thisPlace = 'frogContainer';
       consoleOutput("<br>\n<br>New Frog:<br>");
       if (typeof baseFrog_Frog !== 'undefined') {                              // Load Frog Type
           loadAttribute("Frog", baseFrog_Frog, thisPlace)       // Load Frog Type from baseFrog
@@ -536,7 +537,7 @@
         <div class="downloads pre">
           <a class="pointer" style="margin-top: 2%;" href="https://freshfrogs.github.io/"><b><u>Minting Terminal</u> ↗️</b></a>
           <ul class="downloads2">
-            <li><a id="morphFrogs" href="" class="pointer"><strong>🐸Morph FROGS</strong></a></li>
+            <li><a id="morphFrogs" href="" class="pointer" onclick="combineTokens(1, 2)"><strong>🐸Morph FROGS</strong></a></li>
             <li><a id="selectBase" class="pointer" onclick="selectBaseFrog(1)"><strong>Base</strong>Select FROG</a></li>
             <li><a id="selectSub" class="pointer" onclick="selectSubFrog(2)"><strong>Sub</strong>Select FROG</a></li>
           </ul>
