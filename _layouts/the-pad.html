@@ -452,9 +452,10 @@
           subFrog = 'undefined'
           document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
         } else if (subFrog == 'undefined') { // subFrog
-          baseFrog !== ownedFrog;
-          selectSubFrog(ownedFrog);
-          subFrog = ownedFrog;
+          if (baseFrog !== ownedFrog) {
+            selectSubFrog(ownedFrog);
+            subFrog = ownedFrog;
+          }
         } else {
           // Reset Morph
           document.getElementById("frogContainer").innerHTML = ""
