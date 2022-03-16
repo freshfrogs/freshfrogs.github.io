@@ -394,7 +394,7 @@
       async function selectBaseFrog(selectedBase){
         newFrog = document.createElement("div")
         newFrog.id = 'baseFrogCont'
-        newFrog.className = "imgWrapper"
+        newFrog.className = "smallContainer2"
         document.getElementById("frogContainer").appendChild(newFrog)
         let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedBase+".json")).json();
         for (var i = 0; i < baseFrogmetadata.attributes.length; i++){
