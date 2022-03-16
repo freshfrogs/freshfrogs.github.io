@@ -382,9 +382,6 @@
         let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+baseFrog+".json")).json();
         consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
         // 2. Get metadata from otherFrog
-        let otherFrogTokenURI = await collection.methods.tokenURI(otherFrog).call()
-        let otherFrogCID = otherFrogTokenURI.replace("ipfs://", "")
-        let otherFrogIpfsGatewayURI = "https://ipfs.io/ipfs/" + otherFrogCID
         // otherFrog MetaData
         let otherFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+otherFrog+".json")).json();
         consoleOutput("<br>otherFrog:"+otherFrogmetadata.name)
