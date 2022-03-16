@@ -395,7 +395,7 @@
         //
         newFrog = document.createElement("div")
         newFrog.className = "imgWrapper"
-        newFrog.innerHTML = "<div style='width: auto !important;' class='frogImg'><div class='smallContainer2' id='subDisplay'></div></div>"
+        newFrog.innerHTML = "<div class='frogImg'><div class='smallContainer2' id='subDisplay'></div></div>"
         document.getElementById("frogContainer").appendChild(newFrog)
         //
         let subFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedSub+".json")).json();
@@ -410,7 +410,7 @@
         //
         newFrog = document.createElement("div")
         newFrog.className = "imgWrapper"
-        newFrog.innerHTML = "<div style='width: auto !important;' class='frogImg'><div class='smallContainer2' id='baseDisplay'></div></div>"
+        newFrog.innerHTML = "<div class='frogImg'><div class='smallContainer2' id='baseDisplay'></div></div>"
         document.getElementById("frogContainer").appendChild(newFrog)
         //
         let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedBase+".json")).json();
