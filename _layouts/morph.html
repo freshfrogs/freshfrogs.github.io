@@ -446,6 +446,7 @@
       function applyFrogOwned(ownedFrog) {
         //alert(ownedFrog);
         if (baseFrog == 'undefined') { // baseFrog 
+          document.getElementById("frogContainer").innerHTML = ""
           selectBaseFrog(ownedFrog);
           baseFrog = ownedFrog;
           subFrog = 'undefined'
@@ -454,6 +455,7 @@
           subFrog = ownedFrog;
         } else {
           // Reset Morph
+          document.getElementById("frogContainer").innerHTML = ""
           selectBaseFrog(ownedFrog);
           baseFrog = ownedFrog;
           subFrog = 'undefined'
