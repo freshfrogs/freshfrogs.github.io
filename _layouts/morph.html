@@ -368,7 +368,7 @@
         //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"+"Compiling tokens... Please wait... ⌛"
         document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... Please wait... ⌛<b id="progress"></b>'+'<br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
         consoleOutput("Test combo. 1 & 2")
-        combineTokens(1, 2);
+        combineTokens(1);
       })
       // Output to minting terminal
       function consoleOutput(output) {
@@ -377,30 +377,16 @@
         document.getElementById("pre").appendChild(newLine)
       }
       // Function combine tokens
-      async function combineTokens(baseFrog, otherFrog) {
+      async function combineTokens(baseFrog) {
         // baseFrog = Dominate trait(s)
         // frogType, and attributes.
         // Inherits trait; and additional attirbutes from otherFrog
         // 1. Get metadata from baseFrog
-        let baseFrogTokenURI = await collection.methods.tokenURI(baseFrog).call()
-        let baseFrogCID = baseFrogTokenURI.replace("ipfs://", "")
-        let baseFrogIpfsGatewayURI = "https://ipfs.io/ipfs/" + baseFrogCID
         // baseFrog Metadata
-        let baseFrogmetadata = await (await fetch(baseFrogIpfsGatewayURI)).json();
+        let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json"+baseFrog+".json")).json();
         consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
         for (var baseFrogi = 0; baseFrogi < baseFrogmetadata.attributes.length; baseFrogi++){
           var data = baseFrogmetadata.attributes[baseFrogi]
-          consoleOutput(data.trait_type+": "+data.value)
-        }
-        // 2. Get metadata from otherFrog
-        let otherFrogTokenURI = await collection.methods.tokenURI(otherFrog).call()
-        let otherFrogCID = otherFrogTokenURI.replace("ipfs://", "")
-        let otherFrogIpfsGatewayURI = "https://ipfs.io/ipfs/" + otherFrogCID
-        // otherFrog MetaData
-        let otherFrogmetadata = await (await fetch(otherFrogIpfsGatewayURI)).json();
-        consoleOutput("<br>otherFrog:"+otherFrogmetadata.name)
-        for (var otherFrogi = 0; otherFrogi < otherFrogmetadata.attributes.length; otherFrogi++){
-          var data = otherFrogmetadata.attributes[otherFrogi]
           consoleOutput(data.trait_type+": "+data.value)
         }
       }
