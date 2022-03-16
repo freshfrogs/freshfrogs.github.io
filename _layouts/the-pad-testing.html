@@ -546,6 +546,21 @@
         document.getElementById("selectBase").innerHTML = "<strong># Base</strong>"+baseFrogmetadata.name
         document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" / "
       }
+      // Save results
+      $(function() { 
+          $("#morphFrogs").click(function() { 
+              html2canvas($("#share"), {
+                  onrendered: function(canvas) {
+                      theCanvas = canvas;
+                      document.body.appendChild(canvas);
+
+                      canvas.toBlob(function(blob) {
+                saveAs(blob, "Dashboard.png"); 
+              });
+                  }
+              });
+          });
+      });
       // Select otherFrog
       // Function combine tokens
       async function combineTokens(baseFrog, otherFrog) {
@@ -706,7 +721,7 @@
             <li><a id="selectBase" class="pointer"><strong># Base</strong>Select FROG</a></li>
             <li><a id="selectSub" class="pointer"><strong># Sub</strong>Select FROG</a></li>
           </ul>
-          <div class="bigContainer">
+          <div id="share" class="bigContainer">
             <div id="frogContainer" class="container"><div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.github.io/assets/frogs/FR0G.png" /></div></div>
           </div>
         </div>
