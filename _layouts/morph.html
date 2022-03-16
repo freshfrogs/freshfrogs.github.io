@@ -323,8 +323,8 @@
         consoleOutput("test")
         const web3 = new Web3(window.ethereum)
         const f0 = new F0();
-        let CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
-        let collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
+        var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
+        var collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
         try {
           await f0.init({
             web3: web3,
@@ -364,22 +364,8 @@
         //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"+"Compiling tokens... Please wait... ⌛"
         document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... Please wait... ⌛<b id="progress"></b>'+'<br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
         consoleOutput("Test combo. 1 & 2")
-        combineTokens(1, 2);
-      })
-      // Output to minting terminal
-      function consoleOutput(output) {
-        newLine = document.createElement("div")
-        newLine.innerHTML = output
-        document.getElementById("pre").appendChild(newLine)
-      }
-      // Function combine tokens
-      function combineTokens(baseFrog, otherFrog) {
-        // baseFrog = Dominate trait(s)
-        // frogType, and attributes.
-        // Inherits trait; and additional attirbutes from otherFrog
-        // 1. Get metadata from baseFrog
-        let CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
-        let collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
+        baseFrog = 1;
+        otherFrog = 2;
         let baseFrogTokenURI = await collection.methods.tokenURI(baseFrog).call()
         let baseFrogCID = baseFrogTokenURI.replace("ipfs://", "")
         let baseFrogIpfsGatewayURI = "https://ipfs.io/ipfs/" + baseFrogCID
@@ -393,8 +379,14 @@
         // otherFrog MetaData
         let otherFrogmetadata = await (await fetch(otherFrogIpfsGatewayURI)).json();
         consoleOutput("<br>otherFrog:"+otherFrogmetadata.name)
-      // Check first attribute. Is it a Frog or specialFrog?
+      })
+      // Output to minting terminal
+      function consoleOutput(output) {
+        newLine = document.createElement("div")
+        newLine.innerHTML = output
+        document.getElementById("pre").appendChild(newLine)
       }
+      // Function combine tokens
     </script>
   <div class="top">{{ content }}</div>
   </head>
