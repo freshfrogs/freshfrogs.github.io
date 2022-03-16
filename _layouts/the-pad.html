@@ -377,7 +377,7 @@
         //document.getElementById("supply").innerHTML = "<b><strong><a style='color: #222 !important;' href='https://opensea.io/collection/fresh-frogs' target='_blank'>ℹ️ ("+nextIdC+"/4040) Total Supply</a></strong></b>"
         //document.getElementById("mintTotal").innerHTML = "<strong>3.8M FROGS</strong>Possible Combinations"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
         //document.getElementById("mintTransact").innerHTML = "<strong>⛔MINT CLOSED</strong>" // "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
-        combineTokens("1", "2");
+        
         //document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
         let snapshot = []
         let i = 1;
@@ -469,115 +469,6 @@
         // Set safeLow -- Set suggested gas fee to lowest setting
         // MINT -- Send the transaction to mint!
       })
-      //
-      function combineTokens(baseFrog, otherFrog) {
-        consoleOutput("combineTokens("+baseFrog+", "+otherFrog+")");
-        // baseFrog = Dominate trait(s)
-        // frogType, and attributes.
-        // Inherits trait; and additional attirbutes from otherFrog
-        // 1. Get metadata from baseFrog
-        let baseFrogTokenURI = await collection.methods.tokenURI(baseFrog).call()
-        let baseFrogCID = baseFrogTokenURI.replace("ipfs://", "")
-        let baseFrogIpfsGatewayURI = "https://ipfs.io/ipfs/" + baseFrogCID
-        // baseFrog Metadata
-        let baseFrogmetadata = await (await fetch(baseFrogIpfsGatewayURI)).json();
-        consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
-        for (var baseFrogi = 0; baseFrogi < baseFrogmetadata.attributes.length; baseFrogi++){
-          var data = baseFrogmetadata.attributes[baseFrogi]
-          consoleOutput(data.trait_type+": "+data.value)
-          if (data.trait_type == "Frog") {
-            baseFrog.Frog = data.value;
-          } else if (data.trait_type == "SpecialFrog") {
-            baseFrog.SpecialFrog = data.value;
-          } else if (data.trait_type == "Trait") {
-            baseFrog.Trait = data.value;
-          } else if (data.trait_type == "Accessory") {
-            baseFrog.Accessory = data.value;
-          } else if (data.trait_type == "Eyes") {
-            baseFrog.Eyes = data.value;
-          } else if (data.trait_type == "Hat") {
-            baseFrog.Hat = data.value;
-          } else if (data.trait_type == "Mouth") {
-            baseFrog.Mouth = data.value;
-          }
-        }
-        // 2. Get metadata from otherFrog
-        let otherFrogTokenURI = await collection.methods.tokenURI(otherFrog).call()
-        let otherFrogCID = otherFrogTokenURI.replace("ipfs://", "")
-        let otherFrogIpfsGatewayURI = "https://ipfs.io/ipfs/" + otherFrogCID
-        // otherFrog MetaData
-        let otherFrogmetadata = await (await fetch(otherFrogIpfsGatewayURI)).json();
-        consoleOutput("<br>otherFrog:"+otherFrogmetadata.name)
-        for (var otherFrogi = 0; otherFrogi < otherFrogmetadata.attributes.length; otherFrogi++){
-          var data2 = otherFrogmetadata.attributes[otherFrogi]
-          consoleOutput(data2.trait_type+": "+data2.value)
-          if (data2.trait_type == "Frog") {
-            otherFrog.Frog = data2.value;
-          } else if (data2.trait_type == "SpecialFrog") {
-            otherFrog.SpecialFrog = data2.value;
-          } else if (data2.trait_type == "Trait") {
-            otherFrog.Trait = data2.value;
-          } else if (data2.trait_type == "Accessory") {
-            otherFrog.Accessory = data2.value;
-          } else if (data2.trait_type == "Eyes") {
-            otherFrog.Eyes = data2.value;
-          } else if (data2.trait_type == "Hat") {
-            otherFrog.Hat = data2.value;
-          } else if (data2.trait_type == "Mouth") {
-            otherFrog.Mouth = data2.value;
-          }
-        }
-      // Check first attribute. Is it a Frog or specialFrog?
-      if (baseFrog.Frog != null) {                              // Load Frog Type
-          //loadAttribute("Frog", baseFrog.Frog, thisPlace)       // Load Frog Type from baseFrog
-          consoleOutput("Frog: "+baseFrog.Frog); // Test Frog
-          // Trait
-          if (otherFrog.Trait != null) {                        // Check for trait from otherfrog
-            //loadAttribute("Trait", otherFrog.Trait, thisPlace)  // Load Trait from otherFrog
-            consoleOutput("Trait: "+otherFrog.Trait); // Test Trait
-          } else if (baseFrog.Trait != null) {                  // If otherFrog has no trait; check baseFrog
-            //loadAttribute("Trait", baseFrog.Trait, thisPlace)   // Load trait from baseFrog
-            consoleOutput("Trait: "+baseFrog.Trait); // Test Trait
-          }
-          // Accessory
-          if (baseFrog.Accessory != null) {                             // Check for Accessory from baseFrog
-            //loadAttribute("Accessory", baseFrog.Accessory, thisPlace)   // Load Accessory from baseFrog
-            consoleOutput("Accessory: "+baseFrog.Accessory); // Test Accessory
-          } else if (otherFrog.Accessory != null) {                     // If baseFrog has no Accessory; check otherFrog
-            //loadAttribute("Accessory", otherFrog.Accessory, thisPlace)      // Load Accessory from otherFrog
-            consoleOutput("Accessory: "+otherFrog.Accessory); // Test Trait
-          }
-          // Eyes
-          if (baseFrog.Eyes != null) {                             // Check for Accessory from baseFrog
-            //loadAttribute("Eyes", baseFrog.Eyes, thisPlace)        // Load Accessory from baseFrog
-            consoleOutput("Eyes: "+baseFrog.Eyes); // Test Trait
-          } else if (otherFrog.Eyes != null) {                     // If baseFrog has no Accessory; check otherFrog
-            //loadAttribute("Eyes", otherFrog.Eyes, thisPlace)      // Load Accessory from otherFrog
-            consoleOutput("Eyes: "+otherFrog.Eyes);
-          }
-          // Hat
-          if (baseFrog.Hat != null) {                             // Check for Accessory from baseFrog
-            //loadAttribute("Hat", baseFrog.Hat, thisPlace)         // Load Accessory from baseFrog
-            consoleOutput("Hat: "+baseFrog.Hat);
-          } else if (otherFrog.Hat != null) {                     // If baseFrog has no Accessory; check otherFrog
-            //loadAttribute("Hat", otherFrog.Hat, thisPlace)      // Load Accessory from otherFrog
-            consoleOutput("Hat: "+otherFrog.Hat);
-          }
-          // Mouth
-          if (baseFrog.Mouth != null) {                             // Check for Accessory from baseFrog
-            //loadAttribute("Mouth", baseFrog.Mouth, thisPlace)       // Load Accessory from baseFrog
-            consoleOutput("Mouth: "+baseFrog.Mouth);
-          } else if (otherFrog.Mouth != null) {                     // If baseFrog has no Accessory; check otherFrog
-            //loadAttribute("Mouth", otherFrog.Mouth, thisPlace)      // Load Accessory from otherFrog
-            consoleOutput("Mouth: "+otherFrog.Mouth);
-          }
-          
-        } else if (baseFrog.SpecialFrog != null) { // Load SpecialFrog Type
-          //loadAttribute("SpecialFrog", baseFrog.SpecialFrog, thisPlace)
-          consoleOutput("SpecialFrog Found: "+baseFrog.SpecialFrog)
-        }
-      }
-      //
       // Output to minting terminal
       function consoleOutput(output) {
         newLine = document.createElement("div")
