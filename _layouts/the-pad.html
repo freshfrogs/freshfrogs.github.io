@@ -483,7 +483,7 @@
           selectBaseFrog(ownedFrog);
           baseFrog = ownedFrog;
           subFrog = 'undefined'
-          document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
+          document.getElementById("selectSub").innerHTML = "<strong># Sub</strong>Select FROG"
           document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" / "
         } else if (subFrog == 'undefined') { // subFrog
           if (baseFrog !== ownedFrog) {
@@ -496,7 +496,7 @@
           selectBaseFrog(ownedFrog);
           baseFrog = ownedFrog;
           subFrog = 'undefined'
-          document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
+          document.getElementById("selectSub").innerHTML = "<strong># Sub</strong>Select FROG"
           document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" / "
         }
       }
@@ -527,7 +527,7 @@
           var data = subFrogmetadata.attributes[i]
           loadAttribute(data.trait_type, data.value, 'subDisplay')
         }
-        document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>"+subFrogmetadata.name
+        document.getElementById("selectSub").innerHTML = "<strong># Sub</strong>"+subFrogmetadata.name
         document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" / #"+subFrog
       }
       // Select baseFrog
@@ -543,7 +543,7 @@
           var data = baseFrogmetadata.attributes[i]
           loadAttribute(data.trait_type, data.value, 'baseDisplay')
         }
-        document.getElementById("selectBase").innerHTML = "<strong>Base</strong>"+baseFrogmetadata.name
+        document.getElementById("selectBase").innerHTML = "<strong># Base</strong>"+baseFrogmetadata.name
         document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" / "
       }
       // Select otherFrog
@@ -701,8 +701,8 @@
           <strong id="supply">4,040 Total Supply</strong><a class="pointer" style="margin-top: 2%;" href="https://freshfrogs.github.io/"><b><u>Minting Terminal</u> ↗️</b></a>
           <ul class="downloads2">
             <li><a id="morphFrogs" class="pointer"><strong>🍄Morph</strong>Two Frogs!</a></li>
-            <li><a id="selectBase" class="pointer"><strong>Base</strong>Select FROG</a></li>
-            <li><a id="selectSub" class="pointer"><strong>Sub</strong>Select FROG</a></li>
+            <li><a id="selectBase" class="pointer"><strong># Base</strong>Select FROG</a></li>
+            <li><a id="selectSub" class="pointer"><strong># Sub</strong>Select FROG</a></li>
           </ul>
           <div class="bigContainer">
             <div id="frogContainer" class="container"><div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.github.io/assets/frogs/FR0G.png" /></div></div>
