@@ -391,7 +391,7 @@
         document.getElementById(where).appendChild(newAttribute)
       }
       // Select subFrog
-      async function selectBaseFrog(selectedSub){
+      async function selectSubFrog(selectedSub){
         // <div class="smallContainer2" id="baseDisplay"></div>
         let subFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedSub+".json")).json();
         for (var i = 0; i < subFrogmetadata.attributes.length; i++){
@@ -526,7 +526,7 @@
         <div class="downloads pre">
           <a class="pointer" style="margin-top: 2%;" href="https://freshfrogs.github.io/"><b><u>Minting Terminal</u> ↗️</b></a>
           <ul class="downloads2">
-            <li><a id="morphFrogs" href="" class="pointer"><strong>🐸Morph FROGS</strong></a></li>
+            <li><a id="morphFrogs" href="" class="pointer" onclick="selectSubFrog(2)"><strong>🐸Morph FROGS</strong></a></li>
             <li><a id="selectBase" class="pointer" onclick="selectBaseFrog(1)"><strong>Base</strong>Select FROG</a></li>
             <li><a class="selectSub"><strong>Sub</strong>Select FROG</a></li>
           </ul>
