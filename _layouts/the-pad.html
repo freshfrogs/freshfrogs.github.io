@@ -398,7 +398,7 @@
               loadFreshFrog(thisFrogRender)
               //Load Metadata
               async function get() {
-                let metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+i+".json")).json();
+                let metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+thisFrogRender+".json")).json();
                 //console.log(obj);
                 return metadata;
               }
