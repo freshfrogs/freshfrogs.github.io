@@ -386,10 +386,9 @@
         consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
         for (var baseFrogi = 0; baseFrogi < baseFrogmetadata.attributes.length; baseFrogi++){
           var data = baseFrogmetadata.attributes[baseFrogi]
-          //consoleOutput(data.trait_type+": "+data.value)
+          consoleOutput(data.trait_type+": "+data.value)
           if (data.trait_type == "Frog") {
             baseFrog.Frog = data.value;
-            consoleOutput(data.trait_type+": "+data.value)
           } else if (data.trait_type == "SpecialFrog") {
             baseFrog.SpecialFrog = data.value;
           } else if (data.trait_type == "Trait") {
@@ -410,9 +409,9 @@
         consoleOutput("<br>otherFrog:"+otherFrogmetadata.name)
         for (var otherFrogi = 0; otherFrogi < otherFrogmetadata.attributes.length; otherFrogi++){
           var data = otherFrogmetadata.attributes[otherFrogi]
+          consoleOutput(data.trait_type+": "+data.value)
           if (data.trait_type == "Frog") {
             otherFrog.Frog = data.value;
-            consoleOutput(data.trait_type+": "+data.value)
           } else if (data.trait_type == "SpecialFrog") {
             otherFrog.SpecialFrog = data.value;
           } else if (data.trait_type == "Trait") {
@@ -428,7 +427,7 @@
           }
         }
       // Check first attribute. Is it a Frog or specialFrog?
-      if (baseFrog.Frog != null) {                              // Load Frog Type
+      if (baseFrog.Frog !== null) {                              // Load Frog Type
           //loadAttribute("Frog", baseFrog.Frog, thisPlace)       // Load Frog Type from baseFrog
           consoleOutput("Frog: "+baseFrog.Frog); // Test Frog
           // Trait
