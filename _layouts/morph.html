@@ -377,49 +377,6 @@
         newLine.innerHTML = output
         document.getElementById("pre").appendChild(newLine)
       }
-      // Load attribute
-      function loadAttribute(trait, attribute, where) {
-        newAttribute = document.createElement("img")
-        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
-        newAttribute.id = attribute
-        newAttribute.target = "_blank"
-        newAttribute.className = "frogImg2 pointer"
-        newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
-        //newAttribute.alt = attribute
-        document.getElementById(where).appendChild(newAttribute)
-      }
-      // Load FROG Menu
-      function loadFrogMenu(){
-        newAttribute = document.createElement("a")
-        newAttribute.id = "FrogButton"
-        newAttribute.className = "frogType2 pointer"
-        newAttribute.onClick = "loadFrogs()"
-        newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogType" src="./the-pad/Frog/unknown.png" alt="Frogs" id="Frog"><b>Frogs</b>'
-        document.getElementById("pre").appendChild(newAttribute)
-        newAttribute = document.createElement("a")
-        newAttribute.id = "SpecialFrogButton"
-        newAttribute.className = "frogType2 pointer"
-        newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogType" src="./the-pad/SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs"><b>SpecialFrogs</b>'
-        document.getElementById("pre").appendChild(newAttribute)
-      }
-      // Random Number
-      function randomNumber(min, max) {
-        return Math.random() * (max - min) + min;
-      }
-      // Load Certain FROG
-      function loadFreshFrog(freshFrog) {
-        newFrog = document.createElement("a")
-        newFrog.href = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+freshFrog
-        newFrog.id = "Frog #"+freshFrog
-        newFrog.target = "_blank"
-        newFrog.className = "smallContainer2"
-        //newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+freshFrog+'.png" alt="Frog '+freshFrog+'" id="frog'+freshFrog+'">'
-        document.getElementById("pre").appendChild(newFrog)
-        /*
-          <a id="" class="smallContainer2">
-          </a>
-        */
-      }
       // Function combine tokens
       function combineTokens(baseFrog, otherFrog) {
         // baseFrog = Dominate trait(s)
@@ -436,19 +393,19 @@
           var data = baseFrogmetadata.attributes[baseFrogi]
           consoleOutput(data.trait_type+": "+data.value)
           if (data.trait_type == "Frog") {
-            baseFrogFrog = data.value;
+            baseFrog.Frog = data.value;
           } else if (data.trait_type == "SpecialFrog") {
-            baseFrogSpecialFrog = data.value;
+            baseFrog.SpecialFrog = data.value;
           } else if (data.trait_type == "Trait") {
-            baseFrogTrait = data.value;
+            baseFrog.Trait = data.value;
           } else if (data.trait_type == "Accessory") {
-            baseFrogAccessory = data.value;
+            baseFrog.Accessory = data.value;
           } else if (data.trait_type == "Eyes") {
-            baseFrogEyes = data.value;
+            baseFrog.Eyes = data.value;
           } else if (data.trait_type == "Hat") {
-            baseFrogHat = data.value;
+            baseFrog.Hat = data.value;
           } else if (data.trait_type == "Mouth") {
-            baseFrogMouth = data.value;
+            baseFrog.Mouth = data.value;
           }
         }
         // 2. Get metadata from otherFrog
@@ -462,167 +419,71 @@
           var data = otherFrogmetadata.attributes[otherFrogi]
           consoleOutput(data.trait_type+": "+data.value)
           if (data.trait_type == "Frog") {
-            otherFrogFrog = data.value;
+            otherFrog.Frog = data.value;
           } else if (data.trait_type == "SpecialFrog") {
-            otherFrogSpecialFrog = data.value;
+            otherFrog.SpecialFrog = data.value;
           } else if (data.trait_type == "Trait") {
-            otherFrogTrait = data.value;
+            otherFrog.Trait = data.value;
           } else if (data.trait_type == "Accessory") {
-            otherFrogAccessory = data.value;
+            otherFrog.Accessory = data.value;
           } else if (data.trait_type == "Eyes") {
-            otherFrogEyes = data.value;
+            otherFrog.Eyes = data.value;
           } else if (data.trait_type == "Hat") {
-            otherFrogHat = data.value;
+            otherFrog.Hat = data.value;
           } else if (data.trait_type == "Mouth") {
-            otherFrogMouth = data.value;
+            otherFrog.Mouth = data.value;
           }
         }
       // Check first attribute. Is it a Frog or specialFrog?
-      if (baseFrogFrog != null) {                              // Load Frog Type
-          //loadAttribute("Frog", baseFrogFrog, thisPlace)       // Load Frog Type from baseFrog
-          consoleOutput("Frog: "+baseFrogFrog); // Test Frog
+      if (baseFrog.Frog != null) {                              // Load Frog Type
+          //loadAttribute("Frog", baseFrog.Frog, thisPlace)       // Load Frog Type from baseFrog
+          consoleOutput("Frog: "+baseFrog.Frog); // Test Frog
           // Trait
-          if (otherFrogTrait != null) {                        // Check for trait from otherfrog
-            //loadAttribute("Trait", otherFrogTrait, thisPlace)  // Load Trait from otherFrog
-            consoleOutput("Trait: "+otherFrogTrait); // Test Trait
-          } else if (baseFrogTrait != null) {                  // If otherFrog has no trait; check baseFrog
-            //loadAttribute("Trait", baseFrogTrait, thisPlace)   // Load trait from baseFrog
-            consoleOutput("Trait: "+baseFrogTrait); // Test Trait
+          if (otherFrog.Trait != null) {                        // Check for trait from otherfrog
+            //loadAttribute("Trait", otherFrog.Trait, thisPlace)  // Load Trait from otherFrog
+            consoleOutput("Trait: "+otherFrog.Trait); // Test Trait
+          } else if (baseFrog.Trait != null) {                  // If otherFrog has no trait; check baseFrog
+            //loadAttribute("Trait", baseFrog.Trait, thisPlace)   // Load trait from baseFrog
+            consoleOutput("Trait: "+baseFrog.Trait); // Test Trait
           }
           // Accessory
-          if (baseFrogAccessory != null) {                             // Check for Accessory from baseFrog
-            //loadAttribute("Accessory", baseFrogAccessory, thisPlace)   // Load Accessory from baseFrog
-            consoleOutput("Accessory: "+baseFrogAccessory); // Test Accessory
-          } else if (otherFrogAccessory != null) {                     // If baseFrog has no Accessory; check otherFrog
-            //loadAttribute("Accessory", otherFrogAccessory, thisPlace)      // Load Accessory from otherFrog
-            consoleOutput("Accessory: "+otherFrogAccessory); // Test Trait
+          if (baseFrog.Accessory != null) {                             // Check for Accessory from baseFrog
+            //loadAttribute("Accessory", baseFrog.Accessory, thisPlace)   // Load Accessory from baseFrog
+            consoleOutput("Accessory: "+baseFrog.Accessory); // Test Accessory
+          } else if (otherFrog.Accessory != null) {                     // If baseFrog has no Accessory; check otherFrog
+            //loadAttribute("Accessory", otherFrog.Accessory, thisPlace)      // Load Accessory from otherFrog
+            consoleOutput("Accessory: "+otherFrog.Accessory); // Test Trait
           }
           // Eyes
-          if (baseFrogEyes != null) {                             // Check for Accessory from baseFrog
-            //loadAttribute("Eyes", baseFrogEyes, thisPlace)        // Load Accessory from baseFrog
-            consoleOutput("Eyes: "+baseFrogEyes); // Test Trait
-          } else if (otherFrogEyes != null) {                     // If baseFrog has no Accessory; check otherFrog
-            //loadAttribute("Eyes", otherFrogEyes, thisPlace)      // Load Accessory from otherFrog
-            consoleOutput("Eyes: "+otherFrogEyes);
+          if (baseFrog.Eyes != null) {                             // Check for Accessory from baseFrog
+            //loadAttribute("Eyes", baseFrog.Eyes, thisPlace)        // Load Accessory from baseFrog
+            consoleOutput("Eyes: "+baseFrog.Eyes); // Test Trait
+          } else if (otherFrog.Eyes != null) {                     // If baseFrog has no Accessory; check otherFrog
+            //loadAttribute("Eyes", otherFrog.Eyes, thisPlace)      // Load Accessory from otherFrog
+            consoleOutput("Eyes: "+otherFrog.Eyes);
           }
           // Hat
-          if (baseFrogHat != null) {                             // Check for Accessory from baseFrog
-            //loadAttribute("Hat", baseFrogHat, thisPlace)         // Load Accessory from baseFrog
-            consoleOutput("Hat: "+baseFrogHat);
-          } else if (otherFrogHat != null) {                     // If baseFrog has no Accessory; check otherFrog
-            //loadAttribute("Hat", otherFrogHat, thisPlace)      // Load Accessory from otherFrog
-            consoleOutput("Hat: "+otherFrogHat);
+          if (baseFrog.Hat != null) {                             // Check for Accessory from baseFrog
+            //loadAttribute("Hat", baseFrog.Hat, thisPlace)         // Load Accessory from baseFrog
+            consoleOutput("Hat: "+baseFrog.Hat);
+          } else if (otherFrog.Hat != null) {                     // If baseFrog has no Accessory; check otherFrog
+            //loadAttribute("Hat", otherFrog.Hat, thisPlace)      // Load Accessory from otherFrog
+            consoleOutput("Hat: "+otherFrog.Hat);
           }
           // Mouth
-          if (baseFrogMouth != null) {                             // Check for Accessory from baseFrog
-            //loadAttribute("Mouth", baseFrogMouth, thisPlace)       // Load Accessory from baseFrog
-            consoleOutput("Mouth: "+baseFrogMouth);
-          } else if (otherFrogMouth != null) {                     // If baseFrog has no Accessory; check otherFrog
-            //loadAttribute("Mouth", otherFrogMouth, thisPlace)      // Load Accessory from otherFrog
-            consoleOutput("Mouth: "+otherFrogMouth);
+          if (baseFrog.Mouth != null) {                             // Check for Accessory from baseFrog
+            //loadAttribute("Mouth", baseFrog.Mouth, thisPlace)       // Load Accessory from baseFrog
+            consoleOutput("Mouth: "+baseFrog.Mouth);
+          } else if (otherFrog.Mouth != null) {                     // If baseFrog has no Accessory; check otherFrog
+            //loadAttribute("Mouth", otherFrog.Mouth, thisPlace)      // Load Accessory from otherFrog
+            consoleOutput("Mouth: "+otherFrog.Mouth);
           }
           
-        } else if (baseFrogSpecialFrog != null) { // Load SpecialFrog Type
-          //loadAttribute("SpecialFrog", baseFrogSpecialFrog, thisPlace)
-          consoleOutput("SpecialFrog Found: "+baseFrogSpecialFrog)
+        } else if (baseFrog.SpecialFrog != null) { // Load SpecialFrog Type
+          //loadAttribute("SpecialFrog", baseFrog.SpecialFrog, thisPlace)
+          consoleOutput("SpecialFrog Found: "+baseFrog.SpecialFrog)
         }
       }
-      // Function FROG Generator
-      function generateRandomFROG() {
-
-        where = "randomFrogWhere"
-        document.getElementById(where).innerHTML = ""
-        // Generate Frog
-        Frog = Math.floor((Math.random() * 30) + 1);
-        
-        if (Frog >= 26){
-          // Load special Frog
-          SpecialFrog = Math.floor((Math.random() * 5) + 1);
-          loadAttribute("Generate/SpecialFrog", SpecialFrog, where)
-
-          //Generate Accessory
-          Accessory = Math.floor((Math.random() * 40) + 1); // 4
-          if (Accessory >= 5){
-            Accessory = 0;
-          }
-          loadAttribute("Generate/Accessory", Accessory, where)
-
-          // Generate Eyes
-          Eyes = Math.floor((Math.random() * 40) + 0); // 8
-          if (Eyes >= 9){
-            Eyes = 0;
-          }
-          loadAttribute("Generate/Eyes", Eyes, where)
-
-          // Generate Hat
-          Hat = Math.floor((Math.random() * 40) + 0); // 15
-          if (Hat >= 16){
-            Hat = 0;
-          }
-          loadAttribute("Generate/Hat", Hat, where)
-
-          // Generate Mouth
-          Mouth = Math.floor((Math.random() * 40) + 0); // 10
-          if (Mouth >= 11){
-            Mouth = 0;
-          }
-          loadAttribute("Generate/Mouth", Mouth, where)
-
-        } else {
-          loadAttribute("Generate/Frog", Frog, where)
-          // Generate Trait
-          Trait = Math.floor((Math.random() * 18) + 0); // 18
-          loadAttribute("Generate/Trait", Trait, where)
-
-          //Generate Accessory
-          Accessory = Math.floor((Math.random() * 40) + 1); // 4
-          if (Accessory >= 5){
-            Accessory = 0;
-          }
-          loadAttribute("Generate/Accessory", Accessory, where)
-
-          // Generate Eyes
-          Eyes = Math.floor((Math.random() * 40) + 0); // 8
-          if (Eyes >= 9){
-            Eyes = 0;
-          }
-          loadAttribute("Generate/Eyes", Eyes, where)
-
-          // Generate Hat
-          Hat = Math.floor((Math.random() * 40) + 0); // 15
-          if (Hat >= 16){
-            Hat = 0;
-          }
-          loadAttribute("Generate/Hat", Hat, where)
-
-          // Generate Mouth
-          Mouth = Math.floor((Math.random() * 40) + 0); // 10
-          if (Mouth >= 11){
-            Mouth = 0;
-          }
-          loadAttribute("Generate/Mouth", Mouth, where)
-        }
-      }
-      // Load recent mints
-      function recentlyMinted(mostRecent) {
-        for(let i=1; i<=24; i++) {
-          mostRecent2 = mostRecent - i
-          mostRecentDesc = "frog"+i+"Desc"
-          mostRecentLink = "frog"+i+"Link"
-          mostRecentFrog = "frog"+i
-          // <a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+mostRecent2+'" id="'+mostRecentLink+'" target="_blank">
-          newFrog = document.createElement("a")
-          newFrog.href = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+mostRecent2
-          newFrog.id = mostRecentLink
-          newFrog.target = "_blank"
-          newFrog.className = "smallContainer2"
-          newFrog.width = randomNumber(64, 128)+"px"
-          newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+mostRecent2+'.png" alt="Frog '+mostRecent2+'" id="frog'+i+'">'
-          document.getElementById("pre").appendChild(newFrog)
-        }
-        consoleOutput("<a id='loadRecentMints2' class='pointer' onclick='recentlyMinted("+mostRecent2+")'><u>Load More</u></a></b>");
-      }
-      //    {% include head-custom.html %}
     </script>
   <div class="top">{{ content }}</div>
   </head>
