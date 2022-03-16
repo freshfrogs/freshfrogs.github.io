@@ -380,9 +380,11 @@
           }
         })
         consoleOutput('<hr class="hr2"><b>🍄Morph FROGS</b><br> FROG token combinations! <br>ℹ️ Select FROGs by clicking on them'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>')
-        // random 1 & 2
-        applyFrogOwned(2)
-        applyFrogOwned(3)
+        // Generate two random FROGS
+        randomFROG = Math.floor(Math.random() * nextIdC);
+        randomFROG2 = Math.floor(Math.random() * nextIdC);
+        applyFrogOwned(randomFROG)
+        applyFrogOwned(randomFROG2)
         let snapshot = []
         let i = 1;
         let loadedFrogs = 0;
