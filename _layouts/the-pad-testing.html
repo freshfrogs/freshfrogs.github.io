@@ -53,7 +53,7 @@
   }
   .bigContainer{
     border-radius: 5px;
-    border: 0px solid #e0e0e0;
+    border: 1px solid #e0e0e0;
     overflow: hidden;
     background-color: transparent;
     box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
@@ -302,6 +302,12 @@
     height: 100% !important;
     display: inline-block !important;
   }
+  .learnMoreFM {
+    background-color: #e0e0e08a;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    padding: 5px;
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -366,13 +372,21 @@
 
         // Messages Sent to Terminal
         //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"+"Compiling tokens... Please wait... ⌛"
-        document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... Please wait... ⌛<b id="progress"></b>'+'<br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
+        document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... Please wait... ⌛<b id="progress"></b>'+'<br>\n<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
+        document.getElementById("supply").innerHTML = "<strong>"+nextIdC+" / 4,040 Total Supply</strong>" // Supply
         document.querySelector("#morphFrogs").addEventListener("click", async (e) => {
           if (baseFrog !== 'undefined' && subFrog !== 'undefined') { 
             //alert("Morph "+baseFrog+" + "+subFrog);
             combineTokens(baseFrog, subFrog);
           }
         })
+        consoleOutput('<hr class="hr2"><b>🍄Morph FROGS</b><br> FROG token combinations!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>')
+        //consoleOutput('ℹ️ Select TWO FROGs by <u>clicking on them</u>');
+        // Generate two random FROGS
+        //randomFROG = Math.floor(Math.random() * nextIdC);
+        //randomFROG2 = Math.floor(Math.random() * nextIdC);
+        //applyFrogOwned(407)
+        //applyFrogOwned(67)
         let snapshot = []
         let i = 1;
         let loadedFrogs = 0;
@@ -380,12 +394,12 @@
         while(true) {
           try {
             let owner = await collection.methods.ownerOf(i++).call()
-            if (ownedFrogs == 0) { // ❌ No FROGS
+            if (ownedFrogs == 4) { // ❌ No FROGS
               document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>❌ It seems you do not own any FROGS!'+'<br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
               break;
             }
             if (ownedFrogs == loadedFrogs) {
-              document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ✅ '+ownedFrogs+' FROG(s) found!'+'<br><input type="text" id="frogIndex" onkeyup="frogIndexer()" placeholder="TokenID" title="Search by TokenID">'+'<br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
+              document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ✅ '+ownedFrogs+' FROG(s) found!'+'<br>\n<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
               break;
             }
             document.getElementById("progress").innerHTML = parseInt((i/nextIdC)*100)+"%"
@@ -423,8 +437,8 @@
               })()
             }
           } catch (e) {
-            document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ✅ '+ownedFrogs+' FROG(s) found!'+'<br><input type="text" id="frogIndex" onkeyup="frogIndexer()" placeholder="TokenID" title="Search by TokenID">'+'<br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
-            consoleOutput(e);
+            document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ✅ '+ownedFrogs+' FROG(s) found!'+'<br>\n<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
+            altert(e.message+"\nREFRESH THE PAGE");
             break;
           }
         }
@@ -434,6 +448,11 @@
         newLine = document.createElement("div")
         newLine.innerHTML = output
         document.getElementById("pre").appendChild(newLine)
+      }
+      // Function Learn More Frog Morph
+      function learnMore() {
+        document.getElementById("learnMoreFM").className = "learnMoreFM"
+        document.getElementById("learnMoreFM").innerHTML = "<b>Does this make a brand new NFT?</b>"+"<br>Not YET! However, once all 4,040 FROGS have been minted, this will become a feature that DOES generate a (N)ew (F)rog (T)oken!"
       }
       // Function Scroll to Frog 
       function frogIndexer() {
@@ -464,7 +483,8 @@
           selectBaseFrog(ownedFrog);
           baseFrog = ownedFrog;
           subFrog = 'undefined'
-          document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
+          document.getElementById("selectSub").innerHTML = "<strong># Sub</strong>Select FROG"
+          document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" / "
         } else if (subFrog == 'undefined') { // subFrog
           if (baseFrog !== ownedFrog) {
             selectSubFrog(ownedFrog);
@@ -476,7 +496,8 @@
           selectBaseFrog(ownedFrog);
           baseFrog = ownedFrog;
           subFrog = 'undefined'
-          document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
+          document.getElementById("selectSub").innerHTML = "<strong># Sub</strong>Select FROG"
+          document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" / "
         }
       }
       // Load attribute
@@ -489,6 +510,9 @@
         newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
         //newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
+      }
+      function getRandomArbitrary(min, max) {
+          return Math.random() * (max - min) + min;
       }
       // Select subFrog
       async function selectSubFrog(selectedSub){
@@ -503,7 +527,8 @@
           var data = subFrogmetadata.attributes[i]
           loadAttribute(data.trait_type, data.value, 'subDisplay')
         }
-        document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>"+subFrogmetadata.name
+        document.getElementById("selectSub").innerHTML = "<strong># Sub</strong>"+subFrogmetadata.name
+        document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" / #"+subFrog
       }
       // Select baseFrog
       async function selectBaseFrog(selectedBase){
@@ -518,7 +543,8 @@
           var data = baseFrogmetadata.attributes[i]
           loadAttribute(data.trait_type, data.value, 'baseDisplay')
         }
-        document.getElementById("selectBase").innerHTML = "<strong>Base</strong>"+baseFrogmetadata.name
+        document.getElementById("selectBase").innerHTML = "<strong># Base</strong>"+baseFrogmetadata.name
+        document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" / "
       }
       // Select otherFrog
       // Function combine tokens
@@ -672,14 +698,14 @@
     <div class="wrapper">
       <header>
         <div class="downloads pre">
-          <a class="pointer" style="margin-top: 2%;" href="https://freshfrogs.github.io/"><b><u>Minting Terminal</u> ↗️</b></a>
+          <strong id="supply">4,040 Total Supply</strong><a class="pointer" style="margin-top: 2%;" href="https://freshfrogs.github.io/"><b><u>Minting Terminal</u> ↗️</b></a>
           <ul class="downloads2">
-            <li><a id="morphFrogs" class="pointer"><strong>🐸Morph FROGS</strong></a></li>
-            <li><a id="selectBase" class="pointer"><strong>Base</strong>Select FROG</a></li>
-            <li><a id="selectSub" class="pointer"><strong>Sub</strong>Select FROG</a></li>
+            <li><a id="morphFrogs" class="pointer"><strong>🍄Morph</strong>Two Frogs!</a></li>
+            <li><a id="selectBase" class="pointer"><strong># Base</strong>Select FROG</a></li>
+            <li><a id="selectSub" class="pointer"><strong># Sub</strong>Select FROG</a></li>
           </ul>
           <div class="bigContainer">
-            <div id="frogContainer" class="container"><div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.github.io/assets/frogs/preview2.gif" /></div></div>
+            <div id="frogContainer" class="container"><div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.github.io/assets/frogs/FR0G.png" /></div></div>
           </div>
         </div>
       </header>
@@ -689,7 +715,7 @@
         <br>
         <div class="downloads pre">
           <div id="pre">
-            <div id="netStatus">Connect to view 'FROG' tokens... <b><a class="pointer" href="https://freshfrogs.github.io/the-pad">Connect Wallet</a></b><br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b></div>
+            <div id="netStatus">Connect to view 'FROG' tokens... <b><a class="pointer" href="https://freshfrogs.github.io/the-pad">Connect Wallet</a></b><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b></div>
           </div>
           <br>
           <hr>
