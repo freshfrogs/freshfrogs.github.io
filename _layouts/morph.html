@@ -432,7 +432,7 @@
       // Load Certain FROG
       function loadFreshFrog(freshFrog) {
         newFrog = document.createElement("a")
-        newFrog.onclick = applyFrogOwned(freshFrog);
+        newFrog.onclick = function() {applyFrogOwned(freshFrog)};
         newFrog.id = "Frog #"+freshFrog
         newFrog.className = "smallContainer2"
         //newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+freshFrog+'.png" alt="Frog '+freshFrog+'" id="frog'+freshFrog+'">'
