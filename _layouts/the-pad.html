@@ -484,6 +484,7 @@
           baseFrog = ownedFrog;
           subFrog = 'undefined'
           document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
+          document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" + ?"
         } else if (subFrog == 'undefined') { // subFrog
           if (baseFrog !== ownedFrog) {
             selectSubFrog(ownedFrog);
@@ -496,6 +497,7 @@
           baseFrog = ownedFrog;
           subFrog = 'undefined'
           document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
+          document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" + ?"
         }
       }
       // Load attribute
@@ -526,7 +528,7 @@
           loadAttribute(data.trait_type, data.value, 'subDisplay')
         }
         document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>"+subFrogmetadata.name
-        document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>"+baseFrog+" + "+subFrog
+        document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>"+baseFrog+" + #"+subFrog
       }
       // Select baseFrog
       async function selectBaseFrog(selectedBase){
@@ -542,7 +544,7 @@
           loadAttribute(data.trait_type, data.value, 'baseDisplay')
         }
         document.getElementById("selectBase").innerHTML = "<strong>Base</strong>"+baseFrogmetadata.name
-        document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>"+baseFrog+" + ?"
+        document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" + ?"
       }
       // Select otherFrog
       // Function combine tokens
