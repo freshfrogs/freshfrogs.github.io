@@ -409,9 +409,9 @@
         consoleOutput("<br>otherFrog:"+otherFrogmetadata.name)
         for (var otherFrogi = 0; otherFrogi < otherFrogmetadata.attributes.length; otherFrogi++){
           var data = otherFrogmetadata.attributes[otherFrogi]
-          consoleOutput(data.trait_type+": "+data.value)
           if (data.trait_type == "Frog") {
             otherFrog.Frog = data.value;
+            consoleOutput(data.trait_type+": "+data.value)
           } else if (data.trait_type == "SpecialFrog") {
             otherFrog.SpecialFrog = data.value;
           } else if (data.trait_type == "Trait") {
