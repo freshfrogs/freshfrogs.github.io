@@ -423,10 +423,10 @@
             loadingSymbol = 1;
             if (loadingSymbol == '1') { 
               loadingSymbol = 0;
-              document.getElementById("progress").innerHTML = "⏳"
+              document.getElementById("progress").innerHTML = "⏳" // not done ⏳
             } else {
               loadingSymbol = 1;
-              document.getElementById("progress").innerHTML = "⌛"
+              document.getElementById("progress").innerHTML = "⌛" // done ⌛
             }
             elem = document.getElementById("myBar");
             width = parseInt((i/nextIdC)*100);
