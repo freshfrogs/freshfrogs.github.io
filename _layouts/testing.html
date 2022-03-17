@@ -477,7 +477,7 @@
           if (frogCount <= 1) {
             mintList = nextIdC
           } else {
-            mintList = nextIdC+" - "+(nextIdC+frogCount)
+            mintList = nextIdC+" - "+((nextIdC-1)+frogCount)
           }
           document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
           document.getElementById("frogQuant").innerHTML = "  "+frogCount+"  "
@@ -508,7 +508,7 @@
           if (frogCount <= 1) {
             mintList = nextIdC
           } else {
-            mintList = nextIdC+" - "+(nextIdC+frogCount)
+            mintList = nextIdC+" - "+((nextIdC-1)+frogCount)
           }
           document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
           document.getElementById("frogQuant").innerHTML = "  "+frogCount+"  "
