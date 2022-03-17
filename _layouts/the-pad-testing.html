@@ -484,7 +484,6 @@
         if (baseFrog == 'undefined') { // baseFrog 
           document.getElementById("frogContainer").innerHTML = ""
           selectBaseFrog(ownedFrog);
-          document.getElementById(ownedFrog).className = ""
           baseFrog = ownedFrog;
           subFrog = 'undefined'
           document.getElementById("selectSub").innerHTML = "<strong># Sub</strong>Select FROG"
@@ -596,7 +595,8 @@
           } else if (data2.trait_type == "SpecialFrog") {
             otherFrog_SpecialFrog = data2.value;
             if (data2.value = "thirdEye") {
-              alert("thirdEye")
+              alert("thirdEye");
+              otherFrog_Trait = '/thirdEye/base'
             }
           } else if (data2.trait_type == "Trait") {
             otherFrog_Trait = data2.value;
