@@ -592,7 +592,6 @@
             baseFrog_Frog = data.value;
           } else if (data.trait_type == "SpecialFrog") {
             baseFrog_SpecialFrog = data.value;
-            alert(baseFrog_SpecialFrog)
           } else if (data.trait_type == "Trait") {
             baseFrog_Trait = data.value;
           } else if (data.trait_type == "Accessory") {
@@ -618,8 +617,7 @@
           } else if (data2.trait_type == "SpecialFrog") {
             otherFrog_SpecialFrog = data2.value;
           } else if (data2.trait_type == "Trait") {
-            //alert(baseFrog_SpecialFrog)
-            if (baseFrog_SpecialFrog == "closedEyes" ) {
+            if (typeof baseFrog_SpecialFrog == "closedEyes" ) {
               otherFrog_Trait = "special/"+data2.value
             } else if (typeof baseFrog_Frog !== "undefined") { 
               otherFrog_Trait = data2.value;
