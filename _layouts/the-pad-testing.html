@@ -285,7 +285,6 @@
     transform: scale(1.25);
     box-shadow: none;
     border: none;
-    overflow: show;
   }
   .hr2{
     width: 128px;
@@ -387,9 +386,8 @@
         // Generate two random FROGS
         //randomFROG = Math.floor(Math.random() * nextIdC);
         //randomFROG2 = Math.floor(Math.random() * nextIdC);
-        applyFrogOwned(60)
-        applyFrogOwned(408)
-        //
+        //applyFrogOwned(407)
+        //applyFrogOwned(67)
         let snapshot = []
         let i = 1;
         let loadedFrogs = 0;
@@ -397,7 +395,7 @@
         while(true) {
           try {
             let owner = await collection.methods.ownerOf(i++).call()
-            if (ownedFrogs <= 0) { // ❌ No FROGS
+            if (ownedFrogs == 0) { // ❌ No FROGS
               document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>❌ It seems you do not own any FROGS!'+'<br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
               break;
             }
@@ -455,7 +453,7 @@
       // Function Learn More Frog Morph
       function learnMore() {
         document.getElementById("learnMoreFM").className = "learnMoreFM"
-        document.getElementById("learnMoreFM").innerHTML = "<b>Does this make a brand new NFT?</b>"+"<br>Not YET! However, once all 4,040 FROGS have been minted, this will become a feature that DOES generate a (N)ew (F)rog (T)oken!"
+        document.getElementById("learnMoreFM").innerHTML = "<b><u>Does this make a NEW NFT?</u></b>"+"<br><b>Not YET!</b> However, once all 4,040 FROGS have been minted, this will become a feature that DOES generate a (N)ew (F)rog (T)oken!"
       }
       // Function Scroll to Frog 
       function frogIndexer() {
@@ -486,7 +484,7 @@
           selectBaseFrog(ownedFrog);
           baseFrog = ownedFrog;
           subFrog = 'undefined'
-          document.getElementById("selectSub").innerHTML = "<strong># Sub</strong>Select FROG"
+          document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
           document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" / "
         } else if (subFrog == 'undefined') { // subFrog
           if (baseFrog !== ownedFrog) {
@@ -499,7 +497,7 @@
           selectBaseFrog(ownedFrog);
           baseFrog = ownedFrog;
           subFrog = 'undefined'
-          document.getElementById("selectSub").innerHTML = "<strong># Sub</strong>Select FROG"
+          document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
           document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" / "
         }
       }
@@ -530,7 +528,7 @@
           var data = subFrogmetadata.attributes[i]
           loadAttribute(data.trait_type, data.value, 'subDisplay')
         }
-        document.getElementById("selectSub").innerHTML = "<strong># Sub</strong>"+subFrogmetadata.name
+        document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>"+subFrogmetadata.name
         document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" / #"+subFrog
       }
       // Select baseFrog
@@ -540,14 +538,13 @@
         newFrog.className = "imgWrapper"
         newFrog.innerHTML = "<div class='frogImg'><div style='float: left !important;' class='smallContainer2' id='baseDisplay'></div></div>"
         document.getElementById("frogContainer").appendChild(newFrog)
-        openseaLinkBase = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+baseFrog+""
         //
         let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedBase+".json")).json();
         for (var i = 0; i < baseFrogmetadata.attributes.length; i++){
           var data = baseFrogmetadata.attributes[i]
           loadAttribute(data.trait_type, data.value, 'baseDisplay')
         }
-        document.getElementById("selectBase").innerHTML = "<strong># Base</strong>"+baseFrogmetadata.name
+        document.getElementById("selectBase").innerHTML = "<strong>Base</strong>"+baseFrogmetadata.name
         document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" / "
       }
       // Select otherFrog
@@ -601,7 +598,6 @@
             } else if (otherFrog_SpecialFrog == "peace") {
               otherFrog_Trait = "blue"
             } 
-            //
           } else if (data2.trait_type == "Trait") {
             otherFrog_Trait = data2.value;
           } else if (data2.trait_type == "Accessory") {
@@ -620,8 +616,6 @@
       //consoleOutput("<br>\n<br>New Frog:<br>");
       if (typeof baseFrog_Frog !== 'undefined') {                              // Load Frog Type
           loadAttribute("Frog", baseFrog_Frog, thisPlace)       // Load Frog Type from baseFrog
-          loadAttribute("Frog", "frog", thisPlace);
-          //loadAttribute("Frog", "frog", thisPlace);
           //consoleOutput("Frog: "+baseFrog_Frog); // Test Frog
           // Trait
           if (typeof otherFrog_Trait !== 'undefined') {                        // Check for trait from otherfrog
@@ -664,11 +658,11 @@
             //consoleOutput("Mouth: "+otherFrog_Mouth);
           }
           //consoleOutput("Done")
-          
+          loadAttribute("Frog", "frog", thisPlace);
         } else if (typeof baseFrog_SpecialFrog !== 'undefined') { // Load SpecialFrog Type
           loadAttribute("SpecialFrog", baseFrog_SpecialFrog, thisPlace)
           //consoleOutput("SpecialFrog Found: "+baseFrog_SpecialFrog)
-          loadAttribute("Frog", "frog", thisPlace);
+          //
           // Accessory
           if (typeof baseFrog_Accessory !== 'undefined') {                             // Check for Accessory from baseFrog
             loadAttribute("Accessory", baseFrog_Accessory, thisPlace)   // Load Accessory from baseFrog
@@ -702,7 +696,7 @@
             //consoleOutput("Mouth: "+otherFrog_Mouth);
           }
           //consoleOutput("Done")
-          //
+          loadAttribute("Frog", "frog", thisPlace);
         }
       }
     </script>
@@ -712,11 +706,11 @@
     <div class="wrapper">
       <header>
         <div class="downloads pre">
-          <strong id="supply">4,040 Total Supply</strong><a class="pointer" style="margin-top: 2%;" href="https://freshfrogs.github.io/"><b><u>Minting Terminal</u> ↗️</b></a>
+          <a class="pointer" style="margin-top: 2%;" href="https://freshfrogs.github.io/"><b><u>Minting Terminal</u></b> ↗️</a><strong id="supply">4,040 Total Supply</strong>
           <ul class="downloads2">
             <li><a id="morphFrogs" class="pointer"><strong>🍄Morph</strong>Two Frogs!</a></li>
-            <li><a id="selectBase" class="pointer"><strong># Base</strong>Select FROG</a></li>
-            <li><a id="selectSub" class="pointer"><strong># Sub</strong>Select FROG</a></li>
+            <li><a id="selectBase" class="pointer"><strong>Base</strong>Select FROG</a></li>
+            <li><a id="selectSub" class="pointer"><strong>Sub</strong>Select FROG</a></li>
           </ul>
           <div class="bigContainer">
             <div id="frogContainer" class="container"><div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.github.io/assets/frogs/FR0G.png" /></div></div>
