@@ -6,6 +6,21 @@
   html,h1,h2,h3 {
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
   }
+  #myProgress {
+    width: 50%;
+    background-color: #ddd;
+    margin-top: 8px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid #324d64;
+    border-radius: 5px;
+  }
+
+  #myBar {
+    width: 1%;
+    height: 16px;
+    background-color: #7cc1ff;
+  }
   .wrapper {
     margin-left: auto;
     margin-right: auto;
@@ -373,7 +388,7 @@
 
         // Messages Sent to Terminal
         //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"+"Compiling tokens... Please wait... ⌛"
-        document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... Please wait... ⌛<b id="progress"></b>'+'<br>\n<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
+        document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... Please wait... ⌛<b id="progress"></b><div id="myProgress"><div id="myBar"></div></div>'+'<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
         document.getElementById("supply").innerHTML = "<strong>"+nextIdC+" / 4,040 Total Supply</strong>" // Supply
         document.querySelector("#morphFrogs").addEventListener("click", async (e) => {
           if (baseFrog !== 'undefined' && subFrog !== 'undefined') { 
@@ -403,7 +418,13 @@
               document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ✅ '+ownedFrogs+' FROG(s) found!'+'<br>\n<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
               break;
             }
+            // Progress Bar!
             document.getElementById("progress").innerHTML = parseInt((i/nextIdC)*100)+"%"
+            elem = document.getElementById("myBar");
+            width = parseInt((i/nextIdC)*100);
+            //var id = setInterval(frame, 10);
+            width++;
+            elem.style.width = width + "%";
             if (userAcc === owner.toLowerCase()) {
               loadedFrogs = loadedFrogs + 1;
               //consoleOutput(i-1)
