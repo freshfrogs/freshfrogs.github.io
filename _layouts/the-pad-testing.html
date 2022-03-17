@@ -617,7 +617,7 @@
           } else if (data2.trait_type == "SpecialFrog") {
             otherFrog_SpecialFrog = data2.value;
           } else if (data2.trait_type == "Trait") {
-            if (typeof baseFrog_SpecialFrog === "closedEyes" || "inversedEyes" ) {
+            if (typeof baseFrog_SpecialFrog == "closedEyes" ) {
               otherFrog_Trait = "special/"+data2.value
             } else if (typeof baseFrog_Frog !== "undefined") { 
               otherFrog_Trait = data2.value;
