@@ -1,7 +1,7 @@
 ---
 layout: the-pad-testing
 ---
-<title>Fresh Frogs NFT (The Pad)</title>
+<title>Fresh Frogs NFT 🍀 The Pad</title>
 <h1 class="h1">Fresh Frogs NFT</h1><hr>
 Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more! Available for mint at https://freshfrogs.github.io/
 
