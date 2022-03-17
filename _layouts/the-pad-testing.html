@@ -617,7 +617,7 @@
           } else if (data2.trait_type == "SpecialFrog") {
             otherFrog_SpecialFrog = data2.value;
           } else if (data2.trait_type == "Trait") {
-            if (typeof baseFrog_SpecialFrog == "closedEyes" ) { // Adapt trait for special Frogs
+            if (typeof baseFrog_SpecialFrog == ("closedEyes" || "inversedEyes") ) { // Adapt trait for special Frogs
               alert("closedEyes: "+baseFrog_SpecialFrog);
               otherFrog_Trait = "special/"+data2.value
 /*          } else if (baseFrog_SpecialFrog == "croaking" ) {
