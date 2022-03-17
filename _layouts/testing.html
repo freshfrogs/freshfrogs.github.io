@@ -464,7 +464,11 @@
             var select = document.getElementById("frogContainer");
             select.removeChild(select.lastChild);
             frogCount = frogCount - 1
-            mintList = nextIdC+" - "+(nextIdC+frogCount)
+            if (frogCount == 1) {
+              mintList = nextIdC
+            } else {
+              mintList = nextIdC+" - "+(nextIdC+frogCount)
+            }
           } else if (frogCount >= 4) {
             var select = document.getElementById("frogContainer2");
             select.removeChild(select.lastChild);
