@@ -617,14 +617,11 @@
           } else if (data2.trait_type == "SpecialFrog") {
             otherFrog_SpecialFrog = data2.value;
           } else if (data2.trait_type == "Trait") {
-            //
             if (typeof otherFrog_SpecialFrog !== 'undefined') {
               otherFrog_Trait = "special/"+data2.value
             } else {
               otherFrog_Trait = data2.value;
             }
-            //
-            otherFrog_Trait = data2.value;
           } else if (data2.trait_type == "Accessory") {
             otherFrog_Accessory = data2.value;
           } else if (data2.trait_type == "Eyes") {
