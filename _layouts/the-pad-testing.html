@@ -594,17 +594,16 @@
             otherFrog_Frog = data2.value;
           } else if (data2.trait_type == "SpecialFrog") {
             otherFrog_SpecialFrog = data2.value;
-          } else if (data2.trait_type == "Trait") {
+            // SpecialFrog Types
             if (otherFrog_SpecialFrog == "thirdEye") {
-              //alert("thirdEye");
-              otherFrog_Trait = 'thirdEye/base'
+              otherFrog_Trait = "thirdEye/base"
               alert('thirdEye!')
             } else if (otherFrog_SpecialFrog == "peace") {
-              //alert("thirdEye");
-              otherFrog_Trait = 'blue'
-            } else {
-              otherFrog_Trait = data2.value;
-            }
+              otherFrog_Trait = "blue"
+            } 
+            //
+          } else if (data2.trait_type == "Trait") {
+            otherFrog_Trait = data2.value;
           } else if (data2.trait_type == "Accessory") {
             otherFrog_Accessory = data2.value;
           } else if (data2.trait_type == "Eyes") {
