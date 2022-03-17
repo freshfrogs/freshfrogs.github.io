@@ -617,9 +617,15 @@
           } else if (data2.trait_type == "SpecialFrog") {
             otherFrog_SpecialFrog = data2.value;
           } else if (data2.trait_type == "Trait") {
-            if (baseFrog_SpecialFrog == "closedEyes"||"inversedEyes" ) {
+            if (baseFrog_SpecialFrog == "closedEyes"||"inversedEyes" ) { // Adapt trait for special Frogs
               otherFrog_Trait = "special/"+data2.value
-            } else if (typeof baseFrog_Frog !== "undefined") { 
+/*            } else if (baseFrog_SpecialFrog == "croaking" ) {
+              otherFrog_Trait = "special/"+data2.value
+            }  else if (baseFrog_SpecialFrog == "peace" ) {
+              otherFrog_Trait = "special/"+data2.value
+            } else if (baseFrog_SpecialFrog == "thirdEye" ) {
+              otherFrog_Trait = "special/"+data2.value
+          */} else if (typeof baseFrog_Frog !== "undefined") { // Regular Frog; continue
               otherFrog_Trait = data2.value;
             }
           } else if (data2.trait_type == "Accessory") {
