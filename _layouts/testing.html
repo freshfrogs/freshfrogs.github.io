@@ -503,12 +503,11 @@
             document.getElementById("frogContainer").appendChild(newFrog)
 
           }
+          frogCount = frogCount + 1
           if (frogCount == 1) {
             mintList = nextIdC
-            frogCount = frogCount + 1
           } else {
-            mintList = nextIdC+" - "+(nextIdC+frogCount)
-            frogCount = frogCount + 1
+            mintList = nextIdC+" - "+((nextIdC-1)+frogCount)
           }
           document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
           document.getElementById("frogQuant").innerHTML = "  "+frogCount+"  "
