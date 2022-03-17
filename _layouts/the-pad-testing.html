@@ -617,11 +617,12 @@
           } else if (data2.trait_type == "SpecialFrog") {
             otherFrog_SpecialFrog = data2.value;
           } else if (data2.trait_type == "Trait") {
-            if (typeof baseFrog_SpecialFrog == ("closedEyes") ) {
+            if (typeof baseFrog_SpecialFrog == ("closedEyes"||'inversedEyes') ) {
               otherFrog_Trait = "special/"+data2.value
             } else if (typeof baseFrog_Frog !== 'undefined') { 
               otherFrog_Trait = data2.value;
             }
+            alert(otherFrog_Trait);
           } else if (data2.trait_type == "Accessory") {
             otherFrog_Accessory = data2.value;
           } else if (data2.trait_type == "Eyes") {
