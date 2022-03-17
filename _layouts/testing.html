@@ -425,14 +425,12 @@
         })
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-          alert(mintList);
-          stop;
           if (mintProgress == 1 || mint === 0 ) {
             if (mint === 0) {
               consoleOutput("<strong>❯ Minting closed!</strong> Join discord for more info! "+"<b><u><a class='pointer' href='https://freshfrogs.github.io/discord'>Join Discord</b></u></a>")
             }
             if (mintProgress === 1) {
-              consoleOutput("<strong>❯</strong> The mint button is locked out after one time use. <a href='https://freshfrogs.github.io' class='pointer'><b>Refresh the page!</b></a>")
+              consoleOutput("<strong>❯</strong> To prevent duplicate transactions the mint button is locked out after one use. <a href='https://freshfrogs.github.io' class='pointer'>Please refresh the page!</a>")
             }
           } else {
             mintProgress = 1;
@@ -462,23 +460,23 @@
         })
         // Remove FROG from minting tray
         document.querySelector("#removeFrog").addEventListener("click", async (e) => {
-          frogCount = frogCount - 1
-          if (frogCount >= 7) { // 7+
+          if (frogCount >= 7) {
             var select = document.getElementById("frogContainer");
             select.removeChild(select.lastChild);
-            mintList = nextIdC+" - "+(nextIdC+frogCount)
+            frogCount = frogCount - 1
           } else if (frogCount >= 4) {
             var select = document.getElementById("frogContainer2");
             select.removeChild(select.lastChild);
-            mintList = nextIdC+" - "+(nextIdC+frogCount)
+            frogCount = frogCount - 1
           } else if (frogCount >= 2) {
             var select = document.getElementById("frogContainer3");
             select.removeChild(select.lastChild);
-            if (frogCount == 1) {
-              mintList = nextIdC
-            } else {
-              mintList = nextIdC+" - "+(nextIdC+frogCount)
-            }
+            frogCount = frogCount - 1
+          }
+          if (frogCount == 1) {
+            mintList = nextIdC
+          } else {
+            mintList = nextIdC+" - "+(nextIdC+frogCount)
           }
           document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
           document.getElementById("frogQuant").innerHTML = "  "+frogCount+"  "
@@ -486,33 +484,32 @@
         })
         // ADD FROG to minting tray
         document.querySelector("#addFrog").addEventListener("click", async (e) => {
-          frogCount = frogCount + 1
           if (frogCount <= 2) {
             newFrog = document.createElement("div")
             newFrog.className = "imgWrapper"
             newFrog.innerHTML = "<img class='frogImg' src='https://freshfrogs.github.io/frog/"+(nextIdC+frogCount)+".png'/>"
             document.getElementById("frogContainer3").appendChild(newFrog)
-            mintList = nextIdC+" - "+(nextIdC+frogCount)
-            if (frogCount == 1) {
-              mintList = nextIdC
-            } else {
-              mintList = nextIdC+" - "+(nextIdC+frogCount)
-            }
+            frogCount = frogCount + 1
 
           } else if (frogCount <= 5) {
             newFrog = document.createElement("div")
             newFrog.className = "imgWrapper"
             newFrog.innerHTML = "<img class='frogImg' src='https://freshfrogs.github.io/frog/"+(nextIdC+frogCount)+".png'/>"
             document.getElementById("frogContainer2").appendChild(newFrog)
-            mintList = nextIdC+" - "+(nextIdC+frogCount)
+            frogCount = frogCount + 1
 
           } else if (frogCount <= 8) {
             newFrog = document.createElement("div")
             newFrog.className = "imgWrapper"
             newFrog.innerHTML = "<img class='frogImg' src='https://freshfrogs.github.io/frog/"+(nextIdC+frogCount)+".png'/>"
             document.getElementById("frogContainer").appendChild(newFrog)
-            mintList = nextIdC+" - "+(nextIdC+frogCount)
+            frogCount = frogCount + 1
 
+          }
+          if (frogCount == 1) {
+            mintList = nextIdC
+          } else {
+            mintList = nextIdC+" - "+(nextIdC+frogCount)
           }
           document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
           document.getElementById("frogQuant").innerHTML = "  "+frogCount+"  "
