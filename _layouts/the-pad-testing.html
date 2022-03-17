@@ -616,13 +616,7 @@
             otherFrog_Frog = data2.value;
           } else if (data2.trait_type == "SpecialFrog") {
             otherFrog_SpecialFrog = data2.value;
-            // SpecialFrog Types
-            if (otherFrog_SpecialFrog == "thirdEye") {
-              otherFrog_Trait = "thirdEye/base"
-              //alert("https://freshfrogs.github.io/the-pad/Trait/"+otherFrog_Trait+".png")
-            } else if (otherFrog_SpecialFrog == "peace") {
-              otherFrog_Trait = "blue"
-            } 
+            otherFrog_Trait = "special/"+data2.value
           } else if (data2.trait_type == "Trait") {
             otherFrog_Trait = data2.value;
           } else if (data2.trait_type == "Accessory") {
@@ -689,6 +683,15 @@
           loadAttribute("SpecialFrog", baseFrog_SpecialFrog, thisPlace)
           loadAttribute("Frog", "frog", thisPlace);
           //
+          // Trait
+          if (typeof otherFrog_Trait !== 'undefined') {                        // Check for trait from otherfrog
+            loadAttribute("Trait", otherFrog_Trait, thisPlace)  // Load Trait from otherFrog
+            //consoleOutput("Trait: "+otherFrog_Trait); // Test Trait
+            //alert(otherFrog_Trait);
+          } else if (typeof baseFrog_Trait !== 'undefined') {                  // If otherFrog has no trait; check baseFrog
+            loadAttribute("Trait", baseFrog_Trait, thisPlace)   // Load trait from baseFrog
+            //consoleOutput("Trait: "+baseFrog_Trait); // Test Trait
+          }
           // Accessory
           if (typeof baseFrog_Accessory !== 'undefined') {                             // Check for Accessory from baseFrog
             loadAttribute("Accessory", baseFrog_Accessory, thisPlace)   // Load Accessory from baseFrog
