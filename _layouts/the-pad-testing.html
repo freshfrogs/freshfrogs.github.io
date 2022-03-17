@@ -623,9 +623,9 @@
               otherFrog_Trait = "special/"+data2.value
             }  else if (baseFrog_SpecialFrog == "peace" ) {
               otherFrog_Trait = "special/"+data2.value
-            } else if (baseFrog_SpecialFrog == "thirdEye" ) {
-              otherFrog_Trait = "special/"+data2.value
-        */  } else if (typeof baseFrog_Frog !== "undefined") { // Regular Frog; continue
+      */    } else if (baseFrog_SpecialFrog == "thirdEye" ) {
+              otherFrog_Trait = "thirdEye/"+data2.value
+            } else if (typeof baseFrog_Frog !== "undefined") { // Regular Frog; continue
               otherFrog_Trait = data2.value;
             }
           } else if (data2.trait_type == "Accessory") {
