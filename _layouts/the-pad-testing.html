@@ -389,18 +389,10 @@
         applyFrogOwned(67)
         //
         document.querySelector("#selectBase").addEventListener("click", async (e) => {
-          if (baseFrog !== 'undefined') { 
-            window.location.replace("https://opensea.io/collection/fresh-frogs");
-          } else {
-            window.location.replace("https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+baseFrog+"");
-          }
+          location.href = "https://opensea.io/collection/fresh-frogs";
         })
         document.querySelector("#selectSub").addEventListener("click", async (e) => {
-          if (subFrog !== 'undefined') { 
-            window.location.replace("https://opensea.io/collection/fresh-frogs");
-          } else {
-            window.location.replace("https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+subFrog+"");
-          }
+          location.href = "https://opensea.io/collection/fresh-frogs";
         })
         //
         let snapshot = []
