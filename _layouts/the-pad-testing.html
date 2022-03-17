@@ -415,17 +415,11 @@
             }
             document.getElementById("progress").innerHTML = parseInt((i/nextIdC)*100)+"%"
             //
-            if (i == 0) {
-              var elem = document.getElementById("myBar");
-              var width = parseInt((i/nextIdC)*100);
-              //var id = setInterval(frame, 10);
-              if (width >= 100) {
-                //clearInterval(id);
-              } else {
-                width++;
-                elem.style.width = width + "%";
-              }
-            }
+            var elem = document.getElementById("myBar");
+            var width = parseInt((i/nextIdC)*100);
+            //var id = setInterval(frame, 10);
+            width++;
+            elem.style.width = width + "%";
             
             //
             if (userAcc === owner.toLowerCase()) {
