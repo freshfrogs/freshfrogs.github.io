@@ -407,6 +407,7 @@
         let snapshot = []
         let i = 1;
         let loadedFrogs = 0;
+        let loadingSymbol = 0;
         //consoleOutput("Scanning Tokens... Please wait... ⌛")
         while(true) {
           try {
@@ -421,14 +422,14 @@
             }
             // Progress Bar!
             //loadingSymbol = 1;
-            if (loadingSymbol == 1 || loadingSymbol == 'undefined') { // First symbol
-              loadingSymbol = 2;
-              document.getElementById("progress").innerHTML = '/'
-            } else if (loadingSymbol == 2) { // Second
-              loadingSymbol = 3;
-              document.getElementById("progress").innerHTML = '-'
-            } else if (loadingSymbol == 3) { // Third
+            if (loadingSymbol == 0) { // First symbol
               loadingSymbol = 1;
+              document.getElementById("progress").innerHTML = '/'
+            } else if (loadingSymbol == 1) { // Second
+              loadingSymbol = 2;
+              document.getElementById("progress").innerHTML = '-'
+            } else if (loadingSymbol == 2) { // Third
+              loadingSymbol = 0;
               document.getElementById("progress").innerHTML = '|'
             }
             elem = document.getElementById("myBar");
