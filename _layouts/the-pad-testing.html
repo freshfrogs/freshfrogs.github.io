@@ -389,24 +389,17 @@
         applyFrogOwned(67)
         //
         document.querySelector("#selectBase").addEventListener("click", async (e) => {
-          if (baseFrog != 'undefined') { 
-            // Opensea collection link
+          if (baseFrog !== 'undefined') { 
             window.location.replace("https://opensea.io/collection/fresh-frogs");
           } else {
-            // Token ID Link
-            openseaLinkBase = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+baseFrog+""
-            window.location.replace(openseaLinkBase);
+            window.location.replace("https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+baseFrog+"");
           }
         })
         document.querySelector("#selectSub").addEventListener("click", async (e) => {
-          if (subFrog != 'undefined') { 
-            // Opensea collection link
+          if (subFrog !== 'undefined') { 
             window.location.replace("https://opensea.io/collection/fresh-frogs");
           } else {
-            openseaLinkSub = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+subFrog+""
-            // Token ID Link
-            alert(openseaLinkSub);
-            window.location.replace(openseaLinkSub);
+            window.location.replace("https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+subFrog+"");
           }
         })
         //
