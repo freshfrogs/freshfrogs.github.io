@@ -3,6 +3,16 @@
   html{
     background-image: url("/assets/background.png");
   }
+  #myProgress {
+  width: 100%;
+  background-color: #ddd;
+}
+
+#myBar {
+  width: 1%;
+  height: 30px;
+  background-color: #04AA6D;
+}
   html,h1,h2,h3 {
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
   }
@@ -373,7 +383,7 @@
 
         // Messages Sent to Terminal
         //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"+"Compiling tokens... Please wait... ⌛"
-        document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... Please wait... ⌛<b id="progress"></b>'+'<br>\n<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
+        document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... Please wait... ⌛<div id="myProgress"><div id="myBar"></div></div>'+'<br>\n<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
         document.getElementById("supply").innerHTML = "<strong>"+nextIdC+" / 4,040 Total Supply</strong>" // Supply
         document.querySelector("#morphFrogs").addEventListener("click", async (e) => {
           if (baseFrog !== 'undefined' && subFrog !== 'undefined') { 
@@ -404,6 +414,22 @@
               break;
             }
             document.getElementById("progress").innerHTML = parseInt((i/nextIdC)*100)+"%"
+            //
+            if (i == 0) {
+              i = 1;
+              var elem = document.getElementById("myBar");
+              var width = 1;
+              //var id = setInterval(frame, 10);
+              if (width >= 100) {
+                //clearInterval(id);
+                i = 0;
+              } else {
+                width++;
+                elem.style.width = width + "%";
+              }
+            }
+            
+            //
             if (userAcc === owner.toLowerCase()) {
               loadedFrogs = loadedFrogs + 1;
               //consoleOutput(i-1)
