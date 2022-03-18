@@ -640,7 +640,7 @@
             } else if (baseFrog_SpecialFrog == "thirdEye" ) {
               otherFrog_Trait = "thirdEye/"+data2.value
             } else if (baseFrog_Frog !== "undefined") { // Regular Frog; continue
-              if (baseFrog_Frog !== "blueDartFrog") {
+              if (otherFrog_Frog == "blueDartFrog") {
                 otherFrog_Trait = "natural/"+baseFrog_Frog
               }
               otherFrog_Trait = data2.value;
