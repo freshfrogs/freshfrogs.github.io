@@ -478,8 +478,8 @@
               })()
             }
           } catch (e) {
+            alert("Something went wrong, refresh the page!")
             document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ✅ '+ownedFrogs+' FROG(s) found!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'+'<br>\n<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
-            altert(e.message+"\nREFRESH THE PAGE");
             break;
           }
         }
