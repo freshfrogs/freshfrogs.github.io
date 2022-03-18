@@ -435,7 +435,7 @@
             }
           } else {
             mintProgress = 1;
-            consoleOutput("\n<strong>❯</strong> <strong>Minting x"+frogCount+" FROG(s) #"+mintList+"... <br>\nPlease sign the transaction and wait...<br>\nDo Not Leave This Page")
+            consoleOutput("\n<strong>❯ Minting ("+frogCount+") FROG Tokens...</strong>"+"FROG(s) #"+mintList+"... <br>\nPlease sign the transaction and wait...<br>\nDo Not Leave This Page")
             try {
               if (highPriority === 1) {
                 let tokens = await f0.mint(mintInviteCode, frogCount)
