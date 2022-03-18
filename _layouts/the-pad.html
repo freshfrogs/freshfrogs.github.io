@@ -648,7 +648,15 @@
             } else if (baseFrog_SpecialFrog == "thirdEye" ) {
               otherFrog_Trait = "thirdEye/"+data2.value
             } else if (baseFrog_Frog !== "undefined") { // Regular Frog; continue
-              otherFrog_Trait = data2.value;
+              if (data2.value == "natural") {
+                if (otherFrog_Frog == "") {
+                  otherFrog_Trait = "natural/"+otherFrog_Frog
+                } else {
+                  otherFrog_Trait = "natural/"+otherFrog_Frog
+                }
+              } else {
+                otherFrog_Trait = data2.value;
+              }
             }
           } else if (data2.trait_type == "Accessory") {
             otherFrog_Accessory = data2.value;
