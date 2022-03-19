@@ -3,6 +3,9 @@
   html{
     background-image: url("/assets/background.png");
   }
+  html,h1,h2,h3 {
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+  }
   #myProgress {
     width: 50%;
     background: #f4f4f4;
@@ -11,26 +14,13 @@
     margin-right: auto;
     border: 1px solid #324d64;
     border-radius: 5px;
-    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
   }
-  .myProgress {
-    width: 50%;
-    background: #f4f4f4;
-    margin-top: 8px;
-    margin-left: auto;
-    margin-right: auto;
-    border: 1px solid #324d64;
-    border-radius: 5px;
-    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
-    height: 16px;
-  }
+
   #myBar {
     width: 1%;
-    height: 16px;
+    height: 18px;
     background-color: #7cc1ff;
-  }
-  html,h1,h2,h3 {
-    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    border-radius: 5px;
   }
   .wrapper {
     margin-left: auto;
@@ -335,6 +325,19 @@
     border-radius: 5px;
     padding: 5px;
   }
+  .myProgress {
+    width: 50%;
+    background: #f4f4f4;
+    margin-top: 8px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid #324d64;
+    border-radius: 5px;
+    height: 18px;
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    vertical-align: middle;
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -400,7 +403,7 @@
 
         // Messages Sent to Terminal
         //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"+"Compiling tokens... Please wait... ⌛"
-        document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... Please wait... ⌛<div id="myProgress"><div id="myBar"></div></div>'+'<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
+        document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... Please wait... ⌛ <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div>'+'<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
         document.getElementById("supply").innerHTML = "<strong>"+nextIdC+" / 4,040 Total Supply</strong>" // Supply
         document.querySelector("#morphFrogs").addEventListener("click", async (e) => {
           if (baseFrog !== 'undefined' && subFrog !== 'undefined') { 
@@ -411,10 +414,14 @@
         consoleOutput('<hr class="hr2"><b>🍄Morph FROGS</b><br> FROG token combinations!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>')
         //consoleOutput('ℹ️ Select TWO FROGs by <u>clicking on them</u>');
         // Generate two random FROGS
-        randomFROG = getRandomInt(1, 4039);
-        randomFROG2 = getRandomInt(1, 4039);
-        applyFrogOwned(randomFROG);
-        applyFrogOwned(51);
+        //randomFROG = Math.floor(Math.random() * nextIdC);
+        //randomFROG2 = Math.floor(Math.random() * nextIdC);
+        //applyFrogOwned(407)
+        //applyFrogOwned(67)
+        //randomFROG = getRandomInt(1, nextIdC);
+        //randomFROG2 = getRandomInt(1, nextIdC);
+        //applyFrogOwned(randomFROG);
+        //applyFrogOwned(randomFROG2);
         let snapshot = []
         let i = 1;
         let loadedFrogs = 0;
@@ -427,18 +434,16 @@
               break;
             }
             if (ownedFrogs == loadedFrogs) {
-              document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ✅ '+ownedFrogs+' FROG(s) found!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'+'<br>\n<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
+              document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ✅ <b>'+ownedFrogs+' FROG(s) found!</b>'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'+'<br>\n<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
               break;
             }
-            //document.getElementById("progress").innerHTML = parseInt((i/nextIdC)*100)+"%"
-            //
+            // Progress Bar!
+            document.getElementById("progress").innerHTML = parseInt((i/nextIdC)*100)+"%"
             elem = document.getElementById("myBar");
             width = parseInt((i/nextIdC)*100);
             //var id = setInterval(frame, 10);
             width++;
             elem.style.width = width + "%";
-            
-            //
             if (userAcc === owner.toLowerCase()) {
               loadedFrogs = loadedFrogs + 1;
               //consoleOutput(i-1)
@@ -473,6 +478,7 @@
               })()
             }
           } catch (e) {
+            //alert("Something went wrong, refresh the page!"+e.message)
             document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ❌ '+loadedFrogs+'/'+ownedFrogs+' FROG(s) loaded!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'+'<br>\n<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
             break;
           }
@@ -535,6 +541,11 @@
           document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" / "
         }
       }
+      function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
       // Load attribute
       function loadAttribute(trait, attribute, where) {
         newAttribute = document.createElement("img")
@@ -542,15 +553,12 @@
         newAttribute.id = attribute
         newAttribute.target = "_blank"
         newAttribute.className = "frogImg2 pointer"
-        newAttribute.alt = trait+": "+attribute
         newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
         //newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
       }
-      function getRandomInt(min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+      function getRandomArbitrary(min, max) {
+          return Math.random() * (max - min) + min;
       }
       // Select subFrog
       async function selectSubFrog(selectedSub){
@@ -566,7 +574,7 @@
           loadAttribute(data.trait_type, data.value, 'subDisplay')
         }
         document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>"+subFrogmetadata.name
-        document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" / #"+subFrog
+        document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>("+baseFrog+" / "+subFrog+")"
       }
       // Select baseFrog
       async function selectBaseFrog(selectedBase){
@@ -582,7 +590,7 @@
           loadAttribute(data.trait_type, data.value, 'baseDisplay')
         }
         document.getElementById("selectBase").innerHTML = "<strong>Base</strong>"+baseFrogmetadata.name
-        document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>#"+baseFrog+" / "
+        document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>("+baseFrog+" / )"
       }
       // Select otherFrog
       // Function combine tokens
@@ -668,7 +676,6 @@
           if (typeof otherFrog_Trait !== 'undefined') {                        // Check for trait from otherfrog
             loadAttribute("Trait", otherFrog_Trait, thisPlace)  // Load Trait from otherFrog
             //consoleOutput("Trait: "+otherFrog_Trait); // Test Trait
-           // alert(otherFrog_Trait);
           } else if (typeof baseFrog_Trait !== 'undefined') {                  // If otherFrog has no trait; check baseFrog
             loadAttribute("Trait", baseFrog_Trait, thisPlace)   // Load trait from baseFrog
             //consoleOutput("Trait: "+baseFrog_Trait); // Test Trait
@@ -709,6 +716,7 @@
         } else if (typeof baseFrog_SpecialFrog !== 'undefined') { // Load SpecialFrog Type
           loadAttribute("SpecialFrog", baseFrog_SpecialFrog, thisPlace)
           loadAttribute("Frog", "frog", thisPlace);
+          //consoleOutput("SpecialFrog Found: "+baseFrog_SpecialFrog)
           //
           // Trait
           if (typeof otherFrog_Trait !== 'undefined') {                        // Check for trait from otherfrog
