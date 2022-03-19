@@ -422,7 +422,7 @@
         let targetFrog = nextIdC;
         //consoleOutput("Scanning Tokens... Please wait... ⌛")
         try {
-          for (var thisToken = 0; thisToken < targetFrog; thisToken++) {
+          for (var thisToken = 1; thisToken < targetFrog; thisToken++) {
             let owner = await collection.methods.ownerOf(thisToken).call()
             if (ownedFrogs <= 0) { // ❌ No FROGS
               document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>❌ It seems you do not own any FROGS!'+'<br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
