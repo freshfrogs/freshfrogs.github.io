@@ -636,29 +636,21 @@
             }
             
           } else if (data2.trait_type == "Trait") { // <--TRAITS
-            alert("getting trait")
             if (typeof baseFrog_SpecialFrog !== "undefined") { // Adapt trait for special Frogs
-              alert("getting specialFrog base")
-              // Inversed Eyes / Closed Eyes
-              if (baseFrog_SpecialFrog == "inversedEyes" || "closedEyes") {
-                alert("invsersed eyes / closedEyes base")
+              if (baseFrog_SpecialFrog === "inversedEyes") {
                 var otherFrog_Trait = "special/"+data2.value
-              // All other frogs
-              // Is the recieving trait a natural trait?
-              } else if (data2.value !== "natural") { //alert ("baseFrog_SpecialFrog")
-              // No
-                alert(" not invsersed eyes / closedEyes AND not natural trait from sub frog")
-                var otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
-                alert(baseFrog_SpecialFrog+" "+otherFrog_Trait)
-              // Yes and the base from is a thirdEye
-              } 
-            } else if (typeof baseFrog_Frog !== "undefined") { // Regular Frog; continue
-              alert("getting Frog base")
+              } else if (baseFrog_SpecialFrog === "closedEyes") {
+                var otherFrog_Trait = "special/"+data2.value
+              } else { //alert ("baseFrog_SpecialFrog")
+              var otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
+              }
               if (data2.value == "natural") {
-                alert("getting Frog natural sub trait")
+                var otherFrog_Trait = "natural/"+baseFrog_SpecialFrog+"/"+otherFrog_Frog
+              }
+            } else if (typeof baseFrog_Frog !== "undefined") { // Regular Frog; continue
+              if (data2.value == "natural") {
                 var otherFrog_Trait = "natural/"+otherFrog_Frog
               } else {
-                alert("getting Frog sub trait")
                 var otherFrog_Trait = data2.value;
               }
             }
