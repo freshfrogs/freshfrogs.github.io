@@ -636,7 +636,12 @@
             otherFrog_Frog = data2.value;
           } else if (data2.trait_type == "SpecialFrog") {
             otherFrog_SpecialFrog = data2.value;
-            otherFrog_Trait = "sand";
+            if (data2.value == "thirdEye") {
+              otherFrog_Trait = "thirdEye/"+baseFrog_Trait
+            } else {
+              otherFrog_Trait = "sand";
+            }
+            
           } else if (data2.trait_type == "Trait") {
             if (baseFrog_SpecialFrog == "closedEyes") { // Adapt trait for special Frogs
               otherFrog_Trait = "special/"+data2.value
