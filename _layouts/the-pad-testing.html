@@ -637,11 +637,16 @@
             
           } else if (data2.trait_type == "Trait") { // <--TRAITS
             if (typeof baseFrog_SpecialFrog !== "undefined") { // Adapt trait for special Frogs
+              // Inversed Eyes / Closed Eyes
               if (typeof baseFrog_SpecialFrog == "inversedEyes" || "closedEyes") {
                 var otherFrog_Trait = "special/"+data2.value
+              // All other frogs
+              // Is the recieving trait a natural trait?
               } else if (data2.value !== "natural") { //alert ("baseFrog_SpecialFrog")
+              // No
               var otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
-              } else if (data2.value == "natural" && baseFrog_SpecialFrog == "thirdEye") {
+              // Yes and the base from is a thirdEye
+              } else if (data2.value == "natural" && typeof baseFrog_SpecialFrog == "thirdEye") {
                 var otherFrog_Trait = "natural/"+baseFrog_SpecialFrog+"/"+otherFrog_Frog
               } else {
                 var otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
