@@ -651,9 +651,13 @@
               }
             } else if (typeof baseFrog_Frog !== "undefined") { // Regular Frog; continue
               if (data2.value == "natural") {
-                var otherFrog_Trait = "natural/"+otherFrog_Frog
-              } else {
-                var otherFrog_Trait = data2.value;
+                if (baseFrog_SpecialFrog === "inversedEyes") {
+                  var otherFrog_Trait = "natural/"+otherFrog_Frog
+                } else if (baseFrog_SpecialFrog === "closedEyes") {
+                  var otherFrog_Trait = "natural/"+otherFrog_Frog
+                } else { //alert ("baseFrog_SpecialFrog")
+                  var otherFrog_Trait = "natural/"+baseFrog_SpecialFrog+"/"+otherFrog_Frog
+                }
               }
             }
           } else if (data2.trait_type == "Accessory") {
