@@ -637,7 +637,11 @@
           } else if (data2.trait_type == "SpecialFrog") {
             otherFrog_SpecialFrog = data2.value;
             if (data2.value == "thirdEye") {
-              otherFrog_Trait = "thirdEye/base"
+              if (baseFrog_SpecialFrog !== "undefined") {
+                otherFrog_Trait = "thirdEye/baseSpecial"
+              } else {
+                otherFrog_Trait = "thirdEye/base"
+              }
             } else {
               otherFrog_Trait = "sand";
             }
