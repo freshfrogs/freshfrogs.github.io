@@ -15,7 +15,11 @@
     border: 1px solid #324d64;
     border-radius: 5px;
   }
-  
+  hr {
+    width: 75%;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
   #myBar {
     width: 1%;
     height: 18px;
@@ -363,13 +367,13 @@
       document.addEventListener("DOMContentLoaded", async () => {
         const web3 = new Web3(window.ethereum)
         const f0 = new F0();
-        var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
+        var CONTRACT_ADDRESS = "0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524"
         var collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
         try {
           await f0.init({
             web3: web3,
             contract: CONTRACT_ADDRESS, // 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b MAIN // 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524 RINKEBY
-            network: "main"
+            network: "rinkeby"
           })
           //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <strong>❯ Connecting...</strong>"
           } catch (e) {
@@ -404,7 +408,7 @@
         // Messages Sent to Terminal
         //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"+"Compiling tokens... Please wait... ⌛"
         document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... Please wait... ⌛ <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div>'+'<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
-        document.getElementById("supply").innerHTML = "<strong>"+nextIdC+" / 4,040 Total Supply</strong>" // Supply
+        document.getElementById("supply").innerHTML = "<strong>FROG "+nextIdC+" / 4,040 Total Supply</strong>" // Supply
         document.querySelector("#morphFrogs").addEventListener("click", async (e) => {
           if (baseFrog !== 'undefined' && subFrog !== 'undefined') { 
             //alert("Morph "+baseFrog+" + "+subFrog);
@@ -414,10 +418,6 @@
         consoleOutput('<hr class="hr2"><b>🍄Morph FROGS</b><br> FROG token combinations!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>')
         //consoleOutput('ℹ️ Select TWO FROGs by <u>clicking on them</u>');
         // Generate two random FROGS
-        //randomFROG = Math.floor(Math.random() * nextIdC);
-        //randomFROG2 = Math.floor(Math.random() * nextIdC);
-        //applyFrogOwned(407)
-        //applyFrogOwned(67)
         var loadedFrogs = 0;
         let targetFrog = nextIdC;
         //consoleOutput("Scanning Tokens... Please wait... ⌛")
@@ -639,7 +639,7 @@
             if (typeof baseFrog_SpecialFrog !== "undefined") { // Adapt trait for special Frogs
               if (typeof baseFrog_SpecialFrog == "inversedEyes" || "closedEyes") {
                 var otherFrog_Trait = "special/"+data2.value
-              } else { alert ("baseFrog_SpecialFrog")
+              } else { //alert ("baseFrog_SpecialFrog")
               var otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
               }
               if (data2.value == "natural") {
@@ -767,7 +767,7 @@
     <div class="wrapper">
       <header>
         <div class="downloads pre">
-          <a class="pointer" style="margin-top: 2%;" href="https://freshfrogs.github.io/"><b><u>Minting Terminal</u></b> ↗️</a><strong id="supply">4,040 Total Supply</strong>
+          <a class="pointer" style="margin-top: 2%;" href="https://freshfrogs.github.io/"><b><u>Minting Terminal</u></b> ↗️</a><strong id="supply">FROG 4,040 Total Supply</strong>
           <ul class="downloads2">
             <li><a id="morphFrogs" class="pointer"><strong>🍄Morph</strong>Two Frogs!</a></li>
             <li><a id="selectBase" class="pointer"><strong>Base</strong>Select FROG</a></li>
