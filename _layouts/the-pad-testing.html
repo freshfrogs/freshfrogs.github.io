@@ -643,7 +643,7 @@
             }
           } else if (data2.trait_type == "Trait") {
             if (baseFrog_SpecialFrog !== "undefined") { // Adapt trait for special Frogs
-              if (baseFrog_SpecialFrog == ("inversedEyes"||"closedEyes")) {
+              if (baseFrog_SpecialFrog == "inversedEyes" || baseFrog_SpecialFrog == "closedEyes") {
                 otherFrog_Trait = "special/"+data2.value
               } else {
                 otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
