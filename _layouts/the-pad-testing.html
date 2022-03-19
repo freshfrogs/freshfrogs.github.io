@@ -420,7 +420,7 @@
         //applyFrogOwned(67)
         let loadedFrogs = 0;
         //consoleOutput("Scanning Tokens... Please wait... ⌛")
-        for (var thisToken = thisToken; i < (nextIdC-1); thisToken++){
+        for (var thisToken = thisToken; thisToken < (nextIdC-1); thisToken++){
           try {
             let owner = await collection.methods.ownerOf(thisToken).call()
             if (ownedFrogs <= 0) { // ❌ No FROGS
