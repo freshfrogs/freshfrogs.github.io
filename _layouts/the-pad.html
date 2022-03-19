@@ -650,10 +650,11 @@
             } else if (baseFrog_Frog !== "undefined") { // Regular Frog; continue
               if (data2.value == "natural") {
                 otherFrog_Trait = "natural/"+otherFrog_Frog
-              } else if (data2.value == "undefined") {
-                otherFrog_Trait = "sand";
               } else {
                 otherFrog_Trait = data2.value;
+              }
+              if (otherFrog_Trait == "undefined") {
+                otherFrog_Trait = "sand";
               }
             }
           } else if (data2.trait_type == "Accessory") {
