@@ -640,12 +640,12 @@
             if (typeof baseFrog_SpecialFrog !== "undefined") { // Adapt trait for special Frogs
               alert("getting specialFrog base")
               // Inversed Eyes / Closed Eyes
-              if (typeof baseFrog_SpecialFrog === "inversedEyes") {
+              if (baseFrog_SpecialFrog == "inversedEyes") {
                 alert("invsersed eyes base")
                 var otherFrog_Trait = "special/"+data2.value
               // All other frogs
               // Is the recieving trait a natural trait?
-              } else if (typeof baseFrog_SpecialFrog === "closedEyes") {
+              } else if (baseFrog_SpecialFrog == "closedEyes") {
                 alert("closedEyes base")
                 var otherFrog_Trait = "special/"+data2.value
               // All other frogs
