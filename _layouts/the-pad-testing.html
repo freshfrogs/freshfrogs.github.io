@@ -644,6 +644,9 @@
             
           } else if (data2.trait_type == "Trait") {
             if (baseFrog_SpecialFrog !== "undefined") { // Adapt trait for special Frogs
+              if (baseFrog_SpecialFrog == ("inversedEyes"||"closedEyes")) {
+                otherFrog_Trait = "special/"+data2.value
+              }
               otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
               if (data2.value == "natural") {
                 otherFrog_Trait = "natural/"+baseFrog_SpecialFrog+"/"+data2.value
