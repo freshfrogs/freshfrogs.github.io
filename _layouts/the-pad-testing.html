@@ -644,14 +644,11 @@
               // Is the recieving trait a natural trait?
               } else if (data2.value !== "natural") { //alert ("baseFrog_SpecialFrog")
               // No
-              var otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
-              // Yes and the base from is a thirdEye
-              } else if (data2.value == "natural" && typeof baseFrog_SpecialFrog == "thirdEye") {
-                var otherFrog_Trait = "natural/"+baseFrog_SpecialFrog+"/"+otherFrog_Frog
-              } else {
-                alter(baseFrog_SpecialFrog+"/"+data2.value)
+                alter(baseFrog_SpecialFrog+" "+otherFrog_Trait)
                 var otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
-              }
+                alter(baseFrog_SpecialFrog+" "+otherFrog_Trait)
+              // Yes and the base from is a thirdEye
+              } 
             } else if (typeof baseFrog_Frog !== "undefined") { // Regular Frog; continue
               if (data2.value == "natural") {
                 var otherFrog_Trait = "natural/"+otherFrog_Frog
