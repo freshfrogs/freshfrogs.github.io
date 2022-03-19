@@ -414,44 +414,31 @@
         consoleOutput('<hr class="hr2"><b>🍄Morph FROGS</b><br> FROG token combinations!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>')
         //consoleOutput('ℹ️ Select TWO FROGs by <u>clicking on them</u>');
         // Generate two random FROGS
-        //randomFROG = Math.floor(Math.random() * nextIdC);
-        //randomFROG2 = Math.floor(Math.random() * nextIdC);
-        //applyFrogOwned(407)
-        //applyFrogOwned(67)
-        //randomFROG = getRandomInt(1, nextIdC);
-        //randomFROG2 = getRandomInt(1, nextIdC);
-        //applyFrogOwned(randomFROG);
-        //applyFrogOwned(randomFROG2);
-        let snapshot = []
-        let i = 1;
-        let loadedFrogs = 0;
+        var loadedFrogs = 0;
+        let targetFrog = nextIdC;
         //consoleOutput("Scanning Tokens... Please wait... ⌛")
-        while(true) {
-          try {
-            let owner = await collection.methods.ownerOf(i++).call()
+        try {
+          for (var thisToken = 1; thisToken < targetFrog; thisToken++) {
+            let owner = await collection.methods.ownerOf(thisToken).call()
             if (ownedFrogs <= 0) { // ❌ No FROGS
               document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>❌ It seems you do not own any FROGS!'+'<br>\n<br>Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
               break;
             }
-            if (ownedFrogs == loadedFrogs) {
-              document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ✅ <b>'+ownedFrogs+' FROG(s) found!</b>'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'+'<br>\n<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
-              break;
-            }
             // Progress Bar!
-            document.getElementById("progress").innerHTML = parseInt((i/nextIdC)*100)+"%"
+            percent = parseInt((thisToken/targetFrog)*100);
+            document.getElementById("progress").innerHTML = percent+"%"
             elem = document.getElementById("myBar");
-            width = parseInt((i/nextIdC)*100);
-            //var id = setInterval(frame, 10);
+            width = percent
             width++;
             elem.style.width = width + "%";
             if (userAcc === owner.toLowerCase()) {
-              let loadedFrogs = loadedFrogs + 1;
+              loadedFrogs++;
               //consoleOutput(i-1)
-              let thisFrogRender = i-1
+              let thisFrogRender = thisToken
               consoleOutput("<br>\n<br><hr>")
               loadFreshFrog(thisFrogRender)
               //Load Metadata
-              let tokenURI = await collection.methods.tokenURI(i-1).call()
+              let tokenURI = await collection.methods.tokenURI(thisToken).call()
               let cid = tokenURI.replace("ipfs://", "")
               let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
               async function get() {
@@ -466,22 +453,20 @@
                 openseaLink = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+thisFrogRender+""
                 consoleOutput('<a target="_blank" href="'+openseaLink+'">View on OpenSea ↗️</a><hr class="hr2">')
                 for (var i = 0; i < metadata2.attributes.length; i++){
-                  //document.write("<br><br>array index: " + i);
-                  //consoleOutput("<br><br>array index: " + i);
                   var data = metadata2.attributes[i]
                   consoleOutput(data.trait_type+": <b>"+data.value+"</b>")
                   loadAttribute(data.trait_type, data.value, metadata2.name)
-                  //
                 }
-                //
-                //consoleOutput(JSON.stringify(metadata2.attributes)); // JSON.stringify(metadata2.attributes.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', ''));
               })()
             }
-          } catch (e) {
-            //alert("Something went wrong, refresh the page!"+e.message)
-            document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ❌ '+loadedFrogs+'/'+ownedFrogs+' FROG(s) loaded! Refresh the page!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'+'<br>\n<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
-            break;
+            if (ownedFrogs == loadedFrogs) {
+              document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ✅ <b>'+ownedFrogs+' FROG(s) found!</b>'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'+'<br>\n<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
+              break;
+            }
           }
+        } catch (e) {
+          alert("Something went wrong, refresh the page!"+e.message)
+          document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ❌ '+loadedFrogs+'/'+ownedFrogs+' FROG(s) loaded!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'+'<br>\n<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
         }
       })
       // Output to minting terminal
