@@ -635,11 +635,11 @@
               otherFrog_Trait = "sand";
             }
             
-          } else if (data2.trait_type == "Trait") {
+          } else if (data2.trait_type == "Trait") { // <--TRAITS
             if (baseFrog_SpecialFrog !== "undefined") { // Adapt trait for special Frogs
               if (baseFrog_SpecialFrog == ("inversedEyes"||"closedEyes")) {
                 otherFrog_Trait = "special/"+data2.value
-              } else {
+              } else { alert ("baseFrog_SpecialFrog")
                 otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
               }
               if (data2.value == "natural") {
