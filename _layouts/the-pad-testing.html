@@ -418,15 +418,9 @@
         //randomFROG2 = Math.floor(Math.random() * nextIdC);
         //applyFrogOwned(407)
         //applyFrogOwned(67)
-        randomFROG = getRandomInt(1, 4039);
-        randomFROG2 = getRandomInt(1, 4039);
-        applyFrogOwned(66);
-        applyFrogOwned(408);
-        let snapshot = []
-        let i = 1;
         let loadedFrogs = 0;
         //consoleOutput("Scanning Tokens... Please wait... ⌛")
-        while(true) {
+        for (var i = 0; i < (nextIdC-1); i++){
           try {
             let owner = await collection.methods.ownerOf(i++).call()
             if (ownedFrogs <= 0) { // ❌ No FROGS
