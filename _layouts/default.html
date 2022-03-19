@@ -338,27 +338,29 @@
             consoleOutput("<br>"+"\n<strong><b>Error: "+e.message+"</b></strong>")
         }
 
-        let userAcc = web3.currentProvider.selectedAddress;
-        let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
-        let myInvites = await f0.myInvites()
-        let myInvitesKeys = Object.keys(myInvites)
+        // VARIABLES
 
-        let name = await f0.api.name().call()
-        let symbol = await f0.api.symbol().call()
-        let nextId = await f0.api.nextId().call()
-        let nextIdC = parseInt(nextId)
+        let userAcc = web3.currentProvider.selectedAddress; // USERS ACCOUNT ADDRESS
+        let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4); // USERS ACCOUNT ADDRESS CUT
+        let myInvites = await f0.myInvites() // USERS INVITES
+        let myInvitesKeys = Object.keys(myInvites) // INVITE KEYS
+
+        let name = await f0.api.name().call() // TOKEN NAME
+        let symbol = await f0.api.symbol().call() // TOKEN SYMBOL
+        let nextId = await f0.api.nextId().call() // NEXT TOKEN ID
+        let nextIdC = parseInt(nextId) // NEXT TOKEN ID PARSED
         let highPriority = 1 // low gas or high gas? low gas = 0 / high gas = 1
-        mostRecent2 = nextIdC - 1
-        let nextToken = await f0.get(nextId);
+        mostRecent2 = nextIdC - 1 // MOST RECENT MINT
+        //let nextToken = await f0.get(nextId); 
         let mintPrice = "0.02"
-        let mintAmmount = 1 // number to mint
-        let mintInviteCode = "0x0000000000000000000000000000000000000000000000000000000000000000" // invite code to mint from
-        let mintList = parseInt(nextId)
-        let mintLimit = 1
+        let mintAmmount = 1 // STARTING number to mint
+        let mintInviteCode = "0x0000000000000000000000000000000000000000000000000000000000000000" // invite code to mint from PUBLIC
+        let mintList = parseInt(nextId) // STARTING FROG
+        let mintLimit = 1 // MINT LIMIT FOR INVITE CODE
         
-        let frogCount = 1;
-        let mintProgress = 0;
-        let mint = 0;
+        let frogCount = 1; // # FROGS IN MINTING TRAY
+        let mintProgress = 0; // MINT IN PROGRESS
+        let mint = 0; // MINT ON /OFF
         let ownedFrogs = await collection.methods.balanceOf(userAcc).call()
 
         // Load public invite first
