@@ -418,7 +418,7 @@
         //randomFROG2 = Math.floor(Math.random() * nextIdC);
         //applyFrogOwned(407)
         //applyFrogOwned(67)
-        let loadedFrogs = 0;
+        var loadedFrogs = 0;
         let targetFrog = nextIdC;
         //consoleOutput("Scanning Tokens... Please wait... ⌛")
         try {
@@ -436,7 +436,7 @@
             width++;
             elem.style.width = width + "%";
             if (userAcc === owner.toLowerCase()) {
-              let loadedFrogs = loadedFrogs + 1;
+              loadedFrogs++;
               //consoleOutput(i-1)
               let thisFrogRender = thisToken
               consoleOutput("<br>\n<br><hr>")
