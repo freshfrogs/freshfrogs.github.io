@@ -649,6 +649,7 @@
               } else if (data2.value == "natural" && typeof baseFrog_SpecialFrog == "thirdEye") {
                 var otherFrog_Trait = "natural/"+baseFrog_SpecialFrog+"/"+otherFrog_Frog
               } else {
+                alter(baseFrog_SpecialFrog+"/"+data2.value)
                 var otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
               }
             } else if (typeof baseFrog_Frog !== "undefined") { // Regular Frog; continue
