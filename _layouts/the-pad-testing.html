@@ -618,6 +618,10 @@
         let otherFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+otherFrog+".json")).json();
         //consoleOutput("<img width='128px' src='https://freshfrogs.github.io/frog/"+otherFrog+".png'>");
         //consoleOutput("<br>otherFrog:"+otherFrogmetadata.name)
+        // natural traits from all frogs for specialBase Frogs
+        // special Frog + specialFrog combos
+        // DONE
+
         for (var otherFrogi = 0; otherFrogi < otherFrogmetadata.attributes.length; otherFrogi++){
           var data2 = otherFrogmetadata.attributes[otherFrogi]
           //consoleOutput(data2.trait_type+": "+data2.value)
@@ -648,7 +652,13 @@
               var otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
               }
               if (data2.value == "natural") {
-                var otherFrog_Trait = "natural/"+baseFrog_SpecialFrog+"/"+otherFrog_Frog
+                if (baseFrog_SpecialFrog === "inversedEyes") {
+                  var otherFrog_Trait = "natural/"+otherFrog_Frog
+                } else if (baseFrog_SpecialFrog === "closedEyes") {
+                  var otherFrog_Trait = "natural/"+otherFrog_Frog
+                } else { //alert ("baseFrog_SpecialFrog")
+                  var otherFrog_Trait = "natural/"+baseFrog_SpecialFrog+"/"+otherFrog_Frog
+                }
               }
             } else if (typeof baseFrog_Frog !== "undefined") { // Regular Frog; continue
               if (data2.value == "natural") {
