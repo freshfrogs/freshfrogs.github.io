@@ -626,7 +626,7 @@
           } else if (data2.trait_type == "SpecialFrog") {
             var otherFrog_SpecialFrog = data2.value;
             if (data2.value == "thirdEye") {
-              if (baseFrog_SpecialFrog !== "undefined") {
+              if (typeof baseFrog_SpecialFrog !== "undefined") {
                 var otherFrog_Trait = "thirdEye/baseSpecial"
               } else {
                 var otherFrog_Trait = "thirdEye/base"
@@ -636,8 +636,8 @@
             }
             
           } else if (data2.trait_type == "Trait") { // <--TRAITS
-            if (baseFrog_SpecialFrog !== "undefined") { // Adapt trait for special Frogs
-              if (baseFrog_SpecialFrog == ("inversedEyes"||"closedEyes")) {
+            if (typeof baseFrog_SpecialFrog !== "undefined") { // Adapt trait for special Frogs
+              if (typeof baseFrog_SpecialFrog == ("inversedEyes"||"closedEyes")) {
                 var otherFrog_Trait = "special/"+data2.value
               } else { alert ("baseFrog_SpecialFrog")
               var otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
@@ -645,7 +645,7 @@
               if (data2.value == "natural") {
                 var otherFrog_Trait = "natural/"+baseFrog_SpecialFrog+"/"+otherFrog_Frog
               }
-            } else if (baseFrog_Frog !== "undefined") { // Regular Frog; continue
+            } else if (typeof baseFrog_Frog !== "undefined") { // Regular Frog; continue
               if (data2.value == "natural") {
                 var otherFrog_Trait = "natural/"+otherFrog_Frog
               } else {
