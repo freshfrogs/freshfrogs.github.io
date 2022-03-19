@@ -420,8 +420,8 @@
         //applyFrogOwned(67)
         randomFROG = getRandomInt(1, 4039);
         randomFROG2 = getRandomInt(1, 4039);
-        applyFrogOwned(407);
         applyFrogOwned(408);
+        applyFrogOwned(407);
         let snapshot = []
         let i = 1;
         let loadedFrogs = 0;
@@ -554,7 +554,7 @@
         newAttribute.target = "_blank"
         newAttribute.className = "frogImg2 pointer"
         newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
-        newAttribute.alt = attribute
+        //newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
       }
       function getRandomArbitrary(min, max) {
@@ -643,16 +643,17 @@
             }
           } else if (data2.trait_type == "Trait") {
             if (baseFrog_SpecialFrog !== "undefined") { // Adapt trait for special Frogs
-              if (baseFrog_SpecialFrog == "inversedEyes" || baseFrog_SpecialFrog == "closedEyes") {
+              if (baseFrog_SpecialFrog == ("inversedEyes"||"closedEyes")) {
                 otherFrog_Trait = "special/"+data2.value
               } else {
                 otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
               }
               if (data2.value == "natural") {
                 otherFrog_Trait = "natural/"+baseFrog_SpecialFrog+"/"+otherFrog_Frog
+                alert(otherFrog_Trait)
               }
             } else if (baseFrog_Frog !== "undefined") { // Regular Frog; continue
-              if (data2.value == "natural") { // Natural trait applied to base frogs
+              if (data2.value == "natural") {
                 otherFrog_Trait = "natural/"+otherFrog_Frog
               } else {
                 otherFrog_Trait = data2.value;
