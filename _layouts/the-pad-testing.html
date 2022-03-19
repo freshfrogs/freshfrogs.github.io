@@ -636,9 +636,15 @@
             otherFrog_Frog = data2.value;
           } else if (data2.trait_type == "SpecialFrog") {
             otherFrog_SpecialFrog = data2.value;
+            //
+            if (data2.value == "thirdEye") {
+              otherFrog_Trait = "thirdEye/base"
+            } else {
+              otherFrog_Trait = "sand";
+            }
+            //
           } else if (data2.trait_type == "Trait") {
             if (baseFrog_SpecialFrog !== "undefined") { // Adapt trait for special Frogs
-              alert(baseFrog_SpecialFrog)
               if (baseFrog_SpecialFrog == ("inversedEyes"||"closedEyes")) {
                 otherFrog_Trait = "special/"+data2.value
               } else {
@@ -648,15 +654,7 @@
                 otherFrog_Trait = "natural/"+baseFrog_SpecialFrog+"/"+otherFrog_Frog
               }
             } else if (baseFrog_Frog !== "undefined") { // Regular Frog; continue
-              alert(otherFrog_SpecialFrog+"1")
-              if (otherFrog_SpecialFrog !== "undefined") {
-                alert(otherFrog_SpecialFrog+"2")
-                if (otherFrog_SpecialFrog == "thirdEye") {
-                  otherFrog_Trait = "thirdEye/base"
-                } else {
-                  otherFrog_Trait = "sand";
-                }
-              } else if (data2.value == "natural") { // Natural trait applied to base frogs
+              if (data2.value == "natural") { // Natural trait applied to base frogs
                 otherFrog_Trait = "natural/"+otherFrog_Frog
               } else {
                 otherFrog_Trait = data2.value;
