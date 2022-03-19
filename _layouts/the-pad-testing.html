@@ -432,7 +432,7 @@
               break;
             }
             // Progress Bar!
-            document.getElementById("progress").innerHTML = parseInt((thisToken/nextIdC)*100)+"%"
+            document.getElementById("progress").innerHTML = parseInt((thisToken/(nextIdC-1))*100)+"%"
             elem = document.getElementById("myBar");
             width = parseInt((thisToken/nextIdC)*100);
             //var id = setInterval(frame, 10);
