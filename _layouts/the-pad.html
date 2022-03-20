@@ -565,6 +565,9 @@
         } else {
           newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
         }
+        if (attribute === "loadMorph") {
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".gif"
+        }
         newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
       }
@@ -799,7 +802,7 @@
             //consoleOutput("Mouth: "+otherFrog_Mouth);
           }
           //consoleOutput("Done")
-        }
+        } loadAttribute("Frog", "loadMorph", thisPlace);
       }
     </script>
   <div class="top">{{ content }}</div>
