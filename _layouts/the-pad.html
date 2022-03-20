@@ -559,14 +559,15 @@
         newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
         newAttribute.id = attribute
         newAttribute.target = "_blank"
-        newAttribute.className = "frogImg2 pointer"
-        if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") {
+        newAttribute.className = "frogImg2 pointer" //shadesAnimation
+        if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") { 
           newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".gif"
+        } else if (attribute === "morphAnimation") {
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/Frog/loadMorph.gif"
+        } else if (attribute === "shadesAnimation") {
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/Eyes/shadesAnimation.gif"
         } else {
           newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
-        }
-        if (attribute === "morphAnimation") {
-          newAttribute.src = "https://freshfrogs.github.io/the-pad/Frog/loadMorph.gif"
         }
         newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
@@ -694,8 +695,11 @@
             }
           } else if (data2.trait_type == "Accessory") {
             var otherFrog_Accessory = data2.value;
-          } else if (data2.trait_type == "Eyes") {
+          } else if (data2.trait_type == "Eyes") { // shadesAnimation
+            //
+           // if (data2.value === "shades" || data2.value === "shadesPurple" || data2.value === "shadesThreeD" || data2.value === "shadesWhite") {
             var otherFrog_Eyes = data2.value;
+            //
           } else if (data2.trait_type == "Hat") {
             var otherFrog_Hat = data2.value;
           } else if (data2.trait_type == "Mouth") {
@@ -733,6 +737,11 @@
           // Eyes
           if (typeof baseFrog_Eyes !== 'undefined') {                             // Check for Accessory from baseFrog
             loadAttribute("Eyes", baseFrog_Eyes, thisPlace)        // Load Accessory from baseFrog
+            // shadesAnimation
+            if (baseFrog_Eyes === "shades" || data2.value === "shadesPurple" || data2.value === "shadesThreeD" || data2.value === "shadesWhite") {
+              loadAttribute("Eyes", "shadesAnimation", thisPlace)
+            }
+            //
             //consoleOutput("Eyes: "+baseFrog_Eyes); // Test Trait
           } else if (typeof otherFrog_Eyes !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
             loadAttribute("Eyes", otherFrog_Eyes, thisPlace)      // Load Accessory from otherFrog
