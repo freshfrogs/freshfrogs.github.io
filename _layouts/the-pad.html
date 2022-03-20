@@ -560,7 +560,12 @@
         newAttribute.id = attribute
         newAttribute.target = "_blank"
         newAttribute.className = "frogImg2 pointer"
-        newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
+        if (useGIF == "true") {
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".gif"
+        } else {
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
+        }
+        
         newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
       }
@@ -687,7 +692,12 @@
           } else if (data2.trait_type == "Hat") {
             var otherFrog_Hat = data2.value;
           } else if (data2.trait_type == "Mouth") {
-            var otherFrog_Mouth = data2.value;
+            if (data2.value == "smoking") {
+              var useGIF = "true";
+              var otherFrog_Mouth = data2.value;
+            } else {
+              var otherFrog_Mouth = data2.value;
+            }
           }
         }
       // Check first attribute. Is it a Frog or specialFrog?
