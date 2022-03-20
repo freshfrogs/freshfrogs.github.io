@@ -617,7 +617,11 @@
           } else if (data.trait_type == "Hat") {
             var baseFrog_Hat = data.value;
           } else if (data.trait_type == "Mouth") {
-            var baseFrog_Mouth = data.value;
+            if (data.value === ("smoking" || "smokingPipe" || "smokingCigar")) {
+              var baseFrog_Mouth = data.value+"2";
+            } else {
+              var baseFrog_Mouth = data.value;
+            }
           }
         }
         // 2. Get metadata from otherFrog
