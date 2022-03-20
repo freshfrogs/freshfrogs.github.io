@@ -565,8 +565,8 @@
         } else {
           newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
         }
-        if (attribute === "loadMorph") {
-          newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".gif"
+        if (attribute === "morphAnimation") {
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/loadMorph.gif"
         }
         newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
@@ -803,7 +803,7 @@
           }
           //loadAttribute("Frog", "loadMorph", thisPlace);
         }
-        loadAttribute("Frog", "loadMorph", thisPlace);
+        loadAttribute("Frog", "morphAnimation", thisPlace);
       }
     </script>
   <div class="top">{{ content }}</div>
