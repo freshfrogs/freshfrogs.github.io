@@ -692,7 +692,7 @@
           } else if (data2.trait_type == "Hat") {
             var otherFrog_Hat = data2.value;
           } else if (data2.trait_type == "Mouth") {
-            if (data2.value = "smoking") {
+            if (data2.value === ("smoking" || "smokingPipe" || "smokingCigar")) {
               var otherFrog_Mouth = data2.value+"2";
             } else {
               var otherFrog_Mouth = data2.value;
