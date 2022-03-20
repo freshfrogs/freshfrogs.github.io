@@ -350,7 +350,7 @@
     <![endif]-->
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
-    <script src="https://testnet.factoria.app/f0/token_abi.js"></script>
+    <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
@@ -431,10 +431,7 @@
         })
         consoleOutput('<hr class="hr2"><b>🍄Morph FROGS</b><br> FROG token combinations!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>')
         //consoleOutput('ℹ️ Select TWO FROGs by <u>clicking on them</u>');
-        // Generate two random FROGS 67 584
-        applyFrogOwned(67)
-        applyFrogOwned(584)
-        
+        // Generate two random FROGS
         var loadedFrogs = 0;
         let targetFrog = nextIdC;
         //consoleOutput("Scanning Tokens... Please wait... ⌛")
@@ -562,14 +559,15 @@
         newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
         newAttribute.id = attribute
         newAttribute.target = "_blank"
-        newAttribute.className = "frogImg2 pointer"
-        if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") {
+        newAttribute.className = "frogImg2 pointer" //shadesAnimation
+        if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") { 
           newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".gif"
+        } else if (attribute === "morphAnimation") {
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/Frog/loadMorph.gif"
+        } else if (attribute === "shadesAnimation") {
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/Eyes/shadesAnimation.gif"
         } else {
           newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
-        }
-        if (attribute === "loadMorph") {
-          newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".gif"
         }
         newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
@@ -697,8 +695,11 @@
             }
           } else if (data2.trait_type == "Accessory") {
             var otherFrog_Accessory = data2.value;
-          } else if (data2.trait_type == "Eyes") {
+          } else if (data2.trait_type == "Eyes") { // shadesAnimation
+            //
+           // if (data2.value === "shades" || data2.value === "shadesPurple" || data2.value === "shadesThreeD" || data2.value === "shadesWhite") {
             var otherFrog_Eyes = data2.value;
+            //
           } else if (data2.trait_type == "Hat") {
             var otherFrog_Hat = data2.value;
           } else if (data2.trait_type == "Mouth") {
@@ -709,11 +710,11 @@
             }
           }
         }
-      // Check first attribute. Is it a Frog or specialFrog?
-      //consoleOutput("<div id='newFrog' class='smallContainer2'></div>");
-      thisPlace = 'comboFrog';
-      //consoleOutput("<br>\n<br>New Frog:<br>");
-      if (typeof baseFrog_Frog !== 'undefined') {                              // Load Frog Type
+        // Check first attribute. Is it a Frog or specialFrog?
+        //consoleOutput("<div id='newFrog' class='smallContainer2'></div>");
+        thisPlace = 'comboFrog';
+        //consoleOutput("<br>\n<br>New Frog:<br>");
+        if (typeof baseFrog_Frog !== 'undefined') {                              // Load Frog Type
           loadAttribute("Frog", baseFrog_Frog, thisPlace)       // Load Frog Type from baseFrog
           loadAttribute("Frog", "frog", thisPlace);
           //consoleOutput("Frog: "+baseFrog_Frog); // Test Frog
@@ -736,6 +737,11 @@
           // Eyes
           if (typeof baseFrog_Eyes !== 'undefined') {                             // Check for Accessory from baseFrog
             loadAttribute("Eyes", baseFrog_Eyes, thisPlace)        // Load Accessory from baseFrog
+            // shadesAnimation
+            if (baseFrog_Eyes === "shades" || data2.value === "shadesPurple" || data2.value === "shadesThreeD" || data2.value === "shadesWhite") {
+              loadAttribute("Eyes", "shadesAnimation", thisPlace)
+            }
+            //
             //consoleOutput("Eyes: "+baseFrog_Eyes); // Test Trait
           } else if (typeof otherFrog_Eyes !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
             loadAttribute("Eyes", otherFrog_Eyes, thisPlace)      // Load Accessory from otherFrog
@@ -757,7 +763,8 @@
             loadAttribute("Mouth", otherFrog_Mouth, thisPlace)      // Load Accessory from otherFrog
             //consoleOutput("Mouth: "+otherFrog_Mouth);
           }
-          //consoleOutput("Done")
+          loadAttribute("Frog", "morphAnimation", thisPlace);
+          //loadAttribute("Frog", "loadMorph", thisPlace);
         } else if (typeof baseFrog_SpecialFrog !== 'undefined') { // Load SpecialFrog Type
           loadAttribute("SpecialFrog", baseFrog_SpecialFrog, thisPlace)
           loadAttribute("Frog", "frog", thisPlace);
@@ -804,8 +811,8 @@
             loadAttribute("Mouth", otherFrog_Mouth, thisPlace)      // Load Accessory from otherFrog
             //consoleOutput("Mouth: "+otherFrog_Mouth);
           }
-          //consoleOutput("Done")
-        } loadAttribute("Frog", "loadMorph", thisPlace);
+          loadAttribute("Frog", "morphAnimation", thisPlace);
+        }
       }
     </script>
   <div class="top">{{ content }}</div>
