@@ -754,7 +754,7 @@
             loadAttribute("Mouth", otherFrog_Mouth, thisPlace)      // Load Accessory from otherFrog
             //consoleOutput("Mouth: "+otherFrog_Mouth);
           }
-          loadAttribute("Frog", "loadMorph", thisPlace);
+          //loadAttribute("Frog", "loadMorph", thisPlace);
         } else if (typeof baseFrog_SpecialFrog !== 'undefined') { // Load SpecialFrog Type
           loadAttribute("SpecialFrog", baseFrog_SpecialFrog, thisPlace)
           loadAttribute("Frog", "frog", thisPlace);
@@ -801,8 +801,9 @@
             loadAttribute("Mouth", otherFrog_Mouth, thisPlace)      // Load Accessory from otherFrog
             //consoleOutput("Mouth: "+otherFrog_Mouth);
           }
-          loadAttribute("Frog", "loadMorph", thisPlace);
+          //loadAttribute("Frog", "loadMorph", thisPlace);
         }
+        loadAttribute("Frog", "loadMorph", thisPlace);
       }
     </script>
   <div class="top">{{ content }}</div>
