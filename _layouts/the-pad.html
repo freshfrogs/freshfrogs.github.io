@@ -706,11 +706,11 @@
             }
           }
         }
-      // Check first attribute. Is it a Frog or specialFrog?
-      //consoleOutput("<div id='newFrog' class='smallContainer2'></div>");
-      thisPlace = 'comboFrog';
-      //consoleOutput("<br>\n<br>New Frog:<br>");
-      if (typeof baseFrog_Frog !== 'undefined') {                              // Load Frog Type
+        // Check first attribute. Is it a Frog or specialFrog?
+        //consoleOutput("<div id='newFrog' class='smallContainer2'></div>");
+        thisPlace = 'comboFrog';
+        //consoleOutput("<br>\n<br>New Frog:<br>");
+        if (typeof baseFrog_Frog !== 'undefined') {                              // Load Frog Type
           loadAttribute("Frog", baseFrog_Frog, thisPlace)       // Load Frog Type from baseFrog
           loadAttribute("Frog", "frog", thisPlace);
           //consoleOutput("Frog: "+baseFrog_Frog); // Test Frog
@@ -754,7 +754,7 @@
             loadAttribute("Mouth", otherFrog_Mouth, thisPlace)      // Load Accessory from otherFrog
             //consoleOutput("Mouth: "+otherFrog_Mouth);
           }
-          //consoleOutput("Done")
+          loadAttribute("Frog", "loadMorph", thisPlace);
         } else if (typeof baseFrog_SpecialFrog !== 'undefined') { // Load SpecialFrog Type
           loadAttribute("SpecialFrog", baseFrog_SpecialFrog, thisPlace)
           loadAttribute("Frog", "frog", thisPlace);
@@ -801,8 +801,8 @@
             loadAttribute("Mouth", otherFrog_Mouth, thisPlace)      // Load Accessory from otherFrog
             //consoleOutput("Mouth: "+otherFrog_Mouth);
           }
-          //consoleOutput("Done")
-        } loadAttribute("Frog", "loadMorph", thisPlace);
+          loadAttribute("Frog", "loadMorph", thisPlace);
+        }
       }
     </script>
   <div class="top">{{ content }}</div>
