@@ -410,6 +410,17 @@
             combineTokens(baseFrog, subFrog);
           }
         })
+        //
+        document.querySelector("#selectBase").addEventListener("click", async (e) => {
+          if (typeof baseFrog !== 'undefined') { 
+            document.getElementById("Frog #"+baseFrog).scrollIntoView();
+          }
+        })
+        document.querySelector("#selectSub").addEventListener("click", async (e) => {
+          if (typeof subFrog !== 'undefined') { 
+            document.getElementById("Frog #"+subFrog).scrollIntoView();
+          }
+        })
         consoleOutput('<hr class="hr2"><b>🍄Morph FROGS</b><br> FROG token combinations!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>')
         //consoleOutput('ℹ️ Select TWO FROGs by <u>clicking on them</u>');
         // Generate two random FROGS
