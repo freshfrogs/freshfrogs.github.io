@@ -546,7 +546,7 @@
         newAttribute.target = "_blank"
         newAttribute.className = "frogImg2 pointer"
         //alert(attribute)
-        if (attribute === ("smoking2" || "smokingPipe2" || "smokingCigar2")) {
+        if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") {
           alert(attribute+"!")
           newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".gif"
         } else {
@@ -619,7 +619,7 @@
           } else if (data.trait_type == "Hat") {
             var baseFrog_Hat = data.value;
           } else if (data.trait_type == "Mouth") {
-            if (data.value === ("smoking" || "smokingPipe" || "smokingCigar")) {
+            if (data.value === "smoking" || data.value === "smokingPipe" || data.value === "smokingCigar") {
               var baseFrog_Mouth = data.value+"2";
             } else {
               var baseFrog_Mouth = data.value;
@@ -687,7 +687,7 @@
           } else if (data2.trait_type == "Hat") {
             var otherFrog_Hat = data2.value;
           } else if (data2.trait_type == "Mouth") {
-            if (data2.value === ("smoking" || "smokingPipe" || "smokingCigar")) {
+            if (data2.value === "smoking" || data2.value === "smokingPipe" || data2.value === "smokingCigar") {
               var otherFrog_Mouth = data2.value+"2";
             } else {
               var otherFrog_Mouth = data2.value;
