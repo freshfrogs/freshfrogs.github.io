@@ -538,13 +538,18 @@
         return Math.floor(Math.random() * (max - min + 1)) + min;
       }
       // Load attribute
+      // Load attribute
       function loadAttribute(trait, attribute, where) {
         newAttribute = document.createElement("img")
         newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
         newAttribute.id = attribute
         newAttribute.target = "_blank"
         newAttribute.className = "frogImg2 pointer"
-        newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
+        if (attribute === ("smoking2" || "smokingPipe2" || "smokingCigar2")) {
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".gif"
+        } else {
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
+        }
         newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
       }
@@ -676,7 +681,11 @@
           } else if (data2.trait_type == "Hat") {
             var otherFrog_Hat = data2.value;
           } else if (data2.trait_type == "Mouth") {
-            var otherFrog_Mouth = data2.value;
+            if (data2.value = "smoking") {
+              var otherFrog_Mouth = data2.value+"2";
+            } else {
+              var otherFrog_Mouth = data2.value;
+            }
           }
         }
       // Check first attribute. Is it a Frog or specialFrog?
