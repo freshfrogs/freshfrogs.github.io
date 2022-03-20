@@ -560,7 +560,7 @@
         newAttribute.id = attribute
         newAttribute.target = "_blank"
         newAttribute.className = "frogImg2 pointer"
-        if (typeof useGIF !== "undefined") {
+        if (attribute == "smoking2") {
           newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".gif"
         } else {
           newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
@@ -693,8 +693,7 @@
             var otherFrog_Hat = data2.value;
           } else if (data2.trait_type == "Mouth") {
             if (data2.value == "smoking") {
-              let useGIF = "true";
-              var otherFrog_Mouth = data2.value;
+              var otherFrog_Mouth = "smoking2";
             } else {
               var otherFrog_Mouth = data2.value;
             }
