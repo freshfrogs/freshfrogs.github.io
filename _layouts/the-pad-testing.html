@@ -614,14 +614,10 @@
         // frogType, and attributes.
         var useGIF = undefined;
         // Test save to json object
-        //
-        //let attributesList2 = await (await fetch('https://freshfrogs.github.io/frog/lockedMorphs/lockedMorphs.json')).json();
-        //var attributesListObj2 = JSON.stringify(attributesList2)
-        //
         let attributes = await (await fetch('lockedMorphs.json')).json();
-        var attributesList = JSON.stringify(attributes)
-        var attributesListObj = JSON.stringify(attributes)
-        alert(attributesList)
+        var attributesList = JSON.stringify(attributesList);
+        var attributesListObj = JSON.parse(attributesList);
+
         //attributesListObj[i].push({"trait_type":"traitType","value":"traitValue"});
         //
         var baseFrog_Frog, baseFrog_SpecialFrog, baseFrog_Trait, baseFrog_Accessory, baseFrog_Eyes, baseFrog_Hat, baseFrog_Mouth = undefined;
@@ -873,10 +869,6 @@
         }
         attributesList = JSON.stringify(attributesListObj);
         alert(attributesList)
-        const FileSystem = require("fs");
-        FileSystem.writeFile('lockedMorphs.json', JSON.stringify(attributesListObj), (error) => {
-          if (error) throw error;
-        });
       }
     </script>
   <div class="top">{{ content }}</div>
