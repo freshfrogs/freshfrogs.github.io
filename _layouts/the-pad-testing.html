@@ -615,9 +615,9 @@
         var useGIF = undefined;
         // Test save to json object
         let attributesList = await (await fetch('https://freshfrogs.github.io/frog/lockedMorphs/lockedMorphs.json')).json();
-        alert(JSON.stringify(attributesList))
+        let attributesListJson = JSON.stringify(attributesList)
         //var attributesList = '{"Attributes":[]}'; {"attributes": []}
-        var attributesListObj = JSON.parse(attributesList);
+        var attributesListObj = JSON.parse(attributesListJson);
 
         //attributesListObj[i].push({"trait_type":"traitType","value":"traitValue"});
         //
