@@ -615,7 +615,7 @@
         var useGIF = undefined;
         // Test save to json object
         var attributesList = '{"Attributes":[]}';
-        var attributesListObj = JSON.parse(attributesList.Attributes);
+        var attributesListObj = JSON.parse(attributesList);
 
         //attributesListObj[i].push({"trait_type":"traitType","value":"traitValue"});
         //
@@ -753,33 +753,33 @@
         if (typeof baseFrog_Frog !== 'undefined') {                              // Load Frog Type
           loadAttribute("Frog", baseFrog_Frog, thisPlace)       // Load Frog Type from baseFrog
           loadAttribute("Frog", "frog", thisPlace);
-          attributesListObj[1].push({"trait_type":"Frog","value":baseFrog_Frog});
+          attributesListObj['Attributes'].push({"trait_type":"Frog","value":baseFrog_Frog});
           //consoleOutput("Frog: "+baseFrog_Frog); // Test Frog
           // Trait
           if (typeof otherFrog_Trait !== 'undefined') {                        // Check for trait from otherfrog
             loadAttribute("Trait", otherFrog_Trait, thisPlace)  // Load Trait from otherFrog
             //consoleOutput("Trait: "+otherFrog_Trait); // Test Trait
-            attributesListObj[2].push({"trait_type":"Trait","value":otherFrog_Trait});
+            attributesListObj['Attributes'].push({"trait_type":"Trait","value":otherFrog_Trait});
           } else if (typeof baseFrog_Trait !== 'undefined') {                  // If otherFrog has no trait; check baseFrog
             loadAttribute("Trait", baseFrog_Trait, thisPlace)   // Load trait from baseFrog
             //consoleOutput("Trait: "+baseFrog_Trait); // Test Trait
-            attributesListObj[2].push({"trait_type":"Trait","value":baseFrog_Trait});
+            attributesListObj['Attributes'].push({"trait_type":"Trait","value":baseFrog_Trait});
           }
           // Accessory
           if (typeof baseFrog_Accessory !== 'undefined') {                             // Check for Accessory from baseFrog
             loadAttribute("Accessory", baseFrog_Accessory, thisPlace)   // Load Accessory from baseFrog
             //consoleOutput("Accessory: "+baseFrog_Accessory); // Test Accessory
-            attributesListObj[3].push({"trait_type":"Accessory","value":baseFrog_Accessory});
+            attributesListObj['Attributes'].push({"trait_type":"Accessory","value":baseFrog_Accessory});
           } else if (typeof otherFrog_Accessory !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
             loadAttribute("Accessory", otherFrog_Accessory, thisPlace)      // Load Accessory from otherFrog
             //consoleOutput("Accessory: "+otherFrog_Accessory); // Test Trait
-            attributesListObj[3].push({"trait_type":"Accessory","value":otherFrog_Accessory});
+            attributesListObj['Attributes'].push({"trait_type":"Accessory","value":otherFrog_Accessory});
           }
           // Eyes
           if (typeof baseFrog_Eyes !== 'undefined') {                             // Check for Accessory from baseFrog
             loadAttribute("Eyes", baseFrog_Eyes, thisPlace)        // Load Accessory from baseFrog
             // shadesAnimation
-            attributesListObj[4].push({"trait_type":"Eyes","value":baseFrog_Eyes});
+            attributesListObj['Attributes'].push({"trait_type":"Eyes","value":baseFrog_Eyes});
             if (baseFrog_Eyes === "shades" || baseFrog_Eyes === "shadesPurple" || baseFrog_Eyes === "shadesThreeD" || baseFrog_Eyes === "shadesWhite") {
               loadAttribute("Eyes", "shadesAnimation", thisPlace)
             }
@@ -788,7 +788,7 @@
           } else if (typeof otherFrog_Eyes !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
             loadAttribute("Eyes", otherFrog_Eyes, thisPlace)      // Load Accessory from otherFrog
             //consoleOutput("Eyes: "+otherFrog_Eyes);
-            attributesListObj[4].push({"trait_type":"Eyes","value":otherFrog_Eyes});
+            attributesListObj['Attributes'].push({"trait_type":"Eyes","value":otherFrog_Eyes});
             if (otherFrog_Eyes === "shades" || otherFrog_Eyes === "shadesPurple" || otherFrog_Eyes === "shadesThreeD" || otherFrog_Eyes === "shadesWhite") {
               loadAttribute("Eyes", "shadesAnimation", thisPlace)
             }
@@ -814,7 +814,7 @@
         } else if (typeof baseFrog_SpecialFrog !== 'undefined') { // Load SpecialFrog Type
           loadAttribute("SpecialFrog", baseFrog_SpecialFrog, thisPlace)
           loadAttribute("Frog", "frog", thisPlace);
-          attributesListObj[1].push({"trait_type":"SpecialFrog","value":baseFrog_SpecialFrog});
+          attributesListObj['Attributes'].push({"trait_type":"SpecialFrog","value":baseFrog_SpecialFrog});
           //consoleOutput("SpecialFrog Found: "+baseFrog_SpecialFrog)
           //
           // Trait
