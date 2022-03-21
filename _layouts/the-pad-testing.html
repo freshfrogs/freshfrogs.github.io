@@ -620,7 +620,7 @@
         //
         let attributes = await (await fetch('lockedMorphs.json')).json();
         var attributesList = JSON.stringify(attributes)
-        var attributesListObj = JSON.parse(attributesList);
+        var attributesListObj = attributesList
         alert(attributesList)
         //attributesListObj[i].push({"trait_type":"traitType","value":"traitValue"});
         //
