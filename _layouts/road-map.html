@@ -310,6 +310,13 @@
   box-sizing: border-box;
 }
 
+body {
+  background-color: #474e5d;
+  font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+  font-size: auto;
+  font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
 /* The actual timeline (the vertical ruler) */
 .timeline {
   position: relative;
@@ -402,7 +409,6 @@
   border-radius: 6px;
   font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
   font-size: auto;
-  font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* Media queries - Responsive timeline on screens less than 600px wide */
@@ -421,20 +427,20 @@
   
   /* Make sure that all arrows are pointing leftwards */
   .container::before {
-    left: 60px;
-    border: medium solid white;
-    border-width: 10px 10px 10px 0;
-    border-color: transparent white transparent transparent;
+  left: 60px;
+  border: medium solid white;
+  border-width: 10px 10px 10px 0;
+  border-color: transparent white transparent transparent;
   }
 
   /* Make sure all circles are at the same spot */
   .left::after, .right::after {
-    left: 15px;
+  left: 15px;
   }
   
   /* Make all right containers behave like the left ones */
   .right {
-    left: 0%;
+  left: 0%;
   }
 }
 </style>
@@ -475,13 +481,13 @@
           </div>
         </div>
         <div class="container left">
-          <div class="content downloads">
+          <div class="content">
             <h2>Secondary Release Q2 2022</h2>
             <p>Public mint opened for 1,212 FROGS available at 0.02 $ETH</p>
           </div>
         </div>
         <div class="container right">
-          <div class="content downloads">
+          <div class="content">
             <h2>Final Release Q3 2022</h2>
             <p>Public mint opened for 2,020 FROGS available at 0.04 $ETH</p>
           </div>
