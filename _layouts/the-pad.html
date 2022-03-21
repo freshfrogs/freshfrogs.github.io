@@ -675,7 +675,12 @@
               } else if (baseFrog_SpecialFrog === "closedEyes") {
                 var otherFrog_Trait = "special/"+data2.value
               } else { //alert ("baseFrog_SpecialFrog")
-                var otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
+                if (baseFrog_SpecialFrog === "thirdEye" && otherFrog_SpecialFrog === "inversedEyes") {
+                  var otherFrog_Trait = baseFrog_SpecialFrog+"/basedInversed"
+                } else{
+                  var otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
+                }
+                
               }
               if (data2.value == "natural") {
                 if (baseFrog_SpecialFrog === "inversedEyes") {
