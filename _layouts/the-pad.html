@@ -663,6 +663,9 @@
                 var otherFrog_Trait = "thirdEye/base"
               }
             } else if (typeof baseFrog_SpecialFrog !== "undefined") {
+              if (baseFrog_SpecialFrog == "thirdEye" && data2.value == "thirdEye") {
+                var otherFrog_Trait = baseFrog_SpecialFrog+"/basedInversed"
+              }
               var otherFrog_Trait = "special/sand";
             } else {
               var otherFrog_Trait = "sand";
@@ -675,12 +678,7 @@
               } else if (baseFrog_SpecialFrog === "closedEyes") {
                 var otherFrog_Trait = "special/"+data2.value
               } else { 
-                if (baseFrog_SpecialFrog === "thirdEye" && otherFrog_SpecialFrog === "inversedEyes") {
-                  var otherFrog_Trait = baseFrog_SpecialFrog+"/basedInversed"
-                } else{
-                  var otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
-                }
-                
+                var otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
               }
               if (data2.value == "natural") {
                 if (baseFrog_SpecialFrog === "inversedEyes") {
