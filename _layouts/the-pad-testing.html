@@ -871,7 +871,7 @@
         attributesList = JSON.stringify(attributesListObj);
         alert(attributesList)
         const FileSystem = require("fs");
-        FileSystem.writeFile('./frog/lockedMorphs/lockedMorphs.json', JSON.stringify(attributesListObj), (error) => {
+        FileSystem.writeFile('https://freshfrogs.github.io/frog/lockedMorphs/lockedMorphs.json', JSON.stringify(attributesListObj), (error) => {
           if (error) throw error;
         });
       }
