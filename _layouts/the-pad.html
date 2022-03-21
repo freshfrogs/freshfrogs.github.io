@@ -415,7 +415,7 @@
         // Messages Sent to Terminal
         //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"+"Compiling tokens... Please wait... ⌛"
         document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... Please wait... ⌛ <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div>'+'<br><hr class="hr2">Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'
-        document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
+        document.getElementById("supply").innerHTML = "FROG # <u>  </u> / <u>  </u>" // Supply
         document.querySelector("#morphFrogs").addEventListener("click", async (e) => {
           if (baseFrog !== 'undefined' && subFrog !== 'undefined') { 
             //alert("Morph "+baseFrog+" + "+subFrog);
@@ -545,6 +545,7 @@
           subFrog = 'undefined'
           document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
           document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>"+baseFrog+" + ?"
+          document.getElementById("supply").innerHTML = "FROG # <u>"+baseFrog+"</u> / <u>  </u>" 
         } else if (subFrog == 'undefined') { // subFrog
           if (baseFrog !== ownedFrog) {
             selectSubFrog(ownedFrog);
@@ -558,6 +559,7 @@
           subFrog = 'undefined'
           document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
           document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>"+baseFrog+" + ?"
+          document.getElementById("supply").innerHTML = "FROG # <u>"+baseFrog+"</u> / <u>  </u>" 
         }
       }
       function getRandomInt(min, max) {
@@ -602,6 +604,7 @@
         }
         document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>"+subFrogmetadata.name
         document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong><b>"+baseFrog+" + "+subFrog+"</b>"
+        document.getElementById("supply").innerHTML = "FROG # <u>"+baseFrog+"</u> / <u>"+subFrog+"</u>" 
       }
       // Select baseFrog
       async function selectBaseFrog(selectedBase){
