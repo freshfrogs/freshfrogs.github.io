@@ -298,6 +298,13 @@
     margin-bottom: 0px;
 
   }
+  .infoPanel {
+    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
+    background: #f4f4f4;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    padding: 5px;
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="./assets/logo.png">
@@ -323,7 +330,7 @@
       document.addEventListener("DOMContentLoaded", async () => {
         // consoleOutput("<strong>❯</strong> Minting closed! Join discord for more info!"+"<b><u><a class='pointer' href='https://freshfrogs.github.io/discord'>Join Discord</b></u></a>")
         consoleOutput('<br>\n'+'Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>')
-        consoleOutput('<br>\n'+'Combine FROG Tokens...<a class="pointer" href="https://freshfrogs.github.io/the-pad"><b>🍄 <u>Frog Morph</u></b> ↗️</a><br>')
+        consoleOutput('<br>\n'+'<div class="infoPanel">Combine FROG Tokens...<a class="pointer" href="https://freshfrogs.github.io/the-pad"><b>🍄 <u>Frog Morph</u></b> ↗️</a></div>')
         const web3 = new Web3(window.ethereum)
         const f0 = new F0();
         var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
