@@ -401,7 +401,7 @@
         // VARIABLES
 
         let userAcc = web3.currentProvider.selectedAddress; // USERS ACCOUNT ADDRESS
-        let addressCut = userAcc.substring(0, 8)+"..."+userAcc.slice(-8); // USERS ACCOUNT ADDRESS CUT
+        let addressCut = userAcc.substring(0, 8)+".."+userAcc.slice(-8); // USERS ACCOUNT ADDRESS CUT
         let myInvites = await f0.myInvites() // USERS INVITES
         let myInvitesKeys = Object.keys(myInvites) // INVITE KEYS
 
