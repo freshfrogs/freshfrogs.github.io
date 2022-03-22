@@ -329,6 +329,7 @@
   max-width: 1140px;
   margin: 0 auto;
   padding: 15px 0;
+  box-sizing: border-box;
 }
 
 .timeline::after {
@@ -348,14 +349,17 @@
   position: relative;
   background: inherit;
   width: 50%;
+  box-sizing: border-box;
 }
 
 .containertimeline.left {
   left: 0;
+  box-sizing: border-box;
 }
 
 .containertimeline.right {
   left: 50%;
+  box-sizing: border-box;
 }
 
 .containertimeline::after {
@@ -405,14 +409,17 @@
   text-transform: uppercase;
   letter-spacing: 1px;
   z-index: 1;
+  box-sizing: border-box;
 }
 
 .containertimeline.left .date {
   right: -75px;
+  box-sizing: border-box;
 }
 
 .containertimeline.right .date {
   left: -75px;
+  box-sizing: border-box;
 }
 
 .containertimeline .icon {
@@ -429,14 +436,17 @@
   font-size: 18px;
   color: #006E51;
   z-index: 1;
+  box-sizing: border-box;
 }
 
 .containertimeline.left .icon {
   right: 56px;
+  box-sizing: border-box;
 }
 
 .containertimeline.right .icon {
   left: 56px;
+  box-sizing: border-box;
 }
 
 .containertimeline .content {
@@ -444,11 +454,13 @@
   background: rgba(126, 183, 128, 1);;
   position: relative;
   border-radius: 0 500px 500px 0;
+  box-sizing: border-box;
 }
 
 .containertimeline.right .content {
   padding: 30px 30px 30px 90px;
   border-radius: 500px 0 0 500px;
+  box-sizing: border-box;
 }
 
 .containertimeline .content h2 {
@@ -456,6 +468,7 @@
   font-size: 18px;
   font-weight: normal;
   color: #006E51;
+  box-sizing: border-box;
 }
 
 .containertimeline .content p {
@@ -463,21 +476,25 @@
   font-size: 16px;
   line-height: 22px;
   color: #000000;
+  box-sizing: border-box;
 }
 
 @media (max-width: 767.98px) {
   .timeline::after {
     left: 90px;
+    box-sizing: border-box;
   }
 
   .containertimeline {
     width: 100%;
     padding-left: 120px;
     padding-right: 30px;
+    box-sizing: border-box;
   }
 
   .containertimeline.right {
     left: 0%;
+    box-sizing: border-box;
   }
 
   .containertimeline.left::after, 
@@ -497,18 +514,21 @@
   .containertimeline.right .date {
     right: auto;
     left: 15px;
+    box-sizing: border-box;
   }
 
   .containertimeline.left .icon,
   .containertimeline.right .icon {
     right: auto;
     left: 146px;
+    box-sizing: border-box;
   }
 
   .containertimeline.left .content,
   .containertimeline.right .content {
     padding: 30px 30px 30px 90px;
     border-radius: 500px 0 0 500px;
+    box-sizing: border-box;
   }
 }
 </style>
