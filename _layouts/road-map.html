@@ -392,7 +392,7 @@
             contract: CONTRACT_ADDRESS, // 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b MAIN // 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524 RINKEBY
             network: "main"
           })
-          document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <strong>❯ Connecting...</strong>"
+          //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <strong>❯ Connecting...</strong>"
           } catch (e) {
             consoleOutput("<br>"+"\n<strong><b>Error: "+e.message+"</b></strong>")
         }
@@ -429,7 +429,7 @@
 
         // Messages Sent to Terminal
         document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
-        document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"
+        //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"
         
 //        if (nextIdC >= 575) {
   //        mint = 0;
@@ -438,14 +438,14 @@
         // Mint Open 4,040 randomly generated Frogs on <b><strong>Ethereum</b></strong>\n<br>
         //document.getElementById("pre").innerHTML = ""
         //consoleOutput('Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'+'<br>\n')
-        consoleOutput("<hr class='hr2'><b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint...\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
+        //consoleOutput("<hr class='hr2'><b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint...\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
         //consoleOutput("Public minting price... <strong> FROG(s) @ "+mintPrice+" ΞETH</strong>") //("<b>Minting begins Sunday, 02/06/2022. \nJoin discord and follow on twitter to get on the FREE mint whitelist<b>")
         //consoleOutput("<b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint... <b><a href='https://freshfrogs.github.io/collection' class='pointer'>View Collection</a></b>")
         if (myInvitesKeys[1] === "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550
           myInviteFound = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4"
-          document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>"+"<br>\nAn invite was found coupled with this address... <b><a id='setInvite' class='pointer' href=''>Apply</u></a></b>"
+          //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>"+"<br>\nAn invite was found coupled with this address... <b><a id='setInvite' class='pointer' href=''>Apply</u></a></b>"
         } else { 
-          document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>\n<a id='setInvite' class='pointer'></a>"
+          //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>\n<a id='setInvite' class='pointer'></a>"
         }
 
         //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
@@ -698,7 +698,7 @@
         <h2><strong><a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank">Fresh Frogs NFT 'FROG' ERC-721</a></strong></h2>
         <div class="downloads pre">
           <div id="pre">
-            <div id="netStatus">Please connect an Ethereum wallet... <b><a class="pointer" href="https://freshfrogs.github.io/">Connect</a></b><hr class="hr2">Don't have a wallet?... <b><a class="pointer" href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b></div>
+
           </div>
           <div class="divTimeline">
             <h4 class="pTimeline"><img style="border-radius: 10px; display: block;" src="../assets/frogs/FLY.gif">What is Fresh Frogs NFT?</h4>
