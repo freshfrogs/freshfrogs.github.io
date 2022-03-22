@@ -441,7 +441,7 @@
         mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
 
         // Messages Sent to Terminal
-        growDiv();
+        loadTerminal();
         document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
         document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"
         
