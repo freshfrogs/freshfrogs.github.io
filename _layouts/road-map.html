@@ -340,6 +340,7 @@
   bottom: 0;
   left: 50%;
   margin-left: -1px;
+  box-sizing: border-box;
 }
 
 .containertimeline {
@@ -368,10 +369,12 @@
   border: 2px solid #006E51;
   border-radius: 16px;
   z-index: 1;
+  box-sizing: border-box;
 }
 
 .containertimeline.right::after {
   left: -8px;
+  box-sizing: border-box;
 }
 
 .containertimeline::before {
@@ -383,10 +386,12 @@
   right: 8px;
   background: #006E51;
   z-index: 1;
+  box-sizing: border-box;
 }
 
 .containertimeline.right::before {
   left: 8px;
+  box-sizing: border-box;
 }
 
 .containertimeline .date {
@@ -478,12 +483,14 @@
   .containertimeline.left::after, 
   .containertimeline.right::after {
     left: 82px;
+    box-sizing: border-box;
   }
 
   .containertimeline.left::before,
   .containertimeline.right::before {
     left: 100px;
     border-color: transparent #006E51 transparent transparent;
+    box-sizing: border-box;
   }
 
   .containertimeline.left .date,
