@@ -323,214 +323,39 @@
     margin-top: 1%;
   }
 
-.timeline {
-  position: relative;
-  width: 100%;
-  max-width: 1140px;
-  margin: 0 auto;
-  padding: 15px 0;
-  box-sizing: border-box;
-}
 
-.timeline::after {
-  content: '';
-  position: absolute;
-  width: 2px;
-  background: #006E51;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  margin-left: -1px;
-  box-sizing: border-box;
-}
-
-.containertimeline {
-  padding: 15px 30px;
-  position: relative;
-  background: inherit;
-  width: 50%;
-  box-sizing: border-box;
-}
-
-.containertimeline.left {
-  left: 0;
-  box-sizing: border-box;
-}
-
-.containertimeline.right {
-  left: 50%;
-  box-sizing: border-box;
-}
-
-.containertimeline::after {
-  content: '';
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  top: calc(50% - 8px);
-  right: -8px;
-  background: #ffffff;
-  border: 2px solid #006E51;
-  border-radius: 16px;
-  z-index: 1;
-  box-sizing: border-box;
-}
-
-.containertimeline.right::after {
-  left: -8px;
-  box-sizing: border-box;
-}
-
-.containertimeline::before {
-  content: '';
-  position: absolute;
-  width: 50px;
-  height: 2px;
-  top: calc(50% - 1px);
-  right: 8px;
-  background: #006E51;
-  z-index: 1;
-  box-sizing: border-box;
-}
-
-.containertimeline.right::before {
-  left: 8px;
-  box-sizing: border-box;
-}
-
-.containertimeline .date {
-  position: absolute;
-  display: inline-block;
-  top: calc(50% - 8px);
-  text-align: center;
-  font-size: 14px;
-  font-weight: bold;
-  color: #006E51;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  z-index: 1;
-  box-sizing: border-box;
-}
-
-.containertimeline.left .date {
-  right: -75px;
-  box-sizing: border-box;
-}
-
-.containertimeline.right .date {
-  left: -75px;
-  box-sizing: border-box;
-}
-
-.containertimeline .icon {
-  position: absolute;
-  display: inline-block;
-  width: 40px;
-  height: 40px;
-  padding: 9px 0;
-  top: calc(50% - 20px);
-  background: rgba(126, 183, 128, 1);;
-  border: 2px solid #006E51;
-  border-radius: 40px;
-  text-align: center;
-  font-size: 18px;
-  color: #006E51;
-  z-index: 1;
-  box-sizing: border-box;
-}
-
-.containertimeline.left .icon {
-  right: 56px;
-  box-sizing: border-box;
-}
-
-.containertimeline.right .icon {
-  left: 56px;
-  box-sizing: border-box;
-}
-
-.containertimeline .content {
-  padding: 30px 90px 30px 30px;
-  background: rgba(126, 183, 128, 1);;
-  position: relative;
-  border-radius: 0 500px 500px 0;
-  box-sizing: border-box;
-}
-
-.containertimeline.right .content {
-  padding: 30px 30px 30px 90px;
-  border-radius: 500px 0 0 500px;
-  box-sizing: border-box;
-}
-
-.containertimeline .content h2 {
-  margin: 0 0 10px 0;
-  font-size: 18px;
-  font-weight: normal;
-  color: #006E51;
-  box-sizing: border-box;
-}
-
-.containertimeline .content p {
-  margin: 0;
-  font-size: 16px;
-  line-height: 22px;
-  color: #000000;
-  box-sizing: border-box;
-}
-
-@media (max-width: 767.98px) {
-  .timeline::after {
-    left: 90px;
-    box-sizing: border-box;
+  .divTimeline {
+    width: 300px;
+    margin: auto;
   }
-
-  .containertimeline {
-    width: 100%;
-    padding-left: 120px;
-    padding-right: 30px;
-    box-sizing: border-box;
+  .pTimeline {
+    border-top: 2px dashed;
+    border-color: blue !important;
+    margin:0; padding: 30px;
   }
-
-  .containertimeline.right {
-    left: 0%;
-    box-sizing: border-box;
+  .pTimeline:nth-child(even) {
+    border-left: 2px dashed;
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+    margin-right: 30px; 
+    padding-right: 0;
   }
-
-  .containertimeline.left::after, 
-  .containertimeline.right::after {
-    left: 82px;
-    box-sizing: border-box;
+  .pTimeline:nth-child(odd) {
+    border-right: 2px dashed;
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+    margin-left: 30px; 
+    padding-left: 0;
   }
-
-  .containertimeline.left::before,
-  .containertimeline.right::before {
-    left: 100px;
-    border-color: transparent #006E51 transparent transparent;
-    box-sizing: border-box;
+  .pTimeline:first-child {
+    border-top: 0;
+    border-top-right-radius:0;
+    border-top-left-radius:0;
   }
-
-  .containertimeline.left .date,
-  .containertimeline.right .date {
-    right: auto;
-    left: 15px;
-    box-sizing: border-box;
+  .pTimeline:last-child {
+    border-bottom-right-radius:0;
+    border-bottom-left-radius:0;
   }
-
-  .containertimeline.left .icon,
-  .containertimeline.right .icon {
-    right: auto;
-    left: 146px;
-    box-sizing: border-box;
-  }
-
-  .containertimeline.left .content,
-  .containertimeline.right .content {
-    padding: 30px 30px 30px 90px;
-    border-radius: 500px 0 0 500px;
-    box-sizing: border-box;
-  }
-}
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="./assets/logo.png">
@@ -884,67 +709,13 @@
             <a href="https://nftcalendar.io/event/fresh-frogs-nft-collection-release/" target="_blank" style="display: inline !important;"><img background="white" class="headLineImg" src="./assets/nftCalendar.png"></a>
             <a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/etherScan.png"></a>
           </headline>
-          <div class="timeline">
-            <div class="containertimeline left">
-              <div class="date">15 Dec</div>
-              <i class="icon fa fa-home"></i>
-              <div class="content">
-                <h2>Fresh Frogs NFT Announced!</h2>
-                <p>
-                  Fresh Frogs NFT smart contract deployed on to the <b>Ethereum Network!</b> ERC-721 Standard <code>`0xBE4Bef8735107db540De269FF82c7dE9ef68C51b`</code>
-                </p>
-              </div>
-            </div>
-            <div class="containertimeline right">
-              <div class="date">22 Oct</div>
-              <i class="icon fa fa-gift"></i>
-              <div class="content">
-                <h2>Initial Public Mint</h2>
-                <p>
-                  Phase (I) 808 FROGS Available at 0.02 Eth
-                </p>
-              </div>
-            </div>
-            <div class="containertimeline left">
-              <div class="date">10 Jul</div>
-              <i class="icon fa fa-user"></i>
-              <div class="content">
-                <h2>Secondary Public Mint</h2>
-                <p>
-                  Phase (II) 1,212 FROGS Available at 0.02 Eth
-                </p>
-              </div>
-            </div>
-            <div class="containertimeline right">
-              <div class="date">18 May</div>
-              <i class="icon fa fa-running"></i>
-              <div class="content">
-                <h2>Final Public Mint</h2>
-                <p>
-                  Phase (III) 2,020 FROGS Available at 0.04 Eth
-                </p>
-              </div>
-            </div>
-            <div class="containertimeline left">
-              <div class="date">10 Feb</div>
-              <i class="icon fa fa-cog"></i>
-              <div class="content">
-                <h2>Lorem ipsum dolor sit amet</h2>
-                <p>
-                  Lorem ipsum dolor sit amet elit. Aliquam odio dolor, id luctus erat sagittis non. Ut blandit semper pretium.
-                </p>
-              </div>
-            </div>
-            <div class="containertimeline right">
-              <div class="date">01 Jan</div>
-              <i class="icon fa fa-certificate"></i>
-              <div class="content">
-                <h2>Lorem ipsum dolor sit amet</h2>
-                <p>
-                  Lorem ipsum dolor sit amet elit. Aliquam odio dolor, id luctus erat sagittis non. Ut blandit semper pretium.
-                </p>
-              </div>
-            </div>
+          <div class="divTimeline">
+            <p class="pTimeline">Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci, iste iusto quas eligendi corporis id eius corrupti temporibus velit? Molestias harum voluptatibus veritatis explicabo ut velit deserunt, saepe sit commodi?</p>
+            <p class="pTimeline">Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci, iste iusto quas eligendi corporis id eius corrupti temporibus velit? Molestias harum voluptatibus veritatis explicabo ut velit deserunt, saepe sit commodi?</p>
+            <p class="pTimeline">Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci, iste iusto quas eligendi corporis id eius corrupti temporibus velit? Molestias harum voluptatibus veritatis explicabo ut velit deserunt, saepe sit commodi?</p>
+            <p class="pTimeline">Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci, iste iusto quas eligendi corporis id eius corrupti temporibus velit? Molestias harum voluptatibus veritatis explicabo ut velit deserunt, saepe sit commodi?</p>
+            <p class="pTimeline">Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci, iste iusto quas eligendi corporis id eius corrupti temporibus velit? Molestias harum voluptatibus veritatis explicabo ut velit deserunt, saepe sit commodi?</p>
+              
           </div>
         </div>
       </section>
