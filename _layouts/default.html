@@ -322,6 +322,40 @@
     margin-right: auto;
     margin-top: 1%;
   }
+
+
+  .divTimeline {
+    width: 300px;
+    margin: auto;
+  }
+  .pTimeline {
+    border-top: 2px dashed;
+    border-color: rgba(126, 183, 128, 1) !important;
+    margin:0; padding: 30px;
+  }
+  .pTimeline:nth-child(even) {
+    border-left: 2px dashed;
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+    margin-right: 30px; 
+    padding-right: 0;
+  }
+  .pTimeline:nth-child(odd) {
+    border-right: 2px dashed;
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+    margin-left: 30px; 
+    padding-left: 0;
+  }
+  .pTimeline:first-child {
+    border-top: 0;
+    border-top-right-radius:0;
+    border-top-left-radius:0;
+  }
+  .pTimeline:last-child {
+    border-bottom-right-radius:0;
+    border-bottom-left-radius:0;
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="./assets/logo.png">
@@ -346,8 +380,8 @@
       gtag('config', 'G-6PB0WKB4SH');
       document.addEventListener("DOMContentLoaded", async () => {
         // consoleOutput("<strong>❯</strong> Minting closed! Join discord for more info!"+"<b><u><a class='pointer' href='https://freshfrogs.github.io/discord'>Join Discord</b></u></a>")
-        consoleOutput('<hr class="hr2">\n'+'Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>')
-        consoleOutput('<hr class="hr2">\n'+'<b>Morph FROG Tokens</b><br>Combine Fresh Frog attributes and traits!<a class="pointer" href="https://freshfrogs.github.io/the-pad"><b>🍄 Frog Morph</b> ↗️</a>')
+        //consoleOutput('<hr class="hr2">\n'+'Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>')
+        consoleOutput('<hr class="hr2">\n'+'<b>🍄Morph Fresh Frog NFTs</b><br>Exclusive content for FROG token holders!<a class="pointer" href="https://freshfrogs.github.io/the-pad"><b>freshfrogs/the-pad🍀</b> ↗️</a>')
         const web3 = new Web3(window.ethereum)
         const f0 = new F0();
         var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
@@ -404,7 +438,7 @@
         // Mint Open 4,040 randomly generated Frogs on <b><strong>Ethereum</b></strong>\n<br>
         //document.getElementById("pre").innerHTML = ""
         //consoleOutput('Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'+'<br>\n')
-        consoleOutput("<hr class='hr2'><b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint...\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b><br>")
+        consoleOutput("<hr class='hr2'><b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint...\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
         //consoleOutput("Public minting price... <strong> FROG(s) @ "+mintPrice+" ΞETH</strong>") //("<b>Minting begins Sunday, 02/06/2022. \nJoin discord and follow on twitter to get on the FREE mint whitelist<b>")
         //consoleOutput("<b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint... <b><a href='https://freshfrogs.github.io/collection' class='pointer'>View Collection</a></b>")
         if (myInvitesKeys[1] === "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550
@@ -635,13 +669,15 @@
       }
       //    {% include head-custom.html %}
     </script>
-  <div class="top">{{ content }}</div>
+    <div class="top">
+      {{ content }}
+    </div>
   </head>
   <body class="bodyb">
     <div class="wrapper">
       <header>
         <div class="downloads pre">
-          <h2 class="h2"><strong id="supply">FROG 4,040 Total Supply</strong></h2><strong>Mint Open April 1st!</strong>
+          <h3 id="supply">FROG 4,040 Total Supply</h3>
           <ul class="downloads2">
             <li><a id="mintTransact" href="" class="pointer"><strong>⛔LINK WALLET</strong></a></li>
             <li><a id="mintTotal"><strong>0.02 ΞETH</strong>Plus gas</a></li>
@@ -660,13 +696,31 @@
       </header>
       <section>
         <h2><strong><a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank">Fresh Frogs NFT 'FROG' ERC-721</a></strong></h2>
-        <div></div>
-        <br>
         <div class="downloads pre">
           <div id="pre">
             <div id="netStatus">Please connect an Ethereum wallet... <b><a class="pointer" href="https://freshfrogs.github.io/">Connect</a></b><hr class="hr2">Don't have a wallet?... <b><a class="pointer" href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b></div>
           </div>
           <br>
+          <div class="divTimeline">
+            <h3>🚙 Road Map 2022</h3>
+            <h4 class="pTimeline"><img style="border-radius: 10px; display: block;" src="./assets/frogs/FLY.gif">Fresh Frogs NFT Announced!</h4><p class="pTimeline"><u>Saturday, January 29th, 2022</u><br>Contract deployed on to the <b>Ethereum Blockchain!</b><a href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b">ERC-721 Standard 0xBE4B..C51b ↗️</a></p>
+            <div class="pTimeline">
+              <h4>FROG 4,040 Total Supply</h4>
+              <p>Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
+            </div>
+            <div class="pTimeline">
+              <h4>Initial Public Mint</h4><u>Friday, Febuary 11th, 2022</u>
+              <p>The first 404 frogs from the collection made available to mint for FREE! Then re-opened exclusively for discord members totally <b>580+ Frogs</b> between 110+ different holders!</p>
+            </div>
+            <div class="pTimeline">
+              <h4>Secondary Public Mint</h4><u>Friday, April 1st, 2022</u>
+              <p>A limited supply of <b>1,212 Frogs</b> will be available to mint for <b>0.02 ΞETH</b></p>
+            </div>
+            <div class="pTimeline">
+              <h4>Final Release</h4><u>Date To Be Decided</u>
+              <p>Remaining collection of <b>2,020 Frogs</b> will be available to mint for <b>0.04 ΞETH</b></p>
+            </div>
+          </div>
           <headline class="headLine2">
             <a href="https://twitter.com/FreshFrogs_NFT" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/twitter.png"></a>
             <a href="https://discord.gg/t84NyjpS3H" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/discord.png"></a>
