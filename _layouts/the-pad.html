@@ -544,7 +544,7 @@
           subFrog = 'undefined'
           document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
           document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>"+baseFrog+" + ?"
-          document.getElementById("supply").innerHTML = "FROG # "+baseFrog+" 🍄 <u></u>" 
+          document.getElementById("supply").innerHTML = "# "+baseFrog+" 🍄 <br>New Frog Token" 
         } else if (subFrog == 'undefined') { // subFrog
           if (baseFrog !== ownedFrog) {
             selectSubFrog(ownedFrog);
@@ -558,7 +558,7 @@
           subFrog = 'undefined'
           document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
           document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>"+baseFrog+" + ?"
-          document.getElementById("supply").innerHTML = "FROG # "+baseFrog+" 🍄 <u></u>" 
+          document.getElementById("supply").innerHTML = "# "+baseFrog+" 🍄 <br>New Frog Token" 
         }
       }
       function getRandomInt(min, max) {
@@ -603,7 +603,7 @@
         }
         document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>"+subFrogmetadata.name
         document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong><b>"+baseFrog+" + "+subFrog+"</b>"
-        document.getElementById("supply").innerHTML = "FROG # "+baseFrog+" 🍄 # "+subFrog
+        document.getElementById("supply").innerHTML = "# "+baseFrog+" 🍄 # "+subFrog+"<br>New Frog Token"
       }
       // Select baseFrog
       async function selectBaseFrog(selectedBase){
