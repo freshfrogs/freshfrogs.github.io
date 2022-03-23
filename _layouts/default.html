@@ -40,15 +40,26 @@
     border: 0px solid #e0e0e0;
     overflow: hidden;
     background-color: transparent;
-    width: 128px;
+    width: 256px;
     padding-top: 0px !important;
-    height: 128px !important;
+    height: 256px !important;
     display: inline-block !important;
+    position: relative;
     margin-left: 2%;
     margin-right: 2%;
     margin-top: 2%;
     margin-bottom: 2%;
-    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
+    image-rendering: pixelated;
+  }
+  .bigContainer2{
+    border-radius: 5px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    background-color: #7cc1ff;
+    margin-left: 2%;
+    margin-right: 2%;
+    margin-top: 2%;
+    margin-bottom: 2%;
   }
   .bigContainer{
     border-radius: 5px;
@@ -800,7 +811,7 @@
               <p>Remaining supply of <b>2,020 Frogs</b> will be available to mint for <b>0.04 ΞETH</b></p>
             </div>
             <div class="pTimeline">
-              <div class="bigContainer">
+              <div class="bigContainer2">
                 <div id="frogContainer" class="container">
                   <div id='comboFrog' class='smallContainer2'></div>
                 </div>
