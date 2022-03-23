@@ -439,12 +439,14 @@
             });
           }
         })
+        document.querySelector("#randomMorph").addEventListener("click", async (e) => {
+          applyFrogOwned(548)
+          applyFrogOwned(157)
+        })
         //consoleOutput('ℹ️ Select TWO FROGs by <u>clicking on them</u>');
         // Generate two random FROGS
         var loadedFrogs = 0;
         let targetFrog = nextIdC;
-        applyFrogOwned(548)
-        applyFrogOwned(157)
         //consoleOutput("Scanning Tokens... Please wait... ⌛")
         try {
           for (var thisToken = 1; thisToken < targetFrog; thisToken++) {
@@ -857,6 +859,7 @@
             <div id="frogContainer" class="container"><div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.github.io/assets/frogs/FR0G.png"/></div></div>
           </div>
           <h3 id="supply">Morph FROG Tokens!</h3>
+          <a id="randomMorph">Generate Random 🍄 Morph</a>
           <hr class="hr2">
           <headline class="headLine2">
             <a href="https://twitter.com/FreshFrogs_NFT" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/twitter.png"></a>
