@@ -444,6 +444,7 @@
           if (baseFrog !== 'undefined' && subFrog !== 'undefined' && morphed !== 'true') { 
             //alert("Morph "+baseFrog+" + "+subFrog);
             combineTokens(baseFrog, subFrog);
+            let morphed = "true";
           }
         })
         // test
@@ -586,7 +587,7 @@
           document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
           document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>"+baseFrog+" + ?"
           document.getElementById("twoFrogs").innerHTML = "";
-          let morphed = "false";
+          morphed = "false";
           //document.getElementById("supply").innerHTML = "# "+baseFrog
         } else if (subFrog == 'undefined') { // subFrog
           if (baseFrog !== ownedFrog) {
@@ -602,7 +603,7 @@
           document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
           document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>"+baseFrog+" + ?"
           document.getElementById("twoFrogs").innerHTML = "";
-          let morphed = "false";
+          morphed = "false";
           //document.getElementById("supply").innerHTML = "# "+baseFrog
         }
       }
@@ -671,7 +672,6 @@
       async function combineTokens(baseFrog, otherFrog) {
         displayFrog(baseFrog);
         displayFrog(otherFrog);
-        let morphed = "true";
         // baseFrog = Dominate trait(s)
         // frogType, and attributes.
         var useGIF = undefined;
