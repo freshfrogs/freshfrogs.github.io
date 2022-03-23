@@ -471,9 +471,9 @@
         applyFrogOwned(randomFrog);
         randomFrogTwo = getRandomInt(1, (nextIdC-1));
         applyFrogOwned(randomFrogTwo);
-        combineTokens(baseFrog, subFrog);
         var loadedFrogs = 0;
         let targetFrog = nextIdC;
+        combineTokens(baseFrog, subFrog);
         //consoleOutput("Scanning Tokens... Please wait... ⌛")
         try {
           for (var thisToken = 1; thisToken < targetFrog; thisToken++) {
