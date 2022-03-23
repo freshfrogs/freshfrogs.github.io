@@ -465,14 +465,6 @@
             });
           }
         })
-        document.querySelector("#randomMorph").addEventListener("click", async (e) => {
-          applyFrogOwned(getRandomInt(1, (nextIdC-1)))
-          applyFrogOwned(553)
-          if (baseFrog !== 'undefined' && subFrog !== 'undefined') { 
-            //alert("Morph "+baseFrog+" + "+subFrog);
-            combineTokens(baseFrog, subFrog);
-          }
-        })
         //consoleOutput('ℹ️ Select TWO FROGs by <u>clicking on them</u>');
         // Generate two random FROGS
         var loadedFrogs = 0;
