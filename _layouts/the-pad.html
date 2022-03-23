@@ -677,6 +677,7 @@
         } else {
           var wrapper = document.querySelector('.measuringWrapper');
           growTray.style.height = wrapper.clientHeight + "px";
+          document.getElementById("netStatus").style.height = "0px"
         }
       }
 
@@ -718,6 +719,7 @@
   <body class="bodyb">
     <div class="wrapper">
       <header>
+        <div id="netStatus">Please connect an Ethereum wallet... <b><a class="pointer" href="https://freshfrogs.github.io/">Connect</a></b><hr class="hr2">Don't have a wallet?... <b><a class="pointer" href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b></div>
         <div id="growTray" class="downloads pre">
           <div class='measuringWrapper'>
             <h3 style="margin-top: 8px;" id="supply">FROG 4,040 Total Supply</h3>
@@ -744,7 +746,6 @@
           <div id='growTerminal'>
             <div class='measuringWrapper'>
               <div id="pre">
-                <div id="netStatus">Please connect an Ethereum wallet... <b><a class="pointer" href="https://freshfrogs.github.io/">Connect</a></b><hr class="hr2">Don't have a wallet?... <b><a class="pointer" href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b></div>
               </div>
             </div>
           </div>
