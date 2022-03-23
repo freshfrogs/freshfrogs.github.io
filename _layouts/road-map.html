@@ -719,6 +719,27 @@
         consoleOutput("<a id='loadRecentMints2' class='pointer' onclick='recentlyMinted("+mostRecent2+")'><u>Load More</u></a></b>");
       }
       //    {% include head-custom.html %}
+      /*
+      function recentlyMinted(mostRecent) {
+        for(let i=1; i<=24; i++) {
+          mostRecent2 = mostRecent - i
+          mostRecentDesc = "frog"+i+"Desc"
+          mostRecentLink = "frog"+i+"Link"
+          mostRecentFrog = "frog"+i
+          // <a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+mostRecent2+'" id="'+mostRecentLink+'" target="_blank">
+          newFrog = document.createElement("a")
+          newFrog.href = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+mostRecent2
+          newFrog.id = mostRecentLink
+          newFrog.target = "_blank"
+          newFrog.className = "smallContainer2"
+          newFrog.width = randomNumber(64, 128)+"px"
+          newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+mostRecent2+'.png" alt="Frog '+mostRecent2+'" id="frog'+i+'">'
+          <a id="CreatorPic" href="" target="_blank" class="smallContainer2" wdith="64px"><img class="frogImg2" src="/frog/408.png" alt="NF7UOS" id="NF7UOS"></a>
+          document.getElementById("pre").appendChild(newFrog)
+        }
+        consoleOutput("<a id='loadRecentMints2' class='pointer' onclick='recentlyMinted("+mostRecent2+")'><u>Load More</u></a></b>");
+      }
+      */
     </script>
     <div class="top">
       {{ content }}
