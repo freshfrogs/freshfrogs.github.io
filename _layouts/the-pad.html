@@ -440,8 +440,8 @@
           }
         })
         document.querySelector("#randomMorph").addEventListener("click", async (e) => {
-          applyFrogOwned(548)
-          applyFrogOwned(157)
+          applyFrogOwned(getRandomInt(1, (nextIdC-1)))
+          applyFrogOwned(getRandomInt(1, (nextIdC-1)))
         })
         //consoleOutput('ℹ️ Select TWO FROGs by <u>clicking on them</u>');
         // Generate two random FROGS
