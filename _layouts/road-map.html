@@ -677,7 +677,8 @@
         } else {
           var wrapper = document.querySelector('.measuringWrapper');
           growTray.style.height = wrapper.clientHeight + "px";
-          document.getElementById("netStatus").style.height = "0px"
+          document.getElementById("netStatus").style.height = "auto"
+          document.getElementById("netStatus").style.width = "auto"
           document.getElementById("netStatus").innerHTML = ""
         }
       }
@@ -689,7 +690,8 @@
           growTerminal.style.height = 0;
         } else {
           var wrapper = document.querySelector('.measuringWrapper');
-          growTerminal.style.height = wrapper.clientHeight + "px";
+          growTerminal.style.height = "auto";
+          growTerminal.style.width = "auto";
         }
       }
       // Load recent mints
