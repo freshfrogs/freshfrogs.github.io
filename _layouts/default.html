@@ -396,6 +396,7 @@
         // consoleOutput("<strong>❯</strong> Minting closed! Join discord for more info!"+"<b><u><a class='pointer' href='https://freshfrogs.github.io/discord'>Join Discord</b></u></a>")
         //consoleOutput('<hr class="hr2">\n'+'Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>')
         //consoleOutput('<hr class="hr2">\n'+'🍄Morph Fresh Frog NFTs<br>Exclusive content for FROG token holders!<a class="pointer" href="https://freshfrogs.github.io/the-pad"><b>freshfrogs/the-pad🍀</b> ↗️</a>')
+        loadAttribute("SpecialFrog", "thirdEye", "comboFrog");
         const web3 = new Web3(window.ethereum)
         const f0 = new F0();
         var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
@@ -702,6 +703,25 @@
           growTerminal.style.height = "100%";
         }
       }
+      // Load Att loadAttribute("SpecialFrog", "thirdEye", "comboFrog")
+      function loadAttribute(trait, attribute, where) {
+        newAttribute = document.createElement("img")
+        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
+        newAttribute.id = attribute
+        newAttribute.target = "_blank"
+        newAttribute.className = "frogImg2 pointer" //shadesAnimation
+        if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") { 
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".gif"
+        } else if (attribute === "morphAnimation") {
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/Frog/loadMorph.gif"
+        } else if (attribute === "shadesAnimation") {
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/Eyes/shadesAnimation.gif"
+        } else {
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
+        }
+        newAttribute.alt = attribute
+        document.getElementById(where).appendChild(newAttribute)
+      }
       // Load recent mints
       function recentlyMinted(mostRecent) {
         for(let i=1; i<=24; i++) {
@@ -778,6 +798,9 @@
             <div class="pTimeline">
               <h4>Final Release</h4><u>Date To Be Decided</u>
               <p>Remaining supply of <b>2,020 Frogs</b> will be available to mint for <b>0.04 ΞETH</b></p>
+            </div>
+            <div class="pTimeline">
+              <div id='comboFrog' class='smallContainer2'></div>
             </div>
           </div>
         </div>
