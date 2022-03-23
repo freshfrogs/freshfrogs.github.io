@@ -267,6 +267,16 @@
     width: 256px;
     height: 256px;
   }
+  .frogImg3 {
+    transition: transform .2s;
+    height: auto;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    width: 64px;
+    height: 64px;
+  }
   .frogImg2:hover{
     -ms-transform: scale(1.5); /* IE 9 */
     -webkit-transform: scale(1.5); /* Safari 3-8 */
@@ -552,7 +562,7 @@
         newFrog.target = "_blank"
         newFrog.className = "smallContainer3"
         newFrog.width = "64px"
-        newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+thisFrog+'.png" alt="Frog '+thisFrog+'" id="frog'+thisFrog+'">'
+        newFrog.innerHTML = '<img class="frogImg3" src="/frog/'+thisFrog+'.png" alt="Frog '+thisFrog+'" id="frog'+thisFrog+'">'
         document.getElementById("twoFrogs").appendChild(newFrog)
       }
       // Load Certain FROG
