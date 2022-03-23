@@ -587,7 +587,6 @@
           document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
           document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>"+baseFrog+" + ?"
           document.getElementById("twoFrogs").innerHTML = "";
-          morphed = "false";
           //document.getElementById("supply").innerHTML = "# "+baseFrog
         } else if (subFrog == 'undefined') { // subFrog
           if (baseFrog !== ownedFrog) {
@@ -603,7 +602,6 @@
           document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
           document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>"+baseFrog+" + ?"
           document.getElementById("twoFrogs").innerHTML = "";
-          morphed = "false";
           //document.getElementById("supply").innerHTML = "# "+baseFrog
         }
       }
@@ -649,6 +647,7 @@
         }
         document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>"+subFrogmetadata.name
         document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong><b>"+baseFrog+" + "+subFrog+"</b>"
+        let morphed = 'false';
         //document.getElementById("supply").innerHTML = "# "+baseFrog+" 🍄 # "+subFrog
       }
       // Select baseFrog
