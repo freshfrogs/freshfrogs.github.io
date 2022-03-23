@@ -675,7 +675,6 @@
         if (growTray.clientHeight) {
           growTray.style.height = 0;
         } else {
-          var wrapper = document.querySelector('.measuringWrapper');
           growTray.style.height = wrapper.clientHeight + "px";
           document.getElementById("netStatus").style.height = "auto"
           document.getElementById("netStatus").style.width = "auto"
@@ -689,7 +688,6 @@
         if (growTerminal.clientHeight) {
           growTerminal.style.height = 0;
         } else {
-          var wrapper = document.querySelector('.measuringWrapper');
           growTerminal.style.height = "auto";
           growTerminal.style.width = "auto";
         }
