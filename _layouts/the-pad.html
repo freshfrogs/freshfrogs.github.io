@@ -446,7 +446,6 @@
             //alert("Morph "+baseFrog+" + "+subFrog);
             combineTokens(baseFrog, subFrog);
           }
-          recentlyMinted(nextIdC);
         })
         //consoleOutput('ℹ️ Select TWO FROGs by <u>clicking on them</u>');
         // Generate two random FROGS
@@ -651,6 +650,7 @@
       // Select otherFrog
       // Function combine tokens
       async function combineTokens(baseFrog, otherFrog) {
+        recentlyMinted(nextIdC);
         // baseFrog = Dominate trait(s)
         // frogType, and attributes.
         var useGIF = undefined;
