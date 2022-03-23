@@ -443,7 +443,6 @@
         document.querySelector("#morphFrogs").addEventListener("click", async (e) => {
           if (baseFrog !== 'undefined' && subFrog !== 'undefined') { 
             //alert("Morph "+baseFrog+" + "+subFrog);
-            document.getElementById("twoFrogs").innerHTML = "";
             combineTokens(baseFrog, subFrog);
           }
         })
@@ -641,6 +640,7 @@
         document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>"+subFrogmetadata.name
         document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong><b>"+baseFrog+" + "+subFrog+"</b>"
         //document.getElementById("supply").innerHTML = "# "+baseFrog+" 🍄 # "+subFrog
+        displayFrog(otherFrog);
       }
       // Select baseFrog
       async function selectBaseFrog(selectedBase){
@@ -657,12 +657,12 @@
         }
         document.getElementById("selectBase").innerHTML = "<strong>Base</strong>"+baseFrogmetadata.name
         document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>"+baseFrog+" + ?"
+        document.getElementById("twoFrogs").innerHTML = "";
+        displayFrog(baseFrog);
       }
       // Select otherFrog
       // Function combine tokens
       async function combineTokens(baseFrog, otherFrog) {
-        displayFrog(baseFrog);
-        displayFrog(otherFrog);
         // baseFrog = Dominate trait(s)
         // frogType, and attributes.
         var useGIF = undefined;
