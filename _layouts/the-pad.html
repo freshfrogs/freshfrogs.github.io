@@ -446,6 +446,7 @@
             //alert("Morph "+baseFrog+" + "+subFrog);
             combineTokens(baseFrog, subFrog);
           }
+          recentlyMinted(nextIdC);
         })
         //consoleOutput('ℹ️ Select TWO FROGs by <u>clicking on them</u>');
         // Generate two random FROGS
@@ -526,6 +527,26 @@
           block: 'center',
           inline: 'center'
         });
+      }
+      // Display the two frogs
+      // Load recent mints
+      function recentlyMinted(mostRecent) {
+        for(let i=1; i<=2; i++) {
+          mostRecent2 = mostRecent - i
+          mostRecentDesc = "frog"+i+"Desc"
+          mostRecentLink = "frog"+i+"Link"
+          mostRecentFrog = "frog"+i
+          // <a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+mostRecent2+'" id="'+mostRecentLink+'" target="_blank">
+          newFrog = document.createElement("a")
+          newFrog.href = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+mostRecent2
+          newFrog.id = mostRecentLink
+          newFrog.target = "_blank"
+          newFrog.className = "smallContainer2"
+          newFrog.width = randomNumber(64, 128)+"px"
+          newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+mostRecent2+'.png" alt="Frog '+mostRecent2+'" id="frog'+i+'">'
+          document.getElementById("twoFrogs").appendChild(newFrog)
+        }
+        consoleOutput("<a id='loadRecentMints2' class='pointer' onclick='recentlyMinted("+mostRecent2+")'><u>Load More</u></a></b>");
       }
       // Load Certain FROG
       function loadFreshFrog(freshFrog) {
@@ -865,6 +886,7 @@
           <h3 id="supply">Morph FROG Tokens!</h3>
           <hr class="hr2">
           <a id="randomMorph" class="pointer">🔄 Random Morph</a>
+          <div id="twoFrogs"></div>
           <headline class="headLine2">
             <a href="https://twitter.com/FreshFrogs_NFT" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/twitter.png"></a>
             <a href="https://discord.gg/t84NyjpS3H" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/discord.png"></a>
