@@ -670,7 +670,11 @@
       function loadMintingTray() {
         var growTray = document.getElementById('mintingTray');
         growTray.innerHTML = 
-
+        '<ul class="downloads2">' +
+        '  <li><a id="mintTransact" href="" class="pointer"><strong>LINK WALLET</strong></a></li>' +
+        '  <li><a id="mintTotal"><strong>0.02 ΞETH</strong>Plus gas</a></li>' +
+        '  <li><a class="pointer"><strong><b id="removeFrog" class="pointer">🡯</b><frogQuant id="frogQuant">  1  </frogQuant><b id="addFrog" class="pointer">🡭</b></strong>Quantity</a></li>' +
+        '</ul>' +
         '<div class="bigContainer">' +
         '  <div id="frogContainer" class="container">' +
         '  </div>' +
@@ -680,12 +684,7 @@
         '    <div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.github.io/assets/frogs/preview2.gif"/></div>' +
         '  </div>' +
         '</div>' +
-        '<h3 id="supply">FROG 4,040 Total Supply</h3>' +
-        '<ul class="downloads2">' +
-        '  <li><a id="mintTransact" href="" class="pointer"><strong>LINK WALLET</strong></a></li>' +
-        '  <li><a id="mintTotal"><strong>0.02 ΞETH</strong>Plus gas</a></li>' +
-        '  <li><a class="pointer"><strong><b id="removeFrog" class="pointer">🡯</b><frogQuant id="frogQuant">  1  </frogQuant><b id="addFrog" class="pointer">🡭</b></strong>Quantity</a></li>' +
-        '</ul>';
+        '<h3 id="supply">FROG 4,040 Total Supply</h3>';
         document.getElementById("netStatus").innerHTML = '';
       }
 
