@@ -675,9 +675,8 @@
         if (growTray.clientHeight) {
           growTray.style.height = 0;
         } else {
-          growTray.style.height = wrapper.clientHeight + "px";
-          document.getElementById("netStatus").style.height = "auto"
-          document.getElementById("netStatus").style.width = "auto"
+          growTray.style.height = "auto";
+          growTray.style.width = "auto";
           document.getElementById("netStatus").innerHTML = ""
         }
       }
