@@ -443,6 +443,7 @@
         document.querySelector("#morphFrogs").addEventListener("click", async (e) => {
           if (baseFrog !== 'undefined' && subFrog !== 'undefined') { 
             //alert("Morph "+baseFrog+" + "+subFrog);
+            document.getElementById("twoFrogs").innerHTML = "";
             combineTokens(baseFrog, subFrog);
           }
         })
