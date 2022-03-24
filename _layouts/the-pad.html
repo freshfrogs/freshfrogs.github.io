@@ -67,7 +67,6 @@
     image-rendering: pixelated;
   }
   .frogContainer {
-    border-radius: 200px;
     border: 1px solid #e0e0e0;
     overflow: hidden;
     background-color: #7cc1ff;
@@ -82,6 +81,9 @@
     margin-bottom: 2%;
     image-rendering: pixelated;
     transition: .2s;
+    box-sizing: border-box;
+    -webkit-clip-path: polygon(0% 50%, 25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%);
+    clip-path: polygon(0% 50%, 25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%);
   }
   .frogContainer:hover{
     border-radius: 5px;
