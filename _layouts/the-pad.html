@@ -66,6 +66,25 @@
     margin-bottom: 2%;
     image-rendering: pixelated;
   }
+  .frogContainer{
+    border-radius: 100%;
+    border: 0px solid #e0e0e0;
+    overflow: hidden;
+    background-color: transparent;
+    width: 256px;
+    padding-top: 0px !important;
+    height: 256px !important;
+    display: inline-block !important;
+    position: relative;
+    margin-left: 2%;
+    margin-right: 2%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    image-rendering: pixelated;
+  }
+  .frogContainer:hover{
+    border-radius: 5px;
+  }
   .smallContainer3 {
     border-radius: 5px;
     border: 0px solid #e0e0e0;
@@ -578,7 +597,7 @@
         newFrog = document.createElement("a")
         newFrog.onclick = function() {applyFrogOwned(freshFrog)};
         newFrog.id = "Frog #"+freshFrog
-        newFrog.className = "smallContainer2"
+        newFrog.className = "frogContainer"
         //newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+freshFrog+'.png" alt="Frog '+freshFrog+'" id="frog'+freshFrog+'">'
         document.getElementById("pre").appendChild(newFrog)
         /*
