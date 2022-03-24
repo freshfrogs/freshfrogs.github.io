@@ -451,13 +451,13 @@
         consoleOutput('Generate Random Morph'+'<b><a id="randomMorphExample" class="pointer">Random Morph</a></b>')
         document.querySelector("#morphFrogs").addEventListener("click", async (e) => {
           if (baseFrog !== 'undefined' && subFrog !== 'undefined') { 
-            //alert("Morph "+baseFrog+" + "+subFrog);
             combineTokens(baseFrog, subFrog);
           }
         })
         //
         document.querySelector("#randomMorphExample").addEventListener("click", async (e) => {
           randomMorph();
+          alert("Morph "+baseFrog+" + "+subFrog);
         })
         // test
         document.querySelector("#selectBase").addEventListener("click", async (e) => {
