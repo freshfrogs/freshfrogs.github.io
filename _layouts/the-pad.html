@@ -411,7 +411,7 @@
           })
           //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <strong>❯ Connecting...</strong>"
           } catch (e) {
-            consoleOutput("<br>"+"\n<strong><b>Error: "+e.message+"</b></strong>")
+            consoleOutput("<br>"+"<div style='border-bottom: 1px solid black;'><strong><b>Error: "+e.message+"</b></strong></div>")
         }
 
         let userAcc = web3.currentProvider.selectedAddress;
@@ -529,8 +529,8 @@
             }
           }
         } catch (e) {
-          alert("Something went wrong, refresh the page!"+e.message)
-          document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling Tokens... ❌ '+loadedFrogs+'/'+ownedFrogs+' FROG(s) loaded!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'
+          consoleOutput("<br>"+"<div style='border-bottom: 1px solid black;'><strong><b>Error: "+e.message+"</b></strong></div>")
+          document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling Tokens... ❌ '+loadedFrogs+'/'+ownedFrogs+' FROG(s) loaded! Refresh page!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'
         }
       })
       // Output to minting terminal
