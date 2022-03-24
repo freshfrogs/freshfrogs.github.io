@@ -593,7 +593,7 @@
           document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
           document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>"+baseFrog+" + ?"
           document.getElementById("twoFrogs").innerHTML = "";
-          document.getElementById("supply").innerHTML = "Select <b>Sub Frog</b>"
+          document.getElementById("supply").innerHTML = "Select <u>Sub Frog</u>"
           //document.getElementById("supply").innerHTML = "# "+baseFrog+" 🍄 # "+subFrog
         } else if (subFrog == 'undefined') { // subFrog
           if (baseFrog !== ownedFrog) {
@@ -609,7 +609,7 @@
           document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
           document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>"+baseFrog+" + ?"
           document.getElementById("twoFrogs").innerHTML = "";
-          document.getElementById("supply").innerHTML = "Select <b>Sub Frog</b>"
+          document.getElementById("supply").innerHTML = "Select <u>Sub Frog</u>"
         }
       }
       function getRandomInt(min, max) {
@@ -657,7 +657,7 @@
         document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong><b>"+baseFrog+" + "+subFrog+"</b>"
         morphed = 'false';
         //alert(morphed)
-        document.getElementById("supply").innerHTML = "Click <b>'🍄Morph'</b>"
+        document.getElementById("supply").innerHTML = "Click 🍄<u>Morph</u>"
       }
       // Select baseFrog
       async function selectBaseFrog(selectedBase){
