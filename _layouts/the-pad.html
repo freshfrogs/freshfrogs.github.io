@@ -448,7 +448,6 @@
         // Messages Sent to Terminal
         //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"+"Compiling Tokens tokens... Please wait... ⌛"
         document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling Tokens... Please wait... ⌛ <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div>'
-        consoleOutput('Generate Random Morph'+'<b><a id="randomMorphExample" class="pointer">Random Morph</a></b>')
         document.querySelector("#morphFrogs").addEventListener("click", async (e) => {
           if (baseFrog !== 'undefined' && subFrog !== 'undefined') { 
             combineTokens(baseFrog, subFrog);
@@ -460,8 +459,6 @@
           applyFrogOwned(randomFrog); // 303 / 33
           randomFrogTwo = getRandomInt(1, (nextIdC-1));
           applyFrogOwned(randomFrogTwo); // 67
-          combineTokens(baseFrog, subFrog);
-          //alert("Morph "+baseFrog+" + "+subFrog);
         })
         // test
         document.querySelector("#selectBase").addEventListener("click", async (e) => {
@@ -929,6 +926,7 @@
             <div id="frogContainer" class="container"><div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.github.io/assets/frogs/FR0G.png"/></div></div>
           </div>
           <div id="twoFrogs" class="imgWrapper"></div>
+          <b><a id="randomMorphExample" class="pointer">Random Morph 🔃</a></b>
         </div>
       </header>
       <section>
