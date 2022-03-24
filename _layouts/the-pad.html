@@ -448,12 +448,16 @@
         // Messages Sent to Terminal
         //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"+"Compiling Tokens tokens... Please wait... ⌛"
         document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling Tokens... Please wait... ⌛ <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div>'
-        consoleOutput('Generate Random Morph'+'<b><a onclick="randomMorph();" class="pointer">Random Morph</a></b>')
+        consoleOutput('Generate Random Morph'+'<b><a id="randomMorphExample" class="pointer">Random Morph</a></b>')
         document.querySelector("#morphFrogs").addEventListener("click", async (e) => {
           if (baseFrog !== 'undefined' && subFrog !== 'undefined') { 
             //alert("Morph "+baseFrog+" + "+subFrog);
             combineTokens(baseFrog, subFrog);
           }
+        })
+        //
+        document.querySelector("#randomMorphExample").addEventListener("click", async (e) => {
+          randomMorph();
         })
         // test
         document.querySelector("#selectBase").addEventListener("click", async (e) => {
