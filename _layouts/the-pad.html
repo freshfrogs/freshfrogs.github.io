@@ -411,7 +411,7 @@
           })
           //document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <strong>❯ Connecting...</strong>"
           } catch (e) {
-            consoleOutput("<br>"+"<div style='border-bottom: 1px solid black;'><strong><b>Error: "+e.message+"</b></strong></div>")
+            consoleOutput("<br>"+"<div style='border-bottom: 1px solid black;'><strong><b>Error Linking Wallet: <br>"+e.message+"</b></strong></div>")
         }
 
         let userAcc = web3.currentProvider.selectedAddress;
