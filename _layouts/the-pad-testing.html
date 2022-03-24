@@ -123,9 +123,6 @@
     padding: 0%;
     font-size: xx-large;
   }
-  svg{
-    width:30%;
-  }
   .supply{
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
     color: #333;
@@ -308,6 +305,9 @@
     margin-right: auto;
     margin-top: 1%;
   }
+  svg {
+    width: 30%;
+  }
   .h2 {
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
     font-weight: 750;
@@ -481,7 +481,16 @@
                 metadata2 = await get()
                 consoleOutput("<strong><u>"+metadata2.name+"</u></strong> ✅ [ Owned ]\n");
                 openseaLink = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+thisFrogRender+""
-                consoleOutput('<a target="_blank" href="'+openseaLink+'">View on OpenSea ↗️</a><hr class="hr2">')
+                smallFrogNFT = 
+                  '<svg viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg">' +
+                  '<defs>' +
+                    '<pattern id="img" patternUnits="userSpaceOnUse" width="100" height="100">' +
+                      '<image xlink:href="https://freshfrogs.github.io/frog/"'+thisFrogRender+'".png" x="-25" width="150" height="100" />' +
+                    '</pattern>' +
+                  '</defs>' +
+                  '<polygon points="50 1 95 25 95 75 50 99 5 75 5 25" fill="url(#img)"/>' +
+                '</svg>';
+                consoleOutput('<a target="_blank" href="'+openseaLink+'">View on OpenSea ↗️</a><hr class="hr2"><br>'+smallFrogNFT)
                 for (var i = 0; i < metadata2.attributes.length; i++){
                   var data = metadata2.attributes[i]
                   consoleOutput(data.trait_type+": <b>"+data.value+"</b>")
@@ -524,23 +533,10 @@
       }
       // Load Certain FROG
       function loadFreshFrog(freshFrog) {
-        newFrog = document.createElement("div")
+        newFrog = document.createElement("a")
         newFrog.onclick = function() {applyFrogOwned(freshFrog)};
-        newFrogid = "Frog #"+freshFrog
+        newFrog.id = "Frog #"+freshFrog
         newFrog.className = "smallContainer2"
-
-        //
-        newFrog.innerHTML = 
-        '<svg viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg">' +
-          '<defs>' +
-            '<pattern id="img" patternUnits="userSpaceOnUse" width="100" height="100">' +
-              '<div background="blue" id ="'+newFrogid+'"></div>' +
-            '</pattern>' +
-          '</defs>' +
-          '<polygon points="50 1 95 25 95 75 50 99 5 75 5 25" fill="url(#img)"/>' +
-        '</svg>'
-        //
-
         //newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+freshFrog+'.png" alt="Frog '+freshFrog+'" id="frog'+freshFrog+'">'
         document.getElementById("pre").appendChild(newFrog)
         /*
