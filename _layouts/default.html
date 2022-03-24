@@ -470,7 +470,7 @@
         consoleOutput("<hr class='hr2'><b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint...\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
         document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
         document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>04/01/22" // "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
-        document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
+        //document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
         consoleOutput('<hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>');
@@ -507,7 +507,7 @@
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           if (mintProgress == 1 || mint === 0 ) {
             if (mint === 0) {
-              consoleOutput("<strong>❯ Minting closed!</strong> Join discord for more info! "+"<b><u><a class='pointer' href='https://freshfrogs.github.io/discord'>Join Discord</b></u></a>")
+              consoleOutput("<strong>❯ Mint open Friday April 1st! 04/01/22</strong> Join discord for more info! "+"<b><u><a class='pointer' href='https://discord.gg/xWMFWgpvd3?event=950943812832858172'>Join Discord</b></u></a>")
             }
             if (mintProgress === 1) {
               consoleOutput("<strong>❯</strong> To prevent duplicate transactions the mint button is locked out after one use. <a href='https://freshfrogs.github.io' class='pointer'>Please refresh the page!</a>")
@@ -676,7 +676,7 @@
         var growTray = document.getElementById('mintingTray');
         growTray.innerHTML = 
         '<ul class="downloads2">' +
-        '  <li><a id="mintTransact" href="" class="pointer"><strong>LINK WALLET</strong></a></li>' +
+        '  <li><a id="mintTransact" href="https://discord.gg/xWMFWgpvd3?event=950943812832858172" class="pointer"><strong>LINK WALLET</strong></a></li>' +
         '  <li><a id="mintTotal"><strong>0.02 ΞETH</strong>Plus gas</a></li>' +
         '  <li><a class="pointer"><strong><b id="removeFrog" class="pointer">−</b><frogQuant id="frogQuant">  1  </frogQuant><b id="addFrog" class="pointer">+</b></strong>Quantity</a></li>' +
         '</ul>' +
