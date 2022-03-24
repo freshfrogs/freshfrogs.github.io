@@ -447,6 +447,7 @@
           if (baseFrog !== 'undefined' && subFrog !== 'undefined') { 
             //alert("Morph "+baseFrog+" + "+subFrog);
             combineTokens(baseFrog, subFrog);
+            document.getElementById("supply").innerHTML = "# "+baseFrog+" 🍄 # "+subFrog
           }
         })
         // test
@@ -656,7 +657,7 @@
         document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong><b>"+baseFrog+" + "+subFrog+"</b>"
         morphed = 'false';
         //alert(morphed)
-        document.getElementById("supply").innerHTML = "CLick '<strong>Morph</strong>"
+        document.getElementById("supply").innerHTML = "Click <strong>'Morph'</strong>"
       }
       // Select baseFrog
       async function selectBaseFrog(selectedBase){
