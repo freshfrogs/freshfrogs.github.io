@@ -456,7 +456,11 @@
         })
         //
         document.querySelector("#randomMorphExample").addEventListener("click", async (e) => {
-          randomMorph();
+          randomFrog = getRandomInt(1, (nextIdC-1));
+          applyFrogOwned(randomFrog); // 303 / 33
+          randomFrogTwo = getRandomInt(1, (nextIdC-1));
+          applyFrogOwned(randomFrogTwo); // 67
+          combineTokens(baseFrog, subFrog);
           alert("Morph "+baseFrog+" + "+subFrog);
         })
         // test
@@ -666,14 +670,6 @@
         morphed = 'false';
         //alert(morphed)
         //document.getElementById("supply").innerHTML = "# "+baseFrog+" 🍄 # "+subFrog
-      }
-      // Random Frog Morph
-      function randomMorph() {
-        randomFrog = getRandomInt(1, (nextIdC-1));
-        applyFrogOwned(randomFrog); // 303 / 33
-        randomFrogTwo = getRandomInt(1, (nextIdC-1));
-        applyFrogOwned(randomFrogTwo); // 67
-        combineTokens(baseFrog, subFrog);
       }
       // Select baseFrog
       async function selectBaseFrog(selectedBase){
