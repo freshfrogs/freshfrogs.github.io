@@ -476,13 +476,15 @@
         })
         //consoleOutput('ℹ️ Select TWO FROGs by <u>clicking on them</u>');
         // Generate two random FROGS
+        /*
         randomFrog = getRandomInt(1, (nextIdC-1));
         applyFrogOwned(63); // 303 / 33
         randomFrogTwo = getRandomInt(1, (nextIdC-1));
         applyFrogOwned(67); // 67
+        combineTokens(baseFrog, subFrog);
+        */
         var loadedFrogs = 0;
         let targetFrog = nextIdC;
-        combineTokens(baseFrog, subFrog);
         //consoleOutput("Scanning Tokens... Please wait... ⌛")
         try {
           for (var thisToken = 1; thisToken < targetFrog; thisToken++) {
