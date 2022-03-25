@@ -721,12 +721,13 @@
         return Math.floor(Math.random() * (max - min + 1)) + min;
       }
       // Load recent mints
-      function recentlyMinted(howMany) {
-        //if (howMany = "nextToken") {
-        //  howMany = nextIdC-1
-        //}
+      function recentlyMinted(howMany, which) {
         for(let i=1; i<=howMany; i++) {
-          recentMint = getRandomInt(1, 587);
+          if (which == "nextToken") {
+            recentMint = i;
+          } else {
+            recentMint = getRandomInt(1, 587);
+          }
           mostRecentDesc = "frog"+recentMint+"Desc"
           mostRecentLink = "frog"+recentMint+"Link"
           mostRecentFrog = "frog"+recentMint
