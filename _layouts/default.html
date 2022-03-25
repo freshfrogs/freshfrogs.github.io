@@ -724,7 +724,7 @@
       function recentlyMinted(howMany, which) {
         for(let i=1; i<=howMany; i++) {
           if (which == "nextToken") {
-            recentMint = (nextIdC-i);
+            let recentMint = (nextIdC-i);
             alert("nextToken:"+recentMint)
           } else {
             recentMint = getRandomInt(1, 587);
