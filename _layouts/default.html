@@ -458,7 +458,8 @@
         // Load minting Tray / Terminal
         loadMintingTerminal();
         loadMintingTray();
-
+        document.getElementById("recentMints").innerHTML = ""
+        recentlyMinted("nextToken");
         // Messages Sent to Terminal
         document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
         
@@ -721,6 +722,9 @@
       }
       // Load recent mints
       function recentlyMinted(howMany) {
+        if (howMany = "nextToken") {
+          howMany = nextIdC
+        }
         for(let i=1; i<=howMany; i++) {
           recentMint = getRandomInt(1, 587);
           mostRecentDesc = "frog"+recentMint+"Desc"
