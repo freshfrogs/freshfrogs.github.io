@@ -399,6 +399,7 @@
         // consoleOutput("<strong>❯</strong> Minting closed! Join discord for more info!"+"<b><u><a class='pointer' href='https://freshfrogs.github.io/discord'>Join Discord</b></u></a>")
         //consoleOutput('<hr class="hr2">\n'+'Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>')
         //consoleOutput('<hr class="hr2">\n'+'🍄Morph Fresh Frog NFTs<br>Exclusive content for FROG token holders!<a class="pointer" href="https://freshfrogs.github.io/the-pad"><b>freshfrogs/the-pad🍀</b> ↗️</a>')
+        recentlyMinted(1);
         const web3 = new Web3(window.ethereum)
         const f0 = new F0();
         var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
@@ -704,24 +705,29 @@
           growTerminal.style.height = "100%";
         }
       }
+      function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
       // Load recent mints
-      function recentlyMinted(mostRecent) {
-        for(let i=1; i<=24; i++) {
-          mostRecent2 = mostRecent - i
-          mostRecentDesc = "frog"+i+"Desc"
-          mostRecentLink = "frog"+i+"Link"
-          mostRecentFrog = "frog"+i
+      function recentlyMinted(howMany) {
+        for(let i=1; i<=howMany; i++) {
+          recentMint = getRandomInt(1, 587);
+          mostRecentDesc = "frog"+recentMint+"Desc"
+          mostRecentLink = "frog"+recentMint+"Link"
+          mostRecentFrog = "frog"+recentMint
           // <a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+mostRecent2+'" id="'+mostRecentLink+'" target="_blank">
           newFrog = document.createElement("a")
-          newFrog.href = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+mostRecent2
+          newFrog.href = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+recentMint
           newFrog.id = mostRecentLink
           newFrog.target = "_blank"
           newFrog.className = "smallContainer2"
           newFrog.width = randomNumber(64, 128)+"px"
-          newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+mostRecent2+'.png" alt="Frog '+mostRecent2+'" id="frog'+i+'">'
-          document.getElementById("pre").appendChild(newFrog)
+          newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+recentMint+'.png" alt="Frog '+recentMint+'" id="frog'+i+'">'
+          document.getElementById("recentMints").appendChild(newFrog)
         }
-        consoleOutput("<a id='loadRecentMints2' class='pointer' onclick='recentlyMinted("+mostRecent2+")'><u>Load More</u></a></b>");
+        consoleOutput("<a id='loadRecentMints2' class='pointer' onclick='recentlyMinted(4)'><u>Load More</u></a></b>");
       }
       //    {% include head-custom.html %}
     </script>
@@ -780,6 +786,10 @@
             <div class="pTimeline">
               <h4>Final Release</h4><u>Date To Be Decided</u>
               <p>Remaining supply of <b>2,020 Frogs</b> will be available to mint for <b>0.04 ΞETH</b></p>
+            </div>
+            <div class="pTimeline">
+              <h4>Recent Mints!</h4>
+              <div id="recentMints"></div>
             </div>
           </div>
         </div>
