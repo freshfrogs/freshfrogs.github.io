@@ -9,3 +9,4 @@ Unbelievably, over 200,000 acres of rainforest are burned every day. That is ove
 
 Created by [NF7UOS](https://opensea.io/NF7UOS)
 <hr>
+<div id="recentMints"></div>
