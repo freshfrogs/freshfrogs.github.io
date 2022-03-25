@@ -722,8 +722,8 @@
       }
       // Load recent mints
       function recentlyMinted(howMany, which) {
+        alert(which)
         for(let i=1; i<=howMany; i++) {
-            alert(which)
           if (which == "nextToken") {
             recentMint = nextIdC-i;
             alert("nextToken:"+recentMint)
