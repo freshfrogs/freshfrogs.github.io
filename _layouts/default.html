@@ -725,7 +725,7 @@
       }
       // Load recent mints from next token
       function recentlyMinted(nextToken) {
-        document.getElementById("recentMints").innerHTML = "<h3>Recent Mints</h3><hr>"
+        document.getElementById("recentMints").innerHTML = "<br><h3>Recent Mints</h3><hr>"
         for(let i=1; i<=6; i++) {
           recentMint = nextToken - i;
           mostRecentDesc = "frog"+recentMint+"Desc"
