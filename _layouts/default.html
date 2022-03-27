@@ -386,11 +386,6 @@
     transition: height .5s;
     height: 0;
   }
-  #navbar {
-    height: 100;
-    transition: height 0.3s;
-    overflow: hidden;
-  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="./assets/logo.png">
@@ -409,18 +404,6 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
     <script>
-      //
-      var prevScrollpos = window.pageYOffset;
-      window.onscroll = function() {
-      var currentScrollPos = window.pageYOffset;
-        if (prevScrollpos > currentScrollPos) {
-          document.getElementById("navbar").style.height = "100"; //overflow
-        } else {
-          document.getElementById("navbar").style.height = "0";
-        }
-        prevScrollpos = currentScrollPos;
-      }
-      //
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
@@ -782,7 +765,7 @@
       //    {% include head-custom.html %}
     </script>
     <div class="top">
-      <div id="navbar">{{ content }}</div>
+      {{ content }}
     </div>
   </head>
   <body class="bodyb">
