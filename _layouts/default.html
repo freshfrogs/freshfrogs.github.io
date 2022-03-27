@@ -385,6 +385,7 @@
     -webkit-transition: height .5s;
     transition: height .5s;
     height: 0;
+    overflow: hidden;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -707,13 +708,14 @@
         '</div>' +
         '<h3 id="supply">FROG 4,040 Total Supply</h3>';
         document.getElementById("netStatus").innerHTML = '';
+        document.getElementById('mintingTray').style.height = "100%"
       }
 
       // Load Minting Terminal...
       function loadMintingTerminal() {
         var growTerminal = document.getElementById('growTerminal');
         if (growTerminal.clientHeight) {
-          growTerminal.style.height = 0;
+          growTerminal.style.height = "0%";
         } else {
           growTerminal.style.height = "100%";
         }
