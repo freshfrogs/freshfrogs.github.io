@@ -384,8 +384,7 @@
     -o-transition: height .5s;
     -webkit-transition: height .5s;
     transition: height .5s;
-    height: 0%;
-    overflow: hidden;
+    height: 0;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -426,8 +425,8 @@
           })
           document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <strong>❯ Connecting...</strong>"
           } catch (e) {
-            consoleOutput("<br>"+"<div style='border-bottom: 1px solid black;'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong></div>")
             loadMintingTerminal();
+            consoleOutput("<br>"+"<div style='border-bottom: 1px solid black;'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong></div>")
         }
 
         // VARIABLES
@@ -496,8 +495,6 @@
         //recentlyMinted(nextIdC);
         consoleOutput('<hr class="hr2"><div id="recentMints"></div><hr>')
         recentlyMinted(nextIdC);
-        document.getElementById("top").style.height = "0px"
-        document.getElementById("top").style.overflow = "hidden"
         //
         //loadFrogMenu();
 
@@ -710,14 +707,13 @@
         '</div>' +
         '<h3 id="supply">FROG 4,040 Total Supply</h3>';
         document.getElementById("netStatus").innerHTML = '';
-        document.getElementById('mintingTray').style.height = "100%"
       }
 
       // Load Minting Terminal...
       function loadMintingTerminal() {
         var growTerminal = document.getElementById('growTerminal');
         if (growTerminal.clientHeight) {
-          growTerminal.style.height = "0%";
+          growTerminal.style.height = 0;
         } else {
           growTerminal.style.height = "100%";
         }
@@ -768,7 +764,9 @@
       }
       //    {% include head-custom.html %}
     </script>
-    <div id="top" class="top">{{ content }}</div>
+    <div class="top">
+      {{ content }}
+    </div>
   </head>
   <body class="bodyb">
     <div class="wrapper">
@@ -814,10 +812,6 @@
               </headline>
             </div>
             <div class="pTimeline">
-              <p>Unbelievably, over 200,000 acres of rainforest are burned every day. A portion of every initial sale will be donated and for every 1.00 ETH, two and a half acres of rainforest will be saved forever!</p>
-              <a class="pointer" href="https://rainforestfoundation.org/"><b>The Rainforest Foundation</b></a>
-            </div>
-            <div class="pTimeline">
               <h3>Initial Public Mint</h3><u>Friday, Febuary 11th, 2022</u>
               <p>The first 404 frogs from the collection made available to mint for FREE! Then re-opened exclusively for discord members! Totaling <b>580+ Frogs</b> between 110+ different holders!</p>
             </div>
@@ -831,7 +825,7 @@
             </div>
             <div class="pTimeline">
               <h3>Frog Token Combinations!</h3>
-              <p>After the full collection of <b>4,040 Frogs</b> have been minted, Frog holders will be able to "Morph" their Frogs into a new NFT on Ethereum, combining their attributes and traits! Frog owners can try out this feature at <a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a></p>
+              <p>After the full collection of <b>4,040 Frogs</b> has been minted, Frog holders will be able to "Morph" their Frogs into a new NFT on Ethereum, combining their attributes and traits! Frog owners can try out this feature at <a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a></p>
               <img href="./the-pad" style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="./assets/frogs/morphTray.png">
             </div>
             <div class="pTimeline">
