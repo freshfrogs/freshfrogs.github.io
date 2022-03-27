@@ -8,5 +8,4 @@ Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each 
 A portion of every initial sale will be donated to [The Rainforest Foundation](https://rainforestfoundation.org/)
 For every 1.00 ETH donated, two and a half acres of rainforest will be saved forever!
 
-Created by [NF7UOS](https://opensea.io/NF7UOS)
 <hr>
