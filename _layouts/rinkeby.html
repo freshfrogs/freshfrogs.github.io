@@ -485,7 +485,7 @@
         consoleOutput("<hr class='hr2'><b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint...\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
         document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
         document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>04/01/22" // "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
-        //document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
+        document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
         consoleOutput('<hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>');
