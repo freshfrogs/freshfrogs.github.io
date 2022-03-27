@@ -415,6 +415,7 @@
       var currentScrollPos = window.pageYOffset;
         if (prevScrollpos > currentScrollPos) {
           document.getElementById("navbar").style.height = "100"; //overflow
+          document.getElementById("navbar").style.overflow = "unset";
           
         } else {
           document.getElementById("navbar").style.overflow = "hidden";
