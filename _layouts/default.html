@@ -387,8 +387,8 @@
     height: 0;
   }
   #navbar {
-    top: 0;
-    transition: top 0.3s;
+    height: 100;
+    transition: height 0.3s;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -413,9 +413,9 @@
       window.onscroll = function() {
       var currentScrollPos = window.pageYOffset;
         if (prevScrollpos > currentScrollPos) {
-          document.getElementById("navbar").style.top = "0";
+          document.getElementById("navbar").style.height = "100";
         } else {
-          document.getElementById("navbar").style.top = "-50px";
+          document.getElementById("navbar").style.height = "0";
         }
         prevScrollpos = currentScrollPos;
       }
