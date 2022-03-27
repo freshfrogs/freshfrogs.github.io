@@ -389,7 +389,7 @@
   #navbar {
     height: 100;
     transition: height 0.3s;
-    overflow: unset;
+    overflow: hidden;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -414,10 +414,8 @@
       window.onscroll = function() {
       var currentScrollPos = window.pageYOffset;
         if (prevScrollpos > currentScrollPos) {
-          document.getElementById("navbar").style.overflow = "unset";
           document.getElementById("navbar").style.height = "100"; //overflow
         } else {
-          document.getElementById("navbar").style.overflow = "hidden";
           document.getElementById("navbar").style.height = "0";
         }
         prevScrollpos = currentScrollPos;
