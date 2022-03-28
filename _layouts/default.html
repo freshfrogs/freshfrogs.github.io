@@ -485,7 +485,7 @@
         consoleOutput("<hr class='hr2'><b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint...\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
         document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
         document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>04/01/22" // "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
-        //document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
+        document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
         consoleOutput('<hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>');
@@ -521,6 +521,7 @@
         })
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
+          //
           if (mintProgress == 1 || mint === 0 ) {
             if (mint === 0) {
               consoleOutput("❯ Mint open <strong>Friday April 1st! 04/01/22</strong> Join discord for more info! "+"<b><u><a class='pointer' href='https://discord.gg/xWMFWgpvd3?event=950943812832858172'>Join Discord</b></u></a>")
@@ -530,7 +531,7 @@
             }
           } else {
             mintProgress = 1;
-            consoleOutput("\n<strong>❯</strong> <strong>Minting x"+frogCount+" FROG(s) #"+mintList+"... <br>\nPlease sign the transaction and wait...<br>\nDo Not Leave This Page")
+            consoleOutput("<br>\n<strong><u>Minting ("+frogCount+") FROG Tokens</u></strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo Not Leave This Page")
             try {
               if (highPriority === 1) {
                 let tokens = await f0.mint(mintInviteCode, frogCount)
@@ -548,10 +549,10 @@
                   return token.links.opensea
                 })
               }
+              consoleOutput("<br><div class='learnMoreFM'><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.github.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>")
             } catch (e) {
               consoleOutput("<br>\n<strong>❯</strong> ⚠️ <strong><b>Transaction Error:</b></strong> <br>\n"+JSON.stringify(e.message)+"<br>\n<u>If you believe this to be a mistake, please <b><a href='https://freshfrogs.github.io/discord'>Report it Here</u></a></b>")
-            }
-            consoleOutput("<hr><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a href='https://freshfrogs.github.io/the-pad'><b>View 'FROG' Tokens</a></b><hr>")
+            }            
           }
         })
         // Remove FROG from minting tray
