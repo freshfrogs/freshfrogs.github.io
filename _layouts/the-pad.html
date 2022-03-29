@@ -403,6 +403,7 @@
         var collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
         try {
           consoleOutput('<br>'+'Mint from the collection...<a class="pointer" href="https://freshfrogs.github.io/"><b>Minting Terminal</b> ↗️</a>')
+          consoleOutput('<hr class="hr2">'+'Generate a Random Frog Combination! <b><a class="pointer" onclick="randomFrogMorph(getRandomInt(1, (nextIdC-1)), getRandomInt(1, (nextIdC-1)));">Random Morph</a></b>')
           consoleOutput('<hr class="hr2"><b>🍄Morph FROGS</b><br>Fresh Frog NFT Combinations! <br>Select Frogs to combine their attributes!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>')
           await f0.init({
             web3: web3,
@@ -593,7 +594,7 @@
           document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
           document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>"+baseFrog+" + ?"
           document.getElementById("twoFrogs").innerHTML = "";
-          document.getElementById("supply").innerHTML = "FROG # "+baseFrog+" / # "+"Select FROG"+" 🍄"
+          document.getElementById("supply").innerHTML = "FROG # "+baseFrog+" / # "+" ? "+" 🍄"
           //document.getElementById("supply").innerHTML = "# "+baseFrog+" 🍄 # "+subFrog
         } else if (subFrog == 'undefined') { // subFrog
           if (baseFrog !== ownedFrog) {
@@ -609,13 +610,18 @@
           document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG"
           document.getElementById("morphFrogs").innerHTML = "<strong>🍄Morph</strong>"+baseFrog+" + ?"
           document.getElementById("twoFrogs").innerHTML = "";
-          document.getElementById("supply").innerHTML = "FROG # "+baseFrog+" / # "+"Select FROG"+" 🍄"
+          document.getElementById("supply").innerHTML = "FROG # "+baseFrog+" / # "+" ? "+" 🍄"
         }
       }
       function getRandomInt(min, max) {
         min = Math.ceil(min);
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+      function randomFrogMorph(randomBase, randomSub) {
+        applyFrogOwned(randomBase); // 303 / 33
+        applyFrogOwned(randomSub); // 67
+        combineTokens(randomBase, randomSub);
       }
       // Load attribute
       function loadAttribute(trait, attribute, where) {
