@@ -403,7 +403,7 @@
         var collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
         try {
           consoleOutput('<br>'+'Mint from the collection...<a class="pointer" href="https://freshfrogs.github.io/"><b>Minting Terminal</b> ↗️</a>')
-          consoleOutput('<hr class="hr2">'+'Generate a Random Frog Combination! <b><a class="pointer" onclick="randomFrogMorph(getRandomInt(1, ('+nextIdC+'-1)), getRandomInt(1, ('+nextIdC+'-1)));">Random Morph 🔄</a></b>')
+          consoleOutput('<hr class="hr2">'+'Generate a Random Frog Combination! <b><a class="pointer" onclick="randomFrogMorph(getRandomInt(1, 587), getRandomInt(1, 587));">Random Morph 🔄</a></b>')
           consoleOutput('<hr class="hr2"><b>🍄Morph FROGS</b><br>Fresh Frog NFT Combinations! <br>Select Frogs to combine their attributes!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>')
           await f0.init({
             web3: web3,
