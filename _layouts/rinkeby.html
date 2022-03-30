@@ -14,6 +14,7 @@
     background-color: transparent;
     margin-left: auto;
     margin-right: auto;
+    padding-top: 8px;
   }
   .top {
     margin-left: auto;
@@ -388,7 +389,7 @@
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
-  <link rel="icon" href="../assets/logo.png">
+  <link rel="icon" href="./assets/logo.png">
   <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -451,7 +452,7 @@
         
         let frogCount = 1; // # FROGS IN MINTING TRAY
         let mintProgress = 0; // MINT IN PROGRESS
-        let mint = 1; // MINT ON /OFF
+        let mint = 0; // MINT ON /OFF
         let ownedFrogs = await collection.methods.balanceOf(userAcc).call()
 
         // Load public invite first
@@ -522,16 +523,16 @@
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           //
-          if (mintProgress == 1 || mint === 0 ) {
+          if (mint === 0 ) {
             if (mint === 0) {
-              consoleOutput("<strong>❯ Minting closed!</strong> Join discord for more info! "+"<b><u><a class='pointer' href='https://freshfrogs.github.io/discord'>Join Discord</b></u></a>")
+              consoleOutput("❯ Mint open <strong>Friday April 1st! 04/01/22</strong> Join discord for more info! "+"<b><u><a class='pointer' href='https://discord.gg/xWMFWgpvd3?event=950943812832858172'>Join Discord</b></u></a>")
             }
             if (mintProgress === 1) {
               consoleOutput("<strong>❯</strong> To prevent duplicate transactions the mint button is locked out after one use. <a href='https://freshfrogs.github.io' class='pointer'>Please refresh the page!</a>")
             }
           } else {
             mintProgress = 1;
-            consoleOutput("<br>\n<strong><u>Minting ("+frogCount+") FROG Token(s)</u></strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo Not Leave This Page")
+            consoleOutput("<br>\n<strong><u>Minting ("+frogCount+") FROG Tokens</u></strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo Not Leave This Page")
             try {
               if (highPriority === 1) {
                 let tokens = await f0.mint(mintInviteCode, frogCount)
@@ -549,7 +550,7 @@
                   return token.links.opensea
                 })
               }
-              consoleOutput("<br><div class='learnMoreFM'><h3 class='h3'>Congratulations!</h3>"+"<b>("+frogCount+") FROG Token(s)</b> successfully minted! <a class='pointer' href='https://freshfrogs.github.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>")
+              consoleOutput("<br><div class='learnMoreFM'><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.github.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>")
             } catch (e) {
               consoleOutput("<br>\n<strong>❯</strong> ⚠️ <strong><b>Transaction Error:</b></strong> <br>\n"+JSON.stringify(e.message)+"<br>\n<u>If you believe this to be a mistake, please <b><a href='https://freshfrogs.github.io/discord'>Report it Here</u></a></b>")
             }            
@@ -626,7 +627,7 @@
         newAttribute.id = attribute
         newAttribute.target = "_blank"
         newAttribute.className = "frogType2 pointer"
-        newAttribute.innerHTML = '<img class="frogType" src="../the-pad/'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><b>'+attribute+'</b>'
+        newAttribute.innerHTML = '<img class="frogType" src="./the-pad/'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><b>'+attribute+'</b>'
         document.getElementById("pre").appendChild(newAttribute)
       }
       // Load FROG Types
@@ -676,12 +677,12 @@
         newAttribute.id = "FrogButton"
         newAttribute.className = "frogType2 pointer"
         newAttribute.onClick = "loadFrogs()"
-        newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogType" src="../the-pad/Frog/unknown.png" alt="Frogs" id="Frog"><b>Frogs</b>'
+        newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogType" src="./the-pad/Frog/unknown.png" alt="Frogs" id="Frog"><b>Frogs</b>'
         document.getElementById("pre").appendChild(newAttribute)
         newAttribute = document.createElement("a")
         newAttribute.id = "SpecialFrogButton"
         newAttribute.className = "frogType2 pointer"
-        newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogType" src="../the-pad/SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs"><b>SpecialFrogs</b>'
+        newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogType" src="./the-pad/SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs"><b>SpecialFrogs</b>'
         document.getElementById("pre").appendChild(newAttribute)
       }
       // Random Number
@@ -764,8 +765,30 @@
         //consoleOutput("<a id='loadRecentMints2' class='pointer' onclick='recentlyMinted(4)'><u>Load More</u></a></b>");
       }
       //    {% include head-custom.html %}
+      /*
+            <div class="pTimeline">
+              <h3>Staking FROG Tokens</h3>
+              <p>NFT staking refers to locking up non-fungible tokens on a platform or protocol in exchange for staking rewards and other benefits. Staking NFTs allows holders to earn an income from their collection while maintaining ownership. It’s similar to earning interest from a bank account, but without a middleman facilitating transactions and taking a cut.</p>
+              <svg viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <pattern id="img" patternUnits="userSpaceOnUse" width="100" height="100">
+                    <image xlink:href="https://freshfrogs.github.io/frog/66.png" x="-25" width="150" height="100" />
+                    <image xlink:href="https://freshfrogs.github.io/the-pad/Frog/frog.png" x="-25" width="150" height="100" />
+                    <image xlink:href="https://freshfrogs.github.io/the-pad/SpecialFrog/closedEyes.png" x="-25" width="150" height="100" />
+                    <image xlink:href="https://freshfrogs.github.io/the-pad/Trait/darkGreen.png" x="-25" width="150" height="100" />
+                    <image xlink:href="https://freshfrogs.github.io/the-pad/Hat/cowboyHatWhite.png" x="-25" width="150" height="100" />
+                    <image xlink:href="https://freshfrogs.github.io/the-pad/Mouth/tongueFly.png" x="-25" width="150" height="100" />
+                  </pattern>
+                </defs>
+                <polygon points="50 1 95 25 95 75 50 99 5 75 5 25" fill="url(#img)"/>
+              </svg>
+              <h4>(N)ew (F)rog (T)oken</h4>
+            </div>
+      */
     </script>
-    <div class="top">{{ content }}</div>
+    <div class="top">
+      {{ content }}
+    </div>
   </head>
   <body class="bodyb">
     <div class="wrapper">
@@ -773,6 +796,7 @@
         <div class="downloads pre">
           <div id="mintingTray"></div>
           <div id="netStatus">
+            <br>
             <h2>FROG 4,040 Total Supply</h2>
             Please connect an Ethereum wallet...
             <b><a class="pointer" href="https://freshfrogs.github.io/">Connect Wallet</a></b>
@@ -794,20 +818,20 @@
           </div>
           <br>
           <div class="divTimeline">
-            <img style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="../assets/frogs/FLY.gif">
+            <img style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="./assets/frogs/FLY.gif">
             <h4>What is Fresh Frogs NFT?</h4>
             <div class="pTimeline">
               <p>Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
               <b>Ethereum Blockchain</b><a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b">ERC-721 Standard 0xBE4B..C51b ↗️</a>
               <hr class="hr2">
               <headline class="headLine2">
-                <a href="https://twitter.com/FreshFrogs_NFT" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/twitter.png"></a>
-                <a href="https://discord.gg/t84NyjpS3H" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/discord.png"></a>
-                <a href="https://opensea.io/collection/fresh-frogs" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/opensea.png"></a>
-                <a href="https://nftcalendar.io/event/fresh-frogs-nft-collection-release/" target="_blank" style="display: inline !important;"><img background="white" class="headLineImg" src="../assets/nftCalendar.png"></a>
-                <a href="https://nftdroops.com/nft/fresh-frogs/" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/droops2.png"></a>
-                <a href="https://rarible.com/fresh-frogs/" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/Rarible.png"></a>
-                <a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/etherScan.png"></a>
+                <a href="https://twitter.com/FreshFrogs_NFT" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/twitter.png"></a>
+                <a href="https://discord.gg/t84NyjpS3H" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/discord.png"></a>
+                <a href="https://opensea.io/collection/fresh-frogs" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/opensea.png"></a>
+                <a href="https://nftcalendar.io/event/fresh-frogs-nft-collection-release/" target="_blank" style="display: inline !important;"><img background="white" class="headLineImg" src="./assets/nftCalendar.png"></a>
+                <a href="https://nftdroops.com/nft/fresh-frogs/" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/droops2.png"></a>
+                <a href="https://rarible.com/fresh-frogs/" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/Rarible.png"></a>
+                <a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/etherScan.png"></a>
               </headline>
             </div>
             <div class="pTimeline">
@@ -825,25 +849,7 @@
             <div class="pTimeline">
               <h3>Frog Token Combinations!</h3>
               <p>After the full collection of <b>4,040 Frogs</b> has been minted, Frog holders will be able to "Morph" their Frogs into a new NFT on Ethereum, combining their attributes and traits! Frog owners can try out this feature at <a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a></p>
-              <img href="../the-pad" style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="../assets/frogs/morphTray.png">
-            </div>
-            <div class="pTimeline">
-              <h3>Staking FROG Tokens</h3>
-              <p>NFT staking refers to locking up non-fungible tokens on a platform or protocol in exchange for staking rewards and other benefits. Staking NFTs allows holders to earn an income from their collection while maintaining ownership. It’s similar to earning interest from a bank account, but without a middleman facilitating transactions and taking a cut.</p>
-              <svg viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <pattern id="img" patternUnits="userSpaceOnUse" width="100" height="100">
-                    <image xlink:href="https://freshfrogs.github.io/frog/66.png" x="-25" width="150" height="100" />
-                    <image xlink:href="https://freshfrogs.github.io/the-pad/Frog/frog.png" x="-25" width="150" height="100" />
-                    <image xlink:href="https://freshfrogs.github.io/the-pad/SpecialFrog/closedEyes.png" x="-25" width="150" height="100" />
-                    <image xlink:href="https://freshfrogs.github.io/the-pad/Trait/darkGreen.png" x="-25" width="150" height="100" />
-                    <image xlink:href="https://freshfrogs.github.io/the-pad/Hat/cowboyHatWhite.png" x="-25" width="150" height="100" />
-                    <image xlink:href="https://freshfrogs.github.io/the-pad/Mouth/tongueFly.png" x="-25" width="150" height="100" />
-                  </pattern>
-                </defs>
-                <polygon points="50 1 95 25 95 75 50 99 5 75 5 25" fill="url(#img)"/>
-              </svg>
-              <h4>(N)ew (F)rog (T)oken</h4>
+              <img href="./the-pad" style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="./assets/frogs/morphTray.png">
             </div>
           </div>
         </div>
