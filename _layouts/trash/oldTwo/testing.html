@@ -14,11 +14,12 @@
     background-color: transparent;
     margin-left: auto;
     margin-right: auto;
+    padding-top: 8px;
   }
   .top {
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 2%;
+    margin-bottom: 0%;
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
     font-weight: 500;
     color: rgba(126, 183, 128, 1);
@@ -40,30 +41,37 @@
     border: 0px solid #e0e0e0;
     overflow: hidden;
     background-color: transparent;
-    width: 128px;
+    width: 64px;
     padding-top: 0px !important;
-    height: 128px !important;
+    height: 64px !important;
     display: inline-block !important;
-    margin-left: 2%;
-    margin-right: 2%;
-    margin-top: 2%;
-    margin-bottom: 2%;
-    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
+    margin-left: 1%;
+    margin-right: 1%;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    transition: transform .2s;
+  }
+  .smallContainer2:hover{
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Safari 3-8 */
+    transform: scale(1.5);
+    box-shadow: none;
+    border: none;
   }
   .bigContainer{
     border-radius: 5px;
     border: 0px solid #e0e0e0;
     overflow: hidden;
     background-color: transparent;
-    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
-    margin-left: 2%;
-    margin-right: 2%;
+    margin-left: auto;
+    margin-right: auto;
     margin-top: 2%;
     margin-bottom: 2%;
+    width: 256px
   }
   .headLine{
     color: transparent;
-    image-rendering: crisp-edges;
+    image-rendering: crisp-edges !important;
     width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -74,23 +82,26 @@
   .headLine2 {
     margin-left: auto;
     margin-right: auto;
-    image-rendering: crisp-edges;
+    image-rendering: crisp-edges !important;
     margin-bottom: 2%;
+    height: auto;
   }
   .headLineImg {
     float: none;
-    image-rendering: crisp-edges;
+    image-rendering: crisp-edges !important;
     height: 32px;
+    width: 32px;
     vertical-align: top;
     border-radius: 100%;
     padding: 0px;
     transition: transform .2s;
+    margin-top: auto;
+    margin-bottom: auto;
     margin-left: 3%;
     margin-right: 3%;
-    margin-bottom: 3%;
-    margin-top: 3%;
-    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
     background-color: transparent;
+    overflow: hidden;
   }
   .headLineImg:hover{
     -ms-transform: scale(1.5); /* IE 9 */
@@ -107,6 +118,17 @@
     image-rendering: pixelated;
     padding: 0%;
     font-size: xx-large;
+  }
+  .h2 {
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font-weight: 750;
+    text-align: center;
+    padding: 0%;
+    font-size: large;
+    font: "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+    margin-top: 8px;
+    margin-bottom: 0px;
+    line-height: 1.1;
   }
   .supply{
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
@@ -129,19 +151,22 @@
     list-style: none;
     height: 40px;
     padding: 0;
-    background: #f4f4f4;
+    background: white;
     border-radius: 5px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid lightgrey;
     width: 270px;
-    border-top: 1px solid #e0e0e0;
-    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
     margin-left: auto;
     margin-right: auto;
     margin-top: 2%;
     line-height: 1;
     text-align: center;
     vertical-align: middle;
-}
+  }
+  svg {
+    width: 50%;
+    image-rendering: pixelated;
+  }
   section {
     border: 4px solid white;
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
@@ -185,7 +210,7 @@
     margin-right: auto;
     padding: 14px;
   }
-  .downloads a{
+  .downloads a {
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
     font-size: inherit !important;
     color: #333;
@@ -214,13 +239,6 @@
     box-pack: center;
     box-align: center;
   }
-  .learnMoreFM {
-    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
-    background: #f4f4f4;
-    border: 1px solid lightgray;
-    border-radius: 5px;
-    padding: 5px;
-  }
   .imgWrapper {
     -webkit-box-flex: 13;
     -moz-box-flex: 1;
@@ -231,8 +249,8 @@
     height: auto;
     display: block;
     image-rendering: pixelated;
-    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
     overflow: hidden;
+    border-radius: 5px;
   }
   .frogImg2 {
     transition: transform .2s;
@@ -241,6 +259,7 @@
     image-rendering: pixelated;
     box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
     overflow: hidden;
+    border-radius: 5px;
   }
   .frogImg2:hover{
     -ms-transform: scale(1.5); /* IE 9 */
@@ -305,9 +324,72 @@
     margin-bottom: 0px;
 
   }
+  .infoPanel {
+    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
+    background: #f4f4f4;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    padding: 5px;
+  }
+  .hr2{
+    width: 128px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 1%;
+  }
+
+
+  .divTimeline {
+    width: 300px;
+    margin: auto;
+  }
+  .pTimeline {
+    border-top: 2px dashed;
+    border-color: rgba(126, 183, 128, 1) !important;
+    margin:0; padding: 30px;
+  }
+  .pTimeline:nth-child(even) {
+    border-left: 2px dashed;
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+    margin-right: 30px; 
+    padding-right: 0;
+  }
+  .pTimeline:nth-child(odd) {
+    border-right: 2px dashed;
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+    margin-left: 30px; 
+    padding-left: 0;
+  }
+  .pTimeline:first-child {
+    border-top: 0;
+    border-top-right-radius:0;
+    border-top-left-radius:0;
+  }
+  .pTimeline:last-child {
+    border-bottom-right-radius:0;
+    border-bottom-left-radius:0;
+  }
+  #growTray {
+    -moz-transition: height .5s;
+    -ms-transition: height .5s;
+    -o-transition: height .5s;
+    -webkit-transition: height .5s;
+    transition: height .5s;
+    height: 0;
+  }
+  #growTerminal {
+    -moz-transition: height .5s;
+    -ms-transition: height .5s;
+    -o-transition: height .5s;
+    -webkit-transition: height .5s;
+    transition: height .5s;
+    height: 0;
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
-  <link rel="icon" href="../assets/logo.png">
+  <link rel="icon" href="./assets/logo.png">
   <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -318,7 +400,7 @@
     <![endif]-->
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
-    <script src="https://testnet.factoria.app/f0/token_abi.js"></script>
+    <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
@@ -329,7 +411,9 @@
       gtag('config', 'G-6PB0WKB4SH');
       document.addEventListener("DOMContentLoaded", async () => {
         // consoleOutput("<strong>❯</strong> Minting closed! Join discord for more info!"+"<b><u><a class='pointer' href='https://freshfrogs.github.io/discord'>Join Discord</b></u></a>")
-        consoleOutput('<br>\n'+'Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b><br>')
+        //consoleOutput('<hr class="hr2">\n'+'Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>')
+        //consoleOutput('<hr class="hr2">\n'+'🍄Morph Fresh Frog NFTs<br>Exclusive content for FROG token holders!<a class="pointer" href="https://freshfrogs.github.io/the-pad"><b>freshfrogs/the-pad🍀</b> ↗️</a>')
+        //randomlyMinted(9);
         const web3 = new Web3(window.ethereum)
         const f0 = new F0();
         var CONTRACT_ADDRESS = "0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524"
@@ -342,30 +426,33 @@
           })
           document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <strong>❯ Connecting...</strong>"
           } catch (e) {
-            consoleOutput("<br>"+"\n<strong><b>Error: "+e.message+"</b></strong>")
+            loadMintingTerminal();
+            consoleOutput("<br>"+"<div style='border-bottom: 1px solid black;'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong></div>")
         }
 
-        let userAcc = web3.currentProvider.selectedAddress;
-        let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
-        let myInvites = await f0.myInvites()
-        let myInvitesKeys = Object.keys(myInvites)
+        // VARIABLES
 
-        let name = await f0.api.name().call()
-        let symbol = await f0.api.symbol().call()
-        let nextId = await f0.api.nextId().call()
-        let nextIdC = parseInt(nextId)
+        let userAcc = web3.currentProvider.selectedAddress; // USERS ACCOUNT ADDRESS
+        let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4); // USERS ACCOUNT ADDRESS CUT
+        let myInvites = await f0.myInvites() // USERS INVITES
+        let myInvitesKeys = Object.keys(myInvites) // INVITE KEYS
+
+        let name = await f0.api.name().call() // TOKEN NAME
+        let symbol = await f0.api.symbol().call() // TOKEN SYMBOL
+        let nextId = await f0.api.nextId().call() // NEXT TOKEN ID
+        let nextIdC = parseInt(nextId) // NEXT TOKEN ID PARSED
         let highPriority = 1 // low gas or high gas? low gas = 0 / high gas = 1
-        mostRecent2 = nextIdC - 1
-        let nextToken = await f0.get(nextId);
+        mostRecent2 = nextIdC - 1 // MOST RECENT MINT
+        //let nextToken = await f0.get(nextId); 
         let mintPrice = "0.02"
-        let mintAmmount = 1 // number to mint
-        let mintInviteCode = "0x0000000000000000000000000000000000000000000000000000000000000000" // invite code to mint from
-        let mintList = parseInt(nextId)
-        let mintLimit = 1
+        let mintAmmount = 1 // STARTING number to mint
+        let mintInviteCode = "0x0000000000000000000000000000000000000000000000000000000000000000" // invite code to mint from PUBLIC
+        let mintList = parseInt(nextId) // STARTING FROG
+        let mintLimit = 1 // MINT LIMIT FOR INVITE CODE
         
-        let frogCount = 1;
-        let mintProgress = 0;
-        let mint = 1;
+        let frogCount = 1; // # FROGS IN MINTING TRAY
+        let mintProgress = 0; // MINT IN PROGRESS
+        let mint = 0; // MINT ON /OFF
         let ownedFrogs = await collection.methods.balanceOf(userAcc).call()
 
         // Load public invite first
@@ -373,9 +460,11 @@
         mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
         mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
 
+        // Load minting Tray / Terminal
+        loadMintingTerminal();
+        loadMintingTray();
         // Messages Sent to Terminal
-        document.getElementById("supply").innerHTML = "<strong>"+nextIdC+" / 4,040 Total Supply</strong>"
-        document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b><a id='setInvite' class='pointer'></a>"
+        document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
         
 //        if (nextIdC >= 575) {
   //        mint = 0;
@@ -384,28 +473,29 @@
         // Mint Open 4,040 randomly generated Frogs on <b><strong>Ethereum</b></strong>\n<br>
         //document.getElementById("pre").innerHTML = ""
         //consoleOutput('Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'+'<br>\n')
-        consoleOutput("Mint a FROG onto the <b><strong>Ethereum Blockchain</b></strong>\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b><br>")
         //consoleOutput("Public minting price... <strong> FROG(s) @ "+mintPrice+" ΞETH</strong>") //("<b>Minting begins Sunday, 02/06/2022. \nJoin discord and follow on twitter to get on the FREE mint whitelist<b>")
         //consoleOutput("<b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint... <b><a href='https://freshfrogs.github.io/collection' class='pointer'>View Collection</a></b>")
-        if (myInvitesKeys[1] === "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550
-          myInviteFound = "0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550"
-          document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>"+"<br>\nAn invite was found coupled with this address... <b><a id='setInvite' class='pointer' href=''>Apply</u></a></b>"
+        if (myInvitesKeys[1] === "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550
+          myInviteFound = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4"
+          consoleOutput("Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>"+"<br>\nAn invite was found coupled with this address... <b><a id='setInvite' class='pointer' href=''>Apply</u></a></b>")
         } else { 
-          document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>\n<a id='setInvite' class='pointer'></a>"
+          consoleOutput("Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>\n<a id='setInvite' class='pointer'></a>")
         }
-
         //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
         //document.getElementById("supply").innerHTML = "<b><strong><a style='color: #222 !important;' href='https://opensea.io/collection/fresh-frogs' target='_blank'>ℹ️ ("+nextIdC+"/4040) Total Supply</a></strong></b>"
+        consoleOutput("<hr class='hr2'><b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint...\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
         document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
-        document.getElementById("mintTransact").innerHTML = "<strong>⛔MINT CLOSED</strong>" // "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
+        document.getElementById("mintTransact").innerHTML = "<strong>MINT</strong>04/01/22" // "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
+        consoleOutput('<hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>');
      //   document.getElementById("addFrog").innerHTML = "<strong> <u>-</u> "+frogCount+" <u>+</u></strong>Quantity"
         //document.getElementById("recentMints").innerHTML = ""
         //document.getElementById("loadRecentMints2").removeAttribute("href")
         //recentlyMinted(nextIdC);
-
+        //consoleOutput('<hr class="hr2"><div id="recentMints"></div><hr>')
+        recentlyMinted(nextIdC);
         //
         //loadFrogMenu();
 
@@ -433,9 +523,9 @@
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           //
-          if (mintProgress == 1 || mint === 0 ) {
+          if (mint === 0 ) {
             if (mint === 0) {
-              consoleOutput("<strong>❯ Minting closed!</strong> Join discord for more info! "+"<b><u><a class='pointer' href='https://freshfrogs.github.io/discord'>Join Discord</b></u></a>")
+              consoleOutput("❯ Mint open <strong>Friday April 1st! 04/01/22</strong> Join discord for more info! "+"<b><u><a class='pointer' href='https://discord.gg/xWMFWgpvd3?event=950943812832858172'>Join Discord</b></u></a>")
             }
             if (mintProgress === 1) {
               consoleOutput("<strong>❯</strong> To prevent duplicate transactions the mint button is locked out after one use. <a href='https://freshfrogs.github.io' class='pointer'>Please refresh the page!</a>")
@@ -489,6 +579,7 @@
           document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
           document.getElementById("frogQuant").innerHTML = "  "+frogCount+"  "
           document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
+          document.getElementById("supply").innerHTML = "FROG(s) # "+mintList // Supply
         })
         // ADD FROG to minting tray
         document.querySelector("#addFrog").addEventListener("click", async (e) => {
@@ -520,6 +611,7 @@
           document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
           document.getElementById("frogQuant").innerHTML = "  "+frogCount+"  "
           document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
+          document.getElementById("supply").innerHTML = "FROG(s) # "+mintList // Supply
         })
       })
       // Output to minting terminal
@@ -535,7 +627,7 @@
         newAttribute.id = attribute
         newAttribute.target = "_blank"
         newAttribute.className = "frogType2 pointer"
-        newAttribute.innerHTML = '<img class="frogType" src="../the-pad/'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><b>'+attribute+'</b>'
+        newAttribute.innerHTML = '<img class="frogType" src="./the-pad/'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><b>'+attribute+'</b>'
         document.getElementById("pre").appendChild(newAttribute)
       }
       // Load FROG Types
@@ -585,79 +677,181 @@
         newAttribute.id = "FrogButton"
         newAttribute.className = "frogType2 pointer"
         newAttribute.onClick = "loadFrogs()"
-        newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogType" src="../the-pad/Frog/unknown.png" alt="Frogs" id="Frog"><b>Frogs</b>'
+        newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogType" src="./the-pad/Frog/unknown.png" alt="Frogs" id="Frog"><b>Frogs</b>'
         document.getElementById("pre").appendChild(newAttribute)
         newAttribute = document.createElement("a")
         newAttribute.id = "SpecialFrogButton"
         newAttribute.className = "frogType2 pointer"
-        newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogType" src="../the-pad/SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs"><b>SpecialFrogs</b>'
+        newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogType" src="./the-pad/SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs"><b>SpecialFrogs</b>'
         document.getElementById("pre").appendChild(newAttribute)
       }
       // Random Number
       function randomNumber(min, max) {
         return Math.random() * (max - min) + min;
       }
-      // Load recent mints
-      function recentlyMinted(mostRecent) {
-        for(let i=1; i<=24; i++) {
-          mostRecent2 = mostRecent - i
-          mostRecentDesc = "frog"+i+"Desc"
-          mostRecentLink = "frog"+i+"Link"
-          mostRecentFrog = "frog"+i
+      // Load Minting Tray...
+      function loadMintingTray() {
+        var growTray = document.getElementById('mintingTray');
+        growTray.innerHTML = 
+        '<ul class="downloads2">' +
+        '  <li><a id="mintTransact" href="https://discord.gg/xWMFWgpvd3?event=950943812832858172" class="pointer" target="_blank"><strong>LINK WALLET</strong></a></li>' +
+        '  <li><a id="mintTotal"><strong>0.02 ΞETH</strong>Plus gas</a></li>' +
+        '  <li><a class="pointer"><strong><b id="removeFrog" class="pointer">−</b><frogQuant id="frogQuant">  1  </frogQuant><b id="addFrog" class="pointer">+</b></strong>Quantity</a></li>' +
+        '</ul>' +
+        '<div class="bigContainer">' +
+        '  <div id="frogContainer" class="container">' +
+        '  </div>' +
+        '  <div id="frogContainer2" class="container">' +
+        '  </div>' +
+        '  <div id="frogContainer3" class="container">' +
+        '    <div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.github.io/assets/frogs/preview2.gif"/></div>' +
+        '  </div>' +
+        '</div>' +
+        '<h3 id="supply">FROG 4,040 Total Supply</h3>';
+        document.getElementById("netStatus").innerHTML = '';
+      }
+
+      // Load Minting Terminal...
+      function loadMintingTerminal() {
+        var growTerminal = document.getElementById('growTerminal');
+        if (growTerminal.clientHeight) {
+          growTerminal.style.height = 0;
+        } else {
+          growTerminal.style.height = "100%";
+        }
+      }
+      function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+      // Load recent mints from next token
+      function recentlyMinted(nextToken) {
+        document.getElementById("recentMints").innerHTML = "<br><h3>Recent Mints</h3><hr>"
+        for(let i=1; i<=6; i++) {
+          recentMint = nextToken - i;
+          mostRecentDesc = "frog"+recentMint+"Desc"
+          mostRecentLink = "frog"+recentMint+"Link"
+          mostRecentFrog = "frog"+recentMint
           // <a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+mostRecent2+'" id="'+mostRecentLink+'" target="_blank">
           newFrog = document.createElement("a")
-          newFrog.href = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+mostRecent2
+          newFrog.href = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+recentMint
           newFrog.id = mostRecentLink
           newFrog.target = "_blank"
           newFrog.className = "smallContainer2"
           newFrog.width = randomNumber(64, 128)+"px"
-          newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+mostRecent2+'.png" alt="Frog '+mostRecent2+'" id="frog'+i+'">'
-          document.getElementById("pre").appendChild(newFrog)
+          newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+recentMint+'.png" alt="Frog '+recentMint+'" id="frog'+recentMint+'">'
+          document.getElementById("recentMints").appendChild(newFrog)
         }
-        consoleOutput("<a id='loadRecentMints2' class='pointer' onclick='recentlyMinted("+mostRecent2+")'><u>Load More</u></a></b>");
+        //consoleOutput("<a id='loadRecentMints2' class='pointer' onclick='recentlyMinted(4)'><u>Load More</u></a></b>");
+      }
+      // Random recent mints
+      function randomlyMinted(howMany) {
+        for(let i=1; i<=howMany; i++) {
+          recentMint = getRandomInt(1, 587);
+          mostRecentDesc = "frog"+recentMint+"Desc"
+          mostRecentLink = "frog"+recentMint+"Link"
+          mostRecentFrog = "frog"+recentMint
+          // <a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+mostRecent2+'" id="'+mostRecentLink+'" target="_blank">
+          newFrog = document.createElement("a")
+          newFrog.href = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+recentMint
+          newFrog.id = mostRecentLink
+          newFrog.target = "_blank"
+          newFrog.className = "smallContainer2"
+          newFrog.width = randomNumber(64, 128)+"px"
+          newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+recentMint+'.png" alt="Frog '+recentMint+'" id="frog'+recentMint+'">'
+          document.getElementById("recentMints").appendChild(newFrog)
+        }
+        //consoleOutput("<a id='loadRecentMints2' class='pointer' onclick='recentlyMinted(4)'><u>Load More</u></a></b>");
       }
       //    {% include head-custom.html %}
+      /*
+            <div class="pTimeline">
+              <h3>Staking FROG Tokens</h3>
+              <p>NFT staking refers to locking up non-fungible tokens on a platform or protocol in exchange for staking rewards and other benefits. Staking NFTs allows holders to earn an income from their collection while maintaining ownership. It’s similar to earning interest from a bank account, but without a middleman facilitating transactions and taking a cut.</p>
+              <svg viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <pattern id="img" patternUnits="userSpaceOnUse" width="100" height="100">
+                    <image xlink:href="https://freshfrogs.github.io/frog/66.png" x="-25" width="150" height="100" />
+                    <image xlink:href="https://freshfrogs.github.io/the-pad/Frog/frog.png" x="-25" width="150" height="100" />
+                    <image xlink:href="https://freshfrogs.github.io/the-pad/SpecialFrog/closedEyes.png" x="-25" width="150" height="100" />
+                    <image xlink:href="https://freshfrogs.github.io/the-pad/Trait/darkGreen.png" x="-25" width="150" height="100" />
+                    <image xlink:href="https://freshfrogs.github.io/the-pad/Hat/cowboyHatWhite.png" x="-25" width="150" height="100" />
+                    <image xlink:href="https://freshfrogs.github.io/the-pad/Mouth/tongueFly.png" x="-25" width="150" height="100" />
+                  </pattern>
+                </defs>
+                <polygon points="50 1 95 25 95 75 50 99 5 75 5 25" fill="url(#img)"/>
+              </svg>
+              <h4>(N)ew (F)rog (T)oken</h4>
+            </div>
+      */
     </script>
-  <div class="top">{{ content }}</div>
+    <div class="top">
+      {{ content }}
+    </div>
   </head>
   <body class="bodyb">
     <div class="wrapper">
       <header>
         <div class="downloads pre">
-          <a class="pointer" style="margin-top: 2%;" href="https://freshfrogs.github.io/the-pad"><b>🍄 <u>Frog Morph</u></b> ↗️</a><strong id="supply">4,040 Total Supply</strong>
-          <ul class="downloads2">
-            <li><a id="mintTransact" href="" class="pointer"><strong>⛔LINK WALLET</strong></a></li>
-            <li><a id="mintTotal"><strong>0.02 ΞETH</strong>Plus gas</a></li>
-            <li><a class="pointer"><strong><u id="removeFrog" class="pointer">⇦</u><frogQuant id="frogQuant">  1  </frogQuant><u id="addFrog" class="pointer">⇨</u></strong>Quantity</a></li>
-          </ul>
-          <div class="bigContainer">
-            <div id="frogContainer" class="container">
-            </div>
-            <div id="frogContainer2" class="container">
-            </div>
-            <div id="frogContainer3" class="container">
-              <div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.github.io/assets/frogs/preview2.gif" /></div>
-            </div>
+          <div id="mintingTray"></div>
+          <div id="netStatus">
+            <br>
+            <h2>FROG 4,040 Total Supply</h2>
+            Please connect an Ethereum wallet...
+            <b><a class="pointer" href="https://freshfrogs.github.io/">Connect Wallet</a></b>
+            <hr class="hr2">Don't have a wallet?...
+            <b><a class="pointer" href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b>
+            <hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>
           </div>
         </div>
       </header>
       <section>
         <h2><strong><a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank">Fresh Frogs NFT 'FROG' ERC-721</a></strong></h2>
-        <div></div>
-        <br>
         <div class="downloads pre">
-          <div id="pre">
-            <div id="netStatus">Please connect an Ethereum wallet... <b><a class="pointer" href="https://freshfrogs.github.io/">Connect</a></b><br>Don't have a wallet?... <b><a class="pointer" href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b></div>
+          <div id='growTerminal'>
+            <div class='measuringWrapper'>
+              <div id="pre">
+              </div>
+              <div id="recentMints"></div><hr>
+            </div>
           </div>
           <br>
-          <headline class="headLine2">
-            <a href="https://twitter.com/FreshFrogs_NFT" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/twitter.png"></a>
-            <a href="https://discord.gg/t84NyjpS3H" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/discord.png"></a>
-            <a href="https://opensea.io/collection/fresh-frogs" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/opensea.png"></a>
-            <a href="https://rarible.com/fresh-frogs" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/Rarible.png"></a>
-            <a href="https://nftcalendar.io/event/fresh-frogs-nft-collection-release/" target="_blank" style="display: inline !important;"><img background="white" class="headLineImg" src="../assets/nftCalendar.png"></a>
-            <a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/etherScan.png"></a>
-          </headline>
+          <div class="divTimeline">
+            <img style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="./assets/frogs/FLY.gif">
+            <h4>What is Fresh Frogs NFT?</h4>
+            <div class="pTimeline">
+              <p>Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
+              <b>Ethereum Blockchain</b><a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b">ERC-721 Standard 0xBE4B..C51b ↗️</a>
+              <hr class="hr2">
+              <headline class="headLine2">
+                <a href="https://twitter.com/FreshFrogs_NFT" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/twitter.png"></a>
+                <a href="https://discord.gg/t84NyjpS3H" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/discord.png"></a>
+                <a href="https://opensea.io/collection/fresh-frogs" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/opensea.png"></a>
+                <a href="https://nftcalendar.io/event/fresh-frogs-nft-collection-release/" target="_blank" style="display: inline !important;"><img background="white" class="headLineImg" src="./assets/nftCalendar.png"></a>
+                <a href="https://nftdroops.com/nft/fresh-frogs/" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/droops2.png"></a>
+                <a href="https://rarible.com/fresh-frogs/" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/Rarible.png"></a>
+                <a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/etherScan.png"></a>
+              </headline>
+            </div>
+            <div class="pTimeline">
+              <h3>Initial Public Mint</h3><u>Friday, Febuary 11th, 2022</u>
+              <p>The first 404 frogs from the collection made available to mint for FREE! Then re-opened exclusively for discord members! Totaling <b>580+ Frogs</b> between 110+ different holders!</p>
+            </div>
+            <div class="pTimeline">
+              <h3>Secondary Public Mint</h3><u>Friday, April 1st, 2022</u>
+              <p>A limited supply of <b>1,212 Frogs</b> will be available to mint for <b>0.02 ΞETH</b></p>
+            </div>
+            <div class="pTimeline">
+              <h3>Final Release</h3><u>Date To Be Decided</u>
+              <p>Remaining supply of <b>2,020 Frogs</b> will be available to mint for <b>0.04 ΞETH</b></p>
+            </div>
+            <div class="pTimeline">
+              <h3>Frog Token Combinations!</h3>
+              <p>After the full collection of <b>4,040 Frogs</b> has been minted, Frog holders will be able to "Morph" their Frogs into a new NFT on Ethereum, combining their attributes and traits! Frog owners can try out this feature at <a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a></p>
+              <img href="./the-pad" style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="./assets/frogs/morphTray.png">
+            </div>
+          </div>
         </div>
       </section>
     </div>
