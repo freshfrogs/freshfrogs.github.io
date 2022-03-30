@@ -285,15 +285,13 @@
     border: none;
   }
   .pre {
-    background: white;
-    border-radius: 5px;
-    border: 1px solid lightgrey;
-    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
+    border-radius: 2%;
     text-align: center;
     padding: 0px;
     margin-bottom: 8px;
     width: 100%;
     height: 100%;
+    box-shadow: none;
   }
   .frogType {
     transition: transform .2s;
@@ -391,10 +389,17 @@
   }
   .mintingText {
     background-color: #99ffc5;
-    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
-    padding: 4px;
     border-radius: 5px;
     border: 1px solid lightgrey;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
+    padding: 4px;
+  }
+  .mintingTerminal {
+    background: white;
+    border-radius: 5px;
+    border: 1px solid lightgrey;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
+    padding: 4px;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -820,7 +825,7 @@
         <div class="downloads pre">
           <div id='growTerminal'>
             <div class='measuringWrapper'>
-              <div id="pre">
+              <div id="pre" class="mintingTerminal">
               </div>
               <div id="recentMints"></div><hr>
             </div>
