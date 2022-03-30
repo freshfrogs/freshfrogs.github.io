@@ -387,15 +387,14 @@
     transition: height .5s;
     height: 0;
   }
-  .mintingText {
-    background-color: #99ffc5;
+  .mintingTextGreen {
     border-radius: 5px;
-    border: 1px solid lightgrey;
+    background-color: #99ffc5;
     box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
     padding: 4px;
   }
-  .mintingTerminal {
-    background: white;
+  .mintingTextWhite {
+    background-color: white;
     border-radius: 5px;
     border: 1px solid lightgrey;
     box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
@@ -546,7 +545,7 @@
             }
           } else {
             mintProgress = 1;
-            consoleOutput("<br>\n<strong><u>Minting ("+frogCount+") FROG Tokens</u></strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo Not Leave This Page")
+            consoleOutput("<br><div id='mintingText' class='mintingTextWhite'><strong><u>Minting ("+frogCount+") FROG Tokens</u></strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo Not Leave This Page</div>")
             try {
               if (highPriority === 1) {
                 let tokens = await f0.mint(mintInviteCode, frogCount)
@@ -564,7 +563,9 @@
                   return token.links.opensea
                 })
               }
-              consoleOutput("<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.github.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>")
+              document.getElementById('mintingText').innerHTML = "<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.github.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>"
+              document.getElementById('mintingText').className = "mintingTextGreen"
+              //consoleOutput("<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.github.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>")
             } catch (e) {
               consoleOutput("<br>\n<strong>❯</strong> ⚠️ <strong><b>Transaction Error:</b></strong> <br>\n"+JSON.stringify(e.message)+"<br>\n<u>If you believe this to be a mistake, please <b><a href='https://freshfrogs.github.io/discord'>Report it Here</u></a></b>")
             }            
@@ -825,7 +826,7 @@
         <div class="downloads pre">
           <div id='growTerminal'>
             <div class='measuringWrapper'>
-              <div id="pre" class="mintingTerminal">
+              <div id="pre">
               </div>
               <div id="recentMints"></div><hr>
             </div>
