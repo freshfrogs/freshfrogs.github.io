@@ -410,7 +410,7 @@
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
-  <link rel="icon" href="./assets/logo.png">
+  <link rel="icon" href="../assets/logo.png">
   <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -676,7 +676,7 @@
         newAttribute.id = attribute
         newAttribute.target = "_blank"
         newAttribute.className = "frogType2 pointer"
-        newAttribute.innerHTML = '<img class="frogType" src="./the-pad/'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><b>'+attribute+'</b>'
+        newAttribute.innerHTML = '<img class="frogType" src="../the-pad/'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><b>'+attribute+'</b>'
         document.getElementById("pre").appendChild(newAttribute)
       }
       // Load FROG Types
@@ -726,12 +726,12 @@
         newAttribute.id = "FrogButton"
         newAttribute.className = "frogType2 pointer"
         newAttribute.onClick = "loadFrogs()"
-        newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogType" src="./the-pad/Frog/unknown.png" alt="Frogs" id="Frog"><b>Frogs</b>'
+        newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogType" src="../the-pad/Frog/unknown.png" alt="Frogs" id="Frog"><b>Frogs</b>'
         document.getElementById("pre").appendChild(newAttribute)
         newAttribute = document.createElement("a")
         newAttribute.id = "SpecialFrogButton"
         newAttribute.className = "frogType2 pointer"
-        newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogType" src="./the-pad/SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs"><b>SpecialFrogs</b>'
+        newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogType" src="../the-pad/SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs"><b>SpecialFrogs</b>'
         document.getElementById("pre").appendChild(newAttribute)
       }
       // Random Number
@@ -867,20 +867,20 @@
           </div>
           <br>
           <div class="divTimeline">
-            <img style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="./assets/frogs/FLY.gif">
+            <img style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="../assets/frogs/FLY.gif">
             <h4>What is Fresh Frogs NFT?</h4>
             <div class="pTimeline">
               <p>Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
               <b>Ethereum Blockchain</b><a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b">ERC-721 Standard 0xBE4B..C51b ↗️</a>
               <hr class="hr2">
               <headline class="headLine2">
-                <a href="https://twitter.com/FreshFrogs_NFT" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/twitter.png"></a>
-                <a href="https://discord.gg/t84NyjpS3H" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/discord.png"></a>
-                <a href="https://opensea.io/collection/fresh-frogs" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/opensea.png"></a>
-                <a href="https://nftcalendar.io/event/fresh-frogs-nft-collection-release/" target="_blank" style="display: inline !important;"><img background="white" class="headLineImg" src="./assets/nftCalendar.png"></a>
-                <a href="https://nftdroops.com/nft/fresh-frogs/" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/droops2.png"></a>
-                <a href="https://rarible.com/fresh-frogs/" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/Rarible.png"></a>
-                <a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/etherScan.png"></a>
+                <a href="https://twitter.com/FreshFrogs_NFT" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/twitter.png"></a>
+                <a href="https://discord.gg/t84NyjpS3H" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/discord.png"></a>
+                <a href="https://opensea.io/collection/fresh-frogs" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/opensea.png"></a>
+                <a href="https://nftcalendar.io/event/fresh-frogs-nft-collection-release/" target="_blank" style="display: inline !important;"><img background="white" class="headLineImg" src="../assets/nftCalendar.png"></a>
+                <a href="https://nftdroops.com/nft/fresh-frogs/" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/droops2.png"></a>
+                <a href="https://rarible.com/fresh-frogs/" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/Rarible.png"></a>
+                <a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/etherScan.png"></a>
               </headline>
             </div>
             <div class="pTimeline">
@@ -901,7 +901,7 @@
             <div class="pTimeline">
               <h3>Frog Token Combinations!</h3>
               <p>After the full collection of <b>4,040 Frogs</b> has been minted, Frog holders will be able to "Morph" their Frogs into a new NFT on Ethereum, combining their attributes and traits! Frog owners can try out this feature at <a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a></p>
-              <img href="./the-pad" style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="./assets/frogs/morphTray.png">
+              <img href="../the-pad" style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="../assets/frogs/morphTray.png">
             </div>
           </div>
         </div>
