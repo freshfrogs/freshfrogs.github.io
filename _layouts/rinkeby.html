@@ -480,7 +480,7 @@
         myInviteFound = "0x0000000000000000000000000000000000000000000000000000000000000000"
         mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
         mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
-
+        testGetFrogs(userAcc);
         // Load minting Tray / Terminal
         loadMintingTerminal();
         loadMintingTray();
@@ -543,7 +543,6 @@
         })
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-          testGetFrogs();
           if (mint === 0) {
             if (mint === 0) {
               consoleOutput("❯ Mint open <strong>Friday April 1st! 04/01/22</strong> Join discord for more info! "+"<b><u><a class='pointer' href='https://discord.gg/xWMFWgpvd3?event=950943812832858172'>Join Discord</b></u></a>")
@@ -656,8 +655,8 @@
         document.getElementById("pre").appendChild(newAttribute)
       }
       // Test function
-      async function testGetFrogs() {
-        collection.defaultAccount = userAcc
+      async function testGetFrogs(thisAcc) {
+        collection.defaultAccount = thisAcc
         let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
         incomingTokenTransferEvents.forEach( (event) => alert(event.returnValues));
       }
