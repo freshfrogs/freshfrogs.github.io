@@ -518,7 +518,7 @@
         recentlyMinted(nextIdC);
         collection.defaultAccount = userAcc
         let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
-        incomingTokenTransferEvents.forEach( (event) => alert(JSON.stringify(event.returnValues)));
+        incomingTokenTransferEvents.forEach( (event) => alert(JSON.stringify(event.receipt)));
         //loadFrogMenu();
 
 
