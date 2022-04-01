@@ -500,7 +500,7 @@
         let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
         incomingTokenTransferEvents.forEach( (event) => checkFrogToken(event.returnValues.tokenId));
         function checkFrogToken(frogID){
-          if (frogID > 1) {
+          if (frogID > 587) {
             useInvite = "false";
           }
         }
