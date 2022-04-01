@@ -387,6 +387,27 @@
     transition: height .5s;
     height: 0;
   }
+  .mintingTextGreen {
+    background-color: #99ffc5;
+    border-radius: 5px;
+    border: 0px solid white;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
+    padding: 4px;
+  }
+  .mintingTextWhite {
+    background-color: #faff99;
+    border-radius: 5px;
+    border: 0px solid white;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
+    padding: 4px;
+  }
+  .mintingTextRed {
+    background-color: #ff99b6;
+    border-radius: 5px;
+    border: 0px solid white;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
+    padding: 4px;
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="./assets/logo.png">
@@ -523,7 +544,7 @@
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           //
-          if (mint === 0 ) {
+          if (mint === 0) {
             if (mint === 0) {
               consoleOutput("❯ Mint open <strong>Friday April 1st! 04/01/22</strong> Join discord for more info! "+"<b><u><a class='pointer' href='https://discord.gg/xWMFWgpvd3?event=950943812832858172'>Join Discord</b></u></a>")
             }
@@ -532,7 +553,7 @@
             }
           } else {
             mintProgress = 1;
-            consoleOutput("<br>\n<strong><u>Minting ("+frogCount+") FROG Tokens</u></strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo Not Leave This Page")
+            consoleOutput("<br><div id='mintingText' class='mintingTextWhite'><strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the Page!</div>")
             try {
               if (highPriority === 1) {
                 let tokens = await f0.mint(mintInviteCode, frogCount)
@@ -550,9 +571,13 @@
                   return token.links.opensea
                 })
               }
-              consoleOutput("<br><div class='learnMoreFM'><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.github.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>")
+              document.getElementById('mintingText').innerHTML = "<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3> <b>"+frogCount+" FROG(s) </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.github.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>"
+              document.getElementById('mintingText').className = "mintingTextGreen"
+              //consoleOutput("<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.github.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>")
             } catch (e) {
-              consoleOutput("<br>\n<strong>❯</strong> ⚠️ <strong><b>Transaction Error:</b></strong> <br>\n"+JSON.stringify(e.message)+"<br>\n<u>If you believe this to be a mistake, please <b><a href='https://freshfrogs.github.io/discord'>Report it Here</u></a></b>")
+              document.getElementById('mintingText').innerHTML = "<br>\n<strong><b>❌Transaction Failed!</b></strong> <br>\n"+JSON.stringify(e.message)
+              document.getElementById('mintingText').className = "mintingTextRed"
+              //consoleOutput("<br>\n<strong>❯</strong> ⚠️ <strong><b>Transaction Error:</b></strong> <br>\n"+JSON.stringify(e.message)+"<br>\n<u>If you believe this to be a mistake, please <b><a href='https://freshfrogs.github.io/discord'>Report it Here</u></a></b>")
             }            
           }
         })
