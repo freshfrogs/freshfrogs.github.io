@@ -583,8 +583,6 @@
       }
       // Connect Wallet
       async function connectWallet() {
-        localStorage.removeItem('walletconnect')
-        localStorage.removeItem('WALLETCONNECT_DEEPLINK_CHOICE')
         const web3Modal = new Web3Modal.default({
           network: "rinkeby",
           cacheProvider: false,
