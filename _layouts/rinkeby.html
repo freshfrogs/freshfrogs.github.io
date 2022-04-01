@@ -571,33 +571,29 @@
             mintProgress = 1;
             consoleOutput("<br><div id='mintingText' class='mintingTextWhite'><strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the Page!</div>")
             try {
-              if (inviteApplied == "true") {
-                alert("invite")
-                if (frogCount > 1) {
-                  alert("frogs+")
-                }
-                //document.getElementById('mintingText').innerHTML = "<br>\n<strong><b>❌Transaction Failed!</b></strong> <br>This invite code is only valid for ONE Frog!"
-                //document.getElementById('mintingText').className = "mintingTextRed"
-              }
-              if (highPriority === 1) {
-                let tokens = await f0.mint(mintInviteCode, frogCount)
-                var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
-                  return token.links.opensea
-                })
+              if (inviteApplied == "true" && frogCount > 1) {
+                document.getElementById('mintingText').innerHTML = "<br>\n<strong><b>❌Transaction Failed!</b></strong> <br>This invite code is only valid for ONE Frog!"
+                document.getElementById('mintingText').className = "mintingTextRed"
               } else {
-                let cost = await f0.cost()
-                let averageGwei = cost.gas.average / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
-                let averageWei = averageGwei * Math.pow(10, 9)
-                let tokens = await f0.mint(mintInviteCode, frogCount, {
-                  gasPrice: "" + averageWei  // the gasPrice must be a string value of the number
-                })
-                var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
-                  return token.links.opensea
-                })
+                if (highPriority === 1) {
+                  let tokens = await f0.mint(mintInviteCode, frogCount)
+                  var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
+                    return token.links.opensea
+                  })
+                } else {
+                  let cost = await f0.cost()
+                  let averageGwei = cost.gas.average / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
+                  let averageWei = averageGwei * Math.pow(10, 9)
+                  let tokens = await f0.mint(mintInviteCode, frogCount, {
+                    gasPrice: "" + averageWei  // the gasPrice must be a string value of the number
+                  })
+                  var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
+                    return token.links.opensea
+                  })
+                }
+                document.getElementById('mintingText').innerHTML = "<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3> <b>"+frogCount+" FROG(s) </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.github.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>"
+                document.getElementById('mintingText').className = "mintingTextGreen"
               }
-              document.getElementById('mintingText').innerHTML = "<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3> <b>"+frogCount+" FROG(s) </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.github.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>"
-              document.getElementById('mintingText').className = "mintingTextGreen"
-              //consoleOutput("<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3>"+"<b>FROG(s) #"+mintList+" </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.github.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>")
             } catch (e) {
               document.getElementById('mintingText').innerHTML = "<br>\n<strong><b>❌Transaction Failed!</b></strong> <br>\n"+JSON.stringify(e.message)
               document.getElementById('mintingText').className = "mintingTextRed"
