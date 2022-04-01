@@ -332,9 +332,11 @@
       document.addEventListener("DOMContentLoaded", async () => {
         // consoleOutput("<strong>❯</strong> Minting closed! Join discord for more info!"+"<b><u><a class='pointer' href='https://freshfrogs.github.io/discord'>Join Discord</b></u></a>")
         consoleOutput('<br>\n'+'Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b><br>')
-        //
+        localStorage.removeItem('walletconnect')
+        localStorage.removeItem('WALLETCONNECT_DEEPLINK_CHOICE')
+        alert("test")
         const web3Modal = new Web3Modal.default({
-          network: { network: "rinkeby" },
+          network: "rinkeby",
           cacheProvider: false,
           providerOptions: {
             walletconnect: {
@@ -346,6 +348,7 @@
             }
           }
         });
+        alert("test2")
         let provider = await web3Modal.connect();
         const web3 = new Web3(provider);
         //
