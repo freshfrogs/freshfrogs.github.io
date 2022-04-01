@@ -542,7 +542,7 @@
           document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
         })
         // test functions
-        function writeToFile(d1, d2){
+        function writeToFile(){
           // Requiring fs module in which
           // writeFile function is defined.
           const fs = require('fs')
@@ -560,7 +560,7 @@
         //
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-          writeToFile("USER: ", "test");
+          writeToFile();
           if (mint === 0) {
             if (mint === 0) {
               consoleOutput("❯ Mint open <strong>Friday April 1st! 04/01/22</strong> Join discord for more info! "+"<b><u><a class='pointer' href='https://discord.gg/xWMFWgpvd3?event=950943812832858172'>Join Discord</b></u></a>")
