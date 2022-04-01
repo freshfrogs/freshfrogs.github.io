@@ -541,26 +541,15 @@
           consoleOutput("<br>"+"\n<strong>❯</strong> [ ! ] Invite code applied... Valid for <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>")
           document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
         })
-        // test functions
-        function writeToFile(){
-          // Requiring fs module in which
-          // writeFile function is defined.
-          const fs = require('fs')
-            
-          // Data which will write in a file.
-          let data = "Learning how to write in a file."
-            
-          // Write data in 'Output.txt' .
-          fs.writeFile('data.txt', data, (err) => {
-                
-              // In case of a error throw err.
-              if (err) throw err;
-          })
+        // Test function
+        async function testGetFrogs(){
+          collection.defaultAccount = userAcc
+          let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
+          incomingTokenTransferEvents.forEach( (event) => alert(event.returnValues));
         }
-        //
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-          writeToFile();
+          //
           if (mint === 0) {
             if (mint === 0) {
               consoleOutput("❯ Mint open <strong>Friday April 1st! 04/01/22</strong> Join discord for more info! "+"<b><u><a class='pointer' href='https://discord.gg/xWMFWgpvd3?event=950943812832858172'>Join Discord</b></u></a>")
