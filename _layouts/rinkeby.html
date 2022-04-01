@@ -448,7 +448,7 @@
           document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <strong>❯ Connecting...</strong>"
           } catch (e) {
             loadMintingTerminal();
-            consoleOutput("<br>"+"<div style='border-bottom: 1px solid black;'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong></div>")
+            consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong></div>")
         }
 
         // VARIABLES
