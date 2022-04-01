@@ -656,6 +656,7 @@
       }
       // Test function
       async function testGetFrogs(thisAcc) {
+        alert("test")
         collection.defaultAccount = thisAcc
         let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
         incomingTokenTransferEvents.forEach( (event) => alert(event.returnValues));
