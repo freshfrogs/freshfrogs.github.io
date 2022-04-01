@@ -334,7 +334,7 @@
         consoleOutput('<br>\n'+'Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b><br>')
         //
         const web3Modal = new Web3Modal.default({
-          network: "rinkeby",
+          network: { network: "rinkeby" },
           cacheProvider: false,
           providerOptions: {
             walletconnect: {
