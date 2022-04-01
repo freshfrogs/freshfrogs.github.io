@@ -502,7 +502,7 @@
           let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
           incomingTokenTransferEvents.forEach( (event) => checkFrogToken(event.returnValues.tokenId));
           function checkFrogToken(frogID){
-            if (frogID > 1) {
+            if (frogID > 587) {
               useInvite = "false";
             }
           }
@@ -569,7 +569,7 @@
             mintProgress = 1;
             consoleOutput("<br><div id='mintingText' class='mintingTextWhite'><strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the Page!</div>")
             try {
-              if (inviteApplied == "true" && frogCount > 587) {
+              if (inviteApplied == "true" && frogCount > 1) {
                 document.getElementById('mintingText').innerHTML = "<br>\n<strong><b>❌Transaction Failed!</b></strong> <br>This invite code is only valid for ONE FROG!"
                 document.getElementById('mintingText').className = "mintingTextRed"
               } else {
