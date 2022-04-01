@@ -571,9 +571,13 @@
             mintProgress = 1;
             consoleOutput("<br><div id='mintingText' class='mintingTextWhite'><strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the Page!</div>")
             try {
-              if (inviteApplied == "true" && frogCount > 1) {
-                document.getElementById('mintingText').innerHTML = "<br>\n<strong><b>❌Transaction Failed!</b></strong> <br>This invite code is only valid for ONE Frog!"
-                document.getElementById('mintingText').className = "mintingTextRed"
+              if (inviteApplied == "true") {
+                alert("invite")
+                if (frogCount > 1) {
+                  alert("frogs+")
+                }
+                //document.getElementById('mintingText').innerHTML = "<br>\n<strong><b>❌Transaction Failed!</b></strong> <br>This invite code is only valid for ONE Frog!"
+                //document.getElementById('mintingText').className = "mintingTextRed"
               }
               if (highPriority === 1) {
                 let tokens = await f0.mint(mintInviteCode, frogCount)
