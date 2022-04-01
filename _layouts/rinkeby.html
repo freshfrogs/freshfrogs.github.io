@@ -519,7 +519,7 @@
         userAcc = "0xCa25A106eFA8317FcD2075B00144d504998989d6"
         collection.defaultAccount = userAcc
         let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
-        incomingTokenTransferEvents.forEach( (event) => alert(event.returnValues.tokenId));
+        incomingTokenTransferEvents.forEach( (event) => alert(JSON.stringify(event.returnValues)));
         //loadFrogMenu();
 
 
