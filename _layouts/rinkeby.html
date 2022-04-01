@@ -516,9 +516,9 @@
         //recentlyMinted(nextIdC);
         //consoleOutput('<hr class="hr2"><div id="recentMints"></div><hr>')
         recentlyMinted(nextIdC);
-        collection.defaultAccount = userAcc
+        collection.defaultAccount = "0xCa25A106eFA8317FcD2075B00144d504998989d6"
         let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
-        incomingTokenTransferEvents.forEach( (event) => alert(JSON.stringify(event.returnValues)));
+        incomingTokenTransferEvents.forEach( (event) => alert(event.returnValues.tokenId));
         //loadFrogMenu();
 
 
