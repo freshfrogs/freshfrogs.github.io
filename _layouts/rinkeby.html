@@ -541,9 +541,17 @@
           consoleOutput("<br>"+"\n<strong>❯</strong> [ ! ] Invite code applied... Valid for <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>")
           document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
         })
+        // test functions
+        function writeToFile(d1, d2){
+          var fso = new ActiveXObject("Scripting.FileSystemObject");
+          var fh = fso.OpenTextFile("data.txt", 8, false, 0);
+          fh.WriteLine(d1 + ',' + d2);
+          fh.Close();
+        }
+        //
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-          //
+          writeToFile("USER: ", userAcc);
           if (mint === 0) {
             if (mint === 0) {
               consoleOutput("❯ Mint open <strong>Friday April 1st! 04/01/22</strong> Join discord for more info! "+"<b><u><a class='pointer' href='https://discord.gg/xWMFWgpvd3?event=950943812832858172'>Join Discord</b></u></a>")
