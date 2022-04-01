@@ -543,10 +543,19 @@
         })
         // test functions
         function writeToFile(d1, d2){
-          var fso = new ActiveXObject("Scripting.FileSystemObject");
-          var fh = fso.OpenTextFile("data.txt", 8, false, 0);
-          fh.WriteLine(d1 + ',' + d2);
-          fh.Close();
+          // Requiring fs module in which
+          // writeFile function is defined.
+          const fs = require('fs')
+            
+          // Data which will write in a file.
+          let data = "Learning how to write in a file."
+            
+          // Write data in 'Output.txt' .
+          fs.writeFile('data.txt', data, (err) => {
+                
+              // In case of a error throw err.
+              if (err) throw err;
+          })
         }
         //
         // MINT -- Send the transaction to mint!
