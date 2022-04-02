@@ -505,7 +505,7 @@
           incomingTokenTransferEvents.forEach( (event) => checkFrogToken(event.returnValues.tokenId));
           function checkFrogToken(frogID){
             if (frogID > 587) {
-              useInvite = "false";
+              useInvite = "notSet";
             }
           }
           if (useInvite !== "false") {
