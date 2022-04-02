@@ -552,7 +552,7 @@
      //   })
         // Apply -- Apply Invite
         document.querySelector("#setInvite").addEventListener("click", async (e) => {
-          if (inviteValid == "true") {
+          if (inviteValid === "true") {
             mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
             mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
             mintInviteCode = myInviteFound
