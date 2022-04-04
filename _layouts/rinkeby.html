@@ -563,10 +563,10 @@
                 })
               } else {
                 let cost = await f0.cost()
-                let averageGwei = cost.gas.safeLow / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
+                let averageGwei = cost.gas.average / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
                 let averageWei = averageGwei * Math.pow(10, 9)
                 let tokens = await f0.mint(mintInviteCode, frogCount, {
-                  gasPrice: "" + (averageWei+10)  // the gasPrice must be a string value of the number
+                  gasPrice: "" + averageWei  // the gasPrice must be a string value of the number
                 })
                 var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
                   return token.links.opensea
