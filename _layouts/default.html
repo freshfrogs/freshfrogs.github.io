@@ -497,27 +497,17 @@
         //consoleOutput('Browse the collection on OpenSea... <b><a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop Collection 🛒</a></b>'+'<br>\n')
         //consoleOutput("Public minting price... <strong> FROG(s) @ "+mintPrice+" ΞETH</strong>") //("<b>Minting begins Sunday, 02/06/2022. \nJoin discord and follow on twitter to get on the FREE mint whitelist<b>")
         //consoleOutput("<b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint... <b><a href='https://freshfrogs.github.io/collection' class='pointer'>View Collection</a></b>")
-        inviteValid = "false"
-        if (myInvitesKeys[1] === "0x0fc1b419dbc8f244844e1813ced6ddb77e341d0940d488f419d96c032fe2f45e") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550 NEW: 0x0fc1b419dbc8f244844e1813ced6ddb77e341d0940d488f419d96c032fe2f45e
-          useInvite = "notSet"
-          collection.defaultAccount = userAcc
-          let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
-          incomingTokenTransferEvents.forEach( (event) => checkFrogToken(event.returnValues.tokenId));
-          function checkFrogToken(frogID){
-            if (frogID > 587) {
-              useInvite = "false";
-            }
+        consoleOutput("Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>")
+        for (var i = 0; i < myInvitesKeys.length; i++){
+          inviteLoopThis = myInvitesKeys[i]
+          if (inviteLoopThis === "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d") {
+            myInviteFound = inviteLoopThis
+            mintPrice = JSON.stringify(myInvites[inviteCode].condition.converted.eth, inviteCode, 1)
+            mintLimit = JSON.stringify(myInvites[inviteCode].condition.converted.limit, inviteCode, 1)
+            mintInviteCode = inviteCode
+            consoleOutput("<br>"+"\n<strong>❯</strong> [ ! ] Invite code applied... Valid for <strong>ONE FROG(s) @ "+mintPrice+" ΞETH</strong>")
+            document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
           }
-          if (useInvite !== "false") {
-
-            myInviteFound = "0x0fc1b419dbc8f244844e1813ced6ddb77e341d0940d488f419d96c032fe2f45e"
-            inviteValid = "true"
-            consoleOutput("Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>"+"<br>\nAn invite was found coupled with this address... <b><a id='setInvite' class='pointer' href=''>Apply</u></a></b>")
-          } else {
-            consoleOutput("Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>\n<a id='setInvite' class='pointer'></a>")
-          }
-        } else { 
-          consoleOutput("Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>\n<a id='setInvite' class='pointer'></a>")
         }
         //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
         //document.getElementById("supply").innerHTML = "<b><strong><a style='color: #222 !important;' href='https://opensea.io/collection/fresh-frogs' target='_blank'>ℹ️ ("+nextIdC+"/4040) Total Supply</a></strong></b>"
