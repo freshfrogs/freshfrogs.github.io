@@ -505,7 +505,7 @@
         }
         //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
         //document.getElementById("supply").innerHTML = "<b><strong><a style='color: #222 !important;' href='https://opensea.io/collection/fresh-frogs' target='_blank'>ℹ️ ("+nextIdC+"/4040) Total Supply</a></strong></b>"
-        consoleOutput("<hr class='hr2'><b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint...\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
+        consoleOutput("<hr class='hr2'><b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint...");//\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
         document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
         document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
@@ -525,10 +525,10 @@
     // END OF LOADING PAGE ----------------------------------------->
      // EVENTS ------------------------------------------------------------------------------------------------------->
         // Set safeLow -- Set suggested gas fee to lowest setting
-        document.querySelector("#HTP").addEventListener("click", async (e) => {
-          consoleOutput("<br>"+"<strong>❯</strong> The lowest possible gas fee will now be requested!")
-          highPriority = 0;
-        })
+//        document.querySelector("#HTP").addEventListener("click", async (e) => {
+//          consoleOutput("<br>"+"<strong>❯</strong> The lowest possible gas fee will now be requested!")
+//          highPriority = 0;
+//        })
 
         // View Collection -- Load Recent Mints
      //   document.querySelector("#loadRecentMints").addEventListener("click", async (e) => {
@@ -556,22 +556,10 @@
             mintProgress = 1;
             consoleOutput("<br><div id='mintingText' class='mintingTextWhite'><strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the Page!</div>")
             try {
-              if (highPriority === 1) {
-                let tokens = await f0.mint(mintInviteCode, frogCount)
-                var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
-                  return token.links.opensea
-                })
-              } else {
-                let cost = await f0.cost()
-                let averageGwei = cost.gas.average / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
-                let averageWei = averageGwei * Math.pow(10, 9)
-                let tokens = await f0.mint(mintInviteCode, frogCount, {
-                  gasPrice: "" + averageWei  // the gasPrice must be a string value of the number
-                })
-                var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
-                  return token.links.opensea
-                })
-              }
+              let tokens = await f0.mint(mintInviteCode, frogCount)
+              var openseaTest = tokens.map((token) => { // return opensea link for newly minted token
+                return token.links.opensea
+              })
               document.getElementById('mintingText').innerHTML = "<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3> <b>"+frogCount+" FROG(s) </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.github.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>"
               document.getElementById('mintingText').className = "mintingTextGreen"
             } catch (e) {
