@@ -498,7 +498,7 @@
         //consoleOutput("Public minting price... <strong> FROG(s) @ "+mintPrice+" ΞETH</strong>") //("<b>Minting begins Sunday, 02/06/2022. \nJoin discord and follow on twitter to get on the FREE mint whitelist<b>")
         //consoleOutput("<b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint... <b><a href='https://freshfrogs.github.io/collection' class='pointer'>View Collection</a></b>")
         inviteValid = "false"
-        if (myInvitesKeys[2] === "0x0fc1b419dbc8f244844e1813ced6ddb77e341d0940d488f419d96c032fe2f45e") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550 NEW: 0x0fc1b419dbc8f244844e1813ced6ddb77e341d0940d488f419d96c032fe2f45e
+        if (myInvitesKeys[1] === "0x0fc1b419dbc8f244844e1813ced6ddb77e341d0940d488f419d96c032fe2f45e") { // testnet inv 0x6697b8afb461b284f8f1c7bdc9a7437ca414ea08433ac2c83f07c7f7f342d550 NEW: 0x0fc1b419dbc8f244844e1813ced6ddb77e341d0940d488f419d96c032fe2f45e
           useInvite = "notSet"
           collection.defaultAccount = userAcc
           let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
