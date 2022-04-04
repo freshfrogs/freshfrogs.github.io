@@ -477,6 +477,7 @@
         mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
         mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
         inviteApplied = "false"
+        inviteApplied2 = "false"
 
         // Load minting Tray / Terminal
         loadMintingTerminal();
@@ -502,11 +503,12 @@
             mintInviteCode = myInviteFound
             if (userAcc === "0x20eCF9EceCc84AdaEb71FbA016706DA4B9d8f6De".toLowerCase() || userAcc === "0xf0552a5A9ef0658978a0b9bf73E75050f41EC9cb".toLowerCase()) {
               consoleOutput("<br>"+"\n<strong>❯</strong> [ ! ] Invite code applied... Valid for <strong>TWO FROG(s) @ "+mintPrice+" ΞETH</strong>")
+              inviteApplied2 = "true"
             } else {
               consoleOutput("<br>"+"\n<strong>❯</strong> [ ! ] Invite code applied... Valid for <strong>ONE FROG(s) @ "+mintPrice+" ΞETH</strong>")
+              inviteApplied = "true"
             }
             document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
-            inviteApplied = "true"
             break;
           }
         }
@@ -527,15 +529,11 @@
             mintProgress = 1;
             consoleOutput("<br><div id='mintingText' class='mintingTextWhite'><strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the Page!</div>")
             if (inviteApplied == "true" && frogCount > 1) {
-              if (userAcc === "0x20eCF9EceCc84AdaEb71FbA016706DA4B9d8f6De".toLowerCase() || userAcc === "0xf0552a5A9ef0658978a0b9bf73E75050f41EC9cb".toLowerCase()) {
-                if (frogCount > 2) {
-                  document.getElementById('mintingText').innerHTML = "<br>\n<strong><b>❌Transaction Failed!</b></strong> <br>This invite code is only valid for TWO FROGS!"
-                  document.getElementById('mintingText').className = "mintingTextRed"
-                }
-              } else {
-                document.getElementById('mintingText').innerHTML = "<br>\n<strong><b>❌Transaction Failed!</b></strong> <br>This invite code is only valid for ONE FROG!"
-                document.getElementById('mintingText').className = "mintingTextRed"
-              }
+              document.getElementById('mintingText').innerHTML = "<br>\n<strong><b>❌Transaction Failed!</b></strong> <br>This invite code is only valid for ONE FROG!"
+              document.getElementById('mintingText').className = "mintingTextRed"
+            } else if(inviteApplied2 == "true" && frogCount > 2){
+              document.getElementById('mintingText').innerHTML = "<br>\n<strong><b>❌Transaction Failed!</b></strong> <br>This invite code is only valid for TWO FROGS!"
+              document.getElementById('mintingText').className = "mintingTextRed"
             } else {
               try {
                 let tokens = await f0.mint(mintInviteCode, frogCount)
