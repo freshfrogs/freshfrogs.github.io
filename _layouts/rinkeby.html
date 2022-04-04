@@ -502,9 +502,9 @@
           inviteLoopThis = myInvitesKeys[i]
           if (inviteLoopThis === "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d") {
             myInviteFound = inviteLoopThis
-            mintPrice = JSON.stringify(myInvites[inviteCode].condition.converted.eth, inviteCode, 1)
-            mintLimit = JSON.stringify(myInvites[inviteCode].condition.converted.limit, inviteCode, 1)
-            mintInviteCode = inviteCode
+            mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
+            mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
+            mintInviteCode = myInviteFound
             consoleOutput("<br>"+"\n<strong>❯</strong> [ ! ] Invite code applied... Valid for <strong>ONE FROG(s) @ "+mintPrice+" ΞETH</strong>")
             document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
           }
