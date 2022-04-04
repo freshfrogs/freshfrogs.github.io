@@ -507,11 +507,6 @@
               document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
               break;
             } else {
-              // Load Invite
-              myInviteFound = inviteLoopThis
-              mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
-              mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
-              mintInviteCode = myInviteFound
               // Check Previous Mints
               collection.defaultAccount = userAcc
               let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
@@ -522,6 +517,11 @@
                 }
               }
               if (useInvite !== "false") {
+                // Load Invite
+                myInviteFound = inviteLoopThis
+                mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
+                mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
+                mintInviteCode = myInviteFound
                 if (userAcc === "0x20eCF9EceCc84AdaEb71FbA016706DA4B9d8f6De".toLowerCase() || userAcc === "0xf0552a5A9ef0658978a0b9bf73E75050f41EC9cb".toLowerCase()) {
                   consoleOutput("<br>"+"\n<strong>❯</strong> [ ! ] Invite code applied... Valid for <strong>TWO FROG(s) @ "+mintPrice+" ΞETH</strong>")
                   inviteApplied2 = "true"
