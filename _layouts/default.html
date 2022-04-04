@@ -41,9 +41,9 @@
     border: 0px solid #e0e0e0;
     overflow: hidden;
     background-color: transparent;
-    width: 96px;
+    width: 64px;
     padding-top: 0px !important;
-    height: 96px !important;
+    height: 64px !important;
     display: inline-block !important;
     margin-left: 1%;
     margin-right: 1%;
@@ -748,7 +748,7 @@
       // Load recent mints from next token
       function recentlyMinted(nextToken) {
         document.getElementById("recentMints").innerHTML = "<hr class='hr2'><br><h3>Recent Mints</h3>"
-        for(let i=1; i<=3; i++) {
+        for(let i=1; i<=6; i++) {
           recentMint = nextToken - i;
           mostRecentDesc = "frog"+recentMint+"Desc"
           mostRecentLink = "frog"+recentMint+"Link"
