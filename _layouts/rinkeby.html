@@ -483,6 +483,7 @@
 
             //
           } catch (e) { // Failed; Send Error Code
+            loadMintingTerminal();
             consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong></div>");
           }
 
