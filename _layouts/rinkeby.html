@@ -506,16 +506,15 @@
         recentlyMinted(nextIdC);
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-          if (mint === 0 || mintProgress === 1) {
+          if (mint === 0 || checkTX(userAcc) >= 1) {
             if (mint === 0) {
               consoleOutput("❯ Mint open <strong>Friday April 1st! 04/01/22</strong> Join discord for more info! "+"<b><u><a class='pointer' href='https://discord.gg/xWMFWgpvd3?event=950943812832858172'>Join Discord</b></u></a>")
             }
-            if (mintProgress === 1) {
+            if (checkTX(userAcc) >= 1) {
               consoleOutput("<strong>❯</strong> To prevent duplicate transactions the mint button is locked out after one use. <a href='https://freshfrogs.github.io' class='pointer'>Please refresh the page!</a>")
             }
           } else {
             try {
-              mintProgress = 1;
               consoleOutput("<br><div id='mintingText' class='mintingTextWhite'><strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the Page!</div>")
               let tokens = await f0.mint(mintInviteCode, frogCount)
               document.getElementById('mintingText').innerHTML = "<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3> <b>"+frogCount+" FROG(s) </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.github.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>"
@@ -586,7 +585,18 @@
           }
         })
       })
-
+      // Check Pending Transactions
+      async function checkTX(thisUser) {
+        // Reads previous, and pending transctions
+        let pendingTx = 0;
+        let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 'pending', toBlock: 'pending'})
+        incomingTokenTransferEvents.forEach( (event) => {
+          if (event.returnValues.tokenId > 1) { // Counts all incoming tx from Frog # 1 and above
+            let pendingTx = pendingTx + 1;
+          }
+        });
+        return pendingTx;
+      }
       // Get User's Invite Codes
       async function getInvites() {
         for (var i = 0; i < 5; i++) { // Loop Five Times; Check First Five Invites
