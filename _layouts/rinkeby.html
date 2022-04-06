@@ -469,11 +469,9 @@
             collection.defaultAccount = userAcc;
             userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
             userTotalTx = 0;
-            let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
+            let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 'pending', toBlock: 'latest'})
             incomingTokenTransferEvents.forEach( (event) => {
-              if (event.returnValues.tokenId > 1) { // Counts all incoming tx from Frog # 587 and above
-                userTotalTx = userTotalTx + 1;
-              }
+              userTotalTx = userTotalTx + 1;
             });
             alert(userTotalTx)
 
