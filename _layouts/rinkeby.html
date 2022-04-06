@@ -426,11 +426,13 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
     <script>
+      // <-- [Google Analytics]
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-6PB0WKB4SH');
-      var userInvitesKeys;
+      // -- >
+      // Assign Global Variables
       document.addEventListener("DOMContentLoaded", async () => {
         // Connect Wallet / Load Minting Terminal
         connectWallet();
@@ -550,9 +552,9 @@
 
         const web3 = new Web3(window.ethereum);   // Open WEB3.0 Browsner Exentions Window
         const f0 = new F0();    // Connect to Factoria
-        var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";    // Contract Address (Ethereum Mainnet)
-        var COLLECTION = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
-        var NETWORK = "main";   // Which Network?
+        CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";    // Contract Address (Ethereum Mainnet)
+        COLLECTION = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
+        NETWORK = "main";   // Which Network?
 
         try {   // Connect
           await f0.init({
@@ -563,20 +565,19 @@
 
           // Assign Variables (CONSTANTS)
           // CONNECTED USER'S WALLET ADDRESS; AND INVITES
-          var userAcc = web3.currentProvider.selectedAddress;
-          var addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
-          var userInvites = await f0.myInvites()
+          userAcc = web3.currentProvider.selectedAddress;
+          addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
+          userInvites = await f0.myInvites()
           userInvitesKeys = Object.keys(userInvites)
 
           // CONTRACT NAME, SYMBOL, NEXT ID
-          var name = await f0.api.name().call()
-          var symbol = await f0.api.symbol().call()
-          var nextId = await f0.api.nextId().call()
-          var nextIdC = parseInt(nextId)
-          var mintPrice;
-          var mintLimit;
+          name = await f0.api.name().call()
+          symbol = await f0.api.symbol().call()
+          nextId = await f0.api.nextId().call()
+          nextIdC = parseInt(nextId)
+          mintPrice;
+          mintLimit;
 
-          alert("Connected: "+userAcc)
           // Load Invite Codes
           getInvites();
 
