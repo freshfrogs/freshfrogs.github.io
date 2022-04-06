@@ -574,8 +574,9 @@
         })
       })
 
-      // Import Previous Transaction
-      async function checkTx(fromUser) {
+      // Get User's Invite Codes
+      function getInvites() {
+        // Default Invites and Previous / Pending transactions
         collection.defaultAccount = fromUser;
         userTotalTx = 0;
         let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': fromUser}, fromBlock: 0, toBlock: 'pending'})
@@ -584,13 +585,6 @@
             userTotalTx = userTotalTx + 1;
           }
         });
-        // Returns number of previous transactions
-      }
-
-      // Get User's Invite Codes
-      function getInvites() {
-        // Default Invites and Previous / Pending transactions
-        checkTx(userAcc);
         userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
         for (var i = 0; i < 5; i++) { // Loop Five Times; Check First Five Invites
           let thisInvite = userInviteKeys[i]
