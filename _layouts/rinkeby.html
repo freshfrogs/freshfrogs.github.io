@@ -469,14 +469,13 @@
             collection.defaultAccount = userAcc;
             userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
             userTotalTx = 0;
-            let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
+            let incomingTokenTransferEvents = await collection.getPastEvents({}, {fromBlock: 'pending', toBlock: 'latest'})
             incomingTokenTransferEvents.forEach( (event) => {
-              if (event.returnValues.tokenId > 587) { // Counts all incoming tx from Frog # 587 and above
-                userTotalTx = userTotalTx + 1;
-              }
+              userTotalTx = userTotalTx + 1;
             });
 
-            checkTX(userAcc); // pendingTx -- Number of pending tx
+            alert(userTotalTx)
+            //checkTX(userAcc); // pendingTx -- Number of pending tx
 
             // Load Invite Codes
             frogCount = 1;
@@ -511,8 +510,6 @@
         recentlyMinted(nextIdC);
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-          checkTX(userAcc)
-          alert(pendingTx)
           if (mint === 0 || pendingTx >= 1) {
             if (mint === 0) {
               consoleOutput("❯ Mint open <strong>Friday April 1st! 04/01/22</strong> Join discord for more info! "+"<b><u><a class='pointer' href='https://discord.gg/xWMFWgpvd3?event=950943812832858172'>Join Discord</b></u></a>")
@@ -594,15 +591,6 @@
           }
         })
       })
-      // Check Pending Transactions
-      async function checkTX(thisUser) {
-        // Reads previous, and pending transctions
-        pendingTx = 0;
-        let pendingEvents = await collection.getPastEvents({}, {fromBlock: 'pending', toBlock: 'latest'})
-        pendingEvents.forEach( (event) => { // Counts all incoming tx from Frog # 1 and above
-          pendingTx = pendingTx + 1;
-        });
-      }
       // Get User's Invite Codes
       async function getInvites() {
         for (var i = 0; i < 5; i++) { // Loop Five Times; Check First Five Invites
