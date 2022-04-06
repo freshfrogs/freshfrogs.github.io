@@ -468,7 +468,7 @@
             userPendingTx = 0;
             frogCount = 1;
             frogCountMax = 9;
-            frogMintMax = 'unlimited';
+            frogMintMax;
 
             // Reads previous, and pending transctions
             collection = COLLECTION;
@@ -606,6 +606,7 @@
               // Unlimited Free Mints
               userInvite = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4";
               frogMintMax = 4040-nextIdC;
+              ("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>"+frogMintMax+" FROG(s) @ 0.00 ΞETH</strong></div>")
               break;
             }
             if (userAcc === "0x20eCF9EceCc84AdaEb71FbA016706DA4B9d8f6De".toLowerCase() || userAcc === "0xf0552a5A9ef0658978a0b9bf73E75050f41EC9cb".toLowerCase()) {
@@ -614,6 +615,7 @@
                 userInvite = thisInvite;
                 frogCountMax = 2;
                 frogMintMax = 2;
+                ("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>"+frogMintMax+" FROG(s) @ 0.00 ΞETH</strong></div>")
                 break;
               }
             }
@@ -623,6 +625,7 @@
               userInvite = thisInvite;
               frogCountMax = 1;
               frogMintMax = 1;
+              ("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>"+frogMintMax+" FROG(s) @ 0.00 ΞETH</strong></div>")
               break;
             }
           }
@@ -631,7 +634,7 @@
         mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
         mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
         document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
-        consoleOutput("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>"+frogMintMax+" FROG(s) @ 0.00 ΞETH</strong></div>")
+        //consoleOutput("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>"+frogMintMax+" FROG(s) @ 0.00 ΞETH</strong></div>")
       }
 
       // Output to minting terminal
