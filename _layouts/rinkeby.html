@@ -577,14 +577,14 @@
       // Import Previous Transaction
       async function checkTx(fromUser) {
         collection.defaultAccount = fromUser;
-        prevTx = 0;
+        userTotalTx = 0;
         let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': fromUser}, fromBlock: 0, toBlock: 'pending'})
         incomingTokenTransferEvents.forEach( (event) => {
           if (event.returnValues.tokenId > 587) { // Counts all incoming tx from Frog # 587 and above
-            prevTx = prevTx + 1;
+            userTotalTx = userTotalTx + 1;
           }
         });
-        return prevTx; // Returns number of previous transactions
+        // Returns number of previous transactions
       }
 
       // Get User's Invite Codes
@@ -602,9 +602,8 @@
             }
 
             // Public Access
-            test = checkTx(userAcc)
-            alert(test);
-            if (checkTx(userAcc) >= 1) { // Previous Tx
+            alert(userTotalTx);
+            if (userTotalTx >= 1) { // Previous Tx
               // For x2 Free Invitees DVR / Ozy
               if (userAcc === "0x20eCF9EceCc84AdaEb71FbA016706DA4B9d8f6De".toLowerCase() || userAcc === "0xf0552a5A9ef0658978a0b9bf73E75050f41EC9cb".toLowerCase()) {
                 if (checkTx(userAcc) >= 2){ // 2 or more mints. No Invite
