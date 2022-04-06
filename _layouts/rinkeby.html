@@ -566,15 +566,15 @@
 
           // Assign Variables (CONSTANTS)
           // CONNECTED USER'S WALLET ADDRESS; AND INVITES
-          const userAcc = web3.currentProvider.selectedAddress;
-          const addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
-          const userInvites = await f0.myInvites()
-          const userInvitesKeys = Object.keys(userInvites)
+          var userAcc = web3.currentProvider.selectedAddress;
+          var addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
+          var userInvites = await f0.myInvites()
+          var userInvitesKeys = Object.keys(userInvites)
 
           // CONTRACT NAME, SYMBOL, NEXT ID
-          const name = await f0.api.name().call()
-          const symbol = await f0.api.symbol().call()
-          const nextId = await f0.api.nextId().call()
+          var name = await f0.api.name().call()
+          var symbol = await f0.api.symbol().call()
+          var nextId = await f0.api.nextId().call()
           var nextIdC = parseInt(nextId)
           var mintPrice;
           var mintLimit;
