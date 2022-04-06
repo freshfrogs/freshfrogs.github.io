@@ -507,6 +507,7 @@
         consoleOutput("Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>")
 
         consoleOutput('<br><hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>');
+        consoleOutput("<br><div id='mintingText' class='mintingTextWhite'></div>")
         recentlyMinted(nextIdC);
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
@@ -518,8 +519,10 @@
               consoleOutput("<div class='mintingTextRed'><strong><b>❌Please wait for pending Transactions to complete!</b></strong></div>")
             }
           } else {
-            try {
-              consoleOutput("<br><div id='mintingText' class='mintingTextWhite'><strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the Page!</div>")
+            try {              
+              document.getElementById('mintingText').innerHTML = "<strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the Page!"
+              document.getElementById('mintingText').className = "mintingTextWhite"
+              
               let tokens = await f0.mint(userInvite, frogCount)
               document.getElementById('mintingText').innerHTML = "<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3> <b>"+frogCount+" FROG(s) </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.github.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>"
               document.getElementById('mintingText').className = "mintingTextGreen"
