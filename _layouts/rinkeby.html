@@ -577,11 +577,11 @@
       // Import Previous Transaction
       async function checkTx(fromUser) {
         collection.defaultAccount = fromUser;
-        let prevTx = 0;
+        prevTx = 0;
         let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': fromUser}, fromBlock: 0, toBlock: 'pending'})
         incomingTokenTransferEvents.forEach( (event) => {
           if (event.returnValues.tokenId > 587) { // Counts all incoming tx from Frog # 587 and above
-            let prevTx = prevTx + 1;
+            prevTx = prevTx + 1;
           }
         });
         return prevTx; // Returns number of previous transactions
