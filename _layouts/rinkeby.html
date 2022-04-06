@@ -475,7 +475,7 @@
                 userTotalTx = userTotalTx + 1;
               }
             });
-            mint = 1; // Mint On or Off?
+
             checkTX(userAcc); // pendingTx -- Number of pending tx
 
             // Load Invite Codes
@@ -485,7 +485,9 @@
             loadMintingTray();
             getInvites();
 
-            //
+            mint = 1; // Mint On or Off?
+
+            // Done!
           } catch (e) { // Failed; Send Error Code
             loadMintingTerminal();
             consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong></div>");
