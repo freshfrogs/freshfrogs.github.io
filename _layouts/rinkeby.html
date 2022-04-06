@@ -469,14 +469,15 @@
             collection.defaultAccount = userAcc;
             userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
             userTotalTx = 0;
-            let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 'latest', toBlock: 'pending'})
+            let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
             incomingTokenTransferEvents.forEach( (event) => {
-              //if (event.returnValues.tokenId > 1) { // Counts all incoming tx from Frog # 587 and above
+              if (event.returnValues.tokenId > 1) { // Counts all incoming tx from Frog # 587 and above
                 userTotalTx = userTotalTx + 1;
-              //}
+              }
             });
 
-            alert(userTotalTx)
+            alert(userTotalTx);
+            checkPendingTx(userAcc);
             pendingTx = 0;
             // Load Invite Codes
             frogCount = 1;
@@ -593,6 +594,17 @@
           }
         })
       })
+      // Check Pending Transactions
+      async function checkPendingTx(thisUser) {
+        userPendingTx = 0;
+        let userPendingTxTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': thisUser}, fromBlock: 0, toBlock: 'latest'})
+        userPendingTxTokenTransferEvents.forEach( (event) => {
+          if (event.returnValues.tokenId > 1) { // Counts all incoming tx from Frog # 587 and above
+            userPendingTx = userPendingTx + 1;
+          }
+        });
+        alert(userPendingTx);
+      }
       // Get User's Invite Codes
       async function getInvites() {
         for (var i = 0; i < 5; i++) { // Loop Five Times; Check First Five Invites
