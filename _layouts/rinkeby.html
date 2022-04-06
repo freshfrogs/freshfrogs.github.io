@@ -588,6 +588,7 @@
       // Check Pending Transactions
       async function checkTX(thisUser) {
         // Reads previous, and pending transctions
+        collection = new web3.eth.Contract(token_abi, "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b");
         let pendingTx = 0;
         let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 'pending', toBlock: 'pending'})
         incomingTokenTransferEvents.forEach( (event) => {
