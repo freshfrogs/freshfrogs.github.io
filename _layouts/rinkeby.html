@@ -436,8 +436,8 @@
           connectWallet();
           loadMintingTerminal();
           loadMintingTray();
-        } catch (e) {
-          alert(e.message)
+        } catch (error) {
+          alert(error)
         }
         // Messages Sent to Terminal
         document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
