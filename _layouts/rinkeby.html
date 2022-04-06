@@ -602,7 +602,8 @@
             }
 
             // Public Access
-            alert(checkTx(userAcc));
+            test = checkTx(userAcc)
+            alert(test);
             if (checkTx(userAcc) >= 1) { // Previous Tx
               // For x2 Free Invitees DVR / Ozy
               if (userAcc === "0x20eCF9EceCc84AdaEb71FbA016706DA4B9d8f6De".toLowerCase() || userAcc === "0xf0552a5A9ef0658978a0b9bf73E75050f41EC9cb".toLowerCase()) {
