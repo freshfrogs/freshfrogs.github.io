@@ -599,7 +599,7 @@
         // Reads previous, and pending transctions
         try {
           pendingTx = 0;
-          let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 'pending', toBlock: 'latest'})
+          let incomingTokenTransferEvents = await collection.getPastEvents({ filter: {'to': userAcc}, fromBlock: 'pending', toBlock: 'latest'})
           incomingTokenTransferEvents.forEach( (event) => { // Counts all incoming tx from Frog # 1 and above
             pendingTx = pendingTx + 1;
           });
