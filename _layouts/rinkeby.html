@@ -650,7 +650,6 @@
         // Connect Wallet / Load Minting Terminal
         //connectWallet();
         // Connect Ethereum Wallet
-        async function connectWallet() {
 
           const web3 = new Web3(window.ethereum);   // Open WEB3.0 Browsner Exentions Window
           const f0 = new F0();    // Connect to Factoria
@@ -687,7 +686,6 @@
           } catch (e) { // Failed; Send Error Code
             consoleOutput("<br>"+"<div style='border-bottom: 1px solid black;'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong></div>");
           }
-        }
         loadMintingTerminal();
         loadMintingTray();
         // Messages Sent to Terminal
