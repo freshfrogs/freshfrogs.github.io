@@ -467,15 +467,15 @@
             // Load Invite Codes
             frogCount = 1;
             frogCountMax = 9;
-
             loadMintingTerminal();
             loadMintingTray();
             getInvites();
 
             //
           } catch (e) { // Failed; Send Error Code
-            consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong></div>");
+            consoleOutput("<br>"+"<div style='border-bottom: 1px solid black;'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong></div>");
           }
+
         // Messages Sent to Terminal
         document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
         //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
@@ -624,7 +624,7 @@
             } else { // No Previous Tx
               // Apply Invite
               userInvite = "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d";
-              consoleOutput("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>ONE FROG(s) @ 0.00 ΞETH</strong></div>")
+              consoleOutput("<br>"+"\n<strong>❯</strong> [ ! ] Invite code applied... Valid for <strong>ONE FROG(s) @ 0.00 ΞETH</strong>")
               frogCountMax = 1;
               break;
             }
