@@ -435,40 +435,12 @@
       // Assign Global Variables
       document.addEventListener("DOMContentLoaded", async () => {
         // Connect Wallet / Load Minting Terminal
-        const web3 = new Web3(window.ethereum);   // Open WEB3.0 Browsner Exentions Window
-        const f0 = new F0();    // Connect to Factoria
-        CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";    // Contract Address (Ethereum Mainnet)
-        COLLECTION = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
-        NETWORK = "main";   // Which Network?
-
-        try {   // Connect
-          await f0.init({
-            web3: web3,
-            contract: CONTRACT_ADDRESS,
-            network: NETWORK
-          })
-
-          // Assign Variables (CONSTANTS)
-          // CONNECTED USER'S WALLET ADDRESS; AND INVITES
-          userAcc = web3.currentProvider.selectedAddress;
-          addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
-          userInviteList = await f0.myInvites();
-          userInviteKeys = Object.keys(userInviteList);
-
-          // CONTRACT NAME, SYMBOL, NEXT ID
-          name = await f0.api.name().call();
-          symbol = await f0.api.symbol().call();
-          nextId = await f0.api.nextId().call();
-          nextIdC = parseInt(nextId);
-          frogCount = 1;
-          frogCountMax = 9;
-
-          // Load Invite Codes
-          getInvites();
-
-          //
-        } catch (e) { // Failed; Send Error Code
-          consoleOutput("<br>"+"<div style='border-bottom: 1px solid black;'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong></div>");
+        try {
+          connectWallet();
+          loadMintingTerminal();
+          loadMintingTray();
+        } catch (error) {
+          alert(error)
         }
         // Messages Sent to Terminal
         alert(nextId)
@@ -570,6 +542,46 @@
           }
         })
       })
+      
+      // Connect Ethereum Wallet
+      async function connectWallet() {
+
+        const web3 = new Web3(window.ethereum);   // Open WEB3.0 Browsner Exentions Window
+        const f0 = new F0();    // Connect to Factoria
+        CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";    // Contract Address (Ethereum Mainnet)
+        COLLECTION = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
+        NETWORK = "main";   // Which Network?
+
+        try {   // Connect
+          await f0.init({
+            web3: web3,
+            contract: CONTRACT_ADDRESS,
+            network: NETWORK
+          })
+
+          // Assign Variables (CONSTANTS)
+          // CONNECTED USER'S WALLET ADDRESS; AND INVITES
+          userAcc = web3.currentProvider.selectedAddress;
+          addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
+          userInviteList = await f0.myInvites();
+          userInviteKeys = Object.keys(userInviteList);
+
+          // CONTRACT NAME, SYMBOL, NEXT ID
+          name = await f0.api.name().call();
+          symbol = await f0.api.symbol().call();
+          nextId = await f0.api.nextId().call();
+          nextIdC = parseInt(nextId);
+          frogCount = 1;
+          frogCountMax = 9;
+
+          // Load Invite Codes
+          getInvites();
+
+          //
+        } catch (e) { // Failed; Send Error Code
+          consoleOutput("<br>"+"<div style='border-bottom: 1px solid black;'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong></div>");
+        }
+      }
 
       // Import Previous Transaction
       async function checkTx(fromUser) {
