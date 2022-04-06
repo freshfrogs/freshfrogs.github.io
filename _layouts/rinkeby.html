@@ -435,9 +435,13 @@
       // Assign Global Variables
       document.addEventListener("DOMContentLoaded", async () => {
         // Connect Wallet / Load Minting Terminal
-        connectWallet();
-        loadMintingTerminal();
-        loadMintingTray();
+        try {
+          connectWallet();
+          loadMintingTerminal();
+          loadMintingTray();
+        } catch (error) {
+          alert(error)
+        }
         // Messages Sent to Terminal
         document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
         //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
