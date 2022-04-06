@@ -469,7 +469,7 @@
             collection.defaultAccount = userAcc;
             userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
             userTotalTx = 0;
-            let incomingTokenTransferEvents = await collection.getPastEvents({}, {fromBlock: 'pending', toBlock: 'latest'})
+            let incomingTokenTransferEvents = await collection.getPastEvents({}, {fromBlock: 0, toBlock: 'latest'})
             incomingTokenTransferEvents.forEach( (event) => {
               userTotalTx = userTotalTx + 1;
             });
