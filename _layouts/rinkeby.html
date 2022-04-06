@@ -435,13 +435,9 @@
       // Assign Global Variables
       document.addEventListener("DOMContentLoaded", async () => {
         // Connect Wallet / Load Minting Terminal
-        try {
-          connectWallet();
-          loadMintingTerminal();
-          loadMintingTray();
-        } catch (error) {
-          alert(error)
-        }
+        connectWallet();
+        loadMintingTerminal();
+        loadMintingTray();
         // Messages Sent to Terminal
         alert(nextId)
         document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
