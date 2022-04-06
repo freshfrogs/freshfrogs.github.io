@@ -632,7 +632,6 @@
         // Assign Variables, Update UI
         mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
         mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
-        window.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
       }
 
       // Output to minting terminal
@@ -651,7 +650,7 @@
         growTray.innerHTML = 
         '<ul class="downloads2">' +
         '  <li><a id="mintTransact" href="https://discord.gg/xWMFWgpvd3?event=950943812832858172" class="pointer" target="_blank"><strong>LINK WALLET</strong></a></li>' +
-        '  <li><a id="mintTotal"><strong>0.02 ΞETH</strong>Plus gas</a></li>' +
+        '  <li><a id="mintTotal"><strong>'+(frogCount*mintPrice)+' ΞETH</strong>plus gas</a></li>' +
         '  <li><a class="pointer"><strong><b id="removeFrog" class="pointer">−</b><frogQuant id="frogQuant">  1  </frogQuant><b id="addFrog" class="pointer">+</b></strong>Quantity</a></li>' +
         '</ul>' +
         '<div class="bigContainer">' +
