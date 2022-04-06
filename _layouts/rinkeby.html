@@ -433,9 +433,6 @@
       gtag('config', 'G-6PB0WKB4SH');
       // -- >
       // Assign Global Variables
-      var frogCount = 1;
-      var frogCountMax = 9;
-      var mintPrice;
       document.addEventListener("DOMContentLoaded", async () => {
         // Connect Wallet / Load Minting Terminal
         //connectWallet();
@@ -466,6 +463,9 @@
             symbol = await f0.api.symbol().call();
             nextId = await f0.api.nextId().call();
             nextIdC = parseInt(nextId);
+            var frogCount = 1;
+            var frogCountMax = 9;
+            var mintPrice;
 
             // Load Invite Codes
             getInvites();
