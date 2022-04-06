@@ -593,11 +593,11 @@
       // Check Pending Transactions
       async function checkTX(thisUser) {
         // Reads previous, and pending transctions
-        let pendingTx = 0;
+        pendingTx = 0;
         let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 'pending', toBlock: 'pending'})
         incomingTokenTransferEvents.forEach( (event) => {
           if (event.returnValues.tokenId > 1) { // Counts all incoming tx from Frog # 1 and above
-            let pendingTx = pendingTx + 1;
+            pendingTx = pendingTx + 1;
           }
         });
       }
