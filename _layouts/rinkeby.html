@@ -432,13 +432,10 @@
       gtag('config', 'G-6PB0WKB4SH');
       document.addEventListener("DOMContentLoaded", async () => {
         // Connect Wallet / Load Minting Terminal
-        try {
+          var userInvitesKeys;
           connectWallet();
           loadMintingTerminal();
           loadMintingTray();
-        } catch (error) {
-          alert(error)
-        }
         // Messages Sent to Terminal
         document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
         //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
@@ -569,7 +566,7 @@
           var userAcc = web3.currentProvider.selectedAddress;
           var addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
           var userInvites = await f0.myInvites()
-          userInvitesKeys = Object.keys(userInvites)
+          var userInvitesKeys = Object.keys(userInvites)
 
           // CONTRACT NAME, SYMBOL, NEXT ID
           var name = await f0.api.name().call()
