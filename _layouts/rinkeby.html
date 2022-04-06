@@ -512,16 +512,16 @@
         recentlyMinted(nextIdC);
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-          if (mint === 0 || pendingTx >= 1) {
+          checkPendingTx(userAcc)
+          if (mint === 0 || userPendingTx >= 1) {
             if (mint === 0) {
               consoleOutput("❯ Mint open <strong>Friday April 1st! 04/01/22</strong> Join discord for more info! "+"<b><u><a class='pointer' href='https://discord.gg/xWMFWgpvd3?event=950943812832858172'>Join Discord</b></u></a>")
             }
-            if (pendingTx >= 1) {
+            if (userPendingTx >= 1) {
               consoleOutput("<div class='mintingTextRed'><strong><b>❌Please wait for pending Transactions to complete!</b></strong></div>")
             }
           } else {
             try {
-              pendingTx = 1;
               document.getElementById('mintingText').innerHTML = "<strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the Page!"
               document.getElementById('mintingText').className = "mintingTextWhite"
               
@@ -603,7 +603,6 @@
             userPendingTx = userPendingTx + 1;
           //}
         });
-        alert(userPendingTx);
       }
       // Get User's Invite Codes
       async function getInvites() {
