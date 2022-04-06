@@ -676,7 +676,7 @@
             name = await f0.api.name().call();
             symbol = await f0.api.symbol().call();
             nextId = await f0.api.nextId().call();
-            nextIdC = parseInt(nextId);
+            var nextIdC = parseInt(nextId);
             frogCount = 1;
             frogCountMax = 9;
 
