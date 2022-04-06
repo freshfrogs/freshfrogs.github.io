@@ -497,14 +497,14 @@
         document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
         //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
         //document.getElementById("supply").innerHTML = "<b><strong><a style='color: #222 !important;' href='https://opensea.io/collection/fresh-frogs' target='_blank'>ℹ️ ("+nextIdC+"/4040) Total Supply</a></strong></b>"
-        consoleOutput("<hr><b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint...");//\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
+        //consoleOutput("<hr><b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint...");//\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
         //document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
         document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         //document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
         
-        consoleOutput("Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>")
+        consoleOutput("<div id='mintingText' class='mintingTextGreen'>Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>"+"<br><b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint...")
 
         consoleOutput('<br><hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>');
         //consoleOutput("<br><div id='mintingText' class='mintingTextWhite'></div>")
@@ -636,7 +636,7 @@
         mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
         mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
         document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
-        consoleOutput("<div id='mintingText' class='mintingTextGreen'> Invite code applied... Valid for <strong>"+frogCountMax+" FROG(s) @ 0.00 ΞETH</strong></div>")
+        consoleOutput("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>"+frogCountMax+" FROG(s) @ 0.00 ΞETH</strong></div>")
       }
 
       // Output to minting terminal
