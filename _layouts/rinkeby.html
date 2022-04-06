@@ -599,9 +599,9 @@
         userPendingTx;
         let userPendingTxTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': thisUser}, fromBlock: 'latest', toBlock: 'pending'})
         userPendingTxTokenTransferEvents.forEach( (event) => {
-          if (event.returnValues.tokenId > 1) { // Counts all incoming tx from Frog # 587 and above
+          //if (event.returnValues.tokenId > 1) { // Counts all incoming tx from Frog # 587 and above
             userPendingTx = userPendingTx + 1;
-          }
+          //}
         });
         alert(userPendingTx);
       }
