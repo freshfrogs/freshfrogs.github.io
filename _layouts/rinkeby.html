@@ -632,8 +632,6 @@
         // Assign Variables, Update UI
         mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
         mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
-        alert("mintPrice: "+mintPrice)
-        alert("frogCount: "+frogCount)
         window.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
       }
 
