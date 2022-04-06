@@ -566,7 +566,7 @@
           var userAcc = web3.currentProvider.selectedAddress;
           var addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
           var userInvites = await f0.myInvites()
-          var userInvitesKeys = Object.keys(userInvites)
+          userInvitesKeys = Object.keys(userInvites)
 
           // CONTRACT NAME, SYMBOL, NEXT ID
           var name = await f0.api.name().call()
