@@ -481,7 +481,6 @@
                 userTotalTx = userTotalTx + 1;
               }
             });
-            console.log('Total Mints: '+userTotalTx)
             // Load Functions
             loadMintingTerminal();
             loadMintingTray();
@@ -602,14 +601,12 @@
         for (var i = 0; i < 5; i++) { // Loop Five Times; Check First Five Invites
           let thisInvite = userInviteKeys[i]
           if (thisInvite === "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d") { // Main: 0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d / Rinkeby: 0x98469878d3ea48d71e828da43d41d9ffcc8b974d712d3fee969274e52b180275
-            console.log('Invite Found')
             // NF7UOS / C7AR Bypass
             if (userAcc === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase()) {
               // Unlimited Free Mints
               userInvite = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4";
               frogMintMax = 4040-nextIdC;
               consoleOutput("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>"+frogMintMax+" FROG(s) @ 0.00 ΞETH</strong></div>")
-              console.log('Yeet')
               break;
             // For x2 Free Invitees DVR / Ozy
             }
@@ -619,10 +616,8 @@
                 frogCountMax = 2;
                 frogMintMax = 2;
                 consoleOutput("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>"+frogMintMax+" FROG(s) @ 0.00 ΞETH</strong></div>")
-                console.log('Invite Found x2, applied')
                 break;
               } else {
-                console.log('Invite Found x2, but already minted')
                 break;
               }
             }
@@ -633,10 +628,8 @@
               frogCountMax = 1;
               frogMintMax = 1;
               consoleOutput("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>"+frogMintMax+" FROG(s) @ 0.00 ΞETH</strong></div>")
-              console.log('Invite Found, applied')
               break;
             } else { // Yes, skip
-              console.log('Invite Found, but already minted')
               break;
             }
           }
