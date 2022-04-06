@@ -589,6 +589,8 @@
 
       // Get User's Invite Codes
       function getInvites() {
+        // Default Invites and Previous / Pending transactions
+        checkTx(userAcc);
         userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
         for (var i = 0; i < 5; i++) { // Loop Five Times; Check First Five Invites
           let thisInvite = userInviteKeys[i]
@@ -606,7 +608,7 @@
             if (userTotalTx >= 1) { // Previous Tx
               // For x2 Free Invitees DVR / Ozy
               if (userAcc === "0x20eCF9EceCc84AdaEb71FbA016706DA4B9d8f6De".toLowerCase() || userAcc === "0xf0552a5A9ef0658978a0b9bf73E75050f41EC9cb".toLowerCase()) {
-                if (checkTx(userAcc) >= 2){ // 2 or more mints. No Invite
+                if (userTotalTx >= 2){ // 2 or more mints. No Invite
                   // break
                   break;
                 } else { // Less than 2 mints. Apply Invite.
