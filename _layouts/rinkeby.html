@@ -431,62 +431,15 @@
       gtag('js', new Date());
       gtag('config', 'G-6PB0WKB4SH');
       document.addEventListener("DOMContentLoaded", async () => {
-        const web3 = new Web3(window.ethereum)
-        const f0 = new F0();
-        var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
-        var collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
-        try {
-          await f0.init({
-            web3: web3,
-            contract: CONTRACT_ADDRESS, // 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b MAIN // 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524 RINKEBY
-            network: "main"
-          })
-          document.getElementById("netStatus").innerHTML = "Please connect an Ethereum wallet... <strong>❯ Connecting...</strong>"
-          } catch (e) {
-            loadMintingTerminal();
-            consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong></div>")
-        }
-
-        // VARIABLES
-
-        let userAcc = web3.currentProvider.selectedAddress; // USERS ACCOUNT ADDRESS
-        let addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4); // USERS ACCOUNT ADDRESS CUT
-        let myInvites = await f0.myInvites() // USERS INVITES
-        let myInvitesKeys = Object.keys(myInvites) // INVITE KEYS
-
-        let name = await f0.api.name().call() // TOKEN NAME
-        let symbol = await f0.api.symbol().call() // TOKEN SYMBOL
-        let nextId = await f0.api.nextId().call() // NEXT TOKEN ID
-        let nextIdC = parseInt(nextId) // NEXT TOKEN ID PARSED
-        let highPriority = 1 // low gas or high gas? low gas = 0 / high gas = 1
-        mostRecent2 = nextIdC - 1 // MOST RECENT MINT
-        //let nextToken = await f0.get(nextId); 
-        let mintPrice = "0.02"
-        let mintAmmount = 1 // STARTING number to mint
-        let mintInviteCode = "0x0000000000000000000000000000000000000000000000000000000000000000" // invite code to mint from PUBLIC
-        let mintList = parseInt(nextId) // STARTING FROG
-        let mintLimit = 1 // MINT LIMIT FOR INVITE CODE
-        
-        let frogCount = 1; // # FROGS IN MINTING TRAY
-        let mintProgress = 0; // MINT IN PROGRESS
-        let mint = 1; // MINT ON /OFF
-        let ownedFrogs = await collection.methods.balanceOf(userAcc).call()
-
-        // Load public invite first
-        myInviteFound = "0x0000000000000000000000000000000000000000000000000000000000000000"
-        mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
-        mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
-        inviteApplied = "false"
-        inviteApplied2 = "false"
-
-        // Load minting Tray / Terminal
+        // Connect Wallet / Load Minting Terminal
+        connectWallet();
         loadMintingTerminal();
         loadMintingTray();
         // Messages Sent to Terminal
         document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
         //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
         //document.getElementById("supply").innerHTML = "<b><strong><a style='color: #222 !important;' href='https://opensea.io/collection/fresh-frogs' target='_blank'>ℹ️ ("+nextIdC+"/4040) Total Supply</a></strong></b>"
-        consoleOutput("<hr class='hr2'><b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint...");//\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
+        consoleOutput("<hr><b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint...");//\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
         document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
         document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
@@ -494,62 +447,6 @@
         document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
         
         consoleOutput("Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>")
-        useInvite = 0;
-        for (var i = 0; i < 5; i++){
-          inviteLoopThis = myInvitesKeys[i]
-          if (inviteLoopThis === "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d") { // One Free Mint
-            if (userAcc === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E81".toLowerCase()) { // D & C
-              myInviteFound = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4"
-              mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
-              mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
-              mintInviteCode = myInviteFound
-              consoleOutput("<br>"+"\n<strong>❯</strong> [ ! ] Invite code applied... Valid for <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>")
-              document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
-              break;
-            } else {
-              // Check Previous Mints
-              collection.defaultAccount = userAcc
-              let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
-              incomingTokenTransferEvents.forEach( (event) => checkFrogToken(event.returnValues.tokenId));
-              function checkFrogToken(frogID){
-                if (frogID > 587) {
-                  useInvite = useInvite+1;
-                }
-              }
-              if (userAcc === "0x20eCF9EceCc84AdaEb71FbA016706DA4B9d8f6De".toLowerCase() || userAcc === "0xf0552a5A9ef0658978a0b9bf73E75050f41EC9cb".toLowerCase()) {
-                if (useInvite >= 2) {
-                  // Load Invite
-                  myInviteFound = inviteLoopThis
-                  mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
-                  mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
-                  mintInviteCode = myInviteFound
-                  consoleOutput("<br>"+"\n<strong>❯</strong> [ ! ] Invite code applied... Valid for <strong>TWO FROG(s) @ "+mintPrice+" ΞETH</strong>")
-                  inviteApplied2 = "true"
-                  break;
-                } else {
-                  document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
-                  break;
-                }
-              } else {
-                if (useInvite >= 1) {
-                  // Load Invite
-                  myInviteFound = inviteLoopThis
-                  mintPrice = JSON.stringify(myInvites[myInviteFound].condition.converted.eth, myInviteFound, 1)
-                  mintLimit = JSON.stringify(myInvites[myInviteFound].condition.converted.limit, myInviteFound, 1)
-                  mintInviteCode = myInviteFound
-                  consoleOutput("<br>"+"\n<strong>❯</strong> [ ! ] Invite code applied... Valid for <strong>ONE FROG(s) @ "+mintPrice+" ΞETH</strong>")
-                  inviteApplied = "true"
-                  braek;
-                } else {
-                  document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
-                  break;
-                }
-              }
-            } 
-            document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
-            break;
-          }
-        }
 
         consoleOutput('<br><hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>');
         recentlyMinted(nextIdC);
@@ -646,6 +543,106 @@
           document.getElementById("supply").innerHTML = "FROG(s) # "+mintList // Supply
         })
       })
+      
+      // Connect Ethereum Wallet
+      async function connectWallet() {
+
+        const web3 = new Web3(window.ethereum);   // Open WEB3.0 Browsner Exentions Window
+        const f0 = new F0();    // Connect to Factoria
+        var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";    // Contract Address (Ethereum Mainnet)
+        var COLLECTION = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
+        var NETWORK = "main";   // Which Network?
+
+        try {   // Connect
+          await f0.init({
+            web3: web3,
+            contract: CONTRACT_ADDRESS,
+            network: NETWORK
+          })
+
+          // Assign Variables (CONSTANTS)
+          // CONNECTED USER'S WALLET ADDRESS; AND INVITES
+          const userAcc = web3.currentProvider.selectedAddress;
+          const addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
+          const userInvites = await f0.myInvites()
+          const userInvitesKeys = Object.keys(userInvites)
+
+          // CONTRACT NAME, SYMBOL, NEXT ID
+          const name = await f0.api.name().call()
+          const symbol = await f0.api.symbol().call()
+          const nextId = await f0.api.nextId().call()
+          var nextIdC = parseInt(nextId)
+          var mintPrice;
+          var mintLimit;
+
+          // Load Invite Codes
+          getInvites();
+
+          //
+        } catch (e) { // Failed; Send Error Code
+          consoleOutput("<br>"+"<div style='border-bottom: 1px solid black;'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong></div>");
+        }
+      }
+
+      // Import Previous Transaction
+      async function checkTx(fromUser) {
+        collection.defaultAccount = fromUser;
+        let prevTx = 0;
+        let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': fromUser}, fromBlock: 0, toBlock: 'latest'})
+        incomingTokenTransferEvents.forEach( (event) => {
+          if (event.returnValues.tokenId > 587) { // Counts all incoming tx from Frog # 587 and above
+            let prevTx = prevTx + 1;
+          }
+        });
+        return prevTx; // Returns number of previous transactions
+      }
+
+      // Get User's Invite Codes
+      async function getInvites() {
+        for (var i = 0; i < 5; i++) { // Loop Five Times; Check First Five Invites
+          let thisInvite = userInvitesKeys[i]
+          if (thisInvite === "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d") {
+            // NF7UOS / C7AR Bypass
+            if (userAcc === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase()) {
+              // Unlimited Free Mints
+              var userInvite = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4";
+              consoleOutput("<br>"+"\n<strong>❯</strong> [ ! ] Invite code applied... Valid for <strong>"+mintLimit+" FROG(s) @ "+mintPrice+" ΞETH</strong>")
+              break;
+            }
+
+            // Public Access
+            if (checkTx(userAcc) >= 1) { // Previous Tx
+              // For x2 Free Invitees DVR / Ozy
+              if (userAcc === "0x20eCF9EceCc84AdaEb71FbA016706DA4B9d8f6De".toLowerCase() || userAcc === "0xf0552a5A9ef0658978a0b9bf73E75050f41EC9cb".toLowerCase()) {
+                if (checkTx(userAcc) >= 2){ // 2 or more mints. No Invite
+                  var userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
+                  break;
+                } else { // Less than 2 mints. Apply Invite.
+                  var userInvite = "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d";
+                  consoleOutput("<br>"+"\n<strong>❯</strong> [ ! ] Invite code applied... Valid for <strong>TWO FROG(s) @ "+mintPrice+" ΞETH</strong>")
+                  break;
+                }
+              }
+
+              // No Invite or Special Circumstance
+              var userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
+              break;
+
+            } else { // No Previous Tx
+              // Apply Invite
+              var userInvite = "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d";
+              consoleOutput("<br>"+"\n<strong>❯</strong> [ ! ] Invite code applied... Valid for <strong>ONE FROG(s) @ "+mintPrice+" ΞETH</strong>")
+              break;
+            }
+          }
+        }
+        // Assign Variables, Update UI
+        var mintPrice = JSON.stringify(myInvites[userInvite].condition.converted.eth, userInvite, 1)
+        var mintLimit = JSON.stringify(myInvites[userInvite].condition.converted.limit, userInvite, 1)
+        document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
+
+      }
+
       // Output to minting terminal
       function consoleOutput(output) {
         newLine = document.createElement("div")
