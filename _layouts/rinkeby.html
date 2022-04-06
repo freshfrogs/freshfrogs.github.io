@@ -507,7 +507,7 @@
         consoleOutput("Please connect an Ethereum wallet... <b><i><strong>"+addressCut+" ✓</strong></i></b>")
 
         consoleOutput('<br><hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>');
-        consoleOutput("<br><div id='mintingText' class='mintingTextWhite'></div>")
+        //consoleOutput("<br><div id='mintingText' class='mintingTextWhite'></div>")
         recentlyMinted(nextIdC);
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
@@ -612,14 +612,13 @@
             if (userAcc === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase()) {
               // Unlimited Free Mints
               userInvite = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4";
-              consoleOutput("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>404 FROG(s) @ 0.00 ΞETH</strong></div>")
+              frogCountMax = 4,040-nextIdC;
               break;
             }
             if (userAcc === "0x20eCF9EceCc84AdaEb71FbA016706DA4B9d8f6De".toLowerCase() || userAcc === "0xf0552a5A9ef0658978a0b9bf73E75050f41EC9cb".toLowerCase()) {
               if (userTotalTx < 2) { // Previous Tx
                 // For x2 Free Invitees DVR / Ozy
                 userInvite = "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d";
-                consoleOutput("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>TWO FROG(s) @ 0.00 ΞETH</strong></div>")
                 frogCountMax = 2;
                 break;
               }
@@ -628,7 +627,6 @@
             if (userTotalTx < 1) { // Previous Tx
               // For x2 Free Invitees DVR / Ozy
               userInvite = "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d";
-              consoleOutput("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>ONE FROG(s) @ 0.00 ΞETH</strong></div>")
               frogCountMax = 1;
               break;
             }
@@ -638,6 +636,7 @@
         mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
         mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
         document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
+        consoleOutput("<div id='mintingText' class='mintingTextGreen'> Invite code applied... Valid for <strong>"+frogCountMax+" FROG(s) @ 0.00 ΞETH</strong></div>")
       }
 
       // Output to minting terminal
