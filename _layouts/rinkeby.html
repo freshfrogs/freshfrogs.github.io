@@ -641,71 +641,6 @@
         newLine.innerHTML = output
         document.getElementById("pre").appendChild(newLine)
       }
-      // Load attribute
-      function loadAttribute(trait, attribute) {
-        newAttribute = document.createElement("a")
-        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
-        newAttribute.id = attribute
-        newAttribute.target = "_blank"
-        newAttribute.className = "frogType2 pointer"
-        newAttribute.innerHTML = '<img class="frogType" src="../the-pad/'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><b>'+attribute+'</b>'
-        document.getElementById("pre").appendChild(newAttribute)
-      }
-      // Load FROG Types
-      function loadFrogs() {
-        // FROG
-        document.getElementById("pre").innerHTML = "<h2>Frog Types</h2>"
-        //consoleOutput("\n")
-        loadAttribute("Frog", "blueDartFrog")
-        loadAttribute("Frog", "blueTreeFrog")
-        loadAttribute("Frog", "brownTreeFrog")
-        loadAttribute("Frog", "cyanTreeFrog")
-        loadAttribute("Frog", "goldenDartFrog")
-        loadAttribute("Frog", "goldenTreeFrog")
-        loadAttribute("Frog", "grayTreeFrog")
-        loadAttribute("Frog", "greenTreeFrog")
-        loadAttribute("Frog", "lightBrownTreeFrog")
-        loadAttribute("Frog", "orangeTreeFrog")
-        loadAttribute("Frog", "pinkTreeFrog")
-        loadAttribute("Frog", "purpleTreeFrog")
-        loadAttribute("Frog", "redEyedTreeFrog")
-        loadAttribute("Frog", "splendidLeafFrog")
-        loadAttribute("Frog", "stawberryDartFrog")
-        loadAttribute("Frog", "tomatoFrog")
-        loadAttribute("Frog", "treeFrog(1)")
-        loadAttribute("Frog", "treeFrog(2)")
-        loadAttribute("Frog", "treeFrog(3)")
-        loadAttribute("Frog", "treeFrog(4)")
-        loadAttribute("Frog", "treeFrog(5)")
-        loadAttribute("Frog", "treeFrog(6)")
-        loadAttribute("Frog", "treeFrog(7)")
-        loadAttribute("Frog", "treeFrog(8)")
-        loadAttribute("Frog", "unknown")
-      }
-      // Load special FROG Types
-      function loadSpecialFrogs() {
-        document.getElementById("pre").innerHTML = "<h2>Special Frogs</h2>"
-        //consoleOutput("\n")
-        loadAttribute("SpecialFrog", "closedEyes")
-        loadAttribute("SpecialFrog", "croaking")
-        loadAttribute("SpecialFrog", "inversedEyes")
-        loadAttribute("SpecialFrog", "peace")
-        loadAttribute("SpecialFrog", "thirdEye")
-      }
-      // Load FROG Menu
-      function loadFrogMenu(){
-        newAttribute = document.createElement("a")
-        newAttribute.id = "FrogButton"
-        newAttribute.className = "frogType2 pointer"
-        newAttribute.onClick = "loadFrogs()"
-        newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogType" src="../the-pad/Frog/unknown.png" alt="Frogs" id="Frog"><b>Frogs</b>'
-        document.getElementById("pre").appendChild(newAttribute)
-        newAttribute = document.createElement("a")
-        newAttribute.id = "SpecialFrogButton"
-        newAttribute.className = "frogType2 pointer"
-        newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogType" src="../the-pad/SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs"><b>SpecialFrogs</b>'
-        document.getElementById("pre").appendChild(newAttribute)
-      }
       // Random Number
       function randomNumber(min, max) {
         return Math.random() * (max - min) + min;
@@ -760,25 +695,6 @@
           newFrog.id = mostRecentLink
           newFrog.target = "_blank"
           newFrog.className = "smallContainer2"
-          newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+recentMint+'.png" alt="Frog '+recentMint+'" id="frog'+recentMint+'">'
-          document.getElementById("recentMints").appendChild(newFrog)
-        }
-        //consoleOutput("<a id='loadRecentMints2' class='pointer' onclick='recentlyMinted(4)'><u>Load More</u></a></b>");
-      }
-      // Random recent mints
-      function randomlyMinted(howMany) {
-        for(let i=1; i<=howMany; i++) {
-          recentMint = getRandomInt(1, 588);
-          mostRecentDesc = "frog"+recentMint+"Desc"
-          mostRecentLink = "frog"+recentMint+"Link"
-          mostRecentFrog = "frog"+recentMint
-          // <a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+mostRecent2+'" id="'+mostRecentLink+'" target="_blank">
-          newFrog = document.createElement("a")
-          newFrog.href = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+recentMint
-          newFrog.id = mostRecentLink
-          newFrog.target = "_blank"
-          newFrog.className = "smallContainer2"
-          newFrog.width = randomNumber(64, 128)+"px"
           newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+recentMint+'.png" alt="Frog '+recentMint+'" id="frog'+recentMint+'">'
           document.getElementById("recentMints").appendChild(newFrog)
         }
