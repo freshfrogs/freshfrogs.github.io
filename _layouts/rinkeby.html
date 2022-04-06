@@ -634,7 +634,7 @@
         mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
         alert("mintPrice: "+mintPrice)
         alert("frogCount: "+frogCount)
-        document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
+        window.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
       }
 
       // Output to minting terminal
