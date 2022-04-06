@@ -577,9 +577,9 @@
       // Get User's Invite Codes
       function getInvites() {
         // Default Invites and Previous / Pending transactions
-        collection.defaultAccount = fromUser;
+        collection.defaultAccount = userAcc;
         userTotalTx = 0;
-        let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': fromUser}, fromBlock: 0, toBlock: 'latest'})
+        let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'pending'})
         incomingTokenTransferEvents.forEach( (event) => {
           if (event.returnValues.tokenId > 587) { // Counts all incoming tx from Frog # 587 and above
             userTotalTx = userTotalTx + 1;
