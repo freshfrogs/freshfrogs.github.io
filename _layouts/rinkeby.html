@@ -475,7 +475,7 @@
                 userTotalTx = userTotalTx + 1;
               }
             });
-            alert("Pending Transactions: "+checkTX(userAcc))
+            checkTX(userAcc);
             // Load Invite Codes
             frogCount = 1;
             frogCountMax = 9;
@@ -588,15 +588,14 @@
       // Check Pending Transactions
       async function checkTX(thisUser) {
         // Reads previous, and pending transctions
-        collection = new web3.eth.Contract(token_abi, "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b");
         let pendingTx = 0;
-        let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': thisUser}, fromBlock: 'pending', toBlock: 'pending'})
+        let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 'pending', toBlock: 'pending'})
         incomingTokenTransferEvents.forEach( (event) => {
           if (event.returnValues.tokenId > 1) { // Counts all incoming tx from Frog # 1 and above
             let pendingTx = pendingTx + 1;
           }
         });
-        return pendingTx;
+        alert("Pending Transactions: "+pendingTx)
       }
       // Get User's Invite Codes
       async function getInvites() {
