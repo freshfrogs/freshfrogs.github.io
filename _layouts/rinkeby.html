@@ -464,6 +464,12 @@
             nextId = await f0.api.nextId().call();
             nextIdC = parseInt(nextId);
 
+            // Other Function Variables
+            userPendingTx = 0;
+            frogCount = 1;
+            frogCountMax = 9;
+            frogMintMax = 'unlimited';
+
             // Reads previous, and pending transctions
             collection = COLLECTION;
             collection.defaultAccount = userAcc;
@@ -476,12 +482,8 @@
               }
             });
 
-            //alert(userTotalTx);
-            userPendingTx = 0;
-            // Load Invite Codes
-            frogCount = 1;
-            frogCountMax = 9;
-            frogMintMax = 'unlimited';
+
+            // Load Functions
             loadMintingTerminal();
             loadMintingTray();
             getInvites();
