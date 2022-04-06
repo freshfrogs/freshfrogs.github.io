@@ -435,20 +435,53 @@
       // Assign Global Variables
       document.addEventListener("DOMContentLoaded", async () => {
         // Connect Wallet / Load Minting Terminal
-        try {
-          connectWallet();
-          loadMintingTerminal();
-          loadMintingTray();
-        } catch (error) {
-          alert(error)
-        }
+        //connectWallet();
+        // Connect Ethereum Wallet
+
+          const web3 = new Web3(window.ethereum);   // Open WEB3.0 Browsner Exentions Window
+          const f0 = new F0();    // Connect to Factoria
+          CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";    // Contract Address (Ethereum Mainnet)
+          COLLECTION = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
+          NETWORK = "main";   // Which Network?
+
+          try {   // Connect
+            await f0.init({
+              web3: web3,
+              contract: CONTRACT_ADDRESS,
+              network: NETWORK
+            })
+
+            // Assign Variables (CONSTANTS)
+            // CONNECTED USER'S WALLET ADDRESS; AND INVITES
+            userAcc = web3.currentProvider.selectedAddress;
+            addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
+            userInviteList = await f0.myInvites();
+            userInviteKeys = Object.keys(userInviteList);
+
+            // CONTRACT NAME, SYMBOL, NEXT ID
+            name = await f0.api.name().call();
+            symbol = await f0.api.symbol().call();
+            nextId = await f0.api.nextId().call();
+            nextIdC = parseInt(nextId);
+
+            // Load Invite Codes
+            frogCount = 1;
+            frogCountMax = 9;
+            mintPrice, mintLimit;
+            getInvites();
+
+            //
+          } catch (e) { // Failed; Send Error Code
+            consoleOutput("<br>"+"<div style='border-bottom: 1px solid black;'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong></div>");
+          }
+        loadMintingTerminal();
+        loadMintingTray();
         // Messages Sent to Terminal
-        alert(nextId)
         document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
         //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
         //document.getElementById("supply").innerHTML = "<b><strong><a style='color: #222 !important;' href='https://opensea.io/collection/fresh-frogs' target='_blank'>ℹ️ ("+nextIdC+"/4040) Total Supply</a></strong></b>"
         consoleOutput("<hr><b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint...");//\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
-        document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
+        //document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
         document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         //document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
@@ -542,46 +575,6 @@
           }
         })
       })
-      
-      // Connect Ethereum Wallet
-      async function connectWallet() {
-
-        const web3 = new Web3(window.ethereum);   // Open WEB3.0 Browsner Exentions Window
-        const f0 = new F0();    // Connect to Factoria
-        CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";    // Contract Address (Ethereum Mainnet)
-        COLLECTION = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
-        NETWORK = "main";   // Which Network?
-
-        try {   // Connect
-          await f0.init({
-            web3: web3,
-            contract: CONTRACT_ADDRESS,
-            network: NETWORK
-          })
-
-          // Assign Variables (CONSTANTS)
-          // CONNECTED USER'S WALLET ADDRESS; AND INVITES
-          userAcc = web3.currentProvider.selectedAddress;
-          addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
-          userInviteList = await f0.myInvites();
-          userInviteKeys = Object.keys(userInviteList);
-
-          // CONTRACT NAME, SYMBOL, NEXT ID
-          name = await f0.api.name().call();
-          symbol = await f0.api.symbol().call();
-          nextId = await f0.api.nextId().call();
-          nextIdC = parseInt(nextId);
-          frogCount = 1;
-          frogCountMax = 9;
-
-          // Load Invite Codes
-          getInvites();
-
-          //
-        } catch (e) { // Failed; Send Error Code
-          consoleOutput("<br>"+"<div style='border-bottom: 1px solid black;'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong></div>");
-        }
-      }
 
       // Import Previous Transaction
       async function checkTx(fromUser) {
@@ -640,6 +633,7 @@
         // Assign Variables, Update UI
         mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
         mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
+        alert("mintPrice: "+mintPrice)
         document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
       }
 
@@ -648,71 +642,6 @@
         newLine = document.createElement("div")
         newLine.innerHTML = output
         document.getElementById("pre").appendChild(newLine)
-      }
-      // Load attribute
-      function loadAttribute(trait, attribute) {
-        newAttribute = document.createElement("a")
-        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
-        newAttribute.id = attribute
-        newAttribute.target = "_blank"
-        newAttribute.className = "frogType2 pointer"
-        newAttribute.innerHTML = '<img class="frogType" src="../the-pad/'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><b>'+attribute+'</b>'
-        document.getElementById("pre").appendChild(newAttribute)
-      }
-      // Load FROG Types
-      function loadFrogs() {
-        // FROG
-        document.getElementById("pre").innerHTML = "<h2>Frog Types</h2>"
-        //consoleOutput("\n")
-        loadAttribute("Frog", "blueDartFrog")
-        loadAttribute("Frog", "blueTreeFrog")
-        loadAttribute("Frog", "brownTreeFrog")
-        loadAttribute("Frog", "cyanTreeFrog")
-        loadAttribute("Frog", "goldenDartFrog")
-        loadAttribute("Frog", "goldenTreeFrog")
-        loadAttribute("Frog", "grayTreeFrog")
-        loadAttribute("Frog", "greenTreeFrog")
-        loadAttribute("Frog", "lightBrownTreeFrog")
-        loadAttribute("Frog", "orangeTreeFrog")
-        loadAttribute("Frog", "pinkTreeFrog")
-        loadAttribute("Frog", "purpleTreeFrog")
-        loadAttribute("Frog", "redEyedTreeFrog")
-        loadAttribute("Frog", "splendidLeafFrog")
-        loadAttribute("Frog", "stawberryDartFrog")
-        loadAttribute("Frog", "tomatoFrog")
-        loadAttribute("Frog", "treeFrog(1)")
-        loadAttribute("Frog", "treeFrog(2)")
-        loadAttribute("Frog", "treeFrog(3)")
-        loadAttribute("Frog", "treeFrog(4)")
-        loadAttribute("Frog", "treeFrog(5)")
-        loadAttribute("Frog", "treeFrog(6)")
-        loadAttribute("Frog", "treeFrog(7)")
-        loadAttribute("Frog", "treeFrog(8)")
-        loadAttribute("Frog", "unknown")
-      }
-      // Load special FROG Types
-      function loadSpecialFrogs() {
-        document.getElementById("pre").innerHTML = "<h2>Special Frogs</h2>"
-        //consoleOutput("\n")
-        loadAttribute("SpecialFrog", "closedEyes")
-        loadAttribute("SpecialFrog", "croaking")
-        loadAttribute("SpecialFrog", "inversedEyes")
-        loadAttribute("SpecialFrog", "peace")
-        loadAttribute("SpecialFrog", "thirdEye")
-      }
-      // Load FROG Menu
-      function loadFrogMenu(){
-        newAttribute = document.createElement("a")
-        newAttribute.id = "FrogButton"
-        newAttribute.className = "frogType2 pointer"
-        newAttribute.onClick = "loadFrogs()"
-        newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogType" src="../the-pad/Frog/unknown.png" alt="Frogs" id="Frog"><b>Frogs</b>'
-        document.getElementById("pre").appendChild(newAttribute)
-        newAttribute = document.createElement("a")
-        newAttribute.id = "SpecialFrogButton"
-        newAttribute.className = "frogType2 pointer"
-        newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogType" src="../the-pad/SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs"><b>SpecialFrogs</b>'
-        document.getElementById("pre").appendChild(newAttribute)
       }
       // Random Number
       function randomNumber(min, max) {
@@ -724,7 +653,7 @@
         growTray.innerHTML = 
         '<ul class="downloads2">' +
         '  <li><a id="mintTransact" href="https://discord.gg/xWMFWgpvd3?event=950943812832858172" class="pointer" target="_blank"><strong>LINK WALLET</strong></a></li>' +
-        '  <li><a id="mintTotal"><strong>0.02 ΞETH</strong>Plus gas</a></li>' +
+        '  <li><a id="mintTotal"><strong>-.-- ΞETH</strong>Plus gas</a></li>' +
         '  <li><a class="pointer"><strong><b id="removeFrog" class="pointer">−</b><frogQuant id="frogQuant">  1  </frogQuant><b id="addFrog" class="pointer">+</b></strong>Quantity</a></li>' +
         '</ul>' +
         '<div class="bigContainer">' +
@@ -773,46 +702,7 @@
         }
         //consoleOutput("<a id='loadRecentMints2' class='pointer' onclick='recentlyMinted(4)'><u>Load More</u></a></b>");
       }
-      // Random recent mints
-      function randomlyMinted(howMany) {
-        for(let i=1; i<=howMany; i++) {
-          recentMint = getRandomInt(1, 588);
-          mostRecentDesc = "frog"+recentMint+"Desc"
-          mostRecentLink = "frog"+recentMint+"Link"
-          mostRecentFrog = "frog"+recentMint
-          // <a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+mostRecent2+'" id="'+mostRecentLink+'" target="_blank">
-          newFrog = document.createElement("a")
-          newFrog.href = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+recentMint
-          newFrog.id = mostRecentLink
-          newFrog.target = "_blank"
-          newFrog.className = "smallContainer2"
-          newFrog.width = randomNumber(64, 128)+"px"
-          newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+recentMint+'.png" alt="Frog '+recentMint+'" id="frog'+recentMint+'">'
-          document.getElementById("recentMints").appendChild(newFrog)
-        }
-        //consoleOutput("<a id='loadRecentMints2' class='pointer' onclick='recentlyMinted(4)'><u>Load More</u></a></b>");
-      }
-      //    {% include head-custom.html %}
-      /*
-            <div class="pTimeline">
-              <h3>Staking FROG Tokens</h3>
-              <p>NFT staking refers to locking up non-fungible tokens on a platform or protocol in exchange for staking rewards and other benefits. Staking NFTs allows holders to earn an income from their collection while maintaining ownership. It’s similar to earning interest from a bank account, but without a middleman facilitating transactions and taking a cut.</p>
-              <svg viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <pattern id="img" patternUnits="userSpaceOnUse" width="100" height="100">
-                    <image xlink:href="https://freshfrogs.github.io/frog/66.png" x="-25" width="150" height="100" />
-                    <image xlink:href="https://freshfrogs.github.io/the-pad/Frog/frog.png" x="-25" width="150" height="100" />
-                    <image xlink:href="https://freshfrogs.github.io/the-pad/SpecialFrog/closedEyes.png" x="-25" width="150" height="100" />
-                    <image xlink:href="https://freshfrogs.github.io/the-pad/Trait/darkGreen.png" x="-25" width="150" height="100" />
-                    <image xlink:href="https://freshfrogs.github.io/the-pad/Hat/cowboyHatWhite.png" x="-25" width="150" height="100" />
-                    <image xlink:href="https://freshfrogs.github.io/the-pad/Mouth/tongueFly.png" x="-25" width="150" height="100" />
-                  </pattern>
-                </defs>
-                <polygon points="50 1 95 25 95 75 50 99 5 75 5 25" fill="url(#img)"/>
-              </svg>
-              <h4>(N)ew (F)rog (T)oken</h4>
-            </div>
-      */
+      // -- END FUNCTIONS ------------------------------------------------------------------------------------------------------------------------------
     </script>
     <div class="top">
       {{ content }}
