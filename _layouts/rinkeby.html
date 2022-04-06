@@ -475,7 +475,9 @@
                 userTotalTx = userTotalTx + 1;
               }
             });
-            checkTX(userAcc);
+            mint = 1; // Mint On or Off?
+            checkTX(userAcc); // pendingTx -- Number of pending tx
+
             // Load Invite Codes
             frogCount = 1;
             frogCountMax = 9;
