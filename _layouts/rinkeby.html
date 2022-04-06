@@ -463,11 +463,11 @@
             symbol = await f0.api.symbol().call();
             nextId = await f0.api.nextId().call();
             nextIdC = parseInt(nextId);
-            var frogCount = 1;
-            var frogCountMax = 9;
-            var mintPrice;
 
             // Load Invite Codes
+            frogCount = 1;
+            frogCountMax = 9;
+            mintPrice, mintLimit;
             getInvites();
 
             //
