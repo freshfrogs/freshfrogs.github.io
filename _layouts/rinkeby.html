@@ -575,7 +575,7 @@
       })
 
       // Get User's Invite Codes
-      function getInvites() {
+      async function getInvites() {
         // Default Invites and Previous / Pending transactions
         collection.defaultAccount = userAcc;
         userTotalTx = 0;
