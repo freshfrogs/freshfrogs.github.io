@@ -610,23 +610,24 @@
               frogMintMax = 4040-nextIdC;
               ("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>"+frogMintMax+" FROG(s) @ 0.00 ΞETH</strong></div>")
               break;
+            // For x2 Free Invitees DVR / Ozy
             } else if (userAcc === "0x20eCF9EceCc84AdaEb71FbA016706DA4B9d8f6De".toLowerCase() || userAcc === "0xf0552a5A9ef0658978a0b9bf73E75050f41EC9cb".toLowerCase()) {
               if (userTotalTx < 2) { // Previous Tx
-                // For x2 Free Invitees DVR / Ozy
                 userInvite = thisInvite;
                 frogCountMax = 2;
                 frogMintMax = 2;
                 ("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>"+frogMintMax+" FROG(s) @ 0.00 ΞETH</strong></div>")
                 break;
               }
+            // Everyone else with invite
             // Has user Minted since #587?
-            } else if (userTotalTx < 1) { // No
+            } else if (userTotalTx < 1) { // No, Apply invite
               userInvite = thisInvite;
               frogCountMax = 1;
               frogMintMax = 1;
               ("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>"+frogMintMax+" FROG(s) @ 0.00 ΞETH</strong></div>")
               break;
-            } else { // Yes
+            } else { // Yes, skip
               break;
             }
           }
