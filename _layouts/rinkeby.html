@@ -597,11 +597,16 @@
       // Check Pending Transactions
       async function checkTX(thisUser) {
         // Reads previous, and pending transctions
-        pendingTx = 0;
-        let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 'pending', toBlock: 'latest'})
-        incomingTokenTransferEvents.forEach( (event) => { // Counts all incoming tx from Frog # 1 and above
-          pendingTx = pendingTx + 1;
-        });
+        try {
+          pendingTx = 0;
+          let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 'pending', toBlock: 'latest'})
+          incomingTokenTransferEvents.forEach( (event) => { // Counts all incoming tx from Frog # 1 and above
+            pendingTx = pendingTx + 1;
+          });
+        } catch (e) {
+          alert(e.message)
+        }
+
       }
       // Get User's Invite Codes
       async function getInvites() {
