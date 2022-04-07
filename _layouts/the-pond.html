@@ -547,12 +547,11 @@
             'yellow' : 0
           } // Start at 0
 
-          consoleOutput('<hr>thirdEye Frogs: <div id="thirdEyeFrogsTotal">'+attributesTotal["thirdEye"]+'<div>')
-            consoleOutput('<hr>Loading... Frog # <div id="FrogNumber">0<div>')
+
           // ownedFrogs = await collection.methods.balanceOf(userAcc).call();
           // Loop Minted Frogs, Frog # 1 - NextID
           for (var thisToken = 1; thisToken < nextIdC; thisToken++) {
-            document.getElementById('FrogNumber').innerHTML = thisToken
+
             var tokenName = 'Frog #'+thisToken;
 
             // Does Frog belong to the owner?
@@ -562,9 +561,10 @@
             if (userAcc === thisTokenOwner.toLowerCase()) {
               var thisTokenOwner = 'true';
               //freshFrogPanel(tokenName, thisToken); // <--
-              //consoleOutput(tokenName)
+              consoleOutput(tokenName)
             }
 
+            // Get Metadata URI for Token
             var metadata = (await fetch("https://freshfrogs.github.io/frog/json/"+thisToken+".json")).json();
 
             (async () => { // Pull Metadata
@@ -576,10 +576,6 @@
                 var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
                 let trait_type = attribute.trait_type
                 let value = attribute.value
-
-                if (value === 'thirdEye') {
-                  document.getElementById('thirdEyeFrogsTotal').innerHTML = attributesTotal["thirdEye"]
-                }
 
                 // Add to Totals
                 attributesTotal[value] = attributesTotal[value] + 1;
@@ -594,7 +590,7 @@
             })()
           }
 
-          //consoleOutput('<hr>thirdEye Frogs: '+attributesTotal['thirdEye'])
+          consoleOutput(attributesTotal)
 
           // ----------------------------->
           mint = 1; // <--- Mint On or Off? 1 / 0
