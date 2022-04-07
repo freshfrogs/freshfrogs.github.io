@@ -453,23 +453,11 @@
 
           // Reads previous, and pending transctions
           collection = COLLECTION;
-          collection.defaultAccount = userAcc;
-          userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
-          userTotalTx = 0;
-          let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
-          incomingTokenTransferEvents.forEach( (event) => {
-            if (event.returnValues.tokenId > 587) { // Counts all incoming tx from Frog # 587 and above
-              userTotalTx = userTotalTx + 1;
-            }
-          });
 
           baseFrog = 'undefined';
           subFrog = 'undefined';
           morphed = 'false';
 
-
-          // here
-          //
           // Attribute Rarities
           var attributesTotal = {
             'goldChain' : 0,
@@ -594,7 +582,7 @@
                 let value = attribute.value
 
                 // Add to Totals
-                attributesTotal[value] = attributesTotal[value] + 1;
+                //attributesTotal[value] = attributesTotal[value] + 1;
 
                 // Display Frog to User (Owner)
                 if (thisTokenOwner === 'true') {
