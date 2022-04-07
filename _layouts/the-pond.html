@@ -565,12 +565,7 @@
               //consoleOutput(tokenName)
             }
 
-            // Get Metadata URI for Token
-            let tokenURI = await collection.methods.tokenURI(thisToken).call()
-            let cid = tokenURI.replace("ipfs://", "")
-            let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
-
-            var metadata = await (await fetch(ipfsGatewayURI)).json();
+            var metadata = (await fetch("https://freshfrogs.github.io/frog/json/"+thisToken+".json")).json();
 
             (async () => { // Pull Metadata
 
