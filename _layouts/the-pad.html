@@ -61,7 +61,6 @@
     position: relative;
     margin: 8px;
     image-rendering: pixelated;
-    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
   }
   .frogContainer {
     border-radius: 200px;
@@ -792,8 +791,8 @@
         // Inherits trait; and additional attirbutes from otherFrog
         // 1. Get metadata from baseFrog
         //document.getElementById("frogContainer").appendChild("<div id='comboFrog' class='smallContainer2'></div>")
-        document.getElementById("baseFrogDiv").style.opacity = '0.35'
-        document.getElementById("subFrogDiv").style.opacity = '0.35'
+        document.getElementById("baseFrogDiv").style.opacity = '0.30'
+        document.getElementById("subFrogDiv").style.opacity = '0.30'
         let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseFrog+".json")).json();
         //consoleOutput("<img width='128px' src='https://freshfrogs.io/frog/"+baseFrog+".png'>");
         //consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
