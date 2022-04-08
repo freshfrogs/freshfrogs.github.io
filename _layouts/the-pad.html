@@ -591,9 +591,6 @@
             for (var thisToken = 1; thisToken < loop_to; thisToken++) {
 
               var tokenName = 'Frog #'+thisToken;
-              if (loaded_to >= ownedFrogs) {
-                break;
-              }
 
               // Progress Bar!
               percent = parseInt((thisToken/loop_to)*100);
@@ -603,6 +600,16 @@
               width++;
               elem.style.width = width + "%";
 
+              if (loaded_to >= ownedFrogs) {
+                percent = 100;
+                document.getElementById("progress").innerHTML = percent+"%"
+                elem = document.getElementById("myBar");
+                width = percent
+                width++;
+                elem.style.width = width + "%";
+                break;
+              }
+
               // Does Frog belong to the owner?
               var thisTokenOwner = await collection.methods.ownerOf(thisToken).call(); // Get owner of thisToken
 
@@ -611,7 +618,7 @@
 
                 // Load Fresh Frog (elementID. tokenID)
                 loadFreshFrog(thisToken);
-                
+
                 loaded_to = loaded_to + 1;
 
                 let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
