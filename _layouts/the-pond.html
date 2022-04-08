@@ -544,7 +544,8 @@
             'white(2)' : 0,
             'white' : 0,
             'yellow(2)' : 0,
-            'yellow' : 0
+            'yellow' : 0,
+            'total' : 0
           } // Start at 0
 
 
@@ -578,9 +579,7 @@
                 trait_type = attribute.trait_type
                 value = attribute.value
 
-                // Add to Totals
-                attributesTotal[value] = (attributesTotal[value]+1);
-                consoleOutput(value+': '+attributesTotal[value])
+                attribute['total']++
 
                 // Display Frog to User (Owner)
                 if (thisTokenOwner === 'true') {
@@ -592,11 +591,7 @@
             })()
           }
 
-          consoleOutput('thirdEye Frogs: '+attributesTotal['thirdEye'])
-          consoleOutput('closedEyes Frogs: '+attributesTotal['closedEyes'])
-          consoleOutput('inversedEyes Frogs: '+attributesTotal['inversedEyes'])
-          consoleOutput('peace Frogs: '+attributesTotal['peace'])
-          consoleOutput('croaking Frogs: '+attributesTotal['croaking'])
+          consoleOutput('Total Frogs: '+attributesTotal['total'])
 
           // ----------------------------->
           mint = 1; // <--- Mint On or Off? 1 / 0
