@@ -54,9 +54,9 @@
     border-radius: 5px;
     overflow: hidden;
     background-color: transparent;
-    width: 128px;
+    width: 256px;
     padding-top: 0px !important;
-    height: 128px !important;
+    height: 256px !important;
     display: inline-block !important;
     position: relative;
     margin-left: auto;
@@ -459,7 +459,7 @@
           morphed = 'false';
 
           // Attribute Rarities
-          attributesTotal = {
+          var attributesTotal = {
             'goldChain' : 0,
             'goldDollarChain' : 0,
             'silverChain' : 0,
@@ -544,8 +544,7 @@
             'white(2)' : 0,
             'white' : 0,
             'yellow(2)' : 0,
-            'yellow' : 0,
-            'total' : 0
+            'yellow' : 0
           } // Start at 0
 
 
@@ -560,14 +559,17 @@
 
             // Create new Frog Panel
             if (userAcc === thisTokenOwner.toLowerCase()) {
-              thisTokenOwner = 'true';
+              var thisTokenOwner = 'true';
               //freshFrogPanel(tokenName, thisToken); // <--
-              thisTokenSrc = 'https://freshfrogs.io/frog/'+thisToken+'.png'
-              consoleOutput('<img src='+thisTokenSrc+' class="smallContainer2">')
+              consoleOutput(tokenName)
             }
 
             // Get Metadata URI for Token
-            var metadata = (await fetch("https://freshfrogs.io/frog/json/"+thisToken+".json")).json();
+            let tokenURI = await collection.methods.tokenURI(thisToken).call()
+            let cid = tokenURI.replace("ipfs://", "")
+            let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
+
+            var metadata = await (await fetch(ipfsGatewayURI)).json();
 
             (async () => { // Pull Metadata
 
@@ -575,23 +577,24 @@
               for (var i = 0; i < metadata.attributes.length; i++){
 
                 // Trait_Type : Value
-                attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
-                trait_type = attribute.trait_type
-                value = attribute.value
+                var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                let trait_type = attribute.trait_type
+                let value = attribute.value
 
-                attribute['total']++
+                // Add to Totals
+                attributesTotal[value] = attributesTotal[value] + 1;
 
                 // Display Frog to User (Owner)
                 if (thisTokenOwner === 'true') {
                   // Build Attribute, Type, Value, Where
                   //loadAttribute(trait_type, value, tokenName)
-                  //consoleOutput(trait_type+': '+value)
+                  consoleOutput(trait_type+': '+value)
                 }
               }
             })()
           }
 
-          consoleOutput('Total Frogs: '+attributesTotal['total'])
+          consoleOutput('<hr>thirdEye Frogs: '+attributesTotal['thirdEye'])
 
           // ----------------------------->
           mint = 1; // <--- Mint On or Off? 1 / 0
@@ -621,20 +624,21 @@
             <li><a id="selectSub" class="pointer"><strong>Sub</strong>Select FROG</a></li>
           </ul>
           <div class="bigContainer">
-            <div id="frogContainer" class="container"><div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.io/assets/frogs/FR0G.png"/></div></div>
+            <div id="frogContainer" class="container"><div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.github.io/assets/frogs/FR0G.png"/></div></div>
           </div>
           <div id="twoFrogs" class="imgWrapper"></div>
+          <h3 id="supply">Morph FROG Tokens!</h3>
         </div>
       </header>
       <section>
-        <h2><strong><a href="https://freshfrogs.io">Fresh Frogs NFT 'FROG' ERC-721</a></strong></h2>
+        <h2><strong><a href="https://freshfrogs.github.io">Fresh Frogs NFT 'FROG' ERC-721</a></strong></h2>
         <div></div>
         <br>
         <div class="downloads pre">
           <div id="pre">
             <div id="netStatus">
               Connect to view 'FROG' tokens...
-              <b><a class="pointer" href="https://freshfrogs.io/the-pad">Connect Wallet</a></b>
+              <b><a class="pointer" href="https://freshfrogs.github.io/the-pad">Connect Wallet</a></b>
               <hr class="hr2">
             </div>
           </div>
