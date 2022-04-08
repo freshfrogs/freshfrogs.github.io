@@ -588,7 +588,7 @@
                 // Add to Totals
                 if (value === 'thirdEye') {
                   attributesTotal[value] = attributesTotal[value] + 1;
-                  document.querySelectorAll('#'+value+'Total').innerHTML = attributesTotal[value];
+                  document.getElementsByClassName(value+'Total').innerHTML = attributesTotal[value];
                 }
 
                 // Display Frog to User (Owner)
