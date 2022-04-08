@@ -547,11 +547,10 @@
             'yellow' : 0
           } // Start at 0
 
-          //consoleOutput('<hr>'+'closedEyes Frogs: <b id="closedEyesTotal"></b>');
-          //consoleOutput('croaking Frogs: <b id="croakingTotal"></b>');
-          //consoleOutput('inversedEyes Frogs: <b id="inversedEyesTotal"></b>');
-          //consoleOutput('peace Frogs: <b id="peaceTotal"></b>');
-          consoleOutput('thirdEye Frogs: <b class="thirdEyeTotal"></b>'+'<hr>');
+          consoleOutput('<hr>'+'closedEyes Frogs: <b class="closedEyesTotal"></b>');
+          consoleOutput('croaking Frogs: <b class="croakingTotal"></b>');
+          consoleOutput('inversedEyes Frogs: <b class="inversedEyesTotal"></b>');
+          consoleOutput('peace Frogs: <b class="peaceTotal"></b>');
           consoleOutput('thirdEye Frogs: <b class="thirdEyeTotal"></b>'+'<hr>');
 
           // ownedFrogs = await collection.methods.balanceOf(userAcc).call();
@@ -585,13 +584,13 @@
                 var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
                 let trait_type = attribute.trait_type
                 let value = attribute.value
+
                 // Add to Totals
-                if (value === 'thirdEye') {
-                  attributesTotal[value] = attributesTotal[value] + 1;
-                  var thirdEyes = document.getElementsByClassName(value+'Total');
-                  for (var i = 0; i < thirdEyes.length; i++) {
-                    thirdEyes[i].innerHTML = attributesTotal[value];
-                  }
+                attributesTotal[value] = attributesTotal[value] + 1;
+
+                var rarity = document.getElementsByClassName(value+'Total');
+                for (var i = 0; i < rarity.length; i++) {
+                  rarity[i].innerHTML = attributesTotal[value];
                 }
 
                 // Display Frog to User (Owner)
