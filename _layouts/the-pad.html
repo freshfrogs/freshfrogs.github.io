@@ -739,6 +739,7 @@
         //
         newFrog = document.createElement("div")
         newFrog.className = "imgWrapper"
+        newFrog.id = 'subFrogDiv'
         newFrog.innerHTML = "<div class='frogImg'><div style='float: right !important;' class='smallContainer2' id='subDisplay'></div></div>"
         document.getElementById("frogContainer").appendChild(newFrog)
         //
@@ -758,6 +759,7 @@
         //document.getElementById("twoFrogs").innerHTML = "";
         newFrog = document.createElement("div")
         newFrog.className = "imgWrapper"
+        newFrog.id = 'baseFrogDiv'
         newFrog.innerHTML = "<div class='frogImg'><div style='float: left !important;' class='smallContainer2' id='baseDisplay'></div></div>"
         document.getElementById("frogContainer").appendChild(newFrog)
         //
@@ -785,7 +787,11 @@
         var otherFrog_Frog, otherFrog_SpecialFrog, otherFrog_Trait, otherFrog_Accessory, otherFrog_Eyes, otherFrog_Hat, otherFrog_Mouth = undefined;
         // Inherits trait; and additional attirbutes from otherFrog
         // 1. Get metadata from baseFrog
-        document.getElementById("frogContainer").innerHTML = "<div id='comboFrog' class='smallContainer2'></div>"
+        //document.getElementById("frogContainer").innerHTML = "<div id='comboFrog' class='smallContainer2'></div>"
+        //
+        document.getElementById('subFrogDiv').style.opacity = '0.3';
+        document.getElementById('baseFrogDiv').style.opacity = '0.3';
+        //
         let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseFrog+".json")).json();
         //consoleOutput("<img width='128px' src='https://freshfrogs.io/frog/"+baseFrog+".png'>");
         //consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
@@ -884,7 +890,7 @@
         }
         // Check first attribute. Is it a Frog or specialFrog?
         //consoleOutput("<div id='newFrog' class='smallContainer2'></div>");
-        thisPlace = 'comboFrog';
+        thisPlace = 'frogContainer';
         //consoleOutput("<br>\n<br>New Frog:<br>");
         if (typeof baseFrog_Frog !== 'undefined') {                              // Load Frog Type
           loadAttribute("Frog", baseFrog_Frog, thisPlace)       // Load Frog Type from baseFrog
