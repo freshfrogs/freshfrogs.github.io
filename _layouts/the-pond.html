@@ -547,12 +547,13 @@
             'yellow' : 0
           } // Start at 0
 
-          consoleOutput('<hr>closedEyes Frogs: <b id="closedEyesTotal"></b>');
-          consoleOutput('croaking Frogs: <b id="croakingTotal"></b>');
-          consoleOutput('inversedEyes Frogs: <b id="inversedEyesTotal"></b>');
-          consoleOutput('peace Frogs: <b id="peaceTotal"></b>');
-          consoleOutput('thirdEye Frogs: <b id="thirdEyeTotal"></b><hr>');
-          alert(attributesTotal['thirdEye'])
+          //consoleOutput('<hr>closedEyes Frogs: <b id="closedEyesTotal"></b>');
+          //consoleOutput('croaking Frogs: <b id="croakingTotal"></b>');
+          //consoleOutput('inversedEyes Frogs: <b id="inversedEyesTotal"></b>');
+          //consoleOutput('peace Frogs: <b id="peaceTotal"></b>');
+
+          consoleOutput('<hr>thirdEye Frogs: <b id="thirdEyeTotal">'+attributesTotal["thirdEye"]+'</b><hr>');
+
           // ownedFrogs = await collection.methods.balanceOf(userAcc).call();
           // Loop Minted Frogs, Frog # 1 - NextID
           for (var thisToken = 1; thisToken < nextIdC; thisToken++) {
@@ -580,7 +581,7 @@
                 // Trait_Type : Value
                 var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
                 let trait_type = attribute.trait_type
-                let value = stringify(attribute.value)
+                let value = attribute.value
 
                 // Add to Totals
                 attributesTotal[value] = attributesTotal[value] + 1;
@@ -596,9 +597,7 @@
                 }
               }
             })()
-            
           }
-          alert(attributesTotal['thirdEye'])
           // ----------------------------->
           mint = 1; // <--- Mint On or Off? 1 / 0
           // <-----------------------------
