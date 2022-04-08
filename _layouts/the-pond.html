@@ -588,7 +588,7 @@
                 // Add to Totals
                 attributesTotal[value] = attributesTotal[value] + 1;
 
-                let rarity = document.getElementsByClassName(value+'Total');
+                rarity = document.getElementsByClassName(value+'Total');
                 for (var i = 0; i < rarity.length; i++) {
                   rarity[i].innerHTML = attributesTotal[value];
                 }
