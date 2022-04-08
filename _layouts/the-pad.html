@@ -403,7 +403,7 @@
         var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
         var collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
         try {
-          consoleOutput('<br>'+'Mint from the collection...<a class="pointer" href="https://freshfrogs.github.io/"><b>Minting Terminal</b> ↗️</a>')
+          consoleOutput('<br>'+'Mint from the collection...<a class="pointer" href="https://freshfrogs.io/"><b>Minting Terminal</b> ↗️</a>')
           //consoleOutput('<hr class="hr2">'+'Generate a Random Frog Combination! <b><a class="pointer" onclick="randomFrogMorph(getRandomInt(1, 587), getRandomInt(1, 587));">Random Morph 🔄</a></b>')
           consoleOutput('<hr class="hr2"><b>🍄Morph FROGS</b><br>Fresh Frog NFT Combinations! <br>Select Frogs to combine their attributes!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>')
           await f0.init({
@@ -577,7 +577,7 @@
         newFrog.onclick = function() {applyFrogOwned(freshFrog)};
         newFrog.id = "Frog #"+freshFrog
         newFrog.className = "frogContainer"
-        //newFrog.backgroundImage = "https://freshfrogs.github.io/frog/"+freshFrog+".png"
+        //newFrog.backgroundImage = "https://freshfrogs.io/frog/"+freshFrog+".png"
         //newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+freshFrog+'.png" alt="Frog '+freshFrog+'" id="frog'+freshFrog+'">'
         document.getElementById("pre").appendChild(newFrog)
         /*
@@ -638,13 +638,13 @@
         newAttribute.className = "frogImg2" //shadesAnimation
         newAttribute.style.cursor = "pointer"
         if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") { 
-          newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".gif"
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
         } else if (attribute === "morphAnimation") {
-          newAttribute.src = "https://freshfrogs.github.io/the-pad/Frog/loadMorph.gif"
+          newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
         } else if (attribute === "shadesAnimation") {
-          newAttribute.src = "https://freshfrogs.github.io/the-pad/Eyes/shadesAnimation.gif"
+          newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
         } else {
-          newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
         }
         newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
@@ -660,7 +660,7 @@
         newFrog.innerHTML = "<div class='frogImg'><div style='float: right !important;' class='smallContainer2' id='subDisplay'></div></div>"
         document.getElementById("frogContainer").appendChild(newFrog)
         //
-        let subFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedSub+".json")).json();
+        let subFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+selectedSub+".json")).json();
         for (var i = 0; i < subFrogmetadata.attributes.length; i++){
           var data = subFrogmetadata.attributes[i]
           loadAttribute(data.trait_type, data.value, 'subDisplay')
@@ -679,7 +679,7 @@
         newFrog.innerHTML = "<div class='frogImg'><div style='float: left !important;' class='smallContainer2' id='baseDisplay'></div></div>"
         document.getElementById("frogContainer").appendChild(newFrog)
         //
-        let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selectedBase+".json")).json();
+        let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+selectedBase+".json")).json();
         for (var i = 0; i < baseFrogmetadata.attributes.length; i++){
           var data = baseFrogmetadata.attributes[i]
           loadAttribute(data.trait_type, data.value, 'baseDisplay')
@@ -704,8 +704,8 @@
         // Inherits trait; and additional attirbutes from otherFrog
         // 1. Get metadata from baseFrog
         document.getElementById("frogContainer").innerHTML = "<div id='comboFrog' class='smallContainer2'></div>"
-        let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+baseFrog+".json")).json();
-        //consoleOutput("<img width='128px' src='https://freshfrogs.github.io/frog/"+baseFrog+".png'>");
+        let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseFrog+".json")).json();
+        //consoleOutput("<img width='128px' src='https://freshfrogs.io/frog/"+baseFrog+".png'>");
         //consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
         for (var baseFrogi = 0; baseFrogi < baseFrogmetadata.attributes.length; baseFrogi++){
           var data = baseFrogmetadata.attributes[baseFrogi]
@@ -732,8 +732,8 @@
         }
         // 2. Get metadata from otherFrog
         // otherFrog MetaData
-        let otherFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+otherFrog+".json")).json();
-        //consoleOutput("<img width='128px' src='https://freshfrogs.github.io/frog/"+otherFrog+".png'>");
+        let otherFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+otherFrog+".json")).json();
+        //consoleOutput("<img width='128px' src='https://freshfrogs.io/frog/"+otherFrog+".png'>");
         //consoleOutput("<br>otherFrog:"+otherFrogmetadata.name)
         for (var otherFrogi = 0; otherFrogi < otherFrogmetadata.attributes.length; otherFrogi++){
           var data2 = otherFrogmetadata.attributes[otherFrogi]
@@ -926,21 +926,21 @@
             <li><a id="selectSub" class="pointer"><strong>Sub</strong>Select FROG</a></li>
           </ul>
           <div class="bigContainer">
-            <div id="frogContainer" class="container"><div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.github.io/assets/frogs/FR0G.png"/></div></div>
+            <div id="frogContainer" class="container"><div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.io/assets/frogs/FR0G.png"/></div></div>
           </div>
           <div id="twoFrogs" class="imgWrapper"></div>
           <h3 id="supply">Morph FROG Tokens!</h3>
         </div>
       </header>
       <section>
-        <h2><strong><a href="https://freshfrogs.github.io">Fresh Frogs NFT 'FROG' ERC-721</a></strong></h2>
+        <h2><strong><a href="https://freshfrogs.io">Fresh Frogs NFT 'FROG' ERC-721</a></strong></h2>
         <div></div>
         <br>
         <div class="downloads pre">
           <div id="pre">
             <div id="netStatus">
               Connect to view 'FROG' tokens...
-              <b><a class="pointer" href="https://freshfrogs.github.io/the-pad">Connect Wallet</a></b>
+              <b><a class="pointer" href="https://freshfrogs.io/the-pad">Connect Wallet</a></b>
               <hr class="hr2">
             </div>
           </div>
