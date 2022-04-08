@@ -561,7 +561,7 @@
             if (userAcc === thisTokenOwner.toLowerCase()) {
               var thisTokenOwner = 'true';
               //freshFrogPanel(tokenName, thisToken); // <--
-              //consoleOutput(tokenName)
+              consoleOutput(tokenName)
             }
 
             // Get Metadata URI for Token
@@ -584,13 +584,13 @@
                 if (thisTokenOwner === 'true') {
                   // Build Attribute, Type, Value, Where
                   //loadAttribute(trait_type, value, tokenName)
-                  //consoleOutput(trait_type+': '+value)
+                  consoleOutput(trait_type+': '+value)
                 }
               }
             })()
           }
-          
-          consoleOutput(JSON.stringify(attributesTotal)) //
+
+          consoleOutput('<hr>thirdEye Frogs: '+attributesTotal['thirdEye'])
 
           // ----------------------------->
           mint = 1; // <--- Mint On or Off? 1 / 0
