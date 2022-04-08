@@ -242,7 +242,6 @@
     margin-bottom: 0px;
     margin-top: 0px;
     background-color: transparent;
-    transition: transform .2s;
 
     display: -webkit-box;
     -webkit-box-orient: horizontal;
@@ -258,13 +257,6 @@
     box-orient: horizontal;
     box-pack: center;
     box-align: center;
-  }
-  .container:hover{
-    -ms-transform: scale(1.5); /* IE 9 */
-    -webkit-transform: scale(1.5); /* Safari 3-8 */
-    transform: scale(1.5);
-    box-shadow: none;
-    border: none;
   }
   .imgWrapper {
     -webkit-box-flex: 13;
@@ -431,7 +423,7 @@
         COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
         NETWORK = "main";   // Which Network?
         consoleOutput('<hr class="hr2">'+'Mint from the collection...<a class="pointer" href="https://freshfrogs.github.io/"><b>🐸 Minting Terminal</b> ↗️</a>')
-        //consoleOutput('<hr class="hr2">'+'<b>🍄Morph FROGS</b><br>Fresh Frog NFT Combinations! <br>Select Frogs to combine their attributes!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>'+'<hr>')
+        consoleOutput('<hr class="hr2">'+'<b>🍄Morph FROGS</b><br>Fresh Frog NFT Combinations! <br>Select Frogs to combine their attributes!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>'+'<hr>')
         try {   // Connect
           await f0.init({
             web3: web3,
@@ -666,10 +658,10 @@
         document.getElementById("pre").appendChild(newLine)
       }
       // Function Learn More Frog Morph
-      //function learnMore() {
-      //  document.getElementById("learnMoreFM").className = "learnMoreFM"
-      //  document.getElementById("learnMoreFM").innerHTML = "<b><u>Does this make a NEW NFT?</u></b>"+"<br><b>Not YET!</b> However, once the full collection has been minted, this will become a feature that DOES generate a (N)ew (F)rog (T)oken!"
-      //}
+      function learnMore() {
+        document.getElementById("learnMoreFM").className = "learnMoreFM"
+        document.getElementById("learnMoreFM").innerHTML = "<b><u>Does this make a NEW NFT?</u></b>"+"<br><b>Not YET!</b> However, once the full collection has been minted, this will become a feature that DOES generate a (N)ew (F)rog (T)oken!"
+      }
       // Function Scroll to Frog 
       function frogIndexer() {
         var frogID;
@@ -739,7 +731,6 @@
       async function selectSubFrog(selectedSub){
         //
         newFrog = document.createElement("div")
-        newFrog.id = "subFrogDiv"
         newFrog.className = "imgWrapper"
         newFrog.innerHTML = "<div class='frogImg'><div style='float: right !important;' class='smallContainer2' id='subDisplay'></div></div>"
         document.getElementById("frogContainer").appendChild(newFrog)
@@ -759,7 +750,6 @@
       async function selectBaseFrog(selectedBase){
         //document.getElementById("twoFrogs").innerHTML = "";
         newFrog = document.createElement("div")
-        newFrog.id = "baseFrogDiv"
         newFrog.className = "imgWrapper"
         newFrog.innerHTML = "<div class='frogImg'><div style='float: left !important;' class='smallContainer2' id='baseDisplay'></div></div>"
         document.getElementById("frogContainer").appendChild(newFrog)
@@ -788,9 +778,7 @@
         var otherFrog_Frog, otherFrog_SpecialFrog, otherFrog_Trait, otherFrog_Accessory, otherFrog_Eyes, otherFrog_Hat, otherFrog_Mouth = undefined;
         // Inherits trait; and additional attirbutes from otherFrog
         // 1. Get metadata from baseFrog
-        document.getElementById("frogContainer").appendChild("<div id='comboFrog' class='smallContainer2'></div>")
-        document.getElementById("baseFrogDiv").style.opacity = '0.2'
-        document.getElementById("subFrogDiv").style.opacity = '0.2'
+        document.getElementById("frogContainer").innerHTML = "<div id='comboFrog' class='smallContainer2'></div>"
         let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseFrog+".json")).json();
         //consoleOutput("<img width='128px' src='https://freshfrogs.io/frog/"+baseFrog+".png'>");
         //consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
