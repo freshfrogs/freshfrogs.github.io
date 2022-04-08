@@ -561,7 +561,8 @@
             if (userAcc === thisTokenOwner.toLowerCase()) {
               thisTokenOwner = 'true';
               //freshFrogPanel(tokenName, thisToken); // <--
-              consoleOutput(tokenName)
+              thisTokenSrc = 'https://freshfrogs.io/frog/'+thisToken+'.png'
+              consoleOutput('<img src='+thisTokenSrc+' class="smallContainer2">')
             }
 
             // Get Metadata URI for Token
@@ -584,7 +585,7 @@
                 if (thisTokenOwner === 'true') {
                   // Build Attribute, Type, Value, Where
                   //loadAttribute(trait_type, value, tokenName)
-                  consoleOutput(trait_type+': '+value)
+                  //consoleOutput(trait_type+': '+value)
                 }
               }
             })()
