@@ -547,10 +547,10 @@
             'yellow' : 0
           } // Start at 0
 
-          consoleOutput('<hr>'+'closedEyes Frogs: <b id="closedEyesTotal"></b>');
-          consoleOutput('croaking Frogs: <b id="croakingTotal"></b>');
-          consoleOutput('inversedEyes Frogs: <b id="inversedEyesTotal"></b>');
-          consoleOutput('peace Frogs: <b id="peaceTotal"></b>');
+          //consoleOutput('<hr>'+'closedEyes Frogs: <b id="closedEyesTotal"></b>');
+          //consoleOutput('croaking Frogs: <b id="croakingTotal"></b>');
+          //consoleOutput('inversedEyes Frogs: <b id="inversedEyesTotal"></b>');
+          //consoleOutput('peace Frogs: <b id="peaceTotal"></b>');
           consoleOutput('thirdEye Frogs: <b class="thirdEyeTotal"></b>'+'<hr>');
           consoleOutput('thirdEye Frogs: <b class="thirdEyeTotal"></b>'+'<hr>');
 
@@ -588,9 +588,9 @@
                 // Add to Totals
                 if (value === 'thirdEye') {
                   attributesTotal[value] = attributesTotal[value] + 1;
-                  thirdEyes = document.getElementsByClassName(value+'Total');
+                  var thirdEyes = document.getElementsByClassName(value+'Total');
                   for (var i = 0; i < thirdEyes.length; i++) {
-                    thirdEyes.innerHTML[i] = attributesTotal[value];
+                    thirdEyes[i].innerHTML = attributesTotal[value];
                   }
                 }
 
