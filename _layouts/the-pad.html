@@ -566,9 +566,9 @@
             }
           })
 
-
+          consoleOutput('<br>'+'Mint from the collection...<a class="pointer" href="https://freshfrogs.github.io/"><b>🐸 Minting Terminal</b> ↗️</a>'+'<hr class="hr2">')
           // Connected! Begin loading Frogs!
-          if (ownedFrogs <= 6) { // ❌ No FROGS
+          if (ownedFrogs <= 0) { // ❌ No FROGS
             document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>❌ It seems you do not own any FROGS!'
           } else {
             document.getElementById('netStatus').innerHTML = '';
