@@ -547,12 +547,6 @@
             'yellow' : 0
           } // Start at 0
 
-          consoleOutput('<hr>'+'closedEyes Frogs: <b class="closedEyesTotal"></b>');
-          consoleOutput('croaking Frogs: <b class="croakingTotal"></b>');
-          consoleOutput('inversedEyes Frogs: <b class="inversedEyesTotal"></b>');
-          consoleOutput('peace Frogs: <b class="peaceTotal"></b>');
-          consoleOutput('thirdEye Frogs: <b class="thirdEyeTotal"></b>'+'<hr>');
-
           // ownedFrogs = await collection.methods.balanceOf(userAcc).call();
           // Loop Minted Frogs, Frog # 1 - NextID
           for (var thisToken = 1; thisToken < nextIdC; thisToken++) {
@@ -562,45 +556,33 @@
             // Does Frog belong to the owner?
             var thisTokenOwner = await collection.methods.ownerOf(thisToken).call(); // Get owner of thisToken
 
-            // Create new Frog Panel
+            // Frog is Owned
             if (userAcc === thisTokenOwner.toLowerCase()) {
-              var thisTokenOwner = 'true';
-              //freshFrogPanel(tokenName, thisToken); // <--
-              //consoleOutput(tokenName)
-            }
 
-            // Get Metadata URI for Token
+              // Load Fresh Frog (elementID. tokenID)
+              loadFreshFrog(thisToken);
 
-            let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' //
+              let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
+              var metadata = await (await fetch(jsonLink)).json();
 
-            var metadata = await (await fetch(jsonLink)).json();
+              (async () => { // Pull Metadata
 
-            (async () => { // Pull Metadata
+                // Loop Attributes
+                for (var i = 0; i < metadata.attributes.length; i++){
 
-              // Loop Attributes
-              for (var i = 0; i < metadata.attributes.length; i++){
+                  // Trait_Type : Value
+                  var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                  let trait_type = attribute.trait_type
+                  let value = attribute.value
 
-                // Trait_Type : Value
-                var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
-                let trait_type = attribute.trait_type
-                let value = attribute.value
+                  // Add to Totals
+                  //attributesTotal[value] = attributesTotal[value] + 1;
 
-                // Add to Totals
-                attributesTotal[value] = attributesTotal[value] + 1;
-
-                //rarity = document.getElementsByClassName(value+'Total');
-               // for (var i = 0; i < rarity.length; i++) {
-                //  rarity[i].innerHTML = attributesTotal[value];
-               // }
-
-                // Display Frog to User (Owner)
-                if (thisTokenOwner === 'true') {
-                  // Build Attribute, Type, Value, Where
+                  // Build Fresh Frogs Attributes
                   //loadAttribute(trait_type, value, tokenName)
-                  //consoleOutput(trait_type+': '+value)
                 }
-              }
-            })()
+              })()
+            }
           }
           // ----------------------------->
           mint = 1; // <--- Mint On or Off? 1 / 0
@@ -611,6 +593,15 @@
           consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong></div>");
         }
       })
+      // Load Fresh Frog
+      function loadFreshFrog(tokenID) {
+        newFrog = document.createElement("a")
+        //newFrog.onclick = function() {applyFrogOwned(freshFrog)};
+        newFrog.id = "Frog #"+tokenID
+        newFrog.className = "frogContainer"
+        newFrog.innerHTML = '<img class="frogImg2" src="https://freshfrogs.io/frog/'+tokenID+'.png" alt="Frog '+tokenID+'">'
+        document.getElementById("pre").appendChild(newFrog)
+      }
       // Output to minting terminal
       function consoleOutput(output) {
         newLine = document.createElement("div")
