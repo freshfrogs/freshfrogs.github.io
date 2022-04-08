@@ -59,7 +59,6 @@
     height: 128px !important;
     display: inline-block !important;
     position: relative;
-    margin: 8px;
     image-rendering: pixelated;
   }
   .frogContainer {
@@ -789,8 +788,8 @@
         // 1. Get metadata from baseFrog
         //document.getElementById("frogContainer").innerHTML = "<div id='comboFrog' class='smallContainer2'></div>"
         //
-        document.getElementById('subFrogDiv').style.opacity = '0.25';
-        document.getElementById('baseFrogDiv').style.opacity = '0.25';
+        document.getElementById('subFrogDiv').style.opacity = '0.3';
+        document.getElementById('baseFrogDiv').style.opacity = '0.3';
         //
         let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseFrog+".json")).json();
         //consoleOutput("<img width='128px' src='https://freshfrogs.io/frog/"+baseFrog+".png'>");
@@ -1014,8 +1013,9 @@
             <li><a id="selectSub" class="pointer"><strong>Sub</strong>Select FROG</a></li>
           </ul>
           <div class="bigContainer">
-            <div id="frogContainer" class="container"><div class="smallContainer2"><img id="previewImg" class="frogImg" src="https://freshfrogs.io/assets/frogs/preview.gif"/></div></div>
+            <div id="frogContainer" class="container"><div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.io/assets/frogs/FLY.gif"/></div></div>
           </div>
+          <div id="twoFrogs" class="imgWrapper"></div>
         </div>
       </header>
       <section>
