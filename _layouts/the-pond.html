@@ -585,7 +585,9 @@
                 console.log(value)
                 // Add to Totals
                 attributesTotal['thirdEye'] = attributesTotal['thirdEye'] + 1;
+                
                 if (value === 'thirdEye') {
+                  console.log(attributesTotal['thirdEye'])
                   document.getElementById('thirdEyeTotal').innerHTML = attributesTotal['thirdEye']
                 }
 
