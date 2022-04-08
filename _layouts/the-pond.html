@@ -579,7 +579,8 @@
                 value = attribute.value
 
                 // Add to Totals
-                attributesTotal[value]++
+                attributesTotal[value] = (attributesTotal[value]+1);
+                consoleOutput(value+': '+attributesTotal[value])
 
                 // Display Frog to User (Owner)
                 if (thisTokenOwner === 'true') {
