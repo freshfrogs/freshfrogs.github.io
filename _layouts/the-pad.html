@@ -739,6 +739,7 @@
       async function selectSubFrog(selectedSub){
         //
         newFrog = document.createElement("div")
+        newFrog.id = "subFrogDiv"
         newFrog.className = "imgWrapper"
         newFrog.innerHTML = "<div class='frogImg'><div style='float: right !important;' class='smallContainer2' id='subDisplay'></div></div>"
         document.getElementById("frogContainer").appendChild(newFrog)
@@ -758,6 +759,7 @@
       async function selectBaseFrog(selectedBase){
         //document.getElementById("twoFrogs").innerHTML = "";
         newFrog = document.createElement("div")
+        newFrog.id = "baseFrogDiv"
         newFrog.className = "imgWrapper"
         newFrog.innerHTML = "<div class='frogImg'><div style='float: left !important;' class='smallContainer2' id='baseDisplay'></div></div>"
         document.getElementById("frogContainer").appendChild(newFrog)
@@ -787,6 +789,8 @@
         // Inherits trait; and additional attirbutes from otherFrog
         // 1. Get metadata from baseFrog
         document.getElementById("frogContainer").appendChild("<div id='comboFrog' class='smallContainer2'></div>")
+        document.getElementById("baseFrogDiv").style.opacity = '0.2'
+        document.getElementById("subFrogDiv").style.opacity = '0.2'
         let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseFrog+".json")).json();
         //consoleOutput("<img width='128px' src='https://freshfrogs.io/frog/"+baseFrog+".png'>");
         //consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
