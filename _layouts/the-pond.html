@@ -587,7 +587,7 @@
                 // Add to Totals
 
                 attributesTotal[value] = attributesTotal[value] + 1;
-                document.getElementById(value+'Total').innerHTML = attributesTotal[value];
+                document.querySelectorAll(value+'Total').innerHTML = attributesTotal[value];
 
                 // Display Frog to User (Owner)
                 if (thisTokenOwner === 'true') {
