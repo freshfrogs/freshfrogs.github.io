@@ -588,7 +588,10 @@
                 // Add to Totals
                 if (value === 'thirdEye') {
                   attributesTotal[value] = attributesTotal[value] + 1;
-                  document.getElementsByClassName(value+'Total').innerHTML = attributesTotal[value];
+                  thirdEyes = document.getElementsByClassName(value+'Total');
+                  for (var i = 0; i < thirdEyes.length; i++) {
+                    thirdEyes.innerHTML[i] = attributesTotal[value];
+                  }
                 }
 
                 // Display Frog to User (Owner)
