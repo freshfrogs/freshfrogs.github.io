@@ -547,12 +547,11 @@
             'yellow' : 0
           } // Start at 0
 
-          consoleOutput('<hr>'+'closedEyes Frogs: <b class="closedEyesTotal"></b>');
-          consoleOutput('croaking Frogs: <b class="croakingTotal"></b>');
-          consoleOutput('inversedEyes Frogs: <b class="inversedEyesTotal"></b>');
-          consoleOutput('peace Frogs: <b class="peaceTotal"></b>');
-          consoleOutput('thirdEye Frogs: <b class="thirdEyeTotal"></b>'+'<hr>');
-          consoleOutput('thirdEye Frogs: <b class="thirdEyeTotal"></b>'+'<hr>');
+          consoleOutput('<hr>'+'closedEyes Frogs: <b id="closedEyesTotal"></b>');
+          consoleOutput('croaking Frogs: <b id="croakingTotal"></b>');
+          consoleOutput('inversedEyes Frogs: <b id="inversedEyesTotal"></b>');
+          consoleOutput('peace Frogs: <b id="peaceTotal"></b>');
+          consoleOutput('thirdEye Frogs: <b id="thirdEyeTotal"></b>'+'<hr>');
 
           // ownedFrogs = await collection.methods.balanceOf(userAcc).call();
           // Loop Minted Frogs, Frog # 1 - NextID
@@ -588,7 +587,8 @@
                 // Add to Totals
 
                 attributesTotal[value] = attributesTotal[value] + 1;
-                document.getElementsByClassName(value+'Total').innerHTML = attributesTotal[value];
+                document.getElementById(value+'Total').innerHTML = attributesTotal[value];
+
                 // Display Frog to User (Owner)
                 if (thisTokenOwner === 'true') {
                   // Build Attribute, Type, Value, Where
