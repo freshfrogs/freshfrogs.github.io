@@ -547,11 +547,11 @@
             'yellow' : 0
           } // Start at 0
 
-          consoleOutput('<hr>'+'closedEyes Frogs: <b class="closedEyesTotal"></b>');
-          consoleOutput('croaking Frogs: <b class="croakingTotal"></b>');
-          consoleOutput('inversedEyes Frogs: <b class="inversedEyesTotal"></b>');
-          consoleOutput('peace Frogs: <b class="peaceTotal"></b>');
-          consoleOutput('thirdEye Frogs: <b class="thirdEyeTotal"></b>'+'<hr>');
+          consoleOutput('<hr>'+'closedEyes Frogs: <b class="closedEyesRarity"></b>');
+          consoleOutput('croaking Frogs: <b class="croakingRarity"></b>');
+          consoleOutput('inversedEyes Frogs: <b class="inversedEyesRarity"></b>');
+          consoleOutput('peace Frogs: <b class="peaceRarity"></b>');
+          consoleOutput('thirdEye Frogs: <b class="thirdEyeRarity"></b>'+'<hr>');
 
           // ownedFrogs = await collection.methods.balanceOf(userAcc).call();
           // Loop Minted Frogs, Frog # 1 - NextID
@@ -588,7 +588,7 @@
                 // Add to Totals
                 attributesTotal[value] = attributesTotal[value] + 1;
 
-                var rarity = document.getElementsByClassName(value+'Total');
+                var rarity = document.getElementsByClassName(value+'Rarity');
                 for (var i = 0; i < rarity.length; i++) {
                   rarity[i].innerHTML = attributesTotal[value];
                 }
