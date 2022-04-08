@@ -551,7 +551,7 @@
           consoleOutput('croaking Frogs: <b id="croakingTotal"></b>');
           consoleOutput('inversedEyes Frogs: <b id="inversedEyesTotal"></b>');
           consoleOutput('peace Frogs: <b id="peaceTotal"></b>');
-          consoleOutput('thirdEye Frogs: <b id="thirdEye"></b><hr>');
+          consoleOutput('thirdEye Frogs: <b id="thirdEyeTotal"></b><hr>');
           alert(attributesTotal['thirdEye'])
           // ownedFrogs = await collection.methods.balanceOf(userAcc).call();
           // Loop Minted Frogs, Frog # 1 - NextID
@@ -584,7 +584,9 @@
 
                 // Add to Totals
                 attributesTotal[value] = attributesTotal[value] + 1;
-                alert(attributesTotal[value])
+                if (value === 'thirdEye') {
+                  document.getElementById('thirdEyeTotal').innerHTML = attributesTotal['thirdEye']
+                }
 
                 // Display Frog to User (Owner)
                 if (thisTokenOwner === 'true') {
