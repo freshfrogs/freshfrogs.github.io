@@ -422,7 +422,8 @@
         CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";    // Contract Address (Ethereum Mainnet) 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b // Rinkeby: 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524
         COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
         NETWORK = "main";   // Which Network?
-        consoleOutput('<hr class="hr2">'+'Mint from the collection...<a class="pointer" href="https://freshfrogs.github.io/"><b>🐸 Minting Terminal</b> ↗️</a>'+'<hr class="hr2">')
+        consoleOutput('<hr class="hr2">'+'Mint from the collection...<a class="pointer" href="https://freshfrogs.github.io/"><b>🐸 Minting Terminal</b> ↗️</a>')
+        consoleOutput('<hr class="hr2">'+'<b>🍄Morph FROGS</b><br>Fresh Frog NFT Combinations! <br>Select Frogs to combine their attributes!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>'+'<hr class="hr2">')
         try {   // Connect
           await f0.init({
             web3: web3,
@@ -655,6 +656,23 @@
         newLine = document.createElement("div")
         newLine.innerHTML = output
         document.getElementById("pre").appendChild(newLine)
+      }
+      // Function Learn More Frog Morph
+      function learnMore() {
+        document.getElementById("learnMoreFM").className = "learnMoreFM"
+        document.getElementById("learnMoreFM").innerHTML = "<b><u>Does this make a NEW NFT?</u></b>"+"<br><b>Not YET!</b> However, once all 4,040 FROGS have been minted, this will become a feature that DOES generate a (N)ew (F)rog (T)oken!"
+      }
+      // Function Scroll to Frog 
+      function frogIndexer() {
+        var frogID;
+        frogID = document.getElementById("frogIndex").value;
+        // FIND FROG
+        //alert(frogID);
+        document.getElementById("Frog #"+frogID).scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'center'
+        });
       }
       // Function apply Owned Frog
       function applyFrogOwned(ownedFrog) {
