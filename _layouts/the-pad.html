@@ -55,12 +55,11 @@
     overflow: hidden;
     background-color: transparent;
     width: 128px;
-    padding: 0px !important;
+    padding: 8px !important;
     height: 128px !important;
     display: inline-block !important;
     position: relative;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0%;
     image-rendering: pixelated;
   }
   .frogContainer {
@@ -102,12 +101,10 @@
     border-radius: 5px;
     overflow: hidden;
     background-color: #7cc1ff;
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: 2%;
+    margin-right: 2%;
     margin-top: 2%;
     margin-bottom: 2%;
-    height: 256px;
-    width: 256px;
   }
   .headLine{
     color: transparent;
@@ -241,11 +238,11 @@
     margin-top: 8px;
   }
   .container {
-    height: 256px;
     width: auto;
-    margin-bottom: auto;
-    margin-top: auto;
+    margin-bottom: 0px;
+    margin-top: 0px;
     background-color: transparent;
+
     display: -webkit-box;
     -webkit-box-orient: horizontal;
     -webkit-box-pack: center;
@@ -265,7 +262,6 @@
     -webkit-box-flex: 13;
     -moz-box-flex: 1;
     box-flex: 1;
-    transition: transform .2s;
   }
   .frogImg {
     transition: transform .2s;
@@ -285,15 +281,6 @@
     width: 128px;
     height: 128px;
     border-radius: 5px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .frogImg2:hover{
-    -ms-transform: scale(1.5); /* IE 9 */
-    -webkit-transform: scale(1.5); /* Safari 3-8 */
-    transform: scale(1.5);
-    box-shadow: none;
-    border: none;
   }
   .frogImg3 {
     transition: transform .2s;
@@ -435,8 +422,8 @@
         CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";    // Contract Address (Ethereum Mainnet) 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b // Rinkeby: 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524
         COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
         NETWORK = "main";   // Which Network?
-        consoleOutput('<hr class="hr2">'+'Mint from the collection...<a class="pointer" href="https://freshfrogs.github.io/"><b>🐸 Minting Terminal</b> ↗️</a>'+'<hr class="hr2">')
-        //consoleOutput('<hr class="hr2">'+'<b>🍄Morph FROGS</b><br>Fresh Frog NFT Combinations! <br>Select Frogs to combine their attributes!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>'+'<hr>')
+        consoleOutput('<hr class="hr2">'+'Mint from the collection...<a class="pointer" href="https://freshfrogs.github.io/"><b>🐸 Minting Terminal</b> ↗️</a>')
+        consoleOutput('<hr class="hr2">'+'<b>🍄Morph FROGS</b><br>Fresh Frog NFT Combinations! <br>Select Frogs to combine their attributes!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>'+'<hr>')
         try {   // Connect
           await f0.init({
             web3: web3,
@@ -660,7 +647,7 @@
         newFrog = document.createElement("a")
         newFrog.onclick = function() {applyFrogOwned(tokenID)};
         newFrog.id = "Frog #"+tokenID
-        newFrog.className = "smallContainer2"
+        newFrog.className = "smallContainer2 pointer"
         newFrog.innerHTML = '<img class="frogImg2" src="https://freshfrogs.io/frog/'+tokenID+'.png" alt="Frog '+tokenID+'">'
         document.getElementById("pre").appendChild(newFrog)
       }
@@ -671,10 +658,10 @@
         document.getElementById("pre").appendChild(newLine)
       }
       // Function Learn More Frog Morph
-      //function learnMore() {
-      //  document.getElementById("learnMoreFM").className = "learnMoreFM"
-      //  document.getElementById("learnMoreFM").innerHTML = "<b><u>Does this make a NEW NFT?</u></b>"+"<br><b>Not YET!</b> However, once the full collection has been minted, this will become a feature that DOES generate a (N)ew (F)rog (T)oken!"
-      //}
+      function learnMore() {
+        document.getElementById("learnMoreFM").className = "learnMoreFM"
+        document.getElementById("learnMoreFM").innerHTML = "<b><u>Does this make a NEW NFT?</u></b>"+"<br><b>Not YET!</b> However, once the full collection has been minted, this will become a feature that DOES generate a (N)ew (F)rog (T)oken!"
+      }
       // Function Scroll to Frog 
       function frogIndexer() {
         var frogID;
@@ -724,7 +711,7 @@
         newAttribute.id = attribute
         newAttribute.target = "_blank"
         newAttribute.className = "frogImg2" //shadesAnimation
-        //newAttribute.style.cursor = "pointer"
+        newAttribute.style.cursor = "pointer"
         if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") { 
           newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
         } else if (attribute === "morphAnimation") {
@@ -745,7 +732,6 @@
         //
         newFrog = document.createElement("div")
         newFrog.className = "imgWrapper"
-        newFrog.id = "subFrogDiv"
         newFrog.innerHTML = "<div class='frogImg'><div style='float: right !important;' class='smallContainer2' id='subDisplay'></div></div>"
         document.getElementById("frogContainer").appendChild(newFrog)
         //
@@ -765,7 +751,6 @@
         //document.getElementById("twoFrogs").innerHTML = "";
         newFrog = document.createElement("div")
         newFrog.className = "imgWrapper"
-        newFrog.id = "baseFrogDiv"
         newFrog.innerHTML = "<div class='frogImg'><div style='float: left !important;' class='smallContainer2' id='baseDisplay'></div></div>"
         document.getElementById("frogContainer").appendChild(newFrog)
         //
@@ -793,9 +778,7 @@
         var otherFrog_Frog, otherFrog_SpecialFrog, otherFrog_Trait, otherFrog_Accessory, otherFrog_Eyes, otherFrog_Hat, otherFrog_Mouth = undefined;
         // Inherits trait; and additional attirbutes from otherFrog
         // 1. Get metadata from baseFrog
-        //document.getElementById("frogContainer").appendChild("<div id='comboFrog' class='smallContainer2'></div>")
-        document.getElementById("baseFrogDiv").style.opacity = '0.30'
-        document.getElementById("subFrogDiv").style.opacity = '0.30'
+        document.getElementById("frogContainer").innerHTML = "<div id='comboFrog' class='smallContainer2'></div>"
         let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseFrog+".json")).json();
         //consoleOutput("<img width='128px' src='https://freshfrogs.io/frog/"+baseFrog+".png'>");
         //consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
@@ -894,7 +877,7 @@
         }
         // Check first attribute. Is it a Frog or specialFrog?
         //consoleOutput("<div id='newFrog' class='smallContainer2'></div>");
-        thisPlace = 'frogContainer';
+        thisPlace = 'comboFrog';
         //consoleOutput("<br>\n<br>New Frog:<br>");
         if (typeof baseFrog_Frog !== 'undefined') {                              // Load Frog Type
           loadAttribute("Frog", baseFrog_Frog, thisPlace)       // Load Frog Type from baseFrog
@@ -1024,7 +1007,7 @@
         </div>
       </header>
       <section>
-        <h2><strong><a href="https://freshfrogs.io/the-pad">freshfrogs.io/the-pad 🍀</a></strong></h2>
+        <h2><strong><a href="https://freshfrogs.io">Fresh Frogs NFT 'FROG' ERC-721</a></strong></h2>
         <div></div>
         <br>
         <div class="downloads pre">
@@ -1041,6 +1024,7 @@
             <a href="https://opensea.io/collection/fresh-frogs" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/opensea.png"></a>
             <a href="https://nftcalendar.io/event/fresh-frogs-nft-collection-release/" target="_blank" style="display: inline !important;"><img background="white" class="headLineImg" src="../assets/nftCalendar.png"></a>
             <a href="https://nftdroops.com/nft/fresh-frogs/" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/droops2.png"></a>
+            <a href="https://rarible.com/fresh-frogs/" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/Rarible.png"></a>
             <a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/etherScan.png"></a>
           </headline>
         </div>
