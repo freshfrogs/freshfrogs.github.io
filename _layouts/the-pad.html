@@ -570,8 +570,7 @@
           if (ownedFrogs <= 0) { // ❌ No FROGS
             document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>❌ It seems you do not own any FROGS!'
           } else {
-            document.getElementById('netStatus').innerHTML = '';
-            consoleOutput('Compiling Tokens... Please wait... ⌛ <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br><br>')
+            document.getElementById('netStatus').innerHTML = 'Compiling Tokens... Please wait... ⌛ <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br><br>';
 
             // Loop Minted Frogs, Frog # 1 - NextID
             var loop_to = (nextIdC-1)
