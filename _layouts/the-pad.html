@@ -407,9 +407,8 @@
   }
   .headerDiv {
     border: 2px solid #7cc1ff;
-    padding: 14px;
+    padding: 4px;
     border-radius: 5px;
-    margin-top: 8px;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -907,7 +906,7 @@
         //consoleOutput("<br>\n<br>New Frog:<br>");
         if (typeof baseFrog_Frog !== 'undefined') {                              // Load Frog Type
           loadAttribute("Frog", baseFrog_Frog, thisPlace)       // Load Frog Type from baseFrog
-          //loadAttribute("Frog", "frog", thisPlace);
+          loadAttribute("Frog", "frog", thisPlace);
           //consoleOutput("Frog: "+baseFrog_Frog); // Test Frog
           // Trait
           if (typeof otherFrog_Trait !== 'undefined') {                        // Check for trait from otherfrog
@@ -961,7 +960,7 @@
           //loadAttribute("Frog", "loadMorph", thisPlace);
         } else if (typeof baseFrog_SpecialFrog !== 'undefined') { // Load SpecialFrog Type
           loadAttribute("SpecialFrog", baseFrog_SpecialFrog, thisPlace)
-          //loadAttribute("Frog", "frog", thisPlace);
+          loadAttribute("Frog", "frog", thisPlace);
           //consoleOutput("SpecialFrog Found: "+baseFrog_SpecialFrog)
           //
           // Trait
@@ -1022,7 +1021,7 @@
       <header>
         <div class="downloads pre">
           <ul class="downloads2">
-            <li><a id="morphFrogs" class="pointer"><strong>Morph</strong>Base / Sub</a></li>
+            <li><a id="morphFrogs" class="pointer"><strong>Morph</strong>🐸 <b>+</b> 🐸</a></li>
             <li><a id="selectBase" class="pointer"><strong>Base</strong>Select FROG</a></li>
             <li><a id="selectSub" class="pointer"><strong>Sub</strong>Select FROG</a></li>
           </ul>
