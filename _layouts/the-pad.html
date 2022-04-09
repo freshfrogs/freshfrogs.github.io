@@ -793,7 +793,7 @@
 
         newFrog = document.createElement("div")
         newFrog.id = 'comboFrog'
-        document.getElementById("bigContainer").appendChild(newFrog)
+        document.getElementById("imgWrapper").appendChild(newFrog)
 
 
         let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseFrog+".json")).json();
@@ -1018,7 +1018,7 @@
             <li><a id="selectSub" class="pointer"><strong>Sub</strong>Select FROG</a></li>
           </ul>
           <div id="bigContainer" class="bigContainer">
-            <div id="frogContainer" class="container"><div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.io/assets/frogs/FLY.gif"/></div></div>
+            <div id="frogContainer" class="container"><div id="imgWrapper" class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.io/assets/frogs/FLY.gif"/></div></div>
           </div>
           <div id="twoFrogs" class="imgWrapper"></div>
         </div>
