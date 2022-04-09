@@ -428,6 +428,11 @@
     border-radius: 5px;
     padding: 4px;
   }
+  .trait{
+    border-radius: 5px;
+    background: rgba(126, 183, 128, 1);
+    color: white;
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -712,7 +717,7 @@
                 console.log(attributeText.length)
                 for (var a = 0; a < attributeText.length; a++) {
                   console.log('◆ '+value+'('+rarity+'%)')
-                  attributeText[a].innerHTML = '<b>'+rarity+'%</b> '+value;
+                  attributeText[a].innerHTML = '<b class="trait">'+rarity+'%</b> '+value;
                 }
               }
             })()
