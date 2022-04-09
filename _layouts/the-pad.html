@@ -399,10 +399,7 @@
     padding: 4px;
   }
   .thePad {
-    background-color: #7cc1ff;
     border-radius: 5px;
-    border: 0px solid white;
-    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
     padding: 4px;
     min-height: 128px;
   }
@@ -416,11 +413,14 @@
     image-rendering: pixelated;
     color: white;
     text-align: center;
-    border: 1px solid white;
-    padding: 8px;
+    border: 1px solid rgba(126, 183, 128, 1);
     border-radius: 5px;
+    padding: 8px;
+    padding-top: 0px;
+    padding-bottom: 0px;
     margin: 8px;
     background-color: rgba(126, 183, 128, 1);
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -818,8 +818,8 @@
         var otherFrog_Frog, otherFrog_SpecialFrog, otherFrog_Trait, otherFrog_Accessory, otherFrog_Eyes, otherFrog_Hat, otherFrog_Mouth = undefined;
         // Inherits trait; and additional attirbutes from otherFrog
         // 1. Get metadata from baseFrog
-        document.getElementById("subFrogDiv").style.opacity = '0.25';
-        document.getElementById("baseFrogDiv").style.opacity = '0.25';
+        document.getElementById("subFrogDiv").style.opacity = '0.20';
+        document.getElementById("baseFrogDiv").style.opacity = '0.20';
         let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseFrog+".json")).json();
         //consoleOutput("<img width='128px' src='https://freshfrogs.io/frog/"+baseFrog+".png'>");
         //consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
