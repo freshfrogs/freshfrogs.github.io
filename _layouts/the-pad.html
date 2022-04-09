@@ -656,7 +656,7 @@
 
                     // Build Fresh Frogs Attributes
                     loadAttribute(trait_type, value, tokenName)
-                    newAttribute = document.createTextNode('<br>'+trait_type+' | '+value)
+                    newAttribute = document.createTextNode('\n'+trait_type+' | '+value)
                     document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute)
                   }
                 })()
