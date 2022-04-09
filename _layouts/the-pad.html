@@ -688,9 +688,9 @@
           async function frogRarity(thisFrog) {
             let jsonLink = 'https://freshfrogs.io/frog/json/'+thisFrog+'.json' 
             var metadata = await (await fetch(jsonLink)).json();
-            
+            total = 1;
             (async () => { // Pull Metadata
-              total = 1;
+              
               // Loop Attributes
               for (var i = 0; i < metadata.attributes.length; i++){
 
@@ -699,8 +699,8 @@
                 let value = attribute.value
                 total = (1 / attributesTotal[value]) * total
               }
-              console.log(total);
             })()
+            console.log(total);
           }
           // ----------------------------->
           // mint = 1; // <--- Mint On or Off? 1 / 0
