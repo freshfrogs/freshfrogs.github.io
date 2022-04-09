@@ -423,6 +423,9 @@
     background-color: rgba(126, 183, 128, 1);
     box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
   }
+  .attributeList {
+    border: 1px solid white;
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -687,7 +690,7 @@
         newFrog = document.createElement("div")
         newFrog.onclick = function() {applyFrogOwned(tokenID)};
         newFrog.className = 'frogPanel'
-        newFrog.innerHTML = '<a class="smallContainer2 pointer" id="Frog #'+tokenID+'"></a>'+'<p id="Frog #'+tokenID+'Desc"></p>'
+        newFrog.innerHTML = '<a class="smallContainer2 pointer" id="Frog #'+tokenID+'"></a>'+'<p class="attributeList" id="Frog #'+tokenID+'Desc"></p>'
         document.getElementById("thePad").appendChild(newFrog)
       }
       // Output to minting terminal
