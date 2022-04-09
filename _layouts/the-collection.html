@@ -598,10 +598,9 @@
       // Load Fresh Frog
       function loadFreshFrog(tokenID) {
         newFrog = document.createElement("a")
-        newFrog.className = 'frogPanel'
         newFrog.href = '';
         newFrog.id = "Frog #"+tokenID
-        newFrog.className = "smallContainer2 pointer"
+        newFrog.className = "smallContainer2 pointer frogPanel"
         document.getElementById("thePad").appendChild(newFrog)
       }
       // Output to minting terminal
