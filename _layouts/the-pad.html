@@ -679,9 +679,27 @@
           }
           // Loop Frog Rarities
           var frogPanel = document.getElementsByClassName('frogPanel');
-          for(var i = 0; i < frogPanel.length; i++)
-          {
-            console.log(frogPanel[i].id);
+          for (var i = 0; i < frogPanel.length; i++) {
+            let frog = frogPanel[i].id
+            frogPanel[i].style.background = frogRarity(frog);
+            //console.log(frogPanel[i].id);
+          }
+          async function frogRarity(thisFrog) {
+            let jsonLink = 'https://freshfrogs.io/frog/json/'+thisFrog+'.json' 
+            var metadata = await (await fetch(jsonLink)).json();
+            var total = 1;
+            (async () => { // Pull Metadata
+              
+              // Loop Attributes
+              for (var i = 0; i < metadata.attributes.length; i++){
+
+                // Trait_Type : Value
+                var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                let value = attribute.value
+                let total = (1 / attributesTotal[value]) * total
+              }
+            })()
+            console.log(total);
           }
           // ----------------------------->
           // mint = 1; // <--- Mint On or Off? 1 / 0
