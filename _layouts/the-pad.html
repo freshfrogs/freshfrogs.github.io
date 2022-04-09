@@ -790,7 +790,16 @@
         document.getElementById("subFrogDiv").style.opacity = '0.25';
         document.getElementById("baseFrogDiv").style.opacity = '0.25';
         //document.getElementById("frogContainer").appendChild("<div id='comboFrog' class='smallContainer2'></div>");
+        
+        //
 
+        newFrog = document.createElement("div")
+        newFrog.className = "imgWrapper"
+        newFrog.id = 'comboFrog'
+        newFrog.innerHTML = "<div class='frogImg'><div style='margin: auto !important;' class='smallContainer2'></div></div>"
+        document.getElementById("frogContainer").appendChild(newFrog)
+
+        //
         let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseFrog+".json")).json();
         //consoleOutput("<img width='128px' src='https://freshfrogs.io/frog/"+baseFrog+".png'>");
         //consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
@@ -889,7 +898,7 @@
         }
         // Check first attribute. Is it a Frog or specialFrog?
         //consoleOutput("<div id='newFrog' class='smallContainer2'></div>");
-        thisPlace = 'frogContainer';
+        thisPlace = 'comboFrog';
         //consoleOutput("<br>\n<br>New Frog:<br>");
         if (typeof baseFrog_Frog !== 'undefined') {                              // Load Frog Type
           loadAttribute("Frog", baseFrog_Frog, thisPlace)       // Load Frog Type from baseFrog
