@@ -630,7 +630,7 @@
 
                 // Load Fresh Frog (elementID. tokenID)
                 loadFreshFrog(thisToken);
-
+                document.getElementById('Frog #'+thisToken+'Desc').innerHTML = tokenName;
                 loaded_to = loaded_to + 1;
 
                 let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
@@ -651,6 +651,7 @@
 
                     // Build Fresh Frogs Attributes
                     loadAttribute(trait_type, value, tokenName)
+
                   }
                 })()
               }
@@ -668,11 +669,9 @@
       })
       // Load Fresh Frog
       function loadFreshFrog(tokenID) {
-        newFrog = document.createElement("a")
+        newFrog = document.createElement("div")
         newFrog.onclick = function() {applyFrogOwned(tokenID)};
-        newFrog.id = "Frog #"+tokenID
-        newFrog.innerHTML = "Frog #"+tokenID
-        newFrog.className = "smallContainer2 pointer"
+        newFrog.innerHTML = '<a class="smallContainer2 pointer" id="Frog #'+tokenID+'"></a>'+'<p id="Frog #'+tokenID+'Desc"></p>'
         document.getElementById("thePad").appendChild(newFrog)
       }
       // Output to minting terminal
