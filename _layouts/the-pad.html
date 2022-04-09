@@ -639,7 +639,7 @@
                 document.getElementById('netStatus').innerHTML = ''
                 break;
               }
-              let loadAttributes = 'false';
+              loadAttributes = 'false';
               // Does Frog belong to the owner?
               var thisTokenOwner = await collection.methods.ownerOf(thisToken).call(); // Get owner of thisToken
 
@@ -650,7 +650,7 @@
                 loadFreshFrog(thisToken);
                 document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<b><u>'+tokenName+'</u></b>';
                 loaded_to = loaded_to + 1;
-                let loadAttributes = 'true';
+                loadAttributes = 'true';
               }
 
               let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
