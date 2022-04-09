@@ -671,6 +671,7 @@
         newFrog = document.createElement("a")
         newFrog.onclick = function() {applyFrogOwned(tokenID)};
         newFrog.id = "Frog #"+tokenID
+        newFrog.innerHTML = "Frog #"+tokenID
         newFrog.className = "smallContainer2 pointer"
         document.getElementById("thePad").appendChild(newFrog)
       }
