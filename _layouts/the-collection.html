@@ -565,8 +565,10 @@
             loadFreshFrog(thisToken);
             newText = document.createElement("b")
             newText.innerHTML = tokenName;
-
+            newText.style.marginLeft = 'auto'
+            newText.style.marginRight = 'auto'
             document.getElementById(tokenName).appendChild(newText);
+
             let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
             var metadata = await (await fetch(jsonLink)).json();
 
