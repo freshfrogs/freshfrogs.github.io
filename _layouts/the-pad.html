@@ -415,7 +415,6 @@
     display: inline-block !important;
     image-rendering: pixelated;
     color: white;
-    font-weight: bold;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -636,7 +635,7 @@
 
                 // Load Fresh Frog (elementID. tokenID)
                 loadFreshFrog(thisToken);
-                document.getElementById('Frog #'+thisToken+'Desc').innerHTML = tokenName;
+                document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<b>'+tokenName+'</b>';
                 loaded_to = loaded_to + 1;
 
                 let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
@@ -657,7 +656,7 @@
 
                     // Build Fresh Frogs Attributes
                     loadAttribute(trait_type, value, tokenName)
-                    newAttribute = document.createElement('p');
+                    newAttribute = document.createElement('li');
                     newAttribute.innerHTML = value;
                     document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute)
                   }
