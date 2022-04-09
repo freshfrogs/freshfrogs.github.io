@@ -565,8 +565,7 @@
             loadFreshFrog(thisToken);
             newText = document.createElement("b")
             newText.innerHTML = tokenName;
-            newText.style.marginLeft = 'auto'
-            newText.style.marginRight = 'auto'
+            newText.style.margin = 'auto'
             document.getElementById(tokenName).appendChild(newText);
 
             let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
@@ -587,6 +586,11 @@
 
                 // Build Fresh Frogs Attributes
                 loadAttribute(trait_type, value, tokenName)
+
+                newText = document.createElement("p")
+                newText.innerHTML = trait_type+' | '+value;
+                newText.style.margin = 'auto'
+                document.getElementById(tokenName).appendChild(newText);
               }
             })()
           }
