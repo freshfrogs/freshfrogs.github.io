@@ -394,8 +394,15 @@
     box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
     padding: 4px;
   }
-  .mintingTextWhite {
+  .mintingTextYellow {
     background-color: #faff99;
+    border-radius: 5px;
+    border: 0px solid white;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
+    padding: 4px;
+  }
+  .mintingTextWhite {
+    background-color: white;
     border-radius: 5px;
     border: 0px solid white;
     box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
@@ -525,7 +532,7 @@
             userPendingTx = 1;
             try {
               document.getElementById('mintingText').innerHTML = "<strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the Page!"
-              document.getElementById('mintingText').className = "mintingTextWhite"
+              document.getElementById('mintingText').className = "mintingTextYellow"
               
               let tokens = await f0.mint(userInvite, frogCount)
               document.getElementById('mintingText').innerHTML = "<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3> <b>"+frogCount+" FROG(s) </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>"
