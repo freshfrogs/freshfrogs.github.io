@@ -639,7 +639,7 @@
                 document.getElementById('netStatus').innerHTML = ''
                 break;
               }
-              var loadAttributes = 'false';
+              let loadAttributes = 'false';
               // Does Frog belong to the owner?
               var thisTokenOwner = await collection.methods.ownerOf(thisToken).call(); // Get owner of thisToken
 
