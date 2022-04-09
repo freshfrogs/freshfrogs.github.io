@@ -569,7 +569,7 @@
             newText = document.createElement("div")
             newText.innerHTML = tokenName;
             newText.style.margin = 'auto'
-            document.getElementById(tokenName).appendChild(newText);
+            document.getElementById(tokenName+"Panel").appendChild(newText);
 
             let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
             var metadata = await (await fetch(jsonLink)).json();
@@ -593,7 +593,7 @@
                 newText = document.createElement("div")
                 newText.innerHTML = trait_type+' | '+value;
                 newText.style.margin = 'auto'
-                document.getElementById(tokenName).appendChild(newText);
+                document.getElementById(tokenName+"Panel").appendChild(newText);
               }
             })()
           }
@@ -610,8 +610,9 @@
       // Load Fresh Frog
       function loadFreshFrog(tokenID) {
         newFrog = document.createElement("div")
-        newFrog.id = "Frog #"+tokenID
-        newFrog.className = "smallContainer2 pointer frogPanel"
+        newFrog.id = "Frog #"+tokenID+"Panel"
+        newFrog.className = "frogPanel"
+        newFrog.innerHTML = '<a id='+newFrog_id+'class="smallContainer2 pointer"></a>'
         document.getElementById("thePad").appendChild(newFrog)
       }
       // Output to minting terminal
