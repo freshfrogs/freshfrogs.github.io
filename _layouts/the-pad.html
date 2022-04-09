@@ -706,7 +706,7 @@
                 let value = attribute.value
                 //total = (1 / attributesTotal[value]) * total
                 var rarity = Math.round( ((attributesTotal[value])/(nextIdC-1))*100 );
-                console.log(value+': '+rarity);
+                console.log(value+': '+attributesTotal[value]);
 
                 var attributeText = document.getElementsByClassName(value);
                 console.log(attributeText.length)
