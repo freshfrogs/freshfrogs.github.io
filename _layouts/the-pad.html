@@ -697,10 +697,10 @@
                 // Trait_Type : Value
                 var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
                 let value = attribute.value
-                total = (1 / attributesTotal[value]) * total
+                //total = (1 / attributesTotal[value]) * total
+                console.log(value+': '+attributesTotal[value]);
               }
             })()
-            console.log(total);
           }
           // ----------------------------->
           // mint = 1; // <--- Mint On or Off? 1 / 0
