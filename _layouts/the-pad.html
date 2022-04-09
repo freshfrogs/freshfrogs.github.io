@@ -673,6 +673,7 @@
                   if (loadAttributes === 'true') {
                     loadAttribute(trait_type, value, tokenName)
                     newAttribute = document.createTextNode('◆ '+value)
+                    newAttribute.className = value;
                     space = document.createElement('br')
                     document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
                     document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
@@ -703,7 +704,13 @@
                 var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
                 let value = attribute.value
                 //total = (1 / attributesTotal[value]) * total
-                console.log(value+': '+(attributesTotal[value])/(nextIdC-1));
+                var rarity = (attributesTotal[value])/(nextIdC-1);
+                console.log(value+': '+rarity);
+
+                var attributeText = document.getElementsByClassName(value);
+                for (var i = 0; i < attributeText.length; i++) {
+                  attributeText[i].innerText = value+'(%'+rarity+')';
+                }
               }
             })()
           }
