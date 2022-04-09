@@ -654,7 +654,7 @@
                 var metadata = await (await fetch(jsonLink)).json();
 
                 (async () => { // Pull Metadata
-
+                  
                   // Loop Attributes
                   for (var i = 0; i < metadata.attributes.length; i++){
 
@@ -664,7 +664,7 @@
                     let value = attribute.value
 
                     // Add to Totals
-                    //attributesTotal[value] = attributesTotal[value] + 1;
+                    attributesTotal[value] = attributesTotal[value] + 1;
 
                     // Build Fresh Frogs Attributes
                     loadAttribute(trait_type, value, tokenName)
@@ -677,7 +677,12 @@
               }
             }
           }
-
+          // Loop Frog Rarities
+          var frogPanel = document.getElementsByClassName('frogPanel');
+          for(var i = 0; i < frogPanel.length; i++)
+          {
+            console.log(frogPanel[i]);
+          }
           // ----------------------------->
           // mint = 1; // <--- Mint On or Off? 1 / 0
           // <-----------------------------
@@ -691,6 +696,7 @@
       function loadFreshFrog(tokenID) {
         newFrog = document.createElement("div")
         newFrog.onclick = function() {applyFrogOwned(tokenID)};
+        newFrog.id = tokenID
         newFrog.className = 'frogPanel'
         newFrog.innerHTML = '<a class="smallContainer2 pointer" id="Frog #'+tokenID+'"></a>'+'<p class="attributeList" id="Frog #'+tokenID+'Desc"></p>'
         document.getElementById("thePad").appendChild(newFrog)
