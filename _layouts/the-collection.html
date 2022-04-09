@@ -395,7 +395,6 @@
     border-radius: 5px;
     background-color: white;
     padding: 8px;
-    text-align: center;
     margin: 8px;
     border: 1px solid lightgray;
     height: auto;
@@ -567,7 +566,7 @@
 
             // Load Fresh Frog (elementID. tokenID)
             loadFreshFrog(thisToken);
-            newText = document.createElement("b")
+            newText = document.createElement("div")
             newText.innerHTML = tokenName;
             newText.style.margin = 'auto'
             document.getElementById(tokenName).appendChild(newText);
@@ -591,7 +590,7 @@
                 // Build Fresh Frogs Attributes
                 loadAttribute(trait_type, value, tokenName)
 
-                newText = document.createElement("p")
+                newText = document.createElement("div")
                 newText.innerHTML = trait_type+' | '+value;
                 newText.style.margin = 'auto'
                 document.getElementById(tokenName).appendChild(newText);
