@@ -697,7 +697,7 @@
                 // Trait_Type : Value
                 var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
                 let value = attribute.value
-                let total = (1 / attributesTotal[value]) * total
+                total = (1 / attributesTotal[value]) * total
               }
               console.log(total);
             })()
