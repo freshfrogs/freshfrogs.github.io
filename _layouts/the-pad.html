@@ -461,6 +461,10 @@
           subFrog = 'undefined';
           morphed = 'false';
 
+          // Get two Frogs Ready
+          applyFrogOwned(407);
+          applyFrogOwned(67);
+
           // Attribute Rarities
           var attributesTotal = {
             'goldChain' : 0,
@@ -578,6 +582,8 @@
           })
 
           // Connected! Begin loading Frogs!
+          // Display Two Random Frogs!
+          combineTokens(baseFrog, subFrog);
           if (ownedFrogs <= 0) { // ❌ No FROGS
             document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>❌ It seems you do not own any FROGS!'
           } else {
