@@ -638,7 +638,7 @@
                 document.getElementById('netStatus').innerHTML = ''
                 break;
               }
-
+              var loadAttributes = 'false';
               // Does Frog belong to the owner?
               var thisTokenOwner = await collection.methods.ownerOf(thisToken).call(); // Get owner of thisToken
 
@@ -649,32 +649,36 @@
                 loadFreshFrog(thisToken);
                 document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<b><u>'+tokenName+'</u></b>';
                 loaded_to = loaded_to + 1;
+                let loadAttributes = 'true';
+              }
 
-                let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
-                var metadata = await (await fetch(jsonLink)).json();
+              let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
+              var metadata = await (await fetch(jsonLink)).json();
 
-                (async () => { // Pull Metadata
-                  
-                  // Loop Attributes
-                  for (var i = 0; i < metadata.attributes.length; i++){
+              (async () => { // Pull Metadata
+                
+                // Loop Attributes
+                for (var i = 0; i < metadata.attributes.length; i++){
 
-                    // Trait_Type : Value
-                    var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
-                    let trait_type = attribute.trait_type
-                    let value = attribute.value
+                  // Trait_Type : Value
+                  var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                  let trait_type = attribute.trait_type
+                  let value = attribute.value
 
-                    // Add to Totals
-                    attributesTotal[value] = attributesTotal[value] + 1;
+                  // Add to Totals
+                  attributesTotal[value] = attributesTotal[value] + 1;
 
-                    // Build Fresh Frogs Attributes
+                  // Build Fresh Frogs Attributes
+                  if (loadAttributes === 'true') {
                     loadAttribute(trait_type, value, tokenName)
                     newAttribute = document.createTextNode('◆ '+value)
                     space = document.createElement('br')
                     document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
                     document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
                   }
-                })()
-              }
+                }
+              })()
+              
             }
           }
           // Loop Frog Rarities
