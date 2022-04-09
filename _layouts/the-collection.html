@@ -563,7 +563,7 @@
 
             // Load Fresh Frog (elementID. tokenID)
             loadFreshFrog(thisToken);
-
+            document.getElementById(tokenName).appendChild('<strong>'+tokenName+'</strong>');
             let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
             var metadata = await (await fetch(jsonLink)).json();
 
@@ -582,7 +582,6 @@
 
                 // Build Fresh Frogs Attributes
                 loadAttribute(trait_type, value, tokenName)
-                document.getElementById(tokenName).appendChild('<strong>'+tokenName+'</strong>');
               }
             })()
           }
