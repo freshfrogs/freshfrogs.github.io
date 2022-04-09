@@ -432,6 +432,7 @@
     border-radius: 5px;
     background: white;
     color: rgba(126, 183, 128, 1);
+    font-size: small;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -634,7 +635,7 @@
               width++;
               elem.style.width = width + "%";
 
-              if (loaded_to >= loop_to) {
+              if (thisToken >= loop_to) {
                 percent = 100;
                 document.getElementById("progress").innerHTML = percent+"%"
                 elem = document.getElementById("myBar");
@@ -649,7 +650,7 @@
               var thisTokenOwner = await collection.methods.ownerOf(thisToken).call(); // Get owner of thisToken
 
               // Frog is Owned
-              if (userAcc === thisTokenOwner.toLowerCase()) {
+              if (loaded_to < ownedFrogs && userAcc === thisTokenOwner.toLowerCase()) {
 
                 // Load Fresh Frog (elementID. tokenID)
                 loadFreshFrog(thisToken);
@@ -717,7 +718,7 @@
                 console.log(attributeText.length)
                 for (var a = 0; a < attributeText.length; a++) {
                   console.log('◆ '+value+'('+rarity+'%)')
-                  attributeText[a].innerHTML = '<b class="trait">'+rarity+'%</b> '+value;
+                  attributeText[a].innerHTML = '<i class="trait">'+rarity+'%</i> <b>'+value+'</b>';
                 }
               }
             })()
