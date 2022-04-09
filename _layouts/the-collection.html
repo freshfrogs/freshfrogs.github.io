@@ -391,12 +391,10 @@
     box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
     padding: 4px;
   }
-  .mintingTextRed {
-    background-color: #ff99b6;
+  .frogPanel {
     border-radius: 5px;
-    border: 0px solid white;
-    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
-    padding: 4px;
+    background-color: white;
+    padding: 8px;
   }
   .thePad {
     background-color: transparent;
@@ -584,6 +582,7 @@
 
                 // Build Fresh Frogs Attributes
                 loadAttribute(trait_type, value, tokenName)
+                document.getElementById(tokenName).appendChild('<strong>'+tokenName+'</strong>');
               }
             })()
           }
@@ -600,6 +599,7 @@
       // Load Fresh Frog
       function loadFreshFrog(tokenID) {
         newFrog = document.createElement("a")
+        newFrog.className = 'frogPanel'
         newFrog.href = '';
         newFrog.id = "Frog #"+tokenID
         newFrog.className = "smallContainer2 pointer"
