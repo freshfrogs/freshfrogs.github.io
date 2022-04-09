@@ -563,7 +563,10 @@
 
             // Load Fresh Frog (elementID. tokenID)
             loadFreshFrog(thisToken);
-            document.getElementById(tokenName).appendChild('<strong>'+tokenName+'</strong>');
+            newText = document.createElement("b")
+            newText.innerHTML = tokenName;
+
+            document.getElementById(tokenName).appendChild(newText);
             let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
             var metadata = await (await fetch(jsonLink)).json();
 
