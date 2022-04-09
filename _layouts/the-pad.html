@@ -792,8 +792,9 @@
 
 
         newFrog = document.createElement("div")
-        newFrog.id = 'comboFrog'
-        document.getElementById("imgWrapper").appendChild(newFrog)
+        newFrog.className = "imgWrapper"
+        newFrog.innerHTML = "<div class='frogImg'><div style='float: left !important;' class='smallContainer2' id='comboFrog'></div></div>"
+        document.getElementById("frogContainer").appendChild(newFrog)
 
 
         let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseFrog+".json")).json();
