@@ -729,7 +729,7 @@
       // Display Recently Minted 
       async function displayRecentMints(howMany) {
 
-        for (let thisToken=(nextIdC); thisToken<=howMany; thisToken--) {
+        for (var thisToken=nextIdC; thisToken<=howMany; thisToken--) {
           loadFreshFrog(thisToken);
           document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<b><u>'+tokenName+'</u></b>';
 
