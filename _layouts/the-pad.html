@@ -637,16 +637,6 @@
               width++;
               elem.style.width = width + "%";
 
-              if (thisToken >= loop_to) {
-                percent = 100;
-                document.getElementById("progress").innerHTML = percent+"%"
-                elem = document.getElementById("myBar");
-                width = percent
-                width++;
-                elem.style.width = width + "%";
-                document.getElementById('netStatus').innerHTML = ''
-                break;
-              }
               loadAttributes = 'false';
               // Does Frog belong to the owner?
               var thisTokenOwner = await collection.methods.ownerOf(thisToken).call(); // Get owner of thisToken
@@ -689,7 +679,16 @@
                   }
                 }
               })()
-              
+              if (thisToken >= loop_to) {
+                percent = 100;
+                document.getElementById("progress").innerHTML = percent+"%"
+                elem = document.getElementById("myBar");
+                width = percent
+                width++;
+                elem.style.width = width + "%";
+                document.getElementById('netStatus').innerHTML = ''
+                break;
+              }
             }
           }
           console.log(JSON.stringify(attributesTotal))
