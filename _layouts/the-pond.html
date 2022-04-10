@@ -689,7 +689,7 @@
             elem.style.width = width + "%";
             document.getElementById('netStatus').innerHTML = ''
           }
-          console.log(JSON.stringify(attributesTotal))
+          //console.log(JSON.stringify(attributesTotal))
           // Loop Frog Rarities
           var frogPanel = document.getElementsByClassName('frogPanel');
           for (var i = 0; i < frogPanel.length; i++) {
@@ -708,12 +708,12 @@
                 let value = attribute.value
                 //total = (1 / attributesTotal[value]) * total
                 var rarity = Math.round( ((attributesTotal[value])/(nextIdC-1))*100 );
-                console.log(value+': '+attributesTotal[value]);
+                //console.log(value+': '+attributesTotal[value]);
                 total = total * (rarity/100)
                 var attributeText = document.getElementsByClassName(value);
-                console.log(attributeText.length)
+                //console.log(attributeText.length)
                 for (var a = 0; a < attributeText.length; a++) {
-                  console.log('◆ '+value+'('+rarity+'%)')
+                  //console.log('◆ '+value+'('+rarity+'%)')
                   attributeText[a].innerHTML = value+' <b><i class="trait">'+rarity+'%</i></b>';
                 }
               }
