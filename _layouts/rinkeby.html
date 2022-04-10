@@ -763,7 +763,7 @@
       // Load Fresh Frog
       function loadFreshFrog(tokenID) {
         newFrog = document.createElement("div")
-        newFrog.onclick = function() {applyFrogOwned(tokenID)};
+        newFrog.href = '';
         newFrog.id = tokenID
         newFrog.className = 'frogPanel'
         newFrog.innerHTML = '<a class="smallContainer2 pointer" id="Frog #'+tokenID+'"></a>'+'<p class="attributeList" id="Frog #'+tokenID+'Desc"></p>'
@@ -788,25 +788,6 @@
         }
         newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
-      }
-      // Load recent mints from next token
-      function recentlyMinted(nextToken) {
-        document.getElementById("recentMints").innerHTML = "<hr class='hr2'><br><h3>Recent Mints</h3>"
-        for(let i=1; i<=6; i++) {
-          recentMint = nextToken - i;
-          mostRecentDesc = "frog"+recentMint+"Desc"
-          mostRecentLink = "frog"+recentMint+"Link"
-          mostRecentFrog = "frog"+recentMint
-          // <a href="https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+mostRecent2+'" id="'+mostRecentLink+'" target="_blank">
-          newFrog = document.createElement("a")
-          newFrog.href = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+recentMint
-          newFrog.id = mostRecentLink
-          newFrog.target = "_blank"
-          newFrog.className = "smallContainer2"
-          newFrog.innerHTML = '<img class="frogImg2" src="/frog/'+recentMint+'.png" alt="Frog '+recentMint+'" id="frog'+recentMint+'">'
-          document.getElementById("recentMints").appendChild(newFrog)
-        }
-        //consoleOutput("<a id='loadRecentMints2' class='pointer' onclick='recentlyMinted(4)'><u>Load More</u></a></b>");
       }
       // -- END FUNCTIONS ------------------------------------------------------------------------------------------------------------------------------
     </script>
