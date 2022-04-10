@@ -701,10 +701,10 @@
             (async () => { // Pull Metadata
               
               // Loop Attributes
-              for (var i = 0; i < metadata.attributes.length; i++){
+              for (var f = 0; f < metadata.attributes.length; f++){
 
                 // Trait_Type : Value
-                var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                var attribute = metadata.attributes[f] // attribute.trait_type / attribute.value
                 let value = attribute.value
                 //total = (1 / attributesTotal[value]) * total
                 var rarity = Math.round( ((attributesTotal[value])/(nextIdC-1))*100 );
