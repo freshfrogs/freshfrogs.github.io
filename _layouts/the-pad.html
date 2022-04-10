@@ -649,7 +649,7 @@
 
                 // Load Fresh Frog (elementID. tokenID)
                 loadFreshFrog(thisToken);
-                document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<b><u>'+tokenName+'</u></b>';
+                document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<b><i id="'+tokenName+'trait" class="trait">0%</i></b>'+'<b><u>'+tokenName+'</u></b>';
                 loaded_to = loaded_to + 1;
                 loadAttributes = 'true';
               }
@@ -728,31 +728,38 @@
             
             totalMoved = Math.round((total*30000));
             console.log('Frog #'+frog+' Total: '+totalMoved);
-            frogPanelDesc = document.getElementById('Frog #'+frog+'Desc')
+            frogPanelDesc = document.getElementById('Frog #'+frog+'trait')
             if (totalMoved >= 128.48) {
               console.log('Most Common Frog!')
-              frog = frogPanelDesc.style.background = '#7cc1ff' // '#ff9999'
+              frog = frogPanelDesc.style.background = '#ad99ff' // '#ff9999'
+              frog = frogPanelDesc.style.color = '#ad99ff' // '#ff9999'
             } else if (totalMoved >= 64.40) { 
               console.log('Semi Common Frog!')
-              frog = frogPanelDesc.style.background = '#7cc1ff' // '#ffc299'
+              frog = frogPanelDesc.style.background = '#ad99ff' // '#ffc299'
+              frog = frogPanelDesc.style.color = '#ad99ff' // '#ff9999'
             } else if (totalMoved >= 32.32) { 
               console.log('Decent Frog!')
-              frog = frogPanelDesc.style.background = '#7cc1ff' // '#fdff99'
+              frog = frogPanelDesc.style.background = '#ad99ff' // '#fdff99'
+              frog = frogPanelDesc.style.color = '#ad99ff' // '#ff9999'
             } else if (totalMoved >= 16.24) { 
               console.log('Fair Frog!')
-              frog = frogPanelDesc.style.background = '#7cc1ff' // '#a3ff99'
+              frog = frogPanelDesc.style.background = '#ad99ff' // '#a3ff99'
+              frog = frogPanelDesc.style.color = '#ad99ff' // '#ff9999'
             } else if (totalMoved >= 8.16) { 
               console.log('Good Frog!')
-              frog = frogPanelDesc.style.background = '#7cc1ff' // '#99ffda'
+              frog = frogPanelDesc.style.background = '#ad99ff' // '#99ffda'
+              frog = frogPanelDesc.style.color = '#ad99ff' // '#ff9999'
             } else if (totalMoved >= 4.08) { 
               console.log('Rare Frog!')
-              frog = frogPanelDesc.style.background = '#7cc1ff' // '#7cc1ff'
+              frog = frogPanelDesc.style.background = '#ad99ff' // '#7cc1ff'
+              frog = frogPanelDesc.style.color = '#ad99ff' // '#ff9999'
             } else if (totalMoved >= 2.04) { 
               console.log('Epic Frog!')
               frog = frogPanelDesc.style.background = '#ad99ff'
             } else if (totalMoved >= 1.52 || totalMoved < 0.02) { 
               console.log('Legendary Frog!')
-              frog = frogPanelDesc.style.background = '#dd99ff'
+              frog = frogPanelDesc.style.background = '#ad99ff'
+              frog = frogPanelDesc.style.color = '#ad99ff' // '#ff9999'
             } 
           }
 
