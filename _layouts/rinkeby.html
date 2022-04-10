@@ -486,6 +486,40 @@
     transition: height .5s;
     height: 0;
   }
+  .containerMint {
+    width: auto;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    background-color: transparent;
+
+    display: -webkit-box;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+
+    display: -moz-box;
+    -moz-box-orient: horizontal;
+    -moz-box-pack: center;
+    -moz-box-align: center;
+
+    display: box;
+    box-orient: horizontal;
+    box-pack: center;
+    box-align: center;
+  }
+  .imgWrapperMint {
+    -webkit-box-flex: 13;
+    -moz-box-flex: 1;
+    box-flex: 1;
+  }
+  .frogImgMint {
+    transition: transform .2s;
+    height: auto;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    border-radius: 5px;
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -678,20 +712,20 @@
           if (frogCount !== frogCountMax) {
             if (frogCount <= 2) {
               newFrog = document.createElement("div")
-              newFrog.className = "imgWrapper"
+              newFrog.className = "imgWrapperMint"
               newFrog.innerHTML = "<img class='frogImg' src='https://freshfrogs.io/frog/"+(nextIdC+frogCount)+".png'/>"
               document.getElementById("frogContainer3").appendChild(newFrog)
               frogCount = frogCount + 1
             } else if (frogCount <= 5) {
               newFrog = document.createElement("div")
-              newFrog.className = "imgWrapper"
-              newFrog.innerHTML = "<img class='frogImg' src='https://freshfrogs.io/frog/"+(nextIdC+frogCount)+".png'/>"
+              newFrog.className = "imgWrapperMint"
+              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frogCount)+".png'/>"
               document.getElementById("frogContainer2").appendChild(newFrog)
               frogCount = frogCount + 1
             } else if (frogCount <= 8) {
               newFrog = document.createElement("div")
-              newFrog.className = "imgWrapper"
-              newFrog.innerHTML = "<img class='frogImg' src='https://freshfrogs.io/frog/"+(nextIdC+frogCount)+".png'/>"
+              newFrog.className = "imgWrapperMint"
+              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frogCount)+".png'/>"
               document.getElementById("frogContainer").appendChild(newFrog)
               frogCount = frogCount + 1
             }
@@ -778,8 +812,8 @@
         '  </div>' +
         '  <div id="frogContainer2" class="container">' +
         '  </div>' +
-        '  <div id="frogContainer3" class="container">' +
-        '    <div class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.io/assets/frogs/preview2.gif"/></div>' +
+        '  <div id="frogContainer3" class="containerMint">' +
+        '    <div class="imgWrapperMint"><img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/preview2.gif"/></div>' +
         '  </div>' +
         '</div>';
         document.getElementById("netStatus").innerHTML = '';
