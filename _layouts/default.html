@@ -762,7 +762,7 @@
         for (var thisToken = 1; thisToken < loop_to; thisToken++) {
           let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
           var metadata = await (await fetch(jsonLink)).json();
-          console.log('Frog #'+thisToken)
+          console.log('Frog loop')
           (async () => { // Pull Metadata
             
             // Loop Attributes
