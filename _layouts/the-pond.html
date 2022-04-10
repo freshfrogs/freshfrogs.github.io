@@ -8,18 +8,19 @@
   }
   #myProgress {
     width: 50%;
-    background: #f4f4f4;
+    background: #7cc1ff;
     margin-top: 8px;
     margin-left: auto;
     margin-right: auto;
-    border: 1px solid #324d64;
+    border: 1px solid white;
     border-radius: 5px;
+    overflow: hidden;
   }
   #myBar {
     width: 1%;
     height: 18px;
-    background-color: #7cc1ff;
-    border-radius: 5px;
+    background-color: white;
+    border-radius: 1px;
   }
 
   .wrapper {
@@ -184,11 +185,11 @@
     vertical-align: middle;
   }
   section {
-    border: 4px solid white;
+    border: 4px solid #7cc1ff;
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
     font-size: auto;
-    color: #333;
-    background-color: white;
+    color: white !important;
+    background-color: #7cc1ff;
     text-align: center;
     border-radius: 7px;
     padding: 14px;
@@ -229,7 +230,7 @@
   .downloads a{
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
     font-size: inherit !important;
-    color: #333;
+    color: inherit !important;
   }
   .pre h1{
     margin-top: 8px;
@@ -403,40 +404,47 @@
     border-radius: 5px;
     padding: 4px;
     min-height: 128px;
-    background-color: rgba(126, 183, 128, 1);
+    background-color: #7cc1ff;
   }
   .headerDiv {
     border-bottom: 2px solid #7cc1ff;
     padding: 4px;
     border-radius: 5px;
+    color: white !important;
   }
   .frogPanel {
     display: inline-block !important;
     image-rendering: pixelated;
-    color: white;
     text-align: center;
+    border: 1px solid #7cc1ff;
     border-radius: 5px;
     padding: 8px;
     padding-top: 0px;
     padding-bottom: 0px;
     margin: 4px;
-    background-color: transparent;
-    height: inherit;
+    background-color: #7cc1ff;
   }
   .attributeList {
     border: 1px solid white;
     border-radius: 5px;
     padding: 4px;
     overflow: hidden;
-    background-color: #7cc1ff;
+    background-color: white;
+    color: #333;
   }
-  .trait{
-    border-radius: 5px;
-    background: transparent;
-    color: white;
+  .trait {
+    border-radius: 2px;
+    background: white;
+    color: rgba(126, 183, 128, 1);
     font-size: x-small;
-    padding: 2px;
-    border: 1px solid white;
+    padding: 1px;
+  }
+  .trait2 {
+    border-radius: 100%;
+    background: #7cc1ff;
+    color: #7cc1ff;
+    font-size: x-small;
+    padding: 1px;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -532,7 +540,7 @@
             'tomatoFrog' : 0,
             'treeFrog(1)' : 0,
             'treeFrog(2)' : 0,
-            'treeFrog(3)' : 0,
+            'treeFrog(2)' : 0,
             'treeFrog(4)' : 0,
             'treeFrog(5)' : 0,
             'treeFrog(6)' : 0,
@@ -622,7 +630,7 @@
           if (ownedFrogs <= 0) { // ❌ No FROGS
             document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>❌ It seems you do not own any FROGS!'
           } else {
-            document.getElementById('netStatus').innerHTML = 'Compiling Tokens... Please wait... ⌛ <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br><br>';
+            document.getElementById('netStatus').innerHTML = 'Loading Frogs from ΞEthereum... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br><br>';
 
             // Loop Minted Frogs, Frog # 1 - NextID
             var loop_to = nextIdC;
@@ -648,7 +656,7 @@
 
                 // Load Fresh Frog (elementID. tokenID)
                 loadFreshFrog(thisToken);
-                document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<b><u>'+tokenName+'</u></b>';
+                document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<b><u>'+tokenName+'</u></b>'+'<br><b><i id="'+tokenName+'trait" class="trait2">0%</i></b> Rarity'+'<hr class="hr2">';
                 loaded_to = loaded_to + 1;
                 loadAttributes = 'true';
               }
@@ -672,8 +680,8 @@
                   // Build Fresh Frogs Attributes
                   if (loadAttributes === 'true') {
                     loadAttribute(trait_type, value, tokenName)
-                    newAttribute = document.createElement('text')
-                    newAttribute.innerHTML = value+' ◆';
+                    newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
+                    newAttribute.innerHTML = value + ' <b><i class="trait">▪%</i></b>';
                     newAttribute.className = value;
                     space = document.createElement('br')
                     document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
@@ -711,7 +719,11 @@
                 //total = (1 / attributesTotal[value]) * total
                 var rarity = Math.round( ((attributesTotal[value])/(nextIdC-1))*100 );
                 //console.log(value+': '+attributesTotal[value]);
-                total = total * (rarity/100)
+                if (attribute.trait_type === 'Trait') {
+                  if (value !== 'natural') {
+                    total = total * (rarity/100);
+                  }
+                }
                 var attributeText = document.getElementsByClassName(value);
                 //console.log(attributeText.length)
                 for (var a = 0; a < attributeText.length; a++) {
@@ -720,35 +732,42 @@
                 }
               }
             })()
-            console.log('Frog #'+frog+' Total: '+Math.round((total*20000)));
-
+            
             totalMoved = Math.round((total*30000));
-            frogPanelDesc = document.getElementById('Frog #'+frog+'Desc')
-            if (totalMoved >= 64.48) {
+            console.log('Frog #'+frog+' Total: '+totalMoved);
+            frogPanelDesc = document.getElementById('Frog #'+frog+'trait')
+            if (totalMoved >= 128.48) {
               console.log('Most Common Frog!')
-              frog = frogPanelDesc.style.background = '#7cc1ff' // '#ff9999'
-            } else if (totalMoved >= 32.40) { 
+              frog = frogPanelDesc.style.background = '#ad99ff' // '#ff9999'
+              frog = frogPanelDesc.style.color = '#ad99ff' // '#ff9999'
+            } else if (totalMoved >= 64.40) { 
               console.log('Semi Common Frog!')
-              frog = frogPanelDesc.style.background = '#7cc1ff' // '#ffc299'
-            } else if (totalMoved >= 16.32) { 
+              frog = frogPanelDesc.style.background = '#ad99ff' // '#ffc299'
+              frog = frogPanelDesc.style.color = '#ad99ff' // '#ff9999'
+            } else if (totalMoved >= 32.32) { 
               console.log('Decent Frog!')
-              frog = frogPanelDesc.style.background = '#7cc1ff' // '#fdff99'
-            } else if (totalMoved >= 8.24) { 
+              frog = frogPanelDesc.style.background = '#ad99ff' // '#fdff99'
+              frog = frogPanelDesc.style.color = '#ad99ff' // '#ff9999'
+            } else if (totalMoved >= 16.24) { 
               console.log('Fair Frog!')
-              frog = frogPanelDesc.style.background = '#7cc1ff' // '#a3ff99'
-            } else if (totalMoved >= 4.16) { 
+              frog = frogPanelDesc.style.background = '#ad99ff' // '#a3ff99'
+              frog = frogPanelDesc.style.color = '#ad99ff' // '#ff9999'
+            } else if (totalMoved >= 8.16) { 
               console.log('Good Frog!')
-              frog = frogPanelDesc.style.background = '#7cc1ff' // '#99ffda'
-            } else if (totalMoved >= 2.08) { 
+              frog = frogPanelDesc.style.background = '#ad99ff' // '#99ffda'
+              frog = frogPanelDesc.style.color = '#ad99ff' // '#ff9999'
+            } else if (totalMoved >= 4.08) { 
               console.log('Rare Frog!')
-              frog = frogPanelDesc.style.background = '#7cc1ff' // '#7cc1ff'
-            } else if (totalMoved >= 1.04) { 
+              frog = frogPanelDesc.style.background = '#ad99ff' // '#7cc1ff'
+              frog = frogPanelDesc.style.color = '#ad99ff' // '#ff9999'
+            } else if (totalMoved >= 2.04) { 
               console.log('Epic Frog!')
               frog = frogPanelDesc.style.background = '#ad99ff'
-            } else if (totalMoved >= 0.52 || totalMoved < 0.02) { 
+            } else if (totalMoved >= 1.52 || totalMoved < 0.02) { 
               console.log('Legendary Frog!')
-              frog = frogPanelDesc.style.background = '#dd99ff'
-            }
+              frog = frogPanelDesc.style.background = '#ad99ff'
+              frog = frogPanelDesc.style.color = '#ad99ff' // '#ff9999'
+            } 
           }
 
             //console.log(thisFrog+' Total Rarity: '+total)
