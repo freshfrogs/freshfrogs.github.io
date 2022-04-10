@@ -427,7 +427,7 @@
     border-radius: 5px;
     padding: 4px;
     overflow: hidden;
-    background-color: rgba(126, 183, 128, 1);
+    background-color: #7cc1ff;
   }
   .trait{
     border-radius: 2px;
@@ -720,13 +720,13 @@
             console.log('Frog #'+frog+' Total: '+(total*100));
 
             totalMoved = (total*100);
-            if (totalMoved >= 2.56) {
+            if (totalMoved >= 0.80) {
               console.log('Most Common Frog!')
               frog = frogPanel[i].style.background = '#ff9999'
-            } else if (totalMoved >= 1.28) { 
+            } else if (totalMoved >= 0.64) { 
               console.log('Semi Common Frog!')
               frog = frogPanel[i].style.background = '#ffc299'
-            } else if (totalMoved >= 0.64) { 
+            } else if (totalMoved >= 0.48) { 
               console.log('Decent Frog!')
               frog = frogPanel[i].style.background = '#fdff99'
             } else if (totalMoved >= 0.32) { 
