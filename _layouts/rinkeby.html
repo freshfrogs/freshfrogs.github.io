@@ -551,7 +551,7 @@
         consoleOutput('<br><hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>'+'<div id="thePad" class="thePad"></div>');
         // Recent Mints
 
-        for (var thisToken = nextIdC; thisToken <= 3; thisToken--) {
+          thisToken = 1;
           tokenName = 'Frog #'+thisToken
           loadFreshFrog(thisToken);
           document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<b><u>'+tokenName+'</u></b>';
@@ -581,7 +581,7 @@
             
             }
           })()
-        }
+        
         //
         //consoleOutput("<br><div id='mintingText' class='mintingTextWhite'></div>")
         //recentlyMinted(nextIdC);
