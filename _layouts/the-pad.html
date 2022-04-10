@@ -697,6 +697,11 @@
             //frogPanel[i].style.background =
             frogRarity(frog);
             console.log('Frog #'+frog);
+            if (total < 2) {
+              frog = frogPanel[i].style.background = '#7cc1ff'
+            } //else if (total < 4) {
+
+            //}
           }
           async function frogRarity(thisFrog) {
             let jsonLink = 'https://freshfrogs.io/frog/json/'+thisFrog+'.json' 
@@ -723,6 +728,7 @@
               }
             })()
             console.log(thisFrog+' Total Rarity: '+total)
+
           }
           // ----------------------------->
           // mint = 1; // <--- Mint On or Off? 1 / 0
