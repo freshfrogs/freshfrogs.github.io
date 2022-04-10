@@ -672,8 +672,8 @@
                   if (loadAttributes === 'true') {
                     loadAttribute(trait_type, value, tokenName)
                     newAttribute = document.createElement('text')
-                    newAttribute.innerHTML = value+' ◆';
-                    newAttribute.className = value, 'trait';
+                    newAttribute.innerHTML = value;
+                    newAttribute.className = value;
                     space = document.createElement('br')
                     document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
                     document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
