@@ -656,7 +656,8 @@
 
                 // Load Fresh Frog (elementID. tokenID)
                 loadFreshFrog(thisToken);
-                document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<b><u>'+tokenName+'</u></b>';
+                openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
+                document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a href="'+openSeaLink+'" target="_blank"><b><u>'+tokenName+'</u></b>↗️</a>';
                 loaded_to = loaded_to + 1;
                 loadAttributes = 'true';
               }
