@@ -717,30 +717,31 @@
                 }
               }
             })()
-            console.log('Frog #'+frog+' Total: '+(total*10000));
+            console.log('Frog #'+frog+' Total: '+(total*100));
 
-            if (total >= 2.56) {
+            totalMoved = (total*100);
+            if (totalMoved >= 2.56) {
               console.log('Most Common Frog!')
               frog = frogPanel[i].style.background = '#ff9999'
-            } else if (total >= 1.28) { 
+            } else if (totalMoved >= 1.28) { 
               console.log('Semi Common Frog!')
               frog = frogPanel[i].style.background = '#ffc299'
-            } else if (total >= 0.64) { 
+            } else if (totalMoved >= 0.64) { 
               console.log('Decent Frog!')
               frog = frogPanel[i].style.background = '#fdff99'
-            } else if (total >= 0.32) { 
+            } else if (totalMoved >= 0.32) { 
               console.log('Fair Frog!')
               frog = frogPanel[i].style.background = '#a3ff99'
-            } else if (total >= 0.16) { 
+            } else if (totalMoved >= 0.16) { 
               console.log('Good Frog!')
               frog = frogPanel[i].style.background = '#99ffda'
-            } else if (total >= 0.08) { 
+            } else if (totalMoved >= 0.08) { 
               console.log('Rare Frog!')
               frog = frogPanel[i].style.background = '#7cc1ff'
-            } else if (total >= 0.04) { 
+            } else if (totalMoved >= 0.04) { 
               console.log('Epic Frog!')
               frog = frogPanel[i].style.background = '#ad99ff'
-            } else if (total >= 0.02 || total < 0.02) { 
+            } else if (totalMoved >= 0.02 || totalMoved < 0.02) { 
               console.log('Legendary Frog!')
               frog = frogPanel[i].style.background = '#dd99ff'
             }
