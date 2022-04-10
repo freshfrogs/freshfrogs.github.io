@@ -720,30 +720,31 @@
             console.log('Frog #'+frog+' Total: '+(total*100));
 
             totalMoved = (total*100);
-            if (totalMoved >= 0.80) {
+            frogPanelDesc = document.getElementById('Frog #'+frog+'Desc')
+            if (totalMoved >= 0.48) {
               console.log('Most Common Frog!')
-              frog = frogPanel[i].style.background = '#ff9999'
-            } else if (totalMoved >= 0.64) { 
+              frog = frogPanelDesc.style.background = '#ff9999'
+            } else if (totalMoved >= 0.40) { 
               console.log('Semi Common Frog!')
-              frog = frogPanel[i].style.background = '#ffc299'
-            } else if (totalMoved >= 0.48) { 
-              console.log('Decent Frog!')
-              frog = frogPanel[i].style.background = '#fdff99'
+              frog = frogPanelDesc.style.background = '#ffc299'
             } else if (totalMoved >= 0.32) { 
+              console.log('Decent Frog!')
+              frog = frogPanelDesc.style.background = '#fdff99'
+            } else if (totalMoved >= 0.24) { 
               console.log('Fair Frog!')
-              frog = frogPanel[i].style.background = '#a3ff99'
+              frog = frogPanelDesc.style.background = '#a3ff99'
             } else if (totalMoved >= 0.16) { 
               console.log('Good Frog!')
-              frog = frogPanel[i].style.background = '#99ffda'
+              frog = frogPanelDesc.style.background = '#99ffda'
             } else if (totalMoved >= 0.08) { 
               console.log('Rare Frog!')
-              frog = frogPanel[i].style.background = '#7cc1ff'
+              frog = frogPanelDesc.style.background = '#7cc1ff'
             } else if (totalMoved >= 0.04) { 
               console.log('Epic Frog!')
-              frog = frogPanel[i].style.background = '#ad99ff'
+              frog = frogPanelDesc.style.background = '#ad99ff'
             } else if (totalMoved >= 0.02 || totalMoved < 0.02) { 
               console.log('Legendary Frog!')
-              frog = frogPanel[i].style.background = '#dd99ff'
+              frog = frogPanelDesc.style.background = '#dd99ff'
             }
           }
 
