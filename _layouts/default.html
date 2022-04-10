@@ -724,92 +724,7 @@
 
         consoleOutput('<br><hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>'+'<hr class="hr2"><br><h3 class="headerDiv">Recently Minted</h3><div id="thePad" class="thePad"></div>');
         // Recent Mints
-
-        for (var t = 1; t < 4; t++){
-          let thisToken = nextIdC - t
-          tokenName = 'Frog #'+thisToken
-          loadFreshFrog(thisToken);
-          document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<b><u>'+tokenName+'</u></b>';
-
-          let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
-          var metadata = await (await fetch(jsonLink)).json();
-
-          (async () => { // Pull Metadata
-            
-            // Loop Attributes
-            for (var i = 0; i < metadata.attributes.length; i++){
-
-              // Trait_Type : Value
-              var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
-              let trait_type = attribute.trait_type
-              let value = attribute.value
-
-
-              // Build Fresh Frogs Attributes
-              loadAttribute(trait_type, value, tokenName)
-              newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
-              newAttribute.innerHTML = value + ' <b><i class="trait">▪%</i></b>';
-              newAttribute.className = value;
-              space = document.createElement('br')
-              document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
-              document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
-            
-            }
-          })()
-        }
-        // Loop
-        var loop_to = nextIdC;
-        for (var thisToken = 1; thisToken < loop_to; thisToken++) {
-          let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
-          var metadata = await (await fetch(jsonLink)).json();
-          console.log('Frog loop')
-          (async () => { // Pull Metadata
-            
-            // Loop Attributes
-            for (var i = 0; i < metadata.attributes.length; i++){
-
-              // Trait_Type : Value
-              var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
-              let trait_type = attribute.trait_type
-              let value = attribute.value
-
-              // Add to Totals
-              attributesTotal[value] = attributesTotal[value] + 1;
-            }
-          })()
-        }
-        // Update Rarity Percentages
-        var frogPanel = document.getElementsByClassName('frogPanel');
-        for (var i = 0; i < frogPanel.length; i++) {
-          let frog = frogPanel[i].id
-          //frogPanel[i].style.background =
-          let jsonLink = 'https://freshfrogs.io/frog/json/'+frog+'.json' 
-          var metadata = await (await fetch(jsonLink)).json();
-          total = 1;
-          (async () => { // Pull Metadata
-            
-            // Loop Attributes
-            for (var f = 0; f < metadata.attributes.length; f++){
-
-              // Trait_Type : Value
-              var attribute = metadata.attributes[f] // attribute.trait_type / attribute.value
-              let value = attribute.value
-              //total = (1 / attributesTotal[value]) * total
-              var rarity = Math.round( ((attributesTotal[value])/(nextIdC-1))*100 );
-              //console.log(value+': '+attributesTotal[value]);
-              //total = total * (rarity/100)
-              var attributeText = document.getElementsByClassName(value);
-              //console.log(attributeText.length)
-              for (var a = 0; a < attributeText.length; a++) {
-                //console.log('◆ '+value+'('+rarity+'%)')
-                attributeText[a].innerHTML = value+' <b><i class="trait">'+rarity+'%</i></b>';
-              }
-            }
-          })()
-        }
-        //
-        //consoleOutput("<br><div id='mintingText' class='mintingTextWhite'></div>")
-        //recentlyMinted(nextIdC);
+        // Event Listeners 
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           if (mint === 0 || userPendingTx >= 1) {
@@ -893,6 +808,92 @@
             document.getElementById("supply").innerHTML = "FROG(s) # "+mintList // Supply
           }
         })
+        //
+        for (var t = 1; t < 4; t++){
+          let thisToken = nextIdC - t
+          tokenName = 'Frog #'+thisToken
+          loadFreshFrog(thisToken);
+          document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<b><u>'+tokenName+'</u></b>';
+
+          let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
+          var metadata = await (await fetch(jsonLink)).json();
+
+          (async () => { // Pull Metadata
+            
+            // Loop Attributes
+            for (var i = 0; i < metadata.attributes.length; i++){
+
+              // Trait_Type : Value
+              var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+              let trait_type = attribute.trait_type
+              let value = attribute.value
+
+
+              // Build Fresh Frogs Attributes
+              loadAttribute(trait_type, value, tokenName)
+              newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
+              newAttribute.innerHTML = value + ' <b><i class="trait">▪%</i></b>';
+              newAttribute.className = value;
+              space = document.createElement('br')
+              document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
+              document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
+            
+            }
+          })()
+        }
+        // Loop
+        var loop_to = nextIdC;
+        for (var thisToken = 1; thisToken < loop_to; thisToken++) {
+          let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
+          var metadata = await (await fetch(jsonLink)).json();
+
+          (async () => { // Pull Metadata
+            
+            // Loop Attributes
+            for (var i = 0; i < metadata.attributes.length; i++){
+
+              // Trait_Type : Value
+              var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+              let trait_type = attribute.trait_type
+              let value = attribute.value
+
+              // Add to Totals
+              attributesTotal[value] = attributesTotal[value] + 1;
+            }
+          })()
+        }
+        // Update Rarity Percentages
+        var frogPanel = document.getElementsByClassName('frogPanel');
+        for (var i = 0; i < frogPanel.length; i++) {
+          let frog = frogPanel[i].id
+          //frogPanel[i].style.background =
+          let jsonLink = 'https://freshfrogs.io/frog/json/'+frog+'.json' 
+          var metadata = await (await fetch(jsonLink)).json();
+          total = 1;
+          (async () => { // Pull Metadata
+            
+            // Loop Attributes
+            for (var f = 0; f < metadata.attributes.length; f++){
+
+              // Trait_Type : Value
+              var attribute = metadata.attributes[f] // attribute.trait_type / attribute.value
+              let value = attribute.value
+              //total = (1 / attributesTotal[value]) * total
+              var rarity = Math.round( ((attributesTotal[value])/(nextIdC-1))*100 );
+              //console.log(value+': '+attributesTotal[value]);
+              //total = total * (rarity/100)
+              var attributeText = document.getElementsByClassName(value);
+              //console.log(attributeText.length)
+              for (var a = 0; a < attributeText.length; a++) {
+                //console.log('◆ '+value+'('+rarity+'%)')
+                attributeText[a].innerHTML = value+' <b><i class="trait">'+rarity+'%</i></b>';
+              }
+            }
+          })()
+        }
+        //
+        //consoleOutput("<br><div id='mintingText' class='mintingTextWhite'></div>")
+        //recentlyMinted(nextIdC);
       })
       // Get User's Invite Codes
       async function getInvites() {
