@@ -718,32 +718,32 @@
                 }
               }
             })()
-            console.log('Frog #'+frog+' Total: '+Math.round((total*10000)));
+            console.log('Frog #'+frog+' Total: '+Math.round((total*20000)));
 
-            totalMoved = (total*100);
+            totalMoved = Math.round((total*20000));
             frogPanelDesc = document.getElementById('Frog #'+frog+'Desc')
-            if (totalMoved >= 0.48) {
+            if (totalMoved >= 64.48) {
               console.log('Most Common Frog!')
               frog = frogPanelDesc.style.background = '#ff9999'
-            } else if (totalMoved >= 0.40) { 
+            } else if (totalMoved >= 32.40) { 
               console.log('Semi Common Frog!')
               frog = frogPanelDesc.style.background = '#ffc299'
-            } else if (totalMoved >= 0.32) { 
+            } else if (totalMoved >= 16.32) { 
               console.log('Decent Frog!')
               frog = frogPanelDesc.style.background = '#fdff99'
-            } else if (totalMoved >= 0.24) { 
+            } else if (totalMoved >= 8.24) { 
               console.log('Fair Frog!')
               frog = frogPanelDesc.style.background = '#a3ff99'
-            } else if (totalMoved >= 0.16) { 
+            } else if (totalMoved >= 4.16) { 
               console.log('Good Frog!')
               frog = frogPanelDesc.style.background = '#99ffda'
-            } else if (totalMoved >= 0.08) { 
+            } else if (totalMoved >= 2.08) { 
               console.log('Rare Frog!')
               frog = frogPanelDesc.style.background = '#7cc1ff'
-            } else if (totalMoved >= 0.04) { 
+            } else if (totalMoved >= 1.04) { 
               console.log('Epic Frog!')
               frog = frogPanelDesc.style.background = '#ad99ff'
-            } else if (totalMoved >= 0.02 || totalMoved < 0.02) { 
+            } else if (totalMoved >= 0.52 || totalMoved < 0.02) { 
               console.log('Legendary Frog!')
               frog = frogPanelDesc.style.background = '#dd99ff'
             }
