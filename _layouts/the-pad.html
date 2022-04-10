@@ -715,7 +715,7 @@
                 //total = (1 / attributesTotal[value]) * total
                 var rarity = Math.round( ((attributesTotal[value])/(nextIdC-1))*100 );
                 console.log(value+': '+attributesTotal[value]);
-
+                total = total * rarity
                 var attributeText = document.getElementsByClassName(value);
                 console.log(attributeText.length)
                 for (var a = 0; a < attributeText.length; a++) {
@@ -724,6 +724,7 @@
                 }
               }
             })()
+            console.log(thisFrog+' Total Rarity: '+total)
           }
           // ----------------------------->
           // mint = 1; // <--- Mint On or Off? 1 / 0
