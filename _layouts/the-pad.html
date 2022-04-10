@@ -102,6 +102,9 @@
     background-repeat: no-repeat;
     border: 0px solid white;
     image-rendering: pixelated;
+    -ms-transform: scale(1.1); /* IE 9 */
+    -webkit-transform: scale(1.1); /* Safari 3-8 */
+    transform: scale(1.1);
   }
   .headLine{
     color: transparent;
@@ -270,11 +273,6 @@
     display: block;
     image-rendering: pixelated;
     overflow: hidden;
-  }
-  .bigContainer:hover{
-    -ms-transform: scale(1.1); /* IE 9 */
-    -webkit-transform: scale(1.1); /* Safari 3-8 */
-    transform: scale(1.1);
   }
   .frogImg2:hover{
     -ms-transform: scale(1.5); /* IE 9 */
