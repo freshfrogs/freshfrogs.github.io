@@ -6,23 +6,6 @@
   html,h1,h2,h3 {
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
   }
-  #myProgress {
-    width: 50%;
-    background: #7cc1ff;
-    margin-top: 8px;
-    margin-left: auto;
-    margin-right: auto;
-    border: 1px solid white;
-    border-radius: 5px;
-    overflow: hidden;
-  }
-  #myBar {
-    width: 1%;
-    height: 18px;
-    background-color: white;
-    border-radius: 1px;
-  }
-
   .wrapper {
     margin-left: auto;
     margin-right: auto;
@@ -47,6 +30,7 @@
   }
   .smallContainer{
     border-radius: 5px;
+    border: 0px solid #e0e0e0;
     overflow: hidden;
     background-color: transparent;
     box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
@@ -54,59 +38,40 @@
   }
   .smallContainer2 {
     border-radius: 5px;
+    border: 0px solid #e0e0e0;
     overflow: hidden;
     background-color: transparent;
-    width: 128px;
-    padding: 0px !important;
-    height: 128px !important;
-    display: inline-block !important;
-    position: relative;
-    image-rendering: pixelated;
-  }
-  .frogContainer {
-    border-radius: 200px;
-    overflow: hidden;
-    width: 256px;
+    width: 64px;
     padding-top: 0px !important;
-    height: 256px !important;
+    height: 64px !important;
     display: inline-block !important;
-    position: relative;
-    margin-left: 2%;
-    margin-right: 2%;
-    margin-top: 2%;
-    margin-bottom: 2%;
-    image-rendering: pixelated;
-    transition: .2s;
-  }
-  .smallContainer3 {
-    border-radius: 5px;
-    overflow: hidden;
-    background-color: transparent;
-    width: 128px;
-    padding-top: 0px !important;
-    height: 128px !important;
-    display: inline-block !important;
-    position: relative;
     margin-left: 1%;
     margin-right: 1%;
-    margin-top: 2%;
-    margin-bottom: 2%;
-    image-rendering: pixelated;
-    transition: .2s;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    transition: transform .2s;
+  }
+  .smallContainer2:hover{
+    -ms-transform: scale(2.0); /* IE 9 */
+    -webkit-transform: scale(2.0); /* Safari 3-8 */
+    transform: scale(2.0);
+    box-shadow: none;
+    border: none;
   }
   .bigContainer{
     border-radius: 5px;
+    border: 0px solid #e0e0e0;
     overflow: hidden;
-    background-color: #7cc1ff;
-    margin: auto;
-    width: 256px;
-    height: 256px;
-    padding: 4px;
-    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
+    background-color: transparent;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    width: 256px
   }
   .headLine{
     color: transparent;
-    image-rendering: crisp-edges;
+    image-rendering: crisp-edges !important;
     width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -117,23 +82,26 @@
   .headLine2 {
     margin-left: auto;
     margin-right: auto;
-    image-rendering: crisp-edges;
+    image-rendering: crisp-edges !important;
     margin-bottom: 2%;
+    height: auto;
   }
   .headLineImg {
     float: none;
-    image-rendering: crisp-edges;
+    image-rendering: crisp-edges !important;
     height: 32px;
+    width: 32px;
     vertical-align: top;
     border-radius: 100%;
     padding: 0px;
     transition: transform .2s;
+    margin-top: auto;
+    margin-bottom: auto;
     margin-left: 3%;
     margin-right: 3%;
-    margin-bottom: 3%;
-    margin-top: 3%;
     box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
     background-color: transparent;
+    overflow: hidden;
   }
   .headLineImg:hover{
     -ms-transform: scale(1.5); /* IE 9 */
@@ -150,6 +118,17 @@
     image-rendering: pixelated;
     padding: 0%;
     font-size: xx-large;
+  }
+  .h2 {
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font-weight: 750;
+    text-align: center;
+    padding: 0%;
+    font-size: large;
+    font: "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+    margin-top: 8px;
+    margin-bottom: 0px;
+    line-height: 1.1;
   }
   .supply{
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
@@ -176,7 +155,7 @@
     border-radius: 5px;
     border: 1px solid lightgrey;
     width: 270px;
-    box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
     margin-left: auto;
     margin-right: auto;
     margin-top: 2%;
@@ -184,11 +163,15 @@
     text-align: center;
     vertical-align: middle;
   }
+  svg {
+    width: 50%;
+    image-rendering: pixelated;
+  }
   section {
     border: 4px solid #7cc1ff;
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
     font-size: auto;
-    color: white !important;
+    color: white;
     background-color: #7cc1ff;
     text-align: center;
     border-radius: 7px;
@@ -227,7 +210,7 @@
     margin-right: auto;
     padding: 14px;
   }
-  .downloads a{
+  .downloads a {
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
     font-size: inherit !important;
     color: inherit !important;
@@ -236,10 +219,9 @@
     margin-top: 8px;
   }
   .container {
-    height: 256px;
     width: auto;
-    margin-bottom: auto;
-    margin-top: auto;
+    margin-bottom: 0px;
+    margin-top: 0px;
     background-color: transparent;
 
     display: -webkit-box;
@@ -265,43 +247,24 @@
   .frogImg {
     transition: transform .2s;
     height: auto;
-    width: auto;
     display: block;
     image-rendering: pixelated;
     overflow: hidden;
-  }
-  .frogImg2:hover{
-    -ms-transform: scale(1.5); /* IE 9 */
-    -webkit-transform: scale(1.5); /* Safari 3-8 */
-    transform: scale(1.5);
-    box-shadow: none;
-    border: none;
+    border-radius: 5px;
   }
   .frogImg2 {
     transition: transform .2s;
     height: auto;
     display: block;
     image-rendering: pixelated;
+    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
     overflow: hidden;
-    position: absolute;
-    width: 128px;
-    height: 128px;
     border-radius: 5px;
   }
-  .frogImg3 {
-    transition: transform .2s;
-    height: auto;
-    display: block;
-    image-rendering: pixelated;
-    overflow: hidden;
-    position: absolute;
-    height: auto;
-    width: auto;
-  }
-  .smallContainer3:hover{
-    -ms-transform: scale(1.1); /* IE 9 */
-    -webkit-transform: scale(1.1); /* Safari 3-8 */
-    transform: scale(1.1);
+  .frogImg2:hover{
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Safari 3-8 */
+    transform: scale(1.5);
     box-shadow: none;
     border: none;
   }
@@ -313,6 +276,13 @@
     -ms-transform: scale(1.1); /* IE 9 */
     -webkit-transform: scale(1.1); /* Safari 3-8 */
     transform: scale(1.1);
+  }
+  .frogImg:hover{
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Safari 3-8 */
+    transform: scale(1.5);
+    box-shadow: none;
+    border: none;
   }
   .pre {
     border-radius: 2%;
@@ -330,7 +300,36 @@
     image-rendering: pixelated;
     box-shadow: none;
     border: none;
-    position: absolute;
+  }
+  .frogType:hover{
+    -ms-transform: scale(1.25); /* IE 9 */
+    -webkit-transform: scale(1.25); /* Safari 3-8 */
+    transform: scale(1.25);
+    box-shadow: none;
+    border: none;
+  }
+  .frogType2 {
+    border-radius: 5px;
+    border: 0px solid #e0e0e0;
+    overflow: hidden;
+    background-color: transparent;
+
+    width: 128px;
+    padding-top: 0px !important;
+    height: 100% !important;
+    display: inline-block !important;
+    margin-left: 0%;
+    margin-right: 0%;
+    margin-top: 2%;
+    margin-bottom: 0px;
+
+  }
+  .infoPanel {
+    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
+    background: #f4f4f4;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    padding: 5px;
   }
   .hr2{
     width: 128px;
@@ -338,46 +337,55 @@
     margin-right: auto;
     margin-top: 1%;
   }
-  .h2 {
-    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
-    font-weight: 750;
-    text-align: center;
-    padding: 0%;
-    font-size: large;
-    font: "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
-    margin-top: 8px;
-    margin-bottom: 0px;
-    line-height: 1.1;
+
+
+  .divTimeline {
+    width: 300px;
+    margin: auto;
   }
-  .frogType2 {
-    border-radius: 5px;
-    border: 0px solid #e0e0e0;
-    overflow: hidden;
-    background-color: transparent;
-    width: 128px;
-    padding-top: 0px !important;
-    height: 100% !important;
-    display: inline-block !important;
+  .pTimeline {
+    border-top: 2px dashed;
+    border-color: rgba(126, 183, 128, 1) !important;
+    margin:0; padding: 30px;
   }
-  .learnMoreFM {
-    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
-    background: #f4f4f4;
-    border: 1px solid lightgray;
-    border-radius: 5px;
-    padding: 5px;
+  .pTimeline:nth-child(even) {
+    border-left: 2px dashed;
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+    margin-right: 30px; 
+    padding-right: 0;
   }
-  .myProgress {
-    width: 50%;
-    background: #f4f4f4;
-    margin-top: 8px;
-    margin-left: auto;
-    margin-right: auto;
-    border: 1px solid #324d64;
-    border-radius: 5px;
-    height: 18px;
-    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
-    font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    vertical-align: middle;
+  .pTimeline:nth-child(odd) {
+    border-right: 2px dashed;
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+    margin-left: 30px; 
+    padding-left: 0;
+  }
+  .pTimeline:first-child {
+    border-top: 0;
+    border-top-right-radius:0;
+    border-top-left-radius:0;
+  }
+  .pTimeline:last-child {
+    border-bottom-right-radius:0;
+    border-bottom-left-radius:0;
+  }
+  #growTray {
+    -moz-transition: height .5s;
+    -ms-transition: height .5s;
+    -o-transition: height .5s;
+    -webkit-transition: height .5s;
+    transition: height .5s;
+    height: 0;
+  }
+  #growTerminal {
+    -moz-transition: height .5s;
+    -ms-transition: height .5s;
+    -o-transition: height .5s;
+    -webkit-transition: height .5s;
+    transition: height .5s;
+    height: 0;
   }
   .mintingTextGreen {
     background-color: #99ffc5;
@@ -399,45 +407,6 @@
     border: 0px solid white;
     box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
     padding: 4px;
-  }
-  .thePad {
-    border-radius: 5px;
-    padding: 4px;
-    min-height: 128px;
-    background-color: #7cc1ff;
-  }
-  .headerDiv {
-    border-bottom: 2px solid #7cc1ff;
-    padding: 4px;
-    border-radius: 5px;
-    color: white !important;
-  }
-  .frogPanel {
-    display: inline-block !important;
-    image-rendering: pixelated;
-    text-align: center;
-    border: 1px solid #7cc1ff;
-    border-radius: 5px;
-    padding: 8px;
-    padding-top: 0px;
-    padding-bottom: 0px;
-    margin: 4px;
-    background-color: #7cc1ff;
-  }
-  .attributeList {
-    border: 1px solid white;
-    border-radius: 5px;
-    padding: 4px;
-    overflow: hidden;
-    background-color: white;
-    color: #333;
-  }
-  .trait{
-    border-radius: 2px;
-    background: white;
-    color: rgba(126, 183, 128, 1);
-    font-size: x-small;
-    padding: 1px;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
