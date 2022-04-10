@@ -671,8 +671,8 @@
                   // Build Fresh Frogs Attributes
                   if (loadAttributes === 'true') {
                     loadAttribute(trait_type, value, tokenName)
-                    newAttribute = document.createElement('text')
-                    newAttribute.innerHTML = value;
+                    newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
+                    newAttribute.innerHTML = value + '<b><i class="trait">0%</i></b>';
                     newAttribute.className = value;
                     space = document.createElement('br')
                     document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
