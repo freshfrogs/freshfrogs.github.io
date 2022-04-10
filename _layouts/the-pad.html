@@ -679,7 +679,7 @@
 
                   // Build Fresh Frogs Attributes
                   if (loadAttributes === 'true') {
-                    loadAttribute(trait_type, value, tokenName)
+                    //loadAttribute(trait_type, value, tokenName)
                     newAttribute = document.createElement('text')
                     newAttribute.innerHTML = '◆ '+value;
                     newAttribute.className = value;
@@ -740,7 +740,8 @@
         newFrog.onclick = function() {applyFrogOwned(tokenID)};
         newFrog.id = tokenID
         newFrog.className = 'frogPanel'
-        newFrog.innerHTML = '<a class="smallContainer2 pointer" id="Frog #'+tokenID+'"></a>'+'<p class="attributeList" id="Frog #'+tokenID+'Desc"></p>'
+        imgSrc = 'https://freshfrogs.io/frog/'+tokenID+'.png'
+        newFrog.innerHTML = '<a class="smallContainer2 pointer" id="Frog #'+tokenID+'"><img src="'+imgSrc+'"></a>'+'<p class="attributeList" id="Frog #'+tokenID+'Desc"></p>'
         document.getElementById("thePad").appendChild(newFrog)
       }
       // Output to minting terminal
