@@ -719,14 +719,14 @@
                 //console.log(attributeText.length)
                 for (var a = 0; a < attributeText.length; a++) {
                   //console.log('◆ '+value+'('+rarity+'%)')
-                  attributeText[a].innerHTML = value+' <b><i class="trait">'+rarity+'%</i></b>';
+                  attributeText[a].innerHTML = value+' <b><i id="Frog #'+frog+'trait" class="trait">'+rarity+'%</i></b>';
                 }
               }
             })()
             
             totalMoved = Math.round((total*100));
             console.log('Frog #'+frog+' Total: '+totalMoved);
-            frogPanelDesc = document.getElementById('Frog #'+frog)
+            frogPanelDesc = document.getElementById('Frog #'+frog+'trait')
             if (totalMoved >= 128.48) {
               console.log('Most Common Frog!')
               frog = frogPanelDesc.style.background = '#7cc1ff' // '#ff9999'
