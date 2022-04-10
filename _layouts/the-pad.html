@@ -695,18 +695,7 @@
           for (var i = 0; i < frogPanel.length; i++) {
             let frog = frogPanel[i].id
             //frogPanel[i].style.background =
-            total;
-            frogRarity(frog);
-            console.log('Frog #'+frog+' Total: '+total);
-            if (total <= 2) {
-              console.log('rare Frog!')
-              frog = frogPanel[i].style.background = '#7cc1ff'
-            } //else if (total < 4) {
-
-            //}
-          }
-          async function frogRarity(thisFrog) {
-            let jsonLink = 'https://freshfrogs.io/frog/json/'+thisFrog+'.json' 
+            let jsonLink = 'https://freshfrogs.io/frog/json/'+frog+'.json' 
             var metadata = await (await fetch(jsonLink)).json();
             total = 1;
             (async () => { // Pull Metadata
@@ -729,9 +718,18 @@
                 }
               }
             })()
+            console.log('Frog #'+frog+' Total: '+total);
+            if (total <= 2) {
+              console.log('rare Frog!')
+              frog = frogPanel[i].style.background = '#7cc1ff'
+            } //else if (total < 4) {
+
+            //}
+          }
+
             //console.log(thisFrog+' Total Rarity: '+total)
 
-          }
+          
           // ----------------------------->
           // mint = 1; // <--- Mint On or Off? 1 / 0
           // <-----------------------------
