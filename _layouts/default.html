@@ -733,7 +733,9 @@
               consoleOutput("❯ Mint open <strong>Friday April 1st! 04/01/22</strong> Join discord for more info! "+"<b><u><a class='pointer' href='https://discord.gg/xWMFWgpvd3?event=950943812832858172'>Join Discord</b></u></a>")
             }
             if (userPendingTx >= 1) {
-              consoleOutput("<div class='mintingTextRed'><strong><b>❌Mint button locked out after one time use.</b></strong><a href='https://freshfrogs.io'><b>Refresh the Page</b></a></div>")
+              //consoleOutput("<div class='mintingTextRed'><strong><b>❌Mint button locked out after one time use.</b></strong><a href='https://freshfrogs.io'><b>Refresh the Page</b></a></div>")
+              document.getElementById('mintingText').innerHTML = "<br>\n<strong><b>❌Mint button locked out after one use!</b></strong><br><a href='https://freshfrogs.io'><b>Refresh the Page</b></a>"
+              document.getElementById('mintingText').className = "mintingTextRed"
             }
           } else {
             userPendingTx = 1;
