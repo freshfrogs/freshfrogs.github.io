@@ -32,15 +32,10 @@
     margin-left: auto;
     margin-right: auto;
     padding-top: 8px;
+    margin-top: 5%;
   }
   .top {
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 0%;
-    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
-    font-weight: 500;
-    color: rgba(126, 183, 128, 1);
-    font-size: 1em;
+    margin: 0%;
     image-rendering: pixelated;
     text-align: center;
     max-width: 1000px;
@@ -99,10 +94,15 @@
     overflow: hidden;
     background-color: #7cc1ff;
     margin: auto;
-    width: 256px;
-    height: 256px;
+    width: auto;
+    height: auto;
     padding: 4px;
-    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
+    transition: transform .2s;
+    border: 0px solid white;
+    image-rendering: pixelated;
+    -ms-transform: scale(1.1); /* IE 9 */
+    -webkit-transform: scale(1.1); /* Safari 3-8 */
+    transform: scale(1.1);
   }
   .headLine{
     color: transparent;
@@ -123,22 +123,21 @@
   .headLineImg {
     float: none;
     image-rendering: crisp-edges;
-    height: 32px;
-    vertical-align: top;
+    height: 18px;
+    vertical-align: middle;
     border-radius: 100%;
     padding: 0px;
     transition: transform .2s;
-    margin-left: 3%;
-    margin-right: 3%;
-    margin-bottom: 3%;
-    margin-top: 3%;
-    box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
+    margin-left: 2%;
+    margin-right: 2%;
+    margin-bottom: 2%;
+    margin-top: 2%;
     background-color: transparent;
   }
   .headLineImg:hover{
-    -ms-transform: scale(1.5); /* IE 9 */
-    -webkit-transform: scale(1.5); /* Safari 3-8 */
-    transform: scale(1.5);
+    -ms-transform: scale(1.1); /* IE 9 */
+    -webkit-transform: scale(1.1); /* Safari 3-8 */
+    transform: scale(1.1);
     box-shadow: none;
     border: none;
   }
@@ -174,17 +173,19 @@
     padding: 0;
     background: white;
     border-radius: 5px;
-    border: 1px solid lightgrey;
+    border: 1px solid white;
     width: 270px;
     box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
     margin-left: auto;
     margin-right: auto;
     margin-top: 2%;
+    margin-bottom: 1%;
     line-height: 1;
     text-align: center;
     vertical-align: middle;
   }
   section {
+    border-top: 0px solid #7cc1ff !important;
     border: 4px solid #7cc1ff;
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
     font-size: auto;
@@ -192,6 +193,8 @@
     background-color: #7cc1ff;
     text-align: center;
     border-radius: 7px;
+    padding-top: 0px !important;
+    margin-top: 0px !important;
     padding: 14px;
     padding-bottom: 16px !important;
     width: auto;
@@ -199,10 +202,10 @@
     margin-bottom: 16px;
   }
   header {
-    border: 4px solid white;
+    border: 4px solid #7cc1ff;
     overflow: hidden;
 
-    background-color: white;
+    background-color: #7cc1ff;
     text-align: center;
     border-radius: 7px;
     padding: 14px;
@@ -402,8 +405,8 @@
   .thePad {
     border-radius: 5px;
     padding: 4px;
-    min-height: 128px;
     background-color: #7cc1ff;
+    vertical-align: bottom;
   }
   .headerDiv {
     border-bottom: 2px solid #7cc1ff;
@@ -466,7 +469,7 @@
         CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";    // Contract Address (Ethereum Mainnet) 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b // Rinkeby: 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524
         COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
         NETWORK = "main";   // Which Network?
-        consoleOutput('<hr class="hr2">'+'Mint from the collection...<a class="pointer" href="https://freshfrogs.github.io/"><b>🐸 Minting Terminal</b> ↗️</a>'+'<hr class="hr2">'+'<div id="thePad" class="thePad"></div>')
+        consoleOutput('<hr class="hr2">'+'Mint from the collection...<a class="pointer" href="https://freshfrogs.io/"><b>🐸 Minting Terminal</b> ↗️</a>'+'<hr class="hr2">'+'<div id="thePad" class="thePad"></div>')
         //consoleOutput('<hr class="hr2">'+'<b>🍄Morph FROGS</b><br>Fresh Frog NFT Combinations! <br>Select Frogs to combine their attributes!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>'+'<hr>')
         try {   // Connect
           await f0.init({
@@ -532,7 +535,7 @@
             'tomatoFrog' : 0,
             'treeFrog(1)' : 0,
             'treeFrog(2)' : 0,
-            'treeFrog(2)' : 0,
+            'treeFrog(3)' : 0,
             'treeFrog(4)' : 0,
             'treeFrog(5)' : 0,
             'treeFrog(6)' : 0,
@@ -620,7 +623,7 @@
           // Display Two Random Frogs!
           //combineTokens(baseFrog, subFrog);
           if (ownedFrogs <= 20) { // ❌ No FROGS
-            document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>❌ It seems you do not own any FROGS!'
+            document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i>"+addressCut+' ✓</i></b>'+'<br>❌ It seems you do not own any FROGS!<br>'
           } else {
             document.getElementById('netStatus').innerHTML = 'Loading Frogs from ΞEthereum... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br><br>';
 
@@ -648,7 +651,8 @@
 
                 // Load Fresh Frog (elementID. tokenID)
                 loadFreshFrog(thisToken);
-                document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<b><u>'+tokenName+'</u></b>';
+                openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
+                document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+tokenName+'</u></b>'+'</a>';
                 loaded_to = loaded_to + 1;
                 loadAttributes = 'true';
               }
@@ -760,7 +764,7 @@
           console.log('done loading Frogs!')
           // Done! Ready to mint!
         } catch (e) { // Failed; Send Error Code!
-          consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong></div>");
+          consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong><a href='https://freshfrogs.io/the-pad'><b><u>Refresh the Page</u></b></a></div>");
         }
       })
       // Load Fresh Frog
@@ -1113,26 +1117,25 @@
         }
       }
     </script>
-    <div class="top">{{ content }}</div>
   </head>
   <body class="bodyb">
     <div class="wrapper">
       <header>
         <div class="downloads pre">
+          <div id="bigContainer" class="bigContainer">
+            <div id="frogContainer" class="container"><div id="imgWrapper" class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.io/assets/frogs/previewMorph.png"/></div></div>
+          </div>
+          <div id="twoFrogs" class="imgWrapper"></div>
+          <br>
           <ul class="downloads2">
             <li><a id="morphFrogs" class="pointer"><strong>Morph</strong>🐸 <b>+</b> 🐸</a></li>
             <li><a id="selectBase" class="pointer"><strong>Base</strong>Select FROG</a></li>
             <li><a id="selectSub" class="pointer"><strong>Sub</strong>Select FROG</a></li>
           </ul>
-          <div id="bigContainer" class="bigContainer">
-            <div id="frogContainer" class="container"><div id="imgWrapper" class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.io/assets/frogs/previewMorph.png"/></div></div>
-          </div>
-          <div id="twoFrogs" class="imgWrapper"></div>
         </div>
       </header>
       <section>
-        <h2><strong><a href="https://freshfrogs.io/the-pad" class="headerDiv">freshfrogs.io/the-pad 🍀</a></strong></h2>
-        <div></div>
+        <div class="top">{{ content }}<h2 style="color: white !important;"><b>freshfrogs.io/the-pad 🍀</b></h2></div>
         <br>
         <div class="downloads pre">
           <div id="pre">
