@@ -32,15 +32,10 @@
     margin-left: auto;
     margin-right: auto;
     padding-top: 8px;
+    margin-top: 5%;
   }
   .top {
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 0%;
-    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
-    font-weight: 500;
-    color: rgba(126, 183, 128, 1);
-    font-size: 1em;
+    margin: 0%;
     image-rendering: pixelated;
     text-align: center;
     max-width: 1000px;
@@ -186,7 +181,6 @@
     vertical-align: middle;
   }
   section {
-    border: 4px solid #7cc1ff;
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
     font-size: auto;
     color: white !important;
@@ -195,15 +189,16 @@
     border-radius: 7px;
     padding: 14px;
     padding-bottom: 16px !important;
+    padding-top: 0px !important;
     width: auto;
     overflow: hidden;
     margin-bottom: 16px;
   }
   header {
-    border: 4px solid white;
+    border: 4px solid #7cc1ff;
     overflow: hidden;
 
-    background-color: white;
+    background-color: #7cc1ff;
     text-align: center;
     border-radius: 7px;
     padding: 14px;
@@ -408,12 +403,12 @@
     padding: 4px;
     min-height: 128px;
     background-color: #7cc1ff;
-    border: 1px solid white;
   }
   .headerDiv {
     padding: 4px;
     border-radius: 5px;
     color: white !important;
+    margin: 0px !important;
   }
   .frogPanel {
     display: inline-block !important;
@@ -530,6 +525,13 @@
     transform: scale(1.5);
     box-shadow: none;
     border: none;
+  }
+  .consoleOutput {
+    border-radius: 5px;
+    border: 1px solid white;
+    padding: 8px;
+    background: transparent;
+    color: white;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -722,7 +724,7 @@
         
         consoleOutput("<div id='mintingText'>Please connect an Ethereum wallet... <b><i>"+addressCut+" ✓</b></i>"+"<br><b>FROG #"+nextIdC+"</b> is now available to mint...")
 
-        consoleOutput('<br><hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>'+'<hr class="hr2"><br><h3 class="headerDiv">Recently Minted</h3><div id="thePad" class="thePad"></div>');
+        consoleOutput('<br><hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>');
         // Recent Mints
         // Event Listeners 
         // MINT -- Send the transaction to mint!
@@ -957,7 +959,7 @@
       function loadMintingTray() {
         var growTray = document.getElementById('mintingTray');
         growTray.innerHTML = 
-        '<h2 id="supply">FROG 4,040 Total Supply</h2>' +
+        '<h2 class="headerDiv" id="supply">FROG 4,040 Total Supply</h2>' +
         '<ul class="downloads2">' +
         '  <li><a id="mintTransact" href="https://discord.gg/xWMFWgpvd3?event=950943812832858172" class="pointer" target="_blank"><strong>LINK WALLET</strong></a></li>' +
         '  <li><a id="mintTotal"><strong>0.02 ΞETH</strong>Plus gas</a></li>' +
@@ -1020,18 +1022,15 @@
       }
       // -- END FUNCTIONS ------------------------------------------------------------------------------------------------------------------------------
     </script>
-    <div class="top">
-      {{ content }}
-    </div>
   </head>
   <body class="bodyb">
     <div class="wrapper">
       <header>
         <div class="downloads pre">
           <div id="mintingTray"></div>
-          <div id="netStatus">
-            <br>
-            <h2>FROG 4,040 Total Supply</h2>
+          <div id="netStatus" style="color: white;">
+            <h2 class="headerDiv">mint.freshfrogs.io</h2>
+            <hr class="hr2">
             Please connect an Ethereum wallet...
             <b><a class="pointer" href="https://freshfrogs.io/">Connect Wallet</a></b>
             <hr class="hr2">Don't have a wallet?...
@@ -1041,12 +1040,13 @@
         </div>
       </header>
       <section>
-        <h2><a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"  class="headerDiv">mint.freshfrogs.io</a></h2><br><hr>
+        <div class="top">{{ content }}</div>
         <div class="downloads pre">
           <div id='growTerminal'>
             <div class='measuringWrapper'>
-              <div id="pre">
+              <div id="pre" class="consoleOutput">
               </div>
+              <div id="thePad" class="thePad"></div>
             </div>
           </div>
           <br>
