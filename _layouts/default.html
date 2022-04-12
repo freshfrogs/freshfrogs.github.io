@@ -960,7 +960,6 @@
       function loadMintingTray() {
         var growTray = document.getElementById('mintingTray');
         growTray.innerHTML = 
-        '<h2 class="headerDiv" id="supply">FROG 4,040 Total Supply</h2>' +
         '<ul class="downloads2">' +
         '  <li><a id="mintTransact" href="https://discord.gg/xWMFWgpvd3?event=950943812832858172" class="pointer" target="_blank"><strong>LINK WALLET</strong></a></li>' +
         '  <li><a id="mintTotal"><strong>0.02 ΞETH</strong>Plus gas</a></li>' +
@@ -974,7 +973,8 @@
         '  <div id="frogContainer3" class="containerMint">' +
         '    <div class="imgWrapperMint"><img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/preview2.gif"/></div>' +
         '  </div>' +
-        '</div>';
+        '</div>' +
+        '<h3 class="headerDiv" id="supply">FROG 4,040 Total Supply</h3>';
         document.getElementById("netStatus").innerHTML = '';
       }
 
