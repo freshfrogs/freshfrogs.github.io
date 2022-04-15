@@ -640,7 +640,7 @@
               //
               .then((res) => res.json())
               .then((res) => {
-                console.log(res.assets)
+                return res.assets
               })
               .catch((e) => {
                 console.error(e)
