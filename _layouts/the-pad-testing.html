@@ -628,137 +628,24 @@
             // Loop Minted Frogs, Frog # 1 - NextID
             var loop_to = nextIdC;
             var loaded_to = 0;
-            for (var thisToken = 1; thisToken < loop_to; thisToken++) {
+            // OPEN SEA API
 
-              var tokenName = 'Frog #'+thisToken;
-              console.log('loading... '+tokenName)
-              // Progress Bar!
-              percent = parseInt((thisToken/loop_to)*100);
-              document.getElementById("progress").innerHTML = percent+"%"
-              elem = document.getElementById("myBar");
-              width = percent
-              width++;
-              elem.style.width = width + "%";
 
-              loadAttributes = 'false';
-              // Does Frog belong to the owner?
-              var thisTokenOwner = await collection.methods.ownerOf(thisToken).call(); // Get owner of thisToken
-
-              // Frog is Owned
-              if (loaded_to < ownedFrogs && userAcc === thisTokenOwner.toLowerCase()) {
-
-                // Load Fresh Frog (elementID. tokenID)
-                loadFreshFrog(thisToken);
-                openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
-                document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+tokenName+'</u></b>'+'</a>';
-                loaded_to = loaded_to + 1;
-                loadAttributes = 'true';
-              }
-
-              let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
-              var metadata = await (await fetch(jsonLink)).json();
-
-              (async () => { // Pull Metadata
-                
-                // Loop Attributes
-                for (var i = 0; i < metadata.attributes.length; i++){
-
-                  // Trait_Type : Value
-                  var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
-                  let trait_type = attribute.trait_type
-                  let value = attribute.value
-
-                  // Add to Totals
-                  attributesTotal[value] = attributesTotal[value] + 1;
-
-                  // Build Fresh Frogs Attributes
-                  if (loadAttributes === 'true') {
-                    loadAttribute(trait_type, value, tokenName)
-                    newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
-                    newAttribute.innerHTML = value + ' <b><i class="trait">▪%</i></b>';
-                    newAttribute.className = value;
-                    space = document.createElement('br')
-                    document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
-                    document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
-                  }
-                }
-              })()
-            }
-            // Finish Loading Bar
-            percent = 100;
-            document.getElementById("progress").innerHTML = percent+"%"
-            elem = document.getElementById("myBar");
-            width = percent
-            width++;
-            elem.style.width = width + "%";
-            document.getElementById('netStatus').innerHTML = ''
-          }
-          //console.log(JSON.stringify(attributesTotal))
-          // Loop Frog Rarities
-          var frogPanel = document.getElementsByClassName('frogPanel');
-          for (var i = 0; i < frogPanel.length; i++) {
-            let frog = frogPanel[i].id
-            //frogPanel[i].style.background =
-            let jsonLink = 'https://freshfrogs.io/frog/json/'+frog+'.json' 
-            var metadata = await (await fetch(jsonLink)).json();
-            total = 1;
-            (async () => { // Pull Metadata
-              
-              // Loop Attributes
-              for (var f = 0; f < metadata.attributes.length; f++){
-
-                // Trait_Type : Value
-                var attribute = metadata.attributes[f] // attribute.trait_type / attribute.value
-                let value = attribute.value
-                //total = (1 / attributesTotal[value]) * total
-                var rarity = Math.round( ((attributesTotal[value])/(nextIdC-1))*100 );
-                //console.log(value+': '+attributesTotal[value]);
-                total = total * (rarity/100)
-                var attributeText = document.getElementsByClassName(value);
-                //console.log(attributeText.length)
-                for (var a = 0; a < attributeText.length; a++) {
-                  //console.log('◆ '+value+'('+rarity+'%)')
-                  attributeText[a].innerHTML = value+' <b><i class="trait">'+rarity+'%</i></b>';
-                }
-              }
-            })()
+            const options = {
+              method: 'GET',
+              headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
+            };
             
-            totalMoved = Math.round((total*30000));
-            console.log('Frog #'+frog+' Total: '+totalMoved);
-     /*       frogPanelDesc = document.getElementById('Frog #'+frog+'Desc')
-            if (totalMoved >= 64.48) {
-              console.log('Most Common Frog!')
-              frog = frogPanelDesc.style.background = '#7cc1ff' // '#ff9999'
-            } else if (totalMoved >= 32.40) { 
-              console.log('Semi Common Frog!')
-              frog = frogPanelDesc.style.background = '#7cc1ff' // '#ffc299'
-            } else if (totalMoved >= 16.32) { 
-              console.log('Decent Frog!')
-              frog = frogPanelDesc.style.background = '#7cc1ff' // '#fdff99'
-            } else if (totalMoved >= 8.24) { 
-              console.log('Fair Frog!')
-              frog = frogPanelDesc.style.background = '#7cc1ff' // '#a3ff99'
-            } else if (totalMoved >= 4.16) { 
-              console.log('Good Frog!')
-              frog = frogPanelDesc.style.background = '#7cc1ff' // '#99ffda'
-            } else if (totalMoved >= 2.08) { 
-              console.log('Rare Frog!')
-              frog = frogPanelDesc.style.background = '#7cc1ff' // '#7cc1ff'
-            } else if (totalMoved >= 1.04) { 
-              console.log('Epic Frog!')
-              frog = frogPanelDesc.style.background = '#ad99ff'
-            } else if (totalMoved >= 0.52 || totalMoved < 0.02) { 
-              console.log('Legendary Frog!')
-              frog = frogPanelDesc.style.background = '#dd99ff'
-            } */
+            const items = await fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=20&include_orders=false', options)
+              .then(response => response.json())
+              .then(response => console.log(response))
+              .catch(err => console.error(err));
+
+            items.forEach((nft) => {
+              const { name } = nft;
+              consoleOutput(name);
+            })
           }
-
-            //console.log(thisFrog+' Total Rarity: '+total)
-
-          
-          // ----------------------------->
-          // mint = 1; // <--- Mint On or Off? 1 / 0
-          // <-----------------------------
           console.log('done loading Frogs!')
           // Done! Ready to mint!
         } catch (e) { // Failed; Send Error Code!
