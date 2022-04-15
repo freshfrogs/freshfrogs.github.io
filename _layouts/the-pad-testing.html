@@ -638,9 +638,7 @@
             
             const frogs = await fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=20&include_orders=false', options)
 
-            frogs.forEach((nft) => {
-              const { name } = nft;
-            })
+            frogs.forEach(element => console.log(element))
           }
           console.log('done loading Frogs!')
           // Done! Ready to mint!
