@@ -631,31 +631,18 @@
             // OPEN SEA API
 
 
-            //const options = {
-            //  method: 'GET',
-            //  headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
-            //};
+            const options = {
+              method: 'GET',
+              headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
+            };
             
+            const items = await fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=20&include_orders=false', options)
+              .then(response => response.json())
+              .then(response => console.log(response))
+              .catch(err => console.error(err));
 
-            const items = await fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=desc&offset=0&limit=50')
-              .then((res) => res.json())
-              .then((res) => {
-                return res.assets
-              })
-              .catch((e) => {
-                console.error(e)
-                console.error('Could not talk to OpenSea')
-                return null
-              })
-
-            items.assets.forEach((nft) => {
-              const { name, image_url, description, permalink } = nft
-              console.log(name);
-            })
-          
+            console.log(items)
           }
-          console.log('done loading Frogs!')
-          // Done! Ready to mint!
         } catch (e) { // Failed; Send Error Code!
           consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong><a href='https://freshfrogs.io/the-pad'><b><u>Refresh the Page</u></b></a></div>");
         }
