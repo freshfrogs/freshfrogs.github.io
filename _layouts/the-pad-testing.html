@@ -636,9 +636,14 @@
               headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
             };
             
-            const items = await fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=20&include_orders=false', options)
+            fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=20&include_orders=false', options)
               .then(response => response.json())
               .then(response => console.log(response))
+              .then(({ assets }) => {
+                assets.forEach((attributes) => { // attributes.name
+                  console.log(attributes.name)
+                })
+              })
               .catch(err => console.error(err));
 
             console.log(items)
