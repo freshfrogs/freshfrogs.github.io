@@ -643,7 +643,15 @@
                 loadFreshFrog(thisToken);
                 openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
                 document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+frog.name+'</u></b>'+'</a>';
-                //
+
+                // Progress Bar!
+                percent = parseInt((thisToken/ownedFrogs)*100);
+                document.getElementById("progress").innerHTML = percent+"%"
+                elem = document.getElementById("myBar");
+                width = percent
+                width++;
+                elem.style.width = width + "%";
+                
                 let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
                 fetch(jsonLink)
                 .then((metadata) => metadata.json())
@@ -668,6 +676,14 @@
                   }
                 })
               })
+              // Finish Loading Bar
+              percent = 100;
+              document.getElementById("progress").innerHTML = percent+"%"
+              elem = document.getElementById("myBar");
+              width = percent
+              width++;
+              elem.style.width = width + "%";
+              document.getElementById('netStatus').innerHTML = ''
             })
           }
         } catch (e) { // Failed; Send Error Code!
