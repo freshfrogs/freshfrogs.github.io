@@ -638,10 +638,8 @@
                 assets.forEach((frog) => { // For Each FROG
                   console.log('Loading... '+frog.name);
                   
-                  thisToken = parseInt(frog.name.replace('Frog #', ''));
+                  thisToken = frog.name.replace('Frog #', '');
                   tokenName = frog.name
-                  // --- >
-
 
                   // Load Fresh Frog (elementID. tokenID)
                   loadFreshFrog(thisToken);
@@ -654,27 +652,11 @@
                     let { attributes } = metadata.attributes
                   })
 
-                  (async () => { // Pull Metadata
-                    
-                    // Loop Attributes
-                    for (var i = 0; i < attributes.length; i++){
+                  // Loop Attributes
+                  for (var i = 0; i < attributes.length; i++){
+                    console.log(attributes[i])
+                  }
 
-                      // Trait_Type : Value
-                      attribute = attributes[i] // attribute.trait_type / attribute.value
-                      trait_type = attribute.trait_type
-                      value = attribute.value
-
-                      // Build Fresh Frogs Attributes
-                      loadAttribute(trait_type, value, frog.name)
-                      newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
-                      newAttribute.innerHTML = value + ' <b><i class="trait">▪%</i></b>';
-                      newAttribute.className = value;
-                      space = document.createElement('br')
-                      document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
-                      document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
-                    }
-                  })()
-                  // <---
                 })
               })
               .catch(err => console.error(err));
