@@ -639,8 +639,8 @@
             fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=20&include_orders=false', options)
               .then(response => response.json())
               .then(({ assets }) => {
-                assets.forEach((attributes) => { // attributes.name
-                  console.log(attributes.name)
+                assets.forEach((frog) => { // attributes.name
+                  console.log(frog.name.replace('Frog #', ''));
                 })
               })
               .catch(err => console.error(err));
