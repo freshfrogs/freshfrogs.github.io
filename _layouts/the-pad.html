@@ -638,7 +638,12 @@
               console.log(res)
               var { assets } = res
               assets.forEach((frog) => { // For Each FROG
-                console.log('Loading... '+frog.name);
+                var { name, token_metadata, permalink, traits } = frog
+                console.log('Loading... '+name);
+                for (var i = 0; i < traits.length; i++) {
+                 attributesTotal[traits[i].trait_type] = traits[i].count
+                }
+
                 let thisToken = frog.name.replace('Frog #', '');
                 //
                 loadFreshFrog(thisToken);
@@ -653,8 +658,7 @@
                 width++;
                 elem.style.width = width + "%";
                 
-                let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
-                fetch(jsonLink)
+                fetch(token_metadata)
                 .then((metadata) => metadata.json())
                 .then((metadata) => {
                   // Loop Attributes
@@ -685,6 +689,7 @@
               width++;
               elem.style.width = width + "%";
               document.getElementById('netStatus').innerHTML = ''
+              console.log(attributesTotal)
             })
           }
         } catch (e) { // Failed; Send Error Code!
