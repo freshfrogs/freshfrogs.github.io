@@ -649,15 +649,18 @@
                   document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+frog.name+'</u></b>'+'</a>';
 
                   jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
-                  metadata = fetch(jsonLink).json();
+                  fetch(jsonLink).then((metadata) => metadata.json())
+                  .then((metadata) => {
+                    let { attributes } = metadata.attributes
+                  })
 
                   (async () => { // Pull Metadata
                     
                     // Loop Attributes
-                    for (var i = 0; i < metadata.attributes.length; i++){
+                    for (var i = 0; i < attributes.length; i++){
 
                       // Trait_Type : Value
-                      attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                      attribute = attributes[i] // attribute.trait_type / attribute.value
                       trait_type = attribute.trait_type
                       value = attribute.value
 
