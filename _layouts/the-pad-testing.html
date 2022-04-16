@@ -634,13 +634,52 @@
             
             fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=20&include_orders=false', options)
             .then((res) => res.json())
-            .then((res) => { console.log(res)
-              // Start Loading Frogs
+            .then((res) => {
+              console.log(res)
               var { assets } = res
               assets.forEach((frog) => { // For Each FROG
-                const { name, token_metadata, permalink, traits } = frog
+                var { name, token_metadata, permalink, traits } = frog
                 console.log('Loading... '+name);
-                console.log('token_metadata Link: '+token_metadata)
+                for (var i = 0; i < traits.length; i++) {
+                 attributesTotal[traits[i].trait_type] = traits[i].count
+                }
+
+                let thisToken = frog.name.replace('Frog #', '');
+                //
+                loadFreshFrog(thisToken);
+                openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
+                document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+frog.name+'</u></b>'+'</a>';
+
+                // Progress Bar!
+                percent = parseInt((thisToken/ownedFrogs)*100);
+                document.getElementById("progress").innerHTML = percent+"%"
+                elem = document.getElementById("myBar");
+                width = percent
+                width++;
+                elem.style.width = width + "%";
+                
+                fetch(token_metadata)
+                .then((metadata) => metadata.json())
+                .then((metadata) => {
+                  // Loop Attributes
+                  for (var i = 0; i < metadata.attributes.length; i++){
+                    //console.log(metadata.attributes[i]);
+
+                    // Trait_Type : Value
+                    var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                    let trait_type = attribute.trait_type
+                    let value = attribute.value
+
+                    // Build Fresh Frogs Attributes
+                    loadAttribute(trait_type, value, frog.name)
+                    newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
+                    newAttribute.innerHTML = value + ' <b><i class="trait">▪%</i></b>';
+                    newAttribute.className = value;
+                    space = document.createElement('br')
+                    document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
+                    document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
+                  }
+                })
               })
               // Finish Loading Bar
               percent = 100;
@@ -650,6 +689,7 @@
               width++;
               elem.style.width = width + "%";
               document.getElementById('netStatus').innerHTML = ''
+              console.log(attributesTotal)
             })
           }
         } catch (e) { // Failed; Send Error Code!
