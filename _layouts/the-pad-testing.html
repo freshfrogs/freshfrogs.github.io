@@ -641,7 +641,7 @@
                 var { name, token_metadata, permalink, traits } = frog
                 console.log('Loading... '+name);
                 for (var i = 0; i < traits.length; i++) {
-                 attributesTotal[traits[i].trait_type] = traits[i].count
+                 attributesTotal[traits[i].value] = traits[i].count
                 }
 
                 let thisToken = frog.name.replace('Frog #', '');
