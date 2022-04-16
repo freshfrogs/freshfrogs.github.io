@@ -625,11 +625,7 @@
           } else {
             document.getElementById('netStatus').innerHTML = 'Loading Frogs from ΞEthereum... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br><br>';
 
-            // Loop Minted Frogs, Frog # 1 - NextID
-            var loop_to = nextIdC;
-            var loaded_to = 0;
             // OPEN SEA API
-
 
             const options = {
               method: 'GET',
@@ -640,7 +636,40 @@
               .then(response => response.json())
               .then(({ assets }) => {
                 assets.forEach((frog) => { // attributes.name
-                  console.log(frog.name.replace('Frog #', ''));
+                  console.log('Loaded'+frog.name);
+                  //
+                  var thisToken = frog.name.replace('Frog #', '')
+                  var tokenName = frog.name
+                  // Progress Bar!
+
+                  // Load Fresh Frog (elementID. tokenID)
+                  loadFreshFrog(thisToken);
+                  openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
+                  document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+tokenName+'</u></b>'+'</a>';
+                
+                  let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
+                  var metadata = await (await fetch(jsonLink)).json();
+
+                  (async () => { // Pull Metadata
+                    
+                    // Loop Attributes
+                    for (var i = 0; i < metadata.attributes.length; i++){
+
+                      // Trait_Type : Value
+                      var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                      let trait_type = attribute.trait_type
+                      let value = attribute.value
+
+                      // Build Fresh Frogs Attributes
+                      loadAttribute(trait_type, value, tokenName)
+                      newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
+                      newAttribute.innerHTML = value + ' <b><i class="trait">▪%</i></b>';
+                      newAttribute.className = value;
+                      space = document.createElement('br')
+                      document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
+                      document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
+                    }
+                  })()
                 })
               })
               .catch(err => console.error(err));
