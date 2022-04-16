@@ -646,12 +646,11 @@
                     .then((metadata) => metadata.json())
                     .then((metadata) => {
                       var { attributes } = metadata.attributes
+                      // Loop Attributes
+                      for (var i = 0; i < attributes.length; i++){
+                        console.log(attributes[i])
+                      }
                     })
-
-                  // Loop Attributes
-                  for (var i = 0; i < attributes.length; i++){
-                    console.log(attributes[i])
-                  }
 
                 })
               })
