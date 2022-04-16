@@ -660,7 +660,7 @@
                   var attribute = frog.traits[i] // attribute.trait_type / attribute.value
                   let trait_type = attribute.trait_type
                   let value = attribute.value
-                  let trait_rarity = Math.round((1 / attribute.trait_count) * 100) / 100
+                  let trait_rarity = Math.round((attribute.trait_count / nextIdC) * 100) / 100
 
                   // Build Fresh Frogs Attributes
                   loadAttribute(trait_type, value, frog.name)
