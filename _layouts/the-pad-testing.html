@@ -633,27 +633,26 @@
             };
             
             fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=20&include_orders=false', options)
-              .then((res) => res.json())
-              .then((res) => {
-                var { assets } = res
-                assets.forEach((frog) => { // For Each FROG
-                  console.log('Loading... '+frog.name);
-                  
-                  let thisToken = frog.name.replace('Frog #', '');
+            .then((res) => res.json())
+            .then((res) => {
+              var { assets } = res
+              assets.forEach((frog) => { // For Each FROG
+                console.log('Loading... '+frog.name);
+                
+                let thisToken = frog.name.replace('Frog #', '');
 
-                  let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
-                  fetch(jsonLink)
-                    .then((metadata) => metadata.json())
-                    .then((metadata) => {
-                      var { attributes } = metadata.attributes
-                      // Loop Attributes
-                      for (var i = 0; i < attributes.length; i++){
-                        console.log(attributes[i])
-                      }
-                    })
-
+                let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
+                fetch(jsonLink)
+                .then((metadata) => metadata.json())
+                .then((metadata) => {
+                  var { attributes } = metadata.attributes
+                  // Loop Attributes
+                  for (var i = 0; i < attributes.length; i++){
+                    console.log(attributes[i])
+                  }
                 })
               })
+            })
           }
         } catch (e) { // Failed; Send Error Code!
           consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong><a href='https://freshfrogs.io/the-pad'><b><u>Refresh the Page</u></b></a></div>");
