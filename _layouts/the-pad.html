@@ -635,6 +635,7 @@
             fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=20&include_orders=false', options)
             .then((res) => res.json())
             .then((res) => {
+              console.log(res)
               var { assets } = res
               assets.forEach((frog) => { // For Each FROG
                 console.log('Loading... '+frog.name);
@@ -651,27 +652,30 @@
                 width = percent
                 width++;
                 elem.style.width = width + "%";
-                //
-                // Loop Attributes
-                for (var i = 0; i < frog.traits.length; i++){
-                  //console.log(metadata.attributes[i]);
+                
+                let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
+                fetch(jsonLink)
+                .then((metadata) => metadata.json())
+                .then((metadata) => {
+                  // Loop Attributes
+                  for (var i = 0; i < metadata.attributes.length; i++){
+                    //console.log(metadata.attributes[i]);
 
-                  // Trait_Type : Value
-                  var attribute = frog.traits[i] // attribute.trait_type / attribute.value
-                  let trait_type = attribute.trait_type
-                  let value = attribute.value
-                  let trait_rarity = 1 / attribute.trait_count
+                    // Trait_Type : Value
+                    var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                    let trait_type = attribute.trait_type
+                    let value = attribute.value
 
-                  // Build Fresh Frogs Attributes
-                  loadAttribute(trait_type, value, frog.name)
-                  newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
-                  newAttribute.innerHTML = value + ' <b><i class="trait">'+trait_rarity+'%</i></b>';
-                  newAttribute.className = value;
-                  space = document.createElement('br')
-                  document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
-                  document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
-                }
-                //
+                    // Build Fresh Frogs Attributes
+                    loadAttribute(trait_type, value, frog.name)
+                    newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
+                    newAttribute.innerHTML = value + ' <b><i class="trait">▪%</i></b>';
+                    newAttribute.className = value;
+                    space = document.createElement('br')
+                    document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
+                    document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
+                  }
+                })
               })
               // Finish Loading Bar
               percent = 100;
