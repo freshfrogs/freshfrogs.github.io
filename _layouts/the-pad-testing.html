@@ -671,7 +671,7 @@
                     var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
                     let trait_type = attribute.trait_type
                     let value = attribute.value
-                    let trait_rarity = roundToTwo((attributesTotal[value]/nextIdC)*100)
+                    let trait_rarity = roundToTwo((attributesTotal[value]/nextIdC))
 
                     // Build Fresh Frogs Attributes
                     loadAttribute(trait_type, value, frog.name)
@@ -699,8 +699,8 @@
           consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong><a href='https://freshfrogs.io/the-pad'><b><u>Refresh the Page</u></b></a></div>");
         }
       })
-      function roundToTwo(num) {    
-        return +(Math.round(num + "e+2")  + "e-2");
+      function roundToTwo(num) {
+        return +((Math.round(num + "e+2")  + "e-2"))*100
       }
       // Load Fresh Frog
       function loadFreshFrog(tokenID) {
