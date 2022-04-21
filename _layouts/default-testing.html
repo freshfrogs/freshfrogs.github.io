@@ -670,6 +670,7 @@
         .then((res) => {
           console.log(res)
           var { assets } = res
+          var nextIdC;
           assets.forEach((frog) => { // For Each FROG
             var { name, token_metadata, permalink, traits } = frog
 
@@ -680,6 +681,9 @@
             }
 
             let thisToken = frog.name.replace('Frog #', '');
+            if (nextIdC) {
+              var nextIdC = thisToken
+            }
             //
             loadFreshFrog(thisToken);
             openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
