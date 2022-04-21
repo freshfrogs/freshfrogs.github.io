@@ -670,7 +670,7 @@
         .then((res) => {
           console.log(res)
           var { assets } = res
-          var nextIdC;
+          nextIdC;
           assets.forEach((frog) => { // For Each FROG
             var { name, token_metadata, permalink, traits } = frog
 
@@ -682,7 +682,7 @@
             console.log('Next ID: '+nextIdC)
             let thisToken = frog.name.replace('Frog #', '');
             if (typeof nextIdC === 'undefined') {
-              var nextIdC = thisToken + 1
+              let nextIdC = thisToken
               console.log(nextIdC+'!')
             }
 
