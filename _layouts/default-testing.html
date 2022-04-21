@@ -670,7 +670,7 @@
         .then((res) => {
           console.log(res)
           var { assets } = res
-          var nextIdC = assets[0].name;
+          var nextIdC = assets[0].name.replace('Frog #', '');
           assets.forEach((frog) => { // For Each FROG
             var { name, token_metadata, permalink, traits } = frog
 
