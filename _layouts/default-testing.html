@@ -679,12 +679,14 @@
             for (var i = 0; i < traits.length; i++) {
               attributesTotal[traits[i].value] = traits[i].trait_count
             }
-
+            console.log('Next ID: '+nextIdC)
             let thisToken = frog.name.replace('Frog #', '');
             if (typeof nextIdC === 'undefined') {
               var nextIdC = thisToken
-              console.log('Next ID: '+nextIdC)
             }
+
+
+
             //
             loadFreshFrog(thisToken);
             openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
