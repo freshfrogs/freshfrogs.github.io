@@ -681,8 +681,9 @@
             }
 
             let thisToken = frog.name.replace('Frog #', '');
-            if (nextIdC) {
+            if (nextIdC == 'undefined') {
               var nextIdC = thisToken
+              console.log(nextIdC)
             }
             //
             loadFreshFrog(thisToken);
