@@ -595,8 +595,8 @@
           frogMintMax = 'unlimited';
 
           // Rarities
-                    // Attribute Rarities
-                    var attributesTotal = {
+          // Attribute Rarities
+          var attributesTotal = {
             'goldChain' : 0,
             'goldDollarChain' : 0,
             'silverChain' : 0,
@@ -732,7 +732,7 @@
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           if (mint === 0 || userPendingTx >= 1) {
             if (mint === 0) {
-              consoleOutput("<b>Mint Open 04/22/22 8:00 PM (UTC)</b>"+"<b><u><a class='pointer' target='_blank' href='https://discord.gg/xWMFWgpvd3'>Join Discord!</b></u></a>")
+              consoleOutput("<div class='mintingTextRed'><b>Mint Open 04/22/22 8:00 PM (UTC)</b>"+"<b><u><a class='pointer' target='_blank' href='https://discord.gg/xWMFWgpvd3'>Join Discord!</b></u></a></div>")
             }
             if (userPendingTx >= 1) {
               //consoleOutput("<div class='mintingTextRed'><strong><b>❌Mint button locked out after one time use.</b></strong><a href='https://freshfrogs.io'><b><u>Refresh the Page</u></b></a></div>")
