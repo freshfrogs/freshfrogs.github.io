@@ -907,37 +907,7 @@
       function randomNumber(min, max) {
         return Math.random() * (max - min) + min;
       }
-      // Load Minting Tray...
-      function loadMintingTray() {
-        var growTray = document.getElementById('mintingTray');
-        growTray.innerHTML = 
-        '<ul class="downloads2">' +
-        '  <li><a id="mintTransact" href="https://discord.gg/xWMFWgpvd3?event=950943812832858172" class="pointer" target="_blank"><strong>LINK WALLET</strong></a></li>' +
-        '  <li><a id="mintTotal"><strong>0.02 ΞETH</strong>Plus gas</a></li>' +
-        '  <li><a class="pointer"><strong><b id="removeFrog" class="pointer">−</b><frogQuant id="frogQuant">  1  </frogQuant><b id="addFrog" class="pointer">+</b></strong>Quantity</a></li>' +
-        '</ul>' +
-        '<div class="bigContainer">' +
-        '  <div id="frogContainer" class="containerMint">' +
-        '  </div>' +
-        '  <div id="frogContainer2" class="containerMint">' +
-        '  </div>' +
-        '  <div id="frogContainer3" class="containerMint">' +
-        '    <div class="imgWrapperMint"><img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/preview2.gif"/></div>' +
-        '  </div>' +
-        '</div>' +
-        '<h3 class="headerDiv" id="supply">FROG 4,040 Total Supply</h3>';
-        document.getElementById("netStatus").innerHTML = '';
-      }
 
-      // Load Minting Terminal...
-      function loadMintingTerminal() {
-        var growTerminal = document.getElementById('growTerminal');
-        if (growTerminal.clientHeight) {
-          growTerminal.style.height = 0;
-        } else {
-          growTerminal.style.height = "100%";
-        }
-      }
       function getRandomInt(min, max) {
         min = Math.ceil(min);
         max = Math.floor(max);
@@ -979,7 +949,27 @@
     <div class="wrapper">
       <header>
         <div class="downloads pre">
-          <div id="mintingTray"></div>
+          <div id="mintingTray">
+            <ul class="downloads2">
+              <li><a id="mintTransact" href="https://discord.gg/xWMFWgpvd3?event=950943812832858172" class="pointer" target="_blank"><strong>LINK WALLET</strong></a></li>
+              <li><a id="mintTotal"><strong>0.00 ΞETH</strong>Plus gas</a></li>
+              <li><a class="pointer"><strong><b id="removeFrog" class="pointer">−</b><frogQuant id="frogQuant">  1  </frogQuant><b id="addFrog" class="pointer">+</b></strong>Quantity</a></li>
+            </ul>
+            <div class="bigContainer">
+              <div id="frogContainer" class="containerMint"></div>
+              <div id="frogContainer2" class="containerMint"></div>
+              <div id="frogContainer3" class="containerMint">
+                <div class="imgWrapperMint"><img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/preview2.gif"/></div>
+              </div>
+            </div>
+            <h3 class="headerDiv" id="supply">FROG 4,040 Total Supply</h3>
+          </div>
+        </div>
+      </header>
+      <section>
+        <div class="top"><img src="/assets/frogs/websiteBannerFinal.png" style="border-radius: 5px; width: 100%; height: auto; max-width: 860px;"></div>
+        <h2 style="margin-top: 0px !important;" class="headerDiv">freshfrogs.io</h2><br>
+        <div class="downloads pre">
           <div id="netStatus" style="color: white;">
             <h2 style="margin-top: 8px;" class="headerDiv">FRΞSH FROGS NFT</h2>
             <br>
@@ -989,19 +979,8 @@
             <b><a class="pointer" href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b>
             <hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>
           </div>
-        </div>
-      </header>
-      <section>
-        <div class="top"><img src="/assets/frogs/websiteBannerFinal.png" style="border-radius: 5px; width: 100%; height: auto; max-width: 860px;"></div>
-        <h2 style="margin-top: 0px !important;" class="headerDiv">freshfrogs.io</h2><br>
-        <div class="downloads pre">
-          <div id='growTerminal'>
-            <div class='measuringWrapper'>
-              <div id="pre" class="consoleOutput">
-              </div>
-              <div id="thePad" class="thePad"></div>
-            </div>
-          </div>
+          <div id="pre" class="consoleOutput"></div>
+          <div id="thePad" class="thePad"></div>
           <br>
           <div class="divTimeline">
             <img style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="../assets/frogs/FLY.gif">
