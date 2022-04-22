@@ -683,7 +683,7 @@
             for (var i = 0; i < traits.length; i++) {
               attributesTotal[traits[i].value] = traits[i].trait_count
             }
-            console.log('Next ID: '+nextIdC)
+            //console.log('Next ID: '+nextIdC)
             let thisToken = frog.name.replace('Frog #', '');
 
             loadFreshFrog(thisToken);
@@ -738,6 +738,9 @@
 
           userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
           
+          console.log('Wallet Connected! '+userAcc);
+          console.log(name+' '+symbol);
+
           // Load Functions
 
           frogCount = 1;
