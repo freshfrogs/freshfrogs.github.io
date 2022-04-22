@@ -766,7 +766,7 @@
 
           // Done! Ready to mint!
         } catch (e) { // Failed; Send Error Code!
-          consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><b>''</b>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
+          consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><b>''</b>"+JSON.stringify(e.message)+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
           return;
         }
 
@@ -796,8 +796,10 @@
               document.getElementById('mintingText').innerHTML = "<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3> <b>"+frogCount+" FROG(s) </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>"
               document.getElementById('mintingText').className = "mintingTextGreen"
             } catch (e) {
-              document.getElementById('mintingText').innerHTML = "<br>\n<strong><b>❌Transaction Failed!</b></strong> <br>\n"+JSON.stringify(e.message)
+              //consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><b>''</b>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
+              document.getElementById('mintingText').innerHTML = "Something Went Wrong! <br><b>''</b>"+JSON.stringify(e.message)+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a>"
               document.getElementById('mintingText').className = "mintingTextRed"
+              return
             } 
           }
         })
