@@ -766,7 +766,7 @@
 
           // Done! Ready to mint!
         } catch (e) { // Failed; Send Error Code!
-          consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><b>''</b>"+JSON.stringify(e.message)+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
+          consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><b>''</b>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
           return;
         }
 
@@ -797,7 +797,7 @@
               document.getElementById('mintingText').className = "mintingTextGreen"
             } catch (e) {
               //consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><b>''</b>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
-              document.getElementById('mintingText').innerHTML = "Something Went Wrong! <br><b>''</b>"+JSON.stringify(e.message)+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a>"
+              document.getElementById('mintingText').innerHTML = "Something Went Wrong! <br><b>''</b>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a>"
               document.getElementById('mintingText').className = "mintingTextRed"
               return
             } 
