@@ -2,4 +2,4 @@
 layout: default
 ---
 <title>freshfrogs.io</title>
-<img src="../assets/frogs/websiteBannerFinal.png" style="border-radius: 5px; height: auto; width: 750px;">
+<img src="../assets/frogs/websiteBannerFinal.png" style="border-radius: 5px; height: auto; width: auto;">
