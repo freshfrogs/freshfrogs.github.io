@@ -1,4 +1,4 @@
 ---
-layout: default-testing
+layout: rinkeby
 ---
 <title>Fresh Frogs NFT - Testing</title>
