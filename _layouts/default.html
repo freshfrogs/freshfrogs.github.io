@@ -725,21 +725,33 @@
 
           // Assign Variables (CONSTANTS)
           // CONNECTED USER'S WALLET ADDRESS; AND INVITES
-          var userAcc = web3.currentProvider.selectedAddress;
-          var addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
-          var userInviteList = await f0.myInvites();
-          var userInviteKeys = Object.keys(userInviteList);
-          var userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
+          userAcc = web3.currentProvider.selectedAddress;
+          addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
+          userInviteList = await f0.myInvites();
+          userInviteKeys = Object.keys(userInviteList);
 
           // CONTRACT NAME, SYMBOL, NEXT ID
-          var name = await f0.api.name().call();
-          var symbol = await f0.api.symbol().call();
-          var nextId = await f0.api.nextId().call();
-          var nextIdC = parseInt(nextId);
+          name = await f0.api.name().call();
+          symbol = await f0.api.symbol().call();
+          nextId = await f0.api.nextId().call();
+          nextIdC = parseInt(nextId);
 
-          // Messages Sent to Terminal (Again)
-          document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
-          document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.io/frog/"+nextIdC+".png");
+          // Other Function Variables
+          userPendingTx = 0;
+          frogCount = 1;
+          frogCountMax = 9;
+          frogMintMax = 'unlimited';
+
+          // Reads previous, and pending transctions
+          collection.defaultAccount = userAcc;
+          userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
+          userTotalTx = 0;
+          let incomingTokenTransferEvents = await collection.getPastEvents('Transfer', { filter: {'to': userAcc}, fromBlock: 0, toBlock: 'latest'})
+          incomingTokenTransferEvents.forEach( (event) => {
+            if (event.returnValues.tokenId > 587) { // Counts all incoming tx from Frog # 587 and above
+              userTotalTx = userTotalTx + 1;
+            }
+          });
           
           // Load Functions
           document.getElementById('netStatus').innerHTML = '';
@@ -868,7 +880,8 @@
             if (userAcc === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase()) {
               // Unlimited Free Mints
               userInvite = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4";
-              consoleOutput("<div> Invite code applied... Valid for <b>"+mintLimit+" FROG(s) @ 0.00 ΞETH</b></div>"+"<br>")
+              frogMintMax = 4040-nextIdC;
+              consoleOutput("<div> Invite code applied... Valid for <b>"+frogMintMax+" FROG(s) @ 0.00 ΞETH</b></div>"+"<br>")
               break;
             } else {
               break;
