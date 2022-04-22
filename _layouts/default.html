@@ -734,7 +734,7 @@
 
           // Assign Variables (Fetch from Connect)
           // CONNECTED USER'S WALLET ADDRESS; AND INVITES
-          userAcc = web3.currentProvider.selectedAddress;
+          userAcc = await web3.currentProvider.selectedAddress;
           addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
           userInviteList = await f0.myInvites();
           userInviteKeys = Object.keys(userInviteList);
