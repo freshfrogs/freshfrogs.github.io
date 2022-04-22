@@ -782,6 +782,11 @@
         consoleOutput('<br><hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.io/the-pad">🍀 <b>freshfrogs.io/the-pad</b> ↗️</a>');
         // Recent Mints
         // Event Listeners 
+
+        /*
+
+        */
+        
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           if (mint === 0 || nextIdC >= 3021) {
@@ -794,7 +799,14 @@
               document.getElementById('mintingText').innerHTML = "<strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the page!"
               document.getElementById('mintingText').className = "mintingTextWhite"
               
-              let tokens = await f0.mint(userInvite, frogCount) // AWAIT RESPONSE!
+              //let tokens = await f0.mint(userInvite, frogCount) // AWAIT RESPONSE!
+
+              let cost = await f0.cost()
+              let safeLowGwei = cost.gas.safeLow / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
+              let safeLowWei = safeLowGwei * Math.pow(10, 9)
+              let tokens = await f0.mint(userInvite, frogCount, {
+                gasPrice: "" + safeLowWei  // the gasPrice must be a string value of the number
+              })
 
             } catch (e) { // Something went wrong!
               //consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><b>''</b>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
@@ -877,7 +889,7 @@
       async function getInvites() {
         for (var i = 0; i < 5; i++) { // Loop Five Times; Check First Five Invites
           let thisInvite = userInviteKeys[i]
-          if (thisInvite === "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d") { // Main: 0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d / Rinkeby: 0x98469878d3ea48d71e828da43d41d9ffcc8b974d712d3fee969274e52b180275
+          if (thisInvite === "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d_1") { // Main: 0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d / Rinkeby: 0x98469878d3ea48d71e828da43d41d9ffcc8b974d712d3fee969274e52b180275
             // NF7UOS / C7AR Bypass
             if (userAcc === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase()) {
               // Unlimited Free Mints
