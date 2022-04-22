@@ -2,4 +2,4 @@
 layout: the-pad-rinkeby
 ---
 <title>Fresh Frogs NFT 🍀 The Pad Rinkeby</title>
-<img src="../assets/frogs/websiteBannerFinal.png" style="border-radius: 5px; width: 100%; height: auto; max-width: 860px;">
+<img src="../assets/frogs/websiteBannerFinal.png" style="border-radius: 5px; height: auto; width: 860px;">
