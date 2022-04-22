@@ -2,4 +2,4 @@
 layout: the-pad
 ---
 <title>freshfrogs.io/the-pad 🍀</title>
-<img src="../assets/frogs/websiteBannerFinal.png" style="border-radius: 5px; width: auto; height: auto;">
+<img src="../assets/frogs/websiteBannerFinal.png" style="border-radius: 5px; width: 100%; height: auto; max-width: 860px;">
