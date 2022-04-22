@@ -780,10 +780,8 @@
         // Event Listeners 
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-          if (mint === 0) {
-            if (mint === 0) {
-              consoleOutput("<div class='mintingTextRed'><b>Mint Open 04/22/22 8:00 PM (UTC)</b>"+"<b><u><a class='pointer' target='_blank' href='https://discord.gg/xWMFWgpvd3'>Join Discord!</b></u></a></div>")
-            }
+          if (mint === 0 || nextIdC >= 3021) {
+            consoleOutput("<div class='mintingTextRed'><b>Mint Open 04/22/22 8:00 PM (UTC)</b>"+"<b><u><a class='pointer' target='_blank' href='https://discord.gg/xWMFWgpvd3'>Join Discord!</b></u></a></div>")
           } else {
             userPendingTx = 1;
             try {
