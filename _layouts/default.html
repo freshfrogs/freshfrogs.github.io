@@ -786,21 +786,26 @@
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           if (mint === 0 || nextIdC >= 3021) {
             consoleOutput("<div class='mintingTextRed'><b>Mint Open 04/22/22 8:00 PM (UTC)</b>"+"<b><u><a class='pointer' target='_blank' href='https://discord.gg/xWMFWgpvd3'>Join Discord!</b></u></a></div>")
-          } else {
-            userPendingTx = 1;
-            try {
+            return; // BREAK!
+
+          } else { // SEND MINT TX!
+
+            try { // Attempt to Send!
               document.getElementById('mintingText').innerHTML = "<strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the page!"
               document.getElementById('mintingText').className = "mintingTextWhite"
               
-              let tokens = await f0.mint(userInvite, frogCount)
-              document.getElementById('mintingText').innerHTML = "<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3> <b>"+frogCount+" FROG(s) </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>"
-              document.getElementById('mintingText').className = "mintingTextGreen"
-            } catch (e) {
+              let tokens = await f0.mint(userInvite, frogCount) // AWAIT RESPONSE!
+
+            } catch (e) { // Something went wrong!
               //consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><b>''</b>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
               document.getElementById('mintingText').innerHTML = "Something went wrong! <br><b>''</b>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a>"
               document.getElementById('mintingText').className = "mintingTextRed"
-              return
-            } 
+              return; // BREAK!
+            }
+            // MINT SENT NO PROBLEMS!
+            document.getElementById('mintingText').innerHTML = "<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3> <b>"+frogCount+" FROG(s) </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>"
+            document.getElementById('mintingText').className = "mintingTextGreen"
+            return; // BREAK!
           }
         })
         // Remove FROG from minting tray
@@ -872,7 +877,7 @@
       async function getInvites() {
         for (var i = 0; i < 5; i++) { // Loop Five Times; Check First Five Invites
           let thisInvite = userInviteKeys[i]
-          if (thisInvite === "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d_1") { // Main: 0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d / Rinkeby: 0x98469878d3ea48d71e828da43d41d9ffcc8b974d712d3fee969274e52b180275
+          if (thisInvite === "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d") { // Main: 0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d / Rinkeby: 0x98469878d3ea48d71e828da43d41d9ffcc8b974d712d3fee969274e52b180275
             // NF7UOS / C7AR Bypass
             if (userAcc === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase()) {
               // Unlimited Free Mints
