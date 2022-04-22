@@ -821,7 +821,7 @@
         })
         // ADD FROG to minting tray
         document.querySelector("#addFrog").addEventListener("click", async (e) => {
-          if (frogCount !== frogCountMax) {
+          if (frogCount !== 9) {
             if (frogCount <= 2) {
               newFrog = document.createElement("div")
               newFrog.className = "imgWrapperMint"
