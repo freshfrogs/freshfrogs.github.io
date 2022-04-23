@@ -871,7 +871,7 @@
         })
       })
       function roundToTwo(number) { // Round Numbers
-        let results = Math.round((number + Number.EPSILON) * 100)
+        let result = Math.round((number + Number.EPSILON) * 100)
         if (result <= 1) { return '<1' } else { return result }
       }
       
