@@ -719,6 +719,9 @@
                 document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
               }
             })
+            .catch((e) => {
+              console.log('OpenSea Error! \n'+e.message)
+            })
           })
         }) // End OpenSea API
 
