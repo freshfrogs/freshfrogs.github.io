@@ -872,7 +872,9 @@
       })
       // Round Numbers
       function roundToTwo(num) {
+        console.log('de-bugger: rounding number.. '+num)
         let result = ((Math.round(num + "e+2")  + "e-2"))*100
+        console.log('de-bugger: resulting... '+result)
         if (result <= 1) { return '<1' } else { return result }
       }
       // Get User's Invite Codes
