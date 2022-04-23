@@ -870,13 +870,11 @@
           }
         })
       })
-      // Round Numbers
-      function roundToTwo(num) {
-        console.log('de-bugger: rounding number.. '+num)
-        let result = ((Math.round(num + "e+2")  + "e-2"))*100
-        console.log('de-bugger: resulting... '+result)
+      function roundToTwo(number) { // Round Numbers
+        let results = Math.round((num + Number.EPSILON) * 100)
         if (result <= 1) { return '<1' } else { return result }
       }
+      
       // Get User's Invite Codes
       async function getInvites() {
         for (var i = 0; i < 5; i++) { // Loop Five Times; Check First Five Invites
