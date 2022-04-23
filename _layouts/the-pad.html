@@ -621,7 +621,7 @@
           // Display Two Random Frogs!
           //combineTokens(baseFrog, subFrog);
           if (ownedFrogs <= 0) { // ❌ No FROGS
-            document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i>"+addressCut+' ✓</i></b>'+'<br>❌ It seems you do not own any FROGS!<br>\n<br>'
+            document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i>"+addressCut+" ✓</i></b>"+"<br>❌ It seems you do not own any FROGS!<br>\n<br>"
           } else {
             document.getElementById('netStatus').innerHTML = 'Loading Frogs from ΞEthereum... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br><br>';
 
@@ -692,7 +692,7 @@
               width = percent
               width++;
               elem.style.width = width + "%";
-              document.getElementById('netStatus').innerHTML = "<div id='mintingText'>Connect to view 'FROG' tokens... <b><i>("+ownedFrogs+")</b> FROG(S)</i>"+'<br><b>'+userAcc.toUpperCase()+' ✓</b>'+'<br>\n<br>'
+              document.getElementById('netStatus').innerHTML = "<div id='mintingText'>Connect to view 'FROG' tokens... <b><i>"+addressCut+" ✓</i></b>"+"<br><b>✔️["+ownedFrogs+"]</b> FROG Holdings...<br>\n<br></div>" //"<div id='mintingText'>Connect to view 'FROG' tokens... <b><i>("+ownedFrogs+")</b> FROG(S)</i>"+'<br><b>'+userAcc.toUpperCase()+' ✓</b>'+'<br>\n<br>'
               console.log(attributesTotal)
             })
           }
