@@ -671,7 +671,7 @@
                     var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
                     let trait_type = attribute.trait_type
                     let value = attribute.value
-                    let trait_rarity = roundToTwo((attributesTotal[value]/nextIdC))
+                    let trait_rarity = roundToHundredth((attributesTotal[value]/nextIdC))
 
                     // Build Fresh Frogs Attributes
                     loadAttribute(trait_type, value, frog.name)
@@ -700,10 +700,10 @@
           consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong><a href='https://discord.gg/xWMFWgpvd3' target='_blank'><b><u>Discord #Support</u></b></a></div>");
         }
       })
-      function roundToTwo(number) { // Round Numbers
-        let result = Math.round((number + Number.EPSILON) * 100)
-        if (result < 1) { return '<1' } else { return result }
-      }
+      // Round to Hundredth place
+      const roundToHundredth = (value) => {
+        return Number(value.toFixed(2));
+      };
       // Load Fresh Frog
       function loadFreshFrog(tokenID) {
         newFrog = document.createElement("div")
