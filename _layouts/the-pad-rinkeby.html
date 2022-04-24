@@ -719,7 +719,7 @@
         newFrog.id = tokenID
         newFrog.className = 'frogPanel'
         newFrog_backgroundImage = 'https://freshfrogs.io/frog/'+tokenID+'.png'
-        newFrog.innerHTML = '<a class="smallContainer2 pointer" style="background-image: '+newFrog_backgroundImage+';" id="Frog #'+tokenID+'"></a>'+'<p class="attributeList" id="Frog #'+tokenID+'Desc"></p>'
+        newFrog.innerHTML = '<a class="smallContainer2 pointer" style="background: url('+newFrog_backgroundImage+');" id="Frog #'+tokenID+'"></a>'+'<p class="attributeList" id="Frog #'+tokenID+'Desc"></p>'
         document.getElementById("thePad").appendChild(newFrog)
       }
       // Output to minting terminal
