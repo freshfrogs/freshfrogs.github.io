@@ -671,7 +671,7 @@
                     var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
                     let trait_type = attribute.trait_type
                     let value = attribute.value
-                    let trait_rarity = roundToHundredth((attributesTotal[value]/nextIdC))
+                    let trait_rarity = roundToHundredth((attributesTotal[value]/nextIdC)*100)
 
                     // Build Fresh Frogs Attributes
                     loadAttribute(trait_type, value, frog.name)
