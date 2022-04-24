@@ -718,6 +718,7 @@
         newFrog.onclick = function() {applyFrogOwned(tokenID)};
         newFrog.id = tokenID
         newFrog.className = 'frogPanel'
+        newFrog.backgroundImage = 'https://freshfrogs.io/frog/'+tokenID+'.png'
         newFrog.innerHTML = '<a class="smallContainer2 pointer" id="Frog #'+tokenID+'"></a>'+'<p class="attributeList" id="Frog #'+tokenID+'Desc"></p>'
         document.getElementById("thePad").appendChild(newFrog)
       }
