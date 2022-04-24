@@ -723,7 +723,7 @@
                 loadAttribute(trait_type, value, frog.name)
                 newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
                 if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
-                  else { newAttribute.innerHTML = value + ' <b><i class="trait">'+trait_rarity+'%</i></b>'; }
+                  else { newAttribute.innerHTML = value.slice(0, 12) + '...' + ' <b><i class="trait">'+trait_rarity+'%</i></b>'; }
                 newAttribute.className = value;
                 space = document.createElement('br')
                 document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
