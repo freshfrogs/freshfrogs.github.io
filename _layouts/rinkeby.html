@@ -392,12 +392,12 @@
     color: #333 !important;
   }
   .mintingTextWhite {
-    background-color: #faff99;
+    background-color: white;
     border-radius: 5px;
     border: 0px solid white;
     box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
     padding: 4px;
-    color: #333 !important;
+    color: #7cc1ff !important;
   }
   .mintingTextRed {
     background-color: #ff99b6;
@@ -799,7 +799,7 @@
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           if (mint === 0 || nextIdC >= 1200) { // || nextIdC >= 3021
-            consoleOutput("<div class='mintingTextRed'><b>Mint Paused!</b>"+"<b><u><a class='pointer' target='_blank' href='https://twitter.com/FreshFrogs_NFT'>Follow twitter for updates!</b></u></a></div>")
+            consoleOutput("<div class='mintingTextWhite'><b>Mint Paused!</b>"+"<b><u><a class='pointer' target='_blank' href='https://twitter.com/FreshFrogs_NFT'>Follow @FreshFrogs_NFT for updates!</b></u></a></div>")
             return; // BREAK!
 
           } else { // SEND MINT TX!
