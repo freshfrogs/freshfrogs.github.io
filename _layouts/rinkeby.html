@@ -688,6 +688,7 @@
           //console.log(res)
           var { assets } = res
           var nextIdC = parseInt(assets[0].name.replace('Frog #', '')) + 1;
+          
           // Messages Sent to Terminal
           document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
           document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.io/frog/"+nextIdC+".png");
@@ -702,6 +703,8 @@
             }
             //console.log('Next ID: '+nextIdC)
             let thisToken = frog.name.replace('Frog #', '');
+            let frog_owner = await f0.api.ownerOf(thisToken).call()
+            console.log('Owner of Frog #'+thisToken+' \n '+frog_owner);
 
             loadFreshFrog(thisToken);
             openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
