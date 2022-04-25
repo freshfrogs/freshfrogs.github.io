@@ -703,8 +703,6 @@
             }
             //console.log('Next ID: '+nextIdC)
             let thisToken = frog.name.replace('Frog #', '');
-            let frog_owner = await f0.api.ownerOf(thisToken).call()
-            console.log('Owner of Frog #'+thisToken+' \n '+frog_owner);
 
             loadFreshFrog(thisToken);
             openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
@@ -761,6 +759,10 @@
           nextId = await f0.api.nextId().call();
           nextIdC = parseInt(nextId);
 
+          for (var i = 1; i < nextIdC; i++) {
+            let frog_owner = await f0.api.ownerOf(i).call()
+            console.log('Owner of Frog #'+i+' \n '+frog_owner);
+          }
           userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
           getInvites(); // Check and Confirm Invite Keys
           
