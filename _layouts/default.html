@@ -887,8 +887,10 @@
               // Unlimited Free Mints
               userInvite = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4";
               //consoleOutput("<div> Invite code applied... Valid for <b>"+mintLimit+" FROG(s) @ 0.00 ΞETH</b></div>"+"<br>")
+              console.log('Invite Code: '+userInvite)
               break;
             } else {
+              console.log('Invite Code: '+userInvite)
               break;
             }
           }
@@ -897,6 +899,7 @@
         mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
         mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
         document.getElementById("mintTotal").innerHTML = "<strong>"+(mintPrice)+" ΞETH</strong>plus gas"
+        console.log('Invite Code: '+userInvite)
         //consoleOutput("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>"+frogMintMax+" FROG(s) @ 0.00 ΞETH</strong></div>")
       }
 
