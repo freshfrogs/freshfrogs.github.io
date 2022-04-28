@@ -702,7 +702,7 @@
               elem.style.width = width + "%";
               document.getElementById('netStatus').innerHTML = "<div id='mintingText'>Connect to view FROG tokens... <b><i>"+addressCut+"</i></b>"+"<br>✔️ <b>[ "+ownedFrogs+" ]</b> FROG(s) belong to this address...</div><br><hr class='hr2'>" //"<div id='mintingText'><b><i>"+addressCut+"</i></b> ✔️ This address holds <b>[ "+ownedFrogs+" ]</b> FROG(S)...</div><br><hr class='hr2'>" //"<div id='mintingText'>Connect to view 'FROG' tokens... <b><i>("+ownedFrogs+")</b> FROG(S)</i>"+'<br><b>'+userAcc.toUpperCase()+' ✓</b>'+'<br>\n<br>'
               //console.log(attributesTotal)
-            })
+            }); pull_frogs(); // Load all frogs?
           }
         } catch (e) { // Failed; Send Error Code!
           consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong><a href='https://discord.gg/xWMFWgpvd3' target='_blank'><b><u>Discord #Support</u></b></a></div>");
@@ -846,7 +846,6 @@
           document.getElementById('netStatus').innerHTML = "<div id='mintingText'>Connect to view FROG tokens... <b><i>"+addressCut+"</i></b>"+"<br>✔️ <b>[ "+ownedFrogs+" ]</b> FROG(s) belong to this address...</div><br><hr class='hr2'>" //"<div id='mintingText'><b><i>"+addressCut+"</i></b> ✔️ This address holds <b>[ "+ownedFrogs+" ]</b> FROG(S)...</div><br><hr class='hr2'>" //"<div id='mintingText'>Connect to view 'FROG' tokens... <b><i>("+ownedFrogs+")</b> FROG(S)</i>"+'<br><b>'+userAcc.toUpperCase()+' ✓</b>'+'<br>\n<br>'
           //console.log(attributesTotal)
         })
-        pull_frogs(); // Load all frogs?
       }
       // Load attribute
       function loadAttribute(trait, attribute, where) {
