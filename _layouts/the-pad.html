@@ -643,7 +643,6 @@
             fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=40&include_orders=false', options)
             .then((res) => res.json())
             .then((res) => {
-              console.log(res)
               var { assets } = res
               assets.forEach((frog) => { // For Each FROG
                 var { name, token_metadata, permalink, traits } = frog
@@ -701,7 +700,6 @@
               width++;
               elem.style.width = width + "%";
               document.getElementById('netStatus').innerHTML = "<div id='mintingText'>Connect to view FROG tokens... <b><i>"+addressCut+"</i></b>"+"<br>✔️ <b>[ "+ownedFrogs+" ]</b> FROG(s) belong to this address...</div><br><hr class='hr2'>" //"<div id='mintingText'><b><i>"+addressCut+"</i></b> ✔️ This address holds <b>[ "+ownedFrogs+" ]</b> FROG(S)...</div><br><hr class='hr2'>" //"<div id='mintingText'>Connect to view 'FROG' tokens... <b><i>("+ownedFrogs+")</b> FROG(S)</i>"+'<br><b>'+userAcc.toUpperCase()+' ✓</b>'+'<br>\n<br>'
-              console.log(attributesTotal)
             })
           }
         } catch (e) { // Failed; Send Error Code!
