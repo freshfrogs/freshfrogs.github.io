@@ -639,14 +639,8 @@
               method: 'GET',
               headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
             };
-            
-            if (userAcc === "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359".toLowerCase()) { // 0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359 FROG VAULT
-              let api_os = 'https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=40&include_orders=false'
-            } else {
-              let api_os = 'https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=40&include_orders=false'
-            }
 
-            fetch(api_os, options)
+            fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=40&include_orders=false', options)
             .then((res) => res.json())
             .then((res) => {
               console.log(res)
@@ -750,6 +744,7 @@
           inline: 'center'
         });
       }
+
       // Function apply Owned Frog
       function applyFrogOwned(ownedFrog) {
         //alert(ownedFrog);
