@@ -673,7 +673,7 @@
         };
         
         console.log('Connecting to OpenSea..')
-        fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=3&include_orders=false', options)
+        fetch('https://testnets-api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=3&include_orders=false', options)
         .then((res) => res.json())
         .then((res) => {
           //console.log(res)
