@@ -1,0 +1,194 @@
+<style>
+    .data{
+        margin: auto;
+        border-radius: 5px;
+    }
+    .recent_sale {
+        width: 256px;
+        margin: 4px;
+    }
+    .recent_sales {
+        display: inline-flex;
+        flex-wrap: wrap;
+        image-rendering: pixelated;
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+    }
+</style>
+<html>
+    <head>
+        <script>
+            document.addEventListener("DOMContentLoaded", async () => {
+                
+                CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
+
+                var attributesTotal = {
+
+                    'goldChain' : 0,
+                    'goldDollarChain' : 0,
+                    'silverChain' : 0,
+                    'silverEthChain' : 0,
+                    'circleGlasses' : 0,
+                    'circleNightVision' : 0,
+                    'circleShadesPurple' : 0,
+                    'circleShadesRed' : 0,
+                    'shades' : 0,
+                    'shadesPurple' : 0,
+                    'shadesThreeD' : 0,
+                    'shadesWhite' : 0,
+                    'blueDartFrog' : 0,
+                    'blueTreeFrog' : 0,
+                    'brownTreeFrog' : 0,
+                    'cyanTreeFrog' : 0,
+                    'goldenDartFrog' : 0,
+                    'goldenTreeFrog' : 0,
+                    'grayTreeFrog' : 0,
+                    'greenTreeFrog' : 0,
+                    'lightBrownTreeFrog' : 0,
+                    'natural' : 0,
+                    'orangeTreeFrog' : 0,
+                    'pinkTreeFrog' : 0,
+                    'purpleTreeFrog' : 0,
+                    'redEyedTreeFrog' : 0,
+                    'splendidLeafFrog' : 0,
+                    'stawberryDartFrog' : 0,
+                    'tomatoFrog' : 0,
+                    'treeFrog(1)' : 0,
+                    'treeFrog(2)' : 0,
+                    'treeFrog(3)' : 0,
+                    'treeFrog(4)' : 0,
+                    'treeFrog(5)' : 0,
+                    'treeFrog(6)' : 0,
+                    'treeFrog(7)' : 0,
+                    'treeFrog(8)' : 0,
+                    'unknown' : 0,
+                    'baseballCapBlue' : 0,
+                    'baseballCapRed' : 0,
+                    'baseballCapWhite' : 0,
+                    'cowboyHatBlack' : 0,
+                    'cowboyHatBrown' : 0,
+                    'cowboyHatTan' : 0,
+                    'cowboyHatWhite' : 0,
+                    'crown' : 0,
+                    'stockingCap' : 0,
+                    'topHatBlue' : 0,
+                    'topHatRed' : 0,
+                    'topHatYellow' : 0,
+                    'witchBlack' : 0,
+                    'witchBrown' : 0,
+                    'witchStraw' : 0,
+                    'bandannaBlue' : 0,
+                    'bandannaRed' : 0,
+                    'mask' : 0,
+                    'smoking' : 0,
+                    'smokingCigar' : 0,
+                    'smokingPipe' : 0,
+                    'tongue' : 0,
+                    'tongueFly' : 0,
+                    'tongueSpider' : 0,
+                    'tongueSpiderRed' : 0,
+                    'closedEyes' : 0,
+                    'croaking' : 0,
+                    'inversedEyes' : 0,
+                    'peace' : 0,
+                    'thirdEye' : 0,
+                    'blue(2)' : 0,
+                    'blue' : 0,
+                    'brown' : 0,
+                    'cyan' : 0,
+                    'darkGreen' : 0,
+                    'green' : 0,
+                    'orange(2)' : 0,
+                    'orange' : 0,
+                    'pink' : 0,
+                    'purple(2)' : 0,
+                    'purple' : 0,
+                    'red(2)' : 0,
+                    'red' : 0,
+                    'sand' : 0,
+                    'white(2)' : 0,
+                    'white' : 0,
+                    'yellow(2)' : 0,
+                    'yellow' : 0
+                }   // Start at 0
+                
+                // Pull Collection data from OpenSea
+
+                const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
+
+                fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
+                .then(response => response.json())
+                .then(response => {
+
+                    var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = response
+
+                    document.getElementById('banner_image').setAttribute('src', banner_image_url)
+                    document.getElementById('name').innerHTML = name
+                    document.getElementById('count').innerHTML = count
+                    document.getElementById('num_owners').innerHTML = num_owners
+                    document.getElementById('market_cap').innerHTML = market_cap.toFixed(2)+' Ξ'
+                    document.getElementById('floor_price').innerHTML = floor_price+' Ξ'
+                    document.getElementById('total_volume').innerHTML = total_volume.toFixed(2)+' Ξ'
+                    document.getElementById('description').innerHTML = description
+                    document.getElementById('created_date').innerHTML = created_date
+                    //document.getElementById('payout_address').innerHTML = payout_address+' [ 005058 ] '
+
+                    var initial_sales = (parseInt(count) - 3240) * 0.01
+
+                    document.getElementById('initial_sales').innerHTML = initial_sales+' Ξ'
+
+                })
+                .catch(err => console.error(err)); // End data pull / first paid Frog 3,236
+
+                // Get recent sales
+                
+                fetch('https://api.opensea.io/api/v1/events?collection_slug=fresh-frogs&event_type=successful&limit=7', options)
+                .then(res => res.json())
+                .then(res => {
+
+                    var { asset_events } = res
+
+                    console.log(asset_events)
+                    
+
+                    asset_events.forEach((sale) => {
+                        
+
+                        try {
+
+                            var { asset: { image_url, name }, payment_token: { decimals }, total_price } = sale
+
+                            var sale_price = total_price / Math.pow(10, decimals)
+
+                            console.log('Sale found...'+sale.asset.name+' : '+sale_price)
+
+                            recent_sale = document.createElement('div')
+                            recent_sale.style.verticalAlign = 'center'
+                            recent_sale.style.textAlign = 'center'
+                            recent_sale.style.width = 'auto'
+                            recent_sale.innerHTML = 
+                                '<img class="recent_sale" src='+image_url+'>' +
+                                '<p>'+name+' | '+sale_price+' Ξ<p>';
+                            document.getElementById('recent_sales').appendChild(recent_sale)
+                        
+                        } catch (e) { console.log(e.message) }
+
+                    })
+
+
+                })
+                .catch(err => console.error(err));
+            })
+        </script>
+    </head>
+    <body>
+        <img class="banner_image" id="banner_image" src=""/>
+        <a href="https://opensea.io/collection/fresh-frogs" target="_blank"><h1 id="name">Loading...</h1></a>
+        <p>Items: <b id="count"></b> | Owners: <b id="num_owners"></b> | Market Cap: <b id="market_cap"></b> | Floor Price: <b id="floor_price"></b> | Total Volume: <b id="total_volume"></b> | Initial Sales: <b id="initial_sales"></b></p>
+        <p id="description"></p>
+        <hr>
+        <p><i id="created_date"></i></p>
+        <div id="recent_sales" class="recent_sales"></div>
+    <body>
+</html>
