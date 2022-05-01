@@ -2,7 +2,11 @@
 layout: help
 ---
 <title>freshfrogs.io/help 🍀</title>
+
 <img src="../assets/frogs/websiteBannerFinal.png" style="border-radius: 5px; height: auto !important; width: 100% !important;">
+
+<br>
+
 <div class="faq">
 
     ### How do I Mint?
@@ -15,5 +19,5 @@ layout: help
     3. Then, Click on **Mint** (transact) to send to submit the transaction!
 
     4. Finally, Review and **Confirm** the request with your provider and send the transaction!
-    
+
 </div>
