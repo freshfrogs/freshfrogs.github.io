@@ -6,6 +6,7 @@
   html,h1,h2,h3 {
     font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
   }
+
   .wrapper {
     margin-left: auto;
     margin-right: auto;
@@ -17,11 +18,8 @@
     padding-top: 8px;
     margin-top: 5%;
   }
-  section {
+  .howto {
     background-color: white;
-    border-radius: 5px;
-    padding: 8px;
-    image-rendering: pixelated;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -34,8 +32,11 @@
   </head>
   <body class="bodyb">
     <div class="wrapper">
+      <header>
+
+      </header>
       <section>
-        {{ content }}
+        <div class="howto">{{ content }}</div>
       </section>
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
