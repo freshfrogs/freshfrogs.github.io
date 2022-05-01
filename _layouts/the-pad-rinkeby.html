@@ -498,6 +498,8 @@
           symbol = await f0.api.symbol().call();
           nextId = await f0.api.nextId().call();
           nextIdC = parseInt(nextId);
+          let balance = await collection.methods.balanceOf(CONTRACT_ADDRESS).call()
+          console.log('balance: '+balance)
 
           // Other Function Variables
           baseFrog = 'undefined';
@@ -703,7 +705,6 @@
               document.getElementById('netStatus').innerHTML = "<div id='mintingText'>Connect to view FROG tokens... <b><i>"+addressCut+"</i></b>"+"<br>✔️ <b>[ "+ownedFrogs+" ]</b> FROG(s) belong to this address...</div><br><hr class='hr2'>" //"<div id='mintingText'><b><i>"+addressCut+"</i></b> ✔️ This address holds <b>[ "+ownedFrogs+" ]</b> FROG(S)...</div><br><hr class='hr2'>" //"<div id='mintingText'>Connect to view 'FROG' tokens... <b><i>("+ownedFrogs+")</b> FROG(S)</i>"+'<br><b>'+userAcc.toUpperCase()+' ✓</b>'+'<br>\n<br>'
               //console.log(attributesTotal)
             });
-            //
             fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&token_ids=1840&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=40&include_orders=false', options)
             .then((res) => res.json())
             .then((res) => {
@@ -749,17 +750,7 @@
                   }
                 })
               })
-              // Finish Loading Bar
-              percent = 100;
-              document.getElementById("progress").innerHTML = percent+"%"
-              elem = document.getElementById("myBar");
-              width = percent
-              width++;
-              elem.style.width = width + "%";
-              document.getElementById('netStatus').innerHTML = "<div id='mintingText'>Connect to view FROG tokens... <b><i>"+addressCut+"</i></b>"+"<br>✔️ <b>[ "+ownedFrogs+" ]</b> FROG(s) belong to this address...</div><br><hr class='hr2'>" //"<div id='mintingText'><b><i>"+addressCut+"</i></b> ✔️ This address holds <b>[ "+ownedFrogs+" ]</b> FROG(S)...</div><br><hr class='hr2'>" //"<div id='mintingText'>Connect to view 'FROG' tokens... <b><i>("+ownedFrogs+")</b> FROG(S)</i>"+'<br><b>'+userAcc.toUpperCase()+' ✓</b>'+'<br>\n<br>'
-              //console.log(attributesTotal)
             })
-            //
           }
         } catch (e) { // Failed; Send Error Code!
           consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong><a href='https://discord.gg/xWMFWgpvd3' target='_blank'><b><u>Discord #Support</u></b></a></div>");
