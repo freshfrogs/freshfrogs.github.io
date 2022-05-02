@@ -6,7 +6,7 @@ layout: wiki
 
 <div id="mintingTray" class="mintingTray">
     <img style="width: 100%;" src="../frog/3410.png"/>
-    <button id="random-morph" class="random-morph">Mint</button><button id="random-morph" class="random-morph">Price</button><button id="random-morph" class="random-morph">Quantity</button>
+    <i class="label_mint">Mint</i><i class="label_quantity">Quantity</i>;
 </div>
 
 ### How do I Mint?
