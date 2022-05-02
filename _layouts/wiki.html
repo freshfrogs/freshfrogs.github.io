@@ -57,7 +57,7 @@
         margin-right: 2.5%;
     }
     .frog_img {
-        width: 128px;
+        width: 100%;
         border-radius: 0px;
     }
     .label_name {
@@ -129,7 +129,7 @@
 
                     //console.log(asset_events)
                     
-                    var percent_width = 92 / 7 + '%'
+                    var percent_width = '256px'//92 / 7 + '%'
 
                     asset_events.forEach((sale) => {
                       
@@ -144,12 +144,12 @@
 
                             recent_sale = document.createElement('a');
                             recent_sale.className = 'recent_sale';
-                            recent_sale.style.width = '256px';
+                            recent_sale.style.width = percent_width;
                             recent_sale.href = permalink;
                             recent_sale.innerHTML = 
                                 '<img class="frog_img" src='+image_url+'>' +
-                                '<div style="width: 256px; overflow: hidden;"><i class="label_name">Fresh Frogs NFT</i><i class="label_price">Price</i>' +
-                                '<b class="frog_name">'+name+'</b><b class="frog_price">Ξ '+sale_price+'</b></div>';
+                                '<i class="label_name">Fresh Frogs NFT</i><i class="label_price">Price</i>' +
+                                '<b class="frog_name">'+name+'</b><b class="frog_price">Ξ '+sale_price+'</b>';
                             document.getElementById('recent_sales').appendChild(recent_sale);
                       
                         } catch (e) { console.log(e.message) }
