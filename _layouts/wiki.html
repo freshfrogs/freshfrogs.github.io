@@ -17,7 +17,11 @@
         width: 100%;
     }
     .recent_sale {
-        width: inherit;
+        text-align: center;
+        vertical-align: center;
+        width: 100%;
+        height: 100%;
+        margin: 1%;
     }
     #banner_image {
         width: 100%;
@@ -90,10 +94,7 @@
                             console.log('Sale found...'+sale.asset.name+' : '+sale_price)
 
                             recent_sale = document.createElement('div')
-                            recent_sale.style.verticalAlign = 'center'
-                            recent_sale.style.textAlign = 'center'
-                            recent_sale.style.width = percent_width
-                            recent_sale.style.height = '100%';
+                            recent_sale.className = 'recent_sale'
                             recent_sale.innerHTML = 
                                 '<img style="max-width: 100%;" src='+image_url+'>' +
                                 '<p>'+name+' | '+sale_price+' Ξ<p>';
