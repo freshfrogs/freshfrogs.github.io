@@ -47,8 +47,6 @@
         padding: 5%;
         padding-top: 0%;
         margin-left: 2.5%;
-        max-width: 64px;
-        overflow: hidden;
     }
     .frog_price {
         text-align: right;
@@ -57,8 +55,6 @@
         padding: 5%;
         padding-top: 0%;
         margin-right: 2.5%;
-        max-width: 64px;
-        overflow: hidden;
     }
     .frog_img {
         width: 100%;
@@ -71,8 +67,6 @@
         padding: 5%;
         padding-bottom: 0%;
         color: gray;
-        max-width: 64px;
-        overflow: hidden;
     }
     .label_price {
         text-align: right;
@@ -81,8 +75,6 @@
         padding: 5%;
         padding-bottom: 0%;
         color: gray;
-        max-width: 64px;
-        overflow: hidden;
     }
 </style>
 <html>
@@ -152,8 +144,7 @@
 
                             recent_sale = document.createElement('a');
                             recent_sale.className = 'recent_sale';
-                            recent_sale.style.width = percent_width;
-                            recent_sale.style.minWidth = '128px';
+                            recent_sale.style.width = '256px'; // percent_width
                             recent_sale.href = permalink;
                             recent_sale.innerHTML = 
                                 '<img class="frog_img" src='+image_url+'>' +
