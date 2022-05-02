@@ -3,10 +3,15 @@
         margin-left: auto;
         margin-right: auto;
         width: 80%;
+        image-rendering: pixelated !important;
     }
     .data {
         margin: auto;
         border-radius: 5px;
+    }
+    .recent_sale {
+        width: 256px;
+        margin: 4px;
     }
     .recent_sales {
         display: inline-flex;
@@ -21,10 +26,7 @@
         object-fit: contain;
     }
     #recent_sale {
-        width: (100 / 7);
-    }
-    .recent_sale_img {
-        width: auto;
+        width: 80% / 8;
     }
 </style>
 <html>
@@ -95,9 +97,8 @@
                             recent_sale.style.verticalAlign = 'center'
                             recent_sale.style.textAlign = 'center'
                             recent_sale.style.width = 'auto'
-                            recent_sale.className = 'recent_sale'
                             recent_sale.innerHTML = 
-                                '<img class="recent_sale_img" src='+image_url+'>' +
+                                '<img class="recent_sale" src='+image_url+'>' +
                                 '<p>'+name+' | '+sale_price+' Ξ<p>';
                             document.getElementById('recent_sales').appendChild(recent_sale)
                       
