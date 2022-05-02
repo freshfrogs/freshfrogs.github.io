@@ -8,7 +8,7 @@ layout: wiki
 
 ---
 
-<div style=""float: left;>
+<div style="float: left;">
 
 1. First **Connect** an Ethereum wallet! Don't have a wallet? We recommend **[Meta Mask](https://metamask.io/download/)** 🦊
 
