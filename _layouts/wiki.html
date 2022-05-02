@@ -16,16 +16,9 @@
         margin-right: auto;
         width: 100%;
     }
-    .recent_sale {
-        max-width: 100%;
-        overflow: hidden;
-    }
     #banner_image {
         width: 100%;
         object-fit: contain;
-    }
-    .recent_sale_img {
-        width: 128px;
     }
 </style>
 <html>
@@ -97,7 +90,7 @@
                             recent_sale.style.textAlign = 'center'
                             recent_sale.style.width = 100 / 7 + '%'
                             recent_sale.innerHTML = 
-                                '<img class="recent_sale_img" "src='+image_url+'>' +
+                                '<img "src='+image_url+'>' +
                                 '<p>'+name+' | '+sale_price+' Ξ<p>';
                             document.getElementById('recent_sales').appendChild(recent_sale)
                       
