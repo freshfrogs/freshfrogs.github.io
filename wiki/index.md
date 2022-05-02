@@ -5,7 +5,8 @@ layout: wiki
 <title>freshfrogs.io/wiki 🍀</title>
 
 <div id="mintingTray" class="mintingTray">
-    <img style="width: 100%; border-radius: 5px;" src="../assets/frogs/morphTray.png"/>
+    <a href="#where-are-my-frogs?">Where are My Frogs?</a>
+    <a href="#what-is-staking?">What is Staking?</a>
 </div>
 
 ### How do I Mint?
