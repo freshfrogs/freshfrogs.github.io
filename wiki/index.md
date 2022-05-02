@@ -36,3 +36,11 @@ layout: wiki
 - View your Frogs on **[OpenSea](https://opensea.io/account)** or at **[freshfrogs.io/the-pad](https://freshfrogs.io/the-pad)**
 
     - Frogs not displaying? Try manually checking **[here]()**
+
+### What is "Morphing" and How do I Morph?
+
+---
+
+### What do I Stake my Frogs?
+
+---
