@@ -39,11 +39,13 @@
         text-align: left;
         font-weight: bold;
         float: left;
+        padding: 4px;
     }
     .frog_price {
         text-align: right;
         font-weight: bold;
         float: right;
+        padding: 4px;
     }
 </style>
 <html>
@@ -116,7 +118,7 @@
                             recent_sale.style.width = percent_width;
                             recent_sale.innerHTML = 
                                 '<img style="width: 100%;" src='+image_url+'>' +
-                                '<p><b class="frog_name">'+name+'</b><b class="frog_price">'+sale_price+'</b> Ξ<p>';
+                                '<p><b class="frog_name">'+name+'</b><b class="frog_price">Ξ '+sale_price+'</b><p>';
                             document.getElementById('recent_sales').appendChild(recent_sale)
                       
                         } catch (e) { console.log(e.message) }
