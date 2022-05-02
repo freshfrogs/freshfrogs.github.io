@@ -4,8 +4,6 @@ layout: wiki
 
 <title>freshfrogs.io/wiki 🍀</title>
 
-## Fresh Frogs Wikipedia
-
 ### How do I Mint?
 
 ---
