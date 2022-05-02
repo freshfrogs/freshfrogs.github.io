@@ -20,7 +20,7 @@ layout: wiki
 
     - You may mint up to NINE Frogs per transaction with a max of 40 Frogs per wallet!
 
-3. Then, Click on **Mint** (transact) to send to submit the transaction!
+3. Then, Click on **Mint** (transact) to submit the transaction!
 
 4. Finally, Review and **Confirm** the transaction!
 
