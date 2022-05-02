@@ -6,6 +6,8 @@ layout: help
 
 ### How do I Mint?
 
+---
+
 1. First **Connect** an Ethereum wallet! Don't have a wallet? We recommend Meta Mask
 
     - Browser extensions will automatically be deteced, a request will be sent to your provider.
@@ -24,7 +26,10 @@ layout: help
 
     - Make sure all details are correct, and gas limit is appropriate!
 
+
 ### How do I View My Frogs?
+
+---
 
 - View your Frogs on [OpenSea]() or at [freshfrogs.io/the-pad](https://freshfrogs.io/the-pad)
 
