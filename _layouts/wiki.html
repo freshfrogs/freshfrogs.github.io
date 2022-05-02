@@ -129,7 +129,7 @@
 
                     //console.log(asset_events)
                     
-                    var percent_width = '256px'//92 / 7 + '%'
+                    var percent_width = 92 / 7 + '%'
 
                     asset_events.forEach((sale) => {
                       
@@ -145,6 +145,7 @@
                             recent_sale = document.createElement('a');
                             recent_sale.className = 'recent_sale';
                             recent_sale.style.width = percent_width;
+                            recent_sale.style.minWidth = '128px';
                             recent_sale.href = permalink;
                             recent_sale.innerHTML = 
                                 '<img class="frog_img" src='+image_url+'>' +
