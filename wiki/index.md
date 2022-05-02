@@ -4,13 +4,12 @@ layout: wiki
 
 <title>freshfrogs.io/wiki 🍀</title>
 
-<div id="mintingTray" class="mintingTray">
-    <img class="frog_img" src="../frog/3410.png">
-    <i class="label_mint">Price + gas</i><i class="label_q">Quantity</i>
-    <b class="frog_mint">0.01</b><b class="frog_q">- 1 +</b>
-</div>
-
-<div id="mintingTray" class="mintingTray">
+<div class="minting-display">
+    <div id="mintingTray" class="mintingTray">
+        <img class="frog_img" src="../frog/3410.png">
+        <i class="label_mint">Price + gas</i><i class="label_q">Quantity</i>
+        <b class="frog_mint">0.01</b><b class="frog_q">- 1 +</b>
+    </div>
     <button class="random-morph">Mint! Send Transaction</button>
 </div>
 
