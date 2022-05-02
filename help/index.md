@@ -24,8 +24,6 @@ layout: help
 
 ### How do I View My Frogs?
 
-- View your Frogs on [OpenSea]()
+- View your Frogs on [OpenSea]() or at [freshfrogs.io/the-pad](https://freshfrogs.io/the-pad)
 
-- Render your Frogs at [freshfrogs.io/the-pad](https://freshfrogs.io/the-pad)
-
-    - Frogs not displaying? Try manually scanning [here]()
+    - Frogs not displaying? Try manually checking [here]()
