@@ -8,10 +8,6 @@
         margin: auto;
         border-radius: 5px;
     }
-    .recent_sale {
-        width: auto;
-        margin: 4px;
-    }
     .recent_sales {
         display: inline-flex;
         flex-wrap: wrap;
@@ -96,9 +92,9 @@
                             recent_sale = document.createElement('div')
                             recent_sale.style.verticalAlign = 'center'
                             recent_sale.style.textAlign = 'center'
-                            recent_sale.style.width = '100 / 7'
+                            recent_sale.style.width = 100 / 7 + '%'
                             recent_sale.innerHTML = 
-                                '<img class="recent_sale" src='+image_url+'>' +
+                                '<img src='+image_url+'>' +
                                 '<p>'+name+' | '+sale_price+' Ξ<p>';
                             document.getElementById('recent_sales').appendChild(recent_sale)
                       
