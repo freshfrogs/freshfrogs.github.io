@@ -26,9 +26,9 @@ layout: wiki
 
     - Make sure all details are correct, and the gas limit is appropriate!
 
-### What are Gas Fees?
+- What are Gas Fees?
 
----
+    - A "Gas Fee" is required when minting any NFT on to the Ethereum blockchain. **[Learn more]()**
 
 ### How do I View My Frogs?
 
