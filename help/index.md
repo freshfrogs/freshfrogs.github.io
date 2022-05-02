@@ -1,5 +1,5 @@
 ---
-layout: help
+layout: wiki
 ---
 
 <title>freshfrogs.io/help 🍀</title>
