@@ -30,8 +30,6 @@ layout: wiki
 
     - A "Gas Fee" is required when minting any NFT on to the Ethereum blockchain. **[Learn more](https://www.investopedia.com/terms/g/gas-ethereum.asp)**
 
-<div style="position: absolute; width: 100%; float: right; border: 1px solid black;">
-</div>
 
 ### How do I View My Frogs?
 
@@ -43,6 +41,7 @@ layout: wiki
 
     <div id='my-frogs'></div>
 
+
 ### What is "Morphing" and How do I Morph?
 
 ---
@@ -51,6 +50,7 @@ layout: wiki
 
 - Everyone can preview their morphs now at **[freshfrogs.io/the-pad](https://freshfrogs.io/the-pad)**
 
+
 ### What is Staking?
 
 ---
@@ -58,6 +58,7 @@ layout: wiki
 - NFT staking refers to locking up non-fungible tokens on a platform or protocol in exchange for staking rewards and other benefits! Staking NFTs allows holders to earn an income from their collection while maintaining ownership!
 
 - Owner's can stake their Frogs to earn special tokens, rewards, participate in raffles, and more!
+
 
 ### What are the benefits from staking?
 
