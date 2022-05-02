@@ -2,7 +2,9 @@
 layout: wiki
 ---
 
-<title>freshfrogs.io/help 🍀</title>
+<title>freshfrogs.io/wiki 🍀</title>
+
+## Fresh Frogs WIKI & FAQ
 
 ### How do I Mint?
 
