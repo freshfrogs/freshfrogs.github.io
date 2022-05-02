@@ -11,7 +11,7 @@ layout: wiki
 </div>
 
 <div id="mintingTray" class="mintingTray">
-    Mint! Send Transaction
+    <button class="random-morph">Mint! Send Transaction</button>
 </div>
 
 ### How do I Mint?
