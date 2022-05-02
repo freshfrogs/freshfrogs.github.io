@@ -5,7 +5,7 @@ layout: wiki
 <title>freshfrogs.io/wiki 🍀</title>
 
 <div id="mintingTray" class="mintingTray">
-    <img style="width: 100%;" src="../assets/frogs/morphTray.png"/>
+    <img style="width: 100%;" src="../frog/3410.png"/>
     <button id="random-morph" class="random-morph">Mint</button><button id="random-morph" class="random-morph">Price</button><button id="random-morph" class="random-morph">Quantity</button>
 </div>
 
