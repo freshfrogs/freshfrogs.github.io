@@ -54,6 +54,18 @@
         width: 100%;
         border-radius: 0px;
     }
+    .label_name {
+        text-align: center;
+        float: left;
+        margin-left: 2.5%;
+        color: gray;
+    }
+    .label_price {
+        text-align: center;
+        float: right;
+        margin-right: 2.5%;
+        color: gray;
+    }
 </style>
 <html>
     <head>
@@ -125,7 +137,7 @@
                             recent_sale.style.width = percent_width;
                             recent_sale.innerHTML = 
                                 '<img class="frog_img" src='+image_url+'>' +
-                                '<i>Fresh Frogs NFT </i><i> Price</i>'+
+                                '<i class="label_name">Fresh Frogs NFT </i><i class="label_price"> Price</i>'+
                                 '<b class="frog_name">'+name+'</b><b class="frog_price">Ξ '+sale_price+'</b>';
                             document.getElementById('recent_sales').appendChild(recent_sale)
                       
