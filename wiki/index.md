@@ -7,7 +7,7 @@ layout: wiki
 <div id="mintingTray" class="mintingTray">
     <img style="width: 100%;" src="../frog/3410.png"/>
     <i class="label_mint">Mint</i><i class="label_quantity">Quantity</i>
-    <b class="frog_name">0.01</b><b class="frog_price">- 1 +</b>
+    <b class="frog_mint">0.01</b><b class="frog_quantity">- 1 +</b>
 </div>
 
 ### How do I Mint?
