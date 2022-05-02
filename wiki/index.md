@@ -10,6 +10,10 @@ layout: wiki
     <b class="frog_mint">0.01</b><b class="frog_q">- 1 +</b>
 </div>
 
+<div id="mintingTray" class="mintingTray">
+    Mint! Send Transaction
+</div>
+
 ### How do I Mint?
 
 ---
