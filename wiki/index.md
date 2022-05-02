@@ -11,9 +11,9 @@ layout: wiki
         <b class="frog_mint">0.01 ΞETH</b><b class="frog_q">- 1 +</b>
     </div>
     <button class="button"><b><i>Connect Wallet !</i></b></button>
-</div>
-<div class="minting-console">
-    > conntect wallet...
+    <div class="minting-console">
+        > conntect wallet...
+    </div>
 </div>
 
 ### How do I Mint?
