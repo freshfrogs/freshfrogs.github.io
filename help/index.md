@@ -4,8 +4,6 @@ layout: help
 
 <title>freshfrogs.io/help 🍀</title>
 
-<img src="../assets/frogs/websiteBannerFinal.png" style="border-radius: 5px; height: auto !important; width: 100% !important;">
-
 ### How do I Mint?
 
 1. First **Connect** an Ethereum wallet! Don't have a wallet? We recommend Meta Mask
