@@ -8,7 +8,7 @@ layout: help
 
 ---
 
-1. First **Connect** an Ethereum wallet! Don't have a wallet? We recommend Meta Mask
+1. First **Connect** an Ethereum wallet! Don't have a wallet? We recommend [Meta Mask 🦊](https://metamask.io/download/)
 
     - Go to [freshfrogs.io](https://freshfrogs.io) Browser extensions will automatically be deteced, a request will be sent to your provider.
     
