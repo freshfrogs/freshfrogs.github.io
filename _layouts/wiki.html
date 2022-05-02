@@ -148,8 +148,8 @@
                             recent_sale.href = permalink;
                             recent_sale.innerHTML = 
                                 '<img class="frog_img" src='+image_url+'>' +
-                                '<i class="label_name">Fresh Frogs NFT</i><i class="label_price">Price</i>' +
-                                '<b class="frog_name">'+name+'</b><b class="frog_price">Ξ '+sale_price+'</b>';
+                                '<div style="width: '+percent_width+'; overflow: hidden;"><i class="label_name">Fresh Frogs NFT</i><i class="label_price">Price</i>' +
+                                '<b class="frog_name">'+name+'</b><b class="frog_price">Ξ '+sale_price+'</b></div>';
                             document.getElementById('recent_sales').appendChild(recent_sale);
                       
                         } catch (e) { console.log(e.message) }
