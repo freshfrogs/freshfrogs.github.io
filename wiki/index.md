@@ -6,7 +6,7 @@ layout: wiki
 
 <div id="mintingTray" class="mintingTray">
     <img style="width: 100%;" src="../assets/frogs/morphTray.png"/>
-    <b>Generate Random Morph</b>
+    <button id="random-morph" class="random-morph">Random Morph</button>
 </div>
 
 ### How do I Mint?
