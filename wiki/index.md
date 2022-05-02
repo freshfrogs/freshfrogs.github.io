@@ -30,7 +30,7 @@ layout: wiki
 
     - A "Gas Fee" is required when minting any NFT on to the Ethereum blockchain. **[Learn more](https://www.investopedia.com/terms/g/gas-ethereum.asp)**
 
-![HowToMint](https://freshfrogs.io/assets/how-to/mintTransact.png)
+![HowToMint](https://freshfrogs.io/assets/how-to/mintTransact3.png)
 
 
 ### How do I View My Frogs?
