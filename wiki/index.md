@@ -4,6 +4,15 @@ layout: wiki
 
 <title>freshfrogs.io/wiki 🍀</title>
 
+<div class="minting-display">
+    <div id="mintingTray" class="mintingTray">
+        <img class="frog_img" src="../frog/3410.png">
+        <i class="label_mint">Frog 3410 / 4040</i><i class="label_q">Quantity</i>
+        <b class="frog_mint">0.01 ΞETH</b><b class="frog_q">- 1 +</b>
+    </div>
+    <button class="button"><b><i>Connect Wallet !</i></b></button>
+</div>
+
 ### How do I Mint?
 
 ---
@@ -29,15 +38,6 @@ layout: wiki
 - _What are Gas Fees?_
 
     - A "Gas Fee" is required when minting any NFT on to the Ethereum blockchain. **[Learn more](https://www.investopedia.com/terms/g/gas-ethereum.asp)**
-
-<div class="minting-display">
-    <div id="mintingTray" class="mintingTray">
-        <img class="frog_img" src="../frog/3410.png">
-        <i class="label_mint">Frog 3410 / 4040</i><i class="label_q">Quantity</i>
-        <b class="frog_mint">0.01 ΞETH</b><b class="frog_q">- 1 +</b>
-    </div>
-    <button class="button"><b><i>Connect Wallet !</i></b></button>
-</div>
 
 
 ### How do I View My Frogs?
