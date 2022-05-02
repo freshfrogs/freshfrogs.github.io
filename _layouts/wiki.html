@@ -24,6 +24,9 @@
         width: 100%;
         object-fit: contain;
     }
+    .recent_sale_img {
+        width: auto;
+    }
 </style>
 <html>
     <head>
@@ -94,7 +97,7 @@
                             recent_sale.style.textAlign = 'center'
                             recent_sale.style.width = 100 / 7 + '%'
                             recent_sale.innerHTML = 
-                                '<img src='+image_url+'>' +
+                                '<img class="recent_sale_img" "src='+image_url+'>' +
                                 '<p>'+name+' | '+sale_price+' Ξ<p>';
                             document.getElementById('recent_sales').appendChild(recent_sale)
                       
