@@ -4,6 +4,8 @@ layout: wiki
 
 <title>freshfrogs.io/wiki 🍀</title>
 
+<div id="mintingTray" class="mintingTray"></div>
+
 ### How do I Mint?
 
 ---
@@ -29,8 +31,6 @@ layout: wiki
 - _What are Gas Fees?_
 
     - A "Gas Fee" is required when minting any NFT on to the Ethereum blockchain. **[Learn more](https://www.investopedia.com/terms/g/gas-ethereum.asp)**
-
-<div id="mintingTray" class="mintingTray"></div>
 
 
 ### How do I View My Frogs?
