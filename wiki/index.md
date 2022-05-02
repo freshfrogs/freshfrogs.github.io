@@ -5,6 +5,7 @@ layout: wiki
 <title>freshfrogs.io/wiki 🍀</title>
 
 <div id="mintingTray" class="mintingTray"><img style="width: 100%;" src="../assets/frogs/morphTray.png"/></div>
+<button id="random-morph" class="random-morph"></button>
 
 ### How do I Mint?
 
