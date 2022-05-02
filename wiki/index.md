@@ -71,7 +71,3 @@ layout: wiki
 
 - Owner's can stake their Frogs to earn special tokens, rewards, participate in raffles, and more!
 
-
-### What are the benefits from staking?
-
----
