@@ -44,17 +44,17 @@ layout: wiki
 
 ---
 
-    - Frog holders will be able to "Morph" two Frogs to create a new NFT on Ethereum with combined attributes! Morphing will require a special token aquired through staking!
+- Frog holders will be able to "Morph" two Frogs to create a new NFT on Ethereum with combined attributes! Morphing will require a special token aquired through staking!
 
-    - Everyone can preview their morphs now at **[freshfrogs.io/the-pad](https://freshfrogs.io/the-pad)**
+- Everyone can preview their morphs now at **[freshfrogs.io/the-pad](https://freshfrogs.io/the-pad)**
 
 ### What is Staking?
 
 ---
 
-    - NFT staking refers to locking up non-fungible tokens on a platform or protocol in exchange for staking rewards and other benefits! Staking NFTs allows holders to earn an income from their collection while maintaining ownership!
+- NFT staking refers to locking up non-fungible tokens on a platform or protocol in exchange for staking rewards and other benefits! Staking NFTs allows holders to earn an income from their collection while maintaining ownership!
 
-    - Owner's can stake their Frogs to earn special tokens, rewards, particpate in raffles, and more!
+- Owner's can stake their Frogs to earn special tokens, rewards, particpate in raffles, and more!
 
 ### What are the benefits from staking?
 
