@@ -5,7 +5,10 @@ layout: help
 ### How do I Mint?
 
 1. First **Connect** an Ethereum wallet! Don't have a wallet? We recommend Meta Mask
-    Browser extensions will automatically be deteced, and a request will be sent with your provider. When using a mobile device: Use the built in browser within your wallet's app.
+
+    - Browser extensions will automatically be deteced, a request will be sent to your provider.
+    
+    - When using a mobile device: Use the built in browser within your wallet's app.
 
 2. Next, **Select** up to NINE Frogs to mint per transaction!
 
