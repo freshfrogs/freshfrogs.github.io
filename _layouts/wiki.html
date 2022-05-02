@@ -128,7 +128,7 @@
                             recent_sale.style.width = percent_width;
                             recent_sale.innerHTML = 
                                 '<img class="frog_img" src='+image_url+'>' +
-                                '<p><b class="frog_name">'+name+'</b><b class="frog_price">Ξ '+sale_price+'</b><p>';
+                                '<b class="frog_name">'+name+'</b><b class="frog_price">Ξ '+sale_price+'</b>';
                             document.getElementById('recent_sales').appendChild(recent_sale)
                       
                         } catch (e) { console.log(e.message) }
