@@ -4,7 +4,9 @@ layout: wiki
 
 <title>freshfrogs.io/wiki 🍀</title>
 
-<div id="mintingTray" class="mintingTray"></div>
+<div id="mintingTray" class="mintingTray">
+    <img src="../frog/1.png">
+</div>
 
 ### How do I Mint?
 
