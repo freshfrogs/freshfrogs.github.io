@@ -4,6 +4,11 @@ layout: wiki
 
 <title>freshfrogs.io/wiki 🍀</title>
 
+<p id="description"></p>
+<hr>
+<p><i id="created_date"></i></p>
+<div id="recent_sales" class="recent_sales"></div>
+
 ### How do I Mint?
 
 ---
