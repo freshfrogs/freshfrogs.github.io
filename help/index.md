@@ -22,3 +22,10 @@ layout: help
 
     - Make sure all details are correct, and gas limit is appropriate!
 
+### How do I View My Frogs?
+
+- View your Frogs on [OpenSea]()
+
+- Render your Frogs at [freshfrogs.io/the-pad](https://freshfrogs.io/the-pad)
+
+    - Frogs not displaying? Try manually scanning [here]()
