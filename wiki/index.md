@@ -10,7 +10,7 @@ layout: wiki
 
 1. First **Connect** an Ethereum wallet! Don't have a wallet? We recommend **[Meta Mask](https://metamask.io/download/)** 🦊
 
-    - Go to **[freshfrogs.io](https://freshfrogs.io)** Browser extensions will automatically be deteced, a request will be sent to your provider.
+    - Go to **[freshfrogs.io](https://freshfrogs.io)** Browser extensions will automatically be detected, a request will be sent to your provider.
     
     - When using a mobile device: Use the built in browser within your wallet app.
 
@@ -54,7 +54,7 @@ layout: wiki
 
 - NFT staking refers to locking up non-fungible tokens on a platform or protocol in exchange for staking rewards and other benefits! Staking NFTs allows holders to earn an income from their collection while maintaining ownership!
 
-- Owner's can stake their Frogs to earn special tokens, rewards, particpate in raffles, and more!
+- Owner's can stake their Frogs to earn special tokens, rewards, participate in raffles, and more!
 
 ### What are the benefits from staking?
 
