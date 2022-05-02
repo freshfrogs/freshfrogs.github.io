@@ -80,6 +80,7 @@
 
                     console.log(asset_events)
                     
+                    var resize = 100 / 7 + '%'
 
                     asset_events.forEach((sale) => {
                       
@@ -95,9 +96,9 @@
                             recent_sale = document.createElement('div')
                             recent_sale.style.verticalAlign = 'center'
                             recent_sale.style.textAlign = 'center'
-                            recent_sale.style.width = 100 / 7 + '%'
+                            recent_sale.style.width = resize
                             recent_sale.innerHTML = 
-                                '<img class="recent_sale_img" "src='+image_url+'>' +
+                                '<img style="width: '+resize+';" "src='+image_url+'>' +
                                 '<p>'+name+' | '+sale_price+' Ξ<p>';
                             document.getElementById('recent_sales').appendChild(recent_sale)
                       
