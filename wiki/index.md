@@ -10,7 +10,7 @@ layout: wiki
         <i class="label_mint">Fresh Frogs NFT</i><i class="label_q">Quantity</i>
         <b class="frog_mint">0.01 ΞETH</b><b class="frog_q">- 1 +</b>
     </div>
-    <button><b><i>Connect Wallet !</i></b></button>
+    <button class="button"><b><i>Connect Wallet !</i></b></button>
 </div>
 
 ### How do I Mint?
