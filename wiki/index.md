@@ -12,6 +12,9 @@ layout: wiki
     </div>
     <button class="button"><b><i>Connect Wallet !</i></b></button>
 </div>
+<div class="minting-console">
+> conntect wallet...
+</div>
 
 ### How do I Mint?
 
