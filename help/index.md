@@ -10,7 +10,7 @@ layout: help
 
 1. First **Connect** an Ethereum wallet! Don't have a wallet? We recommend Meta Mask
 
-    - Browser extensions will automatically be deteced, a request will be sent to your provider.
+    - Go to [freshfrogs.io](https://freshfrogs.io) Browser extensions will automatically be deteced, a request will be sent to your provider.
     
     - When using a mobile device: Use the built in browser within your wallet's app.
 
