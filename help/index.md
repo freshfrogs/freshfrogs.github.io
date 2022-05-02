@@ -31,6 +31,6 @@ layout: help
 
 ---
 
-- View your Frogs on [OpenSea]() or at [freshfrogs.io/the-pad](https://freshfrogs.io/the-pad)
+- View your Frogs on **[OpenSea](https://opensea.io/account)** or at **[freshfrogs.io/the-pad](https://freshfrogs.io/the-pad)**
 
     - Frogs not displaying? Try manually checking [here]()
