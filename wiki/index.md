@@ -41,6 +41,6 @@ layout: wiki
 
 ---
 
-### What do I Stake my Frogs?
+### How do I Stake my Frogs?
 
 ---
