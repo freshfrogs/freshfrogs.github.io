@@ -8,8 +8,6 @@ layout: wiki
 
 ---
 
-<div style="float: left;">
-
 1. First **Connect** an Ethereum wallet! Don't have a wallet? We recommend **[Meta Mask](https://metamask.io/download/)** 🦊
 
     - Go to **[freshfrogs.io](https://freshfrogs.io)** Browser extensions will automatically be detected, a request will be sent to your provider.
@@ -32,7 +30,6 @@ layout: wiki
 
     - A "Gas Fee" is required when minting any NFT on to the Ethereum blockchain. **[Learn more](https://www.investopedia.com/terms/g/gas-ethereum.asp)**
 
-</div>
 <div style="width: 100%; float: right; border: 1px solid black;">
 </div>
 
