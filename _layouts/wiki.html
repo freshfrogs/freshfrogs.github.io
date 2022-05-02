@@ -127,32 +127,30 @@
 
                     var { asset_events } = res
 
-                    console.log(asset_events)
+                    //console.log(asset_events)
                     
                     var percent_width = 92 / 7 + '%'
-
-                    console.log(asset_events)
 
                     asset_events.forEach((sale) => {
                       
 
                         try {
 
-                            var { asset: { image_url, name }, payment_token: { decimals }, total_price } = sale
+                            var { asset: { image_url, name, permalink }, payment_token: { decimals }, total_price } = sale;
 
-                            var sale_price = total_price / Math.pow(10, decimals)
+                            var sale_price = total_price / Math.pow(10, decimals);
 
-                            console.log('Sale found...'+sale.asset.name+' : '+sale_price)
+                            console.log('Sale found...'+sale.asset.name+' : '+sale_price);
 
-                            recent_sale = document.createElement('a')
-                            recent_sale.className = 'recent_sale'
+                            recent_sale = document.createElement('a');
+                            recent_sale.className = 'recent_sale';
                             recent_sale.style.width = percent_width;
-                            recent_sale.href = 'https://opensea.io'
+                            recent_sale.href = permalink;
                             recent_sale.innerHTML = 
                                 '<img class="frog_img" src='+image_url+'>' +
                                 '<i class="label_name">Fresh Frogs NFT</i><i class="label_price">Price</i>' +
                                 '<b class="frog_name">'+name+'</b><b class="frog_price">Ξ '+sale_price+'</b>';
-                            document.getElementById('recent_sales').appendChild(recent_sale)
+                            document.getElementById('recent_sales').appendChild(recent_sale);
                       
                         } catch (e) { console.log(e.message) }
 
