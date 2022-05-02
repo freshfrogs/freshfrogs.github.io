@@ -130,11 +130,10 @@
                     //document.getElementById('initial_sales').innerHTML = (initial_sales+parseInt(total_volume.toFixed(2)))+' Ξ'
 
                 })
-                .catch(err => {
+                .catch(e => {
 
-                    document.getElementById('description').innerHTML = 'Error: Could not talk to OpenSea...'
-
-                    console.error(err)
+                    console.log('Error: Could not talk to OpenSea...');
+                    console.error(e.message)
               
                 }); // End data pull / first paid Frog 3,236
 
@@ -178,7 +177,12 @@
 
 
                 })
-                .catch(err => console.error(err));
+                .catch(e => {
+
+                    console.log('Error: Could not talk to OpenSea...');
+                    console.error(e.message)
+
+                });
             })
         </script>
     </head>
