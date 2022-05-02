@@ -12,7 +12,7 @@ layout: wiki
     </div>
     <button class="button"><b><i>Connect Wallet !</i></b></button>
     <div class="minting-console">
-        > conntect wallet...
+        > connect wallet...
     </div>
 </div>
 
