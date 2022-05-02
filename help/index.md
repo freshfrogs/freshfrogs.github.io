@@ -12,7 +12,13 @@ layout: help
 
 2. Next, **Select** up to NINE Frogs to mint per transaction!
 
+    - You may mint up to NINE Frogs per transaction with a max of 40 Frogs per wallet!
+
 3. Then, Click on **Mint** (transact) to send to submit the transaction!
 
-4. Finally, Review and **Confirm** the request with your provider and send the transaction!
+4. Finally, Review and **Confirm** the transaction!
+
+    - Review and confirm the request with your prodiver to send the transaction!
+
+    - Make sure all details are correct, and gas limit is appropriate!
 
