@@ -24,9 +24,9 @@ layout: wiki
 
 4. Finally, Review and **Confirm** the transaction!
 
-    - Review and confirm the request with your prodiver to send the transaction!
+    - Review and confirm the request with your provider to send the transaction!
 
-    - Make sure all details are correct, and gas limit is appropriate!
+    - Make sure all details are correct, and the gas limit is appropriate!
 
 
 ### How do I View My Frogs?
