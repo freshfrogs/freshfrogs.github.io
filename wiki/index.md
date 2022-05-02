@@ -6,8 +6,8 @@ layout: wiki
 
 <div id="mintingTray" class="mintingTray">
     <img class="frog_img" src="../frog/3410.png">
-    <i class="label_name">Fresh Frogs NFT</i><i class="label_price">Price</i>
-    <b class="frog_name">name</b><b class="frog_price">Ξ sale_price</b>
+    <i class="label_name">Fresh Frogs NFT</i><i class="label_price">Quantity</i>
+    <b class="frog_name">0.01</b><b class="frog_price">- 1 +</b>
 </div>
 
 ### How do I Mint?
