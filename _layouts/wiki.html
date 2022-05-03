@@ -182,7 +182,25 @@
     <head>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
         <script>
-            
+
+            async function load_ownedFrogs() {
+
+                const options = {
+                    method: 'GET',
+                    headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
+                };
+
+                fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=40&include_orders=false', options)
+                .then((res) => res.json())
+                .then((res) => {
+                    var { assets } = res
+                    console.log(assets);
+                    assets.forEach((frog) => { // For Each FROG
+                        var { name, token_metadata, permalink, traits } = frog
+                    })
+                })
+            }
+
             function truncateAddress(address) {
                 if (!address) {
                     return "";
@@ -209,6 +227,7 @@
                         window.localStorage.setItem("userAddress", selectedAccount);
                         consoleOutput(`☑ETH Address: ${truncateAddress(window.userAddress)}`);
                         document.getElementById('mint-button').innerHTML = '<b><i>Send Transaction!</i></b>';
+                        load_ownedFrogs();
                     } catch (error) {
                         console.error(error);
                         consoleOutput(error);
