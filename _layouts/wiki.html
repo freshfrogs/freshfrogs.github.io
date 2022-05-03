@@ -264,6 +264,7 @@
                         window.userAddress = selectedAccount;
                         window.localStorage.setItem("userAddress", selectedAccount);
                         consoleOutput(`ETH Address: ${truncateAddress(window.userAddress)}`);
+                        document.getElementById('mint-button').innerHTML = '<b><i>Connect Wallet !</i></b>';
                     } catch (error) {
                         console.error(error);
                         consoleOutput(error);
