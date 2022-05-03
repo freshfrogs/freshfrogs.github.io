@@ -216,13 +216,14 @@
                     var { assets } = res
                     console.log(assets);
                     assets.forEach((frog) => { // For Each FROG
+
                         try {
 
                             var { name, token_metadata, permalink, traits, image_url, external_link } = frog
 
                             owned_frog = document.createElement('a');
                             owned_frog.className = 'recent_sale';
-                            owned_frog.style.width = 128+64+'px';
+                            owned_frog.style.width = '128px';
                             owned_frog.href = permalink;
                             owned_frog.innerHTML = 
                                 '<img class="frog_img" src='+image_url+'>' +
