@@ -222,16 +222,22 @@
 
                         try {
 
-                            var { name, token_metadata, permalink, traits, image_url, external_link } = frog
+                            var { asset: { image_url, name, permalink }, payment_token: { decimals }, total_price } = sale;
 
-                            owned_frog = document.createElement('a');
-                            owned_frog.className = 'owned-frog';
-                            owned_frog.href = permalink;
-                            owned_frog.innerHTML = 
-                                '<img src='+external_link+'>' +
+                            var sale_price = total_price / Math.pow(10, decimals);
+
+                            console.log('Sale found...'+sale.asset.name+' : '+sale_price);
+
+                            recent_sale = document.createElement('a');
+                            recent_sale.className = 'recent_sale';
+                            recent_sale.style.width = percent_width;
+                            recent_sale.style.minWidth = 128+64+'px';
+                            recent_sale.href = permalink;
+                            recent_sale.innerHTML = 
+                                '<img class="frog_img" src='+image_url+'>' +
                                 '<i class="label_name">Fresh Frogs NFT</i><i class="label_price">Price</i>' +
-                                '<b class="frog_name">'+name+'</b><b class="frog_price">Ξ x</b>';
-                            document.getElementById('owned-frogs').appendChild(owned_frog);
+                                '<b class="frog_name">'+name+'</b><b class="frog_price">Ξ '+sale_price+'</b>';
+                            document.getElementById('owned-frogs').appendChild(recent_sale);
                         
                         } catch (e) { console.log(e.message) }
                     })
