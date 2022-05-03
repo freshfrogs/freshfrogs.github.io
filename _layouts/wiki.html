@@ -256,20 +256,22 @@
                         })
                         .then((accounts) => accounts[0])
                         .catch(() => {
-                            document.getElementById('minting-console').innerHTML = "No account selected!";
+                            consoleOutput("No account selected!");
                             throw Error("No account selected!");
                         });
                         window.userAddress = selectedAccount;
                         window.localStorage.setItem("userAddress", selectedAccount);
-                        document.getElementById('minting-console').innerHTML = `ETH Address: ${truncateAddress(window.userAddress)}`;
-
+                        consoleOutput(`ETH Address: ${truncateAddress(window.userAddress)}`);
                     } catch (error) {
                         console.error(error);
-                        document.getElementById('minting-console').innerHTML = error;
+                        consoleOutput(error);
                     }
                 } else {
-                    document.getElementById('minting-console').innerHTML = "No ETH brower extension detected.";
+                    consoleOutput("No ETH brower extension detected.");
                 }
+            }
+            function consoleOutput(output) {
+                document.getElementById('minting-console').innerHTML = output;
             }
         </script>
     </head>
