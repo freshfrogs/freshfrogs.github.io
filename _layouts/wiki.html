@@ -306,8 +306,10 @@
                     document.getElementById('frog-tray-1').appendChild(new_frog);
 
                     all_frogs = document.getElementsByClassName('tray-frog');
-                    
-                    all_frogs.style.width = 100 / frog_count + '%';
+
+                    for (var i = 0; i < all_frogs.length; i++) {
+                        all_frogs[i].style.width = 100 / frog_count + '%';
+                    }
 
                 })
             })
