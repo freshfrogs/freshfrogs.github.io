@@ -305,7 +305,9 @@
 
                     document.getElementById('frog-tray-1').appendChild(new_frog);
 
-                    document.getElementsByClassName('tray-frog').style.width = 100 / frog_count + '%';
+                    all_frogs = document.getElementsByClassName('tray-frog');
+                    
+                    all_frogs.style.width = 100 / frog_count + '%';
 
                 })
             })
