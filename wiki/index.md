@@ -51,7 +51,7 @@ layout: wiki
 
     - Frogs not displaying? Try manually checking: **[Scan Frog Txs]()**
 
-<div id='owned-frogs'><h4 style="margin: auto;">Connect Wallet</h4></div>
+<div id='owned-frogs'><h4 style="margin-bottom: auto; margin-top: auto;">Connect Wallet</h4></div>
 
 
 ### What is "Morphing" and How do I Morph?
