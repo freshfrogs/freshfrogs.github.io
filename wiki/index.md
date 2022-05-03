@@ -71,3 +71,29 @@ layout: wiki
 
 - Owner's can stake their Frogs to earn special tokens, rewards, participate in raffles, and more!
 
+
+### Fresh Frogs Meta
+
+---
+
+    - Frog Types
+
+        - Red Eyed Tree Frogs
+
+        - Blue Dart Frogs
+
+        - Golden Dart Frogs
+
+        - Splendid Leaf Frogs
+
+    - Special Frogs
+
+        - Croaking Frogs
+
+        - Third Eye Frogs
+
+        - Closed Eyed Frogs
+
+        - Peace Frogs
+
+        - Inversed Eyes Frogs
