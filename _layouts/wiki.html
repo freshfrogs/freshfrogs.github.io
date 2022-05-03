@@ -208,6 +208,7 @@
                             owned_frog = document.createElement('a');
                             owned_frog.className = 'owned_frog';
                             owned_frog.style.width = 128+'px';
+                            owned_frog.onclick = function() { expand_element(); }
                             owned_frog.innerHTML = 
                                 '<img class="frog_img" src='+external_link+'>' +
                                 '<i class="label_name">Fresh Frogs NFT</i>' +
@@ -348,7 +349,7 @@
                     console.error(e.message)
 
                 })
-                document.querySelector("#owned_frog").addEventListener("click", async (e) => {
+                function expand_element() {
 
                     var target = event.target || event.srcElement;
 
@@ -356,7 +357,7 @@
 
                     console.log(target)
 
-                })
+                }
                 document.querySelector("#add-frog").addEventListener("click", async (e) => {
 
                     if (frog_count <= 1) {
