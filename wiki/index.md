@@ -10,7 +10,7 @@ layout: wiki
         <i class="label_mint">Frog 3410 / 4040</i><i class="label_q">Quantity</i>
         <b class="frog_mint">0.01 ΞETH</b><b class="frog_q">- 1 +</b>
     </div>
-    <button class="button"><b><i>Connect Wallet !</i></b></button>
+    <button class="button" onclick="loginWithEth()"><b><i>Connect Wallet !</i></b></button>
     <div class="minting-console">
         > connect wallet...
     </div>

@@ -37,6 +37,7 @@
         margin-right: auto;
         width: 256px;
         transition: box-shadow .2s;
+        cursor: pointer;
     }
     .button:hover{
         box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);
@@ -236,6 +237,30 @@
 
                 });
             })
+                // Login with Web3 via Metamasks window.ethereum library
+            async function loginWithEth() {
+                if (window.ethereum) {
+                    try {
+                        // We use this since ethereum.enable() is deprecated. This method is not
+                        // available in Web3JS - so we call it directly from metamasks' library
+                        const selectedAccount = await window.ethereum
+                        .request({
+                            method: "eth_requestAccounts",
+                        })
+                        .then((accounts) => accounts[0])
+                        .catch(() => {
+                            throw Error("No account selected!");
+                        });
+                        window.userAddress = selectedAccount;
+                        window.localStorage.setItem("userAddress", selectedAccount);
+                        showAddress();
+                    } catch (error) {
+                        console.error(error);
+                    }
+                } else {
+                    alert("No ETH brower extension detected.");
+                }
+            }
         </script>
     </head>
     <header>
