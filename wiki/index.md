@@ -76,24 +76,24 @@ layout: wiki
 
 ---
 
-    - Frog Types
+- Frog Types
 
-        - Red Eyed Tree Frogs
+    - Red Eyed Tree Frogs
 
-        - Blue Dart Frogs
+    - Blue Dart Frogs
 
-        - Golden Dart Frogs
+    - Golden Dart Frogs
 
-        - Splendid Leaf Frogs
+    - Splendid Leaf Frogs
 
-    - Special Frogs
+- Special Frogs
 
-        - Croaking Frogs
+    - Croaking Frogs
 
-        - Third Eye Frogs
+    - Third Eye Frogs
 
-        - Closed Eyed Frogs
+    - Closed Eyed Frogs
 
-        - Peace Frogs
+    - Peace Frogs
 
-        - Inversed Eyes Frogs
+    - Inversed Eyes Frogs
