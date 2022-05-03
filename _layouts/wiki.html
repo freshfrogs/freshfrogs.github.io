@@ -207,13 +207,11 @@
                 document.getElementById('minting-console').innerHTML = output;
             }
 
-            frog_count = 1;
-
             document.addEventListener("DOMContentLoaded", async () => {
 
                 CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
 
-                frog_count = 1;
+                var frog_count;
               
                 // Pull Collection data from OpenSea
 
@@ -296,7 +294,8 @@
                 })
                 document.querySelector("#add-frog").addEventListener("click", async (e) => {
 
-                    if (frog_count <= 1) {
+                    if (!frog_count) {
+                        let frog_count = 1;
                         document.getElementById('frog-tray-1').innerHTML = '';
                     } 
                     
