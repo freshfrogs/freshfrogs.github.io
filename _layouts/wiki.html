@@ -208,7 +208,7 @@
                             owned_frog = document.createElement('a');
                             owned_frog.className = 'owned_frog';
                             owned_frog.style.width = 128+'px';
-                            owned_frog.onclick = function() { var element = event.target || event.srcElement; element.style.width = '512px'; }
+                            owned_frog.onclick = function() { var element = event.currentTarget; element.style.width = '512px'; }
                             owned_frog.innerHTML = 
                                 '<img class="frog_img" src='+external_link+'>' +
                                 '<i class="label_name">Fresh Frogs NFT</i>' +
