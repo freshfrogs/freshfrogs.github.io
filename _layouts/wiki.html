@@ -263,7 +263,7 @@
                         });
                         window.userAddress = selectedAccount;
                         window.localStorage.setItem("userAddress", selectedAccount);
-                        consoleOutput(`ETH Address: ${truncateAddress(window.userAddress)}`);
+                        consoleOutput(`☑ETH Address: ${truncateAddress(window.userAddress)}`);
                         document.getElementById('mint-button').innerHTML = '<b><i>Send Transaction!</i></b>';
                     } catch (error) {
                         console.error(error);
