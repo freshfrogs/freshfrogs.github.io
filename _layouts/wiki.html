@@ -216,13 +216,21 @@
                     var { assets } = res
                     console.log(assets);
                     assets.forEach((frog) => { // For Each FROG
-                        var { name, token_metadata, permalink, traits, image_url, external_link } = frog
+                        try {
 
-                        owned_frog = document.createElement('img')
-                        owned_frog.src = external_link
-                        owned_frog.className = 'owned-frog'
-                        document.getElementById('owned-frogs').appendChild(owned_frog)
+                            var { name, token_metadata, permalink, traits, image_url, external_link } = frog
 
+                            recent_sale = document.createElement('a');
+                            recent_sale.className = 'recent_sale';
+                            recent_sale.style.width = 128+64+'px';
+                            recent_sale.href = permalink;
+                            recent_sale.innerHTML = 
+                                '<img class="frog_img" src='+image_url+'>' +
+                                '<i class="label_name">Fresh Frogs NFT</i><i class="label_price">Price</i>' +
+                                '<b class="frog_name">'+name+'</b><b class="frog_price">Ξ x</b>';
+                            document.getElementById('recent_sales').appendChild('owned-frogs');
+                        
+                        } catch (e) { console.log(e.message) }
                     })
                 })
                 .catch(e => {
