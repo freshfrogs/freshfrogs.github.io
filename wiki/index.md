@@ -86,6 +86,8 @@ layout: wiki
 
     - Splendid Leaf Frogs
 
+    - **Tree Frogs** Tree frogs are the most basic Frog type and contain various green patterns, with EIGHT different types.
+
 - Special Frogs
 
     - Croaking Frogs
