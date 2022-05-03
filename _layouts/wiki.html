@@ -155,6 +155,69 @@
     <head>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
         <script>
+            //
+            document.querySelector("#add-frog").addEventListener("click", async (e) => {
+
+                if (!frog_count) {
+                    var frog_count = 1;
+                    document.getElementById('frog-tray-1').innerHTML = '';
+                } else { let frog_count = frog_count + 1 }
+
+                new_frog = document.createElement('img');
+                new_frog.style.borderRadius = '5px'
+                new_frog.style.width = 100 / 3 + '%';
+                new_frog.src = '../frog/'+frog_count+'.png'
+
+                if (frog_count >= 9) {
+                    return; // break
+                } else if (frog_count >= 6) {
+                    document.getElementById('frog-tray-3').appendChild(new_frog);
+                } else if (frog_count >= 3) {
+                    document.getElementById('frog-tray-2').appendChild(new_frog);
+                } else if (frog_count < 3) {
+                    document.getElementById('frog-tray-1').appendChild(new_frog);
+                }
+
+            });
+            
+            function truncateAddress(address) {
+                if (!address) {
+                    return "";
+                }
+                return `${address.substr(0, 5)}...${address.substr(
+                    address.length - 5,
+                    address.length
+                )}`;
+            }
+            // Login with Web3 via Metamasks window.ethereum library
+            async function loginWithEth() {
+                if (window.ethereum) {
+                    try {
+                        const selectedAccount = await window.ethereum
+                        .request({
+                            method: "eth_requestAccounts",
+                        })
+                        .then((accounts) => accounts[0])
+                        .catch(() => {
+                            consoleOutput("No account selected!");
+                            throw Error("No account selected!");
+                        });
+                        window.userAddress = selectedAccount;
+                        window.localStorage.setItem("userAddress", selectedAccount);
+                        consoleOutput(`☑ETH Address: ${truncateAddress(window.userAddress)}`);
+                        document.getElementById('mint-button').innerHTML = '<b><i>Send Transaction!</i></b>';
+                    } catch (error) {
+                        console.error(error);
+                        consoleOutput(error);
+                    }
+                } else {
+                    consoleOutput("No ETH brower extension detected.");
+                }
+            }
+            function consoleOutput(output) {
+                document.getElementById('minting-console').innerHTML = output;
+            }
+
             document.addEventListener("DOMContentLoaded", async () => {
 
                 CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
@@ -239,43 +302,6 @@
 
                 });
             })
-            function truncateAddress(address) {
-                if (!address) {
-                    return "";
-                }
-                return `${address.substr(0, 5)}...${address.substr(
-                    address.length - 5,
-                    address.length
-                )}`;
-            }
-            // Login with Web3 via Metamasks window.ethereum library
-            async function loginWithEth() {
-                if (window.ethereum) {
-                    try {
-                        const selectedAccount = await window.ethereum
-                        .request({
-                            method: "eth_requestAccounts",
-                        })
-                        .then((accounts) => accounts[0])
-                        .catch(() => {
-                            consoleOutput("No account selected!");
-                            throw Error("No account selected!");
-                        });
-                        window.userAddress = selectedAccount;
-                        window.localStorage.setItem("userAddress", selectedAccount);
-                        consoleOutput(`☑ETH Address: ${truncateAddress(window.userAddress)}`);
-                        document.getElementById('mint-button').innerHTML = '<b><i>Send Transaction!</i></b>';
-                    } catch (error) {
-                        console.error(error);
-                        consoleOutput(error);
-                    }
-                } else {
-                    consoleOutput("No ETH brower extension detected.");
-                }
-            }
-            function consoleOutput(output) {
-                document.getElementById('minting-console').innerHTML = output;
-            }
         </script>
     </head>
     <header>
