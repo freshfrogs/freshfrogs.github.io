@@ -164,33 +164,18 @@
     .tray-frog {
         width: 100%;
     }
-    .view-owned {
-        background: transparent;
-        border-radius: 5px;
-        border: 1px solid lightgray;
-        padding: 4px;
-        display: inline-flex;
-    }
-    #owned_frogs {
-        text-align: center;
-        display: inline-flex;
-        flex-wrap: wrap;
-        image-rendering: pixelated;
-        margin-left: auto;
-        margin-right: auto;
-        width: 100%;
-    }
-    .owned-frog {
+    .owned_frog {
         text-align: center;
         vertical-align: center;
-        width: 25%;
+        width: 100%;
+        height: 100%;
         margin: 0.5%;
         border-radius: 5px;
         border: solid 1px lightgrey;
         overflow: hidden;
         transition: box-shadow .2s;
     }
-    .owned-frog:hover{
+    .owned_frog:hover{
         box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);
     }
 </style>
@@ -220,7 +205,7 @@
                             var { name, token_metadata, permalink, traits, external_link } = frog
 
                             owned_frog = document.createElement('a');
-                            owned_frog.className = 'recent_sale';
+                            owned_frog.className = 'owned_frog';
                             owned_frog.style.width = 128+'px';
                             owned_frog.href = permalink;
                             owned_frog.innerHTML = 
@@ -361,6 +346,11 @@
 
                     console.log('Error: Could not talk to OpenSea...');
                     console.error(e.message)
+
+                })
+                document.querySelector("#owned_frog").addEventListener("click", async (e) => {
+
+                    console.log(event.target)
 
                 })
                 document.querySelector("#add-frog").addEventListener("click", async (e) => {
