@@ -164,6 +164,12 @@
     .tray-frog {
         width: 100%;
     }
+    .view-owned {
+        background: transparent;
+        border-radius: 5px;
+        border: 1px solid lightgray;
+        padding: 4px;
+    }
 </style>
 <html>
     <head>
@@ -330,7 +336,7 @@
         <p>Items: <b id="count"></b> | Owners: <b id="num_owners"></b> | Market Cap: <b id="market_cap"></b> | Floor Price: <b id="floor_price"></b> | Sales Volume: <b id="total_volume"></b> <b id="initial_sales"></b></p>
         <p id="description">A collection of 4,040 randomly generated Frogs on #Ethereum</p>
         <hr>
-        <p><i id="created_date"></i></p>
+        <p><i id="created_date"></i></p><button class="view-owned" id="view-owned">View Owned</button>
         <div id="recent_sales" class="recent_sales"></div>
         {{ content }}
     <body>
