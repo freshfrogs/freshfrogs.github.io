@@ -237,29 +237,43 @@
 
                 });
             })
-                // Login with Web3 via Metamasks window.ethereum library
+            function truncateAddress(address) {
+                if (!address) {
+                    return "";
+                }
+                return `${address.substr(0, 5)}...${address.substr(
+                    address.length - 5,
+                    address.length
+                )}`;
+            }
+            // Login with Web3 via Metamasks window.ethereum library
             async function loginWithEth() {
                 if (window.ethereum) {
                     try {
-                        // We use this since ethereum.enable() is deprecated. This method is not
-                        // available in Web3JS - so we call it directly from metamasks' library
                         const selectedAccount = await window.ethereum
                         .request({
                             method: "eth_requestAccounts",
                         })
                         .then((accounts) => accounts[0])
                         .catch(() => {
+                            consoleOutput("No account selected!");
                             throw Error("No account selected!");
                         });
                         window.userAddress = selectedAccount;
                         window.localStorage.setItem("userAddress", selectedAccount);
-                        showAddress();
+                        consoleOutput(`ETH Address: ${truncateAddress(window.userAddress)}`);
                     } catch (error) {
                         console.error(error);
+                        consoleOutput(error);
                     }
                 } else {
-                    alert("No ETH brower extension detected.");
+                    consoleOutput("No ETH brower extension detected.");
                 }
+            }
+            function consoleOutput(output) {
+                newLine = document.createElement("p")
+                newLine.innerHTML = output
+                document.getElementById("minting-console").appendChild(newLine)
             }
         </script>
     </head>
