@@ -286,9 +286,9 @@
                 document.querySelector("#add-frog").addEventListener("click", async (e) => {
 
                     if (!frog_count) {
-                        var frog_count = 1;
+                        frog_count = 2;
                         //document.getElementById('frog-tray-1').innerHTML = '';
-                    } else { let frog_count = frog_count + 1 }
+                    } else { frog_count = frog_count + 1 }
 
                     new_frog = document.createElement('img');
                     new_frog.style.borderRadius = '5px'
