@@ -228,14 +228,14 @@
                         
                         } catch (e) { console.log(e.message) }
                     })
-
-                    document.getElementById('owned_frogs').style.height = 'auto';
-
                 })
                 .catch(e => {
                     document.getElementById('owned-frogs').innerHTML = e.message
                     console.log(e.message)
                 })
+
+                document.getElementById('owned_frogs').style.height = 'auto';
+
             }
 
             function truncateAddress(address) {
