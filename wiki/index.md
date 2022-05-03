@@ -10,7 +10,7 @@ layout: wiki
         <div class="frog-tray" id="frog-tray-2"></div>
         <div class="frog-tray" id="frog-tray-3"></div>
         <i class="label_mint">Frog 3410 / 4040</i><i class="label_q">Quantity</i>
-        <b class="frog_mint">0.01 ΞETH</b><b class="frog_q"><b class="add-frog" id="add-frog">-</b> <b class="quant-frog" id="quant-frog">1</b> <b class="remove-frog" id="remove-frog">+</b>
+        <b class="frog_mint">0.01 ΞETH</b><b class="frog_q"><b id="add-frog">-</b> <b id="quant-frog">1</b> <b id="remove-frog">+</b>
     </div>
     <button id="mint-button" class="button" onclick="loginWithEth()"><b><i>Connect Wallet !</i></b></button>
     <div id="minting-console" class="minting-console">
