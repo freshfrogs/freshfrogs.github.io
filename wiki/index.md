@@ -76,15 +76,15 @@ layout: wiki
 
 ---
 
-- Frog Types
+- **Frog Types** 27 differnt Frog Types with 19 possible colorations (traits)
 
-    - **Red Eyed Tree Frogs** are extremely rare and come in many different colors. The rarest being the "natural" Red Eyed Tree Frog that features distict colorations.
+    - **Red Eyed Tree Frogs** Extremely rare, the rarest being the "natural" Red Eyed Tree Frog that features distict colorations.
 
-    - **Blue & Golden Dart Frogs** are rare and unique poison dart Frogs, the rarest being those that contain the "natural" trait.
+    - **Blue & Golden Dart Frogs** Extremely rare, the rarest being the "natural" Red Eyed Tree Frog that features distict colorations.
 
-    - **Splendid Leaf Frogs**
+    - **Splendid Leaf Frogs** Extremely rare, the rarest being the "natural" Red Eyed Tree Frog that features distict colorations.
 
-    - **Strawberry Dart Frogs**
+    - **Strawberry Dart Frogs** Extremely rare, the rarest being the "natural" Red Eyed Tree Frog that features distict colorations.
 
     - **Tree Frogs** Tree frogs are the most basic Frog type and contain various green patterns, with EIGHT different types.
 
