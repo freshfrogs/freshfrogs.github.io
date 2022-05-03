@@ -174,6 +174,7 @@
         border: solid 1px lightgrey;
         overflow: hidden;
         transition: box-shadow .2s;
+        cursor: pointer;
     }
     .owned_frog:hover{
         box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);
@@ -349,9 +350,11 @@
                 })
                 document.querySelector("#owned_frog").addEventListener("click", async (e) => {
 
-                    event.target.style.width = '512px'
+                    var target = event.target || event.srcElement;
 
-                    console.log(event.target)
+                    target.style.width = '512px'
+
+                    console.log(target)
 
                 })
                 document.querySelector("#add-frog").addEventListener("click", async (e) => {
