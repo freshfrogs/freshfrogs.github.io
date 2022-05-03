@@ -226,6 +226,7 @@
                     })
                 })
                 .catch(e => {
+                    document.getElementById('owned-frogs').innerHTML = e.message
                     console.log(e.message)
                 })
             }
