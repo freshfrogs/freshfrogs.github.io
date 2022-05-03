@@ -7,8 +7,6 @@ layout: wiki
 <div class="minting-display">
     <div id="mintingTray" class="mintingTray">
         <div class="frog-tray" id="frog-tray-1"><img class="frog_img" src="../frog/3410.png"></div>
-        <div class="frog-tray" id="frog-tray-2"></div>
-        <div class="frog-tray" id="frog-tray-3"></div>
         <i class="label_mint">Frog 3410 / 4040</i><i class="label_q">Quantity</i>
         <b class="frog_mint">0.01 ΞETH</b><b class="frog_q"><b id="remove-frog">-</b> <b id="quant-frog">1</b> <a id="add-frog"><b>+</b></a></b>
     </div>
