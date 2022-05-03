@@ -156,6 +156,10 @@
     .collection-name {
         font-weight: 600;
     }
+
+    #add-frog {
+        cursor: pointer;
+    }
 </style>
 <html>
     <head>
@@ -295,15 +299,7 @@
                     new_frog.style.width = 100 / frog_count + '%';
                     new_frog.src = '../frog/'+frog_count+'.png'
 
-                    if (frog_count >= 9) {
-                        return; // break
-                    } else if (frog_count >= 7) {
-                        document.getElementById('frog-tray-3').appendChild(new_frog);
-                    } else if (frog_count >= 4) {
-                        document.getElementById('frog-tray-2').appendChild(new_frog);
-                    } else if (frog_count < 3) {
-                        document.getElementById('frog-tray-1').appendChild(new_frog);
-                    }
+                    document.getElementById('frog-tray-1').appendChild(new_frog);
 
                 })
             })
