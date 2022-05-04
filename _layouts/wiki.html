@@ -219,7 +219,7 @@
                             owned_frog.id = name
                             owned_frog.className = 'owned_frog';
                             owned_frog.style.width = 128+'px';
-                            owned_frog.onclick = function() { var this_frog = event.currentTarget.id; document.getElementById('display-frog').setAttribute('src', '../frog/'+this_frog+'.png') }
+                            owned_frog.onclick = function() { var this_frog = event.currentTarget.id.replace('Frog #', ''); document.getElementById('display-frog').setAttribute('src', '../frog/'+this_frog+'.png') }
                             owned_frog.innerHTML = 
                                 '<img class="frog_img" src='+external_link+'>' +
                                 '<i class="label_name">Fresh Frogs NFT</i>' +
