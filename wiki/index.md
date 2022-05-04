@@ -8,7 +8,7 @@ layout: wiki
     <div id="mintingTray" class="mintingTray">
         <div class="frog-tray" id="frog-tray-1"><img id="display-frog" class="frog_img" src="../frog/3410.png"></div>
         <i class="label_mint">Frog 3410 / 4040</i><i class="label_q">Quantity</i>
-        <b class="frog_mint">0.01 ΞETH</b><b class="frog_q"><b id="remove-frog">-</b> <b id="quant-frog">1</b> <a id="add-frog"><b>+</b></a></b>
+        <div id="display-desc"><b class="frog_mint">0.01 ΞETH</b><b class="frog_q"><b id="remove-frog">-</b> <b id="quant-frog">1</b> <a id="add-frog"><b>+</b></a></b></div>
     </div>
     <button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button>
     <div id="minting-console" class="minting-console">
