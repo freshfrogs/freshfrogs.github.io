@@ -97,6 +97,26 @@
         padding-top: 0%;
         margin-right: 2.5%;
     }
+    .frog_img {
+        width: 100%;
+        border-radius: 0px;
+    }
+    .label_name {
+        text-align: left;
+        float: left;
+        margin-left: 2.5%;
+        padding: 5%;
+        padding-bottom: 0%;
+        color: gray;
+    }
+    .label_price {
+        text-align: right;
+        float: right;
+        margin-right: 2.5%;
+        padding: 5%;
+        padding-bottom: 0%;
+        color: gray;
+    }
 
     .frog_mint {
         text-align: left;
@@ -179,35 +199,6 @@
     #display-id {
         width: 90%;
         padding: 5%;
-    }
-
-    .frog_img {
-        width: 100%;
-        border-radius: 0px;
-    }
-    .desc-name {
-        text-align: left;
-        padding: 0%;
-        color: gray;
-        width: 50%;
-        height: 1%;
-        overflow: hidden;
-        margin: 0%;
-        display: block;
-    }
-    .desc-label {
-        text-align: right;
-        padding: 0%;
-        color: gray;
-        width: 50%;
-        overflow: hidden;
-        margin: 0%;
-        display: block;
-        height: 1%;
-    }
-    .desc-div {
-        width: 98%;
-        padding: 1%;
     }
 </style>
 <html>
@@ -401,8 +392,8 @@
                             recent_sale.href = permalink;
                             recent_sale.innerHTML = 
                                 '<img class="frog_img" src='+image_url+'>' +
-                                '<div class="desc-div"><i class="desc-name">Fresh Frogs NFT</i><i class="desc-label">Price</i></div>' +
-                                '<div class="desc-div"><b class="desc-name">'+name+'</b><b class="desc-label>Ξ '+sale_price+'</b></div>';
+                                '<i class="label_name">Fresh Frogs NFT</i><i class="label_price">Price</i>' +
+                                '<b class="frog_name">'+name+'</b><b class="frog_price">Ξ '+sale_price+'</b>';
                             document.getElementById('recent_sales').appendChild(recent_sale);
                       
                         } catch (e) { console.log(e.message) }
