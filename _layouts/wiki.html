@@ -227,10 +227,30 @@
 
                                 document.getElementById('display-id').innerHTML = '<i class="label_mint"> '+name+' </i><i class="label_q">Rarity</i>'
 
-                                new_div = document.createElement('div')
-                                new_div.innerHTML = '<b class="frog_mint">Frog Type</b><b class="frog_q">Trait</b>'
+                                //
 
-                                document.getElementById('display-desc').appendChild(new_div)
+                                fetch(token_metadata)
+                                .then((metadata) => metadata.json())
+                                .then((metadata) => {
+                                // Loop Attributes
+                                for (var i = 0; i < metadata.attributes.length; i++){
+                                    //console.log(metadata.attributes[i]);
+
+                                    // Trait_Type : Value
+                                    var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                                    let trait_type = attribute.trait_type
+                                    let value = attribute.value
+                                    //let trait_rarity = ((attributesTotal[value]/nextIdC)*100).toFixed(2);
+
+                                    new_div = document.createElement('div')
+                                    new_div.innerHTML = '<b class="frog_mint">'+trait_type+'</b><b class="frog_q">'+value+'</b>'
+
+                                    document.getElementById('display-desc').appendChild(new_div)
+
+                                }
+                                })
+
+                                //
                             
                             }
                             owned_frog.innerHTML = 
