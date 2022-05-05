@@ -5,6 +5,7 @@ layout: wiki
 <title>freshfrogs.io/wiki 🍀</title>
 
 <div class="minting-display">
+    <h4 style="float: left;">Properties</h4>
     <div id="mintingTray" class="mintingTray">
         <div class="frog-tray" id="frog-tray-1"><img id="display-frog" class="frog_img" src="../frog/3410.png"></div>
         <div id="display-table">
