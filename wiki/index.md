@@ -69,6 +69,10 @@ layout: wiki
 
     - Frogs not displaying? Try manually checking: **[Scan Frog Txs]()**
 
+    - Each Frog is unique with thousands of possible combinations!
+
+    - Some Frogs with the 'natural' trait contain a unique color pattern!
+
 <div id="owned-frogs" class="owned_frogs">
 
     <h4 id="owned-frogs-header" style="margin-top: auto; margin-bottom: auto; margin-left: auto; margin-right: auto; cursor: pointer;"  onclick="connect()">Connect Wallet</h4>
