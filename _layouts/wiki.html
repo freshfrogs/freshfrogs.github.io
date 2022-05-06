@@ -246,7 +246,9 @@
 
                                 document.getElementById('label_name').innerHTML = name
 
-                                document.getElementById('display-table').removeChild();
+                                var display_table = document.getElementById('display-table')
+                                
+                                display_table.removeChild(display_table.lastElementChild);
 
                                 fetch(token_metadata)
                                 .then((metadata) => metadata.json())
