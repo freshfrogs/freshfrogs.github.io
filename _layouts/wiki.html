@@ -269,11 +269,11 @@
 
                                 document.getElementById('lower_display').innerHTML = 
 
-                                '<h4 style="text-align: left;">Details</h4><hr>' +
+                                    '<h4 style="text-align: left;">Details</h4><hr>' +
 
-                                '<b>OpenSea</b> ' + '<i><a href="'+permalink+'" target="_blank">'+permalink+'</a></i>' +
-                                
-                                '<h4 style="text-align: left;">Properties</h4><hr>';
+                                    '<b>OpenSea</b> ' + '<i><a href="'+permalink.slice(0, 13)+'" target="_blank">'+permalink+'</a></i>' +
+                                    
+                                    '<h4 style="text-align: left;">Properties</h4><hr>';
 
                                 traits.forEach((trait) => {
 
