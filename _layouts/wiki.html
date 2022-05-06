@@ -254,19 +254,13 @@
                             owned_frog.style.width = 128+'px';
                             owned_frog.onclick = function() { 
                                 
-                                var this_frog = event.currentTarget.id.replace('Frog #', '')
-
+                                var this_frog = event.currentTarget.id.replace('Frog #', '');
+                                
                                 document.getElementById('display-frog').setAttribute('src', '../frog/'+this_frog+'.png')
-
-                                document.getElementById('mintingTray').setAttribute('href', permalink)
-
-                                document.getElementById('mintingTray').setAttribute('target', '_blank')
-
-                                document.getElementById('mintingTray').style.cursor = 'pointer'
 
                                 document.getElementById('label_name').innerHTML = 'Fresh Frogs NFT'
 
-                                document.getElementById('frog_name').innerHTML = name
+                                document.getElementById('frog_name').innerHTML = '<a href="'+permalink+'" target="_blank">'+name+'</a>'
 
                                 document.getElementById('label_price').innerHTML = 'Owner'
 
@@ -274,7 +268,6 @@
 
                                 document.getElementById('lower_display').innerHTML = 
                                     
-                                    '' +
                                     '<h4 style="text-align: left;">Properties</h4><hr>';
 
                                 traits.forEach((trait) => {
