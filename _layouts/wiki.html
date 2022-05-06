@@ -268,35 +268,24 @@
                                 document.getElementById('lower_display').innerHTML = '<h4 style="text-align: left;">Properties</h4><hr>';
 
                                 traits.forEach((trait) => {
-                                    console.log(trait)
-                                })
 
-                    /*          fetch(token_metadata)
-                                .then((metadata) => metadata.json())
-                                .then((metadata) => {
-                                    console.log(metadata)
-                                    // Loop Attributes
-                                    for (var i = 0; i < metadata.attributes.length; i++){
-                                        //console.log(metadata.attributes[i]);
+                                    //console.log(trait)
 
-                                        // Trait_Type : Value
-                                        var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
-                                        let trait_type = attribute.trait_type
-                                        let value = attribute.value
-                                        //let trait_rarity = ((attributesTotal[value]/nextIdC)*100).toFixed(2);
+                                    var { trait_type, value, trait_count } = trait
 
-                                        var new_trait = document.createElement('div')
-                                        new_trait.className = 'frog_trait'
-                                        new_trait.innerHTML = 
-                                            
-                                            '<i>'+trait_type+'</i><br>' +
-                                            '<b>'+value.slice(0, 15)+'</b><br>' +
-                                            '<i>0% have this trait<i>';
+                                    var trait_rarity = ((trait_count / 4040) *100).toFixed(2)
 
-                                        document.getElementById('lower_display').appendChild(new_trait)
+                                    var new_trait = document.createElement('div')
+                                    new_trait.className = 'frog_trait'
+                                    new_trait.innerHTML = 
+                                        
+                                        '<i>'+trait_type+'</i><br>' +
+                                        '<b>'+value.slice(0, 15)+'</b><br>' +
+                                        '<i>'+trait_rarity+'% have this trait<i>';
 
-                                    }
-                                })      */
+                                    document.getElementById('lower_display').appendChild(new_trait)
+
+                                })      
                             
                             }
                             owned_frog.innerHTML = 
