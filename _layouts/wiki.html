@@ -538,7 +538,7 @@
                 })
                 document.querySelector("#add-frog").addEventListener("click", async (e) => {
 
-                    let this_frogTray = 'frog-tray-1'
+                    this_frogTray = 'frog-tray-1'
 
                     if (frog_count <= 1) {
                         document.getElementById('display-frog').style.width = '50%';
@@ -549,11 +549,11 @@
                     console.log(frog_count)
 
                     if (frog_count <= 2) {
-                        let this_frogTray = 'frog-tray-1'
+                        this_frogTray = 'frog-tray-1'
                     } else if (frog_count <= 5) {
-                        let this_frogTray = 'frog-tray-2'
+                        this_frogTray = 'frog-tray-2'
                     } else if (frog_count <= 8) {
-                        let this_frogTray = 'frog-tray-3'
+                        this_frogTray = 'frog-tray-3'
                     } else {
                         return
                     }
