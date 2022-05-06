@@ -203,6 +203,12 @@
         width: 90%;
         padding: 5%;
     }
+    .frog_trait {
+        border: 1px solid lightblue;
+        border-radius: 5px;
+        width: 96px;
+        height: 64px;
+    }
 </style>
 <html>
     <head>
@@ -266,8 +272,11 @@
                                     //let trait_rarity = ((attributesTotal[value]/nextIdC)*100).toFixed(2);
 
                                     var new_trait = document.createElement('div')
-                                    new_trait.style.width = 'auto'
-                                    new_trait.innerHTML = '<b class="frog_name">' + value + '</b>' + '<i class="frog_price">' + trait_type + '</i>'
+                                    new_trait.className = 'frog_trait'
+                                    new_trait.innerHTML = 
+                                        
+                                        '<i>'+value+'</i>' +
+                                        '<b>'+trait_type+'</b>';
 
                                     document.getElementById('display-table').appendChild(new_trait)
 
