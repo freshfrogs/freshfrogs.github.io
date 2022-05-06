@@ -524,7 +524,7 @@
                 document.querySelector("#add-frog").addEventListener("click", async (e) => {
 
                     if (frog_count <= 1) {
-                        document.getElementById('frog-tray-1').innerHTML = '';
+                        //First Frog
                     } 
                     
                     frog_count = frog_count + 1
@@ -534,7 +534,7 @@
                     new_frog.className = 'tray-frog'
                     new_frog.src = '../frog/'+frog_count+'.png'
 
-                    document.getElementById('frog-tray-1').appendChild(new_frog);
+                    document.getElementById('minting-console').appendChild(new_frog);
 
                     all_frogs = document.getElementsByClassName('tray-frog');
 
