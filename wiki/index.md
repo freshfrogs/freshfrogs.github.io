@@ -85,6 +85,6 @@ layout: wiki
 
 <div id="owned-frogs" class="owned_frogs">
 
-    <button class="button_1" style="margin-top: auto; margin-bottom: auto; margin-left: auto; margin-right: auto; cursor: pointer;" onclick="connect()">Connect Wallet</button>
+    <button id="button_ownedfrogs" class="button_2" style="margin-top: auto; margin-bottom: auto; margin-left: auto; margin-right: auto; cursor: pointer;" onclick="connect()">Connect Wallet</button>
 
 </div>
