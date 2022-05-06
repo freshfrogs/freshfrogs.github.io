@@ -18,7 +18,7 @@ layout: wiki
 
 <div class="minting-display">
     <div>
-        <div class="button_bar"><button class="button_1">Mint</button><button class="button_2">Morph</button><button class="button_3">Index</button></div>
+        <div class="button_bar"><button class="button_1">Mint</button><button class="button_2">Morph</button></div>
         <div id="mintingTray" class="mintingTray">
             <div class="frog-tray" id="frog-tray-1"><img id="display-frog" class="frog_img" src="../frog/3410.png"></div>
             <div id="display-table">
