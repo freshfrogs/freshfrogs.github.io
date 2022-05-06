@@ -256,7 +256,9 @@
                                 
                                 var this_frog = event.currentTarget.id.replace('Frog #', '');
                                 
-                                document.getElementById('display-frog').setAttribute('src', '../frog/'+this_frog+'.png')
+                                document.getElementById('display-frog').setAttribute('src', '../frog/'+this_frog+'.png') // display-frogLink
+
+                                document.getElementById('display-frogLink').setAttribute('href', permalink) // display-frogLink
 
                                 document.getElementById('label_name').innerHTML = 'Fresh Frogs NFT'
 
