@@ -261,11 +261,11 @@
                                     let value = attribute.value
                                     //let trait_rarity = ((attributesTotal[value]/nextIdC)*100).toFixed(2);
 
-                                    new_div = document.createElement('b')
-                                    new_div.className = 'frog_name'
-                                    new_div.innerHTML = trait_type + ' ' + value
+                                    var new_trait = document.createElement('b')
+                                    new_trait.className = 'frog_name'
+                                    new_trait.innerHTML = trait_type + ' ' + value
 
-                                    document.getElementById('display-table').appendChild(new_div)
+                                    document.getElementById('display-table').appendChild(new_trait)
 
                                 }
                                 })
