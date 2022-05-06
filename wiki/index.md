@@ -45,7 +45,7 @@ layout: wiki
     
     - When using a mobile device: Use the built in browser within your wallet app.
 
-2. Next, **Select** up to NINE Frogs to mint per transaction!
+2. Next, **Select** up to NINE Frogs to mint!
 
     - You may mint up to NINE Frogs per transaction with a max of 40 Frogs per wallet!
 
