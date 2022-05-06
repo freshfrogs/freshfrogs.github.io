@@ -525,7 +525,7 @@
                 document.querySelector("#add-frog").addEventListener("click", async (e) => {
 
                     if (frog_count <= 1) {
-                        //First Frog
+                        document.getElementById('minting-console').innerHTML = '';
                     } 
                     
                     frog_count = frog_count + 1
