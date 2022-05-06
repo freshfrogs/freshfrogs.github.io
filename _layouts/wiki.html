@@ -536,7 +536,7 @@
                 document.querySelector("#add-frog").addEventListener("click", async (e) => {
 
                     if (frog_count <= 1) {
-                        document.getElementById('display-frog').style.width = 'auto';
+                        document.getElementById('display-frog').style.width = '50%';
                     } 
                     
                     frog_count = frog_count + 1
@@ -549,6 +549,12 @@
                     new_frog.src = '../frog/'+frog_count+'.png'
 
                     document.getElementById('frog-tray-1').appendChild(new_frog);
+
+                    var all_trayfrogs = document.getElementsByClassName('tray-frog');
+
+                    for (var i = 0; i < all_trayfrogs.length; i++) {
+                        all_trayfrogs[i].style.width = 100 / frog_count + '%';
+                    }
                 })
             })
         </script>
