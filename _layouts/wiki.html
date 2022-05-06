@@ -542,13 +542,7 @@
 
                     if (frog_count <= 1) {
                         document.getElementById('display-frog').style.width = '50%';
-                    } 
-                    
-                    frog_count = frog_count + 1
-
-                    console.log(frog_count)
-
-                    if (frog_count <= 2) {
+                    } else if (frog_count <= 2) {
                         this_frogTray = 'frog-tray-1'
                     } else if (frog_count <= 5) {
                         this_frogTray = 'frog-tray-2'
@@ -557,6 +551,10 @@
                     } else {
                         return
                     }
+
+                    frog_count = frog_count + 1
+
+                    console.log(frog_count)
 
                     console.log(this_frogTray)
 
