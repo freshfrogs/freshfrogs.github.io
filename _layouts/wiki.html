@@ -280,6 +280,7 @@
 
                 owned_frogs_div.style.background = 'white'
                 owned_frogs_div.style.border = 'none'
+                owned_frogs_div.style.color = 'inherit'
 
                 fetch('https://api.opensea.io/api/v1/assets?owner='+window.userAddress+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=11&include_orders=false', options)
                 .then((res) => res.json())
