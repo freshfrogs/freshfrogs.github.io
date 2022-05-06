@@ -250,6 +250,8 @@
                                 
                                 display_table.removeChild(display_table.lastElementChild);
 
+                                display_table.removeChild(display_table.lastElementChild); // x2
+
                                 fetch(token_metadata)
                                 .then((metadata) => metadata.json())
                                 .then((metadata) => {
