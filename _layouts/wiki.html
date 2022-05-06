@@ -538,13 +538,17 @@
                 })
                 document.querySelector("#add-frog").addEventListener("click", async (e) => {
 
-                    console.log(frog_count)
-
                     let this_frogTray = 'frog-tray-1'
 
                     if (frog_count <= 1) {
                         document.getElementById('display-frog').style.width = '50%';
-                    } else if (frog_count <= 2) {
+                    } 
+                    
+                    frog_count = frog_count + 1
+
+                    console.log(frog_count)
+
+                    if (frog_count <= 2) {
                         let this_frogTray = 'frog-tray-1'
                     } else if (frog_count <= 5) {
                         let this_frogTray = 'frog-tray-2'
@@ -553,8 +557,8 @@
                     } else {
                         return
                     }
-                    
-                    frog_count = frog_count + 1
+
+                    console.log(this_frogTray)
 
                     document.getElementById('quant-frog').innerHTML = frog_count
 
