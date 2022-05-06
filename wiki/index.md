@@ -25,9 +25,11 @@ layout: wiki
                 <b class="frog_name">0.01 ΞETH</b><b class="frog_price"><b id="remove-frog">-</b> <b id="quant-frog">1</b> <a id="add-frog"><b>+</b></a></b>
             </div>
         </div>
-        <div id="lower_display"><button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button></div>
-        <div id="minting-console" class="minting-console">
-            > connect wallet...
+        <div id="lower_display">
+            <button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button>
+            <div id="minting-console" class="minting-console">
+                > connect wallet...
+            </div>
         </div>
     </div>
 </div>
