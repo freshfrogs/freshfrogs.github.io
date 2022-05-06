@@ -231,7 +231,7 @@
         cursor: pointer;
     }
     .tray-frog {
-        width: 64px;
+        width: auto;
         border-radius: 5px;
         display: inline-block;
         margin: 1%;
@@ -536,7 +536,8 @@
                 document.querySelector("#add-frog").addEventListener("click", async (e) => {
 
                     if (frog_count <= 1) {
-                        document.getElementById('minting-console').innerHTML = '';
+                        document.getElementById('frog-tray-1').innerHTML = '';
+                        document.getElementById('display-frog').style.width = 'auto';
                     } 
                     
                     frog_count = frog_count + 1
@@ -548,7 +549,7 @@
                     new_frog.className = 'tray-frog'
                     new_frog.src = '../frog/'+frog_count+'.png'
 
-                    document.getElementById('minting-console').appendChild(new_frog);
+                    document.getElementById('frog-tray-1').appendChild(new_frog);
                 })
             })
         </script>
