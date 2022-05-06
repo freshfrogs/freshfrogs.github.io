@@ -65,7 +65,7 @@ layout: wiki
 
     - Our smart contract has been verified on **[etherscan.io](https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b)** ✔️
 
-    > *0xBE4Bef8735107db540De269FF82c7dE9ef68C51b*
+    *0xBE4Bef8735107db540De269FF82c7dE9ef68C51b*
 
 
 ### How do I View My Frogs?
