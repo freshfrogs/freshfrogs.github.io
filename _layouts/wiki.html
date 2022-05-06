@@ -265,9 +265,9 @@
                                     let value = attribute.value
                                     //let trait_rarity = ((attributesTotal[value]/nextIdC)*100).toFixed(2);
 
-                                    var new_trait = document.createElement('b')
-                                    new_trait.className = 'frog_name'
-                                    new_trait.innerHTML = trait_type + ' ' + value
+                                    var new_trait = document.createElement('div')
+                                    new_trait.style.width = 'auto'
+                                    new_trait.innerHTML = '<b class="frog_name">' + value + '</b>' + '<i class="label_price">' + trait_type + '</i>'
 
                                     document.getElementById('display-table').appendChild(new_trait)
 
