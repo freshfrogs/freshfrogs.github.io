@@ -81,6 +81,8 @@ layout: wiki
 
     - Some Frogs with the 'natural' trait contain a unique color pattern!
 
+    - Connect an Ethereum wallet to display your Frogs below!
+
 
 <div id="owned-frogs" class="owned_frogs">
 
