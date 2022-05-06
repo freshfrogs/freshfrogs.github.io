@@ -2,7 +2,7 @@
 layout: wiki
 ---
 
-<title>freshfrogs.io/wiki 🍀</title>
+<title>freshfrogs.io/wiki 🍀</title><link rel="icon" href="./assets/logo.png">
 
 ### What is Fresh Frogs NFT?
 
