@@ -248,9 +248,9 @@
 
                                 var display_table = document.getElementById('display-table')
                                 
-                                display_table.removeChild(display_table.lastElementChild);
+                                display_table.removeChild(display_table.lastChild);
 
-                                display_table.removeChild(display_table.lastElementChild); // x2
+                                display_table.removeChild(display_table.lastChild); // x2
 
                                 fetch(token_metadata)
                                 .then((metadata) => metadata.json())
