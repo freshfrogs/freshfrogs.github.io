@@ -240,7 +240,7 @@
                 .then((res) => res.json())
                 .then((res) => {
                     var { assets } = res
-                    console.log('assets : '+assets);
+                    console.log(assets);
                     assets.forEach((frog) => { // For Each FROG
 
                         try {
@@ -270,7 +270,7 @@
                                 fetch(token_metadata)
                                 .then((metadata) => metadata.json())
                                 .then((metadata) => {
-                                    console.log('metadata : '+metadata)
+                                    console.log(metadata)
                                     // Loop Attributes
                                     for (var i = 0; i < metadata.attributes.length; i++){
                                         //console.log(metadata.attributes[i]);
@@ -371,7 +371,7 @@
                 .then(response => response.json())
                 .then(response => {
 
-                    console.log('collection : '+response)
+                    console.log(response)
 
                     var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = response
 
