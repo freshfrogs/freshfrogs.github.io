@@ -255,11 +255,7 @@
 
                                 document.getElementById('label_name').innerHTML = name
 
-                                var display_table = document.getElementById('display-table')
-                                
-                                display_table.removeChild(display_table.lastElementChild);
-
-                                display_table.removeChild(display_table.lastElementChild); // x2
+                                document.getElementById('lower_display').innerHTML = '';
 
                                 fetch(token_metadata)
                                 .then((metadata) => metadata.json())
@@ -281,7 +277,7 @@
                                         '<i>'+trait_type+'</i><br>' +
                                         '<b>'+value+'</b>';
 
-                                    document.getElementById('display-table').appendChild(new_trait)
+                                    document.getElementById('lower_display').appendChild(new_trait)
 
                                 }
                                 })
