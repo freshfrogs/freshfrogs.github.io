@@ -206,8 +206,9 @@
     .frog_trait {
         border: 1px solid lightblue;
         border-radius: 5px;
-        width: 96px;
-        height: 64px;
+        width: auto;
+        height: auto;
+        padding: 8px;
     }
 </style>
 <html>
@@ -275,7 +276,7 @@
                                     new_trait.className = 'frog_trait'
                                     new_trait.innerHTML = 
                                         
-                                        '<i>'+value+'</i>' +
+                                        '<i>'+value+'</i><br>' +
                                         '<b>'+trait_type+'</b>';
 
                                     document.getElementById('display-table').appendChild(new_trait)
