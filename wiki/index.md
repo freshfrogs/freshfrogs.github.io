@@ -31,6 +31,9 @@ layout: wiki
                 > connect wallet...
             </div>
         </div>
+        <div id="owned-frogs" class="owned_frogs">
+            <h4 id="owned-frogs-header" style="margin-top: auto; margin-bottom: auto; margin-left: auto; margin-right: auto; cursor: pointer;"  onclick="connect()">Connect Wallet</h4>
+        </div>
     </div>
 </div>
 
@@ -72,15 +75,6 @@ layout: wiki
     - Each Frog is unique with thousands of possible combinations!
 
     - Some Frogs with the 'natural' trait contain a unique color pattern!
-
-
-#### Connect an Ethereum wallet to view Frog Tokens!
-
-<div id="owned-frogs" class="owned_frogs">
-
-    <h4 id="owned-frogs-header" style="margin-top: auto; margin-bottom: auto; margin-left: auto; margin-right: auto; cursor: pointer;"  onclick="connect()">Connect Wallet</h4>
-
-</div>
 
 
 ### What is "Morphing" and How do I Morph?
