@@ -85,6 +85,6 @@ layout: wiki
 
 <div id="owned-frogs" class="owned_frogs">
 
-    <button id="owned-frogs-header" class="button_1" onclick="connect()">Connect Wallet</h4>
+    <button id="owned-frogs-header" class="button_1" onclick="connect()">Connect Wallet</button>
 
 </div>
