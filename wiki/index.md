@@ -61,6 +61,12 @@ layout: wiki
     - A "Gas Fee" is required when minting any NFT on to the Ethereum blockchain. **[Learn more](https://www.investopedia.com/terms/g/gas-ethereum.asp)**
 
 
+<div id="owned-frogs" class="owned_frogs">
+
+    <h4 id="owned-frogs-header" style="margin-top: auto; margin-bottom: auto; margin-left: auto; margin-right: auto; cursor: pointer;"  onclick="connect()">Connect Wallet</h4>
+
+</div>
+
 ### How do I View My Frogs?
 
 ---
@@ -72,15 +78,6 @@ layout: wiki
     - Each Frog is unique with thousands of possible combinations!
 
     - Some Frogs with the 'natural' trait contain a unique color pattern!
-
-
-- #### Connect an Ethereum wallet to view Frog Tokens!
-
-<div id="owned-frogs" class="owned_frogs">
-
-    <h4 id="owned-frogs-header" style="margin-top: auto; margin-bottom: auto; margin-left: auto; margin-right: auto; cursor: pointer;"  onclick="connect()">Connect Wallet</h4>
-
-</div>
 
 
 ### What is "Morphing" and How do I Morph?
