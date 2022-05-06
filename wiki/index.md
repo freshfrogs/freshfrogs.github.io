@@ -93,4 +93,6 @@ layout: wiki
 
 ### What is "Morphing" and How do I Morph?
 
+---
+
 - Preview morph combinations at [freshfrogs.io/the-pad](https://freshfrogs.io/the-pad)
