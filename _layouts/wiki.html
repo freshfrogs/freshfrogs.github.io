@@ -390,7 +390,9 @@
                     document.getElementById('market_cap').innerHTML = market_cap.toFixed(2)+' Ξ'
                     document.getElementById('floor_price').innerHTML = floor_price+' Ξ'
                     document.getElementById('total_volume').innerHTML = total_volume.toFixed(2)+' Ξ'
-                    document.getElementById('description').appendChild('<br>'+description)
+
+                    var orig_desc = document.getElementById('description').innerHTML;
+                    document.getElementById('description').innerHTML = orig_desc + '<br>' + description
                     document.getElementById('created_date').innerHTML = created_date + ' - present <b>Recent Sales</b> limited 7'
                     //document.getElementById('payout_address').innerHTML = payout_address
 
