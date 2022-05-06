@@ -418,10 +418,11 @@
                             recent_sale = document.createElement('div');
                             recent_sale.className = 'recent_sale';
                             recent_sale.style.width = 128+64+'px';
+                            recent_sale.href = permalink;
                             recent_sale.innerHTML = 
                                 '<img class="frog_img" src='+image_url+'>' +
                                 '<i class="label_name">Fresh Frogs NFT</i><i class="label_price">Price</i>' +
-                                '<b class="frog_name">'+'<a href="'+permalink+'" target="_blank">'+name+'</a>'+'</b><b class="frog_price">Ξ '+sale_price+'</b>';
+                                '<b class="frog_name">'+name+'</b><b class="frog_price">Ξ '+sale_price+'</b>';
                             document.getElementById('recent_sales').appendChild(recent_sale);
                       
                         } catch (e) { console.log(e.message) }
