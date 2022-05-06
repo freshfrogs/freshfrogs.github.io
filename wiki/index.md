@@ -69,7 +69,7 @@ layout: wiki
 
 <div id="owned-frogs" class="owned_frogs">
 
-    <h4 id="owned-frogs-header" style="margin-top: auto; margin-bottom: auto; margin-left: auto; margin-right: auto;">Connect Wallet</h4>
+    <h4 id="owned-frogs-header" style="margin-top: auto; margin-bottom: auto; margin-left: auto; margin-right: auto;"  onclick="connect()">Connect Wallet</h4>
 
 </div>
 
