@@ -256,15 +256,13 @@
                                 
                                 var this_frog = event.currentTarget.id.replace('Frog #', '')
 
-                                var display_frog = document.getElementById('display-frog')
-                                
-                                display_frog.setAttribute('src', '../frog/'+this_frog+'.png')
+                                document.getElementById('display-frog').setAttribute('src', '../frog/'+this_frog+'.png')
 
-                                display_frog.setAttribute('href', permalink)
+                                document.getElementById('mintingTray').setAttribute('href', permalink)
 
-                                display_frog.setAttribute('target', '_blank')
+                                document.getElementById('mintingTray').setAttribute('target', '_blank')
 
-                                display_frog.style.cursor = 'pointer'
+                                document.getElementById('mintingTray').style.cursor = 'pointer'
 
                                 document.getElementById('label_name').innerHTML = 'Fresh Frogs NFT'
 
