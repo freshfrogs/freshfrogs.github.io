@@ -540,7 +540,15 @@
 
                     if (frog_count <= 1) {
                         document.getElementById('display-frog').style.width = '50%';
-                    } 
+                    } else if (frog_count <= 2) {
+                        let this_frogTray = 'frog-tray-1'
+                    } else if (frog_count <= 5) {
+                        let this_frogTray = 'frog-tray-2'
+                    } else if (frog_count <= 8) {
+                        let this_frogTray = 'frog-tray-3'
+                    } else {
+                        return
+                    }
                     
                     frog_count = frog_count + 1
 
@@ -551,7 +559,7 @@
                     new_frog.className = 'tray-frog'
                     new_frog.src = '../frog/'+frog_count+'.png'
 
-                    document.getElementById('frog-tray-1').appendChild(new_frog);
+                    document.getElementById(this_frogTray).appendChild(new_frog);
 
                     var all_trayfrogs = document.getElementsByClassName('tray-frog');
 
