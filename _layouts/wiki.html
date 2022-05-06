@@ -278,8 +278,8 @@
                                     new_trait.className = 'frog_trait'
                                     new_trait.innerHTML = 
                                         
-                                        '<i>'+trait_type+'</i><br>' +
-                                        '<b>'+value.slice(0, 13)+'</b><br>' +
+                                        //'<i>'+trait_type+'</i><br>' +
+                                        '<b>'+value.slice(0, 13) + '..'+'</b><br>' +
                                         '<i>0% have this trait<i>';
 
                                     document.getElementById('lower_display').appendChild(new_trait)
