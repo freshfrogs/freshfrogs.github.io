@@ -280,7 +280,7 @@
                                     new_trait.innerHTML = 
                                         
                                         '<i>'+trait_type+'</i><br>' +
-                                        '<b>'+value+'</b>';
+                                        '<b>'+value.slice(0, 10) + '...'+'</b>';
 
                                     document.getElementById('lower_display').appendChild(new_trait)
 
