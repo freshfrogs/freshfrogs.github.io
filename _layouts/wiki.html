@@ -270,27 +270,28 @@
                                 fetch(token_metadata)
                                 .then((metadata) => metadata.json())
                                 .then((metadata) => {
-                                // Loop Attributes
-                                for (var i = 0; i < metadata.attributes.length; i++){
-                                    //console.log(metadata.attributes[i]);
+                                    console.log(metadata)
+                                    // Loop Attributes
+                                    for (var i = 0; i < metadata.attributes.length; i++){
+                                        //console.log(metadata.attributes[i]);
 
-                                    // Trait_Type : Value
-                                    var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
-                                    let trait_type = attribute.trait_type
-                                    let value = attribute.value
-                                    //let trait_rarity = ((attributesTotal[value]/nextIdC)*100).toFixed(2);
+                                        // Trait_Type : Value
+                                        var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                                        let trait_type = attribute.trait_type
+                                        let value = attribute.value
+                                        //let trait_rarity = ((attributesTotal[value]/nextIdC)*100).toFixed(2);
 
-                                    var new_trait = document.createElement('div')
-                                    new_trait.className = 'frog_trait'
-                                    new_trait.innerHTML = 
-                                        
-                                        '<i>'+trait_type+'</i><br>' +
-                                        '<b>'+value.slice(0, 15)+'</b><br>' +
-                                        '<i>0% have this trait<i>';
+                                        var new_trait = document.createElement('div')
+                                        new_trait.className = 'frog_trait'
+                                        new_trait.innerHTML = 
+                                            
+                                            '<i>'+trait_type+'</i><br>' +
+                                            '<b>'+value.slice(0, 15)+'</b><br>' +
+                                            '<i>0% have this trait<i>';
 
-                                    document.getElementById('lower_display').appendChild(new_trait)
+                                        document.getElementById('lower_display').appendChild(new_trait)
 
-                                }
+                                    }
                                 })
                             
                             }
@@ -370,25 +371,19 @@
                 .then(response => response.json())
                 .then(response => {
 
+                    console.log(response)
+
                     var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = response
 
                     document.getElementById('banner_image').setAttribute('src', banner_image_url)
                     document.getElementById('name').innerHTML = name
-                    console.log('name '+name)
                     document.getElementById('count').innerHTML = count
-                    console.log('items '+count)
                     document.getElementById('num_owners').innerHTML = num_owners
-                    console.log('owners '+num_owners)
                     document.getElementById('market_cap').innerHTML = market_cap.toFixed(2)+' Ξ'
-                    console.log('market cap '+market_cap)
                     document.getElementById('floor_price').innerHTML = floor_price+' Ξ'
-                    console.log('floor price '+floor_price)
                     document.getElementById('total_volume').innerHTML = total_volume.toFixed(2)+' Ξ'
-                    console.log('total volume '+total_volume)
                     document.getElementById('description').innerHTML = description
-                    console.log('desc '+description)
                     document.getElementById('created_date').innerHTML = created_date + ' - present <b>Recent Sales</b> limit: 7'
-                    console.log('created '+created_date)
                     //document.getElementById('payout_address').innerHTML = payout_address
 
                     var initial_sales = (parseInt(count) - 3240) * 0.01
@@ -468,9 +463,6 @@
                     for (var i = 0; i < all_frogs.length; i++) {
                         all_frogs[i].style.width = 100 / frog_count + '%';
                     }
-
-                    console.log(frog_count)
-
                 })
             })
         </script>
