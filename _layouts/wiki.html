@@ -267,7 +267,11 @@
 
                                 document.getElementById('lower_display').innerHTML = '<h4 style="text-align: left;">Properties</h4><hr>';
 
-                                fetch(token_metadata)
+                                traits.forEach((trait) => {
+                                    console.log(trait)
+                                })
+
+                    /*          fetch(token_metadata)
                                 .then((metadata) => metadata.json())
                                 .then((metadata) => {
                                     console.log(metadata)
@@ -292,7 +296,7 @@
                                         document.getElementById('lower_display').appendChild(new_trait)
 
                                     }
-                                })
+                                })      */
                             
                             }
                             owned_frog.innerHTML = 
