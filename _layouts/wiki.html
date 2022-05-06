@@ -375,7 +375,10 @@
                                 '<b class="frog_name">'+name+'</b>';
                             document.getElementById('owned-frogs').appendChild(owned_frog);
                         
-                        } catch (e) { console.log(e.message) }
+                        } catch (e) { 
+                            console.log(e.message);
+                            document.getElementById('button_ownedfrogs').innerHTML = 'It seems you do not own any Frogs!'
+                        }
                     })
                 })
                 .catch(e => {
