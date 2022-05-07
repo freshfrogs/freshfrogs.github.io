@@ -607,7 +607,7 @@
                 properties.innerHTML = 'Properties'//'Frog #'+ base_frog + ' + ' + sub_frog + '<hr>'
                 
                 var select = document.getElementById('lower_display')
-                select.removeChild(select.lastChild)
+                select.innerHTML = '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button>';
                 select.appendChild(properties)
 
 
