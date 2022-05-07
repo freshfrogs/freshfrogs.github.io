@@ -437,6 +437,213 @@
                 document.getElementById('mint-button').innerHTML = '<b><i>Generate Morph !</i></b>'
             }
 
+            // Select subFrog
+            async function selectSubFrog(selectedSub){
+                
+                let subFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+selectedSub+".json")).json();
+                for (var i = 0; i < subFrogmetadata.attributes.length; i++){
+                    var data = subFrogmetadata.attributes[i]
+                    //loadAttribute(data.trait_type, data.value, 'subDisplay')
+                    console.log(data.trait_type + ' ' + data.value + ' subDisplay')
+                }
+            }
+            // Select baseFrog
+            async function selectBaseFrog(selectedBase){
+
+                let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+selectedBase+".json")).json();
+                for (var i = 0; i < baseFrogmetadata.attributes.length; i++){
+                    var data = baseFrogmetadata.attributes[i]
+                    //loadAttribute(data.trait_type, data.value, 'baseDisplay')
+                    console.log(data.trait_type + ' ' + data.value + ' baseDisplay')
+                }
+            }
+
+            // Function combine tokens
+            async function combineTokens(baseFrog, otherFrog) {
+                var useGIF = undefined;
+                var baseFrog_Frog, baseFrog_SpecialFrog, baseFrog_Trait, baseFrog_Accessory, baseFrog_Eyes, baseFrog_Hat, baseFrog_Mouth = undefined;
+                var otherFrog_Frog, otherFrog_SpecialFrog, otherFrog_Trait, otherFrog_Accessory, otherFrog_Eyes, otherFrog_Hat, otherFrog_Mouth = undefined;
+
+                //document.getElementById("subFrogDiv").style.opacity = '0.20';
+                //document.getElementById("baseFrogDiv").style.opacity = '0.20';
+
+                let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseFrog+".json")).json();
+
+                for (var baseFrogi = 0; baseFrogi < baseFrogmetadata.attributes.length; baseFrogi++) {
+
+                    var data = baseFrogmetadata.attributes[baseFrogi]
+
+                    if (data.trait_type == "Frog") {
+                        var baseFrog_Frog = data.value;
+                    } else if (data.trait_type == "SpecialFrog") {
+                        var baseFrog_SpecialFrog = data.value;
+                    } else if (data.trait_type == "Trait") {
+                        var baseFrog_Trait = data.value;
+                    } else if (data.trait_type == "Accessory") {
+                        var baseFrog_Accessory = data.value;
+                    } else if (data.trait_type == "Eyes") {
+                        var baseFrog_Eyes = data.value;
+                    } else if (data.trait_type == "Hat") {
+                        var baseFrog_Hat = data.value;
+                    } else if (data.trait_type == "Mouth") {
+                        if (data.value === "smoking" || data.value === "smokingPipe" || data.value === "smokingCigar") {
+                            var baseFrog_Mouth = data.value+"2";
+                        } else {
+                            var baseFrog_Mouth = data.value;
+                        }
+                    }
+                }
+
+                let otherFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+otherFrog+".json")).json();
+
+                for (var otherFrogi = 0; otherFrogi < otherFrogmetadata.attributes.length; otherFrogi++){
+                    var data2 = otherFrogmetadata.attributes[otherFrogi]
+
+                    if (data2.trait_type == "Frog") {
+                        var otherFrog_Frog = data2.value;
+                    } else if (data2.trait_type == "SpecialFrog") {
+                        var otherFrog_SpecialFrog = data2.value;
+                        if (data2.value == "thirdEye") {
+                            if (typeof baseFrog_SpecialFrog !== "undefined") {
+                                var otherFrog_Trait = "thirdEye/baseSpecial"
+                            } else {
+                                var otherFrog_Trait = "thirdEye/base"
+                            }
+                        } else if (typeof baseFrog_SpecialFrog !== "undefined") {
+                            if (baseFrog_SpecialFrog == "thirdEye" && otherFrog_SpecialFrog == "inversedEyes") {
+                                var otherFrog_Trait = baseFrog_SpecialFrog+"/baseInversed"
+                            } else {
+                                var otherFrog_Trait = "special/sand";
+                            }
+                        } else {
+                            var otherFrog_Trait = "sand";
+                        }
+                        
+                    } else if (data2.trait_type == "Trait") { // <--TRAITS
+                        if (typeof baseFrog_SpecialFrog !== "undefined") { // Adapt trait for special Frogs
+                            if (baseFrog_SpecialFrog === "inversedEyes") {
+                                var otherFrog_Trait = "special/"+data2.value
+                            } else if (baseFrog_SpecialFrog === "closedEyes") {
+                                var otherFrog_Trait = "special/"+data2.value
+                            } else { 
+                                var otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
+                            }
+                            if (data2.value == "natural") {
+                                if (baseFrog_SpecialFrog === "inversedEyes") {
+                                    var otherFrog_Trait = "natural/special/"+otherFrog_Frog
+                                } else if (baseFrog_SpecialFrog === "closedEyes") {
+                                    var otherFrog_Trait = "natural/special/"+otherFrog_Frog
+                                } else { //alert ("baseFrog_SpecialFrog")
+                                    var otherFrog_Trait = "natural/"+baseFrog_SpecialFrog+"/"+otherFrog_Frog
+                                }
+                            }
+                        } else if (typeof baseFrog_Frog !== "undefined") { // Regular Frog; continue
+                            if (data2.value == "natural") {
+                                var otherFrog_Trait = "natural/"+otherFrog_Frog
+                            } else {
+                                var otherFrog_Trait = data2.value;
+                            }
+                        }
+                    } else if (data2.trait_type == "Accessory") {
+                        var otherFrog_Accessory = data2.value;
+                    } else if (data2.trait_type == "Eyes") { // shadesAnimation
+                        var otherFrog_Eyes = data2.value;
+                    } else if (data2.trait_type == "Hat") {
+                        var otherFrog_Hat = data2.value;
+                    } else if (data2.trait_type == "Mouth") {
+                        if (data2.value === "smoking" || data2.value === "smokingPipe" || data2.value === "smokingCigar") {
+                            var otherFrog_Mouth = data2.value+"2";
+                        } else {
+                            var otherFrog_Mouth = data2.value;
+                        }
+                    }
+                }
+
+                thisPlace = 'frogContainer';
+                // Frog
+                if (typeof baseFrog_Frog !== 'undefined') {
+                    loadAttribute("Frog", baseFrog_Frog, thisPlace)
+                    // Trait
+                    if (typeof otherFrog_Trait !== 'undefined') {
+                        loadAttribute("Trait", otherFrog_Trait, thisPlace)
+                    } else if (typeof baseFrog_Trait !== 'undefined') {
+                        loadAttribute("Trait", baseFrog_Trait, thisPlace)
+                    }
+                    // Accessory
+                    if (typeof baseFrog_Accessory !== 'undefined') {
+                        loadAttribute("Accessory", baseFrog_Accessory, thisPlace)
+                    } else if (typeof otherFrog_Accessory !== 'undefined') {
+                        loadAttribute("Accessory", otherFrog_Accessory, thisPlace)
+                    }
+                    // Eyes
+                    if (typeof baseFrog_Eyes !== 'undefined') {
+                            loadAttribute("Eyes", baseFrog_Eyes, thisPlace)
+                        if (baseFrog_Eyes === "shades" || baseFrog_Eyes === "shadesPurple" || baseFrog_Eyes === "shadesThreeD" || baseFrog_Eyes === "shadesWhite") {
+                            loadAttribute("Eyes", "shadesAnimation", thisPlace)
+                        }
+                    } else if (typeof otherFrog_Eyes !== 'undefined') {
+                            loadAttribute("Eyes", otherFrog_Eyes, thisPlace)
+                        if (otherFrog_Eyes === "shades" || otherFrog_Eyes === "shadesPurple" || otherFrog_Eyes === "shadesThreeD" || otherFrog_Eyes === "shadesWhite") {
+                            loadAttribute("Eyes", "shadesAnimation", thisPlace)
+                        }
+                    }
+                    // Hat
+                    if (typeof baseFrog_Hat !== 'undefined') {
+                        loadAttribute("Hat", baseFrog_Hat, thisPlace)
+                    } else if (typeof otherFrog_Hat !== 'undefined') {
+                        loadAttribute("Hat", otherFrog_Hat, thisPlace)
+                    }
+                    // Mouth
+                    if (typeof baseFrog_Mouth !== 'undefined') {
+                        loadAttribute("Mouth", baseFrog_Mouth, thisPlace)
+                    } else if (typeof otherFrog_Mouth !== 'undefined') {
+                        loadAttribute("Mouth", otherFrog_Mouth, thisPlace)
+                    }
+                // Special Frog
+                } else if (typeof baseFrog_SpecialFrog !== 'undefined') {
+                    loadAttribute("SpecialFrog", baseFrog_SpecialFrog, thisPlace)
+                    if (typeof otherFrog_Trait !== 'undefined') {
+                        loadAttribute("Trait", otherFrog_Trait, thisPlace)
+                    } else if (typeof baseFrog_Trait !== 'undefined') {
+                        loadAttribute("Trait", baseFrog_Trait, thisPlace)
+                    }
+                    // Accessory
+                    if (typeof baseFrog_Accessory !== 'undefined') {
+                        loadAttribute("Accessory", baseFrog_Accessory, thisPlace)
+                    } else if (typeof otherFrog_Accessory !== 'undefined') {
+                        loadAttribute("Accessory", otherFrog_Accessory, thisPlace)
+                    }
+                    // Eyes
+                    if (typeof baseFrog_Eyes !== 'undefined') {
+                            loadAttribute("Eyes", baseFrog_Eyes, thisPlace)
+                        if (baseFrog_Eyes === "shades" || baseFrog_Eyes === "shadesPurple" || baseFrog_Eyes === "shadesThreeD" || baseFrog_Eyes === "shadesWhite") {
+                            loadAttribute("Eyes", "shadesAnimation", thisPlace)
+                        }
+                    } else if (typeof otherFrog_Eyes !== 'undefined') {
+                            loadAttribute("Eyes", otherFrog_Eyes, thisPlace)
+                        if (otherFrog_Eyes === "shades" || otherFrog_Eyes === "shadesPurple" || otherFrog_Eyes === "shadesThreeD" || otherFrog_Eyes === "shadesWhite") {
+                            loadAttribute("Eyes", "shadesAnimation", thisPlace)
+                        }
+                    }
+                    // Hat
+                    if (typeof baseFrog_Hat !== 'undefined') {
+                        loadAttribute("Hat", baseFrog_Hat, thisPlace)
+                    } else if (typeof otherFrog_Hat !== 'undefined') {
+                        loadAttribute("Hat", otherFrog_Hat, thisPlace)
+                    }
+                    // Mouth
+                    if (typeof baseFrog_Mouth !== 'undefined') {
+                        loadAttribute("Mouth", baseFrog_Mouth, thisPlace)
+                    } else if (typeof otherFrog_Mouth !== 'undefined') {
+                        loadAttribute("Mouth", otherFrog_Mouth, thisPlace)
+                    }
+                }
+            }
+
+            function loadAttribute(one, two, three) {
+                console.log(one + ' ' + two + ' ' + three)
+            }
+
             async function load_ownedFrogs() {
 
                 const options = {
@@ -478,6 +685,7 @@
                                 if (morph) {
                                     if (!base_frog && sub_frog !== this_frog) { // SELECT BASE
                                         base_frog = this_frog
+                                        selectBaseFrog(base_frog);
                                         document.getElementById('frog_name_base').innerHTML = this_frog_ID
                                         document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px salmon'
 
@@ -489,6 +697,7 @@
                                         base_frog = false;
                                     } else if (!sub_frog && base_frog !== this_frog) { // SELECT SUB
                                         sub_frog = this_frog
+                                        selectSubFrog(sub_frog);
                                         document.getElementById('frog_name_sub').innerHTML = this_frog_ID
                                         document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px salmon'
                                         
