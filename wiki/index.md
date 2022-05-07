@@ -89,7 +89,7 @@ layout: wiki
 
 - Connect an Ethereum wallet to display your Frogs below!
 
-    <b><i id="user-add"></i></b>
+    <i id="user-add"></i>
 
 
 <div id="owned-frogs" class="owned_frogs">
