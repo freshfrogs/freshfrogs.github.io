@@ -406,7 +406,29 @@
 
             function load_morph() {
                 morph = true;
-                console.log('morph enabled')
+                document.getElementById('mintingTray').innerHTML = 
+
+                    '<div id="display-table" style="height: 7%;">' +
+                    '    <i id="label_name" class="label_name">Frog Morph</i><i id="label_price" class="label_price">Frog(s)</i>' +
+                    '    <b id="frog_name_base" class="frog_name">Select Base</b><b id="frog_price" class="frog_price">Base</b>' +
+                    '    <b id="frog_name_sub" class="frog_name">Select Sub</b><b id="frog_price" class="frog_price">Sub</b>' +
+                    '</div>' +
+                    '<div class="bigContainer">' +
+                    '    <div id="frogContainer" class="containerMint"></div>' +
+                    '    <div id="frogContainer2" class="containerMint"></div>' +
+                    '    <div id="frogContainer3" class="containerMint">' +
+                    '        <div class="imgWrapperMint"><img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/frog/1.png"/></div>' +
+                    '    </div>' +
+                    '</div>';
+
+                document.getElementById('lower_display').innerHTML = 
+
+                    '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button>' +
+                    '<div id="minting-console" class="minting-console">' +
+                    '    > connect wallet...' +
+                    '</div>';
+                
+                connect();
             }
 
             async function load_ownedFrogs() {
@@ -448,7 +470,6 @@
                                 var this_frog = this_frog_ID.replace('Frog #', '');
 
                                 if (morph) {
-                                    console.log('morph!')
                                     document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px salmon'
                                 }
 
