@@ -599,6 +599,12 @@
                 thisPlace_div.style.width = '256px'
                 thisPlace_div.style.height = '128px'
                 thisPlace_div.innerHTML = ''
+                document.getElementById('lower_display').innerHTML = 
+
+                    '<h4 style="text-align: left;">Properties</h4>' +
+
+                    '<i>'+ base_frog + ' + ' + sub_frog + '</i>';
+
                 // Frog
                 if (typeof baseFrog_Frog !== 'undefined') {
                     loadAttribute("Frog", baseFrog_Frog, thisPlace)
@@ -677,12 +683,6 @@
                         loadAttribute("Mouth", otherFrog_Mouth, thisPlace)
                     }
                 }
-                document.getElementById('lower_display').innerHTML = 
-
-                    '<h4 style="text-align: left;">Properties</h4>' +
-
-                    '<i>'+ base_frog + ' + ' + sub_frog + '</i>';
-
             }
 
             // Load attribute
