@@ -409,7 +409,6 @@
             }
 
             function load_morph() {
-                morph = true;
                 document.getElementById('mintingTray').innerHTML = 
 
                     '<div id="display-table" style="height: 64px;">' +
@@ -432,9 +431,12 @@
                     '</div>';
                 
                 connect();
+                morph = true;
             }
 
             async function load_ownedFrogs() {
+
+                morph = false
 
                 const options = {
                     method: 'GET',
