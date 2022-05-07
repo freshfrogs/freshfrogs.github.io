@@ -95,7 +95,7 @@ layout: wiki
     <button id="button_ownedfrogs" class="button_2" style="margin-top: auto; margin-bottom: auto; margin-left: auto; margin-right: auto; cursor: pointer;" onclick="connect()">Connect an Ethereum wallet to view Frog Tokens!</button>
 
 </div>
----
+
 
 ### What is "Morphing" and How do I Morph?
 
