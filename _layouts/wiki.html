@@ -601,9 +601,12 @@
                 thisPlace_div.style.width = '256px'
                 thisPlace_div.style.height = '128px'
                 thisPlace_div.innerHTML = ''
-                document.getElementById('lower_display').innerHTML = 
 
-                    '<h4 style="text-align: left;">Frog #'+ base_frog + ' + ' + sub_frog + '</h4><hr>';
+                properties = document.createElement('h4')
+                properties.style.textAlign = 'left'
+                properties.innerHTML = 'Frog #'+ base_frog + ' + ' + sub_frog + '<hr>'
+
+                document.getElementById('lower_display').appendChild(properties)
 
 
                 // Frog
