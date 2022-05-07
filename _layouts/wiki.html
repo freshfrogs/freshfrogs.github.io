@@ -650,8 +650,25 @@
                 }
             }
 
-            function loadAttribute(one, two, three) {
-                console.log(one + ' ' + two + ' ' + three)
+            // Load attribute
+            function loadAttribute(trait, attribute, where) {
+                newAttribute = document.createElement("img")
+                newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
+                newAttribute.id = attribute
+                newAttribute.target = "_blank"
+                newAttribute.className = "frogImg2" //shadesAnimation
+                newAttribute.style.cursor = "pointer"
+                if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") { 
+                    newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
+                } else if (attribute === "morphAnimation") {
+                    newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
+                } else if (attribute === "shadesAnimation") {
+                    newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
+                } else {
+                    newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
+                }
+                newAttribute.alt = attribute
+                document.getElementById(where).appendChild(newAttribute)
             }
 
             async function load_ownedFrogs() {
