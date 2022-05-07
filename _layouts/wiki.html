@@ -403,8 +403,6 @@
 
                 frog_count = 1;
 
-                console.log('load minting terminal..')
-
                 document.getElementById('mintingTray').innerHTML = 
 
                     '<div id="display-table" style="height: 64px;">' +
@@ -437,8 +435,7 @@
                 morph = true;
                 base_frog = false;
                 sub_frog = false;
-                console.log('morph enabled')
-                console.log(morph)
+                
                 document.getElementById('mintingTray').innerHTML = 
 
                     '<div id="display-table" style="height: 64px;">' +
@@ -466,18 +463,15 @@
                     '</div>';
 
                 if (typeof window.userAddress == 'undefined') {
-                    try { connect() } catch (e) { console.log('failed') }
+                    try { connect() } catch (e) { console.log('Error : ' + e.message) }
                 } else { load_ownedFrogs(); }
-                
-                console.log(window.userAddress)
 
                 var mint_button = document.getElementById('mint-button')
                 mint_button.innerHTML = '<b><i>Generate Morph !</i></b>';
                 mint_button.onclick = function(){
                     if (!base_frog || !sub_frog) {
-                        console.log('Base or Sub Frog not defined')
+                        console.log('Base or Sub Frog not defined. Morph Failed.')
                     } else {
-                        console.log('Combining tokens..')
                         combineTokens(base_frog, sub_frog);
                     }
                     
@@ -486,22 +480,20 @@
 
             // Select subFrog
             async function selectSubFrog(selectedSub){
-                
+                console.log('> subDisplay: ' + sub_frog)
                 let subFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+selectedSub+".json")).json();
                 for (var i = 0; i < subFrogmetadata.attributes.length; i++){
                     var data = subFrogmetadata.attributes[i]
                     //loadAttribute(data.trait_type, data.value, 'subDisplay')
-                    console.log(data.trait_type + ' ' + data.value + ' subDisplay')
                 }
             }
             // Select baseFrog
             async function selectBaseFrog(selectedBase){
-
+                console.log('> baseDisplay: ' + base_frog)
                 let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+selectedBase+".json")).json();
                 for (var i = 0; i < baseFrogmetadata.attributes.length; i++){
                     var data = baseFrogmetadata.attributes[i]
                     //loadAttribute(data.trait_type, data.value, 'baseDisplay')
-                    console.log(data.trait_type + ' ' + data.value + ' baseDisplay')
                 }
             }
 
@@ -750,8 +742,6 @@
 
             async function load_ownedFrogs() {
 
-                console.log('Loading Owned Frogs...')
-
                 const options = {
                     method: 'GET',
                     headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
@@ -771,7 +761,6 @@
                 .then((res) => res.json())
                 .then((res) => {
                     var { assets } = res
-                    console.log(assets);
                     assets.forEach((frog) => { // For Each FROG
 
                         try {
