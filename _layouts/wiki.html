@@ -605,8 +605,10 @@
                 properties = document.createElement('h4')
                 properties.style.textAlign = 'left'
                 properties.innerHTML = 'Frog #'+ base_frog + ' + ' + sub_frog + '<hr>'
-
-                document.getElementById('lower_display').appendChild(properties)
+                
+                var select = document.getElementById('lower_display')
+                select.removeChild(select.lastChild)
+                select.appendChild(properties)
 
 
                 // Frog
