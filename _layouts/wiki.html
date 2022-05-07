@@ -366,13 +366,15 @@
 
                 console.log('load minting terminal..')
 
+                document.getElementById('previewImg').setAttribute('src', '../frog/'+nextIdC+'.png')
+
                 document.getElementById('lower_display').innerHTML = 
                     '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button>' +
                     '<div id="minting-console" class="minting-console">' +
                     '    > connect wallet...' +
                     '</div>';
                 
-                //connect();
+                connect();
 
             }
 
