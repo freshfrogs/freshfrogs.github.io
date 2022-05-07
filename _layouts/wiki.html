@@ -562,6 +562,7 @@
                         window.userAddress = selectedAccount;
                         window.localStorage.setItem("userAddress", selectedAccount);
                         consoleOutput(`☑ETH Address: ${truncateAddress(window.userAddress)}`);
+                        console.log(`☑ETH Address: ${truncateAddress(window.userAddress)}`);
                         document.getElementById('mint-button').innerHTML = '<b><i>Send Transaction!</i></b>';
                         document.getElementById('user-add').innerHTML = 'connected: '+window.userAddress
                         load_ownedFrogs();
@@ -582,6 +583,8 @@
 
 
             document.addEventListener("DOMContentLoaded", async () => {
+
+                connect();
 
                 CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
               
