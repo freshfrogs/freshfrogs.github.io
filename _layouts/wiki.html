@@ -434,7 +434,17 @@
                 
                 load_ownedFrogs();
 
-                document.getElementById('mint-button').innerHTML = '<b><i>Generate Morph !</i></b>'
+                var mint_button = document.getElementById('mint-button')
+                mint_button.innerHTML = '<b><i>Generate Morph !</i></b>';
+                mint_button.onclick = function(){
+                    if (!base_frog || !sub_frog) {
+                        console.log('Base or Sub Frog not defined')
+                    } else {
+                        console.log('Combining tokens..')
+                        combineTokens(base_frog, sub_frog);
+                    }
+                    
+                }
             }
 
             // Select subFrog
