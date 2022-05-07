@@ -464,9 +464,11 @@
                     '   <br>- <i>First select the BASE Frog, then the SUB Frog</i><br>' +
                     '</div>';
 
-                if (!window.userAddress) {
+                if (typeof window.userAddress == 'undefined') {
                     try { connect() } catch (e) { console.log(e.message); return }
-                } else { console.log(window.userAddress) }
+                }
+                
+                console.log(window.userAddress)
                 
                 load_ownedFrogs();
 
