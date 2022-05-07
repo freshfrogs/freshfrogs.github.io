@@ -499,6 +499,42 @@
                     address.length
                 )}`;
             }
+            // ADD FROG to minting tray
+            function add_frog() {
+                console.log('add frog')
+                console.log(frog_count)
+                if (frog_count > 9) {
+                    console.log('frog count less than 9')
+                    if (frog_count <= 2) {
+                        console.log('frog greater than or equal to 2')
+                        newFrog = document.createElement("div")
+                        newFrog.className = "imgWrapperMint"
+                        newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frog_count)+".png'/>"
+                        document.getElementById("frogContainer3").appendChild(newFrog)
+                        frog_count = frog_count + 1
+                    } else if (frog_count <= 5) {
+                        console.log('frog greater than or equal to 5')
+                        newFrog = document.createElement("div")
+                        newFrog.className = "imgWrapperMint"
+                        newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frog_count)+".png'/>"
+                        document.getElementById("frogContainer2").appendChild(newFrog)
+                        frog_count = frog_count + 1
+                    } else if (frog_count <= 8) {
+                        console.log('frog greater than or equal to 8')
+                        newFrog = document.createElement("div")
+                        newFrog.className = "imgWrapperMint"
+                        newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frog_count)+".png'/>"
+                        document.getElementById("frogContainer").appendChild(newFrog)
+                        frog_count = frog_count + 1
+                    }
+                    
+                    if (frog_count <= 1) {
+                        mintList = nextIdC
+                    } else {
+                        mintList = nextIdC+" - "+((nextIdC-1)+frog_count)
+                    }
+                } else { console.log('greater than 9') }
+            }
             // Login with Web3 via Metamasks window.ethereum library
             async function connect() {
                 if (window.ethereum) {
@@ -627,43 +663,6 @@
 
                 })
             })
-            //
-            // ADD FROG to minting tray
-            function add_frog() {
-                console.log('add frog')
-                console.log(frog_count)
-                if (frog_count > 9) {
-                    console.log('frog count less than 9')
-                    if (frog_count <= 2) {
-                        console.log('frog greater than or equal to 2')
-                        newFrog = document.createElement("div")
-                        newFrog.className = "imgWrapperMint"
-                        newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frog_count)+".png'/>"
-                        document.getElementById("frogContainer3").appendChild(newFrog)
-                        frog_count = frog_count + 1
-                    } else if (frog_count <= 5) {
-                        console.log('frog greater than or equal to 5')
-                        newFrog = document.createElement("div")
-                        newFrog.className = "imgWrapperMint"
-                        newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frog_count)+".png'/>"
-                        document.getElementById("frogContainer2").appendChild(newFrog)
-                        frog_count = frog_count + 1
-                    } else if (frog_count <= 8) {
-                        console.log('frog greater than or equal to 8')
-                        newFrog = document.createElement("div")
-                        newFrog.className = "imgWrapperMint"
-                        newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frog_count)+".png'/>"
-                        document.getElementById("frogContainer").appendChild(newFrog)
-                        frog_count = frog_count + 1
-                    }
-                    
-                    if (frog_count <= 1) {
-                        mintList = nextIdC
-                    } else {
-                        mintList = nextIdC+" - "+((nextIdC-1)+frog_count)
-                    }
-                } else { console.log('greater than 9') }
-            }
         </script>
     </head>
     <header>
