@@ -81,13 +81,11 @@ layout: wiki
 
 - View your Frogs on **[OpenSea](https://opensea.io/account)** or at **[freshfrogs.io/the-pad](https://freshfrogs.io/the-pad)**
 
+- Connect an Ethereum wallet to display your Frogs below!
+
     - Frogs not displaying? Try manually checking: **[Scan Frog Txs]()**
 
-    - Each Frog is unique with thousands of possible combinations!
-
-    - Some Frogs with the 'natural' trait contain a unique color pattern!
-
-- Connect an Ethereum wallet to display your Frogs below!
+    - View attribute rarities of each Frog, Morph, and more!
 
     <i id="user-add"></i>
 
