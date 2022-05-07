@@ -20,7 +20,7 @@ layout: wiki
     <div>
         <div class="button_bar"><button id="buttonbar_mint" class="button_1" onclick="load_mintingTerminal()"><b>🐸Mint</b></button><button id="buttonbar_morph" class="button_1" onclick="load_morph()"><b>🍄Morph</b></button><button id="buttonbar_stake" class="button_1"><b>📌Stake</b></button></div>
         <div id="mintingTray" class="mintingTray">
-            <div id="display-table" style="height: 64px;">
+            <div id="display-table" style="min-height: 64px;">
                 <i id="label_name" class="label_name">Frog 3410 / 4040</i><i id="label_price" class="label_price">Quantity</i>
                 <b id="frog_name" class="frog_name">0.01 ΞETH</b><b id="frog_price" class="frog_price"><b id="remove-frog">-</b> <b id="quant-frog">1</b> <a id="add-frog" onclick="add_frog()"><b>+</b></a></b>
             </div>
