@@ -371,6 +371,8 @@
 
             var frog_count;
 
+            var morph;
+
             async function load_mintingTerminal() {
 
                 frog_count = 1;
@@ -400,6 +402,10 @@
                 
                 connect();
 
+            }
+
+            function load_morph() {
+                morph = true;
             }
 
             async function load_ownedFrogs() {
@@ -437,6 +443,10 @@
                             owned_frog.onclick = function() { 
                                 
                                 var this_frog = event.currentTarget.id.replace('Frog #', '');
+
+                                if (morph) {
+                                    event.currentTarget.style.boxShadow = 'box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);'
+                                }
 
                                 document.getElementById('frogContainer').innerHTML = ''
                                 document.getElementById('frogContainer2').innerHTML = ''
