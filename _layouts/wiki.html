@@ -397,6 +397,9 @@
                                 
                                 var this_frog = event.currentTarget.id.replace('Frog #', '');
 
+                                document.getElementById('frogContainer1').innerHTML = ''
+                                document.getElementById('frogContainer2').innerHTML = ''
+
                                 document.getElementById('frogContainer3').innerHTML = '<img id="display-frog" class="tray-frog" src="../frog/3410.png">'
                                 
                                 document.getElementById('display-frog').setAttribute('src', '../frog/'+this_frog+'.png')
