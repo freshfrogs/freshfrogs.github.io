@@ -22,7 +22,7 @@ layout: wiki
         <div id="mintingTray" class="mintingTray">
             <div id="display-table" style="height: 7%;">
                 <i id="label_name" class="label_name">Frog 3410 / 4040</i><i id="label_price" class="label_price">Quantity</i>
-                <b id="frog_name" class="frog_name">0.01 ΞETH</b><b id="frog_price" class="frog_price"><b id="remove-frog">-</b> <b id="quant-frog">1</b> <a id="add-frog"><b>+</b></a></b>
+                <b id="frog_name" class="frog_name">0.01 ΞETH</b><b id="frog_price" class="frog_price"><b id="remove-frog">-</b> <b id="quant-frog">1</b> <a id="add-frog" onclick="add_frog();"><b>+</b></a></b>
             </div>
             <div class="bigContainer">
                 <div id="frogContainer" class="containerMint"></div>
