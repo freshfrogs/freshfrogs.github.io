@@ -418,9 +418,12 @@
                     '</div>' +
                     '<div class="bigContainer">' +
                     '    <div id="frogContainer" class="containerMint"></div>' +
-                    '    <div id="frogContainer2" class="containerMint"></div>' +
+                    '    <div id="frogContainer2" class="containerMint">' +
+                    '        <div class="imgWrapperMint"><img id="base_frog_img" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/preview2.gif"/></div>' +
+                    '        <div class="imgWrapperMint"><img id="sub_frog_img" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/preview2.gif"/></div>' +
+                    '    </div>' +
                     '    <div id="frogContainer3" class="containerMint">' +
-                    '        <div class="imgWrapperMint"><img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/previewMorph.png"/></div>' +
+                    '        <div class="imgWrapperMint"><img id="morph_frog_img" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/previewMorph.png"/></div>' +
                     '    </div>' +
                     '</div>';
 
@@ -477,12 +480,9 @@
                                         base_frog = this_frog
                                         document.getElementById('frog_name_base').innerHTML = this_frog_ID
                                         document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px salmon'
-                                        //
-                                        newFrog = document.createElement("div")
-                                        newFrog.className = "imgWrapperMint"
-                                        newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+base_frog+".png'/>"
-                                        document.getElementById("frogContainer3").appendChild(newFrog)
-                                        //
+
+                                        document.getElementById("base_frog_img").setAttribute('src', 'https://freshfrogs.io/frog/'+base_frog+'.png')
+                                        
                                     } else if (this_frog == base_frog) { // UN-SELECT BASE
                                         document.getElementById('frog_name_base').innerHTML = 'Select Frog'
                                         document.getElementById(this_frog_ID).style.boxShadow = 'none'
@@ -491,12 +491,9 @@
                                         sub_frog = this_frog
                                         document.getElementById('frog_name_sub').innerHTML = this_frog_ID
                                         document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px salmon'
-                                        //
-                                        newFrog = document.createElement("div")
-                                        newFrog.className = "imgWrapperMint"
-                                        newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+sub_frog+".png'/>"
-                                        document.getElementById("frogContainer3").appendChild(newFrog)
-                                        //
+                                        
+                                        document.getElementById("sub_frog_img").setAttribute('src', 'https://freshfrogs.io/frog/'+base_frog+'.png')
+
                                     } else if (this_frog == sub_frog) { // UN-SELECT SUB
                                         document.getElementById('frog_name_sub').innerHTML = 'Select Frog'
                                         document.getElementById(this_frog_ID).style.boxShadow = 'none'
