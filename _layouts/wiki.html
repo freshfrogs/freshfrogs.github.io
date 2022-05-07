@@ -727,12 +727,7 @@
 
                 //var trait_rarity = 0 // ((trait_list[trait[attribute]] / 4040) * 100).toFixed(0)
 
-                console.log('trait_rarity : ' + attribute)
-
-                const trait_rarity = (traits_list) => {
-                    let trait_rarities = Object.trait_rarities(traits_list);
-                    return traits_list[trait_rarities[trait]][attribute];
-                }
+                console.log(traits_list[trait][attribute])
 
                 var new_trait = document.createElement('div')
                 new_trait.className = 'frog_trait'
