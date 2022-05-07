@@ -445,9 +445,10 @@
                                 
                                 var this_frog = event.currentTarget.id.replace('Frog #', '');
 
-                                if (morph == true) {
+                                if (morph) {
                                     console.log('morph!')
-                                    event.currentTarget.style.boxShadow = '0px 0px 6px 6px rgba(122, 122, 122, 0.20)'
+                                    event.currentTarget.style.background = 'red'
+                                    owned_frog.style.width = '1px'
                                 }
 
                                 document.getElementById('frogContainer').innerHTML = ''
