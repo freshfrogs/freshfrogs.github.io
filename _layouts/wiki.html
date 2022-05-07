@@ -548,6 +548,7 @@
             }
             // Login with Web3 via Metamasks window.ethereum library
             async function connect() {
+                console.log('Connecting eth address...')
                 if (window.ethereum) {
                     try {
                         const selectedAccount = await window.ethereum
