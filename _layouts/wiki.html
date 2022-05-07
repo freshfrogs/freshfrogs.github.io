@@ -724,13 +724,11 @@
                 newAttribute.alt = attribute
                 document.getElementById(where).appendChild(newAttribute)
 
-                var trait_lc = trait
+                console.log(traits_list[trait][attribute.toLowerCase()])
 
-                var attribute_lc = attribute.toLowerCase()
-                console.log(traits_list)
-                console.log(traits_list[trait_lc][attribute_lc])
+                var trait_rarity = ((traits_list[trait][attribute.toLowerCase()] / 4040) * 100).toFixed(0)
 
-                var trait_rarity = 0 // ((traits_list[trait_lc][attribute_lc] / 4040) * 100).toFixed(0)
+                if (typeof trait_rarity == 'undefined') { var trait_rarity = 0 }
 
                 console.log(traits_list)
 
