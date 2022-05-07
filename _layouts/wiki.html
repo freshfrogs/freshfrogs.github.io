@@ -465,7 +465,7 @@
                     '</div>';
 
                 if (typeof window.userAddress == 'undefined') {
-                    try { connect() } catch (e) { console.log(e.message); return }
+                    try { connect() } catch (e) { console.log('failed'); return }
                 }
                 
                 console.log(window.userAddress)
