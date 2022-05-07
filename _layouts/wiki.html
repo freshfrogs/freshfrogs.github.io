@@ -418,7 +418,10 @@
 
                 document.getElementById('lower_display').innerHTML = 
 
-                    '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button>';
+                    '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button>' +
+                    '<div id="minting-console" class="minting-console">' +
+                    '    > connect wallet...' +
+                    '</div>';
 
                 morph = false;
                 
@@ -449,10 +452,7 @@
 
                 document.getElementById('lower_display').innerHTML = 
 
-                    '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button>' +
-                    '<div id="minting-console" class="minting-console">' +
-                    '    > connect wallet...' +
-                    '</div>';
+                    '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button>';
                 
                 load_ownedFrogs();
 
