@@ -587,7 +587,9 @@
                 }
 
                 thisPlace = 'frogContainer3';
-                document.getElementById(thisPlace).style.background = '#7cc1ff'
+                var thisPlace_div = document.getElementById(thisPlace)
+                thisPlace_div.style.background = '#7cc1ff'
+                thisPlace_div.style.minWidth = '256px'
                 // Frog
                 if (typeof baseFrog_Frog !== 'undefined') {
                     loadAttribute("Frog", baseFrog_Frog, thisPlace)
