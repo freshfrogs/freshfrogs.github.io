@@ -468,26 +468,26 @@
                             owned_frog.id = name
                             owned_frog.className = 'owned_frog';
                             owned_frog.style.width = 128+'px';
-                            owned_frog.onclick = function() { 
+                            owned_frog.onclick = function() { // Frog Select ()
                                 
                                 var this_frog_ID = event.currentTarget.id
                                 
                                 var this_frog = this_frog_ID.replace('Frog #', ''); // token ID
 
                                 if (morph) {
-                                    if (!base_frog && sub_frog !== this_frog) {
+                                    if (!base_frog && sub_frog !== this_frog) { // SELECT BASE
                                         base_frog = this_frog
                                         document.getElementById('frog_name_base').innerHTML = this_frog_ID
                                         document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px salmon'
-                                    } else if (this_frog == base_frog) {
+                                    } else if (this_frog == base_frog) { // UN-SELECT BASE
                                         document.getElementById('frog_name_base').innerHTML = 'Select Frog'
                                         document.getElementById(this_frog_ID).style.boxShadow = 'none'
                                         base_frog = false;
-                                    } else if (!sub_frog && base_frog !== this_frog) {
+                                    } else if (!sub_frog && base_frog !== this_frog) { // SELECT SUB
                                         sub_frog = this_frog
                                         document.getElementById('frog_name_sub').innerHTML = this_frog_ID
                                         document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px salmon'
-                                    } else if (this_frog == sub_frog) {
+                                    } else if (this_frog == sub_frog) { // UN-SELECT SUB
                                         document.getElementById('frog_name_sub').innerHTML = 'Select Frog'
                                         document.getElementById(this_frog_ID).style.boxShadow = 'none'
                                         sub_frog = false;
