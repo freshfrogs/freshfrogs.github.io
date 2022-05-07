@@ -750,6 +750,14 @@
                 };
 
                 var owned_frogs_div = document.getElementById('owned-frogs')
+                
+                owned_frogs_div.innerHTML = ''
+
+                owned_frogs_div.style.background = 'white'
+                owned_frogs_div.style.border = 'none'
+                owned_frogs_div.style.color = 'inherit'
+
+                owned_frogs_div.style.height = 'auto';
 
                 fetch('https://api.opensea.io/api/v1/assets?owner='+window.userAddress+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=9&include_orders=false', options)
                 .then((res) => res.json())
@@ -861,16 +869,7 @@
                 .catch(e => {
                     document.getElementById('button_ownedfrogs').innerHTML = e.message
                     console.log(e.message)
-                    return
                 })
-                
-                owned_frogs_div.innerHTML = ''
-
-                owned_frogs_div.style.background = 'white'
-                owned_frogs_div.style.border = 'none'
-                owned_frogs_div.style.color = 'inherit'
-
-                owned_frogs_div.style.height = 'auto';
             }
 
             function truncateAddress(address) {
