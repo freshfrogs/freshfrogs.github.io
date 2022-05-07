@@ -443,12 +443,13 @@
                             owned_frog.style.width = 128+'px';
                             owned_frog.onclick = function() { 
                                 
-                                var this_frog = event.currentTarget.id.replace('Frog #', '');
+                                var this_frog_ID = event.currentTarget.id
+                                
+                                var this_frog = this_frog_ID.replace('Frog #', '');
 
                                 if (morph) {
                                     console.log('morph!')
-                                    event.currentTarget.style.background = 'red'
-                                    owned_frog.style.width = '1px'
+                                    document.getElementById(this_frog_ID).style.boxShadow = '10px 10px red'
                                 }
 
                                 document.getElementById('frogContainer').innerHTML = ''
