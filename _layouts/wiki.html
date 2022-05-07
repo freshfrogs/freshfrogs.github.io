@@ -499,6 +499,36 @@
                     address.length
                 )}`;
             }
+            // ADD FROG to minting tray
+            function add_frog() {
+                if (frog_count !== 9) {
+                    if (frog_count <= 2) {
+                        newFrog = document.createElement("div")
+                        newFrog.className = "imgWrapperMint"
+                        newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frog_count)+".png'/>"
+                        document.getElementById("frogContainer3").appendChild(newFrog)
+                        frog_count = frog_count + 1
+                    } else if (frog_count <= 5) {
+                        newFrog = document.createElement("div")
+                        newFrog.className = "imgWrapperMint"
+                        newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frog_count)+".png'/>"
+                        document.getElementById("frogContainer2").appendChild(newFrog)
+                        frog_count = frog_count + 1
+                    } else if (frog_count <= 8) {
+                        newFrog = document.createElement("div")
+                        newFrog.className = "imgWrapperMint"
+                        newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frog_count)+".png'/>"
+                        document.getElementById("frogContainer").appendChild(newFrog)
+                        frog_count = frog_count + 1
+                    }
+                    
+                    if (frog_count <= 1) {
+                        mintList = nextIdC
+                    } else {
+                        mintList = nextIdC+" - "+((nextIdC-1)+frog_count)
+                    }
+                }
+            }
             // Login with Web3 via Metamasks window.ethereum library
             async function connect() {
                 if (window.ethereum) {
@@ -626,36 +656,6 @@
                     console.error(e.message)
 
                 })
-                // ADD FROG to minting tray
-                function add_frog() {
-                    if (frog_count !== 9) {
-                        if (frog_count <= 2) {
-                            newFrog = document.createElement("div")
-                            newFrog.className = "imgWrapperMint"
-                            newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frog_count)+".png'/>"
-                            document.getElementById("frogContainer3").appendChild(newFrog)
-                            frog_count = frog_count + 1
-                        } else if (frog_count <= 5) {
-                            newFrog = document.createElement("div")
-                            newFrog.className = "imgWrapperMint"
-                            newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frog_count)+".png'/>"
-                            document.getElementById("frogContainer2").appendChild(newFrog)
-                            frog_count = frog_count + 1
-                        } else if (frog_count <= 8) {
-                            newFrog = document.createElement("div")
-                            newFrog.className = "imgWrapperMint"
-                            newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frog_count)+".png'/>"
-                            document.getElementById("frogContainer").appendChild(newFrog)
-                            frog_count = frog_count + 1
-                        }
-                        
-                        if (frog_count <= 1) {
-                            mintList = nextIdC
-                        } else {
-                            mintList = nextIdC+" - "+((nextIdC-1)+frog_count)
-                        }
-                    }
-                }
             })
         </script>
     </head>
