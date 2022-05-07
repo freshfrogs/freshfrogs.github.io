@@ -558,6 +558,7 @@
                         window.localStorage.setItem("userAddress", selectedAccount);
                         consoleOutput(`☑ETH Address: ${truncateAddress(window.userAddress)}`);
                         document.getElementById('mint-button').innerHTML = '<b><i>Send Transaction!</i></b>';
+                        document.getElementById('user-add').innerHTML = window.userAddress
                         load_ownedFrogs();
                     } catch (error) {
                         console.error(error);
