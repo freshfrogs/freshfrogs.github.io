@@ -479,6 +479,12 @@
                                         base_frog = this_frog
                                         document.getElementById('frog_name_base').innerHTML = this_frog_ID
                                         document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px salmon'
+                                        //
+                                        newFrog = document.createElement("div")
+                                        newFrog.className = "imgWrapperMint"
+                                        newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+base_frog+".png'/>"
+                                        document.getElementById("frogContainer3").appendChild(newFrog)
+                                        //
                                     } else if (this_frog == base_frog) { // UN-SELECT BASE
                                         document.getElementById('frog_name_base').innerHTML = 'Select Frog'
                                         document.getElementById(this_frog_ID).style.boxShadow = 'none'
@@ -487,6 +493,12 @@
                                         sub_frog = this_frog
                                         document.getElementById('frog_name_sub').innerHTML = this_frog_ID
                                         document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px salmon'
+                                        //
+                                        newFrog = document.createElement("div")
+                                        newFrog.className = "imgWrapperMint"
+                                        newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+sub_frog+".png'/>"
+                                        document.getElementById("frogContainer3").appendChild(newFrog)
+                                        //
                                     } else if (this_frog == sub_frog) { // UN-SELECT SUB
                                         document.getElementById('frog_name_sub').innerHTML = 'Select Frog'
                                         document.getElementById(this_frog_ID).style.boxShadow = 'none'
