@@ -477,10 +477,18 @@
                                         base_frog = this_frog
                                         document.getElementById('frog_name_base').innerHTML = this_frog_ID
                                         document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px salmon'
+                                    } else if (this_frog == base_frog) {
+                                        document.getElementById('frog_name_base').innerHTML = 'Select Frog'
+                                        document.getElementById(this_frog_ID).style.boxShadow = 'none'
+                                        base_frog = false;
                                     } else if (!sub_frog) {
                                         sub_frog = this_frog
                                         document.getElementById('frog_name_sub').innerHTML = this_frog_ID
                                         document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px salmon'
+                                    } else if (this_frog == sub_frog) {
+                                        document.getElementById('frog_name_sub').innerHTML = 'Select Frog'
+                                        document.getElementById(this_frog_ID).style.boxShadow = 'none'
+                                        sub_frog = false;
                                     }
                                     return
                                 }
