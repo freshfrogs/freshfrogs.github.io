@@ -16,9 +16,9 @@ layout: wiki
 
 </desc>
 
-<div class="minting-display">
+<div id="minting-display" class="minting-display">
     <div>
-        <div class="button_bar"><button id="buttonbar_mint" class="button_1"><b>🐸Mint</b></button><button id="buttonbar_morph" class="button_1"><b>🍄Morph</b></button><button id="buttonbar_stake" class="button_1"><b>📌Stake</b></button></div>
+        <div class="button_bar"><button id="buttonbar_mint" class="button_1" onclick="load_mintingTerminal()"><b>🐸Mint</b></button><button id="buttonbar_morph" class="button_1"><b>🍄Morph</b></button><button id="buttonbar_stake" class="button_1"><b>📌Stake</b></button></div>
         <div id="mintingTray" class="mintingTray">
             <div id="display-table" style="height: 7%;">
                 <i id="label_name" class="label_name">Frog 3410 / 4040</i><i id="label_price" class="label_price">Quantity</i>

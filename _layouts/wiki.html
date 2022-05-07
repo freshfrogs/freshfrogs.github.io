@@ -361,6 +361,18 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
         <script>
 
+            async function load_mintingTerminal() {
+
+                document.getElementById('lower_display').innerHTML = 
+                    '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button>' +
+                    '<div id="minting-console" class="minting-console">' +
+                    '    > connect wallet...' +
+                    '</div>';
+                
+                connect();
+
+            }
+
             async function load_ownedFrogs() {
 
                 const options = {
