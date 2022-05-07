@@ -465,12 +465,10 @@
                     '</div>';
 
                 if (typeof window.userAddress == 'undefined') {
-                    try { connect() } catch (e) { console.log('failed'); return }
-                }
+                    try { connect() } catch (e) { console.log('failed') }
+                } else { load_ownedFrogs(); }
                 
                 console.log(window.userAddress)
-                
-                load_ownedFrogs();
 
                 var mint_button = document.getElementById('mint-button')
                 mint_button.innerHTML = '<b><i>Generate Morph !</i></b>';
