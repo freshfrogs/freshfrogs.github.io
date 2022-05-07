@@ -433,10 +433,6 @@
 
             function load_morph() {
 
-                if (!window.address) {
-                    try { connect() } catch (e) { return }
-                }
-
                 morph = true;
                 base_frog = false;
                 sub_frog = false;
@@ -467,6 +463,10 @@
                     '   - <i>Select two Frogs to combine attributes!</i><br>' +
                     '   <br>- <i>First select the BASE Frog, then the SUB Frog</i><br>' +
                     '</div>';
+
+                if (!window.userAddress) {
+                    try { connect() } catch (e) { console.log(e.message); return }
+                } else { console.log(window.userAddress) }
                 
                 load_ownedFrogs();
 
