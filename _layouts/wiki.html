@@ -473,14 +473,16 @@
                                 var this_frog = this_frog_ID.replace('Frog #', ''); // token ID
 
                                 if (morph) {
-                                    document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px salmon'
                                     if (!base_frog) {
                                         base_frog = this_frog
                                         document.getElementById('frog_name_base').innerHTML = this_frog_ID
+                                        document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px salmon'
                                     } else if (!sub_frog) {
                                         sub_frog = this_frog
                                         document.getElementById('frog_name_sub').innerHTML = this_frog_ID
+                                        document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px salmon'
                                     }
+                                    return
                                 }
 
                                 document.getElementById('frogContainer').innerHTML = ''
