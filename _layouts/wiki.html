@@ -362,6 +362,10 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
         <script>
 
+            var nextIdC = 1;
+
+            var frog_count = 1;
+
             async function load_mintingTerminal() {
 
                 console.log('load minting terminal..')
@@ -568,17 +572,10 @@
 
             // start here
 
-            var nextIdC;
-
-            var frog_count;
 
             document.addEventListener("DOMContentLoaded", async () => {
 
                 CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
-
-                var frog_count = 1;
-
-                var nextIdC = 1;
               
                 // Pull Collection data from OpenSea
 
