@@ -432,6 +432,11 @@
             }
 
             function load_morph() {
+
+                if (!window.address) {
+                    try { connect() } catch (e) { return }
+                }
+
                 morph = true;
                 base_frog = false;
                 sub_frog = false;
