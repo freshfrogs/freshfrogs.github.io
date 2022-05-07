@@ -704,6 +704,19 @@
                 }
                 newAttribute.alt = attribute
                 document.getElementById(where).appendChild(newAttribute)
+                //
+
+                var trait_rarity = 0 // ((trait_count / 4040) * 100).toFixed(0)
+
+                var new_trait = document.createElement('div')
+                new_trait.className = 'frog_trait'
+                new_trait.innerHTML = 
+                    
+                    '<i>'+trait+'</i><br>' +
+                    '<b>'+attribute.slice(0, 13)+'</b><br>' +
+                    '<i>'+trait_rarity+'% have this trait<i>';
+
+                document.getElementById('lower_display').appendChild(new_trait)
             }
 
             async function load_ownedFrogs() {
