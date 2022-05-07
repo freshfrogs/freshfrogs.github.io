@@ -602,13 +602,12 @@
                 thisPlace_div.style.height = '128px'
                 thisPlace_div.innerHTML = ''
 
-                properties = document.createElement('h4')
-                properties.style.textAlign = 'left'
-                properties.innerHTML = 'Properties'//'Frog #'+ base_frog + ' + ' + sub_frog + '<hr>'
+                //'Frog #'+ base_frog + ' + ' + sub_frog + '<hr>'
                 
                 var select = document.getElementById('lower_display')
-                select.innerHTML = '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button>';
-                select.appendChild(properties)
+                select.innerHTML = 
+                    '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button>' +
+                    '<h4 style="text-align: left;">Properties</h4><hr>';
 
                 var mint_button = document.getElementById('mint-button')
                 mint_button.innerHTML = '<b><i>Generate Morph !</i></b>';
