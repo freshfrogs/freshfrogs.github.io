@@ -386,7 +386,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
         <script>
 
-            var traits;
+            var traits_list;
 
             var nextIdC = 1;
 
@@ -714,7 +714,7 @@
 
                 var trait_rarity = 0 // ((trait_count / 4040) * 100).toFixed(0)
 
-                console.log(traits)
+                console.log(traits_list)
 
                 var new_trait = document.createElement('div')
                 new_trait.className = 'frog_trait'
@@ -955,7 +955,9 @@
 
                     console.log(response)
 
-                    var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = response
+                    var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = response
+
+                    traits_list = traits;
 
                     document.getElementById('banner_image').setAttribute('src', banner_image_url)
                     document.getElementById('name').innerHTML = name
