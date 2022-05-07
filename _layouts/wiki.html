@@ -725,9 +725,11 @@
                 document.getElementById(where).appendChild(newAttribute)
                 //
 
-                var trait_rarity = 0 // ((trait_count / 4040) * 100).toFixed(0)
+                var trait_rarity = 0 // ((trait_list[trait[attribute]] / 4040) * 100).toFixed(0)
 
                 console.log(traits_list)
+
+                console.log(trait_list[trait[attribute]])
 
                 var new_trait = document.createElement('div')
                 new_trait.className = 'frog_trait'
