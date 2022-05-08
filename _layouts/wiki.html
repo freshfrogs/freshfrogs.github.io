@@ -120,7 +120,7 @@
         margin-left: none;
         font-family: inherit;
         transition: all .2s ease;
-        min-width: 93%;
+        min-width: 90%;
         text-align: center;
         cursor: pointer;
         min-height: 3%;
@@ -439,8 +439,7 @@
                     '</div>';
 
                 document.getElementById('lower_display').innerHTML = 
-                    
-                    '<div class="button_bar"><button id="buttonbar_mint" class="button_1 buttonbar_mint_on" onclick="load_mintingTerminal()"><b>🐸Mint</b></button><button id="buttonbar_morph" class="button_1" onclick="load_morph()"><b>🍄Morph</b></button><button id="buttonbar_stake" class="button_1"><b>📌Stake</b></button></div>' +
+
                     '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button>' +
                     '<div id="minting-console" class="minting-console">' +
                     '    > connect wallet...' +
@@ -491,8 +490,7 @@
                     '</div>';
 
                 document.getElementById('lower_display').innerHTML = 
-                    
-                '<div class="button_bar"><button id="buttonbar_mint" class="button_1 buttonbar_mint_on" onclick="load_mintingTerminal()"><b>🐸Mint</b></button><button id="buttonbar_morph" class="button_1" onclick="load_morph()"><b>🍄Morph</b></button><button id="buttonbar_stake" class="button_1"><b>📌Stake</b></button></div>' +
+
                     '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button>' +
                     '<h4 style="text-align: left;">Morph Fresh Frogs!</h4><hr>' +
                     '<div>' +
@@ -648,7 +646,6 @@
                 
                 var select = document.getElementById('lower_display')
                 select.innerHTML = 
-                '<div class="button_bar"><button id="buttonbar_mint" class="button_1 buttonbar_mint_on" onclick="load_mintingTerminal()"><b>🐸Mint</b></button><button id="buttonbar_morph" class="button_1" onclick="load_morph()"><b>🍄Morph</b></button><button id="buttonbar_stake" class="button_1"><b>📌Stake</b></button></div>' +
                     '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button>' +
                     '<h4 style="text-align: left;">Properties</h4><hr>';
 
@@ -877,8 +874,6 @@
                                 gem_xyz_link = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id
 
                                 document.getElementById('lower_display').innerHTML = 
-
-                                '<div class="button_bar"><button id="buttonbar_mint" class="button_1 buttonbar_mint_on" onclick="load_mintingTerminal()"><b>🐸Mint</b></button><button id="buttonbar_morph" class="button_1" onclick="load_morph()"><b>🍄Morph</b></button><button id="buttonbar_stake" class="button_1"><b>📌Stake</b></button></div>' +
 
                                 '<h4 style="text-align: left;">Properties</h4>' +
 
