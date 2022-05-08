@@ -117,6 +117,8 @@ Holders will be soon able to "Morph" two Frogs to create a new NFT on Ethereum w
 
 ---
 
+Preview Frog Morph Combinations!
+
 1. **Connect** an Ethereum Wallet that holds Fresh Frog Tokens!
 
 2. Go to the <button id="morph_ref" class="buttonbar_morph"><b>🍄Morph</b></button> tab and **Select** two Frogs to Morph!
