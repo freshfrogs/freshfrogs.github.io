@@ -156,6 +156,7 @@ Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with
 
 ---
 
-<img src="https://freshfrogs.io/assets/frogs/FLY.gif" class="float-img" style="float: left !important;"/>
+<img src="https://freshfrogs.io/assets/frogs/FLY.gif" class="float-img2"/>
 
+<br>
 NFT staking refers to locking up non-fungible tokens on a platform or protocol in exchange for staking rewards and other benefits! Staking NFTs allows holders to earn an income from their collection while maintaining ownership!
