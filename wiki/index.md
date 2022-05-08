@@ -109,9 +109,9 @@ layout: wiki
 
 2. **Select** two Frogs to Morph!
 
-    - First select the **Base** Frog! This Frog will keep all of it's attributes, except for traits!
+    - First select the **Base** Frog! This Frog will keep all attributes, except for traits!
 
-    - Then select the **Sub** Frog! This frog will have all of it's attributes inherited, without overwriting existing!
+    - Then select the **Sub** Frog! This frog will have all attributes inherited, without overwriting existing!
 
     - This means there are two possible morph combinations for every two Frogs!
 
