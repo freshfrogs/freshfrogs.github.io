@@ -891,23 +891,23 @@
             }
             // REMOVE FROG from minting Tray
             function remove_frog() {
-                if (frogCount >= 7) {
+                if (frog_count >= 7) {
                     var select = document.getElementById("frogContainer");
                     select.removeChild(select.lastChild);
-                    frogCount = frogCount - 1
-                } else if (frogCount >= 4) {
+                    frog_count = frog_count - 1
+                } else if (frog_count >= 4) {
                     var select = document.getElementById("frogContainer2");
                     select.removeChild(select.lastChild);
-                    frogCount = frogCount - 1
-                } else if (frogCount >= 2) {
+                    frog_count = frog_count - 1
+                } else if (frog_count >= 2) {
                     var select = document.getElementById("frogContainer3");
                     select.removeChild(select.lastChild);
-                    frogCount = frogCount - 1
+                    frog_count = frog_count - 1
                 }
-                if (frogCount <= 1) {
+                if (frog_count <= 1) {
                     mintList = "Frog #"+nextIdC
                 } else {
-                    mintList = "Frog #"+nextIdC+" - "+((nextIdC-1)+frogCount)
+                    mintList = "Frog #"+nextIdC+" - "+((nextIdC-1)+frog_count)
                 }
                 document.getElementById('quant-frog').innerHTML = frog_count
                 document.getElementById('label_name').innerHTML = mintList
