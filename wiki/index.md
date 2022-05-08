@@ -121,12 +121,12 @@ Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with
 
     - (N)ew (F)rog (T)okens can be combined to create even more Frogs! More details coming soon!
 
+<img src="https://freshfrogs.io/assets/frogs/previewMorph.png" class="float-img"/>
 
 ### How do I Morph?
 
 ---
 
-<img src="https://freshfrogs.io/assets/frogs/previewMorph.png" class="float-img"/>
 
 1. **Connect** an Ethereum Wallet that holds Fresh Frog Tokens!
 
