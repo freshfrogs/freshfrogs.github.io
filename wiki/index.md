@@ -115,6 +115,7 @@ Holders will be soon able to "Morph" two Frogs to create a new NFT on Ethereum w
 
 **What is Meta-Morphing?** (N)ew (F)rog (T)okens can be combined to create even more Frogs! More details coming soon!
 
+<br>
 
 ### How do I Morph?
 
