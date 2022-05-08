@@ -107,11 +107,11 @@ layout: wiki
 
     - First select the **Base Frog!** 
     
-        - **Dominant Traits** This Frog will keep all attributes, except for traits! 
+        - **Dominant** This Frog will keep all attributes, except for traits! 
 
     - Then select the **Sub Frog!**
     
-        - **Passive Traits** This frog will have all attributes inherited, without overwriting existing!
+        - **Passive** This frog will have all attributes inherited, without overwriting existing!
 
     - This means there are two possible morph combinations for every two Frogs!
 
