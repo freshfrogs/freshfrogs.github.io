@@ -104,23 +104,13 @@ layout: wiki
 
 Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with combined traits! Morphing will require a special token aquired through staking!
 
-- What will happen to My Frogs after I Morph?
+- *What will happen to My Frogs after I Morph?* Existing Frogs will remain without change, and a NEW NFT will be created!
 
-    - Existing Frogs will remain without change, and a NEW NFT will be created!
+- *When will the full Morph utility be released?* Once the full collection of 4,040 Frogs has been minted!
 
-- When will the full Morph utility be released?
+- *What will it cost to Morph?* Morphing will require a special token aquired through staking, and a gas fee will be needed to create the NEW NFT! These "special tokens" will be free and easy to obtain for Frog owners through [staking]()!
 
-    - Once the full collection of 4,040 Frogs has been minted!
-
-- What will it cost to Morph?
-
-    - Morphing will require a special token aquired through staking, and a gas fee will be needed to create the NEW NFT!
-
-    - These "special tokens" will be free and easy to obtain for Frog owners through [staking]()!
-
-- What is Meta-Morphing?
-
-    - (N)ew (F)rog (T)okens can be combined to create even more Frogs! More details coming soon!
+- *What is Meta-Morphing?* (N)ew (F)rog (T)okens can be combined to create even more Frogs! More details coming soon!
 
 
 ### How do I Morph?
@@ -131,13 +121,9 @@ Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with
 
 2. Go to the <button id="morph_ref" class="buttonbar_morph"><b>🍄Morph</b></button> tab and **Select** two Frogs to Morph!
 
-    - First select the **Base Frog!** 
-    
-        - **Dominant** This Frog will keep all attributes, except for colored traits! 
+    - First select the **Base Frog!** This Frog will keep all attributes, except for colored traits! 
 
-    - Then select the **Sub Frog!**
-    
-        - **Passive** This frog will have all attributes inherited, without overwriting existing!
+    - Then select the **Sub Frog!** This frog will have all attributes inherited, without overwriting existing!
 
     - This means there are two possible morph combinations for every two Frogs!
 
