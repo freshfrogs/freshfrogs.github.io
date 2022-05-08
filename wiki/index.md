@@ -64,11 +64,11 @@ layout: wiki
 
     - Make sure all details are correct, and the gas limit is appropriate!
 
-- _What are Gas Fees?_
+- __What are Gas Fees?__
 
     - A "Gas Fee" is required when minting any NFT on to the Ethereum blockchain. **[Learn more](https://www.investopedia.com/terms/g/gas-ethereum.asp)**
 
-- _Verified Smart Contract on Ethereum_
+- __Verified Smart Contract on Ethereum__
 
     - Our smart contract has been verified on **[etherscan.io](https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b)** ✔️
 
