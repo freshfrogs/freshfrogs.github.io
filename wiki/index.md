@@ -127,6 +127,17 @@ layout: wiki
 
     - This is currently just a preview until the full utility is released!
 
-- **What is "Morphing?**
 
-    - Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with combined traits! Morphing will require a special token aquired through staking!
+### What is Morphing?
+
+---
+
+    Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with combined traits! Morphing will require a special token aquired through staking!
+
+    - **What's will happen to My Frogs after I Morph?**
+
+    - **When will the full morph utility be released?**
+
+    - **What will it cost to Morph?**
+
+    - **What is Meta-Morphing?**
