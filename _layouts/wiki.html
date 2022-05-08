@@ -432,6 +432,10 @@
                     '</div>';
 
                 morph = false;
+                var morphbar = document.getElementById('buttonbar_morph')
+                morphbar.style.boxShadow = 'none'
+                morphbar.style.background = 'white'
+                morphbar.style.color = 'initial'
 
                 document.getElementById('previewImg').setAttribute('src', '../frog/'+nextIdC+'.png')
                 
@@ -442,6 +446,11 @@
             function load_morph() {
 
                 morph = true;
+                var morphbar = document.getElementById('buttonbar_morph')
+                morphbar.style.boxShadow = '0px 0px 6px 6px rgba(122, 122, 122, 0.20)'
+                morphbar.style.background = 'lightcoral'
+                morphbar.style.color = 'white'
+
                 base_frog = false;
                 sub_frog = false;
                 
