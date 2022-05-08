@@ -97,8 +97,24 @@ layout: wiki
 </div>
 
 
-### What is "Morphing" and How do I Morph?
+### How do I Morph?
 
 ---
 
-- Preview morph combinations at [freshfrogs.io/the-pad](https://freshfrogs.io/the-pad)
+1. **Connect** an Ethereum Wallet that holds Fresh Frog Tokens!
+
+2. **Select** to Frogs to Morph!
+
+    - First select the **Base** Frog! This Frog will keep all of it's attributes, except for traits!
+
+    - Then select the **Sub** Frog! This frog will have all of it's attributes inherited, without overwriting existing!
+
+    - This means there are two possible morph combinations for every two Frogs!
+
+        - **Example** FROG A + FROG B will have a different outcome than FROG B + FROG A
+
+3. **Generate Morph!**
+
+- _What is "Morphing?_
+
+    - Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with combined traits! Morphing will require a special token aquired through staking!
