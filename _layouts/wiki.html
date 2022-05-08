@@ -537,7 +537,7 @@
                     var data = baseFrogmetadata.attributes[i]
                     //loadAttribute(data.trait_type, data.value, 'baseDisplay')
                 }
-                
+
                 if (!base_frog || !sub_frog) {
                     return
                 } else {
@@ -840,6 +840,7 @@
                                     } else if (this_frog == base_frog) { // UN-SELECT BASE
                                         document.getElementById('frog_name_base').innerHTML = 'Select Frog'
                                         document.getElementById(this_frog_ID).style.boxShadow = 'none'
+                                        document.getElementById('mint-button').style.boxShadow = 'none'
                                         base_frog = false;
                                     } else if (!sub_frog && base_frog !== this_frog) { // SELECT SUB
                                         sub_frog = this_frog
@@ -852,6 +853,7 @@
                                     } else if (this_frog == sub_frog) { // UN-SELECT SUB
                                         document.getElementById('frog_name_sub').innerHTML = 'Select Frog'
                                         document.getElementById(this_frog_ID).style.boxShadow = 'none'
+                                        document.getElementById('mint-button').style.boxShadow = 'none'
                                         sub_frog = false;
                                     }
                                     return
