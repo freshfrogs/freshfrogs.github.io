@@ -507,6 +507,7 @@
                         console.log('Base or Sub Frog not defined. Morph Failed.')
                     } else {
                         combineTokens(base_frog, sub_frog);
+                        mint_button.style.boxShadow = 'none'
                     }
                     
                 }
@@ -520,6 +521,7 @@
                     var data = subFrogmetadata.attributes[i]
                     //loadAttribute(data.trait_type, data.value, 'subDisplay')
                 }
+                document.getElementById('mint-button').style.boxShadow = '0px 0px 6px 6px #7cc1ff'
             }
             // Select baseFrog
             async function selectBaseFrog(selectedBase){
@@ -529,6 +531,7 @@
                     var data = baseFrogmetadata.attributes[i]
                     //loadAttribute(data.trait_type, data.value, 'baseDisplay')
                 }
+                document.getElementById('mint-button').style.boxShadow = '0px 0px 6px 6px #7cc1ff'
             }
 
             // Function combine tokens
