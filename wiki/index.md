@@ -87,7 +87,7 @@ layout: wiki
 
     - View attribute rarities of each Frog, Morph, and more!
 
-    - <i id="user-add"></i>
+    - *connected:* <i id="user-add"></i>
 
 ---
 <div id="owned-frogs" class="owned_frogs">

@@ -965,7 +965,7 @@
                         consoleOutput(`☑ETH Address: ${truncateAddress(window.userAddress)}`);
                         console.log(`☑ETH Address: ${truncateAddress(window.userAddress)}`);
                         if (!morph) { document.getElementById('mint-button').innerHTML = '<b><i>Send Transaction!</i></b>'; }
-                        document.getElementById('user-add').innerHTML = 'connected: '+window.userAddress
+                        document.getElementById('user-add').innerHTML = window.userAddress
                         load_ownedFrogs();
                     } catch (error) {
                         console.error(error);
