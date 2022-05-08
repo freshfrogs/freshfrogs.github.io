@@ -46,23 +46,23 @@ layout: wiki
 
 ---
 
-> 1. First **Connect** an Ethereum wallet! Don't have a wallet? We recommend **[Meta Mask](https://metamask.io/download/)** 🦊
->
->    - Browser extensions will automatically be detected, a request will be sent to your provider.
->    
->    - When using a mobile device: Use the built in browser within your wallet app.
->
->2. Next, **Select** up to NINE Frogs to mint!
->
->    - You may mint up to NINE Frogs per transaction with a max of 40 Frogs per wallet!
->
->3. Then, Click on **Mint** (transact) to submit the transaction!
->
->4. Finally, Review and **Confirm** the transaction!
->
->    - Review and confirm the request with your provider to send the transaction!
->
->    - Make sure all details are correct, and the gas limit is appropriate!
+1. First **Connect** an Ethereum wallet! Don't have a wallet? We recommend **[Meta Mask](https://metamask.io/download/)** 🦊
+
+    - Browser extensions will automatically be detected, a request will be sent to your provider.
+    
+    - When using a mobile device: Use the built in browser within your wallet app.
+
+2. Next, **Select** up to NINE Frogs to mint!
+
+    - You may mint up to NINE Frogs per transaction with a max of 40 Frogs per wallet!
+
+3. Then, Click on **Mint** (transact) to submit the transaction!
+
+4. Finally, Review and **Confirm** the transaction!
+
+    - Review and confirm the request with your provider to send the transaction!
+
+    - Make sure all details are correct, and the gas limit is appropriate!
 
 - _What are Gas Fees?_
 
