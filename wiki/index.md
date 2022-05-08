@@ -101,6 +101,10 @@ layout: wiki
 
 ---
 
+- _What is "Morphing?_
+
+    - Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with combined traits! Morphing will require a special token aquired through staking!
+
 1. **Connect** an Ethereum Wallet that holds Fresh Frog Tokens!
 
 2. **Select** to Frogs to Morph!
@@ -115,6 +119,5 @@ layout: wiki
 
 3. **Generate Morph!**
 
-- _What is "Morphing?_
+    - A NEW Frog will be generated with combined attributes!
 
-    - Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with combined traits! Morphing will require a special token aquired through staking!
