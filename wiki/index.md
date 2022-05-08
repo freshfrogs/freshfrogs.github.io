@@ -119,6 +119,9 @@ Morphing will require a special token aquired through staking, and a gas fee wil
 **What is Meta-Morphing?**
 (N)ew (F)rog (T)okens can be combined to create even more Frogs! More details coming soon!
 
+<br>
+
+<br>
 
 ### How do I Morph?
 
