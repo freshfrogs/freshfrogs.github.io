@@ -843,6 +843,12 @@
                                     return
                                 } else {
                                     document.getElementById('buttonbar_mint').className = 'button_1';
+                                    
+                                    var all_owned_frogs = document.getElementsByClassName('owned_frog')
+                                    for (var i = 0; i < all_owned_frogs.length; i++) {
+                                        all_owned_frogs[i].style.boxShadow = 'none';
+                                    }
+
                                     document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px #7cc1ff'
                                 }
 
