@@ -87,6 +87,8 @@ layout: wiki
 
     - View attribute rarities of each Frog, Morph, and more!
 
+    - Click on a Frog to view Attributes and more!
+
     - *connected:* <i id="user-add"></i>
 
 ---
