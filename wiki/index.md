@@ -123,11 +123,6 @@ layout: wiki
 
     - This is currently just a preview until the full utility is released!
 
-
-### What is Morphing?
-
----
-
 Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with combined traits! Morphing will require a special token aquired through staking!
 
     - **What's will happen to My Frogs after I Morph?**
@@ -137,3 +132,10 @@ Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with
     - **What will it cost to Morph?**
 
     - **What is Meta-Morphing?**
+
+
+### What is Staking?
+
+---
+
+NFT staking refers to locking up non-fungible tokens on a platform or protocol in exchange for staking rewards and other benefits! Staking NFTs allows holders to earn an income from their collection while maintaining ownership!
