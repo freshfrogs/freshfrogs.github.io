@@ -160,3 +160,9 @@ Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with
 
 <br>
 NFT staking refers to locking up non-fungible tokens on a platform or protocol in exchange for staking rewards and other benefits! Staking NFTs allows holders to earn an income from their collection while maintaining ownership!
+
+- Frog Owners will have the option to stake in return for special tokens, raffles, rewards and more! Here are some examples!
+
+    - Loyalty payment program! Coming soon Frog holders will be able to lock-in their Frogs at https://freshfrogs.io for rewards! 🐸 
+
+    - The longer the Frog is held without listings, greater the reward! Royalties, rewards, raffles, and more!
