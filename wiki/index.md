@@ -99,8 +99,6 @@ layout: wiki
 </div>
 
 
-<img src="https://freshfrogs.io/assets/frogs/previewMorph.png" class="float-img"/>
-
 ### What is Morphing?
 
 ---
