@@ -115,7 +115,7 @@ Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with
 
     - Morphing will require a special token aquired through staking, and a gas fee will be needed to create the NEW NFT!
 
-    - These "special tokens" will be free and easy to obtain for Frog owners!
+    - These "special tokens" will be free and easy to obtain for Frog owners through [staking]()!
 
 - What is Meta-Morphing?
 
