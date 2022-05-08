@@ -18,7 +18,6 @@ layout: wiki
 
 <div id="minting-display" class="minting-display">
     <div>
-        <div class="button_bar"><button id="buttonbar_mint" class="button_1 buttonbar_mint_on" onclick="load_mintingTerminal()"><b>🐸Mint</b></button><button id="buttonbar_morph" class="button_1" onclick="load_morph()"><b>🍄Morph</b></button><button id="buttonbar_stake" class="button_1"><b>📌Stake</b></button></div>
         <div id="mintingTray" class="mintingTray">
             <div id="display-table" style="min-height: 64px;">
                 <i id="label_name" class="label_name">4040 Total Supply</i><i id="label_price" class="label_price">Quantity</i>
@@ -33,6 +32,7 @@ layout: wiki
             </div>
         </div>
         <div id="lower_display" class="lower_display">
+            <div class="button_bar"><button id="buttonbar_mint" class="button_1 buttonbar_mint_on" onclick="load_mintingTerminal()"><b>🐸Mint</b></button><button id="buttonbar_morph" class="button_1" onclick="load_morph()"><b>🍄Morph</b></button><button id="buttonbar_stake" class="button_1"><b>📌Stake</b></button></div>
             <button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button>
             <div id="minting-console" class="minting-console">
                 > connect wallet...
