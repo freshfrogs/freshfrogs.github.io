@@ -103,6 +103,7 @@ layout: wiki
 
 ---
 
+<img src="https://freshfrogs.io/assets/frogs/morphPreview.png" class="float-img"/>
 
 Holders will be soon able to "Morph" two Frogs to create a new NFT on Ethereum with combined traits! Morphing will require a special token aquired through staking!
 
