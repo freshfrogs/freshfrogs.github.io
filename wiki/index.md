@@ -103,13 +103,13 @@ layout: wiki
 
 Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with combined traits! Morphing will require a special token aquired through staking!
 
-    - **What's will happen to My Frogs after I Morph?**
+- **What will happen to My Frogs after I Morph?**
 
-    - **When will the full Morph utility be released?**
+- **When will the full Morph utility be released?**
 
-    - **What will it cost to Morph?**
+- **What will it cost to Morph?**
 
-    - **What is Meta-Morphing?**
+- **What is Meta-Morphing?**
 
 
 ### How do I Morph?
