@@ -414,7 +414,7 @@
 
                     '<div id="display-table" style="height: 64px;">' +
                     '    <i id="label_name" class="label_name">Frog 3410 / 4040</i><i id="label_price" class="label_price">Quantity</i>' +
-                    '    <b id="frog_name" class="frog_name">0.01 ΞETH</b><b id="frog_price" class="frog_price"><b id="remove-frog">-</b> <b id="quant-frog">1</b> <a id="add-frog" onclick="add_frog();"><b>+</b></a></b>' +
+                    '    <b id="frog_name" class="frog_name">0.01 ΞETH</b><b id="frog_price" class="frog_price"><b id="remove-frog" onclick="remove_frog();">-</b> <b id="quant-frog">1</b> <a id="add-frog" onclick="add_frog();"><b>+</b></a></b>' +
                     '</div>' +
                     '<div class="bigContainer">' +
                     '    <div id="frogContainer" class="containerMint"></div>' +
@@ -889,6 +889,29 @@
                     address.length
                 )}`;
             }
+            // REMOVE FROG from minting Tray
+            function remove_frog() {
+                if (frogCount >= 7) {
+                    var select = document.getElementById("frogContainer");
+                    select.removeChild(select.lastChild);
+                    frogCount = frogCount - 1
+                } else if (frogCount >= 4) {
+                    var select = document.getElementById("frogContainer2");
+                    select.removeChild(select.lastChild);
+                    frogCount = frogCount - 1
+                } else if (frogCount >= 2) {
+                    var select = document.getElementById("frogContainer3");
+                    select.removeChild(select.lastChild);
+                    frogCount = frogCount - 1
+                }
+                if (frogCount <= 1) {
+                    mintList = nextIdC
+                } else {
+                    mintList = nextIdC+" - "+((nextIdC-1)+frogCount)
+                }
+                document.getElementById('quant-frog').innerHTML = frog_count
+                document.getElementById('label_name').innerHTML = mintList
+            }
             // ADD FROG to minting tray
             function add_frog() {
                 if (typeof frog_count == 'undefined') { frog_count = 1; }
@@ -919,6 +942,9 @@
                         mintList = nextIdC+" - "+((nextIdC-1)+frog_count)
                     }
                 }
+
+                document.getElementById('quant-frog').innerHTML = frog_count
+                document.getElementById('label_name').innerHTML = mintList
             }
             // Login with Web3 via Metamasks window.ethereum library
             async function connect() {
