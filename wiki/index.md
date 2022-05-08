@@ -101,6 +101,8 @@ layout: wiki
 
 ---
 
+<img src="https://freshfrogs.io/assets/frogs/previewMorph.png" class="float-img"/>
+
 Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with combined traits! Morphing will require a special token aquired through staking!
 
 - What will happen to My Frogs after I Morph?
@@ -121,7 +123,6 @@ Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with
 
     - (N)ew (F)rog (T)okens can be combined to create even more Frogs! More details coming soon!
 
-<img src="https://freshfrogs.io/assets/frogs/previewMorph.png" class="float-img"/>
 
 ### How do I Morph?
 
