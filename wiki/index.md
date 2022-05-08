@@ -105,7 +105,7 @@ layout: wiki
 
 ---
 
-**Holders will be soon able to "Morph" two Frogs to create a new NFT on Ethereum with combined traits! Morphing will require a special token aquired through staking!**
+Holders will be soon able to "Morph" two Frogs to create a new NFT on Ethereum with combined traits! Morphing will require a special token aquired through staking!
 
 **What will happen to My Frogs after I Morph?** Existing Frogs will remain without change, and a NEW NFT will be created on Ethereum!
 
@@ -115,6 +115,7 @@ layout: wiki
 
 **What is Meta-Morphing?** (N)ew (F)rog (T)okens can be combined to create even more Frogs! More details coming soon!
 
+<br>
 
 ### How do I Morph?
 
