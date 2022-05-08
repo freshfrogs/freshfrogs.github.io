@@ -121,3 +121,5 @@ layout: wiki
 
     - A NEW Frog will be generated with combined attributes!
 
+    - This is currently just a preview until the full utility is released!
+
