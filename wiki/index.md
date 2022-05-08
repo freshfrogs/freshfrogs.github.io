@@ -107,7 +107,7 @@ layout: wiki
 
 1. **Connect** an Ethereum Wallet that holds Fresh Frog Tokens!
 
-2. **Select** two Frogs to Morph!
+2. Go to the Morph tab and **Select** two Frogs to Morph!
 
     - First select the **Base** Frog! This Frog will keep all attributes, except for traits!
 
