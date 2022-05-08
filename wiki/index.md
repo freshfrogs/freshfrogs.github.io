@@ -122,8 +122,6 @@ Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with
     - (N)ew (F)rog (T)okens can be combined to create even more Frogs! More details coming soon!
 
 
-<img src="https://freshfrogs.io/assets/frogs/previewMorph.png" class="float-img"/>
-
 ### How do I Morph?
 
 ---
@@ -149,6 +147,8 @@ Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with
     - A NEW Frog will be generated with combined attributes!
 
     - This is currently just a preview until the full utility is released!
+
+<img src="https://freshfrogs.io/assets/frogs/previewMorph.png" class="float-img"/>
 
 
 ### What is Staking?
