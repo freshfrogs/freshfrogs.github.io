@@ -132,7 +132,7 @@ Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with
 
     - **What's will happen to My Frogs after I Morph?**
 
-    - **When will the full morph utility be released?**
+    - **When will the full Morph utility be released?**
 
     - **What will it cost to Morph?**
 
