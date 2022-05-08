@@ -107,7 +107,7 @@ layout: wiki
 
     - First select the **Base Frog!** 
     
-        - **Dominant** This Frog will keep all attributes, except for traits! 
+        - **Dominant** This Frog will keep all attributes, except for colored traits! 
 
     - Then select the **Sub Frog!**
     
