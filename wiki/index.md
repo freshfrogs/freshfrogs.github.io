@@ -99,11 +99,11 @@ layout: wiki
 </div>
 
 
+<img src="https://freshfrogs.io/assets/frogs/previewMorph.png" class="float-img"/>
+
 ### What is Morphing?
 
 ---
-
-<img src="https://freshfrogs.io/assets/frogs/previewMorph.png" class="float-img"/>
 
 **Holders will be soon able to "Morph" two Frogs to create a new NFT on Ethereum with combined traits! Morphing will require a special token aquired through staking!**
 
