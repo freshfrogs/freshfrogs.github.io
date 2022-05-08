@@ -89,6 +89,11 @@
         min-height: 1%;
         margin: 1%;
     }
+    .buttonbar_mint_on {
+        box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);
+        background-color: #7cc1ff;
+        color: white;
+    }
     #buttonbar_mint:hover {
         box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);
         background-color: #7cc1ff;
@@ -442,6 +447,8 @@
                 morphbar.style.background = 'white'
                 morphbar.style.color = 'initial'
 
+                document.getElementById('buttonbar_mint').className = 'buttonbar_mint_on';
+
                 document.getElementById('previewImg').setAttribute('src', '../frog/'+nextIdC+'.png')
                 
                 connect();
@@ -455,6 +462,8 @@
                 morphbar.style.boxShadow = '0px 0px 6px 6px rgba(122, 122, 122, 0.20)'
                 morphbar.style.background = 'lightcoral'
                 morphbar.style.color = 'white'
+
+                document.getElementById('buttonbar_mint').className = 'none';
 
                 base_frog = false;
                 sub_frog = false;
