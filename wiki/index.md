@@ -97,6 +97,21 @@ layout: wiki
 </div>
 
 
+### What is Morphing?
+
+---
+
+Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with combined traits! Morphing will require a special token aquired through staking!
+
+    - **What's will happen to My Frogs after I Morph?**
+
+    - **When will the full Morph utility be released?**
+
+    - **What will it cost to Morph?**
+
+    - **What is Meta-Morphing?**
+
+
 ### How do I Morph?
 
 ---
@@ -122,21 +137,6 @@ layout: wiki
     - A NEW Frog will be generated with combined attributes!
 
     - This is currently just a preview until the full utility is released!
-
-
-### What is Morphing?
-
----
-
-Holders will be soon able to "Morph" Frogs to create a new NFT on Ethereum, with combined traits! Morphing will require a special token aquired through staking!
-
-    - **What's will happen to My Frogs after I Morph?**
-
-    - **When will the full Morph utility be released?**
-
-    - **What will it cost to Morph?**
-
-    - **What is Meta-Morphing?**
 
 
 ### What is Staking?
