@@ -107,16 +107,18 @@ layout: wiki
 
 Holders will be soon able to "Morph" two Frogs to create a new NFT on Ethereum with combined traits! Morphing will require a special token aquired through staking!
 
-**What will happen to My Frogs after I Morph?** Existing Frogs will remain without change, and a NEW NFT will be created on Ethereum!
+**What will happen to My Frogs after I Morph?**
+Existing Frogs will remain without change, and a NEW NFT will be created on Ethereum!
 
-**When will the full Morph utility be released?** Once the full collection of 4,040 Frogs has been minted!
+**When will the full Morph utility be released?**
+Once the full collection of 4,040 Frogs has been minted!
 
-**What will it cost to Morph?** Morphing will require a special token aquired through staking, and a gas fee will be needed to create the NEW NFT! These "special tokens" will be free and easy to obtain for Frog owners through [staking]()!
+**What will it cost to Morph?**
+Morphing will require a special token aquired through staking, and a gas fee will be needed to create the NEW NFT! These "special tokens" will be free and easy to obtain for Frog owners through [staking]()!
 
-**What is Meta-Morphing?** (N)ew (F)rog (T)okens can be combined to create even more Frogs! More details coming soon!
+**What is Meta-Morphing?**
+(N)ew (F)rog (T)okens can be combined to create even more Frogs! More details coming soon!
 
-<br>
-<br>
 
 ### How do I Morph?
 
