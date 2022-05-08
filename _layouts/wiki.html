@@ -493,15 +493,6 @@
 
             }
 
-            //
-            document.getElementById("morph_ref").addEventListener("click", async (e) => {
-                document.getElementById('minting-display').scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center',
-                    inline: 'center'
-                });
-            })
-
             function load_morph() {
 
                 morph = true;
@@ -1080,6 +1071,14 @@
 
 
             document.addEventListener("DOMContentLoaded", async () => {
+
+                document.querySelector("#morph_ref").addEventListener("click", async (e) => {
+                    document.getElementById('minting-display').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center',
+                        inline: 'center'
+                    });
+                })
 
                 CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
               
