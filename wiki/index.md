@@ -183,15 +183,15 @@ NFT staking refers to locking up non-fungible tokens on a platform or protocol i
 
 ---
 
-The Fresh Frogs NFT Collection consists of 4,040 Frogs that are each unique and randomly generated. There are 32 different Frog Types, with 60 different traits! Resulting in 2.8 million possible combinations!
+The Fresh Frogs NFT Collection consists of 4,040 Frogs that are each unique and randomly generated. There are 30 different Frog Types, with 60 different traits! Resulting in 2.8 million possible combinations!
 
 - **Base Frog Types**
 
-    - There are SEVEN basic Tree Frog variantions within the collection. They are the most common!
+    - There are EIGHT basic Tree Frog variantions within the collection. They are the most common!
 
 - **Colored Frog Types**
 
-    - There are EIGHT colored Tree Frog variantions within the collection. They are rare!
+    - There are NINE colored Tree Frog variantions within the collection. They are rare!
 
 - **Special Frog Types**
 
