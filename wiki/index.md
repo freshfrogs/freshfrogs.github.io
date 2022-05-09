@@ -161,4 +161,4 @@ NFT staking refers to locking up non-fungible tokens on a platform or protocol i
 
 - #### When Will Staking be Released?
 
-    - Staking is scheduled for released around Q2/Q3 2022
+    - Staking is scheduled to be released around Q2/Q3 2022
