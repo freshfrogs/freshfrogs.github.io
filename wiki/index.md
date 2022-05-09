@@ -158,3 +158,7 @@ NFT staking refers to locking up non-fungible tokens on a platform or protocol i
 - Passive Income from Fresh Frog Staking -- Passive income streams, via royalty payouts and token rewards!
 
     - Fresh Frog Owners will be able to stake to earn **passive income** by **a.)** earning tokens that can be used for utilities and **b.)** loyalty reward payments from sales royalties!
+
+- #### When Will Staking be Released?
+
+    - Staking is scheduled for released around Q2/Q3 2022
