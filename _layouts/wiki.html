@@ -605,10 +605,20 @@
                 }
             }
 
+
+
             // Select subFrog
-            async function selectSubFrog(selectedSub){
+            async function selectSubFrog(selected_sub){
+
+                sub_frog = selected_sub
+
+                document.getElementById('frog_name_sub').innerHTML = this_frog_ID
+                document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px lightsalmon'
+                
+                document.getElementById("sub_frog_img").setAttribute('src', 'https://freshfrogs.io/frog/'+sub_frog+'.png')
+
                 console.log('> subDisplay: ' + sub_frog)
-                let subFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+selectedSub+".json")).json();
+                let subFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+selected_sub+".json")).json();
                 for (var i = 0; i < subFrogmetadata.attributes.length; i++){
                     var data = subFrogmetadata.attributes[i]
                     //loadAttribute(data.trait_type, data.value, 'subDisplay')
@@ -622,9 +632,17 @@
                 
             }
             // Select baseFrog
-            async function selectBaseFrog(selectedBase){
+            async function selectBaseFrog(selected_base){
+
+                base_frog = selected_base;
+
+                document.getElementById('frog_name_base').innerHTML = this_frog_ID
+                document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px lightcoral'
+
+                document.getElementById("base_frog_img").setAttribute('src', 'https://freshfrogs.io/frog/'+base_frog+'.png')
+
                 console.log('> baseDisplay: ' + base_frog)
-                let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+selectedBase+".json")).json();
+                let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+selected_base+".json")).json();
                 for (var i = 0; i < baseFrogmetadata.attributes.length; i++){
                     var data = baseFrogmetadata.attributes[i]
                     //loadAttribute(data.trait_type, data.value, 'baseDisplay')
@@ -922,34 +940,35 @@
 
                                 if (morph) {
                                     if (!base_frog && sub_frog !== this_frog) { // SELECT BASE
-                                        base_frog = this_frog
-                                        selectBaseFrog(base_frog);
-                                        document.getElementById('frog_name_base').innerHTML = this_frog_ID
-                                        document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px lightcoral'
 
-                                        document.getElementById("base_frog_img").setAttribute('src', 'https://freshfrogs.io/frog/'+base_frog+'.png')
+                                        selectBaseFrog(base_frog);
+                                        return
                                         
                                     } else if (this_frog == base_frog) { // UN-SELECT BASE
+
                                         document.getElementById('frog_name_base').innerHTML = 'Select Frog'
                                         document.getElementById(this_frog_ID).style.boxShadow = 'none'
                                         document.getElementById('mint-button').style.boxShadow = 'none'
                                         base_frog = false;
+                                        return
+
                                     } else if (!sub_frog && base_frog !== this_frog) { // SELECT SUB
-                                        sub_frog = this_frog
+
                                         selectSubFrog(sub_frog);
-                                        document.getElementById('frog_name_sub').innerHTML = this_frog_ID
-                                        document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px lightsalmon'
-                                        
-                                        document.getElementById("sub_frog_img").setAttribute('src', 'https://freshfrogs.io/frog/'+sub_frog+'.png')
+                                        return
 
                                     } else if (this_frog == sub_frog) { // UN-SELECT SUB
+
                                         document.getElementById('frog_name_sub').innerHTML = 'Select Frog'
                                         document.getElementById(this_frog_ID).style.boxShadow = 'none'
                                         document.getElementById('mint-button').style.boxShadow = 'none'
                                         sub_frog = false;
+                                        return
+
                                     }
-                                    return
+
                                 } else {
+                                    
                                     document.getElementById('buttonbar_mint').className = 'button_1';
                                     
                                     var all_owned_frogs = document.getElementsByClassName('owned_frog')
