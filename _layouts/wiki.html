@@ -455,7 +455,7 @@
     }
     .freshfrogsmeta {
         text-align: center;
-        display: inline-flex;
+        display: inline-block;
         flex-wrap: wrap;
         image-rendering: pixelated;
         margin-left: auto;
@@ -469,6 +469,10 @@
         border: 1px solid lightgray;
         color: white;
         transition: all .9s ease;
+    }
+    .caption {
+        /* Make the caption a block so it occupies its own line. */
+        display: block;
     }
 </style>
 <link rel="icon" href="../assets/logo.png">
