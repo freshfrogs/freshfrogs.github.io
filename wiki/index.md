@@ -111,19 +111,19 @@ layout: wiki
 
 Holders will be soon able to "Morph" two Frogs to create a new NFT on Ethereum with combined traits! Morphing will require a special token aquired through staking!
 
-- **What will happen to My Frogs after I Morph?**
+- What will happen to My Frogs after I Morph?
 
     - Existing Frogs will remain without change, and a NEW NFT will be created on Ethereum!
 
-- **When will the full Morph utility be released?**
+- When will the full Morph utility be released?
 
     - Once the full collection of 4,040 Frogs has been minted!
 
-- **What will it cost to Morph?**
+- What will it cost to Morph?
 
     - Morphing will require a special token aquired through staking, and a gas fee will be needed to create the NEW NFT! These "special tokens" will be free and easy to obtain for Frog owners through [staking]()!
 
-- **What is Meta-Morphing?**
+- What is Meta-Morphing?
 
     - (N)ew (F)rog (T)okens can be combined to create even more Frogs! More details coming soon!
 
@@ -185,19 +185,19 @@ NFT staking refers to locking up non-fungible tokens on a platform or protocol i
 
 The Fresh Frogs NFT Collection consists of 4,040 Frogs that are each unique and randomly generated. There are 30 different Frog Types, with 60 different traits! Resulting in 2.8 million possible combinations!
 
-- **Base Frog Types**
+- Base Frog Types
 
     - There are EIGHT basic Tree Frog variantions within the collection. They are the most common!
 
-- **Colored Frog Types**
+- Colored Frog Types
 
     - There are NINE colored Tree Frog variantions within the collection. They are rare!
 
-- **Special Frog Types**
+- Special Frog Types
 
     - There are FIVE Special Frog variantions within the collection! They are the very rare!
 
-- **Natural Frog Types**
+- Natural Frog Types
 
     - There are EIGHT Frog types that *can* hold an extremely rare "natural" trait. These are the most rare!
 
