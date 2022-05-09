@@ -184,8 +184,8 @@ The Fresh Frogs NFT Collection consists of 4,040 Frogs that are each unique and 
     - There are FIVE Special Frog variantions within the collection! They are the very rare!
 
 - **Natural Frog Types**
-    - There are EIGHT Frog types that *can* hold an extremely rare "natural" trait. These are the most rare!</p>
-    - 0.25% chance to recieve a Frog that can hold a "special" natural trait, and a 0.05% chance to recieve said trait!</p>
+    - There are EIGHT Frog types that *can* hold an extremely rare "natural" trait. These are the most rare!
+    - 0.25% chance to recieve a Frog that can hold a "special" natural trait, and a 0.05% chance to recieve said trait!
 
 
 
