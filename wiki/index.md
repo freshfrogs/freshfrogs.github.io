@@ -175,21 +175,28 @@ NFT staking refers to locking up non-fungible tokens on a platform or protocol i
 
 ---
 
+The Fresh Frogs NFT Collection consists of 4,040 Frogs that are each unique and randomly generated. There are 32 different Frog Types, with 60 different traits! Resulting in 2.8 million possible combinations!
+
 <div id="freshfrogsmeta" class="freshfrogsmeta">
     <div style="margin-left: 10%; margin-right: auto;">
         <img class="meta_img" src="../the-pad/Frog/treeFrog(3).png"/>
-        <p>Base Frog Types</p>
+        <p><b>Base Frog Types<b></p>
+        <p>There are SEVEN basic Tree Frog variantions within the collection. They the most common</p>
     </div>
-    <div style="margin-left: auto; margin-right: auto;">
-        <img class="meta_img" src="../the-pad/SpecialFrog/peace.png"/>
-        <p>Peace Frogs</p>
+    <div style="margin-left: 10%; margin-right: auto;">
+        <img class="meta_img" src="../the-pad/Frog/treeFrog(3).png"/>
+        <p><b>Base Frog Types<b></p>
+        <p>There are NINE basic Tree Frog variantions within the collection. They the most common</p>
     </div>
     <div style="margin-left: auto; margin-right: auto;">
         <img class="meta_img" src="../the-pad/SpecialFrog/thirdEye.png"/>
-        <p>Special Frog Types</p>
+        <p><b>Special Frog Types<b></p>
+        <p>There are FIVE Special Frog variantions within the collection! They are the very rare!</p>
     </div>
     <div style="margin-left: auto; margin-right: 10%;">
         <img class="meta_img" src="../the-pad/Frog/redEyedTreeFrog.png"/>
-        <p>Natural Frog Types</p>
+        <p><b>Natural Frog Types<b></p>
+        <p>There are EIGHT Frog types that *can* hold an extremely rare "natural" trait. These are the most rare!</p>
+        <p>0.25% chance to recieve a Frog that can hold a "special" natural trait, and a 0.05% chance to recieve said trait!</p>
     </div>
 </div>
