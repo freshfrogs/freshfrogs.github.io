@@ -178,15 +178,15 @@ NFT staking refers to locking up non-fungible tokens on a platform or protocol i
 <div id="freshfrogsmeta" class="freshfrogsmeta">
     <div>
         <img class="meta_img" src="../the-pad/Frog/treeFrog(3).png"/>
-        <b>Base Frog Types</b>
+        <p>Base Frog Types</p>
     </div>
     <div>
         <img class="meta_img" src="../the-pad/SpecialFrog/peace.png"/>
-        <b>Peace Frogs</b>
+        <p>Peace Frogs</p>
     </div>
     <div>
         <img class="meta_img" src="../the-pad/SpecialFrog/thirdEye.png"/>
-        <b>Special Frog Types</b>
+        <p>Special Frog Types</p>
     </div>
     <div>
         <img class="meta_img" src="../the-pad/Frog/redEyedTreeFrog.png"/>
