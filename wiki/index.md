@@ -207,7 +207,7 @@ The Fresh Frogs NFT Collection consists of 4,040 Frogs that are each unique and 
 
     - Trait (Sub Color)
 
-        - NINETEEN possible color variations
+        - Total of 19 possible color variations
 
     - Accessory
 
