@@ -16,6 +16,9 @@ layout: wiki
 
 </desc>
 
+<div id="recent_sales" class="recent_sales"></div>
+<h4><u><a href="https://opensea.io/collection/fresh-frogs?tab=activity" target="_blank">Recent Sales</a></u></h4>
+
 <div id="minting-display" class="minting-display">
     <div>
         <div class="button_bar"><button id="buttonbar_mint" class="button_1 buttonbar_mint_on" onclick="load_mintingTerminal()"><b>🐸Mint</b></button><button id="buttonbar_morph" class="button_1" onclick="load_morph()"><b>🍄Morph</b></button><button id="buttonbar_stake" class="button_1"><b>📌Stake</b></button></div>
