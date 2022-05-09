@@ -125,12 +125,12 @@ Holders will be soon able to "Morph" two Frogs to create a new NFT on Ethereum w
 ---
 
 <div class="float-img2">
-    <img class="frogImg2" style="width: 256px; height: 256px;" src="../the-pad/Frog/frog_gif.gif"/>
-    <img class="frogImg2" style="width: 256px; height: 256px;" src="../the-pad/Trait/trait_gif.gif"/>
-    <img class="frogImg2" style="width: 256px; height: 256px;" src="../the-pad/Accessory/accessory_gif.gif"/>
-    <img class="frogImg2" style="width: 256px; height: 256px;" src="../the-pad/Eyes/eyes_gif.gif"/>
-    <img class="frogImg2" style="width: 256px; height: 256px;" src="../the-pad/Hat/hat_gif.gif"/>
-    <img class="frogImg2" style="width: 256px; height: 256px;" src="../the-pad/Mouth/mouth_gif.gif"/>
+    <img style="width: 256px; height: 256px;" src="../the-pad/Frog/frog_gif.gif"/>
+    <img style="width: 256px; height: 256px;" src="../the-pad/Trait/trait_gif.gif"/>
+    <img style="width: 256px; height: 256px;" src="../the-pad/Accessory/accessory_gif.gif"/>
+    <img style="width: 256px; height: 256px;" src="../the-pad/Eyes/eyes_gif.gif"/>
+    <img style="width: 256px; height: 256px;" src="../the-pad/Hat/hat_gif.gif"/>
+    <img style="width: 256px; height: 256px;" src="../the-pad/Mouth/mouth_gif.gif"/>
 </div>
 
 Preview Frog Morph Combinations!
