@@ -125,7 +125,7 @@ Holders will be soon able to "Morph" two Frogs to create a new NFT on Ethereum w
 ---
 
 <div class="float-img2">
-    <img class="frogImg3" src="../the-pad/Frog/frog.gif"/>
+    <img class="frogImg3" src="../the-pad/Frog/frog_gif.gif"/>
     <img class="frogImg3" src="../the-pad/Trait/trait.gif"/>
     <img class="frogImg3" src="../the-pad/Accessory/accessory.gif"/>
     <img class="frogImg3" src="../the-pad/Eyes/eyes_gif.gif"/>
