@@ -153,4 +153,8 @@ Preview Frog Morph Combinations!
 
 NFT staking refers to locking up non-fungible tokens on a platform or protocol in exchange for staking rewards and other benefits! Staking NFTs allows holders to earn an income from their collection while maintaining ownership!
 
-- Frog Owners will have the option to stake in return for special tokens, royalties, raffles, rewards and more!
+- Frog Owners will have the option to stake in return for special tokens! That can be used to redeem free mints, morph, enter raffles and more rewards!
+
+- Passive Income from Fresh Frog Staking -- Passive income streams, via royalty payouts and token rewards!
+
+    - Fresh Frog Owners will be able to stake to earn passive income by a.) earning tokens that can be used for utilities or sold to others! As well as b.) loyalty reward payments from sales royalties!
