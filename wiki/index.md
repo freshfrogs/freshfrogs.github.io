@@ -16,8 +16,10 @@ layout: wiki
 
 </desc>
 
-<div id="recent_sales" class="recent_sales"></div>
-<h4><u><a href="https://opensea.io/collection/fresh-frogs?tab=activity" target="_blank">Recent Sales</a></u></h4>
+<div style="margin-left: auto; margin-right: auto; text-align: center;">
+    <div id="recent_sales" class="recent_sales"></div>
+    <h4><u><a href="https://opensea.io/collection/fresh-frogs?tab=activity" target="_blank">Recent Sales</a></u></h4>
+</div>
 
 <div id="minting-display" class="minting-display">
     <div>
