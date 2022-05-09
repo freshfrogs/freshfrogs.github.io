@@ -124,7 +124,9 @@ Holders will be soon able to "Morph" two Frogs to create a new NFT on Ethereum w
 
 ---
 
-<img src="https://freshfrogs.io/assets/frogs/morphTray.png" class="float-img2"/>
+<div class="float-img2">
+    <img class="meta_img" src="../the-pad/Frog/frog_gif.gif"/>
+</div>
 
 Preview Frog Morph Combinations!
 
