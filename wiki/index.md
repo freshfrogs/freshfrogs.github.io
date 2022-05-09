@@ -95,7 +95,7 @@ layout: wiki
 
     - Click on a Frog to view properties and more!
 
-    - *connected:* <i id="user-add"></i>
+    - *connected:* <i id="user-add">X</i>
 
 ---
 <div id="owned-frogs" class="owned_frogs">
