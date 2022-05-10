@@ -188,23 +188,6 @@ The Fresh Frogs NFT Collection consists of 4,040 Frogs that are each unique and 
 
     - A 1/30th chance to recieve a Frog that can hold a "special" natural trait, and a 1/19th chance to recieve said trait!
 
-- <a onclick="reset_frogsmeta();" style="cursor: pointer;"><b><u>🗘 Reset Menu</u></b></a>
-
-<div id="freshfrogsmeta" class="freshfrogsmeta">
-    <div style="margin-left: 20%; margin-right: auto;" onclick="loadBaseFrogTypes();">
-        <img class="meta_img" src="../the-pad/Frog/treeFrog(3).png"/>
-        <p>Base Frog Types</p>
-    </div>
-    <div style="margin-left: auto; margin-right: auto;" onclick="loadColoredFrogTypes();">
-        <img class="meta_img" src="../the-pad/Frog/cyanTreeFrog.png"/>
-        <p>Colored Frog Types</p>
-    </div>
-    <div style="margin-left: auto; margin-right: auto;" onclick="loadSpecialFrogTypes();">
-        <img class="meta_img" src="../the-pad/SpecialFrog/peace.png"/>
-        <p>Special Frog Types</p>
-    </div>
-    <div style="margin-left: auto; margin-right: 20%;" onclick="loadNaturalFrogTypes();">
-        <img class="meta_img" src="../the-pad/Frog/redEyedTreeFrog.png"/>
-        <p>Natural Frog Types</p>
-    </div>
+<div class="float-img2">
+    <img class="frogImg3" src="../the-pad/Frog/frog_gif.gif"/>
 </div>
