@@ -1110,7 +1110,7 @@
 
                 try {
 
-                    var ownedFrogs = null//
+                    let ownedFrogs = await collection.methods.balanceOf(this_user).call()
 
                     if (ownedFrogs <= 0) { // ❌ No FROGS
                         console.log("It seems you do not own any FROGS!")
