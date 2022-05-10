@@ -207,7 +207,7 @@ The Fresh Frogs NFT Collection consists of 4,040 Frogs that are each unique and 
         <p><b>Natural Frog Types</b></p>
     </div>
     <div style="margin-left: auto; margin-right: 10%;">
-        <img class="meta_img" src="../the-pad/Frog/redEyedTreeFrog.png"/>
+        <img class="meta_img" src="../assets/opensea.png"/>
         <p><b>View on OpenSea</b></p>
     </div>
 </div>
