@@ -136,7 +136,7 @@ Holders will be soon able to "Morph" two Frogs to create a new NFT on Ethereum w
     <img class="frogImg3" src="../the-pad/Accessory/accessory_gif2.gif"/>
     <img class="frogImg3" src="../the-pad/Eyes/eyes_gif2.gif"/>
     <img class="frogImg3" src="../the-pad/Hat/hat_gif2.gif"/>
-    <img class="frogImg3" src="../the-pad/Mouth/mouth_gif2.gif"/>
+    <img class="frogImg3" src="../the-pad/Mouth/smokingPipe2.gif"/>
 </div>
 
 Preview Frog Morph Combinations!
@@ -171,10 +171,6 @@ NFT staking refers to locking up non-fungible tokens on a platform or protocol i
 - Passive Income from Fresh Frog Staking -- Passive income streams, via royalty payouts and token rewards!
 
     - Fresh Frog Owners will be able to stake to earn **passive income** by **a.)** earning tokens that can be used for utilities and **b.)** loyalty reward payments from sales royalties!
-
-- #### When Will Staking be Released?
-
-    - Staking is scheduled to be released around Q2/Q3 2022
 
 
 ### Fresh Frogs META
