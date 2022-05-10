@@ -558,15 +558,7 @@
         <script src="https://unpkg.com/f0js/dist/f0.js"></script>
         <script>
 
-            var traits_list, frog_count, morph;
-
-            const web3 = new Web3(window.ethereum);   // Open WEB3.0 Browsner Exentions Window
-            const f0 = new F0();    // Connect to Factoria
-            const CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";    // Contract Address (Ethereum Mainnet) 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b // Rinkeby: 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524
-            const COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
-            const NETWORK = "main";   // Which Network?
-
-            var userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
+            var traits_list, collection, CONTRACT_ADDRESS, frog_count, morph;
 
             var nextIdC = 1;
 
@@ -652,7 +644,7 @@
                     '   <br><br><i>3. Generate Morph!</i>' +
                     '</div>';
 
-                if (typeof userAddress == 'undefined') {
+                if (typeof window.userAddress == 'undefined') {
                     try { connect(); } catch (e) { console.log('Error : ' + e.message); }
                 } else { load_ownedFrogs(); }
 
@@ -1010,7 +1002,7 @@
 
                 owned_frogs_div.style.height = 'auto';
 
-                fetch('https://api.opensea.io/api/v1/assets?owner='+userAddress+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+                fetch('https://api.opensea.io/api/v1/assets?owner='+window.userAddress+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
                 .then((res) => res.json())
                 .then((res) => {
                     var { assets } = res
@@ -1135,9 +1127,9 @@
             // Manually check Frog transactions
             async function load_ownedFrogs_manual() {
 
-                let this_user = userAddress;
+                let this_user = window.userAddress;
 
-                console.log('Checking Frogs Manually.. for user...'+userAddress)
+                console.log('Checking Frogs Manually.. for user...'+window.userAddress)
 
                 try {
 
@@ -1370,7 +1362,6 @@
                 }
                 document.getElementById('quant-frog').innerHTML = frog_count
                 document.getElementById('label_name').innerHTML = mintList
-                document.getElementById('frog_name').innerHTML = (frog_count * 0.01) +' ΞETH'
             }
             // ADD FROG to minting tray
             function add_frog() {
@@ -1404,64 +1395,51 @@
                 }
 
                 document.getElementById('quant-frog').innerHTML = frog_count
-                document.getElementById('label_name').innerHTML = mintList // 0.01 ΞETH
-                document.getElementById('frog_name').innerHTML = (frog_count * 0.01) +' ΞETH'
-            }
-            // Mint Function
-            async function sendMint() {
-                console.log('sending mint...');
-                try {
-                    let tokens = await f0.mint(userInvite, frog_count)
-                } catch (e) {
-                    alert(e.message)
-                    return
-                }
-
-                console.log('Done!');
-                
+                document.getElementById('label_name').innerHTML = mintList
             }
             // Login with Web3 via Metamasks window.ethereum library
             async function connect() {
                 console.log('Connecting eth address...')
                 if (window.ethereum) {
-                    // userAddress
-                    try { // Connect Factoria
+                    try {
+                        const selectedAccount = await window.ethereum
+                        .request({
+                            method: "eth_requestAccounts",
+                        })
+                        .then((accounts) => accounts[0])
+                        .catch(() => {
+                            consoleOutput("No account selected!");
+                            throw Error("No account selected!");
+                        });
+                        window.userAddress = selectedAccount;
+                        window.localStorage.setItem("userAddress", selectedAccount);
+                        consoleOutput(`☑ETH Address: ${truncateAddress(window.userAddress)}`);
+                        console.log(`☑ETH Address: ${truncateAddress(window.userAddress)}`);
+                        if (!morph) { document.getElementById('mint-button').innerHTML = '<b><i>Send Transaction!</i></b>'; }
+                        document.getElementById('user-add').innerHTML = window.userAddress
+                        load_ownedFrogs();
+
+                        // Connect Factoria
+
+                        const web3 = new Web3(window.ethereum)
+                        const f0 = new F0();
+
+                        CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"
+                        collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
                         try {
+                            console.log("Connecting to Factoria...")
                             await f0.init({
                                 web3: web3,
                                 contract: CONTRACT_ADDRESS,
-                                network: NETWORK
+                                network: "main"
                             })
-                            
-                            userAddress = await web3.currentProvider.selectedAddress;
-                            nextId = await f0.api.nextId().call();
-                            nextIdC = parseInt(nextId);
-
                         } catch (e) {
                             console.log("Couldn't talk with Factoria")
                         }
-
-                        consoleOutput(`☑ETH Address: ${truncateAddress(userAddress)}`);
-                        console.log(`☑ETH Address: ${truncateAddress(userAddress)}`);
-                        document.getElementById('user-add').innerHTML = userAddress
-
-                        console.log('Done! ' + nextId)
-
-                        load_ownedFrogs();
-
-                        if (!morph) { 
-                            
-                            temp = document.getElementById('mint-button')
-                            temp.innerHTML = '<b><i>Send Transaction!</i></b>';
-                            temp.onClick = sendMint();
-
-                        }
-
                     } catch (error) {
                         console.error(error);
                         consoleOutput(error);
                     }
-                    
                 } else {
                     consoleOutput("No ETH brower extension detected.");
                 }
@@ -1484,6 +1462,8 @@
                         inline: 'center'
                     });
                 })
+
+                CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
               
                 // Pull Collection data from OpenSea
 
