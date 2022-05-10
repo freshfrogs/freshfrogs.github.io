@@ -93,7 +93,7 @@ layout: wiki
 
     - Click on a Frog to view attribute rarities, Morph, and more!
 
-    - *connected:* <i id="user-add">[X]</i>
+    - *connected:* <i id="user-add">[ X ]</i>
 
 ---
 <div id="owned-frogs" class="owned_frogs">
