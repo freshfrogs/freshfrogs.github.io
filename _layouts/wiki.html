@@ -633,7 +633,7 @@
                     '</div>';
 
                 if (typeof window.userAddress == 'undefined') {
-                    try { connect() } catch (e) { console.log('Error : ' + e.message) }
+                    try { connect(); } catch (e) { console.log('Error : ' + e.message); }
                 } else { load_ownedFrogs(); }
 
                 var mint_button = document.getElementById('mint-button')
@@ -647,6 +647,12 @@
                     }
                     
                 }
+
+                // Load two random Frogs
+                selectBaseFrog(randomIntFromInterval(1, nextIdC));
+                selectSubFrog(randomIntFromInterval(1, nextIdC));
+                combineTokens(base_frog, sub_frog);
+                
             }
 
 
@@ -677,6 +683,11 @@
                 }
                 
             }
+
+            function randomIntFromInterval(min, max) { // min and max included 
+                return Math.floor(Math.random() * (max - min + 1) + min)
+            }
+            
             // Switch Frogs
             function switch_base_sub() {
 
@@ -694,7 +705,7 @@
 
                     selectBaseFrog(sub_i)
                     selectSubFrog(base_i)
-                    
+
                 }
 
             }
