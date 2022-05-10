@@ -91,11 +91,9 @@ layout: wiki
 
     - Frogs not displaying? Try manually checking: **[Scan Frog Txs]()**
 
-    - View attribute rarities of each Frog, Morph, and more!
+    - Click on a Frog to view attribute rarities, Morph, and more!
 
-    - Click on a Frog to view properties and more!
-
-    - *connected:* <i id="user-add">X</i>
+    - *connected:* <i id="user-add">[X]</i>
 
 ---
 <div id="owned-frogs" class="owned_frogs">
