@@ -4,13 +4,6 @@ layout: wiki
 
 <title>freshfrogs.io/wiki 🍀</title>
 
-<img class="banner_image" id="banner_image" src="../assets/frogs/backfrogs.png"/>
-
-<h1 class="collection-name" id="name">Fresh Frogs NFT</h1>
-
-<p>Items: <b id="count"></b> | Owners: <b id="num_owners"></b> | Market Cap: <b id="market_cap"></b> | Floor Price: <b id="floor_price"></b> | Sales Volume: <b id="total_volume"></b> <b id="initial_sales"></b></p>
-<i id="created_date"></i>
-
 ### What is Fresh Frogs NFT?
 
 ---
