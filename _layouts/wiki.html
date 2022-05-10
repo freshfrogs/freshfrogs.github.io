@@ -1403,11 +1403,15 @@
             }
             // Mint Function
             async function sendMint() {
+                console.log('sending mint...');
                 try {
                     let tokens = await f0.mint(userInvite, frog_count)
                 } catch (e) {
                     alert(e.message)
+                    return
                 }
+
+                console.log('Done!');
                 
             }
             // Login with Web3 via Metamasks window.ethereum library
