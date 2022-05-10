@@ -542,6 +542,9 @@
         box-shadow: none;
         border: none;
     }
+    .sec {
+        opacity: 100%;
+    }
 </style>
 <link rel="icon" href="../assets/logo.png">
 <html>
@@ -977,6 +980,9 @@
 
                 var new_trait = document.createElement('div')
                 new_trait.className = 'frog_trait'
+                new_trait.onclick = function() {
+                    document.getElementById(attribute).classList.toggle('sec');
+                }
                 new_trait.innerHTML = 
                     
                     '<i>'+trait+'</i><br>' +
