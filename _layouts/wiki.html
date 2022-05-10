@@ -1022,8 +1022,15 @@
                                 
                                 var this_frog = this_frog_ID.replace('Frog #', ''); // token ID
 
+                                console.log(this_frog_ID+' Selected.')
+
                                 if (morph) {
+
+                                    console.log('Morph = true : '+morph)
+
                                     if (!base_frog && sub_frog !== this_frog) { // SELECT BASE
+
+                                        console.log('Selecting base..'+this_frog)
 
                                         selectBaseFrog(this_frog);
                                         document.getElementById(base_frog_ID).style.boxShadow = '0px 0px 6px 6px lightcoral'
@@ -1049,7 +1056,7 @@
                                         sub_frog = false;
                                         return
 
-                                    }
+                                    } else { return }
 
                                 } else {
 
