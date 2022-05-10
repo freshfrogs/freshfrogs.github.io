@@ -595,9 +595,9 @@
                     collection_address = contract_address;
                     collection = new web3.eth.Contract(token_abi, contract_address);
 
-                    console.log('done! ' + collection)
-
                     // --
+
+                    console.log('Fetching Opensea...')
 
                     const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
 
@@ -605,7 +605,7 @@
                     .then(collection => collection.json())
                     .then(collection => {
 
-                        console.log(collection)
+                        console.log('Fetching Opensea Collection...')
 
                         var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
 
@@ -640,6 +640,7 @@
                     fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=3&include_orders=false', options)
                     .then((set) => set.json())
                     .then((set) => {
+                        console.log('Fetching Opensea Assets...')
                         var { assets } = set
                         console.log(assets)
                         nextIdC = parseInt(assets[0].name.replace('Frog #', '')) + 1;
@@ -652,6 +653,8 @@
                     fetch('https://api.opensea.io/api/v1/events?collection_slug=fresh-frogs&event_type=successful&limit=7', options)
                     .then(res => res.json())
                     .then(res => {
+
+                        console.log('Fetching Opensea Asset Events...')
 
                         var { asset_events } = res
 
@@ -693,7 +696,7 @@
 
                     })
 
-                    // --
+                    console.log('Fetching Opensea..... Done!')
 
                 } catch (e) { console.log(e) }
 
