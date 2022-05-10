@@ -50,7 +50,9 @@ layout: wiki
 ### How do I Mint?
 
 ---
+
 <br>
+
 1. First **Connect** an Ethereum wallet! Don't have a wallet? We recommend **[Meta Mask](https://metamask.io/download/)** 🦊
 
     - Browser extensions will automatically be detected, a request will be sent to your provider.
