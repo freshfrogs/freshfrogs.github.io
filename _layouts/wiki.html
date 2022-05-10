@@ -340,7 +340,7 @@
         margin: 1%;
         display: inline-block;
         transition: all .2s ease;
-        cursor: default;
+        cursor: pointer;
         overflow: hidden;
     }
     .frog_trait:hover {
@@ -542,6 +542,13 @@
         box-shadow: none;
         border: none;
     }
+    .sec {
+        opacity: 0%;
+    }
+    .sec2 {
+        background-color: #7cc1ff;
+        box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);
+    }
 </style>
 <link rel="icon" href="../assets/logo.png">
 <html>
@@ -551,13 +558,148 @@
         <script src="https://unpkg.com/f0js/dist/f0.js"></script>
         <script>
 
-            var traits_list, collection, CONTRACT_ADDRESS, frog_count, morph;
+            var traits_list, collection, frog_count, userAddress, morph, collection_address;
+
+            var contract_address = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b'
+
+            var web3 = new Web3(window.ethereum);
 
             var nextIdC = 1;
 
             var base_frog = false;
 
             var sub_frog = false;
+
+            // testing
+
+            async function syncAccount () {
+
+                try {
+
+                    console.log('syncing account...')
+
+                    let _res = await window.ethereum.send('eth_requestAccounts');
+                    let userAddress = _res.result[0];
+
+                    console.log('done! ' + userAddress)
+
+                } catch (e) { console.log(e) }
+            }
+
+            async function syncCollection () {
+
+                try { 
+                    
+                    console.log('syncing collection...')
+
+                    collection_address = contract_address;
+                    collection = new web3.eth.Contract(token_abi, contract_address);
+
+                    console.log('done! ' + collection)
+
+                    // --
+
+                    const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
+
+                    fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
+                    .then(collection => collection.json())
+                    .then(collection => {
+
+                        console.log(collection)
+
+                        var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
+
+                        traits_list = traits;
+
+                        document.getElementById('banner_image').setAttribute('src', banner_image_url)
+                        document.getElementById('name').innerHTML = name
+                        document.getElementById('count').innerHTML = count
+                        document.getElementById('num_owners').innerHTML = num_owners
+                        document.getElementById('market_cap').innerHTML = market_cap.toFixed(2)+' Ξ'
+                        document.getElementById('floor_price').innerHTML = floor_price+' Ξ'
+                        document.getElementById('total_volume').innerHTML = total_volume.toFixed(2)+' Ξ'
+
+                    //    var orig_desc = document.getElementById('description').innerHTML;
+                    //    document.getElementById('description').innerHTML = orig_desc + ' ' + description
+                        document.getElementById('created_date').innerHTML = 'created ' + created_date
+                        //document.getElementById('payout_address').innerHTML = payout_address
+
+                        var initial_sales = (parseInt(count) - 3240) * 0.01
+
+                        //document.getElementById('initial_sales').innerHTML = (initial_sales+parseInt(total_volume.toFixed(2)))+' Ξ'
+
+                    })
+                    .catch(e => {
+
+                        console.log('Error: Could not talk to OpenSea...');
+                        console.error('Error : ' + e.message)
+                
+                    }); // End data pull / first paid Frog 3,236
+
+                    // Assets
+                    fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=3&include_orders=false', options)
+                    .then((set) => set.json())
+                    .then((set) => {
+                        var { assets } = set
+                        console.log(assets)
+                        nextIdC = parseInt(assets[0].name.replace('Frog #', '')) + 1;
+                        document.getElementById('label_name').innerHTML = 'Frog #'+nextIdC
+                        document.getElementById('previewImg').setAttribute('src', '../frog/'+nextIdC+'.png')
+                    })
+
+                    // Get recent sales
+                
+                    fetch('https://api.opensea.io/api/v1/events?collection_slug=fresh-frogs&event_type=successful&limit=7', options)
+                    .then(res => res.json())
+                    .then(res => {
+
+                        var { asset_events } = res
+
+                        //console.log(asset_events)
+                        
+                        var percent_width = 92 / 7 + '%'
+
+                        asset_events.forEach((sale) => {
+                        
+
+                            try {
+
+                                var { asset: { image_url, name, permalink }, payment_token: { decimals }, total_price } = sale;
+
+                                var sale_price = total_price / Math.pow(10, decimals);
+
+                                //console.log('Sale found...'+sale.asset.name+' : '+sale_price);
+
+                                recent_sale = document.createElement('a');
+                                recent_sale.className = 'recent_sale';
+                                recent_sale.style.width = 128+64+'px';
+                                recent_sale.href = permalink;
+                                recent_sale.innerHTML = 
+                                    '<img class="frog_img" src='+image_url+'>' +
+                                    '<i class="label_name">Fresh Frogs NFT</i><i class="label_price">Price</i>' +
+                                    '<b class="frog_name">'+name+'</b><b class="frog_price">Ξ '+sale_price+'</b>';
+                                document.getElementById('recent_sales').appendChild(recent_sale);
+                        
+                            } catch (e) { console.log('Error : ' + e.message) }
+
+                        })
+
+
+                    })
+                    .catch(e => {
+
+                        console.log('Error: Could not talk to OpenSea...');
+                        console.error('Error : ' + e.message)
+
+                    })
+
+                    // --
+
+                } catch (e) { console.log(e) }
+
+            }
+
+            // testing
 
             async function load_mintingTerminal() {
 
@@ -630,7 +772,6 @@
 
                 document.getElementById('lower_display').innerHTML = 
 
-                    '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet!</i></b></button>' +
                     '<h4 style="text-align: left;">Morph Fresh Frogs!</h4><hr>' +
                     '<div>' +
                     '   <br><i>1. Connect Wallet!</i>' +
@@ -641,18 +782,6 @@
                 if (typeof window.userAddress == 'undefined') {
                     try { connect(); } catch (e) { console.log('Error : ' + e.message); }
                 } else { load_ownedFrogs(); }
-
-                var mint_button = document.getElementById('mint-button')
-                mint_button.innerHTML = '<b><i>Generate Morph!</i></b>';
-                mint_button.onclick = function(){
-                    if (!base_frog || !sub_frog) {
-                        console.log('Base or Sub Frog not defined. Morph Failed.')
-                    } else {
-                        combineTokens(base_frog, sub_frog);
-                        mint_button.style.boxShadow = 'none'
-                    }
-                    
-                }
 
                 // Load two random Frogs
                 // selectBaseFrog(randomIntFromInterval(1, nextIdC));
@@ -684,7 +813,12 @@
                 if (!base_frog || !sub_frog) {
                     return
                 } else {
-                    document.getElementById('mint-button').style.boxShadow = '0px 0px 6px 6px #7cc1ff'
+                    if (!base_frog || !sub_frog) {
+                        console.log('Base or Sub Frog not defined. Morph Failed.')
+                    } else {
+                        combineTokens(base_frog, sub_frog);
+                        mint_button.style.boxShadow = 'none'
+                    }
                 }
                 
             }
@@ -735,7 +869,12 @@
                 if (!base_frog || !sub_frog) {
                     return
                 } else {
-                    document.getElementById('mint-button').style.boxShadow = '0px 0px 6px 6px #7cc1ff'
+                    if (!base_frog || !sub_frog) {
+                        console.log('Base or Sub Frog not defined. Morph Failed.')
+                    } else {
+                        combineTokens(base_frog, sub_frog);
+                        mint_button.style.boxShadow = 'none'
+                    }
                 }
             }
 
@@ -850,21 +989,7 @@
                 //'Frog #'+ base_frog + ' + ' + sub_frog + '<hr>'
                 
                 var select = document.getElementById('lower_display')
-                select.innerHTML = 
-                    '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button>' +
-                    '<h4 style="text-align: left;">Properties</h4><hr>';
-
-                var mint_button = document.getElementById('mint-button')
-                mint_button.innerHTML = '<b><i>Generate Morph !</i></b>';
-                mint_button.onclick = function(){
-                    if (!base_frog || !sub_frog) {
-                        console.log('Base or Sub Frog not defined')
-                    } else {
-                        console.log('Combining tokens..')
-                        combineTokens(base_frog, sub_frog);
-                    }
-                    
-                }
+                select.innerHTML = '<h4 style="text-align: left;">Properties</h4><hr>'
 
                 // Frog
                 if (typeof baseFrog_Frog !== 'undefined') {
@@ -977,6 +1102,15 @@
 
                 var new_trait = document.createElement('div')
                 new_trait.className = 'frog_trait'
+                new_trait.onclick = function() {
+                    console.log('test')
+                    if (trait !== 'Frog' && trait !== 'SpecialFrog') {
+                        document.getElementById(attribute).classList.toggle('sec');
+                        this.classList.toggle('sec2');
+
+                        document.getElementById('morph_float').innerHTML = document.getElementById('frogContainer3').innerHTML
+                    }
+                }
                 new_trait.innerHTML = 
                     
                     '<i>'+trait+'</i><br>' +
@@ -1023,8 +1157,15 @@
                                 
                                 var this_frog = this_frog_ID.replace('Frog #', ''); // token ID
 
+                                console.log(this_frog_ID+' Selected.')
+
                                 if (morph) {
-                                    if (!base_frog && sub_frog !== this_frog) { // SELECT BASE
+
+                                    console.log('Morph = true : '+morph)
+
+                                    if (!base_frog && sub_frog !== this_frog) { // SELECT BASE (If current base_frog = false and sub_frog != selected)
+
+                                        console.log('Selecting base..'+this_frog)
 
                                         selectBaseFrog(this_frog);
                                         document.getElementById(base_frog_ID).style.boxShadow = '0px 0px 6px 6px lightcoral'
@@ -1034,7 +1175,6 @@
 
                                         document.getElementById('frog_name_base').innerHTML = 'Select Frog'
                                         document.getElementById(this_frog_ID).style.boxShadow = 'none'
-                                        document.getElementById('mint-button').style.boxShadow = 'none'
                                         base_frog = false;
                                         return
 
@@ -1048,11 +1188,10 @@
 
                                         document.getElementById('frog_name_sub').innerHTML = 'Select Frog'
                                         document.getElementById(this_frog_ID).style.boxShadow = 'none'
-                                        document.getElementById('mint-button').style.boxShadow = 'none'
                                         sub_frog = false;
                                         return
 
-                                    }
+                                    } else { return }
 
                                 } else {
 
@@ -1466,103 +1605,9 @@
                     });
                 })
 
-                CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
-              
-                // Pull Collection data from OpenSea
-
-                const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
-
-                fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
-                .then(collection => collection.json())
-                .then(collection => {
-
-                    console.log(collection)
-
-                    var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
-
-                    traits_list = traits;
-
-                    document.getElementById('banner_image').setAttribute('src', banner_image_url)
-                    document.getElementById('name').innerHTML = name
-                    document.getElementById('count').innerHTML = count
-                    document.getElementById('num_owners').innerHTML = num_owners
-                    document.getElementById('market_cap').innerHTML = market_cap.toFixed(2)+' Ξ'
-                    document.getElementById('floor_price').innerHTML = floor_price+' Ξ'
-                    document.getElementById('total_volume').innerHTML = total_volume.toFixed(2)+' Ξ'
-
-                //    var orig_desc = document.getElementById('description').innerHTML;
-                //    document.getElementById('description').innerHTML = orig_desc + ' ' + description
-                    document.getElementById('created_date').innerHTML = 'created ' + created_date
-                    //document.getElementById('payout_address').innerHTML = payout_address
-
-                    var initial_sales = (parseInt(count) - 3240) * 0.01
-
-                    //document.getElementById('initial_sales').innerHTML = (initial_sales+parseInt(total_volume.toFixed(2)))+' Ξ'
-
-                })
-                .catch(e => {
-
-                    console.log('Error: Could not talk to OpenSea...');
-                    console.error('Error : ' + e.message)
-              
-                }); // End data pull / first paid Frog 3,236
-
-                // Assets
-                fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=3&include_orders=false', options)
-                .then((set) => set.json())
-                .then((set) => {
-                    var { assets } = set
-                    console.log(assets)
-                    nextIdC = parseInt(assets[0].name.replace('Frog #', '')) + 1;
-                    document.getElementById('label_name').innerHTML = 'Frog #'+nextIdC
-                    document.getElementById('previewImg').setAttribute('src', '../frog/'+nextIdC+'.png')
-                })
-
-                // Get recent sales
-              
-                fetch('https://api.opensea.io/api/v1/events?collection_slug=fresh-frogs&event_type=successful&limit=7', options)
-                .then(res => res.json())
-                .then(res => {
-
-                    var { asset_events } = res
-
-                    //console.log(asset_events)
-                    
-                    var percent_width = 92 / 7 + '%'
-
-                    asset_events.forEach((sale) => {
-                      
-
-                        try {
-
-                            var { asset: { image_url, name, permalink }, payment_token: { decimals }, total_price } = sale;
-
-                            var sale_price = total_price / Math.pow(10, decimals);
-
-                            //console.log('Sale found...'+sale.asset.name+' : '+sale_price);
-
-                            recent_sale = document.createElement('a');
-                            recent_sale.className = 'recent_sale';
-                            recent_sale.style.width = 128+64+'px';
-                            recent_sale.href = permalink;
-                            recent_sale.innerHTML = 
-                                '<img class="frog_img" src='+image_url+'>' +
-                                '<i class="label_name">Fresh Frogs NFT</i><i class="label_price">Price</i>' +
-                                '<b class="frog_name">'+name+'</b><b class="frog_price">Ξ '+sale_price+'</b>';
-                            document.getElementById('recent_sales').appendChild(recent_sale);
-                      
-                        } catch (e) { console.log('Error : ' + e.message) }
-
-                    })
-
-
-                })
-                .catch(e => {
-
-                    console.log('Error: Could not talk to OpenSea...');
-                    console.error('Error : ' + e.message)
-
-                })
+                syncCollection();
+                syncAccount();
+                
             })
         </script>
     </head>
