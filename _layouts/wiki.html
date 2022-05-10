@@ -340,7 +340,7 @@
         margin: 1%;
         display: inline-block;
         transition: all .2s ease;
-        cursor: default;
+        cursor: pointer;
         overflow: hidden;
     }
     .frog_trait:hover {
@@ -544,6 +544,10 @@
     }
     .sec {
         opacity: 0%;
+    }
+    .sec2 {
+        background-color: #7cc1ff;
+        box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);
     }
 </style>
 <link rel="icon" href="../assets/logo.png">
@@ -983,6 +987,7 @@
                 new_trait.onclick = function() {
                     console.log('test')
                     document.getElementById(attribute).classList.toggle('sec');
+                    this.getElementById(attribute).classList.toggle('sec2');
                 }
                 new_trait.innerHTML = 
                     
