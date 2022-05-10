@@ -652,7 +652,7 @@
                     '   <br><br><i>3. Generate Morph!</i>' +
                     '</div>';
 
-                if (typeof window.userAddress == 'undefined') {
+                if (typeof userAddress == 'undefined') {
                     try { connect(); } catch (e) { console.log('Error : ' + e.message); }
                 } else { load_ownedFrogs(); }
 
@@ -1010,7 +1010,7 @@
 
                 owned_frogs_div.style.height = 'auto';
 
-                fetch('https://api.opensea.io/api/v1/assets?owner='+window.userAddress+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+                fetch('https://api.opensea.io/api/v1/assets?owner='+userAddress+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
                 .then((res) => res.json())
                 .then((res) => {
                     var { assets } = res
@@ -1135,9 +1135,9 @@
             // Manually check Frog transactions
             async function load_ownedFrogs_manual() {
 
-                let this_user = window.userAddress;
+                let this_user = userAddress;
 
-                console.log('Checking Frogs Manually.. for user...'+window.userAddress)
+                console.log('Checking Frogs Manually.. for user...'+userAddress)
 
                 try {
 
@@ -1424,39 +1424,30 @@
             async function connect() {
                 console.log('Connecting eth address...')
                 if (window.ethereum) {
-                    try {
-                        const selectedAccount = await window.ethereum
-                        .request({
-                            method: "eth_requestAccounts",
-                        })
-                        .then((accounts) => accounts[0])
-                        .catch(() => {
-                            consoleOutput("No account selected!");
-                            throw Error("No account selected!");
-                        });
-                        window.userAddress = selectedAccount;
-                        window.localStorage.setItem("userAddress", selectedAccount);
-                        consoleOutput(`☑ETH Address: ${truncateAddress(window.userAddress)}`);
-                        console.log(`☑ETH Address: ${truncateAddress(window.userAddress)}`);
-                        document.getElementById('user-add').innerHTML = window.userAddress
-                        load_ownedFrogs();
-
-                        // Connect Factoria
+                    // userAddress
+                    try { // Connect Factoria
                         try {
-                            console.log("Connecting to Factoria...")
                             await f0.init({
                                 web3: web3,
                                 contract: CONTRACT_ADDRESS,
-                                network: "main"
+                                network: NETWORK
                             })
+                            
+                            userAddress = await web3.currentProvider.selectedAddress;
+                            nextId = await f0.api.nextId().call();
+                            nextIdC = parseInt(nextId);
+
                         } catch (e) {
                             console.log("Couldn't talk with Factoria")
                         }
 
-                        nextId = await f0.api.nextId().call();
-                        nextIdC = parseInt(nextId);
+                        consoleOutput(`☑ETH Address: ${truncateAddress(userAddress)}`);
+                        console.log(`☑ETH Address: ${truncateAddress(userAddress)}`);
+                        document.getElementById('user-add').innerHTML = userAddress
 
                         console.log('Done! ' + nextId)
+
+                        load_ownedFrogs();
 
                         if (!morph) { 
                             
@@ -1465,10 +1456,12 @@
                             temp.onClick = sendMint();
 
                         }
+
                     } catch (error) {
                         console.error(error);
                         consoleOutput(error);
                     }
+                    
                 } else {
                     consoleOutput("No ETH brower extension detected.");
                 }
