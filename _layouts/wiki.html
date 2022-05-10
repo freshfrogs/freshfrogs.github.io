@@ -1344,6 +1344,9 @@
                 } else {
                     mintList = "Frog #"+nextIdC+" - "+((nextIdC-1)+frog_count)
                 }
+
+                document.getElementById('frog_name').innerHTML = (0.01 * frog_count) + ' ΞETH'
+                
                 document.getElementById('quant-frog').innerHTML = frog_count
                 document.getElementById('label_name').innerHTML = mintList
             }
@@ -1377,6 +1380,8 @@
                         mintList = "Frog #"+nextIdC+" - "+((nextIdC-1)+frog_count)
                     }
                 }
+
+                document.getElementById('frog_name').innerHTML = (0.01 * frog_count) + ' ΞETH'
 
                 document.getElementById('quant-frog').innerHTML = frog_count
                 document.getElementById('label_name').innerHTML = mintList
