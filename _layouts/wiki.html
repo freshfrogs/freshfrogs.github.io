@@ -649,18 +649,6 @@
                     try { connect(); } catch (e) { console.log('Error : ' + e.message); }
                 } else { load_ownedFrogs(); }
 
-                var mint_button = document.getElementById('mint-button')
-                mint_button.innerHTML = '<b><i>Generate Morph!</i></b>';
-                mint_button.onclick = function(){
-                    if (!base_frog || !sub_frog) {
-                        console.log('Base or Sub Frog not defined. Morph Failed.')
-                    } else {
-                        combineTokens(base_frog, sub_frog);
-                        mint_button.style.boxShadow = 'none'
-                    }
-                    
-                }
-
                 // Load two random Frogs
                 // selectBaseFrog(randomIntFromInterval(1, nextIdC));
                 // selectSubFrog(randomIntFromInterval(1, nextIdC));
@@ -691,7 +679,12 @@
                 if (!base_frog || !sub_frog) {
                     return
                 } else {
-                    document.getElementById('mint-button').style.boxShadow = '0px 0px 6px 6px #7cc1ff'
+                    if (!base_frog || !sub_frog) {
+                        console.log('Base or Sub Frog not defined. Morph Failed.')
+                    } else {
+                        combineTokens(base_frog, sub_frog);
+                        mint_button.style.boxShadow = 'none'
+                    }
                 }
                 
             }
@@ -742,7 +735,12 @@
                 if (!base_frog || !sub_frog) {
                     return
                 } else {
-                    document.getElementById('mint-button').style.boxShadow = '0px 0px 6px 6px #7cc1ff'
+                    if (!base_frog || !sub_frog) {
+                        console.log('Base or Sub Frog not defined. Morph Failed.')
+                    } else {
+                        combineTokens(base_frog, sub_frog);
+                        mint_button.style.boxShadow = 'none'
+                    }
                 }
             }
 
@@ -989,7 +987,7 @@
                     if (trait !== 'Frog' && trait !== 'SpecialFrog') {
                         document.getElementById(attribute).classList.toggle('sec');
                         this.classList.toggle('sec2');
-                        
+
                         document.getElementById('morph_float').innerHTML = document.getElementById('frogContainer3').innerHTML
                     }
                 }
@@ -1050,7 +1048,6 @@
 
                                         document.getElementById('frog_name_base').innerHTML = 'Select Frog'
                                         document.getElementById(this_frog_ID).style.boxShadow = 'none'
-                                        document.getElementById('mint-button').style.boxShadow = 'none'
                                         base_frog = false;
                                         return
 
@@ -1064,7 +1061,6 @@
 
                                         document.getElementById('frog_name_sub').innerHTML = 'Select Frog'
                                         document.getElementById(this_frog_ID).style.boxShadow = 'none'
-                                        document.getElementById('mint-button').style.boxShadow = 'none'
                                         sub_frog = false;
                                         return
 
