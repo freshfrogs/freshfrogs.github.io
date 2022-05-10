@@ -1452,6 +1452,12 @@
                         } catch (e) {
                             console.log("Couldn't talk with Factoria")
                         }
+
+                        nextId = await f0.api.nextId().call();
+                        nextIdC = parseInt(nextId);
+
+                        console.log('Done! ' + nextId)
+
                         if (!morph) { 
                             
                             temp = document.getElementById('mint-button')
