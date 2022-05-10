@@ -176,7 +176,7 @@ NFT staking refers to locking up non-fungible tokens on a platform or protocol i
 ---
 
 <div class="float-img2">
-    <img class="frogImg3" src="../the-pad/Frog/frog_gif.gif"/>
+    <img class="frogImg3" src="../assets/frogs/preview2.gif"/>
 </div>
 
 All 4,040 Frogs are randomly generated and each unique! There are 30 different Frog Types, with 60 different traits! Resulting in 2.8 million possible combinations!
