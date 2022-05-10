@@ -560,6 +560,8 @@
 
             var traits_list, collection, CONTRACT_ADDRESS, frog_count, morph;
 
+            var userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
+
             var nextIdC = 1;
 
             var base_frog = false;
@@ -1402,7 +1404,7 @@
             // Mint Function
             async function sendMint() {
                 try {
-                    let tokens = await f0.mint(null, frog_count)
+                    let tokens = await f0.mint(userInvite, frog_count)
                 } catch (e) {
                     alert(e.message)
                 }
