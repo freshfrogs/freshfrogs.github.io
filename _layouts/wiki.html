@@ -612,8 +612,10 @@
 
                 sub_frog = selected_sub
 
-                document.getElementById('frog_name_sub').innerHTML = this_frog_ID
-                document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px lightsalmon'
+                sub_frog_ID = 'Frog #'+selected_sub
+
+                document.getElementById('frog_name_sub').innerHTML = sub_frog_ID
+                document.getElementById(sub_frog_ID).style.boxShadow = '0px 0px 6px 6px lightsalmon'
                 
                 document.getElementById("sub_frog_img").setAttribute('src', 'https://freshfrogs.io/frog/'+sub_frog+'.png')
 
@@ -636,8 +638,10 @@
 
                 base_frog = selected_base;
 
-                document.getElementById('frog_name_base').innerHTML = this_frog_ID
-                document.getElementById(this_frog_ID).style.boxShadow = '0px 0px 6px 6px lightcoral'
+                base_frog_ID = 'Frog #'+selected_base
+
+                document.getElementById('frog_name_base').innerHTML = base_frog_ID
+                document.getElementById(base_frog_ID).style.boxShadow = '0px 0px 6px 6px lightcoral'
 
                 document.getElementById("base_frog_img").setAttribute('src', 'https://freshfrogs.io/frog/'+base_frog+'.png')
 
