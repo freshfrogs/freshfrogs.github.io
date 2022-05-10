@@ -108,8 +108,8 @@ layout: wiki
 ---
 
 <div class="float-img2">
-    <img class="frogImg3" src="../the-pad/Frog/blueDartFrog.png"/>
-    <img class="frogImg3" src="../the-pad/Trait/trait_gif2.gif"/>
+    <img class="frogImg3" src="../the-pad/SpecialFrog/peace.png"/>
+    <img class="frogImg3" src="../the-pad/Trait/peace/cyan.png"/>
     <img class="frogImg3" src="../the-pad/Eyes/circleShadesRed.png"/>
     <img class="frogImg3" src="../the-pad/Hat/hat_gif2.gif"/>
     <img class="frogImg3" src="../the-pad/Mouth/smokingCigar2.gif"/>
