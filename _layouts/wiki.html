@@ -665,6 +665,8 @@
                 sub_frog_ID = 'Frog #'+selected_sub
 
                 document.getElementById('frog_name_sub').innerHTML = sub_frog_ID
+
+                document.getElementById(sub_frog_ID).style.boxShadow = '0px 0px 6px 6px lightsalmon'
                 
                 document.getElementById("sub_frog_img").setAttribute('src', 'https://freshfrogs.io/frog/'+sub_frog+'.png')
 
@@ -716,6 +718,8 @@
                 base_frog_ID = 'Frog #'+selected_base
 
                 document.getElementById('frog_name_base').innerHTML = base_frog_ID
+
+                document.getElementById(base_frog_ID).style.boxShadow = '0px 0px 6px 6px lightcoral'
 
                 document.getElementById("base_frog_img").setAttribute('src', 'https://freshfrogs.io/frog/'+base_frog+'.png')
 
@@ -1014,7 +1018,6 @@
                                     if (!base_frog && sub_frog !== this_frog) { // SELECT BASE
 
                                         selectBaseFrog(this_frog);
-                                        document.getElementById(base_frog_ID).style.boxShadow = '0px 0px 6px 6px lightcoral'
                                         return
                                         
                                     } else if (this_frog == base_frog) { // UN-SELECT BASE
@@ -1027,7 +1030,7 @@
                                     } else if (!sub_frog && base_frog !== this_frog) { // SELECT SUB
 
                                         selectSubFrog(this_frog);
-                                        document.getElementById(sub_frog_ID).style.boxShadow = '0px 0px 6px 6px lightsalmon'
+                                        
                                         return
 
                                     } else if (this_frog == sub_frog) { // UN-SELECT SUB
