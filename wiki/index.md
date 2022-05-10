@@ -111,6 +111,31 @@ layout: wiki
 </div>
 
 
+### How do I Morph?
+
+---
+
+Preview Frog Morph Combinations!
+
+1. **Connect** an Ethereum Wallet that holds Fresh Frog Tokens!
+
+2. Go to the <button id="morph_ref" class="buttonbar_morph"><b>🍄Morph</b></button> tab and **Select** two Frogs to Morph!
+
+    - First select the **Base Frog!** This Frog will keep all attributes, except for colored traits! 
+
+    - Then select the **Sub Frog!** This frog will have all attributes inherited, without overwriting existing!
+
+    - This means there are two possible morph combinations for every two Frogs!
+
+        - **Example** FROG A + FROG B will have a different outcome than FROG B + FROG A
+
+3. **Generate Morph!**
+
+    - A NEW Frog will be generated with combined attributes!
+
+    - This is currently just a preview until the full utility is released!
+
+
 ### What is Morphing?
 
 ---
@@ -140,31 +165,6 @@ Holders will be soon able to "Morph" two Frogs to create a new NFT on Ethereum w
 - What is Meta-Morphing?
 
     - (N)ew (F)rog (T)okens can be combined to create even more Frogs! More details coming soon!
-
-
-### How do I Morph?
-
----
-
-Preview Frog Morph Combinations!
-
-1. **Connect** an Ethereum Wallet that holds Fresh Frog Tokens!
-
-2. Go to the <button id="morph_ref" class="buttonbar_morph"><b>🍄Morph</b></button> tab and **Select** two Frogs to Morph!
-
-    - First select the **Base Frog!** This Frog will keep all attributes, except for colored traits! 
-
-    - Then select the **Sub Frog!** This frog will have all attributes inherited, without overwriting existing!
-
-    - This means there are two possible morph combinations for every two Frogs!
-
-        - **Example** FROG A + FROG B will have a different outcome than FROG B + FROG A
-
-3. **Generate Morph!**
-
-    - A NEW Frog will be generated with combined attributes!
-
-    - This is currently just a preview until the full utility is released!
 
 
 ### What is Staking?
