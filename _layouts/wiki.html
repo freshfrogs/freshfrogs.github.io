@@ -1362,6 +1362,7 @@
                 }
                 document.getElementById('quant-frog').innerHTML = frog_count
                 document.getElementById('label_name').innerHTML = mintList
+                document.getElementById('frog_name').innerHTML = (frog_count * 0.01) +' ΞETH'
             }
             // ADD FROG to minting tray
             function add_frog() {
@@ -1395,7 +1396,17 @@
                 }
 
                 document.getElementById('quant-frog').innerHTML = frog_count
-                document.getElementById('label_name').innerHTML = mintList
+                document.getElementById('label_name').innerHTML = mintList // 0.01 ΞETH
+                document.getElementById('frog_name').innerHTML = (frog_count * 0.01) +' ΞETH'
+            }
+            // Mint Function
+            async function sendMint() {
+                try {
+                    let tokens = await f0.mint(null, frog_count)
+                } catch (e) {
+                    alert(e.message)
+                }
+                
             }
             // Login with Web3 via Metamasks window.ethereum library
             async function connect() {
