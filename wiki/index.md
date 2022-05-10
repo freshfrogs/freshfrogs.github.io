@@ -112,7 +112,7 @@ layout: wiki
 
 <div id="morph_float" class="float-img2">
     <img class="frogImg3" src="../the-pad/SpecialFrog/peace.png"/>
-    <img class="frogImg3" src="../the-pad/Trait/peace/white.png"/>
+    <img class="frogImg3" src="../the-pad/Trait/peace/peace_gif.gif"/>
     <img class="frogImg3" src="../the-pad/Eyes/circleShadesRed.png"/>
     <img class="frogImg3" src="../the-pad/Hat/witchBlack.png"/>
     <img class="frogImg3" src="../the-pad/Mouth/smokingCigar2.gif"/>
