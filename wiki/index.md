@@ -50,7 +50,7 @@ layout: wiki
 ### How do I Mint?
 
 ---
-
+<br>
 1. First **Connect** an Ethereum wallet! Don't have a wallet? We recommend **[Meta Mask](https://metamask.io/download/)** 🦊
 
     - Browser extensions will automatically be detected, a request will be sent to your provider.
@@ -78,7 +78,7 @@ layout: wiki
     - Our smart contract has been verified on **[etherscan.io](https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b)** ✔️
 
     - *contract address: 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b*
-
+<br>
 
 ### How do I View My Frogs?
 
