@@ -1486,7 +1486,7 @@
                 .then((set) => set.json())
                 .then((set) => {
                     var { assets } = set
-                    console.log(assets)
+                    //console.log(assets)
                     nextIdC = parseInt(assets[0].name.replace('Frog #', '')) + 1;
                     document.getElementById('label_name').innerHTML = 'Frog #'+nextIdC
                     document.getElementById('previewImg').setAttribute('src', '../frog/'+nextIdC+'.png')
