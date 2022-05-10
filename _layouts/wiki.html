@@ -649,8 +649,6 @@
                     } else {
                         combineTokens(base_frog, sub_frog);
                         mint_button.style.boxShadow = 'none'
-
-                        document.getElementById('morph_float').innerHTML = document.getElementById('frogContainer3').innerHTML
                     }
                     
                 }
@@ -863,7 +861,6 @@
                     } else {
                         console.log('Combining tokens..')
                         combineTokens(base_frog, sub_frog);
-                        document.getElementById('morph_float').innerHTML = document.getElementById('frogContainer3').innerHTML
                     }
                     
                 }
@@ -946,6 +943,7 @@
                         loadAttribute("Mouth", otherFrog_Mouth, thisPlace)
                     }
                 }
+                document.getElementById('morph_float').innerHTML = document.getElementById('frogContainer3').innerHTML
             }
 
             // Load attribute
