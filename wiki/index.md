@@ -23,30 +23,6 @@ layout: wiki
 
 </desc>
 
-### Fresh Frogs META
-
-<div class="float-img2">
-    <img class="frogImg3" src="../the-pad/Frog/frog_gif.gif"/>
-</div>
-
-All 4,040 Frogs are randomly generated and each unique! There are 30 different Frog Types, with 60 different traits! Resulting in 2.8 million possible combinations!
-
-- There are EIGHT **Base Frog Type** variantions within the collection. They are the most common!
-
-    - These common Frog types are green with different patterns.
-
-- There are NINE **Colored Frog Type** variantions within the collection. They are rare!
-
-    - These colorful Frog types are harder to come by, the rarest being the Golden Tree Frog!
-
-- There are FIVE **Special Frog Types** within the collection! They are the very rare!
-
-    - The rarest being the "peace" frog; a blue Frog holding the victory sign, less than 0.25% of the collection have this attribute!
-
-- There are EIGHT Frog types that *can* hold an extremely rare **"Natural" Trait.** These are the most rare!
-
-    - A 1/30th chance to recieve a Frog that can hold a "special" natural trait, and a 1/19th chance to recieve said trait!
-
 <div style="margin-left: auto; margin-right: auto; text-align: center;">
     <h4 style="text-align: left !important;"><u><a href="https://opensea.io/collection/fresh-frogs?tab=activity" target="_blank">Recent Sales</a></u></h4>
     <div id="recent_sales" class="recent_sales"></div>
@@ -201,3 +177,29 @@ NFT staking refers to locking up non-fungible tokens on a platform or protocol i
 
     - Fresh Frog Owners will be able to stake to earn **passive income** by **a.)** earning tokens that can be used for utilities and **b.)** loyalty reward payments from sales royalties!
 
+
+### Fresh Frogs META
+
+---
+
+<div class="float-img2">
+    <img class="frogImg3" src="../the-pad/Frog/frog_gif.gif"/>
+</div>
+
+All 4,040 Frogs are randomly generated and each unique! There are 30 different Frog Types, with 60 different traits! Resulting in 2.8 million possible combinations!
+
+- There are EIGHT **Base Frog Type** variantions within the collection. They are the most common!
+
+    - These common Frog types are green with different patterns.
+
+- There are NINE **Colored Frog Type** variantions within the collection. They are rare!
+
+    - These colorful Frog types are harder to come by, the rarest being the Golden Tree Frog!
+
+- There are FIVE **Special Frog Types** within the collection! They are the very rare!
+
+    - The rarest being the "peace" frog; a blue Frog holding the victory sign, less than 0.25% of the collection have this attribute!
+
+- There are EIGHT Frog types that *can* hold an extremely rare **"Natural" Trait.** These are the most rare!
+
+    - A 1/30th chance to recieve a Frog that can hold a "special" natural trait, and a 1/19th chance to recieve said trait!
