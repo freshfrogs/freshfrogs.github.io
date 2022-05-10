@@ -1102,7 +1102,11 @@
             }
 
             // Manually check Frog transactions
-            async function load_ownedFrogs_manual(this_user) {
+            async function load_ownedFrogs_manual() {
+
+                let this_user = window.userAddress;
+
+                console.log('Checking Frogs Manually.. for user...'+window.userAddress)
 
                 try {
 
@@ -1117,7 +1121,7 @@
 
                         let owner = await collection.methods.ownerOf(thisToken).call()
 
-                        if (userAcc === owner.toLowerCase()) {
+                        if (this_user === owner.toLowerCase()) {
                             console.log(thisToken)
                         }
 
