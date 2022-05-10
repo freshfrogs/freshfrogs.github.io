@@ -340,7 +340,7 @@
         margin: 1%;
         display: inline-block;
         transition: all .2s ease;
-        cursor: pointer;
+        cursor: default;
         overflow: hidden;
     }
     .frog_trait:hover {
@@ -542,13 +542,6 @@
         box-shadow: none;
         border: none;
     }
-    .sec {
-        opacity: 0%;
-    }
-    .sec2 {
-        background-color: #7cc1ff;
-        box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);
-    }
 </style>
 <link rel="icon" href="../assets/logo.png">
 <html>
@@ -637,6 +630,7 @@
 
                 document.getElementById('lower_display').innerHTML = 
 
+                    '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet!</i></b></button>' +
                     '<h4 style="text-align: left;">Morph Fresh Frogs!</h4><hr>' +
                     '<div>' +
                     '   <br><i>1. Connect Wallet!</i>' +
@@ -647,6 +641,18 @@
                 if (typeof window.userAddress == 'undefined') {
                     try { connect(); } catch (e) { console.log('Error : ' + e.message); }
                 } else { load_ownedFrogs(); }
+
+                var mint_button = document.getElementById('mint-button')
+                mint_button.innerHTML = '<b><i>Generate Morph!</i></b>';
+                mint_button.onclick = function(){
+                    if (!base_frog || !sub_frog) {
+                        console.log('Base or Sub Frog not defined. Morph Failed.')
+                    } else {
+                        combineTokens(base_frog, sub_frog);
+                        mint_button.style.boxShadow = 'none'
+                    }
+                    
+                }
 
                 // Load two random Frogs
                 // selectBaseFrog(randomIntFromInterval(1, nextIdC));
@@ -678,12 +684,7 @@
                 if (!base_frog || !sub_frog) {
                     return
                 } else {
-                    if (!base_frog || !sub_frog) {
-                        console.log('Base or Sub Frog not defined. Morph Failed.')
-                    } else {
-                        combineTokens(base_frog, sub_frog);
-                        mint_button.style.boxShadow = 'none'
-                    }
+                    document.getElementById('mint-button').style.boxShadow = '0px 0px 6px 6px #7cc1ff'
                 }
                 
             }
@@ -734,12 +735,7 @@
                 if (!base_frog || !sub_frog) {
                     return
                 } else {
-                    if (!base_frog || !sub_frog) {
-                        console.log('Base or Sub Frog not defined. Morph Failed.')
-                    } else {
-                        combineTokens(base_frog, sub_frog);
-                        mint_button.style.boxShadow = 'none'
-                    }
+                    document.getElementById('mint-button').style.boxShadow = '0px 0px 6px 6px #7cc1ff'
                 }
             }
 
@@ -854,7 +850,21 @@
                 //'Frog #'+ base_frog + ' + ' + sub_frog + '<hr>'
                 
                 var select = document.getElementById('lower_display')
-                select.innerHTML = '<h4 style="text-align: left;">Properties</h4><hr>'
+                select.innerHTML = 
+                    '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button>' +
+                    '<h4 style="text-align: left;">Properties</h4><hr>';
+
+                var mint_button = document.getElementById('mint-button')
+                mint_button.innerHTML = '<b><i>Generate Morph !</i></b>';
+                mint_button.onclick = function(){
+                    if (!base_frog || !sub_frog) {
+                        console.log('Base or Sub Frog not defined')
+                    } else {
+                        console.log('Combining tokens..')
+                        combineTokens(base_frog, sub_frog);
+                    }
+                    
+                }
 
                 // Frog
                 if (typeof baseFrog_Frog !== 'undefined') {
@@ -967,15 +977,6 @@
 
                 var new_trait = document.createElement('div')
                 new_trait.className = 'frog_trait'
-                new_trait.onclick = function() {
-                    console.log('test')
-                    if (trait !== 'Frog' && trait !== 'SpecialFrog') {
-                        document.getElementById(attribute).classList.toggle('sec');
-                        this.classList.toggle('sec2');
-
-                        document.getElementById('morph_float').innerHTML = document.getElementById('frogContainer3').innerHTML
-                    }
-                }
                 new_trait.innerHTML = 
                     
                     '<i>'+trait+'</i><br>' +
@@ -1022,15 +1023,8 @@
                                 
                                 var this_frog = this_frog_ID.replace('Frog #', ''); // token ID
 
-                                console.log(this_frog_ID+' Selected.')
-
                                 if (morph) {
-
-                                    console.log('Morph = true : '+morph)
-
-                                    if (!base_frog && sub_frog !== this_frog) { // SELECT BASE (If current base_frog = false and sub_frog != selected)
-
-                                        console.log('Selecting base..'+this_frog)
+                                    if (!base_frog && sub_frog !== this_frog) { // SELECT BASE
 
                                         selectBaseFrog(this_frog);
                                         document.getElementById(base_frog_ID).style.boxShadow = '0px 0px 6px 6px lightcoral'
@@ -1040,6 +1034,7 @@
 
                                         document.getElementById('frog_name_base').innerHTML = 'Select Frog'
                                         document.getElementById(this_frog_ID).style.boxShadow = 'none'
+                                        document.getElementById('mint-button').style.boxShadow = 'none'
                                         base_frog = false;
                                         return
 
@@ -1053,10 +1048,11 @@
 
                                         document.getElementById('frog_name_sub').innerHTML = 'Select Frog'
                                         document.getElementById(this_frog_ID).style.boxShadow = 'none'
+                                        document.getElementById('mint-button').style.boxShadow = 'none'
                                         sub_frog = false;
                                         return
 
-                                    } else { return }
+                                    }
 
                                 } else {
 
