@@ -184,9 +184,15 @@ The Fresh Frogs NFT Collection consists of 4,040 Frogs that are each unique and 
 
 - There are EIGHT **Base Frog Type** variantions within the collection. They are the most common!
 
+    - These common Frog types are green with different patterns.
+
 - There are NINE **Colored Frog Type** variantions within the collection. They are rare!
 
+    - These colorful Frog types are harder to come by, the rarest being the Golden Tree Frog!
+
 - There are FIVE **Special Frog Types** within the collection! They are the very rare!
+
+    - The rarest being the "peace" frog; a blue Frog holding the victory sign, less than 0.25% of the collection have this attribute!
 
 - There are EIGHT Frog types that *can* hold an extremely rare **"Natural" Trait.** These are the most rare!
 
