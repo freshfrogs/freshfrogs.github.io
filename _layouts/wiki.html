@@ -1346,7 +1346,7 @@
                 }
 
                 document.getElementById('frog_name').innerHTML = (0.01 * frog_count) + ' ΞETH'
-                
+
                 document.getElementById('quant-frog').innerHTML = frog_count
                 document.getElementById('label_name').innerHTML = mintList
             }
@@ -1402,7 +1402,7 @@
                         window.userAddress = selectedAccount;
                         window.localStorage.setItem("userAddress", selectedAccount);
                         console.log(`☑ETH Address: ${window.userAddress}`);
-                        if (!morph) { document.getElementById('mint-button').innerHTML = '<b><i>Send Transaction!</i></b>'; }
+                        if (!morph) { document.getElementById('mint-button').innerHTML = '<b><a href="https://freshfrogs.io">Mint freshfrogs.io</a></b>'; }
                         document.getElementById('user-add').innerHTML = window.userAddress
                         load_ownedFrogs();
 
