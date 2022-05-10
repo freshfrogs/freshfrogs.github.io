@@ -136,7 +136,7 @@ Preview Frog Morph Combinations!
 
     - A NEW Frog will be generated with combined attributes!
 
-    - This is currently just a preview until the full utility is released!
+    - <u>This is currently just a preview until the full utility is released!</u>
 
 
 ### What is Morphing?
