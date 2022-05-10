@@ -1438,6 +1438,16 @@
 
             document.addEventListener("DOMContentLoaded", async () => {
 
+                try {
+
+                    connect();
+
+                } catch (e) {
+                    console.log(e.message)
+                    document.getElementById('minting-console').innerHTML = e.message;
+                }
+                
+
                 document.querySelector("#morph_ref").addEventListener("click", async (e) => {
                     document.getElementById('minting-display').scrollIntoView({
                         behavior: 'smooth',
