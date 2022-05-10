@@ -178,45 +178,27 @@ NFT staking refers to locking up non-fungible tokens on a platform or protocol i
 
 The Fresh Frogs NFT Collection consists of 4,040 Frogs that are each unique and randomly generated. There are 30 different Frog Types, with 60 different traits! Resulting in 2.8 million possible combinations!
 
-- Base Frog Types
+- There are EIGHT **Base Frog Type** variantions within the collection. They are the most common!
 
-    - There are EIGHT basic Tree Frog variantions within the collection. They are the most common!
+- There are NINE **Colored Frog Type** variantions within the collection. They are rare!
 
-- Colored Frog Types
+- There are FIVE **Special Frog Types** within the collection! They are the very rare!
 
-    - There are NINE colored Tree Frog variantions within the collection. They are rare!
-
-- Special Frog Types
-
-    - There are FIVE Special Frog variantions within the collection! They are the very rare!
-
-- Natural Frog Types
-
-    - There are EIGHT Frog types that *can* hold an extremely rare "natural" trait. These are the most rare!
+- There are EIGHT Frog types that *can* hold an extremely rare **"Natural" Trait.** These are the most rare!
 
     - A 1/30th chance to recieve a Frog that can hold a "special" natural trait, and a 1/19th chance to recieve said trait!
 
 - Attributes
 
-    - Trait (Sub Color)
+    - Trait (Sub Color). Total of 19 possible color variations
 
-        - Total of 19 possible color variations
+    - Accessory.  FOUR possible accessories
 
-    - Accessory
+    - Eyes. EIGHT possible eye coverings
 
-        - FOUR possible accessories
+    - Hat. Total of 15 hats
 
-    - Eyes
-
-        - EIGHT possible eye coverings
-
-    - Hat
-
-        - Total of 15 hats
-
-    - Mouth
-
-        - Total of 13 mouth attributes
+    - Mouth. Total of 13 mouth attributes
 
 
 
