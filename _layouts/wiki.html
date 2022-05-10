@@ -1054,6 +1054,45 @@
                     address.length
                 )}`;
             }
+            // Load Base Frog Types
+            function loadBaseFrogTypes() {
+            //    <div id="freshfrogsmeta" class="freshfrogsmeta">
+            //    <div style="margin-left: 20%; margin-right: auto;">
+            //        <img class="meta_img" src="../the-pad/Frog/treeFrog(3).png"/>
+            //        <p><b>Base Frog Types</b></p>
+            //    </div>
+                var freshfrogsmeta = document.getElementById('freshfrogsmeta')
+                freshfrogsmeta.innerHTML = 
+                
+                    '<div style="margin-left: 20%; margin-right: auto;">' + 
+                    '    <img class="meta_img" src="../the-pad/Frog/treeFrog(1).png"/>' +
+                    '    <p>treeFrog(1)</p>' +
+                    '</div>' +
+                    '<div style="margin-left: 20%; margin-right: auto;">' + 
+                    '    <img class="meta_img" src="../the-pad/Frog/treeFrog(2).png"/>' +
+                    '    <p>treeFrog(2)</p>' +
+                    '</div>' +
+                    '<div style="margin-left: 20%; margin-right: auto;">' + 
+                    '    <img class="meta_img" src="../the-pad/Frog/treeFrog(3).png"/>' +
+                    '    <p>treeFrog(3)</p>' +
+                    '</div>' +
+                    '<div style="margin-left: 20%; margin-right: auto;">' + 
+                    '    <img class="meta_img" src="../the-pad/Frog/treeFrog(4).png"/>' +
+                    '    <p>treeFrog(4)</p>' +
+                    '</div>' +
+                    '<div style="margin-left: 20%; margin-right: auto;">' + 
+                    '    <img class="meta_img" src="../the-pad/Frog/treeFrog(5).png"/>' +
+                    '    <p>treeFrog(5)</p>' +
+                    '</div>' +
+                    '<div style="margin-left: 20%; margin-right: auto;">' + 
+                    '    <img class="meta_img" src="../the-pad/Frog/treeFrog(6).png"/>' +
+                    '    <p>treeFrog(6)</p>' +
+                    '</div>' +
+                    '<div style="margin-left: 20%; margin-right: auto;">' + 
+                    '    <img class="meta_img" src="../the-pad/Frog/treeFrog(7).png"/>' +
+                    '    <p>treeFrog(7)</p>' +
+                    '</div>';
+            }
             // REMOVE FROG from minting Tray
             function remove_frog() {
                 if (frog_count >= 7) {
