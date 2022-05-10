@@ -1428,7 +1428,13 @@
                         window.localStorage.setItem("userAddress", selectedAccount);
                         consoleOutput(`☑ETH Address: ${truncateAddress(window.userAddress)}`);
                         console.log(`☑ETH Address: ${truncateAddress(window.userAddress)}`);
-                        if (!morph) { document.getElementById('mint-button').innerHTML = '<b><i>Send Transaction!</i></b>'; document.getElementById('mint-button').onClick = function() { sendMint() }; }
+                        if (!morph) { 
+
+                            temp = document.getElementById('mint-button')
+                            temp.innerHTML = '<b><i>Send Transaction!</i></b>';
+                            temp.onClick = function() { sendMint(); }
+
+                        }
                         document.getElementById('user-add').innerHTML = window.userAddress
                         load_ownedFrogs();
 
