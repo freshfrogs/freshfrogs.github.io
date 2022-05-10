@@ -558,11 +558,9 @@
         <script src="https://unpkg.com/f0js/dist/f0.js"></script>
         <script>
 
-            var traits_list, collection, frog_count, userAddress, morph, collection_address;
+            var traits_list, collection, frog_count, morph;
 
-            var contract_address = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b'
-
-            var web3 = new Web3(window.ethereum);
+            const CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
 
             var nextIdC = 1;
 
@@ -570,20 +568,93 @@
 
             var sub_frog = false;
 
-            // testing
+            async function load_mintingTerminal() {
 
-            async function syncAccount () {
+                frog_count = 1;
 
-                try {
+                document.getElementById('mintingTray').innerHTML = 
 
-                    console.log('syncing account...')
+                    '<div id="display-table" style="height: 64px;">' +
+                    '    <i id="label_name" class="label_name">Frog 3410 / 4040</i><i id="label_price" class="label_price">Quantity</i>' +
+                    '    <b id="frog_name" class="frog_name">0.01 ΞETH</b><b id="frog_price" class="frog_price"><a id="remove-frog" onclick="remove_frog();"><b>-</b></a> <b id="quant-frog">1</b> <a id="add-frog" onclick="add_frog();"><b>+</b></a></b>' +
+                    '</div>' +
+                    '<div class="bigContainer">' +
+                    '    <div id="frogContainer" class="containerMint"></div>' +
+                    '    <div id="frogContainer2" class="containerMint"></div>' +
+                    '    <div id="frogContainer3" class="containerMint">' +
+                    '        <div class="imgWrapperMint"><img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/preview2.gif"/></div>' +
+                    '    </div>' +
+                    '</div>';
 
-                    let _res = await window.ethereum.send('eth_requestAccounts');
-                    let userAddress = _res.result[0];
+                document.getElementById('lower_display').innerHTML = 
 
-                    console.log('done! ' + userAddress)
+                    '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet!</i></b></button>' +
+                    '<div id="minting-console" class="minting-console">' +
+                    '    > connect wallet...' +
+                    '</div>';
 
-                } catch (e) { console.log(e) }
+                morph = false;
+                var morphbar = document.getElementById('buttonbar_morph')
+                morphbar.style.boxShadow = 'none'
+                morphbar.style.background = 'white'
+                morphbar.style.color = 'initial'
+
+                document.getElementById('buttonbar_mint').className = 'buttonbar_mint_on button_1';
+
+                document.getElementById('previewImg').setAttribute('src', '../frog/'+nextIdC+'.png')
+                
+                connect();
+
+            }
+
+            function load_morph() {
+
+                morph = true;
+                var morphbar = document.getElementById('buttonbar_morph')
+                morphbar.style.boxShadow = '0px 0px 6px 6px rgba(122, 122, 122, 0.20)'
+                morphbar.style.background = 'lightcoral'
+                morphbar.style.color = 'white'
+
+                document.getElementById('buttonbar_mint').className = 'button_1';
+
+                base_frog = false;
+                sub_frog = false;
+                
+                document.getElementById('mintingTray').innerHTML = 
+
+                    '<div id="display-table" style="height: 64px;">' +
+                    '    <i id="label_name" class="label_name">Base Frog</i><button class="switch_button" onclick="switch_base_sub();">🗘</button><i id="label_price" class="label_price">Sub Frog</i>' +
+                    '    <b id="frog_name_base" class="frog_name">Select Frog</b><b id="frog_name_sub" class="frog_price">Select Frog</b>' +
+                    '</div>' +
+                    '<div class="bigContainer">' +
+                    '    <div id="frogContainer" class="containerMint"></div>' +
+                    '    <div id="frogContainer2" class="containerMint">' +
+                    '        <div class="imgWrapperMint"><img id="base_frog_img" class="frogImgMint" src="https://freshfrogs.io/frog/606.png"/></div>' + // 603 605
+                    '        <div class="imgWrapperMint"><img id="sub_frog_img" class="frogImgMint" src="https://freshfrogs.io/frog/407.png"/></div>' +
+                    '    </div>' +
+                    '    <div id="frogContainer3" class="containerMint"><div class="imgWrapperMint">' +
+                    '       <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/morph-preview.png"/></div>' +
+                    '    </div>' +
+                    '</div>';
+
+                document.getElementById('lower_display').innerHTML = 
+
+                    '<h4 style="text-align: left;">Morph Fresh Frogs!</h4><hr>' +
+                    '<div>' +
+                    '   <br><i>1. Connect Wallet!</i>' +
+                    '   <br><br><i>2. Select Two Frogs!</i>' +
+                    '   <br><br><i>3. Generate Morph!</i>' +
+                    '</div>';
+
+                if (typeof window.userAddress == 'undefined') {
+                    try { connect(); } catch (e) { console.log('Error : ' + e.message); }
+                } else { load_ownedFrogs(); }
+
+                // Load two random Frogs
+                // selectBaseFrog(randomIntFromInterval(1, nextIdC));
+                // selectSubFrog(randomIntFromInterval(1, nextIdC));
+                // combineTokens(base_frog, sub_frog);
+
             }
 
             async function syncCollection () {
@@ -704,98 +775,6 @@
                 } catch (e) { console.log(e) }
 
             }
-
-            // testing
-
-            async function load_mintingTerminal() {
-
-                frog_count = 1;
-
-                document.getElementById('mintingTray').innerHTML = 
-
-                    '<div id="display-table" style="height: 64px;">' +
-                    '    <i id="label_name" class="label_name">Frog 3410 / 4040</i><i id="label_price" class="label_price">Quantity</i>' +
-                    '    <b id="frog_name" class="frog_name">0.01 ΞETH</b><b id="frog_price" class="frog_price"><a id="remove-frog" onclick="remove_frog();"><b>-</b></a> <b id="quant-frog">1</b> <a id="add-frog" onclick="add_frog();"><b>+</b></a></b>' +
-                    '</div>' +
-                    '<div class="bigContainer">' +
-                    '    <div id="frogContainer" class="containerMint"></div>' +
-                    '    <div id="frogContainer2" class="containerMint"></div>' +
-                    '    <div id="frogContainer3" class="containerMint">' +
-                    '        <div class="imgWrapperMint"><img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/preview2.gif"/></div>' +
-                    '    </div>' +
-                    '</div>';
-
-                document.getElementById('lower_display').innerHTML = 
-
-                    '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet!</i></b></button>' +
-                    '<div id="minting-console" class="minting-console">' +
-                    '    > connect wallet...' +
-                    '</div>';
-
-                morph = false;
-                var morphbar = document.getElementById('buttonbar_morph')
-                morphbar.style.boxShadow = 'none'
-                morphbar.style.background = 'white'
-                morphbar.style.color = 'initial'
-
-                document.getElementById('buttonbar_mint').className = 'buttonbar_mint_on button_1';
-
-                document.getElementById('previewImg').setAttribute('src', '../frog/'+nextIdC+'.png')
-                
-                connect();
-
-            }
-
-            function load_morph() {
-
-                morph = true;
-                var morphbar = document.getElementById('buttonbar_morph')
-                morphbar.style.boxShadow = '0px 0px 6px 6px rgba(122, 122, 122, 0.20)'
-                morphbar.style.background = 'lightcoral'
-                morphbar.style.color = 'white'
-
-                document.getElementById('buttonbar_mint').className = 'button_1';
-
-                base_frog = false;
-                sub_frog = false;
-                
-                document.getElementById('mintingTray').innerHTML = 
-
-                    '<div id="display-table" style="height: 64px;">' +
-                    '    <i id="label_name" class="label_name">Base Frog</i><button class="switch_button" onclick="switch_base_sub();">🗘</button><i id="label_price" class="label_price">Sub Frog</i>' +
-                    '    <b id="frog_name_base" class="frog_name">Select Frog</b><b id="frog_name_sub" class="frog_price">Select Frog</b>' +
-                    '</div>' +
-                    '<div class="bigContainer">' +
-                    '    <div id="frogContainer" class="containerMint"></div>' +
-                    '    <div id="frogContainer2" class="containerMint">' +
-                    '        <div class="imgWrapperMint"><img id="base_frog_img" class="frogImgMint" src="https://freshfrogs.io/frog/606.png"/></div>' + // 603 605
-                    '        <div class="imgWrapperMint"><img id="sub_frog_img" class="frogImgMint" src="https://freshfrogs.io/frog/407.png"/></div>' +
-                    '    </div>' +
-                    '    <div id="frogContainer3" class="containerMint"><div class="imgWrapperMint">' +
-                    '       <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/morph-preview.png"/></div>' +
-                    '    </div>' +
-                    '</div>';
-
-                document.getElementById('lower_display').innerHTML = 
-
-                    '<h4 style="text-align: left;">Morph Fresh Frogs!</h4><hr>' +
-                    '<div>' +
-                    '   <br><i>1. Connect Wallet!</i>' +
-                    '   <br><br><i>2. Select Two Frogs!</i>' +
-                    '   <br><br><i>3. Generate Morph!</i>' +
-                    '</div>';
-
-                if (typeof window.userAddress == 'undefined') {
-                    try { connect(); } catch (e) { console.log('Error : ' + e.message); }
-                } else { load_ownedFrogs(); }
-
-                // Load two random Frogs
-                // selectBaseFrog(randomIntFromInterval(1, nextIdC));
-                // selectSubFrog(randomIntFromInterval(1, nextIdC));
-                // combineTokens(base_frog, sub_frog);
-
-            }
-
 
 
             // Select subFrog
@@ -1612,8 +1591,7 @@
                 })
 
                 syncCollection();
-                //syncAccount();
-                
+
             })
         </script>
     </head>
