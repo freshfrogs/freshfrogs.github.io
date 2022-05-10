@@ -1462,7 +1462,7 @@
                             
                             temp = document.getElementById('mint-button')
                             temp.innerHTML = '<b><i>Send Transaction!</i></b>';
-                            temp.onClick = sendMint;
+                            temp.onClick = sendMint();
 
                         }
                     } catch (error) {
