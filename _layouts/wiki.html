@@ -1402,7 +1402,9 @@
 
                         userAddress = await web3.currentProvider.selectedAddress
 
-                        console.log('Connected! '+userAddress)
+                        console.log('Connected Wallet! '+userAddress)
+
+                        console.log('Connecting Factoria..')
 
                         await f0.init({
                             web3: web3,
@@ -1410,9 +1412,11 @@
                             network: "main"
                         })
 
+                        console.log('Done!')
+
                     } catch (e) {
 
-                        console.log("Couldn't talk with Factoria : " + e.message)
+                        console.log("Couldn't talk with Factoria! : " + e.message)
                         
                     }
                     
