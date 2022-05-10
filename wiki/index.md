@@ -21,6 +21,7 @@ layout: wiki
     <div id="recent_sales" class="recent_sales"></div>
 </div>
 
+
 ### Fresh Frogs META
 
 ---
@@ -46,6 +47,7 @@ The Fresh Frogs NFT Collection consists of 4,040 Frogs that are each unique and 
 - There are EIGHT Frog types that *can* hold an extremely rare **"Natural" Trait.** These are the most rare!
 
     - A 1/30th chance to recieve a Frog that can hold a "special" natural trait, and a 1/19th chance to recieve said trait!
+
 
 <div id="minting-display" class="minting-display">
     <div>
