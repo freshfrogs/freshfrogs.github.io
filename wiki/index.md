@@ -80,14 +80,13 @@ layout: wiki
     - Our smart contract has been verified on **[etherscan.io](https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b)** ✔️
 
     - *contract address: 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b*
-
+    
 <br>
+
 
 ### How do I View My Frogs?
 
 ---
-
-<br>
 
 - View your Frogs on **[OpenSea](https://opensea.io/account)** or at **[freshfrogs.io/the-pad](https://freshfrogs.io/the-pad)**
 
@@ -106,14 +105,10 @@ layout: wiki
 
 </div>
 
-<br>
-
 
 ### How do I Morph?
 
 ---
-
-<br>
 
 Preview Frog Morph Combinations!
 
@@ -135,14 +130,10 @@ Preview Frog Morph Combinations!
 
     - This is currently just a preview until the full utility is released!
 
-<br>
-
 
 ### What is Morphing?
 
 ---
-
-<br>
 
 <div class="float-img2">
     <img class="frogImg3" src="../the-pad/SpecialFrog/peace.png"/>
@@ -170,14 +161,10 @@ Holders will be soon able to "Morph" two Frogs to create a new NFT on Ethereum w
 
     - (N)ew (F)rog (T)okens can be combined to create even more Frogs! More details coming soon!
 
-<br>
-
 
 ### What is Staking?
 
 ---
-
-<br>
 
 NFT staking refers to locking up non-fungible tokens on a platform or protocol in exchange for staking rewards and other benefits! Staking NFTs allows holders to earn an income from their collection while maintaining ownership!
 
@@ -187,14 +174,10 @@ NFT staking refers to locking up non-fungible tokens on a platform or protocol i
 
     - Fresh Frog Owners will be able to stake to earn **passive income** by **a.)** earning tokens that can be used for utilities and **b.)** loyalty reward payments from sales royalties!
 
-<br>
-
 
 ### Fresh Frogs META
 
 ---
-
-<br>
 
 <div class="float-img2">
     <img class="frogImg3" src="../assets/frogs/preview_frogs.gif"/>
@@ -217,5 +200,3 @@ All 4,040 Frogs are randomly generated and each unique! There are 30 different F
 - There are EIGHT Frog types that *can* hold an extremely rare **"Natural" Trait.** These are the most rare!
 
     - A 1/30th chance to recieve a Frog that can hold a "special" natural trait, and a 1/19th chance to recieve said trait!
-
-<br>
