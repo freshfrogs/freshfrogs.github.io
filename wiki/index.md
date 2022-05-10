@@ -193,18 +193,18 @@ The Fresh Frogs NFT Collection consists of 4,040 Frogs that are each unique and 
 <div id="freshfrogsmeta" class="freshfrogsmeta">
     <div style="margin-left: 20%; margin-right: auto;" onclick="loadBaseFrogTypes();">
         <img class="meta_img" src="../the-pad/Frog/treeFrog(3).png"/>
-        <p><b>Base Frog Types</b></p>
+        <p>Base Frog Types</p>
     </div>
     <div style="margin-left: auto; margin-right: auto;" onclick="loadColoredFrogTypes();">
         <img class="meta_img" src="../the-pad/Frog/cyanTreeFrog.png"/>
-        <p><b>Colored Frog Types</b></p>
+        <p>Colored Frog Types</p>
     </div>
     <div style="margin-left: auto; margin-right: auto;" onclick="loadSpecialFrogTypes();">
         <img class="meta_img" src="../the-pad/SpecialFrog/peace.png"/>
-        <p><b>Special Frog Types</b></p>
+        <p>Special Frog Types</p>
     </div>
     <div style="margin-left: auto; margin-right: 20%;" onclick="loadNaturalFrogTypes();">
         <img class="meta_img" src="../the-pad/Frog/redEyedTreeFrog.png"/>
-        <p><b>Natural Frog Types</b></p>
+        <p>Natural Frog Types</p>
     </div>
 </div>
