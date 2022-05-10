@@ -1432,13 +1432,6 @@
                         window.localStorage.setItem("userAddress", selectedAccount);
                         consoleOutput(`☑ETH Address: ${truncateAddress(window.userAddress)}`);
                         console.log(`☑ETH Address: ${truncateAddress(window.userAddress)}`);
-                        if (!morph) { 
-                            
-                            temp = document.getElementById('mint-button')
-                            temp.innerHTML = '<b><i>Send Transaction!</i></b>';
-                            temp.onClick = sendMint;
-
-                        }
                         document.getElementById('user-add').innerHTML = window.userAddress
                         load_ownedFrogs();
 
@@ -1458,6 +1451,13 @@
                             })
                         } catch (e) {
                             console.log("Couldn't talk with Factoria")
+                        }
+                        if (!morph) { 
+                            
+                            temp = document.getElementById('mint-button')
+                            temp.innerHTML = '<b><i>Send Transaction!</i></b>';
+                            temp.onClick = sendMint;
+
                         }
                     } catch (error) {
                         console.error(error);
