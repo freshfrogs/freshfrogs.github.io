@@ -558,13 +558,50 @@
         <script src="https://unpkg.com/f0js/dist/f0.js"></script>
         <script>
 
-            var traits_list, collection, CONTRACT_ADDRESS, frog_count, morph;
+            var traits_list, collection, frog_count, userAddress, morph, collection_address;
+
+            var contract_address = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b'
+
+            var web3 = new Web3(window.ethereum);
 
             var nextIdC = 1;
 
             var base_frog = false;
 
             var sub_frog = false;
+
+            // testing
+
+            async function syncAccount () {
+
+                try {
+
+                    console.log('syncing account...')
+
+                    let _res = await window.ethereum.send('eth_requestAccounts');
+                    let userAddress = _res.result[0];
+
+                    console.log('done! ' + userAddress)
+
+                } catch (e) { console.log(e) }
+            }
+
+            async function syncCollection () {
+
+                try { 
+                    
+                    console.log('syncing collection...')
+
+                    collection_address = contract_address;
+                    collection = new web3.eth.Contract(token_abi, contract_address);
+
+                    console.log('done! ' + collection)
+
+                } catch (e) { console.log(e) }
+
+            }
+
+            // testing
 
             async function load_mintingTerminal() {
 
@@ -1028,7 +1065,7 @@
 
                                     console.log('Morph = true : '+morph)
 
-                                    if (!base_frog && sub_frog !== this_frog) { // SELECT BASE
+                                    if (!base_frog && sub_frog !== this_frog) { // SELECT BASE (If current base_frog = false and sub_frog != selected)
 
                                         console.log('Selecting base..'+this_frog)
 
@@ -1470,7 +1507,10 @@
                     });
                 })
 
-                CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
+                syncAccount();
+                syncCollection();
+
+                //CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
               
                 // Pull Collection data from OpenSea
 
