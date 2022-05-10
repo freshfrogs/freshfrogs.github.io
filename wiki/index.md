@@ -188,7 +188,7 @@ The Fresh Frogs NFT Collection consists of 4,040 Frogs that are each unique and 
 
     - A 1/30th chance to recieve a Frog that can hold a "special" natural trait, and a 1/19th chance to recieve said trait!
 
-<button class="button_1" onclick="reset_frogsmeta();">🗘 Reset Menu</button>
+- <a onclick="reset_frogsmeta();"><b>🗘 Reset Menu</b></a>
 
 <div id="freshfrogsmeta" class="freshfrogsmeta">
     <div style="margin-left: 20%; margin-right: auto;" onclick="loadBaseFrogTypes();">
