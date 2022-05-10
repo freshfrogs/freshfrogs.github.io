@@ -739,12 +739,10 @@
 
             // Function combine tokens
             async function combineTokens(baseFrog, otherFrog) {
+                
                 var useGIF = undefined;
                 var baseFrog_Frog, baseFrog_SpecialFrog, baseFrog_Trait, baseFrog_Accessory, baseFrog_Eyes, baseFrog_Hat, baseFrog_Mouth = undefined;
                 var otherFrog_Frog, otherFrog_SpecialFrog, otherFrog_Trait, otherFrog_Accessory, otherFrog_Eyes, otherFrog_Hat, otherFrog_Mouth = undefined;
-
-                //document.getElementById("subFrogDiv").style.opacity = '0.20';
-                //document.getElementById("baseFrogDiv").style.opacity = '0.20';
 
                 let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseFrog+".json")).json();
 
