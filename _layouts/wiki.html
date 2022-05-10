@@ -1414,15 +1414,25 @@
 
                         console.log('Done!')
 
+                        //
+                        if (!morph) { document.getElementById('mint-button').innerHTML = '<b><a href="https://freshfrogs.io">Mint freshfrogs.io</a></b>'; }
+                        document.getElementById('user-add').innerHTML = window.userAddress
+                        load_ownedFrogs();
+                        return
+                        //
+
                     } catch (e) {
 
                         console.log("Couldn't talk with Factoria! : " + e.message)
+
+                        return
                         
                     }
                     
                 } else {
                     alert("No ETH brower extension detected!");
                     console.log("No ETH brower extension detected!");
+                    return
                 }
             }
 
