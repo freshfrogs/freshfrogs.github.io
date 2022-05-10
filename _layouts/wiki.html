@@ -584,7 +584,7 @@
                 document.getElementById('mintingTray').innerHTML = 
 
                     '<div id="display-table" style="height: 64px;">' +
-                    '    <i id="label_name" class="label_name">Base Frog</i><button class="switch_button">🗘</button><i id="label_price" class="label_price">Sub Frog</i>' +
+                    '    <i id="label_name" class="label_name">Base Frog</i><button class="switch_button" onclick="switch_base_sub();">🗘</button><i id="label_price" class="label_price">Sub Frog</i>' +
                     '    <b id="frog_name_base" class="frog_name">Select Frog</b><b id="frog_name_sub" class="frog_price">Select Frog</b>' +
                     '</div>' +
                     '<div class="bigContainer">' +
@@ -652,6 +652,16 @@
                     document.getElementById('mint-button').style.boxShadow = '0px 0px 6px 6px #7cc1ff'
                 }
                 
+            }
+            // Switch Frogs
+            function switch_base_sub(base_i, sub_i) {
+
+                base_frog = false;
+                sub_frog = false;
+
+                selectBaseFrog(sub_i)
+                selectSubFrog(base_i)
+
             }
             // Select baseFrog
             async function selectBaseFrog(selected_base){
