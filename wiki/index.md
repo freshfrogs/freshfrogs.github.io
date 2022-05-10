@@ -22,7 +22,7 @@ layout: wiki
     <img class="frogImg3" src="../the-pad/Frog/frog_gif.gif"/>
 </div>
 
-The Fresh Frogs NFT Collection consists of 4,040 Frogs that are each unique and randomly generated. There are 30 different Frog Types, with 60 different traits! Resulting in 2.8 million possible combinations!
+All 4,040 Frogs are randomly generated and each unique! There are 30 different Frog Types, with 60 different traits! Resulting in 2.8 million possible combinations!
 
 - There are EIGHT **Base Frog Type** variantions within the collection. They are the most common!
 
