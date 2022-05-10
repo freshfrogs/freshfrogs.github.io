@@ -88,7 +88,7 @@ layout: wiki
 
 - Connect an Ethereum wallet to display your Frogs below!
 
-    - Frogs not displaying? Try manually checking: <b onclick="load_ownedFrogs_manual();">Scan Frog Txn</b>
+    - Frogs not displaying? Try manually checking: <b style="cursor: pointer;" onclick="load_ownedFrogs_manual();">Scan Frog Txn</b>
 
     - Click on a Frog to view attribute rarities, Morph, and more!
 
