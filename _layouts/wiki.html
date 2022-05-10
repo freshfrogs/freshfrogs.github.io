@@ -1400,10 +1400,6 @@
                     
                     try {
 
-                        userAddress = await web3.currentProvider.selectedAddress
-
-                        console.log('Connected Wallet! '+userAddress)
-
                         console.log('Connecting Factoria..')
 
                         await f0.init({
@@ -1412,12 +1408,17 @@
                             network: "main"
                         })
 
-                        console.log('Done! Loading FROG tokens...')
+                        userAddress = await web3.currentProvider.selectedAddress
 
+                        console.log('Connected Wallet! '+userAddress)
+
+                        console.log('Done! Loading FROG tokens...')
                         
                         if (!morph) { document.getElementById('mint-button').innerHTML = '<b><a href="https://freshfrogs.io">Mint freshfrogs.io</a></b>'; }
-                        document.getElementById('user-add').innerHTML = window.userAddress
+                        document.getElementById('user-add').innerHTML = userAddress
+
                         load_ownedFrogs();
+
                         return
 
                     } catch (e) {
