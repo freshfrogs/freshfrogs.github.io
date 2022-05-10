@@ -1000,7 +1000,7 @@
                 .then((res) => res.json())
                 .then((res) => {
                     var { assets } = res
-                    assets.forEach((frog) => { // For Each FROG
+                    assets.forEach((frog) => { // Get user's assets
 
                         try {
 
@@ -1114,14 +1114,14 @@
                             document.getElementById('owned-frogs').appendChild(owned_frog);
                         
                         } catch (e) { 
-                            console.log('Error : ' + e.message);
-                            document.getElementById('button_ownedfrogs').innerHTML = 'It seems you do not own any Frogs!'
+                            console.log('Could not get OpenSea user assets : ' + e.message);
+                            document.getElementById('button_ownedfrogs').innerHTML = 'Something went wrong! Refresh the page!'
                         }
                     })
                 })
                 .catch(e => {
-                    document.getElementById('button_ownedfrogs').innerHTML = 'Error : ' + e.message
-                    console.log('Error : ' + e.message)
+                    console.log('Could not get OpenSea user assets : ' + e.message);
+                    document.getElementById('button_ownedfrogs').innerHTML = 'Something went wrong! Refresh the page!'
                 })
             }
 
@@ -1500,7 +1500,7 @@
                 })
                 .catch(e => {
 
-                    console.log('Error: Could not talk to OpenSea... Recent sales..');
+                    console.log('Error: Could not talk to OpenSea... Collection..');
                     //console.error('Error : ' + e.message)
               
                 }); 
@@ -1563,7 +1563,7 @@
                 })
                 .catch(e => {
 
-                    console.log('Error: Could not talk to Asset Events...');
+                    console.log('Error: Could not get OpenSea recent sales!');
                     //console.error('Error : ' + e.message)
 
                 })
