@@ -16,15 +16,7 @@ layout: wiki
 
 </desc>
 
-<div style="margin-left: auto; margin-right: auto; text-align: center;">
-    <h4 style="text-align: left !important;"><u><a href="https://opensea.io/collection/fresh-frogs?tab=activity" target="_blank">Recent Sales</a></u></h4>
-    <div id="recent_sales" class="recent_sales"></div>
-</div>
-
-
 ### Fresh Frogs META
-
----
 
 <div class="float-img2">
     <img class="frogImg3" src="../the-pad/Frog/frog_gif.gif"/>
@@ -48,6 +40,10 @@ The Fresh Frogs NFT Collection consists of 4,040 Frogs that are each unique and 
 
     - A 1/30th chance to recieve a Frog that can hold a "special" natural trait, and a 1/19th chance to recieve said trait!
 
+<div style="margin-left: auto; margin-right: auto; text-align: center;">
+    <h4 style="text-align: left !important;"><u><a href="https://opensea.io/collection/fresh-frogs?tab=activity" target="_blank">Recent Sales</a></u></h4>
+    <div id="recent_sales" class="recent_sales"></div>
+</div>
 
 <div id="minting-display" class="minting-display">
     <div>
