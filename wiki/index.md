@@ -188,19 +188,6 @@ The Fresh Frogs NFT Collection consists of 4,040 Frogs that are each unique and 
 
     - A 1/30th chance to recieve a Frog that can hold a "special" natural trait, and a 1/19th chance to recieve said trait!
 
-- Attributes
-
-    - Trait (Sub Color). Total of 19 possible color variations
-
-    - Accessory.  FOUR possible accessories
-
-    - Eyes. EIGHT possible eye coverings
-
-    - Hat. Total of 15 hats
-
-    - Mouth. Total of 13 mouth attributes
-
-
 
 <div id="freshfrogsmeta" class="freshfrogsmeta">
     <div style="margin-left: 10%; margin-right: auto;">
