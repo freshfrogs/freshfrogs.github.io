@@ -1417,7 +1417,11 @@
                     if (!morph) { document.getElementById('mint-button').innerHTML = '<b><a href="https://freshfrogs.io">Mint freshfrogs.io</a></b>'; }
                     document.getElementById('user-add').innerHTML = userAddress
 
-                    load_ownedFrogs()
+                    ownedFrogs = await collection.methods.balanceOf(userAcc).call();
+
+                    if (ownedFrogs >= 1) {
+                        load_ownedFrogs()
+                    }
 
                 // Done! Ready to mint!
                 } catch (e) { // Failed; Send Error Code!
