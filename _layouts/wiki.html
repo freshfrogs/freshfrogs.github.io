@@ -1390,6 +1390,7 @@
 
             // Login with Web3 via Metamasks window.ethereum library
             async function connect() {
+
                 console.log('Connecting...')
                     
                 const web3 = new Web3(window.ethereum);   // Open WEB3.0 Browsner Exentions Window
@@ -1398,7 +1399,6 @@
                 const COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
                 const NETWORK = "main";   // Which Network?
 
-                console.log('Connecting...')
 
                 try {   // Connect Wallet
                     
@@ -1417,13 +1417,14 @@
                     if (!morph) { document.getElementById('mint-button').innerHTML = '<b><a href="https://freshfrogs.io">Mint freshfrogs.io</a></b>'; }
                     document.getElementById('user-add').innerHTML = userAddress
 
+                    load_ownedFrogs()
+
                 // Done! Ready to mint!
                 } catch (e) { // Failed; Send Error Code!
                     console.log("Failed to Connect! Error : " + e.message);
                     return
                 }
 
-                try { load_ownedFrogs(); } catch (e) { console.log(e) }
             }
 
 
