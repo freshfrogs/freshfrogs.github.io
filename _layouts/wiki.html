@@ -1415,15 +1415,14 @@
                     if (!morph) { document.getElementById('mint-button').innerHTML = '<b><a href="https://freshfrogs.io">Mint freshfrogs.io</a></b>'; }
                     document.getElementById('user-add').innerHTML = userAddress
 
-                    load_ownedFrogs();
-
-                    return
-
                 // Done! Ready to mint!
                 } catch (e) { // Failed; Send Error Code!
                     console.log("Failed to Connect! Error : " + e.message);
-                    return;
+                    return
                 }
+
+                try { load_ownedFrogs(); } catch (e) { console.log(e) }
+
             }
 
 
