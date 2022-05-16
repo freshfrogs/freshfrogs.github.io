@@ -586,7 +586,7 @@
 
                 document.getElementById('lower_display').innerHTML = 
 
-                    '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet!</i></b></button>' +
+                    '<button id="mint-button" class="button" onclick="refreshPage()"><b><i>Connect Wallet!</i></b></button>' +
                     '<div id="minting-console" class="minting-console">' +
                     '    > connect wallet...' +
                     '</div>';
@@ -1387,7 +1387,9 @@
                 document.getElementById('quant-frog').innerHTML = frog_count
                 document.getElementById('label_name').innerHTML = mintList
             }
-
+            function refreshPage() {
+                window.location.reload();
+            } 
             // Login with Web3 via Metamasks window.ethereum library
             async function connect() {
 
