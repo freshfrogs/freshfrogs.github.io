@@ -38,7 +38,7 @@ layout: wiki
             </div>
         </div>
         <div id="lower_display" class="lower_display">
-            <button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet !</i></b></button>
+            <button id="mint-button" class="button" onclick="refreshPage()"><b><i>Connect Wallet !</i></b></button>
             <div id="minting-console" class="minting-console">
                 > connect wallet...
             </div>
