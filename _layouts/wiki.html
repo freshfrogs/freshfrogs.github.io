@@ -1397,15 +1397,15 @@
             async function connect() {
                 console.log('Connecting...')
                 if (window.ethereum) {
-                    
-                    try {
 
-                        console.log('Connecting Factoria..')
+                    console.log('Connecting Factoria..')
 
+                    try {   // Connect Wallet
+                        
                         await f0.init({
                             web3: web3,
                             contract: CONTRACT_ADDRESS,
-                            network: "main"
+                            network: NETWORK
                         })
 
                         userAddress = await web3.currentProvider.selectedAddress
@@ -1413,7 +1413,7 @@
                         console.log('Connected Wallet! '+userAddress)
 
                         console.log('Done! Loading FROG tokens...')
-                        
+
                         if (!morph) { document.getElementById('mint-button').innerHTML = '<b><a href="https://freshfrogs.io">Mint freshfrogs.io</a></b>'; }
                         document.getElementById('user-add').innerHTML = userAddress
 
@@ -1421,11 +1421,10 @@
 
                         return
 
-                    } catch (e) {
-
-                        console.log("Couldn't talk with Factoria! : " + e.message)
-                        return
-                        
+                    // Done! Ready to mint!
+                    } catch (e) { // Failed; Send Error Code!
+                        consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><b>''</b>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
+                        return;
                     }
                     
                 } else {
@@ -1443,9 +1442,7 @@
 
             document.addEventListener("DOMContentLoaded", async () => {
 
-
                 connect()
-
 
                 document.querySelector("#morph_ref").addEventListener("click", async (e) => {
                     document.getElementById('minting-display').scrollIntoView({
