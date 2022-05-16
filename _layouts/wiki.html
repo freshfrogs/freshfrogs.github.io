@@ -1395,44 +1395,34 @@
             }
             // Login with Web3 via Metamasks window.ethereum library
             async function connect() {
+
                 console.log('Connecting...')
-                if (window.ethereum) {
 
-                    console.log('Connecting Factoria..')
-
-                    try {   // Connect Wallet
-                        
-                        await f0.init({
-                            web3: web3,
-                            contract: CONTRACT_ADDRESS,
-                            network: NETWORK
-                        })
-
-                        userAddress = await web3.currentProvider.selectedAddress
-
-                        console.log('Connected Wallet! '+userAddress)
-
-                        console.log('Done! Loading FROG tokens...')
-
-                        if (!morph) { document.getElementById('mint-button').innerHTML = '<b><a href="https://freshfrogs.io">Mint freshfrogs.io</a></b>'; }
-                        document.getElementById('user-add').innerHTML = userAddress
-
-                        load_ownedFrogs();
-
-                        return
-
-                    // Done! Ready to mint!
-                    } catch (e) { // Failed; Send Error Code!
-                        console.log("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><b>''</b>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
-                        return;
-                    }
+                try {   // Connect Wallet
                     
-                } else {
+                    await f0.init({
+                        web3: web3,
+                        contract: CONTRACT_ADDRESS,
+                        network: NETWORK
+                    })
 
-                    alert("No ETH brower extension detected!");
-                    console.log("No ETH brower extension detected!");
+                    userAddress = await web3.currentProvider.selectedAddress
+
+                    console.log('Connected Wallet! '+userAddress)
+
+                    console.log('Done! Loading FROG tokens...')
+
+                    if (!morph) { document.getElementById('mint-button').innerHTML = '<b><a href="https://freshfrogs.io">Mint freshfrogs.io</a></b>'; }
+                    document.getElementById('user-add').innerHTML = userAddress
+
+                    load_ownedFrogs();
+
                     return
-                    
+
+                // Done! Ready to mint!
+                } catch (e) { // Failed; Send Error Code!
+                    console.log("Failed to Connect! Error : " + e.message);
+                    return;
                 }
             }
 
