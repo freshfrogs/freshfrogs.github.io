@@ -191,8 +191,9 @@
     }
     #banner_image {
         width: 100%;
-        object-fit: contain;
         border-radius: 5px;
+        padding: 0% !important;
+        margin: 0% !important;
     }
     .frog_name {
         text-align: left;
@@ -1135,7 +1136,7 @@
 
                     }
                 } catch (e) {
-                    alert("Something went wrong, refresh the page!"+e.message)
+                    console.log("Something went wrong, refresh the page!"+e.message)
                     //document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ❌ '+loadedFrogs+'/'+ownedFrogs+' FROG(s) loaded!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'
                 }
 
