@@ -14,9 +14,9 @@ layout: wiki
 
     Unbelievably, over 200,000 acres of rainforest are burned every day. That is over 150 acres lost every minute of every day, and 78 million acres are lost every year! A portion of every re-sale will be donated to The Rainforest Foundation, where every 1.00 ETH in donations will save 2.5 acres of natural rainforest forever!
 
-    <i id="created_date"></i>
-
 </desc>
+
+<i id="created_date"></i>
 
 <div style="margin-left: auto; margin-right: auto; text-align: center;">
     <h4 style="text-align: left !important;"><u><a href="https://opensea.io/collection/fresh-frogs?tab=activity" target="_blank">Recent Sales</a></u></h4>
