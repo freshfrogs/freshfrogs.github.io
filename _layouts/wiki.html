@@ -560,12 +560,6 @@
 
             var traits_list, collection, frog_count, morph, userAddress;
 
-            const web3 = new Web3(window.ethereum);   // Open WEB3.0 Browsner Exentions Window
-            const f0 = new F0();    // Connect to Factoria
-            const CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";    // Contract Address (Ethereum Mainnet) 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b // Rinkeby: 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524
-            const COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
-            const NETWORK = "main";   // Which Network?
-
             var nextIdC = 1;
 
             var base_frog = false;
@@ -592,7 +586,7 @@
 
                 document.getElementById('lower_display').innerHTML = 
 
-                    '<button id="mint-button" class="button" onclick="connect()"><b><i>Connect Wallet!</i></b></button>' +
+                    '<button id="mint-button" class="button" onclick=""><b><i>Connect Wallet!</i></b></button>' +
                     '<div id="minting-console" class="minting-console">' +
                     '    > connect wallet...' +
                     '</div>';
@@ -606,8 +600,6 @@
                 document.getElementById('buttonbar_mint').className = 'buttonbar_mint_on button_1';
 
                 document.getElementById('previewImg').setAttribute('src', '../frog/'+nextIdC+'.png')
-                
-                connect();
 
             }
 
@@ -650,9 +642,7 @@
                     '   <br><br><i>3. Generate Morph!</i>' +
                     '</div>';
 
-                if (typeof userAddress == 'undefined') {
-                    try { connect(); } catch (e) { console.log('Failed to Connect : ' + e.message); }
-                } else { load_ownedFrogs(); }
+                load_ownedFrogs();
 
                 // Load two random Frogs
                 // selectBaseFrog(randomIntFromInterval(1, nextIdC));
@@ -1393,8 +1383,17 @@
                 document.getElementById('quant-frog').innerHTML = frog_count
                 document.getElementById('label_name').innerHTML = mintList
             }
-            // Login with Web3 via Metamasks window.ethereum library
-            async function connect() {
+
+            // start here
+
+
+            document.addEventListener("DOMContentLoaded", async () => {
+
+                const web3 = new Web3(window.ethereum);   // Open WEB3.0 Browsner Exentions Window
+                const f0 = new F0();    // Connect to Factoria
+                const CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";    // Contract Address (Ethereum Mainnet) 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b // Rinkeby: 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524
+                const COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
+                const NETWORK = "main";   // Which Network?
 
                 console.log('Connecting...')
 
@@ -1422,16 +1421,6 @@
                 }
 
                 try { load_ownedFrogs(); } catch (e) { console.log(e) }
-
-            }
-
-
-            // start here
-
-
-            document.addEventListener("DOMContentLoaded", async () => {
-
-                connect()
 
                 document.querySelector("#morph_ref").addEventListener("click", async (e) => {
                     document.getElementById('minting-display').scrollIntoView({
