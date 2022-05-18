@@ -733,6 +733,9 @@
 
 
         try {   // Connect Wallet
+
+          consoleOutput('<div id="mintingText" class="mintingTextWhite"><strong></strong>Connecting...</div>')
+
           await f0.init({
             web3: web3,
             contract: CONTRACT_ADDRESS,
@@ -787,8 +790,8 @@
         document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         //document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
-        consoleOutput("<div id='mintingText'>Please connect an Ethereum wallet... <b><i>"+addressCut+" ✔️</b></i>"+"<br><b>FROG #"+nextIdC+"</b> available to mint... Limit: <b>"+mintLimit+" Frogs</b> per Wallet</div>")
-
+        document.getElementById('mintingText').innerHTML = "Please connect an Ethereum wallet... <b><i>"+addressCut+" ✔️</b></i>"+"<br><b>FROG #"+nextIdC+"</b> available to mint... Limit: <b>"+mintLimit+" Frogs</b> per Wallet"
+        
         consoleOutput('<br><hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.io/the-pad">🍀 <b>freshfrogs.io/the-pad</b> ↗️</a>');
         // Recent Mints
         // Event Listeners 
