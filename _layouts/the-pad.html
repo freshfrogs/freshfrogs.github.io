@@ -680,6 +680,11 @@
                     let value = attribute.value
                     let trait_rarity = ((attributesTotal[value]/nextIdC)*100).toFixed(0);
 
+                    
+                    if (trait_rarity < 1) {
+                      let trait_rarity = '<1';
+                    }
+
                     // Build Fresh Frogs Attributes
                     loadAttribute(trait_type, value, frog.name)
                     newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
