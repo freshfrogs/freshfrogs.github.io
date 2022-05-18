@@ -675,6 +675,30 @@
           method: 'GET',
           headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
         };
+
+        fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
+        .then(collection => collection.json())
+        .then(collection => {
+
+          var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
+
+          traits_list = traits;
+
+          //document.getElementById('banner_image').setAttribute('src', banner_image_url)
+          document.getElementById('name').innerHTML = name
+          document.getElementById('count').innerHTML = count
+          document.getElementById('num_owners').innerHTML = num_owners
+          document.getElementById('market_cap').innerHTML = market_cap.toFixed(2)+' Ξ'
+          document.getElementById('floor_price').innerHTML = floor_price+' Ξ'
+          document.getElementById('total_volume').innerHTML = total_volume.toFixed(2)+' Ξ'
+
+        })
+        .catch(e => {
+
+            console.log('Error: Could not get Collection data from Opensea.');
+            console.error('Error : ' + e.message)
+      
+        }); // End data pull / first paid Frog 3,236
         
         fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=3&include_orders=false', options)
         .then((res) => res.json())
@@ -996,8 +1020,9 @@
           <div id="thePad" class="thePad"></div>
           <br>
           <div id="stats" class="mintingTextWhite">
-            Fresh Frogs NFT
-            4,040 Randomly generated frogs on ethereum!
+            <br>
+            <p>Items: <b id="count"></b> | Owners: <b id="num_owners"></b> | Market Cap: <b id="market_cap"></b> | Floor Price: <b id="floor_price"></b> | Sales Volume: <b id="total_volume"></b> <b id="initial_sales"></b></p>
+            <br>
           </div>
           <br>
           <div class="divTimeline">
