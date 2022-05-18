@@ -808,8 +808,8 @@
 
             } catch (e) { // Something went wrong!
               //consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><b>''</b>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
-              document.getElementById('mintingText').innerHTML = "Something went wrong! <br><b>''</b>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a>"
-              document.getElementById('mintingText').className = "mintingTextRed"
+              document.getElementById('mintingText').innerHTML = "Something went wrong!<br>"+e.message+"<a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a>"
+              //document.getElementById('mintingText').className = "mintingTextRed"
               return; // BREAK!
             }
             // MINT SENT NO PROBLEMS!
