@@ -801,7 +801,7 @@
           } else { // SEND MINT TX!
 
             try { // Attempt to Send!
-              document.getElementById('mintingText').innerHTML = "<strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the page!"
+              document.getElementById('mintingText').innerHTML = "<br><strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the page!<br>"
               document.getElementById('mintingText').className = "mintingTextWhite"
               
               let tokens = await f0.mint(userInvite, frogCount) // AWAIT RESPONSE!
