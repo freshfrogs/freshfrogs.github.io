@@ -686,6 +686,7 @@
 
           document.getElementById('banner_image').setAttribute('src', banner_image_url)
           document.getElementById('name').innerHTML = name
+          document.getElementById('description').innerHTML = description
           document.getElementById('count').innerHTML = count
           document.getElementById('num_owners').innerHTML = num_owners
           document.getElementById('market_cap').innerHTML = market_cap.toFixed(2)+' Ξ'
@@ -1023,6 +1024,7 @@
             <img id="banner_image" src="../assets/frogs/backfrogs.png"/>
             <h3 id="name"></h3>
             <p>Items: <b id="count"></b> | Owners: <b id="num_owners"></b> | Market Cap: <b id="market_cap"></b> | Floor Price: <b id="floor_price"></b> | Sales Volume: <b id="total_volume"></b> <b id="initial_sales"></b></p>
+            <p id="description"></p>
             <br>
           </div>
           <br>
