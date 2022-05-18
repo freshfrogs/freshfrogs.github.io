@@ -800,16 +800,16 @@
 
           } else { // SEND MINT TX!
 
-            try { // Attempt to Send!
-              document.getElementById('mintingText').innerHTML = "<br><strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the page!<br>"
-              document.getElementById('mintingText').className = "mintingTextWhite"
+            try { // Attempt to Send! '<strong>Minting ('+frogCount+'') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'
+              document.getElementById('mintingText').innerHTML = '<strong>Minting ('+frogCount+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'
+              document.getElementById('mintingText').className = 'mintingTextWhite'
               
               let tokens = await f0.mint(userInvite, frogCount) // AWAIT RESPONSE!
 
             } catch (e) { // Something went wrong!
               //consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><b>''</b>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
-              document.getElementById('mintingText').innerHTML = "<strong></strong><br>"+e.message+"<a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><strong><u>Discord #Support</u></strong></a>"
-              //document.getElementById('mintingText').className = "mintingTextRed"
+              document.getElementById('mintingText').innerHTML = '<strong></strong>'+'<br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>' //"<strong></strong><br>"+e.message+"<a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><strong><u>Discord #Support</u></strong></a>"
+              document.getElementById('mintingText').className = 'mintingTextWhite'
               return; // BREAK!
             }
             // MINT SENT NO PROBLEMS!
