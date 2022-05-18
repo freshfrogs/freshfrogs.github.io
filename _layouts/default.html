@@ -771,10 +771,12 @@
           mint = 1; // <--- Mint On or Off? 1 / 0
 
           // <-----------------------------
-
+          //document.getElementById('mintingText').innerHTML = "<strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the page!"
+          //document.getElementById('mintingText').className = "mintingTextWhite"
           // Done! Ready to mint!
         } catch (e) { // Failed; Send Error Code!
-          consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><b>''</b>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
+          //consoleOutput("<br>"+"<div class='mintingTextRed'><strong>Error Linking Wallet: <br>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
+          consoleOutput('<br>'+'<div class="mintingTextRed"><strong></strong><br>'+e.message+'</b><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><b><u>Discord #Support</u></b></a></div>')
           return;
         }
 
