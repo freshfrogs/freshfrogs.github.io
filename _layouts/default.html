@@ -698,7 +698,7 @@
           headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
         };
 
-        fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
+      /*  fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
         .then(collection => collection.json())
         .then(collection => {
 
@@ -720,7 +720,7 @@
             console.log('Error: Could not get Collection data from Opensea.');
             console.error('Error : ' + e.message)
       
-        }); // End data pull / first paid Frog 3,236
+        }); // End data pull / first paid Frog 3,236 */
         
         fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=3&include_orders=false', options)
         .then((res) => res.json())
@@ -1041,14 +1041,7 @@
             <div id="pre" class="consoleOutput"></div>
           </div>
           <br>
-          <div id="stats" class="mintingTextWhite" style="border: 1px solid white; color: #333 !important; border-radius: 5px !important; padding: 0px !important;">
-            <div style="padding: 8px !important;">
-              <a href="https://opensea.io/collection/fresh-frogs" target="_blank" class="pointer"><u><h3 id="name">Fresh Frogs NFT</h3></u></a>
-              <p>Items: <b id="count"></b> | Owners: <b id="num_owners"></b> | Market Cap: <b id="market_cap"></b> | Floor Price: <b id="floor_price"></b></p>
-              <p id="description" style="color: #333 !important;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more! A portion of every re-sale will be donated to The Rainforest Foundation</p>
-            </div>
-            <div id="thePad" class="thePad"></div>
-          </div>
+          <div id="thePad" class="thePad"></div>
           <br>
           <div class="divTimeline">
             <img style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="./assets/frogs/FLY.gif">
