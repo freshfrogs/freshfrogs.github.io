@@ -856,7 +856,7 @@
 
             try { // Attempt to Send! '<strong>Minting ('+frogCount+'') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'
               //document.getElementById('mintingText').innerHTML = '<br>'+'<strong>Minting ('+frogCount+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br><p></p>'
-              consoleOutput('<br>'+'<strong>Minting ('+frogCount+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
+              consoleOutput('<br>'+'<strong>Minting ('+frogCount+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!')
               document.getElementById('pre').className = 'mintingTextWhite'
               
               let tokens = await f0.mint(userInvite, frogCount) // AWAIT RESPONSE!
