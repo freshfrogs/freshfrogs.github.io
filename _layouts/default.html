@@ -747,7 +747,7 @@
           var { assets } = res
           var nextIdC = parseInt(assets[0].name.replace('Frog #', '')) + 1;
           // Messages Sent to Terminal
-          document.getElementById("supply").innerHTML = nextIdC+" / 4,040 Total Supply" // Supply
+          document.getElementById("supply").innerHTML = "Total Supply "+nextIdC+" / 4040" // Supply
           document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.io/frog/"+nextIdC+".png");
 
           assets.forEach((frog) => { // For Each FROG
@@ -834,7 +834,7 @@
           //document.getElementById('netStatus').innerHTML = '<br><h2 style="color: white !important;"><b>freshfrogs.io</b></h2><div id="pre" class="consoleOutput"></div>';
           
           // Messages Sent to Terminal (Again)
-          document.getElementById("supply").innerHTML = nextIdC+" / 4,040 Total Supply" // Supply
+          document.getElementById("supply").innerHTML = "Total Supply "+nextIdC+" / 4040" // Supply
           document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.io/frog/"+nextIdC+".png");
 
           // ----------------------------->
@@ -1043,7 +1043,7 @@
       <header>
         <div class="downloads pre">
           <div id="mintingTray">
-            <h3 class="headerDiv" id="supply">Total Supply 4,040</h3>
+            <h3 class="headerDiv" id="supply">4040 Total Supply</h3>
             <ul class="downloads2">
               <li><a id="mintTransact" href="https://freshfrogs.io/" class="pointer"><strong>LINK WALLET</strong></a></li>
               <li><a id="mintTotal"><strong>0.01 ΞETH</strong>Plus gas</a></li>
