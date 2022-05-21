@@ -476,7 +476,7 @@
         COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
         NETWORK = "main";   // Which Network?
         //consoleOutput('<b>🍄Morph FROGS</b><br>Fresh Frog NFT Combinations! <br>Select Frogs to combine their attributes!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>')
-        consoleOutput('Mint from the collection...<a class="pointer" href="https://freshfrogs.io/"><b>🐸 Minting Terminal</b> ↗️</a>'+'<br><div id="thePad" class="thePad"></div>')
+        //consoleOutput('Mint from the collection...<a class="pointer" href="https://freshfrogs.io/"><b>🐸 Minting Terminal</b> ↗️</a>'+'<br><div id="thePad" class="thePad"></div>')
         try {   // Connect
           await f0.init({
             web3: web3,
@@ -629,9 +629,11 @@
           // Display Two Random Frogs!
           //combineTokens(baseFrog, subFrog);
           if (ownedFrogs <= 0) { // ❌ No FROGS
-            document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i>"+addressCut+" ✓</i></b>"+"<br>❌ It seems you do not own any FROGS!<br>\n<br>"
+            //document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i>"+addressCut+" ✓</i></b>"+"<br>❌ It seems you do not own any FROGS!<br>\n<br>"
+            consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS!<br>'+'<p></p>')
           } else {
-            document.getElementById('netStatus').innerHTML = 'Loading Frogs from ΞEthereum... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br><br>';
+            //document.getElementById('netStatus').innerHTML = 'Loading Frogs from ΞEthereum... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br><br>';
+            consoleOutput('<br>'+'<strong>Connected!</strong> Loading Frogs ΞEthereum... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>'+'<p></p>')
 
             // OPEN SEA API
 
@@ -704,11 +706,11 @@
               width = percent
               width++;
               elem.style.width = width + "%";
-              document.getElementById('netStatus').innerHTML = "<div id='mintingText'>Connect to view FROG tokens... <b><i>"+addressCut+"</i></b>"+"<br>✔️ <b>[ "+ownedFrogs+" ]</b> FROG(s) belong to this address...</div><br><hr class='hr2'>" //"<div id='mintingText'><b><i>"+addressCut+"</i></b> ✔️ This address holds <b>[ "+ownedFrogs+" ]</b> FROG(S)...</div><br><hr class='hr2'>" //"<div id='mintingText'>Connect to view 'FROG' tokens... <b><i>("+ownedFrogs+")</b> FROG(S)</i>"+'<br><b>'+userAcc.toUpperCase()+' ✓</b>'+'<br>\n<br>'
+              consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+'Frog #'+nextIdC+' is now available to mint!<br>Maximum of '+mintLimit+' frogs per wallet!<br>'+'<p></p>')
             })
           }
         } catch (e) { // Failed; Send Error Code!
-          consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong><a href='https://discord.gg/xWMFWgpvd3' target='_blank'><b><u>Discord #Support</u></b></a></div>");
+          consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
         }
       })
       // Round to Hundredth place
@@ -726,9 +728,7 @@
       }
       // Output to minting terminal
       function consoleOutput(output) {
-        newLine = document.createElement("div")
-        newLine.innerHTML = output
-        document.getElementById("pre").appendChild(newLine)
+        document.getElementById("pre").innerHTML = output
       }
       // Function Learn More Frog Morph
       //function learnMore() {
@@ -1087,11 +1087,17 @@
         <div class="top">{{ content }}<h2 style="color: white !important;"><b>freshfrogs.io/the-pad 🍀</b></h2></div>
         <br>
         <div class="downloads pre">
-          <div id="pre">
-            <div id="netStatus">
-              Connect to view 'FROG' tokens...
-              <b><a class="pointer" href="https://freshfrogs.io/the-pad">Connect Wallet</a></b><hr class="hr2">
-            </div>
+          <div id="netStatus" class="netStatus">
+            <img src="../assets/frogs/websiteBannerFinal.png" style="border-radius: 5px; height: auto !important; width: 100% !important;">
+            <br>
+            <h2 style="color: white !important;"><b>freshfrogs.io</b></h2>
+            Please connect an Ethereum wallet...
+            <b><a class="pointer" href="https://freshfrogs.io/">Connect Wallet</a></b>
+            <hr class="hr2">Don't have a wallet?...
+            <b><a class="pointer" href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b>
+            <hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.io/the-pad"><b>🍀freshfrogs.io/the-pad</b> ↗️</a>
+            <br>
+            <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a></div>
           </div>
         </div>
       </section>
