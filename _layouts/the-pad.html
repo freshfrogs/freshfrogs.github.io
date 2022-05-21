@@ -840,6 +840,15 @@
         document.getElementById("selectBase").innerHTML = "<strong>Base</strong>"+baseFrogmetadata.name
         //document.getElementById("morphFrogs").innerHTML = "<strong>Morph</strong>"+baseFrog+" 🍄 ?"
       }
+      function truncateAddress(address) {
+        if (!address) {
+          return "";
+        }
+        return `${address.substr(0, 5)}...${address.substr(
+          address.length - 5,
+          address.length
+        )}`;
+      }
       // Select otherFrog
       // Function combine tokens
       async function combineTokens(baseFrog, otherFrog) {
