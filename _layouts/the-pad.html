@@ -707,7 +707,7 @@
           document.querySelector("#morphFrogs").addEventListener("click", async (e) => {
             if (baseFrog !== 'undefined' && subFrog !== 'undefined') { 
               //alert("Morph "+baseFrog+" + "+subFrog);
-              combineTokens(baseFrog, subFrog);
+              switch_base_sub();
               //document.getElementById("supply").innerHTML = "FROG # "+baseFrog+" / # "+subFrog+" 🍄"
             }
           })
@@ -935,6 +935,28 @@
               return
           }
           
+      }
+
+      // Switch Frogs
+      function switch_base_sub() {
+
+          if (!base_frog || !sub_frog) {
+
+              return
+
+          } else {
+
+              var base_i = base_frog;
+              var sub_i = sub_frog;
+
+              base_frog = false;
+              sub_frog = false;
+
+              selectBaseFrog(sub_i)
+              selectSubFrog(base_i)
+
+          }
+
       }
 
       function randomIntFromInterval(min, max) { // min and max included 
