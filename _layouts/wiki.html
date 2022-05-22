@@ -1130,15 +1130,27 @@
                         return
                     }
 
+                    //
+                    var sub_array = [];
+                    var super_array = [];
+
                     for (var thisToken = 1; thisToken < nextIdC; thisToken++) {
 
                         let owner = await collection.methods.ownerOf(thisToken).call()
 
-                        if (this_user === owner.toLowerCase()) {
-                            console.log(thisToken)
+                        //
+                        for (var i = 1; i <= super_array.length; i++) {
+                            if (super_array[i] == owner) {
+                                return
+                            }
                         }
 
+                        super_array.push(owner);
+                        console.log('Unique Owner : '+owner)
+
                     }
+
+                    console.log(super_array);
                 } catch (e) {
                     console.log("Something went wrong, refresh the page!"+e.message)
                     //document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ❌ '+loadedFrogs+'/'+ownedFrogs+' FROG(s) loaded!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'
