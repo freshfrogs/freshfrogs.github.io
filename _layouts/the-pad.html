@@ -705,11 +705,7 @@
 
           // event listeners
           document.querySelector("#morphFrogs").addEventListener("click", async (e) => {
-            if (baseFrog !== 'undefined' && subFrog !== 'undefined') { 
-              //alert("Morph "+baseFrog+" + "+subFrog);
               switch_base_sub();
-              //document.getElementById("supply").innerHTML = "FROG # "+baseFrog+" / # "+subFrog+" 🍄"
-            }
           })
           document.querySelector("#selectBase").addEventListener("click", async (e) => {
             if (typeof baseFrog !== 'undefined') { 
