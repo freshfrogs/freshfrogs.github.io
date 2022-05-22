@@ -717,22 +717,18 @@
               switch_base_sub();
           })
           document.querySelector("#selectBase").addEventListener("click", async (e) => {
-            if (typeof base_frog !== 'undefined') { 
-              document.getElementById("Frog #"+base_frog+"Desc").scrollIntoView({
-                behavior: 'smooth',
-                block: 'center',
-                inline: 'center'
-              });
-            }
+            document.getElementById("Frog #"+base_frog+"Desc").scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+              inline: 'center'
+            });
           })
           document.querySelector("#selectSub").addEventListener("click", async (e) => {
-            if (typeof sub_Frog !== 'undefined') { 
-              document.getElementById("Frog #"+sub_Frog+"Desc").scrollIntoView({
-                behavior: 'smooth',
-                block: 'center',
-                inline: 'center'
-              });
-            }
+            document.getElementById("Frog #"+sub_Frog+"Desc").scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+              inline: 'center'
+            });
           })
 
           // Connected! Begin loading Frogs!
