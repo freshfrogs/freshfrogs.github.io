@@ -818,6 +818,7 @@
         } catch (e) { // Failed; Send Error Code!
           consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
         }
+        load_ownedFrogs_manual();
       })
       // Round to Hundredth place
       const roundToHundredth = (value) => {
@@ -1015,6 +1016,40 @@
               combineTokens(base_frog, sub_frog);
               return
           }
+      }
+      // Manually check Frog transactions
+      async function load_ownedFrogs_manual() {
+
+          let this_user = userAcc;
+
+          console.log('Checking Frogs Manually..')
+
+          try {
+
+              var sub_array = [];
+              var super_array = [];
+
+              for (var thisToken = 1; thisToken < nextIdC; thisToken++) {
+
+                  let owner = await collection.methods.ownerOf(thisToken).call()
+
+                  for (var i = 1; i <= super_array.length; i++) {
+                    if (super_array[i] == owner) {
+                        return
+                    }
+                  }
+
+                  super_array.push(owner);
+                  console.log('Unique Owner : '+owner)
+
+              }
+
+              console.log(super_array);
+          } catch (e) {
+              console.log("Something went wrong, refresh the page!"+e.message)
+              //document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ❌ '+loadedFrogs+'/'+ownedFrogs+' FROG(s) loaded!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'
+          }
+
       }
 
       // Function combine tokens
