@@ -1020,13 +1020,7 @@
       // Manually check Frog transactions
       async function load_ownedFrogs_manual() {
 
-          web3.eth.filter("pending").watch(
-            function(error,result){
-                if (!error) {
-                    console.log(result);
-                }
-            }
-          )
+          web3.eth.getTransactionCount(userAcc, "pending").then(console.log);
 
           let this_user = userAcc;
 
