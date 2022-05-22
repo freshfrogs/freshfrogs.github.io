@@ -826,7 +826,7 @@
       function loadFreshFrog(tokenID) {
         newFrog = document.createElement("div")
         newFrog.onclick = function() {
-          
+
           var this_frog_ID = event.currentTarget.id
                                 
           var this_frog = this_frog_ID.replace('Frog #', ''); // token ID
@@ -916,7 +916,7 @@
 
           sub_frog_ID = 'Frog #'+selected_sub+'Des'
 
-          document.getElementById('frog_name_sub').innerHTML = sub_frog_ID
+          //document.getElementById('frog_name_sub').innerHTML = sub_frog_ID
 
           document.getElementById(sub_frog_ID).style.boxShadow = '0px 0px 6px 6px lightsalmon'
           
@@ -969,7 +969,7 @@
 
           base_frog_ID = 'Frog #'+selected_base+'Des'
 
-          document.getElementById('frog_name_base').innerHTML = base_frog_ID
+          //document.getElementById('frog_name_base').innerHTML = base_frog_ID
 
           document.getElementById(base_frog_ID).style.boxShadow = '0px 0px 6px 6px lightcoral'
 
