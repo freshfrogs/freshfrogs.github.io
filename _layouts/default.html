@@ -824,7 +824,6 @@
           nextIdC = parseInt(nextId);
 
           userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
-          getInvites(); // Check and Confirm Invite Keys
           
           console.log('Wallet Connected! '+userAcc);
           console.log('Contract Connected! '+name+' | '+symbol);
@@ -851,6 +850,7 @@
           return;
         }
         consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+'Frog #'+nextIdC+' is now available to mint!<br>Maximum of '+mintLimit+' frogs per wallet!<br>'+'<p></p>')
+        getInvites(); // Check and Confirm Invite Keys
         //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
         //document.getElementById("supply").innerHTML = "<b><strong><a style='color: #222 !important;' href='https://opensea.io/collection/fresh-frogs' target='_blank'>ℹ️ ("+nextIdC+"/4040) Total Supply</a></strong></b>"
         //consoleOutput("<hr><b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint...");//\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
