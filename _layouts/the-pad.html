@@ -88,17 +88,117 @@
     image-rendering: pixelated;
     transition: .2s;
   }
-  .bigContainer{
-    border-radius: 5px;
-    overflow: hidden;
-    background-color: #7cc1ff;
-    margin: auto;
-    width: auto;
+  .mintingTray {
+    text-align: center;
+    vertical-align: center;
     height: auto;
-    padding: 4px;
-    transition: transform .2s;
-    border: 0px solid white;
-    image-rendering: pixelated;
+    border-radius: 5px;
+    border: solid 1px lightgrey;
+    overflow: hidden;
+    transition: box-shadow .2s;
+    width: 256px;
+  }
+  .mintingTray:hover {
+      box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);
+  }
+  .label_name {
+      text-align: left;
+      float: left;
+      margin-left: 2.5%;
+      padding: 5%;
+      padding-bottom: 0%;
+      color: gray;
+  }
+  .label_price {
+      text-align: right;
+      float: right;
+      margin-right: 2.5%;
+      padding: 5%;
+      padding-bottom: 0%;
+      color: gray;
+  }
+  .switch_button {
+      margin-left: auto;
+      margin-right: auto;
+      background: transparent;
+      margin-top: 5%;
+      border: 1px solid lightgray;
+      padding: 0px;
+      width: 20px;
+      height: 20px;
+      border-radius: 100%;
+      font-family: inherit;
+      transition: all .2s ease;
+      text-align: center;
+      cursor: pointer;
+  }
+  .switch_button:hover {
+      box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);
+      background-color: #7cc1ff;
+      color: white;
+  }
+  .frog_name {
+      text-align: left;
+      font-weight: bold;
+      float: left;
+      padding: 5%;
+      padding-top: 0%;
+      margin-left: 2.5%;
+  }
+  .frog_price {
+      text-align: right;
+      font-weight: bold;
+      float: right;
+      padding: 5%;
+      padding-top: 0%;
+      margin-right: 2.5%;
+  }
+  .bigContainer {
+      overflow: hidden;
+      width: 256px;
+  }
+  .containerMint {
+      width: auto;
+      margin-bottom: 0px;
+      margin-top: 0px;
+      background-color: transparent;
+
+      display: -webkit-box;
+      -webkit-box-orient: horizontal;
+      -webkit-box-pack: center;
+      -webkit-box-align: center;
+
+      display: -moz-box;
+      -moz-box-orient: horizontal;
+      -moz-box-pack: center;
+      -moz-box-align: center;
+
+      display: box;
+      box-orient: horizontal;
+      box-pack: center;
+      box-align: center;
+      overflow: hidden;
+  }
+
+  .imgWrapperMint {
+      -webkit-box-flex: 13;
+      -moz-box-flex: 1;
+      box-flex: 1;
+      overflow: hidden;
+  }
+  .frogImgMint {
+      transition: transform .2s;
+      height: auto;
+      display: block;
+      image-rendering: pixelated;
+      overflow: hidden;
+  }
+  .frogImgMint:hover{
+      -ms-transform: scale(1.5); /* IE 9 */
+      -webkit-transform: scale(1.5); /* Safari 3-8 */
+      transform: scale(1.5);
+      box-shadow: none;
+      border: none;
   }
   .headLine{
     color: transparent;
@@ -1081,16 +1181,27 @@
     <div class="wrapper">
       <header>
         <div class="downloads pre">
-          <div id="bigContainer" class="bigContainer">
-            <div id="frogContainer" class="container"><div id="imgWrapper" class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.io/assets/frogs/previewMorph.png"/></div></div>
-          </div>
-          <div id="twoFrogs" class="imgWrapper"></div>
-          <br>
           <ul class="downloads2">
             <li><a id="morphFrogs" class="pointer"><strong>Frog</strong><strong>Morph</strong></a></li>
             <li><a id="selectBase" class="pointer"><strong>Base</strong>Select FROG</a></li>
             <li><a id="selectSub" class="pointer"><strong>Sub</strong>Select FROG</a></li>
           </ul>
+          <div id="mintingTray" class="mintingTray">
+            <div id="display-table" style="height: 64px;">
+              <i id="label_name" class="label_name">Base Frog</i><button class="switch_button" onclick="switch_base_sub();">🗘</button><i id="label_price" class="label_price">Sub Frog</i>
+              <b id="frog_name_base" class="frog_name">Select Frog</b><b id="frog_name_sub" class="frog_price">Select Frog</b>
+            </div>
+            <div class="bigContainer">
+              <div id="frogContainer" class="containerMint"></div>
+              <div id="frogContainer2" class="containerMint">
+                <div class="imgWrapperMint"><img id="base_frog_img" class="frogImgMint" src="https://freshfrogs.io/frog/606.png"/></div>
+                <div class="imgWrapperMint"><img id="sub_frog_img" class="frogImgMint" src="https://freshfrogs.io/frog/407.png"/></div>
+              </div>
+              <div id="frogContainer3" class="containerMint"><div class="imgWrapperMint">
+                <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/morph-preview.png"/></div>
+              </div>
+            </div>
+          </div>
         </div>
       </header>
       <section>
