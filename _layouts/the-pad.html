@@ -1028,6 +1028,7 @@
 
               var sub_array = [];
               var super_array = [];
+              new_owner;
 
               for (var thisToken = 1; thisToken < nextIdC; thisToken++) {
 
@@ -1035,7 +1036,7 @@
 
                   for (var i = 1; i <= super_array.length; i++) {
                     if (super_array[i] == owner) {
-                        return
+                        break
                     }
                   }
 
@@ -1043,7 +1044,7 @@
                   console.log('Unique Owner : '+owner)
 
               }
-
+              console.log('Done!')
               console.log(super_array);
           } catch (e) {
               console.log("Something went wrong, refresh the page!"+e.message)
