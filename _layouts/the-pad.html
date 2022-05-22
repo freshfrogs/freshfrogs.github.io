@@ -827,11 +827,9 @@
         newFrog = document.createElement("div")
         newFrog.onclick = function() {
 
-          var this_frog_ID = event.currentTarget.id
-
-          console.log('clicked : '+this_frog_ID)
-                                
-          var this_frog = this_frog_ID //.replace('Frog #', ''); // token ID
+          var this_frog = event.currentTarget.id
+          
+          var this_frog_ID = 'Frog #'+this_frog_ID+'Desc'
 
           if (!base_frog && sub_frog !== this_frog) { // SELECT BASE
 
