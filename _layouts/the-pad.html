@@ -1026,6 +1026,7 @@
 
           try {
 
+              var total_owners = 0;
               var sub_array = [];
               var super_array = [];
 
@@ -1043,10 +1044,11 @@
                   if (owner !== null) {
                     super_array.push(owner);
                     console.log('Unique Owner : '+owner)
+                    total_owners = total_owners + 1
                   }
 
               }
-              console.log('Done!')
+              console.log('Done! Total: '+total_owners)
               console.log(super_array);
           } catch (e) {
               console.log("Something went wrong, refresh the page!"+e.message)
