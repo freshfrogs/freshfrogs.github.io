@@ -838,7 +838,7 @@
               
           } else if (this_frog == base_frog) { // UN-SELECT BASE
 
-              //document.getElementById('frog_name_base').innerHTML = 'Select Frog'
+              document.getElementById('baseText').innerHTML = 'Select Frog'
               document.getElementById(this_frog_ID).style.boxShadow = 'none'
               base_frog = false;
               return
@@ -851,7 +851,7 @@
 
           } else if (this_frog == sub_frog) { // UN-SELECT SUB
 
-              //document.getElementById('frog_name_sub').innerHTML = 'Select Frog'
+              document.getElementById('subText').innerHTML = 'Select Frog'
               document.getElementById(this_frog_ID).style.boxShadow = 'none'
               sub_frog = false;
               return
@@ -916,7 +916,7 @@
 
           sub_frog_ID = 'Frog #'+selected_sub+'Desc'
 
-          //document.getElementById('frog_name_sub').innerHTML = sub_frog_ID
+          document.getElementById('subText').innerHTML = sub_frog_ID
 
           document.getElementById(sub_frog_ID).style.boxShadow = '0px 0px 6px 6px lightsalmon'
           
@@ -969,7 +969,7 @@
 
           base_frog_ID = 'Frog #'+selected_base+'Desc'
 
-          //document.getElementById('frog_name_base').innerHTML = base_frog_ID
+          document.getElementById('baseText').innerHTML = base_frog_ID
 
           document.getElementById(base_frog_ID).style.boxShadow = '0px 0px 6px 6px lightcoral'
 
@@ -1195,8 +1195,8 @@
         <div class="downloads pre">
           <ul class="downloads2">
             <li><a id="morphFrogs" class="pointer"><strong>Frog</strong><strong>Morph</strong></a></li>
-            <li><a id="selectBase" class="pointer"><strong>Base</strong>Select FROG</a></li>
-            <li><a id="selectSub" class="pointer"><strong>Sub</strong>Select FROG</a></li>
+            <li><a id="selectBase" class="pointer"><strong>Base</strong><base id="baseText">Select FROG</base></a></li>
+            <li><a id="selectSub" class="pointer"><strong>Sub</strong><sub id="baseText">Select FROG</sub></a></li>
           </ul>
           <br>
           <div id="mintingTray" class="mintingTray">
