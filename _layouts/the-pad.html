@@ -364,13 +364,30 @@
     overflow: hidden;
   }
   .frogImg2:hover{
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Safari 3-8 */
+    transform: scale(1.5);
+    box-shadow: none;
+    border: none;
+  }
+  .frogImg2 {
+    transition: transform .2s;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    width: 128px;
+    height: 128px;
+    border-radius: 5px;
+  }
+  .frogImg3:hover{
       -ms-transform: scale(1.5); /* IE 9 */
       -webkit-transform: scale(1.5); /* Safari 3-8 */
       transform: scale(1.5);
       box-shadow: none;
       border: none;
   }
-  .frogImg2 {
+  .frogImg3 {
       transition: transform .2s;
       display: block;
       image-rendering: pixelated;
@@ -381,16 +398,6 @@
       border-radius: 5px;
       margin-left: 64px;
       margin-right: 64px;
-  }
-  .frogImg3 {
-    transition: transform .2s;
-    height: auto;
-    display: block;
-    image-rendering: pixelated;
-    overflow: hidden;
-    position: absolute;
-    height: auto;
-    width: auto;
   }
   .smallContainer3:hover{
     -ms-transform: scale(1.1); /* IE 9 */
@@ -889,7 +896,12 @@
         newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
         newAttribute.id = attribute
         newAttribute.target = "_blank"
-        newAttribute.className = "frogImg2" //shadesAnimation
+        if (where == 'frogContainer3') {
+          newAttribute.className = "frogImg3" //shadesAnimation
+        } else {
+          newAttribute.className = "frogImg2" //shadesAnimation
+        }
+        
         newAttribute.style.cursor = "pointer"
         if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") { 
           newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
