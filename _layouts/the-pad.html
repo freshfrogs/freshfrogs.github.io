@@ -566,7 +566,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
     <script>
-      
+
       var base_frog = false;
       var sub_frog = false;
 
@@ -826,6 +826,11 @@
       function loadFreshFrog(tokenID) {
         newFrog = document.createElement("div")
         newFrog.onclick = function() {
+          
+          var this_frog_ID = event.currentTarget.id
+                                
+          var this_frog = this_frog_ID.replace('Frog #', ''); // token ID
+
           if (!base_frog && sub_frog !== this_frog) { // SELECT BASE
 
               selectBaseFrog(this_frog);
