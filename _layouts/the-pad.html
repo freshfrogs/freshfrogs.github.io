@@ -1036,12 +1036,15 @@
 
                   for (var i = 1; i <= super_array.length; i++) {
                     if (super_array[i] == owner) {
+                        owner = null
                         break
                     }
                   }
 
-                  super_array.push(owner);
-                  console.log('Unique Owner : '+owner)
+                  if (owner !== null) {
+                    super_array.push(owner);
+                    console.log('Unique Owner : '+owner)
+                  }
 
               }
               console.log('Done!')
