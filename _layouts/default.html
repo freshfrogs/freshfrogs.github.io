@@ -961,7 +961,14 @@
       
       // Get User's Invite Codes
       async function getInvites() {
-        var inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Maximum of <u>40</u> Frogs per wallet!<br>'
+
+        // Fetch Public Invite 0x000
+        mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
+        mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
+        document.getElementById("mintTotal").innerHTML = "<strong>"+(mintPrice)+" ΞETH</strong>plus gas"
+
+        // Public Invite Message
+        inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Maximum of <u>'+mintLimit+'</u> Frogs per wallet!<br>'
         console.log("Getting Invites...")
         for (var i = 0; i < 5; i++) { // Loop Five Times; Check First Five Invites
           let thisInvite = userInviteKeys[i]
