@@ -749,7 +749,7 @@
               headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
             };
 
-            fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=40&include_orders=false', options)
+            fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b_0&limit=40&include_orders=false', options)
             .then((res) => res.json())
             .then((res) => {
               var { assets } = res
@@ -859,6 +859,14 @@
 
                   thisToken++
 
+                  // Progress Bar!
+                  percent = parseInt((thisToken/nextIdC)*100);
+                  document.getElementById("progress").innerHTML = percent+"%"
+                  elem = document.getElementById("myBar");
+                  width = percent
+                  width++;
+                  elem.style.width = width + "%";
+
                   let owner = await collection.methods.ownerOf(thisToken).call()
 
                   if (this_user === owner.toLowerCase()) {
@@ -868,14 +876,6 @@
                       loadFreshFrog(thisToken);
                       openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
                       document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a class="pointer" href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+'Frog #'+thisToken+'</u></b> ↗️'+'</a>';
-
-                      // Progress Bar!
-                      percent = parseInt((thisToken/nextIdC)*100);
-                      document.getElementById("progress").innerHTML = percent+"%"
-                      elem = document.getElementById("myBar");
-                      width = percent
-                      width++;
-                      elem.style.width = width + "%";
 
                       //Load Metadata
                       let tokenURI = await collection.methods.tokenURI(thisToken).call()
