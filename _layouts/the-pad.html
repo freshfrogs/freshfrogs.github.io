@@ -883,8 +883,8 @@
                       let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
 
                       var metadata = await (await fetch(ipfsGatewayURI)).json();
-                      for (var g = 0; g < metadata.attributes.length; g++){
-                          var data = metadata.attributes[g]
+                      for (var i = 0; i < metadata.attributes.length; i++){
+                          var data = metadata.attributes[i]
 
                           //console.log(data.trait_type+": "+data.value)
                           trait_type = trait = data.trait_type
