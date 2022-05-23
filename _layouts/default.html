@@ -867,14 +867,6 @@
         // Event Listeners 
         // MINT -- Send the transaction to mint!
 
-        //
-        document.querySelector("#applyInvite").addEventListener("click", async (e) => {
-          userInvite = userInviteCode
-          mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
-          mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
-          document.getElementById("mintTotal").innerHTML = "<strong>"+(mintPrice)+" ΞETH</strong>plus gas"
-        })
-        //
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           if (mint === 0) { // || nextIdC >= 3021
             //consoleOutput("<strong></strong>"+"<b><a class='pointer' target='_blank' href='https://twitter.com/FreshFrogs_NFT'>Follow @FreshFrogs_NFT for updates!</b></a></div>")
@@ -967,7 +959,12 @@
         let result = Math.round((number + Number.EPSILON) * 100)
         if (result < 1) { return '<1' } else { return result }
       }
-      
+      async function applyInvite() {
+        userInvite = userInviteCode
+        mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
+        mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
+        document.getElementById("mintTotal").innerHTML = "<strong>"+(mintPrice)+" ΞETH</strong>plus gas"
+      }
       // Get User's Invite Codes
       async function getInvites() {
 
@@ -989,7 +986,7 @@
               invLimit = JSON.stringify(userInviteList[userInviteCode].condition.converted.limit, userInvite, 1)
               invPrice = JSON.stringify(userInviteList[userInviteCode].condition.converted.eth, userInvite, 1)
 
-              inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Invite found! <u>Valid for '+(invLimit-ownedFrogs)+'</u> Frogs @ '+invPrice+' ΞETH<a class="pointer" id="applyInvite"><strong><u>Apply Invite</u></strong></a>'
+              inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Invite found! <u>Valid for '+(invLimit-ownedFrogs)+'</u> Frogs @ '+invPrice+' ΞETH<a class="pointer" id="applyInvite" onclick="applyInvite()"><strong><u>Apply Invite</u></strong></a>'
               break;
             }
           }
