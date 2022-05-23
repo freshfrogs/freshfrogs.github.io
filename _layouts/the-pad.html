@@ -745,7 +745,7 @@
 
             const options = {
               method: 'GET',
-              headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
+              headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211_0'}
             };
 
             fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=40&include_orders=false', options)
@@ -805,7 +805,6 @@
                   }
                 })
               })
-              load_ownedFrogs_manual()
               // Finish Loading Bar
               percent = 100;
               document.getElementById("progress").innerHTML = percent+"%"
@@ -817,7 +816,8 @@
             })
           }
         } catch (e) { // Failed; Send Error Code!
-          consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
+          console.log(e.message)
+          load_ownedFrogs_manual();
         }
       })
       // Round to Hundredth place
