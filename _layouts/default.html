@@ -977,11 +977,11 @@
         document.getElementById("mintTotal").innerHTML = "<strong>"+(mintPrice)+" ΞETH</strong>plus gas"
 
         // Public Invite Message
-        inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Maximum of <u>'+mintLimit+'</u> Frogs per wallet!<br>'
+        inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Maximum of <u>'+mintLimit+'</u> Frogs per wallet!<br>'+'<p></p>'
         console.log("Getting Invites...")
         for (var i = 0; i < 5; i++) { // Loop Five Times; Check First Five Invites
           let thisInvite = userInviteKeys[i]
-          if (thisInvite === "0x307715518f6f5415ef52982008043b9b481ab5d5c2e44dde262dbfc379e0863b") {
+          if (thisInvite === "0x307715518f6f5415ef52982008043b9b481ab5d5c2e44dde262dbfc379e0863b_0") {
             if (ownedFrogs <= 9) {
 
               userInviteCode = "0x307715518f6f5415ef52982008043b9b481ab5d5c2e44dde262dbfc379e0863b"
@@ -1001,11 +1001,11 @@
               mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
               mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
               document.getElementById("mintTotal").innerHTML = "<strong>"+(mintPrice)+" ΞETH</strong>plus gas"
-              inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Maximum of <u>'+mintLimit+'</u> Frogs per wallet!<br>'
+              inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Maximum of <u>'+mintLimit+'</u> Frogs per wallet!<br>'+'<p></p>'
             }
           }
         }
-        consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+inviteMessage+'<p></p>')
+        consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+inviteMessage)
       }
 
       // Output to minting terminal
