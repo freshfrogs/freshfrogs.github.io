@@ -592,7 +592,7 @@
         //consoleOutput('<b>🍄Morph FROGS</b><br>Fresh Frog NFT Combinations! <br>Select Frogs to combine their attributes!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>')
         //consoleOutput('Mint from the collection...<a class="pointer" href="https://freshfrogs.io/"><b>🐸 Minting Terminal</b> ↗️</a>'+'<br><div id="thePad" class="thePad"></div>')
         try {   // Connect
-          
+
           await f0.init({
             web3: web3,
             contract: CONTRACT_ADDRESS,
@@ -746,7 +746,7 @@
 
             const options = {
               method: 'GET',
-              headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211_0'}
+              headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
             };
 
             fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=40&include_orders=false', options)
