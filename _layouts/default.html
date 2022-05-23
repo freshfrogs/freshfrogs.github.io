@@ -866,6 +866,14 @@
         // Recent Mints
         // Event Listeners 
         // MINT -- Send the transaction to mint!
+
+        //
+        document.querySelector("#applyInvite").addEventListener("click", async (e) => {
+          mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
+          mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
+          document.getElementById("mintTotal").innerHTML = "<strong>"+(mintPrice)+" ΞETH</strong>plus gas"
+        })
+        //
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           if (mint === 0) { // || nextIdC >= 3021
             //consoleOutput("<strong></strong>"+"<b><a class='pointer' target='_blank' href='https://twitter.com/FreshFrogs_NFT'>Follow @FreshFrogs_NFT for updates!</b></a></div>")
@@ -975,7 +983,7 @@
           if (thisInvite === "0x307715518f6f5415ef52982008043b9b481ab5d5c2e44dde262dbfc379e0863b") {
             if (ownedFrogs <= 9) {
               userInvite = "0x307715518f6f5415ef52982008043b9b481ab5d5c2e44dde262dbfc379e0863b"
-              inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Invite found! <u>'+mintLimit+'</u> Frogs @ 0.00 Eth<br><strong>Apply</strong>'
+              inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Invite found! <u>'+mintLimit+'</u> Frogs @ 0.00 Eth<br><a id="applyInvite">Apply</a>'
               break;
             }
           }
