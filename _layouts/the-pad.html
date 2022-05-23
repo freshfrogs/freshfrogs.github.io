@@ -853,9 +853,11 @@
                   return
               }
 
-              for (var thisToken = 1; thisToken < nextIdC; thisToken++) {
+              var thisToken = 1
 
-                  let owner = await collection.methods.ownerOf(thisToken).call()
+              while(true) {
+
+                  let owner = await collection.methods.ownerOf(thisToken++).call()
 
                   if (this_user === owner.toLowerCase()) {
 
