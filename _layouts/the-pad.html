@@ -851,7 +851,7 @@
                       console.log(thisToken)
 
                       //Load Metadata
-                      let tokenURI = await collection.methods.tokenURI(i-1).call()
+                      let tokenURI = await collection.methods.tokenURI(thisToken).call()
                       let cid = tokenURI.replace("ipfs://", "")
                       let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
                       async function get() {
