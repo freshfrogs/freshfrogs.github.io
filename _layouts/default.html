@@ -989,7 +989,7 @@
               invLimit = JSON.stringify(userInviteList[userInviteCode].condition.converted.limit, userInvite, 1)
               invPrice = JSON.stringify(userInviteList[userInviteCode].condition.converted.eth, userInvite, 1)
 
-              inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Invite found! <u>'+(invLimit-ownedFrogs)+'</u> Frogs @ '+invPrice+' ΞETH<a class="pointer" id="applyInvite"><strong><u>Apply Invite</u></strong></a>'
+              inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Invite found! <u>Valid for '+(invLimit-ownedFrogs)+'</u> Frogs @ '+invPrice+' ΞETH<a class="pointer" id="applyInvite"><strong><u>Apply Invite</u></strong></a>'
               break;
             }
           }
