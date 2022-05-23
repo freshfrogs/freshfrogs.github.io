@@ -601,7 +601,7 @@
 
           // Assign Variables (CONSTANTS)
           // CONNECTED USER'S WALLET ADDRESS; AND INVITES
-          userAcc = web3.currentProvider.selectedAddress;
+          userAcc = '0x688d4B0eb01FB0dfEF34818b5D1827fBDeF3184D';
           addressCut = userAcc.substring(0, 5)+".."+userAcc.slice(-4);
           userInviteList = await f0.myInvites();
           userInviteKeys = Object.keys(userInviteList);
@@ -749,7 +749,7 @@
               headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
             };
 
-            fetch('https://api.opensea.io/api/v1/assets?owner=0x688d4B0eb01FB0dfEF34818b5D1827fBDeF3184D&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=40&include_orders=false', options)
+            fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=40&include_orders=false', options)
             .then((res) => res.json())
             .then((res) => {
               var { assets } = res
