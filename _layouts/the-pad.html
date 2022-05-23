@@ -857,7 +857,7 @@
 
               while(true) {
 
-                  thisToken++
+                  thisToken = thisToken + 1;
 
                   let owner = await collection.methods.ownerOf(thisToken).call()
 
