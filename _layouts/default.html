@@ -850,7 +850,6 @@
           consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
           return;
         }
-        consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+'Frog #'+nextIdC+' is now available to mint!<br>Maximum of <u>40</u> Frogs per wallet!<br>'+'<p></p>')
         getInvites(); // Check and Confirm Invite Keys
         //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
         //document.getElementById("supply").innerHTML = "<b><strong><a style='color: #222 !important;' href='https://opensea.io/collection/fresh-frogs' target='_blank'>ℹ️ ("+nextIdC+"/4040) Total Supply</a></strong></b>"
@@ -962,34 +961,19 @@
       
       // Get User's Invite Codes
       async function getInvites() {
+        var inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Maximum of <u>'+mintLimit+'</u> Frogs per wallet!<br>'
         console.log("Getting Invites...")
         for (var i = 0; i < 5; i++) { // Loop Five Times; Check First Five Invites
           let thisInvite = userInviteKeys[i]
-          if (thisInvite === "0x307715518f6f5415ef52982008043b9b481ab5d5c2e44dde262dbfc379e0863b_0") {
+          if (thisInvite === "0x307715518f6f5415ef52982008043b9b481ab5d5c2e44dde262dbfc379e0863b") {
             if (ownedFrogs <= 9) {
               userInvite = "0x307715518f6f5415ef52982008043b9b481ab5d5c2e44dde262dbfc379e0863b"
-              
-              // Assign Variables, Update UI
-              mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
-              mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
-              document.getElementById("mintTotal").innerHTML = "<strong>"+(mintPrice)+" ΞETH</strong>plus gas"
-              consoleOutput('<br><strong>Connected!</strong><br>Invite Valid for '+(mintLimit-ownedFrogs)+' FROG(s) @ 0.00 ΞETH<a id="" href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Apply Invite</u></strong></a>')
-            }
-          }
-          if (thisInvite === "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d_0") { // Main: 0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d / Rinkeby: 0x98469878d3ea48d71e828da43d41d9ffcc8b974d712d3fee969274e52b180275
-            // NF7UOS / C7AR Bypass
-            if (userAcc === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase() || userAcc === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) { // 0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25
-              // Unlimited Free Mints
-              userInvite = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4";
-
-              // Assign Variables, Update UI
-              mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
-              mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
-              document.getElementById("mintTotal").innerHTML = "<strong>"+(mintPrice)+" ΞETH</strong>plus gas"
-              consoleOutput('<br><strong>Connected!</strong><br>Invite Valid for '+(mintLimit-ownedFrogs)+' FROG(s) @ 0.00 ΞETH<a id="" href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Apply Invite</u></strong></a>')
+              inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Invite found! <u>'+mintLimit+'</u> Frogs @ 0.00 Eth<br><strong>Apply</strong>'
+              break;
             }
           }
         }
+        consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+inviteMessage+'<p></p>')
       }
 
       // Output to minting terminal
