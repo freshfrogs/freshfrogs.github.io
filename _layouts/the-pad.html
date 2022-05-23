@@ -853,7 +853,7 @@
                   return
               }
 
-              for (var thisToken = 1; thisToken < nextIdC; thisToken++) {
+              for (var thisToken = 0; thisToken < nextIdC; thisToken++) {
 
                   let owner = await collection.methods.ownerOf(thisToken).call()
 
