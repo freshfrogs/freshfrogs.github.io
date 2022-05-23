@@ -893,8 +893,9 @@
                               value = data.value
                               trait_rarity = 'i'
                               
+                              let here = 'Frog #'+thisToken
                               // Build Fresh Frogs Attributes
-                              loadAttribute(trait_type, value, 'Frog #'+thisToken)
+                              loadAttribute(trait_type, value, here)
                               newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
                               if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
                                 else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
