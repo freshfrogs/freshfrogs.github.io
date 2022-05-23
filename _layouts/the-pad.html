@@ -892,29 +892,9 @@
                           trait_rarity = 'i'
                           
                           let here = 'Frog #'+thisToken
-                          // Build Fresh Frogs Attributes
 
-                          newAttribute = document.createElement("img")
-                          newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
-                          newAttribute.id = attribute
-                          newAttribute.target = "_blank"
-                          
-                          newAttribute.style.cursor = "pointer"
-                          if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") { 
-                            newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
-                          } else if (attribute === "morphAnimation") {
-                            newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
-                          } else if (attribute === "shadesAnimation") {
-                            newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
-                          } else {
-                            newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
-                          }
-                          newAttribute.alt = attribute
-                          console.log(here)
-                          
-                          document.getElementById(here).appendChild(newAttribute)
+                          loadAttribute(trait_type, value, here)
 
-                          //
                           newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
                           if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
                             else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
