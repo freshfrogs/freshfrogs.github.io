@@ -805,12 +805,6 @@
                   }
                 })
               })
-              .catch(e => {
-
-                  console.log('Error: Could not get Collection data from Opensea.');
-                  load_ownedFrogs_manual();
-            
-              });
 
               // Finish Loading Bar
               percent = 100;
@@ -822,6 +816,12 @@
               consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
 
             })
+            .catch(e => {
+
+                console.log('Error: Could not get Collection data from Opensea.');
+                load_ownedFrogs_manual();
+          
+            });
           }
         } catch (e) { // Failed; Send Error Code!
           console.log('bad')
