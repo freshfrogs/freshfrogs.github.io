@@ -869,6 +869,7 @@
 
         //
         document.querySelector("#applyInvite").addEventListener("click", async (e) => {
+          userInvite = userInviteCode
           mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
           mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
           document.getElementById("mintTotal").innerHTML = "<strong>"+(mintPrice)+" ΞETH</strong>plus gas"
@@ -982,8 +983,13 @@
           let thisInvite = userInviteKeys[i]
           if (thisInvite === "0x307715518f6f5415ef52982008043b9b481ab5d5c2e44dde262dbfc379e0863b") {
             if (ownedFrogs <= 9) {
-              userInvite = "0x307715518f6f5415ef52982008043b9b481ab5d5c2e44dde262dbfc379e0863b"
-              inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Invite found! <u>'+mintLimit+'</u> Frogs @ 0.00 ΞETH<br><a id="applyInvite">Apply Invite</a>'
+
+              userInviteCode = "0x307715518f6f5415ef52982008043b9b481ab5d5c2e44dde262dbfc379e0863b"
+
+              invLimit = JSON.stringify(userInviteList[userInviteCode].condition.converted.limit, userInvite, 1)
+              invPrice = JSON.stringify(userInviteList[userInviteCode].condition.converted.eth, userInvite, 1)
+
+              inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Invite found! <u>'+(invLimit-ownedFrogs)+'</u> Frogs @ '+invPrice+' ΞETH<br><a id="applyInvite">Apply Invite</a>'
               break;
             }
           }
