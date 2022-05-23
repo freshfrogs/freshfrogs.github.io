@@ -601,7 +601,7 @@
 
           // Assign Variables (CONSTANTS)
           // CONNECTED USER'S WALLET ADDRESS; AND INVITES
-          userAcc = '0x688d4B0eb01FB0dfEF34818b5D1827fBDeF3184D';
+          userAcc = web3.currentProvider.selectedAddress;
           addressCut = userAcc.substring(0, 5)+".."+userAcc.slice(-4);
           userInviteList = await f0.myInvites();
           userInviteKeys = Object.keys(userInviteList);
