@@ -853,7 +853,7 @@
                   return
               }
 
-              for (var thisToken = 0; thisToken < nextIdC; thisToken++) {
+              for (var thisToken = 1; thisToken < nextIdC; thisToken++) {
 
                   let owner = await collection.methods.ownerOf(thisToken).call()
 
@@ -874,7 +874,7 @@
                       elem.style.width = width + "%";
 
                       //Load Metadata
-                      let tokenURI = await collection.methods.tokenURI(thisToken).call()
+                      let tokenURI = await collection.methods.tokenURI(thisToken-1).call()
                       let cid = tokenURI.replace("ipfs://", "")
                       let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
                       async function get() {
