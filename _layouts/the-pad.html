@@ -893,7 +893,7 @@
                           
                           let here = 'Frog #'+thisToken
 
-                          console.log(value)
+                          loadAttribute(trait_type, value, here)
 
                           newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
                           if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
