@@ -825,13 +825,15 @@
         return Number(value.toFixed(2));
       };
 
-//
+
       // Manually check Frog transactions
       async function load_ownedFrogs_manual() {
 
           let this_user = userAcc;
 
           console.log('Checking Frogs Manually.. for user...'+this_user)
+
+          document.getElementById("thePad").innerHTML = ''
 
           try {
 
@@ -850,22 +852,48 @@
 
                       console.log(thisToken)
 
+                      //
+                      loadFreshFrog(thisToken);
+                      openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
+                      document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a class="pointer" href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+frog.name+'</u></b> ↗️'+'</a>';
+
+                      // Progress Bar!
+                      percent = parseInt((thisToken/ownedFrogs)*100);
+                      document.getElementById("progress").innerHTML = percent+"%"
+                      elem = document.getElementById("myBar");
+                      width = percent
+                      width++;
+                      elem.style.width = width + "%";
+
                       //Load Metadata
                       let tokenURI = await collection.methods.tokenURI(thisToken).call()
                       let cid = tokenURI.replace("ipfs://", "")
                       let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
                       async function get() {
                           let metadata = await (await fetch(ipfsGatewayURI)).json();
-                          //console.log(obj);
                           return metadata;
                       }
                       var metadata2;
                       (async () => {
                           metadata2 = await get()
-                          openseaLink = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+thisToken+""
                           for (var i = 0; i < metadata2.attributes.length; i++){
                               var data = metadata2.attributes[i]
+
                               console.log(data.trait_type+": "+data.value)
+                              trait_type = data.trait_type
+                              value = data.value
+                              trait_rarity = 'i'
+                              
+                              // Build Fresh Frogs Attributes
+                              loadAttribute(trait_type, value, 'Frog #'+thisToken)
+                              newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
+                              if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
+                                else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
+                              newAttribute.className = value;
+                              space = document.createElement('br')
+                              document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
+                              document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
+                              
                           }
                       })()
                   }
@@ -876,7 +904,6 @@
           }
 
       }
-//
 
       // Load Fresh Frog
       function loadFreshFrog(tokenID) {
