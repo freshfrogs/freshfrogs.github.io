@@ -886,11 +886,9 @@
                       var metadata2;
                       (async () => {
                           metadata2 = await get()
-                          for (var i = 0; i < metadata2.attributes.length;){
-
-                              let i = i + 1
+                          for (var i = 0; i < metadata2.attributes.length; i++){
                               var data = metadata2.attributes[i]
-
+                              thisToken = thisToken-1
                               //console.log(data.trait_type+": "+data.value)
                               trait_type = trait = data.trait_type
                               value = attribute = data.value
