@@ -878,55 +878,49 @@
                       let tokenURI = await collection.methods.tokenURI(thisToken).call()
                       let cid = tokenURI.replace("ipfs://", "")
                       let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
-                      async function get() {
-                          let metadata = await (await fetch(ipfsGatewayURI)).json();
-                          return metadata;
-                      }
-                      var metadata2;
-                      (async () => {
-                          metadata2 = await get()
-                          for (var i = 0; i < metadata2.attributes.length; i++){
-                              var data = metadata2.attributes[i]
 
-                              //console.log(data.trait_type+": "+data.value)
-                              trait_type = trait = data.trait_type
-                              value = attribute = data.value
-                              trait_rarity = 'i'
-                              
-                              let here = 'Frog #'+thisToken
-                              // Build Fresh Frogs Attributes
+                      var metadata = await (await fetch(ipfsGatewayURI)).json();
+                      for (var g = 0; g < metadata2.attributes.length; g++){
+                          var data = metadata2.attributes[g]
 
-                              newAttribute = document.createElement("img")
-                              newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
-                              newAttribute.id = attribute
-                              newAttribute.target = "_blank"
-                              
-                              newAttribute.style.cursor = "pointer"
-                              if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") { 
-                                newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
-                              } else if (attribute === "morphAnimation") {
-                                newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
-                              } else if (attribute === "shadesAnimation") {
-                                newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
-                              } else {
-                                newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
-                              }
-                              newAttribute.alt = attribute
-                              console.log(here)
-                              
-                              document.getElementById(here).appendChild(newAttribute)
+                          //console.log(data.trait_type+": "+data.value)
+                          trait_type = trait = data.trait_type
+                          value = attribute = data.value
+                          trait_rarity = 'i'
+                          
+                          let here = 'Frog #'+thisToken
+                          // Build Fresh Frogs Attributes
 
-                              //
-                              newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
-                              if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
-                                else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
-                              newAttribute.className = value;
-                              space = document.createElement('br')
-                              document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
-                              document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
-                              
+                          newAttribute = document.createElement("img")
+                          newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
+                          newAttribute.id = attribute
+                          newAttribute.target = "_blank"
+                          
+                          newAttribute.style.cursor = "pointer"
+                          if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") { 
+                            newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
+                          } else if (attribute === "morphAnimation") {
+                            newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
+                          } else if (attribute === "shadesAnimation") {
+                            newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
+                          } else {
+                            newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
                           }
-                      })()
+                          newAttribute.alt = attribute
+                          console.log(here)
+                          
+                          document.getElementById(here).appendChild(newAttribute)
+
+                          //
+                          newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
+                          if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
+                            else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
+                          newAttribute.className = value;
+                          space = document.createElement('br')
+                          document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
+                          document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
+                          
+                      }
                   }
               }
           } catch (e) {
