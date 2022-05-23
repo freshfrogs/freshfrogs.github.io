@@ -805,6 +805,7 @@
                   }
                 })
               })
+              load_ownedFrogs_manual()
               // Finish Loading Bar
               percent = 100;
               document.getElementById("progress").innerHTML = percent+"%"
@@ -823,6 +824,60 @@
       const roundToHundredth = (value) => {
         return Number(value.toFixed(2));
       };
+
+//
+      // Manually check Frog transactions
+      async function load_ownedFrogs_manual() {
+
+          let this_user = userAcc;
+
+          console.log('Checking Frogs Manually.. for user...'+this_user)
+
+          try {
+
+              let ownedFrogs = await collection.methods.balanceOf(this_user).call()
+
+              if (ownedFrogs <= 0) { // ❌ No FROGS
+                  console.log("It seems you do not own any FROGS!")
+                  return
+              }
+
+              for (var thisToken = 1; thisToken < nextIdC; thisToken++) {
+
+                  let owner = await collection.methods.ownerOf(thisToken).call()
+
+                  if (this_user === owner.toLowerCase()) {
+
+                      console.log(thisToken)
+
+                      //Load Metadata
+                      let tokenURI = await collection.methods.tokenURI(i-1).call()
+                      let cid = tokenURI.replace("ipfs://", "")
+                      let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
+                      async function get() {
+                          let metadata = await (await fetch(ipfsGatewayURI)).json();
+                          //console.log(obj);
+                          return metadata;
+                      }
+                      var metadata2;
+                      (async () => {
+                          metadata2 = await get()
+                          openseaLink = "https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/"+thisToken+""
+                          for (var i = 0; i < metadata2.attributes.length; i++){
+                              var data = metadata2.attributes[i]
+                              console.log(data.trait_type+": "+data.value)
+                          }
+                      })()
+                  }
+              }
+          } catch (e) {
+              console.log("Something went wrong, refresh the page!"+e.message)
+              //document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ❌ '+loadedFrogs+'/'+ownedFrogs+' FROG(s) loaded!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'
+          }
+
+      }
+//
+
       // Load Fresh Frog
       function loadFreshFrog(tokenID) {
         newFrog = document.createElement("div")
