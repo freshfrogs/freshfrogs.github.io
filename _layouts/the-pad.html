@@ -888,12 +888,12 @@
                           metadata2 = await get()
                           for (var i = 0; i < metadata2.attributes.length; i++){
                               var data = metadata2.attributes[i]
-                              thisToken = thisToken-1
+
                               //console.log(data.trait_type+": "+data.value)
                               trait_type = trait = data.trait_type
                               value = attribute = data.value
                               trait_rarity = 'i'
-                              console.log(thisToken)
+                              
                               let here = 'Frog #'+thisToken
                               // Build Fresh Frogs Attributes
 
@@ -914,7 +914,7 @@
                               }
                               newAttribute.alt = attribute
                               console.log(here)
-                              console.log(thisToken)
+                              
                               document.getElementById(here).appendChild(newAttribute)
 
                               //
@@ -929,7 +929,6 @@
                           }
                       })()
                   }
-                  thisToken++
               }
           } catch (e) {
               console.log("Something went wrong, refresh the page!"+e.message)
