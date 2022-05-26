@@ -980,8 +980,36 @@
         newFrog = document.createElement("div")
         newFrog.onclick = function() {
 
-          buildFrogToken(tokenID)
+          var this_frog = event.currentTarget.id
 
+          var this_frog_ID = 'Frog #'+this_frog+'Desc'
+
+          if (!base_frog && sub_frog !== this_frog) { // SELECT BASE
+
+              selectBaseFrog(this_frog);
+              return
+              
+          } else if (this_frog == base_frog) { // UN-SELECT BASE
+
+              document.getElementById('baseText').innerHTML = 'Select Frog'
+              document.getElementById(this_frog_ID).style.boxShadow = 'none'
+              base_frog = false;
+              return
+
+          } else if (!sub_frog && base_frog !== this_frog) { // SELECT SUB
+
+              selectSubFrog(this_frog);
+              
+              return
+
+          } else if (this_frog == sub_frog) { // UN-SELECT SUB
+
+              document.getElementById('subText').innerHTML = 'Select Frog'
+              document.getElementById(this_frog_ID).style.boxShadow = 'none'
+              sub_frog = false;
+              return
+
+          } else { return }
         }
         newFrog.id = tokenID
         newFrog.className = 'frogPanel'
@@ -1016,6 +1044,11 @@
         newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
         newAttribute.id = attribute
         newAttribute.target = "_blank"
+        if (where == 'frogContainer3') {
+          newAttribute.className = "frogImg3" //shadesAnimation
+        } else {
+          newAttribute.className = "frogImg2" //shadesAnimation
+        }
         
         newAttribute.style.cursor = "pointer"
         if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") { 
@@ -1106,23 +1139,6 @@
               selectBaseFrog(sub_i)
               selectSubFrog(base_i)
 
-          }
-
-      }
-      async function buildFrogToken(TOKEN_ID) {
-
-
-          // clear images
-          document.getElementById('frogContainer').innerHTML = ''
-          document.getElementById('frogContainer2').innerHTML = ''
-          document.getElementById('frogContainer3').innerHTML = '<img id="display-frog" class="tray-frog" src="../frog/3410.png">'
-          document.getElementById('display-frog').setAttribute('src', '../frog/'+TOKEN_ID+'.png')
-
-          // pull local metadata json file
-          let TOKEN_METADATA = await (await fetch("https://freshfrogs.io/frog/json/"+TOKEN_ID+".json")).json();
-          for (var i = 0; i < TOKEN_METADATA.attributes.length; i++){
-              var data = TOKEN_METADATA.attributes[i]
-              loadAttribute(data.trait_type, data.value, 'display-frog')
           }
 
       }
