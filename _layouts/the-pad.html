@@ -1187,6 +1187,7 @@
                   var baseFrog_Frog = data.value;
               } else if (data.trait_type == "SpecialFrog") {
                   var baseFrog_SpecialFrog = data.value;
+                  console.log(baseFrog_SpecialFrog)
               } else if (data.trait_type == "Trait") {
                   var baseFrog_Trait = data.value;
               } else if (data.trait_type == "Accessory") {
@@ -1212,6 +1213,7 @@
               if (data2.trait_type == "Frog") {
                   var otherFrog_Frog = data2.value;
                   if (baseFrog_SpecialFrog == "peace" && otherFrog_Frog == "tomatoFrog") {
+                    console.log(baseFrog_SpecialFrog)
                     let baseFrog_SpecialFrog = "/peace/peaceTomatoFrog"
                     console.log('tomato Peace Frog'+baseFrog_SpecialFrog)
                   }
