@@ -1211,6 +1211,10 @@
 
               if (data2.trait_type == "Frog") {
                   var otherFrog_Frog = data2.value;
+                  if (baseFrog_SpecialFrog == "peace" && otherFrog_Frog == "tomatoFrog") {
+                    console.log('tomato Peace Frog')
+                    baseFrog_SpecialFrog == "/peace/peaceTomatoFrog"
+                  }
               } else if (data2.trait_type == "SpecialFrog") {
                   var otherFrog_SpecialFrog = data2.value;
                   if (data2.value == "thirdEye") {
