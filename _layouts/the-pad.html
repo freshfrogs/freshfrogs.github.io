@@ -619,7 +619,7 @@
           var userAddress = web3.currentProvider.selectedAddress;
           var userInviteList = await f0.myInvites();
           var userInviteKeys = Object.keys(userInviteList);
-          var ownedFrogs = await collection.methods.balanceOf(userAcc).call();
+          var ownedFrogs = await collection.methods.balanceOf(userAddress).call();
 
           // CONTRACT NAME, SYMBOL, NEXT ID
           var contractName = await f0.api.name().call();
