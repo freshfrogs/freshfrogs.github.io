@@ -664,6 +664,7 @@
                   var { name, token_metadata, permalink, traits, external_link, token_id } = frog
 
                   owned_frog = document.createElement('a');
+                  owned_frog.className = 'frogPanel'
                   owned_frog.href = permalink
                   owned_frog.id = name
                   owned_frog.style.width = 128+'px';
