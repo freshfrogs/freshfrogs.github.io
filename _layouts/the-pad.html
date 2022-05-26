@@ -980,36 +980,8 @@
         newFrog = document.createElement("div")
         newFrog.onclick = function() {
 
-          var this_frog = event.currentTarget.id
+          buildFrogToken(tokenID)
 
-          var this_frog_ID = 'Frog #'+this_frog+'Desc'
-
-          if (!base_frog && sub_frog !== this_frog) { // SELECT BASE
-
-              selectBaseFrog(this_frog);
-              return
-              
-          } else if (this_frog == base_frog) { // UN-SELECT BASE
-
-              document.getElementById('baseText').innerHTML = 'Select Frog'
-              document.getElementById(this_frog_ID).style.boxShadow = 'none'
-              base_frog = false;
-              return
-
-          } else if (!sub_frog && base_frog !== this_frog) { // SELECT SUB
-
-              selectSubFrog(this_frog);
-              
-              return
-
-          } else if (this_frog == sub_frog) { // UN-SELECT SUB
-
-              document.getElementById('subText').innerHTML = 'Select Frog'
-              document.getElementById(this_frog_ID).style.boxShadow = 'none'
-              sub_frog = false;
-              return
-
-          } else { return }
         }
         newFrog.id = tokenID
         newFrog.className = 'frogPanel'
