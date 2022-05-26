@@ -1142,6 +1142,23 @@
           }
 
       }
+      async function buildFrogToken(TOKEN_ID) {
+
+
+          // clear images
+          document.getElementById('frogContainer').innerHTML = ''
+          document.getElementById('frogContainer2').innerHTML = ''
+          document.getElementById('frogContainer3').innerHTML = '<img id="display-frog" class="tray-frog" src="../frog/3410.png">'
+          document.getElementById('display-frog').setAttribute('src', '../frog/'+TOKEN_ID+'.png')
+
+          // pull local metadata json file
+          let TOKEN_METADATA = await (await fetch("https://freshfrogs.io/frog/json/"+TOKEN_ID+".json")).json();
+          for (var i = 0; i < TOKEN_METADATA.attributes.length; i++){
+              var data = TOKEN_METADATA.attributes[i]
+              loadAttribute(data.trait_type, data.value, 'display-frog')
+          }
+
+      }
       // Select baseFrog
       async function selectBaseFrog(selected_base){
 
