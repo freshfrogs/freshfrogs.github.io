@@ -648,15 +648,15 @@
         }
         
         newAttribute.style.cursor = "pointer"
-    /*  if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
+        if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
           newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+"2.gif"
         } else if (attribute === "morphAnimation") {
           newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
         } else if (attribute === "shadesAnimation") {
           newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
-        } else {  */
+        } else {
           newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
-    //  } 
+        }
         newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
       }
@@ -668,7 +668,7 @@
           display_name = 'Frog #'+token
           display_os = ''
 
-          document.getElementById('previewImg').setAttribute('src', display_frog)
+          document.getElementById().setAttribute('src', display_frog)
           document.getElementById('display_name').innerHTML = display_name
           
       }
@@ -680,7 +680,6 @@
         openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
 
         newFrog = document.createElement("div")
-        newFrog.onclick = function() { display_token(token) }
         newFrog.id = token
         newFrog.className = 'frogPanel'
         newFrog.innerHTML = '<a style="margin-bottom" 0px !important;  display: inline !important;" class="smallContainer2 pointer2" id="Frog #'+token+'"><img class="frogImg3" src="https://freshfrogs.io/frog/'+token+'.png"/></a>'+'<p class="attributeList" id="Frog #'+token+'Desc"></p>'
@@ -898,8 +897,17 @@
             <li><a id="selectSub" class="pointer"><strong>Sub</strong><frog id="subText">Select FROG</frog></a></li>
           </ul>
           <br>
-          <div class="bigContainer">
-            <img id="previewImg" style="width: 100%;" src="https://freshfrogs.io/frog/1.png"/></div>
+          <div id="mintingTray" class="mintingTray">
+            <div class="bigContainer">
+              <div id="frogContainer" class="containerMint"></div>
+              <div id="frogContainer2" class="containerMint">
+                <div class="imgWrapperMint"><img id="base_frog_img" class="frogImgMint" src="https://freshfrogs.io/frog/606.png"/></div>
+                <div class="imgWrapperMint"><img id="sub_frog_img" class="frogImgMint" src="https://freshfrogs.io/frog/407.png"/></div>
+              </div>
+              <div id="frogContainer3" class="containerMint"><div class="imgWrapperMint">
+                <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/morph-preview.png"/></div>
+              </div>
+            </div>
           </div>
         </div>
       </header>
