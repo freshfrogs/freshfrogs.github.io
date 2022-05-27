@@ -589,7 +589,7 @@
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
     <script>
 
-      var userAddress, userInviteList, userInviteKeys, ownedFrogs, contractName, contractSymbol, nextId, nextIdC, collection, COLLECTION;
+      var userAddress, userInviteList, userInviteKeys, ownedFrogs, contractName, contractSymbol, nextId, nextIdC, collection, COLLECTION, traits_list;
       var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
       var NETWORK = "main";
 
@@ -768,10 +768,25 @@
 
       async function fetch_tokens(from_address) {
 
-        const options = {
-          method: 'GET',
-          headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
-        };
+        // Pull Collection data from OpenSea
+
+        const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
+
+        fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
+        .then(collection => collection.json())
+        .then(collection => {
+
+            var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
+
+            traits_list = traits;
+
+        })
+        .catch(e => {
+
+            console.log('Error: Could not get Collection data from Opensea.');
+            console.error('Error : ' + e.message)
+      
+        }); // End data pull / first paid Frog 3,236
 
         fetch('https://api.opensea.io/api/v1/assets?owner='+from_address+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
         .then((res) => res.json())
@@ -805,11 +820,15 @@
                 let trait_type = attribute.trait_type
                 let value = attribute.value
 
+                var trait_rarity = ((traits_list[trait][attribute.toLowerCase()] / 4040) * 100).toFixed(0)
+
+                if (trait_rarity == 'NaN' || trait_rarity == '0') { trait_rarity = '<1' }
+
                 // Build Fresh Frogs Attributes
                 load_trait(trait_type, value, frog.name)
                 newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
-                if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">n%</i></b>'; } 
-                  else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">n%</i></b>'; }
+                if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
+                  else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
                 newAttribute.className = value;
                 space = document.createElement('br')
                 document.getElementById('Frog #'+token_id+'Desc').appendChild(space)
