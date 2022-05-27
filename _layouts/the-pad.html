@@ -756,7 +756,7 @@
             //document.getElementById('netStatus').innerHTML = 'Loading Frogs from ΞEthereum... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br><br>';
             consoleOutput('<br>'+'<strong>Connected!</strong> Loading Frogs from OpenSea... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
 
-            document.getElementById('thePad').innerHTML = 
+/*            document.getElementById('thePad').innerHTML = 
 
               '<div id="stats" class="mintingTextWhite" style="border-radius: 5px !important; padding: 0px !important;">' +
               ' <img id="banner_image" src="../assets/frogs/backfrogs.png"/><br>' +
@@ -765,7 +765,7 @@
               '    <p>Items: <b id="count"></b> | Owners: <b id="num_owners"></b> | Market Cap: <b id="market_cap"></b> | Floor Price: <b id="floor_price"></b></p>' +
               '    <p id="description" style="color: #333 !important;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more! A portion of every re-sale will be donated to The Rainforest Foundation</p>' +
               ' </div>' +
-              '</div>';
+              '</div>'; */
 
             // OPEN SEA API
 
@@ -774,7 +774,7 @@
               headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
             };
 
-            fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
+/*            fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
             .then(collection => collection.json())
             .then(collection => {
 
@@ -796,7 +796,7 @@
                 console.log('Error: Could not get Collection data from Opensea.');
                 console.error('Error : ' + e.message)
           
-            }); // End data pull / first paid Frog 3,236 
+            }); // End data pull / first paid Frog 3,236 */
 
             fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
             .then((res) => res.json())
