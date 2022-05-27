@@ -617,6 +617,31 @@
 
       })
 
+      function load_trait(trait, attribute, where) {
+        newAttribute = document.createElement("img")
+        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
+        newAttribute.id = attribute
+        newAttribute.target = "_blank"
+        if (where == 'frogContainer3') {
+          newAttribute.className = "frogImg3" //shadesAnimation
+        } else {
+          newAttribute.className = "frogImg2" //shadesAnimation
+        }
+        
+        newAttribute.style.cursor = "pointer"
+        if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+"2.gif"
+        } else if (attribute === "morphAnimation") {
+          newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
+        } else if (attribute === "shadesAnimation") {
+          newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
+        } else {
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
+        }
+        newAttribute.alt = attribute
+        document.getElementById(where).appendChild(newAttribute)
+      }
+
       // Load Fresh Frog
       function load_token(token) {
 
@@ -648,7 +673,7 @@
             traits.forEach((trait) => {
 
               // Build Fresh Frogs Attributes
-              loadAttribute(trait_type, value, frog.name)
+              load_trait(trait_type, value, frog.name)
               newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
               if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">n%</i></b>'; } 
                 else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">n%</i></b>'; }
