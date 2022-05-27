@@ -363,13 +363,6 @@
     image-rendering: pixelated;
     overflow: hidden;
   }
-  .frogImg2:hover{
-    -ms-transform: scale(1.5); /* IE 9 */
-    -webkit-transform: scale(1.5); /* Safari 3-8 */
-    transform: scale(1.5);
-    box-shadow: none;
-    border: none;
-  }
   .frogImg2 {
     transition: transform .2s;
     display: block;
@@ -379,6 +372,8 @@
     width: 128px;
     height: 128px;
     border-radius: 5px;
+    left: -32px;
+    top: -16px;
   }
   .frogImg3:hover{
       -ms-transform: scale(1.5); /* IE 9 */
@@ -763,7 +758,7 @@
         newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
       }
-      
+
       function loadFreshFrog(tokenID) {
         newFrog = document.createElement("div")
         //newFrog.onclick = function() { build_token(tokenID); }
