@@ -671,9 +671,9 @@
           document.getElementById('previewImg').setAttribute('src', display_frog)
           document.getElementById('display_name').innerHTML = display_name
 
-          let subFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+selected_sub+".json")).json();
-          for (var i = 0; i < subFrogmetadata.attributes.length; i++){
-              var data = subFrogmetadata.attributes[i]
+          let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
+          for (var i = 0; i < token_metadata.attributes.length; i++){
+              var data = token_metadata.attributes[i]
               //loadAttribute(data.trait_type, data.value, 'subDisplay')
               if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
                 document.getElementById('display_type').innerHTML = data.value
