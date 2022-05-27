@@ -738,7 +738,32 @@
               //document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ❌ '+loadedFrogs+'/'+ownedFrogs+' FROG(s) loaded!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'
           }
       }
-
+      // Load attribute
+      function loadAttribute(trait, attribute, where) {
+        newAttribute = document.createElement("img")
+        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
+        newAttribute.id = attribute
+        newAttribute.target = "_blank"
+        if (where == 'frogContainer3') {
+          newAttribute.className = "frogImg3" //shadesAnimation
+        } else {
+          newAttribute.className = "frogImg2" //shadesAnimation
+        }
+        
+        newAttribute.style.cursor = "pointer"
+        if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") { 
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
+        } else if (attribute === "morphAnimation") {
+          newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
+        } else if (attribute === "shadesAnimation") {
+          newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
+        } else {
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
+        }
+        newAttribute.alt = attribute
+        document.getElementById(where).appendChild(newAttribute)
+      }
+      
       function loadFreshFrog(tokenID) {
         newFrog = document.createElement("div")
         //newFrog.onclick = function() { build_token(tokenID); }
