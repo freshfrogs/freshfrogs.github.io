@@ -522,13 +522,11 @@
     display: inline-block !important;
     image-rendering: pixelated;
     text-align: center;
-    border: 1px solid #7cc1ff;
     border-radius: 5px;
     padding: 4px;
     padding-top: 0px;
     padding-bottom: 0px;
     margin: 2px;
-    background-color: #7cc1ff;
   }
   .attributeList {
     border: 1px solid white;
@@ -637,48 +635,7 @@
 
             consoleOutput('<br>'+'<strong>Connected!</strong> Fetching data from OpenSea... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
 
-            document.getElementById('thePad').innerHTML = 
-
-              '<div id="stats" class="mintingTextWhite" style="border-radius: 5px !important; padding: 0px !important;">' +
-              ' <img id="banner_image" src="../assets/frogs/backfrogs.png"/><br>' +
-              ' <div style="padding: 4px !important;">' +
-              '    <a href="https://opensea.io/collection/fresh-frogs" target="_blank"><h3 id="name">Fresh Frogs NFT</h3></a>' +
-              '    <p>Items: <b id="count"></b> | Owners: <b id="num_owners"></b> | Market Cap: <b id="market_cap"></b> | Floor Price: <b id="floor_price"></b></p>' +
-              '    <p id="description" style="color: #333 !important;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more! A portion of every re-sale will be donated to The Rainforest Foundation</p>' +
-              ' </div>' +
-              '</div>';
-
-            // OPEN SEA API
-
-            const options = {
-              method: 'GET',
-              headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
-            };
-
-            fetch('https://api.opensea.io/api/v1/assets?owner='+userAddress+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
-            .then((res) => res.json())
-            .then((res) => {
-                var { assets } = res
-                assets.forEach((frog) => {
-
-                  var { name, token_metadata, permalink, traits, external_link, token_id } = frog
-
-                  owned_frog = document.createElement('a');
-                  owned_frog.className = 'frogPanel'
-                  owned_frog.href = permalink
-                  owned_frog.target = '_blank'
-                  owned_frog.id = name
-                  owned_frog.style.width = 128+'px';
-                  //owned_frog.onclick = function() {}
-                  owned_frog.innerHTML = '<img class="frog_img" src='+external_link+'>'
-                  document.getElementById('thePad').appendChild(owned_frog);
-                    
-                })
-            })
-            .catch(e => {
-                document.getElementById('button_ownedfrogs').innerHTML = 'No Frogs Found :(';
-                console.log('Could not get assets from Opensea : ' + e.message)
-            })
+            load_tokens(userAddress)
 
             // Done
 
@@ -688,6 +645,41 @@
           console.log(e.message)
         }
       })
+
+      // Load Fresh Frog Tokens
+      async function load_tokens(_address) {
+
+          const options = {
+              method: 'GET',
+              headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
+          };
+
+          fetch('https://api.opensea.io/api/v1/assets?owner='+_address+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+          .then((res) => res.json())
+          .then((res) => {
+            var { assets } = res
+            assets.forEach((frog) => { // For Each FROG
+              var { name, token_metadata, permalink, traits, external_link, token_id } = frog
+
+              // For each Frog
+              owned_frog = document.createElement('a');
+              owned_frog.className = 'frogPanel'
+              owned_frog.href = permalink
+              owned_frog.target = '_blank'
+              owned_frog.id = name
+              //owned_frog.onclick = function() {}
+              owned_frog.innerHTML = '<img src='+external_link+'>'
+              document.getElementById('thePad').appendChild(owned_frog);
+
+            })
+          })
+          .catch(e => {
+
+            document.getElementById('button_ownedfrogs').innerHTML = 'No Frogs Found :(';
+            console.log('Could not get assets from Opensea : ' + e.message)
+
+          })
+      }
 
       // Round to Hundredth place
       const roundToHundredth = (value) => {
