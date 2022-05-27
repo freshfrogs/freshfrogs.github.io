@@ -675,6 +675,96 @@
 
       }
 
+      // Manually check Frog transactions
+      async function load_ownedFrogs_manual() {
+
+          let this_user = userAcc;
+
+          console.log('Checking Frogs Manually.. for user...'+this_user)
+
+          document.getElementById("thePad").innerHTML = ''
+
+          try {
+
+              let ownedFrogs = await collection.methods.balanceOf(this_user).call()
+
+              if (ownedFrogs <= 0) { // ❌ No FROGS
+                  console.log("It seems you do not own any FROGS!")
+                  return
+              }
+
+              var thisToken = loaded = 0;
+
+              while(true) {
+
+                  if (loaded >= ownedFrogs) {
+                    break
+                  }
+
+                  thisToken++
+
+                  // Progress Bar!
+                  percent = parseInt((thisToken/nextIdC)*100);
+                  document.getElementById("progress").innerHTML = percent+"%"
+                  elem = document.getElementById("myBar");
+                  width = percent
+                  width++;
+                  elem.style.width = width + "%";
+
+                  let owner = await collection.methods.ownerOf(thisToken).call()
+
+                  if (this_user === owner.toLowerCase()) {
+
+                      console.log(thisToken)
+
+                      loadFreshFrog(thisToken);
+                      loaded = loaded + 1
+                      openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
+                      document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a class="pointer" href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+'Frog #'+thisToken+'</u></b> ↗️'+'</a>';
+
+                      //Load Metadata
+                      let tokenURI = await collection.methods.tokenURI(thisToken).call()
+                      let cid = tokenURI.replace("ipfs://", "")
+                      let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
+
+                      var metadata = await (await fetch(ipfsGatewayURI)).json();
+                      for (var i = 0; i < metadata.attributes.length; i++){
+                          var data = metadata.attributes[i]
+
+                          //console.log(data.trait_type+": "+data.value)
+                          trait_type = trait = data.trait_type
+                          value = attribute = data.value
+                          trait_rarity = 'n'
+                          
+                          let here = 'Frog #'+thisToken
+
+                          loadAttribute(trait_type, value, here)
+
+                          newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
+                          if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
+                            else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
+                          newAttribute.className = value;
+                          space = document.createElement('br')
+                          document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
+                          document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
+                          
+                      }
+                  }
+              }
+              // Finish Loading Bar
+              percent = 100;
+              document.getElementById("progress").innerHTML = percent+"%"
+              elem = document.getElementById("myBar");
+              width = percent
+              width++;
+              elem.style.width = width + "%";
+              consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
+          } catch (e) {
+              console.log("Something went wrong, refresh the page!"+e.message)
+              //document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ❌ '+loadedFrogs+'/'+ownedFrogs+' FROG(s) loaded!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'
+          }
+      }
+
       async function fetch_tokens(from_address) {
 
         const options = {
@@ -729,16 +819,23 @@
 
           })
 
-            // Finish Loading Bar
-            percent = 100;
-            document.getElementById("progress").innerHTML = percent+"%"
-            elem = document.getElementById("myBar");
-            width = percent
-            width++;
-            elem.style.width = width + "%";
-            consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
+          // Finish Loading Bar
+          percent = 100;
+          document.getElementById("progress").innerHTML = percent+"%"
+          elem = document.getElementById("myBar");
+          width = percent
+          width++;
+          elem.style.width = width + "%";
+          consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
 
         })
+        .catch(e => {
+
+          console.log('Error: Could not get Collection data from Opensea.');
+          consoleOutput('<br>'+'<strong>Connected!</strong> Could not talk to OpenSea! <br>Loading Frogs from IPFS... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
+          load_ownedFrogs_manual()
+      
+        });
       }
 
 
