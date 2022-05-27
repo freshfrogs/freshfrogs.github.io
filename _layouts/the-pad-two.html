@@ -631,6 +631,10 @@
 
       })
 
+      function consoleOutput(output) {
+        document.getElementById("pre").innerHTML = output
+      }
+
       function load_trait(trait, attribute, where) {
         newAttribute = document.createElement("img")
         newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
