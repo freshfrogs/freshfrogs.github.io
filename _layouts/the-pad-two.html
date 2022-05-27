@@ -685,8 +685,18 @@
         fetch('https://api.opensea.io/api/v1/assets?owner='+from_address+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
         .then((res) => res.json())
         .then((res) => {
+          loaded = 0;
           var { assets } = res
           assets.forEach((frog) => {
+
+            // Progress Bar!
+            loaded = loaded + 1;
+            percent = parseInt((loaded/ownedFrogs)*100);
+            document.getElementById("progress").innerHTML = percent+"%"
+            elem = document.getElementById("myBar");
+            width = percent
+            width++;
+            elem.style.width = width + "%";
 
             var { name, token_metadata, permalink, traits, external_link, token_id } = frog
 
@@ -718,6 +728,16 @@
             })
 
           })
+
+            // Finish Loading Bar
+            percent = 100;
+            document.getElementById("progress").innerHTML = percent+"%"
+            elem = document.getElementById("myBar");
+            width = percent
+            width++;
+            elem.style.width = width + "%";
+            consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
+
         })
       }
 
