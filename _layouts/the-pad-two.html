@@ -648,9 +648,7 @@
       })
 
       // Manually check Frog transactions
-      async function load_ownedFrogs_manual() {
-
-          let this_user = userAcc;
+      async function load_ownedFrogs_manual(this_user) {
 
           console.log('Checking Frogs Manually.. for user...'+this_user)
 
@@ -730,7 +728,7 @@
               width = percent
               width++;
               elem.style.width = width + "%";
-              consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
+              consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(this_user)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
           } catch (e) {
               console.log("Something went wrong, refresh the page!"+e.message)
               //document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ❌ '+loadedFrogs+'/'+ownedFrogs+' FROG(s) loaded!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'
@@ -819,14 +817,14 @@
             width = percent
             width++;
             elem.style.width = width + "%";
-            consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
+            consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
 
           })
           .catch(e => {
 
               console.log('Error: Could not get Collection data from Opensea.');
               consoleOutput('<br>'+'<strong>Connected!</strong> Could not talk to OpenSea! <br>Loading Frogs from IPFS... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
-              load_ownedFrogs_manual()
+              load_ownedFrogs_manual(userAddress)
         
           });
       }
