@@ -626,6 +626,8 @@
           let nextId = await f0.api.nextId().call();
           let nextIdC = parseInt(nextId);
 
+          console.log('connected. '+userAddress)
+
 
           // Connected! Begin loading Frogs!
           if (ownedFrogs <= 0) { // ❌ No FROGS
