@@ -615,16 +615,16 @@
 
           // User Variables
 
-          var userAddress = web3.currentProvider.selectedAddress;
-          var userInviteList = await f0.myInvites();
-          var userInviteKeys = Object.keys(userInviteList);
-          var ownedFrogs = await collection.methods.balanceOf(userAddress).call();
+          let userAddress = web3.currentProvider.selectedAddress;
+          let userInviteList = await f0.myInvites();
+          let userInviteKeys = Object.keys(userInviteList);
+          let ownedFrogs = await collection.methods.balanceOf(userAddress).call();
 
           // CONTRACT NAME, SYMBOL, NEXT ID
-          var contractName = await f0.api.name().call();
-          var contractSymbol = await f0.api.symbol().call();
-          var nextId = await f0.api.nextId().call();
-          var nextIdC = parseInt(nextId);
+          let contractName = await f0.api.name().call();
+          let contractSymbol = await f0.api.symbol().call();
+          let nextId = await f0.api.nextId().call();
+          let nextIdC = parseInt(nextId);
 
 
           // Connected! Begin loading Frogs!
