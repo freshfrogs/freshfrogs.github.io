@@ -697,7 +697,7 @@
         document.getElementById('selectSub').setAttribute('href', openSeaLink)
 
         let token_owner = collection.methods.ownerOf(token).call()
-        document.getElementById('baseText').innerHTML = truncateAddress(token_owner)
+        document.getElementById('baseText').innerHTML = token_owner.slice(0, 10)
 
         document.getElementById('Frog #'+token+'Desc').innerHTML = '<a class="pointer" href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>Frog #'+token+'</u></b> ↗️'+'</a>';
 
