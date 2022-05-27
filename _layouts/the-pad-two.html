@@ -834,9 +834,19 @@
           console.log(e.message);
           console.log('Error: Could not get Collection data from Opensea.');
           consoleOutput('<br>'+'<strong>Connected!</strong> Could not talk to OpenSea! <br>Loading Frogs from IPFS... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
-          //load_ownedFrogs_manual()
+          load_ownedFrogs_manual()
       
         });
+      }
+
+      function truncateAddress(address) {
+        if (!address) {
+          return "";
+        }
+        return `${address.substr(0, 5)}...${address.substr(
+          address.length - 5,
+          address.length
+        )}`;
       }
 
 
