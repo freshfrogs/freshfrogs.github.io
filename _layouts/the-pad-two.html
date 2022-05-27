@@ -661,12 +661,26 @@
         document.getElementById(where).appendChild(newAttribute)
       }
 
+      // Select Frog
+      async function display_token(token){
+
+          display_frog = 'https://freshfrogs.io/frog/'+token+'.png'
+          display_name = 'Frog #'+token
+          display_os = ''
+
+          document.getElementById('previewImg').setAttribute('src', display_frog)
+          document.getElementById('display_name').innerHTML = display_name
+          
+      }
+
+
       // Load Fresh Frog
       function load_token(token) {
 
         openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
 
         newFrog = document.createElement("div")
+        newFrog.onclick = function() { display_token(token) }
         newFrog.id = token
         newFrog.className = 'frogPanel'
         newFrog.innerHTML = '<a style="margin-bottom" 0px !important;  display: inline !important;" class="smallContainer2 pointer2" id="Frog #'+token+'"><img class="frogImg3" src="https://freshfrogs.io/frog/'+token+'.png"/></a>'+'<p class="attributeList" id="Frog #'+token+'Desc"></p>'
@@ -879,21 +893,14 @@
       <header>
         <div class="downloads pre">
           <ul class="downloads2">
-            <li><a id="morphFrogs" class="pointer"><strong>🡲</strong><strong>🡰</strong></a></li>
+            <li><a id="morphFrogs" class="pointer"><strong id="display_name">Frog #1</strong>frog type</a></li>
             <li><a id="selectBase" class="pointer"><strong>Base</strong><frog id="baseText">Select FROG</frog></a></li>
             <li><a id="selectSub" class="pointer"><strong>Sub</strong><frog id="subText">Select FROG</frog></a></li>
           </ul>
           <br>
           <div id="mintingTray" class="mintingTray">
             <div class="bigContainer">
-              <div id="frogContainer" class="containerMint"></div>
-              <div id="frogContainer2" class="containerMint">
-                <div class="imgWrapperMint"><img id="base_frog_img" class="frogImgMint" src="https://freshfrogs.io/frog/606.png"/></div>
-                <div class="imgWrapperMint"><img id="sub_frog_img" class="frogImgMint" src="https://freshfrogs.io/frog/407.png"/></div>
-              </div>
-              <div id="frogContainer3" class="containerMint"><div class="imgWrapperMint">
-                <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/morph-preview.png"/></div>
-              </div>
+              <img id="previewImg" src="https://freshfrogs.io/assets/frogs/morph-preview.png"/></div>
             </div>
           </div>
         </div>
