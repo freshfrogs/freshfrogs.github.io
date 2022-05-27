@@ -669,7 +669,7 @@
 
             var { name, token_metadata, permalink, traits, external_link, token_id } = frog
 
-            load_token(frog.token_id);
+            load_token(token_id);
 
             traits.forEach((trait) => {
 
@@ -682,8 +682,8 @@
                 else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">n%</i></b>'; }
               newAttribute.className = value;
               space = document.createElement('br')
-              document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
-              document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute)
+              document.getElementById('Frog #'+token_id+'Desc').appendChild(space)
+              document.getElementById('Frog #'+token_id+'Desc').appendChild(newAttribute)
 
             })
 
