@@ -737,6 +737,15 @@
           }
       }
 
+      function loadFreshFrog(tokenID) {
+        newFrog = document.createElement("div")
+        //newFrog.onclick = function() { build_token(tokenID); }
+        newFrog.id = tokenID
+        newFrog.className = 'frogPanel'
+        newFrog.innerHTML = '<a class="smallContainer2 pointer" id="Frog #'+tokenID+'"></a>'+'<p class="attributeList" id="Frog #'+tokenID+'Desc"></p>'
+        document.getElementById("thePad").appendChild(newFrog)
+      }
+
       // Load Fresh Frog Tokens
       async function load_tokens(_address) {
 
