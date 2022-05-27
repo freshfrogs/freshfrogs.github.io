@@ -708,14 +708,6 @@
                           let here = 'Frog #'+thisToken
 
                           loadAttribute(trait_type, value, here)
-
-                          newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
-                          if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
-                            else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
-                          newAttribute.className = value;
-                          space = document.createElement('br')
-                          document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
-                          document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
                           
                       }
                   }
@@ -764,7 +756,7 @@
         //newFrog.onclick = function() { build_token(tokenID); }
         newFrog.id = tokenID
         newFrog.className = 'frogPanel'
-        newFrog.innerHTML = '<a class="smallContainer2 pointer" id="Frog #'+tokenID+'"></a>'+'<p class="attributeList" id="Frog #'+tokenID+'Desc"></p>'
+        newFrog.innerHTML = '<a class="smallContainer2 pointer" id="Frog #'+tokenID+'"></a>'
         document.getElementById("thePad").appendChild(newFrog)
       }
 
@@ -823,13 +815,6 @@
 
                 // Build Fresh Frogs Attributes
                 loadAttribute(trait_type, value, frog.name)
-                newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
-                if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
-                  else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
-                newAttribute.className = value;
-                space = document.createElement('br')
-                document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
-                document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
               }
             })
           })
