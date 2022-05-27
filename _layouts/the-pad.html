@@ -571,32 +571,6 @@
     image-rendering: auto;
     overflow: hidden;
   }
-  .float-img2 img {
-    width: 256px !important;
-    height: 256px !important;
-    margin: 0px;
-  }
-  .float-img2 {
-    border-radius: 5px;
-    border: 1px solid lightgrey;
-    width: 256px;
-    height: 256px;
-    vertical-align: middle;
-    image-rendering: pixelated;
-    background-color: #7cc1ff;
-    text-align: center;
-    overflow: hidden;
-  }
-  .frogImg3 {
-    transition: transform .2s;
-    display: block;
-    image-rendering: pixelated;
-    overflow: hidden;
-    position: absolute;
-    width: 256px;
-    height: 256px;
-    border-radius: 5px;
-  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -782,7 +756,7 @@
             //document.getElementById('netStatus').innerHTML = 'Loading Frogs from ΞEthereum... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br><br>';
             consoleOutput('<br>'+'<strong>Connected!</strong> Loading Frogs from OpenSea... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
 
-/*            document.getElementById('thePad').innerHTML = 
+            document.getElementById('thePad').innerHTML = 
 
               '<div id="stats" class="mintingTextWhite" style="border-radius: 5px !important; padding: 0px !important;">' +
               ' <img id="banner_image" src="../assets/frogs/backfrogs.png"/><br>' +
@@ -791,7 +765,7 @@
               '    <p>Items: <b id="count"></b> | Owners: <b id="num_owners"></b> | Market Cap: <b id="market_cap"></b> | Floor Price: <b id="floor_price"></b></p>' +
               '    <p id="description" style="color: #333 !important;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more! A portion of every re-sale will be donated to The Rainforest Foundation</p>' +
               ' </div>' +
-              '</div>'; */
+              '</div>';
 
             // OPEN SEA API
 
@@ -800,7 +774,7 @@
               headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
             };
 
-/*            fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
+            fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
             .then(collection => collection.json())
             .then(collection => {
 
@@ -822,7 +796,7 @@
                 console.log('Error: Could not get Collection data from Opensea.');
                 console.error('Error : ' + e.message)
           
-            }); // End data pull / first paid Frog 3,236 */
+            }); // End data pull / first paid Frog 3,236 
 
             fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
             .then((res) => res.json())
@@ -1004,7 +978,39 @@
       // Load Fresh Frog
       function loadFreshFrog(tokenID) {
         newFrog = document.createElement("div")
-        newFrog.onclick = function() { display_token(tokenID); }
+        newFrog.onclick = function() {
+
+          var this_frog = event.currentTarget.id
+
+          var this_frog_ID = 'Frog #'+this_frog+'Desc'
+
+          if (!base_frog && sub_frog !== this_frog) { // SELECT BASE
+
+              selectBaseFrog(this_frog);
+              return
+              
+          } else if (this_frog == base_frog) { // UN-SELECT BASE
+
+              document.getElementById('baseText').innerHTML = 'Select Frog'
+              document.getElementById(this_frog_ID).style.boxShadow = 'none'
+              base_frog = false;
+              return
+
+          } else if (!sub_frog && base_frog !== this_frog) { // SELECT SUB
+
+              selectSubFrog(this_frog);
+              
+              return
+
+          } else if (this_frog == sub_frog) { // UN-SELECT SUB
+
+              document.getElementById('subText').innerHTML = 'Select Frog'
+              document.getElementById(this_frog_ID).style.boxShadow = 'none'
+              sub_frog = false;
+              return
+
+          } else { return }
+        }
         newFrog.id = tokenID
         newFrog.className = 'frogPanel'
         newFrog.innerHTML = '<a class="smallContainer2 pointer" id="Frog #'+tokenID+'"></a>'+'<p class="attributeList" id="Frog #'+tokenID+'Desc"></p>'
@@ -1112,22 +1118,30 @@
       }
 
       function randomIntFromInterval(min, max) { // min and max included 
-        return Math.floor(Math.random() * (max - min + 1) + min)
-      }
-
-      // Select baseFrog
-      async function display_token(select_token){
-
-        document.getElementById('morph_float').innerHTML = '<img src="https://freshfrogs.io/frog/'+base_frog+'.png"/>'
-
-        let select_token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+select_token+".json")).json();
-        for (var i = 0; i < select_token_metadata.attributes.length; i++){
-          var data = select_token_metadata.attributes[i]
-          loadAttribute(data.trait_type, data.value, 'morph_float')
-        }
-
+          return Math.floor(Math.random() * (max - min + 1) + min)
       }
       
+      // Switch Frogs
+      function switch_base_sub() {
+
+          if (!base_frog || !sub_frog) {
+
+              return
+
+          } else {
+
+              var base_i = base_frog;
+              var sub_i = sub_frog;
+
+              base_frog = false;
+              sub_frog = false;
+
+              selectBaseFrog(sub_i)
+              selectSubFrog(base_i)
+
+          }
+
+      }
       // Select baseFrog
       async function selectBaseFrog(selected_base){
 
@@ -1372,15 +1386,20 @@
       <header>
         <div class="downloads pre">
           <ul class="downloads2">
-            <li><a id="morphFrogs" class="pointer"><strong>Frog #1</strong>frog type</a></li>
+            <li><a id="morphFrogs" class="pointer"><strong>🡲</strong><strong>🡰</strong></a></li>
             <li><a id="selectBase" class="pointer"><strong>Base</strong><frog id="baseText">Select FROG</frog></a></li>
             <li><a id="selectSub" class="pointer"><strong>Sub</strong><frog id="subText">Select FROG</frog></a></li>
           </ul>
           <br>
           <div id="mintingTray" class="mintingTray">
             <div class="bigContainer">
+              <div id="frogContainer" class="containerMint"></div>
+              <div id="frogContainer2" class="containerMint">
+                <div class="imgWrapperMint"><img id="base_frog_img" class="frogImgMint" src="https://freshfrogs.io/frog/606.png"/></div>
+                <div class="imgWrapperMint"><img id="sub_frog_img" class="frogImgMint" src="https://freshfrogs.io/frog/407.png"/></div>
+              </div>
               <div id="frogContainer3" class="containerMint"><div class="imgWrapperMint">
-                <div id="morph_float" class="float-img2"></div>
+                <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/morph-preview.png"/></div>
               </div>
             </div>
           </div>
