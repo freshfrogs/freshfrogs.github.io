@@ -689,7 +689,7 @@
                 let value = attribute.value
 
                 // Build Fresh Frogs Attributes
-                loadAttribute(trait_type, value, frog.name)
+                load_trait(trait_type, value, frog.name)
                 newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
                 if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">n%</i></b>'; } 
                   else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">n%</i></b>'; }
