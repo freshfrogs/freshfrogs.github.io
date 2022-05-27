@@ -647,6 +647,96 @@
         }
       })
 
+      // Manually check Frog transactions
+      async function load_ownedFrogs_manual() {
+
+          let this_user = userAcc;
+
+          console.log('Checking Frogs Manually.. for user...'+this_user)
+
+          document.getElementById("thePad").innerHTML = ''
+
+          try {
+
+              let ownedFrogs = await collection.methods.balanceOf(this_user).call()
+
+              if (ownedFrogs <= 0) { // ❌ No FROGS
+                  console.log("It seems you do not own any FROGS!")
+                  return
+              }
+
+              var thisToken = loaded = 0;
+
+              while(true) {
+
+                  if (loaded >= ownedFrogs) {
+                    break
+                  }
+
+                  thisToken++
+
+                  // Progress Bar!
+                  percent = parseInt((thisToken/nextIdC)*100);
+                  document.getElementById("progress").innerHTML = percent+"%"
+                  elem = document.getElementById("myBar");
+                  width = percent
+                  width++;
+                  elem.style.width = width + "%";
+
+                  let owner = await collection.methods.ownerOf(thisToken).call()
+
+                  if (this_user === owner.toLowerCase()) {
+
+                      console.log(thisToken)
+
+                      loadFreshFrog(thisToken);
+                      loaded = loaded + 1
+                      openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
+                      document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a class="pointer" href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+'Frog #'+thisToken+'</u></b> ↗️'+'</a>';
+
+                      //Load Metadata
+                      let tokenURI = await collection.methods.tokenURI(thisToken).call()
+                      let cid = tokenURI.replace("ipfs://", "")
+                      let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
+
+                      var metadata = await (await fetch(ipfsGatewayURI)).json();
+                      for (var i = 0; i < metadata.attributes.length; i++){
+                          var data = metadata.attributes[i]
+
+                          //console.log(data.trait_type+": "+data.value)
+                          trait_type = trait = data.trait_type
+                          value = attribute = data.value
+                          trait_rarity = 'i'
+                          
+                          let here = 'Frog #'+thisToken
+
+                          loadAttribute(trait_type, value, here)
+
+                          newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
+                          if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
+                            else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
+                          newAttribute.className = value;
+                          space = document.createElement('br')
+                          document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
+                          document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
+                          
+                      }
+                  }
+              }
+              // Finish Loading Bar
+              percent = 100;
+              document.getElementById("progress").innerHTML = percent+"%"
+              elem = document.getElementById("myBar");
+              width = percent
+              width++;
+              elem.style.width = width + "%";
+              consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
+          } catch (e) {
+              console.log("Something went wrong, refresh the page!"+e.message)
+              //document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ❌ '+loadedFrogs+'/'+ownedFrogs+' FROG(s) loaded!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'
+          }
+      }
+
       // Load Fresh Frog Tokens
       async function load_tokens(_address) {
 
@@ -655,31 +745,81 @@
               headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
           };
 
-          fetch('https://api.opensea.io/api/v1/assets?owner='+_address+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+          fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
           .then((res) => res.json())
           .then((res) => {
             var { assets } = res
             assets.forEach((frog) => { // For Each FROG
-              var { name, token_metadata, permalink, traits, external_link, token_id } = frog
+              var { name, token_metadata, permalink, traits } = frog
 
-              // For each Frog
-              owned_frog = document.createElement('a');
-              owned_frog.className = 'frogPanel'
-              owned_frog.href = permalink
-              owned_frog.target = '_blank'
-              owned_frog.id = name
-              //owned_frog.onclick = function() {}
-              owned_frog.innerHTML = '<img src='+external_link+'>'
-              document.getElementById('thePad').appendChild(owned_frog);
+              // Attribute Rarities
+              //console.log('Loading... '+name);
+              for (var i = 0; i < traits.length; i++) {
+                attributesTotal[traits[i].value] = traits[i].trait_count
+              }
 
+              let thisToken = frog.name.replace('Frog #', '');
+              //
+              loadFreshFrog(thisToken);
+              openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
+              document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a class="pointer" href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+frog.name+'</u></b> ↗️'+'</a>';
+
+              // Progress Bar!
+              percent = parseInt((thisToken/ownedFrogs)*100);
+              document.getElementById("progress").innerHTML = percent+"%"
+              elem = document.getElementById("myBar");
+              width = percent
+              width++;
+              elem.style.width = width + "%";
+              
+              fetch(token_metadata)
+              .then((metadata) => metadata.json())
+              .then((metadata) => {
+                // Loop Attributes
+                for (var i = 0; i < metadata.attributes.length; i++){
+                  //console.log(metadata.attributes[i]);
+
+                  // Trait_Type : Value
+                  var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                  let trait_type = attribute.trait_type
+                  let value = attribute.value
+                  let trait_rarity = ((attributesTotal[value]/nextIdC)*100).toFixed(0);
+
+                  
+                  if (trait_rarity < 1) {
+                    trait_rarity = '<1';
+                  }
+
+                  // Build Fresh Frogs Attributes
+                  loadAttribute(trait_type, value, frog.name)
+                  newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
+                  if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
+                    else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
+                  newAttribute.className = value;
+                  space = document.createElement('br')
+                  document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
+                  document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
+                }
+              })
             })
+
+            // Finish Loading Bar
+            percent = 100;
+            document.getElementById("progress").innerHTML = percent+"%"
+            elem = document.getElementById("myBar");
+            width = percent
+            width++;
+            elem.style.width = width + "%";
+            consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
+
           })
           .catch(e => {
 
-            document.getElementById('button_ownedfrogs').innerHTML = 'No Frogs Found :(';
-            console.log('Could not get assets from Opensea : ' + e.message)
-
-          })
+              console.log('Error: Could not get Collection data from Opensea.');
+              consoleOutput('<br>'+'<strong>Connected!</strong> Could not talk to OpenSea! <br>Loading Frogs from IPFS... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
+              load_ownedFrogs_manual()
+        
+          });
       }
 
       // Round to Hundredth place
