@@ -820,7 +820,7 @@
                 let trait_type = attribute.trait_type
                 let value = attribute.value
 
-                var trait_rarity = ((traits_list[trait][attribute.toLowerCase()] / 4040) * 100).toFixed(0)
+                var trait_rarity = ((traits_list[trait_type][value.toLowerCase()] / 4040) * 100).toFixed(0)
 
                 if (trait_rarity == 'NaN' || trait_rarity == '0') { trait_rarity = '<1' }
 
