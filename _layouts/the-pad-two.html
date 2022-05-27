@@ -636,7 +636,7 @@
 
             consoleOutput('<br>'+'<strong>Connected!</strong> Fetching data from OpenSea... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
 
-            load_tokens(userAddress)
+            load_tokens()
 
             // Done
 
@@ -648,7 +648,9 @@
       })
 
       // Manually check Frog transactions
-      async function load_ownedFrogs_manual(this_user) {
+      async function load_ownedFrogs_manual() {
+
+          let this_user = userAddress;
 
           console.log('Checking Frogs Manually.. for user...'+this_user)
 
@@ -728,7 +730,7 @@
               width = percent
               width++;
               elem.style.width = width + "%";
-              consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(this_user)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
+              consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAddress)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
           } catch (e) {
               console.log("Something went wrong, refresh the page!"+e.message)
               //document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ❌ '+loadedFrogs+'/'+ownedFrogs+' FROG(s) loaded!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'
@@ -745,14 +747,14 @@
       }
 
       // Load Fresh Frog Tokens
-      async function load_tokens(_address) {
+      async function load_tokens() {
 
           const options = {
               method: 'GET',
               headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
           };
 
-          fetch('https://api.opensea.io/api/v1/assets?owner='+_address+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+          fetch('https://api.opensea.io/api/v1/assets?owner='+userAddress+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
           .then((res) => res.json())
           .then((res) => {
             var { assets } = res
@@ -817,14 +819,14 @@
             width = percent
             width++;
             elem.style.width = width + "%";
-            consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
+            consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAddress)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
 
           })
           .catch(e => {
 
               console.log('Error: Could not get Collection data from Opensea.');
               consoleOutput('<br>'+'<strong>Connected!</strong> Could not talk to OpenSea! <br>Loading Frogs from IPFS... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
-              load_ownedFrogs_manual(_address)
+              load_ownedFrogs_manual()
         
           });
       }
