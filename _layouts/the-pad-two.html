@@ -668,7 +668,7 @@
           display_name = 'Frog #'+token
           display_os = ''
 
-          document.getElementById().setAttribute('src', display_frog)
+          document.getElementById('previewImg').setAttribute('src', display_frog)
           document.getElementById('display_name').innerHTML = display_name
           
       }
@@ -679,7 +679,9 @@
 
         openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
 
+
         newFrog = document.createElement("div")
+        newFrog.onclick = function() { display_token(token) }
         newFrog.id = token
         newFrog.className = 'frogPanel'
         newFrog.innerHTML = '<a style="margin-bottom" 0px !important;  display: inline !important;" class="smallContainer2 pointer2" id="Frog #'+token+'"><img class="frogImg3" src="https://freshfrogs.io/frog/'+token+'.png"/></a>'+'<p class="attributeList" id="Frog #'+token+'Desc"></p>'
@@ -899,13 +901,10 @@
           <br>
           <div id="mintingTray" class="mintingTray">
             <div class="bigContainer">
-              <div id="frogContainer" class="containerMint"></div>
-              <div id="frogContainer2" class="containerMint">
-                <div class="imgWrapperMint"><img id="base_frog_img" class="frogImgMint" src="https://freshfrogs.io/frog/606.png"/></div>
-                <div class="imgWrapperMint"><img id="sub_frog_img" class="frogImgMint" src="https://freshfrogs.io/frog/407.png"/></div>
-              </div>
-              <div id="frogContainer3" class="containerMint"><div class="imgWrapperMint">
-                <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/morph-preview.png"/></div>
+              <div id="frogContainer3" class="containerMint">
+                <div class="imgWrapperMint">
+                  <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/morph-preview.png"/>
+                </div>
               </div>
             </div>
           </div>
