@@ -806,7 +806,12 @@
 
           fetch('https://api.opensea.io/api/v1/asset/'+CONTRACT_ADDRESS+'/'+frog+'/?include_orders=false', options)
           .then(response => response.json())
-          .then(response => console.log(response))
+          .then(frogs => {
+            var { name, token_metadata, permalink, traits, external_link, token_id } = frogs
+            
+            console.log(name)
+
+          })
           .catch(err => console.error(err));
 
         }
