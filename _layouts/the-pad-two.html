@@ -660,6 +660,8 @@
           display_name = 'Frog #'+token
           display_os = ''
 
+          document.getElementById('thisheader').style.backgroundImage = 'url('+display_frog+')';
+
           document.getElementById('previewImg').setAttribute('src', display_frog)
           document.getElementById('display_name').innerHTML = display_name
 
@@ -897,7 +899,7 @@
   </head>
   <body class="bodyb">
     <div class="wrapper">
-      <header>
+      <header id="thisheader">
         <div class="downloads pre">
           <ul class="downloads2">
             <li><a id="morphFrogs" class="pointer"><strong id="display_name">Fresh Frogs</strong><div id="display_type">ΞEthereum</div></a></li>
