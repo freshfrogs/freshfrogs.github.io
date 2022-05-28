@@ -686,12 +686,11 @@
                           '<img class="frog_img" src='+external_link+'>' +
                           '<i class="label_name">Fresh Frogs NFT</i>' +
                           '<b class="frog_name">'+name+'</b>';
-                      document.getElementById('owned-frogs').appendChild(owned_frog);
+                      document.getElementById('thePad').appendChild(owned_frog);
                   
               })
           })
           .catch(e => {
-              document.getElementById('button_ownedfrogs').innerHTML = 'No Frogs Found :(';
               console.log('Could not get assets from Opensea : ' + e.message)
           })
       }
