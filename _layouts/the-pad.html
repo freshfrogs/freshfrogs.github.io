@@ -804,7 +804,7 @@
 
           frog = getRandomInt(i, nextIdC)
 
-          fetch('https://api.opensea.io/api/v1/asset/0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb/'+frog+'/?include_orders=false', options)
+          fetch('https://api.opensea.io/api/v1/asset/'+CONTRACT_ADDRESS+'/'+frog+'/?include_orders=false', options)
           .then(response => response.json())
           .then(response => console.log(response))
           .catch(err => console.error(err));
