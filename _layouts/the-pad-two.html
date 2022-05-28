@@ -659,7 +659,9 @@
           display_frogImg = 'https://freshfrogs.io/frog/'+token+'.png'
           display_name = 'Frog #'+token
 
-          display_frog = document.getElementById('frogContainer3')
+          document.getElementById('frogContainer3').innerHTML = ''
+
+          display_frog = document.getElementById('thisheader')
           display_frog.innerHTML = ''
           display_frog.backgroundImage = 'url('+display_frogImg+')';
           display_frog.backgroundSize = '1024px 1024px'
@@ -900,7 +902,7 @@
   </head>
   <body class="bodyb">
     <div class="wrapper">
-      <header>
+      <header id="thisheader">
         <div class="downloads pre">
           <ul class="downloads2">
             <li><a id="morphFrogs" class="pointer"><strong id="display_name">Fresh Frogs</strong><div id="display_type">ΞEthereum</div></a></li>
