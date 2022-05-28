@@ -814,7 +814,7 @@
       
         }); // End data pull / first paid Frog 3,236
 
-        fetch('https://api.opensea.io/api/v1/assets?owner='+from_address+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+        fetch('https://api.opensea.io/api/v1/assets?owner='+from_address+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
         .then((res) => res.json())
         .then((res) => {
           loaded = 0;
@@ -905,7 +905,7 @@
         <div class="downloads pre">
           <ul class="downloads2">
             <li><a id="morphFrogs" class="pointer"><strong id="display_name">Fresh Frogs</strong><div id="display_type"><strong>NFT</strong></div></a></li>
-            <li><a id="selectBase" class="pointer"><strong>Morph</strong><frog id="baseText">Combine Frogs</frog></a></li>
+            <li><a id="selectBase" class="pointer" href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><strong>View on</strong><frog id="baseText">Etherscan</frog></a></li>
             <li><a id="selectSub" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>View on</strong><frog id="subText">OpenSea ↗️</frog></a></li>
           </ul>
           <br>
