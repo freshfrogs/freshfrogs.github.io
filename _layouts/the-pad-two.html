@@ -634,7 +634,7 @@
         newAttribute.id = attribute
         newAttribute.target = "_blank"
         if (where == 'frogContainer3') {
-          newAttribute.className = "frogImg2" //shadesAnimation
+          newAttribute.className = "frogImg3" //shadesAnimation
         } else {
           newAttribute.className = "frogImg2" //shadesAnimation
         }
@@ -656,15 +656,11 @@
       // Select Frog
       async function display_token(token){
 
-          display_frogImg = 'https://freshfrogs.io/frog/'+token+'.png'
+          display_frog = 'https://freshfrogs.io/frog/'+token+'.png'
           display_name = 'Frog #'+token
+          display_os = ''
 
-          document.getElementById('frogContainer3').innerHTML = ''
-
-          display_frog = document.getElementById('thisheader')
-          display_frog.backgroundImage = 'url('+display_frogImg+')';
-          display_frog.backgroundSize = '1024px 1024px'
-
+          document.getElementById('previewImg').setAttribute('src', display_frog)
           document.getElementById('display_name').innerHTML = display_name
 
           openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
@@ -675,7 +671,7 @@
           let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
           for (var i = 0; i < token_metadata.attributes.length; i++){
               var data = token_metadata.attributes[i]
-              load_trait(data.trait_type, data.value, 'frogContainer3')
+              //loadAttribute(data.trait_type, data.value, 'subDisplay')
               if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
                 document.getElementById('display_type').innerHTML = data.value.slice(0, 10)+'..'
               }
@@ -901,7 +897,7 @@
   </head>
   <body class="bodyb">
     <div class="wrapper">
-      <header id="thisheader">
+      <header>
         <div class="downloads pre">
           <ul class="downloads2">
             <li><a id="morphFrogs" class="pointer"><strong id="display_name">Fresh Frogs</strong><div id="display_type">ΞEthereum</div></a></li>
