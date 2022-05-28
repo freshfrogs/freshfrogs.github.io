@@ -652,7 +652,8 @@
           } else {
             //document.getElementById('netStatus').innerHTML = 'Loading Frogs from ΞEthereum... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br><br>';
             consoleOutput('<br>'+'<strong>Connected!</strong> Loading Frogs from OpenSea... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
-            fetch_tokens(userAddress)
+            load_ownedFrogs();
+            //fetch_tokens(userAddress)
             //fetch_random_tokens(9)
         }
 
