@@ -620,9 +620,16 @@
             //document.getElementById('netStatus').innerHTML = 'Loading Frogs from ΞEthereum... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br><br>';
             consoleOutput('<br>'+'<strong>Connected!</strong> Loading Frogs from OpenSea... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
             fetch_tokens(userAddress)
+            fetch_random_tokens(9)
         }
 
       })
+
+      function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
 
       function consoleOutput(output) {
         document.getElementById("pre").innerHTML = output
@@ -787,6 +794,23 @@
               console.log("Something went wrong, refresh the page!"+e.message)
               //document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ❌ '+loadedFrogs+'/'+ownedFrogs+' FROG(s) loaded!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'
           }
+      }
+
+      async function fetch_random_tokens(how_many) {
+
+        const options = {method: 'GET'};
+
+        for (var i = 1; i < how_many; i++) {
+
+          frog = getRandomInt(i, nextIdC)
+
+          fetch('https://api.opensea.io/api/v1/asset/0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb/'+frog+'/?include_orders=false', options)
+          .then(response => response.json())
+          .then(response => console.log(response))
+          .catch(err => console.error(err));
+
+        }
+
       }
 
       async function fetch_tokens(from_address) {
