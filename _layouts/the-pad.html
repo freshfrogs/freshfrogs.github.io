@@ -12,7 +12,7 @@
     margin-top: 8px;
     margin-left: auto;
     margin-right: auto;
-    border: 1px solid white;
+    border: 1px solid #7cc1ff;
     border-radius: 5px;
     overflow: hidden;
   }
@@ -47,7 +47,7 @@
     width: 128px;
   }
   .smallContainer2 {
-    border-radius: 5px;
+    border-radius: 0px;
     overflow: hidden;
     background-color: transparent;
     width: 128px;
@@ -99,7 +99,6 @@
     margin-left: auto;
     margin-right: auto;
     color: white !important;
-    box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);
   }
   .label_name {
       text-align: left;
@@ -192,13 +191,6 @@
       display: block;
       image-rendering: pixelated;
       overflow: hidden;
-  }
-  .frogImgMint:hover{
-      -ms-transform: scale(1.5); /* IE 9 */
-      -webkit-transform: scale(1.5); /* Safari 3-8 */
-      transform: scale(1.5);
-      box-shadow: none;
-      border: none;
   }
   .headLine{
     color: transparent;
@@ -380,24 +372,18 @@
     height: 128px;
     border-radius: 5px;
   }
-  .frogImg3:hover{
-      -ms-transform: scale(1.5); /* IE 9 */
-      -webkit-transform: scale(1.5); /* Safari 3-8 */
-      transform: scale(1.5);
-      box-shadow: none;
-      border: none;
-  }
   .frogImg3 {
-      transition: transform .2s;
-      display: block;
-      image-rendering: pixelated;
-      overflow: hidden;
-      position: absolute;
-      width: 128px;
-      height: 128px;
-      border-radius: 5px;
-      margin-left: 64px;
-      margin-right: 64px;
+    transition: transform .2s;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    width: 1024px !important;
+    height: 1024px !important;
+    border-radius: 5px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    max-width: 400% !important;
   }
   .smallContainer3:hover{
     -ms-transform: scale(1.1); /* IE 9 */
@@ -405,6 +391,10 @@
     transform: scale(1.1);
     box-shadow: none;
     border: none;
+  }
+  .pointer2 {
+    transition: transform .2s;
+    cursor: pointer;
   }
   .pointer {
     transition: transform .2s;
@@ -522,23 +512,26 @@
     display: inline-block !important;
     image-rendering: pixelated;
     text-align: center;
-    border: 1px solid #7cc1ff;
     border-radius: 5px;
-    padding: 4px;
-    padding-top: 0px;
-    padding-bottom: 0px;
-    margin: 2px;
-    background-color: #7cc1ff;
+    padding: 0px !important;
+    margin: 8px;
+    background-color: white;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
+    overflow: hidden;
+    border: 0px solid white;
   }
   .attributeList {
     border: 1px solid white;
     border-radius: 5px;
-    padding: 6px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    padding: 0px !important;
+    padding-bottom: 4px !important;
     overflow: hidden;
     background-color: white;
     color: #333;
-    box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
-    width: 128px;
+    width: 100%;
+    margin: 0px !important;
   }
   .trait {
     border-radius: 2px;
@@ -586,310 +579,130 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
     <script>
 
-      var base_frog = false;
-      var sub_frog = false;
+      var userAddress, userInviteList, userInviteKeys, ownedFrogs, contractName, contractSymbol, nextId, nextIdC, collection, COLLECTION, traits_list;
+      var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
+      var NETWORK = "main";
 
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-6PB0WKB4SH');
       document.addEventListener("DOMContentLoaded", async () => {
-        const web3 = new Web3(window.ethereum);   // Open WEB3.0 Browsner Exentions Window
-        const f0 = new F0();    // Connect to Factoria
-        CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";    // Contract Address (Ethereum Mainnet) 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b // Rinkeby: 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524
-        COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
-        NETWORK = "main";   // Which Network?
-        //consoleOutput('<b>🍄Morph FROGS</b><br>Fresh Frog NFT Combinations! <br>Select Frogs to combine their attributes!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>')
-        //consoleOutput('Mint from the collection...<a class="pointer" href="https://freshfrogs.io/"><b>🐸 Minting Terminal</b> ↗️</a>'+'<br><div id="thePad" class="thePad"></div>')
-        try {   // Connect
-          
+
+        const web3 = new Web3(window.ethereum);
+        const f0 = new F0();
+
+        COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
+
+        try { // Connect Wallet, Factoria
+
           await f0.init({
             web3: web3,
             contract: CONTRACT_ADDRESS,
             network: NETWORK
           })
 
-          // Assign Variables (CONSTANTS)
-          // CONNECTED USER'S WALLET ADDRESS; AND INVITES
-          userAcc = web3.currentProvider.selectedAddress;
-          addressCut = userAcc.substring(0, 5)+".."+userAcc.slice(-4);
+          userAddress = web3.currentProvider.selectedAddress;
           userInviteList = await f0.myInvites();
           userInviteKeys = Object.keys(userInviteList);
-
-          ownedFrogs = await collection.methods.balanceOf(userAcc).call();
-
-          // CONTRACT NAME, SYMBOL, NEXT ID
-          name = await f0.api.name().call();
-          symbol = await f0.api.symbol().call();
+          ownedFrogs = await collection.methods.balanceOf(userAddress).call();
+          contractName = await f0.api.name().call();
+          contractSymbol = await f0.api.symbol().call();
           nextId = await f0.api.nextId().call();
           nextIdC = parseInt(nextId);
 
-          // Other Function Variables
-          baseFrog = 'undefined';
-          subFrog = 'undefined';
-          morphed = 'false';
+        } catch (e) { console.log(e.message); }
 
-          // Get two Frogs Ready
-          //applyFrogOwned(407);
-          //applyFrogOwned(67);
+        console.log('Connected : '+userAddress)
 
-          // Attribute Rarities
-          var attributesTotal = {
-            'goldChain' : 0,
-            'goldDollarChain' : 0,
-            'silverChain' : 0,
-            'silverEthChain' : 0,
-            'circleGlasses' : 0,
-            'circleNightVision' : 0,
-            'circleShadesPurple' : 0,
-            'circleShadesRed' : 0,
-            'shades' : 0,
-            'shadesPurple' : 0,
-            'shadesThreeD' : 0,
-            'shadesWhite' : 0,
-            'blueDartFrog' : 0,
-            'blueTreeFrog' : 0,
-            'brownTreeFrog' : 0,
-            'cyanTreeFrog' : 0,
-            'goldenDartFrog' : 0,
-            'goldenTreeFrog' : 0,
-            'grayTreeFrog' : 0,
-            'greenTreeFrog' : 0,
-            'lightBrownTreeFrog' : 0,
-            'natural' : 0,
-            'orangeTreeFrog' : 0,
-            'pinkTreeFrog' : 0,
-            'purpleTreeFrog' : 0,
-            'redEyedTreeFrog' : 0,
-            'splendidLeafFrog' : 0,
-            'stawberryDartFrog' : 0,
-            'tomatoFrog' : 0,
-            'treeFrog(1)' : 0,
-            'treeFrog(2)' : 0,
-            'treeFrog(3)' : 0,
-            'treeFrog(4)' : 0,
-            'treeFrog(5)' : 0,
-            'treeFrog(6)' : 0,
-            'treeFrog(7)' : 0,
-            'treeFrog(8)' : 0,
-            'unknown' : 0,
-            'baseballCapBlue' : 0,
-            'baseballCapRed' : 0,
-            'baseballCapWhite' : 0,
-            'cowboyHatBlack' : 0,
-            'cowboyHatBrown' : 0,
-            'cowboyHatTan' : 0,
-            'cowboyHatWhite' : 0,
-            'crown' : 0,
-            'stockingCap' : 0,
-            'topHatBlue' : 0,
-            'topHatRed' : 0,
-            'topHatYellow' : 0,
-            'witchBlack' : 0,
-            'witchBrown' : 0,
-            'witchStraw' : 0,
-            'bandannaBlue' : 0,
-            'bandannaRed' : 0,
-            'mask' : 0,
-            'smoking' : 0,
-            'smokingCigar' : 0,
-            'smokingPipe' : 0,
-            'tongue' : 0,
-            'tongueFly' : 0,
-            'tongueSpider' : 0,
-            'tongueSpiderRed' : 0,
-            'closedEyes' : 0,
-            'croaking' : 0,
-            'inversedEyes' : 0,
-            'peace' : 0,
-            'thirdEye' : 0,
-            'blue(2)' : 0,
-            'blue' : 0,
-            'brown' : 0,
-            'cyan' : 0,
-            'darkGreen' : 0,
-            'green' : 0,
-            'orange(2)' : 0,
-            'orange' : 0,
-            'pink' : 0,
-            'purple(2)' : 0,
-            'purple' : 0,
-            'red(2)' : 0,
-            'red' : 0,
-            'sand' : 0,
-            'white(2)' : 0,
-            'white' : 0,
-            'yellow(2)' : 0,
-            'yellow' : 0
-          } // Start at 0
-
-          // event listeners
-          document.querySelector("#morphFrogs").addEventListener("click", async (e) => {
-              switch_base_sub();
-          })
-          document.querySelector("#selectBase").addEventListener("click", async (e) => {
-            document.getElementById("Frog #"+base_frog+"Desc").scrollIntoView({
-              behavior: 'smooth',
-              block: 'center',
-              inline: 'center'
-            });
-          })
-          document.querySelector("#selectSub").addEventListener("click", async (e) => {
-            document.getElementById("Frog #"+sub_Frog+"Desc").scrollIntoView({
-              behavior: 'smooth',
-              block: 'center',
-              inline: 'center'
-            });
-          })
-
-          // Connected! Begin loading Frogs!
-          // Display Two Random Frogs!
-          //combineTokens(baseFrog, subFrog);
-          if (ownedFrogs <= 0) { // ❌ No FROGS
+        if (ownedFrogs <= 0) { // ❌ No FROGS
             //document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i>"+addressCut+" ✓</i></b>"+"<br>❌ It seems you do not own any FROGS!<br>\n<br>"
             consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS!<br>'+'<p></p>')
           } else {
             //document.getElementById('netStatus').innerHTML = 'Loading Frogs from ΞEthereum... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br><br>';
             consoleOutput('<br>'+'<strong>Connected!</strong> Loading Frogs from OpenSea... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
-
-            document.getElementById('thePad').innerHTML = 
-
-              '<div id="stats" class="mintingTextWhite" style="border-radius: 5px !important; padding: 0px !important;">' +
-              ' <img id="banner_image" src="../assets/frogs/backfrogs.png"/><br>' +
-              ' <div style="padding: 4px !important;">' +
-              '    <a href="https://opensea.io/collection/fresh-frogs" target="_blank"><h3 id="name">Fresh Frogs NFT</h3></a>' +
-              '    <p>Items: <b id="count"></b> | Owners: <b id="num_owners"></b> | Market Cap: <b id="market_cap"></b> | Floor Price: <b id="floor_price"></b></p>' +
-              '    <p id="description" style="color: #333 !important;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more! A portion of every re-sale will be donated to The Rainforest Foundation</p>' +
-              ' </div>' +
-              '</div>';
-
-            // OPEN SEA API
-
-            const options = {
-              method: 'GET',
-              headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
-            };
-
-            fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
-            .then(collection => collection.json())
-            .then(collection => {
-
-              var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
-
-              traits_list = traits;
-
-              document.getElementById('banner_image').setAttribute('src', banner_image_url)
-              document.getElementById('name').innerHTML = name
-              document.getElementById('description').innerHTML = description
-              document.getElementById('count').innerHTML = count
-              document.getElementById('num_owners').innerHTML = num_owners
-              document.getElementById('market_cap').innerHTML = market_cap.toFixed(2)+' Ξ'
-              document.getElementById('floor_price').innerHTML = floor_price+' Ξ'
-
-            })
-            .catch(e => {
-
-                console.log('Error: Could not get Collection data from Opensea.');
-                console.error('Error : ' + e.message)
-          
-            }); // End data pull / first paid Frog 3,236 
-
-            fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
-            .then((res) => res.json())
-            .then((res) => {
-              var { assets } = res
-              assets.forEach((frog) => { // For Each FROG
-                var { name, token_metadata, permalink, traits } = frog
-
-                // Attribute Rarities
-                //console.log('Loading... '+name);
-                for (var i = 0; i < traits.length; i++) {
-                 attributesTotal[traits[i].value] = traits[i].trait_count
-                }
-
-                let thisToken = frog.name.replace('Frog #', '');
-                //
-                loadFreshFrog(thisToken);
-                openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
-                document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a class="pointer" href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+frog.name+'</u></b> ↗️'+'</a>';
-
-                // Progress Bar!
-                percent = parseInt((thisToken/ownedFrogs)*100);
-                document.getElementById("progress").innerHTML = percent+"%"
-                elem = document.getElementById("myBar");
-                width = percent
-                width++;
-                elem.style.width = width + "%";
-                
-                fetch(token_metadata)
-                .then((metadata) => metadata.json())
-                .then((metadata) => {
-                  // Loop Attributes
-                  for (var i = 0; i < metadata.attributes.length; i++){
-                    //console.log(metadata.attributes[i]);
-
-                    // Trait_Type : Value
-                    var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
-                    let trait_type = attribute.trait_type
-                    let value = attribute.value
-                    let trait_rarity = ((attributesTotal[value]/nextIdC)*100).toFixed(0);
-
-                    
-                    if (trait_rarity < 1) {
-                      trait_rarity = '<1';
-                    }
-
-                    // Build Fresh Frogs Attributes
-                    loadAttribute(trait_type, value, frog.name)
-                    newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
-                    if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
-                      else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
-                    newAttribute.className = value;
-                    space = document.createElement('br')
-                    document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
-                    document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute)
-                    
-                  }
-                })
-              })
-
-              // Finish Loading Bar
-              percent = 100;
-              document.getElementById("progress").innerHTML = percent+"%"
-              elem = document.getElementById("myBar");
-              width = percent
-              width++;
-              elem.style.width = width + "%";
-              consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
-
-            })
-            .catch(e => {
-
-                console.log('Error: Could not get Collection data from Opensea.');
-                consoleOutput('<br>'+'<strong>Connected!</strong> Could not talk to OpenSea! <br>Loading Frogs from IPFS... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
-                load_ownedFrogs_manual()
-          
-            });
-          }
-        } catch (e) { // Failed; Send Error Code!
-          console.log('bad')
-          console.log(e.message)
+            fetch_tokens(userAddress)
         }
-      })
-      // Round to Hundredth place
-      const roundToHundredth = (value) => {
-        return Number(value.toFixed(2));
-      };
 
+      })
+
+      function consoleOutput(output) {
+        document.getElementById("pre").innerHTML = output
+      }
+
+      function load_trait(trait, attribute, where) {
+        newAttribute = document.createElement("img")
+        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
+        newAttribute.id = attribute
+        newAttribute.target = "_blank"
+        if (where == 'frogContainer3') {
+          newAttribute.className = "frogImg3" //shadesAnimation
+        } else {
+          newAttribute.className = "frogImg2" //shadesAnimation
+        }
+        
+        newAttribute.style.cursor = "pointer"
+        if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+"2.gif"
+        } else if (attribute === "morphAnimation") {
+          newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
+        } else if (attribute === "shadesAnimation") {
+          newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
+        } else {
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
+        }
+        newAttribute.alt = attribute
+        document.getElementById(where).appendChild(newAttribute)
+      }
+
+      // Select Frog
+      async function display_token(token){
+
+          display_frog = 'https://freshfrogs.io/frog/'+token+'.png'
+          display_name = 'Frog #'+token
+          display_os = ''
+
+          document.getElementById('thisheader').style.backgroundImage = 'url('+display_frog+')';
+          document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
+
+          document.getElementById('previewImg').setAttribute('src', display_frog)
+          document.getElementById('display_name').innerHTML = display_name
+
+          openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
+          etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
+          document.getElementById('selectSub').setAttribute('href', openSeaLink)
+          document.getElementById('selectBase').setAttribute('href', etherscanLink)
+
+          let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
+          for (var i = 0; i < token_metadata.attributes.length; i++){
+              var data = token_metadata.attributes[i]
+              //loadAttribute(data.trait_type, data.value, 'subDisplay')
+              if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
+                document.getElementById('display_type').innerHTML = data.value.slice(0, 10)+'..'
+              }
+          }
+          
+      }
+
+      // Load Fresh Frog
+      function load_token(token) {
+
+        openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
+        etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
+
+        newFrog = document.createElement("div")
+        newFrog.onclick = function() { display_token(token) }
+        newFrog.id = token
+        newFrog.className = 'frogPanel'
+        newFrog.innerHTML = '<a style="margin-bottom" 0px !important;  display: inline !important;" class="smallContainer2 pointer2" id="Frog #'+token+'"><img class="frogImg3" src="https://freshfrogs.io/frog/'+token+'.png"/></a>'+'<p class="attributeList" id="Frog #'+token+'Desc"></p>'
+        document.getElementById("thePad").appendChild(newFrog)
+
+        document.getElementById('Frog #'+token+'Desc').innerHTML = '<a class="pointer" href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>Frog #'+token+'</u></b> ↗️'+'</a>';
+
+      }
 
       // Manually check Frog transactions
       async function load_ownedFrogs_manual() {
 
-          let this_user = userAcc;
+          let this_user = userAddress;
 
           console.log('Checking Frogs Manually.. for user...'+this_user)
 
@@ -928,7 +741,7 @@
 
                       console.log(thisToken)
 
-                      loadFreshFrog(thisToken);
+                      load_token(thisToken);
                       loaded = loaded + 1
                       openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
                       document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a class="pointer" href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+'Frog #'+thisToken+'</u></b> ↗️'+'</a>';
@@ -945,11 +758,11 @@
                           //console.log(data.trait_type+": "+data.value)
                           trait_type = trait = data.trait_type
                           value = attribute = data.value
-                          trait_rarity = 'i'
+                          trait_rarity = 'n'
                           
                           let here = 'Frog #'+thisToken
 
-                          loadAttribute(trait_type, value, here)
+                          load_trait(trait_type, value, here)
 
                           newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
                           if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
@@ -969,406 +782,107 @@
               width = percent
               width++;
               elem.style.width = width + "%";
-              consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
+              consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAddress)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
           } catch (e) {
               console.log("Something went wrong, refresh the page!"+e.message)
               //document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ❌ '+loadedFrogs+'/'+ownedFrogs+' FROG(s) loaded!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'
           }
       }
 
-      // Load Fresh Frog
-      function loadFreshFrog(tokenID) {
-        newFrog = document.createElement("div")
-        newFrog.onclick = function() {
+      async function fetch_tokens(from_address) {
 
-          var this_frog = event.currentTarget.id
+        // Pull Collection data from OpenSea
 
-          var this_frog_ID = 'Frog #'+this_frog+'Desc'
+        const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
 
-          if (!base_frog && sub_frog !== this_frog) { // SELECT BASE
+        fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
+        .then(collection => collection.json())
+        .then(collection => {
 
-              selectBaseFrog(this_frog);
-              return
-              
-          } else if (this_frog == base_frog) { // UN-SELECT BASE
+            var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
 
-              document.getElementById('baseText').innerHTML = 'Select Frog'
-              document.getElementById(this_frog_ID).style.boxShadow = 'none'
-              base_frog = false;
-              return
+            traits_list = traits;
 
-          } else if (!sub_frog && base_frog !== this_frog) { // SELECT SUB
+            console.log(traits_list)
 
-              selectSubFrog(this_frog);
-              
-              return
+        })
+        .catch(e => {
 
-          } else if (this_frog == sub_frog) { // UN-SELECT SUB
-
-              document.getElementById('subText').innerHTML = 'Select Frog'
-              document.getElementById(this_frog_ID).style.boxShadow = 'none'
-              sub_frog = false;
-              return
-
-          } else { return }
-        }
-        newFrog.id = tokenID
-        newFrog.className = 'frogPanel'
-        newFrog.innerHTML = '<a class="smallContainer2 pointer" id="Frog #'+tokenID+'"></a>'+'<p class="attributeList" id="Frog #'+tokenID+'Desc"></p>'
-        document.getElementById("thePad").appendChild(newFrog)
-      }
-      // Output to minting terminal
-      function consoleOutput(output) {
-        document.getElementById("pre").innerHTML = output
-      }
-      // Function Learn More Frog Morph
-      //function learnMore() {
-      //  document.getElementById("learnMoreFM").className = "learnMoreFM"
-      //  document.getElementById("learnMoreFM").innerHTML = "<b><u>Does this make a NEW NFT?</u></b>"+"<br><b>Not YET!</b> However, once the full collection has been minted, this will become a feature that DOES generate a (N)ew (F)rog (T)oken!"
-      //}
-      // Function Scroll to Frog 
-      function frogIndexer() {
-        var frogID;
-        frogID = document.getElementById("frogIndex").value;
-        // FIND FROG
-        //alert(frogID);
-        document.getElementById("Frog #"+frogID).scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-          inline: 'center'
-        });
-      }
-
-      // Load attribute
-      function loadAttribute(trait, attribute, where) {
-        newAttribute = document.createElement("img")
-        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
-        newAttribute.id = attribute
-        newAttribute.target = "_blank"
-        if (where == 'frogContainer3') {
-          newAttribute.className = "frogImg3" //shadesAnimation
-        } else {
-          newAttribute.className = "frogImg2" //shadesAnimation
-        }
-        
-        newAttribute.style.cursor = "pointer"
-        if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") { 
-          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
-        } else if (attribute === "morphAnimation") {
-          newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
-        } else if (attribute === "shadesAnimation") {
-          newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
-        } else {
-          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
-        }
-        newAttribute.alt = attribute
-        document.getElementById(where).appendChild(newAttribute)
-      }
-      function getRandomArbitrary(min, max) {
-          return Math.random() * (max - min) + min;
-      }
-
-      // Select subFrog
-      async function selectSubFrog(selected_sub){
-
-          sub_frog = selected_sub
-
-          sub_frog_ID = 'Frog #'+selected_sub+'Desc'
-
-          document.getElementById('subText').innerHTML = 'Frog #'+sub_frog
-
-          document.getElementById(sub_frog_ID).style.boxShadow = '0px 0px 6px 6px lightsalmon'
-          
-          document.getElementById("sub_frog_img").setAttribute('src', 'https://freshfrogs.io/frog/'+sub_frog+'.png')
-
-          let subFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+selected_sub+".json")).json();
-          for (var i = 0; i < subFrogmetadata.attributes.length; i++){
-              var data = subFrogmetadata.attributes[i]
-              //loadAttribute(data.trait_type, data.value, 'subDisplay')
-          }
-
-          if (!base_frog || !sub_frog) {
-              return
-          } else {
-              combineTokens(base_frog, sub_frog);
-              return
-          }
-          
-      }
-
-      // Switch Frogs
-      function switch_base_sub() {
-
-          if (!base_frog || !sub_frog) {
-
-              return
-
-          } else {
-
-              var base_i = base_frog;
-              var sub_i = sub_frog;
-
-              base_frog = false;
-              sub_frog = false;
-
-              selectBaseFrog(sub_i)
-              selectSubFrog(base_i)
-
-          }
-
-      }
-
-      function randomIntFromInterval(min, max) { // min and max included 
-          return Math.floor(Math.random() * (max - min + 1) + min)
-      }
+            console.log('Error: Could not get Collection data from Opensea.');
+            console.error('Error : ' + e.message)
       
-      // Switch Frogs
-      function switch_base_sub() {
+        }); // End data pull / first paid Frog 3,236
 
-          if (!base_frog || !sub_frog) {
+        fetch('https://api.opensea.io/api/v1/assets?owner='+from_address+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+        .then((res) => res.json())
+        .then((res) => {
+          loaded = 0;
+          var { assets } = res
+          console.log(assets)
+          assets.forEach((frog) => {
 
-              return
+            // Progress Bar!
+            loaded = loaded + 1;
+            percent = parseInt((loaded/ownedFrogs)*100);
+            document.getElementById("progress").innerHTML = percent+"%"
+            elem = document.getElementById("myBar");
+            width = percent
+            width++;
+            elem.style.width = width + "%";
 
-          } else {
+            var { name, token_metadata, permalink, traits, external_link, token_id } = frog
 
-              var base_i = base_frog;
-              var sub_i = sub_frog;
+            load_token(token_id);
 
-              base_frog = false;
-              sub_frog = false;
+            fetch(token_metadata)
+            .then((metadata) => metadata.json())
+            .then((metadata) => {
+              // Loop Attributes
+              for (var i = 0; i < metadata.attributes.length; i++){
+                //console.log(metadata.attributes[i]);
 
-              selectBaseFrog(sub_i)
-              selectSubFrog(base_i)
+                // Trait_Type : Value
+                var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                let trait_type = attribute.trait_type
+                let value = attribute.value
 
-          }
+                try { var trait_rarity = ((traits_list[trait_type][value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'i'}
+                
+                if (trait_rarity == 'NaN' || trait_rarity < 1) { trait_rarity = '<1' }
 
-      }
-      // Select baseFrog
-      async function selectBaseFrog(selected_base){
-
-          base_frog = selected_base;
-
-          base_frog_ID = 'Frog #'+selected_base+'Desc'
-
-          document.getElementById('baseText').innerHTML = 'Frog #'+base_frog
-
-          document.getElementById(base_frog_ID).style.boxShadow = '0px 0px 6px 6px lightcoral'
-
-          document.getElementById("base_frog_img").setAttribute('src', 'https://freshfrogs.io/frog/'+base_frog+'.png')
-
-          let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+selected_base+".json")).json();
-          for (var i = 0; i < baseFrogmetadata.attributes.length; i++){
-              var data = baseFrogmetadata.attributes[i]
-              //loadAttribute(data.trait_type, data.value, 'baseDisplay')
-              console.log(data.trait_type+' : '+data.value)
-          }
-
-          if (!base_frog || !sub_frog) {
-              return
-          } else {
-              combineTokens(base_frog, sub_frog);
-              return
-          }
-      }
-
-      // Function combine tokens
-      async function combineTokens(baseFrog, otherFrog) {
-          
-          var useGIF = undefined;
-          var baseFrog_Frog, baseFrog_SpecialFrog, baseFrog_Trait, baseFrog_Accessory, baseFrog_Eyes, baseFrog_Hat, baseFrog_Mouth = undefined;
-          var otherFrog_Frog, otherFrog_SpecialFrog, otherFrog_Trait, otherFrog_Accessory, otherFrog_Eyes, otherFrog_Hat, otherFrog_Mouth = undefined;
-
-          let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseFrog+".json")).json();
-
-          for (var baseFrogi = 0; baseFrogi < baseFrogmetadata.attributes.length; baseFrogi++) {
-
-              var data = baseFrogmetadata.attributes[baseFrogi]
-
-              if (data.trait_type == "Frog") {
-                  var baseFrog_Frog = data.value;
-              } else if (data.trait_type == "SpecialFrog") {
-                  var baseFrog_SpecialFrog = data.value;
-                  console.log(baseFrog_SpecialFrog)
-              } else if (data.trait_type == "Trait") {
-                  var baseFrog_Trait = data.value;
-              } else if (data.trait_type == "Accessory") {
-                  var baseFrog_Accessory = data.value;
-              } else if (data.trait_type == "Eyes") {
-                  var baseFrog_Eyes = data.value;
-              } else if (data.trait_type == "Hat") {
-                  var baseFrog_Hat = data.value;
-              } else if (data.trait_type == "Mouth") {
-                  if (data.value === "smoking" || data.value === "smokingPipe" || data.value === "smokingCigar") {
-                      var baseFrog_Mouth = data.value+"2";
-                  } else {
-                      var baseFrog_Mouth = data.value;
-                  }
+                // Build Fresh Frogs Attributes
+                load_trait(trait_type, value, frog.name)
+                newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
+                if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
+                  else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
+                newAttribute.className = value;
+                space = document.createElement('br')
+                document.getElementById('Frog #'+token_id+'Desc').appendChild(space)
+                document.getElementById('Frog #'+token_id+'Desc').appendChild(newAttribute)
+                
               }
-          }
+            })
 
-          let otherFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+otherFrog+".json")).json();
+          })
 
-          for (var otherFrogi = 0; otherFrogi < otherFrogmetadata.attributes.length; otherFrogi++){
-              var data2 = otherFrogmetadata.attributes[otherFrogi]
+          // Finish Loading Bar
+          percent = 100;
+          document.getElementById("progress").innerHTML = percent+"%"
+          elem = document.getElementById("myBar");
+          width = percent
+          width++;
+          elem.style.width = width + "%";
+          consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAddress)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
 
-              if (data2.trait_type == "Frog") {
-                  var otherFrog_Frog = data2.value;
-                  console.log(baseFrog_SpecialFrog + ' ' + otherFrog_Frog)
-                  if (baseFrog_SpecialFrog == "peace" && otherFrog_Frog == "tomatoFrog") {
-                    baseFrog_SpecialFrog = "/peace/peaceTomatoFrog"
-                    console.log('tomato Peace Frog')
-                  }
-              } else if (data2.trait_type == "SpecialFrog") {
-                  var otherFrog_SpecialFrog = data2.value;
-                  if (data2.value == "thirdEye") {
-                      if (typeof baseFrog_SpecialFrog !== "undefined") {
-                          var otherFrog_Trait = "thirdEye/baseSpecial"
-                      } else {
-                          var otherFrog_Trait = "thirdEye/base"
-                      }
-                  } else if (typeof baseFrog_SpecialFrog !== "undefined") {
-                      if (baseFrog_SpecialFrog == "thirdEye" && otherFrog_SpecialFrog == "inversedEyes") {
-                          var otherFrog_Trait = baseFrog_SpecialFrog+"/baseInversed"
-                      } else if (baseFrog_SpecialFrog == "peace" && otherFrog_SpecialFrog == "closedEyes") {
-                          var baseFrog_SpecialFrog = "peace/peaceClosedEyes"
-                          var otherFrog_Trait = "special/sand";
-                      } else {
-                          var otherFrog_Trait = "special/sand";
-                      }
-                  } else {
-                      var otherFrog_Trait = "sand";
-                  }
-                  
-              } else if (data2.trait_type == "Trait") { // <--TRAITS
-                  if (typeof baseFrog_SpecialFrog !== "undefined") { // Adapt trait for special Frogs
-                      if (baseFrog_SpecialFrog === "inversedEyes") {
-                          var otherFrog_Trait = "special/"+data2.value
-                      } else if (baseFrog_SpecialFrog === "closedEyes") {
-                          var otherFrog_Trait = "special/"+data2.value
-                      } else if (baseFrog_SpecialFrog.includes("peace")) {
-                          var otherFrog_Trait = "peace/"+data2.value
-                      } else { 
-                          var otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
-                      }
-                      if (data2.value == "natural") {
-                          if (baseFrog_SpecialFrog === "inversedEyes") {
-                              var otherFrog_Trait = "natural/special/"+otherFrog_Frog
-                          } else if (baseFrog_SpecialFrog === "closedEyes") {
-                              var otherFrog_Trait = "natural/special/"+otherFrog_Frog
-                          } else { //alert ("baseFrog_SpecialFrog")
-                              var otherFrog_Trait = "natural/"+baseFrog_SpecialFrog+"/"+otherFrog_Frog
-                          }
-                      }
-                  } else if (typeof baseFrog_Frog !== "undefined") { // Regular Frog; continue
-                      if (data2.value == "natural") {
-                          var otherFrog_Trait = "natural/"+otherFrog_Frog
-                      } else {
-                          var otherFrog_Trait = data2.value;
-                      }
-                  }
-              } else if (data2.trait_type == "Accessory") {
-                  var otherFrog_Accessory = data2.value;
-              } else if (data2.trait_type == "Eyes") { // shadesAnimation
-                  var otherFrog_Eyes = data2.value;
-              } else if (data2.trait_type == "Hat") {
-                  var otherFrog_Hat = data2.value;
-              } else if (data2.trait_type == "Mouth") {
-                  if (data2.value === "smoking" || data2.value === "smokingPipe" || data2.value === "smokingCigar") {
-                      var otherFrog_Mouth = data2.value+"2";
-                  } else {
-                      var otherFrog_Mouth = data2.value;
-                  }
-              }
-          }
+        })
+        .catch(e => {
 
-          thisPlace = 'frogContainer3';
-          var thisPlace_div = document.getElementById(thisPlace)
-          thisPlace_div.style.background = '#99ffb3'
-          thisPlace_div.style.width = '256px'
-          thisPlace_div.style.height = '128px'
-          thisPlace_div.innerHTML = ''
-
-          //'Frog #'+ base_frog + ' + ' + sub_frog + '<hr>'
-
-          // Frog
-          if (typeof baseFrog_Frog !== 'undefined') {
-              loadAttribute("Frog", baseFrog_Frog, thisPlace)
-              // Trait
-              if (typeof otherFrog_Trait !== 'undefined') {
-                  loadAttribute("Trait", otherFrog_Trait, thisPlace)
-              } else if (typeof baseFrog_Trait !== 'undefined') {
-                  loadAttribute("Trait", baseFrog_Trait, thisPlace)
-              }
-              // Accessory
-              if (typeof baseFrog_Accessory !== 'undefined') {
-                  loadAttribute("Accessory", baseFrog_Accessory, thisPlace)
-              } else if (typeof otherFrog_Accessory !== 'undefined') {
-                  loadAttribute("Accessory", otherFrog_Accessory, thisPlace)
-              }
-              // Eyes
-              if (typeof baseFrog_Eyes !== 'undefined') {
-                      loadAttribute("Eyes", baseFrog_Eyes, thisPlace)
-                  if (baseFrog_Eyes === "shades" || baseFrog_Eyes === "shadesPurple" || baseFrog_Eyes === "shadesThreeD" || baseFrog_Eyes === "shadesWhite") {
-                      loadAttribute("Eyes", "shadesAnimation", thisPlace)
-                  }
-              } else if (typeof otherFrog_Eyes !== 'undefined') {
-                      loadAttribute("Eyes", otherFrog_Eyes, thisPlace)
-                  if (otherFrog_Eyes === "shades" || otherFrog_Eyes === "shadesPurple" || otherFrog_Eyes === "shadesThreeD" || otherFrog_Eyes === "shadesWhite") {
-                      loadAttribute("Eyes", "shadesAnimation", thisPlace)
-                  }
-              }
-              // Hat
-              if (typeof baseFrog_Hat !== 'undefined') {
-                  loadAttribute("Hat", baseFrog_Hat, thisPlace)
-              } else if (typeof otherFrog_Hat !== 'undefined') {
-                  loadAttribute("Hat", otherFrog_Hat, thisPlace)
-              }
-              // Mouth
-              if (typeof baseFrog_Mouth !== 'undefined') {
-                  loadAttribute("Mouth", baseFrog_Mouth, thisPlace)
-              } else if (typeof otherFrog_Mouth !== 'undefined') {
-                  loadAttribute("Mouth", otherFrog_Mouth, thisPlace)
-              }
-          // Special Frog
-          } else if (typeof baseFrog_SpecialFrog !== 'undefined') {
-              loadAttribute("SpecialFrog", baseFrog_SpecialFrog, thisPlace)
-              if (typeof otherFrog_Trait !== 'undefined') {
-                  loadAttribute("Trait", otherFrog_Trait, thisPlace)
-              } else if (typeof baseFrog_Trait !== 'undefined') {
-                  loadAttribute("Trait", baseFrog_Trait, thisPlace)
-              }
-              // Accessory
-              if (typeof baseFrog_Accessory !== 'undefined') {
-                  loadAttribute("Accessory", baseFrog_Accessory, thisPlace)
-              } else if (typeof otherFrog_Accessory !== 'undefined') {
-                  loadAttribute("Accessory", otherFrog_Accessory, thisPlace)
-              }
-              // Eyes
-              if (typeof baseFrog_Eyes !== 'undefined') {
-                      loadAttribute("Eyes", baseFrog_Eyes, thisPlace)
-                  if (baseFrog_Eyes === "shades" || baseFrog_Eyes === "shadesPurple" || baseFrog_Eyes === "shadesThreeD" || baseFrog_Eyes === "shadesWhite") {
-                      loadAttribute("Eyes", "shadesAnimation", thisPlace)
-                  }
-              } else if (typeof otherFrog_Eyes !== 'undefined') {
-                      loadAttribute("Eyes", otherFrog_Eyes, thisPlace)
-                  if (otherFrog_Eyes === "shades" || otherFrog_Eyes === "shadesPurple" || otherFrog_Eyes === "shadesThreeD" || otherFrog_Eyes === "shadesWhite") {
-                      loadAttribute("Eyes", "shadesAnimation", thisPlace)
-                  }
-              }
-              // Hat
-              if (typeof baseFrog_Hat !== 'undefined') {
-                  loadAttribute("Hat", baseFrog_Hat, thisPlace)
-              } else if (typeof otherFrog_Hat !== 'undefined') {
-                  loadAttribute("Hat", otherFrog_Hat, thisPlace)
-              }
-              // Mouth
-              if (typeof baseFrog_Mouth !== 'undefined') {
-                  loadAttribute("Mouth", baseFrog_Mouth, thisPlace)
-              } else if (typeof otherFrog_Mouth !== 'undefined') {
-                  loadAttribute("Mouth", otherFrog_Mouth, thisPlace)
-              }
-          }
-//          document.getElementById('morph_float').innerHTML = document.getElementById('frogContainer3').innerHTML
+          console.log(e.message);
+          console.log('Error: Could not get Collection data from Opensea.');
+          consoleOutput('<br>'+'<strong>Connected!</strong> Could not talk to OpenSea! <br>Loading Frogs from IPFS... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
+          load_ownedFrogs_manual()
+      
+        });
       }
 
       function truncateAddress(address) {
@@ -1380,27 +894,26 @@
           address.length
         )}`;
       }
+
+
     </script>
   </head>
   <body class="bodyb">
     <div class="wrapper">
-      <header>
+      <header id="thisheader">
         <div class="downloads pre">
           <ul class="downloads2">
-            <li><a id="morphFrogs" class="pointer"><strong>🡲</strong><strong>🡰</strong></a></li>
-            <li><a id="selectBase" class="pointer"><strong>Base</strong><frog id="baseText">Select FROG</frog></a></li>
-            <li><a id="selectSub" class="pointer"><strong>Sub</strong><frog id="subText">Select FROG</frog></a></li>
+            <li><a id="morphFrogs" class="pointer"><strong id="display_name">Fresh Frogs</strong><div id="display_type">ΞEthereum</div></a></li>
+            <li><a id="selectBase" class="pointer" href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><strong>View on</strong><frog id="baseText">Etherscan</frog></a></li>
+            <li><a id="selectSub" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>View on</strong><frog id="subText">OpenSea</frog></a></li>
           </ul>
           <br>
           <div id="mintingTray" class="mintingTray">
             <div class="bigContainer">
-              <div id="frogContainer" class="containerMint"></div>
-              <div id="frogContainer2" class="containerMint">
-                <div class="imgWrapperMint"><img id="base_frog_img" class="frogImgMint" src="https://freshfrogs.io/frog/606.png"/></div>
-                <div class="imgWrapperMint"><img id="sub_frog_img" class="frogImgMint" src="https://freshfrogs.io/frog/407.png"/></div>
-              </div>
-              <div id="frogContainer3" class="containerMint"><div class="imgWrapperMint">
-                <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/morph-preview.png"/></div>
+              <div id="frogContainer3" class="containerMint">
+                <div class="imgWrapperMint">
+                  <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/FLY.gif"/>
+                </div>
               </div>
             </div>
           </div>
