@@ -368,8 +368,8 @@
     image-rendering: pixelated;
     overflow: hidden;
     position: absolute;
-    width: 128px;
-    height: 128px;
+    width: 256px;
+    height: 256px;
     border-radius: 5px;
   }
   .frogImg3 {
@@ -915,8 +915,8 @@
                   else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
                 newAttribute.className = value;
                 space = document.createElement('br')
-                //document.getElementById('Frog #'+token_id+'Desc').appendChild(space)
-                //document.getElementById('Frog #'+token_id+'Desc').appendChild(newAttribute)
+                document.getElementById('Frog #'+token_id+'Desc').appendChild(space)
+                document.getElementById('Frog #'+token_id+'Desc').appendChild(newAttribute)
                 
               }
             })
