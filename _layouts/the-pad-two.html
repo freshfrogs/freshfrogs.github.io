@@ -564,6 +564,37 @@
     image-rendering: auto;
     overflow: hidden;
   }
+  .owned_frog {
+        text-align: center;
+        vertical-align: center;
+        width: 100%;
+        height: 100%;
+        margin: 4px;
+        border-radius: 5px;
+        border: solid 1px lightgrey;
+        overflow: hidden;
+        transition: box-shadow .2s;
+        cursor: pointer;
+    }
+    .owned_frog:hover{
+        box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);
+    }
+    .label_name {
+        text-align: left;
+        float: left;
+        margin-left: 2.5%;
+        padding: 5%;
+        padding-bottom: 0%;
+        color: gray;
+    }
+    .frog_name {
+        text-align: left;
+        font-weight: bold;
+        float: left;
+        padding: 5%;
+        padding-top: 0%;
+        margin-left: 2.5%;
+    }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -609,6 +640,8 @@
           nextId = await f0.api.nextId().call();
           nextIdC = parseInt(nextId);
 
+          document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
+
         } catch (e) { console.log(e.message); }
 
         console.log('Connected : '+userAddress)
@@ -620,9 +653,53 @@
             //document.getElementById('netStatus').innerHTML = 'Loading Frogs from ΞEthereum... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br><br>';
             consoleOutput('<br>'+'<strong>Connected!</strong> Loading Frogs from OpenSea... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
             fetch_tokens(userAddress)
+            //fetch_random_tokens(9)
         }
 
       })
+
+      async function load_ownedFrogs() {
+
+          const options = {
+              method: 'GET',
+              headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
+          };
+
+          document.getElementById('thePad').innerHTML = ''
+
+          fetch('https://api.opensea.io/api/v1/assets?owner='+userAddress+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+          .then((res) => res.json())
+          .then((res) => {
+
+              var { assets } = res
+              assets.forEach((frog) => { // For Each FROG
+
+
+                      var { name, token_metadata, permalink, traits, external_link, token_id } = frog
+
+                      owned_frog = document.createElement('a');
+                      owned_frog.id = name
+                      owned_frog.className = 'owned_frog';
+                      owned_frog.style.width = 128+'px';
+                      owned_frog.innerHTML = 
+                          '<img class="frog_img" src='+external_link+'>' +
+                          '<i class="label_name">Fresh Frogs NFT</i>' +
+                          '<b class="frog_name">'+name+'</b>';
+                      document.getElementById('owned-frogs').appendChild(owned_frog);
+                  
+              })
+          })
+          .catch(e => {
+              document.getElementById('button_ownedfrogs').innerHTML = 'No Frogs Found :(';
+              console.log('Could not get assets from Opensea : ' + e.message)
+          })
+      }
+
+      function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
 
       function consoleOutput(output) {
         document.getElementById("pre").innerHTML = output
@@ -789,6 +866,57 @@
           }
       }
 
+      async function fetch_random_tokens(how_many) {
+
+        const options = {method: 'GET'};
+
+        for (var i = 1; i < how_many; i++) {
+
+          frog = getRandomInt(i, nextIdC)
+
+          fetch('https://api.opensea.io/api/v1/asset/'+CONTRACT_ADDRESS+'/'+frog+'/?include_orders=false', options)
+          .then(response => response.json())
+          .then(frog => {
+            var { name, token_metadata, permalink, traits, external_link, token_id } = frog
+            
+            load_token(token_id);
+
+            fetch(token_metadata)
+            .then((metadata) => metadata.json())
+            .then((metadata) => {
+              // Loop Attributes
+              for (var i = 0; i < metadata.attributes.length; i++){
+                //console.log(metadata.attributes[i]);
+
+                // Trait_Type : Value
+                var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                let trait_type = attribute.trait_type
+                let value = attribute.value
+
+                try { var trait_rarity = ((traits_list[trait_type][value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'i'}
+                
+                if (trait_rarity == 'NaN' || trait_rarity < 1) { trait_rarity = '<1' }
+
+                // Build Fresh Frogs Attributes
+                load_trait(trait_type, value, frog.name)
+                newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
+                if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
+                  else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
+                newAttribute.className = value;
+                space = document.createElement('br')
+                //document.getElementById('Frog #'+token_id+'Desc').appendChild(space)
+                //document.getElementById('Frog #'+token_id+'Desc').appendChild(newAttribute)
+                
+              }
+            })
+
+          })
+          .catch(err => console.error(err));
+
+        }
+
+      }
+
       async function fetch_tokens(from_address) {
 
         // Pull Collection data from OpenSea
@@ -926,9 +1054,9 @@
             <img src="../assets/frogs/websiteBannerFinal_2.png" style="border-radius: 5px; height: auto !important; width: 100% !important; margin-bottom: 14px; transform: scale(1.01);">
             <br>
             <h2 style="color: white !important;"><b>freshfrogs.io/the-pad🍀</b></h2>
-            Connect to view FROG tokens...
-            <b><a class="pointer" href="https://freshfrogs.io/the-pad">Connect Wallet</a></b>
+            <br>Connect to view Frog tokens...<a class="pointer" href="https://freshfrogs.io/the-pad"><b id="connected">Connect Wallet</b></a>
             <hr class="hr2">Mint from the collection...<a class="pointer" href="https://freshfrogs.io/"><b>🐸 Minting Terminal</b> ↗️</a>
+            <hr class="hr2">Fresh Frogs NFT Exclusive<a class="pointer" href="https://discord.gg/xWMFWgpvd3" target="_blank"><b>🔹 Discord Server</b> ↗️</a>
             <br>
             <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a></div>
           </div>
