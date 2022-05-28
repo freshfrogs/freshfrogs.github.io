@@ -674,7 +674,7 @@
           let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
           for (var i = 0; i < token_metadata.attributes.length; i++){
               var data = token_metadata.attributes[i]
-              loadAttribute(data.trait_type, data.value, 'frogContainer3')
+              load_trait(data.trait_type, data.value, 'frogContainer3')
               if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
                 document.getElementById('display_type').innerHTML = data.value.slice(0, 10)+'..'
               }
