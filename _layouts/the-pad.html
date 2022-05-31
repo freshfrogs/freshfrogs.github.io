@@ -748,8 +748,6 @@
 
                   if (this_user === owner.toLowerCase()) {
 
-                      console.log(thisToken)
-
                       load_token(thisToken);
                       loaded = loaded + 1
                       openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
@@ -825,7 +823,7 @@
                 let trait_type = attribute.trait_type
                 let value = attribute.value
 
-                try { var trait_rarity = ((traits_list[trait_type][value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'i'}
+                try { var trait_rarity = ((traits_list[trait_type][value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'i';}
                 
                 if (trait_rarity == 'NaN' || trait_rarity < 1) { trait_rarity = '<1' }
 
@@ -863,8 +861,6 @@
 
             traits_list = traits;
 
-            console.log(traits_list)
-
         })
         .catch(e => {
 
@@ -878,7 +874,6 @@
         .then((res) => {
           loaded = 0;
           var { assets } = res
-          console.log(assets)
           assets.forEach((frog) => {
 
             // Progress Bar!
