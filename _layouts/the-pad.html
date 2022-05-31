@@ -600,7 +600,7 @@
             network: NETWORK
           })
 
-          userAddress = web3.currentProvider.selectedAddress;
+          userAddress = await web3.currentProvider.selectedAddress;
           userInviteList = await f0.myInvites();
           userInviteKeys = Object.keys(userInviteList);
           ownedFrogs = await collection.methods.balanceOf(userAddress).call();
