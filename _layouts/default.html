@@ -1005,9 +1005,9 @@
 
               inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Invite found! Valid for <u>'+(invLimit-ownedFrogs)+'</u> Frogs @ '+invPrice+' ΞETH<a class="pointer" id="applyInvite" onclick="applyInvite()"><strong><u>Apply Invite</u></strong></a>'
               break;
-            }
+            } else { console.log('Too many Frogs owned for invite.. Public invite applied') }
           }
-          if (thisInvite === "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064") { // 0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359
+         /* if (thisInvite === "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064") { // 0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359
             // NF7UOS / C7AR Bypass
             if (userAcc === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase()  || userAcc === "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase() || userAcc === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
               // Unlimited Free Mints
@@ -1016,8 +1016,8 @@
               mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
               document.getElementById("mintTotal").innerHTML = "<strong>"+(mintPrice)+" ΞETH</strong>plus gas"
               inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Maximum of <u>'+(mintLimit-ownedFrogs)+'</u> Frogs per wallet!<br>'+'<p></p>'
-            }
-          }
+            } 
+          } */
         }
         consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+inviteMessage)
       }
