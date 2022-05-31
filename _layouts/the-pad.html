@@ -744,6 +744,8 @@
                   width++;
                   elem.style.width = width + "%";
 
+                  console.log('test')
+
                   let owner = await collection.methods.ownerOf(thisToken).call()
 
                   if (this_user === owner.toLowerCase()) {
@@ -752,7 +754,7 @@
                       loaded = loaded + 1
                       openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
                       document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a class="pointer" href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+'Frog #'+thisToken+'</u></b> ↗️'+'</a>';
-
+                      console.log('test')
                       //Load Metadata
                       let tokenURI = await collection.methods.tokenURI(thisToken).call()
                       let cid = tokenURI.replace("ipfs://", "")
@@ -775,6 +777,7 @@
                           if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
                             else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
                           newAttribute.className = value;
+                          console.log('test')
                           space = document.createElement('br')
                           document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
                           document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
@@ -785,6 +788,7 @@
               // Finish Loading Bar
               percent = 100;
               document.getElementById("progress").innerHTML = percent+"%"
+              console.log('test')
               elem = document.getElementById("myBar");
               width = percent
               width++;
