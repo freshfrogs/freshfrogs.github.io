@@ -520,22 +520,6 @@
     overflow: hidden;
     border: 0px solid white;
   }
-  .frogPanel2 {
-    display: inline-block !important;
-    image-rendering: pixelated;
-    text-align: center;
-    border-radius: 5px;
-    padding: 0px !important;
-    margin: 8px;
-    background-color: white;
-    box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
-    overflow: hidden;
-    border: 0px solid white;
-    transition: all .2s;
-  }
-  .frogPanel2:hover {
-    box-shadow: 0px 0px 6px 6px #7cc1ff;
-  }
   .attributeList {
     border: 1px solid white;
     border-radius: 5px;
@@ -600,7 +584,6 @@
       var userAddress, userInviteList, userInviteKeys, ownedFrogs, contractName, contractSymbol, nextId, nextIdC, collection, COLLECTION, traits_list;
       var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
       var NETWORK = "main";
-      var morph = false;
 
       document.addEventListener("DOMContentLoaded", async () => {
 
@@ -696,9 +679,8 @@
             console.log('Morph '+morph)
             document.getElementById('baseText').innerHTML = 'select frog!'
             theseFrogs = document.getElementsByClassName('frogPanel')
-            for (var i = 1; i < theseFrogs.length; i++){
-              theseFrogs[i].style.className = "frogPanel2";
-              theseFrogs[i],innerHTML = ''
+            for (var i = 0; i < theseFrogs.length; i++){
+              theseFrogs.style.boxShadow = "10px 20px 30px blue";
             }
           }
 
@@ -710,6 +692,7 @@
                 document.getElementById('display_type').innerHTML = data.value.slice(0, 10)+'..'
               }
           }
+          
       }
 
       // Load Fresh Frog
