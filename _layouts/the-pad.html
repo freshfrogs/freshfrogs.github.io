@@ -703,9 +703,16 @@
           document.getElementById('selectSub').setAttribute('href', openSeaLink)
           document.getElementById('selectBase').innerHTML = '<strong>Morph</strong><frog id="baseText">two Frogs!</frog>'
           document.getElementById('selectBase').onclick = function() {
-            base_frog = token
-            morph = true;
-            document.getElementById('baseText').innerHTML = 'select frog!'
+            if (!morph) {
+              base_frog = token
+              morph = true;
+              document.getElementById('baseText').innerHTML = 'select frog!'
+            } else {
+              base_frog = false;
+              morph = false;
+              document.getElementById('baseText').innerHTML = 'two Frogs!'
+            } 
+
           }
 
           let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
@@ -912,7 +919,7 @@
 
         newFrog = document.createElement("div")
         newFrog.onclick = function() { 
-          if (!morph) { display_token(token); } else { combineTokens(base_frog, token) }
+          if (!morph) { display_token(token); } else { combineTokens(base_frog, token); document.getElementById('baseText').innerHTML = 'Frog #'+token; }
         }
         newFrog.id = token
         newFrog.className = 'frogPanel'
