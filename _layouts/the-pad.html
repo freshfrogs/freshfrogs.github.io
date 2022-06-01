@@ -908,7 +908,7 @@
 
         newFrog = document.createElement("div")
         newFrog.onclick = function() { 
-          if (!morph) { display_token(token) } else { morph_tokens(token) }
+          if (!morph) { display_token(token); } else { morph_tokens(token); }
         }
         newFrog.id = token
         newFrog.className = 'frogPanel'
