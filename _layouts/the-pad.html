@@ -700,7 +700,7 @@
           let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
           for (var i = 0; i < token_metadata.attributes.length; i++){
               var data = token_metadata.attributes[i]
-              //loadAttribute(data.trait_type, data.value, 'subDisplay')
+              //load_trait(data.trait_type, data.value, 'subDisplay')
               if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
                 document.getElementById('display_type').innerHTML = data.value.slice(0, 10)+'..'
               }
@@ -815,80 +815,80 @@
 
           // Frog
           if (typeof baseFrog_Frog !== 'undefined') {
-              loadAttribute("Frog", baseFrog_Frog, thisPlace)
+              load_trait("Frog", baseFrog_Frog, thisPlace)
               // Trait
               if (typeof otherFrog_Trait !== 'undefined') {
-                  loadAttribute("Trait", otherFrog_Trait, thisPlace)
+                  load_trait("Trait", otherFrog_Trait, thisPlace)
               } else if (typeof baseFrog_Trait !== 'undefined') {
-                  loadAttribute("Trait", baseFrog_Trait, thisPlace)
+                  load_trait("Trait", baseFrog_Trait, thisPlace)
               }
               // Accessory
               if (typeof baseFrog_Accessory !== 'undefined') {
-                  loadAttribute("Accessory", baseFrog_Accessory, thisPlace)
+                  load_trait("Accessory", baseFrog_Accessory, thisPlace)
               } else if (typeof otherFrog_Accessory !== 'undefined') {
-                  loadAttribute("Accessory", otherFrog_Accessory, thisPlace)
+                  load_trait("Accessory", otherFrog_Accessory, thisPlace)
               }
               // Eyes
               if (typeof baseFrog_Eyes !== 'undefined') {
-                      loadAttribute("Eyes", baseFrog_Eyes, thisPlace)
+                      load_trait("Eyes", baseFrog_Eyes, thisPlace)
                   if (baseFrog_Eyes === "shades" || baseFrog_Eyes === "shadesPurple" || baseFrog_Eyes === "shadesThreeD" || baseFrog_Eyes === "shadesWhite") {
-                      loadAttribute("Eyes", "shadesAnimation", thisPlace)
+                      load_trait("Eyes", "shadesAnimation", thisPlace)
                   }
               } else if (typeof otherFrog_Eyes !== 'undefined') {
-                      loadAttribute("Eyes", otherFrog_Eyes, thisPlace)
+                      load_trait("Eyes", otherFrog_Eyes, thisPlace)
                   if (otherFrog_Eyes === "shades" || otherFrog_Eyes === "shadesPurple" || otherFrog_Eyes === "shadesThreeD" || otherFrog_Eyes === "shadesWhite") {
-                      loadAttribute("Eyes", "shadesAnimation", thisPlace)
+                      load_trait("Eyes", "shadesAnimation", thisPlace)
                   }
               }
               // Hat
               if (typeof baseFrog_Hat !== 'undefined') {
-                  loadAttribute("Hat", baseFrog_Hat, thisPlace)
+                  load_trait("Hat", baseFrog_Hat, thisPlace)
               } else if (typeof otherFrog_Hat !== 'undefined') {
-                  loadAttribute("Hat", otherFrog_Hat, thisPlace)
+                  load_trait("Hat", otherFrog_Hat, thisPlace)
               }
               // Mouth
               if (typeof baseFrog_Mouth !== 'undefined') {
-                  loadAttribute("Mouth", baseFrog_Mouth, thisPlace)
+                  load_trait("Mouth", baseFrog_Mouth, thisPlace)
               } else if (typeof otherFrog_Mouth !== 'undefined') {
-                  loadAttribute("Mouth", otherFrog_Mouth, thisPlace)
+                  load_trait("Mouth", otherFrog_Mouth, thisPlace)
               }
           // Special Frog
           } else if (typeof baseFrog_SpecialFrog !== 'undefined') {
-              loadAttribute("SpecialFrog", baseFrog_SpecialFrog, thisPlace)
+              load_trait("SpecialFrog", baseFrog_SpecialFrog, thisPlace)
               if (typeof otherFrog_Trait !== 'undefined') {
-                  loadAttribute("Trait", otherFrog_Trait, thisPlace)
+                  load_trait("Trait", otherFrog_Trait, thisPlace)
               } else if (typeof baseFrog_Trait !== 'undefined') {
-                  loadAttribute("Trait", baseFrog_Trait, thisPlace)
+                  load_trait("Trait", baseFrog_Trait, thisPlace)
               }
               // Accessory
               if (typeof baseFrog_Accessory !== 'undefined') {
-                  loadAttribute("Accessory", baseFrog_Accessory, thisPlace)
+                  load_trait("Accessory", baseFrog_Accessory, thisPlace)
               } else if (typeof otherFrog_Accessory !== 'undefined') {
-                  loadAttribute("Accessory", otherFrog_Accessory, thisPlace)
+                  load_trait("Accessory", otherFrog_Accessory, thisPlace)
               }
               // Eyes
               if (typeof baseFrog_Eyes !== 'undefined') {
-                      loadAttribute("Eyes", baseFrog_Eyes, thisPlace)
+                      load_trait("Eyes", baseFrog_Eyes, thisPlace)
                   if (baseFrog_Eyes === "shades" || baseFrog_Eyes === "shadesPurple" || baseFrog_Eyes === "shadesThreeD" || baseFrog_Eyes === "shadesWhite") {
-                      loadAttribute("Eyes", "shadesAnimation", thisPlace)
+                      load_trait("Eyes", "shadesAnimation", thisPlace)
                   }
               } else if (typeof otherFrog_Eyes !== 'undefined') {
-                      loadAttribute("Eyes", otherFrog_Eyes, thisPlace)
+                      load_trait("Eyes", otherFrog_Eyes, thisPlace)
                   if (otherFrog_Eyes === "shades" || otherFrog_Eyes === "shadesPurple" || otherFrog_Eyes === "shadesThreeD" || otherFrog_Eyes === "shadesWhite") {
-                      loadAttribute("Eyes", "shadesAnimation", thisPlace)
+                      load_trait("Eyes", "shadesAnimation", thisPlace)
                   }
               }
               // Hat
               if (typeof baseFrog_Hat !== 'undefined') {
-                  loadAttribute("Hat", baseFrog_Hat, thisPlace)
+                  load_trait("Hat", baseFrog_Hat, thisPlace)
               } else if (typeof otherFrog_Hat !== 'undefined') {
-                  loadAttribute("Hat", otherFrog_Hat, thisPlace)
+                  load_trait("Hat", otherFrog_Hat, thisPlace)
               }
               // Mouth
               if (typeof baseFrog_Mouth !== 'undefined') {
-                  loadAttribute("Mouth", baseFrog_Mouth, thisPlace)
+                  load_trait("Mouth", baseFrog_Mouth, thisPlace)
               } else if (typeof otherFrog_Mouth !== 'undefined') {
-                  loadAttribute("Mouth", otherFrog_Mouth, thisPlace)
+                  load_trait("Mouth", otherFrog_Mouth, thisPlace)
               }
           }
       }
