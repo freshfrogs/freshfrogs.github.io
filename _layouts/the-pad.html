@@ -520,6 +520,22 @@
     overflow: hidden;
     border: 0px solid white;
   }
+  .frogPanel2 {
+    display: inline-block !important;
+    image-rendering: pixelated;
+    text-align: center;
+    border-radius: 5px;
+    padding: 0px !important;
+    margin: 8px;
+    background-color: white;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
+    overflow: hidden;
+    border: 0px solid white;
+    transition: all .2s;
+  }
+  .frogPanel2:hover {
+    box-shadow: 0px 0px 6px 6px #7cc1ff;
+  }
   .attributeList {
     border: 1px solid white;
     border-radius: 5px;
@@ -584,6 +600,7 @@
       var userAddress, userInviteList, userInviteKeys, ownedFrogs, contractName, contractSymbol, nextId, nextIdC, collection, COLLECTION, traits_list;
       var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
       var NETWORK = "main";
+      var morph = false;
 
       document.addEventListener("DOMContentLoaded", async () => {
 
@@ -675,13 +692,9 @@
           document.getElementById('selectSub').setAttribute('href', openSeaLink)
           document.getElementById('selectBase').innerHTML = '<strong>Morph</strong><frog id="baseText">two Frogs!</frog>'
           document.getElementById('selectBase').onclick = function() {
-            let morph = true;
-            console.log('Morph '+morph)
+            base_frog = token
+            morph = true;
             document.getElementById('baseText').innerHTML = 'select frog!'
-            theseFrogs = document.getElementsByClassName('frogPanel')
-            for (var i = 0; i < theseFrogs.length; i++){
-              theseFrogs.style.boxShadow = "10px 20px 30px blue";
-            }
           }
 
           let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
@@ -692,7 +705,13 @@
                 document.getElementById('display_type').innerHTML = data.value.slice(0, 10)+'..'
               }
           }
-          
+      }
+
+      function morph_tokens(sub_Frog) {
+
+        console.log(sub_Frog)
+        console.lot(base_frog)
+
       }
 
       // Load Fresh Frog
@@ -702,7 +721,9 @@
         etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
 
         newFrog = document.createElement("div")
-        newFrog.onclick = function() { display_token(token) }
+        newFrog.onclick = function() { 
+          if (!morph) { display_token(token) } else { morph_tokens(token) }
+        }
         newFrog.id = token
         newFrog.className = 'frogPanel'
         newFrog.innerHTML = '<a style="margin-bottom" 0px !important;  display: inline !important;" class="smallContainer2 pointer2" id="Frog #'+token+'"><img class="frogImg3" src="https://freshfrogs.io/frog/'+token+'.png"/></a>'+'<p class="attributeList" id="Frog #'+token+'Desc"></p>'
