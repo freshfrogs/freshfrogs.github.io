@@ -678,6 +678,10 @@
           document.getElementById('selectBase').setAttribute('target', '')
           document.getElementById('selectBase').onclick = function() {
             console.log('Morph '+token)
+            theseFrogs = document.getElementsByClassName('frogPanel')
+            for (var i = 0; i < theseFrogs.length; i++){
+              i.style.box.boxShadow = "10px 20px 30px blue";
+            }
           }
 
           let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
