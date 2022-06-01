@@ -677,6 +677,7 @@
           document.getElementById('selectBase').onclick = function() {
             let morph = true;
             console.log('Morph '+morph)
+            document.getElementById('baseText').innerHTML = 'select frog!'
             theseFrogs = document.getElementsByClassName('frogPanel')
             for (var i = 0; i < theseFrogs.length; i++){
               i.style.boxShadow = "10px 20px 30px blue";
