@@ -675,7 +675,8 @@
           document.getElementById('selectSub').setAttribute('href', openSeaLink)
           document.getElementById('selectBase').innerHTML = '<strong>Morph</strong><frog id="baseText">two Frogs!</frog>'
           document.getElementById('selectBase').onclick = function() {
-            console.log('Morph '+token)
+            let morph = true;
+            console.log('Morph '+morph)
             theseFrogs = document.getElementsByClassName('frogPanel')
             for (var i = 0; i < theseFrogs.length; i++){
               i.style.box.boxShadow = "10px 20px 30px blue";
