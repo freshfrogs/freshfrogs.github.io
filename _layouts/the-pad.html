@@ -673,7 +673,8 @@
           openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
           etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
           document.getElementById('selectSub').setAttribute('href', openSeaLink)
-          document.getElementById('selectBase').setAttribute('href', etherscanLink)
+          document.getElementById('selectBase').innerHTML = '<strong>View on</strong><frog id="baseText">Etherscan</frog>'
+          document.getElementById('selectBase').setAttribute('href', '')
 
           let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
           for (var i = 0; i < token_metadata.attributes.length; i++){
