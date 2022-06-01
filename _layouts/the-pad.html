@@ -674,8 +674,6 @@
           etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
           document.getElementById('selectSub').setAttribute('href', openSeaLink)
           document.getElementById('selectBase').innerHTML = '<strong>Morph</strong><frog id="baseText">two Frogs!</frog>'
-          document.getElementById('selectBase').setAttribute('href', '')
-          document.getElementById('selectBase').setAttribute('target', '')
           document.getElementById('selectBase').onclick = function() {
             console.log('Morph '+token)
             theseFrogs = document.getElementsByClassName('frogPanel')
@@ -967,7 +965,7 @@
         <div class="downloads pre">
           <ul class="downloads2">
             <li><a id="morphFrogs" class="pointer"><strong id="display_name">Fresh Frogs</strong><div id="display_type">ΞEthereum</div></a></li>
-            <li><a id="selectBase" class="pointer" href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><strong>View on</strong><frog id="baseText">Etherscan</frog></a></li>
+            <li><a id="selectBase" class="pointer"><strong>View on</strong><frog id="baseText">Etherscan</frog></a></li>
             <li><a id="selectSub" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>View on</strong><frog id="subText">OpenSea</frog></a></li>
           </ul>
           <br>
