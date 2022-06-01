@@ -1006,6 +1006,7 @@
               mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
               document.getElementById("mintTotal").innerHTML = "<strong>"+(mintPrice)+" ΞETH</strong>plus gas"
               inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Maximum of <u>'+(mintLimit-ownedFrogs)+'</u> Frogs per wallet!<br>'+'<p></p>'
+              break;
             } 
           } else if (thisInvite === "0x307715518f6f5415ef52982008043b9b481ab5d5c2e44dde262dbfc379e0863b") {
             if (ownedFrogs <= 9) {
