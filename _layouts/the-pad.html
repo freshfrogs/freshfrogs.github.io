@@ -385,6 +385,16 @@
     border-bottom-right-radius: 0px;
     max-width: 400% !important;
   }
+  .frogImg4 {
+    transition: transform .2s;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    width: 256px;
+    height: 256px;
+    border-radius: 5px;
+  }
   .smallContainer3:hover{
     -ms-transform: scale(1.1); /* IE 9 */
     -webkit-transform: scale(1.1); /* Safari 3-8 */
@@ -654,8 +664,8 @@
         newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
         newAttribute.id = attribute
         newAttribute.target = "_blank"
-        if (where == 'frogContainer3') {
-          newAttribute.className = "frogImg2" //shadesAnimation
+        if (where == 'frogContainer4') {
+          newAttribute.className = "frogImg4" //shadesAnimation
         } else {
           newAttribute.className = "frogImg2" //shadesAnimation
         }
