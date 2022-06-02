@@ -830,19 +830,21 @@
 
         }
 
-        if (base_SpecialFrog != false || other_SpecialFrog != false) {
+          // Update alpha_Trait for SpecialFrogs
 
-          if (other_SpecialFrog != false && other_SpecialFrog == 'inversedEyes') {
-            var alpha_Trait = alpha_SpecialFrog+'/'+other_SpecialFrog
+          if (base_SpecialFrog != false || other_SpecialFrog != false) {
+
+            if (base_SpecialFrog != false && base_SpecialFrog == 'thirdEye') {
+              if (other_SpecialFrog == 'inversedEyes') {
+                var alpha_Trait = alpha_SpecialFrog+'/'+other_SpecialFrog
+              } else {
+                var alpha_Trait = alpha_SpecialFrog+'/'+alpha_Trait
+              }
+            } else if (other_SpecialFrog != false && other_SpecialFrog == 'thirdEye') {
+              var alpha_Trait = alpha_SpecialFrog+'/base/'+alpha_Trait
+            }
+
           }
-
-          if (base_SpecialFrog != false && base_SpecialFrog == 'thirdEye') {
-            var alpha_Trait = alpha_SpecialFrog+'/'+alpha_Trait
-          } else if (other_SpecialFrog != false && other_SpecialFrog == 'thirdEye') {
-            var alpha_Trait = alpha_SpecialFrog+'/base/'+alpha_Trait
-          }
-
-        }
 
         // Accessory
         if (base_Accessory != false) {
