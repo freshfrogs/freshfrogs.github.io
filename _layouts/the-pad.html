@@ -612,7 +612,7 @@
       var userAddress, userInviteList, userInviteKeys, ownedFrogs, contractName, contractSymbol, nextId, nextIdC, collection, COLLECTION, traits_list;
       var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
       var NETWORK = "main";
-      var morph = false;
+      var morph = sub_frog = base_frog = false;
 
       document.addEventListener("DOMContentLoaded", async () => {
 
@@ -708,10 +708,10 @@
               base_frog = token
               morph = true;
               document.getElementById('baseText').innerHTML = 'select frog!'
-            } else {
-              base_frog = false;
-              morph = false;
-              document.getElementById('baseText').innerHTML = 'two Frogs!'
+            } else if (morph) {
+              console.log('Frog Morph')
+              console.log('Frog #'+base_frog)
+              console.log('Frog #'+sub_frog)
             } 
 
           }
@@ -920,7 +920,7 @@
 
         newFrog = document.createElement("div")
         newFrog.onclick = function() { 
-          if (!morph) { display_token(token); } else { combineTokens(base_frog, token); document.getElementById('baseText').innerHTML = 'Frog #'+token; }
+          if (!morph) { display_token(token); } else { sub_frog = token; combineTokens(base_frog, sub_frog); document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog; }
         }
         newFrog.id = token
         newFrog.className = 'frogPanel'
