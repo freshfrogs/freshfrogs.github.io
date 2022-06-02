@@ -866,13 +866,12 @@
         thisPlace_div.style.background = 'transparent'
         thisPlace_div.innerHTML = ''
 
-        if (alpha_Frog != false) { load_trait("Frog", alpha_Frog, thisPlace) } else if (alpha_SpecialFrog != false) { load_trait("SpecialFrog", alpha_SpecialFrog, thisPlace) }
-
-        load_trait("Trait", alpha_Trait, thisPlace)
-        load_trait("Accessory", alpha_Accessory, thisPlace)
-        load_trait("Hat", alpha_Hat, thisPlace)
-        load_trait("Eyes", alpha_Eyes, thisPlace)
-        load_trait("Mouth", alpha_Mouth, thisPlace)
+        if (alpha_Frog != false) { load_trait("Frog", alpha_Frog, thisPlace); } else if (alpha_SpecialFrog != false) { load_trait("SpecialFrog", alpha_SpecialFrog, thisPlace); }
+        if (alpha_Trait != false) { load_trait("Trait", alpha_Trait, thisPlace); }
+        if (alpha_Accessory != false) { load_trait("Accessory", alpha_Accessory, thisPlace); }
+        if (alpha_Hat != false) { load_trait("Hat", alpha_Hat, thisPlace); }
+        if (alpha_Eyes != false) { load_trait("Eyes", alpha_Eyes, thisPlace); }
+        if (alpha_Mouth != false) { load_trait("Mouth", alpha_Mouth, thisPlace); }
 
       }
 
