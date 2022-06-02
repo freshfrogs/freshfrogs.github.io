@@ -817,7 +817,7 @@
 
           var alpha_SpecialFrog = base_SpecialFrog;
 
-        } else { console.log('Frog Type not found!') }
+        }
 
         // Trait Type
         if (other_Trait != false) {
@@ -828,7 +828,7 @@
 
           var alpha_trait = base_Trait;
 
-        } else { console.log('Trait Type not found!') }
+        }
 
         // Accessory
         if (base_Accessory != false) {
@@ -839,7 +839,7 @@
 
           alpha_Accessory = other_Accessory
 
-        } else { console.log('Accessory not found!') }
+        }
 
         // Eyes
         if (base_Eyes != false) {
@@ -850,7 +850,7 @@
 
           alpha_Eyes = other_Eyes
 
-        } else { console.log('Eyes not found!') }
+        }
 
         // Hat
         if (base_Hat != false) {
@@ -861,7 +861,7 @@
 
           alpha_Hat = other_Hat
 
-        } else { console.log('Hat not found!') }
+        }
 
         // Mouth
         if (base_Mouth != false) {
@@ -872,7 +872,7 @@
 
           alpha_Mouth = other_Mouth
 
-        } else { console.log('Mouth not found!') }
+        }
 
 
         thisPlace = 'frogContainer4';
@@ -880,20 +880,12 @@
         thisPlace_div.style.background = 'transparent'
         thisPlace_div.innerHTML = ''
 
-        console.log('SpecialFrog: '+alpha_SpecialFrog)
-        console.log('Frog: '+alpha_Frog)
-        console.log('Trait: '+alpha_Trait)
-        console.log('Accessory: '+alpha_Accessory)
-        console.log('Hat: '+alpha_Hat)
-        console.log('Eyes: '+alpha_Eyes)
-        console.log('Mouth: '+alpha_Mouth)
-
-        if (alpha_Frog != false) { load_trait("Frog", alpha_Frog, thisPlace); } else if (alpha_SpecialFrog != false) { load_trait("SpecialFrog", alpha_SpecialFrog, thisPlace); }
-        if (alpha_Trait != false) { load_trait("Trait", alpha_Trait, thisPlace); }
-        if (alpha_Accessory != false) { load_trait("Accessory", alpha_Accessory, thisPlace); }
-        if (alpha_Hat != false) { load_trait("Hat", alpha_Hat, thisPlace); }
-        if (alpha_Eyes != false) { load_trait("Eyes", alpha_Eyes, thisPlace); }
-        if (alpha_Mouth != false) { load_trait("Mouth", alpha_Mouth, thisPlace); }
+        if (alpha_Frog != false) { load_trait("Frog", alpha_Frog, thisPlace); console.log('Frog: '+alpha_Frog);} else if (alpha_SpecialFrog != false) { load_trait("SpecialFrog", alpha_SpecialFrog, thisPlace); console.log('SpecialFrog: '+alpha_SpecialFrog);}
+        if (alpha_Trait != false) { load_trait("Trait", alpha_Trait, thisPlace); console.log('Trait: '+alpha_Trait);}
+        if (alpha_Accessory != false) { load_trait("Accessory", alpha_Accessory, thisPlace); console.log('Accessory: '+alpha_Accessory);}
+        if (alpha_Hat != false) { load_trait("Hat", alpha_Hat, thisPlace); console.log('Hat: '+alpha_Hat);}
+        if (alpha_Eyes != false) { load_trait("Eyes", alpha_Eyes, thisPlace); console.log('Eyes: '+alpha_Eyes);}
+        if (alpha_Mouth != false) { load_trait("Mouth", alpha_Mouth, thisPlace); console.log('Mouth: '+alpha_Mouth);}
 
       }
 
