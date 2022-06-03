@@ -836,7 +836,9 @@
 
           if (base_SpecialFrog != false) {
             if (other_SpecialFrog != false) {
-              var alpha_Trait = base_SpecialFrog+'/'+other_SpecialFrog;
+              if (base_SpecialFrog == 'thirdEye' && other_SpecialFrog == 'peace') { var alpha_Trait = base_SpecialFrog+'/blue';} else {
+                var alpha_Trait = base_SpecialFrog+'/'+other_SpecialFrog;
+              }
             } else {
               var alpha_Trait = base_SpecialFrog+'/'+alpha_Trait;
             }
