@@ -841,7 +841,14 @@
                 
                 var alpha_Trait = base_SpecialFrog+'/blue';
               
-              } else if (base_SpecialFrog == 'inversedEyes' && other_SpecialFrog == 'peace') {
+              } else if (base_SpecialFrog == 'thirdEye' && (other_Trait == 'cyan' || other_Trait == 'yellow')) {
+                
+                var alpha_Trait = base_SpecialFrog+'/alpha/'+other_Trait;
+              
+              }
+              
+              
+              else if (base_SpecialFrog == 'inversedEyes' && other_SpecialFrog == 'peace') {
                 
                 var alpha_SpecialFrog = 'peace'
                 var alpha_Trait = 'inversedEyes/peace';
