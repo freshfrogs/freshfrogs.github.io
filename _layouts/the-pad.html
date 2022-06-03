@@ -837,19 +837,14 @@
 
             if (base_SpecialFrog == 'peace') {
 
-              if (other_SpecialFrog == 'inversedEyes') {
+              if (other_SpecialFrog != false) {
                 
                 var alpha_Trait = 'peace/'+other_SpecialFrog
-
-              } else if (other_SpecialFrog == 'closedEyes') {
-                
-                var alpha_Trait = 'peace/'+other_SpecialFrog
-
-              }
               
-              
-              else {
+              } else {
+
                 var alpha_Trait = 'peace/'+alpha_Trait;
+                
               }
 
             }
