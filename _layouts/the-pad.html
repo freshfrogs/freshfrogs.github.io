@@ -835,18 +835,19 @@
 
         if (base_SpecialFrog != false || other_SpecialFrog != false) {
 
+          if (base_SpecialFrog == 'thirdEye' && (other_Frog == 'cyanTreeFrog' || other_Frog == 'goldenTreeFrog')) {
+                
+            var alpha_SpecialFrog = base_SpecialFrog+'/alpha/'+other_Trait;
+          
+          }
+
           if (base_SpecialFrog != false) {
             if (other_SpecialFrog != false) {
               if (base_SpecialFrog == 'thirdEye' && other_SpecialFrog == 'peace') {
                 
                 var alpha_Trait = base_SpecialFrog+'/blue';
               
-              } else if (base_SpecialFrog == 'thirdEye' && (other_Trait == 'cyan' || other_Trait == 'yellow')) {
-                
-                var alpha_SpecialFrog = base_SpecialFrog+'/alpha/'+other_Trait;
-              
               }
-              
               
               else if (base_SpecialFrog == 'inversedEyes' && other_SpecialFrog == 'peace') {
                 
