@@ -831,7 +831,7 @@
         }
 
         // Update alpha_Trait for SpecialFrogs
-        if (alpha_Trait != false) {
+        //if (alpha_Trait != false) {
 
           if (base_SpecialFrog != false || other_SpecialFrog != false) {
 
@@ -840,7 +840,17 @@
             }
 
             else if (base_SpecialFrog == 'inversedEyes' || other_SpecialFrog == 'inversedEyes') {
-              var alpha_Trait = 'inversedEyes/'+alpha_Trait
+
+              if (base_SpecialFrog == 'peace' && other_SpecialFrog == 'inversedEyes') {
+                
+                var alpha_Trait = 'peace/inversedEyes'
+
+              } else {
+
+                var alpha_Trait = 'inversedEyes/'+alpha_Trait
+                
+              }
+              
             }
 
             else if (base_SpecialFrog == 'thirdEye') {
@@ -854,7 +864,7 @@
             }
 
           }
-        }
+        //}
 
         // Accessory
         if (base_Accessory != false) {
