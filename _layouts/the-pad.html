@@ -1135,7 +1135,7 @@
       
         }); // End data pull / first paid Frog 3,236
 
-        fetch('https://api.opensea.io/api/v1/assets?owner='+from_address+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+        fetch('https://api.opensea.io/api/v1/assets?owner='+from_address+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
         .then((res) => res.json())
         .then((res) => {
           loaded = 0;
