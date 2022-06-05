@@ -837,13 +837,17 @@
 
         if (base_SpecialFrog != false || other_SpecialFrog != false) {
 
-          if ((base_SpecialFrog == 'thirdEye' || base_SpecialFrog == 'inversedEyes') && other_Frog != false) {
+          if ((base_SpecialFrog == 'thirdEye' || base_SpecialFrog == 'inversedEyes' || base_SpecialFrog == 'peace') && other_Frog != false) {
 
             if (base_SpecialFrog == 'inversedEyes') {
 
               var alpha_SpecialFrog = '../Frog/'+other_Frog
 
             } else if (base_SpecialFrog == 'thirdEye') {
+
+              var alpha_SpecialFrog = base_SpecialFrog+'/'+other_Frog;
+
+            } else if (base_SpecialFrog == 'peace' && (other_Frog == 'brownTreeFrog' || other_Frog == 'cyanTreeFrog' || other_Frog == 'goldenTreeFrog' || other_Frog == 'orangeTreeFrog' || other_Frog == 'tomatoFrog')) {
 
               var alpha_SpecialFrog = base_SpecialFrog+'/'+other_Frog;
 
