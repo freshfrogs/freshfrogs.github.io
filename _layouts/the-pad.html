@@ -680,6 +680,8 @@
           newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
         } else if (attribute === "shadesAnimation") {
           newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
+        } else if (attribute.includes("croaking2")) {
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
         } else {
           newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
         }
@@ -814,7 +816,7 @@
 
           var alpha_Frog = base_Frog;
 
-          if (base_Frog == 'cyanTreeFrog' && other_Frog == 'cyanTreeFrog') { var alpha_Frog = false; var alpha_SpecialFrog = 'elBino/'+base_Frog; }
+          if (base_Frog == 'cyanTreeFrog' && other_Frog == 'cyanTreeFrog') { var alpha_Frog = false; var alpha_SpecialFrog = 'elBino/'+base_Frog; }          
 
         } else if (base_SpecialFrog != false) {
 
@@ -836,6 +838,10 @@
         // Update alpha_Trait for SpecialFrogs
 
         if (base_SpecialFrog != false || other_SpecialFrog != false) {
+
+          if (base_SpecialFrog == 'croaking' && other_SpecialFrog == 'croaking') {
+            var alpha_SpecialFrog = base_SpecialFrog+'/croaking2'
+          }
 
           if ((base_SpecialFrog == 'thirdEye' || base_SpecialFrog == 'inversedEyes' || base_SpecialFrog == 'peace') && other_Frog != false) {
 
