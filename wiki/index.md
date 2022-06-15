@@ -5,7 +5,6 @@ layout: wiki
 <title>freshfrogs.io/wiki 🍀</title>
 
 <div style="margin-left: auto; margin-right: auto; text-align: center;">
-    <h4 style="text-align: left !important;"><u><a href="https://opensea.io/collection/fresh-frogs?tab=activity" target="_blank">Recent Sales</a></u></h4>
     <div id="recent_sales" class="recent_sales"></div>
 </div>
 
