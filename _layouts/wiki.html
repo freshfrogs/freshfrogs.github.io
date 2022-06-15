@@ -616,24 +616,7 @@
                     console.log('Error: Could not get Collection data from Opensea.');
                     console.error('Error : ' + e.message)
               
-                }); // End data pull / first paid Frog 3,236
-
-                // Assets
-                fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=3&include_orders=false', options)
-                .then((set) => set.json())
-                .then((set) => {
-                    var { assets } = set
-                    //console.log(assets)
-                    nextIdC = parseInt(assets[0].name.replace('Frog #', '')) + 1;
-                    document.getElementById('label_name').innerHTML = 'Frog #'+nextIdC
-                    document.getElementById('previewImg').setAttribute('src', '../frog/'+nextIdC+'.png')
-                })
-                .catch(e => {
-
-                    console.log('Error: Could not get recent assets from Opensea...');
-                    console.error('Error : ' + e.message)
-
-                })
+                });
 
                 // Get recent sales
               
