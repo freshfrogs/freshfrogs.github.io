@@ -23,7 +23,7 @@
       image-rendering: pixelated;
       margin-left: auto !important;
       margin-right: auto !important;
-      max-width: 100%;
+      width: 100%;
       margin-bottom: 0.5%;
     }
     .frog_name {
@@ -796,7 +796,7 @@
           headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
         };
 
-        fetch('https://api.opensea.io/api/v1/collection/fresh-frogs2asd', options)
+        fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
         .then(collection => collection.json())
         .then(collection => {
 
@@ -1160,7 +1160,7 @@
       <section>
         <div class="downloads pre">
           <div id="netStatus" class="netStatus">
-            <img id="banner_image" src="../assets/frogs/websiteBannerFinal_2.png" style="border-radius: 5px; height: auto !important; width: 100% !important; margin-bottom: 14px; transform: scale(1.01);">
+            <img id="banner_image" src="../assets/frogs/backfrogs.png" style="border-radius: 5px; height: auto !important; width: 100% !important; margin-bottom: 14px; transform: scale(1.01);">
             <a style="display: inline-flex !important;" href="https://opensea.io/collection/fresh-frogs" target="_blank"><h1 class="collection-name" id="name">Fresh Frogs NFT</h1><img class="headLineImg" src="../assets/opensea.png"></a><p style="display: inline-block !important;">Items: <b id="count"></b> | Owners: <b id="num_owners"></b> | Floor Price: <b id="floor_price"></b> | Sales Volume: <b id="total_volume"></b> <b id="initial_sales"></b></p>
             {{ content }}
             <div style="margin-left: auto; margin-right: auto; text-align: center;">
