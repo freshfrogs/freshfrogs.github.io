@@ -4,6 +4,8 @@ layout: default
 
 <title>freshfrogs.io</title>
 
+<br>
+
 <desc id="description" markdown="1" style="width: 90%; margin-left: auto; margin-right: auto;">
 
     Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!
