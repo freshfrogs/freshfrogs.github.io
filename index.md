@@ -6,7 +6,7 @@ layout: default
 
 A collection of 4,040 randomly generated Frogs on #Ethereum
 
-Combine "Morph" Fresh Frogs! [freshfrogs.io/the-pad🍀](https://freshfrogs.io/the-pad)
-Holders only discord! [discord.gg/xWMFWgpvd3](https://discord.gg/xWMFWgpvd3)
+Combine "Morph" Fresh Frogs! __[freshfrogs.io/the-pad🍀](https://freshfrogs.io/the-pad)__
+Holders only discord! __[discord.gg/xWMFWgpvd3](https://discord.gg/xWMFWgpvd3)__
 
-__Recent Sales__
+__[Recent Sales](https://opensea.io/collection/fresh-frogs)__
