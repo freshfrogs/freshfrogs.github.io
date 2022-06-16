@@ -4,7 +4,6 @@ layout: default
 
 <title>freshfrogs.io</title>
 
-<br>
 
 <span id="description" markdown="1" style="width: 90%; margin-left: auto; margin-right: auto;">
 
