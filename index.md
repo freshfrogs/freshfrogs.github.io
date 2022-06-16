@@ -4,13 +4,12 @@ layout: default
 
 <title>freshfrogs.io</title>
 
+A collection of 4,040 randomly generated Frogs on #Ethereum
 
-<span class="note" id="description">
+Combine "Morph" Fresh Frogs! [freshfrogs.io/the-pad🍀](https://freshfrogs.io/the-pad)
 
-    Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!
+Holders only discord! [discord.gg/xWMFWgpvd3](https://discord.gg/xWMFWgpvd3)
 
-    <i id="created_date"></i>
-
-</span>
+<i id="created_date"></i>
 
 <br>
