@@ -3,7 +3,7 @@ layout: default
 ---
 
 <title>freshfrogs.io</title>
-
+<hr>
 A collection of 4,040 randomly generated Frogs on #Ethereum
 
 Combine "Morph" Fresh Frogs! <ins>[freshfrogs.io/the-pad🍀](https://freshfrogs.io/the-pad)</ins>
