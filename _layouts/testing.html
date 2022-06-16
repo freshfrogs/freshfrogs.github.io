@@ -740,7 +740,7 @@
 
           traits_list = traits;
 
-          //document.getElementById('banner_image').setAttribute('src', banner_image_url)
+          document.getElementById('banner_image').setAttribute('src', banner_image_url)
           document.getElementById('name').innerHTML = name
           //document.getElementById('description').innerHTML = description
           document.getElementById('count').innerHTML = count
@@ -1048,9 +1048,7 @@
       <section>
         <div class="downloads pre">
           <div id="netStatus" class="netStatus">
-            <br>
-            <h2 style="color: white !important;"><b>freshfrogs.io</b></h2>
-            <br>
+            <img id="banner_image" src="../assets/frogs/websiteBannerFinal_2.png" style="border-radius: 5px; height: auto !important; width: 100% !important; margin-bottom: 14px; transform: scale(1.01);">
             <a style="display: inline-flex !important;" href="https://opensea.io/collection/fresh-frogs" target="_blank"><h1 class="collection-name" id="name">Fresh Frogs NFT</h1><img class="headLineImg" src="../assets/opensea.png"></a><p style="display: inline-block !important;">Items: <b id="count"></b> | Owners: <b id="num_owners"></b> | Floor Price: <b id="floor_price"></b> | Sales Volume: <b id="total_volume"></b> <b id="initial_sales"></b></p>
             {{ content }}
             <br>
