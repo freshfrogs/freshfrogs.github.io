@@ -6,7 +6,7 @@ layout: default
 **Combine "Morph" Fresh Frogs!** <ins>[freshfrogs.io/the-pad🍀](https://freshfrogs.io/the-pad)</ins>
 **Holders only discord!** <ins>[discord.gg/xWMFWgpvd3](https://discord.gg/xWMFWgpvd3)</ins>
 
-<div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a></div>
+<div id="pre" class="mintingTextWhite2">Waiting to Connect Web3...<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a></div>
 
 [Recent Sales on OpenSea](https://opensea.io/collection/fresh-frogs/activity)
 ---
