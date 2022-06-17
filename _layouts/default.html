@@ -888,7 +888,7 @@
           userInviteList = await f0.myInvites();
           userInviteKeys = Object.keys(userInviteList);
 
-          // CONTRACT NAME, SYMBOL, NEXT ID
+          // CONTRACT NAME, SYMBOL, NEXT ID;
           name = await f0.api.name().call();
           symbol = await f0.api.symbol().call();
           nextId = await f0.api.nextId().call();
