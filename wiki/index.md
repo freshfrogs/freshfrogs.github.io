@@ -8,7 +8,7 @@ layout: wiki
     <div id="recent_sales" class="recent_sales"></div>
 </div>
 
-## [freshfrogs.io](https://opensea.io/collection/fresh-frogs)
+## [freshfrogs.io](https://freshfrogs.io/)
 
 Fresh Frogs NFT is a collection of 4,040 randomly generated Frogs living on the Ethereum Blockchain! The collection is randomly generated, with each Frog being individually unique! There are a total of 30 different Frog types, and 60 traits! Resulting in 2.8 million total possible combinations!
 
