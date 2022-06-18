@@ -845,7 +845,7 @@
                     recent_sale.style.width = 128+64+'px';
                     recent_sale.href = permalink;
                     recent_sale.innerHTML = 
-                        '<div id="'+name+'"><img class="frog_img" src='+image_url+'></div>' +
+                        '<div id="'+name+'" class="trait_display"><img class="frog_img" src='+image_url+'></div>' +
                         '<i class="label_name">FreshFrogsNFT</i>' +
                         '<strong class="frog_name">'+name+'</strong> ' + ' <b>Ξ'+sale_price+'</b>';
                     document.getElementById('recent_sales').appendChild(recent_sale);
@@ -920,7 +920,7 @@
           //document.getElementById('netStatus').innerHTML = '<br><h2 style="color: white !important;"><b>freshfrogs.io</b></h2><div id="pre" class="consoleOutput"></div>';
           
           // Messages Sent to Terminal (Again)
-          document.getElementById("supply").innerHTML = "Fresh Frog #"+nextIdC+" / 4040" // Supply
+          //document.getElementById("supply").innerHTML = "Fresh Frog #"+nextIdC+" / 4040" // Supply
           document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.io/frog/"+nextIdC+".png");
 
           // ----------------------------->
@@ -1049,7 +1049,7 @@
         document.getElementById("mintTotal").innerHTML = "<strong>"+(mintPrice)+" ΞETH</strong>plus gas"
 
         // Public Invite Message
-        inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Maximum of <u>'+mintLimit+'</u> Frogs per wallet!<br>'+'<p></p>'
+        inviteMessage = 'Frog #'+nextIdC+'/4040'+' is now available to mint!<br>Maximum of <u>'+mintLimit+'</u> Frogs per wallet!<br>'+'<p></p>'
         console.log("Getting Invites...")
         for (var i = 0; i < 5; i++) { // Loop Five Times; Check First Five Invites
           let thisInvite = userInviteKeys[i]
@@ -1153,7 +1153,6 @@
       <header>
         <div class="downloads pre">
           <div id="mintingTray">
-            <h3 class="headerDiv" id="supply">4040 Total Supply</h3>
             <ul class="downloads2">
               <li><a id="mintTransact" href="https://freshfrogs.io/" class="pointer"><p>Connect Wallet!</p></a></li>
               <li><a id="mintTotal"><strong>0.01 ΞETH</strong>Plus gas</a></li>
