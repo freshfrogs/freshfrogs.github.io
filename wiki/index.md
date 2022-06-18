@@ -52,7 +52,7 @@ After Frog 3,233 has been minted, the price will increase to 0.01 and limit to 4
 
 **Smart Contract**
 
-Fresh Frogs NFT smart contract powered by Factoria's ERC-721A contract resulting in extremely low gas fees.
+Fresh Frogs NFT smart contract powered by Factoria's ERC-721 contract resulting in extremely low gas fees.
 
 
 ***
