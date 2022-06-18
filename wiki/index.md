@@ -17,20 +17,13 @@ Deployed following the ERC-721 standard, stored on IPFS, and verified on [ethers
 Fresh Frog holders can connect to [freshfrogs.io/the-pad ](https://freshfrogs.io/the-pad/):four_leaf_clover: and view held FROG Tokens! Each Frog will be rendered with trait rarities and more! Two Fresh Frogs can soon be used create a brand new NFT through morphing! In addition, some traits will be animated upon creation!
 
 ### Official Links
-* Official Website:
-    [freshfrogs.io/](https://freshfrogs.io/)
-* Official Twitter:
-    [twitter.com/FreshFrogs_NFT](https://twitter.com/FreshFrogs_NFT)
-* Etherscan:
-    [etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b](https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b)
-* OpenSea Collection:
-    [opensea.io/collection/fresh-frogs](https://opensea.io/collection/fresh-frogs)
-* Gem.xyz:
-    [www.gem.xyz/collection/fresh-frogs/](https://www.gem.xyz/collection/fresh-frogs/)
-* Looks Rare:
-    [looksrare.org/collections/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b](https://looksrare.org/collections/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b)
-* X2Y2:
-    [x2y2.io/collection/fresh-frogs/](https://x2y2.io/collection/fresh-frogs/)
+* Official Website: [https://freshfrogs.io/](https://freshfrogs.io/)
+* Official Twitter: [https://twitter.com/FreshFrogs_NFT](https://twitter.com/FreshFrogs_NFT)
+* Etherscan: [https://etherscan.io/address/0xbe4b](https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b)
+* OpenSea Collection: [https://opensea.io/collection/fresh-frogs](https://opensea.io/collection/fresh-frogs)
+* Gem.xyz: [https://www.gem.xyz/collection/fresh-frogs/](https://www.gem.xyz/collection/fresh-frogs/)
+* Looks Rare: [https://looksrare.org/collections/0xBE4B](https://looksrare.org/collections/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b)
+* X2Y2: [https://x2y2.io/collection/fresh-frogs/](https://x2y2.io/collection/fresh-frogs/)
 
 
 ***
