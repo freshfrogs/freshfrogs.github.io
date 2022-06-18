@@ -832,6 +832,7 @@
 
             asset_events.forEach((sale) => {
               
+                console.log(sale)
 
                 try {
 
@@ -918,21 +919,9 @@
           return;
         }
         getInvites(); // Check and Confirm Invite Keys
-        //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
-        //document.getElementById("supply").innerHTML = "<b><strong><a style='color: #222 !important;' href='https://opensea.io/collection/fresh-frogs' target='_blank'>ℹ️ ("+nextIdC+"/4040) Total Supply</a></strong></b>"
-        //consoleOutput("<hr><b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint...");//\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
-        //document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
         document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
-        //document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
-        //consoleOutput('<br>'+'FROG #'+nextIdC+' available to mint... Limit: '+mintLimit+' Frogs per Wallet<br>'+'<strong>Connected! '+truncateAddress(userAcc)+'</strong></div>'+'<p></p>')
-        //consoleOutput('<strong></strong><br>Connected! Mint up to '+mintLimit+' Frogs per Wallet!<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
-        //consoleOutput('<br><b>FROG #'+nextIdC+'</b> available to mint... Limit: <b>'+mintLimit+' Frogs</b> per Wallet</div>')
 
-        //consoleOutput('<br><hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.io/the-pad">🍀 <b>freshfrogs.io/the-pad</b> ↗️</a>');
-        // Recent Mints
-        // Event Listeners 
-        // MINT -- Send the transaction to mint!
 
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           if (mint === 0) { // || nextIdC >= 3021
