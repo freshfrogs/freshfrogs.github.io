@@ -43,7 +43,7 @@ Final 808 Frogs will cost 0.01
 
 **Private Whitelist**
 
-The first 404 Frogs available to mint exclusively to discord members!
+The first 404 Frogs available to mint exclusively to discord members! [FreshFrogsNFT Wiki](https://freshfrogs.io/wiki)
 
 **Public Mint**
 
