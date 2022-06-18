@@ -29,6 +29,19 @@ Fresh Frog holders can connect to [freshfrogs.io/the-pad ](https://freshfrogs.io
 ***
 
 
+### Royalties Payout
+The collection will begin with a five percent royalty, that will increase to seven percent after the collection has sold out. Royalties payouts are automatically distributed using [moneypipe.xyz](https://stream.moneypipe.xyz/ethereum/group#address=0x82A5c43f06BF6CA33Ec637831fa81fbc51CfD94C) as shown below:
+
+* 1.5% automatically be sent to [@RainforestUS](https://twitter.com/RainforestUS) A non profit organization that will use funds to protect natural rainforests! For every 1.00 ETH in donations, 2.5 acres will be saved forever!
+
+* The other 1.5% will be sent to [@savethefrogs](https://twitter.com/savethefrogs) The world’s first and most effective public charity dedicated exclusively to protecting amphibian populations. Founded 2008!
+
+* The remaining 3% will be used to grow the project and reward the community!
+
+
+***
+
+
 ### Mint Info (Updated)
 **Cost to Mint**
 
@@ -54,15 +67,3 @@ After Frog 3,233 has been minted, the price will increase to 0.01 and limit to 4
 
 Fresh Frogs NFT smart contract powered by Factoria's ERC-721 contract resulting in extremely low gas fees.
 
-
-***
-
-
-### Royalties Payout
-The collection will begin with a five percent royalty, that will increase to seven percent after the collection has sold out. Royalties payouts are automatically distributed using [moneypipe.xyz](https://stream.moneypipe.xyz/ethereum/group#address=0x82A5c43f06BF6CA33Ec637831fa81fbc51CfD94C) as shown below:
-
-* 1.5% automatically be sent to [@RainforestUS](https://twitter.com/RainforestUS) A non profit organization that will use funds to protect natural rainforests! For every 1.00 ETH in donations, 2.5 acres will be saved forever!
-
-* The other 1.5% will be sent to [@savethefrogs](https://twitter.com/savethefrogs) The world’s first and most effective public charity dedicated exclusively to protecting amphibian populations. Founded 2008!
-
-* The remaining 3% will be used to grow the project and reward the community!
