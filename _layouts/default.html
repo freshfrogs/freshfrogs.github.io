@@ -1039,7 +1039,7 @@
         userInvite = userInviteCode
         mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
         mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
-        document.getElementById("mintTotal").innerHTML = "<strong>"+(mintPrice)+" ΞETH</strong>plus gas"
+        document.getElementById("mintTotal").innerHTML = "<strong>Ξ"+(mintPrice)+"</strong>plus gas"
         consoleOutput('<b>Connected!</b> <acc style="color: white !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+'<u>Frog (#'+nextIdC+'/4040)</u>'+' is now available to mint!<br>Maximum of <u>'+(mintLimit-ownedFrogs)+'</u> Frogs per wallet! [@ '+mintPrice+' ΞETH]<br>'+'<p></p>')
       }
       // Get User's Invite Codes
@@ -1048,7 +1048,7 @@
         // Fetch Public Invite 0x000
         mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
         mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
-        document.getElementById("mintTotal").innerHTML = "<strong>"+(mintPrice)+" ΞETH</strong>plus gas"
+        document.getElementById("mintTotal").innerHTML = "<strong>Ξ"+(mintPrice)+"</strong>plus gas"
 
         // Public Invite Message
         inviteMessage = '<u>Frog (#'+nextIdC+'/4040)</u>'+' is now available to mint!<br>Maximum of <u>'+mintLimit+'</u> Frogs per wallet!<br>'+'<p></p>'
@@ -1062,7 +1062,7 @@
               userInvite = "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064";
               mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
               mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
-              document.getElementById("mintTotal").innerHTML = "<strong>"+(mintPrice)+" ΞETH</strong>plus gas"
+              document.getElementById("mintTotal").innerHTML = "<strong>Ξ"+(mintPrice)+"</strong>plus gas"
               inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Maximum of <u>'+(mintLimit-ownedFrogs)+'</u> Frogs per wallet!<br>'+'<p></p>'
               break;
             } 
@@ -1157,7 +1157,7 @@
           <div id="mintingTray">
             <ul class="downloads2">
               <li><a id="mintTransact" href="https://freshfrogs.io/" class="pointer"><p>Connect Wallet!</p></a></li>
-              <li><a id="mintTotal"><strong>0.01 ΞETH</strong>Plus gas</a></li>
+              <li><a id="mintTotal"><strong>Ξ0.01</strong>Plus gas</a></li>
               <li><a class="pointer"><strong><b id="removeFrog" class="pointer">−</b><frogQuant id="frogQuant">  1  </frogQuant><b id="addFrog" class="pointer">+</b></strong>Quantity</a></li>
             </ul>
             <div class="bigContainer">
