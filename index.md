@@ -8,4 +8,4 @@ layout: default
 
 <div id="pre" class="mintingTextWhite2">Waiting to Connect Web3...<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a></div>
 
-[Recent Sales on OpenSea](https://opensea.io/collection/fresh-frogs/activity)
+[**Recent Sales on OpenSea**](https://opensea.io/collection/fresh-frogs/activity)
