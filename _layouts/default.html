@@ -850,7 +850,7 @@
                         '<strong class="frog_name">'+name+'</strong> ' + ' <b>Ξ'+sale_price+'</b>';
                     document.getElementById('recent_sales').appendChild(recent_sale);
 
-                    console.log(frog)
+                    console.log(name)
                     fetch(token_metadata)
                     .then((metadata) => metadata.json())
                     .then((metadata) => {
