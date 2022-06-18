@@ -850,6 +850,7 @@
                         '<strong class="frog_name">'+name+'</strong> ' + ' <b>Ξ'+sale_price+'</b>';
                     document.getElementById('recent_sales').appendChild(recent_sale);
 
+                    console.log(frog)
                     fetch(token_metadata)
                     .then((metadata) => metadata.json())
                     .then((metadata) => {
@@ -863,7 +864,7 @@
                         let value = attribute.value
 
                         // Build Fresh Frogs Attributes
-                        load_trait(trait_type, value, name)
+                        load_trait(trait_type, value, name);
                         console.log(trait_type+' : '+value);
                         
                       }
