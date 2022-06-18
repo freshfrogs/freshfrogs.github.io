@@ -836,7 +836,7 @@
 
                 try {
 
-                    var { asset: { image_url, name, permalink }, payment_token: { decimals }, total_price } = sale;
+                    var { asset: { image_url, name, permalink, token_metadata }, payment_token: { decimals }, total_price } = sale;
 
                     var sale_price = total_price / Math.pow(10, decimals);
 
@@ -847,14 +847,33 @@
                     recent_sale.style.width = 128+64+'px';
                     recent_sale.href = permalink;
                     recent_sale.innerHTML = 
-                        '<img class="frog_img" src='+image_url+'>' +
+                        '<div id="'+frog.name+'"><img class="frog_img" src='+image_url+'>' +
                         '<i class="label_name">FreshFrogsNFT</i>' +
                         '<strong class="frog_name">'+name+'</strong> ' + ' <b>Ξ'+sale_price+'</b>';
                     document.getElementById('recent_sales').appendChild(recent_sale);
-              
-                } catch (e) { console.log('Error : ' + e.message) }
 
-            })
+                    fetch(token_metadata)
+                    .then((metadata) => metadata.json())
+                    .then((metadata) => {
+                      // Loop Attributes
+                      for (var i = 0; i < metadata.attributes.length; i++){
+                        //console.log(metadata.attributes[i]);
+
+                        // Trait_Type : Value
+                        var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                        let trait_type = attribute.trait_type
+                        let value = attribute.value
+
+                        // Build Fresh Frogs Attributes
+                        //load_trait(trait_type, value, frog.name)
+                        console.log(trait_type+' : '+value);
+                        
+                      }
+                    })
+                      
+                        } catch (e) { console.log('Error : ' + e.message) }
+
+                    })
 
 
         })
