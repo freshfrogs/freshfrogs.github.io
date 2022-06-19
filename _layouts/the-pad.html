@@ -1099,7 +1099,7 @@
                   let trait_type = attribute.trait_type
                   let value = attribute.value
 
-                  try { var trait_rarity = ((traits_list[trait_type][value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'i';}
+                  try { var trait_rarity = ((traits_list[trait_type][value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'i'; console.log(e); }
                   
                   if (trait_rarity == 'NaN' || trait_rarity < 1) { trait_rarity = '<1' }
 
@@ -1179,7 +1179,7 @@
                 let trait_type = attribute.trait_type
                 let value = attribute.value
 
-                try { var trait_rarity = ((traits_list[trait_type][value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'i'}
+                try { var trait_rarity = ((traits_list[trait_type][value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'i'; console.log(e); }
                 
                 if (trait_rarity == 'NaN' || trait_rarity < 1) { trait_rarity = '<1' }
 
