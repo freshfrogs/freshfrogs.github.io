@@ -817,74 +817,61 @@
       
         });
 
-        //
-        // Get recent sales
-      
-        fetch('https://api.opensea.io/api/v1/events?collection_slug=fresh-frogs&event_type=successful&limit=3', options)
-        .then(res => res.json())
-        .then(res => {
 
-            var { asset_events } = res
+        // Get Owned Frogs
 
-            //console.log(asset_events)
-            
-            var percent_width = 92 / 7 + '%'
+        fetch('https://api.opensea.io/api/v1/assets?owner='+from_address+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+        .then((res) => res.json())
+        .then((res) => {
+          loaded = 0;
+          var { assets } = res
+          assets.forEach((frog) => {
 
-            document.getElementById('recent_sales').innerHTML = '';
+            var { name, token_metadata, permalink, traits, external_link, token_id } = frog
 
-            asset_events.forEach((sale) => {
+            recent_sale = document.createElement('a');
+            recent_sale.className = 'recent_sale';
+            recent_sale.style.width = 128+64+'px';
+            recent_sale.href = permalink;
+            recent_sale.innerHTML = 
+                '<div id="'+name+'" class="trait_display"><img class="frog_img" src='+external_link+'></div>' +
+                '<i class="label_name">FreshFrogsNFT</i>' +
+                '<strong class="frog_name">'+name+'</strong> ';
+            document.getElementById('recent_sales').appendChild(recent_sale);
 
-                try {
+            fetch(token_metadata)
+            .then((metadata) => metadata.json())
+            .then((metadata) => {
+              // Loop Attributes
+              for (var i = 0; i < metadata.attributes.length; i++){
+                //console.log(metadata.attributes[i]);
 
-                    var { asset: { image_url, name, permalink, token_metadata }, payment_token: { decimals }, total_price } = sale;
+                // Trait_Type : Value
+                var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                let trait_type = attribute.trait_type
+                let value = attribute.value
 
-                    var sale_price = total_price / Math.pow(10, decimals);
+                // Build Fresh Frogs Attributes
+                //load_trait(trait_type, value, name);
+                console.log(trait_type+' : '+value);
+                
+              }
+            })
 
-                    //console.log('Sale found...'+sale.asset.name+' : '+sale_price);
+          })
 
-                    recent_sale = document.createElement('a');
-                    recent_sale.className = 'recent_sale';
-                    recent_sale.style.width = 128+64+'px';
-                    recent_sale.href = permalink;
-                    recent_sale.innerHTML = 
-                        '<div id="'+name+'" class="trait_display"><img class="frog_img" src='+image_url+'></div>' +
-                        '<i class="label_name">FreshFrogsNFT</i>' +
-                        '<strong class="frog_name">'+name+'</strong> ' + ' <b>Ξ'+sale_price+'</b>';
-                    document.getElementById('recent_sales').appendChild(recent_sale);
-
-                    console.log(name)
-                    fetch(token_metadata)
-                    .then((metadata) => metadata.json())
-                    .then((metadata) => {
-                      // Loop Attributes
-                      for (var i = 0; i < metadata.attributes.length; i++){
-                        //console.log(metadata.attributes[i]);
-
-                        // Trait_Type : Value
-                        var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
-                        let trait_type = attribute.trait_type
-                        let value = attribute.value
-
-                        // Build Fresh Frogs Attributes
-                        //load_trait(trait_type, value, name);
-                        console.log(trait_type+' : '+value);
-                        
-                      }
-                    })
-                      
-                        } catch (e) { console.log('Error : ' + e.message) }
-
-                    })
-
+          // Finish Loading Bar
+          consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAddress)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<strong class="pointer" onclick="load_ownedFrogs_manual()"><u>Check via IPFS</u> 🔃</strong>'+'<p></p>')
 
         })
         .catch(e => {
 
-            console.log('Error: Could not get recent sales from Opensea...');
-            console.error('Error : ' + e.message)
+          console.log(e.message);
+          console.log('Error: Could not get Collection data from Opensea.');
+          consoleOutput('<br>'+'<strong>Connected!</strong> Could not talk to OpenSea! <br>Loading Frogs from IPFS... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
+      
+        });
 
-        })
-        //
 
         try {   // Connect Wallet
 
