@@ -818,9 +818,64 @@
         });
 
 
+        try {   // Connect Wallet
+
+          //consoleOutput('<strong></strong><br>Connecting...<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
+
+          await f0.init({
+            web3: web3,
+            contract: CONTRACT_ADDRESS,
+            network: NETWORK
+          })
+
+          // Assign Variables (Fetch from Connect)
+          // CONNECTED USER'S WALLET ADDRESS; AND INVITES
+          userAddress = await web3.currentProvider.selectedAddress;
+          addressCut = userAddress.substring(0, 5)+".."+userAddress.slice(-4);
+          userInviteList = await f0.myInvites();
+          userInviteKeys = Object.keys(userInviteList);
+
+          // CONTRACT NAME, SYMBOL, NEXT ID;
+          name = await f0.api.name().call();
+          symbol = await f0.api.symbol().call();
+          nextId = await f0.api.nextId().call();
+          nextIdC = parseInt(nextId);
+
+          //document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
+
+          userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
+          ownedFrogs = await collection.methods.balanceOf(userAddress).call();
+          
+          console.log('Wallet Connected! '+userAddress);
+          console.log('Contract Connected! '+name+' | '+symbol);
+
+          // Clear Status
+
+          //document.getElementById('netStatus').innerHTML = '<br><h2 style="color: white !important;"><b>freshfrogs.io</b></h2><div id="pre" class="consoleOutput"></div>';
+          
+          // Messages Sent to Terminal (Again)
+          //document.getElementById("supply").innerHTML = "Fresh Frog #"+nextIdC+" / 4040" // Supply
+          document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.io/frog/"+nextIdC+".png");
+
+          // ----------------------------->
+
+          mint = 1; // <--- Mint On or Off? 1 / 0
+
+          // <-----------------------------
+          //document.getElementById('mintingText').innerHTML = "<strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the page!"
+          //document.getElementById('mintingText').className = "mintingTextWhite"
+          // Done! Ready to mint!
+        } catch (e) { // Failed; Send Error Code!
+          //consoleOutput("<br>"+"<div class='mintingTextRed'><strong>Error Linking Wallet: <br>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
+          consoleOutput(e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
+          return;
+        }
+        getInvites(); // Check and Confirm Invite Keys
+        document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
+        document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         // Get Owned Frogs
 
-        fetch('https://api.opensea.io/api/v1/assets?owner='+from_address+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+        fetch('https://api.opensea.io/api/v1/assets?owner='+userAddress+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
         .then((res) => res.json())
         .then((res) => {
           loaded = 0;
@@ -871,64 +926,6 @@
           consoleOutput('<br>'+'<strong>Connected!</strong> Could not talk to OpenSea! <br>Loading Frogs from IPFS... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
       
         });
-
-
-        try {   // Connect Wallet
-
-          //consoleOutput('<strong></strong><br>Connecting...<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
-
-          await f0.init({
-            web3: web3,
-            contract: CONTRACT_ADDRESS,
-            network: NETWORK
-          })
-
-          // Assign Variables (Fetch from Connect)
-          // CONNECTED USER'S WALLET ADDRESS; AND INVITES
-          userAcc = await web3.currentProvider.selectedAddress;
-          addressCut = userAcc.substring(0, 5)+".."+userAcc.slice(-4);
-          userInviteList = await f0.myInvites();
-          userInviteKeys = Object.keys(userInviteList);
-
-          // CONTRACT NAME, SYMBOL, NEXT ID;
-          name = await f0.api.name().call();
-          symbol = await f0.api.symbol().call();
-          nextId = await f0.api.nextId().call();
-          nextIdC = parseInt(nextId);
-
-          //document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
-
-          userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
-          ownedFrogs = await collection.methods.balanceOf(userAcc).call();
-          
-          console.log('Wallet Connected! '+userAcc);
-          console.log('Contract Connected! '+name+' | '+symbol);
-
-          // Clear Status
-
-          //document.getElementById('netStatus').innerHTML = '<br><h2 style="color: white !important;"><b>freshfrogs.io</b></h2><div id="pre" class="consoleOutput"></div>';
-          
-          // Messages Sent to Terminal (Again)
-          //document.getElementById("supply").innerHTML = "Fresh Frog #"+nextIdC+" / 4040" // Supply
-          document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.io/frog/"+nextIdC+".png");
-
-          // ----------------------------->
-
-          mint = 1; // <--- Mint On or Off? 1 / 0
-
-          // <-----------------------------
-          //document.getElementById('mintingText').innerHTML = "<strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the page!"
-          //document.getElementById('mintingText').className = "mintingTextWhite"
-          // Done! Ready to mint!
-        } catch (e) { // Failed; Send Error Code!
-          //consoleOutput("<br>"+"<div class='mintingTextRed'><strong>Error Linking Wallet: <br>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
-          consoleOutput(e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
-          return;
-        }
-        getInvites(); // Check and Confirm Invite Keys
-        document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
-        document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
-
 
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           if (mint === 0) { // || nextIdC >= 3021
@@ -1027,7 +1024,7 @@
         mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
         mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
         document.getElementById("mintTotal").innerHTML = "<strong>Ξ"+(mintPrice)+"</strong>+ gas"
-        consoleOutput('<b>Connected!</b> <acc style="color: white !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+'Frog ( '+nextIdC+' / 4040 )'+' is now available to mint!<br>Maximum of <u>'+(mintLimit-ownedFrogs)+'</u> Frogs per wallet! [@ '+mintPrice+' ΞETH]<br>'+'<p></p>')
+        consoleOutput('<b>Connected!</b> <acc style="color: white !important;">[ '+truncateAddress(userAddress)+' ]</acc><br>'+'Frog ( '+nextIdC+' / 4040 )'+' is now available to mint!<br>Maximum of <u>'+(mintLimit-ownedFrogs)+'</u> Frogs per wallet! [@ '+mintPrice+' ΞETH]<br>'+'<p></p>')
       }
       // Get User's Invite Codes
       async function getInvites() {
@@ -1044,7 +1041,7 @@
           let thisInvite = userInviteKeys[i]
           if (thisInvite === "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064") { // 0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359
             // NF7UOS / C7AR Bypass
-            if (userAcc === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase()  || userAcc === "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359_0".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase() || userAcc === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
+            if (userAddress === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase()  || userAddress === "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359_0".toLowerCase() || userAddress === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase() || userAddress === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
               // Unlimited Free Mints
               userInvite = "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064";
               mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
@@ -1066,7 +1063,7 @@
             } else { console.log('Too many Frogs owned for invite.. Public invite applied') }
           }
         }
-        consoleOutput('<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+inviteMessage)
+        consoleOutput('<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAddress)+' ]</acc><br>'+inviteMessage)
       }
 
       // Output to minting terminal
