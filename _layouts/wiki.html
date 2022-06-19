@@ -646,9 +646,9 @@
                             recent_sale.className = 'recent_sale';
                             recent_sale.href = permalink;
                             recent_sale.innerHTML = 
-                                '<img class="frog_img" src='+image_url+'>' +
-                                '<i class="label_name">FreshFrogsNFT</i><i class="label_price">Price</i>' +
-                                '<strong class="frog_name">'+name+'</strong><strong class="frog_price">'+sale_price+' Ξ</strong>';
+                                '<div id="'+name+'" class="trait_display"><img class="frog_img" src='+image_url+'></div>' +
+                                '<i class="label_name">FreshFrogsNFT</i>' +
+                                '<strong class="frog_name">'+name+'</strong> ' + ' <b>Ξ'+sale_price+'</b>';
                             document.getElementById('recent_sales').appendChild(recent_sale);
                       
                         } catch (e) { console.log('Error : ' + e.message) }
