@@ -824,7 +824,7 @@
         .then(res => res.json())
         .then(res => {
 
-            var { asset_events } = res
+            var { assets } = res
 
             //console.log(asset_events)
             
@@ -832,14 +832,14 @@
 
             document.getElementById('recent_sales').innerHTML = '';
 
-            asset_events.forEach((frog) => {
+            assets.forEach((frog) => {
 
                 try {
 
                     //var { asset: { image_url, name, permalink, token_metadata }, payment_token: { decimals }, total_price } = sale;
                     var { name, token_metadata, permalink, traits, image_url } = frog
 
-                    var sale_price = total_price / Math.pow(10, decimals);
+                    //var sale_price = total_price / Math.pow(10, decimals);
 
                     //console.log('Sale found...'+sale.asset.name+' : '+sale_price);
 
