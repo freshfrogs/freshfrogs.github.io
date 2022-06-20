@@ -832,11 +832,12 @@
 
             document.getElementById('recent_sales').innerHTML = '';
 
-            asset_events.forEach((sale) => {
+            asset_events.forEach((frog) => {
 
                 try {
 
-                    var { asset: { image_url, name, permalink, token_metadata }, payment_token: { decimals }, total_price } = sale;
+                    //var { asset: { image_url, name, permalink, token_metadata }, payment_token: { decimals }, total_price } = sale;
+                    var { name, token_metadata, permalink, traits, image_url } = frog
 
                     var sale_price = total_price / Math.pow(10, decimals);
 
@@ -849,7 +850,7 @@
                     recent_sale.innerHTML = 
                         '<div id="'+name+'" class="trait_display"><img class="frog_img" src='+image_url+'></div>' +
                         '<i class="label_name">FreshFrogsNFT</i>' +
-                        '<strong class="frog_name">'+name+'</strong> ' + ' <b>Ξ'+sale_price+'</b>';
+                        '<strong class="frog_name">'+name+'</strong> ';
                     document.getElementById('recent_sales').appendChild(recent_sale);
 
                     console.log(name)
