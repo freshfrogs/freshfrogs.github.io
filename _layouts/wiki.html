@@ -566,6 +566,11 @@
         margin: auto;
         display: block;
         image-rendering: pixelated;
+        -ms-overflow-style: none;  /* Internet Explorer 10+ */
+        scrollbar-width: none;  /* Firefox */
+    }
+    .banner_int::-webkit-scrollbar { 
+        display: none;  /* Safari and Chrome */
     }
     .banner_int img {
         width: 64px;
