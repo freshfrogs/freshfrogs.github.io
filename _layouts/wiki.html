@@ -571,6 +571,8 @@
     }
     .banner_int::-webkit-scrollbar { 
         display: none;  /* Safari and Chrome */
+        -ms-overflow-style: none;  /* Internet Explorer 10+ */
+        scrollbar-width: none;  /* Firefox */
     }
     .banner_int img {
         width: 64px;
