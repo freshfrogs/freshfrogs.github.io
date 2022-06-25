@@ -11,7 +11,7 @@
       height: 100% !important;
       padding-top: 0px !important;
       background-color: white;
-      width: 128px !important;
+      width: 64px !important;
       margin-left: auto;
       margin-right: auto;
     }
@@ -40,7 +40,7 @@
         margin-right: 2.5%;
     }
     .frog_img {
-        width: 256px;
+        width: 64px;
         border-radius: 5px;
     }
     .label_name {
@@ -732,7 +732,7 @@
         
         // Get recent mints
       
-        fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=3&include_orders=false', options)
+        fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=9&include_orders=false', options)
         .then(res => res.json())
         .then(res => {
 
@@ -756,9 +756,7 @@
               recent_sale.style.width = 128+64+'px';
               recent_sale.href = permalink;
               recent_sale.innerHTML = 
-                  '<div id="'+name+'" class="trait_display"><img class="frog_img" src='+image_url+'></div>' +
-                  '<i class="label_name">FreshFrogsNFT</i>' +
-                  '<strong class="frog_name">'+name+'</strong> ';
+                  '<img class="frog_img" src='+image_url+'>';
               document.getElementById('recent_sales').appendChild(recent_sale);    
 
             })
