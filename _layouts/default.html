@@ -761,6 +761,46 @@
             })
 
         })
+        //
+        .then((res) => {
+          loaded = 0;
+          var { assets } = res
+          assets.forEach((frog) => {
+
+            var { name, token_metadata, permalink, traits, external_link, token_id } = frog
+
+            load_token(token_id);
+
+            fetch(token_metadata)
+            .then((metadata) => metadata.json())
+            .then((metadata) => {
+              // Loop Attributes
+              for (var i = 0; i < metadata.attributes.length; i++){
+
+                // Trait_Type : Value
+                var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                let trait_type = attribute.trait_type
+                let value = attribute.value
+
+                try { var trait_rarity = ((traits_list[trait_type][value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'i'; console.log(e); }
+                
+                if (trait_rarity == 'NaN' || trait_rarity < 1) { trait_rarity = '<1' }
+
+                // Build Fresh Frogs Attributes
+                load_trait(trait_type, value, frog.name)
+                newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
+                if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
+                  else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
+                newAttribute.className = value;
+                space = document.createElement('br')
+                document.getElementById('Frog #'+token_id+'Desc').appendChild(space)
+                document.getElementById('Frog #'+token_id+'Desc').appendChild(newAttribute)
+                
+              }
+            })
+          })
+        })
+        //
         .catch(e => {
 
             console.log('Error: Could not get recent sales from Opensea...');
@@ -987,9 +1027,11 @@
 
       // Load Fresh Frog
 
+      // Load Fresh Frog
       function load_token(token) {
 
         openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
+        etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
 
         newFrog = document.createElement("div")
         newFrog.id = token
