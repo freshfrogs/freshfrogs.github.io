@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<style>
+  html{
+    background-image: url("/assets/background.png");
+  }
+  html,h1,h2,h3 {
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+  }
+  .desc {
+    overflow: hidden;
+  }
+  .lower{
+    top: 20px
+  }
+  .bodyb {
+    background-color: transparent;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .logoImg {
+    image-rendering: crisp-edges !important;
+    width: 64px;
+    height: 64px;
+    bottom: 16px;
+    border-radius: 100%;
+  }
+  .top {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 2%;
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font-weight: 500;
+    color: rgba(126, 183, 128, 1);
+    font-size: 1em;
+    image-rendering: pixelated;
+    text-align: center;
+    max-width: 1000px;
+  }
+  .smallContainer{
+    border-radius: 5px;
+    border: 0px solid #e0e0e0;
+    overflow: hidden;
+    background-color: transparent;
+    box-shadow: 2px 4px rgba(122, 122, 122, 0.33);
+    width: 128px;
+  }
+  .smallContainer2 {
+    border-radius: 5px;
+    border: 0px solid #e0e0e0;
+    overflow: hidden;
+    background-color: transparent;
+
+    width: 128px;
+    padding-top: 0px !important;
+    height: 100% !important;
+    display: inline-block !important;
+    margin-left: 0%;
+    margin-right: 0%;
+    margin-top: 2%;
+    margin-bottom: 0px;
+
+  }
+  .bigContainer{
+    border-radius: 5px;
+    border: 0px solid #e0e0e0;
+    overflow: hidden;
+    background-color: transparent;
+    box-shadow: 2px 4px rgba(122, 122, 122, 0.33);
+  }
+  .headLine{
+    color: transparent;
+    image-rendering: crisp-edges;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 0px;
+    margin-top: auto;
+    vertical-align: top;
+  }
+  .headLineImg {
+    float: none;
+    image-rendering: crisp-edges;
+    height: 32px;
+    vertical-align: top;
+    border-radius: 100%;
+    padding: 0%;
+    transition: transform .2s;
+    margin-left: 6%;
+    margin-right: 6%;
+    margin-bottom: 0%;
+    box-shadow: 2px 4px rgba(122, 122, 122, 0.33);
+  }
+  .headLineImg:hover{
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Safari 3-8 */
+    transform: scale(1.5);
+    box-shadow: none;
+    border: none;
+  }
+  .h1 {
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font-weight: 800;
+    color: white;
+    text-align: center;
+    image-rendering: pixelated;
+    padding: 0%;
+    font-size: xx-large;
+  }
+  .supply{
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    color: #333;
+  }
+  section {
+    border: 4px solid white;
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font-size: auto;
+    color: #333;
+    background-color: white;
+    text-align: center !important;
+    border-radius: 7px;
+    padding: 14px;
+    padding-bottom: 16px !important;
+    width: 100% !important;
+    overflow: hidden;
+    margin-bottom: 16px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    float: none !important;
+  }
+  header {
+    border: 4px solid white;
+    overflow: hidden;
+
+    background-color: white;
+    text-align: center;
+    border-radius: 7px;
+    padding: 14px;
+    width: auto;
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font-size: small;
+
+    color: #333;
+  }
+  .desc {
+    position: relative;
+    background-color: inherit;
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font-size: inherit !important;
+    color: #333;
+  }
+  .downloads {
+    margin-top: 0%;
+    margin-bottom: 4%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 14px;
+    box-shadow: 2px 4px rgba(122, 122, 122, 0.33);
+  }
+  .downloads a{
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font-size: inherit !important;
+    color: #333;
+  }
+  .pre h1{
+    margin-top: 8px;
+  }
+  .container {
+    width: auto;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    background-color: transparent;
+
+    display: -webkit-box;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+
+    display: -moz-box;
+    -moz-box-orient: horizontal;
+    -moz-box-pack: center;
+    -moz-box-align: center;
+
+    display: box;
+    box-orient: horizontal;
+    box-pack: center;
+    box-align: center;
+  }
+  .imgWrapper {
+    -webkit-box-flex: 13;
+    -moz-box-flex: 1;
+    box-flex: 1;
+  }
+
+  .frogImg {
+    transition: transform .2s;
+    height: auto;
+    display: block;
+    image-rendering: pixelated;
+    box-shadow: 2% 4% rgba(122, 122, 122, 0.33);
+    overflow: hidden;
+  }
+
+  .headLineImg2 {
+    transition: transform .2s;
+    display: block;
+    box-shadow: none;
+    border: none;
+    float: none;
+    image-rendering: crisp-edges;
+    height: 56px;
+    border-radius: 100%;
+    padding: 0%;
+    transition: transform .2s;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: auto;
+    margin-top: auto;
+  }
+  .headLineImg2:hover{
+    -ms-transform: scale(1.01); /* IE 9 */
+    -webkit-transform: scale(1.01); /* Safari 3-8 */
+    transform: scale(1.01);
+    box-shadow: none;
+    border: none;
+  }
+
+  .frogImg2 {
+    transition: transform .2s;
+    width: 128px;
+    display: block;
+    image-rendering: pixelated;
+    box-shadow: none;
+    border: none;
+  }
+  .frogImg2:hover{
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Safari 3-8 */
+    transform: scale(1.5);
+    box-shadow: none;
+    border: none;
+  }
+  .pointer {
+    transition: transform .2s;
+    cursor: pointer;
+  }
+  .pointer:hover{
+    -ms-transform: scale(1.1); /* IE 9 */
+    -webkit-transform: scale(1.1); /* Safari 3-8 */
+    transform: scale(1.1);
+  }
+  .frogImg:hover{
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Safari 3-8 */
+    transform: scale(1.5);
+    box-shadow: none;
+    border: none;
+  }
+  .pre {
+    border-radius: 2%;
+    text-align: center;
+    padding: 0px;
+    margin-bottom: 8px;
+    width: 100%;
+    height: 100%;
+    box-shadow: none;
+  }
+</style>
+<html lang="{{ site.lang | default: "en-US" }}">
+  <link rel="icon" href="../assets/logo.png">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+    <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
+    <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        //
+        newAttribute = document.createElement("a")
+        newAttribute.id = "FrogButton"
+        newAttribute.className = "smallContainer2 pointer"
+        newAttribute.onClick = "loadFrogs()"
+        newAttribute.innerHTML = '<img onclick="loadFrogs()" class="frogImg2" src="./Frog/unknown.png" alt="Frogs" id="Frog"><b>Frogs</b>'
+        document.getElementById("pre").appendChild(newAttribute)
+        //
+        //
+        newAttribute = document.createElement("a")
+        newAttribute.id = "SpecialFrogButton"
+        newAttribute.className = "smallContainer2 pointer"
+        newAttribute.innerHTML = '<img onclick="loadSpecialFrogs()" class="frogImg2" src="./SpecialFrog/thirdEye.png" alt="SpecialFrog" id="Frogs"><b>SpecialFrogs</b>'
+        document.getElementById("pre").appendChild(newAttribute)
+        //
+        //
+        newAttribute = document.createElement("a")
+        newAttribute.id = "OpenSeaButton"
+        newAttribute.href = "https://opensea.io/collection/fresh-frogs"
+        newAttribute.target = "_blank"
+        newAttribute.className = "smallContainer2 pointer"
+        newAttribute.innerHTML = '<img class="headLineImg2" src="OpenSea.png" alt="OpenSea" id="OpenSea"><br><br><b>View on OpenSea</b>'
+        document.getElementById("pre").appendChild(newAttribute)
+        //
+        //
+        newAttribute = document.createElement("a")
+        newAttribute.id = "RaribleButton"
+        newAttribute.href = "https://rarible.com/fresh-frogs"
+        newAttribute.target = "_blank"
+        newAttribute.className = "smallContainer2 pointer"
+        newAttribute.innerHTML = '<img class="headLineImg2" src="Rarible.png" alt="Rarible" id="Rarible"><br><br><b>View on Rarible</b>'
+        document.getElementById("pre").appendChild(newAttribute)
+        //
+        //
+        newAttribute = document.createElement("a")
+        newAttribute.id = "EtherScanButton"
+        newAttribute.href = "https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b#inventory"
+        newAttribute.target = "_blank"
+        newAttribute.className = "smallContainer2 pointer"
+        newAttribute.innerHTML = '<img class="headLineImg2" src="EtherScan.png" alt="EtherScan" id="EtherScan"><br><br><b>View on EtherScan</b>'
+        document.getElementById("pre").appendChild(newAttribute)
+        //
+        /*
+        newAttribute = document.createElement("a")
+        newAttribute.id = "AttributesButton"
+        newAttribute.className = "smallContainer2"
+        newAttribute.innerHTML = '<img onclick="loadAttributes()" class="frogImg2 lower" src="./Hat/witchBlack.png" alt="Attributes" id="Attributes">Attributes'
+        document.getElementById("pre").appendChild(newAttribute)
+        */
+        
+     /*   let snapshot = []
+        let i = 1;
+        consoleOutput(userAcc+" Tokens Held")
+        while(true) {
+          try {
+            let owner = await collection.methods.ownerOf(i++).call()
+            if (userAcc === owner.toLowerCase()) {
+              consoleOutput(i-1)
+            }
+          } catch (e) {
+            break;
+            consoleOutput("done")
+          }
+        }
+        
+        if (ownedFrogs => 1){
+          loadAllAttributes()
+        } else {
+          consoleOutput("This content is only available to FROG holders at this time...")
+        }
+        */
+/*      async function get() {
+          let metadata = await (await fetch(ipfsGatewayURI)).json();
+          //console.log(obj);
+          return metadata;
+        }
+        var metadata2;
+        (async () => {
+          metadata2 = await get()
+          document.getElementById("pre").innerHTML = JSON.stringify(metadata2.attributes); // JSON.stringify(metadata2.attributes.replace('[{"trait_type":"', '').replace('","value":"', '').replace('"},', ''));
+        })() */
+
+      }) 
+      function consoleOutput(output) {
+        newLine = document.createElement("div")
+        newLine.innerHTML = output
+        document.getElementById("pre").appendChild(newLine)
+      }
+      //
+      function loadAttribute(trait, attribute) {
+        newAttribute = document.createElement("a")
+        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
+        newAttribute.id = attribute
+        newAttribute.target = "_blank"
+        newAttribute.className = "smallContainer2 pointer"
+        newAttribute.innerHTML = '<img class="frogImg2" src="./'+trait+'/'+attribute+'.png" alt="'+attribute+'" id="'+attribute+'"><b>'+attribute+'</b>'
+        document.getElementById("pre").appendChild(newAttribute)
+      }
+      function loadFrogs() {
+        // FROG
+        document.getElementById("pre").innerHTML = ""
+        consoleOutput("\n")
+        loadAttribute("Frog", "blueDartFrog")
+        loadAttribute("Frog", "blueTreeFrog")
+        loadAttribute("Frog", "brownTreeFrog")
+        loadAttribute("Frog", "cyanTreeFrog")
+        loadAttribute("Frog", "goldenDartFrog")
+        loadAttribute("Frog", "goldenTreeFrog")
+        loadAttribute("Frog", "grayTreeFrog")
+        loadAttribute("Frog", "greenTreeFrog")
+        loadAttribute("Frog", "lightBrownTreeFrog")
+        loadAttribute("Frog", "orangeTreeFrog")
+        loadAttribute("Frog", "pinkTreeFrog")
+        loadAttribute("Frog", "purpleTreeFrog")
+        loadAttribute("Frog", "redEyedTreeFrog")
+        loadAttribute("Frog", "splendidLeafFrog")
+        loadAttribute("Frog", "stawberryDartFrog")
+        loadAttribute("Frog", "tomatoFrog")
+        loadAttribute("Frog", "treeFrog(1)")
+        loadAttribute("Frog", "treeFrog(2)")
+        loadAttribute("Frog", "treeFrog(3)")
+        loadAttribute("Frog", "treeFrog(4)")
+        loadAttribute("Frog", "treeFrog(5)")
+        loadAttribute("Frog", "treeFrog(6)")
+        loadAttribute("Frog", "treeFrog(7)")
+        loadAttribute("Frog", "treeFrog(8)")
+        loadAttribute("Frog", "unknown")
+      }
+      function loadSpecialFrogs() {
+        document.getElementById("pre").innerHTML = ""
+        consoleOutput("\n")
+        loadAttribute("SpecialFrog", "closedEyes")
+        loadAttribute("SpecialFrog", "croaking")
+        loadAttribute("SpecialFrog", "inversedEyes")
+        loadAttribute("SpecialFrog", "peace")
+        loadAttribute("SpecialFrog", "thirdEye")
+      }
+      function loadAttributes() {
+        document.getElementById("pre").innerHTML = ""
+        consoleOutput("\n")
+        loadAttribute("Eyes", "shades")
+        loadAttribute("Eyes", "shadesPurple")
+        loadAttribute("Eyes", "shadesThreeD")
+        loadAttribute("Eyes", "shadesWhite")
+        loadAttribute("Eyes", "circleGlasses")
+        loadAttribute("Eyes", "circleNightVision")
+        loadAttribute("Eyes", "circleShadesPurple")
+        loadAttribute("Eyes", "circleShadesRed")
+        
+
+        //goldChain
+        consoleOutput("\n")
+        loadAttribute("Accessory", "goldChain")
+        loadAttribute("Accessory", "goldDollarChain")
+        loadAttribute("Accessory", "silverChain")
+        loadAttribute("Accessory", "silverEthChain")
+        
+        //Hat
+        consoleOutput("\n")
+        loadAttribute("Hat", "baseballCapBlue")
+        loadAttribute("Hat", "baseballCapRed")
+        loadAttribute("Hat", "baseballCapWhite")
+        loadAttribute("Hat", "cowboyHatBlack")
+        loadAttribute("Hat", "cowboyHatBrown")
+        loadAttribute("Hat", "cowboyHatTan")
+        loadAttribute("Hat", "cowboyHatWhite")
+        loadAttribute("Hat", "crown")
+        loadAttribute("Hat", "stockingCap")
+        loadAttribute("Hat", "topHatBlue")
+        loadAttribute("Hat", "topHatRed")
+        loadAttribute("Hat", "topHatYellow")
+        loadAttribute("Hat", "witchBlack")
+        loadAttribute("Hat", "witchBrown")
+        loadAttribute("Hat", "witchStraw")
+        
+        //Mouth
+        consoleOutput("\n")
+        loadAttribute("Mouth", "bandannaBlue")
+        loadAttribute("Mouth", "bandannaRed")
+        loadAttribute("Mouth", "mask")
+        loadAttribute("Mouth", "smoking")
+        loadAttribute("Mouth", "smokingCigar")
+        loadAttribute("Mouth", "smokingPipe")
+        loadAttribute("Mouth", "tongue")
+        loadAttribute("Mouth", "tongueFly")
+        loadAttribute("Mouth", "tongueSpider")
+        loadAttribute("Mouth", "tongueSpiderRed")
+        
+/*        //Trait
+        consoleOutput("\n<br><hr><h2>\nTrait</h2>")
+        loadAttribute("Trait", "blue")
+        loadAttribute("Trait", "blue(2)")
+        loadAttribute("Trait", "brown")
+        loadAttribute("Trait", "cyan")
+        loadAttribute("Trait", "darkGreen")
+        loadAttribute("Trait", "green")
+    //    loadAttribute("Trait", "natural")
+        loadAttribute("Trait", "orange")
+        loadAttribute("Trait", "orange(2)")
+        loadAttribute("Trait", "pink")
+        loadAttribute("Trait", "purple")
+        loadAttribute("Trait", "purple(2)")
+        loadAttribute("Trait", "red")
+        loadAttribute("Trait", "red(2)")
+        loadAttribute("Trait", "sand")
+        loadAttribute("Trait", "white")
+        loadAttribute("Trait", "white(2)")
+        loadAttribute("Trait", "yellow")
+        loadAttribute("Trait", "yellow(2)")
+      */  
+    }
+      //
+    </script>
+  <div class="top">{{ content }}</div>
+  </head>
+  <body class="bodyb">
+    <div class="wrapper">
+      <section>
+        <h2><strong><a href="https://freshfrogs.github.io">🐸 Fresh Frogs NFT (FROG)</a></strong></h2>
+        <div class="downloads pre">
+          <div id="pre">
+          </div>
+          <div>
+            <div id="recentMints">
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
+  </body>
+</html>
