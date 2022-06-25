@@ -734,34 +734,6 @@
       
         fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=5&include_orders=false', options)
         .then(res => res.json())
-        .then(res => {
-
-            var { assets } = res
-            
-            var percent_width = 92 / 7 + '%'
-
-            document.getElementById('recent_sales').innerHTML = '';
-
-            assets.forEach((frog) => {
-
-              //var { asset: { image_url, name, permalink, token_metadata }, payment_token: { decimals }, total_price } = sale;
-              var { name, token_metadata, permalink, traits, image_url } = frog
-
-              //var sale_price = total_price / Math.pow(10, decimals);
-
-              //console.log('Sale found...'+sale.asset.name+' : '+sale_price);
-
-              recent_sale = document.createElement('a');
-              recent_sale.className = 'recent_sale';
-              recent_sale.style.width = 64+'px';
-              recent_sale.href = permalink;
-              recent_sale.innerHTML = '<img class="frog_img" src='+image_url+'>';
-              document.getElementById('recent_sales').appendChild(recent_sale);    
-
-            })
-
-        })
-        //
         .then((res) => {
           loaded = 0;
           var { assets } = res
@@ -800,7 +772,6 @@
             })
           })
         })
-        //
         .catch(e => {
 
             console.log('Error: Could not get recent sales from Opensea...');
