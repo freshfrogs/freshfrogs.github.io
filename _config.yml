@@ -207,6 +207,7 @@ yat:
 
 # Build settings
 # highlighter: none
+remote_theme: jeffreytse/jekyll-theme-yat
 markdown: kramdown
 kmarkdown:
   input: GFM
