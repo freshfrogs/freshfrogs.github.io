@@ -810,7 +810,7 @@
 
 
         } catch (e) {
-          consoleOutput(e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
+          //consoleOutput(e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
           return;
         }
 
@@ -821,22 +821,22 @@
 
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           if (mint === 0) {
-            consoleOutput('Mint is currently closed!<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
+            //consoleOutput('Mint is currently closed!<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
             return;
           } else {
 
             try {
-              consoleOutput('<strong>Minting ('+frogCount+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
+              //consoleOutput('<strong>Minting ('+frogCount+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
               document.getElementById('pre').className = 'mintingTextWhite'
               let tokens = await f0.mint(userInvite, frogCount) // AWAIT RESPONSE!
 
             } catch (e) {
-              consoleOutput(e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
+              //consoleOutput(e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
               document.getElementById('pre').className = 'mintingTextWhite'
               return; 
             }
             
-            consoleOutput('<h3 class="h3">Congratulations!</h3> <b>'+frogCount+' FROG(s)</b> have successfully been minted! <a class="pointer" href="https://freshfrogs.io/the-pad"><b>View "FROG" Tokens</a></b></div><br>')
+            //consoleOutput('<h3 class="h3">Congratulations!</h3> <b>'+frogCount+' FROG(s)</b> have successfully been minted! <a class="pointer" href="https://freshfrogs.io/the-pad"><b>View "FROG" Tokens</a></b></div><br>')
             document.getElementById('pre').className = "mintingTextGreen"
             return;
           }
@@ -916,7 +916,7 @@
         mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
         mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
         document.getElementById("mintTotal").innerHTML = "<strong>Ξ"+(mintPrice)+"</strong>+ gas"
-        consoleOutput('<b>Connected!</b> <acc style="color: white !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+'Frog ( '+nextIdC+' / 4040 )'+' is now available to mint!<br>Maximum of <u>'+(mintLimit-ownedFrogs)+'</u> Frogs per wallet! [@ '+mintPrice+' ΞETH]<br>'+'<p></p>')
+        //consoleOutput('<b>Connected!</b> <acc style="color: white !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+'Frog ( '+nextIdC+' / 4040 )'+' is now available to mint!<br>Maximum of <u>'+(mintLimit-ownedFrogs)+'</u> Frogs per wallet! [@ '+mintPrice+' ΞETH]<br>'+'<p></p>')
       }
 
       // Get User's Invite Codes
@@ -957,7 +957,7 @@
             } else { console.log('Too many Frogs owned for invite.. Public invite applied') }
           }
         }
-        consoleOutput('<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+inviteMessage)
+        //consoleOutput('<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAcc)+' ]</acc><br>'+inviteMessage)
       }
 
       // Output to minting terminal
