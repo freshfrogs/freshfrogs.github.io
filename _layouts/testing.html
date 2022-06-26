@@ -712,12 +712,12 @@
 
           traits_list = traits;
 
-          document.getElementById('banner_image').setAttribute('src', banner_image_url)
-          document.getElementById('name').innerHTML = name
-          document.getElementById('count').innerHTML = (count/1000).toFixed(2) + 'k'
-          document.getElementById('num_owners').innerHTML = num_owners
-          document.getElementById('floor_price').innerHTML = 'Ξ'+floor_price
-          document.getElementById('total_volume').innerHTML = 'Ξ'+total_volume.toFixed(2)
+          //document.getElementById('banner_image').setAttribute('src', banner_image_url)
+          //document.getElementById('name').innerHTML = name
+          //document.getElementById('count').innerHTML = (count/1000).toFixed(2) + 'k'
+          //document.getElementById('num_owners').innerHTML = num_owners
+          //document.getElementById('floor_price').innerHTML = 'Ξ'+floor_price
+          //document.getElementById('total_volume').innerHTML = 'Ξ'+total_volume.toFixed(2)
           //document.getElementById('description').innerHTML = description
           //document.getElementById('created_date').innerHTML = 'Created ' + created_date
 
@@ -728,55 +728,6 @@
             console.error('Error : ' + e.message)
       
         });
-
-        
-        // Get recent mints
-      
-        fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=3&include_orders=false', options)
-        .then(res => res.json())
-        .then((res) => {
-          var { assets } = res
-          assets.forEach((frog) => {
-
-            var { name, token_metadata, permalink, traits, external_link, token_id } = frog
-
-            load_token(token_id);
-
-            fetch(token_metadata)
-            .then((metadata) => metadata.json())
-            .then((metadata) => {
-              // Loop Attributes
-              for (var i = 0; i < metadata.attributes.length; i++){
-
-                // Trait_Type : Value
-                var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
-                let trait_type = attribute.trait_type
-                let value = attribute.value
-
-                try { var trait_rarity = ((traits_list[trait_type][value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'i'; console.log(e); }
-                
-                if (trait_rarity == 'NaN' || trait_rarity < 1) { trait_rarity = '<1' }
-
-                // Build Fresh Frogs Attributes
-                load_trait(trait_type, value, frog.name)
-                newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
-                if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
-                  else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
-                newAttribute.className = value;
-                space = document.createElement('br')
-                document.getElementById('Frog #'+token_id+'Desc').appendChild(space)
-                document.getElementById('Frog #'+token_id+'Desc').appendChild(newAttribute)
-                
-              }
-            })
-          })
-        })
-        .catch(e => {
-
-            console.log('Error: Could not get recent sales from Opensea...');
-            console.error('Error : ' + e.message)
-
-        })
 
         // Attempt to Connect
 
@@ -1069,12 +1020,7 @@
       <section>
         <div class="downloads pre">
           <div id="netStatus" class="netStatus">
-            <div style="overflow: hidden; height: 20%;"><img id="banner_image" src="../assets/frogs/backfrogs.png" style="border-radius: 5px; height: auto !important; width: 100% !important; margin-bottom: 14px; transform: scale(2.0);"></div>
-            <a style="display: inline-flex !important;" href="https://opensea.io/collection/fresh-frogs" target="_blank"><h1 class="collection-name" id="name">FreshFrogsNFT</h1><img class="headLineImg" src="../assets/opensea.png"></a><p style="display: inline-block !important;">items: <b id="count">3577</b> | owners: <b id="num_owners">540</b> | floor price: <b id="floor_price">-- Ξ</b> | total volume: <b id="total_volume">0.38 Ξ</b></p>
             {{ content }}
-            <div style="margin-left: auto; margin-right: auto; text-align: center;">
-              <div id="recent_sales" class="recent_sales"></div>
-            </div>
           </div>
         </div>
       </section>
