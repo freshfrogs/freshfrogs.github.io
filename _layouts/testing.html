@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <style>
+  .fresh_frog {
+    width: 64px;
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="./assets/logo.png">
@@ -26,8 +29,65 @@
       // -- >
       // Assign Global Variables
       
-      // -- END
+      // -- START
+      document.addEventListener("DOMContentLoaded", async () => {
+
+        // Connect Ethereum Wallet
+
+        const web3 = new Web3(window.ethereum);
+        const f0 = new F0();
+        const CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
+        // (Ethereum Mainnet): 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b || (Rinkeby): 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524
+        const COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
+        const NETWORK = "main";
+
+        // Load OpenSea API
+
+        const options = {
+          method: 'GET',
+          headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
+        };
+
+        // Collection Data
+
+        fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
+        .then(collection => collection.json())
+        .then(collection => {
+
+          var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
+
+        })
+        .catch(e => {
+
+            console.log('Could not talk to Opensea!');
+            console.log('OpenSea : ' + e.message)
       
+        });
+      
+        fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=5&include_orders=false', options)
+        .then(res => res.json())
+        .then((res) => {
+          var { assets } = res
+          assets.forEach((frog) => {
+
+            var { name, token_metadata, permalink, traits, external_link, token_id } = frog
+
+            new_frog = document.createElement('img')
+            new_frog.src = external_link
+            new_frog.className = 'fresh_frog'
+            document.getElementById('fresh_frogs').appendChild(new_frog)
+
+          })
+        })
+        .catch(e => {
+
+            console.log('Error: Could not get recent sales from Opensea...');
+            console.error('Error : ' + e.message)
+
+        })
+
+        // Attempt to Connect
+    })
     </script>
   </head>
   <body>
@@ -35,6 +95,7 @@
       <header>
       </header>
       <section>
+        <div class="fresh_frogs" id="fresh_frogs"></div>
         {{ content }}
       </section>
     </div>
