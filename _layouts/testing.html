@@ -7,7 +7,7 @@
     text-align: left;
   }
   .fresh_frog {
-    width: 64px;
+    width: 128px;
     margin: 8px;
   }
   section {
@@ -74,7 +74,7 @@
       
         });
       
-        fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=5&include_orders=false', options)
+        fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=16&include_orders=false', options)
         .then(res => res.json())
         .then((res) => {
           var { assets } = res
