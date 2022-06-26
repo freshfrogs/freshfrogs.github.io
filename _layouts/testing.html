@@ -69,8 +69,8 @@
         })
         .catch(e => {
 
-            console.log('Could not talk to Opensea!');
-            console.log('OpenSea : ' + e.message)
+          console.log('Could not talk to Opensea!');
+          console.log('OpenSea : ' + e.message);
       
         });
       
@@ -105,7 +105,13 @@
       <header>
       </header>
       <section>
+        <h3>FreshFrogsNFT</h3>
         <div class="fresh_frogs" id="fresh_frogs"></div>
+        <br>
+        <h3>Frog Types</h3>
+        <h4>Special Frog Types</h4>
+        <div class="fresh_frogs" id="special_frogs"></div>
+        <br>
       </section>
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
