@@ -3,7 +3,7 @@ layout: testing
 ---
 <title>freshfrogs.io/testing</title>
 
-### Fresh Frogs NFT
+# Fresh Frogs NFT
 A collection of 4,040 randomly generated Frogs on #Ethereum
 
 <html>
