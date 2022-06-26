@@ -5,6 +5,8 @@
     margin-left: auto;
     margin-right: auto;
     text-align: left;
+    border-top: 1px solid #333;
+    border-right: 1px solid #333;
   }
   .fresh_frog {
     width: 64px;
@@ -12,6 +14,10 @@
   }
   section {
     border: 0px solid lightgray;
+  }
+  .name_tag {
+    width: 100%;
+    text-align: right;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -82,10 +88,10 @@
 
             var { name, token_metadata, permalink, traits, external_link, token_id } = frog
 
-            new_frog = document.createElement('img')
-            new_frog.src = external_link
-            new_frog.className = 'fresh_frog'
-            document.getElementById('fresh_frogs').appendChild(new_frog)
+            //new_frog = document.createElement('img')
+            //new_frog.src = external_link
+            //new_frog.className = 'fresh_frog'
+            //document.getElementById('fresh_frogs').appendChild(new_frog)
 
           })
         })
@@ -105,18 +111,21 @@
         <img src='https://freshfrogs.io/frog/1.png' style="width: 256px;" />
       </header>
       <section>
-        <h3>FreshFrogsNFT</h3>
-        <div class="fresh_frogs" id="fresh_frogs"></div>
-        <br>
-        <b>Croaking</b>
-        <div class="fresh_frogs" id="croaking_frogs"><img src='https://freshfrogs.io/frog/3476.png' class='fresh_frog' /></div>
-        <b>ClosedEyes</b>
+        <i class="name_tag">Croaking</i>
+        <div class="fresh_frogs" id="croaking_frogs">
+          <img src='https://freshfrogs.io/frog/3476.png' class='fresh_frog' />
+          <img src='https://freshfrogs.io/frog/3476.png' class='fresh_frog' />
+          <img src='https://freshfrogs.io/frog/3476.png' class='fresh_frog' />
+          <img src='https://freshfrogs.io/frog/3476.png' class='fresh_frog' />
+          <img src='https://freshfrogs.io/frog/3476.png' class='fresh_frog' />
+        </div>
+        <i class="name_tag">Croaking</i>
         <div class="fresh_frogs" id="closedEye_frogs"><img src='https://freshfrogs.io/frog/69.png' class='fresh_frog' /></div>
-        <b>InversedEyes</b>
+        <i class="name_tag">Croaking</i>
         <div class="fresh_frogs" id="inversedEye_frogs"><img src='https://freshfrogs.io/frog/3503.png' class='fresh_frog' /></div>
-        <b>Peace</b>
+        <i class="name_tag">Croaking</i>
         <div class="fresh_frogs" id="peace_frogs"><img src='https://freshfrogs.io/frog/343.png' class='fresh_frog' /></div>
-        <b>ThirdEye</b>
+        <i class="name_tag">Croaking</i>
         <div class="fresh_frogs" id="thirdEye_frogs"><img src='https://freshfrogs.io/frog/3130.png' class='fresh_frog' /></div>
       </section>
     </div>
