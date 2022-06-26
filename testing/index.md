@@ -1,7 +1,7 @@
 ---
 layout: testing
 ---
-<title>freshfrogs.io/testing</title>[A collection of 4,040 randomly generated Frogs on #Ethereum ↗️](https://freshfrogs.io/wiki/)
+<title>freshfrogs.io/testing</title>
 
 <hr style="width: 60%; margin-left: auto; margin-right: auto;">
 **Combine "Morph" Fresh Frogs!** <ins>[freshfrogs.io/the-pad🍀](https://freshfrogs.io/the-pad)</ins>
