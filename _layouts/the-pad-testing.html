@@ -837,7 +837,6 @@
                     let trait_type = attribute.trait_type
                     let value = attribute.value
                     let trait_rarity = ((attributesTotal[value]/nextIdC)*100).toFixed(0);
-
                     
                     if (trait_rarity < 1) {
                       trait_rarity = '<1';
@@ -845,13 +844,13 @@
 
                     // Build Fresh Frogs Attributes
                     loadAttribute(trait_type, value, frog.name)
-                    newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
-                    if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
-                      else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
-                    newAttribute.className = value;
-                    space = document.createElement('br')
-                    document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
-                    document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
+                    //newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
+                    //if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
+                    //  else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
+                    //newAttribute.className = value;
+                    //space = document.createElement('br')
+                    //document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
+                    //document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
                   }
                 })
               })
