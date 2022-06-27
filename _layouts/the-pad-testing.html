@@ -782,7 +782,6 @@
                 //
                 loadFreshFrog(thisToken);
                 openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
-                document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a class="pointer" href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+frog.name+'</u></b> ↗️'+'</a>';
 
                 // Progress Bar!
                 percent = parseInt((thisToken/ownedFrogs)*100);
@@ -944,42 +943,9 @@
       // Load Fresh Frog
       function loadFreshFrog(tokenID) {
         newFrog = document.createElement("div")
-        newFrog.onclick = function() {
-
-          var this_frog = event.currentTarget.id
-
-          var this_frog_ID = 'Frog #'+this_frog+'Desc'
-
-          if (!base_frog && sub_frog !== this_frog) { // SELECT BASE
-
-              selectBaseFrog(this_frog);
-              return
-              
-          } else if (this_frog == base_frog) { // UN-SELECT BASE
-
-              document.getElementById('baseText').innerHTML = 'Select Frog'
-              document.getElementById(this_frog_ID).style.boxShadow = 'none'
-              base_frog = false;
-              return
-
-          } else if (!sub_frog && base_frog !== this_frog) { // SELECT SUB
-
-              selectSubFrog(this_frog);
-              
-              return
-
-          } else if (this_frog == sub_frog) { // UN-SELECT SUB
-
-              document.getElementById('subText').innerHTML = 'Select Frog'
-              document.getElementById(this_frog_ID).style.boxShadow = 'none'
-              sub_frog = false;
-              return
-
-          } else { return }
-        }
         newFrog.id = tokenID
         newFrog.className = 'frogPanel'
-        newFrog.innerHTML = '<a class="smallContainer2 pointer" id="Frog #'+tokenID+'"></a>'+'<p class="attributeList" id="Frog #'+tokenID+'Desc"></p>'
+        newFrog.innerHTML = '<a class="smallContainer2 pointer" id="Frog #'+tokenID+'"></a>';
         document.getElementById("thePad").appendChild(newFrog)
       }
       // Output to minting terminal
