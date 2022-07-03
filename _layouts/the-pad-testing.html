@@ -621,6 +621,9 @@
 
         COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
 
+        pull_collection_data();
+        update_collection_data();
+
         try { // Connect
 
           await f0.init({
@@ -630,19 +633,17 @@
           })
 
           userAddress = await web3.currentProvider.selectedAddress;
-          //userInviteList = await f0.myInvites();
-          //userInviteKeys = Object.keys(userInviteList);
-          //ownedFrogs = await collection.methods.balanceOf(userAddress).call();
-          //contractName = await f0.api.name().call();
-          //contractSymbol = await f0.api.symbol().call();
+          userInviteList = await f0.myInvites();
+          userInviteKeys = Object.keys(userInviteList);
+          ownedFrogs = await collection.methods.balanceOf(userAddress).call();
+          contractName = await f0.api.name().call();
+          contractSymbol = await f0.api.symbol().call();
           nextId = await f0.api.nextId().call();
           nextIdC = parseInt(nextId);
 
-          console.log(nextIdC)
-
           // Open Mint --
 
-        } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); console.log(e.message); }
+        } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
 
       })
 
