@@ -711,9 +711,6 @@
         etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
 
         newFrog = document.createElement("div")
-        newFrog.onclick = function() { 
-          if (!morph) { display_token(token); } else { sub_frog = token; combineTokens(base_frog, sub_frog); document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog; }
-        }
         newFrog.id = token
         newFrog.className = 'frogPanel'
         newFrog.innerHTML = '<a style="margin-bottom" 0px !important;  display: inline !important;" class="smallContainer2 pointer2" id="Frog #'+token+'"><img class="frogImg3" src="https://freshfrogs.io/frog/'+token+'.png"/></a>'+'<p class="attributeList" id="Frog #'+token+'Desc"></p>'
