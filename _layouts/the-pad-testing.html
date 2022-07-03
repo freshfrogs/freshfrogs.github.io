@@ -622,7 +622,6 @@
         COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
 
         pull_collection_data();
-        display_token(nextIdC)
 
         try { // Connect
 
@@ -685,6 +684,8 @@
 
           var { assets } = res
           nextIdC = parseInt(assets[0].name.replace('Frog #', '')) + 1;
+
+          display_token(nextIdC);
 
           console.log('nextID : '+nextIdC)
 
