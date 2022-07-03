@@ -1,4 +1,4 @@
 ---
-layout: testing
+layout: the-pad-testing
 ---
-<title>freshfrogs.io/testing</title>
+<title>freshfrogs.io/the-pad 🍀</title>
