@@ -622,7 +622,7 @@
         COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
 
         pull_collection_data();
-        update_collection_data();
+        display_token(nextIdC)
 
         try { // Connect
 
@@ -695,14 +695,6 @@
           console.error('Error : ' + e.message)
 
         })
-
-      }
-
-      function update_collection_data() {
-
-        console.log(nextIdC)
-
-        display_token(nextIdC)
 
       }
 
