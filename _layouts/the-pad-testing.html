@@ -640,7 +640,7 @@
 
           //document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
 
-          if (ownedFrogs <= 0) { // ❌ No FROGS
+          if (ownedFrogs <= 1000) { // ❌ No FROGS
             consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS!<br> Here are a few at random to try out!'+'<p></p>')
             fetch_random_tokens(9)
           } else {
