@@ -630,11 +630,11 @@
           })
 
           userAddress = await web3.currentProvider.selectedAddress;
-          userInviteList = await f0.myInvites();
-          userInviteKeys = Object.keys(userInviteList);
-          ownedFrogs = await collection.methods.balanceOf(userAddress).call();
-          contractName = await f0.api.name().call();
-          contractSymbol = await f0.api.symbol().call();
+          //userInviteList = await f0.myInvites();
+          //userInviteKeys = Object.keys(userInviteList);
+          //ownedFrogs = await collection.methods.balanceOf(userAddress).call();
+          //contractName = await f0.api.name().call();
+          //contractSymbol = await f0.api.symbol().call();
           nextId = await f0.api.nextId().call();
           nextIdC = parseInt(nextId);
 
