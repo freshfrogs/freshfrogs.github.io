@@ -669,6 +669,8 @@
 
           traits_list = traits;
 
+          console.log('update collection data 1')
+
         })
         .catch(e => {
 
@@ -684,6 +686,8 @@
           var { assets } = res
           var nextIdC = parseInt(assets[0].name.replace('Frog #', '')) + 1;
 
+          console.log('update collection data 2')
+
         })
         .catch((e) => {
 
@@ -696,13 +700,7 @@
 
       function update_collection_data() {
 
-        // Update display for next ID
-        display_token(nextIdC)
-
-        // Update display for recently minted
-        display_token(nextIdC-1)
-        display_token(nextIdC-2)
-        display_token(nextIdC-3)
+        console.log('update collection data 3')
 
       }
 
