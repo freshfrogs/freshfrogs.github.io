@@ -669,7 +669,7 @@
 
           traits_list = traits;
 
-          console.log('update collection data 1')
+          console.log(traits_list)
 
         })
         .catch(e => {
@@ -686,7 +686,7 @@
           var { assets } = res
           var nextIdC = parseInt(assets[0].name.replace('Frog #', '')) + 1;
 
-          console.log('update collection data 2')
+          console.log('nextID : '+nextIdC)
 
         })
         .catch((e) => {
@@ -700,7 +700,7 @@
 
       function update_collection_data() {
 
-        console.log('update collection data 3')
+        display_token(nextIdC)
 
       }
 
