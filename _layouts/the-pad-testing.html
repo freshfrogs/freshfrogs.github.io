@@ -768,25 +768,32 @@
       // Display Frog
       async function display_token(token){
 
-          display_src = 'https://freshfrogs.io/frog/'+token+'.png'
-          display_frog = 'Frog #'+token
+          token_img = 'https://freshfrogs.io/frog/'+token+'.png'
+          token_name = 'Frog #'+token
 
-          document.getElementById('thisheader').style.backgroundImage = 'url('+display_src+')';
+          document.getElementById('thisheader').style.backgroundImage = 'url('+token_img+')';
           document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
-
-          document.getElementById('previewImg').setAttribute('src', display_src)
-          document.getElementById('display_name').innerHTML = display_frog
-
-          //document.getElementById('li_2').innerHTML = '';
+          document.getElementById('previewImg').setAttribute('src', token_img)
 
           let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
           for (var i = 0; i < token_metadata.attributes.length; i++){
               var data = token_metadata.attributes[i]
               //load_trait(data.trait_type, data.value, 'subDisplay')
               if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
-                document.getElementById('display_type').innerHTML = data.value.slice(0, 10)+'..'
+                token_type = data.value.slice(0, 10)+'..'
+                break;
               }
           }
+
+          document.getElementById('mint_token').innerHTML = '<strong>'+token_name+'</strong>'+token_type;
+          document.getElementById('mint_token').removeAttribute('href');
+
+          document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>0.01 +gas';
+          document.getElementById('mint_total').removeAttribute('href');
+
+          document.getElementById('mint_quantity').innerHTML = '<strong>- 1 +</strong>quantity';
+          document.getElementById('mint_quantity').removeAttribute('href');
+
       }
 
     </script>
@@ -796,9 +803,9 @@
       <header id="thisheader">
         <div class="downloads pre">
           <ul class="downloads2">
-            <li id="li_1"><a id="mint_transact" class="pointer" href=""><strong id="display_name">MINT</strong><div id="display_type">Ξ0.01 +gas</div></a></li>
-            <li id="li_2"><a id="mint_total" class="pointer" href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b"><strong>Etherscan</strong><frog id="baseText">view on</frog></a></li>
-            <li id="li_3"><a id="mint_quantity" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>OpenSea</strong><frog id="subText">view on</frog></a></li>
+            <li><a id="mint_token" class="pointer" href=""><strong>MINT</strong>Ξ0.01 +gas</a></li>
+            <li><a id="mint_total" class="pointer" href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b"><strong>Etherscan</strong>view on</a></li>
+            <li><a id="mint_quantity" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>OpenSea</strong>view on</a></li>
           </ul>
           <br>
           <div id="mintingTray" class="mintingTray">
