@@ -746,7 +746,7 @@
               var data = token_metadata.attributes[i]
               //load_trait(data.trait_type, data.value, 'subDisplay')
               if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
-                document.getElementById('display_type').innerHTML = data.value//.slice(0, 10)+'..'
+                document.getElementById('display_type').innerHTML = data.value.slice(0, 10)+'..'
               }
           }
       }
