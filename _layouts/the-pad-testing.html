@@ -671,14 +671,14 @@
 
         // Remove from quantity
 
-        document.querySelector("#removeFrog").addEventListener("click", async (e) => {
+        document.querySelector("#quantity_remove").addEventListener("click", async (e) => {
           mint_quantity = mint_quantity - 1;
           console.log(mint_quantity);
         })
 
         // Add to quantity
 
-        document.querySelector("#addFrog").addEventListener("click", async (e) => {
+        document.querySelector("#quantity_add").addEventListener("click", async (e) => {
           mint_quantity = mint_quantity + 1;
           console.log(mint_quantity);
         })
@@ -794,7 +794,7 @@
           <ul class="downloads2">
             <li><a id="morphFrogs" class="pointer"><strong id="display_name">Fresh Frogs</strong><div id="display_type">ΞEthereum</div></a></li>
             <li><a id="mintTotal"><strong>0.01 ΞETH</strong>Plus gas</a></li>
-            <li><strong><b id="removeFrog" class="pointer">−</b><frogQuant id="frogQuant">  1  </frogQuant><b id="addFrog" class="pointer">+</b></strong>Quantity</li>
+            <li><a id="mint_quantity"><strong><b id="quantity_remove" class="pointer">−</b><frogQuant id="quantity_total">  1  </frogQuant><b id="quantity_add" class="pointer">+</b></strong>Quantity</a></li>
           </ul>
           <br>
           <div id="mintingTray" class="mintingTray">
