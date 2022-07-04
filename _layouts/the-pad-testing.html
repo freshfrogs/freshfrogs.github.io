@@ -635,6 +635,8 @@
 
         COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
 
+        fetch_collection_data();
+
         try { // Connect
 
           await f0.init({
@@ -671,6 +673,55 @@
         document.getElementById("pre").innerHTML = output
       }
 
+      /*
+        Fetch OpenSea collection data
+      */
+
+      function fetch_opensea_data() {
+
+        const options = {
+          method: 'GET',
+          headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
+        };
+
+        // Collection variables
+        // Trait list and rarities
+
+        fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
+        .then(collection => collection.json())
+        .then(collection => {
+
+          var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
+
+          traits_list = traits;
+
+        })
+        .catch(e => {
+
+            console.log('Error: Could not talk to Opensea. (1)');
+            console.error('Error : ' + e.message)
+      
+        });
+        
+        // Pull next available token ID prior to web3 connection
+        //
+
+        fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=3&include_orders=false', options)
+        .then((assets) => assets.json())
+        .then((assets) => {
+
+          var { assets } = assets
+          var contract_id = mint_id = parseInt(assets[0].name.replace('Frog #', '')) + 1;
+
+        })
+        .catch(e => {
+
+          console.log('Error: Could not talk to Opensea. (2)');
+          console.error('Error : ' + e.message)
+
+        });
+
+      }
 
     </script>
   </head>
