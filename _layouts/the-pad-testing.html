@@ -664,6 +664,8 @@
           console.log('Ethereum : '+contract_address);
           console.log('Connected User : '+user_address);
 
+          getInvites();
+
           // Update minting ui
 
         } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
@@ -728,6 +730,30 @@
 
       }
 
+      // Check invites
+      async function getInvites() {
+
+        mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1);
+        mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1);
+
+        for (var i = 0; i < 5; i++) { 
+
+          if (user_inviteKeys[i] === "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064") {
+
+            if (user_address === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || user_address === "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359".toLowerCase() || user_address === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase() || userAcc === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
+
+              user_invite = "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064";
+              mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, userInvite, 1);
+              mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, userInvite, 1);
+
+            }
+          }
+        }
+
+        consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'Frog #'+mint_id+' is now available to mint!<br>Maximum of <u>'+mint_limit+'</u> Frogs per wallet!<br>'+'<p></p>')
+      
+      }
+
       // Display Frog
       async function display_token(token){
 
@@ -740,6 +766,7 @@
           document.getElementById('previewImg').setAttribute('src', display_src)
           document.getElementById('display_name').innerHTML = display_frog
 
+          document.getElementById('li_2').innerHTML = '';
 
           let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
           for (var i = 0; i < token_metadata.attributes.length; i++){
