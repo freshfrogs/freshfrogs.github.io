@@ -664,6 +664,8 @@
           console.log('Ethereum : '+contract_address);
           console.log('Connected User : '+user_address);
 
+          // Update minting ui
+
         } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
 
       })
@@ -713,6 +715,7 @@
           var { assets } = assets
           var contract_id = mint_id = parseInt(assets[0].name.replace('Frog #', '')) + 1;
 
+          display_token(contract_id)
           console.log(contract_id)
 
         })
@@ -723,6 +726,47 @@
 
         });
 
+      }
+
+      // Display Frog
+      async function display_token(token){
+
+          display_frog = 'https://freshfrogs.io/frog/'+token+'.png'
+          display_name = 'Frog #'+token
+          display_os = ''
+
+          document.getElementById('thisheader').style.backgroundImage = 'url('+display_frog+')';
+          document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
+
+          document.getElementById('previewImg').setAttribute('src', display_frog)
+          document.getElementById('display_name').innerHTML = display_name
+
+          openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
+          etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
+          document.getElementById('selectSub').setAttribute('href', openSeaLink)
+          document.getElementById('selectBase').innerHTML = '<strong>Morph</strong><frog id="baseText">two Frogs!</frog>'
+          document.getElementById('selectBase').onclick = function() {
+            if (!morph) {
+              base_frog = token
+              morph = true;
+              document.getElementById('baseText').innerHTML = 'select frog!'
+            } else if (morph) {
+              alert('Create new custom Frog on Ethereum! Coming soon!')
+              console.log('Frog Morph')
+              console.log('Frog #'+base_frog)
+              console.log('Frog #'+sub_frog)
+            } 
+
+          }
+
+          let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
+          for (var i = 0; i < token_metadata.attributes.length; i++){
+              var data = token_metadata.attributes[i]
+              //load_trait(data.trait_type, data.value, 'subDisplay')
+              if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
+                document.getElementById('display_type').innerHTML = data.value.slice(0, 10)+'..'
+              }
+          }
       }
 
     </script>
