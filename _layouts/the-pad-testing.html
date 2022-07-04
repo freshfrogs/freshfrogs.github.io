@@ -687,7 +687,7 @@
             return; // Quantity always greater than or equal to 1;
           } else {
             mint_quantity = mint_quantity - 1;
-            document.getElementById('mint_total_actual').innerHTML = (0.01*mint_quantity);
+            document.getElementById('mint_total_actual').innerHTML = (0.01*mint_quantity).slice(0, 2);
             document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
           }
         })
