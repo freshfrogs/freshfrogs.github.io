@@ -568,7 +568,7 @@
     font-size: x-small;
     padding: 1px;
   }
-  .userAddress {
+  .user_address {
     padding-left: 1px;
     padding-right: 1px;
     border-radius: 5px;
@@ -654,8 +654,8 @@
 
           user_address = await web3.currentProvider.selectedAddress;
           user_invites = await f0.myInvites();
-          user_inviteKeys = Object.keys(userInviteList);
-          user_tokens = await collection.methods.balanceOf(userAddress).call();
+          user_inviteKeys = Object.keys(user_invites);
+          user_tokens = await collection.methods.balanceOf(user_address).call();
           contract_name = await f0.api.name().call();
           contract_symbol = await f0.api.symbol().call();
           nextId = await f0.api.nextId().call();
