@@ -694,11 +694,11 @@
 
         // Add token to minting tray mint_total
         document.querySelector("#add_token").addEventListener("click", async (e) => {
-          if (mint_quantity <= (mint_limit - user_tokens)) {
+          //if (mint_quantity <= (mint_limit - user_tokens)) {
             mint_quantity = mint_quantity + 1;
             document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ'+(0.01*mint_quantity)+' +gas';
             document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> '+mint_quantity+' <b id="add_token">+</b></strong>quantity';
-          } else { console.log('User mint limit reached!'); console.log('Mint Limit '+mint_limit+' : '+user_tokens+' User Tokens'); }
+          //} else { console.log('User mint limit reached!'); console.log('Mint Limit '+mint_limit+' : '+user_tokens+' User Tokens'); }
         })
 
         // Send mint transaction to provider!
