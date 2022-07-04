@@ -683,8 +683,8 @@
 
         // Remove token from minting tray
         document.querySelector("#remove_token").addEventListener("click", async (e) => {
-          if (mint_quantity <= 1) {
-            return; // Quantity always greater than or equal to 1;
+          if (mint_quantity <= 1 && mint_quantity >= 9) {
+            return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
           } else {
             mint_quantity = mint_quantity - 1;
             document.getElementById('mint_total_actual').innerHTML = (0.01*mint_quantity);
