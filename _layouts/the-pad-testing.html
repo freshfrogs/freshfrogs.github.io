@@ -743,21 +743,6 @@
 
           openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
           etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
-          document.getElementById('selectSub').setAttribute('href', openSeaLink)
-          document.getElementById('selectBase').innerHTML = '<strong>Morph</strong><frog id="baseText">two Frogs!</frog>'
-          document.getElementById('selectBase').onclick = function() {
-            if (!morph) {
-              base_frog = token
-              morph = true;
-              document.getElementById('baseText').innerHTML = 'select frog!'
-            } else if (morph) {
-              alert('Create new custom Frog on Ethereum! Coming soon!')
-              console.log('Frog Morph')
-              console.log('Frog #'+base_frog)
-              console.log('Frog #'+sub_frog)
-            } 
-
-          }
 
           let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
           for (var i = 0; i < token_metadata.attributes.length; i++){
