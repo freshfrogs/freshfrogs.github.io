@@ -680,9 +680,11 @@
 
         // Add token to minting tray
         document.querySelector("#add_token").addEventListener("click", async (e) => {
-          mint_quantity = mint_quantity + 1;
-          document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ'+(0.01*mint_quantity)+' +gas';
-          document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> '+mint_quantity+' <b id="add_token">+</b></strong>quantity';
+          if (mint_quantity <= (user_tokens - mint_limit)) {
+            mint_quantity = mint_quantity + 1;
+            document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ'+(0.01*mint_quantity)+' +gas';
+            document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> '+mint_quantity+' <b id="add_token">+</b></strong>quantity';
+          }
         })
 
       })
