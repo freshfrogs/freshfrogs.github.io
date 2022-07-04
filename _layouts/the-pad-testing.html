@@ -671,6 +671,20 @@
 
         } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
 
+        // Remove token from minting tray
+        document.querySelector("#remove_token").addEventListener("click", async (e) => {
+          mint_quantity = mint_quantity - 1;
+          document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ'+(0.01*mint_quantity)+' +gas';
+          document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> '+mint_quantity+' <b id="add_token">+</b></strong>quantity';
+        })
+
+        // Add token to minting tray
+        document.querySelector("#add_token").addEventListener("click", async (e) => {
+          mint_quantity = mint_quantity + 1;
+          document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ'+(0.01*mint_quantity)+' +gas';
+          document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> '+mint_quantity+' <b id="add_token">+</b></strong>quantity';
+        })
+
       })
 
 
@@ -788,10 +802,10 @@
           document.getElementById('mint_token').innerHTML = '<strong>'+token_name+'</strong>'+token_type;
           document.getElementById('mint_token').removeAttribute('href');
 
-          document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ0.01 +gas';
+          document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ'+(0.01*mint_quantity)+' +gas';
           document.getElementById('mint_total').removeAttribute('href');
 
-          document.getElementById('mint_quantity').innerHTML = '<strong>- 1 +</strong>quantity';
+          document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> '+mint_quantity+' <b id="add_token">+</b></strong>quantity';
           document.getElementById('mint_quantity').removeAttribute('href');
 
       }
