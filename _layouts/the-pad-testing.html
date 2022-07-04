@@ -678,9 +678,13 @@
 
         // Remove token from minting tray
         document.querySelector("#remove_token").addEventListener("click", async (e) => {
-          mint_quantity = mint_quantity - 1;
-          document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ'+(0.01*mint_quantity)+' +gas';
-          document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> '+mint_quantity+' <b id="add_token">+</b></strong>quantity';
+          if (mint_quantity <= 1) {
+            return; // Quantity always greater than or equal to 1;
+          } else {
+            mint_quantity = mint_quantity - 1;
+            document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ'+(0.01*mint_quantity)+' +gas';
+            document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> '+mint_quantity+' <b id="add_token">+</b></strong>quantity';
+          }
         })
 
         // Add token to minting tray mint_total
