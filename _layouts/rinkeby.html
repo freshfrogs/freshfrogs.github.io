@@ -798,8 +798,8 @@
         // Event Listeners 
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-          if (mint === 0) { // || nextIdC >= 3021
-            consoleOutput("<div class='mintingTextWhite'><b>Mint Paused!</b>"+"<b><a class='pointer' target='_blank' href='https://twitter.com/FreshFrogs_NFT'>Follow @FreshFrogs_NFT for updates!</b></a></div>")
+          if (mint === 0 || nextIdC >= 2030) { // || nextIdC >= 3021
+            consoleOutput("<div class='mintingTextWhite'><b>Mint Paused!</b>"+"<b><u><a class='pointer' target='_blank' href='https://twitter.com/FreshFrogs_NFT'>Follow @FreshFrogs_NFT for updates!</b></u></a></div>")
             return; // BREAK!
 
           } else { // SEND MINT TX!
@@ -891,7 +891,7 @@
       async function getInvites() {
         for (var i = 0; i < 5; i++) { // Loop Five Times; Check First Five Invites
           let thisInvite = userInviteKeys[i]
-          if (thisInvite === "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d") { // Main: 0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d / Rinkeby: 0x98469878d3ea48d71e828da43d41d9ffcc8b974d712d3fee969274e52b180275
+          if (thisInvite === "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d_1") { // Main: 0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d / Rinkeby: 0x98469878d3ea48d71e828da43d41d9ffcc8b974d712d3fee969274e52b180275
             // NF7UOS / C7AR Bypass
             if (userAcc === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase()) {
               // Unlimited Free Mints
@@ -993,8 +993,6 @@
           <div id="pre" class="consoleOutput"></div>
           <br>
           <div id="thePad" class="thePad"></div>
-          <br>
-          <blockquote class="twitter-tweet"><p lang="en" dir="ltr">Congratulations to everyone that took part in our <a href="https://twitter.com/hashtag/FreeMint?src=hash&amp;ref_src=twsrc%5Etfw">#FreeMint</a> 🎉 Once Frog 3030 has passed, the price will increase to 0.01 <a href="https://twitter.com/search?q=%24ETH&amp;src=ctag&amp;ref_src=twsrc%5Etfw">$ETH</a> as planned<br><br>After the collection has sold out; holders will be able to Morph their Frogs into a new <a href="https://twitter.com/hashtag/NFT?src=hash&amp;ref_src=twsrc%5Etfw">#NFT</a> 🔥<br><br>Preview now at 🍀 <a href="https://t.co/2fGUTS46aO">https://t.co/2fGUTS46aO</a> ↗️ <a href="https://t.co/crjdz1mfuQ">pic.twitter.com/crjdz1mfuQ</a></p>&mdash; Fresh Frogs (@FreshFrogs_NFT) <a href="https://twitter.com/FreshFrogs_NFT/status/1518554186866118659?ref_src=twsrc%5Etfw">April 25, 2022</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
           <br>
           <div class="divTimeline">
             <img style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="../assets/frogs/FLY.gif">
