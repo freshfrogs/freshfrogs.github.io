@@ -171,10 +171,11 @@
     border-radius: 5px;
     border: 1px solid white;
     width: 270px;
-    box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
     margin-left: auto;
     margin-right: auto;
     margin-top: 2%;
+    margin-bottom: 1%;
     line-height: 1;
     text-align: center;
     vertical-align: middle;
@@ -747,7 +748,7 @@
           var { assets } = res
           var nextIdC = parseInt(assets[0].name.replace('Frog #', '')) + 1;
           // Messages Sent to Terminal
-          document.getElementById("supply").innerHTML = nextIdC+" / 4040 Total Supply" // Supply
+          //document.getElementById("supply").innerHTML = nextIdC+" / 4040 Total Supply" // Supply
           document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.io/frog/"+nextIdC+".png");
 
           assets.forEach((frog) => { // For Each FROG
@@ -834,7 +835,7 @@
           //document.getElementById('netStatus').innerHTML = '<br><h2 style="color: white !important;"><b>freshfrogs.io</b></h2><div id="pre" class="consoleOutput"></div>';
           
           // Messages Sent to Terminal (Again)
-          document.getElementById("supply").innerHTML = nextIdC+" / 4040 Total Supply" // Supply
+          //document.getElementById("supply").innerHTML = nextIdC+" / 4040 Total Supply" // Supply
           document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.io/frog/"+nextIdC+".png");
 
           // ----------------------------->
@@ -1066,7 +1067,6 @@
       <header>
         <div class="downloads pre">
           <div id="mintingTray">
-            <h3 class="headerDiv" id="supply">4040 Total Supply</h3>
             <ul class="downloads2">
               <li><a id="mintTransact" href="https://freshfrogs.io/" class="pointer"><strong>LINK WALLET</strong></a></li>
               <li><a id="mintTotal"><strong>0.01 ΞETH</strong>Plus gas</a></li>
