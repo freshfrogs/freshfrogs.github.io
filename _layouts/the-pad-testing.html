@@ -615,7 +615,7 @@
 
       // User Variables
 
-      var user_address, user_invites, user_inviteKeys, user_tokens;
+      var user_address, user_invites, user_inviteKeys, user_tokens, user_invite;
       var mint_id, mint_quantity, mint_price;
 
       // Contract Variables
@@ -653,6 +653,7 @@
           user_invites = await f0.myInvites();
           user_inviteKeys = Object.keys(user_invites);
           user_tokens = await collection.methods.balanceOf(user_address).call();
+          user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
 
           contract_name = await f0.api.name().call();
           contract_symbol = await f0.api.symbol().call();
