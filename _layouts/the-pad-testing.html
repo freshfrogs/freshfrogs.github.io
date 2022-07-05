@@ -398,9 +398,9 @@
     border-radius: 5px;
   }
   .frogImg4:hover{
-    -ms-transform: scale(1.5); /* IE 9 */
-    -webkit-transform: scale(1.5); /* Safari 3-8 */
-    transform: scale(1.5);
+    -ms-transform: scale(1.25); /* IE 9 */
+    -webkit-transform: scale(1.25); /* Safari 3-8 */
+    transform: scale(1.25);
   }
   .smallContainer3:hover{
     -ms-transform: scale(1.1); /* IE 9 */
@@ -948,33 +948,9 @@
       function load_trait(trait, attribute, where) {
 
         newAttribute = document.createElement("img")
-        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
         newAttribute.id = attribute
-        newAttribute.target = "_blank"
         newAttribute.className = "frogImg4"
-        newAttribute.style.cursor = "pointer"
-
-        if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
-          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+"2.gif"
-
-        } else if (attribute === "morphAnimation") {
-
-          newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
-
-        } else if (attribute === "shadesAnimation") {
-
-          newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
-
-        } else if (attribute.includes("croaking2")) {
-
-          console.log('! '+trait+' / '+attribute)
-          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
-
-        } else {
-
-          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
-
-        }
+        newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
 
         newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
