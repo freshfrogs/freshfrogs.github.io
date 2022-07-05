@@ -696,68 +696,65 @@
 
         } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
 
-                    // Listeners
-
-          // Remove token from minting tray
-          document.querySelector("#remove_token").addEventListener("click", async (e) => {
-            if (mint_quantity <= 1) {
-              return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
-            } else {
-              mint_quantity = mint_quantity - 1;
-              document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
-              document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
-            }
-          })
-
-          // Add token to minting tray mint_total
-          document.querySelector("#add_token").addEventListener("click", async (e) => {
-            if (mint_quantity >= 9) {
-              return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
-            } else {
-              mint_quantity = mint_quantity + 1;
-              document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
-              document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
-            }
-
-            //if (mint_quantity <= (mint_limit - user_tokens)) {
-            //} else { console.log('User mint limit reached!'); console.log('Mint Limit '+mint_limit+' : '+user_tokens+' User Tokens'); }
-
-          })
-
-          // Send mint transaction to provider!
-
-          document.querySelector("#mint_total").addEventListener("click", async (e) => {
-
-            console.log('Send mint transaction!');
-            console.log(mint_quantity+' FROGS @ Ξ'+mint_price+' : ['+(mint_price*mint_quantity)+']');
-            
-            try {
-                
-              consoleOutput('<br>'+'<strong>Minting ('+mint_quantity+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
-              document.getElementById('pre').className = 'mintingTextWhite'
-                
-              let tokens = await f0.mint(user_invite, mint_quantity);
-              
-              // AWAIT RESPONSE!
-
-              consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>'+mint_quantity+' FROG(s)</b> have successfully been minted! <a class="pointer" href="https://freshfrogs.io/the-pad"><b>View "FROG" Tokens</a></b></div><br>')
-              document.getElementById('pre').className = "mintingTextGreen"
-              return; // BREAK!
-
-            } catch (e) {
-                
-              // Something went wrong!
-              
-              consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
-              document.getElementById('pre').className = 'mintingTextWhite'
-              return; // BREAK!
-
-            }
-
-          })
-
       })
 
+      // Remove token from minting tray
+      function remove_token() {
+        if (mint_quantity <= 1) {
+          return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
+        } else {
+          mint_quantity = mint_quantity - 1;
+          document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
+          document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
+        }
+      }
+
+      // Add token to minting tray mint_total
+      function add_token() {
+        if (mint_quantity >= 9) {
+          return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
+        } else {
+          mint_quantity = mint_quantity + 1;
+          document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
+          document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
+        }
+
+        //if (mint_quantity <= (mint_limit - user_tokens)) {
+        //} else { console.log('User mint limit reached!'); console.log('Mint Limit '+mint_limit+' : '+user_tokens+' User Tokens'); }
+
+      }
+
+      // Send mint transaction to provider!
+
+      async function send_mint_request(user_address, user_invite, mint_quantity) {
+
+        console.log('Send mint transaction!');
+        console.log(mint_quantity+' FROGS @ Ξ'+mint_price+' : ['+(mint_price*mint_quantity)+']');
+        
+        try {
+            
+          consoleOutput('<br>'+'<strong>Minting ('+mint_quantity+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
+          document.getElementById('pre').className = 'mintingTextWhite'
+            
+          let tokens = await f0.mint(user_invite, mint_quantity);
+          
+          // AWAIT RESPONSE!
+
+          consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>'+mint_quantity+' FROG(s)</b> have successfully been minted! <a class="pointer" href="https://freshfrogs.io/the-pad"><b>View "FROG" Tokens</a></b></div><br>')
+          document.getElementById('pre').className = "mintingTextGreen"
+          return; // BREAK!
+
+        } catch (e) {
+            
+          // Something went wrong!
+          
+          consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
+          document.getElementById('pre').className = 'mintingTextWhite'
+          return; // BREAK!
+
+        }
+
+      }
 
       function consoleOutput(output) {
         document.getElementById("pre").innerHTML = output
@@ -896,8 +893,9 @@
 
           document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ<b id="mint_total_actual">'+(mint_price*mint_quantity)+'</b> +gas';
           document.getElementById('mint_total').removeAttribute('href');
+          document.getElementById('mint_total').onclick = send_mint_request(user_address, user_invite, mint_quantity);
 
-          document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> <b id="mint_quantity_actual">'+mint_quantity+'</b> <b id="add_token">+</b></strong>quantity';
+          document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token" onclick="remove_token();">-</b> <b id="mint_quantity_actual">'+mint_quantity+'</b> <b id="add_token" onclick="add_token();">+</b></strong>quantity';
           document.getElementById('mint_quantity').removeAttribute('href');
 
       }
