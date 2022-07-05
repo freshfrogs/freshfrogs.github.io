@@ -663,7 +663,7 @@
           user_invites = await f0.myInvites();
           user_inviteKeys = Object.keys(user_invites);
           user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
-          
+
           getInvites();
 
           user_tokens = await collection.methods.balanceOf(user_address).call();
@@ -827,7 +827,7 @@
               mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1);
 
               document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
-              console.log(document.getElementById('mint_total_actual').innerHTML)
+              console.log('! '+(mint_price*mint_quantity))
 
             }
           }
