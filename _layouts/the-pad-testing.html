@@ -697,7 +697,7 @@
         } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
 
         // Remove token from minting tray
-        document.querySelector("#remove_token").addEventListener("click", function() {
+        document.querySelector("#remove_token").addEventListener("click", async (e) => {
           if (mint_quantity <= 1) {
             return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
           } else {
@@ -708,7 +708,7 @@
         })
 
         // Add token to minting tray mint_total
-        document.querySelector("#add_token").addEventListener("click", function() {
+        document.querySelector("#add_token").addEventListener("click", async (e) => {
           if (mint_quantity >= 9) {
             return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
           } else {
@@ -724,7 +724,7 @@
 
         // Send mint transaction to provider!
 
-        document.querySelector("#mint_total").addEventListener("click", async function() {
+        document.querySelector("#mint_total").addEventListener("click", async (e) => {
 
           console.log('Send mint transaction!');
           console.log(mint_quantity+' FROGS @ Ξ'+mint_price+' : ['+(mint_price*mint_quantity)+']');
@@ -779,7 +779,7 @@
 
         const options = {
           method: 'GET',
-          headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211_11'}
+          headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
         };
 
         // Collection variables
