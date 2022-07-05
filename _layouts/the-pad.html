@@ -568,7 +568,7 @@
     font-size: x-small;
     padding: 1px;
   }
-  .userAddress {
+  .user_address {
     padding-left: 1px;
     padding-right: 1px;
     border-radius: 5px;
@@ -615,7 +615,7 @@
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
     <script>
 
-      var userAddress, userInviteList, userInviteKeys, ownedFrogs, contractName, contractSymbol, nextId, nextIdC, collection, COLLECTION, traits_list;
+      var user_address, userInviteList, userInviteKeys, ownedFrogs, contractName, contractSymbol, nextId, nextIdC, collection, COLLECTION, traits_list;
       var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
       var NETWORK = "main";
       var morph = sub_frog = base_frog = false;
@@ -635,10 +635,10 @@
             network: NETWORK
           })
 
-          userAddress = await web3.currentProvider.selectedAddress;
+          user_address = await web3.currentProvider.selectedAddress;
           userInviteList = await f0.myInvites();
           userInviteKeys = Object.keys(userInviteList);
-          ownedFrogs = await collection.methods.balanceOf(userAddress).call();
+          ownedFrogs = await collection.methods.balanceOf(user_address).call();
           contractName = await f0.api.name().call();
           contractSymbol = await f0.api.symbol().call();
           nextId = await f0.api.nextId().call();
@@ -648,11 +648,9 @@
 
           if (ownedFrogs <= 0) { // ❌ No FROGS
             consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS!<br> Here are a few at random to try out!'+'<p></p>')
-            fetch_random_tokens(9)
           } else {
             consoleOutput('<br>'+'<strong>Connected!</strong> Loading Frogs from OpenSea... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
-            fetch_tokens(userAddress)
-            //fetch_random_tokens(9)
+            fetch_user_tokens();
           }
 
         } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
@@ -985,12 +983,48 @@
 
       }
 
+      // Check owned tokens
+
+      function fetch_user_tokens() {
+
+        const options = {
+          method: 'GET',
+          headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
+        };
+
+        fetch('https://api.opensea.io/api/v1/assets?owner='+user_address+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+        .then((tokens) => tokens.json())
+        .then((tokens) => {
+
+          var { assets } = tokens
+          assets.forEach((frog) => {
+
+            var { name, token_metadata, permalink, traits, external_link, token_id } = frog
+
+              // for each owned token
+              user_token = document.createElement('img')
+              user_token.src = external_link
+              user_token.className = 'recentMint'
+
+              document.getElementById('pre').appendChild(user_token);
+
+          })
+
+        })
+        .catch(e => {
+
+          console.log(e.message);
+          console.log('Error: OpenSea Error! fetch_user_tokens()');
+      
+        })
+      }
+
       // Manually check Frog transactions
       async function load_ownedFrogs_manual() {
 
           consoleOutput('<br>'+'<strong>Connected!</strong> Could not talk to OpenSea! <br>Loading Frogs from IPFS... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
 
-          let this_user = userAddress;
+          let this_user = user_address;
 
           console.log('Checking Frogs Manually.. for user...'+this_user)
 
@@ -1070,7 +1104,7 @@
               width = percent
               width++;
               elem.style.width = width + "%";
-              consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAddress)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
+              consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<p></p>')
           } catch (e) {
               console.log("Something went wrong, refresh the page!"+e.message)
               //document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ❌ '+loadedFrogs+'/'+ownedFrogs+' FROG(s) loaded!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'
@@ -1211,7 +1245,7 @@
           width = percent
           width++;
           elem.style.width = width + "%";
-          consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAddress)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<strong class="pointer" onclick="load_ownedFrogs_manual()"><u>Check via IPFS</u> 🔃</strong>'+'<p></p>')
+          consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<strong class="pointer" onclick="load_ownedFrogs_manual()"><u>Check via IPFS</u> 🔃</strong>'+'<p></p>')
 
         })
         .catch(e => {
