@@ -153,35 +153,32 @@
       margin-right: 2.5%;
   }
   .bigContainer {
-    border-radius: 5px;
-    border: 0px solid #e0e0e0;
-    overflow: hidden;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 2%;
-    margin-bottom: 2%;
-    width: 256px;
+      overflow: hidden;
+      width: 256px;
+      height: 256px;
+      image-rendering: pixelated !important;
   }
   .containerMint {
-    width: auto;
-    margin-bottom: 0px;
-    margin-top: 0px;
-    background-color: transparent;
+      width: auto;
+      margin-bottom: 0px;
+      margin-top: 0px;
+      background-color: transparent;
 
-    display: -webkit-box;
-    -webkit-box-orient: horizontal;
-    -webkit-box-pack: center;
-    -webkit-box-align: center;
+      display: -webkit-box;
+      -webkit-box-orient: horizontal;
+      -webkit-box-pack: center;
+      -webkit-box-align: center;
 
-    display: -moz-box;
-    -moz-box-orient: horizontal;
-    -moz-box-pack: center;
-    -moz-box-align: center;
+      display: -moz-box;
+      -moz-box-orient: horizontal;
+      -moz-box-pack: center;
+      -moz-box-align: center;
 
-    display: box;
-    box-orient: horizontal;
-    box-pack: center;
-    box-align: center;
+      display: box;
+      box-orient: horizontal;
+      box-pack: center;
+      box-align: center;
+      overflow: hidden;
   }
 
   .imgWrapperMint {
@@ -694,22 +691,67 @@
           console.log('Ethereum : '+contract_address);
           console.log('Connected User : '+user_address);
 
-          let token_name = 'Frog #'+mint_id
-
-          document.getElementById('mint_token').innerHTML = '<strong>'+token_name+'</strong> / 4040';
-          document.getElementById('mint_token').removeAttribute('href');
-
-          document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ<b id="mint_total_actual">'+(mint_price*mint_quantity)+'</b> +gas';
-          document.getElementById('mint_total').removeAttribute('href');
-
-          document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> <b id="mint_quantity_actual">'+mint_quantity+'</b> <b id="add_token">+</b></strong>quantity';
-          document.getElementById('mint_quantity').removeAttribute('href');
-
-          document.getElementById('previewImg').setAttribute('src', 'https://freshfrogs.io/frog/'+mint_id+'.png')
-
           // Update minting ui
 
         } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
+
+        // Remove token from minting tray
+        document.querySelector("#remove_token").addEventListener("click", async (e) => {
+          if (mint_quantity <= 1) {
+            return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
+          } else {
+            mint_quantity = mint_quantity - 1;
+            document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
+            document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
+          }
+        })
+
+        // Add token to minting tray mint_total
+        document.querySelector("#add_token").addEventListener("click", async (e) => {
+          if (mint_quantity >= 9) {
+            return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
+          } else {
+            mint_quantity = mint_quantity + 1;
+            document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
+            document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
+          }
+
+          //if (mint_quantity <= (mint_limit - user_tokens)) {
+          //} else { console.log('User mint limit reached!'); console.log('Mint Limit '+mint_limit+' : '+user_tokens+' User Tokens'); }
+
+        })
+
+        // Send mint transaction to provider!
+
+        document.querySelector("#mint_total").addEventListener("click", async (e) => {
+
+          console.log('Send mint transaction!');
+          console.log(mint_quantity+' FROGS @ Ξ'+mint_price+' : ['+(mint_price*mint_quantity)+']');
+          
+          try {
+              
+            consoleOutput('<br>'+'<strong>Minting ('+mint_quantity+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
+            document.getElementById('pre').className = 'mintingTextWhite'
+              
+            let tokens = await f0.mint(user_invite, mint_quantity)
+            
+            // AWAIT RESPONSE!
+
+            consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>'+mint_quantity+' FROG(s)</b> have successfully been minted! <a class="pointer" href="https://freshfrogs.io/the-pad"><b>View "FROG" Tokens</a></b></div><br>')
+            document.getElementById('pre').className = "mintingTextGreen"
+            return; // BREAK!
+
+          } catch (e) {
+              
+            // Something went wrong!
+            
+            consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
+            document.getElementById('pre').className = 'mintingTextWhite'
+            return; // BREAK!
+
+          }
+
+        })
 
       })
 
@@ -777,6 +819,8 @@
 
             var { name, token_metadata, permalink, traits, token_id } = frog
 
+            console.log(frog)
+
             // for each recent mint...
             recentMint = document.createElement('img')
             recentMint.src = 'https://freshfrogs.io/frog/'+frog.token_id+'.png'
@@ -820,6 +864,39 @@
 
       }
 
+      // Display Frog
+      async function display_token(token){
+
+          token_img = 'https://freshfrogs.io/frog/'+token+'.png'
+          token_name = 'Frog #'+token
+
+          document.getElementById('thisheader').style.backgroundImage = 'url('+token_img+')';
+          document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
+          document.getElementById('previewImg').setAttribute('src', token_img)
+
+          //
+          let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
+          for (var i = 0; i < token_metadata.attributes.length; i++){
+              var data = token_metadata.attributes[i]
+              //load_trait(data.trait_type, data.value, 'subDisplay')
+              if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
+                token_type = data.value.slice(0, 11)+'..'
+                break;
+              }
+          }
+          //
+
+          document.getElementById('mint_token').innerHTML = '<strong>'+token_name+'</strong>'+token_type;
+          document.getElementById('mint_token').removeAttribute('href');
+
+          document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ<b id="mint_total_actual">'+(mint_price*mint_quantity)+'</b> +gas';
+          document.getElementById('mint_total').removeAttribute('href');
+
+          document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> <b id="mint_quantity_actual">'+mint_quantity+'</b> <b id="add_token">+</b></strong>quantity';
+          document.getElementById('mint_quantity').removeAttribute('href');
+
+      }
+
     </script>
   </head>
   <body class="bodyb">
@@ -827,16 +904,18 @@
       <header id="thisheader">
         <div class="downloads pre">
           <ul class="downloads2">
-            <li><a id="mint_token" class="pointer" href=""><strong>MINT</strong>Ξ0.01 +gas</a></li>
+            <li><a id="mint_token" class="pointer" href=""><strong>MINT!</strong>Ξ0.01 +gas</a></li>
             <li><a id="mint_total" class="pointer" href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b"><strong>Etherscan</strong>view on</a></li>
             <li><a id="mint_quantity" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>OpenSea</strong>view on</a></li>
           </ul>
           <br>
-          <div class="bigContainer">
-            <div id="frogContainer" class="containerMint"></div>
-            <div id="frogContainer2" class="containerMint"></div>
-            <div id="frogContainer3" class="containerMint">
-              <div class="imgWrapperMint"><img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/FLY.gif"/></div>
+          <div id="mintingTray" class="mintingTray">
+            <div class="bigContainer">
+              <div id="frogContainer3" class="containerMint">
+                <div id="frogContainer4" class="imgWrapperMint">
+                  <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/FLY.gif"/>
+                </div>
+              </div>
             </div>
           </div>
         </div>
