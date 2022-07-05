@@ -695,6 +695,7 @@
           // Update minting ui
 
           // Remove token from minting tray
+
           document.querySelector("#remove_token").addEventListener("click", async (e) => {
             if (mint_quantity <= 1) {
               return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
@@ -706,6 +707,7 @@
           })
 
           // Add token to minting tray mint_total
+
           document.querySelector("#add_token").addEventListener("click", async (e) => {
             if (mint_quantity >= 9) {
               return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
@@ -779,7 +781,7 @@
 
         const options = {
           method: 'GET',
-          headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
+          headers: {Accept: 'application/json', 'X-API-KEY': ''} // 1b80881e422a49d393113ede33c81211
         };
 
         // Collection variables
