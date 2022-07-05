@@ -732,14 +732,14 @@
           try {
               
             consoleOutput('<br>'+'<strong>Minting ('+mint_quantity+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
-            //document.getElementById('pre').className = 'mintingTextWhite'
+            document.getElementById('pre').style.backgroundColor = '#99ffc5'
               
             let tokens = await f0.mint(user_invite, mint_quantity)
             
             // AWAIT RESPONSE!
 
             consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>'+mint_quantity+' FROG(s)</b> have successfully been minted! <a class="pointer" href="https://freshfrogs.io/the-pad"><b>View "FROG" Tokens</a></b></div><br>')
-            //document.getElementById('pre').className = "mintingTextGreen"
+            document.getElementById('pre').style.backgroundColor = '#99ffc5'
             return; // BREAK!
 
           } catch (e) {
@@ -747,7 +747,7 @@
             // Something went wrong!
             
             consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
-            //document.getElementById('pre').className = 'mintingTextWhite'
+            document.getElementById('pre').style.backgroundColor = '#ff99b6'
             return; // BREAK!
 
           }
