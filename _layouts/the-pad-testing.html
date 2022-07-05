@@ -701,7 +701,7 @@
             document.getElementById('mint_total_actual').innerHTML = (0.01*mint_quantity);
             document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
           }
-          
+
           //if (mint_quantity <= (mint_limit - user_tokens)) {
           //} else { console.log('User mint limit reached!'); console.log('Mint Limit '+mint_limit+' : '+user_tokens+' User Tokens'); }
 
@@ -843,7 +843,7 @@
           document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
           document.getElementById('previewImg').setAttribute('src', token_img)
 
-          /*
+          //
           let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
           for (var i = 0; i < token_metadata.attributes.length; i++){
               var data = token_metadata.attributes[i]
@@ -853,9 +853,9 @@
                 break;
               }
           }
-          */
+          //
 
-          document.getElementById('mint_token').innerHTML = '<strong>'+token_name+'</strong>of 4040';
+          document.getElementById('mint_token').innerHTML = '<strong>'+token_name+'</strong>'+token_type;
           document.getElementById('mint_token').removeAttribute('href');
 
           document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ<b id="mint_total_actual">'+(0.01*mint_quantity)+'</b> +gas';
