@@ -598,7 +598,7 @@
     overflow: hidden;
   }
   .recentMint {
-    width: 128px;
+    width: 64px;
     height: auto;
     border-radius: 5px;
     box-shadow: 3px 3px rgb(122 122 122 / 20%);
@@ -796,7 +796,7 @@
         // Pull next available token ID prior to web3 connection
         //
 
-        fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=3&include_orders=false', options)
+        fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=6&include_orders=false', options)
         .then((assets) => assets.json())
         .then((assets) => {
 
