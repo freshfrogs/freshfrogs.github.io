@@ -639,7 +639,7 @@
 
       // Function Variables
 
-      var mint_id;
+      var mint_id, opensea_failed;
       var mint_price = 0.01;
       var mint_quantity = 1;
 
@@ -685,6 +685,13 @@
           contract_symbol = await f0.api.symbol().call();
           contract_id = await f0.api.nextId().call();
           mint_id = contract_id = parseInt(contract_id);
+
+          if (opensea_failed){
+
+            display_token(contract_id);
+            console.log('Nex token_id : ' + contract_id);
+
+          }
 
           getInvites();
 
@@ -813,16 +820,14 @@
           var { assets } = assets
           var contract_id = mint_id = parseInt(assets[0].name.replace('Frog #', '')) + 1;
 
-          display_token(contract_id)
-          console.log(contract_id)
+          display_token(contract_id);
+          console.log('Nex token_id : ' + contract_id);
 
           document.getElementById('recent_mints').innerHTML = '';
 
           assets.forEach((frog) => {
 
             var { name, token_metadata, permalink, traits, token_id } = frog
-
-            console.log(frog)
 
             // for each recent mint...
             recentMint = document.createElement('img')
@@ -836,6 +841,7 @@
         })
         .catch(e => {
 
+          opensea_failed = true;
           console.log('Error: Could not talk to Opensea. (2)');
           console.error('Error : ' + e.message)
 
