@@ -724,7 +724,7 @@
 
         // Send mint transaction to provider!
 
-        document.querySelector("#mint_total").addEventListener("click", function() {
+        document.querySelector("#mint_total").addEventListener("click", async function() {
 
           console.log('Send mint transaction!');
           console.log(mint_quantity+' FROGS @ Ξ'+mint_price+' : ['+(mint_price*mint_quantity)+']');
