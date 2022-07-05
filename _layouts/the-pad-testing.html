@@ -693,6 +693,7 @@
 
           }
 
+          fetch_user_tokens();
           getInvites();
 
           console.log('Connected  Smart Contract : '+contract_name+'('+contract_symbol+')');
@@ -870,6 +871,37 @@
 
       }
 
+      // Check owned tokens
+
+      function fetch_user_tokens() {
+
+        fetch('https://api.opensea.io/api/v1/assets?owner='+user_address+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+        .then((tokens) => tokens.json())
+        .then((tokens) => {
+
+          var { assets } = tokens
+          assets.forEach((frog) => {
+
+            var { name, token_metadata, permalink, traits, external_link, token_id } = frog
+
+              // for each owned token
+              user_token = document.createElement('img')
+              user_token.src = external_link
+              user_token.className = 'recentMint'
+
+              document.getElementById('user_tokens').appendChild(user_token);
+
+          })
+
+        })
+        .catch(e => {
+
+          console.log(e.message);
+          console.log('Error: OpenSea Error! fetch_user_tokens()');
+      
+        })
+      }
+
       // Check invites
       async function getInvites() {
 
@@ -962,6 +994,7 @@
             <hr class="hr2">View, Morph, and More..<a class="pointer" href="https://freshfrogs.io/the-pad"><b>🐸 freshfrogs.io/the-pad</b> ↗️</a>
             <br>
             <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a></div>
+            <div id="recent_mints" class="recent_mints"></div>
           </div>
           <br>
           <div id="thePad" class="thePad"></div>
