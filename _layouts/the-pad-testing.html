@@ -701,7 +701,7 @@
 
           }
 
-          fetch_user_tokens();
+          //fetch_user_tokens();
           getInvites();
 
           console.log('Connected  Smart Contract : '+contract_name+'('+contract_symbol+')');
@@ -939,6 +939,49 @@
 
       }
 
+      // Load attribute (trait)
+      function load_trait(trait, attribute, where) {
+
+        newAttribute = document.createElement("img")
+        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
+        newAttribute.id = attribute
+        newAttribute.target = "_blank"
+
+        if (where == 'frogContainer4') {
+          newAttribute.className = "frogImg4"
+        } else {
+          newAttribute.className = "frogImg2"
+        }
+        
+        newAttribute.style.cursor = "pointer"
+
+        if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+"2.gif"
+
+        } else if (attribute === "morphAnimation") {
+
+          newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
+
+        } else if (attribute === "shadesAnimation") {
+
+          newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
+
+        } else if (attribute.includes("croaking2")) {
+
+          console.log('! '+trait+' / '+attribute)
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
+
+        } else {
+
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
+
+        }
+
+        newAttribute.alt = attribute
+        document.getElementById(where).appendChild(newAttribute)
+
+      }
+
       // Display Frog
       async function display_token(token){
 
@@ -947,19 +990,19 @@
 
           document.getElementById('thisheader').style.backgroundImage = 'url('+token_img+')';
           document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
-          document.getElementById('previewImg').setAttribute('src', token_img)
+          //document.getElementById('previewImg').setAttribute('src', token_img)
 
-          /*
+          //
           let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
           for (var i = 0; i < token_metadata.attributes.length; i++){
               var data = token_metadata.attributes[i]
-              //load_trait(data.trait_type, data.value, 'subDisplay')
-              if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
-                token_type = data.value.slice(0, 11)+'..'
-                break;
-              }
+              load_trait(data.trait_type, data.value, 'frogContainer4')
+              //if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
+              //  token_type = data.value.slice(0, 11)+'..'
+              //  break;
+              //}
           }
-          */
+          //
 
           document.getElementById('mint_token').innerHTML = '<strong>'+token_name+'</strong>4040 supply'//+token_type;
           document.getElementById('mint_token').removeAttribute('href');
