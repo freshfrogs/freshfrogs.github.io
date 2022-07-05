@@ -662,8 +662,11 @@
           user_address = await web3.currentProvider.selectedAddress;
           user_invites = await f0.myInvites();
           user_inviteKeys = Object.keys(user_invites);
-          user_tokens = await collection.methods.balanceOf(user_address).call();
           user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
+          
+          getInvites();
+
+          user_tokens = await collection.methods.balanceOf(user_address).call();
 
           contract_name = await f0.api.name().call();
           contract_symbol = await f0.api.symbol().call();
@@ -674,8 +677,6 @@
           console.log('Connected  Smart Contract : '+contract_name+'('+contract_symbol+')');
           console.log('Ethereum : '+contract_address);
           console.log('Connected User : '+user_address);
-
-          getInvites();
 
           // Update minting ui
 
