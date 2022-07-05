@@ -805,6 +805,12 @@
 
             console.log(frog)
 
+            // for each recent mint...
+            recentMint = document.createElement('img')
+            recentMint.src = 'https://freshfrogs.io/frog/'+frog.id
+            recentMint.className = 'recentMint'
+
+            document.getElementById('recent_mints').appendChild(recentMint);
 
           })
 
