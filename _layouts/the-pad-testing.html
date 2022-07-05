@@ -847,6 +847,36 @@
 
         });
 
+
+        // Get recent sales
+      
+        fetch('https://api.opensea.io/api/v1/events?collection_slug=fresh-frogs&event_type=successful&limit=10', options)
+        .then(sales => sales.json())
+        .then(sales => {
+
+            var { asset_events } = sales
+
+            asset_events.forEach((sale) => {
+              
+                try {
+
+                    var { asset: { image_url, name, permalink }, payment_token: { decimals }, total_price } = sale;
+
+                    // here do seomthg
+                    console.log(sale)
+              
+                } catch (e) { console.log('Error : ' + e.message) }
+
+            })
+
+        })
+        .catch(e => {
+
+            console.log('Error: Could not get recent sales from Opensea...');
+            console.error('Error : ' + e.message)
+
+        })
+
       }
 
       // Check invites
