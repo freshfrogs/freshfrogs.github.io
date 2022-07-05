@@ -801,13 +801,13 @@
 
           assets.forEach((frog) => {
 
-            var { name, token_metadata, permalink, traits } = frog
+            var { name, token_metadata, permalink, traits, token_id } = frog
 
             console.log(frog)
 
             // for each recent mint...
             recentMint = document.createElement('img')
-            recentMint.src = 'https://freshfrogs.io/frog/'+frog.id
+            recentMint.src = 'https://freshfrogs.io/frog/'+frog.token_id+'.png'
             recentMint.className = 'recentMint'
 
             document.getElementById('recent_mints').appendChild(recentMint);
