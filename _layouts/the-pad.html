@@ -1015,6 +1015,7 @@
               user_token = document.createElement('img')
               user_token.src = external_link
               user_token.className = 'recentMint'
+              user_token.onclick = function() { display_token(token_id); }
 
               document.getElementById('thePad').appendChild(user_token);
 
