@@ -687,7 +687,7 @@
             return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
           } else {
             mint_quantity = mint_quantity - 1;
-            document.getElementById('mint_total_actual').innerHTML = (0.01*mint_quantity);
+            document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
             document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
           }
         })
@@ -825,11 +825,13 @@
               mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1);
               mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1);
 
+              document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
+
             }
           }
         }
 
-        consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'Frog #'+mint_id+' is now available to mint!<br>Maximum of <u>'+mint_limit+'</u> Frogs per wallet!<br>'+'<p></p>')
+        consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'Frog #'+mint_id+' is now available to mint!<br>Maximum of <u>'+mint_limit+'</u> Frogs @ Ξ'+mint_price+'<br>'+'<p></p>')
       
       }
 
@@ -858,7 +860,7 @@
           document.getElementById('mint_token').innerHTML = '<strong>'+token_name+'</strong>'+token_type;
           document.getElementById('mint_token').removeAttribute('href');
 
-          document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ<b id="mint_total_actual">'+(0.01*mint_quantity)+'</b> +gas';
+          document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ<b id="mint_total_actual">'+(mint_price*mint_quantity)+'</b> +gas';
           document.getElementById('mint_total').removeAttribute('href');
 
           document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> <b id="mint_quantity_actual">'+mint_quantity+'</b> <b id="add_token">+</b></strong>quantity';
