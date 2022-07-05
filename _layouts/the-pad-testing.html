@@ -686,6 +686,7 @@
           mint_id = contract_id = parseInt(contract_id);
 
           getInvites();
+          display_token(mint_id);
 
           console.log('Connected  Smart Contract : '+contract_name+'('+contract_symbol+')');
           console.log('Ethereum : '+contract_address);
@@ -860,11 +861,7 @@
           }
         }
 
-        display_token(mint_id);
-
         consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'Frog #'+mint_id+' is now available to mint!<br>Maximum of <u>'+mint_limit+'</u> Frogs @ Ξ'+mint_price+'<br>'+'<p></p>')
-        document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
-        document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
 
       }
 
