@@ -710,6 +710,8 @@
           document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> <b id="mint_quantity_actual">'+mint_quantity+'</b> <b id="add_token">+</b></strong>quantity';
           document.getElementById('mint_quantity').removeAttribute('href');
 
+          document.getElementById('previewImg').setAttribute('src', 'https://freshfrogs.io/frog/'+mint_id+'.png')
+
           // Update minting ui
 
         } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
