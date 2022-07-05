@@ -1013,8 +1013,9 @@
               user_token = document.createElement('img')
               user_token.src = external_link
               user_token.className = 'recentMint'
-              user_token.onclick = function() { display_token(token_id); }
-
+              user_token.onclick = function() { 
+                if (!morph) { display_token(token); } else { sub_frog = token; combineTokens(base_frog, sub_frog); document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog; }
+              }
               document.getElementById('thePad').appendChild(user_token);
 
           })
