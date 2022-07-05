@@ -946,10 +946,12 @@
 
         newAttribute = document.createElement("img")
         newAttribute.id = attribute
-        newAttribute.className = "frogImg4"
         newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
 
-        newAttribute.alt = attribute
+        if (trait == "Trait") { newAttribute.className = "frogImg3"; } else { newAttribute.className = "frogImg4"; }
+
+        newAttribute.alt = trait+': '+attribute
+
         document.getElementById(where).appendChild(newAttribute)
 
       }
