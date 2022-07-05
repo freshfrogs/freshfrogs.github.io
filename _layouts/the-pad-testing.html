@@ -397,6 +397,11 @@
     height: 256px;
     border-radius: 5px;
   }
+  .frogImg4:hover{
+    -ms-transform: scale(1.1); /* IE 9 */
+    -webkit-transform: scale(1.1); /* Safari 3-8 */
+    transform: scale(1.1);
+  }
   .smallContainer3:hover{
     -ms-transform: scale(1.1); /* IE 9 */
     -webkit-transform: scale(1.1); /* Safari 3-8 */
@@ -946,13 +951,7 @@
         newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
         newAttribute.id = attribute
         newAttribute.target = "_blank"
-
-        if (where == 'frogContainer4') {
-          newAttribute.className = "frogImg4"
-        } else {
-          newAttribute.className = "frogImg2"
-        }
-        
+        newAttribute.className = "frogImg4"
         newAttribute.style.cursor = "pointer"
 
         if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
