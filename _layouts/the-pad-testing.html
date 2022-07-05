@@ -664,15 +664,14 @@
           user_inviteKeys = Object.keys(user_invites);
           user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
 
-          getInvites();
-
           user_tokens = await collection.methods.balanceOf(user_address).call();
 
           contract_name = await f0.api.name().call();
           contract_symbol = await f0.api.symbol().call();
           contract_id = await f0.api.nextId().call();
+          mint_id = contract_id = parseInt(contract_id);
 
-          mint_id = parseInt(contract_id);
+          getInvites();
 
           console.log('Connected  Smart Contract : '+contract_name+'('+contract_symbol+')');
           console.log('Ethereum : '+contract_address);
