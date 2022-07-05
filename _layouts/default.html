@@ -823,21 +823,6 @@
           display_token(contract_id);
           console.log('Nex token_id : ' + contract_id);
 
-          document.getElementById('recent_mints').innerHTML = '';
-
-          assets.forEach((frog) => {
-
-            var { name, token_metadata, permalink, traits, token_id } = frog
-
-            // for each recent mint...
-            recentMint = document.createElement('img')
-            recentMint.src = 'https://freshfrogs.io/frog/'+frog.token_id+'.png'
-            recentMint.className = 'recentMint'
-
-            document.getElementById('recent_mints').appendChild(recentMint);
-
-          })
-
         })
         .catch(e => {
 
@@ -846,6 +831,42 @@
           console.error('Error : ' + e.message)
 
         });
+
+
+        // Get recent sales
+      
+        fetch('https://api.opensea.io/api/v1/events?collection_slug=fresh-frogs&event_type=successful&limit=12', options)
+        .then(sales => sales.json())
+        .then(sales => {
+
+            var { asset_events } = sales
+
+            document.getElementById('recent_mints').innerHTML = '';
+
+            asset_events.forEach((sale) => {
+              
+              try {
+
+                var { asset: { image_url, name, permalink, token_id, external_link }, payment_token: { decimals }, total_price } = sale;
+
+                // for each recent mint...
+                recentMint = document.createElement('img')
+                recentMint.src = external_link
+                recentMint.className = 'recentMint'
+
+                document.getElementById('recent_mints').appendChild(recentMint);
+            
+              } catch (e) { console.log('Error : ' + e.message) }
+
+            })
+
+        })
+        .catch(e => {
+
+            console.log('Error: Could not get recent sales from Opensea...');
+            console.error('Error : ' + e.message)
+
+        })
 
       }
 
@@ -933,7 +954,7 @@
         <div class="top">{{ content }}</div>
         <div class="downloads pre">
           <div id="netStatus" class="netStatus">
-            <div id="recent_mints" class="recent_mints"><img src="https://freshfrogs.io/frog/3584.png" class="recentMint"><img src="https://freshfrogs.io/frog/3583.png" class="recentMint"><img src="https://freshfrogs.io/frog/3582.png" class="recentMint"><img src="https://freshfrogs.io/frog/3581.png" class="recentMint"><img src="https://freshfrogs.io/frog/3580.png" class="recentMint"><img src="https://freshfrogs.io/frog/3579.png" class="recentMint"><img src="https://freshfrogs.io/frog/3578.png" class="recentMint"><img src="https://freshfrogs.io/frog/3577.png" class="recentMint"><img src="https://freshfrogs.io/frog/3576.png" class="recentMint"><img src="https://freshfrogs.io/frog/3575.png" class="recentMint"><img src="https://freshfrogs.io/frog/3574.png" class="recentMint"><img src="https://freshfrogs.io/frog/3573.png" class="recentMint"></div>
+            <div id="recent_mints" class="recent_mints"><img src="https://freshfrogs.io/frog/3584.png" class="recentMint"><img src="https://freshfrogs.io/frog/3583.png" class="recentMint"><img src="https://freshfrogs.io/frog/3582.png" class="recentMint"><img src="https://freshfrogs.io/frog/3581.png" class="recentMint"><img src="https://freshfrogs.io/frog/3580.png" class="recentMint"><img src="https://freshfrogs.io/frog/3579.png" class="recentMint"><img src="https://freshfrogs.io/frog/3578.png" class="recentMint"><img src="https://freshfrogs.io/frog/3577.png" class="recentMint"><img src="https://freshfrogs.io/frog/3576.png" class="recentMint"><img src="https://freshfrogs.io/frog/3575.png" class="recentMint"></div>
             <br>
             <h2 style="color: white !important;"><b>FreshFrogsNFT</b></h2>
             <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
