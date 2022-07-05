@@ -827,28 +827,6 @@
 
       }
 
-      // Display Frog
-      async function display_token(token){
-
-          token_img = 'https://freshfrogs.io/frog/'+token+'.png'
-          token_name = 'Frog #'+token
-
-          document.getElementById('thisheader').style.backgroundImage = 'url('+token_img+')';
-          document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
-          document.getElementById('previewImg').setAttribute('src', token_img)
-
-          let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
-          for (var i = 0; i < token_metadata.attributes.length; i++){
-              var data = token_metadata.attributes[i]
-              //load_trait(data.trait_type, data.value, 'subDisplay')
-              if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
-                token_type = data.value.slice(0, 11)+'..'
-                break;
-              }
-          }
-
-      }
-
     </script>
   </head>
   <body class="bodyb">
