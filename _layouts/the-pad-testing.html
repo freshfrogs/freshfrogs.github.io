@@ -692,16 +692,8 @@
           console.log('Connected User : '+user_address);
 
           let token_name = 'Frog #'+mint_id
-          let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+mint_id+".json")).json();
-          for (var i = 0; i < token_metadata.attributes.length; i++){
-              var data = token_metadata.attributes[i]
-              if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
-                token_type = data.value//.slice(0, 11)+'..'
-                break;
-              }
-          }
 
-          document.getElementById('mint_token').innerHTML = '<strong>'+token_name+'</strong>'+token_type;
+          document.getElementById('mint_token').innerHTML = '<strong>'+token_name+'</strong> / 4040';
           document.getElementById('mint_token').removeAttribute('href');
 
           document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ<b id="mint_total_actual">'+(mint_price*mint_quantity)+'</b> +gas';
