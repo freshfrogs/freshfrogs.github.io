@@ -751,7 +751,7 @@
               var data = token_metadata.attributes[i]
               //load_trait(data.trait_type, data.value, 'subDisplay')
 
-              
+              let attribute_text = document.createElement('i')
               attribute_text.innerHTML = '<br>'+data.trait_type+': '+data.value
               document.getElementById('traits').appendChild(attribute_text)
 
