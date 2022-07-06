@@ -712,54 +712,54 @@
       // Select Frog
       async function display_token(token){
 
-          display_frog = 'https://freshfrogs.io/frog/'+token+'.png'
-          display_name = 'Frog #'+token
-          display_os = ''
+        display_frog = 'https://freshfrogs.io/frog/'+token+'.png'
+        display_name = 'Frog #'+token
+        display_os = ''
 
-          document.getElementById('thisheader').style.backgroundImage = 'url('+display_frog+')';
-          document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
+        document.getElementById('thisheader').style.backgroundImage = 'url('+display_frog+')';
+        document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
 
-          document.getElementById('previewImg').setAttribute('src', display_frog)
-          document.getElementById('display_name').innerHTML = display_name
+        document.getElementById('previewImg').setAttribute('src', display_frog)
+        document.getElementById('display_name').innerHTML = display_name
 
-          openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
-          etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
+        openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
+        etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
 
-          document.getElementById('selectSub').setAttribute('href', openSeaLink)
-          document.getElementById('selectBase').innerHTML = '<strong>Morph</strong><frog id="baseText">combinations</frog>'
-          document.getElementById('selectBase').onclick = function() {
-            if (!morph) {
-              base_frog = token
-              morph = true;
-              document.getElementById('baseText').innerHTML = 'select frog!'
-            } else if (morph) {
-              alert('Create new custom Frog on Ethereum! Coming soon!')
-              console.log('Frog Morph')
-              console.log('Frog #'+base_frog)
-              console.log('Frog #'+sub_frog)
-            } 
+        document.getElementById('selectSub').setAttribute('href', openSeaLink)
+        document.getElementById('selectBase').innerHTML = '<strong>Morph</strong><frog id="baseText">combinations</frog>'
+        document.getElementById('selectBase').onclick = function() {
+          if (!morph) {
+            base_frog = token
+            morph = true;
+            document.getElementById('baseText').innerHTML = 'select frog!'
+          } else if (morph) {
+            alert('Create new custom Frog on Ethereum! Coming soon!')
+            console.log('Frog Morph')
+            console.log('Frog #'+base_frog)
+            console.log('Frog #'+sub_frog)
+          } 
 
-          }
+        }
 
-          consoleOutput('<img src="'+display_frog+'" class="recentMint" style="width: 128px;"/><div id="traits" class="trait_list"></div>')
+        consoleOutput('<img src="'+display_frog+'" class="recentMint" style="width: 128px;"/><div id="traits" class="trait_list"></div>')
 
-          document.getElementById('traits').innerHTML = '<strong>'+display_name+'</strong>'
+        document.getElementById('traits').innerHTML = '<strong>'+display_name+'</strong>'
 
-          let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
-          for (var i = 0; i < token_metadata.attributes.length; i++){
+        let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
+        for (var i = 0; i < token_metadata.attributes.length; i++){
 
-              var data = token_metadata.attributes[i]
-              //load_trait(data.trait_type, data.value, 'subDisplay')
+            var data = token_metadata.attributes[i]
+            //load_trait(data.trait_type, data.value, 'subDisplay')
 
-              let attribute_text = document.createElement('i')
-              attribute_text.innerHTML = '<br>'+data.trait_type+': '+data.value
-              document.getElementById('traits').appendChild(attribute_text)
+            let attribute_text = document.createElement('i')
+            attribute_text.innerHTML = '<br>'+data.trait_type+': '+data.value
+            document.getElementById('traits').appendChild(attribute_text)
 
-              if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
-                document.getElementById('display_type').innerHTML = data.value.slice(0, 13);
-              }
+            if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
+              document.getElementById('display_type').innerHTML = data.value.slice(0, 13);
+            }
 
-          }
+        }
 
       }
 
