@@ -710,7 +710,7 @@
       }
 
       // Select Frog
-      async function display_token(token, price){
+      async function display_token(token){
 
         display_frog = 'https://freshfrogs.io/frog/'+token+'.png'
         display_name = 'Frog #'+token
@@ -759,12 +759,6 @@
               document.getElementById('display_type').innerHTML = data.value.slice(0, 13);
             }
 
-        }
-
-        if (price > 0) {
-          let attribute_text = document.createElement('i')
-          attribute_text.innerHTML = '<br><b>Price<br>Ξ</b>'+price
-          document.getElementById('traits').appendChild(attribute_text)
         }
 
       }
@@ -1037,20 +1031,17 @@
           var { assets } = tokens
           assets.forEach((frog) => {
 
-            //console.log(frog)
+            console.log(frog)
             var { name, token_metadata, permalink, traits, external_link, token_id, last_sale, top_bid } = frog
 
-            console.log(last_sale)
-            console.log(top_bid)
-
-            // for each owned token
-            user_token = document.createElement('img')
-            user_token.src = external_link
-            user_token.className = 'recentMint'
-            user_token.onclick = function() { 
-              if (!morph) { display_token(token_id, price); } else { sub_frog = token_id; combineTokens(base_frog, sub_frog); document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog; }
-            }
-            document.getElementById('thePad').appendChild(user_token);
+              // for each owned token
+              user_token = document.createElement('img')
+              user_token.src = external_link
+              user_token.className = 'recentMint'
+              user_token.onclick = function() { 
+                if (!morph) { display_token(token_id); } else { sub_frog = token_id; combineTokens(base_frog, sub_frog); document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog; }
+              }
+              document.getElementById('thePad').appendChild(user_token);
 
           })
 
