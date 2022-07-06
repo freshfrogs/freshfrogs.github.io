@@ -740,7 +740,7 @@
 
           }
 
-          consoleOutput('<img src="'+display_frog+'" class="recentMint" style="width: 128px;"/><div style="margin: auto; float: right;" id="attributes"></div>')
+          consoleOutput('<img src="'+display_frog+'" class="recentMint" style="width: 128px;"/><div class="trait_list"></div>')
 
           let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
           for (var i = 0; i < token_metadata.attributes.length; i++){
@@ -748,7 +748,7 @@
               var data = token_metadata.attributes[i]
               //load_trait(data.trait_type, data.value, 'subDisplay')
 
-              let attribute_text = document.createElement('b')
+              let attribute_text = document.createElement('i')
               attribute_text.innerHTML = '<br>'+data.trait_type+': '+data.value
 
               document.getElementById('attributes').appendChild(attribute_text)
