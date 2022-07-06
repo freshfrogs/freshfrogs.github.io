@@ -1040,17 +1040,8 @@
             //console.log(frog)
             var { name, token_metadata, permalink, traits, external_link, token_id, last_sale, top_bid } = frog
 
-            var price;
-            
-            if (last_sale) {
-              price = last_sale
-              console.log(last_sale)
-            } else if (top_bid) {
-              price = top_bid
-              console.log(top_bid)
-            }
-
-            console.log(price)
+            console.log(last_sale)
+            console.log(top_bid)
 
               // for each owned token
               user_token = document.createElement('img')
