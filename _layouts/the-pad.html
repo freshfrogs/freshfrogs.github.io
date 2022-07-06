@@ -724,6 +724,7 @@
 
           openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
           etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
+
           document.getElementById('selectSub').setAttribute('href', openSeaLink)
           document.getElementById('selectBase').innerHTML = '<strong>Morph</strong><frog id="baseText">combinations</frog>'
           document.getElementById('selectBase').onclick = function() {
@@ -752,7 +753,6 @@
 
               let attribute_text = document.createElement('i')
               attribute_text.innerHTML = '<br>'+data.trait_type+': '+data.value
-
               document.getElementById('traits').appendChild(attribute_text)
 
               if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
@@ -760,6 +760,9 @@
               }
 
           }
+
+          attribute_text.innerHTML = '<br>opensea link: \n'+openSeaLink
+          document.getElementById('traits').appendChild(attribute_text)
 
       }
 
