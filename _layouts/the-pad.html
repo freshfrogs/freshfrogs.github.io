@@ -606,12 +606,6 @@
     transition: transform .2s;
     cursor: pointer;
   }
-  .recentMint:hover{
-    -ms-transform: scale(1.1); /* IE 9 */
-    -webkit-transform: scale(1.1); /* Safari 3-8 */
-    transform: scale(1.1);
-    box-shadow: none;
-  }
   .trait_list {
     width: 50%;
     margin: auto;
@@ -731,7 +725,7 @@
           openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
           etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
           document.getElementById('selectSub').setAttribute('href', openSeaLink)
-          document.getElementById('selectBase').innerHTML = '<strong>Morph</strong><frog id="baseText">two Frogs!</frog>'
+          document.getElementById('selectBase').innerHTML = '<strong>Morph</strong><frog id="baseText">combinations</frog>'
           document.getElementById('selectBase').onclick = function() {
             if (!morph) {
               base_frog = token
@@ -1320,8 +1314,8 @@
         <div class="downloads pre">
           <ul class="downloads2">
             <li><a id="morphFrogs" class="pointer"><strong id="display_name">Fresh Frogs</strong><div id="display_type">ΞEthereum</div></a></li>
-            <li><a id="selectBase" class="pointer"><strong>View on</strong><frog id="baseText">Etherscan</frog></a></li>
-            <li><a id="selectSub" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>View on</strong><frog id="subText">OpenSea</frog></a></li>
+            <li><a id="selectBase" class="pointer"><strong>Etherscan</strong><frog id="baseText">contract</frog></a></li>
+            <li><a id="selectSub" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>OpenSea</strong><frog id="subText">collection</frog></a></li>
           </ul>
           <br>
           <div id="mintingTray" class="mintingTray">
