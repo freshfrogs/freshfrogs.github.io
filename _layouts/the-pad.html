@@ -740,18 +740,25 @@
 
           }
 
-          consoleOutput('<img src="'+display_frog+'" class="recentMint" style="width: 128px;"/><p id="attributes"></p>')
+          consoleOutput('<img src="'+display_frog+'" class="recentMint" style="width: 128px;"/><div id="attributes"></div>')
 
           let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
           for (var i = 0; i < token_metadata.attributes.length; i++){
+
               var data = token_metadata.attributes[i]
               //load_trait(data.trait_type, data.value, 'subDisplay')
-              let attribute_text = document.createTextNode(data.trait_type+': '+data.value)
+
+              let attribute_text = document.createElement('p')
+              attribute_text.innerHTML = data.trait_type+': '+data.value
+
               document.getElementById('attributes').appendChild(attribute_text)
+
               if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
                 document.getElementById('display_type').innerHTML = data.value.slice(0, 13);
               }
+
           }
+
       }
 
       // Function combine tokens
