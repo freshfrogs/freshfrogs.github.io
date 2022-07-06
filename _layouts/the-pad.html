@@ -761,9 +761,11 @@
 
         }
 
-        let attribute_text = document.createElement('i')
-        attribute_text.innerHTML = '<br><b>Price<br>Ξ</b>'+price
-        document.getElementById('traits').appendChild(attribute_text)
+        if (price > 0) {
+          let attribute_text = document.createElement('i')
+          attribute_text.innerHTML = '<br><b>Price<br>Ξ</b>'+price
+          document.getElementById('traits').appendChild(attribute_text)
+        }
 
       }
 
