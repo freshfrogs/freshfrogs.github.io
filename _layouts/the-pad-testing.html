@@ -710,7 +710,7 @@
       }
 
       // Select Frog
-      async function display_token(token){
+      async function display_token(token) {
 
         display_frog = 'https://freshfrogs.io/frog/'+token+'.png'
         display_name = 'Frog #'+token
@@ -760,6 +760,10 @@
             }
 
         }
+
+        let attribute_text = document.createElement('b')
+        attribute_text.innerHTML = '<br>OpenSea Link<br><a href="'+openSeaLink+'">'+openSeaLink.slice(0, 10)+'</a>';
+        document.getElementById('traits').appendChild(attribute_text)
 
       }
 
@@ -1022,7 +1026,7 @@
           headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
         };
 
-        fetch('https://api.opensea.io/api/v1/assets?owner='+'0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38'+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=48&include_orders=false', options)
+        fetch('https://api.opensea.io/api/v1/assets?owner='+user_address+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=48&include_orders=false', options)
         .then((tokens) => tokens.json())
         .then((tokens) => {
 
