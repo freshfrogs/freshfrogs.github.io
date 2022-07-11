@@ -1014,6 +1014,7 @@
             var { name, token_metadata, permalink, traits, external_link, token_id } = frog
 
             let frog_token = document.createElement('div')
+            frog_token.className = 'mintingTextWhite2'
             frog_token.innerHTML = '<img src="'+external_link+'" class="recentMint" style="width: 128px;"/><div id="traits_'+token_id+'" class="trait_list"></div>'
 
             document.getElementById('thePad').appendChild(frog_token)
