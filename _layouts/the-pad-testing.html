@@ -658,7 +658,7 @@
           user_address = await web3.currentProvider.selectedAddress;
           userInviteList = await f0.myInvites();
           userInviteKeys = Object.keys(userInviteList);
-          ownedFrogs = await collection.methods.balanceOf(user_address).call();
+          ownedFrogs = await collection.methods.balanceOf('0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38').call();
           contractName = await f0.api.name().call();
           contractSymbol = await f0.api.symbol().call();
           nextId = await f0.api.nextId().call();
