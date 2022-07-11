@@ -609,7 +609,6 @@
   .trait_list {
     width: 50%;
     margin: auto;
-    float: right;
     text-align: left;
     padding: 8px;
   }
@@ -617,6 +616,12 @@
     margin: 20px !important;
     margin-left: auto !important;
     margin-right: auto !important;
+  }
+  .frog_token {
+    width: 100%;
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -752,26 +757,6 @@
             console.log('Frog #'+base_frog)
             console.log('Frog #'+sub_frog)
           } 
-
-        }
-
-        document.getElementById('display_frog').innerHTML = '<hr><img src="'+display_frog+'" class="recentMint" style="width: 128px;"/><div id="traits" class="trait_list"></div>';
-
-        document.getElementById('traits').innerHTML = '<strong>'+display_name+'</strong>'
-
-        let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
-        for (var i = 0; i < token_metadata.attributes.length; i++){
-
-            var data = token_metadata.attributes[i]
-            //load_trait(data.trait_type, data.value, 'subDisplay')
-
-            let attribute_text = document.createElement('i')
-            attribute_text.innerHTML = '<br>'+data.trait_type+': '+data.value
-            document.getElementById('traits').appendChild(attribute_text)
-
-            if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
-              document.getElementById('display_type').innerHTML = data.value.slice(0, 13);
-            }
 
         }
 
@@ -1042,23 +1027,33 @@
 
           consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<div id="display_frog"></div><hr>')
 
-          loaded = 0;
           var { assets } = tokens
           assets.forEach((frog) => {
 
             var { name, token_metadata, permalink, traits, external_link, token_id } = frog
 
-              loaded = loaded + 1;
-              console.log('('+loaded+') '+name);
+            let frog_token = document.createElement('div');
+            frog_token.className = 'frog_token';
+            frog_token.innerHTML = '<img src="'+external_link+'" class="recentMint" style="width: 128px;"/><div id="traits_'+token_id+'" class="trait_list"></div>';
+            document.getElementById('pre').appendChild(frog_token);
+            document.getElementById('traits_'+token_id).innerHTML = '<strong>'+name+'</strong>';
 
-              // for each owned token
-              user_token = document.createElement('img')
-              user_token.src = external_link
-              user_token.className = 'recentMint'
-              user_token.onclick = function() { 
-                if (!morph) { display_token(token_id); } else { sub_frog = token_id; combineTokens(base_frog, sub_frog); document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog; }
+            let break_b = document.createElement('hr');
+            document.getElementById('pre').appendChild(break_b);
+
+            fetch(token_metadata)
+            .then((metadata) => metadata.json())
+            .then((metadata) => { 
+
+              for (var i = 0; i < metadata.attributes.length; i++) {
+
+                var data = metadata.attributes[i]
+                let trait_text = document.createElement('i')
+                trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value
+                document.getElementById('traits_'+token_id).appendChild(trait_text)
+
               }
-              document.getElementById('pre').appendChild(user_token);
+            });
 
           })
 
