@@ -741,7 +741,7 @@
 
         }
 
-        consoleOutput('<img src="'+display_frog+'" class="recentMint" style="width: 128px;"/><div id="traits" class="trait_list"></div>')
+        document.getElementById('display_frog').innerHTML = '<img src="'+display_frog+'" class="recentMint" style="width: 128px;"/><div id="traits" class="trait_list"></div>';
 
         document.getElementById('traits').innerHTML = '<strong>'+display_name+'</strong>'
 
@@ -1026,7 +1026,7 @@
         .then((tokens) => tokens.json())
         .then((tokens) => {
 
-          consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<hr>')
+          consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<div id="display_frog"></div><hr>')
 
           var { assets } = tokens
           assets.forEach((frog) => {
