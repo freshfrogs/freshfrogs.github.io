@@ -1035,6 +1035,9 @@
 
             var { name, token_metadata, permalink, traits, external_link, token_id } = frog
 
+            openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id
+            etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id
+
             let frog_token = document.createElement('div');
             frog_token.onclick = function() { 
               if (!morph) { display_token(token_id); } else { sub_frog = token_id; combineTokens(base_frog, sub_frog); document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog; }
@@ -1062,7 +1065,7 @@
             });
 
             let button_b = document.createElement('div');
-            button_b.innerHTML = '<button class="frog_button">OpenSea</button> <button class="frog_button">EtherScan</button>'
+            button_b.innerHTML = '<a href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea</button></a> <a href="'+etherscanLink+'" target="_blank"><button class="frog_button">EtherScan</button></a>'
             document.getElementById('traits_'+token_id).appendChild(button_b);
 
           })
