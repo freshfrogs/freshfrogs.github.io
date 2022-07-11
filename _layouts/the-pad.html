@@ -1042,10 +1042,14 @@
 
           consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<div id="display_frog"></div><hr>')
 
+          loaded = 0;
           var { assets } = tokens
           assets.forEach((frog) => {
 
             var { name, token_metadata, permalink, traits, external_link, token_id } = frog
+
+              loaded = loaded + 1;
+              console.log('('+loaded+') '+name)
 
               // for each owned token
               user_token = document.createElement('img')
