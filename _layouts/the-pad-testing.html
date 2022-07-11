@@ -623,6 +623,9 @@
     margin-left: auto;
     margin-right: auto;
   }
+  .frog_button {
+    border: none;
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -1058,7 +1061,8 @@
               }
             });
 
-            let button_b = document.createElement('button');
+            let button_b = document.createElement('div');
+            button_b.innerHTML = '<button class="frog_button">OpenSea</button> <button class="frog_button">EtherScan</button>'
             document.getElementById('traits_'+token_id).appendChild(button_b);
 
           })
