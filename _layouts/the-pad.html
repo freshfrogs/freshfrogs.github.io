@@ -1026,7 +1026,7 @@
         .then((tokens) => tokens.json())
         .then((tokens) => {
 
-          consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<hr class="hr2">')
+          consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<hr>')
 
           var { assets } = tokens
           assets.forEach((frog) => {
