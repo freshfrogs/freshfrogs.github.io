@@ -1028,10 +1028,10 @@
             var { name, token_metadata, permalink, traits, external_link, token_id } = frog
 
             let frog_token = document.createElement('div');
-            frog_token.className = ''
-            frog_token.innerHTML = '<hr><img src="'+display_frog+'" class="recentMint" style="width: 128px;"/><div id="traits_'+token_id+'" class="trait_list"></div>';
+            //frog_token.className = ''
+            frog_token.innerHTML = '<hr><img src="'+external_link+'" class="recentMint" style="width: 128px;"/><div id="traits_'+token_id+'" class="trait_list"></div>';
             document.getElementById('pre').appendChild(frog_token);
-            document.getElementById('traits_'+token_id).innerHTML = '<strong>'+display_name+'</strong>'
+            document.getElementById('traits_'+token_id).innerHTML = '<strong>'+name+'</strong>'
 
             fetch(token_metadata)
             .then((metadata) => metadata.json())
