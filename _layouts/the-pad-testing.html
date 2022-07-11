@@ -741,26 +741,6 @@
 
         }
 
-        consoleOutput('<img src="'+display_frog+'" class="recentMint" style="width: 128px;"/><div id="traits" class="trait_list"></div>')
-
-        document.getElementById('traits').innerHTML = '<strong>'+display_name+'</strong>'
-
-        let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
-        for (var i = 0; i < token_metadata.attributes.length; i++){
-
-            var data = token_metadata.attributes[i]
-            //load_trait(data.trait_type, data.value, 'subDisplay')
-
-            let attribute_text = document.createElement('i')
-            attribute_text.innerHTML = '<br>'+data.trait_type+': '+data.value
-            document.getElementById('traits').appendChild(attribute_text)
-
-            if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
-              document.getElementById('display_type').innerHTML = data.value.slice(0, 13);
-            }
-
-        }
-
       }
 
       // Function combine tokens
@@ -1033,14 +1013,26 @@
 
             var { name, token_metadata, permalink, traits, external_link, token_id } = frog
 
-              // for each owned token
-              user_token = document.createElement('img')
-              user_token.src = external_link
-              user_token.className = 'recentMint'
-              user_token.onclick = function() { 
-                if (!morph) { display_token(token_id); } else { sub_frog = token_id; combineTokens(base_frog, sub_frog); document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog; }
+            consoleOutput('<img src="'+external_link+'" class="recentMint" style="width: 128px;"/><div id="traits_'+token_id+'" class="trait_list"></div>')
+
+            document.getElementById('traits_'+token_id).innerHTML = '<strong>'+name+'</strong>'
+
+            fetch(token_metadata)
+            .then((metadata) => metadata.json())
+            .then((metadata) => {
+              // Loop Attributes
+              for (var i = 0; i < metadata.attributes.length; i++){
+
+                var data = metadata.attributes[i]
+                //load_trait(data.trait_type, data.value, 'subDisplay')
+
+                let attribute_text = document.createElement('i')
+                attribute_text.innerHTML = '<br>'+data.trait_type+': '+data.value
+                document.getElementById('traits').appendChild(attribute_text)
+
               }
-              document.getElementById('thePad').appendChild(user_token);
+
+            })
 
           })
 
