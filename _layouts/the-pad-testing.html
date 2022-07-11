@@ -633,7 +633,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
     <script>
+      // <-- [Google Analytics]
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-6PB0WKB4SH');
+      // -- >
 
       var user_address, userInviteList, userInviteKeys, ownedFrogs, contractName, contractSymbol, nextId, nextIdC, collection, COLLECTION, traits_list;
       var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
@@ -658,7 +666,7 @@
           user_address = await web3.currentProvider.selectedAddress;
           userInviteList = await f0.myInvites();
           userInviteKeys = Object.keys(userInviteList);
-          ownedFrogs = await collection.methods.balanceOf('0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38').call();
+          ownedFrogs = await collection.methods.balanceOf(user_address).call();
           contractName = await f0.api.name().call();
           contractSymbol = await f0.api.symbol().call();
           nextId = await f0.api.nextId().call();
@@ -667,7 +675,7 @@
           //document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
 
           if (ownedFrogs <= 0) { // ❌ No FROGS
-            consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS!<br> Here are a few at random to try out!'+'<p></p>')
+            consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS!<br>'+'<p></p>')
           } else {
             consoleOutput('<br>'+'<strong>Connected!</strong> Loading Frogs from OpenSea... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
             fetch_user_tokens();
@@ -1028,31 +1036,32 @@
           headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
         };
 
-        fetch('https://api.opensea.io/api/v1/assets?owner='+'0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38'+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=48&include_orders=false', options)
+        fetch('https://api.opensea.io/api/v1/assets?owner='+user_address+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=48&include_orders=false', options)
         .then((tokens) => tokens.json())
         .then((tokens) => {
 
+          let frogs_loaded = 0;
+
           consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<div id="display_frog"></div><hr>')
 
-          try {
-            var { assets } = tokens
-            assets.forEach((frog) => {
+          var { assets } = tokens
+          assets.forEach((frog) => {
 
-              var { name, token_metadata, permalink, traits, external_link, token_id } = frog
+            var { name, token_metadata, permalink, traits, external_link, token_id } = frog
 
-                // for each owned token
-                user_token = document.createElement('img')
-                user_token.src = external_link
-                user_token.className = 'recentMint'
-                user_token.onclick = function() { 
-                  if (!morph) { display_token(token_id); } else { sub_frog = token_id; combineTokens(base_frog, sub_frog); document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog; }
-                }
-                document.getElementById('pre').appendChild(user_token);
+              // for each owned token
+              user_token = document.createElement('img')
+              user_token.src = external_link
+              user_token.className = 'recentMint'
+              user_token.onclick = function() { 
+                if (!morph) { display_token(token_id); } else { sub_frog = token_id; combineTokens(base_frog, sub_frog); document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog; }
+              }
+              document.getElementById('pre').appendChild(user_token);
 
-            })
-          } catch (e) {
-            console.log('OpenSea Error : Something went wrong! \n'+e.message);
-          }
+              let frogs_loaded = frogs_loaded + 1;
+              console.log('('+frogs_loaded+') '+name);
+
+          })
 
         })
         .catch(e => {
