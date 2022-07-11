@@ -1034,21 +1034,25 @@
 
           consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<div id="display_frog"></div><hr>')
 
-          var { assets } = tokens
-          assets.forEach((frog) => {
+          try {
+            var { assets } = tokens
+            assets.forEach((frog) => {
 
-            var { name, token_metadata, permalink, traits, external_link, token_id } = frog
+              var { name, token_metadata, permalink, traits, external_link, token_id } = frog
 
-              // for each owned token
-              user_token = document.createElement('img')
-              user_token.src = external_link
-              user_token.className = 'recentMint'
-              user_token.onclick = function() { 
-                if (!morph) { display_token(token_id); } else { sub_frog = token_id; combineTokens(base_frog, sub_frog); document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog; }
-              }
-              document.getElementById('pre').appendChild(user_token);
+                // for each owned token
+                user_token = document.createElement('img')
+                user_token.src = external_link
+                user_token.className = 'recentMint'
+                user_token.onclick = function() { 
+                  if (!morph) { display_token(token_id); } else { sub_frog = token_id; combineTokens(base_frog, sub_frog); document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog; }
+                }
+                document.getElementById('pre').appendChild(user_token);
 
-          })
+            })
+          } catch (e) {
+            console.log('OpenSea Error : Something went wrong! \n'+e.message);
+          }
 
         })
         .catch(e => {
