@@ -987,11 +987,11 @@
         console.log('--- Final Frog Metadata ---')
         if (alpha_Frog != false) { load_trait("Frog", alpha_Frog, thisPlace); console.log('Frog: '+alpha_Frog);} else if (alpha_SpecialFrog != false) { load_trait("SpecialFrog", alpha_SpecialFrog, thisPlace); console.log('SpecialFrog: '+alpha_SpecialFrog);}
         
-        if (other_Frog == 'blueDartFrog' || other_Frog == 'splendidLeafFrog') {
+        if (other_Frog == 'blueDartFrog' || base_Frog == 'splendidLeafFrog') {
 
           if (other_Frog == 'splendidLeafFrog') {
 
-            load_trait("Trait/natural/"+other_Frog, base_Trait, thisPlace);
+            load_trait("Trait/natural/"+base_Frog, base_Trait, thisPlace);
 
           } else if (other_Frog == 'blueDartFrog') {
 
