@@ -1062,11 +1062,12 @@
                 document.getElementById('traits_'+token_id).appendChild(trait_text)
 
               }
-            });
 
-            let button_b = document.createElement('div');
-            button_b.innerHTML = '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+etherscanLink+'" target="_blank"><button class="frog_button">EtherScan</button></a>'
-            document.getElementById('traits_'+token_id).appendChild(button_b);
+              let button_b = document.createElement('div');
+              button_b.innerHTML = '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+etherscanLink+'" target="_blank"><button class="frog_button">EtherScan</button></a>'
+              document.getElementById('traits_'+token_id).appendChild(button_b);
+              
+            });
 
           })
 
