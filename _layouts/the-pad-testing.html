@@ -1019,10 +1019,23 @@
 
       function fetch_user_tokens() {
 
-        const options = {
-          method: 'GET',
-          headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
-        };
+        const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
+
+        fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
+        .then(collection => collection.json())
+        .then(collection => {
+
+            var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
+
+            traits_list = traits;
+
+        })
+        .catch(e => {
+
+            console.log('Error: Could not get Collection data from Opensea.');
+            console.error('Error : ' + e.message)
+      
+        }); // End data pull / first paid Frog 3,236
 
         fetch('https://api.opensea.io/api/v1/assets?owner='+user_address+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
         .then((tokens) => tokens.json())
@@ -1090,8 +1103,13 @@
               for (var i = 0; i < metadata.attributes.length; i++) {
 
                 var data = metadata.attributes[i]
+
+                try { var trait_rarity = ((traits_list[data.trait_type][value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'i'; console.log(e); }
+                  
+                if (trait_rarity == 'NaN' || trait_rarity < 1) { trait_rarity = '<1' }
+
                 let trait_text = document.createElement('i')
-                trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value
+                trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value+' '+trait_rarity+'%'
                 document.getElementById('traits_'+token_id).appendChild(trait_text)
 
               }
