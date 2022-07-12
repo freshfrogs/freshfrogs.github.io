@@ -1059,6 +1059,7 @@
             document.getElementById('pre').appendChild(frog_token);
 
             if (typeof last_sale_final !== 'undefined') {
+              console.log(name+' ('+last_sale_final+')');
               document.getElementById('traits_'+token_id).innerHTML = '<strong>'+name+'</strong> <b>Ξ'+last_sale_final+'</b>';
             } else {
               document.getElementById('traits_'+token_id).innerHTML = '<strong>'+name+'</strong>';
