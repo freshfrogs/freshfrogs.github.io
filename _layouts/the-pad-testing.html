@@ -1049,7 +1049,13 @@
             frog_token.className = 'frog_token';
             frog_token.innerHTML = '<img src="'+external_link+'" class="recentMint"/><div id="traits_'+token_id+'" class="trait_list"></div>';
             document.getElementById('pre').appendChild(frog_token);
-            document.getElementById('traits_'+token_id).innerHTML = '<strong>'+name+'</strong>';
+
+            if (typeof last_sale_final !== 'undefined') {
+              document.getElementById('traits_'+token_id).innerHTML = '<strong>'+name+'</strong> <b>Ξ'+last_sale_final+'</b>';
+            } else {
+              document.getElementById('traits_'+token_id).innerHTML = '<strong>'+name+'</strong>';
+            }
+            
 
             let break_b = document.createElement('hr');
             document.getElementById('pre').appendChild(break_b);
