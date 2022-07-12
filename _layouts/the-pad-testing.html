@@ -1034,18 +1034,21 @@
           assets.forEach((frog) => { // console.log(frog)
 
             try {
+
+              var sale_price = false;
+
               var { name, token_metadata, permalink, traits, external_link, token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
-            } catch (e) {}
+
+            } catch (e) { console.log(e.message); }
 
             // sale price / listing price <- total_price
             try {
               
               if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
-                let sale_price = total_price / Math.pow(10, decimals);
-                console.log('sale: ' + sale_price);
+                sale_price = total_price / Math.pow(10, decimals);
               }
 
-            } catch (e) {}
+            } catch (e) { console.log(e.message); }
             
             let openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
             let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
@@ -1059,7 +1062,7 @@
             frog_token.innerHTML = '<img src="'+external_link+'" class="recentMint"/><div id="traits_'+token_id+'" class="trait_list"></div>';
             document.getElementById('pre').appendChild(frog_token);
 
-            if (typeof sale_price !== 'undefined') {
+            if (!sale_price) {
               console.log(name+' (Ξ'+sale_price+')');
               document.getElementById('traits_'+token_id).innerHTML = '<strong>'+name+'</strong> <b>Ξ'+sale_price+'</b>';
             } else {
