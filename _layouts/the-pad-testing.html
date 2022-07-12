@@ -1035,8 +1035,9 @@
 
             var { name, token_metadata, permalink, traits, external_link, token_id } = frog
 
-            openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id
-            etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id
+            let openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
+            let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
+            let gemxyzLink = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
 
             let frog_token = document.createElement('div');
             frog_token.onclick = function() { 
@@ -1064,7 +1065,7 @@
               }
 
               let button_b = document.createElement('div');
-              button_b.innerHTML = '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+etherscanLink+'" target="_blank"><button class="frog_button">EtherScan 🡥</button></a>'
+              button_b.innerHTML = '<br><a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
               document.getElementById('traits_'+token_id).appendChild(button_b);
               
             });
