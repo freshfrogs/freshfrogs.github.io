@@ -1036,7 +1036,7 @@
             try { var { name, token_metadata, permalink, traits, external_link, token_id, last_sale: { payment_token: { decimals }, total_price } } = frog } catch (e) {}
 
             // sale price / listing price <- total_price
-            try {} catch (e) { var sale_price = total_price / Math.pow(10, decimals); console.log('sale: '+sale_price); }
+            try { var sale_price = total_price / Math.pow(10, decimals); console.log('sale: '+sale_price); } catch (e) { }
             
             let openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
             let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
