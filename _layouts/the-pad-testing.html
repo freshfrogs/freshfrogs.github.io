@@ -1109,7 +1109,7 @@
                 if (trait_rarity == 'NaN' || trait_rarity < 1) { trait_rarity = '<1' }
 
                 let trait_text = document.createElement('i')
-                trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value+' '+trait_rarity+'%'
+                trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value+' <rarity style="text-size: small;">'+trait_rarity+'%</rarity>'
                 document.getElementById('traits_'+token_id).appendChild(trait_text)
 
               }
