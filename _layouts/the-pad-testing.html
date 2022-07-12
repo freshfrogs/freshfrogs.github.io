@@ -1063,10 +1063,14 @@
             document.getElementById('pre').appendChild(frog_token);
 
             if (!sale_price) {
+
+              document.getElementById('traits_'+token_id).innerHTML = '<strong>'+name+'</strong>';
+
+            } else {
+
               console.log(name+' (Ξ'+sale_price+')');
               document.getElementById('traits_'+token_id).innerHTML = '<strong>'+name+'</strong> <b>Ξ'+sale_price+'</b>';
-            } else {
-              document.getElementById('traits_'+token_id).innerHTML = '<strong>'+name+'</strong>';
+              
             }
             
 
