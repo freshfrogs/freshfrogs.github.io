@@ -1113,12 +1113,12 @@
 
                 var data = metadata.attributes[i]
 
-                //try { var trait_rarity = ((traits_list[data.trait_type][data.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'e'; console.log(e); }
+                try { var trait_rarity = ((traits_list[data.trait_type][data.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'e'; console.log(e); }
                   
-                //if (trait_rarity == 'NaN' || trait_rarity < 1) { trait_rarity = '<1' }
+                if (trait_rarity == 'NaN' || trait_rarity < 1) { trait_rarity = '<1' }
 
                 let trait_text = document.createElement('i')
-                trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value//+' <rarity style="font-size: small;">'+trait_rarity+'%</rarity>'
+                trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value+' (<rarity style="font-size: small;">'+trait_rarity+'%</rarity>)'
                 document.getElementById('traits_'+token_id).appendChild(trait_text)
 
               }
