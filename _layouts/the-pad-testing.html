@@ -716,16 +716,16 @@
         
         newAttribute.style.cursor = "pointer"
         if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
-          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+"2.gif"
+          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"2.gif"
         } else if (attribute === "morphAnimation") {
-          newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
+          newAttribute.src = "https://freshfrogs.io/the-pond/Frog/loadMorph.gif"
         } else if (attribute === "shadesAnimation") {
-          newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
+          newAttribute.src = "https://freshfrogs.io/the-pond/Eyes/shadesAnimation.gif"
         } else if (attribute.includes("croaking2")) {
           console.log('! '+trait+' / '+attribute)
-          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
+          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
         } else {
-          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
+          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png"
         }
         newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
