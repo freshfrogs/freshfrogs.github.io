@@ -717,6 +717,10 @@
         newAttribute.style.cursor = "pointer"
         if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
           newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"2.gif"
+        } else if (attribute === "tongueFly") { 
+          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
+        } else if (attribute === "cyan_tongueFly") { 
+          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
         } else if (attribute === "morphAnimation") {
           newAttribute.src = "https://freshfrogs.io/the-pond/Frog/loadMorph.gif"
         } else if (attribute === "shadesAnimation") {
@@ -748,6 +752,7 @@
         etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
 
         document.getElementById('selectSub').setAttribute('href', openSeaLink)
+        document.getElementById('selectBase').removeAttribute('href');
         document.getElementById('selectBase').innerHTML = '<strong>Morph</strong><frog id="baseText">combinations</frog>'
         document.getElementById('selectBase').onclick = function() {
           if (!morph) {
@@ -879,7 +884,7 @@
             var other_Trait = alpha_Trait = base_Trait = false
           }
 
-          if ((base_SpecialFrog == 'thirdEye' || base_SpecialFrog == 'inversedEyes' || base_SpecialFrog == 'peace') && other_Frog != false) {
+          if ((base_SpecialFrog == 'thirdEye' || base_SpecialFrog == 'inversedEyes' || base_SpecialFrog == 'peace'  || base_SpecialFrog == 'closedEyes') && other_Frog != false) {
 
             if (base_SpecialFrog == 'inversedEyes') {
 
@@ -890,6 +895,10 @@
               var alpha_SpecialFrog = base_SpecialFrog+'/'+other_Frog;
 
             } else if (base_SpecialFrog == 'peace' && other_Frog !== false) {
+
+              var alpha_SpecialFrog = base_SpecialFrog+'/'+other_Frog;
+
+            } else if (base_SpecialFrog == 'closedEyes') {
 
               var alpha_SpecialFrog = base_SpecialFrog+'/'+other_Frog;
 
@@ -986,9 +995,16 @@
         console.log('--- Final Frog Metadata ---')
         if (alpha_Frog != false) { load_trait("Frog", alpha_Frog, thisPlace); console.log('Frog: '+alpha_Frog);} else if (alpha_SpecialFrog != false) { load_trait("SpecialFrog", alpha_SpecialFrog, thisPlace); console.log('SpecialFrog: '+alpha_SpecialFrog);}
         
-        if (other_Frog == 'blueDartFrog') { load_trait("Trait/natural/blueDartFrog", base_Frog, thisPlace); } // Custom for blueDartFrogs
-        
         if (alpha_Trait != false) { load_trait("Trait", alpha_Trait, thisPlace); console.log('Trait: '+alpha_Trait);}
+        if (base_Frog == 'splendidLeafFrog') {
+
+          //load_trait("Frog", other_Frog, thisPlace);
+          load_trait("Trait/splendidLeafFrog", base_Trait, thisPlace);
+
+        } // Custom for traits (overlay)
+        if (alpha_Mouth == "tongueFly" && alpha_Trait == "Cyan") {
+          load_trait("Trait", "cyan_tongueFly", thisPlace)
+        }
         if (alpha_Accessory != false) { load_trait("Accessory", alpha_Accessory, thisPlace); console.log('Accessory: '+alpha_Accessory);}
         if (alpha_Eyes != false) { load_trait("Eyes", alpha_Eyes, thisPlace); console.log('Eyes: '+alpha_Eyes);}
         if (alpha_Hat != false) { load_trait("Hat", alpha_Hat, thisPlace); console.log('Hat: '+alpha_Hat);}
@@ -1037,7 +1053,7 @@
       
         }); // End data pull / first paid Frog 3,236
 
-        fetch('https://api.opensea.io/api/v1/assets?owner='+'0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38'+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+        fetch('https://api.opensea.io/api/v1/assets?owner='+user_address+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
         .then((tokens) => tokens.json())
         .then((tokens) => {
 
@@ -1083,7 +1099,7 @@
 
             if (!sale_price) {
 
-              document.getElementById('traits_'+token_id).innerHTML = '<strong>'+name+'</strong>';
+              document.getElementById('traits_'+token_id).innerHTML = '<strong><u>'+name+'</u></strong>';
 
             } else {
 
@@ -1104,12 +1120,12 @@
 
                 var data = metadata.attributes[i]
 
-                try { var trait_rarity = ((traits_list[data.trait_type][data.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'e'; console.log(e); }
+                //try { var trait_rarity = ((traits_list[data.trait_type][data.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'e'; console.log(e); }
                   
-                if (trait_rarity == 'NaN' || trait_rarity < 1) { trait_rarity = '<1' }
+                //if (trait_rarity == 'NaN' || trait_rarity < 1) { trait_rarity = '<1' }
 
                 let trait_text = document.createElement('i')
-                trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value+' <rarity style="font-size: small;">'+trait_rarity+'%</rarity>'
+                trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value//+' (<rarity style="font-size: small;">'+trait_rarity+'%</rarity>)'
                 document.getElementById('traits_'+token_id).appendChild(trait_text)
 
               }
@@ -1392,8 +1408,8 @@
         <div class="downloads pre">
           <ul class="downloads2">
             <li><a id="morphFrogs" class="pointer"><strong id="display_name">Fresh Frogs</strong><div id="display_type">ΞEthereum</div></a></li>
-            <li><a id="selectBase" class="pointer"><strong>Etherscan</strong><frog id="baseText">contract</frog></a></li>
-            <li><a id="selectSub" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>OpenSea</strong><frog id="subText">view on</frog></a></li>
+            <li><a id="selectBase" class="pointer" href="http://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong><frog id="baseText">support</frog></a></li>
+            <li><a id="selectSub" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>OpenSea</strong><frog id="subText">marketplace</frog></a></li>
           </ul>
           <br>
           <div id="mintingTray" class="mintingTray">
@@ -1413,8 +1429,8 @@
           <div id="netStatus" class="netStatus">
             <img src="../assets/frogs/websiteBannerFinal_2.png" style="border-radius: 5px; height: auto !important; width: 100% !important; margin-bottom: 14px; transform: scale(1.01);">
             <br>
-            <h2 style="color: white !important;"><b>freshfrogs.io/the-pad🍀</b></h2>
-            <br>Connect to view Frog tokens...<a class="pointer" href="https://freshfrogs.io/the-pad"><b id="connected">🔌 Connect Wallet</b> ↗️</a>
+            <h2 style="color: white !important;"><b>freshfrogs.io/the-pond🍀</b></h2>
+            <br>Connect to view Frog tokens...<a class="pointer" href="https://freshfrogs.io/the-pond"><b id="connected">🔌 Connect Wallet</b> ↗️</a>
             <hr class="hr2">Mint from the collection...<a class="pointer" href="https://freshfrogs.io/"><b>🐸 Minting Terminal</b> ↗️</a>
             <br>
             <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a></div>
