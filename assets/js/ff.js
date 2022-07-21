@@ -1,5 +1,5 @@
 
-      function consoleOutput(output) {
+      export function consoleOutput(output) {
         document.getElementById("pre").innerHTML = output
       }
 
@@ -17,7 +17,7 @@
         Fetch OpenSea collection data
       */
 
-      function fetch_opensea_data() {
+      export function fetch_opensea_data() {
 
         const options = {
           method: 'GET',
@@ -131,7 +131,7 @@
       }
 
       // Display Frog
-      async function display_token(token){
+      export async function display_token(token){
 
           token_img = 'https://freshfrogs.io/frog/'+token+'.png'
           token_name = 'Frog #'+token
