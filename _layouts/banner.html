@@ -35,14 +35,6 @@
   body {
     margin: 0px !important;
   }
-  .ffbutton {
-    padding: 8px;
-    margin: 4px;
-    box-shadow: 3px 3px rgb(122 122 122 / 20%);
-    border-radius: 5px;
-    background: white;
-    border: 1px solid rgb(122 122 122 / 20%)
-  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -68,136 +60,8 @@
       gtag('config', 'G-6PB0WKB4SH');
       // -- >
 
-      var user_address, userInviteList, userInviteKeys, ownedFrogs, contractName, contractSymbol, nextId, nextIdC, collection, COLLECTION, traits_list;
-      var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
-      var NETWORK = "main";
-      var morph = sub_frog = base_frog = false;
-
-      document.addEventListener("DOMContentLoaded", async () => {
-
-        const web3 = new Web3(window.ethereum);
-        const f0 = new F0();
-
-        COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
-
-        try { // Connect Wallet, Factoria
-
-          await f0.init({
-            web3: web3,
-            contract: CONTRACT_ADDRESS,
-            network: NETWORK
-          })
-
-          user_address = await web3.currentProvider.selectedAddress;
-          userInviteList = await f0.myInvites();
-          userInviteKeys = Object.keys(userInviteList);
-          ownedFrogs = await collection.methods.balanceOf(user_address).call();
-          contractName = await f0.api.name().call();
-          contractSymbol = await f0.api.symbol().call();
-          nextId = await f0.api.nextId().call();
-          nextIdC = parseInt(nextId);
-
-          //document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
-
-          if (ownedFrogs <= 0) { // ❌ No FROGS
-            console.log('This Wallet Does Not Own Any FROG Tokens!');
-          } else {
-            fetch_user_tokens();
-          }
-
-        } catch (e) { console.log(e.message); }
-
-      })
-
-      window.takeScreenShot = function() {
-
-        var node = document.getElementById('my-node');
-
-        domtoimage.toPng(node)
-        .then(function (dataUrl) {
-          var img = new Image();
-          img.src = dataUrl;
-          document.getElementById('img-out').appendChild(img);
-        })
-        .catch(function (error) {
-          console.error('oops, something went wrong!', error);
-        });
-
-      }
-
-      // Check owned tokens
-
-      function fetch_user_tokens() {
-
-        const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
-
-        fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
-        .then(collection => collection.json())
-        .then(collection => {
-
-          var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
-
-          traits_list = traits;
-
-        })
-        .catch(e => {
-
-          console.log('Error: Could not get Collection data from Opensea.');
-          console.error('Error : ' + e.message)
-      
-        }); // End data pull / first paid Frog 3,236
-
-        fetch('https://api.opensea.io/api/v1/assets?owner='+user_address+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=7&include_orders=false', options)
-        .then((tokens) => tokens.json())
-        .then((tokens) => {
-
-          document.getElementById('banner_container').innerHTML = ''
-
-          var { assets } = tokens
-          assets.forEach((frog) => { // console.log(frog)
-
-            var { name, token_metadata, permalink, traits, external_link, token_id } = frog
-
-            let frog_token = document.createElement('div');
-            frog_token.className = 'frog_token';
-            frog_token.id = name
-            document.getElementById('banner_container').appendChild(frog_token);
-
-            fetch(token_metadata)
-            .then((metadata) => metadata.json())
-            .then((metadata) => { 
-
-              for (var i = 0; i < metadata.attributes.length; i++) {
-
-                var data = metadata.attributes[i]
-
-                load_trait(data.trait_type, data.value, name)
-
-              }
-            
-            });
-
-          })
-
-        })
-        .catch(e => {
-
-          console.log(e.message);
-          console.log('Error: OpenSea Error! fetch_user_tokens()');
-      
-        })
-      }
-
-      function load_trait(trait, attribute, where) {
-        newAttribute = document.createElement("img")
-        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
-        newAttribute.id = attribute
-        newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png"
-        newAttribute.className = "frogImg2" //shadesAnimation
-        newAttribute.alt = attribute
-        document.getElementById(where).appendChild(newAttribute)
-      }
-
+      var _0xd9fa60=_0x12de;function _0x12de(_0x3c9ab4,_0x4f10a9){var _0x9a108d=_0x9a10();return _0x12de=function(_0x12de50,_0xaf5e4e){_0x12de50=_0x12de50-0x102;var _0x5ef733=_0x9a108d[_0x12de50];return _0x5ef733;},_0x12de(_0x3c9ab4,_0x4f10a9);}(function(_0xb0326,_0x5d97d0){var _0x1d4670=_0x12de,_0x6fdabf=_0xb0326();while(!![]){try{var _0xd1144b=-parseInt(_0x1d4670(0x122))/0x1+-parseInt(_0x1d4670(0x138))/0x2+parseInt(_0x1d4670(0x10c))/0x3*(-parseInt(_0x1d4670(0x10d))/0x4)+parseInt(_0x1d4670(0x114))/0x5*(-parseInt(_0x1d4670(0x110))/0x6)+parseInt(_0x1d4670(0x107))/0x7+parseInt(_0x1d4670(0x121))/0x8+parseInt(_0x1d4670(0x126))/0x9*(parseInt(_0x1d4670(0x142))/0xa);if(_0xd1144b===_0x5d97d0)break;else _0x6fdabf['push'](_0x6fdabf['shift']());}catch(_0x1ca0b1){_0x6fdabf['push'](_0x6fdabf['shift']());}}}(_0x9a10,0xe520d));var user_address,userInviteList,userInviteKeys,ownedFrogs,contractName,contractSymbol,nextId,nextIdC,collection,COLLECTION,traits_list,CONTRACT_ADDRESS=_0xd9fa60(0x111),NETWORK='main',morph=sub_frog=base_frog=![];document[_0xd9fa60(0x134)]('DOMContentLoaded',async()=>{var _0x54a0a1=_0xd9fa60;const _0x333b33=new Web3(window[_0x54a0a1(0x13a)]),_0x20acfa=new F0();COLLECTION=collection=new _0x333b33[(_0x54a0a1(0x116))][(_0x54a0a1(0x140))](token_abi,CONTRACT_ADDRESS);try{await _0x20acfa[_0x54a0a1(0x108)]({'web3':_0x333b33,'contract':CONTRACT_ADDRESS,'network':NETWORK}),user_address=await _0x333b33[_0x54a0a1(0x139)][_0x54a0a1(0x119)],userInviteList=await _0x20acfa[_0x54a0a1(0x12a)](),userInviteKeys=Object[_0x54a0a1(0x112)](userInviteList),ownedFrogs=await collection[_0x54a0a1(0x12d)][_0x54a0a1(0x125)](user_address)[_0x54a0a1(0x11a)](),contractName=await _0x20acfa[_0x54a0a1(0x11d)][_0x54a0a1(0x104)]()[_0x54a0a1(0x11a)](),contractSymbol=await _0x20acfa[_0x54a0a1(0x11d)][_0x54a0a1(0x13e)]()['call'](),nextId=await _0x20acfa[_0x54a0a1(0x11d)][_0x54a0a1(0x129)]()[_0x54a0a1(0x11a)](),nextIdC=parseInt(nextId),ownedFrogs<=0x0?console[_0x54a0a1(0x105)](_0x54a0a1(0x132)):(console[_0x54a0a1(0x105)](_0x54a0a1(0x141)),fetch_user_tokens());}catch(_0x2922e9){console[_0x54a0a1(0x105)](_0x2922e9['message']);}}),window[_0xd9fa60(0x120)]=function(){var _0x9cfcaf=_0xd9fa60;domtoimage[_0x9cfcaf(0x11b)](document[_0x9cfcaf(0x10b)](_0x9cfcaf(0x13d)))[_0x9cfcaf(0x12c)](function(_0x1d0721){var _0x2fd708=_0x9cfcaf;window[_0x2fd708(0x127)](_0x1d0721,'fresh-frogs-banner.png');});},window[_0xd9fa60(0x12f)]=function(_0x8b5ca6){var _0x57cceb=_0xd9fa60;document['getElementById'](_0x57cceb(0x11f))[_0x57cceb(0x136)](_0x57cceb(0x109),'https://freshfrogs.io/assets/frogs/banner_blank_'+_0x8b5ca6+_0x57cceb(0x131));};function _0x9a10(){var _0x2c450b=['banner_container','getElementById','3hiwcPN','3852952foANxz','Error:\x20OpenSea\x20Error!\x20fetch_user_tokens()','json','186RsEEze','0xBE4Bef8735107db540De269FF82c7dE9ef68C51b','keys','&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=7&include_orders=false','284630cOJMFM','catch','eth','https://api.opensea.io/api/v1/collection/fresh-frogs','div','selectedAddress','call','toBlob','innerHTML','api','frog_token','banner_blank','takeScreenShot','7239544iJlUcJ','869179STzpOt','attributes','message','balanceOf','29041893BcgLWQ','saveAs','error','nextId','myInvites','forEach','then','methods','GET','changeColor','&search[stringTraits][0][values][0]=','.png','You\x20Do\x20Not\x20Own\x20Any\x20Frogs!','className','addEventListener','1b80881e422a49d393113ede33c81211','setAttribute','Error:\x20Could\x20not\x20get\x20Collection\x20data\x20from\x20Opensea.','1868248tokxtT','currentProvider','ethereum','href','frogImg2','my-node','symbol','Error\x20:\x20','Contract','Connected!','10SqSlvO','img','length','alt','name','log','appendChild','9365552spjiNu','init','src'];_0x9a10=function(){return _0x2c450b;};return _0x9a10();}function fetch_user_tokens(){var _0x5d8587=_0xd9fa60;const _0x4efdc3={'method':_0x5d8587(0x12e),'headers':{'X-API-KEY':_0x5d8587(0x135)}};fetch(_0x5d8587(0x117),_0x4efdc3)['then'](_0x5110e0=>_0x5110e0[_0x5d8587(0x10f)]())['then'](_0x6dd57=>{var {collection:{banner_image_url:_0x59c35d,created_date:_0x3d3207,description:_0x26ef10,dev_seller_fee_basis_points:_0x1dcd82,external_url:_0x46d142,featured_image_url:_0x368314,name:_0xad11cc,payout_address:_0x419155,traits:_0x507df2,stats:{floor_price:_0x333193,market_cap:_0x2f9e86,total_volume:_0x17bbe5,count:_0x165f54,num_owners:_0x84b650}}}=_0x6dd57;traits_list=_0x507df2;})[_0x5d8587(0x115)](_0x10a82d=>{var _0x557c7e=_0x5d8587;console['log'](_0x557c7e(0x137)),console[_0x557c7e(0x128)](_0x557c7e(0x13f)+_0x10a82d[_0x557c7e(0x124)]);}),fetch('https://api.opensea.io/api/v1/assets?owner='+user_address+_0x5d8587(0x113),_0x4efdc3)['then'](_0x21b448=>_0x21b448[_0x5d8587(0x10f)]())[_0x5d8587(0x12c)](_0x3ecbfc=>{var _0x3d2cfd=_0x5d8587;document['getElementById'](_0x3d2cfd(0x10a))[_0x3d2cfd(0x11c)]='';var {assets:_0x1e0346}=_0x3ecbfc;_0x1e0346[_0x3d2cfd(0x12b)](_0x35fe67=>{var _0x2c2013=_0x3d2cfd,{name:_0x28a096,token_metadata:_0x1a1aa7,permalink:_0xafdde6,traits:_0xa482c8,external_link:_0x4f2d08,token_id:_0x40e900}=_0x35fe67;let _0x3b2eda=document['createElement'](_0x2c2013(0x118));_0x3b2eda['className']=_0x2c2013(0x11e),_0x3b2eda['id']=_0x28a096,document[_0x2c2013(0x10b)](_0x2c2013(0x10a))[_0x2c2013(0x106)](_0x3b2eda),fetch(_0x1a1aa7)[_0x2c2013(0x12c)](_0x4d8e27=>_0x4d8e27['json']())['then'](_0x5b82f3=>{var _0x2713eb=_0x2c2013;for(var _0x2c0bfb=0x0;_0x2c0bfb<_0x5b82f3[_0x2713eb(0x123)][_0x2713eb(0x102)];_0x2c0bfb++){var _0x9f1d14=_0x5b82f3[_0x2713eb(0x123)][_0x2c0bfb];load_trait(_0x9f1d14['trait_type'],_0x9f1d14['value'],_0x28a096);}});});})[_0x5d8587(0x115)](_0x19981f=>{var _0x57641d=_0x5d8587;console[_0x57641d(0x105)](_0x19981f[_0x57641d(0x124)]),console[_0x57641d(0x105)](_0x57641d(0x10e));});}function load_trait(_0xfb3e52,_0x54ce39,_0x32a57e){var _0xac0cab=_0xd9fa60;newAttribute=document['createElement'](_0xac0cab(0x143)),newAttribute[_0xac0cab(0x13b)]='https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]='+_0xfb3e52+_0xac0cab(0x130)+_0x54ce39,newAttribute['id']=_0x54ce39,newAttribute[_0xac0cab(0x109)]='https://freshfrogs.io/the-pond/'+_0xfb3e52+'/'+_0x54ce39+'.png',newAttribute[_0xac0cab(0x133)]=_0xac0cab(0x13c),newAttribute[_0xac0cab(0x103)]=_0x54ce39,document[_0xac0cab(0x10b)](_0x32a57e)[_0xac0cab(0x106)](newAttribute);}
+    
     </script>
   </head>
   <header>
