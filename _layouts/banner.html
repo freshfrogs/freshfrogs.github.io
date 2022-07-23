@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<style>
+  .frog_token {
+    width: 64px;
+    height: 64px;
+    border: 1px solid transparent;
+    display: inline-block;
+    position: relative;
+    margin: 16px;
+    margin-top: 64px;
+    margin-bottom: auto;
+  }
+  .banner_container{
+    text-align: center;
+    width: 750px;
+    height: 250px;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+  .frogImg2 {
+    transition: transform .2s;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    width: 128px;
+    height: 128px;
+    border-radius: 5px;
+    top: -32px;
+    right: -32px;
+  }
+  html {
+    image-rendering: pixelated;
+  }
+</style>
+<html lang="{{ site.lang | default: "en-US" }}">
+  <link rel="icon" href="../assets/logo.png">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ "../assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+    <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
+    <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
+    <script>
+      // <-- [Google Analytics]
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-6PB0WKB4SH');
+      // -- >
+
+      var user_address, userInviteList, userInviteKeys, ownedFrogs, contractName, contractSymbol, nextId, nextIdC, collection, COLLECTION, traits_list;
+      var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
+      var NETWORK = "main";
+      var morph = sub_frog = base_frog = false;
+
+      document.addEventListener("DOMContentLoaded", async () => {
+
+        const web3 = new Web3(window.ethereum);
+        const f0 = new F0();
+
+        COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
+
+        try { // Connect Wallet, Factoria
+
+          await f0.init({
+            web3: web3,
+            contract: CONTRACT_ADDRESS,
+            network: NETWORK
+          })
+
+          user_address = await web3.currentProvider.selectedAddress;
+          userInviteList = await f0.myInvites();
+          userInviteKeys = Object.keys(userInviteList);
+          ownedFrogs = await collection.methods.balanceOf(user_address).call();
+          contractName = await f0.api.name().call();
+          contractSymbol = await f0.api.symbol().call();
+          nextId = await f0.api.nextId().call();
+          nextIdC = parseInt(nextId);
+
+          //document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
+
+          if (ownedFrogs <= 0) { // ❌ No FROGS
+            consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS!<br>'+'<p></p>')
+          } else {
+            consoleOutput('<br>'+'<strong>Connected!</strong> Loading Frogs from OpenSea... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
+            fetch_user_tokens();
+          }
+
+        } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
+
+      })
+
+      window.takeScreenShot = function() {
+
+        var node = document.getElementById('my-node');
+
+        domtoimage.toPng(node)
+        .then(function (dataUrl) {
+          var img = new Image();
+          img.src = dataUrl;
+          document.getElementById('img-out').appendChild(img);
+        })
+        .catch(function (error) {
+          console.error('oops, something went wrong!', error);
+        });
+
+      }
+
+      /*
+      window.takeScreenShot = function() {
+          html2canvas(document.body, {
+              useCORS: false,
+              onrendered: function (canvas) {
+              Canvas2Image.saveAsPNG(canvas);
+              }
+          });
+      } */
+
+      // Check owned tokens
+
+      function fetch_user_tokens() {
+
+        const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
+
+        fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
+        .then(collection => collection.json())
+        .then(collection => {
+
+          var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
+
+          traits_list = traits;
+
+        })
+        .catch(e => {
+
+          console.log('Error: Could not get Collection data from Opensea.');
+          console.error('Error : ' + e.message)
+      
+        }); // End data pull / first paid Frog 3,236
+
+        fetch('https://api.opensea.io/api/v1/assets?owner='+user_address+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=7&include_orders=false', options)
+        .then((tokens) => tokens.json())
+        .then((tokens) => {
+
+          document.getElementById('banner_container').innerHTML = ''
+
+          var { assets } = tokens
+          assets.forEach((frog) => { // console.log(frog)
+
+            var { name, token_metadata, permalink, traits, external_link, token_id } = frog
+
+            let frog_token = document.createElement('div');
+            frog_token.className = 'frog_token';
+            frog_token.id = name
+            document.getElementById('banner_container').appendChild(frog_token);
+
+            fetch(token_metadata)
+            .then((metadata) => metadata.json())
+            .then((metadata) => { 
+
+              for (var i = 0; i < metadata.attributes.length; i++) {
+
+                var data = metadata.attributes[i]
+
+                load_trait(data.trait_type, data.value, name)
+
+              }
+            
+            });
+
+          })
+
+        })
+        .catch(e => {
+
+          console.log(e.message);
+          console.log('Error: OpenSea Error! fetch_user_tokens()');
+      
+        })
+      }
+
+      function load_trait(trait, attribute, where) {
+        newAttribute = document.createElement("img")
+        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
+        newAttribute.id = attribute
+        newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png"
+        newAttribute.className = "frogImg2" //shadesAnimation
+        newAttribute.alt = attribute
+        document.getElementById(where).appendChild(newAttribute)
+      }
+
+    </script>
+  </head>
+  <header>
+  </header>
+  <body>
+    <section>
+      <div style="width: 750px; height: 250px;" id="my-node">
+        <img style="position: absolute;" src="https://freshfrogs.io/assets/frogs/banner_blank.png"/>
+        <div class="banner_container" id="banner_container"></div>
+      </div>
+      <button onclick="takeScreenShot()">to image</button>
+      <br/>
+      <div style="width: 750px; height: 250px;" id="img-out"></div>
+    </section>
+  </body>
+  <footer>
+  </footer>
+</html>
