@@ -29,9 +29,6 @@
     top: -32px;
     right: -32px;
   }
-  .banner {
-
-  }
   html {
     image-rendering: pixelated;
   }
@@ -104,18 +101,11 @@
 
       window.takeScreenShot = function() {
 
-        var node = document.getElementById('my-node');
+        //var node = document.getElementById('my-node');
 
-        node.style.backgroundImage="url(https://freshfrogs.io/assets/frogs/banner_blank.png)";
-
-        domtoimage.toPng(node)
-        .then(function (dataUrl) {
-          var img = new Image();
-          img.src = dataUrl;
-          document.getElementById('img-out').appendChild(img);
-        })
-        .catch(function (error) {
-          console.error('oops, something went wrong!', error);
+        domtoimage.toBlob(document.getElementById('my-node'))
+        .then(function (blob) {
+            window.saveAs(blob, 'my-banner.png');
         });
 
       }
@@ -210,6 +200,7 @@
   <body>
     <section>
       <div style="width: 750px; height: 250px;" id="my-node">
+        <img style="position: absolute;" src="https://freshfrogs.io/assets/frogs/banner_blank.png"/>
         <div class="banner_container" id="banner_container"></div>
       </div>
       <button onclick="takeScreenShot()">to image</button>
