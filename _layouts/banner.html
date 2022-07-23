@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <style>
   .frog_token {
-    width: 64px;
-    height: 64px;
+    width: 128px;
+    height: 128px;
     border: 1px solid transparent;
     display: inline-block;
     position: relative;
@@ -12,8 +12,8 @@
   }
   .banner_container{
     text-align: center;
-    width: 750px;
-    height: 250px;
+    width: 1500px;
+    height: 500px;
     margin-top: auto;
     margin-bottom: auto;
   }
@@ -23,11 +23,11 @@
     image-rendering: pixelated;
     overflow: hidden;
     position: absolute;
-    width: 128px;
-    height: 128px;
+    width: 256px;
+    height: 256px;
     border-radius: 5px;
-    top: -32px;
-    right: -32px;
+    top: -64px;
+    right: -64px;
   }
   html {
     image-rendering: pixelated;
@@ -202,13 +202,13 @@
   </header>
   <body>
     <section>
-      <div style="width: 750px; height: 250px;" id="my-node">
+      <div style="width: 1500px; height: 500px;" id="my-node">
         <img style="position: absolute;" src="https://freshfrogs.io/assets/frogs/banner_blank.png"/>
         <div class="banner_container" id="banner_container"></div>
       </div>
       <button onclick="takeScreenShot()">to image</button>
       <br/>
-      <div style="width: 750px; height: 250px;" id="img-out"></div>
+      <div style="width: 1500px; height: 500px;" id="img-out"></div>
     </section>
   </body>
   <footer>
