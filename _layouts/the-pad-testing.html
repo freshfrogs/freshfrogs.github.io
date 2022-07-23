@@ -625,19 +625,6 @@
   }
   .frog_button {
     border: none;
-    border-radius: 5px;
-    border: 1px solid white;
-    padding: 1px;
-    background-color: transparent;
-  }
-  .frog_button2 {
-    border: none;
-    border-radius: 5px;
-    border: 1px solid white;
-    padding: 4px;
-    background-color: transparent;
-    font-weight: bold;
-    color: white;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -1108,7 +1095,7 @@
             }
             frog_token.className = 'frog_token';
             frog_token.innerHTML = '<img src="'+external_link+'" class="recentMint"/><div id="traits_'+token_id+'" class="trait_list"></div>';
-            document.getElementById('thePad').appendChild(frog_token);
+            document.getElementById('pre').appendChild(frog_token);
 
             if (!sale_price) {
 
@@ -1120,6 +1107,10 @@
               document.getElementById('traits_'+token_id).innerHTML = '<strong>'+name+'</strong> Ξ'+sale_price+'';
 
             }
+            
+
+            let break_b = document.createElement('hr');
+            document.getElementById('pre').appendChild(break_b);
 
             fetch(token_metadata)
             .then((metadata) => metadata.json())
