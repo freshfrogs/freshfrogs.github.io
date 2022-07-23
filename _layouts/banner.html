@@ -113,6 +113,14 @@
 
       }
 
+      window.changeColor = function(color) {
+
+        //var node = document.getElementById('my-node');
+
+        document.getElementById('banner_blank').setAttribute('src', 'https://freshfrogs.io/assets/frogs/banner_blank_'+color+'.png')
+
+      }
+
       /*
       window.takeScreenShot = function() {
           html2canvas(document.body, {
@@ -203,10 +211,10 @@
   <body>
     <section>
       <div style="width: 1500px; height: 500px;" id="my-node">
-        <img style="position: absolute; width: 1500px; height: 500px;" src="https://freshfrogs.io/assets/frogs/banner_blank.png"/>
+        <img id="banner_blank" style="position: absolute; width: 1500px; height: 500px;" src="https://freshfrogs.io/assets/frogs/banner_blank.png"/>
         <div class="banner_container" id="banner_container"></div>
       </div>
-      <button onclick="takeScreenShot()">download fresh-frogs-banner.png</button>
+      <button class="ffbutton" onclick="takeScreenShot()">download fresh-frogs-banner.png</button><button class="ffbutton" onclick="changeColor('cyan')">cyan</button><button class="ffbutton" onclick="changeColor('green')">green</button><button class="ffbutton" onclick="changeColor('yellow')">yellow</button><button class="ffbutton" onclick="changeColor('blue')">blue</button><button class="ffbutton" onclick="changeColor('pink')">pink</button>
       <br/>
       <div style="width: 1500px; height: 500px;" id="img-out"></div>
     </section>
