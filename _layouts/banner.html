@@ -104,6 +104,7 @@
             console.log('You Do Not Own Any Frogs!');
           } else {
             console.log('Connected!')
+            document.getElementById('img-out').innerHTML = '<p>Connected : '+user_address+'</p>'
             fetch_user_tokens();
           }
 
@@ -225,7 +226,7 @@
       </div>
       <button class="ffbutton" onclick="takeScreenShot()">download fresh-frogs-banner.png</button><button class="ffbutton" onclick="changeColor('red')">red</button><button class="ffbutton" onclick="changeColor('cyan')">cyan</button><button class="ffbutton" onclick="changeColor('green')">green</button><button class="ffbutton" onclick="changeColor('yellow')">yellow</button><button class="ffbutton" onclick="changeColor('blue')">blue</button><button class="ffbutton" onclick="changeColor('pink')">pink</button>
       <br/>
-      <div style="width: 1500px; height: 500px;" id="img-out"></div>
+      <div class="ffbutton" style="width: 1500px; height: 500px;" id="img-out"></div>
     </section>
   </body>
   <footer>
