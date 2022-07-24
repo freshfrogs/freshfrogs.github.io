@@ -6,7 +6,7 @@ import "https://freshfrogs.io/assets/fresh-frogs/FreshFrogsFLYZ.sol";
 import "https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/master/contracts/token/ERC721/IERC721Upgradeable.sol";
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/IERC721Receiver.sol";
 
-contract NFTStaking is Ownable, IERC721Receiver {
+contract FreshFrogsController is Ownable, IERC721Receiver {
 
   uint256 public totalStaked;
   
@@ -121,7 +121,7 @@ contract NFTStaking is Ownable, IERC721Receiver {
   // should never be used inside of transaction because of gas fee
   function balanceOf(address account) public view returns (uint256) {
     uint256 balance = 0;
-    uint256 supply = nft.totalSupply();
+    uint256 supply = 4040;
     for(uint i = 1; i <= supply; i++) {
       if (vault[i].owner == account) {
         balance += 1;
@@ -133,7 +133,7 @@ contract NFTStaking is Ownable, IERC721Receiver {
   // should never be used inside of transaction because of gas fee
   function tokensOfOwner(address account) public view returns (uint256[] memory ownerTokens) {
 
-    uint256 supply = nft.totalSupply();
+    uint256 supply = 4040;
     uint256[] memory tmp = new uint256[](supply);
 
     uint256 index = 0;
