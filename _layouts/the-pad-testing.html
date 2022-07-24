@@ -1416,12 +1416,12 @@
 
       async function fetch_stake_info(target, token) {
 
-          let stake_data = await controller.methods.vault(token_id).call();
+          let stake_data = await controller.methods.vault(token).call();
           let owner = stake_data.owner;
 
-          if (user_address === owner.toLowerCase()) {
+          if (target === owner.toLowerCase()) {
 
-            console.log('Staked by USER! : Frog #'+token_id);
+            console.log('Staked by USER! : Frog #'+token);
             return true;
 
           }
