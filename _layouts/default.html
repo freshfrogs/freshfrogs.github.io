@@ -1241,8 +1241,14 @@
       }
 
       async function FETCH_FROG_STAKE_INFO(TOKEN_ID) {
-        var nft_data = await controller.methods.vault(token_id).call();
-        console.log(nft_data)
+        
+        try {
+
+          var nft_data = await controller.methods.vault(token_id).call();
+          console.log(nft_data)
+
+        } catch (e) { console.log(e.message); }
+
       }
 
       async function TOTAL_STAKED_FROGS() {
