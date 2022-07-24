@@ -1432,7 +1432,7 @@
 
             } catch (e) { }
 
-            let stake_data = await controller.methods.vault(token_id).call();
+            let stake_data = controller.methods.vault(token_id).call();
             console.log(stake_data.owner);
             
             let openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
