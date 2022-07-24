@@ -1246,6 +1246,7 @@
         try {
 
           var stake_data = await controller.methods.vault(TOKEN_ID).call();
+          console.log(stake_data.tokenId+' : '+stake_data.owner)
           if (stake_data.owner == user_address) {
             console.log(stake_data.tokenId)
           }
