@@ -1414,7 +1414,12 @@
         })
       }
 
-      async function fetch_stake_info(target, token) {
+      async function fetch_stake_info() {
+
+        // display all values
+        for (var i = 0; i < frog_array.length; i++) {
+
+          token_id = frog_array[i];
 
           let stake_data = await controller.methods.vault(token_id).call();
           let owner = stake_data.owner;
@@ -1425,6 +1430,7 @@
             return true;
 
           }
+        }
       }
 
       async function STAKE_FROG(TOKEN_IDS) {
