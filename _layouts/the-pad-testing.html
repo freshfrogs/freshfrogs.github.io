@@ -1409,7 +1409,7 @@
 
               var { name, token_metadata, permalink, traits, external_link, token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
 
-            } catch (e) { console.log(e.message); }
+            } catch (e) { }
 
             // sale price / listing price <- total_price
             try {
@@ -1418,7 +1418,7 @@
                 sale_price = total_price / Math.pow(10, decimals);
               }
 
-            } catch (e) { console.log(e.message); }
+            } catch (e) { }
 
             if (FETCH_FROG_STAKE_INFO(token_id)) {
 
@@ -1447,7 +1447,7 @@
 
               } else {
 
-                console.log(name+' (Ξ'+sale_price+')');
+                //console.log(name+' (Ξ'+sale_price+')');
                 document.getElementById('traits_'+token_id).innerHTML = '<strong><u>'+name+'</u> 📌Staked</strong> Ξ'+sale_price+'';
 
               }
