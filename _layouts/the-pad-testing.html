@@ -1403,8 +1403,10 @@
             frog_array.push(token_id);
 
           })
+
+          fetch_stake_info();
+
         })
-        .then(fetch_stake_info())
         .catch(e => {
 
           console.log('Error: Could not talk to OpenSea! '+e.message);
