@@ -87,7 +87,7 @@ contract FreshFrogsController is Ownable, IERC721Receiver {
       Stake memory staked = vault[tokenId];
       require(staked.owner == account, "not an owner");
       uint256 stakedAt = staked.timestamp;
-      earned += 100000 ether * (block.timestamp - stakedAt) / 1 days;
+      earned += 1 ether * (block.timestamp - stakedAt) / 1 days;
       vault[tokenId] = Stake({
         owner: account,
         tokenId: uint24(tokenId),
