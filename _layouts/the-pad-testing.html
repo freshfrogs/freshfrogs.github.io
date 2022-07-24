@@ -1414,22 +1414,11 @@
         })
       }
 
-      async function fetch_stake_info() {
-
-        // display all values
-        for (var i = 0; i < frog_array.length; i++) {
-
-          token_id = frog_array[i];
+      async function fetch_stake_owner(token_id) {
 
           let stake_data = await controller.methods.vault(token_id).call();
-          let owner = stake_data.owner;
+          return stake_data.owner;
 
-          if (user_address === owner.toLowerCase()) {
-
-            console.log('Staked by USER! : Frog #'+token_id);
-
-          }
-        }
       }
 
       async function STAKE_FROG(TOKEN_IDS) {
@@ -1487,6 +1476,8 @@
 
             // sale price / listing price <- total_price
             try {
+
+              console.log(fetch_stake_owner(token_id));
               
               if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
                 sale_price = total_price / Math.pow(10, decimals);
