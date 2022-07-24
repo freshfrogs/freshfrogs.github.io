@@ -4,6 +4,7 @@ pragma solidity 0.8.4;
 
 import "https://freshfrogs.io/assets/fresh-frogs/FreshFrogsNFT.sol";
 import "https://freshfrogs.io/assets/fresh-frogs/FreshFrogsFLYZ.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract NFTStaking is Ownable, IERC721Receiver {
 
@@ -21,13 +22,13 @@ contract NFTStaking is Ownable, IERC721Receiver {
   event Claimed(address owner, uint256 amount);
 
   // reference to the Block NFT contract
-  FreshFrogsNFT nft;
+  ERC721Upgradeable nft;
   FreshFrogsFLYZ token;
 
   // maps tokenId to stake
   mapping(uint256 => Stake) public vault; 
 
-   constructor(Collection _nft, N2DRewards _token) { 
+   constructor(ERC721Upgradeable _nft, FreshFrogsFLYZ _token) { 
     nft = _nft;
     token = _token;
   }
@@ -120,7 +121,7 @@ contract NFTStaking is Ownable, IERC721Receiver {
   // should never be used inside of transaction because of gas fee
   function balanceOf(address account) public view returns (uint256) {
     uint256 balance = 0;
-    uint256 supply = '4040';
+    uint256 supply = 4040;
     for(uint i = 1; i <= supply; i++) {
       if (vault[i].owner == account) {
         balance += 1;
@@ -132,7 +133,7 @@ contract NFTStaking is Ownable, IERC721Receiver {
   // should never be used inside of transaction because of gas fee
   function tokensOfOwner(address account) public view returns (uint256[] memory ownerTokens) {
 
-    uint256 supply = '4040';
+    uint256 supply = 4040;
     uint256[] memory tmp = new uint256[](supply);
 
     uint256 index = 0;
