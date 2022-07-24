@@ -1241,10 +1241,10 @@
       }
 
       async function FETCH_FROG_STAKE_INFO(TOKEN_ID) {
-        
+
         try {
 
-          var nft_data = await controller.methods.vault(token_id).call();
+          var nft_data = await controller.methods.vault(TOKEN_ID).call();
           console.log(nft_data)
 
         } catch (e) { console.log(e.message); }
