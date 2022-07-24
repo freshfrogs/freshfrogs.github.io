@@ -1423,7 +1423,7 @@
                 elem.style.width = width + "%";
 
                 //let owner = await collection.methods.ownerOf(thisToken).call();
-                let stake_data = await controller.methods.vault(TOKEN_ID).call();
+                let stake_data = await controller.methods.vault(thisToken).call();
                 let owner = stake_data.owner;
 
                 if (user_address === owner.toLowerCase()) {
