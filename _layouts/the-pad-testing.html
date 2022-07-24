@@ -1405,7 +1405,6 @@
             }
 
             var thisToken = loaded = 0;
-            document.getElementById('currentToken').innerHTML = thisToken;
 
             while(true) {
 
@@ -1414,6 +1413,7 @@
                 }
 
                 thisToken++
+                document.getElementById('currentToken').innerHTML = thisToken;
 
                 // Progress Bar!
                 percent = parseInt((thisToken/nextIdC)*100);
