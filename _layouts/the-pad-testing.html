@@ -1020,7 +1020,7 @@
             consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS!<br>'+'<p></p>')
           } else {
             consoleOutput('<br>'+'<strong>Connected!</strong> Loading Frogs from OpenSea... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
-            TOTAL_STAKED_FROGS();
+            fetch_staked_frogs();
           }
 
         } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
@@ -1382,116 +1382,74 @@
 
       }
 
-      async function TOTAL_STAKED_FROGS() {
+      // Manually check Frog transactions
+      async function fetch_staked_frogs() {
 
-        var total_staked = await controller.methods.totalStaked().call();
-        console.log('Total Staked : '+total_staked)
-        //console.log('Your Staked NFTs : ');
+        consoleOutput('<br>'+'<strong>Connected!</strong> Could not talk to OpenSea! <br>Loading Frogs from IPFS... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
 
-        // Check owned tokens
+        let freshfrogscontroller = '0xd302B8B0Dc965553b1D8c247E2cdA5E1F600640f';
 
-        const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
+        console.log('Checking Frogs Manually.. for user...'+freshfrogscontroller)
 
-        fetch('https://api.opensea.io/api/v1/assets?owner='+'0xd302B8B0Dc965553b1D8c247E2cdA5E1F600640f'+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
-        .then((tokens) => tokens.json())
-        .then((tokens) => {
+        document.getElementById("thePad").innerHTML = ''
 
-          var { assets } = tokens
-          assets.forEach((frog) => { // console.log(frog)
+        try {
 
+            let ownedFrogs = await collection.methods.balanceOf(freshfrogscontroller).call()
+            let total_staked = await controller.methods.totalStaked().call();
+            console.log('Total Staked : '+total_staked)
 
-            ///
-
-            try {
-
-              var sale_price = false;
-
-              var { name, token_metadata, permalink, traits, external_link, token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
-
-            } catch (e) { }
-
-            // sale price / listing price <- total_price
-            try {
-              
-              if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
-                sale_price = total_price / Math.pow(10, decimals);
-              }
-
-            } catch (e) { }
-            var stake_f = await FETCH_FROG_STAKE_INFO(token_id);
-            if (stake_f) {
-
-              console.log('displaying staked Frog #'+token_id)
-              let openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
-              let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
-              let gemxyzLink = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
-
-              let frog_token = document.createElement('div');
-              frog_token.onclick = function() { 
-                if (!morph) {
-                  display_token(token_id);
-                } else {
-                  sub_frog = token_id;
-                  combineTokens(base_frog, sub_frog);
-                  document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog;
-                }
-              }
-              frog_token.className = 'frog_token';
-              frog_token.innerHTML = '<img src="'+external_link+'" class="recentMint"/><div id="traits_'+token_id+'" class="trait_list"></div>';
-              document.getElementById('pre').appendChild(frog_token);
-
-              if (!sale_price) {
-
-                document.getElementById('traits_'+token_id).innerHTML = '<strong><u>'+name+'</u> 📌Staked</strong>';
-
-              } else {
-
-                //console.log(name+' (Ξ'+sale_price+')');
-                document.getElementById('traits_'+token_id).innerHTML = '<strong><u>'+name+'</u> 📌Staked</strong> Ξ'+sale_price+'';
-
-              }
-              
-
-              let break_b = document.createElement('hr');
-              document.getElementById('pre').appendChild(break_b);
-
-              fetch(token_metadata)
-              .then((metadata) => metadata.json())
-              .then((metadata) => { 
-
-                for (var i = 0; i < metadata.attributes.length; i++) {
-
-                  var data = metadata.attributes[i]
-
-                  //try { var trait_rarity = ((traits_list[data.trait_type][data.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'e'; console.log(e); }
-                    
-                  //if (trait_rarity == 'NaN' || trait_rarity < 1) { trait_rarity = '<1' }
-
-                  let trait_text = document.createElement('i')
-                  trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value//+' (<rarity style="font-size: small;">'+trait_rarity+'%</rarity>)'
-                  document.getElementById('traits_'+token_id).appendChild(trait_text)
-
-                }
-
-                let button_b = document.createElement('div');
-                button_b.innerHTML = '<br><a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
-                document.getElementById('traits_'+token_id).appendChild(button_b);
-                
-              });
-              
+            if (ownedFrogs <= 0) { // ❌ No FROGS
+                console.log("FreshFrogsController does not hold any FROG Tokens!")
+                return false;
             }
 
-            ///
+            var thisToken = loaded = 0;
 
-          })
+            while(true) {
 
-        })
-        .catch(e => {
+                if (thisToken >= nextIdC) {
+                  break; // dont loading all Frogs!
+                }
 
-          console.log(e.message);
-          console.log('Error: OpenSea Error! fetch_user_tokens()');
-      
-        })
+                thisToken++
+
+                // Progress Bar!
+                percent = parseInt((thisToken/nextIdC)*100);
+                document.getElementById("progress").innerHTML = percent+"%"
+                elem = document.getElementById("myBar");
+                width = percent
+                width++;
+                elem.style.width = width + "%";
+
+                //let owner = await collection.methods.ownerOf(thisToken).call();
+                let stake_data = await controller.methods.vault(TOKEN_ID).call();
+                let owner = stake_data.owner;
+
+                if (user_address === owner.toLowerCase()) {
+
+                  loaded++
+                  console.log(thisToken)
+
+                }
+
+            }
+
+            // Finish Loading Bar
+            percent = 100;
+            document.getElementById("progress").innerHTML = percent+"%"
+            
+            elem = document.getElementById("myBar");
+            width = percent
+            width++;
+            elem.style.width = width + "%";
+            consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+loaded+' ] Frogs Staked!<br>'+'<p></p>')
+
+        } catch (e) {
+          
+            console.log("Something went wrong, refresh the page!"+e.message)
+            //document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ❌ '+loadedFrogs+'/'+ownedFrogs+' FROG(s) loaded!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'
+        }
       }
 
       async function STAKE_FROG(TOKEN_IDS) {
