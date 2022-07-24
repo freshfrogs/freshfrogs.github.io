@@ -1417,9 +1417,8 @@
               }
 
             } catch (e) { }
-            var staked_f = FETCH_FROG_STAKE_INFO(token_id);
-            console.log(staked_f)
-            if (staked_f) {
+
+            if (await FETCH_FROG_STAKE_INFO(token_id)) {
 
               console.log('displaying staked Frog #'+token_id)
               let openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
