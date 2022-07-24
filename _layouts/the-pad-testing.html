@@ -1023,7 +1023,7 @@
             consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS!<br>'+'<p></p>')
           } else {
             consoleOutput('<br>'+'<strong>Connected!</strong> Loading Frogs from OpenSea... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
-            fetch_staked_frogs();
+            fetch_user_tokens();
           }
 
         } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
@@ -1414,26 +1414,17 @@
         })
       }
 
-      async function fetch_stake_info() {
-
-        // display all values
-        for (var i = 0; i < frog_array.length; i++) {
-
-          token_id = frog_array[i];
+      async function fetch_stake_info(target, token) {
 
           let stake_data = await controller.methods.vault(token_id).call();
           let owner = stake_data.owner;
 
           if (user_address === owner.toLowerCase()) {
 
-            console.log('Staked by USER! : Frog #'+token_id)
-
-          } else {
-
-            console.log('Staked Frog : Frog #'+token_id)
+            console.log('Staked by USER! : Frog #'+token_id);
+            return true;
 
           }
-        }
       }
 
       async function STAKE_FROG(TOKEN_IDS) {
@@ -1487,7 +1478,7 @@
 
               var { name, token_metadata, permalink, traits, external_link, token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
 
-            } catch (e) { console.log(e.message); }
+            } catch (e) { }
 
             // sale price / listing price <- total_price
             try {
@@ -1496,64 +1487,68 @@
                 sale_price = total_price / Math.pow(10, decimals);
               }
 
-            } catch (e) { console.log(e.message); }
-            
-            let openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
-            let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
-            let gemxyzLink = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
+            } catch (e) { }
+            console.log(fetch_stake_info(user_address, token_id))
+            if (fetch_stake_info(user_address, token_id)) {
 
-            let frog_token = document.createElement('div');
-            frog_token.onclick = function() { 
-              if (!morph) {
-                display_token(token_id);
+              let openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
+              let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
+              let gemxyzLink = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
+
+              let frog_token = document.createElement('div');
+              frog_token.onclick = function() { 
+                if (!morph) {
+                  display_token(token_id);
+                } else {
+                  sub_frog = token_id;
+                  combineTokens(base_frog, sub_frog);
+                  document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog;
+                }
+              }
+              frog_token.className = 'frog_token';
+              frog_token.innerHTML = '<img src="'+external_link+'" class="recentMint"/><div id="traits_'+token_id+'" class="trait_list"></div>';
+              document.getElementById('pre').appendChild(frog_token);
+
+              if (!sale_price) {
+
+                document.getElementById('traits_'+token_id).innerHTML = '<strong><u>'+name+'</u></strong>';
+
               } else {
-                sub_frog = token_id;
-                combineTokens(base_frog, sub_frog);
-                document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog;
-              }
-            }
-            frog_token.className = 'frog_token';
-            frog_token.innerHTML = '<img src="'+external_link+'" class="recentMint"/><div id="traits_'+token_id+'" class="trait_list"></div>';
-            document.getElementById('pre').appendChild(frog_token);
 
-            if (!sale_price) {
-
-              document.getElementById('traits_'+token_id).innerHTML = '<strong><u>'+name+'</u></strong>';
-
-            } else {
-
-              //console.log(name+' (Ξ'+sale_price+')');
-              document.getElementById('traits_'+token_id).innerHTML = '<strong>'+name+'</strong> Ξ'+sale_price+'';
-
-            }
-            
-
-            let break_b = document.createElement('hr');
-            document.getElementById('pre').appendChild(break_b);
-
-            fetch(token_metadata)
-            .then((metadata) => metadata.json())
-            .then((metadata) => { 
-
-              for (var i = 0; i < metadata.attributes.length; i++) {
-
-                var data = metadata.attributes[i]
-
-                //try { var trait_rarity = ((traits_list[data.trait_type][data.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'e'; console.log(e); }
-                  
-                //if (trait_rarity == 'NaN' || trait_rarity < 1) { trait_rarity = '<1' }
-
-                let trait_text = document.createElement('i')
-                trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value//+' (<rarity style="font-size: small;">'+trait_rarity+'%</rarity>)'
-                document.getElementById('traits_'+token_id).appendChild(trait_text)
+                //console.log(name+' (Ξ'+sale_price+')');
+                document.getElementById('traits_'+token_id).innerHTML = '<strong>'+name+'</strong> Ξ'+sale_price+'';
 
               }
-
-              let button_b = document.createElement('div');
-              button_b.innerHTML = '<br><a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
-              document.getElementById('traits_'+token_id).appendChild(button_b);
               
-            });
+
+              let break_b = document.createElement('hr');
+              document.getElementById('pre').appendChild(break_b);
+
+              fetch(token_metadata)
+              .then((metadata) => metadata.json())
+              .then((metadata) => { 
+
+                for (var i = 0; i < metadata.attributes.length; i++) {
+
+                  var data = metadata.attributes[i]
+
+                  //try { var trait_rarity = ((traits_list[data.trait_type][data.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'e'; console.log(e); }
+                    
+                  //if (trait_rarity == 'NaN' || trait_rarity < 1) { trait_rarity = '<1' }
+
+                  let trait_text = document.createElement('i')
+                  trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value//+' (<rarity style="font-size: small;">'+trait_rarity+'%</rarity>)'
+                  document.getElementById('traits_'+token_id).appendChild(trait_text)
+
+                }
+
+                let button_b = document.createElement('div');
+                button_b.innerHTML = '<br><a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
+                document.getElementById('traits_'+token_id).appendChild(button_b);
+                
+              });
+
+            }
 
           })
 
