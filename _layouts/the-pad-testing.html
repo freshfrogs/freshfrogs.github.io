@@ -1382,75 +1382,39 @@
 
       }
 
-      // Manually check Frog transactions
       async function fetch_staked_frogs() {
 
-        consoleOutput('<br>'+'<strong>Connected!</strong> Staking FreshFrogsController! <br>Loading Frogs by index... (<i id="currentToken"></i>/4040) <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
+        const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
+        
+        fetch('https://api.opensea.io/api/v1/assets?owner='+'0xd302B8B0Dc965553b1D8c247E2cdA5E1F600640f'+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+        .then((tokens) => tokens.json())
+        .then((tokens) => {
 
-        let freshfrogscontroller = '0xd302B8B0Dc965553b1D8c247E2cdA5E1F600640f';
+          console.log('Connecting to FreshFrongsController via OpenSea...')
+          var { assets } = tokens
+          assets.forEach((frog) => { 
 
-        console.log('Checking Frogs Manually.. for user...'+freshfrogscontroller)
+            var { token_id } = frog
 
-        document.getElementById("thePad").innerHTML = ''
+            let stake_data = await controller.methods.vault(token_id).call();
+            let owner = stake_data.owner;
 
-        try {
+            console.log('Staked Frog : Frog #'+token_id)
+            console.log('Owned By : '+owner)
 
-            let ownedFrogs = await collection.methods.balanceOf(freshfrogscontroller).call()
-            let total_staked = await controller.methods.totalStaked().call();
-            console.log('Total Staked : '+total_staked)
+            if (user_address === owner.toLowerCase()) {
 
-            if (ownedFrogs <= 0) { // ❌ No FROGS
-                console.log("FreshFrogsController does not hold any FROG Tokens!")
-                return false;
-            }
-
-            var thisToken = loaded = 0;
-
-            while(true) {
-
-                if (thisToken >= nextIdC) {
-                  break; // dont loading all Frogs!
-                }
-
-                thisToken++
-                document.getElementById('currentToken').innerHTML = thisToken;
-
-                // Progress Bar!
-                percent = parseInt((thisToken/nextIdC)*100);
-                document.getElementById("progress").innerHTML = percent+"%"
-                elem = document.getElementById("myBar");
-                width = percent
-                width++;
-                elem.style.width = width + "%";
-
-                //let owner = await collection.methods.ownerOf(thisToken).call();
-                let stake_data = await controller.methods.vault(thisToken).call();
-                let owner = stake_data.owner;
-
-                if (user_address === owner.toLowerCase()) {
-
-                  loaded++
-                  console.log(thisToken)
-
-                }
+              console.log('Staked By User : TRUE')
+              console.log(token_id)
 
             }
+          })
+        })
+        .catch(e => {
 
-            // Finish Loading Bar
-            percent = 100;
-            document.getElementById("progress").innerHTML = percent+"%"
-            
-            elem = document.getElementById("myBar");
-            width = percent
-            width++;
-            elem.style.width = width + "%";
-            consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+loaded+' ] Frogs Staked!<br>'+'<p></p>')
-
-        } catch (e) {
-          
-            console.log("Something went wrong, refresh the page!"+e.message)
-            //document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i><strong>"+addressCut+' ✓</strong></i></b>'+'<br>Compiling... ❌ '+loadedFrogs+'/'+ownedFrogs+' FROG(s) loaded!'+'<br><input type="text" class="myProgress" id="frogIndex" onkeyup="frogIndexer()" placeholder="Search by TokenID">'
-        }
+          console.log('Error: Could not talk to OpenSea! '+e.message);
+      
+        })
       }
 
       async function STAKE_FROG(TOKEN_IDS) {
