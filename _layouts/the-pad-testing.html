@@ -1371,7 +1371,6 @@
         try {
 
           var stake_data = await controller.methods.vault(TOKEN_ID).call();
-          console.log(stake_data.tokenId+' : '+stake_data.owner)
           if (stake_data.owner.toLowerCase() == user_address) {
             console.log('Staked by user TRUE: '+stake_data.tokenId)
             return true;
@@ -1419,8 +1418,9 @@
               }
 
             } catch (e) { }
-            console.log(FETCH_FROG_STAKE_INFO(token_id))
-            if (FETCH_FROG_STAKE_INFO(token_id)) {
+            var staked_f = FETCH_FROG_STAKE_INFO(token_id);
+            console.log(staked_f)
+            if (staked_f) {
 
               console.log('displaying staked Frog #'+token_id)
               let openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
