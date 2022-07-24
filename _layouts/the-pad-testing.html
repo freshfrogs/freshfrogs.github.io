@@ -1368,52 +1368,6 @@
 
       }
 
-      async function FETCH_FROG_STAKE_INFO(TOKEN_ID) {
-
-        try {
-
-          var stake_data = await controller.methods.vault(TOKEN_ID).call();
-          if (stake_data.owner.toLowerCase() == user_address) {
-            console.log('Staked by user TRUE: '+stake_data.tokenId)
-            return true;
-          } else {
-            return false;
-            console.log('Staked by user FALSE: '+stake_data.tokenId)
-          }
-          
-        } catch (e) { console.log(e.message); }
-
-      }
-
-      async function fetch_staked_frogs() {
-
-        const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
-        
-        fetch('https://api.opensea.io/api/v1/assets?owner='+'0xd302B8B0Dc965553b1D8c247E2cdA5E1F600640f'+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
-        .then((tokens) => tokens.json())
-        .then((tokens) => {
-
-          console.log('Connecting to FreshFrogsController via OpenSea...')
-          var { assets } = tokens
-          assets.forEach((frog) => { 
-
-            var { token_id } = frog
-
-            // append multiple values to the array
-            frog_array.push(token_id);
-
-          })
-
-          fetch_stake_info();
-
-        })
-        .catch(e => {
-
-          console.log('Error: Could not talk to OpenSea! '+e.message);
-      
-        })
-      }
-
       async function fetch_stake_owner(token_id) {
 
           let stake_data = await controller.methods.vault(token_id).call();
