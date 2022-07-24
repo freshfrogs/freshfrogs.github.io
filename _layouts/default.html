@@ -1002,7 +1002,6 @@
         COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
         CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
 
-        TOTAL_STAKED_FROGS();
         fetch_opensea_data();
 
         try { // Connect
@@ -1037,12 +1036,14 @@
           }
 
           getInvites();
+          
 
           console.log('Connected  Smart Contract : '+contract_name+'('+contract_symbol+')');
           console.log('Ethereum : '+contract_address);
           console.log('Connected User : '+user_address);
 
           // Update minting ui
+          TOTAL_STAKED_FROGS();
 
           // Remove token from minting tray
 
