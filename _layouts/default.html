@@ -1244,9 +1244,11 @@
 
         try {
 
-          var nft_data = await controller.methods.vault(TOKEN_ID).call();
-          console.log(nft_data)
-
+          var stake_data = await controller.methods.vault(TOKEN_ID).call();
+          if (stake_data.owner == user_address.toLowerCase()) {
+            console.log(stake_data.tokenId)
+          }
+          
         } catch (e) { console.log(e.message); }
 
       }
