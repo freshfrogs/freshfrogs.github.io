@@ -1263,7 +1263,7 @@
 
               var { name, token_metadata, permalink, traits, external_link, token_id } = frog
 
-              var nft_data = await controller.methods.vault([token_id]).call();
+              var nft_data = controller.methods.vault([token_id]).call();
 
               console.log(nft_data)
 
