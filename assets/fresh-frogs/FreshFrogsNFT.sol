@@ -1,427 +1,261 @@
-// SPDX-License-Identifier: MIT
-/***************************************************************************************************
-*
-* This file is identical to
-* @openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol
-* with one exception:
-* 
-* _name and _symbol are "internal" types inatead of "private" 
-*   => so the inheriting F0.sol contract can dynamically update it using setNS()
-* 
-***************************************************************************************************/
-pragma solidity ^0.8.0;
-
-import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol";
+// SPDX-License-Identifier: BUSL-1.1
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//  ███████╗░█████╗░░█████╗░████████╗░█████╗░██████╗░██╗░█████╗░  ░░░░░░  ███████╗░█████╗░
+//  ██╔════╝██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗██╔══██╗██║██╔══██╗  ░░░░░░  ██╔════╝██╔══██╗
+//  █████╗░░███████║██║░░╚═╝░░░██║░░░██║░░██║██████╔╝██║███████║  █████╗  █████╗░░██║░░██║
+//  ██╔══╝░░██╔══██║██║░░██╗░░░██║░░░██║░░██║██╔══██╗██║██╔══██║  ╚════╝  ██╔══╝░░██║░░██║
+//  ██║░░░░░██║░░██║╚█████╔╝░░░██║░░░╚█████╔╝██║░░██║██║██║░░██║  ░░░░░░  ██║░░░░░╚█████╔╝
+//  ╚═╝░░░░░╚═╝░░╚═╝░╚════╝░░░░╚═╝░░░░╚════╝░╚═╝░░╚═╝╚═╝╚═╝░░╚═╝  ░░░░░░  ╚═╝░░░░░░╚════╝░
+//
+//  ## THE LAUNCHERS ##
+//  The following humans have brought the FACTORIA F0 contract into existence through crowdfunding:
+//
+//  0x3B31925EeC78dA3CF15c4503604c13b0eEBC57e5	0.1742069 ETH       Emblem Vault + Circuits of Value
+//  0x1593110441AB4C5F2C133F21B0743B2b43E297cB	0.1000000 ETH       EmilySnow.eth
+//  0x334Ce5048e1Dc1cfCbF6A692e7ce6Bd950Ad82ec	0.0750000 ETH       Las Vegas (@artsyassets) -- Shoutout to @skogard @chusla & Bob Marley
+//  0xCe5A9AA866ca82f06Df0d0868CB27C044A9086Ef	0.0731200 ETH       Ramon Torres Batiz
+//  0x298b25385E67B471faa64CB1CA17F31684016629	0.0400000 ETH       Apes4Good @Apes4Good + good frens @HeyGoodFrens
+//  0x701Ee76fc23173B1568f12dEa8a4122fbC55abD1	0.0222000 ETH       Hansel Loh
+//  0x48A64aDbb34837F3Bf4d40BCc40C85bBCa1A3a84	0.0170000 ETH       Arvind "POG" Alexander
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+pragma solidity ^0.8.4;
+//import 'hardhat/console.sol';
+import "./F0ERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-/**
- * @dev Implementation of https://eips.ethereum.org/EIPS/eip-721[ERC721] Non-Fungible Token Standard, including
- * the Metadata extension, but not including the Enumerable extension, which is available separately as
- * {ERC721Enumerable}.
- */
-contract ERC721Upgradeable is Initializable, ContextUpgradeable, ERC165Upgradeable, IERC721Upgradeable, IERC721MetadataUpgradeable {
-    using AddressUpgradeable for address;
-    using StringsUpgradeable for uint256;
+contract F0 is Initializable, ERC721Upgradeable, OwnableUpgradeable {
+  /**********************************************************
+  *
+  *   EVENTS
+  *
+  **********************************************************/
+  event Invited(bytes32 indexed key, bytes32 indexed cid);
+  event NSUpdated(string name, string symbol);
+  event Configured(Config config);
+  event WithdrawerUpdated(Withdrawer withdrawer);
 
-    // Token name
-    string internal _name;
+  /**********************************************************
+  *
+  *   DATA STRUCTURES
+  *
+  **********************************************************/
+  struct Config {
+    string placeholder;
+    string base;
+    uint64 supply;
+    bool permanent;
+  }
+  struct Invite {
+    uint128 price;
+    uint64 start;
+    uint64 limit;
+  }
+  struct Auth {
+    bytes32 key;
+    bytes32[] proof;
+  }
+  struct Withdrawer {
+    address account;
+    bool permanent;
+  }
 
-    // Token symbol
-    string internal _symbol;
+  /**********************************************************
+  *
+  *  VARIABLES
+  *
+  **********************************************************/
+  mapping (bytes32 => Invite) public invite;
+  Config public config;
+  Withdrawer public withdrawer;
+  uint public nextId;
+  uint private feeUsed;
+  string public URI;
+  address public royalty;
 
-    // Mapping from token ID to owner address
-    mapping(uint256 => address) private _owners;
+  /**********************************************************
+  *
+  *  INITIALIZER
+  *
+  **********************************************************/
+  function initialize(string memory name, string memory symbol, Config calldata _config) initializer external {
+    __ERC721_init(name, symbol);
+    __Ownable_init();
+    setConfig(_config);
+  }
 
-    // Mapping owner address to token count
-    mapping(address => uint256) private _balances;
+  /**********************************************************
+  *
+  *  ADMIN
+  *
+  **********************************************************/
+  function setConfig(Config calldata _config) public onlyOwner {
+    require(!config.permanent, "1");
+    config = _config;
+    emit Configured(_config);
+  }
+  function setNS(string calldata name_, string calldata symbol_) external onlyOwner {
+    require(!config.permanent, "2");
+    _name = name_; 
+    _symbol = symbol_;
+    emit NSUpdated(_name, _symbol);
+  }
+  function setURI (string calldata _uri) external onlyOwner {
+    URI = _uri;
+  }
+  function setWithdrawer(Withdrawer calldata _withdrawer) external onlyOwner {
+    require(!withdrawer.permanent, "3");
+    withdrawer = _withdrawer; 
+    emit WithdrawerUpdated(_withdrawer);
+  }
+  function setInvite(bytes32 _key, bytes32 _cid, Invite calldata _invite) external onlyOwner {
+    if (nextId==0) nextId = 1;  // delay nextId setting until the first invite is made.
+    invite[_key] = _invite;
+    emit Invited(_key, _cid);
+  }
+  function withdraw() external payable {
+    /****************************************************************************************************
+    *
+    *  Authorization
+    *   - Either the owner or the withdrawer (in case it's set) can initiate withdraw()
+    *
+    ****************************************************************************************************/
+    require(_msgSender() == owner() || _msgSender() == withdrawer.account, "4");
 
-    // Mapping from token ID to approved address
-    mapping(uint256 => address) private _tokenApprovals;
-
-    // Mapping from owner to operator approvals
-    mapping(address => mapping(address => bool)) private _operatorApprovals;
-
-    /**
-     * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
-     */
-    function __ERC721_init(string memory name_, string memory symbol_) internal initializer {
-        __Context_init_unchained();
-        __ERC165_init_unchained();
-        __ERC721_init_unchained(name_, symbol_);
+    /****************************************************************************************************
+    *
+    *  Fee => 1% of revenue with 1ETH cap
+    *   - compute 1%
+    *   - if paying 1% exceeds the 1ETH total fee used, only pay enough to reach 1ETH
+    *   - update the total fee used
+    *
+    ****************************************************************************************************/
+    uint balance = address(this).balance;
+    uint fee = 0;
+    if (feeUsed < 1 ether) {
+      fee = balance/100;
+      if (feeUsed + fee > 1 ether) fee = 1 ether - feeUsed;
+      feeUsed += fee;
     }
 
-    function __ERC721_init_unchained(string memory name_, string memory symbol_) internal initializer {
-        _name = name_;
-        _symbol = symbol_;
+    /****************************************************************************************************
+    *
+    *   - if the withdrawer.account is not set (0x0 address), withdraw balance-fee to owner
+    *   - if the withdrawer.account is set, withdraw balance-fee to withdrawer.account
+    *
+    ****************************************************************************************************/
+    (bool sent1, ) = payable(
+      withdrawer.account == address(0) ? owner() : withdrawer.account
+    ).call{value: balance-fee}("");
+    require(sent1, "5");
+
+    /****************************************************************************************************
+    *
+    *   - the fee is sent to 0x502b2FE7Cc3488fcfF2E16158615AF87b4Ab5C41
+    *
+    ****************************************************************************************************/
+    (bool sent2, ) = payable(address(0x502b2FE7Cc3488fcfF2E16158615AF87b4Ab5C41)).call{value: fee}("");
+    require(sent2, "6");
+  }
+
+  /**********************************************************
+  *
+  *  TOKEN
+  *
+  **********************************************************/
+  function mint(Auth calldata auth, uint _count) external payable {
+    uint n = nextId;
+    Invite memory i = invite[auth.key];
+    require(verify(auth, _msgSender()), "7");
+    require(i.price * _count == msg.value, "8");
+    require(i.start <= block.timestamp, "9");
+    require(balanceOf(_msgSender()) + _count <= i.limit, "10");
+    require(n+_count-1 <= config.supply, "11");
+    for(uint k=0; k<_count; k++) {
+      _safeMint(_msgSender(), n+k);
     }
-
-    /**
-     * @dev See {IERC165-supportsInterface}.
-     */
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165Upgradeable, IERC165Upgradeable) returns (bool) {
-        return
-            interfaceId == type(IERC721Upgradeable).interfaceId ||
-            interfaceId == type(IERC721MetadataUpgradeable).interfaceId ||
-            super.supportsInterface(interfaceId);
+    nextId = n + _count;
+  }
+  function gift(address _receiver, uint _count) external onlyOwner {
+    // first time: nextId is 0 => n is 1
+    // after that: nextId is 1 or greater => n is the same as nextId
+    uint n = (nextId > 0 ? nextId : 1);
+    require(_count > 0, "12");
+    require(n+_count-1 <= config.supply, "13");
+    for(uint k=0; k<_count; k++) {
+      _safeMint(_receiver, n+k);
     }
-
-    /**
-     * @dev See {IERC721-balanceOf}.
-     */
-    function balanceOf(address owner) public view virtual override returns (uint256) {
-        require(owner != address(0), "ERC721: balance query for the zero address");
-        return _balances[owner];
+    nextId = n + _count;
+  }
+  function burn(uint _tokenId) external {
+    require(_isApprovedOrOwner(_msgSender(), _tokenId), "14");
+    _burn(_tokenId);
+  }
+  function tokenURI(uint tokenId) public view override(ERC721Upgradeable) returns (string memory) {
+    require(tokenId > 0 && tokenId <= config.supply, "15");
+    if (bytes(config.base).length > 0) {
+      return string(abi.encodePacked(config.base, _toString(tokenId), ".json"));
+    } else {
+      return bytes(config.placeholder).length > 0 ?  config.placeholder : "ipfs://bafkreieqcdphcfojcd2vslsxrhzrjqr6cxjlyuekpghzehfexi5c3w55eq";
     }
+  }
 
-    /**
-     * @dev See {IERC721-ownerOf}.
-     */
-    function ownerOf(uint256 tokenId) public view virtual override returns (address) {
-        address owner = _owners[tokenId];
-        require(owner != address(0), "ERC721: owner query for nonexistent token");
-        return owner;
+  /**********************************************************
+  *
+  *  ROYALTY
+  *
+  **********************************************************/
+  function setRoyalty(address _address) external onlyOwner {
+    require(!config.permanent, "16");
+    royalty = _address;
+  }
+  function royaltyInfo(uint tokenId, uint value) external view returns (address receiver, uint256 royaltyAmount) {
+    if (royalty == address(0)) {
+      // Default: No royalty
+      return (royalty, 0);
+    } else {
+      // If the royalty address is set, call the contract to get the royalty values
+      (, bytes memory r) = royalty.staticcall(abi.encodeWithSignature("get(address,uint256,uint256)", address(this), tokenId, value));
+      return abi.decode(r, (address,uint));
     }
+  }
+  function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721Upgradeable) returns (bool) {
+    return (interfaceId == 0x2a55205a || super.supportsInterface(interfaceId));
+  }
 
-    /**
-     * @dev See {IERC721Metadata-name}.
-     */
-    function name() public view virtual override returns (string memory) {
-        return _name;
+  /**********************************************************
+  *
+  *  UTIL
+  *
+  **********************************************************/
+  function _toString(uint value) internal pure returns (string memory) {
+    uint temp = value;
+    uint digits;
+    while (temp != 0) {
+      digits++;
+      temp /= 10;
     }
-
-    /**
-     * @dev See {IERC721Metadata-symbol}.
-     */
-    function symbol() public view virtual override returns (string memory) {
-        return _symbol;
+    bytes memory buffer = new bytes(digits);
+    while (value != 0) {
+      digits--;
+      buffer[digits] = bytes1(uint8(48 + uint(value % 10)));
+      value /= 10;
     }
-
-    /**
-     * @dev See {IERC721Metadata-tokenURI}.
-     */
-    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-        require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
-
-        string memory baseURI = _baseURI();
-        return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.toString())) : "";
+    return string(buffer);
+  }
+  function verify(Auth calldata auth, address account) internal pure returns (bool) {
+    if (auth.key == "") return true; 
+    bytes32 computedHash = keccak256(abi.encodePacked(account));
+    for (uint256 i = 0; i < auth.proof.length; i++) {
+      bytes32 proofElement = auth.proof[i];
+      if (computedHash <= proofElement) {
+        computedHash = keccak256(abi.encodePacked(computedHash, proofElement));
+      } else {
+        computedHash = keccak256(abi.encodePacked(proofElement, computedHash));
+      }
     }
-
-    /**
-     * @dev Base URI for computing {tokenURI}. If set, the resulting URI for each
-     * token will be the concatenation of the `baseURI` and the `tokenId`. Empty
-     * by default, can be overriden in child contracts.
-     */
-    function _baseURI() internal view virtual returns (string memory) {
-        return "";
-    }
-
-    /**
-     * @dev See {IERC721-approve}.
-     */
-    function approve(address to, uint256 tokenId) public virtual override {
-        address owner = ERC721Upgradeable.ownerOf(tokenId);
-        require(to != owner, "ERC721: approval to current owner");
-
-        require(
-            _msgSender() == owner || isApprovedForAll(owner, _msgSender()),
-            "ERC721: approve caller is not owner nor approved for all"
-        );
-
-        _approve(to, tokenId);
-    }
-
-    /**
-     * @dev See {IERC721-getApproved}.
-     */
-    function getApproved(uint256 tokenId) public view virtual override returns (address) {
-        require(_exists(tokenId), "ERC721: approved query for nonexistent token");
-
-        return _tokenApprovals[tokenId];
-    }
-
-    /**
-     * @dev See {IERC721-setApprovalForAll}.
-     */
-    function setApprovalForAll(address operator, bool approved) public virtual override {
-        require(operator != _msgSender(), "ERC721: approve to caller");
-
-        _operatorApprovals[_msgSender()][operator] = approved;
-        emit ApprovalForAll(_msgSender(), operator, approved);
-    }
-
-    /**
-     * @dev See {IERC721-isApprovedForAll}.
-     */
-    function isApprovedForAll(address owner, address operator) public view virtual override returns (bool) {
-        return _operatorApprovals[owner][operator];
-    }
-
-    /**
-     * @dev See {IERC721-transferFrom}.
-     */
-    function transferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) public virtual override {
-        //solhint-disable-next-line max-line-length
-        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
-
-        _transfer(from, to, tokenId);
-    }
-
-    /**
-     * @dev See {IERC721-safeTransferFrom}.
-     */
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) public virtual override {
-        safeTransferFrom(from, to, tokenId, "");
-    }
-
-    /**
-     * @dev See {IERC721-safeTransferFrom}.
-     */
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId,
-        bytes memory _data
-    ) public virtual override {
-        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
-        _safeTransfer(from, to, tokenId, _data);
-    }
-
-    /**
-     * @dev Safely transfers `tokenId` token from `from` to `to`, checking first that contract recipients
-     * are aware of the ERC721 protocol to prevent tokens from being forever locked.
-     *
-     * `_data` is additional data, it has no specified format and it is sent in call to `to`.
-     *
-     * This internal function is equivalent to {safeTransferFrom}, and can be used to e.g.
-     * implement alternative mechanisms to perform token transfer, such as signature-based.
-     *
-     * Requirements:
-     *
-     * - `from` cannot be the zero address.
-     * - `to` cannot be the zero address.
-     * - `tokenId` token must exist and be owned by `from`.
-     * - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
-     *
-     * Emits a {Transfer} event.
-     */
-    function _safeTransfer(
-        address from,
-        address to,
-        uint256 tokenId,
-        bytes memory _data
-    ) internal virtual {
-        _transfer(from, to, tokenId);
-        require(_checkOnERC721Received(from, to, tokenId, _data), "ERC721: transfer to non ERC721Receiver implementer");
-    }
-
-    /**
-     * @dev Returns whether `tokenId` exists.
-     *
-     * Tokens can be managed by their owner or approved accounts via {approve} or {setApprovalForAll}.
-     *
-     * Tokens start existing when they are minted (`_mint`),
-     * and stop existing when they are burned (`_burn`).
-     */
-    function _exists(uint256 tokenId) internal view virtual returns (bool) {
-        return _owners[tokenId] != address(0);
-    }
-
-    /**
-     * @dev Returns whether `spender` is allowed to manage `tokenId`.
-     *
-     * Requirements:
-     *
-     * - `tokenId` must exist.
-     */
-    function _isApprovedOrOwner(address spender, uint256 tokenId) internal view virtual returns (bool) {
-        require(_exists(tokenId), "ERC721: operator query for nonexistent token");
-        address owner = ERC721Upgradeable.ownerOf(tokenId);
-        return (spender == owner || getApproved(tokenId) == spender || isApprovedForAll(owner, spender));
-    }
-
-    /**
-     * @dev Safely mints `tokenId` and transfers it to `to`.
-     *
-     * Requirements:
-     *
-     * - `tokenId` must not exist.
-     * - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
-     *
-     * Emits a {Transfer} event.
-     */
-    function _safeMint(address to, uint256 tokenId) internal virtual {
-        _safeMint(to, tokenId, "");
-    }
-
-    /**
-     * @dev Same as {xref-ERC721-_safeMint-address-uint256-}[`_safeMint`], with an additional `data` parameter which is
-     * forwarded in {IERC721Receiver-onERC721Received} to contract recipients.
-     */
-    function _safeMint(
-        address to,
-        uint256 tokenId,
-        bytes memory _data
-    ) internal virtual {
-        _mint(to, tokenId);
-        require(
-            _checkOnERC721Received(address(0), to, tokenId, _data),
-            "ERC721: transfer to non ERC721Receiver implementer"
-        );
-    }
-
-    /**
-     * @dev Mints `tokenId` and transfers it to `to`.
-     *
-     * WARNING: Usage of this method is discouraged, use {_safeMint} whenever possible
-     *
-     * Requirements:
-     *
-     * - `tokenId` must not exist.
-     * - `to` cannot be the zero address.
-     *
-     * Emits a {Transfer} event.
-     */
-    function _mint(address to, uint256 tokenId) internal virtual {
-        require(to != address(0), "ERC721: mint to the zero address");
-        require(!_exists(tokenId), "ERC721: token already minted");
-
-        _beforeTokenTransfer(address(0), to, tokenId);
-
-        _balances[to] += 1;
-        _owners[tokenId] = to;
-
-        emit Transfer(address(0), to, tokenId);
-    }
-
-    /**
-     * @dev Destroys `tokenId`.
-     * The approval is cleared when the token is burned.
-     *
-     * Requirements:
-     *
-     * - `tokenId` must exist.
-     *
-     * Emits a {Transfer} event.
-     */
-    function _burn(uint256 tokenId) internal virtual {
-        address owner = ERC721Upgradeable.ownerOf(tokenId);
-
-        _beforeTokenTransfer(owner, address(0), tokenId);
-
-        // Clear approvals
-        _approve(address(0), tokenId);
-
-        _balances[owner] -= 1;
-        delete _owners[tokenId];
-
-        emit Transfer(owner, address(0), tokenId);
-    }
-
-    /**
-     * @dev Transfers `tokenId` from `from` to `to`.
-     *  As opposed to {transferFrom}, this imposes no restrictions on msg.sender.
-     *
-     * Requirements:
-     *
-     * - `to` cannot be the zero address.
-     * - `tokenId` token must be owned by `from`.
-     *
-     * Emits a {Transfer} event.
-     */
-    function _transfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal virtual {
-        require(ERC721Upgradeable.ownerOf(tokenId) == from, "ERC721: transfer of token that is not own");
-        require(to != address(0), "ERC721: transfer to the zero address");
-
-        _beforeTokenTransfer(from, to, tokenId);
-
-        // Clear approvals from the previous owner
-        _approve(address(0), tokenId);
-
-        _balances[from] -= 1;
-        _balances[to] += 1;
-        _owners[tokenId] = to;
-
-        emit Transfer(from, to, tokenId);
-    }
-
-    /**
-     * @dev Approve `to` to operate on `tokenId`
-     *
-     * Emits a {Approval} event.
-     */
-    function _approve(address to, uint256 tokenId) internal virtual {
-        _tokenApprovals[tokenId] = to;
-        emit Approval(ERC721Upgradeable.ownerOf(tokenId), to, tokenId);
-    }
-
-    /**
-     * @dev Internal function to invoke {IERC721Receiver-onERC721Received} on a target address.
-     * The call is not executed if the target address is not a contract.
-     *
-     * @param from address representing the previous owner of the given token ID
-     * @param to target address that will receive the tokens
-     * @param tokenId uint256 ID of the token to be transferred
-     * @param _data bytes optional data to send along with the call
-     * @return bool whether the call correctly returned the expected magic value
-     */
-    function _checkOnERC721Received(
-        address from,
-        address to,
-        uint256 tokenId,
-        bytes memory _data
-    ) private returns (bool) {
-        if (to.isContract()) {
-            try IERC721ReceiverUpgradeable(to).onERC721Received(_msgSender(), from, tokenId, _data) returns (bytes4 retval) {
-                return retval == IERC721ReceiverUpgradeable.onERC721Received.selector;
-            } catch (bytes memory reason) {
-                if (reason.length == 0) {
-                    revert("ERC721: transfer to non ERC721Receiver implementer");
-                } else {
-                    assembly {
-                        revert(add(32, reason), mload(reason))
-                    }
-                }
-            }
-        } else {
-            return true;
-        }
-    }
-
-    /**
-     * @dev Hook that is called before any token transfer. This includes minting
-     * and burning.
-     *
-     * Calling conditions:
-     *
-     * - When `from` and `to` are both non-zero, ``from``'s `tokenId` will be
-     * transferred to `to`.
-     * - When `from` is zero, `tokenId` will be minted for `to`.
-     * - When `to` is zero, ``from``'s `tokenId` will be burned.
-     * - `from` and `to` are never both zero.
-     *
-     * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
-     */
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal virtual {}
-    uint256[44] private __gap;
+    return computedHash == auth.key;
+  }
 }
