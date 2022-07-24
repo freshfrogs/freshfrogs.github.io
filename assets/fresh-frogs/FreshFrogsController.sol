@@ -2,8 +2,8 @@
 
 pragma solidity 0.8.4;
 
-import "https://github.com/net2devcrypto/n2dstaking/N2DRewards.sol";
-import "https://github.com/factoria-org/f0/blob/main/contracts/F0ERC721Upgradeable.sol";
+import "https://freshfrogs.io/assets/fresh-frogs/FreshFrogsNFT.sol";
+import "https://freshfrogs.io/assets/fresh-frogs/FreshFrogsFLYZ.sol";
 
 contract NFTStaking is Ownable, IERC721Receiver {
 
@@ -21,8 +21,8 @@ contract NFTStaking is Ownable, IERC721Receiver {
   event Claimed(address owner, uint256 amount);
 
   // reference to the Block NFT contract
-  Collection nft;
-  N2DRewards token;
+  FreshFrogsNFT nft;
+  FreshFrogsFLYZ token;
 
   // maps tokenId to stake
   mapping(uint256 => Stake) public vault; 
@@ -120,7 +120,7 @@ contract NFTStaking is Ownable, IERC721Receiver {
   // should never be used inside of transaction because of gas fee
   function balanceOf(address account) public view returns (uint256) {
     uint256 balance = 0;
-    uint256 supply = nft.totalSupply();
+    uint256 supply = '4040';
     for(uint i = 1; i <= supply; i++) {
       if (vault[i].owner == account) {
         balance += 1;
@@ -132,7 +132,7 @@ contract NFTStaking is Ownable, IERC721Receiver {
   // should never be used inside of transaction because of gas fee
   function tokensOfOwner(address account) public view returns (uint256[] memory ownerTokens) {
 
-    uint256 supply = nft.totalSupply();
+    uint256 supply = '4040';
     uint256[] memory tmp = new uint256[](supply);
 
     uint256 index = 0;
