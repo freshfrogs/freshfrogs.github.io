@@ -1432,7 +1432,8 @@
 
             } catch (e) { }
 
-            console.log(fetch_stake_owner(token_id));
+            let stake_data = await controller.methods.vault(token_id).call();
+            console.log(stake_data.owner);
             
             let openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
             let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
