@@ -656,6 +656,9 @@
       var NETWORK = "main";
       var morph = sub_frog = base_frog = false;
 
+      // initialize array
+      var frog_array = [];
+
       document.addEventListener("DOMContentLoaded", async () => {
 
         const web3 = new Web3(window.ethereum);
@@ -1396,25 +1399,39 @@
 
             var { token_id } = frog
 
-            let stake_data = await controller.methods.vault(token_id).call();
-            let owner = stake_data.owner;
+            // append multiple values to the array
+            frog_array.push(token_id);
 
-            console.log('Staked Frog : Frog #'+token_id)
-            console.log('Owned By : '+owner)
-
-            if (user_address === owner.toLowerCase()) {
-
-              console.log('Staked By User : TRUE')
-              console.log(token_id)
-
-            }
           })
         })
+        .then(fetch_stake_info())
         .catch(e => {
 
           console.log('Error: Could not talk to OpenSea! '+e.message);
       
         })
+      }
+
+      async function fetch_stake_info() {
+
+        // display all values
+        for (var i = 0; i < frog_array.length; i++) {
+
+          token_id = frog_array[i];
+
+          let stake_data = await controller.methods.vault(token_id).call();
+          let owner = stake_data.owner;
+
+          console.log('Staked Frog : Frog #'+token_id)
+          console.log('Owned By : '+owner)
+
+          if (user_address === owner.toLowerCase()) {
+
+            console.log('Staked By User : TRUE')
+            console.log(token_id)
+
+          }
+        }
       }
 
       async function STAKE_FROG(TOKEN_IDS) {
