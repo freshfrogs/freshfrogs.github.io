@@ -1002,6 +1002,7 @@
         COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
         CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
 
+        TOTAL_STAKED_FROGS();
         fetch_opensea_data();
 
         try { // Connect
@@ -1239,10 +1240,18 @@
 
       }
 
-      async function total_staked() {
+      async function TOTAL_STAKED_FROGS() {
 
         var total_staked = await controller.methods.totalStaked().call();
         console.log('Total Staked : '+total_staked)
+
+      }
+
+      async function STAKE_FROG(TOKEN_IDS) {
+
+        console.log('Staking... : '+total_staked)
+        controller.methods.stake([TOKEN_IDS]).send({from: account});
+        
 
       }
 
