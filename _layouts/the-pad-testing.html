@@ -1391,7 +1391,7 @@
 
       // Check owned tokens
 
-      function fetch_user_tokens() {
+      async function fetch_user_tokens() {
 
         const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
 
@@ -1418,7 +1418,7 @@
           consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<div id="display_frog"></div><hr>')
 
           var { assets } = tokens
-          assets.forEach((frog) => { // console.log(frog)
+          assets.forEach((frog) => { 
 
             try {
 
@@ -1426,18 +1426,13 @@
 
               var { name, token_metadata, permalink, traits, external_link, token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
 
-            } catch (e) { console.log(e.message); }
-
-            // sale price / listing price <- total_price
-            try {
-
-              console.log(fetch_stake_owner(token_id));
-              
               if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
                 sale_price = total_price / Math.pow(10, decimals);
               }
 
-            } catch (e) { console.log(e.message); }
+            } catch (e) { }
+
+            console.log(fetch_stake_owner(token_id));
             
             let openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
             let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
