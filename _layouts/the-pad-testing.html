@@ -1233,7 +1233,8 @@
 
           })
 
-          console.log(get_staked_tokens(user_address));
+          let temp_results = await get_staked_tokens(user_address);
+          console.log(temp_results);
 
         })
         .catch(e => {
@@ -1292,7 +1293,8 @@
 
         try {
 
-          return await controller.methods.getStakedTokens(user_address).call();
+          let staked_tokens = await controller.methods.getStakedTokens(user_address).call();
+          return staked_tokens
 
         } catch (e) { console.log(e.message); }
 
