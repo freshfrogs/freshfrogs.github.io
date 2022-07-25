@@ -911,6 +911,9 @@
           is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
           staked_tokens = await get_staked_tokens(user_address);
           stakers_info = await stakers(user_address);
+
+          stakers_info = await controller.methods.stakers(user_address).call();
+          stakers_rewards = (stakers_info.unclaimedRewards / 1000000000000000000).toString().slice(-10);
         
           //document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
 
@@ -1427,7 +1430,7 @@
       // render_token()
       async function render_token(token_id, staked, cost) {
 
-        consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+owned_frogs+' ] Frogs belong to this wallet!<br>'+'[ '+staked_frogs+' ] Frogs currently staked!<br>'+'Rewards Available : [ '+staked_info+' $FLYZ ] <br>'+'<div id="display_frog"></div><hr>')
+        consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+owned_frogs+' ] Frogs belong to this wallet!<br>'+'[ '+staked_frogs+' ] Frogs currently staked!<br>'+'Rewards Available : [ '+stakers_rewards+' $FLYZ ] <br>'+'<div id="display_frog"></div><hr>')
 
         try {
 
