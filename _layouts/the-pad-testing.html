@@ -1357,7 +1357,7 @@
             consoleOutput('<br>'+'<strong>Sign Txn setApprovalForAll</strong>'+'<br>'+'Please sign the transaction and wait...<br>This is a one time transaction to allow staking.'+
               '<div style="text-align: left;">'+
               '<br><b>1.) Approve Contract</b> <br> This is a one time transaction to allow staking.<br>'+
-              '<br><b>2.) Transfer NFT</b><br> Transfer FROG #1111 to staking protocol, requires a gas fee.<br>'+
+              '<br><b>2.) Transfer NFT</b><br> Transfer FROG #'+token_id+' to staking protocol, requires a gas fee.<br>'+
               '</div>')
             
             let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
@@ -1374,7 +1374,7 @@
             consoleOutput('<br>'+'<strong>Sign Txn setApprovalForAll</strong>'+'<br>'+'Please sign the transaction and wait...<br>This is a one time transaction to allow staking.'+
               '<div style="text-align: left;">'+
               '<br><b>1.) Approve Contract</b> <br> This is a one time transaction to allow staking.<br>'+
-              '<br><b>2.) Transfer NFT</b><br> Transfer FROG #1111 to staking protocol, requires a gas fee.<br>'+
+              '<br><b>2.) Transfer NFT</b><br> Transfer FROG #'+token_id+' to staking protocol, requires a gas fee.<br>'+
               '</div>')
             document.getElementById('pre').style.backgroundColor = '#99ffc5'
 
