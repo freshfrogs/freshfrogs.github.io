@@ -912,9 +912,9 @@
           is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
           staked_tokens = await get_staked_tokens(user_address);
           stakers_info = await controller.methods.stakers(user_address).call();
-
-          stakers_rewards = (stakers_info.unclaimedRewards / 1000000000000000000)
-          //stakers_rewards = temp.toString().slice(-10);
+          
+          temp = (stakers_info.unclaimedRewards / 1000000000000000000);
+          stakers_rewards = String(temp).slice(0, 5);
         
           //document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
 
