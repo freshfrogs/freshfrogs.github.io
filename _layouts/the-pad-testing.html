@@ -987,7 +987,7 @@
         etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
 
         document.getElementById('selectBase').removeAttribute('href');
-        document.getElementById('selectBase').innerHTML = '<strong>Morph</strong><frog id="baseText">preview</frog>'
+        document.getElementById('selectBase').innerHTML = '<strong>Morph</strong><frog id="baseText">Preview</frog>'
         document.getElementById('selectBase').onclick = function() {
           if (!morph) {
             base_frog = token
@@ -1005,10 +1005,10 @@
         document.getElementById('selectSub').removeAttribute('href');
 
         if (!staked) {
-          document.getElementById('selectSub').innerHTML = '<strong>Stake!</strong><frog id="baseText">earn rewards!</frog>'
+          document.getElementById('selectSub').innerHTML = '<strong>Stake!</strong><frog id="baseText">Earn rewards!</frog>'
           document.getElementById('selectSub').onclick = function() { claim(token); }
         } else {
-          document.getElementById('selectSub').innerHTML = '<strong>Claim!</strong><frog id="baseText">claim rewards!</frog>'
+          document.getElementById('selectSub').innerHTML = '<strong>Claim!</strong><frog id="baseText">Claim rewards!</frog>'
           document.getElementById('selectSub').onclick = function() { stake(token); }
         }
 
