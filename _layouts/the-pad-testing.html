@@ -1338,9 +1338,6 @@
 
           doc.appendChild(frog_token);
           document.getElementById('traits_'+token_id).innerHTML = '<strong><u>'+name+'</u></strong>';
-            
-          let break_b = document.createElement('hr');
-          doc.appendChild(break_b);
 
           let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
 
