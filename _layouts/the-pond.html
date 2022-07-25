@@ -1431,8 +1431,6 @@
       // render_token()
       async function render_token(token_id, staked, cost) {
 
-        consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+owned_frogs+' ] Frogs belong to this wallet!<br>'+'[ '+staked_frogs+' ] Frogs currently staked!<br>'+'[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'+'<div id="display_frog"></div><hr>')
-
         try {
 
           // Variables
@@ -1491,6 +1489,8 @@
         try {
 
           let staked_tokens = await controller.methods.getStakedTokens(user_address).call();
+
+          consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+owned_frogs+' ] Frogs belong to this wallet!<br>'+'[ '+staked_frogs+' ] Frogs currently staked!<br>'+'[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'+'<div id="display_frog"></div><hr>')
 
           for (var i = 0; i < staked_tokens.length; i++) {
 
