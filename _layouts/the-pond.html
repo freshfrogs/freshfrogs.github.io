@@ -695,7 +695,7 @@
       gtag('config', 'G-6PB0WKB4SH');
       // -- >
       
-      var user_address, userInviteList, userInviteKeys, owned_frogs, staked_frogs, contractName, contractSymbol, nextId, nextIdC, collection, COLLECTION, traits_list, CONTROLLER_ADDRESS, controller, CONTROLLER, is_approved;
+      var user_address, userInviteList, userInviteKeys, owned_frogs, contractName, contractSymbol, nextId, nextIdC, collection, COLLECTION, traits_list, CONTROLLER_ADDRESS, controller, CONTROLLER, is_approved, staked_tokens, staked_frogs, staked_info;
       var CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
       var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
       var NETWORK = "main";
@@ -897,6 +897,7 @@
             network: NETWORK
           })
 
+          // Contract
           user_address = await web3.currentProvider.selectedAddress;
           userInviteList = await f0.myInvites();
           userInviteKeys = Object.keys(userInviteList);
@@ -906,25 +907,27 @@
           nextId = await f0.api.nextId().call();
           nextIdC = parseInt(nextId);
 
+          // Controller
           is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-
+          staked_tokens = await get_staked_tokens(user_address);
+          stakers_info = await stakers(user_address);
+        
           //document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
 
-          if (owned_frogs <= 0) { // ❌ No FROGS
-            consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS!<br>'+'<p></p>')
+          if (owned_frogs <= 0 && staked_tokens <= 0) { // ❌ No FROGS
+
+            consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! ['+staked_tokens+'] Staked<br>'+'<p></p>')
+
           } else {
+
             consoleOutput('<br>'+'<strong>Connected!</strong> Loading... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
 
             console.log('Connected User : ' + user_address);
             console.log('Staking isApprovedForAll : ' + is_approved)
-
-            staked_tokens = await get_staked_tokens(user_address);
             console.log('Total Staked Tokens : ' + staked_tokens);
-
-            stakers_info = await stakers(user_address);
             console.log('UnClaimed Rewards : ' + stakers_info)
-
             console.log('Loading data from OpenSea...')
+
             fetch_user_tokens();
 
           }
@@ -1372,8 +1375,6 @@
       // withdraw()
       async function withdraw(token_id) {
 
-        //
-
         try {
 
           if (!is_approved) {
@@ -1426,7 +1427,7 @@
       // render_token()
       async function render_token(token_id, staked, cost) {
 
-        consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+owned_frogs+' ] Frogs belong to this wallet!<br>'+'[ '+staked_frogs+' ] Frogs currently staked!<br>'+'<div id="display_frog"></div><hr>')
+        consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+owned_frogs+' ] Frogs belong to this wallet!<br>'+'[ '+staked_frogs+' ] Frogs currently staked!<br>'+'Rewards Available : [ '+staked_info+' $FLYZ ] <br>'+'<div id="display_frog"></div><hr>')
 
         try {
 
