@@ -626,10 +626,11 @@
   .frog_button {
     border: 1px solid lightgrey;
     background-color: white;
+    color: #222;
+    padding: 4px;
     border-radius: 5px;
-    padding: 8px;
-    box-shadow: 3px 3px rgb(122 122 122 / 20%);
-    height: 34px;
+    font-weight: bold;
+    padding: 14px;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -1340,7 +1341,7 @@
           }
 
           let button_b = document.createElement('div');
-          button_b.innerHTML = '<br><a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button"><strong>OpenSea 🡥</strong>view on OpenSea</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
+          button_b.innerHTML = '<br><a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
           document.getElementById('traits_'+token_id).appendChild(button_b);
 
         } catch (e) { console.log(e.message); }
@@ -1453,8 +1454,8 @@
             <img src="../assets/frogs/websiteBannerFinal_2.png" style="border-radius: 5px; height: auto !important; width: 100% !important; margin-bottom: 14px; transform: scale(1.01);">
             <br>
             <h2 style="color: white !important;"><b>freshfrogs.io/the-pond🍀</b></h2>
-            <br><a class="pointer" href="https://freshfrogs.io/the-pond"><button class="frog_button"><strong>🔌 Connect Wallet</strong>Connect to view Frog tokens...</button></a>
-            <hr class="hr2"><a class="pointer" href="https://freshfrogs.io/"><button class="frog_button"><strong>🍃 Minting Terminal</strong>Mint from the collection...</button></a>
+            <br>Connect to view Frog tokens...<a class="pointer" href="https://freshfrogs.io/the-pond"><b id="connected">🔌 Connect Wallet</b></a>
+            <hr class="hr2">Mint from the collection...<a class="pointer" href="https://freshfrogs.io/"><b>🍃 Minting Terminal</b></a>
             <br>
             <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a></div>
           </div>
