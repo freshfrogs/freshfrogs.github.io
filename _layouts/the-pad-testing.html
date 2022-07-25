@@ -869,8 +869,10 @@
             consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS!<br>'+'<p></p>')
           } else {
             consoleOutput('<br>'+'<strong>Connected!</strong> Loading Frogs from OpenSea... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
-            let temp_results = await get_staked_tokens(user_address);
+
+            staked_tokens = await get_staked_tokens(user_address);
             console.log(temp_results);
+
           }
 
         } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
@@ -1292,6 +1294,13 @@
         try {
 
           let staked_tokens = await controller.methods.getStakedTokens(user_address).call();
+
+          for (var i = 0; i < staked_tokens.length; i++) {
+
+            console.log(staked_tokens[i].tokenId);
+
+          }
+
           return staked_tokens
 
         } catch (e) { console.log(e.message); }
