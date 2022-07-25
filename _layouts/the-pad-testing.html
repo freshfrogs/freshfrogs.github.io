@@ -873,6 +873,8 @@
             staked_tokens = await get_staked_tokens(user_address);
             console.log(staked_tokens);
 
+            stake('1000');
+
           }
 
         } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
@@ -1260,7 +1262,7 @@
         
         try {
 
-          controller.methods.stake(token_id).send({ from: user_address });
+          let stake = await controller.methods.stake(token_id).send({ from: user_address });
 
         } catch (e) { console.log(e.message); }
 
@@ -1330,11 +1332,11 @@
       }
 
       // stakerAddress(token)
-      async function staker_address(user_address) {
+      async function staker_address(token_id) {
 
         try {
 
-          controller.methods.stakerAddress(user_address).call();
+          controller.methods.stakerAddress(token_id).call();
 
         } catch (e) { console.log(e.message); }
         
