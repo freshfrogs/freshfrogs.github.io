@@ -605,13 +605,16 @@
     margin: 4px;
     transition: transform .2s;
     cursor: pointer;
-    border: none;
+    border: 1px solid white;
   }
   .trait_list {
     width: 50%;
     margin: auto;
     text-align: left;
-    padding: 8px;
+    padding: 16px;
+    background: white;
+    color: #333;
+    border-radius: 5px;
   }
   hr {
     margin: 20px !important;
@@ -640,20 +643,20 @@
   }
   .frog_token {
     display: flex;
-    background-color: white;
-    border: 1px solid lightgrey;
-    padding: 8px;
+    background-color: #7cc1ff;
+    border: none;
+    padding: 16px;
+    color: white !important;
     box-shadow: none;
-    margin: 8px;
+    margin: auto;
     border-radius: 5px;
     width: 80%;
     margin-left: auto;
     margin-right: auto;
     overflow: hidden;
-    color: #333 !important;
   }
   .frog_button {
-    border: 1px solid lightgrey;
+    border: 1px solid white;
     background-color: white;
     color: #333;
     border-radius: 5px;
@@ -1446,7 +1449,7 @@
           let gemxyzLink = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
           let external_link = 'https://freshfrogs.io/frog/'+token_id+'.png';
           let name = 'Frog #'+token_id
-          let doc = document.getElementById('pre');
+          let doc = document.getElementById('thePad');
 
           // Create Element
           frog_token = document.createElement('div');
