@@ -692,8 +692,9 @@
       gtag('js', new Date());
       gtag('config', 'G-6PB0WKB4SH');
       // -- >
-
-      var user_address, userInviteList, userInviteKeys, owned_frogs, staked_frogs, contractName, contractSymbol, nextId, nextIdC, collection, COLLECTION, traits_list;
+      
+      var user_address, userInviteList, userInviteKeys, owned_frogs, staked_frogs, contractName, contractSymbol, nextId, nextIdC, collection, COLLECTION, traits_list, CONTROLLER_ADDRESS, controller, CONTROLLER, is_approved;
+      var CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
       var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
       var NETWORK = "main";
       var morph = sub_frog = base_frog = false;
@@ -883,9 +884,7 @@
             }
           ]
 
-        const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
         CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
-
         COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
 
         try { // Connect Wallet, Factoria
@@ -907,8 +906,6 @@
 
           is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
 
-          console.log('isApprovedForAll : ' + is_approved)
-
           //document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
 
           if (owned_frogs <= 0) { // ❌ No FROGS
@@ -919,6 +916,8 @@
             fetch_user_tokens();
 
             console.log('Connected User : ' + user_address);
+
+            console.log('Staking isApprovedForAll : ' + is_approved)
 
             staked_tokens = staked_frogs = await get_staked_tokens(user_address);
             console.log('Total Staked Tokens : ' + staked_tokens);
