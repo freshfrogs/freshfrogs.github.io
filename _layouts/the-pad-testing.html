@@ -667,143 +667,8 @@
         const CONTROLLER_ABI =
           [
             {
-              "inputs": [
-                {
-                  "internalType": "uint256[]",
-                  "name": "tokenIds",
-                  "type": "uint256[]"
-                }
-              ],
-              "name": "claim",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "account",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256[]",
-                  "name": "tokenIds",
-                  "type": "uint256[]"
-                }
-              ],
-              "name": "claimForAddress",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "contract IERC721Upgradeable",
-                  "name": "_nft",
-                  "type": "address"
-                },
-                {
-                  "internalType": "contract FreshFrogsFLYZ",
-                  "name": "_token",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "nonpayable",
-              "type": "constructor"
-            },
-            {
-              "anonymous": false,
-              "inputs": [
-                {
-                  "indexed": false,
-                  "internalType": "address",
-                  "name": "owner",
-                  "type": "address"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "uint256",
-                  "name": "amount",
-                  "type": "uint256"
-                }
-              ],
-              "name": "Claimed",
-              "type": "event"
-            },
-            {
-              "anonymous": false,
-              "inputs": [
-                {
-                  "indexed": false,
-                  "internalType": "address",
-                  "name": "owner",
-                  "type": "address"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "uint256",
-                  "name": "tokenId",
-                  "type": "uint256"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "uint256",
-                  "name": "value",
-                  "type": "uint256"
-                }
-              ],
-              "name": "NFTStaked",
-              "type": "event"
-            },
-            {
-              "anonymous": false,
-              "inputs": [
-                {
-                  "indexed": false,
-                  "internalType": "address",
-                  "name": "owner",
-                  "type": "address"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "uint256",
-                  "name": "tokenId",
-                  "type": "uint256"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "uint256",
-                  "name": "value",
-                  "type": "uint256"
-                }
-              ],
-              "name": "NFTUnstaked",
-              "type": "event"
-            },
-            {
-              "anonymous": false,
-              "inputs": [
-                {
-                  "indexed": true,
-                  "internalType": "address",
-                  "name": "previousOwner",
-                  "type": "address"
-                },
-                {
-                  "indexed": true,
-                  "internalType": "address",
-                  "name": "newOwner",
-                  "type": "address"
-                }
-              ],
-              "name": "OwnershipTransferred",
-              "type": "event"
-            },
-            {
               "inputs": [],
-              "name": "renounceOwnership",
+              "name": "claimRewards",
               "outputs": [],
               "stateMutability": "nonpayable",
               "type": "function"
@@ -811,9 +676,9 @@
             {
               "inputs": [
                 {
-                  "internalType": "uint256[]",
-                  "name": "tokenIds",
-                  "type": "uint256[]"
+                  "internalType": "uint256",
+                  "name": "_tokenId",
+                  "type": "uint256"
                 }
               ],
               "name": "stake",
@@ -824,12 +689,28 @@
             {
               "inputs": [
                 {
-                  "internalType": "address",
-                  "name": "newOwner",
+                  "internalType": "contract IERC721",
+                  "name": "_nftCollection",
+                  "type": "address"
+                },
+                {
+                  "internalType": "contract IERC20",
+                  "name": "_rewardsToken",
                   "type": "address"
                 }
               ],
-              "name": "transferOwnership",
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_tokenId",
+                  "type": "uint256"
+                }
+              ],
+              "name": "withdraw",
               "outputs": [],
               "stateMutability": "nonpayable",
               "type": "function"
@@ -837,25 +718,12 @@
             {
               "inputs": [
                 {
-                  "internalType": "uint256[]",
-                  "name": "tokenIds",
-                  "type": "uint256[]"
-                }
-              ],
-              "name": "unstake",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
                   "internalType": "address",
-                  "name": "account",
+                  "name": "_staker",
                   "type": "address"
                 }
               ],
-              "name": "balanceOf",
+              "name": "availableRewards",
               "outputs": [
                 {
                   "internalType": "uint256",
@@ -869,83 +737,29 @@
             {
               "inputs": [
                 {
-                  "internalType": "uint256[]",
-                  "name": "tokenIds",
-                  "type": "uint256[]"
-                }
-              ],
-              "name": "earningInfo",
-              "outputs": [
-                {
-                  "internalType": "uint256[2]",
-                  "name": "info",
-                  "type": "uint256[2]"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
                   "internalType": "address",
-                  "name": "",
-                  "type": "address"
-                },
-                {
-                  "internalType": "address",
-                  "name": "from",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "",
-                  "type": "bytes"
-                }
-              ],
-              "name": "onERC721Received",
-              "outputs": [
-                {
-                  "internalType": "bytes4",
-                  "name": "",
-                  "type": "bytes4"
-                }
-              ],
-              "stateMutability": "pure",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "owner",
-              "outputs": [
-                {
-                  "internalType": "address",
-                  "name": "",
+                  "name": "_user",
                   "type": "address"
                 }
               ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "account",
-                  "type": "address"
-                }
-              ],
-              "name": "tokensOfOwner",
+              "name": "getStakedTokens",
               "outputs": [
                 {
-                  "internalType": "uint256[]",
-                  "name": "ownerTokens",
-                  "type": "uint256[]"
+                  "components": [
+                    {
+                      "internalType": "address",
+                      "name": "staker",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "tokenId",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct FreshFrogsController.StakedToken[]",
+                  "name": "",
+                  "type": "tuple[]"
                 }
               ],
               "stateMutability": "view",
@@ -953,12 +767,25 @@
             },
             {
               "inputs": [],
-              "name": "totalStaked",
+              "name": "nftCollection",
               "outputs": [
                 {
-                  "internalType": "uint256",
+                  "internalType": "contract IERC721",
                   "name": "",
-                  "type": "uint256"
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "rewardsToken",
+              "outputs": [
+                {
+                  "internalType": "contract IERC20",
+                  "name": "",
+                  "type": "address"
                 }
               ],
               "stateMutability": "view",
@@ -972,22 +799,41 @@
                   "type": "uint256"
                 }
               ],
-              "name": "vault",
+              "name": "stakerAddress",
               "outputs": [
                 {
-                  "internalType": "uint24",
-                  "name": "tokenId",
-                  "type": "uint24"
-                },
-                {
-                  "internalType": "uint48",
-                  "name": "timestamp",
-                  "type": "uint48"
-                },
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
                 {
                   "internalType": "address",
-                  "name": "owner",
+                  "name": "",
                   "type": "address"
+                }
+              ],
+              "name": "stakers",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "amountStaked",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "timeOfLastUpdate",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "unclaimedRewards",
+                  "type": "uint256"
                 }
               ],
               "stateMutability": "view",
@@ -995,7 +841,7 @@
             }
           ]
 
-        const CONTROLLER_ADDRESS = '0xd302B8B0Dc965553b1D8c247E2cdA5E1F600640f';
+        const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
         CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
 
         COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
@@ -1387,7 +1233,7 @@
 
           })
 
-          fetch_stake_info();
+          console.log(get_staked_tokens(user_address));
 
         })
         .catch(e => {
@@ -1397,23 +1243,105 @@
         })
       }
 
-      async function fetch_stake_info() {
+      // claimRewards()
+      async function claim_rewards(user_address) {
 
-        // display all values
-        for (var i = 0; i < frog_array.length; i++) {
+        try {
 
-          token_id = frog_array[i];
+          controller.methods.claimRewards(user_address).send({ from: user_address });
 
-          let stake_data = await controller.methods.vault(token_id).call();
-          let owner = stake_data.owner;
-
-          if (user_address === owner.toLowerCase()) {
-
-            console.log('Staked by USER! : Frog #'+token_id);
-
-          }
-        }
+        } catch (e) { console.log(e.message); }
+        
       }
+
+      // stake()
+      async function stake(token_id) {
+        
+        try {
+
+          controller.methods.stake(token_id).send({ from: user_address });
+
+        } catch (e) { console.log(e.message); }
+
+      }
+
+      // withdraw()
+      async function withdraw(token_id) {
+
+        try {
+
+          controller.methods.withdraw(token_id).send({ from: user_address });
+
+        } catch (e) { console.log(e.message); }
+        
+      }
+
+      // availableRewards()
+      async function available_rewards(user_address) {
+
+        try {
+
+          controller.methods.availableRewards(user_address).call();
+
+        } catch (e) { console.log(e.message); }
+        
+      }
+
+      // getStakedTokens()
+      async function get_staked_tokens(user_address) {
+
+        try {
+
+          return controller.methods.getStakedTokens(user_address).call();
+
+        } catch (e) { console.log(e.message); }
+
+      }
+
+      // nftCollection()
+      async function nft_collection() {
+
+        try {
+
+          controller.methods.nftCollection().call();
+
+        } catch (e) { console.log(e.message); }
+        
+      }
+
+      // rewardsToken()
+      async function rewards_token() {
+
+        try {
+
+          controller.methods.rewardsToken().call();
+
+        } catch (e) { console.log(e.message); }
+        
+      }
+
+      // stakerAddress(token)
+      async function staker_address(user_address) {
+
+        try {
+
+          controller.methods.stakerAddress(user_address).call();
+
+        } catch (e) { console.log(e.message); }
+        
+      }
+
+      // stakers() function
+      async function stakers(user_address) {
+
+        try {
+
+          controller.methods.stakers().call();
+
+        } catch (e) { console.log(e.message); }
+        
+      }
+
 
       // Check owned tokens
 
