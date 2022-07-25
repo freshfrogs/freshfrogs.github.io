@@ -1449,7 +1449,7 @@
         try {
 
           let stakers_return = await controller.methods.stakers(user_address).call();
-          return (stakers_return.unclaimedRewards / 1000000000000000000);
+          return (stakers_return.unclaimedRewards / 1000000000000000000).slice(0, 9);
 
         } catch (e) { console.log(e.message); }
         
