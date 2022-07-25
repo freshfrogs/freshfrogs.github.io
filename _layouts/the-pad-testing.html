@@ -626,11 +626,9 @@
   .frog_button {
     border: 1px solid lightgrey;
     background-color: white;
-    color: #222;
-    padding: 4px;
     border-radius: 5px;
     font-weight: bold;
-    padding: 14px;
+    padding: 8px;
     box-shadow: 3px 3px rgb(122 122 122 / 20%);
     height: 34px;
   }
@@ -1343,7 +1341,7 @@
           }
 
           let button_b = document.createElement('div');
-          button_b.innerHTML = '<br><a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
+          button_b.innerHTML = '<br><a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button"><strong>OpenSea 🡥</strong>view on OpenSea</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
           document.getElementById('traits_'+token_id).appendChild(button_b);
 
         } catch (e) { console.log(e.message); }
