@@ -680,6 +680,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
     
+    <script src="https://freshfrogs.io/the-pond/banner/FileSaver.js"></script>
+    <script src="https://freshfrogs.io/the-pond/banner/dom-to-image.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
@@ -998,10 +1000,8 @@
             morph = true;
             document.getElementById('baseText').innerHTML = 'select frog!'
           } else if (morph) {
-            alert('Create new custom Frog on Ethereum! Coming soon!')
-            console.log('Frog Morph')
-            console.log('Frog #'+base_frog)
-            console.log('Frog #'+sub_frog)
+            console.log('Sending Image...');
+            takeScreenShot()
           } 
 
         }
@@ -1015,6 +1015,17 @@
           document.getElementById('selectSub').innerHTML = '<strong>UnStake!</strong><frog id="baseText">Return token</frog>'
           document.getElementById('selectSub').onclick = function() { withdraw(token); }
         }
+
+      }
+
+      window.takeScreenShot = function() {
+
+        //var node = document.getElementById('my-node');
+
+        domtoimage.toBlob(document.getElementById('my-node'))
+        .then(function (blob) {
+            window.saveAs(blob, 'fresh-frogs-banner.png');
+        });
 
       }
 
@@ -1542,7 +1553,7 @@
           </ul>
           <br>
           <div id="mintingTray" class="mintingTray">
-            <div class="bigContainer">
+            <div id="my-node" class="bigContainer">
               <div id="frogContainer3" class="containerMint">
                 <div id="frogContainer4" class="imgWrapperMint">
                   <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/FLY.gif"/>
