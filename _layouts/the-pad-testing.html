@@ -909,12 +909,8 @@
           nextIdC = parseInt(nextId);
 
           // Controller
-          is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-          staked_tokens = await get_staked_tokens(user_address);
-          stakers_info = await controller.methods.stakers(user_address).call();
-          
-          temp = (stakers_info.unclaimedRewards / 1000000000000000000);
-          stakers_rewards = String(temp).slice(0, 6);
+          is_approved;
+          staked_tokens = owned_frogs;
         
           //document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
 
@@ -927,10 +923,8 @@
             consoleOutput('<br>'+'<strong>Connected!</strong> Loading... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
 
             console.log('Connected User : ' + user_address);
-            console.log('Staking isApprovedForAll : ' + is_approved);
             console.log('Total Staked Tokens : ' + staked_tokens);
-            console.log('UnClaimed Rewards : ' + stakers_rewards + '('+temp+')');
-            console.log('Loading data from OpenSea...');
+            console.log('Loading VAULT data from OpenSea...');
 
             fetch_user_tokens();
 
@@ -1431,8 +1425,6 @@
       // render_token()
       async function render_token(token_id, staked, staked_owner) {
 
-        consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+owned_frogs+' ] Frogs belong to this wallet!<br>'+'[ '+staked_frogs+' ] Frogs currently staked!<br>'+'[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'+'<div id="display_frog"></div><hr>')
-
         try {
 
           // Variables
@@ -1565,7 +1557,8 @@
         .then((tokens) => {
 
           //consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<div id="display_frog"></div><hr>')
-
+          consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+owned_frogs+' ] Frogs belong to this wallet!<br>'+'[ '+staked_frogs+' ] Frogs currently staked!<br>'+'[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'+'<div id="display_frog"></div><hr>')
+          
           var { assets } = tokens
           assets.forEach((frog) => { // console.log(frog)
 
