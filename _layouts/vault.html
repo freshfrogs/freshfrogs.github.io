@@ -1044,7 +1044,7 @@
 
           if (!is_approved) {
 
-            consoleOutput('<br>'+'<strong>Sign Txn setApprovalForAll</strong>'+'<br>'+'Please sign the transaction and wait...<br>This is one time transaction to allow staking.'+'<p></p>')
+            consoleOutput('<br>'+'<strong>Sign Txn setApprovalForAll</strong>'+'<br>'+'Please sign the transaction and wait...<br>This is a one time transaction to allow staking.'+'<p></p>')
             
             let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
 
