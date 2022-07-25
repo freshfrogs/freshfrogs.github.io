@@ -912,10 +912,15 @@
           } else {
             consoleOutput('<br>'+'<strong>Connected!</strong> Loading Frogs from OpenSea... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
 
+            fetch_user_tokens();
+
+            console.log('Connected User : ' + user_address);
+            
             staked_tokens = staked_frogs = await get_staked_tokens(user_address);
             console.log('Total Staked Tokens : ' + staked_tokens);
+
             stakers_info = await stakers(user_address);
-            console.log(stakers_info)
+            console.log('UnClaimed Rewards : ' + stakers_info)
 
           }
 
@@ -1463,6 +1468,40 @@
           address.length - 5,
           address.length
         )}`;
+      }
+
+      // Check owned tokens
+
+      function fetch_user_tokens() {
+
+        const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
+
+        fetch('https://api.opensea.io/api/v1/assets?owner='+user_address+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+        .then((tokens) => tokens.json())
+        .then((tokens) => {
+
+          //consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<div id="display_frog"></div><hr>')
+
+          var { assets } = tokens
+          assets.forEach((frog) => { // console.log(frog)
+
+            try {
+
+              var { name, token_metadata, permalink, traits, external_link, token_id } = frog
+
+            } catch (e) { console.log(e.message); }
+
+            render_token(token_id)
+
+          })
+
+        })
+        .catch(e => {
+
+          console.log(e.message);
+          console.log('Error: OpenSea Error! fetch_user_tokens()');
+      
+        })
       }
 
 
