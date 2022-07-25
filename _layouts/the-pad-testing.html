@@ -577,12 +577,12 @@
   .mintingTextWhite2 {
     background-color: white;
     border: 1px solid white;
-    padding: 8px;
+    padding: 16px;
     color: #333 !important;
     box-shadow: 3px 3px rgb(122 122 122 / 20%);
     margin: auto;
     border-radius: 5px;
-    width: 85%;
+    width: 80%;
     margin-left: auto;
     margin-right: auto;
     overflow: hidden;
@@ -667,12 +667,6 @@
   .frog_button:hover {
     background-color: #7cc1ff;
     color: white;
-  }
-  .console-pre {
-    margin: 8px;
-    padding: 16px;
-    border-radius: 5px;
-    border: 1px solid lightgrey;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -926,7 +920,7 @@
 
           if (owned_frogs <= 0 && staked_tokens <= 0) { // ❌ No FROGS
 
-            Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div class="console-pre" id="console-pre"></div>')
+            Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div id="console-pre"></div>')
 
           } else {
 
@@ -936,7 +930,7 @@
             console.log('UnClaimed Rewards : ' + stakers_rewards + '('+temp+')');
             console.log('Loading data from OpenSea...');
 
-            Output('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frogs(s) Staked | '+stakers_rewards+' $FLYZ <br><hr>'+'<div class="console-pre" id="console-pre"></div>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
+            Output('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frogs(s) Staked | '+stakers_rewards+' $FLYZ <br><hr>'+'<div id="console-pre"></div>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
 
             fetch_user_tokens();
           }
@@ -1349,7 +1343,7 @@
         
         try {
 
-          console_pre = document.getElementById('console-pre');
+          console_pre = document.getElementById('pre');
           console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
 
           if (!is_approved) {
@@ -1392,7 +1386,7 @@
 
         try {
 
-          console_pre = document.getElementById('console-pre');
+          console_pre = document.getElementById('pre');
           console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
 
           if (!is_approved) {
