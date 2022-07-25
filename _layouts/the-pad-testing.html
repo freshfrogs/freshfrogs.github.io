@@ -640,11 +640,11 @@
   }
   .frog_token {
     display: flex;
-    background-color: white;
-    border: 1px solid white;
+    background-color: #7cc1ff;
+    border: none;
     padding: 16px;
-    color: #333 !important;
-    box-shadow: 3px 3px rgb(122 122 122 / 20%);
+    color: white !important;
+    box-shadow: none;
     margin: auto;
     border-radius: 5px;
     width: 80%;
@@ -1361,7 +1361,7 @@
           }
 
           doc.appendChild(frog_token);
-          document.getElementById('traits_'+token_id).innerHTML = '<strong><u>'+name+'</u></strong>';
+          document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: white !important;"><u>'+name+'</u></strong>';
 
           let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
 
