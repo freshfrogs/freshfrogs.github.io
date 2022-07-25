@@ -1343,9 +1343,12 @@
         
         try {
 
+          console_pre = document.getElementById('pre');
+          console_pre.scrollIntoView();
+
           if (!is_approved) {
 
-            document.getElementById('pre').style.backgroundColor = 'white'
+            console_pre.style.backgroundColor = 'white'
 
             consoleOutput('<strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
               '<div style="text-align: left;">'+
@@ -1363,7 +1366,7 @@
             '<br><b>2.) Transfer NFT</b><br> Transfer FROG #'+token_id+' to staking protocol, requires a gas fee.<br>'+
             '</div>')
             
-          document.getElementById('pre').style.backgroundColor = '#99ffc5'
+            console_pre.style.backgroundColor = '#99ffc5'
 
           let stake = await controller.methods.stake(token_id).send({ from: user_address });
           consoleOutput('<strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been staked!');
@@ -1372,7 +1375,7 @@
 
           console.log(e.message);
           consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
-          document.getElementById('pre').style.backgroundColor = '#ff99b6';
+          console_pre.style.backgroundColor = '#ff99b6';
 
         }
 
@@ -1383,9 +1386,12 @@
 
         try {
 
+          console_pre = document.getElementById('pre');
+          console_pre.scrollIntoView();
+
           if (!is_approved) {
 
-            document.getElementById('pre').style.backgroundColor = 'white'
+            console_pre.style.backgroundColor = 'white'
 
             consoleOutput('<strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
               '<div style="text-align: left;">'+
@@ -1403,7 +1409,7 @@
             '<br><b>2.) Retrieve NFT</b><br> Transfer FROG #'+token_id+' from staking protocol, requires a gas fee.<br>'+
             '</div>')
             
-          document.getElementById('pre').style.backgroundColor = '#99ffc5'
+            console_pre.style.backgroundColor = '#99ffc5'
 
           let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
           consoleOutput('<strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been un-staked!');
@@ -1412,7 +1418,7 @@
 
           console.log(e.message);
           consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
-          document.getElementById('pre').style.backgroundColor = '#ff99b6';
+          console_pre.style.backgroundColor = '#ff99b6';
 
         }
         
