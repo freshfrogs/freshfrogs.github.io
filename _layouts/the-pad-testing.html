@@ -920,7 +920,7 @@
 
           if (owned_frogs <= 0 && staked_tokens <= 0) { // ❌ No FROGS
 
-            consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br>'+'<p></p>')
+            Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br>'+'<div id="console-pre"></div>')
 
           } else {
 
@@ -930,10 +930,9 @@
             console.log('UnClaimed Rewards : ' + stakers_rewards + '('+temp+')');
             console.log('Loading data from OpenSea...');
 
-            consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frogs(s) Staked | '+stakers_rewards+' $FLYZ <br>'+'<div id="display_frog"></div><hr>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
+            Output('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frogs(s) Staked | '+stakers_rewards+' $FLYZ <br>'+'<div id="console-pre"></div><hr>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
 
             fetch_user_tokens();
-            
           }
 
         } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
@@ -947,9 +946,11 @@
       }
 
       function consoleOutput(output) {
-        return_temp = document.createElement('div')
-        return_temp.innerHTML = output
-        document.getElementById("pre").appendChild(output);// = output
+        document.getElementById("console-pre").innerHTML = output;
+      }
+
+      function Output(output) {
+        document.getElementById("pre").innerHTML = output;
       }
 
       function load_trait(trait, attribute, where) {
