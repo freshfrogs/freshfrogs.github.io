@@ -919,7 +919,7 @@
 
             console.log('Staking isApprovedForAll : ' + is_approved)
 
-            staked_tokens = staked_frogs = await get_staked_tokens(user_address);
+            staked_tokens = await get_staked_tokens(user_address);
             console.log('Total Staked Tokens : ' + staked_tokens);
 
             stakers_info = await stakers(user_address);
@@ -978,7 +978,7 @@
 
         openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
         etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
-        
+
         display_frog = 'https://freshfrogs.io/frog/'+token+'.png'
         display_name = 'Frog #'+token
         display_os = ''
@@ -1432,7 +1432,7 @@
             render_token(tokenId, true)
 
           }
-
+          staked_frogs = staked_tokens.length;
           return staked_tokens.length;
 
         } catch (e) { console.log(e.message); }
