@@ -1323,7 +1323,7 @@
 
           if (!is_approved) {
 
-            let set_approval = await collection.methods.setApprobalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
+            let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
 
             let stake = await controller.methods.stake(token_id).send({ from: user_address });
 
