@@ -1353,7 +1353,7 @@
 
             let stake = await controller.methods.stake(token_id).send({ from: user_address });
 
-            consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>Frog #'+token_id+'</b> has successfully been staked! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>Refresh Page!</a></b></div><br>')
+            consoleOutput('<br>'+'<strong>Congratulations</strong><br>Frog #'+token_id+' has successfully been staked!'+'<p></p>');
             document.getElementById('pre').style.backgroundColor = '#99ffc5'
 
           } else {
@@ -1363,7 +1363,8 @@
 
             let stake = await controller.methods.stake(token_id).send({ from: user_address });
 
-            consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>Frog #'+token_id+'</b> has successfully been staked! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>Refresh Page!</a></b></div><br>')
+            //consoleOutput('<br><strong>Congratulations!</strong> <b>Frog #'+token_id+'</b> has successfully been staked!</div><br>')
+            consoleOutput('<br>'+'<strong>Congratulations</strong><br>Frog #'+token_id+' has successfully been staked!'+'<p></p>');
             document.getElementById('pre').style.backgroundColor = '#99ffc5'
 
           }
@@ -1394,7 +1395,7 @@
 
             let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
 
-            consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>Frog #'+token_id+'</b> has successfully been unstaked! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>Refresh Page!</a></b></div><br>')
+            consoleOutput('<br>'+'<strong>Congratulations</strong><br>Frog #'+token_id+' has successfully been un-staked!'+'<p></p>');
             document.getElementById('pre').style.backgroundColor = '#99ffc5'
 
           } else {
@@ -1404,7 +1405,7 @@
 
             let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
 
-            consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>Frog #'+token_id+'</b> has successfully been unstaked! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>Refresh Page!</a></b></div><br>')
+            consoleOutput('<br>'+'<strong>Congratulations</strong><br>Frog #'+token_id+' has successfully been un-staked!'+'<p></p>');
             document.getElementById('pre').style.backgroundColor = '#99ffc5'
 
           }
