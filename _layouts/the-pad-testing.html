@@ -1004,7 +1004,7 @@
 
         document.getElementById('selectSub').removeAttribute('href');
 
-        if (staked) {
+        if (!staked) {
           document.getElementById('selectSub').innerHTML = '<strong>Stake!</strong><frog id="baseText">earn rewards!</frog>'
           document.getElementById('selectSub').onclick = function() { claim(token); }
         } else {
