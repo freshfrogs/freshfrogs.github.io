@@ -1429,7 +1429,7 @@
       }
 
       // render_token()
-      async function render_token(token_id, staked, cost) {
+      async function render_token(token_id, staked, staked_owner) {
 
         consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+owned_frogs+' ] Frogs belong to this wallet!<br>'+'[ '+staked_frogs+' ] Frogs currently staked!<br>'+'[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'+'<div id="display_frog"></div><hr>')
 
@@ -1460,7 +1460,7 @@
           doc.appendChild(frog_token);
 
           if (staked) { // ff9999
-            document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: white !important;"><u>'+name+'</u> <b style="border-radius: 5px; background: rgb(122 122 122 / 20%); color: #ff9999;">(staked)</b></strong>';
+            document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: white !important;"><u>'+name+'</u> <b style="border-radius: 5px; background: rgb(122 122 122 / 20%); color: #ff9999;">(staked)</b></strong>'+'<br><i>'+truncateAddress(staked_owner)+'</i>';
           } else {
             document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: white !important;"><u>'+name+'</u></strong>';
           }
@@ -1486,21 +1486,14 @@
       }
 
       // getStakedTokens()
-      async function get_staked_tokens(user_address) {
+      async function get_staked_tokens(token_id) {
 
         try {
 
-          let staked_tokens = await controller.methods.getStakedTokens(user_address).call();
+          let staked_owner = await controller.methods.stakerAddress(token_id).call();
 
-          for (var i = 0; i < staked_tokens.length; i++) {
-
-            tokenId = staked_tokens[i].tokenId
-            console.log(tokenId);
-            render_token(tokenId, true)
-
-          }
-          staked_frogs = staked_tokens.length;
-          return staked_tokens.length;
+          console.log(tokenId);
+          render_token(tokenId, true, staked_owner)
 
         } catch (e) { console.log(e.message); }
 
@@ -1567,7 +1560,7 @@
 
         const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
 
-        fetch('https://api.opensea.io/api/v1/assets?owner='+user_address+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+        fetch('https://api.opensea.io/api/v1/assets?owner='+CONTROLLER_ADDRESS+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
         .then((tokens) => tokens.json())
         .then((tokens) => {
 
@@ -1582,7 +1575,7 @@
 
             } catch (e) { console.log(e.message); }
 
-            render_token(token_id)
+            render_token(token_id, true)
 
           })
 
@@ -1604,8 +1597,8 @@
         <div class="downloads pre">
           <ul class="downloads2">
             <li><a id="morphFrogs" class="pointer"><strong id="display_name">Fresh Frogs</strong><div id="display_type">ΞEthereum</div></a></li>
-            <li><a id="selectBase" class="pointer" href="http://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong><frog id="baseText">support</frog></a></li>
-            <li><a id="selectSub" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>OpenSea</strong><frog id="subText">marketplace</frog></a></li>
+            <li><a id="selectBase" class="pointer" href="http://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong><frog id="baseText">Support</frog></a></li>
+            <li><a id="selectSub" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>OpenSea</strong><frog id="subText">Marketplace</frog></a></li>
           </ul>
           <br>
           <div id="mintingTray" class="mintingTray">
