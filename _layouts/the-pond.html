@@ -911,10 +911,10 @@
           // Controller
           is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
           staked_tokens = await get_staked_tokens(user_address);
-          stakers_info = await stakers(user_address);
-
           stakers_info = await controller.methods.stakers(user_address).call();
-          stakers_rewards = (stakers_info.unclaimedRewards / 1000000000000000000).toString().slice(-10);
+
+          stakers_rewards = (stakers_info.unclaimedRewards / 1000000000000000000)
+          //stakers_rewards = temp.toString().slice(-10);
         
           //document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
 
@@ -929,7 +929,7 @@
             console.log('Connected User : ' + user_address);
             console.log('Staking isApprovedForAll : ' + is_approved)
             console.log('Total Staked Tokens : ' + staked_tokens);
-            console.log('UnClaimed Rewards : ' + stakers_info)
+            console.log('UnClaimed Rewards : ' + stakers_rewards + '('+temp+')')
             console.log('Loading data from OpenSea...')
 
             fetch_user_tokens();
