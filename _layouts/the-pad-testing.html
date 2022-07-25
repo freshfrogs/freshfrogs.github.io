@@ -641,7 +641,7 @@
   .frog_token {
     display: flex;
     background-color: white;
-    border: none;
+    border: 1px solid lightgrey;
     padding: 8px;
     box-shadow: none;
     margin: 8px;
@@ -930,11 +930,7 @@
             console.log('UnClaimed Rewards : ' + stakers_rewards + '('+temp+')');
             console.log('Loading data from OpenSea...');
 
-            Output('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frogs(s) Staked | '+stakers_rewards+' $FLYZ <br><hr>'+'<div id="console-pre"></div>'+
-              '<button class="frog_button">Morphing 🡥</button>'+
-              '<button class="frog_button">Staking 🡥</button>'+
-              '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="./banner" target="_blank"><button class="frog_button">Custom Banner 🡥</button></a>'
-            ); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
+            Output('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frogs(s) Staked | '+stakers_rewards+' $FLYZ <br><hr>'+'<div id="console-pre"></div>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
 
             fetch_user_tokens();
           }
@@ -1450,7 +1446,7 @@
           let gemxyzLink = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
           let external_link = 'https://freshfrogs.io/frog/'+token_id+'.png';
           let name = 'Frog #'+token_id
-          let doc = document.getElementById('thePad');
+          let doc = document.getElementById('pre');
 
           // Create Element
           frog_token = document.createElement('div');
