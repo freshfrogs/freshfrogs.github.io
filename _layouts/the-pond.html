@@ -920,7 +920,7 @@
 
           if (owned_frogs <= 0 && staked_tokens <= 0) { // ❌ No FROGS
 
-            Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br>'+'<div id="console-pre"></div>')
+            Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div id="console-pre"></div>')
 
           } else {
 
@@ -930,7 +930,7 @@
             console.log('UnClaimed Rewards : ' + stakers_rewards + '('+temp+')');
             console.log('Loading data from OpenSea...');
 
-            Output('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frogs(s) Staked | '+stakers_rewards+' $FLYZ <br>'+'<div id="console-pre"></div><hr>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
+            Output('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frogs(s) Staked | '+stakers_rewards+' $FLYZ <br><hr>'+'<div id="console-pre"></div>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
 
             fetch_user_tokens();
           }
@@ -1345,7 +1345,7 @@
 
           if (!is_approved) {
 
-            consoleOutput('<strong>Sign Txn setApprovalForAll</strong>'+'<br>'+'Please sign the transaction and wait...<br>This is a one time transaction to allow staking.'+
+            consoleOutput('<strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
               '<div style="text-align: left;">'+
               '<br><b>1.) Approve Contract</b> <br> This is a one time transaction to allow staking.<br>'+
               '<br><b>2.) Transfer NFT</b><br> Transfer FROG #'+token_id+' to staking protocol, requires a gas fee.<br>'+
@@ -1353,29 +1353,18 @@
             
             let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
 
-            document.getElementById('pre').style.backgroundColor = '#99ffc5'
+          } 
 
-            let stake = await controller.methods.stake(token_id).send({ from: user_address });
+          consoleOutput('<strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+            '<div style="text-align: left;">'+
+            '<br><b><strike>1.) Approve Contract</b> <br> This is a one time transaction to allow staking.</strike><br>'+
+            '<br><b>2.) Transfer NFT</b><br> Transfer FROG #'+token_id+' to staking protocol, requires a gas fee.<br>'+
+            '</div>')
+            
+          document.getElementById('pre').style.backgroundColor = '#99ffc5'
 
-            consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>Frog #'+token_id+'</b> has successfully been staked! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>Refresh Page!</a></b></div><br>')
-            document.getElementById('pre').style.backgroundColor = '#99ffc5'
-
-          } else {
-
-            consoleOutput('<br>'+'<strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
-              '<div style="text-align: left;">'+
-              '<br><b>1.) Approve Contract</b> <br> This is a one time transaction to allow staking.<br>'+
-              '<br><b>2.) Transfer NFT</b><br> Transfer FROG #'+token_id+' to staking protocol, requires a gas fee.<br>'+
-              '</div>')
-              
-            document.getElementById('pre').style.backgroundColor = '#99ffc5'
-
-            let stake = await controller.methods.stake(token_id).send({ from: user_address });
-
-            consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>Frog #'+token_id+'</b> has successfully been staked! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>Refresh Page!</a></b></div><br>')
-            document.getElementById('pre').style.backgroundColor = '#99ffc5'
-
-          }
+          let stake = await controller.methods.stake(token_id).send({ from: user_address });
+          consoleOutput('<strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been staked!');
 
         } catch (e) { 
 
@@ -1394,29 +1383,26 @@
 
           if (!is_approved) {
 
-            consoleOutput('<br>'+'<strong>Sign Txn setApprovalForAll</strong>'+'<br>'+'Please sign the transaction and wait...<br>This is a one time transaction to allow staking.'+'<p></p>')
+            consoleOutput('<strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+              '<div style="text-align: left;">'+
+              '<br><b>1.) Approve Contract</b> <br> This is a one time transaction to allow staking.<br>'+
+              '<br><b>2.) Retrieve NFT</b><br> Transfer FROG #'+token_id+' from staking protocol, requires a gas fee.<br>'+
+              '</div>')
             
             let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
 
-            consoleOutput('<br>'+'<strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
-            document.getElementById('pre').style.backgroundColor = '#99ffc5'
-
-            let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
-
-            consoleOutput('<br>'+'<strong>Congratulations</strong><br>Frog #'+token_id+' has successfully been un-staked!'+'<p></p>');
-            document.getElementById('pre').style.backgroundColor = '#99ffc5'
-
-          } else {
-
-            consoleOutput('<br>'+'<strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
-            document.getElementById('pre').style.backgroundColor = '#99ffc5'
-
-            let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
-
-            consoleOutput('<br>'+'<strong>Congratulations</strong><br>Frog #'+token_id+' has successfully been un-staked!'+'<p></p>');
-            document.getElementById('pre').style.backgroundColor = '#99ffc5'
-
           }
+            
+          consoleOutput('<strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+            '<div style="text-align: left;">'+
+            '<br><b><strike>1.) Approve Contract</b> <br> This is a one time transaction to allow staking.</strike><br>'+
+            '<br><b>2.) Retrieve NFT</b><br> Transfer FROG #'+token_id+' from staking protocol, requires a gas fee.<br>'+
+            '</div>')
+            
+          document.getElementById('pre').style.backgroundColor = '#99ffc5'
+
+          let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
+          consoleOutput('<strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been un-staked!');
 
         } catch (e) { 
 
@@ -1635,9 +1621,8 @@
             <img src="../assets/frogs/websiteBannerFinal_2.png" style="border-radius: 5px; height: auto !important; width: 100% !important; margin-bottom: 14px; transform: scale(1.01);">
             <br>
             <h2 style="color: white !important;"><b>freshfrogs.io/the-pond🍀</b></h2>
-            <br>Connect to view Frog tokens<a class="pointer" href="https://freshfrogs.io/the-pond"><b id="connected">🔌 Connect Wallet</b></a>
-            <hr class="hr2">Mint from the collection<a class="pointer" href="https://freshfrogs.io/"><b>🍃 Minting Terminal</b></a>
-            <hr class="hr2">View All staked Frogs!<a class="pointer" href="https://freshfrogs.io/vault"><b>🔒 Frog Vault</b></a>
+            <br>Mint From Collection!<a class="pointer" href="https://freshfrogs.io/"><b>🍃 Minting Terminal</b></a>
+            <hr class="hr2">View All Staked Frogs!<a class="pointer" href="https://freshfrogs.io/vault"><b>🔒 Frog Vault</b></a>
             <br>
             <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a></div>
           </div>
