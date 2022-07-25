@@ -1306,6 +1306,7 @@
           let gemxyzLink = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
           let external_link = 'https://freshfrogs.io/frog/'+token_id+'.png';
           let name = 'Frog #'+token_id
+          let doc = document.getElementById('pre');
 
           // Create Element
           frog_token = document.createElement('div');
@@ -1321,11 +1322,13 @@
             }
           }
 
-          document.getElementById('pre').appendChild(frog_token);
-          document.getElementById('traits_'+token_id).innerHTML = '<strong><u>'+name+'</u></strong>';
+          let doc_i = document.getElementById('traits_'+token_id);
+
+          doc.appendChild(frog_token);
+          doc_i.innerHTML = '<strong><u>'+name+'</u></strong>';
             
           let break_b = document.createElement('hr');
-          document.getElementById('pre').appendChild(break_b);
+          doc.appendChild(break_b);
 
           let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
 
@@ -1335,7 +1338,7 @@
 
             let trait_text = document.createElement('i')
             trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value
-            document.getElementById('traits_'+token_id).appendChild(trait_text)
+            doc_i.appendChild(trait_text)
 
           }
 
