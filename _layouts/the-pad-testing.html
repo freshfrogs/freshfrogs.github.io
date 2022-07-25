@@ -914,6 +914,8 @@
 
             staked_tokens = staked_frogs = await get_staked_tokens(user_address);
             console.log('Total Staked Tokens : ' + staked_tokens);
+            stakers_info = await stakers(user_address);
+            console.log(stakers_info)
 
           }
 
@@ -1448,7 +1450,8 @@
 
         try {
 
-          controller.methods.stakers().call();
+          let stakers_return = await controller.methods.stakers(user_address).call();
+          return stakers_return
 
         } catch (e) { console.log(e.message); }
         
