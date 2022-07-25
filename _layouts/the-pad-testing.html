@@ -976,6 +976,9 @@
       // Select Frog
       async function display_token(token, staked){
 
+        openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
+        etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
+        
         display_frog = 'https://freshfrogs.io/frog/'+token+'.png'
         display_name = 'Frog #'+token
         display_os = ''
@@ -985,9 +988,7 @@
 
         document.getElementById('previewImg').setAttribute('src', display_frog)
         document.getElementById('display_name').innerHTML = display_name
-
-        openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
-        etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
+        document.getElementById('morphFrogs').setAttribute('href', etherscanLink)
 
         document.getElementById('selectBase').removeAttribute('href');
         document.getElementById('selectBase').innerHTML = '<strong>Morph</strong><frog id="baseText">Meta-Morph!</frog>'
