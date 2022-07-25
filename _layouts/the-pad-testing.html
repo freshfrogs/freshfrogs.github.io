@@ -1492,7 +1492,7 @@
 
           let staked_owner = await controller.methods.stakerAddress(token_id).call();
 
-          console.log(tokenId);
+          console.log(tokenId+' : '+staked_owner);
           render_token(tokenId, true, staked_owner)
 
         } catch (e) { console.log(e.message); }
