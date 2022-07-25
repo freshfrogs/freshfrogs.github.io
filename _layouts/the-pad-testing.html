@@ -874,6 +874,7 @@
             console.log(staked_tokens);
 
             stake('1000');
+            withdraw('999');
 
           }
 
@@ -1273,7 +1274,7 @@
 
         try {
 
-          controller.methods.withdraw(token_id).send({ from: user_address });
+          let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
 
         } catch (e) { console.log(e.message); }
         
