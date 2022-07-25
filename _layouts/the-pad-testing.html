@@ -915,7 +915,7 @@
             fetch_user_tokens();
 
             console.log('Connected User : ' + user_address);
-            
+
             staked_tokens = staked_frogs = await get_staked_tokens(user_address);
             console.log('Total Staked Tokens : ' + staked_tokens);
 
@@ -1369,7 +1369,7 @@
           doc.appendChild(frog_token);
 
           if (staked) { // ff9999
-            document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: white !important;"><u>'+name+'</u> <b style="color: #ff9999;">(staked)</b></strong>';
+            document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: white !important;"><u>'+name+'</u> <b style="background: rgb(122 122 122 / 20%); color: #ff9999;">(staked)</b></strong>';
           } else {
             document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: white !important;"><u>'+name+'</u></strong>';
           }
