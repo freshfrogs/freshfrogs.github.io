@@ -1023,7 +1023,7 @@
             consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS!<br>'+'<p></p>')
           } else {
             consoleOutput('<br>'+'<strong>Connected!</strong> Loading Frogs from OpenSea... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
-            fetch_user_tokens();
+            fetch_staked_frogs();
           }
 
         } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
@@ -1368,25 +1368,51 @@
 
       }
 
-      async function fetch_stake_owner(token_id) {
+      async function fetch_staked_frogs() {
+
+        const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
+        
+        fetch('https://api.opensea.io/api/v1/assets?owner='+'0xd302B8B0Dc965553b1D8c247E2cdA5E1F600640f'+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+        .then((tokens) => tokens.json())
+        .then((tokens) => {
+
+          console.log('Connecting to FreshFrogsController via OpenSea...')
+          var { assets } = tokens
+          assets.forEach((frog) => { 
+
+            var { token_id } = frog
+
+            // append multiple values to the array
+            frog_array.push(token_id);
+
+          })
+
+          fetch_stake_info();
+
+        })
+        .catch(e => {
+
+          console.log('Error: Could not talk to OpenSea! '+e.message);
+      
+        })
+      }
+
+      async function fetch_stake_info() {
+
+        // display all values
+        for (var i = 0; i < frog_array.length; i++) {
+
+          token_id = frog_array[i];
 
           let stake_data = await controller.methods.vault(token_id).call();
-          return stake_data.owner;
+          let owner = stake_data.owner;
 
-      }
+          if (user_address === owner.toLowerCase()) {
 
-      async function STAKE_FROG(TOKEN_IDS) {
+            console.log('Staked by USER! : Frog #'+token_id);
 
-        console.log('Staking... : '+TOKEN_IDS)
-        controller.methods.stake([TOKEN_IDS]).send({from: user_address});
-
-      }
-
-      async function UN_STAKE_FROG(TOKEN_IDS) {
-
-        console.log('UnStaking... : '+TOKEN_IDS)
-        controller.methods.unstake([TOKEN_IDS]).send({from: user_address});
-
+          }
+        }
       }
 
       // Check owned tokens
@@ -1431,9 +1457,6 @@
               }
 
             } catch (e) { }
-
-            let stake_data = controller.methods.vault(token_id).call();
-            console.log(stake_data.owner);
             
             let openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
             let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
