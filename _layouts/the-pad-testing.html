@@ -1005,7 +1005,7 @@
         document.getElementById('selectSub').removeAttribute('href');
 
         if (!staked) {
-          document.getElementById('selectSub').innerHTML = '<strong>Stake!</strong><frog id="baseText">Earn rewards!</frog>'
+          document.getElementById('selectSub').innerHTML = '<strong>Stake!</strong><frog id="baseText">Earn $FLYZ</frog>'
           document.getElementById('selectSub').onclick = function() { stake(token); }
         } else {
           document.getElementById('selectSub').innerHTML = '<strong>UnStake!</strong><frog id="baseText">Return token</frog>'
