@@ -924,28 +924,16 @@
 
           } else {
 
-            consoleOutput('<br>'+'<strong>Connected!</strong> Loading... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
-
             console.log('Connected User : ' + user_address);
             console.log('Staking isApprovedForAll : ' + is_approved);
             console.log('Total Staked Tokens : ' + staked_tokens);
             console.log('UnClaimed Rewards : ' + stakers_rewards + '('+temp+')');
             console.log('Loading data from OpenSea...');
 
+            consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frogs(s) Staked | '+stakers_rewards+' $FLYZ <br>'+'<div id="display_frog"></div><hr>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
+
             fetch_user_tokens();
-
-            consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+owned_frogs+' ] Frogs belong to this wallet!<br>'+'[ '+staked_frogs+' ] Frogs currently staked!<br>'+'[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'+'<div id="display_frog"></div><hr>')
-            consoleOutput(
-              '<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+owned_frogs+' ] Frogs belong to this wallet!<br>'+'[ '+staked_frogs+' ] Frogs currently staked!<br>'+'[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'+'<div id="display_frog"></div><hr>'+
-              '<br>'+
-              '<strong><u>Staking Utility</u></strong><br>'+
-              'Stake FROG tokens in order to earn rewards!<br>'+
-              '<div style="text-align: left;">'+
-              '<br><b>1.) Approve Contract</b> <br> This is a one time transaction to allow staking.<br>'+
-              '<br><b>2.) Transfer NFT</b><br> Transfer FROG #1111 to staking protocol, requires a gas fee.<br>'+
-              '</div>'
-
-            )
+            
           }
 
         } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
@@ -959,7 +947,9 @@
       }
 
       function consoleOutput(output) {
-        document.getElementById("pre").innerHTML = output
+        return_temp = document.createElement('div')
+        return_temp.innerHTML = output
+        document.getElementById("pre").appendChild(output);// = output
       }
 
       function load_trait(trait, attribute, where) {
@@ -1354,15 +1344,15 @@
 
           if (!is_approved) {
 
-            consoleOutput('<br>'+'<strong>Sign Txn setApprovalForAll</strong>'+'<br>'+'Please sign the transaction and wait...<br>This is a one time transaction to allow staking.'+
+            consoleOutput('<strong>Sign Txn setApprovalForAll</strong>'+'<br>'+'Please sign the transaction and wait...<br>This is a one time transaction to allow staking.'+
               '<div style="text-align: left;">'+
               '<br><b>1.) Approve Contract</b> <br> This is a one time transaction to allow staking.<br>'+
               '<br><b>2.) Transfer NFT</b><br> Transfer FROG #'+token_id+' to staking protocol, requires a gas fee.<br>'+
               '</div>')
-
-            document.getElementById('pre').style.backgroundColor = '#99ffc5'
             
             let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
+
+            document.getElementById('pre').style.backgroundColor = '#99ffc5'
 
             let stake = await controller.methods.stake(token_id).send({ from: user_address });
 
@@ -1376,6 +1366,7 @@
               '<br><b>1.) Approve Contract</b> <br> This is a one time transaction to allow staking.<br>'+
               '<br><b>2.) Transfer NFT</b><br> Transfer FROG #'+token_id+' to staking protocol, requires a gas fee.<br>'+
               '</div>')
+              
             document.getElementById('pre').style.backgroundColor = '#99ffc5'
 
             let stake = await controller.methods.stake(token_id).send({ from: user_address });
@@ -1411,7 +1402,7 @@
 
             let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
 
-            consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>Frog #'+token_id+'</b> has successfully been unstaked! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>Refresh Page!</a></b></div><br>')
+            consoleOutput('<br>'+'<strong>Congratulations</strong><br>Frog #'+token_id+' has successfully been un-staked!'+'<p></p>');
             document.getElementById('pre').style.backgroundColor = '#99ffc5'
 
           } else {
@@ -1421,7 +1412,7 @@
 
             let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
 
-            consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>Frog #'+token_id+'</b> has successfully been unstaked! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>Refresh Page!</a></b></div><br>')
+            consoleOutput('<br>'+'<strong>Congratulations</strong><br>Frog #'+token_id+' has successfully been un-staked!'+'<p></p>');
             document.getElementById('pre').style.backgroundColor = '#99ffc5'
 
           }
