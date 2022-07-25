@@ -668,6 +668,12 @@
     background-color: #7cc1ff;
     color: white;
   }
+  .console-pre {
+    margin: 8px;
+    padding: 16px;
+    border-radius: 5px;
+    border: 1px solid lightgrey;
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -920,7 +926,7 @@
 
           if (owned_frogs <= 0 && staked_tokens <= 0) { // ❌ No FROGS
 
-            Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div id="console-pre"></div>')
+            Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div class="console-pre" id="console-pre"></div>')
 
           } else {
 
@@ -1343,7 +1349,7 @@
         
         try {
 
-          console_pre = document.getElementById('pre');
+          console_pre = document.getElementById('console-pre');
           console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
 
           if (!is_approved) {
@@ -1386,7 +1392,7 @@
 
         try {
 
-          console_pre = document.getElementById('pre');
+          console_pre = document.getElementById('console-pre');
           console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
 
           if (!is_approved) {
