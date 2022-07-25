@@ -1324,6 +1324,7 @@
 
           // Create Element
           frog_token = document.createElement('div');
+          frog_token.id = name;
           frog_token.className = 'frog_token';
           frog_token.innerHTML = '<img src="'+external_link+'" class="recentMint"/><div id="traits_'+token_id+'" class="trait_list"></div>';
           frog_token.onclick = function() { 
@@ -1352,8 +1353,8 @@
           }
 
           let button_b = document.createElement('div');
-          button_b.innerHTML = '<br><a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
-          document.getElementById('traits_'+token_id).appendChild(button_b);
+          button_b.innerHTML = '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
+          document.getElementById(name).appendChild(button_b);
 
         } catch (e) { console.log(e.message); }
 
