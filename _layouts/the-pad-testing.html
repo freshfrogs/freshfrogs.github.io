@@ -1001,7 +1001,7 @@
             document.getElementById('baseText').innerHTML = 'select frog!'
           } else if (morph) {
             console.log('Sending Image...');
-            takeScreenShot()
+            takeScreenShot();
           } 
 
         }
@@ -1022,7 +1022,7 @@
 
         //var node = document.getElementById('my-node');
 
-        domtoimage.toBlob(document.getElementById('my-node'))
+        domtoimage.toBlob(document.getElementById('thisHeader'))
         .then(function (blob) {
             window.saveAs(blob, 'FreshFrogsNFT_Morph.png');
         });
@@ -1335,13 +1335,27 @@
 
           if (!is_approved) {
 
+            consoleOutput('<br>'+'<strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
+            document.getElementById('pre').style.backgroundColor = '#99ffc5'
+            
             let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
 
             let stake = await controller.methods.stake(token_id).send({ from: user_address });
 
+            consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>Frog #'+token_id+'</b> has successfully been staked! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>Refresh Page!</a></b></div><br>')
+            document.getElementById('pre').style.backgroundColor = '#99ffc5'
+
           } else {
 
+            consoleOutput('<br>'+'<strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
+            document.getElementById('pre').style.backgroundColor = '#99ffc5'
+            
+            let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
+
             let stake = await controller.methods.stake(token_id).send({ from: user_address });
+
+            consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>Frog #'+token_id+'</b> has successfully been staked! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>Refresh Page!</a></b></div><br>')
+            document.getElementById('pre').style.backgroundColor = '#99ffc5'
 
           }
           
@@ -1553,7 +1567,7 @@
           </ul>
           <br>
           <div id="mintingTray" class="mintingTray">
-            <div id="my-node" class="bigContainer">
+            <div class="bigContainer">
               <div id="frogContainer3" class="containerMint">
                 <div id="frogContainer4" class="imgWrapperMint">
                   <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/FLY.gif"/>
