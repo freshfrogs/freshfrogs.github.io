@@ -949,7 +949,7 @@
       }
 
       function consoleOutput(output) {
-        document.getElementById("pre").innerHTML = output
+        document.getElementById("pre").appendChild(output);// = output
       }
 
       function load_trait(trait, attribute, where) {
