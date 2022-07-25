@@ -914,7 +914,7 @@
           stakers_info = await controller.methods.stakers(user_address).call();
           
           temp = (stakers_info.unclaimedRewards / 1000000000000000000);
-          stakers_rewards = String(temp).slice(0, 5);
+          stakers_rewards = String(temp).slice(0, 6);
         
           //document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
 
