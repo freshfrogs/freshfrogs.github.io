@@ -1335,10 +1335,12 @@
 
           if (!is_approved) {
 
-            consoleOutput('<br>'+'<strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
-            document.getElementById('pre').style.backgroundColor = '#99ffc5'
+            consoleOutput('<br>'+'<strong>Sign Txn setApprovalForAll</strong>'+'<br>'+'Please sign the transaction and wait...<br>This is one time transaction to allow staking.'+'<p></p>')
             
             let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
+
+            consoleOutput('<br>'+'<strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
+            document.getElementById('pre').style.backgroundColor = '#99ffc5'
 
             let stake = await controller.methods.stake(token_id).send({ from: user_address });
 
@@ -1349,8 +1351,6 @@
 
             consoleOutput('<br>'+'<strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
             document.getElementById('pre').style.backgroundColor = '#99ffc5'
-            
-            let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
 
             let stake = await controller.methods.stake(token_id).send({ from: user_address });
 
@@ -1358,9 +1358,14 @@
             document.getElementById('pre').style.backgroundColor = '#99ffc5'
 
           }
-          
 
-        } catch (e) { console.log(e.message); }
+        } catch (e) { 
+
+          console.log(e.message);
+          consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
+          document.getElementById('pre').style.backgroundColor = '#ff99b6';
+
+        }
 
       }
 
