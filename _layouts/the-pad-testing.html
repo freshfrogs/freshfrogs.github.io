@@ -905,6 +905,10 @@
           nextId = await f0.api.nextId().call();
           nextIdC = parseInt(nextId);
 
+          is_approved = await collection.methods.isApprovedForAll(CONTROLLER_ADDRESS, user_address).call({ from: user_address});
+
+          console.log('isApprovedForAll : ' + is_approved)
+
           //document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
 
           if (owned_frogs <= 0) { // ❌ No FROGS
