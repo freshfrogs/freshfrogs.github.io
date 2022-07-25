@@ -989,10 +989,12 @@
         document.getElementById('previewImg').setAttribute('src', display_frog)
         document.getElementById('display_name').innerHTML = display_name
 
-        openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
-        etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
+        openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token;
+        etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token;
+        ownerLink = 'https://opensea.io/assets/'+owner;
 
         document.getElementById('selectSub').setAttribute('href', openSeaLink)
+        document.getElementById('selectBase').setAttribute('href', ownerLink)
         document.getElementById('selectBase').innerHTML = '<strong>Owner</strong><frog id="baseText">'+truncateAddress(owner)+'</frog>';
 
       }
