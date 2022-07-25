@@ -1003,7 +1003,7 @@
         document.getElementById('morphFrogs').setAttribute('href', etherscanLink)
 
         document.getElementById('selectBase').removeAttribute('href');
-        document.getElementById('selectBase').innerHTML = '<strong>Morph</strong><frog id="baseText">Meta-Morph!</frog>'
+        document.getElementById('selectBase').innerHTML = '<strong>Morph</strong><frog id="baseText">two frogs</frog>'
         document.getElementById('selectBase').onclick = function() {
           if (!morph) {
             base_frog = token
@@ -1019,10 +1019,10 @@
         document.getElementById('selectSub').removeAttribute('href');
 
         if (!staked) {
-          document.getElementById('selectSub').innerHTML = '<strong>Stake!</strong><frog id="baseText">Earn $FLYZ</frog>'
+          document.getElementById('selectSub').innerHTML = '<strong>Stake</strong><frog id="baseText">and earn</frog>'
           document.getElementById('selectSub').onclick = function() { stake(token); }
         } else {
-          document.getElementById('selectSub').innerHTML = '<strong>UnStake!</strong><frog id="baseText">Return token</frog>'
+          document.getElementById('selectSub').innerHTML = '<strong>Withdraw</strong><frog id="baseText">un-stake token</frog>'
           document.getElementById('selectSub').onclick = function() { withdraw(token); }
         }
 
