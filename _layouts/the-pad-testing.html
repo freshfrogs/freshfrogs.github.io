@@ -902,7 +902,7 @@
           user_address = await web3.currentProvider.selectedAddress;
           userInviteList = await f0.myInvites();
           userInviteKeys = Object.keys(userInviteList);
-          owned_frogs = await collection.methods.balanceOf(user_address).call();
+          owned_frogs = await collection.methods.balanceOf(CONTROLLER_ADDRESS).call();
           contractName = await f0.api.name().call();
           contractSymbol = await f0.api.symbol().call();
           nextId = await f0.api.nextId().call();
