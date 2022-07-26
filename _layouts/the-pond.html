@@ -922,7 +922,8 @@
           is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
           staked_tokens = await get_staked_tokens(user_address);
           stakers_info = await controller.methods.stakers(user_address).call();
-          
+          temp2 = await controller.methods.availableRewards(user_address).call();
+          console.log(temp2)
           temp = (stakers_info.unclaimedRewards / 1000000000000000000);
           stakers_rewards = String(temp).slice(0, 6);
         
