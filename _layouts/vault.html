@@ -1168,7 +1168,7 @@
           doc.appendChild(frog_token);
 
           if (staked) { // ff9999
-            document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: white !important;"><u>'+name+'</u> <b style="border-radius: 5px; background: rgb(122 122 122 / 20%); color: #ff9999;">(staked)</b></strong>'+'<br><i>'+truncateAddress(staked_owner)+'</i>';
+            document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: white !important;"><u>'+name+'</u> <b style="border-radius: 5px; background: rgb(122 122 122 / 20%); color: #ff9999;">(staked)</b></strong>'+'<br><i>Owner: '+truncateAddress(staked_owner)+'</i>';
           } else {
             document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: white !important;"><u>'+name+'</u></strong>';
           }
