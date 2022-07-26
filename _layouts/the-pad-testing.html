@@ -604,18 +604,17 @@
     width: 128px !important;
     height: 128px !important;
     border-radius: 5px;
+    box-shadow: 3px 3px rgb(122 122 122 / 20%);
     margin: 4px;
     transition: transform .2s;
     cursor: pointer;
-    border: none;
+    border: 1px solid white;
   }
   .trait_list {
     min-width: 50%;
-    margin: 8px;
+    margin: auto;
     text-align: left;
     padding: 8px;
-    border: 1px solid lightgrey;
-    border-radius: 5px;
   }
   hr {
     margin: 20px !important;
@@ -643,13 +642,13 @@
     overflow: hidden;
   }
   .frog_token {
-    box-shadow: 3px 3px rgb(122 122 122 / 20%);
     display: flex;
     background-color: white;
-    border: none;
+    border: 1px solid white;
     padding: 8px;
     color: #333 !important;
-    margin: auto;
+    box-shadow: none;
+    margin: 16px;
     border-radius: 5px;
     max-width: 100%;
     margin-left: auto;
@@ -657,7 +656,7 @@
     overflow: hidden;
   }
   .frog_button {
-    border: 1px solid lightgrey;
+    border: 1px solid white;
     background-color: white;
     color: #333;
     border-radius: 5px;
@@ -671,6 +670,11 @@
   .frog_button:hover {
     background-color: #7cc1ff;
     color: white;
+  }
+  .console_pre {
+    border: 1px solid lightgrey;
+    border-radius: 5px;
+    padding: 8px;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -924,7 +928,7 @@
 
           if (owned_frogs <= 0 && staked_tokens <= 0) { // ❌ No FROGS
 
-            Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div id="console-pre"></div>')
+            Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div class="console_pre" id="console-pre"></div>')
 
           } else {
 
@@ -934,7 +938,7 @@
             console.log('UnClaimed Rewards : ' + stakers_rewards + '('+temp+')');
             console.log('Loading data from OpenSea...');
 
-            Output('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frogs(s) Staked | '+stakers_rewards+' $FLYZ <br><hr>'+'<div id="console-pre"></div>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
+            Output('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frogs(s) Staked | '+stakers_rewards+' $FLYZ <br><hr>'+'<div class="console_pre" id="console-pre"></div>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
 
             fetch_user_tokens();
           }
@@ -1370,7 +1374,7 @@
             '<br><b>2.) Transfer NFT</b><br> Transfer FROG #'+token_id+' to staking protocol, requires a gas fee.<br>'+
             '</div>')
             
-            console_pre.style.backgroundColor = '#99ffc5'
+            //console_pre.style.backgroundColor = '#99ffc5'
 
           let stake = await controller.methods.stake(token_id).send({ from: user_address });
           consoleOutput('<strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been staked!');
@@ -1379,7 +1383,7 @@
 
           console.log(e.message);
           consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
-          console_pre.style.backgroundColor = '#ff99b6';
+          //console_pre.style.backgroundColor = '#ff99b6';
 
         }
 
@@ -1413,7 +1417,7 @@
             '<br><b>2.) Retrieve NFT</b><br> Transfer FROG #'+token_id+' from staking protocol, requires a gas fee.<br>'+
             '</div>')
             
-            console_pre.style.backgroundColor = '#99ffc5'
+            //console_pre.style.backgroundColor = '#99ffc5'
 
           let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
           consoleOutput('<strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been un-staked!');
@@ -1422,7 +1426,7 @@
 
           console.log(e.message);
           consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
-          console_pre.style.backgroundColor = '#ff99b6';
+          //console_pre.style.backgroundColor = '#ff99b6';
 
         }
         
@@ -1467,9 +1471,6 @@
             }
           }
           doc.appendChild(frog_token);
-
-          break_el = document.createElement('br');
-          doc.appendChild(break_el);
 
           if (staked) { // ff9999
             document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u> <b style="border-radius: 5px; background: rgb(122 122 122 / 20%); color: #ff9999;">(staked)</b></strong>';
