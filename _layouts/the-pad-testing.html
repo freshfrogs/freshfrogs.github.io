@@ -923,7 +923,7 @@
 
           if (owned_frogs <= 0 && staked_tokens <= 0) { // ❌ No FROGS
 
-            Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div id="console-pre"></div>')
+            Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br>'+'<div style="border-top: 1px solid #333;" id="console-pre"></div>')
 
           } else {
 
@@ -933,7 +933,7 @@
             console.log('UnClaimed Rewards : ' + stakers_rewards + '('+temp+')');
             console.log('Loading data from OpenSea...');
 
-            Output('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frogs(s) Staked | '+stakers_rewards+' $FLYZ <br><hr>'+'<div id="console-pre"></div>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
+            Output('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frogs(s) Staked | '+stakers_rewards+' $FLYZ <br>'+'<div style="border-top: 1px solid #333;" id="console-pre"></div>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
 
             fetch_user_tokens();
           }
