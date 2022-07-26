@@ -512,6 +512,9 @@
     border-radius: 5px;
     padding: 4px;
     background-color: #7cc1ff;
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
   }
   .headerDiv {
     border-bottom: 2px solid #7cc1ff;
@@ -605,10 +608,10 @@
     margin: 4px;
     transition: transform .2s;
     cursor: pointer;
-    border: 1px solid white;
+    border: 1px solid lightgrey;
   }
   .trait_list {
-    width: 50%;
+    min-width: 50%;
     margin: auto;
     text-align: left;
     padding: 8px;
@@ -640,20 +643,20 @@
   }
   .frog_token {
     display: flex;
-    background-color: #7cc1ff;
-    border: none;
-    padding: 16px;
-    color: white !important;
+    background-color: white;
+    border: 1px solid white;
+    padding: 8px;
+    color: #333 !important;
     box-shadow: none;
-    margin: auto;
+    margin: 16px;
     border-radius: 5px;
-    width: 80%;
+    max-width: 100%;
     margin-left: auto;
     margin-right: auto;
     overflow: hidden;
   }
   .frog_button {
-    border: 1px solid white;
+    border: 1px solid lightgrey;
     background-color: white;
     color: #333;
     border-radius: 5px;
@@ -667,6 +670,10 @@
   .frog_button:hover {
     background-color: #7cc1ff;
     color: white;
+  }
+  .console_pre {
+    border-radius: 5px;
+    padding: 8px;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
