@@ -1491,7 +1491,13 @@
             if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
 
               let trait_text = document.createElement('i')
-              trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value
+
+              if (data.trait_type == 'Frog') {
+                trait_text.innerHTML = '<br>'+data.value
+              } else {
+                trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value
+              }
+              
               document.getElementById('traits_'+token_id).appendChild(trait_text)
               break;
 
