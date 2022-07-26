@@ -1449,7 +1449,7 @@
           let gemxyzLink = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
           let external_link = 'https://freshfrogs.io/frog/'+token_id+'.png';
           let name = 'Frog #'+token_id
-          let doc = document.getElementById('thePad');
+          let doc = document.getElementById('pre');
 
           // Create Element
           frog_token = document.createElement('div');
@@ -1466,6 +1466,9 @@
             }
           }
           doc.appendChild(frog_token);
+
+          break_el = document.createElement('hr');
+          doc.appendChild(break_el);
 
           if (staked) { // ff9999
             document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: white !important;"><u>'+name+'</u> <b style="border-radius: 5px; background: rgb(122 122 122 / 20%); color: #ff9999;">(staked)</b></strong>';
