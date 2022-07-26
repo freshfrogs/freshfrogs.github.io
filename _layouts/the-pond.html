@@ -604,17 +604,18 @@
     width: 128px !important;
     height: 128px !important;
     border-radius: 5px;
-    box-shadow: 3px 3px rgb(122 122 122 / 20%);
     margin: 4px;
     transition: transform .2s;
     cursor: pointer;
-    border: 1px solid white;
+    border: none;
   }
   .trait_list {
     min-width: 50%;
-    margin: auto;
+    margin: 8px;
     text-align: left;
     padding: 8px;
+    border: 1px solid lightgrey;
+    border-radius: 5px;
   }
   hr {
     margin: 20px !important;
@@ -642,12 +643,12 @@
     overflow: hidden;
   }
   .frog_token {
+    box-shadow: 3px 3px rgb(122 122 122 / 20%);
     display: flex;
-    background-color: #7cc1ff;
+    background-color: white;
     border: none;
     padding: 8px;
-    color: white !important;
-    box-shadow: none;
+    color: #333 !important;
     margin: auto;
     border-radius: 5px;
     max-width: 100%;
@@ -656,7 +657,7 @@
     overflow: hidden;
   }
   .frog_button {
-    border: 1px solid white;
+    border: 1px solid lightgrey;
     background-color: white;
     color: #333;
     border-radius: 5px;
@@ -1369,7 +1370,7 @@
             '<br><b>2.) Transfer NFT</b><br> Transfer FROG #'+token_id+' to staking protocol, requires a gas fee.<br>'+
             '</div>')
             
-            console_pre.style.backgroundColor = '#99ffc5'
+            //console_pre.style.backgroundColor = '#99ffc5'
 
           let stake = await controller.methods.stake(token_id).send({ from: user_address });
           consoleOutput('<strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been staked!');
@@ -1412,7 +1413,7 @@
             '<br><b>2.) Retrieve NFT</b><br> Transfer FROG #'+token_id+' from staking protocol, requires a gas fee.<br>'+
             '</div>')
             
-            console_pre.style.backgroundColor = '#99ffc5'
+            //console_pre.style.backgroundColor = '#99ffc5'
 
           let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
           consoleOutput('<strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been un-staked!');
@@ -1467,10 +1468,13 @@
           }
           doc.appendChild(frog_token);
 
+          break_el = document.createElement('br');
+          doc.appendChild(break_el);
+
           if (staked) { // ff9999
-            document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: white !important;"><u>'+name+'</u> <b style="border-radius: 5px; background: rgb(122 122 122 / 20%); color: #ff9999;">(staked)</b></strong>';
+            document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u> <b style="border-radius: 5px; background: rgb(122 122 122 / 20%); color: #ff9999;">(staked)</b></strong>';
           } else {
-            document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: white !important;"><u>'+name+'</u></strong>';
+            document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u></strong>';
           }
 
           let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
