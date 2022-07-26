@@ -285,7 +285,6 @@
     padding: 0px !important;
     overflow: hidden;
     margin-bottom: 16px;
-    min-height: 380px;
   }
   header {
     overflow: hidden;
@@ -668,7 +667,6 @@
     margin-right: 2px;
     cursor: pointer;
     transition: all .2s;
-    font-family: 'Roboto Condensed', sans-serif !important;
   }
   .frog_button:hover {
     background-color: #7cc1ff;
@@ -927,11 +925,11 @@
 
           if (owned_frogs <= 0 && staked_tokens <= 0) { // ❌ No FROGS
 
-            //consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! ['+staked_tokens+'] Staked<br>'+'<p></p>')
+            consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! ['+staked_tokens+'] Staked<br>'+'<p></p>')
 
           } else {
 
-            //consoleOutput('<br>'+'<strong>Connected!</strong> Loading... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
+            consoleOutput('<br>'+'<strong>Connected!</strong> Loading... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
 
             console.log('Connected User : ' + user_address);
             console.log('Total Staked Tokens : ' + staked_tokens);
@@ -941,7 +939,7 @@
 
           }
 
-        } catch (e) {console.log(e.message)} //consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
+        } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
 
       })
 
@@ -1276,7 +1274,7 @@
         .then((tokens) => {
 
           //consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<div id="display_frog"></div><hr>')
-          //consoleOutput('<br>'+'<strong>Frog Vault</strong> ['+truncateAddress(CONTROLLER_ADDRESS)+']'+'<br>[ '+staked_frogs+' ] Total Frogs currently staked!<br>'+'<div id="display_frog"></div><hr>')
+          consoleOutput('<br>'+'<strong>Frog Vault</strong> ['+truncateAddress(CONTROLLER_ADDRESS)+']'+'<br>[ '+staked_frogs+' ] Total Frogs currently staked!<br>'+'<div id="display_frog"></div><hr>')
 
           var { assets } = tokens
           assets.forEach((frog) => { // console.log(frog)
@@ -1331,11 +1329,10 @@
             <img src="../assets/frogs/websiteBannerFinal_2.png" style="border-radius: 5px; height: auto !important; width: 100% !important; margin-bottom: 14px; transform: scale(1.01);">
             <br>
             <h2 style="color: white !important;"><b>freshfrogs.io/vault</b></h2>
-            <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
-            opensea.io/collection/fresh-frogs<a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><b id="connected">⛵ Shop on OpenSea</b></a>
-            <hr class="hr2">Connect to Mint!<a class="pointer" href="https://freshfrogs.io/"><b id="connected">🔌 Connect Wallet</b></a>
+            <br>Connect to View Frog Tokens<a class="pointer" href="https://freshfrogs.io/vault"><b id="connected">🔌 Connect Wallet</b></a>
             <hr class="hr2">STAKE! Earn Rewards!<a class="pointer" href="https://freshfrogs.io/the-pond"><b>🐸 freshfrogs.io/the-pond</b></a>
             <br>
+            <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a></div>
           </div>
           <br>
           <div id="thePad" class="thePad"></div>
