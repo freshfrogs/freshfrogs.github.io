@@ -608,7 +608,7 @@
     margin: 4px;
     transition: transform .2s;
     cursor: pointer;
-    border: 1px solid lightgrey;
+    border: 1px solid white;
   }
   .trait_list {
     min-width: 50%;
@@ -643,12 +643,12 @@
   }
   .frog_token {
     display: flex;
-    background-color: white;
-    border: 1px solid white;
+    background-color: #7cc1ff;
+    border: none;
     padding: 8px;
-    color: #333 !important;
+    color: white !important;
     box-shadow: none;
-    margin: 16px;
+    margin: auto;
     border-radius: 5px;
     max-width: 100%;
     margin-left: auto;
@@ -656,7 +656,7 @@
     overflow: hidden;
   }
   .frog_button {
-    border: 1px solid lightgrey;
+    border: 1px solid white;
     background-color: white;
     color: #333;
     border-radius: 5px;
@@ -672,6 +672,7 @@
     color: white;
   }
   .console_pre {
+    border: 1px solid lightgrey;
     border-radius: 5px;
     padding: 8px;
   }
@@ -1472,9 +1473,9 @@
           doc.appendChild(frog_token);
 
           if (staked) { // ff9999
-            document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u> <b style="border-radius: 5px; background: rgb(122 122 122 / 20%); color: #ff9999;">(staked)</b></strong>';
+            document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: white !important;"><u>'+name+'</u> <b style="border-radius: 5px; background: rgb(122 122 122 / 20%); color: #ff9999;">(staked)</b></strong>';
           } else {
-            document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u></strong>';
+            document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: white !important;"><u>'+name+'</u></strong>';
           }
 
           let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
