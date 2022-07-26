@@ -678,9 +678,6 @@
     border-radius: 5px;
     padding: 16px;
   }
-  .img_cont {
-    border: 1px solid transparent;
-  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -1459,7 +1456,7 @@
           let gemxyzLink = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
           let external_link = 'https://freshfrogs.io/frog/'+token_id+'.png';
           let name = 'Frog #'+token_id
-          let doc = document.getElementById('thePad');
+          let doc = document.getElementById('pre');
 
           // Create Element
           frog_token = document.createElement('div');
@@ -1488,26 +1485,16 @@
           for (var i = 0; i < metadata.attributes.length; i++) {
 
             var data = metadata.attributes[i]
-            if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
 
-              let trait_text = document.createElement('i')
-
-              if (data.trait_type == 'Frog') {
-                trait_text.innerHTML = '<br>'+data.value
-              } else {
-                trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value
-              }
-              
-              document.getElementById('traits_'+token_id).appendChild(trait_text)
-              break;
-
-            }
+            let trait_text = document.createElement('i')
+            trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value
+            document.getElementById('traits_'+token_id).appendChild(trait_text)
 
           }
 
-          //let button_b = document.createElement('div');
-          //button_b.innerHTML = '<br><a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
-          //document.getElementById('traits_'+token_id).appendChild(button_b);
+          let button_b = document.createElement('div');
+          button_b.innerHTML = '<br><a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
+          document.getElementById('traits_'+token_id).appendChild(button_b);
 
         } catch (e) { console.log(e.message); }
 
