@@ -1488,10 +1488,14 @@
           for (var i = 0; i < metadata.attributes.length; i++) {
 
             var data = metadata.attributes[i]
+            if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
 
-            let trait_text = document.createElement('i')
-            trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value
-            document.getElementById('traits_'+token_id).appendChild(trait_text)
+              let trait_text = document.createElement('i')
+              trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value
+              document.getElementById('traits_'+token_id).appendChild(trait_text)
+              break;
+
+            }
 
           }
 
