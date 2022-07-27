@@ -1341,7 +1341,7 @@
 
         try {
 
-          await controller.methods.claimRewards(user_address).send({ from: user_address });
+          await controller.methods.claimRewards().send({ from: user_address });
 
         } catch (e) { console.log(e.message); }
         
