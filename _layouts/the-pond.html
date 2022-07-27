@@ -1351,7 +1351,12 @@
 
           consoleOutput('<strong>Congratulations!</strong><br>'+stakers_rewards+' $FLYZ have successfully been claimed!');
 
-        } catch (e) { console.log(e.message); }
+        } catch (e) { 
+
+          console.log(e.message);
+          consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
+          
+        }
         
       }
 
