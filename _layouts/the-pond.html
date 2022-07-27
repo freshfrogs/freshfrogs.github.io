@@ -1340,6 +1340,8 @@
       async function claim_rewards() {
 
         try {
+
+          is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
           
           if (!is_approved) {
 
@@ -1379,6 +1381,7 @@
 
           console_pre = document.getElementById('pre');
           console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+          is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
 
           if (!is_approved) {
 
@@ -1422,6 +1425,7 @@
 
           console_pre = document.getElementById('pre');
           console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+          is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
 
           if (!is_approved) {
 
