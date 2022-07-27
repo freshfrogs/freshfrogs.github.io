@@ -1341,7 +1341,15 @@
 
         try {
 
+          consoleOutput('<strong>Claiming '+stakers_rewards+' $FLYZ</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+            '<div style="text-align: left;">'+
+            '<br><b><strike>1.) Approve Contract</b> <br> This is a one time transaction to allow staking.</strike><br>'+
+            '<br><b>2.) Claim Rewards</b><br> Transfer '+stakers_rewards+' $FLYZ from staking protocol, requires a gas fee.<br>'+
+            '</div>');
+            
           await controller.methods.claimRewards().send({ from: user_address });
+
+          consoleOutput('<strong>Congratulations!</strong><br>'+stakers_rewards+' $FLYZ have successfully been claimed!');
 
         } catch (e) { console.log(e.message); }
         
