@@ -1340,6 +1340,18 @@
       async function claim_rewards() {
 
         try {
+          
+          if (!is_approved) {
+
+            consoleOutput('<strong>Claiming '+stakers_rewards+' $FLYZ</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+              '<div style="text-align: left;">'+
+              '<br><b>1.) Approve Contract</b> <br> This is a one time transaction to allow staking.<br>'+
+              '<br><b>2.) Transfer NFT</b><br> Transfer FROG #'+token_id+' to staking protocol, requires a gas fee.<br>'+
+              '</div>')
+            
+            let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
+
+          }
 
           consoleOutput('<strong>Claiming '+stakers_rewards+' $FLYZ</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
             '<div style="text-align: left;">'+
@@ -1355,7 +1367,7 @@
 
           console.log(e.message);
           consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
-          
+
         }
         
       }
