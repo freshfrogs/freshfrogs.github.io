@@ -628,6 +628,310 @@
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+    <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
+    <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
+    <script>
+      // <-- [Google Analytics]
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-6PB0WKB4SH');
+      // -- >
+
+      /*
+        Assign Public Variables
+      */
+
+      // User Variables
+
+      var user_address, user_invites, user_inviteKeys, user_tokens, user_invite;
+
+      // Function Variables
+
+      var mint_id, opensea_failed;
+      var mint_price = 0.01;
+      var mint_quantity = 1;
+
+      // Contract Variables
+
+      var contract_name, contract_symbol, contract_id, collection, COLLECTION, traits_list, controller, CONTROLLER;
+      var CONTRACT_ADDRESS = contract_address = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"; // main: 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b | rinkeby: 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524
+      var NETWORK = "main";
+
+      /*
+        Load web page
+      */
+
+      document.addEventListener("DOMContentLoaded", async () => {
+
+        const web3 = new Web3(window.ethereum);
+        const f0 = new F0();
+
+        //
+        var TOKEN_ABI = [
+        {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"approved","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":false,"internalType":"bool","name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"account","type":"address"},{"indexed":false,"internalType":"uint256","name":"shares","type":"uint256"}],"name":"PayeeAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"from","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"PaymentReceived","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"PaymentReleased","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"approve","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"baseURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"contractURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"devMintLocked","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getApproved","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address[]","name":"payees","type":"address[]"},{"internalType":"uint256[]","name":"shares_","type":"uint256[]"}],"name":"initializePaymentSplitter","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"lockDevMint","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"maxMintsPerTx","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"maxTokens","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"quantity","type":"uint256"}],"name":"mint","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address[]","name":"recipients","type":"address[]"},{"internalType":"uint256[]","name":"specialId","type":"uint256[]"}],"name":"mintSpecial","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"nextTokenId","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"payee","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"provenance","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address payable","name":"account","type":"address"}],"name":"release","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"released","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"bytes","name":"_data","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"_baseURI","type":"string"}],"name":"setBaseURI","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"contractURI_","type":"string"}],"name":"setContractURI","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"_provenance","type":"string"}],"name":"setProvenance","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_startingBlock","type":"uint256"}],"name":"setStartingBlock","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"shares","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"startingBlock","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"tokenByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"index","type":"uint256"}],"name":"tokenOfOwnerByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"tokenPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalReleased","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalShares","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}
+    ]
+
+    var CONTRACT_ADDRESS = '0x1CB1A5e65610AEFF2551A50f76a87a7d3fB649C6';  
+
+    COLLECTION = collection = new web3.eth.Contract(TOKEN_ABI, CONTRACT_ADDRESS);
+
+    let tokenURI = await collection.methods.tokenURI(1).call()
+    let cid = tokenURI.replace("ipfs://", "")
+    let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
+
+    var metadata = await (await fetch(ipfsGatewayURI)).json();
+    for (var i = 0; i < metadata.attributes.length; i++){
+        var data = metadata.attributes[i]
+
+        trait_type = trait = data.trait_type
+        value = attribute = data.value
+
+        console.log(trait_type+' : '+value);
+    }
+        //
+
+        COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
+
+        fetch_opensea_data();
+
+        try { // Connect
+
+          await f0.init({
+
+            web3: web3,
+            contract: CONTRACT_ADDRESS,
+            network: NETWORK
+
+          })
+
+          // Assign variables
+
+          user_address = await web3.currentProvider.selectedAddress;
+          user_invites = await f0.myInvites();
+          user_inviteKeys = Object.keys(user_invites);
+          user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
+
+          user_tokens = await collection.methods.balanceOf(user_address).call();
+
+          contract_name = await f0.api.name().call();
+          contract_symbol = await f0.api.symbol().call();
+          contract_id = await f0.api.nextId().call();
+          mint_id = contract_id = parseInt(contract_id);
+
+          if (opensea_failed){
+
+            display_token(contract_id);
+            console.log('Nex token_id : ' + contract_id);
+
+          }
+
+          getInvites();
+
+          console.log('Connected  Smart Contract : '+contract_name+'('+contract_symbol+')');
+          console.log('Ethereum : '+contract_address);
+          console.log('Connected User : '+user_address);
+
+          // Update minting ui
+
+          // Remove token from minting tray
+
+          document.querySelector("#remove_token").addEventListener("click", async (e) => {
+            if (mint_quantity <= 1) {
+              return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
+            } else {
+              mint_quantity = mint_quantity - 1;
+              document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
+              document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
+            }
+          })
+
+          // Add token to minting tray mint_total
+
+          document.querySelector("#add_token").addEventListener("click", async (e) => {
+            if (mint_quantity >= 9) {
+              return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
+            } else {
+              mint_quantity = mint_quantity + 1;
+              document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
+              document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
+            }
+
+            //if (mint_quantity <= (mint_limit - user_tokens)) {
+            //} else { console.log('User mint limit reached!'); console.log('Mint Limit '+mint_limit+' : '+user_tokens+' User Tokens'); }
+
+          })
+
+          // Send mint transaction to provider!
+
+          document.querySelector("#mint_total").addEventListener("click", async (e) => {
+
+            console.log('Sending mint transaction!');
+            console.log(mint_quantity+' FROGS @ Ξ'+mint_price+' : ['+(mint_price*mint_quantity)+']');
+            
+            try {
+                
+              consoleOutput('<br>'+'<strong>Minting ('+mint_quantity+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
+              document.getElementById('pre').style.backgroundColor = '#99ffc5'
+                
+              let tokens = await f0.mint(user_invite, mint_quantity)
+              
+              // AWAIT RESPONSE!
+
+              consoleOutput('<br>'+'<strong>Congratulations</strong><br><b>'+mint_quantity+' FROG(s)</b> have successfully been minted!'+'<p></p>');
+              document.getElementById('pre').style.backgroundColor = '#99ffc5'
+              return; // BREAK!
+
+            } catch (e) {
+                
+              // Something went wrong!
+              
+              consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
+              document.getElementById('pre').style.backgroundColor = '#ff99b6'
+              return; // BREAK!
+
+            }
+
+          })
+
+        } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
+
+      })
+
+
+      function consoleOutput(output) {
+        document.getElementById("pre").innerHTML = output
+      }
+
+      function truncateAddress(address) {
+        if (!address) {
+          return "";
+        }
+        return `${address.substr(0, 5)}...${address.substr(
+          address.length - 5,
+          address.length
+        )}`;
+      }
+
+      /*
+        Fetch OpenSea collection data
+      */
+
+      function fetch_opensea_data() {
+
+        const options = {
+          method: 'GET',
+          headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'} // 1b80881e422a49d393113ede33c81211
+        };
+
+        // Collection variables
+        // Trait list and rarities
+
+        fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
+        .then(collection => collection.json())
+        .then(collection => {
+
+          var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
+
+          traits_list = traits;
+
+        })
+        .catch(e => {
+
+            console.log('Error: Could not talk to Opensea. (1)');
+            console.error('Error : ' + e.message)
+      
+        });
+        
+        // Pull next available token ID prior to web3 connection
+        //
+
+        fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=12&include_orders=false', options)
+        .then((assets) => assets.json())
+        .then((assets) => {
+
+          var { assets } = assets
+          var contract_id = mint_id = parseInt(assets[0].name.replace('Frog #', '')) + 1;
+
+          display_token(contract_id);
+          console.log('Nex token_id : ' + contract_id);
+
+        })
+        .catch(e => {
+
+          opensea_failed = true;
+          console.log('Error: Could not talk to Opensea. (2)');
+          console.error('Error : ' + e.message)
+
+        });
+
+      }
+
+      // Check invites
+      async function getInvites() {
+
+        mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1);
+        mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1);
+
+        for (var i = 0; i < 10; i++) { 
+
+          if (user_inviteKeys[i] === "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064") {
+
+            if (user_address === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || user_address === "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359_0".toLowerCase() || user_address === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8_0".toLowerCase() || user_address === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
+
+              user_invite = "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064";
+              mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1);
+              mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1);
+
+              break;
+
+            }
+          }
+        }
+        
+        document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
+        consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'Frog #'+mint_id+' is now available to mint!<br>Maximum of <u>'+mint_limit+'</u> Frogs @ Ξ'+mint_price+'<br>'+'<p></p>')
+
+      }
+
+      // Display Frog
+      async function display_token(token){
+
+          token_img = 'https://freshfrogs.io/frog/'+token+'.png'
+          token_name = 'Frog #'+token
+
+          document.getElementById('thisheader').style.backgroundImage = 'url('+token_img+')';
+          document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
+          document.getElementById('previewImg').setAttribute('src', token_img)
+
+          /*
+          let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
+          for (var i = 0; i < token_metadata.attributes.length; i++){
+              var data = token_metadata.attributes[i]
+              //load_trait(data.trait_type, data.value, 'subDisplay')
+              if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
+                token_type = data.value.slice(0, 11)+'..'
+                break;
+              }
+          }
+          */
+
+          document.getElementById('mint_token').innerHTML = '<strong>'+token_name+'</strong>4040 supply'//+token_type;
+          document.getElementById('mint_token').removeAttribute('href');
+
+          document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ<b id="mint_total_actual">'+(mint_price*mint_quantity)+'</b> +gas';
+          document.getElementById('mint_total').removeAttribute('href');
+
+          document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> <b id="mint_quantity_actual">'+mint_quantity+'</b> <b id="add_token">+</b></strong>quantity';
+          document.getElementById('mint_quantity').removeAttribute('href');
+
+      }
+
+    </script>
   </head>
   <body class="bodyb">
     <div class="wrapper">
@@ -662,6 +966,7 @@
             <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="https://freshfrogs.io/"><button class="frog_button">🔌 Connect Wallet</button></a>
             <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="https://freshfrogs.io/the-pond"><button class="frog_button">🐸 freshfrogs.io/the-pond</button></a>
             <br>
+            <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a></div>
           </div>
           <br>
           <div id="thePad" class="thePad"></div>
