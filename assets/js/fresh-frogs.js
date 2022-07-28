@@ -439,7 +439,7 @@
           for (var i = 0; i < staked_tokens.length; i++) {
 
             tokenId = staked_tokens[i].tokenId
-            console.log(tokenId);
+            //console.log(tokenId);
             render_token(tokenId, true)
 
           }
