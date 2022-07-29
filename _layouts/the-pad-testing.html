@@ -681,12 +681,9 @@
     COLLECTION = collection = new web3.eth.Contract(TOKEN_ABI, CONTRACT_ADDRESS);
 
     let tokenURI = await collection.methods.tokenURI(1).call()
-    console.log(tokenURI)
-    let cid = tokenURI.replace("ipfs://", "")
-    console.log(cid)
-    let ipfsGatewayURI = "https://ipfs.io/ipfs/" + cid
 
-    var metadata = await (await fetch(cid)).json();
+    var metadata = await (await fetch(tokenURI)).json();
+    
     for (var i = 0; i < metadata.attributes.length; i++){
         var data = metadata.attributes[i]
 
