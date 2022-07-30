@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <style>
-
+  @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital@1&display=swap');
   html{
     background-image: url("/assets/background.png");
+  }
+  html,h1,h2,h3 {
+    font-family: 'Roboto Condensed', sans-serif !important;
   }
   #myProgress {
     width: 50%;
@@ -124,6 +127,7 @@
       width: 20px;
       height: 20px;
       border-radius: 100%;
+      font-family: inherit;
       transition: all .2s ease;
       text-align: center;
       cursor: pointer;
@@ -229,6 +233,7 @@
     border: none;
   }
   .h1 {
+    font-family: 'Roboto Condensed', sans-serif !important;
     font-weight: 800;
     color: white;
     text-align: center;
@@ -237,6 +242,7 @@
     font-size: xx-large;
   }
   .supply{
+    font-family: 'Roboto Condensed', sans-serif !important;
     color: #333;
     border-radius: 5px;
     border: 1px solid #e0e0e0;
@@ -270,6 +276,7 @@
     vertical-align: middle;
   }
   section {
+    font-family: 'Roboto Condensed', sans-serif !important;
     font-size: auto;
     color: white !important;
     background-color: #7cc1ff;
@@ -287,6 +294,7 @@
     border-radius: 5px;
     padding: 14px !important;
     width: auto;
+    font-family: 'Roboto Condensed', sans-serif !important;
     font-size: auto !important;
     margin-bottom: 16px !important;
     color: #333;
@@ -308,6 +316,7 @@
     image-rendering: pixelated;
   }
   .downloads a{
+    font-family: 'Roboto Condensed', sans-serif !important;
     font-size: inherit !important;
     color: inherit !important;
   }
@@ -434,10 +443,12 @@
     margin-top: 1%;
   }
   .h2 {
+    font-family: 'Roboto Condensed', sans-serif !important;
     font-weight: 750;
     text-align: center;
     padding: 0%;
     font-size: large;
+    font: "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
     margin-top: 8px;
     margin-bottom: 0px;
     line-height: 1.1;
@@ -469,6 +480,8 @@
     border: 1px solid #324d64;
     border-radius: 5px;
     height: 18px;
+    font-family: 'Roboto Condensed', sans-serif !important;
+    font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     vertical-align: middle;
   }
   .mintingTextGreen {
@@ -500,7 +513,9 @@
     border-radius: 5px;
     padding: 4px;
     background-color: #7cc1ff;
-    vertical-align: bottom;
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
   }
   .headerDiv {
     border-bottom: 2px solid #7cc1ff;
@@ -556,7 +571,7 @@
     font-size: x-small;
     padding: 1px;
   }
-  .userAddress {
+  .user_address {
     padding-left: 1px;
     padding-right: 1px;
     border-radius: 5px;
@@ -575,7 +590,6 @@
     margin-left: auto;
     margin-right: auto;
     overflow: hidden;
-    margin-top: 8px;
   }
   #banner_image {
     width: 100%;
@@ -588,18 +602,59 @@
     overflow: hidden;
   }
   .recentMint {
-    width: 128px;
-    height: auto;
+    width: 128px !important;
+    height: 128px !important;
     border-radius: 5px;
     box-shadow: 3px 3px rgb(122 122 122 / 20%);
-    margin: 4px;
+    margin: 2%;
+    transition: transform .2s;
+    cursor: pointer;
+    border: 1px solid white;
   }
-  .recent_mints {
+  .trait_list {
+    min-width: 50%;
+    margin: auto;
+    text-align: left;
+    padding: 8px;
+  }
+  hr {
+    margin: 20px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  .frog_token_old {
+    width: 100%;
+    display: flex;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 5%;
-    margin-bottom: auto;
-    width: 90%;
+  }
+  .staked_token {
+    display: flex;
+    background-color: #ff9999;
+    border: 1px solid white;
+    padding: 16px;
+    color: #333 !important;
+    box-shadow: 3px 3px rgb(122 122 122 / 20%);
+    margin: auto;
+    border-radius: 5px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
+  }
+  .frog_token {
+    display: flex;
+    background-color: #7cc1ff;
+    border: none;
+    padding: 8px;
+    color: white !important;
+    box-shadow: none;
+    margin: auto;
+    border-radius: 5px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
   }
   .frog_button {
     border: 1px solid white;
@@ -617,6 +672,10 @@
     background-color: #7cc1ff;
     color: white;
   }
+  .console_pre {
+    border-radius: 5px;
+    padding: 16px;
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -629,15 +688,38 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
     
+    <script src="https://freshfrogs.io/the-pond/banner/FileSaver.js"></script>
+    <script src="https://freshfrogs.io/the-pond/banner/dom-to-image.js"></script>
+    <script src="https://freshfrogs.io/assets/js/fresh-frogs.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+    <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
+    <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
+    <script>
+      // <-- [Google Analytics]
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-6PB0WKB4SH');
+      // -- >
+
+      document.addEventListener("DOMContentLoaded", async () => {
+
+        connect();
+
+      })
+
+    </script>
   </head>
   <body class="bodyb">
     <div class="wrapper">
       <header id="thisheader">
         <div class="downloads pre">
           <ul class="downloads2">
-            <li><a id="mint_token" class="pointer" href=""><strong>MINT FROG</strong>ΞETHEREUM</a></li>
-            <li><a id="mint_total" class="pointer" href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b"><strong>VIEW ON</strong>OPENSEA</a></li>
-            <li><a id="mint_quantity" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>VIEW ON</strong>LOOKSRARE</a></li>
+            <li><a id="morphFrogs" class="pointer"><strong id="display_name">Fresh Frogs</strong><div id="display_type">ΞEthereum</div></a></li>
+            <li><a id="selectBase" class="pointer" href="http://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong><frog id="baseText">Support</frog></a></li>
+            <li><a id="selectSub" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>OpenSea</strong><frog id="subText">Marketplace</frog></a></li>
           </ul>
           <br>
           <div id="mintingTray" class="mintingTray">
@@ -655,13 +737,11 @@
         <div class="top">{{ content }}</div>
         <div class="downloads pre">
           <div id="netStatus" class="netStatus">
-            <div id="recent_mints" class="recent_mints"><img src="https://freshfrogs.github.io/frog/1205.png" class="recentMint"><img src="https://freshfrogs.github.io/frog/1206.png" class="recentMint"><img src="https://freshfrogs.github.io/frog/1207.png" class="recentMint"></div>
+            <img src="../assets/frogs/websiteBannerFinal_2.png" style="border-radius: 5px; height: auto !important; width: 100% !important; margin-bottom: 14px; transform: scale(1.01);">
             <br>
-            <h2 style="color: white !important;"><b>FreshFrogsNFT</b></h2>
-            <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
-            <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="https://opensea.io/collection/fresh-frogs"><button class="frog_button">⛵ Shop on OpenSea</button></a>
-            <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="https://freshfrogs.io/"><button class="frog_button">🔌 Connect Wallet</button></a>
-            <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="https://freshfrogs.io/the-pond"><button class="frog_button">🐸 freshfrogs.io/the-pond</button></a>
+            <h2 style="color: white !important;"><b>freshfrogs.io/the-pond🍀</b></h2>
+            <br>Mint From Collection!<a class="pointer" href="https://freshfrogs.io/"><b>🍃 Minting Terminal</b></a>
+            <hr class="hr2">View All Staked Frogs!<a class="pointer" href="https://freshfrogs.io/vault"><b>🔒 Frog Vault</b></a>
             <br>
             <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a></div>
           </div>
