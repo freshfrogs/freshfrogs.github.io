@@ -235,7 +235,22 @@
 
             console.log(owned_frogs)
             fetch_user_tokens(0);
-            fetch_user_tokens(50);
+
+            if (owned_frogs > 50){
+              fetch_user_tokens(50);
+            }
+
+            if (owned_frogs > 100){
+              fetch_user_tokens(100);
+            }
+
+            if (owned_frogs > 150){
+              fetch_user_tokens(150);
+            }
+
+            if (owned_frogs > 200){
+              fetch_user_tokens(200);
+            }
 
         }
 

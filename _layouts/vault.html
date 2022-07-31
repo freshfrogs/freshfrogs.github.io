@@ -931,7 +931,7 @@
 
           if (owned_frogs <= 0 && staked_tokens <= 0) { // ❌ No FROGS
 
-            consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! ['+staked_tokens+'] Staked<br>'+'<p></p>')
+            consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems no Frogs have been staked! ['+staked_tokens+'] Staked<br>'+'<p></p>')
 
           } else {
 
@@ -940,9 +940,22 @@
             console.log('Connected User : ' + user_address);
             console.log('Total Staked Tokens : ' + staked_tokens);
             console.log('Loading VAULT data from OpenSea...');
+            
+            if (owned_frogs > 50){
+              fetch_user_tokens(50);
+            }
 
-            fetch_user_tokens(0);
-            fetch_user_tokens(50);
+            if (owned_frogs > 100){
+              fetch_user_tokens(100);
+            }
+
+            if (owned_frogs > 150){
+              fetch_user_tokens(150);
+            }
+
+            if (owned_frogs > 200){
+              fetch_user_tokens(200);
+            }
 
             console.log('Total : '+render_total);
           }
