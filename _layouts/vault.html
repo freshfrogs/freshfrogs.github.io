@@ -943,6 +943,9 @@
             
             fetch_user_tokens(0)
 
+            console.log(owned_frogs)
+            fetch_user_tokens(0);
+
             if (owned_frogs > 50){
               fetch_user_tokens(50);
             }
@@ -957,6 +960,22 @@
 
             if (owned_frogs > 200){
               fetch_user_tokens(200);
+            }
+
+            if (owned_frogs > 250){
+              fetch_user_tokens(250);
+            }
+
+            if (owned_frogs > 300){
+              fetch_user_tokens(300);
+            }
+
+            if (owned_frogs > 350){
+              fetch_user_tokens(350);
+            }
+
+            if (owned_frogs > 400){
+              fetch_user_tokens(400);
             }
 
             console.log('Total : '+render_total);
