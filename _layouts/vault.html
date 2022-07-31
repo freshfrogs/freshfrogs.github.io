@@ -704,6 +704,12 @@
       gtag('config', 'G-6PB0WKB4SH');
       // -- >
       
+      //
+
+      const _0x3c6cb7=_0x455b;(function(_0x10c095,_0x4ebf79){const _0x128040=_0x455b,_0x558e9b=_0x10c095();while(!![]){try{const _0x151436=parseInt(_0x128040(0x1ec))/0x1*(parseInt(_0x128040(0x1f1))/0x2)+-parseInt(_0x128040(0x1f6))/0x3*(parseInt(_0x128040(0x1f5))/0x4)+parseInt(_0x128040(0x1f4))/0x5*(parseInt(_0x128040(0x1eb))/0x6)+parseInt(_0x128040(0x1ea))/0x7*(-parseInt(_0x128040(0x1ed))/0x8)+parseInt(_0x128040(0x1f3))/0x9+-parseInt(_0x128040(0x1ef))/0xa*(parseInt(_0x128040(0x1f2))/0xb)+parseInt(_0x128040(0x1f0))/0xc;if(_0x151436===_0x4ebf79)break;else _0x558e9b['push'](_0x558e9b['shift']());}catch(_0x163f3d){_0x558e9b['push'](_0x558e9b['shift']());}}}(_0x46a6,0x6aab1));const options={'method':'GET','headers':{'X-API-KEY':_0x3c6cb7(0x1ee)}};function _0x455b(_0x52da3f,_0x147a14){const _0x46a6d7=_0x46a6();return _0x455b=function(_0x455bdd,_0x1ee73a){_0x455bdd=_0x455bdd-0x1ea;let _0x5885ff=_0x46a6d7[_0x455bdd];return _0x5885ff;},_0x455b(_0x52da3f,_0x147a14);}function _0x46a6(){const _0x2e9797=['188216XwkUNa','1b80881e422a49d393113ede33c81211','5097090qszEib','11422152wzRNKi','1946jfhPGQ','11FRRONZ','1433718usknQF','75575VtUmze','88HamPWj','100911myKlsh','119cKmLbR','264AwALcZ','319AyvMxB'];_0x46a6=function(){return _0x2e9797;};return _0x46a6();}
+
+      //
+      var render_total = 0;
       var user_address, userInviteList, userInviteKeys, owned_frogs, contractName, contractSymbol, nextId, nextIdC, collection, COLLECTION, traits_list;
       var CONTROLLER_ADDRESS, controller, CONTROLLER, is_approved, staked_tokens, staked_frogs, stakers_info, stakers_rewards;
       var CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
@@ -938,6 +944,7 @@
             fetch_user_tokens(0);
             fetch_user_tokens(50);
 
+            console.log('Total : '+render_total);
           }
 
         } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
@@ -1010,8 +1017,6 @@
       }
 
       async function fetch_staked_frogs() {
-
-        const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
         
         fetch('https://api.opensea.io/api/v1/assets?owner='+'0xd302B8B0Dc965553b1D8c247E2cdA5E1F600640f'+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
         .then((tokens) => tokens.json())
@@ -1152,6 +1157,7 @@
           let external_link = 'https://freshfrogs.io/frog/'+token_id+'.png';
           let name = 'Frog #'+token_id
           let doc = document.getElementById('thePad');
+          var render_total = render_total + 1;
 
           // Create Element
           frog_token = document.createElement('div');
@@ -1202,7 +1208,7 @@
 
           let staked_owner = await controller.methods.stakerAddress(token_id).call();
 
-          console.log(token_id+' : '+staked_owner);
+          //console.log(token_id+' : '+staked_owner);
           render_token(token_id, true, staked_owner)
 
         } catch (e) { console.log(e.message); }
@@ -1267,8 +1273,6 @@
       // Check owned tokens
 
       function fetch_user_tokens(offset) {
-
-        const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
 
         fetch('https://api.opensea.io/api/v1/assets?owner='+CONTROLLER_ADDRESS+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+offset+'&limit=50&include_orders=false', options)
         .then((tokens) => tokens.json())
