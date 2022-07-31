@@ -234,10 +234,8 @@
             Output('<br><button onclick="claim_rewards()" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frogs(s) Staked '+''+stakers_rewards+' $FLYZ 🡥</button>'+'<br><hr>'+'<div class="console_pre" id="console-pre"></div>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
 
             fetch_user_tokens(0);
-
-            if (owned_frogs >= 51) {
-              fetch_user_tokens(50);
-            }
+            fetch_user_tokens(50);
+            
         }
 
         } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
