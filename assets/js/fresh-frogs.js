@@ -233,7 +233,6 @@
 
             Output('<br><button onclick="claim_rewards()" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frogs(s) Staked '+''+stakers_rewards+' $FLYZ 🡥</button>'+'<br><hr>'+'<div class="console_pre" id="console-pre"></div>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
 
-            console.log(owned_frogs)
             fetch_user_tokens(0);
 
             if (owned_frogs > 50){
@@ -250,6 +249,22 @@
 
             if (owned_frogs > 200){
               fetch_user_tokens(200);
+            }
+
+            if (owned_frogs > 250){
+              fetch_user_tokens(250);
+            }
+
+            if (owned_frogs > 300){
+              fetch_user_tokens(300);
+            }
+
+            if (owned_frogs > 350){
+              fetch_user_tokens(350);
+            }
+
+            if (owned_frogs > 400){
+              fetch_user_tokens(400);
             }
 
         }
