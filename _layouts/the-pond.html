@@ -579,17 +579,17 @@
     color: #7cc1ff;
   }
   .mintingTextWhite2 {
-    background-color: #7cc1ff;
+    background-color: white;
     border: 1px solid white;
     padding: 16px;
-    color: white;
+    color: #333 !important;
+    box-shadow: 3px 3px rgb(122 122 122 / 20%);
     margin: auto;
     border-radius: 5px;
     width: 80%;
     margin-left: auto;
     margin-right: auto;
     overflow: hidden;
-    margin-top: 5%;
   }
   #banner_image {
     width: 100%;
@@ -657,9 +657,9 @@
     overflow: hidden;
   }
   .frog_button {
-    border: 1px solid #7cc1ff;
-    background-color: #7cc1ff;
-    color: white;
+    border: 1px solid white;
+    background-color: white;
+    color: #333;
     border-radius: 5px;
     padding: 3px;
     margin-left: 2px;
@@ -675,36 +675,6 @@
   .console_pre {
     border-radius: 5px;
     padding: 16px;
-  }
-  .frog_button2 {
-    border: 1px solid white;
-    background-color: #7cc1ff;
-    color: white;
-    border-radius: 5px;
-    padding: 16px;
-    margin-left: 2px;
-    margin-right: 2px;
-    cursor: pointer;
-    transition: all .2s;
-    font-family: 'Roboto Condensed', sans-serif !important;
-    width: 100%;
-  }
-  .frog_button2:hover {
-    border: 1px solid white;
-    background-color: white;
-    color: #7cc1ff;
-  }
-  .frog_button_div {
-    display: inline-block;
-    padding: 8px;
-    width: 40%;
-  }
-  .recent_mints {
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 5%;
-    margin-bottom: auto;
-    width: 90%;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -767,16 +737,11 @@
         <div class="top">{{ content }}</div>
         <div class="downloads pre">
           <div id="netStatus" class="netStatus">
-            <div id="recent_mints" class="recent_mints"><img src="https://freshfrogs.github.io/frog/1205.png" class="recentMint"><img src="https://freshfrogs.github.io/frog/1206.png" class="recentMint"><img src="https://freshfrogs.github.io/frog/1207.png" class="recentMint"></div>
+            <img src="../assets/frogs/websiteBannerFinal_2.png" style="border-radius: 5px; height: auto !important; width: 100% !important; margin-bottom: 14px; transform: scale(1.01);">
             <br>
-            <h2 style="color: white !important;"><b>FreshFrogsNFT</b></h2>
-            <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
-            <div class="frog_button_div">
-              <a href="https://freshfrogs.io/vault"><button class="frog_button2"><b>🔒 Visit The Vault</b></button></a>
-            </div>
-            <div class="frog_button_div">
-              <a href="https://opensea.io/collection/fresh-frogs" target="_blank"><button class="frog_button2"><b>⛵ Shop on OpenSea</b></button></a>
-            </div>
+            <h2 style="color: white !important;"><b>freshfrogs.io/the-pond🍀</b></h2>
+            <br>Mint From Collection!<a class="pointer" href="https://freshfrogs.io/"><b>🍃 Minting Terminal</b></a>
+            <hr class="hr2">View All Staked Frogs!<a class="pointer" href="https://freshfrogs.io/vault"><b>🔒 Frog Vault</b></a>
             <br>
             <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a></div>
           </div>
