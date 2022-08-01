@@ -617,8 +617,8 @@
   }
   .frog_button {
     border: 1px solid white;
-    background-color: white;
-    color: #333;
+    background-color: #7cc1ff;
+    color: white;
     border-radius: 5px;
     padding: 3px;
     box-shadow: 3px 3px rgb(122 122 122 / 20%);
@@ -626,10 +626,9 @@
     margin-right: 2px;
     cursor: pointer;
     transition: all .2s;
-  }
-  .frog_button:hover {
-    background-color: #7cc1ff;
-    color: white;
+    -ms-transform: scale(1.1); /* IE 9 */
+    -webkit-transform: scale(1.1); /* Safari 3-8 */
+    transform: scale(1.1);
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
