@@ -579,7 +579,7 @@
       }
 
       function consoleOutput(output) {
-        document.getElementById("desc").innerHTML = output;
+        document.getElementById("console-pre").innerHTML = output;
       }
 
       function Output(output) {
