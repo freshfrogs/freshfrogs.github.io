@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
 <style>
+
+  @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital@1&display=swap');
+
   html{
     background-image: url("/assets/background.png");
   }
   html,h1,h2,h3 {
-    font-family: Poppins, sans-serif !important;
+    font-family: 'Roboto Condensed', sans-serif !important;
   }
   #myProgress {
     width: 50%;
@@ -233,7 +235,7 @@
     border: none;
   }
   .h1 {
-    font-family: Poppins, sans-serif !important;
+    font-family: 'Roboto Condensed', sans-serif !important;
     font-weight: 800;
     color: white;
     text-align: center;
@@ -242,7 +244,7 @@
     font-size: xx-large;
   }
   .supply{
-    font-family: Poppins, sans-serif !important;
+    font-family: 'Roboto Condensed', sans-serif !important;
     color: #333;
     border-radius: 5px;
     border: 1px solid #e0e0e0;
@@ -276,7 +278,7 @@
     vertical-align: middle;
   }
   section {
-    font-family: Poppins, sans-serif !important;
+    font-family: 'Roboto Condensed', sans-serif !important;
     font-size: auto;
     color: white !important;
     background-color: #7cc1ff;
@@ -294,7 +296,7 @@
     border-radius: 5px;
     padding: 14px !important;
     width: auto;
-    font-family: Poppins, sans-serif !important;
+    font-family: 'Roboto Condensed', sans-serif !important;
     font-size: auto !important;
     margin-bottom: 16px !important;
     color: #333;
@@ -316,7 +318,7 @@
     image-rendering: pixelated;
   }
   .downloads a{
-    font-family: Poppins, sans-serif !important;
+    font-family: 'Roboto Condensed', sans-serif !important;
     font-size: inherit !important;
     color: inherit !important;
   }
@@ -443,7 +445,7 @@
     margin-top: 1%;
   }
   .h2 {
-    font-family: Poppins, sans-serif !important;
+    font-family: 'Roboto Condensed', sans-serif !important;
     font-weight: 750;
     text-align: center;
     padding: 0%;
@@ -480,7 +482,7 @@
     border: 1px solid #324d64;
     border-radius: 5px;
     height: 18px;
-    font-family: Poppins, sans-serif !important;
+    font-family: 'Roboto Condensed', sans-serif !important;
     font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     vertical-align: middle;
   }
@@ -513,9 +515,7 @@
     border-radius: 5px;
     padding: 4px;
     background-color: #7cc1ff;
-    margin-left: auto;
-    margin-right: auto;
-    width: fit-content;
+    vertical-align: bottom;
   }
   .headerDiv {
     border-bottom: 2px solid #7cc1ff;
@@ -571,7 +571,7 @@
     font-size: x-small;
     padding: 1px;
   }
-  .user_address {
+  .userAddress {
     padding-left: 1px;
     padding-right: 1px;
     border-radius: 5px;
@@ -602,64 +602,23 @@
     overflow: hidden;
   }
   .recentMint {
-    width: 128px !important;
-    height: 128px !important;
+    width: 128px;
+    height: auto;
     border-radius: 5px;
     box-shadow: 3px 3px rgb(122 122 122 / 20%);
-    margin: 2%;
-    transition: transform .2s;
-    cursor: pointer;
-    border: 1px solid white;
+    margin: 4px;
   }
-  .trait_list {
-    min-width: 50%;
-    margin: auto;
-    text-align: left;
-    padding: 8px;
-  }
-  hr {
-    margin: 20px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-  }
-  .frog_token_old {
-    width: 100%;
-    display: flex;
+  .recent_mints {
     margin-left: auto;
     margin-right: auto;
-  }
-  .staked_token {
-    display: flex;
-    background-color: #ff9999;
-    border: 1px solid white;
-    padding: 16px;
-    color: #333 !important;
-    box-shadow: 3px 3px rgb(122 122 122 / 20%);
-    margin: auto;
-    border-radius: 5px;
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
-    overflow: hidden;
-  }
-  .frog_token {
-    display: flex;
-    background-color: #7cc1ff;
-    border: none;
-    padding: 8px;
-    color: white !important;
-    box-shadow: none;
-    margin: auto;
-    border-radius: 5px;
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    overflow: hidden;
+    margin-top: 5%;
+    margin-bottom: auto;
+    width: 90%;
   }
   .frog_button {
     border: 1px solid white;
-    background-color: white;
-    color: #333;
+    background-color: #7cc1ff;
+    color: white;
     border-radius: 5px;
     padding: 3px;
     box-shadow: 3px 3px rgb(122 122 122 / 20%);
@@ -668,13 +627,8 @@
     cursor: pointer;
     transition: all .2s;
   }
-  .frog_button:hover {
-    background-color: #7cc1ff;
-    color: white;
-  }
-  .console_pre {
-    border: 1px solid lightgrey;
-    border-radius: 5px;
+  .frog_button_div {
+    display: inline-block;
     padding: 8px;
   }
 </style>
@@ -689,8 +643,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
     
-    <script src="https://freshfrogs.io/the-pond/banner/FileSaver.js"></script>
-    <script src="https://freshfrogs.io/the-pond/banner/dom-to-image.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
@@ -703,845 +655,146 @@
       gtag('js', new Date());
       gtag('config', 'G-6PB0WKB4SH');
       // -- >
-      
-      //
 
-      const _0x3c6cb7=_0x455b;(function(_0x10c095,_0x4ebf79){const _0x128040=_0x455b,_0x558e9b=_0x10c095();while(!![]){try{const _0x151436=parseInt(_0x128040(0x1ec))/0x1*(parseInt(_0x128040(0x1f1))/0x2)+-parseInt(_0x128040(0x1f6))/0x3*(parseInt(_0x128040(0x1f5))/0x4)+parseInt(_0x128040(0x1f4))/0x5*(parseInt(_0x128040(0x1eb))/0x6)+parseInt(_0x128040(0x1ea))/0x7*(-parseInt(_0x128040(0x1ed))/0x8)+parseInt(_0x128040(0x1f3))/0x9+-parseInt(_0x128040(0x1ef))/0xa*(parseInt(_0x128040(0x1f2))/0xb)+parseInt(_0x128040(0x1f0))/0xc;if(_0x151436===_0x4ebf79)break;else _0x558e9b['push'](_0x558e9b['shift']());}catch(_0x163f3d){_0x558e9b['push'](_0x558e9b['shift']());}}}(_0x46a6,0x6aab1));const options={'method':'GET','headers':{'X-API-KEY':_0x3c6cb7(0x1ee)}};function _0x455b(_0x52da3f,_0x147a14){const _0x46a6d7=_0x46a6();return _0x455b=function(_0x455bdd,_0x1ee73a){_0x455bdd=_0x455bdd-0x1ea;let _0x5885ff=_0x46a6d7[_0x455bdd];return _0x5885ff;},_0x455b(_0x52da3f,_0x147a14);}function _0x46a6(){const _0x2e9797=['188216XwkUNa','1b80881e422a49d393113ede33c81211','5097090qszEib','11422152wzRNKi','1946jfhPGQ','11FRRONZ','1433718usknQF','75575VtUmze','88HamPWj','100911myKlsh','119cKmLbR','264AwALcZ','319AyvMxB'];_0x46a6=function(){return _0x2e9797;};return _0x46a6();}
+      /*
+        Assign Public Variables
+      */
 
-      //
-      var render_total = 0;
-      var user_address, userInviteList, userInviteKeys, owned_frogs, contractName, contractSymbol, nextId, nextIdC, collection, COLLECTION, traits_list;
-      var CONTROLLER_ADDRESS, controller, CONTROLLER, is_approved, staked_tokens, staked_frogs, stakers_info, stakers_rewards;
-      var CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
-      var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
+      // User Variables
+
+      var user_address, user_invites, user_inviteKeys, user_tokens, user_invite;
+
+      // Function Variables
+
+      var mint_id, opensea_failed;
+      var mint_price = 0.01;
+      var mint_quantity = 1;
+
+      // Contract Variables
+
+      var contract_name, contract_symbol, contract_id, collection, COLLECTION, traits_list, controller, CONTROLLER;
+      var CONTRACT_ADDRESS = contract_address = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"; // main: 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b | rinkeby: 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524
       var NETWORK = "main";
-      var morph = sub_frog = base_frog = false;
 
-      // initialize array
-      var frog_array = [];
+      /*
+        Load web page
+      */
 
       document.addEventListener("DOMContentLoaded", async () => {
 
         const web3 = new Web3(window.ethereum);
         const f0 = new F0();
 
-        const CONTROLLER_ABI =
-          [
-            {
-              "inputs": [],
-              "name": "claimRewards",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "_tokenId",
-                  "type": "uint256"
-                }
-              ],
-              "name": "stake",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "contract IERC721",
-                  "name": "_nftCollection",
-                  "type": "address"
-                },
-                {
-                  "internalType": "contract IERC20",
-                  "name": "_rewardsToken",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "nonpayable",
-              "type": "constructor"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "_tokenId",
-                  "type": "uint256"
-                }
-              ],
-              "name": "withdraw",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "_staker",
-                  "type": "address"
-                }
-              ],
-              "name": "availableRewards",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "_user",
-                  "type": "address"
-                }
-              ],
-              "name": "getStakedTokens",
-              "outputs": [
-                {
-                  "components": [
-                    {
-                      "internalType": "address",
-                      "name": "staker",
-                      "type": "address"
-                    },
-                    {
-                      "internalType": "uint256",
-                      "name": "tokenId",
-                      "type": "uint256"
-                    }
-                  ],
-                  "internalType": "struct FreshFrogsController.StakedToken[]",
-                  "name": "",
-                  "type": "tuple[]"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "nftCollection",
-              "outputs": [
-                {
-                  "internalType": "contract IERC721",
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "rewardsToken",
-              "outputs": [
-                {
-                  "internalType": "contract IERC20",
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "name": "stakerAddress",
-              "outputs": [
-                {
-                  "internalType": "address",
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "name": "stakers",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "amountStaked",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "timeOfLastUpdate",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "unclaimedRewards",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            }
-          ]
-
-        CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
         COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
 
-        try { // Connect Wallet, Factoria
+        fetch_opensea_data();
+
+        try { // Connect
 
           await f0.init({
+
             web3: web3,
             contract: CONTRACT_ADDRESS,
             network: NETWORK
+
           })
 
-          // Contract
+          // Assign variables
+
           user_address = await web3.currentProvider.selectedAddress;
-          userInviteList = await f0.myInvites();
-          userInviteKeys = Object.keys(userInviteList);
-          owned_frogs = await collection.methods.balanceOf(CONTROLLER_ADDRESS).call();
-          contractName = await f0.api.name().call();
-          contractSymbol = await f0.api.symbol().call();
-          nextId = await f0.api.nextId().call();
-          nextIdC = parseInt(nextId);
+          user_invites = await f0.myInvites();
+          user_inviteKeys = Object.keys(user_invites);
+          user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
 
-          // Controller
-          is_approved;
-          staked_tokens = staked_frogs = owned_frogs;
-        
-          //document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
+          user_tokens = await collection.methods.balanceOf(user_address).call();
 
-          if (owned_frogs <= 0 && staked_tokens <= 0) { // ❌ No FROGS
+          contract_name = await f0.api.name().call();
+          contract_symbol = await f0.api.symbol().call();
+          contract_id = await f0.api.nextId().call();
+          mint_id = contract_id = parseInt(contract_id);
 
-            consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems no Frogs have been staked! ['+staked_tokens+'] Staked<br>'+'<p></p>')
+          if (opensea_failed){
 
-          } else {
+            display_token(contract_id);
+            console.log('Nex token_id : ' + contract_id);
 
-            consoleOutput('<br>'+'<strong>Connected!</strong> Loading... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
-
-            console.log('Connected User : ' + user_address);
-            console.log('Total Staked Tokens : ' + staked_tokens);
-            console.log('Loading VAULT data from OpenSea...');
-            
-            fetch_user_tokens(0)
-
-            if (owned_frogs > 50){
-              fetch_user_tokens(50);
-            }
-
-            if (owned_frogs > 100){
-              fetch_user_tokens(100);
-            }
-
-            if (owned_frogs > 150){
-              fetch_user_tokens(150);
-            }
-
-            if (owned_frogs > 200){
-              fetch_user_tokens(200);
-            }
-
-            if (owned_frogs > 250){
-              fetch_user_tokens(250);
-            }
-
-            if (owned_frogs > 300){
-              fetch_user_tokens(300);
-            }
-
-            if (owned_frogs > 350){
-              fetch_user_tokens(350);
-            }
-
-            if (owned_frogs > 400){
-              fetch_user_tokens(400);
-            }
-
-            console.log('Total : '+render_total);
           }
+
+          getInvites();
+
+          console.log('Connected  Smart Contract : '+contract_name+'('+contract_symbol+')');
+          console.log('Ethereum : '+contract_address);
+          console.log('Connected User : '+user_address);
+
+          // Update minting ui
+
+          // Remove token from minting tray
+
+          document.querySelector("#remove_token").addEventListener("click", async (e) => {
+            if (mint_quantity <= 1) {
+              return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
+            } else {
+              mint_quantity = mint_quantity - 1;
+              document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
+              document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
+            }
+          })
+
+          // Add token to minting tray mint_total
+
+          document.querySelector("#add_token").addEventListener("click", async (e) => {
+            if (mint_quantity >= 9) {
+              return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
+            } else {
+              mint_quantity = mint_quantity + 1;
+              document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
+              document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
+            }
+
+            //if (mint_quantity <= (mint_limit - user_tokens)) {
+            //} else { console.log('User mint limit reached!'); console.log('Mint Limit '+mint_limit+' : '+user_tokens+' User Tokens'); }
+
+          })
+
+          // Send mint transaction to provider!
+
+          document.querySelector("#mint_total").addEventListener("click", async (e) => {
+
+            console.log('Sending mint transaction!');
+            console.log(mint_quantity+' FROGS @ Ξ'+mint_price+' : ['+(mint_price*mint_quantity)+']');
+            
+            try {
+                
+              consoleOutput('<br>'+'<strong>Minting ('+mint_quantity+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
+              document.getElementById('pre').style.backgroundColor = '#99ffc5'
+                
+              let tokens = await f0.mint(user_invite, mint_quantity)
+              
+              // AWAIT RESPONSE!
+
+              consoleOutput('<br>'+'<strong>Congratulations</strong><br><b>'+mint_quantity+' FROG(s)</b> have successfully been minted!'+'<p></p>');
+              document.getElementById('pre').style.backgroundColor = '#99ffc5'
+              return; // BREAK!
+
+            } catch (e) {
+                
+              // Something went wrong!
+              
+              consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
+              document.getElementById('pre').style.backgroundColor = '#ff99b6'
+              return; // BREAK!
+
+            }
+
+          })
 
         } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
 
       })
 
-      function getRandomInt(min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-      }
 
       function consoleOutput(output) {
         document.getElementById("pre").innerHTML = output
-      }
-
-      function load_trait(trait, attribute, where) {
-        newAttribute = document.createElement("img")
-        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
-        newAttribute.id = attribute
-        newAttribute.target = "_blank"
-        if (where == 'frogContainer4') {
-          newAttribute.className = "frogImg4" //shadesAnimation
-        } else {
-          newAttribute.className = "frogImg2" //shadesAnimation
-        }
-        
-        newAttribute.style.cursor = "pointer"
-        if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
-          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"2.gif"
-        } else if (attribute === "tongueFly") { 
-          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
-        } else if (attribute === "cyan_tongueFly") { 
-          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
-        } else if (attribute === "morphAnimation") {
-          newAttribute.src = "https://freshfrogs.io/the-pond/Frog/loadMorph.gif"
-        } else if (attribute === "shadesAnimation") {
-          newAttribute.src = "https://freshfrogs.io/the-pond/Eyes/shadesAnimation.gif"
-        } else if (attribute.includes("croaking2")) {
-          console.log('! '+trait+' / '+attribute)
-          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
-        } else {
-          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png"
-        }
-        newAttribute.alt = attribute
-        document.getElementById(where).appendChild(newAttribute)
-      }
-
-      // Function combine tokens
-      async function combineTokens(base, other) {
-
-        console.log('Morphing Frogs '+base+', and '+other+'...')
-          
-        var base_Frog = base_SpecialFrog = base_Trait = base_Accessory = base_Eyes = base_Hat = base_Mouth = false;
-        var other_Frog = other_SpecialFrog = other_Trait = other_Accessory = other_Eyes = other_Hat = other_Mouth = false;
-        var alpha_Frog = alpha_SpecialFrog = alpha_Trait = alpha_Accessory = alpha_Eyes = alpha_Hat = alpha_Mouth = false;
-
-        // Fetch Base Frog Metadata
-
-        let base_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+base+".json")).json();
-
-        for (var i = 0; i < base_metadata.attributes.length; i++) {
-
-          var data = base_metadata.attributes[i]
-
-          if (data.trait_type == "Frog") {
-              var base_Frog = data.value;
-              console.log('base_Frog : '+base_Frog)
-          } else if (data.trait_type == "SpecialFrog") {
-              var base_SpecialFrog = data.value;
-              console.log('base_SpecialFrog : '+base_SpecialFrog)
-          } else if (data.trait_type == "Trait") {
-              var base_Trait = data.value;
-              console.log('base_Trait : '+base_Trait)
-          } else if (data.trait_type == "Accessory") {
-              var base_Accessory = data.value;
-              console.log('base_Accessory : '+base_Accessory)
-          } else if (data.trait_type == "Eyes") {
-              var base_Eyes = data.value;
-              console.log('base_Eyes : '+base_Eyes)
-          } else if (data.trait_type == "Hat") {
-              var base_Hat = data.value;
-              console.log('base_Hat : '+base_Hat)
-          } else if (data.trait_type == "Mouth") {
-              var base_Mouth = data.value;
-              console.log('base_Mouth : '+base_Mouth)
-          } else {
-            console.log('Unknown attribute : '+data.value)
-          }
-
-        }
-
-        // Fetch Other Frog Metadata
-
-        let other_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+other+".json")).json();
-
-        for (var l = 0; l < other_metadata.attributes.length; l++) {
-
-          var data = other_metadata.attributes[l]
-
-          if (data.trait_type == "Frog") {
-              var other_Frog = data.value;
-              console.log('other_Frog : '+other_Frog)
-          } else if (data.trait_type == "SpecialFrog") {
-              var other_SpecialFrog = data.value;
-              console.log('other_SpecialFrog : '+other_SpecialFrog)
-          } else if (data.trait_type == "Trait") {
-              var other_Trait = data.value;
-              console.log('other_Trait : '+other_Trait)
-          } else if (data.trait_type == "Accessory") {
-              var other_Accessory = data.value;
-              console.log('other_Accessory : '+other_Accessory)
-          } else if (data.trait_type == "Eyes") {
-              var other_Eyes = data.value;
-              console.log('other_Eyes : '+other_Eyes)
-          } else if (data.trait_type == "Hat") {
-              var other_Hat = data.value;
-              console.log('other_Hat : '+other_Hat)
-          } else if (data.trait_type == "Mouth") {
-              var other_Mouth = data.value;
-              console.log('other_Mouth : '+other_Mouth)
-          } else {
-            console.log('Unknown attribute : '+data.value)
-          }
-
-        }
-
-        // Finalize Metadata Output
-
-        // Frog Type
-        if (base_Frog != false) {
-
-          var alpha_Frog = base_Frog;
-
-          if (base_Frog == 'cyanTreeFrog' && other_Frog == 'cyanTreeFrog') { var alpha_Frog = false; var alpha_SpecialFrog = 'elBino/'+base_Frog; }          
-
-        } else if (base_SpecialFrog != false) {
-
-          var alpha_SpecialFrog = base_SpecialFrog;
-
-        }
-
-        // Trait Type
-        if (other_Trait != false) {
-
-          var alpha_Trait = other_Trait;
-
-        } else if (base_Trait != false) {
-
-          var alpha_Trait = base_Trait;
-
-        }
-
-        // Update alpha_Trait for SpecialFrogs
-
-        if (base_SpecialFrog != false || other_SpecialFrog != false) {
-
-          if (base_SpecialFrog == 'croaking' && other_SpecialFrog == 'croaking') {
-            var alpha_SpecialFrog = base_SpecialFrog+'/croaking2'
-            var other_Trait = alpha_Trait = base_Trait = false
-          }
-
-          if ((base_SpecialFrog == 'thirdEye' || base_SpecialFrog == 'inversedEyes' || base_SpecialFrog == 'peace'  || base_SpecialFrog == 'closedEyes') && other_Frog != false) {
-
-            if (base_SpecialFrog == 'inversedEyes') {
-
-              var alpha_SpecialFrog = '../Frog/'+other_Frog
-
-            } else if (base_SpecialFrog == 'thirdEye') {
-
-              var alpha_SpecialFrog = base_SpecialFrog+'/'+other_Frog;
-
-            } else if (base_SpecialFrog == 'peace' && other_Frog !== false) {
-
-              var alpha_SpecialFrog = base_SpecialFrog+'/'+other_Frog;
-
-            } else if (base_SpecialFrog == 'closedEyes') {
-
-              var alpha_SpecialFrog = base_SpecialFrog+'/'+other_Frog;
-
-            }
-          
-          }
-
-          if (base_SpecialFrog != false) {
-            if (other_SpecialFrog != false) {
-              if (base_SpecialFrog == 'thirdEye' && other_SpecialFrog == 'peace') {
-                
-                var alpha_Trait = base_SpecialFrog+'/blue';
-              
-              }
-              
-              else if (base_SpecialFrog == 'inversedEyes' && other_SpecialFrog == 'peace') {
-                
-                var alpha_SpecialFrog = 'peace'
-                var alpha_Trait = 'inversedEyes/peace';
-              
-              } else if (base_SpecialFrog == 'inversedEyes' && other_SpecialFrog == 'thirdEye') {
-                
-                var alpha_SpecialFrog = 'thirdEye'
-                var alpha_Trait = 'thirdEye/inversedEyes';
-              
-              } else if (base_SpecialFrog == 'closedEyes' && other_SpecialFrog == 'peace') {
-                
-                var alpha_SpecialFrog = 'peace'
-                var alpha_Trait = 'closedEyes/peace';
-              
-              } else {
-                var alpha_Trait = base_SpecialFrog+'/'+other_SpecialFrog;
-              }
-            } else {
-              var alpha_Trait = base_SpecialFrog+'/'+alpha_Trait;
-            }
-          }
-
-          else if (other_SpecialFrog == 'thirdEye' || other_SpecialFrog == 'inversedEyes') {
-            var alpha_Trait = other_SpecialFrog+'/base/'+alpha_Trait;
-          }
-
-        }
-
-        // Accessory
-        if (base_Accessory != false) {
-
-          alpha_Accessory = base_Accessory
-
-        } else if (other_Accessory != false) {
-
-          alpha_Accessory = other_Accessory
-
-        }
-
-        // Eyes
-        if (base_Eyes != false) {
-
-          alpha_Eyes = base_Eyes
-
-        } else if (other_Eyes != false) {
-
-          alpha_Eyes = other_Eyes
-
-        }
-
-        // Hat
-        if (base_Hat != false) {
-
-          alpha_Hat = base_Hat
-
-        } else if (other_Hat != false) {
-
-          alpha_Hat = other_Hat
-
-        }
-
-        // Mouth
-        if (base_Mouth != false) {
-
-          alpha_Mouth = base_Mouth
-
-        } else if (other_Mouth != false) {
-
-          alpha_Mouth = other_Mouth
-
-        }
-
-        thisPlace = 'frogContainer4';
-        var thisPlace_div = document.getElementById(thisPlace)
-        thisPlace_div.style.background = 'transparent'
-        thisPlace_div.innerHTML = ''
-
-        console.log('--- Final Frog Metadata ---')
-        if (alpha_Frog != false) { load_trait("Frog", alpha_Frog, thisPlace); console.log('Frog: '+alpha_Frog);} else if (alpha_SpecialFrog != false) { load_trait("SpecialFrog", alpha_SpecialFrog, thisPlace); console.log('SpecialFrog: '+alpha_SpecialFrog);}
-        
-        if (alpha_Trait != false) { load_trait("Trait", alpha_Trait, thisPlace); console.log('Trait: '+alpha_Trait);}
-        if (base_Frog == 'splendidLeafFrog') {
-
-          //load_trait("Frog", other_Frog, thisPlace);
-          load_trait("Trait/splendidLeafFrog", base_Trait, thisPlace);
-
-        } // Custom for traits (overlay)
-        if (alpha_Mouth == "tongueFly" && alpha_Trait == "Cyan") {
-          load_trait("Trait", "cyan_tongueFly", thisPlace)
-        }
-        if (alpha_Accessory != false) { load_trait("Accessory", alpha_Accessory, thisPlace); console.log('Accessory: '+alpha_Accessory);}
-        if (alpha_Eyes != false) { load_trait("Eyes", alpha_Eyes, thisPlace); console.log('Eyes: '+alpha_Eyes);}
-        if (alpha_Hat != false) { load_trait("Hat", alpha_Hat, thisPlace); console.log('Hat: '+alpha_Hat);}
-        if (alpha_Mouth != false) { load_trait("Mouth", alpha_Mouth, thisPlace); console.log('Mouth: '+alpha_Mouth);}
-
-      }
-
-
-      // Select Frog
-      async function display_token(token){
-
-        openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
-        etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
-
-        display_frog = 'https://freshfrogs.io/frog/'+token+'.png'
-        display_name = 'Frog #'+token
-        display_os = ''
-
-        document.getElementById('thisheader').style.backgroundImage = 'url('+display_frog+')';
-        document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
-
-        document.getElementById('previewImg').setAttribute('src', display_frog)
-        document.getElementById('display_name').innerHTML = display_name
-        document.getElementById('morphFrogs').setAttribute('href', etherscanLink)
-
-        document.getElementById('selectBase').removeAttribute('href');
-        document.getElementById('selectBase').innerHTML = '<strong>Morph</strong><frog id="baseText">two frogs</frog>'
-        document.getElementById('selectBase').onclick = function() {
-          if (!morph) {
-            base_frog = token
-            morph = true;
-            document.getElementById('baseText').innerHTML = 'select frog!'
-          } else if (morph) {
-            console.log('Sending Image...');
-            takeScreenShot();
-          } 
-
-        }
-
-      }
-
-      async function fetch_staked_frogs() {
-        
-        fetch('https://api.opensea.io/api/v1/assets?owner='+'0xd302B8B0Dc965553b1D8c247E2cdA5E1F600640f'+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
-        .then((tokens) => tokens.json())
-        .then((tokens) => {
-
-          console.log('Connecting to FreshFrogsController via OpenSea...')
-          var { assets } = tokens
-          assets.forEach((frog) => { 
-
-            var { token_id } = frog
-
-            // append multiple values to the array
-            frog_array.push(token_id);
-
-          })
-
-        })
-        .catch(e => {
-
-          console.log('Error: Could not talk to OpenSea! '+e.message);
-      
-        })
-      }
-
-      // claimRewards()
-      async function claim_rewards(user_address) {
-
-        try {
-
-          controller.methods.claimRewards(user_address).send({ from: user_address });
-
-        } catch (e) { console.log(e.message); }
-        
-      }
-
-      // stake()
-      async function stake(token_id) {
-        
-        try {
-
-          if (!is_approved) {
-
-            consoleOutput('<br>'+'<strong>Sign Txn setApprovalForAll</strong>'+'<br>'+'Please sign the transaction and wait...<br>This is a one time transaction to allow staking.'+'<p></p>')
-            
-            let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
-
-            consoleOutput('<br>'+'<strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
-            document.getElementById('pre').style.backgroundColor = '#99ffc5'
-
-            let stake = await controller.methods.stake(token_id).send({ from: user_address });
-
-            consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>Frog #'+token_id+'</b> has successfully been staked! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>Refresh Page!</a></b></div><br>')
-            document.getElementById('pre').style.backgroundColor = '#99ffc5'
-
-          } else {
-
-            consoleOutput('<br>'+'<strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
-            document.getElementById('pre').style.backgroundColor = '#99ffc5'
-
-            let stake = await controller.methods.stake(token_id).send({ from: user_address });
-
-            consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>Frog #'+token_id+'</b> has successfully been staked! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>Refresh Page!</a></b></div><br>')
-            document.getElementById('pre').style.backgroundColor = '#99ffc5'
-
-          }
-
-        } catch (e) { 
-
-          console.log(e.message);
-          consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
-          document.getElementById('pre').style.backgroundColor = '#ff99b6';
-
-        }
-
-      }
-
-      // withdraw()
-      async function withdraw(token_id) {
-
-        try {
-
-          if (!is_approved) {
-
-            consoleOutput('<br>'+'<strong>Sign Txn setApprovalForAll</strong>'+'<br>'+'Please sign the transaction and wait...<br>This is one time transaction to allow staking.'+'<p></p>')
-            
-            let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
-
-            consoleOutput('<br>'+'<strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
-            document.getElementById('pre').style.backgroundColor = '#99ffc5'
-
-            let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
-
-            consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>Frog #'+token_id+'</b> has successfully been unstaked! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>Refresh Page!</a></b></div><br>')
-            document.getElementById('pre').style.backgroundColor = '#99ffc5'
-
-          } else {
-
-            consoleOutput('<br>'+'<strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
-            document.getElementById('pre').style.backgroundColor = '#99ffc5'
-
-            let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
-
-            consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>Frog #'+token_id+'</b> has successfully been unstaked! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>Refresh Page!</a></b></div><br>')
-            document.getElementById('pre').style.backgroundColor = '#99ffc5'
-
-          }
-
-        } catch (e) { 
-
-          console.log(e.message);
-          consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
-          document.getElementById('pre').style.backgroundColor = '#ff99b6';
-
-        }
-        
-      }
-
-      // availableRewards()
-      async function available_rewards(user_address) {
-
-        try {
-
-          controller.methods.availableRewards(user_address).call();
-
-        } catch (e) { console.log(e.message); }
-        
-      }
-
-      // render_token()
-      async function render_token(token_id, staked, staked_owner) {
-
-        try {
-
-          // Variables
-          let openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
-          let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
-          let gemxyzLink = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
-          let external_link = 'https://freshfrogs.io/frog/'+token_id+'.png';
-          let name = 'Frog #'+token_id
-          let doc = document.getElementById('thePad');
-          var render_total = render_total + 1;
-
-          // Create Element
-          frog_token = document.createElement('div');
-          frog_token.id = name;
-          frog_token.className = 'frog_token';
-          frog_token.innerHTML = '<img src="'+external_link+'" class="recentMint"/><div id="traits_'+token_id+'" class="trait_list"></div>';
-          frog_token.onclick = function() { 
-            if (!morph) {
-              if (!staked) { display_token(token_id); } else { display_token(token_id); }
-            } else {
-              sub_frog = token_id;
-              combineTokens(base_frog, sub_frog);
-              document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog;
-            }
-          }
-          doc.appendChild(frog_token);
-
-          if (staked) { // ff9999
-            document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: white !important;"><u>'+name+'</u> <b style="border-radius: 5px; background: rgb(122 122 122 / 20%); color: #ff9999;">(staked)</b></strong>'+'<br><i>Owner: '+truncateAddress(staked_owner)+'</i>';
-          } else {
-            document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: white !important;"><u>'+name+'</u></strong>';
-          }
-
-          let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
-
-          for (var i = 0; i < metadata.attributes.length; i++) {
-
-            var data = metadata.attributes[i]
-
-            let trait_text = document.createElement('i')
-            trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value
-            document.getElementById('traits_'+token_id).appendChild(trait_text)
-
-          }
-
-          let button_b = document.createElement('div');
-          button_b.innerHTML = '<br><a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
-          document.getElementById('traits_'+token_id).appendChild(button_b);
-
-        } catch (e) { console.log(e.message); }
-
-      }
-
-      // getStakedTokens()
-      async function get_staked_tokens(token_id) {
-
-        try {
-
-          let staked_owner = await controller.methods.stakerAddress(token_id).call();
-
-          //console.log(token_id+' : '+staked_owner);
-          render_token(token_id, true, staked_owner)
-
-        } catch (e) { console.log(e.message); }
-
-      }
-
-      // nftCollection()
-      async function nft_collection() {
-
-        try {
-
-          controller.methods.nftCollection().call();
-
-        } catch (e) { console.log(e.message); }
-        
-      }
-
-      // rewardsToken()
-      async function rewards_token() {
-
-        try {
-
-          controller.methods.rewardsToken().call();
-
-        } catch (e) { console.log(e.message); }
-        
-      }
-
-      // stakerAddress(token)
-      async function staker_address(token_id) {
-
-        try {
-
-          controller.methods.stakerAddress(token_id).call();
-
-        } catch (e) { console.log(e.message); }
-        
-      }
-
-      // stakers() function
-      async function stakers(user_address) {
-
-        try {
-
-          let stakers_return = await controller.methods.stakers(user_address).call();
-          return (stakers_return.unclaimedRewards / 1000000000000000000);
-
-        } catch (e) { console.log(e.message); }
-        
       }
 
       function truncateAddress(address) {
@@ -1554,39 +807,119 @@
         )}`;
       }
 
-      // Check owned tokens
+      /*
+        Fetch OpenSea collection data
+      */
 
-      function fetch_user_tokens(offset) {
+      function fetch_opensea_data() {
 
-        fetch('https://api.opensea.io/api/v1/assets?owner='+CONTROLLER_ADDRESS+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+offset+'&limit=50&include_orders=false', options)
-        .then((tokens) => tokens.json())
-        .then((tokens) => {
+        const options = {
+          method: 'GET',
+          headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'} // 1b80881e422a49d393113ede33c81211
+        };
 
-          //consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<div id="display_frog"></div><hr>')
-          consoleOutput('<br>'+'<strong>Frog Vault</strong> ['+truncateAddress(CONTROLLER_ADDRESS)+']'+'<br>[ '+staked_frogs+' ] Total Frogs currently staked!<br>'+'<div id="display_frog"></div><hr>')
+        // Collection variables
+        // Trait list and rarities
 
-          var { assets } = tokens
-          assets.forEach((frog) => { // console.log(frog)
+        fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
+        .then(collection => collection.json())
+        .then(collection => {
 
-            try {
+          var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
 
-              var { name, token_metadata, permalink, traits, external_link, token_id } = frog
-
-            } catch (e) { console.log(e.message); }
-
-            get_staked_tokens(token_id)
-
-          })
+          traits_list = traits;
 
         })
         .catch(e => {
 
-          console.log(e.message);
-          console.log('Error: OpenSea Error! fetch_user_tokens()');
+            console.log('Error: Could not talk to Opensea. (1)');
+            console.error('Error : ' + e.message)
       
+        });
+        
+        // Pull next available token ID prior to web3 connection
+        //
+
+        fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=12&include_orders=false', options)
+        .then((assets) => assets.json())
+        .then((assets) => {
+
+          var { assets } = assets
+          var contract_id = mint_id = parseInt(assets[0].name.replace('Frog #', '')) + 1;
+
+          display_token(contract_id);
+          console.log('Nex token_id : ' + contract_id);
+
         })
+        .catch(e => {
+
+          opensea_failed = true;
+          console.log('Error: Could not talk to Opensea. (2)');
+          console.error('Error : ' + e.message)
+
+        });
+
       }
 
+      // Check invites
+      async function getInvites() {
+
+        mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1);
+        mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1);
+
+        for (var i = 0; i < 10; i++) { 
+
+          if (user_inviteKeys[i] === "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064") {
+
+            if (user_address === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || user_address === "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359_0".toLowerCase() || user_address === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8_0".toLowerCase() || user_address === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
+
+              user_invite = "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064";
+              mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1);
+              mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1);
+
+              break;
+
+            }
+          }
+        }
+        
+        document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
+        consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'Frog #'+mint_id+' is now available to mint!<br>Maximum of <u>'+mint_limit+'</u> Frogs @ Ξ'+mint_price+'<br>'+'<p></p>')
+
+      }
+
+      // Display Frog
+      async function display_token(token){
+
+          token_img = 'https://freshfrogs.io/frog/'+token+'.png'
+          token_name = 'Frog #'+token
+
+          document.getElementById('thisheader').style.backgroundImage = 'url('+token_img+')';
+          document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
+          document.getElementById('previewImg').setAttribute('src', token_img)
+
+          /*
+          let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
+          for (var i = 0; i < token_metadata.attributes.length; i++){
+              var data = token_metadata.attributes[i]
+              //load_trait(data.trait_type, data.value, 'subDisplay')
+              if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
+                token_type = data.value.slice(0, 11)+'..'
+                break;
+              }
+          }
+          */
+
+          document.getElementById('mint_token').innerHTML = '<strong>'+token_name+'</strong>4040 supply'//+token_type;
+          document.getElementById('mint_token').removeAttribute('href');
+
+          document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ<b id="mint_total_actual">'+(mint_price*mint_quantity)+'</b> +gas';
+          document.getElementById('mint_total').removeAttribute('href');
+
+          document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> <b id="mint_quantity_actual">'+mint_quantity+'</b> <b id="add_token">+</b></strong>quantity';
+          document.getElementById('mint_quantity').removeAttribute('href');
+
+      }
 
     </script>
   </head>
@@ -1595,9 +928,9 @@
       <header id="thisheader">
         <div class="downloads pre">
           <ul class="downloads2">
-            <li><a id="morphFrogs" class="pointer"><strong id="display_name">Fresh Frogs</strong><div id="display_type">ΞEthereum</div></a></li>
-            <li><a id="selectBase" class="pointer" href="http://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong><frog id="baseText">Support</frog></a></li>
-            <li><a id="selectSub" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>OpenSea</strong><frog id="subText">Marketplace</frog></a></li>
+            <li><a id="mint_token" class="pointer" href=""><strong>MINT</strong>Ξ0.01 +gas</a></li>
+            <li><a id="mint_total" class="pointer" href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b"><strong>Etherscan</strong>view on</a></li>
+            <li><a id="mint_quantity" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>OpenSea</strong>view on</a></li>
           </ul>
           <br>
           <div id="mintingTray" class="mintingTray">
@@ -1615,11 +948,20 @@
         <div class="top">{{ content }}</div>
         <div class="downloads pre">
           <div id="netStatus" class="netStatus">
-            <img src="../assets/frogs/websiteBannerFinal_2.png" style="border-radius: 5px; height: auto !important; width: 100% !important; margin-bottom: 14px; transform: scale(1.01);">
+            <div id="recent_mints" class="recent_mints"><img src="https://freshfrogs.github.io/frog/1205.png" class="recentMint"><img src="https://freshfrogs.github.io/frog/1206.png" class="recentMint"><img src="https://freshfrogs.github.io/frog/1207.png" class="recentMint"></div>
             <br>
-            <h2 style="color: white !important;"><b>freshfrogs.io/vault</b></h2>
-            <br>Mint From Collection!<a class="pointer" href="https://freshfrogs.io/"><b>🍃 Minting Terminal</b></a>
-            <hr class="hr2">STAKE! Earn Rewards!<a class="pointer" href="https://freshfrogs.io/the-pond"><b>🐸 freshfrogs.io/the-pond</b></a>
+            <h2 style="color: white !important;"><b>FreshFrogsNFT</b></h2>
+            <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
+            <hr>
+            <div class="frog_button_div">
+              🔌 Connect to Ethereum!<a href="https://freshfrogs.io/"><button class="frog_button">Connect Wallet 🡥</button></a>
+            </div>
+            <div class="frog_button_div">
+              🐸 STAKE! Earn Rewards!<a href="https://freshfrogs.io/the-pond"><button class="frog_button">freshfrogs.io/the-pond 🡥</button></a>
+            </div>
+            <div class="frog_button_div">
+              ⛵ opensea.io/collection/fresh-frogs<a href="https://opensea.io/collection/fresh-frogs" target="_blank"><button class="frog_button">Shop on OpenSea 🡥</button></a>
+            </div>
             <br>
             <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a></div>
           </div>
