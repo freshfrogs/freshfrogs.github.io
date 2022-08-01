@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <style>
-
   @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital@1&display=swap');
-
   html{
     background-image: url("/assets/background.png");
   }
   html,h1,h2,h3 {
-    font-family: 'Roboto Condensed', sans-serif !important;
+    font-family: Poppins, sans-serif !important;
   }
   #myProgress {
     width: 50%;
@@ -235,7 +233,7 @@
     border: none;
   }
   .h1 {
-    font-family: 'Roboto Condensed', sans-serif !important;
+    font-family: Poppins, sans-serif !important;
     font-weight: 800;
     color: white;
     text-align: center;
@@ -244,7 +242,7 @@
     font-size: xx-large;
   }
   .supply{
-    font-family: 'Roboto Condensed', sans-serif !important;
+    font-family: Poppins, sans-serif !important;
     color: #333;
     border-radius: 5px;
     border: 1px solid #e0e0e0;
@@ -278,7 +276,7 @@
     vertical-align: middle;
   }
   section {
-    font-family: 'Roboto Condensed', sans-serif !important;
+    font-family: Poppins, sans-serif !important;
     font-size: auto;
     color: white !important;
     background-color: #7cc1ff;
@@ -296,7 +294,7 @@
     border-radius: 5px;
     padding: 14px !important;
     width: auto;
-    font-family: 'Roboto Condensed', sans-serif !important;
+    font-family: Poppins, sans-serif !important;
     font-size: auto !important;
     margin-bottom: 16px !important;
     color: #333;
@@ -318,7 +316,7 @@
     image-rendering: pixelated;
   }
   .downloads a{
-    font-family: 'Roboto Condensed', sans-serif !important;
+    font-family: Poppins, sans-serif !important;
     font-size: inherit !important;
     color: inherit !important;
   }
@@ -445,11 +443,12 @@
     margin-top: 1%;
   }
   .h2 {
-    font-family: 'Roboto Condensed', sans-serif !important;
+    font-family: Poppins, sans-serif !important;
     font-weight: 750;
     text-align: center;
     padding: 0%;
     font-size: large;
+    font: "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
     margin-top: 8px;
     margin-bottom: 0px;
     line-height: 1.1;
@@ -481,7 +480,8 @@
     border: 1px solid #324d64;
     border-radius: 5px;
     height: 18px;
-    font-family: 'Roboto Condensed', sans-serif !important;
+    font-family: Poppins, sans-serif !important;
+    font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     vertical-align: middle;
   }
   .mintingTextGreen {
@@ -513,7 +513,9 @@
     border-radius: 5px;
     padding: 4px;
     background-color: #7cc1ff;
-    vertical-align: bottom;
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
   }
   .headerDiv {
     border-bottom: 2px solid #7cc1ff;
@@ -569,7 +571,7 @@
     font-size: x-small;
     padding: 1px;
   }
-  .userAddress {
+  .user_address {
     padding-left: 1px;
     padding-right: 1px;
     border-radius: 5px;
@@ -588,7 +590,6 @@
     margin-left: auto;
     margin-right: auto;
     overflow: hidden;
-    margin-top: 5%;
   }
   #banner_image {
     width: 100%;
@@ -601,40 +602,79 @@
     overflow: hidden;
   }
   .recentMint {
-    width: 128px;
-    height: auto;
+    width: 128px !important;
+    height: 128px !important;
     border-radius: 5px;
     box-shadow: 3px 3px rgb(122 122 122 / 20%);
-    margin: 4px;
+    margin: 2%;
+    transition: transform .2s;
+    cursor: pointer;
+    border: 1px solid white;
   }
-  .recent_mints {
+  .trait_list {
+    min-width: 50%;
+    margin: auto;
+    text-align: left;
+    padding: 8px;
+  }
+  hr {
+    margin: 20px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  .frog_token_old {
+    width: 100%;
+    display: flex;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 5%;
-    margin-bottom: auto;
-    width: 90%;
+  }
+  .staked_token {
+    display: flex;
+    background-color: #ff9999;
+    border: 1px solid white;
+    padding: 16px;
+    color: #333 !important;
+    box-shadow: 3px 3px rgb(122 122 122 / 20%);
+    margin: auto;
+    border-radius: 5px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
+  }
+  .frog_token {
+    display: flex;
+    background-color: #7cc1ff;
+    border: none;
+    padding: 8px;
+    color: white !important;
+    box-shadow: none;
+    margin: auto;
+    border-radius: 5px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
   }
   .frog_button {
     border: 1px solid white;
-    background-color: #7cc1ff;
-    color: white;
+    background-color: white;
+    color: #333;
     border-radius: 5px;
-    padding: 16px;
-    box-shadow: 3px 3px rgb(122 122 122 / 20%);
+    padding: 3px;
     margin-left: 2px;
     margin-right: 2px;
     cursor: pointer;
     transition: all .2s;
-    font-family: 'Roboto Condensed', sans-serif !important;
+    font-family: Poppins, sans-serif !important;
   }
   .frog_button:hover {
-    border: 1px solid white;
-    background-color: white;
-    color: #7cc1ff;
+    background-color: #7cc1ff;
+    color: white;
   }
-  .frog_button_div {
-    display: inline-block;
-    padding: 8px;
+  .console_pre {
+    border-radius: 5px;
+    padding: 16px;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -648,6 +688,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
     
+    <script src="https://freshfrogs.io/the-pond/banner/FileSaver.js"></script>
+    <script src="https://freshfrogs.io/the-pond/banner/dom-to-image.js"></script>
+    <script src="https://freshfrogs.io/assets/js/fresh-frogs.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
@@ -661,270 +704,11 @@
       gtag('config', 'G-6PB0WKB4SH');
       // -- >
 
-      /*
-        Assign Public Variables
-      */
-
-      // User Variables
-
-      var user_address, user_invites, user_inviteKeys, user_tokens, user_invite;
-
-      // Function Variables
-
-      var mint_id, opensea_failed;
-      var mint_price = 0.01;
-      var mint_quantity = 1;
-
-      // Contract Variables
-
-      var contract_name, contract_symbol, contract_id, collection, COLLECTION, traits_list, controller, CONTROLLER;
-      var CONTRACT_ADDRESS = contract_address = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"; // main: 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b | rinkeby: 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524
-      var NETWORK = "main";
-
-      /*
-        Load web page
-      */
-
       document.addEventListener("DOMContentLoaded", async () => {
 
-        const web3 = new Web3(window.ethereum);
-        const f0 = new F0();
-
-        COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
-
-        fetch_opensea_data();
-
-        try { // Connect
-
-          await f0.init({
-
-            web3: web3,
-            contract: CONTRACT_ADDRESS,
-            network: NETWORK
-
-          })
-
-          // Assign variables
-
-          user_address = await web3.currentProvider.selectedAddress;
-          user_invites = await f0.myInvites();
-          user_inviteKeys = Object.keys(user_invites);
-          user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
-
-          user_tokens = await collection.methods.balanceOf(user_address).call();
-
-          contract_name = await f0.api.name().call();
-          contract_symbol = await f0.api.symbol().call();
-          contract_id = await f0.api.nextId().call();
-          mint_id = contract_id = parseInt(contract_id);
-
-          if (opensea_failed){
-
-            display_token(contract_id);
-            console.log('Nex token_id : ' + contract_id);
-
-          }
-
-          getInvites();
-
-          console.log('Connected  Smart Contract : '+contract_name+'('+contract_symbol+')');
-          console.log('Ethereum : '+contract_address);
-          console.log('Connected User : '+user_address);
-
-          // Update minting ui
-
-          // Remove token from minting tray
-
-          document.querySelector("#remove_token").addEventListener("click", async (e) => {
-            if (mint_quantity <= 1) {
-              return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
-            } else {
-              mint_quantity = mint_quantity - 1;
-              document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
-              document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
-            }
-          })
-
-          // Add token to minting tray mint_total
-
-          document.querySelector("#add_token").addEventListener("click", async (e) => {
-            if (mint_quantity >= 9) {
-              return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
-            } else {
-              mint_quantity = mint_quantity + 1;
-              document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
-              document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
-            }
-
-            //if (mint_quantity <= (mint_limit - user_tokens)) {
-            //} else { console.log('User mint limit reached!'); console.log('Mint Limit '+mint_limit+' : '+user_tokens+' User Tokens'); }
-
-          })
-
-          // Send mint transaction to provider!
-
-          document.querySelector("#mint_total").addEventListener("click", async (e) => {
-
-            console.log('Sending mint transaction!');
-            console.log(mint_quantity+' FROGS @ Ξ'+mint_price+' : ['+(mint_price*mint_quantity)+']');
-            
-            try {
-                
-              consoleOutput('<br>'+'<strong>Minting ('+mint_quantity+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
-              document.getElementById('pre').style.backgroundColor = '#99ffc5'
-                
-              let tokens = await f0.mint(user_invite, mint_quantity)
-              
-              // AWAIT RESPONSE!
-
-              consoleOutput('<br>'+'<strong>Congratulations</strong><br><b>'+mint_quantity+' FROG(s)</b> have successfully been minted!'+'<p></p>');
-              document.getElementById('pre').style.backgroundColor = '#99ffc5'
-              return; // BREAK!
-
-            } catch (e) {
-                
-              // Something went wrong!
-              
-              consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
-              document.getElementById('pre').style.backgroundColor = '#ff99b6'
-              return; // BREAK!
-
-            }
-
-          })
-
-        } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
+        connect();
 
       })
-
-
-      function consoleOutput(output) {
-        document.getElementById("pre").innerHTML = output
-      }
-
-      function truncateAddress(address) {
-        if (!address) {
-          return "";
-        }
-        return `${address.substr(0, 5)}...${address.substr(
-          address.length - 5,
-          address.length
-        )}`;
-      }
-
-      /*
-        Fetch OpenSea collection data
-      */
-
-      function fetch_opensea_data() {
-
-        const options = {
-          method: 'GET',
-          headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'} // 1b80881e422a49d393113ede33c81211
-        };
-
-        // Collection variables
-        // Trait list and rarities
-
-        fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
-        .then(collection => collection.json())
-        .then(collection => {
-
-          var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
-
-          traits_list = traits;
-
-        })
-        .catch(e => {
-
-            console.log('Error: Could not talk to Opensea. (1)');
-            console.error('Error : ' + e.message)
-      
-        });
-        
-        // Pull next available token ID prior to web3 connection
-        //
-
-        fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=12&include_orders=false', options)
-        .then((assets) => assets.json())
-        .then((assets) => {
-
-          var { assets } = assets
-          var contract_id = mint_id = parseInt(assets[0].name.replace('Frog #', '')) + 1;
-
-          display_token(contract_id);
-          console.log('Nex token_id : ' + contract_id);
-
-        })
-        .catch(e => {
-
-          opensea_failed = true;
-          console.log('Error: Could not talk to Opensea. (2)');
-          console.error('Error : ' + e.message)
-
-        });
-
-      }
-
-      // Check invites
-      async function getInvites() {
-
-        mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1);
-        mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1);
-
-        for (var i = 0; i < 10; i++) { 
-
-          if (user_inviteKeys[i] === "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064") {
-
-            if (user_address === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || user_address === "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359_0".toLowerCase() || user_address === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8_0".toLowerCase() || user_address === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
-
-              user_invite = "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064";
-              mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1);
-              mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1);
-
-              break;
-
-            }
-          }
-        }
-        
-        document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
-        consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'Frog #'+mint_id+' is now available to mint!<br>Maximum of <u>'+mint_limit+'</u> Frogs @ Ξ'+mint_price+'<br>'+'<p></p>')
-
-      }
-
-      // Display Frog
-      async function display_token(token){
-
-          token_img = 'https://freshfrogs.io/frog/'+token+'.png'
-          token_name = 'Frog #'+token
-
-          document.getElementById('thisheader').style.backgroundImage = 'url('+token_img+')';
-          document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
-          document.getElementById('previewImg').setAttribute('src', token_img)
-
-          /*
-          let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
-          for (var i = 0; i < token_metadata.attributes.length; i++){
-              var data = token_metadata.attributes[i]
-              //load_trait(data.trait_type, data.value, 'subDisplay')
-              if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
-                token_type = data.value.slice(0, 11)+'..'
-                break;
-              }
-          }
-          */
-
-          document.getElementById('mint_token').innerHTML = '<strong>'+token_name+'</strong>4040 supply'//+token_type;
-          document.getElementById('mint_token').removeAttribute('href');
-
-          document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ<b id="mint_total_actual">'+(mint_price*mint_quantity)+'</b> +gas';
-          document.getElementById('mint_total').removeAttribute('href');
-
-          document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> <b id="mint_quantity_actual">'+mint_quantity+'</b> <b id="add_token">+</b></strong>quantity';
-          document.getElementById('mint_quantity').removeAttribute('href');
-
-      }
 
     </script>
   </head>
@@ -933,9 +717,9 @@
       <header id="thisheader">
         <div class="downloads pre">
           <ul class="downloads2">
-            <li><a id="mint_token" class="pointer" href=""><strong>MINT</strong>Ξ0.01 +gas</a></li>
-            <li><a id="mint_total" class="pointer" href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b"><strong>Etherscan</strong>view on</a></li>
-            <li><a id="mint_quantity" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>OpenSea</strong>view on</a></li>
+            <li><a id="morphFrogs" class="pointer"><strong id="display_name">Fresh Frogs</strong><div id="display_type">ΞEthereum</div></a></li>
+            <li><a id="selectBase" class="pointer" href="http://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong><frog id="baseText">Support</frog></a></li>
+            <li><a id="selectSub" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>OpenSea</strong><frog id="subText">Marketplace</frog></a></li>
           </ul>
           <br>
           <div id="mintingTray" class="mintingTray">
@@ -953,16 +737,11 @@
         <div class="top">{{ content }}</div>
         <div class="downloads pre">
           <div id="netStatus" class="netStatus">
-            <div id="recent_mints" class="recent_mints"><img src="https://freshfrogs.github.io/frog/1205.png" class="recentMint"><img src="https://freshfrogs.github.io/frog/1206.png" class="recentMint"><img src="https://freshfrogs.github.io/frog/1207.png" class="recentMint"></div>
+            <img src="../assets/frogs/websiteBannerFinal_2.png" style="border-radius: 5px; height: auto !important; width: 100% !important; margin-bottom: 14px; transform: scale(1.01);">
             <br>
-            <h2 style="color: white !important;"><b>FreshFrogsNFT</b></h2>
-            <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
-            <div class="frog_button_div">
-              <a href="https://freshfrogs.io/the-pond"><button class="frog_button"><b>🐸 Visit The Pond</b></button></a>
-            </div>
-            <div class="frog_button_div">
-              <a href="https://opensea.io/collection/fresh-frogs" target="_blank"><button class="frog_button"><b>⛵ Shop on OpenSea</b></button></a>
-            </div>
+            <h2 style="color: white !important;"><b>freshfrogs.io/the-pond🍀</b></h2>
+            <br>Mint From Collection!<a class="pointer" href="https://freshfrogs.io/"><b>🍃 Minting Terminal</b></a>
+            <hr class="hr2">View All Staked Frogs!<a class="pointer" href="https://freshfrogs.io/vault"><b>🔒 Frog Vault</b></a>
             <br>
             <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a></div>
           </div>
