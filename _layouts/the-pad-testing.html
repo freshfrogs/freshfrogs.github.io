@@ -940,6 +940,8 @@
             console.log('Connected User : ' + user_address);
             console.log('Total Staked Tokens : ' + staked_tokens);
             console.log('Loading VAULT data from OpenSea...');
+            
+            fetch_user_tokens(0)
 
             if (owned_frogs > 50){
               fetch_user_tokens(50);
@@ -1022,8 +1024,12 @@
         document.getElementById(where).appendChild(newAttribute)
       }
 
+
       // Select Frog
-      async function display_token(token, owner){
+      async function display_token(token, staked){
+
+        openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
+        etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
 
         display_frog = 'https://freshfrogs.io/frog/'+token+'.png'
         display_name = 'Frog #'+token
@@ -1034,14 +1040,31 @@
 
         document.getElementById('previewImg').setAttribute('src', display_frog)
         document.getElementById('display_name').innerHTML = display_name
+        document.getElementById('morphFrogs').setAttribute('href', etherscanLink)
 
-        openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token;
-        etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token;
-        ownerLink = 'https://opensea.io/'+owner;
+        document.getElementById('selectBase').removeAttribute('href');
+        document.getElementById('selectBase').innerHTML = '<strong>Morph</strong><frog id="baseText">two frogs</frog>'
+        document.getElementById('selectBase').onclick = function() {
+          if (!morph) {
+            base_frog = token
+            morph = true;
+            document.getElementById('baseText').innerHTML = 'select frog!'
+          } else if (morph) {
+            console.log('Sending Image...');
+            takeScreenShot();
+          } 
 
-        document.getElementById('selectSub').setAttribute('href', openSeaLink)
-        document.getElementById('selectBase').setAttribute('href', ownerLink)
-        document.getElementById('selectBase').innerHTML = '<strong>Owner</strong><frog id="baseText">'+truncateAddress(owner)+'</frog>';
+        }
+
+        document.getElementById('selectSub').removeAttribute('href');
+
+        if (!staked) {
+          document.getElementById('selectSub').innerHTML = '<strong>Stake</strong><frog id="baseText">and earn</frog>'
+          document.getElementById('selectSub').onclick = function() { stake(token); }
+        } else {
+          document.getElementById('selectSub').innerHTML = '<strong>Withdraw</strong><frog id="baseText">unstake frog</frog>'
+          document.getElementById('selectSub').onclick = function() { withdraw(token); }
+        }
 
       }
 
