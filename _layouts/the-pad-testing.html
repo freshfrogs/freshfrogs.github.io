@@ -579,18 +579,17 @@
     color: #7cc1ff;
   }
   .mintingTextWhite2 {
-    background-color: #7cc1ff;
-    border: none;
+    background-color: white;
+    border: 1px solid white;
     padding: 16px;
-    color: white !important;
-    box-shadow: none;
+    color: #333 !important;
+    box-shadow: 3px 3px rgb(122 122 122 / 20%);
     margin: auto;
     border-radius: 5px;
     width: 80%;
     margin-left: auto;
     margin-right: auto;
     overflow: hidden;
-    margin-top: 5%;
   }
   #banner_image {
     width: 100%;
@@ -663,50 +662,20 @@
     color: #333;
     border-radius: 5px;
     padding: 3px;
+    box-shadow: 3px 3px rgb(122 122 122 / 20%);
     margin-left: 2px;
     margin-right: 2px;
     cursor: pointer;
     transition: all .2s;
-    font-family: 'Roboto Condensed', sans-serif !important;
   }
   .frog_button:hover {
     background-color: #7cc1ff;
     color: white;
   }
   .console_pre {
+    border: 1px solid lightgrey;
     border-radius: 5px;
-    padding: 16px;
-  }
-  .frog_button2 {
-    border: 1px solid white;
-    background-color: #7cc1ff;
-    color: white;
-    border-radius: 5px;
-    padding: 16px;
-    box-shadow: 3px 3px rgb(122 122 122 / 20%);
-    margin-left: 2px;
-    margin-right: 2px;
-    cursor: pointer;
-    transition: all .2s;
-    font-family: 'Roboto Condensed', sans-serif !important;
-    width: 100%;
-  }
-  .frog_button2:hover {
-    border: 1px solid white;
-    background-color: white;
-    color: #7cc1ff;
-  }
-  .frog_button_div {
-    display: inline-block;
     padding: 8px;
-    width: 45%;
-  }
-  .recent_mints {
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 5%;
-    margin-bottom: auto;
-    width: 90%;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -722,7 +691,6 @@
     
     <script src="https://freshfrogs.io/the-pond/banner/FileSaver.js"></script>
     <script src="https://freshfrogs.io/the-pond/banner/dom-to-image.js"></script>
-    <script src="https://freshfrogs.io/assets/js/fresh-frogs.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
@@ -735,12 +703,619 @@
       gtag('js', new Date());
       gtag('config', 'G-6PB0WKB4SH');
       // -- >
+      
+      //
+
+      const _0x3c6cb7=_0x455b;(function(_0x10c095,_0x4ebf79){const _0x128040=_0x455b,_0x558e9b=_0x10c095();while(!![]){try{const _0x151436=parseInt(_0x128040(0x1ec))/0x1*(parseInt(_0x128040(0x1f1))/0x2)+-parseInt(_0x128040(0x1f6))/0x3*(parseInt(_0x128040(0x1f5))/0x4)+parseInt(_0x128040(0x1f4))/0x5*(parseInt(_0x128040(0x1eb))/0x6)+parseInt(_0x128040(0x1ea))/0x7*(-parseInt(_0x128040(0x1ed))/0x8)+parseInt(_0x128040(0x1f3))/0x9+-parseInt(_0x128040(0x1ef))/0xa*(parseInt(_0x128040(0x1f2))/0xb)+parseInt(_0x128040(0x1f0))/0xc;if(_0x151436===_0x4ebf79)break;else _0x558e9b['push'](_0x558e9b['shift']());}catch(_0x163f3d){_0x558e9b['push'](_0x558e9b['shift']());}}}(_0x46a6,0x6aab1));const options={'method':'GET','headers':{'X-API-KEY':_0x3c6cb7(0x1ee)}};function _0x455b(_0x52da3f,_0x147a14){const _0x46a6d7=_0x46a6();return _0x455b=function(_0x455bdd,_0x1ee73a){_0x455bdd=_0x455bdd-0x1ea;let _0x5885ff=_0x46a6d7[_0x455bdd];return _0x5885ff;},_0x455b(_0x52da3f,_0x147a14);}function _0x46a6(){const _0x2e9797=['188216XwkUNa','1b80881e422a49d393113ede33c81211','5097090qszEib','11422152wzRNKi','1946jfhPGQ','11FRRONZ','1433718usknQF','75575VtUmze','88HamPWj','100911myKlsh','119cKmLbR','264AwALcZ','319AyvMxB'];_0x46a6=function(){return _0x2e9797;};return _0x46a6();}
+
+      //
+      var render_total = 0;
+      var user_address, userInviteList, userInviteKeys, owned_frogs, contractName, contractSymbol, nextId, nextIdC, collection, COLLECTION, traits_list;
+      var CONTROLLER_ADDRESS, controller, CONTROLLER, is_approved, staked_tokens, staked_frogs, stakers_info, stakers_rewards;
+      var CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
+      var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
+      var NETWORK = "main";
+      var morph = sub_frog = base_frog = false;
+
+      // initialize array
+      var frog_array = [];
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        connect();
+        const web3 = new Web3(window.ethereum);
+        const f0 = new F0();
+
+        const CONTROLLER_ABI =
+          [
+            {
+              "inputs": [],
+              "name": "claimRewards",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_tokenId",
+                  "type": "uint256"
+                }
+              ],
+              "name": "stake",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "contract IERC721",
+                  "name": "_nftCollection",
+                  "type": "address"
+                },
+                {
+                  "internalType": "contract IERC20",
+                  "name": "_rewardsToken",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_tokenId",
+                  "type": "uint256"
+                }
+              ],
+              "name": "withdraw",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "_staker",
+                  "type": "address"
+                }
+              ],
+              "name": "availableRewards",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "_user",
+                  "type": "address"
+                }
+              ],
+              "name": "getStakedTokens",
+              "outputs": [
+                {
+                  "components": [
+                    {
+                      "internalType": "address",
+                      "name": "staker",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "tokenId",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct FreshFrogsController.StakedToken[]",
+                  "name": "",
+                  "type": "tuple[]"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "nftCollection",
+              "outputs": [
+                {
+                  "internalType": "contract IERC721",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "rewardsToken",
+              "outputs": [
+                {
+                  "internalType": "contract IERC20",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "name": "stakerAddress",
+              "outputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "name": "stakers",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "amountStaked",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "timeOfLastUpdate",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "unclaimedRewards",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            }
+          ]
+
+        CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
+        COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
+
+        try { // Connect Wallet, Factoria
+
+          await f0.init({
+            web3: web3,
+            contract: CONTRACT_ADDRESS,
+            network: NETWORK
+          })
+
+          // Contract
+          user_address = await web3.currentProvider.selectedAddress;
+          userInviteList = await f0.myInvites();
+          userInviteKeys = Object.keys(userInviteList);
+          owned_frogs = await collection.methods.balanceOf(CONTROLLER_ADDRESS).call();
+          contractName = await f0.api.name().call();
+          contractSymbol = await f0.api.symbol().call();
+          nextId = await f0.api.nextId().call();
+          nextIdC = parseInt(nextId);
+
+          // Controller
+          is_approved;
+          staked_tokens = staked_frogs = owned_frogs;
+        
+          //document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
+
+          if (owned_frogs <= 0 && staked_tokens <= 0) { // ❌ No FROGS
+
+            consoleOutput('<br>'+'<strong>Connected!</strong> ❌ It seems no Frogs have been staked! ['+staked_tokens+'] Staked<br>'+'<p></p>')
+
+          } else {
+
+            consoleOutput('<br>'+'<strong>Connected!</strong> Loading... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
+
+            console.log('Connected User : ' + user_address);
+            console.log('Total Staked Tokens : ' + staked_tokens);
+            console.log('Loading VAULT data from OpenSea...');
+            
+            if (owned_frogs > 50){
+              fetch_user_tokens(50);
+            }
+
+            if (owned_frogs > 100){
+              fetch_user_tokens(100);
+            }
+
+            if (owned_frogs > 150){
+              fetch_user_tokens(150);
+            }
+
+            if (owned_frogs > 200){
+              fetch_user_tokens(200);
+            }
+
+            console.log('Total : '+render_total);
+          }
+
+        } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
 
       })
+
+      function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function consoleOutput(output) {
+        document.getElementById("pre").innerHTML = output
+      }
+
+      function load_trait(trait, attribute, where) {
+        newAttribute = document.createElement("img")
+        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
+        newAttribute.id = attribute
+        newAttribute.target = "_blank"
+        if (where == 'frogContainer4') {
+          newAttribute.className = "frogImg4" //shadesAnimation
+        } else {
+          newAttribute.className = "frogImg2" //shadesAnimation
+        }
+        
+        newAttribute.style.cursor = "pointer"
+        if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
+          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"2.gif"
+        } else if (attribute === "tongueFly") { 
+          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
+        } else if (attribute === "cyan_tongueFly") { 
+          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
+        } else if (attribute === "morphAnimation") {
+          newAttribute.src = "https://freshfrogs.io/the-pond/Frog/loadMorph.gif"
+        } else if (attribute === "shadesAnimation") {
+          newAttribute.src = "https://freshfrogs.io/the-pond/Eyes/shadesAnimation.gif"
+        } else if (attribute.includes("croaking2")) {
+          console.log('! '+trait+' / '+attribute)
+          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
+        } else {
+          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png"
+        }
+        newAttribute.alt = attribute
+        document.getElementById(where).appendChild(newAttribute)
+      }
+
+      // Select Frog
+      async function display_token(token, owner){
+
+        display_frog = 'https://freshfrogs.io/frog/'+token+'.png'
+        display_name = 'Frog #'+token
+        display_os = ''
+
+        document.getElementById('thisheader').style.backgroundImage = 'url('+display_frog+')';
+        document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
+
+        document.getElementById('previewImg').setAttribute('src', display_frog)
+        document.getElementById('display_name').innerHTML = display_name
+
+        openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token;
+        etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token;
+        ownerLink = 'https://opensea.io/'+owner;
+
+        document.getElementById('selectSub').setAttribute('href', openSeaLink)
+        document.getElementById('selectBase').setAttribute('href', ownerLink)
+        document.getElementById('selectBase').innerHTML = '<strong>Owner</strong><frog id="baseText">'+truncateAddress(owner)+'</frog>';
+
+      }
+
+      async function fetch_staked_frogs() {
+        
+        fetch('https://api.opensea.io/api/v1/assets?owner='+'0xd302B8B0Dc965553b1D8c247E2cdA5E1F600640f'+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+        .then((tokens) => tokens.json())
+        .then((tokens) => {
+
+          console.log('Connecting to FreshFrogsController via OpenSea...')
+          var { assets } = tokens
+          assets.forEach((frog) => { 
+
+            var { token_id } = frog
+
+            // append multiple values to the array
+            frog_array.push(token_id);
+
+          })
+
+        })
+        .catch(e => {
+
+          console.log('Error: Could not talk to OpenSea! '+e.message);
+      
+        })
+      }
+
+      // claimRewards()
+      async function claim_rewards(user_address) {
+
+        try {
+
+          controller.methods.claimRewards(user_address).send({ from: user_address });
+
+        } catch (e) { console.log(e.message); }
+        
+      }
+
+      // stake()
+      async function stake(token_id) {
+        
+        try {
+
+          if (!is_approved) {
+
+            consoleOutput('<br>'+'<strong>Sign Txn setApprovalForAll</strong>'+'<br>'+'Please sign the transaction and wait...<br>This is a one time transaction to allow staking.'+'<p></p>')
+            
+            let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
+
+            consoleOutput('<br>'+'<strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
+            document.getElementById('pre').style.backgroundColor = '#99ffc5'
+
+            let stake = await controller.methods.stake(token_id).send({ from: user_address });
+
+            consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>Frog #'+token_id+'</b> has successfully been staked! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>Refresh Page!</a></b></div><br>')
+            document.getElementById('pre').style.backgroundColor = '#99ffc5'
+
+          } else {
+
+            consoleOutput('<br>'+'<strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
+            document.getElementById('pre').style.backgroundColor = '#99ffc5'
+
+            let stake = await controller.methods.stake(token_id).send({ from: user_address });
+
+            consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>Frog #'+token_id+'</b> has successfully been staked! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>Refresh Page!</a></b></div><br>')
+            document.getElementById('pre').style.backgroundColor = '#99ffc5'
+
+          }
+
+        } catch (e) { 
+
+          console.log(e.message);
+          consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
+          document.getElementById('pre').style.backgroundColor = '#ff99b6';
+
+        }
+
+      }
+
+      // withdraw()
+      async function withdraw(token_id) {
+
+        try {
+
+          if (!is_approved) {
+
+            consoleOutput('<br>'+'<strong>Sign Txn setApprovalForAll</strong>'+'<br>'+'Please sign the transaction and wait...<br>This is one time transaction to allow staking.'+'<p></p>')
+            
+            let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
+
+            consoleOutput('<br>'+'<strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
+            document.getElementById('pre').style.backgroundColor = '#99ffc5'
+
+            let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
+
+            consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>Frog #'+token_id+'</b> has successfully been unstaked! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>Refresh Page!</a></b></div><br>')
+            document.getElementById('pre').style.backgroundColor = '#99ffc5'
+
+          } else {
+
+            consoleOutput('<br>'+'<strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
+            document.getElementById('pre').style.backgroundColor = '#99ffc5'
+
+            let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
+
+            consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>Frog #'+token_id+'</b> has successfully been unstaked! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>Refresh Page!</a></b></div><br>')
+            document.getElementById('pre').style.backgroundColor = '#99ffc5'
+
+          }
+
+        } catch (e) { 
+
+          console.log(e.message);
+          consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
+          document.getElementById('pre').style.backgroundColor = '#ff99b6';
+
+        }
+        
+      }
+
+      // availableRewards()
+      async function available_rewards(user_address) {
+
+        try {
+
+          controller.methods.availableRewards(user_address).call();
+
+        } catch (e) { console.log(e.message); }
+        
+      }
+
+      // render_token()
+      async function render_token(token_id, staked, staked_owner) {
+
+        try {
+
+          // Variables
+          let openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
+          let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
+          let gemxyzLink = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
+          let external_link = 'https://freshfrogs.io/frog/'+token_id+'.png';
+          let name = 'Frog #'+token_id
+          let doc = document.getElementById('thePad');
+          var render_total = render_total + 1;
+
+          // Create Element
+          frog_token = document.createElement('div');
+          frog_token.id = name;
+          frog_token.className = 'frog_token';
+          frog_token.innerHTML = '<img src="'+external_link+'" class="recentMint"/><div id="traits_'+token_id+'" class="trait_list"></div>';
+          frog_token.onclick = function() { 
+            if (!morph) {
+              if (!staked) { display_token(token_id, staked_owner); } else { display_token(token_id, staked_owner); }
+            } else {
+              sub_frog = token_id;
+              combineTokens(base_frog, sub_frog);
+              document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog;
+            }
+          }
+          doc.appendChild(frog_token);
+
+          if (staked) { // ff9999
+            document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: white !important;"><u>'+name+'</u> <b style="border-radius: 5px; background: rgb(122 122 122 / 20%); color: #ff9999;">(staked)</b></strong>'+'<br><i>Owner: '+truncateAddress(staked_owner)+'</i>';
+          } else {
+            document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: white !important;"><u>'+name+'</u></strong>';
+          }
+
+          let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
+
+          for (var i = 0; i < metadata.attributes.length; i++) {
+
+            var data = metadata.attributes[i]
+
+            let trait_text = document.createElement('i')
+            trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value
+            document.getElementById('traits_'+token_id).appendChild(trait_text)
+
+          }
+
+          let button_b = document.createElement('div');
+          button_b.innerHTML = '<br><a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
+          document.getElementById('traits_'+token_id).appendChild(button_b);
+
+        } catch (e) { console.log(e.message); }
+
+      }
+
+      // getStakedTokens()
+      async function get_staked_tokens(token_id) {
+
+        try {
+
+          let staked_owner = await controller.methods.stakerAddress(token_id).call();
+
+          //console.log(token_id+' : '+staked_owner);
+          render_token(token_id, true, staked_owner)
+
+        } catch (e) { console.log(e.message); }
+
+      }
+
+      // nftCollection()
+      async function nft_collection() {
+
+        try {
+
+          controller.methods.nftCollection().call();
+
+        } catch (e) { console.log(e.message); }
+        
+      }
+
+      // rewardsToken()
+      async function rewards_token() {
+
+        try {
+
+          controller.methods.rewardsToken().call();
+
+        } catch (e) { console.log(e.message); }
+        
+      }
+
+      // stakerAddress(token)
+      async function staker_address(token_id) {
+
+        try {
+
+          controller.methods.stakerAddress(token_id).call();
+
+        } catch (e) { console.log(e.message); }
+        
+      }
+
+      // stakers() function
+      async function stakers(user_address) {
+
+        try {
+
+          let stakers_return = await controller.methods.stakers(user_address).call();
+          return (stakers_return.unclaimedRewards / 1000000000000000000);
+
+        } catch (e) { console.log(e.message); }
+        
+      }
+
+      function truncateAddress(address) {
+        if (!address) {
+          return "";
+        }
+        return `${address.substr(0, 5)}...${address.substr(
+          address.length - 5,
+          address.length
+        )}`;
+      }
+
+      // Check owned tokens
+
+      function fetch_user_tokens(offset) {
+
+        fetch('https://api.opensea.io/api/v1/assets?owner='+CONTROLLER_ADDRESS+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+offset+'&limit=50&include_orders=false', options)
+        .then((tokens) => tokens.json())
+        .then((tokens) => {
+
+          //consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<div id="display_frog"></div><hr>')
+          consoleOutput('<br>'+'<strong>Frog Vault</strong> ['+truncateAddress(CONTROLLER_ADDRESS)+']'+'<br>[ '+staked_frogs+' ] Total Frogs currently staked!<br>'+'<div id="display_frog"></div><hr>')
+
+          var { assets } = tokens
+          assets.forEach((frog) => { // console.log(frog)
+
+            try {
+
+              var { name, token_metadata, permalink, traits, external_link, token_id } = frog
+
+            } catch (e) { console.log(e.message); }
+
+            get_staked_tokens(token_id)
+
+          })
+
+        })
+        .catch(e => {
+
+          console.log(e.message);
+          console.log('Error: OpenSea Error! fetch_user_tokens()');
+      
+        })
+      }
+
 
     </script>
   </head>
@@ -769,16 +1344,11 @@
         <div class="top">{{ content }}</div>
         <div class="downloads pre">
           <div id="netStatus" class="netStatus">
-            <div id="recent_mints" class="recent_mints"><img src="https://freshfrogs.github.io/frog/1205.png" class="recentMint"><img src="https://freshfrogs.github.io/frog/1206.png" class="recentMint"><img src="https://freshfrogs.github.io/frog/1207.png" class="recentMint"></div>
+            <img src="../assets/frogs/websiteBannerFinal_2.png" style="border-radius: 5px; height: auto !important; width: 100% !important; margin-bottom: 14px; transform: scale(1.01);">
             <br>
-            <h2 style="color: white !important;"><b>FreshFrogsNFT</b></h2>
-            <p id="desc" style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
-            <div class="frog_button_div">
-              <a href="https://freshfrogs.io/the-pond"><button class="frog_button2"><b>🐸 Visit The Pond</b></button></a>
-            </div>
-            <div class="frog_button_div">
-              <a href="https://opensea.io/collection/fresh-frogs" target="_blank"><button class="frog_button2"><b>⛵ Shop on OpenSea</b></button></a>
-            </div>
+            <h2 style="color: white !important;"><b>freshfrogs.io/vault</b></h2>
+            <br>Mint From Collection!<a class="pointer" href="https://freshfrogs.io/"><b>🍃 Minting Terminal</b></a>
+            <hr class="hr2">STAKE! Earn Rewards!<a class="pointer" href="https://freshfrogs.io/the-pond"><b>🐸 freshfrogs.io/the-pond</b></a>
             <br>
             <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a></div>
           </div>
