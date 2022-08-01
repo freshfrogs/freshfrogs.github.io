@@ -775,14 +775,14 @@
             try {
                 
               //consoleOutput('<br>'+'<strong>Minting ('+mint_quantity+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
-              document.getElementById('pre').style.backgroundColor = '#99ffc5'
+              //document.getElementById('pre').style.backgroundColor = '#99ffc5'
                 
               let tokens = await f0.mint(user_invite, mint_quantity)
               
               // AWAIT RESPONSE!
 
               //consoleOutput('<br>'+'<strong>Congratulations</strong><br><b>'+mint_quantity+' FROG(s)</b> have successfully been minted!'+'<p></p>');
-              document.getElementById('pre').style.backgroundColor = '#99ffc5'
+              //document.getElementById('pre').style.backgroundColor = '#99ffc5'
               return; // BREAK!
 
             } catch (e) {
@@ -790,7 +790,7 @@
               // Something went wrong!
               
               //consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
-              document.getElementById('pre').style.backgroundColor = '#ff99b6'
+              //document.getElementById('pre').style.backgroundColor = '#ff99b6'
               return; // BREAK!
 
             }
