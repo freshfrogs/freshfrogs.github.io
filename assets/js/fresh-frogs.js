@@ -231,7 +231,7 @@
             console.log('UnClaimed Rewards : ' + stakers_rewards + '('+temp+')');
             console.log('Loading data from OpenSea...');
 
-            Output('<br><button onclick="claim_rewards()" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frogs(s) Staked '+''+stakers_rewards+' $FLYZ 🡥</button>'+'<br><hr>'+'<div class="console_pre" id="console-pre"></div>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
+            Output('<br><button onclick="claim_rewards()" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frogs(s) Staked '+''+stakers_rewards+' $FLYZ 🡥</button>'+'<div class="console_pre" id="console-pre"></div>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
 
             console.log(owned_frogs)
             fetch_user_tokens(0);
@@ -441,9 +441,9 @@
 
           }
 
-          let button_b = document.createElement('div');
-          button_b.innerHTML = '<br><a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
-          document.getElementById('traits_'+token_id).appendChild(button_b);
+          //let button_b = document.createElement('div');
+          //button_b.innerHTML = '<br><a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
+          //document.getElementById('traits_'+token_id).appendChild(button_b);
 
         } catch (e) { console.log(e.message); }
 
