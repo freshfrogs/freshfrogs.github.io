@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <style>
+
   @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital@1&display=swap');
+
   html{
     background-image: url("/assets/background.png");
   }
@@ -571,7 +573,7 @@
     font-size: x-small;
     padding: 1px;
   }
-  .user_address {
+  .userAddress {
     padding-left: 1px;
     padding-right: 1px;
     border-radius: 5px;
@@ -602,31 +604,35 @@
     overflow: hidden;
   }
   .recentMint {
-    width: 128px !important;
-    height: 128px !important;
+    width: 128px;
+    height: 128px;
     border-radius: 5px;
     box-shadow: 3px 3px rgb(122 122 122 / 20%);
-    margin: 2%;
-    transition: transform .2s;
-    cursor: pointer;
-    border: 1px solid white;
+    margin: 4px;
   }
-  .trait_list {
-    min-width: 50%;
-    margin: auto;
-    text-align: left;
-    padding: 8px;
-  }
-  hr {
-    margin: 20px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-  }
-  .frog_token_old {
-    width: 100%;
-    display: flex;
+  .recent_mints {
     margin-left: auto;
     margin-right: auto;
+    margin-top: 5%;
+    margin-bottom: auto;
+    width: 90%;
+  }
+  .frog_button {
+    border: 1px solid white;
+    background-color: white;
+    color: #333;
+    border-radius: 5px;
+    padding: 3px;
+    box-shadow: 3px 3px rgb(122 122 122 / 20%);
+    margin-left: 2px;
+    margin-right: 2px;
+    cursor: pointer;
+    transition: all .2s;
+    font-family: 'Roboto Condensed', sans-serif !important;
+  }
+  .frog_button:hover {
+    background-color: #7cc1ff;
+    color: white;
   }
   .staked_token {
     display: flex;
@@ -656,25 +662,10 @@
     margin-right: auto;
     overflow: hidden;
   }
-  .frog_button {
-    border: 1px solid white;
-    background-color: white;
-    color: #333;
-    border-radius: 5px;
-    padding: 3px;
-    box-shadow: 3px 3px rgb(122 122 122 / 20%);
-    margin-left: 2px;
-    margin-right: 2px;
-    cursor: pointer;
-    transition: all .2s;
-  }
-  .frog_button:hover {
-    background-color: #7cc1ff;
-    color: white;
-  }
-  .console_pre {
-    border: 1px solid lightgrey;
-    border-radius: 5px;
+  .trait_list {
+    min-width: 50%;
+    margin: auto;
+    text-align: left;
     padding: 8px;
   }
 </style>
