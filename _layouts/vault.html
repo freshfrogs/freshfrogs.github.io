@@ -1199,9 +1199,9 @@
 
           }
 
-          //let button_b = document.createElement('div');
-          //button_b.innerHTML = '<br><a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
-          //document.getElementById('traits_'+token_id).appendChild(button_b);
+          let button_b = document.createElement('div');
+          button_b.innerHTML = '<br><a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
+          document.getElementById('traits_'+token_id).appendChild(button_b);
 
         } catch (e) { console.log(e.message); }
 
