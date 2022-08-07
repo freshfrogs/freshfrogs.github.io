@@ -219,7 +219,7 @@
         
         //document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
 
-        if (owned_frogs <= 0 && staked_tokens <= 0) { // ❌ No FROGS
+        if (owned_frogs <= 100 && staked_tokens <= 100) { // ❌ No FROGS
 
             Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div class="console_pre" id="console-pre"></div>')
 
