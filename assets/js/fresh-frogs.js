@@ -222,6 +222,7 @@
         if (owned_frogs <= 0 && staked_tokens <= 0) { // ❌ No FROGS
 
             Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div class="console_pre" id="console-pre"></div>')
+            return
 
         } else {
 
