@@ -406,7 +406,7 @@ async function connect() {
       let gemxyzLink = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
       let external_link = 'https://freshfrogs.io/frog/'+token_id+'.png';
       let name = 'Frog #'+token_id
-      let doc = document.getElementById('pre');
+      let doc = document.getElementById('thePad');
 
       // Create Element
       frog_token = document.createElement('div');
