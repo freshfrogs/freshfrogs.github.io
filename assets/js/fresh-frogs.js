@@ -583,7 +583,7 @@
           newAttribute.className = "frogImg2" //shadesAnimation
         }
         
-        newAttribute.style.cursor = "pointer"
+        //newAttribute.style.cursor = "pointer"
         if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
           newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"2.gif"
         } else if (attribute === "tongueFly") { 
