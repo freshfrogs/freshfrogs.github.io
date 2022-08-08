@@ -624,7 +624,6 @@
           var data = metadata.attributes[l] //data.value data.trait_type
           load_trait(data.trait_type, data.value, this_place)
         }
-        //
 
         document.getElementById('display_name').innerHTML = display_name
         document.getElementById('morphFrogs').setAttribute('href', etherscanLink)
