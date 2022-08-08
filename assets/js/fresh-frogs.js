@@ -619,10 +619,10 @@
 
         document.getElementById('frogContainer4').innerHTML = '';
         var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
-        var this_place = 'frogContainer4'
+        var this_place = 'frogContainer4';
         for (var i = 0; i < metadata.attributes.length; i++) {
-          var data = metadata.attributes[i]
-          load_trait(data.trait_type, data.value, this_place)
+          var data = metadata.attributes[i];
+          load_trait(data.trait_type, data.value, this_place);
         }
 
         document.getElementById('display_name').innerHTML = display_name
