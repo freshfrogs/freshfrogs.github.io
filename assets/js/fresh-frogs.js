@@ -617,16 +617,14 @@
         document.getElementById('thisheader').style.backgroundImage = 'url('+display_frog+')';
         document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
 
-        //
-        var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+base+".json")).json();
+        document.getElementById('frogContainer4').innerHTML = '';
+        var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
         var this_place = 'frogContainer4'
         for (var i = 0; i < metadata.attributes.length; i++) {
           var data = metadata.attributes[l] //data.value data.trait_type
           load_trait(data.trait_type, data.value, this_place)
         }
         //
-
-        //document.getElementById('previewImg').setAttribute('src', display_frog)
 
         document.getElementById('display_name').innerHTML = display_name
         document.getElementById('morphFrogs').setAttribute('href', etherscanLink)
