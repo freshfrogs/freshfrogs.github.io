@@ -621,7 +621,7 @@
         var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
         var this_place = 'frogContainer4'
         for (var i = 0; i < metadata.attributes.length; i++) {
-          var data = metadata.attributes[l] //data.value data.trait_type
+          var data = metadata.attributes[i] //data.value data.trait_type
           load_trait(data.trait_type, data.value, this_place)
         }
 
