@@ -408,7 +408,7 @@ async function connect() {
       let name = 'Frog #'+token_id
       let doc = document.getElementById('thePad');
 
-      // Create Element
+      // Create Element!
       frog_token = document.createElement('div');
       frog_token.id = name;
       frog_token.className = 'frog_token';
