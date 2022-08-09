@@ -221,7 +221,7 @@ async function connect() {
 
     if (owned_frogs <= 0 && staked_tokens <= 0) { // ❌ No FROGS
 
-        Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div class="console_pre" id="console-pre"></div>')
+        //Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div class="console_pre" id="console-pre"></div>')
         return
 
     } else {
@@ -232,7 +232,7 @@ async function connect() {
         console.log('UnClaimed Rewards : ' + stakers_rewards + '('+temp+')');
         console.log('Loading data from OpenSea...');
 
-        Output('<br><button onclick="claim_rewards()" style="margin: 16px;" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frog(s) Staked '+''+stakers_rewards+' $FLYZ 🡥</button>'+'<br><hr>'+'<div class="console_pre" id="console-pre"></div>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
+        //Output('<br><button onclick="claim_rewards()" style="margin: 16px;" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frog(s) Staked '+''+stakers_rewards+' $FLYZ 🡥</button>'+'<br><hr>'+'<div class="console_pre" id="console-pre"></div>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
 
         console.log(owned_frogs)
         fetch_user_tokens(0);
@@ -255,7 +255,7 @@ async function connect() {
 
     }
 
-    } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
+    } catch (e) { console.log(e.message); }//consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
 }
 
   // claimRewards()
@@ -266,31 +266,17 @@ async function connect() {
       is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
       
       if (!is_approved) {
-
-        consoleOutput('<strong>Claiming '+stakers_rewards+' $FLYZ</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
-          '<div style="text-align: left;">'+
-          '<br><b>1.) Approve Contract</b> <br> This is a one time transaction to allow staking.<br>'+
-          '<br><b>2.) Transfer NFT</b><br> Transfer FROG #'+token_id+' to staking protocol, requires a gas fee.<br>'+
-          '</div>')
         
         let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
 
       }
-
-      consoleOutput('<strong>Claiming '+stakers_rewards+' $FLYZ</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
-        '<div style="text-align: left;">'+
-        '<br><b><strike>1.) Approve Contract</b> <br> This is a one time transaction to allow staking.</strike><br>'+
-        '<br><b>2.) Claim Rewards</b><br> Transfer '+stakers_rewards+' $FLYZ from staking protocol, requires a gas fee.<br>'+
-        '</div>');
         
       await controller.methods.claimRewards().send({ from: user_address });
 
-      consoleOutput('<strong>Congratulations!</strong><br>'+stakers_rewards+' $FLYZ have successfully been claimed!');
 
     } catch (e) { 
 
       console.log(e.message);
-      consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
 
     }
     
@@ -308,33 +294,16 @@ async function connect() {
       if (!is_approved) {
 
         console_pre.style.backgroundColor = 'white'
-
-        consoleOutput('<strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
-          '<div style="text-align: left;">'+
-          '<br><b>1.) Approve Contract</b> <br> This is a one time transaction to allow staking.<br>'+
-          '<br><b>2.) Transfer NFT</b><br> Transfer FROG #'+token_id+' to staking protocol, requires a gas fee.<br>'+
-          '</div>')
         
         let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
 
-      } 
-
-      consoleOutput('<strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
-        '<div style="text-align: left;">'+
-        '<br><b><strike>1.) Approve Contract</b> <br> This is a one time transaction to allow staking.</strike><br>'+
-        '<br><b>2.) Transfer NFT</b><br> Transfer FROG #'+token_id+' to staking protocol, requires a gas fee.<br>'+
-        '</div>')
-        
-        //console_pre.style.backgroundColor = '#99ffc5'
+      }
 
       let stake = await controller.methods.stake(token_id).send({ from: user_address });
-      consoleOutput('<strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been staked!');
 
     } catch (e) { 
 
       console.log(e.message);
-      consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
-      //console_pre.style.backgroundColor = '#ff99b6';
 
     }
 
@@ -352,33 +321,16 @@ async function connect() {
       if (!is_approved) {
 
         console_pre.style.backgroundColor = 'white'
-
-        consoleOutput('<strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
-          '<div style="text-align: left;">'+
-          '<br><b>1.) Approve Contract</b> <br> This is a one time transaction to allow staking.<br>'+
-          '<br><b>2.) Retrieve NFT</b><br> Transfer FROG #'+token_id+' from staking protocol, requires a gas fee.<br>'+
-          '</div>')
         
         let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
 
       }
-        
-      consoleOutput('<strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
-        '<div style="text-align: left;">'+
-        '<br><b><strike>1.) Approve Contract</b> <br> This is a one time transaction to allow staking.</strike><br>'+
-        '<br><b>2.) Retrieve NFT</b><br> Transfer FROG #'+token_id+' from staking protocol, requires a gas fee.<br>'+
-        '</div>')
-        
-        //console_pre.style.backgroundColor = '#99ffc5'
 
       let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
-      consoleOutput('<strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been un-staked!');
 
     } catch (e) { 
 
       console.log(e.message);
-      consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
-      //console_pre.style.backgroundColor = '#ff99b6';
 
     }
     
@@ -406,7 +358,7 @@ async function connect() {
       let gemxyzLink = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
       let external_link = 'https://freshfrogs.io/frog/'+token_id+'.png';
       let name = 'Frog #'+token_id
-      let doc = document.getElementById('thePad');
+      let doc = document.getElementById('section');
 
       // Create Element
       frog_token = document.createElement('div');
@@ -562,14 +514,6 @@ async function connect() {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  function consoleOutput(output) {
-    document.getElementById("console-pre").innerHTML = output;
-  }
-
-  function Output(output) {
-    document.getElementById("pre").innerHTML = output;
   }
 
   function load_trait(trait, attribute, where) {
