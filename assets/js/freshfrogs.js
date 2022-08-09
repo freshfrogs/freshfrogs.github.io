@@ -258,7 +258,7 @@ async function connect() {
     } catch (e) { console.log(e.message); }//consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
 }
 
-  // claimRewards()
+  // claimRewards() !
   async function claim_rewards() {
 
     try {
