@@ -675,6 +675,16 @@
     text-align: left;
     padding: 8px;
   }
+  .frog_img {
+    width: 256px;
+    height: 256px;
+    border-radius: 5px;
+    margin: 0px;
+    border: 1px solid white;
+    cursor: pointer;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -1176,7 +1186,7 @@
           frog_token = document.createElement('div');
           frog_token.id = name;
           frog_token.className = 'frog_token';
-          frog_token.innerHTML = '<img src="'+external_link+'" class="recentMint"/><div id="traits_'+token_id+'" class="trait_list"></div>';
+          frog_token.innerHTML = '<img src="'+external_link+'" class="frog_img"/><div id="traits_'+token_id+'" class="trait_list"></div>';
           frog_token.onclick = function() { 
             if (!morph) {
               if (!staked) { display_token(token_id, staked_owner); } else { display_token(token_id, staked_owner); }
