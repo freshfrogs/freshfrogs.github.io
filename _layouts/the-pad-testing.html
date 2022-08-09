@@ -400,6 +400,11 @@
     height: 256px;
     border-radius: 5px;
   }
+  .frogImg4:hover{
+    -ms-transform: scale(1.1); /* IE 9 */
+    -webkit-transform: scale(1.1); /* Safari 3-8 */
+    transform: scale(1.1);
+  }
   .smallContainer3:hover{
     -ms-transform: scale(1.1); /* IE 9 */
     -webkit-transform: scale(1.1); /* Safari 3-8 */
@@ -613,10 +618,6 @@
     border: 0px solid white;
     cursor: pointer;
   }
-  .frogTokenCont{
-    border-radius: 5px;
-    border: 1px solid lightgrey;
-  }
   .recent_mints {
     margin-left: auto;
     margin-right: auto;
@@ -655,11 +656,21 @@
     margin-right: auto;
     overflow: hidden;
   }
+  .frog_img {
+    width: 256px;
+    height: 256px;
+    border-radius: 5px;
+    margin: 0px;
+    border: 1px solid white;
+    cursor: pointer;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
   .frog_token {
     display: flex;
     background-color: white;
     border: none;
-    padding: 8px;
+    padding: 0px;
     color: #333 !important;
     box-shadow: none;
     margin: auto;
@@ -677,7 +688,7 @@
     min-width: 50%;
     margin: auto;
     text-align: left;
-    padding: 8px;
+    padding: 16px;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
