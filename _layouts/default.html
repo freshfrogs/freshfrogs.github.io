@@ -739,6 +739,9 @@
               document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
             }
 
+            //if (mint_quantity <= (mint_limit - user_tokens)) {
+            //} else { console.log('User mint limit reached!'); console.log('Mint Limit '+mint_limit+' : '+user_tokens+' User Tokens'); }
+
           })
 
           // Send mint transaction to provider!
@@ -750,21 +753,37 @@
             
             try {
                 
+              consoleOutput('<br>'+'<strong>Minting ('+mint_quantity+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
+              document.getElementById('pre').style.backgroundColor = '#99ffc5'
+                
               let tokens = await f0.mint(user_invite, mint_quantity)
-              return;
+              
+              // AWAIT RESPONSE!
+
+              consoleOutput('<br>'+'<strong>Congratulations</strong><br><b>'+mint_quantity+' FROG(s)</b> have successfully been minted!'+'<p></p>');
+              document.getElementById('pre').style.backgroundColor = '#99ffc5'
+              return; // BREAK!
 
             } catch (e) {
+                
+              // Something went wrong!
               
-              console.log(e.message);
-              return;
+              consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
+              document.getElementById('pre').style.backgroundColor = '#ff99b6'
+              return; // BREAK!
 
             }
 
           })
 
-        } catch (e) { console.log(e.message); }
+        } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a class="pointer" href="https://freshfrogs.io/"><b id="connected">🔌 Connect Wallet</b></a>'); }
 
       })
+
+
+      function consoleOutput(output) {
+        document.getElementById("pre").innerHTML = output
+      }
 
       function truncateAddress(address) {
         if (!address) {
@@ -848,6 +867,7 @@
         }
         
         document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
+        consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'Frog #'+mint_id+' is now available to mint!<br>Maximum of <u>'+mint_limit+'</u> Frogs @ Ξ'+mint_price+'<br>'+'<p></p>')
 
       }
 
@@ -856,13 +876,29 @@
 
           token_img = 'https://freshfrogs.io/frog/'+token+'.png'
           token_name = 'Frog #'+token
+
           document.getElementById('thisheader').style.backgroundImage = 'url('+token_img+')';
           document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
           document.getElementById('previewImg').setAttribute('src', token_img)
+
+          /*
+          let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
+          for (var i = 0; i < token_metadata.attributes.length; i++){
+              var data = token_metadata.attributes[i]
+              //load_trait(data.trait_type, data.value, 'subDisplay')
+              if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog') {
+                token_type = data.value.slice(0, 11)+'..'
+                break;
+              }
+          }
+          */
+
           document.getElementById('mint_token').innerHTML = '<strong>'+token_name+'</strong>4040 supply'//+token_type;
           document.getElementById('mint_token').removeAttribute('href');
+
           document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ<b id="mint_total_actual">'+(mint_price*mint_quantity)+'</b> +gas';
           document.getElementById('mint_total').removeAttribute('href');
+
           document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> <b id="mint_quantity_actual">'+mint_quantity+'</b> <b id="add_token">+</b></strong>quantity';
           document.getElementById('mint_quantity').removeAttribute('href');
 
@@ -902,7 +938,10 @@
             opensea.io/collection/fresh-frogs<a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><b id="connected">Shop on OpenSea ⛵</b></a>
             <hr class="hr2">already own a Frog?<a class="pointer" href="https://freshfrogs.io/the-pond"><b>Stake and Earn Rewards! 🐸</b></a>
             <br>
+            <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a class="pointer" href="https://freshfrogs.io/"><b id="connected">Connect Wallet 🔌</b></a></div>
           </div>
+          <br>
+          <div id="thePad" class="thePad"></div>
         </div>
       </section>
     </div>
