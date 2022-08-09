@@ -221,7 +221,6 @@ async function connect() {
 
     if (owned_frogs <= 0 && staked_tokens <= 0) { // ❌ No FROGS
 
-        //Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div class="console_pre" id="console-pre"></div>')
         return
 
     } else {
@@ -231,8 +230,6 @@ async function connect() {
         console.log('Total Staked Tokens : ' + staked_tokens);
         console.log('UnClaimed Rewards : ' + stakers_rewards + '('+temp+')');
         console.log('Loading data from OpenSea...');
-
-        //Output('<br><button onclick="claim_rewards()" style="margin: 16px;" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frog(s) Staked '+''+stakers_rewards+' $FLYZ 🡥</button>'+'<br><hr>'+'<div class="console_pre" id="console-pre"></div>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
 
         console.log(owned_frogs)
         fetch_user_tokens(0);
@@ -255,10 +252,10 @@ async function connect() {
 
     }
 
-    } catch (e) { console.log(e.message); }//consoleOutput('<strong></strong><br>'+e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>'); }
+    } catch (e) { console.log(e.message); }
 }
 
-  // claimRewards() !
+  // claimRewards()
   async function claim_rewards() {
 
     try {
