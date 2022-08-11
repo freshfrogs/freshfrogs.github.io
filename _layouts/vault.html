@@ -290,16 +290,17 @@
   }
   header {
     overflow: hidden;
-
     background-color: #7cc1ff;
     text-align: center;
     border-radius: 5px;
-    padding: 14px !important;
     width: auto;
     font-family: 'Open Sans', sans-serif !important;
     font-size: auto !important;
     margin-bottom: 16px !important;
     color: #333;
+    padding-bottom: 0px !important;
+    padding-left: 14px;
+    padding-right: 14px;
   }
   .desc {
     position: relative;
@@ -626,7 +627,7 @@
     color: #333;
     border-radius: 5px;
     padding: 3px;
-    box-shadow: 3px 3px rgb(122 122 122 / 20%);
+    box-shadow: 1px 1px rgb(122 122 122 / 20%);
     margin-left: 2px;
     margin-right: 2px;
     cursor: pointer;
@@ -651,9 +652,20 @@
     margin-right: auto;
     overflow: hidden;
   }
+  .frog_img {
+      width: 128px;
+      height: 128px;
+      border-radius: 5px;
+      margin: 8px;
+      border: 1px solid black;
+      cursor: pointer;
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 5px;
+      margin-top: 16px;
+  }
   .frog_token {
-    display: block;
-    background-color: white;
+    display: flex;
+    background-color: antiquewhite;
     border: none;
     padding: 0px;
     color: #333 !important;
@@ -665,7 +677,7 @@
     margin-right: auto;
     overflow: hidden;
     width: auto;
-    border: 0px solid lightgrey;
+    border: 1px solid black;
     margin: 16px;
     box-shadow: 3px 3px rgb(122 122 122 / 20%);
   }
@@ -674,16 +686,6 @@
     margin: auto;
     text-align: left;
     padding: 8px;
-  }
-  .frog_img {
-    width: 256px;
-    height: 256px;
-    border-radius: 5px;
-    margin: 0px;
-    border: 1px solid white;
-    cursor: pointer;
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
