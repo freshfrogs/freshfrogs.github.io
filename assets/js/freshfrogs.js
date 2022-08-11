@@ -373,7 +373,7 @@ async function connect() {
       }
       doc.appendChild(frog_token);
 
-      if (staked) { // ff9999
+      if (staked) {
         document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u> <b>(staked)</b></strong>';
       } else {
         document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u></strong>';
