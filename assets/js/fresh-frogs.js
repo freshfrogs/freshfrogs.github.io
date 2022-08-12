@@ -424,11 +424,13 @@ async function connect() {
       }
       doc.appendChild(frog_token);
 
+      /*
       if (staked) { // ff9999
         document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u> <b style="border-radius: 5px; background: rgb(122 122 122 / 20%); color: #ff9999;">(staked)</b></strong>';
       } else {
         document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u></strong>';
       }
+      */
 
       let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
 
@@ -436,10 +438,17 @@ async function connect() {
 
         var data = metadata.attributes[i]
 
-        let trait_text = document.createElement('i')
-        trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value
-        document.getElementById('traits_'+token_id).appendChild(trait_text)
+        if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog' ) {
 
+          document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u></strong> '+data.trait_type;
+          
+        } else {
+
+          let trait_text = document.createElement('i')
+          trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value
+          document.getElementById('traits_'+token_id).appendChild(trait_text)
+
+        }
       }
 
       let button_b = document.createElement('div');
