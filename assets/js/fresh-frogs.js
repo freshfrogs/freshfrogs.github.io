@@ -328,7 +328,7 @@ async function connect() {
         //console_pre.style.backgroundColor = '#99ffc5'
 
       let stake = await controller.methods.stake(token_id).send({ from: user_address });
-      consoleOutput('<strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been staked!');
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been staked!');
 
     } catch (e) { 
 
@@ -372,7 +372,7 @@ async function connect() {
         //console_pre.style.backgroundColor = '#99ffc5'
 
       let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
-      consoleOutput('<strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been un-staked!');
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been un-staked!');
 
     } catch (e) { 
 
