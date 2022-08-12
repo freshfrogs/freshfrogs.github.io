@@ -311,7 +311,7 @@ async function connect() {
 
         consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
           '<div style="text-align: left;">'+
-          '<br><b>(1/2) Approve Contract</b><br>This is a one time transaction to allow staking.<br>'+
+          '<br><b>Approve Contract</b><br>This is a one time transaction to allow staking, requires a gas fee.<br>'+
           '</div>')
         
         let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
@@ -320,7 +320,7 @@ async function connect() {
 
       consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
         '<div style="text-align: left;">'+
-        '<br><b>(2/2) Transfer NFT</b><br>Transfer FROG #'+token_id+' to staking protocol, requires a gas fee.<br>'+
+        '<br><b>Transfer NFT</b><br>Transfer FROG #'+token_id+' to staking protocol.<br>'+
         '</div>')
         
         //console_pre.style.backgroundColor = '#99ffc5'
@@ -330,9 +330,7 @@ async function connect() {
 
     } catch (e) { 
 
-      console.log(e.message);
-      consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
-      //console_pre.style.backgroundColor = '#ff99b6';
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
 
     }
 
