@@ -296,7 +296,7 @@ async function connect() {
     
   }
 
-  // stake()
+  // stake().
   async function stake(token_id) {
     
     try {
