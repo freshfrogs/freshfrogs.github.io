@@ -883,13 +883,6 @@
           document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
 
           var this_place = 'frogContainer4';
-          document.getElementById(this_place).innerHTML = '';
-          var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
-          
-          for (var i = 0; i < metadata.attributes.length; i++) {
-            var data = metadata.attributes[i];
-            load_trait(data.trait_type, data.value, this_place);
-          }
 
           document.getElementById('mint_token').innerHTML = '<strong>'+token_name+'</strong>4040 supply'//+token_type;
           document.getElementById('mint_token').removeAttribute('href');
@@ -899,6 +892,15 @@
 
           document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> <b id="mint_quantity_actual">'+mint_quantity+'</b> <b id="add_token">+</b></strong>quantity';
           document.getElementById('mint_quantity').removeAttribute('href');
+
+          document.getElementById('frogContainer4').innerHTML = '';
+          
+          var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
+          
+          for (var i = 0; i < metadata.attributes.length; i++) {
+            var data = metadata.attributes[i];
+            load_trait(data.trait_type, data.value, this_place);
+          }
 
       }
 
