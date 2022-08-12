@@ -440,7 +440,7 @@ async function connect() {
 
         if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog' ) {
 
-          document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u></strong> '+data.trait_type;
+          document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u></strong> '+data.value;
 
         } else {
 
