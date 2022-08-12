@@ -441,7 +441,7 @@ async function connect() {
         if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog' ) {
 
           document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u></strong> '+data.trait_type;
-          
+
         } else {
 
           let trait_text = document.createElement('i')
@@ -451,9 +451,19 @@ async function connect() {
         }
       }
 
-      let button_b = document.createElement('div');
-      button_b.innerHTML = '<br><a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+openSeaLink+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
-      document.getElementById('traits_'+token_id).appendChild(button_b);
+      if (staked) {
+
+        let button_b = document.createElement('div');
+        button_b.innerHTML = '<br><button class="frog_button">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
+        document.getElementById('traits_'+token_id).appendChild(button_b);
+
+      } else {
+
+        let button_b = document.createElement('div');
+        button_b.innerHTML = '<br><button class="frog_button">Stake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
+        document.getElementById('traits_'+token_id).appendChild(button_b);
+
+      }
 
     } catch (e) { console.log(e.message); }
 
