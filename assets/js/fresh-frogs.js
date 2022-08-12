@@ -453,6 +453,10 @@ async function connect() {
 
       let button_b = document.createElement('div');
 
+      button_b.width = 'fit-content';
+      button_b.marginLeft = 'auto';
+      button_b.marginRight = 'auto';
+
       if (staked) {
         button_b.innerHTML = '<br><button class="frog_button" style="background: coral; border: 1px solid black;">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
       } else {
