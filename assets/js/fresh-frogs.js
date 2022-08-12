@@ -424,38 +424,26 @@ async function connect() {
       }
       doc.appendChild(frog_token);
 
-      /*
       if (staked) { // ff9999
         document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u> <b style="border-radius: 5px; background: rgb(122 122 122 / 20%); color: #ff9999;">(staked)</b></strong>';
       } else {
         document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u></strong>';
       }
-      */ //
 
       let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
 
       for (var i = 0; i < metadata.attributes.length; i++) {
-
         var data = metadata.attributes[i]
-
-        if (data.trait_type == 'Frog' || data.trait_type == 'SpecialFrog' ) {
-
-          document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u></strong> '+data.value;
-
-        } else {
-
-          let trait_text = document.createElement('i')
-          trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value
-          document.getElementById('traits_'+token_id).appendChild(trait_text)
-
-        }
-      }//
+        let trait_text = document.createElement('i')
+        trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value
+        document.getElementById('traits_'+token_id).appendChild(trait_text)
+      }
 
       let button_b = document.createElement('div');
 
-      button_b.width = 'fit-content';
-      button_b.marginLeft = 'auto';
-      button_b.marginRight = 'auto';
+      button_b.style.width = 'fit-content';
+      button_b.style.marginLeft = 'auto';
+      button_b.style.marginRight = 'auto';
 
       if (staked) {
         button_b.innerHTML = '<br><button class="frog_button" style="background: coral; border: 1px solid black;" onclick="withdraw(token_id)">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
