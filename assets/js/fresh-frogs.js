@@ -456,7 +456,7 @@ async function connect() {
       if (staked) {
         button_b.innerHTML = '<br><button class="frog_button" style="background: coral; border: 1px solid black;">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
       } else {
-        button_b.innerHTML = '<br><button class="frog_button">Stake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
+        button_b.innerHTML = '<br><button class="frog_button" style="background: lightgreen; border: 1px solid black;">Stake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
       }
 
       document.getElementById('traits_'+token_id).appendChild(button_b);
