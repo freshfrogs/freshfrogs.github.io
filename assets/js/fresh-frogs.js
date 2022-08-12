@@ -586,8 +586,8 @@ async function connect() {
     //newAttribute.style.cursor = "pointer"
     if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
       newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"2.gif"
-    } else if (attribute === "tongueFly") { 
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
+    //} else if (attribute === "tongueFly") { 
+    //  newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
     } else if (attribute === "cyan_tongueFly") { 
       newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
     } else if (attribute === "morphAnimation") {
