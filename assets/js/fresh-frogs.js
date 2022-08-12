@@ -279,7 +279,7 @@ async function connect() {
 
       consoleOutput('<strong>Claiming '+stakers_rewards+' $FLYZ</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
         '<div style="text-align: left;">'+
-        '<br><b><strike>1.) Approve Contract</b></strike> ✅<br><strike>This is a one time transaction to allow staking.</strike><br>'+
+        '<br><b><strike>1.) Approve Contract</b></strike> ✅<br>This is a one time transaction to allow staking.<br>'+
         '<br><b>2.) Claim Rewards</b> 🔃<br>Transfer '+stakers_rewards+' $FLYZ from staking protocol, requires a gas fee.<br>'+
         '</div>');
         
@@ -321,7 +321,7 @@ async function connect() {
 
       consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
         '<div style="text-align: left;">'+
-        '<br><b><strike>1.) Approve Contract</b></strike> ✅<br><strike>This is a one time transaction to allow staking.</strike><br>'+
+        '<br><b><strike>1.) Approve Contract</b></strike> ✅<br>This is a one time transaction to allow staking.<br>'+
         '<br><b>2.) Transfer NFT</b> 🔃<br>Transfer FROG #'+token_id+' to staking protocol, requires a gas fee.<br>'+
         '</div>')
         
@@ -365,7 +365,7 @@ async function connect() {
         
       consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
         '<div style="text-align: left;">'+
-        '<br><b><strike>1.) Approve Contract</b></strike> ✅<br> <strike>This is a one time transaction to allow staking.</strike><br>'+
+        '<br><b><strike>1.) Approve Contract</b></strike> ✅<br>This is a one time transaction to allow staking.<br>'+
         '<br><b>2.) Retrieve NFT</b> 🔃<br> Transfer FROG #'+token_id+' from staking protocol, requires a gas fee.<br>'+
         '</div>')
         
