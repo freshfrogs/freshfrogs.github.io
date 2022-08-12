@@ -454,7 +454,7 @@ async function connect() {
       let button_b = document.createElement('div');
 
       if (staked) {
-        button_b.innerHTML = '<br><button class="frog_button">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
+        button_b.innerHTML = '<br><button class="frog_button" style="background: coral; border: 1px solid black;">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
       } else {
         button_b.innerHTML = '<br><button class="frog_button">Stake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>'
       }
