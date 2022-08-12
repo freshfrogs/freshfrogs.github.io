@@ -355,18 +355,18 @@ async function connect() {
 
         consoleOutput('<strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
           '<div style="text-align: left;">'+
-          '<br><b>1.) Approve Contract</b>🔃<br> This is a one time transaction to allow staking.<br>'+
-          '<br><b>2.) Retrieve NFT</b>🔃<br> Transfer FROG #'+token_id+' from staking protocol, requires a gas fee.<br>'+
+          '<br><b>1.) Approve Contract</b> 🔃<br> This is a one time transaction to allow staking.<br>'+
+          '<br><b>2.) Retrieve NFT</b> 🔃<br> Transfer FROG #'+token_id+' from staking protocol, requires a gas fee.<br>'+
           '</div>')
         
         let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
 
       }
         
-      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="print_img" /><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint" /><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
         '<div style="text-align: left;">'+
-        '<br><b><strike>1.) Approve Contract</b>✅<br> This is a one time transaction to allow staking.</strike><br>'+
-        '<br><b>2.) Retrieve NFT</b>🔃<br> Transfer FROG #'+token_id+' from staking protocol, requires a gas fee.<br>'+
+        '<br><b><strike>1.) Approve Contract</b> ✅<br> This is a one time transaction to allow staking.</strike><br>'+
+        '<br><b>2.) Retrieve NFT</b> 🔃<br> Transfer FROG #'+token_id+' from staking protocol, requires a gas fee.<br>'+
         '</div>')
         
         //console_pre.style.backgroundColor = '#99ffc5'
