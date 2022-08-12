@@ -430,7 +430,7 @@ async function connect() {
       } else {
         document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u></strong>';
       }
-      */
+      */ //
 
       let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
 
