@@ -449,7 +449,7 @@ async function connect() {
           document.getElementById('traits_'+token_id).appendChild(trait_text)
 
         }
-      }
+      }//
 
       let button_b = document.createElement('div');
 
