@@ -269,8 +269,7 @@ async function connect() {
 
         consoleOutput('<strong>Claiming '+stakers_rewards+' $FLYZ</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
           '<div style="text-align: left;">'+
-          '<br><b>1.) Approve Contract</b> 🔃<br>This is a one time transaction to allow staking.<br>'+
-          '<br><b>2.) Transfer NFT</b> 🔃<br>Transfer FROG #'+token_id+' to staking protocol, requires a gas fee.<br>'+
+          '<br><b>(1/2) Approve Contract</b><br>This is a one time transaction to allow staking.<br>'+
           '</div>')
         
         let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
@@ -279,8 +278,7 @@ async function connect() {
 
       consoleOutput('<strong>Claiming '+stakers_rewards+' $FLYZ</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
         '<div style="text-align: left;">'+
-        '<br><b><strike>1.) Approve Contract</b></strike> ✅<br>This is a one time transaction to allow staking.<br>'+
-        '<br><b>2.) Claim Rewards</b> 🔃<br>Transfer '+stakers_rewards+' $FLYZ from staking protocol, requires a gas fee.<br>'+
+        '<br><b>Claim Rewards</b><br>Transfer '+stakers_rewards+' $FLYZ from staking protocol, requires a gas fee.<br>'+
         '</div>');
         
       await controller.methods.claimRewards().send({ from: user_address });
@@ -311,7 +309,7 @@ async function connect() {
 
         consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
           '<div style="text-align: left;">'+
-          '<br><b>Approve Contract</b><br>This is a one time transaction to allow staking, requires a gas fee.<br>'+
+          '<br><b>(1/2) Approve Contract</b><br>This is a one time transaction to allow staking, requires a gas fee.<br>'+
           '</div>')
         
         let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
@@ -351,8 +349,7 @@ async function connect() {
 
         consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
           '<div style="text-align: left;">'+
-          '<br><b>1.) Approve Contract</b> 🔃<br> This is a one time transaction to allow staking.<br>'+
-          '<br><b>2.) Retrieve NFT</b> 🔃<br> Transfer FROG #'+token_id+' from staking protocol, requires a gas fee.<br>'+
+          '<br><b>(1/2) Approve Contract</b><br> This is a one time transaction to allow staking.<br>'+
           '</div>')
         
         let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
@@ -361,20 +358,15 @@ async function connect() {
         
       consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
         '<div style="text-align: left;">'+
-        '<br><b><strike>1.) Approve Contract</b></strike> ✅<br>This is a one time transaction to allow staking.<br>'+
-        '<br><b>2.) Retrieve NFT</b> 🔃<br> Transfer FROG #'+token_id+' from staking protocol, requires a gas fee.<br>'+
+        '<br><b>Retrieve NFT</b><br> Transfer FROG #'+token_id+' from staking protocol, requires a gas fee.<br>'+
         '</div>')
-        
-        //console_pre.style.backgroundColor = '#99ffc5'
 
       let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
       consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been un-staked!');
 
     } catch (e) { 
 
-      console.log(e.message);
-      consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
-      //console_pre.style.backgroundColor = '#ff99b6';
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
 
     }
     
