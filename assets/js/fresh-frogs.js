@@ -556,7 +556,7 @@ async function connect() {
         if (!sale_price) {
           render_token(token_id)
         } else {
-          render_token(token_id, sale_price)
+          render_token(token_id, false, sale_price)
         }
         
       })
