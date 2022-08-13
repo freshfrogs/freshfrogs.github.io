@@ -413,9 +413,7 @@ async function connect() {
       doc.appendChild(frog_token);
 
       document.getElementById('frog_'+token_id).innerHTML = name;
-
-      if (typeof cost !== undefined) {
-        console.log(cost)
+      if (cost !== undefined) {
         document.getElementById('price_'+token_id).innerHTML = 'Ξ'+cost;
       }
 
@@ -548,9 +546,8 @@ async function connect() {
 
           var { name, token_metadata, permalink, traits, external_link, token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
 
-          if (total_price !== 'undefined' && decimals !== 'undefined') {
+          if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
             sale_price = total_price / Math.pow(10, decimals);
-            console.log(sale_price);
           }
 
         } catch (e) {}
