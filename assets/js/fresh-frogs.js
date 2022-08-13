@@ -400,7 +400,7 @@ async function connect() {
       frog_token = document.createElement('div');
       frog_token.id = name;
       frog_token.className = 'frog_token';
-      frog_token.innerHTML = '<div class="frogTokenCont"><strong id="frog_'+token_id+'" class="frog_name"></strong><strong id="price_'+token_id+'" class="frog_price"></strong><img src="'+external_link+'" class="frog_img"/><div id="traits_'+token_id+'" class="trait_list"></div></div>';
+      frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left;"><strong id="frog_'+token_id+'" class="frog_name"></strong><strong id="price_'+token_id+'" class="frog_price"></strong></div><img src="'+external_link+'" class="frog_img"/><div id="traits_'+token_id+'" class="trait_list"></div></div>';
       frog_token.onclick = function() { 
         if (!morph) {
           if (!staked) { display_token(token_id); } else { display_token(token_id, true); }
