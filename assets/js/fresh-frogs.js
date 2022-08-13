@@ -412,7 +412,7 @@ async function connect() {
       }
       doc.appendChild(frog_token);
 
-      document.getElementById('frog_'+token_id).innerHTML = '<u>'+name+'</u>';
+      document.getElementById('frog_'+token_id).innerHTML = name;
       //document.getElementById('price_'+token_id).innerHTML = '<u>'+name+'</u>';
 
       /*
