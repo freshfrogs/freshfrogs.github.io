@@ -413,7 +413,9 @@ async function connect() {
       doc.appendChild(frog_token);
 
       document.getElementById('frog_'+token_id).innerHTML = name;
-      //document.getElementById('price_'+token_id).innerHTML = '<u>'+name+'</u>';
+      if (cost !== undefined) {
+        document.getElementById('price_'+token_id).innerHTML = 'Ξ'+cost;
+      }
 
       /*
       if (staked) { // ff9999
@@ -541,12 +543,22 @@ async function connect() {
 
         try {
 
-          var { name, token_metadata, permalink, traits, external_link, token_id } = frog
+          var sale_price = false;
 
-        } catch (e) { console.log(e.message); }
+          var { name, token_metadata, permalink, traits, external_link, token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
 
-        render_token(token_id)
+          if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
+            sale_price = total_price / Math.pow(10, decimals);
+          }
 
+        } catch (e) {}
+
+        if (!sale_price) {
+          render_token(token_id)
+        } else {
+          render_token(token_id, sale_price)
+        }
+        
       })
 
     })
