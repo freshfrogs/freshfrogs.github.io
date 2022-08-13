@@ -466,15 +466,12 @@ async function connect() {
         fetch('https://api.opensea.io/api/v1/asset/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b/'+tokenId+'/?include_orders=false', options)
         .then((token) => token.json())
         .then((token) => {
-
-          var { asset } = token
-          asset.forEach((frog) => { 
     
             try {
     
               var sale_price = false;
     
-              var { last_sale: { payment_token: { decimals }, total_price } } = frog
+              var { last_sale: { payment_token: { decimals }, total_price } } = token
     
               if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
                 sale_price = total_price / Math.pow(10, decimals);
@@ -489,7 +486,6 @@ async function connect() {
             } catch (e) {console.log(e.message);}
             
           })
-        })
       }
 
       staked_frogs = staked_tokens.length;
