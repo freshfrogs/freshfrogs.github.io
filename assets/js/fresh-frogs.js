@@ -573,7 +573,7 @@ async function connect() {
             sale_price = total_price / Math.pow(10, decimals);
           }
 
-        } catch (e) {}
+        } catch (e) {console.log(e.message);}
 
         if (!sale_price) {
           render_token(token_id)
