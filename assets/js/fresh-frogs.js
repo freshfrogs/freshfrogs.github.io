@@ -486,7 +486,7 @@ async function connect() {
                 render_token(tokenId, true, sale_price)
               }
     
-            } catch (e) {}
+            } catch (e) {console.log(e.message);}
             
           })
         })
@@ -495,7 +495,7 @@ async function connect() {
       staked_frogs = staked_tokens.length;
       return staked_tokens.length;
 
-    } catch (e) {}
+    } catch (e) {console.log(e.message);}
 
   }
 
