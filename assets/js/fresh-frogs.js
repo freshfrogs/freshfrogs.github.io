@@ -400,7 +400,7 @@ async function connect() {
       frog_token = document.createElement('div');
       frog_token.id = name;
       frog_token.className = 'frog_token';
-      frog_token.innerHTML = '<div class="frogTokenCont"><img src="'+external_link+'" class="frog_img"/><div id="traits_'+token_id+'" class="trait_list"></div></div>';
+      frog_token.innerHTML = '<div class="frogTokenCont"><strong id="frog_'+token_id+'" class="frog_name"></strong><strong id="price_'+token_id+'" class="frog_price"></strong><img src="'+external_link+'" class="frog_img"/><div id="traits_'+token_id+'" class="trait_list"></div></div>';
       frog_token.onclick = function() { 
         if (!morph) {
           if (!staked) { display_token(token_id); } else { display_token(token_id, true); }
@@ -412,11 +412,16 @@ async function connect() {
       }
       doc.appendChild(frog_token);
 
+      document.getElementById('frog_'+token_id).innerHTML = '<u>'+name+'</u>';
+      //document.getElementById('price_'+token_id).innerHTML = '<u>'+name+'</u>';
+
+      /*
       if (staked) { // ff9999
         document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u> <b style="border-radius: 5px; background: rgb(122 122 122 / 20%); color: #ff9999;">(staked)</b></strong>';
       } else {
         document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u></strong>';
       }
+      */
 
       let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
 
