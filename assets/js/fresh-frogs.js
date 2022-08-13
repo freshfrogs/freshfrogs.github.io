@@ -474,16 +474,16 @@ async function connect() {
     
               var sale_price = false;
     
-              var { name, token_metadata, permalink, traits, external_link, token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
+              var { last_sale: { payment_token: { decimals }, total_price } } = frog
     
               if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
                 sale_price = total_price / Math.pow(10, decimals);
               }
 
               if (!sale_price) {
-                render_token(token_id, true)
+                render_token(tokenId, true)
               } else {
-                render_token(token_id, true, sale_price)
+                render_token(tokenId, true, sale_price)
               }
     
             } catch (e) {}
