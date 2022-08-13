@@ -424,6 +424,10 @@ async function connect() {
         document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u></strong>';
       }
       */
+
+      if (staked) {
+        document.getElementById('price_'+token_id).innerHTML = '<b style="border-radius: 5px; background: rgb(122 122 122 / 20%); color: #ff9999;">(staked)</b>'
+      }
       
       let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
 
