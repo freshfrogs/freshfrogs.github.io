@@ -452,7 +452,7 @@ async function connect() {
 
   }
 
-  // getStakedTokens()
+  // getStakedTokens() //
   async function get_staked_tokens(user_address) {
 
     try {
