@@ -413,7 +413,7 @@ async function connect() {
       doc.appendChild(frog_token);
 
       document.getElementById('frog_'+token_id).innerHTML = name;
-      if (typeof cost !== undefined) {
+      if (cost !== undefined) {
         document.getElementById('price_'+token_id).innerHTML = 'Ξ'+cost;
       }
 
@@ -462,15 +462,13 @@ async function connect() {
       for (var i = 0; i < staked_tokens.length; i++) {
 
         tokenId = staked_tokens[i].tokenId
+        render_token(tokenId, true)
 
-        render_token(tokenId, true);
-        
       }
-
       staked_frogs = staked_tokens.length;
       return staked_tokens.length;
 
-    } catch (e) {console.log(e.message);}
+    } catch (e) { console.log(e.message); }
 
   }
 
@@ -552,7 +550,7 @@ async function connect() {
             sale_price = total_price / Math.pow(10, decimals);
           }
 
-        } catch (e) {console.log(e.message);}
+        } catch (e) {}
 
         if (!sale_price) {
           render_token(token_id)
