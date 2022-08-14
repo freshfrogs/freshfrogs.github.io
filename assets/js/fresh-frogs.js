@@ -561,7 +561,7 @@ async function connect() {
       //consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<div id="display_frog"></div><hr>')
 
       var { assets } = tokens
-      assets.forEach((frog) => { // console.log(frog)
+      assets.forEach((frog) => { console.log(frog)
 
         try {
 
