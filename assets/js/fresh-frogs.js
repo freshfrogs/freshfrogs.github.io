@@ -288,7 +288,7 @@ async function connect() {
     } catch (e) { 
 
       console.log(e.message);
-      consoleOutput('Transaction Failed<br><br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
+      consoleOutput('Something went wrong!<br><br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
 
     }
     
@@ -304,8 +304,6 @@ async function connect() {
       is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
 
       if (!is_approved) {
-
-        console_pre.style.backgroundColor = 'white'
 
         consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
           '<div style="text-align: left;">'+
@@ -327,7 +325,7 @@ async function connect() {
 
     } catch (e) { 
 
-      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Staking Frog #'+token_id+'...</strong><br>Transaction Failed<br>'+'<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+'<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
 
     }
 
@@ -343,8 +341,6 @@ async function connect() {
       is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
 
       if (!is_approved) {
-
-        console_pre.style.backgroundColor = 'white'
 
         consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
           '<div style="text-align: left;">'+
@@ -366,7 +362,7 @@ async function connect() {
 
     } catch (e) { 
 
-      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Withdrawing Frog #'+token_id+'...</strong><br>Transaction Failed<br>'+'<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+'<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
 
     }
     
