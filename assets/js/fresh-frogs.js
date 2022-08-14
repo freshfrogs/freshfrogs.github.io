@@ -417,6 +417,13 @@ async function connect() {
       } else {
         frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+token_id+'" class="frog_name"></strong><strong id="price_'+token_id+'" class="frog_price"></strong></div><div class="frog_imgContainer"><img src="'+external_link+'" class="frog_img"/></div><div id="traits_'+token_id+'" class="trait_list"><b>Properties</b><div id="prop_'+token_id+'" class="properties"></div></div></div>';
       }
+
+      //
+
+      let incomingTokenTransferEvents = await controller.getPastEvents('Stake', { filter: {'from': userAcc}, fromBlock: 0, toBlock: 'latest'})
+        incomingTokenTransferEvents.forEach( (event) => console.log(event.returnValues));
+
+      //
       frog_token.onclick = function() { 
         if (!morph) {
           if (!staked) { display_token(token_id); } else { display_token(token_id, true); }
