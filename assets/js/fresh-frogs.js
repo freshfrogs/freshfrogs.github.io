@@ -588,10 +588,10 @@ async function connect() {
     newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
     newAttribute.id = attribute
     newAttribute.target = "_blank"
-    if (where == 'frogContainer4') {
-      newAttribute.className = "frogImg4" //shadesAnimation
+    if (trait == 'Trait') {
+      newAttribute.className = "frogImg5" //shadesAnimation
     } else {
-      newAttribute.className = "frogImg2" //shadesAnimation
+      newAttribute.className = "frogImg4" //shadesAnimation
     }
     
     //newAttribute.style.cursor = "pointer"
