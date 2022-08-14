@@ -452,7 +452,7 @@ async function connect() {
         if (trait_rarity < 1) { trait_rarity = '<1%' } else { trait_rarity = trait_rarity+'%' }
 
         let trait_text = document.createElement('i')
-        trait_text.innerHTML = data.trait_type+': '+data.value+'<br><b style="font-size: smaller;"><i>'+trait_rarity+' have this trait</i></b><br><br>';
+        trait_text.innerHTML = data.trait_type+': '+data.value+' <b style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>';
         document.getElementById('prop_'+token_id).appendChild(trait_text);
 
       }
