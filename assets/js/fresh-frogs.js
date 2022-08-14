@@ -421,7 +421,7 @@ async function connect() {
       //
 
       let incomingTokenTransferEvents = await controller.getPastEvents('Stake', { filter: {'from': userAcc}, fromBlock: 0, toBlock: 'latest'})
-        incomingTokenTransferEvents.forEach( (event) => console.log(event.returnValues));
+        incomingTokenTransferEvents.forEach( (event) => console.log('Stake() Event Found!'); console.log(event.returnValues));
 
       //
       frog_token.onclick = function() { 
