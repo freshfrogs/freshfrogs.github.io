@@ -452,7 +452,7 @@ async function connect() {
         if (trait_rarity < 1) { trait_rarity = '<1%' } else { trait_rarity = trait_rarity+'%' }
 
         let trait_text = document.createElement('i')
-        trait_text.innerHTML = data.trait_type+': '+data.value+' <b style="font-size: small;"><i>'+trait_rarity+'</i></b><br>';
+        trait_text.innerHTML = data.trait_type+': '+data.value+'<b style="font-size: smaller;"><i>'+trait_rarity+' have this trait</i></b><br>';
         document.getElementById('prop_'+token_id).appendChild(trait_text);
 
       }
@@ -561,7 +561,7 @@ async function connect() {
       //consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<div id="display_frog"></div><hr>')
 
       var { assets } = tokens
-      assets.forEach((frog) => { console.log(frog)
+      assets.forEach((frog) => { // console.log(frog)
 
         try {
 
