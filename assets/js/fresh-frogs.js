@@ -412,7 +412,11 @@ async function connect() {
       frog_token = document.createElement('div');
       frog_token.id = name;
       frog_token.className = 'frog_token';
-      frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+token_id+'" class="frog_name"></strong><strong id="price_'+token_id+'" class="frog_price"></strong></div><div class="frog_imgContainer"><img src="'+external_link+'" class="frog_img"/></div><div id="traits_'+token_id+'" class="trait_list"><b>Properties</b><div id="prop_'+token_id+'" class="properties"></div></div></div>';
+      if (staked) {
+        frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+token_id+'" class="frog_name"></strong><strong id="price_'+token_id+'" class="frog_price"></strong></div><div class="frog_imgContainer"><img src="'+external_link+'" class="frog_img"/></div><br><b id="progress_'+token_id+'"></b><div id="myProgress_'+token_id+'"><div id="myBar_'+token_id+'"></div></div><br><div id="traits_'+token_id+'" class="trait_list"><b>Properties</b><div id="prop_'+token_id+'" class="properties"></div></div></div>';
+      } else {
+        frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+token_id+'" class="frog_name"></strong><strong id="price_'+token_id+'" class="frog_price"></strong></div><div class="frog_imgContainer"><img src="'+external_link+'" class="frog_img"/></div><div id="traits_'+token_id+'" class="trait_list"><b>Properties</b><div id="prop_'+token_id+'" class="properties"></div></div></div>';
+      }
       frog_token.onclick = function() { 
         if (!morph) {
           if (!staked) { display_token(token_id); } else { display_token(token_id, true); }
@@ -438,6 +442,15 @@ async function connect() {
       */
 
       if (staked) {
+        
+        // Progress Bar!
+        percent = parseInt((7/10)*100);
+        document.getElementById('progress_'+token_id).innerHTML = percent+"%"
+        elem = document.getElementById('myBar_'+token_id);
+        width = percent
+        width++;
+        elem.style.width = width + "%";
+        
         document.getElementById('price_'+token_id).innerHTML = '<b style="border-radius: 5px; color: coral;">(staked)</b>'
       }
       
