@@ -783,9 +783,7 @@ async function connect() {
     // Frog Type
     if (base_Frog != false) {
 
-      var alpha_Frog = base_Frog;
-
-      if (base_Frog == 'cyanTreeFrog' && other_Frog == 'cyanTreeFrog') { var alpha_Frog = false; var alpha_SpecialFrog = 'elBino/'+base_Frog; }          
+      var alpha_Frog = base_Frog;         
 
     } else if (base_SpecialFrog != false) {
 
