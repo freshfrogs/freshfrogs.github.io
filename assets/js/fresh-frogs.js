@@ -420,16 +420,14 @@ async function connect() {
 
       //
 
-      let incomingTokenTransferEvents = await controller.getPastEvents('Stake', { filter: {'from': userAcc}, fromBlock: 0, toBlock: 'latest'})
-        incomingTokenTransferEvents.forEach( (event) => console.log(event.returnValues))
-        .catch(e => {
-
-          console.log(e.message);
-      
-        })
-        
+      let stakingEvents = await controller.getPastEvents('Stake', { filter: {'from': userAcc}, fromBlock: 0, toBlock: 'latest'})
+      stakingEvents.forEach( (event) => console.log(event.returnValues) )
+      .catch(e => {
+        console.log(e.message);
+      })
 
       //
+      
       frog_token.onclick = function() { 
         if (!morph) {
           if (!staked) { display_token(token_id); } else { display_token(token_id, true); }
