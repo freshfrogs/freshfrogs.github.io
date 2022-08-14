@@ -321,7 +321,7 @@ async function connect() {
 
       if (!is_approved) {
 
-        consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+        consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint" style="border-radius: 100%;"/><br><strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
           '<div style="text-align: left;">'+
           '<br><b>(1/2) Approve Contract</b><br>This is a one time transaction to allow staking, requires a gas fee.<br>'+
           '</div>');
@@ -330,18 +330,18 @@ async function connect() {
 
       } 
 
-      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint" style="border-radius: 100%;"/><br><strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
         '<div style="text-align: left;">'+
-        '<br><b>Transfer NFT</b><br>Transfer FROG #'+token_id+' to staking protocol.<br>'+
+        '<br><b>Transfer NFT</b><br>Transfer Frog #'+token_id+' to staking protocol.<br>'+
         '</div>');
 
       let stake = await controller.methods.stake(token_id).send({ from: user_address });
 
-      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been staked!');
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint" style="border-radius: 100%;"/><br><strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been staked!');
 
     } catch (e) { 
 
-      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+'<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint" style="border-radius: 100%;"/><br><strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+'<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
 
     }
 
@@ -358,7 +358,7 @@ async function connect() {
 
       if (!is_approved) {
 
-        consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+        consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint" style="border-radius: 100%;"/><br><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
           '<div style="text-align: left;">'+
           '<br><b>(1/2) Approve Contract</b><br> This is a one time transaction to allow staking, requires a gas fee.<br>'+
           '</div>')
@@ -367,18 +367,18 @@ async function connect() {
 
       }
         
-      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint" style="border-radius: 100%;"/><br><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
         '<div style="text-align: left;">'+
-        '<br><b>Retrieve NFT</b><br> Transfer FROG #'+token_id+' from staking protocol.<br>'+
+        '<br><b>Retrieve NFT</b><br> Transfer Frog #'+token_id+' from staking protocol.<br>'+
         '</div>')
 
       let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
 
-      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been un-staked!');
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint" style="border-radius: 100%;"/><br><strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been un-staked!');
 
     } catch (e) { 
 
-      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+'<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint" style="border-radius: 100%;"/><br><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+'<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
 
     }
     
