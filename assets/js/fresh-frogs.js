@@ -429,7 +429,7 @@ async function connect() {
 
       for (var i = 0; i < metadata.attributes.length; i++) {
         var data = metadata.attributes[i]
-        let trait_text = document.createElement('i')
+        let trait_text = document.createElement('p')
         trait_text.innerHTML = '<br>'+data.trait_type+': '+data.value
         document.getElementById('prop_'+token_id).appendChild(trait_text)
       }
