@@ -9,6 +9,22 @@ const _0x3c6cb7=_0x455b;(function(_0x10c095,_0x4ebf79){const _0x128040=_0x455b,_
 
 async function connect() {
 
+    fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
+    .then(collection => collection.json())
+    .then(collection => {
+
+        var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
+
+        traits_list = traits;
+
+    })
+    .catch(e => {
+
+        console.log('Error: Could not talk to OpenSea!');
+        console.error(e.message);
+  
+    }); // End data pull / first paid Frog 3,236
+
     const web3 = new Web3(window.ethereum);
     const f0 = new F0();
 
@@ -428,10 +444,17 @@ async function connect() {
       let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
 
       for (var i = 0; i < metadata.attributes.length; i++) {
+
         var data = metadata.attributes[i]
+
+        try { var trait_rarity = ((traits_list[data.trait_type][value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'e'; console.log(e); }
+                  
+        if (trait_rarity < 1) { trait_rarity = '<1' }
+
         let trait_text = document.createElement('i')
-        trait_text.innerHTML = data.trait_type+': '+data.value+'<br>';
-        document.getElementById('prop_'+token_id).appendChild(trait_text)
+        trait_text.innerHTML = data.trait_type+': '+data.value+'<b style="font-size: small;">'+trait_rarity+'%</b><br>';
+        document.getElementById('prop_'+token_id).appendChild(trait_text);
+
       }
 
       let button_b = document.createElement('div');
