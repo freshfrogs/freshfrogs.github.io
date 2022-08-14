@@ -445,7 +445,6 @@ async function connect() {
         
         // Progress Bar!
         percent = parseInt((7/10)*100);
-        document.getElementById('progress_'+token_id).innerHTML = percent+"%"
         elem = document.getElementById('myBar_'+token_id);
         width = percent
         width++;
