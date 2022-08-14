@@ -644,7 +644,14 @@
       width: 128px;
       height: 128px;
       cursor: pointer;
+      transition: all .2s;
     }
+    .frogImg:hover {
+      -ms-transform: scale(1.1); /* IE 9 */
+      -webkit-transform: scale(1.1); /* Safari 3-8 */
+      transform: scale(1.1);
+    }
+
     .frog_imgContainer {
       border-radius: 5px;
       border: 1px solid black;
@@ -652,6 +659,7 @@
       margin-bottom: 0px;
       width: 128px;
       height: 128px;
+      overflow: hidden;
     }
     .frog_token {
       display: block;
