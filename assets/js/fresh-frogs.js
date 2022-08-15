@@ -441,11 +441,8 @@ async function connect() {
         try {
 
           let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'from': user_address, 'tokenId': token_id}, fromBlock: 0, toBlock: 'latest'});
-
           let staked_block = parseInt(stakingEvents[0].blockNumber);
-          
           let staked_time = await web3.eth.getBlock(staked_block);
-
           let staked_date = new Date(staked_time.timestamp*1000);
           let staked_duration = Date.now() - staked_date;
           let staked_hours = Math.floor(staked_duration/1000/60/60);
