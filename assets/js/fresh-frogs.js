@@ -419,7 +419,7 @@ async function connect() {
       //}
 
 
-      let stakingEvents = await contract.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS}, fromBlock: 0, toBlock: 'latest'})
+      let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS}, fromBlock: 0, toBlock: 'latest'})
       stakingEvents.forEach( (event) => console.log(event.returnValues) )
       .catch(e => {
         console.log(e.message);
