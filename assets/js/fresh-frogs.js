@@ -410,15 +410,14 @@ async function connect() {
       let name = 'Frog #'+token_id
       let doc = document.getElementById('thePad');
 
-      // Create Element
       frog_token = document.createElement('div');
       frog_token.id = name;
       frog_token.className = 'frog_token';
-      //if (staked) {
-      //  frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+token_id+'" class="frog_name"></strong><strong id="price_'+token_id+'" class="frog_price"></strong></div><div class="frog_imgContainer"><img src="'+external_link+'" class="frog_img"/></div><b id="progress_'+token_id+'"></b><div class="myProgress" id="myProgress_'+token_id+'"><div class="myBar" id="myBar_'+token_id+'"></div></div><div id="traits_'+token_id+'" class="trait_list"><b>Properties</b><div id="prop_'+token_id+'" class="properties"></div></div></div>';
-      //} else {
+      if (staked) {
+        frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+token_id+'" class="frog_name"></strong><strong id="price_'+token_id+'" class="frog_price"></strong></div><div class="frog_imgContainer"><img src="'+external_link+'" class="frog_img"/></div><b id="progress_'+token_id+'"></b><div class="myProgress" id="myProgress_'+token_id+'"><div class="myBar" id="myBar_'+token_id+'"></div></div><div id="traits_'+token_id+'" class="trait_list"><b>Properties</b><div id="prop_'+token_id+'" class="properties"></div></div></div>';
+      } else {
         frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+token_id+'" class="frog_name"></strong><strong id="price_'+token_id+'" class="frog_price"></strong></div><div class="frog_imgContainer"><img src="'+external_link+'" class="frog_img"/></div><div id="traits_'+token_id+'" class="trait_list"><b>Properties</b><div id="prop_'+token_id+'" class="properties"></div></div></div>';
-      //}
+      }
 
       frog_token.onclick = function() { 
         if (!morph) {
@@ -451,11 +450,19 @@ async function connect() {
 
           if (staked_hours >= 2000) {
             staked_level = 3;
+            percent = parseInt((staked_hours/3000)*100);
           } else if (staked_hours >= 1000) {
             staked_level = 2;
+            percent = parseInt((staked_hours/2000)*100);
           } else {
             staked_level = 1;
+            percent = parseInt((staked_hours/1000)*100);
           }
+
+          // Progress Bar!
+          elem = document.getElementById('myBar_'+token_id);
+          width = percent
+          elem.style.width = width + "%";
 
           document.getElementById('price_'+token_id).innerHTML = '<b style="border-radius: 5px; color: coral;">(staked)<br>Level '+staked_level+'</b>';
 
