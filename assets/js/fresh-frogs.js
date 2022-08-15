@@ -444,18 +444,24 @@ async function connect() {
           let staked_time = await web3.eth.getBlock(staked_block).timestamp;
           let staked_date = new Date(staked_time*1000);
 
-          console.log('Frog #'+token_id+' Staked : '+staked_date.toUTCString());
+          console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString());
 
           let staked_duration = Date.now() - staked_date;
           let staked_hours = Math.floor(staked_duration/1000/60/60);
 
-          console.log('Frog #'+token_id+' Total Hrs : '+staked_hours);
+          console.log('Frog #'+token_id+' Total Hours: '+staked_hours);
+
+          if (staked_hours >= 2000) {
+            let staked_level = 3;
+          } else if (staked_hours >= 1000) {
+            let staked_level = 2;
+          } else if (staked_hours < 1000) {
+            let staked_level = 1;
+          }
+
+          document.getElementById('price_'+token_id).innerHTML = '<b style="border-radius: 5px; color: coral;">(staked)<br>Level '+staked_level+'</b>';
 
         } catch (e) { console.log(e.message); }
-
-        // 1000 Hours = level 1
-
-        document.getElementById('price_'+token_id).innerHTML = '<b style="border-radius: 5px; color: coral;">(staked)</b>';
 
       }
       
