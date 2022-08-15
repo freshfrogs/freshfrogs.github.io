@@ -233,8 +233,6 @@ async function connect() {
     stakers_info = await controller.methods.availableRewards(user_address).call();
     temp = (stakers_info / 1000000000000000000);
     stakers_rewards = String(temp).slice(0, 6);
-    
-    //document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
 
     if (owned_frogs <= 0 && staked_tokens <= 0) { // ❌ No FROGS
 
