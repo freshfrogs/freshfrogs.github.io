@@ -211,9 +211,9 @@ async function connect() {
     try { // Connect Wallet, Factoria
 
     await f0.init({
-        web3: web3,
-        contract: CONTRACT_ADDRESS,
-        network: NETWORK
+      web3: web3,
+      contract: CONTRACT_ADDRESS,
+      network: NETWORK
     })
 
     // Contract
@@ -441,14 +441,14 @@ async function connect() {
           let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'from': user_address, 'tokenId': token_id}, fromBlock: 0, toBlock: 'latest'});
 
           let staked_block = parseInt(stakingEvents[0].blockNumber);
-          console.log(staked_block)
           let staked_time = await web3.eth.getBlock(staked_block).timestamp;
-          console.log(staked_time)
           let staked_date = new Date(staked_time*1000);
 
           console.log('Frog #'+token_id+' Staked : '+staked_date.toUTCString());
 
         } catch (e) { console.log(e.message); }
+
+        // 1000 Hours = level 1
 
         document.getElementById('price_'+token_id).innerHTML = '<b style="border-radius: 5px; color: coral;">(staked)</b>';
 
