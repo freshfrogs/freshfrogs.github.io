@@ -439,7 +439,14 @@ async function connect() {
         try {
 
           let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'from': user_address, 'tokenId': token_id}, fromBlock: 0, toBlock: 'latest'});
-          console.log(stakingEvents);
+
+          let staked_block = await stakingEvents[0].blockNumber;
+
+          let staked_time = await web3.eth.getBlock(staked_block).timestamp;
+
+          let staked_date = new Date(staked_time*1000);
+
+          console.log('Frog #'+token_id+' Staked : '+staked_date.toUTCString());
 
         } catch (e) { console.log(e.message); }
 
@@ -478,14 +485,6 @@ async function connect() {
       document.getElementById('traits_'+token_id).appendChild(button_b);
 
     } catch (e) { console.log(e.message); }
-
-  }
-
-  async function staked_time(id, block) {
-
-    let staked_time = await web3.eth.getBlock(block).timestamp;
-    let staked_date = new Date(staked_time*1000);
-    console.log('Frog #'+id+' Staked : '+staked_date.toUTCString());
 
   }
 
