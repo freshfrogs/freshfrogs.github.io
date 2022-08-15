@@ -447,8 +447,8 @@ async function connect() {
         try {
 
           let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS}, fromBlock: 0, toBlock: 'latest'})
-          stakingEvents.forEach( (event) => console.log(event.returnValues) )
-          
+          stakingEvents.forEach( (event) => console.log(event.returnValues))
+
         } catch (e) { console.log(e.message); }
 
         document.getElementById('price_'+token_id).innerHTML = '<b style="border-radius: 5px; color: coral;">(staked)</b>'
