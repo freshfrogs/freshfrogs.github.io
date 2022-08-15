@@ -441,7 +441,7 @@ async function connect() {
           let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'from': user_address, 'tokenId': token_id}, fromBlock: 0, toBlock: 'latest'});
 
           let staked_block = parseInt(stakingEvents[0].blockNumber);
-          let staked_time = await web3.eth.getBlock(10000).timestamp;
+          let staked_time = await web3.eth.getBlock(staked_block).timestamp;
           let staked_date = new Date(staked_time*1000);
 
           console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString());
@@ -455,7 +455,7 @@ async function connect() {
             let staked_level = 3;
           } else if (staked_hours >= 1000) {
             let staked_level = 2;
-          } else if (staked_hours < 1000) {
+          } else {
             let staked_level = 1;
           }
 
