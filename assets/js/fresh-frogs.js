@@ -443,13 +443,10 @@ async function connect() {
           let staked_block = parseInt(stakingEvents[0].blockNumber);
           let staked_time = await web3.eth.getBlock(staked_block).timestamp;
           let staked_date = new Date(staked_time*1000);
-
-          console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString());
-
           let staked_duration = Date.now() - staked_date;
           let staked_hours = Math.floor(staked_duration/1000/60/60);
 
-          console.log('Frog #'+token_id+' Total Hours: '+staked_hours);
+          console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
 
           if (staked_hours >= 2000) {
             let staked_level = 3;
