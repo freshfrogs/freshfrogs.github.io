@@ -25,8 +25,8 @@ async function connect() {
   
     }); // End data pull / first paid Frog 3,236
 
-    web3 = new Web3(window.ethereum);
-    f0 = new F0();
+    const web3 = new Web3(window.ethereum);
+    const f0 = new F0();
 
     const CONTROLLER_ABI =
     [
@@ -441,6 +441,7 @@ async function connect() {
           let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'from': user_address, 'tokenId': token_id}, fromBlock: 0, toBlock: 'latest'});
 
           let staked_block = parseInt(stakingEvents[0].blockNumber);
+          console.log(staked_block)
           let staked_time = await web3.eth.getBlock(staked_block).timestamp;
           console.log(staked_time)
           /*let staked_date = new Date(staked_time*1000);
