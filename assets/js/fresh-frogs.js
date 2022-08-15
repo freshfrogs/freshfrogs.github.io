@@ -418,14 +418,6 @@ async function connect() {
         frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+token_id+'" class="frog_name"></strong><strong id="price_'+token_id+'" class="frog_price"></strong></div><div class="frog_imgContainer"><img src="'+external_link+'" class="frog_img"/></div><div id="traits_'+token_id+'" class="trait_list"><b>Properties</b><div id="prop_'+token_id+'" class="properties"></div></div></div>';
       //}
 
-
-      let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS}, fromBlock: 0, toBlock: 'latest'})
-      stakingEvents.forEach( (event) => console.log(event.returnValues) )
-      .catch(e => {
-        console.log(e.message);
-      })
-
-
       frog_token.onclick = function() { 
         if (!morph) {
           if (!staked) { display_token(token_id); } else { display_token(token_id, true); }
@@ -452,12 +444,12 @@ async function connect() {
 
       if (staked) {
         
-        // Progress Bar!
-        percent = parseInt((7/10)*100);
-        elem = document.getElementById('myBar_'+token_id);
-        width = percent
-        width++;
-        elem.style.width = width + "%";
+        try {
+
+          let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS}, fromBlock: 0, toBlock: 'latest'})
+          stakingEvents.forEach( (event) => console.log(event.returnValues) )
+          
+        } catch (e) { console.log(e.message); }
 
         document.getElementById('price_'+token_id).innerHTML = '<b style="border-radius: 5px; color: coral;">(staked)</b>'
       }
