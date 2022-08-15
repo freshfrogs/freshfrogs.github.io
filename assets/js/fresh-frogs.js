@@ -469,7 +469,7 @@ async function connect() {
           width = percent
           elem.style.width = width + "%";
 
-          document.getElementById('price_'+token_id).innerHTML = '<b style="border-radius: 5px; color: coral;"><u>Level '+staked_level+'</u></b>';
+          document.getElementById('price_'+token_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Level '+staked_level+'</b>';
 
         } catch (e) { console.log(e.message); }
 
@@ -486,7 +486,7 @@ async function connect() {
         if (trait_rarity < 1) { trait_rarity = '<1%' } else { trait_rarity = trait_rarity+'%' }
 
         let trait_text = document.createElement('i')
-        trait_text.innerHTML = data.trait_type+': '+data.value+' <b class="trait" style="font-size: smaller;"><i>'+trait_rarity+'</i></b><br>';
+        trait_text.innerHTML = data.trait_type+': '+data.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>';
         document.getElementById('prop_'+token_id).appendChild(trait_text);
 
       }
