@@ -434,14 +434,6 @@ async function connect() {
         document.getElementById('price_'+token_id).innerHTML = 'Ξ'+cost;
       }
 
-      /*
-      if (staked) { // ff9999
-        document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u> <b style="border-radius: 5px; background: rgb(122 122 122 / 20%); color: coral;">(staked)</b></strong>'; // as
-      } else {
-        document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u></strong>';
-      }
-      */
-
       if (staked) {
         
         try {
