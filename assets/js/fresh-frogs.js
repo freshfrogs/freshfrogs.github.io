@@ -442,7 +442,8 @@ async function connect() {
 
           let staked_block = parseInt(stakingEvents[0].blockNumber);
           let staked_time = await web3.eth.getBlock(staked_block).timestamp;
-          let staked_date = new Date(staked_time*1000);
+          console.log(staked_time)
+          /*let staked_date = new Date(staked_time*1000);
           let staked_duration = Date.now() - staked_date;
           let staked_hours = Math.floor(staked_duration/1000/60/60);
 
@@ -456,7 +457,7 @@ async function connect() {
             let staked_level = 1;
           }
 
-          document.getElementById('price_'+token_id).innerHTML = '<b style="border-radius: 5px; color: coral;">(staked)<br>Level '+staked_level+'</b>';
+          document.getElementById('price_'+token_id).innerHTML = '<b style="border-radius: 5px; color: coral;">(staked)<br>Level '+staked_level+'</b>';*/
 
         } catch (e) { console.log(e.message); }
 
