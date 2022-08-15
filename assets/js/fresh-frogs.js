@@ -450,11 +450,11 @@ async function connect() {
           console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
 
           if (staked_hours >= 2000) {
-            let staked_level = 3;
+            staked_level = 3;
           } else if (staked_hours >= 1000) {
-            let staked_level = 2;
+            staked_level = 2;
           } else {
-            let staked_level = 1;
+            staked_level = 1;
           }
 
           document.getElementById('price_'+token_id).innerHTML = '<b style="border-radius: 5px; color: coral;">(staked)<br>Level '+staked_level+'</b>';
