@@ -450,7 +450,7 @@ async function connect() {
           stakingEvents.forEach( (event) => { 
             
             let staked_block = event.blockNumber;
-            let staked_time = web3.eth.getBlock(staked_block).timestamp;
+            let { staked_time } = await web3.eth.getBlock(staked_block).timestamp;
 
             console.log('Frog #'+token_id+' Staked : '+staked_time);
 
