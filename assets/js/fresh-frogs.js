@@ -442,9 +442,8 @@ async function connect() {
           stakingEvents.forEach( (event) => { 
             
             let staked_block = event.blockNumber;
-            //let staked_time = await web3.eth.getBlock(staked_block).timestamp;
 
-            console.log('Frog #'+token_id+' Staked : '+staked_block);
+            console.log('Frog #'+token_id+' Staked : '+staked_time(staked_block));
 
           });
 
@@ -485,6 +484,14 @@ async function connect() {
       document.getElementById('traits_'+token_id).appendChild(button_b);
 
     } catch (e) { console.log(e.message); }
+
+  }
+
+  async function staked_time(block) {
+
+    let staked_time = await web3.eth.getBlock(block).timestamp;
+    let staked_date = new Date(staked_time*1000);
+    return staked_date.toUTCString()
 
   }
 
