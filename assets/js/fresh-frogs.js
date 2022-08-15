@@ -446,6 +446,11 @@ async function connect() {
 
           console.log('Frog #'+token_id+' Staked : '+staked_date.toUTCString());
 
+          let staked_duration = Date.now() - staked_date;
+          let staked_hours = Math.floor(staked_duration/1000/60/60);
+
+          console.log('Frog #'+token_id+' Total Hrs : '+staked_hours);
+
         } catch (e) { console.log(e.message); }
 
         // 1000 Hours = level 1
