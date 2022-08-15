@@ -400,6 +400,8 @@ async function connect() {
 
     try {
 
+      web3 = new Web3(web3.currentProvider);
+
       // Variables
       let openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
       let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
