@@ -447,7 +447,7 @@ async function connect() {
         try {
 
           let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'from': user_address, 'tokenId': token_id}, fromBlock: 0, toBlock: 'latest'});
-          stakingEvents.forEach( (event) => console.log(event.blockNumber));
+          stakingEvents.forEach( (event) => console.log('Frog #'+token_id+' : '+event.blockNumber));
 
         } catch (e) { console.log(e.message); }
 
