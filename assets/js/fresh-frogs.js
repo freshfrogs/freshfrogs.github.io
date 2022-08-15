@@ -446,7 +446,7 @@ async function connect() {
           let staked_duration = Date.now() - staked_date;
           let staked_hours = Math.floor(staked_duration/1000/60/60);
 
-          console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
+          //console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
 
           if (staked_hours >= 2000) {
             staked_level = 3;
