@@ -443,7 +443,7 @@ async function connect() {
             
             let staked_block = event.blockNumber;
 
-            console.log('Frog #'+token_id+' Staked : '+staked_time(staked_block));
+            staked_time(token_id, staked_block);
 
           });
 
@@ -487,11 +487,11 @@ async function connect() {
 
   }
 
-  async function staked_time(block) {
+  async function staked_time(id, block) {
 
     let staked_time = await web3.eth.getBlock(block).timestamp;
     let staked_date = new Date(staked_time*1000);
-    return staked_date.toUTCString()
+    console.log('Frog #'+id+' Staked : '+staked_date.toUTCString());
 
   }
 
