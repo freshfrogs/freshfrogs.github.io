@@ -464,7 +464,7 @@ async function connect() {
           width = percent
           elem.style.width = width + "%";
 
-          document.getElementById('price_'+token_id).innerHTML = '<b style="border-radius: 5px; color: coral;">(staked)<br>Level '+staked_level+'</b>';
+          document.getElementById('price_'+token_id).innerHTML = '<b style="border-radius: 5px; color: coral;">(staked) Level '+staked_level+'</b>';
 
         } catch (e) { console.log(e.message); }
 
