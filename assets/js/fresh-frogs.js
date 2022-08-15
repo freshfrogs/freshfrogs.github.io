@@ -435,7 +435,7 @@ async function connect() {
       if (cost !== undefined) {
         document.getElementById('price_'+token_id).innerHTML = 'Ξ'+cost;
       }
-      //
+      
       if (staked) {
         
         try {
