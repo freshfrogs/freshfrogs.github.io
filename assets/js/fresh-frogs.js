@@ -446,8 +446,8 @@ async function connect() {
         
         try {
 
-          let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS}, fromBlock: 0, toBlock: 'latest'});
-          stakingEvents.forEach( (event) => console.log(event.returnValues));
+          let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'from': user_address}, fromBlock: 0, toBlock: 'latest'});
+          stakingEvents.forEach( (event) => console.log(event));
 
         } catch (e) { console.log(e.message); }
 
