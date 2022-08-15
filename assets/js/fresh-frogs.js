@@ -446,8 +446,8 @@ async function connect() {
           console.log(staked_block);
           
           let staked_time = await web3.eth.getBlock(staked_block);
+          console.log(staked_time);
           console.log(staked_time.timestamp);
-
           /*let staked_date = new Date(staked_time*1000);
           let staked_duration = Date.now() - staked_date;
           let staked_hours = Math.floor(staked_duration/1000/60/60);
