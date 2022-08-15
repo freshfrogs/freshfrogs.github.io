@@ -516,10 +516,12 @@ async function connect() {
         render_token(tokenId, true)
 
       }
+
       staked_frogs = staked_tokens.length;
+
       return staked_tokens.length;
 
-    } catch (e) { console.log(e.message); }
+    } catch (e) { console.log('Failed to call getStakedTokens() : '+e.message); }
 
   }
 
@@ -528,9 +530,10 @@ async function connect() {
 
     try {
 
-      controller.methods.nftCollection().call();
+      let nftCollection = await controller.methods.nftCollection().call();
+      return nftCollection;
 
-    } catch (e) { console.log(e.message); }
+    } catch (e) { console.log('Failed to call nftCollection() : '+e.message); }
     
   }
 
@@ -545,14 +548,15 @@ async function connect() {
     
   }
 
-  // stakerAddress(token)
+  // stakerAddress(tokenId)
   async function staker_address(token_id) {
 
     try {
 
-      controller.methods.stakerAddress(token_id).call();
+      let stakerAddress =  await controller.methods.stakerAddress(token_id).call();
+      return stakerAddress
 
-    } catch (e) { console.log(e.message); }
+    } catch (e) { console.log('Failed to call stakerAddress() : '+e.message); }
     
   }
 
@@ -564,7 +568,7 @@ async function connect() {
       let stakers_return = await controller.methods.stakers(user_address).call();
       return (stakers_return.unclaimedRewards / 1000000000000000000);
 
-    } catch (e) { console.log(e.message); }
+    } catch (e) { console.log('Failed to call stakers() : '+e.message); }
     
   }
 
