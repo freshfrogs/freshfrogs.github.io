@@ -439,13 +439,7 @@ async function connect() {
         try {
 
           let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'from': user_address, 'tokenId': token_id}, fromBlock: 0, toBlock: 'latest'});
-          stakingEvents.forEach( (event) => { 
-            
-            let staked_block = event.blockNumber;
-
-            staked_time(token_id, staked_block);
-
-          });
+          console.log(stakingEvents);
 
         } catch (e) { console.log(e.message); }
 
