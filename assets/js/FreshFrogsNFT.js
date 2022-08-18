@@ -8,7 +8,11 @@
   var CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
   var NETWORK = 'main';
   var morph = sub_frog = base_frog = false;
+
   const _0x3c6cb7=_0x455b;(function(_0x10c095,_0x4ebf79){const _0x128040=_0x455b,_0x558e9b=_0x10c095();while(!![]){try{const _0x151436=parseInt(_0x128040(0x1ec))/0x1*(parseInt(_0x128040(0x1f1))/0x2)+-parseInt(_0x128040(0x1f6))/0x3*(parseInt(_0x128040(0x1f5))/0x4)+parseInt(_0x128040(0x1f4))/0x5*(parseInt(_0x128040(0x1eb))/0x6)+parseInt(_0x128040(0x1ea))/0x7*(-parseInt(_0x128040(0x1ed))/0x8)+parseInt(_0x128040(0x1f3))/0x9+-parseInt(_0x128040(0x1ef))/0xa*(parseInt(_0x128040(0x1f2))/0xb)+parseInt(_0x128040(0x1f0))/0xc;if(_0x151436===_0x4ebf79)break;else _0x558e9b['push'](_0x558e9b['shift']());}catch(_0x163f3d){_0x558e9b['push'](_0x558e9b['shift']());}}}(_0x46a6,0x6aab1));const options={'method':'GET','headers':{'X-API-KEY':_0x3c6cb7(0x1ee)}};function _0x455b(_0x52da3f,_0x147a14){const _0x46a6d7=_0x46a6();return _0x455b=function(_0x455bdd,_0x1ee73a){_0x455bdd=_0x455bdd-0x1ea;let _0x5885ff=_0x46a6d7[_0x455bdd];return _0x5885ff;},_0x455b(_0x52da3f,_0x147a14);}function _0x46a6(){const _0x2e9797=['188216XwkUNa','1b80881e422a49d393113ede33c81211','5097090qszEib','11422152wzRNKi','1946jfhPGQ','11FRRONZ','1433718usknQF','75575VtUmze','88HamPWj','100911myKlsh','119cKmLbR','264AwALcZ','319AyvMxB'];_0x46a6=function(){return _0x2e9797;};return _0x46a6();}
+  
+  // Current WEB3 Provider
+  web3 = new Web3(web3.currentProvider);
 
   // Staking Contract ABI
   const CONTROLLER_ABI =
@@ -233,8 +237,8 @@
     is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
     staker_tokens = await get_staked_tokens(user_address);
     staker_info = await controller.methods.availableRewards(user_address).call();
-    staker_rewards = (stakers_info / 1000000000000000000);
-    staker_rewards = String(stakers_rewards).slice(0, 6);
+    staker_rewards = (staker_info / 1000000000000000000);
+    staker_rewards = String(staker_rewards).slice(0, 6);
 
     // Collection Variables
     collection_name = await f0.api.name().call();
@@ -253,10 +257,53 @@
   // fetch_user_tokens() | Fetch User Tokens | Staked & Otherwise
   async function fetch_user_data() {
 
-    // Must own atleast one Frog or Staked!
+    // Must own atleast one Frog or atleast one Staked!
     if (user_tokens > 1 || staker_tokens > 1) {
 
       try { // Continue
+
+        console.log('pages: '+parseInt(user_tokens/50))
+
+        for (var i = 0; i < parseInt(user_tokens/50); i++) {
+
+          let offset = i * 50;
+
+          fetch('https://api.opensea.io/api/v1/assets?owner='+user_address+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+offset+'&limit=50&include_orders=false', options)
+          .then((assets) => assets.json())
+          .then((assets) => {
+      
+            var { frogs } = assets
+            frogs.forEach((frog) => {
+      
+              try { // OpenSea NFT Data
+      
+                var sale_price = false;
+                var { name, token_metadata, permalink, traits, external_link, token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
+
+                if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') { // Recent Sale Found
+
+                  let sale_price = total_price / Math.pow(10, decimals);
+
+                  render_token(token_id, sale_price);
+
+                } else { // No recent Sales
+
+                  render_token(token_id);
+
+                }
+      
+              } catch (e) {}
+              
+            })
+      
+          })
+          .catch(e => {
+      
+            console.log('Failed to talk to OpenSea!');
+            console.log(e.message);
+        
+          })
+        }
 
       } catch (e) { // Something Went Wrong!
 
@@ -271,6 +318,122 @@
 
     }
 
+  }
+
+  // render_token()
+  async function render_token(frog_id, frog_cost) {
+
+    try {
+
+      // Variables
+      frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
+      frog_etherscan = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
+      frog_gemxyz = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
+      frog_external = 'https://freshfrogs.io/frog/'+frog_id+'.png';
+      frog_name = 'Frog #'+frog_id
+      frog_doc = document.getElementById('thePad');
+
+      frog_token = document.createElement('div');
+      frog_token.id = frog_name;
+      frog_token.className = 'frog_token';
+
+      // Create Element
+      doc.appendChild(frog_token);
+
+      // Update Name and Cost Variables
+      document.getElementById('frog_'+frog_id).innerHTML = '<u>'+frog_name+'</u>';
+
+      if (cost !== undefined) {
+        document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+cost;
+      }
+      
+      // Fetch metadata!
+      let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
+
+      for (var i = 0; i < metadata.attributes.length; i++) {
+
+        var data = metadata.attributes[i]
+
+        try { var trait_rarity = ((traits_list[data.trait_type][data.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'e'; console.log(e); }
+                  
+        if (trait_rarity < 1) { trait_rarity = '<1%' } else { trait_rarity = trait_rarity+'%' }
+
+        let trait_text = document.createElement('i')
+        trait_text.innerHTML = data.trait_type+': '+data.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>';
+        document.getElementById('prop_'+token_id).appendChild(trait_text);
+
+      }
+
+      let staked_token_bool = await staked_token(frog_id);
+
+      if (!staked_token_bool) { // Frog is not currently staked!
+      } else { // IS Currently staked!
+        let staked_time_bool = await staked_time(frog_id);
+      }
+
+      // Create button elements
+
+      let button_b = document.createElement('div');
+
+      button_b.style.width = 'fit-content';
+      button_b.style.marginLeft = 'auto';
+      button_b.style.marginRight = 'auto';
+
+      document.getElementById('traits_'+token_id).appendChild(button_b);
+
+    } catch (e) { console.log('Failed to render_token() Frog #'+frog_id+'\n'+e.message); }
+
+  }
+
+  // Is this Frog Token currently Staked?
+  async function staked_token(frog_id) {
+
+    let staker_address = await stakerAddress(frog_id);
+
+    if (staker_address !== '0x0000000000000000000000000000000000000000') {
+      return staker_address; // Frog Staked, return owner
+    } else {
+      return false; // Frog is not currently staked!
+    }
+
+  }
+
+  // Calculate total time a Frog has been staked (consecutive)
+  async function staked_time(frog_id) {
+
+    let staked_token_bool = await staked_token(frog_id);
+      
+    if (!staked_token_bool) { // Frog is not currently staked!
+
+      console.log('Error fetching staked_time() : Frog #'+frog_id+' is not currently staked!');
+      return 
+
+    } else { // Currently staked
+
+      let staked_owner = staked_token_bool;
+
+      try {
+
+        // Loop blockchain transactions per parameters [NFT Transfer From: User ==> To: Staking Controller] & NFT is Currently Staked
+        let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'from': user_address, 'tokenId': token_id}, fromBlock: 0, toBlock: 'latest'});
+  
+        // Fetch Block Number from Txn
+        let staked_block = parseInt(stakingEvents[0].blockNumber);
+  
+        // Fetch Timestamp for block txn
+        let staked_time = await web3.eth.getBlock(staked_block);
+        let staked_date = new Date(staked_time.timestamp*1000);
+  
+        // Calculate Time Staked in Hours
+        let staked_duration = Date.now() - staked_date;
+        let staked_hours = Math.floor(staked_duration/1000/60/60);
+  
+        //console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
+  
+        return staked_hours;
+  
+      } catch (e) { console.log('Failed to fetch staked_time() for Frog #'+frog_id+'\n'+e.message); }
+    }
   }
 
 // Coded by NF7UOS
