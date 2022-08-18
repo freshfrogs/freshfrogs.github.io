@@ -313,6 +313,7 @@
     } else { // Does not own atleast one Frog!
 
       console.log('Failed to Connect! User does not own any FROGS!');
+      Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div class="console_pre" id="console-pre"></div>')
       return;
 
     }
