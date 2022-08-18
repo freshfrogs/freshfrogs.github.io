@@ -436,4 +436,22 @@
     }
   }
 
+  function consoleOutput(output) {
+    document.getElementById("console-pre").innerHTML = output;
+  }
+
+  function Output(output) {
+    document.getElementById("pre").innerHTML = output;
+  }
+
+  function truncateAddress(address) {
+    if (!address) {
+      return "";
+    }
+    return `${address.substr(0, 5)}...${address.substr(
+      address.length - 5,
+      address.length
+    )}`;
+  }
+
 // Coded by NF7UOS
