@@ -9,23 +9,24 @@
     html,h1,h2,h3 {
       font-family: 'Open Sans', sans-serif !important;
     }
-    #myProgress {
+    .myProgress {
       width: 50%;
-      background: white;
-      margin-top: 8px;
+      background: transparent;
+      margin: 8px;
       margin-left: auto;
       margin-right: auto;
-      border: 1px solid #7cc1ff;
+      margin-bottom: 16px;
+      border: 1px solid black;
       border-radius: 5px;
       overflow: hidden;
+      height: 4px;
     }
-    #myBar {
+    .myBar {
       width: 1%;
       height: 18px;
-      background-color: #7cc1ff;
+      background-color: coral;
       border-radius: 1px;
     }
-  
     .wrapper {
       margin-left: auto;
       margin-right: auto;
@@ -139,28 +140,12 @@
         background-color: #7cc1ff;
         color: white;
     }
-    .frog_name {
-        text-align: left;
-        font-weight: bold;
-        float: left;
-        padding: 5%;
-        padding-top: 0%;
-        margin-left: 2.5%;
-    }
-    .frog_price {
-        text-align: right;
-        font-weight: bold;
-        float: right;
-        padding: 5%;
-        padding-top: 0%;
-        margin-right: 2.5%;
-    }
     .bigContainer {
       overflow: hidden;
       width: 256px;
       height: 256px;
       image-rendering: pixelated !important;
-  }
+    }
     .containerMint {
         width: auto;
         margin-bottom: 0px;
@@ -183,7 +168,6 @@
         box-align: center;
         overflow: hidden;
     }
-  
     .imgWrapperMint {
         -webkit-box-flex: 13;
         -moz-box-flex: 1;
@@ -262,17 +246,17 @@
     }
     ul.downloads2 {
       list-style: none;
-      height: 45px;
+      height: 40px;
       padding: 0;
       background: white;
       border-radius: 5px;
       border: 1px solid black;
       width: 270px;
-      box-shadow: 3px 3px rgb(122 122 122 / 20%);
+      box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
       margin-left: auto;
       margin-right: auto;
-      margin-top: 5%;
-      margin-bottom: 1%;
+      margin-top: 16px;
+      margin-bottom: 0px;
       line-height: 1;
       text-align: center;
       vertical-align: middle;
@@ -392,7 +376,7 @@
       max-width: 400% !important;
     }
     .frogImg4 {
-      transition: transform .2s;
+      transition: all .2s;
       display: block;
       image-rendering: pixelated;
       overflow: hidden;
@@ -405,6 +389,17 @@
       -ms-transform: scale(1.1); /* IE 9 */
       -webkit-transform: scale(1.1); /* Safari 3-8 */
       transform: scale(1.1);
+      opacity: 0.4;
+    }
+    .frogImg5 {
+      transition: all .2s;
+      display: block;
+      image-rendering: pixelated;
+      overflow: hidden;
+      position: absolute;
+      width: 256px;
+      height: 256px;
+      border-radius: 5px;
     }
     .smallContainer3:hover{
       -ms-transform: scale(1.1); /* IE 9 */
@@ -478,19 +473,6 @@
       border-radius: 5px;
       padding: 5px;
       color: #333
-    }
-    .myProgress {
-      width: 50%;
-      background: #f4f4f4;
-      margin-top: 8px;
-      margin-left: auto;
-      margin-right: auto;
-      border: 1px solid #324d64;
-      border-radius: 5px;
-      height: 18px;
-      font-family: 'Open Sans', sans-serif !important;
-      font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-      vertical-align: middle;
     }
     .mintingTextGreen {
       background-color: #99ffc5;
@@ -574,10 +556,11 @@
     }
     .trait {
       border-radius: 2px;
-      background: white;
-      color: rgba(126, 183, 128, 1);
+      background: transparent;
+      color: rgba(126, 183, 128, 1);;
       font-size: x-small;
       padding: 1px;
+      float: none;
     }
     .userAddress {
       padding-left: 1px;
@@ -587,8 +570,8 @@
       color: #7cc1ff;
     }
     .mintingTextWhite2 {
-      background-color: white;
-      border: 1px solid white;
+      background-color: antiquewhite;
+      border: 1px solid black;
       padding: 16px;
       color: #333 !important;
       box-shadow: 3px 3px rgb(122 122 122 / 20%);
@@ -616,7 +599,7 @@
       border-radius: 5px;
       box-shadow: 3px 3px rgb(122 122 122 / 20%);
       margin: 4px;
-      border: 0px solid white;
+      border: 1px solid black;
       cursor: pointer;
     }
     .recent_mints {
@@ -627,7 +610,7 @@
       width: 90%;
     }
     .frog_button {
-      border: 1px solid lightgrey;
+      border: 1px solid black;
       background-color: white;
       color: #333;
       border-radius: 5px;
@@ -638,6 +621,7 @@
       cursor: pointer;
       transition: all .2s;
       font-family: 'Open Sans', sans-serif !important;
+      min-width: 100px;
   }
     .frog_button:hover {
       background-color: #7cc1ff;;
@@ -660,19 +644,31 @@
     .frog_img {
       width: 128px;
       height: 128px;
-      border-radius: 5px;
-      margin: 8px;
-      border: 1px solid black;
       cursor: pointer;
+      transition: all .2s;
+    }
+    .frog_img:hover {
+      -ms-transform: scale(1.1); /* IE 9 */
+      -webkit-transform: scale(1.1); /* Safari 3-8 */
+      transform: scale(1.1);
+    }
+    .frog_imgContainer {
+      border-radius: 100%;
+      border: 1px solid black;
+      margin: 8px;
+      width: 128px;
+      height: 128px;
+      overflow: hidden;
+      margin-left: auto;
+      margin-right: auto;
       border-bottom-left-radius: 5px;
       border-bottom-right-radius: 5px;
-      margin-top: 16px;
-  }
+    }
     .frog_token {
-      display: flex;
+      display: block;
       background-color: antiquewhite;
       border: none;
-      padding: 0px;
+      padding: 4px;
       color: #333 !important;
       box-shadow: none;
       margin: auto;
@@ -691,6 +687,27 @@
       margin: auto;
       text-align: left;
       padding: 16px;
+      padding-top: 0px;
+    }
+    .properties {
+      border-top: 1px solid black;
+      border-left: 1px solid black;
+      padding: 8px;
+      border-top-left-radius: 5px;
+    }
+    .print_img {
+      width: 128px;
+      height: 128px;
+    }
+    .frog_name {
+      color: #222 !important;
+      text-align: left;
+      float: left;
+    }
+    .frog_price {
+      color: #222 !important;
+      text-align: right;
+      float: right;
     }
   </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -706,7 +723,7 @@
     
     <script src="https://freshfrogs.io/the-pond/banner/FileSaver.js"></script>
     <script src="https://freshfrogs.io/the-pond/banner/dom-to-image.js"></script>
-    <script src="https://freshfrogs.io/assets/js/freshfrogs.js"></script>
+    <script src="https://freshfrogs.io/assets/js/FreshFrogsNFT.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
@@ -722,7 +739,8 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        connect();
+        await connect();
+        await fetch_user_data(user_address);
 
       })
 
@@ -733,8 +751,8 @@
       <header id="thisheader">
         <div class="downloads pre">
           <ul class="downloads2">
-            <li><a id="morphFrogs" class="pointer"><strong id="display_name">Fresh Frogs</strong><div id="display_type">ΞEthereum</div></a></li>
-            <li><a id="selectBase" class="pointer" href="http://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong><frog id="baseText">Support</frog></a></li>
+            <li><a id="morphFrogs" class="pointer" href="https://freshfrogs.io"><strong id="display_name">Fresh Frogs</strong><div id="display_type">ΞEthereum</div></a></li>
+            <li><a id="selectBase" class="pointer" href="https://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong><frog id="baseText">Support</frog></a></li>
             <li><a id="selectSub" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>OpenSea</strong><frog id="subText">Marketplace</frog></a></li>
           </ul>
           <div id="mintingTray" class="mintingTray">
@@ -757,7 +775,6 @@
             <h2 style="color: white !important;"><b>FreshFrogsNFT</b></h2>
             <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
             opensea.io/collection/fresh-frogs<a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><b id="connected">Shop on OpenSea ⛵</b></a>
-            <hr class="hr2">All community staked Frogs!<a class="pointer" href="https://freshfrogs.io/vault"><b id="connected">FreshFrogsNFT Vault 🔒</b></a>
             <br>
             <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a class="pointer" href="https://freshfrogs.io/the-pond"><b id="connected">Connect Wallet 🔌</b></a></div>
           </div>
