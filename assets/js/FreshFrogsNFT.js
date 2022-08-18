@@ -14,9 +14,28 @@
   // Current WEB3 Provider
   web3 = new Web3(web3.currentProvider);
 
-  // Staking Contract ABI
-  const CONTROLLER_ABI =
-    [
+  // connect() | Connect Wallet | Update Collection Data
+  async function connect() {
+
+    // Fetch Collection Data via OpenSea API
+    fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
+    .then(collection => collection.json())
+    .then(collection => {
+
+        var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
+
+        traits_list = traits;
+
+    })
+    .catch(e => {
+
+        console.log('Error: Failed to fetch OpenSea collection data!');
+  
+    });
+
+    // Staking Contract ABI
+    const CONTROLLER_ABI =
+      [
         {
         "inputs": [],
         "name": "claimRewards",
@@ -190,26 +209,7 @@
         "stateMutability": "view",
         "type": "function"
         }
-    ]
-
-  // connect() | Connect Wallet | Update Collection Data
-  async function connect() {
-
-    // Fetch Collection Data via OpenSea API
-    fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
-    .then(collection => collection.json())
-    .then(collection => {
-
-        var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
-
-        traits_list = traits;
-
-    })
-    .catch(e => {
-
-        console.log('Error: Failed to fetch OpenSea collection data!');
-  
-    });
+      ]
 
     // Connect WEB3, Factoria
     const web3 = new Web3(window.ethereum);
