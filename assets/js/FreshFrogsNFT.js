@@ -246,7 +246,7 @@
     next_id = await f0.api.nextId().call();
     next_id = parseInt(next_id);
 
-    } catch (e) { // Something Went Wrong!
+    } catch (e) { // Something Went Wrong! /
 
       consoleOutput('<strong></strong><br>Something went wrong!<br>'+e.message+'<a class="pointer" href=""><b id="connected">🔌 Connect Wallet</b></a>');
 
