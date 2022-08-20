@@ -347,7 +347,7 @@
       // Create Element
       frog_doc.appendChild(frog_token);
 
-      // Update Name and Cost Variables
+      // Update Name and Cost Variables /
       document.getElementById('frog_'+frog_id).innerHTML = '<u>'+frog_name+'</u>';
 
       if (cost !== undefined) {
