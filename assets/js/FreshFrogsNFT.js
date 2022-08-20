@@ -297,7 +297,7 @@
 
                 }
       
-              } catch (e) {}
+              } catch (e) {} // No Sales
               
             })
       
