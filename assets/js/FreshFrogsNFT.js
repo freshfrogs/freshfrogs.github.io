@@ -371,7 +371,7 @@
 
       }
 
-      let staked_token_bool = await staked_token(frog_id);
+      let staked_token_bool = await staker_address(frog_id);
 
       if (!staked_token_bool) { // Frog is not currently staked! //
       } else { // IS Currently staked!
@@ -393,9 +393,9 @@
   }
 
   // Is this Frog Token currently Staked?
-  async function staked_token(frog_id) {
+  async function staker_address(frog_id) {
 
-    let staker_address = await stakerAddress(frog_id);
+    let staker_address = await controller.methods.stakerAddress(frog_id).call();
 
     if (staker_address !== '0x0000000000000000000000000000000000000000') {
       return staker_address; // Frog Staked, return owner
