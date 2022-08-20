@@ -238,7 +238,7 @@
     staker_rewards = String(staker_rewards).slice(0, 6);
 
     // Collection Variables
-    collection_name = await f0.api.name().call();
+    collection_name = await f0.api.name().call(); //
     collection_symbol = await f0.api.symbol().call();
     next_id = await f0.api.nextId().call();
     next_id = parseInt(next_id);
