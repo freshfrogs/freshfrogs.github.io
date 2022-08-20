@@ -344,7 +344,7 @@
       frog_token.className = 'frog_token';
 
       // Create Element
-      doc.appendChild(frog_token);
+      frog_doc.appendChild(frog_token);
 
       // Update Name and Cost Variables
       document.getElementById('frog_'+frog_id).innerHTML = '<u>'+frog_name+'</u>';
