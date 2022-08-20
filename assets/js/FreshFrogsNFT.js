@@ -267,7 +267,7 @@
 
         for (var i = 0; i < parseInt(user_tokens/50); i++) {
 
-          let offset = i * 50;
+          let offset = (i+1) * 50;
 
           fetch('https://api.opensea.io/api/v1/assets?owner='+user_address+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+offset+'&limit=50&include_orders=false', options)
           .then((assets) => assets.json())
