@@ -350,12 +350,12 @@
       // Update Name and Cost Variables /
       document.getElementById('frog_'+frog_id).innerHTML = '<u>'+frog_name+'</u>';
 
-      if (cost !== undefined) {
-        document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+cost;
+      if (frog_cost !== undefined) {
+        document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+frog_cost;
       }
       
       // Fetch metadata!
-      let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
+      let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
 
       for (var i = 0; i < metadata.attributes.length; i++) {
 
@@ -367,7 +367,7 @@
 
         let trait_text = document.createElement('i')
         trait_text.innerHTML = data.trait_type+': '+data.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>';
-        document.getElementById('prop_'+token_id).appendChild(trait_text);
+        document.getElementById('prop_'+frog_id).appendChild(trait_text);
 
       }
 
@@ -386,7 +386,7 @@
       button_b.style.marginLeft = 'auto';
       button_b.style.marginRight = 'auto';
 
-      document.getElementById('traits_'+token_id).appendChild(button_b);
+      document.getElementById('traits_'+frog_id).appendChild(button_b);
 
     } catch (e) { console.log('Failed to render_token() Frog #'+frog_id+'\n'+e.message); }
 
