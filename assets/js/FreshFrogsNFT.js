@@ -400,7 +400,7 @@
     if (staker_address !== '0x0000000000000000000000000000000000000000') {
       return staker_address; // Frog Staked, return owner
     } else {
-      return false; // Frog is not currently staked!
+      return false; // Frog is not currently staked! //
     }
 
   }
