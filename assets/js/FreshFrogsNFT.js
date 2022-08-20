@@ -259,7 +259,7 @@
   async function fetch_user_data(user_address) { //
 
     // Must own atleast one Frog or atleast one Staked!
-    if (user_tokens > 1 || staker_tokens > 1) {
+    if (user_tokens > 1 && staker_tokens > 1) {
 
       try { // Continue
 
