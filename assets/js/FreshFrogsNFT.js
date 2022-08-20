@@ -297,7 +297,7 @@
 
                 }
       
-              } catch (e) { console.log(e.message) }
+              } catch (e) {}
               
             })
       
