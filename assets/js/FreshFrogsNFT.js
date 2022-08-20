@@ -218,33 +218,33 @@
 
     try { // Attempt to Connect!
 
-    await f0.init({
-      web3: web3,
-      contract: CONTRACT_ADDRESS,
-      network: NETWORK
-    })
+      await f0.init({
+        web3: web3,
+        contract: CONTRACT_ADDRESS,
+        network: NETWORK
+      })
 
-    // User Variables
-    user_address = await web3.currentProvider.selectedAddress;
-    user_invites = await f0.myInvites();
-    user_keys = Object.keys(user_invites);
+      // User Variables
+      user_address = await web3.currentProvider.selectedAddress;
+      user_invites = await f0.myInvites();
+      user_keys = Object.keys(user_invites);
 
-    // 
-    user_tokens = await collection.methods.balanceOf(user_address).call();
-    is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-    staker_tokens = await get_staked_tokens(user_address);
-    staker_info = await controller.methods.availableRewards(user_address).call();
-    staker_rewards = (staker_info / 1000000000000000000);
-    staker_rewards = String(staker_rewards).slice(0, 6);
+      // 
+      
+      is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+      
+      staker_info = await controller.methods.availableRewards(user_address).call();
+      staker_rewards = (staker_info / 1000000000000000000);
+      staker_rewards = String(staker_rewards).slice(0, 6);
 
-    // Collection Variables
-    collection_name = await f0.api.name().call(); //
-    collection_symbol = await f0.api.symbol().call();
-    next_id = await f0.api.nextId().call();
-    next_id = parseInt(next_id);
+      // Collection Variables
+      collection_name = await f0.api.name().call(); //
+      collection_symbol = await f0.api.symbol().call();
+      next_id = await f0.api.nextId().call();
+      next_id = parseInt(next_id);
 
-    console.log('Connected');
-    //Output('<br><button onclick="claim_rewards()" style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frog(s) Staked '+''+stakers_rewards+' $FLYZ 🡥</button>'+'<br><hr style="background: black;">'+'<div class="console_pre" id="console-pre"></div>');
+      console.log('Connected');
+      //Output('<br><button onclick="claim_rewards()" style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frog(s) Staked '+''+stakers_rewards+' $FLYZ 🡥</button>'+'<br><hr style="background: black;">'+'<div class="console_pre" id="console-pre"></div>');
 
     } catch (e) { // Something Went Wrong!
 
@@ -256,72 +256,74 @@
   }
 
   // fetch_user_tokens() | Fetch User Tokens | Staked & Otherwise
-  async function fetch_user_data(user_address) { //
-
+  async function fetch_user_data(fetch_address) { //
+    // No. Staked Frogs owned by fetch_address
+    let staker_tokens = await controller.methods.getStakedTokens(user_address).call();
+    // No. Frogs owned by fetch_address
+    let user_tokens = await collection.methods.balanceOf(user_address).call();
     // Must own atleast one Frog or atleast one Staked!
-    if (user_tokens > 1 && staker_tokens > 1) {
-
-      try { // Continue
-
-        let pages = parseInt(user_tokens/50) + 1;
-
-        console.log('pages: '+pages)
-
-        for (var i = 0; i < pages; i++) {
-
-          let offset = i * 50;
-
-          console.log('offset: '+offset);
-
-          fetch('https://api.opensea.io/api/v1/assets?owner='+user_address+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+offset+'&limit=50&include_orders=false', options)
-          .then((tokens) => tokens.json())
-          .then((tokens) => {
-      
-            var { assets } = tokens
-            assets.forEach((frog) => {
-
-              try {
-
-                var sale_price = false;
-
-                var { name, token_metadata, permalink, traits, external_link, token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
-
-                if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
-                  sale_price = total_price / Math.pow(10, decimals);
-                }
-
-              } catch (e) {}
-
-              if (!sale_price) {
-                render_token(token_id)
-              } else {
-                render_token(token_id, sale_price)
-              }
-              
-            })
-      
-          })
-          .catch(e => {
-      
-            console.log('Failed to talk to OpenSea!');
-            console.log(e.message);
-        
-          })
+    if (user_tokens >= 1 || staker_tokens.length >= 1) {
+        if (staker_tokens.length >= 1) {
+          for (var i = 0; i < staker_tokens.length; i++) {
+            tokenId = staked_tokens[i].tokenId
+            render_token(tokenId)
+          }
         }
-
-      } catch (e) { // Something Went Wrong!
-
-        console.log(e.message);
-
-      }
-
+        if (user_tokens >= 1) {
+          let pages = parseInt(user_tokens/50) + 1;
+          for (var i = 0; i < pages; i++) {
+            let offset = i * 50;
+            fetch('https://api.opensea.io/api/v1/assets?owner='+fetch_address+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+offset+'&limit=50&include_orders=false', options)
+            .then((tokens) => tokens.json())
+            .then((tokens) => {
+              var { assets } = tokens
+              assets.forEach((frog) => {
+                try {
+                  var sale_price = false;
+                  var { name, token_metadata, permalink, traits, external_link, token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
+                  if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
+                    sale_price = total_price / Math.pow(10, decimals);
+                  }
+                } catch (e) {}
+                if (!sale_price) {
+                  render_token(token_id);
+                } else {
+                  render_token(token_id, sale_price);
+                }
+              })
+            })
+            .catch(e => {
+              console.log('Failed to talk to OpenSea!');
+              console.log(e.message);
+            })
+          }
+        }
     } else { // Does not own atleast one Frog!
-
       console.log('Failed to Connect! User does not own any FROGS!');
       Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div class="console_pre" id="console-pre"></div>')
       return;
-
     }
+  }
+
+  // getStakedTokens()
+  async function get_staked_tokens(user_address) {
+
+    try {
+
+      let staked_tokens = await controller.methods.getStakedTokens(user_address).call();
+
+      for (var i = 0; i < staked_tokens.length; i++) {
+
+        tokenId = staked_tokens[i].tokenId
+        render_token(tokenId, true)
+
+      }
+
+      staked_frogs = staked_tokens.length;
+
+      return staked_tokens.length;
+
+    } catch (e) { console.log('Failed to call getStakedTokens() : '+e.message); }
 
   }
 
