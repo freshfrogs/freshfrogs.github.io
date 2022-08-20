@@ -280,7 +280,7 @@
             var { assets } = tokens
             assets.forEach((frog) => {
       
-              try { // OpenSea NFT Data /
+              try { // OpenSea NFT Data
       
                 var sale_price;
                 var { token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
