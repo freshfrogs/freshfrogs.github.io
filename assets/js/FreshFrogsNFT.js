@@ -256,7 +256,7 @@
   }
 
   // fetch_user_tokens() | Fetch User Tokens | Staked & Otherwise
-  async function fetch_user_data() { //
+  async function fetch_user_data(user_address) { //
 
     // Must own atleast one Frog or atleast one Staked!
     if (user_tokens > 1 || staker_tokens > 1) {
