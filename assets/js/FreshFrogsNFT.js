@@ -392,6 +392,18 @@
 
   }
 
+  // Staked Token's Owner Address
+  async function staker_address(token_id) {
+
+    try {
+
+      let stakerAddress =  await controller.methods.stakerAddress(token_id).call();
+      return stakerAddress
+
+    } catch (e) { console.log('Failed to call stakerAddress() : '+e.message); }
+    
+  }
+
   // Is this Frog Token currently Staked?
   async function staked_token(frog_id) {
 
