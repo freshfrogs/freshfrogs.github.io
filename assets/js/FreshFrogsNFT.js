@@ -373,7 +373,7 @@
 
       let staked_token_bool = await staked_token(frog_id);
 
-      if (!staked_token_bool) { // Frog is not currently staked!
+      if (!staked_token_bool) { // Frog is not currently staked! //
       } else { // IS Currently staked!
         let staked_time_bool = await staked_time(frog_id);
       }
