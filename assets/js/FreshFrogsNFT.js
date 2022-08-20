@@ -263,7 +263,7 @@
 
       try { // Continue
 
-        let pages = parseInt(user_tokens/50) + 1;
+        let pages = parseInt(user_tokens/50);
 
         console.log('pages: '+pages)
 
