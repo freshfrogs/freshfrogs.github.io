@@ -255,7 +255,7 @@
 
   }
 
-  // fetch_user_tokens() | Fetch User Tokens | Staked & Otherwise
+  // fetch_user_tokens() | Fetch User Tokens | Staked & Otherwise /
   async function fetch_user_data() {
 
     // Must own atleast one Frog or atleast one Staked!
