@@ -510,6 +510,7 @@ async function connect() {
 
       let staked_tokens = await controller.methods.getStakedTokens(user_address).call();
 
+      /*
       for (var i = 0; i < staked_tokens.length; i++) {
 
         tokenId = staked_tokens[i].tokenId
@@ -517,10 +518,12 @@ async function connect() {
 
       }
 
+      */
+      
       staked_frogs = staked_tokens.length;
-
+      
       return staked_tokens.length;
-
+      
     } catch (e) { console.log('Failed to call getStakedTokens() : '+e.message); }
 
   }
