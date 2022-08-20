@@ -282,8 +282,8 @@
       
               try { // OpenSea NFT Data
       
-                var sale_price = false;
-                var { name, token_metadata, permalink, traits, external_link, token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
+                var sale_price;
+                var { token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
 
                 if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') { // Recent Sale Found
 
