@@ -279,25 +279,24 @@
       
             var { assets } = tokens
             assets.forEach((frog) => {
-      
-              try { // OpenSea NFT Data
-      
-                var sale_price;
-                var { token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
 
-                if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') { // Recent Sale Found
+              try {
 
-                  let sale_price = total_price / Math.pow(10, decimals);
+                var sale_price = false;
 
-                  render_token(token_id, sale_price);
+                var { name, token_metadata, permalink, traits, external_link, token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
 
-                } else { // No recent Sales
-
-                  render_token(token_id);
-
+                if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
+                  sale_price = total_price / Math.pow(10, decimals);
                 }
-      
-              } catch (e) {} // No Sales
+
+              } catch (e) {}
+
+              if (!sale_price) {
+                render_token(token_id)
+              } else {
+                render_token(token_id, sale_price)
+              }
               
             })
       
