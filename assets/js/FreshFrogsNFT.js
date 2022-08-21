@@ -448,7 +448,7 @@
       try {
 
         // Loop blockchain transactions per parameters [NFT Transfer From: User ==> To: Staking Controller] & NFT is Currently Staked
-        let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'from': user_address, 'tokenId': token_id}, fromBlock: 0, toBlock: 'latest'});
+        let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'from': user_address, 'tokenId': frog_id}, fromBlock: 0, toBlock: 'latest'});
   
         // Fetch Block Number from Txn
         let staked_block = parseInt(stakingEvents[0].blockNumber);
