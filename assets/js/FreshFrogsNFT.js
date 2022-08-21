@@ -358,9 +358,6 @@
         frog_doc.appendChild(frog_token);
         // Check Staked Time / Level
         let staked_time_bool = await staked_time(frog_id);
-        let trait_text = document.createElement('i')
-        trait_text.innerHTML = 'Hours Staked: '+staked_time_bool+'<br>Owner: '+truncateAddress(staked_token_bool)+'<br>';
-        document.getElementById('prop_'+frog_id).appendChild(trait_text);
         if (staked_time_bool >= 2000) {
           staked_level = 3;
           percent = parseInt((staked_time_bool/3000)*100);
