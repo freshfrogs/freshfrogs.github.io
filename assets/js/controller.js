@@ -1,9 +1,6 @@
 
   // Global Variables
-  var CONTROLLER, controller, COLLECTION, collection, web3;
-  var CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
-  var CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
-  // Staking Contract ABI
+  const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
   const CONTROLLER_ABI =
     [
       {
@@ -185,37 +182,35 @@
   const web3 = new Web3(web3.currentProvider);
   const CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
   
-  // FreshFrogsController Smart Contract | NFT Staking Contract | 0xCB1ee125CFf4051a10a55a09B10613876C4Ef199
+  // FreshFrogsController | NFT Staking Smart Contract | 0xCB1ee125CFf4051a10a55a09B10613876C4Ef199
 
-  // claimRewards() | send =>
-  async function claimRewards(tokenId) {
+  // SEND() FUNCTIONS
+
+  // claimRewards(_user (address)) | send =>
+  async function claimRewards(userAddress) {
     try {
-      await controller.methods.claimRewards().send({ from: user_address });
+      let claimRewards = await controller.methods.claimRewards().send({ from: userAddress });
       return 'Rewards have succesfully been claimed!';
     } catch (e) { console.log('Failed to withdraw(): '+e.message); }
   }
 
-  // withdraw(_tokenId (uint256)) | send =>
-  async function withdraw(tokenId) {
+  // withdraw(_tokenId (uint256), _user (address)) | send =>
+  async function withdraw(tokenId, userAddress) {
     try {
-      let user_address = await web3.currentProvider.selectedAddress;
-      let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-      if (!is_approved) { let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address }); } 
-      let withdraw = await controller.methods.withdraw(tokenId).send({ from: user_address });
-      return 'Frog #'+tokenId+' has succesfully been un-staked!\n'+withdraw;
+      let withdraw = await controller.methods.withdraw(tokenId).send({ from: userAddress });
+      return 'Frog #'+tokenId+' has succesfully been un-staked!';
     } catch (e) { console.log('Failed to withdraw(): '+e.message); }
   }
 
-  // stake(_tokenId (uint256)) | send =>
-  async function stake(tokenId) {
+  // stake(_tokenId (uint256), _user (address)) | send =>
+  async function stake(tokenId, userAddress) {
     try {
-      let user_address = await web3.currentProvider.selectedAddress;
-      let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-      if (!is_approved) { let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address }); } 
-      let stake = await controller.methods.stake(tokenId).send({ from: user_address });
-      return 'Frog #'+tokenId+' has succesfully been staked!\n'+stake;
+      let stake = await controller.methods.stake(tokenId).send({ from: userAddress });
+      return 'Frog #'+tokenId+' has succesfully been staked!';
     } catch (e) { console.log('Failed to stake(): '+e.message); }
   }
+
+  // CALL() Functions
 
   // availableRewards(_staker (address)) | return uint256
   async function availableRewards(userAddress) {
