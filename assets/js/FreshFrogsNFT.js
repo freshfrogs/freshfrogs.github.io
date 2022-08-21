@@ -434,7 +434,7 @@
     // Current WEB3 Provider
     web3 = new Web3(web3.currentProvider);
 
-    let staked_token_bool = await staked_token(frog_id);
+    let staked_token_bool = await staker_address(frog_id);
       
     if (!staked_token_bool) { // Frog is not currently staked!
 
