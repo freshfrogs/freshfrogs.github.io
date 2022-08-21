@@ -280,16 +280,18 @@
             // For Each Token
             var { assets } = tokens
             assets.forEach((frog) => {
-              try { // Attempt to pull recent Sale Price
+              try {
                 var sale_price = false;
                 var { name, token_metadata, permalink, traits, external_link, token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
                 if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
                   sale_price = total_price / Math.pow(10, decimals);
-                  render_token(token_id, sale_price);
-                } else {
-                  render_token(token_id);
                 }
-              } catch (e) {console.log(e.message)} // Suppress Error
+              } catch (e) {}
+              if (!sale_price) {
+                render_token(token_id)
+              } else {
+                render_token(token_id, sale_price)
+              }
             })
           })
           .catch(e => { // OpenSea Error
