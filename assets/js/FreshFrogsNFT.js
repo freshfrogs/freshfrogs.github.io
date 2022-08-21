@@ -376,7 +376,7 @@
         elem = document.getElementById('myBar_'+frog_id);
         width = percent
         elem.style.width = width + "%";
-        document.getElementById('price_'+frog_id).innerHTML = 'Level '+staked_level;
+        document.getElementById('price_'+frog_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Level '+staked_level+'</b>';
       }
       
       // Update Name and Cost Variables//
