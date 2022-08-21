@@ -265,7 +265,7 @@
     if (user_tokens >= 1 || staker_tokens.length >= 1) {
         if (staker_tokens.length >= 1) {
           for (var i = 0; i < staker_tokens.length; i++) {
-            tokenId = staked_tokens[i].tokenId
+            tokenId = staker_tokens[i].tokenId
             render_token(tokenId)
           }
         }
