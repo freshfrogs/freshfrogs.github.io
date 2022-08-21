@@ -731,19 +731,6 @@
     document.getElementById(where).appendChild(newAttribute);
   }
 
-  // Is this Frog Token currently Staked?
-  async function staker_address(frog_id) {
-
-    let staker_address = await controller.methods.stakerAddress(frog_id).call();
-
-    if (staker_address !== '0x0000000000000000000000000000000000000000') {
-      return staker_address; // Frog Staked, return owner
-    } else {
-      return false; // Frog is not currently staked! //
-    }
-
-  }
-
   // Calculate total time a Frog has been staked (consecutive)
   async function staked_time(frog_id) {
 
@@ -814,6 +801,41 @@
       
     } catch (e) { console.log('Failed to call getStakedTokens() : '+e.message); }
 
+  }
+
+  // FreshFrogsController | Staking Contract
+  
+  // nftCollection() | address
+  async function nftCollection() {
+    try {
+      let nftCollection = await controller.methods.nftCollection().call();
+      return nftCollection;
+    } catch (e) { console.log('Failed to call nftCollection(): '+e.message); }
+    
+  }
+
+  // rewardsToken() | address
+  async function rewardsToken() {
+    try {
+      let rewardsToken = await controller.methods.rewardsToken().call();
+      return rewardsToken;
+    } catch (e) { console.log('Failed to call rewardsToken(): '+e.message); }
+  }
+
+  // stakerAddress(<input> (uint256)) | address
+  async function stakerAddress(tokenId) {
+    try {
+      let stakerAddress =  await controller.methods.stakerAddress(tokenId).call();
+      return stakerAddress
+    } catch (e) { console.log('Failed to call stakerAddress(): '+e.message); }
+  }
+
+  // stakers(<input> (address), <input> (data_fetch)) | ( amountStaked, timeOfLastUpdate, unclaimedRewards )
+  async function stakers(user_address, data_fetch) {
+    try {
+      let stakers = await controller.methods.stakers(user_address).call();
+      return stakers.data_fetch
+    } catch (e) { console.log('Failed to call stakers(): '+e.message); }
   }
 
 // Coded by NF7UOS
