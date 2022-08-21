@@ -717,6 +717,40 @@
 
   }
 
+
+  // Load Trait
+  function load_trait(trait, attribute, where) {
+    newAttribute = document.createElement("img")
+    newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
+    newAttribute.id = attribute
+    newAttribute.target = "_blank"
+    if (trait == 'Trait') {
+      newAttribute.className = "frogImg5" //shadesAnimation
+    } else {
+      newAttribute.className = "frogImg4" //shadesAnimation
+    }
+    
+    //newAttribute.style.cursor = "pointer"
+    if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
+      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"2.gif"
+    //} else if (attribute === "tongueFly") { 
+    //  newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
+    } else if (attribute === "cyan_tongueFly") { 
+      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
+    } else if (attribute === "morphAnimation") {
+      newAttribute.src = "https://freshfrogs.io/the-pond/Frog/loadMorph.gif"
+    } else if (attribute === "shadesAnimation") {
+      newAttribute.src = "https://freshfrogs.io/the-pond/Eyes/shadesAnimation.gif"
+    } else if (attribute.includes("croaking2")) {
+      console.log('! '+trait+' / '+attribute)
+      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
+    } else {
+      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png"
+    }
+    newAttribute.alt = attribute
+    document.getElementById(where).appendChild(newAttribute)
+  }
+
   // Is this Frog Token currently Staked?
   async function staker_address(frog_id) {
 
