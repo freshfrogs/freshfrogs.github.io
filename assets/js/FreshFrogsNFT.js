@@ -644,7 +644,7 @@
           document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog;
         }
       }
-      
+
       frog_token.id = frog_name;
       frog_token.className = 'frog_token';
       frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+frog_id+'" class="frog_name"></strong><strong id="price_'+frog_id+'" class="frog_price"></strong></div><div class="frog_imgContainer"><img src="'+frog_external+'" class="frog_img"/></div><b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div><strong id="level_'+frog_id+'" class="frog_level"><br></strong><div id="traits_'+frog_id+'" class="trait_list"><b>Properties</b><div id="prop_'+frog_id+'" class="properties"></div></div></div>';
@@ -725,35 +725,10 @@
 
   // Load Trait
   function load_trait(trait, attribute, where) {
-    newAttribute = document.createElement("img")
-    newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
-    newAttribute.id = attribute
-    newAttribute.target = "_blank"
-    if (trait == 'Trait') {
-      newAttribute.className = "frogImg5" //shadesAnimation
-    } else {
-      newAttribute.className = "frogImg4" //shadesAnimation
-    }
-    
-    //newAttribute.style.cursor = "pointer"
-    if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"2.gif"
-    //} else if (attribute === "tongueFly") { 
-    //  newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
-    } else if (attribute === "cyan_tongueFly") { 
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
-    } else if (attribute === "morphAnimation") {
-      newAttribute.src = "https://freshfrogs.io/the-pond/Frog/loadMorph.gif"
-    } else if (attribute === "shadesAnimation") {
-      newAttribute.src = "https://freshfrogs.io/the-pond/Eyes/shadesAnimation.gif"
-    } else if (attribute.includes("croaking2")) {
-      console.log('! '+trait+' / '+attribute)
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
-    } else {
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png"
-    }
-    newAttribute.alt = attribute
-    document.getElementById(where).appendChild(newAttribute)
+    newAttribute = document.createElement("img");
+    if (trait == 'Trait') { newAttribute.className = "frogImg5"; } else { newAttribute.className = "frogImg4"; }
+    newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
+    document.getElementById(where).appendChild(newAttribute);
   }
 
   // Is this Frog Token currently Staked?
