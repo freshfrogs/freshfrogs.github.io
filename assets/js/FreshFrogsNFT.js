@@ -344,7 +344,7 @@
       frog_token = document.createElement('div');
       frog_token.id = frog_name;
       frog_token.className = 'frog_token';
-      frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+frog_id+'" class="frog_name"></strong><strong id="price_'+frog_id+'" class="frog_price"></strong></div><div class="frog_imgContainer"><img src="'+frog_external+'" class="frog_img"/></div><b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div><div id="traits_'+frog_id+'" class="trait_list"><b>Properties</b><div id="prop_'+frog_id+'" class="properties"></div></div></div>';
+      frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+frog_id+'" class="frog_name"></strong><strong id="price_'+frog_id+'" class="frog_price"></strong></div><div class="frog_imgContainer"><img src="'+frog_external+'" class="frog_img"/></div><b id="progress_'+frog_id+'" class="frog_price" style="border-radius: 5px; color: coral; float: none; !important"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div><div id="traits_'+frog_id+'" class="trait_list"><b>Properties</b><div id="prop_'+frog_id+'" class="properties"></div></div></div>';
       frog_doc.appendChild(frog_token);
 
       // Check Staked Status
@@ -370,7 +370,7 @@
         elem = document.getElementById('myBar_'+frog_id);
         width = percent
         elem.style.width = width + "%";
-        document.getElementById('price_'+frog_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Level '+staked_level+'</b>';
+        document.getElementById('progress_'+frog_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Level '+staked_level+'</b>';
       }
       
       // Update Name and Cost Variables//
