@@ -374,7 +374,7 @@
       }
       
       // Update Name and Cost Variables//
-      document.getElementById('frog_'+frog_id).innerHTML = frog_name;
+      document.getElementById('frog_'+frog_id).innerHTML = 'Frog #'+frog_id;
 
       if (frog_cost !== undefined) {
         document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+frog_cost;
