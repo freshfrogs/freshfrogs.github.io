@@ -370,7 +370,7 @@
         elem = document.getElementById('myBar_'+frog_id);
         width = percent
         elem.style.width = width + "%";
-        document.getElementById('progress_'+frog_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Level '+staked_level+'</b>';
+        document.getElementById('progress_'+frog_id).innerHTML = 'Level '+staked_level;
       }
       
       // Update Name and Cost Variables//
