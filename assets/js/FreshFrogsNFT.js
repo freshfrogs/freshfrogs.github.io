@@ -754,8 +754,7 @@
       
     if (!staked_token_bool) { // Frog is not currently staked!
 
-      console.log('Error fetching staked_time() : Frog #'+frog_id+' is not currently staked!');
-      return 
+      return 'Frog #'+frog_id+' is not currently staked!';
 
     } else { // Currently staked
 
@@ -779,6 +778,7 @@
   
         //console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
   
+        // Return time staked in (Hours)
         return staked_hours;
   
       } catch (e) { console.log('Failed to fetch staked_time() for Frog #'+frog_id+'\n'+e.message); }
@@ -805,21 +805,11 @@
 
   // getStakedTokens()
   async function get_staked_tokens(fetch_address) {
-
     try {
-
-      let staked_tokens = await controller.methods.getStakedTokens(fetch_address).call();
-
-      /*
-      for (var i = 0; i < staked_tokens.length; i++) {
-
-        tokenId = staked_tokens[i].tokenId
-        render_token(tokenId, true)
-
-      }
-
-      */
       
+      let staked_tokens = await controller.methods.getStakedTokens(fetch_address).call();
+      
+      // Return ammount of Staked Tokens (Int)
       return staked_tokens.length;
       
     } catch (e) { console.log('Failed to call getStakedTokens() : '+e.message); }
