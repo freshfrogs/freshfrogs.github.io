@@ -361,6 +361,10 @@
         }
       } else { // IS Currently staked!
         // Detail Element
+        let staked_owner = staked_token_bool
+        let trait_text = document.createElement('i')
+        trait_text.innerHTML = 'Owner: '+truncateAddress(staked_owner);
+        document.getElementById('prop_'+frog_id).appendChild(trait_text);
         // Check Staked Time / Level
         let staked_time_bool = await staked_time(frog_id);
         if (staked_time_bool >= 2000) {
