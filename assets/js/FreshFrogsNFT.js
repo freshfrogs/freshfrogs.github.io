@@ -637,9 +637,9 @@
       frog_token = document.createElement('div');
       frog_token.onclick = function() { 
         if (!morph) {
-          display_token(token_id, true);
+          display_token(frog_id, true);
         } else {
-          sub_frog = token_id;
+          sub_frog = frog_id;
           combineTokens(base_frog, sub_frog);
           document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog;
         }
