@@ -305,11 +305,11 @@
   }
 
   // getStakedTokens()
-  async function get_staked_tokens(user_address) {
+  async function get_staked_tokens(fetch_address) {
 
     try {
 
-      let staked_tokens = await controller.methods.getStakedTokens(user_address).call();
+      let staked_tokens = await controller.methods.getStakedTokens(fetch_address).call();
 
       for (var i = 0; i < staked_tokens.length; i++) {
 
@@ -484,11 +484,11 @@
   }
 
   // getStakedTokens()
-  async function get_staked_tokens(user_address) {
+  async function get_staked_tokens(fetch_address) {
 
     try {
 
-      let staked_tokens = await controller.methods.getStakedTokens(user_address).call();
+      let staked_tokens = await controller.methods.getStakedTokens(fetch_address).call();
 
       /*
       for (var i = 0; i < staked_tokens.length; i++) {
