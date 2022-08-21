@@ -349,7 +349,7 @@
         frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+frog_id+'" class="frog_name"></strong><strong id="price_'+frog_id+'" class="frog_price"></strong></div><div class="frog_imgContainer" style="margin-bottom: 16px;"><img src="'+frog_external+'" class="frog_img"/></div><div id="traits_'+frog_id+'" class="trait_list"><b>Properties</b><div id="prop_'+frog_id+'" class="properties"></div></div></div>';
         frog_doc.appendChild(frog_token);
       } else { // IS Currently staked!
-        frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+token_id+'" class="frog_name"></strong><strong id="price_'+token_id+'" class="frog_price"></strong></div><div class="frog_imgContainer"><img src="'+external_link+'" class="frog_img"/></div><b id="progress_'+token_id+'"></b><div class="myProgress" id="myProgress_'+token_id+'"><div class="myBar" id="myBar_'+token_id+'"></div></div><div id="traits_'+token_id+'" class="trait_list"><b>Properties</b><div id="prop_'+token_id+'" class="properties"></div></div></div>';
+        frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+frog_id+'" class="frog_name"></strong><strong id="price_'+frog_id+'" class="frog_price"></strong></div><div class="frog_imgContainer"><img src="'+frog_external+'" class="frog_img"/></div><b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div><div id="traits_'+frog_id+'" class="trait_list"><b>Properties</b><div id="prop_'+frog_id+'" class="properties"></div></div></div>';
         frog_doc.appendChild(frog_token);
         let staked_time_bool = await staked_time(frog_id);
         let trait_text = document.createElement('i')
@@ -365,10 +365,10 @@
           staked_level = 1;
           percent = parseInt((staked_time_bool/1000)*100);
         }
-        elem = document.getElementById('myBar_'+token_id);
+        elem = document.getElementById('myBar_'+frog_id);
         width = percent
         elem.style.width = width + "%";
-        document.getElementById('price_'+token_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Level '+staked_level+'</b>';
+        document.getElementById('price_'+frog_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Level '+staked_level+'</b>';
       }
       
       // Update Name and Cost Variables /
