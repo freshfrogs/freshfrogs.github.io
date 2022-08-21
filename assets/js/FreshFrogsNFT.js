@@ -377,7 +377,7 @@
         document.getElementById('price_'+frog_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Level '+staked_level+'</b>';
       }
       
-      // Update Name and Cost Variables /
+      // Update Name and Cost Variables//
       document.getElementById('frog_'+frog_id).innerHTML = frog_name;
 
       if (frog_cost !== undefined) {
