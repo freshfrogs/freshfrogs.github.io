@@ -646,7 +646,7 @@
       }
       frog_token.id = frog_name;
       frog_token.className = 'frog_token';
-      frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+frog_id+'" class="frog_name"></strong><strong id="price_'+frog_id+'" class="frog_price"></strong></div><div class="frog_imgContainer"><img src="'+frog_external+'" class="frog_img"/></div><b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div><div id="traits_'+frog_id+'" class="trait_list"><b>Properties</b><div id="prop_'+frog_id+'" class="properties"></div></div></div>';
+      frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+frog_id+'" class="frog_name"></strong><strong id="price_'+frog_id+'" class="frog_price"></strong></div><div class="frog_imgContainer"><img src="'+frog_external+'" class="frog_img"/></div><b id="progress_'+frog_id+'"><strong id="level_'+frog_id+'" class="frog_level"></strong></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div><div id="traits_'+frog_id+'" class="trait_list"><b>Properties</b><div id="prop_'+frog_id+'" class="properties"></div></div></div>';
       //frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+frog_id+'" class="frog_name"></strong><strong id="price_'+frog_id+'" class="frog_price"></strong></div><div class="frog_imgContainer"><img src="'+frog_external+'" class="frog_img"/></div><b id="progress_'+frog_id+'" class="frog_price" style="border-radius: 5px; color: coral; float: none; !important"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div><div id="traits_'+frog_id+'" class="trait_list"><b>Properties</b><div id="prop_'+frog_id+'" class="properties"></div></div></div>';
       frog_doc.appendChild(frog_token);
 
@@ -654,10 +654,7 @@
       let staked_token_bool = await staker_address(frog_id);
       // Frog is not currently staked!
       if (!staked_token_bool) {
-        // Detail Element
-        if (frog_cost !== undefined) {
-          document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+frog_cost;
-        }
+        //
       } else { // IS Currently staked!
         // Detail Element
         let staked_owner = staked_token_bool
@@ -679,7 +676,11 @@
         elem = document.getElementById('myBar_'+frog_id);
         width = percent
         elem.style.width = width + "%";
-        document.getElementById('price_'+frog_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Level '+staked_level+'</b>';
+        document.getElementById('level_'+frog_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Level '+staked_level+'</b>';
+      }
+
+      if (frog_cost !== undefined) {
+        document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+frog_cost;
       }
       
       // Update Name and Cost Variables//
