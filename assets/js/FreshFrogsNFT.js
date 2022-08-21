@@ -264,7 +264,7 @@
       if (staker_tokens.length >= 1) {
         for (var i = 0; i < staker_tokens.length; i++) {
           tokenId = staker_tokens[i].tokenId
-          render_token(tokenId)
+          await render_token(tokenId)
         }
       }
       // Render Frogs Held by Fetch Address
