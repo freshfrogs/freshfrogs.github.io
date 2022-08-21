@@ -228,11 +228,8 @@
       user_address = await web3.currentProvider.selectedAddress;
       user_invites = await f0.myInvites();
       user_keys = Object.keys(user_invites);
-
-      // 
-      
       is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-      
+
       staker_info = await controller.methods.availableRewards(user_address).call();
       staker_rewards = (staker_info / 1000000000000000000);
       staker_rewards = String(staker_rewards).slice(0, 6);
@@ -256,48 +253,50 @@
   }
 
   // fetch_user_tokens() | Fetch User Tokens | Staked & Otherwise
-  async function fetch_user_data(fetch_address) { //
-    // No. Staked Frogs owned by fetch_address
-    let staker_tokens = await controller.methods.getStakedTokens(user_address).call();
+  async function fetch_user_data(fetch_address) {
+    // No. STAKED Frogs owned by fetch_address
+    let staker_tokens = await controller.methods.getStakedTokens(fetch_address).call();
     // No. Frogs owned by fetch_address
-    let user_tokens = await collection.methods.balanceOf(user_address).call();
+    let user_tokens = await collection.methods.balanceOf(fetch_address).call();
     // Must own atleast one Frog or atleast one Staked!
     if (user_tokens >= 1 || staker_tokens.length >= 1) {
-        if (staker_tokens.length >= 1) {
-          for (var i = 0; i < staker_tokens.length; i++) {
-            tokenId = staker_tokens[i].tokenId
-            render_token(tokenId)
-          }
+      // Render STAKED Frogs
+      if (staker_tokens.length >= 1) {
+        for (var i = 0; i < staker_tokens.length; i++) {
+          tokenId = staker_tokens[i].tokenId
+          render_token(tokenId)
         }
-        if (user_tokens >= 1) {
-          let pages = parseInt(user_tokens/50) + 1;
-          for (var i = 0; i < pages; i++) {
-            let offset = i * 50;
-            fetch('https://api.opensea.io/api/v1/assets?owner='+fetch_address+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+offset+'&limit=50&include_orders=false', options)
-            .then((tokens) => tokens.json())
-            .then((tokens) => {
-              var { assets } = tokens
-              assets.forEach((frog) => {
-                try {
-                  var sale_price = false;
-                  var { name, token_metadata, permalink, traits, external_link, token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
-                  if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
-                    sale_price = total_price / Math.pow(10, decimals);
-                  }
-                } catch (e) {}
-                if (!sale_price) {
-                  render_token(token_id);
-                } else {
+      }
+      // Render Frogs Held by Fetch Address
+      if (user_tokens >= 1) {
+        // Interations of 50
+        let pages = parseInt(user_tokens/50) + 1; // Round Pages up by one
+        for (var i = 0; i < pages; i++) {
+          // Fetch OpenSea Data
+          fetch('https://api.opensea.io/api/v1/assets?owner='+fetch_address+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+(i * 50)+'&limit=50&include_orders=false', options)
+          .then((tokens) => tokens.json())
+          .then((tokens) => {
+            // For Each Token
+            var { assets } = tokens
+            assets.forEach((frog) => {
+              try { // Attempt to pull recent Sale Price
+                var sale_price = false;
+                var { name, token_metadata, permalink, traits, external_link, token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
+                if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
+                  sale_price = total_price / Math.pow(10, decimals);
                   render_token(token_id, sale_price);
+                } else {
+                  render_token(token_id);
                 }
-              })
+              } catch (e) {} // Suppress Error
             })
-            .catch(e => {
-              console.log('Failed to talk to OpenSea!');
-              console.log(e.message);
-            })
-          }
+          })
+          .catch(e => { // OpenSea Error
+            console.log('Failed to talk to OpenSea!');
+            console.log(e.message);
+          })
         }
+      }
     } else { // Does not own atleast one Frog!
       console.log('Failed to Connect! User does not own any FROGS!');
       Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div class="console_pre" id="console-pre"></div>')
@@ -377,6 +376,9 @@
       if (!staked_token_bool) { // Frog is not currently staked! //
       } else { // IS Currently staked!
         let staked_time_bool = await staked_time(frog_id);
+        let trait_text = document.createElement('i')
+        trait_text.innerHTML = 'Hours Staked: '+staked_time_bool+'<br>Owner: '+staked_token_bool;
+        document.getElementById('prop_'+frog_id).appendChild(trait_text);
       }
 
       // Create button elements
