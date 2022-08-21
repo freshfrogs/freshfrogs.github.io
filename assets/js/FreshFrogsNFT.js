@@ -703,15 +703,19 @@
 
       }
 
-      // Create button elements
-
       let button_b = document.createElement('div');
 
       button_b.style.width = 'fit-content';
       button_b.style.marginLeft = 'auto';
       button_b.style.marginRight = 'auto';
 
-      document.getElementById('traits_'+frog_id).appendChild(button_b);
+      if (!staked_token_bool) {
+        button_b.innerHTML = '<br><button class="frog_button" style="background: lightgreen; border: 1px solid black; font-weight: bold;" onclick="stake('+token_id+')">Stake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button" style="font-weight: bold;">Rankings 🡥</button></a>';
+      } else {
+        button_b.innerHTML = '<br><button class="frog_button" style="background: coral; border: 1px solid black; font-weight: bold;" onclick="withdraw('+token_id+')">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+gemxyzLink+'" target="_blank"><button class="frog_button" style="font-weight: bold;">Rankings 🡥</button></a>';
+      }
+
+      document.getElementById('traits_'+token_id).appendChild(button_b);
 
     } catch (e) { console.log('Failed to render_token() Frog #'+frog_id+'\n'+e.message); }
 
