@@ -342,11 +342,35 @@
       frog_token = document.createElement('div');
       frog_token.id = frog_name;
       frog_token.className = 'frog_token';
-      frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+frog_id+'" class="frog_name"></strong><strong id="price_'+frog_id+'" class="frog_price"></strong></div><div class="frog_imgContainer" style="margin-bottom: 16px;"><img src="'+frog_external+'" class="frog_img"/></div><div id="traits_'+frog_id+'" class="trait_list"><b>Properties</b><div id="prop_'+frog_id+'" class="properties"></div></div></div>';
 
-      // Create Element
-      frog_doc.appendChild(frog_token);
+      let staked_token_bool = await staker_address(frog_id);
 
+      if (!staked_token_bool) { // Frog is not currently staked! //
+        frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+frog_id+'" class="frog_name"></strong><strong id="price_'+frog_id+'" class="frog_price"></strong></div><div class="frog_imgContainer" style="margin-bottom: 16px;"><img src="'+frog_external+'" class="frog_img"/></div><div id="traits_'+frog_id+'" class="trait_list"><b>Properties</b><div id="prop_'+frog_id+'" class="properties"></div></div></div>';
+        frog_doc.appendChild(frog_token);
+      } else { // IS Currently staked!
+        frog_token.innerHTML = '<div class="frogTokenCont"><div style="text-align: left; margin: 8px; height: 16px;"><strong id="frog_'+token_id+'" class="frog_name"></strong><strong id="price_'+token_id+'" class="frog_price"></strong></div><div class="frog_imgContainer"><img src="'+external_link+'" class="frog_img"/></div><b id="progress_'+token_id+'"></b><div class="myProgress" id="myProgress_'+token_id+'"><div class="myBar" id="myBar_'+token_id+'"></div></div><div id="traits_'+token_id+'" class="trait_list"><b>Properties</b><div id="prop_'+token_id+'" class="properties"></div></div></div>';
+        frog_doc.appendChild(frog_token);
+        let staked_time_bool = await staked_time(frog_id);
+        let trait_text = document.createElement('i')
+        trait_text.innerHTML = 'Hours Staked: '+staked_time_bool+'<br>Owner: '+staked_token_bool;
+        document.getElementById('prop_'+frog_id).appendChild(trait_text);
+        if (staked_time_bool >= 2000) {
+          staked_level = 3;
+          percent = parseInt((staked_time_bool/3000)*100);
+        } else if (staked_time_bool >= 1000) {
+          staked_level = 2;
+          percent = parseInt((staked_time_bool/2000)*100);
+        } else {
+          staked_level = 1;
+          percent = parseInt((staked_time_bool/1000)*100);
+        }
+        elem = document.getElementById('myBar_'+token_id);
+        width = percent
+        elem.style.width = width + "%";
+        document.getElementById('price_'+token_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Level '+staked_level+'</b>';
+      }
+      
       // Update Name and Cost Variables /
       document.getElementById('frog_'+frog_id).innerHTML = '<u>'+frog_name+'</u>';
 
@@ -369,16 +393,6 @@
         trait_text.innerHTML = data.trait_type+': '+data.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>';
         document.getElementById('prop_'+frog_id).appendChild(trait_text);
 
-      }
-
-      let staked_token_bool = await staker_address(frog_id);
-
-      if (!staked_token_bool) { // Frog is not currently staked! //
-      } else { // IS Currently staked!
-        let staked_time_bool = await staked_time(frog_id);
-        let trait_text = document.createElement('i')
-        trait_text.innerHTML = 'Hours Staked: '+staked_time_bool+'<br>Owner: '+staked_token_bool;
-        document.getElementById('prop_'+frog_id).appendChild(trait_text);
       }
 
       // Create button elements
