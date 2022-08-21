@@ -1,4 +1,4 @@
-
+  // FreshFrogsController | NFT Staking Smart Contract | 0xCB1ee125CFf4051a10a55a09B10613876C4Ef199
   // Global Variables
   const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
   const CONTROLLER_ABI =
@@ -181,8 +181,6 @@
   // Connect WEB3, FreshFrogsController
   const web3 = new Web3(web3.currentProvider);
   const CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
-  
-  // FreshFrogsController | NFT Staking Smart Contract | 0xCB1ee125CFf4051a10a55a09B10613876C4Ef199
 
   // SEND() FUNCTIONS
 
