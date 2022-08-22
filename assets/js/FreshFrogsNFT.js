@@ -378,14 +378,30 @@
       // Is Frog Currently Staked?
       let staked = await stakerAddress(frog_id);
       if (!staked) { // Stake Button
+        // Create Button
         button_b.innerHTML = 
           '<br>'+
           '<button class="frog_button" style="background: lightgreen; border: 1px solid black; font-weight: bold;" onclick="stake('+frog_id+')">Stake 🡥</button>'+
           '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button" style="font-weight: bold;">Rankings 🡥</button></a>';
+        document.getElementById('traits_'+frog_id).appendChild(button_b);
       } else { // Or Un-stake Button
+        // Create Button
         button_b.innerHTML = '<br><button class="frog_button" style="background: coral; border: 1px solid black; font-weight: bold;" onclick="withdraw('+frog_id+')">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button" style="font-weight: bold;">Rankings 🡥</button></a>';
+        document.getElementById('traits_'+frog_id).appendChild(button_b);
+        // Create Owner Element and Staking Level
+        let trait_text = document.createElement('i')
+        trait_text.innerHTML = 'Owner: '+truncateAddress(staked)+'<br>';
+        document.getElementById('prop_'+frog_id).appendChild(trait_text);
+        // Check Staked Time / Calculate Level
+        let staked_time_bool = await timeStaked(frog_id);
+        if (staked_time_bool >= 2000) { staked_level = 3; } else if (staked_time_bool >= 1000) { staked_level = 2; } else { staked_level = 1; }
+        // Update Progress Bar
+        percent = parseInt((staked_time_bool/1000)*100);
+        elem = document.getElementById('myBar_'+frog_id);
+        width = percent
+        elem.style.width = width + "%";
+        document.getElementById('level_'+frog_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Staked Level '+staked_level+'</b>';
       }
-      document.getElementById('traits_'+frog_id).appendChild(button_b);
     } catch (e) { console.log('Failed to render_token() Frog #'+frog_id+'\n'+e.message); }
   }
 
