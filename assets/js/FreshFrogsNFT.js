@@ -456,18 +456,34 @@
 
   // withdraw(_tokenId (uint256), _user (address)) | send =>
   async function withdraw(tokenId, userAddress) {
-    try {
-      let withdraw = await controller.methods.withdraw(tokenId).send({ from: userAddress });
-      return 'Frog #'+tokenId+' has succesfully been un-staked!';
-    } catch (e) { console.log('Failed to withdraw(): '+e.message); }
+    // Frog is currently staked and belongs to user
+    let staked = await stakerAddress(tokenId);
+    if (!staked) {
+      return; // Frog is not currently staked!
+    } else if (staked.toLowerCase() == userAddress.toLowerCase()) {
+      try { // Frog is staked by user
+        let withdraw = await controller.methods.withdraw(tokenId).send({ from: userAddress });
+        return 'Frog #'+tokenId+' has succesfully been un-staked!';
+      } catch (e) { console.log('Failed to withdraw(): '+e.message); }
+    } else {
+      return; // Frog does not belong to user!
+    }
   }
 
   // stake(_tokenId (uint256), _user (address)) | send =>
   async function stake(tokenId, userAddress) {
-    try {
-      let stake = await controller.methods.stake(tokenId).send({ from: userAddress });
-      return 'Frog #'+tokenId+' has succesfully been staked!';
-    } catch (e) { console.log('Failed to stake(): '+e.message); }
+    // Frog is currently NOT staked and belongs to user
+    let staked = await stakerAddress(tokenId);
+    let owned = await collection.methods.ownerOf(tokenId).call();
+    console.log(owned)
+    if (!staked && owned.toLowerCase() == userAddress.toLowerCase()) {
+      try {
+        let stake = await controller.methods.stake(tokenId).send({ from: userAddress });
+        return 'Frog #'+tokenId+' has succesfully been staked!';
+      } catch (e) { console.log('Failed to stake(): '+e.message); }
+    } else {
+      return; // Frog is already staked or does not belong to owner!
+    }
   }
 
   // CALL() Functions
