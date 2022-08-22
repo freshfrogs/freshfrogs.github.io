@@ -322,13 +322,13 @@
       frog_etherscan = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
       frog_gemxyz = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
       frog_external = 'https://freshfrogs.io/frog/'+frog_id+'.png';
+      // Is Frog Currently Staked?
+      let staked = await stakerAddress(frog_id);
       // <-- Begin Element
       frog_doc = document.getElementById('thePad');
       frog_token = document.createElement('div');
       frog_token.id = 'Frog #'+frog_id;
       frog_token.className = 'frog_token';
-      // Is Frog Currently Staked?
-      let staked = await stakerAddress(frog_id);
       // Element Inner HTML
       frog_token.innerHTML =
       '<div class="frogTokenCont">'+
