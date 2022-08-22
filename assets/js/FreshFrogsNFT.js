@@ -276,7 +276,7 @@
               // Retrieve Token Data
               var { token_id } = frog
               // Render Frog Element
-              render_token(token_id, sale_price)
+              render_token(token_id)
             })
           })
           .catch(e => { // OpenSea Error
@@ -315,11 +315,14 @@
   }
 
   // render_token()
-  async function render_token(frog_id, recent_sale) {
-
-    let staked = await stakerAddress(frog_id);
+  async function render_token(frog_id) {
+    
     // Is Frog Currently Staked?
-    //await stakerAddress(frog_id).then(staked => {
+    let staked = await stakerAddress(frog_id);
+
+    // Has this Frog been sold?
+    let recent_sale = await get_asset_price(frog_id);
+
     // Token Variable Links
     let frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
     let frog_etherscan = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
@@ -354,7 +357,7 @@
     frog_doc.appendChild(frog_token);
 
     // Update Recent Sale Price
-    if (recent_sale !== false && typeof recent_sale !== 'undefined') { document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+recent_sale; }
+    if (!recent_sale) {} else { document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+recent_sale; }
 
     // Update Metadata!
     let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
@@ -420,16 +423,24 @@
       document.getElementById('level_'+frog_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Staked Level '+staked_level+'</b>';
 
     }
-    //})
+
   }
 
   // load_trait(_trait(family), _attribute(type), _where(element))
   function load_trait(trait, attribute, where) {
+
     // Create Img Element
     newAttribute = document.createElement("img");
+
+    // Assign Class
     if (trait == 'Trait') { newAttribute.className = "frogImg5"; } else { newAttribute.className = "frogImg4"; }
+
+    // Assign Source
     newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
+
+    // Render Trait Image
     document.getElementById(where).appendChild(newAttribute);
+
   }
 
   // Print to front page console-output
@@ -444,9 +455,7 @@
 
   // Shorten Ethereum Address
   function truncateAddress(address) {
-    if (!address) {
-      return "";
-    }
+    if (!address) { return ""; }
     return `${address.substr(0, 5)}...${address.substr(
       address.length - 5,
       address.length
@@ -455,22 +464,38 @@
 
   // Recent Sale Price
   async function get_asset_price(tokenId) {
-    const options = {method: 'GET'};
-    fetch('https://api.opensea.io/api/v1/asset/'+CONTRACT_ADDRESS+'/'+tokenId+'/?include_orders=false', options)
-    .then((token) => token.json())
+
+    fetch('https://api.opensea.io/api/v1/asset/'+CONTRACT_ADDRESS+'/'+tokenId+'/?include_orders=false', {method: 'GET'})
     .then((token) => {
+
       // Attempt to retrieve recent sale price
       try { var sale_price = false; 
+
         // Retrieve Token Data
         var { last_sale: { payment_token: { decimals }, total_price } } = token
+
         // Assign and calculate recent sale price if applicable
         if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
+
           sale_price = total_price / Math.pow(10, decimals);
-          console.log('Frog #'+tokenId+' recent sale price: '+sale_price+' ETH');
           return sale_price;
+
+        } else {
+
+          // last_sale not found
+          return false
+
         }
-      } catch (e) { return false; } // Supress Error if last_sale not found
+
+      } catch (e) {
+
+        // Supress Error if last_sale not found
+        return false;
+
+      }
+
     })
+
   }
 
   // FreshFrogsController | NFT Staking Smart Contract | 0xCB1ee125CFf4051a10a55a09B10613876C4Ef199
@@ -479,136 +504,288 @@
 
   // claimRewards(_user (address)) | send =>
   async function claimRewards(userAddress) {
+
     try {
+
+      // Send function to FreshFrogsController Staking Contract
       let claimRewards = await controller.methods.claimRewards().send({ from: userAddress });
       return 'Rewards have succesfully been claimed!';
-    } catch (e) { console.log('Failed to withdraw(): '+e.message); }
+
+    } catch (e) {
+      
+      // Catch Error
+      console.log('Failed to withdraw(): '+e.message);
+
+    }
   }
 
   // withdraw(_tokenId (uint256), _user (address)) | send =>
   async function withdraw(tokenId, userAddress) {
+
     // Frog is currently staked and belongs to user
     let staked = await stakerAddress(tokenId);
+
     if (!staked) {
-      return; // Frog is not currently staked!
+
+      // Frog is not currently staked!
+      return;
+
+    // Frog is currently staked by user
     } else if (staked == userAddress) {
-      console.log(staked+'\n'+userAddress);
-      try { // Frog is staked by user
+
+      try {
+
+        // Send Function to FreshFrogsController Staking Contract
         let withdraw = await controller.methods.withdraw(tokenId).send({ from: userAddress });
         return 'Frog #'+tokenId+' has succesfully been un-staked!';
-      } catch (e) { console.log('Failed to withdraw(): '+e.message); }
+
+      } catch (e) {
+        
+        // Catch Error
+        console.log('Failed to withdraw(): '+e.message);
+      
+      }
+
     } else {
-      return; // Frog does not belong to user!
+
+      // Frog does not belong to user!
+      return;
+
     }
+
   }
 
   // stake(_tokenId (uint256), _user (address)) | send =>
   async function stake(tokenId, userAddress) {
-    // Frog is currently NOT staked and belongs to user
-    let staked = await stakerAddress(tokenId);
+
+    // Frog Ownership Status
     let owned = await collection.methods.ownerOf(tokenId).call();
-    console.log(owned)
-    if (!staked && owned.toLowerCase() == userAddress.toLowerCase()) {
+
+    // Owned by User attempting to Stake
+    if (owned == userAddress) {
+
       try {
+
+        // Send function to FreshFrogsController Staking Contract
         let stake = await controller.methods.stake(tokenId).send({ from: userAddress });
         return 'Frog #'+tokenId+' has succesfully been staked!';
-      } catch (e) { console.log('Failed to stake(): '+e.message); }
+
+      } catch (e) {
+
+        // Catch Error
+        console.log('Failed to stake(): '+e.message);
+
+      }
+
     } else {
-      return; // Frog is already staked or does not belong to owner!
+
+      if (owned == CONTROLLER_ADDRESS) {
+
+        // Already Staked!
+
+      }
+
+      // Token does not belong to user
+      return;
+
     }
+
   }
 
   // CALL() Functions
 
   // availableRewards(_staker (address)) | return uint256
   async function availableRewards(userAddress) {
+
     try {
+
+      // Call function from within FreshFrogsController Staking Contract
       let availableRewards = await controller.methods.availableRewards(userAddress).call();
+
+      // Return available rewards belonging to user
       return availableRewards;
-    } catch (e) { console.log('Failed to call availableRewards(): '+e.message); }
+
+    } catch (e) {
+      
+      // Catch Error
+      console.log('Failed to call availableRewards(): '+e.message);
+    
+    }
+
   }
 
   // getStakedTokens(_user (address)) | return tuple[]
   async function getStakedTokens(userAddress) {
+
     try {
+
+      // Call function from within FreshFrogsController Staking Contract
       let getStakedTokens = await controller.methods.getStakedTokens(userAddress).call();
+
+      // Return Array of Staked Tokens
       return getStakedTokens;
-    } catch (e) { console.log('Failed to call getStakedTokens(): '+e.message); }
+
+    } catch (e) {
+      
+      // Catch Error
+      console.log('Failed to call getStakedTokens(): '+e.message);
+    
+    }
+
   }
   
   // nftCollection() | return address
   async function nftCollection() {
+    
     try {
+
+      // Call function from within FreshFrogsController Staking Contract
       let nftCollection = await controller.methods.nftCollection().call();
+
+      // Return NFT Collection Contract Address
       return nftCollection;
-    } catch (e) { console.log('Failed to call nftCollection(): '+e.message); }
+
+    } catch (e) {
+      
+      // Catch Error
+      console.log('Failed to call nftCollection(): '+e.message);
+    
+    }
+
   }
 
   // rewardsToken() | return address
   async function rewardsToken() {
+
     try {
+
+      // Call function from within FreshFrogsController Staking Contract
       let rewardsToken = await controller.methods.rewardsToken().call();
+
+      // Return Reward Token ERC720 Contract Address
       return rewardsToken;
-    } catch (e) { console.log('Failed to call rewardsToken(): '+e.message); }
+
+    } catch (e) {
+
+      // Catch Error
+      console.log('Failed to call rewardsToken(): '+e.message);
+
+    }
+
   }
 
   // stakerAddress(<input> (uint256)) | return address
   async function stakerAddress(tokenId) {
+
     try {
+
+      // Call function from within FreshFrogsController Staking Contract
       let stakerAddress = await controller.methods.stakerAddress(tokenId).call();
+
+      // stakedAddress does NOT belong to a Null Address, therefore IS currently Staked!
       if (stakerAddress !== '0x0000000000000000000000000000000000000000') {
+
         return stakerAddress
-      } else { return false } // TokenId Not Currently Staked
-    } catch (e) { console.log('Failed to call stakerAddress(): '+e.message); }
+
+      // TokenId Not Currently Staked!
+      } else {
+
+        return false
+
+      }
+
+    } catch (e) {
+      
+      // Catch Error
+      console.log('Failed to call stakerAddress(): '+e.message);
+    
+    }
+
   }
 
   // stakers(<input> (address), <input> (dataFetch)) | return ( amountStaked, timeOfLastUpdate, unclaimedRewards )
   async function stakers(userAddress, _data) {
+
     try {
+
+      // Call function from within FreshFrogsController Staking Contract
       let stakers = await controller.methods.stakers(userAddress).call();
+
       console.log('amountStaked: '+stakers.amountStaked);
       console.log('timeOfLastUpdate: '+stakers.timeOfLastUpdate);
       console.log('unclaimedRewards: '+stakers.unclaimedRewards);
+
       if (_data == 'amountStaked') {
+
+        // Total Tokens Staked by User
         return stakers.amountStaked
+
       } else if (_data == 'timeOfLastUpdate') {
+
+        // Time since Last Update from user
         return stakers.timeOfLastUpdate
+
       } else if (_data == 'unclaimedRewards') {
+
+        // Total unclaimed Rewards from User
         return stakers.unclaimedRewards
+
       } else {
+
         // Invalid Arguments
         return
+
       }
-    } catch (e) { console.log('Failed to call stakers(): '+e.message); }
+
+    } catch (e) {
+      
+      // Catch Error
+      console.log('Failed to call stakers(): '+e.message);
+
+    }
+
   }
 
   // Custom Front-End Functions
 
   // Calculate total time a Frog has been staked (Hours)
   async function timeStaked(tokenId) {
+
+    // Re-establish web3 connection variable
     web3 = new Web3(web3.currentProvider);
+
     // Is Frog currently staked?
     let staked = await stakerAddress(tokenId);
+
     // False, NOT currently staked
     if (!staked) {
-      // Frog is not currently staked!
+
       return 0.00
-    // Currently Staked
+
+    // IS Currently Staked!
     } else {
+
       // Loop blockchain transactions per parameters [NFT Transfer From: User ==> To: Staking Controller] & NFT is Currently Staked
       let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'tokenId': tokenId}, fromBlock: 0, toBlock: 'latest'});
+
       // Fetch Block Number from Txn
       let staked_block = parseInt(stakingEvents[0].blockNumber);
+
       // Fetch Timestamp for block txn
       let staked_time = await web3.eth.getBlock(staked_block);
       let staked_date = new Date(staked_time.timestamp*1000);
+
       // Calculate Time Staked in Hours
       let staked_duration = Date.now() - staked_date;
       let staked_hours = Math.floor(staked_duration/1000/60/60);
+
       //console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
+
       // Return time staked in (Hours)
       return staked_hours;
+
     }
+
   }
 
 // Coded by NF7UOS
