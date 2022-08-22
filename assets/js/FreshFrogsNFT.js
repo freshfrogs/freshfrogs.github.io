@@ -371,7 +371,13 @@
 
       // Calculate Trait Rarity
       try { trait_rarity = ((traits_list[attribute.trait_type][attribute.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) { trait_rarity = 'e'; }
-      if (trait_rarity < 1) { trait_rarity = '<1%' } else { trait_rarity = trait_rarity+'%' }
+
+      // Tune Rarity
+      if (trait_rarity < 1) {
+        trait_rarity = '<1%'
+      } else {
+        trait_rarity = trait_rarity+'%'
+      }
 
       // Create Attribute Text Element
       var trait_text = document.createElement('i')
