@@ -322,8 +322,6 @@
       frog_etherscan = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
       frog_gemxyz = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
       frog_external = 'https://freshfrogs.io/frog/'+frog_id+'.png';
-      // Is Frog Currently Staked?
-      let staked = await stakerAddress(frog_id);
       // <-- Begin Element
       frog_doc = document.getElementById('thePad');
       frog_token = document.createElement('div');
@@ -380,7 +378,8 @@
       button_b.style.width = 'fit-content';
       button_b.style.marginLeft = 'auto';
       button_b.style.marginRight = 'auto';
-      // Staked or Not?
+      // Is Frog Currently Staked?
+      let staked = await stakerAddress(frog_id);
       if (!staked) { // Stake Button
         // Create Button
         button_b.innerHTML = 
