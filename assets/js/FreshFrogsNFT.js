@@ -357,8 +357,8 @@
       for (let i = 0; i < metadata.attributes.length; i++) {
         let attribute = metadata.attributes[i]
         // Calculate Trait Rarity
-        try { let trait_rarity = ((traits_list[attribute.trait_type][attribute.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) { let trait_rarity = 'e'; }
-        if (trait_rarity < 1) { let trait_rarity = '<1%' } else { let trait_rarity = trait_rarity+'%' }
+        try { trait_rarity = ((traits_list[attribute.trait_type][attribute.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) { trait_rarity = 'e'; }
+        if (trait_rarity < 1) { trait_rarity = '<1%' } else { trait_rarity = trait_rarity+'%' }
         // Create Attribute Text Element
         var trait_text = document.createElement('i')
         trait_text.innerHTML = attribute.trait_type+': '+attribute.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>';
