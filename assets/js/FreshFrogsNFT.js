@@ -531,12 +531,22 @@
   }
 
   // stakers(<input> (address), <input> (dataFetch)) | return ( amountStaked, timeOfLastUpdate, unclaimedRewards )
-  async function stakers(userAddress, dataFetch) {
+  async function stakers(userAddress, _data) {
     try {
       let stakers = await controller.methods.stakers(userAddress).call();
-      console.log(stakers)
-      console.log(stakers.dataFetch)
-      return stakers.dataFetch
+      console.log('amountStaked: '+stakers.amountStaked);
+      console.log('timeOfLastUpdate: '+stakers.timeOfLastUpdate);
+      console.log('unclaimedRewards: '+stakers.unclaimedRewards);
+      if (_data == 'amountStaked') {
+        return stakers.amountStaked
+      } else if (_data == 'timeOfLastUpdate') {
+        return stakers.timeOfLastUpdate
+      } else if (_data == 'unclaimedRewards') {
+        return stakers.unclaimedRewards
+      } else {
+        // Invalid Arguments
+        return
+      }
     } catch (e) { console.log('Failed to call stakers(): '+e.message); }
   }
 
