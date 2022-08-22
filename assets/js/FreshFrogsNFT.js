@@ -414,7 +414,7 @@
   
           // Check Staked Time / Calculate Level
           let staked_time_bool = await timeStaked(frog_id);
-          if (staked_time_bool >= 2000) { let staked_level = 3; } else if (staked_time_bool >= 1000) { let staked_level = 2; } else { let staked_level = 1; }
+          if (staked_time_bool >= 2000) { staked_level = 3; } else if (staked_time_bool >= 1000) { staked_level = 2; } else { staked_level = 1; }
   
           // Update Progress Bar
           let percent = parseInt((staked_time_bool/(1000*staked_level))*100);
