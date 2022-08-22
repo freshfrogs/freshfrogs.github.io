@@ -242,8 +242,9 @@
     let user_tokens = await collection.methods.balanceOf(fetch_address).call();
     // Must own atleast one Frog or atleast one Staked!
     if (user_tokens >= 1 || staker_tokens.length >= 1) {
-      // Render STAKED Frogs
+      // Render Frogs Staked by User
       if (staker_tokens.length >= 1) {
+        // Loop Staked Frogs
         for (var i = 0; i < staker_tokens.length; i++) {
           tokenId = staker_tokens[i].tokenId
           await render_token(tokenId)
