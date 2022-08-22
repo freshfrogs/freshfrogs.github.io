@@ -462,11 +462,20 @@
   // Recent Sale Price
   async function get_asset_price(tokenId) {
     const options = {method: 'GET'};
-
     fetch('https://api.opensea.io/api/v1/asset/'+CONTRACT_ADDRESS+'/'+tokenId+'/?include_orders=false', options)
-      .then(response => response.json())
-      .then(response => console.log(response))
-      .catch(err => console.error(err));
+    .then((token) => token.json())
+    .then((token) => {
+      // Attempt to retrieve recent sale price
+      try { var sale_price = false; 
+        // Retrieve Token Data
+        var { last_sale: { payment_token: { decimals }, total_price } } = token
+        // Assign and calculate recent sale price if applicable
+        if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
+          sale_price = total_price / Math.pow(10, decimals);
+          return sale_price;
+        }
+      } catch (e) { return false; } // Supress Error if last_sale not found
+    })
   }
 
   // FreshFrogsController | NFT Staking Smart Contract | 0xCB1ee125CFf4051a10a55a09B10613876C4Ef199
