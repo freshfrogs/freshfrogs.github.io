@@ -399,9 +399,9 @@
         let staked_time_bool = await timeStaked(frog_id);
         if (staked_time_bool >= 2000) { staked_level = 3; } else if (staked_time_bool >= 1000) { staked_level = 2; } else { staked_level = 1; }
         // Update Progress Bar
-        percent = parseInt((staked_time_bool/1000)*100);
+        percent = parseInt((staked_time_bool/(1000*staked_level))*100);
         elem = document.getElementById('myBar_'+frog_id);
-        width = percent
+        width = percent;
         elem.style.width = width + "%";
         document.getElementById('level_'+frog_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Staked Level '+staked_level+'</b>';
       }
