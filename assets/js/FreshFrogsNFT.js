@@ -319,9 +319,6 @@
     // Is Frog Currently Staked?
     let staked = await stakerAddress(frog_id);
 
-    // Has this Frog been sold?
-    let recent_sale = await get_asset_price(frog_id);
-
     // Token Variable Links
     let frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
     let frog_etherscan = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
