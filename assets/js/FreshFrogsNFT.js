@@ -299,19 +299,19 @@
     displayImg = 'https://freshfrogs.io/frog/'+tokenId+'.png'
     displayName = 'Frog #'+tokenId
     // Update Header Background Img
-    document.getElementById('thisheader').style.backgroundImage = 'url('+display_frog+')';
+    document.getElementById('thisheader').style.backgroundImage = 'url('+displayImg+')';
     document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
     // Update Preview Img
     document.getElementById('frogContainer4').innerHTML = '';
     // Fetch Metadata
-    var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
+    var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+tokenId+".json")).json();
     // Loop Attributes and Build Frog
     for (var i = 0; i < metadata.attributes.length; i++) {
       var data = metadata.attributes[i];
       load_trait(data.trait_type, data.value, 'frogContainer4');
     }
     // Update Display Name & External Links
-    document.getElementById('display_name').innerHTML = display_name
+    document.getElementById('display_name').innerHTML = displayName
   }
 
   // render_token()
