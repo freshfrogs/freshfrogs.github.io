@@ -273,7 +273,7 @@
                 if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
                   sale_price = total_price / Math.pow(10, decimals);
                 }
-              } catch (e) {} // Supress Error if last_sale not found
+              } catch (e) { sale_price = false; } // Supress Error if last_sale not found
               // Render Frog Element
               render_token(token_id, sale_price)
             })
