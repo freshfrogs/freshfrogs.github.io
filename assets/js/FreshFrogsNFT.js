@@ -23,6 +23,8 @@
       console.log('Error: Failed to fetch OpenSea collection data!');
     });
 
+    get_asset_price('1');
+
     // Staking Contract ABI
     const CONTROLLER_ABI =
       [
@@ -455,6 +457,16 @@
       address.length - 5,
       address.length
     )}`;
+  }
+
+  // Recent Sale Price
+  async function get_asset_price(tokenId) {
+    const options = {method: 'GET'};
+
+    fetch('https://api.opensea.io/api/v1/asset/'+CONTRACT_ADDRESS+'/'+tokenId+'/?include_orders=false', options)
+      .then(response => response.json())
+      .then(response => console.log(response))
+      .catch(err => console.error(err));
   }
 
   // FreshFrogsController | NFT Staking Smart Contract | 0xCB1ee125CFf4051a10a55a09B10613876C4Ef199
