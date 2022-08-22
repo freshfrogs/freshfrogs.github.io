@@ -520,7 +520,7 @@
 
   // Calculate total time a Frog has been staked (Hours)
   async function timeStaked(tokenId) {
-    var web3 = new Web3(web3.currentProvider);
+    web3 = new Web3(web3.currentProvider);
     // Is Frog currently staked?
     let staked = await stakerAddress(tokenId);
     // False, NOT currently staked
