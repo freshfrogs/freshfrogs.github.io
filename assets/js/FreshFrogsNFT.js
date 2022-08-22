@@ -322,7 +322,6 @@
     staked = await stakerAddress(frog_id);
     // Is Frog Currently Staked?
     //await stakerAddress(frog_id).then(staked => {
-      console.log(staked);
       try {
         // Token Variable Links
         let frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
