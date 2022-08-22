@@ -319,8 +319,9 @@
   // render_token()
   async function render_token(frog_id, recent_sale) {
 
+    staked = await stakerAddress(frog_id);
     // Is Frog Currently Staked?
-    await stakerAddress(frog_id).then(staked => {
+    //await stakerAddress(frog_id).then(staked => {
       console.log(staked);
       try {
         // Token Variable Links
@@ -424,7 +425,7 @@
   
         }
       } catch (e) { console.log(e.message); }
-    })
+    //})
   }
 
   // load_trait(_trait(family), _attribute(type), _where(element))
