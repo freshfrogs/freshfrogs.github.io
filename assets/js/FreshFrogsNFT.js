@@ -244,9 +244,9 @@
     let user_tokens = await collection.methods.balanceOf(fetch_address).call();
     console.log('Total Frogs Held: '+user_tokens);
     // stakers data stakers(<input> (address), <input> (dataFetch)) | return ( amountStaked, timeOfLastUpdate, unclaimedRewards )
-    let stakers_amountStaked = await stakers(fetch_address, 'amountStaked'); console.log('amountStaked : '+stakers_amountStaked);
-    let stakers_timeOfLastUpdate = await stakers(fetch_address, 'timeOfLastUpdate'); console.log('timeOfLastUpdate : '+stakers_timeOfLastUpdate);
-    let stakers_unclaimedRewards = await stakers(fetch_address, 'unclaimedRewards'); console.log('unclaimedRewards : '+stakers_unclaimedRewards);
+    let stakers_amountStaked = await stakers(fetch_address, 'amountStaked'); console.log('amountStaked: '+stakers_amountStaked);
+    let stakers_timeOfLastUpdate = await stakers(fetch_address, 'timeOfLastUpdate'); console.log('timeOfLastUpdate: '+stakers_timeOfLastUpdate);
+    let stakers_unclaimedRewards = await stakers(fetch_address, 'unclaimedRewards'); console.log('unclaimedRewards: '+stakers_unclaimedRewards);
     // Must own atleast one Frog or atleast one Staked!
     if (user_tokens >= 1 || staker_tokens.length >= 1) {
       // Render Frogs Staked by User
