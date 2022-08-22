@@ -243,6 +243,10 @@
     // No. Frogs owned by fetch_address
     let user_tokens = await collection.methods.balanceOf(fetch_address).call();
     console.log('Total Frogs Held: '+user_tokens);
+    // stakers data stakers(<input> (address), <input> (dataFetch)) | return ( amountStaked, timeOfLastUpdate, unclaimedRewards )
+    let stakers_amountStaked = await stakers(fetch_address, 'amountStaked'); console.log('amountStaked : '+stakers_amountStaked);
+    let stakers_timeOfLastUpdate = await stakers(fetch_address, 'timeOfLastUpdate'); console.log('timeOfLastUpdate : '+stakers_timeOfLastUpdate);
+    let stakers_unclaimedRewards = await stakers(fetch_address, 'unclaimedRewards'); console.log('unclaimedRewards : '+stakers_unclaimedRewards);
     // Must own atleast one Frog or atleast one Staked!
     if (user_tokens >= 1 || staker_tokens.length >= 1) {
       // Render Frogs Staked by User
@@ -510,11 +514,11 @@
     } catch (e) { console.log('Failed to call stakerAddress(): '+e.message); }
   }
 
-  // stakers(<input> (address), <input> (data_fetch)) | return ( amountStaked, timeOfLastUpdate, unclaimedRewards )
-  async function stakers(userAddress, input) {
+  // stakers(<input> (address), <input> (dataFetch)) | return ( amountStaked, timeOfLastUpdate, unclaimedRewards )
+  async function stakers(userAddress, dataFetch) {
     try {
       let stakers = await controller.methods.stakers(userAddress).call();
-      return stakers.input
+      return stakers.dataFetch
     } catch (e) { console.log('Failed to call stakers(): '+e.message); }
   }
 
@@ -527,26 +531,23 @@
     let staked = await stakerAddress(tokenId);
     // False, NOT currently staked
     if (!staked) {
-      console.log('Error fetching staked_time(): Frog #'+tokenId+' is not currently staked!');
+      // Frog is not currently staked!
       return
     // Currently Staked
     } else {
-      try {
-        // Loop blockchain transactions per parameters [NFT Transfer From: User ==> To: Staking Controller] & NFT is Currently Staked
-        let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'tokenId': tokenId}, fromBlock: 0, toBlock: 'latest'});
-        // Fetch Block Number from Txn
-        let staked_block = parseInt(stakingEvents[0].blockNumber);
-        // Fetch Timestamp for block txn
-        let staked_time = await web3.eth.getBlock(staked_block);
-        let staked_date = new Date(staked_time.timestamp*1000);
-        // Calculate Time Staked in Hours
-        let staked_duration = Date.now() - staked_date;
-        let staked_hours = Math.floor(staked_duration/1000/60/60);
-        //console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
-        // Return time staked in (Hours)
-        return staked_hours;
-      // Catch Error(s)
-      } catch (e) { console.log('Failed to fetch timeStaked(): '+e.message); }
+      // Loop blockchain transactions per parameters [NFT Transfer From: User ==> To: Staking Controller] & NFT is Currently Staked
+      let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'tokenId': tokenId}, fromBlock: 0, toBlock: 'latest'});
+      // Fetch Block Number from Txn
+      let staked_block = parseInt(stakingEvents[0].blockNumber);
+      // Fetch Timestamp for block txn
+      let staked_time = await web3.eth.getBlock(staked_block);
+      let staked_date = new Date(staked_time.timestamp*1000);
+      // Calculate Time Staked in Hours
+      let staked_duration = Date.now() - staked_date;
+      let staked_hours = Math.floor(staked_duration/1000/60/60);
+      //console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
+      // Return time staked in (Hours)
+      return staked_hours;
     }
   }
 
