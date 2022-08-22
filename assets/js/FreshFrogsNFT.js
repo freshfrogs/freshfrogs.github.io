@@ -549,7 +549,7 @@
     } catch (e) { console.log('Failed to call stakers(): '+e.message); }
   }
 
-  // Custom Functions, 
+  // Custom Front-End Functions
 
   // Calculate total time a Frog has been staked (Hours)
   async function timeStaked(tokenId) {
