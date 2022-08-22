@@ -360,7 +360,7 @@
       if (recent_sale !== false && typeof recent_sale !== 'undefined') { document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+recent_sale; }
 
       // Update Metadata!
-      let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
+      let metadata = await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json").json();
 
       // Loop Each Attribute
       for (let i = 0; i < metadata.attributes.length; i++) {
