@@ -320,7 +320,9 @@
   async function render_token(frog_id, recent_sale) {
 
     // Is Frog Currently Staked?
-    let staked = await stakerAddress(frog_id);
+    await stakerAddress(frog_id).then(staked => {
+      console.log(staked);
+    })
     
     // Token Variable Links
     let frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
@@ -414,7 +416,7 @@
       let width = percent;
       elem.style.width = width + "%";
       document.getElementById('level_'+frog_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Staked Level '+staked_level+'</b>';
-      
+
     }
   }
 
