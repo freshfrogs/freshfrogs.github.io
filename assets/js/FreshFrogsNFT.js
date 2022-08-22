@@ -460,7 +460,8 @@
     let staked = await stakerAddress(tokenId);
     if (!staked) {
       return; // Frog is not currently staked!
-    } else if (staked.toLowerCase() == userAddress.toLowerCase()) {
+    } else if (staked == userAddress) {
+      console.log(staked+'\n'+userAddress);
       try { // Frog is staked by user
         let withdraw = await controller.methods.withdraw(tokenId).send({ from: userAddress });
         return 'Frog #'+tokenId+' has succesfully been un-staked!';
