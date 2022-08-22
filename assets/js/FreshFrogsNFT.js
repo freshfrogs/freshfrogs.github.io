@@ -238,8 +238,8 @@
   async function fetch_user_data(fetch_address) {
     console.log('Fetching Address Data: '+fetch_address);
     // No. STAKED Frogs owned by fetch_address
-    let staker_tokens = await stakers(fetch_address, 'amountStaked');
-    console.log('Total Frogs Staked: '+staker_tokens);
+    let staker_tokens = await controller.methods.getStakedTokens(fetch_address).call();
+    console.log('Total Frogs Staked: '+staker_tokens.length);
     // No. Frogs owned by fetch_address
     let user_tokens = await collection.methods.balanceOf(fetch_address).call();
     console.log('Total Frogs Held: '+user_tokens);
