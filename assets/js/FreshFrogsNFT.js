@@ -343,6 +343,7 @@
           '<div class="frog_imgContainer">'+
             '<img src="'+frog_external+'" class="frog_img"/>'+
           '</div>'+
+          '<br>'+
           '<div id="traits_'+frog_id+'" class="trait_list">'+
             '<b>Properties</b><div id="prop_'+frog_id+'" class="properties"></div>'+
           '</div>'+
