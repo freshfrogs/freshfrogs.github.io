@@ -364,13 +364,13 @@
       // Update Metadata!
       let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
       // Loop Each Attribute
-      for (var i = 0; i < metadata.attributes.length; i++) {
-        var attribute = metadata.attributes[i]
+      for (let i = 0; i < metadata.attributes.length; i++) {
+        let attribute = metadata.attributes[i]
         // Calculate Trait Rarity
-        try { var trait_rarity = ((traits_list[attribute.trait_type][attribute.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'e';}
-        if (trait_rarity < 1) { trait_rarity = '<1%' } else { trait_rarity = trait_rarity+'%' }
+        try { let trait_rarity = ((traits_list[attribute.trait_type][attribute.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {let trait_rarity = 'e';}
+        if (trait_rarity < 1) { let trait_rarity = '<1%' } else { let trait_rarity = trait_rarity+'%' }
         // Create Attribute Text Element
-        let trait_text = document.createElement('i')
+        trait_text = document.createElement('i')
         trait_text.innerHTML = attribute.trait_type+': '+attribute.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>';
         document.getElementById('prop_'+frog_id).appendChild(trait_text);
       }
