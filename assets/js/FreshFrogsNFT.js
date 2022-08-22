@@ -275,7 +275,7 @@
                 }
               } catch (e) {} // Supress Error if last_sale not found
               // Render Frog Element
-              render_token(token_id, sale_price)
+              await render_token(token_id, sale_price)
             })
           })
           .catch(e => { // OpenSea Error
