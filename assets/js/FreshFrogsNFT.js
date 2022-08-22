@@ -226,7 +226,7 @@
       collection_symbol = await f0.api.symbol().call();
       next_id = await f0.api.nextId().call();
       next_id = parseInt(next_id);
-      console.log('Connected');
+      console.log('Connected: '+user_address);
       //Output('<br><button onclick="claim_rewards()" style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frog(s) Staked '+''+stakers_rewards+' $FLYZ 🡥</button>'+'<br><hr style="background: black;">'+'<div class="console_pre" id="console-pre"></div>');
     } catch (e) { // Something Went Wrong!
       console.log('Connection Failed! '+e.message);
@@ -236,6 +236,7 @@
 
   // fetch_user_tokens() | Fetch User Tokens | Staked & Otherwise
   async function fetch_user_data(fetch_address) {
+    console.log('Fetching User Data: '+fetch_address);
     // No. STAKED Frogs owned by fetch_address
     let staker_tokens = await stakers(fetch_address, 'amountStaked');
     console.log('Total Staked: '+staker_tokens);
