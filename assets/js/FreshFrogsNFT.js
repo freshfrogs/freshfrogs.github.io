@@ -472,6 +472,7 @@
         // Assign and calculate recent sale price if applicable
         if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
           sale_price = total_price / Math.pow(10, decimals);
+          console.log('Frog #'+tokenId+' recent sale price: '+sale_price+' ETH');
           return sale_price;
         }
       } catch (e) { return false; } // Supress Error if last_sale not found
