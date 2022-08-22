@@ -320,10 +320,10 @@
   async function render_token(frog_id, recent_sale) {
     try {
       // Token Variable Links
-      frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
-      frog_etherscan = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
-      frog_gemxyz = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
-      frog_external = 'https://freshfrogs.io/frog/'+frog_id+'.png';
+      let frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
+      let frog_etherscan = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
+      let frog_gemxyz = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
+      let frog_external = 'https://freshfrogs.io/frog/'+frog_id+'.png';
       // <-- Begin Element
       frog_doc = document.getElementById('thePad');
       frog_token = document.createElement('div');
@@ -559,7 +559,7 @@
     // False, NOT currently staked
     if (!staked) {
       // Frog is not currently staked!
-      return
+      return 0.00
     // Currently Staked
     } else {
       // Loop blockchain transactions per parameters [NFT Transfer From: User ==> To: Staking Controller] & NFT is Currently Staked
