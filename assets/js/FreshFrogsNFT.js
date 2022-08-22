@@ -250,7 +250,7 @@
         // Loop Staked Frogs
         for (var i = 0; i < staker_tokens.length; i++) {
           tokenId = staker_tokens[i].tokenId
-          await render_token(tokenId)
+          render_token(tokenId)
         }
       }
       // Render Frogs Held by Fetch Address
@@ -275,7 +275,7 @@
                 }
               } catch (e) {} // Supress Error if last_sale not found
               // Render Frog Element
-              await render_token(token_id, sale_price)
+              render_token(token_id, sale_price)
             })
           })
           .catch(e => { // OpenSea Error
