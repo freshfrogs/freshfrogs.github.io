@@ -341,7 +341,7 @@
             '<img src="'+frog_external+'" class="frog_img"/>'+
           '</div>'+
           '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
-          '<strong id="level_'+frog_id+'" class="frog_level"><br></strong>'+
+          '<strong id="level_'+frog_id+'" class="frog_level"><br></strong><br>'+
           '<div id="traits_'+frog_id+'" class="trait_list">'+
             '<b>Properties</b><div id="prop_'+frog_id+'" class="properties"></div>'+
           '</div>'+
@@ -407,7 +407,7 @@
         elem = document.getElementById('myBar_'+frog_id);
         width = percent;
         elem.style.width = width + "%";
-        document.getElementById('level_'+frog_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Staked Level '+staked_level+'</b>';
+        document.getElementById('level_'+frog_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Staked Level '+staked_level+'</b><br>';
       }
     } catch (e) { console.log('Failed to render_token() Frog #'+frog_id+'\n'+e.message); }
   }
