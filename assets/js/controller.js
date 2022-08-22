@@ -258,4 +258,35 @@
     } catch (e) { console.log('Failed to call stakers(): '+e.message); }
   }
 
+  // Custom Functions, 
+
+  // Calculate total time a Frog has been staked (Hours)
+  async function timeStaked(tokenId) {
+    // Is Frog currently staked?
+    let staked = await stakerAddress(tokenId);
+    // False, NOT currently staked
+    if (!staked) {
+      console.log('Error fetching staked_time(): Frog #'+tokenId+' is not currently staked!');
+      return
+    // Currently Staked
+    } else {
+      try {
+        // Loop blockchain transactions per parameters [NFT Transfer From: User ==> To: Staking Controller] & NFT is Currently Staked
+        let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'tokenId': tokenId}, fromBlock: 0, toBlock: 'latest'});
+        // Fetch Block Number from Txn
+        let staked_block = parseInt(stakingEvents[0].blockNumber);
+        // Fetch Timestamp for block txn
+        let staked_time = await web3.eth.getBlock(staked_block);
+        let staked_date = new Date(staked_time.timestamp*1000);
+        // Calculate Time Staked in Hours
+        let staked_duration = Date.now() - staked_date;
+        let staked_hours = Math.floor(staked_duration/1000/60/60);
+        //console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
+        // Return time staked in (Hours)
+        return staked_hours;
+      // Catch Error(s)
+      } catch (e) { console.log('Failed to fetch timeStaked(): '+e.message); }
+    }
+  }
+
 // Coded by NF7UOS
