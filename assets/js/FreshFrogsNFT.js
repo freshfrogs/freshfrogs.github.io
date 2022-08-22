@@ -324,16 +324,17 @@
       let frog_etherscan = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
       let frog_gemxyz = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
       let frog_external = 'https://freshfrogs.io/frog/'+frog_id+'.png';
+      let frog_name = 'Frog #'+frog_id;
       // <-- Begin Element
       frog_doc = document.getElementById('thePad');
       frog_token = document.createElement('div');
-      frog_token.id = 'Frog #'+frog_id;
+      frog_token.id = frog_name;
       frog_token.className = 'frog_token';
       // Element Inner HTML
       frog_token.innerHTML =
       '<div class="frogTokenCont">'+
         '<div style="text-align: left; margin: 8px; height: 16px;">'+
-          '<strong id="frog_'+frog_id+'" class="frog_name"></strong><strong id="price_'+frog_id+'" class="frog_price"></strong>'+
+          '<strong id="frog_'+frog_id+'" class="frog_name">'+frog_name+'</strong><strong id="price_'+frog_id+'" class="frog_price"></strong>'+
         '</div>'+
         '<div class="frog_imgContainer">'+
           '<img src="'+frog_external+'" class="frog_img"/>'+
@@ -360,8 +361,6 @@
       if (recent_sale !== false && typeof recent_sale !== 'undefined') {
         document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+recent_sale;
       }
-      // Update Name
-      document.getElementById('frog_'+frog_id).innerHTML = 'Frog #'+frog_id;
       // Update Metadata!
       let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
       // Loop Each Attribute
@@ -376,7 +375,7 @@
         document.getElementById('prop_'+frog_id).appendChild(trait_text);
       }
       // Create Button Element(s)
-      let button_b = document.createElement('div');
+      button_b = document.createElement('div');
       button_b.style.width = 'fit-content';
       button_b.style.marginLeft = 'auto';
       button_b.style.marginRight = 'auto';
@@ -394,7 +393,7 @@
         button_b.innerHTML = '<br><button class="frog_button" style="background: coral; border: 1px solid black; font-weight: bold;" onclick="withdraw('+frog_id+')">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button" style="font-weight: bold;">Rankings 🡥</button></a>';
         document.getElementById('traits_'+frog_id).appendChild(button_b);
         // Create Owner Element and Staking Level
-        let trait_text = document.createElement('i')
+        trait_text = document.createElement('i')
         trait_text.innerHTML = 'Owner: '+truncateAddress(staked)+'<br>';
         document.getElementById('prop_'+frog_id).appendChild(trait_text);
         // Check Staked Time / Calculate Level
