@@ -359,7 +359,7 @@
       // Create Element -->
       frog_doc.appendChild(frog_token);
       // Update Recent Sale Price
-      if (recent_sale !== false && recent_sale !== 'undefined') {
+      if (recent_sale !== false && typeof recent_sale !== 'undefined') {
         document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+recent_sale;
       }
       // Update Name
