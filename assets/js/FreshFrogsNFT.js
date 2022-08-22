@@ -504,7 +504,9 @@
   async function stakerAddress(tokenId) {
     try {
       let stakerAddress = await controller.methods.stakerAddress(tokenId).call();
-      return stakerAddress
+      if (stakerAddress !== '0x0000000000000000000000000000000000000000') {
+        return stakerAddress
+      } else { return false } // TokenId Not Currently Staked
     } catch (e) { console.log('Failed to call stakerAddress(): '+e.message); }
   }
 
