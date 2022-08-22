@@ -237,9 +237,11 @@
   // fetch_user_tokens() | Fetch User Tokens | Staked & Otherwise
   async function fetch_user_data(fetch_address) {
     // No. STAKED Frogs owned by fetch_address
-    let staker_tokens = await controller.methods.getStakedTokens(fetch_address).call();
+    let staker_tokens = await stakers(fetch_address, 'amountStaked');
+    console.log('Total Staked: '+staker_tokens);
     // No. Frogs owned by fetch_address
     let user_tokens = await collection.methods.balanceOf(fetch_address).call();
+    console.log('Total Held: '+user_tokens);
     // Must own atleast one Frog or atleast one Staked!
     if (user_tokens >= 1 || staker_tokens.length >= 1) {
       // Render Frogs Staked by User
