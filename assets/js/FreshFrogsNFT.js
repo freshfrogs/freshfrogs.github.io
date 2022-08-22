@@ -326,8 +326,8 @@
       let frog_external = 'https://freshfrogs.io/frog/'+frog_id+'.png';
       let frog_name = 'Frog #'+frog_id;
       // <-- Begin Element
-      frog_doc = document.getElementById('thePad');
-      frog_token = document.createElement('div');
+      var frog_doc = document.getElementById('thePad');
+      var frog_token = document.createElement('div');
       frog_token.id = frog_name;
       frog_token.className = 'frog_token';
       // Element Inner HTML
@@ -346,36 +346,26 @@
         '</div>'+
       '</div>';
       // Element Listener Function
-      frog_token.onclick = function() { 
-        if (!morph) {
-          display_token(frog_id, true);
-        } else {
-          sub_frog = frog_id;
-          combineTokens(base_frog, sub_frog);
-          document.getElementById('baseText').innerHTML = 'Frog #'+sub_frog;
-        }
-      }
+      frog_token.onclick = function() { display_token(frog_id, true); }
       // Create Element -->
       frog_doc.appendChild(frog_token);
       // Update Recent Sale Price
-      if (recent_sale !== false && typeof recent_sale !== 'undefined') {
-        document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+recent_sale;
-      }
+      if (recent_sale !== false && typeof recent_sale !== 'undefined') { document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+recent_sale; }
       // Update Metadata!
       let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
       // Loop Each Attribute
       for (let i = 0; i < metadata.attributes.length; i++) {
         let attribute = metadata.attributes[i]
         // Calculate Trait Rarity
-        try { let trait_rarity = ((traits_list[attribute.trait_type][attribute.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {let trait_rarity = 'e';}
+        try { let trait_rarity = ((traits_list[attribute.trait_type][attribute.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) { let trait_rarity = 'e'; }
         if (trait_rarity < 1) { let trait_rarity = '<1%' } else { let trait_rarity = trait_rarity+'%' }
         // Create Attribute Text Element
-        trait_text = document.createElement('i')
+        var trait_text = document.createElement('i')
         trait_text.innerHTML = attribute.trait_type+': '+attribute.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>';
         document.getElementById('prop_'+frog_id).appendChild(trait_text);
       }
       // Create Button Element(s)
-      button_b = document.createElement('div');
+      var button_b = document.createElement('div');
       button_b.style.width = 'fit-content';
       button_b.style.marginLeft = 'auto';
       button_b.style.marginRight = 'auto';
@@ -393,16 +383,16 @@
         button_b.innerHTML = '<br><button class="frog_button" style="background: coral; border: 1px solid black; font-weight: bold;" onclick="withdraw('+frog_id+')">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button" style="font-weight: bold;">Rankings 🡥</button></a>';
         document.getElementById('traits_'+frog_id).appendChild(button_b);
         // Create Owner Element and Staking Level
-        trait_text = document.createElement('i')
+        var trait_text = document.createElement('i')
         trait_text.innerHTML = 'Owner: '+truncateAddress(staked)+'<br>';
         document.getElementById('prop_'+frog_id).appendChild(trait_text);
         // Check Staked Time / Calculate Level
         let staked_time_bool = await timeStaked(frog_id);
-        if (staked_time_bool >= 2000) { staked_level = 3; } else if (staked_time_bool >= 1000) { staked_level = 2; } else { staked_level = 1; }
+        if (staked_time_bool >= 2000) { let staked_level = 3; } else if (staked_time_bool >= 1000) { let staked_level = 2; } else { let staked_level = 1; }
         // Update Progress Bar
-        percent = parseInt((staked_time_bool/(1000*staked_level))*100);
-        elem = document.getElementById('myBar_'+frog_id);
-        width = percent;
+        let percent = parseInt((staked_time_bool/(1000*staked_level))*100);
+        let elem = document.getElementById('myBar_'+frog_id);
+        let width = percent;
         elem.style.width = width + "%";
         document.getElementById('level_'+frog_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Staked Level '+staked_level+'</b>';
       }
