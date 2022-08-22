@@ -407,7 +407,7 @@
           button_b.innerHTML = '<br><button class="frog_button" style="background: coral; border: 1px solid black; font-weight: bold;" onclick="withdraw('+frog_id+')">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button" style="font-weight: bold;">Rankings 🡥</button></a>';
           document.getElementById('traits_'+frog_id).appendChild(button_b);
   
-          // Create Owner Element and Staking Level
+          // Create Owner Element and Staking Level //
           var trait_text = document.createElement('i')
           trait_text.innerHTML = 'Owner: '+truncateAddress(staked)+'<br>';
           document.getElementById('prop_'+frog_id).appendChild(trait_text);
