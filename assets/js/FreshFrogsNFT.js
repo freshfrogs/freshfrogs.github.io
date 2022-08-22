@@ -331,8 +331,24 @@
       frog_token = document.createElement('div');
       frog_token.id = 'Frog #'+frog_id;
       frog_token.className = 'frog_token';
+      // Is Frog Currently Staked?
+      let staked = await stakerAddress(frog_id);
       // Element Inner HTML
-      frog_token.innerHTML =
+      if (!staked) {
+        frog_token.innerHTML =
+        '<div class="frogTokenCont">'+
+          '<div style="text-align: left; margin: 8px; height: 16px;">'+
+            '<strong id="frog_'+frog_id+'" class="frog_name"></strong><strong id="price_'+frog_id+'" class="frog_price"></strong>'+
+          '</div>'+
+          '<div class="frog_imgContainer">'+
+            '<img src="'+frog_external+'" class="frog_img"/>'+
+          '</div>'+
+          '<div id="traits_'+frog_id+'" class="trait_list">'+
+            '<b>Properties</b><div id="prop_'+frog_id+'" class="properties"></div>'+
+          '</div>'+
+        '</div>';
+      } else {
+        frog_token.innerHTML =
         '<div class="frogTokenCont">'+
           '<div style="text-align: left; margin: 8px; height: 16px;">'+
             '<strong id="frog_'+frog_id+'" class="frog_name"></strong><strong id="price_'+frog_id+'" class="frog_price"></strong>'+
@@ -346,6 +362,7 @@
             '<b>Properties</b><div id="prop_'+frog_id+'" class="properties"></div>'+
           '</div>'+
         '</div>';
+      }
       // Element Listener Function
       frog_token.onclick = function() { 
         if (!morph) {
@@ -382,8 +399,7 @@
       button_b.style.width = 'fit-content';
       button_b.style.marginLeft = 'auto';
       button_b.style.marginRight = 'auto';
-      // Is Frog Currently Staked?
-      let staked = await stakerAddress(frog_id);
+      // Staked or Not?
       if (!staked) { // Stake Button
         // Create Button
         button_b.innerHTML = 
