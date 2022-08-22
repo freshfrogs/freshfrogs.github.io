@@ -518,6 +518,7 @@
   async function stakers(userAddress, dataFetch) {
     try {
       let stakers = await controller.methods.stakers(userAddress).call();
+      console.log(stakers)
       return stakers.dataFetch
     } catch (e) { console.log('Failed to call stakers(): '+e.message); }
   }
