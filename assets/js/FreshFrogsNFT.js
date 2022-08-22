@@ -519,6 +519,7 @@
     try {
       let stakers = await controller.methods.stakers(userAddress).call();
       console.log(stakers)
+      console.log(stakers.dataFetch)
       return stakers.dataFetch
     } catch (e) { console.log('Failed to call stakers(): '+e.message); }
   }
