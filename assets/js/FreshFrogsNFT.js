@@ -321,109 +321,111 @@
 
     // Is Frog Currently Staked?
     await stakerAddress(frog_id).then(staked => {
-      console.log(staked);
-    })
-    
-    // Token Variable Links
-    let frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
-    let frog_etherscan = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
-    let frog_gemxyz = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
-    let frog_external = 'https://freshfrogs.io/frog/'+frog_id+'.png';
-    let frog_name = 'Frog #'+frog_id;
 
-    // <-- Begin Element
-    frog_doc = document.getElementById('thePad');
-    frog_token = document.createElement('div');
-    frog_token.id = frog_name;
-    frog_token.className = 'frog_token';
-    frog_token.onclick = function() { display_token(frog_id, true); }
+      console.log('Frog #'+frog_id+': '+staked);
+      // Token Variable Links
+      let frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
+      let frog_etherscan = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
+      let frog_gemxyz = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
+      let frog_external = 'https://freshfrogs.io/frog/'+frog_id+'.png';
+      let frog_name = 'Frog #'+frog_id;
 
-    // Element Inner HTML
-    frog_token.innerHTML =
-      '<div class="frogTokenCont">'+
-        '<div style="text-align: left; margin: 8px; height: 16px;">'+
-          '<strong id="frog_'+frog_id+'" class="frog_name">'+frog_name+'</strong><strong id="price_'+frog_id+'" class="frog_price"></strong>'+
-        '</div>'+
-        '<div class="frog_imgContainer">'+
-          '<img src="'+frog_external+'" class="frog_img"/>'+
-        '</div>'+
-        '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
-        '<strong id="level_'+frog_id+'" class="frog_level"><br></strong>'+
-        '<div id="traits_'+frog_id+'" class="trait_list">'+
-          '<b>Properties</b><div id="prop_'+frog_id+'" class="properties"></div>'+
-        '</div>'+
-      '</div>';
+      // <-- Begin Element
+      frog_doc = document.getElementById('thePad');
+      frog_token = document.createElement('div');
+      frog_token.id = frog_name;
+      frog_token.className = 'frog_token';
+      frog_token.onclick = function() { display_token(frog_id, true); }
 
-    // Create Element -->
-    frog_doc.appendChild(frog_token);
+      // Element Inner HTML
+      frog_token.innerHTML =
+        '<div class="frogTokenCont">'+
+          '<div style="text-align: left; margin: 8px; height: 16px;">'+
+            '<strong id="frog_'+frog_id+'" class="frog_name">'+frog_name+'</strong><strong id="price_'+frog_id+'" class="frog_price"></strong>'+
+          '</div>'+
+          '<div class="frog_imgContainer">'+
+            '<img src="'+frog_external+'" class="frog_img"/>'+
+          '</div>'+
+          '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
+          '<strong id="level_'+frog_id+'" class="frog_level"><br></strong>'+
+          '<div id="traits_'+frog_id+'" class="trait_list">'+
+            '<b>Properties</b><div id="prop_'+frog_id+'" class="properties"></div>'+
+          '</div>'+
+        '</div>';
 
-    // Update Recent Sale Price
-    if (recent_sale !== false && typeof recent_sale !== 'undefined') { document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+recent_sale; }
+      // Create Element -->
+      frog_doc.appendChild(frog_token);
 
-    // Update Metadata!
-    let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
+      // Update Recent Sale Price
+      if (recent_sale !== false && typeof recent_sale !== 'undefined') { document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+recent_sale; }
 
-    // Loop Each Attribute
-    for (let i = 0; i < metadata.attributes.length; i++) {
+      // Update Metadata!
+      let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
 
-      // attribute.trait_type : attribute.value
-      let attribute = metadata.attributes[i]
+      // Loop Each Attribute
+      for (let i = 0; i < metadata.attributes.length; i++) {
 
-      // Calculate Trait Rarity
-      try { trait_rarity = ((traits_list[attribute.trait_type][attribute.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) { trait_rarity = 'e'; }
+        // attribute.trait_type : attribute.value
+        let attribute = metadata.attributes[i]
 
-      // Tune Rarity
-      if (trait_rarity < 1) {
-        trait_rarity = '<1%'
-      } else {
-        trait_rarity = trait_rarity+'%'
+        // Calculate Trait Rarity
+        try { trait_rarity = ((traits_list[attribute.trait_type][attribute.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) { trait_rarity = 'e'; }
+
+        // Tune Rarity
+        if (trait_rarity < 1) {
+          trait_rarity = '<1%'
+        } else {
+          trait_rarity = trait_rarity+'%'
+        }
+
+        // Create Attribute Text Element
+        var trait_text = document.createElement('i')
+        trait_text.innerHTML = attribute.trait_type+': '+attribute.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>';
+        document.getElementById('prop_'+frog_id).appendChild(trait_text);
+
       }
 
-      // Create Attribute Text Element
-      var trait_text = document.createElement('i')
-      trait_text.innerHTML = attribute.trait_type+': '+attribute.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>';
-      document.getElementById('prop_'+frog_id).appendChild(trait_text);
+      // Create Button Element(s)
+      var button_b = document.createElement('div');
+      button_b.style.width = 'fit-content';
+      button_b.style.marginLeft = 'auto';
+      button_b.style.marginRight = 'auto';
 
-    }
+      if (!staked) {
 
-    // Create Button Element(s)
-    var button_b = document.createElement('div');
-    button_b.style.width = 'fit-content';
-    button_b.style.marginLeft = 'auto';
-    button_b.style.marginRight = 'auto';
+        // Stake Button
+        button_b.innerHTML = 
+          '<br>'+
+          '<button class="frog_button" style="background: lightgreen; border: 1px solid black; font-weight: bold;" onclick="stake('+frog_id+')">Stake 🡥</button>'+
+          '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button" style="font-weight: bold;">Rankings 🡥</button></a>';
+        document.getElementById('traits_'+frog_id).appendChild(button_b);
 
-    if (!staked) {
+      } else { 
+        
+        // Or Un-stake Button
+        button_b.innerHTML = '<br><button class="frog_button" style="background: coral; border: 1px solid black; font-weight: bold;" onclick="withdraw('+frog_id+')">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button" style="font-weight: bold;">Rankings 🡥</button></a>';
+        document.getElementById('traits_'+frog_id).appendChild(button_b);
 
-      // Stake Button
-      button_b.innerHTML = 
-        '<br>'+
-        '<button class="frog_button" style="background: lightgreen; border: 1px solid black; font-weight: bold;" onclick="stake('+frog_id+')">Stake 🡥</button>'+
-        '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button" style="font-weight: bold;">Rankings 🡥</button></a>';
-      document.getElementById('traits_'+frog_id).appendChild(button_b);
+        // Create Owner Element and Staking Level
+        var trait_text = document.createElement('i')
+        trait_text.innerHTML = 'Owner: '+truncateAddress(staked)+'<br>';
+        document.getElementById('prop_'+frog_id).appendChild(trait_text);
 
-    } else { 
-      
-      // Or Un-stake Button
-      button_b.innerHTML = '<br><button class="frog_button" style="background: coral; border: 1px solid black; font-weight: bold;" onclick="withdraw('+frog_id+')">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button" style="font-weight: bold;">Rankings 🡥</button></a>';
-      document.getElementById('traits_'+frog_id).appendChild(button_b);
+        // Check Staked Time / Calculate Level
+        let staked_time_bool = await timeStaked(frog_id);
+        if (staked_time_bool >= 2000) { let staked_level = 3; } else if (staked_time_bool >= 1000) { let staked_level = 2; } else { let staked_level = 1; }
 
-      // Create Owner Element and Staking Level
-      var trait_text = document.createElement('i')
-      trait_text.innerHTML = 'Owner: '+truncateAddress(staked)+'<br>';
-      document.getElementById('prop_'+frog_id).appendChild(trait_text);
+        // Update Progress Bar
+        let percent = parseInt((staked_time_bool/(1000*staked_level))*100);
+        let elem = document.getElementById('myBar_'+frog_id);
+        let width = percent;
+        elem.style.width = width + "%";
+        document.getElementById('level_'+frog_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Staked Level '+staked_level+'</b>';
 
-      // Check Staked Time / Calculate Level
-      let staked_time_bool = await timeStaked(frog_id);
-      if (staked_time_bool >= 2000) { let staked_level = 3; } else if (staked_time_bool >= 1000) { let staked_level = 2; } else { let staked_level = 1; }
+      }
 
-      // Update Progress Bar
-      let percent = parseInt((staked_time_bool/(1000*staked_level))*100);
-      let elem = document.getElementById('myBar_'+frog_id);
-      let width = percent;
-      elem.style.width = width + "%";
-      document.getElementById('level_'+frog_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Staked Level '+staked_level+'</b>';
+    })
 
-    }
   }
 
   // load_trait(_trait(family), _attribute(type), _where(element))
