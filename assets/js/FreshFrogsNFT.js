@@ -539,6 +539,10 @@
 
       newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"2.gif"
 
+    } else if (attribute.includes('shades') || attribute.includes('Shades')) {
+
+      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"_animation.gif"
+
     } else {
 
       // Assign Source
