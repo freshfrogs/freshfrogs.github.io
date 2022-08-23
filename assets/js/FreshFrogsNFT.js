@@ -350,7 +350,7 @@
     // Create Element -->
     frog_doc.appendChild(frog_token);
 
-    // Update Recent Sale Price //
+    // Update Recent Sale Price
     let recent_sale = await get_asset_price(frog_id);
 
     // Update Metadata!
