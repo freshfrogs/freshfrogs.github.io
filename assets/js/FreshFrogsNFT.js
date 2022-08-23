@@ -484,11 +484,12 @@
 
         }
 
+        // Return recent sale price
         return sale_price;
 
       } catch (e) {
 
-        // Catch error
+        // Catch error, return false
         return sale_price;
 
       }
