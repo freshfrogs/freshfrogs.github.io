@@ -315,6 +315,7 @@
   async function render_token(frog_id) {
     
     let recent_sale = await get_asset_price(frog_id);
+    console.log('Frog #'+tokenId+' sale price: '+recent_sale);
 
     // Is Frog Currently Staked?
     let staked = await stakerAddress(frog_id);
@@ -480,7 +481,6 @@
 
           // Calculate recent sale price
           sale_price = total_price / Math.pow(10, decimals);
-          console.log('Frog #'+tokenId+' sale price: '+sale_price);
 
         }
 
