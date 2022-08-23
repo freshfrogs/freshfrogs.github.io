@@ -317,7 +317,7 @@
     // Is Frog Currently Staked?
     let staked = await stakerAddress(frog_id);
 
-    // Update Recent Sale Price
+    // Update Recent Sale Price //
     let recent_sale = await get_asset_price(frog_id);
 
     // Token Variable Links
