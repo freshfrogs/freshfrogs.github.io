@@ -469,8 +469,10 @@
 
       try {
 
+        try {
         // Retrieve Token Data //
         var { last_sale: { payment_token: { decimals }, total_price } } = token
+        } catch (e) {console.log(e.message)}
 
         // If recent sale price is found
         if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
