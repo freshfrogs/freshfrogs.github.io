@@ -351,6 +351,7 @@
       // Update Button Properties
       // Left Most Button
       button_left.href = etherscanLink;
+      button_left.target = '_blank';
 
       // Middle Button
       button_middle.innerHTML = '<strong>Owner</strong>'+truncateAddress(staked);
