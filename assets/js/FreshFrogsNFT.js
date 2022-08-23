@@ -539,11 +539,7 @@
 
       newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"2.gif"
 
-    } else if (attribute.includes('shades') || attribute.includes('Shades')) {
-
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"_animation.gif"
-
-    } else if (attribute == 'tongue') {
+    } else if (attribute.includes('shades') || attribute.includes('Shades') || attribute.includes('tongue')) {
 
       newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"_animation.gif"
 
