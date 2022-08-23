@@ -555,7 +555,7 @@
     let owned = await collection.methods.ownerOf(tokenId).call();
 
     // Owned by User attempting to Stake
-    if (owned.toLowerCase() == userAddress.toLowerCase()) {
+    if (owned == userAddress) {
 
       try {
 
