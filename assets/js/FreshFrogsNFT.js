@@ -479,7 +479,7 @@
         }
 
         // Return recent sale price
-        document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+recent_sale;
+        document.getElementById('price_'+tokenId).innerHTML = 'Ξ'+recent_sale;
         console.log('Frog #'+tokenId+' recent sale: Ξ'+recent_sale);
 
       } catch (e) {
