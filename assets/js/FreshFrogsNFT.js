@@ -331,7 +331,7 @@
     frog_token.className = 'frog_token';
     frog_token.onclick = function() { display_token(frog_id, true); }
 
-    // Element Inner HTML
+    // Element Inner HTML //
     frog_token.innerHTML =
       '<div class="frogTokenCont">'+
         '<div style="text-align: left; margin: 8px; height: 16px;">'+
