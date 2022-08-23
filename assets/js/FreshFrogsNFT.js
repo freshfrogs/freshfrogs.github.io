@@ -354,7 +354,7 @@
     frog_doc.appendChild(frog_token);
 
     // Update Recent Sale Price //
-    if (!recent_sale) {} else { document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+recent_sale; }
+    if (!recent_sale) { } else { document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+recent_sale; }
 
     // Update Metadata!
     let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
