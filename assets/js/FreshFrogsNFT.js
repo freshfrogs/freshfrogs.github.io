@@ -349,13 +349,16 @@
       let stakedHours = await timeStaked(tokenId);
 
       // Update Button Properties
+      // Left Most Button
       button_left.href = etherscanLink;
 
+      // Middle Button
       button_middle.innerHTML = '<strong>Owner</strong>'+truncateAddress(staked);
-      button_middle.href = ''
+      button_middle.href = 'https://opensea.io/'+staked;
 
+      // Right Button
       button_right.innerHTML = '<strong>Time Staked</strong>'+stakedHours+' hrs';
-      button_middle.href = ''
+      button_middle.removeAttribute('href');
 
     }
 
