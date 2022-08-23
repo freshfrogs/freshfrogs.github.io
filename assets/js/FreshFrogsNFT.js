@@ -466,29 +466,34 @@
     fetch('https://api.opensea.io/api/v1/asset/'+CONTRACT_ADDRESS+'/'+tokenId+'/?include_orders=false', options)
     .then(token => token.json())
     .then((token) => {
-      
-      // Attempt to retrieve recent sale price
-      var sale_price = false; 
 
-      // Retrieve Token Data
-      var { last_sale: { payment_token: { decimals }, total_price } } = token
+      try {
 
-      // Assign and calculate recent sale price if applicable
-      if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
+        // Attempt to retrieve recent sale price
+        var sale_price = false; 
 
-        sale_price = total_price / Math.pow(10, decimals);
-        console.log('Frog #'+tokenId+' sale price: '+sale_price);
+        // Retrieve Token Data
+        var { last_sale: { payment_token: { decimals }, total_price } } = token
+
+        // If recent sale price is found
+        if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
+
+          // Calculate recent sale price
+          sale_price = total_price / Math.pow(10, decimals);
+          console.log('Frog #'+tokenId+' sale price: '+sale_price);
+
+        }
+
         return sale_price;
 
-      } else {
+      } catch (e) {
 
-        // last_sale not found
-        return false
+        // Catch error
+        return sale_price;
 
       }
 
     })
-    .catch(err => console.error(err));
 
   }
 
