@@ -535,16 +535,16 @@
     }
 
     // Smoking Animations
-    if (attribute.includes('shades') || attribute.includes('Shades') || attribute.includes('tongue') || attribute.includes('smoking')) {
+    //if (attribute.includes('shades') || attribute.includes('Shades') || attribute.includes('tongue') || attribute.includes('smoking')) {
 
       newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"_animation.gif"
 
-    } else {
+    //} else {
 
       // Assign Source
       newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
 
-    }
+    //}
 
     // Render Trait Image
     document.getElementById(where).appendChild(newAttribute);
