@@ -351,7 +351,7 @@
       // Update Button Properties
       button_left.href = etherscanLink;
 
-      button_middle.innerHTML = '<strong>Owner</strong>'+staked;
+      button_middle.innerHTML = '<strong>Owner</strong>'+truncateAddress(staked);
       button_middle.href = ''
 
       button_right.innerHTML = '<strong>Time Staked</strong>'+timeStaked+' hrs';
