@@ -535,11 +535,7 @@
     }
 
     // Smoking Animations
-    if (attribute.includes('smoking')) {
-
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"2.gif"
-
-    } else if (attribute.includes('shades') || attribute.includes('Shades') || attribute.includes('tongue')) {
+    if (attribute.includes('shades') || attribute.includes('Shades') || attribute.includes('tongue') || attribute.includes('smoking')) {
 
       newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"_animation.gif"
 
