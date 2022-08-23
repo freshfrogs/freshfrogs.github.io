@@ -359,7 +359,7 @@
       button_middle.target = '_blank';
 
       // Right Button
-      button_right.innerHTML = '<strong>Time Staked</strong>'+stakedHours+' hrs';
+      button_right.innerHTML = '<strong>Time Staked</strong>'+stakedHours+' hours';
       button_right.removeAttribute('href');
 
     }
