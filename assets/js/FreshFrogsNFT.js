@@ -236,56 +236,93 @@
 
   // fetch_user_tokens() | Fetch User Tokens | Staked & Otherwise
   async function fetch_user_data(fetch_address) {
-    console.log('Fetching Address Data: '+fetch_address);
+
     // No. STAKED Frogs owned by fetch_address
     let staker_tokens = await controller.methods.getStakedTokens(fetch_address).call();
-    console.log('Total Frogs Staked: '+staker_tokens.length);
+
     // No. Frogs owned by fetch_address
     let user_tokens = await collection.methods.balanceOf(fetch_address).call();
-    console.log('Total Frogs Held: '+user_tokens);
+
     // Must own atleast one Frog or atleast one Staked!
     if (user_tokens >= 1 || staker_tokens.length >= 1) {
+
       // Render Frogs Staked by User
       if (staker_tokens.length >= 1) {
+
         try {
+
           // Loop Staked Frogs
           for (var i = 0; i < staker_tokens.length; i++) {
+
             tokenId = staker_tokens[i].tokenId
             render_token(tokenId)
+
           }
+
         } catch (e) {
+
           console.log('Failed to talk to FreshFrogsController!');
           console.log(e.message);
+
         }
+        
       }
+
       // Render Frogs Held by Fetch Address
       if (user_tokens >= 1) {
+
         // Interations of 50
-        let pages = parseInt(user_tokens/50) + 1; // Round Pages up by one
+        let pages = parseInt(user_tokens/50) + 1;
+
+        // Loop Pages
         for (var i = 0; i < pages; i++) {
+
           // Fetch OpenSea Data
           fetch('https://api.opensea.io/api/v1/assets?owner='+fetch_address+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+(i * 50)+'&limit=50&include_orders=false', options)
           .then((tokens) => tokens.json())
           .then((tokens) => {
+
             // For Each Token
             var { assets } = tokens
             assets.forEach((frog) => {
+
               // Retrieve Token Data
-              var { token_id } = frog
-              // Render Frog Element
-              render_token(token_id)
+              try { var { token_id, last_sale: { payment_token: { decimals }, total_price }} = frog } catch (e) {}
+
+              // Calculate recent sale price if applicable
+              if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
+
+                let sale_price = total_price / Math.pow(10, decimals);
+                render_token(token_id, sale_price);
+
+              } else {
+
+                render_token(token_id);
+
+              }
+
             })
+
           })
-          .catch(e => { // OpenSea Error
+          .catch(e => {
+
             console.log('Failed to talk to OpenSea!');
             console.log(e.message);
+
           })
+
         }
+
       }
-    } else { // Does not own atleast one Frog!
+
+    } else {
+      
+      // Does not own atleast one Frog!
       Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div class="console_pre" id="console-pre"></div>')
       return;
+
     }
+
   }
 
   // Display Frog Token
@@ -312,7 +349,9 @@
   }
 
   // render_token()
-  async function render_token(frog_id) {
+  async function render_token(frog_id, recent_sale) {
+
+    if (!recent_sale) { recent_sale = '' }
 
     // Is Frog Currently Staked? //
     let staked = await stakerAddress(frog_id);
@@ -335,7 +374,7 @@
     frog_token.innerHTML =
       '<div class="frogTokenCont">'+
         '<div style="text-align: left; margin: 8px; height: 16px;">'+
-          '<strong id="frog_'+frog_id+'" class="frog_name">'+frog_name+'</strong><strong id="price_'+frog_id+'" class="frog_price"></strong>'+
+          '<strong id="frog_'+frog_id+'" class="frog_name">'+frog_name+'</strong><strong id="price_'+frog_id+'" class="frog_price">Ξ'+recent_sale+'</strong>'+
         '</div>'+
         '<div class="frog_imgContainer" id="cont_'+frog_id+'">'+
           //'<img src="'+frog_external+'" class="frog_img"/>'+
@@ -351,7 +390,9 @@
     frog_doc.appendChild(frog_token);
 
     // Update Recent Sale Price
-    await get_asset_price(frog_id);
+    //await get_asset_price(frog_id);
+
+    //document.getElementById('price_'+tokenId).innerHTML = 'Ξ'+recent_sale;
 
     // Update Metadata!
     let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
