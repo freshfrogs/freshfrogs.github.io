@@ -345,15 +345,8 @@
       image-rendering: pixelated;
       overflow: hidden;
     }
-    .frogImg2:hover{
-      -ms-transform: scale(1.5); /* IE 9 */
-      -webkit-transform: scale(1.5); /* Safari 3-8 */
-      transform: scale(1.5);
-      box-shadow: none;
-      border: none;
-    }
     .frogImg2 {
-      transition: transform .2s;
+      transition: all .2s;
       display: block;
       image-rendering: pixelated;
       overflow: hidden;
@@ -362,18 +355,21 @@
       height: 128px;
       border-radius: 5px;
     }
+    .frogImg2:hover{
+      -ms-transform: scale(1.1); /* IE 9 */
+      -webkit-transform: scale(1.1); /* Safari 3-8 */
+      transform: scale(1.1);
+      opacity: 0.4;
+    }
     .frogImg3 {
-      transition: transform .2s;
+      transition: all .2s;
       display: block;
       image-rendering: pixelated;
       overflow: hidden;
       position: absolute;
-      width: 1024px !important;
-      height: 1024px !important;
+      width: 128px;
+      height: 128px;
       border-radius: 5px;
-      border-bottom-left-radius: 0px;
-      border-bottom-right-radius: 0px;
-      max-width: 400% !important;
     }
     .frogImg4 {
       transition: all .2s;
