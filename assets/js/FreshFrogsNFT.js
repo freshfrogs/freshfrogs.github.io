@@ -463,7 +463,7 @@
   // Recent Sale Price
   async function get_asset_price(tokenId) {
 
-    fetch('https://api.opensea.io/api/v1/asset/'+CONTRACT_ADDRESS+'/'+tokenId+'/?include_orders=false', {method: 'GET'})
+    fetch('https://api.opensea.io/api/v1/asset/'+CONTRACT_ADDRESS+'/'+tokenId+'/?include_orders=false', options)
     .then(token => token.json())
     .then((token) => {
 
