@@ -326,26 +326,64 @@
   }
 
   // Display Frog Token
-  async function display_token(tokenId){
+  async function display_token(tokenId) {
+
     // Assign Variables
-    openseaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
-    etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
-    displayImg = 'https://freshfrogs.io/frog/'+tokenId+'.png'
-    displayName = 'Frog #'+tokenId
+    var button_left = document.getElementById('button_left');
+    var button_middle = document.getElementById('button_middle');
+    var button_right = document.getElementById('button_right');
+    
+    let openseaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
+    let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
+    let displayImg = 'https://freshfrogs.io/frog/'+tokenId+'.png'
+    let displayName = 'Frog #'+tokenId
+
+    // Is this token currently staked?
+    let staked = await stakerAddress(tokenId)
+
+    if (!staked) {
+      // NOT Staked
+    } else {
+
+      // Get Total Hours Staked
+      let timeStaked = await timeStaked(tokenId);
+
+      // Update Button Properties
+      button_left.href = etherscanLink;
+
+      button_middle.innerHTML = '<strong>Owner</strong>'+staked;
+      button_middle.href = ''
+
+      button_right.innerHTML = '<strong>Time Staked</strong>'+timeStaked+' hrs';
+      button_middle.href = ''
+
+    }
+
     // Update Header Background Img
     document.getElementById('thisheader').style.backgroundImage = 'url('+displayImg+')';
     document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
+
     // Update Preview Img
     document.getElementById('frogContainer4').innerHTML = '';
+
     // Fetch Metadata
     var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+tokenId+".json")).json();
+
     // Loop Attributes and Build Frog
     for (var i = 0; i < metadata.attributes.length; i++) {
+
+      // Update Display Button
+      if (attribute.trait_type == 'Frog' || attribute.trait_type == 'SpecialFrog') {
+
+        button_left.innerHTML = '<strong>'+displayName+'</strong>'+attribute.value;
+
+      }
+
       var data = metadata.attributes[i];
       load_trait(data.trait_type, data.value, 'frogContainer4');
+
     }
-    // Update Display Name & External Links
-    document.getElementById('display_name').innerHTML = displayName
+
   }
 
   // render_token()
