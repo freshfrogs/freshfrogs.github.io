@@ -556,12 +556,13 @@
 
   // stake(_tokenId (uint256), _user (address)) | send =>
   async function stake(tokenId, userAddress) {
-    console.log('staking..')
+
     // Frog Ownership Status
     let owned = await collection.methods.ownerOf(tokenId).call();
+    owned = owned.toString();
 
     // Owned by User attempting to Stake
-    if (owned == userAddress) {
+    if (owned.toString().toLowerCase() == userAddress.toString().toLowerCase()) {
 
       try {
 
