@@ -501,8 +501,9 @@
       let elem = document.getElementById('myBar_'+frog_id);
       let width = percent;
       elem.style.width = width + "%";
-      document.getElementById('level_'+frog_id).innerHTML = '<b style="border-radius: 5px; color: coral;">Staked Level '+staked_level+'</b>';
-
+      document.getElementById('level_'+frog_id).innerHTML = 'Staked Level '+staked_level+'';
+      document.getElementById('level_'+frog_id).style.color = 'coral';
+      
     }
 
   }
