@@ -422,26 +422,32 @@
 
     }
 
+    /*
     // Create Button Element(s)
     var button_b = document.createElement('div');
     button_b.style.width = 'fit-content';
     button_b.style.marginLeft = 'auto';
     button_b.style.marginRight = 'auto';
+    */
 
     if (!staked) {
 
+      /*
       // Stake Button
       button_b.innerHTML = 
         '<br>'+
         '<button class="frog_button" style="background: lightgreen; border: 1px solid black; font-weight: bold;" onclick="stake('+frog_id+')">Stake 🡥</button>'+
         '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button" style="font-weight: bold;">Rankings 🡥</button></a>';
       document.getElementById('traits_'+frog_id).appendChild(button_b);
+      */
 
     } else { 
-      
+
+      /*
       // Or Un-stake Button
       button_b.innerHTML = '<br><button class="frog_button" style="background: coral; border: 1px solid black; font-weight: bold;" onclick="withdraw('+frog_id+')">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button" style="font-weight: bold;">Rankings 🡥</button></a>';
       document.getElementById('traits_'+frog_id).appendChild(button_b);
+      */
 
       // Create Owner Element and Staking Level //
       var trait_text = document.createElement('i')
