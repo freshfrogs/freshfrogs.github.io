@@ -337,8 +337,8 @@
         '<div style="text-align: left; margin: 8px; height: 16px;">'+
           '<strong id="frog_'+frog_id+'" class="frog_name">'+frog_name+'</strong><strong id="price_'+frog_id+'" class="frog_price"></strong>'+
         '</div>'+
-        '<div class="frog_imgContainer">'+
-          '<img src="'+frog_external+'" class="frog_img"/>'+
+        '<div class="frog_imgContainer" id="cont_'+frog_id+'">'+
+          //'<img src="'+frog_external+'" class="frog_img"/>'+
         '</div>'+
         '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
         '<strong id="level_'+frog_id+'" class="frog_level"><br></strong>'+
@@ -361,6 +361,8 @@
 
       // attribute.trait_type : attribute.value
       let attribute = metadata.attributes[i]
+
+      load_trait(attribute.trait_type, attribute.value, 'cont_'+frog_id);
 
       // Calculate Trait Rarity
       try { trait_rarity = ((traits_list[attribute.trait_type][attribute.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) { trait_rarity = 'e'; }
