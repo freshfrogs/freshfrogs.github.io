@@ -406,6 +406,7 @@
       // attribute.trait_type : attribute.value
       let attribute = metadata.attributes[i]
 
+      // Render Attribute
       load_trait(attribute.trait_type, attribute.value, 'cont_'+frog_id);
 
       // Calculate Trait Rarity
