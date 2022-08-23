@@ -489,7 +489,7 @@
 
       } catch (e) {
 
-        // Catch error, return false
+        // Catch error, return false //
         return sale_price;
 
       }
