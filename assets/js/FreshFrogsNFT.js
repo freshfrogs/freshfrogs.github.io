@@ -466,7 +466,7 @@
     fetch('https://api.opensea.io/api/v1/asset/'+CONTRACT_ADDRESS+'/'+tokenId+'/?include_orders=false', options)
     .then(token => token.json())
     .then((token) => {
-      console.log(token);
+      
       // Attempt to retrieve recent sale price
       var sale_price = false; 
 
