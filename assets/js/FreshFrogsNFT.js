@@ -354,7 +354,7 @@
       button_left.target = '_blank';
 
       // Middle Button
-      button_middle.innerHTML = '<strong>Owner</strong>'+truncateAddress(staked);
+      button_middle.innerHTML = '<strong>Owned By</strong>'+truncateAddress(staked);
       button_middle.href = 'https://opensea.io/'+staked;
       button_middle.target = '_blank';
 
