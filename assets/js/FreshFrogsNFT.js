@@ -492,14 +492,13 @@
       document.getElementById('traits_'+frog_id).appendChild(button_b);
       */
 
-      /* Create Owner Element and Staking Level //
+      // Create Owner Element and Staking Level //
       var trait_text = document.createElement('i')
       trait_text.innerHTML = 'Owner: '+truncateAddress(staked)+'<br>';
       document.getElementById('prop_'+frog_id).appendChild(trait_text);
-      */
 
       // Insert Owner if staked
-      document.getElementById('price_'+frog_id).innerHTML = truncateAddress(staked);
+      //document.getElementById('price_'+frog_id).innerHTML = truncateAddress(staked);
 
       // Check Staked Time / Calculate Level
       let staked_time_bool = await timeStaked(frog_id);
