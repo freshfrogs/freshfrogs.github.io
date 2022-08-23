@@ -478,19 +478,14 @@
           // Calculate recent sale price
           var recent_sale = total_price / Math.pow(10, decimals);
 
+          console.log(recent_sale);
           return recent_sale;
 
-        } else {
-
-          return "";
-          
         }
 
       } catch (e) {
 
-        // Catch Error
         console.log(e.message)
-        return "";
 
       }
 
