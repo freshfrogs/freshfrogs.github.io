@@ -372,15 +372,15 @@
     // Loop Attributes and Build Frog
     for (var i = 0; i < metadata.attributes.length; i++) {
 
+      var attribute = metadata.attributes[i];
+      load_trait(attribute.trait_type, attribute.value, 'frogContainer4');
+
       // Update Display Button
       if (attribute.trait_type == 'Frog' || attribute.trait_type == 'SpecialFrog') {
 
         button_left.innerHTML = '<strong>'+displayName+'</strong>'+attribute.value;
 
       }
-
-      var data = metadata.attributes[i];
-      load_trait(data.trait_type, data.value, 'frogContainer4');
 
     }
 
