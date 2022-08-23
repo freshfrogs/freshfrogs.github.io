@@ -313,9 +313,6 @@
 
   // render_token()
   async function render_token(frog_id) {
-    
-    let recent_sale = await get_asset_price(frog_id);
-    console.log('Frog #'+tokenId+' sale price: '+recent_sale);
 
     // Is Frog Currently Staked?
     let staked = await stakerAddress(frog_id);
@@ -354,7 +351,7 @@
     frog_doc.appendChild(frog_token);
 
     // Update Recent Sale Price //
-    if (!recent_sale) { } else { document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+recent_sale; }
+    let recent_sale = await get_asset_price(frog_id);
 
     // Update Metadata!
     let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
