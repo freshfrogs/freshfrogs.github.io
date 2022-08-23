@@ -521,7 +521,7 @@
     if (where.includes('cont_')) {
       // Assign Class
       
-      if (trait == 'Trait') { newAttribute.className = "frogImg3"; } else { newAttribute.className = "frogImg2"; }
+      newAttribute.className = "frogImg3";
 
     } else {
 
