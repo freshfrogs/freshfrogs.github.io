@@ -489,6 +489,7 @@
       } catch (e) {
 
         // Catch Error
+        console.log(e.message)
         return "";
 
       }
