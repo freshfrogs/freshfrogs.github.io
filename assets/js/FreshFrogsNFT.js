@@ -314,7 +314,7 @@
   // render_token()
   async function render_token(frog_id) {
 
-    // Is Frog Currently Staked?
+    // Is Frog Currently Staked? //
     let staked = await stakerAddress(frog_id);
 
     // Token Variable Links
