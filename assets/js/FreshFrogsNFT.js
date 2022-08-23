@@ -317,6 +317,9 @@
     // Is Frog Currently Staked?
     let staked = await stakerAddress(frog_id);
 
+    // Update Recent Sale Price
+    let recent_sale = await get_asset_price(frog_id);
+
     // Token Variable Links
     let frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
     let frog_etherscan = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
@@ -335,7 +338,7 @@
     frog_token.innerHTML =
       '<div class="frogTokenCont">'+
         '<div style="text-align: left; margin: 8px; height: 16px;">'+
-          '<strong id="frog_'+frog_id+'" class="frog_name">'+frog_name+'</strong><strong id="price_'+frog_id+'" class="frog_price"></strong>'+
+          '<strong id="frog_'+frog_id+'" class="frog_name">'+frog_name+'</strong><strong id="price_'+frog_id+'" class="frog_price">'+recent_sale+'</strong>'+
         '</div>'+
         '<div class="frog_imgContainer">'+
           '<img src="'+frog_external+'" class="frog_img"/>'+
@@ -349,9 +352,6 @@
 
     // Create Element -->
     frog_doc.appendChild(frog_token);
-
-    // Update Recent Sale Price
-    get_asset_price(frog_id);
 
     // Update Metadata!
     let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
@@ -476,14 +476,18 @@
           // Calculate recent sale price
           var recent_sale = total_price / Math.pow(10, decimals);
 
-        }
+          return recent_sale;
 
-        // Return recent sale price
-        document.getElementById('price_'+tokenId).innerHTML = 'Ξ'+recent_sale;
+        } else {
+
+          return "";
+          
+        }
 
       } catch (e) {
 
         // Catch Error
+        return "";
 
       }
 
