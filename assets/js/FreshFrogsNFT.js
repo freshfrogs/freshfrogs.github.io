@@ -469,7 +469,7 @@
 
       try {
 
-        // Retrieve Token Data //
+        // Retrieve Token Data
         var { last_sale: { payment_token: { decimals }, total_price } } = token
 
         // If recent sale price is found
