@@ -477,7 +477,7 @@
         if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
 
           sale_price = total_price / Math.pow(10, decimals);
-          //console.log('Frog #'+tokenId+' sale price: '+sale_price);
+          console.log('Frog #'+tokenId+' sale price: '+sale_price);
           return sale_price;
 
         } else {
