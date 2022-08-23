@@ -645,7 +645,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
     
-    <script src="https://freshfrogs.io/assets/js/FreshFrogsNFT.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
@@ -694,8 +693,7 @@
 
         COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
 
-        await fetch_opensea_data();
-        await fetch_user_data(CONTROLLER_ADDRESS);
+        fetch_opensea_data();
 
         try { // Connect
 
@@ -819,7 +817,7 @@
         Fetch OpenSea collection data
       */
 
-      async function fetch_opensea_data() {
+      function fetch_opensea_data() {
 
         // Collection variables
         // Trait list and rarities
