@@ -490,6 +490,7 @@
       } catch (e) {
 
         // Supress Error if last_sale not found
+        console.log(e.message);
         return false;
 
       }
