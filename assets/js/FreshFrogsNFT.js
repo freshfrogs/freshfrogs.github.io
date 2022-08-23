@@ -316,6 +316,8 @@
   // render_token()
   async function render_token(frog_id) {
     
+    get_asset_price(frog_id);
+    
     // Is Frog Currently Staked?
     let staked = await stakerAddress(frog_id);
 
