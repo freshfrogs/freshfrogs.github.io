@@ -393,6 +393,9 @@
     //await get_asset_price(frog_id);
 
     //document.getElementById('price_'+tokenId).innerHTML = 'Ξ'+recent_sale;
+    // Update Header Background Img
+    document.getElementById('cont_'+frog_id).style.backgroundImage = 'url('+frog_external+')';
+    document.getElementById('cont_'+frog_id).style.backgroundSize = "2048px 2048px";
 
     // Update Metadata!
     let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
