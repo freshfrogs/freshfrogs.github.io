@@ -351,7 +351,7 @@
   // render_token()
   async function render_token(frog_id, recent_sale) {
 
-    if (!recent_sale) { recent_sale = '' }
+    if (! recent_sale) { recent_sale = '' } else { recent_sale = 'Ξ'+recent_sale }
 
     // Is Frog Currently Staked? //
     let staked = await stakerAddress(frog_id);
@@ -374,7 +374,7 @@
     frog_token.innerHTML =
       '<div class="frogTokenCont">'+
         '<div style="text-align: left; margin: 8px; height: 16px;">'+
-          '<strong id="frog_'+frog_id+'" class="frog_name">'+frog_name+'</strong><strong id="price_'+frog_id+'" class="frog_price">Ξ'+recent_sale+'</strong>'+
+          '<strong id="frog_'+frog_id+'" class="frog_name">'+frog_name+'</strong><strong id="price_'+frog_id+'" class="frog_price">'+recent_sale+'</strong>'+
         '</div>'+
         '<div class="frog_imgContainer" id="cont_'+frog_id+'">'+
           //'<img src="'+frog_external+'" class="frog_img"/>'+
