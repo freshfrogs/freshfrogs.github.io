@@ -543,6 +543,10 @@
 
       newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"_animation.gif"
 
+    } else if (attribute == 'tongue') {
+
+      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"_animation.gif"
+
     } else {
 
       // Assign Source
