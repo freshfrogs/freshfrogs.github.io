@@ -320,6 +320,8 @@
     // Update Recent Sale Price //
     let recent_sale = await get_asset_price(frog_id);
 
+    console.log('Frog #'+frog_id+' Recent Sale: '+recent_sale);
+
     // Token Variable Links
     let frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
     let frog_etherscan = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
