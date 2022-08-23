@@ -265,7 +265,7 @@
           console.log(e.message);
 
         }
-        
+
       }
 
       // Render Frogs Held by Fetch Address
@@ -465,8 +465,13 @@
     // Create Img Element
     newAttribute = document.createElement("img");
 
-    // Assign Class
-    if (trait == 'Trait') { newAttribute.className = "frogImg5"; } else { newAttribute.className = "frogImg4"; }
+    if (where.includes('cont_')) {
+      // Assign Class
+      if (trait == 'Trait') { newAttribute.className = "frogImg3"; } else { newAttribute.className = "frogImg2"; }
+    } else {
+      // Assign Class
+      if (trait == 'Trait') { newAttribute.className = "frogImg5"; } else { newAttribute.className = "frogImg4"; }
+    }
 
     // Assign Source
     newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
