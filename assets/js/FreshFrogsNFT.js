@@ -311,7 +311,7 @@
     document.getElementById('display_name').innerHTML = displayName
   }
 
-  // render_token()
+  // render_token()//
   async function render_token(frog_id) {
     
     let recent_sale = await get_asset_price(frog_id);
