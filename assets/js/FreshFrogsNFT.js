@@ -360,7 +360,7 @@
 
       // Right Button
       button_right.innerHTML = '<strong>Time Staked</strong>'+stakedHours+' hrs';
-      button_middle.removeAttribute('href');
+      button_right.removeAttribute('href');
 
     }
 
