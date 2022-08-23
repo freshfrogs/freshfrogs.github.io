@@ -470,27 +470,24 @@
 
       try {
 
-        // Attempt to retrieve recent sale price
-        var sale_price = false; 
-
         // Retrieve Token Data
-        var { last_sale: { payment_token: { decimals }, total_price } } = token
+        let { last_sale: { payment_token: { decimals }, total_price } } = token
 
         // If recent sale price is found
         if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
 
           // Calculate recent sale price
-          sale_price = total_price / Math.pow(10, decimals);
+          let recent_sale = total_price / Math.pow(10, decimals);
 
         }
 
         // Return recent sale price
-        return sale_price;
+        document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+recent_sale;
 
       } catch (e) {
 
         // Catch error, return false //
-        return sale_price;
+        return;
 
       }
 
