@@ -352,7 +352,7 @@
     // Create Element -->
     frog_doc.appendChild(frog_token);
 
-    // Update Recent Sale Price
+    // Update Recent Sale Price //
     //if (!recent_sale) {} else { document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+recent_sale; }
 
     // Update Metadata!
