@@ -378,7 +378,7 @@
       // Update Display Button
       if (attribute.trait_type == 'Frog' || attribute.trait_type == 'SpecialFrog') {
 
-        button_left.innerHTML = '<strong>'+displayName+'</strong>'+attribute.value;
+        button_left.innerHTML = '<strong>'+displayName+'</strong>'+attribute.value.slice(0, 11);
 
       }
 
