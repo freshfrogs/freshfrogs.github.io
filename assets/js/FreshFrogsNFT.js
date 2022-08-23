@@ -317,7 +317,7 @@
   async function render_token(frog_id) {
     
     get_asset_price(frog_id);
-    
+
     // Is Frog Currently Staked?
     let staked = await stakerAddress(frog_id);
 
@@ -464,8 +464,7 @@
   async function get_asset_price(tokenId) {
 
     fetch('https://api.opensea.io/api/v1/asset/'+CONTRACT_ADDRESS+'/'+tokenId+'/?include_orders=false', {method: 'GET'})
-    .then((tokens) => tokens.json())
-    .then((tokens) => {
+    .then((token) => {
 
       // Attempt to retrieve recent sale price
       try { var sale_price = false; 
