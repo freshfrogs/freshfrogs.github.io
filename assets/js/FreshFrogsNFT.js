@@ -465,6 +465,11 @@
   // load_trait(_trait(family), _attribute(type), _where(element))
   function load_trait(trait, attribute, where) {
 
+    // Animations
+    if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
+      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"2.gif"
+    }
+
     // Create Img Element
     newAttribute = document.createElement("img");
 
