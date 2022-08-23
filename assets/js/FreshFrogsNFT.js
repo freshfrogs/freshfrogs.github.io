@@ -341,7 +341,7 @@
           //'<img src="'+frog_external+'" class="frog_img"/>'+
         '</div>'+
         '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
-        '<strong id="level_'+frog_id+'" class="frog_level"><br></strong>'+
+        '<strong id="level_'+frog_id+'" class="frog_level"><i>not staked</i></strong>'+
         '<div id="traits_'+frog_id+'" class="trait_list">'+
           '<b>Properties</b><div id="prop_'+frog_id+'" class="properties"></div>'+
         '</div>'+
