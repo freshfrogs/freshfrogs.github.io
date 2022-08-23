@@ -311,7 +311,7 @@
     document.getElementById('display_name').innerHTML = displayName
   }
 
-  // render_token()//
+  // render_token()
   async function render_token(frog_id) {
     
     let recent_sale = await get_asset_price(frog_id);
@@ -466,7 +466,7 @@
     fetch('https://api.opensea.io/api/v1/asset/'+CONTRACT_ADDRESS+'/'+tokenId+'/?include_orders=false', options)
     .then(token => token.json())
     .then((token) => {
-
+      console.log(token);
       // Attempt to retrieve recent sale price
       var sale_price = false; 
 
