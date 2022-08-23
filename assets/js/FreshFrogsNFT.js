@@ -534,8 +534,8 @@
 
     }
 
-    // Animations
-    if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") {
+    // Smoking Animations
+    if (attribute.includes('smoking')) {
 
       newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"2.gif"
 
