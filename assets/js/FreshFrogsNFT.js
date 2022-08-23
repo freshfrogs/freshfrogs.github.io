@@ -459,7 +459,7 @@
       if (trait_rarity < 1) { trait_rarity = '<1%' } else { trait_rarity = trait_rarity+'%' }
 
       // Create Attribute Text Element
-      var trait_text = document.createElement('i')
+      var trait_text = document.createElement('div')
       trait_text.innerHTML = attribute.trait_type+': '+attribute.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>';
       document.getElementById('prop_'+frog_id).appendChild(trait_text);
 
