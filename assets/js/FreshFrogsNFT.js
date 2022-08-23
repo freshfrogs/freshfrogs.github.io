@@ -23,8 +23,6 @@
       console.log('Error: Failed to fetch OpenSea collection data!');
     });
 
-    get_asset_price('1');
-
     // Staking Contract ABI
     const CONTROLLER_ABI =
       [
@@ -316,7 +314,7 @@
   // render_token()
   async function render_token(frog_id) {
     
-    //let recent_sale = await get_asset_price(frog_id);
+    let recent_sale = await get_asset_price(frog_id);
 
     // Is Frog Currently Staked?
     let staked = await stakerAddress(frog_id);
@@ -355,7 +353,7 @@
     frog_doc.appendChild(frog_token);
 
     // Update Recent Sale Price //
-    //if (!recent_sale) {} else { document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+recent_sale; }
+    if (!recent_sale) {} else { document.getElementById('price_'+frog_id).innerHTML = 'Ξ'+recent_sale; }
 
     // Update Metadata!
     let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
@@ -479,7 +477,7 @@
       if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
 
         sale_price = total_price / Math.pow(10, decimals);
-        console.log('Frog #'+tokenId+' sale price: '+sale_price);
+        //console.log('Frog #'+tokenId+' sale price: '+sale_price);
         return sale_price;
 
       } else {
