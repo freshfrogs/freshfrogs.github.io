@@ -351,7 +351,7 @@
     frog_doc.appendChild(frog_token);
 
     // Update Recent Sale Price
-    let recent_sale = await get_asset_price(frog_id);
+    get_asset_price(frog_id);
 
     // Update Metadata!
     let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
@@ -468,13 +468,13 @@
       try {
 
         // Retrieve Token Data
-        let { last_sale: { payment_token: { decimals }, total_price } } = token
+        var { last_sale: { payment_token: { decimals }, total_price } } = token
 
         // If recent sale price is found
         if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
 
           // Calculate recent sale price
-          let recent_sale = total_price / Math.pow(10, decimals);
+          var recent_sale = total_price / Math.pow(10, decimals);
 
         }
 
@@ -483,8 +483,7 @@
 
       } catch (e) {
 
-        // Catch error, return false //
-        return;
+        // Catch Error
 
       }
 
