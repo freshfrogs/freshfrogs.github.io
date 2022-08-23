@@ -450,7 +450,7 @@
       let attribute = metadata.attributes[i]
 
       // Render Attribute
-      load_trait(attribute.trait_type, attribute.value, 'cont_'+frog_id);
+      load_trait(attribute.trait_type, attribute.value, 'cont_'+frog_id, false);
 
       // Calculate Trait Rarity
       try { trait_rarity = ((traits_list[attribute.trait_type][attribute.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) { trait_rarity = 'e'; }
@@ -888,6 +888,151 @@
       // Return time staked in (Hours)
       return staked_hours;
 
+    }
+
+  }
+
+  // Token Combinations / Rebuild Token
+  async function token_rebuild(baseId, subId) {
+
+    var baseFrog, baseSpecialFrog, baseTrait, baseAccessory, baseEyes, baseHat, baseMouth;
+    var subFrog, subSpecialFrog, subTrait, subAccessory, subEyes, subHat, subMouth;
+    var returnFrog, returnSpecialFrog, returnTrait, returnSecondaryTrait, returnAccessory, returnEyes, returnHat, returnMouth;
+
+    // Fetch Metadata (baseId)
+    let baseMetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseId+".json")).json();
+
+    // Loop Attributes and Build Frog
+    for (var i = 0; i < baseMetadata.attributes.length; i++) {
+
+      // Attribute
+      var attribute = baseMetadata.attributes[i];
+
+      // Update Variables
+      if (attribute.trait_type == 'Frog') {
+        baseFrog = attribute.value;
+      } else if (attribute.trait_type == 'SpecialFrog') {
+        baseSpecialFrog = attribute.value;
+      } else if (attribute.trait_type == 'Trait') {
+        baseTrait = attribute.value;
+      } else if (attribute.trait_type == 'Accessory') {
+        baseAccessory = attribute.value;
+      } else if (attribute.trait_type == 'Eyes') {
+        baseEyes = attribute.value;
+      } else if (attribute.trait_type == 'Hat') {
+        baseHat = attribute.value;
+      } else if (attribute.trait_type == 'Mouth') {
+        baseMouth = attribute.value;
+      }
+
+    }
+
+    // Fetch Metadata (subId)
+    let subMetadata = await (await fetch("https://freshfrogs.io/frog/json/"+subId+".json")).json();
+
+    // Loop Attributes and Build Frog
+    for (var i = 0; i < subMetadata.attributes.length; i++) {
+
+      // Attribute
+      var attribute = subMetadata.attributes[i];
+
+      // Update Variables
+      if (attribute.trait_type == 'Frog') {
+        subFrog = attribute.value;
+      } else if (attribute.trait_type == 'SpecialFrog') {
+        subSpecialFrog = attribute.value;
+      } else if (attribute.trait_type == 'Trait') {
+        subTrait = attribute.value;
+      } else if (attribute.trait_type == 'Accessory') {
+        subAccessory = attribute.value;
+      } else if (attribute.trait_type == 'Eyes') {
+        subEyes = attribute.value;
+      } else if (attribute.trait_type == 'Hat') {
+        subHat = attribute.value;
+      } else if (attribute.trait_type == 'Mouth') {
+        subMouth = attribute.value;
+      }
+
+    }
+
+    var file_path = 'https://freshfrogs.io/frog/preset_/'
+    // https://freshfrogs.io/frog/preset_/trait_type/value.png
+    // FROG / [ TRAIT / FROG ]
+
+    // Base SpecialFrog
+    if (typeof baseSpecialFrog !== 'undefined') {
+
+      // --> FINAL Trait <--
+      returnTrait = baseSpecialFrog+'/'+subTrait;
+      
+      // Sub Frog
+      if (typeof subFrog !== 'undefined') {
+
+        // --> FINAL SpecialFrog <--
+        returnSpecialFrog = baseSpecialFrog+'/'+subFrog;
+
+      // Sub SpecialFrog
+      } else if (typeof subSpecialFrog !== 'undefined') {
+
+        // --> FINAL SpecialFrog <--
+        returnSpecialFrog = baseSpecialFrog+'/'+subSpecialFrog;
+
+      }
+    
+    // Base Frog
+    } else if (typeof baseFrog !== 'undefined') {
+
+      returnFrog = baseFrog;
+      
+      // blueDartFrog
+      // goldenDartFrog
+      // grayTreeFrog
+      // redEyedTreeFrog
+      // splendidLeaFrog
+      // stawberryDartFrog
+      // unknown
+
+      // Unique Frogs | returnSecondaryTrait
+      if (baseFrog == 'splendidLeaFrog' || baseFrog == 'stawberryDartFrog' || baseFrog == 'redEyedTreeFrog') {
+        
+      }
+
+    }
+
+    // Trait
+    if (typeof returnTrait !== 'undefined') {
+
+      // FINAL Trait <--
+      returnTrait = subTrait;
+
+    }
+
+    // FINAL Accessory
+    if (typeof baseAccessory !== 'undefined') {
+      returnAccessory = baseAccessory;
+    } else if (typeof subAccessory !== 'undefined') {
+      returnAccessory = subAccessory;
+    }
+
+    // FINAL Eyes
+    if (typeof baseEyes !== 'undefined') {
+      returnEyes = baseEyes;
+    } else if (typeof subEyes !== 'undefined') {
+      returnEyes = subEyes;
+    }
+
+    // FINAL Hat
+    if (typeof baseHat !== 'undefined') {
+      returnHat = baseHat;
+    } else if (typeof subHat !== 'undefined') {
+      returnHat = subHat;
+    }
+
+    // FINAL Mouth
+    if (typeof baseMouth !== 'undefined') {
+      returnMouth = baseMouth;
+    } else if (typeof subMouth !== 'undefined') {
+      returnMouth = subMouth;
     }
 
   }
