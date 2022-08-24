@@ -388,7 +388,7 @@
         button_left.href = etherscanLink;
         button_left.target = '_blank';
 
-        button_middle.innerHTML = '<strong>Withdraw</strong>un-stake Frog';
+        button_middle.innerHTML = '<strong>Withdraw</strong>unstake Frog';
         button_middle.onclick = function() { withdraw_init(tokenId) }
         button_middle.removeAttribute('href');
 
