@@ -635,6 +635,10 @@
   // withdraw(_tokenId (uint256), _user (address)) | send =>
   async function withdraw(tokenId) {
 
+    // Scroll Into View
+    console_pre = document.getElementById('pre');
+    console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+
     // Check staked/ownership status
     let staked = await stakerAddress(tokenId);
 
@@ -663,6 +667,10 @@
 
   // stake(_tokenId (uint256), _user (address)) | send =>
   async function stake(tokenId) {
+
+    // Scroll Into View
+    console_pre = document.getElementById('pre');
+    console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
 
     // Check ownership status
     let owned = await collection.methods.ownerOf(tokenId).call();
