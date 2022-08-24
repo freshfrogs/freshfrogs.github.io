@@ -358,11 +358,11 @@
         button_left.href = etherscanLink;
         button_left.target = '_blank';
 
-        button_middle.innerHTML = '<strong>Stake</strong>and earn';
+        button_middle.innerHTML = '<strong>Stake</strong>and earn!';
         button_middle.onclick = function() { stake_init(tokenId) }
         button_middle.removeAttribute('href');
 
-        button_right.innerHTML = '<strong>Morph</strong>merge Frogs';
+        button_right.innerHTML = '<strong>Morph</strong>merge Frogs!';
         button_right.removeAttribute('href');
 
       } else {
@@ -388,11 +388,11 @@
         button_left.href = etherscanLink;
         button_left.target = '_blank';
 
-        button_middle.innerHTML = '<strong>Withdraw</strong>un-stake Frog';
+        button_middle.innerHTML = '<strong>Withdraw</strong>un-stake Frog!';
         button_middle.onclick = function() { withdraw_init(tokenId) }
         button_middle.removeAttribute('href');
 
-        button_right.innerHTML = '<strong>Morph</strong>merge Frogs';
+        button_right.innerHTML = '<strong>Morph</strong>merge Frogs!';
         button_right.removeAttribute('href');
 
       // Staked by someone else
