@@ -543,7 +543,7 @@
         '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
         'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
         '<br><div style="text-align: left;">'+
-          '<strong>(1/2) Approve Contract</strong><br>This is a one time transaction to allow staking, requires a gas fee.'+
+          '<strong>(1/2) Approve Staking</strong><br>This is a one time transaction to allow staking, requires a gas fee.'+
         '</div>'
       );
 
@@ -557,7 +557,7 @@
           '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
           'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
           '<br><div style="text-align: left;">'+
-            '<strong>(1/2) Approve Contract</strong><br> '+set_approval+
+            '<strong>(1/2) Approve Staking</strong><br> '+set_approval+
           '</div>'
         );
 
