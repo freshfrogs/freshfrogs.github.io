@@ -328,6 +328,9 @@
     // Is this token currently staked?
     let staked = await stakerAddress(tokenId);
 
+    // Get Total Hours Staked
+    let stakedHours = await timeStaked(tokenId);
+
     // Token Holder
     let owner = await collection.methods.ownerOf(tokenId).call();
 
@@ -358,9 +361,6 @@
       }
 
     } else { // STAKED
-
-      // Get Total Hours Staked
-      let stakedHours = await timeStaked(tokenId);
 
       // Staked by current user
       if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
