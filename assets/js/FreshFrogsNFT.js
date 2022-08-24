@@ -526,28 +526,18 @@
     newAttribute = document.createElement("img");
 
     // Assign Class
-    if (where.includes('cont_')) { newAttribute.className = "frogImg3"; } else { if (trait == 'Trait') { newAttribute.className = "frogImg5"; } else { newAttribute.className = "frogImg4"; } }
-
-    if (!animate) {
-
-      // Assign Source
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
-
+    if (where.includes('cont_')) {
+      newAttribute.className = "frogImg3";
     } else {
-
-      // Smoking Animations
-      if (attribute.includes('shades') || attribute.includes('Shades') || attribute.includes('tongue') || attribute.includes('smoking')) {
-
-        newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"_animation.gif"
-
+      if (trait == 'Trait') {
+        newAttribute.className = "frogImg5";
       } else {
-
-        // Assign Source
-        newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
-
+        newAttribute.className = "frogImg4";
       }
-
     }
+
+    // Assign Source
+    newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
 
     // Render Trait Image
     document.getElementById(where).appendChild(newAttribute);
