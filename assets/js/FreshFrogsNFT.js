@@ -411,6 +411,9 @@
         '<div class="frog_imgContainer" id="cont_'+frog_id+'">'+
           //'<img src="'+frog_external+'" class="frog_img"/>'+
         '</div>'+
+        '<div style="text-align: left; margin: 8px; height: 16px;">'+
+        '<strong class="frog_name"></strong><strong id="time_'+frog_id+'" class="frog_price"></strong>'+
+      '</div>'+
         '<div id="staked_'+frog_id+'"></div>'+
         '<div id="traits_'+frog_id+'" class="trait_list">'+
           '<strong>Properties</strong><div id="prop_'+frog_id+'" class="properties"></div>'+
@@ -468,7 +471,8 @@
       
       // Check Staked Time / Calculate Level
       let staked_time_bool = await timeStaked(frog_id);
-      if (staked_time_bool >= 2000) { staked_level = 3; } else if (staked_time_bool >= 1000) { staked_level = 2; } else { staked_level = 1; }     
+      if (staked_time_bool >= 2000) { staked_level = 3; } else if (staked_time_bool >= 1000) { staked_level = 2; } else { staked_level = 1; }
+      document.getElementById('time_'+frog_id).innerHTML = staked_time_bool+'hrs';
 
       // Update Progress Bar
       let percent = parseInt((staked_time_bool/(1000*staked_level))*100);
