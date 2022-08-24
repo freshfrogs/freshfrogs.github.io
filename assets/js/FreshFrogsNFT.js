@@ -509,32 +509,76 @@
 
   // FreshFrogsController | NFT Staking Smart Contract | 0xCB1ee125CFf4051a10a55a09B10613876C4Ef199
 
-  async function stake_init(tokenId) {
+  async function approval_init() {
 
-    // Staking Contract Approval
+    // Staking contract approval for current user
     let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
     if (!is_approved) {
-      consoleOutput('<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br><strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
-      '<div style="text-align: left;">'+
-      '<br><b>(1/2) Approve Contract</b><br>This is a one time transaction to allow staking, requires a gas fee.<br>'+
-      '</div>');
+      consoleOutput(
+        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br><strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
+        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+        '<div style="text-align: left;">'+
+          '<b>(1/2) Approve Contract</b><br>This is a one time transaction to allow staking, requires a gas fee.'+
+        '</div>'
+      );
 
       let set_approval = await setApproval();
+      return
 
-    }
+    } else { return }
+  }
 
-    // Begin Staking Txn
-    consoleOutput('<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br><strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
-    '<div style="text-align: left;">'+
-    '<br><b>Transfer NFT</b><br>Transfer Frog #'+tokenId+' to staking protocol.<br>'+
-    '</div>');
+  async function withdraw_init(tokenId) {
+
+    // Check Contract Approval
+    await approval_init();
+
+    // Begin Withdraw Txn
+    consoleOutput(
+      '<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br>'+
+      '<strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+
+      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+      '<div style="text-align: left;">'+
+        '<b>Withdraw NFT</b><br> Transfer Frog #'+token_id+' <u>from</u> staking protocol.'+
+      '</div>'
+    );
+
+    let withdraw_txn = await withdraw(tokenId);
+
+    // Complete
+    consoleOutput(
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/>'+'<br>'+
+      '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
+      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+      '<div style="text-align: left;">'+withdraw_txn+'</div>'
+    );
+
+  }
+
+  async function stake_init(tokenId) {
+
+    // Check Contract Approval
+    await approval_init();
+
+    // Begin Stake Txn
+    consoleOutput(
+      '<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br>'+
+      '<strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+
+      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+      '<div style="text-align: left;">'+
+        '<b>Stake NFT</b><br> Transfer Frog #'+token_id+' <u>to</u> staking protocol.'+
+      '</div>'
+    );
 
     let stake_txn = await stake(tokenId);
 
     // Complete
-    consoleOutput('<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br><strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br><br>'+stake_txn+
-    '<div style="text-align: left;">'+
-    '</div>');
+    consoleOutput(
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/>'+'<br>'+
+      '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
+      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+      '<div style="text-align: left;">'+stake_txn+'</div>'
+    );
 
   }
 
