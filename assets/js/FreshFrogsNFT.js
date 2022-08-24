@@ -594,7 +594,36 @@
   async function stake_init(tokenId) {
 
     // Check Contract Approval
-    await approval_init();
+    let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+
+    if (!is_approved) {
+
+      consoleOutput(
+        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+        '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
+        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+        '<br><div style="text-align: left;">'+
+          '<strong>(1/2) Approve Contract</strong><br>This is a one time transaction to allow staking, requires a gas fee.'+
+        '</div>'
+      );
+
+      let set_approval = await setApprovalForAll();
+
+      if (set_approval !==true) {
+
+        consoleOutput(
+          '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+          '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
+          'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+          '<br><div style="text-align: left;">'+
+            '<strong>(1/2) Approve Contract</strong><br> '+set_approval+
+          '</div>'
+        );
+
+        return
+        
+      }
+    }
 
     // Begin Stake Txn
     consoleOutput(
@@ -621,24 +650,26 @@
   }
 
   // setApproval | set staking contract approval
-  async function setApproval() {
+  async function setApprovalForAll() {
 
-    try { // Set Contract Approval
       let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
 
-      if (!is_approved) { // Submit Txn
-        let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
-        return 'Contract approval has been updated!';
-  
+      if (!is_approved) { 
+
+        try {
+          let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
+          return true; // Contract Approved!
+
+        } catch (e) {
+          return e.message;
+
+        }
+        
       } else {
-        return 'Contract has already been approved by user!';
+        return true; // Contract Already Approved!
   
       }
     
-    } catch (e) { // Catch Error =>
-      return e.message;
-
-    }
   }
   
   // <-----
@@ -668,12 +699,18 @@
     // Check staked/ownership status
     let staked = await stakerAddress(tokenId);
 
+    let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+
     // Token is not currently staked
     if (!staked) {
       return 'Frog #'+tokenId+' is not currently staked!';
 
     // Valid ownership
     } else if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+
+      if (!approved) {
+        return 'Staking contract not approved for token transfer!';
+      }
 
       try { // Withdraw token from staking contract
         let withdraw = await controller.methods.withdraw(tokenId).send({ from: user_address });
@@ -701,8 +738,14 @@
     // Check ownership status
     let owner = await collection.methods.ownerOf(tokenId).call();
 
+    let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+
     // Valid ownership
     if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+
+      if (!approved) {
+        return 'Staking contract not approved for token transfer!';
+      }
 
       try {
         let stake = await controller.methods.stake(tokenId).send({ from: user_address });
