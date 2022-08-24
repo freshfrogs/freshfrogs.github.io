@@ -641,7 +641,7 @@
   }
   
   // <-----
-  // SEND()
+  // SEND() //
   // ----->
 
   // claimRewards(_user (address)) | send =>
