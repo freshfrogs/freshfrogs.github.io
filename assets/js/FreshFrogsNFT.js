@@ -517,23 +517,28 @@
   }
 
   // load_trait(_trait(family), _attribute(type), _where(element))
-  function load_trait(trait, attribute, where, animate) {
-
-    // Default Parameters
-    if (! animate) { animate = false }
+  function load_trait(trait, attribute, where) {
 
     // Create Img Element
     newAttribute = document.createElement("img");
 
     // Assign Class
     if (where.includes('cont_')) {
+
       newAttribute.className = "frogImg3";
+
     } else {
+
       if (trait == 'Trait') {
+
         newAttribute.className = "frogImg5";
+
       } else {
+
         newAttribute.className = "frogImg4";
+
       }
+      
     }
 
     // Assign Source
