@@ -224,12 +224,9 @@
       user_invites = await f0.myInvites();
       user_keys = Object.keys(user_invites);
       is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-      staker_info = await controller.methods.availableRewards(user_address).call();
-      staker_rewards = (staker_info / 1000000000000000000);
-      staker_rewards = String(staker_rewards).slice(0, 6);
 
       // Collection Variables
-      collection_name = await f0.api.name().call(); //
+      collection_name = await f0.api.name().call();
       collection_symbol = await f0.api.symbol().call();
       next_id = await f0.api.nextId().call();
       next_id = parseInt(next_id);
@@ -244,23 +241,27 @@
   // fetch_user_tokens() | Fetch User Tokens | Staked & Otherwise |
   async function fetch_user_data(fetch_address) {
 
-    // No. STAKED Frogs owned by fetch_address
-    let staker_tokens = await controller.methods.getStakedTokens(fetch_address).call();
+    // No. of Frogs staked by fetch_address
+    let staker_tokens = await stakers(fetch_address, 'amountStaked')
 
     // No. Frogs owned by fetch_address
     let user_tokens = await collection.methods.balanceOf(fetch_address).call();
 
     // Must own atleast one Frog or atleast one Staked!
-    if (user_tokens >= 1 || staker_tokens.length >= 1) {
+    if (user_tokens >= 1 || staker_tokens >= 1) {
 
-      Output('<br><button onclick="claim_rewards()" style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(fetch_address)+' ]</acc><br>'+staker_tokens.length+' Frog(s) Staked '+''+staker_rewards+' $FLYZ 🡥</button>'+'<br><hr style="background: black;">'+'<div class="console_pre" id="console-pre"></div>');
+      let staker_info = await stakers(fetch_address, 'unclaimedRewards');
+      let staker_rewards = (staker_info / 1000000000000000000);
+      staker_rewards = String(staker_rewards).slice(0, 6);
+
+      Output('<br><button onclick="claim_rewards()" style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(fetch_address)+' ]</acc><br>'+staker_tokens+' Frog(s) Staked '+''+staker_rewards+' $FLYZ 🡥</button>'+'<br><hr style="background: black;">'+'<div class="console_pre" id="console-pre"></div>');
 
       // Render Frogs Staked by User
-      if (staker_tokens.length >= 1) {
-
+      if (staker_tokens >= 1) {
+        let staker_tokens_array = await controller.methods.getStakedTokens(fetch_address).call();
         try { // Fetch staked token data
-          for (var i = 0; i < staker_tokens.length; i++) {
-            tokenId = staker_tokens[i].tokenId
+          for (var i = 0; i < staker_tokens_array.length; i++) {
+            tokenId = staker_tokens_array[i].tokenId
             render_token(tokenId)
 
           }
