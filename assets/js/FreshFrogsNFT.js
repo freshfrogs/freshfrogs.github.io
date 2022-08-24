@@ -355,7 +355,7 @@
         button_middle.onclick = function() { stake_init(tokenId) }
         button_middle.removeAttribute('href');
 
-        button_right.innerHTML = '<strong>Morph</strong>two Frogs!';
+        button_right.innerHTML = '<strong>Morph</strong>combine Frog!!';
         button_right.removeAttribute('href');
 
       }
@@ -369,7 +369,7 @@
         button_middle.onclick = function() { withdraw_init(tokenId) }
         button_middle.removeAttribute('href');
 
-        button_right.innerHTML = '<strong>Morph</strong>combine Frogs!';
+        button_right.innerHTML = '<strong>Morph</strong>combine Frog!';
         button_right.removeAttribute('href');
 
       // Staked by someone else
