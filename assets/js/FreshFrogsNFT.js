@@ -515,14 +515,25 @@
     let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
     if (!is_approved) {
       consoleOutput(
-        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br><strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
+        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/>'+'<br>'+
+        '<strong>Staking Contract Approval</strong>'+'<br>'+
         'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
         '<div style="text-align: left;">'+
           '<b>(1/2) Approve Contract</b><br>This is a one time transaction to allow staking, requires a gas fee.'+
         '</div>'
       );
 
-      let set_approval = await setApproval();
+      // Submit Txn
+      let approval_txn = await setApproval();
+      
+      // Complete
+      consoleOutput(
+        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/>'+'<br>'+
+        '<strong>Staking Contract Approval</strong>'+'<br>'+
+        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+        '<div style="text-align: left;">'+approval_txn+'</div>'
+      );
+
       return
 
     } else { return }
@@ -543,6 +554,7 @@
       '</div>'
     );
 
+    // Submit Txn
     let withdraw_txn = await withdraw(tokenId);
 
     // Complete
@@ -570,6 +582,7 @@
       '</div>'
     );
 
+    // Submit Txn
     let stake_txn = await stake(tokenId);
 
     // Complete
@@ -579,7 +592,6 @@
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<div style="text-align: left;">'+stake_txn+'</div>'
     );
-
   }
 
   // setApproval | set staking contract approval
@@ -588,7 +600,7 @@
     try { // Set Contract Approval
       let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
 
-      if (!is_approved) {
+      if (!is_approved) { // Submit Txn
         let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
         return 'Contract approval has been updated!';
   
