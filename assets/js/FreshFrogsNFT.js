@@ -366,8 +366,9 @@
   async function render_token(frog_id, recent_sale) {
     if (! recent_sale) { recent_sale = '' } else { recent_sale = 'Ξ'+recent_sale }
 
-    // Is Frog Currently Staked? //
+    // Is Frog Currently Staked?
     let staked = await stakerAddress(frog_id);
+    let owner = await collection.methods.ownerOf(frog_id).call();
 
     // Token Variable Links
     let frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
@@ -428,16 +429,22 @@
     button_b.style.marginRight = 'auto';
 
     if (!staked) { // NOT Staked
-      button_b.innerHTML = 
+      if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+        button_b.innerHTML = 
         '<br>'+
         '<button class="frog_button" style="background: lightgreen; border: 1px solid black;" onclick="stake_init('+frog_id+')">Stake 🡥</button>'+
         '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
-      document.getElementById('traits_'+frog_id).appendChild(button_b);
+        document.getElementById('traits_'+frog_id).appendChild(button_b);
+
+      }
 
     } else { // STAKED
-      button_b.innerHTML = '<br><button class="frog_button" style="background: coral; border: 1px solid black;" onclick="withdraw_init('+frog_id+')">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
-      document.getElementById('traits_'+frog_id).appendChild(button_b);
+      if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+        button_b.innerHTML = '<br><button class="frog_button" style="background: coral; border: 1px solid black;" onclick="withdraw_init('+frog_id+')">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
+        document.getElementById('traits_'+frog_id).appendChild(button_b);
 
+      }
+      
       // Insert Owner Element
       var trait_text = document.createElement('div')
       trait_text.innerHTML = 'Owner: '+truncateAddress(staked)+'<br>';
