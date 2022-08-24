@@ -519,6 +519,9 @@
   // load_trait(_trait(family), _attribute(type), _where(element))
   function load_trait(trait, attribute, where, animate) {
 
+    // Default Parameters
+    if (! animate) { animate = false }
+
     // Create Img Element
     newAttribute = document.createElement("img");
 
@@ -534,15 +537,24 @@
 
     }
 
-    // Smoking Animations
-    if (attribute.includes('shades') || attribute.includes('Shades') || attribute.includes('tongue') || attribute.includes('smoking') && animate == true) {
-
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"_animation.gif"
-
-    } else {
+    if (!animate) {
 
       // Assign Source
       newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
+
+    } else {
+
+      // Smoking Animations
+      if (attribute.includes('shades') || attribute.includes('Shades') || attribute.includes('tongue') || attribute.includes('smoking')) {
+
+        newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"_animation.gif"
+
+      } else {
+
+        // Assign Source
+        newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
+
+      }
 
     }
 
