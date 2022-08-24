@@ -546,11 +546,11 @@
 
     // Begin Withdraw Txn
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br>'+
-      '<strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<div style="text-align: left;">'+
-        '<b>Withdraw NFT</b><br> Transfer Frog #'+token_id+' <u>from</u> staking protocol.'+
+        '<b>Withdraw NFT</b><br> Transfer Frog #'+tokenId+' <u>from</u> staking protocol.'+
       '</div>'
     );
 
@@ -574,11 +574,11 @@
 
     // Begin Stake Txn
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br>'+
-      '<strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<div style="text-align: left;">'+
-        '<b>Stake NFT</b><br> Transfer Frog #'+token_id+' <u>to</u> staking protocol.'+
+        '<b>Stake NFT</b><br> Transfer Frog #'+tokenId+' <u>to</u> staking protocol.'+
       '</div>'
     );
 
