@@ -515,7 +515,7 @@
     let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
     if (!is_approved) {
       consoleOutput(
-        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/>'+'<br>'+
+        '<br>'+
         '<strong>Staking Contract Approval</strong>'+'<br>'+
         'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
         '<br><div style="text-align: left;">'+
@@ -527,7 +527,7 @@
       let approval_txn = await setApproval();
       
       consoleOutput(
-        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/>'+'<br>'+
+        '<br>'+
         '<strong>Staking Contract Approval</strong>'+'<br>'+
         'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
         '<br><div style="text-align: left;">'+
