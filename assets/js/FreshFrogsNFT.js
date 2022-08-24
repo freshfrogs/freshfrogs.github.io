@@ -530,37 +530,6 @@
 
   // FreshFrogsController | NFT Staking Smart Contract | 0xCB1ee125CFf4051a10a55a09B10613876C4Ef199
 
-  async function approval_init() {
-
-    // Staking contract approval for current user
-    let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-    if (!is_approved) {
-      consoleOutput(
-        '<br>'+
-        '<strong>Staking Contract Approval</strong>'+'<br>'+
-        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-        '<br><div style="text-align: left;">'+
-          '<strong>(1/2) Approve Contract</strong><br>This is a one time transaction to allow staking, requires a gas fee.'+
-        '</div>'
-      );
-
-      // Submit Txn
-      let approval_txn = await setApproval();
-      
-      consoleOutput(
-        '<br>'+
-        '<strong>Staking Contract Approval</strong>'+'<br>'+
-        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-        '<br><div style="text-align: left;">'+
-          '<strong>(1/2) Approve Contract</strong><br> '+approval_txn+
-        '</div>'
-      );
-
-      return
-
-    } else { return }
-  }
-
   async function withdraw_init(tokenId) {
 
     // Check Contract Approval
