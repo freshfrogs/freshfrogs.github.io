@@ -234,11 +234,11 @@
       next_id = await f0.api.nextId().call();
       next_id = parseInt(next_id);
 
-      //Output('<br><button onclick="claim_rewards()" style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frog(s) Staked '+''+stakers_rewards+' $FLYZ 🡥</button>'+'<br><hr style="background: black;">'+'<div class="console_pre" id="console-pre"></div>');
+      Output('<br><button onclick="claim_rewards()" style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frog(s) Staked '+''+stakers_rewards+' $FLYZ 🡥</button>'+'<br><hr style="background: black;">'+'<div class="console_pre" id="console-pre"></div>');
 
     } catch (e) { // Something Went Wrong!
       console.log('WEB3 Connection Failed! '+e.message);
-      //consoleOutput('<strong></strong><br>Something went wrong!<br>'+e.message+'<a class="pointer" href=""><b id="connected">🔌 Connect Wallet</b></a>');
+      consoleOutput('<strong></strong><br>Something went wrong!<br>'+e.message+'<a class="pointer" href=""><b id="connected">🔌 Connect Wallet</b></a>');
 
     }
   }
@@ -500,6 +500,57 @@
   }
 
   // FreshFrogsController | NFT Staking Smart Contract | 0xCB1ee125CFf4051a10a55a09B10613876C4Ef199
+
+  async function stake_init(tokenId) {
+
+    // Staking Contract Approval
+    let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+    if (!is_approved) {
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br><strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+      '<div style="text-align: left;">'+
+      '<br><b>(1/2) Approve Contract</b><br>This is a one time transaction to allow staking, requires a gas fee.<br>'+
+      '</div>');
+
+      let set_approval = await setApproval();
+
+    }
+
+    // Begin Staking Txn
+    consoleOutput('<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br><strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+    '<div style="text-align: left;">'+
+    '<br><b>Transfer NFT</b><br>Transfer Frog #'+tokenId+' to staking protocol.<br>'+
+    '</div>');
+
+    let stake_txn = await stake(tokenId);
+
+    // Complete
+    consoleOutput('<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br><strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+    '<div style="text-align: left;">'+
+    '<br><p>'+stake_txn+'</p><br>'+
+    '</div>');
+
+  }
+
+  // setApproval | set staking contract approval
+  async function setApproval() {
+
+    try { // Set Contract Approval
+      let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+
+      if (!is_approved) {
+        let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
+        return 'Contract approval has been updated!';
+  
+      } else {
+        return 'Contract has already been approved by user!';
+  
+      }
+    
+    } catch (e) { // Catch Error =>
+      return 'Something went wrong! '+e.message;
+
+    }
+  }
   
   // <-----
   // SEND()
