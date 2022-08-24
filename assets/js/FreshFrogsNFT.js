@@ -443,8 +443,7 @@
         '<div class="frog_imgContainer" id="cont_'+frog_id+'">'+
           //'<img src="'+frog_external+'" class="frog_img"/>'+
         '</div>'+
-        '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
-        '<strong id="level_'+frog_id+'" class="frog_level"><i>not staked</i></strong>'+
+        '<div id="staked_'+frog_id+'"></div>'+
         '<div id="traits_'+frog_id+'" class="trait_list">'+
           '<strong>Properties</strong><div id="prop_'+frog_id+'" class="properties"></div>'+
         '</div>'+
@@ -498,6 +497,10 @@
 
       }
       */
+
+      document.getElementById('staked_'+frog_id).innerHTML = 
+        '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
+        '<strong id="level_'+frog_id+'" class="frog_level"><i>staked</i></strong>';
       
       // Check Staked Time / Calculate Level
       let staked_time_bool = await timeStaked(frog_id);
