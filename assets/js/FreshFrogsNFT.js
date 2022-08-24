@@ -526,10 +526,13 @@
       // Submit Txn
       let approval_txn = await setApproval();
       
-      // Complete
       consoleOutput(
         '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/>'+'<br>'+
-        '<strong>Staking Contract Approval</strong>'+'<br>'+approval_txn
+        '<strong>Staking Contract Approval</strong>'+'<br>'+
+        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+        '<br><div style="text-align: left;">'+
+          '<strong>(1/2) Approve Contract</strong><br> '+approval_txn+
+        '</div>'
       );
 
       return
@@ -555,10 +558,14 @@
     // Submit Txn
     let withdraw_txn = await withdraw(tokenId);
 
-    // Complete
+    // Begin Withdraw Txn
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/>'+'<br>'+
-      '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+withdraw_txn
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
+      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+      '<br><div style="text-align: left;">'+
+        '<strong>Withdraw NFT</strong><br> '+withdraw_txn+
+      '</div>'
     );
 
   }
@@ -583,8 +590,12 @@
 
     // Complete
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/>'+'<br>'+
-      '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+stake_txn
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
+      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+      '<br><div style="text-align: left;">'+
+        '<strong>Stake NFT</strong><br> '+stake_txn+
+      '</div>'
     );
   }
 
