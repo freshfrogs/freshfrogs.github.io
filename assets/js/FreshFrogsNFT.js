@@ -822,7 +822,7 @@
 
       //console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
 
-      // Return time staked in (Hours) //
+      // Return time staked in (Hours)
       return staked_hours;
 
     }
