@@ -348,11 +348,11 @@
       // Owned by current user
       if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
 
-        button_middle.innerHTML = '<strong>Stake</strong>stake Frog!';
+        button_middle.innerHTML = '<strong>Stake</strong>and earn!';
         button_middle.onclick = function() { stake_init(tokenId) }
         button_middle.removeAttribute('href');
 
-        button_right.innerHTML = '<strong>Morph</strong>combine Frogs!';
+        button_right.innerHTML = '<strong>Morph</strong>merge Frog!';
         button_right.removeAttribute('href');
 
       }
