@@ -378,7 +378,7 @@
     for (var i = 0; i < metadata.attributes.length; i++) {
 
       var attribute = metadata.attributes[i];
-      load_trait(attribute.trait_type, attribute.value, 'frogContainer4', true);
+      load_trait(attribute.trait_type, attribute.value, 'frogContainer4');
 
       // Update Display Button
       if (attribute.trait_type == 'Frog' || attribute.trait_type == 'SpecialFrog') {
@@ -450,7 +450,7 @@
       let attribute = metadata.attributes[i]
 
       // Render Attribute
-      load_trait(attribute.trait_type, attribute.value, 'cont_'+frog_id, false);
+      load_trait(attribute.trait_type, attribute.value, 'cont_'+frog_id);
 
       // Calculate Trait Rarity
       try { trait_rarity = ((traits_list[attribute.trait_type][attribute.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) { trait_rarity = 'e'; }
@@ -538,7 +538,7 @@
         newAttribute.className = "frogImg4";
 
       }
-      
+
     }
 
     // Assign Source
