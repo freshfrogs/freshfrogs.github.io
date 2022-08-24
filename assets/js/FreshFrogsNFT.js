@@ -478,14 +478,14 @@
       // Stake Button
       button_b.innerHTML = 
         '<br>'+
-        '<button class="frog_button" style="background: lightgreen; border: 1px solid black; font-weight: bold;" onclick="stake('+frog_id+')">Stake 🡥</button>'+
+        '<button class="frog_button" style="background: lightgreen; border: 1px solid black; font-weight: bold;" onclick="stake('+frog_id+', '+user_address+')">Stake 🡥</button>'+
         '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button" style="font-weight: bold;">Rankings 🡥</button></a>';
       document.getElementById('traits_'+frog_id).appendChild(button_b);
 
     } else { 
 
       // Or Un-stake Button
-      button_b.innerHTML = '<br><button class="frog_button" style="background: coral; border: 1px solid black; font-weight: bold;" onclick="withdraw('+frog_id+')">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button" style="font-weight: bold;">Rankings 🡥</button></a>';
+      button_b.innerHTML = '<br><button class="frog_button" style="background: coral; border: 1px solid black; font-weight: bold;" onclick="withdraw('+frog_id+', '+user_address+')">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button" style="font-weight: bold;">Rankings 🡥</button></a>';
       document.getElementById('traits_'+frog_id).appendChild(button_b);
 
       // Create Owner Element and Staking Level //
