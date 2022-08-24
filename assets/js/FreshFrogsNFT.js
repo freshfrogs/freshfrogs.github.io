@@ -409,7 +409,7 @@
         '<div class="frog_imgContainer" id="cont_'+frog_id+'">'+
           //'<img src="'+frog_external+'" class="frog_img"/>'+
         '</div>'+
-        '<div id="staked_'+frog_id+'"><br></div>'+
+        '<div id="staked_'+frog_id+'"></div>'+
         '<div id="traits_'+frog_id+'" class="trait_list">'+
           '<strong>Properties</strong><div id="prop_'+frog_id+'" class="properties"></div>'+
         '</div>'+
