@@ -250,7 +250,7 @@
     // Must own atleast one Frog or atleast one Staked!
     if (user_tokens >= 1 || staker_tokens >= 1) {
 
-      let staker_info = await stakers(fetch_address, 'unclaimedRewards');
+      let staker_info = await controller.methods.availableRewards(user_address).call();
       let staker_rewards = (staker_info / 1000000000000000000);
       staker_rewards = String(staker_rewards).slice(0, 6);
 
