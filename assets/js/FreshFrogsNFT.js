@@ -617,7 +617,7 @@
   }
 
   // withdraw(_tokenId (uint256), _user (address)) | send =>
-  async function withdraw(tokenId, userAddress) {
+  async function withdraw(tokenId) {
 
     // Frog is currently staked and belongs to user
     let staked = await stakerAddress(tokenId);
@@ -628,12 +628,12 @@
       return;
 
     // Frog is currently staked by user
-    } else if (staked == userAddress) {
+    } else if (staked == user_address) {
 
       try {
 
         // Send Function to FreshFrogsController Staking Contract
-        let withdraw = await controller.methods.withdraw(tokenId).send({ from: userAddress });
+        let withdraw = await controller.methods.withdraw(tokenId).send({ from: user_address });
         return 'Frog #'+tokenId+' has succesfully been un-staked!';
 
       } catch (e) {
@@ -653,19 +653,19 @@
   }
 
   // stake(_tokenId (uint256), _user (address)) | send =>
-  async function stake(tokenId, userAddress) {
+  async function stake(tokenId) {
 
     // Frog Ownership Status
     let owned = await collection.methods.ownerOf(tokenId).call();
     owned = owned.toString();
 
     // Owned by User attempting to Stake
-    if (owned.toString().toLowerCase() == userAddress.toString().toLowerCase()) {
+    if (owned.toString().toLowerCase() == user_address.toString().toLowerCase()) {
 
       try {
 
         // Send function to FreshFrogsController Staking Contract
-        let stake = await controller.methods.stake(tokenId).send({ from: userAddress });
+        let stake = await controller.methods.stake(tokenId).send({ from: user_address });
         return 'Frog #'+tokenId+' has succesfully been staked!';
 
       } catch (e) {
