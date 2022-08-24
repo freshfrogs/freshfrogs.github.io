@@ -518,8 +518,8 @@
         '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/>'+'<br>'+
         '<strong>Staking Contract Approval</strong>'+'<br>'+
         'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-        '<div style="text-align: left;">'+
-          '<b>(1/2) Approve Contract</b><br>This is a one time transaction to allow staking, requires a gas fee.'+
+        '<br><div style="text-align: left;">'+
+          '<strong>(1/2) Approve Contract</strong><br>This is a one time transaction to allow staking, requires a gas fee.'+
         '</div>'
       );
 
@@ -529,9 +529,7 @@
       // Complete
       consoleOutput(
         '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/>'+'<br>'+
-        '<strong>Staking Contract Approval</strong>'+'<br>'+
-        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-        '<div style="text-align: left;">'+approval_txn+'</div>'
+        '<strong>Staking Contract Approval</strong>'+'<br>'+approval_txn
       );
 
       return
@@ -549,8 +547,8 @@
       '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
       '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-      '<div style="text-align: left;">'+
-        '<b>Withdraw NFT</b><br> Transfer Frog #'+tokenId+' <u>from</u> staking protocol.'+
+      '<br><div style="text-align: left;">'+
+        '<strong>Withdraw NFT</strong><br> Transfer Frog #'+tokenId+' <u>from</u> staking protocol.'+
       '</div>'
     );
 
@@ -560,9 +558,7 @@
     // Complete
     consoleOutput(
       '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/>'+'<br>'+
-      '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
-      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-      '<div style="text-align: left;">'+withdraw_txn+'</div>'
+      '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+withdraw_txn
     );
 
   }
@@ -577,8 +573,8 @@
       '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
       '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-      '<div style="text-align: left;">'+
-        '<b>Stake NFT</b><br> Transfer Frog #'+tokenId+' <u>to</u> staking protocol.'+
+      '<br><div style="text-align: left;">'+
+        '<strong>Stake NFT</strong><br> Transfer Frog #'+tokenId+' <u>to</u> staking protocol.'+
       '</div>'
     );
 
@@ -588,9 +584,7 @@
     // Complete
     consoleOutput(
       '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/>'+'<br>'+
-      '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
-      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-      '<div style="text-align: left;">'+stake_txn+'</div>'
+      '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+stake_txn
     );
   }
 
