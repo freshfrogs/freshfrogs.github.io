@@ -619,7 +619,7 @@
         return 'Frog #'+tokenId+' has succesfully been staked!';
 
       } catch (e) {
-        return 'Something went wrong! '+e.message;
+        return 'Something went wrong!\n'+e.message;
 
       }
 
