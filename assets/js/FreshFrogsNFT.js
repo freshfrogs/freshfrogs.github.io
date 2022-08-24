@@ -352,7 +352,7 @@
 
     button_left.href = etherscanLink;
     button_left.target = '_blank';
-    
+
     if (!staked) { // Not Staked
 
       let owner = await collection.methods.ownerOf(tokenId).call();
@@ -463,17 +463,12 @@
       }
 
       document.getElementById('staked_'+frog_id).innerHTML = 
-        '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
+        '<i>'+truncateAddress(staked)+'</i><br><b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
         '<strong id="level_'+frog_id+'" class="frog_level"><i>staked</i></strong>';
       
       // Check Staked Time / Calculate Level
       let staked_time_bool = await timeStaked(frog_id);
-      if (staked_time_bool >= 2000) { staked_level = 3; } else if (staked_time_bool >= 1000) { staked_level = 2; } else { staked_level = 1; }
-
-      // Insert Owner Element
-      var trait_text = document.createElement('div')
-      trait_text.innerHTML = 'Owner: '+truncateAddress(staked)+'<br>';//+'Time Staked: '+staked_time_bool+' hours';
-      document.getElementById('prop_'+frog_id).appendChild(trait_text);      
+      if (staked_time_bool >= 2000) { staked_level = 3; } else if (staked_time_bool >= 1000) { staked_level = 2; } else { staked_level = 1; }     
 
       // Update Progress Bar
       let percent = parseInt((staked_time_bool/(1000*staked_level))*100);
