@@ -335,8 +335,7 @@
     document.getElementById('thisheader').style.backgroundImage = 'url('+displayImg+')';
     document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
     document.getElementById('frogContainer4').innerHTML = '';
-    button_left.href = etherscanLink;
-    button_left.target = '_blank';
+
     var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+tokenId+".json")).json();
     for (var i = 0; i < metadata.attributes.length; i++) {
       var attribute = metadata.attributes[i];
@@ -351,6 +350,9 @@
     // Is this token currently staked?
     let staked = await stakerAddress(tokenId);
 
+    button_left.href = etherscanLink;
+    button_left.target = '_blank';
+    
     if (!staked) { // Not Staked
 
       let owner = await collection.methods.ownerOf(tokenId).call();
