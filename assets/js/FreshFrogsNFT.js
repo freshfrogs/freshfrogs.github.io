@@ -652,7 +652,7 @@
       return 'Rewards have succesfully been claimed!';
 
     } catch (e) { // Catch Error =>
-      return e.message;
+      return '(!) '+e.message;
 
     }
   }
@@ -679,7 +679,7 @@
         return 'Frog #'+tokenId+' has succesfully been un-staked!';
 
       } catch (e) {
-        return e.message;
+        return '(!) '+e.message;
       
       }
 
@@ -708,7 +708,7 @@
         return 'Frog #'+tokenId+' has succesfully been staked!';
 
       } catch (e) {
-        return e.message;
+        return '(!) '+e.message;
 
       }
 
