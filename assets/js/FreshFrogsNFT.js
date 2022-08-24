@@ -625,6 +625,7 @@
     if (!staked) {
 
       // Frog is not currently staked!
+      console.log('Frog is not currently staked!')
       return;
 
     // Frog is currently staked by user
@@ -646,6 +647,7 @@
     } else {
 
       // Frog does not belong to user!
+      console.log('Frog does not belong to user!')
       return;
 
     }
@@ -657,7 +659,8 @@
 
     // Frog Ownership Status
     let owned = await collection.methods.ownerOf(tokenId).call();
-    owned = owned.toString();
+
+    console.log('owned: '+owned);
 
     // Owned by User attempting to Stake
     if (owned.toString().toLowerCase() == user_address.toString().toLowerCase()) {
