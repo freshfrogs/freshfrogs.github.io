@@ -352,7 +352,7 @@
         button_middle.onclick = function() { stake_init(tokenId) }
         button_middle.removeAttribute('href');
 
-        button_right.innerHTML = '<strong>Morph</strong>merge Frog!';
+        button_right.innerHTML = '<strong>Morph</strong>two Frogs!';
         button_right.removeAttribute('href');
 
       }
