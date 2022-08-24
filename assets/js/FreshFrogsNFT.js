@@ -352,7 +352,7 @@
 
     button_left.href = etherscanLink;
     button_left.target = '_blank';
-
+    
     if (!staked) { // Not Staked
 
       let owner = await collection.methods.ownerOf(tokenId).call();
@@ -411,9 +411,6 @@
         '<div class="frog_imgContainer" id="cont_'+frog_id+'">'+
           //'<img src="'+frog_external+'" class="frog_img"/>'+
         '</div>'+
-        '<div style="text-align: left; margin: 8px; height: 16px;">'+
-        '<strong class="frog_name"></strong><strong id="time_'+frog_id+'" class="frog_price"></strong>'+
-      '</div>'+
         '<div id="staked_'+frog_id+'"></div>'+
         '<div id="traits_'+frog_id+'" class="trait_list">'+
           '<strong>Properties</strong><div id="prop_'+frog_id+'" class="properties"></div>'+
@@ -466,13 +463,17 @@
       }
 
       document.getElementById('staked_'+frog_id).innerHTML = 
-        '<i>'+truncateAddress(staked)+'</i><br><b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
+        '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
         '<strong id="level_'+frog_id+'" class="frog_level"><i>staked</i></strong>';
       
       // Check Staked Time / Calculate Level
       let staked_time_bool = await timeStaked(frog_id);
       if (staked_time_bool >= 2000) { staked_level = 3; } else if (staked_time_bool >= 1000) { staked_level = 2; } else { staked_level = 1; }
-      document.getElementById('time_'+frog_id).innerHTML = staked_time_bool+'hrs';
+
+      // Insert Owner Element
+      var trait_text = document.createElement('div')
+      trait_text.innerHTML = 'Owner: '+truncateAddress(staked)+'<br>';//+'Time Staked: '+staked_time_bool+' hours';
+      document.getElementById('prop_'+frog_id).appendChild(trait_text);      
 
       // Update Progress Bar
       let percent = parseInt((staked_time_bool/(1000*staked_level))*100);
@@ -598,7 +599,7 @@
     // Begin Stake Txn
     consoleOutput(
       '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-      '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
+      '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
         '<strong>Stake NFT</strong><br> Transfer Frog #'+tokenId+' <u>to</u> staking protocol.'+
@@ -611,7 +612,7 @@
     // Complete
     consoleOutput(
       '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-      '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
+      '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
         '<strong>Stake NFT</strong><br> '+stake_txn+
@@ -641,7 +642,7 @@
   }
   
   // <-----
-  // SEND() //
+  // SEND()
   // ----->
 
   // claimRewards(_user (address)) | send =>
@@ -652,7 +653,7 @@
       return 'Rewards have succesfully been claimed!';
 
     } catch (e) { // Catch Error =>
-      return '(!) '+e.message;
+      return e.message;
 
     }
   }
@@ -679,7 +680,7 @@
         return 'Frog #'+tokenId+' has succesfully been un-staked!';
 
       } catch (e) {
-        return '(!) '+e.message;
+        return e.message;
       
       }
 
@@ -708,7 +709,7 @@
         return 'Frog #'+tokenId+' has succesfully been staked!';
 
       } catch (e) {
-        return '(!) '+e.message;
+        return e.message;
 
       }
 
