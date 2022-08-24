@@ -451,7 +451,7 @@
 
       // Insert Owner Element
       var trait_text = document.createElement('div')
-      trait_text.innerHTML = 'Owner: '+truncateAddress(staked)+'<br>'+'Time Staked: '+staked_time_bool+' hours'+'<br>';
+      trait_text.innerHTML = 'Owner: '+truncateAddress(staked)+'<br>'+'Time Staked: '+staked_time_bool+' hours';
       document.getElementById('prop_'+frog_id).appendChild(trait_text);      
 
       // Update Progress Bar
