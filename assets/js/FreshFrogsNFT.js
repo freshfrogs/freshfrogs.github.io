@@ -596,6 +596,7 @@
     // Check Contract Approval
     let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
 
+    // Not Approved
     if (!is_approved) {
 
       consoleOutput(
@@ -607,6 +608,7 @@
         '</div>'
       );
 
+      // Submit Txn
       let set_approval = await setApprovalForAll();
 
       if (set_approval !==true) {
@@ -620,11 +622,12 @@
           '</div>'
         );
 
+        // Catch Error
         return
-        
+
       }
     }
-
+    
     // Begin Stake Txn
     consoleOutput(
       '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
@@ -647,6 +650,7 @@
         '<strong>Stake NFT</strong><br> '+stake_txn+
       '</div>'
     );
+
   }
 
   // setApproval | set staking contract approval
