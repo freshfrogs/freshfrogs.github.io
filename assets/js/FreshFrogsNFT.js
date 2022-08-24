@@ -525,17 +525,8 @@
     // Create Img Element
     newAttribute = document.createElement("img");
 
-    if (where.includes('cont_')) {
-      // Assign Class
-      
-      newAttribute.className = "frogImg3";
-
-    } else {
-
-      // Assign Class
-      if (trait == 'Trait') { newAttribute.className = "frogImg5"; } else { newAttribute.className = "frogImg4"; }
-
-    }
+    // Assign Class
+    if (where.includes('cont_')) { newAttribute.className = "frogImg3"; } else { if (trait == 'Trait') { newAttribute.className = "frogImg5"; } else { newAttribute.className = "frogImg4"; } }
 
     if (!animate) {
 
