@@ -326,23 +326,63 @@
     let displayName = 'Frog #'+tokenId
 
     // Is this token currently staked?
-    let staked = await stakerAddress(tokenId)
+    let staked = await stakerAddress(tokenId);
+
+    // Token Holder
+    let owner = await collection.methods.ownerOf(tokenId).call();
+
+    // Default Button Properties
+    button_left.href = etherscanLink;
+    button_left.target = '_blank';
+
+    button_middle.innerHTML = '<strong>Owned By</strong>'+truncateAddress(owner);
+    button_middle.href = 'https://opensea.io/'+owner;
+    button_middle.target = '_blank';
+
+    button_right.innerHTML = '<strong>OpenSea</strong>view on';
+    button_middle.href = openseaLink;
+    button_left.target = '_blank';
 
     if (!staked) { // NOT Staked
+
+      // Owned by current user
+      if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+
+        button_middle.innerHTML = '<strong>Stake</strong>stake Frog!';
+        button_middle.onclick = function() { stake_init(tokenId) }
+        button_middle.removeAttribute('href');
+
+        button_right.innerHTML = '<strong>Morph</strong>combine Frogs!';
+        button_right.removeAttribute('href');
+
+      }
+
     } else { // STAKED
 
       // Get Total Hours Staked
       let stakedHours = await timeStaked(tokenId);
 
-      // Update Button Properties
-      button_left.href = etherscanLink;
-      button_left.target = '_blank';
-      button_middle.innerHTML = '<strong>Owned By</strong>'+truncateAddress(staked);
-      button_middle.href = 'https://opensea.io/'+staked;
-      button_middle.target = '_blank';
-      button_right.innerHTML = '<strong>Time Staked</strong>'+stakedHours+' hours';
-      button_right.removeAttribute('href');
+      // Staked by current user
+      if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
 
+        button_middle.innerHTML = '<strong>Withdraw</strong>un-stake Frog!';
+        button_middle.onclick = function() { withdraw_init(tokenId) }
+        button_middle.removeAttribute('href');
+
+        button_right.innerHTML = '<strong>Morph</strong>combine Frogs!';
+        button_right.removeAttribute('href');
+
+      // Staked by someone else
+      } else {
+
+        button_middle.innerHTML = '<strong>Owned By</strong>'+truncateAddress(staked);
+        button_middle.href = 'https://opensea.io/'+staked;
+        button_middle.target = '_blank';
+
+        button_right.innerHTML = '<strong>Time Staked</strong>'+stakedHours+' hours';
+        button_right.removeAttribute('href');
+
+      }
     }
 
     document.getElementById('thisheader').style.backgroundImage = 'url('+displayImg+')';
@@ -682,10 +722,10 @@
     console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
 
     // Check ownership status
-    let owned = await collection.methods.ownerOf(tokenId).call();
+    let owner = await collection.methods.ownerOf(tokenId).call();
 
     // Valid ownership
-    if (owned.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+    if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
 
       try {
         let stake = await controller.methods.stake(tokenId).send({ from: user_address });
@@ -697,7 +737,7 @@
       }
 
     // Token already Staked
-    } else if (owned.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) {
+    } else if (owner.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) {
       return 'Frog #'+tokenId+' is already staked!';
 
     // Invalid Ownership
