@@ -532,7 +532,7 @@
     let stake_txn = await stake(tokenId);
 
     // Complete
-    consoleOutput('<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br><strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+stake_txn+
+    consoleOutput('<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br><strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br><br>'+stake_txn+
     '<div style="text-align: left;">'+
     '</div>');
 
@@ -554,7 +554,7 @@
       }
     
     } catch (e) { // Catch Error =>
-      return 'Something went wrong! '+e.message;
+      return e.message;
 
     }
   }
@@ -571,7 +571,7 @@
       return 'Rewards have succesfully been claimed!';
 
     } catch (e) { // Catch Error =>
-      return 'Something went wrong! '+e.message;
+      return e.message;
 
     }
   }
@@ -594,7 +594,7 @@
         return 'Frog #'+tokenId+' has succesfully been un-staked!';
 
       } catch (e) {
-        return 'Something went wrong! '+e.message;
+        return e.message;
       
       }
 
@@ -619,7 +619,7 @@
         return 'Frog #'+tokenId+' has succesfully been staked!';
 
       } catch (e) {
-        return 'Something went wrong!\n'+e.message;
+        return e.message;
 
       }
 
