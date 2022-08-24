@@ -240,6 +240,12 @@
 
   // fetch_user_tokens() | Fetch User Tokens | Staked & Otherwise |
   async function fetch_user_data(fetch_address) {
+    if (! fetch_address) { fetch_address = user_address; }
+    if (fetch_address.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) {
+      render_functions = false;
+    } else if (fetch_address.toString().toLowerCase() == user_address.toString().toLowerCase()){
+      render_functions = true;
+    }
 
     // No. of Frogs staked by fetch_address
     let staker_tokens = await stakers(fetch_address, 'amountStaked')
@@ -262,7 +268,7 @@
         try { // Fetch staked token data
           for (var i = 0; i < staker_tokens_array.length; i++) {
             tokenId = staker_tokens_array[i].tokenId
-            render_token(tokenId)
+            render_token(tokenId, render_functions)
 
           }
         } catch (e) {
@@ -288,10 +294,10 @@
 
               if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
                 let sale_price = total_price / Math.pow(10, decimals);
-                render_token(token_id, sale_price);
+                render_token(token_id, render_functions, sale_price);
 
               } else {
-                render_token(token_id);
+                render_token(token_id, render_functions);
 
               }
             })
@@ -319,17 +325,18 @@
     var button_left = document.getElementById('button_left');
     var button_middle = document.getElementById('button_middle');
     var button_right = document.getElementById('button_right');
-    
+    // Links
     let openseaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
     let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
     let displayImg = 'https://freshfrogs.io/frog/'+tokenId+'.png'
     let displayName = 'Frog #'+tokenId
 
+    // Update Display Image
     document.getElementById('thisheader').style.backgroundImage = 'url('+displayImg+')';
     document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
     document.getElementById('frogContainer4').innerHTML = '';
-
-    // Fetch Metadata
+    button_left.href = etherscanLink;
+    button_left.target = '_blank';
     var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+tokenId+".json")).json();
     for (var i = 0; i < metadata.attributes.length; i++) {
       var attribute = metadata.attributes[i];
@@ -344,19 +351,22 @@
     // Is this token currently staked?
     let staked = await stakerAddress(tokenId);
 
-    // Get Total Hours Staked
-    let stakedHours = await timeStaked(tokenId);
+    if (!staked) { // Not Staked
 
-    // Token Holder
-    let owner = await collection.methods.ownerOf(tokenId).call();
+      let owner = await collection.methods.ownerOf(tokenId).call();
 
-    if (!staked) { // NOT Staked
+      button_middle.innerHTML = '<strong>Owned By</strong>'+truncateAddress(owner);
+      button_middle.href = 'https://opensea.io/'+owner;
+      button_middle.target = '_blank';
 
-    } else { // STAKED
+      button_right.innerHTML = '<strong>OpenSea</strong>view on';
+      button_right.href = openseaLink;
+      button_right.target = '_blank';
 
-      button_left.href = etherscanLink;
-      button_left.target = '_blank';
-      
+    } else { // Staked
+
+      let stakedHours = await timeStaked(tokenId);
+
       button_middle.innerHTML = '<strong>Owned By</strong>'+truncateAddress(staked);
       button_middle.href = 'https://opensea.io/'+staked;
       button_middle.target = '_blank';
@@ -368,8 +378,9 @@
   }
 
   // render_token()
-  async function render_token(frog_id, recent_sale) {
-    if (! recent_sale) { recent_sale = '' } else { recent_sale = 'Ξ'+recent_sale }
+  async function render_token(frog_id, functions, recent_sale) {
+    if (! recent_sale) { recent_sale = ''; } else { recent_sale = 'Ξ'+recent_sale; }
+    if (! functions) { functions = false; }
 
     // Is Frog Currently Staked?
     let staked = await stakerAddress(frog_id);
@@ -433,25 +444,21 @@
     button_b.style.marginRight = 'auto';
 
     if (!staked) { // NOT Staked
-      /*
-      if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+      if (owner.toString().toLowerCase() == user_address.toString().toLowerCase() && functions) {
         button_b.innerHTML = 
-        '<br>'+
-        '<button class="frog_button" style="background: lightgreen; border: 1px solid black;" onclick="stake_init('+frog_id+')">Stake 🡥</button>'+
-        '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
+          '<br>'+
+          '<button class="frog_button" style="background: lightgreen; border: 1px solid black;" onclick="stake_init('+frog_id+')">Stake 🡥</button>'+
+          '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
         document.getElementById('traits_'+frog_id).appendChild(button_b);
 
       }
-      */
 
     } else { // STAKED
-      /*
-      if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+      if (staked.toString().toLowerCase() == user_address.toString().toLowerCase() && functions) {
         button_b.innerHTML = '<br><button class="frog_button" style="background: coral; border: 1px solid black;" onclick="withdraw_init('+frog_id+')">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
         document.getElementById('traits_'+frog_id).appendChild(button_b);
 
       }
-      */
 
       document.getElementById('staked_'+frog_id).innerHTML = 
         '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
