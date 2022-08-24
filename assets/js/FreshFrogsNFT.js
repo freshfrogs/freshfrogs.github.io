@@ -493,7 +493,7 @@
       */
 
       // Create Owner Element and Staking Level //
-      var trait_text = document.createElement('i')
+      var trait_text = document.createElement('div')
       trait_text.innerHTML = 'Owner: '+truncateAddress(staked)+'<br>';
       document.getElementById('prop_'+frog_id).appendChild(trait_text);
 
