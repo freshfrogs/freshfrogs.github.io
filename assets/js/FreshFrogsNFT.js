@@ -532,9 +532,8 @@
     let stake_txn = await stake(tokenId);
 
     // Complete
-    consoleOutput('<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br><strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+    consoleOutput('<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br><strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+stake_txn+
     '<div style="text-align: left;">'+
-    '<br><p>'+stake_txn+'</p><br>'+
     '</div>');
 
   }
