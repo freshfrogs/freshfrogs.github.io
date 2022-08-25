@@ -365,8 +365,8 @@
       button_middle.href = 'https://opensea.io/'+owner;
       button_middle.target = '_blank';
 
-      button_right.innerHTML = '<strong>OpenSea</strong>view on';
-      button_right.href = openseaLink;
+      button_right.innerHTML = '<strong>Image</strong>original';
+      button_right.href = 'https://freshfrogs.io/frog/'+tokenId+'.png';
       button_right.target = '_blank';
 
     } else { // Staked
