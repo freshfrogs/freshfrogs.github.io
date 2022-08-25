@@ -398,7 +398,7 @@
         '</div>'+
         '<div id="staked_'+frog_id+'"></div>'+
         '<div id="traits_'+frog_id+'" class="trait_list">'+
-          '<strong>Properties</strong><div id="prop_'+frog_id+'" class="properties"></div>'+
+          '<strong>Properties</strong><div id="owner_'+frog_id+'"style="float:right;">'+truncateAddress(owner)+'</div><div id="prop_'+frog_id+'" class="properties"></div>'+
         '</div>'+
       '</div>';
 
@@ -438,7 +438,6 @@
           '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
           //'<button class="frog_button" style="border: 1px solid black;" onclick="morph_init('+frog_id+')">Morph 🡥</button>';
         document.getElementById('traits_'+frog_id).appendChild(button_b);
-
       }
 
     } else { // STAKED
@@ -460,10 +459,13 @@
       let staked_time_bool = await timeStaked(frog_id);
       if (staked_time_bool >= 2000) { staked_level = 3; } else if (staked_time_bool >= 1000) { staked_level = 2; } else { staked_level = 1; }
 
-      // Insert Owner Element
-      //var trait_text = document.createElement('div')
-      //trait_text.innerHTML = 'Owner: '+truncateAddress(staked)+'<br>';//+'Time Staked: '+staked_time_bool+' hours';
-      //document.getElementById('prop_'+frog_id).appendChild(trait_text);      
+      // Time Staked
+      var trait_text = document.createElement('div')
+      trait_text.innerHTML = 'Staked: '+parseInt(staked_time_bool/24)+'<br>';
+      document.getElementById('prop_'+frog_id).appendChild(trait_text);
+
+      // Owner
+      document.getElementById('owner_'+frog_id).innerHTML = truncateAddress(staker);
 
       // Update Progress Bar
       let percent = parseInt((staked_time_bool/(1000*staked_level))*100);
