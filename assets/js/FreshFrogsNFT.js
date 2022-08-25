@@ -557,42 +557,6 @@
     console_pre = document.getElementById('pre');
     console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
 
-    // Check Contract Approval
-    let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-
-    // Not Approved
-    if (!is_approved) {
-
-      consoleOutput(
-        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-        '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
-        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-        '<br><div style="text-align: left;">'+
-          '<strong>(1/2) Approve Staking</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
-          '<br><br>This is a one time transaction to allow staking, requires a gas fee.'+
-        '</div>'
-      );
-
-      // Submit Txn
-      let set_approval = await setApprovalForAll();
-
-      if (set_approval !==true) {
-
-        consoleOutput(
-          '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-          '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
-          'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-          '<br><div style="text-align: left;">'+
-            '<strong>(1/2) Approve Staking</strong><br> '+set_approval+
-          '</div>'
-        );
-
-        // Catch Error
-        return
-
-      }
-    }
-
     // Begin Withdraw Txn
     consoleOutput(
       '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
