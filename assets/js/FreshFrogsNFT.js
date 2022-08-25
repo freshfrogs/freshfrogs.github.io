@@ -467,7 +467,7 @@
       document.getElementById('prop_'+frog_id).appendChild(trait_text);
 
       // Owner
-      document.getElementById('owner_'+frog_id).innerHTML = truncateAddress(staker);
+      document.getElementById('owner_'+frog_id).innerHTML = truncateAddress(staked);
 
       // Update Progress Bar
       let percent = parseInt((staked_time_bool/(1000*staked_level))*100);
