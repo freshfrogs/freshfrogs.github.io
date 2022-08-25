@@ -469,7 +469,7 @@
         button_b.innerHTML = 
           '<br>'+
           '<button class="frog_button" style="background: salmon; border: 1px solid black;" onclick="withdraw_init('+frog_id+')">UnStake 🡥</button>'+
-          '<button class="frog_button" style="border: 1px solid black;" onclick="morph_init('+frog_id+')">Morph 🡥</button>';
+          '<button class="frog_button id="morph_'+frog_id+'" style="border: 1px solid black;" onclick="morph_init('+frog_id+')">Morph 🡥</button>';
         document.getElementById('traits_'+frog_id).appendChild(button_b);
 
       }
@@ -928,6 +928,7 @@
   }
 
   async function morph_init(frog_token) {
+    document.getElementById('morph_'+frog_token).innerHTML = 'Select Frog!'
     let base_frog = frog_token;
     let morphing = true;
   }
