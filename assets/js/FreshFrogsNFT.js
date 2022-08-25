@@ -461,7 +461,9 @@
 
       // Time Staked
       var trait_text = document.createElement('div')
-      trait_text.innerHTML = 'Staked: '+parseInt(staked_time_bool/24)+'<br>';
+      if (staked_time_bool >= 720) { trait_text.innerHTML = 'Staked: '+parseInt(staked_time_bool/24)+' days 🔥<br>'; } 
+      else { trait_text.innerHTML = 'Staked: '+parseInt(staked_time_bool/24)+' days<br>'; }
+      
       document.getElementById('prop_'+frog_id).appendChild(trait_text);
 
       // Owner
