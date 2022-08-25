@@ -466,7 +466,14 @@
     
     document.getElementById('traits_'+frog_id).appendChild(button_b);
 
-    if (staked !== false) { // STAKED
+    if (!staked) {
+
+      // Insert Owner Element
+      var trait_text = document.createElement('div')
+      trait_text.innerHTML = 'Owner: '+truncateAddress(owner)+'<br>';//+'Time Staked: '+staked_time_bool+' hours';
+      document.getElementById('prop_'+frog_id).appendChild(trait_text);
+
+    } else {// STAKED
 
       document.getElementById('staked_'+frog_id).innerHTML = 
         '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
@@ -479,7 +486,7 @@
       // Insert Owner Element
       var trait_text = document.createElement('div')
       trait_text.innerHTML = 'Owner: '+truncateAddress(staked)+'<br>';//+'Time Staked: '+staked_time_bool+' hours';
-      document.getElementById('prop_'+frog_id).appendChild(trait_text);      
+      document.getElementById('prop_'+frog_id).appendChild(trait_text);
 
       // Update Progress Bar
       let percent = parseInt((staked_time_bool/(1000*staked_level))*100);
