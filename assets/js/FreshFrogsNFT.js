@@ -241,6 +241,11 @@
   // fetch_user_tokens() | Fetch User Tokens | Staked & Otherwise |
   async function fetch_user_data(fetch_address) {
     if (! fetch_address) { fetch_address = user_address; }
+    if (fetch_address.toString().toLowerCase() == user_address.toString().toLowerCase()){
+      render_functions = true;
+    } else {
+      render_functions = false;
+    }
 
     // No. of Frogs staked by fetch_address
     let staker_tokens = await stakers(fetch_address, 'amountStaked')
@@ -267,7 +272,7 @@
         try { // Fetch staked token data
           for (var i = 0; i < staker_tokens_array.length; i++) {
             tokenId = staker_tokens_array[i].tokenId
-            render_token(tokenId)
+            render_token(tokenId, render_functions)
 
           }
         } catch (e) {
@@ -293,10 +298,10 @@
 
               if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
                 let sale_price = total_price / Math.pow(10, decimals);
-                render_token(token_id, sale_price);
+                render_token(token_id, render_functions, sale_price);
 
               } else {
-                render_token(token_id);
+                render_token(token_id, render_functions);
 
               }
             })
@@ -348,54 +353,40 @@
 
     // Is this token currently staked?
     let staked = await stakerAddress(tokenId);
-    let owner = await collection.methods.ownerOf(tokenId).call();
 
-    // Default Properties
     button_left.href = etherscanLink;
     button_left.target = '_blank';
-
-    button_right.innerHTML = '<strong>Image</strong>original';
-    button_right.href = 'https://freshfrogs.io/frog/'+tokenId+'.png';
-    button_right.target = '_blank';
     
     if (!staked) { // Not Staked
 
-      if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
-        button_middle.innerHTML = '<strong>Stake</strong>and earn';
-        button_middle.removeAttribute('href');
-        button_middle.onclick = function() { stake_init(tokenId); }
-  
-      } else { // Public
-        button_middle.innerHTML = '<strong>Owned By</strong>'+truncateAddress(owner);
-        button_middle.href = 'https://opensea.io/'+owner;
-        button_middle.target = '_blank';
-  
-      }
+      let owner = await collection.methods.ownerOf(tokenId).call();
+
+      button_middle.innerHTML = '<strong>Owned By</strong>'+truncateAddress(owner);
+      button_middle.href = 'https://opensea.io/'+owner;
+      button_middle.target = '_blank';
+
+      button_right.innerHTML = '<strong>OpenSea</strong>view on';
+      button_right.href = openseaLink;
+      button_right.target = '_blank';
 
     } else { // Staked
 
       let stakedHours = await timeStaked(tokenId);
 
+      button_middle.innerHTML = '<strong>Owned By</strong>'+truncateAddress(staked);
+      button_middle.href = 'https://opensea.io/'+staked;
+      button_middle.target = '_blank';
+
       button_right.innerHTML = '<strong>Time Staked</strong>'+stakedHours+' hours';
       button_right.removeAttribute('href');
 
-      if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
-        button_middle.innerHTML = '<strong>Withdraw</strong>return Frog';
-        button_middle.removeAttribute('href');
-        button_middle.onclick = function() { withdraw_init(tokenId); }
-
-      } else { // Public
-        button_middle.innerHTML = '<strong>Owned By</strong>'+truncateAddress(staked);
-        button_middle.href = 'https://opensea.io/'+staked;
-        button_middle.target = '_blank';
-
-      }
     }
   }
 
   // render_token()
-  async function render_token(frog_id, recent_sale) {
+  async function render_token(frog_id, functions, recent_sale) {
     if (! recent_sale) { recent_sale = ''; } else { recent_sale = 'Ξ'+recent_sale; }
+    if (! functions) { functions = false; }
 
     // Is Frog Currently Staked?
     let staked = await stakerAddress(frog_id);
@@ -424,9 +415,9 @@
         '<div class="frog_imgContainer" id="cont_'+frog_id+'">'+
           //'<img src="'+frog_external+'" class="frog_img"/>'+
         '</div>'+
-        '<div id="staked_'+frog_id+'" style="margin: 4px;"></div>'+
+        '<div id="staked_'+frog_id+'"></div>'+
         '<div id="traits_'+frog_id+'" class="trait_list">'+
-          '<strong>Properties</strong><div id="owner_'+frog_id+'" style="float: right;"></div><div id="prop_'+frog_id+'" class="properties"></div>'+
+          '<strong>Properties</strong><div id="prop_'+frog_id+'" class="properties"></div>'+
         '</div>'+
       '</div>';
 
@@ -458,19 +449,22 @@
     button_b.style.marginLeft = 'auto';
     button_b.style.marginRight = 'auto';
 
-    button_b.innerHTML = 
-    '<br>'+
-    '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_opensea+'" target="_blank"><button class="frog_button" style="color: white; background: cornflowerblue; border: 1px solid black;">OpenSea 🡥</button></a>'+
-    '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
-    
-    document.getElementById('traits_'+frog_id).appendChild(button_b);
+    if (!staked) { // NOT Staked
+      if (owner.toString().toLowerCase() == user_address.toString().toLowerCase() && functions) {
+        button_b.innerHTML = 
+          '<br>'+
+          '<button class="frog_button" style="background: lightgreen; border: 1px solid black;" onclick="stake_init('+frog_id+')">Stake 🡥</button>'+
+          '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
+        document.getElementById('traits_'+frog_id).appendChild(button_b);
 
-    if (!staked) {
+      }
 
-      // Insert Owner Element
-      document.getElementById('owner_'+frog_id).innerHTML = truncateAddress(owner);
+    } else { // STAKED
+      if (staked.toString().toLowerCase() == user_address.toString().toLowerCase() && functions) {
+        button_b.innerHTML = '<br><button class="frog_button" style="background: lightsalmon; border: 1px solid black;" onclick="withdraw_init('+frog_id+')">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
+        document.getElementById('traits_'+frog_id).appendChild(button_b);
 
-    } else {// STAKED
+      }
 
       document.getElementById('staked_'+frog_id).innerHTML = 
         '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
@@ -481,14 +475,16 @@
       if (staked_time_bool >= 2000) { staked_level = 3; } else if (staked_time_bool >= 1000) { staked_level = 2; } else { staked_level = 1; }
 
       // Insert Owner Element
-      document.getElementById('owner_'+frog_id).innerHTML = truncateAddress(staked);
+      var trait_text = document.createElement('div')
+      trait_text.innerHTML = 'Owner: '+truncateAddress(staked)+'<br>';//+'Time Staked: '+staked_time_bool+' hours';
+      document.getElementById('prop_'+frog_id).appendChild(trait_text);      
 
       // Update Progress Bar
       let percent = parseInt((staked_time_bool/(1000*staked_level))*100);
       let elem = document.getElementById('myBar_'+frog_id);
       let width = percent;
       elem.style.width = width + "%";
-      document.getElementById('level_'+frog_id).innerHTML = 'Staked Lvl '+staked_level+'';
+      document.getElementById('level_'+frog_id).innerHTML = 'Staked Level '+staked_level+'';
       document.getElementById('level_'+frog_id).style.color = 'coral';
       
     }
