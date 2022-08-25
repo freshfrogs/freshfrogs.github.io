@@ -688,6 +688,7 @@
       margin: 16px;
       box-shadow: 3px 3px rgb(122 122 122 / 20%);
       font-size: small;
+      transition: all .2s;
     }
     .trait_list {
       min-width: 50%;
@@ -754,11 +755,13 @@
       // -- >
 
       document.addEventListener("DOMContentLoaded", async () => {
+        await connect_init();
+      })
 
+      async function connect_init() {
         await connect();
         await fetch_user_data(CONTROLLER_ADDRESS);
-
-      })
+      }
 
     </script>
     
@@ -768,9 +771,9 @@
       <header id="thisheader">
         <div class="downloads pre">
           <ul class="downloads2">
-            <li><a id="button_left" class="pointer" href="https://freshfrogs.io"><strong id="display_name">Fresh Frogs</strong><div id="display_type">ΞEthereum</div></a></li>
-            <li><a id="button_middle" class="pointer" href="https://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong><frog id="baseText">Support</frog></a></li>
-            <li><a id="button_right" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>OpenSea</strong><frog id="subText">Marketplace</frog></a></li>
+            <li><a id="button_left" class="pointer" href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><strong id="display_name">Etherscan</strong><div id="display_type">contract</div></a></li>
+            <li><a id="button_middle" class="pointer" href="https://www.gem.xyz/collection/fresh-frogs" target="_blank"><strong>Gemxyz</strong><frog id="baseText">rankings</frog></a></li>
+            <li><a id="button_right" class="pointer" href="https://freshfrogs.io/vault"><strong>Vault</strong><frog id="subText">staked Frogs</frog></a></li>
           </ul>
           <div id="mintingTray" class="mintingTray">
             <div class="bigContainer">
@@ -791,9 +794,14 @@
             <br>
             <h2 style="color: white !important;"><b>FreshFrogsNFT</b></h2>
             <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
-            opensea.io/collection/fresh-frogs<a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><b id="connected">Shop on OpenSea ⛵</b></a>
+            opensea.io/collection/fresh-frogs<a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong style="color: white;">Shop on OpenSea ⛵</strong></a>
             <br>
-            <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a class="pointer" href="https://freshfrogs.io/the-pond"><b id="connected">Connect Wallet 🔌</b></a></div>
+            <div id="pre" class="mintingTextWhite2">
+              <br><button onclick="connect_init()" style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">
+                <strong>Connect Wallet 🔌</strong><br>Connect to View Frog Tokens
+              </button><br><hr style="background: black;">
+              <div class="console_pre" id="console-pre"></div>
+            </div>
           </div>
           <br>
           <div id="thePad" class="thePad"></div>
