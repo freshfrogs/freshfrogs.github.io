@@ -886,9 +886,10 @@
       let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'tokenId': tokenId}, fromBlock: 0, toBlock: 'latest'});
 
       let mostRecentTxn = stakingEvents.length
+      console.log('most recent txn: '+mostRecentTxn)
 
       // Fetch Block Number from Txn
-      let staked_block = parseInt(stakingEvents[mostRecentTxn].blockNumber);
+      let staked_block = parseInt(stakingEvents[0].blockNumber);
 
       // Fetch Timestamp for block txn
       let staked_time = await web3.eth.getBlock(staked_block);
