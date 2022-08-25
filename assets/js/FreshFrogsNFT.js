@@ -339,7 +339,7 @@
     button_left.href = etherscanLink;
     button_left.target = '_blank';
 
-    button_middle.innerHTML = '<strong>Opensea</strong>view on';
+    button_middle.innerHTML = '<strong>Opensea</strong>page';
     button_middle.href = openseaLink
     button_middle.target = '_blank';
 
