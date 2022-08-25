@@ -377,7 +377,7 @@
       button_middle.href = 'https://opensea.io/'+staked;
       button_middle.target = '_blank';
 
-      button_right.innerHTML = '<strong>Time Staked</strong>'+stakedHours+' hours';
+      button_right.innerHTML = '<strong>Time Staked</strong>'+parseInt(stakedHours/24)+' days';
       button_right.removeAttribute('href');
 
     }
