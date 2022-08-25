@@ -1015,7 +1015,7 @@
     // RedEyedTreeFrog
     if (baseFrog == 'redEyedTreeFrog' || subFrog  == 'redEyedTreeFrog' && typeof baseFrog !== 'undefined') {
       var returnTrait = baseFrog+'/'+subTrait;
-      var returnOverlay = baseFrog+'/overlay/'+subTrait;
+      var returnOverlay = baseFrog+'/overlay/'+baseTrait;
 
     }
     
