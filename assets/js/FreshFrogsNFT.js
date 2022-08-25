@@ -488,7 +488,7 @@
       let elem = document.getElementById('myBar_'+frog_id);
       let width = percent;
       elem.style.width = width + "%";
-      document.getElementById('level_'+frog_id).innerHTML = 'Staked Lvl '+staked_level+'';
+      document.getElementById('level_'+frog_id).innerHTML = 'Staked Lvl '+staked_level+' ('+staked_time_bool+' hrs)';
       document.getElementById('level_'+frog_id).style.color = 'coral';
       
     }
