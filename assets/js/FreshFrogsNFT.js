@@ -256,11 +256,11 @@
     // Must own atleast one Frog or atleast one Staked!
     if (user_tokens >= 1 || staker_tokens >= 1) {
 
-      let staker_info = await controller.methods.availableRewards(fetch_address).call();
+      let staker_info = await availableRewards(fetch_address);
       let staker_rewards = (staker_info / 1000000000000000000);
       staker_rewards = String(staker_rewards).slice(0, 6);
 
-      Output('<br><button onclick="claim_rewards()" style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(fetch_address)+' ]</acc><br>'+staker_tokens+' Frog(s) Staked '+''+staker_rewards+' $FLYZ 🡥</button>'+'<br><hr style="background: black;">'+'<div class="console_pre" id="console-pre"></div>');
+      Output('<br><button onclick="claimRewards_init('+staker_rewards+')" style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(fetch_address)+' ]</acc><br>'+staker_tokens+' Frog(s) Staked '+''+staker_rewards+' $FLYZ 🡥</button>'+'<br><hr style="background: black;">'+'<div class="console_pre" id="console-pre"></div>');
 
       // Render Frogs Staked by User
       if (staker_tokens >= 1) {
@@ -530,6 +530,29 @@
 
   // FreshFrogsController | NFT Staking Smart Contract | 0xCB1ee125CFf4051a10a55a09B10613876C4Ef199
 
+  async function claimRewards_init(ammount) {
+
+    // Begin Withdraw Txn
+    consoleOutput(
+      '<strong>Claiming Rewards...</strong>'+'<br>'+
+      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+      '<br><div style="text-align: left;">'+
+        '<strong>Claim Rewards</strong><br> Transfer '+ammount+' $FLYZ <u>from</u> staking protocol.'+
+      '</div>'
+    );
+
+    // Submit Txn
+    let claimRewards_txn = await claimRewards();
+
+    consoleOutput(
+      '<strong>Claiming Rewards...</strong>'+'<br>'+
+      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+      '<br><div style="text-align: left;">'+
+        '<strong>Claim Rewards</strong><br> '+claimRewards_txn+
+      '</div>'
+    );
+  }
+
   async function withdraw_init(tokenId) {
 
     // Check Contract Approval
@@ -682,10 +705,10 @@
   // ----->
 
   // claimRewards(_user (address)) | send =>
-  async function claimRewards(userAddress) {
+  async function claimRewards() {
 
     try { // Claim rewards available to user
-      let claimRewards = await controller.methods.claimRewards().send({ from: userAddress });
+      let claimRewards = await controller.methods.claimRewards().send({ from: user_address });
       return 'Rewards have succesfully been claimed!';
 
     } catch (e) { // Catch Error =>
