@@ -348,6 +348,7 @@
 
     // Is this token currently staked?
     let staked = await stakerAddress(tokenId);
+    let owner = await collection.methods.ownerOf(tokenId).call();
 
     // Default Properties
     button_left.href = etherscanLink;
@@ -358,8 +359,6 @@
     button_right.target = '_blank';
     
     if (!staked) { // Not Staked
-
-      let owner = await collection.methods.ownerOf(tokenId).call();
 
       if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
         button_middle.innerHTML = '<strong>Stake</strong>and earn';
