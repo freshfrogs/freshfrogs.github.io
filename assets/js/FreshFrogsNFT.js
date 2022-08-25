@@ -449,22 +449,14 @@
     button_b.style.marginLeft = 'auto';
     button_b.style.marginRight = 'auto';
 
-    if (!staked) { // NOT Staked
-      if (owner.toString().toLowerCase() == user_address.toString().toLowerCase() && functions) {
-        button_b.innerHTML = 
-          '<br>'+
-          '<button class="frog_button" style="background: lightgreen; border: 1px solid black;" onclick="stake_init('+frog_id+')">Stake 🡥</button>'+
-          '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
-        document.getElementById('traits_'+frog_id).appendChild(button_b);
+    button_b.innerHTML = 
+    '<br>'+
+    '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_opensea+'" target="_blank"><button class="frog_button" style="color: white; background: #7cc1ff; border: 1px solid black;">OpenSea 🡥</button></a>'+
+    '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
+    
+    document.getElementById('traits_'+frog_id).appendChild(button_b);
 
-      }
-
-    } else { // STAKED
-      if (staked.toString().toLowerCase() == user_address.toString().toLowerCase() && functions) {
-        button_b.innerHTML = '<br><button class="frog_button" style="background: lightsalmon; border: 1px solid black;" onclick="withdraw_init('+frog_id+')">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
-        document.getElementById('traits_'+frog_id).appendChild(button_b);
-
-      }
+    if (staked !== false) { // STAKED
 
       document.getElementById('staked_'+frog_id).innerHTML = 
         '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
