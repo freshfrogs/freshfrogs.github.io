@@ -1019,30 +1019,24 @@
 
     }
     
-    if (typeof returnTrait !== 'undefined') { // Trait
-      var returnTrait = subTrait;
-    }
+    // Trait
+    if (typeof returnTrait !== 'undefined') { var returnTrait = subTrait; }
     
-    if (typeof baseAccessory !== 'undefined') { // Accessory
-      var returnAccessory = baseAccessory;
-    } else if (typeof subAccessory !== 'undefined') {
-      var returnAccessory = subAccessory;
-    }
-    if (typeof baseEyes !== 'undefined') { // Eyes
-      var returnEyes = baseEyes;
-    } else if (typeof subEyes !== 'undefined') {
-      var returnEyes = subEyes;
-    }
-    if (typeof baseHat !== 'undefined') { // Hat
-      var returnHat = baseHat;
-    } else if (typeof subHat !== 'undefined') {
-      var returnHat = subHat;
-    }
-    if (typeof baseMouth !== 'undefined') { // Mouth
-      var returnMouth = baseMouth;
-    } else if (typeof subMouth !== 'undefined') {
-      var returnMouth = subMouth;
-    }
+    // Accessory
+    if (typeof baseAccessory !== 'undefined') { var returnAccessory = baseAccessory; } 
+    else if (typeof subAccessory !== 'undefined') { var returnAccessory = subAccessory; }
+
+    // Eyes
+    if (typeof baseEyes !== 'undefined') { var returnEyes = baseEyes; } 
+    else if (typeof subEyes !== 'undefined') { var returnEyes = subEyes; }
+
+    // Hat
+    if (typeof baseHat !== 'undefined') { var returnHat = baseHat; } 
+    else if (typeof subHat !== 'undefined') {var returnHat = subHat;}
+
+    // Mouth
+    if (typeof baseMouth !== 'undefined') { var returnMouth = baseMouth; }
+    else if (typeof subMouth !== 'undefined') { var returnMouth = subMouth; }
 
     // <------ BUILD NEW METADATA (baseId, subId) ------>
 
