@@ -404,12 +404,7 @@
     frog_token = document.createElement('div');
     frog_token.id = frog_name;
     frog_token.className = 'frog_token';
-    frog_token.onclick = function() {
-
-      if (morphing) { morph(base_frog, frog_id, 'frogContainer4'); }
-      else { display_token(frog_id); }
-
-    }
+    frog_token.onclick = function() { display_token(frog_id); }
 
     // Element Inner HTML
     frog_token.innerHTML =
@@ -459,7 +454,8 @@
         button_b.innerHTML = 
           '<br>'+
           '<button class="frog_button" style="background: lightgreen; border: 1px solid black;" onclick="stake_init('+frog_id+')">Stake 🡥</button>'+
-          '<button class="frog_button" style="border: 1px solid black;" onclick="morph_init('+frog_id+')">Morph 🡥</button>';
+          '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
+          //'<button class="frog_button" style="border: 1px solid black;" onclick="morph_init('+frog_id+')">Morph 🡥</button>';
         document.getElementById('traits_'+frog_id).appendChild(button_b);
 
       }
@@ -469,7 +465,8 @@
         button_b.innerHTML = 
           '<br>'+
           '<button class="frog_button" style="background: salmon; border: 1px solid black;" onclick="withdraw_init('+frog_id+')">UnStake 🡥</button>'+
-          '<button class="frog_button" id="morph_'+frog_id+'" style="border: 1px solid black;" onclick="morph_init('+frog_id+')">Morph 🡥</button>';
+          '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
+          //'<button class="frog_button" id="morph_'+frog_id+'" style="border: 1px solid black;" onclick="morph_init('+frog_id+')">Morph 🡥</button>';
         document.getElementById('traits_'+frog_id).appendChild(button_b);
 
       }
