@@ -754,7 +754,8 @@
       // -- >
 
       document.addEventListener("DOMContentLoaded", async () => {
-        connect_init();
+        await connect()
+        .then(await fetch_user_data(user_address));
       })
 
       async function connect_init() {
