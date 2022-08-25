@@ -475,9 +475,9 @@
       if (staked_time_bool >= 2000) { staked_level = 3; } else if (staked_time_bool >= 1000) { staked_level = 2; } else { staked_level = 1; }
 
       // Insert Owner Element
-      var trait_text = document.createElement('div')
-      trait_text.innerHTML = 'Owner: '+truncateAddress(staked)+'<br>';//+'Time Staked: '+staked_time_bool+' hours';
-      document.getElementById('prop_'+frog_id).appendChild(trait_text);      
+      //var trait_text = document.createElement('div')
+      //trait_text.innerHTML = 'Owner: '+truncateAddress(staked)+'<br>';//+'Time Staked: '+staked_time_bool+' hours';
+      //document.getElementById('prop_'+frog_id).appendChild(trait_text);      
 
       // Update Progress Bar
       let percent = parseInt((staked_time_bool/(1000*staked_level))*100);
