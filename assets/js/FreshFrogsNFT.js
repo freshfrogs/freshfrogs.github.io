@@ -550,7 +550,7 @@
       '<strong>Claiming Rewards...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
-        '<strong>Claim Rewards</strong><br> Retrieve $FLYZ <u>from</u> staking protocol.'+
+        '<strong>Claim Rewards</strong><br> Retrieve $FLYZ from staking protocol.'+
       '</div>'
     );
 
@@ -614,7 +614,7 @@
       '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
-        '<strong>Withdraw NFT</strong><br> Transfer Frog #'+tokenId+' <u>from</u> staking protocol.'+
+        '<strong>Withdraw NFT</strong><br> Return Frog #'+tokenId+' from staking protocol.'+
       '</div>'
     );
 
