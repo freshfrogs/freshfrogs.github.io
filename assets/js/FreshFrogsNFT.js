@@ -886,7 +886,7 @@
       let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'tokenId': tokenId}, fromBlock: 0, toBlock: 'latest'});
 
       let mostRecentTxn = stakingEvents.length
-      console.log('most recent txn: '+mostRecentTxn)
+      console.log('most recent txn: '+mostRecentTxn); //
 
       // Fetch Block Number from Txn
       let staked_block = parseInt(stakingEvents[0].blockNumber);
