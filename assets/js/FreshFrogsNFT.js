@@ -885,8 +885,10 @@
       // Loop blockchain transactions per parameters [NFT Transfer From: User ==> To: Staking Controller] & NFT is Currently Staked
       let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'tokenId': tokenId}, fromBlock: 0, toBlock: 'latest'});
 
+      let mostRecentTxn = stakingEvents.length
+
       // Fetch Block Number from Txn
-      let staked_block = parseInt(stakingEvents[stakingEvents.length].blockNumber);
+      let staked_block = parseInt(stakingEvents[mostRecentTxn].blockNumber);
 
       // Fetch Timestamp for block txn
       let staked_time = await web3.eth.getBlock(staked_block);
