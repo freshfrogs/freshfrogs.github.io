@@ -705,7 +705,7 @@
           return true; // Contract Approved!
 
         } catch (e) {
-          return e.message;
+          return '❌ '+e.message;
 
         }
         
@@ -725,10 +725,10 @@
 
     try { // Claim rewards available to user
       let claimRewards = await controller.methods.claimRewards().send({ from: user_address });
-      return 'Rewards have succesfully been claimed!';
+      return '✅ Rewards have succesfully been claimed!';
 
     } catch (e) { // Catch Error =>
-      return e.message;
+      return '❌ '+e.message;
 
     }
   }
@@ -743,27 +743,27 @@
 
     // Token is not currently staked
     if (!staked) {
-      return 'Frog #'+tokenId+' is not currently staked!';
+      return '❌ Frog #'+tokenId+' is not currently staked!';
 
     // Valid ownership
     } else if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
 
       if (!approved) {
-        return 'Staking contract not approved for token transfer!';
+        return '❌ Staking contract not approved for token transfer!';
       }
 
       try { // Withdraw token from staking contract
         let withdraw = await controller.methods.withdraw(tokenId).send({ from: user_address });
-        return 'Frog #'+tokenId+' has succesfully been un-staked!';
+        return '✅ Frog #'+tokenId+' has succesfully been un-staked!';
 
       } catch (e) {
-        return e.message;
+        return '❌ '+e.message;
       
       }
 
     // Invalid ownership
     } else {
-      return 'Frog #'+tokenId+' does not belong to user!';
+      return '❌ Frog #'+tokenId+' does not belong to user!';
 
     }
   }
@@ -780,25 +780,25 @@
     if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
 
       if (!approved) {
-        return 'Staking contract not approved for token transfer!';
+        return '❌ Staking contract not approved for token transfer!';
       }
 
       try {
         let stake = await controller.methods.stake(tokenId).send({ from: user_address });
-        return 'Frog #'+tokenId+' has succesfully been staked!';
+        return '✅ Frog #'+tokenId+' has succesfully been staked!';
 
       } catch (e) {
-        return e.message;
+        return '❌ '+e.message;
 
       }
 
     // Token already Staked
     } else if (owner.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) {
-      return 'Frog #'+tokenId+' is already staked!';
+      return '❌ Frog #'+tokenId+' is already staked!';
 
     // Invalid Ownership
     } else {
-      return 'Frog #'+tokenId+' does not belong to user!';
+      return '❌ Frog #'+tokenId+' does not belong to user!';
 
     }
   }
