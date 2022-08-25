@@ -1022,6 +1022,7 @@
     if (typeof returnTrait !== 'undefined') { // Trait
       var returnTrait = subTrait;
     }
+    
     if (typeof baseAccessory !== 'undefined') { // Accessory
       var returnAccessory = baseAccessory;
     } else if (typeof subAccessory !== 'undefined') {
@@ -1060,6 +1061,12 @@
     // Load Trait
     if (typeof returnTrait !== 'undefined') {
       load_trait('Trait', returnTrait, build_loc);
+
+    }
+
+    // Load Trait Overlay
+    if (typeof returnOverlay !== 'undefined') {
+      load_trait('Trait', returnOverlay, build_loc);
 
     }
 
