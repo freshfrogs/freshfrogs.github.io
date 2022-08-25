@@ -755,8 +755,9 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        await connect();
-        await fetch_user_data(user_address);
+        async function connect_init() {
+          await connect().then(await fetch_user_data(user_address));
+        }
 
       })
 
@@ -793,7 +794,11 @@
             <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
             opensea.io/collection/fresh-frogs<a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><b id="connected">Shop on OpenSea ⛵</b></a>
             <br>
-            <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a class="pointer" href="https://freshfrogs.io/the-pond"><b id="connected">Connect Wallet 🔌</b></a></div>
+            <div id="pre" class="mintingTextWhite2">
+              <button onclick="connect_init()" style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">
+                <strong>Connect Wallet</strong><br>connect ethereum wallet<br>
+                <div class="console_pre" id="console-pre"></div>
+            </div>
           </div>
           <br>
           <div id="thePad" class="thePad"></div>
