@@ -758,7 +758,10 @@
       })
 
       async function connect_init() {
-        await connect().then(await fetch_user_data(user_address));
+        await connect()
+        .then((connection) => {
+          await fetch_user_data(user_address)
+        });
       }
 
     </script>
