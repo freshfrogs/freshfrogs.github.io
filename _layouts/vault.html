@@ -755,8 +755,7 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        //await connect();
-        user_address = '';
+        await connect();
         await fetch_user_data(CONTROLLER_ADDRESS);
 
       })
