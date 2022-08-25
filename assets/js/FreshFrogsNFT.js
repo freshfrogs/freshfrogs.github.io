@@ -364,7 +364,7 @@
       if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
         button_middle.innerHTML = '<strong>Stake</strong>and earn';
         button_middle.removeAttribute('href');
-        button_middle.onclick = function() { withdraw_init(tokenId); }
+        button_middle.onclick = function() { stake_init(tokenId); }
   
       } else { // Public
         button_middle.innerHTML = '<strong>Owned By</strong>'+truncateAddress(owner);
