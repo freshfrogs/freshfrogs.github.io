@@ -754,12 +754,12 @@
       // -- >
 
       document.addEventListener("DOMContentLoaded", async () => {
-
-        async function connect_init() {
-          await connect().then(await fetch_user_data(user_address));
-        }
-
+        connect_init();
       })
+
+      async function connect_init() {
+        await connect().then(await fetch_user_data(user_address));
+      }
 
     </script>
     
