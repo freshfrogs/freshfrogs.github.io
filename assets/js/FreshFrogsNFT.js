@@ -929,8 +929,8 @@
 
   async function morph_init(frog_token) {
     document.getElementById('morph_'+frog_token).innerHTML = 'Select Frog!'
-    let base_frog = frog_token;
-    let morphing = true;
+    base_frog = frog_token;
+    morphing = true;
   }
 
   // Token Combinations / Rebuild Token
