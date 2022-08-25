@@ -335,6 +335,18 @@
     let displayImg = 'https://freshfrogs.io/frog/'+tokenId+'.png'
     let displayName = 'Frog #'+tokenId
 
+    // Button Properties
+    button_left.href = etherscanLink;
+    button_left.target = '_blank';
+
+    button_middle.innerHTML = '<strong>View/strong>on Opensea'+truncateAddress(owner);
+    button_middle.href = openseaLink
+    button_middle.target = '_blank';
+
+    button_right.innerHTML = '<strong>View</strong>image';
+    button_right.href = 'https://freshfrogs.io/frog/'+tokenId+'.png';
+    button_right.target = '_blank';
+
     // Update Display Image
     document.getElementById('thisheader').style.backgroundImage = 'url('+displayImg+')';
     document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
@@ -349,37 +361,6 @@
         button_left.innerHTML = '<strong>'+displayName+'</strong>'+attribute.value.slice(0, 11);
 
       }
-    }
-
-    // Is this token currently staked?
-    let staked = await stakerAddress(tokenId);
-
-    button_left.href = etherscanLink;
-    button_left.target = '_blank';
-    
-    if (!staked) { // Not Staked
-
-      let owner = await collection.methods.ownerOf(tokenId).call();
-
-      button_middle.innerHTML = '<strong>Owned By</strong>'+truncateAddress(owner);
-      button_middle.href = 'https://opensea.io/'+owner;
-      button_middle.target = '_blank';
-
-      button_right.innerHTML = '<strong>View</strong>image';
-      button_right.href = 'https://freshfrogs.io/frog/'+tokenId+'.png';
-      button_right.target = '_blank';
-
-    } else { // Staked
-
-      let stakedHours = await timeStaked(tokenId);
-
-      button_middle.innerHTML = '<strong>Owned By</strong>'+truncateAddress(staked);
-      button_middle.href = 'https://opensea.io/'+staked;
-      button_middle.target = '_blank';
-
-      button_right.innerHTML = '<strong>Time Staked</strong>'+parseInt(stakedHours/24)+' days';
-      button_right.removeAttribute('href');
-
     }
   }
 
