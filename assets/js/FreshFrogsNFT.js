@@ -349,32 +349,48 @@
     // Is this token currently staked?
     let staked = await stakerAddress(tokenId);
 
+    // Default Properties
     button_left.href = etherscanLink;
     button_left.target = '_blank';
+
+    button_right.innerHTML = '<strong>Image</strong>original';
+    button_right.href = 'https://freshfrogs.io/frog/'+tokenId+'.png';
+    button_right.target = '_blank';
     
     if (!staked) { // Not Staked
 
       let owner = await collection.methods.ownerOf(tokenId).call();
 
-      button_middle.innerHTML = '<strong>Owned By</strong>'+truncateAddress(owner);
-      button_middle.href = 'https://opensea.io/'+owner;
-      button_middle.target = '_blank';
-
-      button_right.innerHTML = '<strong>OpenSea</strong>view on';
-      button_right.href = openseaLink;
-      button_right.target = '_blank';
+      if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+        button_middle.innerHTML = '<strong>Stake</strong>and earn';
+        button_middle.removeAttribute('href');
+        button_middle.onclick = function() { withdraw_init(tokenId); }
+  
+      } else { // Public
+        button_middle.innerHTML = '<strong>Owned By</strong>'+truncateAddress(owner);
+        button_middle.href = 'https://opensea.io/'+owner;
+        button_middle.target = '_blank';
+  
+      }
 
     } else { // Staked
 
       let stakedHours = await timeStaked(tokenId);
 
-      button_middle.innerHTML = '<strong>Owned By</strong>'+truncateAddress(staked);
-      button_middle.href = 'https://opensea.io/'+staked;
-      button_middle.target = '_blank';
-
       button_right.innerHTML = '<strong>Time Staked</strong>'+stakedHours+' hours';
       button_right.removeAttribute('href');
 
+      if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+        button_middle.innerHTML = '<strong>Withdraw</strong>return Frog';
+        button_middle.removeAttribute('href');
+        button_middle.onclick = function() { withdraw_init(tokenId); }
+
+      } else { // Public
+        button_middle.innerHTML = '<strong>Owned By</strong>'+truncateAddress(staked);
+        button_middle.href = 'https://opensea.io/'+staked;
+        button_middle.target = '_blank';
+
+      }
     }
   }
 
