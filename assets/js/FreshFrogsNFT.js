@@ -461,7 +461,7 @@
 
     } else { // STAKED
       if (staked.toString().toLowerCase() == user_address.toString().toLowerCase() && functions) {
-        button_b.innerHTML = '<br><button class="frog_button" style="background: lightsalmon; border: 1px solid black;" onclick="withdraw_init('+frog_id+')">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
+        button_b.innerHTML = '<br><button class="frog_button" style="background: salmon; border: 1px solid black;" onclick="withdraw_init('+frog_id+')">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
         document.getElementById('traits_'+frog_id).appendChild(button_b);
 
       }
@@ -484,8 +484,8 @@
       let elem = document.getElementById('myBar_'+frog_id);
       let width = percent;
       elem.style.width = width + "%";
-      document.getElementById('level_'+frog_id).innerHTML = 'Staked Level '+staked_level+'';
-      document.getElementById('level_'+frog_id).style.color = 'coral';
+      document.getElementById('level_'+frog_id).innerHTML = 'Staked Lvl '+staked_level+'';
+      document.getElementById('level_'+frog_id).style.color = 'tomato';
       
     }
   }
