@@ -534,7 +534,7 @@
 
   // FreshFrogsController | NFT Staking Smart Contract | 0xCB1ee125CFf4051a10a55a09B10613876C4Ef199
 
-  async function claimRewards_init(ammount) {
+  async function claimRewards_init() {
 
     // Scroll Into View
     console_pre = document.getElementById('pre');
@@ -545,7 +545,7 @@
       '<strong>Claiming Rewards...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
-        '<strong>Claim Rewards</strong><br> Transfer '+ammount+' $FLYZ <u>from</u> staking protocol.'+
+        '<strong>Claim Rewards</strong><br> Retrieve $FLYZ <u>from</u> staking protocol.'+
       '</div>'
     );
 
@@ -725,13 +725,18 @@
 
     let available_rewards = await availableRewards(user_address);
 
-    if (available_rewards > 0) try { // Claim rewards available to user
-      let claimRewards = await controller.methods.claimRewards().send({ from: user_address });
-      return '✅ Rewards have succesfully been claimed!';
-
-    } catch (e) { // Catch Error =>
-      return '❌ '+e.message;
-
+    if (available_rewards > 0) {
+      try { // Claim rewards available to user
+        let claimRewards = await controller.methods.claimRewards().send({ from: user_address });
+        return '✅ Rewards have succesfully been claimed!';
+  
+      } catch (e) { // Catch Error =>
+        return '❌ '+e.message;
+  
+      }
+    } else {
+      return '❌ No rewards available to claim!';
+      
     }
   }
 
