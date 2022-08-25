@@ -632,7 +632,7 @@
 
       consoleOutput(
         '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-        '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
+        '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
         'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
         '<br><div style="text-align: left;">'+
           '<strong>(1/2) Approve Staking</strong><br>This is a one time transaction to allow staking, requires a gas fee.'+
