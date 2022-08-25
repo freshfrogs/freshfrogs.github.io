@@ -658,7 +658,7 @@
       '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
-        '<strong>Stake NFT</strong><br> Transfer Frog #'+tokenId+' <u>to</u> staking protocol.'+
+        '<strong>Stake NFT</strong><br> Transfer Frog #'+tokenId+' to staking protocol.'+
       '</div>'
     );
 
