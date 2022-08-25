@@ -464,7 +464,7 @@
 
       document.getElementById('staked_'+frog_id).innerHTML = 
         '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
-        '<strong id="level_'+frog_id+'" class="frog_level"><i>staked</i></strong>';
+        '<div id="level_'+frog_id+'" class="frog_level"><i>staked</i></div>';
       
       // Check Staked Time / Calculate Level
       let staked_time_bool = await timeStaked(frog_id);
