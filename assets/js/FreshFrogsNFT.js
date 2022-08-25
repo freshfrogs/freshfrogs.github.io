@@ -584,7 +584,7 @@
         'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
         '<br><div style="text-align: left;">'+
           '<strong>(1/2) Approve Staking</strong><br>This is a one time transaction to allow staking, requires a gas fee.'+
-          '<br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
+          '<br><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
         '</div>'
       );
 
@@ -651,7 +651,7 @@
         'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
         '<br><div style="text-align: left;">'+
           '<strong>(1/2) Approve Staking</strong><br>This is a one time transaction to allow staking, requires a gas fee.'+
-          '<br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
+          '<br><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
         '</div>'
       );
 
