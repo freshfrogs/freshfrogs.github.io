@@ -759,9 +759,7 @@
 
       async function connect_init() {
         await connect()
-        .then((connection) => {
-          await fetch_user_data(user_address)
-        });
+        .then(await fetch_user_data(user_address));
       }
 
     </script>
