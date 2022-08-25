@@ -536,7 +536,8 @@
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
         '<strong>Claim Rewards</strong><br> Retrieve $FLYZ from staking protocol.'+
-      '</div>'
+      '</div>'+
+      '<hr style="margin-top: 8px; background: black;">'
     );
 
     // Submit Txn
@@ -547,7 +548,8 @@
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
         '<strong>Claim Rewards</strong><br> '+claimRewards_txn+
-      '</div>'
+      '</div>'+
+      '<hr style="margin-top: 8px; background: black;">'
     );
   }
 
@@ -569,7 +571,8 @@
         'While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+'<br>'+
         '<br><div style="text-align: left;">'+
           '<strong>(1/2) Approve Staking</strong><br>This is a one time transaction to allow staking, requires a gas fee.'+
-        '</div>'
+        '</div>'+
+        '<hr style="margin-top: 8px; background: black;">'
       );
 
       // Submit Txn
@@ -583,7 +586,8 @@
           'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
           '<br><div style="text-align: left;">'+
             '<strong>(1/2) Approve Staking</strong><br> '+set_approval+
-          '</div>'
+          '</div>'+
+          '<hr style="margin-top: 8px; background: black;">'
         );
 
         // Catch Error
@@ -599,7 +603,8 @@
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
         '<strong>Withdraw NFT</strong><br> Return Frog #'+tokenId+' from staking protocol.'+
-      '</div>'
+      '</div>'+
+      '<hr style="margin-top: 8px; background: black;">'
     );
 
     // Submit Txn
@@ -612,7 +617,8 @@
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
         '<strong>Withdraw NFT</strong><br> '+withdraw_txn+
-      '</div>'
+      '</div>'+
+      '<hr style="margin-top: 8px; background: black;">'
     );
 
   }
@@ -635,7 +641,8 @@
         'While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+'<br>'+
         '<br><div style="text-align: left;">'+
           '<strong>(1/2) Approve Staking</strong><br>This is a one time transaction to allow staking, requires a gas fee.'+
-        '</div>'
+        '</div>'+
+        '<hr style="margin-top: 8px; background: black;">'
       );
 
       // Submit Txn
@@ -649,7 +656,8 @@
           'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
           '<br><div style="text-align: left;">'+
             '<strong>(1/2) Approve Staking</strong><br> '+set_approval+
-          '</div>'
+          '</div>'+
+          '<hr style="margin-top: 8px; background: black;">'
         );
 
         // Catch Error
@@ -665,7 +673,8 @@
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
         '<strong>Stake NFT</strong><br> Transfer Frog #'+tokenId+' to staking protocol.'+
-      '</div>'
+      '</div>'+
+      '<hr style="margin-top: 8px; background: black;">'
     );
 
     // Submit Txn
@@ -678,7 +687,8 @@
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
         '<strong>Stake NFT</strong><br> '+stake_txn+
-      '</div>'
+      '</div>'+
+      '<hr style="margin-top: 8px; background: black;">'
     );
 
   }
