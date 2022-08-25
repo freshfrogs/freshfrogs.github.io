@@ -723,7 +723,9 @@
   // claimRewards(_user (address)) | send =>
   async function claimRewards() {
 
-    try { // Claim rewards available to user
+    let available_rewards = await availableRewards(user_address);
+
+    if (available_rewards > 0) try { // Claim rewards available to user
       let claimRewards = await controller.methods.claimRewards().send({ from: user_address });
       return '✅ Rewards have succesfully been claimed!';
 
