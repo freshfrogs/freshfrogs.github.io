@@ -445,7 +445,7 @@
 
     button_b.innerHTML = 
     '<br>'+
-    '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_opensea+'" target="_blank"><button class="frog_button" style="color: white; background: #7cc1ff; border: 1px solid black;">OpenSea 🡥</button></a>'+
+    '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_opensea+'" target="_blank"><button class="frog_button" style="color: white; background: cornflowerblue; border: 1px solid black;">OpenSea 🡥</button></a>'+
     '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
     
     document.getElementById('traits_'+frog_id).appendChild(button_b);
