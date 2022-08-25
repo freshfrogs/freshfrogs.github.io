@@ -532,6 +532,10 @@
 
   async function claimRewards_init(ammount) {
 
+    // Scroll Into View
+    console_pre = document.getElementById('pre');
+    console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+
     // Begin Withdraw Txn
     consoleOutput(
       '<strong>Claiming Rewards...</strong>'+'<br>'+
@@ -554,6 +558,10 @@
   }
 
   async function withdraw_init(tokenId) {
+
+    // Scroll Into View
+    console_pre = document.getElementById('pre');
+    console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
 
     // Check Contract Approval
     let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
@@ -616,6 +624,10 @@
   }
 
   async function stake_init(tokenId) {
+
+    // Scroll Into View
+    console_pre = document.getElementById('pre');
+    console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
 
     // Check Contract Approval
     let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
@@ -720,10 +732,6 @@
   // withdraw(_tokenId (uint256), _user (address)) | send =>
   async function withdraw(tokenId) {
 
-    // Scroll Into View
-    console_pre = document.getElementById('pre');
-    console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
-
     // Check staked/ownership status
     let staked = await stakerAddress(tokenId);
 
@@ -758,10 +766,6 @@
 
   // stake(_tokenId (uint256), _user (address)) | send =>
   async function stake(tokenId) {
-
-    // Scroll Into View
-    console_pre = document.getElementById('pre');
-    console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
 
     // Check ownership status
     let owner = await collection.methods.ownerOf(tokenId).call();
