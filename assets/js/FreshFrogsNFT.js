@@ -758,7 +758,7 @@
           '<strong>Transfer NFT</strong><br> '+transfer_txn+
         '</div>'
       );
-      
+
     })
   }
 
@@ -771,7 +771,7 @@
       try {
 
         // Send Txn
-        let safeTransfer_txn = await collection.methods.safeTransferFrom(user_address, receiver, tokenId).send({ from: user_address});
+        let safeTransfer_txn = await collection.methods.transferFrom(user_address, receiver, tokenId).send({ from: user_address});
         return 'Frog #'+tokenId+' has succesfully been sent!';
       
       // Catch Errors
