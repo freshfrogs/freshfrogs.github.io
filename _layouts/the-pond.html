@@ -756,10 +756,9 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        for (i = 0; i < 3; i++) {
-          displayImg = document.getElementById('displayImg'+i)
-          displayImg.setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(4040)+'.png')
-        }
+        document.getElementById('displayImg1').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(4040)+'.png');
+        document.getElementById('displayImg2').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(4040)+'.png');
+        document.getElementById('displayImg3').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(4040)+'.png');
 
         await connect_init();
 
