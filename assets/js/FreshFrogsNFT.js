@@ -737,9 +737,11 @@
     consoleOutput(
       '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
       '<strong>Transfering Frog #'+tokenId+'...</strong>'+'<br>'+
-      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+      'Please input recipient address...<br>'+
+      '<input style="padding: 2px; border: 1px solid black; border-radius: 5px;" id="receiver" placeholder="receiver address"><br>'+
+      '<button id="receiver_button" class="frog_button" style="background: #7cc1ff; color: white; border: 1px solid black;">Send 🡥</button>'+
       '<br><div style="text-align: left;">'+
-        '<strong>Transfer NFT</strong> <input style="padding: 2px; border: 1px solid black; border-radius: 5px;" id="receiver" placeholder="receiver address"> '+'<button id="receiver_button" class="frog_button" style="background: #7cc1ff; color: white; border: 1px solid black;">Send 🡥</button>'+
+        '<strong>Transfer NFT</strong>'+
         '<br>Items sent to the wrong address cannot be recovered!'+
       '</div>'
     );
