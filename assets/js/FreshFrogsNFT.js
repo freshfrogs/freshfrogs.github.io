@@ -337,6 +337,7 @@
     // Links
     let openseaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
     let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
+    let gemxyzLink = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId;
     let displayImg = 'https://freshfrogs.io/frog/'+tokenId+'.png'
     let displayName = 'Frog #'+tokenId
 
@@ -354,8 +355,8 @@
       button_middle.target = '_blank';
     }
 
-    button_right.innerHTML = '<strong>View</strong>image';
-    button_right.href = 'https://freshfrogs.io/frog/'+tokenId+'.png';
+    button_right.innerHTML = '<strong>View</strong>opensea';
+    button_right.href = openseaLink;
     button_right.target = '_blank';
 
     // Update Display Image
