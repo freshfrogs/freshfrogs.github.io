@@ -398,7 +398,7 @@
         '</div>'+
         '<div id="staked_'+frog_id+'"></div>'+
         '<div id="traits_'+frog_id+'" class="trait_list">'+
-          '<strong>Properties</strong><div id="time_'+frog_id+'"style="float:right;">not staked</div><div id="prop_'+frog_id+'" class="properties"></div>'+
+          '<strong>Properties</strong><div id="time_'+frog_id+'"style="float:right;"></div><div id="prop_'+frog_id+'" class="properties"></div>'+
         '</div>'+
       '</div>';
 
@@ -439,6 +439,8 @@
           //'<button class="frog_button" style="border: 1px solid black;" onclick="morph_init('+frog_id+')">Morph 🡥</button>';
         document.getElementById('traits_'+frog_id).appendChild(button_b);
       }
+
+      document.getElementById('time_'+frog_id).innerHTML = 'not staked';
 
     } else { // STAKED
       if (staked.toString().toLowerCase() == user_address.toString().toLowerCase() && functions) {
