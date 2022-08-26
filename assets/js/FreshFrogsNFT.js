@@ -739,8 +739,8 @@
       '<strong>Transfering Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
-        '<strong>Transfer NFT</strong><br> Transfer Frog #'+tokenId+'. Items sent to the wrong address cannot be recovered!'+
-        '<br><input style="padding: 4px;" id="receiver" placeholder="receiver address">'+
+        '<strong>Transfer NFT</strong> <input style="padding: 2px;" id="receiver" placeholder="receiver address">'+
+        '<br>Items sent to the wrong address cannot be recovered!'+
       '</div>'
     );
 
@@ -788,7 +788,7 @@
 
         // Send Txn
         let safeTransfer_txn = await collection.methods.safeTransferFrom(user_address, receiver, tokenId).send({ from: user_address});
-        return 'Frog #'+tokenId+' has succesfully been sent!';
+        return '✅ Frog #'+tokenId+' has succesfully been transfered!';
       
       // Catch Errors
       } catch (e) { return '❌ '+e.message; }
