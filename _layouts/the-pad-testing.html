@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <style>
 
-  @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
   
     html{
       background-image: url("/assets/background.png");
     }
     html,h1,h2,h3 {
-      font-family: 'Montserrat', sans-serif;
+      font-family: 'Open Sans', sans-serif !important;
     }
     .myProgress {
-      width: 128px;
+      width: 100px;
       background: transparent;
       margin: 8px;
       margin-left: auto;
@@ -219,7 +219,7 @@
       border: none;
     }
     .h1 {
-      font-family: 'Montserrat', sans-serif;
+      font-family: 'Open Sans', sans-serif !important;
       font-weight: 800;
       color: white;
       text-align: center;
@@ -228,7 +228,7 @@
       font-size: xx-large;
     }
     .supply{
-      font-family: 'Montserrat', sans-serif;
+      font-family: 'Open Sans', sans-serif !important;
       color: #333;
       border-radius: 5px;
       border: 1px solid #e0e0e0;
@@ -263,7 +263,7 @@
       font-size: small !important;
     }
     section {
-      font-family: 'Montserrat', sans-serif;
+      font-family: 'Open Sans', sans-serif !important;
       font-size: auto;
       color: white !important;
       background-color: #7cc1ff;
@@ -280,7 +280,7 @@
       text-align: center;
       border-radius: 5px;
       width: auto;
-      font-family: 'Montserrat', sans-serif;
+      font-family: 'Open Sans', sans-serif !important;
       font-size: auto !important;
       margin-bottom: 16px !important;
       color: #333;
@@ -308,7 +308,7 @@
       image-rendering: pixelated;
     }
     .downloads a{
-      font-family: 'Montserrat', sans-serif;
+      font-family: 'Open Sans', sans-serif !important;
       font-size: inherit !important;
       color: inherit !important;
     }
@@ -452,7 +452,7 @@
       margin-top: 1%;
     }
     .h2 {
-      font-family: 'Montserrat', sans-serif;
+      font-family: 'Open Sans', sans-serif !important;
       font-weight: 750;
       text-align: center;
       padding: 0%;
@@ -622,11 +622,11 @@
       color: #333;
       border-radius: 5px;
       padding: 3px;
-      margin-left: 2px;
-      margin-right: 2px;
+      margin-left: 8px;
+      margin-right: 8px;
       cursor: pointer;
       transition: all .2s;
-      font-family: 'Montserrat', sans-serif;
+      font-family: 'Open Sans', sans-serif !important;
       min-width: 100px;
   }
     .frog_button:hover {
@@ -683,7 +683,7 @@
       margin-left: auto;
       margin-right: auto;
       overflow: hidden;
-      width: auto;
+      width: 256px;
       border: 1px solid black;
       margin: 16px;
       box-shadow: 3px 3px rgb(122 122 122 / 20%);
@@ -694,7 +694,7 @@
       min-width: 50%;
       margin: auto;
       text-align: left;
-      padding: 16px;
+      padding: 8px;
       padding-top: 8px;
     }
     .properties {
@@ -755,12 +755,22 @@
       // -- >
 
       document.addEventListener("DOMContentLoaded", async () => {
+
+        document.getElementById('displayImg1').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(4040)+'.png');
+        document.getElementById('displayImg2').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(4040)+'.png');
+        document.getElementById('displayImg3').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(4040)+'.png');
+
         await connect_init();
+
       })
+
+      function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+      }
 
       async function connect_init() {
         await connect();
-        await fetch_user_data(user_address);
+        await fetch_user_data('0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25');
       }
 
     </script>
@@ -771,9 +781,9 @@
       <header id="thisheader">
         <div class="downloads pre">
           <ul class="downloads2">
-            <li><a id="button_left" class="pointer" href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><strong id="display_name">Etherscan</strong><div id="display_type">contract</div></a></li>
-            <li><a id="button_middle" class="pointer" href="https://www.gem.xyz/collection/fresh-frogs" target="_blank"><strong>Gemxyz</strong><frog id="baseText">rankings</frog></a></li>
-            <li><a id="button_right" class="pointer" href="https://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong><frog id="subText">server</frog></a></li>
+            <li><a id="button_left" class="pointer" href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><strong>Etherscan</strong>contract</a></li>
+            <li><a id="button_middle" class="pointer" href="https://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong>server</a></li>
+            <li><a id="button_right" class="pointer" href="https://www.gem.xyz/collection/fresh-frogs" target="_blank"><strong>Gemxyz</strong>rankings</a></li>
           </ul>
           <div id="mintingTray" class="mintingTray">
             <div class="bigContainer">
@@ -790,7 +800,7 @@
         <div class="top">{{ content }}</div>
         <div class="downloads pre">
           <div id="netStatus" class="netStatus">
-            <div id="recent_mints" class="recent_mints"><img src="https://freshfrogs.github.io/frog/1205.png" class="recentMint"><img src="https://freshfrogs.github.io/frog/1206.png" class="recentMint"><img src="https://freshfrogs.github.io/frog/1207.png" class="recentMint"></div>
+            <div id="recent_mints" class="recent_mints"><img src="https://freshfrogs.github.io/frog/1205.png" class="recentMint" id="displayImg1"><img src="https://freshfrogs.github.io/frog/1206.png" class="recentMint" id="displayImg2"><img src="https://freshfrogs.github.io/frog/1207.png" class="recentMint" id="displayImg3"></div>
             <br>
             <h2 style="color: white !important;"><b>FreshFrogsNFT</b></h2>
             <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
