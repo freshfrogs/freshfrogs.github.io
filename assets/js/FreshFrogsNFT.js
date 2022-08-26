@@ -757,7 +757,7 @@
         '<strong>Transfering Frog #'+tokenId+'...</strong>'+'<br>'+
         'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
         '<br><div style="text-align: left;">'+
-          '<strong>Transfer NFT</strong><br> Transfering Frog #'+tokenId+' to '+truncateAddress(receiver)+
+          '<strong>Transfer NFT</strong><br> Transfering Frog #'+tokenId+' to '+receiver+
         '</div>'
       );
 
