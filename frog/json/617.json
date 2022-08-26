@@ -14,7 +14,11 @@
     },
     {
       "trait_type": "Trait",
-      "value": "brown"
+      "value": "chocolate"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "open"
     }
   ]
 }
