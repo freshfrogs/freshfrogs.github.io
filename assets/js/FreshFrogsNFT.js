@@ -395,7 +395,10 @@
     frog_token = document.createElement('div');
     frog_token.id = frog_name;
     frog_token.className = 'frog_token';
-    frog_token.onclick = function() { display_token(frog_id); }
+    frog_token.onclick = function() { 
+      if (morphing) { morph_init(frog_id); }
+      else { display_token(frog_id); }
+    }
 
     // Element Inner HTML
     frog_token.innerHTML =
@@ -939,6 +942,8 @@
   // Initiate Morph Function
   async function morph_init(tokenId) {
 
+    var morphing = true;
+
     // Assign Variables
     var button_left = document.getElementById('button_left');
     var button_middle = document.getElementById('button_middle');
@@ -946,6 +951,7 @@
 
     // Display Base Frog
     if (!base_frog) {
+      var base_frog = tokenId;
 
       // Render Base Frog
       display_token(tokenId);
@@ -957,10 +963,18 @@
       button_right.innerHTML = '<strong>Reset</strong>morph';
       button_right.removeAttribute('href');
 
-    } else if (!sub_frog) {
+    } else {
+      var sub_frog = tokenId;
+      let subType = document.getElementById('frogType_'+tokenId).innerHTML;
+
+      // Update Button Variables
+      button_middle.innerHTML = '<strong>Frog #'+tokenId+'</strong>'+subType;
+      button_middle.removeAttribute('href');
+
+      // Morph
+      morph(base_frog, sub_frog, 'frogContainer4');
 
     }
-
   }
 
   // Token Combinations / Rebuild Token
