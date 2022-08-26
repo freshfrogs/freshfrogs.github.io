@@ -952,7 +952,7 @@
       var base_frog = tokenId;
 
       // Render Base Frog
-      display_token(tokenId);
+      await display_token(tokenId);
 
       // Update Button Variables
       button_middle.innerHTML = '<strong>Select</strong>2nd Frog';
