@@ -355,8 +355,8 @@
       button_middle.target = '_blank';
     }
 
-    button_right.innerHTML = '<strong>View</strong>opensea';
-    button_right.href = openseaLink;
+    button_right.innerHTML = '<strong>Gemxyz</strong>rankings';
+    button_right.href = gemxyzLink;
     button_right.target = '_blank';
 
     // Update Display Image
