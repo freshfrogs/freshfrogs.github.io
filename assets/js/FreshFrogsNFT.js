@@ -398,7 +398,7 @@
         '</div>'+
         '<div id="staked_'+frog_id+'"></div>'+
         '<div id="traits_'+frog_id+'" class="trait_list">'+
-          '<strong>Properties</strong><div id="owner_'+frog_id+'"style="float:right;">'+truncateAddress(owner)+'</div><div id="prop_'+frog_id+'" class="properties"></div>'+
+          '<strong>Properties</strong><div id="time_'+frog_id+'"style="float:right;">not staked</div><div id="prop_'+frog_id+'" class="properties"></div>'+
         '</div>'+
       '</div>';
 
@@ -460,14 +460,8 @@
       if (staked_time_bool >= 2000) { staked_level = 3; } else if (staked_time_bool >= 1000) { staked_level = 2; } else { staked_level = 1; }
 
       // Time Staked
-      var trait_text = document.createElement('div')
-      if (staked_time_bool >= 720) { trait_text.innerHTML = 'Staked: '+parseInt(staked_time_bool/24)+' days 🔥<br>'; } 
-      else { trait_text.innerHTML = 'Staked: '+parseInt(staked_time_bool/24)+' days<br>'; }
-      
-      document.getElementById('prop_'+frog_id).appendChild(trait_text);
-
-      // Owner
-      document.getElementById('owner_'+frog_id).innerHTML = truncateAddress(staked);
+      if (staked_time_bool >= 720) { document.getElementById('time_'+frog_id).innerHTML = '🔥 Staked '+parseInt(staked_time_bool/24)+' days'; } 
+      else { document.getElementById('time_'+frog_id).innerHTML = 'Staked '+parseInt(staked_time_bool/24)+' days'; }
 
       // Update Progress Bar
       let percent = parseInt((staked_time_bool/(1000*staked_level))*100);
