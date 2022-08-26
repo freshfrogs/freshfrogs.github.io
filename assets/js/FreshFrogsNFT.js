@@ -738,7 +738,7 @@
     // Begin Withdraw Txn
     consoleOutput(
       '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-      '<strong>Transfering Frog #'+tokenId+'...</strong>'+'<br>'+
+      '<strong>Transferring Frog #'+tokenId+'...</strong>'+'<br>'+
       '<input style="margin: 4px; width: 256px; padding: 4px; border: 1px solid black; border-radius: 5px;" id="receiver" placeholder="Receiver address"><br>'+
       '<button id="receiver_button" class="frog_button" style="background: #7cc1ff; color: white; border: 1px solid black;">Send 🡥</button>'+
       '<br><div style="text-align: left;">'+
@@ -754,10 +754,10 @@
 
       consoleOutput(
         '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-        '<strong>Transfering Frog #'+tokenId+'...</strong>'+'<br>'+
+        '<strong>Transferring Frog #'+tokenId+'...</strong>'+'<br>'+
         'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
         '<br><div style="text-align: left;">'+
-          '<strong>Transfer NFT</strong><br> Transfering Frog #'+tokenId+' to '+receiver+
+          '<strong>Transfer NFT</strong><br> Transferring Frog #'+tokenId+' to '+receiver+
         '</div>'
       );
 
@@ -766,7 +766,7 @@
 
       consoleOutput(
         '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-        '<strong>Transfering Frog #'+tokenId+'...</strong>'+'<br>'+
+        '<strong>Transferring Frog #'+tokenId+'...</strong>'+'<br>'+
         'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
         '<br><div style="text-align: left;">'+
           '<strong>Transfer NFT</strong><br> '+transfer_txn+
