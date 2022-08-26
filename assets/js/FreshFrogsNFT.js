@@ -325,10 +325,15 @@
   // Display Frog Token
   async function display_token(tokenId) {
 
+    // Is Frog Currently Staked?
+    let staked = await stakerAddress(tokenId);
+    let owner = await collection.methods.ownerOf(owner).call();
+
     // Assign Variables
     var button_left = document.getElementById('button_left');
     var button_middle = document.getElementById('button_middle');
     var button_right = document.getElementById('button_right');
+    
     // Links
     let openseaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
     let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
@@ -339,9 +344,15 @@
     button_left.href = etherscanLink;
     button_left.target = '_blank';
 
-    button_middle.innerHTML = '<strong>Opensea</strong>page';
-    button_middle.href = openseaLink
-    button_middle.target = '_blank';
+    if (!staked) {
+      button_middle.innerHTML = '<strong>Owner</strong>'+truncateAddress(staked);
+      button_middle.href = 'https://opensea.io/'+staked;
+      button_middle.target = '_blank';
+    } else {
+      button_middle.innerHTML = '<strong>Owner</strong>'+truncateAddress(owner);
+      button_middle.href = 'https://opensea.io/'+owner;
+      button_middle.target = '_blank';
+    }
 
     button_right.innerHTML = '<strong>View</strong>image';
     button_right.href = 'https://freshfrogs.io/frog/'+tokenId+'.png';
