@@ -779,7 +779,7 @@
     web3 = new Web3(window.ethereum);
 
     // Validate Receiver
-    let receiver_address = Web3.utils.isAddress(address)
+    let receiver_address = Web3.utils.isAddress(receiver)
     if (!receiver_address) { return '❌ Invalid receiver address!'; }
     if (receiver.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) { return '❌ Invalid receiver address! Please use the stake() function!'; }
 
