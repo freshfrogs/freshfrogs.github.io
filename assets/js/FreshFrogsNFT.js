@@ -449,8 +449,7 @@
         button_b.innerHTML = 
           '<br>'+
           '<button class="frog_button" style="background: lightgreen; border: 1px solid black;" onclick="stake_init('+frog_id+')">Stake 🡥</button>'+
-          '<button class="frog_button" onclick="transfer_init('+frog_id+')">Transfer 🡥</button>';
-          //'<button class="frog_button" style="border: 1px solid black;" onclick="morph_init('+frog_id+')">Morph 🡥</button>';
+          '<button class="frog_button" style="border: 1px solid black;" onclick="morph_init('+frog_id+')">Morph 🡥</button>';
         document.getElementById('traits_'+frog_id).appendChild(button_b);
       }
 
@@ -459,8 +458,7 @@
         button_b.innerHTML = 
           '<br>'+
           '<button class="frog_button" style="background: salmon; border: 1px solid black;" onclick="withdraw_init('+frog_id+')">UnStake 🡧</button>'+
-          '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_etherscan+'" target="_blank"><button class="frog_button">Etherscan 🡥</button></a>';
-          //'<button class="frog_button" id="morph_'+frog_id+'" style="border: 1px solid black;" onclick="morph_init('+frog_id+')">Morph 🡥</button>';
+          '<button class="frog_button" id="morph_'+frog_id+'" style="border: 1px solid black;" onclick="morph_init('+frog_id+')">Morph 🡥</button>';
         document.getElementById('traits_'+frog_id).appendChild(button_b);
 
       }
