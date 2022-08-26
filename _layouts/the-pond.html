@@ -756,13 +756,13 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        for (let i = 0; i < 3; i++) {
-          let displayImg = document.getElementById('displayImg'+i)
+        for (i = 0; i < 3; i++) {
+          displayImg = document.getElementById('displayImg'+i)
           displayImg.setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(4040)+'.png')
         }
 
         await connect_init();
-        
+
       })
 
       function getRandomInt(max) {
