@@ -793,7 +793,7 @@
 
         // Send Txn
         let safeTransfer_txn = await collection.methods.safeTransferFrom(user_address, receiver, tokenId).send({ from: user_address});
-        return '✅ Frog #'+tokenId+' has succesfully been transfered!';
+        return '✅ Frog #'+tokenId+' has succesfully been transferred!';
       
       // Catch Errors
       } catch (e) { return '❌ '+e.message; }
