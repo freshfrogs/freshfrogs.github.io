@@ -341,7 +341,21 @@
     let displayImg = 'https://freshfrogs.io/frog/'+tokenId+'.png'
     let displayName = 'Frog #'+tokenId
 
+    // Update Display Image
+    document.getElementById('thisheader').style.backgroundImage = 'url('+displayImg+')';
+    document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
+    document.getElementById('frogContainer4').innerHTML = '';
+
+    var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+tokenId+".json")).json();
+    for (var i = 0; i < metadata.attributes.length; i++) {
+      var attribute = metadata.attributes[i];
+      load_trait(attribute.trait_type, attribute.value, 'frogContainer4');
+    }
+
+    var frogType = document.getElementById('frogType_'+tokenId).innerHTML
+
     // Button Properties
+    button_left.innerHTML = '<strong>'+displayName+'</strong>'+frogType.slice(0, 11);
     button_left.removeAttribute('href');
     button_left.onclick = function() { scroll_to('traits_'+tokenId); }
 
@@ -358,22 +372,6 @@
     button_right.innerHTML = '<strong>Gemxyz</strong>rankings';
     button_right.href = gemxyzLink;
     button_right.target = '_blank';
-
-    // Update Display Image
-    document.getElementById('thisheader').style.backgroundImage = 'url('+displayImg+')';
-    document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
-    document.getElementById('frogContainer4').innerHTML = '';
-
-    var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+tokenId+".json")).json();
-    for (var i = 0; i < metadata.attributes.length; i++) {
-      var attribute = metadata.attributes[i];
-      load_trait(attribute.trait_type, attribute.value, 'frogContainer4');
-
-      if (attribute.trait_type == 'Frog' || attribute.trait_type == 'SpecialFrog') {
-        button_left.innerHTML = '<strong>'+displayName+'</strong>'+attribute.value.slice(0, 11);
-
-      }
-    }
   }
 
   // render_token()
@@ -431,7 +429,8 @@
       if (trait_rarity < 1) { trait_rarity = '<1%' } else { trait_rarity = trait_rarity+'%' }
 
       var trait_text = document.createElement('div')
-      trait_text.innerHTML = attribute.trait_type+': '+attribute.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>';
+      if (attribute.trait_type == 'Frog' || attribute.trait_type == 'SpecialFrog') { trait_text.innerHTML = attribute.trait_type+': <frog id="frogType_'+frog_id+'">'+attribute.value+'</frog> <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>'; }
+      else { trait_text.innerHTML = attribute.trait_type+': '+attribute.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>'; }
       document.getElementById('prop_'+frog_id).appendChild(trait_text);
 
     }
@@ -757,7 +756,7 @@
         '<strong>Transferring Frog #'+tokenId+'...</strong>'+'<br>'+
         'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
         '<br><div style="text-align: left;">'+
-          '<strong>Transfer NFT</strong><br> Transferring Frog #'+tokenId+' to '+receiver+
+          '<strong>Transfer NFT</strong><br> Transferring Frog #'+tokenId+' to '+truncateAddress(receiver)+
         '</div>'
       );
 
@@ -937,10 +936,31 @@
     }
   }
 
-  async function morph_init(frog_token) {
-    document.getElementById('morph_'+frog_token).innerHTML = 'Select Frog!'
-    base_frog = frog_token;
-    morphing = true;
+  // Initiate Morph Function
+  async function morph_init(tokenId) {
+
+    // Assign Variables
+    var button_left = document.getElementById('button_left');
+    var button_middle = document.getElementById('button_middle');
+    var button_right = document.getElementById('button_right');
+
+    // Display Base Frog
+    if (!base_frog) {
+
+      // Render Base Frog
+      display_token(tokenId);
+
+      // Update Button Variables
+      button_middle.innerHTML = '<strong>Select</strong>2nd Frog';
+      button_middle.removeAttribute('href');
+
+      button_right.innerHTML = '<strong>Reset</strong>morph';
+      button_right.removeAttribute('href');
+
+    } else if (!sub_frog) {
+
+    }
+
   }
 
   // Token Combinations / Rebuild Token
