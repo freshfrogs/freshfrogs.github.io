@@ -661,24 +661,20 @@
   // setApproval | set staking contract approval
   async function setApprovalForAll() {
 
-      let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-
-      if (!is_approved) { 
-
-        try {
-          let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
-          return true; // Contract Approved!
-
-        } catch (e) {
-          return '❌ '+e.message;
-
-        }
+    // Check Approval Status
+    let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+    if (!is_approved) { 
+      try {
         
-      } else {
-        return true; // Contract Already Approved!
-  
-      }
+        // Send Txn
+        let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
+        return true;
+
+      // Catch Errors
+      } catch (e) { return '❌ '+e.message; }
     
+    // Already Approved
+    } else { return true; }
   }
   
   // <-----
@@ -688,91 +684,92 @@
   // claimRewards(_user (address)) | send =>
   async function claimRewards() {
 
+    // Check Available Rewards
     let available_rewards = await availableRewards(user_address);
-
     if (available_rewards > 0) {
-      try { // Claim rewards available to user
+      try {
+
+        // Send Txn
         let claimRewards = await controller.methods.claimRewards().send({ from: user_address });
         return '✅ Rewards have succesfully been claimed!';
   
-      } catch (e) { // Catch Error =>
-        return '❌ '+e.message;
-  
-      }
-    } else {
-      return '❌ No rewards available to claim!';
-
-    }
+      // Catch Errors!
+      } catch (e) { return '❌ '+e.message; }
+    
+    // No Rewards
+    } else { return '❌ No rewards available to claim!'; }
   }
 
   // withdraw(_tokenId (uint256), _user (address)) | send =>
   async function withdraw(tokenId) {
 
-    // Check staked/ownership status
+    // Check Staked/Approval Status
     let staked = await stakerAddress(tokenId);
-
     let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
 
-    // Token is not currently staked
-    if (!staked) {
-      return '❌ Frog #'+tokenId+' is not currently staked!';
+    // Invalid Approval / Not Staked
+    if (!approved) { return '❌ Staking contract not approved for token transfer!'; }
+    if (!staked) { return '❌ Frog #'+tokenId+' is not currently staked!'; } 
 
     // Valid ownership
-    } else if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
-
-      if (!approved) {
-        return '❌ Staking contract not approved for token transfer!';
-      }
-
-      try { // Withdraw token from staking contract
+    else if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+      try {
+        
+        // Send Txn
         let withdraw = await controller.methods.withdraw(tokenId).send({ from: user_address });
         return '✅ Frog #'+tokenId+' has succesfully been un-staked!';
 
-      } catch (e) {
-        return '❌ '+e.message;
+      // Catch Errors
+      } catch (e) { return '❌ '+e.message; }
+
+    // Invalid Ownership
+    } else { return '❌ Frog #'+tokenId+' does not belong to user!'; }
+  }
+
+  async function safeTransferFrom(sender, receiver, tokenId) {
+
+    // Check Ownership
+    let owner = await collection.methods.ownerOf(tokenId).call();
+    if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+      try {
+
+        // Send Txn
+        let safeTransfer_txn = await collection.methods.safeTransferFrom(user_address, receiver, tokenId).send({ from: user_address});
+        return 'Frog #'+tokenId+' has succesfully been sent!';
       
-      }
+      // Catch Errors
+      } catch (e) { return '❌ '+e.message; }
 
-    // Invalid ownership
-    } else {
-      return '❌ Frog #'+tokenId+' does not belong to user!';
-
-    }
+    // Invalid Ownership
+    } else { return '❌ Frog #'+tokenId+' does not belong to user!'; }
   }
 
   // stake(_tokenId (uint256), _user (address)) | send =>
   async function stake(tokenId) {
 
-    // Check ownership status
+    // Check Ownership / Approval Status
     let owner = await collection.methods.ownerOf(tokenId).call();
-
     let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+    if (!approved) { return '❌ Staking contract not approved for token transfer!'; }
 
     // Valid ownership
     if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
-
-      if (!approved) {
-        return '❌ Staking contract not approved for token transfer!';
-      }
-
       try {
+
+        // Send Txn
         let stake = await controller.methods.stake(tokenId).send({ from: user_address });
         return '✅ Frog #'+tokenId+' has succesfully been staked!';
 
-      } catch (e) {
-        return '❌ '+e.message;
-
-      }
+      // Catch Errors
+      } catch (e) { return '❌ '+e.message; }
 
     // Token already Staked
     } else if (owner.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) {
       return '❌ Frog #'+tokenId+' is already staked!';
+    } 
 
     // Invalid Ownership
-    } else {
-      return '❌ Frog #'+tokenId+' does not belong to user!';
-
-    }
+    else { return '❌ Frog #'+tokenId+' does not belong to user!'; }
   }
 
   // <-----
@@ -809,13 +806,11 @@
 
     // Return staker's address
     if (stakerAddress !== '0x0000000000000000000000000000000000000000') {
-      return stakerAddress
-
-    // Token is Not Currently Staked!
-    } else {
-      return false
-
+      return stakerAddress;
     }
+    
+    // Token is Not Currently Staked!
+    else { return false; }
   }
 
   // stakers(<input> (address), <input> (dataFetch)) | return ( amountStaked, timeOfLastUpdate, unclaimedRewards )
@@ -846,7 +841,7 @@
   // Calculate total time a Frog has been staked (Hours)
   async function timeStaked(tokenId) {
 
-    // Check staked status
+    // Check Staked Status
     web3 = new Web3(window.ethereum);
     let staked = await stakerAddress(tokenId);
 
@@ -857,31 +852,31 @@
 
     // Valid staked status
     } else {
+      try {
 
-      // Loop blockchain transactions per parameters [NFT Transfer From: User ==> To: Staking Controller] & NFT is Currently Staked
-      let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'tokenId': tokenId}, fromBlock: 0, toBlock: 'latest'});
+        // Loop blockchain transactions per parameters [NFT Transfer From: User ==> To: Staking Controller] & NFT is Currently Staked
+        let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'tokenId': tokenId}, fromBlock: 0, toBlock: 'latest'});
+        let mostRecentTxn = (stakingEvents.length) - 1;
 
-      let mostRecentTxn = (stakingEvents.length) - 1;
-      //console.log('most recent txn: '+mostRecentTxn); //
+        // Fetch Block Number from Txn
+        let staked_block = parseInt(stakingEvents[mostRecentTxn].blockNumber);
 
-      // Fetch Block Number from Txn
-      let staked_block = parseInt(stakingEvents[mostRecentTxn].blockNumber);
+        // Fetch Timestamp for block txn
+        let staked_time = await web3.eth.getBlock(staked_block);
+        let staked_date = new Date(staked_time.timestamp*1000);
 
-      // Fetch Timestamp for block txn
-      let staked_time = await web3.eth.getBlock(staked_block);
-      let staked_date = new Date(staked_time.timestamp*1000);
+        // Calculate Time Staked in Hours
+        let staked_duration = Date.now() - staked_date;
+        let staked_hours = Math.floor(staked_duration/1000/60/60);
 
-      // Calculate Time Staked in Hours
-      let staked_duration = Date.now() - staked_date;
-      let staked_hours = Math.floor(staked_duration/1000/60/60);
+        //console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
 
-      //console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
+        // Return time staked in (Hours)
+        return staked_hours;
 
-      // Return time staked in (Hours)
-      return staked_hours;
-
+      // Catch Errors, Return 0.00
+      } catch (e) { return 0.00; }
     }
-
   }
 
   async function morph_init(frog_token) {
