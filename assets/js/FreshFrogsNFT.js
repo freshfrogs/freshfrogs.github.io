@@ -472,7 +472,7 @@
       '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
       '<div class="frog_level" style="color: tomato;">Level '+staked_level+'</div>';
 
-      if (staked_time_bool >= 720) { document.getElementById('time_'+frog_id).innerHTML = '🔥 Staked '+parseInt(staked_time_bool/24)+' days'; } 
+      if (staked_time_bool >= 720) { document.getElementById('time_'+frog_id).innerHTML = 'Staked '+parseInt(staked_time_bool/24)+' days 🔥'; } 
       else { document.getElementById('time_'+frog_id).innerHTML = 'Staked '+parseInt(staked_time_bool/24)+' days'; }
 
       // Update Progress Bar
