@@ -268,7 +268,7 @@
 
       // Render Frogs Staked by User
       if (staker_tokens >= 1) {
-        let staker_tokens_array = await controller.methods.getStakedTokens(fetch_address).call();
+        let staker_tokens_array = await getStakedTokens(fetch_address);
         try { // Fetch staked token data
           for (var i = 0; i < staker_tokens_array.length; i++) {
             tokenId = staker_tokens_array[i].tokenId
