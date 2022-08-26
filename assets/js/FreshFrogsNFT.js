@@ -345,11 +345,11 @@
     button_left.target = '_blank';
 
     if (!staked) {
-      button_middle.innerHTML = '<strong>Owner</strong>'+truncateAddress(staked);
+      button_middle.innerHTML = '<strong>Owner</strong>'+truncateAddress(owner);
       button_middle.href = 'https://opensea.io/'+staked;
       button_middle.target = '_blank';
     } else {
-      button_middle.innerHTML = '<strong>Owner</strong>'+truncateAddress(owner);
+      button_middle.innerHTML = '<strong>Owner</strong>'+truncateAddress(staked);
       button_middle.href = 'https://opensea.io/'+owner;
       button_middle.target = '_blank';
     }
