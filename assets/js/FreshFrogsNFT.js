@@ -327,7 +327,7 @@
 
     // Is Frog Currently Staked?
     let staked = await stakerAddress(tokenId);
-    let owner = await collection.methods.ownerOf(owner).call();
+    let owner = await collection.methods.ownerOf(tokenId).call();
 
     // Assign Variables
     var button_left = document.getElementById('button_left');
