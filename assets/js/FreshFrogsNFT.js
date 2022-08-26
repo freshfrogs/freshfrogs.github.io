@@ -352,7 +352,7 @@
       button_middle.onclick = function() { scroll_to('traits_'+tokenId); }
 
       // Morph
-      morph(base_frog, tokenId, 'frogContainer4');
+      morphFrogs(base_frog, tokenId, 'frogContainer4');
       return;
 
     }
@@ -997,13 +997,13 @@
       button_middle.removeAttribute('href');
 
       // Morph
-      morph(base_frog, sub_frog, 'frogContainer4');
+      morphFrogs(base_frog, sub_frog, 'frogContainer4');
 
     }
   }
 
   // Token Combinations / Rebuild Token
-  async function morph(baseId, subId, build_loc) {
+  async function morphFrogs(baseId, subId, build_loc) {
 
     var baseFrog, baseSpecialFrog, baseTrait, baseAccessory, baseEyes, baseHat, baseMouth;
     var subFrog, subSpecialFrog, subTrait, subAccessory, subEyes, subHat, subMouth;
