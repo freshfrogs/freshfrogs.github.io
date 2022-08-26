@@ -342,8 +342,7 @@
     let displayName = 'Frog #'+tokenId
 
     // Button Properties
-    button_left.href = etherscanLink;
-    button_left.target = '_blank';
+    button_left.removeAttribute('href');
     button_left.onclick = function() { scroll_to('traits_'+tokenId); }
 
     if (!staked) {
