@@ -325,10 +325,15 @@
   // Display Frog Token
   async function display_token(tokenId) {
 
+    // Is Frog Currently Staked?
+    let staked = await stakerAddress(tokenId);
+    let owner = await collection.methods.ownerOf(tokenId).call();
+
     // Assign Variables
     var button_left = document.getElementById('button_left');
     var button_middle = document.getElementById('button_middle');
     var button_right = document.getElementById('button_right');
+    
     // Links
     let openseaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
     let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
@@ -339,9 +344,15 @@
     button_left.href = etherscanLink;
     button_left.target = '_blank';
 
-    button_middle.innerHTML = '<strong>Opensea</strong>view on';
-    button_middle.href = openseaLink
-    button_middle.target = '_blank';
+    if (!staked) {
+      button_middle.innerHTML = '<strong>Owner</strong>'+truncateAddress(staked);
+      button_middle.href = 'https://opensea.io/'+staked;
+      button_middle.target = '_blank';
+    } else {
+      button_middle.innerHTML = '<strong>Owner</strong>'+truncateAddress(owner);
+      button_middle.href = 'https://opensea.io/'+owner;
+      button_middle.target = '_blank';
+    }
 
     button_right.innerHTML = '<strong>View</strong>image';
     button_right.href = 'https://freshfrogs.io/frog/'+tokenId+'.png';
@@ -450,20 +461,18 @@
         document.getElementById('traits_'+frog_id).appendChild(button_b);
 
       }
-
-      document.getElementById('staked_'+frog_id).innerHTML = 
-        '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
-        '<div id="level_'+frog_id+'" class="frog_level"><i>staked</i></div>';
       
       // Check Staked Time / Calculate Level
       let staked_time_bool = await timeStaked(frog_id);
       if (staked_time_bool >= 2000) { staked_level = 3; } else if (staked_time_bool >= 1000) { staked_level = 2; } else { staked_level = 1; }
 
-      // Time Staked
+      document.getElementById('staked_'+frog_id).innerHTML = 
+      '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
+      '<div style="color:tomato;" class="frog_level">Staked Lvl '+staked_level+'</div>';
+
       var trait_text = document.createElement('div')
       if (staked_time_bool >= 720) { trait_text.innerHTML = 'Staked: '+parseInt(staked_time_bool/24)+' days 🔥<br>'; } 
       else { trait_text.innerHTML = 'Staked: '+parseInt(staked_time_bool/24)+' days<br>'; }
-      
       document.getElementById('prop_'+frog_id).appendChild(trait_text);
 
       // Owner
@@ -474,8 +483,6 @@
       let elem = document.getElementById('myBar_'+frog_id);
       let width = percent;
       elem.style.width = width + "%";
-      document.getElementById('level_'+frog_id).innerHTML = 'Staked Lvl '+staked_level+'';
-      document.getElementById('level_'+frog_id).style.color = 'tomato';
       
     }
   }
