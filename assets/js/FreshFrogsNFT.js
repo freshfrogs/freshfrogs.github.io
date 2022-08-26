@@ -452,16 +452,15 @@
         document.getElementById('traits_'+frog_id).appendChild(button_b);
 
       }
-
-      document.getElementById('staked_'+frog_id).innerHTML = 
-        '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
-        '<div id="level_'+frog_id+'" class="frog_level"><i>staked</i></div>';
       
       // Check Staked Time / Calculate Level
       let staked_time_bool = await timeStaked(frog_id);
       if (staked_time_bool >= 2000) { staked_level = 3; } else if (staked_time_bool >= 1000) { staked_level = 2; } else { staked_level = 1; }
 
-      // Time Staked
+      document.getElementById('staked_'+frog_id).innerHTML = 
+      '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
+      '<div class="frog_level" style="color: tomato;">Level '+staked_level+'</div>';
+
       if (staked_time_bool >= 720) { document.getElementById('time_'+frog_id).innerHTML = '🔥 Staked '+parseInt(staked_time_bool/24)+' days'; } 
       else { document.getElementById('time_'+frog_id).innerHTML = 'Staked '+parseInt(staked_time_bool/24)+' days'; }
 
@@ -470,8 +469,6 @@
       let elem = document.getElementById('myBar_'+frog_id);
       let width = percent;
       elem.style.width = width + "%";
-      document.getElementById('level_'+frog_id).innerHTML = 'Staked Lvl '+staked_level+'';
-      document.getElementById('level_'+frog_id).style.color = 'tomato';
       
     }
   }
