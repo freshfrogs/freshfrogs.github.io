@@ -377,7 +377,7 @@
 
     if (morph) {
 
-      var morphing = true;
+      morphing = true;
 
       // Update Button Variables
       button_middle.innerHTML = '<strong>Select</strong>2nd Frog';
