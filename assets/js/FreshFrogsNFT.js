@@ -447,7 +447,7 @@
         button_b.innerHTML = 
           '<br>'+
           '<button class="frog_button" style="background: lightgreen; border: 1px solid black;" onclick="stake_init('+frog_id+')">Stake 🡥</button>'+
-          '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
+          '<button class="frog_button" onclick="transfer_init('+frog_id+')">Transfer 🡥</button>';
           //'<button class="frog_button" style="border: 1px solid black;" onclick="morph_init('+frog_id+')">Morph 🡥</button>';
         document.getElementById('traits_'+frog_id).appendChild(button_b);
       }
@@ -726,7 +726,45 @@
     } else { return '❌ Frog #'+tokenId+' does not belong to user!'; }
   }
 
-  async function safeTransferFrom(sender, receiver, tokenId) {
+  // Initiate Transfer Txn
+  async function transfer_init(tokenId) {
+
+    // Scroll Into View
+    console_pre = document.getElementById('pre');
+    console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+
+    // Begin Withdraw Txn
+    consoleOutput(
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<strong>Transfering Frog #'+tokenId+'...</strong>'+'<br>'+
+      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+      '<br><div style="text-align: left;">'+
+        '<strong>Transfer NFT</strong><br> Transfer Frog #'+tokenId+
+        '<br><input id="receiver" placeholder="receiver address">'+
+      '</div>'
+    );
+
+    document.querySelector("#receiver").addEventListener("input", async (e) => {
+
+      // Send Transfer Txn
+      let receiver = document.querySelector("#receiver").value
+      let transfer_txn = await safeTransferFrom(receiver, tokenId)
+
+      consoleOutput(
+        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+        '<strong>Transfering Frog #'+tokenId+'...</strong>'+'<br>'+
+        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+        '<br><div style="text-align: left;">'+
+          '<strong>Transfer NFT</strong><br> '+transfer_txn+
+        '</div>'
+      );
+
+    })
+
+  }
+
+  // Transfer Function
+  async function safeTransferFrom(receiver, tokenId) {
 
     // Check Ownership
     let owner = await collection.methods.ownerOf(tokenId).call();
