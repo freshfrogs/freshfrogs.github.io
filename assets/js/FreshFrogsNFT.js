@@ -440,15 +440,27 @@
     button_b.style.width = 'fit-content';
     button_b.style.marginLeft = 'auto';
     button_b.style.marginRight = 'auto';
-    
-    button_b.innerHTML = 
-      '<br>'+
-      '<a style="background: cornflowerblue; color: white; margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_opensea+'" target="_blank"><button class="frog_button">OpenSea 🡥</button></a>'+
-      '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
-    
-    document.getElementById('traits_'+frog_id).appendChild(button_b);
 
-    if (staked !== false) { // Staked
+    if (!staked) { // NOT Staked
+      if (owner.toString().toLowerCase() == user_address.toString().toLowerCase() && functions) {
+        button_b.innerHTML = 
+          '<br>'+
+          '<button class="frog_button" style="background: lightgreen; border: 1px solid black;" onclick="stake_init('+frog_id+')">Stake 🡥</button>'+
+          '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
+          //'<button class="frog_button" style="border: 1px solid black;" onclick="morph_init('+frog_id+')">Morph 🡥</button>';
+        document.getElementById('traits_'+frog_id).appendChild(button_b);
+      }
+
+    } else { // STAKED
+      if (staked.toString().toLowerCase() == user_address.toString().toLowerCase() && functions) {
+        button_b.innerHTML = 
+          '<br>'+
+          '<button class="frog_button" style="background: salmon; border: 1px solid black;" onclick="withdraw_init('+frog_id+')">UnStake 🡥</button>'+
+          '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button">Rankings 🡥</button></a>';
+          //'<button class="frog_button" id="morph_'+frog_id+'" style="border: 1px solid black;" onclick="morph_init('+frog_id+')">Morph 🡥</button>';
+        document.getElementById('traits_'+frog_id).appendChild(button_b);
+
+      }
       
       // Check Staked Time / Calculate Level
       let staked_time_bool = await timeStaked(frog_id);
