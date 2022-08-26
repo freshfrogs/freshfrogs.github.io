@@ -532,7 +532,7 @@
   // Scroll Into view
   function scroll_to(element) {
     console_pre = document.getElementById(element);
-    console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+    console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "center"});
   }
 
   // FreshFrogsController | NFT Staking Smart Contract | 0xCB1ee125CFf4051a10a55a09B10613876C4Ef199
