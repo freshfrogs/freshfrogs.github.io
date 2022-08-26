@@ -739,12 +739,12 @@
       '<strong>Transfering Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
-        '<strong>Transfer NFT</strong> <input style="padding: 2px; border: 1px solid black; border-radius: 5px;" id="receiver" placeholder="receiver address">'+
+        '<strong>Transfer NFT</strong> <input style="padding: 2px; border: 1px solid black; border-radius: 5px;" id="receiver" placeholder="receiver address"> '+'<button id="receiver_button" class="frog_button" style="border: 1px solid black;">Send 🡥</button>'+
         '<br>Items sent to the wrong address cannot be recovered!'+
       '</div>'
     );
 
-    document.querySelector("#receiver").addEventListener("input", async (e) => {
+    document.querySelector("#receiver_button").addEventListener("click", async (e) => {
 
       // Token Reciever
       let receiver = document.querySelector("#receiver").value
@@ -779,7 +779,7 @@
     web3 = new Web3(window.ethereum);
 
     // Validate Receiver
-    let receiver_address = Web3.utils.isAddress(receiver)
+    let receiver_address = await Web3.utils.isAddress(receiver)
     if (!receiver_address) { return '❌ Invalid receiver address!'; }
     if (receiver.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) { return '❌ Invalid receiver address! Please use the stake() function!'; }
 
