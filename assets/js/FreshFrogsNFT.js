@@ -748,7 +748,7 @@
 
       // Send Transfer Txn
       let receiver = document.querySelector("#receiver").value
-      let transfer_txn = await safeTransferFrom(receiver, tokenId)
+      let transfer_txn = await transferFrom(receiver, tokenId)
 
       consoleOutput(
         '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
@@ -763,7 +763,12 @@
   }
 
   // Transfer Function
-  async function safeTransferFrom(receiver, tokenId) {
+  async function transferFrom(receiver, tokenId) {
+
+    web3 = new Web3(window.ethereum);
+    
+    let receiver_address = Web3.utils.isAddress(address)
+    if (!receiver_address) { return '❌ Invalid receiver address!'; }
 
     // Check Ownership
     let owner = await collection.methods.ownerOf(tokenId).call();
