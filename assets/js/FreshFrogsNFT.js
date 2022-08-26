@@ -758,9 +758,8 @@
           '<strong>Transfer NFT</strong><br> '+transfer_txn+
         '</div>'
       );
-
+      
     })
-
   }
 
   // Transfer Function
