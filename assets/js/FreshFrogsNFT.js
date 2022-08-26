@@ -344,6 +344,7 @@
     // Button Properties
     button_left.href = etherscanLink;
     button_left.target = '_blank';
+    button_left.onclick = function() { scroll_to('traits_'+tokenId); }
 
     if (!staked) {
       button_middle.innerHTML = '<strong>Owner</strong>'+truncateAddress(owner);
@@ -530,13 +531,18 @@
     )}`;
   }
 
+  // Scroll Into view
+  function scroll_to(element) {
+    console_pre = document.getElementById(element);
+    console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+  }
+
   // FreshFrogsController | NFT Staking Smart Contract | 0xCB1ee125CFf4051a10a55a09B10613876C4Ef199
 
   async function claimRewards_init() {
 
     // Scroll Into View
-    console_pre = document.getElementById('pre');
-    console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+    scroll_to('pre');
 
     // Begin Withdraw Txn
     consoleOutput(
@@ -562,8 +568,7 @@
   async function withdraw_init(tokenId) {
 
     // Scroll Into View
-    console_pre = document.getElementById('pre');
-    console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+    scroll_to('pre');
 
     // Begin Withdraw Txn
     consoleOutput(
@@ -593,8 +598,7 @@
   async function stake_init(tokenId) {
 
     // Scroll Into View
-    console_pre = document.getElementById('pre');
-    console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+    scroll_to('pre');
 
     // Check Contract Approval
     let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
@@ -730,8 +734,7 @@
   async function transfer_init(tokenId) {
 
     // Scroll Into View
-    console_pre = document.getElementById('pre');
-    console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+    scroll_to('pre');
 
     // Begin Withdraw Txn
     consoleOutput(
