@@ -779,7 +779,6 @@
     // Validate Receiver
     let receiver_address = Web3.utils.isAddress(address)
     if (!receiver_address) { return '❌ Invalid receiver address!'; }
-
     if (receiver.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) { return '❌ Invalid receiver address! Please use the stake() function!'; }
 
     // Check Ownership
