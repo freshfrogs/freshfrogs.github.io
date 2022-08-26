@@ -746,6 +746,15 @@
 
     document.querySelector("#receiver").addEventListener("input", async (e) => {
 
+      consoleOutput(
+        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+        '<strong>Transfering Frog #'+tokenId+'...</strong>'+'<br>'+
+        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+        '<br><div style="text-align: left;">'+
+          '<strong>Transfer NFT</strong><br> Transfering Frog #'+tokenId+' to '+truncateAddress(receiver)+
+        '</div>'
+      );
+
       // Send Transfer Txn
       let receiver = document.querySelector("#receiver").value
       let transfer_txn = await safeTransferFrom(receiver, tokenId)
