@@ -378,6 +378,7 @@
     if (morph) {
 
       morphing = true;
+      base_frog = tokenId;
 
       // Update Button Variables
       button_middle.innerHTML = '<strong>Select</strong>2nd Frog';
