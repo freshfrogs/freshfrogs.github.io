@@ -739,8 +739,7 @@
     consoleOutput(
       '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
       '<strong>Transfering Frog #'+tokenId+'...</strong>'+'<br>'+
-      'Please input recipient address...<br>'+
-      '<input style="padding: 4px; border: 1px solid black; border-radius: 5px;" id="receiver" placeholder="Address"><br>'+
+      '<input style="padding: 4px; border: 1px solid black; border-radius: 5px;" id="receiver" placeholder="receiver address"><br>'+
       '<button id="receiver_button" class="frog_button" style="background: #7cc1ff; color: white; border: 1px solid black;">Send 🡥</button>'+
       '<br><div style="text-align: left;">'+
         '<strong>Transfer NFT</strong>'+
