@@ -746,6 +746,9 @@
 
     document.querySelector("#receiver").addEventListener("input", async (e) => {
 
+      // Token Reciever
+      let receiver = document.querySelector("#receiver").value
+
       consoleOutput(
         '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
         '<strong>Transfering Frog #'+tokenId+'...</strong>'+'<br>'+
@@ -756,7 +759,6 @@
       );
 
       // Send Transfer Txn
-      let receiver = document.querySelector("#receiver").value
       let transfer_txn = await safeTransferFrom(receiver, tokenId)
 
       consoleOutput(
