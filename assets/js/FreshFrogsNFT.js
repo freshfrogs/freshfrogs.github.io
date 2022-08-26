@@ -448,8 +448,7 @@
     
     document.getElementById('traits_'+frog_id).appendChild(button_b);
 
-    if (!staked) { // NOT Staked
-    } else { // STAKED
+    if (staked !== false) { // Staked
       
       // Check Staked Time / Calculate Level
       let staked_time_bool = await timeStaked(frog_id);
