@@ -739,7 +739,7 @@
       '<strong>Transfering Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
-        '<strong>Transfer NFT</strong> <input style="padding: 2px;" id="receiver" placeholder="receiver address">'+
+        '<strong>Transfer NFT</strong> <input style="padding: 2px; border: 1px solid black; border-radius: 5px;" id="receiver" placeholder="receiver address">'+
         '<br>Items sent to the wrong address cannot be recovered!'+
       '</div>'
     );
