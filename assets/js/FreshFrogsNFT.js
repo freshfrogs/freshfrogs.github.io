@@ -1101,6 +1101,7 @@
 
     } */
     
+    // Select Attributes!
     if (typeof renderTrait == 'undefined') { var renderTrait = subTrait; }
     if (typeof baseAccessory !== 'undefined') { var renderAccessory = baseAccessory; } 
     else if (typeof subAccessory !== 'undefined') { var renderAccessory = subAccessory; }
@@ -1113,14 +1114,19 @@
 
     // <------ BUILD NEW METADATA (baseId, subId) ------>
     
+    // BASE FROG
     if (typeof renderFrog !== 'undefined') { loadTrait('Frog', renderFrog, build_loc); }
     else if (typeof renderSpecialFrog !== 'undefined') { loadTrait('SpecialFrog', renderSpecialFrog, build_loc); }
 
+    // HALF FROG
     if (typeof subFrog !== 'undefined') { loadTrait('Frog/half/', subFrog, build_loc); }
     else if (typeof subSpecialFrog !== 'undefined') { loadTrait('SpecialFrog/half/', subSpecialFrog, build_loc); }
 
+    // TRAIT(S)
     if (typeof renderTrait !== 'undefined') { loadTrait('Trait', renderTrait, build_loc); }
     if (typeof renderOverlay !== 'undefined') { loadTrait('Trait', renderOverlay, build_loc); }
+
+    // ACCESSORIES
     if (typeof renderAccessory !== 'undefined') { loadTrait('Accessory', renderAccessory, build_loc); }
     if (typeof renderEyes !== 'undefined') { loadTrait('Eyes', renderEyes, build_loc); }
     if (typeof renderHat !== 'undefined') { loadTrait('Hat', renderHat, build_loc); }
