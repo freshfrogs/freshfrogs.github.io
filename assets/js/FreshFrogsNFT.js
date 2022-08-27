@@ -1085,14 +1085,16 @@
 
       let frog_stakedTotal = await timeStaked(tokenId)
       if (frog_stakedTotal > staked_total) {
-        staked_total = frog_stakedTotal;
-        staked_total_leader = frog_stakedAddress;
+        var staked_total = frog_stakedTotal;
+        var staked_total_leader = frog_stakedAddress;
+        console.log(staked_total_leader)
       } 
 
       let frog_stakedTime = await stakers(frog_stakedAddress, 'amountStaked')
       if (frog_stakedTime > staked_time) {
-        staked_time = frog_stakedTime;
-        staked_time_leader = tokenId;
+        var staked_time = frog_stakedTime;
+        var staked_time_leader = tokenId;
+        console.log(staked_time_leader)
       }
 
     } else { return; }
