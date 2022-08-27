@@ -17,9 +17,9 @@
 
     // Connecting
     consoleOutput(
-      '<br><div style="text-align: left;">'+
-        '<strong>Connecting WEB3</strong> Please wait...<br>'+
-        '</div>'
+      '<div style="text-align: left;">'+
+        'Connecting please wait...<br>'+
+      '</div>'
     );
 
     // Fetch Collection Data via OpenSea API
@@ -241,16 +241,16 @@
 
       // Connected!
       consoleOutput(
-        '<br><div style="text-align: left;">'+
-          '<strong>Connecting WEB3</strong> Fetching user data...<br>'+
-          '</div>'
+        '<div style="text-align: left;">'+
+          'Connected! Fetching user data...<br>'+
+        '</div>'
       );
 
     } catch (e) { // Something Went Wrong!
       consoleOutput(
-        '<br><div style="text-align: left;">'+
-          '<strong>Connecting WEB3</strong> ❌ '+e.message+
-          '</div>'
+        '<div style="text-align: left;">'+
+          '❌ '+e.message+
+        '</div>'
       );
     }
   }
