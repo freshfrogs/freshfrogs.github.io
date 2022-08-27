@@ -242,15 +242,14 @@
       // Connected!
       consoleOutput(
         '<br><div style="text-align: left;">'+
-          '<strong>Connecting</strong> Connected! Fetching user data...<br>'+
+          '<strong>Connecting WEB3</strong> Connected! Fetching user data...<br>'+
           '</div>'
       );
 
     } catch (e) { // Something Went Wrong!
       consoleOutput(
         '<br><div style="text-align: left;">'+
-          '<strong>Connecting</strong> Something went wrong!<br>'+
-          '❌ '+e.message+
+          '<strong>Connecting WEB3</strong> ❌ '+e.message+
           '</div>'
       );
     }
