@@ -1010,11 +1010,11 @@
 
     if (baseSpecialFrog !== 'undefined' || subSpecialFrog !== 'undefined') {
 
-      // New Trait (Updated)
+      // New Frog, Trait (Updated)
       if (baseSpecialFrog !== 'undefined') { var returnTrait = baseSpecialFrog+'/'+subTrait; var returnFrog = baseSpecialFrog; } 
       else { var returnTrait = baseTrait; var returnFrog = baseFrog; }
 
-    // Default Trait
+    // Default Frog, Trait
     } else { var returnTrait = subTrait; returnFrog = baseFrog; }
     
     if (typeof returnTrait !== 'undefined') { var returnTrait = subTrait; }
