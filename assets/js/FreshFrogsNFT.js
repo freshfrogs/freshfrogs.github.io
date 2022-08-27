@@ -258,7 +258,7 @@
   // fetch_user_tokens() | Fetch User Tokens | Staked & Otherwise |
   async function fetch_user_data(fetch_address) {
     if (! fetch_address) { fetch_address = user_address; }
-    if (fetch_address.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) { render_vault = true; }
+    if (fetch_address.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) { render_vault = true; } else { render_vault = false; }
 
     // No. of Frogs staked by fetch_address
     let staker_tokens = await stakers(fetch_address, 'amountStaked')
