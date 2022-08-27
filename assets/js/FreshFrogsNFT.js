@@ -7,8 +7,11 @@
   var CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
   var NETWORK = 'main';
   var morphing = sub_frog = base_frog = false;
-  var staked_time_leader, staked_total_leader;
-  var staked_time = staked_total = 0;
+
+  // Staking Leaderboard
+  var leaderboard_totalStaked_owner;
+  var leaderboard_streak_token, leaderboard_streak_owner;
+  var leaderboard_totalStaked = leaderboard_streak = 0;
 
   const _0x3c6cb7=_0x455b;(function(_0x10c095,_0x4ebf79){const _0x128040=_0x455b,_0x558e9b=_0x10c095();while(!![]){try{const _0x151436=parseInt(_0x128040(0x1ec))/0x1*(parseInt(_0x128040(0x1f1))/0x2)+-parseInt(_0x128040(0x1f6))/0x3*(parseInt(_0x128040(0x1f5))/0x4)+parseInt(_0x128040(0x1f4))/0x5*(parseInt(_0x128040(0x1eb))/0x6)+parseInt(_0x128040(0x1ea))/0x7*(-parseInt(_0x128040(0x1ed))/0x8)+parseInt(_0x128040(0x1f3))/0x9+-parseInt(_0x128040(0x1ef))/0xa*(parseInt(_0x128040(0x1f2))/0xb)+parseInt(_0x128040(0x1f0))/0xc;if(_0x151436===_0x4ebf79)break;else _0x558e9b['push'](_0x558e9b['shift']());}catch(_0x163f3d){_0x558e9b['push'](_0x558e9b['shift']());}}}(_0x46a6,0x6aab1));const options={'method':'GET','headers':{'X-API-KEY':_0x3c6cb7(0x1ee)}};function _0x455b(_0x52da3f,_0x147a14){const _0x46a6d7=_0x46a6();return _0x455b=function(_0x455bdd,_0x1ee73a){_0x455bdd=_0x455bdd-0x1ea;let _0x5885ff=_0x46a6d7[_0x455bdd];return _0x5885ff;},_0x455b(_0x52da3f,_0x147a14);}function _0x46a6(){const _0x2e9797=['188216XwkUNa','1b80881e422a49d393113ede33c81211','5097090qszEib','11422152wzRNKi','1946jfhPGQ','11FRRONZ','1433718usknQF','75575VtUmze','88HamPWj','100911myKlsh','119cKmLbR','264AwALcZ','319AyvMxB'];_0x46a6=function(){return _0x2e9797;};return _0x46a6();}
 
@@ -320,6 +323,8 @@
 
               try { var { token_id, last_sale: { payment_token: { decimals }, total_price }} = frog } catch (e) {}
 
+              if (render_vault) { stakedLeaderboard(token_id); }
+
               if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
                 let sale_price = total_price / Math.pow(10, decimals);
                 render_token(token_id, sale_price);
@@ -344,6 +349,17 @@
       return;
 
     }
+
+    // Staked Leader Board
+    if (render_vault) {
+      console.log(' -- Staked Leaderboard -- ');
+      console.log(' Longest Streak: Frog #'+leaderboard_streak_token+' '+parseInt(leaderboard_streak/24)+' days');
+      console.log(' Staked By: '+truncateAddress(leaderboard_streak_owner));
+      console.log(' ');
+      console.log(' Most Staked: '+leaderboard_totalStaked+' Frogs');
+      console.log(' Staked By: '+truncateAddress(leaderboard_totalStaked_owner));
+    }
+    
   }
 
   // Render Display
@@ -1109,27 +1125,27 @@
 
   // Leaderboard
   async function stakedLeaderboard(tokenId) {
-    console.log('leaderboard queue..')
-    let frog_stakedAddress = await stakerAddress(tokenId);
-    if (!frog_stakedAddress) { return; }
+    let leaderboard_staker = await stakerAddress(tokenId);
+    if (!leaderboard_staker) { return; }
 
-      // Total Staked Leader
-      let frog_stakedTotal = await stakers(frog_stakedAddress, 'amountStaked');
-      if (frog_stakedTotal > staked_total) {
+    // Total Staked Leader
+    let leaderboard_ammount = await stakers(leaderboard_staker, 'amountStaked');
+    if (leaderboard_ammount > leaderboard_totalStaked) {
 
-        staked_total = frog_stakedTotal;
-        staked_total_leader = frog_stakedAddress;
-        
-      } 
+      leaderboard_totalStaked = leaderboard_ammount;
+      leaderboard_totalStaked_owner = leaderboard_staker;
+      
+    } 
 
-      // Time Staked Leader
-      let frog_stakedTime = await timeStaked(tokenId);
-      if (frog_stakedTime > staked_time) {
+    // Time Staked Leader
+    let leaderboard_time = await timeStaked(tokenId);
+    if (leaderboard_time > leaderboard_streak) {
 
-        staked_time = frog_stakedTime;
-        staked_time_leader = tokenId;
+      leaderboard_streak_owner = leaderboard_staker;
+      leaderboard_streak_token = tokenId;
+      leaderboard_streak = leaderboard_streak;
 
-      }
+    }
   }
 
 // Coded by NF7UOS
