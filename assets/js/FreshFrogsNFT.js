@@ -1081,23 +1081,33 @@
   async function stakedLeaderboard(tokenId) {
     
     let frog_stakedAddress = await stakerAddress(tokenId);
-    if (frog_stakedAddress !== false) {
+    console.log('frog_stakedAddress :'+frog_stakedAddress);
 
-      let frog_stakedTotal = await timeStaked(tokenId)
+      // Total Staked Leader
+      let frog_stakedTotal = await stakers(frog_stakedAddress, 'amountStaked');
+      console.log('staked_total :'+frog_stakedAddress);
+
       if (frog_stakedTotal > staked_total) {
-        var staked_total = frog_stakedTotal;
-        var staked_total_leader = frog_stakedAddress;
-        console.log(staked_total_leader)
+        staked_total = frog_stakedTotal;
+        console.log('staked_total :'+frog_stakedTotal);
+
+        staked_total_leader = frog_stakedAddress;
+        console.log('staked_total :'+frog_stakedAddress);
+        
       } 
 
-      let frog_stakedTime = await stakers(frog_stakedAddress, 'amountStaked')
+      // Time Staked Leader
+      let frog_stakedTime = await timeStaked(tokenId);
+      console.log('frog_stakedTotal :'+frog_stakedTotal);
+
       if (frog_stakedTime > staked_time) {
         var staked_time = frog_stakedTime;
-        var staked_time_leader = tokenId;
-        console.log(staked_time_leader)
-      }
+        console.log('staked_time :'+staked_time);
 
-    } else { return; }
+        var staked_time_leader = tokenId;
+        console.log('staked_time_leader :'+staked_time_leader);
+
+      }
   }
 
 // Coded by NF7UOS
