@@ -1016,10 +1016,10 @@
     // <------ DETERMINE NEW METADATA (baseId, subId) ------>
     // https://freshfrogs.io/frog/preset_/ [ trait_type/value ] .png
 
-    if (baseSpecialFrog !== 'undefined' || subSpecialFrog !== 'undefined') {
+    if (typeof baseSpecialFrog !== 'undefined' || typeof subSpecialFrog !== 'undefined') {
 
       // New Frog, Trait (Updated)
-      if (baseSpecialFrog !== 'undefined') { var returnTrait = baseSpecialFrog+'/'+subTrait; var returnSpecialFrog = baseSpecialFrog; } 
+      if (typeof baseSpecialFrog !== 'undefined') { var returnTrait = baseSpecialFrog+'/'+subTrait; var returnSpecialFrog = baseSpecialFrog; } 
       else { var returnTrait = baseTrait; var returnFrog = baseFrog; }
 
     // Default Frog, Trait
