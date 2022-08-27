@@ -1049,12 +1049,20 @@
 
     // SpecialFrogs
     if (typeof baseSpecialFrog !== 'undefined') {
-      var renderSpecialFrog = baseSpecialFrog+'/'+subFrog;
-      var renderTrait = '/SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
+      if (baseSpecialFrog == 'inversedEyes') {
+        var renderTrait = '/SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
+      } else {
+        var renderSpecialFrog = baseSpecialFrog+'/'+subFrog;
+        var renderTrait = '/SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
+      }
     }
     else if (typeof subSpecialFrog !== 'undefined') {
+      if (baseSpecialFrog == 'inversedEyes') {
+        var renderTrait = '/SpecialFrog/'+subSpecialFrog+'/'+baseTrait;
+      } else {
         var renderSpecialFrog = subSpecialFrog+'/'+baseFrog;
         var renderTrait = '/SpecialFrog/'+subSpecialFrog+'/'+baseTrait;
+      }
     }
 
     // Default Frog, Trait
