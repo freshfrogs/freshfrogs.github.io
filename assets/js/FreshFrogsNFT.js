@@ -19,6 +19,7 @@
     .then(collection => {
       var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
       traits_list = traits;
+      console.log('Count: '+count)
 
     })
     .catch(e => {
