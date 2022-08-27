@@ -384,8 +384,12 @@
       button_middle.innerHTML = '<strong>Select</strong>2nd Frog';
       button_middle.removeAttribute('href');
 
-      button_right.innerHTML = '<strong>Back</strong>reset';
+      button_right.innerHTML = '<strong>Morph</strong>reset';
       button_right.removeAttribute('href');
+      button_right.onclick = function () {
+        morphing = false;
+        display_token(base_frog);
+      }
       return
 
     } else {
