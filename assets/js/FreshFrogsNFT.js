@@ -244,7 +244,7 @@
     if (fetch_address.toString().toLowerCase() == user_address.toString().toLowerCase()){
       render_functions = true;
     } else {
-      render_functions = true;
+      render_functions = false;
     }
 
     // No. of Frogs staked by fetch_address
