@@ -1095,9 +1095,10 @@
       staked_time = frog_stakedTime;
       staked_time_leader = tokenId;
       console.log('New Staked Time Leader: Frog #'+staked_time_leader);
-
     } else {
+
       return;
+      
     }
   }
 
