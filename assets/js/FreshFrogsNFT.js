@@ -1079,7 +1079,7 @@
 
   // Leaderboard
   async function stakedLeaderboard(tokenId) {
-    
+    console.log('leaderboard queue..')
     let frog_stakedAddress = await stakerAddress(tokenId);
     if (!frog_stakedAddress) { return; }
 
@@ -1098,7 +1098,7 @@
       // Time Staked Leader
       let frog_stakedTime = await timeStaked(tokenId);
       if (frog_stakedTime > staked_time) {
-        
+
         var staked_time = frog_stakedTime;
         console.log('staked_time :'+staked_time);
 
