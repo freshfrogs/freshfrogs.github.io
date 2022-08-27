@@ -689,6 +689,10 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
+        document.getElementById('displayImg1').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(1, 4040)+'.png');
+        document.getElementById('displayImg2').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(1, 4040)+'.png');
+        document.getElementById('displayImg3').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(1, 4040)+'.png');
+
         const web3 = new Web3(window.ethereum);
         const f0 = new F0();
 
@@ -799,6 +803,11 @@
 
       })
 
+      function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min) + min);
+      }
 
       function consoleOutput(output) {
         document.getElementById("pre").innerHTML = output
