@@ -1088,10 +1088,7 @@
       if (frog_stakedTotal > staked_total) {
 
         staked_total = frog_stakedTotal;
-        console.log('staked_total :'+frog_stakedTotal);
-
         staked_total_leader = frog_stakedAddress;
-        console.log('staked_total :'+frog_stakedAddress);
         
       } 
 
@@ -1099,11 +1096,8 @@
       let frog_stakedTime = await timeStaked(tokenId);
       if (frog_stakedTime > staked_time) {
 
-        var staked_time = frog_stakedTime;
-        console.log('staked_time :'+staked_time);
-
-        var staked_time_leader = tokenId;
-        console.log('staked_time_leader :'+staked_time_leader);
+        staked_time = frog_stakedTime;
+        staked_time_leader = tokenId;
 
       }
   }
