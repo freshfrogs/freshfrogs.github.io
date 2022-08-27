@@ -1081,13 +1081,12 @@
   async function stakedLeaderboard(tokenId) {
     
     let frog_stakedAddress = await stakerAddress(tokenId);
-    console.log('frog_stakedAddress :'+frog_stakedAddress);
+    if (!frog_stakedAddress) { return; }
 
       // Total Staked Leader
       let frog_stakedTotal = await stakers(frog_stakedAddress, 'amountStaked');
-      console.log('staked_total :'+frog_stakedAddress);
-
       if (frog_stakedTotal > staked_total) {
+
         staked_total = frog_stakedTotal;
         console.log('staked_total :'+frog_stakedTotal);
 
@@ -1098,9 +1097,8 @@
 
       // Time Staked Leader
       let frog_stakedTime = await timeStaked(tokenId);
-      console.log('frog_stakedTotal :'+frog_stakedTotal);
-
       if (frog_stakedTime > staked_time) {
+        
         var staked_time = frog_stakedTime;
         console.log('staked_time :'+staked_time);
 
