@@ -1067,4 +1067,65 @@
 
   }
 
+  // Staking Leaderboard
+
+  // Get Longest Staking Streak
+
+
+  // Fetch Opensea Assets
+  async function fetch_staked_assets() {
+
+    // Total Staked Frogs
+    let total_staked = await collection.methods.balanceOf(CONTROLLER_ADDRESS).call();
+
+    // Staked Leaders
+    var staked_time_leader, staked_total_leader;
+    var staked_time = staked_total = 0;
+
+    // Pages of Assets
+    let pages = parseInt(total_staked/50) + 1;
+    for (var i = 0; i < pages; i++) {
+
+      // Fetch OpenSea Data
+      fetch('https://api.opensea.io/api/v1/assets?owner='+CONTROLLER_ADDRESS+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+(i * 50)+'&limit=50&include_orders=false', options)
+      .then((tokens) => tokens.json())
+      .then((tokens) => {
+        var { assets } = tokens
+        assets.forEach((frog) => {
+
+          var { token_id } = frog
+
+          let frog_stakedTime = await timeStaked(token_id);
+          let frog_stakedAddress = await stakerAddress(token_id);
+          let frog_ownerTotal = await stakers(fetch_address, 'amountStaked')
+
+          if (frog_ownerTotal > staked_total_leader) {
+
+            staked_total = frog_ownerTotal
+            staked_total_leader = frog_stakedAddress;
+
+          }
+
+          if (frog_stakedTime > staked_time) {
+
+            staked_time = frog_stakedTime;
+            staked_time_leader = frog_stakedAddress;
+
+          }
+
+        })
+      })
+      .catch(e => {
+
+        console.log(e.message);
+        
+      })
+
+      console.log('Staking Leaderboard!');
+      console.log('Total Staked Leader: '+truncateAddress(staked_total_leader));
+      console.log('Time Staked Leader: '+truncateAddress(staked_time_leader));
+
+    }
+  }
+
 // Coded by NF7UOS
