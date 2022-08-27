@@ -18,7 +18,7 @@
     // Connecting
     consoleOutput(
       '<br><div style="text-align: left;">'+
-        '<strong>Connecting</strong> Please wait...<br>'+
+        '<strong>Connecting WEB3</strong> Please wait...<br>'+
         '</div>'
     );
 
@@ -242,7 +242,7 @@
       // Connected!
       consoleOutput(
         '<br><div style="text-align: left;">'+
-          '<strong>Connecting WEB3</strong> Success! Fetching user data...<br>'+
+          '<strong>Connecting WEB3</strong> Fetching user data...<br>'+
           '</div>'
       );
 
