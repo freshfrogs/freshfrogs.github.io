@@ -625,8 +625,8 @@
   async function stake_init(tokenId) {
 
     // Scroll Into View
-    scroll_to('pre');
     morphing = false;
+    scroll_to('pre');
     display_token(tokenId);
 
     // Check Contract Approval
