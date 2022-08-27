@@ -242,8 +242,6 @@
   // fetch_user_tokens() | Fetch User Tokens | Staked & Otherwise |
   async function fetch_user_data(fetch_address) {
     if (! fetch_address) { fetch_address = user_address; }
-    if (fetch_address.toString().toLowerCase() == user_address.toString().toLowerCase()){ render_functions = true; } 
-    else { render_functions = false; }
 
     // No. of Frogs staked by fetch_address
     let staker_tokens = await stakers(fetch_address, 'amountStaked')
@@ -270,7 +268,7 @@
         try { // Fetch staked token data
           for (var i = 0; i < staker_tokens_array.length; i++) {
             tokenId = staker_tokens_array[i].tokenId
-            render_token(tokenId, render_functions)
+            render_token(tokenId)
 
           }
         } catch (e) {
@@ -296,10 +294,10 @@
 
               if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
                 let sale_price = total_price / Math.pow(10, decimals);
-                render_token(token_id, render_functions, sale_price);
+                render_token(token_id, sale_price);
 
               } else {
-                render_token(token_id, render_functions);
+                render_token(token_id);
 
               }
             })
@@ -412,9 +410,8 @@
   }
 
   // render_token()
-  async function render_token(frog_id, functions, recent_sale) {
+  async function render_token(frog_id, recent_sale) {
     if (! recent_sale) { recent_sale = ''; } else { recent_sale = 'Ξ'+recent_sale; }
-    if (! functions) { functions = false; }
 
     // Is Frog Currently Staked?
     let staked = await stakerAddress(frog_id);
@@ -480,7 +477,7 @@
     button_b.style.marginTop = '8px';
 
     if (!staked) { // NOT Staked
-      if (owner.toString().toLowerCase() == user_address.toString().toLowerCase() && functions) {
+      if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
         button_b.innerHTML = 
           '<button class="frog_button" style="background: lightgreen; border: 1px solid black;" onclick="stake_init('+frog_id+')">Stake 🡥</button>'+
           '<button class="frog_button" style="border: 1px solid black;" onclick="display_token('+frog_id+', true)">Morph 🡥</button>';
@@ -488,7 +485,7 @@
       }
 
     } else { // STAKED
-      if (staked.toString().toLowerCase() == user_address.toString().toLowerCase() && functions) {
+      if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
         button_b.innerHTML = 
           '<button class="frog_button" style="background: salmon; border: 1px solid black;" onclick="withdraw_init('+frog_id+')">UnStake 🡧</button>'+
           '<button class="frog_button" id="morph_'+frog_id+'" style="border: 1px solid black;" onclick="display_token('+frog_id+', true)">Morph 🡥</button>';
