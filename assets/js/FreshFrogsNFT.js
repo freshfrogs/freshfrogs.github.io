@@ -1018,13 +1018,14 @@
     // <------ DETERMINE NEW METADATA (baseId, subId) ------>
     // https://freshfrogs.io/frog/preset_/ [ trait_type/value ] .png
 
+    // SpecialFrogs
     if (typeof baseSpecialFrog !== 'undefined') {
       var renderSpecialFrog = baseSpecialFrog+'/'+subFrog;
-      var renderTrait = baseSpecialFrog+'/SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
+      var renderTrait = '/SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
     }
     else if (typeof subSpecialFrog !== 'undefined') {
         var renderSpecialFrog = subSpecialFrog+'/'+baseFrog;
-        var renderTrait = subSpecialFrog+'/SpecialFrog/'+subSpecialFrog+'/'+baseTrait;
+        var renderTrait = '/SpecialFrog/'+subSpecialFrog+'/'+baseTrait;
     }
 
     // Default Frog, Trait
