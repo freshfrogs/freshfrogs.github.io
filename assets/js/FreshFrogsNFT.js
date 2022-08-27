@@ -1050,6 +1050,7 @@
     // SpecialFrogs
     if (typeof baseSpecialFrog !== 'undefined') {
       if (baseSpecialFrog == 'inversedEyes') {
+        var renderSpecialFrog = baseSpecialFrog;
         var renderTrait = '/SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
       } else {
         var renderSpecialFrog = baseSpecialFrog+'/'+subFrog;
@@ -1059,6 +1060,7 @@
     else if (typeof subSpecialFrog !== 'undefined') {
       if (baseSpecialFrog == 'inversedEyes') {
         var renderTrait = '/SpecialFrog/'+subSpecialFrog+'/'+baseTrait;
+        var renderSpecialFrog = subSpecialFrog;
       } else {
         var renderSpecialFrog = subSpecialFrog+'/'+baseFrog;
         var renderTrait = '/SpecialFrog/'+subSpecialFrog+'/'+baseTrait;
