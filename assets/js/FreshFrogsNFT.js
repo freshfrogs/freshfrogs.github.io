@@ -242,7 +242,7 @@
       // Connected!
       consoleOutput(
         '<br><div style="text-align: left;">'+
-          '<strong>Connecting WEB3</strong> Connected! Fetching user data...<br>'+
+          '<strong>Connecting WEB3</strong> Success! Fetching user data...<br>'+
           '</div>'
       );
 
