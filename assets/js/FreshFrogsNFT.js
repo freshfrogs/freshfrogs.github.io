@@ -626,6 +626,8 @@
 
     // Scroll Into View
     scroll_to('pre');
+    morphing = false;
+    display_token(tokenId);
 
     // Check Contract Approval
     let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
