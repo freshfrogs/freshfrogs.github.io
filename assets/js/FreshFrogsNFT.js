@@ -15,6 +15,13 @@
   // connect() | Connect Wallet | Update Collection Data
   async function connect() {
 
+    // Connecting
+    consoleOutput(
+      '<br><div style="text-align: left;">'+
+        '<strong>Connecting</strong> Please wait...<br>'+
+        '</div>'
+    );
+
     // Fetch Collection Data via OpenSea API
     fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
     .then(collection => collection.json())
@@ -232,10 +239,20 @@
       next_id = await f0.api.nextId().call();
       next_id = parseInt(next_id);
 
-    } catch (e) { // Something Went Wrong!
-      console.log('WEB3 Connection Failed! '+e.message);
-      //consoleOutput('<strong></strong><br>Something went wrong!<br>'+e.message+'<a class="pointer" href=""><b id="connected">🔌 Connect Wallet</b></a>');
+      // Connected!
+      consoleOutput(
+        '<br><div style="text-align: left;">'+
+          '<strong>Connecting</strong> Connected! Fetching user data...<br>'+
+          '</div>'
+      );
 
+    } catch (e) { // Something Went Wrong!
+      consoleOutput(
+        '<br><div style="text-align: left;">'+
+          '<strong>Connecting</strong> Something went wrong!<br>'+
+          '❌ '+e.message+
+          '</div>'
+      );
     }
   }
 
