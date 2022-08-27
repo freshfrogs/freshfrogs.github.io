@@ -245,7 +245,7 @@
     if (fetch_address.toString().toLowerCase() == user_address.toString().toLowerCase()){ render_functions = true; } 
     else { render_functions = false; }
 
-    if (fetch_address.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) { render_vault = true; }
+    if (fetch_address.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) { render_vault = true; } else { render_vault = false; }
 
     // No. of Frogs staked by fetch_address
     let staker_tokens = await stakers(fetch_address, 'amountStaked')
