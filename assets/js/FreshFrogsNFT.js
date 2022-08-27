@@ -1037,8 +1037,8 @@
       var renderTrait = baseSpecialFrog+'/SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
     }
     else if (typeof subSpecialFrog !== 'undefined') {
-        var renderSpecialFrog = baseSpecialFrog+'/'+baseFrog;
-        var renderTrait = baseSpecialFrog+'/SpecialFrog/'+baseSpecialFrog+'/'+baseTrait;
+        var renderSpecialFrog = subSpecialFrog+'/'+baseFrog;
+        var renderTrait = subSpecialFrog+'/SpecialFrog/'+subSpecialFrog+'/'+baseTrait;
     }
 
     // Default Frog, Trait
