@@ -401,12 +401,12 @@
 
     } else {
       
-      button_middle.innerHTML = '<strong>View</strong>image';
+      button_middle.innerHTML = '<strong>Image</strong>view';
       button_middle.href = 'https://freshfrogs.io/frog/'+tokenId+'.png';
       button_middle.target = '_blank';
   
-      button_right.innerHTML = '<strong>Gemxyz</strong>rankings';
-      button_right.href = gemxyzLink;
+      button_right.innerHTML = '<strong>Opensea</strong>view on';
+      button_right.href = openseaLink;
       button_right.target = '_blank';
 
     }
