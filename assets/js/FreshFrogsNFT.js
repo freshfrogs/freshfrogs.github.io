@@ -274,7 +274,13 @@
       staker_rewards = String(staker_rewards).slice(0, 6);
 
       if (render_vault) {
-        Output('<button style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+'<strong>FreshFrogsNFT Staking Vault</strong><br>'+user_tokens+' Total Frogs Staked!</button>'+'<br><hr style="background: black;">'+'<div class="console_pre" id="console-pre"></div>');
+        Output(
+          '<button style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+
+            '<strong>FreshFrogsNFT Staking Vault</strong><br>'+user_tokens+' Total Frogs Staked!'+
+          '</button>'+'<br>'+
+          '<hr style="background: black;">'+
+          '<button class="frog_button" onclick="">Claim Rewards 🡥</button>'+'<button class="frog_button" onclick="">Custom Banner 🡥</button>'+'<button class="frog_button" onclick="">Staking Vault 🡥</button>'+
+          '<div class="console_pre" id="console-pre"></div>');
       } else {
         Output('<button onclick="claimRewards_init()" style="list-style: none; min-height: 40px; padding: 8px; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(fetch_address)+' ]</acc><br>'+staker_tokens+' Frog(s) Staked '+''+staker_rewards+' $FLYZ 🡥</button>'+'<br><hr style="background: black;">'+'<div class="console_pre" id="console-pre"></div>');
       }
