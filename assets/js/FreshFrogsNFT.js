@@ -240,11 +240,10 @@
   // fetch_user_tokens() | Fetch User Tokens | Staked & Otherwise |
   async function fetch_user_data(fetch_address) {
     if (! fetch_address) { fetch_address = user_address; }
-    if (fetch_address.toString().toLowerCase() == user_address.toString().toLowerCase()){
-      render_functions = true;
-    } else {
-      render_functions = false;
-    }
+    if (fetch_address.toString().toLowerCase() == user_address.toString().toLowerCase()){ render_functions = true; } 
+    else { render_functions = false; }
+
+    if (fetch_address.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) { render_vault = true; }
 
     // No. of Frogs staked by fetch_address
     let staker_tokens = await stakers(fetch_address, 'amountStaked')
@@ -259,7 +258,7 @@
       let staker_rewards = (staker_info / 1000000000000000000);
       staker_rewards = String(staker_rewards).slice(0, 6);
 
-      if (fetch_address.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) {
+      if (render_vault) {
         Output('<br><button style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+'<strong>FreshFrogsNFT Staking Vault</strong><br>'+user_tokens+' Total Frogs Staked!</button>'+'<br><hr style="background: black;">'+'<div class="console_pre" id="console-pre"></div>');
       } else {
         Output('<br><button onclick="claimRewards_init()" style="list-style: none; min-height: 40px; padding: 8px; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(fetch_address)+' ]</acc><br>'+staker_tokens+' Frog(s) Staked '+''+staker_rewards+' $FLYZ 🡥</button>'+'<br><hr style="background: black;">'+'<div class="console_pre" id="console-pre"></div>');
@@ -281,6 +280,10 @@
         }
       }
 
+      // Staked Leaders
+      var staked_time_leader, staked_total_leader;
+      var staked_time = staked_total = 0;
+
       // Render Frogs Held by Fetch Address
       if (user_tokens >= 1) {
         let pages = parseInt(user_tokens/50) + 1;
@@ -294,6 +297,17 @@
             assets.forEach((frog) => {
 
               try { var { token_id, last_sale: { payment_token: { decimals }, total_price }} = frog } catch (e) {}
+
+              // Staking Leaderboard
+              if (render_vault) {
+
+                let frog_stakedTime = await timeStaked(token_id);
+                let frog_stakedAddress = await stakerAddress(token_id);
+                let frog_ownerTotal = await stakers(frog_stakedAddress, 'amountStaked')
+                if (frog_ownerTotal > staked_total_leader) { staked_total = frog_ownerTotal; staked_total_leader = frog_stakedAddress; }
+                if (frog_stakedTime > staked_time) { staked_time = frog_stakedTime; staked_time_leader = frog_stakedAddress; }
+
+              }
 
               if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
                 let sale_price = total_price / Math.pow(10, decimals);
@@ -310,6 +324,12 @@
             console.log(e.message);
 
           })
+
+          if (render_vault) {
+            console.log('Staking Leaderboard!');
+            console.log('Total Staked Leader: '+truncateAddress(staked_total_leader));
+            console.log('Time Staked Leader: '+truncateAddress(staked_time_leader));
+          }
         }
       }
 
@@ -1065,67 +1085,6 @@
     if (typeof renderHat !== 'undefined') { load_trait('Hat', renderHat, build_loc); }
     if (typeof renderMouth !== 'undefined') { load_trait('Mouth', renderMouth, build_loc); }
 
-  }
-
-  // Staking Leaderboard
-
-  // Get Longest Staking Streak
-
-
-  // Fetch Opensea Assets
-  async function stakingLeaderboard() {
-
-    // Total Staked Frogs
-    let total_staked = await collection.methods.balanceOf(CONTROLLER_ADDRESS).call();
-
-    // Staked Leaders
-    var staked_time_leader, staked_total_leader;
-    var staked_time = staked_total = 0;
-
-    // Pages of Assets
-    let pages = parseInt(total_staked/50) + 1;
-    for (var i = 0; i < pages; i++) {
-
-      // Fetch OpenSea Data
-      fetch('https://api.opensea.io/api/v1/assets?owner='+CONTROLLER_ADDRESS+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+(i * 50)+'&limit=50&include_orders=false', options)
-      .then((tokens) => tokens.json())
-      .then((tokens) => {
-        var { assets } = tokens
-        assets.forEach((frog) => {
-
-          var { token_id } = frog
-
-          let frog_stakedTime = await timeStaked(token_id);
-          let frog_stakedAddress = await stakerAddress(token_id);
-          let frog_ownerTotal = await stakers(fetch_address, 'amountStaked')
-
-          if (frog_ownerTotal > staked_total_leader) {
-
-            staked_total = frog_ownerTotal
-            staked_total_leader = frog_stakedAddress;
-
-          }
-
-          if (frog_stakedTime > staked_time) {
-
-            staked_time = frog_stakedTime;
-            staked_time_leader = frog_stakedAddress;
-
-          }
-
-        })
-      })
-      .catch(e => {
-
-        console.log(e.message);
-        
-      })
-
-      console.log('Staking Leaderboard!');
-      console.log('Total Staked Leader: '+truncateAddress(staked_total_leader));
-      console.log('Time Staked Leader: '+truncateAddress(staked_time_leader));
-
-    }
   }
 
 // Coded by NF7UOS
