@@ -1025,7 +1025,7 @@
     // Default Frog, Trait
     } else { var returnTrait = subTrait; returnFrog = baseFrog; }
     
-    if (typeof returnTrait !== 'undefined') { var returnTrait = subTrait; }
+    if (typeof returnTrait == 'undefined') { var returnTrait = subTrait; }
     if (typeof baseAccessory !== 'undefined') { var returnAccessory = baseAccessory; } 
     else if (typeof subAccessory !== 'undefined') { var returnAccessory = subAccessory; }
     if (typeof baseEyes !== 'undefined') { var returnEyes = baseEyes; } 
