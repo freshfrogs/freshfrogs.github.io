@@ -411,7 +411,7 @@
       button_middle.innerHTML = '<strong>Select</strong>2nd Frog';
       button_middle.removeAttribute('href');
 
-      button_right.innerHTML = '<strong>Morph</strong>reset';
+      button_right.innerHTML = '<strong>Morph</strong>Reset';
       button_right.removeAttribute('href');
       button_right.onclick = function () {
         morphing = false;
@@ -421,11 +421,11 @@
 
     } else {
   
-      button_middle.innerHTML = '<strong>Opensea</strong>view on';
+      button_middle.innerHTML = '<strong>Opensea</strong>View On';
       button_middle.href = openseaLink;
       button_middle.target = '_blank';
 
-      button_right.innerHTML = '<strong>Image</strong>view';
+      button_right.innerHTML = '<strong>Image</strong>View';
       button_right.href = 'https://freshfrogs.io/frog/'+tokenId+'.png';
       button_right.target = '_blank';
 
