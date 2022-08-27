@@ -400,13 +400,13 @@
       return
 
     } else {
-      
-      button_middle.innerHTML = '<strong>Image</strong>view';
-      button_middle.href = 'https://freshfrogs.io/frog/'+tokenId+'.png';
-      button_middle.target = '_blank';
   
-      button_right.innerHTML = '<strong>Opensea</strong>view on';
-      button_right.href = openseaLink;
+      button_middle.innerHTML = '<strong>Opensea</strong>view on';
+      button_middle.href = openseaLink;
+      button_middle.target = '_blank';
+
+      button_right.innerHTML = '<strong>Image</strong>view';
+      button_right.href = 'https://freshfrogs.io/frog/'+tokenId+'.png';
       button_right.target = '_blank';
 
     }
