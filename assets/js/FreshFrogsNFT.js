@@ -322,6 +322,22 @@
     }
   }
 
+  // Render Display
+  async function render_display(tokenId) {
+
+    // Update Display Image
+    document.getElementById('thisheader').style.backgroundImage = 'url('+'https://freshfrogs.io/frog/'+tokenId+'.png'+')';
+    document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
+    document.getElementById('frogContainer4').innerHTML = '';
+
+    var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+tokenId+".json")).json();
+    for (var i = 0; i < metadata.attributes.length; i++) {
+      var attribute = metadata.attributes[i];
+      load_trait(attribute.trait_type, attribute.value, 'frogContainer4');
+    }
+
+  }
+
   // Display Frog Token
   async function display_token(tokenId, morph) {
 
@@ -357,16 +373,8 @@
 
     }
 
-    // Update Display Image
-    document.getElementById('thisheader').style.backgroundImage = 'url('+displayImg+')';
-    document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
-    document.getElementById('frogContainer4').innerHTML = '';
-
-    var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+tokenId+".json")).json();
-    for (var i = 0; i < metadata.attributes.length; i++) {
-      var attribute = metadata.attributes[i];
-      load_trait(attribute.trait_type, attribute.value, 'frogContainer4');
-    }
+    // Update Token Display
+    await render_display(tokenId);
 
     var frogType = document.getElementById('frogType_'+tokenId).innerHTML
 
