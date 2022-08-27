@@ -523,6 +523,7 @@
 
     newAttribute = document.createElement("img");
     newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
+    newAttribute.alt = attribute
 
     if (where.includes('cont_')) {
       newAttribute.className = "frogImg3";
