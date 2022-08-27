@@ -1048,8 +1048,8 @@
     
     if (typeof renderFrog !== 'undefined') { load_trait('Frog', renderFrog, build_loc); }
     else if (typeof renderSpecialFrog !== 'undefined') { load_trait('SpecialFrog', renderSpecialFrog, build_loc); }
-    if (typeof renderOverlay !== 'undefined') { load_trait('Trait', renderOverlay, build_loc); }
     if (typeof renderTrait !== 'undefined') { load_trait('Trait', renderTrait, build_loc); }
+    if (typeof renderOverlay !== 'undefined') { load_trait('Trait', renderOverlay, build_loc); }
     if (typeof renderAccessory !== 'undefined') { load_trait('Accessory', renderAccessory, build_loc); }
     if (typeof renderEyes !== 'undefined') { load_trait('Eyes', renderEyes, build_loc); }
     if (typeof renderHat !== 'undefined') { load_trait('Hat', renderHat, build_loc); }
