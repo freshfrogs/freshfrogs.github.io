@@ -1089,9 +1089,13 @@
     if (frog_stakedTotal > staked_total_leader) {
       staked_total = frog_stakedTotal;
       staked_total_leader = frog_stakedAddress;
-    } else if (frog_stakedTime > staked_time_leader) {
+    } 
+    
+    if (frog_stakedTime > staked_time_leader) {
       staked_time = frog_stakedTime;
       staked_time_leader = tokenId;
+      console.log('New Staked Time Leader: Frog #'+staked_time_leader);
+
     } else {
       return;
     }
