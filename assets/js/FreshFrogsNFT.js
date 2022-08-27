@@ -481,8 +481,8 @@
 
     if (!staked) { // NOT Staked
       if (owner.toString().toLowerCase() == user_address.toString().toLowerCase() && functions) {
+        button_b.style.marginTop = '8px;'
         button_b.innerHTML = 
-          '<br>'+
           '<button class="frog_button" style="background: lightgreen; border: 1px solid black;" onclick="stake_init('+frog_id+')">Stake 🡥</button>'+
           '<button class="frog_button" style="border: 1px solid black;" onclick="display_token('+frog_id+', true)">Morph 🡥</button>';
         document.getElementById('traits_'+frog_id).appendChild(button_b);
@@ -490,8 +490,8 @@
 
     } else { // STAKED
       if (staked.toString().toLowerCase() == user_address.toString().toLowerCase() && functions) {
+        button_b.style.marginTop = '8px;'
         button_b.innerHTML = 
-          '<br>'+
           '<button class="frog_button" style="background: salmon; border: 1px solid black;" onclick="withdraw_init('+frog_id+')">UnStake 🡧</button>'+
           '<button class="frog_button" id="morph_'+frog_id+'" style="border: 1px solid black;" onclick="display_token('+frog_id+', true)">Morph 🡥</button>';
         document.getElementById('traits_'+frog_id).appendChild(button_b);
