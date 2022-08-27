@@ -1082,12 +1082,12 @@
     
     let frog_stakedAddress = await stakerAddress(tokenId);
     if (frog_stakedAddress !== false) {
-      if (await timeStaked(tokenId) > staked_total_leader) {
+      if (await timeStaked(tokenId) > staked_total) {
         staked_total = frog_stakedTotal;
         staked_total_leader = frog_stakedAddress;
       } 
       
-      if (await stakers(frog_stakedAddress, 'amountStaked') > staked_time_leader) {
+      if (await stakers(frog_stakedAddress, 'amountStaked') > staked_time) {
         staked_time = frog_stakedTime;
         staked_time_leader = tokenId;
         console.log('New Staked Time Leader: Frog #'+staked_time_leader);
