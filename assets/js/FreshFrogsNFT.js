@@ -1028,7 +1028,7 @@
     if (renderFrog == 'stawberryDartFrog' || renderFrog == 'redEyedTreeFrog' || renderFrog == 'splendidLeafFrog') {
       if (renderFrog == 'redEyedTreeFrog' || renderFrog == 'splendidLeafFrog') {
         var renderOverlay = '/Overlay/'+renderFrog+'/'+baseTrait;
-      } else { var renderOverlay = '/Overlay/'+baseFrog; }
+      } else { var renderOverlay = '/Overlay/'+subFrog; }
       
       var renderFrog = subFrog;
 
