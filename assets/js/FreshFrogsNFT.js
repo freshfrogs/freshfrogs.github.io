@@ -478,6 +478,7 @@
     button_b.style.width = 'fit-content';
     button_b.style.marginLeft = 'auto';
     button_b.style.marginRight = 'auto';
+    button_b.style.marginTop = '8px';
 
     if (!staked) { // NOT Staked
       if (owner.toString().toLowerCase() == user_address.toString().toLowerCase() && functions) {
