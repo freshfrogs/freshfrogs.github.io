@@ -621,7 +621,7 @@
       background-color: white;
       color: #333;
       border-radius: 5px;
-      padding: 3px;
+      padding: 2px;
       margin-left: 8px;
       margin-right: 8px;
       cursor: pointer;
@@ -746,7 +746,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
     <script>
-
+      // C 0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38 | A 0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25
       // <-- [Google Analytics]
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -757,15 +757,18 @@
       document.addEventListener("DOMContentLoaded", async () => {
 
         document.getElementById('displayImg1').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(4040)+'.png');
-        document.getElementById('displayImg2').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(4040)+'.png');
-        document.getElementById('displayImg3').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(4040)+'.png');
+        document.getElementById('displayImg1').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(1, 4040)+'.png');
+        document.getElementById('displayImg2').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(1, 4040)+'.png');
+        document.getElementById('displayImg3').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(1, 4040)+'.png');
 
         await connect_init();
 
       })
 
-      function getRandomInt(max) {
-        return Math.floor(Math.random() * max);
+      function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min) + min);
       }
 
       async function connect_init() {
@@ -807,8 +810,8 @@
             opensea.io/collection/fresh-frogs<a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong style="color: white;">Shop on OpenSea ⛵</strong></a>
             <br>
             <div id="pre" class="mintingTextWhite2">
-              <br><button onclick="connect_init()" style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">
-                <strong>Connect Wallet 🔌</strong><br>Connect Ethereum Wallet
+              <br><button onclick="connect_init()" style="list-style: none; min-height: 40px; padding: 8px; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">
+                <strong>Stake and Earn Rewards!</strong><br>connect ethereum wallet
               </button><br><hr style="background: black;">
               <div class="console_pre" id="console-pre"></div>
             </div>
