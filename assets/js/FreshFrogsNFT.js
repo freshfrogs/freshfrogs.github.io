@@ -1082,24 +1082,17 @@
     
     let frog_stakedAddress = await stakerAddress(tokenId);
     if (frog_stakedAddress !== false) {
-      frog_stakedTime = await timeStaked(tokenId);
-      frog_stakedTotal = await stakers(frog_stakedAddress, 'amountStaked');
+      if (await timeStaked(tokenId) > staked_total_leader) {
+        staked_total = frog_stakedTotal;
+        staked_total_leader = frog_stakedAddress;
+      } 
+      
+      if (await stakers(frog_stakedAddress, 'amountStaked') > staked_time_leader) {
+        staked_time = frog_stakedTime;
+        staked_time_leader = tokenId;
+        console.log('New Staked Time Leader: Frog #'+staked_time_leader);
+      }
     } else { return; }
-
-    if (frog_stakedTotal > staked_total_leader) {
-      staked_total = frog_stakedTotal;
-      staked_total_leader = frog_stakedAddress;
-    } 
-    
-    if (frog_stakedTime > staked_time_leader) {
-      staked_time = frog_stakedTime;
-      staked_time_leader = tokenId;
-      console.log('New Staked Time Leader: Frog #'+staked_time_leader);
-    } else {
-
-      return;
-
-    }
   }
 
 // Coded by NF7UOS
