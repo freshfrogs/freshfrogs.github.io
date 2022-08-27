@@ -1073,7 +1073,7 @@
 
 
   // Fetch Opensea Assets
-  async function fetch_staked_assets() {
+  async function stakingLeaderboard() {
 
     // Total Staked Frogs
     let total_staked = await collection.methods.balanceOf(CONTROLLER_ADDRESS).call();
