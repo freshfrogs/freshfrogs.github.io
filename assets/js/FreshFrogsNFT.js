@@ -388,21 +388,17 @@
       button_right.removeAttribute('href');
       return
 
-    }
-
-    if (!staked) {
-      button_middle.innerHTML = '<strong>Owner</strong>'+truncateAddress(owner);
-      button_middle.href = 'https://opensea.io/'+staked;
-      button_middle.target = '_blank';
     } else {
-      button_middle.innerHTML = '<strong>Owner</strong>'+truncateAddress(staked);
-      button_middle.href = 'https://opensea.io/'+owner;
+      
+      button_middle.innerHTML = '<strong>View</strong>image';
+      button_middle.href = 'https://freshfrogs.io/frog/'+tokenId+'.png';
       button_middle.target = '_blank';
-    }
+  
+      button_right.innerHTML = '<strong>Gemxyz</strong>rankings';
+      button_right.href = gemxyzLink;
+      button_right.target = '_blank';
 
-    button_right.innerHTML = '<strong>Gemxyz</strong>rankings';
-    button_right.href = gemxyzLink;
-    button_right.target = '_blank';
+    }
   }
 
   // render_token()
