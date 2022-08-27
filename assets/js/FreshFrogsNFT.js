@@ -20,7 +20,7 @@
       var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
       traits_list = traits;
       console.log('Count: '+count)
-
+      display_render(1);
     })
     .catch(e => {
       console.log('Error: Failed to fetch OpenSea collection data!');
