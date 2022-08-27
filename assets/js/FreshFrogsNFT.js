@@ -1082,8 +1082,8 @@
     
     let frog_stakedAddress = await stakerAddress(tokenId);
     if (frog_stakedAddress !== false) {
-      let frog_stakedTime = await timeStaked(tokenId);
-      let frog_stakedTotal = await stakers(frog_stakedAddress, 'amountStaked');
+      frog_stakedTime = await timeStaked(tokenId);
+      frog_stakedTotal = await stakers(frog_stakedAddress, 'amountStaked');
     } else { return; }
 
     if (frog_stakedTotal > staked_total_leader) {
@@ -1098,7 +1098,7 @@
     } else {
 
       return;
-      
+
     }
   }
 
