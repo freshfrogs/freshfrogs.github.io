@@ -1081,14 +1081,19 @@
   async function stakedLeaderboard(tokenId) {
     
     let frog_stakedAddress = await stakerAddress(tokenId);
-    let frog_stakedTime = await timeStaked(tokenId);
-    let frog_stakedTotal = await stakers(frog_stakedAddress, 'amountStaked');
+    if (frog_stakedAddress !== false) {
+      let frog_stakedTime = await timeStaked(tokenId);
+      let frog_stakedTotal = await stakers(frog_stakedAddress, 'amountStaked');
+    } else { return; }
 
     if (frog_stakedTotal > staked_total_leader) {
-      var staked_total = frog_stakedTotal; var staked_total_leader = frog_stakedAddress;
-    }
-    if (frog_stakedTime > staked_time_leader) {
-      var staked_time = frog_stakedTime; var staked_time_leader = tokenId;
+      staked_total = frog_stakedTotal;
+      staked_total_leader = frog_stakedAddress;
+    } else if (frog_stakedTime > staked_time_leader) {
+      staked_time = frog_stakedTime;
+      staked_time_leader = tokenId;
+    } else {
+      return;
     }
   }
 
