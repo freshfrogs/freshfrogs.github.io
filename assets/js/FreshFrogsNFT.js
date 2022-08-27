@@ -322,7 +322,7 @@
         console.log('Total Staked Leader: '+truncateAddress(staked_total_leader));
         console.log('Time Staked Leader: '+truncateAddress(staked_time_leader));
       }
-
+      
     // Does not own atleast one Frog!
     } else {
       Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div class="console_pre" id="console-pre"></div>')
