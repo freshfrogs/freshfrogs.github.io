@@ -9,6 +9,7 @@
   var morphing = sub_frog = base_frog = false;
 
   // Staking Leaderboard
+  var render_vault;
   var leaderboard_totalStaked_owner;
   var leaderboard_streak_token, leaderboard_streak_owner;
   var leaderboard_totalStaked = leaderboard_streak = 0;
@@ -323,8 +324,6 @@
 
               try { var { token_id, last_sale: { payment_token: { decimals }, total_price }} = frog } catch (e) {}
 
-              if (render_vault) { stakedLeaderboard(token_id); }
-
               if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
                 let sale_price = total_price / Math.pow(10, decimals);
                 render_token(token_id, sale_price);
@@ -558,6 +557,8 @@
       let elem = document.getElementById('myBar_'+frog_id);
       let width = percent;
       elem.style.width = width + "%";
+
+      if (render_vault) { stakedLeaderboard(token_id); }
       
     }
   }
