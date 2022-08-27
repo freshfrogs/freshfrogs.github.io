@@ -1064,7 +1064,7 @@
     // <------ DETERMINE NEW METADATA (baseId, subId) ------>
     // https://freshfrogs.io/frog/preset_/ [ trait_type/value ] .png
 
-    // SpecialFrogs
+    /* // SpecialFrogs
     if (typeof baseSpecialFrog !== 'undefined') {
       if (baseSpecialFrog == 'inversedEyes') {
         var renderSpecialFrog = baseSpecialFrog;
@@ -1083,9 +1083,10 @@
         var renderTrait = '/SpecialFrog/'+subSpecialFrog+'/'+baseTrait;
       }
     }
+    */
 
     // Default Frog, Trait
-    else { var renderTrait = subTrait; renderFrog = baseFrog; }
+    //else { var renderTrait = subTrait; renderFrog = baseFrog; }
 
     /* // Natural Frogs 
     if (baseFrog == 'stawberryDartFrog' || baseFrog == 'redEyedTreeFrog' || baseFrog == 'splendidLeafFrog' || subFrog == 'stawberryDartFrog'|| subFrog == 'redEyedTreeFrog'|| subFrog == 'splendidLeafFrog') {
@@ -1114,13 +1115,13 @@
 
     // <------ BUILD NEW METADATA (baseId, subId) ------>
     
-    // BASE FROG
-    if (typeof renderFrog !== 'undefined') { loadTrait('Frog', renderFrog, build_loc); }
-    else if (typeof renderSpecialFrog !== 'undefined') { loadTrait('SpecialFrog', renderSpecialFrog, build_loc); }
+    // SUB FROG (underlay)
+    if (typeof subFrog !== 'undefined') { loadTrait('Frog', subFrog, build_loc); }
+    else if (typeof subSpecialFrog !== 'undefined') { loadTrait('SpecialFrog', subSpecialFrog, build_loc); }
 
-    // HALF FROG
-    if (typeof subFrog !== 'undefined') { loadTrait('Frog/half/', subFrog, build_loc); }
-    else if (typeof subSpecialFrog !== 'undefined') { loadTrait('SpecialFrog/half/', subSpecialFrog, build_loc); }
+    // BASE FROG (overlay)
+    if (typeof renderFrog !== 'undefined') { loadTrait('Frog/half/', renderFrog, build_loc); }
+    else if (typeof renderSpecialFrog !== 'undefined') { loadTrait('SpecialFrog/half/', renderSpecialFrog, build_loc); }
 
     // TRAIT(S)
     if (typeof renderTrait !== 'undefined') { loadTrait('Trait', renderTrait, build_loc); }
