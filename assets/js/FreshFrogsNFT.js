@@ -314,13 +314,13 @@
             console.log(e.message);
 
           })
-
-          if (render_vault) {
-            console.log('Staking Leaderboard!');
-            console.log('Total Staked Leader: '+truncateAddress(staked_total_leader));
-            console.log('Time Staked Leader: '+truncateAddress(staked_time_leader));
-          }
         }
+      }
+
+      if (render_vault) {
+        console.log('Staking Leaderboard!');
+        console.log('Total Staked Leader: '+truncateAddress(staked_total_leader));
+        console.log('Time Staked Leader: '+truncateAddress(staked_time_leader));
       }
 
     // Does not own atleast one Frog!
@@ -1079,11 +1079,17 @@
 
   // Leaderboard
   async function stakedLeaderboard(tokenId) {
-    let frog_stakedTime = await timeStaked(tokenId);
+    
     let frog_stakedAddress = await stakerAddress(tokenId);
-    let frog_ownerTotal = await stakers(frog_stakedAddress, 'amountStaked');
-    if (frog_ownerTotal > staked_total_leader) { staked_total = frog_ownerTotal; staked_total_leader = frog_stakedAddress; }
-    if (frog_stakedTime > staked_time) { staked_time = frog_stakedTime; staked_time_leader = tokenId; }
+    let frog_stakedTime = await timeStaked(tokenId);
+    let frog_stakedTotal = await stakers(frog_stakedAddress, 'amountStaked');
+
+    if (frog_stakedTotal > staked_total_leader) {
+      var staked_total = frog_stakedTotal; var staked_total_leader = frog_stakedAddress;
+    }
+    if (frog_stakedTime > staked_time_leader) {
+      var staked_time = frog_stakedTime; var staked_time_leader = tokenId;
+    }
   }
 
 // Coded by NF7UOS
