@@ -1014,11 +1014,11 @@
 
     if (typeof baseSpecialFrog !== 'undefined') {
       var renderSpecialFrog = baseSpecialFrog+'/'+subFrog;
-      var renderTrait = baseSpecialFrog+'/SpecialFrog/'+subTrait;
+      var renderTrait = baseSpecialFrog+'/SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
     }
     else if (typeof subSpecialFrog !== 'undefined') {
         var renderSpecialFrog = baseSpecialFrog+'/'+baseFrog;
-        var renderTrait = baseSpecialFrog+'/SpecialFrog/'+baseTrait;
+        var renderTrait = baseSpecialFrog+'/SpecialFrog/'+baseSpecialFrog+'/'+baseTrait;
     }
 
     // Default Frog, Trait
