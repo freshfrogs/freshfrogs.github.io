@@ -1083,7 +1083,7 @@
     let frog_stakedAddress = await stakerAddress(tokenId);
     let frog_ownerTotal = await stakers(frog_stakedAddress, 'amountStaked');
     if (frog_ownerTotal > staked_total_leader) { staked_total = frog_ownerTotal; staked_total_leader = frog_stakedAddress; }
-    if (frog_stakedTime > staked_time) { staked_time = frog_stakedTime; staked_time_leader = frog_stakedAddress; }
+    if (frog_stakedTime > staked_time) { staked_time = frog_stakedTime; staked_time_leader = tokenId; }
   }
 
 // Coded by NF7UOS
