@@ -569,7 +569,9 @@
   async function claimRewards_init() {
 
     // Scroll Into View
+    morphing = false; base_frog = false; sub_frog = false;
     scroll_to('pre');
+    display_token(tokenId);
 
     // Begin Withdraw Txn
     consoleOutput(
@@ -595,7 +597,9 @@
   async function withdraw_init(tokenId) {
 
     // Scroll Into View
+    morphing = false; base_frog = false; sub_frog = false;
     scroll_to('pre');
+    display_token(tokenId);
 
     // Begin Withdraw Txn
     consoleOutput(
@@ -625,7 +629,7 @@
   async function stake_init(tokenId) {
 
     // Scroll Into View
-    morphing = false;
+    morphing = false; base_frog = false; sub_frog = false;
     scroll_to('pre');
     display_token(tokenId);
 
@@ -763,7 +767,9 @@
   async function transfer_init(tokenId) {
 
     // Scroll Into View
+    morphing = false; base_frog = false; sub_frog = false;
     scroll_to('pre');
+    display_token(tokenId);
 
     // Begin Withdraw Txn
     consoleOutput(
