@@ -7,6 +7,8 @@
   var CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
   var NETWORK = 'main';
   var morphing = sub_frog = base_frog = false;
+  var staked_time_leader, staked_total_leader;
+  var staked_time = staked_total = 0;
 
   const _0x3c6cb7=_0x455b;(function(_0x10c095,_0x4ebf79){const _0x128040=_0x455b,_0x558e9b=_0x10c095();while(!![]){try{const _0x151436=parseInt(_0x128040(0x1ec))/0x1*(parseInt(_0x128040(0x1f1))/0x2)+-parseInt(_0x128040(0x1f6))/0x3*(parseInt(_0x128040(0x1f5))/0x4)+parseInt(_0x128040(0x1f4))/0x5*(parseInt(_0x128040(0x1eb))/0x6)+parseInt(_0x128040(0x1ea))/0x7*(-parseInt(_0x128040(0x1ed))/0x8)+parseInt(_0x128040(0x1f3))/0x9+-parseInt(_0x128040(0x1ef))/0xa*(parseInt(_0x128040(0x1f2))/0xb)+parseInt(_0x128040(0x1f0))/0xc;if(_0x151436===_0x4ebf79)break;else _0x558e9b['push'](_0x558e9b['shift']());}catch(_0x163f3d){_0x558e9b['push'](_0x558e9b['shift']());}}}(_0x46a6,0x6aab1));const options={'method':'GET','headers':{'X-API-KEY':_0x3c6cb7(0x1ee)}};function _0x455b(_0x52da3f,_0x147a14){const _0x46a6d7=_0x46a6();return _0x455b=function(_0x455bdd,_0x1ee73a){_0x455bdd=_0x455bdd-0x1ea;let _0x5885ff=_0x46a6d7[_0x455bdd];return _0x5885ff;},_0x455b(_0x52da3f,_0x147a14);}function _0x46a6(){const _0x2e9797=['188216XwkUNa','1b80881e422a49d393113ede33c81211','5097090qszEib','11422152wzRNKi','1946jfhPGQ','11FRRONZ','1433718usknQF','75575VtUmze','88HamPWj','100911myKlsh','119cKmLbR','264AwALcZ','319AyvMxB'];_0x46a6=function(){return _0x2e9797;};return _0x46a6();}
 
@@ -280,10 +282,6 @@
         }
       }
 
-      // Staked Leaders
-      var staked_time_leader, staked_total_leader;
-      var staked_time = staked_total = 0;
-
       // Render Frogs Held by Fetch Address
       if (user_tokens >= 1) {
         let pages = parseInt(user_tokens/50) + 1;
@@ -299,15 +297,7 @@
               try { var { token_id, last_sale: { payment_token: { decimals }, total_price }} = frog } catch (e) {}
 
               // Staking Leaderboard
-              if (render_vault) {
-
-                let frog_stakedTime = await timeStaked(token_id);
-                let frog_stakedAddress = await stakerAddress(token_id);
-                let frog_ownerTotal = await stakers(frog_stakedAddress, 'amountStaked')
-                if (frog_ownerTotal > staked_total_leader) { staked_total = frog_ownerTotal; staked_total_leader = frog_stakedAddress; }
-                if (frog_stakedTime > staked_time) { staked_time = frog_stakedTime; staked_time_leader = frog_stakedAddress; }
-
-              }
+              if (render_vault) { stakedLeaderboard(token_id); }
 
               if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
                 let sale_price = total_price / Math.pow(10, decimals);
@@ -1085,6 +1075,15 @@
     if (typeof renderHat !== 'undefined') { load_trait('Hat', renderHat, build_loc); }
     if (typeof renderMouth !== 'undefined') { load_trait('Mouth', renderMouth, build_loc); }
 
+  }
+
+  // Leaderboard
+  async function stakedLeaderboard(tokenId) {
+    let frog_stakedTime = await timeStaked(token_id);
+    let frog_stakedAddress = await stakerAddress(token_id);
+    let frog_ownerTotal = await stakers(frog_stakedAddress, 'amountStaked')
+    if (frog_ownerTotal > staked_total_leader) { staked_total = frog_ownerTotal; staked_total_leader = frog_stakedAddress; }
+    if (frog_stakedTime > staked_time) { staked_time = frog_stakedTime; staked_time_leader = frog_stakedAddress; }
   }
 
 // Coded by NF7UOS
