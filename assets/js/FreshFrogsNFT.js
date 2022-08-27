@@ -245,8 +245,6 @@
     if (fetch_address.toString().toLowerCase() == user_address.toString().toLowerCase()){ render_functions = true; } 
     else { render_functions = false; }
 
-    if (fetch_address.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) { render_vault = true; } else { render_vault = false; }
-
     // No. of Frogs staked by fetch_address
     let staker_tokens = await stakers(fetch_address, 'amountStaked')
 
@@ -296,9 +294,6 @@
 
               try { var { token_id, last_sale: { payment_token: { decimals }, total_price }} = frog } catch (e) {}
 
-              // Staking Leaderboard
-              if (render_vault) { stakedLeaderboard(token_id); }
-
               if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
                 let sale_price = total_price / Math.pow(10, decimals);
                 render_token(token_id, render_functions, sale_price);
@@ -317,12 +312,6 @@
         }
       }
 
-      if (render_vault) {
-        console.log('Staking Leaderboard!');
-        console.log('Total Staked Leader: '+truncateAddress(staked_total_leader));
-        console.log('Time Staked Leader: '+truncateAddress(staked_time_leader));
-      }
-      
     // Does not own atleast one Frog!
     } else {
       Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div class="console_pre" id="console-pre"></div>')
