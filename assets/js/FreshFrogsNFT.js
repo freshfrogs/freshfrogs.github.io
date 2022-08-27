@@ -975,7 +975,7 @@
 
     var baseFrog, baseSpecialFrog, baseTrait, baseAccessory, baseEyes, baseHat, baseMouth;
     var subFrog, subSpecialFrog, subTrait, subAccessory, subEyes, subHat, subMouth;
-    var returnFrog, returnSpecialFrog, returnTrait, returnSecondaryTrait, returnAccessory, returnEyes, returnHat, returnMouth;
+    var renderFrog, renderSpecialFrog, renderTrait, renderSecondaryTrait, renderAccessory, renderEyes, renderHat, renderMouth;
     
     document.getElementById(build_loc).innerHTML = '';
 
@@ -1015,32 +1015,41 @@
     if (typeof baseSpecialFrog !== 'undefined' || typeof subSpecialFrog !== 'undefined') {
 
       // New Frog, Trait (Updated)
-      if (typeof baseSpecialFrog !== 'undefined') { var returnTrait = baseSpecialFrog+'/SpecialFrog/'+subTrait; var returnSpecialFrog = baseSpecialFrog; } 
-      else { var returnTrait = baseTrait; var returnFrog = baseFrog; }
+      if (typeof baseSpecialFrog !== 'undefined') { var renderSpecialFrog = baseSpecialFrog+'/'+subFrog; } 
+      else { var renderSpecialFrog = baseSpecialFrog+'/'+baseFrog; }
+      
+      var renderTrait = baseSpecialFrog+'/SpecialFrog/'+subTrait;
 
     // Default Frog, Trait
-    } else { var returnTrait = subTrait; returnFrog = baseFrog; }
+    } else { var renderTrait = subTrait; renderFrog = baseFrog; }
+
+    // Natural Frogs
+    if (renderFrog == 'stawberryDartFrog' || renderFrog == 'redEyedTreeFrog' || renderFrog == 'splendidLeafFrog') {
+      var renderOverlay = '/Overlay/'+renderFrog
+      var renderFrog = subFrog;
+
+    }
     
-    if (typeof returnTrait == 'undefined') { var returnTrait = subTrait; }
-    if (typeof baseAccessory !== 'undefined') { var returnAccessory = baseAccessory; } 
-    else if (typeof subAccessory !== 'undefined') { var returnAccessory = subAccessory; }
-    if (typeof baseEyes !== 'undefined') { var returnEyes = baseEyes; } 
-    else if (typeof subEyes !== 'undefined') { var returnEyes = subEyes; }
-    if (typeof baseHat !== 'undefined') { var returnHat = baseHat; } 
-    else if (typeof subHat !== 'undefined') {var returnHat = subHat;}
-    if (typeof baseMouth !== 'undefined') { var returnMouth = baseMouth; }
-    else if (typeof subMouth !== 'undefined') { var returnMouth = subMouth; }
+    if (typeof renderTrait == 'undefined') { var renderTrait = subTrait; }
+    if (typeof baseAccessory !== 'undefined') { var renderAccessory = baseAccessory; } 
+    else if (typeof subAccessory !== 'undefined') { var renderAccessory = subAccessory; }
+    if (typeof baseEyes !== 'undefined') { var renderEyes = baseEyes; } 
+    else if (typeof subEyes !== 'undefined') { var renderEyes = subEyes; }
+    if (typeof baseHat !== 'undefined') { var renderHat = baseHat; } 
+    else if (typeof subHat !== 'undefined') {var renderHat = subHat;}
+    if (typeof baseMouth !== 'undefined') { var renderMouth = baseMouth; }
+    else if (typeof subMouth !== 'undefined') { var renderMouth = subMouth; }
 
     // <------ BUILD NEW METADATA (baseId, subId) ------>
     
-    if (typeof returnFrog !== 'undefined') { load_trait('Frog', returnFrog, build_loc); }
-    else if (typeof returnSpecialFrog !== 'undefined') { load_trait('SpecialFrog', returnSpecialFrog, build_loc); }
-    if (typeof returnTrait !== 'undefined') { load_trait('Trait', returnTrait, build_loc); }
-    if (typeof returnOverlay !== 'undefined') { load_trait('Trait', returnOverlay, build_loc); }
-    if (typeof returnAccessory !== 'undefined') { load_trait('Accessory', returnAccessory, build_loc); }
-    if (typeof returnEyes !== 'undefined') { load_trait('Eyes', returnEyes, build_loc); }
-    if (typeof returnHat !== 'undefined') { load_trait('Hat', returnHat, build_loc); }
-    if (typeof returnMouth !== 'undefined') { load_trait('Mouth', returnMouth, build_loc); }
+    if (typeof renderFrog !== 'undefined') { load_trait('Frog', renderFrog, build_loc); }
+    else if (typeof renderSpecialFrog !== 'undefined') { load_trait('SpecialFrog', renderSpecialFrog, build_loc); }
+    if (typeof renderOverlay !== 'undefined') { load_trait('Trait', renderOverlay, build_loc); }
+    if (typeof renderTrait !== 'undefined') { load_trait('Trait', renderTrait, build_loc); }
+    if (typeof renderAccessory !== 'undefined') { load_trait('Accessory', renderAccessory, build_loc); }
+    if (typeof renderEyes !== 'undefined') { load_trait('Eyes', renderEyes, build_loc); }
+    if (typeof renderHat !== 'undefined') { load_trait('Hat', renderHat, build_loc); }
+    if (typeof renderMouth !== 'undefined') { load_trait('Mouth', renderMouth, build_loc); }
 
   }
 
