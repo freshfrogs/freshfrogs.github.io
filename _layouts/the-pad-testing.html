@@ -621,7 +621,7 @@
       background-color: white;
       color: #333;
       border-radius: 5px;
-      padding: 3px;
+      padding: 2px;
       margin-left: 8px;
       margin-right: 8px;
       cursor: pointer;
@@ -746,7 +746,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
     <script>
-
+      // C 0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38 | A 0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25
       // <-- [Google Analytics]
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -756,21 +756,23 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        document.getElementById('displayImg1').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(4040)+'.png');
-        document.getElementById('displayImg2').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(4040)+'.png');
-        document.getElementById('displayImg3').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(4040)+'.png');
+        document.getElementById('displayImg1').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(1, 4040)+'.png');
+        document.getElementById('displayImg2').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(1, 4040)+'.png');
+        document.getElementById('displayImg3').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(1, 4040)+'.png');
 
         await connect_init();
 
       })
 
-      function getRandomInt(max) {
-        return Math.floor(Math.random() * max);
+      function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min) + min);
       }
 
       async function connect_init() {
         await connect();
-        await fetch_user_data('0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25'); // C 0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38 | A 0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25
+        await fetch_user_data('0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25');
       }
 
     </script>
@@ -781,9 +783,9 @@
       <header id="thisheader">
         <div class="downloads pre">
           <ul class="downloads2">
-            <li><a id="button_left" class="pointer" href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><strong>Etherscan</strong>contract</a></li>
-            <li><a id="button_middle" class="pointer" href="https://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong>server</a></li>
-            <li><a id="button_right" class="pointer" href="https://www.gem.xyz/collection/fresh-frogs" target="_blank"><strong>Gemxyz</strong>rankings</a></li>
+            <li><a id="button_left" class="pointer" href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><strong>Mint</strong>Ξ0.01 +gas</a></li>
+            <li><a id="button_middle" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>Opensea</strong>view</a></li>
+            <li><a id="button_right" class="pointer" href="https://www.gem.xyz/collection/fresh-frogs" target="_blank"><strong>Gemxyz</strong>view</a></li>
           </ul>
           <div id="mintingTray" class="mintingTray">
             <div class="bigContainer">
