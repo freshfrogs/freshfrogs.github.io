@@ -1026,7 +1026,10 @@
 
     // Natural Frogs
     if (renderFrog == 'stawberryDartFrog' || renderFrog == 'redEyedTreeFrog' || renderFrog == 'splendidLeafFrog') {
-      var renderOverlay = '/Overlay/'+renderFrog
+      if (renderFrog == 'redEyedTreeFrog' || renderFrog == 'splendidLeafFrog') {
+        var renderOverlay = '/Overlay/'+renderFrog+'/'+baseTrait;
+      } else { var renderOverlay = '/Overlay/'+renderFrog; }
+      
       var renderFrog = subFrog;
 
     }
