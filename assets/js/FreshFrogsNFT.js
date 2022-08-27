@@ -1073,10 +1073,10 @@
     // Natural Frogs
     if (baseFrog == 'stawberryDartFrog' || baseFrog == 'redEyedTreeFrog' || baseFrog == 'splendidLeafFrog' || subFrog == 'stawberryDartFrog'|| subFrog == 'redEyedTreeFrog'|| subFrog == 'splendidLeafFrog') {
       if (baseFrog == 'stawberryDartFrog' || baseFrog == 'redEyedTreeFrog' || baseFrog == 'splendidLeafFrog'){
-        var renderOverlay = '/Overlay/'+renderFrog+'/'+subTrait;
+        var renderOverlay = '/Overlay/'+renderFrog+'/'+baseTrait;
         var renderFrog = subFrog;
       } else {
-        var renderOverlay = '/Overlay/'+renderFrog+'/'+subTrait;
+        var renderOverlay = '/Overlay/'+renderFrog+'/'+baseTrait;
         var renderFrog = baseFrog;
       }
 
