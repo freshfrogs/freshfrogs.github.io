@@ -1087,7 +1087,7 @@
     // Default Frog, Trait
     else { var renderTrait = subTrait; renderFrog = baseFrog; }
 
-    // Natural Frogs
+    /* // Natural Frogs 
     if (baseFrog == 'stawberryDartFrog' || baseFrog == 'redEyedTreeFrog' || baseFrog == 'splendidLeafFrog' || subFrog == 'stawberryDartFrog'|| subFrog == 'redEyedTreeFrog'|| subFrog == 'splendidLeafFrog') {
       if (baseFrog == 'stawberryDartFrog' || baseFrog == 'redEyedTreeFrog' || baseFrog == 'splendidLeafFrog'){
         var renderOverlay = '/Overlay/'+baseFrog+'/'+baseTrait;
@@ -1099,7 +1099,7 @@
         var renderTrait = subTrait;
       }
 
-    }
+    } */
     
     if (typeof renderTrait == 'undefined') { var renderTrait = subTrait; }
     if (typeof baseAccessory !== 'undefined') { var renderAccessory = baseAccessory; } 
@@ -1115,6 +1115,10 @@
     
     if (typeof renderFrog !== 'undefined') { loadTrait('Frog', renderFrog, build_loc); }
     else if (typeof renderSpecialFrog !== 'undefined') { loadTrait('SpecialFrog', renderSpecialFrog, build_loc); }
+
+    if (typeof subFrog !== 'undefined') { loadTrait('Frog/half/', subFrog, build_loc); }
+    else if (typeof subSpecialFrog !== 'undefined') { loadTrait('SpecialFrog/half/', subSpecialFrog, build_loc); }
+
     if (typeof renderTrait !== 'undefined') { loadTrait('Trait', renderTrait, build_loc); }
     if (typeof renderOverlay !== 'undefined') { loadTrait('Trait', renderOverlay, build_loc); }
     if (typeof renderAccessory !== 'undefined') { loadTrait('Accessory', renderAccessory, build_loc); }
