@@ -329,7 +329,7 @@
     var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+tokenId+".json")).json();
     for (var i = 0; i < metadata.attributes.length; i++) {
       var attribute = metadata.attributes[i];
-      load_trait(attribute.trait_type, attribute.value, 'frogContainer4');
+      loadTrait(attribute.trait_type, attribute.value, 'frogContainer4');
     }
 
   }
@@ -457,7 +457,7 @@
 
       // attribute.trait_type : attribute.value
       let attribute = metadata.attributes[i]
-      load_trait(attribute.trait_type, attribute.value, 'cont_'+frog_id);
+      loadTrait(attribute.trait_type, attribute.value, 'cont_'+frog_id);
 
       try { trait_rarity = ((traits_list[attribute.trait_type][attribute.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) { trait_rarity = 'e'; }
       if (trait_rarity < 1) { trait_rarity = '<1%' } else { trait_rarity = trait_rarity+'%' }
@@ -518,8 +518,8 @@
     }
   }
 
-  // load_trait(_trait(family), _attribute(type), _where(element))
-  function load_trait(trait, attribute, where) {
+  // loadTrait(_trait(family), _attribute(type), _where(element))
+  function loadTrait(trait, attribute, where) {
 
     newAttribute = document.createElement("img");
     newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
@@ -1054,14 +1054,14 @@
 
     // <------ BUILD NEW METADATA (baseId, subId) ------>
     
-    if (typeof renderFrog !== 'undefined') { load_trait('Frog', renderFrog, build_loc); }
-    else if (typeof renderSpecialFrog !== 'undefined') { load_trait('SpecialFrog', renderSpecialFrog, build_loc); }
-    if (typeof renderTrait !== 'undefined') { load_trait('Trait', renderTrait, build_loc); }
-    if (typeof renderOverlay !== 'undefined') { load_trait('Trait', renderOverlay, build_loc); }
-    if (typeof renderAccessory !== 'undefined') { load_trait('Accessory', renderAccessory, build_loc); }
-    if (typeof renderEyes !== 'undefined') { load_trait('Eyes', renderEyes, build_loc); }
-    if (typeof renderHat !== 'undefined') { load_trait('Hat', renderHat, build_loc); }
-    if (typeof renderMouth !== 'undefined') { load_trait('Mouth', renderMouth, build_loc); }
+    if (typeof renderFrog !== 'undefined') { loadTrait('Frog', renderFrog, build_loc); }
+    else if (typeof renderSpecialFrog !== 'undefined') { loadTrait('SpecialFrog', renderSpecialFrog, build_loc); }
+    if (typeof renderTrait !== 'undefined') { loadTrait('Trait', renderTrait, build_loc); }
+    if (typeof renderOverlay !== 'undefined') { loadTrait('Trait', renderOverlay, build_loc); }
+    if (typeof renderAccessory !== 'undefined') { loadTrait('Accessory', renderAccessory, build_loc); }
+    if (typeof renderEyes !== 'undefined') { loadTrait('Eyes', renderEyes, build_loc); }
+    if (typeof renderHat !== 'undefined') { loadTrait('Hat', renderHat, build_loc); }
+    if (typeof renderMouth !== 'undefined') { loadTrait('Mouth', renderMouth, build_loc); }
 
   }
 
