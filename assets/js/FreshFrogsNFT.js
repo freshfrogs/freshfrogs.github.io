@@ -1080,7 +1080,6 @@
 
       // Special Frog => Frog
       if (subFrog !== 'undefined') {
-        baseSpecialFrog = 'bottom/'+baseSpecialFrog;
         subSpecialFrog = baseSpecialFrog+'/'+subFrog;
         subFrog = undefined;
 
