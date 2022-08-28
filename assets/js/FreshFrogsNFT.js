@@ -1080,7 +1080,7 @@
       // Sub Special Frog
       else if (typeof baseFrog !== 'undefined') {
         subTrait = 'SpecialFrog/'+subSpecialFrog+'/'+baseTrait;
-        baseSpecialFrog = '/bottom/'+subSpecialFrog;
+        baseSpecialFrog = subSpecialFrog;
         subSpecialFrog = subSpecialFrog+'/'+baseFrog;
         baseFrog = undefined;
       }
