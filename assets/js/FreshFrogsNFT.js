@@ -1033,8 +1033,7 @@
     document.getElementById(build_loc).innerHTML = '';
 
     // <------ FETCH METADATA (baseId, subId) ------>
-    console.log('');
-    console.log(' > Frog #'+baseId);
+    console.log(' -- Frog #'+baseId+' -- ');
 
     let baseMetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseId+".json")).json();
     for (i = 0; i < baseMetadata.attributes.length; i++) {
@@ -1052,8 +1051,7 @@
 
     }
 
-    console.log('');
-    console.log(' > Frog #'+subId);
+    console.log(' -- Frog #'+subId+' -- ');
 
     let subMetadata = await (await fetch("https://freshfrogs.io/frog/json/"+subId+".json")).json();
     for (j = 0; j < subMetadata.attributes.length; j++) {
@@ -1096,7 +1094,7 @@
 
     // <------ BUILD NEW METADATA (baseId, subId) ------>
 
-    console.log(' -- Final Morph ('+baseId+' + '+subId+') -- ');
+    console.log(' == Final Morph ('+baseId+' + '+subId+') == ');
     
     // SUB FROG (UNDERLAY)
     if (typeof subFrog !== 'undefined') { loadTrait('Frog', subFrog, build_loc); console.log(' => SUB Frog: '+subFrog); }
