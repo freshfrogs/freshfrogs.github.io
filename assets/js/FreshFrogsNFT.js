@@ -1067,10 +1067,11 @@
     if (subFrog == 'splendidLeafFrog' || subFrog == 'stawberryDartFrog' || subFrog == 'redEyedTreeFrog' || baseFrog == 'splendidLeafFrog' || baseFrog == 'stawberryDartFrog' || baseFrog == 'redEyedTreeFrog') {
 
       //subTrait =
-      if (typeof baseTrait !== 'undefined') {
-        renderOverlay = subFrog+'/'+baseTrait;
-      } else if (typeof subTrait !== 'undefined'){
+      if (typeof subTrait !== 'undefined') {
         renderOverlay = subFrog+'/'+subTrait;
+
+      } else if (typeof baseTrait !== 'undefined') {
+        renderOverlay = subFrog+'/'+baseTrait;
       }
 
     }
