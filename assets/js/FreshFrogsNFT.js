@@ -1074,7 +1074,7 @@
       returnOverlay = subFrog+'/baseTrait';
     }
     
-    // Select Attributes!
+    // Select Attributes! //
     if (typeof baseAccessory !== 'undefined') { var renderAccessory = baseAccessory; } 
     else if (typeof subAccessory !== 'undefined') { var renderAccessory = subAccessory; }
     if (typeof baseEyes !== 'undefined') { var renderEyes = baseEyes; } 
