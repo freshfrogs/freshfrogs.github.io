@@ -1113,11 +1113,11 @@
 
     // <------ BUILD NEW METADATA (baseId, subId) ------>
     
-    // SUB FROG (underlay)
+    // SUB FROG (UNDERLAY)
     if (typeof subFrog !== 'undefined') { loadTrait('Frog', subFrog, build_loc); }
     else if (typeof subSpecialFrog !== 'undefined') { loadTrait('SpecialFrog', subSpecialFrog, build_loc); }
 
-    // BASE FROG (overlay)
+    // BASE FROG (OVERLAY)
     if (typeof baseFrog !== 'undefined') { loadTrait('Frog/half/', renderFrog, build_loc); }
     else if (typeof baseSpecialFrog !== 'undefined') { loadTrait('SpecialFrog/half/', renderSpecialFrog, build_loc); }
 
