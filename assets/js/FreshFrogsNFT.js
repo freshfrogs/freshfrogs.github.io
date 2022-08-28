@@ -1023,7 +1023,7 @@
   // Token Combinations / Rebuild Token
   async function morphFrogs(baseId, subId, build_loc) {
 
-    console.log(' ==== Morphing Frog#'+baseId+' and Frog #'+subId+' ==== ');
+    console.log(' ====> Morphing Frog#'+baseId+' and Frog #'+subId+'');
     
     var baseFrog, baseSpecialFrog, baseTrait, baseAccessory, baseEyes, baseHat, baseMouth;
     var subFrog, subSpecialFrog, subTrait, subAccessory, subEyes, subHat, subMouth;
@@ -1107,8 +1107,6 @@
     else if (typeof subMouth !== 'undefined') { var renderMouth = subMouth; }
 
     // <------ BUILD NEW METADATA (baseId, subId) ------>
-
-    console.log(' ==== Final Morph ('+baseId+' + '+subId+') ==== ');
     
     // SUB FROG (UNDERLAY)
     if (typeof subFrog !== 'undefined') { loadTrait('Frog', subFrog, build_loc); console.log(' => SUB Frog: '+subFrog); }
@@ -1131,7 +1129,7 @@
     if (typeof renderHat !== 'undefined') { loadTrait('Hat', renderHat, build_loc); console.log(' => Hat: '+renderHat); }
     if (typeof renderMouth !== 'undefined') { loadTrait('Mouth', renderMouth, build_loc); console.log(' => Mouth: '+renderMouth); }
 
-    console.log(' ==== ==== ==== ==== ==== ==== ');
+    console.log(' ====>');
 
   }
 
