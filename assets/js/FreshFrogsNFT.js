@@ -1080,9 +1080,7 @@
       subTrait = 'SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
     }
 
-    if (subSpecialFrog == 'thirdEye') {
-      subSpecialFrog = 'bottom/'+subSpecialFrog;
-    } else if (subFrog == 'splendidLeafFrog' || subFrog == 'stawberryDartFrog' || subFrog == 'redEyedTreeFrog') {
+    if (subFrog == 'splendidLeafFrog' || subFrog == 'stawberryDartFrog' || subFrog == 'redEyedTreeFrog') {
       returnOverlay = subFrog+'/baseTrait';
     }
     
@@ -1106,7 +1104,7 @@
 
     // BASE FROG (OVERLAY)
     if (typeof baseFrog !== 'undefined') { loadTrait('Frog/half', baseFrog, build_loc); console.log(' => BASE Frog: '+baseFrog); }
-    else if (typeof baseSpecialFrog !== 'undefined') { loadTrait('SpecialFrog/half', baseSpecialFrog, build_loc); console.log(' => BASE SpecialFrog: '+baseSpecialFrog); }
+    else if (typeof baseSpecialFrog !== 'undefined') { loadTrait('SpecialFrog/bottom', baseSpecialFrog, build_loc); console.log(' => BASE SpecialFrog: '+baseSpecialFrog); }
 
     // ADD ON OVERLAY
     if (typeof renderOverlay !== 'undefined') { loadTrait('Trait/overlay', renderOverlay, build_loc); console.log(' => Adaptation: '+renderOverlay); }
