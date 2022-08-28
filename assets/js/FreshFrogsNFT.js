@@ -1093,7 +1093,7 @@
     if (subFrog == 'splendidLeafFrog' || subFrog == 'stawberryDartFrog' || subFrog == 'redEyedTreeFrog') {
 
       //subTrait =
-      renderOverlay = subFrog+'/baseTrait';
+      renderOverlay = subFrog+'/'+baseTrait;
 
     }
     
