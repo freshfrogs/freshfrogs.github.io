@@ -1101,7 +1101,7 @@
     } */
     
     // Select Attributes!
-    if (typeof renderTrait == 'undefined') { var renderTrait = subTrait; }
+    if (typeof subTrait !== 'undefined') { var renderTrait = subTrait; }
     if (typeof baseAccessory !== 'undefined') { var renderAccessory = baseAccessory; } 
     else if (typeof subAccessory !== 'undefined') { var renderAccessory = subAccessory; }
     if (typeof baseEyes !== 'undefined') { var renderEyes = baseEyes; } 
