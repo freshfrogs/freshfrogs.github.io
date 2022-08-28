@@ -1098,9 +1098,9 @@
 
       // Frog => Special Frog
       else if (typeof baseFrog !== 'undefined') {
-        baseSpecialFrog = subSpecialFrog+'/'+baseFrog;
+        baseSpecialFrog = subSpecialFrog+'/bottom';
+        subSpecialFrog = subSpecialFrog+'/'+baseFrog;
         baseFrog = undefined;
-        subSpecialFrog = subSpecialFrog+'/bottom';
       }
 
     }
