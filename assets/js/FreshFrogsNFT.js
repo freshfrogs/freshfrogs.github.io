@@ -1076,15 +1076,19 @@
     if (subFrog == 'splendidLeafFrog' || subFrog == 'stawberryDartFrog' || subFrog == 'redEyedTreeFrog') {
 
       //subTrait =
-      renderOverlay = subFrog+'/'+baseTrait;
+      if (!baseTrait) {
+        renderOverlay = subFrog+'/'+subTrait;
+      } else {
+        renderOverlay = subFrog+'/'+baseTrait;
+      }
 
     }
 
     // Special Frogs
-    if (typeof baseSpecialFrog !== 'undefined' ) {
+    if (typeof baseSpecialFrog !== 'undefined' || typeof subSpecialFrog !== 'undefined') {
 
-      // Special Trait
-      subTrait = 'SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
+      if (!baseTrait) { subTrait = 'SpecialFrog/'+baseSpecialFrog+'/'+subTrait; }
+      else { baseTrait = 'SpecialFrog/'+baseSpecialFrog+'/'+baseTrait; }
 
       // Special Frog => Frog
       if (subFrog !== 'undefined') {
