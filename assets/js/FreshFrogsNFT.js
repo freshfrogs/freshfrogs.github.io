@@ -350,14 +350,14 @@
     }
 
     // Staked Leader Board
-    if (render_vault) {
-      console.log(' -- Staked Leaderboard -- ');
-      console.log(' Longest Streak: Frog #'+leaderboard_streak_token+' '+parseInt(leaderboard_streak/24)+' days');
-      console.log(' Staked By: '+truncateAddress(leaderboard_streak_owner));
-      console.log(' ');
-      console.log(' Most Staked: '+leaderboard_totalStaked+' Frogs');
-      console.log(' Staked By: '+truncateAddress(leaderboard_totalStaked_owner));
-    }
+    //if (render_vault) {
+    //  console.log(' -- Staked Leaderboard -- ');
+    //  console.log(' Longest Streak: Frog #'+leaderboard_streak_token+' '+parseInt(leaderboard_streak/24)+' days');
+    //  console.log(' Staked By: '+truncateAddress(leaderboard_streak_owner));
+    //  console.log(' ');
+    //  console.log(' Most Staked: '+leaderboard_totalStaked+' Frogs');
+    //  console.log(' Staked By: '+truncateAddress(leaderboard_totalStaked_owner));
+    //}
     
   }
 
@@ -1022,8 +1022,6 @@
 
   // Token Combinations / Rebuild Token
   async function morphFrogs(baseId, subId, build_loc) {
-
-    console.log(' ====> Morphing Frog#'+baseId+' and Frog #'+subId+'');
     
     var baseFrog, baseSpecialFrog, baseTrait, baseAccessory, baseEyes, baseHat, baseMouth;
     var subFrog, subSpecialFrog, subTrait, subAccessory, subEyes, subHat, subMouth;
@@ -1102,27 +1100,25 @@
     // <------ BUILD NEW METADATA (baseId, subId) ------>
     
     // SUB FROG (UNDERLAY)
-    if (typeof subFrog !== 'undefined') { loadTrait('Frog', subFrog, build_loc); console.log(' => SUB Frog: '+subFrog); }
-    else if (typeof subSpecialFrog !== 'undefined') { loadTrait('SpecialFrog', subSpecialFrog, build_loc); console.log(' => SUB SpecialFrog: '+subSpecialFrog); }
+    if (typeof subFrog !== 'undefined') { loadTrait('Frog', subFrog, build_loc); }
+    else if (typeof subSpecialFrog !== 'undefined') { loadTrait('SpecialFrog', subSpecialFrog, build_loc); }
 
     // BASE FROG (OVERLAY)
-    if (typeof baseFrog !== 'undefined') { loadTrait('Frog/base', baseFrog, build_loc); console.log(' => BASE Frog: '+baseFrog); }
-    else if (typeof baseSpecialFrog !== 'undefined') { loadTrait('SpecialFrog/bottom', baseSpecialFrog, build_loc); console.log(' => BASE SpecialFrog: '+baseSpecialFrog); }
+    if (typeof baseFrog !== 'undefined') { loadTrait('Frog/base', baseFrog, build_loc); }
+    else if (typeof baseSpecialFrog !== 'undefined') { loadTrait('SpecialFrog/bottom', baseSpecialFrog, build_loc); }
 
     // ADD ON OVERLAY
-    if (typeof renderOverlay !== 'undefined') { loadTrait('Trait/Overlay', renderOverlay, build_loc); console.log(' => Adaptation: '+renderOverlay); }
+    if (typeof renderOverlay !== 'undefined') { loadTrait('Trait/Overlay', renderOverlay, build_loc); }
 
     // TRAIT(S)
-    if (typeof subTrait !== 'undefined') { loadTrait('Trait', subTrait, build_loc); console.log(' => Trait: '+subTrait); }
-    else if (typeof baseTrait !== 'undefined') { loadTrait('Trait', baseTrait, build_loc); console.log(' => Trait: '+baseTrait); }
+    if (typeof subTrait !== 'undefined') { loadTrait('Trait', subTrait, build_loc); }
+    else if (typeof baseTrait !== 'undefined') { loadTrait('Trait', baseTrait, build_loc); }
 
     // ACCESSORIES
-    if (typeof renderAccessory !== 'undefined') { loadTrait('Accessory', renderAccessory, build_loc); console.log(' => Accessory: '+renderAccessory); }
-    if (typeof renderEyes !== 'undefined') { loadTrait('Eyes', renderEyes, build_loc); console.log(' => Eyes: '+renderEyes); }
-    if (typeof renderHat !== 'undefined') { loadTrait('Hat', renderHat, build_loc); console.log(' => Hat: '+renderHat); }
-    if (typeof renderMouth !== 'undefined') { loadTrait('Mouth', renderMouth, build_loc); console.log(' => Mouth: '+renderMouth); }
-
-    console.log(' ====>');
+    if (typeof renderAccessory !== 'undefined') { loadTrait('Accessory', renderAccessory, build_loc); }
+    if (typeof renderEyes !== 'undefined') { loadTrait('Eyes', renderEyes, build_loc); }
+    if (typeof renderHat !== 'undefined') { loadTrait('Hat', renderHat, build_loc); }
+    if (typeof renderMouth !== 'undefined') { loadTrait('Mouth', renderMouth, build_loc); }
 
   }
 
