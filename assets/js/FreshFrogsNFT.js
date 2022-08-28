@@ -558,7 +558,7 @@
       let width = percent;
       elem.style.width = width + "%";
 
-      if (render_vault) { stakedLeaderboard(token_id); }
+      if (render_vault) { stakedLeaderboard(frog_id); }
       
     }
   }
