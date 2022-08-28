@@ -1119,7 +1119,7 @@
     else if (typeof baseSpecialFrog !== 'undefined') { loadTrait('SpecialFrog/bottom', baseSpecialFrog, build_loc); console.log(' => BASE SpecialFrog: '+baseSpecialFrog); }
 
     // ADD ON OVERLAY
-    if (typeof renderOverlay !== 'undefined') { loadTrait('Trait/overlay', renderOverlay, build_loc); console.log(' => Adaptation: '+renderOverlay); }
+    if (typeof renderOverlay !== 'undefined') { loadTrait('Trait/Overlay', renderOverlay, build_loc); console.log(' => Adaptation: '+renderOverlay); }
 
     // TRAIT(S)
     if (typeof subTrait !== 'undefined') { loadTrait('Trait', subTrait, build_loc); console.log(' => Trait: '+subTrait); }
