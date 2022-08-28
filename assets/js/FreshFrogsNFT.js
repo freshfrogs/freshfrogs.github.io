@@ -1072,7 +1072,7 @@
     // <------ DETERMINE NEW METADATA (baseId, subId) ------> //
     // https://freshfrogs.io/frog/preset_/ [ trait_type/value ] .png
 
-    // Special Frogs //
+    // Special Frogs
     if (typeof baseSpecialFrog !== 'undefined' ) {
 
       // Special Trait
