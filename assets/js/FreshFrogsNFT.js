@@ -1122,6 +1122,7 @@
 
     // TRAIT(S)
     if (typeof subTrait !== 'undefined') { loadTrait('Trait', subTrait, build_loc); }
+    else if (typeof baseTrait !== 'undefined') { loadTrait('Trait', baseTrait, build_loc); }
 
     // ACCESSORIES
     if (typeof renderAccessory !== 'undefined') { loadTrait('Accessory', renderAccessory, build_loc); }
