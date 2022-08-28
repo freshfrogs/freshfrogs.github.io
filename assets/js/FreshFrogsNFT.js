@@ -1069,7 +1069,7 @@
       //subTrait =
       if (typeof baseTrait !== 'undefined') {
         renderOverlay = subFrog+'/'+baseTrait;
-      } else {
+      } else if (typeof subTrait !== 'undefined'){
         renderOverlay = subFrog+'/'+subTrait;
       }
 
