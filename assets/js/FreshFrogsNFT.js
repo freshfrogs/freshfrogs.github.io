@@ -1084,7 +1084,8 @@
         subSpecialFrog = baseSpecialFrog+'/'+subFrog;
         subFrog = 'undefined';
 
-      }
+      // Special Frog => Special Frog
+      } else {}
 
     }
 
