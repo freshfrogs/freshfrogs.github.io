@@ -1140,6 +1140,8 @@
     if (typeof renderHat !== 'undefined') { loadTrait('Hat', renderHat, build_loc); console.log(' => Hat: '+renderHat); }
     if (typeof renderMouth !== 'undefined') { loadTrait('Mouth', renderMouth, build_loc); console.log(' => Mouth: '+renderMouth); }
 
+    console.log(' ==== ==== ==== ==== ==== ==== ');
+
   }
 
   // Leaderboard
