@@ -1023,7 +1023,7 @@
   // Token Combinations / Rebuild Token
   async function morphFrogs(baseId, subId, build_loc) {
 
-    console.log(' == Morphing Frog#'+baseId+' and Frog #'+subId+' == ');
+    console.log(' -- Morphing Frog#'+baseId+' and Frog #'+subId+' -- ');
     
 
     var baseFrog, baseSpecialFrog, baseTrait, baseAccessory, baseEyes, baseHat, baseMouth;
@@ -1087,6 +1087,7 @@
     // Special Frogs
     if (typeof baseSpecialFrog !== 'undefined' || typeof subSpecialFrog !== 'undefined') {
 
+      // Trait
       if (typeof baseTrait !== 'undefined' ) { subTrait = 'SpecialFrog/'+baseSpecialFrog+'/'+subTrait; }
       else { baseTrait = 'SpecialFrog/'+baseSpecialFrog+'/'+baseTrait; }
 
@@ -1096,7 +1097,10 @@
         subFrog = undefined;
 
       // Special Frog => Special Frog
-      } else {}
+      } else {
+        subSpecialFrog = baseSpecialFrog+'/'+subFrog;
+
+      }
 
     }
     
