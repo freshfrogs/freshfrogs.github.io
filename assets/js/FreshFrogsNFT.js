@@ -1088,7 +1088,7 @@
 
       // Trait
       if (typeof baseTrait !== 'undefined' ) { subTrait = 'SpecialFrog/'+baseSpecialFrog+'/'+subTrait; }
-      else { baseTrait = 'SpecialFrog/'+baseSpecialFrog+'/'+baseTrait; }
+      else { baseTrait = 'SpecialFrog/'+subSpecialFrog+'/'+baseTrait; }
 
       // Special Frog => Frog
       if (typeof subFrog !== 'undefined') {
@@ -1121,7 +1121,7 @@
     
     // SUB FROG (UNDERLAY)
     if (typeof subFrog !== 'undefined') { loadTrait('Frog', subFrog, build_loc); console.log(' => SUB Frog: '+subFrog); }
-    else if (typeof subSpecialFrog !== 'undefined') { loadTrait('SpecialFrog', subSpecialFrog, build_loc); console.log(' => SUB SpecialFrog: '+subSpecialFrog); }
+    else if (typeof subSpecialFrog !== 'undefined') { loadTrait('SpecialFrog/bottom', subSpecialFrog, build_loc); console.log(' => SUB SpecialFrog: '+subSpecialFrog); }
 
     // BASE FROG (OVERLAY)
     if (typeof baseFrog !== 'undefined') { loadTrait('Frog/base', baseFrog, build_loc); console.log(' => BASE Frog: '+baseFrog); }
