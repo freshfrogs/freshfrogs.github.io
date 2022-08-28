@@ -1075,7 +1075,7 @@
     if (subFrog == 'splendidLeafFrog' || subFrog == 'stawberryDartFrog' || subFrog == 'redEyedTreeFrog') {
 
       //subTrait =
-      if (!baseTrait) {
+      if (typeof baseTrait !== 'undefined') {
         renderOverlay = subFrog+'/'+subTrait;
       } else {
         renderOverlay = subFrog+'/'+baseTrait;
