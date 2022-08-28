@@ -515,9 +515,9 @@
     // Create Button Element(s)
     var button_b = document.createElement('div');
     button_b.style.width = 'fit-content';
+    button_b.style.margin = '8px';
     button_b.style.marginLeft = 'auto';
     button_b.style.marginRight = 'auto';
-    button_b.style.margin = '8px';
 
     if (!staked) { // NOT Staked
       if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
@@ -1116,7 +1116,7 @@
 
     // ADD ON OVERLAY
     if (typeof renderOverlay !== 'undefined') { loadTrait('Trait/Overlay', renderOverlay, build_loc); }
-    
+
     // BASE FROG (OVERLAY)
     if (typeof baseFrog !== 'undefined') { loadTrait('Frog/base', baseFrog, build_loc); }
     else if (typeof baseSpecialFrog !== 'undefined') { loadTrait('SpecialFrog/bottom', baseSpecialFrog, build_loc); }
