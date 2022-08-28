@@ -1079,9 +1079,11 @@
     // Special Frogs
     if (typeof baseSpecialFrog !== 'undefined' || typeof subSpecialFrog !== 'undefined') {
 
-      // Trait
-      if (typeof baseTrait !== 'undefined' ) { subTrait = 'SpecialFrog/'+baseSpecialFrog+'/'+subTrait; }
-      else { baseTrait = 'SpecialFrog/'+subSpecialFrog+'/'+baseTrait; }
+      // Base Special Frog
+      if (typeof subTrait !== 'undefined' ) { baseTrait = 'SpecialFrog/'+baseSpecialFrog+'/'+subTrait; }
+
+      // Sub Special Frog
+      else { subTrait = 'SpecialFrog/'+subSpecialFrog+'/'+baseTrait; }
 
       // Special Frog => Frog
       if (typeof subFrog !== 'undefined') {
@@ -1091,7 +1093,7 @@
 
       // Frog => Special Frog
       else if (typeof baseFrog !== 'undefined') {
-        baseSpecialFrog = subSpecialFrog+'/bottom';
+        baseSpecialFrog = '/bottom/'+subSpecialFrog;
         subSpecialFrog = subSpecialFrog+'/'+baseFrog;
         baseFrog = undefined;
       }
