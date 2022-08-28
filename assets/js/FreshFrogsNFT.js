@@ -528,14 +528,7 @@
       }
 
     } else { // STAKED
-      if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
-        button_b.innerHTML = 
-          '<button class="frog_button" style="background: salmon; border: 1px solid black;" onclick="withdraw_init('+frog_id+')">UnStake 🡧</button>'+
-          '<button class="frog_button" id="morph_'+frog_id+'" style="border: 1px solid black;" onclick="display_token('+frog_id+', true)">Morph 🡥</button>';
-        document.getElementById('staked_'+frog_id).appendChild(button_b);
 
-      }
-      
       // Check Staked Time / Calculate Level
       let staked_time_bool = await timeStaked(frog_id);
       if (staked_time_bool >= 2000) { staked_level = 3; } else if (staked_time_bool >= 1000) { staked_level = 2; } else { staked_level = 1; }
@@ -557,7 +550,14 @@
       let elem = document.getElementById('myBar_'+frog_id);
       let width = percent;
       elem.style.width = width + "%";
-      
+
+      if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+        button_b.innerHTML = 
+          '<button class="frog_button" style="background: salmon; border: 1px solid black;" onclick="withdraw_init('+frog_id+')">UnStake 🡧</button>'+
+          '<button class="frog_button" id="morph_'+frog_id+'" style="border: 1px solid black;" onclick="display_token('+frog_id+', true)">Morph 🡥</button>';
+        document.getElementById('staked_'+frog_id).appendChild(button_b);
+        
+      }
     }
   }
 
