@@ -1095,10 +1095,12 @@
       if (typeof subFrog !== 'undefined') {
         subSpecialFrog = baseSpecialFrog+'/'+subFrog;
         subFrog = undefined;
-
-      // Special Frog => Special Frog
-      } else {
-        subSpecialFrog = baseSpecialFrog+'/'+subFrog;
+      }
+      
+      // Frog => Special Frog
+      else if (typeof baseFrog !== 'undefined') {
+        baseSpecialFrog = subSpecialFrog+'/'+baseFrog;
+        baseFrog = undefined;
 
       }
 
