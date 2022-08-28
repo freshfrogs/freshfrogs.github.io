@@ -517,7 +517,7 @@
     button_b.style.width = 'fit-content';
     button_b.style.marginLeft = 'auto';
     button_b.style.marginRight = 'auto';
-    button_b.style.margin = '8px';
+    button_b.style.marginTop = '8px';
 
     if (!staked) { // NOT Staked
       if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
@@ -556,7 +556,7 @@
           '<button class="frog_button" style="background: salmon; border: 1px solid black;" onclick="withdraw_init('+frog_id+')">UnStake 🡧</button>'+
           '<button class="frog_button" id="morph_'+frog_id+'" style="border: 1px solid black;" onclick="display_token('+frog_id+', true)">Morph 🡥</button>';
         document.getElementById('staked_'+frog_id).appendChild(button_b);
-
+        
       }
     }
   }
