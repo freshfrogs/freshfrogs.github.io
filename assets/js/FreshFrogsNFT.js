@@ -1062,43 +1062,11 @@
     // <------ DETERMINE NEW METADATA (baseId, subId) ------>
     // https://freshfrogs.io/frog/preset_/ [ trait_type/value ] .png
 
-    /* // SpecialFrogs
     if (typeof baseSpecialFrog !== 'undefined') {
-      if (baseSpecialFrog == 'inversedEyes') {
-        var renderSpecialFrog = baseSpecialFrog;
-        var renderTrait = '/SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
-      } else {
-        var renderSpecialFrog = baseSpecialFrog+'/'+subFrog;
-        var renderTrait = '/SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
-      }
+      baseFrog = '/bottom/'+baseSpecialFrog;
+      subFrog = baseSpecialFrog+'/'+subFrog;
+      subTrait = '/SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
     }
-    else if (typeof subSpecialFrog !== 'undefined') {
-      if (baseSpecialFrog == 'inversedEyes') {
-        var renderTrait = '/SpecialFrog/'+subSpecialFrog+'/'+baseTrait;
-        var renderSpecialFrog = subSpecialFrog;
-      } else {
-        var renderSpecialFrog = subSpecialFrog+'/'+baseFrog;
-        var renderTrait = '/SpecialFrog/'+subSpecialFrog+'/'+baseTrait;
-      }
-    }
-    */
-
-    // Default Frog, Trait
-    //else { var renderTrait = subTrait; renderFrog = baseFrog; }
-
-    /* // Natural Frogs 
-    if (baseFrog == 'stawberryDartFrog' || baseFrog == 'redEyedTreeFrog' || baseFrog == 'splendidLeafFrog' || subFrog == 'stawberryDartFrog'|| subFrog == 'redEyedTreeFrog'|| subFrog == 'splendidLeafFrog') {
-      if (baseFrog == 'stawberryDartFrog' || baseFrog == 'redEyedTreeFrog' || baseFrog == 'splendidLeafFrog'){
-        var renderOverlay = '/Overlay/'+baseFrog+'/'+baseTrait;
-        var renderFrog = subFrog;
-        var renderTrait = baseTrait;
-      } else {
-        var renderOverlay = '/Overlay/'+subFrog+'/'+subTrait;
-        var renderFrog = baseFrog;
-        var renderTrait = subTrait;
-      }
-
-    } */
     
     // Select Attributes!
     if (typeof baseAccessory !== 'undefined') { var renderAccessory = baseAccessory; } 
