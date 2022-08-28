@@ -1088,7 +1088,7 @@
 
     }
     
-    // Select Attributes! //
+    // Select Attributes!
     if (typeof baseAccessory !== 'undefined') { var renderAccessory = baseAccessory; } 
     else if (typeof subAccessory !== 'undefined') { var renderAccessory = subAccessory; }
     if (typeof baseEyes !== 'undefined') { var renderEyes = baseEyes; } 
@@ -1107,7 +1107,7 @@
     else if (typeof subSpecialFrog !== 'undefined') { loadTrait('SpecialFrog', subSpecialFrog, build_loc); console.log(' => SUB SpecialFrog: '+subSpecialFrog); }
 
     // BASE FROG (OVERLAY)
-    if (typeof baseFrog !== 'undefined') { loadTrait('Frog/half', baseFrog, build_loc); console.log(' => BASE Frog: '+baseFrog); }
+    if (typeof baseFrog !== 'undefined') { loadTrait('Frog/base', baseFrog, build_loc); console.log(' => BASE Frog: '+baseFrog); }
     else if (typeof baseSpecialFrog !== 'undefined') { loadTrait('SpecialFrog/bottom', baseSpecialFrog, build_loc); console.log(' => BASE SpecialFrog: '+baseSpecialFrog); }
 
     // ADD ON OVERLAY
