@@ -1117,8 +1117,8 @@
     else if (typeof subSpecialFrog !== 'undefined') { loadTrait('SpecialFrog', subSpecialFrog, build_loc); }
 
     // BASE FROG (OVERLAY)
-    if (typeof baseFrog !== 'undefined') { loadTrait('Frog/half/', renderFrog, build_loc); }
-    else if (typeof baseSpecialFrog !== 'undefined') { loadTrait('SpecialFrog/half/', renderSpecialFrog, build_loc); }
+    if (typeof baseFrog !== 'undefined') { loadTrait('Frog/half/', baseFrog, build_loc); }
+    else if (typeof baseSpecialFrog !== 'undefined') { loadTrait('SpecialFrog/half/', baseSpecialFrog, build_loc); }
 
     // TRAIT(S)
     if (typeof subTrait !== 'undefined') { loadTrait('Trait', subTrait, build_loc); }
