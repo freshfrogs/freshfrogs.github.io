@@ -1067,6 +1067,10 @@
       subFrog = baseSpecialFrog+'/'+subFrog;
       subTrait = 'SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
     }
+
+    if (typeof subSpecialFrog !== 'undefined' && subSpecialFrog == 'thirdEye') {
+      subSpecialFrog = 'bottom/'+subSpecialFrog;
+    }
     
     // Select Attributes!
     if (typeof baseAccessory !== 'undefined') { var renderAccessory = baseAccessory; } 
