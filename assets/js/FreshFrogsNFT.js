@@ -1101,7 +1101,6 @@
     } */
     
     // Select Attributes!
-    if (typeof subTrait !== 'undefined') { var renderTrait = subTrait; }
     if (typeof baseAccessory !== 'undefined') { var renderAccessory = baseAccessory; } 
     else if (typeof subAccessory !== 'undefined') { var renderAccessory = subAccessory; }
     if (typeof baseEyes !== 'undefined') { var renderEyes = baseEyes; } 
@@ -1122,7 +1121,7 @@
     else if (typeof baseSpecialFrog !== 'undefined') { loadTrait('SpecialFrog/half/', renderSpecialFrog, build_loc); }
 
     // TRAIT(S)
-    if (typeof renderTrait !== 'undefined') { loadTrait('Trait', renderTrait, build_loc); }
+    if (typeof subTrait !== 'undefined') { loadTrait('Trait', subTrait, build_loc); }
 
     // ACCESSORIES
     if (typeof renderAccessory !== 'undefined') { loadTrait('Accessory', renderAccessory, build_loc); }
