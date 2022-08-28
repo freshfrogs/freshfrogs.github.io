@@ -1032,14 +1032,10 @@
     document.getElementById(build_loc).innerHTML = '';
 
     // <------ FETCH METADATA (baseId, subId) ------>
-    console.log(' -- Frog #'+baseId+' -- ');
-
     let baseMetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseId+".json")).json();
     for (i = 0; i < baseMetadata.attributes.length; i++) {
 
       let attribute = baseMetadata.attributes[i];
-      console.log(' > '+attribute.trait_type+' : '+attribute.value);
-
       if (attribute.trait_type == 'Frog') { var baseFrog = attribute.value; } 
       else if (attribute.trait_type == 'SpecialFrog') { var baseSpecialFrog = attribute.value; } 
       else if (attribute.trait_type == 'Trait') { var baseTrait = attribute.value; } 
@@ -1050,14 +1046,10 @@
 
     }
 
-    console.log(' -- Frog #'+subId+' -- ');
-
     let subMetadata = await (await fetch("https://freshfrogs.io/frog/json/"+subId+".json")).json();
     for (j = 0; j < subMetadata.attributes.length; j++) {
 
       let attribute = subMetadata.attributes[j];
-      console.log(' > '+attribute.trait_type+' : '+attribute.value);
-
       if (attribute.trait_type == 'Frog') { var subFrog = attribute.value; } 
       else if (attribute.trait_type == 'SpecialFrog') { var subSpecialFrog = attribute.value; } 
       else if (attribute.trait_type == 'Trait') { var subTrait = attribute.value; } 
