@@ -1028,7 +1028,7 @@
 
     var baseFrog, baseSpecialFrog, baseTrait, baseAccessory, baseEyes, baseHat, baseMouth;
     var subFrog, subSpecialFrog, subTrait, subAccessory, subEyes, subHat, subMouth;
-    var renderFrog, renderSpecialFrog, renderTrait, renderSecondaryTrait, renderAccessory, renderEyes, renderHat, renderMouth;
+    var renderFrog, renderSpecialFrog, renderTrait, renderSecondaryTrait, renderAccessory, renderEyes, renderHat, renderMouth, renderOverlay;
     
     document.getElementById(build_loc).innerHTML = '';
 
@@ -1079,7 +1079,7 @@
       renderOverlay = subFrog+'/'+baseTrait;
 
     }
-    
+
     // Special Frogs
     if (typeof baseSpecialFrog !== 'undefined' ) {
 
