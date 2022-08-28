@@ -1063,19 +1063,12 @@
     // <------ DETERMINE NEW METADATA (baseId, subId) ------> //
     // https://freshfrogs.io/frog/preset_/ [ trait_type/value ] .png
 
-    // Adaptative Frogs
-    if (subFrog == 'splendidLeafFrog' || subFrog == 'stawberryDartFrog' || subFrog == 'redEyedTreeFrog' || baseFrog == 'splendidLeafFrog' || baseFrog == 'stawberryDartFrog' || baseFrog == 'redEyedTreeFrog') {
-
-      //subTrait =
-      if (typeof subTrait !== 'undefined') {
-        renderOverlay = subFrog+'/'+subTrait;
-
-      } else if (typeof baseTrait !== 'undefined') {
-        renderOverlay = subFrog+'/'+baseTrait;
-      }
-
-    }
-
+    // Base Adaptative Frog
+    if (baseFrog == 'splendidLeafFrog' || baseFrog == 'stawberryDartFrog' || baseFrog == 'redEyedTreeFrog') { renderOverlay = baseFrog+'/'+subTrait; } 
+    
+    // Sub Adaptative Frog
+    else if (subFrog == 'splendidLeafFrog' || subFrog == 'stawberryDartFrog' || subFrog == 'redEyedTreeFrog') { renderOverlay = subFrog+'/'+baseTrait; }
+    
     // Special Frogs
     if (typeof baseSpecialFrog !== 'undefined' || typeof subSpecialFrog !== 'undefined') {
 
