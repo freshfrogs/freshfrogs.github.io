@@ -1063,9 +1063,9 @@
     // https://freshfrogs.io/frog/preset_/ [ trait_type/value ] .png
 
     if (typeof baseSpecialFrog !== 'undefined') {
-      baseFrog = '/bottom/'+baseSpecialFrog;
+      baseFrog = 'bottom/'+baseSpecialFrog;
       subFrog = baseSpecialFrog+'/'+subFrog;
-      subTrait = '/SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
+      subTrait = 'SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
     }
     
     // Select Attributes!
