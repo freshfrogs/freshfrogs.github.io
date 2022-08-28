@@ -557,8 +557,6 @@
       let elem = document.getElementById('myBar_'+frog_id);
       let width = percent;
       elem.style.width = width + "%";
-
-      //if (render_vault) { stakedLeaderboard(frog_id); }
       
     }
   }
