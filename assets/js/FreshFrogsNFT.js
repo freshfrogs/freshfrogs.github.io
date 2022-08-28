@@ -1023,7 +1023,7 @@
   // Token Combinations / Rebuild Token
   async function morphFrogs(baseId, subId, build_loc) {
 
-    console.log(' == Morphing Frog#'+baseId+' and Frog #'+subId+' == ');
+    console.log(' <== Morphing Frog#'+baseId+' and Frog #'+subId+' ==> ');
     
     var baseFrog, baseSpecialFrog, baseTrait, baseAccessory, baseEyes, baseHat, baseMouth;
     var subFrog, subSpecialFrog, subTrait, subAccessory, subEyes, subHat, subMouth;
