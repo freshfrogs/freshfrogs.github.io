@@ -335,8 +335,12 @@
             })
           })
           .catch(e => {
-            console.log('Failed to talk to OpenSea!');
-            console.log(e.message);
+            
+            consoleOutput(
+              '<div style="text-align: left;">'+
+                'Failed to fetch user data. Try refreshing the page!<br>'+
+              '</div>'
+            );
 
           })
         }
