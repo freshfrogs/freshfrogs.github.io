@@ -338,7 +338,7 @@
             
             consoleOutput(
               '<div style="text-align: left;">'+
-                'Failed to fetch user data. Try refreshing the page!<br>'+
+                'Failed to fetch user data (partial). Try refreshing the page!<br>'+
               '</div>'
             );
 
