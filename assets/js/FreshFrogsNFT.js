@@ -1103,11 +1103,11 @@
     }
     
     // Select Attributes!
-    if (typeof baseAccessory !== 'undefined') { var renderAccessory = baseAccessory; } 
+    if (typeof baseAccessory !== 'undefined') { var renderAccessory = baseAccessory; }
     else if (typeof subAccessory !== 'undefined') { var renderAccessory = subAccessory; }
-    if (typeof baseEyes !== 'undefined') { var renderEyes = baseEyes; } 
+    if (typeof baseEyes !== 'undefined') { var renderEyes = baseEyes; }
     else if (typeof subEyes !== 'undefined') { var renderEyes = subEyes; }
-    if (typeof baseHat !== 'undefined') { var renderHat = baseHat; } 
+    if (typeof baseHat !== 'undefined') { var renderHat = baseHat; }
     else if (typeof subHat !== 'undefined') {var renderHat = subHat;}
     if (typeof baseMouth !== 'undefined') { var renderMouth = baseMouth; }
     else if (typeof subMouth !== 'undefined') { var renderMouth = subMouth; }
@@ -1119,7 +1119,7 @@
     else if (typeof subSpecialFrog !== 'undefined') { loadTrait('SpecialFrog', subSpecialFrog, build_loc); }
 
     // ADD ON OVERLAY
-    if (typeof renderOverlay !== 'undefined') { loadTrait('Trait/Overlay', renderOverlay, build_loc); }
+    //if (typeof renderOverlay !== 'undefined') { loadTrait('Trait/Overlay', renderOverlay, build_loc); }
 
     // BASE FROG (OVERLAY)
     if (typeof baseFrog !== 'undefined') { loadTrait('Frog/base', baseFrog, build_loc); }
