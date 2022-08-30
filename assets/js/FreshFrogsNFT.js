@@ -1085,8 +1085,15 @@
     // Special Frogs
     if (typeof baseSpecialFrog !== 'undefined' || typeof subSpecialFrog !== 'undefined') {
 
+      // Base Special Frog AND Sub Special Frog
+      if (typeof baseSpecialFrog !== 'undefined' && typeof subSpecialFrog !== 'undefined') {
+        subTrait = 'SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
+        subSpecialFrog = baseSpecialFrog+'/SpecialFrog/'+subSpecialFrog;
+        subFrog = undefined;
+      }
+
       // Base Special Frog
-      if (typeof subFrog !== 'undefined') {
+      else if (typeof subFrog !== 'undefined') {
         subTrait = 'SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
         subSpecialFrog = baseSpecialFrog+'/'+subFrog;
         subFrog = undefined;
