@@ -1087,14 +1087,14 @@
 
       // Base Special Frog AND Sub Special Frog
       if (typeof baseSpecialFrog !== 'undefined' && typeof subSpecialFrog !== 'undefined') {
-        subSpecialFrog = '/bottom/'+baseSpecialFrog+'/SpecialFrog/'+subSpecialFrog;
+        subSpecialFrog = baseSpecialFrog+'/SpecialFrog/'+subSpecialFrog;
         subTrait = undefined;
       }
 
       // Base Special Frog
       else if (typeof subFrog !== 'undefined') {
         subTrait = 'SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
-        subSpecialFrog = '/bottom/'+baseSpecialFrog+'/'+subFrog;
+        subSpecialFrog = baseSpecialFrog+'/'+subFrog;
         subFrog = undefined;
       }
 
@@ -1102,16 +1102,8 @@
       else if (typeof baseFrog !== 'undefined') {
         subTrait = 'SpecialFrog/'+subSpecialFrog+'/'+baseTrait;
         baseSpecialFrog = subSpecialFrog;
-        subSpecialFrog = '/bottom/'+subSpecialFrog+'/'+baseFrog;
+        subSpecialFrog = subSpecialFrog+'/'+baseFrog;
         baseFrog = undefined;
-      }
-
-      if (baseSpecialFrog == 'croaking') {
-
-      }
-
-      else if (subSpecialFrog == 'croaking') {
-
       }
 
     }
@@ -1137,7 +1129,7 @@
 
     // BASE FROG (OVERLAY)
     if (typeof baseFrog !== 'undefined') { loadTrait('Frog/base', baseFrog, build_loc); }
-    else if (typeof baseSpecialFrog !== 'undefined') { loadTrait('SpecialFrog', baseSpecialFrog, build_loc); }
+    else if (typeof baseSpecialFrog !== 'undefined') { loadTrait('SpecialFrog/bottom', baseSpecialFrog, build_loc); }
 
     // TRAIT(S)
     if (typeof subTrait !== 'undefined') { loadTrait('Trait', subTrait, build_loc); }
