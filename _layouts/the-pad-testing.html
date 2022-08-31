@@ -742,6 +742,69 @@
     <![endif]-->
     <script>
 
+      async function generate_NFB() {
+
+        let destination = document.getElementById('console-pre');
+
+        // Generate Cap =>
+          // blue, brown, cyan, darkBlue, darkBrown, darkGreen, darkPurple, green, lightBrown, mauveine, midnightGreen, pink, purple, red, violet, white, yellow
+
+        mushroom_cap = document.createElement('img');
+        mushroom_cap.src = 'https://freshfrogs.io/non-fungi-bles/Cap/'+getRandomInt(0, 17)+'.png';
+
+        // Generate Mycelium => 
+          // blue, cyan, green, purple, red, violet
+
+        mushroom_mycelium = document.createElement('img');
+        mushroom_mycelium.src = 'https://freshfrogs.io/non-fungi-bles/Mycelium/'+getRandomInt(0, 6)+'.png';
+
+        // Generate Scales => 
+          // brown, cyan, green, magenta, mallow, pink, purple, red, tan, truquise, violet, white
+
+        mushroom_scales = document.createElement('img');
+        mushroom_scales.src = 'https://freshfrogs.io/non-fungi-bles/Scales/'+getRandomInt(0, 12)+'.png';
+
+        // Generate Spores => 
+          // brown, cream, cyan, green, jade, pink, red, tan, white
+
+        mushroom_spores = document.createElement('img');
+        mushroom_spores.src = 'https://freshfrogs.io/non-fungi-bles/Spores/'+getRandomInt(0, 9)+'.png';
+
+        // Generate Stem => 
+          // black, brown, darkroot, hazlenut, moss, oaknut, tan
+
+        mushroom_steam = document.createElement('img');
+        mushroom_stem.src = 'https://freshfrogs.io/non-fungi-bles/Stem/'+getRandomInt(0, 7)+'.png';
+
+        // Generate Stripe => 
+          // black, brown, green, tan, violet, white, 
+
+        mushroom_stripe = document.createElement('img');
+        mushroom_stipe.src = 'https://freshfrogs.io/non-fungi-bles/Stripe/'+getRandomInt(0, 6)+'.png';
+
+        // Generate Volva => 
+          // black, brown, darkbrown, earth, gray, green, tan
+
+        mushroom_volva = document.createElement('img');
+        mushroom_volva.src = 'https://freshfrogs.io/non-fungi-bles/Volva/'+getRandomInt(0, 7)+'.png';
+
+        // Build Non-Fungi-Ble
+        destination.appendChild(mushroom_cap);
+        destination.appendChild(mushroom_mycelium);
+        destination.appendChild(mushroom_scales);
+        destination.appendChild(mushroom_spores);
+        destination.appendChild(mushroom_stem);
+        destination.appendChild(mushroom_stripe);
+        destination.appendChild(mushroom_volva);
+
+      }
+
+      function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min) + min);
+      }
+
     </script>
     
   </head>
@@ -751,18 +814,10 @@
         <div class="top">{{ content }}</div>
         <div class="downloads pre">
           <div id="netStatus" class="netStatus">
-            <div id="recent_mints" class="recent_mints"><img src="https://freshfrogs.github.io/frog/1205.png" class="recentMint" id="displayImg1"><img src="https://freshfrogs.github.io/frog/1206.png" class="recentMint" id="displayImg2"><img src="https://freshfrogs.github.io/frog/1207.png" class="recentMint" id="displayImg3"></div>
-            <br>
-            <h1 style="color: white !important;">FreshFrogsNFT</h1>
-            <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
-            opensea.io/collection/fresh-frogs<a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong style="color: white;">Shop on OpenSea ⛵</strong></a>
-            <br>
             <div id="pre" class="mintingTextWhite2">
-              <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="https://freshfrogs.io/the-pond">
-                <button onclick="connect_init()" style="list-style: none; min-height: 40px; padding: 8px; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">
-                  <strong>Stake and Earn Rewards!</strong>Connect Ethereum Wallet
-                </button>
-              </a>
+              <button onclick="generate_NFB()" style="list-style: none; min-height: 40px; padding: 8px; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">
+                <strong>Generate</strong>Non-fungi-ble
+              </button>
               <br>
               <hr style="background: black;">
               <div class="console_pre" id="console-pre"></div>
