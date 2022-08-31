@@ -774,7 +774,7 @@
         destination.innerHTML = ''
 
         const backgrounds = [ "#ff99a8", "#99ffe6", "#99ffaa", "#fffd99", "#ff99ec", "#a099ff", "#99ffbe", "#ffc299" ]
-        background = getRandomInt(1, backgrounds.length); console.log(backgrounds[background]+' : '+background);
+        background = getRandomInt(1, (backgrounds.length-1));
         document.getElementById('mushroom_frame').style.background = backgrounds[background];
 
         overlay_one = getRandomInt(1, 3);
@@ -782,7 +782,7 @@
 
         // Generate Stem => 
         const stems = [ "black", "brown", "darkroot", "hazlenut", "moss", "oaknut", "tan" ]
-        stem = getRandomInt(1, stems.length); console.log(stems[stem]+' : '+stem);
+        stem = getRandomInt(1, (stems.length-1));
 
         mushroom_stem = document.createElement('img');
         mushroom_stem.src = 'https://freshfrogs.io/non-fungi-bles/Stem/'+stems[stem]+'.png';
@@ -791,7 +791,7 @@
 
         // Generate Cap =>
         const caps = ["blue", "brown", "cyan", "darkBlue", "darkBrown", "darkGreen", "darkPurple", "green", "lightBrown", "mauveine", "midnightGreen", "pink", "purple", "red", "violet", "white", "yellow"]
-        cap = getRandomInt(1, caps.length);
+        cap = getRandomInt(1, (caps.length-1));
 
         mushroom_cap = document.createElement('img');
         mushroom_cap.src = 'https://freshfrogs.io/non-fungi-bles/Cap/'+caps[cap]+'.png';
@@ -802,7 +802,7 @@
 
           // Generate Mycelium => 
           const mycelium = [ "blue", "cyan", "green", "purple", "red", "violet" ]
-          celium = getRandomInt(1, mycelium.length);
+          celium = getRandomInt(1, (mycelium.length-1));
 
           mushroom_mycelium = document.createElement('img');
           mushroom_mycelium.src = 'https://freshfrogs.io/non-fungi-bles/Mycelium/'+mycelium[celium]+'.png';
@@ -813,7 +813,7 @@
 
           // Generate Stripe => 
           const stripes = [ "black", "brown", "green", "tan", "violet", "white" ]
-          stripe = getRandomInt(1, stripes.length);
+          stripe = getRandomInt(1, (stripes.length-1));
 
           mushroom_stripe = document.createElement('img');
           mushroom_stripe.src = 'https://freshfrogs.io/non-fungi-bles/Stripe/'+stripes[stripe]+'.png';
@@ -824,7 +824,7 @@
 
           // Generate Volva => 
           const volvas = [ "black", "brown", "darkbrown", "earth", "gray", "green", "tan" ]
-          volva = getRandomInt(1, volvas.length);
+          volva = getRandomInt(1, (volvas.length-1));
 
           mushroom_volva = document.createElement('img');
           mushroom_volva.src = 'https://freshfrogs.io/non-fungi-bles/Volva/'+volvas[volva]+'.png';
@@ -837,7 +837,7 @@
 
           // Generate Scales => 
           const scales = [ "brown", "cyan", "green", "magenta", "mallow", "pink", "purple", "red", "tan", "truquise", "violet", "white" ]
-          scale = getRandomInt(1, scales.length);
+          scale = getRandomInt(1, (scales.length-1));
 
           mushroom_scales = document.createElement('img');
           mushroom_scales.src = 'https://freshfrogs.io/non-fungi-bles/Scales/'+scales[scale]+'.png';
@@ -848,7 +848,7 @@
 
           // Generate Spores => 
           const spores = [ "brown", "cream", "cyan", "green", "jade", "pink", "red", "tan", "white" ]
-          spore = getRandomInt(1, spores.length);
+          spore = getRandomInt(1, (spores.length-1));
 
           mushroom_spores = document.createElement('img');
           mushroom_spores.src = 'https://freshfrogs.io/non-fungi-bles/Spores/'+spores[spore]+'.png';
