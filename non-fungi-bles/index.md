@@ -1,4 +1,4 @@
 ---
 layout: non-fungi-bles
 ---
-<title>freshfrogs.io/non-fungi-bles 🍄</title>
+<title>non-fungi-bles 🍄</title>
