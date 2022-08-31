@@ -539,7 +539,7 @@
 
       document.getElementById('staked_'+frog_id).innerHTML = 
         '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
-        '<div style="color:tomato;" class="frog_level">Staked Level '+staked_level+'</div>';
+        '<div style="color:tomato;" class="frog_level"><b>Level '+staked_level+'</b></div>';
 
       var trait_text = document.createElement('div')
       if (staked_time_bool >= 720) { trait_text.innerHTML = 'Staked: '+parseInt(staked_time_bool/24)+' days 🔥<br>'; } 
