@@ -724,6 +724,20 @@
       float: none;
       font-size: small;
     }
+    .k_img {
+      transition: all .2s;
+      display: block;
+      image-rendering: pixelated;
+      overflow: hidden;
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      border-radius: 5px;
+    }
+    .k_mint {
+      width: 64px;
+      height: 64px;
+    }
   </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -781,6 +795,7 @@
           k_frog = getRandomInt(1, 4040);
 
           k_container = document.createElement('div');
+          k_container.className = 'k_mint'
           k_container.id = 'k_'+k_frog
           document.getElementById('recent_mints').appendChild(k_container)
 
@@ -791,7 +806,7 @@
             k_trait = document.createElement("img");
             k_trait.src = "https://freshfrogs.io/the-pond/"+k_metadata.attributes[k].trait_type+"/"+k_metadata.attributes[k].value+".png";
             k_trait.alt = k_metadata.attributes[k].value
-            k_trait.className = "frogImg4";
+            k_trait.className = "k_img";
 
             document.getElementById('k_'+k_frog).appendChild(k_trait);
 
