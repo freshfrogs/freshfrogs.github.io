@@ -774,7 +774,7 @@
         destination.innerHTML = ''
 
         const backgrounds = [ "#ff99a8", "#99ffe6", "#99ffaa", "#fffd99", "#ff99ec", "#a099ff", "#99ffbe", "#ffc299" ]
-        background = getRandomInt(1, backgrounds.length);
+        background = getRandomInt(1, backgrounds.length); console.log(backgrounds[background]+' : '+background);
         document.getElementById('mushroom_frame').style.background = backgrounds[background];
 
         overlay_one = getRandomInt(1, 3);
