@@ -764,9 +764,9 @@
         destination = document.getElementById('mushroom');
         destination.innerHTML = ''
 
-        const backgrounds = ["#ff99a8", "#99ffe6", "#99ffaa", "#fffd99", "#ff99ec", "#a099ff", "#99ffbe", "#ffc299"]
+        const backgrounds = [ "#ff99a8", "#99ffe6", "#99ffaa", "#fffd99", "#ff99ec", "#a099ff", "#99ffbe", "#ffc299" ]
 
-        destination.style.background = backgrounds[getRandomInt(1, backgrounds.length)]
+        destination.style.background = backgrounds[getRandomInt(0, backgrounds.length)]
         destination.style.border = '1px solid white'
 
         overlay_one = getRandomInt(1, 3);
@@ -776,14 +776,14 @@
         const stems = [ "black", "brown", "darkroot", "hazlenut", "moss", "oaknut", "tan" ]
 
         mushroom_stem = document.createElement('img');
-        mushroom_stem.src = 'https://freshfrogs.io/non-fungi-bles/Stem/'+stems[getRandomInt(1, stems.length)]+'.png';
+        mushroom_stem.src = 'https://freshfrogs.io/non-fungi-bles/Stem/'+stems[getRandomInt(0, stems.length)]+'.png';
         mushroom_stem.className = 'mushroom_img';
 
         // Generate Cap =>
-        const caps = [ "blue", "brown", "cyan", "darkBlue", "darkBrown", "darkGreen", "darkPurple", "green", "lightBrown", "mauveine", "midnightGreen", "pink", "purple", "red", "violet", "white", "yellow" ]
+        const caps = ["blue", "brown", "cyan", "darkBlue", "darkBrown", "darkGreen", "darkPurple", "green", "lightBrown", "mauveine", "midnightGreen", "pink", "purple", "red", "violet", "white", "yellow"]
 
         mushroom_cap = document.createElement('img');
-        mushroom_cap.src = 'https://freshfrogs.io/non-fungi-bles/Cap/'+caps[getRandomInt(1, caps.length)]+'.png';
+        mushroom_cap.src = 'https://freshfrogs.io/non-fungi-bles/Cap/'+caps[getRandomInt(0, caps.length)]+'.png';
         mushroom_cap.className = 'mushroom_img';
 
         if (overlay_one == 1) {
@@ -792,7 +792,7 @@
           const mycelium = [ "blue", "cyan", "green", "purple", "red", "violet" ]
 
           mushroom_mycelium = document.createElement('img');
-          mushroom_mycelium.src = 'https://freshfrogs.io/non-fungi-bles/Mycelium/'+getRandomInt(1, 6)+'.png';
+          mushroom_mycelium.src = 'https://freshfrogs.io/non-fungi-bles/Mycelium/'+getRandomInt(0, 6)+'.png';
           mushroom_mycelium.className = 'mushroom_img';
 
         } else if (overlay_one == 2) {
@@ -801,7 +801,7 @@
           const stripes = [ "black", "brown", "green", "tan", "violet", "white" ]
 
           mushroom_stripe = document.createElement('img');
-          mushroom_stripe.src = 'https://freshfrogs.io/non-fungi-bles/Stripe/'+getRandomInt(1, 6)+'.png';
+          mushroom_stripe.src = 'https://freshfrogs.io/non-fungi-bles/Stripe/'+getRandomInt(0, 6)+'.png';
           mushroom_stripe.className = 'mushroom_img';
 
         } else if (overlay_one == 3) {
@@ -810,7 +810,7 @@
           const volvas = [ "black", "brown", "darkbrown", "earth", "gray", "green", "tan" ]
 
           mushroom_volva = document.createElement('img');
-          mushroom_volva.src = 'https://freshfrogs.io/non-fungi-bles/Volva/'+getRandomInt(1, 7)+'.png';
+          mushroom_volva.src = 'https://freshfrogs.io/non-fungi-bles/Volva/'+getRandomInt(0, 7)+'.png';
           mushroom_volva.className = 'mushroom_img';
 
         }
@@ -821,7 +821,7 @@
           const scales = [ "brown", "cyan", "green", "magenta", "mallow", "pink", "purple", "red", "tan", "truquise", "violet", "white" ]
 
           mushroom_scales = document.createElement('img');
-          mushroom_scales.src = 'https://freshfrogs.io/non-fungi-bles/Scales/'+getRandomInt(1, 12)+'.png';
+          mushroom_scales.src = 'https://freshfrogs.io/non-fungi-bles/Scales/'+getRandomInt(0, 12)+'.png';
           mushroom_scales.className = 'mushroom_img';
 
         } else if (overlay_two == 2) {
@@ -830,7 +830,7 @@
           const spores = [ "brown", "cream", "cyan", "green", "jade", "pink", "red", "tan", "white" ]
 
           mushroom_spores = document.createElement('img');
-          mushroom_spores.src = 'https://freshfrogs.io/non-fungi-bles/Spores/'+getRandomInt(1, 9)+'.png';
+          mushroom_spores.src = 'https://freshfrogs.io/non-fungi-bles/Spores/'+getRandomInt(0, 9)+'.png';
           mushroom_spores.className = 'mushroom_img';
 
         }
