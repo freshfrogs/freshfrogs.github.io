@@ -764,6 +764,10 @@
         destination = document.getElementById('mushroom');
         destination.innerHTML = ''
 
+        const backgrounds = ["#ff99a8", "#99ffe6", "#99ffaa", "#fffd99", "#ff99ec", "#a099ff", "#99ffbe", "#ffc299"]
+
+        destination.style.background = backgrounds[getRandomInt(1, backgrounds.length)]
+
         overlay_one = getRandomInt(1, 4)
         overlay_two = getRandomInt(1, 3)
         // Generate Cap =>
