@@ -793,6 +793,7 @@
         mushroom_stem = document.createElement('img');
         mushroom_stem.src = 'https://freshfrogs.io/non-fungi-bles/Stem/'+stems[stem-1]+'.png';
         mushroom_stem.className = 'mushroom_img';
+        mushroom_stem.alt = stems[stem-1];
         destination.appendChild(mushroom_stem);
 
         // Generate Cap =>
@@ -802,6 +803,7 @@
         mushroom_cap = document.createElement('img');
         mushroom_cap.src = 'https://freshfrogs.io/non-fungi-bles/Cap/'+caps[cap-1]+'.png';
         mushroom_cap.className = 'mushroom_img';
+        mushroom_cap.alt = caps[cap-1];
         destination.appendChild(mushroom_cap);
 
         if (overlay_one == 1) {
@@ -813,6 +815,7 @@
           mushroom_mycelium = document.createElement('img');
           mushroom_mycelium.src = 'https://freshfrogs.io/non-fungi-bles/Mycelium/'+mycelium[celium-1]+'.png';
           mushroom_mycelium.className = 'mushroom_img';
+          mushroom_mycelium.alt = mycelium[celium-1];
           destination.appendChild(mushroom_mycelium);
 
         } else if (overlay_one == 2) {
@@ -824,6 +827,7 @@
           mushroom_stripe = document.createElement('img');
           mushroom_stripe.src = 'https://freshfrogs.io/non-fungi-bles/Stripe/'+stripes[stripe-1]+'.png';
           mushroom_stripe.className = 'mushroom_img';
+          mushroom_stripe.alt = stripes[stripe-1];
           destination.appendChild(mushroom_stripe);
 
         } else if (overlay_one == 3) {
@@ -835,6 +839,7 @@
           mushroom_volva = document.createElement('img');
           mushroom_volva.src = 'https://freshfrogs.io/non-fungi-bles/Volva/'+volvas[volva-1]+'.png';
           mushroom_volva.className = 'mushroom_img';
+          mushroom_volva.alt = volvas[volva-1];
           destination.appendChild(mushroom_volva);
 
         }
@@ -848,6 +853,7 @@
           mushroom_scales = document.createElement('img');
           mushroom_scales.src = 'https://freshfrogs.io/non-fungi-bles/Scales/'+scales[scale-1]+'.png';
           mushroom_scales.className = 'mushroom_img';
+          mushroom_scales.alt = scales[scale-1];
           destination.appendChild(mushroom_scales);
 
         } else if (overlay_two == 2) {
@@ -859,6 +865,7 @@
           mushroom_spores = document.createElement('img');
           mushroom_spores.src = 'https://freshfrogs.io/non-fungi-bles/Spores/'+spores[spore-1]+'.png';
           mushroom_spores.className = 'mushroom_img';
+          mushroom_spores.alt = spores[spore-1];
           destination.appendChild(mushroom_spores);
 
         }
