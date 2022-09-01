@@ -762,7 +762,7 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        generate_background_frogs(404);
+        generate_background_frogs(481);
 
       })
 
@@ -778,7 +778,7 @@
           document.getElementById('thePad').appendChild(jContainer);
 
           try {
-            
+
             let jMetadata = await (await fetch("https://freshfrogs.io/frog/json/"+jFrog+".json")).json();
             for (j = 0; j < jMetadata.attributes.length; j++) {
 
