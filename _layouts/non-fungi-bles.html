@@ -788,6 +788,12 @@
 
         //document.getElementById('traits').innerHTML = '';
 
+        nonfungible = document.createElement('img');
+        nonfungible.src = 'https://freshfrogs.io/non-fungi-bles/non-fungi-ble.png';
+        nonfungible.className = 'mushroom_img';
+        nonfungible.alt = 'non-fungi-ble';
+        destination.appendChild(nonfungible);
+
         // Generate Stem => 
         const stems = [ "black", "brown", "darkroot", "hazlenut", "moss", "oaknut", "tan" ]
         stem = getRandomInt(1, stems.length);
