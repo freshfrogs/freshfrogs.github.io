@@ -800,7 +800,13 @@
         const mushroom_4_smallCaps = [ "Blue", "Brown", "DarkRed", "Green", "GreyBlue", "LightBlue", "LightRed", "Orange", "Purple", "White", "Yellow" ]
         const mushroom_4_stems = [ "Blue", "DarkBrown", "Green", "Grey", "LightBrown", "Purple" ]
 
+        // Reset Generator
+        destination = document.getElementById('mushroom');
+        destination.innerHTML = ''
+
         const backgrounds = [ "#ff99a8", "#99ffe6", "#99ffaa", "#fffd99", "#ff99ec", "#a099ff", "#99ffbe", "#ffc299" ]
+        background = getRandomInt(1, backgrounds.length);
+        document.getElementById('mushroom_frame').style.background = backgrounds[background-1];
 
         /*
         nonfungible = document.createElement('img');
@@ -810,14 +816,7 @@
         destination.appendChild(nonfungible);
         */
 
-        // MUSHROOM_1
-
-          // Reset Generator
-          destination = document.getElementById('mushroom1');
-          destination.innerHTML = ''
-
-          background = getRandomInt(1, backgrounds.length);
-          document.getElementById('mushroom_frame1').style.background = backgrounds[background-1];
+        if (mushroom_type == 1) {
 
           // ==> MUSHROOM_1
 
@@ -900,14 +899,7 @@
 
           }
 
-        // MUSHROOM_2
-
-          // Reset Generator
-          destination = document.getElementById('mushroom2');
-          destination.innerHTML = ''
-
-          background = getRandomInt(1, backgrounds.length);
-          document.getElementById('mushroom_frame2').style.background = backgrounds[background-1];
+        } else if (mushroom_type == 2) {
 
           // Generate Stem =>
           mushroom_2_stem_type = getRandomInt(1, mushroom_2_stems.length);
@@ -933,14 +925,7 @@
           mushroom_2_dot.alt = mushroom_2_dots[mushroom_2_dot_type-1];
           destination.appendChild(mushroom_2_dot);
 
-        // MUSHROOM_3
-
-          // Reset Generator
-          destination = document.getElementById('mushroom3');
-          destination.innerHTML = ''
-
-          background = getRandomInt(1, backgrounds.length);
-          document.getElementById('mushroom_frame3').style.background = backgrounds[background-1];
+        } else if (mushroom_type == 3) {
 
           // Generate Stem =>
           mushroom_3_stem_type = getRandomInt(1, mushroom_3_stems.length);
@@ -974,14 +959,7 @@
           mushroom_3_moss.alt = mushroom_3_mossi[mushroom_3_moss_type-1];
           destination.appendChild(mushroom_3_moss);
 
-        // MUSHROOM_4
-
-          // Reset Generator
-          destination = document.getElementById('mushroom4');
-          destination.innerHTML = ''
-
-          background = getRandomInt(1, backgrounds.length);
-          document.getElementById('mushroom_frame4').style.background = backgrounds[background-1];
+        } else if (mushroom_type == 4) {
 
           // Generate Stem =>
           mushroom_4_stem_type = getRandomInt(1, mushroom_4_stems.length);
@@ -1023,6 +1001,8 @@
           mushroom_4_dot.alt = mushroom_4_dots[mushroom_4_dot_type-1];
           destination.appendChild(mushroom_4_dot);
 
+        }
+
       }
 
       function getRandomInt(min, max) { // min and max included 
@@ -1038,10 +1018,7 @@
         <div class="top">{{ content }}</div>
         <div class="downloads pre">
           <div id="netStatus" class="netStatus">
-              <div id="mushroom_frame2" class="mushroom_frame"><div id="mushroom1" class="mushroom"><img src="fungi.png"></div></div>
-              <div id="mushroom_frame3" class="mushroom_frame"><div id="mushroom2" class="mushroom"><img src="fungi.png"></div></div>
-              <div id="mushroom_frame4" class="mushroom_frame"><div id="mushroom3" class="mushroom"><img src="fungi.png"></div></div>
-              <div id="mushroom_frame5" class="mushroom_frame"><div id="mushroom4" class="mushroom"><img src="fungi.png"></div></div>
+              <div id="mushroom_frame" class="mushroom_frame"><div id="mushroom" class="mushroom"><img src="fungi.png"></div></div>
               <br>
               <button onclick="generate_NFB(getRandomInt(1, 4))" style="list-style: none; min-height: 40px; padding: 8px; border-radius: 5px; border: 1px solid black; width: auto; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">
                 Generate 🍄 Non-fungi-ble
