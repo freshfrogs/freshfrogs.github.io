@@ -786,7 +786,7 @@
         overlay_one = getRandomInt(1, 3);
         overlay_two = getRandomInt(1, 2);
 
-        document.getElementById('traits').innerHTML = '';
+        //document.getElementById('traits').innerHTML = '';
 
         // Generate Stem => 
         const stems = [ "black", "brown", "darkroot", "hazlenut", "moss", "oaknut", "tan" ]
@@ -800,7 +800,7 @@
 
         some_text = document.createElement('div');
         some_text.innerHTML = '"Stem : '+stems[stem-1]+'"';
-        document.getElementById('traits').appendChild(some_text);
+        //document.getElementById('traits').appendChild(some_text);
 
         // Generate Cap =>
         const caps = ["blue", "brown", "cyan", "darkBlue", "darkBrown", "darkGreen", "darkPurple", "green", "lightBrown", "mauveine", "midnightGreen", "pink", "purple", "red", "violet", "white", "yellow"]
@@ -814,7 +814,7 @@
 
         some_text = document.createElement('div');
         some_text.innerHTML = '"Cap : '+caps[cap-1]+'"';
-        document.getElementById('traits').appendChild(some_text);
+        //document.getElementById('traits').appendChild(some_text);
 
         if (overlay_one == 1) {
 
@@ -830,7 +830,7 @@
 
           some_text = document.createElement('div');
           some_text.innerHTML = '"Mycelium : '+mycelium[celium-1]+'"';
-          document.getElementById('traits').appendChild(some_text);
+          //document.getElementById('traits').appendChild(some_text);
 
         } else if (overlay_one == 2) {
 
@@ -846,7 +846,7 @@
 
           some_text = document.createElement('div');
           some_text.innerHTML = '"Stripes : '+stripes[stripe-1]+'"';
-          document.getElementById('traits').appendChild(some_text);
+          //document.getElementById('traits').appendChild(some_text);
 
         } else if (overlay_one == 3) {
 
@@ -862,7 +862,7 @@
 
           some_text = document.createElement('div');
           some_text.innerHTML = '"Volvas : '+volvas[volva-1]+'"';
-          document.getElementById('traits').appendChild(some_text);
+          //document.getElementById('traits').appendChild(some_text);
 
         }
 
@@ -880,7 +880,7 @@
 
           some_text = document.createElement('div');
           some_text.innerHTML = '"Scales : '+scales[scale-1]+'"';
-          document.getElementById('traits').appendChild(some_text);
+          //document.getElementById('traits').appendChild(some_text);
 
         } else if (overlay_two == 2) {
 
@@ -896,7 +896,7 @@
 
           some_text = document.createElement('div');
           some_text.innerHTML = '"Spores : '+spores[spore-1]+'"';
-          document.getElementById('traits').appendChild(some_text);
+          //document.getElementById('traits').appendChild(some_text);
 
         }
       }
@@ -916,7 +916,7 @@
           <div id="netStatus" class="netStatus">
               <div id="mushroom_frame" class="mushroom_frame"><div id="mushroom" class="mushroom"><img src="fungi.png"></div></div>
               <br>
-              <button onclick="generate_NFB()" style="list-style: none; min-height: 40px; padding: 8px; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">
+              <button onclick="generate_NFB()" style="list-style: none; min-height: 40px; padding: 8px; border-radius: 5px; border: 1px solid black; width: auto; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">
                 Generate 🍄 Non-fungi-ble
               </button>
           </div>
