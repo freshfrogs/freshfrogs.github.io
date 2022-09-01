@@ -770,14 +770,14 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        generate_background_frogs(10);
+        generate_background_frogs();
 
       })
 
 
-      async function generate_background_frogs(ammount) {
+      async function generate_background_frogs() {
 
-        for (i = 0; i < ammount; i++) {
+        for (i = 0; i < 10; i++) {
 
           jFrog = getRandomInt(0, 4040);
           jContainer = document.createElement('div');
