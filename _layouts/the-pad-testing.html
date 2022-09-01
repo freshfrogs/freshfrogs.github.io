@@ -794,7 +794,9 @@
 
           } catch (e) {
 
-            document.getElementById('j_'+jFrog).remove();
+            console.log(e.message)
+            element = document.getElementById('j_'+jFrog);
+            element.remove();
 
           }
 
