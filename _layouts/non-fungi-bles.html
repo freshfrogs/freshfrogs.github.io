@@ -789,10 +789,10 @@
         const mushroom_2_caps = [ "BlueCamo", "CoolColors", "DarkBlue", "DarkerBlue", "Fog", "GoldPurple", "Green", "GreenCamo", "GreenMagenta", "GreyBlue", "LightBlue", "LightPurple", "LightRed", "Natural", "Navy", "Orange", "Plumb", "Purple", "Rainbow", "Red", "Teal", "WarmColors", "Yellow" ]
         const mushroom_2_stems = [ "DarkBrown", "DarkGreen", "GreyBrown", "LightBrown", "LightGreen", "LightGrey", "Yellow" ]
 
-        const mushroom_3_cap = [ "Blue", "DarkRed", "Green", "Grey", "GreyBlue", "LightGreen", "LightPurple", "LightRed", "LightTeal", "Orange", "Pink", "Purple", "Red", "Teal" ]
-        const mushroom_3_moss = [ "DarkGreen", "Green", "Orange", "Purple", "Teal", "Yellow" ]
+        const mushroom_3_caps = [ "Blue", "DarkRed", "Green", "Grey", "GreyBlue", "LightGreen", "LightPurple", "LightRed", "LightTeal", "Orange", "Pink", "Purple", "Red", "Teal" ]
+        const mushroom_3_mossi = [ "DarkGreen", "Green", "Orange", "Purple", "Teal", "Yellow" ]
         const mushroom_3_smallerCaps = [ "Blue", "Camo", "Green", "Yellow" ]
-        const mushroom_3_stem = [ "Brown", "DarkBrown", "Green", "Grey", "LightBrown", "Yellow" ]
+        const mushroom_3_stems = [ "Brown", "DarkBrown", "Green", "Grey", "LightBrown", "Yellow" ]
 
         const mushroom_4_dots = [ "Blue", "Lavender", "Pink", "Purple", "Rainbow", "White", "Yellow" ]
         const mushroom_4_extraShrooms = [ "Blue", "DarkYellow", "Green", "Grey", "Lavender", "Pink", "Tan", "Yellow" ]
@@ -902,7 +902,7 @@
           // Generate Stem =>
           mushroom_2_stem_type = getRandomInt(1, mushroom_2_stems.length);
           mushroom_2_stem = document.createElement('img');
-          mushroom_2_stem.src = 'https://freshfrogs.io/non-fungi-bles/mushroom_2/Caps/'+mushroom_2_stems[mushroom_2_stem_type-1]+'.png';
+          mushroom_2_stem.src = 'https://freshfrogs.io/non-fungi-bles/mushroom_2/Stems/'+mushroom_2_stems[mushroom_2_stem_type-1]+'.png';
           mushroom_2_stem.className = 'mushroom_img';
           mushroom_2_stem.alt = mushroom_2_stems[mushroom_2_stem_type-1];
           destination.appendChild(mushroom_2_stem);
@@ -918,10 +918,20 @@
           // Generate Dots=>
           mushroom_2_dot_type = getRandomInt(1, mushroom_2_dots.length);
           mushroom_2_dot = document.createElement('img');
-          mushroom_2_dot.src = 'https://freshfrogs.io/non-fungi-bles/mushroom_2/Caps/'+mushroom_2_dots[mushroom_2_dot_type-1]+'.png';
+          mushroom_2_dot.src = 'https://freshfrogs.io/non-fungi-bles/mushroom_2/Dots/'+mushroom_2_dots[mushroom_2_dot_type-1]+'.png';
           mushroom_2_dot.className = 'mushroom_img';
           mushroom_2_dot.alt = mushroom_2_dots[mushroom_2_dot_type-1];
           destination.appendChild(mushroom_2_dot);
+
+        } else if (mushroom_type == 3) {
+
+          // Generate Stem =>
+          mushroom_3_stem_type = getRandomInt(1, mushroom_3_stems.length);
+          mushroom_3_stem = document.createElement('img');
+          mushroom_3_stem.src = 'https://freshfrogs.io/non-fungi-bles/mushroom_2/Caps/'+mushroom_3_stems[mushroom_3_stem_type-1]+'.png';
+          mushroom_3_stem.className = 'mushroom_img';
+          mushroom_3_stem.alt = mushroom_3_stems[mushroom_3_stem_type-1];
+          destination.appendChild(mushroom_3_stem);
 
         }
 
