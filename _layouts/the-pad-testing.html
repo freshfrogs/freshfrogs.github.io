@@ -782,7 +782,7 @@
           jFrog = getRandomInt(0, 4040);
           jContainer = document.createElement('div');
           jContainer.id = 'j_'+jFrog
-          document.getElementById('the-pad').appendChild(jContainer);
+          document.getElementById('thePad').appendChild(jContainer);
 
           let jMetadata = await (await fetch("https://freshfrogs.io/frog/json/"+jFrog+".json")).json();
           for (j = 0; j < jMetadata.attributes.length; i++) {
