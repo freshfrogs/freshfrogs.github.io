@@ -770,14 +770,14 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        generate_background_frogs();
+        generate_background_frogs(10);
 
       })
 
 
-      async function generate_background_frogs() {
+      async function generate_background_frogs(ammount) {
 
-        for (i = 0; i < 10; i++) {
+        for (i = 0; i < ammount; i++) {
 
           jFrog = getRandomInt(0, 4040);
           jContainer = document.createElement('div');
@@ -785,7 +785,7 @@
           document.getElementById('thePad').appendChild(jContainer);
 
           let jMetadata = await (await fetch("https://freshfrogs.io/frog/json/"+jFrog+".json")).json();
-          for (j = 0; j < jMetadata.attributes.length; i++) {
+          for (j = 0; j < jMetadata.attributes.length; j++) {
 
             jAttribute = jMetadata.attributes[j]
 
