@@ -786,6 +786,8 @@
         overlay_one = getRandomInt(1, 3);
         overlay_two = getRandomInt(1, 2);
 
+        document.getElementById('traits').innerHTML = '';
+
         // Generate Stem => 
         const stems = [ "black", "brown", "darkroot", "hazlenut", "moss", "oaknut", "tan" ]
         stem = getRandomInt(1, stems.length);
