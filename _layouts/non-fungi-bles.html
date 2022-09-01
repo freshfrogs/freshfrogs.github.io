@@ -928,10 +928,44 @@
           // Generate Stem =>
           mushroom_3_stem_type = getRandomInt(1, mushroom_3_stems.length);
           mushroom_3_stem = document.createElement('img');
-          mushroom_3_stem.src = 'https://freshfrogs.io/non-fungi-bles/mushroom_2/Caps/'+mushroom_3_stems[mushroom_3_stem_type-1]+'.png';
+          mushroom_3_stem.src = 'https://freshfrogs.io/non-fungi-bles/mushroom_2/Stems/'+mushroom_3_stems[mushroom_3_stem_type-1]+'.png';
           mushroom_3_stem.className = 'mushroom_img';
           mushroom_3_stem.alt = mushroom_3_stems[mushroom_3_stem_type-1];
           destination.appendChild(mushroom_3_stem);
+
+          // Generate Cap =>
+          mushroom_3_cap_type = getRandomInt(1, mushroom_3_caps.length);
+          mushroom_3_cap = document.createElement('img');
+          mushroom_3_cap.src = 'https://freshfrogs.io/non-fungi-bles/mushroom_2/Caps/'+mushroom_3_caps[mushroom_3_cap_type-1]+'.png';
+          mushroom_3_cap.className = 'mushroom_img';
+          mushroom_3_cap.alt = mushroom_3_caps[mushroom_3_cap_type-1];
+          destination.appendChild(mushroom_3_cap);
+
+          // Generate Cap =>
+          mushroom_3_smallerCap_type = getRandomInt(1, mushroom_3_smallerCaps.length);
+          mushroom_3_smallerCap = document.createElement('img');
+          mushroom_3_smallerCap.src = 'https://freshfrogs.io/non-fungi-bles/mushroom_2/SmallerCaps/'+mushroom_3_smallerCaps[mushroom_3_smallerCap_type-1]+'.png';
+          mushroom_3_smallerCap.className = 'mushroom_img';
+          mushroom_3_smallerCap.alt = mushroom_3_smallerCaps[mushroom_3_smallerCap_type-1];
+          destination.appendChild(mushroom_3_smallerCap);
+
+          // Generate Moss =>
+          mushroom_3_moss_type = getRandomInt(1, mushroom_3_mossi.length);
+          mushroom_3_moss = document.createElement('img');
+          mushroom_3_moss.src = 'https://freshfrogs.io/non-fungi-bles/mushroom_2/SmallerCaps/'+mushroom_3_mossi[mushroom_3_moss_type-1]+'.png';
+          mushroom_3_moss.className = 'mushroom_img';
+          mushroom_3_moss.alt = mushroom_3_mossi[mushroom_3_moss_type-1];
+          destination.appendChild(mushroom_3_moss);
+
+        } else if (mushroom_type == 4) {
+
+          // Generate Stem =>
+          mushroom_4_stem_type = getRandomInt(1, mushroom_4_stems.length);
+          mushroom_4_stem = document.createElement('img');
+          mushroom_4_stem.src = 'https://freshfrogs.io/non-fungi-bles/mushroom_2/Stems/'+mushroom_4_stems[mushroom_4_stem_type-1]+'.png';
+          mushroom_4_stem.className = 'mushroom_img';
+          mushroom_4_stem.alt = mushroom_4_stems[mushroom_4_stem_type-1];
+          destination.appendChild(mushroom_4_stem);
 
         }
 
@@ -952,7 +986,7 @@
           <div id="netStatus" class="netStatus">
               <div id="mushroom_frame" class="mushroom_frame"><div id="mushroom" class="mushroom"><img src="fungi.png"></div></div>
               <br>
-              <button onclick="generate_NFB()" style="list-style: none; min-height: 40px; padding: 8px; border-radius: 5px; border: 1px solid black; width: auto; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">
+              <button onclick="generate_NFB(2)" style="list-style: none; min-height: 40px; padding: 8px; border-radius: 5px; border: 1px solid black; width: auto; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">
                 Generate 🍄 Non-fungi-ble
               </button>
           </div>
