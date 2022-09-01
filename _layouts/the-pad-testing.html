@@ -777,18 +777,27 @@
           jContainer.id = 'j_'+jFrog
           document.getElementById('thePad').appendChild(jContainer);
 
-          let jMetadata = await (await fetch("https://freshfrogs.io/frog/json/"+jFrog+".json")).json();
-          for (j = 0; j < jMetadata.attributes.length; j++) {
+          try {
+            
+            let jMetadata = await (await fetch("https://freshfrogs.io/frog/json/"+jFrog+".json")).json();
+            for (j = 0; j < jMetadata.attributes.length; j++) {
 
-            jAttribute = jMetadata.attributes[j]
+              jAttribute = jMetadata.attributes[j]
 
-            displayFrog = document.createElement("img");
-            displayFrog.src = "https://freshfrogs.io/the-pond/"+jAttribute.trait_type+"/"+jAttribute.value+".png";
-            displayFrog.alt = jAttribute.value
-            displayFrog.className = "j_img";
-            document.getElementById('j_'+jFrog).appendChild(displayFrog);
+              displayFrog = document.createElement("img");
+              displayFrog.src = "https://freshfrogs.io/the-pond/"+jAttribute.trait_type+"/"+jAttribute.value+".png";
+              displayFrog.alt = jAttribute.value
+              displayFrog.className = "j_img";
+              document.getElementById('j_'+jFrog).appendChild(displayFrog);
+
+            }
+
+          } catch (e) {
+
+            document.getElementById('j_'+jFrog).remove();
 
           }
+
         }
       }
 
