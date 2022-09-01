@@ -728,7 +728,7 @@
       float: none;
       font-size: small;
     }
-    .mushroom_img {
+    .j_img {
       transition: all .2s;
       display: block;
       image-rendering: pixelated;
@@ -738,20 +738,12 @@
       height: 128px;
       border-radius: 5px;
     }
-    .mushroom {
+    .j_frame {
       width: 128px;
       height: 128px;
       display: inline-block;
       background: transparent;
       margin: 32px;
-    }
-    .mushroom_frame {
-      border: 1px solid white;
-      width: 200px;
-      height: 200px;
-      border-radius: 100%;
-      margin-left: auto;
-      margin-right: auto;
     }
   </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -781,6 +773,7 @@
 
           jFrog = getRandomInt(0, 4040);
           jContainer = document.createElement('div');
+          jContainer.className = "j_frame";
           jContainer.id = 'j_'+jFrog
           document.getElementById('thePad').appendChild(jContainer);
 
@@ -792,7 +785,7 @@
             displayFrog = document.createElement("img");
             displayFrog.src = "https://freshfrogs.io/the-pond/"+jAttribute.trait_type+"/"+jAttribute.value+".png";
             displayFrog.alt = jAttribute.value
-            displayFrog.className = "frogImg4";
+            displayFrog.className = "j_img";
             document.getElementById('j_'+jFrog).appendChild(displayFrog);
 
           }
