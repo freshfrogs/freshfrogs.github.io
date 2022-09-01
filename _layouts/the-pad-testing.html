@@ -734,13 +734,13 @@
       image-rendering: pixelated;
       overflow: hidden;
       position: absolute;
-      width: 128px;
-      height: 128px;
+      width: 64px;
+      height: 64px;
       border-radius: 5px;
     }
     .j_frame {
-      width: 128px;
-      height: 128px;
+      width: 64px;
+      height: 64px;
       display: inline-block;
       background: transparent;
       margin: -8px;
@@ -771,7 +771,7 @@
 
         for (i = 0; i < ammount; i++) {
 
-          jFrog = getRandomInt(0, 4040);
+          jFrog = getRandomInt(1, 4040);
           jContainer = document.createElement('div');
           jContainer.className = "j_frame";
           jContainer.id = 'j_'+jFrog
