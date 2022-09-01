@@ -270,10 +270,14 @@
       background-color: #7cc1ff;
       text-align: center;
       border-radius: 7px;
-      padding: 0px !important;
+      padding: 64px !important;
       overflow: hidden;
       margin-bottom: 16px;
       font-size: small !important;
+      float: none !important;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 10%;
     }
     header {
       overflow: hidden;
@@ -724,6 +728,31 @@
       float: none;
       font-size: small;
     }
+    .mushroom_img {
+      transition: all .2s;
+      display: block;
+      image-rendering: pixelated;
+      overflow: hidden;
+      position: absolute;
+      width: 128px;
+      height: 128px;
+      border-radius: 5px;
+    }
+    .mushroom {
+      width: 128px;
+      height: 128px;
+      display: inline-block;
+      background: transparent;
+      margin: 32px;
+    }
+    .mushroom_frame {
+      border: 1px solid white;
+      width: 200px;
+      height: 200px;
+      border-radius: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
   </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -737,44 +766,41 @@
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
-    
-    <script src="https://freshfrogs.io/the-pond/banner/FileSaver.js"></script>
-    <script src="https://freshfrogs.io/the-pond/banner/dom-to-image.js"></script>
-    <script src="https://freshfrogs.io/assets/js/FreshFrogsNFT.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
-    <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
-    <script src="https://unpkg.com/f0js/dist/f0.js"></script>
-
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
     <script>
-      // C 0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38 | A 0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25
-      // <-- [Google Analytics]
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-6PB0WKB4SH');
-      // -- >
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        document.getElementById('displayImg1').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(1, 4040)+'.png');
-        document.getElementById('displayImg2').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(1, 4040)+'.png');
-        document.getElementById('displayImg3').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(1, 4040)+'.png');
-
-        await connect_init();
+        generate_background_frogs(10);
 
       })
 
-      function getRandomInt(min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min) + min);
+
+      async function generate_background_frogs(ammount) {
+
+        for (i = 0; i < ammount; i++) {
+
+          jFrog = getRandomInt(0, 4040);
+          jContainer = document.createElement('div');
+          jContainer.id = 'j_'+jFrog
+          document.getElementById('the-pad').appendChild(jContainer);
+
+          let jMetadata = await (await fetch("https://freshfrogs.io/frog/json/"+jFrog+".json")).json();
+          for (j = 0; j < jMetadata.attributes.length; i++) {
+
+            jAttribute = jMetadata.attributes[j]
+
+            displayFrog = document.createElement("img");
+            displayFrog.src = "https://freshfrogs.io/the-pond/"+jAttribute.trait_type+"/"+jAttribute.value+".png";
+            displayFrog.alt = jAttribute.value
+            displayFrog.className = "frogImg4";
+            document.getElementById('j_'+jFrog).appendChild(displayFrog);
+
+          }
+        }
       }
 
-      async function connect_init() {
-        await connect();
-        await fetch_user_data(user_address);
+      function getRandomInt(min, max) { // min and max included 
+        return Math.floor(Math.random() * (max - min + 1) + min)
       }
 
     </script>
@@ -782,46 +808,9 @@
   </head>
   <body class="bodyb">
     <div class="wrapper">
-      <header id="thisheader">
-        <div class="downloads pre">
-          <ul class="downloads2">
-            <li><a id="button_left" class="pointer" href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><strong>Etherscan</strong>Contract</a></li>
-            <li><a id="button_middle" class="pointer" href="https://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong>Server</a></li>
-            <li><a id="button_right" onclick="randomMorph()"><strong>Random</strong>Morph</a></li>
-          </ul>
-          <div id="mintingTray" class="mintingTray">
-            <div class="bigContainer">
-              <div id="frogContainer3" class="containerMint">
-                <div id="frogContainer4" class="imgWrapperMint">
-                  <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/FLY.gif"/>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
       <section>
         <div class="top">{{ content }}</div>
         <div class="downloads pre">
-          <div id="netStatus" class="netStatus">
-            <div id="recent_mints" class="recent_mints"><img src="https://freshfrogs.github.io/frog/1205.png" class="recentMint" id="displayImg1"><img src="https://freshfrogs.github.io/frog/1206.png" class="recentMint" id="displayImg2"><img src="https://freshfrogs.github.io/frog/1207.png" class="recentMint" id="displayImg3"></div>
-            <br>
-            <h1 style="color: white !important;">FreshFrogsNFT</h1>
-            <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
-            opensea.io/collection/fresh-frogs<a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong style="color: white;">Shop on OpenSea ⛵</strong></a>
-            <br>
-            <div id="pre" class="mintingTextWhite2">
-              <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="https://freshfrogs.io/the-pond">
-                <button onclick="connect_init()" style="list-style: none; min-height: 40px; padding: 8px; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">
-                  <strong>Stake and Earn Rewards!</strong>Connect Ethereum Wallet
-                </button>
-              </a>
-              <br>
-              <hr style="background: black;">
-              <div class="console_pre" id="console-pre"></div>
-            </div>
-          </div>
-          <br>
           <div id="thePad" class="thePad"></div>
         </div>
       </section>
