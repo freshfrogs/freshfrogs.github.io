@@ -39,6 +39,10 @@
       margin: 0%;
       image-rendering: pixelated;
       text-align: center;
+      color: white;
+      width: 30%;
+      margin-left: auto;
+      margin-right: auto;
     }
     .smallContainer{
       border-radius: 5px;
@@ -215,15 +219,6 @@
       box-shadow: none;
       border: none;
     }
-    .h1 {
-      
-      font-weight: 800;
-      color: white;
-      text-align: center;
-      image-rendering: pixelated;
-      padding: 0%;
-      font-size: xx-large;
-    }
     .supply{
       
       color: #333;
@@ -310,9 +305,6 @@
     }
     .downloads li {
       border-right: none;
-    }
-    .pre h1{
-      margin-top: 8px;
     }
     .container {
       height: 256px;
@@ -711,6 +703,9 @@
       float: none;
       font-size: small;
     }
+    h1 {
+      font-size: x-large !important;
+    }
   </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -763,14 +758,15 @@
     
   </head>
   <body class="bodyb">
+    <div class="top">{{ content }}
+      <h1 style="color: white !important;">FreshFrogsNFT</h1>
+      <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
+    </div>
     <section>
-      <div class="top">{{ content }}</div>
       <div class="downloads pre">
         <div id="netStatus" class="netStatus">
           <img src="https://freshfrogs.io/assets/frogs/FreshFrogsNFT.png" class="recentMint" id="displayImg1">
           <br>
-          <h1 style="color: white !important;">FreshFrogsNFT</h1>
-          <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
           <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="https://freshfrogs.io/the-pond">
             <button onclick="connect_init()" style="list-style: none; min-height: 40px; padding: 8px; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">
               <strong>Stake and Earn Rewards!</strong>Connect Ethereum Wallet
