@@ -758,12 +758,6 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        document.getElementById('displayImg1').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(1, 4040)+'.png');
-        document.getElementById('displayImg2').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(1, 4040)+'.png');
-        document.getElementById('displayImg3').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(1, 4040)+'.png');
-
-        await connect_init();
-
       })
 
       function getRandomInt(min, max) {
@@ -783,24 +777,6 @@
   </head>
   <body class="bodyb">
     <div class="wrapper">
-      <header id="thisheader">
-        <div class="downloads pre">
-          <ul class="downloads2">
-            <li><a id="button_left" class="pointer" href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><strong>Etherscan</strong>Contract</a></li>
-            <li><a id="button_middle" class="pointer" href="https://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong>Server</a></li>
-            <li><a id="button_right" class="pointer" href="https://www.gem.xyz/collection/fresh-frogs" target="_blank"><strong>Gemxyz</strong>Rankings</a></li>
-          </ul>
-          <div id="mintingTray" class="mintingTray">
-            <div class="bigContainer">
-              <div id="frogContainer3" class="containerMint">
-                <div id="frogContainer4" class="imgWrapperMint">
-                  <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/FLY.gif"/>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
       <section>
         <div class="top">{{ content }}</div>
         <div class="downloads pre">
