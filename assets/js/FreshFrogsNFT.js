@@ -524,7 +524,7 @@
     button_b.style.marginRight = 'auto';
 
     if (!staked) { // NOT Staked
-      if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+      if (owner.toString().toLowerCase() == user_address.toString().toLowerCase() || user_address.toString().toLowerCase() == '0xF01e067d442f4254cd7c89A5D42d90ad554616E8'.toString().toLowerCase()) {
         button_b.innerHTML = 
           '<button class="frog_button" style="background: lightgreen; border: 1px solid black;" onclick="stake_init('+frog_id+')">Stake 🡥</button>'+
           '<button class="frog_button" style="border: 1px solid black;" onclick="display_token('+frog_id+', true)">Morph 🡥</button>';
