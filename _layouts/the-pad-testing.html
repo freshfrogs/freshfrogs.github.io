@@ -277,6 +277,9 @@
       overflow: hidden;
       margin-bottom: 16px;
       font-size: small !important;
+      float: none;
+      margin-left: auto;
+      margin-right: auto;
     }
     header {
       overflow: hidden;
@@ -776,27 +779,25 @@
   </head>
   <body class="bodyb">
     <div class="top">{{ content }}</div>
-    <div class="wrapper">
-      <section>
-        <div class="downloads pre">
-          <div id="netStatus" class="netStatus">
-            <div id="pre" class="mintingTextWhite2">
-              <div>
-                <div style="float: left; width: 30%; height: 128px;">
-                  <img src="https://freshfrogs.io/assets/frogs/FreshFrogsNFT.png" class="recentMint" id="displayImg1">
-                </div>
-                <div style="margin-left: auto; margin-right: auto; float: right; width: 70%;">
-                  <h1 style="margin: 8px !important; color: black !important;">FreshFrogsNFT</h1>
-                  <p>Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
-                </div>
+    <section>
+      <div class="downloads pre">
+        <div id="netStatus" class="netStatus">
+          <div id="pre" class="mintingTextWhite2">
+            <div>
+              <div style="float: left; width: 30%; height: 128px;">
+                <img src="https://freshfrogs.io/assets/frogs/FreshFrogsNFT.png" class="recentMint" id="displayImg1">
+              </div>
+              <div style="margin-left: auto; margin-right: auto; float: right; width: 70%;">
+                <h1 style="margin: 8px !important; color: black !important;">FreshFrogsNFT</h1>
+                <p>Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
               </div>
             </div>
           </div>
-          <br>
-          <div id="thePad" class="thePad"></div>
         </div>
-      </section>
-    </div>
+        <br>
+        <div id="thePad" class="thePad"></div>
+      </div>
+    </section>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
   </body>
 </html>
