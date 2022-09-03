@@ -789,13 +789,13 @@
           shroom_frame.id = 'mushroom_frame_'+i;
           shroom_frame.innerHTML = '<div clas="mushroom" id="shroom_'+i+'"></div>'
           document.getElementById('thePad').appendChild(shroom_frame)
-          generate_NFB('shroom_'+i);
+          generate_NFB(i);
 
         }
 
       }
 
-      async function generate_NFB(whereTo) {
+      async function generate_NFB(mushroomNumber) {
 
         mushroom_type = getRandomInt(1, 4);
 
@@ -824,12 +824,12 @@
         const mushroom_4_stems = [ "Blue", "DarkBrown", "Green", "Grey", "LightBrown", "Purple" ]
 
         // Reset Generator
-        destination = document.getElementById(whereTo);
+        destination = document.getElementById('shroom_'+mushroomNumber);
         //destination.innerHTML = ''
 
         const backgrounds = [ "#ff99a8", "#99ffe6", "#99ffaa", "#fffd99", "#ff99ec", "#a099ff", "#99ffbe", "#ffc299" ]
         background = getRandomInt(1, backgrounds.length);
-        destination.style.background = backgrounds[background-1];
+        document.getElementById('mushroom_frame_'+mushroomNumber).style.background = backgrounds[background-1];
 
         /*
         nonfungible = document.createElement('img');
