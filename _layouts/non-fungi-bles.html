@@ -772,6 +772,8 @@
 
       async function begin_build(howMany) {
 
+        document.getElementById('thePad').innerHTML = ''
+
         for (let i = 0; i < howMany; i++) {
 
           shroom_frame = document.createElement('div')
@@ -1037,7 +1039,7 @@
             <p>"Non-Fungi-bles" is a collection of randomly generated, pixelated mushrooms on the Ethereum blockchain</p>
           </div>
         </div>
-        <button onclick="begin_build(getRandomInt(1, 4))" style="list-style: none; min-height: 40px; padding: 8px; border-radius: 5px; border: 1px solid black; width: auto; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">
+        <button onclick="begin_build(10)" style="list-style: none; min-height: 40px; padding: 8px; border-radius: 5px; border: 1px solid black; width: auto; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">
           Generate 🍄 Non-fungi-ble
         </button>
       </div>
