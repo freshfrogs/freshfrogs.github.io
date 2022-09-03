@@ -750,6 +750,8 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
+        await connect_init();
+
       })
 
       function getRandomInt(min, max) {
@@ -781,6 +783,8 @@
         </div>
       </div>
     </section>
+    <br>
+    <div id="thePad" class="thePad"></div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
   </body>
 </html>
