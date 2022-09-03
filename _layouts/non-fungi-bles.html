@@ -717,8 +717,8 @@
       font-size: small;
     }
     .mushroom {
-      width: 64px;
-      height: 64px;
+      width: 128px;
+      height: 128px;
       display: inline-block;
       background: transparent;
       margin: 32px;
@@ -729,8 +729,8 @@
       image-rendering: pixelated;
       overflow: hidden;
       position: absolute;
-      width: 64px;
-      height: 64px;
+      width: 128px;
+      height: 128px;
       border-radius: 5px;
     }
   </style>
@@ -818,9 +818,9 @@
         destination = document.getElementById(whereTo);
         //destination.innerHTML = ''
 
-        //const backgrounds = [ "#ff99a8", "#99ffe6", "#99ffaa", "#fffd99", "#ff99ec", "#a099ff", "#99ffbe", "#ffc299" ]
-        //background = getRandomInt(1, backgrounds.length);
-        //document.getElementById('mushroom_frame').style.background = backgrounds[background-1];
+        const backgrounds = [ "#ff99a8", "#99ffe6", "#99ffaa", "#fffd99", "#ff99ec", "#a099ff", "#99ffbe", "#ffc299" ]
+        background = getRandomInt(1, backgrounds.length);
+        document.getElementById(destination).style.background = backgrounds[background-1];
 
         /*
         nonfungible = document.createElement('img');
@@ -1039,16 +1039,13 @@
             <p>"Non-Fungi-bles" is a collection of randomly generated, pixelated mushrooms on the Ethereum blockchain</p>
           </div>
         </div>
-        <br>
         <button onclick="begin_build(10)" style="list-style: none; min-height: 40px; padding: 8px; border-radius: 5px; border: 1px solid black; width: auto; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">
           Generate 🍄 Non-fungi-ble
         </button>
       </div>
     </section>
     <br>
-    <section style="background: antiquewhite; border-radius: 5px;">
-      <div id="thePad" class="thePad"></div>
-    </section>
+    <div id="thePad" class="thePad"></div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
   </body>
 </html>
