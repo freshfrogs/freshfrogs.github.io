@@ -790,15 +790,13 @@
           shroom_frame.id = 'mushroom_frame_'+i;
           shroom_frame.innerHTML = '<div class="mushroom" id="shroom_'+i+'"></div>'
           document.getElementById('thePad').appendChild(shroom_frame)
-          generate_NFB(i);
+          generate_NFB(i, i);
 
         }
 
       }
 
-      async function generate_NFB(mushroomNumber) {
-
-        mushroom_type = getRandomInt(1, 4);
+      async function generate_NFB(mushroomNumber, mushroom_type) {
 
         // Mushroom Variables
         const mushroom_1_stems = [ "black", "brown", "darkroot", "hazlenut", "moss", "oaknut", "tan" ]
