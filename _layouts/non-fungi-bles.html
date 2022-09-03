@@ -750,7 +750,12 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        for (let i = 0; i < 10; i++) {
+
+      })
+
+      async function begin_build(howMany) {
+
+        for (let i = 0; i < howMany; i++) {
 
           shroom_frame = document.createElement('div')
           shroom_frame.id = 'shroom_'+i;
@@ -759,7 +764,7 @@
 
         }
 
-      })
+      }
 
       async function generate_NFB(whereTo) {
 
