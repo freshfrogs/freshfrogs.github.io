@@ -1,4 +1,4 @@
 ---
-layout: non-fungi-blesGenerate
+layout: non-fungi-bles
 ---
 <title>non-fungi-bles 🍄</title>
