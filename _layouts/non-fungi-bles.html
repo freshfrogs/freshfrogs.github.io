@@ -790,17 +790,16 @@
           shroom_frame.id = 'mushroom_frame_'+i;
           shroom_frame.innerHTML = '<div class="mushroom" id="shroom_'+i+'"></div>'
           document.getElementById('thePad').appendChild(shroom_frame)
-          generate_NFB(i, i);
+          generate_NFB(i);
 
         }
 
       }
 
-      async function generate_NFB(mushroomNumber, mushroom_type) {
+      async function generate_NFB(mushroomNumber) {
 
-        if (mushroom_type > 4) {
-          mushroom_type = 1;
-        }
+        mushroom_type = getRandomInt(1, 4);
+
         // Mushroom Variables
         const mushroom_1_stems = [ "black", "brown", "darkroot", "hazlenut", "moss", "oaknut", "tan" ]
         const mushroom_1_caps = ["blue", "brown", "cyan", "darkBlue", "darkBrown", "darkGreen", "darkPurple", "green", "lightBrown", "mauveine", "midnightGreen", "pink", "purple", "red", "violet", "white", "yellow" ]
