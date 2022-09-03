@@ -716,6 +716,13 @@
       float: none;
       font-size: small;
     }
+    .mushroom {
+      width: 128px;
+      height: 128px;
+      display: inline-block;
+      background: transparent;
+      margin: 32px;
+    }
   </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -758,6 +765,7 @@
         for (let i = 0; i < howMany; i++) {
 
           shroom_frame = document.createElement('div')
+          shroom_frame.className = 'mushroom'
           shroom_frame.id = 'shroom_'+i;
           document.getElementById('thePad').appendChild(shroom_frame)
           generate_NFB('shroom_'+i);
