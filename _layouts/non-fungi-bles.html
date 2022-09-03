@@ -733,6 +733,14 @@
       height: 128px;
       border-radius: 5px;
     }
+    .mushroom_frame {
+      border: 1px solid white;
+      width: 200px;
+      height: 200px;
+      border-radius: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
   </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -777,8 +785,9 @@
         for (let i = 0; i < howMany; i++) {
 
           shroom_frame = document.createElement('div')
-          shroom_frame.className = 'mushroom'
-          shroom_frame.id = 'shroom_'+i;
+          shroom_frame.className = 'mushroom_frame'
+          shroom_frame.id = 'mushroom_frame_'+i;
+          shroom_frame.innerHTML = '<div clas="mushroom" id="shroom_'+i+'"></div>'
           document.getElementById('thePad').appendChild(shroom_frame)
           generate_NFB('shroom_'+i);
 
