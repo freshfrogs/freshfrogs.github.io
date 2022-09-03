@@ -584,11 +584,8 @@
       padding: 16px;
       color: #333 !important;
       box-shadow: 3px 3px rgb(122 122 122 / 20%);
-      margin: auto;
+      margin: 8px;
       border-radius: 5px;
-      width: 80%;
-      margin-left: auto;
-      margin-right: auto;
       overflow: hidden;
       font-size: small !important;
     }
@@ -761,8 +758,6 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        await connect_init();
-
       })
 
       function getRandomInt(min, max) {
@@ -782,24 +777,6 @@
   <body class="bodyb">
     <div class="top">{{ content }}</div>
     <div class="wrapper">
-      <header id="thisheader">
-        <div class="downloads pre">
-          <ul class="downloads2">
-            <li><a id="button_left" class="pointer" href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><strong>Etherscan</strong>Contract</a></li>
-            <li><a id="button_middle" class="pointer" href="https://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong>Server</a></li>
-            <li><a id="button_right" class="pointer" href="https://www.gem.xyz/collection/fresh-frogs" target="_blank"><strong>Gemxyz</strong>Rankings</a></li>
-          </ul>
-          <div id="mintingTray" class="mintingTray">
-            <div class="bigContainer">
-              <div id="frogContainer3" class="containerMint">
-                <div id="frogContainer4" class="imgWrapperMint">
-                  <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/FLY.gif"/>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
       <section>
         <div class="downloads pre">
           <div id="netStatus" class="netStatus">
