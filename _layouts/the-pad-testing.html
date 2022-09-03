@@ -43,9 +43,6 @@
       margin: 0%;
       image-rendering: pixelated;
       text-align: center;
-      width: 500px;
-      margin-left: auto;
-      margin-right: auto;
     }
     .smallContainer{
       border-radius: 5px;
@@ -273,13 +270,10 @@
       background-color: #7cc1ff;
       text-align: center;
       border-radius: 7px;
-      padding: 14px !important;
+      padding: 0px !important;
       overflow: hidden;
       margin-bottom: 16px;
       font-size: small !important;
-      float: none !important;
-      margin-left: auto;
-      margin-right: auto;
     }
     header {
       overflow: hidden;
@@ -587,8 +581,11 @@
       padding: 16px;
       color: #333 !important;
       box-shadow: 3px 3px rgb(122 122 122 / 20%);
-      margin: 0px;
+      margin: auto;
       border-radius: 5px;
+      width: 80%;
+      margin-left: auto;
+      margin-right: auto;
       overflow: hidden;
       font-size: small !important;
     }
@@ -606,7 +603,10 @@
     .recentMint {
       width: 128px;
       height: 128px;
-      border-radius: 100%;
+      border-radius: 5px;
+      box-shadow: 3px 3px rgb(122 122 122 / 20%);
+      margin: 4px;
+      border: 1px solid black;
       cursor: pointer;
     }
     .recent_mints {
@@ -775,20 +775,40 @@
     
   </head>
   <body class="bodyb">
-    <div class="top">{{ content }}</div>
-    <section>
-      <div id="pre" class="mintingTextWhite2">
-        <div>
-          <div style="float: left; width: 128px; height: 128px;">
-            <img src="https://freshfrogs.io/assets/frogs/FreshFrogsNFT.png" class="recentMint" id="displayImg1">
-          </div>
-          <div style="margin-left: auto; margin-right: auto; float: right; width: 70%;">
-            <h1 style="margin: 8px !important; color: black !important;">FreshFrogsNFT</h1>
-            <p>Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
+    <div class="wrapper">
+      <header id="thisheader">
+        <div class="downloads pre">
+          <ul class="downloads2">
+            <li><a id="button_left" class="pointer" href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><strong>Etherscan</strong>Contract</a></li>
+            <li><a id="button_middle" class="pointer" href="https://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong>Server</a></li>
+            <li><a id="button_right" class="pointer" href="https://www.gem.xyz/collection/fresh-frogs" target="_blank"><strong>Gemxyz</strong>Rankings</a></li>
+          </ul>
+          <div id="mintingTray" class="mintingTray">
+            <div class="bigContainer">
+              <div id="frogContainer3" class="containerMint">
+                <div id="frogContainer4" class="imgWrapperMint">
+                  <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/FLY.gif"/>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </header>
+      <section>
+        <div class="top">{{ content }}</div>
+        <div id="pre" class="mintingTextWhite2">
+          <div>
+            <div style="float: left; width: 128px; height: 128px;">
+              <img src="https://freshfrogs.io/assets/frogs/FreshFrogsNFT.png" class="recentMint" id="displayImg1">
+            </div>
+            <div style="margin-left: auto; margin-right: auto; float: right; width: 70%;">
+              <h1 style="margin: 8px !important; color: black !important;">FreshFrogsNFT</h1>
+              <p>Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
   </body>
 </html>
