@@ -750,20 +750,7 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        await connect_init();
-
       })
-
-      function getRandomInt(min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min) + min);
-      }
-
-      async function connect_init() {
-        await connect();
-        await fetch_user_data(user_address);
-      }
 
     </script>
     
@@ -781,9 +768,6 @@
             <p>"Non-fungi-bles" is a collection of randomly generated, pixelated mushrooms on the Ethereum blockchain</p>
           </div>
         </div>
-        <br>
-        <div id="pre"></div>
-        <div class="console_pre" id="console-pre"></div>
       </div>
     </section>
     <br>
