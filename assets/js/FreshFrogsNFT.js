@@ -509,7 +509,7 @@
       try { trait_rarity = ((traits_list[attribute.trait_type][attribute.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) { trait_rarity = 'e'; }
       if (trait_rarity < 1) { trait_rarity = '<1%' } else { trait_rarity = trait_rarity+'%' }
 
-      var trait_text = document.createElement('div')
+      var trait_text = document.createElement('div');
       trait_text.style.margin = '4px';
       if (attribute.trait_type == 'Frog' || attribute.trait_type == 'SpecialFrog') { trait_text.innerHTML = attribute.trait_type+': <frog id="frogType_'+frog_id+'">'+attribute.value+'</frog> <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>'; }
       else { trait_text.innerHTML = attribute.trait_type+': '+attribute.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>'; }
@@ -542,7 +542,8 @@
         '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
         '<div style="color:tomato;" class="frog_level"><b>Level '+staked_level+'</b></div>';
 
-      var trait_text = document.createElement('div')
+      var trait_text = document.createElement('div');
+      trait_text.style.margin = '4px';
       if (staked_time_bool >= 720) { trait_text.innerHTML = 'Staked: '+parseInt(staked_time_bool/24)+' days 🔥<br>'; } 
       else { trait_text.innerHTML = 'Staked: '+parseInt(staked_time_bool/24)+' days<br>'; }
       document.getElementById('prop_'+frog_id).appendChild(trait_text);
