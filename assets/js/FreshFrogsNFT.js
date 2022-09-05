@@ -424,7 +424,7 @@
     // Button Properties
     button_left.innerHTML = '<strong>'+displayName+'</strong>'+frogType;
     button_left.removeAttribute('href');
-    button_left.onclick = function() { scroll_to('traits_'+tokenId); }
+    button_left.onclick = function() { scroll_to('traits_'+tokenId.slice(0, 9)); }
 
     if (morph) {
 
@@ -448,6 +448,7 @@
       button_middle.innerHTML = '<strong>Opensea</strong>View On';
       button_middle.href = openseaLink;
       button_middle.target = '_blank';
+      button_middle.onclick = function() {}
 
       button_right.innerHTML = '<strong>Image</strong>View';
       button_right.href = 'https://freshfrogs.io/frog/'+tokenId+'.png';
