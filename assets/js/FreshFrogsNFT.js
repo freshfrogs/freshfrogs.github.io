@@ -511,8 +511,8 @@
 
       var trait_text = document.createElement('div');
       trait_text.style.margin = '4px';
-      if (attribute.trait_type == 'Frog' || attribute.trait_type == 'SpecialFrog') { trait_text.innerHTML = attribute.trait_type+': <br><frog id="frogType_'+frog_id+'">'+attribute.value+'</frog> <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br><br>'; }
-      else { trait_text.innerHTML = attribute.trait_type+': <br>'+attribute.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br><br>'; }
+      if (attribute.trait_type == 'Frog' || attribute.trait_type == 'SpecialFrog') { trait_text.innerHTML = attribute.trait_type+': <frog id="frogType_'+frog_id+'">'+attribute.value+'</frog> <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>'; }
+      else { trait_text.innerHTML = attribute.trait_type+': '+attribute.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>'; }
       document.getElementById('prop_'+frog_id).appendChild(trait_text);
 
     }
