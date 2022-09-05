@@ -422,7 +422,7 @@
     var frogType = document.getElementById('frogType_'+tokenId).innerHTML
 
     // Button Properties
-    button_left.innerHTML = '<strong>'+displayName+'</strong>primary';
+    button_left.innerHTML = '<strong>'+displayName+'</strong>'+frogType;
     button_left.removeAttribute('href');
     button_left.onclick = function() { scroll_to('traits_'+tokenId); }
 
