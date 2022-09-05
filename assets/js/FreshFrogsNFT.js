@@ -553,7 +553,7 @@
       document.getElementById('owner_'+frog_id).innerHTML = truncateAddress(staked);
 
       // Update Progress Bar
-      let percent = parseInt((staked_time_bool/(1000*staked_level))*100);
+      let percent = parseInt(((staked_time_bool - ((staked_level-1)*1000)) / 1000 )*100); //parseInt((staked_time_bool/(1000*staked_level))*100);
       let elem = document.getElementById('myBar_'+frog_id);
       let width = percent;
       elem.style.width = width + "%";
