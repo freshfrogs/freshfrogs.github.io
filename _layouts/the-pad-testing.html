@@ -765,8 +765,10 @@
 
       async function connect_init() {
         await connect();
-        await staker_stats();
-        await staker_stats_total();
+        await staker_stats()
+        .then(() => {
+          staker_stats_total();
+        })
         //await fetch_user_data('0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38');
       }
 
