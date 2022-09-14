@@ -798,7 +798,8 @@
         for (var j = 0; j < staker_list.length; j++) {
 
           staker = staker_list[j];
-          console.log(staker)
+          console.log('loading staker..')
+          console.log(staker);
           stakers(staker, 'amountStaked')
           .then((staker_tokens) => {
 
