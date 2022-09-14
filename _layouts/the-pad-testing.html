@@ -775,11 +775,15 @@
         if (staker_total >= 1) { pages = parseInt(staker_total/50) + 1;
           for (i = 0; i < pages; i++) { // Fetch OpenSea Data
 
-            var assets = await fetch('https://api.opensea.io/api/v1/assets?owner='+'0xCB1ee125CFf4051a10a55a09B10613876C4Ef199'+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+(i * 50)+'&limit=50&include_orders=false', options)
-            //assets = assets.json();
-            console.log(assets)
-            for (j = 0; j < assets.length; j++) {
-              var token = assets[j].token_id;
+            tokens;
+
+            await fetch('https://api.opensea.io/api/v1/assets?owner='+'0xCB1ee125CFf4051a10a55a09B10613876C4Ef199'+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+(i * 50)+'&limit=50&include_orders=false', options)
+            .then((assets) => {
+              tokens = assets.json()
+            })
+
+            for (j = 0; j < tokens.length; j++) {
+              var token = tokens[j].token_id;
               var staker = await stakerAddress(token)
               staker = staker.toString().toLowerCase();
 
