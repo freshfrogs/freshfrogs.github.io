@@ -778,7 +778,7 @@
             
 
             var tokens = await fetch('https://api.opensea.io/api/v1/assets?owner='+'0xCB1ee125CFf4051a10a55a09B10613876C4Ef199'+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+(i * 50)+'&limit=50&include_orders=false', options)
-            var { assets } = tokens
+            var assets = tokens.assets
 
             console.log(assets)
             console.log('Fetching Tokens via OpenSea... '+tokens.length)
