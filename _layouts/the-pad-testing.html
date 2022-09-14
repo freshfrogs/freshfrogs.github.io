@@ -800,18 +800,12 @@
         .then((staker) => {
 
           staker = staker.toString().toLowerCase();
-          console.log(staker_list.indexOf(staker))
           if (staker_list.indexOf(staker) === -1) {            
-            
+            console.log(staker_list.indexOf(staker))
             stakers(staker, 'amountStaked').then((staker_tokens) => { staker_list.push(staker+', '+staker_tokens) });
-            
-          } else {
-            console.log("Owner already listed");
+            console.log(staker_list);
 
-          } 
-
-          console.log(staker_list);
-
+          }
         })
       }
 
