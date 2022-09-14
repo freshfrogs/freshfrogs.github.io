@@ -765,7 +765,7 @@
 
       async function connect_init() {
         await connect();
-        beginFunction;
+        await sendFunction();
         //await fetch_user_data('0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38');
       }
 
@@ -791,12 +791,8 @@
         }
       }
 
-      const beginFunction = async () => {
-        const stakers_stats_return = await staker_stats()
-        staker_stats_total();
-      }
-
-      async function staker_stats_total() {
+      async function sendFunction(){
+        await staker_stats();
         for (var j = 0; j < staker_list.length; j++) {
 
           staker = staker_list[j];
@@ -813,7 +809,7 @@
         }
       }
 
-      async function transit_token(tokenID) {
+      function transit_token(tokenID) {
 
         stakerAddress(tokenID)
         .then((staker) => {
