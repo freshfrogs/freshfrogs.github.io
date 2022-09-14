@@ -792,14 +792,13 @@
 
       async function transit_token(tokenID) {
 
-        var staker = await stakerAddress(tokenID).toString().toLowerCase();
-
-        console.log(staker)
-
-        staker_list.indexOf(staker) === -1 ? staker_list.push(staker) : console.log("Owner already listed");
-
-        console.log(staker_list);
-        
+        stakerAddress(tokenID)
+        .then((staker) => {
+          staker = staker.toString().toLowerCase();
+          console.log(staker)
+          staker_list.indexOf(staker) === -1 ? staker_list.push(staker) : console.log("Owner already listed");
+          console.log(staker_list);
+        })
       }
 
     </script>
