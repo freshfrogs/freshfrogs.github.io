@@ -767,6 +767,7 @@
       async function connect_init() {
         await connect();
         await staker_stats();
+        sendFunction();
       }
 
       async function staker_stats() {
@@ -775,10 +776,7 @@
         if (staker_total >= 1) { pages = parseInt(staker_total/50) + 1;
           for (i = 0; i < pages; i++) { // Fetch OpenSea Data
 
-            await fetch('https://api.opensea.io/api/v1/assets?owner='+'0xCB1ee125CFf4051a10a55a09B10613876C4Ef199'+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+(i * 50)+'&limit=50&include_orders=false', options)
-            .then((assets) => {
-              var tokens = assets.json()
-            })
+            var tokens = await fetch('https://api.opensea.io/api/v1/assets?owner='+'0xCB1ee125CFf4051a10a55a09B10613876C4Ef199'+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+(i * 50)+'&limit=50&include_orders=false', options).json()
 
             for (j = 0; j < tokens.length; j++) {
               var token = tokens[j].token_id;
@@ -799,7 +797,6 @@
       }
 
       async function sendFunction(){
-        await transitTokens(4040);
         
         consoleOutput(
           '<div style="text-align: left;">'+
@@ -823,27 +820,6 @@
           '</div>'
         );
 
-      }
-
-      async function transitTokens(supply) {
-        
-        consoleOutput(
-          '<div style="text-align: left;">'+
-            'Token Index... <i id="tokenIndex"></i>'+
-          '</div>'
-        );
-
-        for (var i = 1; i < supply; i++) {
-          document.getElementById('tokenIndex').innerHTML = i;
-          staker = await stakerAddress(i)
-          staker = staker.toString().toLowerCase();
-
-          if (staker_list.indexOf(staker) === -1 && staker !== 'false') {
-            staker_list.push(staker);
-            console.log(staker);
-
-          }
-        }
       }
 
     </script>
