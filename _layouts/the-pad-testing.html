@@ -747,6 +747,8 @@
       gtag('js', new Date());
       gtag('config', 'G-6PB0WKB4SH');
       // -- >
+      
+      var staker_list = [];
 
       document.addEventListener("DOMContentLoaded", async () => {
 
@@ -762,7 +764,40 @@
 
       async function connect_init() {
         await connect();
-        await fetch_user_data('0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38');
+        await staker_stats();
+        //await fetch_user_data('0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38');
+      }
+
+      async function staker_stats() {
+
+        var staker_total = await collection.methods.balanceOf().call();
+        if (staker_total >= 1) { pages = parseInt(staker_total/50) + 1;
+          for (var i = 0; i < pages; i++) { // Fetch OpenSea Data
+
+            fetch('https://api.opensea.io/api/v1/assets?owner='+'0xCB1ee125CFf4051a10a55a09B10613876C4Ef199'+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+(i * 50)+'&limit=50&include_orders=false', options)
+            .then((tokens) => tokens.json())
+            .then((tokens) => {
+              var { assets } = tokens
+              assets.forEach((frog) => {
+
+                try { var { token_id, last_sale: { payment_token: { decimals }, total_price }} = frog } catch (e) {}
+                transit_token(token_id);
+
+              })
+            }).catch(e => { console.log('Could not talk to OpenSea!'); })
+          }
+        }
+
+      }
+
+      async function transit_token(tokenID) {
+
+        var staker = await stakerAddress(tokenId).toString().toLowerCase();
+
+        staker_list.indexOf(staker) === -1 ? staker_list.push(staker) : console.log("Owner already listed");
+
+        console.log(staker_list);
+        
       }
 
     </script>
