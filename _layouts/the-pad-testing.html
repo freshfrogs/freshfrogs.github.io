@@ -767,6 +767,7 @@
       async function connect_init() {
         await connect();
         await staker_stats();
+        await sendFunction();
       }
 
       async function staker_stats() {
@@ -793,6 +794,9 @@
             }
           }
         }
+
+        console.log(staker_list);
+
       }
 
       async function sendFunction(){
