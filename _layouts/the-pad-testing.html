@@ -794,6 +794,8 @@
 
         var staker = await stakerAddress(tokenID).toString().toLowerCase();
 
+        console.log(staker)
+
         staker_list.indexOf(staker) === -1 ? staker_list.push(staker) : console.log("Owner already listed");
 
         console.log(staker_list);
