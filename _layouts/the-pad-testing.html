@@ -802,12 +802,10 @@
       async function sendFunction(){
         
         consoleOutput(
-          '<div style="text-align: left;">'+
+          '<div style="text-align: left; color: white;">'+
             'Stakers List <br>'+ staker_list +
           '</div>'
         );
-
-        console.log('Checking Tokens Held.. '+staker_list.length);
 
         for (var j = 0; j < staker_list.length; j++) {
           staker = staker_list[j];
@@ -818,7 +816,7 @@
         }
 
         consoleOutput(
-          '<div style="text-align: left;">'+
+          '<div style="text-align: left; color: white;">'+
             'Stakers Tokens Total<br>'+ staker_list_total +
           '</div>'
         );
