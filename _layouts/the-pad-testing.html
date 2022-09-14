@@ -792,12 +792,15 @@
       }
 
       async function sendFunction(){
-        await staker_stats();
+        await transitTokens(4040);
+        console.log('Checking Tokens Held..')
+
         for (var j = 0; j < staker_list.length; j++) {
 
           staker = staker_list[j];
           console.log('loading staker..')
           console.log(staker);
+
           stakers(staker, 'amountStaked')
           .then((staker_tokens) => {
 
@@ -809,20 +812,22 @@
         }
       }
 
-      async function transit_token(tokenID) {
+      async function transitTokens(supply) {
 
-        stakerAddress(tokenID)
-        .then((staker) => {
+        for (var i = 1; i < supply; i++) {
+          stakerAddress(i)
+          .then((staker) => {
 
-          staker = staker.toString().toLowerCase();
-          if (staker_list.indexOf(staker) === -1) {
+            staker = staker.toString().toLowerCase();
+            if (staker_list.indexOf(staker) === -1 && staker !== '0x0000000000000000000000000000000000000000') {
 
-            staker_list.push(staker);
-            console.log(staker);
+              staker_list.push(staker);
+              console.log(staker);
 
-          }
-        })
-        .catch(e => { console.log(e.message); })
+            }
+
+          }).catch(e => { console.log(e.message); })
+        }
       }
 
     </script>
