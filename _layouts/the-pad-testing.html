@@ -781,7 +781,7 @@
 
             console.log('OpenSea Data: Page '+pages);
             console.log(tokens);
-            
+
             for (j = 0; j < tokens.length; j++) {
               var token = tokens[j].token_id;
               var staker = await stakerAddress(token);
@@ -795,9 +795,6 @@
             }
           }
         }
-
-        console.log(staker_list);
-
       }
 
       async function sendFunction(){
