@@ -813,20 +813,15 @@
       }
 
       async function transitTokens(supply) {
-
         for (var i = 1; i < supply; i++) {
-          stakerAddress(i)
-          .then((staker) => {
+          staker = await stakerAddress(i)
+          staker = staker.toString().toLowerCase();
 
-            staker = staker.toString().toLowerCase();
-            if (staker_list.indexOf(staker) === -1 && staker !== '0x0000000000000000000000000000000000000000') {
+          if (staker_list.indexOf(staker) === -1 && staker !== '0x0000000000000000000000000000000000000000') {
+            staker_list.push(staker);
+            console.log(staker);
 
-              staker_list.push(staker);
-              console.log(staker);
-
-            }
-
-          }).catch(e => { console.log(e.message); })
+          }
         }
       }
 
