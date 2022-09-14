@@ -794,6 +794,7 @@
 
       async function staker_stats_total() {
         for (var j = 0; j < staker_list.length; j++) {
+
           staker = staker_list[j];
           stakers(staker, 'amountStaked')
           .then((staker_tokens) => {
@@ -802,6 +803,7 @@
             console.log(staker_list_total);
 
           })
+          .catch(e => { console.log(e.message); })
         }
       }
 
@@ -818,6 +820,7 @@
 
           }
         })
+        .catch(e => { console.log(e.message); })
       }
 
     </script>
