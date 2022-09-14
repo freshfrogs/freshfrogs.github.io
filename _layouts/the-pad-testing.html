@@ -799,7 +799,7 @@
 
           if (staker_list.indexOf(staker) === -1) {
 
-            stakers(fetch_address, 'amountStaked').then((staker_tokens) => { staker_list.push(staker+', '+staker_tokens) });
+            stakers('0xCB1ee125CFf4051a10a55a09B10613876C4Ef199', 'amountStaked').then((staker_tokens) => { staker_list.push(staker+', '+staker_tokens) });
             
           } else { console.log("Owner already listed"); } 
           console.log(staker_list);
