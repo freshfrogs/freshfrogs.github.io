@@ -793,12 +793,15 @@
 
       async function sendFunction(){
         await transitTokens(4040);
-        console.log('Checking Tokens Held.. '+staker_list.length)
+        
         console.log(staker_list);
+        console.log('Checking Tokens Held.. '+staker_list.length);
+
         for (var j = 0; j < staker_list.length; j++) {
           staker = staker_list[j];
           staker_tokens = await stakers(staker, 'amountStaked')
           staker_list_total.push(staker+' : '+staker_tokens);
+          console.log(staker+' : '+staker_tokens)
 
         }
       }
@@ -806,6 +809,7 @@
       async function transitTokens(supply) {
         console.log('Token Index.. #1 - #'+supply)
         for (var i = 1; i < supply; i++) {
+          console.log('Token Index.. #'+i)
           staker = await stakerAddress(i)
           staker = staker.toString().toLowerCase();
 
