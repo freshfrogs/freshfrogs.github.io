@@ -801,7 +801,7 @@
 
           staker = staker.toString().toLowerCase();
           console.log(staker_list.indexOf(staker))
-          if (staker_list.indexOf(staker) == -1) {            
+          if (staker_list.indexOf(staker) === -1) {            
             
             stakers(staker, 'amountStaked').then((staker_tokens) => { staker_list.push(staker+', '+staker_tokens) });
             
