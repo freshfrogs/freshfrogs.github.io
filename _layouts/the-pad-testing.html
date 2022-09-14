@@ -765,8 +765,7 @@
 
       async function connect_init() {
         await connect();
-        await staker_stats()
-        await staker_stats_total();
+        beginFunction;
         //await fetch_user_data('0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38');
       }
 
@@ -790,6 +789,11 @@
             .catch(e => { console.log('Could not talk to OpenSea!'); })
           }
         }
+      }
+
+      const beginFunction = async () => {
+        const stakers_stats_return = await staker_stats()
+        staker_stats_total();
       }
 
       async function staker_stats_total() {
@@ -818,7 +822,7 @@
           if (staker_list.indexOf(staker) === -1) {
 
             staker_list.push(staker);
-            console.log(staker_list);
+            console.log(staker);
 
           }
         })
