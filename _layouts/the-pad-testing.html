@@ -794,7 +794,12 @@
       async function sendFunction(){
         await transitTokens(4040);
         
-        console.log(staker_list);
+        consoleOutput(
+          '<div style="text-align: left;">'+
+            'Stakers List <br>'+ staker_list +
+          '</div>'
+        );
+
         console.log('Checking Tokens Held.. '+staker_list.length);
 
         for (var j = 0; j < staker_list.length; j++) {
@@ -804,12 +809,25 @@
           console.log(staker+' : '+staker_tokens)
 
         }
+
+        consoleOutput(
+          '<div style="text-align: left;">'+
+            'Stakers Tokens Total<br>'+ staker_list_total +
+          '</div>'
+        );
+
       }
 
       async function transitTokens(supply) {
-        console.log('Token Index.. #1 - #'+supply)
+        
+        consoleOutput(
+          '<div style="text-align: left;">'+
+            'Token Index... <i id="tokenIndex"></i>'+
+          '</div>'
+        );
+
         for (var i = 1; i < supply; i++) {
-          console.log('Token Index.. #'+i)
+          document.getElementById('tokenIndex').innerHTML = i;
           staker = await stakerAddress(i)
           staker = staker.toString().toLowerCase();
 
@@ -837,10 +855,10 @@
             <p>Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
           </div>
         </div>
-        <br>
-        <div id="pre"></div>
-        <div class="console_pre" id="console-pre"></div>
       </div>
+      <br>
+      <div id="pre"></div>
+      <div class="console_pre" id="console-pre"></div>
     </section>
     <br>
     <div id="thePad" class="thePad"></div>
