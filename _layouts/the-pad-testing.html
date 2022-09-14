@@ -831,7 +831,7 @@
           staker = await stakerAddress(i)
           staker = staker.toString().toLowerCase();
 
-          if (staker_list.indexOf(staker) === -1 && staker !== false) {
+          if (staker_list.indexOf(staker) === -1 && staker !== 'false') {
             staker_list.push(staker);
             console.log(staker);
 
