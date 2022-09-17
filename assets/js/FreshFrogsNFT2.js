@@ -482,7 +482,7 @@
     // Element Inner HTML
     frog_token.innerHTML =
       '<div class="frogTokenCont">'+
-        '<div class="layer_cont'+frog_id+'" id="layer_cont" onclick="display_token('+frog_id+')">'+
+        '<div class="layer_cont" id="layer_cont'+frog_id+'" onclick="display_token('+frog_id+')">'+
           '<div style="text-align: left; margin: 8px; height: 16px;">'+
             '<strong id="frog_'+frog_id+'" class="frog_name">'+frog_name+'</strong><strong id="price_'+frog_id+'" class="frog_price">'+recent_sale+'</strong>'+
           '</div>'+
