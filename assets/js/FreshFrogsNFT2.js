@@ -492,8 +492,8 @@
           '<div id="traits_'+frog_id+'" class="trait_list">'+
             '<strong>Properties</strong><div id="owner_'+frog_id+'"style="float:right;">'+truncateAddress(owner)+'</div><div id="prop_'+frog_id+'" class="properties"></div>'+
           '</div>'+
+          '<div id="staked_'+frog_id+'"></div>'+
         '</div>'+
-        '<div id="staked_'+frog_id+'"></div>'+
       '</div>';
 
     // Create Element -->
