@@ -661,25 +661,29 @@
       transform: scale(1.1);
     }
     .frog_imgContainer {
+      border-radius: 100%;
+      border: 1px solid black;
+      margin: 8px;
       width: 128px;
       height: 128px;
       overflow: hidden;
       margin-left: auto;
       margin-right: auto;
-    }
-    .layer_cont {
-      border-radius: 5px;
-      border: 1px solid black;
-      margin: 8px;
-      width: auto;
-      height: auto;
-      overflow: hidden;
+      border-bottom-left-radius: 100%;
+      border-bottom-right-radius: 100%;
     }
     .frog_token {
       display: block;
       background-color: antiquewhite;
+      border: none;
+      padding: 4px;
       color: #333 !important;
+      box-shadow: none;
+      margin: auto;
       border-radius: 5px;
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
       overflow: hidden;
       width: 256px;
       border: 1px solid black;
@@ -687,6 +691,7 @@
       box-shadow: 3px 3px rgb(122 122 122 / 20%);
       font-size: small;
       transition: all .2s;
+      padding-bottom: 8px;
     }
     .trait_list {
       min-width: 50%;
@@ -737,7 +742,7 @@
     
     <script src="https://freshfrogs.io/the-pond/banner/FileSaver.js"></script>
     <script src="https://freshfrogs.io/the-pond/banner/dom-to-image.js"></script>
-    <script src="https://freshfrogs.io/assets/js/FreshFrogsNFT2.js"></script>
+    <script src="https://freshfrogs.io/assets/js/FreshFrogsNFT.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
