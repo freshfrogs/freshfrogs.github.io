@@ -498,8 +498,8 @@
 
     // Create Element -->
     frog_doc.appendChild(frog_token);
-    document.getElementById(layer_cont).style.backgroundImage = 'url('+frog_external+')';
-    document.getElementById(layer_cont).style.backgroundSize = "2048px 2048px";
+    document.getElementById('layer_cont').style.backgroundImage = 'url('+frog_external+')';
+    document.getElementById('layer_cont').style.backgroundSize = "2048px 2048px";
 
     // Update Metadata!
     let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
