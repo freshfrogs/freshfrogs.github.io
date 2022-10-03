@@ -419,10 +419,10 @@
     // Update Token Display
     await render_display(tokenId);
 
-    var frogType = document.getElementById('frogType_'+tokenId).innerHTML
+    //var frogType = document.getElementById('frogType_'+tokenId).innerHTML
 
     // Button Properties
-    button_left.innerHTML = '<strong>'+displayName+'</strong>'+frogType.slice(0, 9);
+    button_left.innerHTML = '<strong>'+displayName+'</strong>';//+frogType.slice(0, 9);
     button_left.removeAttribute('href');
     button_left.onclick = function() { scroll_to('traits_'+tokenId); }
 
