@@ -483,14 +483,14 @@
     frog_token.innerHTML =
       '<div id="'+frog_id+'" class="frogTokenCont">'+
         '<div style="text-align: left; margin: 8px; height: 16px;">'+
-          '<strong id="frog_'+frog_id+'" class="frog_name">'+frog_name+'</strong><strong id="price_'+frog_id+'" class="frog_price">'+recent_sale+'</strong>'+
+          '<strong id="price_'+frog_id+'" class="frog_price">'+recent_sale+'</strong>'+
         '</div>'+
         //'<div class="frog_imgContainer" id="cont_'+frog_id+'" onclick="display_token('+frog_id+')">'+
         '<img src="'+frog_external+'" class="recentMint" onclick="display_token('+frog_id+')" />'+
         '<div id="staked_'+frog_id+'"></div>'+
         //'</div>'+
         '<div id="traits_'+frog_id+'" class="trait_list">'+
-          '<strong>Properties</strong><div id="owner_'+frog_id+'"style="float:right;">'+truncateAddress(owner)+'</div><div id="prop_'+frog_id+'" class="properties"></div>'+
+          '<strong id="frog_'+frog_id+'" class="frog_name">'+frog_name+'</strong><div id="owner_'+frog_id+'"style="float:right;">'+truncateAddress(owner)+'</div><div id="prop_'+frog_id+'" class="properties"></div>'+
         '</div>'+
       '</div>';
 
@@ -500,6 +500,7 @@
     //document.getElementById('cont_'+frog_id).style.backgroundSize = "2048px 2048px";
 
     // Update Metadata!
+    /*
     let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
 
@@ -516,7 +517,7 @@
       else { trait_text.innerHTML = attribute.trait_type+': '+attribute.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>'; }
       document.getElementById('prop_'+frog_id).appendChild(trait_text);
 
-    }
+    } */
 
     // Create Button Element(s)
     var button_b = document.createElement('div');
