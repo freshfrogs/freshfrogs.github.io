@@ -481,17 +481,17 @@
 
     // Element Inner HTML
     frog_token.innerHTML =
-      '<div class="frogTokenCont">'+
+      '<div id="'+frog_id+'" class="frogTokenCont">'+
         '<div style="text-align: left; margin: 8px; height: 16px;">'+
           '<strong id="frog_'+frog_id+'" class="frog_name">'+frog_name+'</strong><strong id="price_'+frog_id+'" class="frog_price">'+recent_sale+'</strong>'+
         '</div>'+
         //'<div class="frog_imgContainer" id="cont_'+frog_id+'" onclick="display_token('+frog_id+')">'+
-          '<img src="'+frog_external+'" class="recentMint" onclick="display_token('+frog_id+')" />'+
+        '<img src="'+frog_external+'" class="recentMint" onclick="display_token('+frog_id+')" />'+
+        '<div id="staked_'+frog_id+'"></div>'+
         //'</div>'+
         '<div id="traits_'+frog_id+'" class="trait_list">'+
           '<strong>Properties</strong><div id="owner_'+frog_id+'"style="float:right;">'+truncateAddress(owner)+'</div><div id="prop_'+frog_id+'" class="properties"></div>'+
         '</div>'+
-        '<div id="staked_'+frog_id+'"></div>'+
       '</div>';
 
     // Create Element -->
@@ -528,7 +528,7 @@
       if (owner.toString().toLowerCase() == user_address.toString().toLowerCase() || user_address.toString().toLowerCase() == '0xF01e067d442f4254cd7c89A5D42d90ad554616E8'.toString().toLowerCase()) {
         button_b.innerHTML = 
           '<button class="stake_button" style="background: lightseagreen;" onclick="stake_init('+frog_id+')">Stake 🡥</button>';
-        document.getElementById('staked_'+frog_id).appendChild(button_b);
+        document.getElementById(frog_id).appendChild(button_b);
       }
 
     } else { // STAKED
@@ -537,9 +537,9 @@
       let staked_time_bool = await timeStaked(frog_id);
       if (staked_time_bool >= 2000) { staked_level = 3; } else if (staked_time_bool >= 1000) { staked_level = 2; } else { staked_level = 1; }
 
-      //document.getElementById('staked_'+frog_id).innerHTML = 
-      //  '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
-      //  '<div style="color:tomato;" class="frog_level"><b>Level '+staked_level+'</b></div>';
+      document.getElementById('staked_'+frog_id).innerHTML = 
+        '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
+        '<div style="color:tomato;" class="frog_level"><b>Level '+staked_level+'</b></div>';
 
       var trait_text = document.createElement('div');
       trait_text.style.margin = '4px';
@@ -559,7 +559,7 @@
       if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
         button_b.innerHTML = 
           '<button class="stake_button" onclick="withdraw_init('+frog_id+')">UnStake 🡧</button>';
-        document.getElementById('staked_'+frog_id).appendChild(button_b);
+        document.getElementById(frog_id).appendChild(button_b);
         
       }
     }
