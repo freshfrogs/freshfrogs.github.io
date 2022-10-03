@@ -490,7 +490,7 @@
         '<div id="staked_'+frog_id+'"></div>'+
         //'</div>'+
         '<div id="traits_'+frog_id+'" class="trait_list">'+
-          '<strong id="frog_'+frog_id+'" class="frog_name">'+frog_name+'</strong><div id="owner_'+frog_id+'"style="float:right;">'+truncateAddress(owner)+'</div><div id="prop_'+frog_id+'" class="properties"></div>'+
+          '<strong id="frog_'+frog_id+'">'+frog_name+'</strong><div id="owner_'+frog_id+'"style="float:right;">'+truncateAddress(owner)+'</div><div id="prop_'+frog_id+'" class="properties"></div>'+
         '</div>'+
       '</div>';
 
