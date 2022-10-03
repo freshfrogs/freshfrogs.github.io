@@ -545,7 +545,7 @@
       trait_text.style.margin = '4px';
       if (staked_time_bool >= 720) { trait_text.innerHTML = 'Staked: '+parseInt(staked_time_bool/24)+' days 🔥<br>'; } 
       else { trait_text.innerHTML = 'Staked: '+parseInt(staked_time_bool/24)+' days<br>'; }
-      document.getElementById('prop_'+frog_id).appendChild(trait_text);
+      document.getElementById('staked_'+frog_id).appendChild(trait_text);
 
       // Owner
       document.getElementById('owner_'+frog_id).innerHTML = truncateAddress(staked);
