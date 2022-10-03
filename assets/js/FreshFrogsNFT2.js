@@ -520,7 +520,6 @@
 
     // Create Button Element(s)
     var button_b = document.createElement('div');
-    button_b.style.width = 'fit-content';
     button_b.style.margin = '8px';
     button_b.style.marginLeft = 'auto';
     button_b.style.marginRight = 'auto';
