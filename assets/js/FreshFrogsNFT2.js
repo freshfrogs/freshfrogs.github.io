@@ -528,8 +528,7 @@
     if (!staked) { // NOT Staked
       if (owner.toString().toLowerCase() == user_address.toString().toLowerCase() || user_address.toString().toLowerCase() == '0xF01e067d442f4254cd7c89A5D42d90ad554616E8'.toString().toLowerCase()) {
         button_b.innerHTML = 
-          '<button class="frog_button" style="background: lightgreen; border: 1px solid black;" onclick="stake_init('+frog_id+')">Stake 🡥</button>'+
-          '<button class="frog_button" style="border: 1px solid black;" onclick="display_token('+frog_id+', true)">Morph 🡥</button>';
+          '<button class="stake_button" onclick="stake_init('+frog_id+')">Stake 🡥</button>';
         document.getElementById('staked_'+frog_id).appendChild(button_b);
       }
 
@@ -560,8 +559,7 @@
 
       if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
         button_b.innerHTML = 
-          '<button class="frog_button" style="background: salmon; border: 1px solid black;" onclick="withdraw_init('+frog_id+')">UnStake 🡧</button>'+
-          '<button class="frog_button" id="morph_'+frog_id+'" style="border: 1px solid black;" onclick="display_token('+frog_id+', true)">Morph 🡥</button>';
+          '<button class="stake_button" onclick="withdraw_init('+frog_id+')">UnStake 🡧</button>';
         document.getElementById('staked_'+frog_id).appendChild(button_b);
         
       }
