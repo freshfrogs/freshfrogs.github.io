@@ -489,7 +489,7 @@
           '<strong id="frog_'+frog_id+'" class="frog_name">'+frog_name+'</strong><strong id="price_'+frog_id+'" class="frog_price">'+recent_sale+'</strong>'+
         '</div>'+
         '<div class="frog_imgContainer" id="cont_'+frog_id+'" onclick="display_token('+frog_id+')">'+
-          //'<img src="'+frog_external+'" class="frog_img"/>'+
+          '<img src="'+frog_external+'" class="frog_img"/>'+
         '</div>'+
         '<div id="traits_'+frog_id+'" class="trait_list">'+
           '<strong>Properties</strong><div id="owner_'+frog_id+'"style="float:right;">'+truncateAddress(owner)+'</div><div id="prop_'+frog_id+'" class="properties"></div>'+
@@ -499,8 +499,8 @@
 
     // Create Element -->
     frog_doc.appendChild(frog_token);
-    document.getElementById('cont_'+frog_id).style.backgroundImage = 'url('+frog_external+')';
-    document.getElementById('cont_'+frog_id).style.backgroundSize = "2048px 2048px";
+    //document.getElementById('cont_'+frog_id).style.backgroundImage = 'url('+frog_external+')';
+    //document.getElementById('cont_'+frog_id).style.backgroundSize = "2048px 2048px";
 
     // Update Metadata!
     let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
@@ -508,7 +508,7 @@
 
       // attribute.trait_type : attribute.value
       let attribute = metadata.attributes[i]
-      loadTrait(attribute.trait_type, attribute.value, 'cont_'+frog_id);
+      //loadTrait(attribute.trait_type, attribute.value, 'cont_'+frog_id);
 
       try { trait_rarity = ((traits_list[attribute.trait_type][attribute.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) { trait_rarity = 'e'; }
       if (trait_rarity < 1) { trait_rarity = '<1%' } else { trait_rarity = trait_rarity+'%' }
