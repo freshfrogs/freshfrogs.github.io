@@ -264,7 +264,7 @@
             '</div>'+
             '<div class="terminalBottom">'+
               '<b>Mint Limit</b>'+
-              '<br>'+'Nine Tokens per Wallet'+
+              '<br>'+'9 Frogs @ Ξ0.01 each'+
             '</div>'+
           '</div>'+
         '</div>'+
