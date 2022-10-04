@@ -264,7 +264,7 @@
             '</div>'+
             '<div class="terminalBottom">'+
               '<limit class="displayUnit">Mint Limit</limit>'+
-              '<br>'+'<b>9 Frogs @ Ξ0.01 each</b>'+
+              '<br>'+'<b>9 Frogs @ Ξ0.01</b>'+
             '</div>'+
           '</div>'+
         '</div>'+
