@@ -778,12 +778,15 @@
         // bigContainer recentMint
         var displayLoop = 9;
         var randomFrog = getRandomInt(1, (4040-displayLoop));
+        var container = document.getElementById('bigContainer');
+        
+        container.innerHTML = ''
 
         for (var i = 0; i < displayLoop; i++) {
           var displayImg = document.createElement('img');
           displayImg.src = '../frog/'+(randomFrog+i)+'.png'
           displayImg.className = 'recentMint'
-          document.getElementById('bigContainer').appendChild(displayImg);
+          container.appendChild(displayImg);
         }
 
         await connect_init();
