@@ -253,18 +253,18 @@
       Output(
         '<div>'+
           '<div class="terminalTop">'+
-            '<b>Wallet Address</b>'+
-            '<br>'+user_address+
+            '<div style="color: #62B6CB;">Wallet Address</div>'+
+            '<br><b>'+user_address+'</b>'+
           '</div>'+
           '<br>'+
           '<div class="terminalBase">'+
             '<div class="terminalBottom" style="border-right: 1px solid wheat;">'+
-              '<b>Total Supply</b>'+
-              '<br>'+next_id+' / 4040'+
+              '<div style="color: #62B6CB;">Total Supply</div>'+
+              '<br><b>'+next_id+' / 4040</b>'+
             '</div>'+
             '<div class="terminalBottom">'+
-              '<b>Mint Limit</b>'+
-              '<br>'+'9 Frogs @ Ξ0.01 each'+
+              '<div style="color: #62B6CB;">Mint Limit</div>'+
+              '<br>'+'<b>9 Frogs @ Ξ0.01 each</b>'+
             '</div>'+
           '</div>'+
         '</div>'+
