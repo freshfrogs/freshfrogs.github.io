@@ -250,7 +250,7 @@
 
       // Connected!
       // Update UI
-      
+
       Output(
         '<div>'+
           '<div class="terminalTop">'+
@@ -258,7 +258,7 @@
             '<br><b>'+user_address+'</b>'+
           '</div>'+
           '<div class="terminalBase">'+
-            '<div class="terminalBottom" style="border-right: 1px solid #1B4965;">'+
+            '<div class="terminalBottom" style="border-right: 1px solid antiquewhite;">'+
               '<supply class="displayUnit">Total Supply</supply>'+
               '<br><b>'+next_id+' / 4040</b>'+
             '</div>'+
