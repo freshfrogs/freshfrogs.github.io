@@ -258,7 +258,7 @@
             '<br><b>'+user_address+'</b>'+
           '</div>'+
           '<div class="terminalBase">'+
-            '<div class="terminalBottom" style="border-right: 1px solid antiquewhite;">'+
+            '<div class="terminalBottom">'+
               '<supply class="displayUnit">Total Supply</supply>'+
               '<br><b>'+next_id+' / 4040</b>'+
             '</div>'+
