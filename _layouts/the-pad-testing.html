@@ -800,13 +800,13 @@
         var header = document.getElementById('header');
         var terminal = document.getElementById('pre');
 
-        section.setAttribute('background', baseColor)
-        header.setAttribute('background', baseColor)
-        terminal.setAttribute('background', subColor)
+        section.setAttribute("style", "background-color: "+baseColor+";");
+        header.setAttribute("style", "background-color: "+baseColor+";");
+        terminal.setAttribute("style", "background-color: "+subColor+";");
 
-        section.setAttribute('color', textColor)
-        header.setAttribute('color', textColor)
-        terminal.setAttribute('color', textColor)
+        section.setAttribute("style", "background-color: "+textColor+";");
+        header.setAttribute("style", "background-color: "+textColor+";");
+        terminal.setAttribute("style", "background-color: "+textColor+";");
 
         await connect_init();
 
