@@ -249,22 +249,22 @@
       next_id = parseInt(next_id);
 
       // Connected!
-      
+
       // Update UI
       Output(
         '<div>'+
           '<div class="terminalTop">'+
-            '<div style="color: #62B6CB;">Wallet Address</div>'+
+            '<address style="color: #62B6CB;">Wallet Address</address>'+
             '<br><b>'+user_address+'</b>'+
           '</div>'+
           '<br>'+
           '<div class="terminalBase">'+
-            '<div class="terminalBottom" style="border-right: 1px solid wheat;">'+
-              '<div style="color: #62B6CB;">Total Supply</div>'+
+            '<div class="terminalBottom" style="border-right: 1px solid black;">'+
+              '<supply style="color: #62B6CB;">Total Supply</supply>'+
               '<br><b>'+next_id+' / 4040</b>'+
             '</div>'+
             '<div class="terminalBottom">'+
-              '<div style="color: #62B6CB;">Mint Limit</div>'+
+              '<limit style="color: #62B6CB;">Mint Limit</limit>'+
               '<br>'+'<b>9 Frogs @ Ξ0.01 each</b>'+
             '</div>'+
           '</div>'+
