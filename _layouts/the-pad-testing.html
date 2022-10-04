@@ -790,24 +790,6 @@
           container.appendChild(displayImg);
         }
 
-        console.log('updating color pallet')
-
-        var baseColor = '#06283D'
-        var subColor = '#256D85'
-        var textColor = '#DFF6FF'
-
-        var section = document.getElementById('section');
-        var header = document.getElementById('header');
-        var terminal = document.getElementById('pre');
-
-        section.setAttribute("style", "background-color: "+baseColor+";");
-        header.setAttribute("style", "background-color: "+baseColor+";");
-        terminal.setAttribute("style", "background-color: "+subColor+";");
-
-        section.setAttribute("style", "color: "+textColor+";");
-        header.setAttribute("style", "color: "+textColor+";");
-        terminal.setAttribute("style", "color: "+textColor+";");
-
         await connect_init();
 
       })
