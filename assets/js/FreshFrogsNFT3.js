@@ -258,13 +258,15 @@
             '<br>'+user_address+
           '</div>'+
           '<br>'+
-          '<div class="terminalBottom">'+
-            '<b>Total Supply</b>'+
-            '<br>'+next_id+' / 4040'+
-          '</div>'+
-          '<div class="terminalBottom">'+
-            '<b>Mint Limit</b>'+
-            '<br>'+'Nine Tokens per Wallet'+
+          '<div>'+
+            '<div class="terminalBottom">'+
+              '<b>Total Supply</b>'+
+              '<br>'+next_id+' / 4040'+
+            '</div>'+
+            '<div class="terminalBottom">'+
+              '<b>Mint Limit</b>'+
+              '<br>'+'Nine Tokens per Wallet'+
+            '</div>'+
           '</div>'+
         '</div>'+
         '<div class="console_pre" id="console-pre"></div>'
