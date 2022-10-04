@@ -258,7 +258,7 @@
             '<br>'+user_address+
           '</div>'+
           '<br>'+
-          '<div style="terminalBase">'+
+          '<div class="terminalBase">'+
             '<div class="terminalBottom">'+
               '<b>Total Supply</b>'+
               '<br>'+next_id+' / 4040'+
