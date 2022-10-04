@@ -249,11 +249,6 @@
       next_id = parseInt(next_id);
 
       // Connected!
-      consoleOutput(
-        '<div style="text-align: left;">'+
-          'Connected! Fetching user data...<br>'+
-        '</div>'
-      );
 
       // Update UI
       Output(
