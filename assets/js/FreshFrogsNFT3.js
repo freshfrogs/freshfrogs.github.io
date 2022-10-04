@@ -253,12 +253,12 @@
       // Update UI
       Output(
         '<br>'+
-        '<div>'+
+        '<div style="border-bottom: 1px solid white">'+
           '<b>Wallet Address</b>'+
           '<br>'+user_address+
         '</div>'+
         '<br>'+
-        '<div>'+
+        '<div style="border-right: 1px solid white">'+
           '<b>Total Supply</b>'+
           '<br>'+next_id+' / 4040'+
         '</div>'+
