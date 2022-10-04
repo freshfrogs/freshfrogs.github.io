@@ -253,7 +253,7 @@
       Output(
         '<div>'+
           '<div class="terminalTop">'+
-            '<address class="displayUnit">Wallet Address</address>'+
+            '<wallet class="displayUnit">Wallet Address</wallet>'+
             '<br><b>'+user_address+'</b>'+
           '</div>'+
           '<br>'+
