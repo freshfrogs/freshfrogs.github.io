@@ -255,6 +255,15 @@
         '</div>'
       );
 
+      // Update UI
+      Output(
+        '<br>'+
+        '<div>'+
+          '<b>Wallet Address<b>'+'<br>'+user_address+
+        '</div>'+
+        '<div class="console_pre" id="console-pre"></div>'
+      )
+
     } catch (e) { // Something Went Wrong!
       consoleOutput(
         '<div style="text-align: left;">'+
