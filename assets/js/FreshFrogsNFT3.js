@@ -259,11 +259,11 @@
           '<br>'+
           '<div class="terminalBase">'+
             '<div class="terminalBottom" style="border-right: 1px solid black;">'+
-              '<supply>Total Supply</supply>'+
+              '<supply class="displayUnit">Total Supply</supply>'+
               '<br><b>'+next_id+' / 4040</b>'+
             '</div>'+
             '<div class="terminalBottom">'+
-              '<limit>Mint Limit</limit>'+
+              '<limit class="displayUnit">Mint Limit</limit>'+
               '<br>'+'<b>9 Frogs @ Ξ0.01 each</b>'+
             '</div>'+
           '</div>'+
