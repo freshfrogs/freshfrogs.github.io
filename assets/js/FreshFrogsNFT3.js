@@ -254,7 +254,7 @@
       Output(
         '<br>'+
         '<div>'+
-          '<b>Wallet Address<b>'+'<br>'+user_address+
+          '<b>Wallet Address</b>'+'<br>'+user_address+
         '</div>'+
         '<div class="console_pre" id="console-pre"></div>'
       )
