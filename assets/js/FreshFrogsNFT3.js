@@ -258,7 +258,7 @@
           '</div>'+
           '<br>'+
           '<div class="terminalBase">'+
-            '<div class="terminalBottom">'+
+            '<div class="terminalBottom" style="border-right: 1px solid wheat;">'+
               '<b>Total Supply</b>'+
               '<br>'+next_id+' / 4040'+
             '</div>'+
