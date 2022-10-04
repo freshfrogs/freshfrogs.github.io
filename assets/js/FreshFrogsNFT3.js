@@ -258,7 +258,7 @@
           '</div>'+
           '<br>'+
           '<div class="terminalBase">'+
-            '<div class="terminalBottom" style="border-right: 1px solid black;">'+
+            '<div class="terminalBottom" style="border-right: 1px solid #1B4965;">'+
               '<supply class="displayUnit">Total Supply</supply>'+
               '<br><b>'+next_id+' / 4040</b>'+
             '</div>'+
