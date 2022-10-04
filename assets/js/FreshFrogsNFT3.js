@@ -256,6 +256,15 @@
         '<div>'+
           '<b>Wallet Address</b>'+'<br>'+user_address+
         '</div>'+
+        '<br>'+
+        '<div>'+
+          '<b>Total Supply</b>'+
+          '<br>'+next_id+'/4040'+
+        '</div>'+
+        '<div>'+
+          '<b>Mint Limit</b>'+
+          '<br>'+'Nine Tokens per Wallet'+
+        '</div>'+
         '<div class="console_pre" id="console-pre"></div>'
       )
 
