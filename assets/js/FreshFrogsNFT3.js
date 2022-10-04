@@ -250,6 +250,7 @@
 
       // Connected!
       // Update UI
+      
       Output(
         '<div>'+
           '<div class="terminalTop">'+
