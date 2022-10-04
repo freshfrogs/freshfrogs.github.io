@@ -249,6 +249,7 @@
       next_id = parseInt(next_id);
 
       // Connected!
+      
       // Update UI
       Output(
         '<div>'+
