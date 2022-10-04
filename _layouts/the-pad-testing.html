@@ -789,6 +789,22 @@
           container.appendChild(displayImg);
         }
 
+        var baseColor = '#06283D'
+        var subColor = '#256D85'
+        var textColor = '#DFF6FF'
+
+        var section = document.getElementById('section');
+        var header = document.getElementById('header');
+        var terminal = document.getElementById('pre');
+
+        section.setAttribute('background', baseColor)
+        header.setAttribute('background', baseColor)
+        terminal.setAttribute('background', subColor)
+
+        section.setAttribute('color', textColor)
+        header.setAttribute('color', textColor)
+        terminal.setAttribute('color', textColor)
+
         await connect_init();
 
       })
@@ -812,7 +828,7 @@
       <img src="../assets/bannerTop2.png" style="margin-bottom: 5%;"/>
     </div>
     <div class="wrapper">
-      <header id="thisheader">
+      <header id="header">
         <div class="downloads pre">
           <ul class="downloads2">
             <li><a id="button_left" class="pointer" href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><strong>Etherscan</strong>Contract</a></li>
@@ -824,7 +840,7 @@
           </div>
         </div>
       </header>
-      <section>
+      <section id="section">
         <div class="downloads pre">
           <div id="netStatus" class="netStatus">
             <br>
