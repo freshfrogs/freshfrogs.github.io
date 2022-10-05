@@ -529,7 +529,7 @@
         '</div>'+
         '<div class="renderRight">'+
           '<div id="traits_'+frog_id+'" class="trait_list">'+
-            '<div id="prop_'+frog_id+'" class="properties"></div>'+
+            '<div id="prop_'+frog_id+'" class="properties">Properties</div>'+
           '</div>'+
         '</div>'+
       '</div>';
@@ -541,7 +541,7 @@
     //document.getElementById('cont_'+frog_id).style.backgroundSize = "2048px 2048px";
 
     // Update Metadata!
-    /*
+    
     let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
 
@@ -558,7 +558,7 @@
       else { trait_text.innerHTML = attribute.trait_type+': '+attribute.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>'; }
       document.getElementById('prop_'+frog_id).appendChild(trait_text);
 
-    } */
+    }
 
     // Create Button Element(s)
     var button_b = document.createElement('div');
