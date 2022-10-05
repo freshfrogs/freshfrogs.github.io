@@ -513,7 +513,7 @@
     frog_token = document.createElement('div');
     frog_token.id = frog_name;
     frog_token.className = 'frog_token';
-    
+
     //frog_token.onclick = function() { display_token(frog_id); }
 
     // Element Inner HTML
@@ -524,7 +524,7 @@
           '<img src="'+frog_external+'" class="renderToken" onclick="display_token('+frog_id+')" />'+
           '<div id="staked_'+frog_id+'"></div>'+
           //'</div>'+
-          '<div id="traits_'+frog_id+'" class="trait_list">'+
+          '<div class="trait_list">'+
             '<strong style="color: antiquewhite;" id="frog_'+frog_id+'">'+frog_name+'</strong><strong id="owner_'+frog_id+'"style="float:right; color: antiquewhite;">'+truncateAddress(owner)+'</strong><div id="prop_'+frog_id+'" class="properties"></div>'+
           '</div>'+
         '</div>'+
