@@ -518,15 +518,17 @@
     // Element Inner HTML
     frog_token.innerHTML =
       '<div id="'+frog_id+'" class="frogTokenCont">'+
-        '<div style="text-align: left; margin: 8px; height: 16px;">'+
-          '<strong style="color: white;" id="price_'+frog_id+'" class="frog_price">'+recent_sale+'</strong>'+
-        '</div>'+
-        //'<div class="frog_imgContainer" id="cont_'+frog_id+'" onclick="display_token('+frog_id+')">'+
-        '<img src="'+frog_external+'" class="renderToken" onclick="display_token('+frog_id+')" />'+
-        '<div id="staked_'+frog_id+'"></div>'+
-        //'</div>'+
-        '<div id="traits_'+frog_id+'" class="trait_list">'+
-          '<strong style="color: white;" id="frog_'+frog_id+'">'+frog_name+'</strong><div id="owner_'+frog_id+'"style="float:right;">'+truncateAddress(owner)+'</div><div id="prop_'+frog_id+'" class="properties"></div>'+
+        '<div>'+
+          '<div style="text-align: left; margin: 8px; height: 16px;">'+
+            '<strong style="color: white;" id="price_'+frog_id+'" class="frog_price">'+recent_sale+'</strong>'+
+          '</div>'+
+          //'<div class="frog_imgContainer" id="cont_'+frog_id+'" onclick="display_token('+frog_id+')">'+
+          '<img src="'+frog_external+'" class="renderToken" onclick="display_token('+frog_id+')" />'+
+          '<div id="staked_'+frog_id+'"></div>'+
+          //'</div>'+
+          '<div id="traits_'+frog_id+'" class="trait_list">'+
+            '<strong style="color: white;" id="frog_'+frog_id+'">'+frog_name+'</strong><div id="owner_'+frog_id+'"style="float:right;">'+truncateAddress(owner)+'</div><div id="prop_'+frog_id+'" class="properties"></div>'+
+          '</div>'+
         '</div>'+
       '</div>';
 
