@@ -519,7 +519,7 @@
     frog_token.innerHTML =
       '<div class="frogTokenCont">'+
         '<div id="'+frog_id+'" class="renderLeft">'+
-          '<div class="innerLeft"></div>'+
+          '<div class="innerLeft">'+
             //'<div class="frog_imgContainer" id="cont_'+frog_id+'" onclick="display_token('+frog_id+')">'+
             '<img src="'+frog_external+'" class="renderToken" onclick="display_token('+frog_id+')" />'+
             '<div id="staked_'+frog_id+'"></div>'+
@@ -530,7 +530,7 @@
           '</div>'+
         '</div>'+
         '<div class="renderRight">'+
-          '<div class="innerRight"></div>'+
+          '<div class="innerRight">'+
             '<div id="traits_'+frog_id+'" class="trait_list">'+
             '<b>Properties</b>'+
             '</div>'+
