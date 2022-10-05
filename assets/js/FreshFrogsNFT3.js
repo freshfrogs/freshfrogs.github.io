@@ -523,7 +523,7 @@
           '<img src="'+frog_external+'" class="renderToken" onclick="display_token('+frog_id+')" />'+
           '<div id="staked_'+frog_id+'"></div>'+
           //'</div>'+
-          '<div class="trait_list">'+
+          '<div class="trait_list" style="border-bottom: none;">'+
             '<strong style="color: antiquewhite;" id="frog_'+frog_id+'">'+frog_name+'</strong><strong id="owner_'+frog_id+'"style="float:right; color: antiquewhite;">'+truncateAddress(owner)+'</strong>'+
           '</div>'+
         '</div>'+
