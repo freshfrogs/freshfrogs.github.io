@@ -522,7 +522,7 @@
           '<strong id="price_'+frog_id+'" class="frog_price">'+recent_sale+'</strong>'+
         '</div>'+
         //'<div class="frog_imgContainer" id="cont_'+frog_id+'" onclick="display_token('+frog_id+')">'+
-        '<img src="'+frog_external+'" class="recentMint" onclick="display_token('+frog_id+')" />'+
+        '<img src="'+frog_external+'" class="renderToken" onclick="display_token('+frog_id+')" />'+
         '<div id="staked_'+frog_id+'"></div>'+
         //'</div>'+
         '<div id="traits_'+frog_id+'" class="trait_list">'+
