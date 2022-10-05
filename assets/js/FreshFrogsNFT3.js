@@ -517,8 +517,8 @@
 
     // Element Inner HTML
     frog_token.innerHTML =
-      '<div id="'+frog_id+'" class="frogTokenCont">'+
-        '<div class="renderLeft">'+
+      '<div class="frogTokenCont">'+
+        '<div id="'+frog_id+'" class="renderLeft">'+
           '<div style="text-align: left; margin: 8px; height: 16px;">'+
             '<strong style="color: white;" id="price_'+frog_id+'" class="frog_price">'+recent_sale+'</strong>'+
           '</div>'+
