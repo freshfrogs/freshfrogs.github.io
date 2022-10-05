@@ -529,7 +529,7 @@
         '</div>'+
         '<div class="renderRight">'+
           '<div id="traits_'+frog_id+'" class="trait_list">'+
-            '<div id="prop_'+frog_id+'" class="properties"><b>Properties<b></div>'+
+            '<div id="prop_'+frog_id+'" class="properties"><b>Properties<b></div><br>'+
           '</div>'+
         '</div>'+
       '</div>';
@@ -538,7 +538,7 @@
     frog_doc.appendChild(frog_token);
     
     //document.getElementById('cont_'+frog_id).style.backgroundImage = 'url('+frog_external+')';
-    
+
     //document.getElementById('cont_'+frog_id).style.backgroundSize = "2048px 2048px";
 
     // Update Metadata!
