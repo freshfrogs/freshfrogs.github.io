@@ -527,6 +527,8 @@
             '<strong style="color: antiquewhite;" id="frog_'+frog_id+'">'+frog_name+'</strong><strong id="owner_'+frog_id+'"style="float:right; color: antiquewhite;">'+truncateAddress(owner)+'</strong><div id="prop_'+frog_id+'" class="properties"></div>'+
           '</div>'+
         '</div>'+
+        '<div class="renderRight">'+
+        '</div>'+
       '</div>';
 
     // Create Element -->
