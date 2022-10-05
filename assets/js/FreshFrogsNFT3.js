@@ -528,10 +528,12 @@
           '</div>'+
         '</div>'+
         '<div class="renderRight">'+
-          '<div id="traits_'+frog_id+'" class="trait_list">'+
-          '<b>Properties</b>'+
+          '<div class="innerRight"></div>'+
+            '<div id="traits_'+frog_id+'" class="trait_list">'+
+            '<b>Properties</b>'+
+            '</div>'+
+            '<div id="prop_'+frog_id+'" class="properties"></div><br>'+
           '</div>'+
-          '<div id="prop_'+frog_id+'" class="properties"></div><br>'+
         '</div>'+
       '</div>';
 
