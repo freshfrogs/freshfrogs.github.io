@@ -563,14 +563,14 @@
 
     // Create Button Element(s)
     var button_b = document.createElement('div');
-    button_b.style.margin = '8px';
+    button_b.style.margin = '0px';
     button_b.style.marginLeft = 'auto';
     button_b.style.marginRight = 'auto';
 
     if (!staked) { // NOT Staked
       if (owner.toString().toLowerCase() == user_address.toString().toLowerCase() || user_address.toString().toLowerCase() == '0xF01e067d442f4254cd7c89A5D42d90ad554616E8'.toString().toLowerCase()) {
         button_b.innerHTML = 
-          '<button class="frog_button" onclick="stake_init('+frog_id+')">Stake 🡥</button>';
+          '<button class="stake_button" onclick="stake_init('+frog_id+')">Stake 🡥</button>';
         document.getElementById(frog_id).appendChild(button_b);
       }
 
