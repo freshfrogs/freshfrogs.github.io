@@ -539,7 +539,7 @@
     frog_doc.appendChild(frog_token);
     
     //document.getElementById('cont_'+frog_id).style.backgroundImage = 'url('+frog_external+')';
-    
+
     //document.getElementById('cont_'+frog_id).style.backgroundSize = "2048px 2048px";
 
     // Update Metadata!
@@ -602,7 +602,7 @@
 
       if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
         button_b.innerHTML = 
-          '<button class="stake_button" onclick="withdraw_init('+frog_id+')">UnStake 🡧</button>';
+          '<button class="unstake_button" onclick="withdraw_init('+frog_id+')">UnStake 🡧</button>';
         document.getElementById(frog_id).appendChild(button_b);
         
       }
