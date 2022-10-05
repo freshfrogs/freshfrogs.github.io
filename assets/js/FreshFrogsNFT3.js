@@ -271,6 +271,14 @@
               '<limit class="displayUnit">Mint Limit</limit>'+
               '<br>'+'<b>9 Frogs @ Ξ0.01</b>'+
             '</div>'+
+            '<div class="terminalBottom">'+
+              '<supply class="displayUnit">Frogs Held</supply>'+
+              '<br><b>'+user_tokens+'</b>'+
+            '</div>'+
+            '<div class="terminalBottom">'+
+              '<limit class="displayUnit">Frogs Staked</limit>'+
+              '<br>'+'<b>'+staker_tokens+'</b>'+
+            '</div>'+
           '</div>'+
         '</div>'+
         '<div class="console_pre" id="console-pre"></div>'
