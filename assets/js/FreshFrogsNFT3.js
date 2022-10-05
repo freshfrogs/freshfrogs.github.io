@@ -582,7 +582,7 @@
 
       document.getElementById('staked_'+frog_id).innerHTML = 
         '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
-        '<div style="color:tomato;" class="frog_level"><b>Level '+staked_level+'</b></div>';
+        '<div style="color:#f06900;" class="frog_level"><b>Level '+staked_level+'</b></div>';
 
       var trait_text = document.createElement('div');
       trait_text.style.margin = '4px';
