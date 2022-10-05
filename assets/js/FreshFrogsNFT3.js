@@ -241,6 +241,11 @@
       user_invites = await f0.myInvites();
       user_keys = Object.keys(user_invites);
       is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+      
+      // No. Frogs owned by fetch_address
+      user_tokens = await collection.methods.balanceOf(user_address).call();
+      // No. of Frogs staked by fetch_address
+      staker_tokens = await stakers(user_address, 'amountStaked')
 
       // Collection Variables
       collection_name = await f0.api.name().call();
