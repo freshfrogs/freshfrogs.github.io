@@ -534,7 +534,7 @@
             '<div id="traits_'+frog_id+'" class="trait_list">'+
             '<b>Properties</b>'+
             '</div>'+
-            '<div id="prop_'+frog_id+'" class="properties"></div><br>'+
+            '<div id="prop_'+frog_id+'" class="properties"></div>'+
           '</div>'+
         '</div>'+
       '</div>';
