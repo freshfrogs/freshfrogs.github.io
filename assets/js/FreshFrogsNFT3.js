@@ -525,7 +525,7 @@
             '<div id="staked_'+frog_id+'"></div>'+
             //'</div>'+
             '<div class="trait_list" style="border-bottom: none;">'+
-              '<strong style="color: antiquewhite;" id="frog_'+frog_id+'">'+frog_name+'</strong><strong id="owner_'+frog_id+'"style="float:right; color: antiquewhite;">'+truncateAddress(owner)+'</strong>'+
+              '<strong style="color: white;" id="frog_'+frog_id+'">'+frog_name+'</strong><strong id="owner_'+frog_id+'"style="float:right; color: white;">'+truncateAddress(owner)+'</strong>'+
             '</div>'+
           '</div>'+
         '</div>'+
