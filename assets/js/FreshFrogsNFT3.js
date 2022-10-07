@@ -574,7 +574,7 @@
     if (!staked) { // NOT Staked
       if (owner.toString().toLowerCase() == user_address.toString().toLowerCase() || user_address.toString().toLowerCase() == '0xF01e067d442f4254cd7c89A5D42d90ad554616E8'.toString().toLowerCase()) {
         button_b.innerHTML = 
-          '<button class="stake_button" onclick="stake_init('+frog_id+')">Stake 🡥</button>';
+          '<button class="stake_button" onclick="stake_init('+frog_id+')"><strong>Frog #'+frog_id+'</strong>Stake 🡥</button>';
         document.getElementById(frog_id).appendChild(button_b);
       }
 
