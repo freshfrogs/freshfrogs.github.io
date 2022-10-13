@@ -31,6 +31,8 @@
       '</div>'
     );
 
+    console.log('fetching opensea collection info')
+
     // Fetch Collection Data via OpenSea API
     fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
     .then(collection => collection.json())
@@ -230,6 +232,7 @@
     COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
 
     try { // Attempt to Connect!
+      console.log('Connecting factoria, web3')
       await f0.init({
         web3: web3,
         contract: CONTRACT_ADDRESS,
