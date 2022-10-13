@@ -45,6 +45,8 @@
       
     });
 
+    console.log('Get Contract, Controller ABI')
+
     // Staking Contract ABI
     const CONTROLLER_ABI =
       [
