@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <style>
-
-  @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
   
-    html{
+    html {
       background-image: url("/assets/background.png");
+      font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
     }
-    html,h1,h2,h3 {
-      font-family: 'Open Sans', sans-serif !important;
+    body {
+      font: inherit !important;
     }
     .myProgress {
-      width: 213px;
+      width: 128px;
       background: transparent;
       margin: 8px;
       margin-left: auto;
@@ -131,7 +130,7 @@
         width: 20px;
         height: 20px;
         border-radius: 100%;
-        font-family: inherit;
+        font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
         transition: all .2s ease;
         text-align: center;
         cursor: pointer;
@@ -220,7 +219,7 @@
       border: none;
     }
     .h1 {
-      font-family: 'Open Sans', sans-serif !important;
+      font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
       font-weight: 800;
       color: white;
       text-align: center;
@@ -229,7 +228,7 @@
       font-size: xx-large;
     }
     .supply{
-      font-family: 'Open Sans', sans-serif !important;
+      font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
       color: #333;
       border-radius: 5px;
       border: 1px solid #e0e0e0;
@@ -264,29 +263,32 @@
       font-size: small !important;
     }
     section {
-      font-family: 'Open Sans', sans-serif !important;
+      font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
       font-size: auto;
-      background-color: transparent;
+      color: antiquewhite !important;
+      background-color: #1B4965;
       text-align: center;
+      border-radius: 7px;
       padding: 0px !important;
-      margin-left: auto;
-      margin-right: auto;
-      float: none !important;
-      width: 100%;
+      overflow: hidden;
+      margin-bottom: 16px;
+      font-size: small !important;
+      border: 1px solid black;
     }
     header {
       overflow: hidden;
-      background-color: #7cc1ff;
+      background-color: #1B4965;
       text-align: center;
       border-radius: 5px;
       width: auto;
-      font-family: 'Open Sans', sans-serif !important;
+      font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
       font-size: auto !important;
       margin-bottom: 16px !important;
-      color: #333;
+      color: #19282F;
       padding-bottom: 0px !important;
       padding-left: 14px;
       padding-right: 14px;
+      border: 1px solid black;
     }
     .desc {
       position: relative;
@@ -308,7 +310,7 @@
       image-rendering: pixelated;
     }
     .downloads a{
-      font-family: 'Open Sans', sans-serif !important;
+      font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
       font-size: inherit !important;
       color: inherit !important;
     }
@@ -451,12 +453,11 @@
       margin-top: 1%;
     }
     .h2 {
-      font-family: 'Open Sans', sans-serif !important;
+      font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
       font-weight: 750;
       text-align: center;
       padding: 0%;
       font-size: large;
-      font: "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
       margin-top: 8px;
       margin-bottom: 0px;
       line-height: 1.1;
@@ -507,7 +508,7 @@
     .thePad {
       border-radius: 5px;
       padding: 4px;
-      background-color: transparent;
+      background-color: #7cc1ff;
       margin-left: auto;
       margin-right: auto;
       width: fit-content;
@@ -575,13 +576,16 @@
       color: #7cc1ff;
     }
     .mintingTextWhite2 {
-      background-color: antiquewhite;
+      background-color: #5FA8D3;
       border: 1px solid black;
       padding: 16px;
-      color: #333 !important;
+      color: white !important;
       box-shadow: 3px 3px rgb(122 122 122 / 20%);
-      margin: 0px;
+      margin: auto;
       border-radius: 5px;
+      width: 80%;
+      margin-left: auto;
+      margin-right: auto;
       overflow: hidden;
       font-size: small !important;
     }
@@ -597,9 +601,13 @@
       cursor: pointer;
     }
     .recentMint {
-      width: 128px;
-      height: 128px;
-      border-radius: 100%;
+      width: 64px;
+      height: 64px;
+      border-radius: 5px;
+      box-shadow: 3px 3px rgb(122 122 122 / 20%);
+      margin: 4px;
+      border: 1px solid black;
+      cursor: pointer;
     }
     .recent_mints {
       margin-left: auto;
@@ -607,6 +615,25 @@
       margin-top: 5%;
       margin-bottom: auto;
       width: 90%;
+    }
+    .stake_button {
+      border: 1px solid black;
+      background-color: salmon;
+      color: white;
+      font-weight: bold;
+      border-radius: 5px;
+      padding: 8px;
+      margin-left: auto;
+      margin-right: auto;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
+      width: 90%;
+      box-shadow: 3px 3px rgb(122 122 122 / 20%);
+    }
+    .stake_button:hover {
+      background-color: #7cc1ff;
+      color: white;
     }
     .frog_button {
       border: 1px solid black;
@@ -618,7 +645,7 @@
       margin-right: 8px;
       cursor: pointer;
       transition: all .2s;
-      font-family: 'Open Sans', sans-serif !important;
+      font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
       min-width: 100px;
   }
     .frog_button:hover {
@@ -691,8 +718,6 @@
       padding-top: 8px;
     }
     .properties {
-      border-top: 1px solid black;
-      border-left: 1px solid black;
       padding: 8px;
       border-top-left-radius: 5px;
       padding-bottom: 0px;
@@ -712,7 +737,7 @@
       float: right;
     }
     .frog_level {
-      text-align: center;
+      text-align: middle;
       float: none;
       font-size: small;
     }
@@ -750,6 +775,21 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
+        console.log('updating display frogs')
+        // bigContainer recentMint
+        var displayLoop = 9;
+        var randomFrog = getRandomInt(1, (4040-displayLoop));
+        var container = document.getElementById('bigContainer');
+
+        container.innerHTML = ''
+
+        for (var i = 0; i < displayLoop; i++) {
+          var displayImg = document.createElement('img');
+          displayImg.src = '../frog/'+(randomFrog+i)+'.png'
+          displayImg.className = 'recentMint'
+          container.appendChild(displayImg);
+        }
+
         await connect_init();
 
       })
@@ -762,32 +802,56 @@
 
       async function connect_init() {
         await connect();
-        await fetch_user_data('0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38');
+        await fetch_user_data(user_address);
       }
 
     </script>
     
   </head>
   <body class="bodyb">
-    <section>
-      <div class="top">{{ content }}</div>
-      <div class="mintingTextWhite2">
-        <div>
-          <div style="float: left; width: 128px; height: 128px;">
-            <img src="https://freshfrogs.io/assets/frogs/FreshFrogsNFT.png" class="recentMint" id="displayImg1">
-          </div>
-          <div style="margin-left: auto; margin-right: auto; float: right; width: 70%;">
-            <h1 style="margin: 8px !important; color: black !important;">FreshFrogsNFT</h1>
-            <p>Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
+    <div class="top">{{ content }}
+      <img src="../assets/bannerTop2.png" style="margin-bottom: 5%;"/>
+    </div>
+    <div class="wrapper">
+      <header id="header">
+        <div class="downloads pre">
+          <ul class="downloads2">
+            <li><a id="button_left" class="pointer" href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><strong>Etherscan</strong>Contract</a></li>
+            <li><a id="button_middle" class="pointer" href="https://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong>Server</a></li>
+            <li><a id="button_right" class="pointer" href="https://www.gem.xyz/collection/fresh-frogs" target="_blank"><strong>Gemxyz</strong>Rankings</a></li>
+          </ul>
+          <div id="mintingTray" class="mintingTray">
+            <br>
+            <div id="bigContainer" class="bigContainer"></div>
           </div>
         </div>
-        <br>
-        <div id="pre"></div>
-        <div class="console_pre" id="console-pre"></div>
-      </div>
-    </section>
-    <br>
-    <div id="thePad" class="thePad"></div>
+      </header>
+      <section id="section">
+        <div class="downloads pre">
+          <div id="netStatus" class="netStatus">
+            <br>
+            <img src="../assets/blackWhite.png" class="recentMint" style="border: none; height: 128px; width: 128px; border-radius: 100%; margin: 32px;">
+            <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;"><strong style="color: white;">FreshFrogsNFT</strong> is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
+            opensea.io/collection/fresh-frogs<a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong style="color: white;">Shop on OpenSea ⛵</strong></a>
+            <br>
+            <div id="pre" class="mintingTextWhite2">
+              <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="https://freshfrogs.io/the-pond">
+                <button onclick="connect_init()" style="list-style: none; min-height: 40px; padding: 8px; border-radius: 5px; border: 1px solid black; width: 270px; margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">
+                  <strong>Connect Wallet</strong>Ethereum Blockchain
+                </button>
+              </a>
+              <br>
+              <hr style="background: black;">
+              <div class="console_pre" id="console-pre" style="background: transparent;"></div>
+            </div>
+            <br>
+          </div>
+        </div>
+      </section>
+      <section style="background: transparent; border: none;">
+        <div id="thePad" class="thePad"></div>
+      </section>
+    </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
   </body>
 </html>
