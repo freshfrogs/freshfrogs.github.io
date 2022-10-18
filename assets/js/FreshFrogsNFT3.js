@@ -514,8 +514,8 @@
     let frog_name = 'Frog #'+frog_id;
 
     // <-- Begin Element
-    frog_doc = document.getElementById('thePad');
-    frog_token = document.createElement('div');
+    var frog_doc = document.getElementById('thePad');
+    var frog_token = document.createElement('div');
     frog_token.id = frog_name;
     frog_token.className = 'frog_token';
     //frog_token.onclick = function() { display_token(frog_id); }
