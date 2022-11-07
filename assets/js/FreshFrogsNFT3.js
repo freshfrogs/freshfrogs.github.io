@@ -529,15 +529,15 @@
             '<img src="'+frog_external+'" class="renderToken" onclick="display_token('+frog_id+')" />'+
             '<div id="staked_'+frog_id+'"></div>'+
             //'</div>'+
-            '<div class="trait_list" style="border-bottom: none;">'+
-              '<strong style="color: cornflowerblue;" id="frog_'+frog_id+'">'+frog_name+'</strong><strong id="owner_'+frog_id+'"style="float:right; color: white;">'+truncateAddress(owner)+'</strong>'+
-            '</div>'+
+           // '<div class="trait_list" style="border-bottom: none;">'+
+           //   '<strong style="color: cornflowerblue;" id="frog_'+frog_id+'">'+frog_name+'</strong><strong id="owner_'+frog_id+'"style="float:right; color: white;">'+truncateAddress(owner)+'</strong>'+
+           // '</div>'+
           '</div>'+
         '</div>'+
         '<div class="renderRight">'+
           '<div class="innerRight">'+
             '<div id="traits_'+frog_id+'" class="trait_list">'+
-            '<b>Properties</b>'+
+            '<b>'+frog_name+'</b>'+
             '</div>'+
             '<div id="prop_'+frog_id+'" class="properties"></div>'+
           '</div>'+
