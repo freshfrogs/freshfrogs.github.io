@@ -553,6 +553,7 @@
     // Update Metadata!
     //
     
+    /** 
     let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
 
@@ -570,6 +571,7 @@
       document.getElementById('prop_'+frog_id).appendChild(trait_text);
 
     }
+    */
 
     // Create Button Element(s)
     var button_b = document.createElement('div');
