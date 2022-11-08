@@ -549,10 +549,8 @@
     
     //document.getElementById('cont_'+frog_id).style.backgroundImage = 'url('+frog_external+')';
     //document.getElementById('cont_'+frog_id).style.backgroundSize = "2048px 2048px";
-
     // Update Metadata!
     
-    /** 
     let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
 
@@ -570,7 +568,7 @@
       document.getElementById('prop_'+frog_id).appendChild(trait_text);
 
     }
-    */
+    
 
     // Create Button Element(s)
     var button_b = document.createElement('div');
@@ -578,6 +576,7 @@
     button_b.style.marginLeft = 'auto';
     button_b.style.marginRight = 'auto';
 
+    /*
     if (!staked) { // NOT Staked
       if (owner.toString().toLowerCase() == user_address.toString().toLowerCase() || user_address.toString().toLowerCase() == '0xF01e067d442f4254cd7c89A5D42d90ad554616E8'.toString().toLowerCase()) {
         button_b.innerHTML = 
@@ -617,6 +616,7 @@
         
       }
     }
+    */
   }
 
   // loadTrait(_trait(family), _attribute(type), _where(element))
