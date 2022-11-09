@@ -364,14 +364,16 @@
             console.log(assets)
             assets.forEach((frog) => {
 
-              try { var { token_id, last_sale: { payment_token: { decimals }, total_price }} = frog } catch (e) {}
+              try { var { token_id, last_sale: { payment_token: { decimals }, total_price }, rarity_data } = frog } catch (e) {}
+
+              console.log(frog)
 
               if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
                 let sale_price = total_price / Math.pow(10, decimals);
-                render_token(token_id, sale_price);
+                render_token(token_id, rarity_data, sale_price);
 
               } else {
-                render_token(token_id);
+                render_token(token_id, rarity_data);
 
               }
             })
@@ -500,7 +502,7 @@
   }
 
   // render_token()
-  async function render_token(frog_id, recent_sale) {
+  async function render_token(frog_id, rarity_rank, recent_sale) {
     if (! recent_sale) { recent_sale = ''; } else { recent_sale = 'Ξ'+recent_sale; }
 
     try {
@@ -553,7 +555,7 @@
         '<div class="renderRight">'+
           '<div class="innerRight">'+
             '<div id="traits_'+frog_id+'" class="trait_list">'+
-              '<b>'+frog_name+'</b>'+
+              '<b>'+frog_name+'</b> ('+rarity_rank.rank+')'+
             '</div>'+
             '<div id="prop_'+frog_id+'" class="properties">'+
             //
