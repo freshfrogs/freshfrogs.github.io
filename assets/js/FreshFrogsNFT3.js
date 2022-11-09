@@ -502,15 +502,24 @@
   async function render_token(frog_id, recent_sale) {
     if (! recent_sale) { recent_sale = ''; } else { recent_sale = 'Ξ'+recent_sale; }
 
-    // Is Frog Currently Staked?
-    let staked = await stakerAddress(frog_id);
-    let owner = await collection.methods.ownerOf(frog_id).call();
+    try {
 
-    var staked_time_bool = 0;
-    var staked_level = 1;
+      // Is Frog Currently Staked?
+      let staked = await stakerAddress(frog_id);
+      let owner = await collection.methods.ownerOf(frog_id).call();
 
-    staked_time_bool = await timeStaked(frog_id);
-    staked_level = Math.floor(staked_time_bool / 1000);
+      var staked_time_bool = 0;
+      var staked_level = 1;
+
+      staked_time_bool = await timeStaked(frog_id);
+      staked_level = Math.floor(staked_time_bool / 1000);
+
+    } catch (e) {
+
+      console.log(e.message);
+      
+    }
+
 
     // Token Variable Links
     let frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
