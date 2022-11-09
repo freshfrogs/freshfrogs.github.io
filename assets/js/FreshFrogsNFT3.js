@@ -573,7 +573,6 @@
       '</div>';
 
     // Create Element -->
-
     frog_doc.appendChild(frog_token);
     
     document.getElementById(frog_id).style.backgroundImage = 'url('+frog_external+')';
