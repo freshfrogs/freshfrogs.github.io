@@ -555,7 +555,7 @@
               '<b>'+frog_name+'</b>'+
             '</div>'+
             '<div id="prop_'+frog_id+'" class="properties">'+
-            /**
+            //
               '<div style="margin: 8px;">'+
                 '<text>Time Staked</text>'+'<br>'+
                 '<text style="color: #1ac486;">'+staked_time_bool+' hours (Lvl '+staked_level+')</text>'+
@@ -568,7 +568,7 @@
                 '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
                 //'<br>'+'<button class="stake_button">Build Token</button>'+
               '</div>'+
-            */
+            //
             '</div>'+
           '</div>'+
         '</div>'+
