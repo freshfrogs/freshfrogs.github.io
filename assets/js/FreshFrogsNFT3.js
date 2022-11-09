@@ -352,7 +352,7 @@
       }
 
       // Render Frogs Held by Fetch Address
-      
+
       if (user_tokens >= 1) {
         let pages = parseInt(user_tokens/50) + 1;
         for (var i = 0; i < pages; i++) {
@@ -368,13 +368,14 @@
               try { var { token_id, last_sale: { payment_token: { decimals }, total_price }, rarity_data } = frog } catch (e) {}
 
               console.log(frog)
+              console.log(rarity_data.rank)
 
               if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
                 let sale_price = total_price / Math.pow(10, decimals);
-                render_token(token_id, rarity_data, sale_price);
+                render_token(token_id, rarity_data.rank, sale_price);
 
               } else {
-                render_token(token_id, rarity_data);
+                render_token(token_id, rarity_data.rank);
 
               }
             })
@@ -556,7 +557,7 @@
         '<div class="renderRight">'+
           '<div class="innerRight">'+
             '<div id="traits_'+frog_id+'" class="trait_list">'+
-              '<b>'+frog_name+'</b> ('+rarity_rank.rank+')'+
+              '<b>'+frog_name+'</b> ('+rarity_rank+')'+
             '</div>'+
             '<div id="prop_'+frog_id+'" class="properties">'+
             //
