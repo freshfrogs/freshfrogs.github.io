@@ -543,7 +543,7 @@
           '</div>'+
         '</div>'+
       '</div>';
-
+    
     // Create Element -->
     frog_doc.appendChild(frog_token);
     
