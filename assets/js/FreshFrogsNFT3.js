@@ -316,7 +316,7 @@
       let staker_rewards = (staker_info / 1000000000000000000);
       staker_rewards = String(staker_rewards).slice(0, 6);
 
-      /*
+      //
       if (render_vault) {
         Output(
           '<button style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+
@@ -333,7 +333,7 @@
           '<hr style="background: black;">'+
           '<div class="console_pre" id="console-pre"></div>');
       }
-      */
+      //
 
       // Render Frogs Staked by User
       if (staker_tokens >= 1) {
