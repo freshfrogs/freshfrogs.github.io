@@ -540,8 +540,10 @@
               '<b>'+frog_name+'</b>'+
             '</div>'+
             '<div id="prop_'+frog_id+'" class="properties">'+
-              '<text style="color: #1ac486;">Time Staked</text>'+'<br>'+
-              '<text>0 hours (Lvl 1)</text>'+
+              '<div style="margin: 4px;">'+
+                '<text style="color: #1ac486;">Time Staked</text>'+'<br>'+
+                '<text>0 hours (Lvl 1)</text>'+
+              '</div>'+
             '</div>'+
           '</div>'+
         '</div>'+
@@ -561,14 +563,14 @@
       let attribute = metadata.attributes[i]
       loadTrait(attribute.trait_type, attribute.value, 'cont_'+frog_id);
 
-      try { trait_rarity = ((traits_list[attribute.trait_type][attribute.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) { trait_rarity = 'e'; }
-      if (trait_rarity < 1) { trait_rarity = '<1%' } else { trait_rarity = trait_rarity+'%' }
+      //try { trait_rarity = ((traits_list[attribute.trait_type][attribute.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) { trait_rarity = 'e'; }
+      //if (trait_rarity < 1) { trait_rarity = '<1%' } else { trait_rarity = trait_rarity+'%' }
 
-      var trait_text = document.createElement('div');
-      trait_text.style.margin = '4px';
-      if (attribute.trait_type == 'Frog' || attribute.trait_type == 'SpecialFrog') { trait_text.innerHTML = '<trait style="color: #1ac486;">'+attribute.trait_type+'</trait><br><text id="frogType_'+frog_id+'">'+attribute.value+'</text> <text class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></text><br>'; }
-      else { trait_text.innerHTML = '<trait style="color: #1ac486;">'+attribute.trait_type+'</trait><br><text>'+attribute.value+'</text> <text class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></text><br>'; }
-      document.getElementById('prop_'+frog_id).appendChild(trait_text);
+      //var trait_text = document.createElement('div');
+      //trait_text.style.margin = '4px';
+      //if (attribute.trait_type == 'Frog' || attribute.trait_type == 'SpecialFrog') { trait_text.innerHTML = '<trait style="color: #1ac486;">'+attribute.trait_type+'</trait><br><text id="frogType_'+frog_id+'">'+attribute.value+'</text> <text class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></text><br>'; }
+      //else { trait_text.innerHTML = '<trait style="color: #1ac486;">'+attribute.trait_type+'</trait><br><text>'+attribute.value+'</text> <text class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></text><br>'; }
+      //document.getElementById('prop_'+frog_id).appendChild(trait_text);
 
     }
 
