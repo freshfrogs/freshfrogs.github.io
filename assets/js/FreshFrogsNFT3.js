@@ -562,6 +562,7 @@
     
     //document.getElementById('cont_'+frog_id).style.backgroundImage = 'url('+frog_external+')';
     //document.getElementById('cont_'+frog_id).style.backgroundSize = "2048px 2048px";
+    
     // Update Metadata!
     
     let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
