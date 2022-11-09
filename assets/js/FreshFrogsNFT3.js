@@ -550,7 +550,7 @@
               '</div>'+
               '<div>'+
                 '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
-                '<br>'+'<button class="stake_button">Build Token</button>'+
+                //'<br>'+'<button class="stake_button">Build Token</button>'+
               '</div>'+
             '</div>'+
           '</div>'+
