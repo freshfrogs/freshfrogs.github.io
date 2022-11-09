@@ -506,13 +506,11 @@
     let staked = await stakerAddress(frog_id);
     let owner = await collection.methods.ownerOf(frog_id).call();
 
-    if (staked) {
-      let staked_time_bool = await timeStaked(frog_id);
-      let staked_level = Math.floor(staked_time_bool / 1000);
-    } else {
-      let staked_time_bool = 0;
-      let staked_level = 1;
-    }
+    var staked_time_bool = 0;
+    var staked_level = 1;
+
+    staked_time_bool = await timeStaked(frog_id);
+    staked_level = Math.floor(staked_time_bool / 1000);
 
     // Token Variable Links
     let frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
