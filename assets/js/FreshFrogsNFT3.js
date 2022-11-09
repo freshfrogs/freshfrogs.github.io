@@ -548,7 +548,7 @@
                 '<text>$FLYZ Earned</text>'+'<br>'+
                 '<text style="color: #1ac486;">110.69</text>'+
               '</div>'+
-              '<div>'+
+              '<div style="text-align: center;">'+
                 '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
                 //'<br>'+'<button class="stake_button">Build Token</button>'+
               '</div>'+
