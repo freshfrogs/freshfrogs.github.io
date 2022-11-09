@@ -550,7 +550,7 @@
               '</div>'+
               '<div>'+
                 '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
-                '<button class="stake_button">Build Token</button>'+
+                '<br>'+'<button class="stake_button">Build Token</button>'+
               '</div>'+
             '</div>'+
           '</div>'+
@@ -562,7 +562,7 @@
     
     //document.getElementById('cont_'+frog_id).style.backgroundImage = 'url('+frog_external+')';
     //document.getElementById('cont_'+frog_id).style.backgroundSize = "2048px 2048px";
-    
+
     // Update Metadata!
     
     let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
