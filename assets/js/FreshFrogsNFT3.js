@@ -361,6 +361,7 @@
           .then((tokens) => tokens.json())
           .then((tokens) => {
             var { assets } = tokens
+            console.log(assets)
             assets.forEach((frog) => {
 
               try { var { token_id, last_sale: { payment_token: { decimals }, total_price }} = frog } catch (e) {}
