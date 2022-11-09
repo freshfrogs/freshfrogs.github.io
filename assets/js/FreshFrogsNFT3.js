@@ -541,8 +541,12 @@
             '</div>'+
             '<div id="prop_'+frog_id+'" class="properties">'+
               '<div style="margin: 4px;">'+
-                '<text style="color: #1ac486;">Time Staked</text>'+'<br>'+
-                '<text>0 hours (Lvl 1)</text>'+
+                '<text>Time Staked</text>'+'<br>'+
+                '<text style="color: #1ac486;">0 hours (Lvl 1)</text>'+
+              '</div>'+
+              '<div style="margin: 4px;">'+
+                '<text>$FLYZ Earned</text>'+'<br>'+
+                '<text style="color: #1ac486;">110.69</text>'+
               '</div>'+
             '</div>'+
           '</div>'+
