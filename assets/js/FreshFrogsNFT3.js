@@ -367,7 +367,7 @@
               try { var { token_id, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog } catch (e) { console.log(e.message) }
 
               console.log(frog)
-              console.log(rank)
+              console.log('Rarity: '+rank)
 
               if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
                 let sale_price = total_price / Math.pow(10, decimals);
