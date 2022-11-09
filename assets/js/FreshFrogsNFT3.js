@@ -361,10 +361,9 @@
           .then((tokens) => tokens.json())
           .then((tokens) => {
             var { assets } = tokens
-            console.log(assets)
             assets.forEach((frog) => {
 
-              try { var { token_id, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog } catch (e) { console.log(e.message) }
+              try { var { token_id, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog } catch (e) {}
               console.log('Frog #'+token_id+' : '+rank)
 
               if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
