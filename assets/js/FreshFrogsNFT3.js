@@ -537,9 +537,12 @@
         '<div class="renderRight">'+
           '<div class="innerRight">'+
             '<div id="traits_'+frog_id+'" class="trait_list">'+
-            '<b>'+frog_name+'</b>'+
+              '<b>'+frog_name+'</b>'+
             '</div>'+
-            '<div id="prop_'+frog_id+'" class="properties"></div>'+
+            '<div id="prop_'+frog_id+'" class="properties">'+
+              '<text style="color: #1ac486;">Time Staked</text>'+'<br>'+
+              '<text>0 hours (Lvl 1)</text>'+
+            '</div>'+
           '</div>'+
         '</div>'+
       '</div>';
@@ -574,7 +577,6 @@
     button_b.style.margin = '0px';
     button_b.style.marginLeft = 'auto';
     button_b.style.marginRight = 'auto';
-
     
     /*
     if (!staked) { // NOT Staked
