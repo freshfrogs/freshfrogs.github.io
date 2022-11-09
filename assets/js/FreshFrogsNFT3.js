@@ -365,17 +365,17 @@
             console.log(assets)
             assets.forEach((frog) => {
 
-              try { var { token_id, last_sale: { payment_token: { decimals }, total_price }, rarity_data } = frog } catch (e) {}
+              try { var { token_id, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog } catch (e) {}
 
               console.log(frog)
-              console.log(rarity_data.rank)
+              console.log(rank)
 
               if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
                 let sale_price = total_price / Math.pow(10, decimals);
-                render_token(token_id, rarity_data.rank, sale_price);
+                render_token(token_id, rank, sale_price);
 
               } else {
-                render_token(token_id, rarity_data.rank);
+                render_token(token_id, rank);
 
               }
             })
@@ -534,7 +534,7 @@
     let frog_name = 'Frog #'+frog_id;
 
     // <-- Begin Element
-    
+
     var frog_doc = document.getElementById('thePad');
     var frog_token = document.createElement('div');
     frog_token.id = frog_name;
