@@ -352,7 +352,6 @@
       }
 
       // Render Frogs Held by Fetch Address
-
       if (user_tokens >= 1) {
         let pages = parseInt(user_tokens/50) + 1;
         for (var i = 0; i < pages; i++) {
