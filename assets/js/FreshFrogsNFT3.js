@@ -509,7 +509,11 @@
     if (staked) {
       let staked_time_bool = await timeStaked(frog_id);
       let staked_level = Math.floor(staked_time_bool / 1000);
+    } else {
+      let staked_time_bool = 0;
+      let staked_level = 1;
     }
+
     // Token Variable Links
     let frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
     let frog_etherscan = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
