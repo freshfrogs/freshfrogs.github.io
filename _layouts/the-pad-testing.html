@@ -881,12 +881,14 @@
 
         container.innerHTML = ''
 
-        for (var i = 0; i < displayLoop; i++) {
+        //for (var i = 0; i < displayLoop; i++) {
           var displayImg = document.createElement('img');
           displayImg.src = '../frog/'+(randomFrog+i)+'.png'
           displayImg.className = 'recentMint'
+          displayImg.style.width = '256px'
+          displayImg.style.height = '256px'
           container.appendChild(displayImg);
-        }
+        //}
 
         await connect_init();
 
