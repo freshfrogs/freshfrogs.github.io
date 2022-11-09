@@ -543,7 +543,7 @@
           '</div>'+
         '</div>'+
       '</div>';
-    
+
     // Create Element -->
     frog_doc.appendChild(frog_token);
     
@@ -568,7 +568,6 @@
       document.getElementById('prop_'+frog_id).appendChild(trait_text);
 
     }
-    
 
     // Create Button Element(s)
     var button_b = document.createElement('div');
