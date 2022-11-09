@@ -363,17 +363,8 @@
             var { assets } = tokens
             assets.forEach((frog) => {
 
-              try { var { token_id, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog } catch (e) {}
-              console.log('Frog #'+token_id+' : '+rank)
+              render_token(frog);
 
-              if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
-                let sale_price = total_price / Math.pow(10, decimals);
-                render_token(token_id, sale_price);
-
-              } else {
-                render_token(token_id);
-
-              }
             })
           })
           .catch(e => {
@@ -500,8 +491,25 @@
   }
 
   // render_token()
-  async function render_token(frog_id, recent_sale) {
-    if (! recent_sale) { recent_sale = ''; } else { recent_sale = 'Ξ'+recent_sale; }
+  async function render_token(frog) {
+
+    console.log(frog)
+
+    try { var { token_id, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog } catch (e) {}
+
+    console.log(token_id)
+
+    /*
+
+    if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
+
+      let sale_price = total_price / Math.pow(10, decimals);
+      recent_sale = 'Ξ'+sale_price;
+
+    } else {
+
+      recent_sale = '';
+    }
 
     try {
 
