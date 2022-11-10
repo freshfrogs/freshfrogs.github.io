@@ -499,15 +499,47 @@
     }
   }
 
-  // render_token()
-  
+  /* Get OpenSea Username
+
+    let options = {method: 'GET'};
+
+    fetch('https://api.opensea.io/api/v1/user/USERADDRESS, options)
+      .then(token => token.json())
+      .then(token => render_token(token))
+      .catch(err => console.error(err));
+
+  */
+
+  /*
+
+    Render Token Information
+    render_token( <data object> )
+
+  */
+
   async function render_token(frog) {
 
-    try {
+    try { // Assign token variables from data object
+      var { token_id, owner: { address, user: { username } }, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog
+    } catch (e) {} // Suppress errors for missing variables
 
-      var { token_id, owner: { user: { username } }, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog
-    
-    } catch (e) {}
+    // Is this token currently staked?
+    var staked = await stakerAddress(token_id);
+
+    if (!staked) {} // Token is not currently staked
+    else { // Token IS currently staked!
+
+      let options = {method: 'GET'};
+
+      fetch('https://api.opensea.io/api/v1/user'+staked, options)
+        .then(trueUser => trueUser.json())
+        .then(trueUser => {
+          console.log('True User : '+trueUser)
+          //var { owner: { address, user: { username } } = trueUser
+        })
+        .catch(err => console.error(err));
+
+    }
 
     console.log(token_id+' : '+username)
 
@@ -531,7 +563,7 @@
     try {
 
       // Is Frog Currently Staked?
-      let staked = await stakerAddress(token_id);
+      //let staked = await stakerAddress(token_id);
       let owner = await collection.methods.ownerOf(token_id).call();
 
       var staked_time_bool = 0;
@@ -1063,8 +1095,16 @@
 
   }
 
-  // stakerAddress(<input> (uint256)) | return address
+  /*
+
+    Retrieve staked token's true owner
+    stakerAddress(<input> (uint256)) | return staker's address or false
+
+  */
+
   async function stakerAddress(tokenId) {
+
+    // Call function from controller contract
     let stakerAddress = await controller.methods.stakerAddress(tokenId).call();
 
     // Return staker's address
@@ -1074,6 +1114,7 @@
     
     // Token is Not Currently Staked!
     else { return false; }
+
   }
 
   // stakers(<input> (address), <input> (dataFetch)) | return ( amountStaked, timeOfLastUpdate, unclaimedRewards )
