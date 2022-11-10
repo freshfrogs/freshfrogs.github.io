@@ -520,6 +520,8 @@
 
         var { owner: { address, user: { username } } } = frog
 
+        console.log(token_id+' owned by '+username);
+
       // Token IS currently staked!
       } else { 
 
@@ -537,10 +539,10 @@
           })
           .catch(err => console.error(err));
 
+          console.log(token_id+' staked by '+username);
+
       }
     } catch (e) { console.log(e.message) } // Suppress errors for missing variables
-
-    console.log(token_id+' owned by '+username);
 
     if (typeof username == 'undefined' || username == 'null') { username = ''; }
 
