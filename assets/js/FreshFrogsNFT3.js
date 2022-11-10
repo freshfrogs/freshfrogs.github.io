@@ -548,11 +548,7 @@
       let sale_price = total_price / Math.pow(10, decimals);
       recent_sale = 'Ξ'+sale_price;
 
-    } else {
-
-      recent_sale = '';
-
-    }
+    } else { recent_sale = ''; }
 
     try {
 
