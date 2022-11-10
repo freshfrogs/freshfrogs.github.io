@@ -531,7 +531,7 @@
 
       let options = {method: 'GET'};
 
-      fetch('https://api.opensea.io/api/v1/user'+staked, options)
+      fetch('https://api.opensea.io/api/v1/user/'+staked, options)
         .then(trueUser => trueUser.json())
         .then(trueUser => {
           console.log('True User : '+trueUser)
