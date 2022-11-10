@@ -506,10 +506,8 @@
 
   async function render_token(frog) {
 
-    try {
-
-      // Assign token variables from data object
-      var { token_id, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog
+    // Assign token variables from data object
+    try { var { token_id, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog } catch (e) {}
 
       // Is this token currently staked?
       var staked = await stakerAddress(token_id);
@@ -548,7 +546,6 @@
         console.log(token_id+' staked by '+username);
 
       }
-    } catch (e) { console.log(e.message) } // Suppress errors for missing variables
 
     if (typeof username == 'undefined' || username == 'null') { username = truncateAddress(owner_address); }
 
