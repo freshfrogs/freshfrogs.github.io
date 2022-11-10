@@ -534,78 +534,22 @@
 
   async function render_token(frog) {
 
-
-    // test 2
+    console.log(frog)
 
     // Assign token variables from data object
-    try { var { token_id, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog } catch (e) {}
+    try { var { token_id, external_link, permalink, owner: { address, user: { username } }, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog } catch (e) {}
 
-      // Is this token currently staked?
-      var staked = await stakerAddress(token_id);
+    if (typeof username == 'undefined' || username == 'null') { username = truncateAddress(address); }
 
-      // Username variable
-      var opensea_username;
+    /*
+      if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
 
-      // Token NOT currently staked
-      if (!staked) {
+        let sale_price = total_price / Math.pow(10, decimals);
+        recent_sale = 'Ξ'+sale_price;
 
-        var { owner: { address, user: { username } } } = frog
-        opensea_username = username
+      } else { recent_sale = ''; }
+    */
 
-      // Token IS currently staked!
-      } else {
-        
-        let options = {method: 'GET'};
-
-        fetch('https://api.opensea.io/api/v1/user/'+staked+'', options)
-        .then(OSUser => OSUser.json())
-        .then(OSUser => {
-          
-          var { account: { user: { username } } } = OSUser
-          opensea_username = OSUser.username
-          
-        })
-        .catch(err => {
-          
-          console.error(err)
-          
-        });
-
-      }
-
-    console.log(opensea_username)
-
-    //if (typeof username == 'undefined' || username == 'null') { username = truncateAddress(owner_address); }
-
-    if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
-
-      let sale_price = total_price / Math.pow(10, decimals);
-      recent_sale = 'Ξ'+sale_price;
-
-    } else { recent_sale = ''; }
-
-    try {
-
-      // Is Frog Currently Staked?
-      //let staked = await stakerAddress(token_id);
-      //let owner = await collection.methods.ownerOf(token_id).call();
-
-      var staked_time_bool = 0;
-      var staked_level = 1;
-
-      staked_time_bool = await timeStaked(token_id);
-      staked_level = Math.floor(staked_time_bool / 1000) + 1;
-
-    } catch (e) {
-
-      console.log(e.message);
-      
-    }
-
-    // Token Variable Links
-    let frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
-    let frog_etherscan = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
-    let frog_gemxyz = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
     let frog_external = 'https://freshfrogs.io/frog/'+token_id+'.png';
     let frog_name = 'Frog #'+token_id;
 
@@ -633,7 +577,7 @@
         '<div class="renderRight">'+
           '<div class="innerRight">'+
             '<div id="traits_'+token_id+'" class="trait_list">'+
-              '<b>'+frog_name+'</b> <text style="color: #1ac486;">'+opensea_username+'</text>'+
+              '<b>'+frog_name+'</b> <text style="color: #1ac486;">'+username+'</text>'+
             '</div>'+
             '<div id="prop_'+token_id+'" class="properties">'+
             //
