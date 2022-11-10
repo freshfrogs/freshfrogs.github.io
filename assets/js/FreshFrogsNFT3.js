@@ -557,7 +557,7 @@
         '<div class="renderRight">'+
           '<div class="innerRight">'+
             '<div id="traits_'+token_id+'" class="trait_list">'+
-              '<b>'+frog_name+'</b>'+'('+rank+')'+
+              '<b>'+frog_name+'</b>'+'<text style="color: #1ac486; border: 1px solid #1ac486; border-radius: 100%;">'+rank+'</text>'+
             '</div>'+
             '<div id="prop_'+token_id+'" class="properties">'+
             //
