@@ -499,6 +499,32 @@
 
   /*
 
+    Retrieve OpenSea Username
+    fetch_username(<address>) | return username (string)
+
+  */
+
+    async function fetch_username(address_arg) {
+
+      let options = {
+        method: 'GET',
+        headers: {accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
+      };
+
+      fetch('https://api.opensea.io/api/v1/user/'+staked+'', options)
+      .then(OSUser => OSUser.json())
+      .then(OSUser => {
+        var { account: { user: { username } } } = OSUser
+        return username
+      })
+      .catch(err => {
+        return '';
+        console.error(err)
+      });
+    }
+
+  /*
+
     Render Token Information
     render_token( <data object> )
 
@@ -526,24 +552,10 @@
       } else {
 
         console.log(token_id+' IS staked')
-
         var owner_address = staked;
 
-        // Request staker's OpenSea username
-        let options = {
-          method: 'GET',
-          headers: {accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
-        };
-
-        fetch('https://api.opensea.io/api/v1/user/'+staked+'', options)
-          .then(OSUser => OSUser.json())
-          .then(OSUser => {
-            var { account: { user: { username } } } = OSUser
-            username = OSUser.username
-          })
-          .catch(err => console.error(err));
-
-        console.log(token_id+' staked by '+username);
+        var username = await fetch_username(owner_address);
+        console.log(username)
 
       }
 
