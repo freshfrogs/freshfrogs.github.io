@@ -572,7 +572,7 @@
     frog_token = document.createElement('div');
 
     // Element Details -->
-    frog_token.id = frog_name;
+    frog_token.id = name;
     frog_token.className = 'frog_token';
     frog_token.innerHTML = frog_element
 
