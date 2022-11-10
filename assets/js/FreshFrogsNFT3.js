@@ -539,7 +539,7 @@
       }
     } catch (e) { console.log(e.message) } // Suppress errors for missing variables
 
-    console.log(token_id+' : '+username);
+    console.log(token_id+' owned by '+username);
 
     if (typeof username == 'undefined') {
 
