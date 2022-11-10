@@ -513,8 +513,6 @@
       .then(OSUser => {
 
         var { account: { user: { username } } } = OSUser
-        console.log('username : '+username)
-        console.log('OSUser.username : '+OSUser.username)
         return username
 
       })
@@ -544,8 +542,10 @@
       // Token NOT currently staked
       if (!staked) {
 
-        var owner_address = await collection.methods.ownerOf(token_id).call();
         var { owner: { address, user: { username } } } = frog
+        var owner_address = address;
+
+        console.log('Held by User : '+username)
 
       // Token IS currently staked!
       } else {
@@ -553,9 +553,11 @@
         var owner_address = staked;
         var username = await fetch_username(owner_address);
 
+        console.log('Staked by User : '+username)
+
       }
 
-    if (typeof username == 'undefined' || username == 'null') { username = truncateAddress(owner_address); }
+    //if (typeof username == 'undefined' || username == 'null') { username = truncateAddress(owner_address); }
 
     if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
 
@@ -574,7 +576,7 @@
       var staked_level = 1;
 
       staked_time_bool = await timeStaked(token_id);
-      staked_level = Math.floor(staked_time_bool / 1000);
+      staked_level = Math.floor(staked_time_bool / 1000) + 1;
 
     } catch (e) {
 
