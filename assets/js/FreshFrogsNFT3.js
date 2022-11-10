@@ -534,7 +534,7 @@
           .then(OSUser => {
             var { account: { user: { username } } } = OSUser
             console.log(username)
-            username = username
+            console.log(OSUser.username)
           })
           .catch(err => console.error(err));
 
