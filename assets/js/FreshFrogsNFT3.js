@@ -507,29 +507,37 @@
 
   async function render_token(frog) {
 
-    try { // Assign token variables from data object
-      var { token_id, owner: { address, user: { username } }, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog
+    try {
+
+      // Assign token variables from data object
+      var { token_id, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog
+
+      // Is this token currently staked?
+      var staked = await stakerAddress(token_id);
+
+      // Token NOT currently staked
+      if (!staked) {
+
+        var { owner: { address, user: { username } } } = frog
+
+      // Token IS currently staked!
+      } else { 
+
+        // Request staker's OpenSea username
+        let options = {
+          method: 'GET',
+          headers: {accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
+        };
+
+        fetch('https://api.opensea.io/api/v1/user/'+staked+'', options)
+          .then(OSUser => OSUser.json())
+          .then(OSUser => {
+            var { account: { user: { username } } } = OSUser
+          })
+          .catch(err => console.error(err));
+
+      }
     } catch (e) { console.log(e.message) } // Suppress errors for missing variables
-
-    // Is this token currently staked?
-    var staked = await stakerAddress(token_id);
-
-    if (!staked) { // Token NOT currently staked
-    } else { // Token IS currently staked! Request staker's OpenSea username
-
-      let options = {
-        method: 'GET',
-        headers: {accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
-      };
-
-      fetch('https://api.opensea.io/api/v1/user/'+staked+'', options)
-        .then(trueUser => trueUser.json())
-        .then(trueUser => {
-          var { account: { user: { username } } } = trueUser
-        })
-        .catch(err => console.error(err));
-
-    }
 
     console.log(token_id+' : '+username);
 
