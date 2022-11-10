@@ -507,16 +507,6 @@
     
     } catch (e) {}
 
-    if (typeof !username == 'undefined') {
-
-      owner = username;
-
-    } else {
-
-      owner = truncateAddress(owner);
-
-    }
-
     if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
 
       let sale_price = total_price / Math.pow(10, decimals);
@@ -546,6 +536,15 @@
       
     }
 
+    if (typeof !username == 'undefined') {
+
+      owner = username;
+
+    } else {
+
+      owner = truncateAddress(owner);
+
+    }
 
     // Token Variable Links
     let frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
