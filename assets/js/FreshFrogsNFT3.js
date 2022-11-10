@@ -359,7 +359,7 @@
       }
 
       // Render Frogs Held by Fetch Address
-      
+
       if (user_tokens >= 1) {
         let pages = parseInt(user_tokens/50) + 1;
         for (var i = 0; i < pages; i++) {
@@ -503,7 +503,7 @@
   async function render_token(frog) {
 
     try {
-      var { token_id, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog
+      var { token_id, owner: { user: { username } }, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog
     
     } catch (e) {}
 
@@ -566,7 +566,7 @@
         '<div class="renderRight">'+
           '<div class="innerRight">'+
             '<div id="traits_'+token_id+'" class="trait_list">'+
-              '<b>'+frog_name+'</b>'+
+              '<b>'+frog_name+'</b><text style="color: #1ac486;">'+username+'</text>'+
             '</div>'+
             '<div id="prop_'+token_id+'" class="properties">'+
             //
