@@ -507,13 +507,9 @@
     
     } catch (e) {}
 
-    if (typeof !username == 'undefined') {
+    if (typeof username == 'undefined') {
 
-      owner = username;
-
-    } else {
-
-      owner = truncateAddress(owner);
+      username = '';
 
     }
 
@@ -578,7 +574,7 @@
         '<div class="renderRight">'+
           '<div class="innerRight">'+
             '<div id="traits_'+token_id+'" class="trait_list">'+
-              '<b>'+frog_name+'</b> <text style="color: #1ac486;">'+owner+'</text>'+
+              '<b>'+frog_name+'</b> <text style="color: #1ac486;">'+username+'</text>'+
             '</div>'+
             '<div id="prop_'+token_id+'" class="properties">'+
             //
