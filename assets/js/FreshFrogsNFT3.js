@@ -531,8 +531,6 @@
 
   */
 
-    //
-
   async function render_token(frog) {
 
     // Assign token variables from data object
@@ -552,8 +550,21 @@
 
         //var owner_address = staked;
         
-        await fetch_username(staked)
-        .then(username => { console.log('Staked by User : '+username) })
+        let options = {method: 'GET'};
+
+        fetch('https://api.opensea.io/api/v1/user/'+address_arg+'', options)
+        .then(OSUser => OSUser.json())
+        .then(OSUser => {
+          
+          var { account: { user: { username } } } = OSUser
+          console.log('Staked by User [2] : '+username)
+          
+        })
+        .catch(err => {
+          
+          console.error(err)
+          
+        });
 
       }
 
