@@ -719,17 +719,12 @@
     newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
     newAttribute.alt = attribute
 
-    if (where.includes('cont_')) {
-      newAttribute.className = "frogImg3";
+    if (trait == 'Trait') {
+      newAttribute.className = "frogImg5";
 
     } else {
-      if (trait == 'Trait') {
-        newAttribute.className = "frogImg5";
+      newAttribute.className = "frogImg3";
 
-      } else {
-        newAttribute.className = "frogImg4";
-
-      }
     }
 
     document.getElementById(where).appendChild(newAttribute);
