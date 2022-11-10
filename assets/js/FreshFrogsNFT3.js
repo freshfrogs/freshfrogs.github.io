@@ -543,16 +543,17 @@
       // Is this token currently staked?
       var staked = await stakerAddress(token_id);
 
+      // Username variable
+      var opensea_username;
+
       // Token NOT currently staked
       if (!staked) {
 
         var { owner: { address, user: { username } } } = frog
-        //var owner_address = address;
+        opensea_username = username
 
       // Token IS currently staked!
       } else {
-
-        //var owner_address = staked;
         
         let options = {method: 'GET'};
 
@@ -561,7 +562,7 @@
         .then(OSUser => {
           
           var { account: { user: { username } } } = OSUser
-          staked_username = username
+          opensea_username = username
           
         })
         .catch(err => {
@@ -570,10 +571,9 @@
           
         });
 
-        username = staked_username
-        console.log('staked username final: '+username)
-
       }
+
+    console.log(opensea_username)
 
     //if (typeof username == 'undefined' || username == 'null') { username = truncateAddress(owner_address); }
 
