@@ -550,10 +550,10 @@
       } else {
 
         var owner_address = staked;
-        var username_staked = await fetch_username(staked);
-
-        console.log('Staked by User : '+username_staked)
-
+        //var username_staked =
+        await fetch_username(staked)
+        .then(username => { console.log('Staked by User : '+username) })
+        
       }
 
     //if (typeof username == 'undefined' || username == 'null') { username = truncateAddress(owner_address); }
