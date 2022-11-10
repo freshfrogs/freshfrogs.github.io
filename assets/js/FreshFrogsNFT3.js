@@ -546,13 +546,11 @@
         var { owner: { address, user: { username } } } = frog
         var owner_address = address;
 
-        console.log('Held by User : '+username)
-
       // Token IS currently staked!
       } else {
 
         var owner_address = staked;
-        var username_staked = await fetch_username(owner_address);
+        var username_staked = await fetch_username(staked);
 
         console.log('Staked by User : '+username_staked)
 
