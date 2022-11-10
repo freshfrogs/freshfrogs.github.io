@@ -265,24 +265,24 @@
         '<div>'+
           '<div class="terminalTop">'+
             '<wallet class="displayUnit">Wallet Address</wallet>'+
-            '<br><b>'+user_address+'</b>'+
+            '<br>'+user_address+''+
           '</div>'+
           '<div class="terminalBase">'+
             '<div class="terminalBottom">'+
               '<supply class="displayUnit">Total Supply</supply>'+
-              '<br><b>'+next_id+' / 4040</b>'+
+              '<br>'+next_id+' / 4040'+
             '</div>'+
             '<div class="terminalBottom">'+
               '<limit class="displayUnit">Mint Limit</limit>'+
-              '<br>'+'<b>9 @ Ξ0.01</b>'+
+              '<br>'+'9 @ Ξ0.01'+
             '</div>'+
             '<div class="terminalBottom">'+
               '<supply class="displayUnit">Owned</supply>'+
-              '<br><b>'+user_tokens+'</b>'+
+              '<br>'+user_tokens+''+
             '</div>'+
             '<div class="terminalBottom">'+
               '<limit class="displayUnit">Staked</limit>'+
-              '<br>'+'<b>'+staker_tokens+'</b>'+
+              '<br>'+''+staker_tokens+''+
             '</div>'+
           '</div>'+
         '</div>'+
