@@ -505,8 +505,6 @@
 
   */
 
-    //
-
   async function render_token(frog) {
 
     try {
@@ -526,13 +524,18 @@
       } else { 
 
         // Request staker's OpenSea username
-        let options = {method: 'GET'};
+        let options = {
+          method: 'GET',
+          headers: {accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
+        };
 
         fetch('https://api.opensea.io/api/v1/user/'+staked+'', options)
           .then(OSUser => OSUser.json())
           .then(OSUser => {
-            console.log(OSUser)
+            console.log('1'+OSUser)
             var { account: { user: { username } } } = OSUser
+            console.log('2'+username)
+            console.log('3'+OSUser.username)
           })
           .catch(err => console.error(err));
 
