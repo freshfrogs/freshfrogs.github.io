@@ -532,8 +532,6 @@
 
     }
 
-    console.log(token_id+' : '+username)
-
     if (typeof username == 'undefined') {
 
       username = '';
