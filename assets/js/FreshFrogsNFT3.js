@@ -541,8 +541,8 @@
             username = OSUser.username
           })
           .catch(err => console.error(err));
-
-          console.log(token_id+' staked by '+username);
+          
+        console.log(token_id+' staked by '+username);
 
       }
     } catch (e) { console.log(e.message) } // Suppress errors for missing variables
