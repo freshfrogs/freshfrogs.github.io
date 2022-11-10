@@ -524,7 +524,7 @@
       });
 
       //
-      
+
     }
 
   /*
@@ -533,6 +533,10 @@
     render_token( <data object> )
 
   */
+
+
+
+    //
 
   async function render_token(frog) {
 
@@ -555,7 +559,7 @@
         
         let options = {method: 'GET'};
 
-        fetch('https://api.opensea.io/api/v1/user/'+address_arg+'', options)
+        fetch('https://api.opensea.io/api/v1/user/'+staked+'', options)
         .then(OSUser => OSUser.json())
         .then(OSUser => {
           
