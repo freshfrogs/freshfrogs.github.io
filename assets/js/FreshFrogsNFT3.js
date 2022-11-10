@@ -517,7 +517,7 @@
     if (!staked) {} // Token is not currently staked
     else { // Token IS currently staked!
 
-      const options = {
+      let options = {
         method: 'GET',
         headers: {accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
       };
