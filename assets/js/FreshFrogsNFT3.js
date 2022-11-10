@@ -541,11 +541,7 @@
 
     console.log(token_id+' owned by '+username);
 
-    if (typeof username == 'undefined') {
-
-      username = '';
-
-    }
+    if (typeof username == 'undefined') { username = ''; }
 
     if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
 
