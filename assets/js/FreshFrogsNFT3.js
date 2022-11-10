@@ -519,7 +519,6 @@
       if (!staked) {
 
         var { owner: { address, user: { username } } } = frog
-        console.log(token_id+' owned by '+username);
 
       // Token IS currently staked!
       } else { 
@@ -532,14 +531,16 @@
 
         fetch('https://api.opensea.io/api/v1/user/'+staked+'', options)
           .then(OSUser => OSUser.json())
-          .then(OSUser => OSUser)
+          .then(OSUser => {
+            var { account: { user: { username } } } = OSUser
+            console.log(username);
+          })
           .catch(err => console.error(err));
-
-        var { account: { user: { username } } } = OSUser
-        console.log(token_id+' staked by '+username)
 
       }
     } catch (e) { console.log(e.message) } // Suppress errors for missing variables
+
+    console.log(token_id+' owned by '+username);
 
     if (typeof username == 'undefined') { username = ''; }
 
