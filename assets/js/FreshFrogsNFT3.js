@@ -532,10 +532,8 @@
         fetch('https://api.opensea.io/api/v1/user/'+staked+'', options)
           .then(OSUser => OSUser.json())
           .then(OSUser => {
-            console.log('1'+OSUser)
             var { account: { user: { username } } } = OSUser
-            console.log('2'+username)
-            console.log('3'+OSUser.username)
+            username = OSUser.username
           })
           .catch(err => console.error(err));
 
@@ -544,7 +542,7 @@
 
     console.log(token_id+' owned by '+username);
 
-    if (typeof username == 'undefined') { username = ''; }
+    if (typeof username == 'undefined' || username == 'null') { username = ''; }
 
     if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
 
