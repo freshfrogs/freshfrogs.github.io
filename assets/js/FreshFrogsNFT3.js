@@ -336,12 +336,14 @@
       */
 
       // Render Frogs Staked by User
-      
+
       if (staker_tokens >= 1) {
         let staker_tokens_array = await getStakedTokens(fetch_address);
         try { // Fetch staked token data
           for (var i = 0; i < staker_tokens_array.length; i++) {
             tokenId = staker_tokens_array[i].tokenId
+
+            let options = {method: 'GET'};
 
             fetch('https://api.opensea.io/api/v1/asset/'+CONTRACT_ADDRESS+'/'+tokenId+'/?include_orders=false', options)
               .then(token => token.json())
