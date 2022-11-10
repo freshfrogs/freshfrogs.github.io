@@ -527,149 +527,68 @@
 
   /*
 
-    Render Token Information
-    render_token( <data object> )
+    Frog Display Element
 
   */
 
+  var staked_time_bool, staked_level, username;
+  var frog_element = 
+    '<div class="frogTokenCont">'+
+      '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+external_link+'); background-size: 2048px 2048px;">'+
+        '<div class="innerLeft">'+
+          '<div class="frog_imgContainer" id="cont_'+token_id+'" onclick="display_token('+token_id+')">'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="renderRight">'+
+        '<div class="innerRight">'+
+          '<div id="traits_'+token_id+'" class="trait_list">'+
+            '<b>'+name+'</b> <text style="color: #1ac486;">'+username+'</text>'+
+          '</div>'+
+          '<div id="prop_'+token_id+'" class="properties">'+
+            '<div style="margin: 8px;">'+
+              '<text>Time Staked</text>'+'<br>'+
+              '<text style="color: #1ac486;">'+staked_time_bool+' hours (Lvl '+staked_level+')</text>'+
+            '</div>'+
+            '<div style="margin: 8px;">'+
+              '<text>$FLYZ Earned</text>'+'<br>'+
+              '<text style="color: #1ac486;">110.69</text>'+
+            '</div>'+
+            '<div style="text-align: center;">'+
+              '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  
   async function render_token(frog) {
 
-    console.log(frog)
-
     // Assign token variables from data object
-    try { var { token_id, external_link, permalink, owner: { address, user: { username } }, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog } catch (e) {}
-
-    if (typeof username == 'undefined' || username == 'null') { username = truncateAddress(address); }
-
-    /*
-      if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
-
-        let sale_price = total_price / Math.pow(10, decimals);
-        recent_sale = 'Ξ'+sale_price;
-
-      } else { recent_sale = ''; }
-    */
-
-    let frog_external = 'https://freshfrogs.io/frog/'+token_id+'.png';
-    let frog_name = 'Frog #'+token_id;
+    try { var { token_id, external_link, permalink, name, owner: { address, user: { username } }, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog } catch (e) {}
 
     // <-- Begin Element
-    var frog_doc = document.getElementById('thePad');
-    var frog_token = document.createElement('div');
+    frog_doc = document.getElementById('thePad');
+    frog_token = document.createElement('div');
+
+    // Element Details -->
     frog_token.id = frog_name;
     frog_token.className = 'frog_token';
-    //frog_token.onclick = function() { display_token(token_id); }
+    frog_token.innerHTML = frog_element
 
-    // Element Inner HTML
-    frog_token.innerHTML =
-      '<div class="frogTokenCont">'+
-        '<div id="'+token_id+'" class="renderLeft">'+
-          '<div class="innerLeft">'+
-            '<div class="frog_imgContainer" id="cont_'+token_id+'" onclick="display_token('+token_id+')">'+
-            //'<img src="'+frog_external+'" class="renderToken" onclick="display_token('+token_id+')" />'+
-            //'<div id="staked_'+token_id+'"></div>'+
-            '</div>'+
-           // '<div class="trait_list" style="border-bottom: none;">'+
-           //   '<strong style="color: cornflowerblue;" id="frog_'+token_id+'">'+frog_name+'</strong><strong id="owner_'+token_id+'"style="float:right; color: white;">'+truncateAddress(owner)+'</strong>'+
-           // '</div>'+
-          '</div>'+
-        '</div>'+
-        '<div class="renderRight">'+
-          '<div class="innerRight">'+
-            '<div id="traits_'+token_id+'" class="trait_list">'+
-              '<b>'+frog_name+'</b> <text style="color: #1ac486;">'+username+'</text>'+
-            '</div>'+
-            '<div id="prop_'+token_id+'" class="properties">'+
-            //
-              '<div style="margin: 8px;">'+
-                '<text>Time Staked</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+staked_time_bool+' hours (Lvl '+staked_level+')</text>'+
-              '</div>'+
-              '<div style="margin: 8px;">'+
-                '<text>$FLYZ Earned</text>'+'<br>'+
-                '<text style="color: #1ac486;">110.69</text>'+
-              '</div>'+
-              '<div style="text-align: center;">'+
-                '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
-                //'<br>'+'<button class="stake_button">Build Token</button>'+
-              '</div>'+
-            //
-            '</div>'+
-          '</div>'+
-        '</div>'+
-      '</div>';
-
-    // Create Element -->
+    // Create Element <--
     frog_doc.appendChild(frog_token);
-    document.getElementById(token_id).style.backgroundImage = 'url('+frog_external+')';
-    document.getElementById(token_id).style.backgroundSize = "2048px 2048px";
 
-    // Update Metadata!
+    // Update Metadata! Build Frog -->
     let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
+
     for (let i = 0; i < metadata.attributes.length; i++) {
 
-      // attribute.trait_type : attribute.value
       let attribute = metadata.attributes[i]
       loadTrait(attribute.trait_type, attribute.value, 'cont_'+token_id);
 
-      //try { trait_rarity = ((traits_list[attribute.trait_type][attribute.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) { trait_rarity = 'e'; }
-      //if (trait_rarity < 1) { trait_rarity = '<1%' } else { trait_rarity = trait_rarity+'%' }
-
-      //var trait_text = document.createElement('div');
-      //trait_text.style.margin = '4px';
-      //if (attribute.trait_type == 'Frog' || attribute.trait_type == 'SpecialFrog') { trait_text.innerHTML = '<trait style="color: #1ac486;">'+attribute.trait_type+'</trait><br><text id="frogType_'+token_id+'">'+attribute.value+'</text> <text class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></text><br>'; }
-      //else { trait_text.innerHTML = '<trait style="color: #1ac486;">'+attribute.trait_type+'</trait><br><text>'+attribute.value+'</text> <text class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></text><br>'; }
-      //document.getElementById('prop_'+token_id).appendChild(trait_text);
-
     }
 
-    // Create Button Element(s)
-    var button_b = document.createElement('div');
-    button_b.style.margin = '0px';
-    button_b.style.marginLeft = 'auto';
-    button_b.style.marginRight = 'auto';
-    
-    /*
-    if (!staked) { // NOT Staked
-      if (owner.toString().toLowerCase() == user_address.toString().toLowerCase() || user_address.toString().toLowerCase() == '0xF01e067d442f4254cd7c89A5D42d90ad554616E8'.toString().toLowerCase()) {
-        button_b.innerHTML = 
-          '<button class="stake_button" onclick="stake_init('+token_id+')">Stake</button>';
-        document.getElementById(token_id).appendChild(button_b);
-      }
-
-    } else { // STAKED
-
-      // Check Staked Time / Calculate Level
-      let staked_time_bool = await timeStaked(token_id);
-      if (staked_time_bool >= 2000) { staked_level = 3; } else if (staked_time_bool >= 1000) { staked_level = 2; } else { staked_level = 1; }
-
-      document.getElementById('staked_'+token_id).innerHTML = 
-        '<b id="progress_'+token_id+'"></b><div class="myProgress" id="myProgress_'+token_id+'"><div class="myBar" id="myBar_'+token_id+'"></div></div>'+
-        '<div style="color:#f06900;" class="frog_level"><b>Level '+staked_level+'</b></div>';
-
-      var trait_text = document.createElement('div');
-      trait_text.style.margin = '4px';
-      if (staked_time_bool >= 720) { trait_text.innerHTML = 'Staked '+parseInt(staked_time_bool/24)+' days 🔥<br>'; } 
-      else { trait_text.innerHTML = 'Staked '+parseInt(staked_time_bool/24)+' days<br>'; }
-      document.getElementById('staked_'+token_id).appendChild(trait_text);
-
-      // Owner
-      document.getElementById('owner_'+token_id).innerHTML = truncateAddress(staked);
-
-      // Update Progress Bar
-      let percent = parseInt(((staked_time_bool - ((staked_level-1)*1000)) / 1000 )*100); //parseInt((staked_time_bool/(1000*staked_level))*100);
-      let elem = document.getElementById('myBar_'+token_id);
-      let width = percent;
-      elem.style.width = width + "%";
-
-      if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
-        button_b.innerHTML = 
-          '<button class="unstake_button" onclick="withdraw_init('+token_id+')">UnStake 🡧</button>';
-        document.getElementById(token_id).appendChild(button_b);
-        
-      }
-    }
-    */
   }
 
   // loadTrait(_trait(family), _attribute(type), _where(element))
