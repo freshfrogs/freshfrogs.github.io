@@ -562,7 +562,7 @@
         .then(OSUser => {
           
           var { account: { user: { username } } } = OSUser
-          opensea_username = username
+          opensea_username = OSUser.username
           
         })
         .catch(err => {
