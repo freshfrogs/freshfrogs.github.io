@@ -517,12 +517,15 @@
     if (!staked) {} // Token is not currently staked
     else { // Token IS currently staked!
 
-      let options = {method: 'GET'};
+      const options = {
+        method: 'GET',
+        headers: {accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
+      };
 
       fetch('https://api.opensea.io/api/v1/user/0xF01e067d442f4254cd7c89A5D42d90ad554616E8', options)
         .then(trueUser => trueUser.json())
         .then(trueUser => {
-          console.log('True User : '+trueUser)
+          console.log(trueUser)
           //var { owner: { address, user: { username } } = trueUser
         })
         .catch(err => console.error(err));
