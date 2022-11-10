@@ -499,17 +499,6 @@
     }
   }
 
-  /* Get OpenSea Username
-
-    let options = {method: 'GET'};
-
-    fetch('https://api.opensea.io/api/v1/user/USERADDRESS, options)
-      .then(token => token.json())
-      .then(token => render_token(token))
-      .catch(err => console.error(err));
-
-  */
-
   /*
 
     Render Token Information
