@@ -511,7 +511,7 @@
         headers: {accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
       };
 
-      fetch('https://api.opensea.io/api/v1/user/'+staked+'', options)
+      fetch('https://api.opensea.io/api/v1/user/'+address_arg+'', options)
       .then(OSUser => OSUser.json())
       .then(OSUser => {
         var { account: { user: { username } } } = OSUser
