@@ -506,7 +506,7 @@
   */
 
   async function render_token(frog) {
-    
+
     try { // Assign token variables from data object
       var { token_id, owner: { address, user: { username } }, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog
     } catch (e) {} // Suppress errors for missing variables
@@ -515,7 +515,7 @@
     var staked = await stakerAddress(token_id);
 
     if (!staked) { // Token NOT currently staked
-    } else { // Token IS currently staked!
+    } else { // Token IS currently staked! Request staker's OpenSea username
 
       let options = {
         method: 'GET',
