@@ -532,10 +532,8 @@
         fetch('https://api.opensea.io/api/v1/user/'+staked+'', options)
           .then(OSUser => OSUser.json())
           .then(OSUser => {
-            console.log('1'+OSUser.username)
+            console.log(OSUser)
             var { account: { user: { username } } } = OSUser
-            console.log('2'+username)
-            console.log('3'+OSUser.username)
           })
           .catch(err => console.error(err));
 
