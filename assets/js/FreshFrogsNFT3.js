@@ -514,24 +514,23 @@
     // Is this token currently staked?
     var staked = await stakerAddress(token_id);
 
-    if (!staked) { // Token NOT currently staked
-    } else { // Token IS currently staked! Request staker's OpenSea username
+    if (!staked) {} // Token is not currently staked
+    else { // Token IS currently staked!
 
       let options = {
         method: 'GET',
         headers: {accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
       };
 
-      fetch('https://api.opensea.io/api/v1/user/'+staked+'', options)
+      fetch('https://api.opensea.io/api/v1/user/0xF01e067d442f4254cd7c89A5D42d90ad554616E8', options)
         .then(trueUser => trueUser.json())
         .then(trueUser => {
+          console.log(trueUser)
           var { account: { user: { username } } } = trueUser
         })
         .catch(err => console.error(err));
 
     }
-
-    console.log(token_id+' : '+username);
 
     if (typeof username == 'undefined') {
 
