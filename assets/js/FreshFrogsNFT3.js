@@ -551,9 +551,9 @@
       } else {
 
         var owner_address = staked;
-        var username = await fetch_username(owner_address);
+        var username_staked = await fetch_username(owner_address);
 
-        console.log('Staked by User : '+username)
+        console.log('Staked by User : '+username_staked)
 
       }
 
