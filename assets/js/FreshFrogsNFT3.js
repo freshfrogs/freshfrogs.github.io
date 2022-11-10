@@ -531,6 +531,8 @@
 
   */
 
+    //
+
   async function render_token(frog) {
 
     // Assign token variables from data object
