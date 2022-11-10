@@ -544,16 +544,16 @@
       if (!staked) {
 
         var { owner: { address, user: { username } } } = frog
-        var owner_address = address;
+        //var owner_address = address;
 
       // Token IS currently staked!
       } else {
 
-        var owner_address = staked;
-        //var username_staked =
+        //var owner_address = staked;
+        
         await fetch_username(staked)
         .then(username => { console.log('Staked by User : '+username) })
-        
+
       }
 
     //if (typeof username == 'undefined' || username == 'null') { username = truncateAddress(owner_address); }
