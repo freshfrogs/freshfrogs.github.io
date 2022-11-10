@@ -500,6 +500,7 @@
   }
 
   // render_token()
+  
   async function render_token(frog) {
 
     try {
