@@ -513,6 +513,7 @@
       .then(OSUser => {
 
         var { account: { user: { username } } } = OSUser
+        console.log('username fetch : '+username)
         return username
 
       })
