@@ -503,9 +503,12 @@
   async function render_token(frog) {
 
     try {
+
       var { token_id, owner: { user: { username } }, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog
     
     } catch (e) {}
+
+    console.log(token_id+' : '+username)
 
     if (typeof username == 'undefined') {
 
