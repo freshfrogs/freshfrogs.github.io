@@ -336,6 +336,7 @@
       */
 
       // Render Frogs Staked by User
+      
       if (staker_tokens >= 1) {
         let staker_tokens_array = await getStakedTokens(fetch_address);
         try { // Fetch staked token data
