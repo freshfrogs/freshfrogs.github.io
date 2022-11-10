@@ -525,8 +525,6 @@
 
     }
 
-    // test
-
   /*
 
     Render Token Information
@@ -535,6 +533,9 @@
   */
 
   async function render_token(frog) {
+
+
+    // test 2
 
     // Assign token variables from data object
     try { var { token_id, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog } catch (e) {}
@@ -570,6 +571,7 @@
         });
 
         username = staked_username
+        console.log('staked username final: '+username)
 
       }
 
