@@ -369,8 +369,7 @@
           .then((tokens) => {
             var { assets } = tokens
             assets.forEach((frog) => {
-
-              console.log(frog)
+              
               render_token(frog);
 
             })
@@ -504,8 +503,6 @@
     render_token( <data object> )
 
   */
-
-    //
 
   async function render_token(frog) {
 
