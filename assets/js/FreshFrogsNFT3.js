@@ -526,10 +526,7 @@
       } else { 
 
         // Request staker's OpenSea username
-        let options = {
-          method: 'GET',
-          headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
-        };
+        let options = {method: 'GET'};
 
         fetch('https://api.opensea.io/api/v1/user/'+staked+'', options)
           .then(OSUser => OSUser.json())
