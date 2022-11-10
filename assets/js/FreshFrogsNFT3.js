@@ -507,11 +507,19 @@
     
     } catch (e) {}
 
+    if (typeof username == 'undefined') {
+
+      username = '';
+
+    }
+
     if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
+
       let sale_price = total_price / Math.pow(10, decimals);
       recent_sale = 'Ξ'+sale_price;
 
     } else {
+
       recent_sale = '';
 
     }
