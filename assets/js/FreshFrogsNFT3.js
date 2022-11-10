@@ -569,11 +569,11 @@
           
         });
 
+        username = staked_username
+
       }
 
     //if (typeof username == 'undefined' || username == 'null') { username = truncateAddress(owner_address); }
-
-    console.log('Staked by User [3] : '+staked_username)
 
     if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
 
