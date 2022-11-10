@@ -526,7 +526,7 @@
         .then(trueUser => trueUser.json())
         .then(trueUser => {
           console.log(trueUser)
-          //var { owner: { address, user: { username } } = trueUser
+          var { account: { user: { username } } } = trueUser
         })
         .catch(err => console.error(err));
 
