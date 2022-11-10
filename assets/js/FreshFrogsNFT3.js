@@ -517,6 +517,8 @@
       // Token NOT currently staked
       if (!staked) {
 
+        console.log(token_id+' NOT staked')
+
         var owner_address = await collection.methods.ownerOf(token_id).call();
         var { owner: { address, user: { username } } } = frog
 
@@ -524,6 +526,8 @@
 
       // Token IS currently staked!
       } else {
+
+        console.log(token_id+' IS staked')
 
         var owner_address = staked;
 
