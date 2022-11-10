@@ -505,6 +505,8 @@
 
   */
 
+    //
+
   async function render_token(frog) {
 
     try {
@@ -541,7 +543,7 @@
             username = OSUser.username
           })
           .catch(err => console.error(err));
-          
+
         console.log(token_id+' staked by '+username);
 
       }
