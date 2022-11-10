@@ -517,7 +517,7 @@
     if (!staked) {} // Token is not currently staked
     else { // Token IS currently staked!
 
-      options = {method: 'GET'};
+      //options = {method: 'GET'};
 
       fetch('https://api.opensea.io/api/v1/user/0xF01e067d442f4254cd7c89A5D42d90ad554616E8', options)
         .then(trueUser => trueUser.json())
