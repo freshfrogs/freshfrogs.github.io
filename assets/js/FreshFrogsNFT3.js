@@ -371,7 +371,6 @@
             var { assets } = tokens
             assets.forEach((frog) => {
 
-              console.log(frog)
               render_token(frog);
 
             })
