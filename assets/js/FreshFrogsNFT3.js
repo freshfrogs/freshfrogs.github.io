@@ -518,12 +518,15 @@
       // Token NOT currently staked
       if (!staked) {
 
+        var owner_address = await collection.methods.ownerOf(token_id).call();
         var { owner: { address, user: { username } } } = frog
 
         console.log(token_id+' owned by '+username);
 
       // Token IS currently staked!
-      } else { 
+      } else {
+
+        var owner_address = staked;
 
         // Request staker's OpenSea username
         let options = {
@@ -544,7 +547,7 @@
       }
     } catch (e) { console.log(e.message) } // Suppress errors for missing variables
 
-    if (typeof username == 'undefined' || username == 'null') { username = ''; }
+    if (typeof username == 'undefined' || username == 'null') { username = truncateAddress(owner_address); }
 
     if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
 
@@ -557,7 +560,7 @@
 
       // Is Frog Currently Staked?
       //let staked = await stakerAddress(token_id);
-      let owner = await collection.methods.ownerOf(token_id).call();
+      //let owner = await collection.methods.ownerOf(token_id).call();
 
       var staked_time_bool = 0;
       var staked_level = 1;
