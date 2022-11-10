@@ -564,7 +564,7 @@
         .then(OSUser => {
           
           var { account: { user: { username } } } = OSUser
-          console.log('Staked by User [2] : '+username)
+          staked_username = username
           
         })
         .catch(err => {
@@ -576,6 +576,8 @@
       }
 
     //if (typeof username == 'undefined' || username == 'null') { username = truncateAddress(owner_address); }
+
+    console.log('Staked by User [3] : '+staked_username)
 
     if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
 
