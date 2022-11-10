@@ -533,6 +533,7 @@
           .then(OSUser => OSUser.json())
           .then(OSUser => {
             var { account: { user: { username } } } = OSUser
+            console.log(username)
           })
           .catch(err => console.error(err));
 
