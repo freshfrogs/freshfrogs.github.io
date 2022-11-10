@@ -506,20 +506,23 @@
 
     async function fetch_username(address_arg) {
 
-      let options = {
-        method: 'GET',
-        headers: {accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
-      };
+      let options = {method: 'GET'};
 
       fetch('https://api.opensea.io/api/v1/user/'+address_arg+'', options)
       .then(OSUser => OSUser.json())
       .then(OSUser => {
+
         var { account: { user: { username } } } = OSUser
+        console.log('username : '+username)
+        console.log('OSUser.username : '+OSUser.username)
         return username
+
       })
       .catch(err => {
-        return '';
+
         console.error(err)
+        return ''
+
       });
     }
 
@@ -541,21 +544,14 @@
       // Token NOT currently staked
       if (!staked) {
 
-        console.log(token_id+' NOT staked')
-
         var owner_address = await collection.methods.ownerOf(token_id).call();
         var { owner: { address, user: { username } } } = frog
-
-        console.log(token_id+' owned by '+username);
 
       // Token IS currently staked!
       } else {
 
-        console.log(token_id+' IS staked')
         var owner_address = staked;
-
         var username = await fetch_username(owner_address);
-        console.log(username)
 
       }
 
