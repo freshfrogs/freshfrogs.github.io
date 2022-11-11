@@ -607,7 +607,7 @@
               '</div>'+
               '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text>Next Level</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+staked_next+'</text>'+
+                '<text style="color: #1ac486;">'+staked_next+' hours</text>'+
               '</div>'+
               '<div style="text-align: center;">'+
                 '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
