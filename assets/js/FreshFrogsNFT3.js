@@ -529,7 +529,7 @@
       */
 
         /// test AGAIN
-        
+
     }
 
   /*
@@ -562,7 +562,7 @@
 
     console.log(token_id+' : '+opensea_username)
 
-    if (typeof opensea_username == 'undefined' || opensea_username == '' || typeof opensea_username == 'null' || opensea_username == 'null') {
+    if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == null) {
       console.log('username is null')
       opensea_username = truncateAddress(token_owner)
     }
