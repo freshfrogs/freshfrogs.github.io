@@ -584,13 +584,6 @@
         opensea_username = truncateAddress(staked)
       }
 
-      //staked_time_hours = await timeStaked(token_id)
-      //staked_time_days = Math.floor(staked_time_hours / 24)
-      //staked_level_int = Math.floor((staked_time_hours / 1000 )) + 1
-      //staked_level = romanize(staked_level_int)
-      //staked_next = Math.round((((staked_level_int) * 1000) - staked_time_hours) / 24) // days
-      //staked_earned = staked_time_hours / 1000
-
       let staking_values = await stakingValues(token_id)
       staked_time_days = staking_values[0]
       staked_level = staking_values[1]
