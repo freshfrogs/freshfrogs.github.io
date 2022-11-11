@@ -498,7 +498,7 @@
   }
 
   // test
-  
+
   /*
 
     Retrieve OpenSea Username
@@ -506,6 +506,7 @@
 
   */
 
+    let opensea_username = ''
     async function fetch_username(account_address) {
 
       let options = {method: 'GET'};
