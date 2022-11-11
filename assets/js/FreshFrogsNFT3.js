@@ -665,8 +665,13 @@
   function loadTrait(trait, attribute, where) {
 
     newAttribute = document.createElement("img");
-    newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
     newAttribute.alt = attribute
+
+    if (attribute == 'smoking' || attribute == 'smokingCigar' || attribute == 'smokingPipe' || attribute == 'tongue') {
+      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/animations/"+attribute+"_animation.gif";
+    } else {
+      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
+    }
 
     if (trait == 'Trait') {
       newAttribute.className = "frogImg5";
