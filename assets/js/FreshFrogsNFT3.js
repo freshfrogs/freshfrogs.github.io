@@ -335,7 +335,7 @@
       }
       */
 
-      /*
+      
       // Render Frogs Staked by User
       if (staker_tokens >= 1) {
         let staker_tokens_array = await getStakedTokens(fetch_address);
@@ -347,17 +347,17 @@
 
             fetch('https://api.opensea.io/api/v1/asset/'+CONTRACT_ADDRESS+'/'+tokenId+'/?include_orders=false', options)
               .then(token => token.json())
-              .then(token => render_token(token))
+              .then(token => render_staked_token(token))
               .catch(err => console.error(err));
 
           }
         } catch (e) {
-          console.log('Failed to talk to FreshFrogsController!');
+          console.log('Failed to talk to Opensea!');
           console.log(e.message);
 
         }
       }
-      */
+      
 
       // Render Frogs Held by Fetch Address
 
@@ -372,7 +372,7 @@
             var { assets } = tokens
             assets.forEach((frog) => {
               
-              render_token(frog);
+              //render_token(frog);
 
             })
           })
@@ -506,15 +506,17 @@
 
   */
 
-    async function fetch_username(address_arg) {
+    async function fetch_username(acc_address) {
+
+      var username
 
       let options = {method: 'GET'};
 
-      fetch('https://api.opensea.io/api/v1/user/'+address_arg+'', options)
-      .then(OSUser => OSUser.json())
-      .then(OSUser => {
+      fetch('https://api.opensea.io/api/v1/user/'+acc_address+'', options)
+      .then(data => data.json())
+      .then(data => {
 
-        var { account: { user: { username } } } = OSUser
+        var { account: { user: { username } } } = data
         return username
 
       })
@@ -525,6 +527,8 @@
 
       });
 
+      console.log(username)
+
     }
 
   /*
@@ -533,7 +537,68 @@
 
   */
 
-  var staked_time_bool, staked_level, username;
+  var staked_time_bool = staked_level = 0;
+
+  async function render_staked_token(frog) {
+
+    // Assign token variables from data object
+    try { var { token_id, external_link, permalink, name, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog } catch (e) {}
+
+    var acc_staked = await stakerAddress(token_id)
+    var username = await fetch_username(acc_staked)
+
+    // <-- Begin Element
+    frog_doc = document.getElementById('thePad');
+    frog_token = document.createElement('div');
+
+    // Element Details -->
+    frog_token.id = name;
+    frog_token.className = 'frog_token';
+    frog_token.innerHTML = 
+      '<div class="frogTokenCont">'+
+        '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+external_link+'); background-size: 2048px 2048px;">'+
+          '<div class="innerLeft">'+
+            '<div class="frog_imgContainer" id="cont_'+token_id+'" onclick="display_token('+token_id+')">'+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+        '<div class="renderRight">'+
+          '<div class="innerRight">'+
+            '<div id="traits_'+token_id+'" class="trait_list">'+
+              '<b>'+name+'</b> <text style="color: #1ac486;">'+username+'</text>'+
+            '</div>'+
+            '<div id="prop_'+token_id+'" class="properties">'+
+              '<div style="margin: 8px;">'+
+                '<text>Time Staked</text>'+'<br>'+
+                '<text style="color: #1ac486;">'+staked_time_bool+' hours (Lvl '+staked_level+')</text>'+
+              '</div>'+
+              '<div style="margin: 8px;">'+
+                '<text>$FLYZ Earned</text>'+'<br>'+
+                '<text style="color: #1ac486;">110.69</text>'+
+              '</div>'+
+              '<div style="text-align: center;">'+
+                '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
+              '</div>'+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+
+    // Create Element <--
+    frog_doc.appendChild(frog_token);
+
+    // Update Metadata! Build Frog -->
+    let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
+
+    for (let i = 0; i < metadata.attributes.length; i++) {
+
+      let attribute = metadata.attributes[i]
+      loadTrait(attribute.trait_type, attribute.value, 'cont_'+token_id);
+
+    }
+
+  }
+
   async function render_token(frog) {
 
     // Assign token variables from data object
