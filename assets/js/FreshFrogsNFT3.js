@@ -335,6 +335,7 @@
       }
       */
 
+      /*
       // Render Frogs Staked by User
       if (staker_tokens >= 1) {
         let staker_tokens_array = await getStakedTokens(fetch_address);
@@ -356,6 +357,7 @@
 
         }
       }
+      */
 
       // Render Frogs Held by Fetch Address
 
