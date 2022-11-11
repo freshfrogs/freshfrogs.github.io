@@ -557,8 +557,7 @@
       opensea_username = await fetch_username(staked);
       token_owner = staked
 
-      staked_time = await timeStaked(token_id); // hrs
-      staked_level = staked_time / 1000
+      
 
     }
 
