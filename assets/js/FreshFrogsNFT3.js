@@ -552,10 +552,18 @@
       opensea_username = username
       token_owner = address
 
+      if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == null) {
+        opensea_username = truncateAddress(token_owner)
+      }
+
     } else {
 
       opensea_username = await fetch_username(staked)
       token_owner = staked
+
+      if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == null) {
+        opensea_username = truncateAddress(token_owner)
+      }
 
       staked_time_hours = await timeStaked(token_id)
       staked_time_days = Math.floor(staked_time_hours / 24)
@@ -564,10 +572,6 @@
       staked_next = Math.round((((staked_level_int) * 1000) - staked_time_hours) / 24) // days
       staked_earned = staked_time_hours / 1000
 
-    }
-
-    if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == null) {
-      opensea_username = truncateAddress(token_owner)
     }
 
     rarity_rank = '' //Math.floor(parseFloat((( rank / 4040 ) * 100)))
