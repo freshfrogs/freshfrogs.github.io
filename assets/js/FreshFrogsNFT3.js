@@ -597,6 +597,7 @@
               '</div>'+
               '<div style="text-align: center;">'+
                 '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
+                '<br>'+'<button class="os_button">View on Opensea</button>'+
               '</div>'+
             '</div>'+
           '</div>'+
