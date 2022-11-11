@@ -565,7 +565,7 @@
       opensea_username = truncateAddress(token_owner)
     }
 
-    let rarity_rank = Math.round(( rank / 4040 ) * 100)
+    rarity_rank = Math.round(( rank / 4040 ) * 100)
 
     // <-- Begin Element
     frog_doc = document.getElementById('thePad');
