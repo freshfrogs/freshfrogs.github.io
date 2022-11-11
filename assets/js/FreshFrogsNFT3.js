@@ -593,7 +593,7 @@
 
     }
 
-    console.log(token_id+' : '+opensea_username)
+    console.log(token_id+' :: '+opensea_username)
 
     rarity_rank = '' //Math.floor(parseFloat((( rank / 4040 ) * 100)))
     //if (rarity_rank < 1) { rarity_rank = 1 }
