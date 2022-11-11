@@ -546,8 +546,6 @@
     
     await fetch_username(acc_staked).then(result => { username = result })
 
-    console.log(username)
-
     // <-- Begin Element
     frog_doc = document.getElementById('thePad');
     frog_token = document.createElement('div');
