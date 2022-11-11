@@ -563,12 +563,12 @@
         opensea_username = await fetch_username(staked)
       }
 
-      staked_time_hours = await timeStaked(token_id)
-      staked_time_days = Math.floor(staked_time_hours / 24)
-      staked_level_int = Math.floor((staked_time_hours / 1000 )) + 1
-      staked_level = romanize(staked_level_int)
-      staked_next = Math.round((((staked_level_int) * 1000) - staked_time_hours) / 24) // days
-      staked_earned = staked_time_hours / 1000
+      //staked_time_hours = await timeStaked(token_id)
+      //staked_time_days = Math.floor(staked_time_hours / 24)
+      //staked_level_int = Math.floor((staked_time_hours / 1000 )) + 1
+      //staked_level = romanize(staked_level_int)
+      //staked_next = Math.round((((staked_level_int) * 1000) - staked_time_hours) / 24) // days
+      //staked_earned = staked_time_hours / 1000
 
     }
 
@@ -600,20 +600,20 @@
             '<div id="prop_'+token_id+'" class="properties">'+
               '<div style="margin: 8px; float: left; width: 100px;">'+
                 '<text>Time Staked</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+staked_time_days+' days</text>'+
+                '<text style="color: #1ac486;">'+''+' days</text>'+
               '</div>'+
               '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text>$FLYZ Earned</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+staked_earned+'</text>'+
+                '<text style="color: #1ac486;">'+''+'</text>'+
               '</div>'+
               '<br>'+
               '<div style="margin: 8px; float: left; width: 100px;">'+
                 '<text>Level</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+staked_level+'</text>'+
+                '<text style="color: #1ac486;">'+''+'</text>'+
               '</div>'+
               '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text>Next Level</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+staked_next+' days</text>'+
+                '<text style="color: #1ac486;">'+''+' days</text>'+
               '</div>'+
               '<div style="text-align: center;">'+
                 '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
