@@ -509,10 +509,8 @@
       let options = {method: 'GET'};
       let opensea_response = await fetch('https://api.opensea.io/api/v1/user/'+account_address+'', options)
       let opensea_account = await opensea_response.json()
-      //let { account : { user: { username } } } = opensea_account
-      console.log(opensea_account)
-      //return username;
-
+      let { account: { user: { username } } } = opensea_account
+      return username;
 
       /*
         .then(OSUser => OSUser.json())
