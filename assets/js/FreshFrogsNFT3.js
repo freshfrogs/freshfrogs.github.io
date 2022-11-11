@@ -497,8 +497,6 @@
     }
   }
 
-  // test
-
   /*
 
     Retrieve OpenSea Username
@@ -506,7 +504,6 @@
 
   */
 
-    let opensea_username = ''
     async function fetch_username(account_address) {
 
       let options = {method: 'GET'};
@@ -539,13 +536,19 @@
 
   */
 
+  let opensea_username = ''
   async function render_token(frog) {
 
     // Assign token variables from data object
     try { var { token_id, external_link, permalink, name, owner: { address, user: { username } }, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog } catch (e) {}
 
-    opensea_username = await fetch_username(address);
-    console.log('return from function: '+opensea_username)
+    let staked = await stakerAddress(token_id)
+
+    if (!staked) {
+      opensea_username = username
+    } else {
+      opensea_username = await fetch_username(staked);
+    }
 
     // <-- Begin Element
     frog_doc = document.getElementById('thePad');
@@ -565,7 +568,7 @@
         '<div class="renderRight">'+
           '<div class="innerRight">'+
             '<div id="traits_'+token_id+'" class="trait_list">'+
-              '<b>'+name+'</b> <text style="color: #1ac486;">'+username+'</text>'+
+              '<b>'+name+'</b> <text style="color: #1ac486;">'+opensea_username+'</text>'+
             '</div>'+
             '<div id="prop_'+token_id+'" class="properties">'+
               '<div style="margin: 8px;">'+
