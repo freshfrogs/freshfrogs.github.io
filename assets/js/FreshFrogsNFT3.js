@@ -568,9 +568,9 @@
 
     // Reference controller contract
     let staked = await stakerAddress(token_id)
-    if (staked == '0xF01e067d442f4254cd7c89A5D42d90ad554616E8' || staked == '0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359') {
-      return
-    }
+    //if (staked == '0xF01e067d442f4254cd7c89A5D42d90ad554616E8' || staked == '0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359') {
+    //  return
+    //}
 
     if (!staked) {
 
