@@ -562,6 +562,7 @@
 
     let opensea_username = ''
     let token_owner = ''
+    let staked_time_days = staked_level = staked_next = staked_earned = ''
 
     // Assign token variables from data object
     try { var { token_id, external_link, permalink, name, owner: { address, user: { username } }, rarity_data: { rank }, last_sale: { payment_token: { decimals }, total_price } } = frog } catch (e) {}
