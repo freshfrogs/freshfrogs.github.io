@@ -570,7 +570,7 @@
 
     if (!staked) {
 
-      opensea_username = username
+      let opensea_username = username
 
       if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == null) {
         opensea_username = truncateAddress(address)
@@ -578,7 +578,7 @@
 
     } else {
 
-      opensea_username = await fetch_username(staked)
+      let opensea_username = await fetch_username(staked)
 
       if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == null) {
         opensea_username = truncateAddress(staked)
