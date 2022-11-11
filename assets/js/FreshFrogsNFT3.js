@@ -541,6 +541,8 @@
   let token_owner = ''
   async function render_token(frog) {
 
+    console.log(frog)
+
     // Assign token variables from data object
     try { var { token_id, external_link, permalink, name, owner: { address, user: { username } }, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog } catch (e) {}
 
@@ -558,8 +560,6 @@
       token_owner = staked
 
     }
-
-    console.log(token_id+' : '+opensea_username)
 
     if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == null) {
       console.log('username is null')
