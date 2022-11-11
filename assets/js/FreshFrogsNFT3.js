@@ -591,20 +591,18 @@
                 '<text>Time Staked</text>'+'<br>'+
                 '<text style="color: #1ac486;">'+''+' hours (Lvl '+''+')</text>'+
               '</div>'+
-              '<div style="border-bottom: 1px solid #6d7c91;">'+
-                '<div style="margin: 8px; float: right; width: 100px;">'+
-                  '<text>$FLYZ Earned</text>'+'<br>'+
-                  '<text style="color: #1ac486;">110.69</text>'+
-                '</div>'+
-                '<br>'+
-                '<div style="margin: 8px; float: left; width: 100px;">'+
-                  '<text>Staked Level</text>'+'<br>'+
-                  '<text style="color: #1ac486;">'+''+' hours (Lvl '+''+')</text>'+
-                '</div>'+
-                '<div style="margin: 8px; float: right; width: 100px;">'+
-                  '<text>Next Level</text>'+'<br>'+
-                  '<text style="color: #1ac486;">110.69</text>'+
-                '</div>'+
+              '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text>$FLYZ Earned</text>'+'<br>'+
+                '<text style="color: #1ac486;">110.69</text>'+
+              '</div>'+
+              '<br>'+
+              '<div style="margin: 8px; float: left; width: 100px;">'+
+                '<text>Staked Level</text>'+'<br>'+
+                '<text style="color: #1ac486;">'+''+' hours (Lvl '+''+')</text>'+
+              '</div>'+
+              '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text>Next Level</text>'+'<br>'+
+                '<text style="color: #1ac486;">110.69</text>'+
               '</div>'+
               '<div style="text-align: center;">'+
                 '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
