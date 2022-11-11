@@ -547,7 +547,9 @@
 
     var acc_staked = await stakerAddress(token_id)
     
-    await fetch_username(acc_staked).then(result => { username = result })
+    await fetch_username(acc_staked).then(result => {
+      console.log(result);
+    })
 
     // <-- Begin Element
     frog_doc = document.getElementById('thePad');
