@@ -530,6 +530,9 @@
 
     }
 
+    //test
+
+    
   /*
 
     Frog Display Element
@@ -543,6 +546,7 @@
     // Assign token variables from data object
     try { var { token_id, external_link, permalink, name, owner: { address, user: { username } }, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog } catch (e) {}
 
+    // Reference controller contract
     let staked = await stakerAddress(token_id)
 
     if (!staked) {
