@@ -509,9 +509,9 @@
       let options = {method: 'GET'};
       let opensea_response = await fetch('https://api.opensea.io/api/v1/user/'+account_address+'', options)
       let opensea_account = opensea_response.json()
-      let { account : { user: { username } } } = opensea_account
-      console.log('opensea account username: '+username)
-      return username;
+      //let { account : { user: { username } } } = opensea_account
+      console.log(opensea_account)
+      //return username;
 
 
       /*
@@ -545,7 +545,7 @@
     try { var { token_id, external_link, permalink, name, owner: { address, user: { username } }, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog } catch (e) {}
 
     opensea_username = await fetch_username(address);
-    console.log('return from function: '+opensea_username)
+    //console.log('return from function: '+opensea_username)
 
     // <-- Begin Element
     frog_doc = document.getElementById('thePad');
