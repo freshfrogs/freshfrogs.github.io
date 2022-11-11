@@ -542,13 +542,12 @@
   async function render_staked_token(frog) {
 
     // Assign token variables from data object
-    var username;
     try { var { token_id, external_link, permalink, name, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog } catch (e) {}
 
     var acc_staked = await stakerAddress(token_id)
     
     await fetch_username(acc_staked).then(result => {
-      console.log(result);
+      console.log('results recieved: '+result);
     })
 
     // <-- Begin Element
