@@ -537,6 +537,7 @@
   */
 
   let opensea_username = ''
+  let token_owner = ''
   async function render_token(frog) {
 
     // Assign token variables from data object
@@ -545,9 +546,19 @@
     let staked = await stakerAddress(token_id)
 
     if (!staked) {
+
       opensea_username = username
+      token_owner = address
+
     } else {
+
       opensea_username = await fetch_username(staked);
+      token_owner = staked
+
+    }
+
+    if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == 'null') {
+      opensea_username = truncateAddress(token_owner)
     }
 
     // <-- Begin Element
