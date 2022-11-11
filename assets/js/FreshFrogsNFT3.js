@@ -541,6 +541,8 @@
   let token_owner = ''
   async function render_token(frog) {
 
+    console.log(frog)
+
     // Assign token variables from data object
     try { var { token_id, external_link, permalink, name, owner: { address, user: { username } }, rarity_data: { rank }, last_sale: { payment_token: { decimals }, total_price } } = frog } catch (e) {}
 
@@ -554,24 +556,14 @@
 
     } else {
 
-      opensea_username = await fetch_username(staked)
+      opensea_username = await fetch_username(staked);
       token_owner = staked
-
-      staked_time_hours = await timeStaked(token_id)
-      staked_time_days = Math.floor(staked_time_hours / 24)
-      staked_level_int = Math.floor((staked_time_hours / 1000 )) + 1
-      staked_level = romanize(staked_level_int)
-      staked_next = Math.round((((staked_level_int) * 1000) - staked_time_hours) / 24) // days
-      staked_earned = staked_time_hours / 1000
 
     }
 
     if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == null) {
       opensea_username = truncateAddress(token_owner)
     }
-
-    rarity_rank = '' //Math.floor(parseFloat((( rank / 4040 ) * 100)))
-    //if (rarity_rank < 1) { rarity_rank = 1 }
 
     // <-- Begin Element
     frog_doc = document.getElementById('thePad');
@@ -591,29 +583,19 @@
         '<div class="renderRight">'+
           '<div class="innerRight">'+
             '<div id="traits_'+token_id+'" class="trait_list">'+
-              '<b>'+name+'</b> <text style="color: #1ac486;">'+opensea_username+'</text>'+'<text style="color: #1ac486; float: right;">'+rarity_rank+'</text>'+
+              '<b>'+name+'</b> <text style="color: #1ac486;">'+opensea_username+'</text>'+'<text style="color: #1ac486; float: right;">'+rank+'</text>'+
             '</div>'+
             '<div id="prop_'+token_id+'" class="properties">'+
-              '<div style="margin: 8px; float: left; width: 100px;">'+
+              '<div style="margin: 8px;">'+
                 '<text>Time Staked</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+staked_time_days+' days</text>'+
+                '<text style="color: #1ac486;">'+''+' hours (Lvl '+''+')</text>'+
               '</div>'+
-              '<div style="margin: 8px; float: right; width: 100px;">'+
+              '<div style="margin: 8px;">'+
                 '<text>$FLYZ Earned</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+staked_earned+'</text>'+
-              '</div>'+
-              '<br>'+
-              '<div style="margin: 8px; float: left; width: 100px;">'+
-                '<text>Level</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+staked_level+'</text>'+
-              '</div>'+
-              '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text>Next Level</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+staked_next+' days</text>'+
+                '<text style="color: #1ac486;">110.69</text>'+
               '</div>'+
               '<div style="text-align: center;">'+
                 '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
-                '<br>'+'<button class="os_button">View on Opensea</button>'+
               '</div>'+
             '</div>'+
           '</div>'+
@@ -671,21 +653,6 @@
       address.length - 5,
       address.length
     )}`;
-  }
-
-  // Numbers to roman numerals
-  function romanize (num) {
-    if (isNaN(num))
-        return NaN;
-    var digits = String(+num).split(""),
-        key = ["","C","CC","CCC","CD","D","DC","DCC","DCCC","CM",
-               "","X","XX","XXX","XL","L","LX","LXX","LXXX","XC",
-               "","I","II","III","IV","V","VI","VII","VIII","IX"],
-        roman = "",
-        i = 3;
-    while (i--)
-        roman = (key[+digits.pop() + (i * 10)] || "") + roman;
-    return Array(+digits.join("") + 1).join("M") + roman;
   }
 
   // Random Int
