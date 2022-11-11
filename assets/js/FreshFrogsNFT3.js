@@ -549,20 +549,18 @@
 
     if (!staked) {
 
-      opensea_username = username
-      token_owner = address
-
       if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == null) {
-        opensea_username = truncateAddress(token_owner)
+        opensea_username = truncateAddress(address)
+      } else {
+        opensea_username = username
       }
 
     } else {
 
-      opensea_username = await fetch_username(staked)
-      token_owner = staked
-
       if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == null) {
-        opensea_username = truncateAddress(token_owner)
+        opensea_username = truncateAddress(staked)
+      } else {
+        opensea_username = await fetch_username(staked)
       }
 
       staked_time_hours = await timeStaked(token_id)
@@ -573,6 +571,8 @@
       staked_earned = staked_time_hours / 1000
 
     }
+
+    console.log(token_id+' : '+opensea_username)
 
     rarity_rank = '' //Math.floor(parseFloat((( rank / 4040 ) * 100)))
     //if (rarity_rank < 1) { rarity_rank = 1 }
