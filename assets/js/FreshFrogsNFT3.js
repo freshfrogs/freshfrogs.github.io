@@ -541,8 +541,6 @@
   let token_owner = ''
   async function render_token(frog) {
 
-    console.log(frog)
-
     // Assign token variables from data object
     try { var { token_id, external_link, permalink, name, owner: { address, user: { username } }, rarity_data: { rank }, last_sale: { payment_token: { decimals }, total_price } } = frog } catch (e) {}
 
@@ -559,11 +557,17 @@
       opensea_username = await fetch_username(staked);
       token_owner = staked
 
+      staked_time = await timeStaked(token_id); // hrs
+      staked_level = staked_time / 1000
+
     }
 
     if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == null) {
       opensea_username = truncateAddress(token_owner)
     }
+
+    rarity_rank = '' //Math.floor(parseFloat((( rank / 4040 ) * 100)))
+    //if (rarity_rank < 1) { rarity_rank = 1 }
 
     // <-- Begin Element
     frog_doc = document.getElementById('thePad');
@@ -583,19 +587,29 @@
         '<div class="renderRight">'+
           '<div class="innerRight">'+
             '<div id="traits_'+token_id+'" class="trait_list">'+
-              '<b>'+name+'</b> <text style="color: #1ac486;">'+opensea_username+'</text>'+'<text style="color: #1ac486; float: right;">'+rank+'</text>'+
+              '<b>'+name+'</b> <text style="color: #1ac486;">'+opensea_username+'</text>'+'<text style="color: #1ac486; float: right;">'+rarity_rank+'</text>'+
             '</div>'+
             '<div id="prop_'+token_id+'" class="properties">'+
-              '<div style="margin: 8px;">'+
+              '<div style="margin: 8px; float: left; width: 100px;">'+
                 '<text>Time Staked</text>'+'<br>'+
                 '<text style="color: #1ac486;">'+''+' hours (Lvl '+''+')</text>'+
               '</div>'+
-              '<div style="margin: 8px;">'+
+              '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text>$FLYZ Earned</text>'+'<br>'+
+                '<text style="color: #1ac486;">110.69</text>'+
+              '</div>'+
+              '<br>'+
+              '<div style="margin: 8px; float: left; width: 100px;">'+
+                '<text>Staked Level</text>'+'<br>'+
+                '<text style="color: #1ac486;">'+''+' hours (Lvl '+''+')</text>'+
+              '</div>'+
+              '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text>Next Level</text>'+'<br>'+
                 '<text style="color: #1ac486;">110.69</text>'+
               '</div>'+
               '<div style="text-align: center;">'+
                 '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
+                '<br>'+'<button class="os_button">View on Opensea</button>'+
               '</div>'+
             '</div>'+
           '</div>'+
