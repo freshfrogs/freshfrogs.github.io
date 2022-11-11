@@ -358,7 +358,6 @@
       }
 
       // Render Frogs Held by Fetch Address
-
       if (user_tokens >= 1) {
         let pages = parseInt(user_tokens/50) + 1;
         for (var i = 0; i < pages; i++) {
@@ -585,7 +584,7 @@
         '<div class="renderRight">'+
           '<div class="innerRight">'+
             '<div id="traits_'+token_id+'" class="trait_list">'+
-              '<b>'+name+'</b> <text style="color: #1ac486;">'+opensea_username+'</text>'+
+              '<b>'+name+'</b> <text style="color: #1ac486;">'+opensea_username+'</text>'+'<text style="color: #1ac486; float: right;">'+rank+'</text>'+
             '</div>'+
             '<div id="prop_'+token_id+'" class="properties">'+
               '<div style="margin: 8px;">'+
