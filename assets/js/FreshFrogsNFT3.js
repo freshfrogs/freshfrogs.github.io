@@ -559,7 +559,7 @@
 
       staked_time_hours = await timeStaked(token_id)
       staked_time_days = Math.floor(staked_time_hours / 24)
-      staked_level = Math.floor((staked_time / 1000 )) + 1
+      staked_level = Math.floor((staked_time_hours / 1000 )) + 1
       staked_next = ((staked_level + 1) * 1000) - staked_time_hours // hours
       staked_earned = staked_time_hours / 1000
 
