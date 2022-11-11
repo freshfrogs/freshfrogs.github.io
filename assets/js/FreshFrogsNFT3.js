@@ -532,7 +532,7 @@
 
     //test
 
-    
+
   /*
 
     Frog Display Element
@@ -560,6 +560,8 @@
       token_owner = staked
 
     }
+
+    console.log(token_id+' : '+opensea_username)
 
     if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == 'null') {
       opensea_username = truncateAddress(token_owner)
