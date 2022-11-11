@@ -515,7 +515,7 @@
       .then(data => {
 
         var { account: { user: { username } } } = data
-        console.log(username)
+        console.log('username return : '+username)
         return username
 
       })
