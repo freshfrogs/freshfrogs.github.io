@@ -544,8 +544,6 @@
   let token_owner = ''
   async function render_token(frog) {
 
-    console.log(frog)
-
     // Assign token variables from data object
     try { var { token_id, external_link, permalink, name, rarity_data: { rank }, owner: { address, user: { username } } } = frog } catch (e) {}
 
