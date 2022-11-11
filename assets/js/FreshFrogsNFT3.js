@@ -554,8 +554,15 @@
 
     } else {
 
-      opensea_username = await fetch_username(staked);
+      opensea_username = await fetch_username(staked)
       token_owner = staked
+
+      staked_time_hours = await timeStaked(token_id)
+      staked_time_days = Math.floor(staked_time_hours / 24)
+      staked_level_int = Math.floor((staked_time_hours / 1000 )) + 1
+      staked_level = romanize(staked_level_int)
+      staked_next = Math.round((((staked_level_int) * 1000) - staked_time_hours) / 24) // days
+      staked_earned = staked_time_hours / 1000
 
     }
 
@@ -589,20 +596,20 @@
             '<div id="prop_'+token_id+'" class="properties">'+
               '<div style="margin: 8px; float: left; width: 100px;">'+
                 '<text>Time Staked</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+''+' hours (Lvl '+''+')</text>'+
+                '<text style="color: #1ac486;">'+staked_time_days+' days</text>'+
               '</div>'+
               '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text>$FLYZ Earned</text>'+'<br>'+
-                '<text style="color: #1ac486;">110.69</text>'+
+                '<text style="color: #1ac486;">'+staked_earned+'</text>'+
               '</div>'+
               '<br>'+
               '<div style="margin: 8px; float: left; width: 100px;">'+
-                '<text>Staked Level</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+''+' hours (Lvl '+''+')</text>'+
+                '<text>Level</text>'+'<br>'+
+                '<text style="color: #1ac486;">'+staked_level+'</text>'+
               '</div>'+
               '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text>Next Level</text>'+'<br>'+
-                '<text style="color: #1ac486;">110.69</text>'+
+                '<text style="color: #1ac486;">'+staked_next+' days</text>'+
               '</div>'+
               '<div style="text-align: center;">'+
                 '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
@@ -664,6 +671,21 @@
       address.length - 5,
       address.length
     )}`;
+  }
+
+  // Numbers to roman numerals
+  function romanize (num) {
+    if (isNaN(num))
+        return NaN;
+    var digits = String(+num).split(""),
+        key = ["","C","CC","CCC","CD","D","DC","DCC","DCCC","CM",
+               "","X","XX","XXX","XL","L","LX","LXX","LXXX","XC",
+               "","I","II","III","IV","V","VI","VII","VIII","IX"],
+        roman = "",
+        i = 3;
+    while (i--)
+        roman = (key[+digits.pop() + (i * 10)] || "") + roman;
+    return Array(+digits.join("") + 1).join("M") + roman;
   }
 
   // Random Int
