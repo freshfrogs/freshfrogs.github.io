@@ -538,16 +538,13 @@
 
   */
 
-    //
-
-  let opensea_username = '';
   async function render_token(frog) {
 
     // Assign token variables from data object
     try { var { token_id, external_link, permalink, name, owner: { address, user: { username } }, last_sale: { payment_token: { decimals }, total_price }, rarity_data: { rank } } = frog } catch (e) {}
 
-    //opensea_username = await fetch_username(address);
-    //console.log('return from function: '+opensea_username)
+    opensea_username = await fetch_username(address);
+    console.log('return from function: '+opensea_username)
 
     // <-- Begin Element
     frog_doc = document.getElementById('thePad');
