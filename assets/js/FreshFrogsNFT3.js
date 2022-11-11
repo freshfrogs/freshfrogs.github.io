@@ -561,6 +561,7 @@
       staked_time_days = Math.floor(staked_time_hours / 24)
       staked_level = Math.floor((staked_time / 1000 )) + 1
       staked_next = ((staked_level + 1) * 1000) - staked_time_hours // hours
+      staked_earned = staked_time_hours / 1000
 
     }
 
@@ -598,7 +599,7 @@
               '</div>'+
               '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text>$FLYZ Earned</text>'+'<br>'+
-                '<text style="color: #1ac486;">110.69</text>'+
+                '<text style="color: #1ac486;">'+staked_earned+'</text>'+
               '</div>'+
               '<br>'+
               '<div style="margin: 8px; float: left; width: 100px;">'+
