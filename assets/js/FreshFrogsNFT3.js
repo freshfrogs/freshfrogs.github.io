@@ -508,8 +508,6 @@
 
     async function fetch_username(acc_address) {
 
-      var username
-
       let options = {method: 'GET'};
 
       fetch('https://api.opensea.io/api/v1/user/'+acc_address+'', options)
@@ -517,6 +515,7 @@
       .then(data => {
 
         var { account: { user: { username } } } = data
+        console.log(username)
         return username
 
       })
@@ -526,8 +525,6 @@
         return ''
 
       });
-
-      console.log(username)
 
     }
 
@@ -546,6 +543,7 @@
 
     var acc_staked = await stakerAddress(token_id)
     var username = await fetch_username(acc_staked)
+    console.log(username)
 
     // <-- Begin Element
     frog_doc = document.getElementById('thePad');
