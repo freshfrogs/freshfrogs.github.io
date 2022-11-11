@@ -587,11 +587,11 @@
               '<b>'+name+'</b> <text style="color: #1ac486;">'+opensea_username+'</text>'+'<text style="color: #1ac486; float: right;">'+rarity_rank+'</text>'+
             '</div>'+
             '<div id="prop_'+token_id+'" class="properties">'+
-              '<div style="margin: 8px;">'+
+              '<div style="margin: 8px; float: left;">'+
                 '<text>Time Staked</text>'+'<br>'+
                 '<text style="color: #1ac486;">'+''+' hours (Lvl '+''+')</text>'+
               '</div>'+
-              '<div style="margin: 8px;">'+
+              '<div style="margin: 8px; float: right;">'+
                 '<text>$FLYZ Earned</text>'+'<br>'+
                 '<text style="color: #1ac486;">110.69</text>'+
               '</div>'+
