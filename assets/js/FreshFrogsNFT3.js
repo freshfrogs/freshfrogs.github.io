@@ -560,6 +560,8 @@
 
   async function render_token(frog) {
 
+    console.log('.')
+    
     let opensea_username = ''
     let token_owner = ''
     let staked_time_days = staked_level = staked_next = staked_earned = ''
