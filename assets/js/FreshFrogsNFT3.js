@@ -545,7 +545,7 @@
       stakedTimeDays = Math.floor(stakedTimeHours / 24)                             // Time Staked
       stakedLevel = romanize(stakedLevelInt)                                         // Staked Level
       stakedNext = Math.round((((stakedLevelInt) * 1000) - stakedTimeHours) / 24)  // Days until next level
-      stakedEarned = stakedTimeHours / 1000                                          // Flyz Earned
+      stakedEarned = (stakedTimeHours / 1000).toFixed(3)                                          // Flyz Earned
 
       // [ Time Staked, Staked Level, Next Level, Flyz Earned]
       return [stakedTimeDays, stakedLevel, stakedNext, stakedEarned]
