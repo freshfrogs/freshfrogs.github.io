@@ -584,7 +584,7 @@
         '<div class="renderRight">'+
           '<div class="innerRight">'+
             '<div id="traits_'+token_id+'" class="trait_list">'+
-              '<b>'+name+'</b> <text style="color: #1ac486;">'+opensea_username+'</text>'+'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+              '<b>'+name+'</b> <text style="color: #1ac486;">'+opensea_username+'</text>'+'<b style="color: #1ac486; float: right;">'+rarity_rank+'%</b>'+
             '</div>'+
             '<div id="prop_'+token_id+'" class="properties">'+
               '<div style="margin: 8px;">'+
@@ -597,7 +597,6 @@
               '</div>'+
               '<div style="text-align: center;">'+
                 '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
-                '<br>'+'<button class="os_button">View on Opensea</button>'+
               '</div>'+
             '</div>'+
           '</div>'+
