@@ -530,6 +530,27 @@
         /// test AGAIN
 
     }
+  
+  /*
+
+    Calculate stake values & returns
+
+  */
+
+    async function stakingValues(tokenId) {
+
+      stakedTimeHours = await timeStaked(tokenId)
+      stakedLevelInt = Math.floor((stakedTimeHours / 1000 )) + 1
+
+      stakedTimeDays = Math.floor(stakedTimeHours / 24)                             // Time Staked
+      stakedLevel = romanize(stakedLevelInt)                                         // Staked Level
+      stakedNext = Math.round((((stakedLevelInt) * 1000) - stakedTimeHours) / 24)  // Days until next level
+      stakedEarned = stakedTimeHours / 1000                                          // Flyz Earned
+
+      // [ Time Staked, Staked Level, Next Level, Flyz Earned]
+      return [stakedTimeDays, stakedLevel, stakedNext, stakedEarned]
+
+    }
 
   /*
 
@@ -570,6 +591,12 @@
       //staked_next = Math.round((((staked_level_int) * 1000) - staked_time_hours) / 24) // days
       //staked_earned = staked_time_hours / 1000
 
+      let staking_values = await stakingValues(token_id)
+      staked_time_days = staking_values[0]
+      staked_level = staking_values[1]
+      staked_next = staking_values[2]
+      staked_earned = staking_values[3]
+
     }
 
     console.log(token_id+' : '+opensea_username)
@@ -600,20 +627,20 @@
             '<div id="prop_'+token_id+'" class="properties">'+
               '<div style="margin: 8px; float: left; width: 100px;">'+
                 '<text>Time Staked</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+''+' days</text>'+
+                '<text style="color: #1ac486;">'+staked_time_days+' days</text>'+
               '</div>'+
               '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text>$FLYZ Earned</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+''+'</text>'+
+                '<text style="color: #1ac486;">'+staked_earned+'</text>'+
               '</div>'+
               '<br>'+
               '<div style="margin: 8px; float: left; width: 100px;">'+
                 '<text>Level</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+''+'</text>'+
+                '<text style="color: #1ac486;">'+staked_level+'</text>'+
               '</div>'+
               '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text>Next Level</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+''+' days</text>'+
+                '<text style="color: #1ac486;">'+staked_next+' days</text>'+
               '</div>'+
               '<div style="text-align: center;">'+
                 '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
