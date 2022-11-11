@@ -639,7 +639,7 @@
               '</div>'+
               '<div style="text-align: center;">'+
                 '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
-                '<br>'+'<button class="os_button">View on Opensea</button>'+
+                '<br>'+'<a href="'+permalink+'" target="_blank"><button class="os_button">View on Opensea</button></a>'+
               '</div>'+
             '</div>'+
           '</div>'+
