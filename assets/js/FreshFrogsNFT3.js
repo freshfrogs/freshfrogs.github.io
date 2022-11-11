@@ -563,7 +563,7 @@
       opensea_username = truncateAddress(token_owner)
     }
 
-    rarity_rank = Math.round((( rank / 4040 ) * 100))
+    rarity_rank = Math.floor((( rank / 4040 ) * 100))
     if (rarity_rank < 1) { rarity_rank = 1 }
 
     // <-- Begin Element
