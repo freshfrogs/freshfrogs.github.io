@@ -376,14 +376,12 @@
               console.log(token_id)
 
             })
-            .then(() => {
-              console.log(' | -- Staked Leaderboard -- |');
-              console.log(' Longest Streak: Frog #'+leaderboard_streak_token+' '+parseInt(leaderboard_streak/24)+' days');
-              console.log(' Staked By: '+truncateAddress(leaderboard_streak_owner));
-              console.log(' ');
-              console.log(' Most Staked: '+leaderboard_totalStaked+' Frogs');
-              console.log(' Staked By: '+truncateAddress(leaderboard_totalStaked_owner));
-            })
+            console.log(' | -- Staked Leaderboard -- |');
+            console.log(' Longest Streak: Frog #'+leaderboard_streak_token+' '+parseInt(leaderboard_streak/24)+' days');
+            console.log(' Staked By: '+truncateAddress(leaderboard_streak_owner));
+            console.log(' ');
+            console.log(' Most Staked: '+leaderboard_totalStaked+' Frogs');
+            console.log(' Staked By: '+truncateAddress(leaderboard_totalStaked_owner));
           })
           .catch(e => {
             
