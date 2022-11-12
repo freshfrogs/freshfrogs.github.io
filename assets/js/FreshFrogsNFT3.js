@@ -664,7 +664,7 @@
       await stakedLeaderboard(token_id)
       console.log(token_id)
 
-    }
+    })
       
     console.log(' -- Staked Leaderboard -- ');
     console.log(' Longest Streak: Frog #'+leaderboard_streak_token+' '+parseInt(leaderboard_streak/24)+' days');
@@ -673,7 +673,7 @@
     console.log(' Most Staked: '+leaderboard_totalStaked+' Frogs');
     console.log(' Staked By: '+truncateAddress(leaderboard_totalStaked_owner));
 
-  })
+  }
 
   // loadTrait(_trait(family), _attribute(type), _where(element))
   function loadTrait(trait, attribute, where) {
