@@ -560,7 +560,7 @@
 
   async function render_token(frog) {
 
-    console.log('.')
+    console.log(frog)
 
     let opensea_username = ''
     let token_owner = ''
@@ -569,11 +569,15 @@
     // Assign token variables from data object
     try { var { token_id, external_link, permalink, name, owner: { address, user: { username } }, rarity_data: { rank }, last_sale: { payment_token: { decimals }, total_price } } = frog } catch (e) {}
 
+    console.log(name)
+
     // Reference controller contract
     let staked = await stakerAddress(token_id)
     //if (staked == '0xF01e067d442f4254cd7c89A5D42d90ad554616E8' || staked == '0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359') {
     //  return
     //}
+
+    console.log('Staked Response '+name+' : '+staked)
 
     if (!staked) {
 
@@ -583,6 +587,8 @@
         opensea_username = truncateAddress(address)
       }
 
+      console.log('Updated (not staked) username '+name+' : '+opensea_username)
+
     } else {
 
       opensea_username = await fetch_username(staked)
@@ -591,11 +597,15 @@
         opensea_username = truncateAddress(staked)
       }
 
+      console.log('Updated staked username '+name+' : '+opensea_username)
+
       let staking_values = await stakingValues(token_id)
       staked_time_days = staking_values[0]
       staked_level = staking_values[1]
       staked_next = staking_values[2]
       staked_earned = staking_values[3]
+
+      console.log('Updated staked values '+name+' : '+staking_values)
 
     }
 
@@ -652,8 +662,12 @@
     // Create Element <--
     frog_doc.appendChild(frog_token);
 
+    console.log('Apendchild Element '+name)
+
     // Update Metadata! Build Frog -->
     let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
+
+    console.log('Fetch metadata '+name+' : '+metadata)
 
     for (let i = 0; i < metadata.attributes.length; i++) {
 
@@ -661,6 +675,8 @@
       loadTrait(attribute.trait_type, attribute.value, 'cont_'+token_id);
 
     }
+
+    console.log('Done! '+name)
 
   }
 
