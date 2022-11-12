@@ -544,7 +544,7 @@
       stakedEarned = (stakedTimeHours / 1000).toFixed(3)                                          // Flyz Earned
 
       // [ Time Staked, Staked Level, Next Level, Flyz Earned]
-      return [stakedTimeDays, stakedLevel, stakedNext, stakedEarned]
+      return [ stakedTimeDays, stakedLevel, stakedNext, stakedEarned ]
 
     }
 
@@ -556,7 +556,8 @@
 
   async function render_token(tokens) {
 
-    tokens.forEach(async (frog) => {
+    //tokens.forEach(async (frog) => {
+    for (const frog of tokens ) {
 
       //render_token(frog);
 
@@ -663,9 +664,9 @@
       await stakedLeaderboard(token_id)
       console.log(token_id)
 
-    })
+    }
       
-    console.log(' | -- Staked Leaderboard -- |');
+    console.log(' -- Staked Leaderboard -- ');
     console.log(' Longest Streak: Frog #'+leaderboard_streak_token+' '+parseInt(leaderboard_streak/24)+' days');
     console.log(' Staked By: '+truncateAddress(leaderboard_streak_owner));
     console.log(' ');
