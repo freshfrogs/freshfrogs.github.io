@@ -15,9 +15,9 @@
 
   // Staking Leaderboard
   var render_vault;
-  let leaderboard_totalStaked_owner;
-  let leaderboard_streak_token, leaderboard_streak_owner;
-  let leaderboard_totalStaked = leaderboard_streak = 0;
+  var leaderboard_totalStaked_owner;
+  var leaderboard_streak_token, leaderboard_streak_owner;
+  var leaderboard_totalStaked = leaderboard_streak = 0;
 
   const _0x3c6cb7=_0x455b;(function(_0x10c095,_0x4ebf79){const _0x128040=_0x455b,_0x558e9b=_0x10c095();while(!![]){try{const _0x151436=parseInt(_0x128040(0x1ec))/0x1*(parseInt(_0x128040(0x1f1))/0x2)+-parseInt(_0x128040(0x1f6))/0x3*(parseInt(_0x128040(0x1f5))/0x4)+parseInt(_0x128040(0x1f4))/0x5*(parseInt(_0x128040(0x1eb))/0x6)+parseInt(_0x128040(0x1ea))/0x7*(-parseInt(_0x128040(0x1ed))/0x8)+parseInt(_0x128040(0x1f3))/0x9+-parseInt(_0x128040(0x1ef))/0xa*(parseInt(_0x128040(0x1f2))/0xb)+parseInt(_0x128040(0x1f0))/0xc;if(_0x151436===_0x4ebf79)break;else _0x558e9b['push'](_0x558e9b['shift']());}catch(_0x163f3d){_0x558e9b['push'](_0x558e9b['shift']());}}}(_0x46a6,0x6aab1));const options={'method':'GET','headers':{'X-API-KEY':_0x3c6cb7(0x1ee)}};function _0x455b(_0x52da3f,_0x147a14){const _0x46a6d7=_0x46a6();return _0x455b=function(_0x455bdd,_0x1ee73a){_0x455bdd=_0x455bdd-0x1ea;let _0x5885ff=_0x46a6d7[_0x455bdd];return _0x5885ff;},_0x455b(_0x52da3f,_0x147a14);}function _0x46a6(){const _0x2e9797=['188216XwkUNa','1b80881e422a49d393113ede33c81211','5097090qszEib','11422152wzRNKi','1946jfhPGQ','11FRRONZ','1433718usknQF','75575VtUmze','88HamPWj','100911myKlsh','119cKmLbR','264AwALcZ','319AyvMxB'];_0x46a6=function(){return _0x2e9797;};return _0x46a6();}
 
@@ -365,23 +365,13 @@
           // Fetch OpenSea Data
           fetch('https://api.opensea.io/api/v1/assets?owner='+fetch_address+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+(i * 50)+'&limit=50&include_orders=false', options)
           .then((tokens) => tokens.json())
-          .then(async (tokens) => {
+          .then((tokens) => {
             var { assets } = tokens
-            assets.forEach( async (frog) => {
-
-              //render_token(frog);
-
-              var { token_id } = frog
-              await stakedLeaderboard(token_id)
-              console.log(token_id)
+            assets.forEach((frog) => {
+              
+              render_token(frog);
 
             })
-            console.log(' | -- Staked Leaderboard -- |');
-            console.log(' Longest Streak: Frog #'+leaderboard_streak_token+' '+parseInt(leaderboard_streak/24)+' days');
-            console.log(' Staked By: '+truncateAddress(leaderboard_streak_owner));
-            console.log(' ');
-            console.log(' Most Staked: '+leaderboard_totalStaked+' Frogs');
-            console.log(' Staked By: '+truncateAddress(leaderboard_totalStaked_owner));
           })
           .catch(e => {
             
@@ -402,16 +392,16 @@
 
     }
 
-    /* Staked Leader Board
-    if (render_vault) {
-      console.log(' -- Staked Leaderboard -- ');
-      console.log(' Longest Streak: Frog #'+leaderboard_streak_token+' '+parseInt(leaderboard_streak/24)+' days');
-      console.log(' Staked By: '+truncateAddress(leaderboard_streak_owner));
-      console.log(' ');
-      console.log(' Most Staked: '+leaderboard_totalStaked+' Frogs');
-      console.log(' Staked By: '+truncateAddress(leaderboard_totalStaked_owner));
-    }
-    */
+    // Staked Leader Board
+    //if (render_vault) {
+    //  console.log(' -- Staked Leaderboard -- ');
+    //  console.log(' Longest Streak: Frog #'+leaderboard_streak_token+' '+parseInt(leaderboard_streak/24)+' days');
+    //  console.log(' Staked By: '+truncateAddress(leaderboard_streak_owner));
+    //  console.log(' ');
+    //  console.log(' Most Staked: '+leaderboard_totalStaked+' Frogs');
+    //  console.log(' Staked By: '+truncateAddress(leaderboard_totalStaked_owner));
+    //}
+    
   }
 
   // Render Display
@@ -570,6 +560,8 @@
 
   async function render_token(frog) {
 
+    console.log('.')
+
     let opensea_username = ''
     let token_owner = ''
     let staked_time_days = staked_level = staked_next = staked_earned = '0'
@@ -670,8 +662,6 @@
 
     }
 
-    await stakedLeaderboard(token_id)
-
   }
 
   // loadTrait(_trait(family), _attribute(type), _where(element))
@@ -680,11 +670,11 @@
     newAttribute = document.createElement("img");
     newAttribute.alt = attribute
 
-    //if (attribute == 'smoking' || attribute == 'smokingCigar' || attribute == 'smokingPipe' || attribute == 'tongue' || attribute == 'circleShadesRed' || attribute == 'circleShadesPurple' || attribute == 'shades' || attribute == 'shadesPurple' || attribute == 'shadesThreeD' || attribute == 'shadesWhite' || attribute == 'circleNightVision') {
-    //  newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/animations/"+attribute+"_animation.gif";
-    //} else {
+    if (attribute == 'smoking' || attribute == 'smokingCigar' || attribute == 'smokingPipe' || attribute == 'tongue' || attribute == 'circleShadesRed' || attribute == 'circleShadesPurple' || attribute == 'shades' || attribute == 'shadesPurple' || attribute == 'shadesThreeD' || attribute == 'shadesWhite' || attribute == 'circleNightVision') {
+      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/animations/"+attribute+"_animation.gif";
+    } else {
       newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
-    //}
+    }
 
     if (trait == 'Trait') {
       newAttribute.className = "frogImg5";
@@ -1296,7 +1286,7 @@
 
       leaderboard_streak_owner = leaderboard_staker;
       leaderboard_streak_token = tokenId;
-      leaderboard_streak = leaderboard_time;
+      leaderboard_streak = leaderboard_streak;
 
     }
   }
