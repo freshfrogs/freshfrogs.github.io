@@ -556,8 +556,8 @@
 
   async function render_token(tokens) {
 
-    //tokens.forEach(async (frog) => {
-    for (const frog of tokens ) {
+    tokens.forEach(async (frog) => {
+    //for (const frog of tokens ) {
 
       //render_token(frog);
 
@@ -673,7 +673,7 @@
     console.log(' Most Staked: '+leaderboard_totalStaked+' Frogs');
     console.log(' Staked By: '+truncateAddress(leaderboard_totalStaked_owner));
 
-  }
+  })
 
   // loadTrait(_trait(family), _attribute(type), _where(element))
   function loadTrait(trait, attribute, where) {
