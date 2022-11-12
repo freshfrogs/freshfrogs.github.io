@@ -1296,7 +1296,7 @@
 
       leaderboard_streak_owner = leaderboard_staker;
       leaderboard_streak_token = tokenId;
-      leaderboard_streak = leaderboard_streak;
+      leaderboard_streak = leaderboard_time;
 
     }
   }
