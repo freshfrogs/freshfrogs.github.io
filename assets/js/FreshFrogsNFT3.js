@@ -368,12 +368,8 @@
           .then((tokens) => {
             var { assets } = tokens
             assets.forEach((frog) => {
-              
-              var { token_id } = frog
 
               render_token(frog);
-              
-              if (render_vault) { stakedLeaderboard(token_id) }
 
             })
           })
@@ -564,8 +560,6 @@
 
   async function render_token(frog) {
 
-    console.log('.')
-
     let opensea_username = ''
     let token_owner = ''
     let staked_time_days = staked_level = staked_next = staked_earned = '0'
@@ -665,6 +659,8 @@
       loadTrait(attribute.trait_type, attribute.value, 'cont_'+token_id);
 
     }
+
+    await stakedLeaderboard(token_id)
 
   }
 
