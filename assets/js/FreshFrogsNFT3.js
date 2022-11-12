@@ -365,7 +365,7 @@
           // Fetch OpenSea Data
           fetch('https://api.opensea.io/api/v1/assets?owner='+fetch_address+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+(i * 50)+'&limit=50&include_orders=false', options)
           .then((tokens) => tokens.json())
-          .then((tokens) => {
+          .then(async (tokens) => {
             var { assets } = tokens
             assets.forEach( async (frog) => {
 
