@@ -364,10 +364,24 @@
 
           // Fetch OpenSea Data
           fetch('https://api.opensea.io/api/v1/assets?owner='+fetch_address+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+(i * 50)+'&limit=50&include_orders=false', options)
-          .then((tokens_object) => tokens_object.json())
-          .then((tokens_object) => {
-            var { tokens } = tokens_object
-            render_token(tokens)
+          .then((tokens) => tokens.json())
+          .then((tokens) => {
+            var { assets } = tokens
+            assets.forEach( async (frog) => {
+
+              //render_token(frog);
+
+              var { token_id } = frog
+              await stakedLeaderboard(token_id)
+              console.log(token_id)
+
+            })
+            console.log(' | -- Staked Leaderboard -- |');
+            console.log(' Longest Streak: Frog #'+leaderboard_streak_token+' '+parseInt(leaderboard_streak/24)+' days');
+            console.log(' Staked By: '+truncateAddress(leaderboard_streak_owner));
+            console.log(' ');
+            console.log(' Most Staked: '+leaderboard_totalStaked+' Frogs');
+            console.log(' Staked By: '+truncateAddress(leaderboard_totalStaked_owner));
           })
           .catch(e => {
             
@@ -544,7 +558,7 @@
       stakedEarned = (stakedTimeHours / 1000).toFixed(3)                                          // Flyz Earned
 
       // [ Time Staked, Staked Level, Next Level, Flyz Earned]
-      return [ stakedTimeDays, stakedLevel, stakedNext, stakedEarned ]
+      return [stakedTimeDays, stakedLevel, stakedNext, stakedEarned]
 
     }
 
@@ -554,124 +568,109 @@
 
   */
 
-  async function render_token(tokens) {
+  async function render_token(frog) {
 
-    //tokens.forEach(async (frog) => {
-    for (const frog of tokens ) {
+    let opensea_username = ''
+    let token_owner = ''
+    let staked_time_days = staked_level = staked_next = staked_earned = '0'
 
-      //render_token(frog);
+    // Assign token variables from data object
+    try { var { token_id, external_link, permalink, name, owner: { address, user: { username } }, rarity_data: { rank }, last_sale: { payment_token: { decimals }, total_price } } = frog } catch (e) {}
 
-      let opensea_username = ''
-      let token_owner = ''
-      let staked_time_days = staked_level = staked_next = staked_earned = '0'
+    // Reference controller contract
+    let staked = await stakerAddress(token_id)
+    //if (staked == '0xF01e067d442f4254cd7c89A5D42d90ad554616E8' || staked == '0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359') {
+    //  return
+    //}
 
-      // Assign token variables from data object
-      try { var { token_id, external_link, permalink, name, owner: { address, user: { username } }, rarity_data: { rank }, last_sale: { payment_token: { decimals }, total_price } } = frog } catch (e) {}
+    if (!staked) {
 
-      // Reference controller contract
-      let staked = await stakerAddress(token_id)
-      //if (staked == '0xF01e067d442f4254cd7c89A5D42d90ad554616E8' || staked == '0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359') {
-      //  return
-      //}
+      opensea_username = username
 
-      if (!staked) {
-
-        opensea_username = username
-
-        if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == null) {
-          opensea_username = truncateAddress(address)
-        }
-
-      } else {
-
-        opensea_username = await fetch_username(staked)
-
-        if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == null) {
-          opensea_username = truncateAddress(staked)
-        }
-
-        let staking_values = await stakingValues(token_id)
-        staked_time_days = staking_values[0]
-        staked_level = staking_values[1]
-        staked_next = staking_values[2]
-        staked_earned = staking_values[3]
-
+      if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == null) {
+        opensea_username = truncateAddress(address)
       }
 
-      rarity_rank = '' //Math.floor(parseFloat((( rank / 4040 ) * 100)))
-      //if (rarity_rank < 1) { rarity_rank = 1 }
+    } else {
 
-      // <-- Begin Element
-      frog_doc = document.getElementById('thePad');
-      frog_token = document.createElement('div');
+      opensea_username = await fetch_username(staked)
 
-      // Element Details -->
-      frog_token.id = name;
-      frog_token.className = 'frog_token';
-      frog_token.innerHTML = 
-        '<div class="frogTokenCont">'+
-          '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+external_link+'); background-size: 2048px 2048px;">'+
-            '<div class="innerLeft">'+
-              '<div class="frog_imgContainer" id="cont_'+token_id+'" onclick="display_token('+token_id+')">'+
-              '</div>'+
-            '</div>'+
-          '</div>'+
-          '<div class="renderRight">'+
-            '<div class="innerRight">'+
-              '<div id="traits_'+token_id+'" class="trait_list">'+
-                '<b>'+name+'</b> <text style="color: #1ac486;">'+opensea_username+'</text>'+'<text style="color: #1ac486; float: right;">'+rarity_rank+'</text>'+
-              '</div>'+
-              '<div id="prop_'+token_id+'" class="properties">'+
-                '<div style="margin: 8px; float: left; width: 100px;">'+
-                  '<text>Time Staked</text>'+'<br>'+
-                  '<text style="color: #1ac486;">'+staked_time_days+' days</text>'+
-                '</div>'+
-                '<div style="margin: 8px; float: right; width: 100px;">'+
-                  '<text>$FLYZ Earned</text>'+'<br>'+
-                  '<text style="color: #1ac486;">'+staked_earned+'</text>'+
-                '</div>'+
-                '<br>'+
-                '<div style="margin: 8px; float: left; width: 100px;">'+
-                  '<text>Level</text>'+'<br>'+
-                  '<text style="color: #1ac486;">'+staked_level+'</text>'+
-                '</div>'+
-                '<div style="margin: 8px; float: right; width: 100px;">'+
-                  '<text>Next Level</text>'+'<br>'+
-                  '<text style="color: #1ac486;">'+staked_next+' days</text>'+
-                '</div>'+
-                '<div style="text-align: center;">'+
-                  '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
-                  '<br>'+'<a href="'+permalink+'" target="_blank"><button class="os_button">View on Opensea</button></a>'+
-                '</div>'+
-              '</div>'+
-            '</div>'+
-          '</div>'+
-        '</div>';
-
-      // Create Element <--
-      frog_doc.appendChild(frog_token);
-
-      // Update Metadata! Build Frog -->
-      let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
-
-      for (let i = 0; i < metadata.attributes.length; i++) {
-
-        let attribute = metadata.attributes[i]
-        loadTrait(attribute.trait_type, attribute.value, 'cont_'+token_id);
-
+      if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == null) {
+        opensea_username = truncateAddress(staked)
       }
 
-      await stakedLeaderboard(token_id)
-      console.log(token_id)
+      let staking_values = await stakingValues(token_id)
+      staked_time_days = staking_values[0]
+      staked_level = staking_values[1]
+      staked_next = staking_values[2]
+      staked_earned = staking_values[3]
 
     }
-      
-    console.log(' -- Staked Leaderboard -- ');
-    console.log(' Longest Streak: Frog #'+leaderboard_streak_token+' '+parseInt(leaderboard_streak/24)+' days');
-    console.log(' Staked By: '+truncateAddress(leaderboard_streak_owner));
-    console.log(' ');
-    console.log(' Most Staked: '+leaderboard_totalStaked+' Frogs');
-    console.log(' Staked By: '+truncateAddress(leaderboard_totalStaked_owner));
+
+    rarity_rank = '' //Math.floor(parseFloat((( rank / 4040 ) * 100)))
+    //if (rarity_rank < 1) { rarity_rank = 1 }
+
+    // <-- Begin Element
+    frog_doc = document.getElementById('thePad');
+    frog_token = document.createElement('div');
+
+    // Element Details -->
+    frog_token.id = name;
+    frog_token.className = 'frog_token';
+    frog_token.innerHTML = 
+      '<div class="frogTokenCont">'+
+        '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+external_link+'); background-size: 2048px 2048px;">'+
+          '<div class="innerLeft">'+
+            '<div class="frog_imgContainer" id="cont_'+token_id+'" onclick="display_token('+token_id+')">'+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+        '<div class="renderRight">'+
+          '<div class="innerRight">'+
+            '<div id="traits_'+token_id+'" class="trait_list">'+
+              '<b>'+name+'</b> <text style="color: #1ac486;">'+opensea_username+'</text>'+'<text style="color: #1ac486; float: right;">'+rarity_rank+'</text>'+
+            '</div>'+
+            '<div id="prop_'+token_id+'" class="properties">'+
+              '<div style="margin: 8px; float: left; width: 100px;">'+
+                '<text>Time Staked</text>'+'<br>'+
+                '<text style="color: #1ac486;">'+staked_time_days+' days</text>'+
+              '</div>'+
+              '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text>$FLYZ Earned</text>'+'<br>'+
+                '<text style="color: #1ac486;">'+staked_earned+'</text>'+
+              '</div>'+
+              '<br>'+
+              '<div style="margin: 8px; float: left; width: 100px;">'+
+                '<text>Level</text>'+'<br>'+
+                '<text style="color: #1ac486;">'+staked_level+'</text>'+
+              '</div>'+
+              '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text>Next Level</text>'+'<br>'+
+                '<text style="color: #1ac486;">'+staked_next+' days</text>'+
+              '</div>'+
+              '<div style="text-align: center;">'+
+                '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
+                '<br>'+'<a href="'+permalink+'" target="_blank"><button class="os_button">View on Opensea</button></a>'+
+              '</div>'+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+
+    // Create Element <--
+    frog_doc.appendChild(frog_token);
+
+    // Update Metadata! Build Frog -->
+    let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
+
+    for (let i = 0; i < metadata.attributes.length; i++) {
+
+      let attribute = metadata.attributes[i]
+      loadTrait(attribute.trait_type, attribute.value, 'cont_'+token_id);
+
+    }
+
+    await stakedLeaderboard(token_id)
 
   }
 
