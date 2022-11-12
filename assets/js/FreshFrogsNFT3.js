@@ -373,6 +373,7 @@
 
               var { token_id } = frog
               stakedLeaderboard(token_id)
+              console.log(token_id)
 
             })
           })
@@ -1280,8 +1281,6 @@
 
       leaderboard_totalStaked = leaderboard_ammount;
       leaderboard_totalStaked_owner = leaderboard_staker;
-
-      console.log(leaderboard_totalStaked)
       
     } 
 
@@ -1292,8 +1291,6 @@
       leaderboard_streak_owner = leaderboard_staker;
       leaderboard_streak_token = tokenId;
       leaderboard_streak = leaderboard_streak;
-
-      console.log(leaderboard_streak_owner)
 
     }
   }
