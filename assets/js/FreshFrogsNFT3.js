@@ -556,8 +556,8 @@
 
   async function render_token(tokens) {
 
-    tokens.forEach(async (frog) => {
-    //for (const frog of tokens ) {
+    //tokens.forEach(async (frog) => {
+    for (const frog of tokens ) {
 
       //render_token(frog);
 
@@ -664,7 +664,7 @@
       await stakedLeaderboard(token_id)
       console.log(token_id)
 
-    })
+    }
       
     console.log(' -- Staked Leaderboard -- ');
     console.log(' Longest Streak: Frog #'+leaderboard_streak_token+' '+parseInt(leaderboard_streak/24)+' days');
