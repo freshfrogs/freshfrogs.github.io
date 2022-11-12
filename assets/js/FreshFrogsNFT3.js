@@ -554,9 +554,9 @@
 
   */
 
-  async function render_token(frog) {
+  async function render_token(tokens) {
 
-    assets.forEach(async (frog) => {
+    tokens.forEach(async (frog) => {
 
       //render_token(frog);
 
