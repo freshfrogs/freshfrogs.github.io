@@ -560,8 +560,6 @@
 
       //render_token(frog);
 
-      var { token_id } = frog
-
       let opensea_username = ''
       let token_owner = ''
       let staked_time_days = staked_level = staked_next = staked_earned = '0'
