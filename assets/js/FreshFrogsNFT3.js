@@ -369,7 +369,10 @@
             var { assets } = tokens
             assets.forEach((frog) => {
 
-              render_token(frog);
+              //render_token(frog);
+
+              var { token_id } = frog
+              stakedLeaderboard(token_id)
 
             })
           })
@@ -393,14 +396,14 @@
     }
 
     // Staked Leader Board
-    if (render_vault) {
+    //if (render_vault) {
       console.log(' -- Staked Leaderboard -- ');
       console.log(' Longest Streak: Frog #'+leaderboard_streak_token+' '+parseInt(leaderboard_streak/24)+' days');
       console.log(' Staked By: '+truncateAddress(leaderboard_streak_owner));
       console.log(' ');
       console.log(' Most Staked: '+leaderboard_totalStaked+' Frogs');
       console.log(' Staked By: '+truncateAddress(leaderboard_totalStaked_owner));
-    }
+    //}
     
   }
 
