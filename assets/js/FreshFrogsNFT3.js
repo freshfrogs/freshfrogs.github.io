@@ -841,7 +841,7 @@
       let new_note = document.createElement('div')
       new_note.id = 'note_stake_init_'+tokenId
       new_note.className = 'mintingTextWhite3'
-      document.getElementById('note_tab').appendChild(new_note)
+      document.getElementById('console-pre').appendChild(new_note)
 
     }
 
@@ -881,11 +881,15 @@
 
     // Begin Stake Txn
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
-      '<div>'+
-        '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
-        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
-      '</div>', 'note_stake_init_'+tokenId
+      '<div class="notification-tab">'+
+        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
+        '<div>'+
+          '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
+          'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+        '</div>'+
+      '</div>'
+      
+      , 'note_stake_init_'+tokenId
     );
 
     // Submit Txn
