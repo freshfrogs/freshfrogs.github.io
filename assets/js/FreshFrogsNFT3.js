@@ -834,7 +834,7 @@
 
       let new_note = document.createElement('div')
       new_note.id = 'note_stake_init_'+tokenId
-      new_note.className = 'mintingTextWhite2'
+      new_note.className = 'mintingTextWhite3'
       document.getElementById('note_tab').appendChild(new_note)
 
     }
