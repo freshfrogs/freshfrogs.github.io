@@ -895,7 +895,7 @@
     
     // Complete
     consoleOutput(
-      '<div class="notification-tab">'+
+      '<div class="notification-tab" onclick="remove(this)">'+
         '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
         '<div style="width: 100%; vertical-align: middle; margin: 2px;">'+
           '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
@@ -904,6 +904,11 @@
       '</div>', 'note_stake_init_'+tokenId
     );
 
+  }
+
+  function remove(el) {
+    var element = el;
+    element.remove();
   }
 
   // setApproval | set staking contract approval
