@@ -908,7 +908,8 @@
 
   function remove(el) {
     var element = el;
-    element.remove();
+    //element.remove();
+    element.parentElement.remove()
   }
 
   // setApproval | set staking contract approval
