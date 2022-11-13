@@ -812,7 +812,7 @@
 
     // Begin Withdraw Txn
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
       '<div>'+
         '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
         'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
@@ -824,7 +824,7 @@
 
     // Begin Withdraw Txn
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
       '<div>'+
         '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
         withdraw_txn+
@@ -881,7 +881,7 @@
 
     // Begin Stake Txn
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
       '<div>'+
         '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
         'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
@@ -893,7 +893,7 @@
 
     // Complete
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
       '<div>'+
         '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
         stake_txn+
