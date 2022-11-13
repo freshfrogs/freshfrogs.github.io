@@ -797,19 +797,26 @@
 
   async function withdraw_init(tokenId) {
 
+    let note_exists = document.getElementById('note_withdraw_init_'+tokenId)
+    if (! note_exists) {
+
+      let new_note = document.createElement('div')
+      new_note.id = 'note_withdraw_init_'+tokenId
+      new_note.className = 'mintingTextWhite3'
+      document.getElementById('note_tab').appendChild(new_note)
+
+    }
+
     // Scroll Into View
-    morphing = false; base_frog = false; sub_frog = false;
-    scroll_to('pre');
-    display_token(tokenId);
+    scroll_to('note_withdraw_init_'+tokenId);
 
     // Begin Withdraw Txn
     consoleOutput(
       '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-      '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
-      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-      '<br><div style="text-align: left;">'+
-        '<strong>Withdraw NFT</strong><br> Return Frog #'+tokenId+' from staking protocol.'+
-      '</div>'
+      '<div>'+
+        '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
+        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+      '</div>', 'note_withdraw_init_'+tokenId
     );
 
     // Submit Txn
@@ -818,11 +825,10 @@
     // Begin Withdraw Txn
     consoleOutput(
       '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-      '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
-      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-      '<br><div style="text-align: left;">'+
-        '<strong>Withdraw NFT</strong><br> '+withdraw_txn+
-      '</div>'
+      '<div>'+
+        '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
+        withdraw_txn+
+      '</div>', 'note_withdraw_init_'+tokenId
     );
 
   }
