@@ -37,11 +37,25 @@
     fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
     .then(collection => collection.json())
     .then(collection => {
+
+      
+      consoleOutput(
+        '<div style="text-align: left;">'+
+          'Fetching collection data from Opensea...<br>'+
+        '</div>'
+      );
+
       var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
       traits_list = traits;
     })
     .catch(e => {
       console.log('Error: Failed to fetch OpenSea collection data!');
+
+      consoleOutput(
+        '<div style="text-align: left;">'+
+          'Something went wrong! Try refreshing the page!<br>'+
+        '</div>'
+      );
       
     });
 
@@ -235,6 +249,13 @@
 
     try { // Attempt to Connect!
       console.log('Connecting factoria, web3')
+
+      consoleOutput(
+        '<div style="text-align: left;">'+
+          'Connecting... please wait<br>'+
+        '</div>'
+      );
+
       await f0.init({
         web3: web3,
         contract: CONTRACT_ADDRESS,
@@ -292,6 +313,7 @@
     } catch (e) { // Something Went Wrong!
       consoleOutput(
         '<div style="text-align: left;">'+
+          'Failed to connect Ethereum wallet: '+
           '❌ '+e.message+
         '</div>'
       );
