@@ -952,8 +952,8 @@
     let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
 
     // Invalid Approval / Not Staked
-    if (!approved) { return '❌ Staking contract not approved for token transfer!'; }
     if (!staked) { return '❌ Frog #'+tokenId+' is not currently staked!'; } 
+    if (!approved) { return '❌ Staking contract not approved for token transfer!'; }
 
     // Valid ownership
     else if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
