@@ -661,7 +661,7 @@
                 '<text style="color: #1ac486;">'+staked_next+' days</text>'+
               '</div>'+
               '<div style="text-align: center;">'+
-                '<button class="stake_button">Stake</button> <button class="unstake_button">Un-stake</button>'+
+                '<button class="stake_button" onclick="stake_init('+token_id+')">Stake</button> <button class="unstake_button">Un-stake</button>'+
                 '<br>'+'<a href="'+permalink+'" target="_blank"><button class="os_button">View on Opensea</button></a>'+
               '</div>'+
             '</div>'+
@@ -709,8 +709,14 @@
   }
 
   // Print to front page console-output
-  function consoleOutput(output) {
-    document.getElementById("console-pre").innerHTML = output;
+  function consoleOutput(output, destination) {
+
+    if (! destination) {
+      document.getElementById("console-pre").innerHTML = output;
+    } else {
+      document.getElementById(destination).innerHTML = output;
+    }
+    
   }
 
   // Print to front end output
@@ -823,10 +829,13 @@
 
   async function stake_init(tokenId) {
 
+    let new_note = document.createElement('div')
+    new_note.id = 'note_stake_init_'+tokenId
+    new_note.className = 'mintingTextWhite2'
+    document.getElementById('note_tab').appendChild(new_note)
+
     // Scroll Into View
-    morphing = false; base_frog = false; sub_frog = false;
-    scroll_to('pre');
-    display_token(tokenId);
+    scroll_to('note_stake_init_'+tokenId);
 
     // Check Contract Approval
     let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
@@ -841,7 +850,7 @@
         '<br><div style="text-align: left;">'+
           '<strong>Approve Staking</strong> (1/2)<br>This is a one time transaction to allow staking, requires a gas fee.<br>'+
           '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
-        '</div>'
+        '</div>', 'note_stake_init_'+tokenId
       );
 
       // Submit Txn
@@ -856,7 +865,7 @@
           '<br><div style="text-align: left;">'+
             '<strong>Approve Staking</strong> (1/2)<br>'+set_approval+'<br>'+
             '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
-          '</div>'
+          '</div>', 'note_stake_init_'+tokenId
         );
 
         // Catch Error
@@ -872,7 +881,7 @@
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
         '<strong>Stake NFT</strong><br> Transfer Frog #'+tokenId+' to staking protocol.'+
-      '</div>'
+      '</div>', 'note_stake_init_'+tokenId
     );
 
     // Submit Txn
@@ -885,7 +894,7 @@
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
         '<strong>Stake NFT</strong><br> '+stake_txn+
-      '</div>'
+      '</div>', 'note_stake_init_'+tokenId
     );
 
   }
