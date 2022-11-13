@@ -887,20 +887,20 @@
           '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
           'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
         '</div>'+
-      '</div>'
-      
-      , 'note_stake_init_'+tokenId
+      '</div>', 'note_stake_init_'+tokenId
     );
-
+    
     // Submit Txn
     let stake_txn = await stake(tokenId);
-
+    
     // Complete
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
-      '<div>'+
-        '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
-        stake_txn+
+      '<div class="notification-tab">'+
+        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
+        '<div>'+
+          '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
+          stake_txn+
+        '</div>'+
       '</div>', 'note_stake_init_'+tokenId
     );
 
