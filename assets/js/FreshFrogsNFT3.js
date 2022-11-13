@@ -884,7 +884,7 @@
       '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
       '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-      '<br><div style="text-align: center;">'+
+      '<br><div style="text-align: center; color: #1ac486;">'+
         'Transfer Frog #'+tokenId+' to staking protocol.'+
       '</div>', 'note_stake_init_'+tokenId
     );
@@ -897,7 +897,7 @@
       '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
       '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-      '<br><div style="text-align: center;">'+
+      '<br><div style="text-align: center; color: #1ac486;">'+
         ''+stake_txn+
       '</div>', 'note_stake_init_'+tokenId
     );
