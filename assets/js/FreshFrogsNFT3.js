@@ -849,7 +849,7 @@
     if (!is_approved) {
 
       consoleOutput(
-        '<br><div style="text-align: left;">'+
+        '<div style="text-align: left;">'+
           '<strong>Approve Staking</strong><br>This is a one time transaction to allow staking, requires a gas fee.<br>'+
           '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
         '</div>', 'note_stake_init_'+tokenId
@@ -861,8 +861,7 @@
       if (set_approval !==true) {
 
         consoleOutput(
-          'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-          '<br><div style="text-align: left;">'+
+          '<div style="text-align: left;">'+
             '<strong>Approve Staking</strong><br>'+set_approval+'<br>'+
             '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
           '</div>', 'note_stake_init_'+tokenId
