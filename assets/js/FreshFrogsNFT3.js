@@ -849,11 +849,8 @@
     if (!is_approved) {
 
       consoleOutput(
-        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-        '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
-        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
         '<br><div style="text-align: left;">'+
-          '<strong>Approve Staking</strong> (1/2)<br>This is a one time transaction to allow staking, requires a gas fee.<br>'+
+          '<strong>Approve Staking</strong><br>This is a one time transaction to allow staking, requires a gas fee.<br>'+
           '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
         '</div>', 'note_stake_init_'+tokenId
       );
@@ -864,11 +861,9 @@
       if (set_approval !==true) {
 
         consoleOutput(
-          '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-          '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
           'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
           '<br><div style="text-align: left;">'+
-            '<strong>Approve Staking</strong> (1/2)<br>'+set_approval+'<br>'+
+            '<strong>Approve Staking</strong><br>'+set_approval+'<br>'+
             '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
           '</div>', 'note_stake_init_'+tokenId
         );
@@ -885,9 +880,6 @@
       '<div>'+
         '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
         'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
-      '</div>'+'<br>'+
-      '<br><div style="text-align: center; color: #1ac486;">'+
-        'Transfer Frog #'+tokenId+' to staking protocol.'+
       '</div>', 'note_stake_init_'+tokenId
     );
 
@@ -897,10 +889,9 @@
     // Complete
     consoleOutput(
       '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-      '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
-      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-      '<br><div style="text-align: center; color: #1ac486;">'+
-        ''+stake_txn+
+      '<div>'+
+        '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
+        stake_txn+
       '</div>', 'note_stake_init_'+tokenId
     );
 
