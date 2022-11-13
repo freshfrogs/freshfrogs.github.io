@@ -661,7 +661,7 @@
                 '<text style="color: #1ac486;">'+staked_next+' days</text>'+
               '</div>'+
               '<div style="text-align: center;">'+
-                '<button class="stake_button" onclick="stake_init('+token_id+')">Stake</button> <button class="unstake_button">Un-stake</button>'+
+                '<button class="stake_button" onclick="stake_init('+token_id+')">Stake</button> <button class="unstake_button" onclick="withdraw_init('+token_id+')">Un-stake</button>'+
                 '<br>'+'<a href="'+permalink+'" target="_blank"><button class="os_button">View on Opensea</button></a>'+
               '</div>'+
             '</div>'+
