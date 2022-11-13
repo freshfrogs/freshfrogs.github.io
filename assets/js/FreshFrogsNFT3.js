@@ -883,7 +883,7 @@
     consoleOutput(
       '<div class="notification-tab">'+
         '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
-        '<div>'+
+        '<div style="width: 100%; vertical-align: middle;">'+
           '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
           'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
         '</div>'+
@@ -897,7 +897,7 @@
     consoleOutput(
       '<div class="notification-tab">'+
         '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
-        '<div>'+
+        '<div style="width: 100%; vertical-align: middle;">'+
           '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
           stake_txn+
         '</div>'+
