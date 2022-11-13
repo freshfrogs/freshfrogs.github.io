@@ -901,6 +901,19 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
+        function mouseMoveEventHandler() {
+          const example = document.getElementById('logoImg');
+
+          example.onmousemove = function(e) { 
+              const x = e.pageX - e.currentTarget.offsetLeft; 
+              const y = e.pageY - e.currentTarget.offsetTop;
+              console.log(x+', '+y)
+          }
+          console.log(makeid());
+        }
+
+        window.addEventListener('mousemove', mouseMoveEventHandler);
+
         console.log('updating display frogs')
         // bigContainer recentMint
         var displayLoop = 9;
@@ -953,7 +966,7 @@
       </header>
       <section id="section">
         <div class="downloads pre">
-          <img src="../assets/blackWhite.png" class="logoImage">
+          <img src="../assets/blackWhite.png" class="logoImage" id="logoImg">
           <br><img src="../assets/bannerTop2.png" style="margin-bottom: 5%; width: 256px;"/>
           <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;"><strong style="color: white;">FreshFrogsNFT</strong> is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
           opensea.io/collection/fresh-frogs<a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong style="color: white !important;">Shop on OpenSea ⛵</strong></a>
