@@ -829,10 +829,15 @@
 
   async function stake_init(tokenId) {
 
-    let new_note = document.createElement('div')
-    new_note.id = 'note_stake_init_'+tokenId
-    new_note.className = 'mintingTextWhite2'
-    document.getElementById('note_tab').appendChild(new_note)
+    let note_exists = document.getElementById('note_stake_init_'+tokenId)
+    if (! note_exists) {
+
+      let new_note = document.createElement('div')
+      new_note.id = 'note_stake_init_'+tokenId
+      new_note.className = 'mintingTextWhite2'
+      document.getElementById('note_tab').appendChild(new_note)
+
+    }
 
     // Scroll Into View
     scroll_to('note_stake_init_'+tokenId);
