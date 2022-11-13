@@ -587,8 +587,8 @@
     let staked_time_days = staked_level = staked_next = staked_earned = '0'
 
     // Assign token variables from data object
-    try { var { token_id, external_link, permalink, name, rarity_data: { rank }, owner: { address, user: { username } } } = frog } catch (e) { console.log(e.message) } // , last_sale: { payment_token: { decimals }, total_price }
-    console.log(token_id+' : '+rank)
+    try { var { token_id, external_link, permalink, name, rarity_data: { rank }, owner: { address, user: { username } } } = frog } catch (e) {} // , last_sale: { payment_token: { decimals }, total_price }
+
     // Reference controller contract
     let staked = await stakerAddress(token_id)
     //if (staked == '0xF01e067d442f4254cd7c89A5D42d90ad554616E8' || staked == '0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359') {
