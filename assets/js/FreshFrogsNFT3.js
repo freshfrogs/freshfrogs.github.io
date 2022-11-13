@@ -661,7 +661,7 @@
                 '<text style="color: #1ac486;">'+staked_next+' days</text>'+
               '</div>'+
               '<div style="text-align: center;">'+
-                '<button class="stake_button" onclick="stake_init('+token_id+')">Stake</button> <button class="unstake_button">Un-stake</button>'+
+                '<button class="stake_button" onclick="stake_init('+token_id+')">Stake</button> <button class="unstake_button" onclick="withdraw_init('+token_id+')">Un-stake</button>'+
                 '<br>'+'<a href="'+permalink+'" target="_blank"><button class="os_button">View on Opensea</button></a>'+
               '</div>'+
             '</div>'+
@@ -690,11 +690,11 @@
     newAttribute = document.createElement("img");
     newAttribute.alt = attribute
 
-    if (attribute == 'mask' || attribute == 'smoking' || attribute == 'smokingCigar' || attribute == 'smokingPipe' || attribute == 'tongue' || attribute == 'circleShadesRed' || attribute == 'circleShadesPurple' || attribute == 'shades' || attribute == 'shadesPurple' || attribute == 'shadesThreeD' || attribute == 'shadesWhite' || attribute == 'circleNightVision') {
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/animations/"+attribute+"_animation.gif";
-    } else {
+    //if (attribute == 'mask' || attribute == 'smoking' || attribute == 'smokingCigar' || attribute == 'smokingPipe' || attribute == 'tongue' || attribute == 'circleShadesRed' || attribute == 'circleShadesPurple' || attribute == 'shades' || attribute == 'shadesPurple' || attribute == 'shadesThreeD' || attribute == 'shadesWhite' || attribute == 'circleNightVision') {
+    //  newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/animations/"+attribute+"_animation.gif";
+    //} else {
       newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
-    }
+    //}
 
     if (trait == 'Trait') {
       newAttribute.className = "frogImg5";
@@ -797,19 +797,26 @@
 
   async function withdraw_init(tokenId) {
 
+    let note_exists = document.getElementById('note_withdraw_init_'+tokenId)
+    if (! note_exists) {
+
+      let new_note = document.createElement('div')
+      new_note.id = 'note_withdraw_init_'+tokenId
+      new_note.className = 'mintingTextWhite3'
+      document.getElementById('note_tab').appendChild(new_note)
+
+    }
+
     // Scroll Into View
-    morphing = false; base_frog = false; sub_frog = false;
-    scroll_to('pre');
-    display_token(tokenId);
+    scroll_to('note_withdraw_init_'+tokenId);
 
     // Begin Withdraw Txn
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-      '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
-      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-      '<br><div style="text-align: left;">'+
-        '<strong>Withdraw NFT</strong><br> Return Frog #'+tokenId+' from staking protocol.'+
-      '</div>'
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
+      '<div>'+
+        '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
+        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+      '</div>', 'note_withdraw_init_'+tokenId
     );
 
     // Submit Txn
@@ -817,12 +824,11 @@
 
     // Begin Withdraw Txn
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-      '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
-      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-      '<br><div style="text-align: left;">'+
-        '<strong>Withdraw NFT</strong><br> '+withdraw_txn+
-      '</div>'
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
+      '<div>'+
+        '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
+        withdraw_txn+
+      '</div>', 'note_withdraw_init_'+tokenId
     );
 
   }
@@ -834,7 +840,7 @@
 
       let new_note = document.createElement('div')
       new_note.id = 'note_stake_init_'+tokenId
-      new_note.className = 'mintingTextWhite2'
+      new_note.className = 'mintingTextWhite3'
       document.getElementById('note_tab').appendChild(new_note)
 
     }
@@ -849,11 +855,8 @@
     if (!is_approved) {
 
       consoleOutput(
-        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-        '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
-        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-        '<br><div style="text-align: left;">'+
-          '<strong>Approve Staking</strong> (1/2)<br>This is a one time transaction to allow staking, requires a gas fee.<br>'+
+        '<div style="text-align: left;">'+
+          '<strong>Approve Staking</strong><br>This is a one time transaction to allow staking, requires a gas fee.<br>'+
           '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
         '</div>', 'note_stake_init_'+tokenId
       );
@@ -864,11 +867,8 @@
       if (set_approval !==true) {
 
         consoleOutput(
-          '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-          '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
-          'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-          '<br><div style="text-align: left;">'+
-            '<strong>Approve Staking</strong> (1/2)<br>'+set_approval+'<br>'+
+          '<div style="text-align: left;">'+
+            '<strong>Approve Staking</strong><br>'+set_approval+'<br>'+
             '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
           '</div>', 'note_stake_init_'+tokenId
         );
@@ -881,11 +881,10 @@
 
     // Begin Stake Txn
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-      '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
-      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-      '<br><div style="text-align: left;">'+
-        '<strong>Stake NFT</strong><br> Transfer Frog #'+tokenId+' to staking protocol.'+
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
+      '<div>'+
+        '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
+        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
       '</div>', 'note_stake_init_'+tokenId
     );
 
@@ -894,11 +893,10 @@
 
     // Complete
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-      '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
-      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-      '<br><div style="text-align: left;">'+
-        '<strong>Stake NFT</strong><br> '+stake_txn+
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
+      '<div>'+
+        '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
+        stake_txn+
       '</div>', 'note_stake_init_'+tokenId
     );
 
@@ -954,8 +952,8 @@
     let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
 
     // Invalid Approval / Not Staked
-    if (!approved) { return '❌ Staking contract not approved for token transfer!'; }
     if (!staked) { return '❌ Frog #'+tokenId+' is not currently staked!'; } 
+    if (!approved) { return '❌ Staking contract not approved for token transfer!'; }
 
     // Valid ownership
     else if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
