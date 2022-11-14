@@ -286,6 +286,7 @@
 
       Output(
         '<div>'+
+          '<button class="stake_button">Mint</button>'+'<button class="stake_button">The Pond</button>'+'<button class="stake_button">My Frogs</button>'+
           '<div class="terminalTop">'+
             '<wallet class="displayUnit">Wallet Address</wallet>'+
             '<br>'+user_address+''+
