@@ -1193,14 +1193,98 @@
 
   async function calculate_rarity_ranking() {
 
-    var rarity_ranks_list = {};
+    var rarity_ranks_traits =
+    {
+      "cyanTreeFrog": 106,
+      "sand": 197,
+      "smokingPipe": 87,
+      "treeFrog": 2230,
+      "brown": 177,
+      "tongueSpider": 75,
+      "red": 214,
+      "witchBlack": 178,
+      "white(2)": 185,
+      "blue(2)": 195,
+      "tongue": 171,
+      "purple": 209,
+      "cowboyHatBlack": 171,
+      "natural": 187,
+      "darkGreen": 176,
+      "cowboyHatWhite": 74,
+      "orange(2)": 200,
+      "stockingCap": 76,
+      "white": 205,
+      "witchStraw": 78,
+      "greenTreeFrog": 99,
+      "blue": 204,
+      "goldDollarChain": 126,
+      "orange": 210,
+      "circleGlasses": 84,
+      "mask": 80,
+      "purpleTreeFrog": 86,
+      "goldChain": 184,
+      "baseballCapBlue": 89,
+      "green": 215,
+      "shades": 68,
+      "thirdEye": 44,
+      "shadesPurple": 77,
+      "yellow": 217,
+      "baseballCapRed": 68,
+      "lightBrownTreeFrog": 108,
+      "yellow(2)": 189,
+      "red(2)": 229,
+      "topHatRed": 78,
+      "tomatoFrog": 101,
+      "cowboyHatBrown": 132,
+      "redEyedTreeFrog": 100,
+      "blueTreeFrog": 98,
+      "shadesThreeD": 78,
+      "witchBrown": 154,
+      "shadesWhite": 79,
+      "goldenTreeFrog": 73,
+      "cyan": 222,
+      "circleNightVision": 81,
+      "baseballCapWhite": 84,
+      "smoking": 78,
+      "bandannaRed": 81,
+      "circleShadesPurple": 77,
+      "stawberryDartFrog": 90,
+      "purple(2)": 212,
+      "tongueFly": 139,
+      "inversedEyes": 44,
+      "silverChain": 242,
+      "crown": 80,
+      "silverEthChain": 78,
+      "closedEyes": 46,
+      "circleShadesRed": 90,
+      "smokingCigar": 74,
+      "blueDartFrog": 90,
+      "cowboyHatTan": 71,
+      "unknown": 97,
+      "croaking": 49,
+      "topHatBlue": 82,
+      "pink": 195,
+      "pinkTreeFrog": 94,
+      "goldenDartFrog": 97,
+      "brownTreeFrog": 107,
+      "bandannaBlue": 79,
+      "topHatYellow": 79,
+      "orangeTreeFrog": 89,
+      "tongueSpiderRed": 71,
+      "grayTreeFrog": 95,
+      "splendidLeafFrog": 78,
+      "peace": 19
+    }
+
+    var rarity_ranks_tokens = {};
 
     for (i = 1; i < 4041; i++) {
 
-      console.log(i+'/4040')
+      console.log(i)
+
+      rarity_ranks_tokens[i] = 100
 
       let r_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+i+".json")).json();
-
       for (let j = 0; j < r_metadata.attributes.length; j++) {
   
         // data.trait_type : data.value
@@ -1209,16 +1293,16 @@
         if (data.trait_type == 'Frog' && data.value.includes('treeFrog(')) { trait = 'treeFrog' }
         else { trait = data.value}
 
-        let attribute = rarity_ranks_list[trait]
+        let attribute = rarity_ranks_traits[trait]
+        let rarity_percentage = attribute / 4040
 
-        if (! attribute) { rarity_ranks_list[trait] = 1 }
-        else { rarity_ranks_list[trait] = rarity_ranks_list[trait] + 1 }
+        rarity_ranks_tokens[i] = rarity_ranks_tokens[i] * rarity_percentage
   
       }
 
     }
 
-    console.log(rarity_ranks_list)
+    console.log(rarity_ranks_tokens)
 
   }
 
