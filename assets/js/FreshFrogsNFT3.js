@@ -27,10 +27,11 @@
     // Connecting
     consoleOutput(
       '<div style="text-align: left;">'+
-        'Connecting please wait...<br>'+
+        'Connect Ethereum wallet...<br>'+
       '</div>'
     );
 
+    /*
     console.log('fetching opensea collection info')
 
     // Fetch Collection Data via OpenSea API
@@ -58,6 +59,7 @@
       );
       
     });
+    */
 
     console.log('Get Contract, Controller ABI')
 
