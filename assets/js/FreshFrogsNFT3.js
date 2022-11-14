@@ -309,7 +309,7 @@
             '</div>'+
           '</div>'+
           '<div>'+
-            '<button class="stake_button" id="mint_button">Mint</button>'+'<button class="stake_button" id="thePond_button" onclick="update_icons(thePond_button); fetch_user_data(0xCB1ee125CFf4051a10a55a09B10613876C4Ef199)">The Pond</button>'+'<button class="stake_button" id="myFrogs_button" onclick="update_icons(myFrogs_button); fetch_user_data()">My Frogs</button>'+
+            '<button class="stake_button" id="mint_button">Mint</button>'+'<button class="stake_button" id="thePond_button" onclick="update_icons(\'' + "thePond_button" + '\'); fetch_user_data(\'' + CONTROLLER_ADDRESS + '\')">The Pond</button>'+'<button class="stake_button" id="myFrogs_button" onclick="update_icons(myFrogs_button); fetch_user_data()">My Frogs</button>'+
           '</div>'+
         '</div>'+
         '<div class="console_pre" id="console-pre"></div>'
