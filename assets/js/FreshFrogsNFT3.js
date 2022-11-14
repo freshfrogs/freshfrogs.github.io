@@ -1204,11 +1204,14 @@
   
         // attribute.trait_type
         // attribute.value
-        let attribute = r_metadata.attributes[i]
-        let trait = rarity_ranks_list[attribute.value]
-        if (attribute.trait_type == 'Frog' && attribute.value.includes('treeFrog(')) { trait = 'treeFrog' }
-        if (! trait) { rarity_ranks_list[attribute.value] = 1 }
-        else { rarity_ranks_list[attribute.value] = rarity_ranks_list[attribute.value] + 1 }
+        let attributes_array = r_metadata.attributes[i]
+        let attribute = rarity_ranks_list[attributes_array.value]
+        let trait = attribute.value
+
+
+        if (attributes_array.trait_type == 'Frog' && trait.includes('treeFrog(')) { trait = 'treeFrog' }
+        if (! trait) { rarity_ranks_list[trait] = 1 }
+        else { rarity_ranks_list[trait] = rarity_ranks_list[trait] + 1 }
   
       }
 
