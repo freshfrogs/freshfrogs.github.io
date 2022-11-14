@@ -817,7 +817,7 @@
       '<div class="notification-tab">'+
         '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
         '<div style="width: 100%; vertical-align: middle; margin: auto;">'+
-          '<strong>Withdrawing Frog #'+tokenId+'</strong>'+'<br>'+
+          '<strong>Withdraw Frog #'+tokenId+'</strong>'+'<br>'+
           'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
         '</div>'+
       '</div>', 'note_init_'+tokenId
@@ -832,7 +832,7 @@
       '<div class="notification-tab" onclick="remove(this)">'+
         '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
         '<div style="width: 100%; vertical-align: middle; margin: auto;">'+
-          '<strong>Withdrawing Frog #'+tokenId+'</strong>'+'<br>'+
+          '<strong>Withdraw Frog #'+tokenId+'</strong>'+'<br>'+
           withdraw_txn+
           '<br>'+'<text style="color: #2d3748;">(click to close)</text>'+
         '</div>'+
@@ -913,7 +913,7 @@
       '<div class="notification-tab">'+
         '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
         '<div style="width: 100%; vertical-align: middle; margin: auto;">'+
-          '<strong>Staking Frog #'+tokenId+'</strong>'+'<br>'+
+          '<strong>Stake Frog #'+tokenId+'</strong>'+'<br>'+
           'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
         '</div>'+
       '</div>', 'note_init_'+tokenId
@@ -927,7 +927,7 @@
       '<div class="notification-tab" onclick="remove(this)">'+
         '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
         '<div style="width: 100%; vertical-align: middle; margin: auto;">'+
-          '<strong>Staking Frog #'+tokenId+'</strong>'+'<br>'+
+          '<strong>Stake Frog #'+tokenId+'</strong>'+'<br>'+
           stake_txn+
           '<br>'+'<text style="color: #2d3748;">(click to close)</text>'+
         '</div>'+
