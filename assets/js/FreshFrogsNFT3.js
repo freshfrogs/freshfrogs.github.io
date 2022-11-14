@@ -291,7 +291,7 @@
             '<br>'+user_address+''+
           '</div>'+
           '<div>'+
-            '<button class="stake_button">Mint</button>'+'<button class="stake_button" onclick="fetch_user_data('+CONTROLLER_ADDRESS+')">The Pond</button>'+'<button class="stake_button" onclick="fetch_user_data()">My Frogs</button>'+
+            '<button class="stake_button" id="mint_button">Mint</button>'+'<button class="stake_button" id="thePond_button" onclick="update_icons("thePond_button"); fetch_user_data('+CONTROLLER_ADDRESS+')">The Pond</button>'+'<button class="stake_button" id="myFrogs_button" onclick="update_icons("myFrogs_button"); fetch_user_data()">My Frogs</button>'+
           '</div>'+
           '<div class="terminalBase">'+
             '<div class="terminalBottom">'+
@@ -323,6 +323,29 @@
         '</div>'
       );
     }
+  }
+
+  // Update UI Icons
+  async function update_icons(main_icon) {
+
+    var mint_icon = document.getElementById('mint_button')
+    mint_icon.style.background = 'transparent'
+    mint_icon.style.color = '#1ac486'
+
+    var thePond_icon = document.getElementById('thePond_button')
+    thePond_icon.style.background = 'transparent'
+    thePond_icon.style.color = '#1ac486'
+
+    var myFrogs_icon = document.getElementById('myFrogs_button')
+    myFrogs_icon.style.background = 'transparent'
+    myFrogs_icon.style.color = '#1ac486'
+
+    // --
+
+    var select_icon = document.getElementById(main_icon)
+    mint_icon.style.background = '#1ac486'
+    mint_icon.style.color = 'white'
+
   }
 
   // fetch_user_tokens() | Fetch User Tokens | Staked & Otherwise |
