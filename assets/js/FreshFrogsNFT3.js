@@ -290,9 +290,6 @@
             '<wallet class="displayUnit">Wallet Address</wallet>'+
             '<br>'+user_address+''+
           '</div>'+
-          '<div>'+
-            '<button class="stake_button" id="mint_button">Mint</button>'+'<button class="stake_button" id="thePond_button" onclick="update_icons("thePond_button"); fetch_user_data('+CONTROLLER_ADDRESS+')">The Pond</button>'+'<button class="stake_button" id="myFrogs_button" onclick="update_icons("myFrogs_button"); fetch_user_data()">My Frogs</button>'+
-          '</div>'+
           '<div class="terminalBase">'+
             '<div class="terminalBottom">'+
               '<supply class="displayUnit">Total Supply</supply>'+
@@ -310,6 +307,9 @@
               '<limit class="displayUnit">Staked</limit>'+
               '<br>'+''+staker_tokens+''+
             '</div>'+
+          '</div>'+
+          '<div>'+
+            '<button class="stake_button" id="mint_button">Mint</button>'+'<button class="stake_button" id="thePond_button" onclick="update_icons("thePond_button"); fetch_user_data('+CONTROLLER_ADDRESS+')">The Pond</button>'+'<button class="stake_button" id="myFrogs_button" onclick="update_icons("myFrogs_button"); fetch_user_data()">My Frogs</button>'+
           '</div>'+
         '</div>'+
         '<div class="console_pre" id="console-pre"></div>'
