@@ -840,18 +840,8 @@
 
   async function stake_init(tokenId) {
 
-    let note_exists = document.getElementById('note_init_'+tokenId)
-    if (! note_exists) {
-
-      let new_note = document.createElement('div')
-      new_note.id = 'note_init_'+tokenId
-      new_note.className = 'mintingTextWhite3'
-      document.getElementById('console-pre').appendChild(new_note)
-
-    }
-
     // Scroll Into View
-    scroll_to('note_init_'+tokenId);
+    scroll_to('pre');
 
     // Check Contract Approval
     let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
@@ -859,11 +849,21 @@
     // Not Approved
     if (!is_approved) {
 
+      let note_exists = document.getElementById('approval_init_')
+      if (! note_exists) {
+  
+        let new_note = document.createElement('div')
+        new_note.id = 'approval_init_'
+        new_note.className = 'mintingTextWhite3'
+        document.getElementById('console-pre').appendChild(new_note)
+  
+      }
+
       consoleOutput(
         '<div style="text-align: left;">'+
           '<strong>Approve Staking</strong><br>This is a one time transaction to allow staking, requires a gas fee.<br>'+
           '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
-        '</div>', 'note_init_'+tokenId
+        '</div>', 'approval_init_'
       );
 
       // Submit Txn
@@ -875,13 +875,33 @@
           '<div style="text-align: left;">'+
             '<strong>Approve Staking</strong><br>'+set_approval+'<br>'+
             '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
-          '</div>', 'note_init_'+tokenId
+          '</div>', 'approval_init_'
         );
 
         // Catch Error
         return
 
+      } else {
+
+        consoleOutput(
+          '<div style="text-align: left;">'+
+            '<strong>Approve Staking</strong><br><text style="color: #1ac486;">Staking contract succesfully approved!</text><br>'+
+            '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
+          '</div>', 'approval_init_'
+        );
+
       }
+
+    }
+
+    let note_exists = document.getElementById('note_init_'+tokenId)
+    if (! note_exists) {
+
+      let new_note = document.createElement('div')
+      new_note.id = 'note_init_'+tokenId
+      new_note.className = 'mintingTextWhite3'
+      document.getElementById('console-pre').appendChild(new_note)
+
     }
 
     // Begin Stake Txn
