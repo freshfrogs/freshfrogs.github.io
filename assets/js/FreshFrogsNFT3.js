@@ -690,7 +690,7 @@
     newAttribute = document.createElement("img");
     newAttribute.alt = attribute
 
-    if (attribute == 'closedEyes' || attribute == 'thirdEye' || attribute == 'mask' || attribute == 'smoking' || attribute == 'smokingCigar' || attribute == 'smokingPipe' || attribute == 'tongue' || attribute == 'circleShadesRed' || attribute == 'circleShadesPurple' || attribute == 'shades' || attribute == 'shadesPurple' || attribute == 'shadesThreeD' || attribute == 'shadesWhite' || attribute == 'circleNightVision') {
+    if (attribute == 'inversedEyes' || attribute == 'closedEyes' || attribute == 'thirdEye' || attribute == 'mask' || attribute == 'smoking' || attribute == 'smokingCigar' || attribute == 'smokingPipe' || attribute == 'tongue' || attribute == 'circleShadesRed' || attribute == 'circleShadesPurple' || attribute == 'shades' || attribute == 'shadesPurple' || attribute == 'shadesThreeD' || attribute == 'shadesWhite' || attribute == 'circleNightVision') {
       newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/animations/"+attribute+"_animation.gif";
     } else {
       newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
