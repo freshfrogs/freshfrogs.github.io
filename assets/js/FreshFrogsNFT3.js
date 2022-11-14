@@ -862,7 +862,7 @@
       consoleOutput(
         '<div style="text-align: left;">'+
           '<strong>Approve Staking</strong><br>This is a one time transaction to allow staking, requires a gas fee.<br>'+
-          '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
+          '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero!'+
         '</div>', 'approval_init_'
       );
 
@@ -874,7 +874,7 @@
         consoleOutput(
           '<div style="text-align: left;">'+
             '<strong>Approve Staking</strong><br>'+set_approval+'<br>'+
-            '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
+            '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero!'+
           '</div>', 'approval_init_'
         );
 
@@ -886,7 +886,7 @@
         consoleOutput(
           '<div style="text-align: left;">'+
             '<strong>Approve Staking</strong><br><text style="color: #1ac486;">Staking contract succesfully approved!</text><br>'+
-            '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
+            '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero!'+
           '</div>', 'approval_init_'
         );
 
