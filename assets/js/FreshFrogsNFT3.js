@@ -1204,7 +1204,7 @@
   
         // attribute.trait_type
         // attribute.value
-        let attribute = metadata.attributes[i]
+        let attribute = r_metadata.attributes[i]
         let trait = rarity_ranks_list[attribute.value]
         if (! trait) { rarity_ranks_list[attribute.value] = 1 }
         else { rarity_ranks_list[attribute.value] = rarity_ranks_list[attribute.value] + 1}
