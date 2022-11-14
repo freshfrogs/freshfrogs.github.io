@@ -343,8 +343,8 @@
     // --
 
     var select_icon = document.getElementById(main_icon)
-    mint_icon.style.background = '#1ac486'
-    mint_icon.style.color = 'white'
+    select_icon.style.background = '#1ac486'
+    select_icon.style.color = 'white'
 
   }
 
