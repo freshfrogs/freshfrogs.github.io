@@ -1200,6 +1200,8 @@
 
       let r_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+i+".json")).json();
 
+      console.log(r_metadata)
+
       for (let j = 0; j < r_metadata.attributes.length; j++) {
   
         // attribute.trait_type
