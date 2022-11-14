@@ -832,6 +832,7 @@
         '<div style="width: 100%; vertical-align: middle; margin: auto;">'+
           '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
           withdraw_txn+
+          '<br>'+'<text style="color: #2d3748;">(click to close)</text>'+
         '</div>'+
       '</div>', 'note_init_'+tokenId
     );
@@ -926,6 +927,7 @@
         '<div style="width: 100%; vertical-align: middle; margin: auto;">'+
           '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
           stake_txn+
+          '<br>'+'<text style="color: #2d3748;">(click to close)</text>'+
         '</div>'+
       '</div>', 'note_init_'+tokenId
     );
