@@ -1200,18 +1200,16 @@
 
       let r_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+i+".json")).json();
 
-      console.log(r_metadata)
-
       for (let j = 0; j < r_metadata.attributes.length; j++) {
   
         // attribute.trait_type
         // attribute.value
         let data = r_metadata.attributes[i]
 
-        let trait_type = data.trait_type
+        //let trait_type = data.trait_type
         let trait = data.value
 
-        if (trait_type == 'Frog' && trait.includes('treeFrog(')) { trait = 'treeFrog' }
+        //if (trait_type == 'Frog' && trait.includes('treeFrog(')) { trait = 'treeFrog' }
 
         let attribute = rarity_ranks_list[trait]
 
