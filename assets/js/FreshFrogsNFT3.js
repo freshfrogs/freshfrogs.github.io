@@ -1206,7 +1206,7 @@
         // attribute.value
         let attributes_array = r_metadata.attributes[i]
         let attribute = rarity_ranks_list[attributes_array.value]
-        let trait = attribute.value
+        let trait = attributes_array.value
 
 
         if (attributes_array.trait_type == 'Frog' && trait.includes('treeFrog(')) { trait = 'treeFrog' }
