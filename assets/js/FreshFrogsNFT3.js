@@ -1211,9 +1211,10 @@
         let trait_type = data.trait_type
         let trait = data.value
 
-        let attribute = rarity_ranks_list[trait]
-
         if (trait_type == 'Frog' && trait.includes('treeFrog(')) { trait = 'treeFrog' }
+
+        let attribute = rarity_ranks_list[trait]
+        
         if (! attribute) { rarity_ranks_list[trait] = 1 }
         else { rarity_ranks_list[trait] = rarity_ranks_list[trait] + 1 }
   
