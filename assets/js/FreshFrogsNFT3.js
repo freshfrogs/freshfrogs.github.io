@@ -291,7 +291,7 @@
             '<br>'+user_address+''+
           '</div>'+
           '<div>'+
-            '<button class="stake_button">Mint</button>'+'<button class="stake_button">The Pond</button>'+'<button class="stake_button">My Frogs</button>'+
+            '<button class="stake_button">Mint</button>'+'<button class="stake_button" onclick="fetch_user_data('+CONTROLLER_ADDRESS+')">The Pond</button>'+'<button class="stake_button" onclick="fetch_user_data()">My Frogs</button>'+
           '</div>'+
           '<div class="terminalBase">'+
             '<div class="terminalBottom">'+
@@ -335,6 +335,8 @@
 
     // No. Frogs owned by fetch_address
     let user_tokens = await collection.methods.balanceOf(fetch_address).call();
+
+    document.getElementById('thePad').innerHTML = ''
 
     // Must own atleast one Frog or atleast one Staked!
     if (user_tokens >= 1 || staker_tokens >= 1) {
