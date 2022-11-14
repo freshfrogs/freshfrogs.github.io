@@ -810,12 +810,14 @@
     // Scroll Into View
     scroll_to('note_withdraw_init_'+tokenId);
 
-    // Begin Withdraw Txn
+    // Begin Stake Txn
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
-      '<div>'+
-        '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
-        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+      '<div class="notification-tab">'+
+        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
+        '<div style="width: 100%; vertical-align: middle; margin: 2px;">'+
+          '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
+          'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+        '</div>'+
       '</div>', 'note_withdraw_init_'+tokenId
     );
 
@@ -823,11 +825,14 @@
     let withdraw_txn = await withdraw(tokenId);
 
     // Begin Withdraw Txn
+    // Begin Stake Txn
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
-      '<div>'+
-        '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
-        withdraw_txn+
+      '<div class="notification-tab">'+
+        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
+        '<div style="width: 100%; vertical-align: middle; margin: 2px;">'+
+          '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
+          withdraw_txn+
+        '</div>'+
       '</div>', 'note_withdraw_init_'+tokenId
     );
 
