@@ -1184,6 +1184,39 @@
     }
   }
 
+  /*
+
+    Calculate FreshFrogs Rarity
+
+  */
+
+  async function calculate_rarity_ranking() {
+
+    var rarity_ranks_list = {};
+
+    for (i = 1; i < 4040; i++) {
+
+      console.log(i+'/4040')
+
+      let r_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+i+".json")).json();
+
+      for (let j = 0; j < r_metadata.attributes.length; j++) {
+  
+        // attribute.trait_type
+        // attribute.value
+        let attribute = metadata.attributes[i]
+        let trait = rarity_ranks_list[attribute.value]
+        if (! trait) { rarity_ranks_list[attribute.value] = 1 }
+        else { rarity_ranks_list[attribute.value] = rarity_ranks_list[attribute.value] + 1}
+  
+      }
+
+    }
+
+    console.log(rarity_ranks_list)
+
+  }
+
   // Custom Front-End Functions
 
   // Calculate total time a Frog has been staked (Hours)
