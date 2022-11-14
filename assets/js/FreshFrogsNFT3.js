@@ -1196,15 +1196,14 @@
 
     for (i = 1; i < 4040; i++) {
 
-      console.log(i+' / 4040')
+      console.log(i+'/4040')
 
       let r_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+i+".json")).json();
 
       for (let j = 0; j < r_metadata.attributes.length; j++) {
   
-        // data.trait_type
-        // data.value
-        let data = r_metadata.attributes[i]
+        // data.trait_type : data.value
+        let data = r_metadata.attributes[j]
 
         console.log(data.trait_type+': '+data.value)
 
