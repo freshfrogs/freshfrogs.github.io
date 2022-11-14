@@ -1206,12 +1206,12 @@
         // attribute.value
         let data = r_metadata.attributes[i]
 
-        let trait_type = data.trait_type
+        let attribute = data.trait_type
         let trait = data.value
 
         console.log(trait_type+': '+trait)
 
-        //if (trait_type == 'Frog' && trait.includes('treeFrog(')) { trait = 'treeFrog' }
+        //if (attribute == 'Frog' && trait.includes('treeFrog(')) { trait = 'treeFrog' }
 
         //let attribute = rarity_ranks_list[trait]
 
