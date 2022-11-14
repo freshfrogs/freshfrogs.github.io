@@ -1206,8 +1206,6 @@
         // data.trait_type : data.value
         let data = r_metadata.attributes[j]
 
-        console.log(data.trait_type+': '+data.value)
-
         if (data.trait_type == 'Frog' && data.value.includes('treeFrog(')) { trait = 'treeFrog' }
         else { trait = data.value}
 
