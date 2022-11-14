@@ -803,7 +803,7 @@
       let new_note = document.createElement('div')
       new_note.id = 'note_withdraw_init_'+tokenId
       new_note.className = 'mintingTextWhite3'
-      document.getElementById('note_tab').appendChild(new_note)
+      document.getElementById('console-pre').appendChild(new_note)
 
     }
 
@@ -827,7 +827,7 @@
     // Begin Withdraw Txn
     // Begin Stake Txn
     consoleOutput(
-      '<div class="notification-tab">'+
+      '<div class="notification-tab" onclick="remove(this)">'+
         '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="noteImg"/><br>'+
         '<div style="width: 100%; vertical-align: middle; margin: 2px;">'+
           '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
