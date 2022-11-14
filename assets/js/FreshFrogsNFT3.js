@@ -808,7 +808,7 @@
     }
 
     // Scroll Into View
-    scroll_to('note_init_'+tokenId);
+    scroll_to('pre');
 
     // Begin Stake Txn
     consoleOutput(
