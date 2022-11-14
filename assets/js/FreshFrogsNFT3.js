@@ -1209,7 +1209,7 @@
         let attribute = data.trait_type
         let trait = data.value
 
-        console.log(trait_type+': '+trait)
+        console.log(attribute+': '+trait)
 
         //if (attribute == 'Frog' && trait.includes('treeFrog(')) { trait = 'treeFrog' }
 
