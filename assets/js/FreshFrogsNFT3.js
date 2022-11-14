@@ -1196,7 +1196,7 @@
 
     for (i = 1; i < 4040; i++) {
 
-      console.log(i+'/4040')
+      console.log(i+' / 4040')
 
       let r_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+i+".json")).json();
 
@@ -1214,7 +1214,7 @@
         if (trait_type == 'Frog' && trait.includes('treeFrog(')) { trait = 'treeFrog' }
 
         let attribute = rarity_ranks_list[trait]
-        
+
         if (! attribute) { rarity_ranks_list[trait] = 1 }
         else { rarity_ranks_list[trait] = rarity_ranks_list[trait] + 1 }
   
