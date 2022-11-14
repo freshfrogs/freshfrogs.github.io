@@ -1202,21 +1202,19 @@
 
       for (let j = 0; j < r_metadata.attributes.length; j++) {
   
-        // attribute.trait_type
-        // attribute.value
+        // data.trait_type
+        // data.value
         let data = r_metadata.attributes[i]
 
-        let attribute = data.trait_type
-        let trait = data.value
+        console.log(data.trait_type+': '+data.value)
 
-        console.log(attribute+': '+trait)
+        if (data.trait_type == 'Frog' && data.value.includes('treeFrog(')) { trait = 'treeFrog' }
+        else { trait = data.value}
 
-        //if (attribute == 'Frog' && trait.includes('treeFrog(')) { trait = 'treeFrog' }
+        let attribute = rarity_ranks_list[trait]
 
-        //let attribute = rarity_ranks_list[trait]
-
-        //if (! attribute) { rarity_ranks_list[trait] = 1 }
-        //else { rarity_ranks_list[trait] = rarity_ranks_list[trait] + 1 }
+        if (! attribute) { rarity_ranks_list[trait] = 1 }
+        else { rarity_ranks_list[trait] = rarity_ranks_list[trait] + 1 }
   
       }
 
