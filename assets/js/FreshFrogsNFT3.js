@@ -1187,6 +1187,7 @@
   /*
 
     Calculate FreshFrogs Rarity
+    In House Rarity Ranking
 
   */
 
