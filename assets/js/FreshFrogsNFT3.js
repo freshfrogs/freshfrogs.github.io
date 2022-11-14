@@ -797,18 +797,18 @@
 
   async function withdraw_init(tokenId) {
 
-    let note_exists = document.getElementById('note_withdraw_init_'+tokenId)
+    let note_exists = document.getElementById('note_init_'+tokenId)
     if (! note_exists) {
 
       let new_note = document.createElement('div')
-      new_note.id = 'note_withdraw_init_'+tokenId
+      new_note.id = 'note_init_'+tokenId
       new_note.className = 'mintingTextWhite3'
       document.getElementById('console-pre').appendChild(new_note)
 
     }
 
     // Scroll Into View
-    scroll_to('note_withdraw_init_'+tokenId);
+    scroll_to('note_init_'+tokenId);
 
     // Begin Stake Txn
     consoleOutput(
@@ -818,7 +818,7 @@
           '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
           'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
         '</div>'+
-      '</div>', 'note_withdraw_init_'+tokenId
+      '</div>', 'note_init_'+tokenId
     );
 
     // Submit Txn
@@ -833,18 +833,18 @@
           '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
           withdraw_txn+
         '</div>'+
-      '</div>', 'note_withdraw_init_'+tokenId
+      '</div>', 'note_init_'+tokenId
     );
 
   }
 
   async function stake_init(tokenId) {
 
-    let note_exists = document.getElementById('note_stake_init_'+tokenId)
+    let note_exists = document.getElementById('note_init_'+tokenId)
     if (! note_exists) {
 
       let new_note = document.createElement('div')
-      new_note.id = 'note_stake_init_'+tokenId
+      new_note.id = 'note_init_'+tokenId
       new_note.className = 'mintingTextWhite3'
       document.getElementById('console-pre').appendChild(new_note)
 
@@ -892,7 +892,7 @@
           '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
           'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
         '</div>'+
-      '</div>', 'note_stake_init_'+tokenId
+      '</div>', 'note_init_'+tokenId
     );
     
     // Submit Txn
@@ -906,7 +906,7 @@
           '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
           stake_txn+
         '</div>'+
-      '</div>', 'note_stake_init_'+tokenId
+      '</div>', 'note_init_'+tokenId
     );
 
   }
