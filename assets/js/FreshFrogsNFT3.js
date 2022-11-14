@@ -1195,7 +1195,7 @@
 
     var rarity_ranks_list = {};
 
-    for (i = 1; i < 4040; i++) {
+    for (i = 1; i < 4041; i++) {
 
       console.log(i+'/4040')
 
