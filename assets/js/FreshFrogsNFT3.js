@@ -949,11 +949,11 @@
       if (set_approval !==true) {
 
         consoleOutput(
-          '<div style="text-align: left;" class="notification-tab" onclick="remove(this)">'+
+          '<div style="text-align: left; display: block; border: none;" class="notification-tab" onclick="remove(this)">'+
             '<strong>Approve Staking</strong><br>This is a one time transaction to allow staking, requires a gas fee.<br>'+
-            '<br><text style="color: lightcoral;">'+set_approval+'</text><br>'+
             '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero!'+
-          '</div>', 'approval_init_'
+            '<br><text style="color: lightcoral;">'+set_approval+'</text><br>'+'<text style="color: #2d3748;">(click to close)</text>'+
+            '</div>', 'approval_init_'
         );
 
         // Catch Error
