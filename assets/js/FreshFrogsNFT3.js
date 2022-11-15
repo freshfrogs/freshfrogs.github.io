@@ -319,6 +319,7 @@
         mint_icon_tab.style.background = 'transparent'
         thePond_button_tab.style.background = '#2d3748'
         myFrogs_button_tab.style.background = 'transparent'
+        fetch_user_data(CONTROLLER_ADDRESS);
       });
       
       // My Frogs Tab
@@ -327,6 +328,7 @@
         mint_icon_tab.style.background = 'transparent'
         thePond_button_tab.style.background = 'transparent'
         myFrogs_button_tab.style.background = '#2d3748'
+        fetch_user_data();
       });
 
 
