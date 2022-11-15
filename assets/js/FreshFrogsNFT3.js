@@ -292,7 +292,7 @@
           '<button class="stake_button" id="thePond_button" style="width: 100px;">The Pond</button>'+
         '</div>'+
         '<div id="myFrogs_button_overlay" class="button_overlay" style="background: #2d3748;">'+
-          '<button class="stake_button" id="myFrogs_button" style="width: 100px;">My Frogs</button>'+
+          '<button class="stake_button" id="myFrogs_button" style="width: 100px; background: #1ac486; color: white;">My Frogs</button>'+
         '</div>'
 
       // Add event listeners
