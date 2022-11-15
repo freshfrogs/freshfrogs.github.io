@@ -297,10 +297,12 @@
 
       // Add event listeners
       var mint_icon = document.getElementById('mint_button')
-      var thePond_icon = document.getElementById('thePond_button')
-      var myFrogs_icon = document.getElementById('myFrogs_button')
       var mint_icon_tab = document.getElementById('mint_button_overlay')
+
+      var thePond_icon = document.getElementById('thePond_button')
       var thePond_button_tab = document.getElementById('thePond_button_overlay')
+
+      var myFrogs_icon = document.getElementById('myFrogs_button')
       var myFrogs_button_tab = document.getElementById('myFrogs_button_overlay')
 
       // Mint Tab
