@@ -990,13 +990,15 @@
       const carter = '0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38'
       const m = '0xc447d15905d59f8F10E2921b3Ab91C25859E760c'
       async function connect_init() {
+
         //await calculate_rarity_ranking()
         await connect();
 
-        let random_token = getRandomInt(1, (next_id - 1))
-        let random_holder = await collection.methods.ownerOf(random_token).call();
+        //let random_token = getRandomInt(1, (next_id - 1))
+        //let random_holder = await collection.methods.ownerOf(random_token).call();
 
-        await fetch_user_data(random_holder);
+        await fetch_user_data();
+
       }
 
     </script>
