@@ -285,15 +285,32 @@
       // Update UI
 
       document.getElementById('button_bar').innerHTML =
-        '<div id="mint_button_overlay" class="button_overlay" style="width: 100%;">'+
+        '<div id="mint_button_overlay" class="button_overlay" style="width: 100px;">'+
           '<button class="stake_button" id="mint_button">Mint</button>'+
         '</div>'+
-        '<div id="thePond_button_overlay" class="button_overlay" style="width: 100%;">'+
+        '<div id="thePond_button_overlay" class="button_overlay" style="width: 100px;">'+
           '<button class="stake_button" id="thePond_button">The Pond</button>'+
         '</div>'+
-        '<div id="myFrogs_button_overlay" class="button_overlay" style="background: #2d3748; width: 100%;">'+
-          '<button class="stake_button" id="myFrogs_button">My Frogs</button>'
-        '</div>'+
+        '<div id="myFrogs_button_overlay" class="button_overlay" style="background: #2d3748; width: 100px;">'+
+          '<button class="stake_button" id="myFrogs_button">My Frogs</button>'+
+        '</div>'
+
+      // Add event listeners
+      var mint_icon = document.getElementById('mint_button')
+      mint_icon.addEventListener("click", function(e) {
+        console.log('mint_button')
+      });
+
+      var thePond_icon = document.getElementById('thePond_button')
+      thePond_icon.addEventListener("click", function(e) {
+        console.log('thePond_icon')
+      });
+
+      var myFrogs_icon = document.getElementById('myFrogs_button')
+      myFrogs_icon.addEventListener("click", function(e) {
+        console.log('myFrogs_icon')
+      });
+
 
       Output(
         '<div>'+
@@ -331,29 +348,6 @@
         '</div>'
       );
     }
-  }
-
-  // Update UI Icons
-  async function update_icons(main_icon) {
-
-    var mint_icon = document.getElementById('mint_button')
-    mint_icon.style.background = 'transparent'
-    mint_icon.style.color = '#1ac486'
-
-    var thePond_icon = document.getElementById('thePond_button')
-    thePond_icon.style.background = 'transparent'
-    thePond_icon.style.color = '#1ac486'
-
-    var myFrogs_icon = document.getElementById('myFrogs_button')
-    myFrogs_icon.style.background = 'transparent'
-    myFrogs_icon.style.color = '#1ac486'
-
-    // --
-
-    var select_icon = document.getElementById(main_icon)
-    select_icon.style.background = '#1ac486'
-    select_icon.style.color = 'white'
-
   }
 
   // fetch_user_tokens() | Fetch User Tokens | Staked & Otherwise |
