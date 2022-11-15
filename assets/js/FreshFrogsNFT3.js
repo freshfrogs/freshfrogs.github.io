@@ -291,7 +291,7 @@
         '<div id="thePond_button_overlay" class="button_overlay">'+
           '<button class="stake_button" id="thePond_button" style="width: 100px;">The Pond</button>'+
         '</div>'+
-        '<div id="myFrogs_button_overlay" class="button_overlay" style="background: #2d3748; width: 100px;">'+
+        '<div id="myFrogs_button_overlay" class="button_overlay" style="background: #2d3748;">'+
           '<button class="stake_button" id="myFrogs_button" style="width: 100px;">My Frogs</button>'+
         '</div>'
 
