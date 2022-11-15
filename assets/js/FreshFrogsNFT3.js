@@ -312,6 +312,9 @@
         mint_icon.style.background = '#1ac486'
         thePond_icon.style.background = ''
         myFrogs_icon.style.background = ''
+        mint_icon.style.color = 'white'
+        thePond_icon.style.color = ''
+        myFrogs_icon.style.color = ''
 
         mint_icon_tab.style.background = '#2d3748'
         thePond_button_tab.style.background = 'transparent'
@@ -325,6 +328,9 @@
         mint_icon.style.background = ''
         thePond_icon.style.background = '#1ac486'
         myFrogs_icon.style.background = ''
+        mint_icon.style.color = ''
+        thePond_icon.style.color = 'white'
+        myFrogs_icon.style.color = ''
 
         mint_icon_tab.style.background = 'transparent'
         thePond_button_tab.style.background = '#2d3748'
@@ -339,6 +345,9 @@
         mint_icon.style.background = ''
         thePond_icon.style.background = ''
         myFrogs_icon.style.background = '#1ac486'
+        mint_icon.style.color = ''
+        thePond_icon.style.color = ''
+        myFrogs_icon.style.color = 'white'
 
         mint_icon_tab.style.background = 'transparent'
         thePond_button_tab.style.background = 'transparent'
