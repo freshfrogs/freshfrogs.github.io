@@ -289,7 +289,7 @@
           '<button class="stake_button" id="mint_button">Mint</button>'+
         '</div>'+
         '<div id="thePond_button_overlay" class="button_overlay">'+
-          '<button class="stake_button" id="thePond_button" onclick="console.log(\'' + "thePond_button" + '\');">The Pond</button>'+
+          '<button class="stake_button" id="thePond_button">The Pond</button>'+
         '</div>'+
         '<div id="myFrogs_button_overlay" class="button_overlay">'+
           '<button class="stake_button" id="myFrogs_button">My Frogs</button>'
