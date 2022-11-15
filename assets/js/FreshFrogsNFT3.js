@@ -297,18 +297,34 @@
 
       // Add event listeners
       var mint_icon = document.getElementById('mint_button')
+      var thePond_icon = document.getElementById('thePond_button')
+      var myFrogs_icon = document.getElementById('myFrogs_button')
+      var mint_icon_tab = document.getElementById('mint_button_overlay')
+      var thePond_button_tab = document.getElementById('thePond_button_overlay')
+      var myFrogs_button_tab = document.getElementById('myFrogs_button_overlay')
+
+      // Mint Tab
       mint_icon.addEventListener("click", function(e) {
         console.log('mint_button')
+        mint_icon_tab.style.background = '#2d3748'
+        thePond_button_tab.style.background = 'transparent'
+        myFrogs_button_tab.style.background = 'transparent'
       });
 
-      var thePond_icon = document.getElementById('thePond_button')
+      // The Pond Tab
       thePond_icon.addEventListener("click", function(e) {
         console.log('thePond_icon')
+        mint_icon_tab.style.background = 'transparent'
+        thePond_button_tab.style.background = '#2d3748'
+        myFrogs_button_tab.style.background = 'transparent'
       });
-
-      var myFrogs_icon = document.getElementById('myFrogs_button')
+      
+      // My Frogs Tab
       myFrogs_icon.addEventListener("click", function(e) {
         console.log('myFrogs_icon')
+        mint_icon_tab.style.background = 'transparent'
+        thePond_button_tab.style.background = 'transparent'
+        myFrogs_button_tab.style.background = '#2d3748'
       });
 
 
