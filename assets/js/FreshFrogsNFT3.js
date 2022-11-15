@@ -286,13 +286,13 @@
 
       document.getElementById('button_bar').innerHTML =
         '<div id="mint_button_overlay" class="button_overlay">'+
-          '<button class="stake_button" id="mint_button">Mint</button>'+
+          '<button class="stake_button" id="mint_button" style="width: 100px;">Mint</button>'+
         '</div>'+
         '<div id="thePond_button_overlay" class="button_overlay">'+
-          '<button class="stake_button" id="thePond_button">The Pond</button>'+
+          '<button class="stake_button" id="thePond_button" style="width: 100px;">The Pond</button>'+
         '</div>'+
-        '<div id="myFrogs_button_overlay" class="button_overlay" style="background: #2d3748;">'+
-          '<button class="stake_button" id="myFrogs_button">My Frogs</button>'+
+        '<div id="myFrogs_button_overlay" class="button_overlay" style="background: #2d3748; width: 100px;">'+
+          '<button class="stake_button" id="myFrogs_button" style="width: 100px;">My Frogs</button>'+
         '</div>'
 
       // Add event listeners
