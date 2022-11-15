@@ -285,13 +285,13 @@
       // Update UI
 
       document.getElementById('button_bar').innerHTML =
-        '<div id="mint_button_overlay" class="button_overlay" style="background: #2d3748;">'+
+        '<div id="mint_button_overlay" class="button_overlay">'+
           '<button class="stake_button" id="mint_button">Mint</button>'+
         '</div>'+
         '<div id="thePond_button_overlay" class="button_overlay">'+
           '<button class="stake_button" id="thePond_button">The Pond</button>'+
         '</div>'+
-        '<div id="myFrogs_button_overlay" class="button_overlay">'+
+        '<div id="myFrogs_button_overlay" class="button_overlay" style="background: #2d3748;">'+
           '<button class="stake_button" id="myFrogs_button">My Frogs</button>'
         '</div>'+
 
