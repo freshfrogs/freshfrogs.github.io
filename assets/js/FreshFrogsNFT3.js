@@ -285,7 +285,7 @@
       // Update UI
 
       document.getElementById('button_bar').innerHTML =
-        '<div id="mint_button_overlay" class="button_overlay">'+
+        '<div id="mint_button_overlay" class="button_overlay" style="background: #2d3748;">'+
           '<button class="stake_button" id="mint_button">Mint</button>'+
         '</div>'+
         '<div id="thePond_button_overlay" class="button_overlay">'+
