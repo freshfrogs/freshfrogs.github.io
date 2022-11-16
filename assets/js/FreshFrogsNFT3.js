@@ -336,14 +336,6 @@
                 '<limit class="displayUnit">Mint Limit</limit>'+
                 '<br>'+'9 @ Ξ0.01'+
               '</div>'+
-              '<div class="terminalBottom">'+
-                '<supply class="displayUnit">Owned</supply>'+
-                '<br>'+user_tokens+''+
-              '</div>'+
-              '<div class="terminalBottom">'+
-                '<limit class="displayUnit">Staked</limit>'+
-                '<br>'+''+staker_tokens+''+
-              '</div>'+
             '</div>'+
           '</div>'+
           '<div class="console_pre" id="console-pre"></div>'
