@@ -274,6 +274,8 @@
       user_tokens = await collection.methods.balanceOf(user_address).call();
       // No. of Frogs staked by fetch_address
       staker_tokens = await stakers(user_address, 'amountStaked')
+      // No. of total Frogs staked in contract
+      total_staked = await collection.methods.balanceOf(CONTROLLER_ADDRESS).call();
 
       // Collection Variables
       collection_name = await f0.api.name().call();
@@ -319,6 +321,33 @@
         mint_icon_tab.style.background = '#2d3748'
         thePond_button_tab.style.background = 'transparent'
         myFrogs_button_tab.style.background = 'transparent'
+        Output(
+          '<div>'+
+            '<div class="terminalTop">'+
+              '<wallet class="displayUnit">Wallet Address</wallet>'+
+              '<br>'+user_address+''+
+            '</div>'+
+            '<div class="terminalBase">'+
+              '<div class="terminalBottom">'+
+                '<supply class="displayUnit">Total Supply</supply>'+
+                '<br>'+next_id+' / 4040'+
+              '</div>'+
+              '<div class="terminalBottom">'+
+                '<limit class="displayUnit">Mint Limit</limit>'+
+                '<br>'+'9 @ Ξ0.01'+
+              '</div>'+
+              '<div class="terminalBottom">'+
+                '<supply class="displayUnit">Owned</supply>'+
+                '<br>'+user_tokens+''+
+              '</div>'+
+              '<div class="terminalBottom">'+
+                '<limit class="displayUnit">Staked</limit>'+
+                '<br>'+''+staker_tokens+''+
+              '</div>'+
+            '</div>'+
+          '</div>'+
+          '<div class="console_pre" id="console-pre"></div>'
+        )
       });
 
       // The Pond Tab
@@ -336,6 +365,29 @@
         thePond_button_tab.style.background = '#2d3748'
         myFrogs_button_tab.style.background = 'transparent'
         fetch_user_data(CONTROLLER_ADDRESS);
+        Output(
+          '<div>'+
+            '<div class="terminalTop">'+
+              '<wallet class="displayUnit">Staking Contract</wallet>'+
+              '<br>'+CONTROLLER_ADDRESS+''+
+            '</div>'+
+            '<div class="terminalBase">'+
+              '<div class="terminalBottom">'+
+                '<supply class="displayUnit">Total Supply</supply>'+
+                '<br>'+next_id+' / 4040'+
+              '</div>'+
+              '<div class="terminalBottom">'+
+                '<limit class="displayUnit">Reward Token</limit>'+
+                '<br>'+'$FLYZ'+
+              '</div>'+
+              '<div class="terminalBottom">'+
+                '<supply class="displayUnit">Total Staked</supply>'+
+                '<br>'+total_staked+''+
+              '</div>'+
+            '</div>'+
+          '</div>'+
+          '<div class="console_pre" id="console-pre"></div>'
+        )
       });
       
       // My Frogs Tab
@@ -353,6 +405,35 @@
         thePond_button_tab.style.background = 'transparent'
         myFrogs_button_tab.style.background = '#2d3748'
         fetch_user_data();
+
+        Output(
+          '<div>'+
+            '<div class="terminalTop">'+
+              '<wallet class="displayUnit">Wallet Address</wallet>'+
+              '<br>'+user_address+''+
+            '</div>'+
+            '<div class="terminalBase">'+
+              '<div class="terminalBottom">'+
+                '<supply class="displayUnit">Total Supply</supply>'+
+                '<br>'+next_id+' / 4040'+
+              '</div>'+
+              '<div class="terminalBottom">'+
+                '<limit class="displayUnit">Mint Limit</limit>'+
+                '<br>'+'9 @ Ξ0.01'+
+              '</div>'+
+              '<div class="terminalBottom">'+
+                '<supply class="displayUnit">Owned</supply>'+
+                '<br>'+user_tokens+''+
+              '</div>'+
+              '<div class="terminalBottom">'+
+                '<limit class="displayUnit">Staked</limit>'+
+                '<br>'+''+staker_tokens+''+
+              '</div>'+
+            '</div>'+
+          '</div>'+
+          '<div class="console_pre" id="console-pre"></div>'
+        )
+        
       });
 
 
