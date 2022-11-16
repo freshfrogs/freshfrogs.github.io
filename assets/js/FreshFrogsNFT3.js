@@ -410,14 +410,6 @@
             '</div>'+
             '<div class="terminalBase">'+
               '<div class="terminalBottom">'+
-                '<supply class="displayUnit">Total Supply</supply>'+
-                '<br>'+next_id+' / 4040'+
-              '</div>'+
-              '<div class="terminalBottom">'+
-                '<limit class="displayUnit">Mint Limit</limit>'+
-                '<br>'+'9 @ Ξ0.01'+
-              '</div>'+
-              '<div class="terminalBottom">'+
                 '<supply class="displayUnit">Owned</supply>'+
                 '<br>'+user_tokens+''+
               '</div>'+
@@ -440,14 +432,6 @@
             '<br>'+user_address+''+
           '</div>'+
           '<div class="terminalBase">'+
-            '<div class="terminalBottom">'+
-              '<supply class="displayUnit">Total Supply</supply>'+
-              '<br>'+next_id+' / 4040'+
-            '</div>'+
-            '<div class="terminalBottom">'+
-              '<limit class="displayUnit">Mint Limit</limit>'+
-              '<br>'+'9 @ Ξ0.01'+
-            '</div>'+
             '<div class="terminalBottom">'+
               '<supply class="displayUnit">Owned</supply>'+
               '<br>'+user_tokens+''+
