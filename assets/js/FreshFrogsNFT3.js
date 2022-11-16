@@ -373,10 +373,6 @@
             '</div>'+
             '<div class="terminalBase">'+
               '<div class="terminalBottom">'+
-                '<supply class="displayUnit">Total Supply</supply>'+
-                '<br>'+next_id+' / 4040'+
-              '</div>'+
-              '<div class="terminalBottom">'+
                 '<limit class="displayUnit">Reward Token</limit>'+
                 '<br>'+'$FLYZ'+
               '</div>'+
