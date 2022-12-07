@@ -286,6 +286,7 @@
       // Connected!
       // Update UI
 
+      /*
       document.getElementById('button_bar').innerHTML =
         '<div id="mint_button_overlay" class="button_overlay">'+
           '<button class="stake_button" id="mint_button" style="width: 100px;">Mint</button>'+
@@ -415,6 +416,7 @@
         )
         
       });
+      */
 
 
       Output(
