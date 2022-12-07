@@ -446,6 +446,7 @@
           '❌ '+e.message+
         '</div>'
       );
+      console.log(e)
     }
   }
 
