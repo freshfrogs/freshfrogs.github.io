@@ -342,21 +342,10 @@
           '<div class="console_pre" id="console-pre"></div>'
         )
       });
+      */
 
       // The Pond Tab
-      thePond_icon.addEventListener("click", function(e) {
-        console.log('thePond_icon')
-
-        mint_icon.style.background = ''
-        thePond_icon.style.background = '#1ac486'
-        myFrogs_icon.style.background = ''
-        mint_icon.style.color = ''
-        thePond_icon.style.color = 'white'
-        myFrogs_icon.style.color = ''
-
-        mint_icon_tab.style.background = 'transparent'
-        thePond_button_tab.style.background = '#2d3748'
-        myFrogs_button_tab.style.background = 'transparent'
+      document.getElementById('button_middle').addEventListener("click", function(e) {
         fetch_user_data(CONTROLLER_ADDRESS);
         Output(
           '<div>'+
@@ -379,20 +368,10 @@
         )
       });
       
+      
       // My Frogs Tab
-      myFrogs_icon.addEventListener("click", function(e) {
-        console.log('myFrogs_icon')
+      document.getElementById('button_right').addEventListener("click", function(e) {
 
-        mint_icon.style.background = ''
-        thePond_icon.style.background = ''
-        myFrogs_icon.style.background = '#1ac486'
-        mint_icon.style.color = ''
-        thePond_icon.style.color = ''
-        myFrogs_icon.style.color = 'white'
-
-        mint_icon_tab.style.background = 'transparent'
-        thePond_button_tab.style.background = 'transparent'
-        myFrogs_button_tab.style.background = '#2d3748'
         fetch_user_data();
 
         Output(
@@ -416,7 +395,7 @@
         )
         
       });
-      */
+      
 
 
       Output(
@@ -443,7 +422,7 @@
       consoleOutput(
         '<div style="text-align: left;">'+
           'Failed to connect Ethereum wallet: '+
-          '❌ '+e.message+
+          '❌<br>'+e.message+
         '</div>'
       );
       console.log(e)
