@@ -24,7 +24,7 @@
     .myBar {
       width: 1%;
       height: 18px;
-      background-color: #f06900;
+      background-color: tomato;
       border-radius: 1px;
     }
     .wrapper {
@@ -93,8 +93,16 @@
       transition: .2s;
     }
     .mintingTray {
+      text-align: center;
+      vertical-align: center;
+      height: auto;
+      border-radius: 5px;
+      overflow: hidden;
+      transition: box-shadow .2s;
       width: 256px;
-      height: 256px;
+      margin-left: auto;
+      margin-right: auto;
+      color: white !important;
     }
     .label_name {
         text-align: left;
@@ -133,17 +141,10 @@
         color: white;
     }
     .bigContainer {
-      display: inline-block;
+      overflow: hidden;
       width: 256px;
       height: 256px;
-      flex-wrap: wrap;
-      vertical-align: middle;
-      text-align: center;
-      margin: 16px;
-      margin-left: auto;
-      margin-right: auto;
-      border-radius: 5px;
-      max-width: 256px;
+      image-rendering: pixelated !important;
     }
     .containerMint {
         width: auto;
@@ -247,10 +248,11 @@
       list-style: none;
       height: 40px;
       padding: 0;
-      background: #2d3748;
+      background: white;
       border-radius: 5px;
-      border: none;
+      border: 1px solid black;
       width: 270px;
+      box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
       margin-left: auto;
       margin-right: auto;
       margin-top: 16px;
@@ -259,25 +261,23 @@
       text-align: center;
       vertical-align: middle;
       font-size: small !important;
-      color: white;
-      box-shadow: none;
     }
     section {
       font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
       font-size: auto;
-      color: white !important;
-      background-color: #1a202c;
+      color: antiquewhite !important;
+      background-color: #1B4965;
       text-align: center;
       border-radius: 7px;
       padding: 0px !important;
       overflow: hidden;
-      margin-bottom: 8px;
+      margin-bottom: 16px;
       font-size: small !important;
-      width: 525px;
+      border: 1px solid black;
     }
     header {
       overflow: hidden;
-      background-color: #1a202c;
+      background-color: #1B4965;
       text-align: center;
       border-radius: 5px;
       width: auto;
@@ -288,6 +288,7 @@
       padding-bottom: 0px !important;
       padding-left: 14px;
       padding-right: 14px;
+      border: 1px solid black;
     }
     .desc {
       position: relative;
@@ -312,6 +313,9 @@
       font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
       font-size: inherit !important;
       color: inherit !important;
+    }
+    .downloads li {
+      border-right: none;
     }
     .pre h1{
       margin-top: 8px;
@@ -379,11 +383,6 @@
       border-radius: 100%;
       cursor: pointer;
     }
-    .frogImg3:hover{
-      -ms-transform: scale(1.25); /* IE 9 */
-      -webkit-transform: scale(1.25); /* Safari 3-8 */
-      transform: scale(1.25);
-    }
     .frogImg4 {
       transition: all .2s;
       display: block;
@@ -405,10 +404,9 @@
       image-rendering: pixelated;
       overflow: hidden;
       position: absolute;
-      width: 128px;
-      height: 128px;
-      border-radius: 100%;
-      cursor: pointer;
+      width: 256px;
+      height: 256px;
+      border-radius: 5px;
     }
     .smallContainer3:hover{
       -ms-transform: scale(1.1); /* IE 9 */
@@ -434,7 +432,7 @@
       border-radius: 2%;
       text-align: center;
       padding: 0px;
-      margin-bottom: 0px;
+      margin-bottom: 8px;
       width: 100%;
       height: 100%;
       box-shadow: none;
@@ -565,7 +563,7 @@
     .trait {
       border-radius: 2px;
       background: transparent;
-      color: #1ac486;
+      color: rgba(126, 183, 128, 1);;
       font-size: x-small;
       padding: 1px;
       float: none;
@@ -578,33 +576,18 @@
       color: #7cc1ff;
     }
     .mintingTextWhite2 {
-      background-color: #2d3748;
-      padding: 8px;
-      color: #1ac486 !important;
-      margin: auto;
-      border-radius: 0px;
-      width: auto;
-      margin-left: auto;
-      margin-right: auto;
-      overflow: hidden;
-      font-size: small !important;
-      border: none;
-    }
-    .mintingTextWhite3 strong {
+      background-color: #5FA8D3;
+      border: 1px solid black;
+      padding: 16px;
       color: white !important;
-    }
-    .mintingTextWhite3 {
-      background-color: #2d3748;
-      padding: 8px;
-      color: #1ac486 !important;
+      box-shadow: 3px 3px rgb(122 122 122 / 20%);
       margin: auto;
       border-radius: 5px;
-      width: auto;
+      width: 80%;
       margin-left: auto;
       margin-right: auto;
       overflow: hidden;
       font-size: small !important;
-      border: none;
     }
     #banner_image {
       width: 100%;
@@ -617,30 +600,14 @@
       overflow: hidden;
       cursor: pointer;
     }
-    .noteImg {
-      min-width: 64px;
-      height: 64px;
-      border-radius: 5px;
-      margin: 4px;
-      transition: all .2s;
-      border: none;
-      box-shadow: none;
-    }
     .recentMint {
-      min-width: 64px;
+      width: 64px;
       height: 64px;
       border-radius: 5px;
+      box-shadow: 3px 3px rgb(122 122 122 / 20%);
       margin: 4px;
-      transition: all .2s;
-      border: none;
-      box-shadow: none;
-    }
-    .recentMint:hover{
-      -ms-transform: scale(2.0); /* IE 9 */
-      -webkit-transform: scale(2.0); /* Safari 3-8 */
-      transform: scale(2.0);
-      border: none;
-      box-shadow: none;
+      border: 1px solid black;
+      cursor: pointer;
     }
     .recent_mints {
       margin-left: auto;
@@ -649,90 +616,41 @@
       margin-bottom: auto;
       width: 90%;
     }
-    .os_button {
-      border: 1px solid cornflowerblue;
-      background-color: transparent;
-      color: cornflowerblue;
-      font-weight: normal;
-      line-height: 1;
-      border-radius: 5px;
-      padding: 4px;
-      margin: 4px;
-      cursor: pointer;
-      transition: all .2s;
-      font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
-      width: 242px;
-      text-align: center;
-      vertical-align: middle;
-    }
-    .os_button:hover {
-      background-color: cornflowerblue;
-      color: white;
-    }
-    .unstake_button {
-      border: 1px solid #9f7aea;
-      background-color: transparent;
-      color: #9f7aea;
-      font-weight: normal;
-      line-height: 1;
-      border-radius: 5px;
-      padding: 4px;
-      margin: 4px;
-      cursor: pointer;
-      transition: all .2s;
-      font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
-      width: 115px;
-      text-align: center;
-      vertical-align: middle;
-    }
-    .unstake_button:hover {
-      background-color: #9f7aea;
-      color: white;
-    }
     .stake_button {
-      border: 1px solid #1ac486;
-      background-color: transparent;
-      color: #1ac486;
-      font-weight: normal;
-      line-height: 1;
+      border: 1px solid black;
+      background-color: salmon;
+      color: white;
+      font-weight: bold;
       border-radius: 5px;
-      padding: 4px;
-      margin: 4px;
+      padding: 8px;
+      margin-left: auto;
+      margin-right: auto;
       cursor: pointer;
       transition: all .2s;
       font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
-      width: 115px;
-      text-align: center;
-      vertical-align: middle;
+      width: 90%;
+      box-shadow: 3px 3px rgb(122 122 122 / 20%);
     }
     .stake_button:hover {
-      background-color: #1ac486;
+      background-color: #7cc1ff;
       color: white;
     }
     .frog_button {
-      background-color: transparent;
-      color: #1ac486;
-      border: 1px solid #1ac486 !important;
+      border: 1px solid black;
+      background-color: white;
+      color: #333;
       border-radius: 5px;
+      padding: 2px;
+      margin-left: 8px;
+      margin-right: 8px;
       cursor: pointer;
       transition: all .2s;
       font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
       min-width: 100px;
-      list-style: none;
-      min-height: 40px;
-      padding: 8px;
-      width: 270px;
-      margin: 16px;
-      margin-left: auto;
-      margin-right: auto;
-      line-height: 1;
-      text-align: center;
-      vertical-align: middle;
   }
     .frog_button:hover {
-      background-color: #1ac486;
+      background-color: #7cc1ff;
       color: white;
-      border: 1px solid #1ac486 !important;
     }
     .staked_token {
       display: flex;
@@ -761,8 +679,8 @@
     }
     .frog_imgContainer {
       border-radius: 100%;
-      border: none;
-      margin: 0px;
+      border: 1px solid black;
+      margin: 8px;
       width: 128px;
       height: 128px;
       overflow: hidden;
@@ -772,16 +690,25 @@
       border-bottom-right-radius: 100%;
     }
     .frog_token {
-      display: inline-block;
-      background-color: transparent;
-      padding: 0px;
+      display: block;
+      background-color: antiquewhite;
+      border: none;
+      padding: 4px;
       color: #333 !important;
+      box-shadow: none;
+      margin: auto;
       border-radius: 5px;
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
       overflow: hidden;
-      width: auto;
-      margin: 8px;
+      width: 256px;
+      border: 1px solid black;
+      margin: 16px;
+      box-shadow: 3px 3px rgb(122 122 122 / 20%);
       font-size: small;
       transition: all .2s;
+      padding-bottom: 8px;
     }
     .trait_list {
       min-width: 50%;
@@ -789,13 +716,11 @@
       text-align: left;
       padding: 8px;
       padding-top: 8px;
-      border-bottom: 1px solid #6d7c91;
     }
     .properties {
-      padding: 0px;
+      padding: 8px;
       border-top-left-radius: 5px;
       padding-bottom: 0px;
-      text-align: left;
     }
     .print_img {
       width: 128px;
@@ -816,115 +741,6 @@
       float: none;
       font-size: small;
     }
-    .terminalTop {
-      border-bottom: 1px solid #6d7c91;
-      padding: 12px;
-    }
-    .terminalBottom {
-      width: 100%;
-    }
-    .terminalBase {
-      width: auto;
-      padding: 12px;
-      display: flex;
-    }
-    .displayUnit {
-      color: white;
-    }
-    .downloads li {
-      border-right: none !important;
-      color: white !important;
-    }
-    .downloads a strong {
-      color: #1ac486 !important;
-    }
-    .logoImage {
-      height: 128px;
-      width: 128px;
-      border-radius: 100%;
-      margin: 48px;
-      border: none;
-      box-shadow: none;
-    }
-    .displayToken {
-      width: auto;
-      height: auto;
-      min-height: 256px;
-    }
-    .renderToken {
-      min-width: 128px;
-      height: 128px;
-      border-radius: 5px;
-      margin: 4px;
-      transition: all .2s;
-    }
-    .innerLeft {
-      
-    }
-    .renderLeft {
-      width: auto;
-      border-radius: 5px;
-      background: transparent;
-      color: #333;
-      margin: auto;
-      padding: 0px;
-      min-width: 168px;
-      border: none;
-      border-bottom-left-radius: 0px;
-      border-bottom-right-radius: 0px;
-    }
-    .renderRight {
-      border-radius: 5px;
-      background: #2d3748;
-      color: white;
-      padding: 8px;
-      width: 256px;
-      border-top-left-radius: 0px;
-      border-top-right-radius: 0px;
-    }
-    .innerRight {
-
-    }
-    .frogTokenCont {
-      display: inline-block;
-      margin: 0px;
-      border-radius: 5px;
-      background-color: transparent;
-    }
-    .notification-tab {
-      border: 1px solid #6d7c91;
-      border-radius: 5px;
-      display: flex;
-      padding: 4px;
-      transition: all .2s;
-    }
-    .notification-tab:hover {
-      background-color: #6d7c91;
-    }
-    .iconShelf {
-      image-rendering: auto;
-      margin-bottom: 20px;
-    }
-    .displayIcon {
-      width: 26px;
-      height: 26px;
-      border-radius: 100%;
-      margin-left: 16px;
-      margin-right: 16px;
-    }
-    .displayIcon:hover{
-      -ms-transform: scale(1.1); /* IE 9 */
-      -webkit-transform: scale(1.1); /* Safari 3-8 */
-      transform: scale(1.1);
-    }
-    .button_bar {
-      display: inline-flex;
-    }
-    .button_overlay {
-      border-top-left-radius: 5px;
-      border-top-right-radius: 5px;
-    }
-
   </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -941,7 +757,7 @@
     
     <script src="https://freshfrogs.io/the-pond/banner/FileSaver.js"></script>
     <script src="https://freshfrogs.io/the-pond/banner/dom-to-image.js"></script>
-    <script src="https://freshfrogs.io/assets/js/FreshFrogsNFT3.js"></script>
+    <script src="https://freshfrogs.io/assets/js/FreshFrogsNFT.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
@@ -959,17 +775,16 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        
         console.log('updating display frogs')
-
-        var displayLoop = 3;
-        var container = document.getElementById('recentMints');
+        // bigContainer recentMint
+        var displayLoop = 9;
+        var randomFrog = getRandomInt(1, (4040-displayLoop));
+        var container = document.getElementById('bigContainer');
 
         container.innerHTML = ''
 
         for (var i = 0; i < displayLoop; i++) {
           var displayImg = document.createElement('img');
-          let randomFrog = getRandomInt(1, 4039)
           displayImg.src = '../frog/'+(randomFrog+i)+'.png'
           displayImg.className = 'recentMint'
           container.appendChild(displayImg);
@@ -985,59 +800,56 @@
         return Math.floor(Math.random() * (max - min) + min);
       }
 
-      // FreshFrogsController | NFT Staking Smart Contract | 0xCB1ee125CFf4051a10a55a09B10613876C4Ef199
-      const stakingContract = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199'
-      const andrew = '0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25'
-      const carter = '0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38'
-      const m = '0xc447d15905d59f8F10E2921b3Ab91C25859E760c'
       async function connect_init() {
-
-        //await calculate_rarity_ranking()
         await connect();
-
-        //let random_token = getRandomInt(1, (next_id - 1))
-        //let random_holder = await collection.methods.ownerOf(random_token).call();
-
         await fetch_user_data(user_address);
-
       }
 
     </script>
     
   </head>
   <body class="bodyb">
-    <div class="top">{{ content }}</div>
+    <div class="top">{{ content }}
+      <img src="../assets/bannerTop2.png" style="margin-bottom: 5%;"/>
+    </div>
     <div class="wrapper">
       <header id="header">
         <div class="downloads pre">
           <ul class="downloads2">
-            <li><a id="button_left" class="pointer"><strong>Mint</strong>0.01 ETH</a></li>
-            <li><a id="button_middle" class="pointer"><strong>The Pond</strong>Staking</a></li>
-            <li><a id="button_right" class="pointer"><strong>View</strong>My Frogs</a></li>
+            <li><a id="button_left" class="pointer" href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><strong>Etherscan</strong>Contract</a></li>
+            <li><a id="button_middle" class="pointer" href="https://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong>Server</a></li>
+            <li><a id="button_right" class="pointer" href="https://www.gem.xyz/collection/fresh-frogs" target="_blank"><strong>Gemxyz</strong>Rankings</a></li>
           </ul>
-          <div id="bigContainer" class="bigContainer"><img src="../assets/frogs/logo_animated.gif" class="logoImage"></div>
+          <div id="mintingTray" class="mintingTray">
+            <br>
+            <div id="bigContainer" class="bigContainer"></div>
+          </div>
         </div>
       </header>
       <section id="section">
         <div class="downloads pre">
-          <div id="recentMints" style="margin-top: 32px;"></div>
-          <br><img src="../assets/bannerTop2.png" style="margin-bottom: 20px; width: 256px;"/>
-          <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;"><strong style="color: white;">FreshFrogsNFT</strong> is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
-          <div class="iconShelf"><img class="displayIcon" src="../assets/opensea.png" /><img class="displayIcon" src="../assets/twitter.png" /><img class="displayIcon" src="../assets/etherscan.png" /><img class="displayIcon" src="../assets/discord.png" /></div>
-          <div id="pre" class="mintingTextWhite2">
-            <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="https://freshfrogs.io/the-pond">
-              <button onclick="connect_init()" class="frog_button">
-                <strong style="color: inherit !important;">Connect Wallet</strong><text style="color: white !important;">Ethereum Blockchain</text>
-              </button>
-            </a>
+          <div id="netStatus" class="netStatus">
             <br>
-            <hr style="background: #6d7c91;">
-            <div class="console_pre" id="console-pre" style="background: transparent;"></div>
+            <img src="../assets/blackWhite.png" class="recentMint" style="border: none; height: 128px; width: 128px; border-radius: 100%; margin: 32px;">
+            <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;"><strong style="color: white;">FreshFrogsNFT</strong> is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
+            opensea.io/collection/fresh-frogs<a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong style="color: white;">Shop on OpenSea ⛵</strong></a>
+            <br>
+            <div id="pre" class="mintingTextWhite2">
+              <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="https://freshfrogs.io/the-pond">
+                <button onclick="connect_init()" style="list-style: none; min-height: 40px; padding: 8px; border-radius: 5px; border: 1px solid black; width: 270px; margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">
+                  <strong>Connect Wallet</strong>Ethereum Blockchain
+                </button>
+              </a>
+              <br>
+              <hr style="background: black;">
+              <div class="console_pre" id="console-pre" style="background: transparent;"></div>
+            </div>
+            <br>
           </div>
         </div>
       </section>
-      <section id="note_tab" style="background: transparent; border: none !important;"></section>
-      <section id="thePad" style="background: transparent; border: none !important;">
+      <section style="background: transparent; border: none;">
+        <div id="thePad" class="thePad"></div>
       </section>
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
