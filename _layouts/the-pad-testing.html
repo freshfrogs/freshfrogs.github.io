@@ -959,11 +959,9 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        await connect_init();
-
         
         console.log('updating display frogs')
-        // bigContainer recentMint
+
         var displayLoop = 3;
         var container = document.getElementById('recentMints');
 
@@ -971,11 +969,13 @@
 
         for (var i = 0; i < displayLoop; i++) {
           var displayImg = document.createElement('img');
-          displayImg.src = '../frog/'+(next_id+i)+'.png'
+          let randomFrog = getRandomInt(1, 4039)
+          displayImg.src = '../frog/'+(randomFrog+i)+'.png'
           displayImg.className = 'recentMint'
           container.appendChild(displayImg);
         }
-        
+
+        await connect_init();
 
       })
 
