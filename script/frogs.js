@@ -179,8 +179,6 @@
     console.log('test')
 
     // remove listeners
-    document.getElementById('quantity+').removeEventListener("click", quantity_up)
-    document.getElementById('quantity-').removeEventListener("click", quantity_down)
     document.getElementById('button_left').removeEventListener("click", quantity_mint)
 
     // Update Buttons
