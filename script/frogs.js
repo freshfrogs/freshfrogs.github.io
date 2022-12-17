@@ -55,6 +55,33 @@
     }
   }
 
+  // Render Display
+  async function render_display(tokenId) {
+
+    // remove listeners
+    document.getElementById('quantity+').removeEventListener("click", quantity_up)
+    document.getElementById('quantity-').removeEventListener("click", quantity_down)
+    document.getElementById('button_left').removeEventListener("click", quantity_mint)
+
+    // Update Buttons
+    document.getElementById('button_left').innerHTML = '<strong>Frog</strong>'+tokenId
+    document.getElementById('button_middle').innerHTML = '<strong>Stake</strong>earn rewards'
+    document.getElementById('button_right').innerHTML = '<strong>Morph</strong>combinations'
+
+    // Update Display Image
+    var bigContainer = document.getElementById('bigContainer');
+    bigContainer.innerHTML = '';
+    bigContainer.style.backgroundImage = 'url('+'https://freshfrogs.io/frog/'+tokenId+'.png'+')';
+    bigContainer.style.backgroundSize = "2048px 2048px";
+
+    var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+tokenId+".json")).json();
+    for (var i = 0; i < metadata.attributes.length; i++) {
+      var attribute = metadata.attributes[i];
+      loadTrait(attribute.trait_type, attribute.value, 'bigContainer');
+    }
+
+  }
+
   // fetch_user_tokens() | address
   async function fetch_user_tokens(fetch_address) {
     if (! fetch_address) { fetch_address = user_address; }
@@ -399,8 +426,7 @@
         '<div class="console_pre" id="console-pre"></div>'
       )
 
-      document.getElementById('quantity+').addEventListener("click", function(e) {
-
+      var quantity_up = function (e) {
         if (mint_quantity >= 10) { return; }
         else {
           mint_quantity = mint_quantity + 1;
@@ -410,10 +436,9 @@
           document.getElementById('mintImage').src = '../frog/'+((next_id+mint_quantity)-1)+'.png'
           document.getElementById('button_middle').innerHTML = '<strong>Frog</strong>'+((next_id+mint_quantity)-1)
         }
-  
-      })
-  
-      document.getElementById('quantity-').addEventListener("click", function(e) {
+      };
+
+      var quantity_down = function (e) {
         if (mint_quantity <= 1) { return; }
         else {
           mint_quantity = mint_quantity - 1;
@@ -423,11 +448,9 @@
           document.getElementById('mintImage').src = '../frog/'+((next_id+mint_quantity)-1)+'.png'
           document.getElementById('button_middle').innerHTML = '<strong>Frog</strong>'+((next_id+mint_quantity)-1)
         }
-  
-      })
+      };
 
-      document.getElementById('button_left').addEventListener("click", async function(e) {
-
+      var quantity_mint = async function (e) {
         console.log('Sending mint transaction!\n'+
         mint_quantity+' Tokens @ Ξ'+mint_price+' : ['+(mint_total)+']');
 
@@ -454,8 +477,11 @@
             '</div>'
           );
         }
-        
-      })
+      };
+
+      document.getElementById('quantity+').addEventListener("click", quantity_up)
+      document.getElementById('quantity-').addEventListener("click", quantity_down)
+      document.getElementById('button_left').addEventListener("click", quantity_mint)
 
     } catch (e) { // Something Went Wrong!
       consoleOutput(
