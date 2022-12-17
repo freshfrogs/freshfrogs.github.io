@@ -34,7 +34,11 @@
 
     // Render tokens Held by Fetch Address
       let pages = parseInt(user_tokens/50) + 1;
+      console.log('Total Tokens: '+user_tokens)
+      console.log('Total Pages: '+pages)
       for (var i = 0; i < pages; i++) {
+
+        console.log('Loading page ('+i+'/'+pages+')')
 
         // Fetch OpenSea Data
         fetch('https://api.opensea.io/api/v1/assets?owner='+fetch_address+'&order_direction=asc&asset_contract_address='+CONTRACT_ADDRESS+'&offset='+(i * 50)+'&limit=50&include_orders=false', options)
