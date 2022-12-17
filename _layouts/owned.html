@@ -169,8 +169,8 @@
   }
   .os_button {
     border: 1px solid cornflowerblue;
-    background-color: white;
-    color: cornflowerblue;
+    background-color: cornflowerblue;
+    color: white;
     font-weight: normal;
     line-height: 1;
     border-radius: 5px;
@@ -186,6 +186,7 @@
   .os_button:hover {
     background-color: cornflowerblue;
     color: white;
+    box-shadow: 1px 1px 1px 1px rgba(122, 122, 122, 0.20)
   }
   .mintingTextWhite1 {
     background-color: transparent;
@@ -294,6 +295,21 @@
     margin-left: 16px;
     margin-right: 16px;
   }
+  .frogImg4 {
+    transition: all .2s;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    width: 256px;
+    height: 256px;
+    border-radius: 100%;
+  }
+  .frogImg4:hover{
+    -ms-transform: scale(1.25); /* IE 9 */
+    -webkit-transform: scale(1.25); /* Safari 3-8 */
+    transform: scale(1.25);
+  }
   .frogImg3 {
     transition: all .2s;
     display: block;
@@ -303,6 +319,7 @@
     width: 128px;
     height: 128px;
     border-radius: 100%;
+    cursor: pointer;
   }
   .frogImg3:hover{
     -ms-transform: scale(1.25); /* IE 9 */
@@ -317,6 +334,17 @@
     position: absolute;
     width: 128px;
     height: 128px;
+    border-radius: 100%;
+    cursor: pointer;
+  }
+  .frogImg6 {
+    transition: all .2s;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    width: 256px;
+    height: 256px;
     border-radius: 100%;
   }
 </style>
@@ -358,9 +386,8 @@
 
       async function connect_init() {
 
-        await connect('owned');
-        await fetch_user_tokens();
-
+        connect();
+        fetch_user_tokens(CONTROLLER_ADDRESS);
         document.getElementById('ownedTokens').innerHTML = '<u>Owned</u>'
 
       }
@@ -377,19 +404,19 @@
             <li><a id="button_middle"><strong>Frog</strong>1</a></li>
             <li><a id="button_right"><strong><b id="quantity-" class="pointer">- </b><b id="mint_quantity">1</b><b id="quantity+" class="pointer"> +</b></strong>Quantity</a></li>
           </ul>
-          <div id="bigContainer" class="bigContainer"><img src="../frog/1.png" id="mintImage" class="mintImage"></div>
+          <div id="bigContainer" class="bigContainer"><img src="../assets/blackWhite.png" id="mintImage" class="mintImage"></div>
         </div>
       </header>
       <section id="section" style="box-shadow: 1px 1px 1px 1px rgba(122, 122, 122, 0.20);">
         <div id="pre-top" class="mintingTextWhite1">
-          <img src="../assets/blackWhite.png" class="logoImage" style="padding: 0px; background: transparent;" />
+          <img src="../assets/frogs/FLY.gif" class="logoImage" style="padding: 0px; background: transparent;" />
           <h1 style="color: #1a202c; margin-top: 0px; font-weight: 400;">freshfrogs.io</h1>
           <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%; line-height: 1; font-size: small;">
             <strong>Fresh Frogs NFT (FROG)</strong> is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!<br><br><a href="https://etherscan.io/address/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b" target="_blank">0xBE4Bef8735107db540De269FF82c7dE9ef68C51b</a>
           </p>
           <div class="terminalBase">
             <div class="terminalBottom"><supply class="displayUnit">Items</supply><br><supply id="supply">8,888</supply></div>
-            <div class="terminalBottom"><limit class="displayUnit">Network</limit><br>Ethereum</div>
+            <div class="terminalBottom" id="stakedTotal"><limit class="displayUnit">Network</limit><br>Ethereum</div>
             <div class="terminalBottom"><price class="displayUnit">Royalty</price><br>5%</div>
           </div>
         </div>
