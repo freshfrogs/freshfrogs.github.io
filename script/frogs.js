@@ -227,6 +227,7 @@
 
     // No. Tokens owned by fetch_address
     fetch_tokens = await collection.methods.balanceOf(fetch_address).call();
+    document.getElementById('stakedTotal').innerHTML = fetch_tokens;
 
     if (fetch_tokens >= 1) {
 
@@ -243,7 +244,6 @@
           var { assets } = tokens
           assets.forEach((token) => {
             thisItem++
-            console.log('Token: '+thisItem+'/'+fetch_tokens)
             render_token(token);
           })
         })
