@@ -345,11 +345,11 @@
           '</div>'+
           '<div class="terminalBase">'+
             '<div class="terminalBottom">'+
-              '<owned class="displayUnit">Owned</owned>'+
+              '<a class="displayUnit" id="ownedTokens" href="./owned">Owned</a>'+
               '<br>'+user_tokens+''+
             '</div>'+
             '<div class="terminalBottom">'+
-              '<owned class="displayUnit">Staked</owned>'+
+            '<a class="displayUnit" id="ownedTokens" href="./staked">Owned</a>'+
               '<br>'+staked_tokens+''+
             '</div>'+
             '<div class="terminalBottom">'+
