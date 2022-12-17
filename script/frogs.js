@@ -30,11 +30,14 @@
 
     document.getElementById('frogs').innerHTML = ''
 
-    if (user_tokens >= 1) {
+    // No. Tokens owned by fetch_address
+    fetch_tokens = await collection.methods.balanceOf(fetch_address).call();
+
+    if (fetch_tokens >= 1) {
 
     // Render tokens Held by Fetch Address
-      let pages = parseInt(user_tokens/50) + 1;
-      console.log('Total Tokens: '+user_tokens)
+      let pages = parseInt(fetch_tokens/50) + 1;
+      console.log('Total Tokens: '+fetch_tokens)
       console.log('Total Pages: '+pages)
       for (var i = 0; i < pages; i++) {
 
