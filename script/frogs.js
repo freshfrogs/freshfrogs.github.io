@@ -111,6 +111,8 @@
   // Render Display
   async function render_display(tokenId) {
 
+    console.log('test')
+
     // remove listeners
     document.getElementById('quantity+').removeEventListener("click", quantity_up)
     document.getElementById('quantity-').removeEventListener("click", quantity_down)
