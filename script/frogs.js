@@ -30,7 +30,7 @@
     if (! staker_address) { staker_address = user_address; }
 
     // No. Tokens owned by staker_address
-    let staker_tokens = await stakers(fetch_address, 'amountStaked')
+    let staker_tokens = await stakers(staker_address, 'amountStaked')
 
     // Render Frogs Staked by User
     if (staker_tokens >= 1) {
