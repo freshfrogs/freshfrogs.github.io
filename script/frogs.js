@@ -201,6 +201,7 @@
     document.getElementById('button_right').onclick = function (e) {
       dominant = tokenId;
       morph = true;
+      document.getElementById('button_right').innerHTML = '<strong>Morph</strong>select Frog'
     }
 
     // Update Display Image
