@@ -198,7 +198,7 @@
     document.getElementById('button_right').onclick = function (e) {
       dominant = tokenId;
       morph = true;
-      document.getElementById('button_right').innerHTML = '<strong>Morph</strong>reset'
+      document.getElementById('button_right').innerHTML = '<strong>Morph</strong>select Frog'
       document.getElementById('button_left').onclick = function (e) {
         morph = false;
         render_display(tokenId)
