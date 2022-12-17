@@ -186,8 +186,14 @@
     let staked_render = await stakerAddress(tokenId)
     if (!staked_render) {
       document.getElementById('button_middle').innerHTML = '<strong>Stake</strong>deposit'
+      document.getElementById('button_middle').onclick = async function (e) {
+        await stake_init();
+      }
     } else {
       document.getElementById('button_middle').innerHTML = '<strong>Unstake</strong>withdraw'
+      document.getElementById('button_middle').onclick = async function (e) {
+        await withdraw_init();
+      }
     }
     document.getElementById('button_middle').className = 'pointer'
     document.getElementById('button_left').innerHTML = '<strong>Frog</strong>'+tokenId
@@ -954,6 +960,158 @@
   }
 
   // <-----
+  // SEND()
+  // ----->
+
+  // claimRewards(_user (address)) | send =>
+  async function claimRewards() {
+
+    // Check Available Rewards
+    let available_rewards = await availableRewards(user_address);
+    if (available_rewards > 0) {
+      try {
+
+        // Send Txn
+        let claimRewards = await controller.methods.claimRewards().send({ from: user_address });
+        return '✅ Rewards have succesfully been claimed!';
+  
+      // Catch Errors!
+      } catch (e) { return '❌ '+e.message; }
+    
+    // No Rewards
+    } else { return '❌ No rewards available to claim!'; }
+  }
+
+  // withdraw(_tokenId (uint256), _user (address)) | send =>
+  async function withdraw(tokenId) {
+
+    // Check Staked/Approval Status
+    let staked = await stakerAddress(tokenId);
+    let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+
+    // Invalid Approval / Not Staked
+    if (!approved) { return '❌ Staking contract not approved for token transfer!'; }
+    if (!staked) { return '❌ Frog #'+tokenId+' is not currently staked!'; } 
+
+    // Valid ownership
+    else if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+      try {
+        
+        // Send Txn
+        let withdraw = await controller.methods.withdraw(tokenId).send({ from: user_address });
+        return '✅ Frog #'+tokenId+' has succesfully been un-staked!';
+
+      // Catch Errors
+      } catch (e) { return '❌ '+e.message; }
+
+    // Invalid Ownership
+    } else { return '❌ Frog #'+tokenId+' does not belong to user!'; }
+  }
+
+  // Initiate Transfer Txn
+  async function transfer_init(tokenId) {
+
+    // Scroll Into View
+    morphing = false; base_frog = false; sub_frog = false;
+    scroll_to('pre');
+    display_token(tokenId);
+
+    // Begin Withdraw Txn
+    consoleOutput(
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<strong>Transferring Frog #'+tokenId+'...</strong>'+'<br>'+
+      '<input style="margin: 4px; width: 256px; padding: 4px; border: 1px solid black; border-radius: 5px;" id="receiver" placeholder="receiver address"><br>'+
+      '<button id="receiver_button" class="frog_button" style="background: #7cc1ff; color: white; border: 1px solid black;">Send 🡥</button><br>'+
+      '<br><div style="text-align: left;">'+
+        '<strong>Transfer NFT</strong>'+
+        '<br>Items sent to the wrong address cannot be recovered!'+
+      '</div>'
+    );
+
+    document.querySelector("#receiver_button").addEventListener("click", async (e) => {
+
+      // Token Reciever
+      let receiver = document.querySelector("#receiver").value
+
+      consoleOutput(
+        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+        '<strong>Transferring Frog #'+tokenId+'...</strong>'+'<br>'+
+        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+        '<br><div style="text-align: left;">'+
+          '<strong>Transfer NFT</strong><br> Transferring Frog #'+tokenId+' to '+truncateAddress(receiver)+
+        '</div>'
+      );
+
+      // Send Transfer Txn
+      let transfer_txn = await safeTransferFrom(receiver, tokenId)
+
+      consoleOutput(
+        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+        '<strong>Transferring Frog #'+tokenId+'...</strong>'+'<br>'+
+        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+        '<br><div style="text-align: left;">'+
+          '<strong>Transfer NFT</strong><br> '+transfer_txn+
+        '</div>'
+      );
+
+    })
+  }
+
+  // Transfer Function
+  async function safeTransferFrom(receiver, tokenId) {
+
+    web3 = new Web3(window.ethereum);
+
+    // Validate Receiver
+    let receiver_address = await Web3.utils.isAddress(receiver)
+    if (!receiver_address) { return '❌ Invalid receiver address!'; }
+    if (receiver.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) { return '❌ Invalid receiver address! Please use the stake() function!'; }
+
+    // Check Ownership
+    let owner = await collection.methods.ownerOf(tokenId).call();
+    if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+      try {
+
+        // Send Txn
+        let safeTransfer_txn = await collection.methods.safeTransferFrom(user_address, receiver, tokenId).send({ from: user_address});
+        return '✅ Frog #'+tokenId+' has succesfully been transferred!';
+      
+      // Catch Errors
+      } catch (e) { return '❌ '+e.message; }
+
+    // Invalid Ownership
+    } else { return '❌ Frog #'+tokenId+' does not belong to user!'; }
+  }
+
+  // stake(_tokenId (uint256), _user (address)) | send =>
+  async function stake(tokenId) {
+
+    // Check Ownership / Approval Status
+    let owner = await collection.methods.ownerOf(tokenId).call();
+    let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+    if (!approved) { return '❌ Staking contract not approved for token transfer!'; }
+
+    // Valid ownership
+    if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+      try {
+
+        // Send Txn
+        let stake = await controller.methods.stake(tokenId).send({ from: user_address });
+        return '✅ Frog #'+tokenId+' has succesfully been staked!';
+
+      // Catch Errors
+      } catch (e) { return '❌ '+e.message; }
+
+    // Token already Staked
+    } else if (owner.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) {
+      return '❌ Frog #'+tokenId+' is already staked!';
+    } 
+
+    // Invalid Ownership
+    else { return '❌ Frog #'+tokenId+' does not belong to user!'; }
+  }
+
+  // <-----
   // CALL()
   // ----->
 
@@ -1024,6 +1182,137 @@
       return
 
     }
+  }
+
+  // FreshFrogsController | NFT Staking Smart Contract | 0xCB1ee125CFf4051a10a55a09B10613876C4Ef199
+
+  async function claimRewards_init() {
+
+    // Scroll Into View
+    morphing = false; base_frog = false; sub_frog = false;
+    scroll_to('pre');
+    display_token(tokenId);
+
+    // Begin Withdraw Txn
+    consoleOutput(
+      '<strong>Claiming Rewards...</strong>'+'<br>'+
+      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+      '<br><div style="text-align: left;">'+
+        '<strong>Claim Rewards</strong><br> Retrieve $FLYZ from staking protocol.'+
+      '</div>'
+    );
+
+    // Submit Txn
+    let claimRewards_txn = await claimRewards();
+
+    consoleOutput(
+      '<strong>Claiming Rewards...</strong>'+'<br>'+
+      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+      '<br><div style="text-align: left;">'+
+        '<strong>Claim Rewards</strong><br> '+claimRewards_txn+
+      '</div>'
+    );
+  }
+
+  async function withdraw_init(tokenId) {
+
+    // Scroll Into View
+    morphing = false; base_frog = false; sub_frog = false;
+    scroll_to('pre');
+    display_token(tokenId);
+
+    // Begin Withdraw Txn
+    consoleOutput(
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
+      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+      '<br><div style="text-align: left;">'+
+        '<strong>Withdraw NFT</strong><br> Return Frog #'+tokenId+' from staking protocol.'+
+      '</div>'
+    );
+
+    // Submit Txn
+    let withdraw_txn = await withdraw(tokenId);
+
+    // Begin Withdraw Txn
+    consoleOutput(
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
+      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+      '<br><div style="text-align: left;">'+
+        '<strong>Withdraw NFT</strong><br> '+withdraw_txn+
+      '</div>'
+    );
+
+  }
+
+  async function stake_init(tokenId) {
+
+    // Scroll Into View
+    morphing = false; base_frog = false; sub_frog = false;
+    scroll_to('pre');
+    display_token(tokenId);
+
+    // Check Contract Approval
+    let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+
+    // Not Approved
+    if (!is_approved) {
+
+      consoleOutput(
+        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+        '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
+        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+        '<br><div style="text-align: left;">'+
+          '<strong>Approve Staking</strong> (1/2)<br>This is a one time transaction to allow staking, requires a gas fee.<br>'+
+          '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
+        '</div>'
+      );
+
+      // Submit Txn
+      let set_approval = await setApprovalForAll();
+
+      if (set_approval !==true) {
+
+        consoleOutput(
+          '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+          '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
+          'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+          '<br><div style="text-align: left;">'+
+            '<strong>Approve Staking</strong> (1/2)<br>'+set_approval+'<br>'+
+            '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
+          '</div>'
+        );
+
+        // Catch Error
+        return
+
+      }
+    }
+
+    // Begin Stake Txn
+    consoleOutput(
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
+      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+      '<br><div style="text-align: left;">'+
+        '<strong>Stake NFT</strong><br> Transfer Frog #'+tokenId+' to staking protocol.'+
+      '</div>'
+    );
+
+    // Submit Txn
+    let stake_txn = await stake(tokenId);
+
+    // Complete
+    consoleOutput(
+      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
+      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
+      '<br><div style="text-align: left;">'+
+        '<strong>Stake NFT</strong><br> '+stake_txn+
+      '</div>'
+    );
+
   }
 
 // Coded by NF7UOS
