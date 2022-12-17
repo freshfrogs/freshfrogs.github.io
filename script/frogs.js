@@ -704,12 +704,18 @@
       newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
     }
 
-    if (trait == 'Trait') {
-      newAttribute.className = "frogImg5";
-
+    if (where == 'bigContainer') {
+      if (trait == 'Trait') {
+        newAttribute.className = "frogImg6";
+      } else {
+        newAttribute.className = "frogImg4";
+      }
     } else {
-      newAttribute.className = "frogImg3";
-
+      if (trait == 'Trait') {
+        newAttribute.className = "frogImg5";
+      } else {
+        newAttribute.className = "frogImg3";
+      }
     }
 
     document.getElementById(where).appendChild(newAttribute);
