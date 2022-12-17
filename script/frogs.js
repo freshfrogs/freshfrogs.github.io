@@ -66,26 +66,35 @@
 
     if (fetch_tokens >= 1) {
 
-      // Fetch OpenSea Data
-      fetch('https://api.opensea.io/api/v1/assets?owner='+fetch_address+'&order_direction=asc&asset_contract_address='+CONTRACT_ADDRESS+'&limit=300&include_orders=false', options)
-      .then((tokens) => tokens.json())
-      .then((tokens) => {
-        var { assets } = tokens
-        assets.forEach((token) => {
+      // Render tokens Held by Fetch Address
+      let pages = parseInt(fetch_tokens/50) + 1;
+      console.log('Total Tokens: '+fetch_tokens)
+      console.log('Total Pages: '+pages)
+      for (var i = 0; i < pages; i++) {
+
+        console.log('Loading page ('+i+'/'+pages+')')
+
+        // Fetch OpenSea Data
+        fetch('https://api.opensea.io/api/v1/assets?owner='+fetch_address+'&order_direction=asc&asset_contract_address='+CONTRACT_ADDRESS+'&offset='+(i * 50)+'&limit=50&include_orders=false', options)
+        .then((tokens) => tokens.json())
+        .then((tokens) => {
+          var { assets } = tokens
+          assets.forEach((token) => {
+            
+            render_token(token);
+
+          })
+        })
+        .catch(e => {
           
-          render_token(token);
+          consoleOutput(
+            '<div style="text-align: left;">'+
+              'Failed to fetch user data (partial). Try refreshing the page!<br>'+
+            '</div>'
+          );
 
         })
-      })
-      .catch(e => {
-        
-        consoleOutput(
-          '<div style="text-align: left;">'+
-            'Failed to fetch user data (partial). Try refreshing the page!<br>'+
-          '</div>'
-        );
-
-      })
+      }
 
     // Does not own atleast one token!
     } else {
