@@ -386,8 +386,8 @@
 
       async function connect_init() {
 
-        connect();
-        fetch_user_tokens();
+        await connect();
+        await fetch_user_tokens();
         document.getElementById('ownedTokens').innerHTML = '<u>Owned</u>'
 
       }
