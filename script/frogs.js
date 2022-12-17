@@ -12,58 +12,7 @@
   var CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
   var NETWORK = 'main';
 
-  var quantity_up = function (e) {
-    if (mint_quantity >= 10) { return; }
-    else {
-      mint_quantity = mint_quantity + 1;
-      mint_total = mint_price*mint_quantity;
-      document.getElementById('mint_quantity').innerHTML = mint_quantity
-      document.getElementById('button_left').innerHTML = '<strong>Mint</strong>'+mint_total.toFixed(3)+'Ξ'
-      document.getElementById('mintImage').src = '../frog/'+((next_id+mint_quantity)-1)+'.png'
-      document.getElementById('button_middle').innerHTML = '<strong>Frog</strong>'+((next_id+mint_quantity)-1)
-    }
-  };
-
-  var quantity_down = function (e) {
-    if (mint_quantity <= 1) { return; }
-    else {
-      mint_quantity = mint_quantity - 1;
-      mint_total = mint_price*mint_quantity;
-      document.getElementById('mint_quantity').innerHTML = mint_quantity
-      document.getElementById('button_left').innerHTML = '<strong>Mint</strong>'+mint_total.toFixed(3)+'Ξ'
-      document.getElementById('mintImage').src = '../frog/'+((next_id+mint_quantity)-1)+'.png'
-      document.getElementById('button_middle').innerHTML = '<strong>Frog</strong>'+((next_id+mint_quantity)-1)
-    }
-  };
-
-  var quantity_mint = async function (e) {
-    console.log('Sending mint transaction!\n'+
-    mint_quantity+' Tokens @ Ξ'+mint_price+' : ['+(mint_total)+']');
-
-    try {
-      consoleOutput(
-        '<div style="text-align: left;">'+
-          'Minting <b>'+collection_name+'</b> x'+mint_quantity+'<br>'+
-          'Please sign the transaction and wait...'+
-        '</div>'
-      );
-
-      let tokens = await f0.mint(user_invite, mint_quantity);
-
-      consoleOutput(
-        '<div style="text-align: left;">'+
-          'Congratulations! Tokens successfully minted!<br>'+
-        '</div>'
-      );
-
-    } catch (e) {
-      consoleOutput(
-        '<div style="text-align: left;">'+
-          'Something went wrong! :(<br>'+e.message+
-        '</div>'
-      );
-    }
-  };
+  var quantity_up, quantity_up, quantity_mint;
 
   const _0x3c6cb7=_0x455b;(function(_0x10c095,_0x4ebf79){const _0x128040=_0x455b,_0x558e9b=_0x10c095();while(!![]){try{const _0x151436=parseInt(_0x128040(0x1ec))/0x1*(parseInt(_0x128040(0x1f1))/0x2)+-parseInt(_0x128040(0x1f6))/0x3*(parseInt(_0x128040(0x1f5))/0x4)+parseInt(_0x128040(0x1f4))/0x5*(parseInt(_0x128040(0x1eb))/0x6)+parseInt(_0x128040(0x1ea))/0x7*(-parseInt(_0x128040(0x1ed))/0x8)+parseInt(_0x128040(0x1f3))/0x9+-parseInt(_0x128040(0x1ef))/0xa*(parseInt(_0x128040(0x1f2))/0xb)+parseInt(_0x128040(0x1f0))/0xc;if(_0x151436===_0x4ebf79)break;else _0x558e9b['push'](_0x558e9b['shift']());}catch(_0x163f3d){_0x558e9b['push'](_0x558e9b['shift']());}}}(_0x46a6,0x6aab1));const options={'method':'GET','headers':{'X-API-KEY':_0x3c6cb7(0x1ee)}};function _0x455b(_0x52da3f,_0x147a14){const _0x46a6d7=_0x46a6();return _0x455b=function(_0x455bdd,_0x1ee73a){_0x455bdd=_0x455bdd-0x1ea;let _0x5885ff=_0x46a6d7[_0x455bdd];return _0x5885ff;},_0x455b(_0x52da3f,_0x147a14);}function _0x46a6(){const _0x2e9797=['188216XwkUNa','1b80881e422a49d393113ede33c81211','5097090qszEib','11422152wzRNKi','1946jfhPGQ','11FRRONZ','1433718usknQF','75575VtUmze','88HamPWj','100911myKlsh','119cKmLbR','264AwALcZ','319AyvMxB'];_0x46a6=function(){return _0x2e9797;};return _0x46a6();}
 
@@ -488,6 +437,59 @@
         '</div>'+
         '<div class="console_pre" id="console-pre"></div>'
       )
+
+      quantity_up = function (e) {
+        if (mint_quantity >= 10) { return; }
+        else {
+          mint_quantity = mint_quantity + 1;
+          mint_total = mint_price*mint_quantity;
+          document.getElementById('mint_quantity').innerHTML = mint_quantity
+          document.getElementById('button_left').innerHTML = '<strong>Mint</strong>'+mint_total.toFixed(3)+'Ξ'
+          document.getElementById('mintImage').src = '../frog/'+((next_id+mint_quantity)-1)+'.png'
+          document.getElementById('button_middle').innerHTML = '<strong>Frog</strong>'+((next_id+mint_quantity)-1)
+        }
+      };
+    
+      quantity_down = function (e) {
+        if (mint_quantity <= 1) { return; }
+        else {
+          mint_quantity = mint_quantity - 1;
+          mint_total = mint_price*mint_quantity;
+          document.getElementById('mint_quantity').innerHTML = mint_quantity
+          document.getElementById('button_left').innerHTML = '<strong>Mint</strong>'+mint_total.toFixed(3)+'Ξ'
+          document.getElementById('mintImage').src = '../frog/'+((next_id+mint_quantity)-1)+'.png'
+          document.getElementById('button_middle').innerHTML = '<strong>Frog</strong>'+((next_id+mint_quantity)-1)
+        }
+      };
+    
+      quantity_mint = async function (e) {
+        console.log('Sending mint transaction!\n'+
+        mint_quantity+' Tokens @ Ξ'+mint_price+' : ['+(mint_total)+']');
+    
+        try {
+          consoleOutput(
+            '<div style="text-align: left;">'+
+              'Minting <b>'+collection_name+'</b> x'+mint_quantity+'<br>'+
+              'Please sign the transaction and wait...'+
+            '</div>'
+          );
+    
+          let tokens = await f0.mint(user_invite, mint_quantity);
+    
+          consoleOutput(
+            '<div style="text-align: left;">'+
+              'Congratulations! Tokens successfully minted!<br>'+
+            '</div>'
+          );
+    
+        } catch (e) {
+          consoleOutput(
+            '<div style="text-align: left;">'+
+              'Something went wrong! :(<br>'+e.message+
+            '</div>'
+          );
+        }
+      };
 
       document.getElementById('quantity+').addEventListener("click", quantity_up)
       document.getElementById('quantity-').addEventListener("click", quantity_down)
