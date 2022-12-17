@@ -183,18 +183,9 @@
     document.getElementById('button_left').removeEventListener("click", quantity_mint)
 
     // Update Buttons
-    let staked_render = await stakerAddress(tokenId)
-    if (!staked_render) {
-      document.getElementById('button_middle').innerHTML = '<strong>Stake</strong>deposit'
-      document.getElementById('button_middle').onclick = async function (e) {
-        await stake_init();
-      }
-    } else {
-      document.getElementById('button_middle').innerHTML = '<strong>Unstake</strong>withdraw'
-      document.getElementById('button_middle').onclick = async function (e) {
-        await withdraw_init();
-      }
-    }
+    document.getElementById('button_middle').innerHTML = '<strong>Image</strong>original'
+    document.getElementById('button_middle').href = 'https://freshfrogs.io/frog/'+tokenId+'.png'
+    document.getElementById('button_middle').target = '_blank'
     document.getElementById('button_middle').className = 'pointer'
     document.getElementById('button_left').innerHTML = '<strong>Frog</strong>'+tokenId
     document.getElementById('button_left').className = 'pointer'
@@ -228,6 +219,8 @@
   // fetch_user_tokens() | address
   async function fetch_user_tokens(fetch_address) {
     if (! fetch_address) { fetch_address = user_address; }
+    if (fetch_address.toLowerCase() == user_address.toLowerCase()) { use_case = true; }
+    else { use_case = false; }
 
     document.getElementById('frogs').innerHTML = ''
 
@@ -242,15 +235,13 @@
 
       for (var i = 0; i < pages; i++) {
 
-        thisItem = 0;
         // Fetch OpenSea Data
         fetch('https://api.opensea.io/api/v1/assets?owner='+fetch_address+'&order_direction=asc&asset_contract_address='+CONTRACT_ADDRESS+'&offset='+(i * 50)+'&limit=50&include_orders=false', options)
         .then((tokens) => tokens.json())
         .then((tokens) => {
           var { assets } = tokens
           assets.forEach((token) => {
-            thisItem++
-            render_token(token);
+            render_token(token, use_case);
           })
         })
         .catch(e => {
@@ -724,7 +715,9 @@
 
   */
 
-  async function render_token(token) {
+  async function render_token(token, use_case) {
+
+    if (! use_case) { use_case = false; }
 
     let opensea_username = '';
     let token_owner = '';
@@ -770,6 +763,20 @@
       name = 'Frog #'+token_id
     }
 
+    // Use Functions?
+    if (use_case) {
+      button_elements = 
+      '<div style="text-align: center;">'+
+        '<button class="stake_button" onclick="stake_init('+token_id+')">Stake</button> <button class="unstake_button" onclick="withdraw_init('+token_id+')">Un-stake</button>'+
+        '<br>'+'<a href="'+permalink+'" target="_blank"><button class="os_button">View on Opensea</button></a>'+
+      '</div>';
+    } else {
+      button_elements = 
+      '<div style="text-align: center;">'+
+        '<a href="'+permalink+'" target="_blank"><button class="os_button">View on OpenSea</button></a>'+
+      '</div>';
+    }
+
     // <-- Begin Element
     token_doc = document.getElementById('frogs');
     token_element = document.createElement('div');
@@ -810,9 +817,7 @@
                 '<text>Next Level</text>'+'<br>'+
                 '<text style="color: #1ac486; font-weight: bold;">'+staked_next+' days</text>'+
               '</div>'+
-              '<div style="text-align: center;">'+
-                '<a href="'+permalink+'" target="_blank"><button class="os_button">View on OpenSea</button></a>'+
-              '</div>'+
+              button_elements+
             '</div>'+
           '</div>'+
         '</div>'+
