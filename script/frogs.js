@@ -316,6 +316,8 @@
       // No. of total Frogs staked in contract
       total_staked = await collection.methods.balanceOf(CONTROLLER_ADDRESS).call();
 
+      document.getElementById('totalStaked').innerHTML = total_staked
+
       // Collection Variables
       collection_name = await f0.api.name().call();
       collection_symbol = await f0.api.symbol().call();
