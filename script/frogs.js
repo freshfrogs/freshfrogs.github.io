@@ -636,7 +636,7 @@
       '<div class="display_token_cont">'+
         '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
           '<div class="innerLeft">'+
-            '<div class="display_token_img_cont" id="cont_'+token_id+'" onclick="display_token('+token_id+')">'+
+            '<div class="display_token_img_cont" id="cont_'+token_id+'" onclick="render_display('+token_id+')">'+
               //'<img src="'+image_link+'" class="displayImage"/>'+
             '</div>'+
           '</div>'+
@@ -693,7 +693,6 @@
 
     newAttribute = document.createElement("img");
     newAttribute.alt = attribute
-    newAttribute.onClick = render_display(tokenId);
 
     if (attribute == 'tongueSpiderRed' || attribute == 'tongueSpider' || attribute == 'tongue' || attribute == 'tongueFly' || attribute == 'croaking' || attribute == 'peace' || attribute == 'inversedEyes' || attribute == 'closedEyes' || attribute == 'thirdEye' || attribute == 'mask' || attribute == 'smoking' || attribute == 'smokingCigar' || attribute == 'smokingPipe' || attribute == 'circleShadesRed' || attribute == 'circleShadesPurple' || attribute == 'shades' || attribute == 'shadesPurple' || attribute == 'shadesThreeD' || attribute == 'shadesWhite' || attribute == 'circleNightVision') {
       newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/animations/"+attribute+"_animation.gif";
