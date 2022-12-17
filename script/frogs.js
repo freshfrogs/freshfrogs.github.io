@@ -385,11 +385,11 @@
           '</div>'+
           '<div class="terminalBase">'+
             '<div class="terminalBottom">'+
-              '<a class="displayUnit" id="ownedTokens" href="./owned">Owned</a>'+
+              '<a class="displayUnit" id="ownedTokens" href="../owned">Owned</a>'+
               '<br>'+user_tokens+''+
             '</div>'+
             '<div class="terminalBottom">'+
-            '<a class="displayUnit" id="stakedTokens" href="./staked">Staked</a>'+
+            '<a class="displayUnit" id="stakedTokens" href="../staked">Staked</a>'+
               '<br>'+staked_tokens+''+
             '</div>'+
             '<div class="terminalBottom">'+
