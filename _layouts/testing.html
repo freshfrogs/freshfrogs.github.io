@@ -386,8 +386,8 @@
 
       async function connect_init() {
 
-        await fetch_user_tokens(CONTROLLER_ADDRESS);
-        await connect();
+        connect();
+        fetch_user_tokens(CONTROLLER_ADDRESS);
 
       }
 
