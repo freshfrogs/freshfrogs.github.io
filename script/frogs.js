@@ -479,6 +479,27 @@
 
   /*
 
+    Calculate stake values & returns
+
+  */
+
+    async function stakingValues(tokenId) {
+
+      stakedTimeHours = await timeStaked(tokenId)
+      stakedLevelInt = Math.floor((stakedTimeHours / 1000 )) + 1
+
+      stakedTimeDays = Math.floor(stakedTimeHours / 24)                             // Time Staked
+      stakedLevel = romanize(stakedLevelInt)                                         // Staked Level
+      stakedNext = Math.round((((stakedLevelInt) * 1000) - stakedTimeHours) / 24)  // Days until next level
+      stakedEarned = (stakedTimeHours / 1000).toFixed(3)                                          // Flyz Earned
+
+      // [ Time Staked, Staked Level, Next Level, Flyz Earned]
+      return [stakedTimeDays, stakedLevel, stakedNext, stakedEarned]
+
+    }
+
+  /*
+
     Retrieve OpenSea Username
     fetch_username(<address>) | return username (string)
 
@@ -508,15 +529,37 @@
     // Assign token variables from data object
     try { var { token_id, external_link, permalink, name, rarity_data: { rank }, owner: { address, user: { username } } } = token } catch (e) {} // , last_sale: { payment_token: { decimals }, total_price }
 
-    let image_link = '../frog/'+token_id+'.png'
-    opensea_username = username
-
     if (typeof address == 'undefined' || address == '' || address == null) {
       address = await collection.methods.ownerOf(token_id).call();
     }
 
-    if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == null) {
-      opensea_username = truncateAddress(address)
+    // Reference controller contract
+    let staked = await stakerAddress(token_id)
+
+    let image_link = '../frog/'+token_id+'.png'
+
+    if (!staked) {
+
+      opensea_username = username
+
+      if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == null) {
+        opensea_username = truncateAddress(address)
+      }
+
+    } else {
+
+      opensea_username = await fetch_username(staked)
+
+      if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == null) {
+        opensea_username = truncateAddress(staked)
+      }
+
+      let staking_values = await stakingValues(token_id)
+      staked_time_days = staking_values[0]
+      staked_level = staking_values[1]
+      staked_next = staking_values[2]
+      staked_earned = staking_values[3]
+
     }
 
     if (typeof name == 'undefined' || name == '' || name == null) {
@@ -545,8 +588,67 @@
               '<b>'+name+'</b>'+'<text style="color: #1a202c; float: right;">'+opensea_username+'</text>'+
             '</div>'+
             '<div id="prop_'+token_id+'" class="properties">'+
+              '<div style="margin: 8px; float: left; width: 100px;">'+
+                '<text>Time Staked</text>'+'<br>'+
+                '<text style="color: #1ac486;">'+staked_time_days+' days</text>'+
+              '</div>'+
+              '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text>$FLYZ Earned</text>'+'<br>'+
+                '<text style="color: #1ac486;">'+staked_earned+'</text>'+
+              '</div>'+
+              '<br>'+
+              '<div style="margin: 8px; float: left; width: 100px;">'+
+                '<text>Level</text>'+'<br>'+
+                '<text style="color: #1ac486;">'+staked_level+'</text>'+
+              '</div>'+
+              '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text>Next Level</text>'+'<br>'+
+                '<text style="color: #1ac486;">'+staked_next+' days</text>'+
+              '</div>'+
               '<div style="text-align: center;">'+
                 '<a href="'+permalink+'" target="_blank"><button class="os_button">View on OpenSea</button></a>'+
+              '</div>'+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+
+      //
+
+      frog_token.innerHTML = 
+      '<div class="frogTokenCont">'+
+        '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+external_link+'); background-size: 2048px 2048px;">'+
+          '<div class="innerLeft">'+
+            '<div class="frog_imgContainer" id="cont_'+token_id+'" onclick="display_token('+token_id+')">'+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+        '<div class="renderRight">'+
+          '<div class="innerRight">'+
+            '<div id="traits_'+token_id+'" class="trait_list">'+
+              '<b>'+name+'</b> <text style="color: #1ac486;">'+opensea_username+'</text>'+'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+            '</div>'+
+            '<div id="prop_'+token_id+'" class="properties">'+
+              '<div style="margin: 8px; float: left; width: 100px;">'+
+                '<text>Time Staked</text>'+'<br>'+
+                '<text style="color: #1ac486;">'+staked_time_days+' days</text>'+
+              '</div>'+
+              '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text>$FLYZ Earned</text>'+'<br>'+
+                '<text style="color: #1ac486;">'+staked_earned+'</text>'+
+              '</div>'+
+              '<br>'+
+              '<div style="margin: 8px; float: left; width: 100px;">'+
+                '<text>Level</text>'+'<br>'+
+                '<text style="color: #1ac486;">'+staked_level+'</text>'+
+              '</div>'+
+              '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text>Next Level</text>'+'<br>'+
+                '<text style="color: #1ac486;">'+staked_next+' days</text>'+
+              '</div>'+
+              '<div style="text-align: center;">'+
+                '<button class="stake_button" onclick="stake_init('+token_id+')">Stake</button> <button class="unstake_button" onclick="withdraw_init('+token_id+')">Un-stake</button>'+
+                '<br>'+'<a href="'+permalink+'" target="_blank"><button class="os_button">View on Opensea</button></a>'+
               '</div>'+
             '</div>'+
           '</div>'+
