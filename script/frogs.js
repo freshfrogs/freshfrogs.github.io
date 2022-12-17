@@ -31,7 +31,7 @@
   async function fetch_staked_tokens(staker_address) {
 
     if (! staker_address) { staker_address = user_address; }
-    if (staker_address.toLowerCase() == user_address.toLowerCase()) { use_case = true; }
+    if (! user_address) { use_case = false; } else if (staker_address.toLowerCase() == user_address.toLowerCase()) { use_case = true; }
     else { use_case = false; }
 
     // No. Tokens owned by staker_address
