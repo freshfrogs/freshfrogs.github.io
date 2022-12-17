@@ -120,8 +120,8 @@
 
     // Update Buttons
     document.getElementById('button_left').innerHTML = '<strong>Frog</strong>'+tokenId
-    document.getElementById('button_middle').innerHTML = '<strong>Stake</strong>earn rewards'
-    document.getElementById('button_right').innerHTML = '<strong>Morph</strong>combinations'
+    document.getElementById('button_middle').innerHTML = '<strong>Stake</strong>deposit'
+    document.getElementById('button_right').innerHTML = '<strong>Morph</strong>builder'
 
     // Update Display Image
     var bigContainer = document.getElementById('bigContainer');
