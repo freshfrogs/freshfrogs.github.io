@@ -221,7 +221,7 @@
   // fetch_user_tokens() | address
   async function fetch_user_tokens(fetch_address) {
     if (! fetch_address) { fetch_address = user_address; }
-    if (fetch_address.toLowerCase() == user_address.toLowerCase()) { use_case = true; }
+    if (! user_address) { use_case = false; } else if (fetch_address.toLowerCase() == user_address.toLowerCase()) { use_case = true; }
     else { use_case = false; }
 
     document.getElementById('frogs').innerHTML = ''
