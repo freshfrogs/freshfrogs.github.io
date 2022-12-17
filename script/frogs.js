@@ -278,14 +278,12 @@
       ]
 
     // Connect WEB3, Factoria
-    console.log('Connecting to Ethereum network...')
     const web3 = new Web3(window.ethereum);
-    console.log('Syncing with Factoria...')
     const f0 = new F0();
 
-    console.log('Defining Token ABI...')
     // Connect Collection Smart Contract, Staking Smart Contract
     COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
+    CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
 
     try { // Attempt to Connect!
 
