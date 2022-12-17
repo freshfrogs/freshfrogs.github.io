@@ -11,7 +11,8 @@
   var CONTRACT_ADDRESS, COLLECTION, collection, collection_name, collection_symbol;
   var CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
   var NETWORK = 'main';
-
+  var morph = false;
+  var dominant, recessive;
   var quantity_up, quantity_up, quantity_mint;
 
   const _0x3c6cb7=_0x455b;(function(_0x10c095,_0x4ebf79){const _0x128040=_0x455b,_0x558e9b=_0x10c095();while(!![]){try{const _0x151436=parseInt(_0x128040(0x1ec))/0x1*(parseInt(_0x128040(0x1f1))/0x2)+-parseInt(_0x128040(0x1f6))/0x3*(parseInt(_0x128040(0x1f5))/0x4)+parseInt(_0x128040(0x1f4))/0x5*(parseInt(_0x128040(0x1eb))/0x6)+parseInt(_0x128040(0x1ea))/0x7*(-parseInt(_0x128040(0x1ed))/0x8)+parseInt(_0x128040(0x1f3))/0x9+-parseInt(_0x128040(0x1ef))/0xa*(parseInt(_0x128040(0x1f2))/0xb)+parseInt(_0x128040(0x1f0))/0xc;if(_0x151436===_0x4ebf79)break;else _0x558e9b['push'](_0x558e9b['shift']());}catch(_0x163f3d){_0x558e9b['push'](_0x558e9b['shift']());}}}(_0x46a6,0x6aab1));const options={'method':'GET','headers':{'X-API-KEY':_0x3c6cb7(0x1ee)}};function _0x455b(_0x52da3f,_0x147a14){const _0x46a6d7=_0x46a6();return _0x455b=function(_0x455bdd,_0x1ee73a){_0x455bdd=_0x455bdd-0x1ea;let _0x5885ff=_0x46a6d7[_0x455bdd];return _0x5885ff;},_0x455b(_0x52da3f,_0x147a14);}function _0x46a6(){const _0x2e9797=['188216XwkUNa','1b80881e422a49d393113ede33c81211','5097090qszEib','11422152wzRNKi','1946jfhPGQ','11FRRONZ','1433718usknQF','75575VtUmze','88HamPWj','100911myKlsh','119cKmLbR','264AwALcZ','319AyvMxB'];_0x46a6=function(){return _0x2e9797;};return _0x46a6();}
@@ -57,8 +58,123 @@
     }
   }
 
+  // Token Combinations / Rebuild Token
+  async function morphFrogs(baseId, subId, build_loc) {
+    
+    var baseFrog, baseSpecialFrog, baseTrait, baseAccessory, baseEyes, baseHat, baseMouth;
+    var subFrog, subSpecialFrog, subTrait, subAccessory, subEyes, subHat, subMouth;
+    var renderFrog, renderSpecialFrog, renderTrait, renderSecondaryTrait, renderAccessory, renderEyes, renderHat, renderMouth, renderOverlay;
+    
+    document.getElementById(build_loc).innerHTML = '';
+
+    // <------ FETCH METADATA (baseId, subId) ------>
+    let baseMetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseId+".json")).json();
+    for (i = 0; i < baseMetadata.attributes.length; i++) {
+
+      let attribute = baseMetadata.attributes[i];
+      if (attribute.trait_type == 'Frog') { var baseFrog = attribute.value; } 
+      else if (attribute.trait_type == 'SpecialFrog') { var baseSpecialFrog = attribute.value; } 
+      else if (attribute.trait_type == 'Trait') { var baseTrait = attribute.value; } 
+      else if (attribute.trait_type == 'Accessory') { var baseAccessory = attribute.value; } 
+      else if (attribute.trait_type == 'Eyes') { var baseEyes = attribute.value; } 
+      else if (attribute.trait_type == 'Hat') { var baseHat = attribute.value; } 
+      else if (attribute.trait_type == 'Mouth') { var baseMouth = attribute.value; }
+
+    }
+
+    let subMetadata = await (await fetch("https://freshfrogs.io/frog/json/"+subId+".json")).json();
+    for (j = 0; j < subMetadata.attributes.length; j++) {
+
+      let attribute = subMetadata.attributes[j];
+      if (attribute.trait_type == 'Frog') { var subFrog = attribute.value; } 
+      else if (attribute.trait_type == 'SpecialFrog') { var subSpecialFrog = attribute.value; } 
+      else if (attribute.trait_type == 'Trait') { var subTrait = attribute.value; } 
+      else if (attribute.trait_type == 'Accessory') { var subAccessory = attribute.value; } 
+      else if (attribute.trait_type == 'Eyes') { var subEyes = attribute.value; } 
+      else if (attribute.trait_type == 'Hat') { var subHat = attribute.value; } 
+      else if (attribute.trait_type == 'Mouth') {var subMouth = attribute.value; }
+
+    }
+
+    // <------ DETERMINE NEW METADATA (baseId, subId) ------> //
+    // https://freshfrogs.io/frog/preset_/ [ trait_type/value ] .png
+
+    // Base Adaptative Frog
+    //if (baseFrog == 'splendidLeafFrog' || baseFrog == 'stawberryDartFrog' || baseFrog == 'redEyedTreeFrog' && typeof subTrait !== 'undefined') { renderOverlay = baseFrog+'/'+baseTrait; } 
+    
+    // Sub Adaptative Frog
+    //else if (subFrog == 'splendidLeafFrog' || subFrog == 'stawberryDartFrog' || subFrog == 'redEyedTreeFrog' && typeof baseTrait !== 'undefined') { renderOverlay = subFrog+'/'+baseTrait; }
+    
+    // Special Frogs
+    if (typeof baseSpecialFrog !== 'undefined' || typeof subSpecialFrog !== 'undefined') {
+
+      // Base Special Frog AND Sub Special Frog
+      if (typeof baseSpecialFrog !== 'undefined' && typeof subSpecialFrog !== 'undefined') {
+        subSpecialFrog = baseSpecialFrog+'/SpecialFrog/'+subSpecialFrog;
+        subTrait = undefined;
+      }
+
+      // Base Special Frog
+      else if (typeof subFrog !== 'undefined') {
+        subTrait = 'SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
+        subSpecialFrog = baseSpecialFrog+'/'+subFrog;
+        subFrog = undefined;
+      }
+
+      // Sub Special Frog
+      else if (typeof baseFrog !== 'undefined') {
+        subTrait = 'SpecialFrog/'+subSpecialFrog+'/'+baseTrait;
+        baseSpecialFrog = subSpecialFrog;
+        subSpecialFrog = subSpecialFrog+'/'+baseFrog;
+        baseFrog = undefined;
+      }
+
+    }
+    
+    // Select Attributes!
+    if (typeof baseAccessory !== 'undefined') { var renderAccessory = baseAccessory; }
+    else if (typeof subAccessory !== 'undefined') { var renderAccessory = subAccessory; }
+    if (typeof baseEyes !== 'undefined') { var renderEyes = baseEyes; }
+    else if (typeof subEyes !== 'undefined') { var renderEyes = subEyes; }
+    if (typeof baseHat !== 'undefined') { var renderHat = baseHat; }
+    else if (typeof subHat !== 'undefined') {var renderHat = subHat;}
+    if (typeof baseMouth !== 'undefined') { var renderMouth = baseMouth; }
+    else if (typeof subMouth !== 'undefined') { var renderMouth = subMouth; }
+
+    // <------ BUILD NEW METADATA (baseId, subId) ------>
+    
+    // SUB FROG (UNDERLAY)
+    if (typeof subFrog !== 'undefined') { loadTrait('Frog', subFrog, build_loc); }
+    else if (typeof subSpecialFrog !== 'undefined') { loadTrait('SpecialFrog', subSpecialFrog, build_loc); }
+
+    // ADD ON OVERLAY
+    //if (typeof renderOverlay !== 'undefined') { loadTrait('Trait/Overlay', renderOverlay, build_loc); }
+
+    // BASE FROG (OVERLAY)
+    if (typeof baseFrog !== 'undefined') { loadTrait('Frog/base', baseFrog, build_loc); }
+    else if (typeof baseSpecialFrog !== 'undefined') { loadTrait('SpecialFrog/bottom', baseSpecialFrog, build_loc); }
+
+    // TRAIT(S)
+    if (typeof subTrait !== 'undefined') { loadTrait('Trait', subTrait, build_loc); }
+    else if (typeof baseTrait !== 'undefined') { loadTrait('Trait', baseTrait, build_loc); }
+
+    // ACCESSORIES
+    if (typeof renderAccessory !== 'undefined') { loadTrait('Accessory', renderAccessory, build_loc); }
+    if (typeof renderEyes !== 'undefined') { loadTrait('Eyes', renderEyes, build_loc); }
+    if (typeof renderHat !== 'undefined') { loadTrait('Hat', renderHat, build_loc); }
+    if (typeof renderMouth !== 'undefined') { loadTrait('Mouth', renderMouth, build_loc); }
+
+  }
+
   // Render Display
   async function render_display(tokenId) {
+
+    if (morph) {
+      console.log('morph')
+      recessive = tokenId;
+      morphFrogs(dominant, recessive, 'bigContainer');
+      return
+    } 
 
     console.log('test')
 
@@ -77,6 +193,10 @@
 
     document.getElementById('button_left').innerHTML = '<strong>Frog</strong>'+tokenId
     document.getElementById('button_right').innerHTML = '<strong>Morph</strong>builder'
+    document.getElementById('button_right').onclick = function (e) {
+      dominant = tokenId;
+      morph = true;
+    }
 
     // Update Display Image
     var bigContainer = document.getElementById('bigContainer');
