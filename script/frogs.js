@@ -119,8 +119,14 @@
     document.getElementById('button_left').removeEventListener("click", quantity_mint)
 
     // Update Buttons
+    let staked_render = await stakerAddress(tokenId)
+    if (!staked_render) {
+      document.getElementById('button_middle').innerHTML = '<strong>Stake</strong>deposit'
+    } else {
+      document.getElementById('button_middle').innerHTML = '<strong>Unstake</strong>withdraw'
+    }
+
     document.getElementById('button_left').innerHTML = '<strong>Frog</strong>'+tokenId
-    document.getElementById('button_middle').innerHTML = '<strong>Stake</strong>deposit'
     document.getElementById('button_right').innerHTML = '<strong>Morph</strong>builder'
 
     // Update Display Image
