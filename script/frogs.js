@@ -31,6 +31,8 @@
   async function fetch_staked_tokens(staker_address) {
 
     if (! staker_address) { staker_address = user_address; }
+    if (staker_address.toLowerCase() == user_address.toLowerCase()) { use_case = true; }
+    else { use_case = false; }
 
     // No. Tokens owned by staker_address
     let staker_tokens = await stakers(staker_address, 'amountStaked')
@@ -46,7 +48,7 @@
 
           fetch('https://api.opensea.io/api/v1/asset/'+CONTRACT_ADDRESS+'/'+tokenId+'/?include_orders=false', options)
             .then(token => token.json())
-            .then(token => render_token(token))
+            .then(token => render_token(token, use_case))
             .catch(err => console.error(err));
 
         }
