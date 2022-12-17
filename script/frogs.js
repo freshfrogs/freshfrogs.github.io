@@ -1021,7 +1021,7 @@
     // Scroll Into View
     morphing = false; base_frog = false; sub_frog = false;
     scroll_to('pre');
-    display_token(tokenId);
+    render_display(tokenId);
 
     // Begin Withdraw Txn
     consoleOutput(
@@ -1198,7 +1198,7 @@
     // Scroll Into View
     morphing = false; base_frog = false; sub_frog = false;
     scroll_to('pre');
-    display_token(tokenId);
+    render_display(tokenId);
 
     // Begin Withdraw Txn
     consoleOutput(
@@ -1226,7 +1226,7 @@
     // Scroll Into View
     morphing = false; base_frog = false; sub_frog = false;
     scroll_to('pre');
-    display_token(tokenId);
+    render_display(tokenId);
 
     // Begin Withdraw Txn
     consoleOutput(
@@ -1258,7 +1258,7 @@
     // Scroll Into View
     morphing = false; base_frog = false; sub_frog = false;
     scroll_to('pre');
-    display_token(tokenId);
+    render_display(tokenId);
 
     // Check Contract Approval
     let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
