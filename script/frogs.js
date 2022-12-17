@@ -173,6 +173,7 @@
       console.log('morph')
       recessive = tokenId;
       morphFrogs(dominant, recessive, 'bigContainer');
+      document.getElementById('button_left').innerHTML = '<strong>Frog</strong>'+dominant+'/'+recessive
       return
     } 
 
