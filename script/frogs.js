@@ -153,13 +153,15 @@
 
       for (var i = 0; i < pages; i++) {
 
+        thisItem = 0;
         // Fetch OpenSea Data
         fetch('https://api.opensea.io/api/v1/assets?owner='+fetch_address+'&order_direction=asc&asset_contract_address='+CONTRACT_ADDRESS+'&offset='+(i * 50)+'&limit=50&include_orders=false', options)
         .then((tokens) => tokens.json())
         .then((tokens) => {
           var { assets } = tokens
           assets.forEach((token) => {
-            console.log('Token: '+i+'/'+fetch_tokens)
+            thisItem++
+            console.log('Token: '+thisItem+'/'+fetch_tokens)
             render_token(token);
           })
         })
