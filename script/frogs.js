@@ -24,6 +24,37 @@
 
   }
 
+  // fetch_staked_tokens() | address
+  async function fetch_staked_tokens(staker_address) {
+
+    if (! staker_address) { staker_address = user_address; }
+
+    // No. Tokens owned by staker_address
+    let staker_tokens = await stakers(fetch_address, 'amountStaked')
+
+    // Render Frogs Staked by User
+    if (staker_tokens >= 1) {
+      let staker_tokens_array = await getStakedTokens(staker_address);
+      try { // Fetch staked token data
+        for (var i = 0; i < staker_tokens_array.length; i++) {
+          tokenId = staker_tokens_array[i].tokenId
+
+          let options = {method: 'GET'};
+
+          fetch('https://api.opensea.io/api/v1/asset/'+CONTRACT_ADDRESS+'/'+tokenId+'/?include_orders=false', options)
+            .then(token => token.json())
+            .then(token => render_token(token))
+            .catch(err => console.error(err));
+
+        }
+      } catch (e) {
+
+        console.log('Failed to talk to OpenSea!\n'+e.message);
+
+      }
+    }
+  }
+
   // fetch_user_tokens() | address
   async function fetch_user_tokens(fetch_address) {
     if (! fetch_address) { fetch_address = user_address; }
@@ -349,7 +380,7 @@
               '<br>'+user_tokens+''+
             '</div>'+
             '<div class="terminalBottom">'+
-            '<a class="displayUnit" id="ownedTokens" href="./staked">Owned</a>'+
+            '<a class="displayUnit" id="stakedTokens" href="./staked">Staked</a>'+
               '<br>'+staked_tokens+''+
             '</div>'+
             '<div class="terminalBottom">'+
