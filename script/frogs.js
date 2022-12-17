@@ -587,25 +587,25 @@
           '<div class="innerRight">'+
             '<div id="traits_'+token_id+'" class="trait_list">'+
               //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
-              '<strong>'+name+'</strong> <text style="color: #1ac486;">'+opensea_username+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+              '<strong>'+name+'</strong> <text style="color: #1ac486; font-weight: bold;">'+opensea_username+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
             '</div>'+
             '<div id="prop_'+token_id+'" class="properties">'+
               '<div style="margin: 8px; float: left; width: 100px;">'+
                 '<text>Time Staked</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+staked_time_days+' days</text>'+
+                '<text style="color: #1ac486; font-weight: bold;">'+staked_time_days+' days</text>'+
               '</div>'+
               '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text>$FLYZ Earned</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+staked_earned+'</text>'+
+                '<text style="color: #1ac486; font-weight: bold;">'+staked_earned+'</text>'+
               '</div>'+
               '<br>'+
               '<div style="margin: 8px; float: left; width: 100px;">'+
                 '<text>Level</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+staked_level+'</text>'+
+                '<text style="color: #1ac486; font-weight: bold;">'+staked_level+'</text>'+
               '</div>'+
               '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text>Next Level</text>'+'<br>'+
-                '<text style="color: #1ac486;">'+staked_next+' days</text>'+
+                '<text style="color: #1ac486; font-weight: bold;">'+staked_next+' days</text>'+
               '</div>'+
               '<div style="text-align: center;">'+
                 '<a href="'+permalink+'" target="_blank"><button class="os_button">View on OpenSea</button></a>'+
