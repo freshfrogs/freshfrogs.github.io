@@ -191,6 +191,11 @@
     document.getElementById('button_middle').className = 'pointer'
     document.getElementById('button_left').innerHTML = '<strong>Frog</strong>'+tokenId
     document.getElementById('button_left').className = 'pointer'
+    document.getElementById('button_left').onclick = function (e) {
+      morph = false;
+      render_display(tokenId)
+    }
+
     document.getElementById('button_right').innerHTML = '<strong>Morph</strong>builder'
     document.getElementById('button_right').className = 'pointer'
     document.getElementById('button_right').onclick = function (e) {
