@@ -1191,6 +1191,25 @@
     }
   }
 
+  // setApproval | set staking contract approval
+  async function setApprovalForAll() {
+
+    // Check Approval Status
+    let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+    if (!is_approved) { 
+      try {
+        
+        // Send Txn
+        let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
+        return true;
+
+      // Catch Errors
+      } catch (e) { return '❌ '+e.message; }
+    
+    // Already Approved
+    } else { return true; }
+  }
+
   // FreshFrogsController | NFT Staking Smart Contract | 0xCB1ee125CFf4051a10a55a09B10613876C4Ef199
 
   async function claimRewards_init() {
