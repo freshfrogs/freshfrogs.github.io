@@ -228,7 +228,7 @@
 
     // No. Tokens owned by fetch_address
     fetch_tokens = await collection.methods.balanceOf(fetch_address).call();
-    document.getElementById('stakedTotal').innerHTML = '<limit class="displayUnit">Staked Total</limit><br>'+fetch_tokens;
+    //document.getElementById('stakedTotal').innerHTML = '<limit class="displayUnit">Staked Total</limit><br>'+fetch_tokens;
 
     if (fetch_tokens >= 1) {
 
