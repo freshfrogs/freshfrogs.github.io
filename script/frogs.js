@@ -247,6 +247,7 @@
           })
         })
         .catch(e => {
+          console.log(e.message)
           consoleOutput(
             '<div style="text-align: left;">'+
               'Failed to fetch user data (partial). Try refreshing the page!<br>'+
