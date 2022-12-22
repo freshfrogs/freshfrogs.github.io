@@ -963,7 +963,7 @@
         return staked_hours;
 
       // Catch Errors, Return 0.00
-      } catch (e) { return 0.00; }
+      } catch (e) { console.log(e.message); return 0.00; }
     }
   }
 
