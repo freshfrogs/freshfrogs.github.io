@@ -425,8 +425,9 @@
 
       async function connect_init() {
 
-        connect();
-        fetch_user_tokens(CONTROLLER_ADDRESS);
+        await connect();
+        await connect_minting();
+        await fetch_user_tokens(CONTROLLER_ADDRESS);
 
       }
 
