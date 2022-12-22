@@ -533,24 +533,26 @@
   // connect() | Connect Wallet | Update Collection Data
   async function connect() {
 
-    // Connecting
-    consoleOutput(
-      '<div style="text-align: left;">'+
-        'Waiting to connect Ethereum wallet...<br>'+
-      '</div>'
-    );
-
-    fetch_opensea_collection();
-
-    // Connect WEB3, Factoria
-    const web3 = new Web3(window.ethereum);
-    const f0 = new F0();
-
-    // Connect Collection Smart Contract, Staking Smart Contract
-    COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
-    CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
-
     try { // Attempt to Connect!
+
+      // Connecting
+      consoleOutput(
+        '<div style="text-align: left;">'+
+          'Waiting to connect Ethereum wallet...<br>'+
+        '</div>'
+      );
+
+      fetch_opensea_collection();
+
+      // Connect WEB3, Factoria
+      const web3 = new Web3(window.ethereum);
+      const f0 = new F0();
+
+      // Connect Collection Smart Contract, Staking Smart Contract
+      COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
+      CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
+
+    
 
       consoleOutput(
         '<div style="text-align: left;">'+
@@ -634,12 +636,13 @@
       )
 
     } catch (e) { // Something Went Wrong!
+      console.log(e.message)
       consoleOutput(
         '<div style="text-align: left;">'+
           '❌ Failed to connect Ethereum wallet: '+'<br>'+
           e.message+
         '</div>'
-      );
+      ).catch(e => console.log(e.message));
     }
   }
 
