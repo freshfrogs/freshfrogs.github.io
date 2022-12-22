@@ -642,7 +642,7 @@
           '❌ Failed to connect Ethereum wallet: '+'<br>'+
           e.message+
         '</div>'
-      ).catch(e => console.log(e.message));
+      );
     }
   }
 
