@@ -23,7 +23,7 @@
     console.log('Updated Next ID: '+next_id)
     document.getElementById('supply').innerHTML = (next_id-1)+'/4,040';
     document.getElementById('mintImage').src = '../frog/'+next_id+'.png';
-    document.getElementById('button_middle').innerHTML = '<strong>Frog</strong>'+next_id
+    document.getElementById('button_middle').innerHTML = '<strong>Frog</strong>#'+next_id
 
   }
 
@@ -175,7 +175,7 @@
       console.log('morph')
       recessive = tokenId;
       morphFrogs(dominant, recessive, 'bigContainer');
-      document.getElementById('button_left').innerHTML = '<strong>Frog</strong>'+dominant+'/'+recessive
+      document.getElementById('button_left').innerHTML = '<strong>Frog</strong>#'+dominant+'/'+recessive
       return
     } 
 
@@ -189,7 +189,7 @@
     document.getElementById('button_middle').href = 'https://freshfrogs.io/frog/'+tokenId+'.png'
     document.getElementById('button_middle').target = '_blank'
     document.getElementById('button_middle').className = 'pointer'
-    document.getElementById('button_left').innerHTML = '<strong>Frog</strong>'+tokenId
+    document.getElementById('button_left').innerHTML = '<strong>Frog</strong>#'+tokenId
     document.getElementById('button_left').className = 'pointer'
 
     document.getElementById('button_right').innerHTML = '<strong>Morph</strong>builder'
