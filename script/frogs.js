@@ -573,6 +573,10 @@
       user_invites = await f0.myInvites();
       user_keys = Object.keys(user_invites);
       user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
+
+      // User Invites
+      mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1);
+      mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1);
       
       // No. Tokens owned by fetch_address
       user_tokens = await collection.methods.balanceOf(user_address).call();
@@ -590,9 +594,6 @@
       next_id = parseInt(next_id);
 
       console.log('Retrieving user invites...')
-
-      // User Invites
-      await getInvites();
 
       // Connected!
       console.log(
