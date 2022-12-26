@@ -445,63 +445,6 @@
 
   async function connect_minting() {
 
-    quantity_up = function (e) {
-      if (mint_quantity >= 10) { return; }
-      else {
-        mint_quantity = mint_quantity + 1;
-        mint_total = mint_price*mint_quantity;
-        document.getElementById('mint_quantity').innerHTML = mint_quantity
-        document.getElementById('button_left').innerHTML = '<strong>Mint</strong>'+mint_total.toFixed(3)+'Ξ'
-        document.getElementById('mintImage').src = '../frog/'+((next_id+mint_quantity)-1)+'.png'
-        document.getElementById('button_middle').innerHTML = '<strong>Frog</strong>'+((next_id+mint_quantity)-1)
-      }
-    };
-  
-    quantity_down = function (e) {
-      if (mint_quantity <= 1) { return; }
-      else {
-        mint_quantity = mint_quantity - 1;
-        mint_total = mint_price*mint_quantity;
-        document.getElementById('mint_quantity').innerHTML = mint_quantity
-        document.getElementById('button_left').innerHTML = '<strong>Mint</strong>'+mint_total.toFixed(3)+'Ξ'
-        document.getElementById('mintImage').src = '../frog/'+((next_id+mint_quantity)-1)+'.png'
-        document.getElementById('button_middle').innerHTML = '<strong>Frog</strong>'+((next_id+mint_quantity)-1)
-      }
-    };
-  
-    quantity_mint = async function (e) {
-      console.log('Sending mint transaction!\n'+
-      mint_quantity+' Tokens @ Ξ'+mint_price+' : ['+(mint_total)+']');
-  
-      try {
-        consoleOutput(
-          '<div style="text-align: left;">'+
-            'Minting <b>'+collection_name+'</b> x'+mint_quantity+'<br>'+
-            'Please sign the transaction and wait...'+
-          '</div>'
-        );
-  
-        let tokens = await f0.mint(user_invite, mint_quantity);
-  
-        consoleOutput(
-          '<div style="text-align: left;">'+
-            'Congratulations! Tokens successfully minted!<br>'+
-          '</div>'
-        );
-  
-      } catch (e) {
-        consoleOutput(
-          '<div style="text-align: left;">'+
-            'Something went wrong! :(<br>'+e.message+
-          '</div>'
-        );
-      }
-    };
-
-    document.getElementById('quantity+').addEventListener("click", quantity_up)
-    document.getElementById('quantity-').addEventListener("click", quantity_down)
-    document.getElementById('button_left').addEventListener("click", quantity_mint)
-
   }
 
   async function fetch_opensea_collection() {
@@ -608,7 +551,62 @@
       update_display();
 
       // Minting
-      connect_minting();
+      quantity_up = function (e) {
+        if (mint_quantity >= 10) { return; }
+        else {
+          mint_quantity = mint_quantity + 1;
+          mint_total = mint_price*mint_quantity;
+          document.getElementById('mint_quantity').innerHTML = mint_quantity
+          document.getElementById('button_left').innerHTML = '<strong>Mint</strong>'+mint_total.toFixed(3)+'Ξ'
+          document.getElementById('mintImage').src = '../frog/'+((next_id+mint_quantity)-1)+'.png'
+          document.getElementById('button_middle').innerHTML = '<strong>Frog</strong>'+((next_id+mint_quantity)-1)
+        }
+      };
+    
+      quantity_down = function (e) {
+        if (mint_quantity <= 1) { return; }
+        else {
+          mint_quantity = mint_quantity - 1;
+          mint_total = mint_price*mint_quantity;
+          document.getElementById('mint_quantity').innerHTML = mint_quantity
+          document.getElementById('button_left').innerHTML = '<strong>Mint</strong>'+mint_total.toFixed(3)+'Ξ'
+          document.getElementById('mintImage').src = '../frog/'+((next_id+mint_quantity)-1)+'.png'
+          document.getElementById('button_middle').innerHTML = '<strong>Frog</strong>'+((next_id+mint_quantity)-1)
+        }
+      };
+    
+      quantity_mint = async function (e) {
+        console.log('Sending mint transaction!\n'+
+        mint_quantity+' Tokens @ Ξ'+mint_price+' : ['+(mint_total)+']');
+    
+        try {
+          consoleOutput(
+            '<div style="text-align: left;">'+
+              'Minting <b>'+collection_name+'</b> x'+mint_quantity+'<br>'+
+              'Please sign the transaction and wait...'+
+            '</div>'
+          );
+    
+          let tokens = await f0.mint(user_invite, mint_quantity);
+    
+          consoleOutput(
+            '<div style="text-align: left;">'+
+              'Congratulations! Tokens successfully minted!<br>'+
+            '</div>'
+          );
+    
+        } catch (e) {
+          consoleOutput(
+            '<div style="text-align: left;">'+
+              'Something went wrong! :(<br>'+e.message+
+            '</div>'
+          );
+        }
+      };
+  
+      document.getElementById('quantity+').addEventListener("click", quantity_up)
+      document.getElementById('quantity-').addEventListener("click", quantity_down)
+      document.getElementById('button_left').addEventListener("click", quantity_mint)
 
       Output(
         '<div>'+
