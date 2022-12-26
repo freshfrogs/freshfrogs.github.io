@@ -607,6 +607,9 @@
       // Update UI
       update_display();
 
+      // Minting
+      connect_minting();
+
       Output(
         '<div>'+
           '<div class="terminalTop">'+
