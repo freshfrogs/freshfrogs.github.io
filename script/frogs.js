@@ -214,6 +214,31 @@
 
     // No. Tokens owned by staker_address
     let staker_tokens = await stakers(staker_address, 'amountStaked')
+    let staker_rewards = await stakers(staker_address, 'unclaimedRewards');
+
+    Output(
+      '<div>'+
+        '<div class="terminalTop">'+
+          '<wallet class="displayUnit">Wallet Address</wallet>'+
+          '<br>'+user_address+''+
+        '</div>'+
+        '<div class="terminalBase">'+
+          '<div class="terminalBottom">'+
+            '<a class="displayUnit" id="ownedTokens" href="../owned">Owned</a>'+
+            '<br>'+user_tokens+''+
+          '</div>'+
+          '<div class="terminalBottom">'+
+          '<a class="displayUnit" id="stakedTokens" href="../staked">Staked</a>'+
+            '<br>'+staked_tokens+''+
+          '</div>'+
+          '<div class="terminalBottom">'+
+            '<limit class="displayUnit">Unclaimed Rewards</limit>'+
+            '<br>'+staker_rewards+' $FLYZ'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="console_pre" id="console-pre"></div>'
+    )
 
     // Render Frogs Staked by User
     if (staker_tokens >= 1) {
@@ -441,10 +466,6 @@
 
     }
     
-  }
-
-  async function connect_minting() {
-
   }
 
   async function fetch_opensea_collection() {
