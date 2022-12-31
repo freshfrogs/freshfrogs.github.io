@@ -214,7 +214,7 @@
 
     // No. Tokens owned by staker_address
     let staker_tokens = await stakers(staker_address, 'amountStaked')
-    let staker_rewards = await stakers(staker_address, 'unclaimedRewards');
+    let staker_rewards = await availableRewards(staker_address);
 
     Output(
       '<div>'+
