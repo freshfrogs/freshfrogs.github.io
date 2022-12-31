@@ -215,7 +215,7 @@
     // No. Tokens owned by staker_address
     let staker_tokens = await stakers(staker_address, 'amountStaked')
     let staker_rewards = await availableRewards(staker_address);
-
+    staker_rewards = String(staker_rewards).slice(0, 6);
     Output(
       '<div>'+
         '<div class="terminalTop">'+
@@ -1161,7 +1161,9 @@
 
   // availableRewards(_staker (address)) | return uint256
   async function availableRewards(userAddress) {
-    return await controller.methods.availableRewards(userAddress).call();
+    let available_rewards = await controller.methods.availableRewards(userAddress).call();
+    available_rewards = (available_rewards / 1000000000000000000);
+    return available_rewards;
 
   }
 
