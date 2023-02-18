@@ -1288,7 +1288,8 @@
 
     // Begin Withdraw Txn
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<div class="display_token_img_cont" id="txnDisplayToken"></div>'+
+      //'<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
       '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
@@ -1296,18 +1297,23 @@
       '</div>'
     );
 
+    await txnDisplayToken(tokenId);
+
     // Submit Txn
     let withdraw_txn = await withdraw(tokenId);
 
     // Begin Withdraw Txn
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<div class="display_token_img_cont" id="txnDisplayToken"></div>'+
+      //'<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
       '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
         '<strong>Withdraw NFT</strong><br> '+withdraw_txn+
       '</div>'
     );
+
+    await txnDisplayToken(tokenId);
 
   }
 
