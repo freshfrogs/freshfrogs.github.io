@@ -1311,6 +1311,20 @@
 
   }
 
+  async function txnDisplayToken(token_id) {
+
+    // Update Metadata! Build Frog -->
+    let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
+
+    for (let i = 0; i < metadata.attributes.length; i++) {
+
+      let attribute = metadata.attributes[i]
+      loadTrait(attribute.trait_type, attribute.value, 'txnDisplayToken');
+
+    }
+
+  }
+
   async function stake_init(tokenId) {
 
     // Scroll Into View
@@ -1325,7 +1339,8 @@
     if (!is_approved) {
 
       consoleOutput(
-        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+        '<div class="display_token_img_cont" id="txnDisplayToken"></div>'+
+        //'<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
         '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
         'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
         '<br><div style="text-align: left;">'+
@@ -1334,13 +1349,16 @@
         '</div>'
       );
 
+      await txnDisplayToken(tokenId);
+
       // Submit Txn
       let set_approval = await setApprovalForAll();
 
       if (set_approval !==true) {
 
         consoleOutput(
-          '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+          '<div class="display_token_img_cont" id="txnDisplayToken"></div>'+
+          //'<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
           '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
           'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
           '<br><div style="text-align: left;">'+
@@ -1348,6 +1366,8 @@
             '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
           '</div>'
         );
+
+        await txnDisplayToken(tokenId);
 
         // Catch Error
         return
@@ -1357,7 +1377,8 @@
 
     // Begin Stake Txn
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<div class="display_token_img_cont" id="txnDisplayToken"></div>'+
+      //'<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
       '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
@@ -1365,18 +1386,23 @@
       '</div>'
     );
 
+    await txnDisplayToken(tokenId);
+
     // Submit Txn
     let stake_txn = await stake(tokenId);
 
     // Complete
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<div class="display_token_img_cont" id="txnDisplayToken"></div>'+
+      //'<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
       '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
         '<strong>Stake NFT</strong><br> '+stake_txn+
       '</div>'
     );
+
+    await txnDisplayToken(tokenId);
 
   }
 
