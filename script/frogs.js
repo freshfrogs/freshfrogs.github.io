@@ -524,7 +524,7 @@
     document.getElementById('frogs').innerHTML = ''
 
     // Fetch OpenSea Data
-    fetch('https://api.opensea.io/api/v1/assets?&order_direction=asc&asset_contract_address='+CONTRACT_ADDRESS+'&limit=50&include_orders=false', options)
+    fetch('https://api.opensea.io/api/v1/assets?&order_direction=desc&asset_contract_address='+CONTRACT_ADDRESS+'&limit=50&include_orders=false', options)
     .then((tokens) => tokens.json())
     .then((tokens) => {
       var { assets } = tokens
