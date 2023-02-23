@@ -421,6 +421,128 @@
 
   }
 
+  /*
+
+    Render NFT Token to UI (collection token)
+
+  */
+
+  async function display_collection_token(token) {
+
+    let opensea_username = '';
+    let token_owner = '';
+
+    // Assign token variables from data object
+    try { var { token_id, external_link, permalink, name, rarity_data: { rank }, owner: { address, user: { username } } } = token } catch (e) {} // , last_sale: { payment_token: { decimals }, total_price }
+
+    if (typeof address == 'undefined' || address == '' || address == null) {
+      console.log('Token #'+token_id+' owner address not found')
+      //address = await collection.methods.ownerOf(token_id).call();
+    }
+
+    let image_link = '../frog/'+token_id+'.png'
+
+    opensea_username = username
+
+    if (typeof opensea_username == 'undefined' || opensea_username == '' || opensea_username == null) {
+      opensea_username = truncateAddress(address)
+    }
+
+    if (typeof name == 'undefined' || name == '' || name == null) {
+      name = 'Frog #'+token_id
+    }
+
+    button_elements = 
+    '<div style="text-align: center;">'+
+      '<a href="'+permalink+'" target="_blank"><button class="os_button">View on OpenSea</button></a>'+
+    '</div>';
+
+    // <-- Begin Element
+    token_doc = document.getElementById('frogs');
+    token_element = document.createElement('div');
+
+    // Element Details -->
+    token_element.id = name;
+    token_element.className = 'display_token';
+    token_element.innerHTML = 
+      '<div class="display_token_cont">'+
+        '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
+          '<div class="innerLeft">'+
+            '<div class="display_token_img_cont" id="cont_'+token_id+'" onclick="render_display('+token_id+')">'+
+              //'<img src="'+image_link+'" class="displayImage"/>'+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+        '<div class="renderRight">'+
+          '<div class="innerRight">'+
+            '<div id="traits_'+token_id+'" class="trait_list">'+
+              //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
+              '<strong>'+name+'</strong> <text style="color: #1ac486; font-weight: bold;">'+opensea_username+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+            '</div>'+
+            '<div id="prop_'+token_id+'" class="properties">'+
+              '<div style="margin: 8px; float: left; width: 100px;">'+
+                '<text>Time Staked</text>'+'<br>'+
+                '<text style="color: #1ac486; font-weight: bold;">'+''+' days</text>'+
+              '</div>'+
+              '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text>$FLYZ Earned</text>'+'<br>'+
+                '<text style="color: #1ac486; font-weight: bold;">'+''+'</text>'+
+              '</div>'+
+              '<br>'+
+              '<div style="margin: 8px; float: left; width: 100px;">'+
+                '<text>Level</text>'+'<br>'+
+                '<text style="color: #1ac486; font-weight: bold;">'+''+'</text>'+
+              '</div>'+
+              '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text>Next Level</text>'+'<br>'+
+                '<text style="color: #1ac486; font-weight: bold;">'+''+' days</text>'+
+              '</div>'+
+              button_elements+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+
+    // Create Element <--
+    token_doc.appendChild(token_element);
+
+    // Update Metadata! Build Frog -->
+    let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
+
+    for (let i = 0; i < metadata.attributes.length; i++) {
+
+      let attribute = metadata.attributes[i]
+      loadTrait(attribute.trait_type, attribute.value, 'cont_'+token_id);
+
+    }
+
+  }
+
+  // fetch_collection_tokens()
+  async function fetch_collection_tokens() {
+
+    document.getElementById('frogs').innerHTML = ''
+
+    // Fetch OpenSea Data
+    fetch('https://api.opensea.io/api/v1/assets?&order_direction=asc&asset_contract_address='+CONTRACT_ADDRESS+'&limit=50&include_orders=false', options)
+    .then((tokens) => tokens.json())
+    .then((tokens) => {
+      var { assets } = tokens
+      assets.forEach((token) => {
+        display_collection_token(token);
+      })
+    })
+    .catch(e => {
+      console.log(e.message)
+      consoleOutput(
+        '<div style="text-align: left;">'+
+          'Failed to talk to opensea! Try refreshing the page!<br>'+
+        '</div>'
+      );
+    })
+    
+  }
+
   // fetch_user_tokens() | address
   async function fetch_user_tokens(fetch_address) {
     if (! fetch_address) { fetch_address = user_address; }
