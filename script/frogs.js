@@ -481,24 +481,6 @@
               '<strong>'+name+'</strong> <text style="color: #1ac486; font-weight: bold;">'+opensea_username+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
             '</div>'+
             '<div id="prop_'+token_id+'" class="properties">'+
-              '<div style="margin: 8px; float: left; width: 100px;">'+
-                '<text>Time Staked</text>'+'<br>'+
-                '<text style="color: #1ac486; font-weight: bold;">'+''+' days</text>'+
-              '</div>'+
-              '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text>$FLYZ Earned</text>'+'<br>'+
-                '<text style="color: #1ac486; font-weight: bold;">'+''+'</text>'+
-              '</div>'+
-              '<br>'+
-              '<div style="margin: 8px; float: left; width: 100px;">'+
-                '<text>Level</text>'+'<br>'+
-                '<text style="color: #1ac486; font-weight: bold;">'+''+'</text>'+
-              '</div>'+
-              '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text>Next Level</text>'+'<br>'+
-                '<text style="color: #1ac486; font-weight: bold;">'+''+' days</text>'+
-              '</div>'+
-              button_elements+
             '</div>'+
           '</div>'+
         '</div>'+
@@ -510,10 +492,34 @@
     // Update Metadata! Build Frog -->
     let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
 
+    // Boolean
+    let b = true;
+
     for (let i = 0; i < metadata.attributes.length; i++) {
 
+      // Build Token Image
       let attribute = metadata.attributes[i]
       loadTrait(attribute.trait_type, attribute.value, 'cont_'+token_id);
+
+      // Input properties
+      properties_div = document.getElementById('prop_'+token_id)
+      trait_element = document.createElement('div');
+      trait_element.className = 'traitProperties'
+
+      // Style Float
+      if (b) { trait_element.style.float = 'Left'; } // Class A (left)
+      else { trait_element.style.float = 'Right'; } // Class B (right)
+      
+      // Properties Text
+      trait_element.innerHTML = 
+        '<text>'+attribute.trait_type+'</text>'+'<br>'+
+        '<text style="color: #1ac486; font-weight: bold;">'+attribute.value+'</text>'
+      
+      // Append Child
+      properties_div.appendChild(trait_element)
+
+      // Toggle style float
+      b = !b;
 
     }
 
