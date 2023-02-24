@@ -516,7 +516,7 @@
         '<text>'+attribute.trait_type+'</text>'+'<br>'+
         '<text style="color: #1ac486; font-weight: bold;">'+attribute.value+'</text>'
       
-      // Inster break for every other element
+      // Insert break for every other element
       if (b && i !== 0) {
         linebreak = document.createElement("br");
         properties_div.appendChild(linebreak);
