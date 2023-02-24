@@ -516,14 +516,14 @@
         '<text>'+attribute.trait_type+'</text>'+'<br>'+
         '<text style="color: #1ac486; font-weight: bold;">'+attribute.value+'</text>'
       
-      // Append Child
-      properties_div.appendChild(trait_element)
-
       // Inster break for every other element
-      if (b && i > 0) {
+      if (b && i !== 0) {
         linebreak = document.createElement("br");
         properties_div.appendChild(linebreak);
       }
+
+      // Append Child
+      properties_div.appendChild(trait_element)
 
       // Toggle style float
       b = !b;
