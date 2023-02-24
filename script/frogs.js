@@ -436,7 +436,7 @@
     try { var { token_id, external_link, permalink, name, rarity_data: { rank }, owner: { address, user: { username } } } = token } catch (e) {} // , last_sale: { payment_token: { decimals }, total_price }
 
     console.log(token)
-    
+
     if (typeof address == 'undefined' || address == '' || address == null) {
       //address = await collection.methods.ownerOf(token_id).call();
     }
@@ -482,6 +482,7 @@
             '</div>'+
             '<div id="prop_'+token_id+'" class="properties">'+
             '</div>'+
+            '<div>'+button_elements+'</div>'+
           '</div>'+
         '</div>'+
       '</div>';
