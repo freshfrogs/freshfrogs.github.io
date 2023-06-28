@@ -32,7 +32,7 @@ async function fetch_collection(order) {
 
 async function display_token(token_id) {
 
-    let image_link = '../frog/'+token_id+'.png'
+    let image_link = SOURCE_PATH+'images/'+token_id+'.png'
     let token_name = 'Frog #'+token_id
 
     // <-- Begin Element
