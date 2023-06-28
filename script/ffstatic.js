@@ -16,10 +16,20 @@ async function fetch_collection(order) {
 
     } else {
 
-        // 4040 - 1
-        for (let i = 404; i < 1; i++) {
-            await display_token(i)
+        //
+
+        var exists = [],
+        randomNumber;
+        for(var l=1;l < 4040;l++) {
+            do {
+                randomNumber = Math.floor(Math.random()*4040);  
+            } while (exists[randomNumber]);
+            exists[randomNumber] = true;
+            console.log(randomNumber)
+            display_token(i)
         }
+
+        //
         
     }
 
