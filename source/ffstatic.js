@@ -8,7 +8,7 @@ var SOURCE_PATH = '../source/base_files/Toadz/'
 async function fetch_collection(order) {
 
     var arr = [];
-    while(arr.length < 202){
+    while(arr.length < 207){
         var r = Math.floor(Math.random() * 4040) + 1;
         if(arr.indexOf(r) === -1) arr.push(r);
     }
