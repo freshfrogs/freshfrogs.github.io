@@ -53,7 +53,7 @@ async function display_token(token_id) {
     token_doc.appendChild(token_element);
 
     // Update Metadata! Build Frog -->
-    let token_metadata = await (await fetch("../frog/json/"+token_id+".json")).json();
+    let token_metadata = await (await fetch(SOURCE_PATH+"json/"+token_id+".json")).json();
 
     for (let j = 0; j < token_metadata.attributes.length; j++) {
 
