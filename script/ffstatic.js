@@ -63,6 +63,7 @@ async function display_token(token_id) {
     // Create Element <--
     token_doc.appendChild(token_element);
 
+    /*
     // Update Metadata! Build Frog -->
     let token_metadata = await (await fetch("../frog/json/"+token_id+".json")).json();
 
@@ -102,6 +103,7 @@ async function display_token(token_id) {
         b = !b;
 
     }
+    */
     
 }
 
