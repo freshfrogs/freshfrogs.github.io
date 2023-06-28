@@ -7,32 +7,16 @@ var SOURCE_PATH = '../SRC/'
 // Fetch Collection
 async function fetch_collection(order) {
 
-    if (order > 0) {
-
-        // 1 - 4040
-        for (let i = 1; i < 4040; i++) {
-            await display_token(i)
-        }
-
-    } else {
-
-        //
-
-        var exists = [],
-        randomNumber;
-        for(var l=1;l < 4040;l++) {
-            do {
-                randomNumber = Math.floor(Math.random()*4040);  
-            } while (exists[randomNumber]);
-            exists[randomNumber] = true;
-            console.log(randomNumber)
-            display_token(i)
-        }
-
-        //
-        
+    var exists = [],
+    randomNumber;
+    for(var l=1;l < 4040;l++) {
+        do {
+            randomNumber = Math.floor(Math.random()*4040);  
+        } while (exists[randomNumber]);
+        exists[randomNumber] = true;
+        console.log(randomNumber)
+        display_token(l)
     }
-
 }
 
   /*
