@@ -8,7 +8,7 @@ var SOURCE_PATH = '../source/base_files/Toadz/'
 async function fetch_collection(order) {
 
     console.log(SOURCE_PATH)
-    
+
     var arr = [];
     while(arr.length < 207){
         var r = Math.floor(Math.random() * 4040) + 1;
@@ -73,15 +73,15 @@ async function display_token(token_id) {
         newAttribute = document.createElement("img");
         newAttribute.alt = attribute
 
-        if (attribute == 'tongueSpiderRed' || attribute == 'tongueSpider' || attribute == 'tongue' || attribute == 'tongueFly' || attribute == 'croaking' || attribute == 'peace' || attribute == 'inversedEyes' || attribute == 'closedEyes' || attribute == 'thirdEye' || attribute == 'mask' || attribute == 'smoking' || attribute == 'smokingCigar' || attribute == 'smokingPipe' || attribute == 'circleShadesRed' || attribute == 'circleShadesPurple' || attribute == 'shades' || attribute == 'shadesPurple' || attribute == 'shadesThreeD' || attribute == 'shadesWhite' || attribute == 'circleNightVision') {
+       // if (attribute == 'tongueSpiderRed' || attribute == 'tongueSpider' || attribute == 'tongue' || attribute == 'tongueFly' || attribute == 'croaking' || attribute == 'peace' || attribute == 'inversedEyes' || attribute == 'closedEyes' || attribute == 'thirdEye' || attribute == 'mask' || attribute == 'smoking' || attribute == 'smokingCigar' || attribute == 'smokingPipe' || attribute == 'circleShadesRed' || attribute == 'circleShadesPurple' || attribute == 'shades' || attribute == 'shadesPurple' || attribute == 'shadesThreeD' || attribute == 'shadesWhite' || attribute == 'circleNightVision') {
             
-            newAttribute.src = SOURCE_PATH+trait+"/animations/"+attribute+"_animation.gif";
+           // newAttribute.src = SOURCE_PATH+trait+"/animations/"+attribute+"_animation.gif";
 
-        } else {
+       // } else {
 
             newAttribute.src = SOURCE_PATH+trait+"/"+attribute+".png";
 
-        }
+       // }
 
         if (where == 'bigContainer') {
 
