@@ -37,11 +37,6 @@ async function display_token(token_id) {
     let image_link = '../frog/'+token_id+'.png'
     let token_name = 'Frog #'+token_id
 
-    button_elements = 
-        '<div style="text-align: center;">'+
-            '<a href="'+image_link+'" target="_blank"><button class="os_button">Original Image</button></a>'+
-        '</div>';
-
     // <-- Begin Element
     token_doc = document.getElementById('frogs');
     token_element = document.createElement('div');
