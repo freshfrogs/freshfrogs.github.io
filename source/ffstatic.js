@@ -85,11 +85,11 @@ async function display_token(token_id) {
 
         if (attribute == 'tongueSpiderRed' || attribute == 'tongueSpider' || attribute == 'tongue' || attribute == 'tongueFly' || attribute == 'croaking' || attribute == 'peace' || attribute == 'inversedEyes' || attribute == 'closedEyes' || attribute == 'thirdEye' || attribute == 'mask' || attribute == 'smoking' || attribute == 'smokingCigar' || attribute == 'smokingPipe' || attribute == 'circleShadesRed' || attribute == 'circleShadesPurple' || attribute == 'shades' || attribute == 'shadesPurple' || attribute == 'shadesThreeD' || attribute == 'shadesWhite' || attribute == 'circleNightVision') {
             
-            newAttribute.src = "../source/"+trait+"/animations/"+attribute+"_animation.gif";
+            newAttribute.src = "../source/base_files/"+trait+"/animations/"+attribute+"_animation.gif";
 
         } else {
 
-            newAttribute.src = "../source/"+trait+"/"+attribute+".png";
+            newAttribute.src = "../source/base_files/"+trait+"/"+attribute+".png";
 
         }
 
