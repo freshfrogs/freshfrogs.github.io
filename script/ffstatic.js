@@ -67,10 +67,6 @@ async function display_token(token_id) {
     
 }
 
-
-    // ----
-
-
     // loadTrait(_trait(family), _attribute(type), _where(element))
     function loadTrait(trait, attribute, where) {
 
