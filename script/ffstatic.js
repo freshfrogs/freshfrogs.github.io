@@ -83,7 +83,7 @@ async function display_token(token_id) {
     for (let j = 0; j < token_metadata.attributes.length; j++) {
 
         // Build Token Image
-        let attribute = token_metadata.attributes[i]
+        let attribute = token_metadata.attributes[j]
         loadTrait(attribute.trait_type, attribute.value, 'cont_'+token_id);
 
         // Input properties
