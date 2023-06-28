@@ -2,7 +2,7 @@
 
 // Variables
 var CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
-var SOURCE_PATH = '../SRC/'
+var SOURCE_PATH = '../source/base_files/Toadz/'
 
 // Fetch Collection
 async function fetch_collection(order) {
@@ -73,11 +73,11 @@ async function display_token(token_id) {
 
         if (attribute == 'tongueSpiderRed' || attribute == 'tongueSpider' || attribute == 'tongue' || attribute == 'tongueFly' || attribute == 'croaking' || attribute == 'peace' || attribute == 'inversedEyes' || attribute == 'closedEyes' || attribute == 'thirdEye' || attribute == 'mask' || attribute == 'smoking' || attribute == 'smokingCigar' || attribute == 'smokingPipe' || attribute == 'circleShadesRed' || attribute == 'circleShadesPurple' || attribute == 'shades' || attribute == 'shadesPurple' || attribute == 'shadesThreeD' || attribute == 'shadesWhite' || attribute == 'circleNightVision') {
             
-            newAttribute.src = "../source/base_files/"+trait+"/animations/"+attribute+"_animation.gif";
+            newAttribute.src = SOURCE_PATH+trait+"/animations/"+attribute+"_animation.gif";
 
         } else {
 
-            newAttribute.src = "../source/base_files/"+trait+"/"+attribute+".png";
+            newAttribute.src = SOURCE_PATH+trait+"/"+attribute+".png";
 
         }
 
