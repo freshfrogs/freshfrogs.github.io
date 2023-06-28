@@ -7,16 +7,17 @@ var SOURCE_PATH = '../SRC/'
 // Fetch Collection
 async function fetch_collection(order) {
 
-    var exists = [],
-    randomNumber;
-    for(var l=1;l < 202;l++) {
-        do {
-            randomNumber = Math.floor(Math.random()*4040);  
-        } while (exists[randomNumber]);
-        exists[randomNumber] = true;
-        console.log(randomNumber)
-        display_token(l)
+    var arr = [];
+    while(arr.length < 202){
+        var r = Math.floor(Math.random() * 4040) + 1;
+        if(arr.indexOf(r) === -1) arr.push(r);
     }
+    console.log(arr);
+
+    for (let i = 1; i < arr.length; i++) {
+        await display_token(i)
+    }
+        
 }
 
   /*
@@ -99,7 +100,7 @@ async function display_token(token_id) {
 
             } else {
 
-                newAttribute.className = "frogImg5";
+                newAttribute.className = "frogImg3";
 
             }
 
