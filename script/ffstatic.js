@@ -63,12 +63,11 @@ async function display_token(token_id) {
     // Create Element <--
     token_doc.appendChild(token_element);
 
-    /*
     // Update Metadata! Build Frog -->
     let token_metadata = await (await fetch("../frog/json/"+token_id+".json")).json();
 
     // Boolean
-    let b = true;
+//    let b = true;
 
     for (let j = 0; j < token_metadata.attributes.length; j++) {
 
@@ -77,33 +76,32 @@ async function display_token(token_id) {
         loadTrait(attribute.trait_type, attribute.value, 'cont_'+token_id);
 
         // Input properties
-        properties_div = document.getElementById('prop_'+token_id)
-        trait_element = document.createElement('div');
-        trait_element.className = 'traitProperties'
+//        properties_div = document.getElementById('prop_'+token_id)
+//        trait_element = document.createElement('div');
+//        trait_element.className = 'traitProperties'
 
         // Style Float
-        if (b) { trait_element.style.float = 'Left'; } // Class A (left)
-        else { trait_element.style.float = 'Right'; } // Class B (right)
+//        if (b) { trait_element.style.float = 'Left'; } // Class A (left)
+//        else { trait_element.style.float = 'Right'; } // Class B (right)
         
         // Properties Text
-        trait_element.innerHTML = 
-            '<text>'+attribute.trait_type+'</text>'+'<br>'+
-            '<text style="color: #1ac486; font-weight: bold;">'+attribute.value+'</text>'
+//        trait_element.innerHTML = 
+//            '<text>'+attribute.trait_type+'</text>'+'<br>'+
+//            '<text style="color: #1ac486; font-weight: bold;">'+attribute.value+'</text>'
       
         // Insert break for every other element
-        if (b && j !== 0) {
-            linebreak = document.createElement("br");
-            properties_div.appendChild(linebreak);
-        }
+//        if (b && j !== 0) {
+//            linebreak = document.createElement("br");
+//            properties_div.appendChild(linebreak);
+//        }
 
         // Append Child
-        properties_div.appendChild(trait_element)
+//        properties_div.appendChild(trait_element)
 
         // Toggle style float
-        b = !b;
+//        b = !b;
 
     }
-    */
     
 }
 
