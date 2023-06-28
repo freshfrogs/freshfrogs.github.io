@@ -9,7 +9,7 @@ async function fetch_collection(order) {
 
     var exists = [],
     randomNumber;
-    for(var l=1;l < 4040;l++) {
+    for(var l=1;l < 202;l++) {
         do {
             randomNumber = Math.floor(Math.random()*4040);  
         } while (exists[randomNumber]);
