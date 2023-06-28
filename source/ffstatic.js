@@ -11,7 +11,7 @@ async function fetch_collection(order) {
 
     var arr = [];
     while(arr.length < 207){
-        var r = Math.floor(Math.random() * 4040) + 1;
+        var r = Math.floor(Math.random() * 2222) + 1;
         if(arr.indexOf(r) === -1) arr.push(r);
     }
     console.log(arr);
