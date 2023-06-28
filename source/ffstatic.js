@@ -14,7 +14,7 @@ async function fetch_collection(order) {
     }
     console.log(arr);
 
-    for (let i = 1; i < arr.length; i++) {
+    for (let i = 0; i < arr.length; i++) {
         console.log(arr[i])
         await display_token(arr[i])
     }
