@@ -37,6 +37,11 @@ async function display_token(token_id) {
     let image_link = '../frog/'+token_id+'.png'
     let token_name = 'Frog #'+token_id
 
+    button_elements = 
+        '<div style="text-align: center;">'+
+            '<a href="'+image_link+'" target="_blank"><button class="os_button">Original Image</button></a>'+
+        '</div>';
+
     // <-- Begin Element
     token_doc = document.getElementById('frogs');
     token_element = document.createElement('div');
@@ -45,11 +50,11 @@ async function display_token(token_id) {
     token_element.id = token_name;
     token_element.className = 'display_token';
     token_element.innerHTML = 
-        '<div class="display_token_cont">'+
-            '<div class="display_token_img_cont" id="cont_'+token_id+'">'+
+        '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
+            '<div class="display_token_img_cont" id="cont_'+token_id+'" onclick="render_display('+token_id+')">'+
                 //'<img src="'+image_link+'" class="displayImage"/>'+
             '</div>'+
-        '</div>';
+        '</div>'
 
     // Create Element <--
     token_doc.appendChild(token_element);
