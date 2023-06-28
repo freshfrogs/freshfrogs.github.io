@@ -99,7 +99,7 @@ async function display_token(token_id) {
 
             } else {
 
-                newAttribute.className = "frogImg3";
+                newAttribute.className = "frogImg5";
 
             }
 
