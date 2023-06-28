@@ -17,7 +17,7 @@ async function fetch_collection(order) {
     } else {
 
         // 4040 - 1
-        for (let i = 4040; i < 1; i++) {
+        for (let i = 404; i < 1; i++) {
             await display_token(i)
         }
         
