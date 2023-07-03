@@ -5,7 +5,7 @@ var CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 var SOURCE_PATH = '../source/base_files/Toadz/'
 
 // Fetch Collection
-async function fetch_collection(order) {
+async function fetch_collection() {
 
     console.log(SOURCE_PATH)
 
@@ -52,7 +52,7 @@ async function display_token(token_id) {
     // Create Element <--
     token_doc.appendChild(token_element);
 
-    // Update Metadata! Build Frog -->
+    // Update Metadata! Build Token -->
     let token_metadata = await (await fetch(SOURCE_PATH+"json/"+token_id+".json")).json();
 
     for (let j = 0; j < token_metadata.attributes.length; j++) {
