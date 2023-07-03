@@ -10,7 +10,7 @@ async function fetch_collection() {
     console.log(SOURCE_PATH)
 
     var arr = [];
-    while(arr.length < 3){
+    while(arr.length < 207){
         var r = Math.floor(Math.random() * 2222) + 1;
         if(arr.indexOf(r) === -1) arr.push(r);
     }
