@@ -70,43 +70,8 @@ async function display_token(token_id) {
 
         newAttribute = document.createElement("img");
         newAttribute.alt = attribute
-
-       // if (attribute == 'tongueSpiderRed' || attribute == 'tongueSpider' || attribute == 'tongue' || attribute == 'tongueFly' || attribute == 'croaking' || attribute == 'peace' || attribute == 'inversedEyes' || attribute == 'closedEyes' || attribute == 'thirdEye' || attribute == 'mask' || attribute == 'smoking' || attribute == 'smokingCigar' || attribute == 'smokingPipe' || attribute == 'circleShadesRed' || attribute == 'circleShadesPurple' || attribute == 'shades' || attribute == 'shadesPurple' || attribute == 'shadesThreeD' || attribute == 'shadesWhite' || attribute == 'circleNightVision') {
-            
-           // newAttribute.src = SOURCE_PATH+trait+"/animations/"+attribute+"_animation.gif";
-
-       // } else {
-
-            newAttribute.src = SOURCE_PATH+trait+"/"+attribute+".png";
-
-       // }
-
-        if (where == 'bigContainer') {
-
-            if (trait == 'Trait') {
-
-                newAttribute.className = "frogImg6";
-
-            } else {
-
-                newAttribute.className = "frogImg4";
-
-            }
-
-        } else {
-
-            if (trait == 'Trait') {
-
-                newAttribute.className = "frogImg5";
-
-            } else {
-
-                newAttribute.className = "frogImg5";
-
-            }
-
-        }
-
+        newAttribute.src = SOURCE_PATH+trait+"/"+attribute+".png";
+        newAttribute.className = "frogImg5";
         document.getElementById(where).appendChild(newAttribute);
 
     }
