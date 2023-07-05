@@ -33,6 +33,9 @@
 
         // Third Object
 
+        // Random background
+        var r2 = Math.floor(Math.random() * 2222) + 1;
+
         // <-- Begin Element
         token_doc = document.getElementById('frogs');
         token_element = document.createElement('div');
@@ -41,7 +44,7 @@
         token_element.id = 'Toad';
         token_element.className = 'display_token';
         token_element.innerHTML = 
-            '<div id="morphResult" class="renderLeft" style="">'+
+            '<div id="morphResult" class="renderLeft" style="background-image: url('+SOURCE_PATH+'images/'+r2+'.png'+'); background-size: 2048px 2048px;">'+
                 '<div class="display_token_img_cont" id="cont_morphResult"></div>'+
             '</div>'
 
