@@ -18,7 +18,7 @@
         }
 
         for (let i = 0; i < arr.length; i++) {
-            
+
             if (typeof alphaToad !== 'undefined') {
                 var alphaToad = arr[i]
                 console.log('Alpha Toad : '+alphaToad)
@@ -30,6 +30,23 @@
             await display_token(arr[i])
 
         }
+
+        // Third Object
+
+        // <-- Begin Element
+        token_doc = document.getElementById('frogs');
+        token_element = document.createElement('div');
+
+        // Element Details -->
+        token_element.id = token_name;
+        token_element.className = 'display_token';
+        token_element.innerHTML = 
+            '<div id="morphResult" class="renderLeft" style="">'+
+                '<div class="display_token_img_cont" id="cont_morphResult"></div>'+
+            '</div>'
+
+        // Create Element <--
+        token_doc.appendChild(token_element);
             
     }
 
