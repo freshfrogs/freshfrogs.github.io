@@ -121,6 +121,11 @@
 
     async function morphFrogs(toadAlpha, toadBravo, build_loc) {
 
+        console.log('=-=-=-=-=-=-=-=-=-= Morphing =-=-=-=-=-=-=-=-=-=');
+        console.log('= Morphing Tokens Alpha (#'+toadAlpha+') & Bravo ('+toadBravo+')');
+        console.log('= Fetching Metadata...'+toadAlpha+'...'+toadBravo+'...');
+        console.log('= ');
+
         // Token (Alpha) Metdata
         let alphaMetadata = {
             "Toad": "",
@@ -144,6 +149,7 @@
         // Token (Charlie) Metdata
         let charlieMetadata = {
             "Toad": "",
+            "ToadSubset": "",
             "Trait": "",
             "Accessory": "",
             "Eyes": "",
@@ -153,6 +159,7 @@
         
         document.getElementById(build_loc).innerHTML = '';
 
+        console.log('= TOKEN #'+toadAlpha);
         // Fetch Alpha Metedata ------>
         metadataRaw = await (await fetch(SOURCE_PATH+'json/'+toadAlpha+".json")).json();
         for (i = 0; i < alphaMetadataRaw.attributes.length; i++) {
@@ -160,40 +167,60 @@
             let attribute = alphaMetadataRaw.attributes[i];
 
             alphaMetadata[attribute.trait_type] = attribute.value
+            console.log('= '+attribute.trait_type+' : '+attribute.value);
 
         }
 
+        console.log('= ');
+        console.log('= TOKEN #'+toadAlpha);
         // Fetch Bravo Metedata ------>
         metadataRaw = await (await fetch(SOURCE_PATH+'json/'+toadBravo+".json")).json();
         for (j = 0; j < subMetadata.attributes.length; j++) {
 
             let attribute = subMetadata.attributes[j];
             bravoMetadata[attribute.trait_type] = attribute.value
+            console.log('= '+attribute.trait_type+' : '+attribute.value);
 
         }
+
+        console.log('= ');
+        console.log('= Generating New Metadata (Charlie)...');
 
         // DETERMINE NEW METADATA ------>
         
         // Select Attributes!
+        if (alphaMetadata['Toad'] !== '') {charlieMetadata['Toad'] = alphaMetadata['Toad']}
+        if (bravoMetadata['Toad'] !== '') {charlieMetadata['ToadSubset'] = bravoMetadata['Toad']}
+        console.log('= Toad : '+charlieMetadata['Toad']);
+        console.log('= ToadSubset : '+charlieMetadata['ToadSubset']);
+
+        if (bravoMetadata['Trait'] !== '') {charlieMetadata['Trait'] = bravoMetadata['Toad']}
+        else if (alphaMetadata['Trait'] !== '') { charlieMetadata['Trait'] = alphaMetadata['Trait']; }
+        console.log('= Trait : '+charlieMetadata['Trait']);
+
         if (alphaMetadata['Accessory'] !== '') { charlieMetadata['Accessory'] = alphaMetadata['Accessory']; }
         else if (bravoMetadata['Accessory'] !== '') { charlieMetadata['Accessory'] = bravoMetadata['Accessory']; }
+        console.log('= Accessory : '+charlieMetadata['Accessory']);
 
         if (alphaMetadata['Eyes'] !== '') { charlieMetadata['Eyes'] = alphaMetadata['Eyes']; }
         else if (bravoMetadata['Eyes'] !== '') { charlieMetadata['Eyes'] = bravoMetadata['Eyes']; }
+        console.log('= Eyes : '+charlieMetadata['Eyes']);
 
         if (alphaMetadata['Hat'] !== '') { charlieMetadata['Hat'] = alphaMetadata['Hat']; }
         else if (bravoMetadata['Hat'] !== '') { charlieMetadata['Hat'] = bravoMetadata['Hat']; }
+        console.log('= Hat : '+charlieMetadata['Hat']);
 
         if (alphaMetadata['Mouth'] !== '') { charlieMetadata['Mouth'] = alphaMetadata['Mouth']; }
         else if (bravoMetadata['Mouth'] !== '') { charlieMetadata['Mouth'] = bravoMetadata['Mouth']; }
+        console.log('= Mouth : '+charlieMetadata['Mouth']);
 
         // BUILD NEW METADATA ------>
         
         // Alpha (UNDERLAY)
-        if (bravoMetadata['Toad'] !== '') { loadTrait('Toad', bravoMetadata['Toad'], build_loc); }
-
+        if (charlieMetadata['Toad'] !== '') { loadTrait('Toad', charlieMetadata['Toad'], build_loc); }
+        
         // Bravo (OVERLAY)
-        if (alphaMetadata['Toad'] !== '') { loadTrait('Toad/subset', alphaMetadata['Toad'], build_loc); }
+        if (charlieMetadata['ToadSubset'] !== '') { loadTrait('Toad/subset', charlieMetadata['ToadSubset'], build_loc); }
 
         // TRAIT(S)
         if (bravoMetadata['Trait'] !== '') { loadTrait('Trait', bravoMetadata['Trait'], build_loc); }
