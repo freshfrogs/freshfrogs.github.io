@@ -21,10 +21,8 @@
 
             if (toadA == '') {
                 toadA = arr[i]
-                console.log('Alpha Toad : '+toadA)
             } else if (toadB == '') {
                 toadB = arr[i]
-                console.log('Bravo Toad : '+toadB)
             }
 
             await display_token(arr[i])
