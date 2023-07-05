@@ -161,10 +161,10 @@
 
         console.log('= TOKEN #'+toadAlpha);
         // Fetch Alpha Metedata ------>
-        metadataRaw = await (await fetch(SOURCE_PATH+'json/'+toadAlpha+".json")).json();
-        for (i = 0; i < metadataRaw.attributes.length; i++) {
+        let metadataRawA = await (await fetch(SOURCE_PATH+'json/'+toadAlpha+".json")).json();
+        for (i = 0; i < metadataRawA.attributes.length; i++) {
 
-            let attribute = metadataRaw.attributes[i];
+            let attribute = metadataRawA.attributes[i];
 
             alphaMetadata[attribute.trait_type] = attribute.value
             console.log('= '+attribute.trait_type+' : '+attribute.value);
@@ -174,10 +174,10 @@
         console.log('= ');
         console.log('= TOKEN #'+toadAlpha);
         // Fetch Bravo Metedata ------>
-        metadataRaw = await (await fetch(SOURCE_PATH+'json/'+toadBravo+".json")).json();
-        for (j = 0; j < metadataRaw.attributes.length; j++) {
+        let metadataRawB = await (await fetch(SOURCE_PATH+'json/'+toadBravo+".json")).json();
+        for (j = 0; j < metadataRawB.attributes.length; j++) {
 
-            let attribute = metadataRaw.attributes[j];
+            let attribute = metadataRawB.attributes[j];
             bravoMetadata[attribute.trait_type] = attribute.value
             console.log('= '+attribute.trait_type+' : '+attribute.value);
 
