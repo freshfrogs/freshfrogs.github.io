@@ -8,7 +8,7 @@
     // Fetch Collection
     async function fetch_collection() {
 
-        var toadA = toadB = toadC = '';
+        toadA = toadB = toadC = '';
 
         var arr = [];
 
@@ -20,10 +20,10 @@
         for (let i = 0; i < arr.length; i++) {
 
             if (typeof toadA !== '') {
-                let toadA = arr[i]
+                toadA = arr[i]
                 console.log('Alpha Toad : '+toadA)
             } else if (typeof toadB !== '') {
-                let toadB = arr[i]
+                toadB = arr[i]
                 console.log('Bravo Toad : '+toadB)
             }
 
