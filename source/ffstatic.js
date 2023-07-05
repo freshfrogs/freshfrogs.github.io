@@ -176,6 +176,7 @@
         for (j = 0; j < metadataRawB.attributes.length; j++) {
 
             let attribute = metadataRawB.attributes[j];
+            
             bravoMetadata[attribute.trait_type] = attribute.value
             console.log('= '+attribute.trait_type+' : '+attribute.value);
 
