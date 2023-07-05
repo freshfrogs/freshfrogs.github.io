@@ -8,9 +8,7 @@
     // Fetch Collection
     async function fetch_collection() {
 
-        toadA = toadB = toadC = '';
-
-        console.log(SOURCE_PATH)
+        var toadA = toadB = toadC = '';
 
         var arr = [];
 
