@@ -153,7 +153,7 @@
         document.getElementById(build_loc).innerHTML = '';
 
         // Fetch Alpha Metedata ------>
-        metadataRaw = await (await fetch(SOURCE_PATH+'/json/'+toadA+".json")).json();
+        metadataRaw = await (await fetch(SOURCE_PATH+'json/'+toadA+".json")).json();
         for (i = 0; i < alphaMetadataRaw.attributes.length; i++) {
 
             let attribute = alphaMetadataRaw.attributes[i];
@@ -163,7 +163,7 @@
         }
 
         // Fetch Bravo Metedata ------>
-        metadataRaw = await (await fetch(SOURCE_PATH+'/json/'+toadB+".json")).json();
+        metadataRaw = await (await fetch(SOURCE_PATH+'json/'+toadB+".json")).json();
         for (j = 0; j < subMetadata.attributes.length; j++) {
 
             let attribute = subMetadata.attributes[j];
