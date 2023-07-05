@@ -38,7 +38,7 @@
         token_element = document.createElement('div');
 
         // Element Details -->
-        token_element.id = token_name;
+        token_element.id = 'Toad';
         token_element.className = 'display_token';
         token_element.innerHTML = 
             '<div id="morphResult" class="renderLeft" style="">'+
@@ -47,6 +47,8 @@
 
         // Create Element <--
         token_doc.appendChild(token_element);
+
+        morphFrogs(alphaToad, betaToad, 'morphResult');
             
     }
 
