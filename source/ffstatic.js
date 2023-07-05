@@ -187,8 +187,8 @@
         // DETERMINE NEW METADATA ------>
         
         // Select Attributes!
-        if (alphaMetadata['Toad'] !== '') {charlieMetadata['Toad'] = alphaMetadata['Toad']}
-        if (bravoMetadata['Toad'] !== '') {charlieMetadata['ToadSubset'] = bravoMetadata['Toad']}
+        if (alphaMetadata['Toad'] !== '') {charlieMetadata['Toad'] = bravoMetadata['Toad']}
+        if (bravoMetadata['Toad'] !== '') {charlieMetadata['ToadSubset'] = alphaMetadata['Toad']}
         console.log('= Toad : '+charlieMetadata['Toad']);
         console.log('= ToadSubset : '+charlieMetadata['ToadSubset']);
 
