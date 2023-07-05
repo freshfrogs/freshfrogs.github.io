@@ -19,10 +19,10 @@
 
         for (let i = 0; i < arr.length; i++) {
 
-            if (typeof toadA !== '') {
+            if (toadA == '') {
                 toadA = arr[i]
                 console.log('Alpha Toad : '+toadA)
-            } else if (typeof toadB !== '') {
+            } else if (toadB == '') {
                 toadB = arr[i]
                 console.log('Bravo Toad : '+toadB)
             }
