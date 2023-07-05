@@ -20,10 +20,10 @@
         for (let i = 0; i < arr.length; i++) {
 
             if (typeof alphaToad !== 'undefined') {
-                var alphaToad = arr[i]
+                let alphaToad = arr[i]
                 console.log('Alpha Toad : '+alphaToad)
             } else if (typeof betaToad !== 'undefined') {
-                var betaToad = arr[i]
+                let betaToad = arr[i]
                 console.log('Beta Toad : '+betaToad)
             }
 
@@ -48,7 +48,7 @@
         // Create Element <--
         token_doc.appendChild(token_element);
 
-        morphFrogs(alphaToad, betaToad, 'morphResult');
+        morphFrogs(alphaToad, betaToad, 'cont_morphResult');
             
     }
 
