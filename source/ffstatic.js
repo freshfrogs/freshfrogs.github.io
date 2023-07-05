@@ -1,6 +1,6 @@
     // Fresh Frogs NFT Static Github Pages
 
-    // Variables
+    // Global Variables
     var CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
     var SOURCE_PATH = '../source/base_files/Toadz/'
     var toadA, toadB, toadC;
