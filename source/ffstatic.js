@@ -152,7 +152,7 @@
         document.getElementById(build_loc).innerHTML = '';
 
         // Fetch Alpha Metedata ------>
-        metadataRaw = await (await fetch("../Toad/json/"+toadA+".json")).json();
+        metadataRaw = await (await fetch(SOURCE_PATH+'/json/'+toadA+".json")).json();
         for (i = 0; i < alphaMetadataRaw.attributes.length; i++) {
 
             let attribute = alphaMetadataRaw.attributes[i];
@@ -162,7 +162,7 @@
         }
 
         // Fetch Bravo Metedata ------>
-        metadataRaw = await (await fetch("https://freshfrogs.io/frog/json/"+toadB+".json")).json();
+        metadataRaw = await (await fetch(SOURCE_PATH+'/json/'+toadB+".json")).json();
         for (j = 0; j < subMetadata.attributes.length; j++) {
 
             let attribute = subMetadata.attributes[j];
@@ -170,8 +170,7 @@
 
         }
 
-        // <------ DETERMINE NEW METADATA (baseId, subId) ------> //
-        // https://freshfrogs.io/frog/preset_/ [ trait_type/value ] .png
+        // DETERMINE NEW METADATA ------>
         
         // Select Attributes!
         if (alphaMetadata['Accessory'] !== '') { charlieMetadata['Accessory'] = alphaMetadata['Accessory']; }
@@ -186,12 +185,12 @@
         if (alphaMetadata['Mouth'] !== '') { charlieMetadata['Mouth'] = alphaMetadata['Mouth']; }
         else if (bravoMetadata['Mouth'] !== '') { charlieMetadata['Mouth'] = bravoMetadata['Mouth']; }
 
-        // <------ BUILD NEW METADATA (baseId, subId) ------>
+        // BUILD NEW METADATA ------>
         
-        // SUB FROG (UNDERLAY)
+        // Alpha (UNDERLAY)
         if (bravoMetadata['Toad'] !== '') { loadTrait('Toad', bravoMetadata['Toad'], build_loc); }
 
-        // BASE FROG (OVERLAY)
+        // Bravo (OVERLAY)
         if (alphaMetadata['Toad'] !== '') { loadTrait('Toad/subset', alphaMetadata['Toad'], build_loc); }
 
         // TRAIT(S)
