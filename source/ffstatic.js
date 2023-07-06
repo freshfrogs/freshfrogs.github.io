@@ -12,25 +12,25 @@
 
         var arr = [];
 
-        while(arr.length < 2){
+        while(arr.length < 207){
             var r = Math.floor(Math.random() * 2222) + 1;
             if(arr.indexOf(r) === -1) arr.push(r);
         }
 
         for (let i = 0; i < arr.length; i++) {
 
-            if (toadA == '') {
-                toadA = arr[i]
-            } else if (toadB == '') {
-                toadB = arr[i]
-            }
+        //    if (toadA == '') {
+        //        toadA = arr[i]
+        //    } else if (toadB == '') {
+        //        toadB = arr[i]
+        //    }
 
             await display_token(arr[i])
 
         }
 
         // Third Object
-        //
+        /*
 
         // Random background
         var r2 = Math.floor(Math.random() * 2222) + 1;
@@ -51,6 +51,7 @@
         token_doc.appendChild(token_element);
 
         morphFrogs(toadA, toadB, 'cont_morphResult');
+        */
             
     }
 
