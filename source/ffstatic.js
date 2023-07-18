@@ -30,7 +30,7 @@
             } else if (toadB == '') {
                 toadB = arr[i]
             }
-            
+
         */
 
             await display_token(arr[i])
@@ -254,22 +254,26 @@
 
         try { // Attempt to Connect!
 
-            pageOutput('Waiting to connect Ethereum wallet...');
+            panelOutput('Attempting to connect Ethereum wallet...');
 
             // Connect WEB3
             const web3 = new Web3(window.ethereum);
 
-            // Connect Collection Smart Contract, Staking Smart Contract
-            //COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
-            CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
+            panelOutput('Web3 browser extension detected...');
 
-            consoleOutput('Connecting... please wait');
+            // Connect Collection Smart Contract, Staking Smart Contract
+            // COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
+        //    CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
+
+            panelOutput('Connecting... please wait');
 
             // User Variables
             user_address = await web3.currentProvider.selectedAddress;
 
+            panelOutput('Connected: \n'+userAddress);
+
             // No. Tokens staked by fetch_address
-            staked_tokens = await stakers(user_address, 'amountStaked')
+        //    staked_tokens = await stakers(user_address, 'amountStaked')
 
             // No. of total Frogs staked in contract
             //total_staked = await collection.methods.balanceOf(CONTROLLER_ADDRESS).call();
@@ -282,9 +286,22 @@
 
         } catch (e) { // Something Went Wrong!
             console.log(e.message)
-            consoleOutput('❌ Failed to connect Ethereum wallet: '+e.message);
+            panelOutput('❌ Failed to Connect: \n'+e.message);
         }
     }
+
+
+    // Print to front page console-output
+    function panelOutput(output, destination) {
+
+        if (! destination) {
+            document.getElementById("outputPanel").innerHTML = output;
+        } else {
+            document.getElementById(destination).innerHTML = output;
+        }
+        
+    }
+
 
     /*
 
