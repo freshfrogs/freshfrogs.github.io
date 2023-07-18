@@ -577,8 +577,8 @@
 
                 for (var i = 0; i < staker_tokens_array.length; i++) {
 
-                    console.log('Staked Token Found: #'+tokenId)
                     tokenId = staker_tokens_array[i].tokenId
+                    console.log('Staked Token Found: #'+tokenId)
                     render_token(tokenId)
 
                 }
