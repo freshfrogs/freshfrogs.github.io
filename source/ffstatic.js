@@ -261,19 +261,18 @@
                 //const provider = new ethers.providers.Web3Provider(window.ethereum);
 
                 user_address = await web3.currentProvider.selectedAddress;
-                document.getElementById('connectButton').innerHTML = 'Connected - ['+truncateAddress(user_address)+']'
+                document.getElementById('connectButton').innerHTML = '🟢 Connected - ['+truncateAddress(user_address)+']'
 
             } catch (e) {
 
                 console.log(e.message)
-                document.getElementById('connectButton').innerHTML = '❌ Failed to Connect:'
                 panelOutput(e.message);
 
             }
 
         } else {
 
-            panelOutput('Install MetaMask');
+            panelOutput("Don't have a wallet? <a href='https://metamask.io/download/'>Install Metamask</a>🦊");
 
         }
     }
