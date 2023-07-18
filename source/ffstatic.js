@@ -254,8 +254,6 @@
 
     async function connect() {
 
-        // const web3 = new Web3(window.ethereum);
-
         panelOutput('Attempting to connect Ethereum wallet...');
 
         if (typeof window.ethereum !== "undefined") {
