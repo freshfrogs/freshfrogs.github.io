@@ -108,6 +108,8 @@
     }
 
     // loadTrait(_trait(family), _attribute(type), _where(element))
+    //
+    
     function loadTrait(trait, attribute, where) {
 
         newAttribute = document.createElement("img");
