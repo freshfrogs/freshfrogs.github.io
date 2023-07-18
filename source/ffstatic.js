@@ -75,7 +75,7 @@
         token_element.id = token_name;
         token_element.className = 'display_token';
         token_element.innerHTML = 
-            '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
+            '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2200px 2200px;">'+
                 '<div class="display_token_img_cont" id="cont_'+token_id+'" onclick="render_display('+token_id+')">'+
                     //'<img src="'+image_link+'" class="displayImage"/>'+
                 '</div>'+
