@@ -572,7 +572,7 @@
             // Render Frogs Staked by User
             if (staker_tokens >= 1) {
 
-                console.log('Fetching staked tokens...')
+                console.log('Fetching staked tokens....')
                 let staker_tokens_array = await getStakedTokens(staker_address);
 
                 for (var i = 0; i < staker_tokens_array.length; i++) {
@@ -593,6 +593,8 @@
 
     }
 
+    //
+    
     /*  
 
         stakers(<input> (address), <input> (dataFetch)) | return ( amountStaked, timeOfLastUpdate, unclaimedRewards )
