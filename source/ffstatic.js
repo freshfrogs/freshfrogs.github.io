@@ -593,11 +593,11 @@
 
     }
 
-    /* 
+    /*  
 
         stakers(<input> (address), <input> (dataFetch)) | return ( amountStaked, timeOfLastUpdate, unclaimedRewards )
 
-    */
+    */  
 
     async function stakers(userAddress, _data) {
         let stakers = await controller.methods.stakers(userAddress).call();         // Call function from within Ethereum smart contract
