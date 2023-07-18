@@ -162,9 +162,13 @@
     border-radius: 100%;
   }
   .bottomPanel {
-    background-color: whitesmoke;
-    border-radius: 5%;
-    border: 1px solid darkslategray;
+  }
+  .parentPanel {
+    width: 50% !important;
+    height: 250px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    float: none;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -216,7 +220,7 @@
   </head>
   <body class="bodyb">
     <section id="frogs" style="background: transparent; border: none !important;"></section>
-    <section id="">
+    <section id="parentPanel" class="parentPanel">
       <div id="console" class="bottomPanel">
         <button id="connectButton" class="connectButton" onclick="connect()">Connect to Web3</button>
         <div id="outputPanel"><div>
