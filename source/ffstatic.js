@@ -630,7 +630,7 @@
         '</div>';
 
     // <-- Begin Element
-    token_doc = document.getElementById('frogs');
+    token_doc = document.getElementById('parentPanel');
     token_element = document.createElement('div');
 
     // Element Details -->
