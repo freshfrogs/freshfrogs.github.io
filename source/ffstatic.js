@@ -615,7 +615,7 @@
     let token_owner = '';
     let staked_time_days = staked_level = staked_next = staked_earned = '0';
 
-    let staked = await stakerAddress(token_id)
+    //let staked = await stakerAddress(token_id)
     let image_link = '../frog/'+token_id+'.png'
 
     let staking_values = await stakingValues(token_id)
