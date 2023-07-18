@@ -1207,7 +1207,7 @@
         token_element.className = 'display_token';
         token_element.innerHTML = 
             '<div id="'+token_id+'" class="renderLeft">'+
-                '<div class="display_token_img_cont" id="cont_'+token_id+'" onclick="render_display('+token_id+')">'+
+                '<div class="display_token_img_cont" id="cont_'+token_id+'">'+
                     //'<img src="'+image_link+'" class="displayImage"/>'+
                 '</div>'+
             '</div>'
@@ -1216,7 +1216,7 @@
         token_doc.appendChild(token_element);
 
         // Update Metadata! Build Token -->
-        let token_metadata = await (await fetch('https://freshfrogs.github.io/json/'+token_id+'.json')).json();
+        let token_metadata = await (await fetch('https://freshfrogs.github.io/frog/json/'+token_id+'.json')).json();
 
         for (let j = 0; j < token_metadata.attributes.length; j++) {
 
