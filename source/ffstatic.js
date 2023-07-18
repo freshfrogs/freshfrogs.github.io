@@ -5,7 +5,7 @@
     const SOURCE_PATH = '../source/base_files/Toadz/'
 
     var toadA, toadB, toadC;
-    var CONTROLLER;
+    var CONTROLLER, controller;
 
     const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
     const CONTROLLER_ABI =
@@ -591,6 +591,20 @@
 
         }
 
+    }
+
+    /* 
+
+        stakers(<input> (address), <input> (dataFetch)) | return ( amountStaked, timeOfLastUpdate, unclaimedRewards )
+
+    */
+
+    async function stakers(userAddress, _data) {
+        let stakers = await controller.methods.stakers(userAddress).call();         // Call function from within Ethereum smart contract
+        if (_data == 'amountStaked') { return stakers.amountStaked }                // Total Tokens Staked by User
+        else if (_data == 'timeOfLastUpdate') { return stakers.timeOfLastUpdate }   // Time since Last Update from user
+        else if (_data == 'unclaimedRewards') { return stakers.unclaimedRewards }   // Total unclaimed Rewards from User
+        else { return }                                                             // Invalid arguments
     }
 
   async function render_token(token) {
