@@ -161,6 +161,11 @@
     height: 256px;
     border-radius: 100%;
   }
+  .bottomPanel {
+    background-color: whitesmoke;
+    border-radius: 5%;
+    border: 1px solid darkslategray;
+  }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -211,7 +216,11 @@
   </head>
   <body class="bodyb">
     <section id="frogs" style="background: transparent; border: none !important;"></section>
-    <section></section>
+    <section id="">
+      <div id="console" class="bottomPanel">
+        <button id="connectButton" class="connectButton">Connect to Web3</button>
+      </div>
+    </section>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
   </body>
 </html>
