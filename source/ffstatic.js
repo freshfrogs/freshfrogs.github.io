@@ -482,6 +482,47 @@
         
     }
 
+    // Calculate total time a Frog has been staked (Hours)
+    async function timeStaked(tokenId) {
+
+        // Check Staked Status
+        web3 = new Web3(window.ethereum);
+        let staked = await stakerAddress(tokenId);
+
+        // Token is not currently staked
+        if (!staked) {
+
+            return 0.00
+
+        // Valid staked status
+        } else {
+            try {
+
+                // Loop blockchain transactions per parameters [NFT Transfer From: User ==> To: Staking Controller] & NFT is Currently Staked
+                let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'tokenId': tokenId}, fromBlock: 0, toBlock: 'latest'});
+                let mostRecentTxn = (stakingEvents.length) - 1;
+
+                // Fetch Block Number from Txn
+                let staked_block = parseInt(stakingEvents[mostRecentTxn].blockNumber);
+
+                // Fetch Timestamp for block txn
+                let staked_time = await web3.eth.getBlock(staked_block);
+                let staked_date = new Date(staked_time.timestamp*1000);
+
+                // Calculate Time Staked in Hours
+                let staked_duration = Date.now() - staked_date;
+                let staked_hours = Math.floor(staked_duration/1000/60/60);
+
+                //console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
+
+                // Return time staked in (Hours)
+                return staked_hours;
+
+            // Catch Errors, Return 0.00
+            } catch (e) { console.log(e.message); return 0.00; }
+        }
+    }
+
 
     /*
 
