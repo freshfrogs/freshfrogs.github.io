@@ -1,7 +1,5 @@
     // Fresh Frogs NFT Static Github Pages
 
-const { render } = require("express/lib/response");
-
     // Global Variables
     const CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
     const SOURCE_PATH = '../source/base_files/Toadz/'
