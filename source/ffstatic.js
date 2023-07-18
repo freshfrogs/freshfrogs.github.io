@@ -267,7 +267,7 @@
                 panelOutput('Connecting... please wait');
 
                 await ethereum.request({ method: "eth_requestAccounts" });
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                //const provider = new ethers.providers.Web3Provider(window.ethereum);
 
                 user_address = await web3.currentProvider.selectedAddress;
                 panelOutput('Connected: \n'+user_address);
