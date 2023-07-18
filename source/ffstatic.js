@@ -593,8 +593,6 @@
 
     }
 
-    //
-
     /*  
 
         stakers(<input> (address), <input> (dataFetch)) | return ( amountStaked, timeOfLastUpdate, unclaimedRewards )
