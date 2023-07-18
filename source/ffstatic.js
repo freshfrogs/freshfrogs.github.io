@@ -233,3 +233,106 @@
         if (charlieMetadata['Mouth'] !== '') { loadTrait('Mouth', charlieMetadata['Mouth'], build_loc); }
 
     }
+
+    // Call Functions
+
+    // connect() | Connect Wallet
+    async function connect() {
+
+        try { // Attempt to Connect!
+
+            pageOutput('Waiting to connect Ethereum wallet...');
+
+            // Connect WEB3
+            const web3 = new Web3(window.ethereum);
+
+            // Connect Collection Smart Contract, Staking Smart Contract
+            //COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
+            CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
+
+            consoleOutput('Connecting... please wait');
+
+            // User Variables
+            user_address = await web3.currentProvider.selectedAddress;
+
+            // No. Tokens staked by fetch_address
+            staked_tokens = await stakers(user_address, 'amountStaked')
+
+            // No. of total Frogs staked in contract
+            //total_staked = await collection.methods.balanceOf(CONTROLLER_ADDRESS).call();
+
+            // Collection Variables
+            //collection_name = await f0.api.name().call();
+            //collection_symbol = await f0.api.symbol().call();
+
+            // Connected!
+
+        } catch (e) { // Something Went Wrong!
+            console.log(e.message)
+            consoleOutput('❌ Failed to connect Ethereum wallet: '+e.message);
+        }
+    }
+
+    /*
+
+        Calculate stake values & returns
+
+    */
+
+    async function stakingValues(tokenId) {
+
+        stakedTimeHours = await timeStaked(tokenId)
+        stakedLevelInt = Math.floor((stakedTimeHours / 1000 )) + 1
+
+        stakedTimeDays = Math.floor(stakedTimeHours / 24)                               // Time Staked
+        stakedLevel = romanize(stakedLevelInt)                                          // Staked Level
+        stakedNext = Math.round((((stakedLevelInt) * 1000) - stakedTimeHours) / 24)     // Days until next level
+        stakedEarned = (stakedTimeHours / 1000).toFixed(3)                              // Flyz Earned
+
+        // [ Time Staked, Staked Level, Next Level, Flyz Earned]
+        return [stakedTimeDays, stakedLevel, stakedNext, stakedEarned]
+
+    }
+
+    /*
+
+        Retrieve staked token's true owner
+        stakerAddress(<input> (uint256)) | return staker's address or false
+
+    */
+
+    async function stakerAddress(tokenId) {
+
+        let stakerAddress = await controller.methods.stakerAddress(tokenId).call();
+        if (stakerAddress !== '0x0000000000000000000000000000000000000000') { return stakerAddress; }
+        else { return false; }
+
+    }
+
+    /*
+
+        Retrieve Available Rewards for User
+        availableRewards(_staker (address)) | return uint256
+
+    */
+
+    async function availableRewards(userAddress) {
+
+        let available_rewards = await controller.methods.availableRewards(userAddress).call();
+        available_rewards = (available_rewards / 1000000000000000000);
+        return available_rewards;
+
+    }
+
+    /*
+
+        Retrieve Tokens Staked by User
+        getStakedTokens(_user (address)) | return tuple[]
+
+    */
+
+    async function getStakedTokens(userAddress) {
+        
+        return await controller.methods.getStakedTokens(userAddress).call();
+
+    }
