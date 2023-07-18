@@ -443,7 +443,7 @@
                 user_address = await web3.currentProvider.selectedAddress;
                 document.getElementById('connectButton').innerHTML = '🟢 Connected - ['+truncateAddress(user_address)+']'
                 console.log('Web3 Address found... '+user_address)
-                console.log('Connecting to controller...')
+                console.log('Connecting to controller.... ..')
                 CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
                 await fetch_staked_tokens(user_address);
 
