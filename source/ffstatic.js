@@ -220,7 +220,7 @@
         if (charlieMetadata['Toad'] !== '') { loadTrait('Toad', charlieMetadata['Toad'], build_loc); }
         
         // Bravo (OVERLAY)
-        if (charlieMetadata['ToadSubset'] !== '') { loadTrait('Toad/subset/v2', charlieMetadata['ToadSubset'], build_loc); }
+        if (charlieMetadata['ToadSubset'] !== '') { loadTrait('Toad/subset/v3', charlieMetadata['ToadSubset'], build_loc); }
 
         // TRAIT(S)
         if (bravoMetadata['Trait'] !== '') { loadTrait('Trait', bravoMetadata['Trait'], build_loc); }
