@@ -270,7 +270,7 @@
             // User Variables
             user_address = await web3.currentProvider.selectedAddress;
 
-            panelOutput('Connected: \n'+userAddress);
+            panelOutput('Connected: \n'+user_address);
 
             // No. Tokens staked by fetch_address
         //    staked_tokens = await stakers(user_address, 'amountStaked')
