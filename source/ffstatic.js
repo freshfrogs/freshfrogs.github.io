@@ -1229,7 +1229,7 @@
     }
 
     // loadTrait(_trait(family), _attribute(type), _where(element))
-    //
+    /*
 
     function loadTrait(trait, attribute, where) {
 
@@ -1237,6 +1237,38 @@
         newAttribute.alt = attribute
         newAttribute.src = SOURCE_PATH+trait+"/"+attribute+".png";
         newAttribute.className = "frogImg5";
+        document.getElementById(where).appendChild(newAttribute);
+
+    }
+
+    */
+
+    // loadTrait(_trait(family), _attribute(type), _where(element))
+    function loadTrait(trait, attribute, where) {
+
+        newAttribute = document.createElement("img");
+        newAttribute.alt = attribute
+
+        if (attribute == 'tongueSpiderRed' || attribute == 'tongueSpider' || attribute == 'tongue' || attribute == 'tongueFly' || attribute == 'croaking' || attribute == 'peace' || attribute == 'inversedEyes' || attribute == 'closedEyes' || attribute == 'thirdEye' || attribute == 'mask' || attribute == 'smoking' || attribute == 'smokingCigar' || attribute == 'smokingPipe' || attribute == 'circleShadesRed' || attribute == 'circleShadesPurple' || attribute == 'shades' || attribute == 'shadesPurple' || attribute == 'shadesThreeD' || attribute == 'shadesWhite' || attribute == 'circleNightVision') {
+            newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/animations/"+attribute+"_animation.gif";
+        } else {
+            newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
+        }
+
+        if (where == 'bigContainer') {
+            if (trait == 'Trait') {
+                newAttribute.className = "frogImg6";
+            } else {
+                newAttribute.className = "frogImg4";
+            }
+        } else {
+            if (trait == 'Trait') {
+                newAttribute.className = "frogImg5";
+            } else {
+                newAttribute.className = "frogImg3";
+            }
+        }
+
         document.getElementById(where).appendChild(newAttribute);
 
     }
@@ -1627,7 +1659,7 @@
         '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
           '<div class="innerLeft">'+
             '<div class="display_token_img_cont" id="cont_'+token_id+'" onclick="render_display('+token_id+')">'+
-              '<img src="'+image_link+'" class="displayImage"/>'+
+              //'<img src="'+image_link+'" class="displayImage"/>'+
             '</div>'+
           '</div>'+
         '</div>'+
@@ -1667,7 +1699,7 @@
     //
 
 
-    /*
+    
 
     // Update Metadata! Build Frog -->
     let metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+token_id+".json")).json();
@@ -1678,8 +1710,6 @@
       loadTrait(attribute.trait_type, attribute.value, 'cont_'+token_id);
 
     }
-
-    */
 
   }
 
