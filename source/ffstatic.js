@@ -287,10 +287,10 @@
     // Print to front page console-output
     function panelOutput(output, destination) {
 
-        output_text = document.createElement('text');
-        output_text.innerHTML = '\n'+output
+        //output_text = document.createElement('text');
+        //output_text.innerHTML = '\n'+output
 
-        document.getElementById("outputPanel").appendChild(output_text) //.innerHTML = output;
+        document.getElementById("outputPanel").innerHTML = output;
 
         
     }
