@@ -254,26 +254,20 @@
 
     async function connect() {
 
-        panelOutput('Attempting to connect Ethereum wallet...');
-
         if (typeof window.ethereum !== "undefined") {
-
-            panelOutput('Web3 browser extension detected...');
-
             try {
-
-                panelOutput('Connecting... please wait');
 
                 await ethereum.request({ method: "eth_requestAccounts" });
                 //const provider = new ethers.providers.Web3Provider(window.ethereum);
 
                 user_address = await web3.currentProvider.selectedAddress;
-                panelOutput('Connected: \n'+user_address);
+                document.getElementById('connectButton').innerHTML = 'Connected - ['+truncateAddress(user_address)+']'
 
             } catch (e) {
 
                 console.log(e.message)
-                panelOutput('❌ Failed to Connect: \n'+e.message);
+                document.getElementById('connectButton').innerHTML = '❌ Failed to Connect:'
+                panelOutput(e.message);
 
             }
 
@@ -282,6 +276,15 @@
             panelOutput('Install MetaMask');
 
         }
+    }
+
+    // Shorten Address
+    function truncateAddress(address) {
+        if (!address) { return ""; }
+        return `${address.substr(0, 5)}..${address.substr(
+            address.length - 5,
+            address.length
+        )}`;
     }
 
     // Print to front page console-output
