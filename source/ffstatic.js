@@ -109,7 +109,7 @@
 
     // loadTrait(_trait(family), _attribute(type), _where(element))
     //
-    
+
     function loadTrait(trait, attribute, where) {
 
         newAttribute = document.createElement("img");
@@ -251,47 +251,40 @@
         connect() | Connect Wallet
 
     */
-    
+
     async function connect() {
 
-        try { // Attempt to Connect!
+        // const web3 = new Web3(window.ethereum);
 
-            panelOutput('Attempting to connect Ethereum wallet...');
+        panelOutput('Attempting to connect Ethereum wallet...');
 
-            // Connect WEB3
-            const web3 = new Web3(window.ethereum);
+        if (typeof window.ethereum !== "undefined") {
 
             panelOutput('Web3 browser extension detected...');
 
-            // Connect Collection Smart Contract, Staking Smart Contract
-            // COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
-        //    CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
+            try {
 
-            panelOutput('Connecting... please wait');
+                panelOutput('Connecting... please wait');
 
-            // User Variables
-            user_address = await web3.currentProvider.selectedAddress;
+                await ethereum.request({ method: "eth_requestAccounts" });
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-            panelOutput('Connected: \n'+user_address);
+                user_address = await web3.currentProvider.selectedAddress;
+                panelOutput('Connected: \n'+user_address);
 
-            // No. Tokens staked by fetch_address
-        //    staked_tokens = await stakers(user_address, 'amountStaked')
+            } catch (e) {
 
-            // No. of total Frogs staked in contract
-            //total_staked = await collection.methods.balanceOf(CONTROLLER_ADDRESS).call();
+                console.log(e.message)
+                panelOutput('❌ Failed to Connect: \n'+e.message);
 
-            // Collection Variables
-            //collection_name = await f0.api.name().call();
-            //collection_symbol = await f0.api.symbol().call();
+            }
 
-            // Connected!
+        } else {
 
-        } catch (e) { // Something Went Wrong!
-            console.log(e.message)
-            panelOutput('❌ Failed to Connect: \n'+e.message);
+            panelOutput('Install MetaMask');
+
         }
     }
-
 
     // Print to front page console-output
     function panelOutput(output, destination) {
