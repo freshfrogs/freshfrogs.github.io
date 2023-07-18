@@ -445,7 +445,6 @@
                 console.log('Web3 Address found... '+user_address)
                 console.log('Connecting to controller...')
                 CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
-                console.log('Fetching tokens staked by user...')
                 await fetch_staked_tokens(user_address);
 
             } catch (e) {
