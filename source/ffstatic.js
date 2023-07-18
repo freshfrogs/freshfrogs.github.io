@@ -289,11 +289,11 @@
     // Print to front page console-output
     function panelOutput(output, destination) {
 
-        if (! destination) {
-            document.getElementById("outputPanel").innerHTML = output;
-        } else {
-            document.getElementById(destination).innerHTML = output;
-        }
+        output_text = document.createElement('text');
+        output_text.innerHTML = output
+
+        document.getElementById("outputPanel").appendChild(output_text) //.innerHTML = output;
+
         
     }
 
