@@ -1137,7 +1137,7 @@
 
         var arr = [];
 
-        while(arr.length < 3){
+        while(arr.length < 7){
             var r = Math.floor(Math.random() * 2222) + 1;
             if(arr.indexOf(r) === -1) arr.push(r);
         }
@@ -1195,8 +1195,8 @@
 
     async function display_token(token_id) {
 
-        let image_link = SOURCE_PATH+'images/'+token_id+'.png'
-        let token_name = 'Toad #'+token_id
+        let image_link = 'https://freshfrogs.github.io/frog/'+token_id+'.png'
+        let token_name = 'Frog #'+token_id
 
         // <-- Begin Element
         token_doc = document.getElementById('frogs');
@@ -1206,7 +1206,7 @@
         token_element.id = token_name;
         token_element.className = 'display_token';
         token_element.innerHTML = 
-            '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2200px 2200px;">'+
+            '<div id="'+token_id+'" class="renderLeft">'+
                 '<div class="display_token_img_cont" id="cont_'+token_id+'" onclick="render_display('+token_id+')">'+
                     //'<img src="'+image_link+'" class="displayImage"/>'+
                 '</div>'+
@@ -1216,7 +1216,7 @@
         token_doc.appendChild(token_element);
 
         // Update Metadata! Build Token -->
-        let token_metadata = await (await fetch(SOURCE_PATH+"json/"+token_id+".json")).json();
+        let token_metadata = await (await fetch('https://freshfrogs.github.io/json/'+token_id+'.json')).json();
 
         for (let j = 0; j < token_metadata.attributes.length; j++) {
 
