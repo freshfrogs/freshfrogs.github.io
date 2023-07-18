@@ -594,7 +594,7 @@
     }
 
     //
-    
+
     /*  
 
         stakers(<input> (address), <input> (dataFetch)) | return ( amountStaked, timeOfLastUpdate, unclaimedRewards )
@@ -609,7 +609,7 @@
         else { return }                                                             // Invalid arguments
     }
 
-  async function render_token(token) {
+  async function render_token(token_id) {
 
     let name = 'Frog #'+token_id
     let token_owner = '';
