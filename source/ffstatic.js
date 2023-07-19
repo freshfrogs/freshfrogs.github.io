@@ -495,6 +495,7 @@
 
                 document.getElementById('console').appendChild(rwrdsBtn)
                 document.getElementById('console').appendChild(stkeBtn)
+                document.getElementById('connectButton').onclick = function (e) { console.log(user_address); }
 
                 await fetch_staked_tokens(user_address);
 
