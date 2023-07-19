@@ -187,9 +187,25 @@
         }
       ]
 
+    async function randomLogo() {
+
+        // Update Metadata! Build Token -->
+        let token_metadata = await (await fetch('https://freshfrogs.github.io/frog/json/'+69+'.json')).json();
+
+        for (let r = 0; r < token_metadata.attributes.length; r++) {
+
+            // Build Token Image
+            let attribute = token_metadata.attributes[r]
+            loadTrait(attribute.trait_type, attribute.value, 'randomLogo');
+
+        }
+
+    }
+
     // Fetch Collection
     async function fetch_collection() {
 
+        
         toadA = toadB = toadC = '';
 
         var arr = [];
@@ -270,7 +286,7 @@
             '</div>'
 
         // Create Element <--
-        //token_doc.appendChild(token_element);
+        token_doc.appendChild(token_element);
 
         // Update Metadata! Build Token -->
         let token_metadata = await (await fetch('https://freshfrogs.github.io/frog/json/'+token_id+'.json')).json();
@@ -279,7 +295,7 @@
 
             // Build Token Image
             let attribute = token_metadata.attributes[j]
-            loadTrait(attribute.trait_type, attribute.value, 'randomLogo');
+            loadTrait(attribute.trait_type, attribute.value, 'cont_'+token_id);
 
         }
         
