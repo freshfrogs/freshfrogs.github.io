@@ -1425,6 +1425,7 @@
                 COLLECTION = collection = new web3.eth.Contract(COLLECTION_ABI, CONTRACT_ADDRESS);
 
                 let unclaimed_rewards = await availableRewards(user_address)
+                unclaimed_rewards = Math.round(unclaimed_rewards * 10) / 10;
                 rwrdsBtn = document.createElement('button')
                 rwrdsBtn.className = 'connectButton'
                 rwrdsBtn.onclick = async function (e) { let rewards_return = await claimRewards(); panelOutput(rewards_return) }
