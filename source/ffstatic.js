@@ -585,7 +585,7 @@
 
                 stkeBtn = document.createElement('button')
                 stkeBtn.className = 'connectButton'
-                stkeBtn.onclick = async function (e) { console.log('stake') }
+                stkeBtn.onclick = async function (e) { await Initiate_stake(); }
                 stkeBtn.innerHTML = '📌 Stake and Earn'
 
                 let is_approved = await checkApproval()
