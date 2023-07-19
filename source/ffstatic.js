@@ -1679,7 +1679,7 @@
     // Use Functions?
     button_elements = 
         '<div style="text-align: center;">'+
-            '<button class="connectButton" onclick="" style="padding: 6px !important;">Un-stake</button>'+
+            '<button class="connectButton" onclick="" style="padding: 6px !important; width: 100%; height: auto;">Un-stake</button>'+
         '</div>';
 
     // <-- Begin Element
