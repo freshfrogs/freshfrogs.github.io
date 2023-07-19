@@ -597,7 +597,7 @@
                 appvlBtn.className = 'connectButton'
                 if (!is_approved) {
                     appvlBtn.innerHTML = '❌ Contract Approval'
-                    appvlBtn.onclick = async function (e) { let chkapproval = await setApprovalForAll(); if (!chkapproval) { alert(chkapproval); } else { document.getElementById('approvalButton').innerHTML = '✔️ Contract Approval'; } }
+                    appvlBtn.onclick = async function (e) { let chkapproval = await setApprovalForAll(); if (chkapproval) { document.getElementById('approvalButton').innerHTML = '✔️ Contract Approval'; } else { alert(chkapproval); } }
                 } else {
                     appvlBtn.innerHTML = '✔️ Contract Approval'
                 }
