@@ -1424,7 +1424,7 @@
                 CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
                 COLLECTION = collection = new web3.eth.Contract(COLLECTION_ABI, CONTRACT_ADDRESS);
 
-                unclaimed_rewards = await availableRewards(user_address)
+                let unclaimed_rewards = await availableRewards(user_address)
                 rwrdsBtn = document.createElement('button')
                 rwrdsBtn.className = 'connectButton'
                 rwrdsBtn.onclick = async function (e) { let rewards_return = await claimRewards(); panelOutput(rewards_return) }
@@ -1624,7 +1624,7 @@
                 for (var i = 0; i < staker_tokens_array.length; i++) {
 
                     tokenId = staker_tokens_array[i].tokenId
-                    console.log('Staked Token Found: #'+tokenId)
+                    //console.log('Staked Token Found: #'+tokenId)
                     render_token(tokenId)
 
                 }
