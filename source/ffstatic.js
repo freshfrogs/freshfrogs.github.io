@@ -187,13 +187,48 @@
         }
       ]
 
-    
-    //
+    /*
+
+        stake(_tokenId (uint256), _user (address)) | send =>
+
+    */
+
     async function Initiate_stake() {
 
-        
+        // Token ID input
+        var stakeID = prompt("Which token would you like to stake?\nToken ID: ");
 
-        //var num = prompt("What is your favorite number? ");
+        // Submit Txn
+        let stake_txn = await stake(stakeID);
+        alert(stake_txn);
+    
+    }
+
+    async function stake(tokenId) {
+
+        // Check Ownership / Approval Status
+        let owner = await collection.methods.ownerOf(tokenId).call();
+        let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+        if (!approved) { return '❌ Staking contract is missing approval!'; }
+
+        // Valid ownership
+        if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+            try {
+
+                // Send Txn
+                let stake = await controller.methods.stake(tokenId).send({ from: user_address });
+                return '✅ Frog #'+tokenId+' has succesfully been staked!';
+
+            // Catch Errors
+            } catch (e) { return '❌ '+e.message; }
+
+        // Token already Staked
+        } else if (owner.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) {
+            return '❌ Frog #'+tokenId+' is already staked!';
+        } 
+
+        // Invalid Ownership
+        else { return '❌ Frog #'+tokenId+' does not belong to user!'; }
     }
 
     /*
