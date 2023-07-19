@@ -1434,7 +1434,7 @@
                 stkeBtn = document.createElement('button')
                 stkeBtn.className = 'connectButton'
                 stkeBtn.onclick = async function (e) { console.log('stake') }
-                stkeBtn.innerHTML = '📌 Stake Tokens'
+                stkeBtn.innerHTML = '📌 Stake and Earn'
 
                 document.getElementById('console').appendChild(rwrdsBtn)
                 document.getElementById('console').appendChild(stkeBtn)
