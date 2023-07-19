@@ -190,7 +190,7 @@
     async function randomLogo() {
 
         // Update Metadata! Build Token -->
-        let token_metadata = await (await fetch('https://freshfrogs.github.io/frog/json/'+69+'.json')).json();
+        let token_metadata = await (await fetch('https://freshfrogs.github.io/frog/json/'+66+'.json')).json();
 
         for (let r = 0; r < token_metadata.attributes.length; r++) {
 
