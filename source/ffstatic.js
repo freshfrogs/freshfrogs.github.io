@@ -1431,7 +1431,13 @@
                 rwrdsBtn.onclick = async function (e) { let rewards_return = await claimRewards(); panelOutput(rewards_return) }
                 rwrdsBtn.innerHTML = '🎁 Unclaimed $FLYZ: '+unclaimed_rewards.toFixed(1)
 
+                stkeBtn = document.createElement('button')
+                stkeBtn.className = 'connectButton'
+                stkeBtn.onclick = async function (e) { console.log('stake') }
+                stkeBtn.innerHTML = '📌 Stake Tokens'
+
                 document.getElementById('console').appendChild(rwrdsBtn)
+                document.getElementById('console').appendChild(stkeBtn)
 
                 await fetch_staked_tokens(user_address);
 
