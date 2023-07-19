@@ -1423,6 +1423,15 @@
                 console.log('Connecting to controller.... ..')
                 CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
                 COLLECTION = collection = new web3.eth.Contract(COLLECTION_ABI, CONTRACT_ADDRESS);
+
+                unclaimed_rewards = await availableRewards(user_address)
+                rwrdsBtn = document.createElement('button')
+                rwrdsBtn.className = 'connectButton'
+                rwrdsBtn.onclick = async function (e) { let rewards_return = await claimRewards(); panelOutput(rewards_return) }
+                rwrdsBtn.innerHTML = 'Unclaimed Rewards: '+unclaimed_rewards+' $FLYZ'
+
+                document.getElementById('console').appendChild(rwrdsBtn)
+
                 await fetch_staked_tokens(user_address);
 
             } catch (e) {
@@ -1438,6 +1447,25 @@
             panelOutput("Don't have a wallet? <a href='https://metamask.io/download/'>Install Metamask</a> 🦊");
 
         }
+    }
+
+    // claimRewards(_user (address)) | send =>
+    async function claimRewards() {
+
+        // Check Available Rewards
+        let available_rewards = await availableRewards(user_address);
+        if (available_rewards > 0) {
+            try {
+
+                // Send Txn
+                let claimRewards = await controller.methods.claimRewards().send({ from: user_address });
+                return '✅ Rewards have succesfully been claimed! ('+available_rewards+' $FLYZ)';
+        
+            // Catch Errors!
+            } catch (e) { return '❌ '+e.message; }
+        
+        // No Rewards
+        } else { return '❌ No rewards available to claim!'; }
     }
 
     // Shorten Address
@@ -1696,11 +1724,6 @@
     // Create Element <--
     token_doc.appendChild(token_element);
 
-    //
-
-
-    
-
     // Update Metadata! Build Frog -->
     let metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+token_id+".json")).json();
 
@@ -1727,3 +1750,9 @@
             roman = (key[+digits.pop() + (i * 10)] || "") + roman;
         return Array(+digits.join("") + 1).join("M") + roman;
     }
+
+    /*
+
+        <a style="color: initial; margin: 0px !important; width: fit-content; height: auto; display: initial;" href="https://rarible.com/fresh-frogs"><button id="raribleButton" class="connectButton">Browse on Rarible</button></a>
+
+    */
