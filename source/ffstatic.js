@@ -1435,7 +1435,7 @@
         } else {
 
             console.log('Web3 extension not detected!')
-            panelOutput("Don't have a wallet? <a href='https://metamask.io/download/'>Install Metamask</a>🦊");
+            panelOutput("Don't have a wallet? <a href='https://metamask.io/download/'>Install Metamask</a> 🦊");
 
         }
     }
