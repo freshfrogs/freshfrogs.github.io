@@ -579,11 +579,13 @@
                 let unclaimed_rewards = await availableRewards(user_address)
 
                 rwrdsBtn = document.createElement('button')
+                rwrdsBtn.id = 'rewardsButton'
                 rwrdsBtn.className = 'connectButton'
                 rwrdsBtn.onclick = async function (e) { let rewards_return = await claimRewards(); panelOutput(rewards_return) }
                 rwrdsBtn.innerHTML = '🎁 Claim Rewards: '+unclaimed_rewards.toFixed(1)+' $FLYZ'
 
                 stkeBtn = document.createElement('button')
+                stkeBtn.id = 'stakeButton'
                 stkeBtn.className = 'connectButton'
                 stkeBtn.onclick = async function (e) { await Initiate_stake(); }
                 stkeBtn.innerHTML = '📌 Stake and Earn'
@@ -591,10 +593,11 @@
                 let is_approved = await checkApproval()
 
                 appvlBtn = document.createElement('button')
+                appvlBtn.id = 'approvalButton'
                 appvlBtn.className = 'connectButton'
                 if (! is_approved) {
                     appvlBtn.innerHTML = '❌ Contract Approval'
-                    appvlBtn.onclick = async function (e) { await setApprovalForAll(); }
+                    appvlBtn.onclick = async function (e) { let chkapproval = await setApprovalForAll(); if (! chkapproval) { alert(chkapproval); } else { document.getElementById('approvalButton').innerHTML = '✔️ Contract Approval'; } }
                 } else {
                     appvlBtn.innerHTML = '✔️ Contract Approval'
                 }
