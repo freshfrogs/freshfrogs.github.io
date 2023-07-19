@@ -582,7 +582,7 @@
                 rwrdsBtn.id = 'rewardsButton'
                 rwrdsBtn.className = 'connectButton'
                 rwrdsBtn.onclick = async function (e) { let rewards_return = await claimRewards(); panelOutput(rewards_return) }
-                rwrdsBtn.innerHTML = '🎁 Claim Rewards: '+unclaimed_rewards.toFixed(1)+' $FLYZ'
+                rwrdsBtn.innerHTML = '🎁 Rewards: '+unclaimed_rewards.toFixed(1)+' $FLYZ'
 
                 stkeBtn = document.createElement('button')
                 stkeBtn.id = 'stakeButton'
