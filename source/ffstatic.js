@@ -192,6 +192,9 @@
         // Update Metadata! Build Token -->
         let token_metadata = await (await fetch('https://freshfrogs.github.io/frog/json/'+66+'.json')).json();
 
+        document.getElementById('randomLogo').style.backgroundImage = 'url('+'https://freshfrogs.github.io/frog/'+66+'.png'+')';
+        document.getElementById('randomLogo').style.backgroundSize = "2048px 2048px";
+
         for (let r = 0; r < token_metadata.attributes.length; r++) {
 
             // Build Token Image
