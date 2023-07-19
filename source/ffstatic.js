@@ -1429,7 +1429,7 @@
                 rwrdsBtn = document.createElement('button')
                 rwrdsBtn.className = 'connectButton'
                 rwrdsBtn.onclick = async function (e) { let rewards_return = await claimRewards(); panelOutput(rewards_return) }
-                rwrdsBtn.innerHTML = 'Unclaimed Rewards: '+unclaimed_rewards+' $FLYZ'
+                rwrdsBtn.innerHTML = '🎁 Unclaimed Rewards: '+unclaimed_rewards+' $FLYZ'
 
                 document.getElementById('console').appendChild(rwrdsBtn)
 
