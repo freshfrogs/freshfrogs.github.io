@@ -187,6 +187,46 @@
         }
       ]
 
+    
+    //
+    async function Initiate_stake() {
+
+        
+
+        //var num = prompt("What is your favorite number? ");
+    }
+
+    /*
+
+        setApproval | set staking contract approval
+        checkApproval | check staking contract approval
+
+    */
+    async function setApprovalForAll() {
+
+        // Check Approval Status
+        let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+        if (!is_approved) { 
+            try {
+                
+                // Send Txn
+                let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
+                return true;
+
+            // Catch Errors
+            } catch (e) { return '❌ '+e.message; }
+        
+        // Already Approved
+        } else { return true; }
+    }
+
+    async function checkApproval() {
+        // Check Approval Status
+        let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+        if (!is_approved) { return false; } // Not Approved
+        else { return true; } // Approved
+    }
+
     async function randomLogo() {
 
         // Update Metadata! Build Token -->
@@ -513,8 +553,20 @@
                 stkeBtn.onclick = async function (e) { console.log('stake') }
                 stkeBtn.innerHTML = '📌 Stake and Earn'
 
+                let is_approved = await checkApproval()
+
+                appvlBtn = document.createElement('button')
+                appvlBtn.className = 'connectButton'
+                if (! is_approved) {
+                    appvlBtn.innerHTML = '❌ Contract Approval'
+                    appvlBtn.onclick = async function (e) { await setApprovalForAll(); }
+                } else {
+                    appvlBtn.innerHTML = '✔️ Contract Approval'
+                }
+
                 document.getElementById('console').appendChild(rwrdsBtn)
                 document.getElementById('console').appendChild(stkeBtn)
+                document.getElementById('console').appendChild(appvlBtn)
                 document.getElementById('connectButton').onclick = function (e) { console.log(user_address); }
 
                 await fetch_staked_tokens(user_address);
