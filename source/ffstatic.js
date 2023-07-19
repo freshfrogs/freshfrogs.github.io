@@ -480,7 +480,7 @@
                 console.log('Web3 Address found... '+user_address)
                 console.log('Connecting to controller.... ..')
                 CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
-                COLLECTION = collection = new web3.eth.Contract(COLLECTION_ABI, CONTRACT_ADDRESS);
+                COLLECTION = collection = new web3.eth.Contract(COLLECTION_ABI, COLLECTION_ADDRESS);
 
                 let unclaimed_rewards = await availableRewards(user_address)
 
