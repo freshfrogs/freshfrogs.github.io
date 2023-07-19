@@ -233,6 +233,47 @@
 
     /*
 
+        un-stake (withdraw)
+
+    */
+
+    async function initiate_withdraw(withdrawID) {
+
+
+        // Submit Txn
+        let withdraw_txn = await withdraw(withdrawID);
+        alert(withdraw_txn);
+    
+    }
+
+    // withdraw(_tokenId (uint256), _user (address)) | send =>
+    async function withdraw(tokenId) {
+
+        // Check Staked/Approval Status
+        let staked = await stakerAddress(tokenId);
+        let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+
+        // Invalid Approval / Not Staked
+        if (!approved) { return '❌ Staking contract not approved for token transfer!'; }
+        if (!staked) { return '❌ Frog #'+tokenId+' is not currently staked!'; } 
+
+        // Valid ownership
+        else if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+            try {
+                
+                // Send Txn
+                let withdraw = await controller.methods.withdraw(tokenId).send({ from: user_address });
+                return '✅ Frog #'+tokenId+' has succesfully been un-staked!';
+
+            // Catch Errors
+            } catch (e) { return '❌ '+e.message; }
+
+        // Invalid Ownership
+        } else { return '❌ Frog #'+tokenId+' does not belong to user!'; }
+    }
+
+    /*
+
         setApproval | set staking contract approval
         checkApproval | check staking contract approval
 
@@ -847,7 +888,7 @@
     // Use Functions?
     button_elements = 
         '<div style="text-align: center;">'+
-            '<button class="connectButton" onclick="" style="padding: 6px !important; width: 100%; height: auto;">⏏️ Un-stake</button>'+
+            '<button class="connectButton" onclick="initiate_withdraw('+token_id+')" style="padding: 6px !important; width: 100%; height: auto;">⏏️ Un-stake</button>'+
         '</div>';
 
     // <-- Begin Element
