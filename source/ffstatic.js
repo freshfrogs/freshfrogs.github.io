@@ -872,20 +872,20 @@
             '<div id="prop_'+token_id+'" class="properties">'+
               '<div style="margin: 8px; float: left; width: 100px;">'+
                 '<text>Time Staked</text>'+'<br>'+
-                '<text style="color: #1ac486; font-weight: bold;">'+staked_time_days+' days</text>'+
+                '<text style="color: darkseagreen; font-weight: bold;">'+staked_time_days+' days</text>'+
               '</div>'+
               '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text>$FLYZ Earned</text>'+'<br>'+
-                '<text style="color: #1ac486; font-weight: bold;">'+staked_earned+'</text>'+
+                '<text style="color: darkseagreen; font-weight: bold;">'+staked_earned+'</text>'+
               '</div>'+
               '<br>'+
               '<div style="margin: 8px; float: left; width: 100px;">'+
                 '<text>Level</text>'+'<br>'+
-                '<text style="color: #1ac486; font-weight: bold;">'+staked_level+'</text>'+
+                '<text style="color: darkseagreen; font-weight: bold;">'+staked_level+'</text>'+
               '</div>'+
               '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text>Next Level</text>'+'<br>'+
-                '<text style="color: #1ac486; font-weight: bold;">'+staked_next+' days</text>'+
+                '<text style="color: darkseagreen; font-weight: bold;">'+staked_next+' days</text>'+
               '</div>'+
               button_elements+
             '</div>'+
