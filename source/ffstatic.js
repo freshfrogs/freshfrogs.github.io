@@ -305,7 +305,7 @@
 
     async function randomLogo() {
 
-        var range = [66, 408, 3517, 3620, 608, 581, 3444, 3631],
+        var range = [66, 408]//, 3517, 3620, 608, 581, 3444, 3631]
         rNumber = Math.floor(Math.random()*range.length)%range.length,
         number = range[rNumber];
 
