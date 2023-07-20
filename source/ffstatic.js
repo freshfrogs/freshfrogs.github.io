@@ -305,10 +305,14 @@
 
     async function randomLogo() {
 
-        // Update Metadata! Build Token -->
-        let token_metadata = await (await fetch('https://freshfrogs.github.io/frog/json/'+66+'.json')).json();
+        var range = [66, 408, 3517, 3620, 608, 581, 3444, 3631],
+        rNumber = Math.floor(Math.random()*range.length)%range.length,
+        number = range[rNumber];
 
-        document.getElementById('randomLogo').style.backgroundImage = 'url('+'https://freshfrogs.github.io/frog/'+66+'.png'+')';
+        // Update Metadata! Build Token -->
+        let token_metadata = await (await fetch('https://freshfrogs.github.io/frog/json/'+number+'.json')).json();
+
+        document.getElementById('randomLogo').style.backgroundImage = 'url('+'https://freshfrogs.github.io/frog/'+number+'.png'+')';
         document.getElementById('randomLogo').style.backgroundSize = "2048px 2048px";
 
         for (let r = 0; r < token_metadata.attributes.length; r++) {
