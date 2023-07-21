@@ -892,7 +892,7 @@
     // Use Functions?
     button_elements = 
         '<div style="text-align: center;">'+
-            '<button class="connectButton" onclick="initiate_withdraw('+token_id+')" style="padding: 6px !important; width: 100%; height: auto;">🔵 Un-stake</button>'+
+            '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
         '</div>';
 
     // <-- Begin Element
