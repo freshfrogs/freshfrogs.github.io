@@ -206,7 +206,7 @@
 
     async function stake(tokenId) {
 
-        if (Number.isInteger(value) == false || tokenId > 4040 || tokenId == 0) { return 'TXN FAILED:\n Invalid token ID syntax!'; }
+        if (Number.isInteger(value) == false || tokenId > 4040 || tokenId == 0) { return 'TXN FAILED:\n Invalid token ID!'; }
 
         // Check Ownership / Approval Status
         let owner = await collection.methods.ownerOf(tokenId).call();
@@ -219,6 +219,7 @@
 
                 // Send Txn
                 let stake = await controller.methods.stake(tokenId).send({ from: user_address });
+                console.log(stake)
                 return 'Token #'+tokenId+' has succesfully been staked!';
 
             // Catch Errors
