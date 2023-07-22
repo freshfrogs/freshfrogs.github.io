@@ -223,6 +223,26 @@
     border-radius: 100%;
     margin: 12px;
   }
+  .disconnectedStatus {
+    background: red;
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+    margin: 0px;
+    margin-right: 2;
+    display: inherit;
+    margin-right: 6px;
+  }
+  .connectedStatus {
+    background: greenyellow;
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+    margin: 0px;
+    margin-right: 2;
+    display: inherit;
+    margin-right: 6px;
+  }
 
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -272,7 +292,7 @@
       </div>
       <div id="console" class="bottomPanel">
         <div id="outputPanel" style="color: white;"></div><br>
-        <button id="connectButton" class="connectButton" onclick="connect()">🔴 Connect to Web3</button>
+        <button id="connectButton" class="connectButton" onclick="connect()"><div id="connectStatus" class="disconnectedStatus"></div> Connect to Web3</button>
         <a href="https://rarible.com/fresh-frogs" target="_blank"><button id="raribleButton" class="connectButton">Browse on Rarible</button></a>
       </div>
     </section>
