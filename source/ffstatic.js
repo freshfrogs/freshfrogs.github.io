@@ -206,12 +206,12 @@
 
     async function stake(tokenId) {
 
-        if (Number.isInteger(value) == false || tokenId > 4040 || tokenId == 0) { return 'Invalid token ID syntax!'; }
+        if (Number.isInteger(value) == false || tokenId > 4040 || tokenId == 0) { return 'TXN FAILED:\n Invalid token ID syntax!'; }
 
         // Check Ownership / Approval Status
         let owner = await collection.methods.ownerOf(tokenId).call();
         let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-        if (!approved) { return '❌ Staking contract is missing approval!'; }
+        if (!approved) { return 'TXN FAILED:\n Staking contract is missing approval!'; }
 
         // Valid ownership
         if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
@@ -219,18 +219,18 @@
 
                 // Send Txn
                 let stake = await controller.methods.stake(tokenId).send({ from: user_address });
-                return '✅ Frog #'+tokenId+' has succesfully been staked!';
+                return 'Token #'+tokenId+' has succesfully been staked!';
 
             // Catch Errors
-            } catch (e) { return '❌ '+e.message; }
+            } catch (e) { return 'TXN FAILED:\n '+e.message; }
 
         // Token already Staked
         } else if (owner.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) {
-            return '❌ Frog #'+tokenId+' is already staked!';
+            return 'TXN FAILED:\n Token #'+tokenId+' is already staked!';
         } 
 
         // Invalid Ownership
-        else { return '❌ Frog #'+tokenId+' does not belong to user!'; }
+        else { return 'TXN FAILED:\n Token #'+tokenId+' does not belong to user!'; }
     }
 
     /*
@@ -253,11 +253,7 @@
 
         // Check Staked/Approval Status
         let staked = await stakerAddress(tokenId);
-        let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-
-        // Invalid Approval / Not Staked
-        if (!approved) { return '❌ Staking contract not approved for token transfer!'; }
-        if (!staked) { return '❌ Frog #'+tokenId+' is not currently staked!'; } 
+        if (!staked) { return 'TXN FAILED:\n Token #'+tokenId+' is not currently staked!'; } 
 
         // Valid ownership
         else if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
@@ -265,13 +261,13 @@
                 
                 // Send Txn
                 let withdraw = await controller.methods.withdraw(tokenId).send({ from: user_address });
-                return '✅ Frog #'+tokenId+' has succesfully been un-staked!';
+                return 'Token #'+tokenId+' has succesfully been un-staked!';
 
             // Catch Errors
-            } catch (e) { return '❌ '+e.message; }
+            } catch (e) { return 'TXN FAILED:\n '+e.message; }
 
         // Invalid Ownership
-        } else { return '❌ Frog #'+tokenId+' does not belong to user!'; }
+        } else { return 'TXN FAILED:\n Token #'+tokenId+' does not belong to user!'; }
     }
 
     /*
@@ -292,7 +288,7 @@
                 return true;
 
             // Catch Errors
-            } catch (e) { return '❌ '+e.message; }
+            } catch (e) { return 'TXN FAILED:\n '+e.message; }
         
         // Already Approved
         } else { return true; }
@@ -659,7 +655,7 @@
             } catch (e) {
 
                 console.log(e.message)
-                alert('❌ Something went wrong! '+e.message);
+                alert('FAILED TO CONNECT\n '+e.message);
 
             }
 
@@ -681,13 +677,13 @@
 
                 // Send Txn
                 let claimRewards = await controller.methods.claimRewards().send({ from: user_address });
-                return '✅ Rewards have succesfully been claimed! ('+available_rewards+' $FLYZ)';
+                return 'Rewards have succesfully been claimed! ('+available_rewards+' $FLYZ)';
         
             // Catch Errors!
-            } catch (e) { return '❌ '+e.message; }
+            } catch (e) { return 'TXN FAILED:\n '+e.message; }
         
         // No Rewards
-        } else { return '❌ No rewards available to claim!'; }
+        } else { return 'TXN FAILED:\n No rewards available to claim!'; }
     }
 
     // Shorten Address
