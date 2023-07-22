@@ -642,7 +642,7 @@
                 appvlBtn.className = 'connectButton'
                 if (!is_approved) {
                     appvlBtn.innerHTML = '❌ Contract Approval'
-                    appvlBtn.onclick = async function (e) { let chkapproval = await setApprovalForAll(); if (chkapproval) { document.getElementById('approvalButton').innerHTML = '✔️ Contract Approval'; console.log(chkapproval); } else { alert(chkapproval); } }
+                    appvlBtn.onclick = async function (e) { let chkapproval = await setApprovalForAll(); if (chkapproval == true) { document.getElementById('approvalButton').innerHTML = '✔️ Contract Approval'; console.log(chkapproval); } else { alert(chkapproval); } }
                 } else {
                     appvlBtn.innerHTML = '✔️ Contract Approval'
                 }
