@@ -443,6 +443,7 @@
     let animations = [
         'witchStraw',
         'witchBrown',
+        'witchBlack',
         'blueDartFrog',
         'tongueSpiderRed',
         'tongueSpider',
