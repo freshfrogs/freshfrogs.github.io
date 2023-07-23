@@ -643,7 +643,7 @@
                 appvlBtn.className = 'connectButton'
                 if (!is_approved) {
                     appvlBtn.innerHTML = '❌ Contract Approval'
-                    appvlBtn.onclick = async function (e) { alert("setApprovalForAll() \nThis is a one time transaction that allows the staking contract to recieve and transfer your tokens."); let chkapproval = await setApprovalForAll(); if (chkapproval == true) { document.getElementById('approvalButton').innerHTML = '✔️ Contract Approval'; console.log(chkapproval); } else { alert(chkapproval); } }
+                    appvlBtn.onclick = async function (e) { alert("setApprovalForAll() \nTo start staking, the contract must first be approved. This is a one time transaction that allows the staking contract to recieve and transfer your tokens."); let chkapproval = await setApprovalForAll(); if (chkapproval == true) { document.getElementById('approvalButton').innerHTML = '✔️ Contract Approval'; console.log(chkapproval); } else { alert(chkapproval); } }
                 } else {
                     appvlBtn.innerHTML = '✔️ Contract Approval'
                 }
