@@ -446,6 +446,11 @@
         newAttribute = document.createElement("img");
         newAttribute.alt = attribute
 
+        // <img src="imagenotfound.gif" alt="Image not found" onerror="this.onerror=null;this.src='imagefound.gif';" />
+        newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/animations/"+attribute+"_animation.gif";
+        newAttribute.alt = attribute
+        newAttribute.onerror = function(){ this.onerror=null; this.src='https://freshfrogs.github.io/frog/build_files/"+trait+"/"+attribute+".png'; };
+
         if (attribute == 'witchStraw' || attribute == 'witchBrown' || attribute == 'blueDartFrog' || attribute == 'tongueSpiderRed' || attribute == 'tongueSpider' || attribute == 'tongue' || attribute == 'tongueFly' || attribute == 'croaking' || attribute == 'peace' || attribute == 'inversedEyes' || attribute == 'closedEyes' || attribute == 'thirdEye' || attribute == 'mask' || attribute == 'smoking' || attribute == 'smokingCigar' || attribute == 'smokingPipe' || attribute == 'circleShadesRed' || attribute == 'circleShadesPurple' || attribute == 'shades' || attribute == 'shadesPurple' || attribute == 'shadesThreeD' || attribute == 'shadesWhite' || attribute == 'circleNightVision') {
             newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/animations/"+attribute+"_animation.gif";
         } else {
