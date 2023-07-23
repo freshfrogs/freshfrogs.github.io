@@ -196,7 +196,7 @@
     async function Initiate_stake() {
 
         // Token ID input
-        var stakeID = prompt("Which token would you like to stake?\nToken ID: ");
+        var stakeID = prompt("Please Note: \nWhile tokens are staked, you will not be able to sell them on secondary market places. To do this you will have to un-stake directly from this site. Once a token is un-staked it's staking level will reset to zero!\n"+"\nWhich token would you like to stake?\nToken ID: ");
 
         // Submit Txn
         let stake_txn = await stake(stakeID);
@@ -643,7 +643,7 @@
                 appvlBtn.className = 'connectButton'
                 if (!is_approved) {
                     appvlBtn.innerHTML = '❌ Contract Approval'
-                    appvlBtn.onclick = async function (e) { let chkapproval = await setApprovalForAll(); if (chkapproval == true) { document.getElementById('approvalButton').innerHTML = '✔️ Contract Approval'; console.log(chkapproval); } else { alert(chkapproval); } }
+                    appvlBtn.onclick = async function (e) { alert("setApprovalForAll() \nThis is a one time transaction that allows the staking contract to recieve and transfer your tokens."); let chkapproval = await setApprovalForAll(); if (chkapproval == true) { document.getElementById('approvalButton').innerHTML = '✔️ Contract Approval'; console.log(chkapproval); } else { alert(chkapproval); } }
                 } else {
                     appvlBtn.innerHTML = '✔️ Contract Approval'
                 }
