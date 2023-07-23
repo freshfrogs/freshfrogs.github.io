@@ -484,6 +484,7 @@
         for (y = 0; y < animations.length; y++) {
             if (attribute == animations[y]) {
                 newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/animations/"+attribute+"_animation.gif";
+                break;
             }
         }
 
