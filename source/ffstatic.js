@@ -606,21 +606,44 @@
     async function connect() {
 
         if (typeof window.ethereum !== "undefined") {
-            console.log('Attempting to connect to web3...')
+            
             try {
 
+                console.log('Attempting to connect to web3...')
                 console.log('Requesting accounts...')
+
                 await ethereum.request({ method: "eth_requestAccounts" });
+
                 console.log('Establishing...')
+
                 const web3 = new Web3(window.ethereum);
                 //const provider = new ethers.providers.Web3Provider(window.ethereum);
 
                 user_address = await web3.currentProvider.selectedAddress;
-                document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="connectedStatus"></div> Connected - ['+truncateAddress(user_address)+']'
-                console.log('Web3 Address found... '+user_address)
-                console.log('Connecting to controller.... ..')
+
+                console.log('Connected Ethereum wallet: \n'+user_address)
+
+                console.log('Connecting to controller contract...')
+
                 CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
+
+                console.log(CONTROLLER_ADDRESS)
+                console.log('Connecting to collection contract...')
+
                 COLLECTION = collection = new web3.eth.Contract(COLLECTION_ABI, COLLECTION_ADDRESS);
+
+                console.log(COLLECTION_ADDRESS)
+
+                // No. Tokens owned by user
+                userTokens = await collection.methods.balanceOf(user_address).call();
+
+                console.log('Total tokens currently held by user: ('+userTokens+')')
+
+                // No. Tokens staked by user
+                userTokensStaked = await stakers(user_address, 'amountStaked')
+
+                document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="connectedStatus"></div> Connected - ['+truncateAddress(user_address)+']'
+                //document.getElementById('connectButton').onclick = async function (e) { alert('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); }
 
                 let unclaimed_rewards = await availableRewards(user_address)
 
@@ -651,7 +674,7 @@
                 document.getElementById('console').appendChild(rwrdsBtn)
                 document.getElementById('console').appendChild(stkeBtn)
                 document.getElementById('console').appendChild(appvlBtn)
-                document.getElementById('connectButton').onclick = function (e) { console.log(user_address); }
+                document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); }
 
                 await fetch_staked_tokens(user_address);
 
