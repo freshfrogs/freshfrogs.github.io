@@ -452,18 +452,10 @@
             newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/"+attribute+".png";
         }
 
-        if (where == 'bigContainer') {
-            if (trait == 'Trait') {
-                newAttribute.className = "frogImg6";
-            } else {
-                newAttribute.className = "frogImg4";
-            }
+        if (trait == 'Trait') {
+            newAttribute.className = "frogImg5";
         } else {
-            if (trait == 'Trait') {
-                newAttribute.className = "frogImg5";
-            } else {
-                newAttribute.className = "frogImg3";
-            }
+            newAttribute.className = "frogImg3";
         }
 
         document.getElementById(where).appendChild(newAttribute);
