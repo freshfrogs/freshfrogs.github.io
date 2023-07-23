@@ -470,14 +470,6 @@
     // loadTrait(_trait(family), _attribute(type), _where(element))
     function loadTrait(trait, attribute, where) {
 
-        newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/"+attribute+".png";
-
-        for (y = 0; y < animations.length; y++) {
-            if (attribute == animations[y]) {
-                newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/animations/"+attribute+"_animation.gif";
-            }
-        }
-
         newAttribute = document.createElement("img");
         newAttribute.alt = attribute
 
@@ -485,6 +477,14 @@
             newAttribute.className = "frogImg5";
         } else {
             newAttribute.className = "frogImg3";
+        }
+
+        newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/"+attribute+".png";
+
+        for (y = 0; y < animations.length; y++) {
+            if (attribute == animations[y]) {
+                newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/animations/"+attribute+"_animation.gif";
+            }
         }
 
         document.getElementById(where).appendChild(newAttribute);
