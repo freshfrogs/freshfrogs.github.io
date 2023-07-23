@@ -464,7 +464,9 @@
         'shadesThreeD',
         'shadesWhite',
         'circleNightVision',
-        'yellow'
+        'yellow',
+        'blue(2)',
+        'blue'
     ]
 
     // loadTrait(_trait(family), _attribute(type), _where(element))
