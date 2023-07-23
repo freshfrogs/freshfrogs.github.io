@@ -470,6 +470,8 @@
     // loadTrait(_trait(family), _attribute(type), _where(element))
     function loadTrait(trait, attribute, where) {
 
+        newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/"+attribute+".png";
+
         for (y = 0; y < animations.length; y++) {
             if (attribute == animations[y]) {
                 newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/animations/"+attribute+"_animation.gif";
@@ -478,12 +480,6 @@
 
         newAttribute = document.createElement("img");
         newAttribute.alt = attribute
-
-        if (attribute == 'witchStraw' || attribute == 'witchBrown' || attribute == 'blueDartFrog' || attribute == 'tongueSpiderRed' || attribute == 'tongueSpider' || attribute == 'tongue' || attribute == 'tongueFly' || attribute == 'croaking' || attribute == 'peace' || attribute == 'inversedEyes' || attribute == 'closedEyes' || attribute == 'thirdEye' || attribute == 'mask' || attribute == 'smoking' || attribute == 'smokingCigar' || attribute == 'smokingPipe' || attribute == 'circleShadesRed' || attribute == 'circleShadesPurple' || attribute == 'shades' || attribute == 'shadesPurple' || attribute == 'shadesThreeD' || attribute == 'shadesWhite' || attribute == 'circleNightVision') {
-            newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/animations/"+attribute+"_animation.gif";
-        } else {
-            newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/"+attribute+".png";
-        }
 
         if (trait == 'Trait') {
             newAttribute.className = "frogImg5";
