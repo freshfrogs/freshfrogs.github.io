@@ -454,7 +454,7 @@
         // <img src="imagenotfound.gif" alt="Image not found" onerror="this.onerror=null;this.src='imagefound.gif';" />
         newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/animations/"+attribute+"_animation.gif";
         newAttribute.alt = attribute
-        newAttribute.onerror = function(){ console.log('test !!!'); newAttribute.src='https://freshfrogs.github.io/frog/build_files/"+trait+"/"+attribute+".png'; };
+        newAttribute.onerror = function(){ console.log('----------'); newAttribute.onerror=null; newAttribute.src='https://freshfrogs.github.io/frog/build_files/"+trait+"/"+attribute+".png'; };
 
         document.getElementById(where).appendChild(newAttribute);
 
