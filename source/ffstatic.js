@@ -467,7 +467,10 @@
         'circleNightVision',
         'yellow',
         'blue(2)',
-        'blue'
+        'blue',
+        'baseballCapBlue',
+        'baseballCapRed',
+        'baseballCapWhite'
     ]
 
     // loadTrait(_trait(family), _attribute(type), _where(element))
