@@ -440,8 +440,41 @@
 
     */
 
+    let animations = [
+        'witchStraw',
+        'witchBrown',
+        'blueDartFrog',
+        'tongueSpiderRed',
+        'tongueSpider',
+        'tongue',
+        'tongueFly',
+        'croaking',
+        'peace',
+        'inversedEyes',
+        'closedEyes',
+        'thirdEye',
+        'mask',
+        'smoking',
+        'smokingCigar',
+        'smokingPipe',
+        'circleShadesRed',
+        'circleShadesPurple',
+        'shades',
+        'shadesPurple',
+        'shadesThreeD',
+        'shadesWhite',
+        'circleNightVision',
+        'yellow'
+    ]
+
     // loadTrait(_trait(family), _attribute(type), _where(element))
     function loadTrait(trait, attribute, where) {
+
+        for (y = 0; y < animations.length; y++) {
+            if (attribute == animations[y]) {
+                newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/animations/"+attribute+"_animation.gif";
+            }
+        }
 
         newAttribute = document.createElement("img");
         newAttribute.alt = attribute
