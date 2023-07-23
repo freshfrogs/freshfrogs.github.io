@@ -208,7 +208,7 @@
 
         let tokenId = parseInt(tokenId)
 
-        if (Number.isInteger(tokenId) == false || tokenId > 4040 || tokenId <= 0) { return 'TXN FAILED:\n Invalid token ID!'; }
+        if (Number.isInteger(tokenId) == false || tokenId > 4040 || tokenId < 1) { return 'TXN FAILED:\n Invalid token ID!'; }
 
         // Check Ownership / Approval Status
         let owner = await collection.methods.ownerOf(tokenId).call();
