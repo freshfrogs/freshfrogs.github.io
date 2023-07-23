@@ -206,7 +206,7 @@
 
     async function stake(tokenId) {
 
-        let tokenId = parseInt(tokenId)
+        tokenId = parseInt(tokenId)
 
         if (Number.isInteger(tokenId) == false || tokenId > 4040 || tokenId < 1) { return 'TXN FAILED:\n Invalid token ID!'; }
 
