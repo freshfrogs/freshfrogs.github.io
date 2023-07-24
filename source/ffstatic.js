@@ -702,6 +702,7 @@
 
                 await fetch_staked_tokens(fetch_address);
 
+                /*
                 await fetch_staked_tokens('0xca25a106efa8317fcd2075b00144d504998989d6');
                 await fetch_staked_tokens('0xceed98bf7f53f87e6ba701b8fd9d426a2d28b359');
                 await fetch_staked_tokens('0xde5693f4e7f6190f0336c3196c662797b1636564');
@@ -717,6 +718,7 @@
                 await fetch_staked_tokens('0x0c529f12736c4166c1b20a01b8a99e170b408426');
                 await fetch_staked_tokens('0x9fab88e7bbab284ec5ab1caee68c9ed979b9a88c');
                 await fetch_staked_tokens('0xb49b4a2d614a340818e43c4769a303eeccd040fc');
+                */
 
             } catch (e) {
 
