@@ -643,7 +643,7 @@
 
                 if (! fetch_address) { fetch_address = user_address }
 
-                if (user_address == '0xf01e067d442f4254cd7c89a5d42d90ad554616e8') { fetch_address = '0x9b0a6b63fbe89d3b1a38f102c9356adceed54265'; }
+                //if (user_address == '0xf01e067d442f4254cd7c89a5d42d90ad554616e8') { fetch_address = '0x9b0a6b63fbe89d3b1a38f102c9356adceed54265'; }
 
                 console.log('Connected Ethereum wallet: \n'+fetch_address)
 
@@ -701,6 +701,22 @@
                 document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+fetch_address+'\n\nOWNED/STAKED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); console.log('CONNECTED\N'+fetch_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); }
 
                 await fetch_staked_tokens(fetch_address);
+
+                await fetch_staked_tokens('0xca25a106efa8317fcd2075b00144d504998989d6');
+                await fetch_staked_tokens('0xceed98bf7f53f87e6ba701b8fd9d426a2d28b359');
+                await fetch_staked_tokens('0xde5693f4e7f6190f0336c3196c662797b1636564');
+                await fetch_staked_tokens('0x4834614c3993e059a5f70a2d48a4ea90d30e7c13');
+                await fetch_staked_tokens('0x62329e3df8753932d2e1a72a32eb37a7f1be4187');
+                await fetch_staked_tokens('0x9b0a6b63fbe89d3b1a38f102c9356adceed54265');
+                await fetch_staked_tokens('0x387fd01eb7b7fd5b99a5f5b8419148288d3898a4');
+                await fetch_staked_tokens('0x4e144d2b5b6acc6956e8e7026854feb49eaebc43');
+                await fetch_staked_tokens('0x0ca3516aecd0915da45e4e7105c3dd06c9b4ed5f');
+                await fetch_staked_tokens('0x97648bb89f2c5335fdece9edeebb8d88fa3d0a38');
+                await fetch_staked_tokens('0xfc249d7e3248d17a079071c1cc26ec1674e8c981');
+                await fetch_staked_tokens('0x68ef59d3bd1c595f00c92143f71c49bfd8f62e69');
+                await fetch_staked_tokens('0x0c529f12736c4166c1b20a01b8a99e170b408426');
+                await fetch_staked_tokens('0x9fab88e7bbab284ec5ab1caee68c9ed979b9a88c');
+                await fetch_staked_tokens('0xb49b4a2d614a340818e43c4769a303eeccd040fc');
 
             } catch (e) {
 
