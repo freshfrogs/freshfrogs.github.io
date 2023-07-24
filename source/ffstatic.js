@@ -306,23 +306,11 @@
 
     async function randomLogo() {
 
-        var range = [66, 408]//, 3517, 3620, 608, 581, 3444, 3631]
+        var range = [3071, 3780, 3130, 608, 1881]
         rNumber = Math.floor(Math.random()*range.length)%range.length,
         number = range[rNumber];
 
-        // Update Metadata! Build Token -->
-        let token_metadata = await (await fetch('https://freshfrogs.github.io/frog/json/'+number+'.json')).json();
-
-        document.getElementById('randomLogo').style.backgroundImage = 'url('+'https://freshfrogs.github.io/frog/'+number+'.png'+')';
-        document.getElementById('randomLogo').style.backgroundSize = "2048px 2048px";
-
-        for (let r = 0; r < token_metadata.attributes.length; r++) {
-
-            // Build Token Image
-            let attribute = token_metadata.attributes[r]
-            loadTrait(attribute.trait_type, attribute.value, 'randomLogo');
-
-        }
+        display_token(number);
 
     }
 
@@ -393,18 +381,19 @@
     async function display_token(token_id) {
 
         let image_link = 'https://freshfrogs.github.io/frog/'+token_id+'.png'
-        let token_name = 'Frog #'+token_id
+        let token_name = 'Display #'+token_id
 
         // <-- Begin Element
-        token_doc = document.getElementById('frogs');
+        token_doc = document.getElementById('randomLogo');
+        token_doc.innerHTML = '';
         token_element = document.createElement('div');
 
         // Element Details -->
         token_element.id = token_name;
         token_element.className = 'display_token';
         token_element.innerHTML = 
-            '<div id="'+token_id+'" class="renderLeft">'+
-                '<div class="display_token_img_cont" id="cont_'+token_id+'">'+
+            '<div id="display_'+token_id+'" class="renderLeft">'+
+                '<div class="display_token_img_cont" id="displayCont_'+token_id+'">'+
                     //'<img src="'+image_link+'" class="displayImage"/>'+
                 '</div>'+
             '</div>'
@@ -419,7 +408,7 @@
 
             // Build Token Image
             let attribute = token_metadata.attributes[j]
-            loadTrait(attribute.trait_type, attribute.value, 'cont_'+token_id);
+            loadTrait(attribute.trait_type, attribute.value, 'displayCont_'+token_id);
 
         }
         
