@@ -440,7 +440,7 @@
 
     */
 
-    let animations = [
+    let animated = [
         'witchStraw',
         'witchBrown',
         'witchBlack',
@@ -465,12 +465,14 @@
         'shadesThreeD',
         'shadesWhite',
         'circleNightVision',
+        'baseballCapBlue',
+        'baseballCapRed',
+        'baseballCapWhite',
         'yellow',
         'blue(2)',
         'blue',
-        'baseballCapBlue',
-        'baseballCapRed',
-        'baseballCapWhite'
+        'cyan',
+        'brown'
     ]
 
     // loadTrait(_trait(family), _attribute(type), _where(element))
@@ -487,8 +489,8 @@
 
         newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/"+attribute+".png";
 
-        for (y = 0; y < animations.length; y++) {
-            if (attribute == animations[y]) {
+        for (y = 0; y < animated.length; y++) {
+            if (attribute == animated[y]) {
                 newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/animations/"+attribute+"_animation.gif";
                 break;
             }
@@ -760,7 +762,7 @@
         
     }
 
-    // Calculate total time a Frog has been staked (Hours)
+    // Calculate total time a token has been staked (Hours)
     async function timeStaked(tokenId) {
 
         // Check Staked Status
