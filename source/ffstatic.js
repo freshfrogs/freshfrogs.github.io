@@ -307,10 +307,7 @@
     async function randomLogo() {
 
         var range = [3071, 3780, 3130, 608, 1881]
-        rNumber = Math.floor(Math.random()*range.length)%range.length,
-        number = range[rNumber];
-
-        display_token(number);
+        for (let k = 0; k < range.length; k++) { display_token(range[k]); }
 
     }
 
@@ -385,7 +382,6 @@
 
         // <-- Begin Element
         token_doc = document.getElementById('randomLogo');
-        token_doc.innerHTML = '';
         token_element = document.createElement('div');
 
         // Element Details -->
