@@ -627,7 +627,7 @@
                 console.log('Attempting to connect to web3...')
                 console.log('Requesting accounts...')
 
-                document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="pendingStatus"></div> Connecting...]'
+                document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="pendingStatus"></div> Connecting...'
 
                 await ethereum.request({ method: "eth_requestAccounts" });
 
