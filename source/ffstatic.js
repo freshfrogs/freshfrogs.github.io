@@ -653,7 +653,7 @@
 
                 if (! fetch_address) { fetch_address = user_address }
 
-                if (user_address == '0xf01e067d442f4254cd7c89a5d42d90ad554616e8') { fetch_address = '0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25'; }
+                if (user_address == '0xf01e067d442f4254cd7c89a5d42d90ad554616e8') { fetch_address = '0xca25a106efa8317fcd2075b00144d504998989d6'; }
 
                 console.log('Connected Ethereum wallet: \n'+fetch_address)
 
