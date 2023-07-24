@@ -430,6 +430,7 @@
         'witchBrown',
         'witchBlack',
         'blueDartFrog',
+        'blueTreeFrog',
         'tongueSpiderRed',
         'tongueSpider',
         'tongue',
