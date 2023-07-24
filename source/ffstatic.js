@@ -702,7 +702,7 @@
                 document.getElementById('console').appendChild(rwrdsBtn)
                 document.getElementById('console').appendChild(stkeBtn)
                 document.getElementById('console').appendChild(appvlBtn)
-                document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); }
+                document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); }
 
                 await fetch_staked_tokens(user_address);
 
