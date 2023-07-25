@@ -696,7 +696,7 @@
         // Token (Alpha) Metdata
         let metadata_a = {
             "Frog": "",
-            "specialFrog": "",
+            "SpecialFrog": "",
             "Trait": "",
             "Accessory": "",
             "Eyes": "",
@@ -707,7 +707,7 @@
         // Token (Bravo) Metdata
         let metadata_b = {
             "Frog": "",
-            "specialFrog": "",
+            "SpecialFrog": "",
             "Trait": "",
             "Accessory": "",
             "Eyes": "",
@@ -718,7 +718,7 @@
         // Token (Charlie) Metdata
         let metadata_c = {
             "Frog": "",
-            "specialFrog": "",
+            "SpecialFrog": "",
             "Subset": "",
             "Trait": "",
             "Accessory": "",
@@ -731,7 +731,7 @@
         
         console.log('= TOKEN #'+token_a);
         console.log('= ');
-        // Fetch Alpha Metedata ------>
+        // Fetch Alpha Metadata ------>
         let metadata_a_raw = await (await fetch(SOURCE_PATH+'/json/'+token_a+".json")).json();
         for (i = 0; i < metadata_a_raw.attributes.length; i++) {
 
@@ -746,7 +746,7 @@
         console.log('= ');
         console.log('= TOKEN #'+token_b);
         console.log('= ');
-        // Fetch Bravo Metedata ------>
+        // Fetch Bravo Metadata ------>
         let metadata_b_raw = await (await fetch(SOURCE_PATH+'/json/'+token_b+".json")).json();
         for (j = 0; j < metadata_b_raw.attributes.length; j++) {
 
@@ -763,10 +763,40 @@
         console.log('= ');
 
         // BUILD NEW METADATA ------>
+
+        // Special Frogs
+        if (metadata_a['SpecialFrog'] !== '' || metadata_b['SpecialFrog'] !== '') {
+
+            // Base Special Frog AND Sub Special Frog
+            if (metadata_a['SpecialFrog'] !== '' && metadata_b['SpecialFrog'] !== '') {
+                metadata_b['SpecialFrog'] = metadata_a['SpecialFrog']+'/SpecialFrog/'+metadata_b['SpecialFrog'];
+                metadata_b['Trait'] = '';
+            }
+    
+            // Base Special Frog
+            else if (metadata_b['Frog'] !== '') {
+                metadata_b['Trait'] = 'SpecialFrog/'+metadata_a['SpecialFrog']+'/'+metadata_b['Trait'];
+                metadata_b['SpecialFrog'] = metadata_a['SpecialFrog']+'/'+metadata_b['Frog'];
+                metadata_b['Frog'] = '';
+            }
+    
+            // Sub Special Frog
+            else if (metadata_a['Frog'] !== '') {
+                metadata_b['Trait'] = 'SpecialFrog/'+metadata_b['SpecialFrog']+'/'+metadata_a['Trait'];
+                metadata_a['SpecialFrog'] = metadata_b['SpecialFrog'];
+                metadata_b['SpecialFrog'] = metadata_b['SpecialFrog']+'/'+metadata_a['Frog'];
+                metadata_a['Frog'] = '';
+            }
+    
+        }
         
         // Select Attributes!
         if (metadata_a['Frog'] !== '') {metadata_c['Frog'] = metadata_b['Frog']}
+        else if (metadata_a['SpecialFrog'] !== '') { metadata_c['SpecialFrog'] = '/bottom/'+metadata_a['SpecialFrog']; }
+
         if (metadata_b['Frog'] !== '') {metadata_c['Subset'] = metadata_a['Frog']}
+        else if (metadata_b['SpecialFrog'] !== '') { metadata_c['SpecialFrog'] = metadata_b['SpecialFrog'] }
+
         console.log('= Frog : '+metadata_c['Frog']);
         console.log('= Subset : '+metadata_c['Subset']);
 
@@ -794,6 +824,7 @@
         
         // Alpha (UNDERLAY)
         if (metadata_c['Frog'] !== '') { loadTrait('Frog', metadata_c['Frog'], location); }
+        else if (metadata_c['SpecialFrog'] !== '') { loadTrait('SpecialFrog', metadata_c['SpecialFrog'], location); }
         
         // Bravo (OVERLAY)
         if (metadata_c['Subset'] !== '') { loadTrait('Frog/subset', metadata_c['Subset'], location); }
