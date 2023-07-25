@@ -570,12 +570,12 @@
 
             dropdown_a.onchange = async function (e) {
                 updateMorphDisplay(dropdown_a.value, dropdown_b.value);
-                morph(dropdown_a.value, dropdown_b.value, 'morph-token-result');
+                morph(dropdown_a.value, dropdown_b.value, 'morph-token-display');
             }
             
             dropdown_b.onchange = async function (e) {
                 updateMorphDisplay(dropdown_a.value, dropdown_b.value);
-                morph(dropdown_a.value, dropdown_b.value, 'morph-token-result');
+                morph(dropdown_a.value, dropdown_b.value, 'morph-token-display');
             }
 
         } else { alert('Not enough tokens staked to morph!') }
