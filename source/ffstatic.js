@@ -534,78 +534,126 @@
 
     }
 
-    async function morphDisplay() {
+    async function updateMorphTokenInfo() {
+
+        let staker_tokens_array = await getStakedTokens(user_address);
+        if (staker_tokens_array.length >= 1) {
+
+            for (var i = 0; i < staker_tokens_array.length; i++) {
+
+                tokenId = staker_tokens_array[i].tokenId
+                
+                // Morph Token A Dropdown Option
+                drpdwnoptn = document.createElement('option')
+                drpdwnoptn.value = tokenId
+                drpdwnoptn.innerHTML = 'Frog #'+tokenId;
+                drpdwnoptn.className = 'tokens-dropdown-option';
+
+                document.getElementById('token-ids-a').appendChild(drpdwnoptn)
+
+                // Morph Token B Dropdown Option
+                drpdwnoptn = document.createElement('option')
+                drpdwnoptn.value = tokenId
+                drpdwnoptn.innerHTML = 'Frog #'+tokenId;
+                drpdwnoptn.className = 'tokens-dropdown-option';
+
+                document.getElementById('token-ids-b').appendChild(drpdwnoptn)
+
+            }
+
+            updateMorphDisplay(staker_tokens_array[1].tokenId, staker_tokens_array[2].tokenId)
+
+            let dropdown_a = document.getElementById('token-ids-a');
+            let dropdown_b = document.getElementById('token-ids-b');
+
+            dropdown_a.onchange = async function (e) {
+                updateMorphDisplay(dropdown_a.value, dropdown_b.value)
+            }
+            
+            dropdown_b.onchange = async function (e) {
+                updateMorphDisplay(dropdown_a.value, dropdown_b.value)
+            }
+
+        }
+    }
+
+    async function updateMorphDisplay(token_a, token_b) {
 
         /*
+            Morph Token A
+            mta-time-staked
+            mta-flyz-earned
+            mta-level
+            mta-next-level
         */
 
-        // Prepare parent element
-        parentElement = document.getElementById('console');
-        parentElement.innerHTML = '';
+        document.getElementById('mta-container').innerHTML = ''
 
-        // Dropdown list A
-        tknadropdown = document.createElement('select')
-        tknadropdown.id = 'token-ids-a'
-        tknadropdown.name = 'token-ids-a'
-        tknadropdown.className = 'connectButton'
+        // Update Metadata! Build Token -->
+        let mta_metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+token_a+".json")).json();
 
-        parentElement.appendChild(tknadropdown)
+        for (let i = 0; i < mta_metadata.attributes.length; i++) {
 
-        // Dropdown list B
-        tknbdropdown = document.createElement('select')
-        tknbdropdown.id = 'token-ids-b'
-        tknbdropdown.name = 'token-ids-b'
-        tknbdropdown.className = 'connectButton'
+            let attribute = mta_metadata.attributes[i]
+            loadTrait(attribute.trait_type, attribute.value, 'mta-container');
 
-        parentElement.appendChild(tknbdropdown)
-
-        // Input tokens array
-        await fetch_staked_tokens_raw();
-
-        // Break Element
-        brel = document.createElement('br')
-
-        parentElement.appendChild(brel);
-
-        // Token A UI Display
-        tknaui = document.createElement('div');
-        tknaui.id = 'tknaui'
-        tknaui.className = 'tknaui'
-
-        // tknaui rsltelmnt tknbui
-        parentElement.appendChild(tknaui);
-
-        // Token B UI Display
-        tknbui = document.createElement('div');
-        tknbui.id = 'tknbui'
-        tknbui.className = 'tknbui'
-
-        parentElement.appendChild(tknbui);
-
-        // Result Element
-        parentElement.appendChild(brel);
-        
-        rsltelmnt = document.createElement('div');
-        rsltelmnt.id = 'rsltelmnt'
-        rsltelmnt.className = 'rsltelmnt'
-
-        parentElement.appendChild(rsltelmnt);
-
-        console.log('----')
-
-        // Build token UI elements render_token()
-        let dropdown_a = document.getElementById('token-ids-a');
-        dropdown_a.onchange = async function (e) {
-          console.log('Token A: '+dropdown_a.value);
-          document.getElementById('tknaui').innerHTML = '';
-          await render_token(dropdown_a.value, 'tknaui')
         }
-        let dropdown_b = document.getElementById('token-ids-b');
-        dropdown_b.onchange = async function (e) {
-          console.log('Token B: '+dropdown_b.value);
-          document.getElementById('tknbui').innerHTML = '';
-          await render_token(dropdown_b.value, 'tknbui')
+
+        mtaTimeStaked = document.getElementById('mta-time-staked')
+        mtaFlyzEarned = document.getElementById('mta-flyz-earned')
+        mtaLevel = document.getElementById('mta-level')
+        mtaNextLevel = document.getElementById('mta-next-level')
+
+        mtaTimeStaked.innerHTML = ''
+        mtaFlyzEarned.innerHTML = ''
+        mtaLevel.innerHTML = ''
+        mtaNextLevel.innerHTML = ''
+
+        let mtaStakingData = await stakingValues(token_a)
+        //[ Time Staked, Staked Level, Next Level, Flyz Earned]
+
+        mtaTimeStaked.innerHTML = mtaStakingData[0]
+        mtaFlyzEarned.innerHTML = mtaStakingData[3]
+        mtaLevel.innerHTML = mtaStakingData[1]
+        mtaNextLevel.innerHTML = mtaStakingData[2]
+
+        /*
+            Morph Token B
+            mtb-time-staked
+            mtb-flyz-earned
+            mtb-level
+            mtb-next-level
+        */
+
+        document.getElementById('mtb-container').innerHTML = ''
+       
+        // Update Metadata! Build Token -->
+        let mtb_metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+token_b+".json")).json();
+
+        for (let i = 0; i < mtb_metadata.attributes.length; i++) {
+
+            let attribute = mtb_metadata.attributes[i]
+            loadTrait(attribute.trait_type, attribute.value, 'mtb-container');
+
         }
+
+        mtbTimeStaked = document.getElementById('mtb-time-staked')
+        mtbFlyzEarned = document.getElementById('mtb-flyz-earned')
+        mtbLevel = document.getElementById('mtb-level')
+        mtbNextLevel = document.getElementById('mtb-next-level')
+
+        mtbTimeStaked.innerHTML = ''
+        mtbFlyzEarned.innerHTML = ''
+        mtbLevel.innerHTML = ''
+        mtbNextLevel.innerHTML = ''
+
+        let mtbStakingData = await stakingValues(token_b)
+        //[ Time Staked, Staked Level, Next Level, Flyz Earned]
+
+        mtbTimeStaked.innerHTML = mtbStakingData[0]
+        mtbFlyzEarned.innerHTML = mtbStakingData[3]
+        mtbLevel.innerHTML = mtbStakingData[1]
+        mtbNextLevel.innerHTML = mtbStakingData[2]
 
     }
 
@@ -1080,14 +1128,19 @@
     staked_level = staking_values[1]
     staked_next = staking_values[2]
     staked_earned = staking_values[3]
-    
 
-    // Use Functions?
-    button_elements = 
-        '<div style="text-align: center;">'+
-            '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
-            '<a class="" target="_blank" href="https://freshfrogs.github.io/frog/json/'+token_id+'.json"><button class="unstake_button">View Metadata</button></a>'
-        '</div>';
+    if (location == 'tknaui') {
+        button_elements = ''
+    } else if (location == 'tkbaui') {
+
+    } else {
+        // Use Functions?
+        button_elements = 
+            '<div style="text-align: center;">'+
+                '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
+                '<a class="" target="_blank" href="https://freshfrogs.github.io/frog/json/'+token_id+'.json"><button class="unstake_button">View Metadata</button></a>'
+            '</div>';
+    }
 
     // <-- Begin Element
     token_doc = document.getElementById(location);

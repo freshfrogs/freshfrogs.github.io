@@ -297,7 +297,7 @@
       gtag('config', 'G-6PB0WKB4SH');
       // -- >
 
-      document.addEventListener("DOMContentLoaded", async () => { await connect(); await morphDisplay(); })
+      document.addEventListener("DOMContentLoaded", async () => { await connect(); await updateMorphTokenInfo(); })
       //<a href="https://freshfrogs.github.io/learn-more" target="_blank"><button id="learnmoreButton" class="connectButton">💡 Learn More</button></a>
 
     </script>
@@ -323,7 +323,69 @@
       </div>
       <div id="console" class="bottomPanel">
         <div id="outputPanel" style="color: white;"></div><br>
-        <button id="connectButton" class="connectButton" onclick="connect()"><div id="connectStatus" class="disconnectedStatus"></div> Connect to Web3</button><a href="https://rarible.com/fresh-frogs" target="_blank"><button id="raribleButton" class="connectButton">🛒 View on Rarible</button></a></div>
+        <div id="tknaui" class="display_token">
+            <div class="display_token_cont">
+                <div id="mta-token" class="renderLeft" style="background: white;">
+                    <div class="innerLeft">
+                        <div class="display_token_img_cont" id="mta-container">
+                        </div>
+                    </div>
+                </div>
+                <div class="renderRight">
+                    <div class="innerRight">
+                        <div id="mta-traits" class="trait_list">
+                            <strong id="mta-token-name"></strong>
+                        </div>
+                        <div id="mta-properties" class="properties">
+                            <div style="margin: 8px; float: left; width: 100px;"><text>Time Staked</text><br><text id="mta-time-staked" style="color: darkseagreen; font-weight: bold;"></text>
+                            </div>
+                            <div style="margin: 8px; float: right; width: 100px;"><text>$FLYZ Earned</text><br><text id="mta-flyz-earned" style="color: darkseagreen; font-weight: bold;"></text>
+                            </div>
+                            <br>
+                            <div style="margin: 8px; float: left; width: 100px;"><text>Level</text><br><text id="mta-level" style="color: darkseagreen; font-weight: bold;"></text>
+                            </div>
+                            <div style="margin: 8px; float: right; width: 100px;"><text>Next Level</text><br><text id="mta-next-level" style="color: darkseagreen; font-weight: bold;"></text>
+                            </div>
+                            <div style="text-align: center;">
+                                <select id="token-ids-a" name="token-ids-a" class="connectButton"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="tknbui" class="display_token">
+            <div class="display_token_cont">
+                <div id="mtb-token" class="renderLeft" style="background: white;">
+                    <div class="innerLeft">
+                        <div class="display_token_img_cont" id="mtb-container">
+                        </div>
+                    </div>
+                </div>
+                <div class="renderRight">
+                    <div class="innerRight">
+                        <div id="mtb-traits" class="trait_list">
+                            <strong id="mtb-token-name"></strong>
+                        </div>
+                        <div id="mtb-properties" class="properties">
+                            <div style="margin: 8px; float: left; width: 100px;"><text>Time Staked</text><br><text id="mtb-time-staked" style="color: darkseagreen; font-weight: bold;"></text>
+                            </div>
+                            <div style="margin: 8px; float: right; width: 100px;"><text>$FLYZ Earned</text><br><text id="mtb-flyz-earned" style="color: darkseagreen; font-weight: bold;"></text>
+                            </div>
+                            <br>
+                            <div style="margin: 8px; float: left; width: 100px;"><text>Level</text><br><text id="mtb-level" style="color: darkseagreen; font-weight: bold;"></text>
+                            </div>
+                            <div style="margin: 8px; float: right; width: 100px;"><text>Next Level</text><br><text id="mtb-next-level" style="color: darkseagreen; font-weight: bold;"></text>
+                            </div>
+                            <div style="text-align: center;">
+                                <select id="token-ids-b" name="token-ids-b" class="connectButton"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
     </section>
     <section id="frogs" style="background: transparent; border: none !important;"></section>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
