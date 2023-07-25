@@ -1,7 +1,7 @@
     // Fresh Frogs NFT Static Github Pages
 
     // Global Variables
-    const SOURCE_PATH = '../frog/build_files/'
+    const SOURCE_PATH = '../frog'
 
     var toadA, toadB, toadC;
     var CONTROLLER, controller;
@@ -730,7 +730,7 @@
         console.log('= TOKEN #'+token_a);
         console.log('= ');
         // Fetch Alpha Metedata ------>
-        let metadata_a_raw = await (await fetch(SOURCE_PATH+'json/'+token_a+".json")).json();
+        let metadata_a_raw = await (await fetch(SOURCE_PATH+'/json/'+token_a+".json")).json();
         for (i = 0; i < metadata_a_raw.attributes.length; i++) {
 
             let attribute = metadata_a_raw.attributes[i];
@@ -745,7 +745,7 @@
         console.log('= TOKEN #'+token_b);
         console.log('= ');
         // Fetch Bravo Metedata ------>
-        let metadata_b_raw = await (await fetch(SOURCE_PATH+'json/'+token_b+".json")).json();
+        let metadata_b_raw = await (await fetch(SOURCE_PATH+'/json/'+token_b+".json")).json();
         for (j = 0; j < metadata_b_raw.attributes.length; j++) {
 
             let attribute = metadata_b_raw.attributes[j];
