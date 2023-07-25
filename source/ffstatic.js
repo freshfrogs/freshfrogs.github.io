@@ -570,18 +570,21 @@
         // Token A UI Display
         tknaui = document.createElement('div');
         tknaui.id = 'tknaui'
+        tknaui.className = 'tknaui'
 
         parentElement.appendChild(tknaui);
 
         // Result Element
         rsltelmnt = document.createElement('div');
         rsltelmnt.id = 'rsltelmnt'
+        rsltelmnt.className = 'rsltelmnt'
 
         parentElement.appendChild(rsltelmnt);
 
         // Token B UI Display
         tknbui = document.createElement('div');
         tknbui.id = 'tknbui'
+        tknbui.className = 'tknbui'
 
         parentElement.appendChild(tknbui);
 
