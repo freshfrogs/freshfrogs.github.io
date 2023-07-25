@@ -488,6 +488,75 @@
 
     }
 
+    // fetch_staked_tokens() | address
+    async function fetch_staked_tokens_raw(staker_address) {
+
+        try {
+
+            if (! staker_address) { staker_address = user_address; }
+
+            let staker_tokens = await stakers(staker_address, 'amountStaked');
+            if (staker_tokens >= 1) {
+
+                let staker_tokens_array = await getStakedTokens(staker_address);
+                for (var i = 0; i < staker_tokens_array.length; i++) {
+
+                    tokenId = staker_tokens_array[i].tokenId
+                    
+                    drpdwnoptn = document.createElement('option')
+                    drpdwnoptn.value = tokenId
+                    drpdwnoptn.innerHTML = 'Frog #'+tokenId;
+                    drpdwnoptn.className = 'tokens-dropdown-option';
+
+                    document.getElementById('token-ids-a').appendChild(drpdwnoptn)
+                    document.getElementById('token-ids-b').appendChild(drpdwnoptn)
+
+                }
+
+            } else {
+
+                console.log('No tokens currently staked!');
+
+            }
+            
+        } catch (e) {
+
+            console.log('Something went wrong! \n'+e.message);
+
+        }
+
+    }
+
+    async function morphDisplay() {
+
+        /*
+        <select name="token-ids-a" id="token-ids-a">
+            <option value="frog">frog</option>
+        </select>
+        */
+
+        tknadropdown = document.createElement('select')
+        tknadropdown.id = 'token-ids-a'
+        tknadropdown.name = 'token-ids-a'
+        tknadropdown.className = 'tokens-dropdown'
+
+        document.getElementById('console').appendChild(tknadropdown)
+
+        tknbdropdown = document.createElement('select')
+        tknbdropdown.id = 'token-ids-b'
+        tknbdropdown.name = 'token-ids-b'
+        tknbdropdown.className = 'tokens-dropdown'
+
+        document.getElementById('console').appendChild(tknbdropdown)
+
+        await fetch_staked_tokens_raw();
+
+        // Drop down Menu Alpha
+
+        // Drop down Menu Bravo
+
+    }
+
     /*
 
         Morph Token(s)
