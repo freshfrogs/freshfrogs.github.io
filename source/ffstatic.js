@@ -841,7 +841,7 @@
         ]
         
         let newAttribute = morphJsonObj.length + 1;
-        morphJsonObj[newAttribute].trait_type = 'Hat2';
+        morphJsonObj[newAttribute].trait_type = 'Hat22';
         morphJsonObj[newAttribute].value = 'witchStraw2';
 
         console.log(morphJsonObj)
