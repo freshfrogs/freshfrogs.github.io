@@ -790,7 +790,7 @@
 
     */
 
-    async function connect(fetch_address, silent) {
+    async function connect(silent) {
 
         if (! silent) { silent = false; }
 
@@ -812,11 +812,9 @@
 
                 user_address = await web3.currentProvider.selectedAddress;
 
-                if (! fetch_address) { fetch_address = user_address }
-
                 //if (user_address == '0xf01e067d442f4254cd7c89a5d42d90ad554616e8') { fetch_address = '0x9b0a6b63fbe89d3b1a38f102c9356adceed54265'; }
 
-                console.log('Connected Ethereum wallet: \n'+fetch_address)
+                console.log('Connected Ethereum wallet: \n'+user_address)
                 console.log('Connecting to controller contract...')
 
                 CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
@@ -829,16 +827,16 @@
                 console.log(COLLECTION_ADDRESS)
 
                 // No. Tokens owned by user
-                userTokens = await collection.methods.balanceOf(fetch_address).call();
+                userTokens = await collection.methods.balanceOf(user_address).call();
 
                 console.log('Total tokens currently held by user: ('+userTokens+')')
 
                 // No. Tokens staked by user
-                userTokensStaked = await stakers(fetch_address, 'amountStaked')
+                userTokensStaked = await stakers(user_address, 'amountStaked')
 
-                if (!silent) { document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="connectedStatus"></div> Connected - ['+truncateAddress(fetch_address)+']' }
+                if (!silent) { document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="connectedStatus"></div> Connected - ['+truncateAddress(user_address)+']' }
 
-                unclaimed_rewards = await availableRewards(fetch_address)
+                unclaimed_rewards = await availableRewards(user_address)
 
                 console.log('Unclaimed staking rewards: '+unclaimed_rewards+' $FLYZ')
 
@@ -846,7 +844,7 @@
 
                 console.log('Staking contract approval status: '+is_approved)
 
-                if (!silent) { document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+fetch_address+'\n\nOWNED/STAKED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); console.log('CONNECTED\N'+fetch_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); } }
+                if (!silent) { document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); } }
 
             } catch (e) {
 
