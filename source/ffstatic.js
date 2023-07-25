@@ -726,7 +726,8 @@
         }
         
         document.getElementById(location).innerHTML = '';
-
+        
+        console.log('= ');
         console.log('= TOKEN #'+token_a);
         // Fetch Alpha Metedata ------>
         let metadata_a_raw = await (await fetch(SOURCE_PATH+'json/'+token_a+".json")).json();
