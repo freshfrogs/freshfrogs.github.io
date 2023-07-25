@@ -607,10 +607,12 @@
         mtaLevel = document.getElementById('mta-level')
         mtaNextLevel = document.getElementById('mta-next-level')
 
+        /*
         mtaTimeStaked.innerHTML = ''
         mtaFlyzEarned.innerHTML = ''
         mtaLevel.innerHTML = ''
         mtaNextLevel.innerHTML = ''
+        */
 
         let mtaStakingData = await stakingValues(token_a)
         //[ Time Staked, Staked Level, Next Level, Flyz Earned]
@@ -647,10 +649,12 @@
         mtbLevel = document.getElementById('mtb-level')
         mtbNextLevel = document.getElementById('mtb-next-level')
 
+        /*
         mtbTimeStaked.innerHTML = ''
         mtbFlyzEarned.innerHTML = ''
         mtbLevel.innerHTML = ''
         mtbNextLevel.innerHTML = ''
+        */
 
         let mtbStakingData = await stakingValues(token_b)
         //[ Time Staked, Staked Level, Next Level, Flyz Earned]
