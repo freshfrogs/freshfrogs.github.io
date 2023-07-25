@@ -567,11 +567,13 @@
             let dropdown_b = document.getElementById('token-ids-b');
 
             dropdown_a.onchange = async function (e) {
-                updateMorphDisplay(dropdown_a.value, dropdown_b.value)
+                updateMorphDisplay(dropdown_a.value, dropdown_b.value);
+                morph(dropdown_a.value, dropdown_b.value, 'morph-token-result');
             }
             
             dropdown_b.onchange = async function (e) {
-                updateMorphDisplay(dropdown_a.value, dropdown_b.value)
+                updateMorphDisplay(dropdown_a.value, dropdown_b.value);
+                morph(dropdown_a.value, dropdown_b.value, 'morph-token-result');
             }
 
         } else { alert('Not enough tokens staked to morph!') }
@@ -682,16 +684,17 @@
 
     */
 
-    async function morphFrogs(toadAlpha, toadBravo, build_loc) {
+    async function morph(token_a, token_b, location) {
 
         console.log('=-=-=-=-=-=-=-=-=-= Morphing =-=-=-=-=-=-=-=-=-=');
-        console.log('= Morphing Tokens Alpha (#'+toadAlpha+') & Bravo ('+toadBravo+')');
-        console.log('= Fetching Metadata...'+toadAlpha+'...'+toadBravo+'...');
+        console.log('= Morphing Tokens Alpha (#'+token_a+') & Bravo ('+token_b+')');
+        console.log('= Fetching Metadata...'+token_a+'...'+token_b+'...');
         console.log('= ');
 
         // Token (Alpha) Metdata
-        let alphaMetadata = {
-            "Toad": "",
+        let metadata_a = {
+            "Frog": "",
+            "specialFrog": "",
             "Trait": "",
             "Accessory": "",
             "Eyes": "",
@@ -700,8 +703,9 @@
         }
 
         // Token (Bravo) Metdata
-        let bravoMetadata = {
-            "Toad": "",
+        let metadata_b = {
+            "Frog": "",
+            "specialFrog": "",
             "Trait": "",
             "Accessory": "",
             "Eyes": "",
@@ -710,9 +714,10 @@
         }
 
         // Token (Charlie) Metdata
-        let charlieMetadata = {
-            "Toad": "",
-            "ToadSubset": "",
+        let metadata_c = {
+            "Frog": "",
+            "specialFrog": "",
+            "Subset": "",
             "Trait": "",
             "Accessory": "",
             "Eyes": "",
@@ -722,27 +727,27 @@
         
         document.getElementById(build_loc).innerHTML = '';
 
-        console.log('= TOKEN #'+toadAlpha);
+        console.log('= TOKEN #'+token_a);
         // Fetch Alpha Metedata ------>
-        let metadataRawA = await (await fetch(SOURCE_PATH+'json/'+toadAlpha+".json")).json();
-        for (i = 0; i < metadataRawA.attributes.length; i++) {
+        let metadata_a_raw = await (await fetch(SOURCE_PATH+'json/'+token_a+".json")).json();
+        for (i = 0; i < metadata_a_raw.attributes.length; i++) {
 
-            let attribute = metadataRawA.attributes[i];
+            let attribute = metadata_a_raw.attributes[i];
 
-            alphaMetadata[attribute.trait_type] = attribute.value
+            metadata_a[attribute.trait_type] = attribute.value
             console.log('= '+attribute.trait_type+' : '+attribute.value);
 
         }
 
         console.log('= ');
-        console.log('= TOKEN #'+toadAlpha);
+        console.log('= TOKEN #'+token_b);
         // Fetch Bravo Metedata ------>
-        let metadataRawB = await (await fetch(SOURCE_PATH+'json/'+toadBravo+".json")).json();
-        for (j = 0; j < metadataRawB.attributes.length; j++) {
+        let metadata_b_raw = await (await fetch(SOURCE_PATH+'json/'+token_b+".json")).json();
+        for (j = 0; j < metadata_b_raw.attributes.length; j++) {
 
-            let attribute = metadataRawB.attributes[j];
+            let attribute = metadata_b_raw.attributes[j];
             
-            bravoMetadata[attribute.trait_type] = attribute.value
+            metadata_b[attribute.trait_type] = attribute.value
             console.log('= '+attribute.trait_type+' : '+attribute.value);
 
         }
@@ -750,51 +755,51 @@
         console.log('= ');
         console.log('= Generating New Metadata (Charlie)...');
 
-        // DETERMINE NEW METADATA ------>
-        
-        // Select Attributes!
-        if (alphaMetadata['Toad'] !== '') {charlieMetadata['Toad'] = bravoMetadata['Toad']}
-        if (bravoMetadata['Toad'] !== '') {charlieMetadata['ToadSubset'] = alphaMetadata['Toad']}
-        console.log('= Toad : '+charlieMetadata['Toad']);
-        console.log('= ToadSubset : '+charlieMetadata['ToadSubset']);
-
-        if (bravoMetadata['Trait'] !== '') {charlieMetadata['Trait'] = bravoMetadata['Toad']}
-        else if (alphaMetadata['Trait'] !== '') { charlieMetadata['Trait'] = alphaMetadata['Trait']; }
-        console.log('= Trait : '+charlieMetadata['Trait']);
-
-        if (alphaMetadata['Accessory'] !== '') { charlieMetadata['Accessory'] = alphaMetadata['Accessory']; }
-        else if (bravoMetadata['Accessory'] !== '') { charlieMetadata['Accessory'] = bravoMetadata['Accessory']; }
-        console.log('= Accessory : '+charlieMetadata['Accessory']);
-
-        if (alphaMetadata['Eyes'] !== '') { charlieMetadata['Eyes'] = alphaMetadata['Eyes']; }
-        else if (bravoMetadata['Eyes'] !== '') { charlieMetadata['Eyes'] = bravoMetadata['Eyes']; }
-        console.log('= Eyes : '+charlieMetadata['Eyes']);
-
-        if (alphaMetadata['Hat'] !== '') { charlieMetadata['Hat'] = alphaMetadata['Hat']; }
-        else if (bravoMetadata['Hat'] !== '') { charlieMetadata['Hat'] = bravoMetadata['Hat']; }
-        console.log('= Hat : '+charlieMetadata['Hat']);
-
-        if (alphaMetadata['Mouth'] !== '') { charlieMetadata['Mouth'] = alphaMetadata['Mouth']; }
-        else if (bravoMetadata['Mouth'] !== '') { charlieMetadata['Mouth'] = bravoMetadata['Mouth']; }
-        console.log('= Mouth : '+charlieMetadata['Mouth']);
-
         // BUILD NEW METADATA ------>
         
+        // Select Attributes!
+        if (metadata_a['Frog'] !== '') {metadata_c['Frog'] = metadata_b['Frog']}
+        if (metadata_b['Frog'] !== '') {metadata_c['Subset'] = metadata_a['Frog']}
+        console.log('= Frog : '+metadata_c['Frog']);
+        console.log('= Subset : '+metadata_c['Subset']);
+
+        if (metadata_b['Trait'] !== '') {metadata_c['Trait'] = metadata_b['Frog']}
+        else if (metadata_a['Trait'] !== '') { metadata_c['Trait'] = metadata_a['Trait']; }
+        console.log('= Trait : '+metadata_c['Trait']);
+
+        if (metadata_a['Accessory'] !== '') { metadata_c['Accessory'] = metadata_a['Accessory']; }
+        else if (metadata_b['Accessory'] !== '') { metadata_c['Accessory'] = metadata_b['Accessory']; }
+        console.log('= Accessory : '+metadata_c['Accessory']);
+
+        if (metadata_a['Eyes'] !== '') { metadata_c['Eyes'] = metadata_a['Eyes']; }
+        else if (metadata_b['Eyes'] !== '') { metadata_c['Eyes'] = metadata_b['Eyes']; }
+        console.log('= Eyes : '+metadata_c['Eyes']);
+
+        if (metadata_a['Hat'] !== '') { metadata_c['Hat'] = metadata_a['Hat']; }
+        else if (metadata_b['Hat'] !== '') { metadata_c['Hat'] = metadata_b['Hat']; }
+        console.log('= Hat : '+metadata_c['Hat']);
+
+        if (metadata_a['Mouth'] !== '') { metadata_c['Mouth'] = metadata_a['Mouth']; }
+        else if (metadata_b['Mouth'] !== '') { metadata_c['Mouth'] = metadata_b['Mouth']; }
+        console.log('= Mouth : '+metadata_c['Mouth']);
+
+        // BUILD NEW IMAGE ------>
+        
         // Alpha (UNDERLAY)
-        if (charlieMetadata['Toad'] !== '') { loadTrait('Toad', charlieMetadata['Toad'], build_loc); }
+        if (metadata_c['Frog'] !== '') { loadTrait('Frog', metadata_c['Frog'], location); }
         
         // Bravo (OVERLAY)
-        if (charlieMetadata['ToadSubset'] !== '') { loadTrait('Toad/subset/v4', charlieMetadata['ToadSubset'], build_loc); }
+        if (metadata_c['Subset'] !== '') { loadTrait('Frog/subset/v4', metadata_c['Subset'], location); }
 
         // TRAIT(S)
-        if (bravoMetadata['Trait'] !== '') { loadTrait('Trait', bravoMetadata['Trait'], build_loc); }
-        else if (alphaMetadata['Trait'] !== '') { loadTrait('Trait', alphaMetadata['Trait'], build_loc); }
+        if (metadata_b['Trait'] !== '') { loadTrait('Trait', metadata_b['Trait'], location); }
+        else if (metadata_a['Trait'] !== '') { loadTrait('Trait', metadata_a['Trait'], location); }
 
         // ACCESSORIES
-        if (charlieMetadata['Accessory'] !== '') { loadTrait('Accessory', charlieMetadata['Accessory'], build_loc); }
-        if (charlieMetadata['Eyes'] !== '') { loadTrait('Eyes', charlieMetadata['Eyes'], build_loc); }
-        if (charlieMetadata['Hat'] !== '') { loadTrait('Hat', charlieMetadata['Hat'], build_loc); }
-        if (charlieMetadata['Mouth'] !== '') { loadTrait('Mouth', charlieMetadata['Mouth'], build_loc); }
+        if (metadata_c['Accessory'] !== '') { loadTrait('Accessory', metadata_c['Accessory'], location); }
+        if (metadata_c['Eyes'] !== '') { loadTrait('Eyes', metadata_c['Eyes'], location); }
+        if (metadata_c['Hat'] !== '') { loadTrait('Hat', metadata_c['Hat'], location); }
+        if (metadata_c['Mouth'] !== '') { loadTrait('Mouth', metadata_c['Mouth'], location); }
 
     }
 
