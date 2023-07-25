@@ -6,6 +6,7 @@
     var toadA, toadB, toadC;
     var CONTROLLER, controller;
     var COLLECTION, collection;
+    var user_address, unclaimed_rewards, userTokens, userTokensStaked;
 
     const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 
@@ -738,35 +739,8 @@
                 document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="connectedStatus"></div> Connected - ['+truncateAddress(fetch_address)+']'
                 //document.getElementById('connectButton').onclick = async function (e) { alert('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); }
 
-                let unclaimed_rewards = await availableRewards(fetch_address)
+                unclaimed_rewards = await availableRewards(fetch_address)
 
-                rwrdsBtn = document.createElement('button')
-                rwrdsBtn.id = 'rewardsButton'
-                rwrdsBtn.className = 'connectButton'
-                rwrdsBtn.onclick = async function (e) { let rewards_return = await claimRewards(); alert(rewards_return) }
-                rwrdsBtn.innerHTML = '🎁 Rewards: '+unclaimed_rewards.toFixed(1)+' $FLYZ'
-
-                stkeBtn = document.createElement('button')
-                stkeBtn.id = 'stakeButton'
-                stkeBtn.className = 'connectButton'
-                stkeBtn.onclick = async function (e) { await Initiate_stake(); }
-                stkeBtn.innerHTML = '📌 Stake and Earn'
-
-                let is_approved = await checkApproval()
-
-                appvlBtn = document.createElement('button')
-                appvlBtn.id = 'approvalButton'
-                appvlBtn.className = 'connectButton'
-                if (!is_approved) {
-                    appvlBtn.innerHTML = '❌ Contract Approval'
-                    appvlBtn.onclick = async function (e) { alert("setApprovalForAll() \nTo start staking, the contract must first be approved. This is a one time transaction that allows the staking contract to recieve and transfer your tokens."); let chkapproval = await setApprovalForAll(); if (chkapproval == true) { document.getElementById('approvalButton').innerHTML = '✔️ Contract Approval'; console.log(chkapproval); } else { alert(chkapproval); } }
-                } else {
-                    appvlBtn.innerHTML = '✔️ Contract Approval'
-                }
-
-                document.getElementById('console').appendChild(rwrdsBtn)
-                document.getElementById('console').appendChild(stkeBtn)
-                document.getElementById('console').appendChild(appvlBtn)
                 document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+fetch_address+'\n\nOWNED/STAKED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); console.log('CONNECTED\N'+fetch_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); }
 
                 /*
@@ -800,6 +774,38 @@
             panelOutput("Don't have a wallet? <a href='https://metamask.io/download/'>Install Metamask</a> 🦊");
 
         }
+    }
+
+    async function update_ui_options() {
+
+        rwrdsBtn = document.createElement('button')
+        rwrdsBtn.id = 'rewardsButton'
+        rwrdsBtn.className = 'connectButton'
+        rwrdsBtn.onclick = async function (e) { let rewards_return = await claimRewards(); alert(rewards_return) }
+        rwrdsBtn.innerHTML = '🎁 Rewards: '+unclaimed_rewards.toFixed(1)+' $FLYZ'
+
+        stkeBtn = document.createElement('button')
+        stkeBtn.id = 'stakeButton'
+        stkeBtn.className = 'connectButton'
+        stkeBtn.onclick = async function (e) { await Initiate_stake(); }
+        stkeBtn.innerHTML = '📌 Stake and Earn'
+
+        let is_approved = await checkApproval()
+
+        appvlBtn = document.createElement('button')
+        appvlBtn.id = 'approvalButton'
+        appvlBtn.className = 'connectButton'
+        if (!is_approved) {
+            appvlBtn.innerHTML = '❌ Contract Approval'
+            appvlBtn.onclick = async function (e) { alert("setApprovalForAll() \nTo start staking, the contract must first be approved. This is a one time transaction that allows the staking contract to recieve and transfer your tokens."); let chkapproval = await setApprovalForAll(); if (chkapproval == true) { document.getElementById('approvalButton').innerHTML = '✔️ Contract Approval'; console.log(chkapproval); } else { alert(chkapproval); } }
+        } else {
+            appvlBtn.innerHTML = '✔️ Contract Approval'
+        }
+
+        document.getElementById('console').appendChild(rwrdsBtn)
+        document.getElementById('console').appendChild(stkeBtn)
+        document.getElementById('console').appendChild(appvlBtn)
+
     }
 
     // claimRewards(_user (address)) | send =>
