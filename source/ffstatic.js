@@ -545,14 +545,14 @@
         tknadropdown = document.createElement('select')
         tknadropdown.id = 'token-ids-a'
         tknadropdown.name = 'token-ids-a'
-        tknadropdown.className = 'tokens-dropdown'
+        tknadropdown.className = 'connectButton'
 
         document.getElementById('console').appendChild(tknadropdown)
 
         tknbdropdown = document.createElement('select')
         tknbdropdown.id = 'token-ids-b'
         tknbdropdown.name = 'token-ids-b'
-        tknbdropdown.className = 'tokens-dropdown'
+        tknbdropdown.className = 'connectButton'
 
         document.getElementById('console').appendChild(tknbdropdown)
 
