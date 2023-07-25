@@ -561,7 +561,7 @@
 
             }
 
-            updateMorphDisplay(staker_tokens_array[1].tokenId, staker_tokens_array[2].tokenId)
+            updateMorphDisplay(staker_tokens_array[0].tokenId, staker_tokens_array[0].tokenId)
 
             let dropdown_a = document.getElementById('token-ids-a');
             let dropdown_b = document.getElementById('token-ids-b');
@@ -574,7 +574,7 @@
                 updateMorphDisplay(dropdown_a.value, dropdown_b.value)
             }
 
-        }
+        } else { alert('Not enough tokens staked to morph!') }
     }
 
     async function updateMorphDisplay(token_a, token_b) {
