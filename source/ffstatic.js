@@ -790,7 +790,9 @@
 
     */
 
-    async function connect(fetch_address) {
+    async function connect(fetch_address, silent) {
+
+        if (! silent) { silent = false; }
 
         if (typeof window.ethereum !== "undefined") {
             
@@ -799,7 +801,7 @@
                 console.log('Attempting to connect to web3...')
                 console.log('Requesting accounts...')
 
-                document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="pendingStatus"></div> Connecting...'
+                if (!silent) { document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="pendingStatus"></div> Connecting...' }
 
                 await ethereum.request({ method: "eth_requestAccounts" });
 
@@ -834,7 +836,7 @@
                 // No. Tokens staked by user
                 userTokensStaked = await stakers(fetch_address, 'amountStaked')
 
-                document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="connectedStatus"></div> Connected - ['+truncateAddress(fetch_address)+']'
+                if (!silent) { document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="connectedStatus"></div> Connected - ['+truncateAddress(fetch_address)+']' }
 
                 unclaimed_rewards = await availableRewards(fetch_address)
 
@@ -844,7 +846,7 @@
 
                 console.log('Staking contract approval status: '+is_approved)
 
-                document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+fetch_address+'\n\nOWNED/STAKED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); console.log('CONNECTED\N'+fetch_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); }
+                if (!silent) { document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+fetch_address+'\n\nOWNED/STAKED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); console.log('CONNECTED\N'+fetch_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); } }
 
             } catch (e) {
 
