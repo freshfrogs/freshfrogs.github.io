@@ -590,7 +590,7 @@
 
         document.getElementById('mta-container').innerHTML = ''
 
-        document.getElementById('mta-token').style.backgroundImage = 'url('+'https://freshfrogs.io/frog/'+token_a+'.png'+')';
+        document.getElementById('mta-token').style.backgroundImage = 'url('+'https://freshfrogs.github.io/frog/'+token_a+'.png'+')';
         document.getElementById('mta-token').style.backgroundSize = "2048px 2048px";
 
         // Update Metadata! Build Token -->
@@ -635,7 +635,7 @@
         */
 
         document.getElementById('mtb-container').innerHTML = ''
-        document.getElementById('mtb-token').style.backgroundImage = 'url('+'https://freshfrogs.io/frog/'+token_b+'.png'+')';
+        document.getElementById('mtb-token').style.backgroundImage = 'url('+'https://freshfrogs.github.io/frog/'+token_b+'.png'+')';
         document.getElementById('mtb-token').style.backgroundSize = "2048px 2048px";
        
         // Update Metadata! Build Token -->
