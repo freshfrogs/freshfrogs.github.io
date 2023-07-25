@@ -537,14 +537,13 @@
     async function morphDisplay() {
 
         /*
-        <select name="token-ids-a" id="token-ids-a">
-            <option value="frog">frog</option>
-        </select>
         */
 
+        // Prepare parent element
         parentElement = document.getElementById('console');
         parentElement.innerHTML = '';
 
+        // Dropdown list A
         tknadropdown = document.createElement('select')
         tknadropdown.id = 'token-ids-a'
         tknadropdown.name = 'token-ids-a'
@@ -552,6 +551,7 @@
 
         parentElement.appendChild(tknadropdown)
 
+        // Dropdown list B
         tknbdropdown = document.createElement('select')
         tknbdropdown.id = 'token-ids-b'
         tknbdropdown.name = 'token-ids-b'
@@ -559,11 +559,45 @@
 
         parentElement.appendChild(tknbdropdown)
 
+        // Input tokens array
         await fetch_staked_tokens_raw();
 
-        // Drop down Menu Alpha
+        // Break Element
+        brel = document.createElement('br')
 
-        // Drop down Menu Bravo
+        parentElement.appendChild(brel);
+
+        // Token A UI Display
+        tknaui = document.createElement('div');
+        tknaui.id = 'tknaui'
+
+        parentElement.appendChild(tknaui);
+
+        // Result Element
+        rsltelmnt = document.createElement('div');
+        rsltelmnt.id = 'rsltelmnt'
+
+        parentElement.appendChild(rsltelmnt);
+
+        // Token B UI Display
+        tknbui = document.createElement('div');
+        tknbui.id = 'tknbui'
+
+        parentElement.appendChild(tknbui);
+
+        // Build token UI elements render_token()
+        let dropdown_a = document.getElementById('token-ids-a');
+        let dropdown_b = document.getElementById('token-ids-b');
+        dropdown_a.onchange = function (e) {
+          console.log('Token A: '+dropdown_a.value);
+          document.getElementById('tknaui').innerHTML = '';
+          render_token(dropdown_a.value, 'tknaui')
+        }
+        dropdown_b.onchange = function (e) {
+          console.log('Token B: '+dropdown_b.value);
+          document.getElementById('tknbui').innerHTML = '';
+          render_token(dropdown_b.value, 'tknbui')
+        }
 
     }
 
@@ -1022,7 +1056,9 @@
         else { return }                                                             // Invalid arguments
     }
 
-  async function render_token(token_id) {
+  async function render_token(token_id, location) {
+
+    if (! location) { location = 'frogs'}
 
     let name = 'Frog #'+token_id
     let token_owner = '';
@@ -1046,7 +1082,7 @@
         '</div>';
 
     // <-- Begin Element
-    token_doc = document.getElementById('frogs');
+    token_doc = document.getElementById(location);
     token_element = document.createElement('div');
 
     // Element Details -->
