@@ -581,6 +581,7 @@
 
         /*
             Morph Token A
+            mta-token-name
             mta-time-staked
             mta-flyz-earned
             mta-level
@@ -602,6 +603,7 @@
 
         }
 
+        mtaTokenName = document.getElementById('mta-token-name')
         mtaTimeStaked = document.getElementById('mta-time-staked')
         mtaFlyzEarned = document.getElementById('mta-flyz-earned')
         mtaLevel = document.getElementById('mta-level')
@@ -617,6 +619,7 @@
         let mtaStakingData = await stakingValues(token_a)
         //[ Time Staked, Staked Level, Next Level, Flyz Earned]
 
+        mtaTokenName.innerHTML = 'Frog #'+token_a
         mtaTimeStaked.innerHTML = mtaStakingData[0]
         mtaFlyzEarned.innerHTML = mtaStakingData[3]
         mtaLevel.innerHTML = mtaStakingData[1]
@@ -624,6 +627,7 @@
 
         /*
             Morph Token B
+            mtb-token-name
             mtb-time-staked
             mtb-flyz-earned
             mtb-level
@@ -644,6 +648,7 @@
 
         }
 
+        mtbTokenName = document.getElementById('mta-token-name')
         mtbTimeStaked = document.getElementById('mtb-time-staked')
         mtbFlyzEarned = document.getElementById('mtb-flyz-earned')
         mtbLevel = document.getElementById('mtb-level')
@@ -659,6 +664,7 @@
         let mtbStakingData = await stakingValues(token_b)
         //[ Time Staked, Staked Level, Next Level, Flyz Earned]
 
+        mtbTokenName.innerHTML = 'Frog #'+token_b
         mtbTimeStaked.innerHTML = mtbStakingData[0]
         mtbFlyzEarned.innerHTML = mtbStakingData[3]
         mtbLevel.innerHTML = mtbStakingData[1]
