@@ -6,7 +6,7 @@
     var toadA, toadB, toadC;
     var CONTROLLER, controller;
     var COLLECTION, collection;
-    var user_address, unclaimed_rewards, userTokens, userTokensStaked;
+    var user_address, unclaimed_rewards, userTokens, userTokensStaked, is_approved;
 
     const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 
@@ -747,6 +747,10 @@
 
                 console.log('Unclaimed staking rewards: '+unclaimed_rewards+' $FLYZ')
 
+                is_approved = await checkApproval();
+
+                console.log('Staking contract approval status: '+is_approved)
+
                 document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+fetch_address+'\n\nOWNED/STAKED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); console.log('CONNECTED\N'+fetch_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); }
 
             } catch (e) {
@@ -758,28 +762,44 @@
 
         } else {
 
-            console.log('Web3 extension not detected!')
+            console.log('Web3 browser extension not detected!')
             panelOutput("Don't have a wallet? <a href='https://metamask.io/download/'>Install Metamask</a> 🦊");
 
         }
     }
 
+    /*
+
+        Update website UI options
+
+    */
+
     async function update_ui_options() {
 
+        // Rewards Button | Claim available rewards
+        // Create/define document element
         rwrdsBtn = document.createElement('button')
         rwrdsBtn.id = 'rewardsButton'
         rwrdsBtn.className = 'connectButton'
         rwrdsBtn.onclick = async function (e) { let rewards_return = await claimRewards(); alert(rewards_return) }
         rwrdsBtn.innerHTML = '🎁 Rewards: '+unclaimed_rewards.toFixed(1)+' $FLYZ'
 
+        // Append to parent element
+        document.getElementById('console').appendChild(rwrdsBtn)
+
+        // Stake Button | Stake tokens
+        // Create/define document element
         stkeBtn = document.createElement('button')
         stkeBtn.id = 'stakeButton'
         stkeBtn.className = 'connectButton'
         stkeBtn.onclick = async function (e) { await Initiate_stake(); }
         stkeBtn.innerHTML = '📌 Stake and Earn'
 
-        let is_approved = await checkApproval()
+        // Append to parent element
+        document.getElementById('console').appendChild(stkeBtn)
 
+        // Staking Contract Approval | Approve staking contract to transfer and recieve tokens
+        // Create/define document element
         appvlBtn = document.createElement('button')
         appvlBtn.id = 'approvalButton'
         appvlBtn.className = 'connectButton'
@@ -789,9 +809,8 @@
         } else {
             appvlBtn.innerHTML = '✔️ Contract Approval'
         }
-
-        document.getElementById('console').appendChild(rwrdsBtn)
-        document.getElementById('console').appendChild(stkeBtn)
+        
+        // Append to parent element
         document.getElementById('console').appendChild(appvlBtn)
 
     }
