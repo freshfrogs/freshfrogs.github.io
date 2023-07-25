@@ -470,13 +470,13 @@
         newAttribute = document.createElement("img");
         newAttribute.alt = attribute
 
+        if (where == 'morph-token-display') { newAttribute.style.width = '256px'; newAttribute.style.height = '256px'; }
+
         if (trait == 'Trait') {
             newAttribute.className = "frogImg5";
         } else {
             newAttribute.className = "frogImg3";
         }
-
-        if (where == 'morph-token-display') { newAttribute.style.width = '256px !important'; newAttribute.style.height = '256px !important'; }
 
         newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/"+attribute+".png";
 
