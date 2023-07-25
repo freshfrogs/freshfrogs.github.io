@@ -476,7 +476,7 @@
             newAttribute.className = "frogImg3";
         }
 
-        if (where = 'morph-token-display') { newAttribute.style.width = '256px !important'; newAttribute.style.height = '256px !important'; }
+        if (where == 'morph-token-display') { newAttribute.style.width = '256px !important'; newAttribute.style.height = '256px !important'; }
 
         newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/"+attribute+".png";
 
