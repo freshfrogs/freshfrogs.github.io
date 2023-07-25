@@ -47,12 +47,12 @@ Fresh Frogs NFT smart contract powered by Factoria's ERC-721A contract resulting
 
 
 ### Royalties Payout
-All secondary sales are entitled to a **5%** royalty, that will increase to **7%** after the collection has sold out. Royalties payouts are automatically distributed using moneypipe.xyz as shown below:
+All secondary sales are entitled to a **5%** royalty, that will increase to **7.5%** after the collection has sold out. Royalties payouts are automatically distributed using moneypipe.xyz as shown below:
 
 https://stream.moneypipe.xyz/ethereum/group#address=0x82A5c43f06BF6CA33Ec637831fa81fbc51CfD94C
 
-Per royalty **1%**(2%) will automatically be sent to [@RainforestUS](https://twitter.com/RainforestUS) A non profit organization that will use funds to protect natural rainforests! For every 1.00 ETH in donations, 2.5 acres will be saved forever!
+Per royalty **1.25%**(2%) will automatically be sent to [@RainforestUS](https://twitter.com/RainforestUS) A non profit organization that will use funds to protect natural rainforests! For every 1.00 ETH in donations, 2.5 acres will be saved forever!
 
-The other **1%**(2%) will be sent to [@savethefrogs](https://twitter.com/savethefrogs) The world’s first and most effective public charity dedicated exclusively to protecting amphibian populations. Founded 2008!
+The other **1.25%**(2%) will be sent to [@savethefrogs](https://twitter.com/savethefrogs) The world’s first and most effective public charity dedicated exclusively to protecting amphibian populations. Founded 2008!
 
-The remaining **3%** will be used to grow the project and reward the community!
+The remaining **2.5%**(3.5%) will be used to grow the project and reward the community!
