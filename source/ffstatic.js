@@ -648,7 +648,7 @@
 
         }
 
-        mtbTokenName = document.getElementById('mta-token-name')
+        mtbTokenName = document.getElementById('mtb-token-name')
         mtbTimeStaked = document.getElementById('mtb-time-staked')
         mtbFlyzEarned = document.getElementById('mtb-flyz-earned')
         mtbLevel = document.getElementById('mtb-level')
