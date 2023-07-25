@@ -575,19 +575,21 @@
         // tknaui rsltelmnt tknbui
         parentElement.appendChild(tknaui);
 
-        // Result Element
-        rsltelmnt = document.createElement('div');
-        rsltelmnt.id = 'rsltelmnt'
-        rsltelmnt.className = 'rsltelmnt'
-
-        parentElement.appendChild(rsltelmnt);
-
         // Token B UI Display
         tknbui = document.createElement('div');
         tknbui.id = 'tknbui'
         tknbui.className = 'tknbui'
 
         parentElement.appendChild(tknbui);
+
+        // Result Element
+        parentElement.appendChild(brel);
+        
+        rsltelmnt = document.createElement('div');
+        rsltelmnt.id = 'rsltelmnt'
+        rsltelmnt.className = 'rsltelmnt'
+
+        parentElement.appendChild(rsltelmnt);
 
         console.log('----')
 
