@@ -688,7 +688,7 @@
 
         console.log('=-=-=-=-=-=-=-=-=-= Morphing =-=-=-=-=-=-=-=-=-=');
         console.log('= Morphing Tokens Alpha (#'+token_a+') & Bravo (#'+token_b+')');
-        console.log('= Fetching Metadata...'+token_a+'...'+token_b+'...');
+        console.log('= Fetching Metadata...');
         console.log('= ');
 
         // Token (Alpha) Metdata
