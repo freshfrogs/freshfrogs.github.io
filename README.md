@@ -7,10 +7,10 @@ A collection of 4,040 randomly generated Frogs living on the Ethereum Blockchain
 Deployed following the ERC-721 standard, stored on IPFS, and verified on [etherscan.io](https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b) :white_check_mark:
 
 ### Collection (ERC-721 Standard):
-* Verified on Etherscan: https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b
+* Verified on Etherscan: [0xbe4bef8735107db540de269ff82c7de9ef68c51b](https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b)
 
 ### Live Staking Contract:
-* Verified on Etherscan: https://etherscan.io/address/0xCB1ee125CFf4051a10a55a09B10613876C4Ef199
+* Verified on Etherscan: [0xCB1ee125CFf4051a10a55a09B10613876C4Ef199](https://etherscan.io/address/0xCB1ee125CFf4051a10a55a09B10613876C4Ef199)
 
 ### Marketplaces
 * OpenSea Collection: https://opensea.io/collection/fresh-frogs [ REMOVED (by opensea for unknown reasons) ]
