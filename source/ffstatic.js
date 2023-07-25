@@ -741,7 +741,7 @@
         }
         console.log(metadata_a_raw.attributes)
 
-        
+        console.log('= ');
         console.log('= TOKEN #'+token_b);
         console.log('= ');
         // Fetch Bravo Metedata ------>
@@ -758,6 +758,7 @@
 
         console.log('= ');
         console.log('= Generating New Metadata (Charlie)...');
+        console.log('= ');
 
         // BUILD NEW METADATA ------>
         
