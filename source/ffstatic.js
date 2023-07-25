@@ -789,7 +789,7 @@
         if (metadata_c['Frog'] !== '') { loadTrait('Frog', metadata_c['Frog'], location); }
         
         // Bravo (OVERLAY)
-        if (metadata_c['Subset'] !== '') { loadTrait('Frog/subset/v4', metadata_c['Subset'], location); }
+        if (metadata_c['Subset'] !== '') { loadTrait('Frog/subset', metadata_c['Subset'], location); }
 
         // TRAIT(S)
         if (metadata_b['Trait'] !== '') { loadTrait('Trait', metadata_b['Trait'], location); }
