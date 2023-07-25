@@ -769,8 +769,6 @@
                 document.getElementById('console').appendChild(appvlBtn)
                 document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+fetch_address+'\n\nOWNED/STAKED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); console.log('CONNECTED\N'+fetch_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); }
 
-                await fetch_staked_tokens(fetch_address);
-
                 /*
                 await fetch_staked_tokens('0xca25a106efa8317fcd2075b00144d504998989d6');
                 await fetch_staked_tokens('0xceed98bf7f53f87e6ba701b8fd9d426a2d28b359');
