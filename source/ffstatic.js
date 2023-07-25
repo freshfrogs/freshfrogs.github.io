@@ -727,8 +727,8 @@
         
         document.getElementById(location).innerHTML = '';
         
-        console.log('= ');
         console.log('= TOKEN #'+token_a);
+        console.log('= ');
         // Fetch Alpha Metedata ------>
         let metadata_a_raw = await (await fetch(SOURCE_PATH+'json/'+token_a+".json")).json();
         for (i = 0; i < metadata_a_raw.attributes.length; i++) {
@@ -739,9 +739,11 @@
             console.log('= '+attribute.trait_type+' : '+attribute.value);
 
         }
+        console.log(metadata_a_raw)
 
-        console.log('= ');
+        
         console.log('= TOKEN #'+token_b);
+        console.log('= ');
         // Fetch Bravo Metedata ------>
         let metadata_b_raw = await (await fetch(SOURCE_PATH+'json/'+token_b+".json")).json();
         for (j = 0; j < metadata_b_raw.attributes.length; j++) {
@@ -752,6 +754,7 @@
             console.log('= '+attribute.trait_type+' : '+attribute.value);
 
         }
+        console.log(metadata_b_raw)
 
         console.log('= ');
         console.log('= Generating New Metadata (Charlie)...');
