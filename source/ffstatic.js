@@ -510,6 +510,12 @@
                     drpdwnoptn.className = 'tokens-dropdown-option';
 
                     document.getElementById('token-ids-a').appendChild(drpdwnoptn)
+
+                    drpdwnoptn = document.createElement('option')
+                    drpdwnoptn.value = tokenId
+                    drpdwnoptn.innerHTML = 'Frog #'+tokenId;
+                    drpdwnoptn.className = 'tokens-dropdown-option';
+                    
                     document.getElementById('token-ids-b').appendChild(drpdwnoptn)
 
                 }
