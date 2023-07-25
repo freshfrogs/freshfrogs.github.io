@@ -725,7 +725,7 @@
             "Mouth": ""
         }
         
-        document.getElementById(build_loc).innerHTML = '';
+        document.getElementById(location).innerHTML = '';
 
         console.log('= TOKEN #'+token_a);
         // Fetch Alpha Metedata ------>
