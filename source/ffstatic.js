@@ -801,7 +801,7 @@
         console.log('= SpecialFrog : '+metadata_c['SpecialFrog']);
         console.log('= Subset : '+metadata_c['Subset']);
 
-        if (metadata_b['Trait'] !== '') {metadata_c['Trait'] = metadata_b['Frog']}
+        if (metadata_b['Trait'] !== '') {metadata_c['Trait'] = metadata_b['Trait']}
         else if (metadata_a['Trait'] !== '') { metadata_c['Trait'] = metadata_a['Trait']; }
         console.log('= Trait : '+metadata_c['Trait']);
 
