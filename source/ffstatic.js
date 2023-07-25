@@ -741,7 +741,7 @@
             console.log('= '+attribute.trait_type+' : '+attribute.value);
 
         }
-        console.log(JSON.stringify(metadata_a_raw.attributes, null, "\t"))
+        console.log(JSON.stringify(metadata_a_raw.attributes, null, 4))
 
         console.log('= ');
         console.log('= TOKEN #'+token_b);
