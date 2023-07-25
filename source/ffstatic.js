@@ -798,6 +798,7 @@
         else if (metadata_b['SpecialFrog'] !== '') { metadata_c['SpecialFrog'] = metadata_b['SpecialFrog'] }
 
         console.log('= Frog : '+metadata_c['Frog']);
+        console.log('= SpecialFrog : '+metadata_c['SpecialFrog']);
         console.log('= Subset : '+metadata_c['Subset']);
 
         if (metadata_b['Trait'] !== '') {metadata_c['Trait'] = metadata_b['Frog']}
