@@ -588,18 +588,20 @@
 
         parentElement.appendChild(tknbui);
 
+        console.log('----')
+
         // Build token UI elements render_token()
         let dropdown_a = document.getElementById('token-ids-a');
-        let dropdown_b = document.getElementById('token-ids-b');
-        dropdown_a.onchange = function (e) {
+        dropdown_a.onchange = async function (e) {
           console.log('Token A: '+dropdown_a.value);
           document.getElementById('tknaui').innerHTML = '';
-          render_token(dropdown_a.value, 'tknaui')
+          await render_token(dropdown_a.value, 'tknaui')
         }
-        dropdown_b.onchange = function (e) {
+        let dropdown_b = document.getElementById('token-ids-b');
+        dropdown_b.onchange = async function (e) {
           console.log('Token B: '+dropdown_b.value);
           document.getElementById('tknbui').innerHTML = '';
-          render_token(dropdown_b.value, 'tknbui')
+          await render_token(dropdown_b.value, 'tknbui')
         }
 
     }
