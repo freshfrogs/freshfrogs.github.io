@@ -741,7 +741,7 @@
             console.log('= '+attribute.trait_type+' : '+attribute.value);
 
         }
-        console.log(metadata_a_raw.attributes)
+        //console.log(metadata_a_raw.attributes)
 
         console.log('= ');
         console.log('= TOKEN #'+token_b);
@@ -756,7 +756,7 @@
             console.log('= '+attribute.trait_type+' : '+attribute.value);
 
         }
-        console.log(metadata_b_raw.attributes)
+        //console.log(metadata_b_raw.attributes)
 
         console.log('= ');
         console.log('= Generating New Metadata (Charlie)...');
