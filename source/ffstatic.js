@@ -823,6 +823,30 @@
         else if (metadata_b['Mouth'] !== '') { metadata_c['Mouth'] = metadata_b['Mouth']; }
         console.log('= Mouth : '+metadata_c['Mouth']);
 
+        // CREATE NEW JSON ELEMENT
+
+        var morphJsonObj = [
+            {
+                "trait_type": "Frog",
+                "value": "blueDartFrog"
+            },
+            {
+                "trait_type": "Trait",
+                "value": "yellow"
+            },
+            {
+                "trait_type": "Hat",
+                "value": "witchStraw"
+            }
+        ]
+        
+        let newAttribute = morphJsonObj.length + 1;
+        let newValue = '"trait_type": "Hat2", "value": "witchStraw2"'
+        morphJsonObj[newAttribute] = newValue;
+
+        console.log(morphJsonObj)
+        
+
         // BUILD NEW IMAGE ------>
         
         // Alpha (UNDERLAY)
