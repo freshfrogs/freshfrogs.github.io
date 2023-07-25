@@ -1,7 +1,7 @@
     // Fresh Frogs NFT Static Github Pages
 
     // Global Variables
-    const SOURCE_PATH = '../source/base_files/Toadz/'
+    const SOURCE_PATH = '../frog/build_files/'
 
     var toadA, toadB, toadC;
     var CONTROLLER, controller;
