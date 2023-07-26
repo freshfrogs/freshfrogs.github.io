@@ -480,14 +480,14 @@
 
         newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/"+attribute+".png";
 
-        /*
+        
         for (y = 0; y < animated.length; y++) {
             if (attribute == animated[y]) {
                 newAttribute.src = "https://freshfrogs.github.io/frog/build_files/"+trait+"/animations/"+attribute+"_animation.gif";
                 break;
             }
         }
-        */
+        
 
         document.getElementById(where).appendChild(newAttribute);
 
