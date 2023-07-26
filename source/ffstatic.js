@@ -854,10 +854,10 @@
         // MOUTH
         if (metadata_c['Mouth'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Mouth","value":metadata_c['Mouth']}); loadTrait('Mouth', metadata_c['Mouth'], location); }
 
-        morophMetadataJsonString = JSON.stringify(morophMetadataJsonObject.attributes, null, 4);
+        morophMetadataJsonString = JSON.stringify(morophMetadataJsonObject.attributes, null, '\t');
         //console.log(morophMetadataJsonString)
 
-        console.log('==============================')
+        console.log('-==============================-')
         console.log(morophMetadataJsonString)
 
         document.getElementById('morph-json-metadata').innerHTML = morophMetadataJsonString
