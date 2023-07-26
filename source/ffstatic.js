@@ -573,14 +573,17 @@
             dropdown_a.onchange = async function (e) {
                 updateMorphDisplay(dropdown_a.value, dropdown_b.value);
                 morph(dropdown_a.value, dropdown_b.value, 'morph-token-display');
+                document.getElementById('morph-token-ids').innerHTML = 'Frog #'+dropdown_a.value+' / Frog #'+dropdown_b.value
             }
             
             dropdown_b.onchange = async function (e) {
                 updateMorphDisplay(dropdown_a.value, dropdown_b.value);
                 morph(dropdown_a.value, dropdown_b.value, 'morph-token-display');
+                document.getElementById('morph-token-ids').innerHTML = 'Frog #'+dropdown_a.value+' / Frog #'+dropdown_b.value
             }
 
             morph(dropdown_a.value, dropdown_b.value, 'morph-token-display');
+            document.getElementById('morph-token-ids').innerHTML = 'Frog #'+dropdown_a.value+' / Frog #'+dropdown_b.value
 
         } else { alert('Not enough tokens staked to morph!') }
     }
