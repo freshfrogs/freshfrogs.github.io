@@ -825,39 +825,39 @@
 
         // CREATE NEW JSON ELEMENT
 
-        var morophMetadataJsonString = '{"Attributes":[]}'; // {"trait_type":"Frog","value":"blueDartFrog"}
+        var morophMetadataJsonString = '{"attributes":[]}'; // {"trait_type":"Frog","value":"blueDartFrog"}
         var morophMetadataJsonObject = JSON.parse(morophMetadataJsonString);
         
         // BUILD NEW IMAGE ------>
         
         // FROG A
-        if (metadata_c['Frog'] !== '') { morophMetadataJsonObject['Attributes'].push({"trait_type":"Frog","value":metadata_c['Frog']}); loadTrait('Frog', metadata_c['Frog'], location); }
+        if (metadata_c['Frog'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Frog","value":metadata_c['Frog']}); loadTrait('Frog', metadata_c['Frog'], location); }
         
         // SPECIALFROG
-        else if (metadata_c['SpecialFrog'] !== '') { morophMetadataJsonObject['Attributes'].push({"trait_type":"SpecialFrog","value":metadata_c['SpecialFrog']}); loadTrait('SpecialFrog', metadata_c['SpecialFrog'], location); }
+        else if (metadata_c['SpecialFrog'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"SpecialFrog","value":metadata_c['SpecialFrog']}); loadTrait('SpecialFrog', metadata_c['SpecialFrog'], location); }
         
         // FROG B (SUBSET)
-        if (metadata_c['Subset'] !== '') { morophMetadataJsonObject['Attributes'].push({"trait_type":"Subset","value":metadata_c['Subset']}); loadTrait('Frog/subset', metadata_c['Subset'], location); }
+        if (metadata_c['Subset'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Subset","value":metadata_c['Subset']}); loadTrait('Frog/subset', metadata_c['Subset'], location); }
 
         // TRAIT
-        if (metadata_c['Trait'] !== '') { morophMetadataJsonObject['Attributes'].push({"trait_type":"Trait","value":metadata_c['Trait']}); loadTrait('Trait', metadata_c['Trait'], location); }
+        if (metadata_c['Trait'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Trait","value":metadata_c['Trait']}); loadTrait('Trait', metadata_c['Trait'], location); }
 
         // ACCESSORY
-        if (metadata_c['Accessory'] !== '') { morophMetadataJsonObject['Attributes'].push({"trait_type":"Accessory","value":metadata_c['Accessory']}); loadTrait('Accessory', metadata_c['Accessory'], location); }
+        if (metadata_c['Accessory'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Accessory","value":metadata_c['Accessory']}); loadTrait('Accessory', metadata_c['Accessory'], location); }
         
         // EYES
-        if (metadata_c['Eyes'] !== '') { morophMetadataJsonObject['Attributes'].push({"trait_type":"Eyes","value":metadata_c['Eyes']}); loadTrait('Eyes', metadata_c['Eyes'], location); }
+        if (metadata_c['Eyes'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Eyes","value":metadata_c['Eyes']}); loadTrait('Eyes', metadata_c['Eyes'], location); }
         
         // HAT
-        if (metadata_c['Hat'] !== '') { morophMetadataJsonObject['Attributes'].push({"trait_type":"Hat","value":metadata_c['Hat']}); loadTrait('Hat', metadata_c['Hat'], location); }
+        if (metadata_c['Hat'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Hat","value":metadata_c['Hat']}); loadTrait('Hat', metadata_c['Hat'], location); }
         
         // MOUTH
-        if (metadata_c['Mouth'] !== '') { morophMetadataJsonObject['Attributes'].push({"trait_type":"Mouth","value":metadata_c['Mouth']}); loadTrait('Mouth', metadata_c['Mouth'], location); }
+        if (metadata_c['Mouth'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Mouth","value":metadata_c['Mouth']}); loadTrait('Mouth', metadata_c['Mouth'], location); }
 
         morophMetadataJsonString = JSON.stringify(morophMetadataJsonObject.attributes, null, 4);
         //console.log(morophMetadataJsonString)
 
-        console.log('---------------------------------')
+        console.log('==============================')
         console.log(morophMetadataJsonString)
 
         jsonElement = document.createElement('p')
