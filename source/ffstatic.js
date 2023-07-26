@@ -565,7 +565,7 @@
 
             }
 
-            updateMorphDisplay(staker_tokens_array[0].tokenId, staker_tokens_array[0].tokenId)
+            updateMorphDisplay(staker_tokens_array[0].tokenId, staker_tokens_array[1].tokenId)
 
             let dropdown_a = document.getElementById('token-ids-a');
             let dropdown_b = document.getElementById('token-ids-b');
@@ -579,6 +579,8 @@
                 updateMorphDisplay(dropdown_a.value, dropdown_b.value);
                 morph(dropdown_a.value, dropdown_b.value, 'morph-token-display');
             }
+
+            morph(dropdown_a.value, dropdown_b.value, 'morph-token-display');
 
         } else { alert('Not enough tokens staked to morph!') }
     }
