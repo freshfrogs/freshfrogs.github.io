@@ -860,7 +860,7 @@
         console.log('-==============================-')
         console.log(morophMetadataJsonString)
 
-        document.getElementById('morph-json-metadata').innerHTML = morophMetadataJsonString
+        document.getElementById('morph-json').innerHTML = morophMetadataJsonString
 
     }
 
