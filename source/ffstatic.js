@@ -550,7 +550,7 @@
                 // Morph Token A Dropdown Option
                 drpdwnoptn = document.createElement('option')
                 drpdwnoptn.value = tokenId
-                drpdwnoptn.innerHTML = 'Frog #'+tokenId;
+                drpdwnoptn.innerHTML = '<img src="../frog/'+tokenId+'.png" />'+'<b>Frog #'+tokenId+'</b>';
                 drpdwnoptn.className = 'tokens-dropdown-option';
 
                 document.getElementById('token-ids-a').appendChild(drpdwnoptn)
@@ -558,7 +558,7 @@
                 // Morph Token B Dropdown Option
                 drpdwnoptn = document.createElement('option')
                 drpdwnoptn.value = tokenId
-                drpdwnoptn.innerHTML = 'Frog #'+tokenId;
+                drpdwnoptn.innerHTML = '<img src="../frog/'+tokenId+'.png" />'+'<b>Frog #'+tokenId+'</b>';
                 drpdwnoptn.className = 'tokens-dropdown-option';
 
                 document.getElementById('token-ids-b').appendChild(drpdwnoptn)
