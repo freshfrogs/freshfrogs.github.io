@@ -25,7 +25,7 @@
 
             token_id = collection_tokens_array[i]
             let name = 'Frog #'+token_id
-            let image_link = '../frog/'+token_id+'.png'
+            let image_link = '/frog/'+token_id+'.png'
         
             // Use Functions?
             button_elements = '' //
