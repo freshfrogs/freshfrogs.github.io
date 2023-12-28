@@ -829,7 +829,7 @@
                 await f0.init({
                     web3: web3,
                     contract: COLLECTION_ADDRESS,
-                    network: NETWORK
+                    network: 'main'
                 })
 
                 // Connect Collection Smart Contract, Staking Smart Contract
