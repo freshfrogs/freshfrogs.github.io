@@ -882,7 +882,7 @@
         mintButton.id = 'mintButton'
         mintButton.className = 'connectButton'
         mintButton.onclick = async function (e) {}
-        mintButton.innerHTML = '🔑 Mint'
+        mintButton.innerHTML = '🐸 Mint Frogs'
         // Append to parent element
         document.getElementById('console').appendChild(mintButton)
 
@@ -892,7 +892,7 @@
         holdingsButton.id = 'holdingsButton'
         holdingsButton.className = 'connectButton'
         holdingsButton.onclick = async function (e) {}
-        holdingsButton.innerHTML = '🔐 View Holdings'
+        holdingsButton.innerHTML = '🍃 View Holdings'
         // Append to parent element
         document.getElementById('console').appendChild(holdingsButton)
 
@@ -902,7 +902,7 @@
         stkeBtn.id = 'stakeButton'
         stkeBtn.className = 'connectButton'
         stkeBtn.onclick = async function (e) { await Initiate_stake(); }
-        stkeBtn.innerHTML = '📌 Stake and Earn'
+        stkeBtn.innerHTML = '🌱 Stake & Earn!'
         // Append to parent element
         document.getElementById('console').appendChild(stkeBtn)
 
