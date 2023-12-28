@@ -905,7 +905,7 @@
 
         if (parent_element.hasChildNodes()) {
             parent_element.removeChild(parent_element.children[0]);
-            parent_element.removeChild(parent_element.children[1]);
+            parent_element.removeChild(parent_element.children[0]);
         }
 
         break_element = document.createElement('br')
