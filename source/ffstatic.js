@@ -876,13 +876,21 @@
         document.getElementById('console').appendChild(rwrdsBtn)
     */
 
+        // Mint Button | Mint Tokens
+        // Create/define document element
+        mintButton = document.createElement('button')
+        mintButton.id = 'mintButton'
+        mintButton.className = 'connectButton'
+        mintButton.onclick = async function (e) {}
+        mintButton.innerHTML = '🔑 Mint'
+
         // Holdings Button | View holdings
         // Create/define document element
         holdingsButton = document.createElement('button')
         holdingsButton.id = 'holdingsButton'
         holdingsButton.className = 'connectButton'
         holdingsButton.onclick = async function (e) {}
-        holdingsButton.innerHTML = '🧾 View Holdings'
+        holdingsButton.innerHTML = '🔐 View Holdings'
 
         // Append to parent element
         document.getElementById('console').appendChild(holdingsButton)
