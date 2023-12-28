@@ -8,11 +8,8 @@
     var COLLECTION, collection;
     var user_address, unclaimed_rewards, userTokens, userTokensStaked, is_approved;
 
-    const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
-    const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
-
-    const COLLECTION_ABI = require("./assets/fresh-frogs/collection.json");
-    const CONTROLLER_ABI = require("./assets/fresh-frogs/controller.json");
+    const collection_contract = require("./assets/fresh-frogs/collection.json");
+    const controller_contract = require("./assets/fresh-frogs/controller.json");
 
     // Get the tokens that the account received
     async function get_ownedTokenIDs(account) {
@@ -174,7 +171,7 @@
 
         // Check Ownership / Approval Status
         let owner = await collection.methods.ownerOf(tokenId).call();
-        let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+        let approved = await collection.methods.isApprovedForAll(user_address, controller_contract.address).call({ from: user_address});
         if (!approved) { return 'TXN FAILED:\n Staking contract is missing approval!'; }
 
         // Valid ownership
@@ -190,7 +187,7 @@
             } catch (e) { return 'TXN FAILED:\n '+e.message; }
 
         // Token already Staked
-        } else if (owner.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) {
+        } else if (owner.toString().toLowerCase() == controller_contract.address.toString().toLowerCase()) {
             return 'TXN FAILED:\n Token #'+tokenId+' is already staked!';
         } 
 
@@ -227,13 +224,8 @@
             try {
                 
                 // Send Txn
-                //let withdraw = await controller.methods.withdraw(tokenId).send({ from: user_address });
-                //return 'Token #'+tokenId+' has succesfully been un-staked!';
-
-                controller.methods.withdraw(tokenId).send({from: user_address})
-                .then(function(receipt){
-                    return 'Token #'+tokenId+' has succesfully been un-staked!';
-                })
+                let withdraw = await controller.methods.withdraw(tokenId).send({ from: user_address });
+                return 'Token #'+tokenId+' has succesfully been un-staked!';
 
             // Catch Errors
             } catch (e) { return 'TXN FAILED:\n '+e.message; }
@@ -251,12 +243,12 @@
     async function setApprovalForAll() {
 
         // Check Approval Status
-        let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+        let is_approved = await collection.methods.isApprovedForAll(user_address, controller_contract.address).call({ from: user_address});
         if (!is_approved) { 
             try {
                 
                 // Send Txn
-                let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
+                let set_approval = await collection.methods.setApprovalForAll(controller_contract.address, true).send({ from: user_address });
                 return true;
 
             // Catch Errors
@@ -268,7 +260,7 @@
 
     async function checkApproval() {
         // Check Approval Status
-        let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+        let is_approved = await collection.methods.isApprovedForAll(user_address, controller_contract.address).call({ from: user_address});
         if (!is_approved) { return false; } // Not Approved
         else { return true; } // Approved
     }
@@ -814,14 +806,14 @@
                 console.log('Connected Ethereum wallet: \n'+user_address)
                 console.log('Connecting to controller contract...')
 
-                CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
+                CONTROLLER = controller = new web3.eth.Contract(controller_contract.abi, controller_contract.address);
 
-                console.log(CONTROLLER_ADDRESS)
+                console.log(controller_contract.address)
                 console.log('Connecting to collection contract...')
 
-                COLLECTION = collection = new web3.eth.Contract(COLLECTION_ABI, COLLECTION_ADDRESS);
+                COLLECTION = collection = new web3.eth.Contract(collection_contract.abi, collection_contract.address);
 
-                console.log(COLLECTION_ADDRESS)
+                console.log(collection_contract.address)
 
                 // No. Tokens owned by user
                 userTokens = await collection.methods.balanceOf(user_address).call();
@@ -959,7 +951,7 @@
             try {
 
                 // Loop blockchain transactions per parameters [NFT Transfer From: User ==> To: Staking Controller] & NFT is Currently Staked
-                let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'tokenId': tokenId}, fromBlock: 0, toBlock: 'latest'});
+                let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': controller_contract.address, 'tokenId': tokenId}, fromBlock: 0, toBlock: 'latest'});
                 let mostRecentTxn = (stakingEvents.length) - 1;
 
                 // Fetch Block Number from Txn
