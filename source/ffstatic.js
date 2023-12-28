@@ -67,26 +67,27 @@
 
     async function display_wallet_holdings(wallet) {
 
-        // Clear HTML element
-        document.getElementById('frogs').innerHTML = '';
+        console.log('Display Wallet Holdings: ')
         
         // Defaults to return all staked tokens
         let staked_tokens = await held_tokens_by_wallet() 
 
         // Checks if any staked tokens are owned by by
         for (var token = 0; token < staked_tokens.length; token++) {
-            let tokenId = staked_tokens[token]
+            let tokenId = staked_tokens[token];
             let staked_token = await stakerAddress(tokenId);
             if (staked_token == wallet) {
-                await render_token(tokenId)
+                console.log('Staked Token: Frog #'+tokenId);
+                await render_token(tokenId);
             }
         }
 
         // Tokens held by wallet
-        let held_tokens = await held_tokens_by_wallet(wallet)
+        let held_tokens = await held_tokens_by_wallet(wallet);
         for (var token = 0; token < held_tokens.length; token++) {
-            let tokenId = held_tokens[token]
-            await render_token(tokenId)
+            let tokenId = held_tokens[token];
+            console.log('Held Token: Frog #'+tokenId);
+            await render_token(tokenId);
         }
     }
 
