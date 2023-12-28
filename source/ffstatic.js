@@ -61,7 +61,6 @@
         }
 
         // Return address_tokens_array ->
-        console.log(address_tokens_array)
         return address_tokens_array
     }
 
