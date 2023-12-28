@@ -12,7 +12,7 @@
     const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 
     // Get staked token ID's
-    async function held_tokens_by_address(account) {
+    async function held_tokens_by_wallet(account) {
 
         // Get ALL staked tokens by default
         if (! account) {account = CONTROLLER_ADDRESS}
@@ -64,6 +64,35 @@
         console.log(address_tokens_array)
         return address_tokens_array
     }
+
+    async function display_wallet_holdings(wallet) {
+
+        // Clear HTML element
+        document.getElementById('frogs').innerHTML = '';
+        
+        // Defaults to return all staked tokens
+        let staked_tokens = await held_tokens_by_wallet() 
+
+        // Checks if any staked tokens are owned by by
+        for (var token = 0; token < staked_tokens.length; token++) {
+            let tokenId = staked_tokens[token]
+            let staked_token = await stakerAddress(tokenId);
+            if (staked_token == wallet) {
+                await render_token(tokenId)
+            }
+        }
+
+        // Tokens held by wallet
+        let held_tokens = await held_tokens_by_wallet(wallet)
+        for (var token = 0; token < held_tokens.length; token++) {
+            let tokenId = held_tokens[token]
+            await render_token(tokenId)
+        }
+    }
+
+    /*
+        -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   >
+    */
 
     // Fetch Collection
     async function fetch_collection() {
@@ -887,7 +916,10 @@
         holdingsButton = document.createElement('button')
         holdingsButton.id = 'holdingsButton'
         holdingsButton.className = 'connectButton'
-        holdingsButton.onclick = async function (e) {}
+        holdingsButton.onclick = async function (e) {
+            document.getElementById('frogs').innerHTML = '';
+            display_wallet_holdings(user_address);
+        }
         holdingsButton.innerHTML = '🍃 View Holdings'
         // Append to parent element
         document.getElementById('console').appendChild(holdingsButton)
