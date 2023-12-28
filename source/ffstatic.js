@@ -1345,7 +1345,7 @@
             try {
                 
                 // Send Txn
-                let withdraw = await controller.methods.withdraw(tokenId).send({ from: user_address.toString().toLowerCase() });
+                let withdraw = await controller.methods.withdraw(tokenId).send({ from: user_address });
                 return 'Token #'+tokenId+' has succesfully been un-staked!';
 
             // Catch Errors
