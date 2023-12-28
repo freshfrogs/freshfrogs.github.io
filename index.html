@@ -84,9 +84,6 @@
     border-bottom-left-radius: 100%;
     border-bottom-right-radius: 100%;
   }
-  .innerLeft {
-    
-  }
   .renderLeft {
     width: auto;
     background: transparent;
@@ -104,9 +101,6 @@
     width: auto;
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
-  }
-  .innerRight {
-
   }
   .frogImg4 {
     transition: all .2s;
@@ -274,6 +268,7 @@
     <![endif]-->
     
     <script src="https://freshfrogs.github.io/source/collection_abi.js"></script>
+    <script src="https://freshfrogs.github.io/source/controller_abi.js"></script>
     <script src="https://freshfrogs.github.io/source/ffstatic.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
@@ -292,6 +287,7 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
+        fetch_collection();
         document.getElementById('connectButton').onclick = async function (e) {
           await connect(); await update_ui_options(); await fetch_staked_tokens();
         }

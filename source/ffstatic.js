@@ -9,184 +9,93 @@
     var user_address, unclaimed_rewards, userTokens, userTokensStaked, is_approved;
 
     const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
-
     const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
-    const CONTROLLER_ABI =
-      [
-        {
-        "inputs": [],
-        "name": "claimRewards",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-        },
-        {
-        "inputs": [
-            {
-            "internalType": "uint256",
-            "name": "_tokenId",
-            "type": "uint256"
-            }
-        ],
-        "name": "stake",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-        },
-        {
-        "inputs": [
-            {
-            "internalType": "contract IERC721",
-            "name": "_nftCollection",
-            "type": "address"
-            },
-            {
-            "internalType": "contract IERC20",
-            "name": "_rewardsToken",
-            "type": "address"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-        },
-        {
-        "inputs": [
-            {
-            "internalType": "uint256",
-            "name": "_tokenId",
-            "type": "uint256"
-            }
-        ],
-        "name": "withdraw",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-        },
-        {
-        "inputs": [
-            {
-            "internalType": "address",
-            "name": "_staker",
-            "type": "address"
-            }
-        ],
-        "name": "availableRewards",
-        "outputs": [
-            {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-        },
-        {
-        "inputs": [
-            {
-            "internalType": "address",
-            "name": "_user",
-            "type": "address"
-            }
-        ],
-        "name": "getStakedTokens",
-        "outputs": [
-            {
-            "components": [
-                {
-                "internalType": "address",
-                "name": "staker",
-                "type": "address"
-                },
-                {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-                }
-            ],
-            "internalType": "struct FreshFrogsController.StakedToken[]",
-            "name": "",
-            "type": "tuple[]"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-        },
-        {
-        "inputs": [],
-        "name": "nftCollection",
-        "outputs": [
-            {
-            "internalType": "contract IERC721",
-            "name": "",
-            "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-        },
-        {
-        "inputs": [],
-        "name": "rewardsToken",
-        "outputs": [
-            {
-            "internalType": "contract IERC20",
-            "name": "",
-            "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-        },
-        {
-        "inputs": [
-            {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-            }
-        ],
-        "name": "stakerAddress",
-        "outputs": [
-            {
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-        },
-        {
-        "inputs": [
-            {
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-            }
-        ],
-        "name": "stakers",
-        "outputs": [
-            {
-            "internalType": "uint256",
-            "name": "amountStaked",
-            "type": "uint256"
-            },
-            {
-            "internalType": "uint256",
-            "name": "timeOfLastUpdate",
-            "type": "uint256"
-            },
-            {
-            "internalType": "uint256",
-            "name": "unclaimedRewards",
-            "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
+
+    // Fetch Collection
+    async function fetch_collection() {
+
+        var collection_tokens_array = [];
+
+        while(collection_tokens_array.length < 12){
+            var array_token = Math.floor(Math.random() * 4040) + 1;
+            if(collection_tokens_array.indexOf(array_token) === -1) collection_tokens_array.push(array_token);
         }
-      ]
+
+        for (let i = 0; i < arr.length; i++) {
+
+            tokenId = collection_tokens_array[i].tokenId
+            let name = 'Frog #'+token_id
+            let image_link = '../frog/'+token_id+'.png'
+        
+            // Use Functions?
+            button_elements = 
+                '<div style="text-align: center;">'+
+                    '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
+                    '<a class="" target="_blank" href="https://freshfrogs.github.io/frog/json/'+token_id+'.json"><button class="unstake_button">View Metadata</button></a>'
+                '</div>';
+        
+            // <-- Begin Element
+            token_doc = document.getElementById(location);
+            token_element = document.createElement('div');
+        
+            // Element Details -->
+            token_element.id = name;
+            token_element.className = 'display_token';
+            token_element.innerHTML = 
+              '<div class="display_token_cont">'+
+                '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
+                  '<div class="innerLeft">'+
+                    '<div class="display_token_img_cont" id="cont_'+token_id+'" onclick="render_display('+token_id+')">'+
+                      //'<img src="'+image_link+'" class="displayImage"/>'+
+                    '</div>'+
+                  '</div>'+
+                '</div>'+
+                '<div class="renderRight">'+
+                  '<div class="innerRight">'+
+                    '<div id="traits_'+token_id+'" class="trait_list">'+
+                      //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
+                      '<strong>'+name+'</strong> <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+                    '</div>'+
+                    '<div id="prop_'+token_id+'" class="properties">'+
+                      '<div style="margin: 8px; float: left; width: 100px;">'+
+                        '<text>Time Staked</text>'+'<br>'+
+                        '<text style="color: darkseagreen; font-weight: bold;">'+'0'+' days</text>'+
+                      '</div>'+
+                      '<div style="margin: 8px; float: right; width: 100px;">'+
+                        '<text>$FLYZ Earned</text>'+'<br>'+
+                        '<text style="color: darkseagreen; font-weight: bold;">'+'0'+'</text>'+
+                      '</div>'+
+                      '<br>'+
+                      '<div style="margin: 8px; float: left; width: 100px;">'+
+                        '<text>Level</text>'+'<br>'+
+                        '<text style="color: darkseagreen; font-weight: bold;">'+'0'+'</text>'+
+                      '</div>'+
+                      '<div style="margin: 8px; float: right; width: 100px;">'+
+                        '<text>Next Level</text>'+'<br>'+
+                        '<text style="color: darkseagreen; font-weight: bold;">'+'0'+' days</text>'+
+                      '</div>'+
+                      button_elements+
+                    '</div>'+
+                  '</div>'+
+                '</div>'+
+              '</div>';
+        
+            // Create Element <--
+            token_doc.appendChild(token_element);
+        
+            // Update Metadata! Build Frog -->
+            let metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+token_id+".json")).json();
+        
+            for (let i = 0; i < metadata.attributes.length; i++) {
+        
+              let attribute = metadata.attributes[i]
+              loadTrait(attribute.trait_type, attribute.value, 'cont_'+token_id);
+        
+            }
+
+        }
+
+    }
 
     /*
 
@@ -309,63 +218,6 @@
 
         var range = [3071, 3780, 3130, 608, 1881]
         for (let k = 0; k < range.length; k++) { display_token(range[k]); }
-
-    }
-
-    // Fetch Collection
-    async function fetch_collection() {
-
-        
-        toadA = toadB = toadC = '';
-
-        var arr = [];
-
-        while(arr.length < 1){
-            var r = Math.floor(Math.random() * 4040) + 1;
-            if(arr.indexOf(r) === -1) arr.push(r);
-        }
-
-        for (let i = 0; i < arr.length; i++) {
-
-        /*  
-        
-            if (toadA == '') {
-                toadA = arr[i]
-            } else if (toadB == '') {
-                toadB = arr[i]
-            }
-
-        */
-
-            await display_token(arr[i])
-
-        }
-
-        /*
-        
-        // Third Object
-
-        // Random background
-        var r2 = Math.floor(Math.random() * 2222) + 1;
-
-        // <-- Begin Element
-        token_doc = document.getElementById('frogs');
-        token_element = document.createElement('div');
-
-        // Element Details -->
-        token_element.id = 'Toad';
-        token_element.className = 'display_token';
-        token_element.innerHTML = 
-            '<div id="morphResult" class="renderLeft" style="background-image: url('+SOURCE_PATH+'images/'+r2+'.png'+'); background-size: 2048px 2048px;">'+
-                '<div class="display_token_img_cont" id="cont_morphResult"></div>'+
-            '</div>'
-
-        // Create Element <--
-        token_doc.appendChild(token_element);
-
-        morphFrogs(toadA, toadB, 'cont_morphResult');
-
-        */
 
     }
 
@@ -1164,6 +1016,7 @@
             if (staker_tokens >= 1) {
 
                 console.log('Fetching staked tokens....')
+                document.getElementById('frogs').innerHTML = '';
                 let staker_tokens_array = await getStakedTokens(staker_address);
 
                 for (var i = 0; i < staker_tokens_array.length; i++) {
