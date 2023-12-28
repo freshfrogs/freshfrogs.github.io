@@ -806,7 +806,6 @@
 
     }
 
-
     /*
 
         connect() | Connect Wallet
