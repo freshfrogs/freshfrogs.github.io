@@ -1122,19 +1122,6 @@
     staked_next = staking_values[2]
     staked_earned = staking_values[3]
 
-    if (location == 'tknaui') {
-        button_elements = ''
-    } else if (location == 'tkbaui') {
-
-    } else {
-        // Use Functions?
-        button_elements = 
-            '<div style="text-align: center;">'+
-                '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
-                '<a class="" target="_blank" href="https://freshfrogs.github.io/frog/json/'+token_id+'.json"><button class="unstake_button">View Metadata</button></a>'
-            '</div>';
-    }
-
     // <-- Begin Element
     token_doc = document.getElementById(location);
     token_element = document.createElement('div');
