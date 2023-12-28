@@ -11,9 +11,13 @@
     const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
     const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 
-    // Get the tokens that the account received
-    async function get_ownedTokenIDs(account) {
-        if (! account) {account = user_address}
+    // Get staked token ID's
+    async function get_staked_tokens(account) {
+
+        // Get ALL staked tokens by default
+        if (! account) {account = CONTROLLER_ADDRESS}
+
+        // Retrieve all transactions involving the transfer of said tokens
         const eventsReceivedTokens = await collection.getPastEvents("Transfer", {
             filter: {
                 to: account,
@@ -46,18 +50,17 @@
         }
 
         // Substract the tokens received by the sent to get the tokens owned by account
-        // Store them on ownedTokenIds
-        let ownedTokenIds = [];
+        let staked_token_Ids = [];
         for (let tokenId in receivedTokensCount) {
             if (
                 (sentTokensCount[tokenId] ? sentTokensCount[tokenId] : 0) <
                 receivedTokensCount[tokenId]
             ) {
-                ownedTokenIds.push(tokenId);
+                staked_token_Ids.push(tokenId);
             }
         }
 
-        console.log(ownedTokenIds)
+        console.log(staked_token_Ids)
     }
 
     // Fetch Collection
@@ -883,7 +886,7 @@
         appvlBtn.className = 'connectButton'
         if (!is_approved) {
             appvlBtn.innerHTML = '❌ Contract Approval'
-            appvlBtn.onclick = async function (e) { alert("setApprovalForAll() \nTo start staking, the contract must first be approved. This is a one time transaction that allows the staking contract to recieve and transfer your tokens."); let chkapproval = await setApprovalForAll(); if (chkapproval == true) { document.getElementById('approvalButton').innerHTML = '✔️ Contract Approval'; console.log(chkapproval); } else { alert(chkapproval); } }
+            appvlBtn.onclick = async function (e) { alert("setApprovalForAll() \nTo start staking, the contract must first be approved. This is a one time transaction that allows the staking contract to recieve and transfer your Frogs."); let chkapproval = await setApprovalForAll(); if (chkapproval == true) { document.getElementById('approvalButton').innerHTML = '✔️ Contract Approval'; console.log(chkapproval); } else { alert(chkapproval); } }
         } else {
             appvlBtn.innerHTML = '✔️ Contract Approval'
         }
