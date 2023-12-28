@@ -828,13 +828,13 @@
             try { // Attempt to Connect!
                 await f0.init({
                     web3: web3,
-                    contract: CONTRACT_ADDRESS,
+                    contract: COLLECTION_ADDRESS,
                     network: NETWORK
                 })
 
                 // Connect Collection Smart Contract, Staking Smart Contract
                 CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
-                COLLECTION = collection = new web3.eth.Contract(COLLECTION_ABI, CONTRACT_ADDRESS);
+                COLLECTION = collection = new web3.eth.Contract(COLLECTION_ABI, COLLECTION_ADDRESS);
 
                 // User Variables
                 user_address = await web3.currentProvider.selectedAddress;
