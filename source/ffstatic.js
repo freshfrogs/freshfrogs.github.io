@@ -901,8 +901,8 @@
         document.getElementById('console').appendChild(rwrdsBtn)
     */
 
-        document.getElementById('console').appendChild(mintButton)
-        document.getElementById('console').appendChild(mintButton)
+        document.getElementById('console').removeChild()
+        document.getElementById('console').removeChild()
         break_element = document.createElement('br')
         document.getElementById('console').appendChild(break_element)
 
