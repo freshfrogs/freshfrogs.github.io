@@ -29,10 +29,10 @@
         
             // Use Functions?
             button_elements = '' //
-            //    '<div style="text-align: center;">'+
-            //        '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
-            //        '<a class="" target="_blank" href="https://freshfrogs.github.io/frog/json/'+token_id+'.json"><button class="unstake_button">View Metadata</button></a>'
-            //    '</div>';
+                '<div style="text-align: center;">'+
+                    '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
+                    '<a class="" target="_blank" href="https://freshfrogs.github.io/frog/json/'+token_id+'.json"><button class="unstake_button">View Metadata</button></a>'
+                '</div>';
         
             // <-- Begin Element
             token_doc = document.getElementById('frogs');
