@@ -11,6 +11,55 @@
     const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
     const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 
+    // Get the tokens that the account received
+    async function get_ownedTokenIDs(account) {
+        if (! account) {account = user_address}
+        const eventsReceivedTokens = await collection.getPastEvents("Transfer", {
+            filter: {
+                to: account,
+            },
+            fromBlock: 0,
+        });
+
+        // Count the number of times the account received the token
+        let receivedTokensCount = {};
+        for (let key in eventsReceivedTokens) {
+            let tokenId = eventsReceivedTokens[key]["returnValues"]["tokenId"];
+            receivedTokensCount[tokenId] = (receivedTokensCount[tokenId] || 0) + 1;
+        }
+
+        let receivedTokenIds = Object.keys(receivedTokensCount);
+
+        // Get the tokens that the account sent
+        const eventsSentTokens = await collection.getPastEvents("Transfer", {
+            filter: {
+                from: account,
+                tokenId: receivedTokenIds,
+            },
+            fromBlock: 0,
+        });
+
+        let sentTokensCount = {};
+        for (let key in eventsSentTokens) {
+            let tokenId = eventsSentTokens[key]["returnValues"]["tokenId"];
+            sentTokensCount[tokenId] = (sentTokensCount[tokenId] || 0) + 1;
+        }
+
+        // Substract the tokens received by the sent to get the tokens owned by account
+        // Store them on ownedTokenIds
+        let ownedTokenIds = [];
+        for (let tokenId in receivedTokensCount) {
+            if (
+                (sentTokensCount[tokenId] ? sentTokensCount[tokenId] : 0) <
+                receivedTokensCount[tokenId]
+            ) {
+                ownedTokenIds.push(tokenId);
+            }
+        }
+
+        console.log(ownedTokenIds)
+    }
+
     // Fetch Collection
     async function fetch_collection() {
 
