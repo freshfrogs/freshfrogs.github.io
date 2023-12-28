@@ -61,6 +61,12 @@
         }
 
         console.log(staked_token_Ids)
+        for (var token = 0; token < staked_token_Ids.length; token++) {
+
+            tokenId = staked_token_Ids[token]
+            render_token(tokenId)
+
+        }
     }
 
     // Fetch Collection
