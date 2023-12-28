@@ -23,7 +23,7 @@
 
         for (let i = 0; i < collection_tokens_array.length; i++) {
 
-            token_id = collection_tokens_array[i].tokenId
+            token_id = collection_tokens_array[i]
             let name = 'Frog #'+token_id
             let image_link = '../frog/'+token_id+'.png'
         
