@@ -66,7 +66,7 @@
 
     async function display_wallet_holdings(wallet) {
 
-        terminal_out('Display Wallet Holdings: ')
+        console.log('Display Wallet Holdings: ')
         
         // Defaults to return all staked tokens
         let staked_tokens = await held_tokens_by_wallet() 
@@ -76,7 +76,7 @@
             let tokenId = staked_tokens[token];
             let staked_token = await stakerAddress(tokenId);
             if (staked_token.toString().toLowerCase() == wallet.toString().toLowerCase()) {
-                terminal_out('Staked Token: Frog #'+tokenId);
+                console.log('Staked Token: Frog #'+tokenId);
                 await render_token(tokenId);
             }
         }
@@ -85,11 +85,11 @@
         let held_tokens = await held_tokens_by_wallet(wallet);
         for (var token = 0; token < held_tokens.length; token++) {
             let tokenId = held_tokens[token];
-            terminal_out('Held Token: Frog #'+tokenId);
+            console.log('Held Token: Frog #'+tokenId);
             await render_token(tokenId);
         }
 
-        terminal_out(wallet+' :: '+userTokens+' :: '+userTokensStaked);
+        console.log(wallet+' :: '+userTokens+' :: '+userTokensStaked);
     }
 
     /*
@@ -216,7 +216,7 @@
 
                 // Send Txn
                 let stake = await controller.methods.stake(tokenId).send({ from: user_address });
-                terminal_out(stake)
+                console.log(stake)
                 return 'Token #'+tokenId+' has succesfully been staked!';
 
             // Catch Errors
@@ -463,13 +463,13 @@
 
             } else {
 
-                terminal_out('No tokens currently staked!');
+                console.log('No tokens currently staked!');
 
             }
             
         } catch (e) {
 
-            terminal_out('Something went wrong! \n'+e.message);
+            console.log('Something went wrong! \n'+e.message);
 
         }
 
@@ -632,10 +632,10 @@
 
     async function morph(token_a, token_b, location) {
 
-        terminal_out('=-=-=-=-=-=-=-=-=-= Morphing =-=-=-=-=-=-=-=-=-=');
-        terminal_out('= Morphing Tokens Alpha (#'+token_a+') & Bravo (#'+token_b+')');
-        terminal_out('= Fetching Metadata...');
-        terminal_out('= ');
+        console.log('=-=-=-=-=-=-=-=-=-= Morphing =-=-=-=-=-=-=-=-=-=');
+        console.log('= Morphing Tokens Alpha (#'+token_a+') & Bravo (#'+token_b+')');
+        console.log('= Fetching Metadata...');
+        console.log('= ');
 
         // Token (Alpha) Metdata
         let metadata_a = {
@@ -673,8 +673,8 @@
         
         document.getElementById(location).innerHTML = '';
         
-        terminal_out('= TOKEN #'+token_a);
-        terminal_out('= ');
+        console.log('= TOKEN #'+token_a);
+        console.log('= ');
         // Fetch Alpha Metadata ------>
         let metadata_a_raw = await (await fetch(SOURCE_PATH+'/json/'+token_a+".json")).json();
         for (i = 0; i < metadata_a_raw.attributes.length; i++) {
@@ -682,14 +682,14 @@
             let attribute = metadata_a_raw.attributes[i];
 
             metadata_a[attribute.trait_type] = attribute.value
-            terminal_out('= '+attribute.trait_type+' : '+attribute.value);
+            console.log('= '+attribute.trait_type+' : '+attribute.value);
 
         }
-        terminal_out(JSON.stringify(metadata_a_raw.attributes, null, 4))
+        console.log(JSON.stringify(metadata_a_raw.attributes, null, 4))
 
-        terminal_out('= ');
-        terminal_out('= TOKEN #'+token_b);
-        terminal_out('= ');
+        console.log('= ');
+        console.log('= TOKEN #'+token_b);
+        console.log('= ');
         // Fetch Bravo Metadata ------>
         let metadata_b_raw = await (await fetch(SOURCE_PATH+'/json/'+token_b+".json")).json();
         for (j = 0; j < metadata_b_raw.attributes.length; j++) {
@@ -697,14 +697,14 @@
             let attribute = metadata_b_raw.attributes[j];
             
             metadata_b[attribute.trait_type] = attribute.value
-            terminal_out('= '+attribute.trait_type+' : '+attribute.value);
+            console.log('= '+attribute.trait_type+' : '+attribute.value);
 
         }
-        terminal_out(JSON.stringify(metadata_b_raw.attributes, null, "\t"))
+        console.log(JSON.stringify(metadata_b_raw.attributes, null, "\t"))
 
-        terminal_out('= ');
-        terminal_out('= Generating New Metadata (Charlie)...');
-        terminal_out('= ');
+        console.log('= ');
+        console.log('= Generating New Metadata (Charlie)...');
+        console.log('= ');
 
         // BUILD NEW METADATA ------>
 
@@ -741,29 +741,29 @@
         if (metadata_b['Frog'] !== '') {metadata_c['Subset'] = metadata_a['Frog']}
         else if (metadata_b['SpecialFrog'] !== '') { metadata_c['SpecialFrog'] = metadata_b['SpecialFrog'] }
 
-        terminal_out('= Frog : '+metadata_c['Frog']);
-        terminal_out('= SpecialFrog : '+metadata_c['SpecialFrog']);
-        terminal_out('= Subset : '+metadata_c['Subset']);
+        console.log('= Frog : '+metadata_c['Frog']);
+        console.log('= SpecialFrog : '+metadata_c['SpecialFrog']);
+        console.log('= Subset : '+metadata_c['Subset']);
 
         if (metadata_b['Trait'] !== '') {metadata_c['Trait'] = metadata_b['Trait']}
         else if (metadata_a['Trait'] !== '') { metadata_c['Trait'] = metadata_a['Trait']; }
-        terminal_out('= Trait : '+metadata_c['Trait']);
+        console.log('= Trait : '+metadata_c['Trait']);
 
         if (metadata_a['Accessory'] !== '') { metadata_c['Accessory'] = metadata_a['Accessory']; }
         else if (metadata_b['Accessory'] !== '') { metadata_c['Accessory'] = metadata_b['Accessory']; }
-        terminal_out('= Accessory : '+metadata_c['Accessory']);
+        console.log('= Accessory : '+metadata_c['Accessory']);
 
         if (metadata_a['Eyes'] !== '') { metadata_c['Eyes'] = metadata_a['Eyes']; }
         else if (metadata_b['Eyes'] !== '') { metadata_c['Eyes'] = metadata_b['Eyes']; }
-        terminal_out('= Eyes : '+metadata_c['Eyes']);
+        console.log('= Eyes : '+metadata_c['Eyes']);
 
         if (metadata_a['Hat'] !== '') { metadata_c['Hat'] = metadata_a['Hat']; }
         else if (metadata_b['Hat'] !== '') { metadata_c['Hat'] = metadata_b['Hat']; }
-        terminal_out('= Hat : '+metadata_c['Hat']);
+        console.log('= Hat : '+metadata_c['Hat']);
 
         if (metadata_a['Mouth'] !== '') { metadata_c['Mouth'] = metadata_a['Mouth']; }
         else if (metadata_b['Mouth'] !== '') { metadata_c['Mouth'] = metadata_b['Mouth']; }
-        terminal_out('= Mouth : '+metadata_c['Mouth']);
+        console.log('= Mouth : '+metadata_c['Mouth']);
 
         // CREATE NEW JSON ELEMENT
 
@@ -797,10 +797,10 @@
         if (metadata_c['Mouth'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Mouth","value":metadata_c['Mouth']}); loadTrait('Mouth', metadata_c['Mouth'], location); }
 
         morophMetadataJsonString = JSON.stringify(morophMetadataJsonObject.attributes, null, 4);
-        //terminal_out(morophMetadataJsonString)
+        //console.log(morophMetadataJsonString)
 
-        terminal_out('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=')
-        terminal_out(morophMetadataJsonString)
+        console.log('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=')
+        console.log(morophMetadataJsonString)
 
         document.getElementById('morph-json').innerHTML = morophMetadataJsonString
 
@@ -813,70 +813,64 @@
 
     */
 
-    async function connect(silent) {
-
-        if (! silent) { silent = false; }
+    async function connect() {
 
         if (typeof window.ethereum !== "undefined") {
-            
-            try {
 
-                terminal_out('Attempting to connect to web3...')
-                terminal_out('Requesting accounts...')
+            console.log('Attempting to connect to web3...')
+            console.log('Requesting accounts...')
+            document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="pendingStatus"></div> Connecting...'
 
-                if (!silent) { document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="pendingStatus"></div> Connecting...' }
+            await ethereum.request({ method: "eth_requestAccounts" });
+            const web3 = new Web3(window.ethereum);
+            const f0 = new F0();
 
-                await ethereum.request({ method: "eth_requestAccounts" });
+            try { // Attempt to Connect!
+                await f0.init({
+                    web3: web3,
+                    contract: CONTRACT_ADDRESS,
+                    network: NETWORK
+                })
 
-                terminal_out('Establishing...')
-
-                const web3 = new Web3(window.ethereum);
-                //const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-                user_address = await web3.currentProvider.selectedAddress;
-
-                //if (user_address == '0xf01e067d442f4254cd7c89a5d42d90ad554616e8') { fetch_address = '0x9b0a6b63fbe89d3b1a38f102c9356adceed54265'; }
-
-                terminal_out('Connected Ethereum wallet: \n'+user_address)
-                terminal_out('Connecting to controller contract...')
-
+                // Connect Collection Smart Contract, Staking Smart Contract
                 CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
+                COLLECTION = collection = new web3.eth.Contract(COLLECTION_ABI, CONTRACT_ADDRESS);
 
-                terminal_out(CONTROLLER_ADDRESS)
-                terminal_out('Connecting to collection contract...')
-
-                COLLECTION = collection = new web3.eth.Contract(COLLECTION_ABI, COLLECTION_ADDRESS);
-
-                terminal_out(COLLECTION_ADDRESS)
-
-                // No. Tokens owned by user
+                // User Variables
+                user_address = await web3.currentProvider.selectedAddress;
+                user_invites = await f0.myInvites();
+                user_keys = Object.keys(user_invites);
                 userTokens = await collection.methods.balanceOf(user_address).call();
-
-                terminal_out('Total tokens currently held by user: ('+userTokens+')')
-
-                // No. Tokens staked by user
                 userTokensStaked = await stakers(user_address, 'amountStaked')
-
-                if (!silent) { document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="connectedStatus"></div> Connected - ['+truncateAddress(user_address)+']' }
-
                 unclaimed_rewards = await availableRewards(user_address)
-
                 is_approved = await checkApproval();
 
-                terminal_out('Staking contract approval status: '+is_approved)
+                // Collection Variables
+                collection_name = await f0.api.name().call();
+                collection_symbol = await f0.api.symbol().call();
+                next_id = await f0.api.nextId().call();
+                next_id = parseInt(next_id);
 
-                if (!silent) { document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); terminal_out('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); } }
+                console.log('Next ID: '+next)
+                console.log('Connected Ethereum wallet: \n'+user_address)
+                console.log('Connecting to controller contract...')
+                console.log(CONTROLLER_ADDRESS)
+                console.log('Connecting to collection contract...')
+                console.log(COLLECTION_ADDRESS)
+
+                document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="connectedStatus"></div> Connected - ['+truncateAddress(user_address)+']'
+                document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); }
 
             } catch (e) {
 
-                terminal_out(e.message)
+                console.log(e.message)
                 alert('FAILED TO CONNECT\n '+e.message);
 
             }
 
         } else {
 
-            terminal_out('Web3 browser extension not detected!')
+            console.log('Web3 browser extension not detected!')
             panelOutput("Don't have a wallet? <a href='https://metamask.io/download/'>Install Metamask</a> 🦊");
 
         }
@@ -943,9 +937,6 @@
 
     }
 
-    function terminal_out(message) {
-        document.getElementById('ui_terminal').innerHTML = message
-    }
     /*
         // Staking Contract Approval | Approve staking contract to transfer and recieve tokens
         // Create/define document element
@@ -954,7 +945,7 @@
         appvlBtn.className = 'connectButton'
         if (!is_approved) {
             appvlBtn.innerHTML = '❌ Contract Approval'
-            appvlBtn.onclick = async function (e) { alert("setApprovalForAll() \nTo start staking, the contract must first be approved. This is a one time transaction that allows the staking contract to recieve and transfer your Frogs."); let chkapproval = await setApprovalForAll(); if (chkapproval == true) { document.getElementById('approvalButton').innerHTML = '✔️ Contract Approval'; terminal_out(chkapproval); } else { alert(chkapproval); } }
+            appvlBtn.onclick = async function (e) { alert("setApprovalForAll() \nTo start staking, the contract must first be approved. This is a one time transaction that allows the staking contract to recieve and transfer your Frogs."); let chkapproval = await setApprovalForAll(); if (chkapproval == true) { document.getElementById('approvalButton').innerHTML = '✔️ Contract Approval'; console.log(chkapproval); } else { alert(chkapproval); } }
         } else {
             appvlBtn.innerHTML = '✔️ Contract Approval'
         }
@@ -1033,13 +1024,13 @@
                 let staked_duration = Date.now() - staked_date;
                 let staked_hours = Math.floor(staked_duration/1000/60/60);
 
-                //terminal_out('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
+                //console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
 
                 // Return time staked in (Hours)
                 return staked_hours;
 
             // Catch Errors, Return 0.00
-            } catch (e) { terminal_out(e.message); return 0.00; }
+            } catch (e) { console.log(e.message); return 0.00; }
         }
     }
 
@@ -1119,25 +1110,25 @@
             // No. Tokens owned by staker_address
             let staker_tokens = await stakers(staker_address, 'amountStaked');
 
-            terminal_out('Total tokens currently staked by user: '+staker_tokens)
+            console.log('Total tokens currently staked by user: '+staker_tokens)
 
             // Available Rewards
             let staker_rewards = await availableRewards(staker_address);
             staker_rewards = String(staker_rewards).slice(0, 6);
 
-            terminal_out('Rewards available to user ($FLYZ): '+staker_rewards)
+            console.log('Rewards available to user ($FLYZ): '+staker_rewards)
 
             // Render Frogs Staked by User
             if (staker_tokens >= 1) {
 
-                terminal_out('Fetching staked tokens....')
+                console.log('Fetching staked tokens....')
                 document.getElementById('frogs').innerHTML = '';
                 let staker_tokens_array = await getStakedTokens(staker_address);
 
                 for (var i = 0; i < staker_tokens_array.length; i++) {
 
                     tokenId = staker_tokens_array[i].tokenId
-                    //terminal_out('Staked Token Found: #'+tokenId)
+                    //console.log('Staked Token Found: #'+tokenId)
                     render_token(tokenId)
 
                 }
@@ -1146,7 +1137,7 @@
             
         } catch (e) {
 
-            terminal_out('Something went wrong! \n'+e.message);
+            console.log('Something went wrong! \n'+e.message);
 
         }
 
