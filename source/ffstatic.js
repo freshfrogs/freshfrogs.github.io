@@ -901,6 +901,11 @@
         document.getElementById('console').appendChild(rwrdsBtn)
     */
 
+        document.getElementById('console').appendChild(mintButton)
+        document.getElementById('console').appendChild(mintButton)
+        break_element = document.createElement('br')
+        document.getElementById('console').appendChild(break_element)
+
         // Mint Button | Mint Tokens
         // Create/define document element
         mintButton = document.createElement('button')
