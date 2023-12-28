@@ -279,9 +279,9 @@
     */
 
     let animated = [
-        'witchStraw',
-        'witchBrown',
-        'witchBlack',
+        //'witchStraw',
+        //'witchBrown',
+        //'witchBlack',
         'blueDartFrog',
         'blueTreeFrog',
         'brownTreeFrog',
@@ -306,9 +306,9 @@
         'shadesThreeD',
         'shadesWhite',
         'circleNightVision',
-        'baseballCapBlue',
-        'baseballCapRed',
-        'baseballCapWhite',
+        //'baseballCapBlue',
+        //'baseballCapRed',
+        //'baseballCapWhite',
         'yellow',
         'blue(2)',
         'blue',
