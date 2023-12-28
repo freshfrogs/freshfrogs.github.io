@@ -1334,8 +1334,8 @@
     // withdraw(_tokenId (uint256), _user (address)) | send =>
     async function withdraw(tokenId_r) {
 
-        let tokenId = Number(tokenId_r)
-        // let tokenId = String(tokenId_r)
+        //let tokenId = Number(tokenId_r)
+        let tokenId = String(tokenId_r)
         // Check Staked/Approval Status
         let staked = await stakerAddress(tokenId);
         if (!staked) { return 'TXN FAILED:\n Token #'+tokenId+' is not currently staked!'; } 
