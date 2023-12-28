@@ -11,6 +11,153 @@
     const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
     const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 
+    /*
+
+        connect() | Connect Wallet
+
+    */
+
+    async function connect() {
+
+        if (typeof window.ethereum !== "undefined") {
+
+            console.log('Attempting to connect to web3...')
+            console.log('Requesting accounts...')
+            document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="pendingStatus"></div> Connecting...'
+
+            await ethereum.request({ method: "eth_requestAccounts" });
+            const web3 = new Web3(window.ethereum);
+            const f0 = new F0();
+
+            try { // Attempt to Connect!
+                await f0.init({
+                    web3: web3,
+                    contract: COLLECTION_ADDRESS,
+                    network: 'main'
+                })
+
+                // Connect Collection Smart Contract, Staking Smart Contract
+                CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
+                COLLECTION = collection = new web3.eth.Contract(COLLECTION_ABI, COLLECTION_ADDRESS);
+
+                // User Variables
+                user_address = await web3.currentProvider.selectedAddress;
+                user_invites = await f0.myInvites();
+                user_keys = Object.keys(user_invites);
+                userTokens = await collection.methods.balanceOf(user_address).call();
+                userTokensStaked = await stakers(user_address, 'amountStaked')
+                unclaimed_rewards = await availableRewards(user_address)
+                is_approved = await checkApproval();
+
+                // Collection Variables
+                collection_name = await f0.api.name().call();
+                collection_symbol = await f0.api.symbol().call();
+                next_id = await f0.api.nextId().call();
+                next_id = parseInt(next_id);
+
+                console.log('Connected Ethereum wallet: \n'+user_address)
+                console.log('Connecting to controller contract...')
+                console.log(CONTROLLER_ADDRESS)
+                console.log('Connecting to collection contract...')
+                console.log(COLLECTION_ADDRESS)
+                console.log('Next ID: '+next_id)
+
+                document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="connectedStatus"></div> Connected - ['+truncateAddress(user_address)+']'
+                document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); }
+
+            } catch (e) {
+
+                console.log(e.message)
+                alert('FAILED TO CONNECT\n '+e.message);
+
+            }
+
+        } else {
+
+            console.log('Web3 browser extension not detected!')
+            panelOutput("Don't have a wallet? <a href='https://metamask.io/download/'>Install Metamask</a> 🦊");
+
+        }
+    }
+
+    /*
+
+        Update website UI options
+
+    */
+
+    async function update_ui_options() {
+
+    /*
+        // Rewards Button | Claim available rewards
+        // Create/define document element
+        rwrdsBtn = document.createElement('button')
+        rwrdsBtn.id = 'rewardsButton'
+        rwrdsBtn.className = 'connectButton'
+        rwrdsBtn.onclick = async function (e) { let rewards_return = await claimRewards(); alert(rewards_return) }
+        rwrdsBtn.innerHTML = '🎁 Rewards: '+unclaimed_rewards.toFixed(1)+' $FLYZ' 
+
+        // Append to parent element
+        document.getElementById('console').appendChild(rwrdsBtn)
+    */
+
+        var parent_element = document.getElementById('console');
+
+        break_element = document.createElement('br')
+        parent_element.appendChild(break_element)
+
+        // Mint Button | Mint Tokens
+        // Create/define document element
+        mintButton = document.createElement('button')
+        mintButton.id = 'mintButton'
+        mintButton.className = 'connectButton'
+        mintButton.onclick = async function (e) {}
+        mintButton.innerHTML = '🐸 Mint Frogs'
+        // Append to parent element
+        parent_element.appendChild(mintButton)
+
+        // Holdings Button | View holdings
+        // Create/define document element
+        holdingsButton = document.createElement('button')
+        holdingsButton.id = 'holdingsButton'
+        holdingsButton.className = 'connectButton'
+        holdingsButton.onclick = async function (e) {
+            document.getElementById('frogs').innerHTML = '';
+            display_wallet_holdings(user_address);
+        }
+        holdingsButton.innerHTML = '🍃 View Holdings'
+        // Append to parent element
+        parent_element.appendChild(holdingsButton)
+
+        // Stake Button | Stake tokens
+        // Create/define document element
+        stkeBtn = document.createElement('button')
+        stkeBtn.id = 'stakeButton'
+        stkeBtn.className = 'connectButton'
+        stkeBtn.onclick = async function (e) { await Initiate_stake(); }
+        stkeBtn.innerHTML = '🌱 Stake & Earn!'
+        // Append to parent element
+        parent_element.appendChild(stkeBtn)
+
+    }
+
+    /*
+        // Staking Contract Approval | Approve staking contract to transfer and recieve tokens
+        // Create/define document element
+        appvlBtn = document.createElement('button')
+        appvlBtn.id = 'approvalButton'
+        appvlBtn.className = 'connectButton'
+        if (!is_approved) {
+            appvlBtn.innerHTML = '❌ Contract Approval'
+            appvlBtn.onclick = async function (e) { alert("setApprovalForAll() \nTo start staking, the contract must first be approved. This is a one time transaction that allows the staking contract to recieve and transfer your Frogs."); let chkapproval = await setApprovalForAll(); if (chkapproval == true) { document.getElementById('approvalButton').innerHTML = '✔️ Contract Approval'; console.log(chkapproval); } else { alert(chkapproval); } }
+        } else {
+            appvlBtn.innerHTML = '✔️ Contract Approval'
+        }
+        
+        // Append to parent element
+        document.getElementById('console').appendChild(appvlBtn)
+    */
+
     // Get staked token ID's
     async function held_tokens_by_wallet(account) {
 
@@ -805,153 +952,6 @@
         document.getElementById('morph-json').innerHTML = morophMetadataJsonString
 
     }
-
-    /*
-
-        connect() | Connect Wallet
-
-    */
-
-    async function connect() {
-
-        if (typeof window.ethereum !== "undefined") {
-
-            console.log('Attempting to connect to web3...')
-            console.log('Requesting accounts...')
-            document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="pendingStatus"></div> Connecting...'
-
-            await ethereum.request({ method: "eth_requestAccounts" });
-            const web3 = new Web3(window.ethereum);
-            const f0 = new F0();
-
-            try { // Attempt to Connect!
-                await f0.init({
-                    web3: web3,
-                    contract: COLLECTION_ADDRESS,
-                    network: 'main'
-                })
-
-                // Connect Collection Smart Contract, Staking Smart Contract
-                CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
-                COLLECTION = collection = new web3.eth.Contract(COLLECTION_ABI, COLLECTION_ADDRESS);
-
-                // User Variables
-                user_address = await web3.currentProvider.selectedAddress;
-                user_invites = await f0.myInvites();
-                user_keys = Object.keys(user_invites);
-                userTokens = await collection.methods.balanceOf(user_address).call();
-                userTokensStaked = await stakers(user_address, 'amountStaked')
-                unclaimed_rewards = await availableRewards(user_address)
-                is_approved = await checkApproval();
-
-                // Collection Variables
-                collection_name = await f0.api.name().call();
-                collection_symbol = await f0.api.symbol().call();
-                next_id = await f0.api.nextId().call();
-                next_id = parseInt(next_id);
-
-                console.log('Connected Ethereum wallet: \n'+user_address)
-                console.log('Connecting to controller contract...')
-                console.log(CONTROLLER_ADDRESS)
-                console.log('Connecting to collection contract...')
-                console.log(COLLECTION_ADDRESS)
-                console.log('Next ID: '+next_id)
-
-                document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="connectedStatus"></div> Connected - ['+truncateAddress(user_address)+']'
-                document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); }
-
-            } catch (e) {
-
-                console.log(e.message)
-                alert('FAILED TO CONNECT\n '+e.message);
-
-            }
-
-        } else {
-
-            console.log('Web3 browser extension not detected!')
-            panelOutput("Don't have a wallet? <a href='https://metamask.io/download/'>Install Metamask</a> 🦊");
-
-        }
-    }
-
-    /*
-
-        Update website UI options
-
-    */
-
-    async function update_ui_options() {
-
-    /*
-        // Rewards Button | Claim available rewards
-        // Create/define document element
-        rwrdsBtn = document.createElement('button')
-        rwrdsBtn.id = 'rewardsButton'
-        rwrdsBtn.className = 'connectButton'
-        rwrdsBtn.onclick = async function (e) { let rewards_return = await claimRewards(); alert(rewards_return) }
-        rwrdsBtn.innerHTML = '🎁 Rewards: '+unclaimed_rewards.toFixed(1)+' $FLYZ' 
-
-        // Append to parent element
-        document.getElementById('console').appendChild(rwrdsBtn)
-    */
-
-        var parent_element = document.getElementById('console');
-
-        break_element = document.createElement('br')
-        parent_element.appendChild(break_element)
-
-        // Mint Button | Mint Tokens
-        // Create/define document element
-        mintButton = document.createElement('button')
-        mintButton.id = 'mintButton'
-        mintButton.className = 'connectButton'
-        mintButton.onclick = async function (e) {}
-        mintButton.innerHTML = '🐸 Mint Frogs'
-        // Append to parent element
-        parent_element.appendChild(mintButton)
-
-        // Holdings Button | View holdings
-        // Create/define document element
-        holdingsButton = document.createElement('button')
-        holdingsButton.id = 'holdingsButton'
-        holdingsButton.className = 'connectButton'
-        holdingsButton.onclick = async function (e) {
-            document.getElementById('frogs').innerHTML = '';
-            display_wallet_holdings(user_address);
-        }
-        holdingsButton.innerHTML = '🍃 View Holdings'
-        // Append to parent element
-        parent_element.appendChild(holdingsButton)
-
-        // Stake Button | Stake tokens
-        // Create/define document element
-        stkeBtn = document.createElement('button')
-        stkeBtn.id = 'stakeButton'
-        stkeBtn.className = 'connectButton'
-        stkeBtn.onclick = async function (e) { await Initiate_stake(); }
-        stkeBtn.innerHTML = '🌱 Stake & Earn!'
-        // Append to parent element
-        parent_element.appendChild(stkeBtn)
-
-    }
-
-    /*
-        // Staking Contract Approval | Approve staking contract to transfer and recieve tokens
-        // Create/define document element
-        appvlBtn = document.createElement('button')
-        appvlBtn.id = 'approvalButton'
-        appvlBtn.className = 'connectButton'
-        if (!is_approved) {
-            appvlBtn.innerHTML = '❌ Contract Approval'
-            appvlBtn.onclick = async function (e) { alert("setApprovalForAll() \nTo start staking, the contract must first be approved. This is a one time transaction that allows the staking contract to recieve and transfer your Frogs."); let chkapproval = await setApprovalForAll(); if (chkapproval == true) { document.getElementById('approvalButton').innerHTML = '✔️ Contract Approval'; console.log(chkapproval); } else { alert(chkapproval); } }
-        } else {
-            appvlBtn.innerHTML = '✔️ Contract Approval'
-        }
-        
-        // Append to parent element
-        document.getElementById('console').appendChild(appvlBtn)
-    */
 
     // claimRewards(_user (address)) | send =>
     async function claimRewards() {
