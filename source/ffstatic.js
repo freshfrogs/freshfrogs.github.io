@@ -75,7 +75,7 @@
         for (var token = 0; token < staked_tokens.length; token++) {
             let tokenId = staked_tokens[token];
             let staked_token = await stakerAddress(tokenId);
-            if (staked_token == wallet) {
+            if (staked_token.toString().toLowerCase() == wallet.toString().toLowerCase()) {
                 console.log('Staked Token: Frog #'+tokenId);
                 await render_token(tokenId);
             }
