@@ -14,6 +14,9 @@
     // Get staked token ID's
     async function get_staked_tokens(account) {
 
+        // Clear HTML element
+        document.getElementById('frogs').innerHTML = '';
+
         // Get ALL staked tokens by default
         if (! account) {account = CONTROLLER_ADDRESS}
 
