@@ -883,6 +883,8 @@
         mintButton.className = 'connectButton'
         mintButton.onclick = async function (e) {}
         mintButton.innerHTML = '🔑 Mint'
+        // Append to parent element
+        document.getElementById('console').appendChild(mintButton)
 
         // Holdings Button | View holdings
         // Create/define document element
@@ -891,7 +893,6 @@
         holdingsButton.className = 'connectButton'
         holdingsButton.onclick = async function (e) {}
         holdingsButton.innerHTML = '🔐 View Holdings'
-
         // Append to parent element
         document.getElementById('console').appendChild(holdingsButton)
 
@@ -902,7 +903,6 @@
         stkeBtn.className = 'connectButton'
         stkeBtn.onclick = async function (e) { await Initiate_stake(); }
         stkeBtn.innerHTML = '📌 Stake and Earn'
-
         // Append to parent element
         document.getElementById('console').appendChild(stkeBtn)
 
