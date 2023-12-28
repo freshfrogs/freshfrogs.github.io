@@ -12,10 +12,7 @@
     const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 
     // Get staked token ID's
-    async function get_staked_tokens(account) {
-
-        // Clear HTML element
-        document.getElementById('frogs').innerHTML = '';
+    async function held_tokens_by_address(account) {
 
         // Get ALL staked tokens by default
         if (! account) {account = CONTROLLER_ADDRESS}
@@ -53,23 +50,19 @@
         }
 
         // Substract the tokens received by the sent to get the tokens owned by account
-        let staked_token_Ids = [];
+        let address_tokens_array = [];
         for (let tokenId in receivedTokensCount) {
             if (
                 (sentTokensCount[tokenId] ? sentTokensCount[tokenId] : 0) <
                 receivedTokensCount[tokenId]
             ) {
-                staked_token_Ids.push(tokenId);
+                address_tokens_array.push(tokenId);
             }
         }
 
-        console.log(staked_token_Ids)
-        for (var token = 0; token < staked_token_Ids.length; token++) {
-
-            tokenId = staked_token_Ids[token]
-            await render_token(tokenId)
-
-        }
+        // Return address_tokens_array ->
+        console.log(address_tokens_array)
+        return address_tokens_array
     }
 
     // Fetch Collection
