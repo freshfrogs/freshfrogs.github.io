@@ -901,10 +901,15 @@
         document.getElementById('console').appendChild(rwrdsBtn)
     */
 
-        document.getElementById('console').removeChild()
-        document.getElementById('console').removeChild()
+        var parent_element = document.getElementById('console');
+
+        if (parent_element.hasChildNodes()) {
+            parent_element.removeChild(parent_element.children[0]);
+            parent_element.removeChild(parent_element.children[1]);
+        }
+
         break_element = document.createElement('br')
-        document.getElementById('console').appendChild(break_element)
+        parent_element.appendChild(break_element)
 
         // Mint Button | Mint Tokens
         // Create/define document element
@@ -914,7 +919,7 @@
         mintButton.onclick = async function (e) {}
         mintButton.innerHTML = '🐸 Mint Frogs'
         // Append to parent element
-        document.getElementById('console').appendChild(mintButton)
+        parent_element.appendChild(mintButton)
 
         // Holdings Button | View holdings
         // Create/define document element
@@ -927,7 +932,7 @@
         }
         holdingsButton.innerHTML = '🍃 View Holdings'
         // Append to parent element
-        document.getElementById('console').appendChild(holdingsButton)
+        parent_element.appendChild(holdingsButton)
 
         // Stake Button | Stake tokens
         // Create/define document element
@@ -937,7 +942,7 @@
         stkeBtn.onclick = async function (e) { await Initiate_stake(); }
         stkeBtn.innerHTML = '🌱 Stake & Earn!'
         // Append to parent element
-        document.getElementById('console').appendChild(stkeBtn)
+        parent_element.appendChild(stkeBtn)
 
     /*
         // Staking Contract Approval | Approve staking contract to transfer and recieve tokens
