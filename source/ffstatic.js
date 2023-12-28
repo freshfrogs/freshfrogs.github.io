@@ -16,14 +16,14 @@
 
         var collection_tokens_array = [];
 
-        while(collection_tokens_array.length < 12){
+        while(collection_tokens_array.length < 44){
             var array_token = Math.floor(Math.random() * 4040) + 1;
             if(collection_tokens_array.indexOf(array_token) === -1) collection_tokens_array.push(array_token);
         }
 
-        for (let i = 0; i < arr.length; i++) {
+        for (let i = 0; i < collection_tokens_array.length; i++) {
 
-            tokenId = collection_tokens_array[i].tokenId
+            token_id = collection_tokens_array[i].tokenId
             let name = 'Frog #'+token_id
             let image_link = '../frog/'+token_id+'.png'
         
