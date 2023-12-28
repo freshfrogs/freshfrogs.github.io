@@ -850,12 +850,12 @@
                 next_id = await f0.api.nextId().call();
                 next_id = parseInt(next_id);
 
-                console.log('Next ID: '+next)
                 console.log('Connected Ethereum wallet: \n'+user_address)
                 console.log('Connecting to controller contract...')
                 console.log(CONTROLLER_ADDRESS)
                 console.log('Connecting to collection contract...')
                 console.log(COLLECTION_ADDRESS)
+                console.log('Next ID: '+next_id)
 
                 document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="connectedStatus"></div> Connected - ['+truncateAddress(user_address)+']'
                 document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); }
