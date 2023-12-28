@@ -88,6 +88,8 @@
             terminal_out('Held Token: Frog #'+tokenId);
             await render_token(tokenId);
         }
+
+        terminal_out(wallet+' :: '+userTokens+' :: '+userTokensStaked);
     }
 
     /*
