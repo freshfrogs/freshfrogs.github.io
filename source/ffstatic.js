@@ -1343,7 +1343,7 @@
             try {
                 
                 // Send Txn
-                let withdraw = await controller.methods.withdraw(tokenId).send({ from: user_address });
+                withdraw = await controller.methods.withdraw(tokenId).send({ from: user_address.toString().toLowerCase() });
                 return 'Token #'+tokenId+' has succesfully been un-staked!';
 
             // Catch Errors
