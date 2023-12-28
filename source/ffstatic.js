@@ -17,8 +17,8 @@
         var collection_tokens_array = [];
 
         while(collection_tokens_array.length < 44){
-            var array_token = Math.floor(Math.random() * 4040) + 1;
-            if(collection_tokens_array.indexOf(array_token) === -1) collection_tokens_array.push(array_token);
+            random_token = Math.floor(Math.random() * 4040) + 1;
+            if(collection_tokens_array.indexOf(random_token) === -1) collection_tokens_array.push(random_token);
         }
 
         for (let i = 0; i < collection_tokens_array.length; i++) {
@@ -28,11 +28,11 @@
             let image_link = '../frog/'+token_id+'.png'
         
             // Use Functions?
-            button_elements = 
-                '<div style="text-align: center;">'+
-                    '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
-                    '<a class="" target="_blank" href="https://freshfrogs.github.io/frog/json/'+token_id+'.json"><button class="unstake_button">View Metadata</button></a>'
-                '</div>';
+            button_elements = '' //
+            //    '<div style="text-align: center;">'+
+            //        '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
+            //        '<a class="" target="_blank" href="https://freshfrogs.github.io/frog/json/'+token_id+'.json"><button class="unstake_button">View Metadata</button></a>'
+            //    '</div>';
         
             // <-- Begin Element
             token_doc = document.getElementById('frogs');
