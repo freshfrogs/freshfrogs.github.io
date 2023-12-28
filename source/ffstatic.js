@@ -825,8 +825,6 @@
 
                 unclaimed_rewards = await availableRewards(user_address)
 
-                console.log('Unclaimed staking rewards: '+unclaimed_rewards+' $FLYZ')
-
                 is_approved = await checkApproval();
 
                 console.log('Staking contract approval status: '+is_approved)
@@ -1047,8 +1045,6 @@
 
             // Default to current user's address
             if (! staker_address) { staker_address = user_address; }
-
-            console.log('Fetching tokens staked by user: '+staker_address)
 
             // No. Tokens owned by staker_address
             let staker_tokens = await stakers(staker_address, 'amountStaked');
