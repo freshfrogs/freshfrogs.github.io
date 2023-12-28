@@ -863,16 +863,29 @@
 
     async function update_ui_options() {
 
+    /*
         // Rewards Button | Claim available rewards
         // Create/define document element
         rwrdsBtn = document.createElement('button')
         rwrdsBtn.id = 'rewardsButton'
         rwrdsBtn.className = 'connectButton'
         rwrdsBtn.onclick = async function (e) { let rewards_return = await claimRewards(); alert(rewards_return) }
-        rwrdsBtn.innerHTML = '🎁 Rewards: '+unclaimed_rewards.toFixed(1)+' $FLYZ'
+        rwrdsBtn.innerHTML = '🎁 Rewards: '+unclaimed_rewards.toFixed(1)+' $FLYZ' 
 
         // Append to parent element
         document.getElementById('console').appendChild(rwrdsBtn)
+    */
+
+        // Holdings Button | View holdings
+        // Create/define document element
+        holdingsButton = document.createElement('button')
+        holdingsButton.id = 'holdingsButton'
+        holdingsButton.className = 'connectButton'
+        holdingsButton.onclick = async function (e) {}
+        holdingsButton.innerHTML = '🧾 View Holdings'
+
+        // Append to parent element
+        document.getElementById('console').appendChild(holdingsButton)
 
         // Stake Button | Stake tokens
         // Create/define document element
@@ -885,6 +898,7 @@
         // Append to parent element
         document.getElementById('console').appendChild(stkeBtn)
 
+    /*
         // Staking Contract Approval | Approve staking contract to transfer and recieve tokens
         // Create/define document element
         appvlBtn = document.createElement('button')
@@ -899,7 +913,7 @@
         
         // Append to parent element
         document.getElementById('console').appendChild(appvlBtn)
-
+    */
     }
 
     // claimRewards(_user (address)) | send =>
@@ -1162,7 +1176,6 @@
                 '<text>Next Level</text>'+'<br>'+
                 '<text style="color: darkseagreen; font-weight: bold;">'+staked_next+' days</text>'+
               '</div>'+
-              button_elements+
             '</div>'+
           '</div>'+
         '</div>'+
