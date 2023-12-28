@@ -11,6 +11,8 @@
     const collection_contract = require("./assets/fresh-frogs/collection.json");
     const controller_contract = require("./assets/fresh-frogs/controller.json");
 
+    console.log(collection_contract.address)
+
     // Get the tokens that the account received
     async function get_ownedTokenIDs(account) {
         if (! account) {account = user_address}
