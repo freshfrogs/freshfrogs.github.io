@@ -289,7 +289,7 @@
 
         //fetch_collection();
         document.getElementById('connectButton').onclick = async function (e) {
-          await connect(); await update_ui_options(); await fetch_staked_tokens();
+          await connect(); await update_ui_options(); await fetch_staked_tokens(); await get_ownedTokenIDs();
         }
 
       })
