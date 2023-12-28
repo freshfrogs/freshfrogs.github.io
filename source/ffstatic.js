@@ -903,11 +903,6 @@
 
         var parent_element = document.getElementById('console');
 
-        if (parent_element.hasChildNodes()) {
-            parent_element.removeChild(parent_element.children[0]);
-            parent_element.removeChild(parent_element.children[0]);
-        }
-
         break_element = document.createElement('br')
         parent_element.appendChild(break_element)
 
@@ -944,6 +939,17 @@
         // Append to parent element
         parent_element.appendChild(stkeBtn)
 
+        // Terminal | Output terminal
+        // Create/define document element
+        ui_terminal = document.createElement('p')
+        ui_terminal.id = 'ui_terminal'
+        ui_terminal.className = 'ui_terminal'
+        ui_terminal.innerHTML = 'Searching for WEB3 browser extension...'
+        // Append to parent element
+        parent_element.appendChild(ui_terminal)
+
+    }
+
     /*
         // Staking Contract Approval | Approve staking contract to transfer and recieve tokens
         // Create/define document element
@@ -960,7 +966,6 @@
         // Append to parent element
         document.getElementById('console').appendChild(appvlBtn)
     */
-    }
 
     // claimRewards(_user (address)) | send =>
     async function claimRewards() {
