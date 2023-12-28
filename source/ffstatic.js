@@ -21,8 +21,8 @@
 
         if (typeof window.ethereum !== "undefined") {
 
-            console.log('Attempting to connect to web3...')
-            console.log('Requesting accounts...')
+            console.log('- Attempting to connect to web3...')
+            console.log('- Requesting Ethereum mainnet...')
             document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="pendingStatus"></div> Connecting...'
 
             await ethereum.request({ method: "eth_requestAccounts" });
@@ -55,12 +55,15 @@
                 next_id = await f0.api.nextId().call();
                 next_id = parseInt(next_id);
 
-                console.log('Connected Ethereum wallet: \n'+user_address)
-                console.log('Connecting to controller contract...')
-                console.log(CONTROLLER_ADDRESS)
-                console.log('Connecting to collection contract...')
+                console.log('=')
+                console.log('- Connected Ethereum wallet: \n'+user_address)
+                console.log('- Connected to Smart Contract: '+collection_name+' ('+collection_symbol+')')
+                console.log('- ERC-721 Standard NFT Collection. Supply ('+next_id+'/4040)')
                 console.log(COLLECTION_ADDRESS)
-                console.log('Next ID: '+next_id)
+                console.log('=')
+                console.log('=')
+                console.log('- Connected to Smart Contract: FreshFrogsController')
+                console.log(CONTROLLER_ADDRESS)
 
                 document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="connectedStatus"></div> Connected - ['+truncateAddress(user_address)+']'
                 document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); }
