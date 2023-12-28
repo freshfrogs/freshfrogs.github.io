@@ -941,15 +941,6 @@
         // Append to parent element
         parent_element.appendChild(stkeBtn)
 
-        // Terminal | Output terminal
-        // Create/define document element
-        ui_terminal = document.createElement('p')
-        ui_terminal.id = 'ui_terminal'
-        ui_terminal.className = 'ui_terminal'
-        ui_terminal.innerHTML = 'Searching for WEB3 browser extension...'
-        // Append to parent element
-        parent_element.appendChild(ui_terminal)
-
     }
 
     function terminal_out(message) {
