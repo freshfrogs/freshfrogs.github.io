@@ -23,15 +23,13 @@
     
     }
 
-    async function mint(quantity, invite) {
-        if (! invite) { invite = null }
+    async function mint(quantity) {
+        var invite = "0x0000000000000000000000000000000000000000000000000000000000000000"
         try {
             let tokens = await f0.mint(invite, quantity)
-            var therscanTest = tokens.map((token) => { // return opensea link for newly minted token
-                return token.links.etherscan
-            })
+            return tokens
         } catch (e) {
-            return e.message.code
+            return e.message
         }   
     }
 
