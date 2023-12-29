@@ -21,7 +21,12 @@ const SOURCE_PATH = 'https://freshfrogs.github.io'
 const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 
-async function initiate_mint() {
+async function initiate_mint(quantity) {
+
+    let tokens = await f0.mint(user_invite, quantity)
+    console.log(tokens)
+
+    /*
     console.log('SENDING MINT TXN: (test 2)')
     try {
         var gas = collection.methods.mint(["0x0000000000000000000000000000000000000000000000000000000000000000", []], 1).estimateGas({ from: user_address });
@@ -38,6 +43,7 @@ async function initiate_mint() {
         console.log(e.message);
         return e.message
     }
+    */
 }
 
 // Begin connection
@@ -68,7 +74,7 @@ function update_frontend() {
     mintButton = document.createElement('button')
     mintButton.id = 'mintButton'
     mintButton.className = 'connectButton'
-    mintButton.onclick = async function (e) { await initiate_mint(); }
+    mintButton.onclick = async function (e) { await initiate_mint(1); }
     mintButton.innerHTML = '🐸 Mint Frogs'
     parent_element.appendChild(mintButton)
 
