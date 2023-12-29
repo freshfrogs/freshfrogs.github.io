@@ -53,6 +53,7 @@ async function initiate_web3_connection() {
         document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="pendingStatus"></div> Connecting...'
         await connect().then(function(){ 
             update_frontend();
+            community_staked_tokens();
         })
     } else { // WEB3 browser extenstion could not be found!
         console.log('WEB3 wallet not found!')
@@ -150,6 +151,140 @@ async function connect() {
             mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1)
         }
     } catch (e) { console.log('Section 3 -- '+e.message) }
+}
+
+async function community_staked_tokens() {
+    // Tokens held by staking contract
+    let all_staked_tokens = await held_tokens_by_wallet();
+    for (token = 0; token < all_staked_tokens.length; token++) {
+        let token_id = all_staked_tokens[token];
+        await render_token(token_id);
+    }
+
+    console.log('Total Staked Tokens: '+all_staked_tokens.length);
+}
+
+// Render NFT token by layered attirubtes obtained through metadata.
+async function render_token(token_id) {
+
+    var location = 'frogs'
+
+    // Token Variables
+    let token_name = 'Frog #'+token_id
+    let token_owner = await collection.methods.ownerOf(token_id).call();
+    let image_link = SOURCE_PATH+token_id+'.png'
+
+    if (token_owner.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) {
+        format = 'staked'
+        token_owner = await stakerAddress(token_id);
+    } else { format = 'default' }
+
+    // Default format or staked format
+    if (format == 'default') {
+
+        // Render token information and data
+        top_left = 
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text>Owned By</text>'+'<br>'+
+                '<text style="color: darkseagreen; font-weight: bold;">'+truncateAddress(token_owner)+'</text>'+
+            '</div>'
+        top_right = 
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text>Frog Type</text>'+'<br>'+
+                '<text id="frog_type" style="color: darkseagreen; font-weight: bold;">'+'</text>'+
+            '</div>'
+        bottom_left = 
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text>Next Level</text>'+'<br>'+
+                '<text style="color: darkseagreen; font-weight: bold;">'+' days</text>'+
+            '</div>'
+        bottom_right = 
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text>Next Level</text>'+'<br>'+
+                '<text style="color: darkseagreen; font-weight: bold;">'+' days</text>'+
+            '</div>'
+        
+    } else if (format == 'staked') {
+
+        // Staked token data calculations
+        let staked_time_days = staked_level = staked_next = staked_earned = '0';
+        //let staked = await stakerAddress(token_id)
+        let staking_values = await stakingValues(token_id)
+        staked_time_days = staking_values[0]
+        staked_level = staking_values[1]
+        staked_next = staking_values[2]
+        staked_earned = staking_values[3]
+
+        // Display token properties
+        top_right = 
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text>Owned By</text>'+'<br>'+
+                '<text style="color: darkseagreen; font-weight: bold;">'+truncateAddress(token_owner)+'</text>'+
+            '</div>'
+        bottom_right = 
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text>$FLYZ Earned</text>'+'<br>'+
+                '<text style="color: darkseagreen; font-weight: bold;">'+staked_earned+'</text>'+
+            '</div>'
+        top_left = 
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text>Level</text>'+'<br>'+
+                '<text style="color: darkseagreen; font-weight: bold;">'+staked_level+'</text>'+
+            '</div>'
+        bottom_left = 
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text>Next Level</text>'+'<br>'+
+                '<text style="color: darkseagreen; font-weight: bold;">'+staked_next+' days</text>'+
+            '</div>'
+
+    }
+
+    // <-- Begin Element
+    token_doc = document.getElementById(location);
+    token_element = document.createElement('div');
+
+    // Element Details -->
+    token_element.id = token_name;
+    token_element.className = 'display_token';
+    token_element.innerHTML = 
+        '<div class="display_token_cont">'+
+            '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
+                '<div class="innerLeft">'+
+                    '<div class="display_token_img_cont" id="cont_'+token_id+'" onclick="render_display('+token_id+')">'+
+                        //'<img src="'+image_link+'" class="displayImage"/>'+
+                    '</div>'+
+                '</div>'+
+            '</div>'+
+            '<div class="renderRight">'+
+                '<div class="innerRight">'+
+                    '<div id="traits_'+token_id+'" class="trait_list">'+
+                        //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
+                        '<strong>'+token_name+'</strong> <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+                    '</div>'+
+                    '<div id="prop_'+token_id+'" class="properties">'+
+                        top_right+
+                        top_left+
+                        '<br>'+
+                        bottom_left+
+                        bottom_right+
+                    '</div>'+
+                '</div>'+
+            '</div>'+
+        '</div>';
+
+    // Create Element <--
+    token_doc.appendChild(token_element);
+
+    // Update Metadata! Build Frog -->
+    let metadata = await (await fetch(SOURCE_PATH+'json/'+token_id+'.json')).json();
+
+    for (let i = 0; i < metadata.attributes.length; i++) {
+
+        let attribute = metadata.attributes[i]
+        loadTrait(attribute.trait_type, attribute.value, 'cont_'+token_id);
+
+    }
+
 }
 
 /*
