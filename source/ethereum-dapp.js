@@ -23,9 +23,9 @@ const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 
 async function initiate_mint() {
     try {
-        var gas = collection.methods.mint(0.01, '["0x0000000000000000000000000000000000000000000000000000000000000000", []]', 1).estimateGas({ from: user_address });
+        var gas = collection.methods.mint(0.01, ["0x0000000000000000000000000000000000000000000000000000000000000000", []], 1).estimateGas({ from: user_address });
         gas.then(function(gasTouse) { 
-            collection.methods.mint(0.01, '["0x0000000000000000000000000000000000000000000000000000000000000000", []]', 1).send({ 
+            collection.methods.mint(0.01, ["0x0000000000000000000000000000000000000000000000000000000000000000", []], 1).send({ 
                 from: user_address, 
                 gas: gasTouse 
             }).then(function(hashdata){ 
