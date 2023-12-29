@@ -25,7 +25,7 @@ async function initiate_mint() {
     //let tokens = await f0.mint(user_invite, count)
     //console.log(tokens)
 
-    await send_write_function(collection.methods.Mint("0.01, ('0x0000000000000000000000000000000000000000000000000000000000000000', []), 1"))
+    await send_write_function(collection.methods.Mint(0.01, '["0x0000000000000000000000000000000000000000000000000000000000000000", []]', 1))
 }
 
 // Begin connection
