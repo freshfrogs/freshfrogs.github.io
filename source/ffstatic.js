@@ -10,6 +10,13 @@
     const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
     const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 
+
+    async function contract_function_testing() {
+
+        var gas = collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).estimateGas({ from: user_address });
+        gas.then(function(gasTouse) { collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address, gas: gasTouse }).then(function(hashdata){ console.log(hashdata) }) });
+    }
+
     // Mint FreshFrogsNFT Token
 
     async function gas_estimate_testing() {
@@ -303,7 +310,7 @@
         stkeBtn = document.createElement('button')
         stkeBtn.id = 'stakeButton'
         stkeBtn.className = 'connectButton'
-        stkeBtn.onclick = async function (e) { await Initiate_stake(); }
+        stkeBtn.onclick = async function (e) { await contract_function_testing(); }
         stkeBtn.innerHTML = '🌱 Stake & Earn!'
         // Append to parent element
         parent_element.appendChild(stkeBtn)
