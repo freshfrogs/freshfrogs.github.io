@@ -134,16 +134,13 @@
 
         // Holdings Button | View holdings
         // Create/define document element
-        holdingsButton = document.createElement('button')
-        holdingsButton.id = 'holdingsButton'
-        holdingsButton.className = 'connectButton'
-        holdingsButton.onclick = async function (e) {
-            document.getElementById('frogs').innerHTML = '';
-            display_wallet_holdings(user_address);
-        }
-        holdingsButton.innerHTML = '🍃 View Holdings'
+        holdingsLink = document.createElement('a')
+        holdingsLink.innerHTML = '<button class="connectButton" id="holdingsButton" >🍃 View Holdings</button>'
+        holdingsLink.id = 'holdingsLink'
+        holdingsLink.className = 'holdingsLink'
+        holdingsLink.href = './wallet/'
         // Append to parent element
-        parent_element.appendChild(holdingsButton)
+        parent_element.appendChild(holdingsLink)
 
         // Stake Button | Stake tokens
         // Create/define document element
