@@ -106,7 +106,6 @@ function update_frontend() {
 */
 
 async function connect() {
-    network = "main"
     try {
         // Create new WEB3 instance and request accounts from provider
         await ethereum.request({ method: "eth_requestAccounts" });
@@ -118,30 +117,28 @@ async function connect() {
         // Connect ethereum contracts
         collection = new web3.eth.Contract(COLLECTION_ABI, COLLECTION_ADDRESS);
         controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
-    } catch (e) { console.log('Section 1 -- '+e.message) }
-    try {
-        // Recieve tokens held or staked by current user.
-        //userTokens = await collection.methods.balanceOf(user_address).call();
-        //userTokensStaked = await stakers(user_address, 'amountStaked')
-        //unclaimed_rewards = await availableRewards(user_address)
-        //is_approved = await checkApproval();
+
+        /* // Recieve tokens held or staked by current user
+        userTokens = await collection.methods.balanceOf(user_address).call();
+        userTokensStaked = await stakers(user_address, 'amountStaked')
+        unclaimed_rewards = await availableRewards(user_address)
+        is_approved = await checkApproval();
+        */
 
         // Factoria API
         f0 = new F0();
-        await f0.init({ web3: web3, contract: COLLECTION_ADDRESS, network: network })
+        await f0.init({ web3: web3, contract: COLLECTION_ADDRESS, network: 'main' })
         collection_name = await f0.api.name().call();
         collection_symbol = await f0.api.symbol().call();
         next_id = await f0.api.nextId().call();
         next_id = parseInt(next_id);
+
+        // Mint Invites
         user_invites = await f0.myInvites();
         user_keys = Object.keys(user_invites);
-        console.log(user_keys)
-        console.log(user_invites)
         user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
-    } catch (e) { console.log('Section 2 -- '+e.message) }
-    try {
-        // NF7UOS / C7AR Bypass -- Unlimited Free Mints
         if (user_address === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase()  || user_address === "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359".toLowerCase() || user_address === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase() || user_address === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
+            // NF7UOS / C7AR Bypass -- Unlimited Free Mints
             user_invite = "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064";
             mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1)
             mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1)
@@ -150,7 +147,12 @@ async function connect() {
             mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1)
             mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1)
         }
-    } catch (e) { console.log('Section 3 -- '+e.message) }
+
+        // DONE
+        // CATCH ERRORS
+    } catch (e) {
+        console.log(e.message)
+    }
 }
 
 async function community_staked_tokens() {
