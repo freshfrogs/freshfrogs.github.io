@@ -157,25 +157,8 @@
 
     }
 
-    /*
-        // Staking Contract Approval | Approve staking contract to transfer and recieve tokens
-        // Create/define document element
-        appvlBtn = document.createElement('button')
-        appvlBtn.id = 'approvalButton'
-        appvlBtn.className = 'connectButton'
-        if (!is_approved) {
-            appvlBtn.innerHTML = '❌ Contract Approval'
-            appvlBtn.onclick = async function (e) { alert("setApprovalForAll() \nTo start staking, the contract must first be approved. This is a one time transaction that allows the staking contract to recieve and transfer your Frogs."); let chkapproval = await setApprovalForAll(); if (chkapproval == true) { document.getElementById('approvalButton').innerHTML = '✔️ Contract Approval'; console.log(chkapproval); } else { alert(chkapproval); } }
-        } else {
-            appvlBtn.innerHTML = '✔️ Contract Approval'
-        }
-        
-        // Append to parent element
-        document.getElementById('console').appendChild(appvlBtn)
-    */
-
     async function mint_txn_history() {
-        const mint_txns_array = await collection.getPastEvents("Mint", {
+        let mint_txns_array = await collection.getPastEvents("Mint", {
             filter: {
                 to: COLLECTION_ADDRESS,
             },
@@ -194,7 +177,7 @@
 
         console.log('Total Staked Tokens: '+all_staked_tokens.length);
     }
-    
+
     // Get staked token ID's
     async function held_tokens_by_wallet(account) {
 
