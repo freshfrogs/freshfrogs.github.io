@@ -10,6 +10,32 @@
     const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
     const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 
+    // Mint FreshFrogsNFT Token
+
+    async function initiate_mint() {
+
+        // Token ID input
+        var mint_quantity = prompt("Please Note: \nThe cost to mint is 0.01Ξ per token. There is also an additional gas fee required to submit the transaction on the network. \nHow many Frogs would you like to mint? (0.01Ξ each + gas fee)");
+
+        // Submit Txn
+        let mint_txn = await mint(mint_quantity);
+        alert(mint_txn);
+    
+    }
+
+    async function mint(quantity, invite) {
+        if (! invite) { invite = null }
+        try {
+            let tokens = await f0.mint(invite, quantity)
+            var therscanTest = tokens.map((token) => { // return opensea link for newly minted token
+                return token.links.etherscan
+            })
+        } catch (e) {
+            return e.message.code
+        }   
+    }
+
+
     // Render NFT token by layered attirubtes obtained through metadata.
     async function render_token(token_id) {
 
@@ -237,7 +263,7 @@
         mintButton = document.createElement('button')
         mintButton.id = 'mintButton'
         mintButton.className = 'connectButton'
-        mintButton.onclick = async function (e) {}
+        mintButton.onclick = async function (e) { await initiate_mint(); }
         mintButton.innerHTML = '🐸 Mint Frogs'
         // Append to parent element
         parent_element.appendChild(mintButton)
