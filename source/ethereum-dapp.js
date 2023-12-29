@@ -153,3 +153,12 @@ async function send_write_function(contract_method) {
         return e.message
     }
 }
+
+// Shorten ethereum wallet address
+function truncateAddress(address) {
+    if (!address) { return ""; }
+    return `${address.substr(0, 5)}..${address.substr(
+        address.length - 5,
+        address.length
+    )}`;
+}
