@@ -21,6 +21,20 @@ network;
 const SOURCE_PATH = 'https://freshfrogs.github.io'
 const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
+const options = {
+    method: 'GET',
+    headers: {
+      accept: 'application/json',
+      'X-API-KEY': '69088fdc-43ef-453f-9da8-d9ffc38df082'
+    }
+  };
+
+async function fetch_tokens_by_owner() {
+      fetch('https://api.rarible.org/v0.1/items/byOwner?blockchains=ETHEREUM&owner=ETHEREUM%3A0xF01e067d442f4254cd7c89A5D42d90ad554616E8&collection=ETHEREUM%3A0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
+        .then(response => response.json())
+        .then(response => console.log(response))
+        .catch(err => console.error(err));
+}
 
 async function initiate_mint(quantity) {
 
@@ -53,6 +67,7 @@ async function initiate_web3_connection() {
         document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="pendingStatus"></div> Connecting...'
         await connect().then(function(){ 
             update_frontend();
+            fetch_tokens_by_owner();
             community_staked_tokens();
         })
     } else { // WEB3 browser extenstion could not be found!
