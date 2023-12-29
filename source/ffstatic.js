@@ -532,18 +532,8 @@
             try {
 
                 // Send Txn
-                //let stake = await controller.methods.stake(tokenId).send({ from: user_address });
-
-                var gas = controller.methods.stake(tokenId).estimateGas({ from: user_address });
-                gas.then(function(gasTouse) {
-                    controller.methods.stake(tokenId).send({ 
-                        from: user_address,
-                         gas: gasTouse 
-                    }).then(function(hashdata){ 
-                        console.log(hashdata) 
-                    }) 
-                });
-            
+                let stake = await controller.methods.stake(tokenId).send({ from: user_address });
+                console.log(stake)
                 return 'Token #'+tokenId+' has succesfully been staked!';
 
             // Catch Errors
