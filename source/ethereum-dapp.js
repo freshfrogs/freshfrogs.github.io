@@ -162,3 +162,59 @@ function truncateAddress(address) {
         address.length
     )}`;
 }
+
+var animated = [
+    //'witchStraw',
+    //'witchBrown',
+    //'witchBlack',
+    'blueDartFrog',
+    'blueTreeFrog',
+    'brownTreeFrog',
+    'redEyedTreeFrog',
+    'tongueSpiderRed',
+    'tongueSpider',
+    'tongue',
+    'tongueFly',
+    'croaking',
+    'peace',
+    'inversedEyes',
+    'closedEyes',
+    'thirdEye',
+    'mask',
+    'smoking',
+    'smokingCigar',
+    'smokingPipe',
+    'circleShadesRed',
+    'circleShadesPurple',
+    'shades',
+    'shadesPurple',
+    'shadesThreeD',
+    'shadesWhite',
+    'circleNightVision',
+    //'baseballCapBlue',
+    //'baseballCapRed',
+    //'baseballCapWhite',
+    'yellow',
+    'blue(2)',
+    'blue',
+    'cyan',
+    'brown'
+]
+
+// loadTrait(_trait(family), _attribute(type), _where(element))
+function loadTrait(trait_type, attribute, location) {
+
+    newAttribute = document.createElement("img");
+    newAttribute.alt = attribute
+
+    if (trait_type == 'Trait') { newAttribute.className = "frogImg5"; } 
+    else { newAttribute.className = "frogImg3"; }
+
+    newAttribute.src = SOURCE_PATH+"/frog/build_files/"+trait_type+"/"+attribute+".png";
+    
+    for (y = 0; y < animated.length; y++) {
+        if (attribute == animated[y]) {
+            newAttribute.src = SOURCE_PATH+"/frog/build_files/"+trait_type+"/animations/"+attribute+"_animation.gif";
+            break; }}
+    document.getElementById(location).appendChild(newAttribute);
+}
