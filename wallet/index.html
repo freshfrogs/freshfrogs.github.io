@@ -302,6 +302,7 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
         await connect(); await update_ui_options();
+        document.getElementById('mintButton').remove()
         document.getElementById('holdingsButton').style.boxShadow = '2px 2px lightsalmon'
         await display_wallet_holdings(user_address);
       })
@@ -327,7 +328,7 @@
       </div>
       <div id="console" class="bottomPanel">
         <div id="outputPanel" style="color: white;"></div><br>
-        <button id="connectButton" class="connectButton"><div id="connectStatus" class="disconnectedStatus"></div> Connect to Web3</button><a href="https://github.com/freshfrogs/freshfrogs.github.io" target="_blank"><button id="githubButton" class="connectButton">🔎 View on Github</button></a><a href="https://rarible.com/fresh-frogs" target="_blank"><button id="raribleButton" class="connectButton">🛒 Shop on Rarible</button></a>
+        <button id="connectButton" class="connectButton"><div id="connectStatus" class="disconnectedStatus"></div> Connect to Web3</button><a href="https://freshfrogs.github.io"><button id="backButton" class="connectButton">Back</button></a>
       </div>
     </section>
     <section id="frogs" style="background: transparent; border: none !important;"></section>
