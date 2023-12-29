@@ -310,7 +310,7 @@
         stkeBtn = document.createElement('button')
         stkeBtn.id = 'stakeButton'
         stkeBtn.className = 'connectButton'
-        stkeBtn.onclick = async function (e) { await contract_function_testing(); }
+        stkeBtn.onclick = async function (e) { await Initiate_stake(); }
         stkeBtn.innerHTML = '🌱 Stake & Earn!'
         // Append to parent element
         parent_element.appendChild(stkeBtn)
@@ -532,8 +532,18 @@
             try {
 
                 // Send Txn
-                let stake = await controller.methods.stake(tokenId).send({ from: user_address });
-                console.log(stake)
+                //let stake = await controller.methods.stake(tokenId).send({ from: user_address });
+
+                var gas = controller.methods.stake(tokenId).estimateGas({ from: user_address });
+                gas.then(function(gasTouse) {
+                    controller.methods.stake(tokenId).send({ 
+                        from: user_address,
+                         gas: gasTouse 
+                    }).then(function(hashdata){ 
+                        console.log(hashdata) 
+                    }) 
+                });
+            
                 return 'Token #'+tokenId+' has succesfully been staked!';
 
             // Catch Errors
