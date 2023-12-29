@@ -113,9 +113,9 @@ async function connect(network) {
 
         // Recieve tokens held or staked by current user.
         userTokens = await collection.methods.balanceOf(user_address).call();
-        userTokensStaked = await stakers(user_address, 'amountStaked')
-        unclaimed_rewards = await availableRewards(user_address)
-        is_approved = await checkApproval();
+        //userTokensStaked = await stakers(user_address, 'amountStaked')
+        //unclaimed_rewards = await availableRewards(user_address)
+        //is_approved = await checkApproval();
 
         // Factoria API
         f0 = new F0();
