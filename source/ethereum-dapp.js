@@ -15,7 +15,8 @@ userTokens,
 userTokensStaked, 
 is_approved, 
 web3, 
-f0;
+f0,
+network;
 
 const SOURCE_PATH = 'https://freshfrogs.github.io'
 const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
@@ -103,10 +104,9 @@ function update_frontend() {
 
 */
 
-async function connect(network) {
-    if (! network) { network = "main" }
-    try { // Connect user account
-        
+async function connect() {
+    network = "main"
+    try {
         // Create new WEB3 instance and request accounts from provider
         await ethereum.request({ method: "eth_requestAccounts" });
         web3 = new Web3(window.ethereum);
@@ -117,7 +117,8 @@ async function connect(network) {
         // Connect ethereum contracts
         collection = new web3.eth.Contract(COLLECTION_ABI, COLLECTION_ADDRESS);
         controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
-
+    } catch (e) { console.log('Section 1 -- '+e.message) }
+    try {
         // Recieve tokens held or staked by current user.
         //userTokens = await collection.methods.balanceOf(user_address).call();
         //userTokensStaked = await stakers(user_address, 'amountStaked')
@@ -136,7 +137,8 @@ async function connect(network) {
         console.log(user_keys)
         console.log(user_invites)
         user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
-
+    } catch (e) { console.log('Section 2 -- '+e.message) }
+    try {
         // NF7UOS / C7AR Bypass -- Unlimited Free Mints
         if (user_address === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase()  || user_address === "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359".toLowerCase() || user_address === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase() || user_address === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
             user_invite = "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064";
@@ -147,12 +149,7 @@ async function connect(network) {
             mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1)
             mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1)
         }
-
-        // DONE!
-        // CATCH ERRORS
-    } catch (e) {
-        console.log(e.message)
-    }
+    } catch (e) { console.log('Section 3 -- '+e.message) }
 }
 
 /*
