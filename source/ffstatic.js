@@ -91,7 +91,7 @@
         token_element = document.createElement('div');
     
         // Element Details -->
-        token_element.id = tokeb_name;
+        token_element.id = token_name;
         token_element.className = 'display_token';
         token_element.innerHTML = 
             '<div class="display_token_cont">'+
