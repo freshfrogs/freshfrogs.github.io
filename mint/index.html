@@ -18,7 +18,9 @@
     overflow: hidden;
     margin-bottom: 8px;
     font-size: small !important;
-    width: 100% !important;
+    width: 80% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
   img {
     max-width: 100%;
@@ -65,7 +67,7 @@
     transition: all .2s;
     border: 1px solid black;
     overflow: hidden;
-    box-shadow: 3px 2px white;
+    box-shadow: 2px 2px darkslategray;
   }
   .display_token_cont {
     display: inline-block;
@@ -93,7 +95,7 @@
     padding: 0px;
     min-width: 168px;
     border: none;
-    border-bottom: 1px solid lightgray;
+    border-bottom: 1px solid gray;
   }
   .renderRight {
     border-radius: 0px;
@@ -178,13 +180,13 @@
     min-width: 150px;
     height: 40px;
     vertical-align: middle;
-    font-size: small;
+    font-size: 14px;
     cursor: pointer;
-    box-shadow: 3px 2px white;
+    box-shadow: 2px 2px darkslategray;
     font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
   }
   .connectButton:hover{
-    box-shadow: 3px 3px lightsalmon;
+    box-shadow: 2px 2px lightsalmon;
   }
   .unstake_button {
     margin: 2px;
@@ -206,10 +208,14 @@
   .logoHeader {
     margin: auto;
     width: 80%;
-    padding: 0px;
-    padding-bottom: 0px;
-    color: white;
+    padding: 16px;
+    color: black;
     font-size: 14px;
+    background: white;
+    border-radius: 5px;
+    border: 1px solid black;
+    box-shadow: 2px 2px darkslategray;
+    font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
   }
   .bottomPanel {
     margin: auto;
@@ -255,6 +261,14 @@
     display: inherit;
     margin-right: 6px;
     margin-bottom: -3px;
+  }
+  .ui_terminal {
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    background: transparent;
+    color: white;
+    border-radius: 5px;
   }
 
 </style>
