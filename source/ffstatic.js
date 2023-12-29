@@ -49,10 +49,9 @@
         if (token_owner.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) {
             format = 'staked'
             token_owner = await stakerAddress(token_id);
-        }
+        } else { format = 'default' }
 
         // Default format or staked format
-        if (! format) { format = 'default'; }
         if (format == 'default') {
 
             // Render token information and data
