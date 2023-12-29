@@ -165,11 +165,6 @@
             fromBlock: 0,
         });
         console.log(mint_txns_array)
-
-        let mint_txns_array2 = await collection.getPastEvents("mint", {
-            fromBlock: 0,
-        });
-        console.log(mint_txns_array2)
     }
 
     async function community_staked_tokens() {
