@@ -22,10 +22,21 @@ const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 
 async function initiate_mint() {
-    //let tokens = await f0.mint(user_invite, count)
-    //console.log(tokens)
-
-    await send_write_function(collection.methods.Mint(0.01, '["0x0000000000000000000000000000000000000000000000000000000000000000", []]', 1))
+    try {
+        var gas = collection.methods.Mint(0.01, '["0x0000000000000000000000000000000000000000000000000000000000000000", []]', 1).estimateGas({ from: user_address });
+        gas.then(function(gasTouse) { 
+            collection.methods.Mint(0.01, '["0x0000000000000000000000000000000000000000000000000000000000000000", []]', 1).send({ 
+                from: user_address, 
+                gas: gasTouse 
+            }).then(function(hashdata){ 
+                console.log(hashdata) 
+                return hashdata
+            }) 
+        });
+    } catch (e) {
+        console.log(e.message);
+        return e.message
+    }
 }
 
 // Begin connection
