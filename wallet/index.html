@@ -302,6 +302,7 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
         await connect(); await update_ui_options(); await display_wallet_holdings(user_address);
+        document.getElementById('holdingsButton').style.boxShadow = '2px 2px lightsalmon'
       })
 
       //<a href="https://freshfrogs.github.io/learn-more" target="_blank"><button id="learnmoreButton" class="connectButton">💡 Learn More</button></a> 🔮
