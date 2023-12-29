@@ -13,6 +13,8 @@
     // Render NFT token by layered attirubtes obtained through metadata.
     async function render_token(token_id) {
 
+        location = 'frogs'
+
         // Token Variables
         let token_name = 'Frog #'+token_id
         let token_owner = await collection.methods.ownerOf(token_id).call();
