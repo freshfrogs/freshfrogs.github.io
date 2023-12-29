@@ -138,7 +138,7 @@
         holdingsLink.innerHTML = '<button class="connectButton" id="holdingsButton" >🍃 View Holdings</button>'
         holdingsLink.id = 'holdingsLink'
         holdingsLink.className = 'holdingsLink'
-        holdingsLink.href = './wallet/'
+        holdingsLink.href = 'https://freshfrogs.github.io/wallet/'
         // Append to parent element
         parent_element.appendChild(holdingsLink)
 
