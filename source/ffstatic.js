@@ -65,8 +65,8 @@
             // Display token properties
             top_left = 
                 '<div style="margin: 8px; float: right; width: 100px;">'+
-                    '<text>Time Staked</text>'+'<br>'+
-                    '<text style="color: darkseagreen; font-weight: bold;">'+staked_time_days+' days</text>'+
+                    '<text>Owned By</text>'+'<br>'+
+                    '<text style="color: darkseagreen; font-weight: bold;">'+truncateAddress(token_owner)+'</text>'+
                 '</div>'
             top_right = 
                 '<div style="margin: 8px; float: right; width: 100px;">'+
