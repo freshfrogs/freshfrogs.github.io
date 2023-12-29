@@ -50,7 +50,7 @@ async function initiate_mint(quantity) {
 async function initiate_web3_connection() {
     if (typeof window.ethereum !== "undefined") {
         document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="pendingStatus"></div> Connecting...'
-        await connect().then(function(){ 
+        await connect('goerli').then(function(){ 
             update_frontend();
         })
     } else { // WEB3 browser extenstion could not be found!
