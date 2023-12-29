@@ -12,6 +12,14 @@
 
     // Mint FreshFrogsNFT Token
 
+    async function gas_estimate_testing() {
+        collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).estimateGas({gas: 5000000}, function(error, gasAmount){
+            console.log(gasAmount)
+            if(gasAmount == 5000000)
+                console.log('Method ran out of gas');
+        });
+    }
+
     async function initiate_mint() {
 
         // Token ID input
