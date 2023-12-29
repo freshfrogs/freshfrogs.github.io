@@ -41,12 +41,12 @@
             bottom_left = 
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text>Next Level</text>'+'<br>'+
-                    '<text style="color: darkseagreen; font-weight: bold;">'+staked_next+' days</text>'+
+                    '<text style="color: darkseagreen; font-weight: bold;">'+' days</text>'+
                 '</div>'
             bottom_right = 
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text>Next Level</text>'+'<br>'+
-                    '<text style="color: darkseagreen; font-weight: bold;">'+staked_next+' days</text>'+
+                    '<text style="color: darkseagreen; font-weight: bold;">'+' days</text>'+
                 '</div>'
             
         } else if (format == 'staked') {
