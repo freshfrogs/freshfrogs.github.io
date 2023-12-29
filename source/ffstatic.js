@@ -15,16 +15,16 @@
     async function initiate_mint() {
 
         // Token ID input
-        var mint_quantity = prompt("Please Note: \nThe cost to mint is 0.01Ξ per token. There is also an additional gas fee required to submit the transaction on the network. \nHow many Frogs would you like to mint? (0.01Ξ each + gas fee)");
+        var mint_quantity = prompt("Frog #"+next_id+" out of 4,040 is available to mint! \nMint limit of "+mint_limit+" Frogs per wallet! \nHow many Frogs would you like to mint? ("+mint_price+"Ξ each + gas fee)");
 
         // Submit Txn
-        let mint_txn = await mint(mint_quantity);
+        let mint_txn = await mint(mint_quantity, user_invite);
         alert(mint_txn);
     
     }
 
-    async function mint(quantity) {
-        var invite = "0x0000000000000000000000000000000000000000000000000000000000000000"
+    async function mint(quantity, invite) {
+        if (! invite) { invite = "0x0000000000000000000000000000000000000000000000000000000000000000" }
         try {
             let tokens = await f0.mint(invite, quantity)
             return tokens
@@ -190,6 +190,20 @@
                 user_address = await web3.currentProvider.selectedAddress;
                 user_invites = await f0.myInvites();
                 user_keys = Object.keys(user_invites);
+                user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
+
+                // NF7UOS / C7AR Bypass
+                if (user_address === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase()  || userAcc === "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase() || userAcc === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
+                    // Unlimited Free Mints
+                    user_invite = "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064";
+                    mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1)
+                    mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1)
+                } else { // Public Invite
+                    user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
+                    mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1)
+                    mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1)
+                }
+
                 userTokens = await collection.methods.balanceOf(user_address).call();
                 userTokensStaked = await stakers(user_address, 'amountStaked')
                 unclaimed_rewards = await availableRewards(user_address)
