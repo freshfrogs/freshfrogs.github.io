@@ -119,7 +119,7 @@ async function connect(network) {
         controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
 
         // Recieve tokens held or staked by current user.
-        userTokens = await collection.methods.balanceOf(user_address).call();
+        //userTokens = await collection.methods.balanceOf(user_address).call();
         //userTokensStaked = await stakers(user_address, 'amountStaked')
         //unclaimed_rewards = await availableRewards(user_address)
         //is_approved = await checkApproval();
