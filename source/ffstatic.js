@@ -175,7 +175,8 @@
             web3 = new Web3(window.ethereum);
             f0 = new F0();
 
-            try { // Attempt to Connect!
+            try {
+                // Attempt to Connect!
                 await f0.init({
                     web3: web3,
                     contract: COLLECTION_ADDRESS,
