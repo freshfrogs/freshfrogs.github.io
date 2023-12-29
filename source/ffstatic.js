@@ -193,7 +193,7 @@
                 user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
 
                 // NF7UOS / C7AR Bypass
-                if (user_address === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase()  || userAcc === "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase() || userAcc === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
+                if (user_address === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase()  || user_address === "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359".toLowerCase() || user_address === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase() || user_address === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
                     // Unlimited Free Mints
                     user_invite = "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064";
                     mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1)
