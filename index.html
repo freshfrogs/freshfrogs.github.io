@@ -300,7 +300,7 @@
 
         //fetch_collection();
         document.getElementById('connectButton').onclick = async function (e) {
-          await connect(); await update_ui_options();
+          await connect(); await update_ui_options(); await community_staked_tokens(); await mint_txn_history();
         }
 
       })

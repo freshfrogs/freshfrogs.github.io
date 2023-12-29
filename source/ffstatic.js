@@ -174,6 +174,27 @@
         document.getElementById('console').appendChild(appvlBtn)
     */
 
+    async function mint_txn_history() {
+        const mint_txns_array = await collection.getPastEvents("Mint", {
+            filter: {
+                to: COLLECTION_ADDRESS,
+            },
+            fromBlock: 0,
+        });
+        console.log(mint_txns_array)
+    }
+
+    async function community_staked_tokens() {
+        // Tokens held by staking contract
+        let all_staked_tokens = await held_tokens_by_wallet();
+        for (token = 0; token < all_staked_tokens.length; token++) {
+            let token_id = all_staked_tokens[token];
+            await render_token(token_id);
+        }
+
+        console.log('Total Staked Tokens: '+all_staked_tokens.length);
+    }
+    
     // Get staked token ID's
     async function held_tokens_by_wallet(account) {
 
