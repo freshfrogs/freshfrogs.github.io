@@ -158,13 +158,18 @@
     }
 
     async function mint_txn_history() {
-        let mint_txns_array = await collection.getPastEvents("Mint", {
+        let mint_txns_array = await collection.getPastEvents("Transfer", {
             filter: {
-                to: COLLECTION_ADDRESS,
+                from: '0x0000000000000000000000000000000000000000',
             },
             fromBlock: 0,
         });
         console.log(mint_txns_array)
+
+        let mint_txns_array2 = await collection.getPastEvents("mint", {
+            fromBlock: 0,
+        });
+        console.log(mint_txns_array2)
     }
 
     async function community_staked_tokens() {
