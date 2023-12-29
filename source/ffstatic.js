@@ -11,10 +11,11 @@
     const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
     const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 
-    async function mint_bin_add(quantity) {
-        for (i = 0; i < quantity; i++) {
-            await render_token(next_id+i);
-        }
+    var quantity;
+
+    async function mint_bin_add() {
+        await render_token(next_id+quantity);
+        quantity++
     }
 
     async function mint_bin_sub(quantity) {
