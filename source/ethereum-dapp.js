@@ -155,6 +155,87 @@ async function connect() {
     }
 }
 
+// Get staked token ID's
+async function held_tokens_by_wallet(account) {
+
+    // Get ALL staked tokens by default
+    if (! account) {account = CONTROLLER_ADDRESS}
+
+    // Retrieve all transactions involving the transfer of said tokens
+    const eventsReceivedTokens = await collection.getPastEvents("Transfer", {
+        filter: {
+            to: account,
+        },
+        fromBlock: 0,
+    });
+
+    // Count the number of times the account received the token
+    let receivedTokensCount = {};
+    for (let key in eventsReceivedTokens) {
+        let tokenId = eventsReceivedTokens[key]["returnValues"]["tokenId"];
+        receivedTokensCount[tokenId] = (receivedTokensCount[tokenId] || 0) + 1;
+    }
+
+    let receivedTokenIds = Object.keys(receivedTokensCount);
+
+    // Get the tokens that the account sent
+    const eventsSentTokens = await collection.getPastEvents("Transfer", {
+        filter: {
+            from: account,
+            tokenId: receivedTokenIds,
+        },
+        fromBlock: 0,
+    });
+
+    let sentTokensCount = {};
+    for (let key in eventsSentTokens) {
+        let tokenId = eventsSentTokens[key]["returnValues"]["tokenId"];
+        sentTokensCount[tokenId] = (sentTokensCount[tokenId] || 0) + 1;
+    }
+
+    // Substract the tokens received by the sent to get the tokens owned by account
+    let address_tokens_array = [];
+    for (let tokenId in receivedTokensCount) {
+        if (
+            (sentTokensCount[tokenId] ? sentTokensCount[tokenId] : 0) <
+            receivedTokensCount[tokenId]
+        ) {
+            address_tokens_array.push(tokenId);
+        }
+    }
+
+    // Return address_tokens_array ->
+    return address_tokens_array
+}
+
+async function display_wallet_holdings(wallet) {
+
+    console.log('Display Wallet Holdings: ')
+    
+    // Defaults to return all staked tokens
+    let staked_tokens = await held_tokens_by_wallet() 
+
+    // Checks if any staked tokens are owned by by
+    for (var token = 0; token < staked_tokens.length; token++) {
+        let tokenId = staked_tokens[token];
+        let staked_token = await stakerAddress(tokenId);
+        if (staked_token.toString().toLowerCase() == wallet.toString().toLowerCase()) {
+            console.log('Staked Token: Frog #'+tokenId);
+            await render_token(tokenId);
+        }
+    }
+
+    // Tokens held by wallet
+    let held_tokens = await held_tokens_by_wallet(wallet);
+    for (var token = 0; token < held_tokens.length; token++) {
+        let tokenId = held_tokens[token];
+        console.log('Held Token: Frog #'+tokenId);
+        await render_token(tokenId);
+    }
+
+    console.log(wallet+' :: '+userTokens+' :: '+userTokensStaked);
+}
+
 async function community_staked_tokens() {
     // Tokens held by staking contract
     let all_staked_tokens = await held_tokens_by_wallet();
