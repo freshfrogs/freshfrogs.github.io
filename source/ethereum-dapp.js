@@ -1,9 +1,7 @@
 /* 
 
-    FreshFrogsNFT Ethereum DApp
-
-    This application interacts with contracts on the Ethereum blockchain!
-    
+    FreshFrogsNFT Ethereum Decentralized Application (DApp)
+    This application interacts with WEB3 contracts on the Ethereum blockchain!
     Learn more at https://github.com/freshfrogs
 
 */
