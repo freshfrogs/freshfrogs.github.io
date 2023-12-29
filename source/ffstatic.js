@@ -15,7 +15,7 @@
 
     async function mint_bin_add() {
         await render_token(next_id+quantity);
-        quantity++
+        quantity = quantity + 1;
     }
 
     async function mint_bin_sub(quantity) {
