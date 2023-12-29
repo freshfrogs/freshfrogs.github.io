@@ -157,16 +157,6 @@
 
     }
 
-    async function mint_txn_history() {
-        let mint_txns_array = await collection.getPastEvents("Transfer", {
-            filter: {
-                from: '0x0000000000000000000000000000000000000000',
-            },
-            fromBlock: 0,
-        });
-        console.log(mint_txns_array)
-    }
-
     async function community_staked_tokens() {
         // Tokens held by staking contract
         let all_staked_tokens = await held_tokens_by_wallet();
