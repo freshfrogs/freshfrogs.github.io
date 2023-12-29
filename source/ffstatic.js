@@ -4,7 +4,7 @@
     var toadA, toadB, toadC;
     var CONTROLLER, controller;
     var COLLECTION, collection;
-    var user_address, unclaimed_rewards, userTokens, userTokensStaked, is_approved;
+    var user_address, unclaimed_rewards, userTokens, userTokensStaked, is_approved, web3, f0;
 
     const SOURCE_PATH = 'https://freshfrogs.github.io/frog/'
     const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
@@ -172,8 +172,8 @@
             document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="pendingStatus"></div> Connecting...'
 
             await ethereum.request({ method: "eth_requestAccounts" });
-            const web3 = new Web3(window.ethereum);
-            const f0 = new F0();
+            web3 = new Web3(window.ethereum);
+            f0 = new F0();
 
             try { // Attempt to Connect!
                 await f0.init({
