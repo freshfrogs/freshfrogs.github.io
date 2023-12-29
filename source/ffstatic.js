@@ -20,7 +20,7 @@
         let token_owner = await collection.methods.ownerOf(token_id).call();
         let image_link = SOURCE_PATH+token_id+'.png'
 
-        if (token_owner == CONTROLLER_ADDRESS) {
+        if (token_owner.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) {
             format = 'staked'
             token_owner = await stakerAddress(token_id);
         }
@@ -63,22 +63,22 @@
             staked_earned = staking_values[3]
 
             // Display token properties
-            top_left = 
+            top_right = 
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text>Owned By</text>'+'<br>'+
                     '<text style="color: darkseagreen; font-weight: bold;">'+truncateAddress(token_owner)+'</text>'+
                 '</div>'
-            top_right = 
+            bottom_right = 
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text>$FLYZ Earned</text>'+'<br>'+
                     '<text style="color: darkseagreen; font-weight: bold;">'+staked_earned+'</text>'+
                 '</div>'
-            bottom_left = 
+            top_left = 
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text>Level</text>'+'<br>'+
                     '<text style="color: darkseagreen; font-weight: bold;">'+staked_level+'</text>'+
                 '</div>'
-            bottom_right = 
+            bottom_left = 
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text>Next Level</text>'+'<br>'+
                     '<text style="color: darkseagreen; font-weight: bold;">'+staked_next+' days</text>'+
@@ -109,8 +109,8 @@
                             '<strong>'+token_name+'</strong> <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
                         '</div>'+
                         '<div id="prop_'+token_id+'" class="properties">'+
-                            top_left+
                             top_right+
+                            top_left+
                             '<br>'+
                             bottom_left+
                             bottom_right+
