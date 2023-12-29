@@ -1,27 +1,135 @@
     // Fresh Frogs NFT Static Github Pages
 
     // Global Variables
-    const SOURCE_PATH = '../frog'
-
     var toadA, toadB, toadC;
     var CONTROLLER, controller;
     var COLLECTION, collection;
     var user_address, unclaimed_rewards, userTokens, userTokensStaked, is_approved;
 
+    const SOURCE_PATH = 'https://freshfrogs.github.io/frog/'
     const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
     const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 
-    var quantity;
+    // Render NFT token by layered attirubtes obtained through metadata.
+    async function render_token(token_id) {
 
-    async function mint_bin_add() {
-        await render_token(next_id+quantity);
-        quantity = quantity + 1;
-    }
+        // Token Variables
+        let token_name = 'Frog #'+token_id
+        let token_owner = await collection.methods.ownerOf(token_id).call();
+        let image_link = SOURCE_PATH+token_id+'.png'
 
-    async function mint_bin_sub(quantity) {
-        for (i = 0; i < quantity; i++) {
-            
+        if (token_owner == CONTROLLER_ADDRESS) {
+            format = 'staked'
+            token_owner = await stakerAddress(token_id);
         }
+
+        // Default format or staked format
+        if (! format) { format = 'default'; }
+        if (format == 'default') {
+
+            // Render token information and data
+            top_left = 
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text>Owned By</text>'+'<br>'+
+                    '<text style="color: darkseagreen; font-weight: bold;">'+truncateAddress(token_owner)+'</text>'+
+                '</div>'
+            top_right = 
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text>Frog Type</text>'+'<br>'+
+                    '<text id="frog_type" style="color: darkseagreen; font-weight: bold;">'+'</text>'+
+                '</div>'
+            bottom_left = 
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text>Next Level</text>'+'<br>'+
+                    '<text style="color: darkseagreen; font-weight: bold;">'+staked_next+' days</text>'+
+                '</div>'
+            bottom_right = 
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text>Next Level</text>'+'<br>'+
+                    '<text style="color: darkseagreen; font-weight: bold;">'+staked_next+' days</text>'+
+                '</div>'
+            
+        } else if (format == 'staked') {
+
+            // Staked token data calculations
+            let staked_time_days = staked_level = staked_next = staked_earned = '0';
+            //let staked = await stakerAddress(token_id)
+            let staking_values = await stakingValues(token_id)
+            staked_time_days = staking_values[0]
+            staked_level = staking_values[1]
+            staked_next = staking_values[2]
+            staked_earned = staking_values[3]
+
+            // Display token properties
+            top_left = 
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text>Time Staked</text>'+'<br>'+
+                    '<text style="color: darkseagreen; font-weight: bold;">'+staked_time_days+' days</text>'+
+                '</div>'
+            top_right = 
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text>$FLYZ Earned</text>'+'<br>'+
+                    '<text style="color: darkseagreen; font-weight: bold;">'+staked_earned+'</text>'+
+                '</div>'
+            bottom_left = 
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text>Level</text>'+'<br>'+
+                    '<text style="color: darkseagreen; font-weight: bold;">'+staked_level+'</text>'+
+                '</div>'
+            bottom_right = 
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text>Next Level</text>'+'<br>'+
+                    '<text style="color: darkseagreen; font-weight: bold;">'+staked_next+' days</text>'+
+                '</div>'
+
+        }
+    
+        // <-- Begin Element
+        token_doc = document.getElementById(location);
+        token_element = document.createElement('div');
+    
+        // Element Details -->
+        token_element.id = tokeb_name;
+        token_element.className = 'display_token';
+        token_element.innerHTML = 
+            '<div class="display_token_cont">'+
+                '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
+                    '<div class="innerLeft">'+
+                        '<div class="display_token_img_cont" id="cont_'+token_id+'" onclick="render_display('+token_id+')">'+
+                            //'<img src="'+image_link+'" class="displayImage"/>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+                '<div class="renderRight">'+
+                    '<div class="innerRight">'+
+                        '<div id="traits_'+token_id+'" class="trait_list">'+
+                            //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
+                            '<strong>'+token_name+'</strong> <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+                        '</div>'+
+                        '<div id="prop_'+token_id+'" class="properties">'+
+                            top_left+
+                            top_right+
+                            '<br>'+
+                            bottom_left+
+                            bottom_right+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+            '</div>';
+    
+        // Create Element <--
+        token_doc.appendChild(token_element);
+    
+        // Update Metadata! Build Frog -->
+        let metadata = await (await fetch(SOURCE_PATH+'json/'+token_id+'.json')).json();
+    
+        for (let i = 0; i < metadata.attributes.length; i++) {
+    
+          let attribute = metadata.attributes[i]
+          loadTrait(attribute.trait_type, attribute.value, 'cont_'+token_id);
+    
+        }
+    
     }
 
     /*
@@ -830,7 +938,7 @@
         console.log('= TOKEN #'+token_a);
         console.log('= ');
         // Fetch Alpha Metadata ------>
-        let metadata_a_raw = await (await fetch(SOURCE_PATH+'/json/'+token_a+".json")).json();
+        let metadata_a_raw = await (await fetch(SOURCE_PATH+'json/'+token_a+".json")).json();
         for (i = 0; i < metadata_a_raw.attributes.length; i++) {
 
             let attribute = metadata_a_raw.attributes[i];
@@ -845,7 +953,7 @@
         console.log('= TOKEN #'+token_b);
         console.log('= ');
         // Fetch Bravo Metadata ------>
-        let metadata_b_raw = await (await fetch(SOURCE_PATH+'/json/'+token_b+".json")).json();
+        let metadata_b_raw = await (await fetch(SOURCE_PATH+'json/'+token_b+".json")).json();
         for (j = 0; j < metadata_b_raw.attributes.length; j++) {
 
             let attribute = metadata_b_raw.attributes[j];
@@ -1162,83 +1270,6 @@
         else if (_data == 'unclaimedRewards') { return stakers.unclaimedRewards }   // Total unclaimed Rewards from User
         else { return }                                                             // Invalid arguments
     }
-
-  async function render_token(token_id, location) {
-
-    if (! location) { location = 'frogs'}
-
-    let name = 'Frog #'+token_id
-    let token_owner = '';
-    let staked_time_days = staked_level = staked_next = staked_earned = '0';
-
-    //let staked = await stakerAddress(token_id)
-    let image_link = '../frog/'+token_id+'.png'
-
-    let staking_values = await stakingValues(token_id)
-    staked_time_days = staking_values[0]
-    staked_level = staking_values[1]
-    staked_next = staking_values[2]
-    staked_earned = staking_values[3]
-
-    // <-- Begin Element
-    token_doc = document.getElementById(location);
-    token_element = document.createElement('div');
-
-    // Element Details -->
-    token_element.id = name;
-    token_element.className = 'display_token';
-    token_element.innerHTML = 
-      '<div class="display_token_cont">'+
-        '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
-          '<div class="innerLeft">'+
-            '<div class="display_token_img_cont" id="cont_'+token_id+'" onclick="render_display('+token_id+')">'+
-              //'<img src="'+image_link+'" class="displayImage"/>'+
-            '</div>'+
-          '</div>'+
-        '</div>'+
-        '<div class="renderRight">'+
-          '<div class="innerRight">'+
-            '<div id="traits_'+token_id+'" class="trait_list">'+
-              //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
-              '<strong>'+name+'</strong> <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
-            '</div>'+
-            '<div id="prop_'+token_id+'" class="properties">'+
-              '<div style="margin: 8px; float: left; width: 100px;">'+
-                '<text>Time Staked</text>'+'<br>'+
-                '<text style="color: darkseagreen; font-weight: bold;">'+staked_time_days+' days</text>'+
-              '</div>'+
-              '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text>$FLYZ Earned</text>'+'<br>'+
-                '<text style="color: darkseagreen; font-weight: bold;">'+staked_earned+'</text>'+
-              '</div>'+
-              '<br>'+
-              '<div style="margin: 8px; float: left; width: 100px;">'+
-                '<text>Level</text>'+'<br>'+
-                '<text style="color: darkseagreen; font-weight: bold;">'+staked_level+'</text>'+
-              '</div>'+
-              '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text>Next Level</text>'+'<br>'+
-                '<text style="color: darkseagreen; font-weight: bold;">'+staked_next+' days</text>'+
-              '</div>'+
-            '</div>'+
-          '</div>'+
-        '</div>'+
-      '</div>';
-
-    // Create Element <--
-    token_doc.appendChild(token_element);
-
-    // Update Metadata! Build Frog -->
-    let metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+token_id+".json")).json();
-
-    for (let i = 0; i < metadata.attributes.length; i++) {
-
-      let attribute = metadata.attributes[i]
-      loadTrait(attribute.trait_type, attribute.value, 'cont_'+token_id);
-
-    }
-
-  }
 
     // Numbers to roman numerals
     function romanize (num) {
