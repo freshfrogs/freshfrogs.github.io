@@ -108,6 +108,8 @@ async function connect(network) {
         next_id = parseInt(next_id);
         user_invites = await f0.myInvites();
         user_keys = Object.keys(user_invites);
+        console.log(user_keys)
+        console.log(user_invites)
         user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
 
         // NF7UOS / C7AR Bypass -- Unlimited Free Mints
