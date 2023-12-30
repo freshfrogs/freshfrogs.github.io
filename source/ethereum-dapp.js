@@ -30,7 +30,6 @@ const options = {
   };
 
 async function fetch_tokens_by_owner(wallet) {
-    console.log('test 7')
     fetch('https://deep-index.moralis.io/api/v2.2/'+wallet+'/nft?chain=eth&format=decimal&token_addresses%5B0%5D='+COLLECTION_ADDRESS+'&media_items=false', options)
     .then((tokens) => tokens.json())
     .then((tokens) => {
@@ -321,7 +320,7 @@ async function withdraw(tokenId) {
             // Send Txn
             let withdraw = await send_write_transaction(controller.methods.withdraw(tokenId)); // await controller.methods.withdraw(tokenId).send({ from: user_address });
             console.log(withdraw)
-            return 'Token #'+tokenId+' has succesfully been un-staked!';
+            return withdraw; // 'Token #'+tokenId+' has succesfully been un-staked!';
 
         // Catch Errors
         } catch (e) { return 'TXN FAILED:\n '+e.message; }
