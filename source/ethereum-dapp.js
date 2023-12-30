@@ -54,7 +54,7 @@ async function fetch_tokens_by_owner(wallet) {
 async function initiate_web3_connection() {
     if (typeof window.ethereum !== "undefined") {
         document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="pendingStatus"></div> Connecting...'
-        await connect_user().then(update_frontend());
+        await connect_user().then( async function(){ update_frontend() });
     } else {
         // WEB3 browser extenstion could not be found!
     }
