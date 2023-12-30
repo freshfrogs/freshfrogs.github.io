@@ -25,12 +25,12 @@ const options = {
     method: 'GET',
     headers: {
       accept: 'application/json',
-      'X-API-KEY': '69088fdc-43ef-453f-9da8-d9ffc38df082'
+      'X-API-KEY': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjcyYjJmYWNkLTIzZDUtNDM4NS04ZmE4LTRkN2QxZDJmYTcwMCIsIm9yZ0lkIjoiMzcwMTY1IiwidXNlcklkIjoiMzgwNDMzIiwidHlwZUlkIjoiMjA0MDliMWItNWE3Yi00ZjZlLWI5NjktOWU2OWJiMWY3N2VmIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3MDM4OTQwMDUsImV4cCI6NDg1OTY1NDAwNX0.NSsiVKVdzHmL_b3eNdbEVzJJ4jNLWIQh5Qd3VZ9O-ko'
     }
   };
 
 async function fetch_tokens_by_owner() {
-      fetch('https://api.etherscan.io/api?module=account&action=addresstokennftinventory&address=0x123432244443b54409430979df8333f9308a6040&contractaddress=0xed5af388653567af2f388e6224dc7c4b3241c544&page=1&offset=100&apikey=FPVUBTTPE77UTV78USHWQ44RFMA9S643VD', options)
+      fetch('https://deep-index.moralis.io/api/v2.2/0xff3879b8a363aed92a6eaba8f61f1a96a9ec3c1e/nft?chain=eth&format=decimal&media_items=false')
         .then(response => response.json())
         .then(response => console.log(response))
         .catch(err => console.error(err));
