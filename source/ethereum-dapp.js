@@ -444,15 +444,15 @@ async function render_token(token_id) {
             '<text id="frog_type" style="color: darkseagreen; font-weight: bold;">'+truncateAddress(token_owner)+'</text>'+
         '</div>'
     bottom_left = 
-        '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text>Level</text>'+'<br>'+
-            '<text style="color: darkseagreen; font-weight: bold;">'+staked_lvl+'</text>'+
-        '</div>'
+    '<div style="margin: 8px; float: right; width: 100px;">'+
+        '<text>Next Level</text>'+'<br>'+
+        '<text style="color: darkseagreen; font-weight: bold;">'+staked_next_lvl+' days</text>'+
+    '</div>'
     bottom_right = 
-        '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text>Next Level</text>'+'<br>'+
-            '<text style="color: darkseagreen; font-weight: bold;">'+staked_next_lvl+' days</text>'+
-        '</div>'
+    '<div style="margin: 8px; float: right; width: 100px;">'+
+        '<text>Level</text>'+'<br>'+
+        '<text style="color: darkseagreen; font-weight: bold;">'+staked_lvl+'</text>'+
+    '</div>'
 
     // <-- Begin Element
     token_doc = document.getElementById(location);
