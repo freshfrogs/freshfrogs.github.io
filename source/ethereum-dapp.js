@@ -37,13 +37,13 @@ async function fetch_tokens_by_owner(wallet) {
         var assets = tokens.result
         assets.forEach((frog) => {
             var { token_id } = frog
-            render_token(token_id);
+            render_token(frog.token_id);
         }) })
-    .then(async function(){
+    .then(async function() {
         var staked_tokens_array = await getStakedTokens(wallet);
         for (var i = 0; i < staked_tokens_array.length; i++) {
             token_id = staked_tokens_array[i].tokenId
-            await yrender_token(token_id);
+            render_token(token_id);
         }
     })
 }
