@@ -42,6 +42,13 @@ async function fetch_tokens_by_owner(wallet) {
     })
 }
 
+async function fetch_tokens_by_staker(wallet) {
+    var staked_tokens_array = await getStakedTokens(wallet);
+    for (var i = 0; i < staked_tokens_array.length; i++) {
+        render_token(staked_tokens_array[i].tokenId);
+    }
+}
+
 /*
 
     Connect
@@ -424,12 +431,12 @@ async function render_token(token_id) {
         token_owner = await stakerAddress(token_id);
         staked_values = await stakingValues(token_id);
         staked_lvl = staked_values[1]
-        staked_next_lvl = staked_values[2]
+        staked_next_lvl = staked_values[2].toString()+' days'
     } else {
         staked = 'False';
         staked_status = 'lightsalmon';
-        staked_lvl = '-'
-        staked_next_lvl = '-'
+        staked_lvl = '--'
+        staked_next_lvl = '--'
     }
 
     // Render token information and data
@@ -446,7 +453,7 @@ async function render_token(token_id) {
     bottom_left = 
     '<div style="margin: 8px; float: right; width: 100px;">'+
         '<text>Next Level</text>'+'<br>'+
-        '<text style="color: darkseagreen; font-weight: bold;">'+staked_next_lvl+' days</text>'+
+        '<text style="color: darkseagreen; font-weight: bold;">'+staked_next_lvl+'</text>'+
     '</div>'
     bottom_right = 
     '<div style="margin: 8px; float: right; width: 100px;">'+
