@@ -30,22 +30,21 @@ const options = {
   };
 
 async function fetch_tokens_by_owner(wallet) {
-    console.log('This is just a test! x4 :)')
+    console.log('This is just a test! x5 :)')
     fetch('https://deep-index.moralis.io/api/v2.2/'+wallet+'/nft?chain=eth&format=decimal&token_addresses%5B0%5D='+COLLECTION_ADDRESS+'&media_items=false', options)
     .then((tokens) => tokens.json())
-    .then((tokens) => {tokens_array = tokens.result})
-    .then(async function() {
-        tokens_array.forEach((frog) => {
+    .then((tokens) => {
+        var assets = tokens.result
+        assets.forEach((frog) => {
             var { token_id } = frog
-            render_token(frog.token_id);
-        })
-    })
+            render_token(token_id);
+        }) })
     .then(async function(){
         var staked_tokens_array = await getStakedTokens(wallet);
-        staked_tokens_array.forEach((frog) => {
-            var { token_id } = frog
-            render_token(frog.token_id);
-        })
+        for (var i = 0; i < staked_tokens_array.length; i++) {
+            token_id = staked_tokens_array[i].tokenId
+            await yrender_token(token_id);
+        }
     })
 }
 
