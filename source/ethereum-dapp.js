@@ -239,7 +239,7 @@ async function send_write_transaction(contract_method) {
 
 */
 
-async function Initiate_stake() {
+async function initiate_stake() {
 
     // Token ID input
     var stakeID = prompt("Please Note: \nWhile tokens are staked, you will not be able to sell them on secondary market places. To do this you will have to un-stake directly from this site. Once a token is un-staked it's staking level will reset to zero!\n"+"\nWhich token would you like to stake?\nToken ID: ");
