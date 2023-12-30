@@ -35,8 +35,9 @@ async function fetch_recent_sales() {
     .then((tokens) => tokens.json())
     .then((tokens) => {
         var assets = tokens.result
+        console.log('=- Loading recent secondary sales')
+        console.log('=- Total secondary sales: '+assets.length)
         assets.forEach((frog) => {
-            console.log(frog)
             render_recently_sold(frog)
         }) })
 }
