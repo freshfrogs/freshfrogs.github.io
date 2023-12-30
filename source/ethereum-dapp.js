@@ -35,7 +35,7 @@ async function fetch_tokens_by_owner(wallet) {
     .then((tokens) => {
         console.log(tokens.result)
         
-        var { assets } = tokens.result
+        var assets  = tokens.result
         assets.forEach((frog) => {
             var { token_id } = frog
             render_token(token_id);
