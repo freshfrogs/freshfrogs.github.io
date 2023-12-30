@@ -621,23 +621,23 @@ async function render_token(token_id) {
     // Render token information and data
     top_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text>Staked</text>'+'<br>'+
-            '<text style="color: '+staked_status+'; font-weight: bold;">'+staked+'</text>'+
+            '<text style="color: '+staked_status+'; font-weight: bold;">Staked</text>'+'<br>'+
+            '<text>'+staked+'</text>'+
         '</div>'
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text>Owned By</text>'+'<br>'+
-            '<text id="frog_type" style="color: darkseagreen; font-weight: bold;">'+truncateAddress(token_owner)+'</text>'+
+            '<text style="color: darkseagreen; font-weight: bold;">Owned By</text>'+'<br>'+
+            '<text id="frog_type">'+truncateAddress(token_owner)+'</text>'+
         '</div>'
     bottom_left = 
     '<div style="margin: 8px; float: right; width: 100px;">'+
-        '<text>Next Level</text>'+'<br>'+
-        '<text style="color: darkseagreen; font-weight: bold;">'+staked_next_lvl+'</text>'+
+        '<text style="color: darkseagreen; font-weight: bold;">Next Level</text>'+'<br>'+
+        '<text>'+staked_next_lvl+'</text>'+
     '</div>'
     bottom_right = 
     '<div style="margin: 8px; float: right; width: 100px;">'+
-        '<text>Level</text>'+'<br>'+
-        '<text style="color: darkseagreen; font-weight: bold;">'+staked_lvl+'</text>'+
+        '<text style="color: darkseagreen; font-weight: bold;">Level</text>'+'<br>'+
+        '<text>'+staked_lvl+'</text>'+
     '</div>'
 
     // <-- Begin Element
