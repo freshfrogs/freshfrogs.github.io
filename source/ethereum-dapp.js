@@ -498,8 +498,9 @@ async function render_token(token_id) {
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
     var token_name = 'Frog #'+token_id
     var token_owner = await collection.methods.ownerOf(token_id).call();
-    var staked, staked_status, staked_values, staked_lvl, staked_next_lvl;
+    var staked, staked_status, staked_values, staked_lvl, staked_next_lvl, button_element;
 
+    // Staked
     if (token_owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
         staked = 'True'
         staked_status = 'darkseagreen'
@@ -507,11 +508,18 @@ async function render_token(token_id) {
         staked_values = await stakingValues(token_id);
         staked_lvl = staked_values[1]
         staked_next_lvl = staked_values[2].toString()+' days'
+        button_element = // Un-stake button
+            '<div style="text-align: center;">'+
+                '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
+            '</div>';
+
+    // NOT Staked
     } else {
         staked = 'False';
         staked_status = 'lightsalmon';
         staked_lvl = '--'
         staked_next_lvl = '--'
+        button_element = '';
     }
 
     // Render token information and data
@@ -564,6 +572,7 @@ async function render_token(token_id) {
                         '<br>'+
                         bottom_left+
                         bottom_right+
+                        button_element+
                     '</div>'+
                 '</div>'+
             '</div>'+
