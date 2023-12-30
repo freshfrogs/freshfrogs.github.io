@@ -30,10 +30,15 @@ const options = {
   };
 
 async function fetch_tokens_by_owner(wallet) {
-      fetch('https://deep-index.moralis.io/api/v2.2/'+wallet+'/nft?chain=eth&format=decimal&token_addresses%5B0%5D=0x4aFd4635417132892A4eA9CAE128d03e803317fD&media_items=false', options)
-        .then(response => response.json())
-        .then(response => console.log(response))
-        .catch(err => console.error(err));
+    fetch('https://deep-index.moralis.io/api/v2.2/'+wallet+'/nft?chain=eth&format=decimal&token_addresses%5B0%5D='+COLLECTION_ADDRESS+'&media_items=false', options)
+    .then((tokens) => tokens.json())
+    .then((tokens) => {
+        var { assets } = tokens
+        assets.forEach((frog) => {
+            var { token_id } = frog
+            render_token(token_id);
+        })
+    })
 }
 
 /*
