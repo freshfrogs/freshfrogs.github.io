@@ -495,65 +495,41 @@ async function stakers(userAddress, _data) {
 // Render NFT token by layered attirubtes obtained through metadata.
 async function render_recently_sold(token) {
 
-    var { token_ids, seller_address, buyer_address, price } = token
+    var { token_ids, seller_address, buyer_address, price, block_timestamp } = token
+    var token_id = token_ids[0]
+    price = price / 1000000000000000000;
     console.log('=')
-    console.log('Sale found! Frog #'+token_ids[0])
+    console.log('Sale found! Frog #'+token_id)
     console.log('Buyer: '+truncateAddress(buyer_address))
     console.log('Seller: '+truncateAddress(seller_address))
     console.log('Sale Price: '+price)
     console.log('=')
 
-    /*
     var location = 'frogs'
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
     var token_name = 'Frog #'+token_id
-    var token_owner = await collection.methods.ownerOf(token_id).call();
-    var staked, staked_status, staked_values, staked_lvl, staked_next_lvl, button_element;
-
-    // Staked
-    if (token_owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
-        staked = 'True'
-        staked_status = 'darkseagreen'
-        token_owner = await stakerAddress(token_id);
-        staked_values = await stakingValues(token_id);
-        staked_lvl = staked_values[1]
-        staked_next_lvl = staked_values[2].toString()+' days'
-        if (token_owner.toLowerCase() == user_address.toLowerCase()) { 
-            button_element = // Un-stake button
-                '<div style="text-align: center;">'+
-                    '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
-                '</div>';
-        } else { button_element = ''; }
-    // NOT Staked
-    } else {
-        staked = 'False';
-        staked_status = 'lightsalmon';
-        staked_lvl = '--'
-        staked_next_lvl = '--'
-        button_element = '';
-    }
 
     // Render token information and data
     top_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text>Staked</text>'+'<br>'+
-            '<text style="color: '+staked_status+'; font-weight: bold;">'+staked+'</text>'+
+            '<text>Date</text>'+'<br>'+
+            '<text style="color: darkseagreen; font-weight: bold;">'+block_timestamp+'</text>'+
         '</div>'
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text>Price</text>'+'<br>'+
-            '<text id="frog_type" style="color: darkseagreen; font-weight: bold;">'+''+'</text>'+
+            '<text>Sale Price</text>'+'<br>'+
+            '<text id="frog_type" style="color: darkseagreen; font-weight: bold;">'+price+' (ETH)</text>'+
         '</div>'
     bottom_left = 
-    '<div style="margin: 8px; float: right; width: 100px;">'+
-        '<text>Buyer</text>'+'<br>'+
-        '<text style="color: darkseagreen; font-weight: bold;">'+staked_next_lvl+'</text>'+
-    '</div>'
+        '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<text>Buyer</text>'+'<br>'+
+            '<text style="color: darkseagreen; font-weight: bold;">'+truncateAddress(buyer_address)+'</text>'+
+        '</div>'
     bottom_right = 
-    '<div style="margin: 8px; float: right; width: 100px;">'+
-        '<text>Seller</text>'+'<br>'+
-        '<text style="color: darkseagreen; font-weight: bold;">'+staked_lvl+'</text>'+
-    '</div>'
+        '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<text>Seller</text>'+'<br>'+
+            '<text style="color: darkseagreen; font-weight: bold;">'+truncateAddress(seller_address)+'</text>'+
+        '</div>'
 
     // <-- Begin Element
     token_doc = document.getElementById(location);
@@ -601,7 +577,6 @@ async function render_recently_sold(token) {
         build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
 
     }
-    */
 
 }
 
