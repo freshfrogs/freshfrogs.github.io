@@ -36,6 +36,7 @@ async function fetch_recent_sales() {
     .then((tokens) => {
         var assets = tokens.result
         assets.forEach((frog) => {
+            console.log(frog)
             render_recently_sold(frog)
         }) })
 }
