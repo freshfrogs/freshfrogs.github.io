@@ -443,7 +443,7 @@ async function render_token(token_id) {
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
             '<text>Owned By</text>'+'<br>'+
-            '<text id="frog_type" style="color: darkseagreen; font-weight: bold;">'+token_owner+'</text>'+
+            '<text id="frog_type" style="color: darkseagreen; font-weight: bold;">'+truncateAddress(token_owner)+'</text>'+
         '</div>'
     bottom_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
