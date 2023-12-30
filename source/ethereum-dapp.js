@@ -256,6 +256,143 @@ async function community_staked_tokens() {
     console.log('Total Staked Tokens: '+all_staked_tokens.length);
 }
 
+/*
+
+    setApproval | set staking contract approval
+    checkApproval | check staking contract approval
+
+*/
+async function setApprovalForAll() {
+
+    // Check Approval Status
+    let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+    if (!is_approved) { 
+        try {
+            
+            // Send Txn
+            let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
+            return true;
+
+        // Catch Errors
+        } catch (e) { return 'TXN FAILED:\n '+e.message; }
+    
+    // Already Approved
+    } else { return true; }
+}
+
+async function checkApproval() {
+    // Check Approval Status
+    let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+    if (!is_approved) { return false; } // Not Approved
+    else { return true; } // Approved
+}
+
+// Calculate total time a token has been staked (Hours)
+async function timeStaked(tokenId) {
+
+    // Check Staked Status
+    web3 = new Web3(window.ethereum);
+    let staked = await stakerAddress(tokenId);
+
+    // Token is not currently staked
+    if (!staked) {
+
+        return 0.00
+
+    // Valid staked status
+    } else {
+        try {
+
+            // Loop blockchain transactions per parameters [NFT Transfer From: User ==> To: Staking Controller] & NFT is Currently Staked
+            let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'tokenId': tokenId}, fromBlock: 0, toBlock: 'latest'});
+            let mostRecentTxn = (stakingEvents.length) - 1;
+
+            // Fetch Block Number from Txn
+            let staked_block = parseInt(stakingEvents[mostRecentTxn].blockNumber);
+
+            // Fetch Timestamp for block txn
+            let staked_time = await web3.eth.getBlock(staked_block);
+            let staked_date = new Date(staked_time.timestamp*1000);
+
+            // Calculate Time Staked in Hours
+            let staked_duration = Date.now() - staked_date;
+            let staked_hours = Math.floor(staked_duration/1000/60/60);
+
+            //console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
+
+            // Return time staked in (Hours)
+            return staked_hours;
+
+        // Catch Errors, Return 0.00
+        } catch (e) { console.log(e.message); return 0.00; }
+    }
+}
+
+
+/*
+
+    Calculate stake values & returns
+
+*/
+
+async function stakingValues(tokenId) {
+
+    stakedTimeHours = await timeStaked(tokenId)
+    stakedLevelInt = Math.floor((stakedTimeHours / 1000 )) + 1
+
+    stakedTimeDays = Math.floor(stakedTimeHours / 24)                               // Time Staked
+    stakedLevel = romanize(stakedLevelInt)                                          // Staked Level
+    stakedNext = Math.round((((stakedLevelInt) * 1000) - stakedTimeHours) / 24)     // Days until next level
+    stakedEarned = (stakedTimeHours / 1000).toFixed(3)                              // Flyz Earned
+
+    // [ Time Staked, Staked Level, Next Level, Flyz Earned]
+    return [stakedTimeDays, stakedLevel, stakedNext, stakedEarned]
+
+}
+
+/*
+
+    Retrieve staked token's true owner
+    stakerAddress(<input> (uint256)) | return staker's address or false
+
+*/
+
+async function stakerAddress(tokenId) {
+
+    let stakerAddress = await controller.methods.stakerAddress(tokenId).call();
+    if (stakerAddress !== '0x0000000000000000000000000000000000000000') { return stakerAddress; }
+    else { return false; }
+
+}
+
+/*
+
+    Retrieve Available Rewards for User
+    availableRewards(_staker (address)) | return uint256
+
+*/
+
+async function availableRewards(userAddress) {
+
+    let available_rewards = await controller.methods.availableRewards(userAddress).call();
+    available_rewards = (available_rewards / 1000000000000000000);
+    return available_rewards;
+
+}
+
+/*
+
+    Retrieve Tokens Staked by User
+    getStakedTokens(_user (address)) | return tuple[]
+
+*/
+
+async function getStakedTokens(userAddress) {
+
+    return await controller.methods.getStakedTokens(userAddress).call();
+
+}
+
 /*  
 
     stakers(<input> (address), <input> (dataFetch)) | return ( amountStaked, timeOfLastUpdate, unclaimedRewards )
