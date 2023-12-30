@@ -256,6 +256,20 @@ async function community_staked_tokens() {
     console.log('Total Staked Tokens: '+all_staked_tokens.length);
 }
 
+/*  
+
+    stakers(<input> (address), <input> (dataFetch)) | return ( amountStaked, timeOfLastUpdate, unclaimedRewards )
+
+*/  
+
+async function stakers(userAddress, _data) {
+    let stakers = await controller.methods.stakers(userAddress).call();         // Call function from within Ethereum smart contract
+    if (_data == 'amountStaked') { return stakers.amountStaked }                // Total Tokens Staked by User
+    else if (_data == 'timeOfLastUpdate') { return stakers.timeOfLastUpdate }   // Time since Last Update from user
+    else if (_data == 'unclaimedRewards') { return stakers.unclaimedRewards }   // Total unclaimed Rewards from User
+    else { return }                                                             // Invalid arguments
+}
+
 // Render NFT token by layered attirubtes obtained through metadata.
 async function render_token(token_id) {
 
