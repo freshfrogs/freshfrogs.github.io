@@ -47,7 +47,7 @@ async function fetch_tokens_by_owner(wallet) {
 /*
 
     Connect
-    Allow users to connect using an ethereum wallet via web3 browser extenstion
+    Allow users to connect using an ethereum wallet via web3 browser extension
 
 */
 
