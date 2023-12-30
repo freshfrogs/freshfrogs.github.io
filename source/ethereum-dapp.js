@@ -510,11 +510,12 @@ async function render_token(token_id) {
         staked_values = await stakingValues(token_id);
         staked_lvl = staked_values[1]
         staked_next_lvl = staked_values[2].toString()+' days'
-        button_element = // Un-stake button
-            '<div style="text-align: center;">'+
-                '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
-            '</div>';
-
+        if (token_owner.toLowerCase() == user_address.toLowerCase()) { 
+            button_element = // Un-stake button
+                '<div style="text-align: center;">'+
+                    '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
+                '</div>';
+        } else { button_element = ''; }
     // NOT Staked
     } else {
         staked = 'False';
