@@ -30,7 +30,7 @@ const options = {
   };
 
 async function fetch_tokens_by_owner() {
-      fetch('https://deep-index.moralis.io/api/v2.2/0xff3879b8a363aed92a6eaba8f61f1a96a9ec3c1e/nft?chain=eth&format=decimal&media_items=false')
+      fetch('https://deep-index.moralis.io/api/v2.2/0xff3879b8a363aed92a6eaba8f61f1a96a9ec3c1e/nft?chain=eth&format=decimal&media_items=false', options)
         .then(response => response.json())
         .then(response => console.log(response))
         .catch(err => console.error(err));
