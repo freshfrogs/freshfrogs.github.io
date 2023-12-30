@@ -414,32 +414,46 @@ async function stakers(userAddress, _data) {
 async function render_token(token_id) {
 
     var location = 'frogs'
+    let image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
 
     // Token Variables
     let token_name = 'Frog #'+token_id
     let token_owner = await collection.methods.ownerOf(token_id).call();
-    let image_link = SOURCE_PATH+token_id+'.png'
+
+    if (token_owner == CONTROLLER_ADDRESS.toLowerCase()) {
+        staked = 'True'
+        staked_status = 'darkseagreen'
+        token_owner = await stakerAddress(token_id);
+        staked_values = stakingValues(token_id);
+        staked_lvl = staked_values[1]
+        staked_next_lvl = staked_values[2]
+    } else {
+        staked = 'False';
+        staked_status = 'lightsalmon';
+        staked_lvl = '-'
+        staked_next_lvl = '-'
+    }
 
     // Render token information and data
     top_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text>Owned By</text>'+'<br>'+
-            '<text style="color: darkseagreen; font-weight: bold;">'+truncateAddress(token_owner)+'</text>'+
+            '<text>Staked</text>'+'<br>'+
+            '<text style="color: darkseagreen; font-weight: bold;">'+staked+'</text>'+
         '</div>'
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text>Frog Type</text>'+'<br>'+
-            '<text id="frog_type" style="color: darkseagreen; font-weight: bold;">'+'</text>'+
+            '<text>Owned By</text>'+'<br>'+
+            '<text id="frog_type" style="color: darkseagreen; font-weight: bold;">'+token_owner+'</text>'+
         '</div>'
     bottom_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text>Next Level</text>'+'<br>'+
-            '<text style="color: darkseagreen; font-weight: bold;">'+' days</text>'+
+            '<text>Level</text>'+'<br>'+
+            '<text style="color: darkseagreen; font-weight: bold;">'+staked_lvl+' days</text>'+
         '</div>'
     bottom_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
             '<text>Next Level</text>'+'<br>'+
-            '<text style="color: darkseagreen; font-weight: bold;">'+' days</text>'+
+            '<text style="color: darkseagreen; font-weight: bold;">'+staked_next_lvl+' days</text>'+
         '</div>'
 
     // <-- Begin Element
