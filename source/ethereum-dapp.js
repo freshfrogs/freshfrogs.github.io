@@ -613,17 +613,16 @@ async function send_write_transaction(contract_method) {
         gasprice = Math.round(gasprice * 1.2);// to speed up 1.2 times..
 
         var gas_estimate = await contract_method.estimateGas({ from: user_address }); 
-        gas_estimate.then(async function(gas) { 
-            gas = Math.round(gas * 1.2);
-            await contract_method.send({ 
-                from: user_address, 
-                gas: web3.utils.toHex(gas), 
-                gasPrice:  web3.utils.toHex(gasprice),
-            }).then(function(hashdata){ 
-                console.log(hashdata) 
-                return hashdata.message
-            }) 
-        });
+        gas_estimate = Math.round(gas * 1.2);
+
+        var txn = await contract_method.send({ 
+            from: user_address, 
+            gas: web3.utils.toHex(gas), 
+            gasPrice:  web3.utils.toHex(gasprice),
+        }).then(function(hashdata){ 
+            console.log(hashdata) 
+            return hashdata.message
+        }) 
     } catch (e) {
         console.log(e.message);
         return e.message
