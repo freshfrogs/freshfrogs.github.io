@@ -518,23 +518,23 @@ async function render_recently_sold(token) {
     // Render token information and data
     top_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text>Date</text>'+'<br>'+
-            '<text style="color: darkseagreen; font-weight: bold;">'+timestamp+'</text>'+
+            '<text style="color: darkseagreen; font-weight: bold;">Date</text>'+'<br>'+
+            '<text>'+timestamp+'</text>'+
         '</div>'
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text>Sale Price</text>'+'<br>'+
-            '<text id="frog_type" style="color: darkseagreen; font-weight: bold;">'+price+' (ETH)</text>'+
+            '<text style="color: darkseagreen; font-weight: bold;">Sale Price</text>'+'<br>'+
+            '<text id="frog_type">'+price+'Ξ</text>'+
         '</div>'
     bottom_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text>Buyer</text>'+'<br>'+
-            '<text style="color: darkseagreen; font-weight: bold;">'+truncateAddress(buyer_address)+'</text>'+
+            '<text style="color: darkseagreen; font-weight: bold;">Buyer</text>'+'<br>'+
+            '<text>'+truncateAddress(buyer_address)+'</text>'+
         '</div>'
     bottom_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text>Seller</text>'+'<br>'+
-            '<text style="color: darkseagreen; font-weight: bold;">'+truncateAddress(seller_address)+'</text>'+
+            '<text style="color: darkseagreen; font-weight: bold;">Seller</text>'+'<br>'+
+            '<text>'+truncateAddress(seller_address)+'</text>'+
         '</div>'
 
     // <-- Begin Element
