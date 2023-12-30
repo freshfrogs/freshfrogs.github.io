@@ -541,6 +541,10 @@ function truncateAddress(address) {
     )}`;
 }
 
+var star_frogs = [
+    '',
+    '2553'
+]
 var animated = [
     //'witchStraw',
     //'witchBrown',
