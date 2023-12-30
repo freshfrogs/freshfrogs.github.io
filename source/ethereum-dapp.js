@@ -142,14 +142,13 @@ async function update_frontend() {
     document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="connectedStatus"></div> Connected - ['+truncateAddress(user_address)+']'
     document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); }
 
-    /* // Mint Button | Mint Tokens
+    // Mint Button | Mint Tokens
     mintButton = document.createElement('button')
     mintButton.id = 'mintButton'
     mintButton.className = 'connectButton'
     mintButton.onclick = async function (e) { await initiate_mint(1); }
     mintButton.innerHTML = '🐸 Mint Frogs'
     parent_element.appendChild(mintButton)
-    */
 
     // Holdings Button | View holdings
     holdingsLink = document.createElement('a')
@@ -159,18 +158,17 @@ async function update_frontend() {
     holdingsLink.href = 'https://freshfrogs.github.io/wallet/'
     parent_element.appendChild(holdingsLink)
 
-    /* // Stake Button | Stake tokens
+    // Stake Button | Stake tokens
     stkeBtn = document.createElement('button')
     stkeBtn.id = 'stakeButton'
     stkeBtn.className = 'connectButton'
-    stkeBtn.onclick = async function (e) { await Initiate_stake(); }
+    stkeBtn.onclick = async function (e) { await initiate_stake(); }
     stkeBtn.innerHTML = '🌱 Stake & Earn!'
     parent_element.appendChild(stkeBtn)
-    */
 
 }
 
-// Get staked token ID's
+/* // Get staked token ID's
 async function held_tokens_by_wallet(wallet_address) {
 
     // Get ALL staked tokens by default
@@ -221,45 +219,103 @@ async function held_tokens_by_wallet(wallet_address) {
 
     // Return address_tokens_array ->
     return address_tokens_array
+} */
+
+/*
+
+    Send WRITE Transaction
+    Estimate gas fee and use said estimate within txn
+
+*/
+async function send_write_transaction(contract_method) {
+    var gas = contract_method.estimateGas({ from: user_address });
+    gas.then(function(gasTouse) { contract_method.send({ from: user_address, gas: gasTouse }).then(function(hashdata){ console.log(hashdata); return hashdata }) });
 }
 
-async function display_wallet_holdings(wallet) {
+/*
 
-    console.log('Display Wallet Holdings: ')
-    
-    // Defaults to return all staked tokens
-    let staked_tokens = await held_tokens_by_wallet() 
+    stake(_tokenId (uint256), _user (address)) | send =>
 
-    // Checks if any staked tokens are owned by by
-    for (var token = 0; token < staked_tokens.length; token++) {
-        let tokenId = staked_tokens[token];
-        let staked_token = await stakerAddress(tokenId);
-        if (staked_token.toString().toLowerCase() == wallet.toString().toLowerCase()) {
-            console.log('Staked Token: Frog #'+tokenId);
-            await render_token(tokenId);
-        }
-    }
+*/
 
-    // Tokens held by wallet
-    let held_tokens = await held_tokens_by_wallet(wallet);
-    for (var token = 0; token < held_tokens.length; token++) {
-        let tokenId = held_tokens[token];
-        console.log('Held Token: Frog #'+tokenId);
-        await render_token(tokenId);
-    }
+async function Initiate_stake() {
 
-    console.log(wallet+' :: '+userTokens+' :: '+userTokensStaked);
+    // Token ID input
+    var stakeID = prompt("Please Note: \nWhile tokens are staked, you will not be able to sell them on secondary market places. To do this you will have to un-stake directly from this site. Once a token is un-staked it's staking level will reset to zero!\n"+"\nWhich token would you like to stake?\nToken ID: ");
+
+    // Submit Txn
+    let stake_txn = await stake(stakeID);
+    alert(stake_txn);
+
 }
 
-async function community_staked_tokens() {
-    // Tokens held by staking contract
-    let all_staked_tokens = await held_tokens_by_wallet();
-    for (token = 0; token < all_staked_tokens.length; token++) {
-        let token_id = all_staked_tokens[token];
-        await render_token(token_id);
-    }
+async function stake(tokenId) {
 
-    console.log('Total Staked Tokens: '+all_staked_tokens.length);
+    tokenId = parseInt(tokenId)
+
+    if (Number.isInteger(tokenId) == false || tokenId > 4040 || tokenId < 1) { return 'TXN FAILED:\n Invalid token ID!'; }
+
+    // Check Ownership / Approval Status
+    let owner = await collection.methods.ownerOf(tokenId).call();
+    let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+    if (!approved) { return 'TXN FAILED:\n Staking contract is missing approval!'; }
+
+    // Valid ownership
+    if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+        try {
+
+            // Send Txn
+            let stake = await send_write_transaction(controller.methods.stake(tokenId)) // await controller.methods.stake(tokenId).send({ from: user_address });
+            console.log(stake)
+            return 'Token #'+tokenId+' has succesfully been staked!';
+
+        // Catch Errors
+        } catch (e) { return 'TXN FAILED:\n '+e.message; }
+
+    // Token already Staked
+    } else if (owner.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) {
+        return 'TXN FAILED:\n Token #'+tokenId+' is already staked!';
+    } 
+
+    // Invalid Ownership
+    else { return 'TXN FAILED:\n Token #'+tokenId+' does not belong to user!'; }
+}
+
+/*
+
+    un-stake (withdraw)
+
+*/
+
+async function initiate_withdraw(withdrawID) {
+
+
+    // Submit Txn
+    let withdraw_txn = await withdraw(withdrawID);
+    alert(withdraw_txn);
+
+}
+
+// withdraw(_tokenId (uint256), _user (address)) | send =>
+async function withdraw(tokenId) {
+
+    // Check Staked/Approval Status
+    let staked = await stakerAddress(tokenId);
+    if (!staked) { return 'TXN FAILED:\n Token #'+tokenId+' is not currently staked!'; } 
+
+    // Valid ownership
+    else if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+        try {
+            
+            // Send Txn
+            let withdraw = await controller.methods.withdraw(tokenId).send({ from: user_address });
+            return 'Token #'+tokenId+' has succesfully been un-staked!';
+
+        // Catch Errors
+        } catch (e) { return 'TXN FAILED:\n '+e.message; }
+
+    // Invalid Ownership
+    } else { return 'TXN FAILED:\n Token #'+tokenId+' does not belong to user!'; }
 }
 
 /*

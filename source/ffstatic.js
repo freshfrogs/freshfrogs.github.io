@@ -11,7 +11,7 @@
     const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 
 
-    async function contract_function_testing() {
+    async function send_write_transaction() {
 
         var gas = collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).estimateGas({ from: user_address });
         gas.then(function(gasTouse) { collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address, gas: gasTouse }).then(function(hashdata){ console.log(hashdata) }) });
