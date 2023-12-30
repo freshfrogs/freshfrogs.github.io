@@ -280,7 +280,7 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        fetch_recent_sales();
+        try { fetch_recent_sales(); } catch (e) { console.log('Failed to fetch recent sales! '+e.message) }
 
         async function build_random_logo() {
           // Random Frog Element:
