@@ -421,24 +421,24 @@ async function render_token(token_id) {
     let token_owner = await collection.methods.ownerOf(token_id).call();
 
     if (token_owner == CONTROLLER_ADDRESS.toLowerCase()) {
-        staked = 'True'
-        staked_status = 'darkseagreen'
+        var staked = 'True'
+        var staked_status = 'darkseagreen'
         token_owner = await stakerAddress(token_id);
-        staked_values = stakingValues(token_id);
-        staked_lvl = staked_values[1]
-        staked_next_lvl = staked_values[2]
+        var staked_values = stakingValues(token_id);
+        var staked_lvl = staked_values[1]
+        var staked_next_lvl = staked_values[2]
     } else {
-        staked = 'False';
-        staked_status = 'lightsalmon';
-        staked_lvl = '-'
-        staked_next_lvl = '-'
+        var staked = 'False';
+        var staked_status = 'lightsalmon';
+        var staked_lvl = '-'
+        var staked_next_lvl = '-'
     }
 
     // Render token information and data
     top_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
             '<text>Staked</text>'+'<br>'+
-            '<text style="color: darkseagreen; font-weight: bold;">'+staked+'</text>'+
+            '<text style="color: '+staked_status+'; font-weight: bold;">'+staked+'</text>'+
         '</div>'
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
