@@ -525,13 +525,13 @@ async function render_recently_sold(token) {
         '</div>'
     bottom_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text style="color: black; font-weight: bold;">Buyer</text>'+'<br>'+
-            '<text style="color: teal;">'+truncateAddress(buyer_address)+'</text>'+
+            '<text style="color: black; font-weight: bold;">Seller</text>'+'<br>'+
+            '<text style="color: teal;">'+truncateAddress(seller_address)+'</text>'+
         '</div>'
     bottom_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text style="color: black; font-weight: bold;">Seller</text>'+'<br>'+
-            '<text style="color: teal;">'+truncateAddress(seller_address)+'</text>'+
+            '<text style="color: black; font-weight: bold;">Buyer</text>'+'<br>'+
+            '<text style="color: teal;">'+truncateAddress(buyer_address)+'</text>'+
         '</div>'
 
     // <-- Begin Element
