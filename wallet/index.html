@@ -166,19 +166,23 @@
   .unstake_button {
     margin: 2px;
     background: white;
-    border: 1px solid lightgray;
+    border: 1px solid darkgray;
     border-radius: 5px;
     width: 80%;
     height: 25px;
+    color: black;
     vertical-align: middle;
     font-size: small;
     padding: 0px !important;
     cursor: pointer;
+    box-shadow: 2px 2px darkslategray;
     font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
   }
   .unstake_button:hover{
-    background: lightgray;
-    cursor: pointer
+    box-shadow: 2px 2px lightsalmon;
+    -ms-transform: scale(0.9); /* IE 9 */
+    -webkit-transform: scale(0.9); /* Safari 3-8 */
+    transform: scale(0.9);
   }
   .logoHeader {
     margin: auto;
