@@ -29,49 +29,93 @@ const options = {
     }
   };
 
-async function fetch_tokens_by_owner() {
-      fetch('https://deep-index.moralis.io/api/v2.2/0xF01e067d442f4254cd7c89A5D42d90ad554616E8/nft?chain=eth&format=decimal&token_addresses%5B0%5D=0x4aFd4635417132892A4eA9CAE128d03e803317fD&media_items=false', options)
+async function fetch_tokens_by_owner(wallet) {
+      fetch('https://deep-index.moralis.io/api/v2.2/'+wallet+'/nft?chain=eth&format=decimal&token_addresses%5B0%5D=0x4aFd4635417132892A4eA9CAE128d03e803317fD&media_items=false', options)
         .then(response => response.json())
         .then(response => console.log(response))
         .catch(err => console.error(err));
 }
 
-async function initiate_mint(quantity) {
+/*
 
-    let tokens = await f0.mint(user_invite, quantity)
-    console.log(tokens)
+    Connect
+    Allow users to connect using an ethereum wallet via web3 browser extenstion
 
-    /*
-    console.log('SENDING MINT TXN: (test 2)')
-    try {
-        var gas = collection.methods.mint(["0x0000000000000000000000000000000000000000000000000000000000000000", []], 1).estimateGas({ from: user_address });
-        gas.then(function(gasTouse) { 
-            collection.methods.mint(["0x0000000000000000000000000000000000000000000000000000000000000000", []], 1).send({ 
-                from: user_address, 
-                gas: gasTouse 
-            }).then(function(hashdata){ 
-                console.log(hashdata) 
-                return hashdata
-            }) 
-        });
-    } catch (e) {
-        console.log(e.message);
-        return e.message
-    }
-    */
-}
+*/
 
-// Begin connection
 async function initiate_web3_connection() {
     if (typeof window.ethereum !== "undefined") {
         document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="pendingStatus"></div> Connecting...'
-        await connect().then(function(){ 
-            update_frontend();
-            fetch_tokens_by_owner();
-            community_staked_tokens();
-        })
-    } else { // WEB3 browser extenstion could not be found!
-        console.log('WEB3 wallet not found!')
+        await connect_user().then(update_frontend());
+    } else {
+        // WEB3 browser extenstion could not be found!
+    }
+}
+
+async function connect_user() {
+    try {
+
+        // Create new WEB3 instance and request accounts from provider.
+        await ethereum.request({ method: "eth_requestAccounts" });
+        web3 = new Web3(window.ethereum);
+
+        // Current user address
+        user_address = await web3.currentProvider.selectedAddress;
+
+        // Factoria API
+        // Connect to WEB3 smart contracts
+        f0 = new F0();
+        await f0.init({ web3: web3, contract: COLLECTION_ADDRESS, network: 'main' })
+        await get_user_invites(user_address);
+        await connect_functions(user_address);
+        
+    } catch (e) {
+        console.log(e.message)
+    }
+}
+
+async function connect_functions(wallet_address) {
+    try {
+        
+        // Connect ethereum contracts
+        collection = new web3.eth.Contract(COLLECTION_ABI, COLLECTION_ADDRESS);
+        controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
+        collection_name = await f0.api.name().call();
+        collection_symbol = await f0.api.symbol().call();
+        next_id = await f0.api.nextId().call();
+        next_id = parseInt(next_id);
+        total_supply = '4040';
+
+        // User variables. Held and staked tokens, etc.
+        userTokens = await collection.methods.balanceOf(user_address).call();
+        userTokensStaked = await stakers(user_address, 'amountStaked')
+        unclaimed_rewards = await availableRewards(user_address)
+        is_approved = await checkApproval();
+
+    } catch (e) {
+        console.log(e.message)
+    }
+}
+
+async function get_user_invites(wallet_address) {
+    try {
+
+        user_invites = await f0.myInvites();
+        user_keys = Object.keys(user_invites);
+        user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
+        if (wallet_address === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase()  || wallet_address === "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359".toLowerCase() || wallet_address === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase() || wallet_address === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
+            // NF7UOS / C7AR Bypass -- Unlimited Free Mints
+            user_invite = "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064";
+            mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1)
+            mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1)
+        } else { // Public Invite -- 0.01 ETH
+            user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
+            mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1)
+            mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1)
+        }
+
+    } catch (e) {
+        console.log(e.message)
     }
 }
 
@@ -87,13 +131,14 @@ function update_frontend() {
     document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="connectedStatus"></div> Connected - ['+truncateAddress(user_address)+']'
     document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); }
 
-    // Mint Button | Mint Tokens
+    /* // Mint Button | Mint Tokens
     mintButton = document.createElement('button')
     mintButton.id = 'mintButton'
     mintButton.className = 'connectButton'
     mintButton.onclick = async function (e) { await initiate_mint(1); }
     mintButton.innerHTML = '🐸 Mint Frogs'
     parent_element.appendChild(mintButton)
+    */
 
     // Holdings Button | View holdings
     holdingsLink = document.createElement('a')
@@ -103,83 +148,27 @@ function update_frontend() {
     holdingsLink.href = 'https://freshfrogs.github.io/wallet/'
     parent_element.appendChild(holdingsLink)
 
-    // Stake Button | Stake tokens
+    /* // Stake Button | Stake tokens
     stkeBtn = document.createElement('button')
     stkeBtn.id = 'stakeButton'
     stkeBtn.className = 'connectButton'
     stkeBtn.onclick = async function (e) { await Initiate_stake(); }
     stkeBtn.innerHTML = '🌱 Stake & Earn!'
     parent_element.appendChild(stkeBtn)
+    */
 
-}
-
-/*
-
-    Connect Function
-    Allow users to connect using an ethereum wallet
-
-*/
-
-async function connect() {
-    try {
-        // Create new WEB3 instance and request accounts from provider
-        await ethereum.request({ method: "eth_requestAccounts" });
-        web3 = new Web3(window.ethereum);
-
-        // Current user address
-        user_address = await web3.currentProvider.selectedAddress;
-
-        // Connect ethereum contracts
-        collection = new web3.eth.Contract(COLLECTION_ABI, COLLECTION_ADDRESS);
-        controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
-
-        /* // Recieve tokens held or staked by current user
-        userTokens = await collection.methods.balanceOf(user_address).call();
-        userTokensStaked = await stakers(user_address, 'amountStaked')
-        unclaimed_rewards = await availableRewards(user_address)
-        is_approved = await checkApproval();
-        */
-
-        // Factoria API
-        f0 = new F0();
-        await f0.init({ web3: web3, contract: COLLECTION_ADDRESS, network: 'main' })
-        collection_name = await f0.api.name().call();
-        collection_symbol = await f0.api.symbol().call();
-        next_id = await f0.api.nextId().call();
-        next_id = parseInt(next_id);
-
-        // Mint Invites
-        user_invites = await f0.myInvites();
-        user_keys = Object.keys(user_invites);
-        user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
-        if (user_address === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase()  || user_address === "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359".toLowerCase() || user_address === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase() || user_address === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
-            // NF7UOS / C7AR Bypass -- Unlimited Free Mints
-            user_invite = "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064";
-            mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1)
-            mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1)
-        } else { // Public Invite -- 0.01 ETH
-            user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
-            mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1)
-            mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1)
-        }
-
-        // DONE
-        // CATCH ERRORS
-    } catch (e) {
-        console.log(e.message)
-    }
 }
 
 // Get staked token ID's
-async function held_tokens_by_wallet(account) {
+async function held_tokens_by_wallet(wallet_address) {
 
     // Get ALL staked tokens by default
-    if (! account) {account = CONTROLLER_ADDRESS}
+    if (! wallet_address) {wallet_address = CONTROLLER_ADDRESS}
 
     // Retrieve all transactions involving the transfer of said tokens
     const eventsReceivedTokens = await collection.getPastEvents("Transfer", {
         filter: {
-            to: account,
+            to: wallet_address,
         },
         fromBlock: 0,
     });
@@ -196,7 +185,7 @@ async function held_tokens_by_wallet(account) {
     // Get the tokens that the account sent
     const eventsSentTokens = await collection.getPastEvents("Transfer", {
         filter: {
-            from: account,
+            from: wallet_address,
             tokenId: receivedTokenIds,
         },
         fromBlock: 0,

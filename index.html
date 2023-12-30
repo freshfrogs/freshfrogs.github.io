@@ -298,6 +298,7 @@
       // -- >
 
       document.addEventListener("DOMContentLoaded", async () => {
+        await fetch_tokens_by_owner(CONTROLLER_ADDRESS);
         // Random Frog Element:
         document.getElementById('frog-logo').remove()
         random_token = Math.floor(Math.random() * 4040) + 1;
