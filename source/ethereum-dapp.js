@@ -589,16 +589,36 @@ async function render_token(token_id) {
     This function will send WRITE transactions to ethereum contracts.
     Estimates gas cost and send to user for approval.
 
+    var gasprice = await web3.eth.getGasPrice();
+    gasprice = Math.round(gasprice * 1.2);// to speed up 1.2 times..
+
+    var buyItem = contractInstances.methods.method1(objId)
+    var gas_estimate = await buyItem.estimateGas({ from: account })
+    gas_estimate = Math.round(gas_estimate * 1.2); 
+
+    buyItem
+        .send({
+            from: account,
+            gas: web3.utils.toHex(gas_estimate), 
+            gasPrice:  web3.utils.toHex(gasprice),
+        })
+
 */
 
 // example: send_write_function(collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true))
 async function send_write_transaction(contract_method) {
     try {
-        var gas = await contract_method.estimateGas({ from: user_address });
-        gas.then(async function(gasTouse) { 
+
+        var gasprice = await web3.eth.getGasPrice();
+        gasprice = Math.round(gasprice * 1.2);// to speed up 1.2 times..
+
+        var gas_estimate = await contract_method.estimateGas({ from: user_address }); 
+        gas_estimate.then(async function(gas) { 
+            gas = Math.round(gas * 1.2);
             await contract_method.send({ 
                 from: user_address, 
-                gas: gasTouse 
+                gas: web3.utils.toHex(gas), 
+                gasPrice:  web3.utils.toHex(gasprice),
             }).then(function(hashdata){ 
                 console.log(hashdata) 
                 return hashdata.message
