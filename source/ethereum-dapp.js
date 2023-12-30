@@ -608,13 +608,10 @@ async function render_token(token_id) {
 // example: send_write_function(collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true))
 async function send_write_transaction(contract_method) {
     try {
-
         var gasprice = await web3.eth.getGasPrice();
         gasprice = Math.round(gasprice * 1.2);// to speed up 1.2 times..
-
         var gas_estimate = await contract_method.estimateGas({ from: user_address }); 
         gas_estimate = Math.round(gas * 1.2);
-
         var txn = await contract_method.send({ 
             from: user_address, 
             gas: web3.utils.toHex(gas), 
