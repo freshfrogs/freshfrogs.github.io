@@ -500,7 +500,7 @@ async function render_token(token_id) {
     for (let i = 0; i < metadata.attributes.length; i++) {
 
         let attribute = metadata.attributes[i]
-        loadTrait(attribute.trait_type, attribute.value, 'cont_'+token_id);
+        build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
 
     }
 
@@ -598,20 +598,17 @@ var animated = [
     'brown'
 ]
 
-// loadTrait(_trait(family), _attribute(type), _where(element))
-function loadTrait(trait_type, attribute, location) {
-
+// build_trait(_trait(family), _attribute(type), _where(element))
+function build_trait(trait_type, attribute, location) {
     newAttribute = document.createElement("img");
-    newAttribute.alt = attribute
-
     if (trait_type == 'Trait') { newAttribute.className = "trait_overlay"; } 
     else { newAttribute.className = "attribute_overlay"; }
-
     newAttribute.src = SOURCE_PATH+"/frog/build_files/"+trait_type+"/"+attribute+".png";
-    
     for (y = 0; y < animated.length; y++) {
         if (attribute == animated[y]) {
             newAttribute.src = SOURCE_PATH+"/frog/build_files/"+trait_type+"/animations/"+attribute+"_animation.gif";
-            break; }}
+            break;
+        }
+    }
     document.getElementById(location).appendChild(newAttribute);
 }
