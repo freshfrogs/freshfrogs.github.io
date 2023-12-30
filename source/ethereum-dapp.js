@@ -30,6 +30,7 @@ const options = {
   };
 
 async function fetch_tokens_by_owner(wallet) {
+    console.log('test 7')
     fetch('https://deep-index.moralis.io/api/v2.2/'+wallet+'/nft?chain=eth&format=decimal&token_addresses%5B0%5D='+COLLECTION_ADDRESS+'&media_items=false', options)
     .then((tokens) => tokens.json())
     .then((tokens) => {
@@ -593,9 +594,9 @@ async function render_token(token_id) {
 // example: send_write_function(collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true))
 async function send_write_transaction(contract_method) {
     try {
-        var gas = contract_method.estimateGas({ from: user_address });
-        gas.then(function(gasTouse) { 
-            contract_method.send({ 
+        var gas = await contract_method.estimateGas({ from: user_address });
+        gas.then(async function(gasTouse) { 
+            await contract_method.send({ 
                 from: user_address, 
                 gas: gasTouse 
             }).then(function(hashdata){ 
