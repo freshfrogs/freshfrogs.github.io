@@ -30,7 +30,7 @@ const options = {
   };
 
 async function fetch_tokens_by_owner() {
-      fetch('https://api.rarible.org/v0.1/items/byOwner?blockchains=ETHEREUM&owner=ETHEREUM%3A0xF01e067d442f4254cd7c89A5D42d90ad554616E8&collection=ETHEREUM%3A0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
+      fetch('https://api.etherscan.io/api?module=account&action=addresstokennftinventory&address=0x123432244443b54409430979df8333f9308a6040&contractaddress=0xed5af388653567af2f388e6224dc7c4b3241c544&page=1&offset=100&apikey=FPVUBTTPE77UTV78USHWQ44RFMA9S643VD', options)
         .then(response => response.json())
         .then(response => console.log(response))
         .catch(err => console.error(err));

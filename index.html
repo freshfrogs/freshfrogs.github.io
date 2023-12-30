@@ -282,7 +282,8 @@
     <script src="https://freshfrogs.github.io/source/controller_abi.js"></script>
     <script src="https://freshfrogs.github.io/source/collection_abi.js"></script>
     <script src="https://freshfrogs.github.io/source/ethereum-dapp.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="https://unpkg.com/moralis/dist/moralis.js"></script>
     <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
 
@@ -298,6 +299,15 @@
       // -- >
 
       document.addEventListener("DOMContentLoaded", async () => {
+
+        Moralis.initialize("20409b1b-5a7b-4f6e-b969-9e69bb1f77ef")
+        Moralis.serverURL = "https://hiigo3ummtea.moralis.io:2053/server"
+        async function getNFTs() {
+            const options = { chain: 'eth', address: '0xF01e067d442f4254cd7c89A5D42d90ad554616E8' };
+            const nfts = await Moralis.Web3.getNFTs(options);
+            console.log(nfts)
+        }
+
         // Random Frog Element:
         document.getElementById('frog-logo').remove()
         random_token = Math.floor(Math.random() * 4040) + 1;
