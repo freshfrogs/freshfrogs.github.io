@@ -303,7 +303,7 @@
         }
 
         document.getElementById('connectButton').onclick = async function (e) {
-          await initiate_web3_connection();
+          await initiate_web3_connection().then(async function(){ await fetch_tokens_by_owner(CONTROLLER_ADDRESS); })
         }
       })
     </script>

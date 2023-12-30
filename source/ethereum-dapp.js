@@ -163,8 +163,6 @@ async function update_frontend() {
     parent_element.appendChild(stkeBtn)
     */
 
-    await fetch_tokens_by_owner(CONTROLLER_ADDRESS);
-
 }
 
 // Get staked token ID's
