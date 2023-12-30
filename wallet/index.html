@@ -281,7 +281,7 @@
         //document.getElementById('mintButton').remove()
         document.getElementById('holdingsButton').style.boxShadow = '2px 2px lightsalmon'
         await fetch_tokens_by_owner(user_address);
-        await fetch_tokens_by_staker(wallet);
+        await fetch_tokens_by_staker(user_address);
 
         async function build_random_logo() {
           // Random Frog Element:
