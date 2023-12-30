@@ -244,17 +244,6 @@ async function mint(quantity, invite) {
 
 /*
 
-    Send WRITE Transaction
-    Estimate gas fee and use said estimate within txn
-
-*/
-async function send_write_transaction(contract_method) {
-    var gas = contract_method.estimateGas({ from: user_address });
-    gas.then(function(gasTouse) { contract_method.send({ from: user_address, gas: gasTouse }).then(function(hashdata){ console.log(hashdata); return hashdata }) });
-}
-
-/*
-
     stake(_tokenId (uint256), _user (address)) | send =>
 
 */
@@ -288,7 +277,7 @@ async function stake(tokenId) {
             // Send Txn
             let stake = await send_write_transaction(controller.methods.stake(tokenId)) // await controller.methods.stake(tokenId).send({ from: user_address });
             console.log(stake)
-            return 'Token #'+tokenId+' has succesfully been staked!';
+            return stake;
 
         // Catch Errors
         } catch (e) { return 'TXN FAILED:\n '+e.message; }
@@ -602,7 +591,7 @@ async function render_token(token_id) {
 */
 
 // example: send_write_function(collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true))
-async function send_write_function(contract_method) {
+async function send_write_transaction(contract_method) {
     try {
         var gas = contract_method.estimateGas({ from: user_address });
         gas.then(function(gasTouse) { 
@@ -611,7 +600,7 @@ async function send_write_function(contract_method) {
                 gas: gasTouse 
             }).then(function(hashdata){ 
                 console.log(hashdata) 
-                return hashdata
+                return hashdata.message
             }) 
         });
     } catch (e) {
