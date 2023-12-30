@@ -611,10 +611,10 @@ async function send_write_transaction(contract_method) {
         var gasprice = await web3.eth.getGasPrice();
         gasprice = Math.round(gasprice * 1.2);// to speed up 1.2 times..
         var gas_estimate = await contract_method.estimateGas({ from: user_address }); 
-        gas_estimate = Math.round(gas * 1.2);
+        gas_estimate = Math.round(gas_estimate * 1.2);
         var txn = await contract_method.send({ 
             from: user_address, 
-            gas: web3.utils.toHex(gas), 
+            gas: web3.utils.toHex(gas_estimate), 
             gasPrice:  web3.utils.toHex(gasprice),
         }).then(function(hashdata){ 
             console.log(hashdata) 
