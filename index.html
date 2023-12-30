@@ -286,7 +286,7 @@
           let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+random_token+'.json')).json();
           for (let i = 0; i < metadata.attributes.length; i++) {
             let attribute = metadata.attributes[i]
-            loadTrait(attribute.trait_type, attribute.value, 'randomLogo');
+            build_trait(attribute.trait_type, attribute.value, 'randomLogo');
           }
           var random_token_image = SOURCE_PATH+'/frog/'+random_token+'.png'
           document.getElementById('randomLogo').style.backgroundImage = "url("+random_token_image+")";
