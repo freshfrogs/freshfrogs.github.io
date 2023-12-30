@@ -419,12 +419,11 @@ async function stakers(userAddress, _data) {
 async function render_token(token_id) {
 
     var location = 'frogs'
-    let image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
-
-    // Token Variables
-    let token_name = 'Frog #'+token_id
-    let token_owner = await collection.methods.ownerOf(token_id).call();
-
+    var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
+    var token_name = 'Frog #'+token_id
+    var token_owner = await collection.methods.ownerOf(token_id).call();
+    var staked, staked_status, staked_values, staked_lvl, staked_next_lvl;
+    
     if (token_owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
         staked = 'True'
         staked_status = 'darkseagreen'
