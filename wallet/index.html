@@ -296,8 +296,13 @@
         }
 
         await build_random_logo()
+
+        var intervalId = window.setInterval(async function(){
+          await build_random_logo()
+        }, 6500);
+
         document.getElementById('randomLogo').onclick = async function (e) {
-          await build_random_logo();
+          clearInterval(intervalId);
         }
 
         document.getElementById('connectButton').onclick = async function (e) {
