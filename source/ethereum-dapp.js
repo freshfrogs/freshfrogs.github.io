@@ -266,70 +266,27 @@ async function render_token(token_id) {
     let token_owner = await collection.methods.ownerOf(token_id).call();
     let image_link = SOURCE_PATH+token_id+'.png'
 
-    if (token_owner.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) {
-        format = 'staked'
-        token_owner = await stakerAddress(token_id);
-    } else { format = 'default' }
-
-    // Default format or staked format
-    if (format == 'default') {
-
-        // Render token information and data
-        top_left = 
-            '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text>Owned By</text>'+'<br>'+
-                '<text style="color: darkseagreen; font-weight: bold;">'+truncateAddress(token_owner)+'</text>'+
-            '</div>'
-        top_right = 
-            '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text>Frog Type</text>'+'<br>'+
-                '<text id="frog_type" style="color: darkseagreen; font-weight: bold;">'+'</text>'+
-            '</div>'
-        bottom_left = 
-            '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text>Next Level</text>'+'<br>'+
-                '<text style="color: darkseagreen; font-weight: bold;">'+' days</text>'+
-            '</div>'
-        bottom_right = 
-            '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text>Next Level</text>'+'<br>'+
-                '<text style="color: darkseagreen; font-weight: bold;">'+' days</text>'+
-            '</div>'
-        
-    } else if (format == 'staked') {
-
-        // Staked token data calculations
-        let staked_time_days = staked_level = staked_next = staked_earned = '0';
-        //let staked = await stakerAddress(token_id)
-        let staking_values = await stakingValues(token_id)
-        staked_time_days = staking_values[0]
-        staked_level = staking_values[1]
-        staked_next = staking_values[2]
-        staked_earned = staking_values[3]
-
-        // Display token properties
-        top_right = 
-            '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text>Owned By</text>'+'<br>'+
-                '<text style="color: darkseagreen; font-weight: bold;">'+truncateAddress(token_owner)+'</text>'+
-            '</div>'
-        bottom_right = 
-            '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text>$FLYZ Earned</text>'+'<br>'+
-                '<text style="color: darkseagreen; font-weight: bold;">'+staked_earned+'</text>'+
-            '</div>'
-        top_left = 
-            '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text>Level</text>'+'<br>'+
-                '<text style="color: darkseagreen; font-weight: bold;">'+staked_level+'</text>'+
-            '</div>'
-        bottom_left = 
-            '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text>Next Level</text>'+'<br>'+
-                '<text style="color: darkseagreen; font-weight: bold;">'+staked_next+' days</text>'+
-            '</div>'
-
-    }
+    // Render token information and data
+    top_left = 
+        '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<text>Owned By</text>'+'<br>'+
+            '<text style="color: darkseagreen; font-weight: bold;">'+truncateAddress(token_owner)+'</text>'+
+        '</div>'
+    top_right = 
+        '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<text>Frog Type</text>'+'<br>'+
+            '<text id="frog_type" style="color: darkseagreen; font-weight: bold;">'+'</text>'+
+        '</div>'
+    bottom_left = 
+        '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<text>Next Level</text>'+'<br>'+
+            '<text style="color: darkseagreen; font-weight: bold;">'+' days</text>'+
+        '</div>'
+    bottom_right = 
+        '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<text>Next Level</text>'+'<br>'+
+            '<text style="color: darkseagreen; font-weight: bold;">'+' days</text>'+
+        '</div>'
 
     // <-- Begin Element
     token_doc = document.getElementById(location);
