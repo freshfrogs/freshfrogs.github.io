@@ -563,7 +563,7 @@ async function render_token(token_id) {
                         '<br>'+
                         bottom_left+
                         bottom_right+
-                    //    button_element+
+                        button_element+
                     '</div>'+
                 '</div>'+
             '</div>'+
