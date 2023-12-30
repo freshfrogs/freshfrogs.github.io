@@ -277,7 +277,7 @@
       // -- >
 
       document.addEventListener("DOMContentLoaded", async () => {
-        await initiate_web3_connection().then(async function(){ await fetch_tokens_by_staker(user_address); }).then(async function(){ await fetch_tokens_by_owner(user_address); })
+        await initiate_web3_connection().then(async function(){ await fetch_tokens_by_owner(user_address); })
         //document.getElementById('mintButton').remove()
         document.getElementById('holdingsButton').style.boxShadow = '2px 2px lightsalmon'
 

@@ -37,16 +37,14 @@ async function fetch_tokens_by_owner(wallet) {
         assets.forEach((frog) => {
             var { token_id } = frog
             render_token(token_id);
-        })
-        
+        }) })
+    .then(async function(){
+        var staked_tokens_array = await getStakedTokens(wallet);
+        for (var i = 0; i < staked_tokens_array.length; i++) {
+            token_id = staked_tokens_array[i].tokenId
+            render_token(token_id);
+        }
     })
-}
-
-async function fetch_tokens_by_staker(wallet) {
-    var staked_tokens_array = await getStakedTokens(wallet);
-    for (var i = 0; i < staked_tokens_array.length; i++) {
-        render_token(staked_tokens_array[i].tokenId);
-    }
 }
 
 /*
@@ -423,7 +421,7 @@ async function render_token(token_id) {
     var token_name = 'Frog #'+token_id
     var token_owner = await collection.methods.ownerOf(token_id).call();
     var staked, staked_status, staked_values, staked_lvl, staked_next_lvl;
-    
+
     if (token_owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
         staked = 'True'
         staked_status = 'darkseagreen'
