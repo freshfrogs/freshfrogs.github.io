@@ -450,7 +450,7 @@ async function render_token(token_id) {
     bottom_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
             '<text>Level</text>'+'<br>'+
-            '<text style="color: darkseagreen; font-weight: bold;">'+staked_lvl+' days</text>'+
+            '<text style="color: darkseagreen; font-weight: bold;">'+staked_lvl+'</text>'+
         '</div>'
     bottom_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
