@@ -222,6 +222,27 @@ async function held_tokens_by_wallet(wallet_address) {
     return address_tokens_array
 } */
 
+async function initiate_mint() {
+
+    // Token ID input
+    var mint_quantity = prompt("Frog #"+next_id+" out of 4,040 is available to mint! \nMint limit of "+mint_limit+" Frogs per wallet! \nHow many Frogs would you like to mint? ("+mint_price+"Ξ each + gas fee)");
+
+    // Submit Txn
+    let mint_txn = await mint(mint_quantity, user_invite);
+    alert(mint_txn);
+
+}
+
+async function mint(quantity, invite) {
+    if (! invite) { invite = "0x0000000000000000000000000000000000000000000000000000000000000000" }
+    try {
+        let tokens = await f0.mint(invite, quantity)
+        return tokens
+    } catch (e) {
+        return e.message
+    }   
+}
+
 /*
 
     Send WRITE Transaction
