@@ -128,7 +128,7 @@ async function get_user_invites(wallet_address) {
 }
 
 // Update website UI
-function update_frontend() {
+async function update_frontend() {
 
     // Prepare HTML Element
     var parent_element = document.getElementById('console');
@@ -164,6 +164,8 @@ function update_frontend() {
     stkeBtn.innerHTML = '🌱 Stake & Earn!'
     parent_element.appendChild(stkeBtn)
     */
+
+    await fetch_tokens_by_owner(CONTROLLER_ADDRESS);
 
 }
 
