@@ -29,6 +29,17 @@ const options = {
     }
   };
 
+
+async function fetch_recent_sales() {
+    fetch('https://deep-index.moralis.io/api/v2.2/nft/'+COLLECTION_ADDRESS+'/trades?chain=eth&marketplace=opensea', options)
+    .then((tokens) => tokens.json())
+    .then((tokens) => {
+        var assets = tokens.result
+        assets.forEach((frog) => {
+            render_recently_sold(frog)
+        }) })
+}
+
 async function fetch_tokens_by_owner(wallet) {
     fetch('https://deep-index.moralis.io/api/v2.2/'+wallet+'/nft?chain=eth&format=decimal&token_addresses%5B0%5D='+COLLECTION_ADDRESS+'&media_items=false', options)
     .then((tokens) => tokens.json())
@@ -478,6 +489,114 @@ async function stakers(userAddress, _data) {
     else if (_data == 'timeOfLastUpdate') { return stakers.timeOfLastUpdate }   // Time since Last Update from user
     else if (_data == 'unclaimedRewards') { return stakers.unclaimedRewards }   // Total unclaimed Rewards from User
     else { return }                                                             // Invalid arguments
+}
+
+// Render NFT token by layered attirubtes obtained through metadata.
+async function render_recently_sold(token) {
+
+    var { token_id } = token
+    console.log('Sale found! Frog #'+token_id)
+
+    /*
+    var location = 'frogs'
+    var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
+    var token_name = 'Frog #'+token_id
+    var token_owner = await collection.methods.ownerOf(token_id).call();
+    var staked, staked_status, staked_values, staked_lvl, staked_next_lvl, button_element;
+
+    // Staked
+    if (token_owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
+        staked = 'True'
+        staked_status = 'darkseagreen'
+        token_owner = await stakerAddress(token_id);
+        staked_values = await stakingValues(token_id);
+        staked_lvl = staked_values[1]
+        staked_next_lvl = staked_values[2].toString()+' days'
+        if (token_owner.toLowerCase() == user_address.toLowerCase()) { 
+            button_element = // Un-stake button
+                '<div style="text-align: center;">'+
+                    '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
+                '</div>';
+        } else { button_element = ''; }
+    // NOT Staked
+    } else {
+        staked = 'False';
+        staked_status = 'lightsalmon';
+        staked_lvl = '--'
+        staked_next_lvl = '--'
+        button_element = '';
+    }
+
+    // Render token information and data
+    top_left = 
+        '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<text>Staked</text>'+'<br>'+
+            '<text style="color: '+staked_status+'; font-weight: bold;">'+staked+'</text>'+
+        '</div>'
+    top_right = 
+        '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<text>Price</text>'+'<br>'+
+            '<text id="frog_type" style="color: darkseagreen; font-weight: bold;">'+''+'</text>'+
+        '</div>'
+    bottom_left = 
+    '<div style="margin: 8px; float: right; width: 100px;">'+
+        '<text>Buyer</text>'+'<br>'+
+        '<text style="color: darkseagreen; font-weight: bold;">'+staked_next_lvl+'</text>'+
+    '</div>'
+    bottom_right = 
+    '<div style="margin: 8px; float: right; width: 100px;">'+
+        '<text>Seller</text>'+'<br>'+
+        '<text style="color: darkseagreen; font-weight: bold;">'+staked_lvl+'</text>'+
+    '</div>'
+
+    // <-- Begin Element
+    token_doc = document.getElementById(location);
+    token_element = document.createElement('div');
+
+    // Element Details -->
+    token_element.id = token_name;
+    token_element.className = 'display_token';
+    token_element.innerHTML = 
+        '<div class="display_token_cont">'+
+            '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
+                '<div class="innerLeft">'+
+                    '<div class="display_token_img_cont" id="cont_'+token_id+'" onclick="render_display('+token_id+')">'+
+                        //'<img src="'+image_link+'" class="displayImage"/>'+
+                    '</div>'+
+                '</div>'+
+            '</div>'+
+            '<div class="renderRight">'+
+                '<div class="innerRight">'+
+                    '<div id="traits_'+token_id+'" class="trait_list">'+
+                        //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
+                        '<strong>'+token_name+'</strong> <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+                    '</div>'+
+                    '<div id="prop_'+token_id+'" class="properties">'+
+                        top_right+
+                        top_left+
+                        '<br>'+
+                        bottom_left+
+                        bottom_right+
+                    //    button_element+
+                    '</div>'+
+                '</div>'+
+            '</div>'+
+        '</div>';
+
+    // Create Element <--
+    token_doc.appendChild(token_element);
+
+    // Update Metadata! Build Frog -->
+    let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
+
+    for (let i = 0; i < metadata.attributes.length; i++) {
+
+        let attribute = metadata.attributes[i]
+        build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
+
+    }
+    */
+
 }
 
 // Render NFT token by layered attirubtes obtained through metadata.
