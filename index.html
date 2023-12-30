@@ -275,7 +275,7 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        async function build_random_logo () {
+        async function build_random_logo() {
           // Random Frog Element:
           document.getElementById('randomLogo').innerHTML = ''
           random_token = Math.floor(Math.random() * 4040) + 1;
@@ -289,8 +289,14 @@
           document.getElementById('randomLogo').style.backgroundImage = "url("+random_token_image+")";
         }
 
+        await build_random_logo()
+
+        var intervalId = window.setInterval(async function(){
+          await build_random_logo()
+        }, 30000);
+
         document.getElementById('randomLogo').onclick = async function (e) {
-          await build_random_logo();
+          clearInterval(intervalId);
         }
 
         document.getElementById('connectButton').onclick = async function (e) {
