@@ -498,10 +498,7 @@ async function render_recently_sold(token) {
     var { token_ids, seller_address, buyer_address, price, block_timestamp } = token
     var token_id = token_ids[0]
     price = price / 1000000000000000000;
-    // timestamp
-
-    formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH);
-    timestamp = LocalDate.parse(block_timestamp, formatter);
+    timestamp = block_timestamp.substring(0, 10);
     
     console.log('=')
     console.log('Sale found! Frog #'+token_id)
