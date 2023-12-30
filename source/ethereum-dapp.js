@@ -330,7 +330,8 @@ async function withdraw(tokenId) {
         try {
             
             // Send Txn
-            let withdraw = await controller.methods.withdraw(tokenId).send({ from: user_address });
+            let withdraw = await send_write_transaction(controller.methods.withdraw(tokenId)); // await controller.methods.withdraw(tokenId).send({ from: user_address });
+            console.log(withdraw)
             return 'Token #'+tokenId+' has succesfully been un-staked!';
 
         // Catch Errors
