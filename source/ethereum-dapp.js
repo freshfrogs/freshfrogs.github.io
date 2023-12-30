@@ -515,23 +515,23 @@ async function render_recently_sold(token) {
     // Render token information and data
     top_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text style="color: teal; font-weight: bold;">Date</text>'+'<br>'+
-            '<text>'+timestamp+'</text>'+
+            '<text style="color: darkslategray; font-weight: bold;">Date</text>'+'<br>'+
+            '<text style="color: teal;">'+timestamp+'</text>'+
         '</div>'
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text style="color: teal; font-weight: bold;">Sale Price</text>'+'<br>'+
-            '<text id="frog_type">'+price+'Ξ</text>'+
+            '<text style="color: darkslategray; font-weight: bold;">Sale Price</text>'+'<br>'+
+            '<text id="frog_type" style="color: teal;">'+price+'Ξ</text>'+
         '</div>'
     bottom_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text style="color: teal; font-weight: bold;">Buyer</text>'+'<br>'+
-            '<text>'+truncateAddress(buyer_address)+'</text>'+
+            '<text style="color: darkslategray; font-weight: bold;">Buyer</text>'+'<br>'+
+            '<text style="color: teal;">'+truncateAddress(buyer_address)+'</text>'+
         '</div>'
     bottom_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text style="color: teal; font-weight: bold;">Seller</text>'+'<br>'+
-            '<text>'+truncateAddress(seller_address)+'</text>'+
+            '<text style="color: darkslategray; font-weight: bold;">Seller</text>'+'<br>'+
+            '<text style="color: teal;">'+truncateAddress(seller_address)+'</text>'+
         '</div>'
 
     // <-- Begin Element
@@ -595,7 +595,7 @@ async function render_token(token_id) {
     // Staked
     if (token_owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
         staked = 'True'
-        staked_status = 'teal'
+        staked_status = 'darkslategray'
         token_owner = await stakerAddress(token_id);
         staked_values = await stakingValues(token_id);
         staked_lvl = staked_values[1]
@@ -623,17 +623,17 @@ async function render_token(token_id) {
         '</div>'
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text style="color: teal; font-weight: bold;">Owned By</text>'+'<br>'+
+            '<text style="color: darkslategray; font-weight: bold;">Owned By</text>'+'<br>'+
             '<text id="frog_type">'+truncateAddress(token_owner)+'</text>'+
         '</div>'
     bottom_left = 
     '<div style="margin: 8px; float: right; width: 100px;">'+
-        '<text style="color: teal; font-weight: bold;">Next Level</text>'+'<br>'+
+        '<text style="color: darkslategray; font-weight: bold;">Next Level</text>'+'<br>'+
         '<text>'+staked_next_lvl+'</text>'+
     '</div>'
     bottom_right = 
     '<div style="margin: 8px; float: right; width: 100px;">'+
-        '<text style="color: teal; font-weight: bold;">Level</text>'+'<br>'+
+        '<text style="color: darkslategray; font-weight: bold;">Level</text>'+'<br>'+
         '<text>'+staked_lvl+'</text>'+
     '</div>'
 
