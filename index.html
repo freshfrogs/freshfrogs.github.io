@@ -103,22 +103,7 @@
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
   }
-  .frogImg4 {
-    transition: all .2s;
-    display: block;
-    image-rendering: pixelated;
-    overflow: hidden;
-    position: absolute;
-    width: 256px;
-    height: 256px;
-    border-radius: 100%;
-  }
-  .frogImg4:hover{
-    -ms-transform: scale(1.25); /* IE 9 */
-    -webkit-transform: scale(1.25); /* Safari 3-8 */
-    transform: scale(1.25);
-  }
-  .frogImg3 {
+  .attribute_overlay {
     transition: all .2s;
     display: block;
     image-rendering: pixelated;
@@ -129,12 +114,12 @@
     border-radius: 100%;
     cursor: pointer;
   }
-  .frogImg3:hover{
-    -ms-transform: scale(1.25); /* IE 9 */
-    -webkit-transform: scale(1.25); /* Safari 3-8 */
-    transform: scale(1.25);
+  .attribute_overlay:hover{
+    -ms-transform: scale(1); /* IE 9 */
+    -webkit-transform: scale(1); /* Safari 3-8 */
+    transform: scale(1);
   }
-  .frogImg5 {
+  .trait_overlay {
     transition: all .2s;
     display: block;
     image-rendering: pixelated;
@@ -144,16 +129,6 @@
     height: 128px;
     border-radius: 100%;
     cursor: pointer;
-  }
-  .frogImg6 {
-    transition: all .2s;
-    display: block;
-    image-rendering: pixelated;
-    overflow: hidden;
-    position: absolute;
-    width: 256px;
-    height: 256px;
-    border-radius: 100%;
   }
   .parentPanel {
     width: 70% !important;
@@ -299,17 +274,25 @@
       // -- >
 
       document.addEventListener("DOMContentLoaded", async () => {
-        // Random Frog Element:
-        document.getElementById('frog-logo').remove()
-        random_token = Math.floor(Math.random() * 4040) + 1;
-        // Update Metadata! Build Frog -->
-        let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+random_token+'.json')).json();
-        for (let i = 0; i < metadata.attributes.length; i++) {
-          let attribute = metadata.attributes[i]
-          loadTrait(attribute.trait_type, attribute.value, 'randomLogo');
+
+        async function build_random_logo () {
+          // Random Frog Element:
+          document.getElementById('randomLogo').innerHTML = ''
+          random_token = Math.floor(Math.random() * 4040) + 1;
+          // Update Metadata! Build Frog -->
+          let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+random_token+'.json')).json();
+          for (let i = 0; i < metadata.attributes.length; i++) {
+            let attribute = metadata.attributes[i]
+            loadTrait(attribute.trait_type, attribute.value, 'randomLogo');
+          }
+          var random_token_image = SOURCE_PATH+'/frog/'+random_token+'.png'
+          document.getElementById('randomLogo').style.backgroundImage = "url("+random_token_image+")";
         }
-        var random_token_image = SOURCE_PATH+'/frog/'+random_token+'.png'
-        document.getElementById('randomLogo').style.backgroundImage = "url("+random_token_image+")";
+
+        document.getElementById('randomLogo').onclick = async function (e) {
+          await build_random_logo();
+        }
+
         document.getElementById('connectButton').onclick = async function (e) {
           await initiate_web3_connection();
         }

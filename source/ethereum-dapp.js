@@ -426,7 +426,7 @@ async function render_token(token_id) {
         staked = 'True'
         staked_status = 'darkseagreen'
         token_owner = await stakerAddress(token_id);
-        staked_values = stakingValues(token_id);
+        staked_values = await stakingValues(token_id);
         staked_lvl = staked_values[1]
         staked_next_lvl = staked_values[2]
     } else {
@@ -604,8 +604,8 @@ function loadTrait(trait_type, attribute, location) {
     newAttribute = document.createElement("img");
     newAttribute.alt = attribute
 
-    if (trait_type == 'Trait') { newAttribute.className = "frogImg5"; } 
-    else { newAttribute.className = "frogImg3"; }
+    if (trait_type == 'Trait') { newAttribute.className = "trait_overlay"; } 
+    else { newAttribute.className = "attribute_overlay"; }
 
     newAttribute.src = SOURCE_PATH+"/frog/build_files/"+trait_type+"/"+attribute+".png";
     
