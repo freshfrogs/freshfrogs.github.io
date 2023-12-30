@@ -495,8 +495,13 @@ async function stakers(userAddress, _data) {
 // Render NFT token by layered attirubtes obtained through metadata.
 async function render_recently_sold(token) {
 
-    var { token_ids } = token
+    var { token_ids, seller_address, buyer_address, price } = token
+    console.log('=')
     console.log('Sale found! Frog #'+token_ids[0])
+    console.log('Buyer: '+truncateAddress(buyer_address))
+    console.log('Seller: '+truncateAddress(seller_address))
+    console.log('Sale Price: '+price)
+    console.log('=')
 
     /*
     var location = 'frogs'
