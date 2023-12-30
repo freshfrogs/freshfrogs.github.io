@@ -420,7 +420,7 @@ async function render_token(token_id) {
     let token_name = 'Frog #'+token_id
     let token_owner = await collection.methods.ownerOf(token_id).call();
 
-    if (token_owner == CONTROLLER_ADDRESS.toLowerCase()) {
+    if (token_owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
         staked = 'True'
         staked_status = 'darkseagreen'
         token_owner = await stakerAddress(token_id);
