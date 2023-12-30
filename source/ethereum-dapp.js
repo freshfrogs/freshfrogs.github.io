@@ -498,11 +498,17 @@ async function render_recently_sold(token) {
     var { token_ids, seller_address, buyer_address, price, block_timestamp } = token
     var token_id = token_ids[0]
     price = price / 1000000000000000000;
+    // timestamp
+
+    formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH);
+    timestamp = LocalDate.parse(block_timestamp, formatter);
+    
     console.log('=')
     console.log('Sale found! Frog #'+token_id)
     console.log('Buyer: '+truncateAddress(buyer_address))
     console.log('Seller: '+truncateAddress(seller_address))
     console.log('Sale Price: '+price)
+    console.log('Date: '+timestamp)
     console.log('=')
 
     var location = 'frogs'
@@ -513,7 +519,7 @@ async function render_recently_sold(token) {
     top_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
             '<text>Date</text>'+'<br>'+
-            '<text style="color: darkseagreen; font-weight: bold;">'+block_timestamp+'</text>'+
+            '<text style="color: darkseagreen; font-weight: bold;">'+timestamp+'</text>'+
         '</div>'
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
