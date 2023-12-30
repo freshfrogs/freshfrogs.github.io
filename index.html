@@ -293,7 +293,7 @@
 
         var intervalId = window.setInterval(async function(){
           await build_random_logo()
-        }, 30000);
+        }, 10000);
 
         document.getElementById('randomLogo').onclick = async function (e) {
           clearInterval(intervalId);
