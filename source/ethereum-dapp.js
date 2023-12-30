@@ -515,22 +515,22 @@ async function render_recently_sold(token) {
     // Render token information and data
     top_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text style="color: black; font-weight: bold;">Date</text>'+'<br>'+
+            '<text style="color: #1a202c; font-weight: bold;">Date</text>'+'<br>'+
             '<text style="color: teal;">'+timestamp+'</text>'+
         '</div>'
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text style="color: black; font-weight: bold;">Sale Price</text>'+'<br>'+
+            '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
             '<text id="frog_type" style="color: teal;">'+price+'Ξ</text>'+
         '</div>'
     bottom_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text style="color: black; font-weight: bold;">Seller</text>'+'<br>'+
+            '<text style="color: #1a202c; font-weight: bold;">Seller</text>'+'<br>'+
             '<text style="color: teal;">'+truncateAddress(seller_address)+'</text>'+
         '</div>'
     bottom_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text style="color: black; font-weight: bold;">Buyer</text>'+'<br>'+
+            '<text style="color: #1a202c; font-weight: bold;">Buyer</text>'+'<br>'+
             '<text style="color: teal;">'+truncateAddress(buyer_address)+'</text>'+
         '</div>'
 
@@ -595,7 +595,7 @@ async function render_token(token_id) {
     // Staked
     if (token_owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
         staked = 'True'
-        staked_status = 'black'
+        staked_status = '#1a202c'
         token_owner = await stakerAddress(token_id);
         staked_values = await stakingValues(token_id);
         staked_lvl = staked_values[1]
@@ -623,17 +623,17 @@ async function render_token(token_id) {
         '</div>'
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text style="color: black; font-weight: bold;">Owned By</text>'+'<br>'+
+            '<text style="color: #1a202c; font-weight: bold;">Owned By</text>'+'<br>'+
             '<text id="frog_type">'+truncateAddress(token_owner)+'</text>'+
         '</div>'
     bottom_left = 
     '<div style="margin: 8px; float: right; width: 100px;">'+
-        '<text style="color: black; font-weight: bold;">Next Level</text>'+'<br>'+
+        '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
         '<text>'+staked_next_lvl+'</text>'+
     '</div>'
     bottom_right = 
     '<div style="margin: 8px; float: right; width: 100px;">'+
-        '<text style="color: black; font-weight: bold;">Level</text>'+'<br>'+
+        '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
         '<text>'+staked_lvl+'</text>'+
     '</div>'
 
