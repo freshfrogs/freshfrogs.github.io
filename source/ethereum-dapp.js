@@ -659,7 +659,12 @@ async function render_token(token_id) {
         staked_status = 'tomato';
         staked_lvl = '--'
         staked_next_lvl = '--'
-        button_element = '';
+        if (token_owner.toLowerCase() == user_address.toLowerCase()) { 
+            button_element = // Un-stake button
+                '<div style="text-align: center;">'+
+                    '<button class="stake_button" onclick="initiate_stake('+token_id+')">Stake</button>'+
+                '</div>';
+        } else { button_element = ''; }
     }
 
     // Render token information and data
@@ -712,7 +717,7 @@ async function render_token(token_id) {
                         '<br>'+
                         bottom_left+
                         bottom_right+
-                    //    button_element+
+                        button_element+
                     '</div>'+
                 '</div>'+
             '</div>'+
