@@ -694,15 +694,51 @@ async function render_recently_sold(token) {
     for (let i = 0; i < metadata.attributes.length; i++) {
         let attribute = metadata.attributes[i]
         if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
-            var randomIndex = Math.floor(Math.random() * traitArray.length); 
-            var random = traitArray[randomIndex];
+
+            // get special dna from token id
+            randomFrog = Math.round(( token_id / 100 ) / 2.5)
+            if (randomFrog > frogArray.length) {
+                randomFrog = randomFrog - frogArray.length
+            }
+            frogdna = frogArray[randomFrog]
+            traitdna = traitArray[randomFrog]
             build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
-            build_trait('Trait', 'SpecialFrog/peace/'+random, 'cont_'+token_id);
+            build_trait('SpecialFrog', 'peace/'+frogdna, 'cont_'+token_id);
+            build_trait('Trait', 'SpecialFrog/peace/'+traitdna, 'cont_'+token_id);
         } else {
             build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
         }
     }
 }
+// randomFrog = (( token_id / 100 ) / 2.5) round up
+// frogdna = frogArray[randomFrog]
+var frogArray = [
+    'blueDartFrog',
+    'blueTreeFrog',
+    'brownTreeFrog',
+    'cyanTreeFrog',
+    'goldenDartFrog',
+    'goldenTreeFrog',
+    'grayTreeFrog',
+    'greenTreeFrog',
+    'lightBrownTreeFrog',
+    'orangeTreeFrog',
+    'pinkTreeFrog',
+    'purpleTreeFrog',
+    'redEyedTreeFrog',
+    'splendidTreeFrog',
+    'strawberryDartFrog',
+    'tomatoFrog',
+    'treeFrog(1)',
+    'treeFrog(2)',
+    'treeFrog(3)',
+    'treeFrog(4)',
+    'treeFrog(5)',
+    'treeFrog(6)',
+    'treeFrog(7)',
+    'treeFrog(8)',
+    'unknown'
+]
 
 var traitArray = [
     'blue(2)',
