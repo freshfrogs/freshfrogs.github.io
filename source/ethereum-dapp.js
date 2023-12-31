@@ -329,7 +329,7 @@ async function initiate_stake(token_id) {
     if (!approved) { alert('Before you can begin staking the contract must be given permission to acess your Frogs. See "🌱 Stake & Earn!" to learn more.'); return; }
 
     // Passed all requisites. Request user to confirm token ID
-    var input = prompt('📌 STAKE FROG #'+token_id+'\nWhile this Frog is staked you will not be able to sell it on secondary market places, like Rarible. To do this you will have to un-stake directly from this site. Once a frog is un-staked it""s level will reset to zero!\n'+'\nConfirm the ID of the Frog you would like to stake.\nToken ID: '+token_id);
+    var input = prompt('📌 STAKE FROG #'+token_id+'\nWhile this Frog is staked you will not be able to sell it on secondary market places, like Rarible. To do this you will have to un-stake directly from this site. Once a frog is un-staked it\'s level will reset to zero!\n'+'\nConfirm the ID of the Frog you would like to stake.\nToken ID: '+token_id);
     var input_id = parseInt(input)
     if (input !== null) {
         if (input_id !== token_id) {
@@ -499,7 +499,7 @@ async function initiate_setApprovalForAll() {
     var approval_status;
     let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
     if (is_approved) {approval_status = '🟢 TRUE'} else {approval_status = '🔴 FALSE'}
-    alert('📃 FreshFrogsNFT Staking\nStake your Frogs and start earning 🦟 $FLYZ! Staking works by sending your Frog to our smart contract that will keep it safe. Frogs that are staked can""t be listed on secondary market places, like Rarible.\n\n✍️ Sign Contract Approval\nTo start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.\n\nApproval Status: '+approval_status);
+    alert('📃 FreshFrogsNFT Staking\nStake your Frogs and start earning 🦟 $FLYZ! Staking works by sending your Frog to our smart contract that will keep it safe. Frogs that are staked can\'t be listed on secondary market places, like Rarible.\n\n✍️ Sign Contract Approval\nTo start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.\n\nApproval Status: '+approval_status);
     if (!is_approved) { 
         try {
 
