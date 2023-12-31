@@ -162,8 +162,8 @@ async function update_frontend() {
 
     // Prepare HTML Element
     var parent_element = document.getElementById('console');
-    break_element = document.createElement('br')
-    parent_element.appendChild(break_element)
+    //break_element = document.createElement('br')
+   // parent_element.appendChild(break_element)
 
     // Connected Button
     document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="connectedStatus"></div> Connected - ['+truncateAddress(user_address)+']'
