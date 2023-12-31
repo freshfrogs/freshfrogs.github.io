@@ -190,7 +190,7 @@ async function update_frontend() {
     holdingsLink.innerHTML = '<button class="connectButton" id="holdingsButton" >🍃 View Holdings</button>'
     holdingsLink.id = 'holdingsLink'
     holdingsLink.className = 'holdingsLink'
-    holdingsLink.href = 'https://freshfrogs.github.io/wallet/'
+    holdingsLink.href = 'https://freshfrogs.github.io/user/'
     parent_element.appendChild(holdingsLink)
 
     // Holdings Button | View holdings
