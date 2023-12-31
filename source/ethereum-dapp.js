@@ -293,10 +293,12 @@ async function mint(quantity, invite) {
 */
 
 async function initiate_stake(token_id) {
+    token_id = parseInt(token_id)
 
     // Token ID input
     var input_id = prompt("Please Note: \nWhile tokens are staked, you will not be able to sell them on secondary market places. To do this you will have to un-stake directly from this site. Once a token is un-staked it's staking level will reset to zero!\n"+"\nConfirm the ID of the token you would like to stake:\nToken ID: ");
-    if (input_id.parseInt() !== token_id.parseInt()) {
+    input_id = parseInt(input_id)
+    if (input_id !== token_id) {
         alert('TXN FAILED:\n Token IDs do not match! Please double check and try again!')
         return
     } else {
