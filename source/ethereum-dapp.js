@@ -162,8 +162,8 @@ async function update_frontend() {
 
     // Prepare HTML Element
     var parent_element = document.getElementById('console');
-    //break_element = document.createElement('br')
-    //parent_element.appendChild(break_element)
+    break_element = document.createElement('br')
+    parent_element.appendChild(break_element)
 
     // Connected Button
     document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="connectedStatus"></div> Connected - ['+truncateAddress(user_address)+']'
@@ -600,6 +600,7 @@ async function render_recently_sold(token) {
     for (let i = 0; i < metadata.attributes.length; i++) {
 
         let attribute = metadata.attributes[i]
+        if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') { frog_type = '' }
         build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
 
     }
