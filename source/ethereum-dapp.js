@@ -729,7 +729,7 @@ async function render_token(token_id) {
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
     var token_name = 'Frog #'+token_id
     var token_owner = await collection.methods.ownerOf(token_id).call();
-    var staked, staked_status, staked_values, staked_lvl, staked_next_lvl, button_element;
+    var staked, staked_status, staked_values, staked_lvl, staked_next_lvl, button_element, progress, progress_element;
 
     // Staked
     if (token_owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
@@ -739,6 +739,8 @@ async function render_token(token_id) {
         staked_values = await stakingValues(token_id);
         staked_lvl = staked_values[1]
         staked_next_lvl = staked_values[2].toString()+' days'
+        progress = staked_values[2] / 41.5
+        progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+' !important;"></div></div>'
         if (token_owner.toLowerCase() == user_address.toLowerCase()) { 
             button_element = // Un-stake button
                 '<div style="text-align: center;">'+
@@ -747,6 +749,7 @@ async function render_token(token_id) {
         } else { button_element = ''; }
     // NOT Staked
     } else {
+        progress_element = '';
         staked = 'False';
         staked_status = 'tomato';
         staked_lvl = '--'
@@ -809,7 +812,7 @@ async function render_token(token_id) {
                         '<br>'+
                         bottom_left+
                         bottom_right+
-                        '<b id="progress"></b><div id="myProgress"><div id="myBar"></div></div>'+
+                        progress_element+
                         button_element+
                     '</div>'+
                 '</div>'+
