@@ -103,13 +103,19 @@ async function initiate_web3_connection() {
     }
 }
 
-async function connect_user() {
-    try {
+function openInNewTab(url) {
+    window.open(url, '_blank').focus();
+}
 
+async function connect_user() {
+    try { // Connect wallet
         if (window.ethereum) {
             await window.ethereum.request({method: 'eth_requestAccounts'});
             web3 = new Web3(window.ethereum);
-        } else { return } // No wallet found.
+        } else { // No wallet found.
+            openInNewTab('https://www.coinbase.com/wallet/downloads')
+            return
+        }
 
         // Current user address
         user_address = await web3.currentProvider.selectedAddress;
