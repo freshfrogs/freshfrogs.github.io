@@ -35,9 +35,8 @@ async function fetch_recent_sales(ammount) {
     /*
         Five random secondary sales
         n = 5;
-        array = Array.from({ length: 50 }, (v, k) => k * 10); // [0,10,20,30,...,490]
-        var shuffled = array.sort(function(){ return 0.5 - Math.random() });
-        var selected = shuffled.slice(0,n);
+        shuffled = assets.sort(function(){ return 0.5 - Math.random() });
+        asset_tokens = shuffled.slice(0,n);
     */
     fetch('https://deep-index.moralis.io/api/v2.2/nft/'+COLLECTION_ADDRESS+'/trades?chain=eth&marketplace=opensea', options)
     .then((tokens) => tokens.json())
@@ -49,7 +48,7 @@ async function fetch_recent_sales(ammount) {
         if (! ammount) { asset_tokens = assets } 
         else { // Random Secondary Sales
             n = 5;
-            shuffled = assets.sort(function(){ return 0.5 - Math.random() });
+            shuffled = assets // assets.sort(function(){ return 0.5 - Math.random() });
             asset_tokens = shuffled.slice(0,n);
         }
 
