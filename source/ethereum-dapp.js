@@ -326,7 +326,7 @@ async function initiate_stake(token_id) {
 
     // Has the user approved the staking contract?
     let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-    if (!approved) { alert('Before you can begin staking the contract must be given permission to acess your Frogs. See "🌱 Stake & Earn!" to learn more.'); return; }
+    if (!approved) { alert('Before you can begin staking, the contract must be given permission to acess your Frogs. See "🌱 Stake & Earn!" to learn more.'); return; }
 
     // Passed all requisites. Request user to confirm token ID
     var input = prompt('📌 STAKE FROG #'+token_id+'\nWhile this Frog is staked you will not be able to sell it on secondary market places, like Rarible. To do this you will have to un-stake directly from this site. Once a frog is un-staked it\'s level will reset to zero!\n'+'\nConfirm the ID of the Frog you would like to stake.\nToken ID: '+token_id);
