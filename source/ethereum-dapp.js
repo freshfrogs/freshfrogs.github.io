@@ -58,6 +58,7 @@ async function fetch_recent_sales(ammount) {
         })
     })
     .then(async function() { // Load all recent secondary sales
+        if (! ammount) { return } 
         break_element = document.createElement('br')
         document.getElementById('frogs').appendChild(break_element)
         loadMore = document.createElement('button')
