@@ -308,7 +308,7 @@ async function mint(quantity, invite) {
 
 async function initiate_stake(token_id) {
 
-    console.log('this is a test')
+    console.log('this is a 2ND test')
 
     // Input token_id must be within range and be an integer
     token_id = parseInt(token_id)
@@ -332,7 +332,7 @@ async function initiate_stake(token_id) {
     // Passed all requisites. Request user to confirm token ID
     var input = prompt("PLEASE READ: \nWhile tokens are staked, you will not be able to sell them on secondary market places. To do this you will have to un-stake directly from this site. Once a token is un-staked it's staking level will reset to zero!\n"+"\nConfirm the ID of the token you would like to stake:\nToken ID: ");
     var input_id = parseInt(input)
-    if (typeof input !== "undefined") {
+    if (input !== null) {
         if (input_id !== token_id) {
             alert('TRANSACTION FAILED:\n Token IDs do not match! Please double check and try again!')
             return
