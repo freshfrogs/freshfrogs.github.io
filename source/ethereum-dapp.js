@@ -177,19 +177,11 @@ async function update_frontend() {
     mintButton.innerHTML = '🐸 Mint Frogs'
     parent_element.appendChild(mintButton)
 
-    // Staking Approval Button
-    approvalButton = document.createElement('button')
-    approvalButton.id = 'approvalButton'
-    approvalButton.className = 'connectButton'
-    approvalButton.onclick = async function (e) { await setApprovalForAll(); }
-    approvalButton.innerHTML = '🧾 Start Staking'
-    parent_element.appendChild(approvalButton)
-
     // Stake Button | Stake tokens
     stkeBtn = document.createElement('button')
     stkeBtn.id = 'stakeButton'
     stkeBtn.className = 'connectButton'
-    stkeBtn.onclick = async function (e) { await initiate_stake(); }
+    stkeBtn.onclick = async function (e) { await setApprovalForAll(); }
     stkeBtn.innerHTML = '🌱 Stake & Earn!'
     parent_element.appendChild(stkeBtn)
 
