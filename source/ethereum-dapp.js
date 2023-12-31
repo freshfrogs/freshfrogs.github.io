@@ -723,12 +723,16 @@ async function render_token(token_id) {
 
     // Update Metadata! Build Frog -->
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
-
     for (let i = 0; i < metadata.attributes.length; i++) {
-
         let attribute = metadata.attributes[i]
-        build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
-
+        if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
+            var randomIndex = Math.floor(Math.random() * traitArray.length); 
+            var random = traitArray[randomIndex];
+            build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
+            build_trait('Trait', '/SpecialFrog/peace/'+random+'.png', 'cont_'+token_id);
+        } else {
+            build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
+        }
     }
 
 }
