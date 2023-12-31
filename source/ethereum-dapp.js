@@ -196,7 +196,7 @@ async function update_frontend() {
     // Holdings Button | View holdings
     thePondButton = document.createElement('a')
     thePondButton.innerHTML = '<button class="connectButton" id="thePondButton" >🍀 The Pond</button>'
-    thePondButton.id = 'thePondButton'
+    thePondButton.id = 'thePondLink'
     thePondButton.className = 'thePondButton'
     thePondButton.href = 'https://freshfrogs.github.io/the-pond/'
     parent_element.appendChild(thePondButton)
