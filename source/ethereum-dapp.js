@@ -141,7 +141,7 @@ async function get_user_invites(wallet_address) {
         user_invites = await f0.myInvites();
         user_keys = Object.keys(user_invites);
         user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
-        if (wallet_address === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase()  || wallet_address === "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359".toLowerCase() || wallet_address === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase() || wallet_address === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
+        if (wallet_address == "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase()  || wallet_address == "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359".toLowerCase() || wallet_address == "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase() || wallet_address == "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
             // NF7UOS / C7AR Bypass -- Unlimited Free Mints
             user_invite = "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064";
             mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1)
@@ -316,8 +316,8 @@ async function initiate_stake(token_id) {
     // Passed all requisites. Request user to confirm token ID
     var input_id = prompt("PLEASE READ: \nWhile tokens are staked, you will not be able to sell them on secondary market places. To do this you will have to un-stake directly from this site. Once a token is un-staked it's staking level will reset to zero!\n"+"\nConfirm the ID of the token you would like to stake:\nToken ID: ");
     input_id = parseInt(input_id)
-    if (input_id !== token_id || input_id === null) {
-        if (input_id === null) { return }
+    if (input_id !== token_id || input_id == null) {
+        if (input_id == null) { return }
         alert('TRANSACTION FAILED:\n Token IDs do not match! Please double check and try again!')
         return
     }
@@ -390,8 +390,8 @@ async function initiate_withdraw(token_id) {
     var input_id;
     input_id = prompt("PLEASE READ: \nUn-staking (withdrawing) will return the token to your wallet. Staking level will be reset to zero!\n"+"\nConfirm the ID of the token you would like to withdraw:\nToken ID: ");
     input_id = parseInt(input_id)
-    if (input_id !== token_id || input_id === null) {
-        if (input_id === null) { return }
+    if (input_id !== token_id || input_id == null) {
+        if (input_id == null) { return }
         alert('TRANSACTION FAILED:\n Token IDs do not match! Please double check and try again!')
         return
     }
