@@ -107,9 +107,11 @@ async function initiate_web3_connection() {
 async function connect_user() {
     try {
 
-        // Create new WEB3 instance and request accounts from provider.
-        await ethereum.request({ method: "eth_requestAccounts" });
-        web3 = new Web3(window.ethereum);
+        web3 = require("web3");
+        if (window.ethereum) {
+            await window.ethereum.request({method: 'eth_requestAccounts'});
+            window.web3 = new Web3(window.ethereum);
+        }
 
         // Current user address
         user_address = await web3.currentProvider.selectedAddress;
