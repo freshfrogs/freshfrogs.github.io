@@ -739,8 +739,8 @@ async function render_token(token_id) {
         staked_values = await stakingValues(token_id);
         staked_lvl = staked_values[1]
         staked_next_lvl = staked_values[2].toString()+' days'
-        progress = staked_values[2] / 41.5
-        progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+' !important;"></div></div>'
+        progress = ( 41.7 - staked_values[2] ) / 41.7
+        progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>'
         if (token_owner.toLowerCase() == user_address.toLowerCase()) { 
             button_element = // Un-stake button
                 '<div style="text-align: center;">'+
