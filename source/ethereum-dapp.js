@@ -164,14 +164,6 @@ async function update_frontend() {
     mintButton.innerHTML = '🐸 Mint Frogs'
     parent_element.appendChild(mintButton)
 
-    // Holdings Button | View holdings
-    holdingsLink = document.createElement('a')
-    holdingsLink.innerHTML = '<button class="connectButton" id="holdingsButton" >🍃 View Holdings</button>'
-    holdingsLink.id = 'holdingsLink'
-    holdingsLink.className = 'holdingsLink'
-    holdingsLink.href = 'https://freshfrogs.github.io/wallet/'
-    parent_element.appendChild(holdingsLink)
-
     // Stake Button | Stake tokens
     stkeBtn = document.createElement('button')
     stkeBtn.id = 'stakeButton'
@@ -180,13 +172,30 @@ async function update_frontend() {
     stkeBtn.innerHTML = '🌱 Stake & Earn!'
     parent_element.appendChild(stkeBtn)
 
-    // The Pond | View all staked tokens
+    // Holdings Button | View holdings
+    holdingsLink = document.createElement('a')
+    holdingsLink.innerHTML = '<button class="connectButton" id="holdingsButton" >🍃 View Holdings</button>'
+    holdingsLink.id = 'holdingsLink'
+    holdingsLink.className = 'holdingsLink'
+    holdingsLink.href = 'https://freshfrogs.github.io/wallet/'
+    parent_element.appendChild(holdingsLink)
+
+    // Holdings Button | View holdings
+    thePondButton = document.createElement('a')
+    thePondButton.innerHTML = '<button class="connectButton" id="thePondButton" >🍀 The Pond</button>'
+    thePondButton.id = 'thePondButton'
+    thePondButton.className = 'thePondButton'
+    thePondButton.href = 'https://freshfrogs.github.io/the-pond/'
+    parent_element.appendChild(thePondButton)
+
+    /* // The Pond | View all staked tokens
     thePondButton = document.createElement('button')
     thePondButton.id = 'the-pond'
     thePondButton.className = 'connectButton'
     thePondButton.onclick = async function (e) { document.getElementById('frogs').innerHTML = ''; await fetch_tokens_by_owner(CONTROLLER_ADDRESS); }
-    thePondButton.innerHTML = '🍀 The Pond'
+    thePondButton.innerHTML = ''
     parent_element.appendChild(thePondButton)
+    */
 
 }
 
