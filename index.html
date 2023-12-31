@@ -346,7 +346,7 @@
           await fetch_recent_sales(5);
           // Stake Button | Stake tokens
           loadMore = document.createElement('button')
-          loadMore.id = 'stakeButton'
+          loadMore.id = 'loadMore'
           loadMore.className = 'connectButton'
           loadMore.onclick = async function (e) { document.getElementById('frogs').innerHTML = ''; await fetch_recent_sales(); }
           loadMore.innerHTML = 'Load More'
