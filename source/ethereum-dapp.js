@@ -6,8 +6,6 @@
 
 */
 
-const { set } = require("express/lib/response");
-
 // Public Variables
 var controller, 
 collection, 
