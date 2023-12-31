@@ -30,7 +30,7 @@ const options = {
   };
 
 
-async function fetch_recent_sales() {
+async function fetch_recent_sales(ammount) {
 
     /*
         Five random secondary sales
@@ -43,13 +43,16 @@ async function fetch_recent_sales() {
     .then((tokens) => tokens.json())
     .then((tokens) => {
         var assets = tokens.result
-        console.log('=- Loading recent secondary sales')
-        console.log(assets)
-        console.log('=- Total secondary sales: '+assets.length)
-
-        n = 5; // Random Secondary Sales
-        var shuffled = assets.sort(function(){ return 0.5 - Math.random() });
-        var asset_tokens = shuffled.slice(0,n);
+        var shuffled, asset_tokens;
+        
+        // all
+        if (ammount == 'all' || ! ammount) {
+            asset_tokens = assets
+        } else { // Random Secondary Sales
+            n = 5;
+            shuffled = assets.sort(function(){ return 0.5 - Math.random() });
+            asset_tokens = shuffled.slice(0,n);
+        }
 
         asset_tokens.forEach((frog) => {
             render_recently_sold(frog)
