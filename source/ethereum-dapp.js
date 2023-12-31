@@ -329,16 +329,32 @@ async function initiate_stake(token_id) {
 }
 
 async function stake(token_id) {
-    try { // Send Txn
-        
-        await send_write_transaction(controller.methods.stake(token_id))
+    try { 
+
+        // Estimate gas needed for transaction
+        var gasprice = await web3.eth.getGasPrice();
+        gasprice = Math.round(gasprice * 1.05);// to speed up 1.05 times..
+        var gas_estimate = await controller.methods.stake(token_id).estimateGas({ from: user_address }); 
+        gas_estimate = Math.round(gas_estimate * 1.05);
+        // Send transaction using gas estimate
+        var txn = await controller.methods.stake(token_id).send({ 
+            from: user_address, 
+            gas: web3.utils.toHex(gas_estimate), 
+            gasPrice:  web3.utils.toHex(gasprice),
+        })
+
+        // Transaction Sent
         .on('transactionHash', function(hash){
             return 'TRANSACTION SENT\n Transaction to stake Frog #'+token_id+' has been sent!';
         })
+
+        // Transaction Complete
         .on('receipt', function(receipt){
             console.log(receipt)
             return 'TRANSACTION COMPLETE\nFrog #'+token_id+' has succesfully been staked! :)\nCheck console for receipt details.'
         })
+        
+        // Transaction Error
         .on('error', function(error, receipt) {
             console.log(receipt)
             return 'TRANSACTION ERROR\nSomething went wrong when attempting to stake Frog #'+token_id+' :(\nCheck console for receipt details!'
@@ -383,15 +399,34 @@ async function initiate_withdraw(token_id) {
 
 }
 
-async function withdraw(tokenId) {
-    try { // Send Txn
-        await send_write_transaction(controller.methods.withdraw(tokenId))        .on('transactionHash', function(hash){
+async function withdraw(token_id) {
+    try { 
+
+        // Estimate gas needed for transaction
+        var gasprice = await web3.eth.getGasPrice();
+        gasprice = Math.round(gasprice * 1.05);// to speed up 1.05 times..
+        var gas_estimate = await controller.methods.withdraw(token_id).estimateGas({ from: user_address }); 
+        gas_estimate = Math.round(gas_estimate * 1.05);
+
+        // Send transaction using gas estimate
+        var txn = await controller.methods.withdraw(token_id).send({ 
+            from: user_address, 
+            gas: web3.utils.toHex(gas_estimate), 
+            gasPrice:  web3.utils.toHex(gasprice),
+        })
+
+        // Transaction sent
+        .on('transactionHash', function(hash){
             return 'TRANSACTION SENT\n Transaction to withdraw Frog #'+token_id+' has been sent!';
         })
+
+        // Transction complete
         .on('receipt', function(receipt){
             console.log(receipt)
             return 'TRANSACTION COMPLETE\nFrog #'+token_id+' has succesfully been withdrawn from the staking contract.\nCheck console for receipt details.'
         })
+
+        // Transaction error
         .on('error', function(error, receipt) {
             console.log(receipt)
             return 'TRANSACTION ERROR\nSomething went wrong when attempting to withdraw Frog #'+token_id+' :(\nCheck console for receipt details!'
@@ -804,7 +839,7 @@ async function send_write_transaction(contract_method) {
         }).then(function(hashdata){ 
             console.log(hashdata) 
             return hashdata.message
-        }) 
+        })
     } catch (e) {
         console.log(e.message);
         return e.message
