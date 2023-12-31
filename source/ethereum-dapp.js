@@ -499,17 +499,8 @@ async function render_recently_sold(token) {
 
     var { token_ids, seller_address, buyer_address, price, block_timestamp } = token
     var token_id = token_ids[0]
-    price = price / 1000000000000000000;
-    timestamp = block_timestamp.substring(0, 10);
-    
-    console.log('=')
-    console.log('Sale found! Frog #'+token_id)
-    console.log('Buyer: '+truncateAddress(buyer_address))
-    console.log('Seller: '+truncateAddress(seller_address))
-    console.log('Sale Price: '+price)
-    console.log('Date: '+timestamp)
-    console.log('=')
-
+    var sale_price = price / 1000000000000000000;
+    var timestamp = block_timestamp.substring(0, 10);
     var location = 'frogs'
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
     var token_name = 'Frog #'+token_id
@@ -523,7 +514,7 @@ async function render_recently_sold(token) {
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
             '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
-            '<text id="frog_type" style="color: teal;">'+price+'Ξ</text>'+
+            '<text id="frog_type" style="color: teal;">'+sale_price+'Ξ</text>'+
         '</div>'
     bottom_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
