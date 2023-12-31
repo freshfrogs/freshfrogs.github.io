@@ -107,11 +107,10 @@ async function initiate_web3_connection() {
 async function connect_user() {
     try {
 
-        web3 = require("web3");
         if (window.ethereum) {
             await window.ethereum.request({method: 'eth_requestAccounts'});
-            window.web3 = new Web3(window.ethereum);
-        }
+            web3 = new Web3(window.ethereum);
+        } else { return } // No wallet found.
 
         // Current user address
         user_address = await web3.currentProvider.selectedAddress;
