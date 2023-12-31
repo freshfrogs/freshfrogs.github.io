@@ -555,7 +555,7 @@ async function render_recently_sold(token) {
                 '<div class="innerRight">'+
                     '<div id="traits_'+token_id+'" class="trait_list">'+
                         //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
-                        '<strong>'+token_name+'</strong> <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+                        '<strong><u>'+token_name+'</u></strong> <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
                     '</div>'+
                     '<div id="prop_'+token_id+'" class="properties">'+
                         top_right+
@@ -658,7 +658,7 @@ async function render_token(token_id) {
                 '<div class="innerRight">'+
                     '<div id="traits_'+token_id+'" class="trait_list">'+
                         //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
-                        '<strong>'+token_name+'</strong> <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+                        '<strong><u>'+token_name+'</u></strong> <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
                     '</div>'+
                     '<div id="prop_'+token_id+'" class="properties">'+
                         top_right+
