@@ -349,7 +349,7 @@
           loadMore.id = 'loadMore'
           loadMore.className = 'connectButton'
           loadMore.onclick = async function (e) { document.getElementById('frogs').innerHTML = ''; await fetch_recent_sales(); }
-          loadMore.innerHTML = 'Load More'
+          loadMore.innerHTML = '<b>⟳</b> Load More'
           document.getElementById('frogs').appendChild(loadMore)
         } catch (e) { console.log('Failed to fetch recent sales! '+e.message) }
 
