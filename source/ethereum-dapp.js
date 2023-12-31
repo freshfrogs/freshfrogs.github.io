@@ -750,9 +750,9 @@ var star_frogs = [
     '2553'
 ]
 var animated = [
-    'witchStraw',
-    'witchBrown',
-    'witchBlack',
+    //'witchStraw',
+    //'witchBrown',
+    //'witchBlack',
     'blueDartFrog',
     'blueTreeFrog',
     'brownTreeFrog',
