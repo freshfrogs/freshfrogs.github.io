@@ -729,7 +729,7 @@ async function render_token(token_id) {
             var randomIndex = Math.floor(Math.random() * traitArray.length); 
             var random = traitArray[randomIndex];
             build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
-            build_trait('Trait', 'SpecialFrog/peace/'+random+'.png', 'cont_'+token_id);
+            build_trait('Trait', 'SpecialFrog/peace/'+random, 'cont_'+token_id);
         } else {
             build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
         }
