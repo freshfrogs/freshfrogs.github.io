@@ -499,7 +499,7 @@ async function initiate_setApprovalForAll() {
 
     // Check Approval Status
     let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-    alert('📃 FreshFrogsNFT Staking Contract \nBefore you can begin staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.\n\nAproval Status: '+is_approved.toString().toUpperCase());
+    alert('📃 FreshFrogsNFT Staking Contract\nStake your NFTs and start earning $FLYZ! Staking works by sending your Frog to our smart contract that will keep it safe, these Frogs will not be able to be listed on secondary market places, like Rarible.\nBefore you can begin staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.\n\nAproval Status: '+is_approved.toString().toUpperCase());
     if (!is_approved) { 
         try {
 
