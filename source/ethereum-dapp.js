@@ -180,6 +180,14 @@ async function update_frontend() {
     stkeBtn.innerHTML = '🌱 Stake & Earn!'
     parent_element.appendChild(stkeBtn)
 
+    // The Pond | All staked tokens
+    thePondButton = document.createElement('div')
+    thePondButton.onclick = async function (e) { document.getElementById('frogs').innerHTML = ''; await fetch_tokens_by_owner(CONTROLLER_ADDRESS); }
+    thePondButton.innerHTML = '🍀 The Pond'
+    thePondButton.id = 'the-pond'
+    thePondButton.className = 'the-pond'
+    parent_element.appendChild(thePondButton)
+
 }
 
 /* // Get staked token ID's
