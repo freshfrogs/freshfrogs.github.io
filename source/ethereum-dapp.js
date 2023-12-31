@@ -330,7 +330,7 @@ async function initiate_stake(token_id) {
 
 async function stake(token_id) {
     try { 
-
+        console.log('stake transaction')
         // Estimate gas needed for transaction
         var gasprice = await web3.eth.getGasPrice();
         gasprice = Math.round(gasprice * 1.05);// to speed up 1.05 times..
@@ -353,7 +353,7 @@ async function stake(token_id) {
             console.log(receipt)
             return 'TRANSACTION COMPLETE\nFrog #'+token_id+' has succesfully been staked! :)\nCheck console for receipt details.'
         })
-        
+
         // Transaction Error
         .on('error', function(error, receipt) {
             console.log(receipt)
