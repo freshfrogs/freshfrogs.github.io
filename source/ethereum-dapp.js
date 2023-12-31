@@ -55,7 +55,17 @@ async function fetch_recent_sales(ammount) {
 
         asset_tokens.forEach((frog) => {
             render_recently_sold(frog)
-        }) })
+        })
+    })
+    .then(async function() {
+        // Stake Button | Stake tokens
+        loadMore = document.createElement('button')
+        loadMore.id = 'loadMore'
+        loadMore.className = 'connectButton'
+        loadMore.onclick = async function (e) { document.getElementById('frogs').innerHTML = ''; await fetch_recent_sales(); }
+        loadMore.innerHTML = '<b>⟳</b> Load More'
+        document.getElementById('frogs').appendChild(loadMore)
+      })
 }
 
 async function fetch_tokens_by_owner(wallet) {
