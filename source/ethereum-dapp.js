@@ -404,7 +404,7 @@ async function initiate_withdraw(token_id) {
     if (!approved) { alert('TRANSACTION FAILED:\n Staking contract is missing approval!'); return; }
 
     // Passed all requisites. Request user to confirm token ID
-    var input = prompt('✂️ WITHDRAW FROG #'+token_id+'Un-staking (withdrawing) this Frog will return it to your wallet. The staking level will be reset to zero!\n'+'\nConfirm the ID of the token you would like to withdraw.\nToken ID: '+token_id);
+    var input = prompt('✂️ WITHDRAW FROG #'+token_id+'\nUn-staking (withdrawing) this Frog will return it to your wallet. The staking level will be reset to zero!\n'+'\nConfirm the ID of the token you would like to withdraw.\nToken ID: '+token_id);
     var input_id = parseInt(input)
     if (input !== null) {
         if (input_id !== token_id) {
@@ -463,48 +463,56 @@ async function withdraw(token_id) {
     checkApproval | check staking contract approval
 
 */
+
 async function setApprovalForAll() {
+    // Estimate gas needed for transaction
+    var gasprice = await web3.eth.getGasPrice();
+    gasprice = Math.round(gasprice * 1.05);// to speed up 1.05 times..
+    var gas_estimate = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address }).estimateGas({ from: user_address }); 
+    gas_estimate = Math.round(gas_estimate * 1.05);
+
+    // Send transaction using gas estimate
+    var txn = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address }).send({ 
+        from: user_address, 
+        gas: web3.utils.toHex(gas_estimate), 
+        gasPrice:  web3.utils.toHex(gasprice),
+    })
+
+    // Transaction sent
+    .on('transactionHash', function(hash){
+        return 'TRANSACTION SENT\n Transaction to approve staking has been sent!';
+    })
+
+    // Transction complete
+    .on('receipt', function(receipt){
+        console.log(receipt)
+        return 'TRANSACTION COMPLETE\nYou are now able to stake your Frogs and start earning $FLYZ!'
+    })
+
+    // Transaction error
+    .on('error', function(error, receipt) {
+        console.log(receipt)
+        return 'TRANSACTION ERROR\nSomething went wrong when attempting to approve the staking contract. :(\nCheck console for receipt details!'
+    });
+}
+async function initiate_setApprovalForAll() {
 
     // Check Approval Status
     let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+    alert('📃 FreshFrogsNFT Staking Contract \nBefore you can begin staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.\n\nAproval Status: '+is_approved.toString().toUpperCase());
     if (!is_approved) { 
         try {
 
-            // Estimate gas needed for transaction
-            var gasprice = await web3.eth.getGasPrice();
-            gasprice = Math.round(gasprice * 1.05);// to speed up 1.05 times..
-            var gas_estimate = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address }).estimateGas({ from: user_address }); 
-            gas_estimate = Math.round(gas_estimate * 1.05);
-
-            // Send transaction using gas estimate
-            var txn = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address }).send({ 
-                from: user_address, 
-                gas: web3.utils.toHex(gas_estimate), 
-                gasPrice:  web3.utils.toHex(gasprice),
-            })
-
-            // Transaction sent
-            .on('transactionHash', function(hash){
-                return 'TRANSACTION SENT\n Transaction to approve staking has been sent!';
-            })
-
-            // Transction complete
-            .on('receipt', function(receipt){
-                console.log(receipt)
-                return 'TRANSACTION COMPLETE\nYou can now stake your FreshFrog NFTS!'
-            })
-
-            // Transaction error
-            .on('error', function(error, receipt) {
-                console.log(receipt)
-                return 'TRANSACTION ERROR\nSomething went wrong when attempting to approve the staking contract. :(\nCheck console for receipt details!'
-            });
+            // Submit Txn
+            let setApproval_txn = await setApprovalForAll();
+            alert(setApproval_txn);
+            return
 
         // Catch Errors
         } catch (e) { return 'TRANSACTION FAILED:\n '+e.message; }
     
     // Already Approved
-    } else { return true; }
+    } else { return; }
 }
 
 async function checkApproval() {
