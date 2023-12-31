@@ -397,7 +397,8 @@ async function initiate_withdraw(token_id) {
     if (!approved) { return 'TRANSACTION FAILED:\n Staking contract is missing approval!'; }
 
     // Passed all requisites. Request user to confirm token ID
-    var input_id = prompt("PLEASE READ: \nUn-staking (withdrawing) will return the token to your wallet. Staking level will be reset to zero!\n"+"\nConfirm the ID of the token you would like to withdraw:\nToken ID: ");
+    var input_id;
+    input_id = prompt("PLEASE READ: \nUn-staking (withdrawing) will return the token to your wallet. Staking level will be reset to zero!\n"+"\nConfirm the ID of the token you would like to withdraw:\nToken ID: ");
     input_id = parseInt(input_id)
     if (input_id !== token_id || input_id === null) {
         if (input_id === null) { return }
