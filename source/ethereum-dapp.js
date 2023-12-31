@@ -809,6 +809,7 @@ async function render_token(token_id) {
                         '<br>'+
                         bottom_left+
                         bottom_right+
+                        '<b id="progress"></b><div id="myProgress"><div id="myBar"></div></div>'+
                         button_element+
                     '</div>'+
                 '</div>'+
