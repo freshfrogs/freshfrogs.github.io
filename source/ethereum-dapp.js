@@ -330,8 +330,8 @@ async function initiate_stake(token_id) {
 }
 
 async function stake(token_id) {
-    try { 
-        console.log('stake transaction')
+    try {
+        
         // Estimate gas needed for transaction
         var gasprice = await web3.eth.getGasPrice();
         gasprice = Math.round(gasprice * 1.05);// to speed up 1.05 times..
