@@ -713,9 +713,9 @@ async function render_token(token_id) {
 async function send_write_transaction(contract_method) {
     try {
         var gasprice = await web3.eth.getGasPrice();
-        gasprice = Math.round(gasprice * 1.2);// to speed up 1.2 times..
+        gasprice = Math.round(gasprice * 1.05);// to speed up 1.05 times..
         var gas_estimate = await contract_method.estimateGas({ from: user_address }); 
-        gas_estimate = Math.round(gas_estimate * 1.2);
+        gas_estimate = Math.round(gas_estimate * 1.05);
         var txn = await contract_method.send({ 
             from: user_address, 
             gas: web3.utils.toHex(gas_estimate), 
