@@ -57,8 +57,9 @@ async function fetch_recent_sales(ammount) {
             render_recently_sold(frog)
         })
     })
-    .then(async function() {
-        // Stake Button | Stake tokens
+    .then(async function() { // Load all recent secondary sales
+        break_element = document.createElement('br')
+        document.getElementById('frogs').appendChild(break_element)
         loadMore = document.createElement('button')
         loadMore.id = 'loadMore'
         loadMore.className = 'connectButton'
