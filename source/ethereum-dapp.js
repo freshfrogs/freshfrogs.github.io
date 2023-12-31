@@ -725,12 +725,10 @@ async function render_recently_sold(token) {
 // frogdna = frogArray[randomFrog]
 var frogArray = [
     'blueDartFrog',
-    'blueTreeFrog',
     'brownTreeFrog',
     'cyanTreeFrog',
     'goldenDartFrog',
     'goldenTreeFrog',
-    'grayTreeFrog',
     'greenTreeFrog',
     'lightBrownTreeFrog',
     'orangeTreeFrog',
@@ -740,14 +738,6 @@ var frogArray = [
     'splendidTreeFrog',
     'stawberryDartFrog',
     'tomatoFrog',
-    'treeFrog(1)',
-    'treeFrog(2)',
-    'treeFrog(3)',
-    'treeFrog(4)',
-    'treeFrog(5)',
-    'treeFrog(6)',
-    'treeFrog(7)',
-    'treeFrog(8)',
     'unknown'
 ]
 
