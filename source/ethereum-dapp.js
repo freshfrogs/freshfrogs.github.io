@@ -353,7 +353,7 @@ async function initiate_withdraw(token_id) {
     if (Number.isInteger(token_id) == false || token_id > 4040 || token_id < 1) { return 'TXN FAILED:\n Invalid token ID!'; }
 
     // Is this token currently staked? Does it belond to the user?
-    let token_owner = stakerAddress(token_id);
+    let token_owner = await stakerAddress(token_id);
     if (!token_owner) { return 'TRANSACTION FAILED:\n Token #'+token_id+' is not currently staked!'; } 
     else if (token_owner.toLowerCase() !== user_address.toLowerCase()) { return 'TRANSACTION FAILED:\n Token #'+token_id+' does not belong to user!'; }
 
