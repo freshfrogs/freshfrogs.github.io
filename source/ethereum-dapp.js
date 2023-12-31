@@ -759,9 +759,9 @@ var star_frogs = [
     '2553'
 ]
 var animated = [
-    //'witchStraw',
-    //'witchBrown',
-    //'witchBlack',
+    'witchStraw',
+    'witchBrown',
+    'witchBlack',
     'blueDartFrog',
     'blueTreeFrog',
     'brownTreeFrog',
@@ -793,7 +793,9 @@ var animated = [
     'blue(2)',
     'blue',
     'cyan',
-    'brown'
+    'brown',
+    'silverEthChain',
+    'goldDollarChain'
 ]
 
 // build_trait(_trait(family), _attribute(type), _where(element))
