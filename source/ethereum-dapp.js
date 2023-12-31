@@ -697,8 +697,11 @@ async function render_recently_sold(token) {
 
             // get special dna from token id
             randomFrog = Math.round(( token_id / 100 ) / 2.5)
-            if (randomFrog > frogArray.length) { randomFrog = frogArray.length } 
-            else if (randomFrog < 1) { randomFrog = 0 }
+            console.log('peace Frog #'+token_id)
+            console.log(token_id+' / 100 = '+(token_id / 100))
+            console.log((token_id / 100)+'/ 2.5 = '+((token_id / 100)/2.5))
+            console.log('Final: '+Math.round(( token_id / 100 ) / 2.5))
+            if (randomFrog < 1) { randomFrog = 0 }
             frogdna = frogArray[randomFrog]
             traitdna = traitArray[randomFrog]
             build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
