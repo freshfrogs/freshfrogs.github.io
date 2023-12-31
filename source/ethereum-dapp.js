@@ -293,52 +293,51 @@ async function mint(quantity, invite) {
 */
 
 async function initiate_stake(token_id) {
-    token_id = parseInt(token_id)
 
-    // Token ID input
+    // Input token_id must be within range and be an integer
+    token_id = parseInt(token_id)
+    if (Number.isInteger(token_id) == false || token_id > 4040 || token_id < 1) { return 'TXN FAILED:\n Invalid token ID!'; }
+
+    // Does the user own this token?
+    let token_owner = await collection.methods.ownerOf(token_id).call();
+    if (token_owner !== user_address) {
+        // Is this token already staked?
+        if (token_owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
+            return 'TRANSACTION FAILED:\n Token #'+token_id+' is already staked!';
+        } else {
+            return 'TRANSACTION FAILED:\n Token #'+tokenId+' does not belong to user!';
+        }
+    }
+
+    // Has the user approved the staking contract?
+    let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
+    if (!approved) { return 'TXN FAILED:\n Staking contract is missing approval!'; }
+
+    // Passed all requisites. Request user to confirm token ID
     var input_id = prompt("Please Note: \nWhile tokens are staked, you will not be able to sell them on secondary market places. To do this you will have to un-stake directly from this site. Once a token is un-staked it's staking level will reset to zero!\n"+"\nConfirm the ID of the token you would like to stake:\nToken ID: ");
     input_id = parseInt(input_id)
     if (input_id !== token_id) {
         alert('TXN FAILED:\n Token IDs do not match! Please double check and try again!')
         return
-    } else {
-        // Submit Txn
-        let stake_txn = await stake(token_id);
-        alert(stake_txn);
-        return
     }
+
+    // Submit txn for approval
+    let stake_txn = await stake(token_id);
+    alert(stake_txn);
+    return
+
 }
 
-async function stake(tokenId) {
+async function stake(token_id) {
+    try { // Send Txn
+        
+        let stake = await send_write_transaction(controller.methods.stake(token_id))
+        // let stake = await controller.methods.stake(token_id).send({ from: user_address });
+        console.log(stake)
+        return stake;
 
-    tokenId = parseInt(tokenId)
-
-    if (Number.isInteger(tokenId) == false || tokenId > 4040 || tokenId < 1) { return 'TXN FAILED:\n Invalid token ID!'; }
-
-    // Check Ownership / Approval Status
-    let owner = await collection.methods.ownerOf(tokenId).call();
-    let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-    if (!approved) { return 'TXN FAILED:\n Staking contract is missing approval!'; }
-
-    // Valid ownership
-    if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
-        try {
-
-            // Send Txn
-            let stake = await send_write_transaction(controller.methods.stake(tokenId)) // await controller.methods.stake(tokenId).send({ from: user_address });
-            console.log(stake)
-            return stake;
-
-        // Catch Errors
-        } catch (e) { return 'TXN FAILED:\n '+e.message; }
-
-    // Token already Staked
-    } else if (owner.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) {
-        return 'TXN FAILED:\n Token #'+tokenId+' is already staked!';
-    } 
-
-    // Invalid Ownership
-    else { return 'TXN FAILED:\n Token #'+tokenId+' does not belong to user!'; }
+    // Catch Errors
+    } catch (e) { return 'TXN FAILED:\n '+e.message; }
 }
 
 /*
