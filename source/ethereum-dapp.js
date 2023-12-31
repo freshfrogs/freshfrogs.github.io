@@ -697,10 +697,6 @@ async function render_recently_sold(token) {
 
             // get special dna from token id
             randomFrog = Math.round(( token_id / 100 ) / 2.5)
-            console.log('peace Frog #'+token_id)
-            console.log(token_id+' / 100 = '+(token_id / 100))
-            console.log((token_id / 100)+'/ 2.5 = '+((token_id / 100)/2.5))
-            console.log('Final: '+Math.round(( token_id / 100 ) / 2.5))
             if (randomFrog < 1) { randomFrog = 0 }
             frogdna = frogArray[randomFrog]
             traitdna = traitArray[randomFrog]
@@ -868,10 +864,15 @@ async function render_token(token_id) {
     for (let i = 0; i < metadata.attributes.length; i++) {
         let attribute = metadata.attributes[i]
         if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
-            var randomIndex = Math.floor(Math.random() * traitArray.length); 
-            var random = traitArray[randomIndex];
+
+            // get special dna from token id
+            randomFrog = Math.round(( token_id / 100 ) / 2.5)
+            if (randomFrog < 1) { randomFrog = 0 }
+            frogdna = frogArray[randomFrog]
+            traitdna = traitArray[randomFrog]
             build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
-            build_trait('Trait', 'SpecialFrog/peace/'+random, 'cont_'+token_id);
+            build_trait('SpecialFrog', 'peace/'+frogdna, 'cont_'+token_id);
+            build_trait('Trait', 'SpecialFrog/peace/'+traitdna, 'cont_'+token_id);
         } else {
             build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
         }
