@@ -307,10 +307,10 @@
             build_trait(attribute.trait_type, attribute.value, 'randomLogo');
           }
           var random_token_image = SOURCE_PATH+'/frog/'+random_token+'.png'
+          document.getElementById('randomLogo').style.backgroundImage = "url("+random_token_image+")";
         }
 
-        await build_random_logo();
-        document.getElementById('randomLogo').style.backgroundImage = "url("+random_token_image+")";
+        await build_random_logo()
 
         var intervalId = window.setInterval(async function(){
           await build_random_logo()
