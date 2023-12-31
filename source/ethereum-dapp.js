@@ -700,7 +700,6 @@ async function render_recently_sold(token) {
             if (randomFrog < 1) { randomFrog = 0 }
             frogdna = frogArray[randomFrog]
             traitdna = traitArray[randomFrog]
-            build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
             build_trait('SpecialFrog', 'peace/'+frogdna, 'cont_'+token_id);
             build_trait('Trait', 'SpecialFrog/peace/'+traitdna, 'cont_'+token_id);
         } else {
@@ -725,7 +724,7 @@ var frogArray = [
     'purpleTreeFrog',
     'redEyedTreeFrog',
     'splendidTreeFrog',
-    'strawberryDartFrog',
+    'stawberryDartFrog',
     'tomatoFrog',
     'treeFrog(1)',
     'treeFrog(2)',
@@ -870,7 +869,6 @@ async function render_token(token_id) {
             if (randomFrog < 1) { randomFrog = 0 }
             frogdna = frogArray[randomFrog]
             traitdna = traitArray[randomFrog]
-            build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
             build_trait('SpecialFrog', 'peace/'+frogdna, 'cont_'+token_id);
             build_trait('Trait', 'SpecialFrog/peace/'+traitdna, 'cont_'+token_id);
         } else {
