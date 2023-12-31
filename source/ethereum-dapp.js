@@ -354,7 +354,7 @@ async function initiate_withdraw(token_id) {
 
     // Is this token currently staked? Does it belond to the user?
     let token_owner = stakerAddress(token_id);
-    if (! token_owner) { return 'TRANSACTION FAILED:\n Token #'+token_id+' is not currently staked!'; } 
+    if (!token_owner) { return 'TRANSACTION FAILED:\n Token #'+token_id+' is not currently staked!'; } 
     else if (token_owner.toLowerCase() !== user_address.toLowerCase()) { return 'TRANSACTION FAILED:\n Token #'+token_id+' does not belong to user!'; }
 
     // Has the user approved the staking contract?
