@@ -641,9 +641,9 @@ async function render_token(token_id) {
         '<div class="display_token_cont">'+
             '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
                 '<div class="innerLeft">'+
-                    '<a href="https://rarible.com/token/'+COLLECTION_ADDRESS+':'+token_id+'" target="_blank" class="display_token_img_cont" id="cont_'+token_id+'" onclick="render_display('+token_id+')">'+
+                    '<div href="https://rarible.com/token/'+COLLECTION_ADDRESS+':'+token_id+'" target="_blank" class="display_token_img_cont" id="cont_'+token_id+'" onclick="render_display('+token_id+')">'+
                         //'<img src="'+image_link+'" class="displayImage"/>'+
-                    '</a>'+
+                    '</div>'+
                 '</div>'+
             '</div>'+
             '<div class="renderRight">'+
