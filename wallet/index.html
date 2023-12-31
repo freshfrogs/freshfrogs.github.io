@@ -311,6 +311,8 @@
       // -- >
 
       document.addEventListener("DOMContentLoaded", async () => {
+
+        await build_random_logo()
         await initiate_web3_connection().then(async function(){ await fetch_tokens_by_owner(user_address); })
         //document.getElementById('mintButton').remove()
         document.getElementById('holdingsButton').style.boxShadow = '2px 2px lightsalmon'
@@ -328,8 +330,6 @@
           var random_token_image = SOURCE_PATH+'/frog/'+random_token+'.png'
           document.getElementById('randomLogo').style.backgroundImage = "url("+random_token_image+")";
         }
-
-        await build_random_logo()
 
         var intervalId = window.setInterval(async function(){
           await build_random_logo()
