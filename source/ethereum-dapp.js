@@ -188,7 +188,7 @@ async function update_frontend() {
     mintButton = document.createElement('button')
     mintButton.id = 'mintButton'
     mintButton.className = 'connectButton'
-    mintButton.onclick = async function (e) { await initiate_mint(1); }
+    mintButton.onclick = async function (e) { await initiate_mint(); }
     mintButton.innerHTML = '🐸 Mint Frogs'
     parent_element.appendChild(mintButton)
 
@@ -283,11 +283,12 @@ async function held_tokens_by_wallet(wallet_address) {
 async function initiate_mint() {
 
     // Token ID input
-    var mint_quantity = prompt("Frog #"+next_id+" out of 4,040 is available to mint! \nMint limit of "+mint_limit+" Frogs per wallet! \nHow many Frogs would you like to mint? ("+mint_price+"Ξ each + gas fee)");
-
-    // Submit Txn
-    let mint_txn = await mint(mint_quantity, user_invite);
-    alert(mint_txn);
+    var input_quantity = prompt('🐸 FreshFrogsNFT (FROG)\n Total Supply\n'+next_id+' / 4040\n\nMint Price\n'+mint_price+'\n\nMint Limit\n'+mint_limit+'\n\nHow many Frogs would you like to mint? ('+mint_price+'Ξ each + gas fee)') // prompt("Frog #"+next_id+" out of 4,040 is available to mint! \nMint limit of "+mint_limit+" Frogs per wallet! \nHow many Frogs would you like to mint? ("+mint_price+"Ξ each + gas fee)");
+    if (input_quantity !== null) {
+        mint_quantity = parseInt(input_quantity)
+        let mint_txn = await mint(mint_quantity, user_invite);
+        alert(mint_txn);
+    }
 
 }
 
