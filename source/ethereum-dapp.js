@@ -800,7 +800,7 @@ var animated = [
 // build_trait(_trait(family), _attribute(type), _where(element))
 function build_trait(trait_type, attribute, location) {
     newAttribute = document.createElement("img");
-    if (trait_type == 'Trait') { newAttribute.className = "trait_overlay"; } 
+    if (trait_type == 'Trait' || trait_type == 'Frog' || trait_type == 'SpecialFrog') { newAttribute.className = "trait_overlay"; } 
     else { newAttribute.className = "attribute_overlay"; }
     newAttribute.src = SOURCE_PATH+"/frog/build_files/"+trait_type+"/"+attribute+".png";
     for (y = 0; y < animated.length; y++) {
