@@ -393,7 +393,7 @@ async function initiate_withdraw(token_id) {
     var input_id;
     input_id = prompt("PLEASE READ: \nUn-staking (withdrawing) will return the token to your wallet. Staking level will be reset to zero!\n"+"\nConfirm the ID of the token you would like to withdraw:\nToken ID: ");
     input_id = parseInt(input_id)
-    if( isEmpty(input_id) ) { return }
+    if (input_id.isEmpty() || input_id === null) { console.log('withdraw: empty'); return }
     if (input_id !== token_id) {
         alert('TRANSACTION FAILED:\n Token IDs do not match! Please double check and try again!')
         return
