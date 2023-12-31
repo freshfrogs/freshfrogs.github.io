@@ -329,7 +329,7 @@ async function initiate_stake(token_id) {
 
     // Has the user approved the staking contract?
     let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-    if (!approved) { alert('MISSING APPROVAL:\n The FreshFrogsController smart contract must first be approved before you can begin staking!\n See "🌱 Stake & Earn!" to learn more.'); }
+    if (!approved) { alert('Before you can begin staking the contract must be given permission to acess your Frogs. See "🌱 Stake & Earn!" to learn more.'); }
 
     // Passed all requisites. Request user to confirm token ID
     var input = prompt("PLEASE READ: \nWhile tokens are staked, you will not be able to sell them on secondary market places. To do this you will have to un-stake directly from this site. Once a token is un-staked it's staking level will reset to zero!\n"+"\nConfirm the ID of the token you would like to stake:\nToken ID: ");
