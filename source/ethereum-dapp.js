@@ -309,8 +309,6 @@ async function mint(quantity, invite) {
 
 async function initiate_stake(token_id) {
 
-    console.log('this is a 2ND test')
-
     // Input token_id must be within range and be an integer
     token_id = parseInt(token_id)
     if (Number.isInteger(token_id) == false || token_id > 4040 || token_id < 1) { return 'TRANSACTION FAILED:\n Invalid token ID!'; }
