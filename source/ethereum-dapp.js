@@ -402,7 +402,7 @@ async function initiate_withdraw(token_id) {
     if (!approved) { alert('TRANSACTION FAILED:\n Staking contract is missing approval!'); return; }
 
     // Passed all requisites. Request user to confirm token ID
-    var input = prompt('✂️ WITHDRAW FROG #'+token_id+'\nUn-staking (withdrawing) this Frog will return it to your wallet. The staking level will be reset to zero!\n'+'\nConfirm the ID of the token you would like to withdraw.\nToken ID: '+token_id);
+    var input = prompt('🤏 WITHDRAW FROG #'+token_id+'\nUn-staking (withdrawing) this Frog will return it to your wallet. The staking level will be reset to zero!\n'+'\nConfirm the ID of the token you would like to withdraw.\nToken ID: '+token_id);
     var input_id = parseInt(input)
     if (input !== null) {
         if (input_id !== token_id) {
