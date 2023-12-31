@@ -31,6 +31,14 @@ const options = {
 
 
 async function fetch_recent_sales() {
+
+    /*
+        Five random secondary sales
+        n = 5;
+        array = Array.from({ length: 50 }, (v, k) => k * 10); // [0,10,20,30,...,490]
+        var shuffled = array.sort(function(){ return 0.5 - Math.random() });
+        var selected = shuffled.slice(0,n);
+    */
     fetch('https://deep-index.moralis.io/api/v2.2/nft/'+COLLECTION_ADDRESS+'/trades?chain=eth&marketplace=opensea', options)
     .then((tokens) => tokens.json())
     .then((tokens) => {
@@ -38,7 +46,12 @@ async function fetch_recent_sales() {
         console.log('=- Loading recent secondary sales')
         console.log(assets)
         console.log('=- Total secondary sales: '+assets.length)
-        assets.forEach((frog) => {
+
+        n = 5; // Random Secondary Sales
+        var shuffled = assets.sort(function(){ return 0.5 - Math.random() });
+        var asset_tokens = shuffled.slice(0,n);
+
+        asset_tokens.forEach((frog) => {
             render_recently_sold(frog)
         }) })
 }
