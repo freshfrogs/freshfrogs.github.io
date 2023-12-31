@@ -602,7 +602,7 @@ async function render_token(token_id) {
     // NOT Staked
     } else {
         staked = 'False';
-        staked_status = 'lightsalmon';
+        staked_status = 'tomato';
         staked_lvl = '--'
         staked_next_lvl = '--'
         button_element = '';
