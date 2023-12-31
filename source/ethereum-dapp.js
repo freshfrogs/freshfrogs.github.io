@@ -6,6 +6,8 @@
 
 */
 
+const { set } = require("express/lib/response");
+
 // Public Variables
 var controller, 
 collection, 
@@ -177,6 +179,14 @@ async function update_frontend() {
     mintButton.innerHTML = '🐸 Mint Frogs'
     parent_element.appendChild(mintButton)
 
+    // Staking Approval Button
+    approvalButton = document.createElement('button')
+    approvalButton.id = 'approvalButton'
+    approvalButton.className = 'connectButton'
+    approvalButton.onclick = async function (e) { await setApprovalForAll(); }
+    approvalButton.innerHTML = '🐸 Mint Frogs'
+    parent_element.appendChild(approvalButton)
+
     // Stake Button | Stake tokens
     stkeBtn = document.createElement('button')
     stkeBtn.id = 'stakeButton'
@@ -193,7 +203,7 @@ async function update_frontend() {
     holdingsLink.href = 'https://freshfrogs.github.io/wallet/'
     parent_element.appendChild(holdingsLink)
 
-    // Holdings Button | View holdings
+    // The Pond | View all staked tokens
     thePondButton = document.createElement('a')
     thePondButton.innerHTML = '<button class="connectButton" id="thePondButton" >🍀 The Pond</button>'
     thePondButton.id = 'thePondLink'
@@ -331,7 +341,7 @@ async function initiate_stake(token_id) {
 
 async function stake(token_id) {
     try {
-        
+
         // Estimate gas needed for transaction
         var gasprice = await web3.eth.getGasPrice();
         gasprice = Math.round(gasprice * 1.05);// to speed up 1.05 times..
@@ -450,10 +460,36 @@ async function setApprovalForAll() {
     let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
     if (!is_approved) { 
         try {
-            
-            // Send Txn
-            let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
-            return true;
+
+            // Estimate gas needed for transaction
+            var gasprice = await web3.eth.getGasPrice();
+            gasprice = Math.round(gasprice * 1.05);// to speed up 1.05 times..
+            var gas_estimate = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address }).estimateGas({ from: user_address }); 
+            gas_estimate = Math.round(gas_estimate * 1.05);
+
+            // Send transaction using gas estimate
+            var txn = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address }).send({ 
+                from: user_address, 
+                gas: web3.utils.toHex(gas_estimate), 
+                gasPrice:  web3.utils.toHex(gasprice),
+            })
+
+            // Transaction sent
+            .on('transactionHash', function(hash){
+                return 'TRANSACTION SENT\n Transaction to approve staking has been sent!';
+            })
+
+            // Transction complete
+            .on('receipt', function(receipt){
+                console.log(receipt)
+                return 'TRANSACTION COMPLETE\nYou can now stake your FreshFrog NFTS!'
+            })
+
+            // Transaction error
+            .on('error', function(error, receipt) {
+                console.log(receipt)
+                return 'TRANSACTION ERROR\nSomething went wrong when attempting to approve the staking contract. :(\nCheck console for receipt details!'
+            });
 
         // Catch Errors
         } catch (e) { return 'TRANSACTION FAILED:\n '+e.message; }
