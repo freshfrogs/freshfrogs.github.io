@@ -596,16 +596,39 @@ async function render_recently_sold(token) {
 
     // Update Metadata! Build Frog -->
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
-
     for (let i = 0; i < metadata.attributes.length; i++) {
-
         let attribute = metadata.attributes[i]
-        if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') { frog_type = '' }
-        build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
-
+        if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
+            var randomIndex = Math.floor(Math.random() * traitArray.length); 
+            var random = traitArray[randomIndex];
+            build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
+            build_trait('Trait', '/SpecialFrog/peace/'+random+'.png', 'cont_'+token_id);
+        } else {
+            build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
+        }
     }
-
 }
+
+var traitArray = [
+    'blue(2)',
+    'blue',
+    'brown',
+    'cyan',
+    'green',
+    'natural',
+    'orange(2)',
+    'orange',
+    'pink',
+    'purple(2)',
+    'purple',
+    'red(2)',
+    'red',
+    'sand',
+    'white(2)',
+    'white',
+    'yellow(2)',
+    'yellow'
+]
 
 // Render NFT token by layered attirubtes obtained through metadata.
 async function render_token(token_id) {
@@ -780,6 +803,7 @@ var star_frogs = [
     '',
     '2553'
 ]
+
 var animated = [
     //'witchStraw',
     //'witchBrown',
@@ -793,7 +817,7 @@ var animated = [
     'tongue',
     'tongueFly',
     'croaking',
-    'peace',
+    //'peace',
     'inversedEyes',
     'closedEyes',
     'thirdEye',
