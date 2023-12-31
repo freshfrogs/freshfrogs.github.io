@@ -195,7 +195,7 @@ async function update_frontend() {
     stkeBtn = document.createElement('button')
     stkeBtn.id = 'stakeButton'
     stkeBtn.className = 'connectButton'
-    stkeBtn.onclick = async function (e) { await setApprovalForAll(); }
+    stkeBtn.onclick = async function (e) { await initiate_setApprovalForAll(); }
     stkeBtn.innerHTML = '🌱 Stake & Earn!'
     parent_element.appendChild(stkeBtn)
 
