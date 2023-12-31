@@ -182,7 +182,7 @@ async function update_frontend() {
 
     // The Pond | View all staked tokens
     thePondButton = document.createElement('button')
-    thePondButton.id = 'thePondButton'
+    thePondButton.id = 'the-pond'
     thePondButton.className = 'connectButton'
     thePondButton.onclick = async function (e) { document.getElementById('frogs').innerHTML = ''; await fetch_tokens_by_owner(CONTROLLER_ADDRESS); }
     thePondButton.innerHTML = '🍀 The Pond'
