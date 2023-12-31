@@ -308,6 +308,8 @@ async function mint(quantity, invite) {
 
 async function initiate_stake(token_id) {
 
+    console.log('this is a test')
+
     // Input token_id must be within range and be an integer
     token_id = parseInt(token_id)
     if (Number.isInteger(token_id) == false || token_id > 4040 || token_id < 1) { return 'TRANSACTION FAILED:\n Invalid token ID!'; }
@@ -325,7 +327,7 @@ async function initiate_stake(token_id) {
 
     // Has the user approved the staking contract?
     let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-    if (!approved) { return 'MISSING APPROVAL:\n The FreshFrogsController smart contract must first be approved before you can begin staking!\n See "🌱 Stake & Earn!" to learn more.'; }
+    if (!approved) { alert('MISSING APPROVAL:\n The FreshFrogsController smart contract must first be approved before you can begin staking!\n See "🌱 Stake & Earn!" to learn more.'); }
 
     // Passed all requisites. Request user to confirm token ID
     var input = prompt("PLEASE READ: \nWhile tokens are staked, you will not be able to sell them on secondary market places. To do this you will have to un-stake directly from this site. Once a token is un-staked it's staking level will reset to zero!\n"+"\nConfirm the ID of the token you would like to stake:\nToken ID: ");
@@ -398,7 +400,7 @@ async function initiate_withdraw(token_id) {
 
     // Has the user approved the staking contract?
     let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-    if (!approved) { return 'TRANSACTION FAILED:\n Staking contract is missing approval!'; }
+    if (!approved) { alert('TRANSACTION FAILED:\n Staking contract is missing approval!'); }
 
     // Passed all requisites. Request user to confirm token ID
     var input = prompt("PLEASE READ: \nUn-staking (withdrawing) will return the token to your wallet. Staking level will be reset to zero!\n"+"\nConfirm the ID of the token you would like to withdraw:\nToken ID: ");
