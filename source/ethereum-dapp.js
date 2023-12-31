@@ -317,19 +317,19 @@ async function initiate_stake(token_id) {
     if (!approved) { return 'TRANSACTION FAILED:\n Staking contract is missing approval!'; }
 
     // Passed all requisites. Request user to confirm token ID
-    var input_id = prompt("PLEASE READ: \nWhile tokens are staked, you will not be able to sell them on secondary market places. To do this you will have to un-stake directly from this site. Once a token is un-staked it's staking level will reset to zero!\n"+"\nConfirm the ID of the token you would like to stake:\nToken ID: ");
-    input_id = parseInt(input_id)
-    if (input_id == 'undefined' || input_id === null || input_id == '' || typeof input_id == null) { console.log('stake: empty'); return }
-    else if (input_id !== token_id) {
-        alert('TRANSACTION FAILED:\n Token IDs do not match! Please double check and try again!')
-        return
-    }
-
-    // Submit txn for approval
-    let stake_txn = await stake(token_id);
-    alert(stake_txn);
-    return
-
+    var input = prompt("PLEASE READ: \nUn-staking (withdrawing) will return the token to your wallet. Staking level will be reset to zero!\n"+"\nConfirm the ID of the token you would like to withdraw:\nToken ID: ");
+    var input_id = parseInt(input)
+    if (null != input) {
+        if (input_id !== token_id) {
+            alert('TRANSACTION FAILED:\n Token IDs do not match! Please double check and try again!')
+            return
+        } else {
+            // Submit txn for approval
+            let stake_txn = await stake(token_id);
+            alert(stake_txn);
+            return
+        }
+    } else { return }
 }
 
 async function stake(token_id) {
@@ -390,18 +390,19 @@ async function initiate_withdraw(token_id) {
     if (!approved) { return 'TRANSACTION FAILED:\n Staking contract is missing approval!'; }
 
     // Passed all requisites. Request user to confirm token ID
-    var input_id;
-    input_id = prompt("PLEASE READ: \nUn-staking (withdrawing) will return the token to your wallet. Staking level will be reset to zero!\n"+"\nConfirm the ID of the token you would like to withdraw:\nToken ID: ");
-    input_id = parseInt(input_id)
-    if (input_id == 'undefined' || input_id === null || input_id == '') { console.log('withdraw: empty'); return }
-    if (input_id !== token_id) {
-        alert('TRANSACTION FAILED:\n Token IDs do not match! Please double check and try again!')
-        return
-    }
-
-    // Submit Txn
-    let withdraw_txn = await withdraw(token_id);
-    alert(withdraw_txn);
+    var input = prompt("PLEASE READ: \nUn-staking (withdrawing) will return the token to your wallet. Staking level will be reset to zero!\n"+"\nConfirm the ID of the token you would like to withdraw:\nToken ID: ");
+    var input_id = parseInt(input)
+    if (null != input) {
+        if (input_id !== token_id) {
+            alert('TRANSACTION FAILED:\n Token IDs do not match! Please double check and try again!')
+            return
+        } else {
+            // Submit Txn
+            let withdraw_txn = await withdraw(token_id);
+            alert(withdraw_txn);
+            return
+        }
+    } else { return }
 
 }
 
