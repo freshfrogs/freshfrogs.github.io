@@ -335,7 +335,7 @@ async function initiate_stake(token_id) {
             alert('TRANSACTION FAILED:\n Token IDs do not match! Please double check and try again!')
             return
         } else {
-            // Submit txn for approval
+            // Submit txn for signature
             let stake_txn = await stake(token_id);
             alert(stake_txn);
             return
