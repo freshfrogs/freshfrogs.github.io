@@ -161,7 +161,7 @@ async function get_user_invites(wallet_address) {
 async function update_frontend() {
 
     // Prepare HTML Element
-    var parent_element = document.getElementById('console');
+    var parent_element = document.getElementById('buttonBar');
     //break_element = document.createElement('br')
    // parent_element.appendChild(break_element)
 
