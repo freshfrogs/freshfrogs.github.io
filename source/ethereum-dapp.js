@@ -46,9 +46,8 @@ async function fetch_recent_sales(ammount) {
         var shuffled, asset_tokens;
         
         // all
-        if (ammount == 'all' || ! ammount) {
-            asset_tokens = assets
-        } else { // Random Secondary Sales
+        if (! ammount) { asset_tokens = assets } 
+        else { // Random Secondary Sales
             n = 5;
             shuffled = assets.sort(function(){ return 0.5 - Math.random() });
             asset_tokens = shuffled.slice(0,n);

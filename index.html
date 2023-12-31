@@ -342,7 +342,16 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        try { fetch_recent_sales(5); } catch (e) { console.log('Failed to fetch recent sales! '+e.message) }
+        try {
+          await fetch_recent_sales(5);
+          // Stake Button | Stake tokens
+          loadMore = document.createElement('button')
+          loadMore.id = 'stakeButton'
+          loadMore.className = 'connectButton'
+          loadMore.onclick = async function (e) { document.getElementById('frogs').innerHTML = ''; await fetch_recent_sales(); }
+          loadMore.innerHTML = 'Load More'
+          document.getElementById('frogs').appendChild(loadMore)
+        } catch (e) { console.log('Failed to fetch recent sales! '+e.message) }
 
         async function build_random_logo() {
           // Random Frog Element:
