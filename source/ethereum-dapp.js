@@ -316,8 +316,7 @@ async function initiate_stake(token_id) {
     // Passed all requisites. Request user to confirm token ID
     var input_id = prompt("PLEASE READ: \nWhile tokens are staked, you will not be able to sell them on secondary market places. To do this you will have to un-stake directly from this site. Once a token is un-staked it's staking level will reset to zero!\n"+"\nConfirm the ID of the token you would like to stake:\nToken ID: ");
     input_id = parseInt(input_id)
-    console.log('test')
-    if (input_id == null) { return }
+    if( isEmpty(input_id) ) { return }
     else if (input_id !== token_id) {
         alert('TRANSACTION FAILED:\n Token IDs do not match! Please double check and try again!')
         return
@@ -391,7 +390,7 @@ async function initiate_withdraw(token_id) {
     var input_id;
     input_id = prompt("PLEASE READ: \nUn-staking (withdrawing) will return the token to your wallet. Staking level will be reset to zero!\n"+"\nConfirm the ID of the token you would like to withdraw:\nToken ID: ");
     input_id = parseInt(input_id)
-    if (input_id == '') { return }
+    if( isEmpty(input_id) ) { return }
     if (input_id !== token_id) {
         alert('TRANSACTION FAILED:\n Token IDs do not match! Please double check and try again!')
         return
