@@ -588,7 +588,7 @@ async function render_token(token_id) {
     // Staked
     if (token_owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
         staked = 'True'
-        staked_status = '#1a202c'
+        staked_status = 'teal'
         token_owner = await stakerAddress(token_id);
         staked_values = await stakingValues(token_id);
         staked_lvl = staked_values[1]
@@ -611,23 +611,23 @@ async function render_token(token_id) {
     // Render token information and data
     top_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text style="color: '+staked_status+'; font-weight: bold;">Staked</text>'+'<br>'+
-            '<text>'+staked+'</text>'+
+            '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
+            '<text style="color: '+staked_status+';">'+staked+'</text>'+
         '</div>'
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
             '<text style="color: #1a202c; font-weight: bold;">Owned By</text>'+'<br>'+
-            '<text id="frog_type">'+truncateAddress(token_owner)+'</text>'+
+            '<text style="color: teal;" id="frog_type">'+truncateAddress(token_owner)+'</text>'+
         '</div>'
     bottom_left = 
     '<div style="margin: 8px; float: right; width: 100px;">'+
         '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
-        '<text>'+staked_next_lvl+'</text>'+
+        '<text style="color: teal;">'+staked_next_lvl+'</text>'+
     '</div>'
     bottom_right = 
     '<div style="margin: 8px; float: right; width: 100px;">'+
         '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
-        '<text>'+staked_lvl+'</text>'+
+        '<text style="color: teal;">'+staked_lvl+'</text>'+
     '</div>'
 
     // <-- Begin Element
