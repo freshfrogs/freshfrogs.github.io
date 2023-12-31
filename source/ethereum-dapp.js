@@ -816,7 +816,7 @@ async function render_token(token_id) {
         '</div>'
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
-            '<text style="color: #1a202c; font-weight: bold;">Owned By</text>'+'<br>'+
+            '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
             '<text style="color: teal;" id="frog_type">'+truncateAddress(token_owner)+'</text>'+
         '</div>'
     bottom_left = 
