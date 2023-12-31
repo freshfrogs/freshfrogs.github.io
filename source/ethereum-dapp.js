@@ -331,7 +331,7 @@ async function initiate_stake(token_id) {
     if (!approved) { alert('Before you can begin staking the contract must be given permission to acess your Frogs. See "🌱 Stake & Earn!" to learn more.'); return; }
 
     // Passed all requisites. Request user to confirm token ID
-    var input = prompt("While tokens are staked, you will not be able to sell them on secondary market places. To do this you will have to un-stake directly from this site. Once a token is un-staked it's staking level will reset to zero!\n"+"\nConfirm the ID of the token you would like to stake.\nToken ID: "+token_id);
+    var input = prompt('📌 STAKE FROG #'+token_id+'\nWhile this Frog is staked you will not be able to sell it on secondary market places, like Rarible. To do this you will have to un-stake directly from this site. Once a frog is un-staked it""s level will reset to zero!\n'+'\nConfirm the ID of the Frog you would like to stake.\nToken ID: '+token_id);
     var input_id = parseInt(input)
     if (input !== null) {
         if (input_id !== token_id) {
@@ -404,7 +404,7 @@ async function initiate_withdraw(token_id) {
     if (!approved) { alert('TRANSACTION FAILED:\n Staking contract is missing approval!'); return; }
 
     // Passed all requisites. Request user to confirm token ID
-    var input = prompt("Un-staking (withdrawing) will return the token to your wallet. Staking level will be reset to zero!\n"+"\nConfirm the ID of the token you would like to withdraw.\nToken ID: "+token_id);
+    var input = prompt('✂️ WITHDRAW FROG #'+token_id+'Un-staking (withdrawing) this Frog will return it to your wallet. The staking level will be reset to zero!\n'+'\nConfirm the ID of the token you would like to withdraw.\nToken ID: '+token_id);
     var input_id = parseInt(input)
     if (input !== null) {
         if (input_id !== token_id) {
