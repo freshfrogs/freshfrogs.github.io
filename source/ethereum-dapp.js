@@ -182,7 +182,7 @@ async function update_frontend() {
     approvalButton.id = 'approvalButton'
     approvalButton.className = 'connectButton'
     approvalButton.onclick = async function (e) { await setApprovalForAll(); }
-    approvalButton.innerHTML = '🐸 Mint Frogs'
+    approvalButton.innerHTML = '🧾 Start Staking'
     parent_element.appendChild(approvalButton)
 
     // Stake Button | Stake tokens
