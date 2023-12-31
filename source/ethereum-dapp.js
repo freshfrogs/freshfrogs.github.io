@@ -318,7 +318,7 @@ async function initiate_stake(token_id) {
     // Passed all requisites. Request user to confirm token ID
     var input = prompt("PLEASE READ: \nUn-staking (withdrawing) will return the token to your wallet. Staking level will be reset to zero!\n"+"\nConfirm the ID of the token you would like to withdraw:\nToken ID: ");
     var input_id = parseInt(input)
-    if (null != input) {
+    if (typeof input !== "undefined") {
         if (input_id !== token_id) {
             alert('TRANSACTION FAILED:\n Token IDs do not match! Please double check and try again!')
             return
@@ -391,7 +391,7 @@ async function initiate_withdraw(token_id) {
     // Passed all requisites. Request user to confirm token ID
     var input = prompt("PLEASE READ: \nUn-staking (withdrawing) will return the token to your wallet. Staking level will be reset to zero!\n"+"\nConfirm the ID of the token you would like to withdraw:\nToken ID: ");
     var input_id = parseInt(input)
-    if (null != input) {
+    if (typeof input !== "undefined") {
         if (input_id !== token_id) {
             alert('TRANSACTION FAILED:\n Token IDs do not match! Please double check and try again!')
             return
