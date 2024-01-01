@@ -365,21 +365,23 @@ async function stake(token_id) {
             gasPrice:  web3.utils.toHex(gasprice),
         })
 
-        // Transaction Sent
-        .on('transactionHash', function(hash){
-            return 'TRANSACTION SENT\n Transaction to stake Frog #'+token_id+' has been sent!';
-        })
+        var txn_raw = 'stake('+token_id+')'
 
-        // Transaction Complete
+        // Transaction sent
+        .on('transactionHash', function(hash){
+            return txn_raw+'\nTransaction has been sent and now pending.';
+        })
+    
+        // Transction complete
         .on('receipt', function(receipt){
             console.log(receipt)
-            return 'TRANSACTION COMPLETE\nFrog #'+token_id+' has succesfully been staked! :)\nCheck console for receipt details.'
+            return txn_raw+'\nTransaction has been completed! See console for details.'
         })
-
-        // Transaction Error
+    
+        // Transaction error
         .on('error', function(error, receipt) {
             console.log(receipt)
-            return 'TRANSACTION ERROR\nSomething went wrong when attempting to stake Frog #'+token_id+' :(\nCheck console for receipt details!'
+            return txn_raw+'\nSomething went wrong during the transaction! Did it run out of gas?\nCheck console for receipt details!'
         });
 
     // Catch Errors
@@ -440,21 +442,23 @@ async function withdraw(token_id) {
             gasPrice:  web3.utils.toHex(gasprice),
         })
 
+        var txn_raw = 'withdraw('+token_id+')'
+
         // Transaction sent
         .on('transactionHash', function(hash){
-            return 'TRANSACTION SENT\n Transaction to withdraw Frog #'+token_id+' has been sent!';
+            return txn_raw+'\nTransaction has been sent and now pending.';
         })
-
+    
         // Transction complete
         .on('receipt', function(receipt){
             console.log(receipt)
-            return 'TRANSACTION COMPLETE\nFrog #'+token_id+' has succesfully been withdrawn from the staking contract.\nCheck console for receipt details.'
+            return txn_raw+'\nTransaction has been completed! See console for details.'
         })
-
+    
         // Transaction error
         .on('error', function(error, receipt) {
             console.log(receipt)
-            return 'TRANSACTION ERROR\nSomething went wrong when attempting to withdraw Frog #'+token_id+' :(\nCheck console for receipt details!'
+            return txn_raw+'\nSomething went wrong during the transaction! Did it run out of gas?\nCheck console for receipt details!'
         });
 
     // Catch Errors
@@ -483,21 +487,23 @@ async function setApprovalForAll() {
         gasPrice:  web3.utils.toHex(gasprice),
     })
 
+    var txn_raw = 'setApprovalForAll()'
+
     // Transaction sent
     .on('transactionHash', function(hash){
-        return 'TRANSACTION SENT\n Transaction to approve staking has been sent!';
+        return txn_raw+'\nTransaction has been sent and now pending.';
     })
 
     // Transction complete
     .on('receipt', function(receipt){
         console.log(receipt)
-        return 'TRANSACTION COMPLETE\nYou are now able to stake your Frogs and start earning $FLYZ!'
+        return txn_raw+'\nTransaction has been completed! See console for details.'
     })
 
     // Transaction error
     .on('error', function(error, receipt) {
         console.log(receipt)
-        return 'TRANSACTION ERROR\nSomething went wrong when attempting to approve the staking contract. :(\nCheck console for receipt details!'
+        return txn_raw+'\nSomething went wrong during the transaction! Did it run out of gas?\nCheck console for receipt details!'
     });
 }
 async function initiate_setApprovalForAll() {
