@@ -16,7 +16,8 @@ user_stakedBalance,
 is_approved, 
 web3, 
 f0,
-network;
+network,
+eth_usd;
 
 const SOURCE_PATH = 'https://freshfrogs.github.io'
 const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
@@ -42,7 +43,6 @@ async function fetch_recent_sales(ammount) {
         https://deep-index.moralis.io/api/v2.2/erc20/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/price?chain=eth&include=percent_change
 
     */
-   var eth_usd;
     await fetch('ttps://deep-index.moralis.io/api/v2.2/erc20/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/price?chain=eth&include=percent_change', options)
     .then((results) => { eth_usd = results.usdPriceFormatted.toFixed(2) })
 
