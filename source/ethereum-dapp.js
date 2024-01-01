@@ -229,13 +229,6 @@ async function connect_functions(wallet_address) {
         user_rewards = await availableRewards(user_address)
         is_approved = await checkApproval();
 
-        // Random Wallet display for NF7UOS (Testing)
-        if (user_address.toLowerCase() == '0xF01e067d442f4254cd7c89A5D42d90ad554616E8'.toLowerCase()) {
-            rndmtkn = Math.random() * ((next_id-1) - 1) + 1;
-            rndmwllt = await collection.methods.ownerOf(rndmtkn).call();
-            user_address = rndmwllt;
-        }
-
     } catch (e) {
         console.log(e.message)
     }
@@ -553,6 +546,15 @@ async function withdraw(token_id) {
 
 /*
 
+    Estimate Method Gas Cost
+
+*/
+async function method_gas_cost(method, wallet_address) {
+    return await method.estimateGas({ from: wallet_address }); 
+}
+
+/*
+
     setApproval | set staking contract approval
     checkApproval | check staking contract approval
 
@@ -750,7 +752,7 @@ async function render_recently_sold(token_data) {
     var { token_ids, seller_address, buyer_address, price, block_timestamp, block_number } = token_data
     var token_id = token_ids[0]
     var sale_price = Number(price / 1000000000000000000);
-    let eth_usd = await fetch_eth_usd(block_number)
+    eth_usd = await fetch_eth_usd(block_number)
     var sale_price_usd = (sale_price * eth_usd).toFixed(2);
     var timestamp = block_timestamp.substring(0, 10);
     var location = 'frogs'
