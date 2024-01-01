@@ -346,7 +346,16 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        try { await fetch_recent_sales(5) } catch (e) { console.log('Failed to fetch recent sales! '+e.message) }
+        try {
+
+          await fetch_eth_usd();
+          await fetch_recent_sales(5);
+
+        } catch (e) {
+
+          console.log('Failed to fetch recent sales! '+e.message);
+
+        }
 
         async function build_random_logo() {
           // Random Frog Element:

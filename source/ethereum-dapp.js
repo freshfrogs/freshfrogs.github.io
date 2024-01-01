@@ -107,13 +107,11 @@ async function fetch_eth_usd() {
     console.log('Fetching ETH/USD...')
     fetch('https://deep-index.moralis.io/api/v2.2/erc20/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/price?chain=eth&include=percent_change', options)
     .then((results) => results.json())
-    .then((results) => { eth_usd = Number(results.usdPrice); console.log('CURRENT WRAPPED ETH PRICE\n$'+eth_usd); })
+    .then((results) => { return Number(results.usdPrice); })
 
 }
 
 async function fetch_recent_sales(ammount) {
-
-    await fetch_eth_usd();
 
     fetch('https://deep-index.moralis.io/api/v2.2/nft/'+COLLECTION_ADDRESS+'/trades?chain=eth&marketplace=opensea', options)
     .then((tokens) => tokens.json())
