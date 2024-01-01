@@ -365,7 +365,7 @@ async function held_tokens_by_wallet(wallet_address) {
 async function initiate_mint() {
 
     // Token ID input
-    var input_quantity = prompt('🐸 FreshFrogsNFT (FROG)\nTotal Supply: '+next_id+' / 4040\n\nMint Price: '+mint_price+' | Mint Limit: '+mint_limit+'\n\nMint to create NEW uniquely pre-generated Frogs on the Ethereum blockchain! How many Frogs would you like to mint? ('+mint_price+'Ξ each + gas fee)') // prompt("Frog #"+next_id+" out of 4,040 is available to mint! \nMint limit of "+mint_limit+" Frogs per wallet! \nHow many Frogs would you like to mint? ("+mint_price+"Ξ each + gas fee)");
+    var input_quantity = prompt('🐸 FreshFrogsNFT (FROG)\nTotal Supply: '+next_id+' / 4040\n\nMint Price: '+mint_price+' | Mint Limit: '+mint_limit+'\n\nMint to create NEW uniquely pre-generated Frogs on the Ethereum blockchain! How many Frogs would you like to mint? (Ξ'+mint_price+' each + gas fee)') // prompt("Frog #"+next_id+" out of 4,040 is available to mint! \nMint limit of "+mint_limit+" Frogs per wallet! \nHow many Frogs would you like to mint? ("+mint_price+"Ξ each + gas fee)");
     if (input_quantity !== null) {
         mint_quantity = parseInt(input_quantity)
         let mint_txn = await mint(mint_quantity, user_invite);
@@ -756,7 +756,7 @@ async function render_recently_sold(token_data) {
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
             '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
-            '<text id="frog_type" style="color: teal;">'+toFixedPoint(sale_price, 3)+'Ξ ($'+sale_price_usd+')</text>'+
+            '<text id="frog_type" style="color: teal;">Ξ'+toFixedPoint(sale_price, 3)+' ($'+sale_price_usd+')</text>'+
         '</div>'
     bottom_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
