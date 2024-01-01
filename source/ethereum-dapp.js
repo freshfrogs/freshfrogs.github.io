@@ -39,7 +39,7 @@ async function fetch_recent_sales(ammount) {
 
     */
     fetch('https://deep-index.moralis.io/api/v2.2/erc20/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/price?chain=eth&include=percent_change', options)
-    .then((results) => { eth_usd = results.usdPriceFormatted.toFixed(0); })
+    .then((results) => { eth_usd = parseInt(results.usdPriceFormatted); })
     .then(async function(){
 
         fetch('https://deep-index.moralis.io/api/v2.2/nft/'+COLLECTION_ADDRESS+'/trades?chain=eth&marketplace=opensea', options)
