@@ -34,46 +34,43 @@ const options = {
 async function fetch_recent_sales(ammount) {
 
     /*
-        Five random secondary sales
-        n = 5;
-        shuffled = assets.sort(function(){ return 0.5 - Math.random() });
-        asset_tokens = shuffled.slice(0,n);
-
         
-        https://deep-index.moralis.io/api/v2.2/erc20/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/price?chain=eth&include=percent_change
+        MORALIS API
 
     */
-    fetch('ttps://deep-index.moralis.io/api/v2.2/erc20/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/price?chain=eth&include=percent_change', options)
-    .then((results) => {
-        eth_usd = results.usdPriceFormatted.toFixed(2)
+    fetch('https://deep-index.moralis.io/api/v2.2/erc20/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/price?chain=eth&include=percent_change', options)
+    .then((results) => { eth_usd = results.usdPriceFormatted.toFixed(0); })
+    .then(async function(){
+
         fetch('https://deep-index.moralis.io/api/v2.2/nft/'+COLLECTION_ADDRESS+'/trades?chain=eth&marketplace=opensea', options)
         .then((tokens) => tokens.json())
         .then((tokens) => {
+
             var assets = tokens.result
             var shuffled, asset_tokens;
-            
-            // all
+
             if (! ammount) { asset_tokens = assets } 
-            else { // Random Secondary Sales
-                n = 5;
-                shuffled = assets // assets.sort(function(){ return 0.5 - Math.random() });
-                asset_tokens = shuffled.slice(0,n);
-            }
+            else { n = 5; shuffled = assets; /* assets.sort(function(){ return 0.5 - Math.random() }); */ asset_tokens = shuffled.slice(0,n); }
     
             asset_tokens.forEach((frog) => async function() {
                 await render_recently_sold(frog)
             })
+
         })
         .then(async function() { // Load all recent secondary sales
+
             if (! ammount) { return } 
+
             break_element = document.createElement('br')
             document.getElementById('frogs').appendChild(break_element)
+
             loadMore = document.createElement('button')
             loadMore.id = 'loadMore'
             loadMore.className = 'connectButton'
             loadMore.onclick = async function (e) { document.getElementById('frogs').innerHTML = ''; await fetch_recent_sales(); }
             loadMore.innerHTML = '🔰 Load More'
             document.getElementById('frogs').appendChild(loadMore)
+
         })
     })
 }
