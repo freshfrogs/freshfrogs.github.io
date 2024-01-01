@@ -16,8 +16,7 @@ user_stakedBalance,
 is_approved, 
 web3, 
 f0,
-network,
-eth_usd;
+network;
 
 const SOURCE_PATH = 'https://freshfrogs.github.io'
 const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
@@ -30,50 +29,46 @@ const options = {
     }
   };
 
+async function fetch_eth_usd() {
+
+    console.log('Fetching ETH/USD...')
+    fetch('https://deep-index.moralis.io/api/v2.2/erc20/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/price?chain=eth&include=percent_change', options)
+    .then((results) => { console.log(results); eth_usd = parseInt(results.usdPrice); })
+
+}
 
 async function fetch_recent_sales(ammount) {
 
-    /*
-        
-        MORALIS API
+    await fetch_eth_usd();
 
-    */
+    fetch('https://deep-index.moralis.io/api/v2.2/nft/'+COLLECTION_ADDRESS+'/trades?chain=eth&marketplace=opensea', options)
+    .then((tokens) => tokens.json())
+    .then((tokens) => {
 
-    console.log('Fetching ETH/USD')
-    fetch('https://deep-index.moralis.io/api/v2.2/erc20/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/price?chain=eth&include=percent_change', options)
-    .then((results) => { console.log(results) })
-    .then(async function(){
+        var assets = tokens.result
+        var shuffled, asset_tokens;
 
-        fetch('https://deep-index.moralis.io/api/v2.2/nft/'+COLLECTION_ADDRESS+'/trades?chain=eth&marketplace=opensea', options)
-        .then((tokens) => tokens.json())
-        .then((tokens) => {
+        if (! ammount) { asset_tokens = assets } 
+        else { n = 5; shuffled = assets.sort(function(){ return 0.5 - Math.random() }); asset_tokens = shuffled.slice(0,n); }
 
-            var assets = tokens.result
-            var shuffled, asset_tokens;
+        asset_tokens.forEach((frog) => { render_recently_sold(frog) })
 
-            if (! ammount) { asset_tokens = assets } 
-            else { n = 5; shuffled = assets.sort(function(){ return 0.5 - Math.random() }); asset_tokens = shuffled.slice(0,n); }
-    
-            asset_tokens.forEach((frog) => async function() {
-                await render_recently_sold(frog)
-            })
+    })
+    .then(async function() {
 
-        })
-        .then(async function() { // Load all recent secondary sales
+        if (! ammount) { return } 
 
-            if (! ammount) { return } 
+        break_element = document.createElement('br')
+        document.getElementById('frogs').appendChild(break_element)
 
-            break_element = document.createElement('br')
-            document.getElementById('frogs').appendChild(break_element)
+        loadMore = document.createElement('button')
+        loadMore.id = 'loadMore'
+        loadMore.className = 'connectButton'
+        loadMore.onclick = async function (e) { document.getElementById('frogs').innerHTML = ''; await fetch_recent_sales(); }
+        loadMore.innerHTML = '🔰 Load More'
 
-            loadMore = document.createElement('button')
-            loadMore.id = 'loadMore'
-            loadMore.className = 'connectButton'
-            loadMore.onclick = async function (e) { document.getElementById('frogs').innerHTML = ''; await fetch_recent_sales(); }
-            loadMore.innerHTML = '🔰 Load More'
-            document.getElementById('frogs').appendChild(loadMore)
+        document.getElementById('frogs').appendChild(loadMore)
 
-        })
     })
 }
 
@@ -296,7 +291,7 @@ async function held_tokens_by_wallet(wallet_address) {
 async function initiate_mint() {
 
     // Token ID input
-    var input_quantity = prompt('🐸 FreshFrogsNFT (FROG)\nTotal Supply: '+next_id+' / 4040\n\nMint Price: '+mint_price+' | Mint Limit: '+mint_limit+'\nHow many Frogs would you like to mint? ('+mint_price+'Ξ each + gas fee)');
+    var input_quantity = prompt('🐸 FreshFrogsNFT (FROG)\nTotal Supply: '+next_id+' / 4040\n\nMint Price: '+mint_price+' | Mint Limit: '+mint_limit+'\n\nMint to create NEW uniquely pre-generated Frogs on the Ethereum blockchain! How many Frogs would you like to mint? ('+mint_price+'Ξ each + gas fee)') // prompt("Frog #"+next_id+" out of 4,040 is available to mint! \nMint limit of "+mint_limit+" Frogs per wallet! \nHow many Frogs would you like to mint? ("+mint_price+"Ξ each + gas fee)");
     if (input_quantity !== null) {
         mint_quantity = parseInt(input_quantity)
         let mint_txn = await mint(mint_quantity, user_invite);
@@ -686,7 +681,7 @@ async function render_recently_sold(token) {
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
             '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
-            '<text id="frog_type" style="color: teal;">'+sale_price+'Ξ ($'+(eth_usd*sale_price)+')</text>'+
+            '<text id="frog_type" style="color: teal;">'+sale_price+'Ξ</text>'+
         '</div>'
     bottom_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
