@@ -67,7 +67,7 @@ async function fetch_recent_sales(ammount) {
         loadMore.id = 'loadMore'
         loadMore.className = 'connectButton'
         loadMore.onclick = async function (e) { document.getElementById('frogs').innerHTML = ''; await fetch_recent_sales(); }
-        loadMore.innerHTML = '🔰 Load More'
+        loadMore.innerHTML = '🔰 Secondary Sales'
 
         document.getElementById('frogs').appendChild(loadMore)
 
