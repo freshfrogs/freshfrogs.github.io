@@ -106,7 +106,6 @@ async function fetch_eth_usd(block) {
     if(! block){ block = ''; }
     else { block = '&to_block='+block}
 
-    console.log('Fetching ETH/USD... 3')
     fetch('https://deep-index.moralis.io/api/v2.2/erc20/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/price?chain=eth&include=percent_change'+block, options)
     .then((results) => results.json())
     .then((results) => { return Number(results.usdPrice); })
