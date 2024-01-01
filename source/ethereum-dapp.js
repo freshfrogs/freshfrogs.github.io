@@ -106,7 +106,7 @@ async function fetch_eth_usd(block) {
     if(! block){ block = ''; }
     else { block = '&to_block='+block}
 
-    console.log('Fetching ETH/USD... 2')
+    console.log('Fetching ETH/USD... 3')
     fetch('https://deep-index.moralis.io/api/v2.2/erc20/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/price?chain=eth&include=percent_change'+block, options)
     .then((results) => results.json())
     .then((results) => { return Number(results.usdPrice); })
@@ -750,7 +750,7 @@ async function render_recently_sold(token_data) {
     var { token_ids, seller_address, buyer_address, price, block_timestamp, block_number } = token_data
     var token_id = token_ids[0]
     var sale_price = Number(price / 1000000000000000000);
-    eth_usd = await fetch_eth_usd(block_number)
+    let eth_usd = await fetch_eth_usd(block_number)
     console.log(eth_usd)
     var sale_price_usd = (sale_price * eth_usd).toFixed(2);
     var timestamp = block_timestamp.substring(0, 10);
