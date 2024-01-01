@@ -345,8 +345,24 @@
       // -- >
 
       document.addEventListener("DOMContentLoaded", async () => {
-        await initiate_web3_connection().then(async function(){ await fetch_tokens_by_owner(CONTROLLER_ADDRESS); })
-        document.getElementById('thePondButton').style.boxShadow = '2px 2px lightsalmon'
+
+        await build_random_logo()
+          var intervalId = window.setInterval(async function(){
+            await build_random_logo()
+          }, 6500);
+
+        await initiate_web3_connection().then(async function(){
+          await fetch_tokens_by_owner(CONTROLLER_ADDRESS);
+          document.getElementById('thePondButton').style.boxShadow = '2px 2px lightsalmon'
+
+          document.getElementById('randomLogo').onclick = async function (e) {
+            clearInterval(intervalId);
+          }
+
+          document.getElementById('connectButton').onclick = async function (e) {
+            await initiate_web3_connection();
+          }
+        })
 
         async function build_random_logo() {
           // Random Frog Element:
@@ -360,20 +376,6 @@
           }
           var random_token_image = SOURCE_PATH+'/frog/'+random_token+'.png'
           document.getElementById('randomLogo').style.backgroundImage = "url("+random_token_image+")";
-        }
-
-        await build_random_logo()
-
-        var intervalId = window.setInterval(async function(){
-          await build_random_logo()
-        }, 6500);
-
-        document.getElementById('randomLogo').onclick = async function (e) {
-          clearInterval(intervalId);
-        }
-
-        document.getElementById('connectButton').onclick = async function (e) {
-          await initiate_web3_connection();
         }
       })
     </script>
