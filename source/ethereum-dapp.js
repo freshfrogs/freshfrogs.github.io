@@ -10,9 +10,9 @@
 var controller, 
 collection, 
 user_address, 
-unclaimed_rewards, 
-userTokens, 
-userTokensStaked, 
+user_rewards, 
+user_tokenBalance, 
+user_stakedBalance, 
 is_approved, 
 web3, 
 f0,
@@ -145,9 +145,9 @@ async function connect_functions(wallet_address) {
         total_supply = '4040';
 
         // User variables. Held and staked tokens, etc.
-        userTokens = await collection.methods.balanceOf(user_address).call();
-        userTokensStaked = await stakers(user_address, 'amountStaked')
-        unclaimed_rewards = await availableRewards(user_address)
+        user_tokenBalance = await collection.methods.balanceOf(user_address).call();
+        user_stakedBalance = await stakers(user_address, 'amountStaked')
+        user_rewards = await availableRewards(user_address)
         is_approved = await checkApproval();
 
     } catch (e) {
@@ -187,7 +187,7 @@ async function update_frontend() {
 
     // Connected Button
     document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="connectedStatus"></div> Connected - ['+truncateAddress(user_address)+']'
-    document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+userTokens+'/'+userTokensStaked+')'); }
+    document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+user_tokenBalance+'/'+user_stakedBalance+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+user_tokenBalance+'/'+user_stakedBalance+')'); }
 
     // Mint Button | Mint Tokens
     mintButton = document.createElement('button')
@@ -512,7 +512,7 @@ async function initiate_setApprovalForAll() {
     var approval_status;
     let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
     if (is_approved) {approval_status = '🟢 TRUE'} else {approval_status = '🔴 FALSE'}
-    alert('📃 FreshFrogsNFT Staking\nStake your Frogs and start earning rewards like $FLYZ, and more! Staking works by sending your Frog to our smart contract that will keep it safe. Frogs that are staked can\'t be listed on secondary market places, like Rarible.\n\n✍️ Sign Contract Approval\nTo start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee. Approval Status: '+approval_status);
+    alert('📃 FreshFrogsNFT Staking\nStake your Frogs and start earning rewards like $FLYZ, and more! Staking works by sending your Frog to our smart contract that will keep it safe. Frogs that are staked can\'t be listed on secondary market places, like Rarible.\nStaked Tokens: '+user_stakedBalance+' | Rewards: '+user_rewards+' $FLYZ'+'\n✍️ Sign Contract Approval\nTo start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee. Approval Status: '+approval_status);
     if (!is_approved) { 
         try {
 
