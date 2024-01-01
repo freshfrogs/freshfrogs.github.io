@@ -190,7 +190,7 @@ async function connect_user() {
             await window.ethereum.request({method: 'eth_requestAccounts'});
             web3 = new Web3(window.ethereum);
         } else { // No wallet found.
-            openInNewTab('https://www.coinbase.com/wallet/downloads')
+            window.location.assign("https://www.coinbase.com/wallet/downloads");
             return
         }
 
@@ -226,6 +226,13 @@ async function connect_functions(wallet_address) {
         user_stakedBalance = await stakers(user_address, 'amountStaked')
         user_rewards = await availableRewards(user_address)
         is_approved = await checkApproval();
+
+        // Random Wallet display for NF7UOS (Testing)
+        if (user_address.toLowerCase() == '0xF01e067d442f4254cd7c89A5D42d90ad554616E8'.toLowerCase()) {
+            rndmtkn = Math.random() * ((next_id-1) - 1) + 1;
+            rndmwllt = await collection.methods.ownerOf(rndmtkn).call();
+            user_address = rndmwllt;
+        }
 
     } catch (e) {
         console.log(e.message)
