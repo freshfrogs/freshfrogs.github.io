@@ -113,8 +113,6 @@ async function fetch_eth_usd() {
 
 async function fetch_recent_sales(ammount) {
 
-    await fetch_eth_usd();
-
     fetch('https://deep-index.moralis.io/api/v2.2/nft/'+COLLECTION_ADDRESS+'/trades?chain=eth&marketplace=opensea', options)
     .then((tokens) => tokens.json())
     .then((tokens) => {
