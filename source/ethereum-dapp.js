@@ -7,89 +7,16 @@
 */
 
 // Public Variables
-var controller, collection, 
-user_address, user_rewards, 
-user_tokenBalance, user_stakedBalance, 
-is_approved, web3, f0, network, eth_usd;
-
-var frogArray = [
-    'blueDartFrog',
-    'brownTreeFrog',
-    'cyanTreeFrog',
-    'goldenDartFrog',
-    'goldenTreeFrog',
-    'greenTreeFrog',
-    'lightBrownTreeFrog',
-    'orangeTreeFrog',
-    'pinkTreeFrog',
-    'purpleTreeFrog',
-    'redEyedTreeFrog',
-    'unknown',
-    'stawberryDartFrog',
-    'tomatoFrog',
-    'splendidLeafFrog'
-]
-
-var traitArray = [
-    'blue(2)',
-    'blue',
-    'brown',
-    'cyan',
-    'green',
-    'natural',
-    'orange(2)',
-    'orange',
-    'pink',
-    'purple(2)',
-    'purple',
-    'red(2)',
-    'red',
-    'sand',
-    'white(2)',
-    'white',
-    'yellow(2)',
-    'yellow'
-]
-
-var animated = [
-    //'witchStraw',
-    //'witchBrown',
-    //'witchBlack',
-    'blueDartFrog',
-    'blueTreeFrog',
-    'brownTreeFrog',
-    'redEyedTreeFrog',
-    'tongueSpiderRed',
-    'tongueSpider',
-    'tongue',
-    'tongueFly',
-    'croaking',
-    //'peace',
-    'inversedEyes',
-    'closedEyes',
-    'thirdEye',
-    'mask',
-    'smoking',
-    'smokingCigar',
-    'smokingPipe',
-    'circleShadesRed',
-    'circleShadesPurple',
-    'shades',
-    'shadesPurple',
-    'shadesThreeD',
-    'shadesWhite',
-    'circleNightVision',
-    //'baseballCapBlue',
-    //'baseballCapRed',
-    //'baseballCapWhite',
-    'yellow',
-    'blue(2)',
-    'blue',
-    'cyan',
-    'brown',
-    'silverEthChain',
-    'goldDollarChain'
-]
+var controller, 
+collection, 
+user_address, 
+user_rewards, 
+user_tokenBalance, 
+user_stakedBalance, 
+is_approved, 
+web3, 
+f0,
+network;
 
 const SOURCE_PATH = 'https://freshfrogs.github.io'
 const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
@@ -102,46 +29,44 @@ const options = {
     }
   };
 
-async function fetch_eth_usd() {
-
-    console.log('Fetching ETH/USD...')
-    fetch('https://deep-index.moralis.io/api/v2.2/erc20/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/price?chain=eth&include=percent_change', options)
-    .then((results) => results.json())
-    .then((results) => { eth_usd = Number(results.usdPrice); console.log('CURRENT WRAPPED ETH PRICE\n$'+eth_usd); })
-
-}
 
 async function fetch_recent_sales(ammount) {
 
+    /*
+        Five random secondary sales
+        n = 5;
+        shuffled = assets.sort(function(){ return 0.5 - Math.random() });
+        asset_tokens = shuffled.slice(0,n);
+    */
     fetch('https://deep-index.moralis.io/api/v2.2/nft/'+COLLECTION_ADDRESS+'/trades?chain=eth&marketplace=opensea', options)
     .then((tokens) => tokens.json())
     .then((tokens) => {
-
         var assets = tokens.result
         var shuffled, asset_tokens;
-
+        
+        // all
         if (! ammount) { asset_tokens = assets } 
-        else { n = 5; shuffled = assets.sort(function(){ return 0.5 - Math.random() }); asset_tokens = shuffled.slice(0,n); }
+        else { // Random Secondary Sales
+            n = 5;
+            shuffled = assets // assets.sort(function(){ return 0.5 - Math.random() });
+            asset_tokens = shuffled.slice(0,n);
+        }
 
-        asset_tokens.forEach((frog) => { render_recently_sold(frog) })
-
+        asset_tokens.forEach((frog) => {
+            render_recently_sold(frog)
+        })
     })
-    .then(async function() {
-
+    .then(async function() { // Load all recent secondary sales
         if (! ammount) { return } 
-
         break_element = document.createElement('br')
         document.getElementById('frogs').appendChild(break_element)
-
         loadMore = document.createElement('button')
         loadMore.id = 'loadMore'
         loadMore.className = 'connectButton'
         loadMore.onclick = async function (e) { document.getElementById('frogs').innerHTML = ''; await fetch_recent_sales(); }
-        loadMore.innerHTML = '🔰 Secondary Sales'
-
+        loadMore.innerHTML = '🔰 Load More'
         document.getElementById('frogs').appendChild(loadMore)
-
-    })
+      })
 }
 
 async function fetch_tokens_by_owner(wallet) {
@@ -734,12 +659,11 @@ async function stakers(userAddress, _data) {
 }
 
 // Render NFT token by layered attirubtes obtained through metadata.
-async function render_recently_sold(token_data) {
+async function render_recently_sold(token) {
 
-    var { token_ids, seller_address, buyer_address, price, block_timestamp } = token_data
+    var { token_ids, seller_address, buyer_address, price, block_timestamp } = token
     var token_id = token_ids[0]
-    var sale_price = Number(price / 1000000000000000000);
-    var sale_price_usd = (sale_price * eth_usd).toFixed(2);
+    var sale_price = price / 1000000000000000000;
     var timestamp = block_timestamp.substring(0, 10);
     var location = 'frogs'
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
@@ -754,7 +678,7 @@ async function render_recently_sold(token_data) {
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
             '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
-            '<text id="frog_type" style="color: teal;">'+toFixedPoint(sale_price, 3)+'Ξ ($'+sale_price_usd+')</text>'+
+            '<text id="frog_type" style="color: teal;">'+sale_price+'Ξ</text>'+
         '</div>'
     bottom_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
@@ -822,6 +746,46 @@ async function render_recently_sold(token_data) {
         }
     }
 }
+// randomFrog = (( token_id / 100 ) / 2.5) round up
+// frogdna = frogArray[randomFrog]
+var frogArray = [
+    'blueDartFrog',
+    'brownTreeFrog',
+    'cyanTreeFrog',
+    'goldenDartFrog',
+    'goldenTreeFrog',
+    'greenTreeFrog',
+    'lightBrownTreeFrog',
+    'orangeTreeFrog',
+    'pinkTreeFrog',
+    'purpleTreeFrog',
+    'redEyedTreeFrog',
+    'splendidTreeFrog',
+    'stawberryDartFrog',
+    'tomatoFrog',
+    'unknown'
+]
+
+var traitArray = [
+    'blue(2)',
+    'blue',
+    'brown',
+    'cyan',
+    'green',
+    'natural',
+    'orange(2)',
+    'orange',
+    'pink',
+    'purple(2)',
+    'purple',
+    'red(2)',
+    'red',
+    'sand',
+    'white(2)',
+    'white',
+    'yellow(2)',
+    'yellow'
+]
 
 // Render NFT token by layered attirubtes obtained through metadata.
 async function render_token(token_id) {
@@ -1008,9 +972,50 @@ function truncateAddress(address) {
     )}`;
 }
 
-function toFixedPoint( value, dp ){
-    return +parseFloat(value).toFixed( dp );
-  }
+var star_frogs = [
+    '',
+    '2553'
+]
+
+var animated = [
+    //'witchStraw',
+    //'witchBrown',
+    //'witchBlack',
+    'blueDartFrog',
+    'blueTreeFrog',
+    'brownTreeFrog',
+    'redEyedTreeFrog',
+    'tongueSpiderRed',
+    'tongueSpider',
+    'tongue',
+    'tongueFly',
+    'croaking',
+    //'peace',
+    'inversedEyes',
+    'closedEyes',
+    'thirdEye',
+    'mask',
+    'smoking',
+    'smokingCigar',
+    'smokingPipe',
+    'circleShadesRed',
+    'circleShadesPurple',
+    'shades',
+    'shadesPurple',
+    'shadesThreeD',
+    'shadesWhite',
+    'circleNightVision',
+    //'baseballCapBlue',
+    //'baseballCapRed',
+    //'baseballCapWhite',
+    'yellow',
+    'blue(2)',
+    'blue',
+    'cyan',
+    'brown',
+    'silverEthChain',
+    'goldDollarChain'
+]
 
 // build_trait(_trait(family), _attribute(type), _where(element))
 function build_trait(trait_type, attribute, location) {
