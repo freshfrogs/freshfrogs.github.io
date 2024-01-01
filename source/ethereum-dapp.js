@@ -98,11 +98,46 @@ const options = {
     method: 'GET',
     headers: {
       accept: 'application/json',
-      'X-API-KEY': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjcyYjJmYWNkLTIzZDUtNDM4NS04ZmE4LTRkN2QxZDJmYTcwMCIsIm9yZ0lkIjoiMzcwMTY1IiwidXNlcklkIjoiMzgwNDMzIiwidHlwZUlkIjoiMjA0MDliMWItNWE3Yi00ZjZlLWI5NjktOWU2OWJiMWY3N2VmIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3MDM4OTQwMDUsImV4cCI6NDg1OTY1NDAwNX0.NSsiVKVdzHmL_b3eNdbEVzJJ4jNLWIQh5Qd3VZ9O-ko'
+      'X-API-KEY': '283zwvvZTuZz9enSoOvIUJo7'
     }
   };
 
-async function fetch_nft_scan() {}
+async function fetch_nft_scan(wallet) {
+    if (! wallet) { wallet = user_address; }
+    fetch('https://restapi.nftscan.com/api/v2/account/own/'+wallet+'?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address='+COLLECTION_ADDRESS, options)
+    .then((tokens) => tokens.json())
+    .then((tokens) => {
+
+        console.log(tokens)
+        /*
+        var assets = tokens.result
+        var shuffled, asset_tokens;
+
+        if (! ammount) { asset_tokens = assets } 
+        else { n = 5; shuffled = assets.sort(function(){ return 0.5 - Math.random() }); asset_tokens = shuffled.slice(0,n); }
+
+        asset_tokens.forEach((frog) => { render_recently_sold(frog); })
+        */
+
+    })
+    .then(async function() {
+
+        if (! ammount) { return } 
+
+        break_element = document.createElement('br')
+        document.getElementById('frogs').appendChild(break_element)
+
+        loadMore = document.createElement('button')
+        loadMore.id = 'loadMore'
+        loadMore.className = 'connectButton'
+        loadMore.onclick = async function (e) { document.getElementById('frogs').innerHTML = ''; await fetch_recent_sales(); }
+        loadMore.innerHTML = '🔰 Secondary Sales'
+
+        document.getElementById('frogs').appendChild(loadMore)
+
+    })
+
+}
 async function fetch_eth_usd() {
 
     console.log('Fetching ETH/USD...')
