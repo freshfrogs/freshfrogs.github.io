@@ -7,17 +7,89 @@
 */
 
 // Public Variables
-var controller, 
-collection, 
-user_address, 
-user_rewards, 
-user_tokenBalance, 
-user_stakedBalance, 
-is_approved, 
-web3, 
-f0,
-network,
-eth_usd;
+var controller, collection, 
+user_address, user_rewards, 
+user_tokenBalance, user_stakedBalance, 
+is_approved, web3, f0, network, eth_usd;
+
+var frogArray = [
+    'blueDartFrog',
+    'brownTreeFrog',
+    'cyanTreeFrog',
+    'goldenDartFrog',
+    'goldenTreeFrog',
+    'greenTreeFrog',
+    'lightBrownTreeFrog',
+    'orangeTreeFrog',
+    'pinkTreeFrog',
+    'purpleTreeFrog',
+    'redEyedTreeFrog',
+    'unknown',
+    'stawberryDartFrog',
+    'tomatoFrog',
+    'splendidTreeFrog'
+]
+
+var traitArray = [
+    'blue(2)',
+    'blue',
+    'brown',
+    'cyan',
+    'green',
+    'natural',
+    'orange(2)',
+    'orange',
+    'pink',
+    'purple(2)',
+    'purple',
+    'red(2)',
+    'red',
+    'sand',
+    'white(2)',
+    'white',
+    'yellow(2)',
+    'yellow'
+]
+
+var animated = [
+    //'witchStraw',
+    //'witchBrown',
+    //'witchBlack',
+    'blueDartFrog',
+    'blueTreeFrog',
+    'brownTreeFrog',
+    'redEyedTreeFrog',
+    'tongueSpiderRed',
+    'tongueSpider',
+    'tongue',
+    'tongueFly',
+    'croaking',
+    //'peace',
+    'inversedEyes',
+    'closedEyes',
+    'thirdEye',
+    'mask',
+    'smoking',
+    'smokingCigar',
+    'smokingPipe',
+    'circleShadesRed',
+    'circleShadesPurple',
+    'shades',
+    'shadesPurple',
+    'shadesThreeD',
+    'shadesWhite',
+    'circleNightVision',
+    //'baseballCapBlue',
+    //'baseballCapRed',
+    //'baseballCapWhite',
+    'yellow',
+    'blue(2)',
+    'blue',
+    'cyan',
+    'brown',
+    'silverEthChain',
+    'goldDollarChain'
+]
 
 const SOURCE_PATH = 'https://freshfrogs.github.io'
 const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
@@ -752,46 +824,6 @@ async function render_recently_sold(token) {
         }
     }
 }
-// randomFrog = (( token_id / 100 ) / 2.5) round up
-// frogdna = frogArray[randomFrog]
-var frogArray = [
-    'blueDartFrog',
-    'brownTreeFrog',
-    'cyanTreeFrog',
-    'goldenDartFrog',
-    'goldenTreeFrog',
-    'greenTreeFrog',
-    'lightBrownTreeFrog',
-    'orangeTreeFrog',
-    'pinkTreeFrog',
-    'purpleTreeFrog',
-    'redEyedTreeFrog',
-    'splendidTreeFrog',
-    'stawberryDartFrog',
-    'tomatoFrog',
-    'unknown'
-]
-
-var traitArray = [
-    'blue(2)',
-    'blue',
-    'brown',
-    'cyan',
-    'green',
-    'natural',
-    'orange(2)',
-    'orange',
-    'pink',
-    'purple(2)',
-    'purple',
-    'red(2)',
-    'red',
-    'sand',
-    'white(2)',
-    'white',
-    'yellow(2)',
-    'yellow'
-]
 
 // Render NFT token by layered attirubtes obtained through metadata.
 async function render_token(token_id) {
@@ -981,46 +1013,6 @@ function truncateAddress(address) {
 var star_frogs = [
     '',
     '2553'
-]
-
-var animated = [
-    //'witchStraw',
-    //'witchBrown',
-    //'witchBlack',
-    'blueDartFrog',
-    'blueTreeFrog',
-    'brownTreeFrog',
-    'redEyedTreeFrog',
-    'tongueSpiderRed',
-    'tongueSpider',
-    'tongue',
-    'tongueFly',
-    'croaking',
-    //'peace',
-    'inversedEyes',
-    'closedEyes',
-    'thirdEye',
-    'mask',
-    'smoking',
-    'smokingCigar',
-    'smokingPipe',
-    'circleShadesRed',
-    'circleShadesPurple',
-    'shades',
-    'shadesPurple',
-    'shadesThreeD',
-    'shadesWhite',
-    'circleNightVision',
-    //'baseballCapBlue',
-    //'baseballCapRed',
-    //'baseballCapWhite',
-    'yellow',
-    'blue(2)',
-    'blue',
-    'cyan',
-    'brown',
-    'silverEthChain',
-    'goldDollarChain'
 ]
 
 // build_trait(_trait(family), _attribute(type), _where(element))
