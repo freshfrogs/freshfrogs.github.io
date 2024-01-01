@@ -751,8 +751,7 @@ async function render_recently_sold(token_data) {
     var { token_ids, seller_address, buyer_address, price, block_timestamp, block_number } = token_data
     var token_id = token_ids[0]
     var sale_price = Number(price / 1000000000000000000);
-    eth_usd = await fetch_eth_usd(block_number)
-    console.log('ETH_USD: '+eth_usd)
+    let eth_usd = await fetch_eth_usd(block_number)
     var sale_price_usd = (sale_price * eth_usd).toFixed(2);
     var timestamp = block_timestamp.substring(0, 10);
     var location = 'frogs'
