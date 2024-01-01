@@ -33,6 +33,7 @@ async function fetch_eth_usd() {
 
     console.log('Fetching ETH/USD...')
     fetch('https://deep-index.moralis.io/api/v2.2/erc20/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/price?chain=eth&include=percent_change', options)
+    .then((results) => results.json())
     .then((results) => { console.log(results); eth_usd = parseInt(results.usdPrice); })
 
 }
