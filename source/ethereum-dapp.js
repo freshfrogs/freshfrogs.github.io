@@ -67,6 +67,11 @@ async function fetch_recent_sales(ammount) {
         loadMore.innerHTML = '<b>⟳</b> Load More'
         document.getElementById('frogs').appendChild(loadMore)
       })
+      .then(async function(){
+        fetch('https://api.coinmarketcap.com/v1/ticker/ethereum')
+        .then((result) => result.json())
+        .then((result) => { console.log(result) })
+      })
 }
 
 async function fetch_tokens_by_owner(wallet) {
