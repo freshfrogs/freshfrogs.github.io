@@ -119,8 +119,6 @@ async function fetch_recent_sales(ammount) {
     .then((tokens) => tokens.json())
     .then((tokens) => {
 
-        console.log(tokens);
-
         var assets = tokens.result
         var shuffled, asset_tokens;
 
