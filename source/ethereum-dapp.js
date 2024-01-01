@@ -107,7 +107,7 @@ async function fetch_eth_usd() {
     console.log('Fetching ETH/USD...')
     fetch('https://deep-index.moralis.io/api/v2.2/erc20/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/price?chain=eth&include=percent_change', options)
     .then((results) => results.json())
-    .then((results) => { eth_usd = parseInt(results.usdPrice); console.log('ETH/USD\n$'+eth_usd); })
+    .then((results) => { eth_usd = Number(results.usdPrice); console.log('ETH/USD\n$'+eth_usd); })
 
 }
 
@@ -740,8 +740,8 @@ async function render_recently_sold(token) {
 
     var { token_ids, seller_address, buyer_address, price, block_timestamp } = token
     var token_id = token_ids[0]
-    var sale_price = (price / 1000000000000000000).toFixed(3);
-    var sale_price_usd = (price * eth_usd);
+    var sale_price = Number(price) / 1000000000000000000;
+    var sale_price_usd = price * eth_usd;
     var timestamp = block_timestamp.substring(0, 10);
     var location = 'frogs'
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
@@ -756,7 +756,7 @@ async function render_recently_sold(token) {
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
             '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
-            '<text id="frog_type" style="color: teal;">'+sale_price+'Ξ ($'+sale_price_usd+')</text>'+
+            '<text id="frog_type" style="color: teal;">'+sale_price.toFixed(3)+'Ξ ($'+sale_price_usd.toFixed(0)+')</text>'+
         '</div>'
     bottom_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
