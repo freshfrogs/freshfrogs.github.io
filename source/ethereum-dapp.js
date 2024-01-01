@@ -469,9 +469,19 @@ async function withdraw(token_id) {
 */
 
 async function setApprovalForAll() {
-    
-    // Send Txn
-    let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address })
+    // Estimate gas needed for transaction
+    var gasprice = await web3.eth.getGasPrice();
+    gasprice = Math.round(gasprice * 1.05);// to speed up 1.05 times..
+    var gas_estimate = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address }).estimateGas({ from: user_address }); 
+    gas_estimate = Math.round(gas_estimate * 1.05);
+
+    // Send transaction using gas estimate
+    var txn = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address }).send({ 
+        from: user_address, 
+        gas: web3.utils.toHex(gas_estimate), 
+        gasPrice:  web3.utils.toHex(gasprice),
+    })
+
     // Transaction sent
     .on('transactionHash', function(hash){
         return 'TRANSACTION SENT\n Transaction to approve staking has been sent!';
