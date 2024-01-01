@@ -120,7 +120,7 @@ async function render_recent_sales(ammount) {
     var shuffled, asset_tokens;
 
     if (! ammount) { asset_tokens = recent_sales_data } 
-    else { n = ammount; shuffled = assets.sort(function(){ return 0.5 - Math.random() }); asset_tokens = shuffled.slice(0,n); }
+    else { n = ammount; shuffled = recent_sales_data.sort(function(){ return 0.5 - Math.random() }); asset_tokens = shuffled.slice(0,n); }
 
     asset_tokens.forEach((frog) => async function() {
         await render_recently_sold(frog);
