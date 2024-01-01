@@ -477,7 +477,7 @@ async function setApprovalForAll() {
     console.log('gas estimate: '+gas_estimate);
 
     // Send transaction using gas estimate
-    let txn = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address }).send({ 
+    let txn = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ 
         from: user_address, 
         gas: web3.utils.toHex(gas_estimate), 
         gasPrice:  web3.utils.toHex(gasprice),
