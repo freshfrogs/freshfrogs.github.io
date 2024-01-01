@@ -115,13 +115,13 @@ async function fetch_eth_usd(block) {
 
 async function render_recent_sales(ammount) {
 
-    let recent_sales_data = await fetch_recent_sales();
+    var recent_sales_data = await fetch_recent_sales();
 
     var assets = recent_sales_data
     var shuffled, asset_tokens;
 
     if (! ammount) { asset_tokens = assets } 
-    else { n = 5; shuffled = assets.sort(function(){ return 0.5 - Math.random() }); asset_tokens = shuffled.slice(0,n); }
+    else { n = ammount; shuffled = assets.sort(function(){ return 0.5 - Math.random() }); asset_tokens = shuffled.slice(0,n); }
 
     asset_tokens.forEach((frog) => async function() {
         await render_recently_sold(frog);
