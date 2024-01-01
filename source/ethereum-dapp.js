@@ -359,7 +359,7 @@ async function stake(token_id) {
         var gas_estimate = await controller.methods.stake(token_id).estimateGas({ from: user_address }); 
         gas_estimate = Math.round(gas_estimate * 1.05);
         // Send transaction using gas estimate
-        var txn = await controller.methods.stake(token_id).send({ 
+        let txn = await controller.methods.stake(token_id).send({ 
             from: user_address, 
             gas: web3.utils.toHex(gas_estimate), 
             gasPrice:  web3.utils.toHex(gasprice),
@@ -434,7 +434,7 @@ async function withdraw(token_id) {
         gas_estimate = Math.round(gas_estimate * 1.05);
 
         // Send transaction using gas estimate
-        var txn = await controller.methods.withdraw(token_id).send({ 
+        let txn = await controller.methods.withdraw(token_id).send({ 
             from: user_address, 
             gas: web3.utils.toHex(gas_estimate), 
             gasPrice:  web3.utils.toHex(gasprice),
@@ -477,7 +477,7 @@ async function setApprovalForAll() {
     console.log('gas estimate: '+gas_estimate);
 
     // Send transaction using gas estimate
-    var txn = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address }).send({ 
+    let txn = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address }).send({ 
         from: user_address, 
         gas: web3.utils.toHex(gas_estimate), 
         gasPrice:  web3.utils.toHex(gasprice),
@@ -925,7 +925,7 @@ async function send_write_transaction(contract_method) {
         gasprice = Math.round(gasprice * 1.05);// to speed up 1.05 times..
         var gas_estimate = await contract_method.estimateGas({ from: user_address }); 
         gas_estimate = Math.round(gas_estimate * 1.05);
-        var txn = await contract_method.send({ 
+        let txn = await contract_method.send({ 
             from: user_address, 
             gas: web3.utils.toHex(gas_estimate), 
             gasPrice:  web3.utils.toHex(gasprice),
