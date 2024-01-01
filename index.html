@@ -348,7 +348,8 @@
 
         try {
 
-          let eth_usd = await fetch_eth_usd();
+          console.log('1')
+          eth_usd = await fetch_eth_usd();
           await fetch_recent_sales(5);
 
         } catch (e) {
