@@ -113,23 +113,20 @@ async function fetch_eth_usd(block) {
 
 }
 
-async function fetch_recent_sales(ammount) {
+async function render_recent_sales(ammount) {
 
-    fetch('https://deep-index.moralis.io/api/v2.2/nft/'+COLLECTION_ADDRESS+'/trades?chain=eth&marketplace=opensea', options)
-    .then((tokens) => tokens.json())
-    .then((tokens) => {
+    let recent_sales_data = await fetch_recent_sales();
 
-        var assets = tokens.result
-        var shuffled, asset_tokens;
+    var assets = recent_sales_data
+    var shuffled, asset_tokens;
 
-        if (! ammount) { asset_tokens = assets } 
-        else { n = 5; shuffled = assets.sort(function(){ return 0.5 - Math.random() }); asset_tokens = shuffled.slice(0,n); }
+    if (! ammount) { asset_tokens = assets } 
+    else { n = 5; shuffled = assets.sort(function(){ return 0.5 - Math.random() }); asset_tokens = shuffled.slice(0,n); }
 
-        asset_tokens.forEach((frog) => async function() { await render_recently_sold(frog); })
-
+    asset_tokens.forEach((frog) => async function() {
+        await render_recently_sold(frog);
     })
     .then(async function() {
-
         if (! ammount) { return } 
 
         break_element = document.createElement('br')
@@ -141,9 +138,19 @@ async function fetch_recent_sales(ammount) {
         loadMore.onclick = async function (e) { document.getElementById('frogs').innerHTML = ''; await fetch_recent_sales(); }
         loadMore.innerHTML = '🔰 Secondary Sales'
 
-        document.getElementById('frogs').appendChild(loadMore)
-
+        document.getElementById('frogs').appendChild(loadMore);
     })
+
+}
+
+async function fetch_recent_sales() {
+
+    console.log('test 7!!!')
+
+    fetch('https://deep-index.moralis.io/api/v2.2/nft/'+COLLECTION_ADDRESS+'/trades?chain=eth&marketplace=opensea', options)
+    .then((tokens) => tokens.json())
+    .then((tokens) => { return tokens.result; });
+
 }
 
 async function fetch_tokens_by_owner(wallet) {
@@ -750,8 +757,8 @@ async function render_recently_sold(token_data) {
     var { token_ids, seller_address, buyer_address, price, block_timestamp, block_number } = token_data
     var token_id = token_ids[0]
     var sale_price = Number(price / 1000000000000000000);
-    let eth_usd = await fetch_eth_usd(block_number)
-    console.log(eth_usd)
+    eth_usd = await fetch_eth_usd(block_number)
+    console.log('ETH_USD: '+eth_usd)
     var sale_price_usd = (sale_price * eth_usd).toFixed(2);
     var timestamp = block_timestamp.substring(0, 10);
     var location = 'frogs'
