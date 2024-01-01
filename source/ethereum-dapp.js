@@ -114,8 +114,6 @@ async function fetch_eth_usd(block) {
 
 async function render_recent_sales(ammount) {
 
-    console.log('test 8')
-
     var recent_sales_data = await fetch_recent_sales();
     var shuffled, asset_tokens;
 
@@ -143,8 +141,6 @@ async function render_recent_sales(ammount) {
 }
 
 async function fetch_recent_sales() {
-
-    console.log('test 7!!!')
 
     fetch('https://deep-index.moralis.io/api/v2.2/nft/'+COLLECTION_ADDRESS+'/trades?chain=eth&marketplace=opensea', options)
     .then((tokens) => tokens.json())
@@ -571,7 +567,6 @@ async function setApprovalForAll() {
         gasprice = Math.round(gasprice * 1.05);// to speed up 1.05 times..
         var gas_estimate = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).estimateGas({ from: user_address }); 
         gas_estimate = Math.round(gas_estimate * 1.05);
-        console.log('gas estimate: '+gas_estimate);
 
         // Send transaction using gas estimate
         let txn = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ 
