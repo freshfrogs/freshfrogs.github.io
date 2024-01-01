@@ -668,7 +668,8 @@ async function render_recently_sold(token) {
 
     var { token_ids, seller_address, buyer_address, price, block_timestamp } = token
     var token_id = token_ids[0]
-    var sale_price = price / 1000000000000000000;
+    var sale_price = (price / 1000000000000000000);
+    var sale_price_usd = (price * eth_usd);
     var timestamp = block_timestamp.substring(0, 10);
     var location = 'frogs'
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
@@ -683,7 +684,7 @@ async function render_recently_sold(token) {
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
             '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
-            '<text id="frog_type" style="color: teal;">'+sale_price+'Ξ</text>'+
+            '<text id="frog_type" style="color: teal;">'+sale_price+'Ξ ($'+sale_price_usd+')</text>'+
         '</div>'
     bottom_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
