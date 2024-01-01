@@ -472,8 +472,9 @@ async function setApprovalForAll() {
     // Estimate gas needed for transaction
     var gasprice = await web3.eth.getGasPrice();
     gasprice = Math.round(gasprice * 1.05);// to speed up 1.05 times..
-    var gas_estimate = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address }).estimateGas({ from: user_address }); 
+    var gas_estimate = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).estimateGas({ from: user_address }); 
     gas_estimate = Math.round(gas_estimate * 1.05);
+    console.log('gas estimate: '+gas_estimate);
 
     // Send transaction using gas estimate
     var txn = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address }).send({ 
