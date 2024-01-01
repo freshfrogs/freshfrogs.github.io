@@ -37,8 +37,16 @@ async function fetch_recent_sales(ammount) {
         n = 5;
         shuffled = assets.sort(function(){ return 0.5 - Math.random() });
         asset_tokens = shuffled.slice(0,n);
+
+        
+        https://deep-index.moralis.io/api/v2.2/erc20/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/price?chain=eth&include=percent_change
+
     */
-    fetch('https://deep-index.moralis.io/api/v2.2/nft/'+COLLECTION_ADDRESS+'/trades?chain=eth&marketplace=opensea', options)
+   var eth_usd;
+    await fetch('ttps://deep-index.moralis.io/api/v2.2/erc20/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/price?chain=eth&include=percent_change', options)
+    .then((results) => { eth_usd = results.usdPriceFormatted.toFixed(2) })
+
+    await fetch('https://deep-index.moralis.io/api/v2.2/nft/'+COLLECTION_ADDRESS+'/trades?chain=eth&marketplace=opensea', options)
     .then((tokens) => tokens.json())
     .then((tokens) => {
         var assets = tokens.result
@@ -52,8 +60,8 @@ async function fetch_recent_sales(ammount) {
             asset_tokens = shuffled.slice(0,n);
         }
 
-        asset_tokens.forEach((frog) => {
-            render_recently_sold(frog)
+        asset_tokens.forEach((frog) => async function() {
+            await render_recently_sold(frog)
         })
     })
     .then(async function() { // Load all recent secondary sales
@@ -66,13 +74,7 @@ async function fetch_recent_sales(ammount) {
         loadMore.onclick = async function (e) { document.getElementById('frogs').innerHTML = ''; await fetch_recent_sales(); }
         loadMore.innerHTML = '🔰 Load More'
         document.getElementById('frogs').appendChild(loadMore)
-      })
-      .then(async function(){
-        console.log('Fetching current ethereum price...')
-        fetch('https://api.coinmarketcap.com/v1/ticker/ethereum', options)
-        .then((result) => result.json())
-        .then((result) => { console.log(result) })
-      })
+    })
 }
 
 async function fetch_tokens_by_owner(wallet) {
@@ -684,7 +686,7 @@ async function render_recently_sold(token) {
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
             '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
-            '<text id="frog_type" style="color: teal;">'+sale_price+'Ξ</text>'+
+            '<text id="frog_type" style="color: teal;">'+sale_price+'Ξ ($'+(eth_usd*sale_price)+')</text>'+
         '</div>'
     bottom_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
