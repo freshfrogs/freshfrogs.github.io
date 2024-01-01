@@ -668,7 +668,7 @@ async function render_recently_sold(token) {
 
     var { token_ids, seller_address, buyer_address, price, block_timestamp } = token
     var token_id = token_ids[0]
-    var sale_price = (price / 1000000000000000000);
+    var sale_price = (price / 1000000000000000000).toFixed(3);
     var sale_price_usd = (price * eth_usd);
     var timestamp = block_timestamp.substring(0, 10);
     var location = 'frogs'
