@@ -27,7 +27,7 @@ var frogArray = [
     'unknown',
     'stawberryDartFrog',
     'tomatoFrog',
-    'splendidTreeFrog'
+    'splendidLeafFrog'
 ]
 
 var traitArray = [
