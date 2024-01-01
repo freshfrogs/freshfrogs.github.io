@@ -353,7 +353,7 @@
 
         await initiate_web3_connection().then(async function(){
           await fetch_tokens_by_owner(user_address);
-          document.getElementById('thePondButton').style.boxShadow = '2px 2px lightsalmon'
+          document.getElementById('holdingsButton').style.boxShadow = '2px 2px lightsalmon'
 
           document.getElementById('randomLogo').onclick = async function (e) {
             clearInterval(intervalId);
