@@ -114,6 +114,8 @@ async function fetch_eth_usd(block) {
 
 async function render_recent_sales(ammount) {
 
+    console.log('test F I N A L')
+
     var recent_sales_data = await fetch_recent_sales();
     var shuffled, asset_tokens;
 
