@@ -756,7 +756,7 @@ async function render_recently_sold(token) {
     top_right = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
             '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
-            '<text id="frog_type" style="color: teal;">'+sale_price.toFixed(3)+'Ξ ($'+sale_price_usd.toFixed(0)+')</text>'+
+            '<text id="frog_type" style="color: teal;">'+toFixedPoint(sale_price, 3)+'Ξ ($'+toFixedPoint(sale_price_usd, 0)+')</text>'+
         '</div>'
     bottom_left = 
         '<div style="margin: 8px; float: right; width: 100px;">'+
@@ -1010,10 +1010,9 @@ function truncateAddress(address) {
     )}`;
 }
 
-var star_frogs = [
-    '',
-    '2553'
-]
+function toFixedPoint( value, dp ){
+    return +parseFloat(value).toFixed( dp );
+  }
 
 // build_trait(_trait(family), _attribute(type), _where(element))
 function build_trait(trait_type, attribute, location) {
