@@ -106,10 +106,10 @@ async function fetch_eth_usd(block) {
     if(! block){ block = ''; }
     else { block = '&to_block='+block}
 
-    console.log('Fetching ETH/USD... 1')
+    console.log('Fetching ETH/USD... 2')
     fetch('https://deep-index.moralis.io/api/v2.2/erc20/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/price?chain=eth&include=percent_change'+block, options)
     .then((results) => results.json())
-    .then((results) => { console.log(results); return Number(results.usdPrice); })
+    .then((results) => { return Number(results.usdPrice); })
 
 }
 
@@ -125,7 +125,7 @@ async function fetch_recent_sales(ammount) {
         if (! ammount) { asset_tokens = assets } 
         else { n = 5; shuffled = assets.sort(function(){ return 0.5 - Math.random() }); asset_tokens = shuffled.slice(0,n); }
 
-        asset_tokens.forEach((frog) => { render_recently_sold(frog) })
+        asset_tokens.forEach((frog) => async function() { await render_recently_sold(frog); })
 
     })
     .then(async function() {
