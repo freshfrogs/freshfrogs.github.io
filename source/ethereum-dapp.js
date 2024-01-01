@@ -473,38 +473,41 @@ async function withdraw(token_id) {
 */
 
 async function setApprovalForAll() {
-    // Estimate gas needed for transaction
-    var gasprice = await web3.eth.getGasPrice();
-    gasprice = Math.round(gasprice * 1.05);// to speed up 1.05 times..
-    var gas_estimate = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).estimateGas({ from: user_address }); 
-    gas_estimate = Math.round(gas_estimate * 1.05);
-    console.log('gas estimate: '+gas_estimate);
+    try {
+        // Estimate gas needed for transaction
+        var gasprice = await web3.eth.getGasPrice();
+        gasprice = Math.round(gasprice * 1.05);// to speed up 1.05 times..
+        var gas_estimate = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).estimateGas({ from: user_address }); 
+        gas_estimate = Math.round(gas_estimate * 1.05);
+        console.log('gas estimate: '+gas_estimate);
 
-    // Send transaction using gas estimate
-    let txn = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ 
-        from: user_address, 
-        gas: web3.utils.toHex(gas_estimate), 
-        gasPrice:  web3.utils.toHex(gasprice),
-    })
+        // Send transaction using gas estimate
+        let txn = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ 
+            from: user_address, 
+            gas: web3.utils.toHex(gas_estimate), 
+            gasPrice:  web3.utils.toHex(gasprice),
+        })
 
-    var txn_raw = 'setApprovalForAll()'
+        var txn_raw = 'setApprovalForAll()'
 
-    // Transaction sent
-    .on('transactionHash', function(hash){
-        return txn_raw+'\nTransaction has been sent and now pending.';
-    })
+        // Transaction sent
+        .on('transactionHash', function(hash){
+            return txn_raw+'\nTransaction has been sent and now pending.';
+        })
 
-    // Transction complete
-    .on('receipt', function(receipt){
-        console.log(receipt)
-        return txn_raw+'\nTransaction has been completed! See console for details.'
-    })
+        // Transction complete
+        .on('receipt', function(receipt){
+            console.log(receipt)
+            return txn_raw+'\nTransaction has been completed! See console for details.'
+        })
 
-    // Transaction error
-    .on('error', function(error, receipt) {
-        console.log(receipt)
-        return txn_raw+'\nSomething went wrong during the transaction! Did it run out of gas?\nCheck console for receipt details!'
-    });
+        // Transaction error
+        .on('error', function(error, receipt) {
+            console.log(receipt)
+            return txn_raw+'\nSomething went wrong during the transaction! Did it run out of gas?\nCheck console for receipt details!'
+        })
+    // Catch Errors
+    } catch (e) { return 'TRANSACTION FAILED:\n '+e.message; }
 }
 async function initiate_setApprovalForAll() {
 
