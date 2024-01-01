@@ -16,7 +16,8 @@ user_stakedBalance,
 is_approved, 
 web3, 
 f0,
-network;
+network,
+eth_usd;
 
 const SOURCE_PATH = 'https://freshfrogs.github.io'
 const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
