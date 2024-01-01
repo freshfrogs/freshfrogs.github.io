@@ -68,7 +68,8 @@ async function fetch_recent_sales(ammount) {
         document.getElementById('frogs').appendChild(loadMore)
       })
       .then(async function(){
-        fetch('https://api.coinmarketcap.com/v1/ticker/ethereum')
+        console.log('Fetching current ethereum price...')
+        fetch('https://api.coinmarketcap.com/v1/ticker/ethereum', options)
         .then((result) => result.json())
         .then((result) => { console.log(result) })
       })
