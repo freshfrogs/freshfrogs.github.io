@@ -172,7 +172,7 @@ async function get_all_staked_tokens(wallet) {
 }
 
 // Render NFT token by layered attirubtes obtained through metadata.
-async function render_token(html_elements, token_id) {
+async function render_frog_token(html_elements, token_id) {
 
     var location = 'frogs'
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
