@@ -102,9 +102,10 @@ const options = {
     }
   };
 
-async function fetch_nft_data(wallet, next_string) {
+async function fetch_nft_data(wallet, filter, next_string) {
     if (! wallet) { wallet = user_address; }
     if (! next_string) { next_string = ''; }
+    if (! filter) { filter = false; }
     fetch('https://restapi.nftscan.com/api/v2/account/own/'+wallet+'?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address='+COLLECTION_ADDRESS+'&limit=50&cursor='+next_string+'', options)
     .then(async (tokens) => tokens.json())
     .then(async (tokens) => {
@@ -119,9 +120,9 @@ async function fetch_nft_data(wallet, next_string) {
         
             // Staked
             if (owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
+                owner = await stakerAddress(token_id);
                 staked = 'True'
                 staked_status = 'teal'
-                owner = await stakerAddress(token_id);
                 staked_values = await stakingValues(token_id);
                 staked_lvl = staked_values[1]
                 staked_next_lvl = staked_values[2].toString()+' days'
@@ -145,7 +146,12 @@ async function fetch_nft_data(wallet, next_string) {
                         '<div style="text-align: center;">'+
                             '<button class="stake_button" onclick="initiate_stake('+token_id+')">Stake</button>'+
                         '</div>';
-                } else { button_element = ''; }
+                } else {
+                    button_element = '';
+                    if (filter == true && user_address.toLowerCase() !== owner.toLowerCase()){
+                        return
+                    }
+                }
             }
     
             var html_elements = 
@@ -179,7 +185,7 @@ async function fetch_nft_data(wallet, next_string) {
             loadMore = document.createElement('button')
             loadMore.id = 'loadMore'
             loadMore.className = 'connectButton'
-            loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_nft_data(wallet, next); }
+            loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_nft_data(wallet, filter, next); }
             loadMore.innerHTML = '🔰 Load More'
     
             document.getElementById('frogs').appendChild(loadMore)

@@ -352,7 +352,8 @@
           }, 6500);
 
         await initiate_web3_connection().then(async function(){
-          await fetch_nft_data();
+          await fetch_nft_data(user_address, false);
+          await fetch_nft_data(CONTROLLER_ADDRESS, true);
           document.getElementById('holdingsButton').style.boxShadow = '2px 2px lightsalmon'
 
           document.getElementById('randomLogo').onclick = async function (e) {
