@@ -178,7 +178,7 @@ async function fetch_nft_sales_data(limit, next_string) {
         var token_sales_data = tokens.data.content;
         next = tokens.data.next;
 
-        token_sales_data.forEach(async (frog) => {
+        await token_sales_data.forEach(async (frog) => {
             var { token_id, send, receive, trade_price, timestamp } = frog
             var sale_date = new Date(timestamp).toLocaleDateString("en-US")
             var sale_price = parseFloat(trade_price);
@@ -214,7 +214,7 @@ async function fetch_nft_sales_data(limit, next_string) {
             loadMore = document.createElement('button')
             loadMore.id = 'loadMore'
             loadMore.className = 'connectButton'
-            loadMore.onclick = async function(){ document.getElementById('frogs').innerHTML = ''; await fetch_nft_sales_data('100'); }
+            loadMore.onclick = async function(){ document.getElementById('frogs').innerHTML = ''; await fetch_nft_sales_data('100', next_string); }
             loadMore.innerHTML = '🔰 Secondary Sales'
 
             document.getElementById('frogs').appendChild(loadMore)
@@ -232,7 +232,7 @@ async function fetch_nft_data(wallet, next_string) {
         console.log(tokens)
         var staked_token_data = tokens.data.content;
         next = tokens.data.next;
-        staked_token_data.forEach(async (frog) => {
+        await staked_token_data.forEach(async (frog) => {
             var { token_id, minter, owner, mint_price, latest_trade_price, rarity_rank } = frog
             //var token_owner = await collection.methods.ownerOf(token_id).call();
             var staked, staked_status, staked_values, staked_lvl, staked_next_lvl, button_element, progress, progress_element;
