@@ -347,11 +347,11 @@
       document.addEventListener("DOMContentLoaded", async () => {
 
         await build_random_logo()
-          var intervalId = window.setInterval(async function(){
+          var intervalId = window.setInterval(async () => {
             await build_random_logo()
           }, 6500);
 
-        await initiate_web3_connection().then(async function(){
+        await initiate_web3_connection().then(async () => {
           await get_all_staked_tokens();
           document.getElementById('thePondButton').style.boxShadow = '2px 2px lightsalmon'
 
