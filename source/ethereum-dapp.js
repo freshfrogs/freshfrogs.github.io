@@ -108,15 +108,14 @@ async function fetch_nft_scan(wallet) {
     .then((tokens) => tokens.json())
     .then((tokens) => async function() {
         console.log('FETCHING NFT DATA....');
-        console.log(tokens)
-        return (tokens);
+        console.log(tokens.data.content);
+        return (tokens.data.content);
     })
 }
 
 async function get_all_staked_tokens() {
-    var data_fetch = await fetch_nft_scan(CONTROLLER_ADDRESS)
-    console.log('Data Fetch:\n'+data_fetch)
-    var all_staked_tokens = data_fetch.data.content
+    var all_staked_tokens = await fetch_nft_scan(CONTROLLER_ADDRESS)
+    console.log('Data Fetch:\n'+all_staked_tokens)
     all_staked_tokens.forEach((frog) => async function(){
         var { token_id, minter, owner, mint_price, latest_trade_price, rarity_rank } = frog
         //var token_owner = await collection.methods.ownerOf(token_id).call();
