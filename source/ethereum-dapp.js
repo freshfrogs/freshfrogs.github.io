@@ -106,9 +106,9 @@ async function fetch_nft_scan(wallet) {
     console.log('fetch_nft_scan(wallet)')
     if (! wallet) { wallet = user_address; }
     await fetch('https://restapi.nftscan.com/api/v2/account/own/'+wallet+'?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
-    .then(async (tokens) => { tokens.json(); })
-    .then(async (tokens) => {
-        console.log('FETCHING NFT DATA!!!!');
+    .then((tokens) => { tokens.json(); })
+    .then((tokens) => {
+        console.log('FETCHING NFT DATA 22!!!!');
         console.log(tokens.data.content);
         return (tokens.data.content);
     })
