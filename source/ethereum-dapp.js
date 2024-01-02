@@ -170,7 +170,8 @@ async function fetch_nft_data(wallet, next_string) {
     
             await render_frog_token(html_elements, token_id);
         })
-
+    })
+    .then(async function() {
         if (next !== null && next !== '') {
 
             break_element = document.createElement('br')
