@@ -117,8 +117,8 @@ async function fetch_nft_scan(wallet) {
     .then((tokens) => { tokens.json(); console.log(tokens); })
     .then((tokens) => {
         console.log('FETCHING NFT DATA');
-        console.log(tokens.data.content);
-        return (tokens.data.content);
+        console.log(tokens);
+        return (tokens);
     })
 }
 
