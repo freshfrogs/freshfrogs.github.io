@@ -104,41 +104,145 @@ const options = {
 
 async function fetch_nft_scan(wallet) {
     if (! wallet) { wallet = user_address; }
-    console.log('fetching nfts...')
-    fetch('https://restapi.nftscan.com/api/v2/account/own/0xCB1ee125CFf4051a10a55a09B10613876C4Ef199?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
+    fetch('https://restapi.nftscan.com/api/v2/account/own/'+wallet+'?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
     .then((tokens) => tokens.json())
-    .then((tokens) => {
-
-        console.log(tokens)
-        /*
-        var assets = tokens.result
-        var shuffled, asset_tokens;
-
-        if (! ammount) { asset_tokens = assets } 
-        else { n = 5; shuffled = assets.sort(function(){ return 0.5 - Math.random() }); asset_tokens = shuffled.slice(0,n); }
-
-        asset_tokens.forEach((frog) => { render_recently_sold(frog); })
-        */
-
-    })
-    .then(async function() {
-
-        if (! ammount) { return } 
-
-        break_element = document.createElement('br')
-        document.getElementById('frogs').appendChild(break_element)
-
-        loadMore = document.createElement('button')
-        loadMore.id = 'loadMore'
-        loadMore.className = 'connectButton'
-        loadMore.onclick = async function (e) { document.getElementById('frogs').innerHTML = ''; await fetch_recent_sales(); }
-        loadMore.innerHTML = '🔰 Secondary Sales'
-
-        document.getElementById('frogs').appendChild(loadMore)
-
-    })
-
+    .then((tokens) => { return (tokens.data.content) })
 }
+
+async function get_all_staked_tokens() {
+    let all_staked_tokens = await fetch_nft_scan(CONTROLLER_ADDRESS)
+    all_staked_tokens.forEach((frog) => async function(){
+        var { token_id, minter, owner, mint_price, latest_trade_price, rarity_rank } = frog
+        //var token_owner = await collection.methods.ownerOf(token_id).call();
+        var staked, staked_status, staked_values, staked_lvl, staked_next_lvl, button_element, progress, progress_element;
+    
+        // Staked
+        if (owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
+            staked = 'True'
+            staked_status = 'teal'
+            owner = await stakerAddress(token_id);
+            staked_values = await stakingValues(token_id);
+            staked_lvl = staked_values[1]
+            staked_next_lvl = staked_values[2].toString()+' days'
+            progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
+            progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>'
+            if (owner.toLowerCase() == user_address.toLowerCase()) { 
+                button_element = // Un-stake button
+                    '<div style="text-align: center;">'+
+                        '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
+                    '</div>';
+            } else { button_element = ''; }
+        // NOT Staked
+        } else {
+            progress_element = '';
+            staked = 'False';
+            staked_status = 'tomato';
+            staked_lvl = '--'
+            staked_next_lvl = '--'
+            if (owner.toLowerCase() == user_address.toLowerCase()) { 
+                button_element = // Un-stake button
+                    '<div style="text-align: center;">'+
+                        '<button class="stake_button" onclick="initiate_stake('+token_id+')">Stake</button>'+
+                    '</div>';
+            } else { button_element = ''; }
+        }
+
+        var html_elements = 
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
+                '<text style="color: '+staked_status+';">'+staked+'</text>'+
+            '</div>'+
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
+                '<text style="color: teal;" id="frog_type">'+truncateAddress(owner)+'</text>'+
+            '</div>'+
+            '<br>'+
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
+                '<text style="color: teal;">'+staked_next_lvl+'</text>'+
+            '</div>'+
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
+                '<text style="color: teal;">'+staked_lvl+'</text>'+
+            '</div>'+
+            button_element;
+
+        await render_frog_token(html_elements, token_id);
+    })
+}
+
+// Render NFT token by layered attirubtes obtained through metadata.
+async function render_token(html_elements, token_id) {
+
+    var location = 'frogs'
+    var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
+    var token_name = 'Frog #'+token_id
+
+    // <-- Begin Element
+    token_doc = document.getElementById(location);
+    token_element = document.createElement('div');
+
+    // Element Details -->
+    token_element.id = token_name;
+    token_element.className = 'display_token';
+    token_element.innerHTML = 
+        '<div class="display_token_cont">'+
+            '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
+                '<div class="innerLeft">'+
+                    '<div href="https://rarible.com/token/'+COLLECTION_ADDRESS+':'+token_id+'" target="_blank" class="display_token_img_cont" id="cont_'+token_id+'" onclick="render_display('+token_id+')">'+
+                    '</div>'+
+                '</div>'+
+            '</div>'+
+            '<div class="renderRight">'+
+                '<div class="innerRight">'+
+                    '<div id="traits_'+token_id+'" class="trait_list">'+
+                        //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
+                        '<strong><u>'+token_name+'</u></strong> <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+                    '</div>'+
+                    '<div id="prop_'+token_id+'" class="properties">'+
+                        html_elements
+                    '</div>'+
+                '</div>'+
+            '</div>'+
+        '</div>';
+
+    // Create Element <--
+    token_doc.appendChild(token_element);
+
+    // Update Metadata! Build Frog -->
+    let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
+    for (let i = 0; i < metadata.attributes.length; i++) {
+        let attribute = metadata.attributes[i]
+        if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
+
+            // get special dna from token id
+            randomFrog = Math.round(( token_id / 100 ) / 2.5)
+            if (randomFrog < 1) { randomFrog = 0 }
+            frogdna = frogArray[randomFrog]
+            traitdna = traitArray[randomFrog]
+            build_trait('SpecialFrog', 'peace/'+frogdna, 'cont_'+token_id);
+            build_trait('Trait', 'SpecialFrog/peace/'+traitdna, 'cont_'+token_id);
+        } else {
+            build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
 async function fetch_eth_usd() {
 
     console.log('Fetching ETH/USD...')
