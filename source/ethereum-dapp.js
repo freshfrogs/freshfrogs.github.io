@@ -295,7 +295,7 @@ async function fetch_nft_data(wallet, next_string) {
     
             await render_frog_token(html_elements, token_id);
         })
-        console.log('loading button x3')
+        console.log('loading button x3\n'+next)
         .then(async (tokens) => {
             if (next !== null && next !== '' && next !== 'undefined') {
                 break_element = document.createElement('br')
