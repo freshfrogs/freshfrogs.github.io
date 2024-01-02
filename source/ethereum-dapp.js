@@ -121,8 +121,9 @@ async function fetch_staked_nfts(wallet) {
     .then(async (tokens) => {
         console.log('Fetching (STAKED) tokens from address: \n'+wallet+'\n')
         console.log(tokens)
-        tokens.forEach(async (token_id) => {
+        tokens.forEach(async (token) => {
             //var token_owner = await collection.methods.ownerOf(token_id).call();
+            var token_id = token.tokenId
             var staked, staked_status, staked_values, staked_lvl, staked_next_lvl, button_element, progress, progress_element;
             staked = 'True'
             staked_status = 'teal'
