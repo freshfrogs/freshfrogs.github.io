@@ -108,9 +108,9 @@ async function get_all_staked_tokens(wallet) {
     .then((tokens) => tokens.json())
     .then((tokens) => {
         console.log('Fetching tokens from address: \n'+wallet+'\n')
-        console.log(tokens)
         var staked_token_data = tokens.data.content;
         staked_token_data.forEach(async (page) => {
+            console.log(page);
             page.forEach(async (frog) => {
                 var { token_id, minter, owner, mint_price, latest_trade_price, rarity_rank } = frog
                 //var token_owner = await collection.methods.ownerOf(token_id).call();
