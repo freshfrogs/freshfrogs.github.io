@@ -974,7 +974,7 @@ async function render_recently_sold(token_data) {
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
         let attribute = metadata.attributes[i]
-        if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
+        /* if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
 
             // get special dna from token id
             randomFrog = Math.round(( token_id / 100 ) / 2.5)
@@ -983,9 +983,9 @@ async function render_recently_sold(token_data) {
             traitdna = traitArray[randomFrog]
             build_trait('SpecialFrog', 'peace/'+frogdna, 'cont_'+token_id);
             build_trait('Trait', 'SpecialFrog/peace/'+traitdna, 'cont_'+token_id);
-        } else {
+        } else { */
             build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
-        }
+      //}
     }
 }
 
