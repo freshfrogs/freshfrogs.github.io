@@ -205,7 +205,7 @@ async function render_token(html_elements, token_id) {
                         '<strong><u>'+token_name+'</u></strong> <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
                     '</div>'+
                     '<div id="prop_'+token_id+'" class="properties">'+
-                        html_elements
+                        html_elements+
                     '</div>'+
                 '</div>'+
             '</div>'+
