@@ -181,7 +181,7 @@ async function fetch_nft_sales_data(limit, next_string) {
         await token_sales_data.forEach(async (frog) => {
             var { token_id, send, receive, trade_price, timestamp } = frog
             var sale_date = new Date(timestamp).toLocaleDateString("en-US")
-            var sale_price = parseFloat(trade_price);
+            var sale_price = parseFloat(trade_price); // Number(value.toFixed(2))
 
             // Render token information and data
             var html_elements = 
