@@ -119,8 +119,8 @@ async function timeConverter(UNIX_timestamp){
 async function fetch_nft_sales_data(limit) {
     if (! limit) { limit = '5'; }
     fetch('https://restapi.nftscan.com/api/v2/transactions/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?event_type=Sale&sort_direction=desc&limit='+limit+'', options)
-    .then(async function(tokens) { tokens.json()})
-    .then(async function(tokens) {
+    .then(async (tokens) => tokens.json())
+    .then(async (tokens) => {
 
         console.log('Fetching secondary sales!')
         console.log(tokens)
@@ -156,7 +156,7 @@ async function fetch_nft_sales_data(limit) {
         })
     })
     .then(async function() {
-        (! limit || limit == '5')
+
         break_element = document.createElement('br')
         document.getElementById('frogs').appendChild(break_element)
 
@@ -174,8 +174,8 @@ async function fetch_nft_data(wallet, next_string) {
     if (! wallet) { wallet = user_address; }
     if (! next_string) { next_string = ''; }
     fetch('https://restapi.nftscan.com/api/v2/account/own/'+wallet+'?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address='+COLLECTION_ADDRESS+'&limit=50&cursor='+next_string+'', options)
-    .then(async function(tokens) {tokens.json()})
-    .then(async function(tokens) {
+    .then(async (tokens) => tokens.json())
+    .then(async (tokens) => {
         console.log('Fetching tokens from address: \n'+wallet+'\n')
         console.log(tokens)
         var staked_token_data = tokens.data.content;
