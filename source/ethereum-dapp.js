@@ -296,10 +296,10 @@ async function fetch_nft_data(wallet, next_string) {
     
             await render_frog_token(html_elements, token_id);
         })
-        console.log('done loading frogs.')
+        console.log('done loading frogs 2')
     })
-    .then(async function() {
-        console.log('loading button')
+    .then(async (tokens) => {
+        console.log('loading button 2')
         if (next !== null || next !== '') {
 
             break_element = document.createElement('br')
