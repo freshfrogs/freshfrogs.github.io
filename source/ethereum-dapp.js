@@ -205,8 +205,11 @@ async function fetch_nft_sales_data(limit, next_string) {
     
             await render_frog_token(html_elements, token_id);
         })
+
+        console.log('done loading frogs.')
     })
     .then(async function() {
+        console.log('loading button')
         if (next !== null && next !== '') {
             break_element = document.createElement('br')
             document.getElementById('frogs').appendChild(break_element)
@@ -225,7 +228,7 @@ async function fetch_nft_sales_data(limit, next_string) {
 async function fetch_nft_data(wallet, next_string) {
     if (! wallet) { wallet = user_address; }
     if (! next_string) { next_string = ''; }
-    fetch('https://restapi.nftscan.com/api/v2/account/own/'+wallet+'?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address='+COLLECTION_ADDRESS+'&limit=50&cursor='+next_string+'', options)
+    fetch('https://restapi.nftscan.com/api/v2/account/own/'+wallet+'?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address='+COLLECTION_ADDRESS+'&limit=20&cursor='+next_string+'', options)
     .then(async (tokens) => tokens.json())
     .then(async (tokens) => {
         console.log('Fetching tokens from address: \n'+wallet+'\n')
