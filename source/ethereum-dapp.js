@@ -156,7 +156,7 @@ async function fetch_nft_sales_data(limit) {
         })
     })
     .then(async function() {
-
+        (! limit || limit == '5')
         break_element = document.createElement('br')
         document.getElementById('frogs').appendChild(break_element)
 
