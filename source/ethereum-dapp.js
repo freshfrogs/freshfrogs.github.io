@@ -177,7 +177,7 @@ async function fetch_nft_sales_data(limit, next_string) {
         console.log(tokens)
 
         var token_sales_data = tokens.data.content;
-        var next = tokens.data.next;
+        next = tokens.data.next;
 
         await token_sales_data.forEach(async (frog) => {
             var { token_id, send, receive, trade_price, timestamp } = frog
@@ -234,7 +234,7 @@ async function fetch_nft_data(wallet, next_string) {
         console.log('Fetching tokens from address: \n'+wallet+'\n')
         console.log(tokens)
         var staked_token_data = tokens.data.content;
-        var next = tokens.data.next;
+        next = tokens.data.next;
         await staked_token_data.forEach(async (frog) => {
             var { token_id, minter, owner, mint_price, latest_trade_price, rarity_rank } = frog
             //var token_owner = await collection.methods.ownerOf(token_id).call();
