@@ -297,7 +297,7 @@ async function fetch_nft_data(wallet, next_string) {
         })
         console.log('loading button x3\n'+next)
     })
-    .then(async (tokens) => {
+    .then(async function() {
         if (next !== null && next !== '' && next !== 'undefined') {
             break_element = document.createElement('br')
             document.getElementById('frogs').appendChild(break_element)
