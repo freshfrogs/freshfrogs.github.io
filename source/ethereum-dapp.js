@@ -296,24 +296,19 @@ async function fetch_nft_data(wallet, next_string) {
     
             await render_frog_token(html_elements, token_id);
         })
-        console.log('done loading frogs 2')
-    })
-    .then(async (tokens) => {
-        console.log('loading button 2')
-        if (next !== null || next !== '') {
-
-            break_element = document.createElement('br')
-            document.getElementById('frogs').appendChild(break_element)
-    
-            loadMore = document.createElement('button')
-            loadMore.id = 'loadMore'
-            loadMore.className = 'connectButton'
-            loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_nft_data(wallet, next); }
-            loadMore.innerHTML = '🔰 Load More'
-    
-            document.getElementById('frogs').appendChild(loadMore)
-
-        } else { return }
+        console.log('loading button x3')
+        .then(async (tokens) => {
+            if (next !== null || next !== '') {
+                break_element = document.createElement('br')
+                document.getElementById('frogs').appendChild(break_element)
+                loadMore = document.createElement('button')
+                loadMore.id = 'loadMore'
+                loadMore.className = 'connectButton'
+                loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_nft_data(wallet, next); }
+                loadMore.innerHTML = '🔰 Load More'
+                document.getElementById('frogs').appendChild(loadMore)
+            } else { return }
+        })
     })
 }
 
