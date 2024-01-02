@@ -116,9 +116,10 @@ async function timeConverter(UNIX_timestamp){
 }
 
 // https://restapi.nftscan.com/api/v2/transactions/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?event_type=Sale&sort_direction=desc&limit=100
-async function fetch_nft_sales_data(limit) {
+async function fetch_nft_sales_data(limit, next_string) {
     if (! limit) { limit = '5'; }
-    fetch('https://restapi.nftscan.com/api/v2/transactions/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?event_type=Sale&sort_direction=desc&limit='+limit+'', options)
+    if (! next_string) { next_string = ''; }
+    fetch('https://restapi.nftscan.com/api/v2/transactions/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?event_type=Sale&sort_direction=desc&limit='+limit+'&cursor='+next_string+'', options)
     .then(async (tokens) => tokens.json())
     .then(async (tokens) => {
 
@@ -156,17 +157,18 @@ async function fetch_nft_sales_data(limit) {
         })
     })
     .then(async function() {
+        if (next !== null && next !== '') {
+            break_element = document.createElement('br')
+            document.getElementById('frogs').appendChild(break_element)
 
-        break_element = document.createElement('br')
-        document.getElementById('frogs').appendChild(break_element)
+            loadMore = document.createElement('button')
+            loadMore.id = 'loadMore'
+            loadMore.className = 'connectButton'
+            loadMore.onclick = async function(){ document.getElementById('frogs').innerHTML = ''; await fetch_nft_sales_data('100'); }
+            loadMore.innerHTML = '🔰 Secondary Sales'
 
-        loadMore = document.createElement('button')
-        loadMore.id = 'loadMore'
-        loadMore.className = 'connectButton'
-        loadMore.onclick = async function(){ document.getElementById('frogs').innerHTML = ''; await fetch_nft_sales_data('100'); }
-        loadMore.innerHTML = '🔰 Secondary Sales'
-
-        document.getElementById('frogs').appendChild(loadMore)
+            document.getElementById('frogs').appendChild(loadMore)
+        } else { return }
     })
 }
 
