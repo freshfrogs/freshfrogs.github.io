@@ -211,7 +211,7 @@ async function fetch_nft_sales_data(limit, next_string) {
     })
     .then(async function() {
         console.log('loading button')
-        if (next !== null && next !== '') {
+        if (next !== null || next !== '') {
             break_element = document.createElement('br')
             document.getElementById('frogs').appendChild(break_element)
 
@@ -294,9 +294,11 @@ async function fetch_nft_data(wallet, next_string) {
     
             await render_frog_token(html_elements, token_id);
         })
+        console.log('done loading frogs.')
     })
     .then(async function() {
-        if (next !== null && next !== '') {
+        console.log('loading button')
+        if (next !== null || next !== '') {
 
             break_element = document.createElement('br')
             document.getElementById('frogs').appendChild(break_element)
