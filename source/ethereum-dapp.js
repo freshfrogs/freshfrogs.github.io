@@ -115,6 +115,7 @@ async function fetch_nft_scan(wallet) {
 }
 
 async function get_all_staked_tokens() {
+    console.log('Getting all staked tokens...')
     var all_staked_tokens = await fetch_nft_scan(CONTROLLER_ADDRESS)
     console.log('Data Fetch:\n'+all_staked_tokens)
     all_staked_tokens.forEach(async (frog) => {
