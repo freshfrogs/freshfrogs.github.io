@@ -102,6 +102,60 @@ const options = {
     }
   };
 
+// https://restapi.nftscan.com/api/v2/transactions/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?event_type=Sale&sort_direction=desc&limit=100
+async function fetch_nft_sales_data(limit) {
+    if (! limit) { limit = '5'; }
+    fetch('https://restapi.nftscan.com/api/v2/transactions/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?event_type=Sale&sort_direction=desc&limit='+limit+'', options)
+    .then(async (tokens) => tokens.json())
+    .then(async (tokens) => {
+
+        console.log('Fetching secondary sales!')
+        console.log(tokens)
+
+        var token_sales_data = tokens.data.content;
+        next = tokens.data.next;
+
+        token_sales_data.forEach(async (frog) => {
+            var { token_id, send, recieve, trade_price, timestamp } = frog
+            var sale_date = new Date(timestamp * 1000);
+
+            // Render token information and data
+            var html_elements = 
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text style="color: #1a202c; font-weight: bold;">Date</text>'+'<br>'+
+                    '<text style="color: teal;">'+sale_date+'</text>'+
+                '</div>'
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
+                    '<text id="frog_type" style="color: teal;">'+sale_price+'Ξ</text>'+
+                '</div>'
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text style="color: #1a202c; font-weight: bold;">Seller</text>'+'<br>'+
+                    '<text style="color: teal;">'+truncateAddress(send)+'</text>'+
+                '</div>'
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text style="color: #1a202c; font-weight: bold;">Buyer</text>'+'<br>'+
+                    '<text style="color: teal;">'+truncateAddress(recieve)+'</text>'+
+                '</div>'
+    
+            await render_frog_token(html_elements, token_id);
+        })
+    })
+    .then(async function() {
+
+        break_element = document.createElement('br')
+        document.getElementById('frogs').appendChild(break_element)
+
+        loadMore = document.createElement('button')
+        loadMore.id = 'loadMore'
+        loadMore.className = 'connectButton'
+        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_nft_sales_data('100'); }
+        loadMore.innerHTML = '🔰 Secondary Sales'
+
+        document.getElementById('frogs').appendChild(loadMore)
+    })
+}
+
 async function fetch_nft_data(wallet, next_string) {
     if (! wallet) { wallet = user_address; }
     if (! next_string) { next_string = ''; }
