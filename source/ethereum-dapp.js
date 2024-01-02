@@ -162,7 +162,7 @@ async function fetch_nft_sales_data(limit) {
         loadMore = document.createElement('button')
         loadMore.id = 'loadMore'
         loadMore.className = 'connectButton'
-        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_nft_sales_data('100'); }
+        loadMore.onclick = async function(){ document.getElementById('frogs').innerHTML = ''; await fetch_nft_sales_data('100'); }
         loadMore.innerHTML = '🔰 Secondary Sales'
 
         document.getElementById('frogs').appendChild(loadMore)
