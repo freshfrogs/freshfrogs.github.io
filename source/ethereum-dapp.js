@@ -207,23 +207,21 @@ async function fetch_nft_sales_data(limit, next_string) {
     
             await render_frog_token(html_elements, token_id);
         })
-
-        console.log('done loading frogs.')
-    })
-    .then(async function() {
-        console.log('loading button')
-        if (next !== null || next !== '') {
-            break_element = document.createElement('br')
-            document.getElementById('frogs').appendChild(break_element)
-
-            loadMore = document.createElement('button')
-            loadMore.id = 'loadMore'
-            loadMore.className = 'connectButton'
-            loadMore.onclick = async function(){ document.getElementById('frogs').innerHTML = ''; await fetch_nft_sales_data('100', next_string); }
-            loadMore.innerHTML = '🔰 Secondary Sales'
-
-            document.getElementById('frogs').appendChild(loadMore)
-        } else { return }
+        .then(async function() {
+            console.log('loading button')
+            if (next !== null || next !== '') {
+                break_element = document.createElement('br')
+                document.getElementById('frogs').appendChild(break_element)
+    
+                loadMore = document.createElement('button')
+                loadMore.id = 'loadMore'
+                loadMore.className = 'connectButton'
+                loadMore.onclick = async function(){ document.getElementById('frogs').innerHTML = ''; await fetch_nft_sales_data('100', next_string); }
+                loadMore.innerHTML = '🔰 Secondary Sales'
+    
+                document.getElementById('frogs').appendChild(loadMore)
+            } else { return }
+        })
     })
 }
 
