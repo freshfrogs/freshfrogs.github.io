@@ -102,7 +102,7 @@ const options = {
     }
   };
 
-async function get_all_staked_tokens(wallet) {
+async function fetch_nft_data(wallet) {
     if (! wallet) { wallet = user_address; }
     fetch('https://restapi.nftscan.com/api/v2/account/own/'+wallet+'?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address='+COLLECTION_ADDRESS+'', options)
     .then((tokens) => tokens.json())

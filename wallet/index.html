@@ -352,7 +352,7 @@
           }, 6500);
 
         await initiate_web3_connection().then(async function(){
-          await get_all_staked_tokens();
+          await fetch_nft_data();
           document.getElementById('holdingsButton').style.boxShadow = '2px 2px lightsalmon'
 
           document.getElementById('randomLogo').onclick = async function (e) {
