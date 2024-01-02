@@ -105,7 +105,7 @@ const options = {
 async function fetch_test() {
 
     console.log('Fetch Test:')
-    fetch('https://restapi.nftscan.com/api/v2/account/own/0xF01e067d442f4254cd7c89A5D42d90ad554616E8?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
+    fetch('https://restapi.nftscan.com/api/v2/account/own/0xF01e067d442f4254cd7c89A5D42d90ad554616E8?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address='+COLLECTION_ADDRESS+'', options)
     .then((tokens) => tokens.json())
     .then((tokens) => { console.log(tokens) })
 }
