@@ -105,11 +105,12 @@ const options = {
 async function fetch_nft_data(wallet) {
     if (! wallet) { wallet = user_address; }
     fetch('https://restapi.nftscan.com/api/v2/account/own/'+wallet+'?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address='+COLLECTION_ADDRESS+'&limit=100', options)
-    .then((tokens) => tokens.json())
-    .then((tokens) => {
+    .then(async (tokens) => tokens.json())
+    .then(async (tokens) => {
         console.log('Fetching tokens from address: \n'+wallet+'\n')
         console.log(tokens)
         var staked_token_data = tokens.data.content;
+        next = tokens.data.next;
         staked_token_data.forEach(async (frog) => {
             var { token_id, minter, owner, mint_price, latest_trade_price, rarity_rank } = frog
             //var token_owner = await collection.methods.ownerOf(token_id).call();
@@ -168,6 +169,10 @@ async function fetch_nft_data(wallet) {
     
             await render_frog_token(html_elements, token_id);
         })
+
+        if (next !== null) {
+            await fetch_nft_data(wallet, next);
+        } else { return }
     })
 }
 
