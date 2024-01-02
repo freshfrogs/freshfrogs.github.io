@@ -181,7 +181,7 @@ async function fetch_nft_sales_data(limit, next_string) {
         token_sales_data.forEach(async (frog) => {
             var { token_id, send, receive, trade_price, timestamp } = frog
             var sale_date = new Date(timestamp).toLocaleDateString("en-US")
-            var sale_price = parseFloat(trade_price).toFixed(2);
+            var sale_price = parseFloat(trade_price);
 
             // Render token information and data
             var html_elements = 
@@ -191,7 +191,7 @@ async function fetch_nft_sales_data(limit, next_string) {
                 '</div>'+
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
-                    '<text id="frog_type" style="color: teal;">'+sale_price+'Ξ</text>'+
+                    '<text id="frog_type" style="color: teal;">'+toFixedPoint(sale_price, 3)+'Ξ</text>'+
                 '</div>'+
                 '<br>'+
                 '<div style="margin: 8px; float: right; width: 100px;">'+
@@ -275,7 +275,7 @@ async function fetch_nft_data(wallet, next_string) {
                 '</div>'+
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
-                    '<text style="color: teal;" id="frog_type">'+await truncateAddress(owner)+'</text>'+
+                    '<text style="color: teal;" id="frog_type">'+truncateAddress(owner)+'</text>'+
                 '</div>'+
                 '<br>'+
                 '<div style="margin: 8px; float: right; width: 100px;">'+
@@ -1004,7 +1004,7 @@ function romanize (num) {
 }
 
 // Shorten ethereum wallet address
-async function truncateAddress(address) {
+function truncateAddress(address) {
     if (!address) { return ""; }
     return `${address.substr(0, 5)}..${address.substr(
         address.length - 5,
