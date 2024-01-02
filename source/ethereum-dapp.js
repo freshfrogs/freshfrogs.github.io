@@ -101,6 +101,19 @@ const options = {
       'X-API-KEY': '283zwvvZTuZz9enSoOvIUJo7'
     }
   };
+  
+async function timeConverter(UNIX_timestamp){
+    var a = new Date(UNIX_timestamp * 1000);
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var year = a.getFullYear();
+    var month = a.getMonth();
+    var date = a.getDate();
+    var hour = a.getHours();
+    var min = a.getMinutes();
+    var sec = a.getSeconds();
+    var time = date+'/'+month+'/'+year;
+    return time;
+}
 
 // https://restapi.nftscan.com/api/v2/transactions/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?event_type=Sale&sort_direction=desc&limit=100
 async function fetch_nft_sales_data(limit) {
@@ -117,22 +130,22 @@ async function fetch_nft_sales_data(limit) {
 
         token_sales_data.forEach(async (frog) => {
             var { token_id, send, recieve, trade_price, timestamp } = frog
-            var sale_date = new Date(timestamp * 1000);
+            var sale_date = await timeConverter(timestamp);
 
             // Render token information and data
             var html_elements = 
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text style="color: #1a202c; font-weight: bold;">Date</text>'+'<br>'+
                     '<text style="color: teal;">'+sale_date+'</text>'+
-                '</div>'
+                '</div>'+
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
                     '<text id="frog_type" style="color: teal;">'+trade_price+'Ξ</text>'+
-                '</div>'
+                '</div>'+
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text style="color: #1a202c; font-weight: bold;">Seller</text>'+'<br>'+
                     '<text style="color: teal;">'+truncateAddress(send)+'</text>'+
-                '</div>'
+                '</div>'+
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text style="color: #1a202c; font-weight: bold;">Buyer</text>'+'<br>'+
                     '<text style="color: teal;">'+truncateAddress(recieve)+'</text>'+
