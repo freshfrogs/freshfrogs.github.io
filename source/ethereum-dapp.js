@@ -102,10 +102,9 @@ const options = {
     }
   };
 
-async function fetch_nft_data(wallet, filter, next_string) {
+async function fetch_nft_data(wallet, next_string) {
     if (! wallet) { wallet = user_address; }
     if (! next_string) { next_string = ''; }
-    if (! filter) { filter = false; }
     fetch('https://restapi.nftscan.com/api/v2/account/own/'+wallet+'?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address='+COLLECTION_ADDRESS+'&limit=50&cursor='+next_string+'', options)
     .then(async (tokens) => tokens.json())
     .then(async (tokens) => {
@@ -120,9 +119,9 @@ async function fetch_nft_data(wallet, filter, next_string) {
         
             // Staked
             if (owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
-                owner = await stakerAddress(token_id);
                 staked = 'True'
                 staked_status = 'teal'
+                owner = await stakerAddress(token_id);
                 staked_values = await stakingValues(token_id);
                 staked_lvl = staked_values[1]
                 staked_next_lvl = staked_values[2].toString()+' days'
@@ -146,12 +145,7 @@ async function fetch_nft_data(wallet, filter, next_string) {
                         '<div style="text-align: center;">'+
                             '<button class="stake_button" onclick="initiate_stake('+token_id+')">Stake</button>'+
                         '</div>';
-                } else {
-                    button_element = '';
-                    if (filter == true && user_address.toLowerCase() !== owner.toLowerCase()){
-                        return
-                    }
-                }
+                } else { button_element = ''; }
             }
     
             var html_elements = 
@@ -176,8 +170,7 @@ async function fetch_nft_data(wallet, filter, next_string) {
     
             await render_frog_token(html_elements, token_id);
         })
-    })
-    .then(async function(){
+
         if (next !== null && next !== '') {
 
             break_element = document.createElement('br')
@@ -186,7 +179,7 @@ async function fetch_nft_data(wallet, filter, next_string) {
             loadMore = document.createElement('button')
             loadMore.id = 'loadMore'
             loadMore.className = 'connectButton'
-            loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_nft_data(wallet, filter, next); }
+            loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_nft_data(wallet, next); }
             loadMore.innerHTML = '🔰 Load More'
     
             document.getElementById('frogs').appendChild(loadMore)
@@ -240,11 +233,10 @@ async function render_frog_token(html_elements, token_id) {
         if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
 
             // get special dna from token id
-            let firstDigit = parseInt(token_id / 10);
-            let lastDigit  = token_id % 10;
-            frogdna = frogArray[firstDigit]
-            traitdna = traitArray[lastDigit]
-
+            randomFrog = Math.round(( token_id / 100 ) / 2.5)
+            if (randomFrog < 1) { randomFrog = 0 }
+            frogdna = frogArray[randomFrog]
+            traitdna = traitArray[randomFrog]
             build_trait('SpecialFrog', 'peace/'+frogdna, 'cont_'+token_id);
             build_trait('Trait', 'SpecialFrog/peace/'+traitdna, 'cont_'+token_id);
         } else {
@@ -974,7 +966,7 @@ async function render_recently_sold(token_data) {
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
         let attribute = metadata.attributes[i]
-        /* if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
+        if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
 
             // get special dna from token id
             randomFrog = Math.round(( token_id / 100 ) / 2.5)
@@ -983,9 +975,9 @@ async function render_recently_sold(token_data) {
             traitdna = traitArray[randomFrog]
             build_trait('SpecialFrog', 'peace/'+frogdna, 'cont_'+token_id);
             build_trait('Trait', 'SpecialFrog/peace/'+traitdna, 'cont_'+token_id);
-        } else { */
+        } else {
             build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
-      //}
+        }
     }
 }
 
