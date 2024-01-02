@@ -142,6 +142,7 @@ async function fetch_nft_sales_data(limit) {
                     '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
                     '<text id="frog_type" style="color: teal;">'+trade_price+'Ξ</text>'+
                 '</div>'+
+                '<br>'+
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text style="color: #1a202c; font-weight: bold;">Seller</text>'+'<br>'+
                     '<text style="color: teal;">'+truncateAddress(send)+'</text>'+
