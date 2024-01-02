@@ -102,9 +102,9 @@ const options = {
     }
   };
 
-async function fetch_nft_data(wallet) {
+async function fetch_nft_data(wallet, next_string) {
     if (! wallet) { wallet = user_address; }
-    fetch('https://restapi.nftscan.com/api/v2/account/own/'+wallet+'?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address='+COLLECTION_ADDRESS+'&limit=100', options)
+    fetch('https://restapi.nftscan.com/api/v2/account/own/'+wallet+'?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address='+COLLECTION_ADDRESS+'&limit=100&cursor='+next_string+'', options)
     .then(async (tokens) => tokens.json())
     .then(async (tokens) => {
         console.log('Fetching tokens from address: \n'+wallet+'\n')
