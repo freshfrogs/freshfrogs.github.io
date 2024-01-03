@@ -236,9 +236,9 @@ async function fetch_nft_data(wallet, limit, next_string) {
     .then(async (tokens) => tokens.json())
     .then(async (tokens) => {
 
-        console.log('new api test no. 4')
-
         var token_sales_data = JSON.stringify(tokens);
+        console.log('new api test no. 4')
+        console.log(tokens+'\n'+token_sales_data+JSON.parse(token_sales_data));
         await token_sales_data.forEach(async (frog) => {
 
             var { tokenId  } = frog
