@@ -231,13 +231,8 @@ async function fetch_nft_data(wallet, limit, next_string) {
     .then(async (tokens) => {
 
         var token_sales_data = JSON.stringify(tokens);
-        console.log('new api test no. VII')
-        //console.log(tokens+'\n'+token_sales_data+'\n'+JSON.parse(token_sales_data));
-        var result = Object.keys(tokens).map((key) => [key, tokens[key]]);
-        console.log('\n\n'+result+'\n\n')
-        var result2 = Object.keys(token_sales_data).map((key) => [key, token_sales_data[key]]);
-        console.log('\n\n'+result2+'\n\n')
-        await token_sales_data.forEach(async (frog) => {
+        console.log('new api test no. VIII')
+        await tokens.forEach(async (frog) => {
 
             var { tokenId  } = frog
             var staked, staked_status, staked_values, staked_lvl, staked_next_lvl, button_element, progress, progress_element;
