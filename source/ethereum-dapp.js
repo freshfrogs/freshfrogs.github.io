@@ -230,12 +230,13 @@ async function fetch_nft_sales_data(limit, next_string) {
 async function fetch_nft_data(wallet, limit, next_string) {
     if (! wallet) { wallet = user_address; }
     if (! limit) { limit = '100'; }
-    if (! next_string) { next_string = ''; }
-    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?contract='+COLLECTION_ADDRESS+'&limit='+limit+'', options)
+    if (! next_string) { next_string = ''; var fetch_api_href = 'https://api.reservoir.tools/users/'+wallet+'/tokens/v8?contract='+COLLECTION_ADDRESS+'&limit='+limit+''; } 
+    else { var fetch_api_href = 'https://api.reservoir.tools/users/'+wallet+'/tokens/v8?contract='+COLLECTION_ADDRESS+'&continuation='+next_string+'&limit='+limit+''; }
+    fetch(fetch_api_href, options)
     .then(async (tokens) => tokens.json())
     .then(async (tokens) => {
 
-        console.log('new api test 2: \n'+tokens)
+        console.log('new api test 3: \n'+tokens)
         console.log(JSON.stringify(tokens));
     })
 
