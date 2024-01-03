@@ -10,24 +10,34 @@
 var controller, collection, 
 user_address, user_rewards, 
 user_tokenBalance, user_stakedBalance, 
-is_approved, web3, f0, network, eth_usd, next;
+is_approved, web3, f0, network, eth_usd, next, meta_morph_enabled;
 
 var frogArray = [
     'blueDartFrog',
+    'blueTreeFrog',
     'brownTreeFrog',
     'cyanTreeFrog',
     'goldenDartFrog',
     'goldenTreeFrog',
+    'grayTreeFrog',
     'greenTreeFrog',
     'lightBrownTreeFrog',
     'orangeTreeFrog',
     'pinkTreeFrog',
     'purpleTreeFrog',
     'redEyedTreeFrog',
-    'unknown',
-    'stawberryDartFrog',
+    'splendidLeafFrog',
+    'stawverryDartFrog',
     'tomatoFrog',
-    'splendidLeafFrog'
+    'treeFrog(1)',
+    'treeFrog(2)',
+    'treeFrog(3)',
+    'treeFrog(4)',
+    'treeFrog(5)',
+    'treeFrog(6)',
+    'treeFrog(7)',
+    'treeFrog(8)',
+    'unknown'
 ]
 
 var traitArray = [
@@ -35,6 +45,7 @@ var traitArray = [
     'blue',
     'brown',
     'cyan',
+    'darkGreen',
     'green',
     'natural',
     'orange(2)',
@@ -312,6 +323,11 @@ async function render_frog_token(html_elements, token_id) {
     var token_element = document.createElement('div');
 
     // Element Details -->
+    
+    token_element.onclick = async function(){
+        (meta_morph_enabled);
+        await meta_morph(token_id);
+    }
     token_element.id = token_name;
     token_element.className = 'display_token';
     token_element.innerHTML = 
@@ -478,7 +494,7 @@ async function update_frontend() {
     mintButton.innerHTML = '🐸 Mint Frogs'
     parent_element.appendChild(mintButton)
 
-    // Stake Button | Stake tokens
+    // Stake Button | Stake tokens 
     stkeBtn = document.createElement('button')
     stkeBtn.id = 'stakeButton'
     stkeBtn.className = 'connectButton'
@@ -500,9 +516,9 @@ async function update_frontend() {
     thePondButton.id = 'thePondLink'
     thePondButton.className = 'thePondButton'
     thePondButton.href = 'https://freshfrogs.github.io/the-pond/'
-    parent_element.appendChild(thePondButton)
+    parent_element.appendChild(thePondButton);
 
-    /* // The Pond | View all staked tokens
+    /* // The Pond | View all staked tokens 🍄 Meta Morph
     thePondButton = document.createElement('button')
     thePondButton.id = 'the-pond'
     thePondButton.className = 'connectButton'
