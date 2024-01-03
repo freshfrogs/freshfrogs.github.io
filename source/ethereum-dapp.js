@@ -347,10 +347,10 @@ async function render_frog_token(html_elements, token_id) {
         if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
 
             // get special dna from token id
-            randomFrog = Math.round(( token_id / 100 ) / 2.5)
-            if (randomFrog < 1) { randomFrog = 0 }
-            frogdna = frogArray[randomFrog]
-            traitdna = traitArray[randomFrog]
+            let firstDigit = parseInt(token_id / 10);
+            let lastDigit = token_id % 10;
+            frogdna = frogArray[firstDigit]
+            traitdna = traitArray[lastDigit]
             build_trait('SpecialFrog', 'peace/'+frogdna, 'cont_'+token_id);
             build_trait('Trait', 'SpecialFrog/peace/'+traitdna, 'cont_'+token_id);
         } else {
