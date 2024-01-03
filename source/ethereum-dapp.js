@@ -105,7 +105,8 @@ var animated = [
 const SOURCE_PATH = 'https://freshfrogs.github.io'
 const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
-const _0x392cc3=_0x1f31;(function(_0x1f686b,_0x588b6f){const _0x22651c=_0x1f31,_0x4ae43d=_0x1f686b();while(!![]){try{const _0x212e4d=parseInt(_0x22651c(0x16f))/0x1+-parseInt(_0x22651c(0x175))/0x2+-parseInt(_0x22651c(0x171))/0x3+-parseInt(_0x22651c(0x172))/0x4+-parseInt(_0x22651c(0x16d))/0x5*(parseInt(_0x22651c(0x173))/0x6)+-parseInt(_0x22651c(0x16c))/0x7*(-parseInt(_0x22651c(0x16e))/0x8)+parseInt(_0x22651c(0x170))/0x9;if(_0x212e4d===_0x588b6f)break;else _0x4ae43d['push'](_0x4ae43d['shift']());}catch(_0x1aaf20){_0x4ae43d['push'](_0x4ae43d['shift']());}}}(_0x29c5,0x6ba47));function _0x1f31(_0x4aed8a,_0x15d7a3){const _0x29c526=_0x29c5();return _0x1f31=function(_0x1f31d5,_0x2a3ec8){_0x1f31d5=_0x1f31d5-0x16b;let _0xf9abb9=_0x29c526[_0x1f31d5];return _0xf9abb9;},_0x1f31(_0x4aed8a,_0x15d7a3);}const options={'method':_0x392cc3(0x174),'headers':{'accept':_0x392cc3(0x16b),'X-API-KEY':'3105c552-60b6-5252-bca7-291c724a54bf'}};function _0x29c5(){const _0x45cb93=['2904944jNPoWG','42JmLcDC','GET','1692388saCfPa','application/json','4326315rfVzMd','202165ZAFnNN','8NHILGg','780253oqwZRS','8140302OLWWNa','19236LnKFwC'];_0x29c5=function(){return _0x45cb93;};return _0x29c5();}
+
+const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': 'demo-api-key'}};
 
 // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjcyYjJmYWNkLTIzZDUtNDM4NS04ZmE4LTRkN2QxZDJmYTcwMCIsIm9yZ0lkIjoiMzcwMTY1IiwidXNlcklkIjoiMzgwNDMzIiwidHlwZUlkIjoiMjA0MDliMWItNWE3Yi00ZjZlLWI5NjktOWU2OWJiMWY3N2VmIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3MDM4OTQwMDUsImV4cCI6NDg1OTY1NDAwNX0.NSsiVKVdzHmL_b3eNdbEVzJJ4jNLWIQh5Qd3VZ9O-ko
 
@@ -222,81 +223,10 @@ async function fetch_nft_sales_data(limit, next_string) {
 }
 
 async function fetch_nft_data(wallet, limit, next_string) {
-    if (! wallet) { wallet = user_address; }
-    if (! limit) { limit = '100'; }
-    if (! next_string) { next_string = ''; var fetch_api_href = 'https://api.reservoir.tools/users/'+wallet+'/tokens/v8?contract='+COLLECTION_ADDRESS+'&limit='+limit+''; } 
-    else { var fetch_api_href = 'https://api.reservoir.tools/users/'+wallet+'/tokens/v8?contract='+COLLECTION_ADDRESS+'&continuation='+next_string+'&limit='+limit+''; }
-    fetch(fetch_api_href, options)
-    .then(async (tokens) => tokens.json())
-    .then(async (tokens) => {
-
-        console.log('new api test no. X')
-        await tokens.forEach(async (frog) => {
-
-            var { tokenId  } = frog
-            var staked, staked_status, staked_values, staked_lvl, staked_next_lvl, button_element, progress, progress_element;
-            owner = wallet
-
-            // Staked
-            if (owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
-                staked = 'True'; staked_status = 'teal';
-                owner = await stakerAddress(tokenId);
-                staked_values = await stakingValues(tokenId);
-                staked_lvl = staked_values[1]
-                staked_next_lvl = staked_values[2].toString()+' days'
-                progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
-                progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>'
-                if (owner.toLowerCase() == user_address.toLowerCase()) { 
-                    button_element = // Un-stake button
-                        '<div style="text-align: center;">'+
-                            '<button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>'+
-                        '</div>';
-                } else { button_element = ''; }
-            // NOT Staked
-            } else {
-                progress_element = '';
-                staked = 'False';
-                staked_status = 'tomato';
-                staked_lvl = '--'
-                staked_next_lvl = '--'
-                if (owner.toLowerCase() == user_address.toLowerCase()) { 
-                    button_element = // Un-stake button
-                        '<div style="text-align: center;">'+
-                            '<button class="stake_button" onclick="initiate_stake('+tokenId+')">Stake</button>'+
-                        '</div>';
-                } else { button_element = ''; }
-            }
-
-            // Render token information and data
-            var html_elements = 
-                '<div style="margin: 8px; float: right; width: 100px;">'+
-                    '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
-                    '<text style="color: '+staked_status+';">'+staked+'</text>'+
-                '</div>'+
-                '<div style="margin: 8px; float: right; width: 100px;">'+
-                    '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
-                    '<text style="color: teal;" id="frog_type">'+truncateAddress(owner)+'</text>'+
-                '</div>'+
-                '<br>'+
-                '<div style="margin: 8px; float: right; width: 100px;">'+
-                    '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
-                    '<text style="color: teal;">'+staked_next_lvl+'</text>'+
-                '</div>'+
-                '<div style="margin: 8px; float: right; width: 100px;">'+
-                    '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
-                    '<text style="color: teal;">'+staked_lvl+'</text>'+
-                '</div>'+
-                progress_element+
-                button_element;
-    
-            await render_frog_token(html_elements, tokenId);
-            
-        })
-    })
-    //.then(async function() {
-    //    (next !== null && next !== '' && next !== 'undefined');
-    //    await fetch_nft_data(wallet, '100', next);
-    //})
+    fetch('https://api.reservoir.tools/sales/v5?contract=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
+    .then(response => response.json())
+    .then(response => console.log(response))
+    .catch(err => console.error(err));
 }
 
 // Render NFT token by layered attirubtes obtained through metadata.
