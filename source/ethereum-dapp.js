@@ -393,7 +393,7 @@ async function connect_user() {
             await window.ethereum.request({method: 'eth_requestAccounts'});
             web3 = new Web3(window.ethereum);
         } else { // No wallet found.
-            openInNewTab('https://www.coinbase.com/wallet/downloads')
+            window.location('https://www.coinbase.com/wallet/downloads');
             return
         }
 
