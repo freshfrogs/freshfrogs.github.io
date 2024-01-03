@@ -231,7 +231,7 @@ async function fetch_nft_data(wallet, limit, next_string) {
     if (! wallet) { wallet = user_address; }
     if (! limit) { limit = '100'; }
     if (! next_string) { next_string = ''; }
-    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?contract='+COLLECTION_ADDRESS+'&continuation='+next_string+'&limit='+limit+'', options)
+    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?contract='+COLLECTION_ADDRESS+'&limit='+limit+'', options)
     .then(async (tokens) => tokens.json())
     .then(async (tokens) => {
 
