@@ -237,22 +237,19 @@ async function fetch_nft_data(wallet, limit, next_string) {
     .then(async (tokens) => {
 
         console.log('new api test 3: \n'+tokens)
-        console.log(JSON.stringify(tokens));
-    })
 
-        /*
-        var token_sales_data = tokens.data.content;
-        next = tokens.data.next;
+        var token_sales_data = JSON.stringify(tokens);
         await token_sales_data.forEach(async (frog) => {
 
-            var { token_id, minter, owner, mint_price, latest_trade_price, rarity_rank } = frog
+            var { tokenId  } = frog
             var staked, staked_status, staked_values, staked_lvl, staked_next_lvl, button_element, progress, progress_element;
+            owner = wallet
 
             // Staked
             if (owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
                 staked = 'True'; staked_status = 'teal';
-                owner = await stakerAddress(token_id);
-                staked_values = await stakingValues(token_id);
+                owner = await stakerAddress(tokenId);
+                staked_values = await stakingValues(tokenId);
                 staked_lvl = staked_values[1]
                 staked_next_lvl = staked_values[2].toString()+' days'
                 progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
@@ -260,7 +257,7 @@ async function fetch_nft_data(wallet, limit, next_string) {
                 if (owner.toLowerCase() == user_address.toLowerCase()) { 
                     button_element = // Un-stake button
                         '<div style="text-align: center;">'+
-                            '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
+                            '<button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>'+
                         '</div>';
                 } else { button_element = ''; }
             // NOT Staked
@@ -273,7 +270,7 @@ async function fetch_nft_data(wallet, limit, next_string) {
                 if (owner.toLowerCase() == user_address.toLowerCase()) { 
                     button_element = // Un-stake button
                         '<div style="text-align: center;">'+
-                            '<button class="stake_button" onclick="initiate_stake('+token_id+')">Stake</button>'+
+                            '<button class="stake_button" onclick="initiate_stake('+tokenId+')">Stake</button>'+
                         '</div>';
                 } else { button_element = ''; }
             }
@@ -300,9 +297,10 @@ async function fetch_nft_data(wallet, limit, next_string) {
                 progress_element+
                 button_element;
     
-            await render_frog_token(html_elements, token_id);
+            await render_frog_token(html_elements, tokenId);
             
-        }) */
+        })
+    })
     //.then(async function() {
     //    (next !== null && next !== '' && next !== 'undefined');
     //    await fetch_nft_data(wallet, '100', next);
