@@ -112,19 +112,6 @@ const options = {
       'X-API-KEY': '283zwvvZTuZz9enSoOvIUJo7'
     }
   };
-  
-async function timeConverter(UNIX_timestamp){
-    var a = new Date(UNIX_timestamp * 1000);
-    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    var year = a.getFullYear();
-    var month = a.getMonth();
-    var date = a.getDate();
-    var hour = a.getHours();
-    var min = a.getMinutes();
-    var sec = a.getSeconds();
-    var time = date+'/'+month+'/'+year;
-    return time;
-}
 
 async function fetch_staked_nfts(wallet) {
     if (! wallet) { wallet = user_address; }
@@ -177,7 +164,6 @@ async function fetch_staked_nfts(wallet) {
     })
 }
 
-// https://restapi.nftscan.com/api/v2/transactions/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?event_type=Sale&sort_direction=desc&limit=100
 async function fetch_nft_sales_data(limit, next_string) {
     if (! limit) { limit = '5'; }
     if (! next_string) { next_string = ''; }
@@ -227,7 +213,7 @@ async function fetch_nft_sales_data(limit, next_string) {
             loadMore = document.createElement('button')
             loadMore.id = 'loadMore'
             loadMore.className = 'connectButton'
-            loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_nft_sales_data('100', next); }
+            loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_nft_sales_data('20', next); }
             loadMore.innerHTML = '🔰 Secondary Sales'
             document.getElementById('frogs').appendChild(loadMore)
         } else { return }
