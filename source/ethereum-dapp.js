@@ -105,20 +105,14 @@ var animated = [
 const SOURCE_PATH = 'https://freshfrogs.github.io'
 const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
-const options = {
-    method: 'GET',
-    headers: {
-      accept: 'application/json',
-      'X-API-KEY': '283zwvvZTuZz9enSoOvIUJo7'
-    }
-  };
+function _0x475d(_0x1b3169,_0x78cab){const _0x124974=_0x1249();return _0x475d=function(_0x475d53,_0x4e11d0){_0x475d53=_0x475d53-0xfd;let _0x38e826=_0x124974[_0x475d53];return _0x38e826;},_0x475d(_0x1b3169,_0x78cab);}const _0x193fb2=_0x475d;(function(_0x257171,_0x4fedb0){const _0x405b0c=_0x475d,_0x116af0=_0x257171();while(!![]){try{const _0x10e134=-parseInt(_0x405b0c(0x106))/0x1+-parseInt(_0x405b0c(0xff))/0x2+-parseInt(_0x405b0c(0x107))/0x3+parseInt(_0x405b0c(0x101))/0x4*(parseInt(_0x405b0c(0x103))/0x5)+parseInt(_0x405b0c(0x104))/0x6*(parseInt(_0x405b0c(0x108))/0x7)+-parseInt(_0x405b0c(0xfe))/0x8+parseInt(_0x405b0c(0x102))/0x9*(parseInt(_0x405b0c(0x105))/0xa);if(_0x10e134===_0x4fedb0)break;else _0x116af0['push'](_0x116af0['shift']());}catch(_0x34a983){_0x116af0['push'](_0x116af0['shift']());}}}(_0x1249,0x262f8));const options={'method':_0x193fb2(0x100),'headers':{'accept':_0x193fb2(0xfd),'X-API-KEY':'PMn1Jm9fVdilcAkCLt4ay9O6'}};function _0x1249(){const _0x49f49d=['1295592BFulwu','2122130ecnrAu','252809bgKcWa','714921AcwEbc','7vleyLB','application/json','1159280xzzksc','598508yBrpUZ','GET','4xNSyPS','27dbwvsK','1195585ZjrrnZ'];_0x1249=function(){return _0x49f49d;};return _0x1249();}
 
 const options_2 = {
-method: 'GET',
-headers: {
-    accept: 'application/json',
-    'X-API-KEY': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjcyYjJmYWNkLTIzZDUtNDM4NS04ZmE4LTRkN2QxZDJmYTcwMCIsIm9yZ0lkIjoiMzcwMTY1IiwidXNlcklkIjoiMzgwNDMzIiwidHlwZUlkIjoiMjA0MDliMWItNWE3Yi00ZjZlLWI5NjktOWU2OWJiMWY3N2VmIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3MDM4OTQwMDUsImV4cCI6NDg1OTY1NDAwNX0.NSsiVKVdzHmL_b3eNdbEVzJJ4jNLWIQh5Qd3VZ9O-ko'
-}
+    method: 'GET',
+    headers: {
+        accept: 'application/json',
+        'X-API-KEY': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjcyYjJmYWNkLTIzZDUtNDM4NS04ZmE4LTRkN2QxZDJmYTcwMCIsIm9yZ0lkIjoiMzcwMTY1IiwidXNlcklkIjoiMzgwNDMzIiwidHlwZUlkIjoiMjA0MDliMWItNWE3Yi00ZjZlLWI5NjktOWU2OWJiMWY3N2VmIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3MDM4OTQwMDUsImV4cCI6NDg1OTY1NDAwNX0.NSsiVKVdzHmL_b3eNdbEVzJJ4jNLWIQh5Qd3VZ9O-ko'
+    }
 };
 
 // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjcyYjJmYWNkLTIzZDUtNDM4NS04ZmE4LTRkN2QxZDJmYTcwMCIsIm9yZ0lkIjoiMzcwMTY1IiwidXNlcklkIjoiMzgwNDMzIiwidHlwZUlkIjoiMjA0MDliMWItNWE3Yi00ZjZlLWI5NjktOWU2OWJiMWY3N2VmIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3MDM4OTQwMDUsImV4cCI6NDg1OTY1NDAwNX0.NSsiVKVdzHmL_b3eNdbEVzJJ4jNLWIQh5Qd3VZ9O-ko
