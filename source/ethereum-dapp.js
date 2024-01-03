@@ -191,6 +191,7 @@ async function fetch_nft_sales_data(limit, next_string) {
             var { token_id, send, receive, trade_price, timestamp } = frog
             var sale_date = new Date(timestamp).toLocaleDateString("en-US")
             var sale_price = Math.ceil(trade_price * 10000) / 10000;
+            var sale_usd = (eth_usd * Number(sale_price)).toFixed(2)
 
             // Render token information and data
             var html_elements = 
@@ -200,7 +201,7 @@ async function fetch_nft_sales_data(limit, next_string) {
                 '</div>'+
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
-                    '<text id="frog_type" style="color: teal;">'+sale_price+'Ξ</text>'+
+                    '<text id="frog_type" style="color: teal;">'+sale_price+'Ξ ($'+sale_usd+')</text>'+
                 '</div>'+
                 '<br>'+
                 '<div style="margin: 8px; float: right; width: 100px;">'+
