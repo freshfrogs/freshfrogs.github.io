@@ -227,12 +227,12 @@ async function fetch_nft_data(wallet, limit, next_string) {
     if (! next_string) { next_string = ''; var fetch_api_href = 'https://api.reservoir.tools/users/'+wallet+'/tokens/v8?contract='+COLLECTION_ADDRESS+'&limit='+limit+''; } 
     else { var fetch_api_href = 'https://api.reservoir.tools/users/'+wallet+'/tokens/v8?contract='+COLLECTION_ADDRESS+'&continuation='+next_string+'&limit='+limit+''; }
     fetch(fetch_api_href, options)
-    .then(async (tokens) => tokens.json())
+    .then(async (tokens) => console.log(tokens.json()+tokens))
     .then(async (tokens) => {
 
         var token_sales_data = JSON.stringify(tokens);
-        console.log('new api test no. VI')
-        console.log(tokens+'\n'+token_sales_data+'\n'+JSON.parse(token_sales_data));
+        console.log('new api test no. VII')
+        //console.log(tokens+'\n'+token_sales_data+'\n'+JSON.parse(token_sales_data));
         var result = Object.keys(tokens).map((key) => [key, tokens[key]]);
         console.log('\n\n'+result+'\n\n')
         var result2 = Object.keys(token_sales_data).map((key) => [key, token_sales_data[key]]);
