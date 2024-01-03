@@ -177,9 +177,13 @@ async function fetch_nft_sales_data(limit, next_string) {
         console.log(tokens)
 
         var token_sales_data = tokens.data.content;
+        var shuffled, asset_tokens;
+        n = 5;
+        shuffled = token_sales_data.sort(function(){ return 0.5 - Math.random() });
+        asset_tokens = shuffled.slice(0,n);
         next = tokens.data.next;
 
-        await token_sales_data.forEach(async (frog) => {
+        await asset_tokens.forEach(async (frog) => {
             var { token_id, send, receive, trade_price, timestamp } = frog
             var sale_date = new Date(timestamp).toLocaleDateString("en-US")
             var sale_price = Math.ceil(trade_price * 10000) / 10000;
@@ -227,7 +231,7 @@ async function fetch_nft_sales_data(limit, next_string) {
 async function fetch_nft_data(wallet, next_string) {
     if (! wallet) { wallet = user_address; }
     if (! next_string) { next_string = ''; }
-    fetch('https://restapi.nftscan.com/api/v2/account/own/'+wallet+'?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address='+COLLECTION_ADDRESS+'&limit=20&cursor='+next_string+'', options)
+    fetch('https://restapi.nftscan.com/api/v2/account/own/'+wallet+'?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address='+COLLECTION_ADDRESS+'&limit=100&cursor='+next_string+'', options)
     .then(async (tokens) => tokens.json())
     .then(async (tokens) => {
         console.log('Fetching tokens from address: \n'+wallet+'\n')
