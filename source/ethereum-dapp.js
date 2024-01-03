@@ -251,7 +251,7 @@ async function fetch_nft_data(wallet, limit, next_string) {
             var staked, staked_status, staked_values, staked_lvl, staked_next_lvl, button_element, progress, progress_element;
 
             // Staked
-            if (owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
+            if (owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
                 staked = 'True'; staked_status = 'teal';
                 owner = await stakerAddress(token_id);
                 staked_values = await stakingValues(token_id);
