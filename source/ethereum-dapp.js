@@ -108,7 +108,7 @@ const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 const options = {
     method: 'GET',
     headers: {
-      accept: '*/*',
+      accept: 'application/json',
       'X-API-KEY': '3105c552-60b6-5252-bca7-291c724a54bf'
     }
   };
@@ -235,7 +235,8 @@ async function fetch_nft_data(wallet, limit, next_string) {
     .then(async (tokens) => tokens.json())
     .then(async (tokens) => {
 
-        console.log('new api test 2 : \n'+tokens)
+        console.log('new api: \n'+tokens)
+        console.log(JSON.stringify(tokens));
     })
 
         /*
