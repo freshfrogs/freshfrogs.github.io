@@ -237,7 +237,7 @@ async function fetch_nft_sales_data(limit, next_string) {
 
 async function fetch_nft_data(wallet, limit, next_string) {
     if (! wallet) { wallet = user_address; }
-    if (! limit) { limit = '50'; }
+    if (! limit) { limit = '100'; }
     if (! next_string) { next_string = ''; }
     fetch('https://restapi.nftscan.com/api/v2/account/own/'+wallet+'?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address='+COLLECTION_ADDRESS+'&limit='+limit+'&cursor='+next_string+'', options)
     .then(async (tokens) => tokens.json())
