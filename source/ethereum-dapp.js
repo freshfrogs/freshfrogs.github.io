@@ -10,7 +10,7 @@
 var controller, collection, 
 user_address, user_rewards, 
 user_tokenBalance, user_stakedBalance, 
-is_approved, web3, f0, network, eth_usd;
+is_approved, web3, f0, network, eth_usd, next;
 
 var frogArray = [
     'blueDartFrog',
@@ -169,7 +169,6 @@ async function fetch_staked_nfts(wallet) {
 async function fetch_nft_sales_data(limit, next_string) {
     if (! limit) { limit = '5'; }
     if (! next_string) { next_string = ''; }
-    var next;
     fetch('https://restapi.nftscan.com/api/v2/transactions/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?event_type=Sale&sort_direction=desc&limit='+limit+'&cursor='+next_string+'', options)
     .then(async (tokens) => tokens.json())
     .then(async (tokens) => {
@@ -228,7 +227,6 @@ async function fetch_nft_sales_data(limit, next_string) {
 async function fetch_nft_data(wallet, next_string) {
     if (! wallet) { wallet = user_address; }
     if (! next_string) { next_string = ''; }
-    var next;
     fetch('https://restapi.nftscan.com/api/v2/account/own/'+wallet+'?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address='+COLLECTION_ADDRESS+'&limit=20&cursor='+next_string+'', options)
     .then(async (tokens) => tokens.json())
     .then(async (tokens) => {
