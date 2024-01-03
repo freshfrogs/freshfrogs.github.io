@@ -108,10 +108,10 @@ const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 const options = {
     method: 'GET',
     headers: {
-        accept: 'application/json',
-        'X-API-KEY': '3105c552-60b6-5252-bca7-291c724a54bf'
+      accept: 'application/json',
+      'X-API-KEY': '3105c552-60b6-5252-bca7-291c724a54bf'
     }
-};
+  };
 
 // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjcyYjJmYWNkLTIzZDUtNDM4NS04ZmE4LTRkN2QxZDJmYTcwMCIsIm9yZ0lkIjoiMzcwMTY1IiwidXNlcklkIjoiMzgwNDMzIiwidHlwZUlkIjoiMjA0MDliMWItNWE3Yi00ZjZlLWI5NjktOWU2OWJiMWY3N2VmIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3MDM4OTQwMDUsImV4cCI6NDg1OTY1NDAwNX0.NSsiVKVdzHmL_b3eNdbEVzJJ4jNLWIQh5Qd3VZ9O-ko
 
@@ -236,6 +236,7 @@ async function fetch_nft_data(wallet, limit, next_string) {
     .then(async (tokens) => {
 
         console.log('new api: \n'+tokens)
+    })
 
         /*
         var token_sales_data = tokens.data.content;
@@ -300,7 +301,6 @@ async function fetch_nft_data(wallet, limit, next_string) {
             await render_frog_token(html_elements, token_id);
             
         }) */
-    })
     //.then(async function() {
     //    (next !== null && next !== '' && next !== 'undefined');
     //    await fetch_nft_data(wallet, '100', next);
