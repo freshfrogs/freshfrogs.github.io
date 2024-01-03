@@ -290,8 +290,8 @@ async function fetch_nft_data(wallet, next_string) {
                     '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
                     '<text style="color: teal;">'+staked_lvl+'</text>'+
                 '</div>'+
-                button_element+
-                progress_element;
+                progress_element+
+                button_element;
     
             await render_frog_token(html_elements, token_id);
         })
