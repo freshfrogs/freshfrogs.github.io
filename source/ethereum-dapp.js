@@ -235,6 +235,94 @@ async function fetch_nft_sales_data(limit, next_string) {
     })
 }
 
+async function fetch_nft_data(wallet, limit, next_string) {
+    if (! limit) { limit = '50'; }
+    if (! next_string) { next_string = ''; }
+    fetch('https://restapi.nftscan.com/api/v2/account/own/'+wallet+'?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=&contract_address='+COLLECTION_ADDRESS+'&limit='+limit+'&cursor='+next_string+'', options)
+    .then(async (tokens) => tokens.json())
+    .then(async (tokens) => {
+
+        var token_sales_data = tokens.data.content;
+        next = tokens.data.next;
+        await token_sales_data.forEach(async (frog) => {
+
+            var { token_id, minter, owner, mint_price, latest_trade_price, rarity_rank } = frog
+            var staked, staked_status, staked_values, staked_lvl, staked_next_lvl, button_element, progress, progress_element;
+
+            // Staked
+            if (owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
+                async () => {
+                    staked = 'True'; staked_status = 'teal';
+                    owner = await stakerAddress(token_id);
+                    staked_values = await stakingValues(token_id);
+                    staked_lvl = staked_values[1]
+                    staked_next_lvl = staked_values[2].toString()+' days'
+                    progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
+                    progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>'
+                    if (owner.toLowerCase() == user_address.toLowerCase()) { 
+                        button_element = // Un-stake button
+                            '<div style="text-align: center;">'+
+                                '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
+                            '</div>';
+                    } else { button_element = ''; }
+                }
+            // NOT Staked
+            } else {
+                async () => {
+                    progress_element = '';
+                    staked = 'False';
+                    staked_status = 'tomato';
+                    staked_lvl = '--'
+                    staked_next_lvl = '--'
+                    if (owner.toLowerCase() == user_address.toLowerCase()) { 
+                        button_element = // Un-stake button
+                            '<div style="text-align: center;">'+
+                                '<button class="stake_button" onclick="initiate_stake('+token_id+')">Stake</button>'+
+                            '</div>';
+                    } else { button_element = ''; }
+                }
+            }
+
+            // Render token information and data
+            var html_elements = 
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
+                    '<text style="color: '+staked_status+';">'+staked+'</text>'+
+                '</div>'+
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
+                    '<text style="color: teal;" id="frog_type">'+truncateAddress(owner)+'</text>'+
+                '</div>'+
+                '<br>'+
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
+                    '<text style="color: teal;">'+staked_next_lvl+'</text>'+
+                '</div>'+
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
+                    '<text style="color: teal;">'+staked_lvl+'</text>'+
+                '</div>'+
+                progress_element+
+                button_element;
+    
+            await render_frog_token(html_elements, token_id);
+        })
+    })
+    .then(async function() {
+        console.log('loading button: '+next)
+        if (next !== null && next !== '' && next !== 'undefined') {
+            break_element = document.createElement('br')
+            document.getElementById('frogs').appendChild(break_element)
+            loadMore = document.createElement('button')
+            loadMore.id = 'loadMore'
+            loadMore.className = 'connectButton'
+            loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_nft_data(wallet, '100', next); }
+            loadMore.innerHTML = '🔰 Load More'
+            document.getElementById('frogs').appendChild(loadMore)
+        } else { return }
+    })
+}
+
 async function fetch_nft_data(wallet, next_string) {
     if (! wallet) { wallet = user_address; }
     if (! next_string) { next_string = ''; }
