@@ -347,6 +347,8 @@
 
         try {
 
+          await fetch_eth_usd();
+          console.log('eth_usd = '+eth_usd)
           await fetch_nft_sales_data();
 
         } catch (e) {
