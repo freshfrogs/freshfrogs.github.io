@@ -306,6 +306,7 @@ async function fetch_nft_data(wallet, limit, next_string) {
         })
     })
     .then(async function() {
+        (next !== null && next !== '' && next !== 'undefined');
         await fetch_nft_data(wallet, '100', next);
     })
 }
