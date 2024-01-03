@@ -347,7 +347,7 @@ async function render_frog_token(html_elements, token_id) {
         if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
 
             // get special dna from token id
-            firstDigit = parseInt(token_id / 10);
+            firstDigit = parseInt(token_id / 100);
             lastDigit = token_id % 10;
             frogdna = frogArray[firstDigit]
             traitdna = traitArray[lastDigit]
