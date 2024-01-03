@@ -227,10 +227,10 @@ async function fetch_nft_data(wallet, limit, next_string) {
     if (! next_string) { next_string = ''; var fetch_api_href = 'https://api.reservoir.tools/users/'+wallet+'/tokens/v8?contract='+COLLECTION_ADDRESS+'&limit='+limit+''; } 
     else { var fetch_api_href = 'https://api.reservoir.tools/users/'+wallet+'/tokens/v8?contract='+COLLECTION_ADDRESS+'&continuation='+next_string+'&limit='+limit+''; }
     fetch(fetch_api_href, options)
-    .then(async (tokens) => console.log(tokens.json()+tokens))
+    .then(async (tokens) => tokens.json())
     .then(async (tokens) => {
 
-        var token_sales_data = JSON.stringify(tokens);
+        console.log(tokens.json()+'\n'+tokens);
         console.log('new api test no. VIII')
         await tokens.forEach(async (frog) => {
 
