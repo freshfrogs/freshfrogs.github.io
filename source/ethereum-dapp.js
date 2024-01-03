@@ -252,36 +252,32 @@ async function fetch_nft_data(wallet, limit, next_string) {
 
             // Staked
             if (owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
-                async () => {
-                    staked = 'True'; staked_status = 'teal';
-                    owner = await stakerAddress(token_id);
-                    staked_values = await stakingValues(token_id);
-                    staked_lvl = staked_values[1]
-                    staked_next_lvl = staked_values[2].toString()+' days'
-                    progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
-                    progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>'
-                    if (owner.toLowerCase() == user_address.toLowerCase()) { 
-                        button_element = // Un-stake button
-                            '<div style="text-align: center;">'+
-                                '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
-                            '</div>';
-                    } else { button_element = ''; }
-                }
+                staked = 'True'; staked_status = 'teal';
+                owner = await stakerAddress(token_id);
+                staked_values = await stakingValues(token_id);
+                staked_lvl = staked_values[1]
+                staked_next_lvl = staked_values[2].toString()+' days'
+                progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
+                progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>'
+                if (owner.toLowerCase() == user_address.toLowerCase()) { 
+                    button_element = // Un-stake button
+                        '<div style="text-align: center;">'+
+                            '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
+                        '</div>';
+                } else { button_element = ''; }
             // NOT Staked
             } else {
-                async () => {
-                    progress_element = '';
-                    staked = 'False';
-                    staked_status = 'tomato';
-                    staked_lvl = '--'
-                    staked_next_lvl = '--'
-                    if (owner.toLowerCase() == user_address.toLowerCase()) { 
-                        button_element = // Un-stake button
-                            '<div style="text-align: center;">'+
-                                '<button class="stake_button" onclick="initiate_stake('+token_id+')">Stake</button>'+
-                            '</div>';
-                    } else { button_element = ''; }
-                }
+                progress_element = '';
+                staked = 'False';
+                staked_status = 'tomato';
+                staked_lvl = '--'
+                staked_next_lvl = '--'
+                if (owner.toLowerCase() == user_address.toLowerCase()) { 
+                    button_element = // Un-stake button
+                        '<div style="text-align: center;">'+
+                            '<button class="stake_button" onclick="initiate_stake('+token_id+')">Stake</button>'+
+                        '</div>';
+                } else { button_element = ''; }
             }
 
             // Render token information and data
