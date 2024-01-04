@@ -136,7 +136,7 @@ async function render_token_sales(sales) {
 
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
         var sale_date = createdAt.substring(0, 10);
-        if (from == '0x0000000000000000000000000000000000000000000000000000000000000000') { var txn_string = 'sale'; }
+        if (from == '0x0000000000000000000000000000000000000000000000000000000000000000') { var txn_string = 'mint'; }
         else if (from !== '0x0000000000000000000000000000000000000000000000000000000000000000') { var txn_string = 'sale'; }
 
         // Render token information and data
