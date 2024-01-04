@@ -149,11 +149,11 @@ async function render_token_sales(sales) {
             '</div>'+
             '<br>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text style="color: #1a202c; font-weight: bold;">Seller</text>'+'<br>'+
+                '<text style="color: #1a202c; font-weight: bold;">From</text>'+'<br>'+
                 '<text style="color: teal;">'+truncateAddress(from)+'</text>'+
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text style="color: #1a202c; font-weight: bold;">Buyer</text>'+'<br>'+
+                '<text style="color: #1a202c; font-weight: bold;">To</text>'+'<br>'+
                 '<text style="color: teal;">'+truncateAddress(to)+'</text>'+
             '</div>'
 
