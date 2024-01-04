@@ -11,7 +11,10 @@ var controller, collection,
 user_address, user_rewards, 
 user_tokenBalance, user_stakedBalance, 
 is_approved, web3, f0, network, eth_usd, next, meta_morph_enabled;
-var sales_volume_eth = ales_volume_usd = net_income_usd = 0;
+
+var sales_volume_eth = 0;
+var sales_volume_usd = 0;
+var net_income_usd = 0;
 
 var frogArray = [
     'blueDartFrog',
