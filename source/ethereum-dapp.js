@@ -108,9 +108,9 @@ const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': '3105c552-60b6-5252-bca7-291c724a54bf'}};
 async function fetch_token_sales(limit, next_string) {
     if (! limit) { limit = '5'; }
-    if (! next_string) { continuation = ''; } else { continuation = '&continuation'+next_string }
+    if (! next_string) { next = ''; } else { next = '&continuation'+next_string; console.log(next) }
     console.log('Fetching recent sales data..')
-    fetch('https://api.reservoir.tools/sales/v5?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit='+limit+continuation+'', options)
+    fetch('https://api.reservoir.tools/sales/v5?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit='+limit+next+'', options)
     .then((data) => data.json())
     .then((data) => {
         console.log(data)
@@ -120,14 +120,14 @@ async function fetch_token_sales(limit, next_string) {
     })
     .catch(err => console.error(err));
 }
-async function sales_load_button(continuation) {
-    if (continuation !== null && continuation !== '' && continuation !== 'undefined') {
+async function sales_load_button(next_string) {
+    if (next_string !== null && next_string !== '' && next_string !== 'undefined') {
         break_element = document.createElement('br')
         document.getElementById('frogs').appendChild(break_element)
         loadMore = document.createElement('button')
         loadMore.id = 'loadMore'
         loadMore.className = 'connectButton'
-        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_token_sales('100', continuation); }
+        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_token_sales('100', next_string); console.log(next_string) }
         loadMore.innerHTML = '🔰 Secondary Sales'
         document.getElementById('frogs').appendChild(loadMore)
     } else { return; }
