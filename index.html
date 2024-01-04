@@ -347,6 +347,7 @@
 
         await build_random_logo();
         await fetch_token_sales(COLLECTION_ADDRESS, '5');
+        console.log(freshfrogsnft_api)
 
         var intervalId = window.setInterval(async function(){ await build_random_logo() }, 6500);
         document.getElementById('randomLogo').onclick = async function (e) { clearInterval(intervalId); }
