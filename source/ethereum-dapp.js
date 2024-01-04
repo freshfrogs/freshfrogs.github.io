@@ -117,6 +117,7 @@ async function render_token_sales(sales) {
     sales.forEach(async (token) => {
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
         var sale_date = createdAt.substring(0, 10);
+        var element_id = tokenId+':'+createdAt
 
         // Render token information and data
         var html_elements = 
@@ -138,7 +139,7 @@ async function render_token_sales(sales) {
                 '<text style="color: teal;">'+truncateAddress(to)+'</text>'+
             '</div>'
 
-        await render_frog_token(html_elements, tokenId);
+        await render_frog_token(html_elements, tokenId, tokenId+':'+createdAt);
     })
 }
 
@@ -204,8 +205,9 @@ async function render_owners_tokens(tokens) {
 }
 
 // Render NFT token by layered attirubtes obtained through metadata.
-async function render_frog_token(html_elements, token_id) {
+async function render_frog_token(html_elements, token_id, element_id) {
 
+    if (! element_id) { var element_id = 'Frog #'+token_id }
     var location = 'frogs'
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
     var token_name = 'Frog #'+token_id
@@ -215,12 +217,7 @@ async function render_frog_token(html_elements, token_id) {
     var token_element = document.createElement('div');
 
     // Element Details -->
-    
-    token_element.onclick = async function(){
-        (meta_morph_enabled);
-        await meta_morph(token_id);
-    }
-    token_element.id = token_name;
+    token_element.id = element_id;
     token_element.className = 'display_token';
     token_element.innerHTML = 
         '<div class="display_token_cont">'+
