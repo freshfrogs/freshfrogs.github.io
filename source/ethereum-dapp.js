@@ -139,10 +139,8 @@ async function fetch_held_tokens(wallet, limit, next_string) {
     .catch(err => console.error(err));
 }
 async function update_staked_tokens(tokens) {
-    console.log('Updating staked tokens...')
     tokens.forEach(async (token) => {
         var { token: { tokenId } } = token
-        console.log('Updating Frog #'+tokenId)
         let owner = await stakerAddress(tokenId);
         let staked_values = await stakingValues(tokenId);
         var staked_lvl = staked_values[1]
@@ -183,6 +181,7 @@ async function render_token_sales(contract, sales) {
         var sale_date = createdAt.substring(0, 10);
         sales_volume_eth = sales_volume_eth + Number(decimal);
         sales_volume_usd = sales_volume_usd + Number(usd);
+        console.log(sales_volume_eth.toFixed(2))
         if (from !== '0x0000000000000000000000000000000000000000') { txn_string = 'sale'; from = truncateAddress(from) } else { txn_string = 'mint'; from = 'MINT'; }
         var html_elements = 
             '<div style="margin: 8px; float: right; width: 100px;">'+
@@ -204,7 +203,7 @@ async function render_token_sales(contract, sales) {
             '</div>'
         await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string);
     })
-    console.log('Volume:\n'+' - - -> '+sales_volume_eth+' ETH\n'+' - - -> $'+sales_volume_usd+'');
+    console.log('Volume:\n'+' - - -> '+sales_volume_eth.toFixed(2)+' ETH\n'+' - - -> $'+sales_volume_usd.toFixed(2)+'');
 }
 async function render_held_tokens(wallet, tokens) {
     tokens.forEach(async (token) => {
