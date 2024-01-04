@@ -126,7 +126,7 @@ async function render_token_sales(sales) {
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
-                '<text id="frog_type" style="color: teal;">'+decimal+'Ξ ($'+usd+')'+'</text>'+
+                '<text id="frog_type" style="color: teal;">'+decimal+'Ξ ($'+usd.toFixed(2)+')'+'</text>'+
             '</div>'+
             '<br>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
