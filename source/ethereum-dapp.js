@@ -114,7 +114,7 @@ async function fetch_token_sales(limit, next_string) {
     .then(data => data.json())
     .then(data => function() {
         render_token_sales(data.sales);
-        sales_load_button(data.continuation);
+       // sales_load_button(data.continuation);
     })
     .catch(err => console.error(err));
 }
@@ -162,8 +162,10 @@ async function render_token_sales(sales) {
 async function fetch_owners_tokens(wallet) {
     fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
     .then(data => data.json())
-    .then(data => render_owners_tokens(data.tokens))
-    .then(data => more_load_button(data.continuation))
+    .then(data => function() {
+        render_owners_tokens(data.tokens)
+        //more_load_button(data.continuation)
+    })
     .catch(err => console.error(err));
 }
 async function render_owners_tokens(tokens) {
