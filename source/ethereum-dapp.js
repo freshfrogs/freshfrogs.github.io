@@ -136,7 +136,7 @@ async function render_token_sales(sales) {
 
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
         var sale_date = createdAt.substring(0, 10);
-        if (from !== '0x0000000000000000000000000000000000000000') { txn_string = 'sale'; } else { txn_string = 'mint'; from = 'Mint'; }
+        if (from !== '0x0000000000000000000000000000000000000000') { txn_string = 'sale'; } else { txn_string = 'mint'; }
         // Render token information and data
         var html_elements = 
             '<div style="margin: 8px; float: right; width: 100px;">'+
@@ -162,14 +162,12 @@ async function render_token_sales(sales) {
 }
 
 async function fetch_owners_tokens(wallet, limit, next_string) {
+    if (! wallet) { wallet = user_address}
     if (! limit) { limit = '50'; }
     if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
-    if (! wallet) { wallet = user_address}
     fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit='+limit+next, options)
     .then((data) => data.json())
-    .then(async (data) => {
-        await render_owners_tokens(wallet, data.tokens, data.continuation)
-    })
+    .then((data) => render_owners_tokens(wallet, data.tokens, data.continuation))
     .catch(err => console.error(err));
 }
 async function render_owners_tokens(wallet, tokens, next_string) {
@@ -247,9 +245,9 @@ async function render_frog_token(html_elements, token_id, element_id, txn) {
 
     if (! element_id) { var element_id = 'Frog #'+token_id }
     if (txn == 'sale') {
-        var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: tomato; font-weight: bold;">SALE</text>'
+        var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: tomato; font-weight: inherit;">SALE</text>'
     } else if (txn == 'mint') {
-        var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: teal; font-weight: bold;">MINT</text>'
+        var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: teal; font-weight: inherit;">MINT</text>'
     } else {
         var frog_name = '<strong><u>Frog #'+token_id+'</strong></u>'
     }
