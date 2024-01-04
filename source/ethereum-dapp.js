@@ -175,9 +175,12 @@ async function update_staked_tokens(tokens) {
     })
 }
 async function render_token_sales(contract, sales) {
+    var sales_volume = 0;
     sales.forEach(async (token) => {
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
         var sale_date = createdAt.substring(0, 10);
+        sales_volume = sales_volume + Number(usd);
+        console.log('Volume: $'+sales_volume)
         if (from !== '0x0000000000000000000000000000000000000000') { txn_string = 'sale'; from = truncateAddress(from) } else { txn_string = 'mint'; from = 'MINT'; }
         var html_elements = 
             '<div style="margin: 8px; float: right; width: 100px;">'+
