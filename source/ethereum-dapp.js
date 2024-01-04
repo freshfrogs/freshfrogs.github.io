@@ -167,10 +167,12 @@ async function fetch_owners_tokens(wallet, limit) {
     if (! limit) { limit = '50'; }
     fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit='+limit+'', options)
     .then((data) => data.json())
-    .then((data) => {
-        render_owners_tokens(data.tokens)
+    .then(async (data) => {
+        console.log('testing...')
+        await render_owners_tokens(data.tokens)
+        console.log('1')
         if (! data.continuation) { return }
-        else { more_load_button(data.continuation); }
+        else { await more_load_button(data.continuation); console.log('2'); }
     })
     .catch(err => console.error(err));
 }
