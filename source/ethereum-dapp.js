@@ -112,8 +112,10 @@ async function fetch_token_sales(limit, next_string) {
     if (! next_string) { continuation = ''; } else { continuation = '&continuation'+next_string+'' }
     fetch('https://api.reservoir.tools/sales/v5?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit='+limit+continuation, options)
     .then(data => data.json())
-    .then(data => render_token_sales(data.sales))
-    .then(data => sales_load_button(data.continuation))
+    .then(data => function() {
+        render_token_sales(data.sales);
+        sales_load_button(data.continuation);
+    })
     .catch(err => console.error(err));
 }
 async function sales_load_button(continuation) {
