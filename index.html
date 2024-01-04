@@ -345,19 +345,8 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        try {
-
-          //await fetch_eth_usd()
-          //.then(async () => {
-            //console.log('eth_usd = '+eth_usd)
-            await fetch_nft_sales_data();
-          //})
-        } catch (e) {
-
-          console.log('Failed to fetch recent sales! '+e.message);
-
-        }
-
+        await fetch_token_sales();
+        
         async function build_random_logo() {
           // Random Frog Element:
           document.getElementById('randomLogo').innerHTML = ''

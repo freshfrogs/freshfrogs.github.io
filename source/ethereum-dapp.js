@@ -107,6 +107,112 @@ const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 
 const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': 'demo-api-key'}};
+async function fetch_token_sales() {
+    fetch('https://api.reservoir.tools/sales/v5?contract=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
+    .then(data => data.json())
+    .then(data => render_token_sales(sales.sales))
+    .catch(err => console.error(err));
+}
+
+async function render_token_sales(sales) {
+    sales.forEach(async (token) => {
+        var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
+        var sale_date = createdAt.substring(0, 10);
+
+        // Render token information and data
+        var html_elements = 
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Date</text>'+'<br>'+
+                '<text style="color: teal;">'+sale_date+'</text>'+
+            '</div>'+
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
+                '<text id="frog_type" style="color: teal;">'+decimal+'Ξ ($'+usd+')'+'</text>'+
+            '</div>'+
+            '<br>'+
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Seller</text>'+'<br>'+
+                '<text style="color: teal;">'+truncateAddress(from)+'</text>'+
+            '</div>'+
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Buyer</text>'+'<br>'+
+                '<text style="color: teal;">'+truncateAddress(to)+'</text>'+
+            '</div>'
+
+        await render_frog_token(html_elements, token_id);
+    })
+}
+
+// Render NFT token by layered attirubtes obtained through metadata.
+async function render_frog_token(html_elements, token_id) {
+
+    var location = 'frogs'
+    var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
+    var token_name = 'Frog #'+token_id
+
+    // <-- Begin Element
+    var token_doc = document.getElementById(location);
+    var token_element = document.createElement('div');
+
+    // Element Details -->
+    
+    token_element.onclick = async function(){
+        (meta_morph_enabled);
+        await meta_morph(token_id);
+    }
+    token_element.id = token_name;
+    token_element.className = 'display_token';
+    token_element.innerHTML = 
+        '<div class="display_token_cont">'+
+            '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
+                '<div class="innerLeft">'+
+                    '<div href="https://rarible.com/token/'+COLLECTION_ADDRESS+':'+token_id+'" target="_blank" class="display_token_img_cont" id="cont_'+token_id+'" onclick="render_display('+token_id+')">'+
+                    '</div>'+
+                '</div>'+
+            '</div>'+
+            '<div class="renderRight">'+
+                '<div class="innerRight">'+
+                    '<div id="traits_'+token_id+'" class="trait_list">'+
+                        //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
+                        '<strong><u>'+token_name+'</u></strong> <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+                    '</div>'+
+                    '<div id="prop_'+token_id+'" class="properties">'+
+                        html_elements+
+                    '</div>'+
+                '</div>'+
+            '</div>'+
+        '</div>';
+
+    // Create Element <--
+    token_doc.appendChild(token_element);
+
+    // Update Metadata! Build Frog -->
+    let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
+    for (let i = 0; i < metadata.attributes.length; i++) {
+        let attribute = metadata.attributes[i]
+        if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
+
+            // get special dna from token id
+            firstDigit = parseInt(token_id / 1000);
+            lastDigit = token_id % 10;
+            if (firstDigit > frogArray.length) { firstDigit = frogArray.length; }
+            if (lastDigit > traitArray.length) { lastDigit = traitArray.length; }
+            frogdna = frogArray[firstDigit]
+            traitdna = traitArray[lastDigit]
+            build_trait('SpecialFrog', 'peace/'+frogdna, 'cont_'+token_id);
+            build_trait('Trait', 'SpecialFrog/peace/'+traitdna, 'cont_'+token_id);
+        } else {
+            build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
+        }
+    }
+}
+
+async function fetch_owners_tokens(wallet) {
+    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
+    .then(response => response.json())
+    .then(response => console.log(response))
+    .catch(err => console.error(err));
+}
 
 // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjcyYjJmYWNkLTIzZDUtNDM4NS04ZmE4LTRkN2QxZDJmYTcwMCIsIm9yZ0lkIjoiMzcwMTY1IiwidXNlcklkIjoiMzgwNDMzIiwidHlwZUlkIjoiMjA0MDliMWItNWE3Yi00ZjZlLWI5NjktOWU2OWJiMWY3N2VmIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3MDM4OTQwMDUsImV4cCI6NDg1OTY1NDAwNX0.NSsiVKVdzHmL_b3eNdbEVzJJ4jNLWIQh5Qd3VZ9O-ko
 
@@ -220,77 +326,6 @@ async function fetch_nft_sales_data(limit, next_string) {
             document.getElementById('frogs').appendChild(loadMore)
         } else { return }
     })
-}
-
-async function fetch_nft_data(wallet, limit, next_string) {
-    fetch('https://api.reservoir.tools/sales/v5?contract=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
-    .then(response => response.json())
-    .then(response => console.log(response))
-    .catch(err => console.error(err));
-}
-
-// Render NFT token by layered attirubtes obtained through metadata.
-async function render_frog_token(html_elements, token_id) {
-
-    var location = 'frogs'
-    var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
-    var token_name = 'Frog #'+token_id
-
-    // <-- Begin Element
-    var token_doc = document.getElementById(location);
-    var token_element = document.createElement('div');
-
-    // Element Details -->
-    
-    token_element.onclick = async function(){
-        (meta_morph_enabled);
-        await meta_morph(token_id);
-    }
-    token_element.id = token_name;
-    token_element.className = 'display_token';
-    token_element.innerHTML = 
-        '<div class="display_token_cont">'+
-            '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
-                '<div class="innerLeft">'+
-                    '<div href="https://rarible.com/token/'+COLLECTION_ADDRESS+':'+token_id+'" target="_blank" class="display_token_img_cont" id="cont_'+token_id+'" onclick="render_display('+token_id+')">'+
-                    '</div>'+
-                '</div>'+
-            '</div>'+
-            '<div class="renderRight">'+
-                '<div class="innerRight">'+
-                    '<div id="traits_'+token_id+'" class="trait_list">'+
-                        //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
-                        '<strong><u>'+token_name+'</u></strong> <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
-                    '</div>'+
-                    '<div id="prop_'+token_id+'" class="properties">'+
-                        html_elements+
-                    '</div>'+
-                '</div>'+
-            '</div>'+
-        '</div>';
-
-    // Create Element <--
-    token_doc.appendChild(token_element);
-
-    // Update Metadata! Build Frog -->
-    let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
-    for (let i = 0; i < metadata.attributes.length; i++) {
-        let attribute = metadata.attributes[i]
-        if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
-
-            // get special dna from token id
-            firstDigit = parseInt(token_id / 1000);
-            lastDigit = token_id % 10;
-            if (firstDigit > frogArray.length) { firstDigit = frogArray.length; }
-            if (lastDigit > traitArray.length) { lastDigit = traitArray.length; }
-            frogdna = frogArray[firstDigit]
-            traitdna = traitArray[lastDigit]
-            build_trait('SpecialFrog', 'peace/'+frogdna, 'cont_'+token_id);
-            build_trait('Trait', 'SpecialFrog/peace/'+traitdna, 'cont_'+token_id);
-        } else {
-            build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
-        }
-    }
 }
 
 async function fetch_eth_usd() {
