@@ -138,7 +138,68 @@ async function render_token_sales(sales) {
                 '<text style="color: teal;">'+truncateAddress(to)+'</text>'+
             '</div>'
 
-        await render_frog_token(html_elements, token_id);
+        await render_frog_token(html_elements, tokenId);
+    })
+}
+
+async function fetch_owners_tokens(wallet) {
+    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
+    .then(data => data.json())
+    .then(data => render_owners_tokens(data.tokens))
+    .catch(err => console.error(err));
+}
+async function render_owners_tokens(tokens) {
+    tokens.forEach(async (token) => {
+        var { token: { tokenId } } = token
+        var staked, staked_status, staked_values, staked_lvl, staked_next_lvl, button_element, progress, progress_element;
+        let owner = await collection.methods.ownerOf(tokenId).call();
+        // Staked
+        if (owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
+            staked = 'True'; staked_status = 'teal';
+            owner = await stakerAddress(token_id);
+            staked_values = await stakingValues(token_id);
+            staked_lvl = staked_values[1]; staked_next_lvl = staked_values[2].toString()+' days';
+            progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100;
+            progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>';
+            if (owner.toLowerCase() == user_address.toLowerCase()) { 
+                button_element = // Un-stake button
+                    '<div style="text-align: center;">'+
+                        '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
+                    '</div>';
+            } else { button_element = ''; }
+        // NOT Staked
+        } else {
+            progress_element = ''; staked = 'False'; staked_status = 'tomato'; staked_lvl = '--'; staked_next_lvl = '--';
+            if (owner.toLowerCase() == user_address.toLowerCase()) { 
+                button_element = // Un-stake button
+                    '<div style="text-align: center;">'+
+                        '<button class="stake_button" onclick="initiate_stake('+token_id+')">Stake</button>'+
+                    '</div>';
+            } else { button_element = ''; }
+        }
+
+        var html_elements = 
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
+                '<text style="color: '+staked_status+';">'+staked+'</text>'+
+            '</div>'+
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
+                '<text style="color: teal;" id="frog_type">'+truncateAddress(owner)+'</text>'+
+            '</div>'+
+            '<br>'+
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
+                '<text style="color: teal;">'+staked_next_lvl+'</text>'+
+            '</div>'+
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
+                '<text style="color: teal;">'+staked_lvl+'</text>'+
+            '</div>'+
+            progress_element+
+            button_element;
+
+        await render_frog_token(html_elements, tokenId);
     })
 }
 
@@ -204,13 +265,6 @@ async function render_frog_token(html_elements, token_id) {
             build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
         }
     }
-}
-
-async function fetch_owners_tokens(wallet) {
-    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
-    .then(response => response.json())
-    .then(response => console.log(response))
-    .catch(err => console.error(err));
 }
 
 // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjcyYjJmYWNkLTIzZDUtNDM4NS04ZmE4LTRkN2QxZDJmYTcwMCIsIm9yZ0lkIjoiMzcwMTY1IiwidXNlcklkIjoiMzgwNDMzIiwidHlwZUlkIjoiMjA0MDliMWItNWE3Yi00ZjZlLWI5NjktOWU2OWJiMWY3N2VmIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3MDM4OTQwMDUsImV4cCI6NDg1OTY1NDAwNX0.NSsiVKVdzHmL_b3eNdbEVzJJ4jNLWIQh5Qd3VZ9O-ko
