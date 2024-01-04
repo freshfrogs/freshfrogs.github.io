@@ -347,7 +347,6 @@
 
         await build_random_logo();
         await fetch_token_sales(COLLECTION_ADDRESS, '5');
-        console.log(TEST_KEY)
 
         var intervalId = window.setInterval(async function(){ await build_random_logo() }, 6500);
         document.getElementById('randomLogo').onclick = async function (e) { clearInterval(intervalId); }
@@ -364,6 +363,8 @@
           var random_token_image = SOURCE_PATH+'/frog/'+random_token+'.png'
           document.getElementById('randomLogo').style.backgroundImage = "url("+random_token_image+")";
         }
+
+        console.log(API_KEY)
       })
     </script>
     
