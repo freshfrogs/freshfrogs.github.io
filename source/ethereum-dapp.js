@@ -204,6 +204,7 @@ async function render_token_sales(contract, sales) {
             '</div>'
         await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string);
     })
+    console.log('Volume:\n'+' - - -> '+sales_volume_eth+' ETH\n'+' - - -> $'+sales_volume_usd+'');
 }
 async function render_held_tokens(wallet, tokens) {
     tokens.forEach(async (token) => {
