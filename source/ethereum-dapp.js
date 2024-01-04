@@ -110,8 +110,8 @@ async function fetch_token_sales(limit, next_string) {
     if (! limit) { limit = '5'; }
     if (! next_string) { continuation = ''; } else { continuation = '&continuation'+next_string+'' }
     fetch('https://api.reservoir.tools/sales/v5?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit='+limit+continuation, options)
-    .then(data => data.json())
-    .then(data => function() {
+    .then((data) => data.json())
+    .then((data) => {
         render_token_sales(data.sales);
         if (! data.continuation) { return }
         else { sales_load_button(data.continuation); }
@@ -161,8 +161,8 @@ async function render_token_sales(sales) {
 
 async function fetch_owners_tokens(wallet) {
     fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
-    .then(data => data.json())
-    .then(data => function() {
+    .then((data) => data.json())
+    .then((data) => {
         render_owners_tokens(data.tokens)
         //more_load_button(data.continuation)
     })
