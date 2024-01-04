@@ -186,7 +186,7 @@ async function render_token_sales(contract, sales) {
             txn_string = 'sale'; from = truncateAddress(from)
             net_income_usd = net_income_usd + (Number(usd))*0.025
         } else {
-            txn_string = 'mint'; from = 'MINT';
+            txn_string = 'mint'; from = truncateAddress(COLLECTION_ADDRESS);
             net_income_usd = net_income_usd + Number(usd)
         }
         var html_elements = 
