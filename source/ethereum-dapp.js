@@ -121,11 +121,12 @@ async function fetch_token_sales(limit, next_string) {
 async function sales_load_button(next_string) {
     if (next_string !== null && next_string !== '' && next_string !== 'undefined') {
         break_element = document.createElement('br')
+        break_element.id = 'tempBreak'
         document.getElementById('frogs').appendChild(break_element)
         loadMore = document.createElement('button')
         loadMore.id = 'loadMore'
         loadMore.className = 'connectButton'
-        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_token_sales('100', next_string); }
+        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); document.getElementById('tempBreak').remove(); await fetch_token_sales('100', next_string); }
         loadMore.innerHTML = '🔰 Secondary Sales'
         document.getElementById('frogs').appendChild(loadMore)
     } else { return; }
