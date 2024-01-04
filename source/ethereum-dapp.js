@@ -137,11 +137,11 @@ async function fetch_held_tokens(wallet, limit, next_string) {
 }
 async function update_staked_tokens(tokens) {
     console.log('Updating staked tokens...')
-    tokens.forEach((token) => {
+    tokens.forEach(async (token) => {
         var { token: { tokenId } } = token
         console.log('Updating Frog #'+tokenId)
-        let owner = stakerAddress(tokenId);
-        let staked_values = stakingValues(tokenId);
+        let owner = await stakerAddress(tokenId);
+        let staked_values = await stakingValues(tokenId);
         var staked_lvl = staked_values[1]
         var staked_next_lvl = staked_values[2].toString()+' days'
         var progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
