@@ -201,6 +201,12 @@ async function render_token_sales(contract, sales) {
 async function render_held_tokens(wallet, tokens) {
     tokens.forEach(async (token) => {
         var { token: { tokenId } } = token
+        if (wallet.toLowerCase() == user_address.toLowerCase()) { 
+            button_element = // Stake button
+                '<div style="text-align: center;">'+
+                    '<button class="stake_button" onclick="initiate_stake('+tokenId+')">Stake</button>'+
+                '</div>';
+        } else { button_element = ''; }
         var html_elements = 
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
@@ -218,7 +224,8 @@ async function render_held_tokens(wallet, tokens) {
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
                 '<text style="color: teal;">--</text>'+
-            '</div>';
+            '</div>'+
+            button_element;
         await build_token(html_elements, tokenId);
     })
 }
@@ -271,7 +278,7 @@ async function render_owners_tokens(wallet, tokens, next_string) {
         } else {
             progress_element = ''; staked = 'False'; staked_status = 'tomato'; staked_lvl = '--'; staked_next_lvl = '--';
             if (owner.toLowerCase() == user_address.toLowerCase()) { 
-                button_element = // Un-stake button
+                button_element = // Stake button
                     '<div style="text-align: center;">'+
                         '<button class="stake_button" onclick="initiate_stake('+tokenId+')">Stake</button>'+
                     '</div>';
@@ -413,7 +420,7 @@ async function fetch_staked_tokens(wallet) {
                 progress_element+
                 button_element;
 
-            await build(html_elements, token_id);
+            await build_token(html_elements, token_id);
         })
     })
 }
