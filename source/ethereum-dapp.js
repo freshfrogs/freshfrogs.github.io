@@ -113,12 +113,24 @@ async function fetch_token_sales(limit, next_string) {
     else { fetch_url = 'https://api.reservoir.tools/sales/v5?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit='+limit+'&continuation'+next_string+'' }
     fetch(fetch_url, options)
     .then(data => data.json())
-    .then(data => render_token_sales(data))
+    .then(data => render_token_sales(data.sales))
+    .then(data => {
+        var next_string = data.continuation;
+        if (next_string !== null && next_string !== '' && next_string !== 'undefined') {
+            break_element = document.createElement('br')
+            document.getElementById('frogs').appendChild(break_element)
+            loadMore = document.createElement('button')
+            loadMore.id = 'loadMore'
+            loadMore.className = 'connectButton'
+            loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_token_sales('100', next_string); }
+            loadMore.innerHTML = '🔰 Secondary Sales'
+            document.getElementById('frogs').appendChild(loadMore)
+        }
+    })
     .catch(err => console.error(err));
 }
-async function render_token_sales(data) {
-    var next_string = data.continuation
-    data.sales.forEach(async (token) => {
+async function render_token_sales(sales) {
+    sales.forEach(async (token) => {
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
         var sale_date = createdAt.substring(0, 10);
 
@@ -143,18 +155,6 @@ async function render_token_sales(data) {
             '</div>'
 
         await render_frog_token(html_elements, tokenId, tokenId+':'+createdAt);
-    })
-    .then(async function() {
-        if (next_string !== null && next_string !== '' && next_string !== 'undefined') {
-            break_element = document.createElement('br')
-            document.getElementById('frogs').appendChild(break_element)
-            loadMore = document.createElement('button')
-            loadMore.id = 'loadMore'
-            loadMore.className = 'connectButton'
-            loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_token_sales('100', next_string); }
-            loadMore.innerHTML = '🔰 Secondary Sales'
-            document.getElementById('frogs').appendChild(loadMore)
-        } else { return }
     })
 }
 
