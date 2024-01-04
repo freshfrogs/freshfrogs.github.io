@@ -483,6 +483,8 @@ async function connect_user() {
     } catch (e) {
         console.log(e.message)
     }
+
+    try{console.log('api: '+freshfrogsnft_api)}catch(e){console.log(e.message)}
 }
 
 async function connect_functions(wallet_address) {
