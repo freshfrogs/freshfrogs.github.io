@@ -126,7 +126,7 @@ async function fetch_held_tokens(wallet, limit, next_string) {
     fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
     .then((data) => data.json())
     .then((data) => {
-        render_held_tokens(data.sales);
+        render_held_tokens(data.tokens);
         if (! data.continuation) { return }
         else { load_more_button(wallet, limit, data.continuation); }
     })
@@ -161,7 +161,6 @@ async function render_token_sales(sales) {
 async function render_held_tokens(tokens) {
     tokens.forEach(async (token) => {
         var { token: { tokenId } } = token
-        progress_element = ''; staked = 'False'; staked_status = 'tomato'; staked_lvl = '--'; staked_next_lvl = '--';
         var html_elements = 
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
@@ -174,14 +173,12 @@ async function render_held_tokens(tokens) {
             '<br>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
-                '<text style="color: teal;">'+staked_next_lvl+'</text>'+
+                '<text style="color: teal;">--</text>'+
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
-                '<text style="color: teal;">'+staked_lvl+'</text>'+
-            '</div>'+
-            progress_element+
-            button_element;
+                '<text style="color: teal;">--</text>'+
+            '</div>';
         await build_token(html_elements, tokenId);
     })
 }
