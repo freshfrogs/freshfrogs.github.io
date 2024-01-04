@@ -113,7 +113,6 @@ async function fetch_token_sales(limit, next_string) {
     fetch('https://api.reservoir.tools/sales/v5?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit='+limit+next+'', options)
     .then((data) => data.json())
     .then((data) => {
-        console.log(data)
         render_token_sales(data.sales);
         if (! data.continuation) { return }
         else { sales_load_button(data.continuation); }
@@ -127,7 +126,7 @@ async function sales_load_button(next_string) {
         loadMore = document.createElement('button')
         loadMore.id = 'loadMore'
         loadMore.className = 'connectButton'
-        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_token_sales('5', next_string); console.log(next_string) }
+        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_token_sales('100', next_string); }
         loadMore.innerHTML = '🔰 Secondary Sales'
         document.getElementById('frogs').appendChild(loadMore)
     } else { return; }
