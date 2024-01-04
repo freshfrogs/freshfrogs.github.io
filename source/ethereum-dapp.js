@@ -176,7 +176,7 @@ async function update_staked_tokens(tokens) {
 }
 async function render_token_sales(contract, sales) {
     sales.forEach(async (token) => {
-        var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
+        var { createdAt, from, to, token: { tokenId, rarityRank }, price: { amount: { decimal, usd } } } = token
         var sale_date = createdAt.substring(0, 10);
         if (from !== '0x0000000000000000000000000000000000000000') { txn_string = 'sale'; from = truncateAddress(from) } else { txn_string = 'mint'; from = 'MINT'; }
         var html_elements = 
@@ -197,12 +197,12 @@ async function render_token_sales(contract, sales) {
                 '<text style="color: #1a202c; font-weight: bold;">Buyer</text>'+'<br>'+
                 '<text style="color: teal;">'+truncateAddress(to)+'</text>'+
             '</div>'
-        await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string);
+        await build_token(html_elements, tokenId, rarityRank, tokenId+':'+createdAt, txn_string);
     })
 }
 async function render_held_tokens(wallet, tokens) {
     tokens.forEach(async (token) => {
-        var { token: { tokenId } } = token
+        var { token: { tokenId, rarityRank } } = token
         console.log('Owned: Frog #'+tokenId)
         if (wallet.toLowerCase() == user_address.toLowerCase()) { 
             button_element = // Stake button
@@ -229,7 +229,7 @@ async function render_held_tokens(wallet, tokens) {
                 '<text style="color: teal;">--</text>'+
             '</div>'+
             button_element;
-        await build_token(html_elements, tokenId);
+        await build_token(html_elements, tokenId, rarityRank);
     })
 }
 async function sales_load_button(contract, limit, next_string) {
@@ -309,18 +309,27 @@ async function render_owners_tokens(wallet, tokens, next_string) {
             progress_element+
             button_element;
 
-        await render_frog_token(html_elements, tokenId);
+        await render_frog_token(html_elements, tokenId, rarity);
     })
 //    .then(await more_load_button(wallet, '100', next_string))
 }
 
 // Render NFT token by layered attirubtes obtained through metadata.
-async function build_token(html_elements, token_id, element_id, txn) {
+async function build_token(html_elements, token_id, rarity, element_id, txn) {
 
     if (! element_id) { var element_id = 'Frog #'+token_id }
     if (txn == 'sale') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: tomato; font-weight: inherit;">SALE</text>'; } 
     else if (txn == 'mint') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: teal; font-weight: inherit;">MINT</text>'; } 
     else { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u>'; }
+    if (! rarity) { rarity = 1; }
+    else {
+        rarity = (parseInt(rarity) / 4040) * 100
+        if (rarity < 25) {rarity_color = 'yellow'}
+        else if (rarity > 25) {rarity_color = 'green'}
+        else if (rarity > 50) {rarity_color = 'blue'}
+        else if (rarity > 80) {rarity_color = 'purple'}
+        else if (rarity > 90) {rarity_color = 'orange'}
+    }
     
     var location = 'frogs'
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
@@ -344,7 +353,7 @@ async function build_token(html_elements, token_id, element_id, txn) {
                 '<div class="innerRight">'+
                     '<div id="traits_'+element_id+'" class="trait_list">'+
                         //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
-                        ''+frog_name+' <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+                        '<b style="color: '+rarity_color+';">🞺 </b>'+frog_name+' <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
                     '</div>'+
                     '<div id="prop_'+element_id+'" class="properties">'+
                         html_elements+
