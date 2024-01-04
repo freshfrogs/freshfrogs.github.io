@@ -111,7 +111,7 @@ const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': frog_api}};
 async function fetch_token_sales(contract, limit, next_string) {
     if (! contract) { contract = COLLECTION_ADDRESS; }
-    if (! limit) { limit = '4'; }
+    if (! limit) { limit = '5'; }
     if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
     fetch('https://api.reservoir.tools/sales/v5?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?orderBy=time&limit='+limit+next+'', options)
     .then((data) => data.json())
@@ -124,7 +124,7 @@ async function fetch_token_sales(contract, limit, next_string) {
 }
 async function fetch_held_tokens(wallet, limit, next_string) {
     if (! wallet) { wallet = user_address}
-    if (! limit) { limit = '32'; }
+    if (! limit) { limit = '50'; }
     if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
     fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
     .then((data) => data.json())

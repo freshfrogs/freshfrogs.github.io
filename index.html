@@ -346,7 +346,7 @@
       document.addEventListener("DOMContentLoaded", async () => {
 
         await build_random_logo();
-        await fetch_token_sales(COLLECTION_ADDRESS, '8');
+        await fetch_token_sales(COLLECTION_ADDRESS);
 
         var intervalId = window.setInterval(async function(){ await build_random_logo() }, 6500);
         document.getElementById('randomLogo').onclick = async function (e) { clearInterval(intervalId); }
@@ -386,6 +386,6 @@
       </div>
       <div id="buttonBar" class="buttonBar"><button id="connectButton" class="connectButton"><div id="connectStatus" class="disconnectedStatus"></div> Connect to Web3</button><a href="https://github.com/freshfrogs/freshfrogs.github.io" target="_blank"><button id="githubButton" class="connectButton">🔎 View on Github</button></a><a href="https://rarible.com/fresh-frogs" target="_blank"><button id="raribleButton" class="connectButton">🛒 Rarible Marketplace</button></a></div>
     </section>
-    <section id="frogs" style="width: 70% !important; background: transparent; border: none !important;"></section>
+    <section id="frogs" style="width: 80% !important; background: transparent; border: none !important;"></section>
   </body>
 </html>
