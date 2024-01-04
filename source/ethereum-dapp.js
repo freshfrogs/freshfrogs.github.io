@@ -379,7 +379,7 @@ async function fetch_staked_tokens(wallet) {
                 progress_element+
                 button_element;
 
-            await render_frog_token(html_elements, token_id);
+            await build(html_elements, token_id);
         })
     })
 }
