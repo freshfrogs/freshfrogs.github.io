@@ -106,7 +106,8 @@ const SOURCE_PATH = 'https://freshfrogs.github.io'
 const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': '3105c552-60b6-5252-bca7-291c724a54bf'}};
-async function fetch_token_sales(limit, next_string) {
+async function fetch_token_sales(contract, limit, next_string) {
+    if (! contract) { contract = COLLECTION_ADDRESS; }
     if (! limit) { limit = '5'; }
     if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
     fetch('https://api.reservoir.tools/sales/v5?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?orderBy=time&limit='+limit+next+'', options)
@@ -114,29 +115,28 @@ async function fetch_token_sales(limit, next_string) {
     .then((data) => {
         render_token_sales(data.sales);
         if (! data.continuation) { return }
-        else { sales_load_button(data.continuation); }
+        else { sales_load_button(contract, limit, data.continuation); }
     })
     .catch(err => console.error(err));
 }
-async function sales_load_button(next_string) {
-    if (next_string !== null && next_string !== '' && next_string !== 'undefined') {
-        break_element = document.createElement('br')
-        break_element.id = 'tempBreak'
-        document.getElementById('frogs').appendChild(break_element)
-        loadMore = document.createElement('button')
-        loadMore.id = 'loadMore'
-        loadMore.className = 'connectButton'
-        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); document.getElementById('tempBreak').remove(); await fetch_token_sales('100', next_string); }
-        loadMore.innerHTML = '🔰 Load More'
-        document.getElementById('frogs').appendChild(loadMore)
-    } else { return; }
+async function fetch_held_tokens(wallet, limit, next_string) {
+    if (! wallet) { wallet = user_address}
+    if (! limit) { limit = '10'; }
+    if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
+    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
+    .then((data) => data.json())
+    .then((data) => {
+        render_held_tokens(data.sales);
+        if (! data.continuation) { return }
+        else { load_more_button(wallet, limit, data.continuation); }
+    })
+    .catch(err => console.error(err));
 }
 async function render_token_sales(sales) {
     for ( var i = 0; i < sales.length; i++ ) {
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = sales[i]
         var sale_date = createdAt.substring(0, 10);
         if (from !== '0x0000000000000000000000000000000000000000') { txn_string = 'sale'; } else { txn_string = 'mint'; }
-        // Render token information and data
         var html_elements = 
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Date</text>'+'<br>'+
@@ -155,19 +155,61 @@ async function render_token_sales(sales) {
                 '<text style="color: #1a202c; font-weight: bold;">To</text>'+'<br>'+
                 '<text style="color: teal;">'+truncateAddress(to)+'</text>'+
             '</div>'
-
-        await render_frog_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string);
+        await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string);
     }
 }
-
-async function fetch_owners_tokens(wallet, limit, next_string) {
-    if (! wallet) { wallet = user_address}
-    if (! limit) { limit = '50'; }
-    if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
-    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit='+limit+next, options)
-    .then((data) => data.json())
-    .then((data) => render_owners_tokens(wallet, data.tokens, data.continuation))
-    .catch(err => console.error(err));
+async function render_held_tokens(tokens) {
+    for ( var i = 0; i < tokens.length; i++ ) {
+        var { token: { tokenId } } = tokens[i]
+        progress_element = ''; staked = 'False'; staked_status = 'tomato'; staked_lvl = '--'; staked_next_lvl = '--';
+        var html_elements = 
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
+                '<text style="color: tomato;">False</text>'+
+            '</div>'+
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
+                '<text style="color: teal;" id="frog_type">'+truncateAddress(wallet)+'</text>'+
+            '</div>'+
+            '<br>'+
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
+                '<text style="color: teal;">'+staked_next_lvl+'</text>'+
+            '</div>'+
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
+                '<text style="color: teal;">'+staked_lvl+'</text>'+
+            '</div>'+
+            progress_element+
+            button_element;
+        await build_token(html_elements, tokenId);
+    }
+}
+async function sales_load_button(contract, limit, next_string) {
+    if (next_string !== null && next_string !== '' && next_string !== 'undefined') {
+        break_element = document.createElement('br')
+        break_element.id = 'tempBreak'
+        document.getElementById('frogs').appendChild(break_element)
+        loadMore = document.createElement('button')
+        loadMore.id = 'loadMore'
+        loadMore.className = 'connectButton'
+        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); document.getElementById('tempBreak').remove(); await fetch_token_sales(contract, limit, next_string); }
+        loadMore.innerHTML = '🔰 Load More'
+        document.getElementById('frogs').appendChild(loadMore)
+    } else { return; }
+}
+async function more_load_button(wallet, limit, next_string) {
+    if (next_string !== null && next_string !== '' && next_string !== 'undefined') {
+        break_element = document.createElement('br')
+        break_element.id = 'tempBreak'
+        document.getElementById('frogs').appendChild(break_element)
+        loadMore = document.createElement('button')
+        loadMore.id = 'loadMore'
+        loadMore.className = 'connectButton'
+        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); document.getElementById('tempBreak').remove(); await fetch_owners_tokens(wallet, limit, next_string); }
+        loadMore.innerHTML = '🔰 Load More'
+        document.getElementById('frogs').appendChild(loadMore)
+    } else { return; }
 }
 async function render_owners_tokens(wallet, tokens, next_string) {
     tokens.forEach(async (token) => {
@@ -177,8 +219,8 @@ async function render_owners_tokens(wallet, tokens, next_string) {
         // Staked
         if (owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
             staked = 'True'; staked_status = 'teal';
-            let owner = await stakerAddress(tokenId);
-            let staked_values = await stakingValues(tokenId);
+            owner = await stakerAddress(tokenId);
+            staked_values = await stakingValues(tokenId);
             staked_lvl = staked_values[1]; staked_next_lvl = staked_values[2].toString()+' days';
             progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100;
             progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>';
@@ -222,25 +264,11 @@ async function render_owners_tokens(wallet, tokens, next_string) {
 
         await render_frog_token(html_elements, tokenId);
     })
-    .then(await more_load_button(wallet, '100', next_string))
-}
-
-async function more_load_button(wallet, limit, next_string) {
-    if (next_string !== null && next_string !== '' && next_string !== 'undefined') {
-        break_element = document.createElement('br')
-        break_element.id = 'tempBreak'
-        document.getElementById('frogs').appendChild(break_element)
-        loadMore = document.createElement('button')
-        loadMore.id = 'loadMore'
-        loadMore.className = 'connectButton'
-        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); document.getElementById('tempBreak').remove(); await fetch_owners_tokens(wallet, limit, next_string); }
-        loadMore.innerHTML = '🔰 Load More'
-        document.getElementById('frogs').appendChild(loadMore)
-    } else { return; }
+//    .then(await more_load_button(wallet, '100', next_string))
 }
 
 // Render NFT token by layered attirubtes obtained through metadata.
-async function render_frog_token(html_elements, token_id, element_id, txn) {
+async function build_token(html_elements, token_id, element_id, txn) {
 
     if (! element_id) { var element_id = 'Frog #'+token_id }
     if (txn == 'sale') {
@@ -305,7 +333,7 @@ async function render_frog_token(html_elements, token_id, element_id, txn) {
     }
 }
 
-async function fetch_staked_nfts(wallet) {
+async function fetch_held_tokens(wallet) {
     if (! wallet) { wallet = user_address; }
     await getStakedTokens(wallet)
     .then(async (tokens) => {
