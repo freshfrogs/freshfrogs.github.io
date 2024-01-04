@@ -1,4 +1,3 @@
-import freshfrogsnft_api from './freshfrogsnft_api.js'
 /* 
 
     FreshFrogsNFT Ethereum Decentralized Application (DApp)
