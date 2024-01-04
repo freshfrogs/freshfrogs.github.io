@@ -161,16 +161,18 @@ async function render_token_sales(sales) {
     })
 }
 
-async function fetch_owners_tokens(wallet, limit) {
+async function fetch_owners_tokens(wallet, limit, next_string) {
     if (! limit) { limit = '50'; }
-    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit='+limit+'', options)
+    if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
+    if (! wallet) { wallet = user_address}
+    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit='+limit+next, options)
     .then((data) => data.json())
     .then(async (data) => {
         console.log('testing...')
         await render_owners_tokens(data.tokens)
         console.log('1')
         if (! data.continuation) { return }
-        else { await more_load_button(data.continuation); console.log('2'); }
+        else { await more_load_button(wallet, '100', data.continuation); console.log('2'); }
     })
     .catch(err => console.error(err));
 }
@@ -229,14 +231,15 @@ async function render_owners_tokens(tokens) {
     })
 }
 
-async function more_load_button(continuation) {
-    if (continuation !== null && continuation !== '' && continuation !== 'undefined') {
+async function more_load_button(wallet, limit, next_string) {
+    if (next_string !== null && next_string !== '' && next_string !== 'undefined') {
         break_element = document.createElement('br')
+        break_element.id = 'tempBreak'
         document.getElementById('frogs').appendChild(break_element)
         loadMore = document.createElement('button')
         loadMore.id = 'loadMore'
         loadMore.className = 'connectButton'
-        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_token_sales('100', continuation); }
+        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); document.getElementById('tempBreak').remove(); await fetch_owners_tokens(wallet, limit, next_string); }
         loadMore.innerHTML = '🔰 Load More'
         document.getElementById('frogs').appendChild(loadMore)
     } else { return; }
