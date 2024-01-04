@@ -162,6 +162,7 @@ async function fetch_owners_tokens(wallet) {
     fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
     .then(data => data.json())
     .then(data => render_owners_tokens(data.tokens))
+    .then(data => more_load_button(data.continuation))
     .catch(err => console.error(err));
 }
 async function render_owners_tokens(tokens) {
@@ -217,6 +218,19 @@ async function render_owners_tokens(tokens) {
 
         await render_frog_token(html_elements, tokenId);
     })
+}
+
+async function more_load_button(continuation) {
+    if (continuation !== null && continuation !== '' && continuation !== 'undefined') {
+        break_element = document.createElement('br')
+        document.getElementById('frogs').appendChild(break_element)
+        loadMore = document.createElement('button')
+        loadMore.id = 'loadMore'
+        loadMore.className = 'connectButton'
+        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_token_sales('100', continuation); }
+        loadMore.innerHTML = '🔰 Secondary Sales'
+        document.getElementById('frogs').appendChild(loadMore)
+    } else { return; }
 }
 
 // Render NFT token by layered attirubtes obtained through metadata.
