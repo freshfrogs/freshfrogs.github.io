@@ -11,9 +11,7 @@ var controller, collection,
 user_address, user_rewards, 
 user_tokenBalance, user_stakedBalance, 
 is_approved, web3, f0, network, eth_usd, next, meta_morph_enabled;
-
-var sales_volume_eth = 0;
-var sales_volume_usd = 0;
+var sales_volume_eth = ales_volume_usd = net_income_usd = 0;
 
 var frogArray = [
     'blueDartFrog',
@@ -181,8 +179,14 @@ async function render_token_sales(contract, sales) {
         var sale_date = createdAt.substring(0, 10);
         sales_volume_eth = sales_volume_eth + Number(decimal);
         sales_volume_usd = sales_volume_usd + Number(usd);
-        console.log(sales_volume_eth.toFixed(2))
-        if (from !== '0x0000000000000000000000000000000000000000') { txn_string = 'sale'; from = truncateAddress(from) } else { txn_string = 'mint'; from = 'MINT'; }
+        net_sales_usd = net_sales_usd + Number(usd)
+        if (from !== '0x0000000000000000000000000000000000000000') {
+            txn_string = 'sale'; from = truncateAddress(from)
+            net_income_usd = net_sales_usd + (Number(usd))*0.025
+        } else {
+            txn_string = 'mint'; from = 'MINT';
+            net_income_usd = net_sales_usd + Number(usd)
+        }
         var html_elements = 
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Date</text>'+'<br>'+
@@ -203,7 +207,11 @@ async function render_token_sales(contract, sales) {
             '</div>'
         await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string);
     })
-    console.log('Volume:\n'+' - - -> '+sales_volume_eth.toFixed(2)+' ETH\n'+' - - -> $'+sales_volume_usd.toFixed(2)+'');
+    console.log('Volume:'+
+        '\n - - -> '+ sales_volume_eth.toFixed(2)+' ETH'+
+        '\n - - -> $'+ sales_volume_usd.toFixed(2)+''+
+        '\n - - -> Net: $'+net_income_usd.toFixed(2)
+    );
 }
 async function render_held_tokens(wallet, tokens) {
     tokens.forEach(async (token) => {
