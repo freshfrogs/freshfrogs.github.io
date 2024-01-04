@@ -346,7 +346,7 @@
       document.addEventListener("DOMContentLoaded", async () => {
 
         await build_random_logo();
-        await fetch_token_sales(COLLECTION_ADDRESS, '100');
+        await fetch_token_sales(COLLECTION_ADDRESS, '8');
         console.log('Volume:\n'+' - - -> '+sales_volume_eth+' ETH\n'+' - - -> $'+sales_volume_usd+'');
 
         var intervalId = window.setInterval(async function(){ await build_random_logo() }, 6500);
