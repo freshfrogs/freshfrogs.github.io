@@ -178,7 +178,7 @@ async function render_token_sales(contract, sales) {
     sales.forEach(async (token) => {
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
         var sale_date = createdAt.substring(0, 10);
-        if (from !== '0x0000000000000000000000000000000000000000') { txn_string = 'sale'; } else { txn_string = 'mint'; }
+        if (from !== '0x0000000000000000000000000000000000000000') { txn_string = 'sale'; from = truncateAddress(from) } else { txn_string = 'mint'; from = 'MINT'; }
         var html_elements = 
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Date</text>'+'<br>'+
@@ -190,11 +190,11 @@ async function render_token_sales(contract, sales) {
             '</div>'+
             '<br>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text style="color: #1a202c; font-weight: bold;">From</text>'+'<br>'+
-                '<text style="color: teal;">'+truncateAddress(from)+'</text>'+
+                '<text style="color: #1a202c; font-weight: bold;">Seller</text>'+'<br>'+
+                '<text style="color: teal;">'+from+'</text>'+
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text style="color: #1a202c; font-weight: bold;">To</text>'+'<br>'+
+                '<text style="color: #1a202c; font-weight: bold;">Buyer</text>'+'<br>'+
                 '<text style="color: teal;">'+truncateAddress(to)+'</text>'+
             '</div>'
         await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string);
@@ -868,7 +868,7 @@ async function initiate_setApprovalForAll() {
     var approval_status;
     let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
     if (is_approved) {approval_status = '🟢 TRUE'} else {approval_status = '🔴 FALSE'}
-    alert('📃 FreshFrogsNFT Staking\nStake your Frogs and start earning rewards like $FLYZ, and more! Staking works by sending your Frog to our smart contract that will keep it safe. Frogs that are staked can\'t be listed on secondary market places, like Rarible.\n\n✍️ Sign Contract Approval\nTo start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee. Approval Status: '+approval_status+'\n\nStaked Tokens: ('+user_stakedBalance+') | Rewards: '+user_rewards.toFixed(2)+' $FLYZ');
+    alert('📃 FreshFrogsNFT Staking\nStake your Frogs and start earning rewards like $FLYZ, and more! Staking works by sending your Frog to a smart contract that will keep it safe. Frogs that are staked can\'t be listed on secondary market places, like Rarible.\n\n✍️ Sign Contract Approval\nTo start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee. Approval Status: '+approval_status+'\n\nStaked Tokens: ('+user_stakedBalance+') | Rewards: '+user_rewards.toFixed(2)+' $FLYZ');
     if (!is_approved) { 
         try {
 
