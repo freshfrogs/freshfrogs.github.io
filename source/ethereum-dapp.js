@@ -490,6 +490,7 @@ async function connect_user() {
             await update_frontend();
 
         } else { // No wallet found.
+            console.log('Failed to find WEB3 browser addon')
             window.location('https://www.coinbase.com/wallet/downloads');
             return
         }
