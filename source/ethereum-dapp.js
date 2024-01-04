@@ -14,7 +14,7 @@ is_approved, web3, f0, network, eth_usd, next, meta_morph_enabled;
 
 var sales_volume_eth = 0;
 var sales_volume_usd = 0;
-var net_sales_usd = 0;
+var net_income_usd = 0;
 
 var frogArray = [
     'blueDartFrog',
@@ -182,13 +182,12 @@ async function render_token_sales(contract, sales) {
         var sale_date = createdAt.substring(0, 10);
         sales_volume_eth = sales_volume_eth + Number(decimal);
         sales_volume_usd = sales_volume_usd + Number(usd);
-        net_sales_usd = net_sales_usd + Number(usd)
         if (from !== '0x0000000000000000000000000000000000000000') {
             txn_string = 'sale'; from = truncateAddress(from)
-            net_income_usd = net_sales_usd + (Number(usd))*0.025
+            net_income_usd = net_income_usd + (Number(usd))*0.025
         } else {
             txn_string = 'mint'; from = 'MINT';
-            net_income_usd = net_sales_usd + Number(usd)
+            net_income_usd = net_income_usd + Number(usd)
         }
         var html_elements = 
             '<div style="margin: 8px; float: right; width: 100px;">'+
