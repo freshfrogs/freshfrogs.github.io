@@ -183,8 +183,6 @@ async function render_token_sales(contract, sales) {
         var sale_date = createdAt.substring(0, 10);
         sales_volume_eth = sales_volume_eth + Number(decimal);
         sales_volume_usd = sales_volume_usd + Number(usd);
-        console.log('Volume: '+sales_volume_eth+' ETH')
-        console.log('Volume: $'+sales_volume_usd+'')
         if (from !== '0x0000000000000000000000000000000000000000') { txn_string = 'sale'; from = truncateAddress(from) } else { txn_string = 'mint'; from = 'MINT'; }
         var html_elements = 
             '<div style="margin: 8px; float: right; width: 100px;">'+
