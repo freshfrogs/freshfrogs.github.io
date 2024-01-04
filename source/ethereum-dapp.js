@@ -113,7 +113,7 @@ async function fetch_token_sales(contract, limit, next_string) {
     fetch('https://api.reservoir.tools/sales/v5?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?orderBy=time&limit='+limit+next+'', options)
     .then((data) => data.json())
     .then((data) => {
-        render_token_sales(data.sales);
+        render_token_sales(contract, data.sales);
         if (! data.continuation) { return }
         else { sales_load_button(contract, limit, data.continuation); }
     })
@@ -126,13 +126,13 @@ async function fetch_held_tokens(wallet, limit, next_string) {
     fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
     .then((data) => data.json())
     .then((data) => {
-        render_held_tokens(data.tokens);
+        render_held_tokens(wallet, data.tokens);
         if (! data.continuation) { return }
         else { load_more_button(wallet, limit, data.continuation); }
     })
     .catch(err => console.error(err));
 }
-async function render_token_sales(sales) {
+async function render_token_sales(contract, sales) {
     sales.forEach(async (token) => {
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
         var sale_date = createdAt.substring(0, 10);
@@ -158,7 +158,7 @@ async function render_token_sales(sales) {
         await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string);
     })
 }
-async function render_held_tokens(tokens) {
+async function render_held_tokens(wallet, tokens) {
     tokens.forEach(async (token) => {
         var { token: { tokenId } } = token
         var html_elements = 
