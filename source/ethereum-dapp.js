@@ -133,8 +133,11 @@ async function sales_load_button(next_string) {
 }
 async function render_token_sales(sales) {
     sales.forEach(async (token) => {
+        
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
         var sale_date = createdAt.substring(0, 10);
+        if (from == '0x0000000000000000000000000000000000000000000000000000000000000000') { var txn_string = 'sale'; }
+        else if (from !== '0x0000000000000000000000000000000000000000000000000000000000000000') { var txn_string = 'sale'; }
 
         // Render token information and data
         var html_elements = 
@@ -156,7 +159,7 @@ async function render_token_sales(sales) {
                 '<text style="color: teal;">'+truncateAddress(to)+'</text>'+
             '</div>'
 
-        await render_frog_token(html_elements, tokenId, tokenId+':'+createdAt);
+        await render_frog_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string);
     })
 }
 
@@ -240,12 +243,18 @@ async function more_load_button(continuation) {
 }
 
 // Render NFT token by layered attirubtes obtained through metadata.
-async function render_frog_token(html_elements, token_id, element_id) {
+async function render_frog_token(html_elements, token_id, element_id, txn) {
 
     if (! element_id) { var element_id = 'Frog #'+token_id }
+    if (txn == 'sale') {
+        var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: tomato; font-weight: inherit;">SALE</text>'
+    } else if (txn == 'mint') {
+        var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: teal; font-weight: inherit;">MINT</text>'
+    } else {
+        var frog_name = '<strong><u>Frog #'+token_id+'</strong></u>'
+    }
     var location = 'frogs'
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
-    var token_name = 'Frog #'+token_id
 
     // <-- Begin Element
     var token_doc = document.getElementById(location);
@@ -266,7 +275,7 @@ async function render_frog_token(html_elements, token_id, element_id) {
                 '<div class="innerRight">'+
                     '<div id="traits_'+element_id+'" class="trait_list">'+
                         //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
-                        '<strong><u>'+token_name+'</u></strong> <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+                        ''+frog_name+' <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
                     '</div>'+
                     '<div id="prop_'+element_id+'" class="properties">'+
                         html_elements+
