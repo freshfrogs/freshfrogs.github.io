@@ -132,9 +132,8 @@ async function sales_load_button(next_string) {
     } else { return; }
 }
 async function render_token_sales(sales) {
-    sales.forEach(async (token) => {
-
-        var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
+    for ( var i = 0; i < sales.length; i++ ) {
+        var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = sales[i]
         var sale_date = createdAt.substring(0, 10);
         if (from !== '0x0000000000000000000000000000000000000000') { txn_string = 'sale'; } else { txn_string = 'mint'; }
         // Render token information and data
@@ -158,7 +157,7 @@ async function render_token_sales(sales) {
             '</div>'
 
         await render_frog_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string);
-    })
+    }
 }
 
 async function fetch_owners_tokens(wallet, limit, next_string) {
