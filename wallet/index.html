@@ -68,7 +68,7 @@
     margin-left: auto;
     margin-right: auto;
     padding-top: 8px;
-    margin-top: 5%;
+    margin-top: auto;
   }
   .pointer {
     cursor: pointer;
@@ -238,9 +238,15 @@
     width: 80%;
     padding: 5%;
     padding-bottom: 2%;
-    color: black;
-    font-size: 14px;
-    background: white;
+    color: white;
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+    font-size: initial;
+    font-weight: bolder;
+    background: url('https://freshfrogs.github.io/source/1500x500.png');
     border-radius: 5px;
     border: 1px solid black;
     box-shadow: 2px 2px darkslategray;
@@ -312,6 +318,20 @@
     margin-right: auto;
     width: 100%;
   }
+  .headerPanel {
+    padding: 2%;
+    font-weight: normal;
+    font-size: 14px;
+    text-shadow: none;
+    color: black;
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid black;
+    box-shadow: 2px 2px darkslategray;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+  }
 
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
@@ -382,7 +402,7 @@
       <div id="logoHeader" class="logoHeader">
         <div id="randomLogo" class="display_token_img_cont" style="box-shadow: lightgray 5px 5px; border: 1px solid darkslategray"><img id="frog-logo" src="https://freshfrogs.github.io/source/blackWhite.png"></div>
         <h1 style="font-size: x-large; font-weight: 900;">FreshFrogsNFT</h1>
-        <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">
+        <p class="headerPanel">
           A collection of 4,040 randomly generated frogs on the Ethereum blockchain, that are each unique with thousands of different combinations!
           Stake and earn rewards, level up, unlock custom trait animations and more! All secondary sales are entitled to a <b>5%</b> royalty.<br>
           <br>
