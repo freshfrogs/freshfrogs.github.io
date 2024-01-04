@@ -140,8 +140,8 @@ async function update_staked_tokens(tokens) {
     tokens.forEach((token) => {
         var { token: { tokenId } } = token
         console.log('Updating Frog #'+tokenId)
-        var owner = stakerAddress(tokenId);
-        var staked_values = stakingValues(tokenId);
+        let owner = stakerAddress(tokenId);
+        let staked_values = stakingValues(tokenId);
         var staked_lvl = staked_values[1]
         var staked_next_lvl = staked_values[2].toString()+' days'
         var progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
