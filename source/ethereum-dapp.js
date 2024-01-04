@@ -333,7 +333,7 @@ async function build_token(html_elements, token_id, element_id, txn) {
     }
 }
 
-async function fetch_held_tokens(wallet) {
+async function fetch_staked_tokens(wallet) {
     if (! wallet) { wallet = user_address; }
     await getStakedTokens(wallet)
     .then(async (tokens) => {
