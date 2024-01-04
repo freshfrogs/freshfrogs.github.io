@@ -127,7 +127,7 @@ async function sales_load_button(next_string) {
         loadMore = document.createElement('button')
         loadMore.id = 'loadMore'
         loadMore.className = 'connectButton'
-        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_token_sales('100', next_string); console.log(next_string) }
+        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_token_sales('5', next_string); console.log(next_string) }
         loadMore.innerHTML = '🔰 Secondary Sales'
         document.getElementById('frogs').appendChild(loadMore)
     } else { return; }
@@ -161,8 +161,9 @@ async function render_token_sales(sales) {
     })
 }
 
-async function fetch_owners_tokens(wallet) {
-    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
+async function fetch_owners_tokens(wallet, limit) {
+    if (! limit) { limit = '50'; }
+    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit='+limit+'', options)
     .then((data) => data.json())
     .then((data) => {
         render_owners_tokens(data.tokens)
