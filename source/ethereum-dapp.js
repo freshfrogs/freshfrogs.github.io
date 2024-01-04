@@ -110,7 +110,7 @@ const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': '3105c552-
 async function fetch_token_sales() {
     fetch('https://api.reservoir.tools/sales/v5?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=200', options)
     .then(data => data.json())
-    .then(data => render_token_sales(data.sales))
+    .then(data => console.log(data))
     .catch(err => console.error(err));
 }
 async function render_token_sales(sales) {
