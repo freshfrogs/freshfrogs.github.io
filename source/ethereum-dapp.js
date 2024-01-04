@@ -252,7 +252,7 @@ async function load_more_button(wallet, limit, next_string) {
         loadMore = document.createElement('button')
         loadMore.id = 'loadMore'
         loadMore.className = 'connectButton'
-        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); document.getElementById('tempBreak').remove(); await fetch_owners_tokens(wallet, limit, next_string); }
+        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); document.getElementById('tempBreak').remove(); await fetch_held_tokens(wallet, limit, next_string); }
         loadMore.innerHTML = '🔰 Load More'
         document.getElementById('frogs').appendChild(loadMore)
     } else { return; }
