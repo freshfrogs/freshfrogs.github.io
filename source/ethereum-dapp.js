@@ -145,7 +145,6 @@ async function render_token_sales(sales, next_string) {
         await render_frog_token(html_elements, tokenId, tokenId+':'+createdAt);
     })
     .then(async function() {
-        console.log('loading button: '+next)
         if (! next_string) { return }
         else {
             break_element = document.createElement('br')
