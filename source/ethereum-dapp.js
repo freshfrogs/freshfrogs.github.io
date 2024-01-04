@@ -323,11 +323,11 @@ async function build_token(html_elements, token_id, rarity, element_id, txn) {
     else { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u>'; }
     if (! rarity) { rarity = 1; }
     else { rarity = (parseInt(rarity) / 4040) * 100 }
-    if (rarity < 25) {rarity_color = 'yellow'}
-    else if (rarity > 25) {rarity_color = 'green'}
-    else if (rarity > 50) {rarity_color = 'blue'}
-    else if (rarity > 80) {rarity_color = 'purple'}
-    else if (rarity > 90) {rarity_color = 'orange'}
+    if (rarity < 25) {rarity_color = 'darkgoldenrod'}
+    else if (rarity > 25) {rarity_color = 'darkolivegreen'}
+    else if (rarity > 50) {rarity_color = 'darkturquoise'}
+    else if (rarity > 80) {rarity_color = 'darkviolet'}
+    else if (rarity > 90) {rarity_color = 'darkorange'}
     
     var location = 'frogs'
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
