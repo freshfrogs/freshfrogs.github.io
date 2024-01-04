@@ -198,7 +198,7 @@ async function sales_load_button(contract, limit, next_string) {
         document.getElementById('frogs').appendChild(loadMore)
     } else { return; }
 }
-async function more_load_button(wallet, limit, next_string) {
+async function load_more_button(wallet, limit, next_string) {
     if (next_string !== null && next_string !== '' && next_string !== 'undefined') {
         break_element = document.createElement('br')
         break_element.id = 'tempBreak'
