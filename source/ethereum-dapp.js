@@ -108,8 +108,8 @@ const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': '3105c552-60b6-5252-bca7-291c724a54bf'}};
 async function fetch_token_sales(limit, next_string) {
     if (! limit) { limit = '5'; }
-    if (! next_string) { continuation = ''; } else { continuation = '&continuation'+next_string+'' }
-    fetch('https://api.reservoir.tools/sales/v5?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit='+limit+continuation, options)
+    if (! next_string) { continuation = ''; } else { continuation = '&continuation'+next_string }
+    fetch('https://api.reservoir.tools/sales/v5?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit='+limit+continuation+'', options)
     .then((data) => data.json())
     .then((data) => {
         render_token_sales(data.sales);
@@ -164,7 +164,8 @@ async function fetch_owners_tokens(wallet) {
     .then((data) => data.json())
     .then((data) => {
         render_owners_tokens(data.tokens)
-        //more_load_button(data.continuation)
+        if (! data.continuation) { return }
+        else { more_load_button(data.continuation); }
     })
     .catch(err => console.error(err));
 }
