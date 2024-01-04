@@ -136,8 +136,10 @@ async function fetch_held_tokens(wallet, limit, next_string) {
     .catch(err => console.error(err));
 }
 async function update_staked_tokens(tokens) {
+    console.log('Updating staked tokens...')
     tokens.forEach((token) => {
         var { token: { tokenId } } = token
+        console.log('Updating Frog #'+tokenId)
         var owner = stakerAddress(tokenId);
         var staked_values = stakingValues(tokenId);
         var staked_lvl = staked_values[1]
