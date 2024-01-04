@@ -109,9 +109,11 @@ const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': '3105c552-
 async function fetch_token_sales(limit, next_string) {
     if (! limit) { limit = '5'; }
     if (! next_string) { continuation = ''; } else { continuation = '&continuation'+next_string }
+    console.log('Fetching recent sales data..')
     fetch('https://api.reservoir.tools/sales/v5?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit='+limit+continuation+'', options)
     .then((data) => data.json())
     .then((data) => {
+        console.log(data)
         render_token_sales(data.sales);
         if (! data.continuation) { return }
         else { sales_load_button(data.continuation); }
