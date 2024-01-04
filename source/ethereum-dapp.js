@@ -110,10 +110,9 @@ const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': 'demo-api-
 async function fetch_token_sales() {
     fetch('https://api.reservoir.tools/sales/v5?contract=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
     .then(data => data.json())
-    .then(data => render_token_sales(sales.sales))
+    .then(data => render_token_sales(data.sales))
     .catch(err => console.error(err));
 }
-
 async function render_token_sales(sales) {
     sales.forEach(async (token) => {
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
