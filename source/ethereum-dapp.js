@@ -106,7 +106,8 @@ const SOURCE_PATH = 'https://freshfrogs.github.io'
 const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 
-const _0x232c8a=_0x459a;function _0x46cf(){const _0x97306f=['565275cTFTCP','3105c552-60b6-5252-bca7-291c724a54bf','2aAHUvw','22830ltWgLC','1925vtqZPK','1824372GSIpSG','27167sSLTbi','GET','8CCJwOW','52063fJRcZy','54PFXVQV','41397pLKwbV','77040mWHOyR'];_0x46cf=function(){return _0x97306f;};return _0x46cf();}(function(_0x433fba,_0x3e3c0a){const _0x4822c5=_0x459a,_0x2e5e8a=_0x433fba();while(!![]){try{const _0x4bf22f=parseInt(_0x4822c5(0x17f))/0x1+parseInt(_0x4822c5(0x178))/0x2*(-parseInt(_0x4822c5(0x181))/0x3)+parseInt(_0x4822c5(0x175))/0x4+-parseInt(_0x4822c5(0x176))/0x5+parseInt(_0x4822c5(0x180))/0x6*(-parseInt(_0x4822c5(0x17c))/0x7)+parseInt(_0x4822c5(0x17e))/0x8*(-parseInt(_0x4822c5(0x17b))/0x9)+-parseInt(_0x4822c5(0x179))/0xa*(-parseInt(_0x4822c5(0x17a))/0xb);if(_0x4bf22f===_0x3e3c0a)break;else _0x2e5e8a['push'](_0x2e5e8a['shift']());}catch(_0xc7692d){_0x2e5e8a['push'](_0x2e5e8a['shift']());}}}(_0x46cf,0x19f75));function _0x459a(_0x2da35f,_0x4650ef){const _0x46cf84=_0x46cf();return _0x459a=function(_0x459ab5,_0x17ae63){_0x459ab5=_0x459ab5-0x175;let _0x477f8f=_0x46cf84[_0x459ab5];return _0x477f8f;},_0x459a(_0x2da35f,_0x4650ef);}const options={'method':_0x232c8a(0x17d),'headers':{'accept':'*/*','x-api-key':_0x232c8a(0x177)}};
+const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': '3105c552-60b6-5252-bca7-291c724a54bf'}};
+
 async function fetch_token_sales(limit, next_string) {
     if (! limit) { limit = '5'; }
     if (! next_string) { continuation = ''; } else { continuation = '&continuation'+next_string+'' }
