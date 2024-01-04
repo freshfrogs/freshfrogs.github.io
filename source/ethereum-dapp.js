@@ -464,7 +464,7 @@ async function fetch_eth_usd() {
 async function initiate_web3_connection() {
     if (typeof window.ethereum !== "undefined") {
         document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="pendingStatus"></div> Connecting...'
-        await connect_user().then( async function(){ update_frontend() });
+        await connect_user();
     } else {
         // WEB3 browser extenstion could not be found!
     }
@@ -487,6 +487,7 @@ async function connect_user() {
             await f0.init({ web3: web3, contract: COLLECTION_ADDRESS, network: 'main' })
             await get_user_invites(user_address);
             await connect_functions(user_address);
+            await update_frontend();
 
         } else { // No wallet found.
             window.location('https://www.coinbase.com/wallet/downloads');
