@@ -133,8 +133,8 @@ async function fetch_held_tokens(wallet, limit, next_string) {
     .catch(err => console.error(err));
 }
 async function render_token_sales(sales) {
-    for ( var i = 0; i < sales.length; i++ ) {
-        var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = sales[i]
+    sales.forEach(async (token) => {
+        var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
         var sale_date = createdAt.substring(0, 10);
         if (from !== '0x0000000000000000000000000000000000000000') { txn_string = 'sale'; } else { txn_string = 'mint'; }
         var html_elements = 
@@ -156,11 +156,11 @@ async function render_token_sales(sales) {
                 '<text style="color: teal;">'+truncateAddress(to)+'</text>'+
             '</div>'
         await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string);
-    }
+    })
 }
 async function render_held_tokens(tokens) {
-    for ( var i = 0; i < tokens.length; i++ ) {
-        var { token: { tokenId } } = tokens[i]
+    tokens.forEach(async (token) => {
+        var { token: { tokenId } } = token
         progress_element = ''; staked = 'False'; staked_status = 'tomato'; staked_lvl = '--'; staked_next_lvl = '--';
         var html_elements = 
             '<div style="margin: 8px; float: right; width: 100px;">'+
@@ -183,7 +183,7 @@ async function render_held_tokens(tokens) {
             progress_element+
             button_element;
         await build_token(html_elements, tokenId);
-    }
+    })
 }
 async function sales_load_button(contract, limit, next_string) {
     if (next_string !== null && next_string !== '' && next_string !== 'undefined') {
