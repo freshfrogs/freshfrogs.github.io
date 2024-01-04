@@ -136,25 +136,25 @@ async function render_token_sales(sales) {
 
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
         var sale_date = createdAt.substring(0, 10);
-        if (from !== '0x0000000000000000000000000000000000000000') { txn_string = 'sale'; } else { txn_string = 'mint'; }
+        if (from !== '0x0000000000000000000000000000000000000000') { txn_string = 'sale'; } else { txn_string = 'mint'; from = 'Mint'; }
         // Render token information and data
         var html_elements = 
             '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text style="color: #1a202c; font-weight: bold;">Date</text>'+'<br>'+
-                '<text style="color: teal;">'+sale_date+'</text>'+
+                '<text style="color: teal; font-weight: bold;">'+sale_date+'</text>'+'<br>'+
+                '<text style="color: #1a202c;">Date</text>'+
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
-                '<text id="frog_type" style="color: teal;">'+decimal+'Ξ ($'+usd.toFixed(2)+')'+'</text>'+
+                '<text style="color: teal; font-weight: bold;">'+decimal+'Ξ ($'+usd.toFixed(2)+')'+'</text>'+'<br>'+
+                '<text id="frog_type" style="color: #1a202c;">Sale Price</text>'+
             '</div>'+
             '<br>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text style="color: #1a202c; font-weight: bold;">Seller</text>'+'<br>'+
-                '<text style="color: teal;">'+truncateAddress(from)+'</text>'+
+                '<text style="color: teal; font-weight: bold;">'+truncateAddress(from)+'</text>'+'<br>'+
+                '<text style="color: #1a202c;">From:</text>'+
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text style="color: #1a202c; font-weight: bold;">Buyer</text>'+'<br>'+
-                '<text style="color: teal;">'+truncateAddress(to)+'</text>'+
+                '<text style="color: teal; font-weight: bold;">'+truncateAddress(to)+'</text>'+'<br>'+
+                '<text style="color: #1a202c;">To:</text>'+
             '</div>'
 
         await render_frog_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string);
@@ -250,9 +250,9 @@ async function render_frog_token(html_elements, token_id, element_id, txn) {
 
     if (! element_id) { var element_id = 'Frog #'+token_id }
     if (txn == 'sale') {
-        var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: tomato; font-weight: inherit;">SALE</text>'
+        var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: tomato; font-weight: bold;">SALE</text>'
     } else if (txn == 'mint') {
-        var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: teal; font-weight: inherit;">MINT</text>'
+        var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: teal; font-weight: bold;">MINT</text>'
     } else {
         var frog_name = '<strong><u>Frog #'+token_id+'</strong></u>'
     }
