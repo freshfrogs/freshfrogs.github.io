@@ -14,7 +14,7 @@ is_approved, web3, f0, network, eth_usd, next, meta_morph_enabled;
 
 var sales_volume_eth = 0;
 var sales_volume_usd = 0;
-var net_income_usd = 0;
+var net_sales_usd = 0;
 
 var frogArray = [
     'blueDartFrog',
