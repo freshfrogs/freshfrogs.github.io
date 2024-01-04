@@ -127,10 +127,50 @@ async function fetch_held_tokens(wallet, limit, next_string) {
     .then((data) => data.json())
     .then((data) => {
         render_held_tokens(wallet, data.tokens);
+        if (wallet == CONTROLLER_ADDRESS) {
+            update_staked_tokens(data.tokens)
+        }
         if (! data.continuation) { return }
         else { load_more_button(wallet, limit, data.continuation); }
     })
     .catch(err => console.error(err));
+}
+async function update_staked_tokens(tokens) {
+    tokens.forEach((token) => {
+        var { token: { tokenId } } = token
+        var owner = stakerAddress(tokenId);
+        var staked_values = stakingValues(tokenId);
+        var staked_lvl = staked_values[1]
+        var staked_next_lvl = staked_values[2].toString()+' days'
+        var progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
+        var progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>'
+        if (owner.toLowerCase() == user_address.toLowerCase()) { 
+            button_element = // Un-stake button
+                '<div style="text-align: center;">'+
+                    '<button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>'+
+                '</div>';
+        } else { button_element = ''; }
+        document.getElementById('prop_'+'Frog #'+tokenId).innerHTML = 
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
+                '<text style="color: teal;">True</text>'+
+            '</div>'+
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
+                '<text style="color: teal;" id="frog_type">'+truncateAddress(owner)+'</text>'+
+            '</div>'+
+            '<br>'+
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
+                '<text style="color: teal;">'+staked_next_lvl+'</text>'+
+            '</div>'+
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
+                '<text style="color: teal;">'+staked_lvl+'</text>'+
+            '</div>'+
+            progress_element+
+            button_element;
+    })
 }
 async function render_token_sales(contract, sales) {
     sales.forEach(async (token) => {
@@ -268,13 +308,10 @@ async function render_owners_tokens(wallet, tokens, next_string) {
 async function build_token(html_elements, token_id, element_id, txn) {
 
     if (! element_id) { var element_id = 'Frog #'+token_id }
-    if (txn == 'sale') {
-        var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: tomato; font-weight: inherit;">SALE</text>'
-    } else if (txn == 'mint') {
-        var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: teal; font-weight: inherit;">MINT</text>'
-    } else {
-        var frog_name = '<strong><u>Frog #'+token_id+'</strong></u>'
-    }
+    if (txn == 'sale') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: tomato; font-weight: inherit;">SALE</text>'; } 
+    else if (txn == 'mint') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: teal; font-weight: inherit;">MINT</text>'; } 
+    else { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u>'; }
+    
     var location = 'frogs'
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
 

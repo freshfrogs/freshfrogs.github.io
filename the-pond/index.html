@@ -352,7 +352,7 @@
           }, 6500);
 
         await initiate_web3_connection().then(async () => {
-          await fetch_owners_tokens(CONTROLLER_ADDRESS, '20');
+          await fetch_held_tokens(CONTROLLER_ADDRESS, '20');
           document.getElementById('thePondButton').style.boxShadow = '2px 2px lightsalmon'
           document.getElementById('randomLogo').onclick = async function (e) {
             clearInterval(intervalId);
