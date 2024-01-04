@@ -168,15 +168,11 @@ async function fetch_owners_tokens(wallet, limit, next_string) {
     fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit='+limit+next, options)
     .then((data) => data.json())
     .then(async (data) => {
-        console.log('testing...')
-        await render_owners_tokens(data.tokens)
-        console.log('1')
-        if (! data.continuation) { return }
-        else { await more_load_button(wallet, '100', data.continuation); console.log('2'); }
+        await render_owners_tokens(wallet, data.tokens, data.continuation)
     })
     .catch(err => console.error(err));
 }
-async function render_owners_tokens(tokens) {
+async function render_owners_tokens(wallet, tokens, next_string) {
     tokens.forEach(async (token) => {
         var { token: { tokenId } } = token
         var staked, staked_status, staked_values, staked_lvl, staked_next_lvl, button_element, progress, progress_element;
@@ -184,8 +180,8 @@ async function render_owners_tokens(tokens) {
         // Staked
         if (owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
             staked = 'True'; staked_status = 'teal';
-            owner = await stakerAddress(tokenId);
-            staked_values = await stakingValues(tokenId);
+            let owner = await stakerAddress(tokenId);
+            let staked_values = await stakingValues(tokenId);
             staked_lvl = staked_values[1]; staked_next_lvl = staked_values[2].toString()+' days';
             progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100;
             progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>';
@@ -229,6 +225,7 @@ async function render_owners_tokens(tokens) {
 
         await render_frog_token(html_elements, tokenId);
     })
+    .then(await more_load_button(wallet, '100', next_string))
 }
 
 async function more_load_button(wallet, limit, next_string) {
