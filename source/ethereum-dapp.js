@@ -221,19 +221,19 @@ async function render_frog_token(html_elements, token_id, element_id) {
     token_element.className = 'display_token';
     token_element.innerHTML = 
         '<div class="display_token_cont">'+
-            '<div id="'+token_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
+            '<div id="div_'+element_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
                 '<div class="innerLeft">'+
-                    '<div href="https://rarible.com/token/'+COLLECTION_ADDRESS+':'+token_id+'" target="_blank" class="display_token_img_cont" id="cont_'+token_id+'" onclick="render_display('+token_id+')">'+
+                    '<div href="https://rarible.com/token/'+COLLECTION_ADDRESS+':'+token_id+'" target="_blank" class="display_token_img_cont" id="cont_'+element_id+'" onclick="render_display('+token_id+')">'+
                     '</div>'+
                 '</div>'+
             '</div>'+
             '<div class="renderRight">'+
                 '<div class="innerRight">'+
-                    '<div id="traits_'+token_id+'" class="trait_list">'+
+                    '<div id="traits_'+element_id+'" class="trait_list">'+
                         //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
                         '<strong><u>'+token_name+'</u></strong> <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
                     '</div>'+
-                    '<div id="prop_'+token_id+'" class="properties">'+
+                    '<div id="prop_'+element_id+'" class="properties">'+
                         html_elements+
                     '</div>'+
                 '</div>'+
@@ -256,10 +256,10 @@ async function render_frog_token(html_elements, token_id, element_id) {
             if (lastDigit > traitArray.length) { lastDigit = traitArray.length; }
             frogdna = frogArray[firstDigit]
             traitdna = traitArray[lastDigit]
-            build_trait('SpecialFrog', 'peace/'+frogdna, 'cont_'+token_id);
-            build_trait('Trait', 'SpecialFrog/peace/'+traitdna, 'cont_'+token_id);
+            build_trait('SpecialFrog', 'peace/'+frogdna, 'cont_'+element_id);
+            build_trait('Trait', 'SpecialFrog/peace/'+traitdna, 'cont_'+element_id);
         } else {
-            build_trait(attribute.trait_type, attribute.value, 'cont_'+token_id);
+            build_trait(attribute.trait_type, attribute.value, 'cont_'+element_id);
         }
     }
 }
