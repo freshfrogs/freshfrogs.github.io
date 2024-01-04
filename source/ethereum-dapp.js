@@ -12,6 +12,8 @@ user_address, user_rewards,
 user_tokenBalance, user_stakedBalance, 
 is_approved, web3, f0, network, eth_usd, next, meta_morph_enabled;
 
+var sales_volume = 0;
+
 var frogArray = [
     'blueDartFrog',
     'blueTreeFrog',
@@ -175,7 +177,6 @@ async function update_staked_tokens(tokens) {
     })
 }
 async function render_token_sales(contract, sales) {
-    var sales_volume = 0;
     sales.forEach(async (token) => {
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
         var sale_date = createdAt.substring(0, 10);
