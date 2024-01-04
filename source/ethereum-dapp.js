@@ -203,6 +203,7 @@ async function render_token_sales(contract, sales) {
 async function render_held_tokens(wallet, tokens) {
     tokens.forEach(async (token) => {
         var { token: { tokenId } } = token
+        console.log('Owned: Frog #'+tokenId)
         if (wallet.toLowerCase() == user_address.toLowerCase()) { 
             button_element = // Stake button
                 '<div style="text-align: center;">'+
