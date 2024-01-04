@@ -114,20 +114,20 @@ async function fetch_token_sales(limit, next_string) {
     fetch(fetch_url, options)
     .then(data => data.json())
     .then(data => render_token_sales(data.sales))
-    .then(data => {
-        var next_string = data.continuation;
-        if (next_string !== null && next_string !== '' && next_string !== 'undefined') {
-            break_element = document.createElement('br')
-            document.getElementById('frogs').appendChild(break_element)
-            loadMore = document.createElement('button')
-            loadMore.id = 'loadMore'
-            loadMore.className = 'connectButton'
-            loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_token_sales('100', next_string); }
-            loadMore.innerHTML = '🔰 Secondary Sales'
-            document.getElementById('frogs').appendChild(loadMore)
-        }
-    })
+    .then(data => sales_load_button(data.continuation))
     .catch(err => console.error(err));
+}
+async function sales_load_button(continuation) {
+    if (continuation !== null && continuation !== '' && continuation !== 'undefined') {
+        break_element = document.createElement('br')
+        document.getElementById('frogs').appendChild(break_element)
+        loadMore = document.createElement('button')
+        loadMore.id = 'loadMore'
+        loadMore.className = 'connectButton'
+        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_token_sales('100', continuation); }
+        loadMore.innerHTML = '🔰 Secondary Sales'
+        document.getElementById('frogs').appendChild(loadMore)
+    } else { return; }
 }
 async function render_token_sales(sales) {
     sales.forEach(async (token) => {
