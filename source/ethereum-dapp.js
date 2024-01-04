@@ -11,7 +11,6 @@ var controller, collection,
 user_address, user_rewards, 
 user_tokenBalance, user_stakedBalance, 
 is_approved, web3, f0, network, eth_usd, next, meta_morph_enabled;
-const API_KEY =`${process.API_KEY}`
 var frogArray = [
     'blueDartFrog',
     'blueTreeFrog',
