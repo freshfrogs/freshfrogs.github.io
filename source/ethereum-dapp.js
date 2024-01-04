@@ -11,6 +11,7 @@ var controller, collection,
 user_address, user_rewards, 
 user_tokenBalance, user_stakedBalance, 
 is_approved, web3, f0, network, eth_usd, next, meta_morph_enabled;
+
 var frogArray = [
     'blueDartFrog',
     'blueTreeFrog',
@@ -104,7 +105,7 @@ var animated = [
 const SOURCE_PATH = 'https://freshfrogs.github.io'
 const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
-const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': freshfrogsnft_api}};
+const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': '3105c552-60b6-5252-bca7-291c724a54bf'}};
 async function fetch_token_sales(contract, limit, next_string) {
     if (! contract) { contract = COLLECTION_ADDRESS; }
     if (! limit) { limit = '10'; }
