@@ -176,7 +176,7 @@ async function update_staked_tokens(tokens) {
 }
 async function render_token_sales(contract, sales) {
     sales.forEach(async (token) => {
-        var { createdAt, from, to, token: { tokenId, rarityRank }, price: { amount: { decimal, usd } } } = token
+        var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
         var sale_date = createdAt.substring(0, 10);
         if (from !== '0x0000000000000000000000000000000000000000') { txn_string = 'sale'; from = truncateAddress(from) } else { txn_string = 'mint'; from = 'MINT'; }
         var html_elements = 
@@ -197,12 +197,12 @@ async function render_token_sales(contract, sales) {
                 '<text style="color: #1a202c; font-weight: bold;">Buyer</text>'+'<br>'+
                 '<text style="color: teal;">'+truncateAddress(to)+'</text>'+
             '</div>'
-        await build_token(html_elements, tokenId, rarityRank, tokenId+':'+createdAt, txn_string);
+        await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string);
     })
 }
 async function render_held_tokens(wallet, tokens) {
     tokens.forEach(async (token) => {
-        var { token: { tokenId, rarityRank } } = token
+        var { token: { tokenId } } = token
         console.log('Owned: Frog #'+tokenId)
         if (wallet.toLowerCase() == user_address.toLowerCase()) { 
             button_element = // Stake button
@@ -229,7 +229,7 @@ async function render_held_tokens(wallet, tokens) {
                 '<text style="color: teal;">--</text>'+
             '</div>'+
             button_element;
-        await build_token(html_elements, tokenId, rarityRank);
+        await build_token(html_elements, tokenId);
     })
 }
 async function sales_load_button(contract, limit, next_string) {
@@ -258,22 +258,69 @@ async function load_more_button(wallet, limit, next_string) {
         document.getElementById('frogs').appendChild(loadMore)
     } else { return; }
 }
+async function render_owners_tokens(wallet, tokens, next_string) {
+    tokens.forEach(async (token) => {
+        var { token: { tokenId } } = token
+        var staked, staked_status, staked_values, staked_lvl, staked_next_lvl, button_element, progress, progress_element;
+        let owner = await collection.methods.ownerOf(tokenId).call();
+        // Staked
+        if (owner.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
+            staked = 'True'; staked_status = 'teal';
+            owner = await stakerAddress(tokenId);
+            staked_values = await stakingValues(tokenId);
+            staked_lvl = staked_values[1]; staked_next_lvl = staked_values[2].toString()+' days';
+            progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100;
+            progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>';
+            if (owner.toLowerCase() == user_address.toLowerCase()) { 
+                button_element = // Un-stake button
+                    '<div style="text-align: center;">'+
+                        '<button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>'+
+                    '</div>';
+            } else { button_element = ''; }
+        // NOT Staked
+        } else {
+            progress_element = ''; staked = 'False'; staked_status = 'tomato'; staked_lvl = '--'; staked_next_lvl = '--';
+            if (owner.toLowerCase() == user_address.toLowerCase()) { 
+                button_element = // Stake button
+                    '<div style="text-align: center;">'+
+                        '<button class="stake_button" onclick="initiate_stake('+tokenId+')">Stake</button>'+
+                    '</div>';
+            } else { button_element = ''; }
+        }
+
+        var html_elements = 
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
+                '<text style="color: '+staked_status+';">'+staked+'</text>'+
+            '</div>'+
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
+                '<text style="color: teal;" id="frog_type">'+truncateAddress(owner)+'</text>'+
+            '</div>'+
+            '<br>'+
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
+                '<text style="color: teal;">'+staked_next_lvl+'</text>'+
+            '</div>'+
+            '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
+                '<text style="color: teal;">'+staked_lvl+'</text>'+
+            '</div>'+
+            progress_element+
+            button_element;
+
+        await render_frog_token(html_elements, tokenId);
+    })
+//    .then(await more_load_button(wallet, '100', next_string))
+}
 
 // Render NFT token by layered attirubtes obtained through metadata.
-async function build_token(html_elements, token_id, rarity, element_id, txn) {
+async function build_token(html_elements, token_id, element_id, txn) {
 
     if (! element_id) { var element_id = 'Frog #'+token_id }
     if (txn == 'sale') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: tomato; font-weight: inherit;">SALE</text>'; } 
     else if (txn == 'mint') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: teal; font-weight: inherit;">MINT</text>'; } 
     else { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u>'; }
-    if (! rarity) { rarity = 1; }
-    else { rarity = (Number(rarity) / 4040) * 100 }
-    if (rarity < 25) {rarity_color = 'darkgoldenrod'}
-    else if (rarity > 25) {rarity_color = 'darkolivegreen'}
-    else if (rarity > 50) {rarity_color = 'darkturquoise'}
-    else if (rarity > 80) {rarity_color = 'darkviolet'}
-    else if (rarity > 90) {rarity_color = 'darkorange'}
-    console.log('rarity: '+rarity)
     
     var location = 'frogs'
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
@@ -297,7 +344,7 @@ async function build_token(html_elements, token_id, rarity, element_id, txn) {
                 '<div class="innerRight">'+
                     '<div id="traits_'+element_id+'" class="trait_list">'+
                         //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
-                        '<b style="color: '+rarity_color+';">🞺 </b>'+frog_name+' <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+                        ''+frog_name+' <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
                     '</div>'+
                     '<div id="prop_'+element_id+'" class="properties">'+
                         html_elements+
