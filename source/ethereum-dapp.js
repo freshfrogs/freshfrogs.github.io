@@ -294,8 +294,6 @@ async function render_frog_token(html_elements, token_id, element_id) {
     }
 }
 
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjcyYjJmYWNkLTIzZDUtNDM4NS04ZmE4LTRkN2QxZDJmYTcwMCIsIm9yZ0lkIjoiMzcwMTY1IiwidXNlcklkIjoiMzgwNDMzIiwidHlwZUlkIjoiMjA0MDliMWItNWE3Yi00ZjZlLWI5NjktOWU2OWJiMWY3N2VmIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3MDM4OTQwMDUsImV4cCI6NDg1OTY1NDAwNX0.NSsiVKVdzHmL_b3eNdbEVzJJ4jNLWIQh5Qd3VZ9O-ko
-
 async function fetch_staked_nfts(wallet) {
     if (! wallet) { wallet = user_address; }
     await getStakedTokens(wallet)
@@ -344,67 +342,6 @@ async function fetch_staked_nfts(wallet) {
 
             await render_frog_token(html_elements, token_id);
         })
-    })
-}
-
-async function fetch_nft_sales_data(limit, next_string) {
-    if (! limit) { limit = '5'; }
-    if (! next_string) { next_string = ''; }
-    fetch('https://restapi.nftscan.com/api/v2/transactions/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?event_type=Sale&sort_direction=desc&limit='+limit+'&cursor='+next_string+'', options)
-    .then(async (tokens) => tokens.json())
-    .then(async (tokens) => {
-
-        console.log('Fetching secondary sales!')
-        console.log(tokens)
-
-        var token_sales_data = tokens.data.content;
-        next = tokens.data.next;
-
-        await token_sales_data.forEach(async (frog) => {
-            var { token_id, send, receive, trade_price, timestamp } = frog
-            var sale_date = new Date(timestamp).toLocaleDateString("en-US")
-            var sale_price = Math.ceil(trade_price * 10000) / 10000;
-            var sale_usd = (eth_usd * Number(sale_price)).toFixed(2)
-            var sale_element;
-            if (eth_usd !== null && eth_usd !== 'undefined' && eth_usd !== '') {
-                sale_element = sale_price+'Ξ ($'+sale_usd+')'
-            } else { sale_element = sale_price+'Ξ' }
-
-            // Render token information and data
-            var html_elements = 
-                '<div style="margin: 8px; float: right; width: 100px;">'+
-                    '<text style="color: #1a202c; font-weight: bold;">Date</text>'+'<br>'+
-                    '<text style="color: teal;">'+sale_date+'</text>'+
-                '</div>'+
-                '<div style="margin: 8px; float: right; width: 100px;">'+
-                    '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
-                    '<text id="frog_type" style="color: teal;">'+sale_element+'</text>'+
-                '</div>'+
-                '<br>'+
-                '<div style="margin: 8px; float: right; width: 100px;">'+
-                    '<text style="color: #1a202c; font-weight: bold;">Seller</text>'+'<br>'+
-                    '<text style="color: teal;">'+truncateAddress(send)+'</text>'+
-                '</div>'+
-                '<div style="margin: 8px; float: right; width: 100px;">'+
-                    '<text style="color: #1a202c; font-weight: bold;">Buyer</text>'+'<br>'+
-                    '<text style="color: teal;">'+truncateAddress(receive)+'</text>'+
-                '</div>'
-    
-            await render_frog_token(html_elements, token_id);
-        })
-    })
-    .then(async function() {
-        console.log('loading button: '+next)
-        if (next !== null && next !== '' && next !== 'undefined') {
-            break_element = document.createElement('br')
-            document.getElementById('frogs').appendChild(break_element)
-            loadMore = document.createElement('button')
-            loadMore.id = 'loadMore'
-            loadMore.className = 'connectButton'
-            loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_nft_sales_data('100', next); }
-            loadMore.innerHTML = '🔰 Secondary Sales'
-            document.getElementById('frogs').appendChild(loadMore)
-        } else { return }
     })
 }
 
@@ -1010,9 +947,10 @@ async function stakers(userAddress, _data) {
             gasPrice:  web3.utils.toHex(gasprice),
         })
 
+    example: send_write_function(collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true))
+
 */
 
-// example: send_write_function(collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true))
 async function send_write_transaction(contract_method) {
     try {
         var gasprice = await web3.eth.getGasPrice();
@@ -1056,10 +994,6 @@ function truncateAddress(address) {
         address.length
     )}`;
 }
-
-function toFixedPoint( value, dp ){
-    return +parseFloat(value).toFixed( dp );
-  }
 
 // build_trait(_trait(family), _attribute(type), _where(element))
 function build_trait(trait_type, attribute, location) {
