@@ -477,23 +477,21 @@ function openInNewTab(url) {
 async function connect_user() {
     try { // Connect wallet
         if (window.ethereum) {
+
             await window.ethereum.request({method: 'eth_requestAccounts'});
             web3 = new Web3(window.ethereum);
+
+            user_address = await web3.currentProvider.selectedAddress;
+
+            f0 = new F0();
+            await f0.init({ web3: web3, contract: COLLECTION_ADDRESS, network: 'main' })
+            await get_user_invites(user_address);
+            await connect_functions(user_address);
+
         } else { // No wallet found.
             window.location('https://www.coinbase.com/wallet/downloads');
             return
         }
-
-        // Current user address
-        user_address = await web3.currentProvider.selectedAddress;
-
-        // Factoria API
-        // Connect to WEB3 smart contracts
-        f0 = new F0();
-        await f0.init({ web3: web3, contract: COLLECTION_ADDRESS, network: 'main' })
-        await get_user_invites(user_address);
-        await connect_functions(user_address);
-        
     } catch (e) {
         console.log(e.message)
     }
