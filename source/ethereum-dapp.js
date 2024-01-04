@@ -133,7 +133,7 @@ async function sales_load_button(next_string) {
 }
 async function render_token_sales(sales) {
     sales.forEach(async (token) => {
-        
+
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
         var sale_date = createdAt.substring(0, 10);
         if (from == '0x0000000000000000000000000000000000000000000000000000000000000000') { var txn_string = 'sale'; }
@@ -237,7 +237,7 @@ async function more_load_button(continuation) {
         loadMore.id = 'loadMore'
         loadMore.className = 'connectButton'
         loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); await fetch_token_sales('100', continuation); }
-        loadMore.innerHTML = '🔰 Secondary Sales'
+        loadMore.innerHTML = '🔰 Load More'
         document.getElementById('frogs').appendChild(loadMore)
     } else { return; }
 }
