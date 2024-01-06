@@ -510,28 +510,28 @@ async function build_meta_morph(token_a, token_b, location) {
     // BUILD NEW IMAGE ------>
     
     // FROG A
-    if (metadata_c['Frog'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Frog","value":metadata_c['Frog']}); loadTrait('Frog', metadata_c['Frog'], location); }
+    if (metadata_c['Frog'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Frog","value":metadata_c['Frog']}); build_trait('Frog', metadata_c['Frog'], location); }
     
     // SPECIALFROG
-    else if (metadata_c['SpecialFrog'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"SpecialFrog","value":metadata_c['SpecialFrog']}); loadTrait('SpecialFrog', metadata_c['SpecialFrog'], location); }
+    else if (metadata_c['SpecialFrog'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"SpecialFrog","value":metadata_c['SpecialFrog']}); build_trait('SpecialFrog', metadata_c['SpecialFrog'], location); }
     
     // FROG B (SUBSET)
-    if (metadata_c['Subset'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Subset","value":metadata_c['Subset']}); loadTrait('Frog/subset', metadata_c['Subset'], location); }
+    if (metadata_c['Subset'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Subset","value":metadata_c['Subset']}); build_trait('Frog/subset', metadata_c['Subset'], location); }
 
     // TRAIT
-    if (metadata_c['Trait'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Trait","value":metadata_c['Trait']}); loadTrait('Trait', metadata_c['Trait'], location); }
+    if (metadata_c['Trait'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Trait","value":metadata_c['Trait']}); build_trait('Trait', metadata_c['Trait'], location); }
 
     // ACCESSORY
-    if (metadata_c['Accessory'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Accessory","value":metadata_c['Accessory']}); loadTrait('Accessory', metadata_c['Accessory'], location); }
+    if (metadata_c['Accessory'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Accessory","value":metadata_c['Accessory']}); build_trait('Accessory', metadata_c['Accessory'], location); }
     
     // EYES
-    if (metadata_c['Eyes'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Eyes","value":metadata_c['Eyes']}); loadTrait('Eyes', metadata_c['Eyes'], location); }
+    if (metadata_c['Eyes'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Eyes","value":metadata_c['Eyes']}); build_trait('Eyes', metadata_c['Eyes'], location); }
     
     // HAT
-    if (metadata_c['Hat'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Hat","value":metadata_c['Hat']}); loadTrait('Hat', metadata_c['Hat'], location); }
+    if (metadata_c['Hat'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Hat","value":metadata_c['Hat']}); build_trait('Hat', metadata_c['Hat'], location); }
     
     // MOUTH
-    if (metadata_c['Mouth'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Mouth","value":metadata_c['Mouth']}); loadTrait('Mouth', metadata_c['Mouth'], location); }
+    if (metadata_c['Mouth'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Mouth","value":metadata_c['Mouth']}); build_trait('Mouth', metadata_c['Mouth'], location); }
 
     morophMetadataJsonString = JSON.stringify(morophMetadataJsonObject.attributes, null, 4);
     //console.log(morophMetadataJsonString)
