@@ -407,7 +407,7 @@ async function build_meta_morph(token_a, token_b, location) {
     console.log('= TOKEN #'+token_a);
     console.log('= ');
     // Fetch Alpha Metadata ------>
-    let metadata_a_raw = await (await fetch(SOURCE_PATH+'json/'+token_a+".json")).json();
+    let metadata_a_raw = await (await fetch(SOURCE_PATH+'/frog/json/'+token_a+".json")).json();
     for (i = 0; i < metadata_a_raw.attributes.length; i++) {
 
         let attribute = metadata_a_raw.attributes[i];
@@ -422,7 +422,7 @@ async function build_meta_morph(token_a, token_b, location) {
     console.log('= TOKEN #'+token_b);
     console.log('= ');
     // Fetch Bravo Metadata ------>
-    let metadata_b_raw = await (await fetch(SOURCE_PATH+'json/'+token_b+".json")).json();
+    let metadata_b_raw = await (await fetch(SOURCE_PATH+'/frog/json/'+token_b+".json")).json();
     for (j = 0; j < metadata_b_raw.attributes.length; j++) {
 
         let attribute = metadata_b_raw.attributes[j];
@@ -839,7 +839,7 @@ async function morph_ui(){
         '  <strong id="morph-token-ids"></strong>'
         '  <pre id="morph-json" style="text-align: left; width: fit-content; margin: auto;"></pre>'
         '</div>'
-        document.getElementById('buttonBar').appendChild(morphButton)
+        document.getElementById('buttonBar').appendChild(morphPanel)
         morphing_enabled = true
     }
     morphButton.innerHTML = '🍄 Meta Morph'
