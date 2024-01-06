@@ -334,9 +334,9 @@ var cycle = true;
 
 async function meta_morph(token_id) {
     (morph_enabled)
-    if (alpha_frog !== 'undefined') {
+    if (alpha_frog == 'undefined') {
         alpha_frog = token_id
-    } else if (bravo_frog !== 'undefined') {
+    } else if (bravo_frog == 'undefined') {
         bravo_frog = token_id
         await build_meta_morph(alpha_frog, bravo_frog, 'morph-token-display');
     } else {
