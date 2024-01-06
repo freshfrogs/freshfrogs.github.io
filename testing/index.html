@@ -399,7 +399,7 @@
         await initiate_web3_connection();
         await fetch_staked_tokens();
         await fetch_held_tokens();
-        //await morph_ui();
+        await morph_ui();
 
         document.getElementById('holdingsButton').style.boxShadow = '2px 2px lightsalmon'
         document.getElementById('randomLogo').onclick = async function (e) {
