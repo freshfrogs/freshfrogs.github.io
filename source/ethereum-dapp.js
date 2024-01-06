@@ -333,6 +333,7 @@ var alpha_frog, bravo_frog;
 var cycle = true;
 
 async function meta_morph(token_id) {
+    (morph_enabled)
     if (alpha_frog !== 'undefined') {
         alpha_frog = token_id
     } else if (bravo_frog !== 'undefined') {
@@ -553,18 +554,13 @@ async function build_token(html_elements, token_id, element_id, txn) {
     var token_element = document.createElement('div');
 
     // Element Details -->
-    token_element.onclick = async function (){
-        if (morph_enabled) {
-            await meta_morph(token_id)
-        }
-    }
     token_element.id = element_id;
     token_element.className = 'display_token';
     token_element.innerHTML = 
         '<div class="display_token_cont">'+
             '<div id="div_'+element_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
                 '<div class="innerLeft">'+
-                    '<div href="https://rarible.com/token/'+COLLECTION_ADDRESS+':'+token_id+'" target="_blank" class="display_token_img_cont" id="cont_'+element_id+'" onclick="render_display('+token_id+')">'+
+                    '<div href="https://rarible.com/token/'+COLLECTION_ADDRESS+':'+token_id+'" target="_blank" class="display_token_img_cont" id="cont_'+element_id+'" onclick="meta_morph('+token_id+')">'+
                     '</div>'+
                 '</div>'+
             '</div>'+
