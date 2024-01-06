@@ -333,13 +333,17 @@ var alpha_frog, bravo_frog;
 var cycle = true;
 
 async function meta_morph(token_id) {
+    console.log('morphing...')
     (morph_enabled)
     if (alpha_frog == 'undefined') {
         alpha_frog = token_id
+        console.log('alpha frog = '+alpha_frog)
     } else if (bravo_frog == 'undefined') {
         bravo_frog = token_id
+        console.log('bravo frog = '+alpha_frog)
         await build_meta_morph(alpha_frog, bravo_frog, 'morph-token-display');
     } else {
+        console.log('both morph frogs set')
         if (cycle) {
             cycle = false
             alpha_frog = token_id;
