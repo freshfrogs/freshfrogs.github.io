@@ -822,16 +822,23 @@ async function morph_ui(){
     morphButton.id = 'the-morphButton'
     morphButton.className = 'connectButton'
     morphButton.onclick = async function (e) {
+
+        // <br> x2
         break_element = document.createElement('br')
         document.getElementById('buttonBar').appendChild(break_element)
-        
-        // <-- Begin Element
-        var token_element = document.createElement('div');
+        document.getElementById('buttonBar').appendChild(break_element)
 
+        // Morph preview display
+        var preview_element = document.createElement('div');
+        preview_element.className = 'preview_morph';
+        document.getElementById('buttonBar').appendChild(preview_element);
+        
+        // Morph results display
+        var results_element = document.createElement('div');
         // Element Details -->
-        token_element.id = 'morph-results-display';
-        token_element.className = 'display_token';
-        token_element.innerHTML = 
+        results_element.id = 'morph-results-display';
+        results_element.className = 'display_token';
+        results_element.innerHTML = 
             '<div class="display_token_cont">'+
                 '<div id="div_morph-results" class="renderLeft" style="background: transparent; background-size: 2048px 2048px;">'+
                     '<div class="innerLeft">'+
@@ -851,7 +858,7 @@ async function morph_ui(){
             '</div>';
 
         // Create Element <--
-        document.getElementById('buttonBar').appendChild(token_element);
+        document.getElementById('buttonBar').appendChild(results_element);
         
     }
     morphButton.innerHTML = '🍄 Meta Morph'
