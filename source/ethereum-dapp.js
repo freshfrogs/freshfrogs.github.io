@@ -338,6 +338,7 @@ async function meta_morph(token_id) {
         if (alpha_frog == 'undefined') {
             alpha_frog = token_id
             console.log('alpha frog = '+alpha_frog)
+            document.getElementById().style.boxShadow = '2px 2px salmon'
         } else if (bravo_frog == 'undefined') {
             bravo_frog = token_id
             console.log('bravo frog = '+alpha_frog)
@@ -440,7 +441,7 @@ async function build_meta_morph(token_a, token_b, location) {
     console.log(JSON.stringify(metadata_b_raw.attributes, null, "\t"))
 
     console.log('= ');
-    console.log('= Generating New Metadata (Charlie)...');
+    console.log('= Generating New Metadata...');
     console.log('= ');
 
     // BUILD NEW METADATA ------>
@@ -823,25 +824,36 @@ async function morph_ui(){
     morphButton.onclick = async function (e) {
         break_element = document.createElement('br')
         document.getElementById('buttonBar').appendChild(break_element)
-        morphPanel = document.createElement('div')
-        morphPanel.id = 'morph-token-result'
-        morphPanel.className = 'morph-token-result'
-        morphPanel.innerHTML = 
-        '<div id="morph-token-display" class="morph-token-display"></div>'
-        '<div style="display: inline-flex; width: 100%;">'
-        '  <div style="text-align: center; width: 48%; margin: 8px;">'
-        '    <select id="token-ids-b" name="token-ids-b" class="connectButton" style="border: 1px solid lightgray; width: 100%;"></select>'
-        '  </div>'
-        '  <div style="text-align: center; width: 48%; margin: 8px;">'
-        '    <select id="token-ids-a" name="token-ids-a" class="connectButton" style="border: 1px solid lightgray; width: 100%;"></select>'
-        '  </div>'
-        '</div>'
-        '<div id="morph-json-container" class="morph-json-container">'
-        '  <strong id="morph-token-ids"></strong>'
-        '  <pre id="morph-json" style="text-align: left; width: fit-content; margin: auto;"></pre>'
-        '</div>'
-        document.getElementById('buttonBar').appendChild(morphPanel)
-        morphing_enabled = true
+        
+        // <-- Begin Element
+        var token_element = document.createElement('div');
+
+        // Element Details -->
+        token_element.id = 'morph-results-display';
+        token_element.className = 'display_token';
+        token_element.innerHTML = 
+            '<div class="display_token_cont">'+
+                '<div id="div_morph-results" class="renderLeft" style="background: transparent; background-size: 2048px 2048px;">'+
+                    '<div class="innerLeft">'+
+                        '<div class="display_token_img_cont" id="cont_morph-results" onclick="meta_morph('+token_id+')">'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+                '<div class="renderRight">'+
+                    '<div class="innerRight">'+
+                        '<div id="traits_morph-results" class="trait_list">'+
+                            //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
+                            ''+' <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+                        '</div>'+
+                        '<div id="prop_morph-results" class="properties">'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+            '</div>';
+
+        // Create Element <--
+        document.getElementById('buttonBar').appendChild(token_element);
+        
     }
     morphButton.innerHTML = '🍄 Meta Morph'
     document.getElementById('buttonBar').appendChild(morphButton)
