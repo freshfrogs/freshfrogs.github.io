@@ -835,15 +835,14 @@ async function morph_ui(){
             '<div class="display_token_cont">'+
                 '<div id="div_morph-results" class="renderLeft" style="background: transparent; background-size: 2048px 2048px;">'+
                     '<div class="innerLeft">'+
-                        '<div class="display_token_img_cont" id="cont_morph-results" onclick="meta_morph('+token_id+')">'+
+                        '<div class="display_token_img_cont" id="cont_morph-results">'+
                         '</div>'+
                     '</div>'+
                 '</div>'+
                 '<div class="renderRight">'+
                     '<div class="innerRight">'+
                         '<div id="traits_morph-results" class="trait_list">'+
-                            //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
-                            ''+' <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+                            ''+' <text style="color: #1ac486; font-weight: bold;">'+'</text>'+
                         '</div>'+
                         '<div id="prop_morph-results" class="properties">'+
                         '</div>'+
