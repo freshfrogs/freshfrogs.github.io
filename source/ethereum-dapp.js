@@ -349,12 +349,12 @@ async function metamorph_select(frog){
     if (morph_preset_a) {
         document.getElementById('parent-a-img').src = SOURCE_PATH+'/frog/'+frog+'.png';
         morph_preset_a = false;
-        console.log('Parent B: Frog #'+frog)
+        parent_a = frog
         return;
     } else if (morph_preset_b) {
         document.getElementById('parent-b-img').src = SOURCE_PATH+'/frog/'+frog+'.png';
         morph_preset_b = false;
-        console.log('Parent A: Frog #'+frog)
+        parent_b = frog
         return;
     }
 }
