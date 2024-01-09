@@ -330,11 +330,14 @@ async function render_owners_tokens(wallet, tokens, next_string) {
 }
 
 var morph_preset_a, morph_preset_b, parent_a, parent_b;
-async function metamorph_preset(parent) {
-    console.log('Enable morph select for parent: '+parent)
-    if (parent == 'a') { morph_preset_a = true; morph_preset_b = false; return; } 
-    else if (parent == 'b') { morph_preset_b = true; morph_preset_a = false; return; }
-    else { morph_preset_a = false; morph_preset_b = false; return; }
+async function metamorph_a_preset() {
+    console.log('Enable morph select for parent: A')
+    morph_preset_a = true; morph_preset_b = false; return;
+}
+
+async function metamorph_b_preset() {
+    console.log('Enable morph select for parent: B')
+    morph_preset_b = true; morph_preset_a = false; return;
 }
 
 async function metamorph_select(frog){
@@ -371,14 +374,14 @@ async function morph_ui(){
         preview_element.innerHTML = 
             '<div class="morph-preset-a">'+
                 '<img id="parent-a-img" class="morph-preimg" src="https://freshfrogs.github.io/source/blackWhite.png"/>'+
-                '<button class="morph-select-button" onclick="metamorph_preset(""a"")">Select Frog</button>'+
+                '<button class="morph-select-button" onclick="metamorph_a_preset()">Select Frog</button>'+
             '</div>'+
             '<div class="morph-preset-b">'+
                 '<button class="morph-send-button" onclick="metamorph_build()">Meta Morph</button>'+
             '</div>'+
             '<div class="morph-preset-c">'+
                 '<img id="parent-b-img" class="morph-preimg" src="https://freshfrogs.github.io/source/blackWhite.png"/>'+
-                '<button class="morph-select-button" onclick="metamorph_preset(""b"")">Select Frog</button>'+
+                '<button class="morph-select-button" onclick="metamorph_b_preset()">Select Frog</button>'+
             '</div>';
         document.getElementById('buttonBar').appendChild(preview_element);
         
