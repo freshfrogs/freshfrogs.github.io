@@ -325,51 +325,104 @@ async function render_owners_tokens(wallet, tokens, next_string) {
 
         await render_frog_token(html_elements, tokenId);
     })
-//    .then(await more_load_button(wallet, '100', next_string))
 }
 
-var morph_enabled;
-var alpha_frog, bravo_frog;
-var cycle = true;
+var morph_preset_a, morph_preset_b, parent_a, parent_b;
+async function metamorph_preset(parent) {
+    if (parent == 'a') { morph_preset_a = true; morph_preset_b = false; return; } 
+    else if (parent == 'b') { morph_preset_b = true; morph_preset_a = false; return; }
+    else { morph_preset_a = false; morph_preset_b = false; return; }
+}
 
-async function meta_morph(token_id) {
-    console.log('morphing...')
-    if (morph_enabled) {
-        if (alpha_frog == 'undefined') {
-            alpha_frog = token_id
-            console.log('alpha frog = '+alpha_frog)
-            document.getElementById().style.boxShadow = '2px 2px salmon'
-        } else if (bravo_frog == 'undefined') {
-            bravo_frog = token_id
-            console.log('bravo frog = '+alpha_frog)
-            await build_meta_morph(alpha_frog, bravo_frog, 'morph-token-display');
-        } else {
-            console.log('both morph frogs set')
-            if (cycle) {
-                cycle = false
-                alpha_frog = token_id;
-                await build_meta_morph(alpha_frog, bravo_frog, 'morph-token-display');
-            } else {
-                cycle = true
-                bravo_frog = token_id;
-                await build_meta_morph(alpha_frog, bravo_frog, 'morph-token-display');
-            }
-        }
+async function metamorph_select(frog){
+    if (morph_preset_a = true) {
+        parent_a = frog;
+        document.getElementById('parent-a-img').src = SOURCE_PATH+'/frog/'+parent_a+'.png';
+        return;
+    } else if (morph_preset_b = true) {
+        parent_b = frog;
+        document.getElementById('parent-b-img').src = SOURCE_PATH+'/frog/'+parent_b+'.png';
+        return;
     }
 }
 
-    /*
+async function morph_ui(){
+    // 🍄 Meta Morph
+    morph_enabled = true;
+    morphButton = document.createElement('button')
+    morphButton.id = 'the-morphButton'
+    morphButton.className = 'connectButton'
+    morphButton.onclick = async function (e) {
 
-        Morph Token(s)
-        Combine and Render NFT Tokens
+        // <br> x2
+        break_element = document.createElement('br')
+        document.getElementById('buttonBar').appendChild(break_element)
+        document.getElementById('buttonBar').appendChild(break_element)
 
-        Token(A) + Token(B) = Token(C)
-        Alpha + Bravo = Charlie
+        // Morph preview display
+        var preview_element = document.createElement('div');
+        preview_element.className = 'preview-morph';
+        preview_element.innerHTML = 
+            '<div class="morph-preset-a">'+
+                '<img id="parent-a-img" class="morph-preimg" src="https://freshfrogs.github.io/source/blackWhite.png"/>'+
+                '<button class="morph-select-button" onclick="metamorph_preset('+'a'+')">Select Frog</button>'+
+            '</div>'+
+            '<div class="morph-preset-b">'+
+                '<button class="morph-send-button" onclick="metamorph_build()">Meta Morph</button>'+
+            '</div>'+
+            '<div class="morph-preset-c">'+
+                '<img id="parent-a-img" class="morph-preimg" src="https://freshfrogs.github.io/source/blackWhite.png"/>'+
+                '<button class="morph-select-button" onclick="metamorph_preset('+'b'+')">Select Frog</button>'+
+            '</div>';
+        document.getElementById('buttonBar').appendChild(preview_element);
+        
+        // Morph results display
+        var results_element = document.createElement('div');
+        // Element Details -->
+        results_element.id = 'morph-results-display';
+        results_element.className = 'display_token';
+        results_element.innerHTML = 
+            '<div class="display_token_cont">'+
+                '<div id="div_morph-results" class="renderLeft" style="background: transparent; background-size: 2048px 2048px;">'+
+                    '<div class="innerLeft">'+
+                        '<div class="display_token_img_cont" id="cont_morph-results">'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+                '<div class="renderRight">'+
+                    '<div class="innerRight">'+
+                        '<div id="traits_morph-results" class="trait_list">'+
+                            ''+' <text style="color: #1ac486; font-weight: bold;">'+'</text>'+
+                        '</div>'+
+                        '<div id="prop_morph-results" class="properties">'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+            '</div>';
 
-    */
+        // Create Element <--
+        document.getElementById('buttonBar').appendChild(results_element);
+        
+    }
+    morphButton.innerHTML = '🍄 Meta Morph'
+    document.getElementById('buttonBar').appendChild(morphButton)
+}
 
-async function build_meta_morph(token_a, token_b, location) {
+/*
 
+    Morph Token(s)
+    Combine and Render NFT Tokens
+
+    Token(A) + Token(B) = Token(C)
+    Alpha + Bravo = Charlie
+
+*/
+
+async function metamorph_build(token_a, token_b, location) {
+
+    if (! location) { token_a = parent_a}
+    if (! location) { token_b = parent_b}
+    if (! location) { location = 'cont_morph-results'}
     console.log('=-=-=-=-=-=-=-=-=-= Morphing =-=-=-=-=-=-=-=-=-=');
     console.log('= Morphing Tokens Alpha (#'+token_a+') & Bravo (#'+token_b+')');
     console.log('= Fetching Metadata...');
@@ -566,7 +619,7 @@ async function build_token(html_elements, token_id, element_id, txn) {
         '<div class="display_token_cont">'+
             '<div id="div_'+element_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
                 '<div class="innerLeft">'+
-                    '<div href="https://rarible.com/token/'+COLLECTION_ADDRESS+':'+token_id+'" target="_blank" class="display_token_img_cont" id="cont_'+element_id+'" onclick="meta_morph('+token_id+')">'+
+                    '<div href="https://rarible.com/token/'+COLLECTION_ADDRESS+':'+token_id+'" target="_blank" class="display_token_img_cont" id="cont_'+element_id+'" onclick="metamorph_select('+token_id+')">'+
                     '</div>'+
                 '</div>'+
             '</div>'+
@@ -815,69 +868,6 @@ async function update_frontend() {
 
 }
 
-
-
-async function morph_ui(){
-    // 🍄 Meta Morph
-    morph_enabled = true;
-    morphButton = document.createElement('button')
-    morphButton.id = 'the-morphButton'
-    morphButton.className = 'connectButton'
-    morphButton.onclick = async function (e) {
-
-        // <br> x2
-        break_element = document.createElement('br')
-        document.getElementById('buttonBar').appendChild(break_element)
-        document.getElementById('buttonBar').appendChild(break_element)
-
-        // Morph preview display
-        var preview_element = document.createElement('div');
-        preview_element.className = 'preview-morph';
-        preview_element.innerHTML = 
-            '<div class="morph-preset-a">'+
-                '<img class="morph-preimg" src="https://freshfrogs.github.io/source/blackWhite.png"/>'+
-                '<button class="morph-select-button">Select Frog</button>'+
-            '</div>'+
-            '<div class="morph-preset-b">'+
-                '<button class="morph-send-button">Meta Morph</button>'+
-            '</div>'+
-            '<div class="morph-preset-c">'+
-                '<img class="morph-preimg" src="https://freshfrogs.github.io/source/blackWhite.png"/>'+
-                '<button class="morph-select-button">Select Frog</button>'+
-            '</div>';
-        document.getElementById('buttonBar').appendChild(preview_element);
-        
-        // Morph results display
-        var results_element = document.createElement('div');
-        // Element Details -->
-        results_element.id = 'morph-results-display';
-        results_element.className = 'display_token';
-        results_element.innerHTML = 
-            '<div class="display_token_cont">'+
-                '<div id="div_morph-results" class="renderLeft" style="background: transparent; background-size: 2048px 2048px;">'+
-                    '<div class="innerLeft">'+
-                        '<div class="display_token_img_cont" id="cont_morph-results">'+
-                        '</div>'+
-                    '</div>'+
-                '</div>'+
-                '<div class="renderRight">'+
-                    '<div class="innerRight">'+
-                        '<div id="traits_morph-results" class="trait_list">'+
-                            ''+' <text style="color: #1ac486; font-weight: bold;">'+'</text>'+
-                        '</div>'+
-                        '<div id="prop_morph-results" class="properties">'+
-                        '</div>'+
-                    '</div>'+
-                '</div>'+
-            '</div>';
-
-        // Create Element <--
-        document.getElementById('buttonBar').appendChild(results_element);
-        
-    }
-    morphButton.innerHTML = '🍄 Meta Morph'
-    document.getElementById('buttonBar').appendChild(morphButton)
-}
 /* // Get staked token ID's
 async function held_tokens_by_wallet(wallet_address) {
 
