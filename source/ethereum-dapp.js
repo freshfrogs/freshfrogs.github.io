@@ -337,14 +337,13 @@ async function metamorph_preset(parent) {
 }
 
 async function metamorph_select(frog){
+    console.log('select: Frog #'+frog)
     if (morph_preset_a) {
-        parent_a = frog;
-        document.getElementById('parent-a-img').src = SOURCE_PATH+'/frog/'+parent_a+'.png';
+        document.getElementById('parent-a-img').src = SOURCE_PATH+'/frog/'+frog+'.png';
         morph_preset_a = false;
         return;
     } else if (morph_preset_b) {
-        parent_b = frog;
-        document.getElementById('parent-b-img').src = SOURCE_PATH+'/frog/'+parent_b+'.png';
+        document.getElementById('parent-b-img').src = SOURCE_PATH+'/frog/'+frog+'.png';
         morph_preset_b = false;
         return;
     }
