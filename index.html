@@ -365,7 +365,7 @@
       document.addEventListener("DOMContentLoaded", async () => {
 
         await build_random_logo();
-        await fetch_token_sales(COLLECTION_ADDRESS);
+        await fetch_token_sales(COLLECTION_ADDRESS, '15');
 
         var intervalId = window.setInterval(async function(){ await build_random_logo() }, 6500);
         document.getElementById('randomLogo').onclick = async function (e) { clearInterval(intervalId); }
