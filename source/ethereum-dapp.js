@@ -338,10 +338,12 @@ async function metamorph_select(frog){
     if (morph_preset_a = true) {
         parent_a = frog;
         document.getElementById('parent-a-img').src = SOURCE_PATH+'/frog/'+parent_a+'.png';
+        morph_preset_a = false;
         return;
     } else if (morph_preset_b = true) {
         parent_b = frog;
         document.getElementById('parent-b-img').src = SOURCE_PATH+'/frog/'+parent_b+'.png';
+        morph_preset_b = false;
         return;
     }
 }
