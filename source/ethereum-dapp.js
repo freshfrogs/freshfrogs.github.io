@@ -331,20 +331,23 @@ async function render_owners_tokens(wallet, tokens, next_string) {
 
 var morph_preset_a, morph_preset_b, parent_a, parent_b;
 async function metamorph_preset(parent) {
+    console.log('Enable morph select for parent: '+parent)
     if (parent == 'a') { morph_preset_a = true; morph_preset_b = false; return; } 
     else if (parent == 'b') { morph_preset_b = true; morph_preset_a = false; return; }
     else { morph_preset_a = false; morph_preset_b = false; return; }
 }
 
 async function metamorph_select(frog){
-    console.log('select: Frog #'+frog)
+    console.log('Select: Frog #'+frog)
     if (morph_preset_a) {
         document.getElementById('parent-a-img').src = SOURCE_PATH+'/frog/'+frog+'.png';
         morph_preset_a = false;
+        console.log('Parent B: Frog #'+frog)
         return;
     } else if (morph_preset_b) {
         document.getElementById('parent-b-img').src = SOURCE_PATH+'/frog/'+frog+'.png';
         morph_preset_b = false;
+        console.log('Parent A: Frog #'+frog)
         return;
     }
 }
