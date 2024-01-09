@@ -371,23 +371,6 @@ async function morph_ui(){
         break_element = document.createElement('br')
         document.getElementById('buttonBar').appendChild(break_element)
         document.getElementById('buttonBar').appendChild(break_element)
-
-        // Morph preview display
-        var preview_element = document.createElement('div');
-        preview_element.className = 'preview-morph';
-        preview_element.innerHTML = 
-            '<div class="morph-preset-a">'+
-                '<img id="parent-a-img" class="morph-preimg" src="https://freshfrogs.github.io/source/blackWhite.png"/>'+
-                '<button class="morph-select-button" onclick="metamorph_a_preset()">Select Frog</button>'+
-            '</div>'+
-            '<div class="morph-preset-b">'+
-                '<button class="morph-send-button" onclick="metamorph_build()">Meta Morph</button>'+
-            '</div>'+
-            '<div class="morph-preset-c">'+
-                '<img id="parent-b-img" class="morph-preimg" src="https://freshfrogs.github.io/source/blackWhite.png"/>'+
-                '<button class="morph-select-button" onclick="metamorph_b_preset()">Select Frog</button>'+
-            '</div>';
-        document.getElementById('buttonBar').appendChild(preview_element);
         
         // Morph results display
         var results_element = document.createElement('div');
@@ -403,12 +386,16 @@ async function morph_ui(){
                     '</div>'+
                 '</div>'+
                 '<div class="renderRight">'+
-                    '<div class="innerRight">'+
-                        '<div id="traits_morph-results" class="trait_list">'+
-                            ''+' <text style="color: #1ac486; font-weight: bold;">'+'</text>'+
-                        '</div>'+
-                        '<div id="prop_morph-results" class="properties">'+
-                        '</div>'+
+                    '<div class="morph-preset-a">'+
+                        '<img id="parent-a-img" class="morph-preimg" src="https://freshfrogs.github.io/source/blackWhite.png"/>'+
+                        '<button class="morph-select-button" onclick="metamorph_a_preset()">Select Frog</button>'+
+                    '</div>'+
+                    '<div class="morph-preset-b">'+
+                        '<button class="morph-send-button" onclick="metamorph_build()">Meta Morph</button>'+
+                    '</div>'+
+                    '<div class="morph-preset-c">'+
+                        '<img id="parent-b-img" class="morph-preimg" src="https://freshfrogs.github.io/source/blackWhite.png"/>'+
+                        '<button class="morph-select-button" onclick="metamorph_b_preset()">Select Frog</button>'+
                     '</div>'+
                 '</div>'+
             '</div>';
