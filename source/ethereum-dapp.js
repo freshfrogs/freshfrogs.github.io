@@ -832,7 +832,7 @@ async function morph_ui(){
 
         // Morph preview display
         var preview_element = document.createElement('div');
-        preview_element.className = 'preview_morph';
+        preview_element.className = 'preview-morph';
         preview_element.innerHTML = 
             '<div class="morph-preset-a">'+
                 '<img class="morph-preimg" src="https://freshfrogs.github.io/source/blackWhite.png"/>'+
