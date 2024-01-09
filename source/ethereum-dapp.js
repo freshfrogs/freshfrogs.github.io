@@ -332,12 +332,16 @@ async function render_owners_tokens(wallet, tokens, next_string) {
 var morph_preset_a, morph_preset_b, parent_a, parent_b;
 async function metamorph_a_preset() {
     console.log('Enable morph select for parent: A')
-    morph_preset_a = true; morph_preset_b = false; return;
+    morph_preset_a = true;
+    morph_preset_b = false;
+    return;
 }
 
 async function metamorph_b_preset() {
     console.log('Enable morph select for parent: B')
-    morph_preset_b = true; morph_preset_a = false; return;
+    morph_preset_a = false;
+    morph_preset_b = true;
+    return;
 }
 
 async function metamorph_select(frog){
