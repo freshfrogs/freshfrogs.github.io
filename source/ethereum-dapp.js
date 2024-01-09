@@ -371,7 +371,7 @@ async function morph_ui(){
                 '<button class="morph-send-button" onclick="metamorph_build()">Meta Morph</button>'+
             '</div>'+
             '<div class="morph-preset-c">'+
-                '<img id="parent-a-img" class="morph-preimg" src="https://freshfrogs.github.io/source/blackWhite.png"/>'+
+                '<img id="parent-b-img" class="morph-preimg" src="https://freshfrogs.github.io/source/blackWhite.png"/>'+
                 '<button class="morph-select-button" onclick="metamorph_preset('+'b'+')">Select Frog</button>'+
             '</div>';
         document.getElementById('buttonBar').appendChild(preview_element);
