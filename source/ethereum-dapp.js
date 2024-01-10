@@ -388,14 +388,14 @@ async function morph_ui(){
                 '<div class="renderRight" style="display: inline-block !important;">'+
                     '<div class="morph-preset-a">'+
                         '<img id="parent-a-img" class="morph-preimg" src="https://freshfrogs.github.io/source/blackWhite.png"/>'+
-                        '<button class="morph-select-button" onclick="metamorph_a_preset()">Select Frog</button>'+
-                    '</div>'+
-                    '<div class="morph-preset-b">'+
-                        '<button class="morph-send-button" onclick="metamorph_build()">Meta Morph</button>'+
+                        '<button class="stake_button" onclick="metamorph_a_preset()">Select Frog</button>'+
                     '</div>'+
                     '<div class="morph-preset-c">'+
                         '<img id="parent-b-img" class="morph-preimg" src="https://freshfrogs.github.io/source/blackWhite.png"/>'+
-                        '<button class="morph-select-button" onclick="metamorph_b_preset()">Select Frog</button>'+
+                        '<button class="stake_button" onclick="metamorph_b_preset()">Select Frog</button>'+
+                    '</div>'+
+                    '<div class="morph-preset-b">'+
+                        '<button class="unstake_button" onclick="metamorph_build()">Meta Morph</button>'+
                     '</div>'+
                 '</div>'+
             '</div>';
