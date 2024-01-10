@@ -428,7 +428,7 @@ async function metamorph_build(token_a, token_b, location) {
     console.log('= Fetching Metadata...');
     console.log('= ');
 
-    try { document.getElementById('div_morph-results').style.backgroundImage = url(SOURCE_PATH+'/frog/'+token_a+'.png'); } catch (e) { console.log(e.message); }
+    document.getElementById('div_morph-results').style.backgroundImage = url(SOURCE_PATH+'/frog/'+token_a+'.png');
 
     // Token (Alpha) Metdata
     let metadata_a = {
