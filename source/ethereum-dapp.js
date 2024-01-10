@@ -385,7 +385,7 @@ async function morph_ui(){
                         '</div>'+
                     '</div>'+
                 '</div>'+
-                '<div class="renderRight" style="display: inline-block !important;">'+
+                '<div class="renderRight" style="display: inline-block !important; min-height: auto !important;">'+
                     '<div class="morph-preset-a">'+
                         '<img id="parent-a-img" class="morph-preimg" src="https://freshfrogs.github.io/source/blackWhite.png"/>'+
                         '<button class="stake_button" onclick="metamorph_a_preset()">Select Frog</button>'+
