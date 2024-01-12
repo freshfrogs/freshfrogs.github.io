@@ -15,6 +15,8 @@ is_approved, web3, f0, network, eth_usd, next;
 var sales_volume_eth = 0;
 var sales_volume_usd = 0;
 var net_income_usd = 0;
+var mint_volume_eth = 0;
+var mint_volume_usd = 0;
 
 var frogArray = [
     'blueDartFrog',
@@ -180,14 +182,16 @@ async function render_token_sales(contract, sales) {
     sales.forEach(async (token) => {
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
         var sale_date = createdAt.substring(0, 10);
-        sales_volume_eth = sales_volume_eth + Number(decimal);
-        sales_volume_usd = sales_volume_usd + Number(usd);
         if (from !== '0x0000000000000000000000000000000000000000') {
             txn_string = 'sale'; from = truncateAddress(from)
             net_income_usd = net_income_usd + (Number(usd))*0.025
+            sales_volume_eth = sales_volume_eth + Number(decimal);
+            sales_volume_usd = sales_volume_usd + Number(usd);
         } else {
             txn_string = 'mint'; from = truncateAddress(COLLECTION_ADDRESS);
             net_income_usd = net_income_usd + Number(usd)
+            mint_volume_eth = mint_volume_eth + Number(decimal);
+            mint_volume_usd = mint_volume_usd + Number(usd);
         }
         var html_elements = 
             '<div style="margin: 8px; float: right; width: 100px;">'+
