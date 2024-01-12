@@ -213,9 +213,13 @@ async function render_token_sales(contract, sales) {
             '</div>'
         await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string);
     })
-    console.log('Volume:'+
+    console.log('\nSales Volume:'+
         '\n - - -> '+ sales_volume_eth.toFixed(2)+' ETH'+
-        '\n - - -> $'+ sales_volume_usd.toFixed(2)+''+
+        '\n - - -> $'+ sales_volume_usd.toFixed(2)+''
+    );
+    console.log('\nMint Volume:'+
+        '\n - - -> '+ mint_volume_eth.toFixed(2)+' ETH'+
+        '\n - - -> $'+ mint_volume_usd.toFixed(2)+''+
         '\n - - -> Net: $'+net_income_usd.toFixed(2)
     );
 }
