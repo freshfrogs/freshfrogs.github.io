@@ -747,6 +747,7 @@ async function initiate_web3_connection() {
         await connect_user();
     } else {
         // WEB3 browser extenstion could not be found!
+        alert('WEB3 browser extenstion could not be found!\nHave you tried refreshing the page?')
     }
 }
 
