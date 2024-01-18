@@ -612,8 +612,8 @@ async function metamorph_build(token_a, token_b, location) {
 async function build_token(html_elements, token_id, element_id, txn) {
 
     if (! element_id) { var element_id = 'Frog #'+token_id }
-    if (txn == 'sale') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: tomato; font-weight: inherit;">SALE</text>'; } 
-    else if (txn == 'mint') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: teal; font-weight: inherit;">MINT</text>'; } 
+    if (txn == 'sale') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: tomato; font-weight: bold; font-style: italic;">SALE</text>'; } 
+    else if (txn == 'mint') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: teal; font-weight: bold; font-style: italic;">MINT</text>'; } 
     else { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u>'; }
     
     var location = 'frogs'
