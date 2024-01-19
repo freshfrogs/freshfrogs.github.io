@@ -188,7 +188,7 @@ async function render_token_sales(contract, sales) {
             sales_volume_eth = sales_volume_eth + Number(decimal);
             sales_volume_usd = sales_volume_usd + Number(usd);
         } else {
-            txn_string = 'mint'; from = truncateAddress(COLLECTION_ADDRESS);
+            txn_string = 'mint'; from = 'FreshFrogsNFT';
             net_income_usd = net_income_usd + Number(usd)
             mint_volume_eth = mint_volume_eth + Number(decimal);
             mint_volume_usd = mint_volume_usd + Number(usd);
