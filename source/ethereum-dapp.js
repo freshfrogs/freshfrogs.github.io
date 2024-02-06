@@ -183,12 +183,12 @@ async function render_token_sales(contract, sales) {
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
         var sale_date = createdAt.substring(0, 10);
         if (from !== '0x0000000000000000000000000000000000000000') {
-            txn_string = 'sold'; from = truncateAddress(from)
+            txn_string = 'sale'; from = truncateAddress(from)
             net_income_usd = net_income_usd + (Number(usd))*0.025
             sales_volume_eth = sales_volume_eth + Number(decimal);
             sales_volume_usd = sales_volume_usd + Number(usd);
         } else {
-            txn_string = 'minted'; from = 'FreshFrogsNFT';
+            txn_string = 'mint'; from = 'FreshFrogsNFT';
             net_income_usd = net_income_usd + Number(usd)
             mint_volume_eth = mint_volume_eth + Number(decimal);
             mint_volume_usd = mint_volume_usd + Number(usd);
@@ -612,8 +612,8 @@ async function metamorph_build(token_a, token_b, location) {
 async function build_token(html_elements, token_id, element_id, txn) {
 
     if (! element_id) { var element_id = 'Frog #'+token_id }
-    if (txn == 'sale') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: tomato; font-weight: bold; font-style: italic;">SALE</text>'; } 
-    else if (txn == 'mint') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u> <text style="color: teal; font-weight: bold; font-style: italic;">MINT</text>'; } 
+    if (txn == 'sale') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u><br><text style="color: tomato; font-weight: bold; font-style: italic;">SECONDARY SALE</text>'; } 
+    else if (txn == 'mint') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u><br><text style="color: teal; font-weight: bold; font-style: italic;">COLLECTION MINT</text>'; } 
     else { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u>'; }
     
     var location = 'frogs'
