@@ -116,7 +116,7 @@ async function fetch_token_sales(contract, limit, next_string) {
     if (! contract) { contract = COLLECTION_ADDRESS; }
     if (! limit) { limit = '5'; }
     if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
-    fetch('https://api.reservoir.tools/sales/v5?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?orderBy=time&limit='+limit+next+'', options)
+    fetch('https://api.reservoir.tools/sales/v5?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?orderBy=price&limit='+limit+next+'', options)
     .then((data) => data.json())
     .then((data) => {
         render_token_sales(contract, data.sales);
