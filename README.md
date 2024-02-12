@@ -1,5 +1,5 @@
 ### Web3 ERC721 Minting / Staking Dapp
-This ethereum dapp allows users to [connect](https://freshfrogs.github.io) and mint or stake Fresh Frogs NFT tokens. Holders can level up, earn rewards, unlock custom trait animations and more! Staked tokens will be displayed with staking information and rendered using multiple images layered by attribute allowing for custom features!
+This ethereum dapp allows users to [connect](https://freshfrogs.github.io) and mint or stake Fresh Frogs NFT tokens. Holders can level up, earn rewards, unlock custom trait animations and more! Staked tokens will be displayed with staking information and rendered using multiple images layered by attribute allowing for custom features! [View Site Functions Here](https://freshfrogs.github.io/source/ethereum-dapp.js)
 
 ### Fresh Frogs NFT
 A collection of 4,040 randomly generated Frogs living on the Ethereum Blockchain! The collection is randomly generated, with each Frog being individually unique! There are a total of 30 different Frog types, and 60 traits! Resulting in 2.8 million total possible combinations!
