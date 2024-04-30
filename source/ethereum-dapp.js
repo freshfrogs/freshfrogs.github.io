@@ -766,6 +766,7 @@ async function connect_user() {
             user_address = await web3.currentProvider.selectedAddress;
 
             f0 = new F0();
+            console.log('f0 connection');
             await f0.init({ web3: web3, contract: COLLECTION_ADDRESS, network: 'main' })
             await get_user_invites(user_address);
             await connect_functions(user_address);
@@ -783,20 +784,31 @@ async function connect_user() {
 
 async function connect_functions(wallet_address) {
     try {
+
+        console.log('Fetching contract data...');
         
         // Connect ethereum contracts
+        console.log('Connecting collection contract...');
         collection = new web3.eth.Contract(COLLECTION_ABI, COLLECTION_ADDRESS);
+        console.log('Connecting controller contract...');
         controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
+        console.log('Fetching collection name...');
         collection_name = await f0.api.name().call();
+        console.log('Fetching collection symbol...');
         collection_symbol = await f0.api.symbol().call();
+        console.log('Fetching next id from NFT token supply...');
         next_id = await f0.api.nextId().call();
         next_id = parseInt(next_id);
         total_supply = '4040';
 
         // User variables. Held and staked tokens, etc.
+        console.log('Fetching user token balance...');
         user_tokenBalance = await collection.methods.balanceOf(user_address).call();
+        console.log('Fetching user staked token balance...');
         user_stakedBalance = await stakers(user_address, 'amountStaked')
+        console.log('Fetching user available rewards...');
         user_rewards = await availableRewards(user_address)
+        console.log('Check user staking approval status...');
         is_approved = await checkApproval();
 
     } catch (e) {
@@ -806,6 +818,8 @@ async function connect_functions(wallet_address) {
 
 async function get_user_invites(wallet_address) {
     try {
+
+        console.log('Fetching user invites...');
 
         user_invites = await f0.myInvites();
         user_keys = Object.keys(user_invites);
