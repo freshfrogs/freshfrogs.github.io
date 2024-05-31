@@ -108,10 +108,17 @@ var animated = [
     'goldDollarChain'
 ]
 
+// Constants
 const SOURCE_PATH = 'https://freshfrogs.github.io'
 const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': frog_api}};
+
+/*
+
+    Fetch NFT token sales (initial & secondary) using Resveroir API. Returns => Object
+
+*/
 async function fetch_token_sales(contract, limit, next_string) {
     if (! contract) { contract = COLLECTION_ADDRESS; }
     if (! limit) { limit = '5'; }
@@ -126,6 +133,12 @@ async function fetch_token_sales(contract, limit, next_string) {
     })
     .catch(err => console.error(err));
 }
+
+/*
+
+    Fetch NFT tokens held by user using Resveroir API. Returns => Object
+
+*/
 async function fetch_held_tokens(wallet, limit, next_string) {
     if (! wallet) { wallet = user_address}
     if (! limit) { limit = '50'; }
@@ -142,6 +155,12 @@ async function fetch_held_tokens(wallet, limit, next_string) {
     })
     .catch(err => console.error(err));
 }
+
+/*
+
+    Update NFT token staking information for rendered html objects
+
+*/
 async function update_staked_tokens(tokens) {
     tokens.forEach(async (token) => {
         var { token: { tokenId } } = token
@@ -179,6 +198,11 @@ async function update_staked_tokens(tokens) {
             button_element;
     })
 }
+/*
+
+    Create html objects for token sales from fetch_token_sales()
+
+*/
 async function render_token_sales(contract, sales) {
     sales.forEach(async (token) => {
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
@@ -224,6 +248,12 @@ async function render_token_sales(contract, sales) {
         '\n - - -> Net: $'+net_income_usd.toFixed(2)
     );
 }
+
+/*
+
+    Create html objects for user tokens from fetch_held_tokens()
+
+*/-
 async function render_held_tokens(wallet, tokens) {
     tokens.forEach(async (token) => {
         var { token: { tokenId } } = token
@@ -255,6 +285,12 @@ async function render_held_tokens(wallet, tokens) {
         await build_token(html_elements, tokenId);
     })
 }
+
+/*
+
+    Load more sales -- html button (front page)
+
+*/
 async function sales_load_button(contract, limit, next_string) {
     if (next_string !== null && next_string !== '' && next_string !== 'undefined') {
         break_element = document.createElement('br')
@@ -270,6 +306,12 @@ async function sales_load_button(contract, limit, next_string) {
         document.getElementById('frogs').appendChild(loadMore)
     } else { return; }
 }
+
+/*
+
+    Load more held tokens -- html button
+
+*/
 async function load_more_button(wallet, limit, next_string) {
     if (next_string !== null && next_string !== '' && next_string !== 'undefined') {
         break_element = document.createElement('br')
@@ -284,6 +326,14 @@ async function load_more_button(wallet, limit, next_string) {
         document.getElementById('frogs').appendChild(loadMore)
     } else { return; }
 }
+
+/*
+
+    =================================================
+    ==> Un-used / Outdated & incomplete functions <==
+    =================================================
+
+*/
 async function render_owners_tokens(wallet, tokens, next_string) {
     tokens.forEach(async (token) => {
         var { token: { tokenId } } = token
@@ -609,7 +659,11 @@ async function metamorph_build(token_a, token_b, location) {
 
 }
 
-// Render NFT token by layered attirubtes obtained through metadata.
+/* 
+
+    Render NFT token by layered attirubtes obtained through metadata.
+
+*/
 async function build_token(html_elements, token_id, element_id, txn) {
 
     if (! element_id) { var element_id = 'Frog #'+token_id }
@@ -672,6 +726,11 @@ async function build_token(html_elements, token_id, element_id, txn) {
     }
 }
 
+/*
+
+    Fetch all staked NFT tokens by user (wallet address)
+
+*/
 async function fetch_staked_tokens(wallet) {
     if (! wallet) { wallet = user_address; }
     await getStakedTokens(wallet)
@@ -723,6 +782,11 @@ async function fetch_staked_tokens(wallet) {
     })
 }
 
+/*
+
+    Fetch ETH/USD conversion at time of block transaction
+    
+*/
 async function fetch_eth_usd() {
 
     console.log('Fetching ETH/USD...')
@@ -737,7 +801,7 @@ async function fetch_eth_usd() {
 
 /*
 
-    Connect
+    Connection Functions 
     Allow users to connect using an ethereum wallet via web3 browser extension
 
 */
@@ -751,11 +815,6 @@ async function initiate_web3_connection() {
         alert('WEB3 browser extenstion could not be found!\nHave you tried refreshing the page?')
     }
 }
-
-function openInNewTab(url) {
-    window.open(url, '_blank').focus();
-}
-
 async function connect_user() {
     try { // Connect wallet
         if (window.ethereum) {
@@ -781,7 +840,6 @@ async function connect_user() {
         console.log(e.message)
     }
 }
-
 async function connect_functions(wallet_address) {
     try {
 
@@ -815,7 +873,6 @@ async function connect_functions(wallet_address) {
         console.log(e.message)
     }
 }
-
 async function get_user_invites(wallet_address) {
     try {
 
@@ -840,7 +897,11 @@ async function get_user_invites(wallet_address) {
     }
 }
 
-// Update website UI
+/*
+
+    Update website UI
+
+*/
 async function update_frontend() {
 
     // Prepare HTML Element
@@ -948,6 +1009,12 @@ async function held_tokens_by_wallet(wallet_address) {
     return address_tokens_array
 } */
 
+/*
+
+    Mint NFT tokens!
+    Calls upon collection contract, using user invite for mint price & limit
+
+*/
 async function initiate_mint() {
 
     // Token ID input
@@ -960,6 +1027,11 @@ async function initiate_mint() {
 
 }
 
+/*
+
+    Send mint transaction!
+
+*/
 async function mint(quantity, invite) {
     if (! invite) { invite = "0x0000000000000000000000000000000000000000000000000000000000000000" }
     try {
@@ -1012,7 +1084,6 @@ async function initiate_stake(token_id) {
         }
     } else { return }
 }
-
 async function stake(token_id) {
     try {
 
@@ -1088,7 +1159,6 @@ async function initiate_withdraw(token_id) {
     } else { return }
 
 }
-
 async function withdraw(token_id) {
     try { 
 
@@ -1193,7 +1263,6 @@ async function initiate_setApprovalForAll() {
     // Already Approved
     } else { return; }
 }
-
 async function checkApproval() {
     // Check Approval Status
     let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
@@ -1201,7 +1270,11 @@ async function checkApproval() {
     else { return true; } // Approved
 }
 
-// Calculate total time a token has been staked (Hours)
+/*
+
+    Calculate total time a token has been staked (Hours)
+
+*/
 async function timeStaked(tokenId) {
 
     // Check Staked Status
@@ -1248,7 +1321,6 @@ async function timeStaked(tokenId) {
     Calculate stake values & returns
 
 */
-
 async function stakingValues(tokenId) {
 
     stakedTimeHours = await timeStaked(tokenId)
@@ -1270,7 +1342,6 @@ async function stakingValues(tokenId) {
     stakerAddress(<input> (uint256)) | return staker's address or false
 
 */
-
 async function stakerAddress(tokenId) {
 
     let stakerAddress = await controller.methods.stakerAddress(tokenId).call();
@@ -1285,7 +1356,6 @@ async function stakerAddress(tokenId) {
     availableRewards(_staker (address)) | return uint256
 
 */
-
 async function availableRewards(userAddress) {
 
     let available_rewards = await controller.methods.availableRewards(userAddress).call();
@@ -1300,7 +1370,6 @@ async function availableRewards(userAddress) {
     getStakedTokens(_user (address)) | return tuple[]
 
 */
-
 async function getStakedTokens(userAddress) {
 
     return await controller.methods.getStakedTokens(userAddress).call();
@@ -1312,7 +1381,6 @@ async function getStakedTokens(userAddress) {
     stakers(<input> (address), <input> (dataFetch)) | return ( amountStaked, timeOfLastUpdate, unclaimedRewards )
 
 */  
-
 async function stakers(userAddress, _data) {
     let stakers = await controller.methods.stakers(userAddress).call();         // Call function from within Ethereum smart contract
     if (_data == 'amountStaked') { return stakers.amountStaked }                // Total Tokens Staked by User
@@ -1343,7 +1411,6 @@ async function stakers(userAddress, _data) {
     example: send_write_function(collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true))
 
 */
-
 async function send_write_transaction(contract_method) {
     try {
         var gasprice = await web3.eth.getGasPrice();
@@ -1388,7 +1455,11 @@ function truncateAddress(address) {
     )}`;
 }
 
-// build_trait(_trait(family), _attribute(type), _where(element))
+/*
+
+    build_trait(_trait(family), _attribute(type), _where(element))
+
+*/
 function build_trait(trait_type, attribute, location) {
     newAttribute = document.createElement("img");
     if (trait_type == 'Trait' || trait_type == 'Frog' || trait_type == 'SpecialFrog') { newAttribute.className = "trait_overlay"; } 
