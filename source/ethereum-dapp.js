@@ -667,8 +667,8 @@ async function metamorph_build(token_a, token_b, location) {
 async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
 
     if (! element_id) { var element_id = 'Frog #'+token_id }
-    if (txn == 'sale') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u><br><a href="https://etherscan.io/tx/'+txn_hash+'" target="_blank"><button class="unstake_button">Secondary Sale</button></a>'; } 
-    else if (txn == 'mint') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u><br><a href="https://etherscan.io/tx/'+txn_hash+'" target="_blank"><button class="unstake_button">Collection Mint</button></a>'; } 
+    if (txn == 'sale') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u><br><br><a href="https://etherscan.io/tx/'+txn_hash+'" target="_blank"><button class="unstake_button">Secondary Sale</button></a>'; } 
+    else if (txn == 'mint') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u><br><br><a href="https://etherscan.io/tx/'+txn_hash+'" target="_blank"><button class="stake_button">Collection Mint</button></a>'; } 
     else { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u>'; }
     
     var location = 'frogs'
