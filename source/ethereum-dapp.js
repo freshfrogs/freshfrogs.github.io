@@ -205,7 +205,7 @@ async function update_staked_tokens(tokens) {
 */
 async function render_token_sales(contract, sales) {
     sales.forEach(async (token) => {
-        var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } } } = token
+        var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } }, txHash } = token
         var sale_date = createdAt.substring(0, 10);
         if (from !== '0x0000000000000000000000000000000000000000') {
             txn_string = 'sale'; from = truncateAddress(from)
@@ -236,7 +236,7 @@ async function render_token_sales(contract, sales) {
                 '<text style="color: #1a202c; font-weight: bold;">Buyer</text>'+'<br>'+
                 '<text style="color: teal;">'+truncateAddress(to)+'</text>'+
             '</div>'
-        await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string);
+        await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash);
     })
     console.log('\nSales Volume:'+
         '\n - - -> '+ sales_volume_eth.toFixed(2)+' ETH'+
@@ -664,11 +664,11 @@ async function metamorph_build(token_a, token_b, location) {
     Render NFT token by layered attirubtes obtained through metadata.
 
 */
-async function build_token(html_elements, token_id, element_id, txn) {
+async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
 
     if (! element_id) { var element_id = 'Frog #'+token_id }
-    if (txn == 'sale') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u><br><text style="color: tomato; font-weight: bold; font-style: italic;">SECONDARY SALE</text>'; } 
-    else if (txn == 'mint') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u><br><text style="color: teal; font-weight: bold; font-style: italic;">COLLECTION MINT</text>'; } 
+    if (txn == 'sale') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u><br><a href="https://etherscan.io/tx/'+txn_hash+'" target="_blank"><button class="unstake_button">Secondary Sale</button></a>'; } 
+    else if (txn == 'mint') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u><br><a href="https://etherscan.io/tx/'+txn_hash+'" target="_blank"><button class="unstake_button">Collection Mint</button></a>'; } 
     else { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u>'; }
     
     var location = 'frogs'
