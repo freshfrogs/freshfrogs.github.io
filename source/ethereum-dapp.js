@@ -667,9 +667,9 @@ async function metamorph_build(token_a, token_b, location) {
 async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
 
     if (! element_id) { var element_id = 'Frog #'+token_id }
-    if (txn == 'sale') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u><br><br><a href="https://etherscan.io/tx/'+txn_hash+'" target="_blank"><button class="unstake_button">Secondary Sale</button></a>'; } 
-    else if (txn == 'mint') { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u><br><br><a href="https://etherscan.io/tx/'+txn_hash+'" target="_blank"><button class="stake_button">Collection Mint</button></a>'; } 
-    else { var frog_name = '<strong><u>Frog #'+token_id+'</strong></u>'; }
+    if (txn == 'sale') { var txn_link = '<br><br><a href="https://etherscan.io/tx/'+txn_hash+'" target="_blank"><button class="unstake_button">Secondary Sale</button></a>'; } 
+    else if (txn == 'mint') { var txn_link = '<br><br><a href="https://etherscan.io/tx/'+txn_hash+'" target="_blank"><button class="stake_button">Collection Mint</button></a>'; } 
+    else { var txn_link = ''; }
     
     var location = 'frogs'
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
@@ -693,11 +693,12 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
                 '<div class="innerRight">'+
                     '<div id="traits_'+element_id+'" class="trait_list">'+
                         //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
-                        ''+frog_name+' <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+                        '<strong><u>Frog #'+token_id+'</strong></u>'+' <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
                     '</div>'+
                     '<div id="prop_'+element_id+'" class="properties">'+
                         html_elements+
                     '</div>'+
+                    +txn_link+
                 '</div>'+
             '</div>'+
         '</div>';
