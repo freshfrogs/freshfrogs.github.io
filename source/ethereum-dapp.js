@@ -206,7 +206,6 @@ async function update_staked_tokens(tokens) {
 async function render_token_sales(contract, sales) {
     sales.forEach(async (token) => {
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } }, txHash } = token
-        console.log(txHash)
         var sale_date = createdAt.substring(0, 10);
         if (from !== '0x0000000000000000000000000000000000000000') {
             txn_string = 'sale'; from = truncateAddress(from)
@@ -667,11 +666,13 @@ async function metamorph_build(token_a, token_b, location) {
 */
 async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
 
+    console.log(txn_hash)
     if (! element_id) { var element_id = 'Frog #'+token_id }
     if (txn == 'sale') { var txn_link = '<br><a href="https://etherscan.io/tx/'+txn_hash+'" target="_blank"><button class="unstake_button">Secondary Sale</button></a>'; } 
     else if (txn == 'mint') { var txn_link = '<br><a href="https://etherscan.io/tx/'+txn_hash+'" target="_blank"><button class="stake_button">Collection Mint</button></a>'; } 
     else { var txn_link = ''; }
     
+    console.log(txn_link)
     var location = 'frogs'
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
 
@@ -807,7 +808,6 @@ async function fetch_eth_usd() {
     Allow users to connect using an ethereum wallet via web3 browser extension
 
 */
-
 async function initiate_web3_connection() {
     if (typeof window.ethereum !== "undefined") {
         document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="pendingStatus"></div> Connecting...'
