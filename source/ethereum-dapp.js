@@ -666,7 +666,7 @@ async function metamorph_build(token_a, token_b, location) {
 */
 async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
 
-    console.log(txn_hash)
+    console.log(html_elements+', '+token_id+',+'+element_id+', '+txn+', '+txn_hash);
     if (! element_id) { var element_id = 'Frog #'+token_id }
     if (txn == 'sale') { var txn_link = '<br><a href="https://etherscan.io/tx/'+txn_hash+'" target="_blank"><button class="unstake_button">Secondary Sale</button></a>'; } 
     else if (txn == 'mint') { var txn_link = '<br><a href="https://etherscan.io/tx/'+txn_hash+'" target="_blank"><button class="stake_button">Collection Mint</button></a>'; } 
