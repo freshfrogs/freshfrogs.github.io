@@ -198,6 +198,7 @@ async function update_staked_tokens(tokens) {
             button_element;
     })
 }
+
 /*
 
     Create html objects for token sales from fetch_token_sales()
@@ -785,8 +786,8 @@ async function fetch_staked_tokens(wallet) {
 
 /*
 
-    Fetch ETH/USD conversion at time of block transaction
-    
+    Fetch ETH/USD conversion
+
 */
 async function fetch_eth_usd() {
 
