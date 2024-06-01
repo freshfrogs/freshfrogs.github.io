@@ -146,6 +146,7 @@ async function fetch_held_tokens(wallet, limit, next_string) {
     fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
     .then((data) => data.json())
     .then((data) => {
+        console.log(wallet+', '+data.tokens);
         render_held_tokens(wallet, data.tokens);
         if (wallet == CONTROLLER_ADDRESS) {
             update_staked_tokens(data.tokens)
