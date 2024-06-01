@@ -331,7 +331,7 @@ async function load_more_button(wallet, limit, next_string) {
 /*
 
     =================================================
-    ==> Un-used / Outdated & incomplete functions <==
+    ==> Un-used / Outdated / Incomplete functions <==
     =================================================
 
 */
