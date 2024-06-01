@@ -256,6 +256,8 @@ async function render_token_sales(contract, sales) {
 
 */-
 async function render_held_tokens(wallet, tokens) {
+    console.log(wallet)
+    console.log(tokens)
     tokens.forEach(async (token) => {
         var { token: { tokenId } } = token
         if (wallet.toLowerCase() == user_address.toLowerCase()) { 
