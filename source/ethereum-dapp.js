@@ -1049,7 +1049,6 @@ async function mint(quantity, invite) {
     stake(_tokenId (uint256), _user (address)) | send =>
 
 */
-
 async function initiate_stake(token_id) {
 
     // Input token_id must be within range and be an integer
@@ -1129,7 +1128,6 @@ async function stake(token_id) {
     withdraw(_tokenId (uint256), _user (address)) | send =>
 
 */
-
 async function initiate_withdraw(token_id) {
 
     // Input token_id must be within range and be an integer
@@ -1206,7 +1204,6 @@ async function withdraw(token_id) {
     checkApproval | check staking contract approval
 
 */
-
 async function setApprovalForAll() {
     try {
         // Estimate gas needed for transaction
