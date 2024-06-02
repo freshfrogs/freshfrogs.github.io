@@ -255,7 +255,7 @@ async function render_token_sales(contract, sales) {
 
     Create html objects for user tokens from fetch_held_tokens()
 
-*/-
+*/
 async function render_held_tokens(wallet, tokens) {
     console.log(wallet)
     console.log(tokens)
