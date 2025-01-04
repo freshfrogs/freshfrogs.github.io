@@ -213,6 +213,7 @@ async function update_staked_tokens(tokens) {
 */
 async function render_token_sales(contract, sales) {
     sales.forEach(async (token) => {
+        console.log(token);
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } }, txHash } = token
         var sale_date = createdAt.substring(0, 10);
         if (from !== '0x0000000000000000000000000000000000000000') {
@@ -241,7 +242,7 @@ async function render_token_sales(contract, sales) {
                 '<text style="color: teal; font-weight: bold;">'+from+'</text>'+
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text style="color: #1a202c; font-weight: bold;">Buyer</text>'+'<br>'+
+                '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
                 '<text style="color: teal; font-weight: bold;">'+truncateAddress(to)+'</text>'+
             '</div>'
         await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash);
