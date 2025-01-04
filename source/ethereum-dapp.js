@@ -203,7 +203,7 @@ async function update_staked_tokens(tokens) {
                 '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
                 '<text style="color: teal; font-weight: bold;">'+staked_lvl+'</text>'+
             '</div>'+
-            progress_element+
+            //progress_element+
             button_element;
     })
 }
