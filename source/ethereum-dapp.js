@@ -188,7 +188,7 @@ async function update_staked_tokens(tokens) {
             '<br>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;">'+progress_element+'</text>'+
+                '<text style="color: teal; font-weight: bold;">'+staked_next_lvl+' days</text>'+
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Rewards</text>'+'<br>'+
