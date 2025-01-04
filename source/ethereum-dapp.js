@@ -777,20 +777,20 @@ async function fetch_staked_tokens(wallet) {
             } else { button_element = ''; }
 
             var html_elements = 
-                '<div style="margin: 8px; float: left; width: 100px;">'+
+                '<div class="infobox_left">'+
                     '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
                     '<text style="color: teal; font-weight: bold;" id="frog_type">'+truncateAddress(owner)+'</text>'+
                 '</div>'+
-                '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<div class="infobox_right">'+
                     '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
                     '<text style="color: teal; font-weight: bold;">'+staked_time+' days</text>'+
                 '</div>'+
                 '<br>'+
-                '<div style="margin: 8px; float: left; width: 100px;">'+
+                '<div class="infobox_left">'+
                     '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
                     '<text style="color: teal; font-weight: bold;">'+staked_next_lvl+' days</text>'+
                 '</div>'+
-                '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<div class="infobox_right">'+
                     '<text style="color: #1a202c; font-weight: bold;">Rewards</text>'+'<br>'+
                     '<text style="color: teal; font-weight: bold;">'+Math.round(staked_rewards)+' Flyz</text>'+
                 '</div>'+
