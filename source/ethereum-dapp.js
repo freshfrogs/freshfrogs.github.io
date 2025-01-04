@@ -783,16 +783,16 @@ async function fetch_staked_tokens(wallet) {
                 '</div>'+
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
-                    '<text style="color: teal;" id="frog_type">'+truncateAddress(owner)+'</text>'+
+                    '<text style="color: teal; font-weight: bold;" id="frog_type">'+truncateAddress(owner)+'</text>'+
                 '</div>'+
                 '<br>'+
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
-                    '<text style="color: teal;">'+staked_next_lvl+'</text>'+
+                    '<text style="color: teal; font-weight: bold;">'+staked_next_lvl+'</text>'+
                 '</div>'+
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
-                    '<text style="color: teal;">'+staked_lvl+'</text>'+
+                    '<text style="color: teal; font-weight: bold;">'+staked_lvl+'</text>'+
                 '</div>'+
                 progress_element+
                 button_element;
