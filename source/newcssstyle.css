@@ -210,7 +210,7 @@ html {
   }
   .opensea_button:hover {
     box-shadow: none;
-    top: -2px;
+    top: -10px;
   }
   .stake_button {
     margin: 2px;
