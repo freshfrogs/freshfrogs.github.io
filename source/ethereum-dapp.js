@@ -408,6 +408,7 @@ var morph_preset, morph_a, morph_b;
 async function initiate_morph(token_id) {
     if (morph_preset) {
         finalize_morph(token_id)
+        morph_preset = false
     }
     console.log('Enable morph select for parent: A')
     morph_a = token_id
