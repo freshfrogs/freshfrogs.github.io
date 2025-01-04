@@ -158,7 +158,7 @@ html {
     margin-left: auto !important;
     margin-right: auto !important;
     float: none;
-    padding: 1% !important;
+    padding: 0% !important;
     border: none;
     min-width: 333px;
     background-color: transparent;
@@ -254,6 +254,12 @@ html {
   .unstake_button:hover{
     box-shadow: none;
     top: -2px;
+  }
+  .frogs{
+    width: 80% !important;
+    background: transparent;
+    border: none !important;
+    margin: 0%;
   }
   .logoHeader {
     margin: auto;
