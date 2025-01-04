@@ -405,18 +405,22 @@ async function render_owners_tokens(wallet, tokens, next_string) {
     })
 }
 
-var morph_preset_a, morph_preset_b, parent_a, parent_b;
-async function metamorph_a_preset() {
+var morph_preset, morph_a, morph_b;
+async function initiate_morph(token_id) {
+    if (morph_preset) {
+        finalize_morph(token_id)
+    }
     console.log('Enable morph select for parent: A')
-    morph_preset_a = true;
-    morph_preset_b = false;
+    morph_a = token_id
+    morph_preset = true
     return;
 }
 
-async function metamorph_b_preset() {
+async function finalize_morph(token_id) {
     console.log('Enable morph select for parent: B')
-    morph_preset_a = false;
-    morph_preset_b = true;
+    morph_b = token_id
+    metamorph_build(morph_a, morph_b, 'cont_Frog #'+morph_a)
+    morph_preset = false
     return;
 }
 
@@ -764,7 +768,9 @@ async function fetch_staked_tokens(wallet) {
             //progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
             //progress_element = ''//'<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>'
             if (owner.toLowerCase() == user_address.toLowerCase()) {
-                button_element = '<br><button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>';
+                button_element =
+                    '<br><button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
+                    '<button id="morph_button_'+token_id+'" class="morph_button" onclick="initiate_morph('+token_id+')">Morph 🍄</button>';
             } else { button_element = ''; }
 
             var html_elements = 
