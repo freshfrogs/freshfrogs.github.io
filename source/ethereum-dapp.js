@@ -319,7 +319,7 @@ async function sales_load_button(contract, limit, next_string) {
         loadMore = document.createElement('button')
         loadMore.id = 'loadMore'
         loadMore.className = 'connectButton'
-        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); document.getElementById('tempBreak').remove(); await fetch_token_sales(contract, '100', next_string); }
+        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); document.getElementById('tempBreak').remove(); await fetch_token_sales(contract, '150', next_string); }
         loadMore.innerHTML = '▼'
         loadMore.style.width = '12%'
         loadMore.style.minWidth = '120px'
