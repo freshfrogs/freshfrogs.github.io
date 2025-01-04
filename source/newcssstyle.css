@@ -315,7 +315,7 @@ html {
     float: left;
     width: 100px;
   }
-  infobox_right {
+  .infobox_right {
     margin: 8px;
     float: right;
     width: 100px;
