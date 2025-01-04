@@ -313,10 +313,6 @@ async function render_held_tokens(wallet, tokens) {
 */
 async function sales_load_button(contract, limit, next_string) {
     if (next_string !== null && next_string !== '' && next_string !== 'undefined') {
-
-        await fetch_token_sales(contract, '100', next_string);
-
-        /*
         break_element = document.createElement('br')
         break_element.id = 'tempBreak'
         document.getElementById('frogs').appendChild(break_element)
@@ -328,8 +324,6 @@ async function sales_load_button(contract, limit, next_string) {
         loadMore.style.width = '12%'
         loadMore.style.minWidth = '120px'
         document.getElementById('frogs').appendChild(loadMore)
-        */
-
     } else { return; }
 }
 
