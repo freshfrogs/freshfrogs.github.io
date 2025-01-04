@@ -167,7 +167,8 @@ async function update_staked_tokens(tokens) {
         var { token: { tokenId } } = token
         let owner = await stakerAddress(tokenId);
         let staked_values = await stakingValues(tokenId);
-        var staked_lvl = staked_values[1]
+        var staked_rewards = staked_values[3]
+        var staked_time = staked_values[0]
         var staked_next_lvl = staked_values[2].toString()+' days'
         var progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
         var progress_element = '';//'<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>'
@@ -178,7 +179,7 @@ async function update_staked_tokens(tokens) {
         document.getElementById('prop_'+'Frog #'+tokenId).innerHTML = 
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;">True</text>'+
+                '<text style="color: teal; font-weight: bold;">'+staked_time+'</text>'+
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
@@ -190,8 +191,8 @@ async function update_staked_tokens(tokens) {
                 '<text style="color: teal; font-weight: bold;">'+staked_next_lvl+'</text>'+
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;">'+staked_lvl+'</text>'+
+                '<text style="color: #1a202c; font-weight: bold;">Flyz</text>'+'<br>'+
+                '<text style="color: teal; font-weight: bold;">'+staked_rewards+'</text>'+
             '</div>'+
             '<div style="text-align: center;">'+
                 '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
