@@ -225,12 +225,12 @@ html {
     top: -2px;
   }
   .etherscan_button {
-    margin: 4px;
+    margin: 6px;
     background: #e9ecef;
     border: 1px solid black;
     border-radius: 5px;
     font-weight: bold;
-    width: 115px;
+    width: 120px;
     height: 25px;
     color: #081D35;
     vertical-align: middle;
@@ -245,7 +245,7 @@ html {
     top: -2px;
   }
   .opensea_button {
-    margin: 4px;
+    margin: 6px;
     background: rgb(0, 134, 255);
     border: 1px solid black;
     border-radius: 5px;
@@ -265,7 +265,7 @@ html {
     top: -2px;
   }
   .morph_button{
-    margin: 4px;
+    margin: 6px;
     background: indianred;
     border: 1px solid black;
     border-radius: 5px;
@@ -285,7 +285,7 @@ html {
     top: -2px;
   }
   .stake_button {
-    margin: 4px;
+    margin: 6px;
     background: teal;
     border: 1px solid black;
     border-radius: 5px;
@@ -305,7 +305,7 @@ html {
     top: -2px;
   }
   .unstake_button {
-    margin: 4px;
+    margin: 6px;
     background: tomato;
     border: 1px solid black;
     border-radius: 5px;
