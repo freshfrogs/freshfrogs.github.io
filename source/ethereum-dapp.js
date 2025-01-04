@@ -175,12 +175,12 @@ async function update_staked_tokens(tokens) {
             button_element = // Un-stake button
                 '<div style="text-align: center;">'+
                     '<button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>'+
-                    '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
+                    '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">OpenSea</button></a>'+
                 '</div>';
         } else {
             button_element =
                 '<div style="text-align: center;">'+
-                    '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
+                    '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">OpenSea</button></a>'+
                 '</div>';
         }
         document.getElementById('prop_'+'Frog #'+tokenId).innerHTML = 
@@ -245,7 +245,9 @@ async function render_token_sales(contract, sales) {
                 '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
                 '<text style="color: teal; font-weight: bold;">'+truncateAddress(to)+'</text>'+
             '</div>'
-        if (txn_string == 'sale') { await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash); }
+        //if (txn_string == 'sale') {
+            await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash);
+        //}
     })
     console.log('\nSales Volume:'+
         '\n - - -> '+ sales_volume_eth.toFixed(2)+' ETH'+
