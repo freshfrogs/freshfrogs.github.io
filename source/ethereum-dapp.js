@@ -143,7 +143,8 @@ async function fetch_held_tokens(wallet, limit, next_string) {
     if (! wallet) { wallet = user_address}
     if (! limit) { limit = '50'; }
     if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
-    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
+    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v6?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
+    //fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
     .then((data) => data.json())
     .then((data) => {
         console.log(data);
