@@ -233,16 +233,16 @@ async function render_token_sales(contract, sales) {
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
-                '<text id="frog_type" style="color: teal;" font-weight: bold;">'+decimal+'Ξ ($'+usd.toFixed(2)+')'+'</text>'+
+                '<text id="frog_type" style="color: teal; font-weight: bold;">'+decimal+'Ξ ($'+usd.toFixed(2)+')'+'</text>'+
             '</div>'+
             '<br>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Seller</text>'+'<br>'+
-                '<text style="color: teal;" font-weight: bold;">'+from+'</text>'+
+                '<text style="color: teal; font-weight: bold;">'+from+'</text>'+
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Buyer</text>'+'<br>'+
-                '<text style="color: teal;" font-weight: bold;">'+truncateAddress(to)+'</text>'+
+                '<text style="color: teal; font-weight: bold;">'+truncateAddress(to)+'</text>'+
             '</div>'
         await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash);
     })
