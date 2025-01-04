@@ -245,7 +245,7 @@ async function render_token_sales(contract, sales) {
                 '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
                 '<text style="color: teal; font-weight: bold;">'+truncateAddress(to)+'</text>'+
             '</div>'
-        await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash);
+        if (txn_string == 'sale') { await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash); }
     })
     console.log('\nSales Volume:'+
         '\n - - -> '+ sales_volume_eth.toFixed(2)+' ETH'+
@@ -685,70 +685,67 @@ async function metamorph_build(token_a, token_b, location) {
 
 */
 async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
-    console.log('Building Frog #'+token_id+'...')
     if (! element_id) { var element_id = 'Frog #'+token_id }
-    if (txn !== 'mint') {
-        
-        console.log(txn)
+    if (txn == 'sale') {
         var txn_link =
             '<br><a href="https://etherscan.io/tx/'+txn_hash+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
             '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="opensea_button">Opensea</button></a>';
-        
-        var location = 'frogs'
-        var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
+    }
 
-        // <-- Begin Element
-        var token_doc = document.getElementById(location);
-        var token_element = document.createElement('div');
+    var location = 'frogs'
+    var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
 
-        // Element Details -->
-        token_element.id = element_id;
-        token_element.className = 'display_token';
-        token_element.innerHTML = 
-            '<div class="display_token_cont">'+
-                '<div id="div_'+element_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
-                    '<div class="innerLeft">'+
-                        '<div href="https://rarible.com/token/'+COLLECTION_ADDRESS+':'+token_id+'" target="_blank" class="display_token_img_cont" id="cont_'+element_id+'" onclick="metamorph_select('+token_id+')">'+
-                        '</div>'+
+    // <-- Begin Element
+    var token_doc = document.getElementById(location);
+    var token_element = document.createElement('div');
+
+    // Element Details -->
+    token_element.id = element_id;
+    token_element.className = 'display_token';
+    token_element.innerHTML = 
+        '<div class="display_token_cont">'+
+            '<div id="div_'+element_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
+                '<div class="innerLeft">'+
+                    '<div href="https://rarible.com/token/'+COLLECTION_ADDRESS+':'+token_id+'" target="_blank" class="display_token_img_cont" id="cont_'+element_id+'" onclick="metamorph_select('+token_id+')">'+
                     '</div>'+
                 '</div>'+
-                '<div class="renderRight">'+
-                    '<div class="innerRight">'+
-                        '<div id="traits_'+element_id+'" class="trait_list">'+
-                            //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
-                            '<strong><u>Frog #'+token_id+'</strong></u>'+' <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
-                        '</div>'+
-                        '<div id="prop_'+element_id+'" class="properties">'+
-                            html_elements+
-                        '</div>'+
-                        txn_link+
+            '</div>'+
+            '<div class="renderRight">'+
+                '<div class="innerRight">'+
+                    '<div id="traits_'+element_id+'" class="trait_list">'+
+                        //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
+                        '<strong><u>Frog #'+token_id+'</strong></u>'+' <text style="color: #1ac486; font-weight: bold;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
                     '</div>'+
+                    '<div id="prop_'+element_id+'" class="properties">'+
+                        html_elements+
+                    '</div>'+
+                    txn_link+
                 '</div>'+
-            '</div>';
+            '</div>'+
+        '</div>';
 
-        // Create Element <--
-        token_doc.appendChild(token_element);
+    // Create Element <--
+    token_doc.appendChild(token_element);
 
-        // Update Metadata! Build Frog -->
-        let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
-        for (let i = 0; i < metadata.attributes.length; i++) {
-            let attribute = metadata.attributes[i]
-            if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
+    // Update Metadata! Build Frog -->
+    let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
+    for (let i = 0; i < metadata.attributes.length; i++) {
+        let attribute = metadata.attributes[i]
+        if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
 
-                // get special dna from token id
-                firstDigit = parseInt(token_id / 1000);
-                lastDigit = token_id % 10;
-                if (firstDigit > frogArray.length) { firstDigit = frogArray.length; }
-                if (lastDigit > traitArray.length) { lastDigit = traitArray.length; }
-                frogdna = frogArray[firstDigit]
-                traitdna = traitArray[lastDigit]
-                build_trait('SpecialFrog', 'peace/'+frogdna, 'cont_'+element_id);
-                build_trait('Trait', 'SpecialFrog/peace/'+traitdna, 'cont_'+element_id);
-            } else {
-                build_trait(attribute.trait_type, attribute.value, 'cont_'+element_id);
-            }
+            // get special dna from token id
+            firstDigit = parseInt(token_id / 1000);
+            lastDigit = token_id % 10;
+            if (firstDigit > frogArray.length) { firstDigit = frogArray.length; }
+            if (lastDigit > traitArray.length) { lastDigit = traitArray.length; }
+            frogdna = frogArray[firstDigit]
+            traitdna = traitArray[lastDigit]
+            build_trait('SpecialFrog', 'peace/'+frogdna, 'cont_'+element_id);
+            build_trait('Trait', 'SpecialFrog/peace/'+traitdna, 'cont_'+element_id);
+        } else {
+            build_trait(attribute.trait_type, attribute.value, 'cont_'+element_id);
         }
-    } else { console.log(txn+' (2)'); }
+    }
 }
 
 /*
