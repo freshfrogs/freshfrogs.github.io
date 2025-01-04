@@ -239,7 +239,11 @@ async function render_token_sales(contract, sales) {
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
                 '<text style="color: teal; font-weight: bold;">'+truncateAddress(to)+'</text>'+
-            '</div>'
+            '</div>'+
+            '<div style="text-align: center;">'+
+                '<br><a href="https://etherscan.io/tx/'+txn_hash+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
+                '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">OpenSea</button></a>'+
+            '</div>';
         //if (txn_string == 'sale') {
             await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash);
         //}
