@@ -779,7 +779,7 @@ async function fetch_staked_tokens(wallet) {
             var html_elements = 
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
-                    '<text style="color: '+staked_status+';">'+staked+'</text>'+
+                    '<text style="color: '+staked_status+'; font-weight: bold;">'+staked+'</text>'+
                 '</div>'+
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
