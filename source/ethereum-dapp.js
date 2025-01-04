@@ -735,7 +735,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
         let attribute = metadata.attributes[i]
-        if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
+        /* if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
 
             // get special dna from token id
             firstDigit = parseInt(token_id / 1000);
@@ -746,9 +746,9 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
             traitdna = traitArray[lastDigit]
             build_trait('SpecialFrog', 'peace/'+frogdna, 'cont_'+element_id);
             build_trait('Trait', 'SpecialFrog/peace/'+traitdna, 'cont_'+element_id);
-        } else {
+        } else { */
             build_trait(attribute.trait_type, attribute.value, 'cont_'+element_id);
-        }
+        // }
     }
 }
 
