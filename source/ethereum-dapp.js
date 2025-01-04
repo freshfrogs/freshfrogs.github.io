@@ -301,6 +301,8 @@ async function render_held_tokens(wallet, tokens) {
             '</div>'+
             button_element;
         await build_token(html_elements, tokenId);
+    }).catch((e) => {
+        console.log(e.message)
     })
 }
 
