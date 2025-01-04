@@ -246,8 +246,6 @@ async function render_token_sales(contract, sales) {
                 '<text style="color: teal; font-weight: bold;">'+truncateAddress(to)+'</text>'+
             '</div>'
         await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash);
-    }).catch((e) => {
-        console.log(e.message)
     })
     console.log('\nSales Volume:'+
         '\n - - -> '+ sales_volume_eth.toFixed(2)+' ETH'+
@@ -691,6 +689,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
     if (! element_id) { var element_id = 'Frog #'+token_id }
     if (txn == 'sale') {
         
+        console.log(txn)
         var txn_link =
             '<br><a href="https://etherscan.io/tx/'+txn_hash+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
             '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="opensea_button">Opensea</button></a>';
@@ -749,7 +748,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
                 build_trait(attribute.trait_type, attribute.value, 'cont_'+element_id);
             }
         }
-    }
+    } else {console.log(txn+' (2)')}
 }
 
 /*
