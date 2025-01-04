@@ -174,8 +174,9 @@ async function update_staked_tokens(tokens) {
         if (owner.toLowerCase() == user_address.toLowerCase()) { 
             button_element = // Un-stake button
                 '<div style="text-align: center;">'+
-                    '<button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>'+
+                    '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
                     '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">OpenSea</button></a>'+
+                    '<br><button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>'+
                 '</div>';
         } else {
             button_element =
@@ -273,8 +274,9 @@ async function render_held_tokens(wallet, tokens) {
         if (wallet.toLowerCase() == user_address.toLowerCase()) { 
             button_element = // Stake button
                 '<div style="text-align: center;">'+
-                    '<button class="stake_button" onclick="initiate_stake('+tokenId+')">Stake</button>'+
-                    '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
+                    '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
+                    '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">OpenSea</button></a>'+
+                    '<br><button class="stake_button" onclick="initiate_stake('+tokenId+')">Stake</button>'+
                 '</div>';
         } else {
             button_element = 
@@ -689,11 +691,9 @@ async function metamorph_build(token_a, token_b, location) {
 */
 async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
     if (! element_id) { var element_id = 'Frog #'+token_id }
-    if (txn == 'sale') {
-        var txn_link =
-            '<br><a href="https://etherscan.io/tx/'+txn_hash+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
-            '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="opensea_button">Opensea</button></a>';
-    }
+    var txn_link =
+        '<br><a href="https://etherscan.io/tx/'+txn_hash+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
+        '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="opensea_button">Opensea</button></a>';
 
     var location = 'frogs'
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
