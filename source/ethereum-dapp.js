@@ -505,7 +505,7 @@ async function metamorph_build(token_a, token_b, location) {
     if (! location) { token_b = parent_b}
     if (! location) { location = 'cont_morph-results'}
     console.log('=-=-=-=-=-=-=-=-=-= Morphing =-=-=-=-=-=-=-=-=-=');
-    console.log('= Morphing Tokens Alpha (#'+token_a+') & Bravo (#'+token_b+')');
+    console.log('= Morphing Frog #'+token_a+' & Frog #'+token_b);
     console.log('= Fetching Metadata...');
     console.log('= ');
 
