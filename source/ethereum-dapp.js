@@ -748,7 +748,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
                 build_trait(attribute.trait_type, attribute.value, 'cont_'+element_id);
             }
         }
-    } else {console.log(txn+' (2)')}
+    } else { console.log(txn+' (2)'); }
 }
 
 /*
