@@ -121,7 +121,7 @@ const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': frog_api}}
 */
 async function fetch_token_sales(contract, limit, next_string) {
     if (! contract) { contract = COLLECTION_ADDRESS; }
-    if (! limit) { limit = '5'; }
+    if (! limit) { limit = '50'; }
     if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
     fetch('https://api.reservoir.tools/sales/v5?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?sortBy=price&sortDirection=asc&limit='+limit+next+'', options)
     .then((data) => data.json())
@@ -312,6 +312,8 @@ async function render_held_tokens(wallet, tokens) {
 
 */
 async function sales_load_button(contract, limit, next_string) {
+    await fetch_token_sales(contract, '150', next_string);
+    /*
     if (next_string !== null && next_string !== '' && next_string !== 'undefined') {
         break_element = document.createElement('br')
         break_element.id = 'tempBreak'
@@ -324,7 +326,9 @@ async function sales_load_button(contract, limit, next_string) {
         loadMore.style.width = '12%'
         loadMore.style.minWidth = '120px'
         document.getElementById('frogs').appendChild(loadMore)
+        
     } else { return; }
+    */
 }
 
 /*
