@@ -181,20 +181,20 @@ async function update_staked_tokens(tokens) {
         } else { button_element = ''; }
 
         document.getElementById('prop_'+'Frog #'+tokenId).innerHTML = 
-            '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<div class="infobox_left">'+
                 '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
                 '<text style="color: teal; font-weight: bold;">'+staked_time+' days</text>'+
             '</div>'+
-            '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<div class="infobox_right">'+
                 '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
                 '<text style="color: teal; font-weight: bold;" id="frog_type">'+truncateAddress(owner)+'</text>'+
             '</div>'+
             '<br>'+
-            '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<div class="infobox_left">'+
                 '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
                 '<text style="color: teal; font-weight: bold;">'+staked_next_lvl+' days</text>'+
             '</div>'+
-            '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<div class="infobox_right">'+
                 '<text style="color: #1a202c; font-weight: bold;">Rewards</text>'+'<br>'+
                 '<text style="color: teal; font-weight: bold;">'+Math.round(staked_rewards)+' Flyz</text>'+
             '</div>'+
@@ -275,20 +275,20 @@ async function render_held_tokens(wallet, tokens) {
             button_element = '<br><button class="stake_button" onclick="initiate_stake('+tokenId+')">Stake</button>';
         } else { button_element = ''; }
         var html_elements = 
-            '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<div class="infobox_left">'+
                 '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
                 '<text style="color: tomato; font-weight: bold;">False</text>'+
             '</div>'+
-            '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<div class="infobox_right">'+
                 '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
                 '<text style="color: teal; font-weight: bold;" id="frog_type">'+truncateAddress(wallet)+'</text>'+
             '</div>'+
             '<br>'+
-            '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<div class="infobox_left">'+
                 '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
                 '<text style="color: teal; font-weight: bold;">--</text>'+
             '</div>'+
-            '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<div class="infobox_right">'+
                 '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
                 '<text style="color: teal; font-weight: bold;">--</text>'+
             '</div>'+
@@ -363,8 +363,8 @@ async function render_owners_tokens(wallet, tokens, next_string) {
             owner = await stakerAddress(tokenId);
             staked_values = await stakingValues(tokenId);
             staked_lvl = staked_values[1]; staked_next_lvl = staked_values[2].toString()+' days';
-            progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100;
-            progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>';
+            //progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100;
+            //progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>';
             if (owner.toLowerCase() == user_address.toLowerCase()) { 
                 button_element = // Un-stake button
                     '<div style="text-align: center;">'+
@@ -383,24 +383,23 @@ async function render_owners_tokens(wallet, tokens, next_string) {
         }
 
         var html_elements = 
-            '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
-                '<text style="color: '+staked_status+';">'+staked+'</text>'+
-            '</div>'+
-            '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<div class="infobox_left">'+
                 '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
                 '<text style="color: teal;" id="frog_type">'+truncateAddress(owner)+'</text>'+
             '</div>'+
+            '<div class="infobox_right">'+
+                '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
+                '<text style="color: '+staked_status+';">'+staked+'</text>'+
+            '</div>'+
             '<br>'+
-            '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<div class="infobox_left">'+
                 '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
                 '<text style="color: teal;">'+staked_next_lvl+'</text>'+
             '</div>'+
-            '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<div class="infobox_right">'+
                 '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
                 '<text style="color: teal;">'+staked_lvl+'</text>'+
             '</div>'+
-            progress_element+
             button_element;
 
         await render_frog_token(html_elements, tokenId);
