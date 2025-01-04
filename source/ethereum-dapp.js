@@ -298,8 +298,6 @@ async function render_held_tokens(wallet, tokens) {
                 button_element+
             '</div>';
         await build_token(html_elements, tokenId);
-    }).catch((e) => {
-        console.log(e.message)
     })
 }
 
