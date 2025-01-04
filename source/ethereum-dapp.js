@@ -171,7 +171,7 @@ async function update_staked_tokens(tokens) {
         let staked_values = await stakingValues(tokenId);
         var staked_rewards = staked_values[3]
         var staked_time = staked_values[0]
-        var staked_next_lvl = staked_values[2].toString()+' days'
+        var staked_next_lvl = staked_values[2].toString()
         var progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
         var progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>';
         if (owner.toLowerCase() == user_address.toLowerCase()) { 
