@@ -272,7 +272,9 @@ async function render_held_tokens(wallet, tokens) {
     tokens.forEach(async (token) => {
         var { token: { tokenId } } = token
         if (wallet.toLowerCase() == user_address.toLowerCase()) { 
-            button_element = '<br><button class="stake_button" onclick="initiate_stake('+tokenId+')">Stake</button>';
+            button_element =
+            '<br><button class="stake_button" onclick="initiate_stake('+tokenId+')">Stake</button>'+
+            '<button class="unstake_button" onclick="metamorph_build()">Meta Morph</button>';
         } else { button_element = ''; }
         var html_elements = 
             '<div class="infobox_left">'+
