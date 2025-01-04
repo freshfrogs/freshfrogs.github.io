@@ -226,12 +226,12 @@ async function render_token_sales(contract, sales) {
         }
         var html_elements = 
             '<div class="infobox_left">'+
-                '<text style="color: #1a202c; font-weight: bold;">Date</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;">'+sale_date+'</text>'+
-            '</div>'+
-            '<div class="infobox_right">'+
                 '<text style="color: #1a202c; font-weight: bold;">Last Sale</text>'+'<br>'+
                 '<text id="frog_type" style="color: teal; font-weight: bold !important;">'+decimal+'Ξ '+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
+            '</div>'+
+            '<div class="infobox_right">'+
+                '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
+                '<text style="color: teal; font-weight: bold;">'+truncateAddress(to)+'</text>'+
             '</div>'+
             '<br>'+
             '<div class="infobox_left">'+
@@ -239,8 +239,8 @@ async function render_token_sales(contract, sales) {
                 '<text style="color: teal; font-weight: bold;">'+from+'</text>'+
             '</div>'+
             '<div class="infobox_right">'+
-                '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;">'+truncateAddress(to)+'</text>'+
+                '<text style="color: #1a202c; font-weight: bold;">Date</text>'+'<br>'+
+                '<text style="color: teal; font-weight: bold;">'+sale_date+'</text>'+
             '</div>'+
             '<div style="text-align: center;">'+
                 '<br><a href="https://etherscan.io/tx/'+txHash+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
