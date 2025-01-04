@@ -279,23 +279,25 @@ async function render_held_tokens(wallet, tokens) {
                     '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
                 '</div>';
         }
-        var html_elements = 
-            '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
-                '<text style="color: tomato; font-weight: bold;">False</text>'+
-            '</div>'+
-            '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;" id="frog_type">'+truncateAddress(wallet)+'</text>'+
-            '</div>'+
-            '<br>'+
-            '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;">--</text>'+
-            '</div>'+
-            '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;">--</text>'+
+        var html_elements =
+            '<div class="infobox">'+
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
+                    '<text style="color: tomato; font-weight: bold;">False</text>'+
+                '</div>'+
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
+                    '<text style="color: teal; font-weight: bold;" id="frog_type">'+truncateAddress(wallet)+'</text>'+
+                '</div>'+
+                '<br>'+
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
+                    '<text style="color: teal; font-weight: bold;">--</text>'+
+                '</div>'+
+                '<div style="margin: 8px; float: right; width: 100px;">'+
+                    '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
+                    '<text style="color: teal; font-weight: bold;">--</text>'+
+                '</div>'+
             '</div>'+
             button_element;
         await build_token(html_elements, tokenId);
