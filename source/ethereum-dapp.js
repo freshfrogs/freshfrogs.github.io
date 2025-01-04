@@ -179,7 +179,7 @@ async function update_staked_tokens(tokens) {
         document.getElementById('prop_'+'Frog #'+tokenId).innerHTML = 
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;">'+staked_time+'</text>'+
+                '<text style="color: teal; font-weight: bold;">'+staked_time+' days</text>'+
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
