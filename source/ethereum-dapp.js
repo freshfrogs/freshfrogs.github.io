@@ -413,6 +413,7 @@ async function initiate_morph(token_id) {
     console.log('Enable morph select for parent: A')
     morph_a = token_id
     morph_preset = true
+    document.getElementById('morph_button_'+token_id).style.background = 'coral';
     return;
 }
 
@@ -421,6 +422,7 @@ async function finalize_morph(token_id) {
     morph_b = token_id
     metamorph_build(morph_a, morph_b, 'cont_Frog #'+morph_a)
     morph_preset = false
+    document.getElementById('morph_button_'+token_id).style.background = 'indianred';
     return;
 }
 
