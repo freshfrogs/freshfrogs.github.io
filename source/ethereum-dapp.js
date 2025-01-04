@@ -233,7 +233,7 @@ async function render_token_sales(contract, sales) {
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Last Sale</text>'+'<br>'+
-                '<text id="frog_type" style="color: teal; font-weight: bold !important;">'+decimal+'Ξ'+'</text>'+'<text id="usd_price" class="usd_price">($'+usd.toFixed(2)+')'+'</text>'+
+                '<text id="frog_type" style="color: teal; font-weight: bold !important;">'+decimal+'Ξ '+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
             '</div>'+
             '<br>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
