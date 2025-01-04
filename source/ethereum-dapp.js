@@ -116,7 +116,7 @@ const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': frog_api}}
 
 /*
 
-    Fetch NFT token sales (initial & secondary) using Resveroir API. Returns => Object
+    Fetch NFT token sales (initial & secondary) using Reservoir API. Returns => Object
 
 */
 async function fetch_token_sales(contract, limit, next_string) {
@@ -136,7 +136,7 @@ async function fetch_token_sales(contract, limit, next_string) {
 
 /*
 
-    Fetch NFT tokens held by user using Resveroir API. Returns => Object
+    Fetch NFT tokens held by user using Reservoir API. Returns => Object
 
 */
 async function fetch_held_tokens(wallet, limit, next_string) {
