@@ -246,6 +246,8 @@ async function render_token_sales(contract, sales) {
                 '<text style="color: teal; font-weight: bold;">'+truncateAddress(to)+'</text>'+
             '</div>'
         await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash);
+    }).catch((e) => {
+        console.log(e.message)
     })
     console.log('\nSales Volume:'+
         '\n - - -> '+ sales_volume_eth.toFixed(2)+' ETH'+
@@ -685,7 +687,7 @@ async function metamorph_build(token_a, token_b, location) {
 
 */
 async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
-
+    console.log('Building Frog #'+token_id)
     if (! element_id) { var element_id = 'Frog #'+token_id }
     if (txn == 'sale') {
         
