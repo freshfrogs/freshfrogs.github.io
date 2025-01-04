@@ -229,20 +229,20 @@ async function render_token_sales(contract, sales) {
         var html_elements = 
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Date</text>'+'<br>'+
-                '<text style="color: teal;">'+sale_date+'</text>'+
+                '<text style="color: teal; font-weight: bold;">'+sale_date+'</text>'+
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Sale Price</text>'+'<br>'+
-                '<text id="frog_type" style="color: teal;">'+decimal+'Ξ ($'+usd.toFixed(2)+')'+'</text>'+
+                '<text id="frog_type" style="color: teal;" font-weight: bold;>'+decimal+'Ξ ($'+usd.toFixed(2)+')'+'</text>'+
             '</div>'+
             '<br>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Seller</text>'+'<br>'+
-                '<text style="color: teal;">'+from+'</text>'+
+                '<text style="color: teal;" font-weight: bold;>'+from+'</text>'+
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Buyer</text>'+'<br>'+
-                '<text style="color: teal;">'+truncateAddress(to)+'</text>'+
+                '<text style="color: teal;" font-weight: bold;>'+truncateAddress(to)+'</text>'+
             '</div>'
         await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash);
     })
@@ -282,20 +282,20 @@ async function render_held_tokens(wallet, tokens) {
         var html_elements = 
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
-                '<text style="color: tomato;">False</text>'+
+                '<text style="color: tomato; font-weight: bold;">False</text>'+
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
-                '<text style="color: teal;" id="frog_type">'+truncateAddress(wallet)+'</text>'+
+                '<text style="color: teal; font-weight: bold;" id="frog_type">'+truncateAddress(wallet)+'</text>'+
             '</div>'+
             '<br>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
-                '<text style="color: teal;">--</text>'+
+                '<text style="color: teal; font-weight: bold;">--</text>'+
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
-                '<text style="color: teal;">--</text>'+
+                '<text style="color: teal; font-weight: bold;">--</text>'+
             '</div>'+
             button_element;
         await build_token(html_elements, tokenId);
