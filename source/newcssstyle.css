@@ -310,6 +310,16 @@ html {
     border: none !important;
     margin: 0%;
   }
+  .infobox_left{
+    margin: 8px;
+    float: left;
+    width: 100px;
+  }
+  infobox_right {
+    margin: 8px;
+    float: right;
+    width: 100px;
+  }
   .logoHeader {
     margin: auto;
     width: 80%;

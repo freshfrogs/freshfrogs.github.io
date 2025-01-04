@@ -225,20 +225,20 @@ async function render_token_sales(contract, sales) {
             mint_volume_usd = mint_volume_usd + Number(usd);
         }
         var html_elements = 
-            '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<div class="infobox_left">'+
                 '<text style="color: #1a202c; font-weight: bold;">Date</text>'+'<br>'+
                 '<text style="color: teal; font-weight: bold;">'+sale_date+'</text>'+
             '</div>'+
-            '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<div class="infobox_right">'+
                 '<text style="color: #1a202c; font-weight: bold;">Last Sale</text>'+'<br>'+
                 '<text id="frog_type" style="color: teal; font-weight: bold !important;">'+decimal+'Ξ '+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
             '</div>'+
             '<br>'+
-            '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<div class="infobox_left">'+
                 '<text style="color: #1a202c; font-weight: bold;">Seller</text>'+'<br>'+
                 '<text style="color: teal; font-weight: bold;">'+from+'</text>'+
             '</div>'+
-            '<div style="margin: 8px; float: right; width: 100px;">'+
+            '<div class="infobox_right">'+
                 '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
                 '<text style="color: teal; font-weight: bold;">'+truncateAddress(to)+'</text>'+
             '</div>'+
