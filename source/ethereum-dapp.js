@@ -191,8 +191,8 @@ async function update_staked_tokens(tokens) {
                 '<text style="color: teal; font-weight: bold;">'+progress_element+'</text>'+
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
-                '<text style="color: #1a202c; font-weight: bold;">Flyz</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;">'+staked_rewards+'</text>'+
+                '<text style="color: #1a202c; font-weight: bold;">Rewards</text>'+'<br>'+
+                '<text style="color: teal; font-weight: bold;">'+Math.round(staked_rewards)+' Flyz</text>'+
             '</div>'+
             '<div style="text-align: center;">'+
                 '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
