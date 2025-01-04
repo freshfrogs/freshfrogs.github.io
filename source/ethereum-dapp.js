@@ -778,16 +778,16 @@ async function fetch_staked_tokens(wallet) {
             } else { button_element = ''; }
 
             var html_elements = 
+                '<div style="margin: 8px; float: left; width: 100px;">'+
+                    '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
+                    '<text style="color: teal; font-weight: bold;" id="frog_type">'+truncateAddress(owner)+'</text>'+
+                '</div>'+
                 '<div style="margin: 8px; float: right; width: 100px;">'+
                     '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
                     '<text style="color: teal; font-weight: bold;">'+staked_time+' days</text>'+
                 '</div>'+
-                '<div style="margin: 8px; float: right; width: 100px;">'+
-                    '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
-                    '<text style="color: teal; font-weight: bold;" id="frog_type">'+truncateAddress(owner)+'</text>'+
-                '</div>'+
                 '<br>'+
-                '<div style="margin: 8px; float: right; width: 100px;">'+
+                '<div style="margin: 8px; float: left; width: 100px;">'+
                     '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
                     '<text style="color: teal; font-weight: bold;">'+staked_next_lvl+' days</text>'+
                 '</div>'+
