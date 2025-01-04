@@ -180,7 +180,6 @@ async function update_staked_tokens(tokens) {
         } else {
             button_element =
                 '<div style="text-align: center;">'+
-                    '<button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>'+
                     '<br><a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
                 '</div>';
         }
