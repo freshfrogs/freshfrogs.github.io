@@ -170,7 +170,7 @@ async function update_staked_tokens(tokens) {
         var staked_lvl = staked_values[1]
         var staked_next_lvl = staked_values[2].toString()+' days'
         var progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
-        var progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>'
+        var progress_element = '';//'<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>'
         if (owner.toLowerCase() == user_address.toLowerCase()) { 
             button_element = // Un-stake button
                 '<div style="text-align: center;">'+
