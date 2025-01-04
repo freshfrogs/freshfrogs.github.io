@@ -175,12 +175,12 @@ async function update_staked_tokens(tokens) {
             button_element = // Un-stake button
                 '<div style="text-align: center;">'+
                     '<button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>'+
-                    '<br><a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
+                    '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
                 '</div>';
         } else {
             button_element =
                 '<div style="text-align: center;">'+
-                    '<br><a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
+                    '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
                 '</div>';
         }
         document.getElementById('prop_'+'Frog #'+tokenId).innerHTML = 
@@ -271,13 +271,13 @@ async function render_held_tokens(wallet, tokens) {
             button_element = // Stake button
                 '<div style="text-align: center;">'+
                     '<button class="stake_button" onclick="initiate_stake('+tokenId+')">Stake</button>'+
-                    '<br><a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
+                    '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
                 '</div>';
         } else {
             button_element = 
                 '<div style="text-align: center;">'+
-                    '<br><a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
-                '</div>';;
+                    '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
+                '</div>';
         }
         var html_elements = 
             '<div style="margin: 8px; float: right; width: 100px;">'+
@@ -770,12 +770,12 @@ async function fetch_staked_tokens(wallet) {
                 button_element = // Un-stake button
                     '<div style="text-align: center;">'+
                         '<button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
-                        '<br><a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
+                        '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
                     '</div>';
             } else {
                 button_element =
                     '<div style="text-align: center;">'+
-                        '<br><a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
+                        '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
                     '</div>';
             }
 
