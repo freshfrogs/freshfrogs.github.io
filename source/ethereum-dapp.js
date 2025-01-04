@@ -211,7 +211,6 @@ async function update_staked_tokens(tokens) {
 */
 async function render_token_sales(contract, sales) {
     sales.forEach(async (token) => {
-        console.log(token);
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } }, txHash } = token
         var sale_date = createdAt.substring(0, 10);
         if (from !== '0x0000000000000000000000000000000000000000') {
@@ -268,8 +267,6 @@ async function render_token_sales(contract, sales) {
 
 */
 async function render_held_tokens(wallet, tokens) {
-    console.log(wallet)
-    console.log(tokens)
     tokens.forEach(async (token) => {
         var { token: { tokenId } } = token
         if (wallet.toLowerCase() == user_address.toLowerCase()) { 
@@ -811,15 +808,12 @@ async function fetch_staked_tokens(wallet) {
 
 */
 async function fetch_eth_usd() {
-
-    console.log('Fetching ETH/USD...')
     fetch('https://deep-index.moralis.io/api/v2.2/erc20/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/price?chain=eth&include=percent_change', options_2)
     .then((results) => results.json())
     .then((results) => { eth_usd = Number(results.usdPrice); console.log('CURRENT WRAPPED ETH PRICE\n$'+eth_usd); })
     .catch((e) => {
         console.log(e.message)
     })
-
 }
 
 /*
