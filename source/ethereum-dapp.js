@@ -175,7 +175,9 @@ async function update_staked_tokens(tokens) {
         var progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
         var progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>';
         if (owner.toLowerCase() == user_address.toLowerCase()) { 
-            button_element = '<br><button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>';
+            button_element =
+                '<br><button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>'+
+                '<button class="unstake_button" onclick="metamorph_build()">Meta Morph</button>';
         } else { button_element = ''; }
 
         document.getElementById('prop_'+'Frog #'+tokenId).innerHTML = 
