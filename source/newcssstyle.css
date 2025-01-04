@@ -196,7 +196,7 @@ html {
     top: -2px;
   }
   .opensea_button {
-    margin: 2px;
+    margin: 4px;
     background: rgb(0, 134, 255);
     border: 1px solid black;
     border-radius: 5px;
@@ -216,7 +216,7 @@ html {
     top: -2px;
   }
   .stake_button {
-    margin: 2px;
+    margin: 4px;
     background: teal;
     border: 1px solid black;
     border-radius: 5px;
@@ -236,7 +236,7 @@ html {
     top: -2px;
   }
   .unstake_button {
-    margin: 2px;
+    margin: 4px;
     background: tomato;
     border: 1px solid black;
     border-radius: 5px;
