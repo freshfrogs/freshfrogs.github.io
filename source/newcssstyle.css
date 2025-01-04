@@ -206,7 +206,7 @@ html {
   }
   .loadmore_button {
     margin: 4px;
-    background: #e9ecef;
+    background: white;
     border: 1px solid black;
     border-radius: 5px;
     font-weight: bold;
