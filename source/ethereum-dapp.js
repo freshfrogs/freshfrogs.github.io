@@ -186,20 +186,20 @@ async function update_staked_tokens(tokens) {
         document.getElementById('prop_'+'Frog #'+tokenId).innerHTML = 
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
-                '<text style="color: teal;">True</text>'+
+                '<text style="color: teal; font-weight: bold;"">True</text>'+
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
-                '<text style="color: teal;" id="frog_type">'+truncateAddress(owner)+'</text>'+
+                '<text style="color: teal; font-weight: bold;"" id="frog_type">'+truncateAddress(owner)+'</text>'+
             '</div>'+
             '<br>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
-                '<text style="color: teal;">'+staked_next_lvl+'</text>'+
+                '<text style="color: teal; font-weight: bold;"">'+staked_next_lvl+'</text>'+
             '</div>'+
             '<div style="margin: 8px; float: right; width: 100px;">'+
                 '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
-                '<text style="color: teal;">'+staked_lvl+'</text>'+
+                '<text style="color: teal; font-weight: bold;"">'+staked_lvl+'</text>'+
             '</div>'+
             progress_element+
             button_element;
