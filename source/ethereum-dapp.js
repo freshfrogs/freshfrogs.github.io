@@ -177,7 +177,7 @@ async function update_staked_tokens(tokens) {
         if (owner.toLowerCase() == user_address.toLowerCase()) { 
             button_element =
                 '<br><button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>'+
-                '<button class="unstake_button" onclick="metamorph_build()">Morph 🍄</button>';
+                '<button id="morph_button_'+tokenId+'" class="morph_button" onclick="metamorph_build()">Morph 🍄</button>';
         } else { button_element = ''; }
 
         document.getElementById('prop_'+'Frog #'+tokenId).innerHTML = 
@@ -274,7 +274,7 @@ async function render_held_tokens(wallet, tokens) {
         if (wallet.toLowerCase() == user_address.toLowerCase()) { 
             button_element =
             '<br><button class="stake_button" onclick="initiate_stake('+tokenId+')">Stake</button>'+
-            '<button class="unstake_button" onclick="metamorph_build()">Morph 🍄</button>';
+            '<button id="morph_button_'+tokenId+'" class="morph_button" onclick="metamorph_build()">Morph 🍄</button>';
         } else { button_element = ''; }
         var html_elements = 
             '<div class="infobox_left">'+
@@ -479,7 +479,7 @@ async function morph_ui(){
                         '<button class="stake_button" onclick="metamorph_b_preset()">Select Frog</button>'+
                     '</div>'+
                     '<div class="morph-preset-c">'+
-                        '<button class="unstake_button" onclick="metamorph_build()">Morph 🍄</button>'+
+                        '<button class="morph_button" onclick="metamorph_build()">Morph 🍄</button>'+
                     '</div>'+
                 '</div>'+
             '</div>';
