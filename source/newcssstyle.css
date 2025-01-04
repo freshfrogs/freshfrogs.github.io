@@ -179,6 +179,7 @@ html {
     font-weight: bold !important;
     background: lightgray;
     padding: 1px;
+    padding-left: 2px;
     border-radius: 5px;
   }
   .infobox {
