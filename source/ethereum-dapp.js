@@ -687,7 +687,7 @@ async function metamorph_build(token_a, token_b, location) {
 
 */
 async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
-    console.log('Building Frog #'+token_id)
+    console.log('Building Frog #'+token_id+'...')
     if (! element_id) { var element_id = 'Frog #'+token_id }
     if (txn == 'sale') {
         
