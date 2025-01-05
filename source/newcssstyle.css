@@ -324,6 +324,10 @@ html {
     box-shadow: none;
     top: -2px;
   }
+  .card_text {
+    color: teal;
+    font-weight: 500 !important;
+  }
   .frogs{
     width: 80% !important;
     background: transparent;

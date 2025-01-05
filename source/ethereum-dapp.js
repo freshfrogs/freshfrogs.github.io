@@ -183,20 +183,20 @@ async function update_staked_tokens(tokens) {
         document.getElementById('prop_'+'Frog #'+tokenId).innerHTML = 
             '<div class="infobox_left">'+
                 '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;">'+staked_time+' days</text>'+
+                '<text class="card_text">'+staked_time+' days</text>'+
             '</div>'+
             '<div class="infobox_right">'+
                 '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;" id="frog_type">'+truncateAddress(owner)+'</text>'+
+                '<text class="card_text" id="frog_type">'+truncateAddress(owner)+'</text>'+
             '</div>'+
             '<br>'+
             '<div class="infobox_left">'+
                 '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;">'+staked_next_lvl+' days</text>'+
+                '<text class="card_text">'+staked_next_lvl+' days</text>'+
             '</div>'+
             '<div class="infobox_right">'+
                 '<text style="color: #1a202c; font-weight: bold;">Rewards</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;">'+Math.round(staked_rewards)+' Flyz</text>'+
+                '<text class="card_text">'+Math.round(staked_rewards)+' Flyz</text>'+
             '</div>'+
             '<div style="text-align: center;">'+
                 '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
@@ -229,20 +229,20 @@ async function render_token_sales(contract, sales) {
         var html_elements = 
             '<div class="infobox_left">'+
                 '<text style="color: #1a202c; font-weight: bold;">Last Sale</text>'+'<br>'+
-                '<text id="frog_type" style="color: teal; font-weight: bold !important;">'+decimal+'Ξ '+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
+                '<text id="frog_type" class="card_text">'+decimal+'Ξ '+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
             '</div>'+
             '<div class="infobox_right">'+
                 '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;">'+truncateAddress(to)+'</text>'+
+                '<text class="card_text">'+truncateAddress(to)+'</text>'+
             '</div>'+
             '<br>'+
             '<div class="infobox_left">'+
                 '<text style="color: #1a202c; font-weight: bold;">Seller</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;">'+from+'</text>'+
+                '<text class="card_text">'+from+'</text>'+
             '</div>'+
             '<div class="infobox_right">'+
                 '<text style="color: #1a202c; font-weight: bold;">Date</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;">'+sale_date+'</text>'+
+                '<text class="card_text">'+sale_date+'</text>'+
             '</div>'+
             '<div style="text-align: center;">'+
                 '<br><a href="https://etherscan.io/tx/'+txHash+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
@@ -283,16 +283,16 @@ async function render_held_tokens(wallet, tokens) {
             '</div>'+
             '<div class="infobox_right">'+
                 '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;" id="frog_type">'+truncateAddress(wallet)+'</text>'+
+                '<text class="card_text" id="frog_type">'+truncateAddress(wallet)+'</text>'+
             '</div>'+
             '<br>'+
             '<div class="infobox_left">'+
                 '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;">--</text>'+
+                '<text class="card_text">--</text>'+
             '</div>'+
             '<div class="infobox_right">'+
                 '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
-                '<text style="color: teal; font-weight: bold;">--</text>'+
+                '<text class="card_text">--</text>'+
             '</div>'+
             '<div style="text-align: center;">'+
                 '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
@@ -777,20 +777,20 @@ async function fetch_staked_tokens(wallet) {
             var html_elements = 
                 '<div class="infobox_left">'+
                     '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
-                    '<text style="color: teal; font-weight: bold;" id="frog_type">'+truncateAddress(owner)+'</text>'+
+                    '<text class="card_text" id="frog_type">'+truncateAddress(owner)+'</text>'+
                 '</div>'+
                 '<div class="infobox_right">'+
                     '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
-                    '<text style="color: teal; font-weight: bold;">'+staked_time+' days</text>'+
+                    '<text class="card_text">'+staked_time+' days</text>'+
                 '</div>'+
                 '<br>'+
                 '<div class="infobox_left">'+
                     '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
-                    '<text style="color: teal; font-weight: bold;">'+staked_next_lvl+' days</text>'+
+                    '<text class="card_text">'+staked_next_lvl+' days</text>'+
                 '</div>'+
                 '<div class="infobox_right">'+
                     '<text style="color: #1a202c; font-weight: bold;">Rewards</text>'+'<br>'+
-                    '<text style="color: teal; font-weight: bold;">'+Math.round(staked_rewards)+' Flyz</text>'+
+                    '<text class="card_text">'+Math.round(staked_rewards)+' Flyz</text>'+
                 '</div>'+
                 '<div style="text-align: center;">'+
                     '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
