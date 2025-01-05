@@ -447,6 +447,7 @@ html {
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
     background: cadetblue;
+    box-shadow: 2px 2px darkslategray;
   }
   .main_right {
     padding: 20px;
