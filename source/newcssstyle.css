@@ -444,6 +444,7 @@ html {
     width: 70%;
     margin-left: auto;
     margin-right: auto;
+    box-shadow: 2px 2px darkslategray;
   }
   .morph-token-result {
     background: white;
