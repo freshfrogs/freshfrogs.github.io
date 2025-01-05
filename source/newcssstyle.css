@@ -334,6 +334,11 @@ html {
     border: none !important;
     margin: 0%;
   }
+  .front_title {
+    font-size: x-large;
+    font-weight: 900;
+    text-shadow: 2px 2px darkslategray;
+  }
   .infobox_left{
     margin: 8px;
     float: left;
