@@ -291,7 +291,7 @@ async function render_held_tokens(wallet, tokens) {
                 '<text class="card_text">--</text>'+
             '</div>'+
             '<div class="infobox_right">'+
-                '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
+                '<text style="color: #1a202c; font-weight: bold;">Rewards</text>'+'<br>'+
                 '<text class="card_text">--</text>'+
             '</div>'+
             '<div class="card_buttonbox">'+
