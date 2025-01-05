@@ -43,10 +43,6 @@
           clearInterval(intervalId);
         }
 
-        var intervalId = window.setInterval(async function(){
-          await build_random_logo()
-        }, 6500);
-
         async function build_random_logo() {
           // Random Frog Element:
           document.getElementById('randomLogo').innerHTML = ''
