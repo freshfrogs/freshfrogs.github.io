@@ -176,8 +176,8 @@ async function update_staked_tokens(tokens) {
         var progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>';
         if (owner.toLowerCase() == user_address.toLowerCase()) { 
             button_element =
-                '<br><button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>'+
-                '<button id="morph_button_'+tokenId+'" class="morph_button" onclick="metamorph_build()">Morph 🍄</button>';
+                '<br><button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>';
+                //'<button id="morph_button_'+tokenId+'" class="morph_button" onclick="metamorph_build()">Morph 🍄</button>';
         } else { button_element = ''; }
 
         document.getElementById('prop_'+'Frog #'+tokenId).innerHTML = 
@@ -273,8 +273,8 @@ async function render_held_tokens(wallet, tokens) {
         var { token: { tokenId } } = token
         if (wallet.toLowerCase() == user_address.toLowerCase()) { 
             button_element =
-            '<br><button class="stake_button" onclick="initiate_stake('+tokenId+')">Stake</button>'+
-            '<button id="morph_button_'+tokenId+'" class="morph_button" onclick="metamorph_build()">Morph 🍄</button>';
+            '<br><button class="stake_button" onclick="initiate_stake('+tokenId+')">Stake</button>';
+            //'<button id="morph_button_'+tokenId+'" class="morph_button" onclick="metamorph_build()">Morph 🍄</button>';
         } else { button_element = ''; }
         var html_elements = 
             '<div class="infobox_left">'+
@@ -770,8 +770,8 @@ async function fetch_staked_tokens(wallet) {
             //progress_element = ''//'<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>'
             if (owner.toLowerCase() == user_address.toLowerCase()) {
                 button_element =
-                    '<br><button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>'+
-                    '<button id="morph_button_'+token_id+'" class="morph_button" onclick="initiate_morph('+token_id+')">Morph 🍄</button>';
+                    '<br><button class="unstake_button" onclick="initiate_withdraw('+token_id+')">Un-stake</button>';
+                    //'<button id="morph_button_'+token_id+'" class="morph_button" onclick="initiate_morph('+token_id+')">Morph 🍄</button>';
             } else { button_element = ''; }
 
             var html_elements = 
