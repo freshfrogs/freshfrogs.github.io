@@ -172,27 +172,29 @@ async function update_staked_tokens(tokens) {
 
         var { token: { tokenId } } = token
         let owner = await stakerAddress(tokenId);
-        let staked_values = await stakingValues(tokenId);
-        var staked_rewards = staked_values[3]
-        var staked_time = staked_values[0]
-        var staked_next_lvl = staked_values[2].toString()
-        //var progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
-        //var progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>';
-
-        try {
-            document.getElementById('staked_'+tokenId).innerHTML = staked_time+' days';
-            document.getElementById('staked_'+tokenId).style.color = 'teal';
-        } catch (e) { console.log(e.message) }
-        try { document.getElementById('nextlvl_'+tokenId).innerHTML = staked_next_lvl+' days'; } catch (e) { console.log(e.message) }
-        try { document.getElementById('rewards_'+tokenId).innerHTML = Math.round(staked_rewards); } catch (e) { console.log(e.message) }
-        try {
-            if (owner.toLowerCase() == user_address.toLowerCase()) { 
-                document.getElementById('buttonsPanel_'+tokenId).innerHTML = 
-                    '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
-                    '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">OpenSea</button></a>'+
-                    '<br><button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>';
-            }
-        } catch (e) { console.log(e.message) }
+        if (owner !== false) { // Token is staked
+            let staked_values = await stakingValues(tokenId);
+            var staked_rewards = staked_values[3]
+            var staked_time = staked_values[0]
+            var staked_next_lvl = staked_values[2].toString()
+            //var progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
+            //var progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>';
+    
+            try {
+                document.getElementById('staked_'+tokenId).innerHTML = staked_time+' days';
+                document.getElementById('staked_'+tokenId).style.color = 'teal';
+            } catch (e) { console.log(e.message) }
+            try { document.getElementById('nextlvl_'+tokenId).innerHTML = staked_next_lvl+' days'; } catch (e) { console.log(e.message) }
+            try { document.getElementById('rewards_'+tokenId).innerHTML = Math.round(staked_rewards); } catch (e) { console.log(e.message) }
+            try {
+                if (owner.toLowerCase() == user_address.toLowerCase()) { 
+                    document.getElementById('buttonsPanel_'+tokenId).innerHTML = 
+                        '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
+                        '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">OpenSea</button></a>'+
+                        '<br><button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>';
+                }
+            } catch (e) { console.log(e.message) }
+        }
     })
 }
 
