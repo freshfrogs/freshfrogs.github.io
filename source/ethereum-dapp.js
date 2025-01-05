@@ -128,8 +128,6 @@ async function fetch_token_sales(contract, limit, next_string) {
     .then((data) => {
         console.log(data)
         render_token_sales(contract, data.sales);
-        try { update_staked_tokens(data.sales); }
-        catch (e) { console.log(e.message) }
         if (! data.continuation) { return }
         else { sales_load_button(contract, limit, data.continuation); }
     })
