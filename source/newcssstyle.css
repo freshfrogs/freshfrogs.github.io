@@ -151,7 +151,7 @@ html {
     cursor: pointer;
   }
   .parentPanel {
-    width: 80% !important;
+    width: 90% !important;
     height: auto !important;
     margin-left: auto !important;
     margin-right: auto !important;
@@ -448,7 +448,7 @@ html {
     padding: 15px;
   }
   .main_right {
-    padding: 4%;
+    padding: 20px;
     font-weight: normal;
     font-size: 14px;
     text-shadow: none;
