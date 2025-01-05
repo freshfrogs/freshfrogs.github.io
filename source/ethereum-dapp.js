@@ -167,12 +167,13 @@ async function fetch_held_tokens(wallet, limit, next_string) {
 
 */
 async function update_staked_tokens(tokens) {
+    console.log('Updated staked tokens:')
     console.log(tokens)
     tokens.forEach(async (token) => {
 
         var { token: { tokenId } } = token
-        let owner = await stakerAddress(tokenId);
-        if (owner !== false) { // Token is staked
+        //let owner = await stakerAddress(tokenId);
+        //if (owner == false) { // Token is staked
             let staked_values = await stakingValues(tokenId);
             var staked_rewards = staked_values[3]
             var staked_time = staked_values[0]
@@ -194,7 +195,7 @@ async function update_staked_tokens(tokens) {
                         '<br><button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>';
                 }
             } catch (e) { console.log(e.message) }
-        }
+        //}
     })
 }
 
