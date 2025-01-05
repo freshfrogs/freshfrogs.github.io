@@ -338,6 +338,7 @@ html {
     font-size: x-large;
     font-weight: 900;
     text-shadow: 2px 2px darkslategray;
+    margin-top: 5px;
   }
   .infobox_left{
     margin: 8px;
