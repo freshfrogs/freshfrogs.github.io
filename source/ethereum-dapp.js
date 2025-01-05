@@ -220,13 +220,13 @@ async function render_token_sales(contract, sales) {
         var sale_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
 
         if (from !== '0x0000000000000000000000000000000000000000') {
-            saleorMint = 'Sold on'
+            saleOrMint = 'Sold on'
             txn_string = 'sale'; from = truncateAddress(from)
             net_income_usd = net_income_usd + (Number(usd))*0.025
             sales_volume_eth = sales_volume_eth + Number(decimal);
             sales_volume_usd = sales_volume_usd + Number(usd);
         } else {
-            saleorMint = 'Minted on'
+            saleOrMint = 'Minted on'
             txn_string = 'mint'; from = 'FreshFrogsNFT';
             net_income_usd = net_income_usd + Number(usd)
             mint_volume_eth = mint_volume_eth + Number(decimal);
@@ -245,11 +245,11 @@ async function render_token_sales(contract, sales) {
             '<br>'+
             '<div class="infobox_left">'+
                 '<text class="card_text">'+saleOrMint+'</text>'+'<br>'+
-                '<text class="card_bold">False</text>'+
+                '<text class="card_bold">'+sale_date+'</text>'+
             '</div>'+
             '<div class="infobox_right">'+
-                '<text class="card_text">Rewards</text>'+'<br>'+
-                '<text class="card_bold">--</text>'+
+                '<text class="card_text">Frog Type</text>'+'<br>'+
+                '<text class="card_bold">'+frog_type+'</text>'+
             '</div>'+
             '<div id="buttonsPanel_'+tokenId+'" class="card_buttonbox">'+
                 '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
