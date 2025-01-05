@@ -153,7 +153,7 @@ html {
     cursor: pointer;
   }
   .parentPanel {
-    width: 70% !important;
+    width: 100% !important;
     height: auto !important;
     margin-left: auto !important;
     margin-right: auto !important;
@@ -188,7 +188,7 @@ html {
   }
   .connectButton{
     margin: 4px;
-    padding: 10px;
+    padding: 8px;
     background: white;
     border: 1px solid black;
     border-radius: 5px;
@@ -357,22 +357,18 @@ html {
   }
   .logoHeader {
     margin: auto;
-    width: 80%;
-    padding: 5%;
-    padding-bottom: 2%;
+    width: 100%;
+    padding: 0%;
+    padding-bottom: 0%;
     color: white;
-    text-shadow:
-    -1px -1px 0 #000,
-    1px -1px 0 #000,
-    -1px 1px 0 #000,
-    1px 1px 0 #000;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
     font-size: initial;
     font-weight: bolder;
     background: transparent;
     border-radius: 5px;
     border: none;
     box-shadow: none;
-    font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji !important;
   }
   .bottomPanel {
     margin: auto;
@@ -444,7 +440,7 @@ html {
     width: 100%;
   }
   .headerPanel {
-    padding: 2%;
+    padding: 20px;
     font-weight: normal;
     font-size: 14px;
     text-shadow: none;
@@ -452,7 +448,8 @@ html {
     background-color: white;
     border-radius: 5px;
     border: 1px solid black;
-    width: 70%;
+    width: 40%;
+    min-width: 300px;
     margin-left: auto;
     margin-right: auto;
     box-shadow: 2px 2px darkslategray;
