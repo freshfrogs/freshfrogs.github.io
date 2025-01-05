@@ -31,10 +31,9 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        //await build_random_logo();
+        await build_random_logo();
         await fetch_token_sales(COLLECTION_ADDRESS, '50');
 
-        var intervalId = window.setInterval(async function(){ await build_random_logo() }, 6500);
         document.getElementById('randomLogo').onclick = async function (e) { clearInterval(intervalId); }
         document.getElementById('connectButton').onclick = async function (e) { await initiate_web3_connection(); }
 
