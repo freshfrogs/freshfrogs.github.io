@@ -198,7 +198,7 @@ async function update_staked_tokens(tokens) {
                 '<text style="color: #1a202c; font-weight: bold;">Rewards</text>'+'<br>'+
                 '<text class="card_text">'+Math.round(staked_rewards)+' Flyz</text>'+
             '</div>'+
-            '<div style="text-align: center;">'+
+            '<div class="card_buttonbox">'+
                 '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
                 '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">OpenSea</button></a>'+
                 button_element+
@@ -244,7 +244,7 @@ async function render_token_sales(contract, sales) {
                 '<text style="color: #1a202c; font-weight: bold;">Date</text>'+'<br>'+
                 '<text class="card_text">'+sale_date+'</text>'+
             '</div>'+
-            '<div style="text-align: center;">'+
+            '<div class="card_buttonbox">'+
                 '<br><a href="https://etherscan.io/tx/'+txHash+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
                 '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">OpenSea</button></a>'+
             '</div>';
@@ -294,7 +294,7 @@ async function render_held_tokens(wallet, tokens) {
                 '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
                 '<text class="card_text">--</text>'+
             '</div>'+
-            '<div style="text-align: center;">'+
+            '<div class="card_buttonbox">'+
                 '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
                 '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
                 button_element+
@@ -367,7 +367,7 @@ async function render_owners_tokens(wallet, tokens, next_string) {
             //progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>';
             if (owner.toLowerCase() == user_address.toLowerCase()) { 
                 button_element = // Un-stake button
-                    '<div style="text-align: center;">'+
+                    '<div class="card_buttonbox">'+
                         '<button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>'+
                     '</div>';
             } else { button_element = ''; }
@@ -376,7 +376,7 @@ async function render_owners_tokens(wallet, tokens, next_string) {
             progress_element = ''; staked = 'False'; staked_status = 'tomato'; staked_lvl = '--'; staked_next_lvl = '--';
             if (owner.toLowerCase() == user_address.toLowerCase()) { 
                 button_element = // Stake button
-                    '<div style="text-align: center;">'+
+                    '<div class="card_buttonbox">'+
                         '<button class="stake_button" onclick="initiate_stake('+tokenId+')">Stake</button>'+
                     '</div>';
             } else { button_element = ''; }
@@ -792,7 +792,7 @@ async function fetch_staked_tokens(wallet) {
                     '<text style="color: #1a202c; font-weight: bold;">Rewards</text>'+'<br>'+
                     '<text class="card_text">'+Math.round(staked_rewards)+' Flyz</text>'+
                 '</div>'+
-                '<div style="text-align: center;">'+
+                '<div class="card_buttonbox">'+
                     '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
                     '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="opensea_button">OpenSea</button></a>'+
                     button_element+

@@ -324,6 +324,11 @@ html {
     box-shadow: none;
     top: -2px;
   }
+  .card_buttonbox {
+    text-align: center;
+    display: table;
+    margin: 4px;
+  }
   .card_text {
     color: teal;
     font-weight: 500 !important;
