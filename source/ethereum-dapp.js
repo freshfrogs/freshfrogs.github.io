@@ -233,8 +233,6 @@ async function render_token_sales(contract, sales) {
             mint_volume_usd = mint_volume_usd + Number(usd);
         }
 
-        
-
         var html_elements = 
             '<div class="infobox_left">'+
                 '<text class="card_text">Last Sale</text>'+'<br>'+
@@ -289,21 +287,21 @@ async function render_held_tokens(wallet, tokens) {
         } else { button_element = ''; }
         var html_elements = 
             '<div class="infobox_left">'+
-                '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
-                '<text class="card_text" id="frog_type">'+truncateAddress(wallet)+'</text>'+
+                '<text class="card_text">Owner</text>'+'<br>'+
+                '<text class="card_bold" id="frog_type">'+truncateAddress(wallet)+'</text>'+
             '</div>'+
             '<div class="infobox_right">'+
-                '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
-                '<text id="staked_'+tokenId+'" style="color: tomato; font-weight: 500;">False</text>'+
+                '<text class="card_text">Staked</text>'+'<br>'+
+                '<text id="staked_'+tokenId+'" class="card_bold" style="color: tomato;">False</text>'+
             '</div>'+
             '<br>'+
             '<div class="infobox_left">'+
-                '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
-                '<text id="nextlvl_'+tokenId+'" class="card_text">--</text>'+
+                '<text class="card_text">Next Level</text>'+'<br>'+
+                '<text id="nextlvl_'+tokenId+'" class="card_bold">--</text>'+
             '</div>'+
             '<div class="infobox_right">'+
-                '<text style="color: #1a202c; font-weight: bold;">Rewards</text>'+'<br>'+
-                '<text id="rewards_'+tokenId+'" class="card_text">--</text>'+
+                '<text class="card_text">Rewards</text>'+'<br>'+
+                '<text id="rewards_'+tokenId+'" class="card_bold">--</text>'+
             '</div>'+
             '<div id="buttonsPanel_'+tokenId+'" class="card_buttonbox">'+
                 '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
