@@ -169,7 +169,7 @@ async function fetch_held_tokens(wallet, limit, next_string) {
 async function update_staked_tokens(tokens) {
     console.log(tokens)
     tokens.forEach(async (token) => {
-        
+
         var { token: { tokenId } } = token
         let owner = await stakerAddress(tokenId);
         let staked_values = await stakingValues(tokenId);
@@ -179,7 +179,10 @@ async function update_staked_tokens(tokens) {
         //var progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
         //var progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>';
 
-        try { document.getElementById('staked_'+tokenId).innerHTML = staked_time+' days'; } catch (e) { console.log(e.message) }
+        try {
+            document.getElementById('staked_'+tokenId).innerHTML = staked_time+' days';
+            document.getElementById('staked_'+tokenId).style.color = 'teal';
+        } catch (e) { console.log(e.message) }
         try { document.getElementById('nextlvl_'+tokenId).innerHTML = staked_next_lvl+' days'; } catch (e) { console.log(e.message) }
         try { document.getElementById('rewards_'+tokenId).innerHTML = Math.round(staked_rewards); } catch (e) { console.log(e.message) }
         try {
