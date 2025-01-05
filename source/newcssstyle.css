@@ -458,7 +458,7 @@ html {
     border-radius: 15px;
     border: 1px solid black;
     min-width: 300px;
-    max-width: 600px;
+    max-width: 500px;
     box-shadow: 2px 2px darkslategray;
   }
   .headerPanel {
