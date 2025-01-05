@@ -134,6 +134,15 @@ async function fetch_token_sales(contract, limit, next_string) {
     .catch(err => console.error(err));
 }
 
+function timestampToDate(timestamp) {
+    const date = new Date(timestamp * 1000); // Convert to milliseconds
+    const mm = date.getMonth() + 1; // JavaScript months are 0-indexed
+    const dd = date.getDate();
+    const yy = date.getFullYear().toString().slice(-2);
+  
+    return `${mm}/${dd}/${yy}`;
+  }
+
 /*
 
     Fetch NFT tokens held by user using Reservoir API. Returns => Object
