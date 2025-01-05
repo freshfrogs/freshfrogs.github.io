@@ -70,7 +70,7 @@ html {
     cursor: pointer;
   }
   .properties {
-    display: inline-block;
+    display: initial;
     border-top-left-radius: 5px;
     border-bottom-right-radius: 5px;
   }
