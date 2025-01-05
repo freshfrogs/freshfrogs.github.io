@@ -279,7 +279,7 @@ async function render_held_tokens(wallet, tokens) {
         var html_elements = 
             '<div class="infobox_left">'+
                 '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
-                '<text style="color: tomato; font-weight: bold;">False</text>'+
+                '<text style="color: tomato; font-weight: 500;">False</text>'+
             '</div>'+
             '<div class="infobox_right">'+
                 '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
@@ -291,7 +291,7 @@ async function render_held_tokens(wallet, tokens) {
                 '<text class="card_text">--</text>'+
             '</div>'+
             '<div class="infobox_right">'+
-                '<text style="color: #1a202c; font-weight: bold;">Level</text>'+'<br>'+
+                '<text style="color: #1a202c; font-weight: bold;">Rewards</text>'+'<br>'+
                 '<text class="card_text">--</text>'+
             '</div>'+
             '<div style="text-align: center;">'+
