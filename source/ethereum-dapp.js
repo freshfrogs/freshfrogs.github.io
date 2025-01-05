@@ -233,6 +233,8 @@ async function render_token_sales(contract, sales) {
             mint_volume_usd = mint_volume_usd + Number(usd);
         }
 
+        
+
         var html_elements = 
             '<div class="infobox_left">'+
                 '<text class="card_text">Last Sale</text>'+'<br>'+
@@ -249,7 +251,7 @@ async function render_token_sales(contract, sales) {
             '</div>'+
             '<div class="infobox_right">'+
                 '<text class="card_text">Frog Type</text>'+'<br>'+
-                '<text class="card_bold">'+frog_type+'</text>'+
+                '<text class="card_bold">'+'--'+'</text>'+
             '</div>'+
             '<div id="buttonsPanel_'+tokenId+'" class="card_buttonbox">'+
                 '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
