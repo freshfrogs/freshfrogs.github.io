@@ -448,7 +448,7 @@ html {
     margin-bottom: auto;
   }
   .main_right {
-    padding: 20px;
+    padding: 4%;
     font-weight: normal;
     font-size: 14px;
     text-shadow: none;
@@ -461,18 +461,16 @@ html {
     box-shadow: 2px 2px darkslategray;
   }
   .headerPanel {
-    font-weight: normal;
-    font-size: 14px;
-    text-shadow: none;
-    color: black;
-    background-color: transparent;
-    border-radius: 5px;
+    width: 80% !important;
+    height: auto !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    float: none;
+    padding: 0% !important;
     border: none;
-    width: 100%;
-    min-width: 300px;
-    margin-left: auto;
-    margin-right: auto;
-    box-shadow: none;
+    min-width: 333px;
+    background-color: transparent;
+    color: white;
   }
   .morph-token-result {
     background: white;
