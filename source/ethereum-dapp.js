@@ -777,7 +777,7 @@ async function fetch_staked_tokens(wallet) {
                 '</div>'+
                 '<div class="infobox_right">'+
                     '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
-                    '<text id="staked_'+token_id+'" style="color: tomato; font-weight: 500;">'+staked_time+' days</text>'+
+                    '<text id="staked_'+token_id+'" style="color: teal; font-weight: 500;">'+staked_time+' days</text>'+
                 '</div>'+
                 '<br>'+
                 '<div class="infobox_left">'+
