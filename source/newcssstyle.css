@@ -458,6 +458,7 @@ html {
     border: 1px solid black;
     width: 50%;
     min-width: 300px;
+    max-width: 600px;
     box-shadow: 2px 2px darkslategray;
   }
   .headerPanel {
