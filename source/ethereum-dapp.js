@@ -206,6 +206,8 @@ async function update_staked_tokens(tokens) {
     })
 }
 
+
+
 /*
 
     Create html objects for token sales from fetch_token_sales()
@@ -214,15 +216,17 @@ async function update_staked_tokens(tokens) {
 async function render_token_sales(contract, sales) {
     sales.forEach(async (token) => {
 
-        var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } }, txHash } = token
-        var sale_date = createdAt.substring(0, 10);
+        var { createdAt, timestamp, from, to, token: { tokenId }, price: { amount: { decimal, usd } }, txHash } = token
+        var sale_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
 
         if (from !== '0x0000000000000000000000000000000000000000') {
+            saleorMint = 'Sold on'
             txn_string = 'sale'; from = truncateAddress(from)
             net_income_usd = net_income_usd + (Number(usd))*0.025
             sales_volume_eth = sales_volume_eth + Number(decimal);
             sales_volume_usd = sales_volume_usd + Number(usd);
         } else {
+            saleorMint = 'Minted on'
             txn_string = 'mint'; from = 'FreshFrogsNFT';
             net_income_usd = net_income_usd + Number(usd)
             mint_volume_eth = mint_volume_eth + Number(decimal);
@@ -231,21 +235,21 @@ async function render_token_sales(contract, sales) {
 
         var html_elements = 
             '<div class="infobox_left">'+
-                '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
-                '<text class="card_text">'+truncateAddress(to)+'</text>'+
+                '<text class="card_text">Last Sale</text>'+'<br>'+
+                '<text id="frog_type" class="card_bold">'+decimal+'Ξ '+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
             '</div>'+
             '<div class="infobox_right">'+
-                '<text style="color: #1a202c; font-weight: bold;">Last Sale</text>'+'<br>'+
-                '<text id="frog_type" class="card_text">'+decimal+'Ξ '+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
+                '<text class="card_text">Owner</text>'+'<br>'+
+                '<text class="card_bold">'+truncateAddress(to)+'</text>'+
             '</div>'+
             '<br>'+
             '<div class="infobox_left">'+
-                '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
-                '<text id="staked_'+tokenId+'" style="color: tomato; font-weight: 500;">False</text>'+
+                '<text class="card_text">'+saleOrMint+'</text>'+'<br>'+
+                '<text class="card_bold">False</text>'+
             '</div>'+
             '<div class="infobox_right">'+
-                '<text style="color: #1a202c; font-weight: bold;">Rewards</text>'+'<br>'+
-                '<text id="rewards_'+tokenId+'" class="card_text">--</text>'+
+                '<text class="card_text">Rewards</text>'+'<br>'+
+                '<text class="card_bold">--</text>'+
             '</div>'+
             '<div id="buttonsPanel_'+tokenId+'" class="card_buttonbox">'+
                 '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
