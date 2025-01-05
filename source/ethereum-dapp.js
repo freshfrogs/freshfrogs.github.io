@@ -172,14 +172,25 @@ async function update_staked_tokens(tokens) {
         var staked_rewards = staked_values[3]
         var staked_time = staked_values[0]
         var staked_next_lvl = staked_values[2].toString()
-        var progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
-        var progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>';
-        if (owner.toLowerCase() == user_address.toLowerCase()) { 
-            button_element =
-                '<br><button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>';
-                //'<button id="morph_button_'+tokenId+'" class="morph_button" onclick="metamorph_build()">Morph 🍄</button>';
-        } else { button_element = ''; }
+        //var progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
+        //var progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>';
 
+        document.getElementById('staked_'+tokenId).innerHTML = staked_time+' days'
+        document.getElementById('nextlvl_'+tokenId).innerHTML = staked_next_lvl+' days'
+        document.getElementById('rewards_'+tokenId).innerHTML = Math.round(staked_rewards)
+
+        if (owner.toLowerCase() == user_address.toLowerCase()) { 
+            document.getElementById('buttonsPanel_'+tokenId).innerHTML = 
+                '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
+                '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">OpenSea</button></a>'+
+                '<br><button class="unstake_button" onclick="initiate_withdraw('+tokenId+')">Un-stake</button>';
+            //'<button id="morph_button_'+tokenId+'" class="morph_button" onclick="metamorph_build()">Morph 🍄</button>';
+        } /* else {
+            document.getElementById('buttonsPanel_'+tokenId).innerHTML = 
+                '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
+                '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">OpenSea</button></a>';
+        }
+        
         document.getElementById('prop_'+'Frog #'+tokenId).innerHTML = 
             '<div class="infobox_left">'+
                 '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
@@ -203,6 +214,7 @@ async function update_staked_tokens(tokens) {
                 '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">OpenSea</button></a>'+
                 button_element+
             '</div>';
+        */
     })
 }
 
@@ -283,18 +295,18 @@ async function render_held_tokens(wallet, tokens) {
             '</div>'+
             '<div class="infobox_right">'+
                 '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
-                '<text style="color: tomato; font-weight: 500;">False</text>'+
+                '<text id="staked_'+tokenId+'" style="color: tomato; font-weight: 500;">False</text>'+
             '</div>'+
             '<br>'+
             '<div class="infobox_left">'+
                 '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
-                '<text class="card_text">--</text>'+
+                '<text id="nextlvl_'+tokenId+'" class="card_text">--</text>'+
             '</div>'+
             '<div class="infobox_right">'+
                 '<text style="color: #1a202c; font-weight: bold;">Rewards</text>'+'<br>'+
-                '<text class="card_text">--</text>'+
+                '<text id="rewards_'+tokenId+'" class="card_text">--</text>'+
             '</div>'+
-            '<div class="card_buttonbox">'+
+            '<div id="buttonsPanel_'+tokenId+'" class="card_buttonbox">'+
                 '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
                 '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
                 button_element+
@@ -752,8 +764,6 @@ async function fetch_staked_tokens(wallet) {
     if (! wallet) { wallet = user_address; }
     await getStakedTokens(wallet)
     .then(async (tokens) => {
-        console.log('Fetching (STAKED) tokens from address: \n'+wallet+'\n')
-        console.log(tokens)
         tokens.forEach(async (token) => {
             //var token_owner = await collection.methods.ownerOf(token_id).call();
             var token_id = token.tokenId;
@@ -765,7 +775,7 @@ async function fetch_staked_tokens(wallet) {
             staked_lvl = staked_values[1];
             staked_time = staked_values[0];
             staked_rewards = staked_values[3];
-            staked_next_lvl = staked_values[2].toString()+' days';
+            staked_nextlvl = staked_values[2].toString();
             //progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
             //progress_element = ''//'<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>'
             if (owner.toLowerCase() == user_address.toLowerCase()) {
@@ -781,20 +791,20 @@ async function fetch_staked_tokens(wallet) {
                 '</div>'+
                 '<div class="infobox_right">'+
                     '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
-                    '<text class="card_text">'+staked_time+' days</text>'+
+                    '<text id="staked_'+token_id+'" style="color: tomato; font-weight: 500;">'+staked_time+' days</text>'+
                 '</div>'+
                 '<br>'+
                 '<div class="infobox_left">'+
                     '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
-                    '<text class="card_text">'+staked_next_lvl+' days</text>'+
+                    '<text id="nextlvl_'+token_id+'" class="card_text">'+staked_nextlvl+' days</text>'+
                 '</div>'+
                 '<div class="infobox_right">'+
                     '<text style="color: #1a202c; font-weight: bold;">Rewards</text>'+'<br>'+
-                    '<text class="card_text">'+Math.round(staked_rewards)+' Flyz</text>'+
+                    '<text id="rewards_'+token_id+'" class="card_text">'+Math.round(staked_rewards)+' Flyz</text>'+
                 '</div>'+
-                '<div class="card_buttonbox">'+
+                '<div id="buttonsPanel_'+token_id+'" class="card_buttonbox">'+
                     '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
-                    '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="opensea_button">OpenSea</button></a>'+
+                    '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
                     button_element+
                 '</div>';
 
