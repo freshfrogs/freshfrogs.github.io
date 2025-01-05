@@ -215,6 +215,7 @@ async function render_token_sales(contract, sales) {
     sales.forEach(async (token) => {
         var { createdAt, from, to, token: { tokenId }, price: { amount: { decimal, usd } }, txHash } = token
         var sale_date = createdAt.substring(0, 10);
+        sale_date = LocalDate.parse(sale_date, DateTimeFormatter.ofPattern("yyyy-dd-MM")).format(DateTimeFormatter.ofPattern("dd-MMM-yyyy"))
         if (from !== '0x0000000000000000000000000000000000000000') {
             txn_string = 'sale'; from = truncateAddress(from)
             net_income_usd = net_income_usd + (Number(usd))*0.025
