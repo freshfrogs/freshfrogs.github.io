@@ -103,7 +103,7 @@ html {
     overflow: hidden;
     margin-left: auto;
     margin-right: auto;
-    transition: 100ms ease-in-out;
+    transition: width 1s, height 1s;
   }
   .display_token_img_cont:hover {
     width: 192px;
@@ -139,7 +139,7 @@ html {
     width: inherit;
     height: inherit;
     cursor: pointer;
-    transition: 100ms ease-in-out;
+    transition: width 1s, height 1s;
   }
   .trait_overlay {
     transition: all .2s;
@@ -150,7 +150,7 @@ html {
     width: inherit;
     height: inherit;
     cursor: pointer;
-    transition: 100ms ease-in-out;
+    transition: width 1s, height 1s;
   }
   .parentPanel {
     width: 90% !important;
