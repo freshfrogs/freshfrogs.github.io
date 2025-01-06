@@ -139,7 +139,7 @@ html {
     width: 128px;
     height: 128px;
     cursor: pointer;
-    transition: 1000ms ease-in-out;
+    transition: 100ms ease-in-out;
   }
   .attribute_overlay:hover {
     width: 192px;
@@ -154,7 +154,7 @@ html {
     width: 128px;
     height: 128px;
     cursor: pointer;
-    transition: 1000ms ease-in-out;
+    transition: 100ms ease-in-out;
   }
   .trait_overlay:hover {
     width: 192px;
