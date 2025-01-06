@@ -783,21 +783,21 @@ async function fetch_staked_tokens(wallet) {
 
             var html_elements = 
                 '<div class="infobox_left">'+
-                    '<text style="color: #1a202c; font-weight: bold;">Owner</text>'+'<br>'+
-                    '<text class="card_text" id="frog_type">'+truncateAddress(owner)+'</text>'+
+                    '<text class="card_text">Owner</text>'+'<br>'+
+                    '<text class="card_bold" id="frog_type">'+truncateAddress(owner)+'</text>'+
                 '</div>'+
                 '<div class="infobox_right">'+
-                    '<text style="color: #1a202c; font-weight: bold;">Staked</text>'+'<br>'+
-                    '<text id="staked_'+token_id+'" style="color: teal; font-weight: 500;">'+staked_time+' days</text>'+
+                    '<text class="card_text">Staked</text>'+'<br>'+
+                    '<text id="staked_'+token_id+'" class="card_bold">'+staked_time+' days</text>'+
                 '</div>'+
                 '<br>'+
                 '<div class="infobox_left">'+
-                    '<text style="color: #1a202c; font-weight: bold;">Next Level</text>'+'<br>'+
-                    '<text id="nextlvl_'+token_id+'" class="card_text">'+staked_nextlvl+' days</text>'+
+                    '<text class="card_text">Next Level</text>'+'<br>'+
+                    '<text id="nextlvl_'+token_id+'" class="card_bold">'+staked_nextlvl+' days</text>'+
                 '</div>'+
                 '<div class="infobox_right">'+
-                    '<text style="color: #1a202c; font-weight: bold;">Rewards</text>'+'<br>'+
-                    '<text id="rewards_'+token_id+'" class="card_text">'+Math.round(staked_rewards)+' Flyz</text>'+
+                    '<text class="card_text">Rewards</text>'+'<br>'+
+                    '<text id="rewards_'+token_id+'" class="card_bold">'+Math.round(staked_rewards)+' Flyz</text>'+
                 '</div>'+
                 '<div id="buttonsPanel_'+token_id+'" class="card_buttonbox">'+
                     '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
