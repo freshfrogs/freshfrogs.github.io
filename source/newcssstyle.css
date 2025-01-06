@@ -136,8 +136,8 @@ html {
     image-rendering: pixelated;
     overflow: hidden;
     position: absolute;
-    width: 128px;
-    height: 128px;
+    width: inherit;
+    height: inherit;
     cursor: pointer;
     transition: 100ms ease-in-out;
   }
@@ -151,8 +151,8 @@ html {
     image-rendering: pixelated;
     overflow: hidden;
     position: absolute;
-    width: 128px;
-    height: 128px;
+    width: inherit;
+    height: inherit;
     cursor: pointer;
     transition: 100ms ease-in-out;
   }
