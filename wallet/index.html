@@ -38,11 +38,6 @@
         await fetch_held_tokens();
         //await morph_ui();
 
-        document.getElementById('holdingsButton').style.boxShadow = '2px 2px lightsalmon'
-        document.getElementById('randomLogo').onclick = async function (e) {
-          clearInterval(intervalId);
-        }
-
         async function build_random_logo() {
           // Random Frog Element:
           document.getElementById('randomLogo').innerHTML = ''
