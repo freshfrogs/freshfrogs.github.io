@@ -180,7 +180,7 @@ async function update_staked_tokens(tokens) {
 
         var { token: { tokenId } } = token
         let owner = await stakerAddress(tokenId);
-        if (owner == false) { // Token is staked
+        if (owner !== false) { // Token is staked
             let staked_values = await stakingValues(tokenId);
             var staked_rewards = staked_values[3]
             var staked_time = staked_values[0]
