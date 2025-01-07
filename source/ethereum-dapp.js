@@ -295,7 +295,7 @@ async function render_token_mints(contract, mints) {
             rarityColor = 'turquoise';
         } else if (rarityScore >= 100) {
             rarityColor = 'coral';
-        } if (rarityScore >= 50) {
+        } else if (rarityScore >= 50) {
             rarityColor = 'cornflowerblue';
         } else { rarityColor = 'teal'; }
 
