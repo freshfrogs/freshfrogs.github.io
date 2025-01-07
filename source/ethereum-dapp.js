@@ -238,12 +238,12 @@ async function render_token_sales(contract, sales) {
         
             var html_elements = 
                 '<div class="infobox_left">'+
-                    '<text class="card_text">Last Sale</text>'+'<br>'+
-                    '<text id="frog_type" class="card_bold">'+decimal+'Ξ '+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
-                '</div>'+
-                '<div class="infobox_right">'+
                     '<text class="card_text">Owner</text>'+'<br>'+
                     '<text class="card_bold">'+truncateAddress(to)+'</text>'+
+                '</div>'+
+                '<div class="infobox_right">'+
+                    '<text class="card_text">Price</text>'+'<br>'+
+                    '<text id="frog_type" class="card_bold">'+decimal+'Ξ '+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
                 '</div>'+
                 '<br>'+
                 '<div class="infobox_left">'+
