@@ -875,14 +875,14 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
     // Create Element <--
     token_doc.appendChild(token_element);
 
-    rarityRanking = 1;
+    var rarityRanking;
 
     // Update Metadata! Build Frog -->
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
         let attribute = metadata.attributes[i]
         rarityRanking = rarityScores[attribute.value] + rarityRanking
-        console.log(rarityScores[attribute.value]+': '+rarityRanking)
+        console.log(attribute.value+': '+rarityScores[attribute.value])
         /* if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
 
             // get special dna from token id
