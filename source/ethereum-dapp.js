@@ -138,13 +138,13 @@ async function fetch_token_mints(contract, limit, next_string) {
     if (! contract) { contract = COLLECTION_ADDRESS; }
     if (! limit) { limit = '50'; }
     if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
-    fetch('https://api.reservoir.tools/collections/activity/v6?collection='+contract+'&types=mint'+next, options)
+    fetch('https://api.reservoir.tools/collections/activity/v6?collection='+contract+'&types=sale'+next, options)
     .then((data) => data.json())
     .then((data) => {
         console.log(data)
         render_token_mints(contract, data.activities);
         if (! data.continuation) { return }
-        else {} //fetch_token_mints(contract, limit, data.continuation); }
+        else { fetch_token_mints(contract, limit, data.continuation); }
     })
     .catch(err => console.error(err));
 }
@@ -285,7 +285,7 @@ async function render_token_mints(contract, mints) {
     mints.forEach(async (token) => {
 
         var { createdAt, timestamp, fromAddress, toAddress, token: { tokenId, rarityScore }, price: { amount: { decimal, usd } }, txHash } = token
-        var mint_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
+        var txn_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
         txn_string = 'mint';
         rarityScore = parseInt(rarityScore);
 
@@ -310,8 +310,8 @@ async function render_token_mints(contract, mints) {
             '</div>'+
             '<br>'+
             '<div class="infobox_left">'+
-                '<text class="card_text">Minted on</text>'+'<br>'+
-                '<text class="card_bold">'+mint_date+'</text>'+
+                '<text class="card_text">Date</text>'+'<br>'+
+                '<text class="card_bold">'+txn_date+'</text>'+
             '</div>'+
             '<div class="infobox_right">'+
                 '<text class="card_text">Rarity</text>'+'<br>'+
