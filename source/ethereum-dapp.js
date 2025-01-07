@@ -881,7 +881,8 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
         let attribute = metadata.attributes[i]
-        rarityRanking = (rarityScores[attribute.value]*10) + rarityRanking
+        rarityRanking = rarityScores[attribute.value] + rarityRanking
+        console.log(rarityScores[attribute.value]+': '+rarityRanking)
         /* if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
 
             // get special dna from token id
@@ -898,7 +899,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
         // }
     }
 
-    console.log('Frog #'+token_id+' -- '+rarityRanking)
+    console.log('Frog #'+token_id+' --> '+rarityRanking)
     try {
         if (rarityRanking >= 400) {
             rarityColor = 'violet';
