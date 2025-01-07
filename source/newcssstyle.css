@@ -156,7 +156,6 @@ html {
     transition: width .2s, height .2s;
   }
   .parentPanel {
-    width: 90% !important;
     height: auto !important;
     margin-left: auto !important;
     margin-right: auto !important;
@@ -164,6 +163,7 @@ html {
     padding: 0% !important;
     border: none;
     min-width: 333px;
+    width: fit-content !important;
     background-color: transparent;
     color: white;
   }
@@ -374,7 +374,7 @@ html {
     font-weight: bolder;
     background: transparent;
     border-radius: 5px;
-    display: ruby;
+    display: inline-flex;
     border: none;
     box-shadow: none;
     font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji !important;
@@ -452,6 +452,7 @@ html {
     padding: 15px;
     margin: 15px;
     border: 1px solid black;
+    width: 256px;
     border-radius: 15px;
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
