@@ -117,7 +117,7 @@ const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': frog_api}}
 /*
 
     Fetch NFT token sales (initial & secondary) using Reservoir API. Returns => Object
-
+    'https://api.reservoir.tools/collections/activity/v6?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&types=mint', options
 */
 async function fetch_token_sales(contract, limit, next_string) {
     if (! contract) { contract = COLLECTION_ADDRESS; }
@@ -130,6 +130,21 @@ async function fetch_token_sales(contract, limit, next_string) {
         render_token_sales(contract, data.sales);
         if (! data.continuation) { return }
         else { sales_load_button(contract, limit, data.continuation); }
+    })
+    .catch(err => console.error(err));
+}
+
+async function fetch_token_mints(contract, limit, next_string) {
+    if (! contract) { contract = COLLECTION_ADDRESS; }
+    if (! limit) { limit = '50'; }
+    if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
+    fetch('https://api.reservoir.tools/collections/activity/v6?collection='+contract+'&types=mint', options)
+    .then((data) => data.json())
+    .then((data) => {
+        console.log(data)
+        render_token_mints(contract, data.sales);
+        if (! data.continuation) { return }
+        else { fetch_token_mints(contract, limit, data.continuation); }
     })
     .catch(err => console.error(err));
 }
@@ -264,17 +279,40 @@ async function render_token_sales(contract, sales) {
         }
     })
 
-    /*
-    console.log('\nSales Volume:'+
-        '\n - - -> '+ sales_volume_eth.toFixed(2)+' ETH'+
-        '\n - - -> $'+ sales_volume_usd.toFixed(2)+''
-    );
-    console.log('\nMint Volume:'+
-        '\n - - -> '+ mint_volume_eth.toFixed(2)+' ETH'+
-        '\n - - -> $'+ mint_volume_usd.toFixed(2)+''+
-        '\n - - -> Net: $'+net_income_usd.toFixed(2)
-    );
-    */
+}
+
+async function render_token_mints(contract, sales) {
+    sales.forEach(async (token) => {
+
+        var { createdAt, timestamp, fromAddress, toAddress, token: { tokenId }, price: { amount: { decimal, usd } }, txHash } = token
+        var sale_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
+        var html_elements = 
+            '<div class="infobox_left">'+
+                '<text class="card_text">Owner</text>'+'<br>'+
+                '<text class="card_bold">'+truncateAddress(toAddress)+'</text>'+
+            '</div>'+
+            '<div class="infobox_right">'+
+                '<text class="card_text">Price</text>'+'<br>'+
+                '<text id="frog_type" class="card_bold">'+decimal+'Ξ '+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
+            '</div>'+
+            '<br>'+
+            '<div class="infobox_left">'+
+                '<text class="card_text">Minted on</text>'+'<br>'+
+                '<text class="card_bold">'+sale_date+'</text>'+
+            '</div>'+
+            '<div class="infobox_right">'+
+                '<text class="card_text">Frog Type</text>'+'<br>'+
+                '<text class="card_bold">'+'--'+'</text>'+
+            '</div>'+
+            '<div id="buttonsPanel_'+tokenId+'" class="card_buttonbox">'+
+                '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
+                '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
+            '</div>';
+
+        await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash);
+
+    })
+
 }
 
 /*
