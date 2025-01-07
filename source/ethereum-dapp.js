@@ -287,16 +287,15 @@ async function render_token_mints(contract, mints) {
         var { createdAt, timestamp, fromAddress, toAddress, token: { tokenId, rarityScore }, price: { amount: { decimal, usd } }, txHash } = token
         var mint_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
         txn_string = 'mint';
+        rarityScore = parseInt(rarityScore);
 
         if (rarityScore >= 51) {
-            rarityColor = 'teal'
-        } else if (rarityScore >= 76) {
             rarityColor = 'cornflowerblue'
-        } else if (rarityScore >= 90) {
+        } else if (rarityScore >= 101) {
             rarityColor = 'coral'
-        } else if (rarityScore >= 95) {
+        } else if (rarityScore >= 201) {
             rarityColor = 'turquoise'
-        } else if (rarityScore >= 99) {
+        } else if (rarityScore >= 301) {
             rarityColor = 'violet'
         }
 
