@@ -288,15 +288,15 @@ async function render_token_mints(contract, mints) {
         var txn_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
         txn_string = 'mint';
         rarityScore = Number(rarityScore);
-
-        if (rarityScore > 50) {
-            rarityColor = 'cornflowerblue';
-        } else if (rarityScore > 100) {
-            rarityColor = 'coral';
-        } else if (rarityScore > 200) {
-            rarityColor = 'turquoise';
-        } else if (rarityScore > 300) {
+        
+        if (rarityScore >= 400) {
             rarityColor = 'violet';
+        } else if (rarityScore >= 200) {
+            rarityColor = 'turquoise';
+        } else if (rarityScore >= 100) {
+            rarityColor = 'coral';
+        } if (rarityScore >= 50) {
+            rarityColor = 'cornflowerblue';
         } else { rarityColor = 'teal'; }
 
         var html_elements = 
