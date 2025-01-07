@@ -287,23 +287,18 @@ async function render_token_mints(contract, mints) {
         var { createdAt, timestamp, fromAddress, toAddress, token: { tokenId, rarityScore }, price: { amount: { decimal, usd } }, txHash } = token
         var txn_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
         txn_string = 'mint';
-        rarityScore = parseInt(rarityScore);
+        rarityScore = Number(rarityScore);
         
         if (rarityScore >= 400) {
             rarityColor = 'violet';
-            rarityScore = 'Exotic'
         } else if (rarityScore >= 200) {
             rarityColor = 'darkorchid';
-            rarityScore = 'Mythic'
         } else if (rarityScore >= 100) {
             rarityColor = 'coral';
-            rarityScore = 'Epic'
         } else if (rarityScore >= 50) {
             rarityColor = 'cornflowerblue';
-            rarityScore = 'Uncommon'
         } else {
             rarityColor = 'teal';
-            rarityScore = 'Common'
         }
 
         var html_elements = 
@@ -317,7 +312,7 @@ async function render_token_mints(contract, mints) {
             '</div>'+
             '<br>'+
             '<div class="infobox_left">'+
-                '<text class="card_text">Rarity Tier</text>'+'<br>'+
+                '<text class="card_text">Rarity Score</text>'+'<br>'+
                 '<text class="card_bold" style="color: '+rarityColor+' !important">'+rarityScore+'</text>'+
             '</div>'+
             '<div class="infobox_right">'+
