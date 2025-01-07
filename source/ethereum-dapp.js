@@ -310,12 +310,12 @@ async function render_token_mints(contract, mints) {
             '</div>'+
             '<br>'+
             '<div class="infobox_left">'+
-                '<text class="card_text">Date</text>'+'<br>'+
-                '<text class="card_bold">'+txn_date+'</text>'+
-            '</div>'+
-            '<div class="infobox_right">'+
                 '<text class="card_text">Rarity</text>'+'<br>'+
                 '<text class="card_bold" style="color: '+rarityColor+' !important">'+rarityScore+'</text>'+
+            '</div>'+
+            '<div class="infobox_right">'+
+                '<text class="card_text">Date</text>'+'<br>'+
+                '<text class="card_bold">'+txn_date+'</text>'+
             '</div>'+
             '<div id="buttonsPanel_'+tokenId+'" class="card_buttonbox">'+
                 '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
