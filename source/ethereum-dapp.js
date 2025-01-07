@@ -142,7 +142,7 @@ async function fetch_token_mints(contract, limit, next_string) {
     .then((data) => data.json())
     .then((data) => {
         console.log(data)
-        render_token_mints(contract, data.sales);
+        render_token_mints(contract, data.activities);
         if (! data.continuation) { return }
         else {} //fetch_token_mints(contract, limit, data.continuation); }
     })
@@ -281,8 +281,8 @@ async function render_token_sales(contract, sales) {
 
 }
 
-async function render_token_mints(contract, sales) {
-    sales.forEach(async (token) => {
+async function render_token_mints(contract, mints) {
+    mints.forEach(async (token) => {
 
         var { createdAt, timestamp, fromAddress, toAddress, token: { tokenId, rarityScore }, price: { amount: { decimal, usd } }, txHash } = token
         var sale_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
