@@ -284,8 +284,21 @@ async function render_token_sales(contract, sales) {
 async function render_token_mints(contract, sales) {
     sales.forEach(async (token) => {
 
-        var { createdAt, timestamp, fromAddress, toAddress, token: { tokenId }, price: { amount: { decimal, usd } }, txHash } = token
+        var { createdAt, timestamp, fromAddress, toAddress, token: { tokenId, rarityScore }, price: { amount: { decimal, usd } }, txHash } = token
         var sale_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
+
+        if (rarityScore >= 51) {
+            rarityColor = 'teal'
+        } else if (rarityScore >= 76) {
+            rarityColor = 'cornflowerblue'
+        } else if (rarityScore >= 90) {
+            rarityColor = 'coral'
+        } else if (rarityScore >= 95) {
+            rarityColor = 'turquoise'
+        } else if (rarityScore >= 99) {
+            rarityColor = 'violet'
+        }
+
         var html_elements = 
             '<div class="infobox_left">'+
                 '<text class="card_text">Owner</text>'+'<br>'+
@@ -301,8 +314,8 @@ async function render_token_mints(contract, sales) {
                 '<text class="card_bold">'+sale_date+'</text>'+
             '</div>'+
             '<div class="infobox_right">'+
-                '<text class="card_text">Frog Type</text>'+'<br>'+
-                '<text class="card_bold">'+'--'+'</text>'+
+                '<text class="card_text">Rarity</text>'+'<br>'+
+                '<text class="card_bold" style="color: '+rarityColor+' !important">'+rarityScore+'</text>'+
             '</div>'+
             '<div id="buttonsPanel_'+tokenId+'" class="card_buttonbox">'+
                 '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
