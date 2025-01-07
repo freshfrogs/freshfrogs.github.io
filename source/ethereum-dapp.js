@@ -144,7 +144,7 @@ async function fetch_token_mints(contract, limit, next_string) {
         console.log(data)
         render_token_mints(contract, data.sales);
         if (! data.continuation) { return }
-        else { fetch_token_mints(contract, limit, data.continuation); }
+        else {} //fetch_token_mints(contract, limit, data.continuation); }
     })
     .catch(err => console.error(err));
 }
