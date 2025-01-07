@@ -285,7 +285,7 @@ async function render_token_mints(contract, mints) {
     mints.forEach(async (token) => {
 
         var { createdAt, timestamp, fromAddress, toAddress, token: { tokenId, rarityScore }, price: { amount: { decimal, usd } }, txHash } = token
-        var sale_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
+        var mint_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
 
         if (rarityScore >= 51) {
             rarityColor = 'teal'
@@ -311,7 +311,7 @@ async function render_token_mints(contract, mints) {
             '<br>'+
             '<div class="infobox_left">'+
                 '<text class="card_text">Minted on</text>'+'<br>'+
-                '<text class="card_bold">'+sale_date+'</text>'+
+                '<text class="card_bold">'+mint_date+'</text>'+
             '</div>'+
             '<div class="infobox_right">'+
                 '<text class="card_text">Rarity</text>'+'<br>'+
