@@ -123,7 +123,7 @@ async function fetch_token_sales(contract, limit, next_string) {
     if (! contract) { contract = COLLECTION_ADDRESS; }
     if (! limit) { limit = '50'; }
     if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
-    fetch('https://api.reservoir.tools/sales/v6?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?sortBy=time&sortDirection=asc&limit='+limit+next+'', options)
+    fetch('https://api.reservoir.tools/sales/v6?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?sortBy=time&sortDirection=desc&limit='+limit+next+'', options)
     .then((data) => data.json())
     .then((data) => {
         console.log(data)
@@ -233,30 +233,35 @@ async function render_token_sales(contract, sales) {
             mint_volume_usd = mint_volume_usd + Number(usd);
         }
 
-        var html_elements = 
-            '<div class="infobox_left">'+
-                '<text class="card_text">Last Sale</text>'+'<br>'+
-                '<text id="frog_type" class="card_bold">'+decimal+'Ξ '+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
-            '</div>'+
-            '<div class="infobox_right">'+
-                '<text class="card_text">Owner</text>'+'<br>'+
-                '<text class="card_bold">'+truncateAddress(to)+'</text>'+
-            '</div>'+
-            '<br>'+
-            '<div class="infobox_left">'+
-                '<text class="card_text">'+saleOrMint+'</text>'+'<br>'+
-                '<text class="card_bold">'+sale_date+'</text>'+
-            '</div>'+
-            '<div class="infobox_right">'+
-                '<text class="card_text">Frog Type</text>'+'<br>'+
-                '<text class="card_bold">'+'--'+'</text>'+
-            '</div>'+
-            '<div id="buttonsPanel_'+tokenId+'" class="card_buttonbox">'+
-                '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
-                '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
-            '</div>';
+        if (txn_string == 'mint') {
 
-        await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash);
+        
+            var html_elements = 
+                '<div class="infobox_left">'+
+                    '<text class="card_text">Last Sale</text>'+'<br>'+
+                    '<text id="frog_type" class="card_bold">'+decimal+'Ξ '+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
+                '</div>'+
+                '<div class="infobox_right">'+
+                    '<text class="card_text">Owner</text>'+'<br>'+
+                    '<text class="card_bold">'+truncateAddress(to)+'</text>'+
+                '</div>'+
+                '<br>'+
+                '<div class="infobox_left">'+
+                    '<text class="card_text">'+saleOrMint+'</text>'+'<br>'+
+                    '<text class="card_bold">'+sale_date+'</text>'+
+                '</div>'+
+                '<div class="infobox_right">'+
+                    '<text class="card_text">Frog Type</text>'+'<br>'+
+                    '<text class="card_bold">'+'--'+'</text>'+
+                '</div>'+
+                '<div id="buttonsPanel_'+tokenId+'" class="card_buttonbox">'+
+                    '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
+                    '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
+                '</div>';
+
+            await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash);
+
+        }
     })
 
     /*
