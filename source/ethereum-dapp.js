@@ -138,7 +138,7 @@ async function fetch_token_mints(contract, limit, next_string) {
     if (! contract) { contract = COLLECTION_ADDRESS; }
     if (! limit) { limit = '50'; }
     if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
-    fetch('https://api.reservoir.tools/collections/activity/v6?collection='+contract+'&types=sale'+next, options)
+    fetch('https://api.reservoir.tools/collections/activity/v6?collection='+contract+'&types=sale&types=mint'+next, options)
     .then((data) => data.json())
     .then((data) => {
         console.log(data)
