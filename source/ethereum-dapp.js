@@ -290,14 +290,14 @@ async function render_token_mints(contract, mints) {
         rarityScore = parseInt(rarityScore);
 
         if (rarityScore >= 51) {
-            rarityColor = 'cornflowerblue'
+            rarityColor = 'cornflowerblue';
         } else if (rarityScore >= 101) {
-            rarityColor = 'coral'
+            rarityColor = 'coral';
         } else if (rarityScore >= 201) {
-            rarityColor = 'turquoise'
+            rarityColor = 'turquoise';
         } else if (rarityScore >= 301) {
-            rarityColor = 'violet'
-        }
+            rarityColor = 'violet';
+        } else {rarityColor = 'teal';}
 
         var html_elements = 
             '<div class="infobox_left">'+
