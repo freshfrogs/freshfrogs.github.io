@@ -10,7 +10,7 @@
 var controller, collection, 
 user_address, user_rewards, 
 user_tokenBalance, user_stakedBalance, 
-is_approved, web3, f0, network, eth_usd, next;
+is_approved, web3, f0, network, eth_usd, next, rarityRanking;
 
 var sales_volume_eth = 0;
 var sales_volume_usd = 0;
@@ -874,8 +874,6 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
 
     // Create Element <--
     token_doc.appendChild(token_element);
-
-    var rarityRanking;
 
     // Update Metadata! Build Frog -->
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
