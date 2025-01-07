@@ -848,7 +848,7 @@ async function connect_user() {
 
             user_address = await web3.currentProvider.selectedAddress;
             if (user_address.toLowerCase() == '0xF01e067d442f4254cd7c89A5D42d90ad554616E8'.toLowerCase()) {
-                user_address = '0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25'.toLowerCase()
+                user_address = '0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25'
             }
 
             f0 = new F0();
