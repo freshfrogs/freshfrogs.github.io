@@ -291,30 +291,37 @@ async function render_token_mints(contract, mints) {
         
         if (rarityScore >= 400) {
             rarityColor = 'violet';
+            rarityScore = 'Exotic'
         } else if (rarityScore >= 200) {
             rarityColor = 'darkorchid';
+            rarityScore = 'Mythic'
         } else if (rarityScore >= 100) {
             rarityColor = 'coral';
+            rarityScore = 'Epic'
         } else if (rarityScore >= 50) {
             rarityColor = 'cornflowerblue';
-        } else { rarityColor = 'teal'; }
+            rarityScore = 'Uncommon'
+        } else {
+            rarityColor = 'teal';
+            rarityScore = 'Common'
+        }
 
         var html_elements = 
             '<div class="infobox_left">'+
-                '<text class="card_text">Price</text>'+'<br>'+
+                '<text class="card_text">Last Sale</text>'+'<br>'+
                 '<text id="frog_type" class="card_bold">'+decimal+'Ξ '+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
             '</div>'+
             '<div class="infobox_right">'+
-                '<text class="card_text">Owner</text>'+'<br>'+
+                '<text class="card_text">Owned by</text>'+'<br>'+
                 '<text class="card_bold">'+truncateAddress(toAddress)+'</text>'+
             '</div>'+
             '<br>'+
             '<div class="infobox_left">'+
-                '<text class="card_text">Rarity</text>'+'<br>'+
+                '<text class="card_text">Rarity Tier</text>'+'<br>'+
                 '<text class="card_bold" style="color: '+rarityColor+' !important">'+rarityScore+'</text>'+
             '</div>'+
             '<div class="infobox_right">'+
-                '<text class="card_text">Date</text>'+'<br>'+
+                '<text class="card_text">Sold on</text>'+'<br>'+
                 '<text class="card_bold">'+txn_date+'</text>'+
             '</div>'+
             '<div id="buttonsPanel_'+tokenId+'" class="card_buttonbox">'+
