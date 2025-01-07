@@ -335,7 +335,7 @@ html {
   }
   .card_bold {
     color: teal;
-    font-weight: 500;
+    font-weight: bold;
   }
   .frogs{
     width: 80% !important;
