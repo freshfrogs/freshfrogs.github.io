@@ -363,19 +363,6 @@ async function render_token_mints(contract, mints) {
         var { createdAt, timestamp, fromAddress, toAddress, token: { tokenId, rarityScore }, price: { amount: { decimal, usd } }, txHash } = token
         var txn_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
         txn_string = 'mint';
-        rarityScore = Number(rarityScore);
-        
-        if (rarityScore >= 400) {
-            rarityColor = 'violet';
-        } else if (rarityScore >= 200) {
-            rarityColor = 'darkorchid';
-        } else if (rarityScore >= 100) {
-            rarityColor = 'coral';
-        } else if (rarityScore >= 50) {
-            rarityColor = 'cornflowerblue';
-        } else {
-            rarityColor = 'teal';
-        }
 
         var html_elements = 
             '<div class="infobox_left">'+
@@ -389,7 +376,7 @@ async function render_token_mints(contract, mints) {
             '<br>'+
             '<div class="infobox_left">'+
                 '<text class="card_text">Rarity Score</text>'+'<br>'+
-                '<text class="card_bold" style="color: '+rarityColor+' !important">'+rarityScore+'</text>'+
+                '<text id="rarityRanking_'+tokenId+'" class="card_bold">--</text>'+
             '</div>'+
             '<div class="infobox_right">'+
                 '<text class="card_text">Sold on</text>'+'<br>'+
@@ -894,6 +881,23 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
     }
 
     console.log('Frog #'+token_id+' -- '+rarityRanking)
+    try {
+        if (rarityRanking >= 400) {
+            rarityColor = 'violet';
+        } else if (rarityRanking >= 200) {
+            rarityColor = 'darkorchid';
+        } else if (rarityRanking >= 100) {
+            rarityColor = 'coral';
+        } else if (rarityRanking >= 50) {
+            rarityColor = 'cornflowerblue';
+        } else {
+            rarityColor = 'teal';
+        }
+
+        document.getElementById('rarityRanking_'+token_id).innerHTML = rarityRanking
+        document.getElementById('rarityRanking_'+token_id).style.color = rarityColor
+        
+    } catch (e) {}
 }
 
 /*
