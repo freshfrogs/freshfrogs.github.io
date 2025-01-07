@@ -129,7 +129,7 @@ async function fetch_token_sales(contract, limit, next_string) {
         console.log(data)
         render_token_sales(contract, data.sales);
         if (! data.continuation) { return }
-        else { sales_load_button(contract, limit, data.continuation); }
+        else { sales_load_button('sales', contract, limit, data.continuation); }
     })
     .catch(err => console.error(err));
 }
@@ -144,7 +144,7 @@ async function fetch_token_mints(contract, limit, next_string) {
         console.log(data)
         render_token_mints(contract, data.activities);
         if (! data.continuation) { return }
-        else { fetch_token_mints(contract, limit, data.continuation); }
+        else { sales_load_button('mints', contract, limit, data.continuation); }
     })
     .catch(err => console.error(err));
 }
@@ -178,7 +178,7 @@ async function fetch_held_tokens(wallet, limit, next_string) {
             update_staked_tokens(data.tokens)
         }
         if (! data.continuation) { return }
-        else { load_more_button(wallet, limit, data.continuation); }
+        else { load_more_button('sales', wallet, limit, data.continuation); }
     })
     .catch(err => console.error(err));
 }
@@ -380,7 +380,7 @@ async function render_held_tokens(wallet, tokens) {
     Load more sales -- html button (front page)
 
 */
-async function sales_load_button(contract, limit, next_string) {
+async function sales_load_button(type, contract, limit, next_string) {
     if (next_string !== null && next_string !== '' && next_string !== 'undefined') {
         break_element = document.createElement('br')
         break_element.id = 'tempBreak'
@@ -388,7 +388,12 @@ async function sales_load_button(contract, limit, next_string) {
         loadMore = document.createElement('button')
         loadMore.id = 'loadMore'
         loadMore.className = 'loadmore_button'
-        loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); document.getElementById('tempBreak').remove(); await fetch_token_sales(contract, '150', next_string); }
+        
+        if (type == 'sales') {
+            loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); document.getElementById('tempBreak').remove(); await fetch_token_sales(contract, '150', next_string); }
+        } else if (type = 'mints') {
+            loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); document.getElementById('tempBreak').remove(); await fetch_token_mints(contract, '150', next_string); }
+        }
         loadMore.innerHTML = '▼'
         loadMore.style.width = '12%'
         loadMore.style.minWidth = '120px'
