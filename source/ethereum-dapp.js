@@ -289,13 +289,13 @@ async function render_token_mints(contract, mints) {
         txn_string = 'mint';
         rarityScore = parseInt(rarityScore);
 
-        if (rarityScore >= 51) {
+        if (rarityScore > 50) {
             rarityColor = 'cornflowerblue';
-        } else if (rarityScore >= 101) {
+        } else if (rarityScore > 100) {
             rarityColor = 'coral';
-        } else if (rarityScore >= 201) {
+        } else if (rarityScore > 200) {
             rarityColor = 'turquoise';
-        } else if (rarityScore >= 301) {
+        } else if (rarityScore > 300) {
             rarityColor = 'violet';
         } else {rarityColor = 'teal';}
 
