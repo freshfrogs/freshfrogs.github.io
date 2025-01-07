@@ -195,7 +195,7 @@ html {
     background: white;
     border: 0px solid black;
     border-radius: 5px;
-    min-width: auto;
+    min-width: 130px;
     height: auto;
     vertical-align: middle;
     font-size: small;
