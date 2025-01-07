@@ -103,7 +103,7 @@ html {
     overflow: hidden;
     margin-left: auto;
     margin-right: auto;
-    transition: width .5s, height .5s;
+    transition: width .2s, height .2s;
   }
   .display_token_img_cont:hover {
     width: 192px;
@@ -131,7 +131,6 @@ html {
     border-top-right-radius: 0px;
   }
   .attribute_overlay {
-    transition: all .2s;
     display: block;
     image-rendering: pixelated;
     overflow: hidden;
@@ -139,10 +138,9 @@ html {
     width: inherit;
     height: inherit;
     cursor: pointer;
-    transition: width .5s, height .5s;
+    transition: width .2s, height .2s;
   }
   .trait_overlay {
-    transition: all .2s;
     display: block;
     image-rendering: pixelated;
     overflow: hidden;
@@ -150,7 +148,7 @@ html {
     width: inherit;
     height: inherit;
     cursor: pointer;
-    transition: width .5s, height .5s;
+    transition: width .2s, height .2s;
   }
   .parentPanel {
     width: 90% !important;
