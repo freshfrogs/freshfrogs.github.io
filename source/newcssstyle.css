@@ -331,11 +331,11 @@ html {
   }
   .card_text {
     color: #1a202c;
-    font-weight: 500 !important;
+    font-weight: normal !important;
   }
   .card_bold {
     color: teal;
-    font-weight: bold;
+    font-weight: 500;
   }
   .frogs{
     width: 80% !important;
