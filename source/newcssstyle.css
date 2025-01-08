@@ -1,12 +1,11 @@
 html {
     background: cornflowerblue;
-    /*
+    /**/
     background-image: url("https://freshfrogs.github.io/source/background.png");
-    */
+    
   }
   body {
     background-color: transparent;
-    background: url(https://freshfrogs.github.io/source/1500x500.png);
     margin-left: auto;
     margin-right: auto;
     padding-top: 5%;
