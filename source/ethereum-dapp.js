@@ -789,7 +789,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
         var attribute = metadata.attributes[i].value;
         var trait_type = metadata.attributes[i].trait_type;
         var rarity = 1/(Number(rarityScores[attribute])/4040);
-        rarityScore = Number(rarityScore) + Number(rarity);
+        rarityScore = (parseInt(rarityScore) + parseInt(rarity))/10;
         build_trait(trait_type, attribute, 'cont_'+element_id);
     }
 
