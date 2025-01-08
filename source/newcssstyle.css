@@ -464,8 +464,6 @@ html {
   .main_left {
     padding: 15px;
     margin: 15px;
-    margin-left: auto;
-    margin-right: auto;
     border: 0px solid black;
     width: 512px;
     border-radius: 15px;
@@ -489,7 +487,7 @@ html {
   }
   .headerPanel {
     font-weight: normal;
-    font-size: 14px;
+    font-size: 15px;
     text-shadow: none;
     color: white;
     background-color: transparent;
