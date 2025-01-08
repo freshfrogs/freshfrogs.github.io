@@ -34,6 +34,8 @@ html {
   .frog_icon {
     width: 128px;
     height: 128px;
+    border-radius: 10px;
+    margin: 10px;
   }
   .icons_container {
     width: auto;
