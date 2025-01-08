@@ -31,7 +31,7 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        await build_random_logo();
+        //await build_random_logo();
         await fetch_token_mints(COLLECTION_ADDRESS, '50'); // await fetch_token_sales(COLLECTION_ADDRESS, '50');
 
         document.getElementById('randomLogo').onclick = async function (e) { clearInterval(intervalId); }
@@ -56,7 +56,9 @@
     <section id="parentPanel" class="parentPanel">
       <div id="logoHeader" class="logoHeader">
         <div class="main_left">
-          <div id="randomLogo" class="display_token_img_cont" style="border-radius: 100%; box-shadow: 2px 2px darkslategray; border: 1px solid black; width: 128px; height: 128px;"><img id="frog-logo" src="https://freshfrogs.github.io/source/blackWhite.png"></div>
+          <div id="randomLogo" class="display_token_img_cont" style="border-radius: 100%; box-shadow: 2px 2px darkslategray; border: 1px solid black; width: 128px; height: 128px;">
+            <img id="frog-logo" src="https://freshfrogs.github.io/source/FLY.gif">
+          </div>
           <i><h1 class="front_title">freshfrogs.github.io</h1></i>
         </div>
         <div class="main_right">
