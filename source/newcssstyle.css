@@ -6,6 +6,7 @@ html {
   }
   body {
     background-color: transparent;
+    background: url(https://freshfrogs.github.io/source/1500x500.png);
     margin-left: auto;
     margin-right: auto;
     padding-top: 5%;
@@ -161,11 +162,11 @@ html {
     margin-right: auto !important;
     float: none;
     padding: 1% !important;
-    border: none;
     min-width: 333px;
     width: fit-content !important;
-    background-color: transparent;
     color: white;
+    background: cadetblue;
+    border: 1px solid black;
   }
   .outputPanel {
     color: white;
@@ -193,7 +194,7 @@ html {
     margin: 4px;
     padding: 8px;
     background: white;
-    border: 0px solid black;
+    border: 1px solid black;
     border-radius: 5px;
     min-width: 130px;
     height: auto;
