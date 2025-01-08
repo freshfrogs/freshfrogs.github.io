@@ -18,100 +18,6 @@ var net_income_usd = 0;
 var mint_volume_eth = 0;
 var mint_volume_usd = 0;
 
-var rarityScores = {
-    // Frog Types
-        'blueDartFrog': 3,
-        'blueTreeFrog': 2,
-        'brownTreeFrog': 2,
-        'cyanTreeFrog': 2,
-        'goldenDartFrog': 3,
-        'goldenTreeFrog': 2,
-        'grayTreeFrog': 3,
-        'greenTreeFrog': 2,
-        'lightBrownTreeFrog': 3,
-        'orangeTreeFrog': 2,
-        'pinkTreeFrog': 2,
-        'purpleTreeFrog': 2,
-        'redEyedTreeFrog': 3,
-        'splendidLeafFrog': 3,
-        'stawverryDartFrog': 3,
-        'tomatoFrog': 2,
-        'treeFrog(1)': 1,
-        'treeFrog(2)': 1,
-        'treeFrog(3)': 1,
-        'treeFrog(4)': 1,
-        'treeFrog(5)': 1,
-        'treeFrog(6)': 1,
-        'treeFrog(7)': 1,
-        'treeFrog(8)': 1,
-        'unknown': 3,
-    // Special Frog Types
-        'closedEyes': 5,
-        'croaking': 4,
-        'inversedEyes': 5,
-        'peace': 6,
-        'thirdEye': 5,
-    // Trait
-        'blue(2)': 1,
-        'blue': 1,
-        'brown': 2,
-        'cyan': 2,
-        'darkGreen': 2,
-        'green': 1,
-        'natural': 4,
-        'orange(2)': 1,
-        'orange': 1,
-        'pink': 1,
-        'purple(2)': 1,
-        'purple': 1,
-        'red(2)': 1,
-        'red': 1,
-        'sand': 3,
-        'white(2)': 1,
-        'white': 1,
-        'yellow(2)': 1,
-        'yellow': 1,
-    // Eyes
-        'circleGlasses': 1,
-        'circleNightVision': 4,
-        'circleShadesGreen': 3,
-        'circleShadesPurple': 3,
-        'circleShadesRed': 3,
-        'shades': 1,
-        'shadesPurple': 2,
-        'shadesThreeD': 2,
-        'shadesWhite': 1,
-    // Hat
-        'baseballCapBlue': 1,
-        'baseballCapGreen': 1,
-        'baseballCapRed': 1,
-        'baseballCapWhite': 1,
-        'cowboyHatBlack': 1,
-        'cowboyHatBrown': 1,
-        'cowboyHatTan': 1,
-        'cowboyHatWhite': 1,
-        'crown': 3,
-        'stockingCap': 3,
-        'topHatBLue': 2,
-        'topHatRed': 2,
-        'topHatYellow': 2,
-        'witchBlack': 2,
-        'witchBrown': 2,
-        'witchStraw': 2,
-    // Mouth
-        'bandannaBlack': 2,
-        'bandannaBlue': 2,
-        'bandannaRed': 2,
-        'mask': 3,
-        'open': 2,
-        'smoking': 2,
-        'smokingCigar': 2,
-        'tongue': 1,
-        'tongueFly': 2,
-        'tongueSpider': 3,
-        'tongueSpiderRed': 4,
-    }
-
 var frogArray = [
     'blueDartFrog',
     'blueTreeFrog',
@@ -232,7 +138,7 @@ async function fetch_token_mints(contract, limit, next_string) {
     if (! contract) { contract = COLLECTION_ADDRESS; }
     if (! limit) { limit = '50'; }
     if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
-    fetch('https://api.reservoir.tools/collections/activity/v6?collection='+contract+'&types=sale&types=mint'+next, options)
+    fetch('https://api.reservoir.tools/collections/activity/v6?collection='+contract+'&types=sale'+next, options)
     .then((data) => data.json())
     .then((data) => {
         console.log(data)
