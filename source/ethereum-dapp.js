@@ -786,7 +786,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
     // Update Metadata! Build Frog -->
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
-        var attribute = metadata.attributes[i].valute;
+        var attribute = metadata.attributes[i].value;
         var trait_type = metadata.attributes[i].trait_type;
         var rarity = 1/(Number(rarityScores[attribute])/4040);
         rarityScore = Number(rarityScore) + Number(rarity);
