@@ -144,9 +144,9 @@ html {
     image-rendering: pixelated;
     overflow: hidden;
     position: absolute;
-    width: 128px;
-    height: 128px;
-    margin: 32px;
+    width: inherit;
+    height: inherit;
+    margin: 0px;
     cursor: pointer;
     transition: all .2s;
   }
@@ -160,9 +160,9 @@ html {
     image-rendering: pixelated;
     overflow: hidden;
     position: absolute;
-    margin: 32px;
-    width: 128px;
-    height: 128px;
+    margin: 0px;
+    width: inherit;
+    height: inherit;
     cursor: pointer;
     transition: width .2s, height .2s;
   }
