@@ -788,9 +788,10 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
     for (let i = 0; i < metadata.attributes.length; i++) {
         var attribute = metadata.attributes[i].value;
         var trait_type = metadata.attributes[i].trait_type;
-        var rarity = 1/(Number(rarityScores[attribute])/4040);
-        rarityScore = (parseInt(rarityScore) + parseInt(rarity))/10;
         build_trait(trait_type, attribute, 'cont_'+element_id);
+
+        var rarity = 1/(Number(rarityScores[attribute])/4040);
+        rarityScore = parseInt(rarityScore) + parseInt(rarity);
     }
 
     console.log('Frog #'+token_id+' --==> '+rarityScore)
