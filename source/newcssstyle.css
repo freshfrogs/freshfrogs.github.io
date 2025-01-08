@@ -471,6 +471,7 @@ html {
     border-top-right-radius: 15px;
     background: transparent;
     box-shadow: none;
+    text-align: left;
   }
   .main_right {
     padding: 15px;
@@ -489,7 +490,7 @@ html {
     font-weight: normal;
     font-size: 14px;
     text-shadow: none;
-    color: black;
+    color: white;
     background-color: transparent;
     border-radius: 5px;
     border: none;
