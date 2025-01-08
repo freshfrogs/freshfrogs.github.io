@@ -791,21 +791,21 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
         build_trait(attribute.trait_type, attribute.value, 'cont_'+element_id);
     }
 
-    console.log('Frog #'+token_id+' --> '+rarityRanking)
+    console.log('Frog #'+token_id+' --> '+rarityScore)
     try {
-        if (rarityRanking >= 400) {
+        if (rarityScore >= 400) {
             rarityColor = 'violet';
-        } else if (rarityRanking >= 200) {
+        } else if (rarityScore >= 200) {
             rarityColor = 'darkorchid';
-        } else if (rarityRanking >= 100) {
+        } else if (rarityScore >= 100) {
             rarityColor = 'coral';
-        } else if (rarityRanking >= 50) {
+        } else if (rarityScore >= 50) {
             rarityColor = 'cornflowerblue';
         } else {
             rarityColor = 'teal';
         }
 
-        document.getElementById('rarityRanking_'+token_id).innerHTML = rarityRanking
+        document.getElementById('rarityRanking_'+token_id).innerHTML = rarityScore
         document.getElementById('rarityRanking_'+token_id).style.color = rarityColor
         
     } catch (e) {}
