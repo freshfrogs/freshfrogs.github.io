@@ -785,7 +785,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
         let attribute = metadata.attributes[i]
-        rarityRanking = Number(rarityScores[attribute.value]) + Number(rarityRanking)
+        //rarityRanking = Number(rarityScores[attribute.value]) + Number(rarityRanking)
         console.log(attribute.value+': '+rarityScores[attribute.value])
         /* if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
 
