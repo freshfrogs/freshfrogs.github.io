@@ -888,7 +888,7 @@ async function fetch_eth_usd() {
 */
 async function initiate_web3_connection() {
     if (typeof window.ethereum !== "undefined") {
-        document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="pendingStatus"></div> Connecting...'
+        document.getElementById('connectButton').innerHTML = 'Connecting...'
         await connect_user();
     } else {
         // WEB3 browser extenstion could not be found!
@@ -990,7 +990,7 @@ async function update_frontend() {
     //parent_element.appendChild(break_element)
 
     // Connected Button
-    document.getElementById('connectButton').innerHTML = '<div id="connectStatus" class="connectedStatus"></div> Connected - ['+truncateAddress(user_address)+']'
+    document.getElementById('connectButton').innerHTML = 'Connected - ['+truncateAddress(user_address)+']'
     document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+user_tokenBalance+'/'+user_stakedBalance+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+user_tokenBalance+'/'+user_stakedBalance+')'); }
 
     // Mint Button | Mint Tokens
