@@ -786,26 +786,20 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
     // Update Metadata! Build Frog -->
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
-        let attribute = metadata.attributes[i]
-        let rarity = 1/(Number(rarityScores[attribute.value])/4040);
-        rarityScore = Number(rarityScore)+Number(rarity)
-        console.log(attribute.value+': '+rarity)
-        build_trait(attribute.trait_type, attribute.value, 'cont_'+element_id);
+        var attribute = metadata.attributes[i].valute;
+        var trait_type = metadata.attributes[i].trait_type;
+        var rarity = 1/(Number(rarityScores[attribute])/4040);
+        rarityScore = Number(rarityScore)+Number(rarity);
+        build_trait(trait_type, attribute, 'cont_'+element_id);
     }
 
-    console.log('Frog #'+token_id+' == '+rarityScore)
+    console.log('Frog #'+token_id+' ==> '+rarityScore)
     try {
-        if (rarityScore >= 400) {
-            rarityColor = 'violet';
-        } else if (rarityScore >= 200) {
-            rarityColor = 'darkorchid';
-        } else if (rarityScore >= 100) {
-            rarityColor = 'coral';
-        } else if (rarityScore >= 50) {
-            rarityColor = 'cornflowerblue';
-        } else {
-            rarityColor = 'teal';
-        }
+        if (rarityScore >= 400) {  rarityColor = 'violet';
+        } else if (rarityScore >= 200) { rarityColor = 'darkorchid';
+        } else if (rarityScore >= 100) { rarityColor = 'coral';
+        } else if (rarityScore >= 50) { rarityColor = 'cornflowerblue';
+        } else { rarityColor = 'teal'; }
 
         document.getElementById('rarityRanking_'+token_id).innerHTML = rarityScore
         document.getElementById('rarityRanking_'+token_id).style.color = rarityColor
