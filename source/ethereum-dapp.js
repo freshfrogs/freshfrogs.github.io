@@ -10,7 +10,7 @@
 var controller, collection, 
 user_address, user_rewards, 
 user_tokenBalance, user_stakedBalance, 
-is_approved, web3, f0, network, eth_usd, next, rarityRanking;
+is_approved, web3, f0, network, eth_usd, next, rarityScore;
 
 var sales_volume_eth = 0;
 var sales_volume_usd = 0;
