@@ -36,8 +36,7 @@ html {
     height: 128px;
   }
   .icons_container {
-    width: 512px;
-    height: 512px;
+    width: auto;
   }
   #myProgress {
     width: 75%;
@@ -385,7 +384,8 @@ html {
     font-weight: bolder;
     background: transparent;
     border-radius: 5px;
-    display: inline-flex;
+    display: inline-flex
+;
     border: none;
     box-shadow: none;
     font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji !important;
@@ -460,12 +460,12 @@ html {
     width: 100%;
   }
   .main_left {
-    padding: 0px;
+    padding: 15px;
     margin: 15px;
     margin-left: auto;
     margin-right: auto;
     border: 0px solid black;
-    width: 256px;
+    width: 512px;
     border-radius: 15px;
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
@@ -474,17 +474,16 @@ html {
     text-align: left;
   }
   .main_right {
-    padding: 15px;
+    padding: 0px;
     font-weight: normal;
     font-size: 14px;
     text-shadow: none;
     color: black;
-    background-color: white;
+    background-color: transparent;
     border-radius: 15px;
-    border: 1px solid black;
+    border: 0px solid black;
     min-width: 300px;
-    max-width: 800px;
-    box-shadow: 2px 2px darkslategray;
+    max-width: 400px;
   }
   .headerPanel {
     font-weight: normal;
