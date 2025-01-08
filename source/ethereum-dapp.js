@@ -789,11 +789,11 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
         var attribute = metadata.attributes[i].valute;
         var trait_type = metadata.attributes[i].trait_type;
         var rarity = 1/(Number(rarityScores[attribute])/4040);
-        rarityScore = Number(rarityScore)+Number(rarity);
+        rarityScore = Number(rarityScore) + Number(rarity);
         build_trait(trait_type, attribute, 'cont_'+element_id);
     }
 
-    console.log('Frog #'+token_id+' ==> '+rarityScore)
+    console.log('Frog #'+token_id+' --==> '+rarityScore)
     try {
         if (rarityScore >= 400) {  rarityColor = 'violet';
         } else if (rarityScore >= 200) { rarityColor = 'darkorchid';
