@@ -35,7 +35,7 @@ html {
     width: 128px;
     height: 128px;
   }
-  .icon_container {
+  .icons_container {
     width: 512px;
     height: 512px;
   }
@@ -385,7 +385,7 @@ html {
     font-weight: bolder;
     background: transparent;
     border-radius: 5px;
-    display: inline-block;
+    display: inline-flex;
     border: none;
     box-shadow: none;
     font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji !important;
