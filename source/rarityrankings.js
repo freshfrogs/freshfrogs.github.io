@@ -15,7 +15,7 @@ var rarityScores = {
         'purpleTreeFrog': 83,
         'redEyedTreeFrog': 98,
         'splendidLeafFrog': 75,
-        'stawverryDartFrog': 89,
+        'stawberryDartFrog': 89,
         'tomatoFrog': 92,
         'treeFrog(1)': 79,
         'treeFrog(2)': 165,
