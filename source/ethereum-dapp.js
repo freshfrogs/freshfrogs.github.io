@@ -785,8 +785,9 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
         let attribute = metadata.attributes[i]
-        rarityRanking = await rarity(attribute.value) + rarityRanking;
-        console.log(attribute.value+': '+rarity(attribute.value))
+        let rarity = 1/(rarityScores[id]/4040);
+        rarityScore = rarityScore + rarity
+        console.log(attribute.value+': '+rarity)
         build_trait(attribute.trait_type, attribute.value, 'cont_'+element_id);
     }
 
@@ -808,12 +809,6 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
         document.getElementById('rarityRanking_'+token_id).style.color = rarityColor
         
     } catch (e) {}
-}
-
-// 1/([No.ItemsWithTrait]/[No.ItemsInCollection])
-async function rarity(id) {
-    console.log(1/(rarityScores[id]/4040))
-    return 1/(rarityScores[id]/4040)
 }
 
 /*
