@@ -791,7 +791,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
         build_trait(attribute.trait_type, attribute.value, 'cont_'+element_id);
     }
 
-    console.log('Frog #'+token_id+' --> '+rarityScore)
+    console.log('Frog #'+token_id+' -- '+rarityScore)
     try {
         if (rarityScore >= 400) {
             rarityColor = 'violet';
