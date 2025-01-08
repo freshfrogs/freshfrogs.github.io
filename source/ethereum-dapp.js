@@ -785,22 +785,9 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
         let attribute = metadata.attributes[i]
-        //rarityRanking = Number(rarityScores[attribute.value]) + Number(rarityRanking)
-        console.log(attribute.value+': '+rarityScores[attribute.value])
-        /* if (attribute.trait_type == 'SpecialFrog' && attribute.value == 'peace') {
-
-            // get special dna from token id
-            firstDigit = parseInt(token_id / 1000);
-            lastDigit = token_id % 10;
-            if (firstDigit > frogArray.length) { firstDigit = frogArray.length; }
-            if (lastDigit > traitArray.length) { lastDigit = traitArray.length; }
-            frogdna = frogArray[firstDigit]
-            traitdna = traitArray[lastDigit]
-            build_trait('SpecialFrog', 'peace/'+frogdna, 'cont_'+element_id);
-            build_trait('Trait', 'SpecialFrog/peace/'+traitdna, 'cont_'+element_id);
-        } else { */
-            build_trait(attribute.trait_type, attribute.value, 'cont_'+element_id);
-        // }
+        rarityRanking = rarity(attribute.value) + rarityRanking;
+        console.log(attribute.value+': '+rarity(attribute.value))
+        build_trait(attribute.trait_type, attribute.value, 'cont_'+element_id);
     }
 
     console.log('Frog #'+token_id+' --> '+rarityRanking)
@@ -821,6 +808,12 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
         document.getElementById('rarityRanking_'+token_id).style.color = rarityColor
         
     } catch (e) {}
+}
+
+// 1/([No.ItemsWithTrait]/[No.ItemsInCollection])
+async function rarity(id) {
+    console.log(1/(rarityScores[id]/4040))
+    return 1/(rarityScores[id]/4040)
 }
 
 /*
