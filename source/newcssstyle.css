@@ -31,6 +31,14 @@ html {
   img {
     max-width: 100%;
   }
+  .frog_icon {
+    width: 64px;
+    height: 64px;
+  }
+  .icon_container {
+    width: 256px;
+    height: 256px;
+  }
   #myProgress {
     width: 75%;
     background: white;
