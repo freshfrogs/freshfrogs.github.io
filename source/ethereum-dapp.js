@@ -995,17 +995,17 @@ async function update_frontend() {
     document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+user_tokenBalance+'/'+user_stakedBalance+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+user_tokenBalance+'/'+user_stakedBalance+')'); }
 
     // Mint Button | Mint Tokens
-    container_element = document.createElement('div')
-    container_element.calssName = 'container_element'
-    container_element.innerHTML = 
+    mintContainer_element = document.createElement('div')
+    mintContainer_element.className = 'container_element'
+    mintContainer_element.innerHTML = 
         '<button id="mintButton" class="connectButton" onclick="initiate_mint(); "style="color: white; background: steelblue;">🐸 Mint Frogs</button>'+
         '<p></p>'
-    parent_element.appendChild(container_element)
+    parent_element.appendChild(mintContainer_element)
 
     // Stake Button | Stake tokens 
-    container_element = document.createElement('div')
-    container_element.calssName = 'container_element'
-    container_element.innerHTML = 
+    stakeContainer_element = document.createElement('div')
+    stakeContainer_element.className = 'container_element'
+    stakeContainer_element.innerHTML = 
         '<button id="stakeButton" class="connectButton" onclick="await initiate_setApprovalForAll(); "style="color: white; background: lightsalmon;">🌱 Stake & Earn!</button>'+
         '<p>'+
         '📃 FreshFrogsNFT Staking - Stake your Frogs and start earning rewards like $FLYZ, and more!'+
@@ -1013,23 +1013,23 @@ async function update_frontend() {
         '\n\n✍️ Sign Contract Approval\nTo start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.'+
         'Approval Status: '+approval_status+'\n\nStaked Tokens: ('+user_stakedBalance+') | Rewards: '+user_rewards.toFixed(2)+' $FLYZ'+
         '</p>';
-    parent_element.appendChild(container_element)
+    parent_element.appendChild(stakeContainer_element)
 
     // Holdings Button | View holdings
-    container_element = document.createElement('div')
-    container_element.calssName = 'container_element'
-    container_element.innerHTML = 
+    holdingsContainer_element = document.createElement('div')
+    holdingsContainer_element.className = 'container_element'
+    holdingsContainer_element.innerHTML = 
         '<a id="holdingsLink" className="holdingsLink" href="https://freshfrogs.github.io/wallet/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍃 View Holdings</button></a>'+
         '<p></p>'
-    parent_element.appendChild(container_element)
+    parent_element.appendChild(holdingsContainer_element)
 
     // The Pond | View all staked tokens
-    container_element = document.createElement('div')
-    container_element.calssName = 'container_element'
-    container_element.innerHTML = 
+    pondContainer_element = document.createElement('div')
+    pondContainer_element.className = 'container_element'
+    pondContainer_element.innerHTML = 
         '<a id="thePondLink" className="thePondButton" href="https://freshfrogs.github.io/the-pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍀 The Pond</button></a>'+
         '<p></p>'
-    parent_element.appendChild(container_element)
+    parent_element.appendChild(pondContainer_element)
 
     /* // The Pond | View all staked tokens 🍄 Meta Morph
     thePondButton = document.createElement('button')
