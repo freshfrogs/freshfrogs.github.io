@@ -1024,7 +1024,7 @@ async function update_frontend() {
 
     // The Pond | View all staked tokens
     thePondButton = document.createElement('a')
-    thePondButton.innerHTML = '<button class="connectButton" style="background: aquamarine; color; darkgreen" id="thePondButton" >🍀 The Pond</button>'
+    thePondButton.innerHTML = '<button class="connectButton" style="background: lightseagreen; color; white" id="thePondButton" >🍀 The Pond</button>'
     thePondButton.id = 'thePondLink'
     thePondButton.className = 'thePondButton'
     thePondButton.href = 'https://freshfrogs.github.io/the-pond/'
