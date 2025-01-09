@@ -990,58 +990,41 @@ async function update_frontend() {
     //break_element = document.createElement('br')
     //parent_element.appendChild(break_element)
 
-    // Bullet
-    bullet_html = document.createElement('span')
-    bullet_html.innerHTML = ' &#8226 '
-    parent_element.appendChild(bullet_html)
-
     // Connected Button
     document.getElementById('connectButton').innerHTML = 'Connected - ['+truncateAddress(user_address)+']'
     document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+user_tokenBalance+'/'+user_stakedBalance+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+user_tokenBalance+'/'+user_stakedBalance+')'); }
 
-    parent_element.appendChild(bullet_html)
-
     // Mint Button | Mint Tokens
-    mintButton = document.createElement('button')
-    mintButton.id = 'mintButton'
-    mintButton.className = 'connectButton'
-    mintButton.style.color = 'white'
-    mintButton.style.background = 'steelblue'
-    mintButton.onclick = async function (e) { await initiate_mint(); }
-    mintButton.innerHTML = '🐸 Mint Frogs'
-    parent_element.appendChild(mintButton)
-
-    parent_element.appendChild(bullet_html)
+    container_element = document.createElement('div')
+    container_element.calssName = 'containter_element'
+    container_element.innerHTML = 
+        '<button id="mintButton" class="connectButton" onclick="initiate_mint(); "style="color: white; background: steelblue;">🐸 Mint Frogs</button>'+
+        '<p></p>'
+    parent_element.appendChild(container_element)
 
     // Stake Button | Stake tokens 
-    stkeBtn = document.createElement('button')
-    stkeBtn.id = 'stakeButton'
-    stkeBtn.className = 'connectButton'
-    stkeBtn.style.color = 'white'
-    stkeBtn.style.background = 'lightsalmon'
-    stkeBtn.onclick = async function (e) { await initiate_setApprovalForAll(); }
-    stkeBtn.innerHTML = '🌱 Stake & Earn!'
-    parent_element.appendChild(stkeBtn)
-
-    parent_element.appendChild(bullet_html)
+    container_element = document.createElement('div')
+    container_element.calssName = 'containter_element'
+    container_element.innerHTML = 
+        '<button id="stakeButton" class="connectButton" onclick="await initiate_setApprovalForAll(); "style="color: white; background: lightsalmon;">🌱 Stake & Earn!</button>'+
+        '<p></p>'
+    parent_element.appendChild(container_element)
 
     // Holdings Button | View holdings
-    holdingsLink = document.createElement('a')
-    holdingsLink.innerHTML = '<button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍃 View Holdings</button>'
-    holdingsLink.id = 'holdingsLink'
-    holdingsLink.className = 'holdingsLink'
-    holdingsLink.href = 'https://freshfrogs.github.io/wallet/'
-    parent_element.appendChild(holdingsLink)
-
-    parent_element.appendChild(bullet_html)
+    container_element = document.createElement('div')
+    container_element.calssName = 'containter_element'
+    container_element.innerHTML = 
+        '<a id="holdingsLink" className="holdingsLink" href="https://freshfrogs.github.io/wallet/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍃 View Holdings</button></a>'+
+        '<p></p>'
+    parent_element.appendChild(container_element)
 
     // The Pond | View all staked tokens
-    thePondButton = document.createElement('a')
-    thePondButton.innerHTML = '<button class="connectButton" style="background: lightseagreen; color; white" id="thePondButton" >🍀 The Pond</button>'
-    thePondButton.id = 'thePondLink'
-    thePondButton.className = 'thePondButton'
-    thePondButton.href = 'https://freshfrogs.github.io/the-pond/'
-    parent_element.appendChild(thePondButton);
+    container_element = document.createElement('div')
+    container_element.calssName = 'containter_element'
+    container_element.innerHTML = 
+        '<a id="thePondLink" className="thePondButton" href="https://freshfrogs.github.io/the-pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍃 View Holdings</button></a>'+
+        '<p></p>'
+    parent_element.appendChild(container_element)
 
     /* // The Pond | View all staked tokens 🍄 Meta Morph
     thePondButton = document.createElement('button')
