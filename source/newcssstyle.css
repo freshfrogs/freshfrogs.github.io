@@ -480,6 +480,20 @@ html {
     margin-right: auto;
     width: 100%;
   }
+  .new_section_title {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    font-family: var(--m3-ui-family), "-apple-system", "BlinkMacSystemFont", sans-serif;
+    letter-spacing: normal;
+  }
+  .new_section_text {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    font-family: var(--m3-ui-family), "-apple-system", "BlinkMacSystemFont", sans-serif;
+    letter-spacing: normal;
+  }
   .noto-sans-ff {
     font-family: "Noto Sans", serif;
     font-optical-sizing: auto;
