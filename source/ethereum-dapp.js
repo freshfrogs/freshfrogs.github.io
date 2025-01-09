@@ -1016,21 +1016,17 @@ async function update_frontend() {
 
     // Holdings Button | View holdings
     holdingsLink = document.createElement('a')
-    holdingsLink.innerHTML = '<button class="connectButton" id="holdingsButton" >🍃 View Holdings</button>'
+    holdingsLink.innerHTML = '<button class="connectButton" style="background: teal; color; white" id="holdingsButton" >🍃 View Holdings</button>'
     holdingsLink.id = 'holdingsLink'
     holdingsLink.className = 'holdingsLink'
-    mintButton.style.color = 'white'
-    mintButton.style.background = 'teal'
     holdingsLink.href = 'https://freshfrogs.github.io/wallet/'
     parent_element.appendChild(holdingsLink)
 
     // The Pond | View all staked tokens
     thePondButton = document.createElement('a')
-    thePondButton.innerHTML = '<button class="connectButton" id="thePondButton" >🍀 The Pond</button>'
+    thePondButton.innerHTML = '<button class="connectButton" style="background: aquamarine; color; darkgreen" id="thePondButton" >🍀 The Pond</button>'
     thePondButton.id = 'thePondLink'
     thePondButton.className = 'thePondButton'
-    mintButton.style.color = 'darkgreen'
-    mintButton.style.background = 'aquamarine'
     thePondButton.href = 'https://freshfrogs.github.io/the-pond/'
     parent_element.appendChild(thePondButton);
 
