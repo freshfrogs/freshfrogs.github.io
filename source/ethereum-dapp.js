@@ -996,7 +996,7 @@ async function update_frontend() {
 
     // Mint Button | Mint Tokens
     container_element = document.createElement('div')
-    container_element.calssName = 'containter_element'
+    container_element.calssName = 'container_element'
     container_element.innerHTML = 
         '<button id="mintButton" class="connectButton" onclick="initiate_mint(); "style="color: white; background: steelblue;">🐸 Mint Frogs</button>'+
         '<p></p>'
@@ -1004,7 +1004,7 @@ async function update_frontend() {
 
     // Stake Button | Stake tokens 
     container_element = document.createElement('div')
-    container_element.calssName = 'containter_element'
+    container_element.calssName = 'container_element'
     container_element.innerHTML = 
         '<button id="stakeButton" class="connectButton" onclick="await initiate_setApprovalForAll(); "style="color: white; background: lightsalmon;">🌱 Stake & Earn!</button>'+
         '<p></p>'
@@ -1012,7 +1012,7 @@ async function update_frontend() {
 
     // Holdings Button | View holdings
     container_element = document.createElement('div')
-    container_element.calssName = 'containter_element'
+    container_element.calssName = 'container_element'
     container_element.innerHTML = 
         '<a id="holdingsLink" className="holdingsLink" href="https://freshfrogs.github.io/wallet/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍃 View Holdings</button></a>'+
         '<p></p>'
@@ -1020,7 +1020,7 @@ async function update_frontend() {
 
     // The Pond | View all staked tokens
     container_element = document.createElement('div')
-    container_element.calssName = 'containter_element'
+    container_element.calssName = 'container_element'
     container_element.innerHTML = 
         '<a id="thePondLink" className="thePondButton" href="https://freshfrogs.github.io/the-pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍃 View Holdings</button></a>'+
         '<p></p>'
