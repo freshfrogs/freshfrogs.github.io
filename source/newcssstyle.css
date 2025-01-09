@@ -480,6 +480,14 @@ html {
     margin-right: auto;
     width: 100%;
   }
+  .noto-sans-ff {
+    font-family: "Noto Sans", serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+    font-variation-settings:
+      "wdth" 100;
+  }
   .main_left {
     padding: 15px;
     margin: 15px;
