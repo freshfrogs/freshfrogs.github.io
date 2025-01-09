@@ -33,6 +33,14 @@
       document.addEventListener("DOMContentLoaded", async () => {
 
         //await build_random_logo();
+        document.getElementById('icons_container').innerHTML = '';
+        for (let i = 0; i < 9; i++) {
+          random_token = Math.floor(Math.random() * 4040) + 1;
+          random_tokenImg = document.createElement('img')
+          random_tokenImg.className = 'frog_icon'
+          random_tokenImg.src = SOURCE_PATH+'/frog/'+random_token+'.png'
+          document.getElementById('icons_container').appendChild(random_tokenImg);
+        }
         await fetch_token_sales(COLLECTION_ADDRESS, '50'); // await fetch_token_sales(COLLECTION_ADDRESS, '50');
 
         //document.getElementById('randomLogo').onclick = async function (e) { clearInterval(intervalId); }
@@ -73,7 +81,7 @@
           </div>
         </div>
         <div class="main_right">
-          <div class="icons_container">
+          <div id="icons_container" class="icons_container">
             <img class="frog_icon" src="https://freshfrogs.github.io/frog/500.png">
             <img class="frog_icon" src="https://freshfrogs.github.io/frog/1011.png">
             <img class="frog_icon" src="https://freshfrogs.github.io/frog/1010.png">
