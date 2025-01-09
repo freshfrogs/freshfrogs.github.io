@@ -1013,7 +1013,7 @@ async function update_frontend() {
         '<p class="paragraph_container">'+
         '📃 <b>FreshFrogsNFT Staking</b>'+
         '<br>Stake your Frogs and start earning rewards like $FLYZ, and more!'+
-        ' Staking works by sending your Frog to a smart contract that will keep it can\'t be listed on secondary market places, like Rarible.'+
+        ' Staking works by sending your Frog to a smart contract where it can\'t be listed on secondary market places, like Opensea.'+
         '<br><br><b>✍️ Sign Contract Approval</b>'+
         '<br>To start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.'+
         '</p>'+
