@@ -1022,7 +1022,7 @@ async function update_frontend() {
     container_element = document.createElement('div')
     container_element.calssName = 'container_element'
     container_element.innerHTML = 
-        '<a id="thePondLink" className="thePondButton" href="https://freshfrogs.github.io/the-pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍃 View Holdings</button></a>'+
+        '<a id="thePondLink" className="thePondButton" href="https://freshfrogs.github.io/the-pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍀 The Pond</button></a>'+
         '<p></p>'
     parent_element.appendChild(container_element)
 
