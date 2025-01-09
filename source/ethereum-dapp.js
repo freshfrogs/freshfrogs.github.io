@@ -998,6 +998,8 @@ async function update_frontend() {
     mintButton = document.createElement('button')
     mintButton.id = 'mintButton'
     mintButton.className = 'connectButton'
+    mintButton.style.color = 'white'
+    mintButton.style.background = 'steelblue'
     mintButton.onclick = async function (e) { await initiate_mint(); }
     mintButton.innerHTML = '🐸 Mint Frogs'
     parent_element.appendChild(mintButton)
@@ -1006,6 +1008,8 @@ async function update_frontend() {
     stkeBtn = document.createElement('button')
     stkeBtn.id = 'stakeButton'
     stkeBtn.className = 'connectButton'
+    mintButton.style.color = 'white'
+    mintButton.style.background = 'lightsalmon'
     stkeBtn.onclick = async function (e) { await initiate_setApprovalForAll(); }
     stkeBtn.innerHTML = '🌱 Stake & Earn!'
     parent_element.appendChild(stkeBtn)
@@ -1015,6 +1019,8 @@ async function update_frontend() {
     holdingsLink.innerHTML = '<button class="connectButton" id="holdingsButton" >🍃 View Holdings</button>'
     holdingsLink.id = 'holdingsLink'
     holdingsLink.className = 'holdingsLink'
+    mintButton.style.color = 'white'
+    mintButton.style.background = 'teal'
     holdingsLink.href = 'https://freshfrogs.github.io/wallet/'
     parent_element.appendChild(holdingsLink)
 
@@ -1023,6 +1029,8 @@ async function update_frontend() {
     thePondButton.innerHTML = '<button class="connectButton" id="thePondButton" >🍀 The Pond</button>'
     thePondButton.id = 'thePondLink'
     thePondButton.className = 'thePondButton'
+    mintButton.style.color = 'darkgreen'
+    mintButton.style.background = 'aquamarine'
     thePondButton.href = 'https://freshfrogs.github.io/the-pond/'
     parent_element.appendChild(thePondButton);
 
