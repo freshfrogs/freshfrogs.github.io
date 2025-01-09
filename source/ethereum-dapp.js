@@ -125,7 +125,7 @@ async function fetch_token_sales(contract, limit, next_string) {
     if (! contract) { contract = COLLECTION_ADDRESS; }
     if (! limit) { limit = '50'; }
     if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
-    fetch('https://api.reservoir.tools/sales/v6?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?sortBy=time&sortDirection=desc&limit='+limit+next+'', options)
+    fetch('https://api.reservoir.tools/sales/v6?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?sortBy=time&sortDirection=desc'+next+'', options)
     .then((data) => data.json())
     .then((data) => {
         console.log(data)
@@ -269,8 +269,8 @@ async function render_token_sales(contract, sales) {
                     '<text class="card_bold">'+sale_date+'</text>'+
                 '</div>'+
                 '<div class="infobox_right">'+
-                    '<text class="card_text">Frog Type</text>'+'<br>'+
-                    '<text class="card_bold">'+'--'+'</text>'+
+                '<text class="card_text">Rarity Score</text>'+'<br>'+
+                '<text id="rarityRanking_'+tokenId+'" class="card_bold">--</text>'+
                 '</div>'+
                 '<div id="buttonsPanel_'+tokenId+'" class="card_buttonbox">'+
                     '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
