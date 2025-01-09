@@ -504,6 +504,7 @@ html {
     border: 0px solid black;
     min-width: 410px;
     max-width: 400px;
+    margin: auto;
   }
   .headerPanel {
     font-weight: normal;
