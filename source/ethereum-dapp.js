@@ -206,6 +206,7 @@ async function update_staked_tokens(tokens) {
             //var progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>';
     
             try {
+                document.getElementById('stakedOwner_'+tokenId).innerHTML = truncateAddress(owner);
                 document.getElementById('staked_'+tokenId).innerHTML = staked_time+' days';
                 document.getElementById('staked_'+tokenId).style.color = 'teal';
             } catch (e) { console.log(e.message) }
@@ -335,7 +336,7 @@ async function render_held_tokens(wallet, tokens) {
         var html_elements = 
             '<div class="infobox_left">'+
                 '<text class="card_text">Owner</text>'+'<br>'+
-                '<text class="card_bold" id="frog_type">'+truncateAddress(wallet)+'</text>'+
+                '<text class="card_bold" id="stakedOwner_'+tokenId+'">'+truncateAddress(wallet)+'</text>'+
             '</div>'+
             '<div class="infobox_right">'+
                 '<text class="card_text">Staked</text>'+'<br>'+
