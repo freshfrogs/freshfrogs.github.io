@@ -32,22 +32,22 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        await build_random_logo();
+        //await build_random_logo();
         await fetch_token_mints(COLLECTION_ADDRESS, '50'); // await fetch_token_sales(COLLECTION_ADDRESS, '50');
 
         //document.getElementById('randomLogo').onclick = async function (e) { clearInterval(intervalId); }
         document.getElementById('connectButton').onclick = async function (e) { await initiate_web3_connection(); }
 
         async function build_random_logo() {
-          document.getElementById('icons_container').innerHTML = ''
-          for(let j = 0; j < 4; j++){
-            random_token = Math.floor(Math.random() * 4040) + 1;
-            let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+random_token+'.json')).json();
-            for (let i = 0; i < metadata.attributes.length; i++) {
-              let attribute = metadata.attributes[i]
-              build_trait(attribute.trait_type, attribute.value, 'icons_container');
-            }
+          document.getElementById('randomLogo').innerHTML = ''
+          random_token = Math.floor(Math.random() * 4040) + 1;
+          let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+random_token+'.json')).json();
+          for (let i = 0; i < metadata.attributes.length; i++) {
+            let attribute = metadata.attributes[i]
+            build_trait(attribute.trait_type, attribute.value, 'randomLogo');
           }
+          var random_token_image = SOURCE_PATH+'/frog/'+random_token+'.png'
+          document.getElementById('randomLogo').style.backgroundImage = "url("+random_token_image+")";
         }
       })
     </script>
@@ -72,7 +72,7 @@
           </div>
         </div>
         <div class="main_right">
-          <div id="icons_container" class="icons_container">
+          <div class="icons_container">
             <img class="frog_icon" src="https://freshfrogs.github.io/frog/500.png">
             <img class="frog_icon" src="https://freshfrogs.github.io/frog/1011.png">
             <img class="frog_icon" src="https://freshfrogs.github.io/frog/1010.png">
