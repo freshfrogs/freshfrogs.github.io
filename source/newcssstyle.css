@@ -154,6 +154,9 @@ html {
     background-color: white;
     border: 1px solid black;
     border-radius: 5px;
+    width: 490px;
+    margin: 5px;
+    box-shadow: 2px 2px darkslategray;
   }
   .attribute_overlay:hover {
     -ms-transform: scale(1.2); /* IE 9 */
