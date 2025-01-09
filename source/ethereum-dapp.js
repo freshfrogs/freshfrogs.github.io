@@ -998,37 +998,38 @@ async function update_frontend() {
     mintContainer_element = document.createElement('div')
     mintContainer_element.className = 'container_element'
     mintContainer_element.innerHTML = 
-        '<button id="mintButton" class="connectButton" onclick="initiate_mint(); "style="color: white; background: steelblue;">🐸 Mint Frogs</button>'+
-        '<p class="paragraph_container"></p>'
+        '<p class="paragraph_container"></p>'+
+        '<button id="mintButton" class="connectButton" onclick="initiate_mint(); "style="color: white; background: steelblue;">🐸 Mint Frogs</button>';
+        
     parent_element.appendChild(mintContainer_element)
 
     // Stake Button | Stake tokens 
     stakeContainer_element = document.createElement('div')
     stakeContainer_element.className = 'container_element'
     stakeContainer_element.innerHTML = 
-        '<button id="stakeButton" class="connectButton" onclick="await initiate_setApprovalForAll(); "style="color: white; background: lightsalmon;">🌱 Stake & Earn!</button>'+
         '<p class="paragraph_container">'+
         '📃 FreshFrogsNFT Staking - Stake your Frogs and start earning rewards like $FLYZ, and more!'+
         'Staking works by sending your Frog to a smart contract that will keep it safe. Frogs that are staked can\'t be listed on secondary market places, like Rarible.'+
         '\n\n✍️ Sign Contract Approval\nTo start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.'+
         'Approval Status: '+is_approved+'\n\nStaked Tokens: ('+user_stakedBalance+') | Rewards: '+user_rewards.toFixed(2)+' $FLYZ'+
-        '</p>';
+        '</p>'+
+        '<button id="stakeButton" class="connectButton" onclick="await initiate_setApprovalForAll(); "style="color: white; background: lightsalmon;">🌱 Stake & Earn!</button>';
     parent_element.appendChild(stakeContainer_element)
 
     // Holdings Button | View holdings
     holdingsContainer_element = document.createElement('div')
     holdingsContainer_element.className = 'container_element'
     holdingsContainer_element.innerHTML = 
-        '<a id="holdingsLink" className="holdingsLink" href="https://freshfrogs.github.io/wallet/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍃 View Holdings</button></a>'+
-        '<p class="paragraph_container"></p>'
+        '<p class="paragraph_container"></p>'+
+        '<a id="holdingsLink" className="holdingsLink" href="https://freshfrogs.github.io/wallet/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍃 View Holdings</button></a>';
     parent_element.appendChild(holdingsContainer_element)
 
     // The Pond | View all staked tokens
     pondContainer_element = document.createElement('div')
     pondContainer_element.className = 'container_element'
     pondContainer_element.innerHTML = 
-        '<a id="thePondLink" className="thePondButton" href="https://freshfrogs.github.io/the-pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍀 The Pond</button></a>'+
-        '<p class="paragraph_container"></p>'
+        '<p class="paragraph_container"></p>'+
+        '<a id="thePondLink" className="thePondButton" href="https://freshfrogs.github.io/the-pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍀 The Pond</button></a>';
     parent_element.appendChild(pondContainer_element)
 
     /* // The Pond | View all staked tokens 🍄 Meta Morph
