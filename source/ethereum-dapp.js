@@ -990,9 +990,16 @@ async function update_frontend() {
     //break_element = document.createElement('br')
     //parent_element.appendChild(break_element)
 
+    // Bullet
+    bullet_html = document.createElement('span')
+    bullet_html.innerHTML = ' &#8226 '
+    parent_element.appendChild(bullet_html)
+
     // Connected Button
     document.getElementById('connectButton').innerHTML = 'Connected - ['+truncateAddress(user_address)+']'
     document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+user_tokenBalance+'/'+user_stakedBalance+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+user_tokenBalance+'/'+user_stakedBalance+')'); }
+
+    parent_element.appendChild(bullet_html)
 
     // Mint Button | Mint Tokens
     mintButton = document.createElement('button')
@@ -1004,6 +1011,8 @@ async function update_frontend() {
     mintButton.innerHTML = '🐸 Mint Frogs'
     parent_element.appendChild(mintButton)
 
+    parent_element.appendChild(bullet_html)
+
     // Stake Button | Stake tokens 
     stkeBtn = document.createElement('button')
     stkeBtn.id = 'stakeButton'
@@ -1014,13 +1023,17 @@ async function update_frontend() {
     stkeBtn.innerHTML = '🌱 Stake & Earn!'
     parent_element.appendChild(stkeBtn)
 
+    parent_element.appendChild(bullet_html)
+
     // Holdings Button | View holdings
     holdingsLink = document.createElement('a')
-    holdingsLink.innerHTML = '<button class="connectButton" style="background: teal; color; white" id="holdingsButton" >🍃 View Holdings</button>'
+    holdingsLink.innerHTML = '<button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍃 View Holdings</button>'
     holdingsLink.id = 'holdingsLink'
     holdingsLink.className = 'holdingsLink'
     holdingsLink.href = 'https://freshfrogs.github.io/wallet/'
     parent_element.appendChild(holdingsLink)
+
+    parent_element.appendChild(bullet_html)
 
     // The Pond | View all staked tokens
     thePondButton = document.createElement('a')
