@@ -1014,8 +1014,8 @@ async function update_frontend() {
         '<br><br><b>✍️ Sign Contract Approval</b>'+
         '<br>To start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.'+
         '</p>'+
-        '<button id="stakeButton" class="connectButton" onclick="await initiate_setApprovalForAll(); "style="color: white; background: lightsalmon; margin: 20px; margin-top: 0px;">🌱 Stake & Earn!</button>'+
-        'Staked Tokens: ('+user_stakedBalance+') | Rewards: '+user_rewards.toFixed(2)+' $FLYZ';
+        '<button id="stakeButton" class="connectButton" onclick="await initiate_setApprovalForAll(); "style="color: white; background: lightsalmon; margin: 20px; margin-top: 0px;">🌱 Stake & Earn!</button>';
+        //'Staked Tokens: ('+user_stakedBalance+') | Rewards: '+user_rewards.toFixed(2)+' $FLYZ';
     parent_element.appendChild(stakeContainer_element)
 
     // Holdings Button | View holdings
