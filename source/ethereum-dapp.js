@@ -994,6 +994,7 @@ async function update_frontend() {
     document.getElementById('connectButton').innerHTML = 'Connected - ['+truncateAddress(user_address)+']'
     document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+user_tokenBalance+'/'+user_stakedBalance+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+user_tokenBalance+'/'+user_stakedBalance+')'); }
 
+    /*
     // Mint Button | Mint Tokens
     mintContainer_element = document.createElement('div')
     mintContainer_element.className = 'container_element'
@@ -1036,6 +1037,7 @@ async function update_frontend() {
         '<p class="paragraph_container"></p>'+
         '<a id="thePondLink" className="thePondButton" href="https://freshfrogs.github.io/the-pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍀 The Pond</button></a>';
     parent_element.appendChild(pondContainer_element)
+    */
 
     /* // The Pond | View all staked tokens 🍄 Meta Morph
     thePondButton = document.createElement('button')
