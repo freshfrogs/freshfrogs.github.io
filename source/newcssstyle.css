@@ -40,6 +40,17 @@ html {
   .icons_container {
     width: auto;
   }
+  .paragraph_container {
+    font-weight: normal;
+    font-size: 15px;
+    text-shadow: none;
+    color: black;
+    background-color: transparent;
+    border-radius: 5px;
+    border: none;
+    width: auto;
+    box-shadow: 2px 2px darkslategray;
+  }
   #myProgress {
     width: 75%;
     background: white;
