@@ -1008,8 +1008,8 @@ async function update_frontend() {
     stkeBtn = document.createElement('button')
     stkeBtn.id = 'stakeButton'
     stkeBtn.className = 'connectButton'
-    mintButton.style.color = 'white'
-    mintButton.style.background = 'lightsalmon'
+    stkeBtn.style.color = 'white'
+    stkeBtn.style.background = 'lightsalmon'
     stkeBtn.onclick = async function (e) { await initiate_setApprovalForAll(); }
     stkeBtn.innerHTML = '🌱 Stake & Earn!'
     parent_element.appendChild(stkeBtn)
