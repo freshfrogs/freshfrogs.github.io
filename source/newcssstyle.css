@@ -50,7 +50,7 @@ html {
     border-radius: 5px;
     border: none;
     width: auto;
-    margin: 20px !important;
+    margin: 0px !important;
   }
   #myProgress {
     width: 75%;
@@ -168,6 +168,7 @@ html {
     border-radius: 5px;
     width: 490px;
     margin: 5px;
+    padding: 10px;
     box-shadow: 2px 2px darkslategray;
   }
   .attribute_overlay:hover {
