@@ -50,7 +50,7 @@ html {
     border-radius: 5px;
     border: none;
     width: auto;
-    box-shadow: 2px 2px darkslategray;
+    margin: 20px !important;
   }
   #myProgress {
     width: 75%;
