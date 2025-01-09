@@ -998,7 +998,10 @@ async function update_frontend() {
     mintContainer_element = document.createElement('div')
     mintContainer_element.className = 'container_element'
     mintContainer_element.innerHTML = 
-        '<p class="paragraph_container"></p>'+
+        '<p class="paragraph_container">'+
+            '<b>Mint FROG Tokens</b>'+
+            '<br>'+
+        '</p>'+
         '<button id="mintButton" class="connectButton" onclick="initiate_mint(); "style="color: white; background: steelblue;">🐸 Mint Frogs</button>';
         
     parent_element.appendChild(mintContainer_element)
