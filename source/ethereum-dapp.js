@@ -1011,7 +1011,7 @@ async function update_frontend() {
         '📃 FreshFrogsNFT Staking - Stake your Frogs and start earning rewards like $FLYZ, and more!'+
         'Staking works by sending your Frog to a smart contract that will keep it safe. Frogs that are staked can\'t be listed on secondary market places, like Rarible.'+
         '\n\n✍️ Sign Contract Approval\nTo start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.'+
-        'Approval Status: '+approval_status+'\n\nStaked Tokens: ('+user_stakedBalance+') | Rewards: '+user_rewards.toFixed(2)+' $FLYZ'+
+        'Approval Status: '+is_approved+'\n\nStaked Tokens: ('+user_stakedBalance+') | Rewards: '+user_rewards.toFixed(2)+' $FLYZ'+
         '</p>';
     parent_element.appendChild(stakeContainer_element)
 
