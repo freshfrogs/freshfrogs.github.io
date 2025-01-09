@@ -35,7 +35,8 @@ html {
     width: 128px;
     height: 128px;
     border-radius: 10px;
-    margin: 2px;
+    margin: 4px;
+    box-shadow: 2px 2px darkslategray;
   }
   .icons_container {
     width: auto;
