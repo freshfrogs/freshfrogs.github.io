@@ -81,18 +81,6 @@
             <br>
             <div class="container_element">
               <p class="paragraph_container">
-                <b>📃 FreshFrogsNFT Staking</b>
-                <br>Stake your Frogs and start earning rewards like $FLYZ, and more!
-                Staking works by sending your Frog to a smart contract where it can\'t be listed on secondary market places, like Opensea.
-                <br><br><b>✍️ Sign Contract Approval</b>
-                <br>To start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.
-              </p>
-                <button id="stakeButton" class="connectButton" onclick="await initiate_setApprovalForAll();" style="color: white; background: darkgreen;">🌱 Stake & Earn!</button>
-                <span>&#8226;</span> <button id="stakeButton" class="connectButton" onclick=""; style="color: white; background: lightsalmon;">⭐ Claim Rewards</button>
-            </div>
-            <br>
-            <div class="container_element">
-              <p class="paragraph_container">
                 <b>🍃 Minting Information</b>
                 <br>Each token is randomly generated and individually unique! The Fresh Frogs NFT collection consists of many different attributes and traits with a total supply of 4,040 Frogs!
                 First 3,232 Frogs will free Final 808 Frogs will cost <b>0.01Ξ</b>
@@ -101,16 +89,21 @@
                 <br>ERC-721 powered by Factoria, verified and stored on IPFS ✔️
                 <br>0xbe4bef8735107db540de269ff82c7de9ef68c51b
               </p>
+              <button id="mintButton" class="connectButton" onclick="initiate_mint(); "style="color: white; background: steelblue;">🐸 Mint Frogs</button>
+              <span>&#8226;</span> <a href="https://etherscan.io/" target="_blank"><button id="githubButton" class="connectButton" style="background: #e9ecef; color: black;">Etherscan.io</button></a>
             </div>
-            <button id="mintButton" class="connectButton" onclick="initiate_mint(); "style="color: white; background: steelblue;">🐸 Mint Frogs</button>
-            <span>&#8226;</span> <a href="https://etherscan.io/" target="_blank"><button id="githubButton" class="connectButton" style="background: #e9ecef; color: black;">Etherscan.io</button></a>
             <br>
             <div class="container_element">
               <p class="paragraph_container">
-                <b>🍀 The Pond</b>
-                <br>View all community staked Frogs via The Pond!
+                <b>📃 FreshFrogsNFT Staking</b>
+                <br>Stake your Frogs and start earning rewards like $FLYZ, and more!
+                Staking works by sending your Frog to a smart contract where it can\'t be listed on secondary market places, like Opensea.
+                <br><br><b>✍️ Sign Contract Approval</b>
+                <br>To start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.
               </p>
-              <a id="thePondLink" className="thePondButton" href="https://freshfrogs.github.io/the-pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍀 The Pond</button></a>
+                <button id="stakeButton" class="connectButton" onclick="await initiate_setApprovalForAll();" style="color: white; background: darkgreen;">🌱 Stake & Earn!</button>
+                <span>&#8226;</span> <button id="stakeButton" class="connectButton" onclick=""; style="color: white; background: lightsalmon;">⭐ Claim Rewards</button>
+                <span>&#8226;</span> <a id="thePondLink" className="thePondButton" href="https://freshfrogs.github.io/the-pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍀 The Pond</button></a>
             </div>
           </div>
         </div>
