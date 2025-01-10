@@ -188,6 +188,20 @@ html {
     cursor: pointer;
     transition: width .2s, height .2s;
   }
+  .childPanel {
+    height: auto !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    float: none;
+    padding: 1% !important;
+    min-width: 333px;
+    width: fit-content !important;
+    color: white;
+    background: cadetblue;
+    border: 1px solid black;
+    box-shadow: 12px 12px darkslategray;
+    border-radius: 0px;
+  }
   .parentPanel {
     height: auto !important;
     margin-left: auto !important;
