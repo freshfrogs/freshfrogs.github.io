@@ -32,8 +32,9 @@ async function count_token_traits() {
 }
 
 async function rank_tokens() {
-    for (i = 1; i < max_supply; i++) {
+    for (i = 1; i < 4041; i++) {
         
+        console.log('-- Frog #'+i+' --')
         rarity_token_rankings[i] = { id: i, rarity: 1, type: '', };
 
         let metadata = await (await fetch('https://freshfrogs.github.io/frog/json/'+i+'.json')).json();
@@ -51,31 +52,31 @@ async function rank_tokens() {
             if (attribute == 'natural' && trait_type == 'Trait') {
                 if (frog_type == 'redEyedTreeFrog' || frog_type == 'lightBrownTreeFrog' || frog_type == 'brownTreeFrog' || frog_type == 'goldenDartFrog' || frog_type == 'unknown' || frog_type == 'grayTreeFrog' || frog_type == 'stawberryDartFrog' || frog_type == 'blueDartFrog' || frog_type == 'splendidLeafFrog') {
                     
-                    console.log('Natural Rarity: '+rarity_trait_rankings[frog_type+'_natural'])
+                    console.log('Natural Rarity | '+rarity_trait_rankings[frog_type+'_natural'])
+
+                    // Natural Rarity Score
                     var rarity_raw = parseInt(rarity_token_rankings[i].rarity) + 1/(parseInt(rarity_trait_rankings[frog_type+'_natural'])/4040)
                     rarity_token_rankings[i].rarity = parseInt(rarity_raw);
 
                 } else {
+
                     // Calculate Rarity Score
                     var rarity_raw = parseInt(rarity_token_rankings[i].rarity) + 1/(parseInt(rarity_trait_rankings[attribute])/4040)
                     rarity_token_rankings[i].rarity = parseInt(rarity_raw);
                 }
             } else {
+
                 // Calculate Rarity Score
                 var rarity_raw = parseInt(rarity_token_rankings[i].rarity) + 1/(parseInt(rarity_trait_rankings[attribute])/4040)
                 rarity_token_rankings[i].rarity = parseInt(rarity_raw);
             }
 
         }
-
-        console.log('Frog #'+i+' =->')
-        console.log('=-> '+rarity_token_rankings[i].rarity)
         
     }
 
-    console.log(rarity_token_rankings)
-    var sorted_rarity_rankings = Object.keys(rarity_token_rankings).sort(function(a,b){return rarity_token_rankings[a.rarity]-rarity_token_rankings[b.rarity]})
-    console.log('Final: \n'+sorted_rarity_rankings)
+    var ranked_tokens = rarity_token_rankings.sort(({rarity:a}, {rarity:b}) => b-a);
+    console.log(ranked_tokens);
 }
 
 /*
@@ -180,7 +181,7 @@ var rarity_trait_rankings = {
         'goldenDartFrog_natural': 2,
         'unknown_natural': 2,
         'grayTreeFrog_natural': 6,
-        'stawBerryDartFrog_natural': 6,
+        'stawberryDartFrog_natural': 6,
         'blueDartFrog_natural': 1,
         'splendidLeafFrog_natural': 5,
     //Accessory (10)
