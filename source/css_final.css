@@ -72,6 +72,7 @@ body {
     object-fit: cover;
     border-radius: 1px;
     box-shadow: 2px 2px darkslategray;
+    image-rendering: pixelated;
 }
 
 /* Bottom sections container */
