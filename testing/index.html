@@ -1,75 +1,161 @@
 <!DOCTYPE html>
-<html lang="{{ site.lang | default: "en-US" }}">
-  <title>freshfrogs.github.io</title>
-  <head>
-
+<html lang="en">
+<head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/source/css_final.css" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshFrogs NFT Collection</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <!--[if lt IE 9]>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <![endif]-->
-    
-    <script src="https://freshfrogs.github.io/source/rarityrankings.js"></script>
-    <script src="https://freshfrogs.github.io/source/controller_abi.js"></script>
-    <script src="https://freshfrogs.github.io/source/collection_abi.js"></script>
-    <script src="https://freshfrogs.github.io/source/ethereum-dapp.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
-    <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
-    <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            height: 100vh; /* Full viewport height */
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+        }
 
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
-    <script>
+        /* Container for overall layout */
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1200px; /* Limiting the maximum width */
+            margin: 0 auto; /* Center the container */
+            padding: 20px;
+        }
 
-      // <-- [Google Analytics]
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-6PB0WKB4SH');
-      // -- >
+        /* Top section with margin-top to add spacing */
+        .top-section {
+            flex: 2;
+            background-color: #32cd32; /* Fresh green */
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            text-align: left;
+            margin-top: 20px; /* Added margin-top for spacing */
+        }
 
-    </script>
-    
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>FreshFrogs NFT Collection</title>
-  </head>
-  <body>
-    <div class="container">
-        <!-- Top Section -->
-        <div class="top-section">
-            <div>
-                <h1>FreshFrogs NFT Collection</h1>
-                <p>FreshFrogs are a limited collection of unique digital frogs. Each frog is one-of-a-kind, with its own personality and traits. Collect, trade, and join the FreshFrogs community!</p>
-            </div>
-            <div class="image-grid">
-                <!-- Example images for FreshFrogs NFTs, replace with actual images -->
-                <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog1.png" alt="FreshFrog 1">
-                <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog2.png" alt="FreshFrog 2">
-                <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog3.png" alt="FreshFrog 3">
-                <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog4.png" alt="FreshFrog 4">
-                <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog5.png" alt="FreshFrog 5">
-                <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog6.png" alt="FreshFrog 6">
-                <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog7.png" alt="FreshFrog 7">
-                <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog8.png" alt="FreshFrog 8">
-                <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog9.png" alt="FreshFrog 9">
-            </div>
+        .top-section h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .top-section p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 64px);
+            grid-gap: 10px;
+        }
+
+        .image-grid img {
+            width: 64px;
+            height: 64px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        /* Bottom sections container */
+        .bottom-sections {
+            display: flex;
+            width: 100%; /* Make sure bottom sections take full width */
+            padding: 20px;
+            margin-top: 20px; /* Add some space between the sections */
+        }
+
+        /* Individual bottom section */
+        .bottom-section {
+            flex: 1; /* Ensures both sections take up equal width */
+            margin: 0 10px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .bottom-section h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .bottom-section p {
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        /* Responsive styling for smaller screens */
+        @media (max-width: 768px) {
+            .bottom-sections {
+                flex-direction: column;
+            }
+
+            .bottom-section {
+                margin-bottom: 20px;
+            }
+
+            .top-section {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .image-grid {
+                grid-template-columns: repeat(3, 64px);
+                justify-content: center;
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Top Section -->
+    <div class="top-section">
+        <div>
+            <h1>FreshFrogs NFT Collection</h1>
+            <p>FreshFrogs are a limited collection of unique digital frogs. Each frog is one-of-a-kind, with its own personality and traits. Collect, trade, and join the FreshFrogs community!</p>
         </div>
-    
-        <!-- Bottom Sections -->
-        <div class="bottom-sections">
-            <div class="bottom-section">
-                <h2>Section 1</h2>
-                <p>This is the first smaller section with some content.</p>
-            </div>
-            <div class="bottom-section">
-                <h2>Section 2</h2>
-                <p>This is the second smaller section with some other content.</p>
-            </div>
+        <div class="image-grid">
+            <!-- Example images for FreshFrogs NFTs, replace with actual images -->
+            <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog1.png" alt="FreshFrog 1">
+            <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog2.png" alt="FreshFrog 2">
+            <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog3.png" alt="FreshFrog 3">
+            <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog4.png" alt="FreshFrog 4">
+            <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog5.png" alt="FreshFrog 5">
+            <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog6.png" alt="FreshFrog 6">
+            <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog7.png" alt="FreshFrog 7">
+            <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog8.png" alt="FreshFrog 8">
+            <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog9.png" alt="FreshFrog 9">
         </div>
     </div>
-  </body>
-</html
+
+    <!-- Bottom Sections -->
+    <div class="bottom-sections">
+        <div class="bottom-section">
+            <h2>Section 1</h2>
+            <p>This is the first smaller section with some content.</p>
+        </div>
+        <div class="bottom-section">
+            <h2>Section 2</h2>
+            <p>This is the second smaller section with some other content.</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
