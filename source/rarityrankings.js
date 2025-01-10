@@ -5,7 +5,7 @@
 
 */
 
-var max_supply = 4040;
+var max_supply = 4//040;
 var rarity_values = {}
 
 async function count_token_traits() {
@@ -17,12 +17,12 @@ async function count_token_traits() {
         for (let j = 0; j < metadata.attributes.length; j++) {
             var attribute = metadata.attributes[j].value;
             var trait_type = metadata.attributes[j].trait_type;
-            var rarity_count = rarity_values[attribute] + 1;
-            rarity_values[attribute] = rarity_count
+            var rarity_count = parseInt(rarity_values[attribute]) + 1;
+            rarity_values[attribute] = parseInt(rarity_count);
         }
     }
 
-    console.log();
+    console.log(rarity_values);
 }
 
 // 1/([No.ItemsWithTrait]/[No.ItemsInCollection])
