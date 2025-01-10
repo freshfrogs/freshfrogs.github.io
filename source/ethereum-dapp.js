@@ -785,6 +785,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
     token_doc.appendChild(token_element);
 
     rarityScore = 0;
+    console.log('Rarity Ranking == > ('+rarityScore+')')
 
     // Update Metadata! Build Frog -->
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
@@ -793,7 +794,8 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
         var trait_type = metadata.attributes[i].trait_type;
         build_trait(trait_type, attribute, 'cont_'+element_id);
 
-        var rarity = 1/(Number(rarityScores[attribute])/4040);
+        var rarity = 1/(parseInt(rarityScores[attribute])/4040);
+        console.log(attribute+': '+rarity)
         rarityScore = parseInt(rarityScore) + parseInt(rarity);
     }
 
