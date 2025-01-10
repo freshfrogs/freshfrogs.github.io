@@ -98,23 +98,46 @@ color: #555;
 
 /* Responsive styling for smaller screens */
 @media (max-width: 768px) {
-.bottom-sections {
-    flex-direction: column;
+    .bottom-sections {
+        flex-direction: column;
+    }
+
+    .bottom-section {
+        margin-bottom: 20px;
+    }
+
+    .top-section {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .image-grid {
+        grid-template-columns: repeat(3, 64px);
+        justify-content: center;
+        margin-top: 20px;
+    }
 }
 
-.bottom-section {
-    margin-bottom: 20px;
-}
-
-.top-section {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.image-grid {
-    grid-template-columns: repeat(3, 64px);
-    justify-content: center;
-    margin-top: 20px;
-}
-}
+.connectButton {
+    margin: 4px;
+    padding: 8px;
+    background: white;
+    border: 1px solid black;
+    border-radius: 0px;
+    min-width: 130px;
+    height: auto;
+    vertical-align: middle;
+    font-size: small;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 2px 2px darkslategray;
+    transition: all .3s;
+    font-family: monospace;
+    font-size: initial;
+  }
+  .connectButton:hover {
+    top: -5px;
+    position: relative;
+    box-shadow: 8px 8px 0px darkslategray;
+  }
