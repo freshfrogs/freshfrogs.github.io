@@ -205,17 +205,17 @@ html {
   }
   .childPanel {
     height: auto !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
+    margin: 1% !important;
     float: none;
     padding: 1% !important;
     min-width: 333px;
-    width: fit-content !important;
+    width: 45% !important;
     color: white;
     background: cadetblue;
     border: 1px solid black;
     box-shadow: 12px 12px darkslategray;
     border-radius: 0px;
+    display: inline-block;
   }
   .parentPanel {
     height: auto !important;
