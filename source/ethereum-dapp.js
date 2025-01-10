@@ -1029,6 +1029,7 @@ async function update_frontend() {
     mintContainer_element = document.createElement('div')
     mintContainer_element.className = 'container_element'
     mintContainer_element.innerHTML = 
+    /*
         '<p class="paragraph_container">'+
             '<b>🍃 Minting Information</b>'+
             '<br>Each token is randomly generated and individually unique! The Fresh Frogs NFT collection consists of many different attributes and traits with a total supply of 4,040 Frogs!'+
@@ -1038,9 +1039,10 @@ async function update_frontend() {
             '<br>ERC-721 powered by Factoria, verified and stored on IPFS ✔️'+
             '<br>0xbe4bef8735107db540de269ff82c7de9ef68c51b'+
         '</p>'+
+    */
         '<button id="mintButton" class="connectButton" onclick="initiate_mint(); "style="color: white; background: steelblue;">🐸 Mint Frogs</button>'+
-        '<span>&#8226;</span> <a href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><button id="githubButton" class="connectButton" style="background: #e9ecef; color: black;">Etherscan.io</button></a>'+
-        '<span>&#8226;</span> <a id="holdingsLink" className="holdingsLink" href="https://freshfrogs.github.io/wallet/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍃 View Holdings</button></a>';
+        '<a href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><button id="githubButton" class="connectButton" style="background: #e9ecef; color: black;">Etherscan.io</button></a>'+
+        '<a id="holdingsLink" className="holdingsLink" href="https://freshfrogs.github.io/wallet/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍃 View Holdings</button></a>';
         
     parent_element.appendChild(mintContainer_element)
 
@@ -1048,6 +1050,7 @@ async function update_frontend() {
     stakeContainer_element = document.createElement('div')
     stakeContainer_element.className = 'container_element'
     stakeContainer_element.innerHTML = 
+    /*
         '<p class="paragraph_container">'+
             '<b>📃 FreshFrogsNFT Staking</b>'+
             '<br>Stake your Frogs and start earning rewards like $FLYZ, and more!'+
@@ -1055,9 +1058,10 @@ async function update_frontend() {
             '<br><br><b>✍️ Sign Contract Approval</b>'+
             '<br>To start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.'+
         '</p>'+
+    */
         '<button id="stakeButton" class="connectButton" onclick="initiate_setApprovalForAll();" style="color: white; background: lightseagreen;">🌱 Stake & Earn!</button>'+
-        '<span>&#8226;</span> <button id="stakeButton" class="connectButton" onclick=""; style="color: white; background: lightsalmon;">⭐ Claim Rewards</button>'+
-        '<span>&#8226;</span> <a id="thePondLink" className="thePondButton" href="https://freshfrogs.github.io/the-pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍀 The Pond</button></a>';
+        '<button id="stakeButton" class="connectButton" onclick=""; style="color: white; background: lightsalmon;">⭐ Claim Rewards</button>'+
+        '<a id="thePondLink" className="thePondButton" href="https://freshfrogs.github.io/the-pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍀 The Pond</button></a>';
 
     parent_element.appendChild(stakeContainer_element)
 
@@ -1077,7 +1081,6 @@ async function update_frontend() {
         '<p class="paragraph_container"></p>'+
         '<a id="thePondLink" className="thePondButton" href="https://freshfrogs.github.io/the-pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍀 The Pond</button></a>';
     parent_element.appendChild(pondContainer_element)
-    
 
     // The Pond | View all staked tokens 🍄 Meta Morph
     thePondButton = document.createElement('button')
