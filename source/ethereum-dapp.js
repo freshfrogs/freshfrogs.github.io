@@ -12,8 +12,6 @@ user_address, user_rewards,
 user_tokenBalance, user_stakedBalance, 
 is_approved, web3, f0, network, eth_usd, next;
 
-var rarityScore = 0;
-
 var sales_volume_eth = 0;
 var sales_volume_usd = 0;
 var net_income_usd = 0;
@@ -784,7 +782,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
     // Create Element <--
     token_doc.appendChild(token_element);
 
-    var rarityScore2 = 0;
+    var rarityScore = 0;
 
     // Update Metadata! Build Frog -->
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
@@ -795,17 +793,17 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
 
         // Calculate Rarity Score
         var rarity_raw = 1/(parseInt(rarityScores[attribute])/4040);
-        var rarity = parseInt(rarityScore2) + parseInt(rarity_raw)
-        rarityScore2 = parseInt(rarity);
+        var rarity = parseInt(rarityScore) + parseInt(rarity_raw)
+        rarityScore = parseInt(rarity);
     }
 
-    if (rarityScore2 >= 400) {  rarityColor = 'violet'; }
-    else if (rarityScore2 >= 200) { rarityColor = 'darkorchid'; }
-    else if (rarityScore2 >= 100) { rarityColor = 'coral'; }
-    else if (rarityScore2 >= 50) { rarityColor = 'cornflowerblue'; }
+    if (rarityScore >= 400) {  rarityColor = 'violet'; }
+    else if (rarityScore >= 200) { rarityColor = 'darkorchid'; }
+    else if (rarityScore >= 100) { rarityColor = 'coral'; }
+    else if (rarityScore >= 50) { rarityColor = 'cornflowerblue'; }
     else { rarityColor = 'teal'; }
 
-    document.getElementById('rarityRanking_'+token_id).innerHTML = rarityScore2
+    document.getElementById('rarityRanking_'+token_id).innerHTML = rarityScore
     document.getElementById('rarityRanking_'+token_id).style.color = rarityColor
 }
 
