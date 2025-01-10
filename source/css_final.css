@@ -6,8 +6,8 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
+    font-family: monospace;
+    background-color: teal;
     color: #333;
     display: flex;
     justify-content: center; /* Center horizontally */
@@ -19,31 +19,32 @@ body {
 /* Container for overall layout */
 .container {
     display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 1200px; /* Limiting the maximum width */
-    margin: 0 auto; /* Center the container */
-    padding: 20px;
-    border: 2px solid #32cd32; /* Add border around the entire container */
-    border-radius: 10px; /* Rounded corners */
-    background-color: white; /* White background for the container */
-    overflow: hidden; /* Prevent overflow from causing issues */
+        flex-direction: column;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        border: none;
+        border-radius: 10px;
+        background-color: transparent;
+        overflow: hidden;
 }
 
 /* Top section with margin-top to add spacing */
 .top-section {
     flex: 2;
-    background-color: #32cd32; /* Fresh green */
+    background-color: cadetblue;
     color: white;
     padding: 20px;
     display: flex;
-    justify-content: space-between; /* Space between text and image grid */
+    justify-content: space-between;
     align-items: flex-start;
     text-align: left;
-    margin-top: 20px; /* Added margin-top for spacing */
-    border: 3px solid #228b22; /* Green border around the top section */
-    border-radius: 8px; /* Rounded corners for the top section */
-    width: 100%; /* Make sure top section takes full width */
+    margin-top: 20px;
+    border: 1px solid black;
+    border-radius: 1px;
+    width: 100%;
+    box-shadow: 8px 8px darkslategray;
 }
 
 .top-section h1 {
