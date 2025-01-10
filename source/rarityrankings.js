@@ -74,6 +74,7 @@ async function rank_tokens() {
     console.log('Final: \n'+sorted_rarity_rankings)
 }
 
+/*
 async function render_token_byrarity(batch, leftoff) {
     try{
 
@@ -112,6 +113,7 @@ async function render_token_byrarity(batch, leftoff) {
         console.log(e.message)
     }
 }
+    */
 
 // 1/([No.ItemsWithTrait]/[No.ItemsInCollection])
 var rarity_trait_rankings = {
