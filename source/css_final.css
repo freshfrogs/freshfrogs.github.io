@@ -55,13 +55,14 @@
 
         .image-grid {
             display: grid;
-            grid-template-columns: repeat(3, 64px);
-            grid-gap: 10px;
+            grid-template-columns: repeat(3, 128px); /* 3 columns of 128px */
+            grid-template-rows: repeat(3, 128px); /* 3 rows of 128px */
+            grid-gap: 10px;            
         }
 
         .image-grid img {
-            width: 64px;
-            height: 64px;
+            width: 128px;
+            height: 128px;
             object-fit: cover;
             border-radius: 8px;
         }
