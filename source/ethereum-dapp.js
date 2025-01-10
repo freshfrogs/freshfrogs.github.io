@@ -267,8 +267,8 @@ async function render_token_sales(contract, sales) {
                     '<text class="card_bold">'+sale_date+'</text>'+
                 '</div>'+
                 '<div class="infobox_right">'+
-                '<text class="card_text">Rarity Score</text>'+'<br>'+
-                '<text id="rarityRanking_'+tokenId+'" class="card_bold">--</text>'+
+                    '<text class="card_text">Rarity</text>'+'<br>'+
+                    '<text id="rarityRanking_'+tokenId+'" class="card_bold">--</text>'+
                 '</div>'+
                 '<div id="buttonsPanel_'+tokenId+'" class="card_buttonbox">'+
                     '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
@@ -342,12 +342,12 @@ async function render_held_tokens(wallet, tokens) {
             '</div>'+
             '<br>'+
             '<div class="infobox_left">'+
-                '<text class="card_text">Next Level</text>'+'<br>'+
-                '<text id="nextlvl_'+tokenId+'" class="card_bold">--</text>'+
-            '</div>'+
-            '<div class="infobox_right">'+
                 '<text class="card_text">Rewards</text>'+'<br>'+
                 '<text id="rewards_'+tokenId+'" class="card_bold">--</text>'+
+            '</div>'+
+            '<div class="infobox_right">'+
+                '<text class="card_text">Rarity</text>'+'<br>'+
+                '<text id="rarityRanking_'+tokenId+'" class="card_bold">--</text>'+
             '</div>'+
             '<div id="buttonsPanel_'+tokenId+'" class="card_buttonbox">'+
                 '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
