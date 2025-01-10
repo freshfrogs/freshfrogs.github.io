@@ -9,16 +9,26 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
             color: #333;
+            height: 100vh; /* Full viewport height */
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
         }
 
         /* Container for overall layout */
         .container {
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            width: 100%;
+            max-width: 1200px; /* Limiting the maximum width */
+            margin: 0 auto; /* Center the container */
+            padding: 20px;
+            border: 2px solid #32cd32; /* Add border around the entire container */
+            border-radius: 10px; /* Rounded corners */
+            background-color: white; /* White background for the container */
         }
 
-        /* Top section */
+        /* Top section with margin-top to add spacing */
         .top-section {
             flex: 2;
             background-color: #32cd32; /* Fresh green */
@@ -28,6 +38,9 @@
             justify-content: space-between;
             align-items: flex-start;
             text-align: left;
+            margin-top: 20px; /* Added margin-top for spacing */
+            border: 3px solid #228b22; /* Green border around the top section */
+            border-radius: 8px; /* Rounded corners for the top section */
         }
 
         .top-section h1 {
@@ -56,16 +69,17 @@
         /* Bottom sections container */
         .bottom-sections {
             display: flex;
-            flex: 1;
-            justify-content: space-between;
+            width: 100%; /* Make sure bottom sections take full width */
             padding: 20px;
+            margin-top: 20px; /* Add some space between the sections */
         }
 
         /* Individual bottom section */
         .bottom-section {
-            flex: 1;
+            flex: 1; /* Ensures both sections take up equal width */
             margin: 0 10px;
             background-color: #ffffff;
+            border: 2px solid #ccc; /* Light grey border for the bottom sections */
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             padding: 20px;
