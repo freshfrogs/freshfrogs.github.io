@@ -784,8 +784,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
     // Create Element <--
     token_doc.appendChild(token_element);
 
-    rarityScore = 0;
-    console.log('Rarity Ranking == > ('+rarityScore+')')
+    var rarityScore2 = 0;
 
     // Update Metadata! Build Frog -->
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
@@ -794,23 +793,20 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
         var trait_type = metadata.attributes[i].trait_type;
         build_trait(trait_type, attribute, 'cont_'+element_id);
 
-        var rarity = 1/(parseInt(rarityScores[attribute])/4040);
-        console.log(attribute+': '+rarity)
-        rarityScore = parseInt(rarityScore) + parseInt(rarity);
+        // Calculate Rarity Score
+        var rarity_raw = 1/(parseInt(rarityScores[attribute])/4040);
+        var rarity = parseInt(rarityScore2) + parseInt(rarity_raw)
+        rarityScore2 = parseInt(rarity);
     }
 
-    console.log('Frog #'+token_id+' --==> '+rarityScore)
-    try {
-        if (rarityScore >= 400) {  rarityColor = 'violet';
-        } else if (rarityScore >= 200) { rarityColor = 'darkorchid';
-        } else if (rarityScore >= 100) { rarityColor = 'coral';
-        } else if (rarityScore >= 50) { rarityColor = 'cornflowerblue';
-        } else { rarityColor = 'teal'; }
+    if (rarityScore2 >= 400) {  rarityColor = 'violet'; }
+    else if (rarityScore2 >= 200) { rarityColor = 'darkorchid'; }
+    else if (rarityScore2 >= 100) { rarityColor = 'coral'; }
+    else if (rarityScore2 >= 50) { rarityColor = 'cornflowerblue'; }
+    else { rarityColor = 'teal'; }
 
-        document.getElementById('rarityRanking_'+token_id).innerHTML = rarityScore
-        document.getElementById('rarityRanking_'+token_id).style.color = rarityColor
-        
-    } catch (e) {}
+    document.getElementById('rarityRanking_'+token_id).innerHTML = rarityScore2
+    document.getElementById('rarityRanking_'+token_id).style.color = rarityColor
 }
 
 /*
