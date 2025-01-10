@@ -44,6 +44,7 @@ async function rank_tokens() {
             // Frog Type
             if (trait_type == 'Frog' || trait_type == 'SpecialFrog') {
                 rarity_token_rankings[i].frogtype = attribute
+                var frog_type = attribute;
             }
 
             // Natural Trait Bonus
