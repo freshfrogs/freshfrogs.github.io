@@ -30,17 +30,18 @@ background-color: white; /* White background for the container */
 
 /* Top section with margin-top to add spacing */
 .top-section {
-flex: 2;
-background-color: #32cd32; /* Fresh green */
-color: white;
-padding: 20px;
-display: flex;
-justify-content: space-between;
-align-items: flex-start;
-text-align: left;
-margin-top: 20px; /* Added margin-top for spacing */
-border: 3px solid #228b22; /* Green border around the top section */
-border-radius: 8px; /* Rounded corners for the top section */
+    flex: 2;
+    background-color: cadetblue;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    text-align: left;
+    margin-top: 20px;
+    border: 1px solid black;
+    border-radius: 0px;
+    box-shadow: 8px 8px darkslategray;
 }
 
 .top-section h1 {
