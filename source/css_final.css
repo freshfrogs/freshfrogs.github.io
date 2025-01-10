@@ -7,7 +7,7 @@
 
 body {
     font-family: monospace;
-    background-color: teal;
+    background-color: wheat;
     color: #333;
     display: flex;
     justify-content: center; /* Center horizontally */
@@ -75,6 +75,7 @@ body {
     border-radius: 1px;
     box-shadow: 2px 2px darkslategray;
     image-rendering: pixelated;
+    border: 1px solid black;
 }
 
 /* Bottom sections container */
