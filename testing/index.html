@@ -451,6 +451,9 @@
 
         console.log('Counting token traits...');
         await count_token_traits();
+        console.log('Frog rarity rankings...');
+        await rank_tokens();
+
         await build_random_logo();
         await initiate_web3_connection();
         await fetch_staked_tokens();
