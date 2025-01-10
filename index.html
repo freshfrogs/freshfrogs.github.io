@@ -45,9 +45,8 @@
           random_tokenImg.src = SOURCE_PATH+'/frog/'+random_token+'.png'
           document.getElementById('icons_container').appendChild(random_tokenImg);
         }
-        
-        await render_token_byrarity(50);
-        //await fetch_token_sales(COLLECTION_ADDRESS, '50'); // await fetch_token_sales(COLLECTION_ADDRESS, '50');
+
+        await fetch_token_sales(COLLECTION_ADDRESS, '50'); // await fetch_token_sales(COLLECTION_ADDRESS, '50');
 
         //document.getElementById('randomLogo').onclick = async function (e) { clearInterval(intervalId); }
         document.getElementById('connectButton').onclick = async function (e) { await initiate_web3_connection(); }
