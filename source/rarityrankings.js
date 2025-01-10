@@ -7,7 +7,8 @@
 
 var max_supply = 4040;
 var rarity_trait_rankings = {}
-var rarity_token_rankings = []
+var rarity_token_rankings = [];
+var freshfrogs_rarity_rankings = [];
 
 async function count_token_traits() {
     // Trait Values
@@ -220,7 +221,7 @@ var rarity_trait_rankings = {
     }
 
     
-    freshfrogs_rarity_rankings = [] /*
+     /*
         "1728",
         "933",
         "1452",
