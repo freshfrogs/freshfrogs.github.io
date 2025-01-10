@@ -5,7 +5,7 @@
 
 */
 
-var max_supply = 40//040;
+var max_supply = 4040;
 var rarity_values = {}
 var rarity_token_rankings = {}
 
