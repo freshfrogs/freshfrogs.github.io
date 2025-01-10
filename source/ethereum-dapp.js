@@ -178,7 +178,7 @@ async function fetch_held_tokens(wallet, limit, next_string) {
             update_staked_tokens(data.tokens)
         }
         if (! data.continuation) { return }
-        else { load_more_button('sales', wallet, limit, data.continuation); }
+        else { load_more_button(wallet, limit, data.continuation); }
     })
     .catch(err => console.error(err));
 }
