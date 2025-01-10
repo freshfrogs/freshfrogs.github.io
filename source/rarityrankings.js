@@ -39,7 +39,7 @@ async function rank_tokens() {
             var attribute = metadata.attributes[j].value;
             var trait_type = metadata.attributes[j].trait_type;
 
-            rarity_token_rankings[i.toString()] = 1 / ( parseInt(rarityScores[attribute]) / max_supply );
+            rarity_token_rankings[i.toString()] = 1 / ( parseInt(rarityScores[attribute]) / 4040 );
 
         }
     }
