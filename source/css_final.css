@@ -61,10 +61,11 @@ grid-gap: 10px;
 }
 
 .image-grid img {
-width: 64px;
-height: 64px;
-object-fit: cover;
-border-radius: 8px;
+    width: 128px;
+    height: 128px;
+    border-radius: 0px;
+    margin: 4px;
+    box-shadow: 2px 2px darkslategray;
 }
 
 /* Bottom sections container */
