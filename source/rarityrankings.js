@@ -40,7 +40,7 @@ async function rank_tokens() {
             var trait_type = metadata.attributes[j].trait_type;
 
             var rarity_raw = 1/(parseInt(rarityScores[attribute])/4040);
-            rarity_token_rankings[i.toString()] = parseInt(rarityScore) + parseInt(rarity_raw)
+            rarity_token_rankings[i.toString()] = parseInt(rarity_raw) + parseInt(rarity_raw)
 
         }
 
