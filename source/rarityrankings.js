@@ -5,7 +5,7 @@
 
 */
 
-var max_supply = 4//040;
+var max_supply = 40//040;
 var rarity_values = {}
 
 async function count_token_traits() {
