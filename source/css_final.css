@@ -170,7 +170,7 @@ body {
 
 .image-gallery {
     padding: 20px;
-    background-color: #f9f9f9;
+    background-color: transparent;
 }
 .image-gallery img {
     max-width: 100%;
