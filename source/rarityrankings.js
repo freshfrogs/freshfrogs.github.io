@@ -70,8 +70,8 @@ async function rank_tokens() {
 
         }
 
-        console.log('<-= Frog #'+i+' =->')
-        console.log('==--> '+rarity_token_rankings[i].rarity)
+        console.log('Frog #'+i+' =->')
+        console.log('=-> '+rarity_token_rankings[i].rarity)
         
     }
 
