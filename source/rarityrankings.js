@@ -74,35 +74,41 @@ async function rank_tokens() {
 }
 
 async function render_token_byrarity(batch, leftoff) {
-    if(! leftoff) { leftoff = 0; }
-    for (i = 1; i < batch; i++) {
-        frog = parseInt(freshfrogs_rarity_ranking[(4040-(i+leftoff))]);
+    try{
 
-        var html_elements = 
-        '<div class="infobox_left">'+
-            '<text class="card_text">Owner</text>'+'<br>'+
-            '<text class="card_bold">'+'--'+'</text>'+
-        '</div>'+
-        '<div class="infobox_right">'+
-            '<text class="card_text">Price</text>'+'<br>'+
-            '<text id="frog_type" class="card_bold">'+'--'+'Ξ '+'</text>'+'<text id="usd_price" class="usd_price">$'+'--'+'</text>'+
-        '</div>'+
-        '<br>'+
-        '<div class="infobox_left">'+
-            '<text class="card_text">'+'--'+'</text>'+'<br>'+
-            '<text class="card_bold">'+'--'+'</text>'+
-        '</div>'+
-        '<div class="infobox_right">'+
-            '<text class="card_text">Rarity</text>'+'<br>'+
-            '<text id="rarityRanking_'+frog+'" class="card_bold">--</text>'+
-        '</div>'+
-        '<div id="buttonsPanel_'+frog+'" class="card_buttonbox">'+
-            '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
-            '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
-        '</div>';
-
-        await build_token(html_elements, frog, frog+':'+'', '', '');
-
+        if(! leftoff) { leftoff = 0; }
+        for (i = 1; i < batch; i++) {
+            
+            var frog = parseInt(freshfrogs_rarity_ranking[(4040-(i+leftoff))]);
+    
+            var html_elements = 
+            '<div class="infobox_left">'+
+                '<text class="card_text">Owner</text>'+'<br>'+
+                '<text class="card_bold">'+'--'+'</text>'+
+            '</div>'+
+            '<div class="infobox_right">'+
+                '<text class="card_text">Price</text>'+'<br>'+
+                '<text id="frog_type" class="card_bold">'+'--'+'Ξ '+'</text>'+'<text id="usd_price" class="usd_price">$'+'--'+'</text>'+
+            '</div>'+
+            '<br>'+
+            '<div class="infobox_left">'+
+                '<text class="card_text">'+'--'+'</text>'+'<br>'+
+                '<text class="card_bold">'+'--'+'</text>'+
+            '</div>'+
+            '<div class="infobox_right">'+
+                '<text class="card_text">Rarity</text>'+'<br>'+
+                '<text id="rarityRanking_'+frog+'" class="card_bold">--</text>'+
+            '</div>'+
+            '<div id="buttonsPanel_'+frog+'" class="card_buttonbox">'+
+                '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
+                '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
+            '</div>';
+    
+            await build_token(html_elements, frog, frog+':'+'', '', '');
+    
+        }
+    } catch(e) {
+        console.log(e.message)
     }
 }
 
