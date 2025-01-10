@@ -1,120 +1,120 @@
-          /* Basic Reset */
-          * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+/* Basic Reset */
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
 
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
-            height: 100vh; /* Full viewport height */
-            display: flex;
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically */
-        }
+body {
+font-family: Arial, sans-serif;
+background-color: #f4f4f9;
+color: #333;
+height: 100vh; /* Full viewport height */
+display: flex;
+justify-content: center; /* Center horizontally */
+align-items: center; /* Center vertically */
+}
 
-        /* Container for overall layout */
-        .container {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            max-width: 1200px; /* Limiting the maximum width */
-            margin: 0 auto; /* Center the container */
-            padding: 20px;
-            border: 2px solid #32cd32; /* Add border around the entire container */
-            border-radius: 10px; /* Rounded corners */
-            background-color: white; /* White background for the container */
-        }
+/* Container for overall layout */
+.container {
+display: flex;
+flex-direction: column;
+width: 100%;
+max-width: 1200px; /* Limiting the maximum width */
+margin: 0 auto; /* Center the container */
+padding: 20px;
+border: 2px solid #32cd32; /* Add border around the entire container */
+border-radius: 10px; /* Rounded corners */
+background-color: white; /* White background for the container */
+}
 
-        /* Top section with margin-top to add spacing */
-        .top-section {
-            flex: 2;
-            background-color: #32cd32; /* Fresh green */
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            text-align: left;
-            margin-top: 20px; /* Added margin-top for spacing */
-            border: 3px solid #228b22; /* Green border around the top section */
-            border-radius: 8px; /* Rounded corners for the top section */
-        }
+/* Top section with margin-top to add spacing */
+.top-section {
+flex: 2;
+background-color: #32cd32; /* Fresh green */
+color: white;
+padding: 20px;
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+text-align: left;
+margin-top: 20px; /* Added margin-top for spacing */
+border: 3px solid #228b22; /* Green border around the top section */
+border-radius: 8px; /* Rounded corners for the top section */
+}
 
-        .top-section h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
+.top-section h1 {
+font-size: 2.5em;
+margin-bottom: 10px;
+}
 
-        .top-section p {
-            font-size: 1.2em;
-            margin-bottom: 20px;
-        }
+.top-section p {
+font-size: 1.2em;
+margin-bottom: 20px;
+}
 
-        .image-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 64px);
-            grid-gap: 10px;
-        }
+.image-grid {
+display: grid;
+grid-template-columns: repeat(3, 64px);
+grid-gap: 10px;
+}
 
-        .image-grid img {
-            width: 64px;
-            height: 64px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
+.image-grid img {
+width: 64px;
+height: 64px;
+object-fit: cover;
+border-radius: 8px;
+}
 
-        /* Bottom sections container */
-        .bottom-sections {
-            display: flex;
-            width: 100%; /* Make sure bottom sections take full width */
-            padding: 20px;
-            margin-top: 20px; /* Add some space between the sections */
-        }
+/* Bottom sections container */
+.bottom-sections {
+display: flex;
+width: 100%; /* Make sure bottom sections take full width */
+padding: 20px;
+margin-top: 20px; /* Add some space between the sections */
+}
 
-        /* Individual bottom section */
-        .bottom-section {
-            flex: 1; /* Ensures both sections take up equal width */
-            margin: 0 10px;
-            background-color: #ffffff;
-            border: 2px solid #ccc; /* Light grey border for the bottom sections */
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            text-align: center;
-        }
+/* Individual bottom section */
+.bottom-section {
+flex: 1; /* Ensures both sections take up equal width */
+margin: 0 10px;
+background-color: #ffffff;
+border: 2px solid #ccc; /* Light grey border for the bottom sections */
+border-radius: 8px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+padding: 20px;
+text-align: center;
+}
 
-        .bottom-section h2 {
-            font-size: 1.8em;
-            margin-bottom: 10px;
-        }
+.bottom-section h2 {
+font-size: 1.8em;
+margin-bottom: 10px;
+}
 
-        .bottom-section p {
-            font-size: 1.1em;
-            color: #555;
-        }
+.bottom-section p {
+font-size: 1.1em;
+color: #555;
+}
 
-        /* Responsive styling for smaller screens */
-        @media (max-width: 768px) {
-            .bottom-sections {
-                flex-direction: column;
-            }
+/* Responsive styling for smaller screens */
+@media (max-width: 768px) {
+.bottom-sections {
+    flex-direction: column;
+}
 
-            .bottom-section {
-                margin-bottom: 20px;
-            }
+.bottom-section {
+    margin-bottom: 20px;
+}
 
-            .top-section {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
+.top-section {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
 
-            .image-grid {
-                grid-template-columns: repeat(3, 64px);
-                justify-content: center;
-                margin-top: 20px;
-            }
-        }
+.image-grid {
+    grid-template-columns: repeat(3, 64px);
+    justify-content: center;
+    margin-top: 20px;
+}
+}
