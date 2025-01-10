@@ -1,3 +1,30 @@
+/*
+
+    Custom Rarity Rank Utility for FreshFrogsNFT(FROG)
+    Learn more at https://freshfrogs.github.io
+
+*/
+
+var max_supply = 4040;
+var rarity_values = {}
+
+async function count_token_traits() {
+    // Trait Values
+    for (i = 0; i < max_supply; i++) {
+        
+        console.log('-- Frog #'+i+' --')
+        let metadata = await (await fetch('../frog/json/'+i+'.json')).json();
+        for (let j = 0; j < metadata.attributes.length; j++) {
+            var attribute = metadata.attributes[j].value;
+            var trait_type = metadata.attributes[j].trait_type;
+            var rarity_count = rarity_values[attribute] + 1;
+            rarity_values[attribute] = rarity_count
+        }
+    }
+
+    console.log();
+}
+
 // 1/([No.ItemsWithTrait]/[No.ItemsInCollection])
 var rarityScores = {
     // Frog Types (190)

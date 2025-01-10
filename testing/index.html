@@ -428,6 +428,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
     
+    <script src="https://freshfrogs.github.io/source/rarityrankings.js"></script>
     <script src="https://freshfrogs.github.io/source/controller_abi.js"></script>
     <script src="https://freshfrogs.github.io/source/collection_abi.js"></script>
     <script src="https://freshfrogs.github.io/source/ethereum-dapp.js"></script>
@@ -448,6 +449,8 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
+        console.log('Counting token traits...');
+        await count_token_traits();
         await build_random_logo();
         await initiate_web3_connection();
         await fetch_staked_tokens();
