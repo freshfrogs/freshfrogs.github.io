@@ -835,7 +835,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
         rarityTier = 'Common'
     }
 
-    document.getElementById('rarityRanking_'+token_id).innerHTML = rarityTier
+    document.getElementById('rarityRanking_'+token_id).innerHTML = rarityScore
     document.getElementById('rarityRanking_'+token_id).style.color = rarityColor
 }
 
@@ -883,8 +883,8 @@ async function fetch_staked_tokens(wallet) {
                     '<text id="rewards_'+token_id+'" class="card_bold">'+Math.round(staked_rewards)+' Flyz</text>'+
                 '</div>'+
                 '<div class="infobox_right">'+
-                    '<text class="card_text">Rewards</text>'+'<br>'+
-                    '<text id="rewards_'+token_id+'" class="card_bold">--</text>'+
+                    '<text class="card_text">Rarity</text>'+'<br>'+
+                    '<text id="rarityRanking_'+token_id+'" class="card_bold">--</text>'+
                 '</div>'+
                 '<div id="buttonsPanel_'+token_id+'" class="card_buttonbox">'+
                     '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
