@@ -34,17 +34,11 @@
       document.addEventListener("DOMContentLoaded", async () => {
 
         //await build_random_logo()
-        await render_token_byrarity(100);
+        //await render_token_byrarity(100);
 
-        /*
         await initiate_web3_connection().then(async () => {
           await fetch_held_tokens(CONTROLLER_ADDRESS);
-          document.getElementById('thePondButton').style.boxShadow = '2px 2px lightsalmon'
-          document.getElementById('randomLogo').onclick = async function (e) {
-            clearInterval(intervalId);
-          }
         })
-        */
 
         async function build_random_logo() {
           // Random Frog Element:
