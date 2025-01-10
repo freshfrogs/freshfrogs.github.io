@@ -17,7 +17,18 @@
       <script>
 
         document.addEventListener("DOMContentLoaded", async () => {
+
+          document.getElementById('icons_container').innerHTML = '';
+          for (let i = 0; i < 9; i++) {
+            random_token = Math.floor(Math.random() * 4040) + 1;
+            random_tokenImg = document.createElement('img')
+            random_tokenImg.src = SOURCE_PATH+'/frog/'+random_token+'.png'
+            document.getElementById('icons_container').appendChild(random_tokenImg);
+          }
+
           await fetch_token_sales(COLLECTION_ADDRESS, '50');
+          document.getElementById('connectButton').onclick = async function (e) { await initiate_web3_connection(); }
+
         });
         
       </script>
@@ -42,7 +53,7 @@
           <a href="https://github.com/freshfrogs/freshfrogs.github.io" target="_blank"><button id="githubButton" class="connectButton" style="background: #e9ecef; color: black;">View on Github</button></a>
           <a href="https://opensea.io/collection/fresh-frogs" target="_blank"><button id="raribleButton" class="connectButton" style="background: rgb(0, 134, 255); color: white;">Shop on Opensea</button></a>
         </div>
-        <div class="image-grid">
+        <div id="icons_container" class="image-grid">
           <img src="https://freshfrogs.github.io/frog/500.png">
           <img src="https://freshfrogs.github.io/frog/1011.png">
           <img src="https://freshfrogs.github.io/frog/1010.png">
