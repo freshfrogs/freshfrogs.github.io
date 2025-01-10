@@ -10,10 +10,10 @@ var rarity_values = {}
 
 async function count_token_traits() {
     // Trait Values
-    for (i = 0; i < max_supply; i++) {
+    for (i = 1; i < max_supply; i++) {
         
         console.log('-- Frog #'+i+' --')
-        let metadata = await (await fetch('../frog/json/'+i+'.json')).json();
+        let metadata = await (await fetch('https://freshfrogs.github.io/frog/json/'+i+'.json')).json();
         for (let j = 0; j < metadata.attributes.length; j++) {
             var attribute = metadata.attributes[j].value;
             var trait_type = metadata.attributes[j].trait_type;
