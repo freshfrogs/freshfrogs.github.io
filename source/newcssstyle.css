@@ -514,6 +514,7 @@ html {
     box-shadow: none;
     text-align: left;
     margin: auto;
+    float: left;
   }
   .main_right {
     padding: 0px;
@@ -527,6 +528,7 @@ html {
     min-width: 410px;
     max-width: 400px;
     margin: auto;
+    float: right;
   }
   .headerPanel {
     font-weight: normal;
