@@ -65,7 +65,8 @@
             width: 128px;
             height: 128px;
             object-fit: cover;
-            border-radius: 8px;
+            border-radius: 1px;
+            box-shadow: 2px 2px darkslategray;
         }
 
         /* Bottom sections container */
