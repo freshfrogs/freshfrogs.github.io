@@ -69,8 +69,8 @@ async function rank_tokens() {
     }
 
     console.log(rarity_token_rankings)
-    var sorted_rarity_rankings = Object.keys(rarity_token_rankings).sort(function(a,b){return rarity_token_rankings[a]-rarity_token_rankings[b]})
-    console.log(sorted_rarity_rankings)
+    var sorted_rarity_rankings = Object.keys(rarity_token_rankings).sort(function(a,b){return rarity_token_rankings[a.rarity]-rarity_token_rankings[b.rarity]})
+    console.log('Final: \n'+sorted_rarity_rankings)
 }
 
 async function render_token_byrarity(batch, leftoff) {
