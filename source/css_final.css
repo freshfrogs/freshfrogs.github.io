@@ -78,12 +78,12 @@
 
         /* Individual bottom section */
         .bottom-section {
-            flex: 1; /* Ensures both sections take up equal width */
+            flex: 1;
             margin: 0 10px;
-            background-color: #ffffff;
-            border: 2px solid #ccc; /* Light grey border for the bottom sections */
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: cadetblue;
+            border: 1px solid black;
+            border-radius: 1px;
+            box-shadow: 8px 8px darkslategray;
             padding: 20px;
             text-align: center;
         }
