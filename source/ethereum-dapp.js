@@ -884,7 +884,7 @@ async function fetch_staked_tokens(wallet) {
                 '</div>'+
                 '<div class="infobox_right">'+
                     '<text class="card_text">Rewards</text>'+'<br>'+
-                    '<text id="rewards_'+tokenId+'" class="card_bold">--</text>'+
+                    '<text id="rewards_'+token_id+'" class="card_bold">--</text>'+
                 '</div>'+
                 '<div id="buttonsPanel_'+token_id+'" class="card_buttonbox">'+
                     '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
