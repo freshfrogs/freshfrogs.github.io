@@ -233,3 +233,107 @@ body {
     color: teal;
     font-weight: bold;
 }
+.card_buttonbox {
+    text-align: center;
+    display: table;
+    margin: 4px;
+}
+
+.properties {
+    display: initial;
+    border-top-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+  .display_token {
+    display: inline-block;
+    background-color: transparent;
+    padding: 0px;
+    color: #333 !important;
+    border-radius: 0px;
+    overflow: hidden;
+    width: auto;
+    margin: 12px;
+    margin-bottom: 8px;
+    font-size: small;
+    transition: all .2s;
+    border: 1px solid black;
+    overflow: hidden;
+    box-shadow: 10px 10px darkslategray;
+    font-family: monospace;
+    font-size: initial;
+  }
+  .display_token_cont {
+    display: inline-block;
+    margin: 0px;
+    border-radius: 0px;
+    background-color: transparent;
+  }
+  .display_token_img_cont {
+    border-radius: 0px;
+    width: 192px;
+    height: 192px;
+    overflow: hidden;
+    margin-left: auto;
+    margin-right: auto;
+    transition: width .5s, height .5s;
+  }
+  .display_token_img_cont:hover {
+    width: 192px;
+    height: 192px;
+  }
+  .renderLeft {
+    width: auto;
+    background: transparent;
+    color: #333;
+    margin: auto;
+    padding: 0px;
+    min-width: 168px;
+    border: none;
+    border-bottom: 1px solid gray;
+  }
+  .renderRight {
+    border-radius: 0px;
+    background: white;
+    display: flex;
+    color: #1a202c;
+    padding: 4px;
+    width: auto;
+    height: auto;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+  }
+  .attribute_overlay {
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    width: inherit;
+    height: inherit;
+    margin: 0px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .container_element {
+    background-color: transparent;
+    border: 0px solid black;
+    border-radius: 0px;
+    width: 490px;
+    color: white;
+    margin: 0px;
+  }
+  .attribute_overlay:hover {
+    -ms-transform: scale(1.2); /* IE 9 */
+    -webkit-transform: scale(1.2); /* Safari 3-8 */
+    transform: scale(1.2);
+  }
+  .trait_overlay {
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    margin: 0px;
+    width: inherit;
+    height: inherit;
+    cursor: pointer;
+    transition: width .2s, height .2s;
+  }
