@@ -494,7 +494,7 @@ html {
     font-family: var(--m3-ui-family), "-apple-system", "BlinkMacSystemFont", sans-serif;
     letter-spacing: normal;
   }
-  .noto-sans-ff {
+  .noto-sans-freshfrogs {
     font-family: "Noto Sans", serif;
     font-optical-sizing: auto;
     font-weight: 300;
@@ -502,6 +502,30 @@ html {
     font-variation-settings:
       "wdth" 100;
   }
+  .space-mono-regular {
+    font-family: "Space Mono", serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+  .space-mono-bold {
+    font-family: "Space Mono", serif;
+    font-weight: 700;
+    font-style: normal;
+  }
+  
+  .space-mono-regular-italic {
+    font-family: "Space Mono", serif;
+    font-weight: 400;
+    font-style: italic;
+  }
+  
+  .space-mono-bold-italic {
+    font-family: "Space Mono", serif;
+    font-weight: 700;
+    font-style: italic;
+  }
+  
   .main_left {
     padding: 15px;
     margin: 15px;
