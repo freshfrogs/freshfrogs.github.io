@@ -34,7 +34,7 @@ html {
   .frog_icon {
     width: 128px;
     height: 128px;
-    border-radius: 3px;
+    border-radius: 0px;
     margin: 4px;
     box-shadow: 2px 2px darkslategray;
   }
@@ -47,7 +47,7 @@ html {
     text-shadow: none;
     color: white;
     background-color: transparent;
-    border-radius: 3px;
+    border-radius: 0px;
     border: none;
     width: auto;
     margin-top: 20px !important;
@@ -73,7 +73,7 @@ html {
     overflow: hidden;
     background-color: transparent;
     text-align: center;
-    border-radius: 3px;
+    border-radius: 0px;
     width: auto !important;
     font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
     font-size: auto !important;
@@ -100,7 +100,7 @@ html {
     background-color: transparent;
     padding: 0px;
     color: #333 !important;
-    border-radius: 3px;
+    border-radius: 0px;
     overflow: hidden;
     width: auto;
     margin: 12px;
@@ -116,11 +116,11 @@ html {
   .display_token_cont {
     display: inline-block;
     margin: 0px;
-    border-radius: 3px;
+    border-radius: 0px;
     background-color: transparent;
   }
   .display_token_img_cont {
-    border-radius: 3px;
+    border-radius: 0px;
     width: 192px;
     height: 192px;
     overflow: hidden;
@@ -167,7 +167,7 @@ html {
   .container_element {
     background-color: transparent;
     border: 0px solid black;
-    border-radius: 3px;
+    border-radius: 0px;
     width: 490px;
     color: white;
     margin: 0px;
@@ -200,7 +200,7 @@ html {
     background: cadetblue;
     border: 1px solid black;
     box-shadow: 12px 12px darkslategray;
-    border-radius: 3px;
+    border-radius: 0px;
   }
   .outputPanel {
     color: white;
@@ -209,7 +209,7 @@ html {
     width: 70%;
     margin-left: auto;
     margin-right: auto;
-    border-radius: 3px;
+    border-radius: 0px;
     box-shadow: 2px 2px darkslategray;
   }
   .usd_price{
@@ -219,7 +219,7 @@ html {
     padding: 1px;
     padding-left: 2px;
     padding-right: 2px;
-    border-radius: 3px;
+    border-radius: 0px;
   }
   .infobox {
     
@@ -229,7 +229,7 @@ html {
     padding: 8px;
     background: white;
     border: 1px solid black;
-    border-radius: 3px;
+    border-radius: 0px;
     min-width: 130px;
     height: auto;
     vertical-align: middle;
@@ -250,7 +250,7 @@ html {
     margin: 4px;
     background: white;
     border: 1px solid black;
-    border-radius: 3px;
+    border-radius: 0px;
     font-weight: bold;
     width: 115px;
     height: 25px;
@@ -272,7 +272,7 @@ html {
     margin: 4px;
     background: #e9ecef;
     border: 1px solid black;
-    border-radius: 3px;
+    border-radius: 0px;
     font-weight: bold;
     width: 120px;
     height: 25px;
@@ -295,7 +295,7 @@ html {
     margin: 4px;
     background: rgb(0, 134, 255);
     border: 1px solid black;
-    border-radius: 3px;
+    border-radius: 0px;
     font-weight: bold;
     width: 120px;
     height: 25px;
@@ -318,7 +318,7 @@ html {
     margin: 4px;
     background: indianred;
     border: 1px solid black;
-    border-radius: 3px;
+    border-radius: 0px;
     font-weight: bold;
     width: 120px;
     height: 25px;
@@ -340,7 +340,7 @@ html {
     margin: 4px;
     background: teal;
     border: 1px solid black;
-    border-radius: 3px;
+    border-radius: 0px;
     font-weight: bold;
     width: 248px;
     height: 25px;
@@ -362,7 +362,7 @@ html {
     margin: 4px;
     background: tomato;
     border: 1px solid black;
-    border-radius: 3px;
+    border-radius: 0px;
     font-weight: bold;
     width: 248px;
     height: 25px;
@@ -426,7 +426,7 @@ html {
     font-size: initial;
     font-weight: bolder;
     background: transparent;
-    border-radius: 3px;
+    border-radius: 0px;
 ;
     border: none;
     box-shadow: none;
@@ -486,7 +486,7 @@ html {
     margin-right: auto;
     background: transparent;
     color: white;
-    border-radius: 3px;
+    border-radius: 0px;
   }
   .recentsalesheading {
     color: white;
@@ -582,7 +582,7 @@ html {
     text-shadow: none;
     color: white;
     background-color: transparent;
-    border-radius: 3px;
+    border-radius: 0px;
     border: none;
     width: 100%;
     min-width: 300px;
@@ -592,7 +592,7 @@ html {
   }
   .morph-token-result {
     background: white;
-    border-radius: 3px;
+    border-radius: 0px;
     width: 40%;
     height: auto;
     margin: auto;
@@ -604,7 +604,7 @@ html {
     height: 256px;
     margin: auto;
     background: lightskyblue;
-    border-radius: 3px;
+    border-radius: 0px;
   }
   .morph-json-container {
     margin: auto;
@@ -613,7 +613,7 @@ html {
     padding: 8px;
     padding-left: 16px;
     padding-right: 16px;
-    border-radius: 3px;
+    border-radius: 0px;
     overflow: auto;
   }
   .tokens-dropdown-option {
