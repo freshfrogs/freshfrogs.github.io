@@ -51,12 +51,9 @@ async function rank_tokens() {
             if (attribute == 'natural' && trait_type == 'Trait') {
                 if (frog_type == 'redEyedTreeFrog' || frog_type == 'lightBrownTreeFrog' || frog_type == 'brownTreeFrog' || frog_type == 'goldenDartFrog' || frog_type == 'unknown' || frog_type == 'grayTreeFrog' || frog_type == 'stawberryDartFrog' || frog_type == 'blueDartFrog' || frog_type == 'splendidLeafFrog') {
                     
-                    console.log('Natural Rarity: '+natural_rarity)
-                    var natural_rarity = rarity_trait_rankings[frog_type+'_natural']
-                    var rarity_raw = 1/(parseInt(natural_rarity)/4040);
-                    var rarity = parseInt(rarity_token_rankings[i].rarity) + parseInt(rarity_raw)
-                    rarity_token_rankings[i].rarity = parseInt(rarity);
-                    console.log(rarity_token_rankings[i].rarity)
+                    console.log('Natural Rarity: '+rarity_trait_rankings[frog_type+'_natural'])
+                    var rarity_raw = parseInt(rarity_token_rankings[i].rarity) + 1/(parseInt(rarity_trait_rankings[frog_type+'_natural'])/4040)
+                    rarity_token_rankings[i].rarity = parseInt(rarity_raw);
 
                 } else {
                     // Calculate Rarity Score
