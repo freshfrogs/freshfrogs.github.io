@@ -83,14 +83,14 @@ body {
 
 /* Individual bottom section */
 .bottom-section {
-    flex: 1; /* Ensures both sections take up equal width */
+    flex: 1;
     margin: 0 10px;
-    background-color: #ffffff;
-    border: 2px solid #ccc; /* Light grey border for the bottom sections */
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: cadetblue;
+    border: 1px solid black;
+    border-radius: 1px;
+    box-shadow: 8px 8px darkslategray;
     padding: 20px;
-    text-align: center;
+    text-align: left;
 }
 
 .bottom-section h2 {
@@ -100,7 +100,7 @@ body {
 
 .bottom-section p {
     font-size: 1.1em;
-    color: #555;
+    color: white;
 }
 
 /* Responsive styling for smaller screens */
@@ -163,3 +163,25 @@ body {
         font-size: 1em; /* Smaller paragraph text */
     }
 }
+.connectButton {
+    margin: 4px;
+    padding: 8px;
+    background: white;
+    border: 1px solid black;
+    border-radius: 0px;
+    min-width: 130px;
+    height: auto;
+    vertical-align: middle;
+    font-size: small;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 2px 2px darkslategray;
+    transition: all .3s;
+    font-family: monospace;
+    font-size: initial;
+  }
+  .connectButton:hover {
+    top: -5px;
+    position: relative;
+    box-shadow: 8px 8px 0px darkslategray;
+  }
