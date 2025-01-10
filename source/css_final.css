@@ -6,13 +6,13 @@ box-sizing: border-box;
 }
 
 body {
-font-family: Arial, sans-serif;
-background-color: #f4f4f9;
-color: #333;
-height: 100vh; /* Full viewport height */
-display: flex;
-justify-content: center; /* Center horizontally */
-align-items: center; /* Center vertically */
+    font-family: Arial, sans-serif;
+    background-color: teal;
+    color: #333;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* Container for overall layout */
@@ -77,14 +77,13 @@ margin-top: 20px; /* Add some space between the sections */
 
 /* Individual bottom section */
 .bottom-section {
-flex: 1; /* Ensures both sections take up equal width */
-margin: 0 10px;
-background-color: #ffffff;
-border: 2px solid #ccc; /* Light grey border for the bottom sections */
-border-radius: 8px;
-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-padding: 20px;
-text-align: center;
+    font-family: Arial, sans-serif;
+    background-color: teal;
+    color: #333;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .bottom-section h2 {
