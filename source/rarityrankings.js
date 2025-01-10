@@ -93,14 +93,14 @@ async function render_token_byrarity(batch) {
         '</div>'+
         '<div class="infobox_right">'+
             '<text class="card_text">Rarity</text>'+'<br>'+
-            '<text id="rarityRanking_'+i+'" class="card_bold">--</text>'+
+            '<text id="rarityRanking_'+frog+'" class="card_bold">--</text>'+
         '</div>'+
-        '<div id="buttonsPanel_'+i+'" class="card_buttonbox">'+
-            '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+i+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
-            '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+i+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
+        '<div id="buttonsPanel_'+frog+'" class="card_buttonbox">'+
+            '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
+            '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
         '</div>';
 
-        await build_token(html_elements, i, i+':'+'', '', '');
+        await build_token(html_elements, frog, frog+':'+'', '', '');
 
     }
 }
