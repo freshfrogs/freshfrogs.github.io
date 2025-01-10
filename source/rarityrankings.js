@@ -51,10 +51,8 @@ async function rank_tokens() {
     }
 
     console.log(rarity_token_rankings)
-    rarity_token_rankings.sort(function(a, b) {
-        return a - b;
-      });
-    console.log(rarity_token_rankings)
+    var sorted_rarity_rankings = Object.keys(rarity_token_rankings).sort(function(a,b){return rarity_token_rankings[a]-rarity_token_rankings[b]})
+    console.log(sorted_rarity_rankings)
 }
 
 // 1/([No.ItemsWithTrait]/[No.ItemsInCollection])
