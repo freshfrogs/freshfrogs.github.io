@@ -230,6 +230,52 @@ body {
     position: relative;
     box-shadow: 8px 8px 0px darkslategray;
   }
+  .stake_button {
+    margin: 4px;
+    background: teal;
+    border: 1px solid black;
+    border-radius: 0px;
+    font-weight: bold;
+    width: 248px;
+    height: 25px;
+    color: white;
+    vertical-align: middle;
+    font-size: small;
+    padding: 0px !important;
+    cursor: pointer;
+    box-shadow: 2px 2px darkslategray;
+    transition: all .3s;
+    font-family: monospace;
+    font-size: initial;
+  }
+  .stake_button:hover{
+    top: -5px;
+    position: relative;
+    box-shadow: 8px 8px 0px darkslategray;
+  }
+  .unstake_button {
+    margin: 4px;
+    background: tomato;
+    border: 1px solid black;
+    border-radius: 0px;
+    font-weight: bold;
+    width: 248px;
+    height: 25px;
+    color: white;
+    vertical-align: middle;
+    font-size: small;
+    padding: 0px !important;
+    cursor: pointer;
+    box-shadow: 2px 2px darkslategray;
+    transition: all .3s;
+    font-family: monospace;
+    font-size: initial;
+  }
+  .unstake_button:hover{
+    top: -5px;
+    position: relative;
+    box-shadow: 8px 8px 0px darkslategray;
+  }
 .connectButton {
     margin: 4px;
     padding: 8px;
