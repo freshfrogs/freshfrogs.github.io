@@ -784,6 +784,8 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
     // Create Element <--
     token_doc.appendChild(token_element);
 
+    rarityScore = 0;
+
     // Update Metadata! Build Frog -->
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
