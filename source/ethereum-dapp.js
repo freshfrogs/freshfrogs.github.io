@@ -800,6 +800,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
         if (attribute == 'natural' && trait_type == 'Trait') {
             if (frog_type == 'redEyedTreeFrog' || frog_type == 'lightBrownTreeFrog' || frog_type == 'brownTreeFrog' || frog_type == 'goldenDartFrog' || frog_type == 'unknown' || frog_type == 'grayTreeFrog' || frog_type == 'stawberryDartFrog' || frog_type == 'blueDartFrog' || frog_type == 'splendidLeafFrog') {
                 var rarity_raw = 1/(parseInt(rarity_trait_rankings[frog_type+'_natural'])/4040);
+                console.log(parseInt(rarity_trait_rankings[frog_type+'_natural']))
                 var rarity = parseInt(rarityScore) + parseInt(rarity_raw)
             } else {
                 // Calculate Rarity Score
