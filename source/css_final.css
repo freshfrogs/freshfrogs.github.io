@@ -6,13 +6,14 @@
 }
 
 body {
-    font-family: monospace;
-    background-color: teal;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
     color: #333;
-    height: 100vh; /* Full viewport height */
     display: flex;
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically */
+    min-height: 100vh; /* Ensure the body takes full height */
+    padding: 20px; /* Added padding around the content */
 }
 
 /* Container for overall layout */
@@ -20,28 +21,29 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: 1200px; /* Limiting the maximum width */
+    margin: 0 auto; /* Center the container */
     padding: 20px;
-    border: none;
-    border-radius: 10px;
-    background-color: transparent;
+    border: 2px solid #32cd32; /* Add border around the entire container */
+    border-radius: 10px; /* Rounded corners */
+    background-color: white; /* White background for the container */
+    overflow: hidden; /* Prevent overflow from causing issues */
 }
 
 /* Top section with margin-top to add spacing */
 .top-section {
     flex: 2;
-    background-color: cadetblue;
+    background-color: #32cd32; /* Fresh green */
     color: white;
     padding: 20px;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* Space between text and image grid */
     align-items: flex-start;
     text-align: left;
-    margin-top: 20px;
-    border: 1px solid black;
-    border-radius: 1px;
-    box-shadow: 8px 8px darkslategray;
+    margin-top: 20px; /* Added margin-top for spacing */
+    border: 3px solid #228b22; /* Green border around the top section */
+    border-radius: 8px; /* Rounded corners for the top section */
+    width: 100%; /* Make sure top section takes full width */
 }
 
 .top-section h1 {
@@ -54,19 +56,20 @@ body {
     margin-bottom: 20px;
 }
 
+/* Image grid to the right */
 .image-grid {
     display: grid;
-    grid-template-columns: repeat(3, 128px); /* 3 columns of 128px */
-    grid-template-rows: repeat(3, 128px); /* 3 rows of 128px */
-    grid-gap: 10px;            
+    grid-template-columns: repeat(3, 128px); /* 3 columns */
+    grid-template-rows: repeat(3, 128px); /* 3 rows */
+    grid-gap: 10px;
+    align-items: center;
 }
 
 .image-grid img {
     width: 128px;
     height: 128px;
     object-fit: cover;
-    border-radius: 1px;
-    box-shadow: 2px 2px darkslategray;
+    border-radius: 8px;
 }
 
 /* Bottom sections container */
@@ -79,14 +82,14 @@ body {
 
 /* Individual bottom section */
 .bottom-section {
-    flex: 1;
+    flex: 1; /* Ensures both sections take up equal width */
     margin: 0 10px;
-    background-color: cadetblue;
-    border: 1px solid black;
-    border-radius: 1px;
-    box-shadow: 8px 8px darkslategray;
+    background-color: #ffffff;
+    border: 2px solid #ccc; /* Light grey border for the bottom sections */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    text-align: left;
+    text-align: center;
 }
 
 .bottom-section h2 {
@@ -96,7 +99,7 @@ body {
 
 .bottom-section p {
     font-size: 1.1em;
-    color: white;
+    color: #555;
 }
 
 /* Responsive styling for smaller screens */
@@ -110,43 +113,52 @@ body {
     }
 
     .top-section {
-        flex-direction: column;
+        flex-direction: column; /* Stack text and images on smaller screens */
         align-items: center;
         text-align: center;
     }
 
     .image-grid {
-        grid-template-columns: repeat(3, 64px);
+        grid-template-columns: repeat(3, 128px);
         justify-content: center;
         margin-top: 20px;
     }
+
+    /* Ensure that images in the grid don't overflow or get squished */
+    .image-grid img {
+        width: 128px;
+        height: 128px;
+    }
 }
 
-.connectButton{
-    margin: 4px;
-    padding: 8px;
-    background: white;
-    border: 1px solid black;
-    border-radius: 0px;
-    min-width: 130px;
-    height: auto;
-    vertical-align: middle;
-    font-size: small;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all .3s;
-    box-shadow: 2px 2px darkslategray;
-}
-.connectButton:hover {
-    top: -5px;
-    position: relative;
-    box-shadow: 8px 8px 0px darkslategray;
-}
+/* Further improvements for very small screens */
+@media (max-width: 480px) {
+    .top-section {
+        padding: 15px;
+    }
 
-.front_title {
-    font-size: x-large;
-    font-weight: 900;
-    text-shadow: 2px 2px darkslategray;
-    margin-top: 5px;
-    color: white;
-  }
+    .top-section h1 {
+        font-size: 2em; /* Smaller title for mobile */
+    }
+
+    .top-section p {
+        font-size: 1em; /* Smaller paragraph text */
+    }
+
+    .image-grid {
+        grid-template-columns: repeat(3, 100px); /* Reduce image size on very small screens */
+        grid-gap: 8px;
+    }
+
+    .bottom-sections {
+        margin-top: 15px;
+    }
+
+    .bottom-section h2 {
+        font-size: 1.5em; /* Smaller heading */
+    }
+
+    .bottom-section p {
+        font-size: 1em; /* Smaller paragraph text */
+    }
+}
