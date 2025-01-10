@@ -1,0 +1,26 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+header, .section {
+    padding: 20px;
+    text-align: center;
+}
+header {
+    background-color: #4CAF50;
+    color: white;
+}
+.container {
+    display: flex;
+    flex-direction: column;
+}
+.bottom-sections {
+    display: flex;
+    justify-content: space-between;
+}
+.bottom-sections .section {
+    width: 48%;
+    background-color: #f4f4f4;
+}
