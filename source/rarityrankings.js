@@ -40,6 +40,11 @@ async function rank_tokens() {
             var attribute = metadata.attributes[j].value;
             var trait_type = metadata.attributes[j].trait_type;
 
+            // Frog Type
+            if (trait_type == 'Frog' || trait_type == 'SpecialFrog') {
+                var frog_type = attribute
+            }
+            
             // Natural Trait Bonus
             if (attribute == 'natural' && trait_type == 'Trait') {
                 if (frog_type == 'redEyedTreeFrog' || frog_type == 'lightBrownTreeFrog' || frog_type == 'brownTreeFrog' || frog_type == 'goldenDartFrog' || frog_type == 'unknown' || frog_type == 'grayTreeFrog' || frog_type == 'stawberryDartFrog' || frog_type == 'blueDartFrog' || frog_type == 'splendidLeafFrog') {
