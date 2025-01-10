@@ -76,7 +76,7 @@ async function rank_tokens() {
     }
 
     var ranked_tokens = rarity_token_rankings.sort(({rarity:a}, {rarity:b}) => b-a);
-    console.log(reranked_tokenss);
+    console.log(ranked_tokens);
 }
 
 /*
