@@ -233,6 +233,7 @@ html {
     font-weight: bold;
     cursor: pointer;
     box-shadow: 2px 2px darkslategray;
+    transition: all .5s;
     font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
   }
   .connectButton:hover{
@@ -253,6 +254,7 @@ html {
     padding: 0px !important;
     cursor: pointer;
     box-shadow: 2px 2px darkslategray;
+    transition: all .5s;
     font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
   }
   .loadmore_button:hover {
@@ -273,6 +275,7 @@ html {
     padding: 0px !important;
     cursor: pointer;
     box-shadow: 2px 2px darkslategray;
+    transition: all .5s;
     font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
   }
   .etherscan_button:hover {
@@ -293,6 +296,7 @@ html {
     padding: 0px !important;
     cursor: pointer;
     box-shadow: 2px 2px darkslategray;
+    transition: all .5s;
     font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
   }
   .opensea_button:hover {
@@ -313,6 +317,7 @@ html {
     padding: 0px !important;
     cursor: pointer;
     box-shadow: 2px 2px darkslategray;
+    transition: all .5s;
     font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
   }
   .morph_button:hover{
@@ -333,6 +338,7 @@ html {
     padding: 0px !important;
     cursor: pointer;
     box-shadow: 2px 2px darkslategray;
+    transition: all .5s;
     font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
   }
   .stake_button:hover{
@@ -353,6 +359,7 @@ html {
     padding: 0px !important;
     cursor: pointer;
     box-shadow: 2px 2px darkslategray;
+    transition: all .5s;
     font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
   }
   .unstake_button:hover{
