@@ -52,6 +52,16 @@ var rarityScores = {
         'white': 200,
         'yellow(2)': 179,
         'yellow': 209,
+    // Natural Trait Rarities
+        'redEyedTreeFrog_natural': 4,
+        'lightBrownTreeFrog_natural': 8,
+        'brownTreeFrog_natural': 5,
+        'goldenDartFrog_natural': 2,
+        'unknown_natural': 2,
+        'grayTreeFrog_natural': 6,
+        'stawBerryDartFrog_natural': 6,
+        'blueDartFrog_natural': 1,
+        'splendidLeafFrog_natural': 5,
     //Accessory (10)
         'goldChain': 177,
         'goldDollarChain': 122,

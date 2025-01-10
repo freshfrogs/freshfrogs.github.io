@@ -791,9 +791,23 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
         var trait_type = metadata.attributes[i].trait_type;
         build_trait(trait_type, attribute, 'cont_'+element_id);
 
+        // Frog Type
+        if (trait_type == 'Frog' || trait_type == 'SpecialFrog') {
+            var frog_type = attribute
+        }
+
         // Calculate Rarity Score
         var rarity_raw = 1/(parseInt(rarityScores[attribute])/4040);
         var rarity = parseInt(rarityScore) + parseInt(rarity_raw)
+
+        // Natural Trait Bonus
+        if (attribute == 'natural' && trait_type == 'Trait') {
+            if (frog_type == 'redEyedTreeFrog' || frog_type == 'lightBrownTreeFrog' || frog_type == 'brownTreeFrog' || frog_type == 'goldenDartFrog' || frog_type == 'unknown' || frog_type == 'grayTreeFrog' || frog_type == 'stawberryDartFrog' || frog_type == 'blueDartFrog' || frog_type == 'splendidLeafFrog') {
+                var rarity_raw = 1/(parseInt(rarityScores[frog_type+'_natural'])/4040);
+                var rarity = parseInt(rarityScore) + parseInt(rarity_raw)
+            }
+        }
+        
         rarityScore = parseInt(rarity);
     }
 
