@@ -6,8 +6,8 @@
 */
 
 var max_supply = 4040;
-var rarity_values = {}
-var rarity_token_rankings = {}
+var rarity_trait_rankings = {}
+var rarity_token_rankings = []
 
 async function count_token_traits() {
     // Trait Values
@@ -18,22 +18,22 @@ async function count_token_traits() {
         for (let j = 0; j < metadata.attributes.length; j++) {
             var attribute = metadata.attributes[j].value;
             var trait_type = metadata.attributes[j].trait_type;
-            if (typeof rarity_values[attribute] !== 'undefined') {
-                var rarity_count = parseInt(rarity_values[attribute]) + 1;
-                rarity_values[attribute] = parseInt(rarity_count);
+            if (typeof rarity_trait_rankings[attribute] !== 'undefined') {
+                var rarity_count = parseInt(rarity_trait_rankings[attribute]) + 1;
+                rarity_trait_rankings[attribute] = parseInt(rarity_count);
             } else {
-                rarity_values[attribute] = 1;
+                rarity_trait_rankings[attribute] = 1;
             }
         }
     }
 
-    console.log(rarity_values);
+    console.log(rarity_trait_rankings);
 }
 
 async function rank_tokens() {
     for (i = 1; i < max_supply; i++) {
         
-        rarity_token_rankings[i.toString()] = 1;
+        rarity_token_rankings[i] = { id: 3, rarity: 1, frogtype: '', };
 
         let metadata = await (await fetch('https://freshfrogs.github.io/frog/json/'+i+'.json')).json();
         for (let j = 0; j < metadata.attributes.length; j++) {
@@ -42,29 +42,29 @@ async function rank_tokens() {
 
             // Frog Type
             if (trait_type == 'Frog' || trait_type == 'SpecialFrog') {
-                var frog_type = attribute
+                rarity_token_rankings[i].frogtype = attribute
             }
 
             // Natural Trait Bonus
             if (attribute == 'natural' && trait_type == 'Trait') {
                 if (frog_type == 'redEyedTreeFrog' || frog_type == 'lightBrownTreeFrog' || frog_type == 'brownTreeFrog' || frog_type == 'goldenDartFrog' || frog_type == 'unknown' || frog_type == 'grayTreeFrog' || frog_type == 'stawberryDartFrog' || frog_type == 'blueDartFrog' || frog_type == 'splendidLeafFrog') {
-                    var rarity_raw = parseInt(rarity_token_rankings[i.toString()]) + 1/(parseInt(rarityScores[frog_type+'_natural'])/4040)
-                    rarity_token_rankings[i.toString()] = parseInt(rarity_raw);
+                    var rarity_raw = parseInt(rarity_token_rankings[i].rarity) + 1/(parseInt(rarity_trait_rankings[frog_type+'_natural'])/4040)
+                    rarity_token_rankings[i].rarity = parseInt(rarity_raw);
                 } else {
                     // Calculate Rarity Score
-                    var rarity_raw = parseInt(rarity_token_rankings[i.toString()]) + 1/(parseInt(rarityScores[attribute])/4040)
-                    rarity_token_rankings[i.toString()] = parseInt(rarity_raw);
+                    var rarity_raw = parseInt(rarity_token_rankings[i].rarity) + 1/(parseInt(rarity_trait_rankings[attribute])/4040)
+                    rarity_token_rankings[i].rarity = parseInt(rarity_raw);
                 }
             } else {
                 // Calculate Rarity Score
-                var rarity_raw = parseInt(rarity_token_rankings[i.toString()]) + 1/(parseInt(rarityScores[attribute])/4040)
-                rarity_token_rankings[i.toString()] = parseInt(rarity_raw);
+                var rarity_raw = parseInt(rarity_token_rankings[i].rarity) + 1/(parseInt(rarity_trait_rankings[attribute])/4040)
+                rarity_token_rankings[i].rarity = parseInt(rarity_raw);
             }
 
         }
 
         console.log('<-= Frog #'+i+' =->')
-        console.log('==--> '+rarity_token_rankings[i.toString()])
+        console.log('==--> '+rarity_token_rankings[i].rarity)
         
     }
 
@@ -79,7 +79,7 @@ async function render_token_byrarity(batch, leftoff) {
         if(! leftoff) { leftoff = 0; }
         for (i = 1; i < batch; i++) {
             var frog_slice =  4040 - parseInt(i);
-            var frog = freshfrogs_rarity_ranking[frog_slice.toString()]
+            var frog = freshfrogs_rarity_rankings[frog_slice.toString()]
 
             var html_elements = 
             '<div class="infobox_left">'+
@@ -113,7 +113,7 @@ async function render_token_byrarity(batch, leftoff) {
 }
 
 // 1/([No.ItemsWithTrait]/[No.ItemsInCollection])
-var rarityScores = {
+var rarity_trait_rankings = {
     // Frog Types (190)
         'blueDartFrog': 88,
         'blueTreeFrog': 94,
@@ -219,7 +219,8 @@ var rarityScores = {
         'tongueSpiderRed': 70
     }
 
-    freshfrogs_rarity_ranking = [
+    /*
+    freshfrogs_rarity_rankings = [
         "1728",
         "933",
         "1452",
@@ -4260,3 +4261,4 @@ var rarityScores = {
         "3869",
         "4000"
       ]
+    */
