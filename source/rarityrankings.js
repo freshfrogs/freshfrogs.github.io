@@ -40,7 +40,8 @@ async function rank_tokens() {
             var attribute = metadata.attributes[j].value;
             var trait_type = metadata.attributes[j].trait_type;
 
-            rarity_token_rankings[i.toString()] = parseInt(rarity_token_rankings[i.toString()]) + 1/(parseInt(rarityScores[attribute])/4040);
+            var rarity_raw = parseInt(rarity_token_rankings[i.toString()]) + 1/(parseInt(rarityScores[attribute])/4040)
+            rarity_token_rankings[i.toString()] = parseInt(rarity_raw);
 
         }
 
@@ -49,6 +50,10 @@ async function rank_tokens() {
         
     }
 
+    console.log(rarity_token_rankings)
+    rarity_token_rankings.sort(function(a, b) {
+        return a - b;
+      });
     console.log(rarity_token_rankings)
 }
 
