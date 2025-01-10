@@ -879,12 +879,12 @@ async function fetch_staked_tokens(wallet) {
                 '</div>'+
                 '<br>'+
                 '<div class="infobox_left">'+
-                    '<text class="card_text">Next Level</text>'+'<br>'+
-                    '<text id="nextlvl_'+token_id+'" class="card_bold">'+staked_nextlvl+' days</text>'+
+                    '<text class="card_text">Rewards</text>'+'<br>'+
+                    '<text id="rewards_'+token_id+'" class="card_bold">'+Math.round(staked_rewards)+' Flyz</text>'+
                 '</div>'+
                 '<div class="infobox_right">'+
                     '<text class="card_text">Rewards</text>'+'<br>'+
-                    '<text id="rewards_'+token_id+'" class="card_bold">'+Math.round(staked_rewards)+' Flyz</text>'+
+                    '<text id="rewards_'+tokenId+'" class="card_bold">--</text>'+
                 '</div>'+
                 '<div id="buttonsPanel_'+token_id+'" class="card_buttonbox">'+
                     '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
