@@ -17,8 +17,12 @@ async function count_token_traits() {
         for (let j = 0; j < metadata.attributes.length; j++) {
             var attribute = metadata.attributes[j].value;
             var trait_type = metadata.attributes[j].trait_type;
-            var rarity_count = parseInt(rarity_values[attribute]) + 1;
-            rarity_values[attribute] = parseInt(rarity_count);
+            if (typeof rarity_values[attribute] !== 'undefined') {
+                var rarity_count = parseInt(rarity_values[attribute]) + 1;
+                rarity_values[attribute] = parseInt(rarity_count);
+            } else {
+                rarity_values[attribute] = 1;
+            }
         }
     }
 
