@@ -73,9 +73,10 @@ async function rank_tokens() {
     console.log(sorted_rarity_rankings)
 }
 
-async function render_token_byrarity(batch) {
+async function render_token_byrarity(batch, leftoff) {
+    if(! leftoff) { leftoff = 0; }
     for (i = 1; i < batch; i++) {
-        frog = parseInt(freshfrogs_rarity_ranking[(4040-i)]);
+        frog = parseInt(freshfrogs_rarity_ranking[(4040-(i+leftoff))]);
 
         var html_elements = 
         '<div class="infobox_left">'+
