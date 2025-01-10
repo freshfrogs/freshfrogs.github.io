@@ -560,8 +560,7 @@ html {
     background-color: transparent;
     border-radius: 15px;
     border: 0px solid black;
-    min-width: 410px;
-    max-width: 400px;
+    width: 512px;
     margin: auto;
     float: right;
   }
