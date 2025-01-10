@@ -1049,7 +1049,7 @@ async function update_frontend() {
     parent_element.appendChild(pondContainer_element)
     
 
-    /* // The Pond | View all staked tokens 🍄 Meta Morph
+    // The Pond | View all staked tokens 🍄 Meta Morph
     thePondButton = document.createElement('button')
     thePondButton.id = 'the-pond'
     thePondButton.className = 'connectButton'
