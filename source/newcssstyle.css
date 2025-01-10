@@ -1,5 +1,5 @@
 html {
-    background: teal;
+    background: antiquewhite;
     /*
     background-image: url("https://freshfrogs.github.io/source/background.png");
     */
@@ -109,7 +109,7 @@ html {
     transition: all .2s;
     border: 1px solid black;
     overflow: hidden;
-    box-shadow: 10px 10px darkslategray;
+    box-shadow: 10px 10px darkgray;
   }
   .display_token_cont {
     display: inline-block;
@@ -197,7 +197,7 @@ html {
     color: white;
     background: cadetblue;
     border: 1px solid black;
-    box-shadow: 12px 12px darkslategray;
+    box-shadow: 12px 12px darkgray;
   }
   .outputPanel {
     color: white;
