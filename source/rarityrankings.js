@@ -236,7 +236,7 @@ var rarity_trait_rankings = {
         'tongueSpiderRed': 70
     }
 
-    
+    /*
     var freshfrogs_rarity_rankings = 
     [
         {
@@ -20441,4 +20441,5 @@ var rarity_trait_rankings = {
         },
         null
     ]
+    */
     
