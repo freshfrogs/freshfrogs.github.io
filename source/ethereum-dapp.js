@@ -1128,7 +1128,7 @@ async function update_frontend() {
     
     document.getElementById('remainingSupply').style.color = 'palegreen';
     document.getElementById('totalSupply').style.color = 'palegreen';
-    //document.getElementById('totalCollectors').style.color = 'palegreen';
+    document.getElementById('totalCollectors').style.color = 'palegreen';
     document.getElementById('connected_status').innerHTML = truncateAddress(user_address);
     document.getElementById('connected_status').style.color = 'palegreen'
     document.getElementById('address_owned_tokens').innerHTML = user_tokenBalance+' FROG(s)'
