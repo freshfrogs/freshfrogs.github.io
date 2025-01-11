@@ -57,6 +57,7 @@ async function rank_tokens() {
                     var rarity_raw = parseInt(rarity_token_rankings[i].rarity) + 1/(parseInt(rarity_trait_rankings['rare_natural'])/4040)
                     rarity_token_rankings[i].rarity = parseInt(rarity_raw);
 
+                    // Regular Natural Score
                     var rarity_raw = parseInt(rarity_token_rankings[i].rarity) + 1/(parseInt(rarity_trait_rankings['natural'])/4040)
                     rarity_token_rankings[i].rarity = parseInt(rarity_raw);
 
