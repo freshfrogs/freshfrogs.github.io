@@ -1079,7 +1079,7 @@ async function fetch_staking_stats() {
     .then(stats => stats.json())
     .then(stats => {
       console.log(stats)
-      var owner = owners.find(owner => owner.address === CONTROLLER_ADDRESS.toLowerCase());
+      var owner = stats.find(owner => owner.address === CONTROLLER_ADDRESS.toLowerCase());
       console.log(owner.ownership.tokenCount);
       document.getElementById('total_staked_tokens').innerHTML = owner.ownership.tokenCount;
     })
