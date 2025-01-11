@@ -34,6 +34,8 @@ async function count_token_traits() {
 
 async function rank_tokens() {
 
+    console.log(freshfrogs_rarity_rankings);
+
     // Sort by rarity in descending order
     freshfrogs_rarity_rankings.sort((a, b) => b.rarity - a.rarity);
 
