@@ -33,18 +33,7 @@ async function count_token_traits() {
 
 
 async function rank_tokens() {
-
-    console.log('Adding rank index to rarity rankings');
-    
-    // Add rank value to each object
-    freshfrogs_rarity_rankings.forEach((frog, index) => {
-        frog.rank = index + 1; // Rank starts from 1
-    });
-
-    console.log(freshfrogs_rarity_rankings);
-
-    /*
-    for (i = 1; i < 4041; i++) {
+    for (i = 1; i < 41; i++) {
         
         console.log('=-=- Frog #'+i+' -=-=')
         rarity_token_rankings['Frog #'+i] = { id: i, rarity: 1, type: '', rank: ''};
@@ -90,9 +79,20 @@ async function rank_tokens() {
         }
         
     }
-    
+
+    var ranked_tokens = rarity_token_rankings.sort((a, b) => a.rarity - b.rarity);
+    console.log('Updated: '+ranked_tokens);
+
+    // Sort by rarity in descending order
+    rarity_token_rankings.sort((a, b) => b.rarity - a.rarity);
+
+    // Add rank value to each object
+    rarity_token_rankings.forEach((frog, index) => {
+        frog.rank = index + 1; // Rank starts from 1
+    });
+
+    console.log('New indexed')
     console.log(rarity_token_rankings);
-    */
 }
 
 
