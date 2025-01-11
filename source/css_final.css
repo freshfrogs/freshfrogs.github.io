@@ -8,6 +8,7 @@
 body {
     font-family: monospace;
     background-color: wheat;
+    background: url("https://freshfrogs.github.io/source/background.png");
     color: #333;
     display: flex;
     justify-content: center; /* Center horizontally */
