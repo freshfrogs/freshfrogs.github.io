@@ -10,7 +10,7 @@
 var controller, collection, 
 user_address, user_rewards, 
 user_tokenBalance, user_stakedBalance, 
-is_approved, web3, f0, network, eth_usd, next;
+is_approved, web3, f0, network, eth_usd, next, mint_quantity;
 
 var sales_volume_eth = 0;
 var sales_volume_usd = 0;
@@ -984,6 +984,38 @@ async function connect_functions(wallet_address) {
         user_rewards = await availableRewards(user_address)
         console.log('Check user staking approval status...');
         is_approved = await checkApproval();
+
+        mint_quantity = 1;
+
+        document.getElementById('mintDown').onclick = async function (e) {
+            if (mint_quantity >= 2) {
+                mint_quantity = mint_quantity - 1;
+                net_mint_cost = 0.01 * mint_quantity
+                document.getElementById('mintButton').innerHTML = net_mint_cost+'Ξ 🐸 Mint '+mint_quantity+' Frog(s)'
+                document.getElementById('mintButton').onclick = async function (e) {
+
+                    console.log('Minting '+mint_quantity+' Frog(s) @ 0.01Ξ ['+net_mint_cost+']')
+                    let mint_txn = await mint(mint_quantity, user_invite);
+                    alert(mint_txn);
+
+                }
+            }
+        }
+
+        document.getElementById('mintUp').onclick = async function (e) {
+            if (mint_quantity <= 8) {
+                mint_quantity = mint_quantity + 1;
+                net_mint_cost = 0.01 * mint_quantity
+                document.getElementById('mintButton').innerHTML = net_mint_cost+'Ξ 🐸 Mint '+mint_quantity+' Frog(s)'
+                document.getElementById('mintButton').onclick = async function (e) {
+
+                    console.log('Minting '+mint_quantity+' Frog(s) @ 0.01Ξ ['+net_mint_cost+']')
+                    let mint_txn = await mint(mint_quantity, user_invite);
+                    alert(mint_txn);
+
+                }
+            }
+        }
 
     } catch (e) {
         console.log(e.message)
