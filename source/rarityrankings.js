@@ -80,8 +80,8 @@ async function rank_tokens() {
         
     }
 
-    var ranked_tokens = rarity_token_rankings.sort(({rarity:a}, {rarity:b}) => b-a);
-    console.log(ranked_tokens);
+    var ranked_tokens = rarity_token_rankings.sort((a, b) => a.rarity - b.rarity);
+    console.log('Updated: \n'+ranked_tokens);
 }
 
 
