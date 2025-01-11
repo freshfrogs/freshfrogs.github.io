@@ -1076,12 +1076,13 @@ async function get_user_invites(wallet_address) {
 
 async function fetch_staking_stats() {
     fetch('https://api.reservoir.tools/owners/v2?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
-    .then(stats => stats.json())
-    .then(stats => {
-      console.log(stats)
-      var owner = stats.find(owner => owner.address === CONTROLLER_ADDRESS.toLowerCase());
-      console.log(owner.ownership.tokenCount);
-      document.getElementById('total_staked_tokens').innerHTML = owner.ownership.tokenCount;
+    .then(data => data.json())
+    .then(data => {
+        console.log(data)
+        var owner = data.owners.find(owner => owner.address === CONTROLLER_ADDRESS);
+        var tokenCount = owner ? owner.ownership.tokenCount : null;
+        console.log(tokenCount);
+        document.getElementById('total_staked_tokens').innerHTML = tokenCount;
     })
     .catch(err => console.error(err));
 }
