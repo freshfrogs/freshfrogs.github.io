@@ -1030,14 +1030,12 @@ async function update_frontend() {
     //document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+user_tokenBalance+'/'+user_stakedBalance+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+user_tokenBalance+'/'+user_stakedBalance+')'); }
 
     // Connected Status
-
-
-
+    
     document.getElementById('connected_status').innerHTML = truncateAddress(user_address);
     document.getElementById('connected_status').style.color = 'palegreen'
-    document.getElementById('address_owned_tokens').innerHTML = '<b>Owned Tokens:</b> '+user_tokenBalance+' FROG(s)'
-    document.getElementById('address_staked_tokens').innerHTML = '<b>Staked Tokens:</b> '+user_stakedBalance+' FROG(s)'
-    document.getElementById('address_unclaimed_rewards').innerHTML = '<b>Unclaimed Rewards:</b> '+parseInt(user_rewards)+' $FLYZ'
+    document.getElementById('address_owned_tokens').innerHTML = user_tokenBalance+' FROG(s)'
+    document.getElementById('address_staked_tokens').innerHTML = user_stakedBalance+' FROG(s)'
+    document.getElementById('address_unclaimed_rewards').innerHTML = parseInt(user_rewards)+' $FLYZ'
 
     /*
     
