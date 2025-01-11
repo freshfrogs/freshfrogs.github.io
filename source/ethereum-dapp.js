@@ -1021,7 +1021,6 @@ async function connect_functions(wallet_address) {
     try {
 
         console.log('Fetching contract data...');
-        await fetch_collection_stats();
         
         // Connect ethereum contracts
         console.log('Connecting collection contract...');

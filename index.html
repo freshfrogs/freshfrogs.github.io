@@ -26,8 +26,9 @@
             document.getElementById('icons_container').appendChild(random_tokenImg);
           }
 
-        await fetch_token_sales(COLLECTION_ADDRESS, '50');
-        document.getElementById('connectButton').onclick = async function (e) { await initiate_web3_connection(); }
+          await fetch_collection_stats();
+          await fetch_token_sales(COLLECTION_ADDRESS, '150');
+          document.getElementById('connectButton').onclick = async function (e) { await initiate_web3_connection(); }
 
         mint_quantity = 1;
 
