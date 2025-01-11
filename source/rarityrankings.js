@@ -82,15 +82,20 @@ async function rank_tokens() {
 
     console.log(rarity_token_rankings);
     
-    // Sort by rarity in descending order
-    freshfrogs_rarity_rankings.sort((a, b) => b.rarity - a.rarity);
+    let frogs = rarity_token_rankings;
 
-    // Add rank value to each object
-    freshfrogs_rarity_rankings.forEach((frog, index) => {
+    // Remove null values from the array
+    frogs = frogs.filter(frog => frog !== null);
+
+    // Sort by rarity in descending order
+    frogs.sort((a, b) => b.rarity - a.rarity);
+
+    // Add rank value to each object based on the sorted order
+    frogs.forEach((frog, index) => {
         frog.rank = index + 1; // Rank starts from 1
     });
 
-    console.log(freshfrogs_rarity_rankings);
+    console.log(frogs);
 }
 
 
