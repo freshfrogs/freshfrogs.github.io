@@ -341,7 +341,14 @@ body {
     margin-top: 5px;
     color: white;
 }
-
+.terminal_op {
+    color: seashell;
+    background: darkslategray;
+    padding: 10px;
+    margin: 4px;
+    border: 1px solid black;
+    width: 50%;
+}
 .infobox_left{
     margin: 8px;
     float: left;
