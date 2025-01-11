@@ -479,3 +479,8 @@ body {
     box-shadow: 2px 2px darkslategray;
     border: 1px solid black;
   }
+  .morph_display {
+    width: min-content;
+    height: auto;
+    display: inline-block;
+  }
