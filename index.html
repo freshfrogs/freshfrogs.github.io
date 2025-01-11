@@ -1,140 +1,103 @@
 <!DOCTYPE html>
-<html lang="{{ site.lang | default: "en-US" }}">
-  <title>freshfrogs.io</title>
+<html lang="en">
   <head>
 
-    <link rel="stylesheet" href="/source/newcssstyle.css" type="text/css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@100..1000&family=Noto+Sans:wght@300&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-    
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>FreshFrogs NFT Collection</title>
+      <link rel="stylesheet" href="https://freshfrogs.github.io/source/css_final.css" type="text/css">
 
-    <!--[if lt IE 9]>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <![endif]-->
-    
-    <script src="https://freshfrogs.github.io/source/controller_abi.js"></script>
-    <script src="https://freshfrogs.github.io/source/collection_abi.js"></script>
-    <script src="https://freshfrogs.github.io/source/rarityrankings.js"></script>
-    <script src="https://freshfrogs.github.io/source/ethereum-dapp.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
-    <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+      <script src="https://freshfrogs.github.io/source/rarityrankings.js"></script>
+      <script src="https://freshfrogs.github.io/source/controller_abi.js"></script>
+      <script src="https://freshfrogs.github.io/source/collection_abi.js"></script>
+      <script src="https://freshfrogs.github.io/source/ethereum-dapp.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+      <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
+      <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+      <script>
 
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
-    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
 
-      // <-- [Google Analytics]
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-6PB0WKB4SH');
-      // -- >
-
-      document.addEventListener("DOMContentLoaded", async () => {
-
-        //await build_random_logo();
-        document.getElementById('icons_container').innerHTML = '';
-        for (let i = 0; i < 9; i++) {
-          random_token = Math.floor(Math.random() * 4040) + 1;
-          random_tokenImg = document.createElement('img')
-          random_tokenImg.className = 'frog_icon'
-          random_tokenImg.src = SOURCE_PATH+'/frog/'+random_token+'.png'
-          document.getElementById('icons_container').appendChild(random_tokenImg);
-        }
-
-        await fetch_token_sales(COLLECTION_ADDRESS, '50'); // await fetch_token_sales(COLLECTION_ADDRESS, '50');
-
-        //document.getElementById('randomLogo').onclick = async function (e) { clearInterval(intervalId); }
-        document.getElementById('connectButton').onclick = async function (e) { await initiate_web3_connection(); }
-
-        async function build_random_logo() {
-          document.getElementById('randomLogo').innerHTML = ''
-          random_token = Math.floor(Math.random() * 4040) + 1;
-          let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+random_token+'.json')).json();
-          for (let i = 0; i < metadata.attributes.length; i++) {
-            let attribute = metadata.attributes[i]
-            build_trait(attribute.trait_type, attribute.value, 'randomLogo');
+          document.getElementById('icons_container').innerHTML = '';
+          for (let i = 0; i < 9; i++) {
+            random_token = Math.floor(Math.random() * 4040) + 1;
+            random_tokenImg = document.createElement('img')
+            random_tokenImg.src = SOURCE_PATH+'/frog/'+random_token+'.png'
+            document.getElementById('icons_container').appendChild(random_tokenImg);
           }
-          var random_token_image = SOURCE_PATH+'/frog/'+random_token+'.png'
-          document.getElementById('randomLogo').style.backgroundImage = "url("+random_token_image+")";
-        }
-      })
-    </script>
-    
+
+          await fetch_token_sales(COLLECTION_ADDRESS, '50');
+          document.getElementById('connectButton').onclick = async function (e) { await initiate_web3_connection(); }
+
+        });
+        
+      </script>
+
   </head>
   <body>
-    <section id="parentPanel" class="parentPanel">
-      <div class="main_container">
-        <div class="main_left">
+    <div class="container">
+      <div class="top-section">
+        <div style="padding-right: 3%;">
           <i><h1 class="front_title">freshfrogs.github.io</h1></i>
-          <p class="headerPanel">
-            <b>FreshFrogsNFT</b>
-            <br>A collection of 4,040 randomly generated frogs on the Ethereum blockchain, that are each unique with thousands of different combinations!
+          <p>
+            <b>FreshFrogsNFT</b><br>
+            A collection of 4,040 randomly generated frogs on the Ethereum blockchain, that are each unique with thousands of different combinations!
             Stake and earn rewards, level up, unlock custom trait animations and more! All secondary sales are entitled to a <b>5%</b> royalty.<br>
             <br>
             Smart contracts are verified on etherscan. Feel free to interact with them directly: 
-            <a href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" style="color: white; font-weight: bold;">NFT Smart Contract</a>
-            <a href="https://etherscan.io/address/0xcb1ee125cff4051a10a55a09b10613876c4ef199" target="_blank" style="color: white; font-weight: bold;">Live Staking Contract</a>
+            <a href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank">NFT Smart Contract</a>
+            <a href="https://etherscan.io/address/0xcb1ee125cff4051a10a55a09b10613876c4ef199" target="_blank">Live Staking Contract</a>
           </p>
-          <div id="buttonBar" class="buttonBar">
-            <button id="connectButton" class="connectButton" style="background: lightcoral; color: white;">Connect to Web3</button>
-            <a href="https://github.com/freshfrogs/freshfrogs.github.io" target="_blank"><button id="githubButton" class="connectButton" style="background: #e9ecef; color: black;">View on Github</button></a>
-            <a href="https://opensea.io/collection/fresh-frogs" target="_blank"><button id="raribleButton" class="connectButton" style="background: rgb(0, 134, 255); color: white;">Shop on Opensea</button></a>
-          </div>
+          <br>
+          <button id="connectButton" class="connectButton" style="background: lightcoral; color: white;">Connect to Web3</button>
+          <a href="https://github.com/freshfrogs/freshfrogs.github.io" target="_blank"><button id="githubButton" class="connectButton" style="background: #e9ecef; color: black;">View on Github</button></a>
+          <a href="https://opensea.io/collection/fresh-frogs" target="_blank"><button id="raribleButton" class="connectButton" style="background: rgb(0, 134, 255); color: white;">Shop on Opensea</button></a>
         </div>
-        <div class="main_right">
-          <div id="icons_container" class="icons_container">
-            <img class="frog_icon" src="https://freshfrogs.github.io/frog/500.png">
-            <img class="frog_icon" src="https://freshfrogs.github.io/frog/1011.png">
-            <img class="frog_icon" src="https://freshfrogs.github.io/frog/1010.png">
-            <img class="frog_icon" src="https://freshfrogs.github.io/frog/103.png">
-            <img class="frog_icon" src="https://freshfrogs.github.io/frog/105.png">
-            <img class="frog_icon" src="https://freshfrogs.github.io/frog/1065.png">
-            <img class="frog_icon" src="https://freshfrogs.github.io/frog/512.png">
-            <img class="frog_icon" src="https://freshfrogs.github.io/frog/102.png">
-            <img class="frog_icon" src="https://freshfrogs.github.io/frog/2099.png">
-          </div>
+        <div id="icons_container" class="image-grid">
+          <img src="https://freshfrogs.github.io/frog/500.png">
+          <img src="https://freshfrogs.github.io/frog/1011.png">
+          <img src="https://freshfrogs.github.io/frog/1010.png">
+          <img src="https://freshfrogs.github.io/frog/103.png">
+          <img src="https://freshfrogs.github.io/frog/105.png">
+          <img src="https://freshfrogs.github.io/frog/1065.png">
+          <img src="https://freshfrogs.github.io/frog/512.png">
+          <img src="https://freshfrogs.github.io/frog/102.png">
+          <img src="https://freshfrogs.github.io/frog/2099.png">
         </div>
       </div>
-    </section>
-    <div class="main_container">
-      <section class="childPanel">
-        <div class="main_left">
-          <p class="paragraph_container">
-            <b>🍃 Minting Information</b>
-            <br>Each token is randomly generated and individually unique! The Fresh Frogs NFT collection consists of many different attributes and traits with a total supply of 4,040 Frogs!
-            First 3,232 Frogs will free Final 808 Frogs will cost <b>0.01Ξ</b>
-            <br>
-            <br><b>📃 Smart Contract</b>
-            <br>ERC-721 powered by Factoria, verified and stored on IPFS ✔️
-            <br>0xbe4bef8735107db540de269ff82c7de9ef68c51b
-          </p>
-          <button id="mintButton" class="connectButton" onclick="initiate_mint(); "style="color: white; background: steelblue;">🐸 Mint Frogs</button>
-          <a href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><button id="githubButton" class="connectButton" style="background: #e9ecef; color: black;">Etherscan.io</button></a>
-          <a id="holdingsLink" className="holdingsLink" href="https://freshfrogs.github.io/wallet/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍃 View Holdings</button></a>
-        </div>
-      </section>
-      <section class="childPanel">
-        <div class="main_left">
-          <div class="container_element">
-            <p class="paragraph_container">
-              <b>📃 FreshFrogsNFT Staking</b>
-              <br>Stake your Frogs and start earning rewards like $FLYZ, and more!
-              Staking works by sending your Frog to a smart contract where it can\'t be listed on secondary market places, like Opensea.
-              <br><br><b>✍️ Sign Contract Approval</b>
-              <br>To start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.
+      <div class="bottom-sections">
+          <div class="bottom-section">
+            <p>
+              <b>🍃 Minting Information</b><br>
+              Mint your own unique FreshFrogs NFT today and join the exclusive collection of one-of-a-kind digital frogs!<br>
+              <br>
+              <text style="border-top: 1px solid white; border-bottom: 1px solid white; padding: 6px;">
+                Total Supply: <b>4,040</b> | Mint Cost: <b>0.01Ξ</b>
+              </text><br>
+              <br><br>
+              <b>📃 Ethereum Smart Contract</b><br>
+              ERC-721 powered by Factoria, verified and stored on IPFS ✔️<br>
+              0xbe4bef8735107db540de269ff82c7de9ef68c51b
             </p>
-              <button id="stakeButton" class="connectButton" onclick="initiate_setApprovalForAll();" style="color: white; background: lightseagreen;">🌱 Stake & Earn!</button>
-              <button id="stakeButton" class="connectButton" onclick=""; style="color: white; background: lightsalmon;">⭐ Claim Rewards</button>
-              <a id="thePondLink" className="thePondButton" href="https://freshfrogs.github.io/the-pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍀 The Pond</button></a>
+            <br>
+            <button id="mintButton" class="connectButton" onclick="initiate_mint(); "style="color: white; background: steelblue;">🐸 Mint Frogs</button>
+            <a id="holdingsLink" className="holdingsLink" href="https://freshfrogs.github.io/wallet/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍃 View Holdings</button></a>
           </div>
-        </div>
-      </section>
+          <div class="bottom-section">
+            <p>
+              <b>📃 FreshFrogsNFT Staking</b><br>
+              Stake your FROG(s) to earn exclusive rewards and unlock special benefits, while helping to grow the community and increase the value of your collection!<br>
+              <br>
+              <b>✍️ Sign Contract Approval</b><br>
+              To start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.
+            </p>
+            <br>
+            <button id="stakeButton" class="connectButton" onclick="initiate_setApprovalForAll();" style="color: white; background: lightseagreen;">🌱 Stake & Earn!</button>
+            <a id="thePondLink" className="thePondButton" href="https://freshfrogs.github.io/the-pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍀 The Pond</button></a>
+          </div>
+      </div>
+      <section id="frogs" class="image-gallery">
+    </section>
     </div>
-    <section id="frogs" style="width: 80% !important; background: transparent; border: none !important;"></section>
   </body>
 </html>

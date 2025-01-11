@@ -1,211 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreshFrogs NFT Collection</title>
-    <style>
-        /* Basic Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <head>
 
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
-            display: flex;
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically */
-            min-height: 100vh; /* Ensure the body takes full height */
-            padding: 20px; /* Added padding around the content */
-        }
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>FreshFrogs NFT Collection</title>
+      <link rel="stylesheet" href="https://freshfrogs.github.io/source/css_final.css" type="text/css">
 
-        /* Container for overall layout */
-        .container {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            max-width: 1200px; /* Limiting the maximum width */
-            margin: 0 auto; /* Center the container */
-            padding: 20px;
-            border: 2px solid #32cd32; /* Add border around the entire container */
-            border-radius: 10px; /* Rounded corners */
-            background-color: white; /* White background for the container */
-            overflow: hidden; /* Prevent overflow from causing issues */
-        }
+      <script src="https://freshfrogs.github.io/source/rarityrankings.js"></script>
+      <script src="https://freshfrogs.github.io/source/controller_abi.js"></script>
+      <script src="https://freshfrogs.github.io/source/collection_abi.js"></script>
+      <script src="https://freshfrogs.github.io/source/ethereum-dapp.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+      <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
+      <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+      <script>
 
-        /* Top section with margin-top to add spacing */
-        .top-section {
-            flex: 2;
-            background-color: #32cd32; /* Fresh green */
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between; /* Space between text and image grid */
-            align-items: flex-start;
-            text-align: left;
-            margin-top: 20px; /* Added margin-top for spacing */
-            border: 3px solid #228b22; /* Green border around the top section */
-            border-radius: 8px; /* Rounded corners for the top section */
-            width: 100%; /* Make sure top section takes full width */
-        }
+        document.addEventListener("DOMContentLoaded", async () => {
 
-        .top-section h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
+          document.getElementById('icons_container').innerHTML = '';
+          for (let i = 0; i < 9; i++) {
+            random_token = Math.floor(Math.random() * 4040) + 1;
+            random_tokenImg = document.createElement('img')
+            random_tokenImg.src = SOURCE_PATH+'/frog/'+random_token+'.png'
+            document.getElementById('icons_container').appendChild(random_tokenImg);
+          }
 
-        .top-section p {
-            font-size: 1.2em;
-            margin-bottom: 20px;
-        }
+          document.getElementById('connectButton').onclick = async function (e) { await initiate_web3_connection(); }
+          await initiate_web3_connection().then(async () => {
+            await fetch_held_tokens(CONTROLLER_ADDRESS);
+          })
 
-        /* Image grid to the right */
-        .image-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 128px); /* 3 columns */
-            grid-template-rows: repeat(3, 128px); /* 3 rows */
-            grid-gap: 10px;
-            align-items: center;
-        }
+        });
+        
+      </script>
 
-        .image-grid img {
-            width: 128px;
-            height: 128px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-
-        /* Bottom sections container */
-        .bottom-sections {
-            display: flex;
-            width: 100%; /* Make sure bottom sections take full width */
-            padding: 20px;
-            margin-top: 20px; /* Add some space between the sections */
-        }
-
-        /* Individual bottom section */
-        .bottom-section {
-            flex: 1; /* Ensures both sections take up equal width */
-            margin: 0 10px;
-            background-color: #ffffff;
-            border: 2px solid #ccc; /* Light grey border for the bottom sections */
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            text-align: center;
-        }
-
-        .bottom-section h2 {
-            font-size: 1.8em;
-            margin-bottom: 10px;
-        }
-
-        .bottom-section p {
-            font-size: 1.1em;
-            color: #555;
-        }
-
-        /* Responsive styling for smaller screens */
-        @media (max-width: 768px) {
-            .bottom-sections {
-                flex-direction: column;
-            }
-
-            .bottom-section {
-                margin-bottom: 20px;
-            }
-
-            .top-section {
-                flex-direction: column; /* Stack text and images on smaller screens */
-                align-items: center;
-                text-align: center;
-            }
-
-            .image-grid {
-                grid-template-columns: repeat(3, 128px);
-                justify-content: center;
-                margin-top: 20px;
-            }
-
-            /* Ensure that images in the grid don't overflow or get squished */
-            .image-grid img {
-                width: 128px;
-                height: 128px;
-            }
-        }
-
-        /* Further improvements for very small screens */
-        @media (max-width: 480px) {
-            .top-section {
-                padding: 15px;
-            }
-
-            .top-section h1 {
-                font-size: 2em; /* Smaller title for mobile */
-            }
-
-            .top-section p {
-                font-size: 1em; /* Smaller paragraph text */
-            }
-
-            .image-grid {
-                grid-template-columns: repeat(3, 100px); /* Reduce image size on very small screens */
-                grid-gap: 8px;
-            }
-
-            .bottom-sections {
-                margin-top: 15px;
-            }
-
-            .bottom-section h2 {
-                font-size: 1.5em; /* Smaller heading */
-            }
-
-            .bottom-section p {
-                font-size: 1em; /* Smaller paragraph text */
-            }
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <!-- Top Section -->
-    <div class="top-section">
-        <div>
-            <h1>FreshFrogs NFT Collection</h1>
-            <p>FreshFrogs are a limited collection of unique digital frogs. Each frog is one-of-a-kind, with its own personality and traits. Collect, trade, and join the FreshFrogs community!</p>
+  </head>
+  <body>
+    <div class="container">
+      <div class="top-section">
+        <div style="padding-right: 3%;">
+          <i><h1 class="front_title">freshfrogs.github.io</h1></i>
+          <p>
+            <b>FreshFrogsNFT</b><br>
+            A collection of 4,040 randomly generated frogs on the Ethereum blockchain, that are each unique with thousands of different combinations!
+            Stake and earn rewards, level up, unlock custom trait animations and more! All secondary sales are entitled to a <b>5%</b> royalty.<br>
+            <br>
+            Smart contracts are verified on etherscan. Feel free to interact with them directly: 
+            <a href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank">NFT Smart Contract</a>
+            <a href="https://etherscan.io/address/0xcb1ee125cff4051a10a55a09b10613876c4ef199" target="_blank">Live Staking Contract</a>
+          </p>
+          <br>
+          <button id="connectButton" class="connectButton" style="background: lightcoral; color: white;">Connect to Web3</button>
+          <a href="https://github.com/freshfrogs/freshfrogs.github.io" target="_blank"><button id="githubButton" class="connectButton" style="background: #e9ecef; color: black;">View on Github</button></a>
+          <a href="https://opensea.io/collection/fresh-frogs" target="_blank"><button id="raribleButton" class="connectButton" style="background: rgb(0, 134, 255); color: white;">Shop on Opensea</button></a>
         </div>
-        <div class="image-grid">
-            <!-- Example images for FreshFrogs NFTs, replace with actual images -->
-            <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog1.png" alt="FreshFrog 1">
-            <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog2.png" alt="FreshFrog 2">
-            <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog3.png" alt="FreshFrog 3">
-            <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog4.png" alt="FreshFrog 4">
-            <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog5.png" alt="FreshFrog 5">
-            <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog6.png" alt="FreshFrog 6">
-            <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog7.png" alt="FreshFrog 7">
-            <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog8.png" alt="FreshFrog 8">
-            <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/images/frog9.png" alt="FreshFrog 9">
+        <div id="icons_container" class="image-grid">
+          <img src="https://freshfrogs.github.io/frog/500.png">
+          <img src="https://freshfrogs.github.io/frog/1011.png">
+          <img src="https://freshfrogs.github.io/frog/1010.png">
+          <img src="https://freshfrogs.github.io/frog/103.png">
+          <img src="https://freshfrogs.github.io/frog/105.png">
+          <img src="https://freshfrogs.github.io/frog/1065.png">
+          <img src="https://freshfrogs.github.io/frog/512.png">
+          <img src="https://freshfrogs.github.io/frog/102.png">
+          <img src="https://freshfrogs.github.io/frog/2099.png">
         </div>
+      </div>
+      <div class="bottom-sections">
+          <div class="bottom-section">
+            <p>
+              <b>🍃 Minting Information</b><br>
+              Mint your own unique FreshFrogs NFT today and join the exclusive collection of one-of-a-kind digital frogs!<br>
+              <br>
+              <text style="border-top: 1px solid white; border-bottom: 1px solid white; padding: 6px;">
+                Total Supply: <b>4,040</b> | Mint Cost: <b>0.01Ξ</b>
+              </text><br>
+              <br><br>
+              <b>📃 Ethereum Smart Contract</b><br>
+              ERC-721 powered by Factoria, verified and stored on IPFS ✔️<br>
+              0xbe4bef8735107db540de269ff82c7de9ef68c51b
+            </p>
+            <br>
+            <button id="mintButton" class="connectButton" onclick="initiate_mint(); "style="color: white; background: steelblue;">🐸 Mint Frogs</button>
+            <a id="holdingsLink" className="holdingsLink" href="https://freshfrogs.github.io/wallet/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍃 View Holdings</button></a>
+          </div>
+          <div class="bottom-section">
+            <p>
+              <b>📃 FreshFrogsNFT Staking</b><br>
+              Stake your FROG(s) to earn exclusive rewards and unlock special benefits, while helping to grow the community and increase the value of your collection!<br>
+              <br>
+              <b>✍️ Sign Contract Approval</b><br>
+              To start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.
+            </p>
+            <br>
+            <button id="stakeButton" class="connectButton" onclick="initiate_setApprovalForAll();" style="color: white; background: lightseagreen;">🌱 Stake & Earn!</button>
+            <a id="thePondLink" className="thePondButton" href="https://freshfrogs.github.io/the-pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍀 The Pond</button></a>
+          </div>
+      </div>
+      <section id="frogs" class="image-gallery">
+    </section>
     </div>
-
-    <!-- Bottom Sections -->
-    <div class="bottom-sections">
-        <div class="bottom-section">
-            <h2>Section 1</h2>
-            <p>This is the first smaller section with some content.</p>
-        </div>
-        <div class="bottom-section">
-            <h2>Section 2</h2>
-            <p>This is the second smaller section with some other content.</p>
-        </div>
-    </div>
-</div>
-
-</body>
+  </body>
 </html>
