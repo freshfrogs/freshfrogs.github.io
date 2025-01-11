@@ -1031,8 +1031,8 @@ async function update_frontend() {
 
     // Connected Status
 
-    var new_op_line = document.createElement('text')
-    var break_element = document.createElement('br')
+    new_op_line = document.createElement('text')
+    break_element = document.createElement('br')
     document.getElementById('terminal_op').innerHTML = '';
     
     new_op_line.innerHTML = truncateAddress(user_address);
@@ -1040,19 +1040,23 @@ async function update_frontend() {
     document.getElementById('terminal_op').appendChild(break_element)
     document.getElementById('terminal_op').appendChild(new_op_line)
 
+    new_op_line = document.createElement('text')
     new_op_line.innerHTML = '<b>Network:</b> Ethereum Main';
     new_op_line.style.color = ''
     document.getElementById('terminal_op').appendChild(break_element)
     document.getElementById('terminal_op').appendChild(new_op_line)
 
+    new_op_line = document.createElement('text')
     new_op_line.innerHTML = '<b>Owned Tokens:</b> '+user_tokenBalance+' FROG(s)';
     document.getElementById('terminal_op').appendChild(break_element)
     document.getElementById('terminal_op').appendChild(new_op_line)
 
+    new_op_line = document.createElement('text')
     new_op_line.innerHTML = '<b>Staked Tokens:</b> '+user_stakedBalance+' FROG(s)';
     document.getElementById('terminal_op').appendChild(break_element)
     document.getElementById('terminal_op').appendChild(new_op_line)
 
+    new_op_line = document.createElement('text')
     new_op_line.innerHTML = '<b>Unclaimed Rewards:</b> '+parseInt(user_rewards)+' $FLYZ';
     document.getElementById('terminal_op').appendChild(break_element)
     document.getElementById('terminal_op').appendChild(new_op_line)
