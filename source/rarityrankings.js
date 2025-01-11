@@ -300,6 +300,11 @@ var rarity_trait_rankings = {
             "type": "peace"
         },
         {
+            "id": 2821,
+            "rarity": 241,
+            "type": "lightBrownTreeFrog"
+        },
+        {
             "id": 548,
             "rarity": 237,
             "type": "peace"
@@ -310,9 +315,19 @@ var rarity_trait_rankings = {
             "type": "peace"
         },
         {
+            "id": 3744,
+            "rarity": 237,
+            "type": "splendidLeafFrog"
+        },
+        {
             "id": 2100,
             "rarity": 236,
             "type": "peace"
+        },
+        {
+            "id": 1948,
+            "rarity": 235,
+            "type": "splendidLeafFrog"
         },
         {
             "id": 3421,
@@ -325,14 +340,64 @@ var rarity_trait_rankings = {
             "type": "peace"
         },
         {
-            "id": 2821,
-            "rarity": 219,
+            "id": 1129,
+            "rarity": 227,
+            "type": "stawberryDartFrog"
+        },
+        {
+            "id": 3111,
+            "rarity": 227,
+            "type": "splendidLeafFrog"
+        },
+        {
+            "id": 2101,
+            "rarity": 224,
+            "type": "stawberryDartFrog"
+        },
+        {
+            "id": 1483,
+            "rarity": 222,
+            "type": "grayTreeFrog"
+        },
+        {
+            "id": 3868,
+            "rarity": 222,
+            "type": "stawberryDartFrog"
+        },
+        {
+            "id": 3239,
+            "rarity": 220,
+            "type": "grayTreeFrog"
+        },
+        {
+            "id": 818,
+            "rarity": 217,
+            "type": "grayTreeFrog"
+        },
+        {
+            "id": 1486,
+            "rarity": 217,
             "type": "lightBrownTreeFrog"
         },
         {
-            "id": 3744,
-            "rarity": 215,
-            "type": "splendidLeafFrog"
+            "id": 2657,
+            "rarity": 217,
+            "type": "lightBrownTreeFrog"
+        },
+        {
+            "id": 2858,
+            "rarity": 217,
+            "type": "brownTreeFrog"
+        },
+        {
+            "id": 1624,
+            "rarity": 216,
+            "type": "goldenDartFrog"
+        },
+        {
+            "id": 2219,
+            "rarity": 216,
+            "type": "lightBrownTreeFrog"
         },
         {
             "id": 343,
@@ -340,9 +405,14 @@ var rarity_trait_rankings = {
             "type": "peace"
         },
         {
-            "id": 1948,
+            "id": 3593,
             "rarity": 213,
-            "type": "splendidLeafFrog"
+            "type": "brownTreeFrog"
+        },
+        {
+            "id": 1182,
+            "rarity": 212,
+            "type": "lightBrownTreeFrog"
         },
         {
             "id": 3264,
@@ -350,19 +420,9 @@ var rarity_trait_rankings = {
             "type": "inversedEyes"
         },
         {
-            "id": 1129,
-            "rarity": 205,
-            "type": "stawberryDartFrog"
-        },
-        {
             "id": 1919,
             "rarity": 205,
             "type": "thirdEye"
-        },
-        {
-            "id": 3111,
-            "rarity": 205,
-            "type": "splendidLeafFrog"
         },
         {
             "id": 1228,
@@ -370,54 +430,44 @@ var rarity_trait_rankings = {
             "type": "inversedEyes"
         },
         {
-            "id": 2101,
-            "rarity": 202,
+            "id": 2832,
+            "rarity": 201,
+            "type": "splendidLeafFrog"
+        },
+        {
+            "id": 3190,
+            "rarity": 201,
+            "type": "unknown"
+        },
+        {
+            "id": 2873,
+            "rarity": 200,
+            "type": "redEyedTreeFrog"
+        },
+        {
+            "id": 782,
+            "rarity": 199,
             "type": "stawberryDartFrog"
         },
         {
-            "id": 1483,
-            "rarity": 200,
+            "id": 2581,
+            "rarity": 193,
             "type": "grayTreeFrog"
         },
         {
-            "id": 3868,
-            "rarity": 200,
-            "type": "stawberryDartFrog"
-        },
-        {
-            "id": 3239,
-            "rarity": 198,
-            "type": "grayTreeFrog"
-        },
-        {
-            "id": 818,
-            "rarity": 195,
-            "type": "grayTreeFrog"
-        },
-        {
-            "id": 1486,
-            "rarity": 195,
-            "type": "lightBrownTreeFrog"
-        },
-        {
-            "id": 2657,
-            "rarity": 195,
-            "type": "lightBrownTreeFrog"
-        },
-        {
-            "id": 2858,
-            "rarity": 195,
+            "id": 1755,
+            "rarity": 192,
             "type": "brownTreeFrog"
         },
         {
-            "id": 1624,
-            "rarity": 194,
-            "type": "goldenDartFrog"
+            "id": 991,
+            "rarity": 191,
+            "type": "redEyedTreeFrog"
         },
         {
-            "id": 2219,
-            "rarity": 194,
-            "type": "lightBrownTreeFrog"
+            "id": 998,
+            "rarity": 191,
+            "type": "grayTreeFrog"
         },
         {
             "id": 2545,
@@ -425,19 +475,44 @@ var rarity_trait_rankings = {
             "type": "closedEyes"
         },
         {
-            "id": 3593,
-            "rarity": 191,
-            "type": "brownTreeFrog"
+            "id": 564,
+            "rarity": 190,
+            "type": "goldenDartFrog"
         },
         {
-            "id": 1182,
-            "rarity": 190,
-            "type": "lightBrownTreeFrog"
+            "id": 1401,
+            "rarity": 189,
+            "type": "redEyedTreeFrog"
         },
         {
             "id": 3727,
             "rarity": 189,
             "type": "thirdEye"
+        },
+        {
+            "id": 51,
+            "rarity": 188,
+            "type": "stawberryDartFrog"
+        },
+        {
+            "id": 338,
+            "rarity": 188,
+            "type": "brownTreeFrog"
+        },
+        {
+            "id": 1161,
+            "rarity": 188,
+            "type": "lightBrownTreeFrog"
+        },
+        {
+            "id": 3865,
+            "rarity": 187,
+            "type": "lightBrownTreeFrog"
+        },
+        {
+            "id": 101,
+            "rarity": 184,
+            "type": "redEyedTreeFrog"
         },
         {
             "id": 2429,
@@ -450,7 +525,7 @@ var rarity_trait_rankings = {
             "type": "orangeTreeFrog"
         },
         {
-            "id": 2832,
+            "id": 1690,
             "rarity": 179,
             "type": "splendidLeafFrog"
         },
@@ -460,24 +535,9 @@ var rarity_trait_rankings = {
             "type": "treeFrog(1)"
         },
         {
-            "id": 3190,
-            "rarity": 179,
-            "type": "unknown"
-        },
-        {
             "id": 3606,
             "rarity": 179,
             "type": "inversedEyes"
-        },
-        {
-            "id": 2873,
-            "rarity": 178,
-            "type": "redEyedTreeFrog"
-        },
-        {
-            "id": 782,
-            "rarity": 177,
-            "type": "stawberryDartFrog"
         },
         {
             "id": 963,
@@ -530,14 +590,19 @@ var rarity_trait_rankings = {
             "type": "inversedEyes"
         },
         {
+            "id": 407,
+            "rarity": 171,
+            "type": "blueDartFrog"
+        },
+        {
             "id": 2281,
             "rarity": 171,
             "type": "blueTreeFrog"
         },
         {
-            "id": 2581,
+            "id": 3229,
             "rarity": 171,
-            "type": "grayTreeFrog"
+            "type": "stawberryDartFrog"
         },
         {
             "id": 660,
@@ -545,17 +610,7 @@ var rarity_trait_rankings = {
             "type": "croaking"
         },
         {
-            "id": 1755,
-            "rarity": 170,
-            "type": "brownTreeFrog"
-        },
-        {
-            "id": 991,
-            "rarity": 169,
-            "type": "redEyedTreeFrog"
-        },
-        {
-            "id": 998,
+            "id": 958,
             "rarity": 169,
             "type": "grayTreeFrog"
         },
@@ -575,9 +630,9 @@ var rarity_trait_rankings = {
             "type": "croaking"
         },
         {
-            "id": 564,
+            "id": 415,
             "rarity": 168,
-            "type": "goldenDartFrog"
+            "type": "unknown"
         },
         {
             "id": 3723,
@@ -585,24 +640,14 @@ var rarity_trait_rankings = {
             "type": "blueTreeFrog"
         },
         {
-            "id": 1401,
+            "id": 4000,
+            "rarity": 168,
+            "type": "goldenDartFrog"
+        },
+        {
+            "id": 409,
             "rarity": 167,
             "type": "redEyedTreeFrog"
-        },
-        {
-            "id": 51,
-            "rarity": 166,
-            "type": "stawberryDartFrog"
-        },
-        {
-            "id": 338,
-            "rarity": 166,
-            "type": "brownTreeFrog"
-        },
-        {
-            "id": 1161,
-            "rarity": 166,
-            "type": "lightBrownTreeFrog"
         },
         {
             "id": 50,
@@ -610,9 +655,9 @@ var rarity_trait_rankings = {
             "type": "inversedEyes"
         },
         {
-            "id": 3865,
-            "rarity": 165,
-            "type": "lightBrownTreeFrog"
+            "id": 1296,
+            "rarity": 164,
+            "type": "brownTreeFrog"
         },
         {
             "id": 2228,
@@ -620,14 +665,14 @@ var rarity_trait_rankings = {
             "type": "croaking"
         },
         {
+            "id": 2261,
+            "rarity": 164,
+            "type": "lightBrownTreeFrog"
+        },
+        {
             "id": 2476,
             "rarity": 163,
             "type": "closedEyes"
-        },
-        {
-            "id": 101,
-            "rarity": 162,
-            "type": "redEyedTreeFrog"
         },
         {
             "id": 1390,
@@ -668,11 +713,6 @@ var rarity_trait_rankings = {
             "id": 3125,
             "rarity": 158,
             "type": "treeFrog(2)"
-        },
-        {
-            "id": 1690,
-            "rarity": 157,
-            "type": "splendidLeafFrog"
         },
         {
             "id": 3221,
@@ -925,19 +965,9 @@ var rarity_trait_rankings = {
             "type": "inversedEyes"
         },
         {
-            "id": 407,
-            "rarity": 149,
-            "type": "blueDartFrog"
-        },
-        {
             "id": 1123,
             "rarity": 149,
             "type": "thirdEye"
-        },
-        {
-            "id": 3229,
-            "rarity": 149,
-            "type": "stawberryDartFrog"
         },
         {
             "id": 3444,
@@ -985,11 +1015,6 @@ var rarity_trait_rankings = {
             "type": "croaking"
         },
         {
-            "id": 958,
-            "rarity": 147,
-            "type": "grayTreeFrog"
-        },
-        {
             "id": 1447,
             "rarity": 147,
             "type": "orangeTreeFrog"
@@ -1013,11 +1038,6 @@ var rarity_trait_rankings = {
             "id": 3794,
             "rarity": 147,
             "type": "thirdEye"
-        },
-        {
-            "id": 415,
-            "rarity": 146,
-            "type": "unknown"
         },
         {
             "id": 2116,
@@ -1045,19 +1065,9 @@ var rarity_trait_rankings = {
             "type": "thirdEye"
         },
         {
-            "id": 4000,
-            "rarity": 146,
-            "type": "goldenDartFrog"
-        },
-        {
             "id": 320,
             "rarity": 145,
             "type": "closedEyes"
-        },
-        {
-            "id": 409,
-            "rarity": 145,
-            "type": "redEyedTreeFrog"
         },
         {
             "id": 414,
@@ -1145,22 +1155,12 @@ var rarity_trait_rankings = {
             "type": "croaking"
         },
         {
-            "id": 1296,
-            "rarity": 142,
-            "type": "brownTreeFrog"
-        },
-        {
             "id": 1567,
             "rarity": 142,
             "type": "closedEyes"
         },
         {
             "id": 2066,
-            "rarity": 142,
-            "type": "lightBrownTreeFrog"
-        },
-        {
-            "id": 2261,
             "rarity": 142,
             "type": "lightBrownTreeFrog"
         },
