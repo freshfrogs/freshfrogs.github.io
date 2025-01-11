@@ -472,3 +472,10 @@ body {
     cursor: pointer;
     transition: width .2s, height .2s;
   }
+  .morph_display_img {
+    width: 128px;
+    height: 128px;
+    border-radius: 5px;
+    box-shadow: 2px 2px darkslategray;
+    border: 1px solid black;
+  }
