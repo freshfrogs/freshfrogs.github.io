@@ -841,8 +841,11 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
         rarityTier = 'Common'
     }
 
-    document.getElementById('rarityRanking_'+token_id).innerHTML = rarityScore
-    document.getElementById('rarityRanking_'+token_id).style.color = rarityColor
+    try {
+        document.getElementById('rarityRanking_'+token_id).innerHTML = rarityScore
+        document.getElementById('rarityRanking_'+token_id).style.color = rarityColor
+    } catch (e) { console.log(e.message); }
+
 }
 
 // Setup Morphing UI
