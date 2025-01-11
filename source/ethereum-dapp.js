@@ -10,7 +10,7 @@
 var controller, collection, 
 user_address, user_rewards, 
 user_tokenBalance, user_stakedBalance, 
-is_approved, web3, f0, network, eth_usd, next, mint_quantity;
+is_approved, web3, f0, network, eth_usd, next, mint_quantity, user_price, user_limit;
 
 var sales_volume_eth = 0;
 var sales_volume_usd = 0;
@@ -785,7 +785,8 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
         '</div>';
 
     // Create Element <--
-    token_doc.appendChild(token_element);
+    if (location == 'bottom_sections') { token_doc.prepend(token_element); }
+    else {token_doc.appendChild(token_element); }
 
     var rarityScore = 0;
 
@@ -1022,12 +1023,12 @@ async function get_user_invites(wallet_address) {
         if (wallet_address == "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase()  || wallet_address == "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359".toLowerCase() || wallet_address == "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase() || wallet_address == "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
             // NF7UOS / C7AR Bypass -- Unlimited Free Mints
             user_invite = "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064";
-            mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1)
-            mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1)
+            user_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1)
+            user_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1)
         } else { // Public Invite -- 0.01 ETH
             user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
-            mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1)
-            mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1)
+            user_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1)
+            user_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1)
         }
 
     } catch (e) {
@@ -1210,7 +1211,7 @@ async function held_tokens_by_wallet(wallet_address) {
 async function initiate_mint() {
 
     // Token ID input
-    var input_quantity = prompt('🐸 FreshFrogsNFT (FROG)\nTotal Supply: '+next_id+' / 4040\n\nMint Price: '+mint_price+' | Mint Limit: '+mint_limit+'\n\nMint to create NEW uniquely pre-generated Frogs on the Ethereum blockchain! How many Frogs would you like to mint? ('+mint_price+'Ξ each + gas fee)') // prompt("Frog #"+next_id+" out of 4,040 is available to mint! \nMint limit of "+mint_limit+" Frogs per wallet! \nHow many Frogs would you like to mint? ("+mint_price+"Ξ each + gas fee)");
+    var input_quantity = prompt('🐸 FreshFrogsNFT (FROG)\nTotal Supply: '+next_id+' / 4040\n\nMint Price: '+user_price+' | Mint Limit: '+user_limit+'\n\nMint to create NEW uniquely pre-generated Frogs on the Ethereum blockchain! How many Frogs would you like to mint? ('+user_price+'Ξ each + gas fee)') // prompt("Frog #"+next_id+" out of 4,040 is available to mint! \nMint limit of "+user_limit+" Frogs per wallet! \nHow many Frogs would you like to mint? ("+user_price+"Ξ each + gas fee)");
     if (input_quantity !== null) {
         mint_quantity = parseInt(input_quantity)
         let mint_txn = await mint(mint_quantity, user_invite);
