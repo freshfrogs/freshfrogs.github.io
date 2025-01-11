@@ -395,6 +395,7 @@ body {
     box-shadow: 10px 10px darkslategray;
     font-family: monospace;
     font-size: initial;
+    height: fit-content;
   }
   .display_token_cont {
     display: inline-block;
