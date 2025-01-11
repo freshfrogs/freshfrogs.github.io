@@ -80,8 +80,11 @@ async function rank_tokens() {
         
     }
 
-    var ranked_tokens = rarity_token_rankings.sort((a, b) => a.rarity - b.rarity);
-    console.log('Updated: \n'+ranked_tokens);
+    const sorted = Object.values(rarity_token_rankings).sort(function(a, b) {
+        return a.rarity > b.rarity ? 1 : -1;
+    }).slice(0, 10);
+    
+    console.log(sorted);
 }
 
 
