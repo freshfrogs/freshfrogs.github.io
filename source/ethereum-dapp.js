@@ -1087,6 +1087,31 @@ async function fetch_staking_stats() {
     .catch(err => console.error(err));
 }
 
+async function fetch_staking_stats() {
+
+    try {
+        // Fetch data from the API
+        const response = await fetch('https://api.reservoir.tools/owners/v2?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options);
+        const data = await response.json();
+        console.log(data);
+
+        // Find the owner with the specified CONTROLLER_ADDRESS
+        const owner = data.owners.find(owner => owner.address === CONTROLLER_ADDRESS);
+
+        // Get token count from the owner object if found, otherwise set to null
+        const tokenCount = owner ? owner.ownership.tokenCount : null;
+
+        // Log the token count for debugging
+        console.log(tokenCount);
+
+        // Set the token count in the HTML element with the id 'total_staked_tokens'
+        document.getElementById('total_staked_tokens').innerHTML = tokenCount ? tokenCount : '0'; // Default to 0 if not found
+    } catch (err) {
+        console.error(err);  // Log any errors that occur during the fetch or processing
+    }
+}
+
+
 async function fetch_collection_stats() {
     fetch('https://api.reservoir.tools/collections/v7?id=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&includeSalesCount=true&includeMintStages=true', options)
       .then(stats => stats.json())
@@ -1613,6 +1638,55 @@ async function availableRewards(userAddress) {
     let available_rewards = await controller.methods.availableRewards(userAddress).call();
     available_rewards = (available_rewards / 1000000000000000000);
     return available_rewards;
+
+}
+
+/*
+
+    Redeem (claim) Available Rewards for User
+    claimRewards(_staker (address))
+
+*/
+async function claimRewards(userAddress) {
+
+    //let available_rewards = await controller.methods.claimRewards(userAddress).send();
+    //return available_rewards;
+
+    try {
+
+        // Estimate gas needed for transaction
+        var gasprice = await web3.eth.getGasPrice();
+        gasprice = Math.round(gasprice * 1.05);// to speed up 1.05 times..
+        var gas_estimate = await controller.methods.claimRewards(userAddress).estimateGas({ from: user_address }); 
+        gas_estimate = Math.round(gas_estimate * 1.05);
+        // Send transaction using gas estimate
+        let txn = await controller.methods.claimRewards(userAddress).send({ 
+            from: user_address, 
+            gas: web3.utils.toHex(gas_estimate), 
+            gasPrice:  web3.utils.toHex(gasprice),
+        })
+
+        var txn_raw = 'claimRewards('+userAddress+')'
+
+        // Transaction sent
+        .on('transactionHash', function(hash){
+            return txn_raw+'\nTransaction has been sent and now pending.';
+        })
+    
+        // Transction complete
+        .on('receipt', function(receipt){
+            console.log(receipt)
+            return txn_raw+'\nTransaction has been completed! See console for details.'
+        })
+    
+        // Transaction error
+        .on('error', function(error, receipt) {
+            console.log(receipt)
+            return txn_raw+'\nSomething went wrong during the transaction! Did it run out of gas?\nCheck console for receipt details!'
+        });
+
+    // Catch Errors
+    } catch (e) { return 'TRANSACTION FAILED:\n '+e.message; }
 
 }
 
