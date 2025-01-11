@@ -1123,6 +1123,9 @@ async function update_frontend() {
 
     // Connected Status
     
+    approved = await checkApproval();
+    if (approved) { document.getElementById('staking_status').innerHTML = 'Staking Approved'; document.getElementById('staking_status').style.color = 'palegreen'; }
+    
     document.getElementById('remainingSupply').style.color = 'palegreen';
     document.getElementById('totalSupply').style.color = 'palegreen';
     //document.getElementById('totalCollectors').style.color = 'palegreen';
