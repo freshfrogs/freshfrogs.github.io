@@ -855,37 +855,27 @@ async function meta_morph_select(selected, token_id) {
         meta_morph_frog_b = token_id
     }
 
-    document.getElementById('meta_morph_preview_'+selected).src = 'https://freshfrogs.github.io/frog/'+token_id+'.png'
+    document.getElementById('morph_frog_md_'+selected).innerHTML = 'Frog #'+token_id;
+    document.getElementById('meta_morph_preview_'+selected).src = 'https://freshfrogs.github.io/frog/'+token_id+'.png';
 
-    new_md_input = document.createElement('b')
-    new_md_input.innerHTML = 'Metadata: ';
-    document.getElementById('mm_terminal').appendChild(new_md_input)
-
-    new_md_input = document.createElement('text')
-    new_md_input.innerHTML = 'Frog #'+token_id;
-    new_md_input.style.color = 'palegreen'
-    document.getElementById('mm_terminal').appendChild(new_md_input)
-
+    var atts = '';
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
         var attribute = metadata.attributes[i].value;
         var trait_type = metadata.attributes[i].trait_type;
 
-        new_br = document.createElement('br')
-        document.getElementById('mm_terminal').appendChild(new_br)
-
-        new_md_input = document.createElement('b')
-        new_md_input.innerHTML = trait_type+': ';
-        document.getElementById('mm_terminal').appendChild(new_md_input)
-
-        document.getElementById('mm_terminal').appendChild(new_br)
-
-        new_md_input = document.createElement('text')
-        new_md_input.innerHTML = attribute;
-        new_md_input.style.color = 'palegreen'
-        document.getElementById('mm_terminal').appendChild(new_md_input)
+        if (trait_type == 'Frog' || trait_type == 'SpecialFrog') {
+            document.getElementById('morph_frog_type_'+selected).innerHTML = attribute
+        } else if (trait_type == 'Trait') {
+            document.getElementById('morph_frog_trait_'+selected).innerHTML = attribute
+        } else {
+            atts = atts+attribute+', '
+        }
 
     }
+
+    document.getElementById('morph_frog_atts_'+selected).innerHTML = atts
+    
 }
 
 async function meta_morph_preset() {
