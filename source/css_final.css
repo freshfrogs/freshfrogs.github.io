@@ -484,7 +484,7 @@ body {
   .morph_display {
     width: min-content;
     height: auto;
-    display: block;
+    display: inline-block;
     margin: 12px;
     margin-left: auto;
     margin-right: auto;
