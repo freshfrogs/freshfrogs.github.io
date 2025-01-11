@@ -857,6 +857,15 @@ async function meta_morph_select(selected, token_id) {
 
     document.getElementById('meta_morph_preview_'+selected).src = 'https://freshfrogs.github.io/frog/'+token_id+'.png'
 
+    new_md_input = document.createElement('b')
+    new_md_input.innerHTML = 'Metadata: ';
+    document.getElementById('mm_terminal').appendChild(new_md_input)
+
+    new_md_input = document.createElement('text')
+    new_md_input.innerHTML = 'Frog #'+token_id;
+    new_md_input.style.color = 'palegreen'
+    document.getElementById('mm_terminal').appendChild(new_md_input)
+
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
         var attribute = metadata.attributes[i].value;
