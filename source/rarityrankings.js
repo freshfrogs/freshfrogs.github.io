@@ -80,19 +80,17 @@ async function rank_tokens() {
         
     }
 
-    var ranked_tokens = rarity_token_rankings.sort((a, b) => a.rarity - b.rarity);
-    console.log('Updated: '+ranked_tokens);
-
+    console.log(rarity_token_rankings);
+    
     // Sort by rarity in descending order
-    rarity_token_rankings.sort((a, b) => b.rarity - a.rarity);
+    freshfrogs_rarity_rankings.sort((a, b) => b.rarity - a.rarity);
 
     // Add rank value to each object
-    rarity_token_rankings.forEach((frog, index) => {
+    freshfrogs_rarity_rankings.forEach((frog, index) => {
         frog.rank = index + 1; // Rank starts from 1
     });
 
-    console.log('New indexed')
-    console.log(rarity_token_rankings);
+    console.log(freshfrogs_rarity_rankings);
 }
 
 
