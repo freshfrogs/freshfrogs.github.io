@@ -1079,12 +1079,9 @@ async function fetch_staking_stats() {
     .then(stats => stats.json())
     .then(stats => {
       console.log(stats)
-      stats.forEach(async (holder) => {
-        var { address, ownership: { tokenCount } } = holder
-        if (address.toLocaleLowerCase() == CONTROLLER_ADDRESS.toLocaleLowerCase()) {
-            document.getElementById('total_staked_tokens').innerHTML = tokenCount;
-        }
-      });
+      var owner = owners.find(owner => owner.address === CONTROLLER_ADDRESS.toLowerCase());
+      console.log(owner.ownership.tokenCount);
+      document.getElementById('total_staked_tokens').innerHTML = owner.ownership.tokenCount;
     })
     .catch(err => console.error(err));
 }
