@@ -26,8 +26,8 @@
             document.getElementById('icons_container').appendChild(random_tokenImg);
           }
 
-          //await render_token_byrarity(50);
-          await rank_tokens();
+          await render_token_byrarity(50);
+          //await rank_tokens();
           document.getElementById('connectButton').onclick = async function (e) { await initiate_web3_connection(); }
 
         });
