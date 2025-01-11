@@ -45,7 +45,9 @@
                 mint_quantity = mint_quantity - 1;
                 net_mint_cost = 0.01 * mint_quantity
                 document.getElementById('mintButton').innerHTML = '🐸 Mint <u>'+mint_quantity+'</u> Frog(s)'
-                document.getElementById('netCostButton').innerHTML = net_mint_cost+'Ξ + gas fee'
+
+                document.getElementById('mint_status_total').innerHTML = '1 Frog(s)';
+                document.getElementById('mint_status_cost').innerHTML = '0.01Ξ + gas fee';
             }
         }
 
@@ -54,7 +56,9 @@
                 mint_quantity = mint_quantity + 1;
                 net_mint_cost = 0.01 * mint_quantity
                 document.getElementById('mintButton').innerHTML = '🐸 Mint <u>'+mint_quantity+'</u> Frog(s)'
-                document.getElementById('netCostButton').innerHTML = net_mint_cost+'Ξ + gas fee'
+
+                document.getElementById('mint_status_total').innerHTML = '1 Frog(s)';
+                document.getElementById('mint_status_cost').innerHTML = '0.01Ξ + gas fee';
             }
         }
 
@@ -134,7 +138,16 @@
             <button id="mintUp" class="connectButton" style="background: steelblue; color: white; margin: 0px;">
               <span>&#43;</span>
             </button>
-            <button class="connectButton" style="background: teal; color: white;" id="netCostButton" >0.01Ξ + gas fee</button>
+            <p class="terminal_op" id="mint_terminal">
+              <b>Status:</b>
+              <text id="mint_status" style="color: salmon;">Ethereum wallet not detected!</text>
+              <br>
+              <b>FROG Tokens to Mint: </b>
+              <text id="mint_status_total" style="color: palegreen;">1 Frog(s)</text>
+              <br>
+              <b>Cost to Mint: </b>
+              <text id="mint_status_cost">0.01Ξ + gas fee</text>
+            </p>
           </div>
           <div class="bottom-section">
             <p>

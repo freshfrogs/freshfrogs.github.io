@@ -1036,6 +1036,9 @@ async function update_frontend() {
     document.getElementById('address_owned_tokens').innerHTML = user_tokenBalance+' FROG(s)'
     document.getElementById('address_staked_tokens').innerHTML = user_stakedBalance+' FROG(s)'
     document.getElementById('address_unclaimed_rewards').innerHTML = parseInt(user_rewards)+' $FLYZ'
+    
+    document.getElementById('mint_status').innerHTML = 'Ready to Mint!';
+    document.getElementById('mint_status').style.color = 'palegreen'
 
     /*
     

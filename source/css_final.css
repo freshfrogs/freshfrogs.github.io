@@ -347,7 +347,7 @@ body {
     padding: 10px;
     margin: 4px;
     border: 1px solid black;
-    width: 300px;
+    width: 100%;
 }
 .infobox_left{
     margin: 8px;
