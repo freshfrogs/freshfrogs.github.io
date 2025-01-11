@@ -1082,7 +1082,7 @@ async function fetch_collection_stats(){
         var { tokenCount, ownerCount } = stats.collections[0]
         document.getElementById('remainingSupply').innerHTML = 4040 - parseInt(tokenCount);
         document.getElementById('totalSupply').innerHTML = tokenCount+' / 4040';
-        document.getElementById('totalCollectors').innerHTML = ownerCount;
+        //document.getElementById('totalCollectors').innerHTML = ownerCount;
       })
       .catch(err => console.error(err));
 }
