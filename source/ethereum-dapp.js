@@ -1027,9 +1027,9 @@ async function update_frontend() {
     // Connected Status
     document.getElementById('connected_status').innerHTML = truncateAddress(user_address);
     document.getElementById('connected_status').style.color = 'palegreen'
-    document.getElementById('user_owned_tokens').innerHTML = user_tokenBalance+' FROG(s)'
-    document.getElementById('user_staked_tokens').innerHTML = user_stakedBalance+' FROG(s)'
-    document.getElementById('user_unclaimed_rewards').innerHTML = user_rewards+' $FLYZ'
+    document.getElementById('address_owned_tokens').innerHTML = user_tokenBalance+' FROG(s)'
+    document.getElementById('address_staked_tokens').innerHTML = user_stakedBalance+' FROG(s)'
+    document.getElementById('address_unclaimed_rewards').innerHTML = user_rewards+' $FLYZ'
 
     /*
     
