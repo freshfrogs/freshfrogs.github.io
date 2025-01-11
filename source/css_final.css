@@ -226,7 +226,7 @@ body {
     border: 1px solid black;
     border-radius: 0px;
     font-weight: bold;
-    width: 100px;
+    width: 105px;
     height: 25px;
     color: #081D35;
     vertical-align: middle;
@@ -249,7 +249,7 @@ body {
     border: 1px solid black;
     border-radius: 0px;
     font-weight: bold;
-    width: 100px;
+    width: 105px;
     height: 25px;
     color: white;
     vertical-align: middle;
@@ -272,7 +272,7 @@ body {
     border: 1px solid black;
     border-radius: 0px;
     font-weight: bold;
-    width: 248px;
+    width: 210px;
     height: 25px;
     color: white;
     vertical-align: middle;
@@ -295,7 +295,7 @@ body {
     border: 1px solid black;
     border-radius: 0px;
     font-weight: bold;
-    width: 248px;
+    width: 210px;
     height: 25px;
     color: white;
     vertical-align: middle;
@@ -428,6 +428,7 @@ body {
     height: auto;
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
+    text-align: center;
   }
   .attribute_overlay {
     display: block;
