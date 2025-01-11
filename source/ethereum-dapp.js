@@ -899,6 +899,8 @@ async function meta_morph_preset() {
         '</div>';
 
         await build_token(html_elements, token_a, 'mm', '', '', 'bottom_sections');
+    
+    await metamorph_build(token_a, token_b, 'cont_mm');
 }
 
 /*
