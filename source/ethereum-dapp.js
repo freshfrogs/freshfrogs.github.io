@@ -888,7 +888,7 @@ async function meta_morph_preset() {
     var html_elements = 
         '<div class="infobox_left">'+
             '<text class="card_text">Parent Frog</text>'+'<br>'+
-            '<text class="card_bold" id="meta_morph_primary">Frog #'+token_id+'</text>'+
+            '<text class="card_bold" id="meta_morph_primary">Frog #'+token_a+'</text>'+
         '</div>'+
         '<div class="infobox_right">'+
             '<text class="card_text">Second Frog</text>'+'<br>'+
@@ -898,7 +898,7 @@ async function meta_morph_preset() {
             '<br><button class="unstake_button" onclick="">Metamorphosis</button>'+
         '</div>';
 
-        await build_token(html_elements, token_id, 'mm', '', '', 'bottom_sections');
+        await build_token(html_elements, token_a, 'mm', '', '', 'bottom_sections');
 }
 
 /*
