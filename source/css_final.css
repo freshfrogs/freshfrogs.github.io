@@ -486,8 +486,6 @@ body {
     height: auto;
     display: inline-block;
     margin: 12px;
-    margin-left: auto;
-    margin-right: auto;
   }
 
   .morph_select_button {
