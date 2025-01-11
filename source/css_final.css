@@ -485,3 +485,30 @@ body {
     height: auto;
     display: inline-block;
   }
+
+  .morph_select_button {
+    margin: 4px;
+    padding: 8px;
+    background: white;
+    border: 1px solid black;
+    border-radius: 5px;
+    width: auto;
+    height: auto;
+    vertical-align: middle;
+    font-size: small;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 2px 2px darkslategray;
+    transition: all .3s;
+    font-family: monospace;
+    font-size: initial;
+
+    color: black;
+    background: #e9ecef;
+    width: 128px;
+    margin: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+  }
