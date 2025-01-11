@@ -35,7 +35,7 @@ async function count_token_traits() {
 async function rank_tokens() {
     for (i = 1; i < 4041; i++) {
         
-        console.log('=- Frog #'+i+' -=')
+        console.log('=-=- Frog #'+i+' -=-=')
         rarity_token_rankings[i] = { id: i, rarity: 1, type: '', };
 
         let metadata = await (await fetch('https://freshfrogs.github.io/frog/json/'+i+'.json')).json();
