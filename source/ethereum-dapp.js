@@ -750,10 +750,10 @@ async function metamorph_build(token_a, token_b, location) {
     Render NFT token by layered attirubtes obtained through metadata.
 
 */
-async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
+async function build_token(html_elements, token_id, element_id, txn, txn_hash, location) {
     if (! element_id) { var element_id = 'Frog #'+token_id }
 
-    var location = 'frogs'
+    if (! location) { location = 'frogs'; }
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
 
     // <-- Begin Element
@@ -842,6 +842,27 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
 
     document.getElementById('rarityRanking_'+token_id).innerHTML = rarityScore
     document.getElementById('rarityRanking_'+token_id).style.color = rarityColor
+}
+
+// Setup Morphing UI
+async function meta_morph_preset() {
+
+    token_id = Math.floor(Math.random() * 4040) + 1;
+
+    var html_elements = 
+        '<div class="infobox_left">'+
+            '<text class="card_text">Parent Frog</text>'+'<br>'+
+            '<text class="card_bold" id="meta_morph_primary">Frog #'+token_id+'</text>'+
+        '</div>'+
+        '<div class="infobox_right">'+
+            '<text class="card_text">Second Frog</text>'+'<br>'+
+            '<text id="meta_morph_secondary" class="card_bold">--</text>'+
+        '</div>'+
+        '<div class="card_buttonbox">'+
+            '<br><button class="unstake_button" onclick="">Metamorphosis</button>'+
+        '</div>';
+
+        await build_token(html_elements, tokenId, tokenId+':'+'', '', '', 'bottom_sections');
 }
 
 /*

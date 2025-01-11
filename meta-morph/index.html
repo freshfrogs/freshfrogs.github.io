@@ -18,6 +18,8 @@
 
         document.addEventListener("DOMContentLoaded", async () => {
 
+          await meta_morph_preset();
+
           document.getElementById('icons_container').innerHTML = '';
           for (let i = 0; i < 9; i++) {
             random_token = Math.floor(Math.random() * 4040) + 1;
@@ -117,7 +119,7 @@
         </div>
       </div>
       <div class="bottom-sections">
-          <div class="bottom-section">
+          <div class="bottom-section" id="bottom_sections">
             <p>
               <b>📃 FreshFrogsNFT Staking</b><br>
               Stake your FROG(s) to earn exclusive rewards and unlock special benefits, while helping to grow the community and increase the value of your collection!<br>
