@@ -34,6 +34,8 @@ async function count_token_traits() {
 
 async function rank_tokens() {
 
+    console.log('Adding rank index to rarity rankings');
+    
     // Add rank value to each object
     freshfrogs_rarity_rankings.forEach((frog, index) => {
         frog.rank = index + 1; // Rank starts from 1
