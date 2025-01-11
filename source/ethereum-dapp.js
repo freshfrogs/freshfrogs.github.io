@@ -1034,8 +1034,11 @@ async function update_frontend() {
     document.getElementById('connected_status').innerHTML = truncateAddress(user_address);
     document.getElementById('connected_status').style.color = 'palegreen'
     document.getElementById('address_owned_tokens').innerHTML = user_tokenBalance+' FROG(s)'
+    document.getElementById('address_owned_tokens').style.color = 'palegreen'
     document.getElementById('address_staked_tokens').innerHTML = user_stakedBalance+' FROG(s)'
+    document.getElementById('address_staked_tokens').style.color = 'palegreen'
     document.getElementById('address_unclaimed_rewards').innerHTML = parseInt(user_rewards)+' $FLYZ'
+    document.getElementById('address_unclaimed_rewards').style.color = 'palegreen'
     
     document.getElementById('mint_status').innerHTML = 'Ready to Mint!';
     document.getElementById('mint_status').style.color = 'palegreen'
