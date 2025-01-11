@@ -1074,17 +1074,35 @@ async function get_user_invites(wallet_address) {
     }
 }
 
-async function fetch_collection_stats(){
-    fetch('https://api.reservoir.tools/collections/v7?id=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
+async function fetch_staking_stats() {
+    fetch('https://api.reservoir.tools/owners/v2?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
+    .then(stats => stats.json())
+    .then(stats => {
+      console.log(stats)
+      tokens.forEach(async (holder) => {
+        var { address, ownership: { tokenCount } } = holder
+        if (address.toLocaleLowerCase() == CONTROLLER_ADDRESS.toLocaleLowerCase()) {
+            document.getElementById('total_staked_tokens').innerHTML = tokenCount;
+        }
+      });
+    })
+    .catch(err => console.error(err));
+}
+
+async function fetch_collection_stats() {
+    fetch('https://api.reservoir.tools/collections/v7?id=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&includeSalesCount=true&includeMintStages=true', options)
       .then(stats => stats.json())
       .then(stats => {
         console.log(stats)
         var { tokenCount, ownerCount } = stats.collections[0]
         document.getElementById('remainingSupply').innerHTML = 4040 - parseInt(tokenCount);
         document.getElementById('totalSupply').innerHTML = tokenCount+' / 4040';
-        //document.getElementById('totalCollectors').innerHTML = ownerCount;
+        document.getElementById('totalCollectors').innerHTML = ownerCount;
       })
       .catch(err => console.error(err));
+
+      await fetch_staking_stats();
+
 }
 
 /*
