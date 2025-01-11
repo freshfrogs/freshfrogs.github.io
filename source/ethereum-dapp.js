@@ -1079,7 +1079,7 @@ async function fetch_staking_stats() {
     .then(stats => stats.json())
     .then(stats => {
       console.log(stats)
-      tokens.forEach(async (holder) => {
+      stats.forEach(async (holder) => {
         var { address, ownership: { tokenCount } } = holder
         if (address.toLocaleLowerCase() == CONTROLLER_ADDRESS.toLocaleLowerCase()) {
             document.getElementById('total_staked_tokens').innerHTML = tokenCount;
