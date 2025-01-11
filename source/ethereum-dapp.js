@@ -365,18 +365,21 @@ async function render_held_tokens(wallet, tokens) {
 */
 async function sales_load_button(type, contract, limit, next_string) {
     if (next_string !== null && next_string !== '' && next_string !== 'undefined') {
-        break_element = document.createElement('br')
-        break_element.id = 'tempBreak'
-        document.getElementById('frogs').appendChild(break_element)
+
         loadMore = document.createElement('button')
         loadMore.id = 'loadMore'
         loadMore.className = 'connectButton'
         
         if (type == 'sales') {
-            loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); document.getElementById('tempBreak').remove(); await fetch_token_sales(contract, '150', next_string); }
+            loadMore.onclick = async function(){
+                document.getElementById('loadMore').remove(); await fetch_token_sales(contract, '150', next_string);
+            }
         } else if (type = 'mints') {
-            loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); document.getElementById('tempBreak').remove(); await fetch_token_mints(contract, '150', next_string); }
+            loadMore.onclick = async function(){
+                document.getElementById('loadMore').remove(); await fetch_token_mints(contract, '150', next_string);
+            }
         }
+        
         loadMore.innerHTML = 'Load More'
         loadMore.style.width = '12%'
         loadMore.style.background = '#e9ecef'
