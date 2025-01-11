@@ -1032,7 +1032,7 @@ async function update_frontend() {
     // Connected Status
 
     var new_op_line = document.createElement('text')
-    break_element = document.createElement('br')
+    var break_element = document.createElement('br')
     document.getElementById('terminal_op').innerHTML = '';
     
     new_op_line.innerHTML = truncateAddress(user_address);
