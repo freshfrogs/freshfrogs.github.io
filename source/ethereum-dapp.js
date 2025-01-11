@@ -1080,8 +1080,10 @@ async function fetch_collection_stats(){
       .then(stats => stats.json())
       .then(stats => {
         console.log(stats)
-        var { tokenCount, ownerCount } = stats.collections
+        var { tokenCount, ownerCount } = stats.collections[0]
         console.log(tokenCount)
+        document.getElementById('remainingSupply').innerHTML = 4040 - parseInt(tokenCount)
+        document.getElementById('remainingSupply').style.color = palegreen
       })
       .catch(err => console.error(err));
 }
