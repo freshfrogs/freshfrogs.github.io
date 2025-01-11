@@ -370,15 +370,17 @@ async function sales_load_button(type, contract, limit, next_string) {
         document.getElementById('frogs').appendChild(break_element)
         loadMore = document.createElement('button')
         loadMore.id = 'loadMore'
-        loadMore.className = 'loadmore_button'
+        loadMore.className = 'connectButton'
         
         if (type == 'sales') {
             loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); document.getElementById('tempBreak').remove(); await fetch_token_sales(contract, '150', next_string); }
         } else if (type = 'mints') {
             loadMore.onclick = async function(){ document.getElementById('loadMore').remove(); document.getElementById('tempBreak').remove(); await fetch_token_mints(contract, '150', next_string); }
         }
-        loadMore.innerHTML = '▼'
+        loadMore.innerHTML = 'Load More'
         loadMore.style.width = '12%'
+        loadMore.style.background = '#e9ecef'
+        loadMore.style.color = 'black'
         loadMore.style.minWidth = '120px'
         document.getElementById('frogs').appendChild(loadMore)
         
