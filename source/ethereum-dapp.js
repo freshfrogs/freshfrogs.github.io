@@ -1042,6 +1042,8 @@ async function update_frontend() {
     
     document.getElementById('mint_status').innerHTML = 'Ready to Mint!';
     document.getElementById('mint_status').style.color = 'palegreen'
+    document.getElementById('mint_status_total').style.color = 'palegreen'
+    document.getElementById('mint_status_cost').style.color = 'palegreen'
 
     /*
     
