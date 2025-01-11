@@ -875,12 +875,15 @@ async function meta_morph_select(selected, token_id) {
     }
 
     document.getElementById('morph_frog_atts_'+selected).innerHTML = atts
-    
+
 }
 
 async function meta_morph_preset() {
 
-    token_id = Math.floor(Math.random() * 4040) + 1;
+    token_a = Math.floor(Math.random() * 4040) + 1;
+    await meta_morph_select(1, token_a)
+    token_b = Math.floor(Math.random() * 4040) + 1;
+    await meta_morph_select(2, token_b)
 
     var html_elements = 
         '<div class="infobox_left">'+
