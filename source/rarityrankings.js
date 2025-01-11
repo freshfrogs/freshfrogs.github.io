@@ -102,8 +102,8 @@ async function render_token_byrarity(batch, leftoff) {
             '</div>'+
             '<br>'+
             '<div class="infobox_left">'+
-                '<text class="card_text">'+'--'+'</text>'+'<br>'+
-                '<text class="card_bold">'+'--'+'</text>'+
+                '<text class="card_text">'+'Ranking'+'</text>'+'<br>'+
+                '<text class="card_bold"> No.'+i+'</text>'+
             '</div>'+
             '<div class="infobox_right">'+
                 '<text class="card_text">Rarity</text>'+'<br>'+
