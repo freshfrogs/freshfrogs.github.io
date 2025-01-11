@@ -33,7 +33,7 @@ async function count_token_traits() {
 
 
 async function rank_tokens() {
-    for (i = 1; i < 41; i++) {
+    for (i = 1; i < 4041; i++) {
         
         console.log('=-=- Frog #'+i+' -=-=')
         rarity_token_rankings['Frog #'+i] = { id: i, rarity: 1, type: '', rank: ''};
@@ -79,12 +79,9 @@ async function rank_tokens() {
         }
         
     }
-
-    const sorted = Object.values(rarity_token_rankings).sort(function(a, b) {
-        return a.rarity > b.rarity ? 1 : -1;
-    }).slice(0, 10);
     
-    console.log(sorted);
+    console.log(rarity_token_rankings);
+
 }
 
 
