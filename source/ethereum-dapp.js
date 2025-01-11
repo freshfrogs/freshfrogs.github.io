@@ -1021,15 +1021,23 @@ async function update_frontend() {
     //parent_element.appendChild(break_element)
 
     // Connected Button
-    document.getElementById('connectButton').innerHTML = 'Connected - ['+truncateAddress(user_address)+']'
-    document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+user_tokenBalance+'/'+user_stakedBalance+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+user_tokenBalance+'/'+user_stakedBalance+')'); }
+    //document.getElementById('connectButton').innerHTML = 'Connected - ['+truncateAddress(user_address)+']'
+    //document.getElementById('connectButton').onclick = function (e) { alert('CONNECTED\n'+user_address+'\n\nOWNED/STAKED TOKENS: ('+user_tokenBalance+'/'+user_stakedBalance+')'); console.log('CONNECTED\N'+user_address+'\n\nSTAKED/OWNED TOKENS: ('+user_tokenBalance+'/'+user_stakedBalance+')'); }
 
+    // Connected Status
+    document.getElementById('connected_status').innerHTML = truncateAddress(user_address);
+    document.getElementById('connected_status').style.color = 'palegreen'
+    document.getElementById('user_owned_tokens').innerHTML = user_tokenBalance+' FROG(s)'
+    document.getElementById('user_staked_tokens').innerHTML = user_stakedBalance+' FROG(s)'
+    document.getElementById('user_unclaimed_rewards').innerHTML = user_rewards+' $FLYZ'
+
+    /*
     
     // Mint Button | Mint Tokens
     mintContainer_element = document.createElement('div')
     mintContainer_element.className = 'container_element'
     mintContainer_element.innerHTML = 
-    /*
+    
         '<p class="paragraph_container">'+
             '<b>🍃 Minting Information</b>'+
             '<br>Each token is randomly generated and individually unique! The Fresh Frogs NFT collection consists of many different attributes and traits with a total supply of 4,040 Frogs!'+
@@ -1039,7 +1047,7 @@ async function update_frontend() {
             '<br>ERC-721 powered by Factoria, verified and stored on IPFS ✔️'+
             '<br>0xbe4bef8735107db540de269ff82c7de9ef68c51b'+
         '</p>'+
-    */
+    
         '<button id="mintButton" class="connectButton" onclick="initiate_mint(); "style="color: white; background: steelblue;">🐸 Mint Frogs</button>'+
         '<a href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><button id="githubButton" class="connectButton" style="background: #e9ecef; color: black;">Etherscan.io</button></a>'+
         '<a id="holdingsLink" className="holdingsLink" href="https://freshfrogs.github.io/wallet/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍃 View Holdings</button></a>';
@@ -1058,14 +1066,13 @@ async function update_frontend() {
             '<br><br><b>✍️ Sign Contract Approval</b>'+
             '<br>To start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.'+
         '</p>'+
-    */
+    
         '<button id="stakeButton" class="connectButton" onclick="initiate_setApprovalForAll();" style="color: white; background: lightseagreen;">🌱 Stake & Earn!</button>'+
         '<button id="stakeButton" class="connectButton" onclick=""; style="color: white; background: lightsalmon;">⭐ Claim Rewards</button>'+
         '<a id="thePondLink" className="thePondButton" href="https://freshfrogs.github.io/the-pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍀 The Pond</button></a>';
 
     parent_element.appendChild(stakeContainer_element)
 
-    /*
     // Holdings Button | View holdings
     holdingsContainer_element = document.createElement('div')
     holdingsContainer_element.className = 'container_element'
