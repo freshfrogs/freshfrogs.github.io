@@ -919,7 +919,7 @@ async function fetch_eth_usd() {
 */
 async function initiate_web3_connection() {
     if (typeof window.ethereum !== "undefined") {
-        document.getElementById('connectButton').innerHTML = 'Connecting...'
+        document.getElementById('connected_status').innerHTML = 'Connecting...'
         await connect_user();
     } else {
         // WEB3 browser extenstion could not be found!
