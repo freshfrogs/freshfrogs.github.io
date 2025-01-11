@@ -1044,6 +1044,7 @@ async function update_frontend() {
     document.getElementById('mint_status').style.color = 'palegreen'
     document.getElementById('mint_status_total').style.color = 'palegreen'
     document.getElementById('mint_status_cost').style.color = 'palegreen'
+    document.getElementById('address_network').style.color = 'palegreen'
 
     /*
     
