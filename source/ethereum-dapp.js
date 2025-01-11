@@ -1081,8 +1081,7 @@ async function fetch_collection_stats(){
         console.log(stats)
         var { tokenCount, ownerCount } = stats.collections[0]
         console.log(tokenCount)
-        document.getElementById('remainingSupply').innerHTML = 4040 - parseInt(tokenCount)
-        document.getElementById('remainingSupply').style.color = palegreen
+        document.getElementById('remainingSupply').innerHTML = 4040 - parseInt(tokenCount);
       })
       .catch(err => console.error(err));
 }
@@ -1105,6 +1104,7 @@ async function update_frontend() {
 
     // Connected Status
     
+    document.getElementById('remainingSupply').style.color = 'palegreen';
     document.getElementById('connected_status').innerHTML = truncateAddress(user_address);
     document.getElementById('connected_status').style.color = 'palegreen'
     document.getElementById('address_owned_tokens').innerHTML = user_tokenBalance+' FROG(s)'
