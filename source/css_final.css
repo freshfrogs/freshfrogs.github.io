@@ -168,7 +168,42 @@ body {
         font-size: 1em; /* Smaller paragraph text */
     }
 }
-
+.disconnectedStatus {
+    background: red;
+    width: 14px;
+    height: 14px;
+    border-radius: 100%;
+    margin: 0px;
+    margin-right: 2;
+    display: inherit;
+    margin-right: 6px;
+    margin-bottom: -3px;
+    border: 1px solid black;
+  }
+  .connectedStatus {
+    background: green;
+    width: 14px;
+    height: 14px;
+    border-radius: 100%;
+    margin: 0px;
+    margin-right: 2;
+    display: inherit;
+    margin-right: 6px;
+    margin-bottom: -3px;
+    border: 1px solid black;
+  }
+  .pendingStatus {
+    background: orange;
+    width: 14px;
+    height: 14px;
+    border-radius: 100%;
+    margin: 0px;
+    margin-right: 2;
+    display: inherit;
+    margin-right: 6px;
+    margin-bottom: -3px;
+    border: 1px solid black;
+  }
 .image-gallery {
     padding: 20px;
     background-color: transparent;
