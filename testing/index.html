@@ -26,7 +26,7 @@
             document.getElementById('icons_container').appendChild(random_tokenImg);
           }
 
-          await fetch_token_sales(COLLECTION_ADDRESS, '50');
+          await render_token_byrarity(50);
           document.getElementById('connectButton').onclick = async function (e) { await initiate_web3_connection(); }
 
         });
@@ -46,12 +46,29 @@
             <br>
             Smart contracts are verified on etherscan. Feel free to interact with them directly: 
             <a href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank">NFT Smart Contract</a>
-            <a href="https://etherscan.io/address/0xcb1ee125cff4051a10a55a09b10613876c4ef199" target="_blank">Live Staking Contract</a>
+            <a href="https://etherscan.io/address/0xcb1ee125cff4051a10a55a09b10613876c4ef199" target="_blank">Live Staking Contract</a><br>
           </p>
           <br>
           <button id="connectButton" class="connectButton" style="background: lightcoral; color: white;">Connect to Web3</button>
           <a href="https://github.com/freshfrogs/freshfrogs.github.io" target="_blank"><button id="githubButton" class="connectButton" style="background: #e9ecef; color: black;">View on Github</button></a>
           <a href="https://opensea.io/collection/fresh-frogs" target="_blank"><button id="raribleButton" class="connectButton" style="background: rgb(0, 134, 255); color: white;">Shop on Opensea</button></a>
+          <br><br>
+          <p class="terminal_op">
+            <b>Connected:</b>
+            <text id="connected_status" style="color: salmon;">False</text>
+            <br>
+            <b>Network:</b>
+            Ethereum Main
+            <br>
+            <b>Owned Tokens: </b>
+            <text id="address_owned_tokens"></text>
+            <br>
+            <b>Staked Tokens: </b>
+            <text id="address_staked_tokens"></text>
+            <br>
+            <b>Unclaimed Rewards: </b>
+            <text id="address_unclaimed_rewards"></text>
+          </p>
         </div>
         <div id="icons_container" class="image-grid">
           <img src="https://freshfrogs.github.io/frog/500.png">
