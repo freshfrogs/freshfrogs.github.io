@@ -50,7 +50,7 @@
             if (mint_quantity <= 8) {
                 mint_quantity = mint_quantity + 1;
                 net_mint_cost = 0.01 * mint_quantity
-                document.getElementById('mintButton').innerHTML = net_mint_cost+'Ξ 🐸 Mint '+mint_quantity+' Frog(s)'
+                document.getElementById('mintButton').innerHTML = net_mint_cost+'Ξ 🐸 Mint <u>'+mint_quantity+'</u> Frog(s)'
                 document.getElementById('mintButton').onclick = async function (e) {
 
                     console.log('Minting '+mint_quantity+' Frog(s) @ 0.01Ξ ['+net_mint_cost+']')
@@ -132,7 +132,7 @@
             <button id="mintDown" class="connectButton" style="background: steelblue; color: white; margin: 0px;">
               <span>&#8722;</span>
             </button>
-            <button id="mintButton" class="connectButton" onclick=" "style="color: white; background: steelblue;">0.01Ξ 🐸 Mint 1 Frog(s)</button>
+            <button id="mintButton" class="connectButton" onclick=" "style="color: white; background: steelblue;">0.01Ξ 🐸 Mint <u>1</u> Frog(s)</button>
             <button id="mintUp" class="connectButton" style="background: steelblue; color: white; margin: 0px;">
               <span>&#43;</span>
             </button>
