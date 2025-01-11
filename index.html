@@ -44,7 +44,7 @@
             if (mint_quantity >= 2) {
                 mint_quantity = mint_quantity - 1;
                 net_mint_cost = 0.01 * mint_quantity
-                document.getElementById('mintButton').innerHTML = net_mint_cost+'🐸 Mint '+mint_quantity+' Frog(s)'
+                document.getElementById('mintButton').innerHTML = '🐸 Mint '+mint_quantity+' Frog(s)'
                 document.getElementById('netCostButton').innerHTML = net_mint_cost+'Ξ + gas fee'
             }
         }
@@ -53,7 +53,7 @@
             if (mint_quantity <= 8) {
                 mint_quantity = mint_quantity + 1;
                 net_mint_cost = 0.01 * mint_quantity
-                document.getElementById('mintButton').innerHTML = net_mint_cost+'🐸 Mint <u>'+mint_quantity+'</u> Frog(s)'
+                document.getElementById('mintButton').innerHTML = '🐸 Mint <u>'+mint_quantity+'</u> Frog(s)'
                 document.getElementById('netCostButton').innerHTML = net_mint_cost+'Ξ + gas fee'
             }
         }
