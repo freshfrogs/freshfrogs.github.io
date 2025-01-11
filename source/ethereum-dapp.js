@@ -1029,7 +1029,7 @@ async function update_frontend() {
     document.getElementById('connected_status').style.color = 'palegreen'
     document.getElementById('address_owned_tokens').innerHTML = user_tokenBalance+' FROG(s)'
     document.getElementById('address_staked_tokens').innerHTML = user_stakedBalance+' FROG(s)'
-    document.getElementById('address_unclaimed_rewards').innerHTML = user_rewards+' $FLYZ'
+    document.getElementById('address_unclaimed_rewards').innerHTML = parseInt(user_rewards)+' $FLYZ'
 
     /*
     
