@@ -84,7 +84,7 @@ async function render_token_byrarity(batch, leftoff) {
     try{
 
         if(! leftoff) { leftoff = 0; }
-        for (i = 1; i < batch; i++) {
+        for (i = 0; i < batch; i++) {
             var frog = freshfrogs_rarity_rankings[i].id
             var rarity_rank = freshfrogs_rarity_rankings[i].rarity
 
