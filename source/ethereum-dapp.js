@@ -1013,6 +1013,17 @@ async function get_user_invites(wallet_address) {
     }
 }
 
+async function fetch_collection_stats(){
+    fetch('https://api.reservoir.tools/collections/v7?id=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
+      .then(stats => stats.json())
+      .then(stats => {
+        console.log(stats)
+        var { tokenCount, ownerCount } = stats.collections
+        console.log(tokenCount)
+      })
+      .catch(err => console.error(err));
+}
+
 /*
 
     Update website UI
