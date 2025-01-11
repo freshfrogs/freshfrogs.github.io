@@ -93,8 +93,10 @@
             <text id="connected_status" style="color: salmon;">False</text><br>
             <b>Network: </b><text id="address_network">Ethereum Main</text><br>
             <b>Total Supply: </b><text id="totalSupply">-- / 4040</text><br>
-            <b>Total Collectors: </b><text id="totalCollectors">--</text><br>
+            <!-- <b>Total Collectors: </b><text id="totalCollectors">--</text><br> -->
             <b>Owned Tokens: </b> <text id="address_owned_tokens">--</text><br>
+            <b>Staked Tokens: </b><text id="address_staked_tokens">--</text><br>
+            <b>Unclaimed Rewards: </b><text id="address_unclaimed_rewards">--</text>
           </p>
         </div>
         <div id="icons_container" class="image-grid">
@@ -112,14 +114,11 @@
       <div class="bottom-sections">
           <div class="bottom-section">
             <p>
-              <b>🍃 Minting Info</b><br>
+              <b>🍃 Minting Information</b><br>
               Mint your own unique FreshFrogs NFT today and join the exclusive collection of one-of-a-kind digital frogs!<br>
               <br>
               <b>📃 Ethereum Smart Contract</b><br>
-              ERC-721 powered by Factoria, verified on etherscan and stored on IPFS!<br>
-              <!-- <br><br>
-              <b>✨ Collection Royalties</b><br>
-              All secondary sales are entitles to a 5% royalty fee. <a href="https://github.com/freshfrogs/freshfrogs.github.io?tab=readme-ov-file#royalties-payout">Learn More</a> -->
+              ERC-721 powered by Factoria, verified and stored on IPFS ✔️
             </p>
             <br>
             <button id="mintDown" class="connectButton" style="background: steelblue; color: white; margin: 0px;">
@@ -146,20 +145,14 @@
               <br>
               <b>✍️ Sign Contract Approval</b><br>
               To start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.<br>
-              <!-- <b>🍄 Morph Frog Tokens</b><br>
-              Combine traits from two Fresh Frog NFTs to create a new unique design. (In testing!) -->
+              <br>
+              <b>🍄 Morph Frog Tokens</b><br>
+              Combine traits from two Fresh Frog NFTs to create a new unique design. (In testing!)
             </p>
             <br>
             <button id="stakeButton" class="connectButton" onclick="initiate_setApprovalForAll();" style="color: white; background: lightseagreen;">🌱 Stake & Earn!</button>
             <a href="https://freshfrogs.github.io/the-pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍀 The Pond</button></a>
-            <!-- <a href=""><button class="connectButton" style="background: salmon; color: white;" id="holdingsButton" >🍄 Meta Morph</button></a> -->
-            <br><br>
-            <p class="terminal_op" id="staking_terminal">
-              <b>Staking Status: </b><text id="staking_status" style="color: salmon;">Contract not approved</text><br>
-              <b>Staked Tokens: </b><text id="address_staked_tokens">--</text><br>
-              <b>Unclaimed Rewards: </b><text id="address_unclaimed_rewards">--</text><br>
-              <b>Total Tokens Staked: </b><text id="total_staked_tokens">--</text>
-            </p>
+            <a href=""><button class="connectButton" style="background: tomato; color: white;" id="holdingsButton" >🍄 Meta Morph</button></a>
           </div>
       </div>
       <section id="frogs" class="image-gallery">
