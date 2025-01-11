@@ -1091,12 +1091,12 @@ async function fetch_staking_stats() {
 
     try {
         // Fetch data from the API
-        const response = await fetch('https://api.reservoir.tools/owners/v2?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options);
-        const data = await response.json();
+        var response = await fetch('https://api.reservoir.tools/owners/v2?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options);
+        var data = await response.json();
         console.log(data);
 
         // Find the owner with the specified CONTROLLER_ADDRESS
-        const owner = data.owners.find(owner => owner.address === CONTROLLER_ADDRESS);
+        const owner = data.owners.find(owner => owner.address === CONTROLLER_ADDRESS.toLocaleLowerCase());
 
         // Get token count from the owner object if found, otherwise set to null
         const tokenCount = owner ? owner.ownership.tokenCount : null;
