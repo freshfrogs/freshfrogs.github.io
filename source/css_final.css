@@ -318,7 +318,7 @@ body {
     background: white;
     border: 1px solid black;
     border-radius: 0px;
-    min-width: 130px;
+    width: auto;
     height: auto;
     vertical-align: middle;
     font-size: small;
