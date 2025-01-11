@@ -35,7 +35,7 @@ async function count_token_traits() {
 async function rank_tokens() {
     for (i = 1; i < 4041; i++) {
         
-        console.log('-- Frog #'+i+' --')
+        console.log('=- Frog #'+i+' -=')
         rarity_token_rankings[i] = { id: i, rarity: 1, type: '', };
 
         let metadata = await (await fetch('https://freshfrogs.github.io/frog/json/'+i+'.json')).json();
@@ -47,6 +47,12 @@ async function rank_tokens() {
             if (trait_type == 'Frog' || trait_type == 'SpecialFrog') {
                 var frog_type = attribute;
                 rarity_token_rankings[i].type = attribute;
+
+                if (trait_type == 'SpecialFrog') {
+                    // Special Frog Missing Trait Bonus
+                    var rarity_raw = parseInt(rarity_token_rankings[i].rarity) + 1/(parseInt(rarity_trait_rankings['natural'])/4040)
+                    rarity_token_rankings[i].rarity = parseInt(rarity_raw);
+                }
             }
 
             // Natural Trait Bonus
