@@ -60,11 +60,7 @@ async function rank_tokens() {
                 if (frog_type == 'redEyedTreeFrog' || frog_type == 'lightBrownTreeFrog' || frog_type == 'brownTreeFrog' || frog_type == 'goldenDartFrog' || frog_type == 'unknown' || frog_type == 'grayTreeFrog' || frog_type == 'stawberryDartFrog' || frog_type == 'blueDartFrog' || frog_type == 'splendidLeafFrog') {
 
                     // Natural Rarity Score
-                    var rarity_raw = parseInt(rarity_token_rankings[i].rarity) + 1/(parseInt(rarity_trait_rankings['rare_natural'])/4040)
-                    rarity_token_rankings[i].rarity = parseInt(rarity_raw);
-
-                    // Regular Natural Score
-                    var rarity_raw = parseInt(rarity_token_rankings[i].rarity) + 1/(parseInt(rarity_trait_rankings['natural'])/4040)
+                    var rarity_raw = parseInt(rarity_token_rankings[i].rarity) + 1/(parseInt(rarity_trait_rankings[frog_type+'_natural'])/4040)
                     rarity_token_rankings[i].rarity = parseInt(rarity_raw);
 
                 } else {
