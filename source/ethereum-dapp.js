@@ -379,7 +379,7 @@ async function sales_load_button(type, contract, limit, next_string) {
                 document.getElementById('loadMore').remove(); await fetch_token_mints(contract, '150', next_string);
             }
         }
-        
+
         loadMore.innerHTML = 'Load More'
         loadMore.style.width = '12%'
         loadMore.style.background = '#e9ecef'
@@ -820,16 +820,16 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash) {
         rarityScore = parseInt(rarity);
     }
 
-    if (rarityScore >= 800) {
+    if (rarityScore >= 200) {
         rarityColor = 'crimson';
         rarityTier = 'Legendary'
-    } else if (rarityScore >= 400) {
+    } else if (rarityScore >= 150) {
         rarityColor = 'violet';
         rarityTier = 'Epic'
-    } else if (rarityScore >= 200) {
+    } else if (rarityScore >= 100) {
         rarityColor = 'darkorchid';
         rarityTier = 'Epic'
-    } else if (rarityScore >= 100) {
+    } else if (rarityScore >= 75) {
         rarityColor = 'tomato';
         rarityTier = 'Rare'
     } else if (rarityScore >= 50) {
