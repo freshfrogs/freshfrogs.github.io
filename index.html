@@ -33,6 +33,7 @@
 
         document.getElementById('mintButton').onclick = async function (e) {
 
+            net_mint_cost = 0.01 * mint_quantity
             console.log('Minting '+mint_quantity+' Frog(s) @ 0.01Ξ ['+net_mint_cost+']')
             let mint_txn = await mint(mint_quantity, user_invite);
             alert(mint_txn);
