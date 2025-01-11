@@ -485,6 +485,7 @@ body {
     width: min-content;
     height: auto;
     display: block;
+    margin: 12px;
     margin-left: auto;
     margin-right: auto;
   }
@@ -514,4 +515,9 @@ body {
     margin-bottom: 0px;
     margin-top: 4px;
     margin-bottom: 4px;
+  }
+  .morph_container {
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
   }
