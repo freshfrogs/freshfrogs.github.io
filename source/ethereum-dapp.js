@@ -846,6 +846,39 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
 }
 
 // Setup Morphing UI
+
+async function meta_morph_select(selected, token_id) {
+
+    if (selected == '1') {
+        meta_morph_frog_a = token_id
+    } else if (selected == '2'){
+        meta_morph_frog_b = token_id
+    }
+
+    document.getElementById('meta_morph_preview_'+selected).src = 'https://freshfrogs.github.io/frog/'+token_id+'.png'
+
+    let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
+    for (let i = 0; i < metadata.attributes.length; i++) {
+        var attribute = metadata.attributes[i].value;
+        var trait_type = metadata.attributes[i].trait_type;
+
+        new_br = document.createElement('br')
+        document.getElementById('mm_terminal').appendChild(new_br)
+
+        new_md_input = document.createElement('b')
+        new_md_input.innerHTML = trait_type+': ';
+        document.getElementById('mm_terminal').appendChild(new_md_input)
+
+        document.getElementById('mm_terminal').appendChild(new_br)
+
+        new_md_input = document.createElement('text')
+        new_md_input.innerHTML = attribute;
+        new_md_input.style.color = 'palegreen'
+        document.getElementById('mm_terminal').appendChild(new_md_input)
+
+    }
+}
+
 async function meta_morph_preset() {
 
     token_id = Math.floor(Math.random() * 4040) + 1;
@@ -863,7 +896,7 @@ async function meta_morph_preset() {
             '<br><button class="unstake_button" onclick="">Metamorphosis</button>'+
         '</div>';
 
-        await build_token(html_elements, token_id, token_id+':'+'', '', '', 'bottom_sections');
+        await build_token(html_elements, token_id, 'mm', '', '', 'bottom_sections');
 }
 
 /*
