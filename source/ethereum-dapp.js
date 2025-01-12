@@ -871,8 +871,8 @@ async function meta_morph_preset() {
             '<br><button class="unstake_button" onclick="">Metamorphosis</button>'+
         '</div>';
 
-    await build_token(html_elements, token_a, 'mm', '', '', 'bottom_sections');
-    await metamorph_build(token_a, token_b, 'morph_pallet');
+    await build_token(html_elements, token_a, 'mm', '', '', 'morph_pallet');
+    await metamorph_build(token_a, token_b, 'cont_mm');
 }
 
 /*
