@@ -27,7 +27,7 @@
           }
 
           await fetch_collection_stats();
-          await fetc_staking_stats();
+          await fetch_staking_stats();
           await initiate_web3_connection().then(async () => {
             await fetch_staked_tokens().then(async () => {
               await fetch_held_tokens();
