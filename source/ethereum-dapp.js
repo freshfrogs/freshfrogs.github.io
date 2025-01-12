@@ -792,40 +792,14 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     if (location == 'bottom_sections') { token_doc.prepend(token_element); }
     else {token_doc.appendChild(token_element); }
 
-    /*
-    var rarityScore = 0;
-
     // Update Metadata! Build Frog -->
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
         var attribute = metadata.attributes[i].value;
         var trait_type = metadata.attributes[i].trait_type;
         build_trait(trait_type, attribute, 'cont_'+element_id);
-
-        // Frog Type
-        if (trait_type == 'Frog' || trait_type == 'SpecialFrog') {
-            var frog_type = attribute
-        }
-
-        // Natural Trait Bonus
-        if (attribute == 'natural' && trait_type == 'Trait') {
-            if (frog_type == 'redEyedTreeFrog' || frog_type == 'lightBrownTreeFrog' || frog_type == 'brownTreeFrog' || frog_type == 'goldenDartFrog' || frog_type == 'unknown' || frog_type == 'grayTreeFrog' || frog_type == 'stawberryDartFrog' || frog_type == 'blueDartFrog' || frog_type == 'splendidLeafFrog') {
-                var rarity_raw = 1/(parseInt(rarity_trait_rankings['rare_natural'])/4040);
-                var rarity = parseInt(rarityScore) + parseInt(rarity_raw)
-            } else {
-                // Calculate Rarity Score
-                var rarity_raw = 1/(parseInt(rarity_trait_rankings[attribute])/4040);
-                var rarity = parseInt(rarityScore) + parseInt(rarity_raw)
-            }
-        } else {
-            // Calculate Rarity Score
-            var rarity_raw = 1/(parseInt(rarity_trait_rankings[attribute])/4040);
-            var rarity = parseInt(rarityScore) + parseInt(rarity_raw)
-        }
-        
-        rarityScore = parseInt(rarity);
     }
-    */
+    
 
     console.log('rarity ranking')
     var rarityRanking = findRankingById(parseInt(token_id));
