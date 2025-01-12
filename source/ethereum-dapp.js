@@ -804,25 +804,12 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     console.log('rarity ranking')
     var rarityRanking = findRankingById(parseInt(token_id));
 
-    if (rarityRanking >= 200) {
-        rarityColor = 'crimson';
-        rarityTier = 'Legendary';
-    } else if (rarityRanking >= 150) {
-        rarityColor = 'violet';
-        rarityTier = 'Epic';
-    } else if (rarityRanking >= 100) {
-        rarityColor = 'darkorchid';
-        rarityTier = 'Epic';
-    } else if (rarityRanking >= 75) {
-        rarityColor = 'tomato';
-        rarityTier = 'Rare';
-    } else if (rarityRanking >= 50) {
-        rarityColor = 'cornflowerblue';
-        rarityTier = 'UnCommon';
-    } else {
-        rarityColor = 'teal';
-        rarityTier = 'Common';
-    }
+    if (rarityRanking <= 41) { rarityColor = 'darkorchid'; }
+    else if (rarityRanking <= 202) { rarityColor = 'violet'; }
+    else if (rarityRanking <= 404) { rarityColor = 'cornflowerblue'; }
+    else if (rarityRanking <= 808) { rarityColor = 'teal'; }
+    else if (rarityRanking <= 1212) { rarityColor = 'tomato'; }
+    else if (rarityRanking <= 2020) { rarityColor = 'crimson'; }
 
     try {
         document.getElementById('rarityRanking_'+token_id).innerHTML = 'No.'+rarityRanking
