@@ -827,7 +827,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     }
     */
 
-    var rarityRanking = findRankingById(tokenId)
+    var rarityRanking = findRankingById(token_id)
 
     if (rarityRanking >= 200) {
         rarityColor = 'crimson';
