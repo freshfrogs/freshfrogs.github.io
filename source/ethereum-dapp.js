@@ -225,7 +225,7 @@ async function update_staked_tokens(tokens) {
 // Function to find ranking by ID
 function findRankingById(id) {
     const frog = freshfrogs_rarity_rankings.find(frog => frog.id === id);
-    return frog ? frog.ranking : "ID not found"; // Returns the ranking or a message if ID isn't found
+    return frog ? frog.ranking : "Error"; // Returns the ranking or a message if ID isn't found
 }
 
 /*
