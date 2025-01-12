@@ -1044,6 +1044,43 @@ async function get_user_invites(wallet_address) {
     }
 }
 
+async function fetch_staking_stats() {
+    fetch('https://api.reservoir.tools/owners/v2?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
+    .then(data => data.json())
+    .then(data => {
+        console.log(data)
+        var owner = data.owners.find(owner => owner.address === CONTROLLER_ADDRESS);
+        var tokenCount = owner ? owner.ownership.tokenCount : null;
+        console.log(tokenCount);
+        document.getElementById('total_staked_tokens').innerHTML = tokenCount;
+    })
+    .catch(err => console.error(err));
+}
+
+async function fetch_staking_stats() {
+
+    try {
+        // Fetch data from the API
+        var response = await fetch('https://api.reservoir.tools/owners/v2?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options);
+        var data = await response.json();
+        console.log(data);
+
+        // Find the owner with the specified CONTROLLER_ADDRESS
+        const owner = data.owners.find(owner => owner.address === CONTROLLER_ADDRESS.toLocaleLowerCase());
+
+        // Get token count from the owner object if found, otherwise set to null
+        const tokenCount = owner ? owner.ownership.tokenCount : null;
+
+        // Log the token count for debugging
+        console.log(tokenCount);
+
+        // Set the token count in the HTML element with the id 'total_staked_tokens'
+        document.getElementById('total_staked_tokens').innerHTML = tokenCount ? tokenCount : '0'; // Default to 0 if not found
+    } catch (err) {
+        console.error(err);  // Log any errors that occur during the fetch or processing
+    }
+}
+
 async function fetch_collection_stats(){
     fetch('https://api.reservoir.tools/collections/v7?id=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
       .then(stats => stats.json())
@@ -1082,10 +1119,10 @@ async function update_frontend() {
     document.getElementById('connected_status').style.color = 'palegreen'
     document.getElementById('address_owned_tokens').innerHTML = user_tokenBalance+' FROG(s)'
     document.getElementById('address_owned_tokens').style.color = 'palegreen'
-    document.getElementById('address_staked_tokens').innerHTML = user_stakedBalance+' FROG(s)'
-    document.getElementById('address_staked_tokens').style.color = 'palegreen'
-    document.getElementById('address_unclaimed_rewards').innerHTML = parseInt(user_rewards)+' $FLYZ'
-    document.getElementById('address_unclaimed_rewards').style.color = 'palegreen'
+    //document.getElementById('address_staked_tokens').innerHTML = user_stakedBalance+' FROG(s)'
+    //document.getElementById('address_staked_tokens').style.color = 'palegreen'
+    //document.getElementById('address_unclaimed_rewards').innerHTML = parseInt(user_rewards)+' $FLYZ'
+    //document.getElementById('address_unclaimed_rewards').style.color = 'palegreen'
     
     document.getElementById('mint_status').innerHTML = 'Ready to Mint!';
     document.getElementById('mint_status').style.color = 'palegreen'
