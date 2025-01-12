@@ -756,7 +756,6 @@ async function metamorph_build(token_a, token_b, location) {
 */
 async function build_token(html_elements, token_id, element_id, txn, txn_hash, location) {
     if (! element_id) { var element_id = 'Frog #'+token_id }
-
     if (! location) { location = 'frogs'; }
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
 
@@ -809,7 +808,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     else if (rarityRanking <= 404) { rarityColor = 'cornflowerblue'; }
     else if (rarityRanking <= 808) { rarityColor = 'teal'; }
     else if (rarityRanking <= 1212) { rarityColor = 'tomato'; }
-    else if (rarityRanking <= 2020) { rarityColor = 'crimson'; }
+    else if (rarityRanking >= 2020) { rarityColor = 'crimson'; }
 
     try {
         document.getElementById('rarityRanking_'+token_id).innerHTML = 'No.'+rarityRanking
