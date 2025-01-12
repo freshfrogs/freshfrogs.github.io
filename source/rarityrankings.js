@@ -20449,7 +20449,6 @@ var rarity_trait_rankings = {
             "id": 1728,
             "rarity": 28,
             "type": "treeFrog(8)"
-        },
-        null
+        }
     ]
     

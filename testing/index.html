@@ -27,7 +27,15 @@
           }
 
           //await render_token_byrarity(500);
-          await rank_tokens();
+          // Sort the array by 'rarity' in descending order
+          freshfrogs_rarity_rankings.sort((a, b) => b.rarity - a.rarity);
+
+          // Add a ranking value to each object
+          freshfrogs_rarity_rankings.forEach((frog, index) => {
+              frog.ranking = index + 1;
+          });
+
+          console.log(freshfrogs_rarity_rankings);
           document.getElementById('connectButton').onclick = async function (e) { await initiate_web3_connection(); }
 
         });
