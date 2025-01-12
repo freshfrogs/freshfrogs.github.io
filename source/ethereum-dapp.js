@@ -222,7 +222,11 @@ async function update_staked_tokens(tokens) {
     })
 }
 
-
+// Function to find ranking by ID
+function findRankingById(id) {
+    const frog = freshfrogs_rarity_rankings.find(frog => frog.id === id);
+    return frog ? frog.ranking : "ID not found"; // Returns the ranking or a message if ID isn't found
+}
 
 /*
 
@@ -788,6 +792,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     if (location == 'bottom_sections') { token_doc.prepend(token_element); }
     else {token_doc.appendChild(token_element); }
 
+    /*
     var rarityScore = 0;
 
     // Update Metadata! Build Frog -->
@@ -820,29 +825,32 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
         
         rarityScore = parseInt(rarity);
     }
+    */
 
-    if (rarityScore >= 200) {
+    var rarityRanking = findRankingById(tokenId)
+
+    if (rarityRanking >= 200) {
         rarityColor = 'crimson';
-        rarityTier = 'Legendary'
-    } else if (rarityScore >= 150) {
+        rarityTier = 'Legendary';
+    } else if (rarityRanking >= 150) {
         rarityColor = 'violet';
-        rarityTier = 'Epic'
-    } else if (rarityScore >= 100) {
+        rarityTier = 'Epic';
+    } else if (rarityRanking >= 100) {
         rarityColor = 'darkorchid';
-        rarityTier = 'Epic'
-    } else if (rarityScore >= 75) {
+        rarityTier = 'Epic';
+    } else if (rarityRanking >= 75) {
         rarityColor = 'tomato';
-        rarityTier = 'Rare'
-    } else if (rarityScore >= 50) {
+        rarityTier = 'Rare';
+    } else if (rarityRanking >= 50) {
         rarityColor = 'cornflowerblue';
-        rarityTier = 'UnCommon'
+        rarityTier = 'UnCommon';
     } else {
         rarityColor = 'teal';
-        rarityTier = 'Common'
+        rarityTier = 'Common';
     }
 
     try {
-        document.getElementById('rarityRanking_'+token_id).innerHTML = rarityScore
+        document.getElementById('rarityRanking_'+token_id).innerHTML = 'No.'+rarityRanking
         document.getElementById('rarityRanking_'+token_id).style.color = rarityColor
     } catch (e) { console.log(e.message); }
 
