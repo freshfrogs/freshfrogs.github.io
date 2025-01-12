@@ -1112,6 +1112,7 @@ async function update_frontend() {
 
     // Connected Status
     
+    document.getElementById('total_staked_tokens').style.color = 'palegreen';
     document.getElementById('remainingSupply').style.color = 'palegreen';
     document.getElementById('totalSupply').style.color = 'palegreen';
     document.getElementById('totalCollectors').style.color = 'palegreen';
