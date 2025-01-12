@@ -1052,7 +1052,7 @@ async function fetch_collection_stats(){
         var { tokenCount, ownerCount } = stats.collections[0]
         document.getElementById('remainingSupply').innerHTML = 4040 - parseInt(tokenCount);
         document.getElementById('totalSupply').innerHTML = tokenCount+' / 4040';
-        //document.getElementById('totalCollectors').innerHTML = ownerCount;
+        document.getElementById('totalCollectors').innerHTML = ownerCount;
       })
       .catch(err => console.error(err));
 }
@@ -1077,7 +1077,7 @@ async function update_frontend() {
     
     document.getElementById('remainingSupply').style.color = 'palegreen';
     document.getElementById('totalSupply').style.color = 'palegreen';
-    //document.getElementById('totalCollectors').style.color = 'palegreen';
+    document.getElementById('totalCollectors').style.color = 'palegreen';
     document.getElementById('connected_status').innerHTML = truncateAddress(user_address);
     document.getElementById('connected_status').style.color = 'palegreen'
     document.getElementById('address_owned_tokens').innerHTML = user_tokenBalance+' FROG(s)'
