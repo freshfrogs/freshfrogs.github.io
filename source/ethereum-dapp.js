@@ -812,8 +812,8 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     else { rarityColor = 'crimson'; }
 
     try {
-        document.getElementById('rarityRanking_'+token_id).innerHTML = 'No.'+rarityRanking
-        document.getElementById('rarityRanking_'+token_id).style.color = rarityColor
+        document.getElementById('rarityRanking_'+token_id).innerHTML = 'No.'+rarityRanking;
+        document.getElementById('rarityRanking_'+token_id).style.color = rarityColor;
     } catch (e) { console.log(e.message); }
 
 }
