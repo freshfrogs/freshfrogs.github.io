@@ -208,7 +208,7 @@ async function update_staked_tokens(tokens) {
                 document.getElementById('staked_'+tokenId).innerHTML = staked_time+' days';
                 document.getElementById('staked_'+tokenId).style.color = 'teal';
             } catch (e) { console.log(e.message) }
-            try { document.getElementById('nextlvl_'+tokenId).innerHTML = staked_next_lvl+' days'; } catch (e) { console.log(e.message) }
+            //try { document.getElementById('nextlvl_'+tokenId).innerHTML = staked_next_lvl+' days'; } catch (e) { console.log(e.message) }
             try { document.getElementById('rewards_'+tokenId).innerHTML = Math.round(staked_rewards)+' Flyz'; } catch (e) { console.log(e.message) }
             try {
                 if (owner.toLowerCase() == user_address.toLowerCase()) { 
