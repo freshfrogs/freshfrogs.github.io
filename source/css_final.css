@@ -519,4 +519,5 @@ body {
     width: fit-content;
     margin-left: auto;
     margin-right: auto;
+    display: inline-block;
   }
