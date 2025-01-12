@@ -805,11 +805,11 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
 
     if (rarityRanking <= 41) { rarityColor = 'darkorchid'; } // Top 1%
     else if (rarityRanking <= 202) { rarityColor = 'violet'; } // Top 5%
-    else if (rarityRanking <= 404) { rarityColor = '#e68181'; } // Top 10%
-    else if (rarityRanking <= 808) { rarityColor = '#ea9c68'; } // Top 20%
-    else if (rarityRanking <= 1212) { rarityColor = '#e4b74c'; } // Top 30%
-    else if (rarityRanking <= 2020) { rarityColor = ' #87c973'; } // Top 50%
-    else { rarityColor = '#5e7ebc'; }
+    else if (rarityRanking <= 404) { rarityColor = 'cornflowerblue'; } // Top 10%
+    else if (rarityRanking <= 808) { rarityColor = 'darkseagreen'; } // Top 20%
+    else if (rarityRanking <= 1212) { rarityColor = 'dodgerblue'; } // Top 30%
+    else if (rarityRanking <= 2020) { rarityColor = 'tomato'; } // Top 50%
+    else { rarityColor = 'crimson'; }
 
     try {
         document.getElementById('rarityRanking_'+token_id).innerHTML = 'No.'+rarityRanking;
