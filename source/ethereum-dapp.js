@@ -1118,8 +1118,8 @@ async function update_frontend() {
     document.getElementById('totalCollectors').style.color = 'palegreen';
     document.getElementById('connected_status').innerHTML = truncateAddress(user_address);
     document.getElementById('connected_status').style.color = 'palegreen'
-    document.getElementById('address_owned_tokens').innerHTML = user_tokenBalance+' FROG(s)'
-    document.getElementById('address_owned_tokens').style.color = 'palegreen'
+    //document.getElementById('address_owned_tokens').innerHTML = user_tokenBalance+' FROG(s)'
+    //document.getElementById('address_owned_tokens').style.color = 'palegreen'
     //document.getElementById('address_staked_tokens').innerHTML = user_stakedBalance+' FROG(s)'
     //document.getElementById('address_staked_tokens').style.color = 'palegreen'
     //document.getElementById('address_unclaimed_rewards').innerHTML = parseInt(user_rewards)+' $FLYZ'
