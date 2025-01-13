@@ -107,6 +107,7 @@ async function render_token_byrarity(batch, leftoff) {
         for (i = 0; i < batch; i++) {
             var frog = freshfrogs_rarity_rankings[i].id
             var frog_rarity = freshfrogs_rarity_rankings[i].rarity
+            var rarity_rank = freshfrogs_rarity_rankings[i].rank
 
             var html_elements = 
             '<div class="infobox_left">'+
