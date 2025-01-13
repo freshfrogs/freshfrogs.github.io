@@ -540,11 +540,11 @@ async function morph_ui(){
                 '</div>'+
                 '<div class="renderRight" style="display: inline-block !important; min-height: auto !important;">'+
                     '<div class="morph-preset-a">'+
-                        '<img id="parent-a-img" class="morph-preimg" src="https://freshfrogs.github.io/source/blackWhite.png"/>'+
+                        '<img id="parent-a-img" class="morph-preimg" src="https://freshfrogs.github.io/assets/blackWhite.png"/>'+
                         '<button class="stake_button" onclick="metamorph_a_preset()">Select Frog</button>'+
                     '</div>'+
                     '<div class="morph-preset-b">'+
-                        '<img id="parent-b-img" class="morph-preimg" src="https://freshfrogs.github.io/source/blackWhite.png"/>'+
+                        '<img id="parent-b-img" class="morph-preimg" src="https://freshfrogs.github.io/assets/blackWhite.png"/>'+
                         '<button class="stake_button" onclick="metamorph_b_preset()">Select Frog</button>'+
                     '</div>'+
                     '<div class="morph-preset-c">'+
@@ -1706,7 +1706,7 @@ function build_trait(trait_type, attribute, location) {
     if (trait_type == 'Trait' || trait_type == 'Frog' || trait_type == 'SpecialFrog') { newAttribute.className = "trait_overlay"; } 
     else { newAttribute.className = "attribute_overlay"; }
     if (location == 'randomLogo') { newAttribute.style.width = '128px'; newAttribute.style.height = '128px';}
-    newAttribute.src = SOURCE_PATH+"/source/base_files/"+trait_type+"/"+attribute+".png";
+    newAttribute.src = SOURCE_PATH+"/assets/base_files/"+trait_type+"/"+attribute+".png";
     /*
     for (y = 0; y < animated.length; y++) {
         if (attribute == animated[y]) {
