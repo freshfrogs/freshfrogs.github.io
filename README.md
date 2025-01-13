@@ -1,3 +1,5 @@
+![freshfrogs.github.io](assets/uisnip.png)
+
 ### Web3 Ethereum Dapp
 This ethereum dapp allows users to [connect](https://freshfrogs.github.io), mint, view or stake Fresh Frogs NFT tokens. Holders can earn rewards, level up, and more! Staked tokens will be displayed with staking information and rendered using multiple images layered by attribute allowing for custom trait animations! [>View Site Functions Here](https://github.com/freshfrogs/freshfrogs.github.io/blob/main/source/ethereum-dapp.js)
 
