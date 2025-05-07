@@ -5,6 +5,67 @@
     box-sizing: border-box;
 }
 
+/* new css */
+
+.card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.index-card {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+  border-radius: 6px;
+  padding: 16px;
+  max-width: 600px;
+  margin: auto;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.index-card:hover {
+  transform: scale(1.02);
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+.index-card img {
+  width: 150px;
+  height: auto;
+  border-radius: 4px;
+  margin-right: 20px;
+}
+
+.index-card-text {
+  flex: 1;
+}
+
+.index-card-text h2 {
+  margin-top: 0;
+  font-size: 1.4em;
+}
+
+.index-card-text p {
+  margin-bottom: 0;
+  color: #555;
+}
+
+@media (max-width: 600px) {
+  .index-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .index-card img {
+    margin: 0 0 16px 0;
+    width: 128px;
+    height: 128px;
+  }
+}
+/* end new css */
+
 body {
     font-family: monospace;
     background-color: wheat;
