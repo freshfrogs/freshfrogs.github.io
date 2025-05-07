@@ -765,17 +765,26 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
 
     // Element Details -->
     token_element.id = element_id;
-    token_element.className = 'display_token';
+    token_element.className = 'index-card';
     token_element.innerHTML = 
-        '<div class="display_token_cont">'+
-            '<div id="div_'+element_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 2048px 2048px;">'+
-                '<div class="innerLeft">'+
-                    '<div href="https://rarible.com/token/'+COLLECTION_ADDRESS+':'+token_id+'" target="_blank" class="display_token_img_cont" id="cont_'+element_id+'" onclick="metamorph_select('+token_id+')">'+
-                    '</div>'+
-                '</div>'+
+
+        '<img src="https://freshfrogs.github.io/frog/'+token_id+'.png" alt="Example Image">'+
+        '<div class="index-card-text">'+
+            '<h3>Frog #'+token_id+'</h3>'+
+            '<p>Hover to lift, click to go somewhere. This index card is now interactive and mobile-friendly.</p>'+
+            
+            '<div id="traits_'+element_id+'" class="trait_list">'+
+                //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
+                '<strong><u>Frog #'+token_id+'</strong></u>'+' <text style="color: #1ac486; font-weight: bold; padding-left: 10px;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
             '</div>'+
-            '<div class="renderRight">'+
-                '<div class="innerRight">'+
+            '<div id="prop_'+element_id+'" class="properties">'+
+                html_elements+
+            '</div>'+
+
+        '</div>';
+        
+        /*
+        '<div class="display_token_cont">'+
                     '<div id="traits_'+element_id+'" class="trait_list">'+
                         //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
                         '<strong><u>Frog #'+token_id+'</strong></u>'+' <text style="color: #1ac486; font-weight: bold; padding-left: 10px;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
@@ -786,19 +795,21 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
                 '</div>'+
             '</div>'+
         '</div>';
+        */
 
     // Create Element <--
     if (location == 'bottom_sections') { token_doc.prepend(token_element); }
     else {token_doc.appendChild(token_element); }
 
     // Update Metadata! Build Frog -->
+    /*
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
         var attribute = metadata.attributes[i].value;
         var trait_type = metadata.attributes[i].trait_type;
         build_trait(trait_type, attribute, 'cont_'+element_id);
     }
-    
+    */
 
     console.log('rarity ranking')
     var rarityRanking = findRankingById(parseInt(token_id));
