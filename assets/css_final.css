@@ -20,8 +20,9 @@
   box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
   border-radius: 6px;
   padding: 16px;
-  max-width: 600px;
+  max-width: 450px;
   margin: auto;
+  margin-top: 12px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -40,6 +41,7 @@
 
 .index-card-text {
   flex: 1;
+  padding: 12px;
 }
 
 .index-card-text h2 {
