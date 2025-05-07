@@ -59,9 +59,12 @@
   }
 
   .index-card img {
-    margin: 0 0 16px 0;
     width: 128px;
     height: 128px;
+    border-radius: 5px;
+    box-shadow: 2px 2px darkslategray;
+    image-rendering: pixelated;
+    border: 1px solid black;
   }
 }
 /* end new css */
