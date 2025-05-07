@@ -771,7 +771,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
         '<img src="https://freshfrogs.github.io/frog/'+token_id+'.png" alt="Example Image">'+
         '<div class="index-card-text">'+
             '<h3>Frog #'+token_id+'</h3>'+
-            '<p>Hover to lift, click to go somewhere. This index card is now interactive and mobile-friendly.</p>'+
+            '<p>Hover to lift, click to go somewhere. This index card is now interactive.</p>'+
             
             '<div id="traits_'+element_id+'" class="trait_list">'+
                 //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
