@@ -276,10 +276,12 @@ body {
     background-color: transparent;
 }
 .image-gallery img {
-    max-width: 100%;
-    margin: 0px;
-    border: 0px solid #ddd;
-    border-radius: 8px;
+  width: 128px;
+  height: 128px;
+  border-radius: 5px;
+  box-shadow: 2px 2px darkslategray;
+  image-rendering: pixelated;
+  border: 1px solid black;
 }
 .image-gallery .gallery-container {
     display: flex;
