@@ -433,8 +433,12 @@ body {
     font-weight: normal !important;
 }
 .card_bold {
-    color: teal;
+    color: white;
     font-weight: bold;
+}
+.usd_price {
+  color: white;
+  font-weight: bold;
 }
 .card_buttonbox {
     text-align: center;
