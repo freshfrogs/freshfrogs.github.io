@@ -13,7 +13,7 @@
 }
 
 .index-card {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   background-color: cadetblue;
   border: 1px solid black;
@@ -36,7 +36,7 @@
   width: 150px;
   height: auto;
   border-radius: 4px;
-  margin-right: 20px;
+  margin: 12px;
 }
 
 .index-card-text {
