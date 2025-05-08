@@ -15,10 +15,10 @@
 .index-card {
   display: flex;
   align-items: center;
-  background-color: white;
-  border: 1px solid #ccc;
-  box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
-  border-radius: 6px;
+  background-color: cadetblue;
+  border: 1px solid black;
+  border-radius: 5px;
+  box-shadow: 8px 8px darkslategray;
   padding: 16px;
   max-width: 450px;
   margin: auto;
@@ -26,11 +26,11 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.index-card:hover {
+/*.index-card:hover {
   transform: scale(1.02);
   box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.15);
   cursor: pointer;
-}
+}*/
 
 .index-card img {
   width: 150px;
