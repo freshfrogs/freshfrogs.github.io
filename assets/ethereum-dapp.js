@@ -296,7 +296,7 @@ async function render_token_mints(contract, mints) {
         var html_elements = 
             '<div class="infobox_left">'+
                 '<text class="card_text">Last Sale</text>'+'<br>'+
-                '<text id="frog_type" class="card_bold">'+decimal+'Ξ '+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
+                '<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+' (</text>'+'<text id="frog_type" class="card_bold">'+decimal+'Ξ)'+'</text>'+
             '</div>'+
             '<div class="infobox_right">'+
                 '<text class="card_text">Owned by</text>'+'<br>'+
