@@ -135,8 +135,8 @@ body {
 }
 
 .image-grid img {
-    width: 128px;
-    height: 128px;
+    width: 100% !important;
+    height: 100% !important;
     object-fit: cover;
     border-radius: 5px;
     box-shadow: 2px 2px darkslategray;
