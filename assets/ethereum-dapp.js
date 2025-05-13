@@ -769,9 +769,9 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     token_element.innerHTML = 
 
          
-        '<div id="div_'+element_id+'" class="renderLeft" style="background-image: url('+image_link+'); background-size: 512px 512px;">'+
-            '<div class="innerLeft">'+
-                '<div class="display_token_img_cont" id="cont_'+element_id+'"'+
+        '<div id="div_'+element_id+'" class="renderLeft">'+
+            '<div class="innerLeft" style="background-image: url('+image_link+'); background-size: 512px 512px;">'+
+                '<div class="display_token_img_cont" id="cont_'+element_id+'">'+
                 '</div>'+
             '</div>'+
         '</div>'+
