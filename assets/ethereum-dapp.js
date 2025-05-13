@@ -768,13 +768,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     token_element.className = 'index-card';
     token_element.innerHTML = 
 
-         
-        '<div id="div_'+element_id+'" class="renderLeft">'+
-            '<div class="innerLeft">'+
-                '<div class="display_token_img_cont" id="cont_'+element_id+'" style="background-image: url('+image_link+'); background-size: 512px 512px;">'+
-                '</div>'+
-            '</div>'+
-        '</div>'+
+        '<img src="https://freshfrogs.github.io/frog/'+token_id+'.png" alt="Example Image">'+
         '<div class="index-card-text">'+
             '<div id="traits_'+element_id+'" class="trait_list">'+
                 //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
@@ -804,13 +798,14 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     else {token_doc.appendChild(token_element); }
 
     // Update Metadata! Build Frog -->
-    
+    /*
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
         var attribute = metadata.attributes[i].value;
         var trait_type = metadata.attributes[i].trait_type;
         build_trait(trait_type, attribute, 'cont_'+element_id);
     }
+    */
 
     console.log('rarity ranking')
     var rarityRanking = findRankingById(parseInt(token_id));
