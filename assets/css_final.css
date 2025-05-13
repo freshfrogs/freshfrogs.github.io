@@ -307,7 +307,7 @@ body {
     font-size: initial;
   }
   .etherscan_button:hover {
-    top: -5px;
+    top: -3px;
     position: relative;
     box-shadow: 8px 8px 0px darkslategray;
   }
@@ -330,7 +330,7 @@ body {
     font-size: initial;
   }
   .opensea_button:hover {
-    top: -5px;
+    top: -3px;
     position: relative;
     box-shadow: 8px 8px 0px darkslategray;
   }
@@ -353,7 +353,7 @@ body {
     font-size: initial;
   }
   .stake_button:hover{
-    top: -5px;
+    top: -3px;
     position: relative;
     box-shadow: 8px 8px 0px darkslategray;
   }
@@ -376,7 +376,7 @@ body {
     font-size: initial;
   }
   .unstake_button:hover{
-    top: -5px;
+    top: -3px;
     position: relative;
     box-shadow: 8px 8px 0px darkslategray;
   }
@@ -398,7 +398,7 @@ body {
     font-size: initial;
 }
 .connectButton:hover {
-    top: -5px;
+    top: -3px;
     position: relative;
     box-shadow: 8px 8px 0px darkslategray;
 }
