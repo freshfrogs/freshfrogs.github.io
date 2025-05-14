@@ -423,12 +423,12 @@ body {
 .infobox_left{
     margin: 8px;
     float: left;
-    width: 100px;
+    width: 86px;
 }
 .infobox_right {
     margin: 8px;
     float: right;
-    width: 100px;
+    width: 86px;
 }
 .card_text {
     color: #1a202c;
