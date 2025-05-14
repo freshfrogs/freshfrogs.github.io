@@ -295,8 +295,8 @@ body {
 }
 .etherscan_button {
     margin: 4px;
-    background: #e9ecef;
-    border: 1px solid black;
+    background: lightsteelblue;
+    border: 0px solid black;
     border-radius: 5px;
     font-weight: bold;
     width: 105px;
@@ -306,7 +306,7 @@ body {
     font-size: small;
     padding: 0px !important;
     cursor: pointer;
-    box-shadow: 2px 2px darkslategray;
+    box-shadow: 2px 2px white;
     transition: all .3s;
     font-family: monospace;
     font-size: initial;
@@ -319,7 +319,7 @@ body {
   .opensea_button {
     margin: 4px;
     background: rgb(0, 134, 255);
-    border: 1px solid black;
+    border: 0px solid black;
     border-radius: 5px;
     font-weight: bold;
     width: 105px;
@@ -329,7 +329,7 @@ body {
     font-size: small;
     padding: 0px !important;
     cursor: pointer;
-    box-shadow: 2px 2px darkslategray;
+    box-shadow: 2px 2px white;
     transition: all .3s;
     font-family: monospace;
     font-size: initial;
