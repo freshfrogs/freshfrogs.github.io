@@ -284,6 +284,9 @@ body {
   box-shadow: 2px 2px darkslategray;
   image-rendering: pixelated;
   border: 1px solid black;
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
 }
 .image-gallery .gallery-container {
     display: flex;
