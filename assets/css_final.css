@@ -14,10 +14,10 @@
 .index-card {
   display: inline-block;
   align-items: center;
-  background-color: cadetblue;
+  background-color: darkslategray;
   border: 1px solid black;
   border-radius: 5px;
-  box-shadow: 8px 8px darkslategray;
+  box-shadow: 8px 8px darkseagreen;
   padding: 12px;
   max-width: 450px;
   margin: 16px;
@@ -101,7 +101,7 @@ body {
 /* Top section with margin-top to add spacing */
 .top-section {
     flex: 2;
-    background-color: cadetblue;
+    background-color: darkslategray;
     color: white;
     padding: 20px;
     display: flex;
@@ -114,7 +114,7 @@ body {
     margin-right: auto;
     width: 95%;
     margin-left: auto;
-    box-shadow: 8px 8px darkslategray;
+    box-shadow: 8px 8px darkseagreen;
 }
 
 .top-section h1 {
@@ -158,10 +158,10 @@ body {
 .bottom-section {
     flex: 1;
     margin: 0 10px;
-    background-color: cadetblue;
+    background-color: darkslategray;
     border: 1px solid black;
     border-radius: 5px;
-    box-shadow: 8px 8px darkslategray;
+    box-shadow: 8px 8px darkseagreen;
     padding: 20px;
     text-align: left;
 }
