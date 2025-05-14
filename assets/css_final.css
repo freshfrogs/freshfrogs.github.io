@@ -109,12 +109,12 @@ body {
     align-items: flex-start;
     text-align: left;
     margin-top: 20px;
-    border: 1px solid black;
+    border: 1px solid white;
     border-radius: 5px;
     margin-right: auto;
     width: 95%;
     margin-left: auto;
-    box-shadow: 8px 8px darkseagreen;
+    box-shadow: none;
 }
 
 .top-section h1 {
@@ -159,9 +159,9 @@ body {
     flex: 1;
     margin: 0 10px;
     background-color: darkslategray;
-    border: 1px solid black;
+    border: 1px solid white;
     border-radius: 5px;
-    box-shadow: 8px 8px darkseagreen;
+    box-shadow: none;
     padding: 20px;
     text-align: left;
 }
