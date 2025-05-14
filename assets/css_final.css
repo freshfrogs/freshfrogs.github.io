@@ -389,7 +389,7 @@ body {
     margin: 4px;
     padding: 8px;
     background: white;
-    border: 1px solid black;
+    border: 0px solid black;
     border-radius: 5px;
     width: auto;
     height: auto;
@@ -397,7 +397,7 @@ body {
     font-size: small;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 2px 2px darkslategray;
+    box-shadow: 2px 2px white;
     transition: all .3s;
     font-family: monospace;
     font-size: initial;
