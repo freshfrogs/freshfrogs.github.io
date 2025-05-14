@@ -813,7 +813,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     if (rarityRanking <= 41) { rarityColor = 'rgb(255, 138, 0)'; } // Top 1% Legendary
     else if (rarityRanking <= 404) { rarityColor = 'rgb(211, 88, 255)'; } // Top 10% Epic
     else if (rarityRanking <= 1010) { rarityColor = 'rgb(0, 163, 255)'; } // Top 25% Rare
-    else { rarityColor = 'rgb(137, 138, 140)'; } // Common
+    else { rarityColor = 'white'; } // Common
 
     try {
         document.getElementById('rarityRanking_'+token_id).innerHTML = '#'+rarityRanking;
