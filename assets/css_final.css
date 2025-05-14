@@ -15,9 +15,9 @@
   display: inline-block;
   align-items: center;
   background-color: darkslategray;
-  border: 1px solid black;
+  border: 1px solid white;
   border-radius: 5px;
-  box-shadow: 8px 8px darkseagreen;
+  box-shadow: none; /* 8px 8px darkseagreen; */
   padding: 12px;
   max-width: 450px;
   margin: 16px;
@@ -282,7 +282,7 @@ body {
   border-radius: 5px;
   box-shadow: 2px 2px darkslategray;
   image-rendering: pixelated;
-  border: 1px solid black;
+  border: 0px solid white;
   display: block;
   margin-right: auto;
   margin-left: auto;
@@ -433,7 +433,7 @@ body {
     width: 86px;
 }
 .card_text {
-    color: #1a202c;
+    color: darkseagreen;
     font-weight: normal !important;
 }
 .card_bold {
