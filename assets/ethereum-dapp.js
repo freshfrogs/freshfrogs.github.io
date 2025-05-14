@@ -810,16 +810,13 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     console.log('rarity ranking')
     var rarityRanking = findRankingById(parseInt(token_id));
 
-    if (rarityRanking <= 41) { rarityColor = 'darkorchid'; } // Top 1%
-    else if (rarityRanking <= 202) { rarityColor = 'violet'; } // Top 5%
-    else if (rarityRanking <= 404) { rarityColor = 'cornflowerblue'; } // Top 10%
-    else if (rarityRanking <= 808) { rarityColor = 'darkseagreen'; } // Top 20%
-    else if (rarityRanking <= 1212) { rarityColor = 'dodgerblue'; } // Top 30%
-    else if (rarityRanking <= 2020) { rarityColor = 'tomato'; } // Top 50%
-    else { rarityColor = 'crimson'; }
+    if (rarityRanking <= 41) { rarityColor = 'rgb(255, 138, 0)'; } // Top 1% Legendary
+    else if (rarityRanking <= 404) { rarityColor = 'rgb(211, 88, 255)'; } // Top 10% Epic
+    else if (rarityRanking <= 1010) { rarityColor = 'rgb(0, 163, 255)'; } // Top 25% Rare
+    else { rarityColor = 'rgb(137, 138, 140)'; } // Common
 
     try {
-        document.getElementById('rarityRanking_'+token_id).innerHTML = 'No.'+rarityRanking;
+        document.getElementById('rarityRanking_'+token_id).innerHTML = '#'+rarityRanking;
         document.getElementById('rarityRanking_'+token_id).style.color = rarityColor;
     } catch (e) { console.log(e.message); }
 
