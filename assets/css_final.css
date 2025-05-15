@@ -414,6 +414,13 @@ body {
     margin-top: 5px;
     color: white;
 }
+.index-card-img-cont{
+  width: 128px;
+  height: 128px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
 .terminal_op {
     color: seashell;
     background: darkslategray;
