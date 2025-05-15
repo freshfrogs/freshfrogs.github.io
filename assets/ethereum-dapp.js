@@ -950,6 +950,7 @@ async function fetch_staked_tokens(wallet) {
             staked_values = await stakingValues(token_id);
             staked_lvl = staked_values[1];
             staked_time = staked_values[0];
+            staked_date = staked_values[4];
             staked_rewards = staked_values[3];
             staked_nextlvl = staked_values[2].toString();
             //progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
@@ -966,13 +967,13 @@ async function fetch_staked_tokens(wallet) {
                     '<text class="card_bold" id="frog_type">'+truncateAddress(owner)+'</text>'+
                 '</div>'+
                 '<div class="infobox_right">'+
-                    '<text class="card_text">Staked</text>'+'<br>'+
-                    '<text id="staked_'+token_id+'" class="card_bold">'+staked_time+' days</text>'+
+                    '<text class="card_text">Rewards</text>'+'<br>'+
+                    '<text id="rewards_'+token_id+'" class="card_bold">'+Math.round(staked_rewards)+' Flyz</text>'+
                 '</div>'+
                 '<br>'+
                 '<div class="infobox_left">'+
-                    '<text class="card_text">Rewards</text>'+'<br>'+
-                    '<text id="rewards_'+token_id+'" class="card_bold">'+Math.round(staked_rewards)+' Flyz</text>'+
+                    '<text class="card_text">Staked</text>'+'<br>'+
+                    '<text id="staked_'+token_id+'" class="card_bold">'+staked_date+'</text>'+
                 '</div>'+
                 '<div class="infobox_right">'+
                     '<text class="card_text">Rarity</text>'+'<br>'+
