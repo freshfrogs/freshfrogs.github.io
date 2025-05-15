@@ -81,7 +81,7 @@ var animated = [
     //'tongueSpiderRed',
     //'tongueSpider',
     //'tongue',
-    'tongueFly',
+    //'tongueFly',
     'croaking',
     'peace',
     'inversedEyes',
