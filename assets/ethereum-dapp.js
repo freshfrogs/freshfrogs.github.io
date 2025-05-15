@@ -1155,6 +1155,9 @@ async function fetch_collection_stats(){
         document.getElementById('totalCollectors').innerHTML = ownerCount;
       })
       .catch(err => console.error(err));
+
+      // What IDs are currently staked?
+      await gather_staked_ids();
 }
 
 /*

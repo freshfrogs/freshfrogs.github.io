@@ -29,7 +29,6 @@
             document.getElementById('icons_container').appendChild(random_tokenImg);
           }
 
-          await gather_staked_ids();
           await fetch_collection_stats();
           await fetch_staking_stats();
           await fetch_token_sales(COLLECTION_ADDRESS, 150);
