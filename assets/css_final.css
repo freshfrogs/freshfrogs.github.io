@@ -15,7 +15,7 @@
   display: inline-block;
   align-items: center;
   background-color: darkslategray;
-  border: 1px solid white;
+  border: 1px solid black;
   border-radius: 5px;
   box-shadow: none; /* 8px 8px darkseagreen; */
   padding: 12px;
@@ -109,7 +109,7 @@ body {
     align-items: flex-start;
     text-align: left;
     margin-top: 20px;
-    border: 1px solid white;
+    border: 1px solid black;
     border-radius: 5px;
     margin-right: auto;
     width: 95%;
@@ -159,7 +159,7 @@ body {
     flex: 1;
     margin: 0 10px;
     background-color: darkslategray;
-    border: 1px solid white;
+    border: 1px solid black;
     border-radius: 5px;
     box-shadow: none;
     padding: 20px;
@@ -296,7 +296,7 @@ body {
 .etherscan_button {
     margin: 4px;
     background: lightsteelblue;
-    border: 0px solid black;
+    border: 1px solid darkslategray;
     border-radius: 5px;
     font-weight: bold;
     width: 105px;
@@ -319,7 +319,7 @@ body {
   .opensea_button {
     margin: 4px;
     background: rgb(0, 134, 255);
-    border: 0px solid black;
+    border: 1px solid darkslategray;
     border-radius: 5px;
     font-weight: bold;
     width: 105px;
@@ -342,7 +342,7 @@ body {
   .stake_button {
     margin: 4px;
     background: teal;
-    border: 1px solid black;
+    border: 1px solid darkslategray;
     border-radius: 5px;
     font-weight: bold;
     width: 218px;
@@ -365,7 +365,7 @@ body {
   .unstake_button {
     margin: 4px;
     background: tomato;
-    border: 1px solid black;
+    border: 1px solid darkslategray;
     border-radius: 5px;
     font-weight: bold;
     width: 218px;
@@ -389,7 +389,7 @@ body {
     margin: 4px;
     padding: 8px;
     background: white;
-    border: 0px solid black;
+    border: 1px solid darkslategray;
     border-radius: 5px;
     width: auto;
     height: auto;
