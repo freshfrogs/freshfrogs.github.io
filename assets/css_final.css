@@ -411,6 +411,7 @@ body {
   width: 128px;
   height: 128px;
   display: block;
+  margin: 4px;
   margin-left: auto;
   margin-right: auto;
   border-radius: 5px;
