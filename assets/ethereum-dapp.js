@@ -772,7 +772,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
 
     var staked_title = '';
     if (staked_ids.includes(token_id)) {
-        //staked_title = 'Staked!';
+        staked_title = '[Staked]';
     }
 
     // Element Details -->
@@ -785,7 +785,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
         '<div class="index-card-text">'+
             '<div id="traits_'+element_id+'" class="trait_list">'+
                 //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
-                '<strong style="color: white;"><u>Frog #'+token_id+'</strong></u>'+' <text style="color: lightcoral; font-weight: bold; padding-left: 10px;">'+staked_title+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+                '<strong style="color: white;"><u>Frog #'+token_id+'</strong></u>'+'<text style="color: lightcoral; font-weight: bold; padding-left: 10px;">'+staked_title+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
             '</div>'+
             '<div id="prop_'+element_id+'" class="properties">'+
                 html_elements+
