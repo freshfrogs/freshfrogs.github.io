@@ -811,13 +811,15 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     else {token_doc.appendChild(token_element); }
 
     // Update Metadata! Build Frog -->
-    //if (staked_ids.includes(token_id)) {}
+    if (staked_ids.includes(token_id)) {
+        var animate = true;
+    }
     
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
         var attribute = metadata.attributes[i].value;
         var trait_type = metadata.attributes[i].trait_type;
-        build_trait(trait_type, attribute, 'index-card-img-cont-'+token_id);
+        build_trait(trait_type, attribute, 'index-card-img-cont-'+token_id, animate);
     }
     
 
@@ -1775,14 +1777,14 @@ function truncateAddress(address) {
     build_trait(_trait(family), _attribute(type), _where(element))
 
 */
-function build_trait(trait_type, attribute, location) {
+function build_trait(trait_type, attribute, location, animate) {
+    if (! animate) { animate = false; }
     newAttribute = document.createElement("img");
     if (trait_type == 'Trait' || trait_type == 'Frog' || trait_type == 'SpecialFrog') { newAttribute.className = "trait_overlay"; } 
     else { newAttribute.className = "attribute_overlay"; }
     if (location == 'randomLogo') { newAttribute.style.width = '128px'; newAttribute.style.height = '128px';}
     newAttribute.src = SOURCE_PATH+"/frog/build_files/"+trait_type+"/"+attribute+".png";
     
-    /*
     if (animate) {
         for (y = 0; y < animated.length; y++) {
             if (attribute == animated[y]) {
@@ -1791,7 +1793,6 @@ function build_trait(trait_type, attribute, location) {
             }
         }
     }
-    */
     
     document.getElementById(location).appendChild(newAttribute);
 }
