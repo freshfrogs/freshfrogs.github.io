@@ -1621,6 +1621,16 @@ async function stakingValues(tokenId) {
     let staked_duration = Date.now() - staked_date;
     let staked_hours = Math.floor(staked_duration/1000/60/60);
 
+    staked_date = new Date(staked_date);
+
+    // Extract parts
+    var mm = String(staked_date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    var dd = String(staked_date.getDate()).padStart(2, '0');
+    var yy = String(staked_date.getFullYear()).slice(-2);
+    
+    // Format as mm/dd/yy
+    var formattedDate = `${mm}/${dd}/${yy}`;
+
     stakedLevelInt = Math.floor((staked_hours / 1000 )) + 1
 
     stakedTimeDays = Math.floor(staked_hours / 24)                               // Time Staked
@@ -1629,7 +1639,7 @@ async function stakingValues(tokenId) {
     stakedEarned = (staked_hours / 1000).toFixed(3)                              // Flyz Earned
 
     // [ Time Staked, Staked Level, Next Level, Flyz Earned, Date Staked]
-    return [stakedTimeDays, stakedLevel, stakedNext, stakedEarned, staked_date]
+    return [stakedTimeDays, stakedLevel, stakedNext, stakedEarned, formattedDate]
 
 }
 
