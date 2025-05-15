@@ -30,13 +30,6 @@
   cursor: pointer;
 }*/
 
-.index-card img {
-  width: 150px;
-  height: auto;
-  border-radius: 4px;
-  margin: 12px;
-}
-
 .index-card-text {
   flex: 1;
   padding: 12px;
