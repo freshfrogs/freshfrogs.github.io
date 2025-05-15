@@ -240,17 +240,19 @@ async function render_token_sales(contract, sales) {
         var sale_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
 
         if (from !== '0x0000000000000000000000000000000000000000') {
-            saleOrMint = 'Sold on'
+            saleOrMint = 'Sold'
             txn_string = 'sale'; from = truncateAddress(from)
             net_income_usd = net_income_usd + (Number(usd))*0.025
             sales_volume_eth = sales_volume_eth + Number(decimal);
             sales_volume_usd = sales_volume_usd + Number(usd);
+            receiver = 'Buyer'
         } else {
-            saleOrMint = 'Minted on'
+            saleOrMint = 'Birthday'
             txn_string = 'mint'; from = 'FreshFrogsNFT';
             net_income_usd = net_income_usd + Number(usd)
             mint_volume_eth = mint_volume_eth + Number(decimal);
             mint_volume_usd = mint_volume_usd + Number(usd);
+            receiver = 'Creator'
         }
 
         if (txn_string == 'mint') {
@@ -258,7 +260,7 @@ async function render_token_sales(contract, sales) {
         
             var html_elements = 
                 '<div class="infobox_left">'+
-                    '<text class="card_text">Owner</text>'+'<br>'+
+                    '<text class="card_text">'+receiver+'</text>'+'<br>'+
                     '<text class="card_bold">'+truncateAddress(to)+'</text>'+
                 '</div>'+
                 '<div class="infobox_right">'+
@@ -758,6 +760,12 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     if (! element_id) { var element_id = 'Frog #'+token_id }
     if (! location) { location = 'frogs'; }
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
+
+    // Fetch (current) ownership
+    fetch('https://api.reservoir.tools/owners/v2?token=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b%3A'+token_id, options)
+        .then(res => res.json())
+        .then(res => console.log(res))
+        .catch(err => console.error(err));
 
     // <-- Begin Element
     var token_doc = document.getElementById(location);
