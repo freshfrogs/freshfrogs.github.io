@@ -270,7 +270,7 @@ async function render_token_sales(contract, sales) {
                 '</div>'+
                 '<div class="infobox_right">'+
                     '<text class="card_text">Price</text>'+'<br>'+
-                    '<text id="frog_type" class="card_bold">'+decimal+'Ξ '+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
+                    '<text id="frog_type" class="card_bold">'+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
                 '</div>'+
                 '<br>'+
                 '<div class="infobox_left">'+
