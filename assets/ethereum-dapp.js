@@ -209,7 +209,7 @@ async function update_staked_tokens(tokens) {
             try {
                 document.getElementById('stakedOwner_'+tokenId).innerHTML = truncateAddress(owner);
                 document.getElementById('staked_'+tokenId).innerHTML = staked_date;
-                document.getElementById('staked_'+tokenId).style.color = 'teal';
+                document.getElementById('staked_'+tokenId).style.color = 'white';
             } catch (e) { console.log(e.message) }
             //try { document.getElementById('nextlvl_'+tokenId).innerHTML = staked_next_lvl+' days'; } catch (e) { console.log(e.message) }
             try { document.getElementById('rewards_'+tokenId).innerHTML = Math.round(staked_rewards)+' Flyz'; } catch (e) { console.log(e.message) }
