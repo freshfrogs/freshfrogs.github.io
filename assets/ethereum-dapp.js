@@ -811,7 +811,9 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     else {token_doc.appendChild(token_element); }
 
     // Update Metadata! Build Frog -->
-    if (token_id <= 1010) { var animate = true; }
+    if (staked_ids.includes(token_id)) {
+        var animate = true;
+    }
     
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
