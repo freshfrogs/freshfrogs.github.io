@@ -74,6 +74,7 @@ var animated = [
     //'witchStraw',
     //'witchBrown',
     //'witchBlack',
+    'goldenDartFrog',
     'blueDartFrog',
     'blueTreeFrog',
     'brownTreeFrog',
