@@ -865,7 +865,7 @@ async function meta_morph_select(selected, token_id) {
 }
 
 async function gather_staked_ids() {
-    await getStakedTokens(wallet)
+    await getStakedTokens(CONTROLLER_ADDRESS)
     .then(async (tokens) => {
         tokens.forEach(async (token) => {
             //var token_owner = await collection.methods.ownerOf(token_id).call();
