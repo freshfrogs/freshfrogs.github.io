@@ -1774,7 +1774,7 @@ function build_trait(trait_type, attribute, location) {
     if (trait_type == 'Trait' || trait_type == 'Frog' || trait_type == 'SpecialFrog') { newAttribute.className = "trait_overlay"; } 
     else { newAttribute.className = "attribute_overlay"; }
     if (location == 'randomLogo') { newAttribute.style.width = '128px'; newAttribute.style.height = '128px';}
-    newAttribute.src = SOURCE_PATH+"/assets/base_files/"+trait_type+"/"+attribute+".png";
+    newAttribute.src = SOURCE_PATH+"/frog/build_files/"+trait_type+"/"+attribute+".png";
     
     for (y = 0; y < animated.length; y++) {
         if (attribute == animated[y]) {
