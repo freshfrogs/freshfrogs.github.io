@@ -257,7 +257,7 @@ async function render_token_sales(contract, sales) {
             receiver = 'Creator'
         }
 
-        if (txn_string == 'mint') {
+        if (txn_string !== 'mint') {
 
         
             var html_elements = 
@@ -769,7 +769,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
 
     var staked_title = '';
     if (staked_ids.includes(token_id)) {
-        staked_title = 'Staked!';
+        //staked_title = 'Staked!';
     }
 
     // Element Details -->
