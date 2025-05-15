@@ -107,8 +107,8 @@ var animated = [
     'cyan',
     'brown',
     'silverEthChain',
-    'goldDollarChain',
-    'treeFrog(4)'
+    'goldDollarChain'
+    //'treeFrog(4)'
 ]
 
 // Constants
