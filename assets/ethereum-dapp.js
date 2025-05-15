@@ -864,15 +864,46 @@ async function meta_morph_select(selected, token_id) {
 
 }
 
-async function gather_staked_ids() {
-    await getStakedTokens(CONTROLLER_ADDRESS)
-    .then(async (tokens) => {
-        tokens.forEach(async (token) => {
-            //var token_owner = await collection.methods.ownerOf(token_id).call();
-            var token_id = token.tokenId;
-            staked_ids.push(token_id);
-        })
+/*
+
+async function fetch_held_tokens(wallet, limit, next_string) {
+    if (! wallet) { wallet = user_address}
+    if (! limit) { limit = '50'; }
+    if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
+    //fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v6?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
+    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
+    .then((data) => data.json())
+    .then((data) => {
+        console.log(data);
+        console.log(data.tokens);
+        render_held_tokens(wallet, data.tokens);
+        if (wallet == CONTROLLER_ADDRESS) {
+            update_staked_tokens(data.tokens)
+        }
+        if (! data.continuation) { return }
+        else { load_more_button(wallet, limit, data.continuation); }
     })
+    .catch(err => console.error(err));
+}
+
+*/
+
+async function gather_staked_ids(wallet, limit, next_string) {
+    if (! wallet) { wallet = CONTROLLER_ADDRESS}
+    if (! limit) { limit = '50'; }
+    if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
+    //fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v6?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
+    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
+    .then((data) => data.json())
+    .then((data) => {
+        data.tokens.forEach(async (token) => {
+            var { token: { tokenId } } = token
+            staked_ids.push(tokenId);
+        })
+        if (! data.continuation) { return }
+        else { gather_staked_ids(wallet, limit, data.continuation); }
+    })
+    .catch(err => console.error(err));
 }
 
 async function meta_morph_preset() {
