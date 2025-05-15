@@ -296,7 +296,7 @@ body {
 .etherscan_button {
     margin: 4px;
     background: lightsteelblue;
-    border: 1px solid darkslategray;
+    border: 0px solid darkslategray;
     border-radius: 5px;
     font-weight: bold;
     width: 105px;
@@ -306,7 +306,7 @@ body {
     font-size: small;
     padding: 0px !important;
     cursor: pointer;
-    box-shadow: 2px 2px white;
+    box-shadow: 0px 0px white;
     transition: all .3s;
     font-family: monospace;
     font-size: initial;
@@ -319,7 +319,7 @@ body {
   .opensea_button {
     margin: 4px;
     background: rgb(0, 134, 255);
-    border: 1px solid darkslategray;
+    border: 0px solid darkslategray;
     border-radius: 5px;
     font-weight: bold;
     width: 105px;
@@ -329,7 +329,7 @@ body {
     font-size: small;
     padding: 0px !important;
     cursor: pointer;
-    box-shadow: 2px 2px white;
+    box-shadow: 0px 0px white;
     transition: all .3s;
     font-family: monospace;
     font-size: initial;
@@ -342,7 +342,7 @@ body {
   .stake_button {
     margin: 4px;
     background: teal;
-    border: 1px solid darkslategray;
+    border: 0px solid darkslategray;
     border-radius: 5px;
     font-weight: bold;
     width: 218px;
@@ -352,7 +352,7 @@ body {
     font-size: small;
     padding: 0px !important;
     cursor: pointer;
-    box-shadow: 2px 2px darkslategray;
+    box-shadow: 0px 0px darkslategray;
     transition: all .3s;
     font-family: monospace;
     font-size: initial;
@@ -365,7 +365,7 @@ body {
   .unstake_button {
     margin: 4px;
     background: tomato;
-    border: 1px solid darkslategray;
+    border: 0px solid darkslategray;
     border-radius: 5px;
     font-weight: bold;
     width: 218px;
@@ -375,7 +375,7 @@ body {
     font-size: small;
     padding: 0px !important;
     cursor: pointer;
-    box-shadow: 2px 2px darkslategray;
+    box-shadow: 0px 0px darkslategray;
     transition: all .3s;
     font-family: monospace;
     font-size: initial;
@@ -389,7 +389,7 @@ body {
     margin: 4px;
     padding: 8px;
     background: white;
-    border: 1px solid darkslategray;
+    border: 0px solid darkslategray;
     border-radius: 5px;
     width: auto;
     height: auto;
@@ -397,7 +397,7 @@ body {
     font-size: small;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 2px 2px white;
+    box-shadow: 0px 0px white;
     transition: all .3s;
     font-family: monospace;
     font-size: initial;
