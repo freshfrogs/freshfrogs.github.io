@@ -779,7 +779,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     token_element.innerHTML = 
 
         //'<img src="https://freshfrogs.github.io/frog/'+token_id+'.png" alt="Example Image">'+
-        '<div id="index-card-img-cont-'+token_id+'" class="index-card-img-cont" style="background-image: url('+'https://freshfrogs.github.io/frog/'+token_id+'.png'+');></div>'+
+        '<div id="index-card-img-cont-'+token_id+'" class="index-card-img-cont" style="background-image: url(../frog/'+token_id+'.png);";></div>'+
         '<div class="index-card-text">'+
             '<div id="traits_'+element_id+'" class="trait_list">'+
                 //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
