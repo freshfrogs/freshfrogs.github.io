@@ -761,7 +761,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     if (! location) { location = 'frogs'; }
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
 
-    // Fetch (current) ownership
+    // Fetch (current) ownership -- var { createdAt, timestamp, from, to, token: { tokenId }, price: { amount: { decimal, usd } }, txHash } = token
     fetch('https://api.reservoir.tools/owners/v2?token=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b%3A'+token_id, options)
         .then(res => res.json())
         .then(res => console.log(res))
