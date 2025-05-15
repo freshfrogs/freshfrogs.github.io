@@ -257,7 +257,7 @@ async function render_token_sales(contract, sales) {
             receiver = 'Creator'
         }
 
-        if (txn_string !== 'mint') {
+        if (txn_string == 'mint') {
 
         
             var html_elements = 
