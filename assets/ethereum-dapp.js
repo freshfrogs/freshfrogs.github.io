@@ -201,13 +201,14 @@ async function update_staked_tokens(tokens) {
             let staked_values = await stakingValues(tokenId);
             var staked_rewards = staked_values[3]
             var staked_time = staked_values[0]
+            var staked_date = staked_values[4]
             var staked_next_lvl = staked_values[2].toString()
             //var progress = (( 41.7 - staked_values[2] ) / 41.7 ) * 100
             //var progress_element = '<b id="progress"></b><div id="myProgress"><div id="myBar" style="width: '+progress+'% !important;"></div></div>';
     
             try {
                 document.getElementById('stakedOwner_'+tokenId).innerHTML = truncateAddress(owner);
-                document.getElementById('staked_'+tokenId).innerHTML = staked_time+' days';
+                document.getElementById('staked_'+tokenId).innerHTML = staked_date;
                 document.getElementById('staked_'+tokenId).style.color = 'teal';
             } catch (e) { console.log(e.message) }
             //try { document.getElementById('nextlvl_'+tokenId).innerHTML = staked_next_lvl+' days'; } catch (e) { console.log(e.message) }
@@ -345,13 +346,13 @@ async function render_held_tokens(wallet, tokens) {
                 '<text class="card_bold" id="stakedOwner_'+tokenId+'">'+truncateAddress(wallet)+'</text>'+
             '</div>'+
             '<div class="infobox_right">'+
-                '<text class="card_text">Staked</text>'+'<br>'+
-                '<text id="staked_'+tokenId+'" class="card_bold" style="color: tomato;">False</text>'+
+                '<text class="card_text">Rewards</text>'+'<br>'+
+                '<text id="rewards_'+tokenId+'" class="card_bold">--</text>'+
             '</div>'+
             '<br>'+
             '<div class="infobox_left">'+
-                '<text class="card_text">Rewards</text>'+'<br>'+
-                '<text id="rewards_'+tokenId+'" class="card_bold">--</text>'+
+                '<text class="card_text">Staked</text>'+'<br>'+
+                '<text id="staked_'+tokenId+'" class="card_bold">False</text>'+
             '</div>'+
             '<div class="infobox_right">'+
                 '<text class="card_text">Rarity</text>'+'<br>'+
@@ -1597,14 +1598,10 @@ async function timeStaked(tokenId) {
             let staked_time = await web3.eth.getBlock(staked_block);
             let staked_date = new Date(staked_time.timestamp*1000);
 
-            // Calculate Time Staked in Hours
-            let staked_duration = Date.now() - staked_date;
-            let staked_hours = Math.floor(staked_duration/1000/60/60);
-
             //console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
 
             // Return time staked in (Hours)
-            return staked_hours;
+            return staked_date;
 
         // Catch Errors, Return 0.00
         } catch (e) { console.log(e.message); return 0.00; }
@@ -1619,16 +1616,20 @@ async function timeStaked(tokenId) {
 */
 async function stakingValues(tokenId) {
 
-    stakedTimeHours = await timeStaked(tokenId)
-    stakedLevelInt = Math.floor((stakedTimeHours / 1000 )) + 1
+    staked_date = await timeStaked(tokenId)
+    // Calculate Time Staked in Hours
+    let staked_duration = Date.now() - staked_date;
+    let staked_hours = Math.floor(staked_duration/1000/60/60);
 
-    stakedTimeDays = Math.floor(stakedTimeHours / 24)                               // Time Staked
+    stakedLevelInt = Math.floor((staked_hours / 1000 )) + 1
+
+    stakedTimeDays = Math.floor(staked_hours / 24)                               // Time Staked
     stakedLevel = romanize(stakedLevelInt)                                          // Staked Level
-    stakedNext = Math.round((((stakedLevelInt) * 1000) - stakedTimeHours) / 24)     // Days until next level
-    stakedEarned = (stakedTimeHours / 1000).toFixed(3)                              // Flyz Earned
+    stakedNext = Math.round((((stakedLevelInt) * 1000) - staked_hours) / 24)     // Days until next level
+    stakedEarned = (staked_hours / 1000).toFixed(3)                              // Flyz Earned
 
-    // [ Time Staked, Staked Level, Next Level, Flyz Earned]
-    return [stakedTimeDays, stakedLevel, stakedNext, stakedEarned]
+    // [ Time Staked, Staked Level, Next Level, Flyz Earned, Date Staked]
+    return [stakedTimeDays, stakedLevel, stakedNext, stakedEarned, staked_date]
 
 }
 
