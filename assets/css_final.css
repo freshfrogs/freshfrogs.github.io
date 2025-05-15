@@ -352,7 +352,7 @@ body {
     font-size: small;
     padding: 0px !important;
     cursor: pointer;
-    box-shadow: 0px 0px darkslategray;
+    box-shadow: 0px 0px white;
     transition: all .3s;
     font-family: monospace;
     font-size: initial;
@@ -375,7 +375,7 @@ body {
     font-size: small;
     padding: 0px !important;
     cursor: pointer;
-    box-shadow: 0px 0px darkslategray;
+    box-shadow: 0px 0px white;
     transition: all .3s;
     font-family: monospace;
     font-size: initial;
