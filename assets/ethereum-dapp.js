@@ -18,6 +18,8 @@ var net_income_usd = 0;
 var mint_volume_eth = 0;
 var mint_volume_usd = 0;
 
+var staked_ids = [];
+
 var frogArray = [
     'blueDartFrog',
     'blueTreeFrog',
@@ -761,21 +763,14 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     if (! location) { location = 'frogs'; }
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
 
-    /*
-    // Fetch (current) ownership -- var { createdAt, timestamp, from, to, token: { tokenId }, price: { amount: { decimal, usd } }, txHash } = owners
-    fetch('https://api.reservoir.tools/owners/v2?token=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b%3A'+token_id, options)
-        .then((owners) => owners.json())
-        .then((owners) => {
-            console.log(owners)
-            console.log(owners.owners.address)
-            console.log(owners.address)
-        })
-        .catch(err => console.error(err));
-    */
-
     // <-- Begin Element
     var token_doc = document.getElementById(location);
     var token_element = document.createElement('div');
+
+    var staked_title = '';
+    if (staked_ids.includes(token_id)) {
+        staked_title = 'Staked!';
+    }
 
     // Element Details -->
     token_element.id = element_id;
@@ -786,7 +781,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
         '<div class="index-card-text">'+
             '<div id="traits_'+element_id+'" class="trait_list">'+
                 //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
-                '<strong style="color: white;"><u>Frog #'+token_id+'</strong></u>'+' <text style="color: #1ac486; font-weight: bold; padding-left: 10px;">'+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+                '<strong style="color: white;"><u>Frog #'+token_id+'</strong></u>'+' <text style="color: lightcoral; font-weight: bold; padding-left: 10px;">'+staked_title+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
             '</div>'+
             '<div id="prop_'+element_id+'" class="properties">'+
                 html_elements+
@@ -867,6 +862,17 @@ async function meta_morph_select(selected, token_id) {
 
     document.getElementById('morph_frog_atts_'+selected).innerHTML = atts
 
+}
+
+async function gather_staked_ids() {
+    await getStakedTokens(wallet)
+    .then(async (tokens) => {
+        tokens.forEach(async (token) => {
+            //var token_owner = await collection.methods.ownerOf(token_id).call();
+            var token_id = token.tokenId;
+            staked_ids.push(token_id);
+        })
+    })
 }
 
 async function meta_morph_preset() {
