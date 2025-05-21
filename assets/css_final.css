@@ -289,7 +289,7 @@ body {
 .etherscan_button {
     margin: 4px;
     background: lightsteelblue;
-    border: 0px solid darkslategray;
+    border: 1px solid black;
     border-radius: 5px;
     font-weight: bold;
     width: 105px;
@@ -299,20 +299,20 @@ body {
     font-size: small;
     padding: 0px !important;
     cursor: pointer;
-    box-shadow: 0px 0px white;
+    box-shadow: 2px 2px white;
     transition: all .3s;
     font-family: monospace;
     font-size: initial;
   }
   .etherscan_button:hover {
-    top: -3px;
+    top: 2px;
     position: relative;
-    box-shadow: 6px 6px 0px darkslategray;
+    box-shadow: 1px 1px white;
   }
   .opensea_button {
     margin: 4px;
     background: rgb(0, 134, 255);
-    border: 0px solid darkslategray;
+    border: 1px solid black;
     border-radius: 5px;
     font-weight: bold;
     width: 105px;
@@ -322,20 +322,20 @@ body {
     font-size: small;
     padding: 0px !important;
     cursor: pointer;
-    box-shadow: 0px 0px white;
+    box-shadow: 2px 2px white;
     transition: all .3s;
     font-family: monospace;
     font-size: initial;
   }
   .opensea_button:hover {
-    top: -3px;
+    top: 2px;
     position: relative;
-    box-shadow: 6px 6px 0px darkslategray;
+    box-shadow: 1px 1px white;
   }
   .stake_button {
     margin: 4px;
     background: teal;
-    border: 0px solid darkslategray;
+    border: 1px solid black;
     border-radius: 5px;
     font-weight: bold;
     width: 218px;
@@ -345,20 +345,20 @@ body {
     font-size: small;
     padding: 0px !important;
     cursor: pointer;
-    box-shadow: 0px 0px white;
+    box-shadow: 2px 2px white;
     transition: all .3s;
     font-family: monospace;
     font-size: initial;
   }
   .stake_button:hover{
-    top: -3px;
+    top: 2px;
     position: relative;
-    box-shadow: 6px 6px 0px darkslategray;
+    box-shadow: 1px 1px white;
   }
   .unstake_button {
     margin: 4px;
     background: tomato;
-    border: 0px solid darkslategray;
+    border: 1px solid black;
     border-radius: 5px;
     font-weight: bold;
     width: 218px;
@@ -368,15 +368,15 @@ body {
     font-size: small;
     padding: 0px !important;
     cursor: pointer;
-    box-shadow: 0px 0px white;
+    box-shadow: 2px 2px white;
     transition: all .3s;
     font-family: monospace;
     font-size: initial;
   }
   .unstake_button:hover{
-    top: -3px;
+    top: 2px;
     position: relative;
-    box-shadow: 6px 6px 0px darkslategray;
+    box-shadow: 1px 1px white;
   }
 .connectButton {
     margin: 4px;
@@ -414,7 +414,9 @@ body {
   margin: 4px;
   margin-left: auto;
   margin-right: auto;
+  border: 1px solid black;
   border-radius: 5px;
+  box-shadow: 2px 2px white;
 }
 .terminal_op {
   color: seashell;
