@@ -245,12 +245,12 @@ async function render_token_sales(contract, sales) {
         var sale_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
 
         if (from !== '0x0000000000000000000000000000000000000000') {
-            saleOrMint = 'Sold'
+            saleOrMint = 'Last Sale'
             txn_string = 'sale'; from = truncateAddress(from)
             net_income_usd = net_income_usd + (Number(usd))*0.025
             sales_volume_eth = sales_volume_eth + Number(decimal);
             sales_volume_usd = sales_volume_usd + Number(usd);
-            receiver = 'Buyer'
+            receiver = 'Owner'
         } else {
             saleOrMint = 'Birthday'
             txn_string = 'mint'; from = 'FreshFrogsNFT';
@@ -260,23 +260,27 @@ async function render_token_sales(contract, sales) {
             receiver = 'Creator'
         }
 
-        if (txn_string == 'mint') {
+        if (txn_string == 'sale') {
 
         
             var html_elements = 
+                /*
                 '<div class="infobox_left">'+
                     '<text class="card_text">'+receiver+'</text>'+'<br>'+
                     '<text class="card_bold">'+truncateAddress(to)+'</text>'+
                 '</div>'+
-                '<div class="infobox_right">'+
-                    '<text class="card_text">Price</text>'+'<br>'+
+                */
+                '<div class="infobox_left">'+
+                    '<text class="card_text">Last Sale</text>'+'<br>'+
                     '<text id="frog_type" class="card_bold">'+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
                 '</div>'+
+                /*
                 '<br>'+
                 '<div class="infobox_left">'+
                     '<text class="card_text">'+saleOrMint+'</text>'+'<br>'+
                     '<text class="card_bold">'+sale_date+'</text>'+
                 '</div>'+
+                */
                 '<div class="infobox_right">'+
                     '<text class="card_text">Rarity</text>'+'<br>'+
                     '<text id="rarityRanking_'+tokenId+'" class="card_bold">--</text>'+
