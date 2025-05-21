@@ -417,12 +417,14 @@ body {
   border-radius: 5px;
 }
 .terminal_op {
-    color: seashell;
-    background: darkslategray;
-    padding: 10px;
-    margin: 4px;
-    border: 1px solid black;
-    width: 100%;
+  color: seashell;
+  background: teal;
+  padding: 10px;
+  margin: 4px;
+  border: 1px solid black;
+  width: 100%;
+  border-radius: 5px;
+  box-shadow: 2px 2px white;
 }
 .infobox_left{
     margin: 8px;
