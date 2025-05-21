@@ -260,7 +260,7 @@ async function render_token_sales(contract, sales) {
             receiver = 'Creator'
         }
 
-        if (txn_string == 'sale') {
+        //if (txn_string == 'sale') {
 
         
             var html_elements = 
@@ -292,7 +292,7 @@ async function render_token_sales(contract, sales) {
 
             await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash);
 
-        }
+        //}
     })
 
 }
