@@ -268,6 +268,7 @@ body {
 .image-gallery {
     padding: 8px;
     background-color: transparent;
+    text-align: center;
 }
 .image-gallery img {
   width: 128px;
