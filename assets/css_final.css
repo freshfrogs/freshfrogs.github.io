@@ -442,11 +442,11 @@ body {
     text-align: center;
 }
 .card_text {
-    color: darkseagreen;
+    color: white;
     font-weight: normal !important;
 }
 .card_bold {
-    color: white;
+    color: darkseagreen;
     font-weight: bold;
 }
 .usd_price {
