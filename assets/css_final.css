@@ -543,6 +543,9 @@ body {
     -webkit-transform: scale(1.2); /* Safari 3-8 */
     transform: scale(1.2);
   }
+  .trait_list {
+    text-align: center;
+  }
   .trait_overlay {
     display: block;
     image-rendering: pixelated;
