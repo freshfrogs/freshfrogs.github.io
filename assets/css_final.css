@@ -382,7 +382,7 @@ body {
     margin: 4px;
     padding: 8px;
     background: white;
-    border: 0px solid darkslategray;
+    border: 1px solid black;
     border-radius: 5px;
     width: auto;
     height: auto;
@@ -390,15 +390,15 @@ body {
     font-size: small;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0px 0px white;
+    box-shadow: 2px 2px white;
     transition: all .3s;
     font-family: monospace;
     font-size: initial;
 }
 .connectButton:hover {
-    top: -3px;
+    top: 2px;
     position: relative;
-    box-shadow: 6px 6px 0px darkslategray;
+    box-shadow: 1px 1px white;
 }
 .front_title {
     font-size: x-large;
