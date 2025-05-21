@@ -14,8 +14,8 @@
 .index-card {
   display: inline-block;
   align-items: center;
-  background-color: transparent;
-  border: 0px solid black;
+  background-color: darkslategray;
+  border: 1px solid black;
   border-radius: 5px;
   box-shadow: none; /* 8px 8px darkseagreen; */
   padding: 12px;
