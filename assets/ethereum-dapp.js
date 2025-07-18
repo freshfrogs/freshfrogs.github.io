@@ -276,7 +276,7 @@ async function render_token_sales(contract, sales) {
                 '<br>'+
                 '<div class="infobox_left">'+
                     '<text class="card_text">Frog Type</text>'+'<br>'+
-                    '<text class="card_bold" id="'+tokenId+'"_frogType></text>'+
+                    '<text class="card_bold" id='+tokenId+'"_frogType"></text>'+
                 '</div>'+
                 '<div class="infobox_right">'+
                     '<text class="card_text">Rarity</text>'+'<br>'+
