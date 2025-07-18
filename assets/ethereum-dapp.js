@@ -275,8 +275,8 @@ async function render_token_sales(contract, sales) {
                 '</div>'+
                 '<br>'+
                 '<div class="infobox_left">'+
-                    '<text class="card_text">'+saleOrMint+'</text>'+'<br>'+
-                    '<text class="card_bold">'+sale_date+'</text>'+
+                    '<text class="card_text">Frog Type</text>'+'<br>'+
+                    '<text class="card_bold" id="'+tokenId+'"_frogType></text>'+
                 '</div>'+
                 '<div class="infobox_right">'+
                     '<text class="card_text">Rarity</text>'+'<br>'+
@@ -818,6 +818,9 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     for (let i = 0; i < metadata.attributes.length; i++) {
         var attribute = metadata.attributes[i].value;
         var trait_type = metadata.attributes[i].trait_type;
+        if(trait_type == "Frog" || trait_type == "specialFrog"){
+            document.getElementById(token_id+'_frogType').innerHTML = attribute;
+        }
         build_trait(trait_type, attribute, 'index-card-img-cont-'+token_id);
     }
     
