@@ -20,7 +20,7 @@
   box-shadow: none; /* 8px 8px darkseagreen; */
   padding: 4px;
   max-width: 450px;
-  margin: 4px;
+  margin: 1%;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
