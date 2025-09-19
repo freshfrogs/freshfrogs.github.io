@@ -5,7 +5,7 @@ window.FF_CFG = {
   CONTROLLER_ADDRESS: "0xCB1ee125CFf4051a10a55a09B10613876C4Ef199",
   JSON_PATH: "assets/freshfrogs_rarity_rankings.json",
   AUTO_INIT: false,
-  FROG_API_KEY: "YOUR_RESERVOIR_API_KEY_HERE"
+  FROG_API_KEY: "3105c552-60b6-5252-bca7-291c724a54bf"
 };
 
 // Allow runtime injection without editing files
