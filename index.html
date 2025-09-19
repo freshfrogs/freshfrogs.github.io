@@ -114,31 +114,34 @@
   </section>
 
   <section id="features" class="panel stack" aria-label="Features">
-    <h2 class="section-title" style="margin:0">Features</h2>
-    <p class="muted" style="margin-top:0">If testing from desktop, click “Use selected JSON” above to load <code>assets/freshfrogs_rarity_rankings.json</code>.</p>
+    <div class="row" style="justify-content:space-between;align-items:center;gap:12px;">
+      <h2 class="section-title" style="margin:0">Collection Insights</h2>
 
-    <div class="two-col">
-      <div class="panel stack same-height" aria-label="Recent Sales">
-        <div class="row" style="justify-content:space-between;align-items:center;">
-          <b>Recent Sales</b><span class="pill"><span class="muted">Live</span></span>
-        </div>
-        <ul id="recentSales" class="card-list list-scroll" aria-live="polite"></ul>
-        <div class="row" style="gap:8px;">
-          <button class="btn btn-outline" id="refreshBtn">Refresh</button>
-          <button class="btn btn-ghost" id="fetchLiveBtn">Fetch Live</button>
-        </div>
+      <!-- View tabs (Sales / Rarity) -->
+      <div class="tabs" role="tablist" id="viewTabs" style="min-width:260px;">
+        <span class="tab-indicator" aria-hidden="true"></span>
+        <button class="tab" data-view="sales"  role="tab" aria-selected="true">Sales</button>
+        <button class="tab" data-view="rarity" role="tab" aria-selected="false">Rarity</button>
       </div>
+    </div>
 
-      <div class="panel stack same-height" aria-label="Rarity Rankings">
-        <div class="row" style="justify-content:space-between;align-items:center;">
-          <b>Rarity Rankings</b><span class="pill"><span class="muted">Sorted</span></span>
-        </div>
-        <ul id="rarityList" class="card-list list-scroll" aria-live="polite"></ul>
-        <div class="row" style="gap:8px;">
-          <button class="btn btn-outline" id="sortRankBtn">Sort by Rank</button>
-          <button class="btn btn-outline" id="sortScoreBtn">Sort by Score</button>
-        </div>
-      </div>
+    <p class="muted" style="margin-top:0">
+      If testing from desktop, click “Use selected JSON” above to load
+      <code>assets/freshfrogs_rarity_rankings.json</code>.
+    </p>
+
+    <!-- Unified list area -->
+    <ul id="featureList" class="card-list list-scroll" aria-live="polite"></ul>
+
+    <!-- Unified controls -->
+    <div class="row" id="featureControls" style="gap:8px;">
+      <!-- Sales controls -->
+      <button class="btn btn-outline" id="refreshBtn">Refresh</button>
+      <button class="btn btn-ghost"   id="fetchLiveBtn">Fetch Live</button>
+
+      <!-- Rarity controls -->
+      <button class="btn btn-outline" id="sortRankBtn"  style="display:none;">Sort by Rank</button>
+      <button class="btn btn-outline" id="sortScoreBtn" style="display:none;">Sort by Score</button>
     </div>
   </section>
 

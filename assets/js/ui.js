@@ -34,7 +34,7 @@ export function renderGrid() {
 /* ---------------- SALES ---------------- */
 let salesCache = [];
 export function renderSales(list = salesCache) {
-  const ul = document.getElementById("recentSales");
+  const ul = document.getElementById("recentSales") || document.getElementById("featureList");
   if (!ul) return;
   ul.innerHTML = "";
   const arr = (list && list.length) ? list : [{ id: 3250, time: "3m", price: "0.080 ETH", buyer: "0x9a…D1" }];
@@ -82,7 +82,7 @@ function sortedRarity() {
   return a;
 }
 export function renderRarity() {
-  const ul = document.getElementById("rarityList");
+  const ul = document.getElementById("rarityList") || document.getElementById("featureList");
   if (!ul) return;
   ul.innerHTML = "";
   const data = sortedRarity();
@@ -251,4 +251,49 @@ export function wireFeatureButtons() {
     if (!u) { document.getElementById("stakeStatus").textContent = "Connect a wallet first."; return; }
     clearOwned(); fetchOwned(u);
   });
+}
+
+/* -------------------------------------------------------
+ * Unified Features Panel: view switcher (Sales / Rarity)
+ * ----------------------------------------------------- */
+let currentFeatureView = "sales";
+
+function applyFeatureControls() {
+  const onSales = currentFeatureView === "sales";
+  // Sales buttons
+  const refreshBtn   = document.getElementById("refreshBtn");
+  const fetchLiveBtn = document.getElementById("fetchLiveBtn");
+  // Rarity buttons
+  const sortRankBtn  = document.getElementById("sortRankBtn");
+  const sortScoreBtn = document.getElementById("sortScoreBtn");
+
+  if (refreshBtn)   refreshBtn.style.display   = onSales ? "" : "none";
+  if (fetchLiveBtn) fetchLiveBtn.style.display = onSales ? "" : "none";
+  if (sortRankBtn)  sortRankBtn.style.display  = onSales ? "none" : "";
+  if (sortScoreBtn) sortScoreBtn.style.display = onSales ? "none" : "";
+}
+
+export function setFeatureView(view) {
+  currentFeatureView = view;
+
+  // Tabs UI
+  const tabs     = document.querySelectorAll('#viewTabs .tab');
+  const wrap     = document.getElementById('viewTabs');
+  const indexMap = { sales: 0, rarity: 1 };
+  tabs.forEach(t => t.setAttribute('aria-selected', t.dataset.view === view ? 'true' : 'false'));
+  wrap?.style?.setProperty('--tab-i', indexMap[view] ?? 0);
+
+  // Render
+  if (view === "sales") renderSales();
+  else renderRarity();
+
+  applyFeatureControls();
+}
+
+export function wireFeatureTabs() {
+  document.querySelectorAll('#viewTabs .tab')?.forEach(btn => {
+    btn.addEventListener('click', () => setFeatureView(btn.dataset.view));
+  });
+  // initial state
+  setFeatureView("sales");
 }
