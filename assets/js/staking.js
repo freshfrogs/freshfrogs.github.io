@@ -44,6 +44,27 @@ function pickMethod(obj, names){
   return null;
 }
 
+// --- Reservoir fallback: fetch controller-held token IDs (paged) ---
+async function fetchControllerTokenIds(max=400, page=100){
+  const ids=[]; let cont="";
+  while(ids.length < max){
+    const qs = new URLSearchParams({ collection: FF_CFG.COLLECTION_ADDRESS, limit: String(page) });
+    if (cont) qs.set("continuation", cont);
+    const url = `https://api.reservoir.tools/users/${FF_CFG.CONTROLLER_ADDRESS}/tokens/v8?` + qs.toString();
+    const r = await fetch(url, { headers:{ accept:"*/*", "x-api-key": FF_CFG.FROG_API_KEY } });
+    if (!r.ok) break;
+    const j = await r.json();
+    for (const t of j.tokens || []) {
+      const tokenId = t?.token?.tokenId ?? t?.tokenId ?? t?.id;
+      const id = tokenId!=null ? parseInt(String(tokenId), 10) : null;
+      if (id) ids.push(id);
+    }
+    cont = j.continuation || "";
+    if (!cont) break;
+  }
+  return ids;
+}
+
 // -------- Public: load staked for current user --------
 export async function loadStaked(){
   const status=document.getElementById('stakeStatus');
@@ -58,7 +79,7 @@ export async function loadStaked(){
     ]);
 
     if(userToTokens){
-      // === Preferred fast path (contract supports per-user listing) ===
+      // Fast path
       status.textContent='Loading staked…';
       let rows = await ctrl[userToTokens](user);
       let items=[];
@@ -70,28 +91,23 @@ export async function loadStaked(){
       }
       ST.items = items;
     } else {
-      // === Fallback path (no per-user method): derive from Pond ===
+      // Fallback: derive from Pond (controller-held) then filter by stakerOf
       status.textContent='Loading staked (fallback)…';
-      // ensure we have pondItems from UI (or fetch a page if empty)
-      if (!window.pondItems || !window.pondItems.length) {
-        // light fetch via UI helper if available
-        try { await window.loadPond?.(100); } catch {}
-      }
-      const all = (window.pondItems || []).slice(0, 400); // cap for performance
+      const ids = await fetchControllerTokenIds(400, 100);
       const whoFn = pickMethod(ctrl, ['stakerOf','stakerAddress']);
-      const out = [];
-      for (let i=0;i<all.length;i++){
-        const id = all[i].id;
+      const out=[];
+      for (let i=0;i<ids.length;i++){
         try{
           let st = null;
-          if (whoFn) st = await ctrl[whoFn](id);
-          if (!st && collection) st = await collection.ownerOf(id);
-          if (st && st.toLowerCase()===user.toLowerCase()){
-            out.push({ id, owner: st });
+          if (whoFn) st = await ctrl[whoFn](ids[i]);
+          if (!st && (await ensureCollection())?.ownerOf) {
+            st = await collection.ownerOf(ids[i]);
+          }
+          if (st && st.toLowerCase() === user.toLowerCase()){
+            out.push({ id: ids[i], owner: st });
           }
         }catch{}
-        // yield to UI every ~20 to keep page responsive
-        if (i%20===0) await new Promise(r=>setTimeout(r,0));
+        if (i % 20 === 0) await new Promise(r=>setTimeout(r,0));
       }
       ST.items = out;
     }
@@ -101,9 +117,9 @@ export async function loadStaked(){
     if(rewardsFn){
       try{
         const r = await ctrl[rewardsFn](user);
-        const rewardsLine = document.getElementById('rewardsLine');
-        if(rewardsLine){
-          rewardsLine.style.display='block';
+        const line = document.getElementById('rewardsLine');
+        if(line){
+          line.style.display='block';
           let whole="0";
           try{
             const formatted = ethers.utils.formatUnits(r, 18);
@@ -186,9 +202,9 @@ function render(){
     li.innerHTML =
       `<img class="thumb64" src="${FF_CFG.SOURCE_PATH}/frog/${id}.png" alt="Frog ${id}" width="64" height="64" loading="lazy">`+
       `<div>
-        <div style="display:flex;align-items:center;gap:8px;">
+        <div class="row gap8">
           <b>Frog #${id}</b>
-          ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`}
+          ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill pill-ghost">Rank N/A</span>`}
         </div>
         <div class="muted">Owner <span class="addr">${owner?shorten(String(owner)):'—'}</span></div>
       </div>

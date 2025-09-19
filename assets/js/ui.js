@@ -4,18 +4,19 @@ import {
 } from "./core.js";
 
 /* =============== RARITY STORE =============== */
-let RARITY_LIST=null, RANK_LOOK=null, sortBy='rank';
+let RARITY_LIST = null, RANK_LOOK = null, sortBy = "rank";
 function setRarityList(arr){
-  RARITY_LIST=arr;
-  RANK_LOOK = Object.fromEntries(arr
-    .map(x=>[String(x.id), Number(x.ranking??x.rank??NaN)])
-    .filter(([,v])=>!Number.isNaN(v)));
-  window.FF_getRankById = (id)=> RANK_LOOK ? (RANK_LOOK[String(id)] ?? null) : null;
+  RARITY_LIST = arr;
+  RANK_LOOK = Object.fromEntries(
+    arr.map(x => [String(x.id), Number(x.ranking ?? x.rank ?? NaN)])
+       .filter(([,v]) => !Number.isNaN(v))
+  );
+  window.FF_getRankById = (id) => RANK_LOOK ? (RANK_LOOK[String(id)] ?? null) : null;
 }
 function sortedRarity(){
-  if(!RARITY_LIST?.length) return [];
-  const a=[...RARITY_LIST];
-  if(sortBy==='score') a.sort((x,y)=>Number(y.rarity??y.score??0)-Number(x.rarity??x.score??0));
+  if (!RARITY_LIST?.length) return [];
+  const a = [...RARITY_LIST];
+  if (sortBy === "score") a.sort((x,y)=>Number(y.rarity??y.score??0)-Number(x.rarity??x.score??0));
   else a.sort((x,y)=>Number(x.ranking??x.rank??1e9)-Number(y.ranking??y.rank??1e9));
   return a;
 }
@@ -54,7 +55,7 @@ async function fetchTokenDetails(id){
   }
 }
 
-/* =============== INFO MODAL (layered+animated, 512×512, info bottom) =============== */
+/* =============== INFO MODAL (layered, 512×512, clean chrome) =============== */
 const LAYER_ORDER = [
   "Background",
   "Frog", "SpecialFrog", "Trait",
@@ -66,6 +67,38 @@ const LAYER_ORDER = [
   "Foreground"
 ];
 const LZ = Object.fromEntries(LAYER_ORDER.map((k,i)=>[k,(i+1)*10]));
+
+// Dominant-color sampler (no still PNG in the stack)
+async function setModalBgFromPNG(tokenId, el) {
+  const img = new Image();
+  img.src = `${FF_CFG.SOURCE_PATH}/frog/${tokenId}.png`;
+  await (img.decode?.() || new Promise((res, rej)=>{ img.onload=res; img.onerror=rej; }));
+
+  const size = 24;
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  ctx.drawImage(img, 0, 0, size, size);
+  const { data } = ctx.getImageData(0, 0, size, size);
+
+  const rows = [];
+  for (let i = 0; i < data.length; i += 4) {
+    const a = data[i+3]; if (a < 10) continue;
+    const r = data[i], g = data[i+1], b = data[i+2];
+    const lum = 0.2126*r + 0.7152*g + 0.0722*b;
+    rows.push({ r, g, b, lum });
+  }
+  if (!rows.length) return;
+  rows.sort((a,b)=>a.lum-b.lum);
+  const lo = Math.floor(rows.length*0.10);
+  const hi = Math.floor(rows.length*0.90);
+  let R=0,G=0,B=0,n=0;
+  for (let i=lo;i<hi;i++){ R+=rows[i].r; G+=rows[i].g; B+=rows[i].b; n++; }
+  if (n) {
+    R=Math.round(R/n); G=Math.round(G/n); B=Math.round(B/n);
+    el.style.background = `linear-gradient(180deg, rgba(${R},${G},${B},0.95), rgba(${R},${G},${B},0.85))`;
+  }
+}
 
 function buildLayer(trait_type, attribute, mountEl){
   const img=document.createElement("img");
@@ -84,13 +117,6 @@ function buildLayer(trait_type, attribute, mountEl){
   mountEl.appendChild(img);
 }
 
-async function loadMetadata(tokenId){
-  const url = `${FF_CFG.SOURCE_PATH}/frog/json/${tokenId}.json`;
-  const res = await fetch(url,{cache:"no-store"});
-  if(!res.ok) throw new Error("Metadata "+res.status);
-  return res.json();
-}
-
 async function openFrogInfo(id){
   const L=document.getElementById("lightbox"), S=document.getElementById("lightboxStage");
   if(!L||!S) return;
@@ -101,56 +127,54 @@ async function openFrogInfo(id){
     fetchTokenDetails(id),
     (async()=>{ try{ return await (window.FF_getStakeInfo ? window.FF_getStakeInfo(id) : null); }catch{ return null; } })()
   ]);
-// Replace the openFrogInfo(id) building part (the S.innerHTML) with this:
-S.innerHTML = `
-  <div class="modal-card" style="position:relative;display:flex;flex-direction:column;gap:12px;background:transparent;box-shadow:none;">
-    <button class="btn btn-ghost modal-close" aria-label="Close" style="position:absolute;top:8px;right:8px;">×</button>
 
-    <div class="modal-left" style="background: transparent; border:none; border-radius:12px; padding:0; display:grid; place-items:center;">
-      <div id="modalComposite"
-           style="position:relative;width:512px;height:512px;max-width:100%;
-                  background: var(--surface); /* simple theme surface, no still image */
-                  border-radius:12px; overflow:hidden;">
+  S.innerHTML = `
+    <div class="modal-card modal-clean">
+      <button class="btn btn-ghost modal-close" aria-label="Close">×</button>
+
+      <div class="modal-render">
+        <div id="modalComposite" class="modal-composite"></div>
+        <div class="render-vignette"></div>
+      </div>
+
+      <div class="modal-info panelish">
+        <div class="row tight">
+          <h3 class="h3">Frog #${id}</h3>
+          ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`}
+          ${ stake?.staked ? `<span class="pill" title="${stake?.sinceText||''}">Staked</span>` : `<span class="pill pill-ghost">Unstaked</span>` }
+        </div>
+
+        <div class="grid2 gap8">
+          <div class="muted"><b>Owner:</b> ${tokenInfo.owner ? tokenInfo.owner.slice(0,6)+"…"+tokenInfo.owner.slice(-4) : "—"}</div>
+          <div class="muted"><b>Birthday:</b> ${
+            tokenInfo.birthdayMs ? (new Date(tokenInfo.birthdayMs)).toLocaleString() + ` (${formatAgo(Date.now()-tokenInfo.birthdayMs)} ago)` : "—"
+          }</div>
+          <div class="muted"><b>Staked since:</b> ${
+            (stake?.staked && stake?.sinceMs) ? (new Date(stake.sinceMs)).toLocaleString() + ` (${formatAgo(Date.now()-stake.sinceMs)} ago)` :
+            (stake?.staked ? (stake?.sinceText || "Yes") : "No")
+          }</div>
+        </div>
+
+        <div class="traits-scroll">
+          ${
+            Array.isArray(meta?.attributes) && meta.attributes.length
+              ? meta.attributes.map(a => `${a.trait_type}: <b>${a.value}</b>`).join("<br>")
+              : "No attributes found."
+          }
+        </div>
+
+        <div class="row gap8">
+          <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://etherscan.io/nft/${FF_CFG.COLLECTION_ADDRESS}/${id}">Etherscan</a>
+          <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://opensea.io/assets/ethereum/${FF_CFG.COLLECTION_ADDRESS}/${id}">OpenSea</a>
+        </div>
       </div>
     </div>
+  `;
 
-    <div class="modal-bottom" style="display:flex;flex-direction:column; gap:10px; background:transparent; border:none; border-radius:12px; padding:0;">
-      <div class="row" style="gap:8px;flex-wrap:wrap;">
-        <h3 style="margin:0;">Frog #${id}</h3>
-        ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`}
-        ${ stake?.staked ? `<span class="pill" title="${stake?.sinceText||''}">Staked</span>` : `<span class="pill pill-ghost">Unstaked</span>` }
-      </div>
-
-      <div class="meta grid2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;">
-        <div class="muted"><b>Owner:</b> ${tokenInfo.owner ? tokenInfo.owner.slice(0,6)+"…"+tokenInfo.owner.slice(-4) : "—"}</div>
-        <div class="muted"><b>Birthday:</b> ${
-          tokenInfo.birthdayMs ? (new Date(tokenInfo.birthdayMs)).toLocaleString() + ` (${formatAgo(Date.now()-tokenInfo.birthdayMs)} ago)` : "—"
-        }</div>
-        <div class="muted"><b>Staked since:</b> ${
-          (stake?.staked && stake?.sinceMs) ? (new Date(stake.sinceMs)).toLocaleString() + ` (${formatAgo(Date.now()-stake.sinceMs)} ago)` :
-          (stake?.staked ? (stake?.sinceText || "Yes") : "No")
-        }</div>
-      </div>
-
-      <div class="muted" style="max-height:220px;overflow:auto;border-top:1px dashed var(--line); padding-top:8px;">
-        ${
-          Array.isArray(meta?.attributes) && meta.attributes.length
-            ? meta.attributes.map(a => `${a.trait_type}: <b>${a.value}</b>`).join("<br>")
-            : "No attributes found."
-        }
-      </div>
-
-      <div class="row" style="gap:8px;">
-        <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://etherscan.io/nft/${FF_CFG.COLLECTION_ADDRESS}/${id}">Etherscan</a>
-        <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://opensea.io/assets/ethereum/${FF_CFG.COLLECTION_ADDRESS}/${id}">OpenSea</a>
-      </div>
-    </div>
-  </div>
-`;
-
-  // Layered frog render on top of the background
+  // 512×512 layered render with color-matched background (no still PNG in layers)
   const mount = S.querySelector("#modalComposite");
   if (mount) {
+    try { await setModalBgFromPNG(id, mount); } catch {}
     if (Array.isArray(meta?.attributes)) {
       const ordered = meta.attributes.slice().sort((a,b)=>{
         const ai=LAYER_ORDER.indexOf(a.trait_type), bi=LAYER_ORDER.indexOf(b.trait_type);
@@ -204,7 +228,7 @@ export function renderSales(list=salesCache){
     li.innerHTML =
       thumb64(`${FF_CFG.SOURCE_PATH}/frog/${x.id}.png`,`Frog ${x.id}`)+
       `<div>
-        <div style="display:flex;align-items:center;gap:8px;"><b>Frog #${x.id}</b> ${badge}</div>
+        <div class="row gap8"><b>Frog #${x.id}</b> ${badge}</div>
         <div class="muted">${x.time!=="—"?x.time+" ago":"—"} • Buyer ${x.buyer}</div>
       </div>
       <div class="price">${x.price}</div>`;
@@ -251,7 +275,7 @@ export async function loadRarity(){
 export function setRaritySort(mode){ sortBy=mode; renderRarity(); }
 
 /* =============== POND (All currently staked via controller address) =============== */
-let pondItems=[], pondContinuation='';
+export let pondItems=[], pondContinuation='';
 export async function loadPond(limit=50, nextStr){
   try{
     const cont = nextStr || pondContinuation || '';
@@ -268,11 +292,11 @@ export async function loadPond(limit=50, nextStr){
     }).filter(Boolean);
 
     pondItems = pondItems.concat(items);
+    window.pondItems = pondItems; // expose for staking fallback
     pondContinuation = data.continuation || '';
 
     if(currentFeatureView==='pond') renderPond();
 
-    // manage "load more"
     let btn = document.getElementById('featureMoreBtn');
     const anchor = document.getElementById('featureMoreAnchor') || document.getElementById('featuresHeader');
     if(!pondContinuation){ if(btn) btn.remove(); }
@@ -292,7 +316,6 @@ export async function loadPond(limit=50, nextStr){
     }
   }
 }
-// Replace renderPond with this version
 export function renderPond(){
   const ul=document.getElementById("featureList");
   if(!ul) return; ul.innerHTML="";
@@ -300,23 +323,19 @@ export function renderPond(){
 
   pondItems.forEach(x=>{
     const rank = window.FF_getRankById ? window.FF_getRankById(x.id) : null;
-    const li=document.createElement("li"); li.className="list-item";
     const ownerId = `pond-owner-${x.id}`;
     const sinceId = `pond-since-${x.id}`;
+    const li=document.createElement("li"); li.className="list-item";
     li.innerHTML =
       thumb64(`${FF_CFG.SOURCE_PATH}/frog/${x.id}.png`,`Frog ${x.id}`)+
       `<div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <b>Frog #${x.id}</b>
-          ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`}
-        </div>
+        <div class="row gap8"><b>Frog #${x.id}</b> ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill pill-ghost">Rank N/A</span>`}</div>
         <div class="muted">Owner <span id="${ownerId}" class="addr">—</span></div>
         <div class="muted">Staked <span id="${sinceId}" class="muted">—</span></div>
       </div>`;
     li.style.cursor="pointer"; li.addEventListener("click",()=>openFrogInfo(x.id));
     ul.appendChild(li);
 
-    // Resolve owner + since via controller (best effort)
     (async ()=>{
       try{
         if(window.FF_getStakeInfo){
@@ -373,9 +392,9 @@ export function renderOwned(){
     li.innerHTML =
       thumb64(image || (`${FF_CFG.SOURCE_PATH}/frog/${id}.png`), `Frog ${id}`) +
       `<div>
-        <div style="display:flex;align-items:center;gap:8px;">
+        <div class="row gap8">
           <b>Frog #${id}</b>
-          ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`}
+          ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill pill-ghost">Rank N/A</span>`}
         </div>
         <div class="muted">Owned by <span class="addr">${shorten(getUser()||"")}</span></div>
       </div>
@@ -427,9 +446,7 @@ export async function fetchOwned(wallet, limit=50, nextStr){
 }
 
 /* =============== UNIFIED FEATURE TABS (Sales/Rarity/Pond) =============== */
-// Replace wireFeatureTabs + helpers with this slimmer version
 let currentFeatureView="sales";
-
 function applyFeatureControls(){
   const onSales=currentFeatureView==='sales';
   const onRarity=currentFeatureView==='rarity';
@@ -442,11 +459,10 @@ function applyFeatureControls(){
   if(sortRankBtn)  sortRankBtn.style.display  = onRarity ? "" : "none";
   if(sortScoreBtn) sortScoreBtn.style.display = onRarity ? "" : "none";
 }
-
 function setFeatureView(view){
   currentFeatureView=view;
   const wrap=document.getElementById('viewTabs');
-  wrap?.querySelectorAll('.tab').forEach(btn=>{
+  (wrap||document).querySelectorAll('.tab').forEach(btn=>{
     btn.setAttribute('aria-selected', btn.dataset.view===view ? 'true' : 'false');
   });
   if(view==='sales') renderSales();
@@ -454,7 +470,6 @@ function setFeatureView(view){
   else renderPond();
   applyFeatureControls();
 }
-
 export function wireFeatureTabs(){
   const wrap=document.getElementById('viewTabs');
   if(wrap && !wrap.querySelector('[data-view="pond"]')){
@@ -467,7 +482,6 @@ export function wireFeatureTabs(){
   });
   setFeatureView("sales");
 }
-
 export function wireFeatureButtons(){
   document.getElementById("refreshBtn")?.addEventListener("click",()=>renderSales());
   document.getElementById("fetchLiveBtn")?.addEventListener("click",()=>loadSalesLive());
