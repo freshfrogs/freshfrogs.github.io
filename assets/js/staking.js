@@ -56,23 +56,45 @@ export async function loadStaked(){
     const userToTokens = pickMethod(ctrl, [
       'getStakedTokens','tokensOfOwner','walletOfOwner','stakedTokens','tokenIdsOf'
     ]);
-    if(!userToTokens){
-      if(status) status.textContent='This controller does not expose per-user token listing. Use the Pond tab to view all staked.';
-      return;
-    }
 
-    status.textContent='Loading staked…';
-    let rows = await ctrl[userToTokens](user);
-
-    // Normalize rows → [{id, owner}]
-    let items=[];
-    if(Array.isArray(rows) && rows.length && typeof rows[0]==='object'){
-      items = rows.map(r=>({ id:Number(r.tokenId ?? r.id ?? r.toString?.()), owner:String(r.staker ?? r.owner ?? user) }))
-                  .filter(x=>Number.isFinite(x.id));
-    }else if(Array.isArray(rows)){
-      items = rows.map(v=>({ id:Number(v.toString()), owner:user })).filter(x=>Number.isFinite(x.id));
+    if(userToTokens){
+      // === Preferred fast path (contract supports per-user listing) ===
+      status.textContent='Loading staked…';
+      let rows = await ctrl[userToTokens](user);
+      let items=[];
+      if(Array.isArray(rows) && rows.length && typeof rows[0]==='object'){
+        items = rows.map(r=>({ id:Number(r.tokenId ?? r.id ?? r.toString?.()), owner:String(r.staker ?? r.owner ?? user) }))
+                    .filter(x=>Number.isFinite(x.id));
+      }else if(Array.isArray(rows)){
+        items = rows.map(v=>({ id:Number(v.toString()), owner:user })).filter(x=>Number.isFinite(x.id));
+      }
+      ST.items = items;
+    } else {
+      // === Fallback path (no per-user method): derive from Pond ===
+      status.textContent='Loading staked (fallback)…';
+      // ensure we have pondItems from UI (or fetch a page if empty)
+      if (!window.pondItems || !window.pondItems.length) {
+        // light fetch via UI helper if available
+        try { await window.loadPond?.(100); } catch {}
+      }
+      const all = (window.pondItems || []).slice(0, 400); // cap for performance
+      const whoFn = pickMethod(ctrl, ['stakerOf','stakerAddress']);
+      const out = [];
+      for (let i=0;i<all.length;i++){
+        const id = all[i].id;
+        try{
+          let st = null;
+          if (whoFn) st = await ctrl[whoFn](id);
+          if (!st && collection) st = await collection.ownerOf(id);
+          if (st && st.toLowerCase()===user.toLowerCase()){
+            out.push({ id, owner: st });
+          }
+        }catch{}
+        // yield to UI every ~20 to keep page responsive
+        if (i%20===0) await new Promise(r=>setTimeout(r,0));
+      }
+      ST.items = out;
     }
-    ST.items = items;
 
     // Rewards (optional)
     const rewardsFn = pickMethod(ctrl, ['availableRewards','pendingRewards','rewardsOf']);
@@ -99,7 +121,7 @@ export async function loadStaked(){
     if(status) status.textContent=`Owned/Staked ready • Staked: ${ST.items.length}`;
   }catch(err){
     console.warn(err);
-    if(status) status.textContent='Failed to load staked tokens (check ABI or use Pond tab).';
+    if(status) status.textContent='Could not load staked tokens (try Pond tab).';
   }
 }
 

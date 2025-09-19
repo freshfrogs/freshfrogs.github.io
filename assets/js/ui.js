@@ -101,52 +101,52 @@ async function openFrogInfo(id){
     fetchTokenDetails(id),
     (async()=>{ try{ return await (window.FF_getStakeInfo ? window.FF_getStakeInfo(id) : null); }catch{ return null; } })()
   ]);
+// Replace the openFrogInfo(id) building part (the S.innerHTML) with this:
+S.innerHTML = `
+  <div class="modal-card" style="position:relative;display:flex;flex-direction:column;gap:12px;background:transparent;box-shadow:none;">
+    <button class="btn btn-ghost modal-close" aria-label="Close" style="position:absolute;top:8px;right:8px;">×</button>
 
-  S.innerHTML = `
-    <div class="modal-card" style="position:relative;display:flex;flex-direction:column;gap:12px;">
-      <button class="btn btn-ghost modal-close" aria-label="Close" style="position:absolute;top:8px;right:8px;">×</button>
-
-      <div class="modal-left" style="background: var(--panel); border:1px solid var(--line); border-radius:12px; padding:10px; display:grid; place-items:center;">
-        <div id="modalComposite"
-             style="position:relative;width:512px;height:512px;max-width:100%;
-                    background: var(--surface);
-                    background-image: url('${FF_CFG.SOURCE_PATH}/frog/${id}.png');
-                    background-size: cover; background-position: center; border-radius:8px; overflow:hidden;">
-        </div>
-      </div>
-
-      <div class="modal-bottom" style="display:flex;flex-direction:column; gap:10px; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px;">
-        <h3 style="margin:0;">Frog #${id}</h3>
-        <div class="row" style="gap:8px;flex-wrap:wrap;">
-          ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`}
-          ${ stake?.staked ? `<span class="pill" title="${stake?.sinceText||''}">Staked</span>` : `<span class="pill pill-ghost">Unstaked</span>` }
-        </div>
-        <div class="meta grid2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;">
-          <div class="muted"><b>Owner:</b> ${tokenInfo.owner ? tokenInfo.owner.slice(0,6)+"…"+tokenInfo.owner.slice(-4) : "—"}</div>
-          <div class="muted"><b>Birthday:</b> ${
-            tokenInfo.birthdayMs ? (new Date(tokenInfo.birthdayMs)).toLocaleString() + ` (${formatAgo(Date.now()-tokenInfo.birthdayMs)} ago)` : "—"
-          }</div>
-          <div class="muted"><b>Staked since:</b> ${
-            (stake?.staked && stake?.sinceMs) ? (new Date(stake.sinceMs)).toLocaleString() + ` (${formatAgo(Date.now()-stake.sinceMs)} ago)` :
-            (stake?.staked ? (stake?.sinceText || "Yes") : "No")
-          }</div>
-        </div>
-
-        <div class="muted" style="max-height:220px;overflow:auto;border-top:1px dashed var(--line); padding-top:8px;">
-          ${
-            Array.isArray(meta?.attributes) && meta.attributes.length
-              ? meta.attributes.map(a => `${a.trait_type}: <b>${a.value}</b>`).join("<br>")
-              : "No attributes found."
-          }
-        </div>
-
-        <div class="row" style="gap:8px;">
-          <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://etherscan.io/nft/${FF_CFG.COLLECTION_ADDRESS}/${id}">Etherscan</a>
-          <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://opensea.io/assets/ethereum/${FF_CFG.COLLECTION_ADDRESS}/${id}">OpenSea</a>
-        </div>
+    <div class="modal-left" style="background: transparent; border:none; border-radius:12px; padding:0; display:grid; place-items:center;">
+      <div id="modalComposite"
+           style="position:relative;width:512px;height:512px;max-width:100%;
+                  background: var(--surface); /* simple theme surface, no still image */
+                  border-radius:12px; overflow:hidden;">
       </div>
     </div>
-  `;
+
+    <div class="modal-bottom" style="display:flex;flex-direction:column; gap:10px; background:transparent; border:none; border-radius:12px; padding:0;">
+      <div class="row" style="gap:8px;flex-wrap:wrap;">
+        <h3 style="margin:0;">Frog #${id}</h3>
+        ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`}
+        ${ stake?.staked ? `<span class="pill" title="${stake?.sinceText||''}">Staked</span>` : `<span class="pill pill-ghost">Unstaked</span>` }
+      </div>
+
+      <div class="meta grid2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;">
+        <div class="muted"><b>Owner:</b> ${tokenInfo.owner ? tokenInfo.owner.slice(0,6)+"…"+tokenInfo.owner.slice(-4) : "—"}</div>
+        <div class="muted"><b>Birthday:</b> ${
+          tokenInfo.birthdayMs ? (new Date(tokenInfo.birthdayMs)).toLocaleString() + ` (${formatAgo(Date.now()-tokenInfo.birthdayMs)} ago)` : "—"
+        }</div>
+        <div class="muted"><b>Staked since:</b> ${
+          (stake?.staked && stake?.sinceMs) ? (new Date(stake.sinceMs)).toLocaleString() + ` (${formatAgo(Date.now()-stake.sinceMs)} ago)` :
+          (stake?.staked ? (stake?.sinceText || "Yes") : "No")
+        }</div>
+      </div>
+
+      <div class="muted" style="max-height:220px;overflow:auto;border-top:1px dashed var(--line); padding-top:8px;">
+        ${
+          Array.isArray(meta?.attributes) && meta.attributes.length
+            ? meta.attributes.map(a => `${a.trait_type}: <b>${a.value}</b>`).join("<br>")
+            : "No attributes found."
+        }
+      </div>
+
+      <div class="row" style="gap:8px;">
+        <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://etherscan.io/nft/${FF_CFG.COLLECTION_ADDRESS}/${id}">Etherscan</a>
+        <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://opensea.io/assets/ethereum/${FF_CFG.COLLECTION_ADDRESS}/${id}">OpenSea</a>
+      </div>
+    </div>
+  </div>
+`;
 
   // Layered frog render on top of the background
   const mount = S.querySelector("#modalComposite");
@@ -292,6 +292,7 @@ export async function loadPond(limit=50, nextStr){
     }
   }
 }
+// Replace renderPond with this version
 export function renderPond(){
   const ul=document.getElementById("featureList");
   if(!ul) return; ul.innerHTML="";
@@ -299,27 +300,33 @@ export function renderPond(){
 
   pondItems.forEach(x=>{
     const rank = window.FF_getRankById ? window.FF_getRankById(x.id) : null;
-    const badge=(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`;
     const li=document.createElement("li"); li.className="list-item";
+    const ownerId = `pond-owner-${x.id}`;
     const sinceId = `pond-since-${x.id}`;
     li.innerHTML =
       thumb64(`${FF_CFG.SOURCE_PATH}/frog/${x.id}.png`,`Frog ${x.id}`)+
       `<div>
-        <div style="display:flex;align-items:center;gap:8px;"><b>Frog #${x.id}</b> ${badge}</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <b>Frog #${x.id}</b>
+          ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`}
+        </div>
+        <div class="muted">Owner <span id="${ownerId}" class="addr">—</span></div>
         <div class="muted">Staked <span id="${sinceId}" class="muted">—</span></div>
       </div>`;
     li.style.cursor="pointer"; li.addEventListener("click",()=>openFrogInfo(x.id));
     ul.appendChild(li);
 
-    // Optional: try to resolve "since" from controller if available
+    // Resolve owner + since via controller (best effort)
     (async ()=>{
       try{
         if(window.FF_getStakeInfo){
           const s = await window.FF_getStakeInfo(x.id);
-          const el=document.getElementById(sinceId);
-          if(!el) return;
-          if(s?.sinceMs) el.textContent = (new Date(s.sinceMs)).toLocaleString() + ` (${formatAgo(Date.now()-s.sinceMs)} ago)`;
-          else if (s?.sinceText) el.textContent = s.sinceText;
+          const o=document.getElementById(ownerId), t=document.getElementById(sinceId);
+          if(o && s?.staker) o.textContent = s.staker.slice(0,6)+'…'+s.staker.slice(-4);
+          if(t){
+            if(s?.sinceMs) t.textContent = (new Date(s.sinceMs)).toLocaleString() + ` (${formatAgo(Date.now()-s.sinceMs)} ago)`;
+            else if (s?.sinceText) t.textContent = s.sinceText;
+          }
         }
       }catch{}
     })();
@@ -420,11 +427,12 @@ export async function fetchOwned(wallet, limit=50, nextStr){
 }
 
 /* =============== UNIFIED FEATURE TABS (Sales/Rarity/Pond) =============== */
+// Replace wireFeatureTabs + helpers with this slimmer version
 let currentFeatureView="sales";
+
 function applyFeatureControls(){
   const onSales=currentFeatureView==='sales';
   const onRarity=currentFeatureView==='rarity';
-  const onPond=currentFeatureView==='pond';
   const refreshBtn=document.getElementById("refreshBtn");
   const fetchLiveBtn=document.getElementById("fetchLiveBtn");
   const sortRankBtn=document.getElementById("sortRankBtn");
@@ -433,31 +441,33 @@ function applyFeatureControls(){
   if(fetchLiveBtn) fetchLiveBtn.style.display = onSales ? "" : "none";
   if(sortRankBtn)  sortRankBtn.style.display  = onRarity ? "" : "none";
   if(sortScoreBtn) sortScoreBtn.style.display = onRarity ? "" : "none";
-  // Pond uses the same list area; "Load more" button is created dynamically in loadPond()
 }
+
 function setFeatureView(view){
   currentFeatureView=view;
   const wrap=document.getElementById('viewTabs');
-  const idxMap = {sales:0, rarity:1, pond:2};
-  wrap?.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected', t.dataset.view===view?'true':'false'));
-  wrap?.style?.setProperty('--tab-i', idxMap[view] ?? 0);
+  wrap?.querySelectorAll('.tab').forEach(btn=>{
+    btn.setAttribute('aria-selected', btn.dataset.view===view ? 'true' : 'false');
+  });
   if(view==='sales') renderSales();
   else if(view==='rarity') renderRarity();
   else renderPond();
   applyFeatureControls();
 }
+
 export function wireFeatureTabs(){
-  const tabsWrap=document.getElementById('viewTabs');
-  if(tabsWrap && !tabsWrap.querySelector('[data-view="pond"]')){
+  const wrap=document.getElementById('viewTabs');
+  if(wrap && !wrap.querySelector('[data-view="pond"]')){
     const btn=document.createElement('button');
     btn.className='tab'; btn.dataset.view='pond'; btn.textContent='Pond';
-    tabsWrap.appendChild(btn);
+    wrap.appendChild(btn);
   }
-  (tabsWrap||document).querySelectorAll(".tab").forEach(btn=>{
-    btn.addEventListener("click",()=>setFeatureView(btn.dataset.view));
+  (wrap||document).querySelectorAll('.tab').forEach(btn=>{
+    btn.addEventListener('click',()=>setFeatureView(btn.dataset.view));
   });
   setFeatureView("sales");
 }
+
 export function wireFeatureButtons(){
   document.getElementById("refreshBtn")?.addEventListener("click",()=>renderSales());
   document.getElementById("fetchLiveBtn")?.addEventListener("click",()=>loadSalesLive());
