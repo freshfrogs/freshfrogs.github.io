@@ -1,12 +1,1 @@
-(function(){
-  const KEY="ff_theme",root=document.documentElement;
-  function applyTheme(t){
-    root.setAttribute("data-theme",t);
-    document.querySelectorAll('.theme-dock .swatch').forEach(b=>{
-      b.setAttribute('aria-current', b.dataset.theme===t ? 'true' : 'false');
-    });
-    localStorage.setItem(KEY,t);
-  }
-  applyTheme(localStorage.getItem(KEY) || root.getAttribute('data-theme') || 'noir');
-  document.querySelectorAll('.theme-dock .swatch').forEach(btn=>btn.addEventListener('click', ()=> applyTheme(btn.dataset.theme)));
-})();
+(function(){const K="ff_theme",r=document.documentElement;function a(t){r.setAttribute("data-theme",t);document.querySelectorAll(".theme-dock .swatch").forEach(b=>b.setAttribute("aria-current",b.dataset.theme===t?"true":"false"));localStorage.setItem(K,t)}a(localStorage.getItem(K)||r.getAttribute("data-theme")||"noir");document.querySelectorAll(".theme-dock .swatch").forEach(b=>b.addEventListener("click",()=>a(b.dataset.theme)));})();

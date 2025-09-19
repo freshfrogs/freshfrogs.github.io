@@ -4,7 +4,8 @@
 
   function renderStakeListOwned(){
     const wrap=document.getElementById('chipWrap'); if(!wrap) return;
-    const list=document.createElement('ul'); list.className='card-list'; wrap.innerHTML=''; wrap.appendChild(list);
+    const list=document.createElement('ul'); list.className='card-list list-scroll5';
+    wrap.innerHTML=''; wrap.appendChild(list);
 
     const user = window.FF_getUser();
     if(!user){ list.innerHTML='<li class="list-item"><div class="muted">Connect your wallet to view owned tokens.</div></li>'; return; }
@@ -48,14 +49,10 @@
       heldTokens = heldTokens.concat(items);
       heldContinuation = data.continuation || '';
 
-      // render
       if(window.FF_getTab && window.FF_getTab()==='owned') renderStakeListOwned();
-
-      // status
       const ss=document.getElementById('stakeStatus');
       ss.textContent = `Owned: ${heldTokens.length}` + (heldContinuation ? ' • more available' : '');
 
-      // load more button
       const anchor = document.getElementById('stakeControls');
       let btn = document.getElementById('heldMoreBtn');
       if(!heldContinuation){ if(btn) btn.remove(); }
@@ -73,7 +70,6 @@
     }
   }
 
-  // controls
   document.getElementById('refreshOwned')?.addEventListener('click', ()=>{
     const u = window.FF_getUser();
     if(!u){ document.getElementById('stakeStatus').textContent='Connect a wallet first.'; return; }
@@ -82,7 +78,6 @@
   document.getElementById('selectAll')?.addEventListener('click',()=>{ document.getElementById('stakeStatus').textContent='Selected all visible tokens (demo).'; });
   document.getElementById('clearSel')?.addEventListener('click',()=>{ document.getElementById('stakeStatus').textContent='Cleared selection (demo).'; });
 
-  // expose
   window.FF_fetchOwned = fetchOwned;
   window.FF_renderOwned = renderStakeListOwned;
   window.FF_clearOwned = ()=>{ heldTokens=[]; heldContinuation=''; if(window.FF_getTab && window.FF_getTab()==='owned') renderStakeListOwned(); };
