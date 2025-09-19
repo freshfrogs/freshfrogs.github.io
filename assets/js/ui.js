@@ -55,7 +55,7 @@ async function fetchTokenDetails(id){
   }
 }
 
-/* =============== INFO MODAL (layered, 512×512, clean chrome) =============== */
+/* =============== INFO MODAL (layered, 512×512, stretched PNG bg) =============== */
 const LAYER_ORDER = [
   "Background",
   "Frog", "SpecialFrog", "Trait",
@@ -67,38 +67,6 @@ const LAYER_ORDER = [
   "Foreground"
 ];
 const LZ = Object.fromEntries(LAYER_ORDER.map((k,i)=>[k,(i+1)*10]));
-
-// Dominant-color sampler (no still PNG in the stack)
-async function setModalBgFromPNG(tokenId, el) {
-  const img = new Image();
-  img.src = `${FF_CFG.SOURCE_PATH}/frog/${tokenId}.png`;
-  await (img.decode?.() || new Promise((res, rej)=>{ img.onload=res; img.onerror=rej; }));
-
-  const size = 24;
-  const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = size;
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
-  ctx.drawImage(img, 0, 0, size, size);
-  const { data } = ctx.getImageData(0, 0, size, size);
-
-  const rows = [];
-  for (let i = 0; i < data.length; i += 4) {
-    const a = data[i+3]; if (a < 10) continue;
-    const r = data[i], g = data[i+1], b = data[i+2];
-    const lum = 0.2126*r + 0.7152*g + 0.0722*b;
-    rows.push({ r, g, b, lum });
-  }
-  if (!rows.length) return;
-  rows.sort((a,b)=>a.lum-b.lum);
-  const lo = Math.floor(rows.length*0.10);
-  const hi = Math.floor(rows.length*0.90);
-  let R=0,G=0,B=0,n=0;
-  for (let i=lo;i<hi;i++){ R+=rows[i].r; G+=rows[i].g; B+=rows[i].b; n++; }
-  if (n) {
-    R=Math.round(R/n); G=Math.round(G/n); B=Math.round(B/n);
-    el.style.background = `linear-gradient(180deg, rgba(${R},${G},${B},0.95), rgba(${R},${G},${B},0.85))`;
-  }
-}
 
 function buildLayer(trait_type, attribute, mountEl){
   const img=document.createElement("img");
@@ -171,10 +139,16 @@ async function openFrogInfo(id){
     </div>
   `;
 
-  // 512×512 layered render with color-matched background (no still PNG in layers)
+  // 512×512 layered render with stretched PNG as color-only background
   const mount = S.querySelector("#modalComposite");
   if (mount) {
-    try { await setModalBgFromPNG(id, mount); } catch {}
+    // 1) Background layer: stretch the still PNG so only its color field is visible
+    const bg = document.createElement("div");
+    bg.className = "modal-bg-img";
+    bg.style.backgroundImage = `url("${FF_CFG.SOURCE_PATH}/frog/${id}.png")`;
+    mount.appendChild(bg); // goes under trait layers
+
+    // 2) Layer the traits (with GIFs when available)
     if (Array.isArray(meta?.attributes)) {
       const ordered = meta.attributes.slice().sort((a,b)=>{
         const ai=LAYER_ORDER.indexOf(a.trait_type), bi=LAYER_ORDER.indexOf(b.trait_type);
@@ -182,14 +156,15 @@ async function openFrogInfo(id){
       });
       ordered.forEach(a => buildLayer(a.trait_type, a.value, mount));
     } else {
+      // Fallback: plain image (on top of the color field)
       const img=document.createElement("img");
       img.src=`${FF_CFG.SOURCE_PATH}/frog/${id}.png`;
-      Object.assign(img.style,{position:"absolute",inset:"0",width:"100%",height:"100%",objectFit:"contain",imageRendering:"pixelated"});
+      Object.assign(img.style,{position:"absolute",inset:"0",width:"100%",height:"100%",objectFit:"contain",imageRendering:"pixelated",zIndex:"200"});
       mount.appendChild(img);
     }
   }
 
-  // Wire close & show
+  // Close handlers
   S.querySelector(".modal-close")?.addEventListener("click", ()=>{ L.style.display="none"; document.body.style.overflow=""; });
   L.style.display="grid"; document.body.style.overflow="hidden";
   const backdropClose=(ev)=>{ if(ev.target===L){ L.style.display="none"; document.body.style.overflow=""; L.removeEventListener("click",backdropClose);} };
