@@ -75,3 +75,20 @@ footer.site{border-top:1px solid var(--ring);padding:26px 0;color:var(--muted);m
 .btn-sm{padding:.48rem .7rem;border-radius:8px;font-weight:700}
 .btn-lg{padding:.85rem 1.1rem;font-size:1.05rem}
 .icon-btn{width:40px;height:40px;border-radius:8px;display:inline-grid;place-items:center;border:1px solid color-mix(in srgb, var(--ink) 12%, transparent);background:var(--panel);color:var(--ink)}
+/* Show ~5 cards tall, then scroll */
+.list-scroll5{
+  /* each row ≈ 64px thumb + vertical padding/border/margins -> ~92–100px */
+  max-height: 500px;     /* tweak to taste */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* (Optional) nicer scrollbar on WebKit */
+.list-scroll5::-webkit-scrollbar{ width: 10px }
+.list-scroll5::-webkit-scrollbar-thumb{
+  background: color-mix(in srgb, var(--ink) 18%, transparent);
+  border-radius: 8px;
+}
+.list-scroll5::-webkit-scrollbar-track{
+  background: color-mix(in srgb, var(--panel-2) 70%, transparent);
+}
