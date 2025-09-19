@@ -70,27 +70,40 @@ function buildTrait(trait_type, attribute, mountEl){
   probe.src=gif;
   mountEl.appendChild(img);
 }
-export async function renderGrid(){
-  const g=document.getElementById("grid"); if(!g) return;
-  const L=document.getElementById("lightbox"), S=document.getElementById("lightboxStage");
-  const ids=(n)=>{ const s=new Set(); while(s.size<n) s.add(1+Math.floor(Math.random()*FF_CFG.SUPPLY)); return [...s]; };
-  g.innerHTML="";
-  for(const id of ids(9)){
-    const t=document.createElement("div"); t.className="tile";
-    const cont=document.createElement("div"); cont.id=`index-card-img-cont-${id}`; cont.className="index-card-img-cont";
-    t.appendChild(cont); g.appendChild(t);
-    try{
-      const meta=await loadMetadata(id);
-      const attrs=Array.isArray(meta?.attributes)?meta.attributes:[];
-      for(const a of attrs){ buildTrait(a.trait_type, a.value, cont); }
-    }catch{
-      cont.innerHTML = `<img class="trait_overlay" src="${FF_CFG.SOURCE_PATH}/frog/${id}.png" alt="Frog #${id}" loading="lazy">`;
-    }
-    t.style.cursor="pointer";
-    t.addEventListener("click",()=>openFrogInfo(id));
+// Simple, non-clickable, static image grid
+export function renderGrid() {
+  const g = document.getElementById("grid");
+  if (!g) return;
+
+  // helper: pick N unique random IDs
+  const pickIds = (n) => {
+    const s = new Set();
+    while (s.size < n) s.add(1 + Math.floor(Math.random() * FF_CFG.SUPPLY));
+    return [...s];
+  };
+
+  g.innerHTML = "";
+  const picks = pickIds(9);
+
+  for (const id of picks) {
+    const tile = document.createElement("div");
+    tile.className = "tile";
+
+    const img = document.createElement("img");
+    img.src = `${FF_CFG.SOURCE_PATH}/frog/${id}.png`;
+    img.alt = `Frog #${id}`;
+    img.loading = "lazy";
+    img.decoding = "async";
+    img.style.imageRendering = "pixelated";
+    img.style.width = "100%";
+    img.style.height = "100%";
+    img.style.objectFit = "cover"; // or "contain" if you prefer full frog in frame
+
+    tile.appendChild(img);
+    g.appendChild(tile);
   }
-  if(L){ L.addEventListener("click",()=>{L.style.display="none";},{once:true}); }
 }
+
 
 /* ================= SALES (Reservoir) =============== */
 let salesCache=[];
