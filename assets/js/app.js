@@ -389,3 +389,16 @@ window.FF = window.FF || {};
     window.FF_loadStaked?.();
   }
 })();
+function FF_round18(weiLike){
+  const S = 10n**18n;
+  const n = BigInt(weiLike.toString());
+  return ((n + S/2n) / S).toString();
+}
+window.FF_round18 = FF_round18;
+
+function FF_setRewardsAvailable(weiLike){
+  const v = FF_round18(weiLike);
+  (document.getElementById('rewardsAvailable') || document.querySelector('[data-rewards-available]'))?.textContent = v;
+  return v;
+}
+window.FF_setRewardsAvailable = FF_setRewardsAvailable;
