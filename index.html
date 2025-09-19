@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FreshFrogs — Wallet, Sales, Rarity, Staking</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Grotesk:wght@600;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js" crossorigin="anonymous"></script>
-  
   <link rel="stylesheet" href="assets/css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
 <header class="site">
@@ -36,6 +35,8 @@
         <a class="btn btn-solid btn-lg" href="#trade">🐸 Mint & Staking</a>
         <a class="btn btn-outline" href="https://freshfrogs.github.io/" target="_blank" rel="noopener">Original Site</a>
       </div>
+
+      <!-- Local JSON loader appears only when testing via file:// -->
       <div id="localLoad" class="muted" style="margin-top:8px;display:none;">
         <div><b>Testing locally?</b> Load your rarity JSON:</div>
         <div class="row" style="margin-top:6px">
@@ -45,6 +46,7 @@
         <div style="font-size:.9rem;margin-top:4px">Pick <code>assets/freshfrogs_rarity_rankings.json</code></div>
       </div>
     </div>
+
     <div id="gallery"><div class="gallery" id="grid"></div></div>
   </section>
 
@@ -85,7 +87,6 @@
       <p id="mintStatus" class="muted">Status: ready (demo)</p>
     </div>
 
-    <!-- My Frogs panel height & scrolling now matches Sales/Rarity -->
     <div class="panel stack same-height" aria-label="Staking">
       <div class="row" style="justify-content:space-between">
         <div>
@@ -99,7 +100,6 @@
           <button class="tab" id="tabStaked" role="tab" aria-selected="false" aria-controls="chipWrap">Staked</button>
         </div>
       </div>
-      <!-- unified scroll container -->
       <ul id="chipWrap" class="card-list list-scroll" aria-live="polite"></ul>
 
       <div class="row" id="stakeControls" style="gap:8px;">
@@ -169,14 +169,13 @@
   <div id="lightboxStage" class="stage"></div>
 </div>
 
-<!-- Theme chooser (Noir + Pastel) -->
+<!-- Theme chooser -->
 <div class="theme-dock" role="toolbar" aria-label="Theme chooser">
   <button class="swatch sw-noir"   data-theme="noir"   title="Noir"></button>
   <button class="swatch sw-pastel" data-theme="pastel" title="Pastel"></button>
 </div>
 
-
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/app.js"></script>
+<!-- Boot via ES modules -->
+<script type="module" src="assets/js/main.js"></script>
 </body>
 </html>
