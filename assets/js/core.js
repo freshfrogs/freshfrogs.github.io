@@ -13,32 +13,46 @@ export const FF_CFG = {
   }
 };
 
+// ===== THEME =====
+export function initTheme(){
+  const K="ff_theme",root=document.documentElement;
+  function set(t){
+    root.setAttribute("data-theme",t);
+    document.querySelectorAll(".theme-dock .swatch")
+      .forEach(s=>s.setAttribute("aria-current",s.dataset.theme===t?"true":"false"));
+    localStorage.setItem(K,t);
+  }
+  set(localStorage.getItem(K)||root.getAttribute("data-theme")||"noir");
+  document.querySelectorAll(".theme-dock .swatch").forEach(s=>{
+    s.addEventListener("click",()=>set(s.dataset.theme));
+  });
+}
+
 // ===== UTILS =====
 export const shorten = a => a ? (a.slice(0,6) + "…" + a.slice(-4)) : "";
-export const thumb64 = (src, alt) => `<img class="thumb64" src="${src}" alt="${alt}" width="64" height="64" loading="lazy">`;
+export const thumb64 = (src, alt) =>
+  `<img class="thumb64" src="${src}" alt="${alt}" width="64" height="64" loading="lazy">`;
+export const fetchJSON = async (p)=>{ const r=await fetch(p,{cache:"no-store"}); if(!r.ok) throw new Error(r.status); return r.json(); };
+export const isLocal = ()=> location.protocol === "file:";
 export const formatAgo = (ms)=>{
   const s=Math.floor(ms/1e3); if(s<60) return s+"s";
   const m=Math.floor(s/60);   if(m<60) return m+"m";
   const h=Math.floor(m/60);   if(h<24) return h+"h";
   const d=Math.floor(h/24);   return d+"d";
 };
-export const fetchJSON = async (p)=>{ const r=await fetch(p,{cache:"no-store"}); if(!r.ok) throw new Error(r.status); return r.json(); };
-export const isLocal = ()=> location.protocol === "file:";
-
-// ===== THEME =====
-export function initTheme(){
-  const K="ff_theme",root=document.documentElement;
-  function set(t){
-    root.setAttribute("data-theme",t);
-    document.querySelectorAll(".theme-dock .swatch").forEach(s=>s.setAttribute("aria-current",s.dataset.theme===t?"true":"false"));
-    localStorage.setItem(K,t);
-  }
-  set(localStorage.getItem(K)||root.getAttribute("data-theme")||"noir");
-  document.querySelectorAll(".theme-dock .swatch").forEach(s=>s.addEventListener("click",()=>set(s.dataset.theme)));
+export async function loadABI(path, fallback){
+  try{
+    if(!path) throw 0;
+    const res=await fetch(path,{cache:"no-store"});
+    if(!res.ok) throw 0;
+    const json=await res.json();
+    if(Array.isArray(json)) return json;
+    if(json && Array.isArray(json.abi)) return json.abi;
+    throw 0;
+  }catch{ return fallback; }
 }
 
-// ===== Reservoir Sales API =====
-const salesHeaders = ()=> ({ accept:"*/*", "x-api-key": FF_CFG.FROG_API_KEY });
+// ===== Reservoir Sales helpers =====
 const addr = (s)=>{
   const c=s?.toAddress||s?.to?.address||s?.to;
   if(!c) return "—";
@@ -64,22 +78,7 @@ export async function fetchSales({limit=50,continuation=""}={}){
   const base="https://api.reservoir.tools/sales/v6";
   const q=new URLSearchParams({collection:FF_CFG.COLLECTION_ADDRESS,limit:String(limit),sortBy:"time",sortDirection:"desc"});
   if(continuation) q.set("continuation",continuation);
-  const r=await fetch(base+"?"+q.toString(),{method:"GET",headers:salesHeaders()});
+  const r=await fetch(base+"?"+q.toString(),{method:"GET",headers:{accept:"*/*","x-api-key":FF_CFG.FROG_API_KEY}});
   if(!r.ok) throw new Error(r.status);
   return r.json();
-}
-
-// ===== ABI loader (with fallback) =====
-export async function loadABI(path, fallback){
-  try{
-    if(!path) throw 0;
-    const res=await fetch(path,{cache:"no-store"});
-    if(!res.ok) throw 0;
-    const json=await res.json();
-    if(Array.isArray(json)) return json;
-    if(json && Array.isArray(json.abi)) return json.abi;
-    throw 0;
-  }catch{
-    return fallback;
-  }
 }
