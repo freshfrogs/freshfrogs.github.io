@@ -1,10 +1,14 @@
+// assets/js/ui.js
 import {
   FF_CFG, shorten, thumb64, fetchJSON, isLocal,
   mapSales, fetchSales, loadABIFromScript, formatAgo
 } from "./core.js";
 
-/* =============== RARITY STORE =============== */
+/* =========================================================
+   RARITY STORE
+   ========================================================= */
 let RARITY_LIST = null, RANK_LOOK = null, sortBy = "rank";
+
 function setRarityList(arr){
   RARITY_LIST = arr;
   RANK_LOOK = Object.fromEntries(
@@ -20,8 +24,17 @@ function sortedRarity(){
   else a.sort((x,y)=>Number(x.ranking??x.rank??1e9)-Number(y.ranking??y.rank??1e9));
   return a;
 }
+export async function loadRarity(){
+  if(!isLocal()){
+    try{ const arr=await fetchJSON(FF_CFG.JSON_PATH); if(Array.isArray(arr)) setRarityList(arr); }catch{}
+  }
+  renderRarity();
+}
+export function setRaritySort(mode){ sortBy=mode; renderRarity(); }
 
-/* =============== OWNER FALLBACK (collection ABI) =============== */
+/* =========================================================
+   CHAIN FALLBACKS FOR TOKEN DETAILS (owner / birthday)
+   ========================================================= */
 async function ownerOfViaChain(id){
   try{
     if(!window.ethereum) return null;
@@ -34,8 +47,6 @@ async function ownerOfViaChain(id){
     return addr || null;
   }catch{ return null; }
 }
-
-/* =============== TOKEN DETAILS (Reservoir + fallback) =============== */
 async function fetchTokenDetails(id){
   try{
     const params = new URLSearchParams({ tokens: `${FF_CFG.COLLECTION_ADDRESS}:${id}` });
@@ -55,7 +66,9 @@ async function fetchTokenDetails(id){
   }
 }
 
-/* =============== INFO MODAL (layered, 512×512, stretched PNG bg) =============== */
+/* =========================================================
+   FROG INFO MODAL (layered, 512×512, PNG as bg color)
+   ========================================================= */
 const LAYER_ORDER = [
   "Background",
   "Frog", "SpecialFrog", "Trait",
@@ -77,11 +90,14 @@ function buildLayer(trait_type, attribute, mountEl){
   });
   const png=`${FF_CFG.SOURCE_PATH}/frog/build_files/${trait_type}/${attribute}.png`;
   img.src=png;
+
+  // Prefer GIF animation if available, except where you’ve excluded in CSS/logic
   const gif=`${FF_CFG.SOURCE_PATH}/frog/build_files/${trait_type}/animations/${attribute}_animation.gif`;
   const probe=new Image();
   probe.onload=()=>{ img.src=gif; };
   probe.onerror=()=>{};
   probe.src=gif;
+
   mountEl.appendChild(img);
 }
 
@@ -139,16 +155,20 @@ async function openFrogInfo(id){
     </div>
   `;
 
-  // 512×512 layered render with stretched PNG as color-only background
+  // 512×512 layered render with the still PNG as a CSS bg (zoomed bottom-right so only color shows)
   const mount = S.querySelector("#modalComposite");
   if (mount) {
-    // 1) Background layer: stretch the still PNG so only its color field is visible
+    // Background layer
     const bg = document.createElement("div");
     bg.className = "modal-bg-img";
     bg.style.backgroundImage = `url("${FF_CFG.SOURCE_PATH}/frog/${id}.png")`;
-    mount.appendChild(bg); // goes under trait layers
+    // Ensure strong zoom (CSS provides default var, but we can enforce here per-token)
+    bg.style.setProperty('--modal-bg-zoom', '7000%');
+    // Anchor bottom-right so the flat color corner fills the frame
+    bg.style.backgroundPosition = "100% 100%";
+    mount.appendChild(bg); // sits under trait layers
 
-    // 2) Layer the traits (with GIFs when available)
+    // Trait layers (prefer GIFs when available)
     if (Array.isArray(meta?.attributes)) {
       const ordered = meta.attributes.slice().sort((a,b)=>{
         const ai=LAYER_ORDER.indexOf(a.trait_type), bi=LAYER_ORDER.indexOf(b.trait_type);
@@ -156,7 +176,7 @@ async function openFrogInfo(id){
       });
       ordered.forEach(a => buildLayer(a.trait_type, a.value, mount));
     } else {
-      // Fallback: plain image (on top of the color field)
+      // Fallback: plain image (on top of bg color field)
       const img=document.createElement("img");
       img.src=`${FF_CFG.SOURCE_PATH}/frog/${id}.png`;
       Object.assign(img.style,{position:"absolute",inset:"0",width:"100%",height:"100%",objectFit:"contain",imageRendering:"pixelated",zIndex:"200"});
@@ -164,7 +184,7 @@ async function openFrogInfo(id){
     }
   }
 
-  // Close handlers
+  // Close behaviors
   S.querySelector(".modal-close")?.addEventListener("click", ()=>{ L.style.display="none"; document.body.style.overflow=""; });
   L.style.display="grid"; document.body.style.overflow="hidden";
   const backdropClose=(ev)=>{ if(ev.target===L){ L.style.display="none"; document.body.style.overflow=""; L.removeEventListener("click",backdropClose);} };
@@ -172,7 +192,9 @@ async function openFrogInfo(id){
 }
 window.FF_openFrogInfo = openFrogInfo;
 
-/* =============== GRID (simple static images) =============== */
+/* =========================================================
+   GRID (simple static images)
+   ========================================================= */
 export function renderGrid(){
   const g=document.getElementById("grid"); if(!g) return;
   g.innerHTML="";
@@ -190,7 +212,9 @@ export function renderGrid(){
   }
 }
 
-/* =============== SALES (Reservoir) =============== */
+/* =========================================================
+   SALES (Reservoir)
+   ========================================================= */
 let salesCache=[];
 export function renderSales(list=salesCache){
   const ul=document.getElementById("featureList");
@@ -221,7 +245,9 @@ export async function loadSalesLive(){
   }catch(e){ console.warn("Sales fetch failed",e); return false; }
 }
 
-/* =============== RARITY UI =============== */
+/* =========================================================
+   RARITY LIST UI
+   ========================================================= */
 export function renderRarity(){
   const ul=document.getElementById("featureList");
   if(!ul) return; ul.innerHTML="";
@@ -241,15 +267,10 @@ export function renderRarity(){
     ul.appendChild(li);
   });
 }
-export async function loadRarity(){
-  if(!isLocal()){
-    try{ const arr=await fetchJSON(FF_CFG.JSON_PATH); if(Array.isArray(arr)) setRarityList(arr); }catch{}
-  }
-  renderRarity();
-}
-export function setRaritySort(mode){ sortBy=mode; renderRarity(); }
 
-/* =============== POND (All currently staked via controller address) =============== */
+/* =========================================================
+   POND (controller-held / currently staked)
+   ========================================================= */
 export let pondItems=[], pondContinuation='';
 export async function loadPond(limit=50, nextStr){
   try{
@@ -327,7 +348,9 @@ export function renderPond(){
   });
 }
 
-/* =============== WALLET + OWNED =============== */
+/* =========================================================
+   WALLET + OWNED LIST
+   ========================================================= */
 let currentUser=null;
 function setWalletUI(a){
   const l=document.getElementById("walletLabel"), b=document.getElementById("connectBtn");
@@ -420,7 +443,9 @@ export async function fetchOwned(wallet, limit=50, nextStr){
   }
 }
 
-/* =============== UNIFIED FEATURE TABS (Sales/Rarity/Pond) =============== */
+/* =========================================================
+   UNIFIED FEATURE TABS (Sales / Rarity / Pond)
+   ========================================================= */
 let currentFeatureView="sales";
 function applyFeatureControls(){
   const onSales=currentFeatureView==='sales';
@@ -470,7 +495,9 @@ export function wireFeatureButtons(){
   });
 }
 
-/* =============== TAB GETTER for staking.js =============== */
+/* =========================================================
+   TAB GETTER BRIDGE (for staking.js to ask current tab)
+   ========================================================= */
 let _getTab = ()=>'owned';
 export function setTabGetter(fn){ _getTab = fn; }
-function getTab(){ return _getTab(); } // not exported
+function getTab(){ return _getTab(); } // internal
