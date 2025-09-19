@@ -2,7 +2,7 @@ import { initTheme, FF_CFG } from "./core.js";
 import {
   renderGrid, renderSales, loadSalesLive, loadRarity,
   renderRarity, initWallet, clearOwned, fetchOwned,
-  wireFeatureButtons, wireFeatureTabs
+  wireFeatureButtons, wireFeatureTabs, loadPond
 } from "./ui.js";
 import { wireStakingUI, setTab, loadStaked } from "./staking.js";
 
@@ -21,6 +21,9 @@ wireStakingUI();
   const b = document.getElementById("fetchLiveBtn");
   if (ok && b) { b.textContent = "Live loaded"; b.disabled = true; b.classList.add("btn-ghost"); }
   renderSales();
+
+  // Pond initial page
+  await loadPond(50);
 
   // Grid (simple static images)
   renderGrid();

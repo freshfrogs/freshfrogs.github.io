@@ -1,5 +1,5 @@
 import {
-  FF_CFG, initTheme as _noUse, shorten, thumb64, fetchJSON, isLocal,
+  FF_CFG, shorten, thumb64, fetchJSON, isLocal,
   mapSales, fetchSales, loadABIFromScript, formatAgo
 } from "./core.js";
 
@@ -54,7 +54,7 @@ async function fetchTokenDetails(id){
   }
 }
 
-/* =============== INFO MODAL (layered+animated) =============== */
+/* =============== INFO MODAL (layered+animated, 512×512, info bottom) =============== */
 const LAYER_ORDER = [
   "Background",
   "Frog", "SpecialFrog", "Trait",
@@ -103,21 +103,25 @@ async function openFrogInfo(id){
   ]);
 
   S.innerHTML = `
-    <div class="modal-card" style="display:grid;grid-template-columns: 1.1fr 1fr; gap:16px; position:relative;">
+    <div class="modal-card" style="position:relative;display:flex;flex-direction:column;gap:12px;">
       <button class="btn btn-ghost modal-close" aria-label="Close" style="position:absolute;top:8px;right:8px;">×</button>
 
-      <div class="modal-left" style="background: var(--panel); border:1px solid var(--line); border-radius:12px; padding:8px; display:grid; place-items:center; min-height:320px;">
-        <div id="modalComposite" style="position:relative;width:100%;aspect-ratio:1/1;max-width:420px;"></div>
+      <div class="modal-left" style="background: var(--panel); border:1px solid var(--line); border-radius:12px; padding:10px; display:grid; place-items:center;">
+        <div id="modalComposite"
+             style="position:relative;width:512px;height:512px;max-width:100%;
+                    background: var(--surface);
+                    background-image: url('${FF_CFG.SOURCE_PATH}/frog/${id}.png');
+                    background-size: cover; background-position: center; border-radius:8px; overflow:hidden;">
+        </div>
       </div>
 
-      <div class="modal-right" style="display:flex;flex-direction:column; gap:10px;">
+      <div class="modal-bottom" style="display:flex;flex-direction:column; gap:10px; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px;">
         <h3 style="margin:0;">Frog #${id}</h3>
         <div class="row" style="gap:8px;flex-wrap:wrap;">
           ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`}
           ${ stake?.staked ? `<span class="pill" title="${stake?.sinceText||''}">Staked</span>` : `<span class="pill pill-ghost">Unstaked</span>` }
         </div>
-
-        <div class="stack" style="gap:6px;">
+        <div class="meta grid2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;">
           <div class="muted"><b>Owner:</b> ${tokenInfo.owner ? tokenInfo.owner.slice(0,6)+"…"+tokenInfo.owner.slice(-4) : "—"}</div>
           <div class="muted"><b>Birthday:</b> ${
             tokenInfo.birthdayMs ? (new Date(tokenInfo.birthdayMs)).toLocaleString() + ` (${formatAgo(Date.now()-tokenInfo.birthdayMs)} ago)` : "—"
@@ -136,7 +140,7 @@ async function openFrogInfo(id){
           }
         </div>
 
-        <div class="row" style="gap:8px;margin-top:auto;">
+        <div class="row" style="gap:8px;">
           <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://etherscan.io/nft/${FF_CFG.COLLECTION_ADDRESS}/${id}">Etherscan</a>
           <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://opensea.io/assets/ethereum/${FF_CFG.COLLECTION_ADDRESS}/${id}">OpenSea</a>
         </div>
@@ -144,7 +148,7 @@ async function openFrogInfo(id){
     </div>
   `;
 
-  // Layered frog render
+  // Layered frog render on top of the background
   const mount = S.querySelector("#modalComposite");
   if (mount) {
     if (Array.isArray(meta?.attributes)) {
@@ -190,7 +194,7 @@ export function renderGrid(){
 /* =============== SALES (Reservoir) =============== */
 let salesCache=[];
 export function renderSales(list=salesCache){
-  const ul=document.getElementById("recentSales")||document.getElementById("featureList");
+  const ul=document.getElementById("featureList");
   if(!ul) return; ul.innerHTML="";
   const arr=(list&&list.length)?list:[{id:3250,time:"3m",price:"0.080 ETH",buyer:"0x9a…D1"}];
   arr.forEach(x=>{
@@ -220,7 +224,7 @@ export async function loadSalesLive(){
 
 /* =============== RARITY UI =============== */
 export function renderRarity(){
-  const ul=document.getElementById("rarityList")||document.getElementById("featureList");
+  const ul=document.getElementById("featureList");
   if(!ul) return; ul.innerHTML="";
   const data=sortedRarity();
   if(!data.length){ ul.innerHTML='<li class="list-item"><div class="muted">No data yet</div></li>'; return; }
@@ -245,6 +249,82 @@ export async function loadRarity(){
   renderRarity();
 }
 export function setRaritySort(mode){ sortBy=mode; renderRarity(); }
+
+/* =============== POND (All currently staked via controller address) =============== */
+let pondItems=[], pondContinuation='';
+export async function loadPond(limit=50, nextStr){
+  try{
+    const cont = nextStr || pondContinuation || '';
+    const qs = cont ? '&continuation='+encodeURIComponent(cont) : '';
+    const url = `https://api.reservoir.tools/users/${FF_CFG.CONTROLLER_ADDRESS}/tokens/v8?collection=${FF_CFG.COLLECTION_ADDRESS}&limit=${limit}${qs}`;
+    const res = await fetch(url, { method:'GET', headers:{ accept:'*/*','x-api-key': FF_CFG.FROG_API_KEY } });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    const items = (data.tokens||[]).map(t=>{
+      const tokenId = t?.token?.tokenId ?? t?.tokenId ?? t?.id;
+      const id = tokenId!=null?parseInt(String(tokenId),10):null;
+      const img = t?.token?.image ?? (`${FF_CFG.SOURCE_PATH}/frog/${tokenId}.png`);
+      return id ? { id, image: img } : null;
+    }).filter(Boolean);
+
+    pondItems = pondItems.concat(items);
+    pondContinuation = data.continuation || '';
+
+    if(currentFeatureView==='pond') renderPond();
+
+    // manage "load more"
+    let btn = document.getElementById('featureMoreBtn');
+    const anchor = document.getElementById('featureMoreAnchor') || document.getElementById('featuresHeader');
+    if(!pondContinuation){ if(btn) btn.remove(); }
+    else {
+      if(!btn){
+        btn=document.createElement('button'); btn.id='featureMoreBtn';
+        btn.className='btn btn-outline btn-sm'; btn.textContent='Load more';
+        anchor?.appendChild(btn);
+      }
+      btn.onclick = ()=> loadPond(limit, pondContinuation);
+    }
+  }catch(e){
+    console.warn(e);
+    const ul=document.getElementById("featureList");
+    if(ul && !ul.children.length){
+      ul.innerHTML='<li class="list-item"><div class="muted">Failed to fetch Pond.</div></li>';
+    }
+  }
+}
+export function renderPond(){
+  const ul=document.getElementById("featureList");
+  if(!ul) return; ul.innerHTML="";
+  if(!pondItems.length){ ul.innerHTML='<li class="list-item"><div class="muted">No staked frogs found.</div></li>'; return; }
+
+  pondItems.forEach(x=>{
+    const rank = window.FF_getRankById ? window.FF_getRankById(x.id) : null;
+    const badge=(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`;
+    const li=document.createElement("li"); li.className="list-item";
+    const sinceId = `pond-since-${x.id}`;
+    li.innerHTML =
+      thumb64(`${FF_CFG.SOURCE_PATH}/frog/${x.id}.png`,`Frog ${x.id}`)+
+      `<div>
+        <div style="display:flex;align-items:center;gap:8px;"><b>Frog #${x.id}</b> ${badge}</div>
+        <div class="muted">Staked <span id="${sinceId}" class="muted">—</span></div>
+      </div>`;
+    li.style.cursor="pointer"; li.addEventListener("click",()=>openFrogInfo(x.id));
+    ul.appendChild(li);
+
+    // Optional: try to resolve "since" from controller if available
+    (async ()=>{
+      try{
+        if(window.FF_getStakeInfo){
+          const s = await window.FF_getStakeInfo(x.id);
+          const el=document.getElementById(sinceId);
+          if(!el) return;
+          if(s?.sinceMs) el.textContent = (new Date(s.sinceMs)).toLocaleString() + ` (${formatAgo(Date.now()-s.sinceMs)} ago)`;
+          else if (s?.sinceText) el.textContent = s.sinceText;
+        }
+      }catch{}
+    })();
+  });
+}
 
 /* =============== WALLET + OWNED =============== */
 let currentUser=null;
@@ -339,33 +419,41 @@ export async function fetchOwned(wallet, limit=50, nextStr){
   }
 }
 
-/* =============== UNIFIED FEATURE TABS (Sales/Rarity) =============== */
+/* =============== UNIFIED FEATURE TABS (Sales/Rarity/Pond) =============== */
 let currentFeatureView="sales";
 function applyFeatureControls(){
   const onSales=currentFeatureView==='sales';
+  const onRarity=currentFeatureView==='rarity';
+  const onPond=currentFeatureView==='pond';
   const refreshBtn=document.getElementById("refreshBtn");
   const fetchLiveBtn=document.getElementById("fetchLiveBtn");
   const sortRankBtn=document.getElementById("sortRankBtn");
   const sortScoreBtn=document.getElementById("sortScoreBtn");
   if(refreshBtn)   refreshBtn.style.display   = onSales ? "" : "none";
   if(fetchLiveBtn) fetchLiveBtn.style.display = onSales ? "" : "none";
-  if(sortRankBtn)  sortRankBtn.style.display  = onSales ? "none" : "";
-  if(sortScoreBtn) sortScoreBtn.style.display = onSales ? "none" : "";
+  if(sortRankBtn)  sortRankBtn.style.display  = onRarity ? "" : "none";
+  if(sortScoreBtn) sortScoreBtn.style.display = onRarity ? "" : "none";
+  // Pond uses the same list area; "Load more" button is created dynamically in loadPond()
 }
 function setFeatureView(view){
   currentFeatureView=view;
   const wrap=document.getElementById('viewTabs');
-  const tabs = wrap ? wrap.querySelectorAll('.tab') : [];
-  const idx = {sales:0, rarity:1}[view] ?? 0;
-  tabs.forEach(t=>t.setAttribute('aria-selected', t.dataset.view===view?'true':'false'));
-  wrap?.style?.setProperty('--tab-i', idx);
-  if(view==='sales') renderSales(); else renderRarity();
+  const idxMap = {sales:0, rarity:1, pond:2};
+  wrap?.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected', t.dataset.view===view?'true':'false'));
+  wrap?.style?.setProperty('--tab-i', idxMap[view] ?? 0);
+  if(view==='sales') renderSales();
+  else if(view==='rarity') renderRarity();
+  else renderPond();
   applyFeatureControls();
 }
 export function wireFeatureTabs(){
   const tabsWrap=document.getElementById('viewTabs');
-  if(!tabsWrap){ renderSales(); renderRarity(); return; }
-  tabsWrap.querySelectorAll(".tab").forEach(btn=>{
+  if(tabsWrap && !tabsWrap.querySelector('[data-view="pond"]')){
+    const btn=document.createElement('button');
+    btn.className='tab'; btn.dataset.view='pond'; btn.textContent='Pond';
+    tabsWrap.appendChild(btn);
+  }
+  (tabsWrap||document).querySelectorAll(".tab").forEach(btn=>{
     btn.addEventListener("click",()=>setFeatureView(btn.dataset.view));
   });
   setFeatureView("sales");

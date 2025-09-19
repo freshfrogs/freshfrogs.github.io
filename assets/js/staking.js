@@ -39,8 +39,6 @@ async function ensureCollection(){
   collection = new ethers.Contract(FF_CFG.COLLECTION_ADDRESS, abi, signer);
   return collection;
 }
-
-// Pick the first available method by name
 function pickMethod(obj, names){
   for(const n of names){ if(obj && typeof obj[n]==='function') return n; }
   return null;
@@ -58,7 +56,10 @@ export async function loadStaked(){
     const userToTokens = pickMethod(ctrl, [
       'getStakedTokens','tokensOfOwner','walletOfOwner','stakedTokens','tokenIdsOf'
     ]);
-    if(!userToTokens){ if(status) status.textContent='Staking adapter: no token fetch method found.'; return; }
+    if(!userToTokens){
+      if(status) status.textContent='This controller does not expose per-user token listing. Use the Pond tab to view all staked.';
+      return;
+    }
 
     status.textContent='Loading staked…';
     let rows = await ctrl[userToTokens](user);
@@ -98,7 +99,7 @@ export async function loadStaked(){
     if(status) status.textContent=`Owned/Staked ready • Staked: ${ST.items.length}`;
   }catch(err){
     console.warn(err);
-    if(status) status.textContent='Failed to load staked tokens.';
+    if(status) status.textContent='Failed to load staked tokens (check ABI or use Pond tab).';
   }
 }
 
