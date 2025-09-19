@@ -1,8 +1,9 @@
 import {
-  FF_CFG, shorten, thumb64, fetchJSON, isLocal, mapSales, fetchSales
+  FF_CFG, initTheme as _noUse, shorten, thumb64, fetchJSON, isLocal,
+  mapSales, fetchSales, loadABIFromScript, formatAgo
 } from "./core.js";
 
-/* ================= RARITY STORE ================= */
+/* =============== RARITY STORE =============== */
 let RARITY_LIST=null, RANK_LOOK=null, sortBy='rank';
 function setRarityList(arr){
   RARITY_LIST=arr;
@@ -19,48 +20,60 @@ function sortedRarity(){
   return a;
 }
 
-/* ================= INFO MODAL =================== */
-async function loadMetadata(tokenId){
-  const url = `${FF_CFG.SOURCE_PATH}/frog/json/${tokenId}.json`;
-  const res = await fetch(url,{cache:"no-store"});
-  if(!res.ok) throw new Error("Metadata "+res.status);
-  return res.json();
+/* =============== OWNER FALLBACK (collection ABI) =============== */
+async function ownerOfViaChain(id){
+  try{
+    if(!window.ethereum) return null;
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer   = provider.getSigner();
+    const { file, global } = FF_CFG.ABI.collection || {};
+    const abi = await loadABIFromScript(file, global);
+    const coll = new ethers.Contract(FF_CFG.COLLECTION_ADDRESS, abi, signer);
+    const addr = await coll.ownerOf(id);
+    return addr || null;
+  }catch{ return null; }
 }
-async function openFrogInfo(id){
-  const L=document.getElementById("lightbox"), S=document.getElementById("lightboxStage");
-  if(!L||!S) return;
-  const rank = window.FF_getRankById ? window.FF_getRankById(id) : null;
-  let meta=null; try{ meta=await loadMetadata(id);}catch{}
-  const attrs=(meta?.attributes||[]).map(a=>`${a.trait_type}: <b>${a.value}</b>`).join("<br>");
-  S.innerHTML = `
-    <div class="modal-card">
-      <div class="modal-left">
-        <img src="${FF_CFG.SOURCE_PATH}/frog/${id}.png" alt="Frog #${id}"
-             style="width:100%;height:100%;object-fit:contain;image-rendering:pixelated;">
-      </div>
-      <div class="modal-right">
-        <h3 style="margin:0 0 6px 0;">Frog #${id}</h3>
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-          ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`}
-        </div>
-        <div class="muted" style="max-height:220px;overflow:auto">${attrs||"No attributes found."}</div>
-        <div class="row" style="gap:8px;margin-top:12px;">
-          <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://etherscan.io/nft/${FF_CFG.COLLECTION_ADDRESS}/${id}">Etherscan</a>
-          <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://opensea.io/assets/ethereum/${FF_CFG.COLLECTION_ADDRESS}/${id}">OpenSea</a>
-        </div>
-      </div>
-    </div>`;
-  L.style.display="grid";
-}
-window.FF_openFrogInfo = openFrogInfo;
 
-/* =========== GRID: TRAIT LAYERING + GIFS ========= */
-function buildTrait(trait_type, attribute, mountEl){
+/* =============== TOKEN DETAILS (Reservoir + fallback) =============== */
+async function fetchTokenDetails(id){
+  try{
+    const params = new URLSearchParams({ tokens: `${FF_CFG.COLLECTION_ADDRESS}:${id}` });
+    const r = await fetch(`https://api.reservoir.tools/tokens/v7?${params.toString()}`, {
+      headers: { accept: "*/*", "x-api-key": FF_CFG.FROG_API_KEY }
+    });
+    if(!r.ok) throw 0;
+    const j = await r.json();
+    const tok = j?.tokens?.[0]?.token;
+    let owner = j?.tokens?.[0]?.owner || tok?.owner || null;
+    const mintTs = tok?.mintTimestamp ? Date.parse(tok.mintTimestamp) : null;
+    if(!owner) owner = await ownerOfViaChain(id);
+    return { owner: owner || null, birthdayMs: Number.isFinite(mintTs) ? mintTs : null };
+  }catch{
+    const owner = await ownerOfViaChain(id);
+    return { owner: owner || null, birthdayMs: null };
+  }
+}
+
+/* =============== INFO MODAL (layered+animated) =============== */
+const LAYER_ORDER = [
+  "Background",
+  "Frog", "SpecialFrog", "Trait",
+  "Skin", "Mouth", "Nose",
+  "Eyes", "Eyewear",
+  "Clothes", "Shirt", "Bodywear", "Jacket",
+  "Accessory", "Back", "Hand",
+  "Hat", "Headwear", "Crown",
+  "Foreground"
+];
+const LZ = Object.fromEntries(LAYER_ORDER.map((k,i)=>[k,(i+1)*10]));
+
+function buildLayer(trait_type, attribute, mountEl){
   const img=document.createElement("img");
-  img.loading="lazy";
-  if (trait_type === "Trait" || trait_type === "Frog" || trait_type === "SpecialFrog"){
-    img.className="trait_overlay";
-  } else { img.className="attribute_overlay"; }
+  img.loading="lazy"; img.alt = `${trait_type}: ${attribute}`;
+  Object.assign(img.style,{
+    position:"absolute", inset:"0", width:"100%", height:"100%",
+    objectFit:"contain", imageRendering:"pixelated", zIndex:String(LZ[trait_type] ?? 100)
+  });
   const png=`${FF_CFG.SOURCE_PATH}/frog/build_files/${trait_type}/${attribute}.png`;
   img.src=png;
   const gif=`${FF_CFG.SOURCE_PATH}/frog/build_files/${trait_type}/animations/${attribute}_animation.gif`;
@@ -70,42 +83,111 @@ function buildTrait(trait_type, attribute, mountEl){
   probe.src=gif;
   mountEl.appendChild(img);
 }
-// Simple, non-clickable, static image grid
-export function renderGrid() {
-  const g = document.getElementById("grid");
-  if (!g) return;
 
-  // helper: pick N unique random IDs
-  const pickIds = (n) => {
-    const s = new Set();
-    while (s.size < n) s.add(1 + Math.floor(Math.random() * FF_CFG.SUPPLY));
-    return [...s];
-  };
+async function loadMetadata(tokenId){
+  const url = `${FF_CFG.SOURCE_PATH}/frog/json/${tokenId}.json`;
+  const res = await fetch(url,{cache:"no-store"});
+  if(!res.ok) throw new Error("Metadata "+res.status);
+  return res.json();
+}
 
-  g.innerHTML = "";
-  const picks = pickIds(9);
+async function openFrogInfo(id){
+  const L=document.getElementById("lightbox"), S=document.getElementById("lightboxStage");
+  if(!L||!S) return;
 
-  for (const id of picks) {
-    const tile = document.createElement("div");
-    tile.className = "tile";
+  const rank = window.FF_getRankById ? window.FF_getRankById(id) : null;
+  const [meta, tokenInfo, stake] = await Promise.all([
+    (async()=>{ try{ return await (await fetch(`${FF_CFG.SOURCE_PATH}/frog/json/${id}.json`,{cache:"no-store"})).json(); }catch{return null;} })(),
+    fetchTokenDetails(id),
+    (async()=>{ try{ return await (window.FF_getStakeInfo ? window.FF_getStakeInfo(id) : null); }catch{ return null; } })()
+  ]);
 
-    const img = document.createElement("img");
+  S.innerHTML = `
+    <div class="modal-card" style="display:grid;grid-template-columns: 1.1fr 1fr; gap:16px; position:relative;">
+      <button class="btn btn-ghost modal-close" aria-label="Close" style="position:absolute;top:8px;right:8px;">×</button>
+
+      <div class="modal-left" style="background: var(--panel); border:1px solid var(--line); border-radius:12px; padding:8px; display:grid; place-items:center; min-height:320px;">
+        <div id="modalComposite" style="position:relative;width:100%;aspect-ratio:1/1;max-width:420px;"></div>
+      </div>
+
+      <div class="modal-right" style="display:flex;flex-direction:column; gap:10px;">
+        <h3 style="margin:0;">Frog #${id}</h3>
+        <div class="row" style="gap:8px;flex-wrap:wrap;">
+          ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`}
+          ${ stake?.staked ? `<span class="pill" title="${stake?.sinceText||''}">Staked</span>` : `<span class="pill pill-ghost">Unstaked</span>` }
+        </div>
+
+        <div class="stack" style="gap:6px;">
+          <div class="muted"><b>Owner:</b> ${tokenInfo.owner ? tokenInfo.owner.slice(0,6)+"…"+tokenInfo.owner.slice(-4) : "—"}</div>
+          <div class="muted"><b>Birthday:</b> ${
+            tokenInfo.birthdayMs ? (new Date(tokenInfo.birthdayMs)).toLocaleString() + ` (${formatAgo(Date.now()-tokenInfo.birthdayMs)} ago)` : "—"
+          }</div>
+          <div class="muted"><b>Staked since:</b> ${
+            (stake?.staked && stake?.sinceMs) ? (new Date(stake.sinceMs)).toLocaleString() + ` (${formatAgo(Date.now()-stake.sinceMs)} ago)` :
+            (stake?.staked ? (stake?.sinceText || "Yes") : "No")
+          }</div>
+        </div>
+
+        <div class="muted" style="max-height:220px;overflow:auto;border-top:1px dashed var(--line); padding-top:8px;">
+          ${
+            Array.isArray(meta?.attributes) && meta.attributes.length
+              ? meta.attributes.map(a => `${a.trait_type}: <b>${a.value}</b>`).join("<br>")
+              : "No attributes found."
+          }
+        </div>
+
+        <div class="row" style="gap:8px;margin-top:auto;">
+          <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://etherscan.io/nft/${FF_CFG.COLLECTION_ADDRESS}/${id}">Etherscan</a>
+          <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://opensea.io/assets/ethereum/${FF_CFG.COLLECTION_ADDRESS}/${id}">OpenSea</a>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Layered frog render
+  const mount = S.querySelector("#modalComposite");
+  if (mount) {
+    if (Array.isArray(meta?.attributes)) {
+      const ordered = meta.attributes.slice().sort((a,b)=>{
+        const ai=LAYER_ORDER.indexOf(a.trait_type), bi=LAYER_ORDER.indexOf(b.trait_type);
+        return (ai===-1?999:ai) - (bi===-1?999:bi);
+      });
+      ordered.forEach(a => buildLayer(a.trait_type, a.value, mount));
+    } else {
+      const img=document.createElement("img");
+      img.src=`${FF_CFG.SOURCE_PATH}/frog/${id}.png`;
+      Object.assign(img.style,{position:"absolute",inset:"0",width:"100%",height:"100%",objectFit:"contain",imageRendering:"pixelated"});
+      mount.appendChild(img);
+    }
+  }
+
+  // Wire close & show
+  S.querySelector(".modal-close")?.addEventListener("click", ()=>{ L.style.display="none"; document.body.style.overflow=""; });
+  L.style.display="grid"; document.body.style.overflow="hidden";
+  const backdropClose=(ev)=>{ if(ev.target===L){ L.style.display="none"; document.body.style.overflow=""; L.removeEventListener("click",backdropClose);} };
+  L.addEventListener("click", backdropClose);
+}
+window.FF_openFrogInfo = openFrogInfo;
+
+/* =============== GRID (simple static images) =============== */
+export function renderGrid(){
+  const g=document.getElementById("grid"); if(!g) return;
+  g.innerHTML="";
+  const pickIds=(n)=>{ const s=new Set(); while(s.size<n) s.add(1+Math.floor(Math.random()*FF_CFG.SUPPLY)); return [...s]; };
+  for(const id of pickIds(9)){
+    const tile=document.createElement("div"); tile.className="tile";
+    const img=document.createElement("img");
     img.src = `${FF_CFG.SOURCE_PATH}/frog/${id}.png`;
     img.alt = `Frog #${id}`;
-    img.loading = "lazy";
-    img.decoding = "async";
-    img.style.imageRendering = "pixelated";
-    img.style.width = "100%";
-    img.style.height = "100%";
-    img.style.objectFit = "cover"; // or "contain" if you prefer full frog in frame
-
+    img.loading="lazy"; img.decoding="async";
+    img.style.imageRendering="pixelated";
+    img.style.width="100%"; img.style.height="100%"; img.style.objectFit="cover";
     tile.appendChild(img);
     g.appendChild(tile);
   }
 }
 
-
-/* ================= SALES (Reservoir) =============== */
+/* =============== SALES (Reservoir) =============== */
 let salesCache=[];
 export function renderSales(list=salesCache){
   const ul=document.getElementById("recentSales")||document.getElementById("featureList");
@@ -136,7 +218,7 @@ export async function loadSalesLive(){
   }catch(e){ console.warn("Sales fetch failed",e); return false; }
 }
 
-/* ================= RARITY UI ======================= */
+/* =============== RARITY UI =============== */
 export function renderRarity(){
   const ul=document.getElementById("rarityList")||document.getElementById("featureList");
   if(!ul) return; ul.innerHTML="";
@@ -157,15 +239,14 @@ export function renderRarity(){
   });
 }
 export async function loadRarity(){
-  let ok=false;
   if(!isLocal()){
-    try{ const arr=await fetchJSON(FF_CFG.JSON_PATH); if(Array.isArray(arr)){ setRarityList(arr); ok=true; } }catch{}
+    try{ const arr=await fetchJSON(FF_CFG.JSON_PATH); if(Array.isArray(arr)) setRarityList(arr); }catch{}
   }
   renderRarity();
 }
 export function setRaritySort(mode){ sortBy=mode; renderRarity(); }
 
-/* ================= WALLET + OWNED ================== */
+/* =============== WALLET + OWNED =============== */
 let currentUser=null;
 function setWalletUI(a){
   const l=document.getElementById("walletLabel"), b=document.getElementById("connectBtn");
@@ -258,7 +339,7 @@ export async function fetchOwned(wallet, limit=50, nextStr){
   }
 }
 
-/* =========== UNIFIED FEATURES TABS (Sales/Rarity) ======== */
+/* =============== UNIFIED FEATURE TABS (Sales/Rarity) =============== */
 let currentFeatureView="sales";
 function applyFeatureControls(){
   const onSales=currentFeatureView==='sales';
@@ -302,7 +383,7 @@ export function wireFeatureButtons(){
   });
 }
 
-/* =========== TAB GETTER (for staking.js) =========== */
+/* =============== TAB GETTER for staking.js =============== */
 let _getTab = ()=>'owned';
 export function setTabGetter(fn){ _getTab = fn; }
 function getTab(){ return _getTab(); } // not exported

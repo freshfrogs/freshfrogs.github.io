@@ -6,24 +6,24 @@ import {
 } from "./ui.js";
 import { wireStakingUI, setTab, loadStaked } from "./staking.js";
 
-// Theme + UI wiring
+// Theme + small UI
 initTheme();
 wireFeatureButtons();
 wireFeatureTabs();
 wireStakingUI();
 
 (async () => {
-  // Load rarity first so ranks are available across UI
+  // Rarity first (ranks everywhere)
   await loadRarity();
 
-  // Try live sales (fallback is fine without a key)
+  // Live sales (ok to fail gracefully without key)
   const ok = await loadSalesLive();
   const b = document.getElementById("fetchLiveBtn");
   if (ok && b) { b.textContent = "Live loaded"; b.disabled = true; b.classList.add("btn-ghost"); }
   renderSales();
 
-  // Grid (layered with animations)
-  await renderGrid();
+  // Grid (simple static images)
+  renderGrid();
 
   // Default staking tab
   setTab("owned");
@@ -35,7 +35,8 @@ wireStakingUI();
       const s=document.getElementById("stakeStatus"); if(s) s.textContent="Connected. Loading Owned/Staked…";
     },
     onDisconnect: () => {
-      clearOwned(); const s=document.getElementById("stakeStatus"); if(s) s.textContent="Disconnected.";
+      clearOwned();
+      const s=document.getElementById("stakeStatus"); if(s) s.textContent="Disconnected.";
     },
     onChanged: (addr) => {
       if (addr) { clearOwned(); fetchOwned(addr); loadStaked(); }
@@ -43,7 +44,7 @@ wireStakingUI();
     }
   });
 
-  // Optional auto-init if wallet already selected
+  // Optional auto-init if a wallet is already selected
   if (FF_CFG.AUTO_INIT && window.ethereum?.selectedAddress) {
     const pre = window.ethereum.selectedAddress;
     const label = document.getElementById("walletLabel");
@@ -52,3 +53,14 @@ wireStakingUI();
     clearOwned(); fetchOwned(pre); loadStaked();
   }
 })();
+
+// Close modal on Escape
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    const L = document.getElementById("lightbox");
+    if (L && L.style.display !== "none") {
+      L.style.display = "none";
+      document.body.style.overflow = "";
+    }
+  }
+});
