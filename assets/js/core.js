@@ -5,7 +5,7 @@ export const FF_CFG = {
   COLLECTION_ADDRESS: "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b",
   CONTROLLER_ADDRESS: "0xCB1ee125CFf4051a10a55a09B10613876C4Ef199",
   JSON_PATH: "assets/freshfrogs_rarity_rankings.json",
-  FROG_API_KEY: (window.frog_api || "YOUR_RESERVOIR_API_KEY_HERE"),
+  FROG_API_KEY: (window.frog_api || "3105c552-60b6-5252-bca7-291c724a54bf"),
   AUTO_INIT: false,
   ABI: {
     controller: "assets/abi/controller_abi.json",
