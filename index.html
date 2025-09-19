@@ -3,77 +3,64 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>FreshFrogs — Wallet Connect + Owned Tokens</title>
+<title>FreshFrogs — Wallet, Mint, Sales, Rarity, Staking</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --font-ui: "Inter", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-    --font-display: "Space Grotesk", var(--font-ui);
+    --font-ui:"Inter",ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    --font-display:"Space Grotesk",var(--font-ui);
     --bg:#0b0f13; --ink:#e9f2ff; --muted:#90a3b3; --ring:rgba(255,255,255,.08);
     --panel:#0f141a; --panel-2:#121821; --accent:#35d49a; --accent-ink:#051311;
-    --radius:10px; --radius-pill:999px; --focus: 0 0 0 3px color-mix(in srgb, var(--accent) 26%, transparent);
+    --radius:10px; --radius-pill:999px; --focus:0 0 0 3px color-mix(in srgb, var(--accent) 26%, transparent);
   }
-
-  /* keep noir & pastel + the extra themes */
-  html[data-theme="pastel"]{ --bg:#f6fbff; --ink:#11202b; --muted:#5d7a8a; --ring:rgba(0,0,0,.1); --panel:#ffffff; --panel-2:#eaf5ff; --accent:#8ad1ff; --accent-ink:#08121a; }
-  html[data-theme="aurora"]{ --bg:#0b1020; --ink:#e8f7ff; --muted:#a9c4ff; --ring:rgba(150,200,255,.14); --panel:#111831; --panel-2:#0e1a3b; --accent:#6be7ff; --accent-ink:#07131a; }
-  html[data-theme="moss"]{ --bg:#0f1812; --ink:#e6ffef; --muted:#a3cbb4; --ring:rgba(180,255,210,.12); --panel:#122117; --panel-2:#14271b; --accent:#38d39f; --accent-ink:#04140e; }
-  html[data-theme="plum"]{ --bg:#160d1a; --ink:#ffe9ff; --muted:#d1b6e8; --ring:rgba(255,210,255,.14); --panel:#1f1226; --panel-2:#22142a; --accent:#c084fc; --accent-ink:#220a3a; }
-  html[data-theme="ember"]{ --bg:#1a0e0b; --ink:#ffe7db; --muted:#f5b59e; --ring:rgba(255,200,170,.14); --panel:#221410; --panel-2:#281712; --accent:#ff8f4d; --accent-ink:#2a0f03; }
-  html[data-theme="glacier"]{ --bg:#06121a; --ink:#eafbff; --muted:#b7d7e6; --ring:rgba(190,230,255,.14); --panel:#0a1b25; --panel-2:#0c2230; --accent:#56ccf2; --accent-ink:#03151b; }
-  html[data-theme="candy"]{ --bg:#1a101a; --ink:#fff0f8; --muted:#ffb3d1; --ring:rgba(255,170,210,.14); --panel:#241226; --panel-2:#2a1530; --accent:#ff71ce; --accent-ink:#2a001a; }
-  html[data-theme="inkwell"]{ --bg:#0a0a0a; --ink:#f4f4f4; --muted:#b9b9b9; --ring:rgba(255,255,255,.12); --panel:#141414; --panel-2:#191919; --accent:#ededed; --accent-ink:#0c0c0c; }
-  html[data-theme="dawn"]{ --bg:#fff7ee; --ink:#29160b; --muted:#a27f68; --ring:rgba(0,0,0,.1); --panel:#ffffff; --panel-2:#ffeede; --accent:#ffb86c; --accent-ink:#3a2206; }
-  html[data-theme="dusk"]{ --bg:#0f1220; --ink:#eae8ff; --muted:#bfb9f2; --ring:rgba(220,210,255,.14); --panel:#161933; --panel-2:#1a1f44; --accent:#8da2fb; --accent-ink:#0d1333; }
-  html[data-theme="matrix"]{ --bg:#060d06; --ink:#d7ffdb; --muted:#89b493; --ring:rgba(100,255,150,.18); --panel:#0b150c; --panel-2:#0e1a10; --accent:#00ff87; --accent-ink:#001a0e; }
-  html[data-theme="peach"]{ --bg:#fff3f0; --ink:#2b1410; --muted:#a97d6f; --ring:rgba(0,0,0,.1); --panel:#ffffff; --panel-2:#ffe2db; --accent:#ff9776; --accent-ink:#2a0f0a; }
-  html[data-theme="cobalt"]{ --bg:#070e1f; --ink:#e7f0ff; --muted:#a8c3ff; --ring:rgba(150,190,255,.16); --panel:#0d1830; --panel-2:#0f1f3e; --accent:#4ea1ff; --accent-ink:#071426; }
+  /* Pastel only other theme */
+  html[data-theme="pastel"]{
+    --bg:#f6fbff; --ink:#11202b; --muted:#5d7a8a; --ring:rgba(0,0,0,.1);
+    --panel:#ffffff; --panel-2:#eaf5ff; --accent:#8ad1ff; --accent-ink:#08121a;
+  }
 
   *{box-sizing:border-box} html,body{margin:0;padding:0}
   body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--font-ui)}
   img{max-width:100%;display:block;image-rendering:pixelated}
   a{color:inherit;text-decoration:none}
   .container{width:min(1140px,100%);margin:0 auto;padding:0 20px}
+
   header.site{position:sticky;top:0;z-index:20;background:color-mix(in srgb, var(--panel) 70%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--ring)}
   header .nav{display:flex;gap:18px;align-items:center}
   header .brand{font:900 18px/1 var(--font-display);letter-spacing:-.01em}
   nav a{opacity:.86;font-weight:600} nav a:hover{opacity:1}
 
-  .btn{ display:inline-flex;align-items:center;justify-content:center;gap:.5rem; padding:.62rem .9rem;border-radius:var(--radius);
-        border:1px solid color-mix(in srgb, var(--ink) 12%, transparent); background:var(--panel); color:var(--ink); font-weight:800; letter-spacing:.02em;
-        transition:background .15s ease, border-color .15s ease, transform .05s ease, color .15s ease; cursor:pointer; user-select:none; }
-  .btn:hover{ background: color-mix(in srgb, var(--panel-2) 55%, var(--panel)); border-color: color-mix(in srgb, var(--ink) 18%, transparent); }
-  .btn:active{ transform:translateY(1px); }
-  .btn:focus-visible{ outline:none; box-shadow: var(--focus); }
-  .btn-solid{ background: var(--accent); color: var(--accent-ink); border-color: color-mix(in srgb, var(--accent) 50%, transparent); }
-  .btn-solid:hover{ filter:brightness(1.03) saturate(1.01); }
-  .btn-solid:active{ filter:brightness(.98); }
-  .btn-outline{ background: transparent; color: var(--ink); border-color: color-mix(in srgb, var(--ink) 18%, transparent); }
-  .btn-outline:hover{ background: color-mix(in srgb, var(--panel-2) 45%, transparent); }
-  .btn-ghost{ background: transparent; color: var(--muted); border-color: color-mix(in srgb, var(--ink) 10%, transparent); }
-  .btn-ghost:hover{ color: var(--ink); background: color-mix(in srgb, var(--panel-2) 40%, transparent); }
-  .btn-soft{ background: color-mix(in srgb, var(--accent) 14%, var(--panel)); border-color: color-mix(in srgb, var(--accent) 22%, var(--ring)); color: var(--ink); }
-  .btn-sm{ padding:.48rem .7rem; border-radius:8px; font-weight:700; }
-  .btn-lg{ padding:.85rem 1.1rem; font-size:1.05rem; }
-  .icon-btn{ width:40px;height:40px;border-radius:8px;display:inline-grid;place-items:center;border:1px solid color-mix(in srgb, var(--ink) 12%, transparent);background:var(--panel);color:var(--ink); }
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.62rem .9rem;border-radius:var(--radius);border:1px solid color-mix(in srgb, var(--ink) 12%, transparent);background:var(--panel);color:var(--ink);font-weight:800;letter-spacing:.02em;transition:background .15s,border-color .15s,transform .05s,color .15s;cursor:pointer;user-select:none}
+  .btn:hover{background:color-mix(in srgb, var(--panel-2) 55%, var(--panel));border-color:color-mix(in srgb, var(--ink) 18%, transparent)}
+  .btn:active{transform:translateY(1px)}
+  .btn:focus-visible{outline:none;box-shadow:var(--focus)}
+  .btn-solid{background:var(--accent);color:var(--accent-ink);border-color:color-mix(in srgb, var(--accent) 50%, transparent)}
+  .btn-outline{background:transparent;color:var(--ink);border-color:color-mix(in srgb, var(--ink) 18%, transparent)}
+  .btn-ghost{background:transparent;color:var(--muted);border-color:color-mix(in srgb, var(--ink) 10%, transparent)}
+  .btn-soft{background:color-mix(in srgb, var(--accent) 14%, var(--panel));border-color:color-mix(in srgb, var(--accent) 22%, var(--ring));color:var(--ink)}
+  .btn-sm{padding:.48rem .7rem;border-radius:8px;font-weight:700}
+  .btn-lg{padding:.85rem 1.1rem;font-size:1.05rem}
+  .icon-btn{width:40px;height:40px;border-radius:8px;display:inline-grid;place-items:center;border:1px solid color-mix(in srgb, var(--ink) 12%, transparent);background:var(--panel);color:var(--ink)}
 
   .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   .muted{color:var(--muted)}
   .section-title{font-weight:900;letter-spacing:-.01em;font-family:var(--font-display)}
   .stack{display:flex;flex-direction:column;gap:12px}
-  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px} @media (max-width:900px){.two-col{grid-template-columns:1fr}}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px} @media(max-width:900px){.two-col{grid-template-columns:1fr}}
   .pill{display:inline-flex;align-items:center;gap:6px;padding:.25rem .6rem;border-radius:var(--radius-pill);border:1px solid var(--ring);background:var(--panel)}
+  .spacer{flex:1}
+  .thumb64{width:64px;height:64px;min-width:64px;min-height:64px;border-radius:8px;object-fit:cover;aspect-ratio:1/1;image-rendering:pixelated}
+  .addr{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
 
   .hero{padding:56px 0 22px;display:grid;gap:24px;grid-template-columns:1.05fr .95fr;align-items:center}
-  @media (max-width:960px){.hero{grid-template-columns:1fr}}
-
+  @media(max-width:960px){.hero{grid-template-columns:1fr}}
   .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
   .tile{position:relative;aspect-ratio:1/1;overflow:hidden}
   .tile img{width:100%;height:100%;object-fit:contain}
 
   .facts{display:grid;gap:12px;grid-template-columns:repeat(4,1fr)}
-  @media (max-width:1100px){.facts{grid-template-columns:repeat(2,1fr)}}
-  @media (max-width:580px){.facts{grid-template-columns:1fr}}
+  @media(max-width:1100px){.facts{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:580px){.facts{grid-template-columns:1fr}}
 
   .fact,.panel{background:var(--panel);border:1px solid var(--ring);border-radius:var(--radius);padding:14px;box-shadow:0 1px 0 rgba(0,0,0,.3) inset}
   .panel{margin-block:12px}
@@ -82,30 +69,18 @@
   .list-item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:12px 14px;border-radius:8px;border:1px solid var(--ring);background:var(--panel)}
   .price{font-weight:800}
 
-  .qty-box{min-width:56px;text-align:center;font-weight:800;padding:.6rem .8rem;border-radius:8px;border:1px solid var(--ring);background:var(--panel)}
-  .spacer{flex:1}
-
-  .tabs{ --tab-i: 0; position:relative; display:grid; grid-template-columns:1fr 1fr; padding:4px; border-radius:var(--radius-pill); background:var(--panel-2); border:1px solid var(--ring); min-width:220px; isolation:isolate;}
-  .tab{ position:relative; z-index:1; appearance:none; background:transparent; border:0; padding:.5rem 1rem; border-radius:var(--radius-pill); font-weight:800; cursor:pointer; color:var(--muted); transition:color .15s ease;}
-  .tab[aria-selected="true"]{ color:var(--accent-ink); }
-  .tab-indicator{ position:absolute; z-index:0; inset:4px; width:calc(50% - 0px); border-radius:var(--radius-pill); background:var(--accent);
-    box-shadow:0 6px 18px color-mix(in srgb, var(--accent) 40%, transparent); transform:translateX(calc(var(--tab-i) * 100%)); transition:transform .22s cubic-bezier(.22,.8,.3,1); }
+  .tabs{--tab-i:0;position:relative;display:grid;grid-template-columns:1fr 1fr;padding:4px;border-radius:var(--radius-pill);background:var(--panel-2);border:1px solid var(--ring);min-width:220px;isolation:isolate}
+  .tab{position:relative;z-index:1;appearance:none;background:transparent;border:0;padding:.5rem 1rem;border-radius:var(--radius-pill);font-weight:800;cursor:pointer;color:var(--muted);transition:color .15s}
+  .tab[aria-selected="true"]{color:var(--accent-ink)}
+  .tab-indicator{position:absolute;z-index:0;inset:4px;width:calc(50% - 0px);border-radius:var(--radius-pill);background:var(--accent);box-shadow:0 6px 18px color-mix(in srgb, var(--accent) 40%, transparent);transform:translateX(calc(var(--tab-i) * 100%));transition:transform .22s cubic-bezier(.22,.8,.3,1)}
 
   footer.site{border-top:1px solid var(--ring);padding:26px 0;color:var(--muted);margin-top:26px}
 
-  .theme-dock{ position:fixed; right:14px; bottom:14px; z-index:30; display:flex; gap:8px; flex-wrap:wrap; background:color-mix(in srgb, var(--panel) 82%, transparent); border:1px solid var(--ring); border-radius:12px; padding:8px; backdrop-filter: blur(6px); }
-  .swatch{ width:28px; height:28px; border-radius:8px; border:1px solid var(--ring); cursor:pointer; display:inline-block; }
-  .swatch[aria-current="true"]{ outline:2px solid var(--accent); outline-offset:2px; }
-  .sw-noir{ background:#0f141a; } .sw-pastel{ background:#eaf5ff; }
-  .sw-aurora{ background:linear-gradient(120deg,#6be7ff,#4ea1ff); } .sw-moss{ background:#14271b; }
-  .sw-plum{ background:#22142a; } .sw-ember{ background:#281712; }
-  .sw-glacier{ background:#0c2230; } .sw-candy{ background:linear-gradient(120deg,#ff71ce,#ffb3d1); }
-  .sw-inkwell{ background:#191919; } .sw-dawn{ background:#ffeede; }
-  .sw-dusk{ background:#1a1f44; } .sw-matrix{ background:#0e1a10; }
-  .sw-peach{ background:#ffe2db; } .sw-cobalt{ background:#0f1f3e; }
-
-  .thumb64{ width:64px; height:64px; min-width:64px; min-height:64px; border-radius:8px; object-fit:cover; aspect-ratio:1/1; image-rendering:pixelated; }
-  .addr{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+  .theme-dock{position:fixed;right:14px;bottom:14px;z-index:30;display:flex;gap:8px;flex-wrap:wrap;background:color-mix(in srgb, var(--panel) 82%, transparent);border:1px solid var(--ring);border-radius:12px;padding:8px;backdrop-filter:blur(6px)}
+  .swatch{width:28px;height:28px;border-radius:8px;border:1px solid var(--ring);cursor:pointer;display:inline-block}
+  .swatch[aria-current="true"]{outline:2px solid var(--accent);outline-offset:2px}
+  .sw-noir{background:#0f141a}
+  .sw-pastel{background:#eaf5ff}
 </style>
 </head>
 <body>
@@ -189,20 +164,21 @@
 
     <div class="panel stack" aria-label="Staking">
       <div class="row" style="justify-content:space-between">
-        <div><h2 class="section-title" style="margin:0">My Frogs</h2><div class="muted">Connect your wallet to view owned. Staked coming next.</div></div>
+        <div><h2 class="section-title" style="margin:0">My Frogs</h2><div class="muted">Connect your wallet to view owned & staked.</div></div>
         <div class="tabs" role="tablist" id="stakeTabs">
           <span class="tab-indicator" aria-hidden="true"></span>
           <button class="tab" id="tabOwned"  role="tab" aria-selected="true"  aria-controls="chipWrap">Owned</button>
-          <button class="tab" id="tabStaked" role="tab" aria-selected="false" aria-controls="chipWrap" disabled title="Coming soon">Staked</button>
+          <button class="tab" id="tabStaked" role="tab" aria-selected="false" aria-controls="chipWrap">Staked</button>
         </div>
       </div>
       <div id="chipWrap" aria-live="polite"></div>
-      <div class="row" id="ownedControls" style="gap:8px;">
+      <div class="row" id="stakeControls" style="gap:8px;">
         <button id="selectAll" class="btn btn-ghost btn-sm">Select All</button>
         <button id="clearSel"  class="btn btn-ghost btn-sm">Clear</button>
         <div class="spacer"></div>
-        <button class="btn btn-solid btn-sm" id="refreshOwned">↻ Refresh</button>
-        <!-- load more button will be appended here -->
+        <button class="btn btn-solid btn-sm" id="refreshOwned">↻ Refresh Owned</button>
+        <button class="btn btn-outline btn-sm" id="loadStakedBtn">Load Staked</button>
+        <!-- load more button(s) will be appended here -->
       </div>
       <p id="stakeStatus" class="muted">No wallet connected.</p>
     </div>
@@ -210,7 +186,7 @@
 
   <section id="features" class="panel stack" aria-label="Features">
     <h2 class="section-title" style="margin:0">Features</h2>
-    <p class="muted" style="margin-top:0">Uses one JSON from <code>assets/</code>. If opened from desktop, use the “Load JSON” button above.</p>
+    <p class="muted" style="margin-top:0">If opened from desktop, use the “Load JSON” button (above) to load rarity from <code>assets/freshfrogs_rarity_rankings.json</code>.</p>
 
     <div class="two-col">
       <div class="panel stack" aria-label="Recent Sales">
@@ -245,12 +221,12 @@
 
   <section id="about" class="panel stack">
     <h2 class="section-title" style="margin:0">About FreshFrogs</h2>
-    <p class="muted">FreshFrogs is a collection of pixel frogs with on-chain provenance. Smart contracts are verified on Etherscan. All secondary sales carry a 5% royalty.</p>
+    <p class="muted">FreshFrogs is a collection of pixel frogs with on-chain provenance. All secondary sales carry a 5% royalty.</p>
   </section>
 
   <section id="faq" class="panel stack">
     <h2 class="section-title" style="margin:0">FAQ</h2>
-    <details><summary><b>How do I mint?</b></summary><p class="muted">Connect a Web3 wallet and call the contract mint function. This template only includes UI; connect your mint logic when ready.</p></details>
+    <details><summary><b>How do I mint?</b></summary><p class="muted">Connect a Web3 wallet and call the contract mint function. This template includes UI only; add your mint logic when ready.</p></details>
     <details><summary><b>Where can I view the collection?</b></summary><p class="muted">OpenSea or the original site’s gallery.</p></details>
   </section>
 </main>
@@ -270,22 +246,14 @@
   <div id="lightboxStage" class="stage" style="position:relative;width:min(90vmin,520px);aspect-ratio:1/1;background:#000;"></div>
 </div>
 
+<!-- Theme chooser (Noir + Pastel only) -->
 <div class="theme-dock" role="toolbar" aria-label="Theme chooser">
-  <button class="swatch sw-noir"     data-theme="noir"     title="Noir"></button>
-  <button class="swatch sw-pastel"   data-theme="pastel"   title="Pastel"></button>
-  <button class="swatch sw-aurora"   data-theme="aurora"   title="Aurora"></button>
-  <button class="swatch sw-moss"     data-theme="moss"     title="Moss"></button>
-  <button class="swatch sw-plum"     data-theme="plum"     title="Plum"></button>
-  <button class="swatch sw-ember"    data-theme="ember"    title="Ember"></button>
-  <button class="swatch sw-glacier"  data-theme="glacier"  title="Glacier"></button>
-  <button class="swatch sw-candy"    data-theme="candy"    title="Candy"></button>
-  <button class="swatch sw-inkwell"  data-theme="inkwell"  title="Inkwell"></button>
-  <button class="swatch sw-dawn"     data-theme="dawn"     title="Dawn"></button>
-  <button class="swatch sw-dusk"     data-theme="dusk"     title="Dusk"></button>
-  <button class="swatch sw-matrix"   data-theme="matrix"   title="Matrix"></button>
-  <button class="swatch sw-peach"    data-theme="peach"    title="Peach"></button>
-  <button class="swatch sw-cobalt"   data-theme="cobalt"   title="Cobalt"></button>
+  <button class="swatch sw-noir"   data-theme="noir"   title="Noir"></button>
+  <button class="swatch sw-pastel" data-theme="pastel" title="Pastel"></button>
 </div>
+
+<!-- If you have your helpers, host them and then UNCOMMENT the next line: -->
+<!-- <script src="assets/ethereum-dapp.js"></script> -->
 
 <script>
 'use strict';
@@ -309,40 +277,14 @@
 const JSON_PATH = "assets/freshfrogs_rarity_rankings.json";
 let RARITY_LIST = null, RANK_LOOKUP = null;
 function showLocalPicker(){ document.getElementById('localLoad').style.display = 'block'; }
-async function fetchJSON(path){
-  const r=await fetch(path,{cache:"no-store"});
-  if(!r.ok) throw new Error(r.status);
-  const j=await r.json();
-  if(!Array.isArray(j)) throw new Error("not array");
-  return j;
-}
-async function loadRarityFromFetch(){
-  try{ setRarity(await fetchJSON(JSON_PATH)); return true; }
-  catch{ return false; }
-}
-function setRarity(list){
-  RARITY_LIST=list;
-  RANK_LOOKUP=Object.fromEntries(
-    list.map(it=>[String(it.id), Number(it.ranking ?? it.rank ?? NaN)])
-        .filter(([,v])=>!Number.isNaN(v))
-  );
-}
+async function fetchJSON(path){ const r=await fetch(path,{cache:"no-store"}); if(!r.ok) throw new Error(r.status); const j=await r.json(); if(!Array.isArray(j)) throw new Error("not array"); return j; }
+async function loadRarityFromFetch(){ try{ setRarity(await fetchJSON(JSON_PATH)); return true; }catch{ return false; } }
+function setRarity(list){ RARITY_LIST=list; RANK_LOOKUP=Object.fromEntries(list.map(it=>[String(it.id), Number(it.ranking ?? it.rank ?? NaN)]).filter(([,v])=>!Number.isNaN(v))); }
 function wireLocalPicker(){
   const pick=document.getElementById('rarityFile'), btn=document.getElementById('useLocalBtn');
   btn?.addEventListener('click', ()=>{
-    const f=pick?.files?.[0];
-    if(!f){ alert("Choose assets/freshfrogs_rarity_rankings.json"); return; }
-    const rd=new FileReader();
-    rd.onload=()=>{
-      try{
-        const arr=JSON.parse(rd.result);
-        if(!Array.isArray(arr)) throw 0;
-        setRarity(arr);
-        renderSalesPage(0); renderRarityPage(0); setTab('owned');
-        document.getElementById('localLoad').style.display='none';
-      }catch{ alert("Invalid rarity JSON"); }
-    };
-    rd.readAsText(f);
+    const f=pick?.files?.[0]; if(!f){ alert("Choose assets/freshfrogs_rarity_rankings.json"); return; }
+    const rd=new FileReader(); rd.onload=()=>{ try{ const arr=JSON.parse(rd.result); if(!Array.isArray(arr)) throw 0; setRarity(arr); renderSalesPage(0); renderRarityPage(0); setTab('owned'); document.getElementById('localLoad').style.display='none'; }catch{ alert("Invalid rarity JSON"); } }; rd.readAsText(f);
   });
 }
 function getRankById(id){ return RANK_LOOKUP ? (RANK_LOOKUP[String(id)] ?? null) : null; }
@@ -364,13 +306,9 @@ function renderSimpleGrid(){
     tile.innerHTML = '<img src="'+SOURCE_PATH+'/frog/'+id+'.png" alt="Frog #'+id+'" loading="lazy" decoding="async">';
     tile.addEventListener('click', ()=>{
       lightboxStage.innerHTML='';
-      const big=document.createElement('img');
-      big.src=SOURCE_PATH+'/frog/'+id+'.png';
-      big.alt='Frog #'+id;
-      big.style.width='100%'; big.style.height='100%';
-      big.style.objectFit='contain'; big.style.imageRendering='pixelated';
-      lightboxStage.appendChild(big);
-      lightbox.style.display='grid';
+      const big=document.createElement('img'); big.src=SOURCE_PATH+'/frog/'+id+'.png'; big.alt='Frog #'+id;
+      big.style.width='100%'; big.style.height='100%'; big.style.objectFit='contain'; big.style.imageRendering='pixelated';
+      lightboxStage.appendChild(big); lightbox.style.display='grid';
     });
     gridEl.appendChild(tile);
   });
@@ -379,7 +317,7 @@ lightbox.addEventListener('click',()=>{ lightbox.style.display='none'; });
 
 /* ============ RECENT SALES (live) ============ */
 const COLLECTION_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
-const FROG_API_KEY = (window.frog_api || "3105c552-60b6-5252-bca7-291c724a54bf");
+const FROG_API_KEY = (window.frog_api || "YOUR_RESERVOIR_API_KEY_HERE");
 const options = { method:'GET', headers:{ accept:'*/*', 'x-api-key': FROG_API_KEY } };
 
 async function fetchTokenSales({ contract = COLLECTION_ADDRESS, limit = 50, continuation = "" } = {}){
@@ -402,13 +340,7 @@ function normalizeTimestamp(sale){
   if (typeof raw === "number") { const ms = raw < 1e12 ? raw * 1000 : raw; return new Date(ms); }
   const t = Date.parse(raw); return Number.isNaN(t) ? null : new Date(t);
 }
-function formatAgo(msAgo){
-  const s=Math.floor(msAgo/1000);
-  if(s<60) return `${s}s`;
-  const m=Math.floor(s/60); if(m<60) return `${m}m`;
-  const h=Math.floor(m/60); if(h<24) return `${h}h`;
-  const d=Math.floor(h/24); return `${d}d`;
-}
+function formatAgo(msAgo){ const s=Math.floor(msAgo/1000); if(s<60) return `${s}s`; const m=Math.floor(s/60); if(m<60) return `${m}m`; const h=Math.floor(m/60); if(h<24) return `${h}h`; const d=Math.floor(h/24); return `${d}d`; }
 function mapSalesToSimple(reservoirSales){
   return (reservoirSales || []).map((s)=>{
     const tokenId = s?.token?.tokenId ?? s?.tokenId ?? s?.tokenIdFull ?? s?.token?.id;
@@ -424,7 +356,7 @@ function mapSalesToSimple(reservoirSales){
   }).filter(Boolean);
 }
 let recentSalesData = [];
-const PAGE_SIZE = 7; let recentPage = 0; let rarityPage = 0; let raritySortBy = 'rank';
+const PAGE_SIZE = 5; let recentPage = 0; let rarityPage = 0; let raritySortBy = 'rank';
 
 function togglePagerBtns(prefix, page, total){
   const more=document.getElementById(`${prefix}More`);
@@ -433,9 +365,7 @@ function togglePagerBtns(prefix, page, total){
   if(more) more.style.display=(page<pages-1)?'':'none';
   if(less) less.style.display=(page>0)?'':'none';
 }
-function thumb64(src, alt){
-  return '<img class="thumb64" src="'+src+'" alt="'+alt+'" width="64" height="64" loading="lazy">';
-}
+function thumb64(src, alt){ return '<img class="thumb64" src="'+src+'" alt="'+alt+'" width="64" height="64" loading="lazy">'; }
 function renderSalesPage(page = 0, list = recentSalesData) {
   const ul = document.getElementById('recentSales'); if (!ul) return;
   ul.innerHTML = '';
@@ -473,14 +403,12 @@ async function getRecentSalesLive(){
   }
 }
 
-/* ============ RARITY LIST (7 per page) ============ */
+/* ============ RARITY LIST (5 per page) ============ */
 function getSortedRarity(){
   if(!RARITY_LIST?.length) return [];
   const a=[...RARITY_LIST];
-  if(raritySortBy==='score')
-    a.sort((x,y)=>Number(y.rarity??y.score??0)-Number(x.rarity??x.score??0));
-  else
-    a.sort((x,y)=>Number(x.ranking??x.rank??1e9)-Number(y.ranking??y.rank??1e9));
+  if(raritySortBy==='score') a.sort((x,y)=>Number(y.rarity??y.score??0)-Number(x.rarity??x.score??0));
+  else a.sort((x,y)=>Number(x.ranking??x.rank??1e9)-Number(y.ranking??y.rank??1e9));
   return a;
 }
 function renderRarityPage(page=0){
@@ -491,10 +419,7 @@ function renderRarityPage(page=0){
   data.slice(start,end).forEach(item=>{
     const id=item.id, rank=item.ranking??item.rank??'?', score=(item.rarity??item.score??'').toString();
     const li=document.createElement('li'); li.className='list-item';
-    li.innerHTML =
-      thumb64(SOURCE_PATH+'/frog/'+id+'.png','Frog '+id) +
-      `<div><div><b>Frog #${id}</b></div><div class="muted">${score?`Rarity Score: ${score}`:`Rarity Score: N/A`}</div></div>
-       <span class="pill">#${rank}</span>`;
+    li.innerHTML = thumb64(SOURCE_PATH+'/frog/'+id+'.png','Frog '+id)+`<div><div><b>Frog #${id}</b></div><div class="muted">${score?`Rarity Score: ${score}`:`Rarity Score: N/A`}</div></div><span class="pill">#${rank}</span>`;
     ul.appendChild(li);
   });
   togglePagerBtns('rarity',page,data.length);
@@ -504,7 +429,7 @@ document.getElementById('rarityLess')?.addEventListener('click',()=>{ if(rarityP
 document.getElementById('sortRankBtn')?.addEventListener('click', ()=>{ raritySortBy='rank'; rarityPage=0; renderRarityPage(0); });
 document.getElementById('sortScoreBtn')?.addEventListener('click', ()=>{ raritySortBy='score'; rarityPage=0; renderRarityPage(0); });
 
-/* ============ WALLET CONNECT + OWNED TOKENS ============ */
+/* ============ WALLET CONNECT + OWNED/STAKED ============ */
 let user_address = null;
 const COLLECTION = COLLECTION_ADDRESS;
 
@@ -512,45 +437,31 @@ function shorten(addr){ return addr ? (addr.slice(0,6)+'…'+addr.slice(-4)) : '
 function setWalletUI(addr){
   const label = document.getElementById('walletLabel');
   const btn = document.getElementById('connectBtn');
-  if(addr){
-    if(label){ label.textContent = 'Connected: ' + shorten(addr); label.style.display = ''; }
-    if(btn){ btn.textContent = 'Disconnect'; }
-  }else{
-    if(label){ label.style.display = 'none'; }
-    if(btn){ btn.textContent = 'Connect Wallet'; }
-  }
+  if(addr){ label.textContent = 'Connected: ' + shorten(addr); label.style.display = ''; btn.textContent = 'Disconnect'; }
+  else { label.style.display = 'none'; btn.textContent = 'Connect Wallet'; }
 }
-
 async function connectWallet(){
+  if (location.protocol === 'file:') { alert('Open the site over http(s) to enable wallet connections.'); return; }
   const provider = window.ethereum;
-  if(!provider){ alert("No Ethereum provider found. Install MetaMask."); return; }
+  if(!provider){ alert("No Ethereum provider found. Install/enable MetaMask."); return; }
   try{
     const accounts = await provider.request({ method: 'eth_requestAccounts' });
     user_address = accounts?.[0] || null;
     setWalletUI(user_address);
-    const ss = document.getElementById('stakeStatus');
-    if(ss) ss.textContent = user_address ? `Fetching owned tokens for ${shorten(user_address)}…` : 'No wallet connected.';
+    const ss = document.getElementById('stakeStatus'); ss.textContent = user_address ? `Fetching owned tokens for ${shorten(user_address)}…` : 'No wallet connected.';
     if(user_address){ heldTokens = []; heldContinuation = ''; await fetch_held_tokens(user_address); setTab('owned'); }
   }catch(e){ console.warn(e); }
 }
-function disconnectWallet(){
-  user_address = null; setWalletUI(null);
-  heldTokens=[]; heldContinuation='';
-  renderStakeList('owned');
-  const ss = document.getElementById('stakeStatus'); if(ss) ss.textContent='Disconnected.';
-}
+function disconnectWallet(){ user_address = null; setWalletUI(null); heldTokens=[]; heldContinuation=''; stakedView.items=[]; stakedView.page=0; renderStakeList(currentTab); document.getElementById('stakeStatus').textContent='Disconnected.'; }
 document.getElementById('connectBtn')?.addEventListener('click', ()=>{ user_address ? disconnectWallet() : connectWallet(); });
-if(window.ethereum){
-  window.ethereum.on?.('accountsChanged', (accs)=>{ user_address = accs?.[0] || null; setWalletUI(user_address); if(user_address){ heldTokens=[]; heldContinuation=''; fetch_held_tokens(user_address); } else { renderStakeList('owned'); } });
-}
+if(window.ethereum){ window.ethereum.on?.('accountsChanged', (accs)=>{ user_address = accs?.[0] || null; setWalletUI(user_address); if(user_address){ heldTokens=[]; heldContinuation=''; fetch_held_tokens(user_address); } else { renderStakeList(currentTab); } }); }
 
-let heldTokens = [];       // accumulated tokens
-let heldContinuation = ''; // pagination cursor
-
+/* OWNED via Reservoir */
+let heldTokens = [];
+let heldContinuation = '';
 async function fetch_held_tokens(wallet, limit, next_string){
   try{
-    wallet = wallet || user_address;
-    if(!wallet){ const ss=document.getElementById('stakeStatus'); if(ss) ss.textContent='Connect a wallet to load owned tokens.'; return; }
+    wallet = wallet || user_address; if(!wallet){ document.getElementById('stakeStatus').textContent='Connect a wallet to load owned tokens.'; return; }
     const lim = limit || 50;
     const cont = next_string || heldContinuation || '';
     const contQS = cont ? '&continuation='+encodeURIComponent(cont) : '';
@@ -570,45 +481,87 @@ async function fetch_held_tokens(wallet, limit, next_string){
     heldTokens = heldTokens.concat(items);
     heldContinuation = data.continuation || '';
 
-    renderStakeList('owned'); // show live
-    const ss=document.getElementById('stakeStatus'); if(ss) ss.textContent = `Loaded ${heldTokens.length} token(s)` + (heldContinuation ? ' • more available' : '');
-
+    if(currentTab==='owned') renderStakeList('owned');
+    const ss=document.getElementById('stakeStatus'); ss.textContent = `Owned: ${heldTokens.length}` + (heldContinuation ? ' • more available' : '');
     renderHeldLoadMore(wallet, lim, heldContinuation);
   }catch(err){
     console.warn('fetch_held_tokens failed:', err);
-    const ss=document.getElementById('stakeStatus'); if(ss) ss.textContent = 'Failed to fetch owned tokens (check API key).';
+    document.getElementById('stakeStatus').textContent = 'Failed to fetch owned tokens (check API key).';
   }
 }
 function renderHeldLoadMore(wallet, limit, continuation){
-  const anchor = document.getElementById('ownedControls');
+  const anchor = document.getElementById('stakeControls');
   let btn = document.getElementById('heldMoreBtn');
-  if(!continuation){
-    if(btn) btn.remove();
-    return;
-  }
+  if(!continuation){ if(btn) btn.remove(); return; }
   if(!btn){
     btn = document.createElement('button');
     btn.id = 'heldMoreBtn';
     btn.className = 'btn btn-outline btn-sm';
-    btn.textContent = 'Load more';
+    btn.textContent = 'Load more Owned';
     anchor?.appendChild(btn);
   }
   btn.onclick = ()=> fetch_held_tokens(wallet, limit, continuation);
 }
 
-/* OWNED/STAKED LIST RENDER */
+/* STAKED integration (without calling your fetch_staked_tokens) */
+const stakedView = { items: [], page: 0, pageSize: 5, hasMore: false, loading: false };
+function stakingHelpersAvailable(){
+  return typeof getStakedTokens === 'function' && typeof stakerAddress === 'function' && typeof stakingValues === 'function';
+}
+async function loadStakedTokens(wallet){
+  if(!user_address && !wallet){ alert('Connect a wallet first.'); return; }
+  wallet = wallet || user_address;
+
+  const status = document.getElementById('stakeStatus');
+  if(!stakingHelpersAvailable()){
+    status.textContent = 'Staking helpers not found. Include assets/ethereum-dapp.js and reload.';
+    return;
+  }
+  if(stakedView.loading) return;
+  stakedView.loading = true; status.textContent = 'Loading staked…';
+
+  try{
+    const tokens = await getStakedTokens(wallet); // expected: array of { tokenId } or similar
+    // Normalize to simple list of ids
+    const tokenIds = (tokens || []).map(t => parseInt(String(t?.tokenId ?? t?.id ?? t), 10)).filter(n=>Number.isFinite(n));
+    const results = [];
+    for (const token_id of tokenIds){
+      // parallelizable, but kept serial to avoid RPC rate limits; tweak if needed
+      const owner = await stakerAddress(token_id);
+      const vals = await stakingValues(token_id); // [time, lvl, nextlvl, rewards, date]
+      const staked_rewards = vals?.[3]; const staked_date = vals?.[4];
+      results.push({ id: token_id, owner, staked_date, rewards: staked_rewards });
+    }
+    stakedView.items = results;
+    stakedView.page = 0;
+    stakedView.hasMore = false; // you can set true if your helpers paginate
+    renderStakeList('staked');
+    status.textContent = `Staked: ${results.length}`;
+  }catch(err){
+    console.warn('loadStakedTokens error:', err);
+    status.textContent = 'Failed to load staked tokens.';
+  }finally{
+    stakedView.loading = false;
+  }
+}
+document.getElementById('loadStakedBtn')?.addEventListener('click', ()=> loadStakedTokens() );
+
+/* OWNED/STAKED TABS + RENDER */
+let currentTab='owned';
 const tabOwned=document.getElementById('tabOwned');
 const tabStaked=document.getElementById('tabStaked');
 const tabsWrap=document.getElementById('stakeTabs');
 
 function setTab(which){
+  currentTab = which;
   const owned=(which==='owned');
   tabOwned?.setAttribute('aria-selected',  owned ? 'true':'false');
   tabStaked?.setAttribute('aria-selected', owned ? 'false':'true');
   tabsWrap?.style.setProperty('--tab-i', owned ? 0 : 1);
-  renderStakeList(owned ? 'owned' : 'staked');
+  renderStakeList(which);
 }
 tabOwned?.addEventListener('click',()=>setTab('owned'));
+tabStaked?.addEventListener('click',()=>setTab('staked'));
 
 function renderStakeList(mode){
   const wrap = document.getElementById('chipWrap'); if(!wrap) return;
@@ -618,14 +571,8 @@ function renderStakeList(mode){
   if(mode==='owned'){
     const data = (user_address && heldTokens.length) ? heldTokens : null;
 
-    if(!user_address){
-      list.innerHTML = '<li class="list-item"><div class="muted">Connect your wallet to view owned tokens.</div></li>';
-      return;
-    }
-    if(!data){
-      list.innerHTML = '<li class="list-item"><div class="muted">No tokens loaded yet. Click “Refresh”.</div></li>';
-      return;
-    }
+    if(!user_address){ list.innerHTML = '<li class="list-item"><div class="muted">Connect your wallet to view owned tokens.</div></li>'; return; }
+    if(!data){ list.innerHTML = '<li class="list-item"><div class="muted">No tokens loaded yet. Click “Refresh Owned”.</div></li>'; return; }
 
     data.forEach(({id, image})=>{
       const rank = getRankById ? getRankById(id) : null;
@@ -640,42 +587,80 @@ function renderStakeList(mode){
           <div class="muted">Owned by <span class="addr">${shorten(user_address)}</span></div>
         </div>
         <div class="row" style="gap:6px;">
-          <button class="btn btn-outline btn-sm" disabled title="Staking coming soon">🔒 Stake</button>
+          <button class="btn btn-outline btn-sm" disabled title="Staking UI separate">🔒 Stake</button>
         </div>`;
       list.appendChild(li);
     });
-  } else {
-    list.innerHTML = '<li class="list-item"><div class="muted">Staked view coming in the next step.</div></li>';
+
+    // Owned "Load more" button handled elsewhere
+
+  } else { // staked
+    const items = stakedView.items || [];
+    if(!user_address){
+      list.innerHTML = '<li class="list-item"><div class="muted">Connect your wallet to load staked tokens.</div></li>'; return;
+    }
+    if(!items.length){
+      list.innerHTML = '<li class="list-item"><div class="muted">No staked tokens yet. Click “Load Staked”.</div></li>'; return;
+    }
+
+    // Paginate staked: 5 per page
+    const start = stakedView.page * stakedView.pageSize;
+    const end = start + stakedView.pageSize;
+    items.slice(start, end).forEach(({id, owner, staked_date, rewards})=>{
+      const rank = getRankById ? getRankById(id) : null;
+      const li = document.createElement('li'); li.className='list-item';
+      li.innerHTML =
+        thumb64(SOURCE_PATH+'/frog/'+id+'.png','Frog '+id) +
+        `<div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <b>Frog #${id}</b>
+            ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`}
+          </div>
+          <div class="muted">Owner <span class="addr">${owner ? shorten(owner) : '—'}</span> • Staked ${staked_date ?? '—'} • Rewards ${Math.round(Number(rewards||0))} Flyz</div>
+        </div>
+        <div class="row" style="gap:6px;">
+          <button class="btn btn-outline btn-sm" id="unstake_${id}" ${typeof initiate_withdraw==='function'?'':'disabled title="initiate_withdraw not found"'}>Un-stake</button>
+        </div>`;
+      list.appendChild(li);
+
+      // Wire unstake if available
+      const ub = document.getElementById(`unstake_${id}`);
+      if (ub && typeof initiate_withdraw==='function') {
+        ub.onclick = ()=> initiate_withdraw(id);
+      }
+    });
+
+    // Pager buttons for staked
+    let moreBtn = document.getElementById('stakedMoreBtn');
+    let lessBtn = document.getElementById('stakedLessBtn');
+    const controls = document.getElementById('stakeControls');
+    const pages = Math.ceil(items.length / stakedView.pageSize);
+
+    if(!lessBtn){ lessBtn = document.createElement('button'); lessBtn.id='stakedLessBtn'; lessBtn.className='btn btn-ghost btn-sm'; lessBtn.textContent='Show less'; controls.appendChild(lessBtn); }
+    if(!moreBtn){ moreBtn = document.createElement('button'); moreBtn.id='stakedMoreBtn'; moreBtn.className='btn btn-outline btn-sm'; moreBtn.textContent='View more'; controls.appendChild(moreBtn); }
+
+    lessBtn.style.display = (stakedView.page>0) ? '' : 'none';
+    moreBtn.style.display = (stakedView.page < pages-1) ? '' : 'none';
+
+    moreBtn.onclick = ()=>{ if(stakedView.page < pages-1){ stakedView.page++; renderStakeList('staked'); } };
+    lessBtn.onclick = ()=>{ if(stakedView.page > 0){ stakedView.page--; renderStakeList('staked'); } };
   }
 }
 
+/* Controls */
+document.getElementById('selectAll')?.addEventListener('click',()=>{ document.getElementById('stakeStatus').textContent='Selected all visible tokens (demo).'; });
+document.getElementById('clearSel')?.addEventListener('click',()=>{ document.getElementById('stakeStatus').textContent='Cleared selection (demo).'; });
+document.getElementById('refreshOwned')?.addEventListener('click',()=>{ if(user_address){ heldTokens=[]; heldContinuation=''; fetch_held_tokens(user_address); } else { document.getElementById('stakeStatus').textContent='Connect a wallet first.'; } });
+
 /* ============ MINT (demo) ============ */
 const PRICE_ETH=0.01; let mintQty=1;
-const mintQtyEl=document.getElementById('mintQty');
-const mintTotalEl=document.getElementById('mintTotal');
-const mintBtn=document.getElementById('mintBtn');
-const mintBar=document.getElementById('mintBar');
-const mintSlider=document.getElementById('mintSlider');
-const gasEstEl=document.getElementById('gasEst');
-
-function updateMintUI(){
-  mintQtyEl.textContent=mintQty;
-  mintSlider.value=String(mintQty);
-  mintTotalEl.textContent=(PRICE_ETH*mintQty).toFixed(2);
-  mintBtn.innerHTML=`Mint <u>${mintQty}</u>`;
-  const gas=0.00015+(mintQty-1)*0.00005;
-  gasEstEl.textContent=gas.toFixed(5);
-}
+const mintQtyEl=document.getElementById('mintQty'); const mintTotalEl=document.getElementById('mintTotal'); const mintBtn=document.getElementById('mintBtn'); const mintBar=document.getElementById('mintBar'); const mintSlider=document.getElementById('mintSlider'); const gasEstEl=document.getElementById('gasEst');
+function updateMintUI(){ mintQtyEl.textContent=mintQty; mintSlider.value=String(mintQty); mintTotalEl.textContent=(PRICE_ETH*mintQty).toFixed(2); mintBtn.innerHTML=`Mint <u>${mintQty}</u>`; const gas=0.00015+(mintQty-1)*0.00005; gasEstEl.textContent=gas.toFixed(5); }
 document.getElementById('mintUp')?.addEventListener('click',()=>{ mintQty=Math.min(20,mintQty+1); updateMintUI(); });
 document.getElementById('mintDown')?.addEventListener('click',()=>{ mintQty=Math.max(1,mintQty-1); updateMintUI(); });
 mintSlider?.addEventListener('input', e=>{ mintQty=parseInt(e.target.value,10); updateMintUI(); });
-document.querySelectorAll('[data-preset]')?.forEach(b=>b.addEventListener('click',()=>{ mintQty=parseInt(b.dataset.preset,10); updateMintUI(); }));
-mintBtn?.addEventListener('click',()=>{
-  if(!mintBar) return;
-  mintBar.style.width='0%';
-  requestAnimationFrame(()=>{ setTimeout(()=>{ mintBar.style.width='100%'; }, 30); });
-  const st=document.getElementById('mintStatus'); if(st) st.textContent=`Mint prepared: ${mintQty} @ ${(PRICE_ETH*mintQty).toFixed(2)} ETH (demo)`;
-});
+document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>{ mintQty=parseInt(b.dataset.preset,10); updateMintUI(); }));
+mintBtn?.addEventListener('click',()=>{ if(!mintBar) return; mintBar.style.width='0%'; requestAnimationFrame(()=>{ setTimeout(()=>{ mintBar.style.width='100%'; }, 30); }); document.getElementById('mintStatus').textContent=`Mint prepared: ${mintQty} @ ${(PRICE_ETH*mintQty).toFixed(2)} ETH (demo)`; });
 updateMintUI();
 
 /* ============ BOOT ============ */
@@ -699,11 +684,9 @@ updateMintUI();
   // hero grid
   renderSimpleGrid();
 
-  // auto-set wallet label if already connected (where available)
+  // auto set label if wallet already connected
   if (window.ethereum?.selectedAddress){
-    user_address = window.ethereum.selectedAddress;
-    setWalletUI(user_address);
-    fetch_held_tokens(user_address);
+    user_address = window.ethereum.selectedAddress; setWalletUI(user_address); fetch_held_tokens(user_address);
   }
 })();
 </script>
