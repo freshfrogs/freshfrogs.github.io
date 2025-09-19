@@ -7,7 +7,7 @@
   C.CONTROLLER_ADDRESS = C.CONTROLLER_ADDRESS || "0xCB1ee125CFf4051a10a55a09B10613876C4Ef199";
   C.JSON_PATH = C.JSON_PATH || "assets/freshfrogs_rarity_rankings.json";
   C.AUTO_INIT = false; // force-off
-  C.FROG_API_KEY = C.FROG_API_KEY || "YOUR_RESERVOIR_API_KEY_HERE";
+  C.FROG_API_KEY = C.FROG_API_KEY || "3105c552-60b6-5252-bca7-291c724a54bf";
   if (typeof window.FROG_API_KEY === 'string' && window.FROG_API_KEY.trim()) {
     C.FROG_API_KEY = window.FROG_API_KEY.trim();
   }
