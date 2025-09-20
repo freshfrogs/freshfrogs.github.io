@@ -1,5 +1,5 @@
 // assets/js/core.js
-// Config, helpers, wallet, endpoints, and shared fetchers
+// Config, helpers, wallet, endpoints, shared fetchers + stronger diagnostics
 
 // ===================== CONFIG =====================
 export const FF_CFG = (() => {
@@ -7,30 +7,24 @@ export const FF_CFG = (() => {
     SOURCE_PATH: "https://freshfrogs.github.io",
     COLLECTION_ADDRESS: "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b",
     CONTROLLER_ADDRESS: "0xCB1ee125CFf4051a10a55a09B10613876C4Ef199",
-    // Leave empty if you don't want to use Reservoir key on GH Pages
-    FROG_API_KEY: "3105c552-60b6-5252-bca7-291c724a54bf",
-
-    // Rarity JSON
+    FROG_API_KEY: "3105c552-60b6-5252-bca7-291c724a54bf",                     // leave blank if you don’t want a key in GH Pages
     RARITY_JSON: "assets/freshfrogs_rarity_rankings.json",
-
-    // Optional endpoint overrides (if you provide your own endpoints).
-    // If you set CUSTOM_ENDPOINTS=true below and fill these, they take priority.
+    SUPPLY: 4040,
+    DEBUG: false,                         // set true to see console debug
     CUSTOM_ENDPOINTS: false,
     ENDPOINTS: {
-      // tokens held by a wallet in the collection
-      owned:   (wallet, qs) => `https://api.reservoir.tools/users/${wallet}/tokens/v8?${qs}`,
-      // all tokens owned by controller (pond)
-      pond:    (controller, qs) => `https://api.reservoir.tools/users/${controller}/tokens/v8?${qs}`,
-      // sales + mints
-      sales:   (qs) => `https://api.reservoir.tools/sales/v6?${qs}`,
-      mints:   (qs) => `https://api.reservoir.tools/collections/activity/v6?${qs}`,
+      owned: (wallet, qs) => `https://api.reservoir.tools/users/${wallet}/tokens/v8?${qs}`,
+      pond:  (controller, qs) => `https://api.reservoir.tools/users/${controller}/tokens/v8?${qs}`,
+      sales: (qs) => `https://api.reservoir.tools/sales/v6?${qs}`,
+      mints: (qs) => `https://api.reservoir.tools/collections/activity/v6?${qs}`,
     },
-
-    SUPPLY: 4040,
+    REQUIRED_CHAIN_ID: 1,                 // Ethereum mainnet
   };
   try { return Object.assign({}, def, window.FF_CFG || {}); }
   catch { return def; }
 })();
+
+function log(...a){ if(FF_CFG.DEBUG) console.log("[FF]",...a); }
 
 // ===================== HELPERS =====================
 export function shorten(addr) {
@@ -54,36 +48,48 @@ export function thumb64(src, alt = "") {
 }
 export async function fetchJSON(url, opts = {}) {
   const res = await fetch(url, opts);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (!res.ok) {
+    const txt = await res.text().catch(()=> "");
+    throw new Error(`HTTP ${res.status} ${res.statusText} @ ${url}\n${txt.slice(0,200)}`);
+  }
   return res.json();
 }
-
-// Build headers for Reservoir if key present
-function reservoirHeaders() {
-  const h = { accept: "*/*" };
-  if (FF_CFG.FROG_API_KEY) h["x-api-key"] = FF_CFG.FROG_API_KEY;
-  return h;
+export function absolutePath(p) {
+  // ensure /assets/... loads from site root (GH Pages)
+  if (/^https?:\/\//i.test(p)) return p;
+  return new URL(p.replace(/^\.\//,"/"), location.origin).toString();
 }
-function use(url) { return fetchJSON(url, { headers: reservoirHeaders() }); }
 
 // ===================== WALLET =====================
 export async function getUser() {
   if (!window.ethereum) throw new Error("No Ethereum provider found. Install MetaMask.");
   const provider = new window.ethers.providers.Web3Provider(window.ethereum, "any");
   await provider.send("eth_requestAccounts", []);
+  const net = await provider.getNetwork();
+  if (FF_CFG.REQUIRED_CHAIN_ID && net.chainId !== FF_CFG.REQUIRED_CHAIN_ID) {
+    throw new Error(`Please switch to Ethereum Mainnet (chainId ${FF_CFG.REQUIRED_CHAIN_ID}).`);
+  }
   const signer = provider.getSigner();
   const address = await signer.getAddress();
   return { provider, signer, address };
 }
 
 // ===================== RESERVOIR (or custom) =====================
+function reservoirHeaders() {
+  const h = { accept: "*/*" };
+  if (FF_CFG.FROG_API_KEY) h["x-api-key"] = FF_CFG.FROG_API_KEY;
+  return h;
+}
+function use(url) {
+  log("GET", url);
+  return fetchJSON(url, { headers: reservoirHeaders() });
+}
+
 export async function fetchOwned({ wallet, limit = 50, continuation = "" } = {}) {
   if (!wallet) throw new Error("wallet required");
   const qs = new URLSearchParams({ collection: FF_CFG.COLLECTION_ADDRESS, limit: String(limit) });
   if (continuation) qs.set("continuation", continuation);
-  const url = FF_CFG.CUSTOM_ENDPOINTS
-    ? FF_CFG.ENDPOINTS.owned(wallet, qs.toString())
-    : FF_CFG.ENDPOINTS.owned(wallet, qs.toString());
+  const url = FF_CFG.ENDPOINTS.owned(wallet, qs.toString());
   return use(url);
 }
 
@@ -91,9 +97,7 @@ export async function fetchPond({ limit = 50, continuation = "" } = {}) {
   if (!FF_CFG.CONTROLLER_ADDRESS) throw new Error("Missing CONTROLLER_ADDRESS");
   const qs = new URLSearchParams({ collection: FF_CFG.COLLECTION_ADDRESS, limit: String(limit) });
   if (continuation) qs.set("continuation", continuation);
-  const url = FF_CFG.CUSTOM_ENDPOINTS
-    ? FF_CFG.ENDPOINTS.pond(FF_CFG.CONTROLLER_ADDRESS, qs.toString())
-    : FF_CFG.ENDPOINTS.pond(FF_CFG.CONTROLLER_ADDRESS, qs.toString());
+  const url = FF_CFG.ENDPOINTS.pond(FF_CFG.CONTROLLER_ADDRESS, qs.toString());
   return use(url);
 }
 
@@ -123,7 +127,6 @@ export async function fetchMints({ limit = 50, continuation = "" } = {}) {
 }
 
 // ===================== CONTRACT ADAPTERS =====================
-// Ensure ABI files assign to window.COLLECTION_ABI / window.CONTROLLER_ABI
 export function getCollectionContract(providerOrSigner) {
   if (!window.COLLECTION_ABI) throw new Error("COLLECTION_ABI not found (ensure assets/abi/collection_abi.js sets window.COLLECTION_ABI)");
   return new window.ethers.Contract(FF_CFG.COLLECTION_ADDRESS, window.COLLECTION_ABI, providerOrSigner);
@@ -137,26 +140,21 @@ export function getControllerContract(providerOrSigner) {
 export async function readStakeInfo(tokenId, provider) {
   const c = getControllerContract(provider);
   let staker = null, sinceMs = null;
-  try { staker = await c.stakerAddress(tokenId); } catch {}
-  try {
-    // stakingValues(uint256) expected tuple: [start, ..., next, ..., rewards, dateStr?]
-    const v = await c.stakingValues(tokenId);
-    const start = v?.[0]; // seconds?
-    if (start != null) sinceMs = Number(start) * 1000;
-  } catch {}
-  if (!sinceMs) {
+
+  try { staker = await c.stakerAddress(tokenId); } catch(e){ log("stakerAddress fail", e.message); }
+
+  // Try common “since” accessors in priority order
+  const tryRead = async (fn) => {
     try {
-      const v = await c.getStake(tokenId); // common pattern
-      const start = v?.[0] ?? v?.since ?? v?.start;
-      if (start != null) sinceMs = Number(start) * 1000;
-    } catch {}
-  }
-  if (!sinceMs) {
-    try {
-      const v = await c.stakeOf(tokenId);
-      const start = v?.[0] ?? v?.since ?? v?.start;
-      if (start != null) sinceMs = Number(start) * 1000;
-    } catch {}
-  }
+      const v = await c[fn](tokenId);
+      const start = (v?.since ?? v?.start ?? v?.[0]);
+      if (start != null) return Number(start) * 1000;
+    } catch(e){/* ignore */ }
+    return null;
+  };
+  sinceMs = sinceMs || await tryRead("stakingValues");
+  sinceMs = sinceMs || await tryRead("getStake");
+  sinceMs = sinceMs || await tryRead("stakeOf");
+
   return { staker, sinceMs };
 }

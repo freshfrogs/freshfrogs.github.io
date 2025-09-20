@@ -2,8 +2,8 @@
 // Owned & Staked panel + staking actions + hooks for modal
 
 import {
-  FF_CFG, fetchOwned,
-  getUser, getCollectionContract, getControllerContract, readStakeInfo
+  FF_CFG, fetchOwned, getUser,
+  getCollectionContract, getControllerContract, readStakeInfo
 } from "./core.js";
 
 let CURRENT_WALLET = null;
@@ -69,11 +69,21 @@ export async function loadStaked({ wallet }) {
     setStakeStatus("Loading staked…");
     const provider = new window.ethers.providers.Web3Provider(window.ethereum, "any");
     const controller = getControllerContract(provider);
-    const rows = await controller.getStakedTokens(wallet); // [{staker, tokenId}]
+
+    // Contract must expose getStakedTokens(address) → [{staker, tokenId}]
+    let rows = [];
+    try {
+      rows = await controller.getStakedTokens(wallet);
+    } catch (e) {
+      setStakeStatus("Controller.getStakedTokens(wallet) unavailable. Check ABI.");
+      return;
+    }
+
     const ids = (rows || []).map(r => {
       const tokenId = r?.tokenId ?? (Array.isArray(r) ? r[1] : null);
       return tokenId != null ? parseInt(String(tokenId), 10) : null;
     }).filter(n => Number.isFinite(n));
+
     if (STAKE_TAB === "staked") renderChipList(ids);
     setStakeStatus(ids.length ? `Staked: ${ids.length}` : "No staked frogs.");
   } catch (e) {
@@ -81,32 +91,24 @@ export async function loadStaked({ wallet }) {
   }
 }
 
-// =============== Actions ==================
-// Wire these to buttons when you add action UI
+// =============== Actions (optional UI) ==================
 export async function stakeToken(tokenId) {
   const { signer, address } = await getUser();
   const coll = getCollectionContract(signer);
   const ctrl = getControllerContract(signer);
-  // need approval
   const isApproved = await coll.isApprovedForAll(address, FF_CFG.CONTROLLER_ADDRESS).catch(()=>false);
-  if (!isApproved) {
-    const txA = await coll.setApprovalForAll(FF_CFG.CONTROLLER_ADDRESS, true);
-    await txA.wait();
-  }
-  const tx = await ctrl.stake(tokenId);
-  await tx.wait();
+  if (!isApproved) { const txA = await coll.setApprovalForAll(FF_CFG.CONTROLLER_ADDRESS, true); await txA.wait(); }
+  const tx = await ctrl.stake(tokenId); await tx.wait();
 }
 export async function unstakeToken(tokenId) {
   const { signer } = await getUser();
   const ctrl = getControllerContract(signer);
-  const tx = await ctrl.withdraw(tokenId);
-  await tx.wait();
+  const tx = await ctrl.withdraw(tokenId); await tx.wait();
 }
 export async function claimRewards() {
   const { signer } = await getUser();
   const ctrl = getControllerContract(signer);
-  const tx = await ctrl.claimRewards();
-  await tx.wait();
+  const tx = await ctrl.claimRewards(); await tx.wait();
 }
 
 // =============== Tabs & boot ==============
@@ -142,15 +144,16 @@ export function wireOwnedStakedPanel() {
 
 export function onWalletConnected(address) {
   CURRENT_WALLET = address;
+  // Auto-load both panes so user sees something immediately
   STAKE_TAB = "owned";
   document.getElementById("tabOwned")?.setAttribute("aria-selected", "true");
   document.getElementById("tabStaked")?.setAttribute("aria-selected", "false");
   loadOwned({ wallet: CURRENT_WALLET });
+  loadStaked({ wallet: CURRENT_WALLET }); // <— now also auto-load staked on connect
 }
 
 // =============== Modal helpers used by ui.js ===============
 export async function getStakeMetaForModal(tokenId) {
-  // returns { staked: boolean, sinceMs: number|null, staker: address|null }
   try {
     const provider = new window.ethers.providers.Web3Provider(window.ethereum, "any");
     const { staker, sinceMs } = await readStakeInfo(tokenId, provider);
