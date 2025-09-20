@@ -241,3 +241,100 @@
 .gap8 { gap:8px; }
 .traits-scroll { max-height:220px; overflow:auto; border-top:1px dashed var(--line); padding-top:8px; }
 .h3 { font-size:1.05rem; margin:0; }
+
+/* === Fresh Frogs: minimal overrides (append to end of styles.css) === */
+
+/* 1) List item layout: force 128px thumbs on desktop, 64px on mobile */
+.list-item { grid-template-columns: 128px 1fr auto; }
+.thumb64 {
+  width: 128px !important;
+  height: 128px !important;
+  object-fit: cover;
+  image-rendering: pixelated;
+  border-radius: 8px;
+  background: var(--panel);
+}
+@media (max-width: 560px) {
+  .list-item { grid-template-columns: 64px 1fr auto; }
+  .thumb64 {
+    width: 64px !important;
+    height: 64px !important;
+  }
+}
+
+/* 2) Slim tab selector for the Collection Insights navbar (#viewTabs only) */
+#viewTabs {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border-bottom: 1px solid var(--ring);
+  padding: 0 2px 6px;
+}
+#viewTabs .tab {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 6px 10px;
+  font: inherit;
+  color: var(--muted);
+  position: relative;
+  cursor: pointer;
+  border-radius: 6px;
+}
+#viewTabs .tab:hover { color: var(--ink); }
+#viewTabs .tab[aria-selected="true"] { color: var(--ink); }
+#viewTabs .tab[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -7px;
+  height: 2px; border-radius: 2px;
+  background: var(--ink);
+}
+
+/* 3) Lightbox + modal: softer overlay, transparent stage, clean composite */
+.lightbox { background: rgba(0,0,0,0.44) !important; }
+#lightboxStage { background: transparent !important; box-shadow: none !important; }
+
+/* Layered render box remains 512×512 on desktop, with PNG-as-color bg */
+.modal-composite {
+  position: relative;
+  width: 512px; height: 512px; max-width: 100%;
+  border-radius: 12px; overflow: hidden;
+  background: transparent; /* the color comes from .modal-bg-img */
+}
+
+/* Use the original still PNG as a background, zoomed & bottom-right
+   so only the flat background color is visible. */
+.modal-bg-img {
+  position: absolute; inset: 0;
+  background-repeat: no-repeat;
+  background-position: 100% 100% !important; /* bottom-right */
+  --modal-bg-zoom: 7000%;
+  background-size: var(--modal-bg-zoom) var(--modal-bg-zoom) !important;
+  z-index: 0;
+  /* Optional softening, if needed:
+     filter: blur(14px);
+     transform: scale(1.02);
+  */
+}
+
+/* Keep trait layers crisp and above the bg color */
+.modal-composite img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+/* 4) Responsive modal: scale render to 256×256 on small screens */
+@media (max-width: 560px) {
+  .modal-composite {
+    width: 256px !important;
+    height: 256px !important;
+  }
+  .render-vignette {
+    width: 256px !important;
+    height: 256px !important;
+    margin-top: -256px !important;
+  }
+}
