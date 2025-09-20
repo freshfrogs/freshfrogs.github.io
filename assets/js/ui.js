@@ -1,10 +1,14 @@
+// assets/js/ui.js
 import {
   FF_CFG, shorten, thumb64, fetchJSON, isLocal,
   mapSales, fetchSales, loadABIFromScript, formatAgo
 } from "./core.js";
 
-/* =============== RARITY STORE =============== */
+/* =========================================================
+   RARITY STORE
+   ========================================================= */
 let RARITY_LIST = null, RANK_LOOK = null, sortBy = "rank";
+
 function setRarityList(arr){
   RARITY_LIST = arr;
   RANK_LOOK = Object.fromEntries(
@@ -20,8 +24,17 @@ function sortedRarity(){
   else a.sort((x,y)=>Number(x.ranking??x.rank??1e9)-Number(y.ranking??y.rank??1e9));
   return a;
 }
+export async function loadRarity(){
+  if(!isLocal()){
+    try{ const arr=await fetchJSON(FF_CFG.JSON_PATH); if(Array.isArray(arr)) setRarityList(arr); }catch{}
+  }
+  renderRarity();
+}
+export function setRaritySort(mode){ sortBy=mode; renderRarity(); }
 
-/* =============== OWNER FALLBACK (collection ABI) =============== */
+/* =========================================================
+   CHAIN FALLBACKS FOR TOKEN DETAILS (owner / birthday)
+   ========================================================= */
 async function ownerOfViaChain(id){
   try{
     if(!window.ethereum) return null;
@@ -34,8 +47,6 @@ async function ownerOfViaChain(id){
     return addr || null;
   }catch{ return null; }
 }
-
-/* =============== TOKEN DETAILS (Reservoir + fallback) =============== */
 async function fetchTokenDetails(id){
   try{
     const params = new URLSearchParams({ tokens: `${FF_CFG.COLLECTION_ADDRESS}:${id}` });
@@ -55,34 +66,39 @@ async function fetchTokenDetails(id){
   }
 }
 
-/* =============== INFO MODAL (layered, 512×512, stretched PNG bg) =============== */
-const LAYER_ORDER = [
-  "Background",
-  "Frog", "SpecialFrog", "Trait",
-  "Skin", "Mouth", "Nose",
-  "Eyes", "Eyewear",
-  "Clothes", "Shirt", "Bodywear", "Jacket",
-  "Accessory", "Back", "Hand",
-  "Hat", "Headwear", "Crown",
-  "Foreground"
-];
-const LZ = Object.fromEntries(LAYER_ORDER.map((k,i)=>[k,(i+1)*10]));
+/* =========================================================
+   FROG INFO MODAL (layered, PNG as bg color, responsive)
+   - No hardcoded layer order: we respect metadata order exactly,
+     but we skip "Background" (modal bg comes from the still PNG).
+   ========================================================= */
 
+// Build a single image layer, prefer GIF if available
 function buildLayer(trait_type, attribute, mountEl){
   const img=document.createElement("img");
   img.loading="lazy"; img.alt = `${trait_type}: ${attribute}`;
   Object.assign(img.style,{
     position:"absolute", inset:"0", width:"100%", height:"100%",
-    objectFit:"contain", imageRendering:"pixelated", zIndex:String(LZ[trait_type] ?? 100)
+    objectFit:"contain", imageRendering:"pixelated"
   });
   const png=`${FF_CFG.SOURCE_PATH}/frog/build_files/${trait_type}/${attribute}.png`;
   img.src=png;
-  const gif=`${FF_CFG.SOURCE_PATH}/frog/build_files/${trait_type}/animations/${attribute}_animation.gif`;
-  const probe=new Image();
-  probe.onload=()=>{ img.src=gif; };
-  probe.onerror=()=>{};
-  probe.src=gif;
+
+  // Prefer GIF animation if it exists (skip Background)
+  if (trait_type !== "Background") {
+    const gif=`${FF_CFG.SOURCE_PATH}/frog/build_files/${trait_type}/animations/${attribute}_animation.gif`;
+    const probe=new Image();
+    probe.onload=()=>{ img.src=gif; };
+    probe.onerror=()=>{};
+    probe.src=gif;
+  }
+
   mountEl.appendChild(img);
+}
+
+// Use the exact metadata order, but skip "Background" (modal bg uses still PNG)
+function orderedAttributes(meta){
+  if(!Array.isArray(meta?.attributes)) return [];
+  return meta.attributes.filter(a => a?.trait_type !== "Background");
 }
 
 async function openFrogInfo(id){
@@ -139,32 +155,31 @@ async function openFrogInfo(id){
     </div>
   `;
 
-  // 512×512 layered render with stretched PNG as color-only background
+  // 512×512 layered render with the still PNG as a CSS bg (zoomed bottom-right so only color shows)
   const mount = S.querySelector("#modalComposite");
   if (mount) {
-    // 1) Background layer: stretch the still PNG so only its color field is visible
+    // Background layer (bottom-right corner, heavy zoom)
     const bg = document.createElement("div");
     bg.className = "modal-bg-img";
     bg.style.backgroundImage = `url("${FF_CFG.SOURCE_PATH}/frog/${id}.png")`;
-    mount.appendChild(bg); // goes under trait layers
+    bg.style.setProperty('--modal-bg-zoom', '7000%');
+    bg.style.backgroundPosition = "100% 100%";
+    mount.appendChild(bg);
 
-    // 2) Layer the traits (with GIFs when available)
-    if (Array.isArray(meta?.attributes)) {
-      const ordered = meta.attributes.slice().sort((a,b)=>{
-        const ai=LAYER_ORDER.indexOf(a.trait_type), bi=LAYER_ORDER.indexOf(b.trait_type);
-        return (ai===-1?999:ai) - (bi===-1?999:bi);
-      });
+    // Lay down traits in metadata order
+    const ordered = orderedAttributes(meta);
+    if (ordered.length) {
       ordered.forEach(a => buildLayer(a.trait_type, a.value, mount));
     } else {
-      // Fallback: plain image (on top of the color field)
+      // Fallback: single still image
       const img=document.createElement("img");
       img.src=`${FF_CFG.SOURCE_PATH}/frog/${id}.png`;
-      Object.assign(img.style,{position:"absolute",inset:"0",width:"100%",height:"100%",objectFit:"contain",imageRendering:"pixelated",zIndex:"200"});
+      Object.assign(img.style,{position:"absolute",inset:"0",width:"100%",height:"100%",objectFit:"contain",imageRendering:"pixelated"});
       mount.appendChild(img);
     }
   }
 
-  // Close handlers
+  // Close behaviors
   S.querySelector(".modal-close")?.addEventListener("click", ()=>{ L.style.display="none"; document.body.style.overflow=""; });
   L.style.display="grid"; document.body.style.overflow="hidden";
   const backdropClose=(ev)=>{ if(ev.target===L){ L.style.display="none"; document.body.style.overflow=""; L.removeEventListener("click",backdropClose);} };
@@ -172,7 +187,9 @@ async function openFrogInfo(id){
 }
 window.FF_openFrogInfo = openFrogInfo;
 
-/* =============== GRID (simple static images) =============== */
+/* =========================================================
+   GRID (simple static images)
+   ========================================================= */
 export function renderGrid(){
   const g=document.getElementById("grid"); if(!g) return;
   g.innerHTML="";
@@ -190,12 +207,14 @@ export function renderGrid(){
   }
 }
 
-/* =============== SALES (Reservoir) =============== */
+/* =========================================================
+   SALES (Reservoir)
+   ========================================================= */
 let salesCache=[];
 export function renderSales(list=salesCache){
   const ul=document.getElementById("featureList");
   if(!ul) return; ul.innerHTML="";
-  const arr=(list&&list.length)?list:[{id:3250,time:"3m",price:"0.080 ETH",buyer:"0x9a…D1"}];
+  const arr=(list&&list.length)?list:[{id:3250,time:"—",price:"—",buyer:"—"}];
   arr.forEach(x=>{
     const rank = window.FF_getRankById ? window.FF_getRankById(x.id) : null;
     const badge=(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`;
@@ -221,7 +240,73 @@ export async function loadSalesLive(){
   }catch(e){ console.warn("Sales fetch failed",e); return false; }
 }
 
-/* =============== RARITY UI =============== */
+/* =========================================================
+   MINTS (Reservoir — activity: types=mint)
+   ========================================================= */
+let mintsCache=[];
+function mapMints(activities){
+  // Reservoir activity/v6 (types=mint) — normalize to {id,time,buyer,price}
+  // price may be missing for free mints; show "—"
+  return (activities||[])
+    .map(a=>{
+      const tokenId = a?.token?.tokenId ?? a?.tokenId ?? a?.id;
+      const id = tokenId!=null ? parseInt(String(tokenId),10) : null;
+      const ts = a?.eventTimestamp ? Date.parse(a.eventTimestamp) :
+                 a?.timestamp ? (Number(a.timestamp)*1000) : null;
+      const taker = a?.toAddress || a?.to || a?.maker || a?.buyer || null;
+      const priceEth = a?.price?.amount?.decimal != null
+        ? `${Number(a.price.amount.decimal).toFixed(4)} ETH`
+        : (a?.price?.amount?.native != null ? `${Number(a.price.amount.native).toFixed(4)} ETH` : "—");
+      return id ? { id, time: ts ? formatAgo(Date.now()-ts) : "—", buyer: taker ? shorten(taker) : "—", price: priceEth } : null;
+    })
+    .filter(Boolean);
+}
+async function fetchMints({limit=50, continuation=""}={}){
+  const qs = new URLSearchParams({
+    collection: FF_CFG.COLLECTION_ADDRESS,
+    types: "mint",
+    limit: String(limit),
+    sortBy: "eventTimestamp",
+    sortDirection: "desc"
+  });
+  if(continuation) qs.set("continuation", continuation);
+  const url = `https://api.reservoir.tools/collections/activity/v6?${qs.toString()}`;
+  const res = await fetch(url, { headers: { accept: "*/*", "x-api-key": FF_CFG.FROG_API_KEY } });
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+export function renderMints(list=mintsCache){
+  const ul=document.getElementById("featureList");
+  if(!ul) return; ul.innerHTML="";
+  const arr=(list&&list.length)?list:[{id:1,time:"—",price:"—",buyer:"—"}];
+  arr.forEach(x=>{
+    const rank = window.FF_getRankById ? window.FF_getRankById(x.id) : null;
+    const badge=(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill pill-ghost">Rank N/A</span>`;
+    const li=document.createElement("li"); li.className="list-item";
+    li.innerHTML =
+      thumb64(`${FF_CFG.SOURCE_PATH}/frog/${x.id}.png`,`Frog ${x.id}`)+
+      `<div>
+        <div class="row gap8"><b>Frog #${x.id}</b> ${badge}</div>
+        <div class="muted">${x.time!=="—"?x.time+" ago":"—"} • Minter ${x.buyer}</div>
+      </div>
+      <div class="price">${x.price}</div>`;
+    li.style.cursor="pointer"; li.addEventListener("click",()=>openFrogInfo(x.id));
+    ul.appendChild(li);
+  });
+}
+export async function loadMintsLive(){
+  try{
+    if(!FF_CFG.FROG_API_KEY || FF_CFG.FROG_API_KEY==="YOUR_RESERVOIR_API_KEY_HERE") throw new Error("Missing Reservoir API key");
+    const data = await fetchMints({limit:50});
+    const mapped = mapMints(data.activities||data.events||[]);
+    if(mapped.length){ mintsCache=mapped; renderMints(); return true; }
+    return false;
+  }catch(e){ console.warn("Mints fetch failed",e); return false; }
+}
+
+/* =========================================================
+   RARITY LIST UI
+   ========================================================= */
 export function renderRarity(){
   const ul=document.getElementById("featureList");
   if(!ul) return; ul.innerHTML="";
@@ -241,15 +326,10 @@ export function renderRarity(){
     ul.appendChild(li);
   });
 }
-export async function loadRarity(){
-  if(!isLocal()){
-    try{ const arr=await fetchJSON(FF_CFG.JSON_PATH); if(Array.isArray(arr)) setRarityList(arr); }catch{}
-  }
-  renderRarity();
-}
-export function setRaritySort(mode){ sortBy=mode; renderRarity(); }
 
-/* =============== POND (All currently staked via controller address) =============== */
+/* =========================================================
+   POND (controller-held / currently staked)
+   ========================================================= */
 export let pondItems=[], pondContinuation='';
 export async function loadPond(limit=50, nextStr){
   try{
@@ -327,7 +407,9 @@ export function renderPond(){
   });
 }
 
-/* =============== WALLET + OWNED =============== */
+/* =========================================================
+   WALLET + OWNED LIST
+   ========================================================= */
 let currentUser=null;
 function setWalletUI(a){
   const l=document.getElementById("walletLabel"), b=document.getElementById("connectBtn");
@@ -420,48 +502,75 @@ export async function fetchOwned(wallet, limit=50, nextStr){
   }
 }
 
-/* =============== UNIFIED FEATURE TABS (Sales/Rarity/Pond) =============== */
-let currentFeatureView="sales";
+/* =========================================================
+   UNIFIED FEATURE TABS (Mints / Sales / Rarity / Pond)
+   ========================================================= */
+let currentFeatureView="mints"; // default order: Mints → Sales → Rarity → Pond
+
 function applyFeatureControls(){
-  const onSales=currentFeatureView==='sales';
-  const onRarity=currentFeatureView==='rarity';
+  const onMints  = currentFeatureView==='mints';
+  const onSales  = currentFeatureView==='sales';
+  const onRarity = currentFeatureView==='rarity';
+  // Toggle any per-view controls (keep simple for now)
   const refreshBtn=document.getElementById("refreshBtn");
   const fetchLiveBtn=document.getElementById("fetchLiveBtn");
   const sortRankBtn=document.getElementById("sortRankBtn");
   const sortScoreBtn=document.getElementById("sortScoreBtn");
-  if(refreshBtn)   refreshBtn.style.display   = onSales ? "" : "none";
-  if(fetchLiveBtn) fetchLiveBtn.style.display = onSales ? "" : "none";
+  if(refreshBtn)   refreshBtn.style.display   = (onMints||onSales) ? "" : "none";
+  if(fetchLiveBtn) fetchLiveBtn.style.display = (onMints||onSales) ? "" : "none";
   if(sortRankBtn)  sortRankBtn.style.display  = onRarity ? "" : "none";
   if(sortScoreBtn) sortScoreBtn.style.display = onRarity ? "" : "none";
 }
+
 function setFeatureView(view){
   currentFeatureView=view;
   const wrap=document.getElementById('viewTabs');
   (wrap||document).querySelectorAll('.tab').forEach(btn=>{
     btn.setAttribute('aria-selected', btn.dataset.view===view ? 'true' : 'false');
   });
-  if(view==='sales') renderSales();
+
+  if(view==='mints')   renderMints();
+  else if(view==='sales')  renderSales();
   else if(view==='rarity') renderRarity();
   else renderPond();
+
   applyFeatureControls();
 }
+
 export function wireFeatureTabs(){
   const wrap=document.getElementById('viewTabs');
-  if(wrap && !wrap.querySelector('[data-view="pond"]')){
-    const btn=document.createElement('button');
-    btn.className='tab'; btn.dataset.view='pond'; btn.textContent='Pond';
-    wrap.appendChild(btn);
+  if(wrap){
+    wrap.innerHTML = ""; // rebuild in the required order
+    const mk = (view,label)=>{
+      const b=document.createElement('button');
+      b.className='tab'; b.dataset.view=view; b.textContent=label;
+      wrap.appendChild(b);
+    };
+    mk('mints','Recent Mints');
+    mk('sales','Recent Sales');
+    mk('rarity','Rarity');
+    mk('pond','Pond');
+
+    wrap.querySelectorAll('.tab').forEach(btn=>{
+      btn.addEventListener('click',()=>setFeatureView(btn.dataset.view));
+    });
   }
-  (wrap||document).querySelectorAll('.tab').forEach(btn=>{
-    btn.addEventListener('click',()=>setFeatureView(btn.dataset.view));
-  });
-  setFeatureView("sales");
+  setFeatureView("mints");
 }
+
 export function wireFeatureButtons(){
-  document.getElementById("refreshBtn")?.addEventListener("click",()=>renderSales());
-  document.getElementById("fetchLiveBtn")?.addEventListener("click",()=>loadSalesLive());
+  document.getElementById("refreshBtn")?.addEventListener("click",()=>{
+    if(currentFeatureView==='mints') renderMints();
+    else if(currentFeatureView==='sales') renderSales();
+  });
+  document.getElementById("fetchLiveBtn")?.addEventListener("click",async()=>{
+    if(currentFeatureView==='mints') { const ok=await loadMintsLive(); if(ok){ const b=document.getElementById("fetchLiveBtn"); if(b){ b.textContent="Live loaded"; b.disabled=true; b.classList.add("btn-ghost"); } } }
+    else if(currentFeatureView==='sales'){ const ok=await loadSalesLive(); if(ok){ const b=document.getElementById("fetchLiveBtn"); if(b){ b.textContent="Live loaded"; b.disabled=true; b.classList.add("btn-ghost"); } } }
+  });
+
   document.getElementById("sortRankBtn")?.addEventListener("click",()=>setRaritySort("rank"));
   document.getElementById("sortScoreBtn")?.addEventListener("click",()=>setRaritySort("score"));
+
   document.getElementById('selectAll')?.addEventListener('click',()=>{ const s=document.getElementById('stakeStatus'); if(s) s.textContent='Selected all visible tokens (demo).'; });
   document.getElementById('clearSel')?.addEventListener('click',()=>{ const s=document.getElementById('stakeStatus'); if(s) s.textContent='Cleared selection (demo).'; });
   document.getElementById('refreshOwned')?.addEventListener('click',()=>{
@@ -470,7 +579,9 @@ export function wireFeatureButtons(){
   });
 }
 
-/* =============== TAB GETTER for staking.js =============== */
+/* =========================================================
+   TAB GETTER BRIDGE (for staking.js to ask current tab)
+   ========================================================= */
 let _getTab = ()=>'owned';
 export function setTabGetter(fn){ _getTab = fn; }
-function getTab(){ return _getTab(); } // not exported
+function getTab(){ return _getTab(); } // internal
