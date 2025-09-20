@@ -1,86 +1,101 @@
-// ================= CONFIG =================
-export const FF_CFG = {
-  SOURCE_PATH: "https://freshfrogs.github.io",
-  SUPPLY: 4040,
-  COLLECTION_ADDRESS: "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b",
-  CONTROLLER_ADDRESS: "0xCB1ee125CFf4051a10a55a09B10613876C4Ef199",
-  JSON_PATH: "assets/freshfrogs_rarity_rankings.json",
-  FROG_API_KEY: (window.frog_api || "3105c552-60b6-5252-bca7-291c724a54bf"),
-  AUTO_INIT: false,
-  ABI: {
-    controller: { file: "assets/abi/controller_abi.js",  global: "controller_abi" },
-    collection: { file: "assets/abi/collection_abi.js", global: "collection_abi" }
-  }
-};
+// assets/js/core.js
+// Single source of truth: config, helpers, and Reservoir fetchers
 
-// ================= THEME =================
-export function initTheme(){
-  const K="ff_theme", root=document.documentElement;
-  function set(t){
-    root.setAttribute("data-theme", t);
-    document.querySelectorAll(".theme-dock .swatch")
-      .forEach(s=>s.setAttribute("aria-current", s.dataset.theme===t ? "true":"false"));
-    localStorage.setItem(K, t);
-  }
-  set(localStorage.getItem(K) || root.getAttribute("data-theme") || "noir");
-  document.querySelectorAll(".theme-dock .swatch")
-    .forEach(s=>s.addEventListener("click", ()=>set(s.dataset.theme)));
+// ---- Config ------------------------------------------------------------
+export const FF_CFG = (() => {
+  // Pull from window.FF_CFG if present (set elsewhere), else defaults:
+  const def = {
+    SOURCE_PATH: "https://freshfrogs.github.io",
+    COLLECTION_ADDRESS: "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b",
+    CONTROLLER_ADDRESS: "", // set if you want Pond to list staked
+    FROG_API_KEY: "3105c552-60b6-5252-bca7-291c724a54bf",
+    SUPPLY: 4040,
+    RARITY_JSON: "assets/freshfrogs_rarity_rankings.json"
+  };
+  try {
+    return Object.assign({}, def, window.FF_CFG || {});
+  } catch { return def; }
+})();
+
+// ---- Helpers -----------------------------------------------------------
+export function shorten(addr) {
+  if (!addr || typeof addr !== "string") return "—";
+  return addr.slice(0, 6) + "…" + addr.slice(-4);
+}
+export function formatAgo(ms) {
+  if (!ms || ms < 0) return "—";
+  const s = Math.floor(ms / 1000);
+  const m = Math.floor(s / 60);
+  const h = Math.floor(m / 60);
+  const d = Math.floor(h / 24);
+  if (d > 0) return `${d}d`;
+  if (h > 0) return `${h}h`;
+  if (m > 0) return `${m}m`;
+  return `${s}s`;
+}
+export function thumb64(src, alt = "") {
+  const escAlt = String(alt).replace(/"/g, "&quot;");
+  return `<img class="thumb64" src="${src}" alt="${escAlt}">`;
+}
+export async function fetchJSON(url, opts = {}) {
+  const res = await fetch(url, opts);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
 }
 
-// ================= UTILS =================
-export const shorten = a => a ? (a.slice(0,6)+"…"+a.slice(-4)) : "";
-export const thumb64 = (src, alt) =>
-  `<img class="thumb64" src="${src}" alt="${alt}" width="64" height="64" loading="lazy">`;
-export const fetchJSON = async (p)=>{ const r=await fetch(p,{cache:"no-store"}); if(!r.ok) throw new Error(r.status); return r.json(); };
-export const isLocal = ()=> location.protocol === "file:";
-export const formatAgo = (ms)=>{
-  const s=Math.floor(ms/1e3); if(s<60) return s+"s";
-  const m=Math.floor(s/60);   if(m<60) return m+"m";
-  const h=Math.floor(m/60);   if(h<24) return h+"h";
-  const d=Math.floor(h/24);   return d+"d";
-};
+// ---- Wallet (MetaMask) -------------------------------------------------
+export async function getUser() {
+  // Returns { provider, signer, address } or throws
+  if (!window.ethereum) throw new Error("No Ethereum provider found. Install MetaMask.");
+  // ethers v5 UMD: window.ethers
+  const provider = new window.ethers.providers.Web3Provider(window.ethereum, "any");
+  await provider.send("eth_requestAccounts", []);
+  const signer = provider.getSigner();
+  const address = await signer.getAddress();
+  return { provider, signer, address };
+}
 
-// Load ABI from a JS file that defines a global, e.g. window.controller_abi = [...]
-export async function loadABIFromScript(filePath, globalName){
-  return new Promise((resolve, reject)=>{
-    if (globalName && window[globalName]) return resolve(window[globalName]);
-    const el = document.createElement('script');
-    el.src = filePath;
-    el.async = true;
-    el.onload = ()=>{
-      if (globalName && window[globalName]) resolve(window[globalName]);
-      else reject(new Error(`ABI global "${globalName}" not found after loading ${filePath}`));
-    };
-    el.onerror = ()=> reject(new Error(`Failed to load ${filePath}`));
-    document.head.appendChild(el);
+// ---- Reservoir helpers -------------------------------------------------
+function reservoirHeaders() {
+  const h = { accept: "*/*" };
+  if (FF_CFG.FROG_API_KEY && FF_CFG.FROG_API_KEY !== "YOUR_RESERVOIR_API_KEY_HERE") {
+    h["x-api-key"] = FF_CFG.FROG_API_KEY;
+  }
+  return h;
+}
+
+// SALES
+export async function fetchSales({ limit = 50, continuation = "" } = {}) {
+  const qs = new URLSearchParams({
+    collection: FF_CFG.COLLECTION_ADDRESS,
+    limit: String(limit),
+    sortBy: "createdAt",
+    sortDirection: "desc",
   });
+  if (continuation) qs.set("continuation", continuation);
+  const url = `https://api.reservoir.tools/sales/v6?${qs.toString()}`;
+  return fetchJSON(url, { headers: reservoirHeaders() });
 }
 
-// ============ Reservoir helpers ============
-const addr = (s)=>{
-  const c=s?.toAddress||s?.to?.address||s?.to; if(!c) return "—";
-  const h=String(c);
-  return /^0x[a-fA-F0-9]{40}$/.test(h)?(h.slice(0,6)+"…"+h.slice(-4)):(h.length>16?h.slice(0,6)+"…"+h.slice(-2):h);
-};
-const ts = (s)=>{
-  let r=s?.timestamp??s?.createdAt; if(r==null) return null;
-  if(typeof r==='number'){ const ms=r<1e12?r*1000:r; return new Date(ms); }
-  const t=Date.parse(r); return Number.isNaN(t)?null:new Date(t);
-};
-export function mapSales(res){
-  return (res||[]).map(s=>{
-    const tid=s?.token?.tokenId??s?.tokenId; const id=tid!=null?parseInt(String(tid),10):null;
-    const b=addr(s); const d=ts(s);
-    const p=s?.price?.amount?.decimal??s?.price?.gross?.decimal??null;
-    if(!id) return null;
-    return { id, time: d?formatAgo(Date.now()-d.getTime()):"—", price: p!=null? p.toFixed(3)+" ETH":"—", buyer: b };
-  }).filter(Boolean);
+// MINTS
+export async function fetchMints({ limit = 50, continuation = "" } = {}) {
+  const qs = new URLSearchParams({
+    collection: FF_CFG.COLLECTION_ADDRESS,
+    types: "mint",
+    limit: String(limit),
+    sortBy: "eventTimestamp",
+    sortDirection: "desc",
+  });
+  if (continuation) qs.set("continuation", continuation);
+  const url = `https://api.reservoir.tools/collections/activity/v6?${qs.toString()}`;
+  return fetchJSON(url, { headers: reservoirHeaders() });
 }
-export async function fetchSales({limit=50,continuation=""}={}){
-  const base="https://api.reservoir.tools/sales/v6";
-  const q=new URLSearchParams({collection:FF_CFG.COLLECTION_ADDRESS,limit:String(limit),sortBy:"time",sortDirection:"desc"});
-  if(continuation) q.set("continuation", continuation);
-  const r=await fetch(base+"?"+q.toString(),{method:"GET",headers:{accept:"*/*","x-api-key":FF_CFG.FROG_API_KEY}});
-  if(!r.ok) throw new Error(r.status);
-  return r.json();
+
+// POND (controller holdings)
+export async function fetchPond({ limit = 50, continuation = "" } = {}) {
+  if (!FF_CFG.CONTROLLER_ADDRESS) throw new Error("Missing CONTROLLER_ADDRESS");
+  const qs = new URLSearchParams({ collection: FF_CFG.COLLECTION_ADDRESS, limit: String(limit) });
+  if (continuation) qs.set("continuation", continuation);
+  const url = `https://api.reservoir.tools/users/${FF_CFG.CONTROLLER_ADDRESS}/tokens/v8?${qs.toString()}`;
+  return fetchJSON(url, { headers: reservoirHeaders() });
 }

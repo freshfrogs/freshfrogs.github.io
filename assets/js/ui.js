@@ -1,12 +1,11 @@
-/* ========================================================================
-   Fresh Frogs — UI (lean, de-duped)
-   - Imports helpers & config from core.js (no duplicates)
-   - Uses core.fetchSales for Sales tab (single source of truth)
-   - Keeps Mints / Rarity / Pond logic here
-   - Exposes initUI(); main.js owns boot (Option B)
-   ======================================================================== */
+// assets/js/ui.js
+// UI-only: grid + tabs + renderers; uses core.js for config + fetchers
 
-import { FF_CFG, shorten, formatAgo, thumb64, fetchJSON, fetchSales } from "./core.js";
+import { FF_CFG, shorten, formatAgo, thumb64, fetchJSON, fetchSales, fetchMints, fetchPond } from "./core.js";
+
+// Optional global hooks if you already had them elsewhere:
+const getRankById = (id) => (typeof window !== "undefined" && window.FF_getRankById) ? window.FF_getRankById(id) : null;
+const openFrogInfo = (id) => (typeof window !== "undefined" && window.FF_openFrogInfo) ? window.FF_openFrogInfo(id) : null;
 
 /* ----------------------- Spotlight Grid (128×128) --------------------- */
 export function renderGrid() {
@@ -27,7 +26,7 @@ export function renderGrid() {
   }
 }
 
-/* ----------------------- Tabs (Mints / Sales / Rarity / Pond) --------- */
+/* ----------------------- Tabs & Buttons ------------------------------- */
 function setFeatureView(view) {
   window.currentFeatureView = view;
   document.querySelectorAll('#viewTabs .tab').forEach(btn => {
@@ -52,7 +51,6 @@ export function wireFeatureTabs() {
   setFeatureView("mints"); // default
 }
 
-/* ----------------------- Feature Buttons ------------------------------ */
 export function wireFeatureButtons() {
   const refresh = document.getElementById("refreshBtn");
   const live = document.getElementById("fetchLiveBtn");
@@ -87,34 +85,23 @@ export function wireFeatureButtons() {
   });
 }
 
-/* ======================= Recent Mints (Reservoir) ===================== */
+/* ======================= Mints ======================================= */
+let mintsCache = [];
+let mintsContinuation = "";
+
 function mapMints(activities) {
   return (activities || []).map(a => {
     const t = a.token || a;
     const tokenId = t?.tokenId ?? t?.id;
     const id = tokenId != null ? parseInt(String(tokenId), 10) : null;
-
-    const ts =
-      (a.eventTimestamp && Date.parse(a.eventTimestamp)) ||
-      (a.timestamp ? Number(a.timestamp) * 1000 : null);
-
+    const ts = (a.eventTimestamp && Date.parse(a.eventTimestamp)) || (a.timestamp ? Number(a.timestamp) * 1000 : null);
     const minter = a.toAddress || a.to || a.maker || a.buyer || null;
-
     const amt = a.price?.amount;
-    const priceEth =
-      (amt?.decimal != null)
-        ? `${Number(amt.decimal).toFixed(4)} ETH`
-        : (amt?.native != null ? `${Number(amt.native).toFixed(4)} ETH` : "—");
-
-    return id ? {
-      id,
-      time: ts ? formatAgo(Date.now() - ts) : "—",
-      buyer: minter ? shorten(minter) : "—",
-      price: priceEth
-    } : null;
+    const priceEth = (amt?.decimal != null) ? `${Number(amt.decimal).toFixed(4)} ETH`
+                    : (amt?.native != null ? `${Number(amt.native).toFixed(4)} ETH` : "—");
+    return id ? { id, time: ts ? formatAgo(Date.now() - ts) : "—", buyer: minter ? shorten(minter) : "—", price: priceEth } : null;
   }).filter(Boolean);
 }
-
 function renderMintsError(msg) {
   const ul = document.getElementById("featureList");
   const anchor = document.getElementById("featureMoreAnchor");
@@ -122,49 +109,16 @@ function renderMintsError(msg) {
   ul.innerHTML = `<li class="list-item"><div class="muted">${msg}</div></li>`;
   anchor && (anchor.innerHTML = "");
 }
-
-async function fetchMints({ limit = 50, continuation = "" } = {}) {
-  const qs = new URLSearchParams({
-    collection: FF_CFG.COLLECTION_ADDRESS,
-    types: "mint",
-    limit: String(limit),
-    sortBy: "eventTimestamp",
-    sortDirection: "desc",
-  });
-  if (continuation) qs.set("continuation", continuation);
-
-  const url = `https://api.reservoir.tools/collections/activity/v6?${qs.toString()}`;
-  const headers = { accept: "*/*" };
-  if (FF_CFG.FROG_API_KEY && FF_CFG.FROG_API_KEY !== "YOUR_RESERVOIR_API_KEY_HERE") {
-    headers["x-api-key"] = FF_CFG.FROG_API_KEY;
-  }
-  const res = await fetch(url, { headers });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json(); // { activities, continuation? }
-}
-
-let mintsCache = [];
-let mintsContinuation = "";
-
 export function renderMints(list = mintsCache) {
   const ul = document.getElementById("featureList");
   const anchor = document.getElementById("featureMoreAnchor");
   if (!ul) return;
-  ul.innerHTML = "";
-  anchor && (anchor.innerHTML = "");
-
+  ul.innerHTML = ""; anchor && (anchor.innerHTML = "");
   const arr = (list && list.length) ? list : [];
-  if (!arr.length) {
-    ul.innerHTML = `<li class="list-item"><div class="muted">No recent mints yet.</div></li>`;
-    return;
-  }
-
+  if (!arr.length) { ul.innerHTML = `<li class="list-item"><div class="muted">No recent mints yet.</div></li>`; return; }
   arr.forEach(x => {
-    const rank = window.FF_getRankById ? window.FF_getRankById(x.id) : null;
-    const badge = (rank || rank === 0)
-      ? `<span class="pill">Rank <b>#${rank}</b></span>`
-      : `<span class="pill pill-ghost">Rank N/A</span>`;
-
+    const rank = getRankById ? getRankById(x.id) : null;
+    const badge = (rank || rank === 0) ? `<span class="pill">Rank <b>#${rank}</b></span>` : `<span class="pill pill-ghost">Rank N/A</span>`;
     const li = document.createElement("li");
     li.className = "list-item";
     li.innerHTML =
@@ -175,10 +129,9 @@ export function renderMints(list = mintsCache) {
        </div>
        <div class="price">${x.price}</div>`;
     li.style.cursor = "pointer";
-    li.addEventListener("click", () => window.FF_openFrogInfo?.(x.id));
+    li.addEventListener("click", () => openFrogInfo && openFrogInfo(x.id));
     ul.appendChild(li);
   });
-
   if (mintsContinuation) {
     const btn = document.createElement("button");
     btn.id = "featureMoreBtn";
@@ -188,12 +141,8 @@ export function renderMints(list = mintsCache) {
     anchor?.appendChild(btn);
   }
 }
-
 export async function loadMintsLive({ append = false } = {}) {
-  if (!FF_CFG.COLLECTION_ADDRESS) {
-    renderMintsError("Missing COLLECTION_ADDRESS in FF_CFG.");
-    return false;
-  }
+  if (!FF_CFG.COLLECTION_ADDRESS) { renderMintsError("Missing COLLECTION_ADDRESS in FF_CFG."); return false; }
   try {
     const data = await fetchMints({ limit: 50, continuation: append ? mintsContinuation : "" });
     const mapped = mapMints(data.activities || data.events || []);
@@ -202,35 +151,23 @@ export async function loadMintsLive({ append = false } = {}) {
     if ((window.currentFeatureView || "mints") === "mints") renderMints();
     return true;
   } catch (e) {
-    console.warn("Mints fetch failed", e);
-    renderMintsError(`Failed to fetch Recent Mints. ${e.message || e}`);
-    return false;
+    renderMintsError(`Failed to fetch Recent Mints. ${e.message || e}`); return false;
   }
 }
 
-/* ======================= Recent Sales (via core.fetchSales) =========== */
+/* ======================= Sales ======================================= */
 let salesCache = [];
 let salesContinuation = "";
-
 function renderSales(list = salesCache) {
   const ul = document.getElementById("featureList");
   const anchor = document.getElementById("featureMoreAnchor");
   if (!ul) return;
-  ul.innerHTML = "";
-  anchor && (anchor.innerHTML = "");
-
+  ul.innerHTML = ""; anchor && (anchor.innerHTML = "");
   const arr = (list && list.length) ? list : [];
-  if (!arr.length) {
-    ul.innerHTML = `<li class="list-item"><div class="muted">No recent sales yet.</div></li>`;
-    return;
-  }
-
+  if (!arr.length) { ul.innerHTML = `<li class="list-item"><div class="muted">No recent sales yet.</div></li>`; return; }
   arr.forEach(x => {
-    const rank = window.FF_getRankById ? window.FF_getRankById(x.id) : null;
-    const badge = (rank || rank === 0)
-      ? `<span class="pill">Rank <b>#${rank}</b></span>`
-      : `<span class="pill pill-ghost">Rank N/A</span>`;
-
+    const rank = getRankById ? getRankById(x.id) : null;
+    const badge = (rank || rank === 0) ? `<span class="pill">Rank <b>#${rank}</b></span>` : `<span class="pill pill-ghost">Rank N/A</span>`;
     const li = document.createElement("li");
     li.className = "list-item";
     li.innerHTML =
@@ -241,10 +178,9 @@ function renderSales(list = salesCache) {
        </div>
        <div class="price">${x.price}</div>`;
     li.style.cursor = "pointer";
-    li.addEventListener("click", () => window.FF_openFrogInfo?.(x.id));
+    li.addEventListener("click", () => openFrogInfo && openFrogInfo(x.id));
     ul.appendChild(li);
   });
-
   if (salesContinuation) {
     const btn = document.createElement("button");
     btn.className = "btn btn-outline btn-sm";
@@ -253,7 +189,6 @@ function renderSales(list = salesCache) {
     anchor?.appendChild(btn);
   }
 }
-
 export async function loadSalesLive({ append = false } = {}) {
   try {
     const data = await fetchSales({ limit: 50, continuation: append ? salesContinuation : "" });
@@ -270,7 +205,6 @@ export async function loadSalesLive({ append = false } = {}) {
              : (amt?.native != null ? `${Number(amt.native).toFixed(4)} ETH` : "—");
       })()
     })).filter(x => Number.isFinite(x.id));
-
     if (append) salesCache = salesCache.concat(mapped); else salesCache = mapped;
     salesContinuation = data.continuation || "";
     if ((window.currentFeatureView || "mints") === "sales") renderSales();
@@ -282,17 +216,13 @@ export async function loadSalesLive({ append = false } = {}) {
   }
 }
 
-/* ======================= Rarity (local JSON) ========================== */
+/* ======================= Rarity ====================================== */
 let rarityCache = []; // [{id, rank, score?}, ...]
 let raritySortMode = "rank";
-
 async function loadRarityJSON() {
-  // Global override first
   if (Array.isArray(window.FF_RARITY_LIST)) return window.FF_RARITY_LIST;
-  // Local JSON fallback
-  return fetchJSON(FF_CFG.JSON_PATH || "assets/freshfrogs_rarity_rankings.json");
+  return fetchJSON(FF_CFG.RARITY_JSON);
 }
-
 export async function loadRarity() {
   try {
     const raw = await loadRarityJSON();
@@ -315,24 +245,16 @@ export async function loadRarity() {
     rarityCache = [];
   }
 }
-
 function renderRarity() {
   const ul = document.getElementById("featureList");
   const anchor = document.getElementById("featureMoreAnchor");
   if (!ul) return;
-  ul.innerHTML = "";
-  anchor && (anchor.innerHTML = "");
-
-  if (!rarityCache.length) {
-    ul.innerHTML = `<li class="list-item"><div class="muted">No rarity data.</div></li>`;
-    return;
-  }
-
+  ul.innerHTML = ""; anchor && (anchor.innerHTML = "");
+  if (!rarityCache.length) { ul.innerHTML = `<li class="list-item"><div class="muted">No rarity data.</div></li>`; return; }
   const sorted = rarityCache.slice().sort((a, b) => {
     if (raritySortMode === "score" && a.score != null && b.score != null) return b.score - a.score;
     return a.rank - b.rank;
   });
-
   sorted.forEach(x => {
     const li = document.createElement("li");
     li.className = "list-item";
@@ -344,12 +266,14 @@ function renderRarity() {
        </div>
        <div class="price"></div>`;
     li.style.cursor = "pointer";
-    li.addEventListener("click", () => window.FF_openFrogInfo?.(x.id));
+    li.addEventListener("click", () => openFrogInfo && openFrogInfo(x.id));
     ul.appendChild(li);
   });
 }
 
-/* ======================= Pond (controller holdings) =================== */
+/* ======================= Pond ======================================== */
+let pondCache = [];
+let pondContinuation = "";
 function mapPond(tokens) {
   return (tokens || []).map(t => {
     const tok = t.token || {};
@@ -358,41 +282,16 @@ function mapPond(tokens) {
     return id ? { id } : null;
   }).filter(Boolean);
 }
-
-async function fetchPond({ limit = 50, continuation = "" } = {}) {
-  if (!FF_CFG.CONTROLLER_ADDRESS) throw new Error("Missing CONTROLLER_ADDRESS");
-  const qs = new URLSearchParams({ collection: FF_CFG.COLLECTION_ADDRESS, limit: String(limit) });
-  if (continuation) qs.set("continuation", continuation);
-  const url = `https://api.reservoir.tools/users/${FF_CFG.CONTROLLER_ADDRESS}/tokens/v8?${qs.toString()}`;
-  const headers = { accept: "*/*" };
-  if (FF_CFG.FROG_API_KEY && FF_CFG.FROG_API_KEY !== "YOUR_RESERVOIR_API_KEY_HERE") headers["x-api-key"] = FF_CFG.FROG_API_KEY;
-  const res = await fetch(url, { headers });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json(); // { tokens, continuation? }
-}
-
-let pondCache = [];
-let pondContinuation = "";
-
 function renderPond(list = pondCache) {
   const ul = document.getElementById("featureList");
   const anchor = document.getElementById("featureMoreAnchor");
   if (!ul) return;
-  ul.innerHTML = "";
-  anchor && (anchor.innerHTML = "");
-
+  ul.innerHTML = ""; anchor && (anchor.innerHTML = "");
   const arr = (list && list.length) ? list : [];
-  if (!arr.length) {
-    ul.innerHTML = `<li class="list-item"><div class="muted">No staked frogs found (Pond empty or controller unset).</div></li>`;
-    return;
-  }
-
+  if (!arr.length) { ul.innerHTML = `<li class="list-item"><div class="muted">No staked frogs found (Pond empty or controller unset).</div></li>`; return; }
   arr.forEach(x => {
-    const rank = window.FF_getRankById ? window.FF_getRankById(x.id) : null;
-    const badge = (rank || rank === 0)
-      ? `<span class="pill">Rank <b>#${rank}</b></span>`
-      : `<span class="pill pill-ghost">Rank N/A</span>`;
-
+    const rank = getRankById ? getRankById(x.id) : null;
+    const badge = (rank || rank === 0) ? `<span class="pill">Rank <b>#${rank}</b></span>` : `<span class="pill pill-ghost">Rank N/A</span>`;
     const li = document.createElement("li");
     li.className = "list-item";
     li.innerHTML =
@@ -403,10 +302,9 @@ function renderPond(list = pondCache) {
        </div>
        <div class="price"></div>`;
     li.style.cursor = "pointer";
-    li.addEventListener("click", () => window.FF_openFrogInfo?.(x.id));
+    li.addEventListener("click", () => openFrogInfo && openFrogInfo(x.id));
     ul.appendChild(li);
   });
-
   if (pondContinuation) {
     const btn = document.createElement("button");
     btn.className = "btn btn-outline btn-sm";
@@ -415,7 +313,6 @@ function renderPond(list = pondCache) {
     anchor?.appendChild(btn);
   }
 }
-
 export async function loadPond({ append = false, limit = 50 } = {}) {
   try {
     const data = await fetchPond({ limit, continuation: append ? pondContinuation : "" });

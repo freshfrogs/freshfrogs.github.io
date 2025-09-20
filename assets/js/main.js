@@ -1,18 +1,20 @@
-import { initUI } from './ui.js';
-import { getUser } from './core.js';
+// assets/js/main.js
+// central boot: theme, mint UI, wallet connect, then initUI
 
+import { initUI } from "./ui.js";
+import { getUser } from "./core.js";
 
 // ---------- Theme switcher ----------
 function applyTheme(theme) {
   if (!theme) return;
   document.documentElement.setAttribute("data-theme", theme);
-  try { localStorage.setItem("ff_theme", theme); } catch (_) {}
+  try { localStorage.setItem("ff_theme", theme); } catch {}
 }
 function restoreTheme() {
   try {
     const saved = localStorage.getItem("ff_theme");
     if (saved) applyTheme(saved);
-  } catch (_) {}
+  } catch {}
 }
 function wireThemeDock() {
   restoreTheme();
@@ -21,9 +23,8 @@ function wireThemeDock() {
   });
 }
 
-// ---------- Mint panel (UI-only placeholder) ----------
+// ---------- Mint panel (UI-only demo) ----------
 const MINT_PRICE_ETH = 0.01;
-
 function updateMintUI(qty) {
   const total = (qty * MINT_PRICE_ETH).toFixed(2);
   const qtyEl = document.getElementById("mintQty");
@@ -55,19 +56,33 @@ function wireMintPanel() {
   slider?.addEventListener("input", () => updateMintUI(getQty()));
   presets.forEach(p => p.addEventListener("click", () => setQty(p.dataset.preset)));
 
-  // tiny fake gas hint
-  if (gasEst) {
-    const val = (Math.random() * 0.003 + 0.001).toFixed(3);
-    gasEst.textContent = val;
-  }
-
-  // initialize once
+  if (gasEst) gasEst.textContent = (Math.random() * 0.003 + 0.001).toFixed(3);
   setQty(Number(slider?.value || 1));
 }
 
-// ---------- Central boot ----------
+// ---------- Wallet connect ----------
+function wireWallet() {
+  const btn = document.getElementById("connectBtn");
+  const lbl = document.getElementById("walletLabel");
+  if (!btn) return;
+
+  btn.addEventListener("click", async () => {
+    try {
+      const { address } = await getUser();
+      if (lbl) { lbl.textContent = address; lbl.style.display = ""; }
+      btn.textContent = "Connected";
+      btn.disabled = true;
+      // could trigger owned/staked refresh here if desired
+    } catch (e) {
+      alert(e.message || String(e));
+    }
+  });
+}
+
+// ---------- Boot ----------
 window.addEventListener("DOMContentLoaded", async () => {
   wireThemeDock();
   wireMintPanel();
-  await initUI(); // calls renderGrid + wireFeatureTabs + loadMintsLive + loadRarity
+  wireWallet();
+  await initUI();
 });
