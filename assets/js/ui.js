@@ -241,67 +241,147 @@ export async function loadSalesLive(){
 }
 
 /* =========================================================
-   MINTS (Reservoir — activity: types=mint)
+   MINTS (Reservoir — collections activity: types=mint)
    ========================================================= */
-let mintsCache=[];
+
+// Normalize activity rows into our list item shape
 function mapMints(activities){
-  // Reservoir activity/v6 (types=mint) — normalize to {id,time,buyer,price}
-  // price may be missing for free mints; show "—"
-  return (activities||[])
-    .map(a=>{
-      const tokenId = a?.token?.tokenId ?? a?.tokenId ?? a?.id;
-      const id = tokenId!=null ? parseInt(String(tokenId),10) : null;
-      const ts = a?.eventTimestamp ? Date.parse(a.eventTimestamp) :
-                 a?.timestamp ? (Number(a.timestamp)*1000) : null;
-      const taker = a?.toAddress || a?.to || a?.maker || a?.buyer || null;
-      const priceEth = a?.price?.amount?.decimal != null
-        ? `${Number(a.price.amount.decimal).toFixed(4)} ETH`
-        : (a?.price?.amount?.native != null ? `${Number(a.price.amount.native).toFixed(4)} ETH` : "—");
-      return id ? { id, time: ts ? formatAgo(Date.now()-ts) : "—", buyer: taker ? shorten(taker) : "—", price: priceEth } : null;
-    })
-    .filter(Boolean);
+  // activities: array from /collections/activity (types=mint)
+  // Normalize to { id, time, buyer, price }
+  return (activities || []).map(a => {
+    // token id may be nested; cover both shapes
+    const t = a.token || a;
+    const tokenId = t?.tokenId ?? t?.id;
+    const id = tokenId != null ? parseInt(String(tokenId), 10) : null;
+
+    // event time
+    const ts =
+      (a.eventTimestamp && Date.parse(a.eventTimestamp)) ||
+      (a.timestamp ? Number(a.timestamp) * 1000 : null);
+
+    // minter (toAddress / to / maker)
+    const minter = a.toAddress || a.to || a.maker || a.buyer || null;
+
+    // price (can be absent for free mints)
+    const amt = a.price?.amount;
+    const priceEth =
+      amt?.decimal != null
+        ? `${Number(amt.decimal).toFixed(4)} ETH`
+        : (amt?.native != null
+            ? `${Number(amt.native).toFixed(4)} ETH`
+            : "—");
+
+    return id
+      ? {
+          id,
+          time: ts ? formatAgo(Date.now() - ts) : "—",
+          buyer: minter ? shorten(minter) : "—",
+          price: priceEth
+        }
+      : null;
+  }).filter(Boolean);
 }
-async function fetchMints({limit=50, continuation=""}={}){
+
+async function fetchMints({ limit = 50, continuation = "" } = {}) {
+  // Reservoir: /collections/activity/v6 with types=mint
   const qs = new URLSearchParams({
     collection: FF_CFG.COLLECTION_ADDRESS,
     types: "mint",
     limit: String(limit),
     sortBy: "eventTimestamp",
-    sortDirection: "desc"
+    sortDirection: "desc",
   });
-  if(continuation) qs.set("continuation", continuation);
+  if (continuation) qs.set("continuation", continuation);
+
   const url = `https://api.reservoir.tools/collections/activity/v6?${qs.toString()}`;
-  const res = await fetch(url, { headers: { accept: "*/*", "x-api-key": FF_CFG.FROG_API_KEY } });
-  if(!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
+  const res = await fetch(url, {
+    headers: {
+      accept: "*/*",
+      "x-api-key": FF_CFG.FROG_API_KEY,
+    },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json(); // { activities: [...], continuation?: string }
 }
-export function renderMints(list=mintsCache){
-  const ul=document.getElementById("featureList");
-  if(!ul) return; ul.innerHTML="";
-  const arr=(list&&list.length)?list:[{id:1,time:"—",price:"—",buyer:"—"}];
-  arr.forEach(x=>{
+
+let mintsCache = [];
+let mintsContinuation = "";
+
+export function renderMints(list = mintsCache) {
+  const ul = document.getElementById("featureList");
+  if (!ul) return;
+  ul.innerHTML = "";
+
+  const arr = (list && list.length) ? list : [];
+  if (!arr.length) {
+    ul.innerHTML = `<li class="list-item"><div class="muted">No recent mints yet.</div></li>`;
+    return;
+  }
+
+  arr.forEach(x => {
     const rank = window.FF_getRankById ? window.FF_getRankById(x.id) : null;
-    const badge=(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill pill-ghost">Rank N/A</span>`;
-    const li=document.createElement("li"); li.className="list-item";
+    const badge = (rank || rank === 0)
+      ? `<span class="pill">Rank <b>#${rank}</b></span>`
+      : `<span class="pill pill-ghost">Rank N/A</span>`;
+
+    const li = document.createElement("li");
+    li.className = "list-item";
     li.innerHTML =
-      thumb64(`${FF_CFG.SOURCE_PATH}/frog/${x.id}.png`,`Frog ${x.id}`)+
+      thumb64(`${FF_CFG.SOURCE_PATH}/frog/${x.id}.png`, `Frog ${x.id}`) +
       `<div>
         <div class="row gap8"><b>Frog #${x.id}</b> ${badge}</div>
-        <div class="muted">${x.time!=="—"?x.time+" ago":"—"} • Minter ${x.buyer}</div>
+        <div class="muted">${x.time !== "—" ? x.time + " ago" : "—"} • Minter ${x.buyer}</div>
       </div>
       <div class="price">${x.price}</div>`;
-    li.style.cursor="pointer"; li.addEventListener("click",()=>openFrogInfo(x.id));
+    li.style.cursor = "pointer";
+    li.addEventListener("click", () => window.FF_openFrogInfo?.(x.id));
     ul.appendChild(li);
   });
+
+  // “Load more” button handling (if continuation present)
+  let btn = document.getElementById("featureMoreBtn");
+  const anchor = document.getElementById("featureMoreAnchor");
+  if (!mintsContinuation) {
+    if (btn) btn.remove();
+  } else {
+    if (!btn) {
+      btn = document.createElement("button");
+      btn.id = "featureMoreBtn";
+      btn.className = "btn btn-outline btn-sm";
+      btn.textContent = "Load more";
+      anchor?.appendChild(btn);
+    }
+    btn.onclick = () => loadMintsLive({ append: true });
+  }
 }
-export async function loadMintsLive(){
-  try{
-    if(!FF_CFG.FROG_API_KEY || FF_CFG.FROG_API_KEY==="YOUR_RESERVOIR_API_KEY_HERE") throw new Error("Missing Reservoir API key");
-    const data = await fetchMints({limit:50});
-    const mapped = mapMints(data.activities||data.events||[]);
-    if(mapped.length){ mintsCache=mapped; renderMints(); return true; }
+
+export async function loadMintsLive({ append = false } = {}) {
+  if (!FF_CFG.FROG_API_KEY || FF_CFG.FROG_API_KEY === "YOUR_RESERVOIR_API_KEY_HERE") {
+    console.warn("Missing Reservoir API key for mints.");
     return false;
-  }catch(e){ console.warn("Mints fetch failed",e); return false; }
+  }
+  try {
+    const data = await fetchMints({
+      limit: 50,
+      continuation: append ? mintsContinuation : "",
+    });
+    const mapped = mapMints(data.activities || data.events || []);
+    if (append) {
+      mintsCache = mintsCache.concat(mapped);
+    } else {
+      mintsCache = mapped;
+    }
+    mintsContinuation = data.continuation || "";
+    if (window.currentFeatureView === "mints") renderMints();
+    return true;
+  } catch (e) {
+    console.warn("Mints fetch failed", e);
+    const ul = document.getElementById("featureList");
+    if (ul && !ul.children.length) {
+      ul.innerHTML = `<li class="list-item"><div class="muted">Failed to fetch Recent Mints.</div></li>`;
+    }
+    return false;
+  }
 }
 
 /* =========================================================
@@ -523,19 +603,19 @@ function applyFeatureControls(){
 }
 
 function setFeatureView(view){
-  currentFeatureView=view;
-  const wrap=document.getElementById('viewTabs');
-  (wrap||document).querySelectorAll('.tab').forEach(btn=>{
-    btn.setAttribute('aria-selected', btn.dataset.view===view ? 'true' : 'false');
-  });
+  window.currentFeatureView = view;
+  const wrap = document.getElementById('viewTabs');
+  (wrap || document).querySelectorAll('.tab')
+    .forEach(btn => btn.setAttribute('aria-selected', btn.dataset.view === view ? 'true' : 'false'));
 
-  if(view==='mints')   renderMints();
-  else if(view==='sales')  renderSales();
-  else if(view==='rarity') renderRarity();
-  else renderPond();
+  if (view === 'mints')      renderMints();
+  else if (view === 'sales') renderSales();
+  else if (view === 'rarity') renderRarity();
+  else                       renderPond();
 
-  applyFeatureControls();
+  applyFeatureControls?.();
 }
+
 
 export function wireFeatureTabs(){
   const wrap=document.getElementById('viewTabs');
@@ -563,10 +643,22 @@ export function wireFeatureButtons(){
     if(currentFeatureView==='mints') renderMints();
     else if(currentFeatureView==='sales') renderSales();
   });
-  document.getElementById("fetchLiveBtn")?.addEventListener("click",async()=>{
-    if(currentFeatureView==='mints') { const ok=await loadMintsLive(); if(ok){ const b=document.getElementById("fetchLiveBtn"); if(b){ b.textContent="Live loaded"; b.disabled=true; b.classList.add("btn-ghost"); } } }
-    else if(currentFeatureView==='sales'){ const ok=await loadSalesLive(); if(ok){ const b=document.getElementById("fetchLiveBtn"); if(b){ b.textContent="Live loaded"; b.disabled=true; b.classList.add("btn-ghost"); } } }
+  document.getElementById("fetchLiveBtn")?.addEventListener("click", async () => {
+    if (window.currentFeatureView === 'mints') {
+      const ok = await loadMintsLive();
+      if (ok) {
+        const b = document.getElementById("fetchLiveBtn");
+        if (b) { b.textContent = "Live loaded"; b.disabled = true; b.classList.add("btn-ghost"); }
+      }
+    } else if (window.currentFeatureView === 'sales') {
+      const ok = await loadSalesLive();
+      if (ok) {
+        const b = document.getElementById("fetchLiveBtn");
+        if (b) { b.textContent = "Live loaded"; b.disabled = true; b.classList.add("btn-ghost"); }
+      }
+    }
   });
+
 
   document.getElementById("sortRankBtn")?.addEventListener("click",()=>setRaritySort("rank"));
   document.getElementById("sortScoreBtn")?.addEventListener("click",()=>setRaritySort("score"));
