@@ -1,50 +1,15 @@
 /* ========================================================================
-   Fresh Frogs — UI (complete, self-contained) LAZY CONFIG VERSION
-   Fix: read FF_CFG lazily so core.js can define it first.
-   Wires: Mints / Sales / Rarity / Pond + Tabs/Buttons + 3×3 128 grid
+   Fresh Frogs — UI (lean, de-duped)
+   - Imports helpers & config from core.js (no duplicates)
+   - Uses core.fetchSales for Sales tab (single source of truth)
+   - Keeps Mints / Rarity / Pond logic here
+   - Exposes initUI(); main.js owns boot (Option B)
    ======================================================================== */
 
-/* ----------------------- Default Config & Lazy Getter ------------------ */
-const DEFAULT_CFG = {
-  SOURCE_PATH: "https://freshfrogs.github.io",
-  COLLECTION_ADDRESS: "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b",
-  CONTROLLER_ADDRESS: "", // set for Pond
-  FROG_API_KEY: "YOUR_RESERVOIR_API_KEY_HERE",
-  SUPPLY: 4040
-};
-function getCFG() {
-  // Always read from window at call time so core.js can set FF_CFG first
-  return Object.assign({}, DEFAULT_CFG, (typeof window !== "undefined" && window.FF_CFG) ? window.FF_CFG : {});
-}
-
-/* ----------------------- Small Utilities ------------------------------ */
-function shorten(addr) {
-  if (!addr || typeof addr !== "string") return "—";
-  return addr.slice(0, 6) + "…" + addr.slice(-4);
-}
-function formatAgo(ms) {
-  if (!ms || ms < 0) return "—";
-  const s = Math.floor(ms / 1000);
-  const m = Math.floor(s / 60);
-  const h = Math.floor(m / 60);
-  const d = Math.floor(h / 24);
-  if (d > 0) return `${d}d`;
-  if (h > 0) return `${h}h`;
-  if (m > 0) return `${m}m`;
-  return `${s}s`;
-}
-function thumb64(src, alt = "") {
-  const escAlt = String(alt).replace(/"/g, "&quot;");
-  return `<img class="thumb64" src="${src}" alt="${escAlt}">`;
-}
-const getRankById = (id) =>
-  (typeof window !== "undefined" && window.FF_getRankById) ? window.FF_getRankById(id) : null;
-const openFrogInfo = (id) =>
-  (typeof window !== "undefined" && window.FF_openFrogInfo) ? window.FF_openFrogInfo(id) : null;
+import { FF_CFG, shorten, formatAgo, thumb64, fetchJSON, fetchSales } from "./core.js";
 
 /* ----------------------- Spotlight Grid (128×128) --------------------- */
 export function renderGrid() {
-  const C = getCFG();
   const wrap = document.getElementById("grid");
   if (!wrap) return;
   wrap.classList.add("grid-128");
@@ -53,11 +18,11 @@ export function renderGrid() {
   const seen = new Set();
   for (let i = 0; i < N; i++) {
     let id;
-    do { id = 1 + Math.floor(Math.random() * (C.SUPPLY || 4040)); } while (seen.has(id));
+    do { id = 1 + Math.floor(Math.random() * (FF_CFG.SUPPLY || 4040)); } while (seen.has(id));
     seen.add(id);
     const tile = document.createElement("div");
     tile.className = "tile";
-    tile.innerHTML = `<img src="${C.SOURCE_PATH}/frog/${id}.png" alt="Frog #${id}">`;
+    tile.innerHTML = `<img src="${FF_CFG.SOURCE_PATH}/frog/${id}.png" alt="Frog #${id}">`;
     wrap.appendChild(tile);
   }
 }
@@ -115,12 +80,10 @@ export function wireFeatureButtons() {
   });
 
   document.getElementById("sortRankBtn")?.addEventListener("click", () => {
-    raritySortMode = "rank";
-    renderRarity();
+    raritySortMode = "rank"; renderRarity();
   });
   document.getElementById("sortScoreBtn")?.addEventListener("click", () => {
-    raritySortMode = "score";
-    renderRarity();
+    raritySortMode = "score"; renderRarity();
   });
 }
 
@@ -130,12 +93,25 @@ function mapMints(activities) {
     const t = a.token || a;
     const tokenId = t?.tokenId ?? t?.id;
     const id = tokenId != null ? parseInt(String(tokenId), 10) : null;
-    const ts = (a.eventTimestamp && Date.parse(a.eventTimestamp)) || (a.timestamp ? Number(a.timestamp) * 1000 : null);
+
+    const ts =
+      (a.eventTimestamp && Date.parse(a.eventTimestamp)) ||
+      (a.timestamp ? Number(a.timestamp) * 1000 : null);
+
     const minter = a.toAddress || a.to || a.maker || a.buyer || null;
+
     const amt = a.price?.amount;
-    const priceEth = (amt?.decimal != null) ? `${Number(amt.decimal).toFixed(4)} ETH`
-                    : (amt?.native != null ? `${Number(amt.native).toFixed(4)} ETH` : "—");
-    return id ? { id, time: ts ? formatAgo(Date.now() - ts) : "—", buyer: minter ? shorten(minter) : "—", price: priceEth } : null;
+    const priceEth =
+      (amt?.decimal != null)
+        ? `${Number(amt.decimal).toFixed(4)} ETH`
+        : (amt?.native != null ? `${Number(amt.native).toFixed(4)} ETH` : "—");
+
+    return id ? {
+      id,
+      time: ts ? formatAgo(Date.now() - ts) : "—",
+      buyer: minter ? shorten(minter) : "—",
+      price: priceEth
+    } : null;
   }).filter(Boolean);
 }
 
@@ -148,9 +124,8 @@ function renderMintsError(msg) {
 }
 
 async function fetchMints({ limit = 50, continuation = "" } = {}) {
-  const C = getCFG();
   const qs = new URLSearchParams({
-    collection: C.COLLECTION_ADDRESS,
+    collection: FF_CFG.COLLECTION_ADDRESS,
     types: "mint",
     limit: String(limit),
     sortBy: "eventTimestamp",
@@ -160,21 +135,18 @@ async function fetchMints({ limit = 50, continuation = "" } = {}) {
 
   const url = `https://api.reservoir.tools/collections/activity/v6?${qs.toString()}`;
   const headers = { accept: "*/*" };
-  if (C.FROG_API_KEY && C.FROG_API_KEY !== "YOUR_RESERVOIR_API_KEY_HERE") headers["x-api-key"] = C.FROG_API_KEY;
-
-  console.debug("[MINTS] GET", url);
+  if (FF_CFG.FROG_API_KEY && FF_CFG.FROG_API_KEY !== "YOUR_RESERVOIR_API_KEY_HERE") {
+    headers["x-api-key"] = FF_CFG.FROG_API_KEY;
+  }
   const res = await fetch(url, { headers });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const json = await res.json();
-  console.debug("[MINTS] rows:", json.activities?.length || json.events?.length || 0, "continuation:", json.continuation);
-  return json; // { activities, continuation? }
+  return res.json(); // { activities, continuation? }
 }
 
 let mintsCache = [];
 let mintsContinuation = "";
 
 export function renderMints(list = mintsCache) {
-  const C = getCFG();
   const ul = document.getElementById("featureList");
   const anchor = document.getElementById("featureMoreAnchor");
   if (!ul) return;
@@ -188,19 +160,22 @@ export function renderMints(list = mintsCache) {
   }
 
   arr.forEach(x => {
-    const rank = getRankById ? getRankById(x.id) : null;
-    const badge = (rank || rank === 0) ? `<span class="pill">Rank <b>#${rank}</b></span>` : `<span class="pill pill-ghost">Rank N/A</span>`;
+    const rank = window.FF_getRankById ? window.FF_getRankById(x.id) : null;
+    const badge = (rank || rank === 0)
+      ? `<span class="pill">Rank <b>#${rank}</b></span>`
+      : `<span class="pill pill-ghost">Rank N/A</span>`;
+
     const li = document.createElement("li");
     li.className = "list-item";
     li.innerHTML =
-      thumb64(`${C.SOURCE_PATH}/frog/${x.id}.png`, `Frog ${x.id}`) +
+      thumb64(`${FF_CFG.SOURCE_PATH}/frog/${x.id}.png`, `Frog ${x.id}`) +
       `<div>
          <div class="row gap8"><b>Frog #${x.id}</b> ${badge}</div>
          <div class="muted">${x.time !== "—" ? x.time + " ago" : "—"} • Minter ${x.buyer}</div>
        </div>
        <div class="price">${x.price}</div>`;
     li.style.cursor = "pointer";
-    li.addEventListener("click", () => openFrogInfo && openFrogInfo(x.id));
+    li.addEventListener("click", () => window.FF_openFrogInfo?.(x.id));
     ul.appendChild(li);
   });
 
@@ -215,8 +190,7 @@ export function renderMints(list = mintsCache) {
 }
 
 export async function loadMintsLive({ append = false } = {}) {
-  const C = getCFG();
-  if (!C.COLLECTION_ADDRESS) {
+  if (!FF_CFG.COLLECTION_ADDRESS) {
     renderMintsError("Missing COLLECTION_ADDRESS in FF_CFG.");
     return false;
   }
@@ -234,43 +208,11 @@ export async function loadMintsLive({ append = false } = {}) {
   }
 }
 
-/* ======================= Recent Sales (Reservoir) ===================== */
-function mapSales(sales) {
-  return (sales || []).map(s => {
-    const t = s.token || {};
-    const tokenId = t.tokenId ?? s.tokenId;
-    const id = tokenId != null ? parseInt(String(tokenId), 10) : null;
-    const ts = (s.createdAt && Date.parse(s.createdAt)) || (s.timestamp ? Number(s.timestamp) * 1000 : null);
-    const buyer = s.toAddress || s.to || s.buyer || s.taker || s.maker || null;
-    const amt = s.price?.amount;
-    const priceEth = (amt?.decimal != null) ? `${Number(amt.decimal).toFixed(4)} ETH`
-                    : (amt?.native != null ? `${Number(amt.native).toFixed(4)} ETH` : "—");
-    return id ? { id, time: ts ? formatAgo(Date.now() - ts) : "—", buyer: buyer ? shorten(buyer) : "—", price: priceEth } : null;
-  }).filter(Boolean);
-}
-
-async function fetchSales({ limit = 50, continuation = "" } = {}) {
-  const C = getCFG();
-  const qs = new URLSearchParams({
-    collection: C.COLLECTION_ADDRESS,
-    limit: String(limit),
-    sortBy: "createdAt",
-    sortDirection: "desc",
-  });
-  if (continuation) qs.set("continuation", continuation);
-  const url = `https://api.reservoir.tools/sales/v6?${qs.toString()}`;
-  const headers = { accept: "*/*" };
-  if (C.FROG_API_KEY && C.FROG_API_KEY !== "YOUR_RESERVOIR_API_KEY_HERE") headers["x-api-key"] = C.FROG_API_KEY;
-  const res = await fetch(url, { headers });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json(); // { sales, continuation? }
-}
-
+/* ======================= Recent Sales (via core.fetchSales) =========== */
 let salesCache = [];
 let salesContinuation = "";
 
 function renderSales(list = salesCache) {
-  const C = getCFG();
   const ul = document.getElementById("featureList");
   const anchor = document.getElementById("featureMoreAnchor");
   if (!ul) return;
@@ -284,19 +226,22 @@ function renderSales(list = salesCache) {
   }
 
   arr.forEach(x => {
-    const rank = getRankById ? getRankById(x.id) : null;
-    const badge = (rank || rank === 0) ? `<span class="pill">Rank <b>#${rank}</b></span>` : `<span class="pill pill-ghost">Rank N/A</span>`;
+    const rank = window.FF_getRankById ? window.FF_getRankById(x.id) : null;
+    const badge = (rank || rank === 0)
+      ? `<span class="pill">Rank <b>#${rank}</b></span>`
+      : `<span class="pill pill-ghost">Rank N/A</span>`;
+
     const li = document.createElement("li");
     li.className = "list-item";
     li.innerHTML =
-      thumb64(`${C.SOURCE_PATH}/frog/${x.id}.png`, `Frog ${x.id}`) +
+      thumb64(`${FF_CFG.SOURCE_PATH}/frog/${x.id}.png`, `Frog ${x.id}`) +
       `<div>
          <div class="row gap8"><b>Frog #${x.id}</b> ${badge}</div>
          <div class="muted">${x.time !== "—" ? x.time + " ago" : "—"} • Buyer ${x.buyer}</div>
        </div>
        <div class="price">${x.price}</div>`;
     li.style.cursor = "pointer";
-    li.addEventListener("click", () => openFrogInfo && openFrogInfo(x.id));
+    li.addEventListener("click", () => window.FF_openFrogInfo?.(x.id));
     ul.appendChild(li);
   });
 
@@ -312,7 +257,20 @@ function renderSales(list = salesCache) {
 export async function loadSalesLive({ append = false } = {}) {
   try {
     const data = await fetchSales({ limit: 50, continuation: append ? salesContinuation : "" });
-    const mapped = mapSales(data.sales || []);
+    const mapped = (data.sales || []).map(s => ({
+      id: parseInt(String(s?.token?.tokenId ?? s.tokenId), 10),
+      time: (() => {
+        const ts = (s.createdAt && Date.parse(s.createdAt)) || (s.timestamp ? Number(s.timestamp) * 1000 : null);
+        return ts ? formatAgo(Date.now() - ts) : "—";
+      })(),
+      buyer: shorten(s.toAddress || s.to || s.buyer || s.taker || s.maker || ""),
+      price: (() => {
+        const amt = s.price?.amount;
+        return (amt?.decimal != null) ? `${Number(amt.decimal).toFixed(4)} ETH`
+             : (amt?.native != null ? `${Number(amt.native).toFixed(4)} ETH` : "—");
+      })()
+    })).filter(x => Number.isFinite(x.id));
+
     if (append) salesCache = salesCache.concat(mapped); else salesCache = mapped;
     salesContinuation = data.continuation || "";
     if ((window.currentFeatureView || "mints") === "sales") renderSales();
@@ -329,12 +287,10 @@ let rarityCache = []; // [{id, rank, score?}, ...]
 let raritySortMode = "rank";
 
 async function loadRarityJSON() {
-  // First, a global provided list if present
+  // Global override first
   if (Array.isArray(window.FF_RARITY_LIST)) return window.FF_RARITY_LIST;
-  // Fallback to local JSON
-  const res = await fetch("assets/freshfrogs_rarity_rankings.json", { cache: "no-cache" });
-  if (!res.ok) throw new Error(`Rarity JSON ${res.status}`);
-  return res.json();
+  // Local JSON fallback
+  return fetchJSON(FF_CFG.JSON_PATH || "assets/freshfrogs_rarity_rankings.json");
 }
 
 export async function loadRarity() {
@@ -361,7 +317,6 @@ export async function loadRarity() {
 }
 
 function renderRarity() {
-  const C = getCFG();
   const ul = document.getElementById("featureList");
   const anchor = document.getElementById("featureMoreAnchor");
   if (!ul) return;
@@ -382,14 +337,14 @@ function renderRarity() {
     const li = document.createElement("li");
     li.className = "list-item";
     li.innerHTML =
-      thumb64(`${C.SOURCE_PATH}/frog/${x.id}.png`, `Frog ${x.id}`) +
+      thumb64(`${FF_CFG.SOURCE_PATH}/frog/${x.id}.png`, `Frog ${x.id}`) +
       `<div>
          <div class="row gap8"><b>Frog #${x.id}</b> <span class="pill">Rank <b>#${x.rank}</b></span></div>
          <div class="muted">${x.score != null ? `Score ${x.score}` : ""}</div>
        </div>
        <div class="price"></div>`;
     li.style.cursor = "pointer";
-    li.addEventListener("click", () => openFrogInfo && openFrogInfo(x.id));
+    li.addEventListener("click", () => window.FF_openFrogInfo?.(x.id));
     ul.appendChild(li);
   });
 }
@@ -405,13 +360,12 @@ function mapPond(tokens) {
 }
 
 async function fetchPond({ limit = 50, continuation = "" } = {}) {
-  const C = getCFG();
-  if (!C.CONTROLLER_ADDRESS) throw new Error("Missing CONTROLLER_ADDRESS");
-  const qs = new URLSearchParams({ collection: C.COLLECTION_ADDRESS, limit: String(limit) });
+  if (!FF_CFG.CONTROLLER_ADDRESS) throw new Error("Missing CONTROLLER_ADDRESS");
+  const qs = new URLSearchParams({ collection: FF_CFG.COLLECTION_ADDRESS, limit: String(limit) });
   if (continuation) qs.set("continuation", continuation);
-  const url = `https://api.reservoir.tools/users/${C.CONTROLLER_ADDRESS}/tokens/v8?${qs.toString()}`;
+  const url = `https://api.reservoir.tools/users/${FF_CFG.CONTROLLER_ADDRESS}/tokens/v8?${qs.toString()}`;
   const headers = { accept: "*/*" };
-  if (C.FROG_API_KEY && C.FROG_API_KEY !== "YOUR_RESERVOIR_API_KEY_HERE") headers["x-api-key"] = C.FROG_API_KEY;
+  if (FF_CFG.FROG_API_KEY && FF_CFG.FROG_API_KEY !== "YOUR_RESERVOIR_API_KEY_HERE") headers["x-api-key"] = FF_CFG.FROG_API_KEY;
   const res = await fetch(url, { headers });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json(); // { tokens, continuation? }
@@ -421,7 +375,6 @@ let pondCache = [];
 let pondContinuation = "";
 
 function renderPond(list = pondCache) {
-  const C = getCFG();
   const ul = document.getElementById("featureList");
   const anchor = document.getElementById("featureMoreAnchor");
   if (!ul) return;
@@ -435,19 +388,22 @@ function renderPond(list = pondCache) {
   }
 
   arr.forEach(x => {
-    const rank = getRankById ? getRankById(x.id) : null;
-    const badge = (rank || rank === 0) ? `<span class="pill">Rank <b>#${rank}</b></span>` : `<span class="pill pill-ghost">Rank N/A</span>`;
+    const rank = window.FF_getRankById ? window.FF_getRankById(x.id) : null;
+    const badge = (rank || rank === 0)
+      ? `<span class="pill">Rank <b>#${rank}</b></span>`
+      : `<span class="pill pill-ghost">Rank N/A</span>`;
+
     const li = document.createElement("li");
     li.className = "list-item";
     li.innerHTML =
-      thumb64(`${C.SOURCE_PATH}/frog/${x.id}.png`, `Frog ${x.id}`) +
+      thumb64(`${FF_CFG.SOURCE_PATH}/frog/${x.id}.png`, `Frog ${x.id}`) +
       `<div>
          <div class="row gap8"><b>Frog #${x.id}</b> ${badge}</div>
          <div class="muted">Staked (Controller)</div>
        </div>
        <div class="price"></div>`;
     li.style.cursor = "pointer";
-    li.addEventListener("click", () => openFrogInfo && openFrogInfo(x.id));
+    li.addEventListener("click", () => window.FF_openFrogInfo?.(x.id));
     ul.appendChild(li);
   });
 
@@ -475,16 +431,11 @@ export async function loadPond({ append = false, limit = 50 } = {}) {
   }
 }
 
-/* ----------------------- Public init (optional) ----------------------- */
+/* ----------------------- Public init ---------------------------------- */
 export async function initUI() {
-  // Spotlight
   renderGrid();
-
-  // Tabs + Buttons
   wireFeatureTabs();
   wireFeatureButtons();
-
-  // Prime
   try { await loadMintsLive(); } catch {}
   try { await loadRarity(); } catch {}
 }
