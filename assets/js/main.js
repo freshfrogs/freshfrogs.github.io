@@ -1,5 +1,6 @@
-// assets/js/main.js
 import { initUI } from './ui.js';
+import { getUser } from './core.js';
+
 
 // ---------- Theme switcher ----------
 function applyTheme(theme) {
