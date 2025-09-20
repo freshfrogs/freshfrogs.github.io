@@ -35,16 +35,6 @@
         <a class="btn btn-solid btn-lg" href="#trade">🐸 Mint & Staking</a>
         <a class="btn btn-outline" href="https://freshfrogs.github.io/" target="_blank" rel="noopener">Original Site</a>
       </div>
-
-      <!-- Local JSON loader appears only when testing via file:// -->
-      <div id="localLoad" class="muted" style="margin-top:8px;display:none;">
-        <div><b>Testing locally?</b> Load your rarity JSON:</div>
-        <div class="row" style="margin-top:6px">
-          <input id="rarityFile" type="file" accept="application/json,.json"/>
-          <button id="useLocalBtn" class="btn btn-outline btn-sm">Use selected JSON</button>
-        </div>
-        <div style="font-size:.9rem;margin-top:4px">Pick <code>assets/freshfrogs_rarity_rankings.json</code></div>
-      </div>
     </div>
 
     <div id="gallery"><div class="gallery" id="grid"></div></div>
@@ -116,21 +106,23 @@
   <section id="features" class="panel stack" aria-label="Features">
     <div class="row" style="justify-content:space-between;align-items:center;gap:12px;">
       <h2 class="section-title" style="margin:0">Collection Insights</h2>
-
-      <!-- View tabs (Sales / Rarity) -->
-      <div class="tabs" role="tablist" id="viewTabs" style="min-width:260px;">
+      <!-- View tabs -->
+      <div class="tabs" role="tablist" id="viewTabs" style="min-width:340px;">
         <span class="tab-indicator" aria-hidden="true"></span>
-        <button class="tab" data-view="sales"  role="tab" aria-selected="true">Sales</button>
+        <button class="tab" data-view="mints"  role="tab" aria-selected="true">Mints</button>
+        <button class="tab" data-view="sales"  role="tab" aria-selected="false">Sales</button>
         <button class="tab" data-view="rarity" role="tab" aria-selected="false">Rarity</button>
+        <button class="tab" data-view="pond"   role="tab" aria-selected="false">Pond</button>
       </div>
     </div>
 
     <!-- Unified list area -->
     <ul id="featureList" class="card-list list-scroll" aria-live="polite"></ul>
+    <!-- Paging / more anchor -->
+    <div id="featureMoreAnchor" class="list-footer"></div>
 
     <!-- Unified controls -->
     <div class="row" id="featureControls" style="gap:8px;">
-      <!-- Sales controls -->
       <button class="btn btn-outline" id="refreshBtn">Refresh</button>
       <button class="btn btn-ghost"   id="fetchLiveBtn">Fetch Live</button>
 
@@ -174,6 +166,8 @@
 </div>
 
 <!-- Boot via ES modules -->
+<script src="assets/abi/collection_abi.js"></script>
+<script src="assets/abi/controller_abi.js"></script>
 <script type="module" src="assets/js/main.js"></script>
 <script type="module">
   import { initUI } from './assets/js/ui.js';
