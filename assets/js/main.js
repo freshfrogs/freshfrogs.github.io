@@ -1,8 +1,7 @@
 // assets/js/main.js
-// central boot: theme, mint UI, wallet connect, then initUI
-
 import { initUI } from "./ui.js";
 import { getUser } from "./core.js";
+import { wireOwnedStakedPanel, onWalletConnected } from "./staking.js";
 
 // ---------- Theme switcher ----------
 function applyTheme(theme) {
@@ -11,10 +10,7 @@ function applyTheme(theme) {
   try { localStorage.setItem("ff_theme", theme); } catch {}
 }
 function restoreTheme() {
-  try {
-    const saved = localStorage.getItem("ff_theme");
-    if (saved) applyTheme(saved);
-  } catch {}
+  try { const saved = localStorage.getItem("ff_theme"); if (saved) applyTheme(saved); } catch {}
 }
 function wireThemeDock() {
   restoreTheme();
@@ -27,15 +23,11 @@ function wireThemeDock() {
 const MINT_PRICE_ETH = 0.01;
 function updateMintUI(qty) {
   const total = (qty * MINT_PRICE_ETH).toFixed(2);
-  const qtyEl = document.getElementById("mintQty");
-  const totEl = document.getElementById("mintTotal");
+  document.getElementById("mintQty")?.replaceChildren(document.createTextNode(String(qty)));
+  document.getElementById("mintTotal")?.replaceChildren(document.createTextNode(total));
   const btn = document.getElementById("mintBtn");
-  qtyEl && (qtyEl.textContent = String(qty));
-  totEl && (totEl.textContent = total);
-  if (btn) {
-    const u = btn.querySelector("u");
-    if (u) u.textContent = String(qty);
-  }
+  const u = btn?.querySelector("u");
+  if (u) u.textContent = String(qty);
 }
 function wireMintPanel() {
   const down = document.getElementById("mintDown");
@@ -72,7 +64,7 @@ function wireWallet() {
       if (lbl) { lbl.textContent = address; lbl.style.display = ""; }
       btn.textContent = "Connected";
       btn.disabled = true;
-      // could trigger owned/staked refresh here if desired
+      onWalletConnected(address);
     } catch (e) {
       alert(e.message || String(e));
     }
@@ -84,5 +76,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   wireThemeDock();
   wireMintPanel();
   wireWallet();
-  await initUI();
+  wireOwnedStakedPanel();
+  await initUI(); // Mints+Rarity prime on load
 });

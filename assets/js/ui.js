@@ -1,9 +1,8 @@
 // assets/js/ui.js
-// UI-only: grid + tabs + renderers; uses core.js for config + fetchers
+// UI-only: grid + tabs + unified list renderers
 
 import { FF_CFG, shorten, formatAgo, thumb64, fetchJSON, fetchSales, fetchMints, fetchPond } from "./core.js";
 
-// Optional global hooks if you already had them elsewhere:
 const getRankById = (id) => (typeof window !== "undefined" && window.FF_getRankById) ? window.FF_getRankById(id) : null;
 const openFrogInfo = (id) => (typeof window !== "undefined" && window.FF_openFrogInfo) ? window.FF_openFrogInfo(id) : null;
 
@@ -48,7 +47,7 @@ export function wireFeatureTabs() {
   wrap.querySelectorAll(".tab").forEach(btn => {
     btn.addEventListener("click", () => setFeatureView(btn.dataset.view));
   });
-  setFeatureView("mints"); // default
+  setFeatureView("mints");
 }
 
 export function wireFeatureButtons() {
@@ -77,18 +76,12 @@ export function wireFeatureButtons() {
     }
   });
 
-  document.getElementById("sortRankBtn")?.addEventListener("click", () => {
-    raritySortMode = "rank"; renderRarity();
-  });
-  document.getElementById("sortScoreBtn")?.addEventListener("click", () => {
-    raritySortMode = "score"; renderRarity();
-  });
+  document.getElementById("sortRankBtn")?.addEventListener("click", () => { raritySortMode = "rank"; renderRarity(); });
+  document.getElementById("sortScoreBtn")?.addEventListener("click", () => { raritySortMode = "score"; renderRarity(); });
 }
 
 /* ======================= Mints ======================================= */
-let mintsCache = [];
-let mintsContinuation = "";
-
+let mintsCache = []; let mintsContinuation = "";
 function mapMints(activities) {
   return (activities || []).map(a => {
     const t = a.token || a;
@@ -150,14 +143,11 @@ export async function loadMintsLive({ append = false } = {}) {
     mintsContinuation = data.continuation || "";
     if ((window.currentFeatureView || "mints") === "mints") renderMints();
     return true;
-  } catch (e) {
-    renderMintsError(`Failed to fetch Recent Mints. ${e.message || e}`); return false;
-  }
+  } catch (e) { renderMintsError(`Failed to fetch Recent Mints. ${e.message || e}`); return false; }
 }
 
 /* ======================= Sales ======================================= */
-let salesCache = [];
-let salesContinuation = "";
+let salesCache = []; let salesContinuation = "";
 function renderSales(list = salesCache) {
   const ul = document.getElementById("featureList");
   const anchor = document.getElementById("featureMoreAnchor");
@@ -217,11 +207,10 @@ export async function loadSalesLive({ append = false } = {}) {
 }
 
 /* ======================= Rarity ====================================== */
-let rarityCache = []; // [{id, rank, score?}, ...]
-let raritySortMode = "rank";
+let rarityCache = []; let raritySortMode = "rank";
 async function loadRarityJSON() {
   if (Array.isArray(window.FF_RARITY_LIST)) return window.FF_RARITY_LIST;
-  return fetchJSON(FF_CFG.RARITY_JSON);
+  return fetchJSON(FF_CFG.RARITY_JSON, { cache: "no-cache" });
 }
 export async function loadRarity() {
   try {
@@ -235,9 +224,7 @@ export async function loadRarity() {
     } else if (typeof raw === "object" && raw) {
       rarityCache = Object.entries(raw).map(([k, v]) => ({ id: Number(k), rank: Number(v) }))
         .filter(x => Number.isFinite(x.id) && Number.isFinite(x.rank));
-    } else {
-      rarityCache = [];
-    }
+    } else { rarityCache = []; }
     if ((window.currentFeatureView || "mints") === "rarity") renderRarity();
   } catch (e) {
     const ul = document.getElementById("featureList");
@@ -272,8 +259,7 @@ function renderRarity() {
 }
 
 /* ======================= Pond ======================================== */
-let pondCache = [];
-let pondContinuation = "";
+let pondCache = []; let pondContinuation = "";
 function mapPond(tokens) {
   return (tokens || []).map(t => {
     const tok = t.token || {};
