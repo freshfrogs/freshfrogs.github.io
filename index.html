@@ -175,5 +175,9 @@
 
 <!-- Boot via ES modules -->
 <script type="module" src="assets/js/main.js"></script>
+<script type="module">
+  import { initUI } from './assets/js/ui.js';
+  window.addEventListener('DOMContentLoaded', initUI);
+</script>
 </body>
 </html>
