@@ -1,12 +1,16 @@
 // assets/js/ui.js
-// UI-only: grid + tabs + unified list renderers
+// Grid + tabs + lists + frog modal (layered render)
 
-import { FF_CFG, shorten, formatAgo, thumb64, fetchJSON, fetchSales, fetchMints, fetchPond } from "./core.js";
+import {
+  FF_CFG, shorten, formatAgo, thumb64, fetchJSON,
+  fetchSales, fetchMints, fetchPond
+} from "./core.js";
+import { getStakeMetaForModal } from "./staking.js";
 
+// Optional global helpers if you’ve defined them:
 const getRankById = (id) => (typeof window !== "undefined" && window.FF_getRankById) ? window.FF_getRankById(id) : null;
-const openFrogInfo = (id) => (typeof window !== "undefined" && window.FF_openFrogInfo) ? window.FF_openFrogInfo(id) : null;
 
-/* ----------------------- Spotlight Grid (128×128) --------------------- */
+// ========= Spotlight Grid (static 128×128 PNGs) =========
 export function renderGrid() {
   const wrap = document.getElementById("grid");
   if (!wrap) return;
@@ -25,7 +29,7 @@ export function renderGrid() {
   }
 }
 
-/* ----------------------- Tabs & Buttons ------------------------------- */
+// ========= Tabs & Buttons =========
 function setFeatureView(view) {
   window.currentFeatureView = view;
   document.querySelectorAll('#viewTabs .tab').forEach(btn => {
@@ -40,7 +44,6 @@ function setFeatureView(view) {
   document.getElementById("sortRankBtn")?.style.setProperty("display", showRaritySort ? "" : "none");
   document.getElementById("sortScoreBtn")?.style.setProperty("display", showRaritySort ? "" : "none");
 }
-
 export function wireFeatureTabs() {
   const wrap = document.getElementById("viewTabs");
   if (!wrap) return;
@@ -49,7 +52,6 @@ export function wireFeatureTabs() {
   });
   setFeatureView("mints");
 }
-
 export function wireFeatureButtons() {
   const refresh = document.getElementById("refreshBtn");
   const live = document.getElementById("fetchLiveBtn");
@@ -61,26 +63,20 @@ export function wireFeatureButtons() {
     else if (v === "rarity") renderRarity();
     else renderPond();
   });
-
   live?.addEventListener("click", async () => {
     const v = window.currentFeatureView || "mints";
     let ok = false;
     if (v === "mints")      ok = await loadMintsLive();
     else if (v === "sales") ok = await loadSalesLive();
     else if (v === "pond")  ok = await loadPond({ append: false, limit: 50 });
-
-    if (ok) {
-      live.textContent = "Live loaded";
-      live.disabled = true;
-      live.classList.add("btn-ghost");
-    }
+    if (ok) { live.textContent = "Live loaded"; live.disabled = true; live.classList.add("btn-ghost"); }
   });
 
   document.getElementById("sortRankBtn")?.addEventListener("click", () => { raritySortMode = "rank"; renderRarity(); });
   document.getElementById("sortScoreBtn")?.addEventListener("click", () => { raritySortMode = "score"; renderRarity(); });
 }
 
-/* ======================= Mints ======================================= */
+// ========= Recent Mints =========
 let mintsCache = []; let mintsContinuation = "";
 function mapMints(activities) {
   return (activities || []).map(a => {
@@ -95,7 +91,7 @@ function mapMints(activities) {
     return id ? { id, time: ts ? formatAgo(Date.now() - ts) : "—", buyer: minter ? shorten(minter) : "—", price: priceEth } : null;
   }).filter(Boolean);
 }
-function renderMintsError(msg) {
+function featureError(msg) {
   const ul = document.getElementById("featureList");
   const anchor = document.getElementById("featureMoreAnchor");
   if (!ul) return;
@@ -122,7 +118,7 @@ export function renderMints(list = mintsCache) {
        </div>
        <div class="price">${x.price}</div>`;
     li.style.cursor = "pointer";
-    li.addEventListener("click", () => openFrogInfo && openFrogInfo(x.id));
+    li.addEventListener("click", () => openFrogModal(x.id));
     ul.appendChild(li);
   });
   if (mintsContinuation) {
@@ -135,7 +131,6 @@ export function renderMints(list = mintsCache) {
   }
 }
 export async function loadMintsLive({ append = false } = {}) {
-  if (!FF_CFG.COLLECTION_ADDRESS) { renderMintsError("Missing COLLECTION_ADDRESS in FF_CFG."); return false; }
   try {
     const data = await fetchMints({ limit: 50, continuation: append ? mintsContinuation : "" });
     const mapped = mapMints(data.activities || data.events || []);
@@ -143,10 +138,10 @@ export async function loadMintsLive({ append = false } = {}) {
     mintsContinuation = data.continuation || "";
     if ((window.currentFeatureView || "mints") === "mints") renderMints();
     return true;
-  } catch (e) { renderMintsError(`Failed to fetch Recent Mints. ${e.message || e}`); return false; }
+  } catch (e) { featureError(`Failed to fetch Recent Mints. ${e.message || e}`); return false; }
 }
 
-/* ======================= Sales ======================================= */
+// ========= Recent Sales =========
 let salesCache = []; let salesContinuation = "";
 function renderSales(list = salesCache) {
   const ul = document.getElementById("featureList");
@@ -168,7 +163,7 @@ function renderSales(list = salesCache) {
        </div>
        <div class="price">${x.price}</div>`;
     li.style.cursor = "pointer";
-    li.addEventListener("click", () => openFrogInfo && openFrogInfo(x.id));
+    li.addEventListener("click", () => openFrogModal(x.id));
     ul.appendChild(li);
   });
   if (salesContinuation) {
@@ -199,14 +194,10 @@ export async function loadSalesLive({ append = false } = {}) {
     salesContinuation = data.continuation || "";
     if ((window.currentFeatureView || "mints") === "sales") renderSales();
     return true;
-  } catch (e) {
-    const ul = document.getElementById("featureList");
-    ul && (ul.innerHTML = `<li class="list-item"><div class="muted">Failed to fetch Sales: ${e.message || e}</div></li>`);
-    return false;
-  }
+  } catch (e) { featureError(`Failed to fetch Sales: ${e.message || e}`); return false; }
 }
 
-/* ======================= Rarity ====================================== */
+// ========= Rarity =========
 let rarityCache = []; let raritySortMode = "rank";
 async function loadRarityJSON() {
   if (Array.isArray(window.FF_RARITY_LIST)) return window.FF_RARITY_LIST;
@@ -226,11 +217,7 @@ export async function loadRarity() {
         .filter(x => Number.isFinite(x.id) && Number.isFinite(x.rank));
     } else { rarityCache = []; }
     if ((window.currentFeatureView || "mints") === "rarity") renderRarity();
-  } catch (e) {
-    const ul = document.getElementById("featureList");
-    ul && (ul.innerHTML = `<li class="list-item"><div class="muted">Failed to load rarity data: ${e.message || e}</div></li>`);
-    rarityCache = [];
-  }
+  } catch (e) { featureError(`Failed to load rarity data: ${e.message || e}`); rarityCache = []; }
 }
 function renderRarity() {
   const ul = document.getElementById("featureList");
@@ -253,12 +240,12 @@ function renderRarity() {
        </div>
        <div class="price"></div>`;
     li.style.cursor = "pointer";
-    li.addEventListener("click", () => openFrogInfo && openFrogInfo(x.id));
+    li.addEventListener("click", () => openFrogModal(x.id));
     ul.appendChild(li);
   });
 }
 
-/* ======================= Pond ======================================== */
+// ========= Pond =========
 let pondCache = []; let pondContinuation = "";
 function mapPond(tokens) {
   return (tokens || []).map(t => {
@@ -288,7 +275,7 @@ function renderPond(list = pondCache) {
        </div>
        <div class="price"></div>`;
     li.style.cursor = "pointer";
-    li.addEventListener("click", () => openFrogInfo && openFrogInfo(x.id));
+    li.addEventListener("click", () => openFrogModal(x.id));
     ul.appendChild(li);
   });
   if (pondContinuation) {
@@ -307,14 +294,133 @@ export async function loadPond({ append = false, limit = 50 } = {}) {
     pondContinuation = data.continuation || "";
     if ((window.currentFeatureView || "mints") === "pond") renderPond();
     return true;
+  } catch (e) { featureError(`Failed to load Pond: ${e.message || e}`); return false; }
+}
+
+// ========= Frog Modal (layered render w/ animations) =========
+function modalStage() { return document.getElementById("lightboxStage"); }
+function modalRoot()  { return document.getElementById("lightbox"); }
+
+export async function openFrogModal(tokenId) {
+  try {
+    const meta = await (await fetch(`${FF_CFG.SOURCE_PATH}/frog/json/${tokenId}.json`, { cache: "no-cache" })).json();
+
+    // Build visual container
+    const root = modalRoot(); const stage = modalStage();
+    if (!root || !stage) return;
+    stage.innerHTML = ""; // clear
+
+    // Background: use original image, zoomed and bottom-right so only color shows
+    const bgUrl = `${FF_CFG.SOURCE_PATH}/frog/${tokenId}.png`;
+    const wrapper = document.createElement("div");
+    wrapper.className = "frog-modal-wrap";
+    Object.assign(wrapper.style, {
+      position: "relative",
+      width: "min(512px, 90vw)",
+      aspectRatio: "1 / 1",
+      backgroundImage: `url("${bgUrl}")`,
+      backgroundSize: "900% 900%",
+      backgroundPosition: "100% 100%",
+      borderRadius: "16px",
+      overflow: "hidden",
+    });
+
+    // Canvas-like stack using absolutely positioned <img>s
+    const layerHost = document.createElement("div");
+    Object.assign(layerHost.style, {
+      position: "absolute", inset: "0", display: "grid", placeItems: "center"
+    });
+
+    // Draw layers IN METADATA ORDER
+    const hasNaturalTrait = meta.attributes?.some(a => a.trait_type === "Trait" && /natural/i.test(a.value));
+    for (const a of (meta.attributes || [])) {
+      const ttype = a.trait_type;
+      const name  = a.value;
+      let src = `${FF_CFG.SOURCE_PATH}/frog/build_files/${ttype}/${name}.png`;
+
+      // Animation rules
+      const allowAnimation =
+        (ttype === "Frog" && hasNaturalTrait) ||
+        (ttype === "SpecialFrog");
+      const blockAnimation = (ttype === "Hat" || ttype === "Trait");
+      if (allowAnimation && !blockAnimation) {
+        const gif = `${FF_CFG.SOURCE_PATH}/frog/build_files/${ttype}/animations/${name}_animation.gif`;
+        // preflight check by attempting to load; fallback to PNG if 404
+        try {
+          await new Promise((res, rej) => {
+            const img = new Image();
+            img.onload = () => res(true);
+            img.onerror = rej;
+            img.src = gif;
+          });
+          src = gif;
+        } catch { /* png fallback already in src */ }
+      }
+
+      const img = document.createElement("img");
+      img.src = src;
+      img.alt = `${ttype}: ${name}`;
+      Object.assign(img.style, {
+        width: "100%", height: "100%", objectFit: "contain",
+        imageRendering: "pixelated",
+      });
+      layerHost.appendChild(img);
+    }
+
+    wrapper.appendChild(layerHost);
+
+    // Info footer
+    const info = document.createElement("div");
+    info.className = "frog-modal-info";
+    Object.assign(info.style, {
+      position: "absolute", left: "0", right: "0", bottom: "0",
+      padding: "10px 12px",
+      background: "rgba(0,0,0,0.35)", /* subtle translucent */
+      color: "white", display: "flex", gap: "10px", alignItems: "center",
+      backdropFilter: "blur(4px)"
+    });
+
+    const rank = getRankById ? getRankById(tokenId) : null;
+    const pill = document.createElement("span");
+    pill.className = "pill";
+    pill.innerHTML = rank || rank === 0 ? `Rank <b>#${rank}</b>` : `Rank N/A`;
+
+    // Staking meta (best-effort)
+    const stakeMeta = await getStakeMetaForModal(tokenId);
+    const stTxt = stakeMeta.staked
+      ? `Staked ${stakeMeta.sinceMs ? formatAgo(Date.now() - stakeMeta.sinceMs) + " ago" : ""}`
+      : "Not staked";
+
+    const title = document.createElement("div");
+    title.innerHTML = `<b>Frog #${tokenId}</b> <span class="muted">• ${stTxt}</span>`;
+
+    const links = document.createElement("div");
+    links.style.marginLeft = "auto";
+    links.innerHTML = `
+      <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="https://etherscan.io/nft/${FF_CFG.COLLECTION_ADDRESS}/${tokenId}">Etherscan</a>
+      <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="https://opensea.io/assets/ethereum/${FF_CFG.COLLECTION_ADDRESS}/${tokenId}">OpenSea</a>
+    `;
+
+    info.appendChild(pill);
+    info.appendChild(title);
+    info.appendChild(links);
+
+    stage.appendChild(wrapper);
+    stage.appendChild(info);
+
+    // show
+    root.style.display = "grid";
+    root.onclick = (e) => { if (e.target === root) { root.style.display = "none"; } };
   } catch (e) {
-    const ul = document.getElementById("featureList");
-    ul && (ul.innerHTML = `<li class="list-item"><div class="muted">Failed to load Pond: ${e.message || e}</div></li>`);
-    return false;
+    console.warn("openFrogModal failed", e);
+    alert(`Failed to load frog ${tokenId}: ${e.message || e}`);
   }
 }
 
-/* ----------------------- Public init ---------------------------------- */
+// Expose for other modules / list clicks:
+window.FF_openFrogInfo = openFrogModal;
+
+// ========= Public init =========
 export async function initUI() {
   renderGrid();
   wireFeatureTabs();

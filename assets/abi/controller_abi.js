@@ -1,5 +1,5 @@
 /* Controller ABI — idempotent global assignment */
-window.controller_abi = window.controller_abi || [
+window.CONTROLLER_ABI = [
   {
     "inputs": [],
     "name": "claimRewards",

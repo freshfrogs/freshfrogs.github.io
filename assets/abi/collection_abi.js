@@ -1,4 +1,4 @@
-window.collection_abi = window.collection_abi || [
+window.COLLECTION_ABI = [
     {
       "anonymous": false,
       "inputs": [
