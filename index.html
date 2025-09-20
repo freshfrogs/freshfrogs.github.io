@@ -1,179 +1,199 @@
 <!doctype html>
-<html lang="en" data-theme="noir">
+<html lang="en" class="theme-noir">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>FreshFrogs — Wallet, Sales, Rarity, Staking</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Grotesk:wght@600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js" crossorigin="anonymous"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fresh Frogs — Collection</title>
+  <link rel="preconnect" href="https://api.reservoir.tools" crossorigin>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <style>
+    /* ---- Minimal layout scaffolding (keeps your existing styles intact) ---- */
+    .mast {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .brand-logo {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: grid; place-items: center;
+      background: var(--panel); border: 1px solid var(--line);
+      box-shadow: var(--shadow-s);
+      font-size: 18px;
+    }
+    .brand h1 {
+      margin: 0; font-size: 1.25rem; letter-spacing: .2px;
+    }
+    .kpis {
+      display: grid; grid-auto-flow: column; gap: 8px; align-items: center;
+    }
+    .kpi { padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line); }
+    .shell {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 16px;
+    }
+    @media (max-width: 980px) {
+      .shell { grid-template-columns: 1fr; }
+    }
+    .stack { display: grid; gap: 16px; }
+    .panel-title small { color: var(--muted); font-weight: 400; margin-left: 6px; }
+    /* Place the feature-panel controls inline and subtle */
+    .feature-controls {
+      display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    }
+    .feature-controls .btn { padding: 6px 10px; }
+    /* Owned/Staked header row */
+    .wallet-row {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .wallet-right { margin-left: auto; display: flex; gap: 8px; }
+    .muted { color: var(--muted); }
+  </style>
 </head>
 <body>
-<header class="site">
-  <div class="container hdr">
-    <div class="brand">FreshFrogs</div>
-    <nav class="nav">
-      <a href="#gallery">Collection</a>
-      <a href="#trade">Mint & Staking</a>
-      <a href="#features">Features</a>
-      <a href="#about">About</a>
-      <a href="#faq">FAQ</a>
-    </nav>
-    <div class="row">
-      <span id="walletLabel" class="muted" style="display:none;"></span>
-      <button id="connectBtn" class="btn btn-solid btn-sm">Connect Wallet</button>
-    </div>
+  <div class="container">
+
+    <!-- Masthead -------------------------------------------------------->
+    <header class="mast">
+      <div class="brand">
+        <div class="brand-logo">🐸</div>
+        <h1>Fresh Frogs</h1>
+      </div>
+      <div class="kpis">
+        <div class="kpi">Chain: <b>Ethereum</b></div>
+        <div class="kpi">Supply: <b>4,040</b></div>
+        <div class="kpi">Mint Price: <b>0.01 ETH</b></div>
+        <div class="kpi">Royalties: <b>5%</b></div>
+      </div>
+    </header>
+
+    <!-- Main Shell ------------------------------------------------------>
+    <main class="shell">
+
+      <!-- Left column: Collection Insights (BIG) ----------------------->
+      <section class="panel stack">
+        <div class="panel-header" id="featuresHeader">
+          <h2 class="panel-title">
+            Collection Insights
+            <small>Live data via Reservoir</small>
+          </h2>
+          <div class="feature-controls">
+            <button id="refreshBtn" class="btn btn-outline btn-sm" title="Re-render current list">Refresh</button>
+            <button id="fetchLiveBtn" class="btn btn-primary btn-sm" title="Fetch latest from Reservoir">Fetch live</button>
+            <button id="sortRankBtn" class="btn btn-outline btn-sm" style="display:none" title="Sort by rank">Sort: Rank</button>
+            <button id="sortScoreBtn" class="btn btn-outline btn-sm" style="display:none" title="Sort by score">Sort: Score</button>
+          </div>
+        </div>
+
+        <!-- Tabs: Mints → Sales → Rarity → Pond -->
+        <nav id="viewTabs" class="row gap8" aria-label="Insights Tabs">
+          <!-- ui.js will re-create in the correct order and wire up -->
+          <button class="tab" data-view="mints" aria-selected="true">Recent Mints</button>
+          <button class="tab" data-view="sales" aria-selected="false">Recent Sales</button>
+          <button class="tab" data-view="rarity" aria-selected="false">Rarity</button>
+          <button class="tab" data-view="pond" aria-selected="false">Pond</button>
+        </nav>
+
+        <!-- Feature list -->
+        <ul id="featureList" class="list" aria-live="polite"></ul>
+
+        <!-- Optional "Load more" anchor (Pond & continuation) -->
+        <div id="featureMoreAnchor" class="list-footer"></div>
+      </section>
+
+      <!-- Right column: Spotlight Grid + Wallet/Owned ------------------->
+      <aside class="stack">
+        <!-- Spotlight grid -->
+        <section class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Spotlight</h2>
+            <!-- Optional: a gentle refresh grid button, if you want it -->
+            <!-- <button class="btn btn-outline btn-sm" onclick="location.reload()">Refresh</button> -->
+          </div>
+          <div id="grid"></div>
+        </section>
+
+        <!-- Wallet + Owned/Staked -->
+        <section class="panel">
+          <div class="panel-header wallet-row">
+            <h2 class="panel-title">Your Frogs</h2>
+            <span id="walletLabel" class="muted" style="display:none"></span>
+            <div class="wallet-right">
+              <button id="connectBtn" class="btn btn-primary btn-sm">Connect Wallet</button>
+              <button id="refreshOwned" class="btn btn-outline btn-sm" title="Fetch owned tokens">Refresh Owned</button>
+            </div>
+          </div>
+
+          <div id="stakeControls" class="row tight" style="margin-bottom:8px;">
+            <button id="selectAll" class="btn btn-outline btn-sm">Select all</button>
+            <button id="clearSel" class="btn btn-outline btn-sm">Clear</button>
+            <span id="stakeStatus" class="muted">Not connected.</span>
+          </div>
+
+          <!-- Owned/Staked results (same scroll height as feature list) -->
+          <ul id="chipWrap" class="list" aria-live="polite"></ul>
+        </section>
+      </aside>
+
+    </main>
   </div>
-</header>
 
-<main class="container">
-  <section class="hero">
-    <div>
-      <h1 class="section-title" style="margin:0;font-size:clamp(2rem,4.2vw,3rem);">Nine random frogs. Clean and fast.</h1>
-      <p class="muted" style="max-width:62ch">Hero grid renders standard PNGs. (Trait-layer code kept for later.)</p>
-      <div class="row" style="margin-top:12px;">
-        <a class="btn btn-solid btn-lg" href="#trade">🐸 Mint & Staking</a>
-        <a class="btn btn-outline" href="https://freshfrogs.github.io/" target="_blank" rel="noopener">Original Site</a>
-      </div>
-
-      <!-- Local JSON loader appears only when testing via file:// -->
-      <div id="localLoad" class="muted" style="margin-top:8px;display:none;">
-        <div><b>Testing locally?</b> Load your rarity JSON:</div>
-        <div class="row" style="margin-top:6px">
-          <input id="rarityFile" type="file" accept="application/json,.json"/>
-          <button id="useLocalBtn" class="btn btn-outline btn-sm">Use selected JSON</button>
-        </div>
-        <div style="font-size:.9rem;margin-top:4px">Pick <code>assets/freshfrogs_rarity_rankings.json</code></div>
-      </div>
-    </div>
-
-    <div id="gallery"><div class="gallery" id="grid"></div></div>
-  </section>
-
-  <section class="facts" aria-label="Key facts">
-    <div class="fact"><b>Supply</b><div class="muted">4,040 tokens</div></div>
-    <div class="fact"><b>Chain</b><div class="muted">Ethereum (ERC-721)</div></div>
-    <div class="fact"><b>Royalty</b><div class="muted">5% on secondary sales</div></div>
-    <div class="fact"><b>Mint Price</b><div class="muted">0.01 ETH</div></div>
-  </section>
-
-  <section id="trade" class="two-col" aria-label="Mint and Staking">
-    <div class="panel stack" aria-label="Mint">
-      <div class="row" style="justify-content:space-between;align-items:center">
-        <div><h2 class="section-title" style="margin:0">Mint</h2><div class="muted">Choose quantity, preview total, then mint.</div></div>
-        <div class="pill">Price <b>0.01Ξ</b></div>
-      </div>
-      <div class="row" style="gap:10px;align-items:center">
-        <button id="mintDown" class="icon-btn" aria-label="Decrease">−</button>
-        <div id="mintQty" aria-live="polite">1</div>
-        <button id="mintUp" class="icon-btn" aria-label="Increase">+</button>
-        <input id="mintSlider" type="range" min="1" max="20" step="1" value="1" style="flex:1"/>
-      </div>
-      <div class="row" style="gap:6px;flex-wrap:wrap">
-        <button class="btn btn-ghost btn-sm" data-preset="1">x1</button>
-        <button class="btn btn-ghost btn-sm" data-preset="3">x3</button>
-        <button class="btn btn-ghost btn-sm" data-preset="5">x5</button>
-        <button class="btn btn-ghost btn-sm" data-preset="10">x10</button>
-        <button class="btn btn-ghost btn-sm" data-preset="20">x20</button>
-      </div>
-      <div class="row" style="align-items:center">
-        <div class="muted">Total</div>
-        <b style="margin-left:6px"><span id="mintTotal">0.01</span> ETH</b>
-        <div class="pill" id="gasHint" style="margin-left:10px;">≈ <span id="gasEst">0.000</span> gas ETH</div>
-        <div class="spacer"></div>
-        <button id="mintBtn" class="btn btn-solid btn-lg">Mint <u>1</u></button>
-      </div>
-      <div class="progress"><i id="mintBar"></i></div>
-      <p id="mintStatus" class="muted">Status: ready (demo)</p>
-    </div>
-
-    <div class="panel stack same-height" aria-label="Staking">
-      <div class="row" style="justify-content:space-between">
-        <div>
-          <h2 class="section-title" style="margin:0">My Frogs</h2>
-          <div class="muted">Connect your wallet to view <b>Owned</b> & <b>Staked</b>.</div>
-          <div id="rewardsLine" class="muted" style="margin-top:4px;display:none;">Available rewards: <b id="rewardsEth">0</b> Flyz</div>
-        </div>
-        <div class="tabs" role="tablist" id="stakeTabs">
-          <span class="tab-indicator" aria-hidden="true"></span>
-          <button class="tab" id="tabOwned"  role="tab" aria-selected="true"  aria-controls="chipWrap">Owned</button>
-          <button class="tab" id="tabStaked" role="tab" aria-selected="false" aria-controls="chipWrap">Staked</button>
-        </div>
-      </div>
-      <ul id="chipWrap" class="card-list list-scroll" aria-live="polite"></ul>
-
-      <div class="row" id="stakeControls" style="gap:8px;">
-        <button id="selectAll" class="btn btn-ghost btn-sm">Select All</button>
-        <button id="clearSel"  class="btn btn-ghost btn-sm">Clear</button>
-        <div class="spacer"></div>
-        <button class="btn btn-solid btn-sm" id="refreshOwned">↻ Refresh Owned</button>
-        <button class="btn btn-outline btn-sm" id="loadStakedBtn">Load Staked</button>
-      </div>
-      <p id="stakeStatus" class="muted">No wallet connected.</p>
-    </div>
-  </section>
-
-  <section id="features" class="panel stack" aria-label="Features">
-    <div class="row" style="justify-content:space-between;align-items:center;gap:12px;">
-      <h2 class="section-title" style="margin:0">Collection Insights</h2>
-
-      <!-- View tabs (Sales / Rarity) -->
-      <div class="tabs" role="tablist" id="viewTabs" style="min-width:260px;">
-        <span class="tab-indicator" aria-hidden="true"></span>
-        <button class="tab" data-view="sales"  role="tab" aria-selected="true">Sales</button>
-        <button class="tab" data-view="rarity" role="tab" aria-selected="false">Rarity</button>
-      </div>
-    </div>
-
-    <!-- Unified list area -->
-    <ul id="featureList" class="card-list list-scroll" aria-live="polite"></ul>
-
-    <!-- Unified controls -->
-    <div class="row" id="featureControls" style="gap:8px;">
-      <!-- Sales controls -->
-      <button class="btn btn-outline" id="refreshBtn">Refresh</button>
-      <button class="btn btn-ghost"   id="fetchLiveBtn">Fetch Live</button>
-
-      <!-- Rarity controls -->
-      <button class="btn btn-outline" id="sortRankBtn"  style="display:none;">Sort by Rank</button>
-      <button class="btn btn-outline" id="sortScoreBtn" style="display:none;">Sort by Score</button>
-    </div>
-  </section>
-
-  <section id="about" class="panel stack">
-    <h2 class="section-title" style="margin:0">About FreshFrogs</h2>
-    <p class="muted">FreshFrogs is a collection of pixel frogs with on-chain provenance. All secondary sales carry a 5% royalty.</p>
-  </section>
-
-  <section id="faq" class="panel stack">
-    <h2 class="section-title" style="margin:0">FAQ</h2>
-    <details><summary><b>How do I mint?</b></summary><p class="muted">Connect a Web3 wallet and call the contract mint function. This template includes UI only; add your mint logic when ready.</p></details>
-    <details><summary><b>Where can I view the collection?</b></summary><p class="muted">OpenSea or the original site’s gallery.</p></details>
-  </section>
-</main>
-
-<footer class="site">
-  <div class="container ftr">
-    <div>© FreshFrogs 2025</div>
-    <div class="links">
-      <a href="https://x.com" target="_blank" rel="noopener">Twitter</a>
-      <a href="#" target="_blank" rel="noopener">Discord</a>
-      <a href="https://freshfrogs.github.io/" target="_blank" rel="noopener">Docs</a>
-    </div>
+  <!-- Lightbox / Modal root (required by ui.js for frog info) ----------->
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-hidden="true" style="display:none;">
+    <div id="lightboxStage" class="panel"></div>
   </div>
-</footer>
 
-<div id="lightbox" class="lightbox" style="display:none">
-  <div id="lightboxStage" class="stage"></div>
-</div>
+  <!-- ABIs (include ONCE to avoid redeclaration) ------------------------>
+  <script src="assets/abi/collection_abi.js"></script>
+  <script src="assets/abi/controller_abi.js"></script>
 
-<!-- Theme chooser -->
-<div class="theme-dock" role="toolbar" aria-label="Theme chooser">
-  <button class="swatch sw-noir"   data-theme="noir"   title="Noir"></button>
-  <button class="swatch sw-pastel" data-theme="pastel" title="Pastel"></button>
-</div>
+  <!-- App modules ------------------------------------------------------->
+  <script type="module" src="assets/js/core.js"></script>
+  <script type="module" src="assets/js/staking.js"></script>
 
-<!-- Boot via ES modules -->
-<script type="module" src="assets/js/main.js"></script>
+  <!-- UI module & on-load bootstrap -->
+  <script type="module">
+    import {
+      renderGrid, wireFeatureTabs, wireFeatureButtons,
+      loadRarity, loadSalesLive, loadMintsLive, loadPond
+    } from './assets/js/ui.js';
+
+    // Initial paint
+    renderGrid();
+    wireFeatureTabs();
+    wireFeatureButtons();
+
+    // Prime data (mints first, then rarity; sales/pond on demand or via buttons)
+    loadMintsLive().catch(()=>{ /* silent */ });
+    loadRarity();
+    // Optionally pre-load pond (comment out if you prefer lazy):
+    // loadPond(50).catch(()=>{});
+  </script>
+
+  <!-- Optional: Theme toggle (Noir/Pastel). Safe, non-breaking -->
+  <script>
+    (function(){
+      const body = document.documentElement;
+      const init = localStorage.getItem('ff_theme') || 'noir';
+      body.classList.remove('theme-noir','theme-pastel');
+      body.classList.add(init === 'pastel' ? 'theme-pastel' : 'theme-noir');
+
+      // If you want a visible toggle, uncomment:
+      // const sel = document.createElement('select');
+      // sel.innerHTML = '<option value="noir">Noir</option><option value="pastel">Pastel</option>';
+      // sel.value = init; sel.className = 'btn btn-outline btn-sm';
+      // document.querySelector('.mast .kpis')?.appendChild(sel);
+      // sel.addEventListener('change', () => {
+      //   localStorage.setItem('ff_theme', sel.value);
+      //   body.classList.toggle('theme-pastel', sel.value==='pastel');
+      //   body.classList.toggle('theme-noir', sel.value!=='pastel');
+      // });
+    })();
+  </script>
 </body>
 </html>
