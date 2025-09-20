@@ -165,13 +165,15 @@
   <button class="swatch sw-pastel" data-theme="pastel" title="Pastel"></button>
 </div>
 
-<!-- Boot via ES modules -->
+<!-- ABIs -->
 <script src="assets/abi/collection_abi.js"></script>
 <script src="assets/abi/controller_abi.js"></script>
+
+<!-- App modules (core defines FF_CFG first) -->
+<script type="module" src="assets/js/core.js"></script>
+<script type="module" src="assets/js/staking.js"></script>
 <script type="module" src="assets/js/main.js"></script>
-<script type="module">
-  import { initUI } from './assets/js/ui.js';
-  window.addEventListener('DOMContentLoaded', initUI);
-</script>
 </body>
 </html>
+
+
