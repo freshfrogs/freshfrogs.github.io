@@ -7,7 +7,7 @@ export const FF_CFG = (() => {
   const def = {
     SOURCE_PATH: "https://freshfrogs.github.io",
     COLLECTION_ADDRESS: "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b",
-    CONTROLLER_ADDRESS: "", // set if you want Pond to list staked
+    CONTROLLER_ADDRESS: "0xCB1ee125CFf4051a10a55a09B10613876C4Ef199", // set if you want Pond to list staked
     FROG_API_KEY: "3105c552-60b6-5252-bca7-291c724a54bf",
     SUPPLY: 4040,
     RARITY_JSON: "assets/freshfrogs_rarity_rankings.json"
