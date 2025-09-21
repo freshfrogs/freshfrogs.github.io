@@ -1,16 +1,13 @@
 // assets/js/main.js
 (function(){
-  // ----- Unified panel tabs (Sales / Rarity / Pond) -----
-  const tabsEl = document.getElementById('infoTabs');
-  const views = {
-    sales:  document.getElementById('tab-sales'),
-    rarity: document.getElementById('tab-rarity'),
-    pond:   document.getElementById('tab-pond'),
-  };
+  // Ensure containers exist (the new layout already includes them)
+  const salesWrap  = document.getElementById('tab-sales');
+  const rarityWrap = document.getElementById('tab-rarity');
+  const pondWrap   = document.getElementById('pondList');
 
   function ensureList(id, container){
-    let el = container.querySelector('#'+id);
-    if (!el) {
+    let el = container?.querySelector('#'+id);
+    if (!el && container) {
       el = document.createElement('ul');
       el.id = id;
       el.className = 'card-list';
@@ -19,56 +16,46 @@
     return el;
   }
 
-  async function showTab(name){
-    if (!tabsEl) return;
-    tabsEl.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
-    Object.entries(views).forEach(([k,el]) => el.classList.toggle('hidden', k !== name));
-
-    if (name === 'sales' && !views.sales.dataset.ready) {
-      ensureList('recentSales', views.sales);
+  async function bootPanels(){
+    // Recent Sales
+    if (salesWrap){
+      ensureList('recentSales', salesWrap);
       try { await window.FF_loadSalesLive?.(); } catch(_) {}
       try { window.FF_renderSales?.(); } catch(_) {}
-      views.sales.dataset.ready = '1';
     }
 
-    if (name === 'rarity' && !views.rarity.dataset.ready) {
-      ensureList('rarityList', views.rarity);
+    // Rarity
+    if (rarityWrap){
+      ensureList('rarityList', rarityWrap);
       try { await window.FF_loadRarity?.(); } catch(_) {}
-      views.rarity.dataset.ready = '1';
     }
 
-    if (name === 'pond' && !views.pond.dataset.ready) {
-      // ✅ Use pond list renderer from staking.js (includes click → modal)
-      if (window.FF_renderPondList) {
-        await window.FF_renderPondList(views.pond);
-      } else {
-        views.pond.textContent = 'Loading pond…';
-      }
-      views.pond.dataset.ready = '1';
+    // Pond (controller-owned)
+    if (pondWrap && window.FF_renderPondList){
+      try { await window.FF_renderPondList(pondWrap); } catch(_) {}
     }
   }
 
-  tabsEl?.addEventListener('click', (e)=>{
-    const b = e.target.closest('.tab'); if (!b) return;
-    showTab(b.dataset.tab);
-  });
-
-  // ----- Initial boot -----
   async function boot(){
     try { window.FF_renderGrid?.(); } catch(_) {}
-    // default tab
-    showTab('sales');
-
-    // default staking sub-tab: Owned (staking.js handles auto-load of staked later)
     try { window.FF_setTab?.('owned'); } catch(_) {}
 
-    // if wallet already selected (e.g., MetaMask preselected), initialize datasets
+    // If a wallet address is already selected (e.g. MetaMask remembered it)
     const pre = window.ethereum?.selectedAddress;
     if (pre){
       try { window.FF_setWalletUI?.(pre); } catch(_) {}
       try { window.FF_fetchOwned?.(pre); } catch(_) {}
       try { window.FF_loadStaked?.(); } catch(_) {}
     }
+
+    await bootPanels();
+
+    // Optional manual pond refresh hook if you added a button
+    const pondRefresh = document.getElementById('refreshPond');
+    pondRefresh?.addEventListener('click', async ()=>{
+      pondWrap.innerHTML = '';
+      try { await window.FF_renderPondList(pondWrap); } catch(_) {}
+    });
   }
 
   if (document.readyState === 'loading') {
