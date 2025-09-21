@@ -9,20 +9,32 @@
     const modal = $('#frogModal');
     if (!modal) { console.warn('frogModal not found in DOM'); return; }
 
-    // elems
-    const fmId = $('#fmId'), fmRank = $('#fmRank'), fmOwner = $('#fmOwner'),
-          fmOwnerShort = $('#fmOwnerShort'), fmRarityLine = $('#fmRarityLine'),
-          fmCollection = $('#fmCollection'), fmAttrs = $('#fmAttrs'),
-          fmHero = $('#fmHero'),
-          fmStakeBtn = $('#fmStakeBtn'), fmUnstakeBtn = $('#fmUnstakeBtn'),
-          fmTransferBtn = $('#fmTransferBtn'), fmMorphBtn = $('#fmMorphBtn'),
-          fmOpenSea = $('#fmOpenSea'), fmEtherscan = $('#fmEtherscan'),
-          fmMetaLink = $('#fmMetaLink'), fmImageLink = $('#fmImageLink'),
-          fmState = $('#fmState');
+    // elements (these IDs must exist in your modal HTML)
+    const fmId          = $('#fmId');
+    const fmRankNum     = $('#fmRankNum');      // shows "Rank #1234"
+    const fmLine        = $('#fmLine');         // "Not staked • Owned by You/0x…"
+    const fmOwner       = $('#fmOwner');        // hidden, kept for other code
+    const fmRarityLine  = $('#fmRarityLine');   // hidden, kept for other code
+    const fmCollection  = $('#fmCollection');   // hidden, kept for other code
+    const fmAttrs       = $('#fmAttrs');        // attributes list
+    const fmHero        = $('#fmHero');         // art container
 
-    let current = { id: null, owner: null, staked: null };
+    const fmStakeBtn    = $('#fmStakeBtn');
+    const fmUnstakeBtn  = $('#fmUnstakeBtn');
+    const fmTransferBtn = $('#fmTransferBtn');
+    const fmMorphBtn    = $('#fmMorphBtn');
 
-    const shorten = (addr) => (FF && FF.shorten) ? FF.shorten(addr) : (addr ? addr.slice(0,6)+'…'+addr.slice(-4) : '—');
+    const fmOpenSea     = $('#fmOpenSea');
+    const fmEtherscan   = $('#fmEtherscan');
+    const fmMetaLink    = $('#fmMetaLink');
+    const fmImageLink   = $('#fmImageLink');
+
+    let current = { id: null, owner: '', staked: false };
+
+    // ---------- helpers ----------
+    const shorten = (addr) =>
+      (FF && FF.shorten) ? FF.shorten(addr) : (addr ? addr.slice(0,6)+'…'+addr.slice(-4) : '—');
+
     const setOpen = (val) => {
       modal.classList.toggle('open', !!val);
       modal.setAttribute('aria-hidden', val ? 'false' : 'true');
@@ -40,40 +52,39 @@
       if (fmImageLink) fmImageLink.href = `${base}/frog/${tokenId}.png`;
     }
 
-    // EXACT visual parity with Owned/Staked (layers + animations) + background trick
+    // EXACT parity with Owned/Staked: use your canonical renderer,
+    // plus the background trick (flat PNG huge, bottom-right).
     async function drawFrog(id) {
       fmHero.innerHTML = '';
 
-      // Background trick using flat PNG; push to BR so only bg color shows
       const flatUrl = `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
       fmHero.style.backgroundImage = `url("${flatUrl}")`;
       fmHero.style.backgroundRepeat = 'no-repeat';
       fmHero.style.backgroundSize = '320% 320%';
       fmHero.style.backgroundPosition = '100% 100%';
 
-      // Canonical renderer
       const maybe = (typeof window.buildFrog128 === 'function')
         ? window.buildFrog128(fmHero, id)
         : null;
 
       if (maybe && typeof maybe.then === 'function') {
-        try { await maybe; } catch(e) {}
+        try { await maybe; } catch (e) {}
       }
+      // ensure canvas has painted before sampling
       await new Promise(r => requestAnimationFrame(r));
 
-      // Sample top-left pixel to set a solid fallback bg color
       try {
         const cv = fmHero.querySelector('canvas');
         if (cv) {
           const ctx = cv.getContext('2d', { willReadFrequently: true });
-          const px = ctx.getImageData(0,0,1,1).data;
+          const px = ctx.getImageData(0,0,1,1).data; // top-left pixel
           fmHero.style.backgroundColor = `rgba(${px[0]},${px[1]},${px[2]},1)`;
         }
-      } catch(e) {
+      } catch (e) {
         fmHero.style.backgroundColor = 'var(--panelSoft)';
       }
 
-      // Fallback if buildFrog128 isn't present
+      // Fallback if buildFrog128 not present
       if (!maybe && typeof window.buildFrog128 !== 'function') {
         const img = new Image();
         img.decoding = 'async';
@@ -86,30 +97,32 @@
     }
 
     function setRarity(id) {
-      const rank = (FF.getRankById ? FF.getRankById(id) : null);
-      if (rank != null) {
-        fmRank && (fmRank.textContent = `Rank ${rank}`);
-        fmRarityLine && (fmRarityLine.textContent = `#${rank} of ${CFG.SUPPLY || 4040}`);
-      } else {
-        fmRank && (fmRank.textContent = `Rank —`);
-        fmRarityLine && (fmRarityLine.textContent = `—`);
-      }
+      const rank = (FF && FF.getRankById) ? FF.getRankById(id) : null;
+      if (fmRankNum)    fmRankNum.textContent   = (rank != null) ? `#${rank}` : '—';
+      if (fmRarityLine) fmRarityLine.textContent = (rank != null)
+        ? `#${rank} of ${CFG.SUPPLY || 4040}` : '—';
     }
 
     function setState(staked, owner) {
       current.staked = !!staked;
-      fmState && (fmState.textContent = staked ? 'Staked' : 'Not staked');
-      if (fmStakeBtn)   fmStakeBtn.disabled   = !!staked;
-      if (fmUnstakeBtn) fmUnstakeBtn.disabled = !staked;
+      current.owner  = owner || '';
 
-      fmOwner && (fmOwner.textContent = owner || '—');
-      fmOwnerShort && (fmOwnerShort.textContent = `Owned by ${shorten(owner || '')}`);
+      // Try to detect current wallet to show "You"
+      const youAddr = (FF && FF.wallet && FF.wallet.address) || window.WALLET_ADDR || window.SELECTED_WALLET || null;
+      const isYou = youAddr && owner && (youAddr.toLowerCase() === owner.toLowerCase());
+      const ownerText = isYou ? 'You' : (owner ? shorten(owner) : '—');
+
+      if (fmLine)       fmLine.textContent      = `${staked ? 'Staked' : 'Not staked'} • Owned by ${ownerText}`;
+      if (fmOwner)      fmOwner.textContent     = owner || '—';
+
+      if (fmStakeBtn)   fmStakeBtn.disabled     = !!staked;
+      if (fmUnstakeBtn) fmUnstakeBtn.disabled   = !staked;
     }
 
     async function loadAttributes(id) {
       try {
         const metaUrl = `${CFG.SOURCE_PATH || ''}/frog/json/${id}.json`;
-        const meta = await (FF.fetchJSON ? FF.fetchJSON(metaUrl) : fetch(metaUrl).then(r=>r.json()));
+        const meta = await (FF && FF.fetchJSON ? FF.fetchJSON(metaUrl) : fetch(metaUrl).then(r=>r.json()));
         if (fmAttrs) {
           fmAttrs.innerHTML = '';
           (meta?.attributes || []).forEach(attr => {
@@ -118,25 +131,23 @@
             fmAttrs.appendChild(li);
           });
         }
-      } catch(e){ /* optional */ }
+      } catch (e) { /* optional */ }
     }
 
-    // public open
+    // ---------- public open ----------
     async function openFrogModal({ id, owner, staked }) {
-      current.id = id;
-      current.owner = owner;
+      if (fmId)         fmId.textContent        = `#${id}`;
+      if (fmCollection) fmCollection.textContent = shorten(CFG.COLLECTION_ADDRESS);
 
-      fmId && (fmId.textContent = `#${id}`);
       setLinks(id);
       setRarity(id);
-      setState(!!staked, owner);
-      fmCollection && (fmCollection.textContent = shorten(CFG.COLLECTION_ADDRESS));
+      setState(!!staked, owner || '');
 
       await Promise.all([drawFrog(id), loadAttributes(id)]);
       setOpen(true);
     }
 
-    // close behaviors
+    // ---------- close / esc ----------
     modal.addEventListener('click', (e) => {
       if (e.target.matches('[data-close]')) setOpen(false);
     });
@@ -144,7 +155,7 @@
       if (e.key === 'Escape' && modal.classList.contains('open')) setOpen(false);
     });
 
-    // actions
+    // ---------- actions ----------
     fmStakeBtn?.addEventListener('click', async () => {
       if (!current.id) return;
       if (window.FFStake?.stakeOne) {
@@ -187,10 +198,10 @@
       alert('Metamorph coming soon ✨');
     });
 
-    // expose
+    // ---------- expose ----------
     window.FFModal = { openFrogModal };
 
-    // delegation for Owned/Staked/Pond rows
+    // ---------- click delegation for rows ----------
     document.addEventListener('click', async (e) => {
       const el = e.target.closest('[data-token-id][data-src]');
       if (!el) return;
@@ -203,7 +214,7 @@
 
       if (Number.isFinite(id)) {
         e.preventDefault();
-        if (FF.ensureRarity) { try { await FF.ensureRarity(); } catch(e){} }
+        if (FF && FF.ensureRarity) { try { await FF.ensureRarity(); } catch(e){} }
         openFrogModal({ id, owner, staked });
       }
     });

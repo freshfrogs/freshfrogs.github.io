@@ -535,3 +535,67 @@ footer.site { border-top:1px solid var(--ring); padding:26px 0; color:var(--mute
   position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0, 0, 1px, 1px); white-space: nowrap; border: 0;
 }
+/* Make rows that open the modal feel clickable */
+.list-item[data-token-id] { cursor: pointer; }
+
+/* Narrow modal panel */
+.modal-narrow { max-width: 640px; padding: 14px; border-radius: 16px; }
+
+/* Two-column grid (narrow left) */
+.ffm-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 14px;
+}
+@media (max-width: 800px) {
+  .ffm-grid { grid-template-columns: 1fr; }
+}
+
+/* Left: hero + button grid */
+.ffm-hero {
+  position: relative;
+  aspect-ratio: 1/1;
+  border: 1px solid var(--edge);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--panelSoft);
+}
+#fmHero canvas, #fmHero img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  image-rendering: pixelated;
+}
+
+/* Buttons: 3 columns × 2 rows, use your btn styles */
+.ffm-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* Right: title line identical to Owned/Staked */
+.ffm-titlerow { display: grid; gap: 6px; }
+
+/* Attribute pills */
+.ffm-attrlist {
+  display: grid;
+  grid-template-columns: 1fr;  /* single column to keep it clean in narrow modal */
+  gap: 6px;
+  max-height: 280px;
+}
+.ffm-attrlist li {
+  display:flex; justify-content: space-between; align-items: center; gap:8px;
+  padding:8px 10px; border:1px solid var(--edge); border-radius:10px; background: var(--panelSoft);
+  font-size: 13px;
+}
+.ffm-attrlist .name { font-weight: 600; opacity: .95; }
+.ffm-attrlist .val  { opacity: .95; }
+
+/* Keep modal above everything */
+.modal.open { display: block !important; z-index: 9999; }
+
+/* a11y helper */
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 1px, 1px); white-space: nowrap; border: 0;
+}
