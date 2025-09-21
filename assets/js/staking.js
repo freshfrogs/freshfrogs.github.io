@@ -1,164 +1,128 @@
-// assets/js/staking.js
-// Owned & Staked panel + staking actions + hooks for modal
+(function(FF, CFG){
+  const ST = { items:[], page:0, pageSize:5 };
+  let provider, signer, controller;
 
-import {
-  FF_CFG, fetchOwned, getUser,
-  getCollectionContract, getControllerContract, readStakeInfo
-} from "./core.js";
-
-let CURRENT_WALLET = null;
-let STAKE_TAB = "owned"; // 'owned' | 'staked'
-
-// =============== UI helpers ===============
-function chipHTML(id) {
-  const img = `${FF_CFG.SOURCE_PATH}/frog/${id}.png`;
-  return `<li class="chip" data-id="${id}">
-    <img class="thumb64" src="${img}" alt="Frog #${id}">
-    <div class="meta"><b>#${id}</b></div>
-  </li>`;
-}
-function setStakeStatus(msg) {
-  const p = document.getElementById("stakeStatus");
-  if (p) p.textContent = msg;
-}
-function renderChipList(ids) {
-  const ul = document.getElementById("chipWrap");
-  if (!ul) return;
-  ul.innerHTML = "";
-  if (!ids || !ids.length) {
-    ul.innerHTML = `<li class="list-item"><div class="muted">No frogs found.</div></li>`;
-    return;
+  // Tabs
+  let currentTab='owned';
+  const tabOwned=document.getElementById('tabOwned');
+  const tabStaked=document.getElementById('tabStaked');
+  const tabsWrap=document.getElementById('stakeTabs');
+  function setTab(which){
+    currentTab=which;
+    const owned=(which==='owned');
+    tabOwned?.setAttribute('aria-selected', owned?'true':'false');
+    tabStaked?.setAttribute('aria-selected', owned?'false':'true');
+    tabsWrap?.style.setProperty('--tab-i', owned?0:1);
+    render();
   }
-  ids.forEach(id => ul.insertAdjacentHTML("beforeend", chipHTML(id)));
+  tabOwned?.addEventListener('click', ()=> setTab('owned'));
+  tabStaked?.addEventListener('click', ()=> setTab('staked'));
+  window.FF_getTab = ()=> currentTab;
 
-  // click → open modal
-  ul.querySelectorAll(".chip").forEach(el => {
-    el.addEventListener("click", () => {
-      const id = Number(el.dataset.id);
-      window.FF_openFrogInfo?.(id);
-    });
-  });
-}
+  function stakingReady(){ return controller && signer && window.FF_getUser(); }
 
-// =============== Owned ====================
-export async function loadOwned({ wallet }) {
-  if (!wallet) { setStakeStatus("No wallet connected."); return; }
-  try {
-    setStakeStatus("Loading owned…");
-    const data = await fetchOwned({ wallet, limit: 200 });
-    const ids = (data.tokens || []).map(t => {
-      const tok = t.token || {};
-      const tokenId = tok.tokenId ?? t.tokenId;
-      return tokenId != null ? parseInt(String(tokenId), 10) : null;
-    }).filter(n => Number.isFinite(n));
-    if (STAKE_TAB === "owned") renderChipList(ids);
-    setStakeStatus(ids.length ? `Owned: ${ids.length}` : "No owned frogs.");
-  } catch (e) {
-    setStakeStatus(`Failed to load owned: ${e.message || e}`);
+  async function initEthers(){
+    if(!window.ethereum) return false;
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    signer = provider.getSigner();
+    // load ABI
+    const abi = await FF.fetchJSON('assets/abi/controller_abi.json');
+    controller = new ethers.Contract(CFG.CONTROLLER_ADDRESS, abi, signer);
+    return true;
   }
-}
 
-// =============== Staked ===================
-export async function loadStaked({ wallet }) {
-  if (!wallet) { setStakeStatus("No wallet connected."); return; }
-  if (!FF_CFG.CONTROLLER_ADDRESS) {
-    setStakeStatus("Set CONTROLLER_ADDRESS to enable staked view.");
-    return;
-  }
-  try {
-    setStakeStatus("Loading staked…");
-    const provider = new window.ethers.providers.Web3Provider(window.ethereum, "any");
-    const controller = getControllerContract(provider);
+  async function loadStaked(){
+    const status=document.getElementById('stakeStatus');
+    const user = window.FF_getUser();
+    if(!user){ status.textContent='Connect a wallet first.'; return; }
+    if(!await initEthers()){ status.textContent='Ethereum provider not available.'; return; }
+    try{
+      status.textContent='Loading staked…';
+      const rows = await controller.getStakedTokens(user); // [{staker, tokenId}]
+      ST.items = (rows||[]).map(r => ({ id: Number(r.tokenId), owner: r.staker || user }));
+      ST.page = 0;
 
-    // Contract must expose getStakedTokens(address) → [{staker, tokenId}]
-    let rows = [];
-    try {
-      rows = await controller.getStakedTokens(wallet);
-    } catch (e) {
-      setStakeStatus("Controller.getStakedTokens(wallet) unavailable. Check ABI.");
-      return;
+      // rewards
+      const rewards = await controller.availableRewards(user);
+      const rewardsLine = document.getElementById('rewardsLine');
+      if(rewardsLine){
+        rewardsLine.style.display='block';
+        document.getElementById('rewardsEth').textContent = ethers.BigNumber.isBigNumber(rewards) ? rewards.toString() : String(rewards);
+      }
+
+      setTab('staked');
+      status.textContent=`Staked: ${ST.items.length}`;
+    }catch(err){
+      console.warn(err);
+      status.textContent='Failed to load staked tokens.';
     }
-
-    const ids = (rows || []).map(r => {
-      const tokenId = r?.tokenId ?? (Array.isArray(r) ? r[1] : null);
-      return tokenId != null ? parseInt(String(tokenId), 10) : null;
-    }).filter(n => Number.isFinite(n));
-
-    if (STAKE_TAB === "staked") renderChipList(ids);
-    setStakeStatus(ids.length ? `Staked: ${ids.length}` : "No staked frogs.");
-  } catch (e) {
-    setStakeStatus(`Failed to load staked: ${e.message || e}`);
   }
-}
 
-// =============== Actions (optional UI) ==================
-export async function stakeToken(tokenId) {
-  const { signer, address } = await getUser();
-  const coll = getCollectionContract(signer);
-  const ctrl = getControllerContract(signer);
-  const isApproved = await coll.isApprovedForAll(address, FF_CFG.CONTROLLER_ADDRESS).catch(()=>false);
-  if (!isApproved) { const txA = await coll.setApprovalForAll(FF_CFG.CONTROLLER_ADDRESS, true); await txA.wait(); }
-  const tx = await ctrl.stake(tokenId); await tx.wait();
-}
-export async function unstakeToken(tokenId) {
-  const { signer } = await getUser();
-  const ctrl = getControllerContract(signer);
-  const tx = await ctrl.withdraw(tokenId); await tx.wait();
-}
-export async function claimRewards() {
-  const { signer } = await getUser();
-  const ctrl = getControllerContract(signer);
-  const tx = await ctrl.claimRewards(); await tx.wait();
-}
-
-// =============== Tabs & boot ==============
-export function wireOwnedStakedPanel() {
-  const btnOwned = document.getElementById("tabOwned");
-  const btnStaked = document.getElementById("tabStaked");
-  const refreshOwned = document.getElementById("refreshOwned");
-  const loadStakedBtn = document.getElementById("loadStakedBtn");
-
-  btnOwned?.addEventListener("click", async () => {
-    STAKE_TAB = "owned";
-    btnOwned.setAttribute("aria-selected", "true");
-    btnStaked?.setAttribute("aria-selected", "false");
-    await loadOwned({ wallet: CURRENT_WALLET });
-  });
-  btnStaked?.addEventListener("click", async () => {
-    STAKE_TAB = "staked";
-    btnOwned?.setAttribute("aria-selected", "false");
-    btnStaked.setAttribute("aria-selected", "true");
-    await loadStaked({ wallet: CURRENT_WALLET });
-  });
-
-  refreshOwned?.addEventListener("click", async () => {
-    await loadOwned({ wallet: CURRENT_WALLET });
-  });
-  loadStakedBtn?.addEventListener("click", async () => {
-    STAKE_TAB = "staked";
-    btnOwned?.setAttribute("aria-selected", "false");
-    btnStaked?.setAttribute("aria-selected", "true");
-    await loadStaked({ wallet: CURRENT_WALLET });
-  });
-}
-
-export function onWalletConnected(address) {
-  CURRENT_WALLET = address;
-  // Auto-load both panes so user sees something immediately
-  STAKE_TAB = "owned";
-  document.getElementById("tabOwned")?.setAttribute("aria-selected", "true");
-  document.getElementById("tabStaked")?.setAttribute("aria-selected", "false");
-  loadOwned({ wallet: CURRENT_WALLET });
-  loadStaked({ wallet: CURRENT_WALLET }); // <— now also auto-load staked on connect
-}
-
-// =============== Modal helpers used by ui.js ===============
-export async function getStakeMetaForModal(tokenId) {
-  try {
-    const provider = new window.ethers.providers.Web3Provider(window.ethereum, "any");
-    const { staker, sinceMs } = await readStakeInfo(tokenId, provider);
-    return { staked: !!(staker && staker !== "0x0000000000000000000000000000000000000000"), sinceMs: sinceMs || null, staker: staker || null };
-  } catch {
-    return { staked: false, sinceMs: null, staker: null };
+  async function unstake(tokenId){
+    if(!stakingReady()) { alert('Wallet/contract not ready'); return; }
+    try{
+      const tx = await controller.withdraw(ethers.BigNumber.from(String(tokenId)));
+      document.getElementById('stakeStatus').textContent = 'Tx sent: '+tx.hash.slice(0,10)+'…';
+      await tx.wait();
+      ST.items = ST.items.filter(t => t.id !== Number(tokenId));
+      render();
+      document.getElementById('stakeStatus').textContent = 'Un-staked #'+tokenId;
+    }catch(err){
+      console.warn(err);
+      alert('Failed to un-stake: '+(err?.message||err));
+    }
   }
-}
+
+  function render(){
+    const wrap=document.getElementById('chipWrap'); if(!wrap) return;
+    const list=document.createElement('ul'); list.className='card-list'; wrap.innerHTML=''; wrap.appendChild(list);
+
+    if(currentTab==='owned'){ window.FF_renderOwned(); return; }
+
+    // staked
+    const items=ST.items||[];
+    if(!window.FF_getUser()){ list.innerHTML='<li class="list-item"><div class="muted">Connect your wallet to load staked tokens.</div></li>'; return; }
+    if(!items.length){ list.innerHTML='<li class="list-item"><div class="muted">No staked tokens yet. Click “Load Staked”.</div></li>'; return; }
+    const start=ST.page*ST.pageSize, end=start+ST.pageSize;
+    items.slice(start,end).forEach(({id,owner})=>{
+      const rank = window.FF_getRankById ? window.FF_getRankById(id) : null;
+      const li=document.createElement('li'); li.className='list-item';
+      li.innerHTML = FF.thumb64(`${CFG.SOURCE_PATH}/frog/${id}.png`, `Frog ${id}`) +
+        `<div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <b>Frog #${id}</b>
+            ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`}
+          </div>
+          <div class="muted">Owner <span class="addr">${owner?FF.shorten(String(owner)):'—'}</span></div>
+        </div>
+        <div class="row" style="gap:6px;">
+          <button class="btn btn-outline btn-sm" data-unstake="${id}">Un-stake</button>
+        </div>`;
+      list.appendChild(li);
+    });
+
+    // wire unstake
+    list.querySelectorAll('[data-unstake]').forEach(btn=>{
+      btn.addEventListener('click',()=> unstake(btn.getAttribute('data-unstake')));
+    });
+
+    // pager
+    const controls=document.getElementById('stakeControls');
+    let more=document.getElementById('stakedMoreBtn');
+    let less=document.getElementById('stakedLessBtn');
+    const pages=Math.ceil(ST.items.length/ST.pageSize);
+    if(!less){ less=document.createElement('button'); less.id='stakedLessBtn'; less.className='btn btn-ghost btn-sm'; less.textContent='Show less'; controls.appendChild(less); }
+    if(!more){ more=document.createElement('button'); more.id='stakedMoreBtn'; more.className='btn btn-outline btn-sm'; more.textContent='View more'; controls.appendChild(more); }
+    less.style.display = (ST.page>0)?'':'none';
+    more.style.display = (ST.page<pages-1)?'':'none';
+    more.onclick=()=>{ if(ST.page<pages-1){ ST.page++; render(); } };
+    less.onclick=()=>{ if(ST.page>0){ ST.page--; render(); } };
+  }
+
+  // buttons
+  document.getElementById('loadStakedBtn')?.addEventListener('click', loadStaked);
+
+  // expose
+  window.FF_setTab = setTab;
+  window.FF_clearStaked = ()=>{ ST.items=[]; ST.page=0; if(window.FF_getTab && window.FF_getTab()==='staked') render(); };
+})(window.FF, window.FF_CFG);

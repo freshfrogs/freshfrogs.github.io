@@ -1,4 +1,5 @@
-window.COLLECTION_ABI = [
+const COLLECTION_ABI =
+[
     {
       "anonymous": false,
       "inputs": [
