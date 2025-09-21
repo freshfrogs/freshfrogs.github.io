@@ -132,50 +132,65 @@ window.FF = window.FF || {};
     return FF.fetchJSON(url);
   }
 
-  // Attempt to load the first image that exists among candidate paths
-  function loadFirstImage(candidates){
-    return new Promise((resolve,reject)=>{
-      let i=0;
-      const tryNext = ()=>{
-        if(i>=candidates.length) return reject(new Error('no layer found'));
-        const src=candidates[i++]; const img=new Image();
-        img.onload=()=>resolve(src); img.onerror=tryNext;
-        // keep pixelated look & crisp edges
-        img.decoding='async'; img.loading='eager'; img.src=src;
-      };
-      tryNext();
+  // probe image existence (resolves src or null)
+  function probe(src){
+    return new Promise((resolve)=>{
+      const img=new Image();
+      img.onload=()=>resolve(src);
+      img.onerror=()=>resolve(null);
+      img.decoding='async'; img.loading='eager';
+      img.src=src;
     });
   }
+  async function firstExisting(cands){
+    for(const src of cands){
+      const ok = await probe(src);
+      if(ok) return ok;
+    }
+    return null;
+  }
 
+  // ✅ Use only this animation path, plus resilient PNG casing variants
   function candidatesFor(attr, value){
-    // Try exact, TitleCase, lowercase (common naming variants)
     const A = String(attr||'').replace(/\s+/g,'');
     const V = String(value||'').replace(/\s+/g,'');
     const cases = [
       [A, V],
-      [title(A), title(V)],
+      [A.charAt(0).toUpperCase()+A.slice(1), V.charAt(0).toUpperCase()+V.slice(1)],
       [A.toLowerCase(), V.toLowerCase()],
     ];
+
     const pngs = [];
     const gifs = [];
     for (const [aa,vv] of cases){
+      // Base layer PNG
       pngs.push(baseURL(`frog/build_files/${aa}/${vv}.png`));
-      // animations location variants:
+      // ✅ Only this animation path is considered
       gifs.push(baseURL(`frog/build_files/${aa}/animations/${vv}_animation.gif`));
-      gifs.push(baseURL(`frog/build_files/${aa}/${vv}/animations/${vv}_animation.gif`));
     }
     return { pngs, gifs };
   }
 
   // Build a layered stage (returns a DOM node)
-  async function buildLayeredStage(meta){
+  async function buildLayeredStage(id, meta){
     const stage = document.createElement('div');
+
+    // Background uses the original PNG, enlarged & offset so only background color shows.
+    // You can tweak bgSize/bgPos values to fine-tune.
+    const bgImg = baseURL(`frog/${id}.png`);
+    const bgSize = '600%';           // enlarge a lot so frog art is off-frame
+    const bgPos  = '-40% 70%';       // shift left (-x) and down (+y)
+
     Object.assign(stage.style, {
       position:'relative',
       width:'256px', height:'256px',
-      background:'#000', // base, change if you have transparency expectations
       borderRadius:'8px', overflow:'hidden',
-      imageRendering:'pixelated'
+      imageRendering:'pixelated',
+      backgroundImage: `url("${bgImg}")`,
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: bgSize,
+      backgroundPosition: bgPos,
+      backgroundColor: '#000' // fallback if image fails
     });
 
     const attrs = (meta?.attributes || meta?.traits || []);
@@ -187,21 +202,9 @@ window.FF = window.FF || {};
 
       const { pngs, gifs } = candidatesFor(key, val);
 
-      // base PNG
-      try{
-        const src = await loadFirstImage(pngs);
-        const img = document.createElement('img');
-        Object.assign(img.style, {
-          position:'absolute', inset:'0',
-          width:'100%', height:'100%',
-          objectFit:'contain', imageRendering:'pixelated'
-        });
-        img.alt = `${key}: ${val}`; img.src = src; stage.appendChild(img);
-      }catch{ /* no png layer found for this attribute */ }
-
-      // optional animation GIF overlay
-      try{
-        const gif = await loadFirstImage(gifs);
+      // 1) Try animation first; if present, use ONLY animation (skip PNG)
+      const gifSrc = await firstExisting(gifs);
+      if (gifSrc){
         const anim = document.createElement('img');
         Object.assign(anim.style, {
           position:'absolute', inset:'0',
@@ -209,14 +212,29 @@ window.FF = window.FF || {};
           objectFit:'contain', imageRendering:'pixelated',
           pointerEvents:'none'
         });
-        anim.alt = `${key}: ${val} (animation)`; anim.src = gif; stage.appendChild(anim);
-      }catch{ /* no animation for this attribute */ }
+        anim.alt = `${key}: ${val} (animation)`; anim.src = gifSrc;
+        stage.appendChild(anim);
+        continue; // 🔸 skip PNG for this attribute
+      }
+
+      // 2) Otherwise, fall back to PNG
+      const pngSrc = await firstExisting(pngs);
+      if (pngSrc){
+        const img = document.createElement('img');
+        Object.assign(img.style, {
+          position:'absolute', inset:'0',
+          width:'100%', height:'100%',
+          objectFit:'contain', imageRendering:'pixelated'
+        });
+        img.alt = `${key}: ${val}`; img.src = pngSrc;
+        stage.appendChild(img);
+      }
     }
 
     return stage;
   }
 
-  // ---------- Modal (layered) ----------
+  // ---------- Modal (layered; image on top, info below) ----------
   FF.openFrogModal = async function(info){
     const id = Number(info?.id);
     if(!Number.isFinite(id)) return;
@@ -244,7 +262,7 @@ window.FF = window.FF || {};
     // build the layered stage (falls back to simple image if meta missing)
     let stageNode = null;
     try{
-      if(meta) stageNode = await buildLayeredStage(meta);
+      if(meta) stageNode = await buildLayeredStage(id, meta);
     }catch{}
     if(!stageNode){
       const img = document.createElement('img');
@@ -283,13 +301,13 @@ window.FF = window.FF || {};
       ? `<div class="muted">${info.price?`Price ${info.price}`:''}${info.buyer?` • Buyer ${FF.shorten(info.buyer)}`:''}${info.time?` • ${info.time} ago`:''}</div>`
       : '';
 
-    // Modal shell
+    // Modal shell (🆕 image on top, info below)
     const el = document.createElement('div');
     el.className = 'modal-overlay';
     el.innerHTML = `
       <div class="modal-card">
         <button class="modal-close" aria-label="Close">×</button>
-        <div class="row" style="align-items:flex-start; gap:16px;">
+        <div class="stack" style="gap:12px;">
           <div id="frogStageSlot"></div>
           <div class="stack" style="gap:6px;">
             <div><b>Frog #${id}</b> ${rankPill}</div>
