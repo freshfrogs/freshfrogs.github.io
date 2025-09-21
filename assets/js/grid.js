@@ -1,132 +1,108 @@
-/* global window, document */
+/* Hero Frog renderer: one 256×256 layered frog with click-to-shuffle.
+   - Uses metadata at:   /frog/json/{id}.json
+   - Layers from:       /frog/build_files/{ATTRIBUTE}/{VALUE}.png
+   - Animations (if exist): /frog/build_files/{ATTRIBUTE}/animations/{VALUE}_animation.gif
+   - Excluded from animation + hover-lift: "Frog", "Trait", "SpecialFrog"
+   - Background: uses original PNG enlarged/offset so only the bg color shows
+*/
 (function (FF, CFG) {
-  // Which attributes should NOT lift on hover
-  const HOVER_EXCLUDE = new Set(['Frog', 'Trait', 'SpecialFrog']);
-  // Which attributes should NOT use animated GIFs (use PNG instead)
-  const ANIM_EXCLUDE = new Set(['Frog', 'Trait', 'Hat']);
+  const grid = document.getElementById('grid');
+  if (!grid) return;
 
-  const SIZE = 256;
+  // ===== helpers =====
+  const randId = () => 1 + Math.floor(Math.random() * Number(CFG.SUPPLY || 4040));
 
-  function sanitize(v) {
-    // file names are case sensitive on GitHub pages
-    return String(v).replace(/\s+/g, '').replace(/[^\w()-]/g, '');
+  function fetchJSON(url) { return fetch(url, { cache: 'no-store' }).then(r => {
+    if (!r.ok) throw new Error('HTTP '+r.status); return r.json();
+  });}
+
+  function loadImg(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error('img 404 ' + src));
+      img.decoding = 'async';
+      img.loading = 'eager';
+      img.src = src;
+    });
   }
 
-  function makeImg(src, cls) {
-    const img = new Image();
-    img.className = cls || '';
-    img.decoding = 'async';
-    img.loading = 'eager';
-    img.style.width = img.style.height = SIZE + 'px';
-    img.style.imageRendering = 'pixelated';
-    img.style.position = 'absolute';
-    img.style.left = '0';
-    img.style.top = '0';
-    return Object.assign(img, { src });
-  }
+  async function tryAnimationFirst(attr, value) {
+    // Try animation, fall back to PNG
+    const anim = `${CFG.SOURCE_PATH}/frog/build_files/${attr}/animations/${value}_animation.gif`;
+    const png  = `${CFG.SOURCE_PATH}/frog/build_files/${attr}/${value}.png`;
 
-  function layerFor(attr, value) {
-    const attrName = String(attr);
-    const val = sanitize(value);
-
-    const base = `${CFG.SOURCE_PATH}/frog/build_files/${encodeURIComponent(attrName)}/`;
-    const png = `${base}${val}.png`;
-    const gif = `${base}animations/${val}_animation.gif`;
-
-    // If animations are excluded for this attribute, just return PNG layer
-    if (ANIM_EXCLUDE.has(attrName)) {
-      return makeImg(png, 'frog-layer');
+    // Skip anim for excluded attributes
+    const excluded = /^(Frog|Trait|SpecialFrog)$/i.test(attr);
+    if (!excluded) {
+      try { const img = await loadImg(anim); img.dataset.anim = '1'; return img; }
+      catch { /* fall back */ }
     }
-
-    // Try GIF first; if it 404s, fall back to PNG
-    const img = makeImg(gif, 'frog-layer');
-    img.onerror = () => { img.onerror = null; img.src = png; };
-    return img;
+    return loadImg(png);
   }
 
-  async function fetchMeta(id) {
-    const url = `${CFG.SOURCE_PATH}/frog/json/${id}.json`;
-    const r = await fetch(url, { cache: 'no-store' });
-    if (!r.ok) throw new Error('meta ' + r.status);
-    return r.json();
+  function clear(el){ while(el.firstChild) el.removeChild(el.firstChild); }
+
+  // ===== rendering =====
+  function ensureShell() {
+    grid.className = 'hero-wrap'; // CSS sizes/positions this
+    grid.innerHTML = `
+      <div id="heroFrog" class="hero-frog" aria-label="Hero Frog" role="img"></div>
+    `;
+    return document.getElementById('heroFrog');
   }
 
-  function heroContainer() {
-    const g = document.getElementById('grid');
-    if (!g) return null;
-    g.innerHTML = '';
-    const wrap = document.createElement('div');
-    wrap.className = 'hero-frog';
-    wrap.style.width = SIZE + 'px';
-    wrap.style.height = SIZE + 'px';
-    g.appendChild(wrap);
-    return wrap;
-  }
+  async function renderHero(id) {
+    const host = ensureShell();
+    clear(host);
 
-  function applyHoverLift(img, attrName) {
-    if (HOVER_EXCLUDE.has(attrName)) return;
-    img.classList.add('liftable');
-    img.addEventListener('mouseenter', () => {
-      img.style.transform = 'translateY(-10px)';
-      img.style.filter = 'drop-shadow(0 8px 0 rgba(0,0,0,.35))';
-    });
-    img.addEventListener('mouseleave', () => {
-      img.style.transform = 'translateY(0)';
-      img.style.filter = 'none';
-    });
-  }
+    // Background: original PNG massively zoomed & shifted (down-left) so only bg color shows
+    const basePng = `${CFG.SOURCE_PATH}/frog/${id}.png`;
+    host.style.setProperty('--bg-src', `url("${basePng}")`);
 
-  async function renderOne(id) {
-    const host = heroContainer();
-    if (!host) return;
-    // Background crop: original PNG, oversized + offset so only bg area shows
-    host.style.backgroundImage = `url(${CFG.SOURCE_PATH}/frog/${id}.png)`;
-    host.style.backgroundRepeat = 'no-repeat';
-    host.style.backgroundSize = '240% 240%';         // enlarge
-    host.style.backgroundPosition = '-35% 65%';      // push down-left (bg only)
+    // Metadata (order preserved)
+    const metaUrl = `${CFG.SOURCE_PATH}/frog/json/${id}.json`;
+    let meta;
+    try { meta = await fetchJSON(metaUrl); }
+    catch { console.warn('meta missing for', id); return; }
 
-    try {
-      const meta = await fetchMeta(id);
-      const attrs = Array.isArray(meta?.attributes) ? meta.attributes : [];
+    const attrs = Array.isArray(meta?.attributes) ? meta.attributes : [];
+    // Build layers in JSON order
+    for (const a of attrs) {
+      const attr = String(a.trait_type || a.traitType || a.attribute || '').trim();
+      const value = String(a.value || '').trim();
+      if (!attr || !value) continue;
 
-      // Layer in the order they appear in metadata
-      for (const item of attrs) {
-        const attr = String(item?.trait_type ?? item?.trait ?? '');
-        const val  = item?.value ?? '';
-        if (!attr || val == null) continue;
+      try {
+        const img = await tryAnimationFirst(attr, value);
+        img.className = 'hero-layer';
+        img.style.imageRendering = 'pixelated';
+        img.alt = `${attr}: ${value}`;
 
-        const layer = layerFor(attr, val);
-        applyHoverLift(layer, attr);
-        host.appendChild(layer);
+        // Raise-on-hover for everything except Frog / Trait / SpecialFrog
+        if (!/^(Frog|Trait|SpecialFrog)$/i.test(attr)) {
+          img.dataset.raise = '1';
+          img.addEventListener('mouseenter', () => {
+            img.style.transform = 'translateY(-8px)';
+          });
+          img.addEventListener('mouseleave', () => {
+            img.style.transform = 'translateY(0)';
+          });
+        }
+        host.appendChild(img);
+      } catch (e) {
+        // Missing asset — skip this layer
+        // console.debug('layer missing', attr, value);
       }
-    } catch (e) {
-      // Fallback to plain PNG if metadata failed
-      const img = makeImg(`${CFG.SOURCE_PATH}/frog/${id}.png`, 'frog-layer');
-      host.appendChild(img);
-      console.warn('Frog meta load failed', e);
     }
+
+    // Click to shuffle
+    host.onclick = () => renderHero(randId());
   }
 
-  function randomId() {
-    return 1 + Math.floor(Math.random() * Number(CFG.SUPPLY || 4040));
-  }
+  // initial render
+  renderHero(randId());
 
-  // Shuffle on click
-  function enableShuffle(host) {
-    host.addEventListener('click', () => {
-      renderOne(randomId());
-    });
-  }
-
-  // Public API
-  async function initGrid() {
-    const g = document.getElementById('grid');
-    if (!g) return;
-    const host = heroContainer();
-    if (!host) return;
-    enableShuffle(host);
-    await renderOne(randomId());
-  }
-
-  window.FF_renderGrid = initGrid;
-})(window.FF || (window.FF = {}), window.FF_CFG || {});
+  // expose for debugging
+  window.FF_renderHero = (id) => renderHero(id || randId());
+})(window.FF || (window.FF = {}), window.FF_CFG);
