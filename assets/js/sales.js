@@ -1,95 +1,89 @@
 (function(FF, CFG){
-  const options = { method:'GET', headers:{ accept:'*/*', 'x-api-key': CFG.FROG_API_KEY } };
-  let recentSalesData = [];
+  const HDR = { accept:'*/*','x-api-key': CFG.FROG_API_KEY };
+  let SALES = []; // {id, time, price, buyer}
 
-  function normAddr(sale){
-    const cand = sale?.toAddress || sale?.to?.address || sale?.to;
-    if(!cand) return null;
-    const hex=String(cand);
-    return /^0x[a-fA-F0-9]{40}$/.test(hex) ? hex : (hex.length>16?hex.slice(0,6)+'…'+hex.slice(-2):hex);
+  function shortenAddr(x){
+    const h = String(x||''); return /^0x[a-fA-F0-9]{40}$/.test(h) ? (h.slice(0,6)+'…'+h.slice(-4)) : (h||'—');
   }
-  function normTs(sale){
+  function parseTs(sale){
     let raw = sale?.timestamp ?? sale?.createdAt;
     if(raw==null) return null;
     if(typeof raw==='number'){ const ms=raw<1e12?raw*1000:raw; return new Date(ms); }
     const t=Date.parse(raw); return Number.isNaN(t)?null:new Date(t);
   }
-  function mapSales(res){
-    return (res||[]).map(s=>{
+  function mapSales(arr){
+    return (arr||[]).map(s=>{
       const tokenId = s?.token?.tokenId ?? s?.tokenId;
-      const id = tokenId!=null?parseInt(String(tokenId),10):null;
-      const buyer = normAddr(s);
-      const dt = normTs(s);
-      const priceEth = s?.price?.amount?.decimal ?? s?.price?.gross?.decimal ?? null;
+      const id = tokenId!=null ? parseInt(String(tokenId),10) : null;
       if(!id) return null;
+      const dt = parseTs(s);
+      const priceEth = s?.price?.amount?.decimal ?? s?.price?.gross?.decimal ?? null;
+      const buyer = s?.toAddress || s?.to?.address || s?.to || '—';
       return {
         id,
-        time: dt?FF.formatAgo(Date.now()-dt.getTime()):null,
-        price: priceEth!=null?priceEth.toFixed(3)+' ETH':null,
-        buyer
+        time: dt ? FF.formatAgo(Date.now() - dt.getTime()) : '—',
+        price: priceEth!=null ? `${Number(priceEth).toFixed(3)} ETH` : '—',
+        buyer: shortenAddr(buyer)
       };
     }).filter(Boolean);
   }
-  async function fetchSales({limit=200, continuation=""}={}){
+
+  async function fetchLive(limit=60){
     const base="https://api.reservoir.tools/sales/v6";
-    const params=new URLSearchParams({
-      collection:CFG.COLLECTION_ADDRESS,
-      limit:String(limit),
-      sortBy:"time",
-      sortDirection:"desc"
+    const q=new URLSearchParams({
+      collection: CFG.COLLECTION_ADDRESS,
+      limit: String(limit),
+      sortBy: "time",
+      sortDirection: "desc"
     });
-    if(continuation) params.set("continuation", continuation);
-    const res=await fetch(base+'?'+params.toString(), options);
+    const res = await fetch(`${base}?${q}`, { method:'GET', headers: HDR });
     if(!res.ok) throw new Error(res.status);
-    return res.json();
+    const json = await res.json();
+    SALES = mapSales(json?.sales || []);
+    return SALES.length;
   }
 
-  function renderAll(list=recentSalesData){
-    const wrap=document.getElementById('tab-sales'); if(!wrap) return;
-    let ul=wrap.querySelector('#recentSales');
-    if(!ul){ ul=document.createElement('ul'); ul.id='recentSales'; ul.className='card-list'; wrap.appendChild(ul); }
-    ul.innerHTML='';
-    const arr=(list&&list.length)?list:[];
-    if(!arr.length){
-      const li=document.createElement('li'); li.className='list-item';
-      li.innerHTML='<div class="muted">No sales yet.</div>'; ul.appendChild(li); return;
+  function render(list = SALES){
+    const ul = document.getElementById('recentSales');
+    if(!ul) return;
+    ul.innerHTML = '';
+    if(!list.length){
+      ul.innerHTML = '<li class="list-item"><div class="muted">No recent sales yet.</div></li>';
+      return;
     }
-    arr.forEach(s=>{
-      const rank = (window.FF_getRankById ? window.FF_getRankById(s.id) : null);
+    list.forEach(s=>{
+      const rank = FF.getRankById ? FF.getRankById(s.id) : null;
       const badge = (rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`;
-      const li=document.createElement('li'); li.className='list-item'; li.dataset.frogId=String(s.id);
-      li.innerHTML = FF.thumb64(`${CFG.SOURCE_PATH}/frog/${s.id}.png`, `Frog ${s.id}`) +
+      const li = document.createElement('li'); li.className='list-item';
+      li.innerHTML =
+        FF.thumb64(`${CFG.SOURCE_PATH}/frog/${s.id}.png`, `Frog ${s.id}`) +
         `<div>
-          <div style="display:flex;align-items:center;gap:8px;"><b>Frog #${s.id}</b> ${badge}</div>
-          <div class="muted">${s.time?`${s.time} ago`:'—'}${s.buyer?` • Buyer ${FF.shorten(s.buyer)}`:''}</div>
-        </div><div class="price">${s.price??''}</div>`;
+           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+             <b>Frog #${s.id}</b> ${badge}
+           </div>
+           <div class="muted">${s.time!=="—"?s.time+" ago":"—"} • Buyer ${s.buyer}</div>
+         </div>
+         <div class="price">${s.price}</div>`;
+      // open modal on click
+      li.addEventListener('click', ()=> FF.openFrogModal?.({ id: s.id }));
       ul.appendChild(li);
-
-      // modal on click
-      li.addEventListener('click', ()=>{
-        FF.openFrogModal({
-          id:s.id,
-          rank,
-          image:`${CFG.SOURCE_PATH}/frog/${s.id}.png`,
-          buyer:s.buyer,
-          time:s.time,
-          price:s.price
-        });
-      });
     });
   }
 
-  async function loadLive(){
+  // Public
+  async function loadAndRender(){
     try{
-      if(!CFG.FROG_API_KEY || CFG.FROG_API_KEY==="YOUR_RESERVOIR_API_KEY_HERE") throw new Error("Missing Reservoir API key");
-      const first = await fetchSales({limit:200});
-      const mapped = mapSales(first.sales||[]);
-      if(mapped.length){ recentSalesData = mapped; renderAll(); return true; }
-      renderAll([]); return false;
-    }catch(e){ console.warn('Sales fetch failed', e); renderAll([]); return false; }
+      await FF.ensureRarity?.(); // so ranks aren’t N/A
+      if(CFG.FROG_API_KEY){ await fetchLive(); }
+      render();
+      return true;
+    }catch(e){ console.warn('Sales load failed', e); render([]); return false; }
   }
 
-  // expose
-  window.FF_renderSales = ()=> renderAll();
-  window.FF_loadSalesLive = loadLive;
+  // Wire refresh button if present
+  document.getElementById('fetchLiveBtn')?.addEventListener('click', loadAndRender);
+
+  // Expose
+  window.FF_loadSalesLive = loadAndRender;
+  window.FF_renderSales    = render;
 })(window.FF, window.FF_CFG);
