@@ -388,3 +388,6 @@ footer.site { border-top:1px solid var(--ring); padding:26px 0; color:var(--mute
   .modal-body { grid-template-columns: 1fr; }
   .kv { grid-template-columns: 1fr; }
 }
+/* ensure modal can display */
+.modal { display: none; }
+.modal.open { display: block !important; z-index: 9999; }
