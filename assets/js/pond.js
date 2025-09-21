@@ -9,16 +9,49 @@
   const CONTROLLER = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
   const COLLECTION = CFG.COLLECTION_ADDRESS || '';
   const PAGE_SIZE  = 20; // reservoir max per call
+  const PREFETCH_PAGES = 3;
 
   function apiHeaders(){
     if (!CFG.FROG_API_KEY) throw new Error('Missing FROG_API_KEY in config.js');
     return { accept: '*/*', 'x-api-key': CFG.FROG_API_KEY };
   }
 
+  // ---------- resilient fetch (timeout + retries + 429 handling) ----------
+  async function reservoirFetch(url, opts={}, retries=3, timeoutMs=9000){
+    for (let i=0; i<=retries; i++){
+      const ctrl = new AbortController();
+      const t = setTimeout(()=>ctrl.abort(new DOMException('Timeout')), timeoutMs);
+      try{
+        const res = await fetch(url, { ...opts, signal: ctrl.signal });
+        clearTimeout(t);
+
+        // 429 backoff
+        if (res.status === 429 && i < retries){
+          const ra = Number(res.headers.get('retry-after')) || (1 << i);
+          await new Promise(r=>setTimeout(r, ra * 1000));
+          continue;
+        }
+        if (!res.ok){
+          // Non-OK: retry a couple times, then throw
+          if (i < retries){
+            await new Promise(r=>setTimeout(r, (300 + Math.random()*300) * (i+1)));
+            continue;
+          }
+          throw new Error(`HTTP ${res.status}`);
+        }
+        return await res.json();
+      }catch(err){
+        clearTimeout(t);
+        if (i === retries) throw err;
+        await new Promise(r=>setTimeout(r, (350 + Math.random()*300) * (i+1)));
+      }
+    }
+  }
+
   // ---------- state ----------
   const ST = {
     pages: [],                 // [{ rows: [{id, staker, since}], contIn, contOut }]
-    page: 0,                   // stores *internal* index (newest-first order)
+    page: 0,                   // internal store index (newest-first)
     nextContinuation: '',      // for next fetch (older)
     blockedIds: new Set(),     // tokens that later left controller
     acceptedIds: new Set()     // dedupe accepted across pages
@@ -44,8 +77,7 @@
     return nav;
   }
 
-  // We fetch pages newest->older, but we DISPLAY oldest->newest.
-  // Display index (0..N-1) -> store index (newest-first array).
+  // We fetch pages newest->older, but DISPLAY oldest->newest.
   const storeIdxFromDisplay = (dispIdx)=> (ST.pages.length - 1 - dispIdx);
   const displayIdxFromStore = (storeIdx)=> (ST.pages.length - 1 - storeIdx);
 
@@ -53,7 +85,7 @@
     const nav = ensurePager();
     nav.innerHTML = '';
 
-    // Build buttons in display order (oldest -> newest)
+    // Buttons in display order (oldest -> newest)
     for (let disp=0; disp<ST.pages.length; disp++){
       const sIdx = storeIdxFromDisplay(disp);
       const btn = document.createElement('button');
@@ -75,11 +107,11 @@
       moreBtn.className = 'btn btn-ghost btn-sm';
       moreBtn.setAttribute('aria-label', 'Load more pages');
       moreBtn.title = 'Load more';
-      moreBtn.textContent = '…'; // U+2026 ellipsis
+      moreBtn.textContent = '…';
       moreBtn.addEventListener('click', async ()=>{
         const ok = await fetchNextPage();
         if (ok){
-          // Jump to the new OLDEST page (which is at the end of the array → highest store index)
+          // Jump to the new OLDEST page (highest store index)
           ST.page = ST.pages.length - 1;
           renderPage();
         }
@@ -88,8 +120,7 @@
     }
   }
 
-  // ---------- frog renderer (128x128, layered, background trick, hover lift) ----------
-  // Exclusions for lift / animations:
+  // ---------- frog renderer (128x128 layered, bg trick, hover lift) ----------
   const NO_ANIM_FOR = new Set(['Frog', 'Trait', 'SpecialFrog']);
 
   function mk(tag, props={}, style={}) {
@@ -98,10 +129,8 @@
     Object.assign(el.style, style);
     return el;
   }
-
   function safePath(part){ return encodeURI(part).replace(/%20/g, ' '); }
 
-  // Try animation path first (onerror -> fallback png)
   function makeLayerImg(attr, value, sizePx){
     const allowAnim = !NO_ANIM_FOR.has(attr);
     const base = `/frog/build_files/${safePath(attr)}`;
@@ -133,7 +162,6 @@
   function attachLiftHandlers(layerEl){
     const attr = layerEl.dataset.attr || '';
     if (NO_ANIM_FOR.has(attr)) return; // no lift for these
-    // Subtle “picked up” effect on hover
     layerEl.addEventListener('mouseenter', ()=>{
       layerEl.style.transform = 'translateY(-6px)';
       layerEl.style.filter = 'drop-shadow(0 4px 0 rgba(0,0,0,0.45))';
@@ -147,7 +175,6 @@
   async function buildFrog128(container, tokenId){
     const SIZE = 128;
 
-    // container box
     Object.assign(container.style, {
       width: `${SIZE}px`,
       height: `${SIZE}px`,
@@ -158,14 +185,13 @@
       borderRadius: '8px',
     });
 
-    // Background technique: use original PNG, scaled & offset so only its bg color shows
+    // Background trick: use the flat PNG scaled & offset so only bg color shows
     const bg = new Image();
     bg.decoding = 'async';
     bg.loading = 'lazy';
     bg.alt = `Frog #${tokenId} background`;
     Object.assign(bg.style, {
       position: 'absolute',
-      // tuned offsets so the frog is pushed off the crop, leaving only bg color
       left: `-${Math.round(SIZE * 0.35)}px`,
       top:  `${Math.round(SIZE * 0.25)}px`,
       transform: `scale(2.6)`,
@@ -173,21 +199,19 @@
       zIndex: '0',
       opacity: '1'
     });
-    // prefer assets path if configured; fallback to /frog/{id}.png
     const pngA = `${CFG.SOURCE_PATH ? CFG.SOURCE_PATH : ''}/frog/${tokenId}.png`;
     const pngB = `/frog/${tokenId}.png`;
     bg.src = pngA;
     bg.onerror = ()=>{ bg.onerror = null; bg.src = pngB; };
-
     container.appendChild(bg);
 
-    // Load metadata & layer
+    // Layered build from metadata
     const metaUrl = `/frog/json/${tokenId}.json`;
     let meta;
     try {
       meta = await FF.fetchJSON(metaUrl);
     } catch {
-      // fallback to a single flat image if meta missing
+      // fallback: flat image
       const flat = new Image();
       flat.decoding = 'async';
       flat.loading = 'lazy';
@@ -203,7 +227,6 @@
       return;
     }
 
-    // Expecting OpenSea-style: attributes: [{trait_type, value}, ...]
     const attrs = Array.isArray(meta?.attributes) ? meta.attributes : [];
     let z = 2;
     for (const rec of attrs){
@@ -244,7 +267,7 @@
       }
     }
 
-    // Oldest -> newest for the page (ascending by time)
+    // Oldest -> newest within page
     out.sort((a,b)=>{
       const ta = a.since ? a.since.getTime() : 0;
       const tb = b.since ? b.since.getTime() : 0;
@@ -262,25 +285,31 @@
     });
     if (continuation) qs.set('continuation', continuation);
 
-    const res = await fetch(`${API}?${qs.toString()}`, { headers: apiHeaders() });
-    if (!res.ok) throw new Error(`Reservoir activity ${res.status}`);
-    const json = await res.json();
+    const url = `${API}?${qs.toString()}`;
+    const json = await reservoirFetch(url, { headers: apiHeaders() });
     return { activities: json?.activities || [], continuation: json?.continuation || '' };
   }
 
   async function fetchNextPage(){
     const cont = ST.nextContinuation || '';
-    const { activities, continuation } = await fetchActivitiesPage(cont);
-    const rows = selectCurrentlyStakedFromActivities(activities);
-    ST.pages.push({ rows, contIn: ST.nextContinuation || null, contOut: continuation || null });
-    ST.nextContinuation = continuation || '';
-    return true;
+    try{
+      const { activities, continuation } = await fetchActivitiesPage(cont);
+      const rows = selectCurrentlyStakedFromActivities(activities);
+      ST.pages.push({ rows, contIn: ST.nextContinuation || null, contOut: continuation || null });
+      ST.nextContinuation = continuation || '';
+      return true;
+    }catch(err){
+      console.warn('Pond: page fetch failed', err);
+      // keep UI usable; do not throw—just report failure to caller
+      return false;
+    }
   }
 
-  async function prefetchInitialPages(n=3){
+  async function prefetchInitialPages(n=PREFETCH_PAGES){
     for (let i=0; i<n; i++){
       const ok = await fetchNextPage();
-      if (!ok || !ST.nextContinuation) break;
+      if (!ok) break;
+      if (!ST.nextContinuation) break;
     }
   }
 
@@ -296,7 +325,6 @@
       return;
     }
 
-    // Translate current store index to display order (oldest->newest)
     const dispIdx = displayIdxFromStore(ST.page);
     const storeIdx = storeIdxFromDisplay(dispIdx);
     const page = ST.pages[storeIdx];
@@ -356,27 +384,31 @@
 
       // reset state
       ST.pages = [];
-      ST.page = 0; // (newest-first internals)
+      ST.page = 0; // newest-first internal index
       ST.nextContinuation = '';
       ST.blockedIds = new Set();
       ST.acceptedIds = new Set();
 
-      // prefetch first 3 pages so pager shows: [1] [2] [3] …
-      await prefetchInitialPages(3);
+      // prefetch first N pages
+      await prefetchInitialPages();
 
       if (!ST.pages.length){
+        // If nothing loaded at all, show a soft message instead of a hard failure
         ul.innerHTML = `<li class="list-item"><div class="muted">No frogs are currently staked.</div></li>`;
         ensurePager().innerHTML = '';
         return;
       }
 
-      // Start by showing the OLDEST among the preloaded pages
+      // Show the OLDEST of the preloaded pages first
       ST.page = ST.pages.length - 1;
       renderPage();
     }catch(e){
       console.warn('Pond load failed', e);
-      ul.innerHTML = `<li class="list-item"><div class="muted">Failed to load the pond.</div></li>`;
-      ensurePager().innerHTML = '';
+      // leave any partial content if present
+      if (!ST.pages.length){
+        ul.innerHTML = `<li class="list-item"><div class="muted">Failed to load the pond.</div></li>`;
+        ensurePager().innerHTML = '';
+      }
     }
   }
 
