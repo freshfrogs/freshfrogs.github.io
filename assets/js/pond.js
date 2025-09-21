@@ -168,72 +168,105 @@
     });
   }
 
-  async function buildFrog128(container, tokenId){
+    // Replace your buildFrog128 with this
+    async function buildFrog128(container, tokenId){
     const SIZE = 128;
 
     Object.assign(container.style, {
-      width: `${SIZE}px`,
-      height: `${SIZE}px`,
-      minWidth: `${SIZE}px`,
-      minHeight: `${SIZE}px`,
-      position: 'relative',
-      overflow: 'hidden',
-      borderRadius: '8px',
+        width: `${SIZE}px`,
+        height: `${SIZE}px`,
+        minWidth: `${SIZE}px`,
+        minHeight: `${SIZE}px`,
+        position: 'relative',
+        overflow: 'hidden',
+        borderRadius: '8px',
+        imageRendering: 'pixelated',
+
+        // === BACKGROUND TRICK ===
+        // Use the flat PNG as a background, zoomed & offset so only the solid
+        // bg color shows (no frog pixels). Works even if trait layers don't load.
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: '900%',          // big zoom
+        backgroundPosition: '-350% 350%'  // push left and down
     });
 
-    // Background trick: use the flat PNG scaled & offset so only the bg color shows
-    const bg = new Image();
-    bg.decoding = 'async';
-    bg.loading = 'lazy';
-    bg.alt = `Frog #${tokenId} background`;
-    Object.assign(bg.style, {
-      position: 'absolute',
-      left: `-${Math.round(SIZE * 0.80)}px`, // push left
-      top:  `${Math.round(SIZE * 0.55)}px`,  // push down
-      transform: `scale(3.2)`,               // enlarge a lot
-      imageRendering: 'pixelated',
-      zIndex: '0',
-      opacity: '1'
-    });
-    // Direct path (assets and frog are siblings)
-    bg.src = `/frog/${tokenId}.png`;
-    // loose fallback to possible alt location if needed
-    bg.onerror = ()=>{ bg.onerror = null; bg.src = `${CFG.SOURCE_PATH ? CFG.SOURCE_PATH : ''}/frog/${tokenId}.png`; };
-    container.appendChild(bg);
+    // Set bg to local /frog/{id}.png; if it fails, fall back to SOURCE_PATH
+    const localBg   = `frog/${tokenId}.png`;
+    const altBg     = (CFG.SOURCE_PATH ? `${CFG.SOURCE_PATH}/frog/${tokenId}.png` : localBg);
+    container.style.backgroundImage = `url('${localBg}')`;
+    const probe = new Image();
+    probe.onload = ()=>{}; // ok, keep local
+    probe.onerror = ()=>{ container.style.backgroundImage = `url('${altBg}')`; };
+    probe.src = localBg;
 
-    // Layered build from metadata
-    const metaUrl = `/frog/json/${tokenId}.json`;
+    // ----- Layered build from metadata -----
+    const metaUrl = `frog/json/${tokenId}.json`;
     let meta;
     try {
-      meta = await FF.fetchJSON(metaUrl);
+        meta = await FF.fetchJSON(metaUrl);
     } catch {
-      // fallback: flat image
-      const flat = new Image();
-      flat.decoding = 'async';
-      flat.loading = 'lazy';
-      flat.alt = `Frog #${tokenId}`;
-      Object.assign(flat.style, {
-        position: 'absolute', left: '0', top: '0',
-        width: `${SIZE}px`, height: `${SIZE}px`,
-        imageRendering: 'pixelated', zIndex: '2'
-      });
-      flat.src = `/frog/${tokenId}.png`;
-      flat.onerror = ()=>{ flat.onerror = null; flat.src = `${CFG.SOURCE_PATH ? CFG.SOURCE_PATH : ''}/frog/${tokenId}.png`; };
-      container.appendChild(flat);
-      return;
+        // fallback: flat frog on top if no metadata
+        const flat = new Image();
+        flat.decoding = 'async';
+        flat.loading  = 'lazy';
+        flat.alt = `Frog #${tokenId}`;
+        Object.assign(flat.style, {
+        position:'absolute', inset:'0',
+        width:`${SIZE}px`, height:`${SIZE}px`,
+        imageRendering:'pixelated', zIndex:'2'
+        });
+        flat.src = localBg;
+        flat.onerror = ()=>{ flat.onerror = null; flat.src = altBg; };
+        container.appendChild(flat);
+        return;
     }
 
     const attrs = Array.isArray(meta?.attributes) ? meta.attributes : [];
-    for (const rec of attrs){
-      const attr = String(rec.trait_type || rec.traitType || '').trim();
-      const val  = String(rec.value).trim();
-      if (!attr || val == null) continue;
 
-      const layer = makeLayerImg(attr, val, SIZE);
-      container.appendChild(layer);
-      attachLiftHandlers(layer);
+    for (const rec of attrs){
+        const attr = String(rec.trait_type || rec.traitType || '').trim();
+        const val  = String(rec.value).trim();
+        if (!attr || !val) continue;
+
+        // No animations for Hat / Frog / Trait
+        const allowAnim = !NO_ANIM_FOR.has(attr);
+        const base = `/frog/build_files/${encodeURIComponent(attr)}`;
+        const png  = `${base}/${encodeURIComponent(val)}.png`;
+        const gif  = `${base}/animations/${encodeURIComponent(val)}_animation.gif`;
+
+        const img = new Image();
+        img.decoding = 'async';
+        img.loading  = 'lazy';
+        img.dataset.attr = attr;
+        Object.assign(img.style, {
+        position:'absolute', left:'0', top:'0',
+        width:`${SIZE}px`, height:`${SIZE}px`,
+        imageRendering:'pixelated', zIndex:'2',
+        transition:'transform 280ms cubic-bezier(.22,.61,.36,1)'
+        });
+
+        if (allowAnim){
+        img.src = gif;
+        img.onerror = ()=>{ img.onerror = null; img.src = png; };
+        } else {
+        img.src = png;
+        }
+
+        // Hover lift (not for Frog / Trait / SpecialFrog)
+        if (!NO_LIFT_FOR.has(attr)){
+        img.addEventListener('mouseenter', ()=>{
+            img.style.transform = 'translateY(-6px)';
+            img.style.filter = 'drop-shadow(0 4px 0 rgba(0,0,0,.45))';
+        });
+        img.addEventListener('mouseleave', ()=>{
+            img.style.transform = 'translateY(0)';
+            img.style.filter = 'none';
+        });
+        }
+
+        container.appendChild(img);
     }
-  }
+    }
 
   // ---------- activity selection ----------
   function selectCurrentlyStakedFromActivities(activities){
