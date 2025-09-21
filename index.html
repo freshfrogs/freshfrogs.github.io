@@ -206,16 +206,11 @@
 <script src="assets/js/modal.js"></script>
 <script src="assets/js/main.js"></script>
 
-<!-- Frog Modal (streamlined layout) -->
+<!-- Frog Modal (narrow, site-consistent) -->
 <div id="frogModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
   <div class="modal-backdrop" data-close></div>
-  <div class="modal-panel modal-compact" role="document">
+  <div class="modal-panel modal-narrow" role="document">
     <button class="btn btn-ghost btn-sm modal-close" data-close aria-label="Close">✕</button>
-
-    <!-- Right column header/info lives inside the right side, but title is here for a11y -->
-    <header class="sr-only">
-      <h2>Frog <span id="fmId">#—</span></h2>
-    </header>
 
     <section class="ffm-grid">
       <!-- LEFT: art + 3x2 buttons -->
@@ -223,44 +218,33 @@
         <div id="fmHero" class="ffm-hero"></div>
 
         <div class="ffm-actions">
-          <!-- row 1 -->
+          <!-- Row 1 (primary actions) -->
           <button id="fmStakeBtn"    class="btn btn-solid btn-sm" data-no-modal>Stake</button>
-          <button id="fmUnstakeBtn"  class="btn btn-sm" data-no-modal>Unstake</button>
-          <button id="fmTransferBtn" class="btn btn-sm" data-no-modal>Transfer</button>
-          <!-- row 2 -->
+          <button id="fmUnstakeBtn"  class="btn btn-ghost btn-sm" data-no-modal>Unstake</button>
+          <button id="fmTransferBtn" class="btn btn-ghost btn-sm" data-no-modal>Transfer</button>
+          <!-- Row 2 (links) -->
           <a id="fmOpenSea"   class="btn btn-ghost btn-sm" target="_blank" rel="noopener">OpenSea</a>
           <a id="fmEtherscan" class="btn btn-ghost btn-sm" target="_blank" rel="noopener">Etherscan</a>
           <a id="fmMetaLink"  class="btn btn-ghost btn-sm" target="_blank" rel="noopener">Metadata</a>
         </div>
-
-        <!-- Optional: tiny extra link under buttons -->
-        <button id="fmMorphBtn" class="btn btn-ghost btn-xs ffm-morph" data-no-modal disabled title="Coming soon">
-          Metamorph (soon)
-        </button>
       </div>
 
-      <!-- RIGHT: title, owner, attributes -->
+      <!-- RIGHT: same typography as Owned/Staked -->
       <div class="ffm-right">
-        <div class="ffm-head">
-          <div class="ffm-title">
-            <span class="muted">Frog</span>
-            <strong id="fmId">#—</strong>
-            <span id="fmRank" class="pill pill-compact">Rank —</span>
-            <span id="fmState" class="pill pill-soft pill-compact">—</span>
+        <div class="ffm-titlerow">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <b>Frog <span id="fmId">#—</span></b>
+            <span id="fmRank" class="pill">Rank <b id="fmRankNum">—</b></span>
           </div>
-          <div class="ffm-owner muted">
-            Owned by <span id="fmOwnerShort">—</span>
-          </div>
+          <div id="fmLine" class="muted">—</div>
         </div>
 
         <div class="ffm-attrs">
           <div class="section-title">Attributes</div>
-          <!-- Pills list (we’ll fill from modal.js) -->
           <ul id="fmAttrs" class="ffm-attrlist list-scroll"></ul>
         </div>
 
-        <!-- Visually hidden full owner/collection lines for copy/paste—
-             we keep them out of the main visual flow per your sketch -->
+        <!-- hidden-but-available extras -->
         <div class="sr-only">
           <div>Owner: <span id="fmOwner">—</span></div>
           <div>Rarity: <span id="fmRarityLine">—</span></div>
