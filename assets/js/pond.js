@@ -9,55 +9,25 @@
   const CONTROLLER = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
   const COLLECTION = CFG.COLLECTION_ADDRESS || '';
   const PAGE_SIZE  = 20; // reservoir max per call
-  const PREFETCH_PAGES = 3;
+  const TILE_SIZE  = 128; // render size for pond thumbnails
 
   function apiHeaders(){
     if (!CFG.FROG_API_KEY) throw new Error('Missing FROG_API_KEY in config.js');
     return { accept: '*/*', 'x-api-key': CFG.FROG_API_KEY };
   }
 
-  // ---------- resilient fetch (timeout + retries + 429 handling) ----------
-  async function reservoirFetch(url, opts={}, retries=3, timeoutMs=9000){
-    for (let i=0; i<=retries; i++){
-      const ctrl = new AbortController();
-      const t = setTimeout(()=>ctrl.abort(new DOMException('Timeout')), timeoutMs);
-      try{
-        const res = await fetch(url, { ...opts, signal: ctrl.signal });
-        clearTimeout(t);
-
-        if (res.status === 429 && i < retries){
-          const ra = Number(res.headers.get('retry-after')) || (1 << i);
-          await new Promise(r=>setTimeout(r, ra * 1000));
-          continue;
-        }
-        if (!res.ok){
-          if (i < retries){
-            await new Promise(r=>setTimeout(r, (300 + Math.random()*300) * (i+1)));
-            continue;
-          }
-          throw new Error(`HTTP ${res.status}`);
-        }
-        return await res.json();
-      }catch(err){
-        clearTimeout(t);
-        if (i === retries) throw err;
-        await new Promise(r=>setTimeout(r, (350 + Math.random()*300) * (i+1)));
-      }
-    }
-  }
-
   // ---------- state ----------
   const ST = {
     pages: [],                 // [{ rows: [{id, staker, since}], contIn, contOut }]
-    page: 0,                   // newest-first internal index
-    nextContinuation: '',
-    blockedIds: new Set(),
-    acceptedIds: new Set()
+    page: 0,
+    nextContinuation: '',      // for next fetch
+    blockedIds: new Set(),     // tokens that later left controller
+    acceptedIds: new Set()     // dedupe accepted across pages
   };
 
   let RANKS = null;
 
-  // ---------- UI helpers ----------
+  // ---------- small helpers ----------
   const fmtAgo = (d)=> d ? (FF.formatAgo(Date.now()-d.getTime())+' ago') : '—';
   const pillRank = (rank)=> (rank||rank===0)
     ? `<span class="pill">Rank <b>#${rank}</b></span>`
@@ -75,39 +45,36 @@
     return nav;
   }
 
-  // We fetch pages newest->older, but DISPLAY oldest->newest.
-  const storeIdxFromDisplay = (dispIdx)=> (ST.pages.length - 1 - dispIdx);
-  const displayIdxFromStore = (storeIdx)=> (ST.pages.length - 1 - storeIdx);
-
   function renderPager(){
     const nav = ensurePager();
     nav.innerHTML = '';
 
-    for (let disp=0; disp<ST.pages.length; disp++){
-      const sIdx = storeIdxFromDisplay(disp);
+    // numbered buttons for fetched pages
+    ST.pages.forEach((_, i)=>{
       const btn = document.createElement('button');
       btn.className = 'btn btn-ghost btn-sm';
-      btn.textContent = String(disp+1);
-      if (sIdx === ST.page) btn.classList.add('btn-solid');
+      btn.textContent = String(i+1);
+      if (i === ST.page) btn.classList.add('btn-solid');
       btn.addEventListener('click', ()=>{
-        if (ST.page !== sIdx){
-          ST.page = sIdx;
+        if (ST.page !== i){
+          ST.page = i;
           renderPage();
         }
       });
       nav.appendChild(btn);
-    }
+    });
 
+    // ellipsis "…" to fetch more, if continuation exists
     if (ST.nextContinuation){
       const moreBtn = document.createElement('button');
       moreBtn.className = 'btn btn-ghost btn-sm';
       moreBtn.setAttribute('aria-label', 'Load more pages');
       moreBtn.title = 'Load more';
-      moreBtn.textContent = '…'; // ellipsis
+      moreBtn.textContent = '…'; // U+2026 ellipsis
       moreBtn.addEventListener('click', async ()=>{
         const ok = await fetchNextPage();
         if (ok){
-          ST.page = ST.pages.length - 1; // jump to oldest newly added page
+          ST.page = ST.pages.length - 1; // jump to the new page
           renderPage();
         }
       });
@@ -115,124 +82,186 @@
     }
   }
 
-  // ---------- frog renderer (128x128 layered, bg trick, hover lift) ----------
-  // Animations OFF for these:
-  const NO_ANIM_FOR = new Set(['Hat','Frog','Trait']);
-  // Hover lift OFF for these:
-  const NO_LIFT_FOR = new Set(['Frog','Trait','SpecialFrog']);
+  // ---------- layered frog (128×128) with bg + hover lift ----------
+  const NO_ANIM_ATTRS  = new Set(['Hat','Frog','Trait']);                 // never use GIF for these
+  const NO_HOVER_ATTRS = new Set(['Frog','Trait','SpecialFrog']);         // never lift these
 
-  function mk(tag, props={}, style={}) {
-    const el = document.createElement(tag);
-    Object.assign(el, props);
-    Object.assign(el.style, style);
-    return el;
-  }
-  function safePath(part){ return encodeURI(part).replace(/%20/g, ' '); }
+  function enc(v){ return encodeURIComponent(String(v)); }
 
-  function makeLayerImg(attr, value, sizePx){
-    const allowAnim = !NO_ANIM_FOR.has(attr);
-    const base = `/frog/build_files/${safePath(attr)}`;
-    const png  = `${base}/${safePath(value)}.png`;
-    const gif  = `${base}/animations/${safePath(value)}_animation.gif`;
+  // Builds a 128×128 node with:
+  //  - massive-bg <img> from ./frog/{id}.png (zoomed & offset so only bg color shows)
+  //  - ordered layers from frog/json/{id}.json using /frog/build_files/{ATTRIBUTE}/{VALUE}.png
+  //  - optional GIF at /frog/build_files/{ATTRIBUTE}/animations/{VALUE}_animation.gif
+  async function buildLayeredFrog(id, size=TILE_SIZE){
+    const stage = document.createElement('div');
+    stage.style.position = 'relative';
+    stage.style.width    = size+'px';
+    stage.style.height   = size+'px';
+    stage.style.borderRadius = '8px';
+    stage.style.overflow = 'hidden';
+    stage.style.background = 'transparent';
+    stage.style.imageRendering = 'pixelated';
 
-    const img = new Image();
-    img.decoding = 'async';
-    img.loading = 'lazy';
-    img.alt = `${attr}: ${value}`;
-    Object.assign(img.style, {
-      position:'absolute', left:'0', top:'0',
-      width:`${sizePx}px`, height:`${sizePx}px`,
-      imageRendering:'pixelated', willChange:'transform, filter', zIndex:'2'
-    });
-    img.dataset.attr = attr;
+    // Background trick using the original static PNG (zoom + push down/left)
+    // This makes only the original background color visible.
+    const bg = document.createElement('img');
+    bg.src = `./frog/${id}.png`;
+    bg.alt = '';
+    bg.style.position = 'absolute';
+    bg.style.pointerEvents = 'none';
+    bg.style.imageRendering = 'pixelated';
+    // Zoom a LOT and push down/left. Tuned so frog artwork is off-stage.
+    const ZOOM = 8; // 8× the canvas
+    bg.style.width  = (size*ZOOM)+'px';
+    bg.style.height = (size*ZOOM)+'px';
+    // push left (negative) and down (positive)
+    bg.style.left = (-size*3)+'px';
+    bg.style.top  = ( size*3)+'px';
+    bg.style.opacity = '1';
+    stage.appendChild(bg);
 
-    if (allowAnim){
-      img.src = gif;
-      img.onerror = ()=>{ img.onerror = null; img.src = png; };
-    } else {
-      img.src = png;
-    }
-    return img;
-  }
-
-  function attachLiftHandlers(layerEl){
-    const attr = layerEl.dataset.attr || '';
-    if (NO_LIFT_FOR.has(attr)) return;
-    layerEl.addEventListener('mouseenter', ()=>{
-      layerEl.style.transform = 'translateY(-6px)';
-      layerEl.style.filter = 'drop-shadow(0 4px 0 rgba(0,0,0,0.45))';
-    });
-    layerEl.addEventListener('mouseleave', ()=>{
-      layerEl.style.transform = 'translateY(0)';
-      layerEl.style.filter = 'none';
-    });
-  }
-
-  async function buildFrog128(container, tokenId){
-    const SIZE = 128;
-
-    Object.assign(container.style, {
-      width: `${SIZE}px`,
-      height: `${SIZE}px`,
-      minWidth: `${SIZE}px`,
-      minHeight: `${SIZE}px`,
-      position: 'relative',
-      overflow: 'hidden',
-      borderRadius: '8px',
-    });
-
-    // Background trick: use the flat PNG scaled & offset so only the bg color shows
-    const bg = new Image();
-    bg.decoding = 'async';
-    bg.loading = 'lazy';
-    bg.alt = `Frog #${tokenId} background`;
-    Object.assign(bg.style, {
-      position: 'absolute',
-      left: `-${Math.round(SIZE * 0.80)}px`, // push left
-      top:  `${Math.round(SIZE * 0.55)}px`,  // push down
-      transform: `scale(3.2)`,               // enlarge a lot
-      imageRendering: 'pixelated',
-      zIndex: '0',
-      opacity: '1'
-    });
-    // Direct path (assets and frog are siblings)
-    bg.src = `/frog/${tokenId}.png`;
-    // loose fallback to possible alt location if needed
-    bg.onerror = ()=>{ bg.onerror = null; bg.src = `${CFG.SOURCE_PATH ? CFG.SOURCE_PATH : ''}/frog/${tokenId}.png`; };
-    container.appendChild(bg);
-
-    // Layered build from metadata
-    const metaUrl = `/frog/json/${tokenId}.json`;
+    // Foreground layers (ordered)
     let meta;
     try {
-      meta = await FF.fetchJSON(metaUrl);
+      meta = await FF.fetchJSON(`./frog/json/${id}.json`);
     } catch {
-      // fallback: flat image
-      const flat = new Image();
-      flat.decoding = 'async';
-      flat.loading = 'lazy';
-      flat.alt = `Frog #${tokenId}`;
-      Object.assign(flat.style, {
-        position: 'absolute', left: '0', top: '0',
-        width: `${SIZE}px`, height: `${SIZE}px`,
-        imageRendering: 'pixelated', zIndex: '2'
-      });
-      flat.src = `/frog/${tokenId}.png`;
-      flat.onerror = ()=>{ flat.onerror = null; flat.src = `${CFG.SOURCE_PATH ? CFG.SOURCE_PATH : ''}/frog/${tokenId}.png`; };
-      container.appendChild(flat);
-      return;
+      // fallback to just show the flat PNG if metadata missing
+      const flat = document.createElement('img');
+      flat.src = `./frog/${id}.png`;
+      flat.alt = `Frog #${id}`;
+      flat.style.position='absolute';
+      flat.style.inset='0';
+      flat.style.width='100%';
+      flat.style.height='100%';
+      flat.style.imageRendering='pixelated';
+      stage.appendChild(flat);
+      return stage;
     }
 
     const attrs = Array.isArray(meta?.attributes) ? meta.attributes : [];
-    for (const rec of attrs){
-      const attr = String(rec.trait_type || rec.traitType || '').trim();
-      const val  = String(rec.value).trim();
-      if (!attr || val == null) continue;
 
-      const layer = makeLayerImg(attr, val, SIZE);
-      container.appendChild(layer);
-      attachLiftHandlers(layer);
+    // mouse hover lift: gentle, smooth, up & left for allowed attrs only
+    function applyLift(on){
+      const lift = on ? 'translate(-10px, -12px)' : 'translate(0,0)';
+      layerImgs.forEach(img=>{
+        if (!img.dataset.attr) return;
+        if (NO_HOVER_ATTRS.has(img.dataset.attr)) return;
+        img.style.transform = lift;
+      });
     }
+    stage.addEventListener('mouseenter', ()=>applyLift(true));
+    stage.addEventListener('mouseleave', ()=>applyLift(false));
+
+    const layerImgs = [];
+    for (const a of attrs){
+      const attr  = (a?.trait_type ?? a?.traitType ?? a?.attribute ?? '').toString();
+      const value = (a?.value ?? '').toString();
+      if (!attr || !value) continue;
+
+      // Animation decision
+      const tryGif = !NO_ANIM_ATTRS.has(attr);
+      const gifSrc = `/frog/build_files/${enc(attr)}/animations/${enc(value)}_animation.gif`;
+      const pngSrc = `/frog/build_files/${enc(attr)}/${enc(value)}.png`;
+
+      const img = document.createElement('img');
+      img.dataset.attr = attr;
+      img.alt = '';
+      img.style.position = 'absolute';
+      img.style.left = '0';
+      img.style.top  = '0';
+      img.style.width = size+'px';
+      img.style.height= size+'px';
+      img.style.imageRendering = 'pixelated';
+      img.style.transition = 'transform 220ms cubic-bezier(.22,.61,.36,1)';
+
+      if (tryGif){
+        img.src = gifSrc;
+        img.onerror = ()=>{ img.onerror=null; img.src = pngSrc; };
+      } else {
+        img.src = pngSrc;
+      }
+
+      stage.appendChild(img);
+      layerImgs.push(img);
+    }
+
+    return stage;
+  }
+
+  // ---------- UI render ----------
+  function renderPage(){
+    ul.innerHTML = '';
+
+    if (!ST.pages.length){
+      const li = document.createElement('li');
+      li.className = 'list-item';
+      li.innerHTML = `<div class="muted">No frogs are currently staked.</div>`;
+      ul.appendChild(li);
+      ensurePager().innerHTML = '';
+      return;
+    }
+
+    const page = ST.pages[ST.page];
+    const rows = page?.rows || [];
+
+    if (!rows.length){
+      const li = document.createElement('li');
+      li.className = 'list-item';
+      li.innerHTML = `<div class="muted">No frogs on this page.</div>`;
+      ul.appendChild(li);
+    } else {
+      rows.forEach(async r=>{
+        const rank = RANKS?.[String(r.id)] ?? null;
+
+        const li = document.createElement('li'); 
+        li.className = 'list-item';
+
+        // left: layered frog 128×128 (with background trick + hover lift)
+        const thumbWrap = document.createElement('div');
+        thumbWrap.style.width = TILE_SIZE+'px';
+        thumbWrap.style.height= TILE_SIZE+'px';
+        thumbWrap.style.minWidth = TILE_SIZE+'px';
+        thumbWrap.style.minHeight= TILE_SIZE+'px';
+        thumbWrap.style.borderRadius = '8px';
+        thumbWrap.style.overflow = 'hidden';
+
+        // build & append layered frog
+        buildLayeredFrog(r.id, TILE_SIZE).then(node=>{
+          thumbWrap.appendChild(node);
+        }).catch(()=>{
+          // fail-soft to flat PNG
+          const flat = document.createElement('img');
+          flat.src = `./frog/${r.id}.png`;
+          flat.alt = `Frog #${r.id}`;
+          flat.className = 'thumb128';
+          thumbWrap.appendChild(flat);
+        });
+
+        const leftCol = document.createElement('div');
+        leftCol.appendChild(thumbWrap);
+
+        // mid: text
+        const mid = document.createElement('div');
+        mid.innerHTML =
+          `<div style="display:flex;align-items:center;gap:8px;">
+            <b>Frog #${r.id}</b> ${pillRank(rank)}
+          </div>
+          <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? FF.shorten(r.staker) : '—'}</div>`;
+
+        // right: status
+        const right = document.createElement('div');
+        right.className = 'price';
+        right.textContent = 'Staked';
+
+        // assemble
+        li.appendChild(leftCol);
+        li.appendChild(mid);
+        li.appendChild(right);
+        ul.appendChild(li);
+      });
+    }
+
+    renderPager();
   }
 
   // ---------- activity selection ----------
@@ -261,11 +290,11 @@
       }
     }
 
-    // Oldest -> newest within the page
+    // keep newest → older (you said no need to invert)
     out.sort((a,b)=>{
       const ta = a.since ? a.since.getTime() : 0;
       const tb = b.since ? b.since.getTime() : 0;
-      return ta - tb;
+      return tb - ta;
     });
     return out;
   }
@@ -279,87 +308,26 @@
     });
     if (continuation) qs.set('continuation', continuation);
 
-    const url = `${API}?${qs.toString()}`;
-    const json = await reservoirFetch(url, { headers: apiHeaders() });
+    const res = await fetch(`${API}?${qs.toString()}`, { headers: apiHeaders() });
+    if (!res.ok) throw new Error(`Reservoir activity ${res.status}`);
+    const json = await res.json();
     return { activities: json?.activities || [], continuation: json?.continuation || '' };
   }
 
   async function fetchNextPage(){
-    const cont = ST.nextContinuation || '';
-    try{
-      const { activities, continuation } = await fetchActivitiesPage(cont);
-      const rows = selectCurrentlyStakedFromActivities(activities);
-      ST.pages.push({ rows, contIn: ST.nextContinuation || null, contOut: continuation || null });
-      ST.nextContinuation = continuation || '';
-      return true;
-    }catch(err){
-      console.warn('Pond: page fetch failed', err);
-      return false;
-    }
+    let cont = ST.nextContinuation || '';
+    const { activities, continuation } = await fetchActivitiesPage(cont);
+    const rows = selectCurrentlyStakedFromActivities(activities);
+    ST.pages.push({ rows, contIn: ST.nextContinuation || null, contOut: continuation || null });
+    ST.nextContinuation = continuation || '';
+    return true;
   }
 
-  async function prefetchInitialPages(n=PREFETCH_PAGES){
+  async function prefetchInitialPages(n=3){
     for (let i=0; i<n; i++){
       const ok = await fetchNextPage();
-      if (!ok) break;
-      if (!ST.nextContinuation) break;
+      if (!ok || !ST.nextContinuation) break;
     }
-  }
-
-  function renderPage(){
-    ul.innerHTML = '';
-
-    if (!ST.pages.length){
-      const li = document.createElement('li');
-      li.className = 'list-item';
-      li.innerHTML = `<div class="muted">No frogs are currently staked.</div>`;
-      ul.appendChild(li);
-      ensurePager().innerHTML = '';
-      return;
-    }
-
-    const dispIdx = displayIdxFromStore(ST.page);
-    const storeIdx = storeIdxFromDisplay(dispIdx);
-    const page = ST.pages[storeIdx];
-    const rows = page?.rows || [];
-
-    if (!rows.length){
-      const li = document.createElement('li');
-      li.className = 'list-item';
-      li.innerHTML = `<div class="muted">No frogs on this page.</div>`;
-      ul.appendChild(li);
-    } else {
-      rows.forEach(r=>{
-        const rank = RANKS?.[String(r.id)] ?? null;
-
-        const li = document.createElement('li');
-        li.className = 'list-item';
-
-        // Left: layered 128x128 with bg trick
-        const left = mk('div', {}, {
-          width:'128px', height:'128px', minWidth:'128px', minHeight:'128px'
-        });
-        li.appendChild(left);
-        buildFrog128(left, r.id);
-
-        // Middle: text block
-        const mid = mk('div');
-        mid.innerHTML =
-          `<div style="display:flex;align-items:center;gap:8px;">
-            <b>Frog #${r.id}</b> ${pillRank(rank)}
-          </div>
-          <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? FF.shorten(r.staker) : '—'}</div>`;
-        li.appendChild(mid);
-
-        // Right: tag
-        const right = mk('div', { className:'price', textContent:'Staked' });
-        li.appendChild(right);
-
-        ul.appendChild(li);
-      });
-    }
-
-    renderPager();
   }
 
   // ---------- main ----------
@@ -371,16 +339,19 @@
         return;
       }
 
+      // load ranks (optional)
       try { RANKS = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json'); }
       catch { RANKS = {}; }
 
+      // reset state
       ST.pages = [];
       ST.page = 0;
       ST.nextContinuation = '';
       ST.blockedIds = new Set();
       ST.acceptedIds = new Set();
 
-      await prefetchInitialPages();
+      // prefetch first 3 pages so pager shows: [1] [2] [3] […]
+      await prefetchInitialPages(3);
 
       if (!ST.pages.length){
         ul.innerHTML = `<li class="list-item"><div class="muted">No frogs are currently staked.</div></li>`;
@@ -388,15 +359,11 @@
         return;
       }
 
-      // Show the OLDEST of the preloaded pages first
-      ST.page = ST.pages.length - 1;
       renderPage();
     }catch(e){
       console.warn('Pond load failed', e);
-      if (!ST.pages.length){
-        ul.innerHTML = `<li class="list-item"><div class="muted">Failed to load the pond.</div></li>`;
-        ensurePager().innerHTML = '';
-      }
+      ul.innerHTML = `<li class="list-item"><div class="muted">Failed to load the pond.</div></li>`;
+      ensurePager().innerHTML = '';
     }
   }
 
