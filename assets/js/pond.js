@@ -1,3 +1,4 @@
+// assets/js/pond.js
 (function(FF, CFG){
   const wrap = document.getElementById('pondListWrap');
   const ul   = document.getElementById('pondList');
@@ -43,7 +44,6 @@
     const pages = Math.max(1, Math.ceil(total / ST.pageSize));
     const nav = ensurePager();
     nav.innerHTML = '';
-
     if (pages <= 1) return;
 
     for (let i=0; i<pages; i++){
@@ -96,7 +96,7 @@
     buildPager();
   }
 
-  // ---------- Reservoir fetches (no RPC) ----------
+  // ---------- Reservoir fetches (CORS-friendly) ----------
   // 1) IDs currently owned by controller
   async function fetchControllerTokenIds(limitPerPage = 200, maxPages = 30){
     if (!KEY) return [];
@@ -132,75 +132,49 @@
     return out;
   }
 
-  // 2) Latest transfers *to* controller (derive staker + since) — try multiple endpoints defensively
+  // 2) Collection activity (transfer events). Filter client-side to TO = controller.
   async function fetchTransfersToController({limit=1000, maxPages=10} = {}){
     if (!KEY) return new Map();
 
-    const cAddr = CFG.CONTROLLER_ADDRESS;
+    const cAddr = CFG.CONTROLLER_ADDRESS.toLowerCase();
     const col   = CFG.COLLECTION_ADDRESS;
 
-    // Robust field getters (Reservoir versions differ slightly)
+    // field getters (cover v7 shapes)
     const getList = (j)=> j?.activities || j?.events || j?.transfers || [];
     const getTokenId = (a)=> {
       const tid = a?.token?.tokenId ?? a?.tokenId ?? a?.event?.token?.tokenId ?? a?.event?.tokenId;
       return tid!=null ? Number(tid) : null;
     };
-    const getFrom = (a)=> a?.fromAddress || a?.from || a?.event?.fromAddress || a?.event?.from || null;
-    const getTo   = (a)=> a?.toAddress   || a?.to   || a?.event?.toAddress   || a?.event?.to   || null;
-    const getTime = (a)=> a?.createdAt   || a?.timestamp || a?.event?.createdAt || null;
+    const getFrom = (a)=> (a?.fromAddress || a?.from || a?.event?.fromAddress || a?.event?.from || '').toLowerCase();
+    const getTo   = (a)=> (a?.toAddress   || a?.to   || a?.event?.toAddress   || a?.event?.to   || '').toLowerCase();
+    const getTime = (a)=> a?.createdAt || a?.timestamp || a?.event?.createdAt || null;
 
-    async function pull(endpoint){
-      const out = [];
-      let continuation = '';
-      for (let i=0; i<maxPages; i++){
-        const url = continuation ? `${endpoint}&continuation=${encodeURIComponent(continuation)}` : endpoint;
-        const res = await fetch(url, { headers:{ accept:'*/*', 'x-api-key': KEY } });
-        if (!res.ok) throw new Error('Reservoir activities '+res.status);
-        const json = await res.json();
-        const list = getList(json);
-        out.push(...list);
-        continuation = json?.continuation || '';
-        if (!continuation) break;
-      }
-      return out;
+    const out = [];
+    let continuation = '';
+    for (let i=0; i<maxPages; i++){
+      const q = new URLSearchParams({
+        types: 'transfer',
+        limit: String(limit)
+      });
+      if (continuation) q.set('continuation', continuation);
+
+      const url = `https://api.reservoir.tools/collections/${col}/activity/v7?` + q.toString();
+      const res = await fetch(url, { headers:{ accept:'*/*', 'x-api-key': KEY } });
+      if (!res.ok) throw new Error('Reservoir activity '+res.status);
+      const json = await res.json();
+      const list = getList(json);
+      out.push(...list);
+      continuation = json?.continuation || '';
+      if (!continuation) break;
     }
 
-    // Try: global activities with filters
-    const q1 = new URLSearchParams({
-      types: 'transfer',
-      collection: col,
-      to: cAddr,
-      limit: String(limit)
-    });
-    const EP1 = `https://api.reservoir.tools/activities/v7?${q1.toString()}`;
-
-    // Fallback: activities scoped to user (controller)
-    const q2 = new URLSearchParams({
-      types: 'transfer',
-      collection: col,
-      limit: String(limit)
-    });
-    const EP2 = `https://api.reservoir.tools/users/${cAddr}/activities/v7?${q2.toString()}`;
-
-    // Fallback: collection activity (filter client-side)
-    const q3 = new URLSearchParams({
-      types: 'transfer',
-      limit: String(limit)
-    });
-    const EP3 = `https://api.reservoir.tools/collections/${col}/activity/v7?${q3.toString()}`;
-
-    let acts = [];
-    try { acts = await pull(EP1); }
-    catch { try { acts = await pull(EP2); } catch { acts = await pull(EP3); } }
-
-    // Build "latest transfer to controller" map
+    // Build latest transfer-to-controller map (newest first in response)
     const latest = new Map(); // id -> { staker, since: Date }
-    for (const a of acts){
-      const to = (getTo(a)||'').toLowerCase();
-      if (to !== cAddr.toLowerCase()) continue; // only TO controller
+    for (const a of out){
+      if (getTo(a) !== cAddr) continue;
       const id = getTokenId(a);
       if (!Number.isFinite(id)) continue;
-      if (latest.has(id)) continue; // lists arrive newest-first
+      if (latest.has(id)) continue;
       const from = getFrom(a) || null;
       const when = getTime(a);
       latest.set(id, { staker: from, since: when ? new Date(when) : null });
@@ -213,10 +187,9 @@
     try{
       await loadRanks();
 
-      // 1) IDs actually owned by the controller (current staked set)
+      // 1) IDs in controller wallet (current staked set)
       const ids = await fetchControllerTokenIds();
 
-      // If nothing, render empty
       if (!ids.length){
         ST.rows = [];
         ST.page = 0;
@@ -224,21 +197,14 @@
         return;
       }
 
-      // 2) Latest transfer TO controller => staker + since (no RPC)
+      // 2) Latest transfer TO controller => staker + since (via collection activity)
       const latestMap = await fetchTransfersToController();
 
-      // 3) Join
+      // 3) Join & sort
       const rows = ids.map(id=>{
         const hit = latestMap.get(id);
-        return {
-          id,
-          staker: hit?.staker || null,
-          since: hit?.since || null
-        };
-      });
-
-      // newest staked first
-      rows.sort((a,b)=>{
+        return { id, staker: hit?.staker || null, since: hit?.since || null };
+      }).sort((a,b)=>{
         const ta = a.since ? a.since.getTime() : 0;
         const tb = b.since ? b.since.getTime() : 0;
         return tb - ta;
