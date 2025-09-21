@@ -2,62 +2,64 @@
   // -----------------------------
   // Settings
   // -----------------------------
-  const PAGE_SIZE = 10;                 // show 10 per page (numbered pager)
-  const RANK_JSON = 'assets/freshfrogs_rank_lookup.json'; // { "1": 123, "2": 456, ... }
+  const PAGE_SIZE = 10; // 10 per page with numbered pager
+  const RANK_JSON = 'assets/freshfrogs_rank_lookup.json';
 
   // -----------------------------
   // State
   // -----------------------------
-  let pages = [];          // array of arrays: pages[i] = [tokenId,...] (10 ids)
-  let continuations = ['']; // continuation token per page index; [0] is empty (start)
-  let hasMore = true;      // whether reservoir has more results
-  let currentPage = 0;     // 0-indexed page
-  let rankMap = null;      // {id -> rank}
-  const stakerCache = new Map(); // tokenId -> { staker, date }
+  let pages = [];                 // pages[i] = [tokenId,...] (10 per page)
+  let continuations = [''];       // reservoir continuation per fetched page
+  let hasMore = true;             // if reservoir has more pages available
+  let currentPage = 0;            // 0-index
+  let rankMap = null;             // {id -> rank}
+  const stakerCache = new Map();  // tokenId -> { staker, date } (resolved once)
 
-  // Shared DOM
+  // DOM
   const listEl = document.getElementById('pondList');
   const wrapEl = document.getElementById('pondListWrap');
 
   // -----------------------------
-  // Utils
+  // Small utils
   // -----------------------------
   function fmtAddr(a) {
     if (!a) return '—';
     const s = String(a);
     return s.slice(0, 6) + '…' + s.slice(-4);
   }
-  function ago(d) {
-    if (!d) return '—';
-    const ms = Date.now() - d.getTime();
+  function ago(date) {
+    if (!date) return '—';
+    const ms = Date.now() - date.getTime();
     const s = Math.floor(ms / 1000);
     if (s < 60) return s + 's';
     const m = Math.floor(s / 60);
     if (m < 60) return m + 'm';
     const h = Math.floor(m / 60);
     if (h < 24) return h + 'h';
-    const dd = Math.floor(h / 24);
-    return dd + 'd';
+    const d = Math.floor(h / 24);
+    return d + 'd';
   }
 
   async function loadRanksOnce() {
     if (rankMap) return;
     try {
-      const j = await FF.fetchJSON(RANK_JSON);
-      // supports either array of {id, rank} or a plain {id:rank} map
-      if (Array.isArray(j)) {
+      const data = await FF.fetchJSON(RANK_JSON);
+      if (Array.isArray(data)) {
         rankMap = Object.fromEntries(
-          j.map(r => [String(r.id), Number(r.rank ?? r.ranking ?? r.score ?? NaN)])
+          data.map(r => [String(r.id), Number(r.rank ?? r.ranking ?? NaN)])
+              .filter(([, v]) => Number.isFinite(v))
+        );
+      } else if (data && typeof data === 'object') {
+        rankMap = Object.fromEntries(
+          Object.entries(data)
+            .map(([k, v]) => [String(k), Number(v)])
             .filter(([, v]) => Number.isFinite(v))
         );
-      } else if (j && typeof j === 'object') {
-        rankMap = Object.fromEntries(
-          Object.entries(j).map(([k, v]) => [String(k), Number(v)])
-            .filter(([, v]) => Number.isFinite(v))
-        );
+      } else {
+        rankMap = {};
       }
     } catch (e) {
-      console.warn('rank lookup load failed', e);
+      console.warn('rank lookup failed', e);
       rankMap = {};
     }
   }
@@ -71,7 +73,7 @@
   // Reservoir fetchers
   // -----------------------------
   async function fetchTokensPage(continuation = '') {
-    // Tokens currently OWNED by the controller (i.e., staked)
+    // Tokens currently owned by the controller (i.e., staked)
     const base = 'https://api.reservoir.tools/tokens/v7';
     const qs = new URLSearchParams({
       collection: CFG.COLLECTION_ADDRESS,
@@ -93,8 +95,46 @@
     return { ids, continuation: json.continuation || '' };
   }
 
-  // For staker & stakedSince, query on-chain logs (10 tokens per page -> OK).
-  // Uses window.ethereum if present; falls back to default provider.
+  // Fallback: use Reservoir Activities (transfers) to find last transfer -> controller
+  async function fetchStakeMetaViaReservoir(tokenId) {
+    try {
+      const base = 'https://api.reservoir.tools/activities/v7';
+      const qs = new URLSearchParams({
+        collection: CFG.COLLECTION_ADDRESS,
+        token: `${CFG.COLLECTION_ADDRESS}:${tokenId}`,
+        types: 'transfer',
+        limit: '50'
+      });
+      const res = await fetch(`${base}?${qs.toString()}`, {
+        method: 'GET',
+        headers: { accept: '*/*', 'x-api-key': CFG.FROG_API_KEY }
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const json = await res.json();
+      const act = (json?.activities || [])
+        .filter(a => (a?.toAddress || a?.to?.address) &&
+                     String(a.toAddress || a.to?.address).toLowerCase() === CFG.CONTROLLER_ADDRESS.toLowerCase() &&
+                     String(a?.token?.tokenId ?? a?.tokenId) === String(tokenId))
+        .sort((a, b) => {
+          const ta = Date.parse(a?.timestamp ?? a?.createdAt ?? 0) || 0;
+          const tb = Date.parse(b?.timestamp ?? b?.createdAt ?? 0) || 0;
+          return ta - tb;
+        })
+        .pop(); // most recent to controller
+
+      if (!act) return { staker: null, date: null };
+
+      const staker = String(act?.fromAddress || act?.from?.address || '').toLowerCase() || null;
+      const raw = act?.timestamp ?? act?.createdAt;
+      const dt = raw ? new Date((typeof raw === 'number' ? (raw < 1e12 ? raw * 1000 : raw) : Date.parse(raw))) : null;
+      return { staker, date: dt };
+    } catch (e) {
+      console.warn('Reservoir activity fallback failed for token', tokenId, e);
+      return { staker: null, date: null };
+    }
+  }
+
+  // Primary: on-chain logs Transfer → controller
   async function getStakeMetaOnChain(tokenId) {
     if (stakerCache.has(tokenId)) return stakerCache.get(tokenId);
     try {
@@ -110,8 +150,8 @@
       const idTopic = ethers.utils.hexZeroPad(
         ethers.BigNumber.from(String(tokenId)).toHexString(), 32
       );
-
       const fromBlock = Number(CFG.CONTROLLER_DEPLOY_BLOCK || 0);
+
       const logs = await provider.getLogs({
         fromBlock,
         toBlock: 'latest',
@@ -120,9 +160,10 @@
       });
 
       if (!logs.length) {
-        const meta = { staker: null, date: null };
-        stakerCache.set(tokenId, meta);
-        return meta;
+        // Fallback to Reservoir activities
+        const viaAPI = await fetchStakeMetaViaReservoir(tokenId);
+        stakerCache.set(tokenId, viaAPI);
+        return viaAPI;
       }
 
       const last = logs[logs.length - 1];
@@ -135,19 +176,19 @@
       stakerCache.set(tokenId, meta);
       return meta;
     } catch (e) {
-      console.warn('stake meta failed', tokenId, e);
-      const meta = { staker: null, date: null };
-      stakerCache.set(tokenId, meta);
-      return meta;
+      console.warn('on-chain stake meta failed; trying reservoir fallback', e);
+      const viaAPI = await fetchStakeMetaViaReservoir(tokenId);
+      stakerCache.set(tokenId, viaAPI);
+      return viaAPI;
     }
   }
 
   // -----------------------------
-  // Paging model (numbered)
+  // Pager model (numbers at bottom)
   // -----------------------------
-  async function ensurePage(index) {
-    // Fetch sequential reservoir pages until we have index
-    while (pages.length <= index && hasMore) {
+  async function ensurePage(i) {
+    // Fetch sequential pages until page i exists or no more pages.
+    while (pages.length <= i && hasMore) {
       const cont = continuations[continuations.length - 1] || '';
       const { ids, continuation } = await fetchTokensPage(cont);
       pages.push(ids);
@@ -157,39 +198,36 @@
   }
 
   function renderPager() {
-    // Remove old pager
+    // Remove existing
     const old = wrapEl.querySelector('.pager');
     if (old) old.remove();
 
-    // Build pager with known page count (may grow as user goes forward)
+    if (!pages.length) return;
     const pager = document.createElement('div');
     pager.className = 'pager';
-    const total = pages.length;
-    if (!total) return;
 
-    for (let i = 0; i < total; i++) {
+    // numbered buttons for all loaded pages
+    pages.forEach((_, i) => {
       const b = document.createElement('button');
-      b.className = 'btn btn-ghost btn-sm';
       b.textContent = String(i + 1);
-      if (i === currentPage) {
-        b.classList.add('btn-solid');
-        b.classList.remove('btn-ghost');
-      }
+      b.className = 'btn btn-ghost btn-sm';
+      if (i === currentPage) { b.classList.add('btn-solid'); b.classList.remove('btn-ghost'); }
       b.addEventListener('click', async () => {
         currentPage = i;
-        await renderPage();
+        await renderPage(); // re-render current page
       });
       pager.appendChild(b);
-    }
+    });
 
-    // "Next" button if we think there are more server pages
+    // show a "Next ›" to fetch one more page & extend numbered list when possible
     if (hasMore) {
       const next = document.createElement('button');
       next.className = 'btn btn-outline btn-sm';
       next.textContent = 'Next ›';
       next.addEventListener('click', async () => {
-        currentPage = pages.length;      // go to yet-unloaded page
-        await ensurePage(currentPage);   // fetch it
+        // advance to next (yet-unloaded) page
+        currentPage = pages.length; // point to the page that doesn't exist yet
+        await ensurePage(currentPage); // fetch it
         await renderPage();
       });
       pager.appendChild(next);
@@ -217,35 +255,32 @@
       return;
     }
 
-    // Render each card; fetch staker meta lazily for just these 10 ids
+    // Render cards for the 10 ids on this page, and fill staker/time once resolved
     for (const id of ids) {
       const rank = getRank(id);
-      const li = document.createElement('li');
-      li.className = 'list-item';
-
-      // placeholder while we fetch staker meta
+      const li = document.createElement('li'); li.className = 'list-item';
       li.innerHTML =
         FF.thumb64(`${CFG.SOURCE_PATH}/frog/${id}.png`, `Frog ${id}`) +
         `<div>
-           <div style="display:flex;align-items:center;gap:8px;">
-             <b>Frog #${id}</b>
-             ${(rank || rank === 0)
-               ? `<span class="pill">Rank <b>#${rank}</b></span>`
-               : `<span class="pill"><span class="muted">Rank N/A</span></span>`}
-           </div>
-           <div class="muted">Staked — • by —</div>
-         </div>`;
+          <div style="display:flex;align-items:center;gap:8px;">
+            <b>Frog #${id}</b>
+            ${(rank || rank === 0)
+              ? `<span class="pill">Rank <b>#${rank}</b></span>`
+              : `<span class="pill"><span class="muted">Rank N/A</span></span>`}
+          </div>
+          <div class="muted">Staked — • by —</div>
+        </div>`;
 
       listEl.appendChild(li);
 
-      // Now fill in staker + time
+      // Resolve staker + when (async) with on-chain, then fallback to Reservoir if needed
       try {
         const meta = await getStakeMetaOnChain(id);
         const when = meta.date ? `${ago(meta.date)} ago` : '—';
         const who = meta.staker ? fmtAddr(meta.staker) : '—';
         const info = li.querySelector('.muted');
         if (info) info.textContent = `Staked ${when} • by ${who}`;
-      } catch {}
+      } catch (_) { /* already logged in helpers */ }
     }
 
     renderPager();
@@ -257,10 +292,10 @@
   async function boot() {
     try {
       listEl.innerHTML = '<li class="list-item"><div class="muted">Loading pond…</div></li>';
-      currentPage = 0;
       pages = [];
       continuations = [''];
       hasMore = true;
+      currentPage = 0;
       await renderPage();
     } catch (e) {
       console.warn(e);
@@ -268,10 +303,10 @@
     }
   }
 
-  // Public hook (if you want to refresh from elsewhere)
+  // public refresh if you need it elsewhere
   window.FF_renderPond = boot;
 
-  // Auto-run when DOM is ready
+  // auto-run
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot, { once: true });
   } else {
