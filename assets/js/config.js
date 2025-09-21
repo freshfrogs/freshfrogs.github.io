@@ -8,5 +8,5 @@ window.FF_CFG = {
   PAGE_SIZE: 5,
   // Set your Reservoir API key at runtime (or here)
   FROG_API_KEY: (window.frog_api || "3105c552-60b6-5252-bca7-291c724a54bf"),
-  COLLECTION_START_BLOCK: 15209637
+  COLLECTION_START_BLOCK: 0
 };
