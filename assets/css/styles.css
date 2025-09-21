@@ -361,3 +361,30 @@ footer.site { border-top:1px solid var(--ring); padding:26px 0; color:var(--mute
   background: rgba(255,255,255,0.06);
   border-color: rgba(255,255,255,0.25);
 }
+/* Modal */
+.modal { position: fixed; inset: 0; display: none; z-index: 50; }
+.modal.open { display: block; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(2px); }
+.modal-panel {
+  position: relative; margin: 5vh auto; max-width: 900px; background: var(--panel); color: var(--text);
+  border: 1px solid var(--edge); border-radius: 18px; box-shadow: 0 10px 40px rgba(0,0,0,.4);
+  display: flex; flex-direction: column; gap: 16px; padding: 16px;
+}
+.modal-close { position: absolute; top: 10px; right: 10px; }
+.modal-header { display: flex; flex-direction: column; gap: 6px; }
+.modal-title { display: flex; align-items: center; gap: 10px; font-size: 18px; }
+.modal-subtitle { display: flex; align-items: center; gap: 10px; }
+.modal-body { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
+.modal-hero { aspect-ratio: 1/1; border-radius: 12px; overflow: hidden; border: 1px solid var(--edge); }
+.modal-actions { margin-top: 12px; display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+.kv { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+.kv > div { padding: 10px; border: 1px dashed var(--edge); border-radius: 12px; background: var(--panelSoft); }
+.attr-wrap .section-title { margin: 10px 0 6px; font-weight: 700; }
+.attr-list { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 6px; }
+.attr-list li { display:flex; justify-content: space-between; gap:8px; padding:8px 10px; border:1px solid var(--edge); border-radius:10px; background: var(--panelSoft); }
+.attr-list .name { font-weight: 600; }
+.attr-list .val { opacity: .9; }
+@media (max-width: 860px) {
+  .modal-body { grid-template-columns: 1fr; }
+  .kv { grid-template-columns: 1fr; }
+}
