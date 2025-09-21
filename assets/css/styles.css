@@ -391,3 +391,22 @@ footer.site { border-top:1px solid var(--ring); padding:26px 0; color:var(--mute
 /* ensure modal can display */
 .modal { display: none; }
 .modal.open { display: block !important; z-index: 9999; }
+/* Click affordance on list items that open modal */
+.list-item[data-token-id] { cursor: pointer; }
+
+/* Action layout */
+.modal-actions { display: grid; gap: 12px; }
+.action-group, .link-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+}
+#fmMorphBtn[disabled] { opacity: .6; cursor: not-allowed; }
+
+/* Modal body tidy (if not already present) */
+.modal-body { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
+@media (max-width: 860px) { .modal-body { grid-template-columns: 1fr; } }
+
+/* Hero art crisp + contained */
+#fmHero { position: relative; aspect-ratio: 1/1; border: 1px solid var(--edge); border-radius: 12px; overflow: hidden; background: var(--panelSoft); }
+#fmHero canvas, #fmHero img { position:absolute; inset:0; width:100%; height:100%; image-rendering: pixelated; }
