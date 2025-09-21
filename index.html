@@ -123,15 +123,39 @@
     </div>
   </section>
 
-  <!-- Pond -->
+  <!-- Pond (big panel below) -->
   <section id="pond" class="panel stack" aria-label="The Pond">
     <div class="row" style="justify-content:space-between;align-items:center">
       <h2 class="section-title" style="margin:0">The Pond</h2>
-      <div class="muted">Frogs currently staked in the controller</div>
+      <div class="row" style="gap:8px;align-items:center">
+        <div class="muted">Frogs currently staked in the controller</div>
+        <button id="refreshPond" class="btn btn-ghost btn-sm">Refresh</button>
+      </div>
     </div>
+
+    <!-- New: Pond stats -->
+    <div id="pondStats" class="facts" aria-label="Pond stats">
+      <div class="fact">
+        <b>Total Staked</b>
+        <div class="muted"><span id="statTotal">—</span></div>
+      </div>
+      <div class="fact">
+        <b>Controller</b>
+        <div class="muted"><a id="statController" class="addr" target="_blank" rel="noopener">—</a></div>
+      </div>
+      <div class="fact">
+        <b>Collection</b>
+        <div class="muted"><a id="statCollection" class="addr" target="_blank" rel="noopener">—</a></div>
+      </div>
+      <div class="fact">
+        <b>Last Update</b>
+        <div class="muted" id="statUpdated">—</div>
+      </div>
+    </div>
+
     <div id="pondListWrap">
       <ul id="pondList" class="card-list list-scroll" aria-live="polite"></ul>
-      <!-- (If you later add pagination, inject it here) -->
+      <!-- pager injected by pond.js -->
     </div>
   </section>
 
