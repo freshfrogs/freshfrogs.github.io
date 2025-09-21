@@ -4,11 +4,11 @@
   const ul   = document.getElementById('pondList');
   if (!wrap || !ul) return;
 
-  // ---------- config / guards ----------
+  // ---------- config ----------
   const API = 'https://api.reservoir.tools/users/activity/v6';
   const CONTROLLER = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
   const COLLECTION = CFG.COLLECTION_ADDRESS || '';
-  const PAGE_SIZE = 20; // reservoir max per call
+  const PAGE_SIZE  = 20; // reservoir max per call
 
   function apiHeaders(){
     if (!CFG.FROG_API_KEY) throw new Error('Missing FROG_API_KEY in config.js');
@@ -17,19 +17,16 @@
 
   // ---------- state ----------
   const ST = {
-    // paged results built strictly from activity (20 newest per page)
-    pages: [],                 // [{ rows: [{id, staker, since}], contIn: string|null, contOut: string|null }]
+    pages: [],                 // [{ rows: [{id, staker, since}], contIn, contOut }]
     page: 0,
-    // tokens that we've already determined are NOT in controller,
-    // because we saw a *newer* outbound event for them.
-    blockedIds: new Set(),
-    // continuation pointer for the next not-yet-fetched activity page
-    nextContinuation: ''
+    nextContinuation: '',      // for next fetch
+    blockedIds: new Set(),     // tokens that later left controller
+    acceptedIds: new Set()     // dedupe accepted across pages
   };
 
   let RANKS = null;
 
-  // ---------- small UI helpers ----------
+  // ---------- UI helpers ----------
   const fmtAgo = (d)=> d ? (FF.formatAgo(Date.now()-d.getTime())+' ago') : '—';
   const pillRank = (rank)=> (rank||rank===0)
     ? `<span class="pill">Rank <b>#${rank}</b></span>`
@@ -51,7 +48,7 @@
     const nav = ensurePager();
     nav.innerHTML = '';
 
-    // numbered buttons for pages we have
+    // numbered buttons for fetched pages
     ST.pages.forEach((_, i)=>{
       const btn = document.createElement('button');
       btn.className = 'btn btn-ghost btn-sm';
@@ -66,27 +63,94 @@
       nav.appendChild(btn);
     });
 
-    // Add "Next" number (pre-create) if there is more to fetch
+    // ellipsis "…" to fetch more, if continuation exists
     if (ST.nextContinuation){
-      const nextIdx = ST.pages.length + 1;
-      const btn = document.createElement('button');
-      btn.className = 'btn btn-ghost btn-sm';
-      btn.textContent = String(nextIdx);
-      btn.title = 'Load more';
-      btn.addEventListener('click', async ()=>{
-        // fetch next page then go to it
+      const moreBtn = document.createElement('button');
+      moreBtn.className = 'btn btn-ghost btn-sm';
+      moreBtn.setAttribute('aria-label', 'Load more pages');
+      moreBtn.title = 'Load more';
+      moreBtn.textContent = '…'; // U+2026 ellipsis
+      moreBtn.addEventListener('click', async ()=>{
         const ok = await fetchNextPage();
         if (ok){
-          ST.page = ST.pages.length - 1;
+          ST.page = ST.pages.length - 1; // jump to the new page
           renderPage();
         }
       });
-      nav.appendChild(btn);
+      nav.appendChild(moreBtn);
     }
   }
 
+  // ---------- layered 128px thumbnail (animations allowed except Frog/Hat) ----------
+  async function renderLayeredThumb128(hostEl, tokenId){
+    const size = 128;
+    const metaUrl  = `frog/json/${tokenId}.json`; // << corrected
+    const baseDir  = 'frog/build_files';          // << corrected
+
+    // container styles (inline to avoid css edits)
+    hostEl.style.position = 'relative';
+    hostEl.style.width = `${size}px`;
+    hostEl.style.height = `${size}px`;
+    hostEl.style.minWidth = `${size}px`;
+    hostEl.style.minHeight = `${size}px`;
+    hostEl.style.borderRadius = '8px';
+    hostEl.style.overflow = 'hidden';
+    hostEl.style.background = 'transparent';
+    hostEl.style.imageRendering = 'pixelated';
+
+    const ANIM_FORBIDDEN = new Set(['Frog','Hat']); // animations off for these groups
+    function addLayer(group, value){
+      const tryAnim = !ANIM_FORBIDDEN.has(group);
+      const pngSrc  = `${baseDir}/${group}/${value}.png`;
+      const gifSrc  = `${baseDir}/${group}/animations/${value}_animation.gif`;
+
+      const img = new Image();
+      img.style.position = 'absolute';
+      img.style.left = '0';
+      img.style.top = '0';
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.imageRendering = 'pixelated';
+      img.decoding = 'async';
+      img.loading = 'lazy';
+
+      if (tryAnim){
+        img.src = gifSrc;
+        img.onerror = ()=>{ img.onerror=null; img.src = pngSrc; };
+      } else {
+        img.src = pngSrc;
+      }
+      hostEl.appendChild(img);
+    }
+
+    try{
+      const meta = await FF.fetchJSON(metaUrl);
+      const attrs = Array.isArray(meta?.attributes) ? meta.attributes : [];
+      for (const a of attrs){
+        const group = a?.trait_type ?? a?.traitType ?? a?.type ?? '';
+        const value = a?.value ?? a?.trait_value ?? '';
+        if (!group || !value) continue;
+        addLayer(String(group), String(value));
+      }
+    }catch{
+      // fallback to plain png if metadata missing
+      const img = new Image();
+      img.src = `frog/${tokenId}.png`; // << corrected fallback
+      img.alt = `Frog ${tokenId}`;
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'contain';
+      img.style.imageRendering = 'pixelated';
+      hostEl.appendChild(img);
+    }
+  }
+
+  // tiny helper so we can call async without awaiting in a loop
+  function awaitable(p){ Promise.resolve(p).catch(()=>{}); }
+
   function renderPage(){
     ul.innerHTML = '';
+
     if (!ST.pages.length){
       const li = document.createElement('li');
       li.className = 'list-item';
@@ -107,16 +171,30 @@
     } else {
       rows.forEach(r=>{
         const rank = RANKS?.[String(r.id)] ?? null;
-        const li = document.createElement('li'); li.className = 'list-item';
-        li.innerHTML =
-          FF.thumb64(`${CFG.SOURCE_PATH}/frog/${r.id}.png`, `Frog ${r.id}`) +
-          `<div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <b>Frog #${r.id}</b> ${pillRank(rank)}
-            </div>
-            <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? FF.shorten(r.staker) : '—'}</div>
-          </div>
-          <div class="price">Staked</div>`;
+
+        const li = document.createElement('li');
+        li.className = 'list-item';
+
+        // left: layered 128
+        const thumb = document.createElement('div');
+        awaitable(renderLayeredThumb128(thumb, r.id));
+        li.appendChild(thumb);
+
+        // middle: text
+        const mid = document.createElement('div');
+        mid.innerHTML =
+          `<div style="display:flex;align-items:center;gap:8px;">
+             <b>Frog #${r.id}</b> ${pillRank(rank)}
+           </div>
+           <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? FF.shorten(r.staker) : '—'}</div>`;
+        li.appendChild(mid);
+
+        // right: tag
+        const right = document.createElement('div');
+        right.className = 'price';
+        right.textContent = 'Staked';
+        li.appendChild(right);
+
         ul.appendChild(li);
       });
     }
@@ -124,13 +202,8 @@
     renderPager();
   }
 
-  // ---------- activity fetch & selection logic ----------
-  // We walk activities newest -> older. For each token:
-  //  - If the newest-seen event is outbound (from controller), the token is NOT currently staked => block it.
-  //  - If the newest-seen event is inbound (to controller) and token not blocked, we take it with {staker, since}.
-  // We carry `blockedIds` across pages so older pages won’t re-add withdrawn tokens.
+  // ---------- activity selection ----------
   function selectCurrentlyStakedFromActivities(activities){
-    // keep in-page dedupe so we don’t double-handle the same token in one batch
     const seenThisPage = new Set();
     const out = [];
 
@@ -139,28 +212,28 @@
       if (!tok) continue;
       const id = Number(tok);
       if (!Number.isFinite(id)) continue;
-      if (seenThisPage.has(id)) continue; // already decided on this page
+      if (seenThisPage.has(id)) continue;
       seenThisPage.add(id);
 
-      const to  = (a?.toAddress   || '').toLowerCase();
-      const from= (a?.fromAddress || '').toLowerCase();
+      const to   = (a?.toAddress   || '').toLowerCase();
+      const from = (a?.fromAddress || '').toLowerCase();
 
-      // outbound from controller? then block it globally
-      if (from === CONTROLLER){
-        ST.blockedIds.add(id);
-        continue;
-      }
+      if (from === CONTROLLER){ ST.blockedIds.add(id); continue; } // outbound ⇒ not staked
 
-      // inbound to controller? if not blocked, accept as currently staked
-      if (to === CONTROLLER){
-        if (!ST.blockedIds.has(id)){
-          const since = a?.createdAt ? new Date(a.createdAt)
-                      : (a?.timestamp ? new Date(a.timestamp*1000) : null);
-          out.push({ id, staker: a?.fromAddress || null, since });
-        }
+      if (to === CONTROLLER && !ST.blockedIds.has(id) && !ST.acceptedIds.has(id)){
+        const since = a?.createdAt ? new Date(a.createdAt)
+                    : (a?.timestamp ? new Date(a.timestamp*1000) : null);
+        out.push({ id, staker: a?.fromAddress || null, since });
+        ST.acceptedIds.add(id);
       }
     }
 
+    // oldest -> newest (ascending)
+    out.sort((a,b)=>{
+      const ta = a.since ? a.since.getTime() : 0;
+      const tb = b.since ? b.since.getTime() : 0;
+      return ta - tb;
+    });
     return out;
   }
 
@@ -180,30 +253,19 @@
   }
 
   async function fetchNextPage(){
-    // Try to get a page that yields at least 1 “currently staked” row.
-    // If a page yields 0 (because all 20 were outbound), we keep pulling until we either
-    //  - get at least 1 inbound row, or
-    //  - run out of continuation.
-    let cont = ST.nextContinuation || '';
-    for (let safety=0; safety<50; safety++){
-      const { activities, continuation } = await fetchActivitiesPage(cont);
-      cont = continuation;
+    const cont = ST.nextContinuation || '';
+    const { activities, continuation } = await fetchActivitiesPage(cont);
+    const rows = selectCurrentlyStakedFromActivities(activities);
+    ST.pages.push({ rows, contIn: ST.nextContinuation || null, contOut: continuation || null });
+    ST.nextContinuation = continuation || '';
+    return true;
+  }
 
-      const rows = selectCurrentlyStakedFromActivities(activities);
-      // Sort newest first (activities already newest first, but be explicit by time)
-      rows.sort((a,b)=>{
-        const ta = a.since ? a.since.getTime() : 0;
-        const tb = b.since ? b.since.getTime() : 0;
-        return tb - ta;
-      });
-
-      // record page even if empty (so pager can still advance)
-      ST.pages.push({ rows, contIn: ST.nextContinuation || null, contOut: cont || null });
-      ST.nextContinuation = cont;
-
-      if (rows.length > 0 || !cont) return true; // page ready
+  async function prefetchInitialPages(n=3){
+    for (let i=0; i<n; i++){
+      const ok = await fetchNextPage();
+      if (!ok || !ST.nextContinuation) break;
     }
-    return false;
   }
 
   // ---------- main ----------
@@ -216,19 +278,20 @@
       }
 
       // load ranks (optional)
-      try {
-        RANKS = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json');
-      } catch { RANKS = {}; }
+      try { RANKS = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json'); }
+      catch { RANKS = {}; }
 
       // reset state
       ST.pages = [];
       ST.page = 0;
-      ST.blockedIds = new Set();
       ST.nextContinuation = '';
+      ST.blockedIds = new Set();
+      ST.acceptedIds = new Set();
 
-      // first page
-      const ok = await fetchNextPage();
-      if (!ok){
+      // prefetch first 3 pages so pager shows: [1] [2] [3] […]
+      await prefetchInitialPages(3);
+
+      if (!ST.pages.length){
         ul.innerHTML = `<li class="list-item"><div class="muted">No frogs are currently staked.</div></li>`;
         ensurePager().innerHTML = '';
         return;
