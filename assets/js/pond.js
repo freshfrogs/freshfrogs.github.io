@@ -1,160 +1,160 @@
 // assets/js/pond.js
 (function(FF, CFG){
-  let STAKED = []; // [{ id, staker, since: Date }]
+  const ul = document.getElementById('pondList');
+  if (!ul) return;
 
-  const API = 'https://api.reservoir.tools';
-  const HDR = { accept:'*/*', 'x-api-key': CFG.FROG_API_KEY };
-  const MAX_PAGES = 10;
+  let RANKS = null;
 
-  function $(id){ return document.getElementById(id); }
-  function hostUL(root){
-    let el = typeof root==='string' ? $(root) : root;
-    if(!el) el = $('pondList') || $('tab-pond') || $('pondPanel');
-    if(!el) return {};
-    let ul = (el.tagName==='UL') ? el : el.querySelector('ul');
-    if(!ul){
-      ul = document.createElement('ul');
-      ul.className = 'card-list list-scroll';
-      el.appendChild(ul);
+  async function loadRanks() {
+    if (RANKS) return RANKS;
+    try {
+      const data = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json');
+      // File is { "3090":1, "2917":2, ... } mapping tokenId -> rank
+      RANKS = data || {};
+    } catch {
+      RANKS = {};
     }
-    return { host: el, ul };
-  }
-  function safeDate(raw){
-    if(raw==null) return null;
-    if(typeof raw==='number'){ const ms = raw < 1e12 ? raw*1000 : raw; return new Date(ms); }
-    const t = Date.parse(raw); return Number.isNaN(t) ? null : new Date(t);
-  }
-  function ago(d){ return d ? (FF.formatAgo ? FF.formatAgo(Date.now()-d.getTime()) : '') : ''; }
-
-  async function fetchTransfers(params){
-    const qs = new URLSearchParams(params);
-    const res = await fetch(`${API}/transfers/v3?${qs.toString()}`, { headers: HDR });
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    return res.json();
+    return RANKS;
   }
 
-  async function scanToController(){
-    const inMap = Object.create(null); // tokenId -> { ts, from }
+  // -------- Reservoir: all tokens owned by controller (staked set) --------
+  async function fetchControllerTokens(limitPerPage = 200, maxPages = 30){
+    const out = [];
+    const key = CFG.FROG_API_KEY;
+    if (!key) return out;
+
     let continuation = '';
-    for(let i=0;i<MAX_PAGES;i++){
-      const q = {
-        contract: CFG.COLLECTION_ADDRESS,
-        to: CFG.CONTROLLER_ADDRESS,
-        limit: '200',
-        sortBy: 'timestamp',
-        sortDirection: 'desc'
-      };
-      if(continuation) q.continuation = continuation;
-      const json = await fetchTransfers(q);
-      const rows = json?.transfers || [];
-      for(const t of rows){
-        const id = Number(t?.token?.tokenId ?? t?.tokenId);
-        if(!Number.isFinite(id)) continue;
-        if(!inMap[id]){
-          inMap[id] = {
-            ts: safeDate(t?.timestamp ?? t?.createdAt ?? t?.txTimestamp),
-            from: t?.fromAddress || t?.from || null
-          };
-        }
-      }
+    const base = 'https://api.reservoir.tools/tokens/v7';
+
+    for (let i=0; i<maxPages; i++){
+      const params = new URLSearchParams({
+        collection: CFG.COLLECTION_ADDRESS,
+        owner: CFG.CONTROLLER_ADDRESS,
+        limit: String(limitPerPage),
+        includeTopBid: 'false'
+      });
+      if (continuation) params.set('continuation', continuation);
+
+      const res = await fetch(`${base}?${params.toString()}`, {
+        headers: { accept:'*/*', 'x-api-key': key }
+      });
+      if (!res.ok) break;
+
+      const json = await res.json();
+      const arr = (json?.tokens || []).map(t => {
+        const tokenId = t?.token?.tokenId ?? t?.tokenId ?? t?.id;
+        const img = t?.token?.image ?? null;
+        return tokenId != null ? { id: Number(tokenId), image: img } : null;
+      }).filter(Boolean);
+
+      out.push(...arr);
       continuation = json?.continuation || '';
-      if(!continuation) break;
+      if (!continuation) break;
     }
-    return inMap;
+    return out;
   }
 
-  async function scanFromController(){
-    const outMap = Object.create(null); // tokenId -> { ts }
-    let continuation = '';
-    for(let i=0;i<MAX_PAGES;i++){
-      const q = {
-        contract: CFG.COLLECTION_ADDRESS,
-        from: CFG.CONTROLLER_ADDRESS,
-        limit: '200',
-        sortBy: 'timestamp',
-        sortDirection: 'desc'
-      };
-      if(continuation) q.continuation = continuation;
-      const json = await fetchTransfers(q);
-      const rows = json?.transfers || [];
-      for(const t of rows){
-        const id = Number(t?.token?.tokenId ?? t?.tokenId);
-        if(!Number.isFinite(id)) continue;
-        if(!outMap[id]){
-          outMap[id] = { ts: safeDate(t?.timestamp ?? t?.createdAt ?? t?.txTimestamp) };
-        }
-      }
-      continuation = json?.continuation || '';
-      if(!continuation) break;
-    }
-    return outMap;
-  }
+  // -------- On-chain: last Transfer(to=controller, tokenId) -> staker + time --------
+  async function getStakeInfoBatch(ids){
+    if (!window.ethereum || !ids.length) return [];
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-  async function loadStakedViaReservoir(){
-    const [inMap, outMap] = await Promise.all([
-      scanToController(),
-      scanFromController()
+    const iface = new ethers.utils.Interface([
+      'event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)'
     ]);
-    const ids = Object.keys(inMap).map(n=>Number(n)).filter(Number.isFinite);
+    const topicTransfer = iface.getEventTopic('Transfer');
+    const toTopic = ethers.utils.hexZeroPad(CFG.CONTROLLER_ADDRESS, 32);
+
+    const fromBlock = (CFG.COLLECTION_START_BLOCK ?? 0);
+
+    // Fetch logs per token (serially to avoid provider throttling)
     const rows = [];
-    for(const id of ids){
-      const inbound = inMap[id];
-      const outbound = outMap[id];
-      const inTs = inbound?.ts ? inbound.ts.getTime() : -1;
-      const outTs = outbound?.ts ? outbound.ts.getTime() : -1;
-      if(inTs > outTs){
-        rows.push({ id, staker: inbound?.from || null, since: inbound?.ts || null });
+    for (const id of ids){
+      try{
+        const idTopic = ethers.utils.hexZeroPad(ethers.BigNumber.from(String(id)).toHexString(), 32);
+        const logs = await provider.getLogs({
+          fromBlock,
+          toBlock: 'latest',
+          address: CFG.COLLECTION_ADDRESS,
+          topics: [topicTransfer, null, toTopic, idTopic]
+        });
+        if (!logs.length) {
+          rows.push({ id, staker: null, since: null });
+          continue;
+        }
+        const last = logs[logs.length-1];
+        const parsed = iface.parseLog(last);
+        const staker = parsed.args.from;
+        const blk = await provider.getBlock(last.blockNumber);
+        const since = new Date(blk.timestamp * 1000);
+        rows.push({ id, staker, since });
+      }catch{
+        rows.push({ id, staker: null, since: null });
       }
     }
-    rows.sort((a,b)=> (b.since?b.since.getTime():0) - (a.since?a.since.getTime():0));
     return rows;
   }
 
-  // Render all (sales-like rows)
-  async function renderAll(container){
-    const { ul } = hostUL(container);
-    if(!ul) return;
-    ul.innerHTML = '';
+  function lineTime(date){
+    if (!date) return '—';
+    return FF.formatAgo(Date.now() - date.getTime()) + ' ago';
+  }
 
-    if(!STAKED.length){
-      ul.innerHTML = '<li class="list-item"><div class="muted">No frogs are currently staked.</div></li>';
+  function render(items){
+    ul.innerHTML = '';
+    if (!items.length){
+      const li = document.createElement('li');
+      li.className = 'list-item';
+      li.innerHTML = `<div class="muted">No frogs are currently staked.</div>`;
+      ul.appendChild(li);
       return;
     }
 
-    try{ await FF.ensureRarity?.(); }catch{}
-
-    STAKED.forEach(({id, staker, since})=>{
-      const rank = FF.getRankById ? FF.getRankById(id) : null;
-      const badge = (rank||rank===0)
+    for (const it of items){
+      const rank = (RANKS && RANKS[String(it.id)]) || null;
+      const pill = (rank || rank === 0)
         ? `<span class="pill">Rank <b>#${rank}</b></span>`
         : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
 
-      const li = document.createElement('li'); li.className='list-item';
+      const li = document.createElement('li');
+      li.className = 'list-item';
       li.innerHTML =
-        FF.thumb64(`${CFG.SOURCE_PATH}/frog/${id}.png`, `Frog ${id}`) +
+        FF.thumb64(`${CFG.SOURCE_PATH}/frog/${it.id}.png`, `Frog ${it.id}`) +
         `<div>
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <b>Frog #${id}</b> ${badge}
+          <div style="display:flex;align-items:center;gap:8px;">
+            <b>Frog #${it.id}</b> ${pill}
           </div>
-          <div class="muted">${since ? (ago(since)+' ago') : '—'} • Staker ${staker ? FF.shorten(String(staker)) : '—'}</div>
-        </div>`;
-      li.addEventListener('click', ()=> FF.openFrogModal?.({ id }));
+          <div class="muted">Staked ${lineTime(it.since)} • Staker ${it.staker ? FF.shorten(it.staker) : '—'}</div>
+        </div>
+        <div class="price">Staked</div>`;
       ul.appendChild(li);
-    });
+    }
   }
 
-  async function renderPond(container){
-    if(!CFG.FROG_API_KEY){ console.warn('Pond: missing FROG_API_KEY'); }
+  async function loadPond(){
     try{
-      STAKED = await loadStakedViaReservoir();
+      // 1) ranks first (non-blocking for UI correctness but we await so pills are correct)
+      await loadRanks();
+
+      // 2) reservoir list of tokens held by controller
+      const base = await fetchControllerTokens();
+
+      // 3) on-chain stake info (staker + since)
+      const info = await getStakeInfoBatch(base.map(x=>x.id));
+
+      // 4) merge and render
+      const map = new Map(info.map(r => [r.id, r]));
+      const merged = base.map(x => Object.assign({ image: x.image }, map.get(x.id) || { id:x.id, staker:null, since:null }));
+      render(merged);
     }catch(e){
       console.warn('Pond load failed', e);
-      STAKED = [];
+      ul.innerHTML = `<li class="list-item"><div class="muted">Failed to load the pond.</div></li>`;
     }
-    await renderAll(container);
   }
 
-  // public
-  window.FF_renderPond = renderPond;
-  window.FF_refreshPond = renderPond;
+  // auto-run on load
+  loadPond();
+  // expose manual hook if you want to refresh later
+  window.FF_reloadPond = loadPond;
+
 })(window.FF, window.FF_CFG);

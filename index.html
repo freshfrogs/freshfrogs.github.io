@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>FreshFrogs — Wallet, Sales, Rarity, Staking</title>
+  <title>FreshFrogs — Wallet, Staking, Pond</title>
 
   <!-- Fonts + Ethers -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Grotesk:wght@600;800&display=swap" rel="stylesheet">
@@ -19,7 +19,6 @@
     <nav class="nav">
       <a href="#gallery">Collection</a>
       <a href="#trade">Mint & Staking</a>
-      <a href="#features">Features</a>
       <a href="#pond">The Pond</a>
       <a href="#about">About</a>
       <a href="#faq">FAQ</a>
@@ -128,28 +127,6 @@
     </div>
   </section>
 
-  <!-- Features: Sales (left) + Rarity (right) -->
-  <section id="features" class="two-col" aria-label="Features">
-    <div class="panel stack same-height">
-      <div class="row" style="justify-content:space-between;align-items:center">
-        <h2 class="section-title" style="margin:0">Recent Sales</h2>
-        <button id="fetchLiveBtn" class="btn btn-ghost btn-sm">Refresh</button>
-      </div>
-      <ul id="recentSales" class="card-list list-scroll" aria-live="polite"></ul>
-    </div>
-
-    <div class="panel stack same-height">
-      <div class="row" style="justify-content:space-between;align-items:center">
-        <h2 class="section-title" style="margin:0">Rarity Rankings</h2>
-        <div class="row">
-          <button id="sortRankBtn"  class="btn btn-ghost btn-sm">By Rank</button>
-          <button id="sortScoreBtn" class="btn btn-ghost btn-sm">By Score</button>
-        </div>
-      </div>
-      <ul id="rarityList" class="card-list list-scroll" aria-live="polite"></ul>
-    </div>
-  </section>
-
   <!-- Pond (big panel below) -->
   <section id="pond" class="panel stack" aria-label="The Pond">
     <div class="row" style="justify-content:space-between;align-items:center">
@@ -202,8 +179,6 @@
 <script src="assets/js/utils.js"></script>
 <script src="assets/js/theme.js"></script>
 <script src="assets/js/grid.js"></script>
-<script src="assets/js/rarity.js"></script>
-<script src="assets/js/sales.js"></script>
 <script src="assets/js/wallet.js"></script>
 <script src="assets/js/owned.js"></script>
 <script src="assets/js/staking.js"></script>
