@@ -166,17 +166,34 @@
   }
 
   function liCard(id, subtitle){
-    const li = document.createElement('li'); li.className = 'list-item';
+    const li = document.createElement('li'); 
+    li.className = 'list-item';
 
-    // enable modal click-delegation for Owned/Staked items
+    // attributes for future-proofing (still useful)
+    const isStaked = !!(ST && ST.mode === 'staked');
+    const ownerAddr = (ST && ST.addr) ? ST.addr : '';
+
     li.setAttribute('data-token-id', String(id));
-    li.setAttribute('data-src', (ST && ST.mode === 'staked') ? 'staked' : 'owned');
-    li.setAttribute('data-owner', (ST && ST.addr) ? ST.addr : '');
-    li.setAttribute('data-staked', (ST && ST.mode === 'staked') ? 'true' : 'false');
+    li.setAttribute('data-src', isStaked ? 'staked' : 'owned');
+    li.setAttribute('data-owner', ownerAddr);
+    li.setAttribute('data-staked', isStaked ? 'true' : 'false');
+
+    // 🔔 direct open: bypass delegation so clicks always work
+    li.addEventListener('click', (e) => {
+      // avoid conflicts if you add inner buttons later
+      const target = e.target.closest('a,button,[data-no-modal]');
+      if (target) return;
+      if (window.FFModal && typeof window.FFModal.openFrogModal === 'function') {
+        window.FFModal.openFrogModal({ id, owner: ownerAddr, staked: isStaked });
+      } else {
+        console.warn('FFModal not found. Make sure assets/js/modal.js is included before main.js');
+      }
+    });
 
     const left = document.createElement('div');
     Object.assign(left.style,{width:'128px',height:'128px',minWidth:'128px',minHeight:'128px'});
-    li.appendChild(left); buildFrog128(left, id);
+    li.appendChild(left); 
+    buildFrog128(left, id);
 
     const rank = (RANKS && (String(id) in RANKS)) ? RANKS[String(id)] : null;
     const mid = document.createElement('div');
@@ -189,6 +206,7 @@
 
     return li;
   }
+
 
   // ------- data fetchers -------
   async function fetchOwnedIds(addr){
