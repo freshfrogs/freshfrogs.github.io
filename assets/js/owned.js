@@ -43,6 +43,16 @@
     return `${s}s ago`;
   };
 
+  // ------- rarity -------
+  let RANKS = null;
+  async function loadRanks(){
+    try { RANKS = await (await fetch('assets/freshfrogs_rank_lookup.json')).json(); }
+    catch { RANKS = {}; }
+  }
+  const pillRank = (rank)=> (rank||rank===0)
+    ? `<span class="pill">Rank <b>#${rank}</b></span>`
+    : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
+
   // ------- 128px layered renderer (same look as Pond) -------
   const NO_ANIM_FOR = new Set(['Hat','Frog','Trait']);
   const NO_LIFT_FOR = new Set(['Frog','Trait','SpecialFrog']);
@@ -52,15 +62,15 @@
 
   function pickBestBgUrl(id){
     const local = `frog/${id}.png`;
-    const leading = `/frog/${id}.png`;
-    const cfg = (CFG.SOURCE_PATH ? `${CFG.SOURCE_PATH}/frog/${id}.png` : local);
-    return [local, leading, cfg];
+    const root  = `/frog/${id}.png`;
+    const cfg   = (CFG.SOURCE_PATH ? `${CFG.SOURCE_PATH}/frog/${id}.png` : local);
+    return [local, root, cfg];
   }
   async function applyFrogBackground(container, tokenId){
     Object.assign(container.style, {
       backgroundRepeat:'no-repeat',
-      backgroundSize:'2000% 2000%',
-      backgroundPosition:'100% 100%',
+      backgroundSize:'2000% 2000%',      // big zoom
+      backgroundPosition:'100% 100%',    // bottom-right = show only bg color area
       imageRendering:'pixelated'
     });
     const urls = pickBestBgUrl(tokenId);
@@ -151,12 +161,23 @@
   function setStatus(msg){ if (status) status.textContent = msg; }
   function clearList(){ if (ul) ul.innerHTML=''; }
 
-  function liCard(id, rightText){
+  function liCard(id, subtitle){
     const li=document.createElement('li'); li.className='list-item';
+
+    // left: frog
     const left = mk('div',{}, {width:'128px',height:'128px',minWidth:'128px',minHeight:'128px'});
     li.appendChild(left); buildFrog128(left, id);
-    const mid = mk('div'); mid.innerHTML = `<b>Frog #${id}</b>` + (rightText?`<div class="muted">${rightText}</div>`:'');
+
+    // middle: name + rank + subtitle
+    const rank = (RANKS && (String(id) in RANKS)) ? RANKS[String(id)] : null;
+    const mid = mk('div');
+    mid.innerHTML =
+      `<div style="display:flex;align-items:center;gap:8px;">
+         <b>Frog #${id}</b> ${pillRank(rank)}
+       </div>
+       <div class="muted">${subtitle || ''}</div>`;
     li.appendChild(mid);
+
     return li;
   }
 
@@ -185,18 +206,15 @@
     }
     return out;
   }
-
   async function renderOwned(){
     setStatus('Loading owned…');
     clearList();
     try{
-      ST.owned = await fetchOwned(ST.addr);
-      if (!ST.owned.length){
-        setStatus('No owned frogs in this wallet for this collection.');
-        return;
-      }
-      ST.owned.forEach(id=> ul.appendChild(liCard(id)));
-      setStatus(`Showing ${ST.owned.length.toLocaleString()} owned frog(s).`);
+      const ids = await fetchOwned(ST.addr);
+      ST.owned = ids;
+      if (!ids.length){ setStatus('No owned frogs in this wallet for this collection.'); return; }
+      ids.forEach(id=> ul.appendChild(liCard(id, 'Not staked')));
+      setStatus(`Showing ${ids.length.toLocaleString()} owned frog(s).`);
     }catch(e){
       console.warn('Owned load failed', e);
       setStatus('Failed to load owned frogs.');
@@ -221,7 +239,6 @@
         const since = a?.createdAt ? new Date(a.createdAt) :
                       (a?.timestamp ? new Date(a.timestamp*1000) : null);
         const prev = map.get(id);
-        // keep newest inbound entry
         if (!prev || (since && prev.since && since.getTime()>prev.since.getTime())) map.set(id, {id, since});
         else if (!prev) map.set(id,{id,since});
       }
@@ -230,7 +247,6 @@
     }
     return [...map.values()];
   }
-
   async function confirmStakedByUser(addr, candidates){
     if (!window.ethereum) return [];
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -250,7 +266,6 @@
     }
     return out;
   }
-
   async function renderStaked(){
     setStatus('Loading staked…');
     clearList();
@@ -262,10 +277,7 @@
         const tb = b.since ? b.since.getTime() : 0;
         return ta - tb;
       });
-      if (!ST.staked.length){
-        setStatus('No frogs from this wallet are currently staked.');
-        return;
-      }
+      if (!ST.staked.length){ setStatus('No frogs from this wallet are currently staked.'); return; }
       ST.staked.forEach(r=>{
         const info = r.since ? `Staked ${fmtAgo(Date.now()-r.since.getTime())}` : 'Staked';
         ul.appendChild(liCard(r.id, info));
@@ -282,19 +294,33 @@
     ST.addr = await getAddr();
     if (!ST.addr){ setStatus('No wallet connected.'); clearList(); return; }
     ST.mode = mode;
+    if (!RANKS) await loadRanks();
     if (mode === 'owned') await renderOwned();
     else await renderStaked();
+
+    // notify tab UI to move slider
+    document.dispatchEvent(new CustomEvent('ff-tabs-updated', { detail: { which: mode } }));
   }
 
+  const tabOwned = document.getElementById('tabOwned');
+  const tabStaked= document.getElementById('tabStaked');
   if (tabOwned){
-    tabOwned.addEventListener('click', ()=>{ tabOwned.setAttribute('aria-selected','true'); tabStaked?.setAttribute('aria-selected','false'); refresh('owned'); });
+    tabOwned.addEventListener('click', ()=>{
+      tabOwned.setAttribute('aria-selected','true');
+      tabStaked?.setAttribute('aria-selected','false');
+      refresh('owned');
+    });
   }
   if (tabStaked){
-    tabStaked.addEventListener('click', ()=>{ tabStaked.setAttribute('aria-selected','true'); tabOwned?.setAttribute('aria-selected','false'); refresh('staked'); });
+    tabStaked.addEventListener('click', ()=>{
+      tabStaked.setAttribute('aria-selected','true');
+      tabOwned?.setAttribute('aria-selected','false');
+      refresh('staked');
+    });
   }
-  if (refreshBtn){
-    refreshBtn.addEventListener('click', ()=>refresh(ST.mode));
-  }
+
+  const refreshBtn = document.getElementById('refreshOwned');
+  if (refreshBtn){ refreshBtn.addEventListener('click', ()=>refresh(ST.mode)); }
 
   // initial
   refresh('owned');
