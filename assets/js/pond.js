@@ -74,16 +74,67 @@
     if (!nav){
       nav = document.createElement('div');
       nav.id = 'pondPager';
-      nav.style.marginTop = '8px';
+      // make sure it actually shows up (some themes hide empty .row)
+      Object.assign(nav.style, {
+        marginTop: '8px',
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '6px',
+        alignItems: 'center'
+      });
       nav.className = 'row';
       wrap.appendChild(nav);
     }
     return nav;
   }
-
+  
   // We fetch pages newest->older, but DISPLAY oldest->newest.
   const storeIdxFromDisplay = (dispIdx)=> (ST.pages.length - 1 - dispIdx);
   const displayIdxFromStore = (storeIdx)=> (ST.pages.length - 1 - storeIdx);
+
+  // ---------- PAGER (restored: [1] [2] [3] …) ----------
+  function renderPager(){
+    const nav = ensurePager();
+    nav.innerHTML = '';
+
+    // show numbered buttons for all fetched pages (oldest -> newest)
+    for (let disp=0; disp<ST.pages.length; disp++){
+      const sIdx = storeIdxFromDisplay(disp); // convert to internal index
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-ghost btn-sm';
+      btn.textContent = String(disp + 1);
+      if (sIdx === ST.page){
+        btn.classList.add('btn-solid');
+        btn.setAttribute('aria-current', 'page');
+      }
+      btn.addEventListener('click', ()=>{
+        if (ST.page !== sIdx){
+          ST.page = sIdx;
+          renderPage();
+        }
+      });
+      nav.appendChild(btn);
+    }
+
+    // trailing ellipsis (…) to fetch the next page if continuation exists
+    if (ST.nextContinuation){
+      const moreBtn = document.createElement('button');
+      moreBtn.className = 'btn btn-ghost btn-sm';
+      moreBtn.setAttribute('aria-label', 'Load more pages');
+      moreBtn.title = 'Load more';
+      moreBtn.textContent = '…';
+      moreBtn.addEventListener('click', async ()=>{
+        const ok = await fetchNextPage();
+        if (ok){
+          // jump to the oldest newly added page (end of display list)
+          ST.page = ST.pages.length - 1;
+          renderPage();
+          renderStatsBar?.(); // keeps "Last Update" fresh if present
+        }
+      });
+      nav.appendChild(moreBtn);
+    }
+  }
 
   function renderPage(){
     ul.innerHTML = '';
@@ -120,13 +171,13 @@
         li.appendChild(left);
         buildFrog128(left, r.id);
 
-        // Middle: text block — only label changed to "Owned by"
+        // Middle: text block — (current copy: "Staker")
         const mid = document.createElement('div');
         mid.innerHTML =
           `<div style="display:flex;align-items:center;gap:8px;">
              <b>Frog #${r.id}</b> ${pillRank(rank)}
            </div>
-           <div class="muted">Staked ${fmtAgo(r.since)} • Owned by ${r.staker ? FF.shorten(r.staker) : '—'}</div>`;
+           <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? shorten(r.staker) : '—'}</div>`;
         li.appendChild(mid);
 
         // Right: tag
@@ -381,8 +432,7 @@
       rows.forEach(r=>{
         const rank = RANKS?.[String(r.id)] ?? null;
 
-        const li = document.createElement('li');
-        li.className = 'list-item';
+        const li = mk('li', { className:'list-item' });
 
         // Left: layered 128x128 with bg trick
         const left = mk('div', {}, {
