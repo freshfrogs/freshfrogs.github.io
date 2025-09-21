@@ -13,7 +13,8 @@
 
     // Pond: paged render (if pond.js is present)
     const pondEl = document.getElementById('pondList');
-    if(pondEl && window.FF_renderPondPaged){ window.FF_renderPondPaged(pondEl); }
+    if (pondEl && window.FF_renderPondPaged) window.FF_renderPondPaged(pondEl);
+
 
     // Default staking tab to OWNED
     if(window.FF_setTab) window.FF_setTab('owned');
