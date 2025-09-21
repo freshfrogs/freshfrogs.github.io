@@ -1,7 +1,8 @@
 window.FF = window.FF || {};
 (function(FF, CFG){
   FF.shorten = (addr)=> addr ? (addr.slice(0,6)+'…'+addr.slice(-4)) : '';
-  FF.thumb64 = (src,alt)=> `<img class="thumb64" src="${src}" alt="${alt}" width="64" height="64" loading="lazy">`;
+  FF.thumb64 = (src, alt) =>
+    `<img class="thumb128" src="${src}" alt="${alt}" width="128" height="128" loading="lazy">`;
   FF.togglePagerBtns = (prefix,page,total)=>{
     const pages=Math.ceil((total||1)/CFG.PAGE_SIZE)||1;
     const more=document.getElementById(prefix+'More');

@@ -89,6 +89,14 @@ footer.site { border-top:1px solid var(--ring); padding:26px 0; color:var(--mute
 }
 .addr { font-family: ui-monospace, Menlo, Consolas, monospace; }
 
+/* Larger list thumbnails */
+.thumb128{
+  width:128px; height:128px;
+  min-width:128px; min-height:128px;
+  border-radius:8px; object-fit:cover; aspect-ratio:1/1;
+  image-rendering:pixelated;
+}
+
 /* Hero + Gallery */
 .hero {
   padding:56px 0 22px;

@@ -1,27 +1,47 @@
 // assets/js/staking.js
 (function(FF, CFG){
-  const ST = { items:[], page:0, pageSize:5 };
-  let provider, signer, controller, collection;
+  const ST = { items:[], page:0, pageSize:5, loaded:false };
 
-  // ---- Inline ABIs (no network fetch; avoids 404s) ----
+  // Read-only provider (works without wallet) and optional wallet provider
+  const readProvider = new ethers.providers.JsonRpcProvider('https://cloudflare-eth.com');
+  let walletProvider = null, signer = null;
+  let controller = null, collection = null;
+
   const CONTROLLER_ABI = [
     {"inputs":[{"internalType":"address","name":"_user","type":"address"}],"name":"getStakedTokens","outputs":[{"components":[{"internalType":"address","name":"staker","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"internalType":"struct StakedToken[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},
     {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},
     {"inputs":[{"internalType":"address","name":"_staker","type":"address"}],"name":"availableRewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-    // optional helpers if your controller has them
     {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"stakerAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
-    {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"stakerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}
+    {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"stakerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+    {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"stakers","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+    {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"tokenIdToStaker","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+    {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"ownerOfStaked","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+    {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"stakedOwnerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}
   ];
   const ERC721_MIN_ABI = [
     "event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)",
     "function ownerOf(uint256 tokenId) view returns (address)"
   ];
 
-  // ---- helpers ----
+  async function initContracts(){
+    if (!controller){
+      if (window.ethereum){
+        walletProvider = new ethers.providers.Web3Provider(window.ethereum);
+        signer = walletProvider.getSigner();
+      }
+      controller = new ethers.Contract(CFG.CONTROLLER_ADDRESS, CONTROLLER_ABI, signer || readProvider);
+    }
+    if (!collection){
+      collection = new ethers.Contract(CFG.COLLECTION_ADDRESS, ERC721_MIN_ABI, readProvider);
+    }
+    return true;
+  }
+
+  // ---------- helpers ----------
   function fmtWholeFromWei(weiLike){
-    try { const f = parseFloat(ethers.utils.formatUnits(weiLike, 18)); return Math.round(f).toString(); }
+    try { return String(Math.round(parseFloat(ethers.utils.formatUnits(weiLike, 18)))); }
     catch { try { const bn = typeof weiLike==='bigint'?weiLike:BigInt(String(weiLike)); return (bn/(10n**18n)).toString(); }
-    catch { const n=Number(weiLike); return Math.round(n/1e18).toString(); } }
+    catch { const n=Number(weiLike); return String(Math.round(n/1e18)); } }
   }
   function sinceShort(date){
     if (!date) return '';
@@ -33,36 +53,55 @@
   }
   function isAddr(x){ return /^0x[a-fA-F0-9]{40}$/.test(String(x||'')); }
   const zaddr="0x0000000000000000000000000000000000000000";
+  const START_BLOCK = Number(CFG.COLLECTION_START_BLOCK || 0);
 
-  // ---- tabs (Owned / Staked) ----
-  let currentTab='owned';
-  const tabOwned=document.getElementById('tabOwned');
-  const tabStaked=document.getElementById('tabStaked');
-  const tabsWrap=document.getElementById('stakeTabs');
-  function setTab(which){
-    currentTab=which;
-    const owned=(which==='owned');
-    tabOwned?.setAttribute('aria-selected', owned?'true':'false');
-    tabStaked?.setAttribute('aria-selected', owned?'false':'true');
-    tabsWrap?.style.setProperty('--tab-i', owned?0:1);
-    render();
+  async function resolveStaker(tokenId){
+    await initContracts();
+    const tryFns = ['stakerAddress','stakerOf','stakers','tokenIdToStaker','ownerOfStaked','stakedOwnerOf'];
+    for (const fn of tryFns){
+      try{
+        if (typeof controller[fn] === 'function'){
+          const a = await controller[fn](ethers.BigNumber.from(String(tokenId)));
+          if (isAddr(a) && a !== zaddr) return ethers.utils.getAddress(a);
+        }
+      }catch{}
+    }
+    try{
+      const iface = new ethers.utils.Interface(['event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)']);
+      const topicTransfer = iface.getEventTopic('Transfer');
+      const toTopic = ethers.utils.hexZeroPad(CFG.CONTROLLER_ADDRESS, 32);
+      const idTopic = ethers.utils.hexZeroPad(ethers.BigNumber.from(String(tokenId)).toHexString(), 32);
+      const logs = await readProvider.getLogs({
+        fromBlock: START_BLOCK, toBlock: 'latest',
+        address: CFG.COLLECTION_ADDRESS, topics: [topicTransfer, null, toTopic, idTopic]
+      });
+      if (!logs.length) return null;
+      const fromAddr = ethers.utils.getAddress('0x'+logs[logs.length-1].topics[1].slice(26));
+      return fromAddr;
+    }catch{ return null; }
   }
-  tabOwned?.addEventListener('click', ()=> setTab('owned'));
-  tabStaked?.addEventListener('click', ()=> setTab('staked'));
-  window.FF_getTab = ()=> currentTab;
 
-  // ---- ethers / contracts (no fetchJSON) ----
-  async function initEthers(){
-    if (provider && signer && controller) return true;
-    if(!window.ethereum) return false;
-    provider = new ethers.providers.Web3Provider(window.ethereum);
-    signer = provider.getSigner();
-    controller = new ethers.Contract(CFG.CONTROLLER_ADDRESS, CONTROLLER_ABI, signer);
-    collection = new ethers.Contract(CFG.COLLECTION_ADDRESS, ERC721_MIN_ABI, provider);
-    return true;
+  async function timeStakedDate(tokenId){
+    await initContracts();
+    try{
+      const ownerNow = await collection.ownerOf(tokenId).catch(()=>null);
+      if (!ownerNow || ownerNow.toLowerCase() !== CFG.CONTROLLER_ADDRESS.toLowerCase()) return null;
+
+      const iface = new ethers.utils.Interface(['event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)']);
+      const topicTransfer = iface.getEventTopic('Transfer');
+      const toTopic = ethers.utils.hexZeroPad(CFG.CONTROLLER_ADDRESS, 32);
+      const idTopic = ethers.utils.hexZeroPad(ethers.BigNumber.from(String(tokenId)).toHexString(), 32);
+      const logs = await readProvider.getLogs({
+        fromBlock: START_BLOCK, toBlock: 'latest',
+        address: CFG.COLLECTION_ADDRESS, topics: [topicTransfer, null, toTopic, idTopic]
+      });
+      if (!logs.length) return null;
+      const last = logs[logs.length - 1];
+      const blk = await readProvider.getBlock(last.blockNumber);
+      return new Date(blk.timestamp * 1000);
+    }catch{ return null; }
   }
 
-  // ---- controller-owned token ids (Reservoir) ----
   async function controllerOwnedTokenIds(){
     const out = [];
     const key = CFG.FROG_API_KEY;
@@ -72,7 +111,9 @@
     for (let i=0;i<6;i++){
       const params = new URLSearchParams({ collection: CFG.COLLECTION_ADDRESS, limit: '200' });
       if (continuation) params.set('continuation', continuation);
-      const res = await fetch(`${base}?${params.toString()}`, { headers: { accept:'*/*','x-api-key': key } }).catch(()=>null);
+      const res = await fetch(`${base}?${params.toString()}`, {
+        headers: { accept:'*/*','x-api-key': key }
+      }).catch(()=>null);
       if (!res || !res.ok) break;
       const json = await res.json();
       const arr = (json?.tokens || []).map(t => Number(t?.token?.tokenId)).filter(Number.isFinite);
@@ -83,71 +124,44 @@
     return out;
   }
 
-  // staker resolution: try ABI helpers, else derive from logs (from = staker)
-  async function getStakerOf(tokenId){
-    try { if (controller.stakerAddress){ const a=await controller.stakerAddress(tokenId); if (isAddr(a)&&a!==zaddr) return a; } } catch{}
-    try { if (controller.stakerOf){ const a=await controller.stakerOf(tokenId); if (isAddr(a)&&a!==zaddr) return a; } } catch{}
-    try{
-      const iface = new ethers.utils.Interface(['event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)']);
-      const topicTransfer = iface.getEventTopic('Transfer');
-      const toTopic = ethers.utils.hexZeroPad(CFG.CONTROLLER_ADDRESS, 32);
-      const idTopic = ethers.utils.hexZeroPad(ethers.BigNumber.from(String(tokenId)).toHexString(), 32);
-      const logs = await provider.getLogs({
-        fromBlock: (CFG.COLLECTION_START_BLOCK ?? 0),
-        toBlock: 'latest',
-        address: CFG.COLLECTION_ADDRESS,
-        topics: [topicTransfer, null, toTopic, idTopic]
-      });
-      if (!logs.length) return null;
-      const fromAddr = ethers.utils.getAddress('0x'+logs[logs.length-1].topics[1].slice(26));
-      return isAddr(fromAddr) ? fromAddr : null;
-    }catch{ return null; }
-  }
+  // ---------- Tabs ----------
+  let currentTab='owned';
+  const tabOwned=document.getElementById('tabOwned');
+  const tabStaked=document.getElementById('tabStaked');
+  const tabsWrap=document.getElementById('stakeTabs');
 
-  async function timeStakedDate(tokenId){
-    try{
-      const ownerNow = await collection.ownerOf(tokenId);
-      if (!ownerNow || ownerNow.toLowerCase() !== CFG.CONTROLLER_ADDRESS.toLowerCase()) return null;
-      try{
-        const filter = collection.filters.Transfer(null, CFG.CONTROLLER_ADDRESS, ethers.BigNumber.from(String(tokenId)));
-        const events = await collection.queryFilter(filter, (CFG.COLLECTION_START_BLOCK ?? 0), 'latest');
-        if (events.length){
-          const blk = await provider.getBlock(events[events.length - 1].blockNumber);
-          return new Date(blk.timestamp * 1000);
-        }
-      }catch{}
-      const iface = new ethers.utils.Interface(['event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)']);
-      const topicTransfer = iface.getEventTopic('Transfer');
-      const toTopic = ethers.utils.hexZeroPad(CFG.CONTROLLER_ADDRESS, 32);
-      const idTopic = ethers.utils.hexZeroPad(ethers.BigNumber.from(String(tokenId)).toHexString(), 32);
-      const logs = await provider.getLogs({
-        fromBlock: (CFG.COLLECTION_START_BLOCK ?? 0),
-        toBlock: 'latest',
-        address: CFG.COLLECTION_ADDRESS,
-        topics: [topicTransfer, null, toTopic, idTopic]
-      });
-      if (logs.length){
-        const blk = await provider.getBlock(logs[logs.length - 1].blockNumber);
-        return new Date(blk.timestamp * 1000);
-      }
-    }catch{}
-    return null;
-  }
+  function setTab(which){
+    currentTab=which;
+    const owned=(which==='owned');
+    tabOwned?.setAttribute('aria-selected', owned?'true':'false');
+    tabStaked?.setAttribute('aria-selected', owned?'false':'true');
+    tabsWrap?.style.setProperty('--tab-i', owned?0:1);
 
-  // ---- load staked for connected user (shows Staker + time) ----
+    // Auto-load when user opens Staked tab
+    if (!owned && !ST.loaded && window.FF_getUser()){
+      loadStaked().catch(()=>{});
+    } else {
+      render();
+    }
+  }
+  tabOwned?.addEventListener('click', ()=> setTab('owned'));
+  tabStaked?.addEventListener('click', ()=> setTab('staked'));
+  window.FF_getTab = ()=> currentTab;
+  window.FF_setTab = setTab;
+
+  // ---------- Load user's staked ----------
   async function loadStaked(){
     const status=document.getElementById('stakeStatus');
     const user = window.FF_getUser();
     if(!user){ status.textContent='Connect a wallet first.'; return; }
-    if(!await initEthers()){ status.textContent='Ethereum provider not available.'; return; }
-
+    await initContracts();
     try{
       status.textContent='Loading staked…';
       let rows = [];
       try{
         if (controller.getStakedTokens){
           const res = await controller.getStakedTokens(user);
-          rows = (res||[]).map(r => ({ id: Number(r.tokenId), owner: r.staker || user }));
+          rows = (res||[]).map(r => ({ id: Number(r.tokenId), owner: ethers.utils.getAddress(r.staker || user) }));
         }
       }catch{}
 
@@ -155,7 +169,7 @@
         const ids = await controllerOwnedTokenIds();
         const out = [];
         for (const id of ids){
-          const who = await getStakerOf(id).catch(()=>null);
+          const who = await resolveStaker(id).catch(()=>null);
           if (who && who.toLowerCase() === user.toLowerCase()) out.push({ id, owner: who });
         }
         rows = out;
@@ -163,7 +177,9 @@
 
       ST.items = rows;
       ST.page = 0;
+      ST.loaded = true;
 
+      // Rewards (rounded whole Flyz)
       const rewardsLine = document.getElementById('rewardsLine');
       try{
         const rewards = await controller.availableRewards(user);
@@ -180,10 +196,10 @@
       status.textContent='Failed to load staked tokens.';
     }
   }
-  document.getElementById('loadStakedBtn')?.addEventListener('click', loadStaked);
+  window.FF_loadStaked = loadStaked;
 
   async function unstake(tokenId){
-    if(!(controller && signer && window.FF_getUser())) { alert('Wallet/contract not ready'); return; }
+    if(!(walletProvider && signer && window.FF_getUser())) { alert('Wallet/contract not ready'); return; }
     try{
       const tx = await controller.withdraw(ethers.BigNumber.from(String(tokenId)));
       document.getElementById('stakeStatus').textContent = 'Tx sent: '+tx.hash.slice(0,10)+'…';
@@ -205,13 +221,14 @@
 
     const items=ST.items||[];
     if(!window.FF_getUser()){ list.innerHTML='<li class="list-item"><div class="muted">Connect your wallet to load staked tokens.</div></li>'; return; }
-    if(!items.length){ list.innerHTML='<li class="list-item"><div class="muted">No staked tokens yet. Click “Load Staked”.</div></li>'; return; }
+    if(!items.length){ list.innerHTML='<li class="list-item"><div class="muted">No staked tokens yet.</div></li>'; return; }
 
     const start=ST.page*ST.pageSize, end=start+ST.pageSize;
     items.slice(start,end).forEach(({id,owner})=>{
       const rank = window.FF_getRankById ? window.FF_getRankById(id) : null;
-      const li=document.createElement('li'); li.className='list-item';
-      li.innerHTML = FF.thumb64(`${CFG.SOURCE_PATH}/frog/${id}.png`, `Frog ${id}`) +
+      const li=document.createElement('li'); li.className='list-item'; li.dataset.frogId=String(id);
+      li.innerHTML =
+        FF.thumb64(`${CFG.SOURCE_PATH}/frog/${id}.png`, `Frog ${id}`) +
         `<div>
           <div style="display:flex;align-items:center;gap:8px;">
             <b>Frog #${id}</b>
@@ -225,8 +242,16 @@
       list.appendChild(li);
     });
 
+    // events
     list.querySelectorAll('[data-unstake]').forEach(btn=>{
-      btn.addEventListener('click',()=> unstake(btn.getAttribute('data-unstake')));
+      btn.addEventListener('click',(ev)=>{ ev.stopPropagation(); unstake(btn.getAttribute('data-unstake')); });
+    });
+    list.querySelectorAll('.list-item').forEach(li=>{
+      li.addEventListener('click', async ()=>{
+        const id = Number(li.dataset.frogId);
+        const info = await gatherFrogInfo(id);
+        openFrogModal(info);
+      });
     });
 
     // pager controls
@@ -242,11 +267,11 @@
     less.onclick=()=>{ if(ST.page>0){ ST.page--; render(); } };
   }
 
-  // ---- The Pond (controller-owned list with staker + staked time) ----
+  // ---------- Pond ----------
   window.FF_renderPondList = async function(containerEl){
     if (!containerEl) return;
     containerEl.innerHTML = '';
-    await initEthers().catch(()=>{});
+    await initContracts();
 
     let ids = [];
     try { ids = await controllerOwnedTokenIds(); } catch(_){ ids = []; }
@@ -262,11 +287,11 @@
     for (const id of ids){
       const rank = window.FF_getRankById ? window.FF_getRankById(id) : null;
       let staker = null, since = null;
-      try { staker = await getStakerOf(id); } catch(_){}
+      try { staker = await resolveStaker(id); } catch(_){}
       try { since  = await timeStakedDate(id); } catch(_){}
 
       const row = document.createElement('div');
-      row.className = 'list-item';
+      row.className = 'list-item'; row.dataset.frogId=String(id);
       row.innerHTML =
         FF.thumb64(`${CFG.SOURCE_PATH}/frog/${id}.png`, `Frog ${id}`) +
         `<div>
@@ -281,11 +306,68 @@
         </div>`;
       containerEl.appendChild(row);
     }
+
+    containerEl.querySelectorAll('.list-item').forEach(li=>{
+      li.addEventListener('click', async ()=>{
+        const id = Number(li.dataset.frogId);
+        const info = await gatherFrogInfo(id);
+        openFrogModal(info);
+      });
+    });
   };
 
-  // ---- expose ----
-  document.getElementById('loadStakedBtn')?.addEventListener('click', loadStaked);
-  window.FF_setTab = setTab;
-  window.FF_clearStaked = ()=>{ ST.items=[]; ST.page=0; if(window.FF_getTab && window.FF_getTab()==='staked') render(); };
-  window.FF_loadStaked = loadStaked;
+  // ---------- Modal ----------
+  async function gatherFrogInfo(id){
+    const rank = window.FF_getRankById ? window.FF_getRankById(id) : null;
+    const staker = await resolveStaker(id).catch(()=>null);
+    const since = await timeStakedDate(id).catch(()=>null);
+    return {
+      id, rank,
+      staker,
+      stakedAgo: since ? sinceShort(since) : null,
+      stakedAt: since ? since.toUTCString() : null,
+      image: `${CFG.SOURCE_PATH}/frog/${id}.png`
+    };
+  }
+  function openFrogModal(info){
+    const el = document.createElement('div');
+    el.className = 'modal-overlay';
+    el.innerHTML = `
+      <div class="modal-card">
+        <button class="modal-close" aria-label="Close">×</button>
+        <div class="row" style="align-items:flex-start; gap:16px;">
+          <img src="${info.image}" alt="Frog #${info.id}" class="thumb128" width="128" height="128" />
+          <div class="stack" style="gap:6px;">
+            <div><b>Frog #${info.id}</b> ${(info.rank||info.rank===0)?`<span class="pill">Rank <b>#${info.rank}</b></span>`:''}</div>
+            <div class="muted">Staker ${info.staker?`<span class="addr">${FF.shorten(info.staker)}</span>`:'—'}</div>
+            ${info.stakedAgo ? `<div class="muted">Staked ${info.stakedAgo} ago <span title="${info.stakedAt}">(${info.stakedAt})</span></div>` : ''}
+            <div class="row" style="gap:8px;margin-top:6px;">
+              <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://opensea.io/assets/ethereum/${CFG.COLLECTION_ADDRESS}/${info.id}">OpenSea</a>
+              <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://etherscan.io/token/${CFG.COLLECTION_ADDRESS}?a=${info.id}">Etherscan</a>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    function close(){ el.remove(); document.removeEventListener('keydown', esc); }
+    function esc(e){ if(e.key==='Escape') close(); }
+    el.addEventListener('click', (e)=>{ if(e.target===el) close(); });
+    el.querySelector('.modal-close').addEventListener('click', close);
+    document.addEventListener('keydown', esc);
+    document.body.appendChild(el);
+  }
+
+  // ---------- Expose & auto-load behaviors ----------
+  window.FF_clearStaked = ()=>{ ST.items=[]; ST.page=0; ST.loaded=false; if(window.FF_getTab && window.FF_getTab()==='staked') render(); };
+
+  // Auto-load shortly after page load if a wallet is already connected
+  setTimeout(()=>{ if(window.FF_getUser && window.FF_getUser()) loadStaked().catch(()=>{}); }, 300);
+
+  // Fallback poller: if user connects later and we haven't loaded yet, auto-load once
+  let autoTick = setInterval(()=>{
+    if (!ST.loaded && window.FF_getUser && window.FF_getUser()){
+      clearInterval(autoTick);
+      loadStaked().catch(()=>{});
+    }
+  }, 1500);
+
 })(window.FF, window.FF_CFG);
