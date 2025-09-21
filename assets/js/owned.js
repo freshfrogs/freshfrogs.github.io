@@ -5,7 +5,14 @@
   const CONTROLLER = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
   const COLLECTION = CFG.COLLECTION_ADDRESS || '';
 
-  // ------- helpers -------
+  // ------- DOM -------
+  const ul         = document.getElementById('chipWrap');
+  const status     = document.getElementById('stakeStatus');
+  const tabOwned   = document.getElementById('tabOwned');
+  const tabStaked  = document.getElementById('tabStaked');
+  const refreshBtn = document.getElementById('refreshOwned');
+
+  // ------- fetch helpers -------
   function apiHeaders(){
     if (!CFG.FROG_API_KEY) throw new Error('Missing FROG_API_KEY in config.js');
     return { accept: '*/*', 'x-api-key': CFG.FROG_API_KEY };
@@ -34,13 +41,9 @@
       }
     }
   }
-  const fmtAgo = (ms)=> {
-    const s = Math.floor(ms/1000);
-    const m = Math.floor(s/60), h = Math.floor(m/60), d = Math.floor(h/24);
-    if (d>0) return `${d}d ago`;
-    if (h>0) return `${h}h ago`;
-    if (m>0) return `${m}m ago`;
-    return `${s}s ago`;
+  const fmtAgoMs = (ms)=>{
+    const s=Math.floor(ms/1000), m=Math.floor(s/60), h=Math.floor(m/60), d=Math.floor(h/24);
+    if (d>0) return `${d}d ago`; if (h>0) return `${h}h ago`; if (m>0) return `${m}m ago`; return `${s}s ago`;
   };
 
   // ------- rarity -------
@@ -53,14 +56,13 @@
     ? `<span class="pill">Rank <b>#${rank}</b></span>`
     : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
 
-  // ------- 128px layered renderer (same look as Pond) -------
+  // ------- 128px layered renderer (same as Pond) -------
   const NO_ANIM_FOR = new Set(['Hat','Frog','Trait']);
   const NO_LIFT_FOR = new Set(['Frog','Trait','SpecialFrog']);
-
   function mk(tag, props={}, style={}){ const el=document.createElement(tag); Object.assign(el,props); Object.assign(el.style,style); return el; }
   function safe(s){ return encodeURIComponent(s); }
 
-  function pickBestBgUrl(id){
+  function pickBgCandidates(id){
     const local = `frog/${id}.png`;
     const root  = `/frog/${id}.png`;
     const cfg   = (CFG.SOURCE_PATH ? `${CFG.SOURCE_PATH}/frog/${id}.png` : local);
@@ -73,28 +75,28 @@
       backgroundPosition:'100% 100%',
       imageRendering:'pixelated'
     });
-    const urls = pickBestBgUrl(tokenId);
+    const urls = pickBgCandidates(tokenId);
     for (const url of urls){
       const ok = await new Promise(resolve=>{
         const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = ()=>{
+        img.crossOrigin='anonymous';
+        img.onload=()=>{
           try{
             const c=document.createElement('canvas'); c.width=2; c.height=2;
-            const ctx=c.getContext('2d'); ctx.drawImage(img,0,0,2,2);
-            const d=ctx.getImageData(0,0,1,1).data;
+            const x=c.getContext('2d'); x.drawImage(img,0,0,2,2);
+            const d=x.getImageData(0,0,1,1).data;
             container.style.backgroundColor = `rgba(${d[0]},${d[1]},${d[2]},${(d[3]||255)/255})`;
           }catch{}
           container.style.backgroundImage = `url('${url}')`;
           resolve(true);
         };
-        img.onerror = ()=>resolve(false);
-        img.src = url;
+        img.onerror=()=>resolve(false);
+        img.src=url;
       });
       if (ok) return true;
     }
-    container.style.backgroundColor = '#151a1e';
-    container.style.backgroundImage = 'none';
+    container.style.backgroundColor='#151a1e';
+    container.style.backgroundImage='none';
     return false;
   }
   function makeLayerImg(attr, value, px){
@@ -102,18 +104,17 @@
     const base = `/frog/build_files/${safe(attr)}`;
     const png  = `${base}/${safe(value)}.png`;
     const gif  = `${base}/animations/${safe(value)}_animation.gif`;
-
     const img = new Image();
     img.decoding='async'; img.loading='lazy';
-    img.dataset.attr = attr;
-    Object.assign(img.style, {
+    img.dataset.attr=attr;
+    Object.assign(img.style,{
       position:'absolute', left:'0', top:'0',
       width:`${px}px`, height:`${px}px`,
       imageRendering:'pixelated', zIndex:'2',
       transition:'transform 280ms cubic-bezier(.22,.61,.36,1)'
     });
-    if (allowAnim){ img.src = gif; img.onerror = ()=>{ img.onerror=null; img.src=png; }; }
-    else img.src = png;
+    if (allowAnim){ img.src=gif; img.onerror=()=>{ img.onerror=null; img.src=png; }; }
+    else img.src=png;
 
     if (!NO_LIFT_FOR.has(attr)){
       img.addEventListener('mouseenter', ()=>{ img.style.transform='translate(-8px,-12px)'; img.style.filter='drop-shadow(0 5px 0 rgba(0,0,0,.45))'; });
@@ -129,7 +130,6 @@
     });
     await applyFrogBackground(container, tokenId);
 
-    // metadata layering
     const metaUrl = `frog/json/${tokenId}.json`;
     try{
       const meta = await (await fetch(metaUrl)).json();
@@ -141,25 +141,28 @@
         container.appendChild(makeLayerImg(attr,val,SIZE));
       }
     }catch{
-      // fallback flat
-      const [url] = pickBestBgUrl(tokenId);
+      const [url] = pickBgCandidates(tokenId);
       const flat = new Image(); flat.decoding='async'; flat.loading='lazy';
       Object.assign(flat.style,{position:'absolute',inset:'0',width:`${SIZE}px`,height:`${SIZE}px`,imageRendering:'pixelated',zIndex:'2'});
-      flat.src = url; container.appendChild(flat);
+      flat.src=url; container.appendChild(flat);
     }
   }
 
-  // ------- wallet + UI -------
-  const ul        = document.getElementById('chipWrap');
-  const status    = document.getElementById('stakeStatus');
-  const tabOwned  = document.getElementById('tabOwned');
-  const tabStaked = document.getElementById('tabStaked');
-  const refreshBtn= document.getElementById('refreshOwned');
-
-  const ST = { addr:null, mode:'owned', owned:[], staked:[] };
+  // ------- state (with caching) -------
+  const ST = {
+    addr:null,
+    mode:'owned',
+    cache:{ ownedIds:null, stakedRows:null }, // cached results for instant tab switch
+    loading:false
+  };
 
   function setStatus(msg){ if (status) status.textContent = msg; }
   function clearList(){ if (ul) ul.innerHTML=''; }
+  function setActiveTab(which){
+    const owned = (which==='owned');
+    tabOwned?.setAttribute('aria-selected', owned ? 'true' : 'false');
+    tabStaked?.setAttribute('aria-selected', owned ? 'false' : 'true');
+  }
 
   function liCard(id, subtitle){
     const li=document.createElement('li'); li.className='list-item';
@@ -189,8 +192,8 @@
     }catch{ return null; }
   }
 
-  // ------- Owned -------
-  async function fetchOwned(addr){
+  // ------- data fetchers -------
+  async function fetchOwnedIds(addr){
     const out=[]; let cont='';
     for (let guard=0; guard<30; guard++){
       const qs = new URLSearchParams({ collection: COLLECTION, limit:'200', includeTopBid:'false' });
@@ -206,24 +209,8 @@
     }
     return out;
   }
-  async function renderOwned(){
-    setStatus('Loading owned…');
-    clearList();
-    try{
-      const ids = await fetchOwned(ST.addr);
-      ST.owned = ids;
-      if (!ids.length){ setStatus('No owned frogs in this wallet for this collection.'); return; }
-      ids.forEach(id=> ul.appendChild(liCard(id, 'Not staked')));
-      setStatus(`Showing ${ids.length.toLocaleString()} owned frog(s).`);
-    }catch(e){
-      console.warn('Owned load failed', e);
-      setStatus('Failed to load owned frogs.');
-    }
-  }
 
-  // ------- Staked (connected user) -------
   async function fetchStakeCandidates(addr){
-    // Activities where user -> controller (transfer)
     const map=new Map(); let cont='';
     for (let guard=0; guard<40; guard++){
       const qs = new URLSearchParams({ users: addr, collection: COLLECTION, types:'transfer', limit:'20' });
@@ -266,63 +253,83 @@
     }
     return out;
   }
-  async function renderStaked(){
-    setStatus('Loading staked…');
+  async function fetchStakedRows(addr){
+    const cands = await fetchStakeCandidates(addr);
+    const rows  = await confirmStakedByUser(addr, cands);
+    return rows.sort((a,b)=>{
+      const ta=a.since? a.since.getTime():0; const tb=b.since? b.since.getTime():0; return ta - tb;
+    });
+  }
+
+  // ------- renderers (from cache) -------
+  function renderOwnedFromCache(){
     clearList();
+    const ids = ST.cache.ownedIds || [];
+    if (!ids.length){ setStatus('No owned frogs in this wallet for this collection.'); return; }
+    ids.forEach(id=> ul.appendChild(liCard(id, 'Not staked • Owned by You')));
+    setStatus(`Showing ${ids.length.toLocaleString()} owned frog(s).`);
+  }
+  function renderStakedFromCache(){
+    clearList();
+    const rows = ST.cache.stakedRows || [];
+    if (!rows.length){ setStatus('No frogs from this wallet are currently staked.'); return; }
+    rows.forEach(r=>{
+      const info = r.since ? `Staked ${fmtAgoMs(Date.now()-r.since.getTime())} • Owned by You` : 'Staked • Owned by You';
+      ul.appendChild(liCard(r.id, info));
+    });
+    setStatus(`Showing ${rows.length} staked frog(s).`);
+  }
+
+  // ------- orchestration -------
+  async function preloadBoth(){
+    if (ST.loading) return;
+    ST.loading = true;
+    setStatus('Loading your frogs…');
     try{
-      const candidates = await fetchStakeCandidates(ST.addr);
-      const rows = await confirmStakedByUser(ST.addr, candidates);
-      ST.staked = rows.sort((a,b)=>{
-        const ta = a.since ? a.since.getTime() : 0;
-        const tb = b.since ? b.since.getTime() : 0;
-        return ta - tb;
-      });
-      if (!ST.staked.length){ setStatus('No frogs from this wallet are currently staked.'); return; }
-      ST.staked.forEach(r=>{
-        const info = r.since ? `Staked ${fmtAgo(Date.now()-r.since.getTime())}` : 'Staked';
-        ul.appendChild(liCard(r.id, info));
-      });
-      setStatus(`Showing ${ST.staked.length} staked frog(s).`);
+      const [ownedIds, stakedRows] = await Promise.all([
+        fetchOwnedIds(ST.addr),
+        fetchStakedRows(ST.addr)
+      ]);
+      ST.cache.ownedIds  = ownedIds;
+      ST.cache.stakedRows= stakedRows;
     }catch(e){
-      console.warn('Staked load failed', e);
-      setStatus('Failed to load staked frogs.');
+      console.warn('Owned/Staked preload failed', e);
+      ST.cache.ownedIds  = ST.cache.ownedIds  || [];
+      ST.cache.stakedRows= ST.cache.stakedRows|| [];
+    }finally{
+      ST.loading = false;
     }
   }
 
-  // ------- tab wiring / refresh -------
-  async function refresh(mode=ST.mode){
+  async function refresh(which=ST.mode){
     ST.addr = await getAddr();
     if (!ST.addr){ setStatus('No wallet connected.'); clearList(); return; }
-    ST.mode = mode;
     if (!RANKS) await loadRanks();
-    if (mode === 'owned') await renderOwned();
-    else await renderStaked();
 
-    // notify tab UI to move slider
-    document.dispatchEvent(new CustomEvent('ff-tabs-updated', { detail: { which: mode } }));
+    // one-time preload (then switch is instant)
+    if (ST.cache.ownedIds===null || ST.cache.stakedRows===null){
+      await preloadBoth();
+    }
+
+    ST.mode = which;
+    setActiveTab(which);
+
+    if (which==='owned') renderOwnedFromCache();
+    else renderStakedFromCache();
   }
 
-  if (tabOwned){
-    tabOwned.addEventListener('click', ()=>{
-      tabOwned.setAttribute('aria-selected','true');
-      tabStaked?.setAttribute('aria-selected','false');
-      refresh('owned');
-    });
-  }
-  if (tabStaked){
-    tabStaked.addEventListener('click', ()=>{
-      tabStaked.setAttribute('aria-selected','true');
-      tabOwned?.setAttribute('aria-selected','false');
-      refresh('staked');
-    });
-  }
+  // ------- events -------
+  tabOwned?.addEventListener('click', ()=>{ if (ST.mode!=='owned') refresh('owned'); });
+  tabStaked?.addEventListener('click', ()=>{ if (ST.mode!=='staked') refresh('staked'); });
+  refreshBtn?.addEventListener('click', async ()=>{
+    // full refetch into cache
+    setStatus('Refreshing…');
+    ST.cache.ownedIds=null; ST.cache.stakedRows=null;
+    await refresh(ST.mode);
+  });
 
-  if (refreshBtn){ refreshBtn.addEventListener('click', ()=>refresh(ST.mode)); }
-
-  // initial
-  refresh('owned');
-
-  // react to wallet changes
+  // initial + wallet change
+  (async ()=>{ await refresh('owned'); })();
   if (window.ethereum){
     window.ethereum.on?.('accountsChanged', ()=>refresh(ST.mode));
     window.ethereum.on?.('chainChanged',  ()=>refresh(ST.mode));

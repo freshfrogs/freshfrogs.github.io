@@ -347,3 +347,17 @@ footer.site { border-top:1px solid var(--ring); padding:26px 0; color:var(--mute
 .hero-layer[data-raise]:hover{
   transform: translateY(-8px);
 }
+/* Owned/Staked toggle: simpler segmented look (hide old slider) */
+#stakeTabs .tab-indicator { display: none; }
+#stakeTabs { gap: 8px; }
+#stakeTabs .tab[role="tab"] {
+  border: 1px solid var(--border, rgba(255,255,255,0.1));
+  border-radius: 10px;
+  padding: .35rem .7rem;
+  line-height: 1;
+  background: transparent;
+}
+#stakeTabs .tab[role="tab"][aria-selected="true"] {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.25);
+}

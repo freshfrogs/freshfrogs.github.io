@@ -85,41 +85,61 @@
   const storeIdxFromDisplay = (dispIdx)=> (ST.pages.length - 1 - dispIdx);
   const displayIdxFromStore = (storeIdx)=> (ST.pages.length - 1 - storeIdx);
 
-  function renderPager(){
-    const nav = ensurePager();
-    nav.innerHTML = '';
+  function renderPage(){
+    ul.innerHTML = '';
 
-    for (let disp=0; disp<ST.pages.length; disp++){
-      const sIdx = storeIdxFromDisplay(disp);
-      const btn = document.createElement('button');
-      btn.className = 'btn btn-ghost btn-sm';
-      btn.textContent = String(disp+1);
-      if (sIdx === ST.page) btn.classList.add('btn-solid');
-      btn.addEventListener('click', ()=>{
-        if (ST.page !== sIdx){
-          ST.page = sIdx;
-          renderPage();
-        }
-      });
-      nav.appendChild(btn);
+    if (!ST.pages.length){
+      const li = document.createElement('li');
+      li.className = 'list-item';
+      li.innerHTML = `<div class="muted">No frogs are currently staked.</div>`;
+      ul.appendChild(li);
+      ensurePager().innerHTML = '';
+      return;
     }
 
-    if (ST.nextContinuation){
-      const moreBtn = document.createElement('button');
-      moreBtn.className = 'btn btn-ghost btn-sm';
-      moreBtn.setAttribute('aria-label', 'Load more pages');
-      moreBtn.title = 'Load more';
-      moreBtn.textContent = '…'; // ellipsis
-      moreBtn.addEventListener('click', async ()=>{
-        const ok = await fetchNextPage();
-        if (ok){
-          ST.page = ST.pages.length - 1; // jump to oldest newly added page
-          renderPage();
-          renderStatsBar(); // update "Last Update" at least
-        }
+    const dispIdx = displayIdxFromStore(ST.page);
+    const storeIdx = storeIdxFromDisplay(dispIdx);
+    const page = ST.pages[storeIdx];
+    const rows = page?.rows || [];
+
+    if (!rows.length){
+      const li = document.createElement('li');
+      li.className = 'list-item';
+      li.innerHTML = `<div class="muted">No frogs on this page.</div>`;
+      ul.appendChild(li);
+    } else {
+      rows.forEach(r=>{
+        const rank = RANKS?.[String(r.id)] ?? null;
+
+        const li = document.createElement('li');
+        li.className = 'list-item';
+
+        // Left: layered 128x128 with bg trick (unchanged)
+        const left = document.createElement('div');
+        Object.assign(left.style, { width:'128px', height:'128px', minWidth:'128px', minHeight:'128px' });
+        li.appendChild(left);
+        buildFrog128(left, r.id);
+
+        // Middle: text block — only label changed to "Owned by"
+        const mid = document.createElement('div');
+        mid.innerHTML =
+          `<div style="display:flex;align-items:center;gap:8px;">
+             <b>Frog #${r.id}</b> ${pillRank(rank)}
+           </div>
+           <div class="muted">Staked ${fmtAgo(r.since)} • Owned by ${r.staker ? FF.shorten(r.staker) : '—'}</div>`;
+        li.appendChild(mid);
+
+        // Right: tag
+        const right = document.createElement('div');
+        right.className = 'price';
+        right.textContent = 'Staked';
+        li.appendChild(right);
+
+        ul.appendChild(li);
       });
-      nav.appendChild(moreBtn);
     }
+
+    renderPager();
   }
 
   // ---------- background helper (uses flat PNG; sets bg image + sampled color) ----------
