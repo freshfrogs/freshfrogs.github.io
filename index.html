@@ -134,34 +134,61 @@
     </div>
   </section>
 
-  <!-- Unified features panel -->
-  <section id="features" class="panel stack" aria-label="Features">
-    <h2 class="section-title" style="margin:0">Features</h2>
-    <p class="muted" style="margin-top:0">
-      If testing from desktop, click “Use selected JSON” above to load
-      <code>assets/freshfrogs_rarity_rankings.json</code>.
-    </p>
+  <section id="features" class="stack" aria-label="Marketplace & Rankings">
+    <h2 class="section-title" style="margin:0">Market Activity & Rankings</h2>
+    <p class="muted" style="margin-top:0">Live sales and rarity side-by-side. The pond lives below.</p>
 
-    <div id="infoPanel" class="panel">
-      <div class="panel-header">
-        <div class="tabs" id="infoTabs">
-          <button class="tab active" data-tab="sales">Recent Sales</button>
-          <button class="tab" data-tab="rarity">Rarity Rankings</button>
-          <button class="tab" data-tab="pond">The Pond</button>
+    <!-- Row: Recent Sales (left) | Rarity (right) -->
+    <div class="two-col">
+      <!-- Recent Sales -->
+      <div class="panel stack same-height" aria-label="Recent Sales">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div>
+            <h3 class="section-title" style="margin:0">Recent Sales</h3>
+            <div class="muted">Newest first (Reservoir)</div>
+          </div>
+          <!-- optional: manual refresh / live hook buttons if you use them -->
+          <!-- <button id="refreshBtn" class="btn btn-ghost btn-sm">Refresh</button> -->
         </div>
-      </div>
-      <div class="panel-body">
-        <!-- Each tab has its own UL so modules can render directly -->
-        <div id="tab-sales"  class="tabview list-scroll">
+
+        <!-- Keep the same container id that sales.js expects -->
+        <div id="tab-sales" class="list-scroll">
           <ul id="recentSales" class="card-list"></ul>
         </div>
-        <div id="tab-rarity" class="tabview list-scroll hidden">
+      </div>
+
+      <!-- Rarity Rankings -->
+      <div class="panel stack same-height" aria-label="Rarity Rankings">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div>
+            <h3 class="section-title" style="margin:0">Rarity Rankings</h3>
+            <div class="muted">Rank or score (from JSON)</div>
+          </div>
+          <div class="row" style="gap:6px;">
+            <button id="sortRankBtn"  class="btn btn-ghost btn-sm">Sort by Rank</button>
+            <button id="sortScoreBtn" class="btn btn-ghost btn-sm">Sort by Score</button>
+          </div>
+        </div>
+
+        <!-- Keep the same container id that rarity.js expects -->
+        <div id="tab-rarity" class="list-scroll">
           <ul id="rarityList" class="card-list"></ul>
         </div>
-        <div id="tab-pond"   class="tabview list-scroll hidden">
-          <div id="pondList" class="card-list"></div>
-        </div>
       </div>
+    </div>
+
+    <!-- Pond panel (full-width under the row) -->
+    <div class="panel stack same-height" aria-label="The Pond">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div>
+          <h3 class="section-title" style="margin:0">The Pond</h3>
+          <div class="muted">All frogs currently staked to the controller</div>
+        </div>
+        <!-- optional: refresh button
+        <button id="refreshPond" class="btn btn-ghost btn-sm">Refresh Pond</button>
+        -->
+      </div>
+      <div id="pondList" class="list-scroll"></div>
     </div>
   </section>
 
