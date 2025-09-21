@@ -152,8 +152,9 @@
   const ST = {
     addr:null,
     mode:'owned',
-    cache:{ ownedIds:null, stakedRows:null }, // cached results for instant tab switch
-    loading:false
+    cache:{ ownedIds:null, stakedRows:null },
+    loading:false,
+    connected:false
   };
 
   function setStatus(msg){ if (status) status.textContent = msg; }
@@ -167,13 +168,12 @@
   function liCard(id, subtitle){
     const li=document.createElement('li'); li.className='list-item';
 
-    // left: frog
-    const left = mk('div',{}, {width:'128px',height:'128px',minWidth:'128px',minHeight:'128px'});
+    const left = document.createElement('div');
+    Object.assign(left.style,{width:'128px',height:'128px',minWidth:'128px',minHeight:'128px'});
     li.appendChild(left); buildFrog128(left, id);
 
-    // middle: name + rank + subtitle
     const rank = (RANKS && (String(id) in RANKS)) ? RANKS[String(id)] : null;
-    const mid = mk('div');
+    const mid = document.createElement('div');
     mid.innerHTML =
       `<div style="display:flex;align-items:center;gap:8px;">
          <b>Frog #${id}</b> ${pillRank(rank)}
@@ -182,14 +182,6 @@
     li.appendChild(mid);
 
     return li;
-  }
-
-  async function getAddr(){
-    try{
-      if (!window.ethereum) return null;
-      const a = await window.ethereum.request({ method:'eth_accounts' });
-      return (a && a[0]) ? a[0] : null;
-    }catch{ return null; }
   }
 
   // ------- data fetchers -------
@@ -302,8 +294,11 @@
   }
 
   async function refresh(which=ST.mode){
-    ST.addr = await getAddr();
-    if (!ST.addr){ setStatus('No wallet connected.'); clearList(); return; }
+    if (!ST.connected || !ST.addr){
+      clearList();
+      setStatus('Connect your wallet to view Owned & Staked.');
+      return;
+    }
     if (!RANKS) await loadRanks();
 
     // one-time preload (then switch is instant)
@@ -322,16 +317,32 @@
   tabOwned?.addEventListener('click', ()=>{ if (ST.mode!=='owned') refresh('owned'); });
   tabStaked?.addEventListener('click', ()=>{ if (ST.mode!=='staked') refresh('staked'); });
   refreshBtn?.addEventListener('click', async ()=>{
-    // full refetch into cache
+    if (!ST.connected){ setStatus('Connect your wallet first.'); return; }
     setStatus('Refreshing…');
     ST.cache.ownedIds=null; ST.cache.stakedRows=null;
     await refresh(ST.mode);
   });
 
-  // initial + wallet change
-  (async ()=>{ await refresh('owned'); })();
-  if (window.ethereum){
-    window.ethereum.on?.('accountsChanged', ()=>refresh(ST.mode));
-    window.ethereum.on?.('chainChanged',  ()=>refresh(ST.mode));
-  }
+  // Wait for explicit connect from wallet.js
+  window.addEventListener('wallet:connected', async (ev)=>{
+    ST.connected = true;
+    ST.addr = ev?.detail?.address || null;
+    ST.cache.ownedIds = null;
+    ST.cache.stakedRows = null;
+    await refresh('owned'); // default to Owned on connect
+  });
+  window.addEventListener('wallet:disconnected', ()=>{
+    ST.connected = false;
+    ST.addr = null;
+    ST.cache.ownedIds = null;
+    ST.cache.stakedRows = null;
+    clearList();
+    setStatus('No wallet connected.');
+    setActiveTab('owned');
+  });
+
+  // Initial (disconnected) state
+  setActiveTab('owned');
+  clearList();
+  setStatus('Connect your wallet to view Owned & Staked.');
 })(window.FF_CFG);
