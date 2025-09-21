@@ -17,11 +17,11 @@
 
   // ---------- state ----------
   const ST = {
-    pages: [],                 // [{ rows: [{id, staker, since}], contIn, contOut }]
+    pages: [],                 // [{ rows: [{id, staker, since}], contIn: string|null, contOut: string|null }]
     page: 0,
-    nextContinuation: '',      // for next fetch
+    nextContinuation: '',      // continuation string for next fetch
     blockedIds: new Set(),     // tokens that later left controller
-    acceptedIds: new Set()     // dedupe accepted across pages
+    acceptedIds: new Set()     // tokens we've already accepted (dedupe across pages)
   };
 
   let RANKS = null;
@@ -48,7 +48,7 @@
     const nav = ensurePager();
     nav.innerHTML = '';
 
-    // numbered buttons for fetched pages
+    // numbered page buttons for pages we have fetched
     ST.pages.forEach((_, i)=>{
       const btn = document.createElement('button');
       btn.className = 'btn btn-ghost btn-sm';
@@ -63,21 +63,21 @@
       nav.appendChild(btn);
     });
 
-    // ellipsis "…" to fetch more, if continuation exists
+    // "Load More" if continuation available
     if (ST.nextContinuation){
-      const moreBtn = document.createElement('button');
-      moreBtn.className = 'btn btn-ghost btn-sm';
-      moreBtn.setAttribute('aria-label', 'Load more pages');
-      moreBtn.title = 'Load more';
-      moreBtn.textContent = '…'; // U+2026 ellipsis
-      moreBtn.addEventListener('click', async ()=>{
+      const loadBtn = document.createElement('button');
+      loadBtn.className = 'btn btn-ghost btn-sm';
+      loadBtn.textContent = 'Load More';
+      loadBtn.title = 'Fetch more staked frogs';
+      loadBtn.addEventListener('click', async ()=>{
         const ok = await fetchNextPage();
         if (ok){
-          ST.page = ST.pages.length - 1; // jump to the new page
+          // jump to the newly added page
+          ST.page = ST.pages.length - 1;
           renderPage();
         }
       });
-      nav.appendChild(moreBtn);
+      nav.appendChild(loadBtn);
     }
   }
 
@@ -137,16 +137,24 @@
       const to   = (a?.toAddress   || '').toLowerCase();
       const from = (a?.fromAddress || '').toLowerCase();
 
-      if (from === CONTROLLER){ ST.blockedIds.add(id); continue; } // outbound ⇒ not staked
+      // Outbound from controller ⇒ not staked
+      if (from === CONTROLLER){
+        ST.blockedIds.add(id);
+        continue;
+      }
 
-      if (to === CONTROLLER && !ST.blockedIds.has(id) && !ST.acceptedIds.has(id)){
-        const since = a?.createdAt ? new Date(a.createdAt)
-                    : (a?.timestamp ? new Date(a.timestamp*1000) : null);
-        out.push({ id, staker: a?.fromAddress || null, since });
-        ST.acceptedIds.add(id);
+      // Inbound to controller ⇒ accept if not blocked and not already accepted
+      if (to === CONTROLLER){
+        if (!ST.blockedIds.has(id) && !ST.acceptedIds.has(id)){
+          const since = a?.createdAt ? new Date(a.createdAt)
+                      : (a?.timestamp ? new Date(a.timestamp*1000) : null);
+          out.push({ id, staker: a?.fromAddress || null, since });
+          ST.acceptedIds.add(id);
+        }
       }
     }
 
+    // newest first
     out.sort((a,b)=>{
       const ta = a.since ? a.since.getTime() : 0;
       const tb = b.since ? b.since.getTime() : 0;
@@ -172,12 +180,20 @@
 
   async function fetchNextPage(){
     let cont = ST.nextContinuation || '';
-    // fetch one page (even if empty) to keep pager chronology
-    const { activities, continuation } = await fetchActivitiesPage(cont);
-    const rows = selectCurrentlyStakedFromActivities(activities);
-    ST.pages.push({ rows, contIn: ST.nextContinuation || null, contOut: continuation || null });
-    ST.nextContinuation = continuation || '';
-    return true;
+    // try up to a few pages until we either get some rows or run out
+    for (let safety=0; safety<20; safety++){
+      const { activities, continuation } = await fetchActivitiesPage(cont);
+      cont = continuation;
+
+      const rows = selectCurrentlyStakedFromActivities(activities);
+      ST.pages.push({ rows, contIn: ST.nextContinuation || null, contOut: cont || null });
+      ST.nextContinuation = cont;
+
+      // even if rows are empty, we consider the page fetched (to keep chronology);
+      // but we return true once we fetched at least one page
+      return true;
+    }
+    return false;
   }
 
   async function prefetchInitialPages(n=3){
@@ -207,7 +223,7 @@
       ST.blockedIds = new Set();
       ST.acceptedIds = new Set();
 
-      // prefetch first 3 pages so pager shows: [1] [2] [3] […]
+      // prefetch first 3 pages so pager shows: [1] [2] [3] [Load More]
       await prefetchInitialPages(3);
 
       if (!ST.pages.length){
