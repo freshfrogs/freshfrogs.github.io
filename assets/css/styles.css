@@ -317,29 +317,26 @@ footer.site { border-top:1px solid var(--ring); padding:26px 0; color:var(--mute
 .pond-pager .btn{ min-width:34px; }
 .pond-pager .btn.btn-solid{ cursor:default; }
 /* === Hero single-frog renderer === */
-/* === Ultra-minimal hero frog === */
+/* === Ultra-minimal hero frog (single 512×512) === */
 .hero-frog{ display:grid; place-items:center; }
 .frog-stage{
   position:relative;
   width:512px; height:512px;
   overflow:hidden;
-  /* no borders, no shadows */
   cursor:pointer;
 }
 
-/* Background pulled from original PNG, enlarged & offset
-   so only the original BG color shows. */
+/* Background: original frog PNG, enlarged & offset so only BG color shows */
 .frog-stage::before{
   content:"";
   position:absolute; inset:0;
   background-image: var(--bg-img, none);
   background-repeat:no-repeat;
-  background-size: 200% 200%;   /* enlarge */
-  background-position: -80px 60px; /* move left & down */
-  /* absolutely no extra styling */
+  background-size: 220% 220%;   /* enlarge */
+  background-position: -90px 70px; /* move left & down */
 }
 
-/* Trait layers (PNG only) that get a tiny parallax */
+/* Trait layers (PNG or GIF) — NO labels, just pixels; tiny parallax */
 .frog-layer{
   position:absolute; left:0; top:0;
   width:512px; height:512px;

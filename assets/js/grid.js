@@ -1,140 +1,115 @@
 // assets/js/grid.js
 (function (FF, CFG) {
-  // DOM
-  const stage = document.getElementById('frogStage');
+  // find or create the stage
+  let stage = document.getElementById('frogStage');
+  const grid = document.getElementById('grid');
+  if (!stage && grid) {
+    grid.innerHTML = '';
+    stage = document.createElement('div');
+    stage.id = 'frogStage';
+    stage.className = 'frog-stage';
+    // ensure a wrapper exists for centering if your HTML uses .hero-frog
+    const w = document.getElementById('heroFrog') || grid;
+    w.appendChild(stage);
+  }
   if (!stage) return;
 
-  // Helpers
-  function randId() {
-    return 1 + Math.floor(Math.random() * Number(CFG.SUPPLY || 4040));
-  }
-  function metaURL(id) { return `${CFG.SOURCE_PATH}/frog/json/${id}.json`; }
-  function basePNG(id) { return `${CFG.SOURCE_PATH}/frog/${id}.png`; }
-  function buildPNG(attr, value) {
-    // Example: ./frog/build_files/Frog/redEyedTreeFrog.png
-    return `${CFG.SOURCE_PATH}/frog/build_files/${encodeURIComponent(attr)}/${encodeURIComponent(value)}.png`;
-  }
-  function buildGIF(attr, value) {
-    // Example: ./frog/build_files/Mouth/animations/mask_animation.gif
-    return `${CFG.SOURCE_PATH}/frog/build_files/${encodeURIComponent(attr)}/animations/${encodeURIComponent(value)}_animation.gif`;
-  }
+  // --- config/helpers ---
+  const SUPPLY = Number(CFG.SUPPLY || 4040);
+  const randId = () => 1 + Math.floor(Math.random() * SUPPLY);
 
-  // Simple cache to avoid re-downloading
-  const imgCache = new Map();
-  function preload(src) {
-    return new Promise((resolve, reject) => {
-      if (!src) return resolve(null);
-      if (imgCache.has(src)) return resolve(imgCache.get(src));
+  const basePNG = (id) => `${CFG.SOURCE_PATH}/frog/${id}.png`;
+  const metaURL = (id) => `${CFG.SOURCE_PATH}/frog/json/${id}.json`;
+  const buildPNG = (attr, value) =>
+    `${CFG.SOURCE_PATH}/frog/build_files/${encodeURIComponent(attr)}/${encodeURIComponent(value)}.png`;
+  const buildGIF = (attr, value) =>
+    `${CFG.SOURCE_PATH}/frog/build_files/${encodeURIComponent(attr)}/animations/${encodeURIComponent(value)}_animation.gif`;
+
+  const NO_ANIM = new Set(['frog','trait','hat']); // case-insensitive
+
+  function fetchJSON(url){
+    return fetch(url, {cache:'no-store'}).then(r=>{
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return r.json();
+    });
+  }
+  function preload(src){
+    return new Promise(res=>{
       const img = new Image();
-      img.decoding = 'async';
-      img.onload = () => { imgCache.set(src, src); resolve(src); };
-      img.onerror = () => resolve(null); // treat as absent
+      img.onload = () => res(src);
+      img.onerror = () => res(null);
       img.src = src;
     });
   }
 
-  async function fetchJSON(url) {
-    const r = await fetch(url, { cache: 'no-store' });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return r.json();
+  // choose the best asset for an attribute (prefer GIF unless disallowed)
+  async function pickAsset(attr, value){
+    const key = String(attr||'').trim();
+    const lower = key.toLowerCase();
+    if (!key || !value) return null;
+
+    // if animations are NOT allowed for this attribute -> use PNG
+    if (NO_ANIM.has(lower)) {
+      return await preload(buildPNG(key, value));
+    }
+
+    // try GIF first, then PNG
+    const gif = await preload(buildGIF(key, value));
+    if (gif) return gif;
+    return await preload(buildPNG(key, value));
   }
 
-  // Build one frog, layering by metadata order.
-  // Rules:
-  //  - If an animation exists for a trait, prefer it.
-  //  - EXCEPT: skip Frog animations and Hat animations entirely.
-  //  - Still draw static PNG if animation was skipped (unless we’re skipping hats completely).
-  //  - "SpecialFrog" is allowed.
-  async function renderFrog(id) {
-    // Clear previous content
+  // --- render one frog ---
+  async function renderFrog(id){
+    // background from original PNG (enlarged+offset via CSS)
+    stage.style.setProperty('--bg-img', `url("${basePNG(id)}")`);
+
+    // clear all trait layers
     stage.replaceChildren();
 
-    // Set background from the original PNG (enlarged & shifted via CSS ::before)
-    stage.style.setProperty('--bg-url', `url("${basePNG(id)}")`);
-    // Use a CSS var through inline style for the ::before background:
-    stage.style.setProperty('background-image', 'none');
-    stage.style.setProperty('--frog-bg', `url("${basePNG(id)}")`);
-    // Patch ::before background with style attribute (works by writing directly)
-    stage.style.setProperty('--bg', basePNG(id));
-    // Since CSS can't read custom props in ::before background-image on all browsers,
-    // we directly set it via style attribute on the pseudo with a helper class toggle:
-    stage.classList.remove('apply-bg');
-    // Force reflow then apply
-    void stage.offsetHeight;
-    stage.classList.add('apply-bg');
-    // (CSS selector uses .frog-stage.apply-bg::before to read style.backgroundImage)
-    stage.style.setProperty('backgroundImage', `url("${basePNG(id)}")`);
+    // load metadata
+    let attributes = [];
+    try {
+      const meta = await fetchJSON(metaURL(id));
+      if (Array.isArray(meta?.attributes)) attributes = meta.attributes;
+    } catch (_) { /* ignore */ }
 
-    // Metadata
-    let meta;
-    try { meta = await fetchJSON(metaURL(id)); } catch { meta = null; }
-    const attributes = Array.isArray(meta?.attributes) ? meta.attributes : [];
-
-    // Build hover chips
-    const chips = document.createElement('div');
-    chips.className = 'frog-attrs';
-    attributes.forEach(a => {
-      const chip = document.createElement('span');
-      chip.className = 'frog-attr';
-      chip.textContent = (a?.trait_type && a?.value)
-        ? `${a.trait_type} ${a.value}`
-        : (a?.value || '');
-      chips.appendChild(chip);
-    });
-    stage.appendChild(chips);
-
-    // Layer images (prefer GIF where allowed)
-    for (const a of attributes) {
+    // build in order given by JSON
+    for (const a of attributes){
       const attr = String(a?.trait_type || '').trim();
-      const value = String(a?.value || '').trim();
-      if (!attr || !value) continue;
+      const val  = String(a?.value || '').trim();
+      if (!attr || !val) continue;
 
-      // Skip hats entirely (per your request)
-      if (/^hat$/i.test(attr)) continue;
-
-      // Prepare sources
-      let src = null;
-
-      // Prefer animation if exists, but skip for Frog
-      if (!/^frog$/i.test(attr)) {
-        const gif = await preload(buildGIF(attr, value));
-        if (gif) src = gif;
-      }
-
-      // If we didn't use an animation, use the PNG
-      if (!src) {
-        const png = await preload(buildPNG(attr, value));
-        if (png) src = png;
-      }
-
+      const src = await pickAsset(attr, val);
       if (!src) continue;
 
       const layer = document.createElement('img');
       layer.className = 'frog-layer';
-      layer.alt = `${attr} ${value}`;
+      layer.alt = `${attr} ${val}`;
       layer.src = src;
       stage.appendChild(layer);
     }
 
-    // Light parallax for attribute chips following the mouse
-    function onMove(e) {
-      const rect = stage.getBoundingClientRect();
-      const rx = (e.clientX - rect.left) / rect.width - 0.5;  // -0.5 .. 0.5
-      const ry = (e.clientY - rect.top) / rect.height - 0.5;
-      chips.style.transform = `translate(${rx * 12}px, ${ry * -12}px)`;
+    // parallax only on layers (not the background)
+    const layers = Array.from(stage.querySelectorAll('.frog-layer'));
+    function onMove(e){
+      const r = stage.getBoundingClientRect();
+      const rx = (e.clientX - r.left)/r.width  - 0.5; // -0.5..0.5
+      const ry = (e.clientY - r.top) /r.height - 0.5;
+      layers.forEach((el, i)=>{
+        const f = 2 + i*0.6; // front moves slightly more
+        el.style.transform = `translate(${rx*f}px, ${ry*-f}px)`;
+      });
     }
+    function reset(){ layers.forEach(el=> el.style.transform = 'translate(0,0)'); }
     stage.onmousemove = onMove;
-    stage.onmouseleave = () => { chips.style.transform = 'translate(0,0)'; };
+    stage.onmouseleave = reset;
   }
 
-  // Shuffle on click
-  async function shuffle() {
-    const id = randId();
-    await renderFrog(id);
-  }
+  // shuffle on click
+  async function shuffle(){ await renderFrog(randId()); }
 
-  // Init
+  // init
   renderFrog(randId());
   stage.addEventListener('click', shuffle);
-
 })(window.FF, window.FF_CFG);
