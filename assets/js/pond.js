@@ -4,8 +4,8 @@
   const ul   = document.getElementById('pondList');
   if (!wrap || !ul) return;
 
-  // ---------- config / provider ----------
-  const START_BLOCK = Number(CFG.COLLECTION_START_BLOCK ?? 15209637); // your deploy block
+  // -------- config / provider --------
+  const START_BLOCK = Number(CFG.COLLECTION_START_BLOCK ?? 15209637);
   const CONTROLLER  = String(CFG.CONTROLLER_ADDRESS).toLowerCase();
   const COLLECTION  = CFG.COLLECTION_ADDRESS;
 
@@ -17,12 +17,11 @@
     return null;
   }
 
-  // ---------- state ----------
+  // -------- state --------
   const ST = {
-    // reservoir list of tokenIds currently owned by controller
-    ids: [],                 // [Number]
-    // cached enrichment: id -> { id, staker, since:Date|null }
-    cache: new Map(),
+    ids: [],          // from Reservoir (fast list of tokenIds)
+    rows: null,       // direct enriched rows (used by fallback) [{id, staker, since}]
+    cache: new Map(), // id -> { id, staker, since }
     page: 0,
     pageSize: 10,
     loadingPage: false
@@ -30,7 +29,7 @@
 
   let RANKS = null;
 
-  // ---------- helpers ----------
+  // -------- helpers --------
   async function loadRanks() {
     if (RANKS) return RANKS;
     try { RANKS = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json'); }
@@ -55,13 +54,11 @@
     return nav;
   }
 
-  function buildPager(){
-    const total = ST.ids.length;
+  function buildPager(total){
     const pages = Math.max(1, Math.ceil(total / ST.pageSize));
     const nav = ensurePager();
     nav.innerHTML = '';
     if (pages <= 1) return;
-
     for (let i=0; i<pages; i++){
       const btn = document.createElement('button');
       btn.className = 'btn btn-ghost btn-sm';
@@ -70,7 +67,7 @@
       btn.addEventListener('click', ()=>{
         if (ST.page !== i){
           ST.page = i;
-          renderPage(); // will enrich lazily if needed
+          renderPage();
         }
       });
       nav.appendChild(btn);
@@ -93,41 +90,7 @@
     );
   }
 
-  // ---------- rendering ----------
-  function renderPage(){
-    ul.innerHTML = '';
-    const total = ST.ids.length;
-
-    if (!total){
-      const li = document.createElement('li');
-      li.className = 'list-item';
-      li.innerHTML = `<div class="muted">No frogs are currently staked.</div>`;
-      ul.appendChild(li);
-      ensurePager().innerHTML = '';
-      return;
-    }
-
-    const start = ST.page * ST.pageSize;
-    const end   = Math.min(start + ST.pageSize, total);
-    const pageIds = ST.ids.slice(start, end);
-
-    // show placeholders immediately
-    pageIds.forEach(id=>{
-      const li = document.createElement('li'); li.className = 'list-item'; li.dataset.id = String(id);
-      const cached = ST.cache.get(id);
-      li.innerHTML = cached
-        ? rowHTML(cached)
-        : (FF.thumb64(`${CFG.SOURCE_PATH}/frog/${id}.png`, `Frog ${id}`) +
-           `<div><b>Frog #${id}</b><div class="muted">Loading stake info…</div></div>`);
-      ul.appendChild(li);
-    });
-
-    // fetch enrichment for this page if not already complete
-    if (!ST.loadingPage) enrichCurrentPage().catch(()=>{});
-    buildPager();
-  }
-
-  // ---------- Reservoir: list token IDs owned by controller ----------
+  // -------- Reservoir: list token IDs owned by controller --------
   async function fetchControllerTokens(limitPerPage = 200, maxPages = 30){
     const key = CFG.FROG_API_KEY;
     if (!key) return [];
@@ -140,7 +103,8 @@
         collection: CFG.COLLECTION_ADDRESS,
         owner: CFG.CONTROLLER_ADDRESS,
         limit: String(limitPerPage),
-        includeTopBid: 'false'
+        includeTopBid: 'false',
+        includeAttributes: 'false'
       });
       if (continuation) p.set('continuation', continuation);
       const res = await fetch(`${base}?${p.toString()}`, {
@@ -161,11 +125,69 @@
     return out;
   }
 
-  // ---------- batched enrichment for *current page* ----------
+  // -------- on-chain utilities (fallback + enrichment) --------
+  function iface(){
+    return new ethers.utils.Interface([
+      'event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)'
+    ]);
+  }
+
+  // Fallback: derive full set (and staker/since) directly from logs
+  async function deriveCurrentStakedSet(){
+    const provider = getProvider();
+    if (!provider) return [];
+
+    const ifc = iface();
+    const topicTransfer = ifc.getEventTopic('Transfer');
+    const controllerTopic = ethers.utils.hexZeroPad(CONTROLLER, 32);
+
+    // 1) all transfers TO controller
+    const logsIn = await provider.getLogs({
+      fromBlock: START_BLOCK,
+      toBlock: 'latest',
+      address: COLLECTION,
+      topics: [ topicTransfer, null, controllerTopic, null ]
+    });
+
+    // 2) all transfers FROM controller (unstake)
+    const logsOut = await provider.getLogs({
+      fromBlock: START_BLOCK,
+      toBlock: 'latest',
+      address: COLLECTION,
+      topics: [ topicTransfer, controllerTopic, null, null ]
+    });
+
+    const all = logsIn.concat(logsOut).sort((a,b)=>{
+      if (a.blockNumber!==b.blockNumber) return a.blockNumber-b.blockNumber;
+      return a.logIndex-b.logIndex;
+    });
+
+    const live = new Map(); // id -> { id, staker, since }
+    for (const log of all){
+      let parsed; try { parsed = ifc.parseLog(log); } catch { continue; }
+      const from = String(parsed.args.from || '').toLowerCase();
+      const to   = String(parsed.args.to   || '').toLowerCase();
+      const id   = Number(parsed.args.tokenId);
+      if (!Number.isFinite(id)) continue;
+
+      if (to === CONTROLLER){
+        const blk = await provider.getBlock(log.blockNumber);
+        live.set(id, { id, staker: parsed.args.from, since: new Date(blk.timestamp*1000) });
+      } else if (from === CONTROLLER){
+        live.delete(id);
+      }
+    }
+    return [...live.values()].sort((a,b)=>{
+      const ta=a.since?+a.since:0, tb=b.since?+b.since:0;
+      return tb-ta;
+    });
+  }
+
+  // Enrich the current page only (one getLogs with OR over tokenIds, then batched getBlock)
   async function enrichCurrentPage(){
     const provider = getProvider();
-    if (!provider) return; // no wallet/RPC available; keep placeholders
-
+    if (!provider) return;
+    if (!ST.ids.length) return;
     const start = ST.page * ST.pageSize;
     const end   = Math.min(start + ST.pageSize, ST.ids.length);
     const pageIds = ST.ids.slice(start, end).filter(id=>!ST.cache.has(id));
@@ -173,10 +195,7 @@
 
     ST.loadingPage = true;
     try{
-      // Build OR-topic for all tokenIds on this page
-      const ifc = new ethers.utils.Interface([
-        'event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)'
-      ]);
+      const ifc = iface();
       const topicTransfer = ifc.getEventTopic('Transfer');
       const toTopic = ethers.utils.hexZeroPad(CONTROLLER, 32);
       const idTopics = pageIds.map(id=>{
@@ -184,82 +203,130 @@
         return ethers.utils.hexZeroPad(hexId, 32);
       });
 
-      // Single getLogs call for all "to controller" transfers for these ids
       const logs = await provider.getLogs({
         fromBlock: START_BLOCK,
         toBlock:   'latest',
         address:   COLLECTION,
-        topics:    [ topicTransfer, null, toTopic, idTopics ] // OR on 4th topic
+        topics:    [ topicTransfer, null, toTopic, idTopics ]
       });
 
-      // Keep only the last "to controller" log per id
-      const lastById = new Map(); // id -> log
+      const lastById = new Map();
       for (const log of logs){
-        let parsed;
-        try { parsed = ifc.parseLog(log); } catch { continue; }
+        let parsed; try { parsed = ifc.parseLog(log); } catch { continue; }
         const id = Number(parsed.args.tokenId);
         if (!Number.isFinite(id)) continue;
-        // we want the most recent => replace if newer
         const prev = lastById.get(id);
         if (!prev || log.blockNumber > prev.blockNumber || (log.blockNumber===prev.blockNumber && log.logIndex>prev.logIndex)){
           lastById.set(id, log);
         }
       }
 
-      // Batch unique block lookups for timestamps
       const needed = pageIds.filter(id => !ST.cache.has(id));
       const blockNums = [...new Set(needed.map(id => lastById.get(id)?.blockNumber).filter(Boolean))];
       const blockMap = new Map();
-      // small batch fetch; provider handles parallelism
       await Promise.all(blockNums.map(async bn=>{
-        try {
-          const blk = await provider.getBlock(bn);
-          blockMap.set(bn, blk);
-        } catch {}
+        try { blockMap.set(bn, await provider.getBlock(bn)); } catch {}
       }));
 
-      // Fill cache for each id on this page
       needed.forEach(id=>{
         const log = lastById.get(id);
-        if (!log){
-          ST.cache.set(id, { id, staker: null, since: null });
-          return;
-        }
-        let parsed;
-        try { parsed = ifc.parseLog(log); } catch { parsed = null; }
+        if (!log){ ST.cache.set(id, { id, staker:null, since:null }); return; }
+        let parsed; try { parsed = ifc.parseLog(log); } catch { parsed = null; }
         const staker = parsed?.args?.from ?? null;
         const blk = blockMap.get(log.blockNumber);
         const since = blk ? new Date(blk.timestamp*1000) : null;
         ST.cache.set(id, { id, staker, since });
       });
 
-      // Update the DOM rows we just enriched
+      // update visible rows
       ul.querySelectorAll('li.list-item').forEach(li=>{
         const id = Number(li.dataset.id);
         const row = ST.cache.get(id);
-        if (row){
-          li.innerHTML = rowHTML(row);
-        }
+        if (row){ li.innerHTML = rowHTML(row); }
       });
-    }finally{
+    } finally {
       ST.loadingPage = false;
     }
   }
 
-  // ---------- main ----------
+  // -------- rendering --------
+  function renderFromRows(){ // fallback path uses ST.rows directly
+    ul.innerHTML = '';
+    const total = ST.rows?.length || 0;
+    if (!total){
+      const li = document.createElement('li');
+      li.className = 'list-item';
+      li.innerHTML = `<div class="muted">No frogs are currently staked.</div>`;
+      ul.appendChild(li);
+      ensurePager().innerHTML = '';
+      return;
+    }
+
+    const start = ST.page * ST.pageSize;
+    const end   = Math.min(start + ST.pageSize, total);
+    const pageRows = ST.rows.slice(start, end);
+    pageRows.forEach(r=>{
+      const li = document.createElement('li'); li.className = 'list-item';
+      li.innerHTML = rowHTML(r);
+      ul.appendChild(li);
+    });
+    buildPager(total);
+  }
+
+  function renderPage(){ // reservoir path uses ST.ids + cache
+    if (ST.rows) { renderFromRows(); return; }
+    ul.innerHTML = '';
+    const total = ST.ids.length;
+
+    if (!total){
+      const li = document.createElement('li');
+      li.className = 'list-item';
+      li.innerHTML = `<div class="muted">No frogs are currently staked.</div>`;
+      ul.appendChild(li);
+      ensurePager().innerHTML = '';
+      return;
+    }
+
+    const start = ST.page * ST.pageSize;
+    const end   = Math.min(start + ST.pageSize, total);
+    const pageIds = ST.ids.slice(start, end);
+
+    pageIds.forEach(id=>{
+      const li = document.createElement('li'); li.className = 'list-item'; li.dataset.id = String(id);
+      const cached = ST.cache.get(id);
+      li.innerHTML = cached
+        ? rowHTML(cached)
+        : (FF.thumb64(`${CFG.SOURCE_PATH}/frog/${id}.png`, `Frog ${id}`) +
+           `<div><b>Frog #${id}</b><div class="muted">Loading stake info…</div></div>`);
+      ul.appendChild(li);
+    });
+
+    buildPager(total);
+    if (!ST.loadingPage) enrichCurrentPage().catch(()=>{});
+  }
+
+  // -------- main --------
   async function loadPond(){
     try{
       await loadRanks();
 
-      // 1) list ids via Reservoir (fast)
+      // 1) try Reservoir first (fast)
       let ids = [];
       try { ids = await fetchControllerTokens(); } catch(e){ console.warn('Reservoir error', e); }
-      ST.ids = ids;
+      if (Array.isArray(ids) && ids.length){
+        ST.ids = ids;
+        ST.rows = null;
+        ST.page = 0;
+        renderPage();     // immediate placeholders
+        return;
+      }
 
-      // 2) render page 1 immediately (placeholders),
-      //    then enrichment fills in staker + since for page 1 only.
+      // 2) fallback to on-chain derivation (slower, but reliable)
+      const rows = await deriveCurrentStakedSet();
+      ST.rows = rows;
+      ST.ids = [];
       ST.page = 0;
-      renderPage();
+      renderFromRows();
     }catch(e){
       console.warn('Pond load failed', e);
       ul.innerHTML = `<li class="list-item"><div class="muted">Failed to load the pond.</div></li>`;
