@@ -5,6 +5,7 @@
   if (!wrap || !ul) return;
 
   const KEY = CFG.FROG_API_KEY;
+  const START_BLOCK = Number(CFG.COLLECTION_START_BLOCK ?? 0);
 
   // ---------- state ----------
   const ST = {
@@ -13,6 +14,32 @@
     pageSize: 10
   };
   let RANKS = null;
+
+  // ---------- tiny cache (localStorage) ----------
+  const CACHE_KEY = 'FF_POND_CACHE_V1';
+  const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
+  function readCache(){
+    try {
+      const raw = localStorage.getItem(CACHE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch { return {}; }
+  }
+  function writeCache(obj){
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify(obj)); } catch {}
+  }
+  function getCached(id){
+    const c = readCache();
+    const hit = c[id];
+    if (!hit) return null;
+    if ((Date.now() - (hit.t||0)) > CACHE_TTL_MS) return null;
+    return hit;
+  }
+  function setCached(id, data){
+    const c = readCache();
+    c[id] = { ...data, t: Date.now() };
+    writeCache(c);
+  }
 
   // ---------- helpers ----------
   async function loadRanks() {
@@ -96,8 +123,7 @@
     buildPager();
   }
 
-  // ---------- Reservoir fetches (CORS-friendly) ----------
-  // 1) IDs currently owned by controller
+  // ---------- Reservoir: get the current staked set (IDs) ----------
   async function fetchControllerTokenIds(limitPerPage = 200, maxPages = 30){
     if (!KEY) return [];
     const out = [];
@@ -132,54 +158,93 @@
     return out;
   }
 
-  // 2) Collection activity (transfer events). Filter client-side to TO = controller.
-  async function fetchTransfersToController({limit=1000, maxPages=10} = {}){
-    if (!KEY) return new Map();
+  // ---------- On-chain enrichment (via window.ethereum) ----------
+  function getProvider(){
+    if (window.ethereum) return new ethers.providers.Web3Provider(window.ethereum);
+    return null;
+  }
 
-    const cAddr = CFG.CONTROLLER_ADDRESS.toLowerCase();
-    const col   = CFG.COLLECTION_ADDRESS;
+  // Minimal ABIs
+  const IFACE = new ethers.utils.Interface([
+    'event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)'
+  ]);
+  const CTRL_IFACE = new ethers.utils.Interface([
+    'function stakerAddress(uint256) view returns (address)'
+  ]);
 
-    // field getters (cover v7 shapes)
-    const getList = (j)=> j?.activities || j?.events || j?.transfers || [];
-    const getTokenId = (a)=> {
-      const tid = a?.token?.tokenId ?? a?.tokenId ?? a?.event?.token?.tokenId ?? a?.event?.tokenId;
-      return tid!=null ? Number(tid) : null;
+  function topicsForTransferTo(controllerAddr, tokenIdHex){
+    const sig = IFACE.getEventTopic('Transfer');
+    const toTopic = ethers.utils.hexZeroPad(controllerAddr, 32);
+    return [ sig, null, toTopic, tokenIdHex ];
+  }
+
+  // Limit concurrency
+  function limit(fn, n){
+    let active = 0, queue = [];
+    const next = ()=> {
+      if (!queue.length || active >= n) return;
+      active++;
+      const {args, resolve, reject} = queue.shift();
+      Promise.resolve(fn(...args)).then(
+        v => { active--; resolve(v); next(); },
+        e => { active--; reject(e); next(); }
+      );
     };
-    const getFrom = (a)=> (a?.fromAddress || a?.from || a?.event?.fromAddress || a?.event?.from || '').toLowerCase();
-    const getTo   = (a)=> (a?.toAddress   || a?.to   || a?.event?.toAddress   || a?.event?.to   || '').toLowerCase();
-    const getTime = (a)=> a?.createdAt || a?.timestamp || a?.event?.createdAt || null;
+    return (...args)=> new Promise((resolve,reject)=>{
+      queue.push({args, resolve, reject});
+      next();
+    });
+  }
 
-    const out = [];
-    let continuation = '';
-    for (let i=0; i<maxPages; i++){
-      const q = new URLSearchParams({
-        types: 'transfer',
-        limit: String(limit)
+  async function enrichForId(provider, controller, id){
+    // cache first
+    const cached = getCached(id);
+    if (cached) {
+      return {
+        id,
+        staker: cached.staker || null,
+        since: cached.since ? new Date(cached.since) : null
+      };
+    }
+
+    const tokenIdHex = ethers.utils.hexZeroPad(ethers.BigNumber.from(String(id)).toHexString(), 32);
+
+    // 1) staker via controller view
+    let staker = null;
+    try {
+      const ctrl = new ethers.Contract(CFG.CONTROLLER_ADDRESS, CTRL_IFACE, provider);
+      staker = await ctrl.stakerAddress(id);
+      if (staker && /^0x0{40}$/i.test(staker)) staker = null;
+    } catch {}
+
+    // 2) since via last Transfer(..., to=controller, tokenId=id)
+    let since = null;
+    try {
+      const logs = await provider.getLogs({
+        fromBlock: START_BLOCK || 0,
+        toBlock: 'latest',
+        address: CFG.COLLECTION_ADDRESS,
+        topics: topicsForTransferTo(CFG.CONTROLLER_ADDRESS, tokenIdHex)
       });
-      if (continuation) q.set('continuation', continuation);
+      if (logs.length){
+        const last = logs[logs.length - 1];
+        const blk = await provider.getBlock(last.blockNumber);
+        since = new Date(blk.timestamp * 1000);
+      }
+    } catch {}
 
-      const url = `https://api.reservoir.tools/collections/${col}/activity/v7?` + q.toString();
-      const res = await fetch(url, { headers:{ accept:'*/*', 'x-api-key': KEY } });
-      if (!res.ok) throw new Error('Reservoir activity '+res.status);
-      const json = await res.json();
-      const list = getList(json);
-      out.push(...list);
-      continuation = json?.continuation || '';
-      if (!continuation) break;
-    }
+    setCached(id, { staker, since: since ? since.toISOString() : null });
+    return { id, staker, since };
+  }
 
-    // Build latest transfer-to-controller map (newest first in response)
-    const latest = new Map(); // id -> { staker, since: Date }
-    for (const a of out){
-      if (getTo(a) !== cAddr) continue;
-      const id = getTokenId(a);
-      if (!Number.isFinite(id)) continue;
-      if (latest.has(id)) continue;
-      const from = getFrom(a) || null;
-      const when = getTime(a);
-      latest.set(id, { staker: from, since: when ? new Date(when) : null });
+  async function enrichAll(ids){
+    const provider = getProvider();
+    if (!provider) {
+      // No RPC — return rows without enrichment
+      return ids.map(id => ({ id, staker: null, since: null }));
     }
-    return latest;
+    const run = limit((id)=>enrichForId(provider, CFG.CONTROLLER_ADDRESS, id), 6);
+    return Promise.all(ids.map(id => run(id)));
   }
 
   // ---------- main ----------
@@ -197,14 +262,11 @@
         return;
       }
 
-      // 2) Latest transfer TO controller => staker + since (via collection activity)
-      const latestMap = await fetchTransfersToController();
+      // 2) Enrich (staker + since) with caching + limited concurrency
+      const rows = await enrichAll(ids);
 
-      // 3) Join & sort
-      const rows = ids.map(id=>{
-        const hit = latestMap.get(id);
-        return { id, staker: hit?.staker || null, since: hit?.since || null };
-      }).sort((a,b)=>{
+      // newest staked first
+      rows.sort((a,b)=>{
         const ta = a.since ? a.since.getTime() : 0;
         const tb = b.since ? b.since.getTime() : 0;
         return tb - ta;
