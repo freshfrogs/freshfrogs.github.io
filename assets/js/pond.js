@@ -7,6 +7,7 @@
   // ---------- config ----------
   const API = 'https://api.reservoir.tools/users/activity/v6';
   const OWNERS_API = 'https://api.reservoir.tools/owners/v2';
+  const TOKENS_API = 'https://api.reservoir.tools/users'; // /{addr}/tokens/v8
   const CONTROLLER = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
   const COLLECTION = CFG.COLLECTION_ADDRESS || '';
   const PAGE_SIZE  = 20; // reservoir max per call
@@ -16,6 +17,9 @@
     if (!CFG.FROG_API_KEY) throw new Error('Missing FROG_API_KEY in config.js');
     return { accept: '*/*', 'x-api-key': CFG.FROG_API_KEY };
   }
+
+  const shorten = (s)=> (FF && FF.shorten) ? FF.shorten(s) :
+    (s ? (s.slice(0,6)+'…'+s.slice(-4)) : '—');
 
   // ---------- resilient fetch (timeout + retries + 429 handling) ----------
   async function reservoirFetch(url, opts={}, retries=3, timeoutMs=9000){
@@ -118,6 +122,52 @@
     }
   }
 
+  // ---------- background helper (uses flat PNG; sets bg image + sampled color) ----------
+  function pickBestBgUrl(id){
+    const local = `frog/${id}.png`;
+    const leading = `/frog/${id}.png`;
+    const cfg = (CFG.SOURCE_PATH ? `${CFG.SOURCE_PATH}/frog/${id}.png` : local);
+    return [local, leading, cfg];
+  }
+
+  async function applyFrogBackground(container, tokenId){
+    // style that hides the frog body by showing bottom-right corner of the flat PNG
+    Object.assign(container.style, {
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: '2000% 2000%',   // huge zoom
+      backgroundPosition: '100% 100%', // bottom-right
+      imageRendering: 'pixelated'
+    });
+
+    const urls = pickBestBgUrl(tokenId);
+    for (const url of urls){
+      const ok = await new Promise(resolve=>{
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = ()=>{
+          // sample top-left pixel to set backgroundColor (extra safety)
+          try{
+            const c = document.createElement('canvas');
+            c.width = 2; c.height = 2;
+            const ctx = c.getContext('2d');
+            ctx.drawImage(img, 0, 0, 2, 2);
+            const d = ctx.getImageData(0,0,1,1).data;
+            container.style.backgroundColor = `rgba(${d[0]},${d[1]},${d[2]},${(d[3]||255)/255})`;
+          }catch{}
+          container.style.backgroundImage = `url('${url}')`;
+          resolve(true);
+        };
+        img.onerror = ()=>resolve(false);
+        img.src = url;
+      });
+      if (ok) return true;
+    }
+    // final fallback: neutral dark if all paths failed
+    container.style.backgroundColor = '#151a1e';
+    container.style.backgroundImage = 'none';
+    return false;
+  }
+
   // ---------- frog renderer (128x128 layered, bg trick, hover lift) ----------
   const NO_ANIM_FOR = new Set(['Hat','Frog','Trait']);
   const NO_LIFT_FOR = new Set(['Frog','Trait','SpecialFrog']);
@@ -156,7 +206,7 @@
 
     if (!NO_LIFT_FOR.has(attr)){
       img.addEventListener('mouseenter', ()=>{
-        img.style.transform = 'translate(-6px, -8px)';
+        img.style.transform = 'translate(-8px, -12px)'; // a bit more lift + left
         img.style.filter = 'drop-shadow(0 5px 0 rgba(0,0,0,.45))';
       });
       img.addEventListener('mouseleave', ()=>{
@@ -179,24 +229,18 @@
       position: 'relative',
       overflow: 'hidden',
       borderRadius: '8px',
-      imageRendering: 'pixelated',
-      backgroundRepeat: 'no-repeat',
-      backgroundSize: '900%',
-      backgroundPosition: '-350% 350%'
+      imageRendering: 'pixelated'
     });
 
-    const localBg = `frog/${tokenId}.png`;
-    const altBg   = (CFG.SOURCE_PATH ? `${CFG.SOURCE_PATH}/frog/${tokenId}.png` : localBg);
-    container.style.backgroundImage = `url('${localBg}')`;
-    const probe = new Image();
-    probe.onerror = ()=>{ container.style.backgroundImage = `url('${altBg}')`; };
-    probe.src = localBg;
+    // Apply the background (flat PNG zoom trick + sampled color)
+    await applyFrogBackground(container, tokenId);
 
     // Layered build from metadata
     const metaUrl = `frog/json/${tokenId}.json`;
     let meta;
     try { meta = await FF.fetchJSON(metaUrl); }
     catch {
+      const [url] = pickBestBgUrl(tokenId);
       const flat = new Image();
       flat.decoding = 'async';
       flat.loading  = 'lazy';
@@ -204,8 +248,8 @@
         position:'absolute', inset:'0', width:`${SIZE}px`, height:`${SIZE}px`,
         imageRendering:'pixelated', zIndex:'2'
       });
-      flat.src = localBg;
-      flat.onerror = ()=>{ flat.onerror = null; flat.src = altBg; };
+      flat.src = url;
+      flat.onerror = ()=>{ /* ignore; bg color already applied */ };
       container.appendChild(flat);
       return;
     }
@@ -333,7 +377,7 @@
           `<div style="display:flex;align-items:center;gap:8px;">
             <b>Frog #${r.id}</b> ${pillRank(rank)}
           </div>
-          <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? FF.shorten(r.staker) : '—'}</div>`;
+          <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? shorten(r.staker) : '—'}</div>`;
         li.appendChild(mid);
 
         // Right: tag
@@ -353,18 +397,18 @@
     const colA = document.getElementById('statCollection');
     if (ctlA){
       ctlA.href = `https://etherscan.io/address/${CFG.CONTROLLER_ADDRESS}`;
-      ctlA.textContent = FF.shorten(CONTROLLER);
+      ctlA.textContent = shorten(CONTROLLER);
     }
     if (colA){
       colA.href = `https://etherscan.io/address/${CFG.COLLECTION_ADDRESS}`;
-      colA.textContent = FF.shorten((CFG.COLLECTION_ADDRESS||'').toLowerCase());
+      colA.textContent = shorten((CFG.COLLECTION_ADDRESS||'').toLowerCase());
     }
   }
 
-  async function fetchTotalStaked(){
+  async function fetchTotalStakedViaOwners(){
     // Walk owners until we find the controller address
     let cont = '';
-    for (let guard=0; guard<20; guard++){
+    for (let guard=0; guard<30; guard++){
       const qs = new URLSearchParams({ collection: COLLECTION });
       if (cont) qs.set('continuation', cont);
       const url = `${OWNERS_API}?${qs.toString()}`;
@@ -378,7 +422,34 @@
       cont = json?.continuation || '';
       if (!cont) break;
     }
-    return 0;
+    return null; // not found
+  }
+
+  async function fetchTotalStakedViaTokens(){
+    // enumerate controller's tokens for this collection and count
+    let cont = '';
+    let total = 0;
+    for (let guard=0; guard<40; guard++){
+      const qs = new URLSearchParams({
+        collection: COLLECTION,
+        limit: '200',
+        includeTopBid: 'false'
+      });
+      if (cont) qs.set('continuation', cont);
+      const url = `${TOKENS_API}/${CONTROLLER}/tokens/v8?${qs.toString()}`;
+      const json = await reservoirFetch(url, { headers: apiHeaders() });
+      const arr = json?.tokens || [];
+      total += arr.length;
+      cont = json?.continuation || '';
+      if (!cont) break;
+    }
+    return total;
+  }
+
+  async function fetchTotalStaked(){
+    const a = await fetchTotalStakedViaOwners();
+    if (a !== null) return a;
+    return await fetchTotalStakedViaTokens();
   }
 
   function renderStatsBar(){
