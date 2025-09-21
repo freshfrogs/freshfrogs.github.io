@@ -4,13 +4,14 @@
   const ul   = document.getElementById('pondList');
   if (!wrap || !ul) return;
 
+  // --- Reservoir endpoints ---
   const API_ACTIVITY = 'https://api.reservoir.tools/users/activity/v6';
-  const API_OWNERS   = 'https://api.reservoir.tools/collections/owners/v2';
+  const API_OWNERS   = 'https://api.reservoir.tools/owners/v2';
   const API_TOKENS   = (addr)=> `https://api.reservoir.tools/users/${addr}/tokens/v8`;
 
   const CONTROLLER = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
   const COLLECTION = CFG.COLLECTION_ADDRESS || '';
-  const PAGE_SIZE  = 20; // Reservoir activity max
+  const PAGE_SIZE  = 20; // activity max
 
   function apiHeaders(){
     if (!CFG.FROG_API_KEY) throw new Error('Missing FROG_API_KEY in config.js');
@@ -19,18 +20,17 @@
 
   // ---------- state ----------
   const ST = {
-    // aggregated, de-duped, *currently staked* rows newest->older
-    rows: [],                 // [{id, staker, since:Date}]
-    totalCount: 0,            // how many frogs controller currently holds
+    rows: [],                 // [{id, staker, since: Date|null}]
+    totalCount: 0,
     page: 0,
-    nextContinuation: '',     // for activity crawl
-    blockedIds: new Set(),    // tokenIds that have an outbound (newer) => not staked
+    nextContinuation: '',
+    blockedIds: new Set(),    // ids with outbound (not currently staked)
   };
 
   let RANKS = null;
 
   // ---------- UI helpers ----------
-  const fmtAgo = (d)=> d ? (FF.formatAgo(Date.now() - d.getTime()) + ' ago') : '—';
+  const fmtAgo = (d)=> d ? (FF.formatAgo(Date.now()-d.getTime())+' ago') : '—';
   const pillRank = (rank)=> (rank||rank===0)
     ? `<span class="pill">Rank <b>#${rank}</b></span>`
     : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
@@ -54,7 +54,6 @@
   function renderPager(){
     const nav = ensurePager();
     nav.innerHTML = '';
-
     const pages = totalPages();
     for (let i=0; i<pages; i++){
       const btn = document.createElement('button');
@@ -111,23 +110,24 @@
     renderPager();
   }
 
-  // ---------- counting helpers (for full pager upfront) ----------
+  // ---------- count helpers (show full pager up-front) ----------
   async function fetchStakedCountFast(){
-    // Try owners endpoint (fast, single call)
+    // Use the endpoint you proved works: /owners/v2
+    // Filter by collection + owner = controller (lightweight, precise).
     const qs = new URLSearchParams({ collection: COLLECTION, owner: CONTROLLER });
     const res = await fetch(`${API_OWNERS}?${qs.toString()}`, { headers: apiHeaders() });
     if (!res.ok) throw new Error(`owners ${res.status}`);
     const j = await res.json();
-    // Defensive parsing: look for tokenCount in owners list
-    const owners = j?.owners || j?.data || [];
-    const row = owners.find(o => (o.owner || o.address || '').toLowerCase() === CONTROLLER);
-    const count = Number(row?.tokenCount ?? row?.count ?? 0);
+    const owners = j?.owners || [];
+    const row = owners.find(o => (o.address || o.owner || '').toLowerCase() === CONTROLLER);
+    // tokenCount usually lives at ownership.tokenCount; keep defensive fallbacks:
+    const count = Number(row?.ownership?.tokenCount ?? row?.tokenCount ?? row?.count ?? 0);
     if (!Number.isFinite(count)) throw new Error('owners count parse');
     return count;
   }
 
   async function fetchStakedCountFallback(){
-    // Walk tokens (200 per page) just to count quickly (light payload, once)
+    // Fallback: count via users/{controller}/tokens/v8
     let continuation = '';
     let count = 0;
     for (let i=0; i<50; i++){
@@ -149,7 +149,7 @@
     catch { return await fetchStakedCountFallback(); }
   }
 
-  // ---------- activity crawl (build rows lazily) ----------
+  // ---------- activity crawl (derive staker + since) ----------
   function pushCandidate(a){
     const tok = a?.token?.tokenId;
     if (!tok) return;
@@ -159,16 +159,15 @@
     const to   = (a?.toAddress   || '').toLowerCase();
     const from = (a?.fromAddress || '').toLowerCase();
 
-    // Outbound from controller => block this id
+    // Outbound from controller => mark not staked + remove if present
     if (from === CONTROLLER){
       ST.blockedIds.add(id);
-      // also remove if it was previously added
       const idx = ST.rows.findIndex(r => r.id === id);
       if (idx >= 0) ST.rows.splice(idx, 1);
       return;
     }
 
-    // Inbound to controller => add if not blocked and not already listed
+    // Inbound to controller => add if not blocked and not duped
     if (to === CONTROLLER && !ST.blockedIds.has(id)){
       if (!ST.rows.some(r => r.id === id)){
         const since = a?.createdAt ? new Date(a.createdAt)
@@ -199,7 +198,6 @@
     if (!res.ok) throw new Error(`activity ${res.status}`);
     const j = await res.json();
     const acts = j?.activities || [];
-    // process newest -> older as returned
     for (const a of acts) pushCandidate(a);
     sortRows();
     ST.nextContinuation = j?.continuation || '';
@@ -208,7 +206,6 @@
 
   async function ensureHaveRowsForPage(pageIndex){
     const need = Math.min(ST.totalCount, (pageIndex + 1) * PAGE_SIZE);
-    // fetch activity pages until we have enough currently-staked rows to cover requested page
     let guard = 0;
     while (ST.rows.length < need && ST.nextContinuation && guard < 200){
       guard++;
@@ -219,7 +216,7 @@
   // ---------- main ----------
   async function loadPond(){
     try{
-      // load ranks (optional)
+      // ranks (optional)
       try { RANKS = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json'); }
       catch { RANKS = {}; }
 
@@ -229,7 +226,7 @@
       ST.nextContinuation = '';
       ST.blockedIds = new Set();
 
-      // get count so we can render all pager buttons up-front
+      // count first so we can render all pager buttons immediately
       ST.totalCount = await getStakedCount();
       renderPager();
 
@@ -238,7 +235,7 @@
         return;
       }
 
-      // fill first page worth of rows and render
+      // prefill first page
       await ensureHaveRowsForPage(0);
       renderPage();
     }catch(e){
