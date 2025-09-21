@@ -166,7 +166,13 @@
   }
 
   function liCard(id, subtitle){
-    const li=document.createElement('li'); li.className='list-item';
+    const li = document.createElement('li'); li.className = 'list-item';
+
+    // enable modal click-delegation for Owned/Staked items
+    li.setAttribute('data-token-id', String(id));
+    li.setAttribute('data-src', (ST && ST.mode === 'staked') ? 'staked' : 'owned');
+    li.setAttribute('data-owner', (ST && ST.addr) ? ST.addr : '');
+    li.setAttribute('data-staked', (ST && ST.mode === 'staked') ? 'true' : 'false');
 
     const left = document.createElement('div');
     Object.assign(left.style,{width:'128px',height:'128px',minWidth:'128px',minHeight:'128px'});
@@ -176,9 +182,9 @@
     const mid = document.createElement('div');
     mid.innerHTML =
       `<div style="display:flex;align-items:center;gap:8px;">
-         <b>Frog #${id}</b> ${pillRank(rank)}
-       </div>
-       <div class="muted">${subtitle || ''}</div>`;
+        <b>Frog #${id}</b> ${pillRank(rank)}
+      </div>
+      <div class="muted">${subtitle || ''}</div>`;
     li.appendChild(mid);
 
     return li;
