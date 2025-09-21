@@ -69,8 +69,8 @@
   async function applyFrogBackground(container, tokenId){
     Object.assign(container.style, {
       backgroundRepeat:'no-repeat',
-      backgroundSize:'2000% 2000%',      // big zoom
-      backgroundPosition:'100% 100%',    // bottom-right = show only bg color area
+      backgroundSize:'2000% 2000%',
+      backgroundPosition:'100% 100%',
       imageRendering:'pixelated'
     });
     const urls = pickBestBgUrl(tokenId);
@@ -150,11 +150,11 @@
   }
 
   // ------- wallet + UI -------
-  const ul   = document.getElementById('chipWrap');
-  const status = document.getElementById('stakeStatus');
-  const tabOwned = document.getElementById('tabOwned');
-  const tabStaked= document.getElementById('tabStaked');
-  const refreshBtn = document.getElementById('refreshOwned');
+  const ul        = document.getElementById('chipWrap');
+  const status    = document.getElementById('stakeStatus');
+  const tabOwned  = document.getElementById('tabOwned');
+  const tabStaked = document.getElementById('tabStaked');
+  const refreshBtn= document.getElementById('refreshOwned');
 
   const ST = { addr:null, mode:'owned', owned:[], staked:[] };
 
@@ -302,8 +302,6 @@
     document.dispatchEvent(new CustomEvent('ff-tabs-updated', { detail: { which: mode } }));
   }
 
-  const tabOwned = document.getElementById('tabOwned');
-  const tabStaked= document.getElementById('tabStaked');
   if (tabOwned){
     tabOwned.addEventListener('click', ()=>{
       tabOwned.setAttribute('aria-selected','true');
@@ -319,7 +317,6 @@
     });
   }
 
-  const refreshBtn = document.getElementById('refreshOwned');
   if (refreshBtn){ refreshBtn.addEventListener('click', ()=>refresh(ST.mode)); }
 
   // initial
