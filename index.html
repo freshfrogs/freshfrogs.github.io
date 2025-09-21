@@ -46,7 +46,7 @@
     .fact,.panel{background:var(--panel);border:1px solid var(--ring);border-radius:var(--radius);padding:14px;box-shadow:0 1px 0 rgba(0,0,0,.3) inset}
     .panel{margin-block:12px}
     .same-height{display:flex;flex-direction:column}
-    .same-height .card-list{flex:1;min-height:0} /* allow scroll section to size correctly */
+    .same-height .card-list{flex:1;min-height:0}
     .card-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
     .list-item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:12px 14px;border-radius:8px;border:1px solid var(--ring);background:var(--panel)}
     .price{font-weight:800}
@@ -77,6 +77,13 @@
     .list-scroll::-webkit-scrollbar{ width: 10px }
     .list-scroll::-webkit-scrollbar-thumb{ background: color-mix(in srgb, var(--ink) 18%, transparent); border-radius: 8px; }
     .list-scroll::-webkit-scrollbar-track{ background: color-mix(in srgb, var(--panel-2) 70%, transparent); }
+
+    /* ✅ Added helpers for unified panel */
+    .hidden { display: none; }
+    .list-scroll5 { max-height: var(--list-max); overflow-y: auto; overscroll-behavior: contain; }
+    .list-scroll5::-webkit-scrollbar{ width: 10px }
+    .list-scroll5::-webkit-scrollbar-thumb{ background: color-mix(in srgb, var(--ink) 18%, transparent); border-radius: 8px; }
+    .list-scroll5::-webkit-scrollbar-track{ background: color-mix(in srgb, var(--panel-2) 70%, transparent); }
   </style>
 </head>
 <body>
@@ -245,6 +252,7 @@ window.FF_CFG = {
   CONTROLLER_ADDRESS: "0xCB1ee125CFf4051a10a55a09B10613876C4Ef199",
   JSON_PATH: "assets/freshfrogs_rarity_rankings.json",
   FROG_API_KEY: (window.frog_api || "3105c552-60b6-5252-bca7-291c724a54bf")
+  // FF_CFG.COLLECTION_START_BLOCK = 0; // optional: set deploy block to speed "staked since"
 };
 /* ======================= THEME ======================= */
 (function(){
@@ -302,7 +310,6 @@ window.FF = window.FF || {};
   function renderAll(list=data){
     const ul=document.getElementById('recentSales'); if(!ul) return; ul.innerHTML='';
     const arr=(list&&list.length)?list:[{id:3250,time:"3m",price:"0.080 ETH",buyer:"0x9a…D1"}];
-    // render ALL; panel scrolls
     arr.forEach(x=>{
       const rank=(window.FF_getRankById?window.FF_getRankById(x.id):null);
       const badge=(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`;
@@ -331,7 +338,6 @@ window.FF = window.FF || {};
   function renderAll(){
     const ul=document.getElementById('rarityList'); if(!ul) return; ul.innerHTML='';
     const data=sorted(); if(!data.length){ ul.innerHTML='<li class="list-item"><div class="muted">No data yet</div></li>'; return; }
-    // render ALL; panel scrolls
     data.forEach(it=>{
       const id=it.id, rank=it.ranking??it.rank??'?', score=(it.rarity??it.score??'').toString();
       const li=document.createElement('li'); li.className='list-item';
@@ -383,7 +389,6 @@ window.FF = window.FF || {};
       const acc=await p.request({method:'eth_requestAccounts'}); user=acc?.[0]||null; ui(user);
       if(user){
         window.FF_clearOwned?.(); window.FF_fetchOwned?.(user);
-        // Auto-load staked on connect
         window.FF_loadStaked?.();
         document.getElementById('stakeStatus').textContent='Connected. Loading Owned/Staked…';
       }
@@ -412,13 +417,12 @@ window.FF = window.FF || {};
 
   function renderOwned(){
     const list=document.getElementById('chipWrap'); if(!list) return;
-    if(window.FF_getTab && window.FF_getTab()!=='owned') return; // render only on 'owned'
+    if(window.FF_getTab && window.FF_getTab()!=='owned') return;
     list.innerHTML='';
     const user = window.FF_getUser();
     if(!user){ list.innerHTML='<li class="list-item"><div class="muted">Connect your wallet to view owned tokens.</div></li>'; return; }
     if(!heldTokens.length){ list.innerHTML='<li class="list-item"><div class="muted">No tokens loaded yet. Click “Refresh Owned”.</div></li>'; return; }
 
-    // render ALL; container scrolls
     heldTokens.forEach(({id,image})=>{
       const rank = window.FF_getRankById ? window.FF_getRankById(id) : null;
       const li=document.createElement('li'); li.className='list-item';
@@ -461,7 +465,6 @@ window.FF = window.FF || {};
       const ss=document.getElementById('stakeStatus');
       ss.textContent = `Owned: ${heldTokens.length}` + (heldContinuation ? ' • more available' : '');
 
-      // Optional "Load more" button
       const anchor = document.getElementById('stakeControls');
       let btn = document.getElementById('heldMoreBtn');
       if(!heldContinuation){ if(btn) btn.remove(); }
@@ -518,7 +521,6 @@ window.FF = window.FF || {};
     if(!window.ethereum) return false;
     provider = new ethers.providers.Web3Provider(window.ethereum);
     signer = provider.getSigner();
-    // minimal ABI for this page
     const abi = [
       {"inputs":[{"internalType":"address","name":"_user","type":"address"}],"name":"getStakedTokens","outputs":[{"components":[{"internalType":"address","name":"staker","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"internalType":"struct FreshFrogsController.StakedToken[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},
       {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},
@@ -602,7 +604,6 @@ window.FF = window.FF || {};
     });
   }
 
-  // expose so wallet.js can auto-load on connect
   window.FF_loadStaked = loadStaked;
   window.FF_clearStaked = ()=>{ ST.items=[]; if(window.FF_getTab && window.FF_getTab()==='staked'){ render(); } };
   window.FF_setTab = setTab;
@@ -615,17 +616,156 @@ window.FF = window.FF || {};
   if(ok && b){ b.textContent="Live loaded"; b.disabled=true; b.classList.add('btn-ghost'); }
   window.FF_renderSales();
   window.FF_renderGrid();
-
-  // Default to OWNED tab but load both datasets if wallet is already connected
   window.FF_setTab('owned');
 
-  // If MetaMask already injected with a selected address, auto-init UI and load both lists
   const pre = window.ethereum?.selectedAddress;
   if(pre){
     window.FF_setWalletUI(pre);
     window.FF_fetchOwned?.(pre);
     window.FF_loadStaked?.();
   }
+})();
+</script>
+
+<!-- ✅ Tab driver that wires Sales / Rarity / Pond into the unified panel -->
+<script>
+(function(){
+  const tabsEl = document.getElementById('infoTabs');
+  if (!tabsEl) return;
+
+  const views = {
+    sales:  document.getElementById('tab-sales'),
+    rarity: document.getElementById('tab-rarity'),
+    pond:   document.getElementById('tab-pond'),
+  };
+
+  // Ensure inner UL targets for existing renderers
+  function ensureInnerList(id, container){
+    let el = container.querySelector('#'+id);
+    if (!el) {
+      el = document.createElement('ul');
+      el.id = id;
+      el.className = 'card-list';
+      container.appendChild(el);
+    }
+    return el;
+  }
+
+  async function showTab(name){
+    tabsEl.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+    Object.entries(views).forEach(([k,el]) => el.classList.toggle('hidden', k !== name));
+
+    if (name === 'sales' && !views.sales.dataset.ready) {
+      ensureInnerList('recentSales', views.sales);
+      try { await window.FF_loadSalesLive(); } catch(_) {}
+      try { window.FF_renderSales(); } catch(_) {}
+      views.sales.dataset.ready = '1';
+    }
+    if (name === 'rarity' && !views.rarity.dataset.ready) {
+      ensureInnerList('rarityList', views.rarity);
+      try { await window.FF_loadRarity(); } catch(_) {}
+      views.rarity.dataset.ready = '1';
+    }
+    if (name === 'pond' && !views.pond.dataset.ready) {
+      try { await renderPondInto(views.pond); } catch(_) {}
+      views.pond.dataset.ready = '1';
+    }
+  }
+
+  tabsEl.addEventListener('click', (e)=>{
+    const b = e.target.closest('.tab'); if (!b) return;
+    showTab(b.dataset.tab);
+  });
+
+  // ---------- Pond renderer (controller-owned tokens) ----------
+  async function fetchTokensByOwner(owner){
+    const out = [];
+    const key = window.FF_CFG.FROG_API_KEY;
+    if (!key) return out;
+
+    const base = 'https://api.reservoir.tools/tokens/v7';
+    let continuation = '';
+    for (let i=0;i<4;i++){
+      const params = new URLSearchParams({
+        collection: FF_CFG.COLLECTION_ADDRESS,
+        owner,
+        limit: '200',
+        includeTopBid: 'false'
+      });
+      if (continuation) params.set('continuation', continuation);
+      const res = await fetch(`${base}?${params.toString()}`, { headers: { accept:'*/*', 'x-api-key': key } });
+      if (!res.ok) break;
+      const json = await res.json();
+      const arr = (json?.tokens || []).map(t => Number(t?.token?.tokenId)).filter(Number.isFinite);
+      out.push(...arr);
+      continuation = json?.continuation || '';
+      if (!continuation) break;
+    }
+    return out;
+  }
+
+  async function getStakedSinceDate(tokenId){
+    if (!window.ethereum) return null;
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const iface = new ethers.utils.Interface(['event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)']);
+      const topicTransfer = iface.getEventTopic('Transfer');
+      const toTopic = ethers.utils.hexZeroPad(FF_CFG.CONTROLLER_ADDRESS, 32);
+      const idTopic = ethers.utils.hexZeroPad(ethers.BigNumber.from(String(tokenId)).toHexString(), 32);
+
+      const logs = await provider.getLogs({
+        fromBlock: (FF_CFG.COLLECTION_START_BLOCK ?? 0),
+        toBlock: 'latest',
+        address: FF_CFG.COLLECTION_ADDRESS,
+        topics: [topicTransfer, null, toTopic, idTopic]
+      });
+      if (!logs.length) return null;
+      const last = logs[logs.length - 1];
+      const blk = await provider.getBlock(last.blockNumber);
+      return new Date(blk.timestamp * 1000);
+    } catch { return null; }
+  }
+
+  function sinceShort(date){
+    if (!date) return '';
+    const ms = Date.now() - date.getTime();
+    const s = Math.floor(ms/1000); if (s < 60) return `${s}s`;
+    const m = Math.floor(s/60);    if (m < 60) return `${m}m`;
+    const h = Math.floor(m/60);    if (h < 24) return `${h}h`;
+    const d = Math.floor(h/24);    return `${d}d`;
+  }
+
+  async function renderPondInto(container){
+    container.innerHTML = '';
+    const ids = await fetchTokensByOwner(FF_CFG.CONTROLLER_ADDRESS).catch(()=>[]);
+    if (!ids.length){
+      const empty = document.createElement('div');
+      empty.className = 'muted';
+      empty.textContent = 'No frogs are currently staked.';
+      container.appendChild(empty);
+      return;
+    }
+
+    for (const id of ids){
+      const rank = window.FF_getRankById ? window.FF_getRankById(id) : null;
+      const since = await getStakedSinceDate(id).catch(()=>null);
+      const row = document.createElement('div');
+      row.className = 'list-item';
+      row.innerHTML =
+        FF.thumb64(`${FF_CFG.SOURCE_PATH}/frog/${id}.png`, `Frog ${id}`) +
+        `<div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <b>Frog #${id}</b>
+            ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`}
+          </div>
+          <div class="muted">Owner Staking Controller${since ? ` • Staked: ${sinceShort(since)} ago` : ''}</div>
+        </div>`;
+      container.appendChild(row);
+    }
+  }
+
+  // default tab on load
+  showTab('sales');
 })();
 </script>
 </body>
