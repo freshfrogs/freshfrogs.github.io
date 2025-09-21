@@ -1,130 +1,132 @@
-// assets/js/grid.js
+/* global window, document */
 (function (FF, CFG) {
-  // Ensure a stage exists
-  let stage = document.getElementById('frogStage');
-  const grid = document.getElementById('grid');
-  if (!stage && grid) {
-    grid.innerHTML = '';
-    // optional wrapper for centering if you added .hero-frog
-    const wrap = document.getElementById('heroFrog') || grid;
-    stage = document.createElement('div');
-    stage.id = 'frogStage';
-    stage.className = 'frog-stage';
-    wrap.appendChild(stage);
-  }
-  if (!stage) return;
+  // Which attributes should NOT lift on hover
+  const HOVER_EXCLUDE = new Set(['Frog', 'Trait', 'SpecialFrog']);
+  // Which attributes should NOT use animated GIFs (use PNG instead)
+  const ANIM_EXCLUDE = new Set(['Frog', 'Trait', 'Hat']);
 
-  // ---------- helpers ----------
-  const SUPPLY = Number(CFG.SUPPLY || 4040);
-  const randId = () => 1 + Math.floor(Math.random() * SUPPLY);
+  const SIZE = 256;
 
-  const basePNG = (id) => `${CFG.SOURCE_PATH}/frog/${id}.png`;
-  const metaURL = (id) => `${CFG.SOURCE_PATH}/frog/json/${id}.json`;
-  const buildPNG = (attr, value) =>
-    `${CFG.SOURCE_PATH}/frog/build_files/${encodeURIComponent(attr)}/${encodeURIComponent(value)}.png`;
-  const buildGIF = (attr, value) =>
-    `${CFG.SOURCE_PATH}/frog/build_files/${encodeURIComponent(attr)}/animations/${encodeURIComponent(value)}_animation.gif`;
-
-  // Animations ARE allowed except for Frog/Trait/Hat (you set this rule earlier)
-  const NO_ANIM = new Set(['frog','trait','hat']); // case-insensitive
-  // Lift effect is disabled ONLY for Trait
-  const NO_LIFT = new Set(['trait']); // case-insensitive
-
-  function fetchJSON(url){
-    return fetch(url, {cache:'no-store'}).then(r=>{
-      if(!r.ok) throw new Error('HTTP '+r.status);
-      return r.json();
-    });
-  }
-  function preload(src){
-    return new Promise(res=>{
-      const img = new Image();
-      img.onload = () => res(src);
-      img.onerror = () => res(null);
-      img.src = src;
-    });
+  function sanitize(v) {
+    // file names are case sensitive on GitHub pages
+    return String(v).replace(/\s+/g, '').replace(/[^\w()-]/g, '');
   }
 
-  async function pickAsset(attr, value){
-    const key = String(attr||'').trim();
-    const lower = key.toLowerCase();
-    if (!key || !value) return null;
+  function makeImg(src, cls) {
+    const img = new Image();
+    img.className = cls || '';
+    img.decoding = 'async';
+    img.loading = 'eager';
+    img.style.width = img.style.height = SIZE + 'px';
+    img.style.imageRendering = 'pixelated';
+    img.style.position = 'absolute';
+    img.style.left = '0';
+    img.style.top = '0';
+    return Object.assign(img, { src });
+  }
 
-    if (NO_ANIM.has(lower)) {
-      return await preload(buildPNG(key, value));
+  function layerFor(attr, value) {
+    const attrName = String(attr);
+    const val = sanitize(value);
+
+    const base = `${CFG.SOURCE_PATH}/frog/build_files/${encodeURIComponent(attrName)}/`;
+    const png = `${base}${val}.png`;
+    const gif = `${base}animations/${val}_animation.gif`;
+
+    // If animations are excluded for this attribute, just return PNG layer
+    if (ANIM_EXCLUDE.has(attrName)) {
+      return makeImg(png, 'frog-layer');
     }
-    // prefer animation if present; fallback to PNG
-    const gif = await preload(buildGIF(key, value));
-    if (gif) return gif;
-    return await preload(buildPNG(key, value));
+
+    // Try GIF first; if it 404s, fall back to PNG
+    const img = makeImg(gif, 'frog-layer');
+    img.onerror = () => { img.onerror = null; img.src = png; };
+    return img;
   }
 
-  // ---------- render one frog ----------
-  async function renderFrog(id){
-    // Set background to the original PNG; CSS hides the sprite itself
-    stage.style.setProperty('--bg-img', `url("${basePNG(id)}")`);
-    stage.replaceChildren();
+  async function fetchMeta(id) {
+    const url = `${CFG.SOURCE_PATH}/frog/json/${id}.json`;
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) throw new Error('meta ' + r.status);
+    return r.json();
+  }
 
-    // Load metadata
-    let attrs = [];
+  function heroContainer() {
+    const g = document.getElementById('grid');
+    if (!g) return null;
+    g.innerHTML = '';
+    const wrap = document.createElement('div');
+    wrap.className = 'hero-frog';
+    wrap.style.width = SIZE + 'px';
+    wrap.style.height = SIZE + 'px';
+    g.appendChild(wrap);
+    return wrap;
+  }
+
+  function applyHoverLift(img, attrName) {
+    if (HOVER_EXCLUDE.has(attrName)) return;
+    img.classList.add('liftable');
+    img.addEventListener('mouseenter', () => {
+      img.style.transform = 'translateY(-10px)';
+      img.style.filter = 'drop-shadow(0 8px 0 rgba(0,0,0,.35))';
+    });
+    img.addEventListener('mouseleave', () => {
+      img.style.transform = 'translateY(0)';
+      img.style.filter = 'none';
+    });
+  }
+
+  async function renderOne(id) {
+    const host = heroContainer();
+    if (!host) return;
+    // Background crop: original PNG, oversized + offset so only bg area shows
+    host.style.backgroundImage = `url(${CFG.SOURCE_PATH}/frog/${id}.png)`;
+    host.style.backgroundRepeat = 'no-repeat';
+    host.style.backgroundSize = '240% 240%';         // enlarge
+    host.style.backgroundPosition = '-35% 65%';      // push down-left (bg only)
+
     try {
-      const meta = await fetchJSON(metaURL(id));
-      if (Array.isArray(meta?.attributes)) attrs = meta.attributes;
-    } catch (_) {}
+      const meta = await fetchMeta(id);
+      const attrs = Array.isArray(meta?.attributes) ? meta.attributes : [];
 
-    // Build in the order given
-    for (const a of attrs){
-      const attr = String(a?.trait_type || '').trim();
-      const val  = String(a?.value || '').trim();
-      if (!attr || !val) continue;
+      // Layer in the order they appear in metadata
+      for (const item of attrs) {
+        const attr = String(item?.trait_type ?? item?.trait ?? '');
+        const val  = item?.value ?? '';
+        if (!attr || val == null) continue;
 
-      const src = await pickAsset(attr, val);
-      if (!src) continue;
-
-      const layer = document.createElement('img');
-      layer.className = 'frog-layer';
-      layer.alt = `${attr} ${val}`;
-      layer.src = src;
-      layer.dataset.attr = attr; // remember original case
-      stage.appendChild(layer);
+        const layer = layerFor(attr, val);
+        applyHoverLift(layer, attr);
+        host.appendChild(layer);
+      }
+    } catch (e) {
+      // Fallback to plain PNG if metadata failed
+      const img = makeImg(`${CFG.SOURCE_PATH}/frog/${id}.png`, 'frog-layer');
+      host.appendChild(img);
+      console.warn('Frog meta load failed', e);
     }
+  }
 
-    // LIFT EFFECT (no parallax):
-    // When the pointer is in the upper region of the canvas,
-    // lift only the interactive layers (not 'Trait').
-    const layers = Array.from(stage.querySelectorAll('.frog-layer'));
-    function updateLift(e){
-      const rect = stage.getBoundingClientRect();
-      const rx = (e.clientX - rect.left) / rect.width;   // 0..1
-      const ry = (e.clientY - rect.top)  / rect.height;  // 0..1
-
-      const inUpper = ry < 0.45; // hats/glasses area
-      layers.forEach(el=>{
-        const attr = String(el.dataset.attr||'').toLowerCase();
-        if (!inUpper || NO_LIFT.has(attr)) {
-          el.classList.remove('is-lifted');
-        } else {
-          // Subtle: more lift if closer to the very top
-          const amt = Math.max(0, (0.45 - ry) / 0.45); // 0..1
-          el.style.setProperty('--liftAmt', amt.toFixed(3));
-          el.classList.add('is-lifted');
-        }
-      });
-    }
-    function resetLift(){
-      layers.forEach(el=>{
-        el.classList.remove('is-lifted');
-        el.style.removeProperty('--liftAmt');
-      });
-    }
-    stage.onmousemove = updateLift;
-    stage.onmouseleave = resetLift;
+  function randomId() {
+    return 1 + Math.floor(Math.random() * Number(CFG.SUPPLY || 4040));
   }
 
   // Shuffle on click
-  async function shuffle(){ await renderFrog(randId()); }
+  function enableShuffle(host) {
+    host.addEventListener('click', () => {
+      renderOne(randomId());
+    });
+  }
 
-  // Init first frog and wire click-to-shuffle
-  renderFrog(randId());
-  stage.addEventListener('click', shuffle);
-})(window.FF, window.FF_CFG);
+  // Public API
+  async function initGrid() {
+    const g = document.getElementById('grid');
+    if (!g) return;
+    const host = heroContainer();
+    if (!host) return;
+    enableShuffle(host);
+    await renderOne(randomId());
+  }
+
+  window.FF_renderGrid = initGrid;
+})(window.FF || (window.FF = {}), window.FF_CFG || {});
