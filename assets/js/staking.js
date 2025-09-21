@@ -3,21 +3,25 @@
   const ST = { items:[], page:0, pageSize:5 };
   let provider, signer, controller, collection;
 
-  // ---------- helpers ----------
+  // ---- Inline ABIs (no network fetch; avoids 404s) ----
+  const CONTROLLER_ABI = [
+    {"inputs":[{"internalType":"address","name":"_user","type":"address"}],"name":"getStakedTokens","outputs":[{"components":[{"internalType":"address","name":"staker","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"internalType":"struct StakedToken[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},
+    {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},
+    {"inputs":[{"internalType":"address","name":"_staker","type":"address"}],"name":"availableRewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+    // optional helpers if your controller has them
+    {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"stakerAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+    {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"stakerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}
+  ];
+  const ERC721_MIN_ABI = [
+    "event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)",
+    "function ownerOf(uint256 tokenId) view returns (address)"
+  ];
+
+  // ---- helpers ----
   function fmtWholeFromWei(weiLike){
-    try {
-      if (ethers?.utils?.formatUnits){
-        const f = parseFloat(ethers.utils.formatUnits(weiLike, 18));
-        return Math.round(f).toString();
-      }
-    } catch {}
-    try {
-      const bn = typeof weiLike==='bigint' ? weiLike : BigInt(String(weiLike));
-      return (bn / (10n**18n)).toString();
-    } catch {
-      const n = Number(weiLike);
-      return Math.round(n/1e18).toString();
-    }
+    try { const f = parseFloat(ethers.utils.formatUnits(weiLike, 18)); return Math.round(f).toString(); }
+    catch { try { const bn = typeof weiLike==='bigint'?weiLike:BigInt(String(weiLike)); return (bn/(10n**18n)).toString(); }
+    catch { const n=Number(weiLike); return Math.round(n/1e18).toString(); } }
   }
   function sinceShort(date){
     if (!date) return '';
@@ -30,12 +34,11 @@
   function isAddr(x){ return /^0x[a-fA-F0-9]{40}$/.test(String(x||'')); }
   const zaddr="0x0000000000000000000000000000000000000000";
 
-  // ---------- tabs (Owned / Staked) ----------
+  // ---- tabs (Owned / Staked) ----
   let currentTab='owned';
   const tabOwned=document.getElementById('tabOwned');
   const tabStaked=document.getElementById('tabStaked');
   const tabsWrap=document.getElementById('stakeTabs');
-
   function setTab(which){
     currentTab=which;
     const owned=(which==='owned');
@@ -48,30 +51,18 @@
   tabStaked?.addEventListener('click', ()=> setTab('staked'));
   window.FF_getTab = ()=> currentTab;
 
-  // ---------- ethers / contracts ----------
+  // ---- ethers / contracts (no fetchJSON) ----
   async function initEthers(){
     if (provider && signer && controller) return true;
     if(!window.ethereum) return false;
-
     provider = new ethers.providers.Web3Provider(window.ethereum);
     signer = provider.getSigner();
-
-    const ctrlAbi = await FF.fetchJSON('assets/abi/controller_abi.json');
-    controller = new ethers.Contract(CFG.CONTROLLER_ADDRESS, ctrlAbi, signer);
-
-    try {
-      const colAbi  = await FF.fetchJSON('assets/abi/collection_abi.json');
-      collection = new ethers.Contract(CFG.COLLECTION_ADDRESS, colAbi, provider); // read-only
-    } catch {
-      collection = new ethers.Contract(CFG.COLLECTION_ADDRESS, [
-        'event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)',
-        'function ownerOf(uint256 tokenId) view returns (address)'
-      ], provider);
-    }
+    controller = new ethers.Contract(CFG.CONTROLLER_ADDRESS, CONTROLLER_ABI, signer);
+    collection = new ethers.Contract(CFG.COLLECTION_ADDRESS, ERC721_MIN_ABI, provider);
     return true;
   }
 
-  // ---------- low-level helpers ----------
+  // ---- controller-owned token ids (Reservoir) ----
   async function controllerOwnedTokenIds(){
     const out = [];
     const key = CFG.FROG_API_KEY;
@@ -92,22 +83,10 @@
     return out;
   }
 
-  // Try ABI method first (stakerAddress/stakerOf), else use last Transfer -> controller "from" as staker
+  // staker resolution: try ABI helpers, else derive from logs (from = staker)
   async function getStakerOf(tokenId){
-    if (!controller) return null;
-    try {
-      if (controller.stakerAddress){
-        const a = await controller.stakerAddress(ethers.BigNumber.from(String(tokenId)));
-        if (isAddr(a) && a !== zaddr) return a;
-      }
-    }catch{}
-    try {
-      if (controller.stakerOf){
-        const a = await controller.stakerOf(ethers.BigNumber.from(String(tokenId)));
-        if (isAddr(a) && a !== zaddr) return a;
-      }
-    }catch{}
-    // fallback via logs: last Transfer(* -> controller, tokenId) => from = staker
+    try { if (controller.stakerAddress){ const a=await controller.stakerAddress(tokenId); if (isAddr(a)&&a!==zaddr) return a; } } catch{}
+    try { if (controller.stakerOf){ const a=await controller.stakerOf(tokenId); if (isAddr(a)&&a!==zaddr) return a; } } catch{}
     try{
       const iface = new ethers.utils.Interface(['event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)']);
       const topicTransfer = iface.getEventTopic('Transfer');
@@ -120,30 +99,23 @@
         topics: [topicTransfer, null, toTopic, idTopic]
       });
       if (!logs.length) return null;
-      const last = logs[logs.length - 1];
-      const [from] = ethers.utils.defaultAbiCoder.decode(['address'], logs[logs.length - 1].topics[1]);
-      return isAddr(from) ? from : null;
+      const fromAddr = ethers.utils.getAddress('0x'+logs[logs.length-1].topics[1].slice(26));
+      return isAddr(fromAddr) ? fromAddr : null;
     }catch{ return null; }
   }
 
   async function timeStakedDate(tokenId){
     try{
-      // verify current owner is controller
       const ownerNow = await collection.ownerOf(tokenId);
       if (!ownerNow || ownerNow.toLowerCase() !== CFG.CONTROLLER_ADDRESS.toLowerCase()) return null;
-
-      // prefer contract filter where tokenId is indexed
       try{
         const filter = collection.filters.Transfer(null, CFG.CONTROLLER_ADDRESS, ethers.BigNumber.from(String(tokenId)));
         const events = await collection.queryFilter(filter, (CFG.COLLECTION_START_BLOCK ?? 0), 'latest');
         if (events.length){
-          const last = events[events.length - 1];
-          const blk = await provider.getBlock(last.blockNumber);
+          const blk = await provider.getBlock(events[events.length - 1].blockNumber);
           return new Date(blk.timestamp * 1000);
         }
       }catch{}
-
-      // raw logs fallback
       const iface = new ethers.utils.Interface(['event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)']);
       const topicTransfer = iface.getEventTopic('Transfer');
       const toTopic = ethers.utils.hexZeroPad(CFG.CONTROLLER_ADDRESS, 32);
@@ -155,15 +127,14 @@
         topics: [topicTransfer, null, toTopic, idTopic]
       });
       if (logs.length){
-        const last = logs[logs.length - 1];
-        const blk = await provider.getBlock(last.blockNumber);
+        const blk = await provider.getBlock(logs[logs.length - 1].blockNumber);
         return new Date(blk.timestamp * 1000);
       }
-    }catch(_){}
+    }catch{}
     return null;
   }
 
-  // ---------- load staked for connected user ----------
+  // ---- load staked for connected user (shows Staker + time) ----
   async function loadStaked(){
     const status=document.getElementById('stakeStatus');
     const user = window.FF_getUser();
@@ -173,7 +144,6 @@
     try{
       status.textContent='Loading staked…';
       let rows = [];
-      // try direct contract method first
       try{
         if (controller.getStakedTokens){
           const res = await controller.getStakedTokens(user);
@@ -181,7 +151,6 @@
         }
       }catch{}
 
-      // fallback: filter controller-owned by staker == user
       if (!rows.length){
         const ids = await controllerOwnedTokenIds();
         const out = [];
@@ -195,7 +164,6 @@
       ST.items = rows;
       ST.page = 0;
 
-      // rewards
       const rewardsLine = document.getElementById('rewardsLine');
       try{
         const rewards = await controller.availableRewards(user);
@@ -257,7 +225,6 @@
       list.appendChild(li);
     });
 
-    // wire unstake
     list.querySelectorAll('[data-unstake]').forEach(btn=>{
       btn.addEventListener('click',()=> unstake(btn.getAttribute('data-unstake')));
     });
@@ -275,7 +242,7 @@
     less.onclick=()=>{ if(ST.page>0){ ST.page--; render(); } };
   }
 
-  // ---------- The Pond ----------
+  // ---- The Pond (controller-owned list with staker + staked time) ----
   window.FF_renderPondList = async function(containerEl){
     if (!containerEl) return;
     containerEl.innerHTML = '';
@@ -294,8 +261,6 @@
 
     for (const id of ids){
       const rank = window.FF_getRankById ? window.FF_getRankById(id) : null;
-
-      // determine staker + when
       let staker = null, since = null;
       try { staker = await getStakerOf(id); } catch(_){}
       try { since  = await timeStakedDate(id); } catch(_){}
@@ -318,7 +283,7 @@
     }
   };
 
-  // ---------- expose ----------
+  // ---- expose ----
   document.getElementById('loadStakedBtn')?.addEventListener('click', loadStaked);
   window.FF_setTab = setTab;
   window.FF_clearStaked = ()=>{ ST.items=[]; ST.page=0; if(window.FF_getTab && window.FF_getTab()==='staked') render(); };
