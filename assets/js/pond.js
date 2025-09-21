@@ -1,33 +1,40 @@
-// assets/js/pond.js  — Reservoir-only pond (no RPC/ethers needed)
+// assets/js/pond.js
 (function(FF, CFG){
   const wrap = document.getElementById('pondListWrap');
   const ul   = document.getElementById('pondList');
   if (!wrap || !ul) return;
 
-  // ----- state -----
+  // -------- config
+  const PAGE_SIZE = 10;
+  const TOKENS_PER_RES_PAGE = 200;   // reservoir tokens page size
+  const MAX_TOKEN_PAGES = 50;        // safety cap
+
+  // -------- state
   const ST = {
-    ids: [],          // token ids currently owned by controller
-    cache: new Map(), // id -> { id, staker, since: Date|null }
-    page: 0,
-    pageSize: 10,
-    loadingPage: false
+    ids: [],            // all controller-held token IDs
+    page: 0,            // current page index (0-based)
+    ranks: null,        // lookup { [id]: rankNumber }
+    fetchingIds: false,
+    allIdsLoaded: false,
+    inflightEnrich: new Map(), // id -> promise
   };
 
-  let RANKS = null;
+  // -------- helpers
+  const hasKey = ()=> !!CFG.FROG_API_KEY && CFG.FROG_API_KEY !== 'YOUR_RESERVOIR_API_KEY_HERE';
 
-  // ----- helpers -----
-  async function loadRanks(){
-    if (RANKS) return RANKS;
-    try { RANKS = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json'); }
-    catch { RANKS = {}; }
-    return RANKS;
+  function fmtAgo(date){
+    if (!date) return '—';
+    const ms = Date.now() - date.getTime();
+    const s = Math.floor(ms/1000); if (s<60) return s+'s ago';
+    const m = Math.floor(s/60);    if (m<60) return m+'m ago';
+    const h = Math.floor(m/60);    if (h<24) return h+'h ago';
+    const d = Math.floor(h/24);    return d+'d ago';
   }
-
-  const fmtAgo = (d)=> d ? (FF.formatAgo(Date.now()-d.getTime())+' ago') : '—';
-  const pillRank = (rank)=> (rank||rank===0)
-    ? `<span class="pill">Rank <b>#${rank}</b></span>`
-    : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
-
+  function pillRank(rank){
+    return (rank || rank === 0)
+      ? `<span class="pill">Rank <b>#${rank}</b></span>`
+      : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
+  }
   function ensurePager(){
     let nav = document.getElementById('pondPager');
     if (!nav){
@@ -39,13 +46,15 @@
     }
     return nav;
   }
-
-  function buildPager(total){
-    const pages = Math.max(1, Math.ceil(total / ST.pageSize));
+  function buildPager(){
+    const total = ST.ids.length;
+    const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
     const nav = ensurePager();
     nav.innerHTML = '';
-    if (pages <= 1) return;
-    for (let i=0;i<pages;i++){
+
+    if (pages <= 1) return; // nothing to show
+
+    for (let i=0; i<pages; i++){
       const btn = document.createElement('button');
       btn.className = 'btn btn-ghost btn-sm';
       btn.textContent = String(i+1);
@@ -60,119 +69,93 @@
     }
   }
 
-  function rowHTML(r){
-    const rank = RANKS?.[String(r.id)] ?? null;
-    return (
-      FF.thumb64(`${CFG.SOURCE_PATH}/frog/${r.id}.png`, `Frog ${r.id}`) +
-      `<div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <b>Frog #${r.id}</b> ${pillRank(rank)}
-        </div>
-        <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? FF.shorten(r.staker) : '—'}</div>
-      </div>
-      <div class="price">Staked</div>`
-    );
+  // -------- ranks
+  async function loadRanks(){
+    if (ST.ranks) return ST.ranks;
+    try {
+      ST.ranks = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json');
+    } catch {
+      ST.ranks = {};
+    }
+    return ST.ranks;
   }
 
-  // ----- Reservoir calls -----
-  const HEADERS = { accept:'*/*', 'x-api-key': CFG.FROG_API_KEY };
-
-  // 1) list tokens where owner == controller
-  async function fetchControllerTokens(limitPerPage=200, maxPages=30){
-    const out = [];
-    let continuation = '';
+  // -------- reservoir fetches
+  async function fetchControllerTokenIds({limit=TOKENS_PER_RES_PAGE, continuation=''} = {}){
+    const key = CFG.FROG_API_KEY;
     const base = 'https://api.reservoir.tools/tokens/v7';
-    for (let i=0;i<maxPages;i++){
-      const p = new URLSearchParams({
-        collection: CFG.COLLECTION_ADDRESS,
-        owner: CFG.CONTROLLER_ADDRESS,
-        limit: String(limitPerPage),
-        includeTopBid: 'false',
-        includeAttributes: 'false'
-      });
-      if (continuation) p.set('continuation', continuation);
-      const r = await fetch(`${base}?${p.toString()}`, { headers: HEADERS });
-      if (!r.ok) throw new Error('Reservoir '+r.status);
-      const j = await r.json();
-      const ids = (j?.tokens||[])
-        .map(t => {
-          const tokenId = t?.token?.tokenId ?? t?.tokenId ?? t?.id;
-          return tokenId!=null ? Number(tokenId) : null;
-        })
-        .filter(Number.isFinite);
-      out.push(...ids);
-      continuation = j?.continuation || '';
-      if (!continuation) break;
-    }
-    return out;
-  }
-
-  // 2) for a token id, get last inbound transfer to controller (staker + since)
-  async function fetchLastInboundForId(id){
-    // We’ll grab latest transfers for this token, then pick the most recent with toAddress == controller
-    // Endpoint: /activities/v7?collection=<addr>&token=<addr>:<id>&types=transfer&limit=5&sortBy=eventTimestamp
-    const base = 'https://api.reservoir.tools/activities/v7';
-    const p = new URLSearchParams({
+    const qs = new URLSearchParams({
       collection: CFG.COLLECTION_ADDRESS,
-      token: `${CFG.COLLECTION_ADDRESS}:${id}`,
-      types: 'transfer',
-      limit: '5',
-      sortBy: 'eventTimestamp'
+      owner: CFG.CONTROLLER_ADDRESS,
+      limit: String(limit),
+      includeTopBid: 'false'
     });
-    const r = await fetch(`${base}?${p.toString()}`, { headers: HEADERS });
-    if (!r.ok) throw new Error('Reservoir activities '+r.status);
-    const j = await r.json();
-    const acts = j?.activities || [];
-    // newest first is typical; ensure we take the most recent that sent to controller
-    const rec = acts.find(a => String(a?.toAddress||a?.to||'').toLowerCase() === String(CFG.CONTROLLER_ADDRESS).toLowerCase());
-    if (!rec) return { id, staker: null, since: null };
-    const from = rec.fromAddress || rec.from || null;
-    const ts   = rec.eventTimestamp || rec.timestamp || rec.createdAt || null;
-    const since = ts ? new Date((typeof ts === 'number' ? (ts < 1e12 ? ts*1000 : ts) : Date.parse(ts))) : null;
-    return { id, staker: from || null, since };
+    if (continuation) qs.set('continuation', continuation);
+
+    const res = await fetch(`${base}?${qs.toString()}`, {
+      headers: { accept:'*/*', 'x-api-key': key }
+    });
+    if (!res.ok) throw new Error('Reservoir tokens '+res.status);
+    const json = await res.json();
+    const ids = (json?.tokens || [])
+      .map(t => {
+        const tokenId = t?.token?.tokenId ?? t?.tokenId ?? t?.id;
+        return tokenId!=null ? Number(tokenId) : null;
+      })
+      .filter(Number.isFinite);
+    return { ids, continuation: json?.continuation || '' };
   }
 
-  // batch helper with small concurrency
-  async function pLimit(n, arr, fn){
-    const out = []; let i=0; const running = new Set();
-    async function run(k){
-      const p = Promise.resolve(fn(arr[k])).then(v => { out[k]=v; running.delete(p); });
-      running.add(p); await p;
+  // get last inbound transfer to controller for a single token
+  async function fetchStakeActivityForId(id){
+    const key = CFG.FROG_API_KEY;
+    const base = 'https://api.reservoir.tools/activities/v7';
+    const tokenParam = `${CFG.COLLECTION_ADDRESS}:${id}`;
+    const qs = new URLSearchParams({
+      types: 'transfer',
+      token: tokenParam,
+      limit: '20',              // grab a few, filter for "to=controller"
+      sortBy: 'eventTimestamp',
+      sortDirection: 'desc'
+    });
+    const res = await fetch(`${base}?${qs.toString()}`, {
+      headers: { accept:'*/*', 'x-api-key': key }
+    });
+    if (!res.ok) throw new Error('Reservoir activities '+res.status);
+    const json = await res.json();
+    const acts = json?.activities || [];
+    // find most recent transfer where "to" is controller
+    let found = null;
+    for (const a of acts){
+      const toAddr = a?.toAddress || a?.to?.address || a?.to;
+      if (toAddr && String(toAddr).toLowerCase() === String(CFG.CONTROLLER_ADDRESS).toLowerCase()){
+        const from = a?.fromAddress || a?.from?.address || a?.from || null;
+        const tsRaw = a?.eventTimestamp || a?.timestamp || a?.createdAt || null;
+        let when = null;
+        if (tsRaw){
+          const t = Date.parse(tsRaw);
+          when = Number.isNaN(t) ? null : new Date(t);
+        }
+        found = { staker: from, since: when };
+        break;
+      }
     }
-    while(i<arr.length){
-      while(running.size < n && i < arr.length){ run(i++); }
-      if (running.size) await Promise.race(running);
-    }
-    return out;
+    return found || { staker: null, since: null };
   }
 
-  async function enrichCurrentPage(){
-    const start = ST.page * ST.pageSize;
-    const end   = Math.min(start + ST.pageSize, ST.ids.length);
-    const pageIds = ST.ids.slice(start, end).filter(id=>!ST.cache.has(id));
-    if (!pageIds.length) return;
-
-    ST.loadingPage = true;
-    try{
-      const rows = await pLimit(5, pageIds, fetchLastInboundForId);
-      rows.forEach(r => ST.cache.set(r.id, r));
-      // swap placeholders
-      ul.querySelectorAll('li.list-item').forEach(li=>{
-        const id = Number(li.dataset.id);
-        const row = ST.cache.get(id);
-        if (row) li.innerHTML = rowHTML(row);
-      });
-    } finally {
-      ST.loadingPage = false;
-    }
+  function enrich(id){
+    if (ST.inflightEnrich.has(id)) return ST.inflightEnrich.get(id);
+    const p = fetchStakeActivityForId(id).catch(()=>({staker:null,since:null}));
+    ST.inflightEnrich.set(id, p);
+    return p;
   }
 
-  // ----- render -----
-  function renderPage(){
+  // -------- render
+  async function renderPage(){
     ul.innerHTML = '';
-    const total = ST.ids.length;
 
-    if (!total){
+    // Nothing yet?
+    if (!ST.ids.length){
       const li = document.createElement('li');
       li.className = 'list-item';
       li.innerHTML = `<div class="muted">No frogs are currently staked.</div>`;
@@ -181,41 +164,101 @@
       return;
     }
 
-    const start = ST.page * ST.pageSize;
-    const end   = Math.min(start + ST.pageSize, total);
-    const pageIds = ST.ids.slice(start, end);
+    await loadRanks();
 
-    pageIds.forEach(id=>{
-      const li = document.createElement('li'); li.className = 'list-item'; li.dataset.id = String(id);
-      const cached = ST.cache.get(id);
-      li.innerHTML = cached
-        ? rowHTML(cached)
-        : (FF.thumb64(`${CFG.SOURCE_PATH}/frog/${id}.png`, `Frog ${id}`) +
-           `<div><b>Frog #${id}</b><div class="muted">Loading stake info…</div></div>`);
+    const start = ST.page * PAGE_SIZE;
+    const end   = Math.min(start + PAGE_SIZE, ST.ids.length);
+    const subset = ST.ids.slice(start, end);
+
+    // Show placeholders first for faster paint
+    for (const id of subset){
+      const li = document.createElement('li'); li.className='list-item'; li.id = `pond-row-${id}`;
+      const rank = ST.ranks?.[String(id)] ?? null;
+      li.innerHTML =
+        FF.thumb64(`${CFG.SOURCE_PATH}/frog/${id}.png`, `Frog ${id}`) +
+        `<div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <b>Frog #${id}</b> ${pillRank(rank)}
+          </div>
+          <div class="muted">Loading staker…</div>
+        </div>
+        <div class="price">Staked</div>`;
       ul.appendChild(li);
+    }
+
+    // Enrich visible rows with staker + since (Reservoir activities)
+    subset.forEach(async (id)=>{
+      const row = await enrich(id);
+      const li = document.getElementById(`pond-row-${id}`);
+      if (!li) return;
+      const rank = ST.ranks?.[String(id)] ?? null;
+      li.innerHTML =
+        FF.thumb64(`${CFG.SOURCE_PATH}/frog/${id}.png`, `Frog ${id}`) +
+        `<div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <b>Frog #${id}</b> ${pillRank(rank)}
+          </div>
+          <div class="muted">Staked ${fmtAgo(row.since)} • Staker ${row.staker ? FF.shorten(String(row.staker)) : '—'}</div>
+        </div>
+        <div class="price">Staked</div>`;
     });
 
-    buildPager(total);
-    if (!ST.loadingPage) enrichCurrentPage().catch(()=>{});
+    buildPager();
   }
 
-  // ----- main -----
-  async function loadPond(){
+  // progressively fetch all controller-held IDs (render as we go)
+  async function loadIds(){
+    if (!hasKey()){
+      ul.innerHTML = `<li class="list-item"><div class="muted">Missing Reservoir API key.</div></li>`;
+      ensurePager().innerHTML = '';
+      return;
+    }
+    if (ST.fetchingIds) return;
+    ST.fetchingIds = true;
+
     try{
-      await loadRanks();
-      const ids = await fetchControllerTokens();
-      ST.ids = Array.isArray(ids) ? ids : [];
-      ST.page = 0;
-      ST.cache.clear();
+      let continuation = '';
+      let pageCount = 0;
+
+      do{
+        const { ids, continuation: next } = await fetchControllerTokenIds({ continuation });
+        if (ids.length){
+          // append & render only if this is the first chunk
+          const wasEmpty = (ST.ids.length === 0);
+          ST.ids.push(...ids);
+          if (wasEmpty){
+            ST.page = 0;
+            renderPage();
+          } else {
+            // if current page wasn't filled before, re-render to include new items
+            buildPager();
+          }
+        }
+        continuation = next;
+        pageCount++;
+      } while (continuation && pageCount < MAX_TOKEN_PAGES);
+
+      ST.allIdsLoaded = true;
+
+      // if nothing came back at all
+      if (!ST.ids.length){
+        ul.innerHTML = `<li class="list-item"><div class="muted">No frogs are currently staked.</div></li>`;
+        ensurePager().innerHTML = '';
+        return;
+      }
+
+      // Make sure current page is rendered (in case we started with empty)
       renderPage();
     }catch(e){
       console.warn('Pond load failed', e);
       ul.innerHTML = `<li class="list-item"><div class="muted">Failed to load the pond.</div></li>`;
       ensurePager().innerHTML = '';
+    }finally{
+      ST.fetchingIds = false;
     }
   }
 
-  // autorun & expose
-  loadPond();
-  window.FF_reloadPond = loadPond;
+  // autorun and expose
+  loadIds();
+  window.FF_reloadPond = loadIds;
 })(window.FF, window.FF_CFG);
