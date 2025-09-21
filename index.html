@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>FreshFrogs — Wallet, Staking, Pond</title>
+  <title>FreshFrogs — Wallet, Staking & The Pond</title>
 
   <!-- Fonts + Ethers -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Grotesk:wght@600;800&display=swap" rel="stylesheet">
@@ -31,17 +31,13 @@
 </header>
 
 <main class="container">
-  <!-- Hero / 3x3 gallery (static thumbnails, not clickable) -->
+  <!-- Hero / 3x3 gallery (static 128×128 thumbnails, not clickable) -->
   <section class="hero" id="gallery">
     <div>
       <h1 class="section-title" style="margin:0;font-size:clamp(2rem,4.2vw,3rem);">Nine random frogs. Clean and fast.</h1>
-      <p class="muted" style="max-width:62ch">Hero grid renders standard PNGs. (Layered trait rendering is used in modals elsewhere.)</p>
-      <div class="row" style="margin-top:12px;">
-        <a class="btn btn-solid btn-lg" href="#trade">🐸 Mint & Staking</a>
-        <a class="btn btn-outline" href="https://freshfrogs.github.io/" target="_blank" rel="noopener">Original Site</a>
-      </div>
+      <p class="muted" style="max-width:62ch">The grid shows static PNGs. Wallet, staking, and The Pond live below.</p>
 
-      <!-- Local rarity JSON helper (only for file:// testing) -->
+      <!-- Local rarity JSON helper (visible only on file:// for testing local JSON) -->
       <div id="localLoad" class="muted" style="margin-top:8px;display:none;">
         <div><b>Testing locally?</b> Load your rarity JSON:</div>
         <div class="row" style="margin-top:6px">
@@ -52,9 +48,7 @@
       </div>
     </div>
 
-    <div id="heroFrog" class="hero-frog">
-      <div id="frogStage" class="frog-stage" title="Click to shuffle"></div>
-    </div>
+    <div class="gallery" id="grid"></div>
   </section>
 
   <!-- Facts -->
@@ -67,7 +61,7 @@
 
   <!-- Mint + My Frogs -->
   <section id="trade" class="two-col" aria-label="Mint and Staking">
-    <!-- Mint panel (UI shell; wire your mint later) -->
+    <!-- Mint panel (UI shell; wire your mint when ready) -->
     <div class="panel stack" aria-label="Mint">
       <div class="row" style="justify-content:space-between;align-items:center">
         <div>
@@ -129,7 +123,7 @@
     </div>
   </section>
 
-  <!-- Pond (big panel below) -->
+  <!-- Pond -->
   <section id="pond" class="panel stack" aria-label="The Pond">
     <div class="row" style="justify-content:space-between;align-items:center">
       <h2 class="section-title" style="margin:0">The Pond</h2>
@@ -137,7 +131,7 @@
     </div>
     <div id="pondListWrap">
       <ul id="pondList" class="card-list list-scroll" aria-live="polite"></ul>
-      <!-- numbered pager will be injected here by pond.js if enabled -->
+      <!-- (If you later add pagination, inject it here) -->
     </div>
   </section>
 
@@ -171,7 +165,7 @@
   <button class="swatch sw-pastel" data-theme="pastel" title="Pastel"></button>
 </div>
 
-<!-- Optional lightbox shell (unused for grid thumbnails; kept for future previews) -->
+<!-- Optional lightbox shell (kept for future previews) -->
 <div id="lightbox" class="lightbox" style="display:none">
   <div id="lightboxStage" class="stage"></div>
 </div>
