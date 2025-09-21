@@ -317,56 +317,34 @@ footer.site { border-top:1px solid var(--ring); padding:26px 0; color:var(--mute
 .pond-pager .btn{ min-width:34px; }
 .pond-pager .btn.btn-solid{ cursor:default; }
 /* === Hero single-frog renderer === */
-.hero-frog {
-  display: grid;
-  place-items: center;
-}
-.frog-stage {
-  position: relative;
-  width: 512px;
-  height: 512px;
-  border-radius: 12px;
-  border: 1px solid var(--ring);
-  background: var(--panel);
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,.25) inset;
-  cursor: pointer;
-}
-/* background image (original PNG) is applied to this element */
-.frog-stage::before {
-  content: "";
-  position: absolute; inset: 0;
-  background-repeat: no-repeat;
-  /* Enlarged and shifted so only the original bg color shows nicely */
-  background-size: 180% 180%;
-  background-position: -60px 40px;
-  filter: saturate(0.9) brightness(1.0);
+/* === Ultra-minimal hero frog === */
+.hero-frog{ display:grid; place-items:center; }
+.frog-stage{
+  position:relative;
+  width:512px; height:512px;
+  overflow:hidden;
+  /* no borders, no shadows */
+  cursor:pointer;
 }
 
-/* Each trait layer (PNG/GIF) */
-.frog-layer {
-  position: absolute;
-  left: 0; top: 0;
-  width: 512px; height: 512px;
+/* Background pulled from original PNG, enlarged & offset
+   so only the original BG color shows. */
+.frog-stage::before{
+  content:"";
+  position:absolute; inset:0;
+  background-image: var(--bg-img, none);
+  background-repeat:no-repeat;
+  background-size: 200% 200%;   /* enlarge */
+  background-position: -80px 60px; /* move left & down */
+  /* absolutely no extra styling */
+}
+
+/* Trait layers (PNG only) that get a tiny parallax */
+.frog-layer{
+  position:absolute; left:0; top:0;
+  width:512px; height:512px;
   image-rendering: pixelated;
   pointer-events: none;
-}
-
-/* Hover attribute chips that follow the pointer a bit */
-.frog-attrs {
-  position: absolute;
-  left: 10px; bottom: 10px;
-  display: flex; gap: 6px; flex-wrap: wrap;
-  pointer-events: none;
-  transition: transform .05s linear;
-}
-.frog-attr {
-  padding: .14rem .5rem;
-  border-radius: 999px;
-  border: 1px solid var(--ring);
-  background: var(--panel);
-  font-weight: 700;
-  font-size: .85rem;
-  color: var(--ink);
-  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+  will-change: transform;
+  transition: transform .02s linear;
 }
