@@ -195,53 +195,122 @@ export async function loadSalesLive({ append = false } = {}) {
   } catch (e) { featureError(`Failed to fetch Sales: ${e.message || e}`); return false; }
 }
 
-/* ================== Rarity ================== */
-let rarityCache = []; let raritySortMode = "rank";
-async function loadRarityJSON() {
-  if (Array.isArray(window.FF_RARITY_LIST)) return window.FF_RARITY_LIST;
-  const url = absolutePath(FF_CFG.RARITY_JSON);
-  return fetchJSON(url, { cache: "no-cache" });
+// ---------- RARITY: robust loader + renderer ----------
+
+// Absolute path helper (prevents GH Pages relative-path issues)
+function FF_abs(p) {
+  return /^https?:\/\//i.test(p) ? p : new URL(p.replace(/^\.\//, "/"), location.origin).toString();
 }
-export async function loadRarity() {
-  try {
-    const raw = await loadRarityJSON();
-    if (Array.isArray(raw)) {
-      rarityCache = raw.map(x => ({
-        id: Number(x.id ?? x.tokenId ?? x[0]),
-        rank: Number(x.rank ?? x[1]),
-        score: x.score != null ? Number(x.score) : undefined
-      })).filter(x => Number.isFinite(x.id) && Number.isFinite(x.rank));
-    } else if (typeof raw === "object" && raw) {
-      rarityCache = Object.entries(raw).map(([k, v]) => ({ id: Number(k), rank: Number(v) }))
-        .filter(x => Number.isFinite(x.id) && Number.isFinite(x.rank));
-    } else { rarityCache = []; }
-    if ((window.currentFeatureView || "mints") === "rarity") renderRarity();
-  } catch (e) { featureError(`Failed to load rarity data: ${e.message || e}`); rarityCache = []; }
+
+// In-memory cache + simple index
+window.FF_RARITY_LIST = window.FF_RARITY_LIST || [];
+window.FF_getRankById = window.FF_getRankById || null;
+
+async function FF_loadRarity(jsonPath = (window.FF_CFG?.RARITY_JSON || "assets/freshfrogs_rarity_rankings.json")) {
+  const url = FF_abs(jsonPath);
+  const res = await fetch(url, { cache: "no-cache" });
+  if (!res.ok) throw new Error(`Rarity HTTP ${res.status} @ ${url}`);
+  const raw = await res.json();
+
+  let list = [];
+  if (Array.isArray(raw)) {
+    list = raw.map(x => ({
+      id: Number(x.id ?? x.tokenId ?? x[0]),
+      rank: Number(x.rank ?? x[1]),
+      score: (x.score != null) ? Number(x.score) : undefined,
+    })).filter(x => Number.isFinite(x.id) && Number.isFinite(x.rank));
+  } else if (raw && typeof raw === "object") {
+    // id -> rank map
+    list = Object.entries(raw).map(([k,v]) => ({ id:Number(k), rank:Number(v) }))
+           .filter(x => Number.isFinite(x.id) && Number.isFinite(x.rank));
+  } else {
+    list = [];
+  }
+
+  // cache + quick lookup
+  window.FF_RARITY_LIST = list;
+  const index = new Map(list.map(o => [o.id, o.rank]));
+  window.FF_getRankById = (id) => index.get(Number(id)) ?? null;
+
+  return list;
 }
-function renderRarity() {
-  const ul = document.getElementById("featureList");
-  const anchor = document.getElementById("featureMoreAnchor");
+
+// Minimal time formatter
+function FF_ago(ms) {
+  if (!ms || ms < 0) return "—";
+  const s = Math.floor(ms/1000), m = Math.floor(s/60), h = Math.floor(m/60), d = Math.floor(h/24);
+  if (d>0) return `${d}d`; if (h>0) return `${h}h`; if (m>0) return `${m}m`; return `${s}s`;
+}
+
+// Small thumb helper (64x64 min)
+function FF_thumb64(src, alt="") {
+  const esc = String(alt).replace(/"/g,"&quot;");
+  return `<img class="thumb64" src="${src}" alt="${esc}">`;
+}
+
+// Renders the rarity list into a UL with id="featureList" (change id if yours differs)
+function FF_renderRarityList(targetId = "featureList") {
+  const ul = document.getElementById(targetId);
+  const anchor = document.getElementById("featureMoreAnchor"); // optional “Load more” area
   if (!ul) return;
-  ul.innerHTML = ""; anchor && (anchor.innerHTML = "");
-  if (!rarityCache.length) { ul.innerHTML = `<li class="list-item"><div class="muted">No rarity data.</div></li>`; return; }
-  const sorted = rarityCache.slice().sort((a, b) => {
-    if (raritySortMode === "score" && a.score != null && b.score != null) return b.score - a.score;
-    return a.rank - b.rank;
-  });
-  sorted.forEach(x => {
+
+  const items = (window.FF_RARITY_LIST || []).slice(); // copy
+  ul.innerHTML = "";
+  if (!items.length) {
+    ul.innerHTML = `<li class="list-item"><div class="muted">No rarity data available.</div></li>`;
+    if (anchor) anchor.innerHTML = "";
+    return;
+  }
+
+  // Default sort by rank asc
+  items.sort((a,b) => a.rank - b.rank);
+
+  // Show first 5; allow “Load more”
+  const page = Number(ul.dataset.page || 1);
+  const pageSize = 25; // render 25 at a time for perf; UI still shows 5 height via CSS scroll
+  const upto = page * pageSize;
+  const slice = items.slice(0, upto);
+
+  slice.forEach(x => {
+    const img = `${(window.FF_CFG?.SOURCE_PATH || "https://freshfrogs.github.io")}/frog/${x.id}.png`;
     const li = document.createElement("li");
     li.className = "list-item";
     li.innerHTML =
-      thumb64(`${FF_CFG.SOURCE_PATH}/frog/${x.id}.png`, `Frog ${x.id}`) +
+      FF_thumb64(img, `Frog ${x.id}`) +
       `<div>
          <div class="row gap8"><b>Frog #${x.id}</b> <span class="pill">Rank <b>#${x.rank}</b></span></div>
          <div class="muted">${x.score != null ? `Score ${x.score}` : ""}</div>
        </div>
        <div class="price"></div>`;
     li.style.cursor = "pointer";
-    li.addEventListener("click", () => openFrogModal(x.id));
+    li.addEventListener("click", () => window.FF_openFrogInfo?.(x.id));
     ul.appendChild(li);
   });
+
+  if (anchor) {
+    anchor.innerHTML = "";
+    if (upto < items.length) {
+      const btn = document.createElement("button");
+      btn.className = "btn btn-outline btn-sm";
+      btn.textContent = "Load more";
+      btn.onclick = () => { ul.dataset.page = String(page + 1); FF_renderRarityList(targetId); };
+      anchor.appendChild(btn);
+    }
+  }
+}
+
+// Convenience: one-call boot for rarity tab
+async function FF_bootRarity(targetId = "featureList") {
+  try {
+    await FF_loadRarity();
+    FF_renderRarityList(targetId);
+  } catch (e) {
+    const ul = document.getElementById(targetId);
+    const anchor = document.getElementById("featureMoreAnchor");
+    if (ul) ul.innerHTML = `<li class="list-item"><div class="muted">Failed to load rarity: ${e.message || e}</div></li>`;
+    if (anchor) anchor.innerHTML = "";
+    console.warn("Rarity load failed", e);
+  }
 }
 
 /* ================== Pond ================== */
