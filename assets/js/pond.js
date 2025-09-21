@@ -25,14 +25,12 @@
         const res = await fetch(url, { ...opts, signal: ctrl.signal });
         clearTimeout(t);
 
-        // 429 backoff
         if (res.status === 429 && i < retries){
           const ra = Number(res.headers.get('retry-after')) || (1 << i);
           await new Promise(r=>setTimeout(r, ra * 1000));
           continue;
         }
         if (!res.ok){
-          // Non-OK: retry a couple times, then throw
           if (i < retries){
             await new Promise(r=>setTimeout(r, (300 + Math.random()*300) * (i+1)));
             continue;
@@ -51,10 +49,10 @@
   // ---------- state ----------
   const ST = {
     pages: [],                 // [{ rows: [{id, staker, since}], contIn, contOut }]
-    page: 0,                   // internal store index (newest-first)
-    nextContinuation: '',      // for next fetch (older)
-    blockedIds: new Set(),     // tokens that later left controller
-    acceptedIds: new Set()     // dedupe accepted across pages
+    page: 0,                   // newest-first internal index
+    nextContinuation: '',
+    blockedIds: new Set(),
+    acceptedIds: new Set()
   };
 
   let RANKS = null;
@@ -85,7 +83,6 @@
     const nav = ensurePager();
     nav.innerHTML = '';
 
-    // Buttons in display order (oldest -> newest)
     for (let disp=0; disp<ST.pages.length; disp++){
       const sIdx = storeIdxFromDisplay(disp);
       const btn = document.createElement('button');
@@ -101,18 +98,16 @@
       nav.appendChild(btn);
     }
 
-    // Ellipsis "…" to fetch next (older) page, if continuation exists
     if (ST.nextContinuation){
       const moreBtn = document.createElement('button');
       moreBtn.className = 'btn btn-ghost btn-sm';
       moreBtn.setAttribute('aria-label', 'Load more pages');
       moreBtn.title = 'Load more';
-      moreBtn.textContent = '…';
+      moreBtn.textContent = '…'; // ellipsis
       moreBtn.addEventListener('click', async ()=>{
         const ok = await fetchNextPage();
         if (ok){
-          // Jump to the new OLDEST page (highest store index)
-          ST.page = ST.pages.length - 1;
+          ST.page = ST.pages.length - 1; // jump to oldest newly added page
           renderPage();
         }
       });
@@ -121,7 +116,10 @@
   }
 
   // ---------- frog renderer (128x128 layered, bg trick, hover lift) ----------
-  const NO_ANIM_FOR = new Set(['Frog', 'Trait', 'SpecialFrog']);
+  // Animations OFF for these:
+  const NO_ANIM_FOR = new Set(['Hat','Frog','Trait']);
+  // Hover lift OFF for these:
+  const NO_LIFT_FOR = new Set(['Frog','Trait','SpecialFrog']);
 
   function mk(tag, props={}, style={}) {
     const el = document.createElement(tag);
@@ -141,13 +139,11 @@
     img.decoding = 'async';
     img.loading = 'lazy';
     img.alt = `${attr}: ${value}`;
-    img.style.position = 'absolute';
-    img.style.left = '0';
-    img.style.top = '0';
-    img.style.width = `${sizePx}px`;
-    img.style.height = `${sizePx}px`;
-    img.style.imageRendering = 'pixelated';
-    img.style.willChange = 'transform, filter';
+    Object.assign(img.style, {
+      position:'absolute', left:'0', top:'0',
+      width:`${sizePx}px`, height:`${sizePx}px`,
+      imageRendering:'pixelated', willChange:'transform, filter', zIndex:'2'
+    });
     img.dataset.attr = attr;
 
     if (allowAnim){
@@ -161,7 +157,7 @@
 
   function attachLiftHandlers(layerEl){
     const attr = layerEl.dataset.attr || '';
-    if (NO_ANIM_FOR.has(attr)) return; // no lift for these
+    if (NO_LIFT_FOR.has(attr)) return;
     layerEl.addEventListener('mouseenter', ()=>{
       layerEl.style.transform = 'translateY(-6px)';
       layerEl.style.filter = 'drop-shadow(0 4px 0 rgba(0,0,0,0.45))';
@@ -185,24 +181,24 @@
       borderRadius: '8px',
     });
 
-    // Background trick: use the flat PNG scaled & offset so only bg color shows
+    // Background trick: use the flat PNG scaled & offset so only the bg color shows
     const bg = new Image();
     bg.decoding = 'async';
     bg.loading = 'lazy';
     bg.alt = `Frog #${tokenId} background`;
     Object.assign(bg.style, {
       position: 'absolute',
-      left: `-${Math.round(SIZE * 0.35)}px`,
-      top:  `${Math.round(SIZE * 0.25)}px`,
-      transform: `scale(2.6)`,
+      left: `-${Math.round(SIZE * 0.80)}px`, // push left
+      top:  `${Math.round(SIZE * 0.55)}px`,  // push down
+      transform: `scale(3.2)`,               // enlarge a lot
       imageRendering: 'pixelated',
       zIndex: '0',
       opacity: '1'
     });
-    const pngA = `${CFG.SOURCE_PATH ? CFG.SOURCE_PATH : ''}/frog/${tokenId}.png`;
-    const pngB = `/frog/${tokenId}.png`;
-    bg.src = pngA;
-    bg.onerror = ()=>{ bg.onerror = null; bg.src = pngB; };
+    // Direct path (assets and frog are siblings)
+    bg.src = `/frog/${tokenId}.png`;
+    // loose fallback to possible alt location if needed
+    bg.onerror = ()=>{ bg.onerror = null; bg.src = `${CFG.SOURCE_PATH ? CFG.SOURCE_PATH : ''}/frog/${tokenId}.png`; };
     container.appendChild(bg);
 
     // Layered build from metadata
@@ -221,21 +217,19 @@
         width: `${SIZE}px`, height: `${SIZE}px`,
         imageRendering: 'pixelated', zIndex: '2'
       });
-      flat.src = pngA;
-      flat.onerror = ()=>{ flat.onerror = null; flat.src = pngB; };
+      flat.src = `/frog/${tokenId}.png`;
+      flat.onerror = ()=>{ flat.onerror = null; flat.src = `${CFG.SOURCE_PATH ? CFG.SOURCE_PATH : ''}/frog/${tokenId}.png`; };
       container.appendChild(flat);
       return;
     }
 
     const attrs = Array.isArray(meta?.attributes) ? meta.attributes : [];
-    let z = 2;
     for (const rec of attrs){
       const attr = String(rec.trait_type || rec.traitType || '').trim();
       const val  = String(rec.value).trim();
       if (!attr || val == null) continue;
 
       const layer = makeLayerImg(attr, val, SIZE);
-      layer.style.zIndex = String(z++);
       container.appendChild(layer);
       attachLiftHandlers(layer);
     }
@@ -267,7 +261,7 @@
       }
     }
 
-    // Oldest -> newest within page
+    // Oldest -> newest within the page
     out.sort((a,b)=>{
       const ta = a.since ? a.since.getTime() : 0;
       const tb = b.since ? b.since.getTime() : 0;
@@ -300,7 +294,6 @@
       return true;
     }catch(err){
       console.warn('Pond: page fetch failed', err);
-      // keep UI usable; do not throw—just report failure to caller
       return false;
     }
   }
@@ -342,7 +335,7 @@
         const li = document.createElement('li');
         li.className = 'list-item';
 
-        // Left: layered 128x128
+        // Left: layered 128x128 with bg trick
         const left = mk('div', {}, {
           width:'128px', height:'128px', minWidth:'128px', minHeight:'128px'
         });
@@ -378,22 +371,18 @@
         return;
       }
 
-      // load ranks (optional)
       try { RANKS = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json'); }
       catch { RANKS = {}; }
 
-      // reset state
       ST.pages = [];
-      ST.page = 0; // newest-first internal index
+      ST.page = 0;
       ST.nextContinuation = '';
       ST.blockedIds = new Set();
       ST.acceptedIds = new Set();
 
-      // prefetch first N pages
       await prefetchInitialPages();
 
       if (!ST.pages.length){
-        // If nothing loaded at all, show a soft message instead of a hard failure
         ul.innerHTML = `<li class="list-item"><div class="muted">No frogs are currently staked.</div></li>`;
         ensurePager().innerHTML = '';
         return;
@@ -404,7 +393,6 @@
       renderPage();
     }catch(e){
       console.warn('Pond load failed', e);
-      // leave any partial content if present
       if (!ST.pages.length){
         ul.innerHTML = `<li class="list-item"><div class="muted">Failed to load the pond.</div></li>`;
         ensurePager().innerHTML = '';
