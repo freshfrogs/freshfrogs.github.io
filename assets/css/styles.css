@@ -456,3 +456,82 @@ footer.site { border-top:1px solid var(--ring); padding:26px 0; color:var(--mute
 
 /* Ensure modal visibility priority */
 .modal.open { display: block !important; z-index: 9999; }
+/* Make list rows feel clickable */
+.list-item[data-token-id] { cursor: pointer; }
+
+/* Compact panel base (uses your variables) */
+.modal-compact { padding: 14px; border-radius: 16px; gap: 12px; }
+
+/* Grid: left (art+buttons) / right (text) */
+.ffm-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 16px;
+}
+@media (max-width: 900px) {
+  .ffm-grid { grid-template-columns: 1fr; }
+}
+
+/* LEFT */
+.ffm-hero {
+  position: relative;
+  aspect-ratio: 1/1;
+  border: 1px solid var(--edge);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--panelSoft);
+}
+#fmHero canvas, #fmHero img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  image-rendering: pixelated;
+}
+
+/* 3x2 button grid under the art */
+.ffm-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+.btn-xs { font-size: 11.5px; padding: 6px 8px; border-radius: 8px; }
+.pill-compact { padding: 2px 8px; border-radius: 999px; font-size: 12px; }
+
+/* Optional tiny link under buttons */
+.ffm-morph { margin-top: 6px; opacity: .75; }
+#fmMorphBtn[disabled] { opacity: .55; cursor: not-allowed; }
+
+/* RIGHT */
+.ffm-head { display: grid; gap: 6px; }
+.ffm-title { display: flex; align-items: center; gap: 8px; font-size: 16px; }
+.ffm-owner { font-size: 12.5px; }
+
+/* Attributes as pills (wraps nicely) */
+.ffm-attrs .section-title { margin: 10px 0 6px; font-weight: 700; font-size: 13px; }
+.ffm-attrlist {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 6px;
+  max-height: 280px; /* uses list-scroll overflow */
+}
+@media (max-width: 900px) {
+  .ffm-attrlist { grid-template-columns: 1fr; }
+}
+.ffm-attrlist li {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--edge);
+  border-radius: 10px;
+  background: var(--panelSoft);
+  font-size: 13px;
+}
+.ffm-attrlist .name { font-weight: 600; opacity: .95; }
+.ffm-attrlist .val  { opacity: .95; }
+
+/* Ensure modal shows above everything */
+.modal.open { display: block !important; z-index: 9999; }
+
+/* a11y helpers */
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 1px, 1px); white-space: nowrap; border: 0;
+}
