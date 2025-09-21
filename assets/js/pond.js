@@ -4,11 +4,11 @@
   const ul   = document.getElementById('pondList');
   if (!wrap || !ul) return;
 
-  // ---------- config / guards ----------
   const API = 'https://api.reservoir.tools/users/activity/v6';
   const CONTROLLER = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
   const COLLECTION = CFG.COLLECTION_ADDRESS || '';
-  const PAGE_SIZE = 20; // reservoir max per call
+  const PAGE_SIZE = 20;            // endpoint max
+  const PREFETCH_MAX_PAGES = 50;   // safety cap for the pager crawl
 
   function apiHeaders(){
     if (!CFG.FROG_API_KEY) throw new Error('Missing FROG_API_KEY in config.js');
@@ -17,19 +17,19 @@
 
   // ---------- state ----------
   const ST = {
-    // paged results built strictly from activity (20 newest per page)
-    pages: [],                 // [{ rows: [{id, staker, since}], contIn: string|null, contOut: string|null }]
+    // built “content” pages (processed with staked selection)
+    pages: [],                 // [{ rows: [{id, staker, since}] }]
     page: 0,
-    // tokens that we've already determined are NOT in controller,
-    // because we saw a *newer* outbound event for them.
-    blockedIds: new Set(),
-    // continuation pointer for the next not-yet-fetched activity page
-    nextContinuation: ''
+    blockedIds: new Set(),     // ids definitely NOT staked (newer outbound seen)
+    nextContinuation: '',      // pointer for next fetchNextPage
+    // pager crawl results: an ordered list of continuation tokens for page i
+    // page 0 uses '', page 1 uses cont[1], etc.
+    allContinuations: [],      // ['' , 'cont1', 'cont2', ...]
   };
 
   let RANKS = null;
 
-  // ---------- small UI helpers ----------
+  // ---------- UI helpers ----------
   const fmtAgo = (d)=> d ? (FF.formatAgo(Date.now()-d.getTime())+' ago') : '—';
   const pillRank = (rank)=> (rank||rank===0)
     ? `<span class="pill">Rank <b>#${rank}</b></span>`
@@ -47,39 +47,37 @@
     return nav;
   }
 
+  async function ensurePageLoaded(targetIndex){
+    // fetch pages sequentially until targetIndex is available
+    while (ST.pages.length <= targetIndex && ST.nextContinuation){
+      const ok = await fetchNextPage();
+      if (!ok) break;
+    }
+  }
+
   function renderPager(){
     const nav = ensurePager();
     nav.innerHTML = '';
 
-    // numbered buttons for pages we have
-    ST.pages.forEach((_, i)=>{
+    const totalPages =
+      (ST.allContinuations && ST.allContinuations.length)
+        ? ST.allContinuations.length
+        : Math.max(1, ST.pages.length + (ST.nextContinuation ? 1 : 0));
+
+    for (let i=0; i<totalPages; i++){
       const btn = document.createElement('button');
       btn.className = 'btn btn-ghost btn-sm';
       btn.textContent = String(i+1);
-      if (i === ST.page) btn.classList.add('btn-solid');
-      btn.addEventListener('click', ()=>{
-        if (ST.page !== i){
-          ST.page = i;
-          renderPage();
-        }
-      });
-      nav.appendChild(btn);
-    });
 
-    // Add "Next" number (pre-create) if there is more to fetch
-    if (ST.nextContinuation){
-      const nextIdx = ST.pages.length + 1;
-      const btn = document.createElement('button');
-      btn.className = 'btn btn-ghost btn-sm';
-      btn.textContent = String(nextIdx);
-      btn.title = 'Load more';
+      // visually emphasize loaded vs not-yet-loaded
+      if (i < ST.pages.length) btn.classList.add('btn-solid');
+      if (i === ST.page) btn.classList.add('btn-solid');
+
       btn.addEventListener('click', async ()=>{
-        // fetch next page then go to it
-        const ok = await fetchNextPage();
-        if (ok){
-          ST.page = ST.pages.length - 1;
-          renderPage();
-        }
+        // must process sequentially to maintain correct blockedIds logic
+        await ensurePageLoaded(i);
+        ST.page = Math.min(i, ST.pages.length - 1);
+        renderPage();
       });
       nav.appendChild(btn);
     }
@@ -124,13 +122,9 @@
     renderPager();
   }
 
-  // ---------- activity fetch & selection logic ----------
-  // We walk activities newest -> older. For each token:
-  //  - If the newest-seen event is outbound (from controller), the token is NOT currently staked => block it.
-  //  - If the newest-seen event is inbound (to controller) and token not blocked, we take it with {staker, since}.
-  // We carry `blockedIds` across pages so older pages won’t re-add withdrawn tokens.
+  // ---------- activity helpers ----------
   function selectCurrentlyStakedFromActivities(activities){
-    // keep in-page dedupe so we don’t double-handle the same token in one batch
+    // newest -> older
     const seenThisPage = new Set();
     const out = [];
 
@@ -139,27 +133,31 @@
       if (!tok) continue;
       const id = Number(tok);
       if (!Number.isFinite(id)) continue;
-      if (seenThisPage.has(id)) continue; // already decided on this page
+      if (seenThisPage.has(id)) continue;
       seenThisPage.add(id);
 
-      const to  = (a?.toAddress   || '').toLowerCase();
-      const from= (a?.fromAddress || '').toLowerCase();
+      const to   = (a?.toAddress   || '').toLowerCase();
+      const from = (a?.fromAddress || '').toLowerCase();
 
-      // outbound from controller? then block it globally
+      // outbound from controller? not staked anymore
       if (from === CONTROLLER){
         ST.blockedIds.add(id);
         continue;
       }
-
-      // inbound to controller? if not blocked, accept as currently staked
-      if (to === CONTROLLER){
-        if (!ST.blockedIds.has(id)){
-          const since = a?.createdAt ? new Date(a.createdAt)
-                      : (a?.timestamp ? new Date(a.timestamp*1000) : null);
-          out.push({ id, staker: a?.fromAddress || null, since });
-        }
+      // inbound to controller? staked unless already blocked by newer outbound
+      if (to === CONTROLLER && !ST.blockedIds.has(id)){
+        const since = a?.createdAt ? new Date(a.createdAt)
+                    : (a?.timestamp ? new Date(a.timestamp*1000) : null);
+        out.push({ id, staker: a?.fromAddress || null, since });
       }
     }
+
+    // newest first by time
+    out.sort((a,b)=>{
+      const ta = a.since ? a.since.getTime() : 0;
+      const tb = b.since ? b.since.getTime() : 0;
+      return tb - ta;
+    });
 
     return out;
   }
@@ -180,30 +178,31 @@
   }
 
   async function fetchNextPage(){
-    // Try to get a page that yields at least 1 “currently staked” row.
-    // If a page yields 0 (because all 20 were outbound), we keep pulling until we either
-    //  - get at least 1 inbound row, or
-    //  - run out of continuation.
-    let cont = ST.nextContinuation || '';
-    for (let safety=0; safety<50; safety++){
-      const { activities, continuation } = await fetchActivitiesPage(cont);
+    // pull one activity page and build a content page from it
+    const { activities, continuation } = await fetchActivitiesPage(ST.nextContinuation || '');
+    const rows = selectCurrentlyStakedFromActivities(activities);
+
+    ST.pages.push({ rows });
+    ST.nextContinuation = continuation || '';
+
+    return true;
+  }
+
+  // Crawl just to learn how many pages we have (store the continuation chain).
+  async function prefetchPagerContinuations(){
+    const conts = ['']; // page 0 uses ''
+    let cont = '';
+    for (let i=0; i<PREFETCH_MAX_PAGES; i++){
+      const { continuation } = await fetchActivitiesPage(cont);
+      if (!continuation){
+        break;
+      }
       cont = continuation;
-
-      const rows = selectCurrentlyStakedFromActivities(activities);
-      // Sort newest first (activities already newest first, but be explicit by time)
-      rows.sort((a,b)=>{
-        const ta = a.since ? a.since.getTime() : 0;
-        const tb = b.since ? b.since.getTime() : 0;
-        return tb - ta;
-      });
-
-      // record page even if empty (so pager can still advance)
-      ST.pages.push({ rows, contIn: ST.nextContinuation || null, contOut: cont || null });
-      ST.nextContinuation = cont;
-
-      if (rows.length > 0 || !cont) return true; // page ready
+      conts.push(cont);
     }
-    return false;
+    ST.allContinuations = conts; // e.g., ['', cont1, cont2, ...]
+    // Set nextContinuation to the first not-yet-fetched page (page 0 is '' and not yet fetched here)
+    ST.nextContinuation = '';
   }
 
   // ---------- main ----------
@@ -215,24 +214,21 @@
         return;
       }
 
-      // load ranks (optional)
-      try {
-        RANKS = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json');
-      } catch { RANKS = {}; }
+      try { RANKS = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json'); }
+      catch { RANKS = {}; }
 
       // reset state
       ST.pages = [];
       ST.page = 0;
       ST.blockedIds = new Set();
       ST.nextContinuation = '';
+      ST.allContinuations = [];
 
-      // first page
-      const ok = await fetchNextPage();
-      if (!ok){
-        ul.innerHTML = `<li class="list-item"><div class="muted">No frogs are currently staked.</div></li>`;
-        ensurePager().innerHTML = '';
-        return;
-      }
+      // crawl pager first so we can show all page numbers immediately
+      await prefetchPagerContinuations();
+
+      // fetch the first page content
+      await fetchNextPage();
 
       renderPage();
     }catch(e){
@@ -242,8 +238,6 @@
     }
   }
 
-  // autorun & expose
   loadPond();
   window.FF_reloadPond = loadPond;
-
 })(window.FF, window.FF_CFG);
