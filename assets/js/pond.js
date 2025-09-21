@@ -1,315 +1,263 @@
-(function (FF, CFG) {
-  // -----------------------------
-  // Settings
-  // -----------------------------
-  const PAGE_SIZE = 10; // 10 per page with numbered pager
-  const RANK_JSON = 'assets/freshfrogs_rank_lookup.json';
+// assets/js/pond.js
+(function(FF, CFG){
+  const wrap = document.getElementById('pondListWrap');
+  const ul   = document.getElementById('pondList');
+  if (!wrap || !ul) return;
 
-  // -----------------------------
-  // State
-  // -----------------------------
-  let pages = [];                 // pages[i] = [tokenId,...] (10 per page)
-  let continuations = [''];       // reservoir continuation per fetched page
-  let hasMore = true;             // if reservoir has more pages available
-  let currentPage = 0;            // 0-index
-  let rankMap = null;             // {id -> rank}
-  const stakerCache = new Map();  // tokenId -> { staker, date } (resolved once)
+  // state
+  const ST = {
+    rows: [],        // [{id, staker, since: Date|null}]
+    page: 0,
+    pageSize: 10
+  };
 
-  // DOM
-  const listEl = document.getElementById('pondList');
-  const wrapEl = document.getElementById('pondListWrap');
+  let RANKS = null;
 
-  // -----------------------------
-  // Small utils
-  // -----------------------------
-  function fmtAddr(a) {
-    if (!a) return '—';
-    const s = String(a);
-    return s.slice(0, 6) + '…' + s.slice(-4);
-  }
-  function ago(date) {
-    if (!date) return '—';
-    const ms = Date.now() - date.getTime();
-    const s = Math.floor(ms / 1000);
-    if (s < 60) return s + 's';
-    const m = Math.floor(s / 60);
-    if (m < 60) return m + 'm';
-    const h = Math.floor(m / 60);
-    if (h < 24) return h + 'h';
-    const d = Math.floor(h / 24);
-    return d + 'd';
+  // ---------- helpers ----------
+  async function loadRanks() {
+    if (RANKS) return RANKS;
+    try { RANKS = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json'); }
+    catch { RANKS = {}; }
+    return RANKS;
   }
 
-  async function loadRanksOnce() {
-    if (rankMap) return;
-    try {
-      const data = await FF.fetchJSON(RANK_JSON);
-      if (Array.isArray(data)) {
-        rankMap = Object.fromEntries(
-          data.map(r => [String(r.id), Number(r.rank ?? r.ranking ?? NaN)])
-              .filter(([, v]) => Number.isFinite(v))
-        );
-      } else if (data && typeof data === 'object') {
-        rankMap = Object.fromEntries(
-          Object.entries(data)
-            .map(([k, v]) => [String(k), Number(v)])
-            .filter(([, v]) => Number.isFinite(v))
-        );
-      } else {
-        rankMap = {};
-      }
-    } catch (e) {
-      console.warn('rank lookup failed', e);
-      rankMap = {};
+  const fmtAgo = (d)=> d ? (FF.formatAgo(Date.now()-d.getTime())+' ago') : '—';
+  const pillRank = (rank)=> (rank||rank===0)
+    ? `<span class="pill">Rank <b>#${rank}</b></span>`
+    : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
+
+  function ensurePager(){
+    let nav = document.getElementById('pondPager');
+    if (!nav){
+      nav = document.createElement('div');
+      nav.id = 'pondPager';
+      nav.style.marginTop = '8px';
+      nav.className = 'row';
+      wrap.appendChild(nav);
     }
-  }
-  function getRank(id) {
-    if (!rankMap) return null;
-    const r = rankMap[String(id)];
-    return (r || r === 0) ? r : null;
+    return nav;
   }
 
-  // -----------------------------
-  // Reservoir fetchers
-  // -----------------------------
-  async function fetchTokensPage(continuation = '') {
-    // Tokens currently owned by the controller (i.e., staked)
-    const base = 'https://api.reservoir.tools/tokens/v7';
-    const qs = new URLSearchParams({
-      collection: CFG.COLLECTION_ADDRESS,
-      owner: CFG.CONTROLLER_ADDRESS,
-      limit: String(PAGE_SIZE),
-      includeTopBid: 'false'
-    });
-    if (continuation) qs.set('continuation', continuation);
-    const res = await fetch(`${base}?${qs.toString()}`, {
-      method: 'GET',
-      headers: { accept: '*/*', 'x-api-key': CFG.FROG_API_KEY }
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const json = await res.json();
-    const ids = (json.tokens || [])
-      .map(t => t?.token?.tokenId ?? t?.tokenId ?? t?.id)
-      .map(x => (x != null ? parseInt(String(x), 10) : null))
-      .filter(Number.isFinite);
-    return { ids, continuation: json.continuation || '' };
-  }
+  function buildPager(){
+    const total = ST.rows.length;
+    const pages = Math.max(1, Math.ceil(total / ST.pageSize));
+    const nav = ensurePager();
+    nav.innerHTML = '';
 
-  // Fallback: use Reservoir Activities (transfers) to find last transfer -> controller
-  async function fetchStakeMetaViaReservoir(tokenId) {
-    try {
-      const base = 'https://api.reservoir.tools/activities/v7';
-      const qs = new URLSearchParams({
-        collection: CFG.COLLECTION_ADDRESS,
-        token: `${CFG.COLLECTION_ADDRESS}:${tokenId}`,
-        types: 'transfer',
-        limit: '50'
+    // small guard if only one page
+    if (pages <= 1) { return; }
+
+    // numbered buttons
+    for (let i=0; i<pages; i++){
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-ghost btn-sm';
+      btn.textContent = String(i+1);
+      if (i === ST.page) btn.classList.add('btn-solid');
+      btn.addEventListener('click', ()=>{
+        if (ST.page !== i){
+          ST.page = i;
+          renderPage();
+        }
       });
-      const res = await fetch(`${base}?${qs.toString()}`, {
-        method: 'GET',
-        headers: { accept: '*/*', 'x-api-key': CFG.FROG_API_KEY }
-      });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const json = await res.json();
-      const act = (json?.activities || [])
-        .filter(a => (a?.toAddress || a?.to?.address) &&
-                     String(a.toAddress || a.to?.address).toLowerCase() === CFG.CONTROLLER_ADDRESS.toLowerCase() &&
-                     String(a?.token?.tokenId ?? a?.tokenId) === String(tokenId))
-        .sort((a, b) => {
-          const ta = Date.parse(a?.timestamp ?? a?.createdAt ?? 0) || 0;
-          const tb = Date.parse(b?.timestamp ?? b?.createdAt ?? 0) || 0;
-          return ta - tb;
-        })
-        .pop(); // most recent to controller
-
-      if (!act) return { staker: null, date: null };
-
-      const staker = String(act?.fromAddress || act?.from?.address || '').toLowerCase() || null;
-      const raw = act?.timestamp ?? act?.createdAt;
-      const dt = raw ? new Date((typeof raw === 'number' ? (raw < 1e12 ? raw * 1000 : raw) : Date.parse(raw))) : null;
-      return { staker, date: dt };
-    } catch (e) {
-      console.warn('Reservoir activity fallback failed for token', tokenId, e);
-      return { staker: null, date: null };
+      nav.appendChild(btn);
     }
   }
 
-  // Primary: on-chain logs Transfer → controller
-  async function getStakeMetaOnChain(tokenId) {
-    if (stakerCache.has(tokenId)) return stakerCache.get(tokenId);
-    try {
-      const provider =
-        (window.ethereum
-          ? new ethers.providers.Web3Provider(window.ethereum)
-          : ethers.getDefaultProvider());
-      const iface = new ethers.utils.Interface([
-        'event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)'
-      ]);
-      const topicTransfer = iface.getEventTopic('Transfer');
-      const toTopic = ethers.utils.hexZeroPad(CFG.CONTROLLER_ADDRESS, 32);
-      const idTopic = ethers.utils.hexZeroPad(
-        ethers.BigNumber.from(String(tokenId)).toHexString(), 32
-      );
-      const fromBlock = Number(CFG.CONTROLLER_DEPLOY_BLOCK || 0);
+  function renderPage(){
+    ul.innerHTML = '';
+    const total = ST.rows.length;
 
-      const logs = await provider.getLogs({
-        fromBlock,
-        toBlock: 'latest',
-        address: CFG.COLLECTION_ADDRESS,
-        topics: [topicTransfer, null, toTopic, idTopic]
-      });
-
-      if (!logs.length) {
-        // Fallback to Reservoir activities
-        const viaAPI = await fetchStakeMetaViaReservoir(tokenId);
-        stakerCache.set(tokenId, viaAPI);
-        return viaAPI;
-      }
-
-      const last = logs[logs.length - 1];
-      const parsed = iface.parseLog(last);
-      const staker = parsed.args?.from ? String(parsed.args.from) : null;
-      const blk = await provider.getBlock(last.blockNumber);
-      const date = new Date(blk.timestamp * 1000);
-
-      const meta = { staker, date };
-      stakerCache.set(tokenId, meta);
-      return meta;
-    } catch (e) {
-      console.warn('on-chain stake meta failed; trying reservoir fallback', e);
-      const viaAPI = await fetchStakeMetaViaReservoir(tokenId);
-      stakerCache.set(tokenId, viaAPI);
-      return viaAPI;
-    }
-  }
-
-  // -----------------------------
-  // Pager model (numbers at bottom)
-  // -----------------------------
-  async function ensurePage(i) {
-    // Fetch sequential pages until page i exists or no more pages.
-    while (pages.length <= i && hasMore) {
-      const cont = continuations[continuations.length - 1] || '';
-      const { ids, continuation } = await fetchTokensPage(cont);
-      pages.push(ids);
-      if (continuation) continuations.push(continuation);
-      else hasMore = false;
-    }
-  }
-
-  function renderPager() {
-    // Remove existing
-    const old = wrapEl.querySelector('.pager');
-    if (old) old.remove();
-
-    if (!pages.length) return;
-    const pager = document.createElement('div');
-    pager.className = 'pager';
-
-    // numbered buttons for all loaded pages
-    pages.forEach((_, i) => {
-      const b = document.createElement('button');
-      b.textContent = String(i + 1);
-      b.className = 'btn btn-ghost btn-sm';
-      if (i === currentPage) { b.classList.add('btn-solid'); b.classList.remove('btn-ghost'); }
-      b.addEventListener('click', async () => {
-        currentPage = i;
-        await renderPage(); // re-render current page
-      });
-      pager.appendChild(b);
-    });
-
-    // show a "Next ›" to fetch one more page & extend numbered list when possible
-    if (hasMore) {
-      const next = document.createElement('button');
-      next.className = 'btn btn-outline btn-sm';
-      next.textContent = 'Next ›';
-      next.addEventListener('click', async () => {
-        // advance to next (yet-unloaded) page
-        currentPage = pages.length; // point to the page that doesn't exist yet
-        await ensurePage(currentPage); // fetch it
-        await renderPage();
-      });
-      pager.appendChild(next);
-    }
-
-    wrapEl.appendChild(pager);
-  }
-
-  // -----------------------------
-  // Render
-  // -----------------------------
-  async function renderPage() {
-    await loadRanksOnce();
-    await ensurePage(currentPage);
-
-    const ids = pages[currentPage] || [];
-    listEl.innerHTML = '';
-
-    if (!ids.length) {
+    if (!total){
       const li = document.createElement('li');
       li.className = 'list-item';
       li.innerHTML = `<div class="muted">No frogs are currently staked.</div>`;
-      listEl.appendChild(li);
-      renderPager();
+      ul.appendChild(li);
+      ensurePager().innerHTML = '';
       return;
     }
 
-    // Render cards for the 10 ids on this page, and fill staker/time once resolved
-    for (const id of ids) {
-      const rank = getRank(id);
+    const start = ST.page * ST.pageSize;
+    const end   = Math.min(start + ST.pageSize, total);
+    const pageRows = ST.rows.slice(start, end);
+
+    pageRows.forEach(r=>{
+      const rank = RANKS?.[String(r.id)] ?? null;
       const li = document.createElement('li'); li.className = 'list-item';
       li.innerHTML =
-        FF.thumb64(`${CFG.SOURCE_PATH}/frog/${id}.png`, `Frog ${id}`) +
+        FF.thumb64(`${CFG.SOURCE_PATH}/frog/${r.id}.png`, `Frog ${r.id}`) +
         `<div>
           <div style="display:flex;align-items:center;gap:8px;">
-            <b>Frog #${id}</b>
-            ${(rank || rank === 0)
-              ? `<span class="pill">Rank <b>#${rank}</b></span>`
-              : `<span class="pill"><span class="muted">Rank N/A</span></span>`}
+            <b>Frog #${r.id}</b> ${pillRank(rank)}
           </div>
-          <div class="muted">Staked — • by —</div>
-        </div>`;
+          <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? FF.shorten(r.staker) : '—'}</div>
+        </div>
+        <div class="price">Staked</div>`;
+      ul.appendChild(li);
+    });
 
-      listEl.appendChild(li);
+    buildPager();
+  }
 
-      // Resolve staker + when (async) with on-chain, then fallback to Reservoir if needed
-      try {
-        const meta = await getStakeMetaOnChain(id);
-        const when = meta.date ? `${ago(meta.date)} ago` : '—';
-        const who = meta.staker ? fmtAddr(meta.staker) : '—';
-        const info = li.querySelector('.muted');
-        if (info) info.textContent = `Staked ${when} • by ${who}`;
-      } catch (_) { /* already logged in helpers */ }
+  // ---------- Reservoir: tokens owned by controller ----------
+  async function fetchControllerTokens(limitPerPage = 200, maxPages = 30){
+    const key = CFG.FROG_API_KEY;
+    if (!key) return [];
+    const out = [];
+    let continuation = '';
+    const base = 'https://api.reservoir.tools/tokens/v7';
+
+    for (let i=0; i<maxPages; i++){
+      const p = new URLSearchParams({
+        collection: CFG.COLLECTION_ADDRESS,
+        owner: CFG.CONTROLLER_ADDRESS,
+        limit: String(limitPerPage),
+        includeTopBid: 'false'
+      });
+      if (continuation) p.set('continuation', continuation);
+      const res = await fetch(`${base}?${p.toString()}`, {
+        headers: { accept:'*/*', 'x-api-key': key }
+      });
+      if (!res.ok) throw new Error('Reservoir '+res.status);
+      const json = await res.json();
+      const arr = (json?.tokens || [])
+        .map(t => {
+          const tokenId = t?.token?.tokenId ?? t?.tokenId ?? t?.id;
+          return tokenId!=null ? Number(tokenId) : null;
+        })
+        .filter(Number.isFinite);
+      out.push(...arr);
+      continuation = json?.continuation || '';
+      if (!continuation) break;
     }
-
-    renderPager();
+    return out;
   }
 
-  // -----------------------------
-  // Boot
-  // -----------------------------
-  async function boot() {
-    try {
-      listEl.innerHTML = '<li class="list-item"><div class="muted">Loading pond…</div></li>';
-      pages = [];
-      continuations = [''];
-      hasMore = true;
-      currentPage = 0;
-      await renderPage();
-    } catch (e) {
-      console.warn(e);
-      listEl.innerHTML = '<li class="list-item"><div class="muted">Failed to load the pond.</div></li>';
+  // ---------- on-chain utilities ----------
+  function getProvider(){
+    if (window.ethereum) return new ethers.providers.Web3Provider(window.ethereum);
+    return null;
+  }
+  function iface(){
+    return new ethers.utils.Interface([
+      'event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)'
+    ]);
+  }
+  function topicsFor({from=null,to=null,tokenId=null}){
+    const ifc = iface();
+    const base = [ ifc.getEventTopic('Transfer') ];
+    const f = from ? ethers.utils.hexZeroPad(from, 32) : null;
+    const t = to   ? ethers.utils.hexZeroPad(to,   32) : null;
+    const id = tokenId!=null
+      ? ethers.utils.hexZeroPad(ethers.BigNumber.from(String(tokenId)).toHexString(), 32)
+      : null;
+    return [ base[0], f, t, id ];
+  }
+
+  async function deriveCurrentStakedSet(){
+    const provider = getProvider();
+    if (!provider) return [];
+
+    const fromBlock = (CFG.COLLECTION_START_BLOCK ?? 0);
+    const controller = CFG.CONTROLLER_ADDRESS;
+    const ifc = iface();
+
+    const logsIn = await provider.getLogs({
+      fromBlock, toBlock:'latest', address: CFG.COLLECTION_ADDRESS,
+      topics: topicsFor({from:null, to:controller, tokenId:null})
+    });
+    const logsOut = await provider.getLogs({
+      fromBlock, toBlock:'latest', address: CFG.COLLECTION_ADDRESS,
+      topics: topicsFor({from:controller, to:null, tokenId:null})
+    });
+
+    const all = logsIn.concat(logsOut).sort((a,b)=>{
+      if (a.blockNumber!==b.blockNumber) return a.blockNumber-b.blockNumber;
+      return a.logIndex-b.logIndex;
+    });
+
+    const live = new Map(); // id -> {id, staker, since}
+    for (const log of all){
+      let parsed;
+      try { parsed = ifc.parseLog(log); } catch { continue; }
+      const from = parsed.args.from;
+      const to   = parsed.args.to;
+      const id   = Number(parsed.args.tokenId);
+      if (!Number.isFinite(id)) continue;
+
+      if (to?.toLowerCase() === controller.toLowerCase()){
+        const blk = await provider.getBlock(log.blockNumber);
+        live.set(id, { id, staker: from, since: new Date(blk.timestamp*1000) });
+      } else if (from?.toLowerCase() === controller.toLowerCase()){
+        live.delete(id);
+      }
+    }
+    return [...live.values()];
+  }
+
+  async function enrichStakeInfoForIds(ids){
+    const provider = getProvider();
+    if (!provider || !ids.length) return [];
+
+    const ifc = iface();
+    const toTopic = ethers.utils.hexZeroPad(CFG.CONTROLLER_ADDRESS, 32);
+    const fromBlock = (CFG.COLLECTION_START_BLOCK ?? 0);
+
+    const rows = [];
+    for (const id of ids){
+      try{
+        const idTopic = ethers.utils.hexZeroPad(
+          ethers.BigNumber.from(String(id)).toHexString(), 32
+        );
+        const logs = await provider.getLogs({
+          fromBlock, toBlock:'latest', address: CFG.COLLECTION_ADDRESS,
+          topics: [ ifc.getEventTopic('Transfer'), null, toTopic, idTopic ]
+        });
+        if (!logs.length) { rows.push({id, staker:null, since:null}); continue; }
+        const last = logs[logs.length-1];
+        const parsed = ifc.parseLog(last);
+        const staker = parsed.args.from;
+        const blk = await provider.getBlock(last.blockNumber);
+        rows.push({ id, staker, since: new Date(blk.timestamp*1000) });
+      }catch{
+        rows.push({ id, staker:null, since:null });
+      }
+    }
+    return rows;
+  }
+
+  // ---------- main ----------
+  async function loadPond(){
+    try{
+      await loadRanks();
+
+      let ids = [];
+      try { ids = await fetchControllerTokens(); } catch(e){ console.warn('Reservoir error', e); }
+
+      let rows;
+      if (ids && ids.length){
+        rows = await enrichStakeInfoForIds(ids);
+      } else {
+        rows = await deriveCurrentStakedSet();
+      }
+
+      // newest staked first
+      rows.sort((a,b)=>{
+        const ta = a.since ? a.since.getTime() : 0;
+        const tb = b.since ? b.since.getTime() : 0;
+        return tb - ta;
+      });
+
+      ST.rows = rows;
+      ST.page = 0;
+      renderPage();
+    }catch(e){
+      console.warn('Pond load failed', e);
+      ul.innerHTML = `<li class="list-item"><div class="muted">Failed to load the pond.</div></li>`;
+      ensurePager().innerHTML = '';
     }
   }
 
-  // public refresh if you need it elsewhere
-  window.FF_renderPond = boot;
-
-  // auto-run
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot, { once: true });
-  } else {
-    boot();
-  }
+  // autorun & expose
+  loadPond();
+  window.FF_reloadPond = loadPond;
 })(window.FF, window.FF_CFG);
