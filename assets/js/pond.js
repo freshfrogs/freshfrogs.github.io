@@ -4,24 +4,39 @@
   const ul   = document.getElementById('pondList');
   if (!wrap || !ul) return;
 
-  // -------- config / provider --------
+  // ─────────────────────────────────────────────────────────────
+  // Config / Providers
+  // ─────────────────────────────────────────────────────────────
   const START_BLOCK = Number(CFG.COLLECTION_START_BLOCK ?? 15209637);
   const CONTROLLER  = String(CFG.CONTROLLER_ADDRESS).toLowerCase();
   const COLLECTION  = CFG.COLLECTION_ADDRESS;
 
+  // Fastest if you set CFG.RPC_URL (Infura/Alchemy/etc)
   function getProvider(){
     if (CFG.RPC_URL) {
       try { return new ethers.providers.StaticJsonRpcProvider(CFG.RPC_URL); } catch {}
     }
     if (window.ethereum) return new ethers.providers.Web3Provider(window.ethereum);
-    return null;
+    // last resort (slower / rate-limited):
+    try { return ethers.getDefaultProvider(); } catch { return null; }
   }
+  const provider = getProvider();
 
-  // -------- state --------
+  // Minimal ABI for the bits we need (extend later if needed)
+  const CTRL_ABI = [
+    "function stakerAddress(uint256 tokenId) view returns (address)"
+  ];
+  const controller = provider
+    ? new ethers.Contract(CFG.CONTROLLER_ADDRESS, CTRL_ABI, provider)
+    : null;
+
+  // ─────────────────────────────────────────────────────────────
+  // State
+  // ─────────────────────────────────────────────────────────────
   const ST = {
-    ids: [],          // from Reservoir (fast list of tokenIds)
-    rows: null,       // direct enriched rows (used by fallback) [{id, staker, since}]
-    cache: new Map(), // id -> { id, staker, since }
+    ids: [],          // tokenIds owned by controller from Reservoir
+    rows: null,       // [{id, staker, since}] when falling back to on-chain only
+    cache: new Map(), // id -> {id, staker, since}
     page: 0,
     pageSize: 10,
     loadingPage: false
@@ -29,7 +44,9 @@
 
   let RANKS = null;
 
-  // -------- helpers --------
+  // ─────────────────────────────────────────────────────────────
+  // Helpers
+  // ─────────────────────────────────────────────────────────────
   async function loadRanks() {
     if (RANKS) return RANKS;
     try { RANKS = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json'); }
@@ -90,7 +107,9 @@
     );
   }
 
-  // -------- Reservoir: list token IDs owned by controller --------
+  // ─────────────────────────────────────────────────────────────
+  // Reservoir: get tokens owned by controller (fast list of ids)
+  // ─────────────────────────────────────────────────────────────
   async function fetchControllerTokens(limitPerPage = 200, maxPages = 30){
     const key = CFG.FROG_API_KEY;
     if (!key) return [];
@@ -125,69 +144,21 @@
     return out;
   }
 
-  // -------- on-chain utilities (fallback + enrichment) --------
+  // ─────────────────────────────────────────────────────────────
+  // On-chain enrichment (true staker + staked since)
+  // ─────────────────────────────────────────────────────────────
   function iface(){
     return new ethers.utils.Interface([
       'event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)'
     ]);
   }
 
-  // Fallback: derive full set (and staker/since) directly from logs
-  async function deriveCurrentStakedSet(){
-    const provider = getProvider();
-    if (!provider) return [];
-
-    const ifc = iface();
-    const topicTransfer = ifc.getEventTopic('Transfer');
-    const controllerTopic = ethers.utils.hexZeroPad(CONTROLLER, 32);
-
-    // 1) all transfers TO controller
-    const logsIn = await provider.getLogs({
-      fromBlock: START_BLOCK,
-      toBlock: 'latest',
-      address: COLLECTION,
-      topics: [ topicTransfer, null, controllerTopic, null ]
-    });
-
-    // 2) all transfers FROM controller (unstake)
-    const logsOut = await provider.getLogs({
-      fromBlock: START_BLOCK,
-      toBlock: 'latest',
-      address: COLLECTION,
-      topics: [ topicTransfer, controllerTopic, null, null ]
-    });
-
-    const all = logsIn.concat(logsOut).sort((a,b)=>{
-      if (a.blockNumber!==b.blockNumber) return a.blockNumber-b.blockNumber;
-      return a.logIndex-b.logIndex;
-    });
-
-    const live = new Map(); // id -> { id, staker, since }
-    for (const log of all){
-      let parsed; try { parsed = ifc.parseLog(log); } catch { continue; }
-      const from = String(parsed.args.from || '').toLowerCase();
-      const to   = String(parsed.args.to   || '').toLowerCase();
-      const id   = Number(parsed.args.tokenId);
-      if (!Number.isFinite(id)) continue;
-
-      if (to === CONTROLLER){
-        const blk = await provider.getBlock(log.blockNumber);
-        live.set(id, { id, staker: parsed.args.from, since: new Date(blk.timestamp*1000) });
-      } else if (from === CONTROLLER){
-        live.delete(id);
-      }
-    }
-    return [...live.values()].sort((a,b)=>{
-      const ta=a.since?+a.since:0, tb=b.since?+b.since:0;
-      return tb-ta;
-    });
-  }
-
-  // Enrich the current page only (one getLogs with OR over tokenIds, then batched getBlock)
+  // Find last Transfer → controller per id for the CURRENT PAGE only (batched getLogs)
   async function enrichCurrentPage(){
-    const provider = getProvider();
     if (!provider) return;
+    if (!controller) return;
     if (!ST.ids.length) return;
+
     const start = ST.page * ST.pageSize;
     const end   = Math.min(start + ST.pageSize, ST.ids.length);
     const pageIds = ST.ids.slice(start, end).filter(id=>!ST.cache.has(id));
@@ -195,6 +166,7 @@
 
     ST.loadingPage = true;
     try{
+      // 1) getLogs batched for current page
       const ifc = iface();
       const topicTransfer = ifc.getEventTopic('Transfer');
       const toTopic = ethers.utils.hexZeroPad(CONTROLLER, 32);
@@ -221,24 +193,40 @@
         }
       }
 
-      const needed = pageIds.filter(id => !ST.cache.has(id));
-      const blockNums = [...new Set(needed.map(id => lastById.get(id)?.blockNumber).filter(Boolean))];
+      // 2) batch get blocks (unique)
+      const blockNums = [...new Set([...lastById.values()].map(l => l.blockNumber))];
       const blockMap = new Map();
       await Promise.all(blockNums.map(async bn=>{
         try { blockMap.set(bn, await provider.getBlock(bn)); } catch {}
       }));
 
-      needed.forEach(id=>{
+      // 3) for true staker, call controller.stakerAddress(tokenId) (parallel with modest concurrency)
+      async function pLimit(n, arr, fn){
+        const out = []; let i=0; const running = new Set();
+        async function run(k){
+          const p = Promise.resolve(fn(arr[k])).then(v => { out[k]=v; running.delete(p); });
+          running.add(p); await p;
+        }
+        while(i<arr.length){
+          while(running.size < n && i < arr.length){ run(i++); }
+          if (running.size) await Promise.race(running);
+        }
+        return out;
+      }
+
+      const stakers = await pLimit(6, pageIds, async id=>{
+        try { return await controller.stakerAddress(id); } catch { return null; }
+      });
+
+      // 4) fill cache and swap visible rows
+      pageIds.forEach((id, idx)=>{
         const log = lastById.get(id);
-        if (!log){ ST.cache.set(id, { id, staker:null, since:null }); return; }
-        let parsed; try { parsed = ifc.parseLog(log); } catch { parsed = null; }
-        const staker = parsed?.args?.from ?? null;
-        const blk = blockMap.get(log.blockNumber);
+        const blk = log ? blockMap.get(log.blockNumber) : null;
         const since = blk ? new Date(blk.timestamp*1000) : null;
+        const staker = stakers[idx] && stakers[idx] !== ethers.constants.AddressZero ? stakers[idx] : null;
         ST.cache.set(id, { id, staker, since });
       });
 
-      // update visible rows
       ul.querySelectorAll('li.list-item').forEach(li=>{
         const id = Number(li.dataset.id);
         const row = ST.cache.get(id);
@@ -249,8 +237,53 @@
     }
   }
 
-  // -------- rendering --------
-  function renderFromRows(){ // fallback path uses ST.rows directly
+  // Full fallback (no Reservoir) — build full set with logs (slower)
+  async function deriveCurrentStakedSet(){
+    if (!provider) return [];
+    const ifc = iface();
+    const topicTransfer = ifc.getEventTopic('Transfer');
+    const ctrlTopic = ethers.utils.hexZeroPad(CONTROLLER, 32);
+
+    // in/out of controller
+    const logsIn = await provider.getLogs({
+      fromBlock: START_BLOCK, toBlock:'latest', address: COLLECTION,
+      topics: [ topicTransfer, null, ctrlTopic, null ]
+    });
+    const logsOut = await provider.getLogs({
+      fromBlock: START_BLOCK, toBlock:'latest', address: COLLECTION,
+      topics: [ topicTransfer, ctrlTopic, null, null ]
+    });
+
+    const all = logsIn.concat(logsOut).sort((a,b)=>{
+      if (a.blockNumber!==b.blockNumber) return a.blockNumber-b.blockNumber;
+      return a.logIndex-b.logIndex;
+    });
+
+    const live = new Map(); // id -> { id, staker, since }
+    for (const log of all){
+      let parsed; try { parsed = ifc.parseLog(log); } catch { continue; }
+      const from = String(parsed.args.from || '').toLowerCase();
+      const to   = String(parsed.args.to   || '').toLowerCase();
+      const id   = Number(parsed.args.tokenId);
+      if (!Number.isFinite(id)) continue;
+
+      if (to === CONTROLLER){
+        const blk = await provider.getBlock(log.blockNumber);
+        live.set(id, { id, staker: parsed.args.from, since: new Date(blk.timestamp*1000) });
+      } else if (from === CONTROLLER){
+        live.delete(id);
+      }
+    }
+    return [...live.values()].sort((a,b)=>{
+      const ta = a.since?+a.since:0, tb = b.since?+b.since:0;
+      return tb - ta;
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Rendering
+  // ─────────────────────────────────────────────────────────────
+  function renderFromRows(){ // fallback path
     ul.innerHTML = '';
     const total = ST.rows?.length || 0;
     if (!total){
@@ -273,7 +306,7 @@
     buildPager(total);
   }
 
-  function renderPage(){ // reservoir path uses ST.ids + cache
+  function renderPage(){ // reservoir path: ids + cache
     if (ST.rows) { renderFromRows(); return; }
     ul.innerHTML = '';
     const total = ST.ids.length;
@@ -305,23 +338,25 @@
     if (!ST.loadingPage) enrichCurrentPage().catch(()=>{});
   }
 
-  // -------- main --------
+  // ─────────────────────────────────────────────────────────────
+  // Main
+  // ─────────────────────────────────────────────────────────────
   async function loadPond(){
     try{
       await loadRanks();
 
-      // 1) try Reservoir first (fast)
+      // Try Reservoir first
       let ids = [];
       try { ids = await fetchControllerTokens(); } catch(e){ console.warn('Reservoir error', e); }
       if (Array.isArray(ids) && ids.length){
         ST.ids = ids;
         ST.rows = null;
         ST.page = 0;
-        renderPage();     // immediate placeholders
+        renderPage();               // immediate placeholders
         return;
       }
 
-      // 2) fallback to on-chain derivation (slower, but reliable)
+      // Fallback to on-chain derivation
       const rows = await deriveCurrentStakedSet();
       ST.rows = rows;
       ST.ids = [];
