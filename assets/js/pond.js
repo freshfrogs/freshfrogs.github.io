@@ -4,11 +4,28 @@
   const ul   = document.getElementById('pondList');
   if (!wrap || !ul) return;
 
-  // state
+  // ---------- config / provider ----------
+  const START_BLOCK = Number(CFG.COLLECTION_START_BLOCK ?? 15209637); // your deploy block
+  const CONTROLLER  = String(CFG.CONTROLLER_ADDRESS).toLowerCase();
+  const COLLECTION  = CFG.COLLECTION_ADDRESS;
+
+  function getProvider(){
+    if (CFG.RPC_URL) {
+      try { return new ethers.providers.StaticJsonRpcProvider(CFG.RPC_URL); } catch {}
+    }
+    if (window.ethereum) return new ethers.providers.Web3Provider(window.ethereum);
+    return null;
+  }
+
+  // ---------- state ----------
   const ST = {
-    rows: [],        // [{id, staker, since: Date|null}]
+    // reservoir list of tokenIds currently owned by controller
+    ids: [],                 // [Number]
+    // cached enrichment: id -> { id, staker, since:Date|null }
+    cache: new Map(),
     page: 0,
-    pageSize: 10
+    pageSize: 10,
+    loadingPage: false
   };
 
   let RANKS = null;
@@ -39,15 +56,12 @@
   }
 
   function buildPager(){
-    const total = ST.rows.length;
+    const total = ST.ids.length;
     const pages = Math.max(1, Math.ceil(total / ST.pageSize));
     const nav = ensurePager();
     nav.innerHTML = '';
+    if (pages <= 1) return;
 
-    // small guard if only one page
-    if (pages <= 1) { return; }
-
-    // numbered buttons
     for (let i=0; i<pages; i++){
       const btn = document.createElement('button');
       btn.className = 'btn btn-ghost btn-sm';
@@ -56,16 +70,33 @@
       btn.addEventListener('click', ()=>{
         if (ST.page !== i){
           ST.page = i;
-          renderPage();
+          renderPage(); // will enrich lazily if needed
         }
       });
       nav.appendChild(btn);
     }
   }
 
+  function rowHTML(r){
+    const rank = RANKS?.[String(r.id)] ?? null;
+    return (
+      FF.thumb64(`${CFG.SOURCE_PATH}/frog/${r.id}.png`, `Frog ${r.id}`) +
+      `<div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <b>Frog #${r.id}</b> ${pillRank(rank)}
+        </div>
+        <div class="muted">
+          Staked ${fmtAgo(r.since)} • Staker ${r.staker ? FF.shorten(r.staker) : '—'}
+        </div>
+      </div>
+      <div class="price">Staked</div>`
+    );
+  }
+
+  // ---------- rendering ----------
   function renderPage(){
     ul.innerHTML = '';
-    const total = ST.rows.length;
+    const total = ST.ids.length;
 
     if (!total){
       const li = document.createElement('li');
@@ -78,27 +109,25 @@
 
     const start = ST.page * ST.pageSize;
     const end   = Math.min(start + ST.pageSize, total);
-    const pageRows = ST.rows.slice(start, end);
+    const pageIds = ST.ids.slice(start, end);
 
-    pageRows.forEach(r=>{
-      const rank = RANKS?.[String(r.id)] ?? null;
-      const li = document.createElement('li'); li.className = 'list-item';
-      li.innerHTML =
-        FF.thumb64(`${CFG.SOURCE_PATH}/frog/${r.id}.png`, `Frog ${r.id}`) +
-        `<div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <b>Frog #${r.id}</b> ${pillRank(rank)}
-          </div>
-          <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? FF.shorten(r.staker) : '—'}</div>
-        </div>
-        <div class="price">Staked</div>`;
+    // show placeholders immediately
+    pageIds.forEach(id=>{
+      const li = document.createElement('li'); li.className = 'list-item'; li.dataset.id = String(id);
+      const cached = ST.cache.get(id);
+      li.innerHTML = cached
+        ? rowHTML(cached)
+        : (FF.thumb64(`${CFG.SOURCE_PATH}/frog/${id}.png`, `Frog ${id}`) +
+           `<div><b>Frog #${id}</b><div class="muted">Loading stake info…</div></div>`);
       ul.appendChild(li);
     });
 
+    // fetch enrichment for this page if not already complete
+    if (!ST.loadingPage) enrichCurrentPage().catch(()=>{});
     buildPager();
   }
 
-  // ---------- Reservoir: tokens owned by controller ----------
+  // ---------- Reservoir: list token IDs owned by controller ----------
   async function fetchControllerTokens(limitPerPage = 200, maxPages = 30){
     const key = CFG.FROG_API_KEY;
     if (!key) return [];
@@ -132,97 +161,89 @@
     return out;
   }
 
-  // ---------- on-chain utilities ----------
-  function getProvider(){
-    if (window.ethereum) return new ethers.providers.Web3Provider(window.ethereum);
-    return null;
-  }
-  function iface(){
-    return new ethers.utils.Interface([
-      'event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)'
-    ]);
-  }
-  function topicsFor({from=null,to=null,tokenId=null}){
-    const ifc = iface();
-    const base = [ ifc.getEventTopic('Transfer') ];
-    const f = from ? ethers.utils.hexZeroPad(from, 32) : null;
-    const t = to   ? ethers.utils.hexZeroPad(to,   32) : null;
-    const id = tokenId!=null
-      ? ethers.utils.hexZeroPad(ethers.BigNumber.from(String(tokenId)).toHexString(), 32)
-      : null;
-    return [ base[0], f, t, id ];
-  }
-
-  async function deriveCurrentStakedSet(){
+  // ---------- batched enrichment for *current page* ----------
+  async function enrichCurrentPage(){
     const provider = getProvider();
-    if (!provider) return [];
+    if (!provider) return; // no wallet/RPC available; keep placeholders
 
-    const fromBlock = (CFG.COLLECTION_START_BLOCK ?? 0);
-    const controller = CFG.CONTROLLER_ADDRESS;
-    const ifc = iface();
+    const start = ST.page * ST.pageSize;
+    const end   = Math.min(start + ST.pageSize, ST.ids.length);
+    const pageIds = ST.ids.slice(start, end).filter(id=>!ST.cache.has(id));
+    if (!pageIds.length) return;
 
-    const logsIn = await provider.getLogs({
-      fromBlock, toBlock:'latest', address: CFG.COLLECTION_ADDRESS,
-      topics: topicsFor({from:null, to:controller, tokenId:null})
-    });
-    const logsOut = await provider.getLogs({
-      fromBlock, toBlock:'latest', address: CFG.COLLECTION_ADDRESS,
-      topics: topicsFor({from:controller, to:null, tokenId:null})
-    });
+    ST.loadingPage = true;
+    try{
+      // Build OR-topic for all tokenIds on this page
+      const ifc = new ethers.utils.Interface([
+        'event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)'
+      ]);
+      const topicTransfer = ifc.getEventTopic('Transfer');
+      const toTopic = ethers.utils.hexZeroPad(CONTROLLER, 32);
+      const idTopics = pageIds.map(id=>{
+        const hexId = ethers.BigNumber.from(String(id)).toHexString();
+        return ethers.utils.hexZeroPad(hexId, 32);
+      });
 
-    const all = logsIn.concat(logsOut).sort((a,b)=>{
-      if (a.blockNumber!==b.blockNumber) return a.blockNumber-b.blockNumber;
-      return a.logIndex-b.logIndex;
-    });
+      // Single getLogs call for all "to controller" transfers for these ids
+      const logs = await provider.getLogs({
+        fromBlock: START_BLOCK,
+        toBlock:   'latest',
+        address:   COLLECTION,
+        topics:    [ topicTransfer, null, toTopic, idTopics ] // OR on 4th topic
+      });
 
-    const live = new Map(); // id -> {id, staker, since}
-    for (const log of all){
-      let parsed;
-      try { parsed = ifc.parseLog(log); } catch { continue; }
-      const from = parsed.args.from;
-      const to   = parsed.args.to;
-      const id   = Number(parsed.args.tokenId);
-      if (!Number.isFinite(id)) continue;
-
-      if (to?.toLowerCase() === controller.toLowerCase()){
-        const blk = await provider.getBlock(log.blockNumber);
-        live.set(id, { id, staker: from, since: new Date(blk.timestamp*1000) });
-      } else if (from?.toLowerCase() === controller.toLowerCase()){
-        live.delete(id);
+      // Keep only the last "to controller" log per id
+      const lastById = new Map(); // id -> log
+      for (const log of logs){
+        let parsed;
+        try { parsed = ifc.parseLog(log); } catch { continue; }
+        const id = Number(parsed.args.tokenId);
+        if (!Number.isFinite(id)) continue;
+        // we want the most recent => replace if newer
+        const prev = lastById.get(id);
+        if (!prev || log.blockNumber > prev.blockNumber || (log.blockNumber===prev.blockNumber && log.logIndex>prev.logIndex)){
+          lastById.set(id, log);
+        }
       }
+
+      // Batch unique block lookups for timestamps
+      const needed = pageIds.filter(id => !ST.cache.has(id));
+      const blockNums = [...new Set(needed.map(id => lastById.get(id)?.blockNumber).filter(Boolean))];
+      const blockMap = new Map();
+      // small batch fetch; provider handles parallelism
+      await Promise.all(blockNums.map(async bn=>{
+        try {
+          const blk = await provider.getBlock(bn);
+          blockMap.set(bn, blk);
+        } catch {}
+      }));
+
+      // Fill cache for each id on this page
+      needed.forEach(id=>{
+        const log = lastById.get(id);
+        if (!log){
+          ST.cache.set(id, { id, staker: null, since: null });
+          return;
+        }
+        let parsed;
+        try { parsed = ifc.parseLog(log); } catch { parsed = null; }
+        const staker = parsed?.args?.from ?? null;
+        const blk = blockMap.get(log.blockNumber);
+        const since = blk ? new Date(blk.timestamp*1000) : null;
+        ST.cache.set(id, { id, staker, since });
+      });
+
+      // Update the DOM rows we just enriched
+      ul.querySelectorAll('li.list-item').forEach(li=>{
+        const id = Number(li.dataset.id);
+        const row = ST.cache.get(id);
+        if (row){
+          li.innerHTML = rowHTML(row);
+        }
+      });
+    }finally{
+      ST.loadingPage = false;
     }
-    return [...live.values()];
-  }
-
-  async function enrichStakeInfoForIds(ids){
-    const provider = getProvider();
-    if (!provider || !ids.length) return [];
-
-    const ifc = iface();
-    const toTopic = ethers.utils.hexZeroPad(CFG.CONTROLLER_ADDRESS, 32);
-    const fromBlock = (CFG.COLLECTION_START_BLOCK ?? 0);
-
-    const rows = [];
-    for (const id of ids){
-      try{
-        const idTopic = ethers.utils.hexZeroPad(
-          ethers.BigNumber.from(String(id)).toHexString(), 32
-        );
-        const logs = await provider.getLogs({
-          fromBlock, toBlock:'latest', address: CFG.COLLECTION_ADDRESS,
-          topics: [ ifc.getEventTopic('Transfer'), null, toTopic, idTopic ]
-        });
-        if (!logs.length) { rows.push({id, staker:null, since:null}); continue; }
-        const last = logs[logs.length-1];
-        const parsed = ifc.parseLog(last);
-        const staker = parsed.args.from;
-        const blk = await provider.getBlock(last.blockNumber);
-        rows.push({ id, staker, since: new Date(blk.timestamp*1000) });
-      }catch{
-        rows.push({ id, staker:null, since:null });
-      }
-    }
-    return rows;
   }
 
   // ---------- main ----------
@@ -230,24 +251,13 @@
     try{
       await loadRanks();
 
+      // 1) list ids via Reservoir (fast)
       let ids = [];
       try { ids = await fetchControllerTokens(); } catch(e){ console.warn('Reservoir error', e); }
+      ST.ids = ids;
 
-      let rows;
-      if (ids && ids.length){
-        rows = await enrichStakeInfoForIds(ids);
-      } else {
-        rows = await deriveCurrentStakedSet();
-      }
-
-      // newest staked first
-      rows.sort((a,b)=>{
-        const ta = a.since ? a.since.getTime() : 0;
-        const tb = b.since ? b.since.getTime() : 0;
-        return tb - ta;
-      });
-
-      ST.rows = rows;
+      // 2) render page 1 immediately (placeholders),
+      //    then enrichment fills in staker + since for page 1 only.
       ST.page = 0;
       renderPage();
     }catch(e){
