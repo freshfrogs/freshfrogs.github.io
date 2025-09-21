@@ -410,3 +410,49 @@ footer.site { border-top:1px solid var(--ring); padding:26px 0; color:var(--mute
 /* Hero art crisp + contained */
 #fmHero { position: relative; aspect-ratio: 1/1; border: 1px solid var(--edge); border-radius: 12px; overflow: hidden; background: var(--panelSoft); }
 #fmHero canvas, #fmHero img { position:absolute; inset:0; width:100%; height:100%; image-rendering: pixelated; }
+/* Click affordance on items that open the modal */
+.list-item[data-token-id] { cursor: pointer; }
+
+/* Modal compact styling */
+.modal-compact { padding: 14px 14px 16px; border-radius: 16px; gap: 10px; }
+.modal-head { display: grid; gap: 4px; }
+.modal-title { display: flex; align-items: center; gap: 8px; font-size: 16px; }
+.modal-subtitle { display: flex; align-items: center; gap: 8px; font-size: 12.5px; opacity: .9; }
+.pill-compact { padding: 2px 8px; border-radius: 999px; font-size: 12px; }
+
+.compact-grid { display: grid; grid-template-columns: 300px 1fr; gap: 14px; }
+@media (max-width: 860px) { .compact-grid { grid-template-columns: 1fr; } }
+
+.compact-hero { aspect-ratio: 1/1; border: 1px solid var(--edge); border-radius: 12px; overflow: hidden; background: var(--panelSoft); }
+#fmHero canvas, #fmHero img { position:absolute; inset:0; width:100%; height:100%; image-rendering: pixelated; }
+#fmHero { position: relative; }
+
+.modal-actions { display: grid; gap: 8px; margin-top: 10px; }
+.action-group, .link-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 6px;
+}
+#fmMorphBtn[disabled] { opacity: .55; cursor: not-allowed; }
+
+/* Condensed info cards */
+.kv-compact { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.kv-compact > div {
+  padding: 8px; border: 1px dashed var(--edge); border-radius: 10px; background: var(--panelSoft);
+  font-size: 13px; line-height: 1.25;
+}
+@media (max-width: 860px) { .kv-compact { grid-template-columns: 1fr; } }
+
+.divider { height: 1px; background: var(--edge); opacity: .6; margin: 10px 0; }
+
+/* Attribute list — compact */
+.attr-compact.attr-list { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 6px; }
+@media (max-width: 860px) { .attr-compact.attr-list { grid-template-columns: 1fr; } }
+.attr-compact li {
+  display:flex; justify-content: space-between; gap:8px; padding:7px 9px;
+  border:1px solid var(--edge); border-radius:9px; background: var(--panelSoft);
+  font-size: 13px;
+}
+
+/* Ensure modal visibility priority */
+.modal.open { display: block !important; z-index: 9999; }
