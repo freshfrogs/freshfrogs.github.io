@@ -1,13 +1,14 @@
+// assets/js/staking.js
 (function(FF, CFG){
   const ST = { items:[], page:0, pageSize:5 };
   let provider, signer, controller, collection;
 
-  // ------------ helpers ------------
+  // ---------- helpers ----------
   function fmtWholeFromWei(weiLike){
     try {
       if (typeof ethers!=="undefined" && ethers.utils?.formatUnits){
         const f = parseFloat(ethers.utils.formatUnits(weiLike, 18));
-        return Math.round(f).toString(); // use Math.floor to round down instead
+        return Math.round(f).toString(); // change to Math.floor for round-down
       }
     } catch {}
     try {
@@ -28,11 +29,12 @@
   }
   function stakingReady(){ return controller && signer && window.FF_getUser(); }
 
-  // ------------ tabs (Owned / Staked) ------------
+  // ---------- tabs (Owned / Staked) ----------
   let currentTab='owned';
   const tabOwned=document.getElementById('tabOwned');
   const tabStaked=document.getElementById('tabStaked');
   const tabsWrap=document.getElementById('stakeTabs');
+
   function setTab(which){
     currentTab=which;
     const owned=(which==='owned');
@@ -45,7 +47,7 @@
   tabStaked?.addEventListener('click', ()=> setTab('staked'));
   window.FF_getTab = ()=> currentTab;
 
-  // ------------ ethers / contracts ------------
+  // ---------- ethers / contracts ----------
   async function initEthers(){
     if (provider && signer && controller) return true;
     if(!window.ethereum) return false;
@@ -53,7 +55,6 @@
     provider = new ethers.providers.Web3Provider(window.ethereum);
     signer = provider.getSigner();
 
-    // Load ABIs from disk
     const ctrlAbi = await FF.fetchJSON('assets/abi/controller_abi.json');
     controller = new ethers.Contract(CFG.CONTROLLER_ADDRESS, ctrlAbi, signer);
 
@@ -61,12 +62,12 @@
       const colAbi  = await FF.fetchJSON('assets/abi/collection_abi.json');
       collection = new ethers.Contract(CFG.COLLECTION_ADDRESS, colAbi, provider); // read-only
     } catch {
-      collection = null; // if ABI missing, Pond will still render without timestamps
+      collection = null; // Pond still renders; timestamps may be skipped
     }
     return true;
   }
 
-  // ------------ load staked for connected user ------------
+  // ---------- user staked ----------
   async function loadStaked(){
     const status=document.getElementById('stakeStatus');
     const user = window.FF_getUser();
@@ -92,6 +93,7 @@
       status.textContent='Failed to load staked tokens.';
     }
   }
+  document.getElementById('loadStakedBtn')?.addEventListener('click', loadStaked);
 
   async function unstake(tokenId){
     if(!stakingReady()) { alert('Wallet/contract not ready'); return; }
@@ -114,7 +116,6 @@
 
     if(currentTab==='owned'){ window.FF_renderOwned?.(); return; }
 
-    // staked
     const items=ST.items||[];
     if(!window.FF_getUser()){ list.innerHTML='<li class="list-item"><div class="muted">Connect your wallet to load staked tokens.</div></li>'; return; }
     if(!items.length){ list.innerHTML='<li class="list-item"><div class="muted">No staked tokens yet. Click “Load Staked”.</div></li>'; return; }
@@ -137,7 +138,6 @@
       list.appendChild(li);
     });
 
-    // wire unstake
     list.querySelectorAll('[data-unstake]').forEach(btn=>{
       btn.addEventListener('click',()=> unstake(btn.getAttribute('data-unstake')));
     });
@@ -155,38 +155,39 @@
     less.onclick=()=>{ if(ST.page>0){ ST.page--; render(); } };
   }
 
-  // ------------ The Pond (global staked) ------------
-  // 1) Time staked from logs: most recent Transfer(* -> controller, tokenId)
-  async function FF_timeStakedDate(tokenId){
+  // ---------- The Pond (controller-owned) ----------
+  async function timeStakedDate(tokenId){
+    // need collection + provider; try to init if missing
     if (!collection || !provider) { try{ await initEthers(); }catch{} }
     if (!collection || !provider) return null;
 
-    // verify currently owned by controller
+    // verify the current owner is controller
     try{
       const ownerNow = await collection.ownerOf(tokenId);
       if (!ownerNow || ownerNow.toLowerCase() !== CFG.CONTROLLER_ADDRESS.toLowerCase()) return null;
     }catch(_){ return null; }
 
-    // query logs
     try{
-      const startBlock = (CFG.COLLECTION_START_BLOCK ?? 0);
-      // Prefer contract filter if tokenId indexed in ABI:
-      try {
+      // Prefer contract filter if ABI indexes tokenId
+      try{
         const filter = collection.filters.Transfer(null, CFG.CONTROLLER_ADDRESS, ethers.BigNumber.from(String(tokenId)));
-        const events = await collection.queryFilter(filter, startBlock, 'latest');
+        const events = await collection.queryFilter(filter, (CFG.COLLECTION_START_BLOCK ?? 0), 'latest');
         if (events.length){
           const last = events[events.length - 1];
           const blk = await provider.getBlock(last.blockNumber);
           return new Date(blk.timestamp * 1000);
         }
-      } catch {}
-      // Fallback raw getLogs:
+      }catch{}
+
+      // Fallback to raw getLogs
       const iface = new ethers.utils.Interface(['event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)']);
       const topicTransfer = iface.getEventTopic('Transfer');
       const toTopic = ethers.utils.hexZeroPad(CFG.CONTROLLER_ADDRESS, 32);
       const idTopic = ethers.utils.hexZeroPad(ethers.BigNumber.from(String(tokenId)).toHexString(), 32);
       const logs = await provider.getLogs({
-        fromBlock: startBlock, toBlock: 'latest', address: CFG.COLLECTION_ADDRESS,
+        fromBlock: (CFG.COLLECTION_START_BLOCK ?? 0),
+        toBlock: 'latest',
+        address: CFG.COLLECTION_ADDRESS,
         topics: [topicTransfer, null, toTopic, idTopic]
       });
       if (logs.length){
@@ -198,13 +199,8 @@
     return null;
   }
 
-  // 2) Fetch tokens by owner (prefer your owned.js; fallback to Reservoir users/{owner}/tokens/v8)
-  async function FF_fetchTokensByOwner(ownerAddr){
-    // prefer an existing global if present
-    if (typeof window.FF_fetchTokensByOwner === 'function' && window.FF_fetchTokensByOwner !== FF_fetchTokensByOwner){
-      try { return await window.FF_fetchTokensByOwner(ownerAddr); } catch(_) {}
-    }
-
+  async function fetchTokensByOwner(ownerAddr){
+    // Use Reservoir users/{owner}/tokens/v8 (same as Owned)
     const out = [];
     const key = CFG.FROG_API_KEY;
     if (!key) return out;
@@ -225,7 +221,7 @@
       const arr = (json?.tokens || []).map(t => {
         const tid = t?.token?.tokenId ?? t?.tokenId ?? t?.id;
         return tid != null ? Number(tid) : NaN;
-      }).filter(Number.isFinite).map(id => ({ id, tokenId:id, owner: ownerAddr }));
+      }).filter(Number.isFinite);
       out.push(...arr);
       continuation = json?.continuation || '';
       if (!continuation) break;
@@ -233,18 +229,17 @@
     return out;
   }
 
-  // 3) Render Pond into any container
+  // Render Pond list into provided container
   window.FF_renderPondList = async function(containerEl){
     if (!containerEl) return;
     containerEl.innerHTML = '';
 
-    // we can render list even without wallet/ethers; timestamps require provider
     await initEthers().catch(()=>{});
 
-    let items = [];
-    try { items = await FF_fetchTokensByOwner(CFG.CONTROLLER_ADDRESS); } catch(_){ items = []; }
+    let ids = [];
+    try { ids = await fetchTokensByOwner(CFG.CONTROLLER_ADDRESS); } catch(_){ ids = []; }
 
-    if (!items.length){
+    if (!ids.length){
       const empty = document.createElement('div');
       empty.className = 'muted';
       empty.textContent = 'No frogs are currently staked.';
@@ -252,12 +247,10 @@
       return;
     }
 
-    for (const it of items){
-      const id = Number(it.id ?? it.tokenId);
+    for (const id of ids){
       const rank = window.FF_getRankById ? window.FF_getRankById(id) : null;
-
       let since = null;
-      try { since = await FF_timeStakedDate(id); } catch(_){}
+      try { since = await timeStakedDate(id); } catch(_){}
 
       const row = document.createElement('div');
       row.className = 'list-item';
@@ -268,21 +261,17 @@
             <b>Frog #${id}</b>
             ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`}
           </div>
-          <div class="muted">
-            Owner Staking Controller
-            ${since ? ` • Staked: ${sinceShort(since)} ago` : ''}
-          </div>
+          <div class="muted">Owner Staking Controller${since ? ` • Staked: ${sinceShort(since)} ago` : ''}</div>
         </div>`;
       containerEl.appendChild(row);
     }
   };
 
-  // ------------ buttons & exposes ------------
+  // ---------- expose ----------
   document.getElementById('loadStakedBtn')?.addEventListener('click', loadStaked);
 
   window.FF_setTab = setTab;
-  window.FF_clearStaked = ()=>{ ST.items=[]; ST.page=0; if(window.FF_getTab && window.FF_getTab()==='staked') render(); };
+  window.FF_clearStaked = ()=>{ ST.items=[]; ST.page=0; if(window.FF_getTab && window.FF_getTab()==='staked') (render()); };
   window.FF_loadStaked = loadStaked;
-  window.FF_timeStakedDate = FF_timeStakedDate;
-  window.FF_fetchTokensByOwner = FF_fetchTokensByOwner;
+  window.FF_timeStakedDate = timeStakedDate;
 })(window.FF, window.FF_CFG);
