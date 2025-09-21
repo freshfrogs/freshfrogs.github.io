@@ -144,7 +144,7 @@ window.FF = window.FF || {};
     Object.assign(stage.style, {
       position:'relative',
       width:SIZE+'px', height:SIZE+'px',
-      borderRadius:'8px', overflow:'hidden',
+      borderRadius:'12px', overflow:'hidden',
       imageRendering:'pixelated',
       backgroundImage: `url("${bgImg}")`,
       backgroundRepeat: 'no-repeat',
@@ -181,7 +181,7 @@ window.FF = window.FF || {};
     return stage;
   }
 
-  /* ---------- “Baseball card” modal ---------- */
+  /* ---------- “Baseball card” modal (image left, details right, traits full width) ---------- */
   FF.openFrogModal = async function(info){
     const id = Number(info?.id);
     if(!Number.isFinite(id)) return;
@@ -198,19 +198,19 @@ window.FF = window.FF || {};
     const isStaked = !!own && own.toLowerCase() === CTRL.toLowerCase();
     const rank = (info.rank ?? rarity.rank);
 
-    // Build layered stage (top)
+    // Build layered stage
     let stageNode = null;
     try{ if(meta) stageNode = await buildLayeredStage(id, meta, 256); }catch{}
     if(!stageNode){
       const img = document.createElement('img');
-      Object.assign(img.style,{width:'256px',height:'256px',objectFit:'contain',imageRendering:'pixelated',borderRadius:'8px'});
+      Object.assign(img.style,{width:'256px',height:'256px',objectFit:'contain',imageRendering:'pixelated',borderRadius:'12px'});
       img.alt=`Frog #${id}`; img.src=baseURL(`frog/${id}.png`);
       stageNode = img;
     }
 
-    // Clean info lines
+    // Lines
     const statusLine = isStaked
-      ? `<span class="pill" style="background:color-mix(in srgb,var(--accent) 35%, var(--panel)); color:var(--accent-ink); border-color:color-mix(in srgb,var(--accent) 55%, transparent)">Staked</span>${since?` <span class="muted">• ${FF.formatAgo(Date.now()-since.getTime())} ago</span>`:''}`
+      ? `<span class="pill pill-green">Staked</span>${since?` <span class="muted">• ${FF.formatAgo(Date.now()-since.getTime())} ago</span>`:''}`
       : `<span class="pill">Not staked</span>`;
 
     const ownerLine = isStaked
@@ -221,44 +221,44 @@ window.FF = window.FF || {};
       ? `<span class="pill">Rank <b>#${rank}</b></span>`
       : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
 
-    // Traits → simple list of chips
+    // Traits → chips
     const traits = (meta?.attributes || meta?.traits || []).map(a=>{
       const key = a?.trait_type ?? a?.key ?? a?.traitType ?? 'Trait';
       const val = a?.value ?? a?.val ?? '';
       return { key, val };
     });
 
-    // Modal skeleton
+    // Modal skeleton (grid layout)
     const el = document.createElement('div');
     el.className = 'modal-overlay';
     el.innerHTML = `
-      <div class="modal-card">
+      <div class="modal-card modal-card--wide">
         <button class="modal-close" aria-label="Close">×</button>
 
-        <div class="stack" style="gap:14px;">
-          <div id="frogStageSlot"></div>
+        <div class="modal-grid">
+          <div id="frogStageSlot" class="modal-left"></div>
 
-          <div class="stack" style="gap:10px;">
-            <div class="row" style="gap:10px;align-items:center;">
-              <h3 style="margin:0">Frog #${id}</h3>
+          <div class="modal-right">
+            <div class="title-row">
+              <h3>Frog #${id}</h3>
               ${rankPill}
             </div>
 
-            <div class="row" style="gap:10px;align-items:center;">${statusLine}</div>
-            <div class="muted">${ownerLine}</div>
+            <div class="status-row">${statusLine}</div>
+            <div class="owner-row muted">${ownerLine}</div>
 
-            <div class="row" style="gap:8px;flex-wrap:wrap;">
+            <div class="btn-row">
               <a class="btn btn-outline btn-sm" target="_blank" rel="noopener"
                  href="https://opensea.io/assets/ethereum/${CFG.COLLECTION_ADDRESS}/${id}">OpenSea</a>
               <a class="btn btn-outline btn-sm" target="_blank" rel="noopener"
                  href="https://etherscan.io/token/${CFG.COLLECTION_ADDRESS}?a=${id}">Etherscan</a>
             </div>
+          </div>
 
-            <div class="panel" style="padding:10px;">
-              <div class="muted" style="margin-bottom:6px"><b>Traits</b> • ${traits.length}</div>
-              <div class="row" style="gap:6px;flex-wrap:wrap;">
-                ${traits.map(t=>`<span class="chip"><span class="muted">${t.key}</span> <b>${t.val}</b></span>`).join('')}
-              </div>
+          <div class="traits-panel">
+            <div class="muted"><b>Traits</b> • ${traits.length}</div>
+            <div class="traits-chips">
+              ${traits.map(t=>`<span class="chip"><span class="muted">${t.key}</span> <b>${t.val}</b></span>`).join('')}
             </div>
           </div>
         </div>
