@@ -4,21 +4,15 @@
   const ul   = document.getElementById('pondList');
   if (!wrap || !ul) return;
 
-  const API = 'https://api.reservoir.tools';
-  const KEY = CFG.FROG_API_KEY;
-
-  // ------- pager state -------
-  const PAGE_SIZE = 20;
+  // -------- state --------
   const ST = {
-    pages: [],              // Array<Array<Row>>
-    pageIndex: 0,
-    continuations: [''],    // one per page-start; index i holds continuation used to fetch page i
-    exhausted: false,
-    blockTsCache: new Map(), // blockNumber -> Date
+    rows: [],      // [{ id, staker, since: Date|null }]
+    page: 0,
+    pageSize: 10
   };
-
-  // ------- ranks -------
   let RANKS = null;
+
+  // -------- helpers --------
   async function loadRanks(){
     if (RANKS) return RANKS;
     try { RANKS = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json'); }
@@ -26,34 +20,7 @@
     return RANKS;
   }
 
-  // ------- provider / contracts (read-only) -------
-  let provider, ctrlContract;
-  function ensureProvider(){
-    if (provider) return provider;
-    try{
-      if (window.ethereum){
-        provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
-      }else{
-        // public RPC (no key required)
-        provider = new ethers.providers.JsonRpcProvider('https://cloudflare-eth.com');
-      }
-    }catch(e){ console.warn(e); }
-    return provider;
-  }
-  function ensureController(){
-    if (ctrlContract) return ctrlContract;
-    const prov = ensureProvider();
-    if (!prov) return null;
-    const abi = [
-      // minimal view we need
-      {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"stakerAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}
-    ];
-    ctrlContract = new ethers.Contract(CFG.CONTROLLER_ADDRESS, abi, prov);
-    return ctrlContract;
-  }
-
-  // ------- UI helpers -------
-  const fmtAgo = (d)=> d ? (FF.formatAgo(Date.now()-d.getTime())+' ago') : '—';
+  const fmtAgo = (d)=> d ? (FF.formatAgo(Date.now() - d.getTime()) + ' ago') : '—';
   const pillRank = (rank)=> (rank||rank===0)
     ? `<span class="pill">Rank <b>#${rank}</b></span>`
     : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
@@ -63,47 +30,40 @@
     if (!nav){
       nav = document.createElement('div');
       nav.id = 'pondPager';
-      nav.className = 'row';
       nav.style.marginTop = '8px';
+      nav.className = 'row';
       wrap.appendChild(nav);
     }
     return nav;
   }
 
-  function renderPager(){
+  function buildPager(){
+    const total = ST.rows.length;
+    const pages = Math.max(1, Math.ceil(total / ST.pageSize));
     const nav = ensurePager();
     nav.innerHTML = '';
+    if (pages <= 1) return;
 
-    // numbered buttons for the pages we've fetched
-    for (let i=0; i<ST.pages.length; i++){
-      const b = document.createElement('button');
-      b.className = 'btn btn-ghost btn-sm';
-      b.textContent = String(i+1);
-      if (i === ST.pageIndex) b.classList.add('btn-solid');
-      b.addEventListener('click', ()=>{ ST.pageIndex = i; renderPage(); });
-      nav.appendChild(b);
-    }
-
-    // fetch more if not exhausted
-    if (!ST.exhausted){
-      const nextBtn = document.createElement('button');
-      nextBtn.className = 'btn btn-outline btn-sm';
-      nextBtn.textContent = 'Next »';
-      nextBtn.addEventListener('click', async ()=>{
-        nextBtn.disabled = true;
-        const ok = await buildPage(ST.pages.length); // build page N (0-based)
-        nextBtn.disabled = false;
-        if (ok){ ST.pageIndex = ST.pages.length - 1; renderPage(); }
+    for (let i=0; i<pages; i++){
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-ghost btn-sm';
+      btn.textContent = String(i+1);
+      if (i === ST.page) btn.classList.add('btn-solid');
+      btn.addEventListener('click', ()=>{
+        if (ST.page !== i){
+          ST.page = i;
+          renderPage();
+        }
       });
-      nav.appendChild(nextBtn);
+      nav.appendChild(btn);
     }
   }
 
   function renderPage(){
     ul.innerHTML = '';
-    const page = ST.pages[ST.pageIndex] || [];
+    const total = ST.rows.length;
 
-    if (!page.length){
+    if (!total){
       const li = document.createElement('li');
       li.className = 'list-item';
       li.innerHTML = `<div class="muted">No frogs are currently staked.</div>`;
@@ -112,7 +72,11 @@
       return;
     }
 
-    page.forEach(r=>{
+    const start = ST.page * ST.pageSize;
+    const end   = Math.min(start + ST.pageSize, total);
+    const pageRows = ST.rows.slice(start, end);
+
+    pageRows.forEach(r=>{
       const rank = RANKS?.[String(r.id)] ?? null;
       const li = document.createElement('li'); li.className = 'list-item';
       li.innerHTML =
@@ -127,168 +91,159 @@
       ul.appendChild(li);
     });
 
-    renderPager();
+    buildPager();
   }
 
-  // ------- Reservoir tokens (controller-owned) -------
-  async function fetchControllerTokensPage(limit, continuation){
-    const base = `${API}/users/${CFG.CONTROLLER_ADDRESS}/tokens/v8`;
-    const params = new URLSearchParams({
-      collection: CFG.COLLECTION_ADDRESS,
-      limit: String(limit)
-    });
-    if (continuation) params.set('continuation', continuation);
-
-    const res = await fetch(`${base}?${params.toString()}`, {
-      headers: { accept: '*/*', 'x-api-key': KEY }
-    });
-    if (!res.ok) throw new Error(`Reservoir tokens ${res.status}`);
-
-    const json = await res.json();
-    const ids = (json.tokens || [])
-      .map(t => {
-        const tid = t?.token?.tokenId ?? t?.tokenId ?? t?.id;
-        const n = Number(tid);
-        return Number.isFinite(n) ? n : null;
-      })
-      .filter(n => n !== null);
-
-    return { ids, continuation: json.continuation || '' };
+  // -------- Reservoir fetchers --------
+  function headers(){
+    return {
+      accept: '*/*',
+      'x-api-key': CFG.FROG_API_KEY || 'demo-api-key'
+    };
   }
 
-  // ------- staker + since enrichment (per visible token only) -------
-  async function getStakerFor(id){
-    // prefer user-provided helper if present
-    if (typeof window.stakerAddress === 'function'){
-      try {
-        const a = await window.stakerAddress(id);
-        if (a && typeof a === 'string' && a !== '0x0000000000000000000000000000000000000000') return a;
-      }catch{}
-    }
-    const ctrl = ensureController();
-    if (!ctrl) return null;
-    try{
-      const addr = await ctrl.stakerAddress(ethers.BigNumber.from(String(id)));
-      if (addr && addr !== '0x0000000000000000000000000000000000000000') return addr;
-      return null;
-    }catch{ return null; }
-  }
-
-  const IFACE = new ethers.utils.Interface([
-    'event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)'
-  ]);
-  const TRANSFER_TOPIC = IFACE.getEventTopic('Transfer');
-
-  async function getLastStakeDate(id){
-    // prefer user's helper if available
-    if (typeof window.timeStaked === 'function'){
-      try{
-        const d = await window.timeStaked(id);
-        if (d && !Number.isNaN(Date.parse(d))) return new Date(d);
-      }catch{}
-    }
-
-    const prov = ensureProvider();
-    if (!prov) return null;
-
-    const fromBlock = (CFG.COLLECTION_START_BLOCK ?? 0);
-    const toTopic   = ethers.utils.hexZeroPad(CFG.CONTROLLER_ADDRESS, 32);
-    const idTopic   = ethers.utils.hexZeroPad(ethers.BigNumber.from(String(id)).toHexString(), 32);
-
-    try{
-      const logs = await prov.getLogs({
-        fromBlock, toBlock: 'latest',
-        address: CFG.COLLECTION_ADDRESS,
-        topics: [ TRANSFER_TOPIC, null, toTopic, idTopic ]
+  // Current staked IDs = tokens owned by controller
+  async function fetchControllerTokenIds(limitPerPage = 200, maxPages = 40){
+    const addr = CFG.CONTROLLER_ADDRESS;
+    const col  = CFG.COLLECTION_ADDRESS;
+    const base = `https://api.reservoir.tools/users/${addr}/tokens/v8`;
+    const ids = [];
+    let cont = '';
+    for (let i=0; i<maxPages; i++){
+      const qs = new URLSearchParams({
+        collection: col,
+        limit: String(limitPerPage),
+        includeTopBid: 'false'
       });
-      if (!logs.length) return null;
-      const last = logs[logs.length - 1];
-
-      // cache block timestamps
-      const bn = last.blockNumber;
-      if (ST.blockTsCache.has(bn)) return ST.blockTsCache.get(bn);
-
-      const blk = await prov.getBlock(bn);
-      const when = new Date(blk.timestamp * 1000);
-      ST.blockTsCache.set(bn, when);
-      return when;
-    }catch(e){
-      console.warn('getLastStakeDate failed for', id, e);
-      return null;
+      if (cont) qs.set('continuation', cont);
+      const url = `${base}?${qs.toString()}`;
+      const res = await fetch(url, { headers: headers() });
+      if (!res.ok) throw new Error(`Reservoir tokens ${res.status}`);
+      const json = await res.json();
+      const arr = (json?.tokens || [])
+        .map(t => {
+          const idStr = t?.token?.tokenId ?? t?.tokenId ?? t?.id;
+          const n = idStr!=null ? Number(idStr) : NaN;
+          return Number.isFinite(n) ? n : null;
+        })
+        .filter(n => n!=null);
+      ids.push(...arr);
+      cont = json?.continuation || '';
+      if (!cont) break;
     }
+    return ids;
   }
 
-  async function enrichRows(ids){
-    const out = [];
-    for (const id of ids){
-      const [staker, since] = await Promise.all([
-        getStakerFor(id),
-        getLastStakeDate(id)
-      ]);
-      out.push({ id, staker, since });
-    }
-    // newest first by since
-    out.sort((a,b)=>{
-      const ta = a.since ? a.since.getTime() : 0;
-      const tb = b.since ? b.since.getTime() : 0;
-      return tb - ta;
-    });
-    return out;
-  }
+  // Build a map tokenId → { staker, since } from activity
+  async function fetchInboundTransfersMap(desiredCount, perPage=1000, maxPages=50){
+    const addr = CFG.CONTROLLER_ADDRESS;
+    const col  = CFG.COLLECTION_ADDRESS;
+    const base = `https://api.reservoir.tools/users/activity/v6?users=${addr}&collection=${col}&types=transfer&limit=${perPage}&sortBy=eventTimestamp`;
+    const map  = new Map();
+    let cont = '';
+    for (let i=0; i<maxPages; i++){
+      const url = cont ? `${base}&continuation=${encodeURIComponent(cont)}` : base;
+      const res = await fetch(url, { headers: headers() });
+      if (!res.ok) throw new Error(`Reservoir activity ${res.status}`);
+      const json = await res.json();
+      const acts = json?.activities || [];
 
-  // Build page N (0-based); uses ST.continuations[N] input and stores N+1
-  async function buildPage(n){
-    try{
-      const startCont = ST.continuations[n] ?? '';
-      const { ids, continuation } = await fetchControllerTokensPage(PAGE_SIZE, startCont);
-
-      // if nothing, mark exhausted and push empty page to keep numbering consistent
-      if (!ids.length){
-        ST.exhausted = true;
-        ST.pages[n] = [];
-        return false;
+      // activities are newest → oldest; first time we see a tokenId
+      // with toAddress==controller is the most recent STAKE event
+      for (const a of acts){
+        if (!a || a.type!=='transfer') continue;
+        if (!a.toAddress || a.toAddress.toLowerCase() !== addr.toLowerCase()) continue;
+        const idStr = a?.token?.tokenId ?? a?.tokenId;
+        const id = idStr!=null ? Number(idStr) : NaN;
+        if (!Number.isFinite(id)) continue;
+        if (!map.has(id)){
+          const staker = a.fromAddress || null;
+          const since  = a.timestamp ? new Date(a.timestamp*1000)
+                                     : (a.createdAt ? new Date(a.createdAt) : null);
+          map.set(id, { staker, since });
+        }
       }
 
-      const rows = await enrichRows(ids);
-      ST.pages[n] = rows;
-      ST.continuations[n+1] = continuation || '';
-      if (!continuation) ST.exhausted = true;
-      return true;
-    }catch(e){
-      console.warn('buildPage failed', e);
-      ST.pages[n] = [];
-      return false;
+      // stop early once we have enough
+      if (map.size >= desiredCount) break;
+
+      cont = json?.continuation || '';
+      if (!cont) break;
     }
+    return map;
   }
 
-  async function init(){
+  // Optional: fill gaps via your on-chain helpers if present (no-op if not defined)
+  async function optionalEnrichGaps(rows){
+    const hasStaker = typeof window.stakerAddress === 'function';
+    const hasTime   = typeof window.timeStaked === 'function';
+    if (!hasStaker && !hasTime) return rows;
+
+    // limit concurrency to avoid provider rate limits
+    const queue = rows.filter(r => !r.staker || !r.since);
+    const CHUNK = 6;
+    for (let i=0; i<queue.length; i+=CHUNK){
+      const slice = queue.slice(i, i+CHUNK);
+      await Promise.all(slice.map(async r=>{
+        try{
+          if (!r.staker && hasStaker){
+            const s = await window.stakerAddress(r.id);
+            if (s) r.staker = s;
+          }
+          if (!r.since && hasTime){
+            const d = await window.timeStaked(r.id);
+            if (d && !Number.isNaN(new Date(d).getTime())) r.since = new Date(d);
+          }
+        }catch(_e){}
+      }));
+    }
+    return rows;
+  }
+
+  // -------- main --------
+  async function loadPond(){
     try{
       await loadRanks();
-      // first page
-      const ok = await buildPage(0);
-      if (!ok && ST.pages[0]?.length === 0){
-        ul.innerHTML = `<li class="list-item"><div class="muted">No frogs are currently staked.</div></li>`;
-        ensurePager().innerHTML = '';
+
+      // 1) which frogs are staked now?
+      const ids = await fetchControllerTokenIds();
+      if (!ids.length){
+        ST.rows = [];
+        ST.page = 0;
+        renderPage();
         return;
       }
-      ST.pageIndex = 0;
+
+      // 2) pull most-recent inbound transfer per token via activity API
+      const inboundMap = await fetchInboundTransfersMap(ids.length);
+
+      // 3) build rows; fill from activity, optionally patch gaps via your helpers
+      let rows = ids.map(id=>{
+        const info = inboundMap.get(id);
+        return { id, staker: info?.staker ?? null, since: info?.since ?? null };
+      });
+
+      rows = await optionalEnrichGaps(rows);
+
+      // 4) newest staked first
+      rows.sort((a,b)=>{
+        const ta = a.since ? a.since.getTime() : 0;
+        const tb = b.since ? b.since.getTime() : 0;
+        return tb - ta;
+      });
+
+      ST.rows = rows;
+      ST.page = 0;
       renderPage();
     }catch(e){
-      console.warn('Pond init failed', e);
+      console.warn('Pond load failed', e);
       ul.innerHTML = `<li class="list-item"><div class="muted">Failed to load the pond.</div></li>`;
       ensurePager().innerHTML = '';
     }
   }
 
-  // autorun + expose reload
-  init();
-  window.FF_reloadPond = async function(){
-    ST.pages = [];
-    ST.pageIndex = 0;
-    ST.continuations = [''];
-    ST.exhausted = false;
-    ST.blockTsCache.clear();
-    await init();
-  };
+  // autorun & expose
+  loadPond();
+  window.FF_reloadPond = loadPond;
 
 })(window.FF, window.FF_CFG);
