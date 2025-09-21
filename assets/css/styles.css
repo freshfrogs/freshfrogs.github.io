@@ -317,31 +317,39 @@ footer.site { border-top:1px solid var(--ring); padding:26px 0; color:var(--mute
 .pond-pager .btn{ min-width:34px; }
 .pond-pager .btn.btn-solid{ cursor:default; }
 /* === Hero single-frog renderer === */
-/* === Ultra-minimal hero frog (single 512×512) === */
+/* === Hero frog 256×256, background-only color, no chrome === */
 .hero-frog{ display:grid; place-items:center; }
 .frog-stage{
   position:relative;
-  width:512px; height:512px;
+  width:256px; height:256px;
   overflow:hidden;
   cursor:pointer;
 }
 
-/* Background: original frog PNG, enlarged & offset so only BG color shows */
+/* Stronger background magnification + offset so only the flat color shows */
 .frog-stage::before{
   content:"";
   position:absolute; inset:0;
   background-image: var(--bg-img, none);
   background-repeat:no-repeat;
-  background-size: 220% 220%;   /* enlarge */
-  background-position: -90px 70px; /* move left & down */
+  /* Bigger than before to hide sprite completely */
+  background-size: 320% 320%;
+  /* Push left/down; tuned for 256px canvas */
+  background-position: -130px 100px;
 }
 
-/* Trait layers (PNG or GIF) — NO labels, just pixels; tiny parallax */
+/* Trait layers (PNG/GIF frames). No borders/labels. */
 .frog-layer{
   position:absolute; left:0; top:0;
-  width:512px; height:512px;
+  width:256px; height:256px;
   image-rendering: pixelated;
-  pointer-events: none;
-  will-change: transform;
-  transition: transform .02s linear;
+  pointer-events: none; /* layers themselves don't capture pointer */
+  will-change: transform, filter;
+  transition: transform .08s ease, filter .12s ease;
+}
+
+/* “Lift” effect: applied by JS to interactive layers (not Trait) */
+.frog-layer.is-lifted{
+  transform: translateY(-8px) scale(1.02);
+  filter: drop-shadow(0 6px 0 rgba(0,0,0,.25));
 }
