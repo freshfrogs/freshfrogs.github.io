@@ -1,38 +1,88 @@
 // assets/js/pond.js
 (function(FF, CFG){
-  const ul = document.getElementById('pondList');
-  if (!ul) return;
+  const wrap = document.getElementById('pondListWrap');
+  const ul   = document.getElementById('pondList');
+  if (!wrap || !ul) return;
+
+  // state
+  const ST = {
+    rows: [],        // [{id, staker, since: Date|null}]
+    page: 0,
+    pageSize: 10
+  };
 
   let RANKS = null;
 
   // ---------- helpers ----------
   async function loadRanks() {
     if (RANKS) return RANKS;
-    try {
-      // tokenId -> rank (string keys are fine)
-      RANKS = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json');
-    } catch {
-      RANKS = {};
-    }
+    try { RANKS = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json'); }
+    catch { RANKS = {}; }
     return RANKS;
   }
+
   const fmtAgo = (d)=> d ? (FF.formatAgo(Date.now()-d.getTime())+' ago') : '—';
   const pillRank = (rank)=> (rank||rank===0)
-      ? `<span class="pill">Rank <b>#${rank}</b></span>`
-      : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
+    ? `<span class="pill">Rank <b>#${rank}</b></span>`
+    : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
 
-  function render(rows){
+  function ensurePager(){
+    let nav = document.getElementById('pondPager');
+    if (!nav){
+      nav = document.createElement('div');
+      nav.id = 'pondPager';
+      nav.style.marginTop = '8px';
+      nav.className = 'row';
+      wrap.appendChild(nav);
+    }
+    return nav;
+  }
+
+  function buildPager(){
+    const total = ST.rows.length;
+    const pages = Math.max(1, Math.ceil(total / ST.pageSize));
+    const nav = ensurePager();
+    nav.innerHTML = '';
+
+    // small guard if only one page
+    if (pages <= 1) { return; }
+
+    // numbered buttons
+    for (let i=0; i<pages; i++){
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-ghost btn-sm';
+      btn.textContent = String(i+1);
+      if (i === ST.page) btn.classList.add('btn-solid');
+      btn.addEventListener('click', ()=>{
+        if (ST.page !== i){
+          ST.page = i;
+          renderPage();
+        }
+      });
+      nav.appendChild(btn);
+    }
+  }
+
+  function renderPage(){
     ul.innerHTML = '';
-    if (!rows.length){
+    const total = ST.rows.length;
+
+    if (!total){
       const li = document.createElement('li');
       li.className = 'list-item';
       li.innerHTML = `<div class="muted">No frogs are currently staked.</div>`;
       ul.appendChild(li);
+      ensurePager().innerHTML = '';
       return;
     }
-    rows.forEach(r=>{
+
+    const start = ST.page * ST.pageSize;
+    const end   = Math.min(start + ST.pageSize, total);
+    const pageRows = ST.rows.slice(start, end);
+
+    pageRows.forEach(r=>{
       const rank = RANKS?.[String(r.id)] ?? null;
-      const li = document.createElement('li'); li.className='list-item';
+      const li = document.createElement('li'); li.className = 'list-item';
       li.innerHTML =
         FF.thumb64(`${CFG.SOURCE_PATH}/frog/${r.id}.png`, `Frog ${r.id}`) +
         `<div>
@@ -44,9 +94,11 @@
         <div class="price">Staked</div>`;
       ul.appendChild(li);
     });
+
+    buildPager();
   }
 
-  // ---------- 1) Reservoir: tokens owned by controller ----------
+  // ---------- Reservoir: tokens owned by controller ----------
   async function fetchControllerTokens(limitPerPage = 200, maxPages = 30){
     const key = CFG.FROG_API_KEY;
     if (!key) return [];
@@ -82,9 +134,7 @@
 
   // ---------- on-chain utilities ----------
   function getProvider(){
-    // Use MetaMask if present; read-only access doesn’t require user approval
     if (window.ethereum) return new ethers.providers.Web3Provider(window.ethereum);
-    // If no wallet, we can’t safely query chain without an RPC key; return null
     return null;
   }
   function iface(){
@@ -103,7 +153,6 @@
     return [ base[0], f, t, id ];
   }
 
-  // scan logs to compute the *current* set of tokens held by controller
   async function deriveCurrentStakedSet(){
     const provider = getProvider();
     if (!provider) return [];
@@ -112,24 +161,20 @@
     const controller = CFG.CONTROLLER_ADDRESS;
     const ifc = iface();
 
-    // 1) All transfers IN to controller (to = controller)
     const logsIn = await provider.getLogs({
       fromBlock, toBlock:'latest', address: CFG.COLLECTION_ADDRESS,
       topics: topicsFor({from:null, to:controller, tokenId:null})
     });
-    // 2) All transfers OUT from controller (from = controller)
     const logsOut = await provider.getLogs({
       fromBlock, toBlock:'latest', address: CFG.COLLECTION_ADDRESS,
       topics: topicsFor({from:controller, to:null, tokenId:null})
     });
 
-    // Merge & sort by (blockNumber, logIndex)
     const all = logsIn.concat(logsOut).sort((a,b)=>{
       if (a.blockNumber!==b.blockNumber) return a.blockNumber-b.blockNumber;
       return a.logIndex-b.logIndex;
     });
 
-    // Walk logs to build live set + remember last staker+time on IN edges
     const live = new Map(); // id -> {id, staker, since}
     for (const log of all){
       let parsed;
@@ -140,19 +185,15 @@
       if (!Number.isFinite(id)) continue;
 
       if (to?.toLowerCase() === controller.toLowerCase()){
-        // now held by controller
         const blk = await provider.getBlock(log.blockNumber);
         live.set(id, { id, staker: from, since: new Date(blk.timestamp*1000) });
       } else if (from?.toLowerCase() === controller.toLowerCase()){
-        // left controller custody
         live.delete(id);
       }
     }
-
     return [...live.values()];
   }
 
-  // If we only have the list of ids (e.g. from Reservoir), fetch staker+since for each
   async function enrichStakeInfoForIds(ids){
     const provider = getProvider();
     if (!provider || !ids.length) return [];
@@ -189,34 +230,34 @@
     try{
       await loadRanks();
 
-      // 1) Try Reservoir first
       let ids = [];
       try { ids = await fetchControllerTokens(); } catch(e){ console.warn('Reservoir error', e); }
 
       let rows;
       if (ids && ids.length){
-        // Enrich with staker+since via on-chain lookups
         rows = await enrichStakeInfoForIds(ids);
       } else {
-        // 2) Fallback to pure on-chain derivation (no Reservoir)
         rows = await deriveCurrentStakedSet();
       }
 
-      // Sort newest staked first (most recent since at top)
+      // newest staked first
       rows.sort((a,b)=>{
         const ta = a.since ? a.since.getTime() : 0;
         const tb = b.since ? b.since.getTime() : 0;
         return tb - ta;
       });
 
-      render(rows);
+      ST.rows = rows;
+      ST.page = 0;
+      renderPage();
     }catch(e){
       console.warn('Pond load failed', e);
       ul.innerHTML = `<li class="list-item"><div class="muted">Failed to load the pond.</div></li>`;
+      ensurePager().innerHTML = '';
     }
   }
 
-  // auto-run
+  // autorun & expose
   loadPond();
   window.FF_reloadPond = loadPond;
 })(window.FF, window.FF_CFG);
