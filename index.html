@@ -204,5 +204,56 @@
 <script src="assets/js/staking.js"></script>
 <script src="assets/js/pond.js"></script>
 <script src="assets/js/main.js"></script>
+
+<!-- Frog Modal -->
+<div id="frogModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-panel" role="document">
+    <button class="btn btn-ghost btn-sm modal-close" data-close aria-label="Close">✕</button>
+
+    <div class="modal-header">
+      <div class="modal-title">
+        <span class="muted">Frog</span>
+        <strong id="fmId">#—</strong>
+        <span id="fmRank" class="pill">Rank —</span>
+      </div>
+      <div class="modal-subtitle">
+        <span id="fmOwnerShort" class="muted">Owned by —</span>
+        <span id="fmState" class="pill pill-soft">—</span>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <div class="modal-left">
+        <div class="modal-hero">
+          <!-- Background trick uses flat PNG via inline style -->
+          <div id="fmHero" class="hero-frog">
+            <canvas id="fmCanvas" width="128" height="128" class="hero-layer"></canvas>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button id="fmStakeBtn" class="btn btn-solid">Stake</button>
+          <button id="fmUnstakeBtn" class="btn">Unstake</button>
+          <a id="fmOpenSea" class="btn btn-ghost" target="_blank" rel="noopener">OpenSea</a>
+          <a id="fmEtherscan" class="btn btn-ghost" target="_blank" rel="noopener">Etherscan</a>
+        </div>
+      </div>
+
+      <div class="modal-right">
+        <div class="kv">
+          <div><span class="muted">Owner</span><div id="fmOwner">—</div></div>
+          <div><span class="muted">Rarity</span><div id="fmRarityLine">—</div></div>
+          <div><span class="muted">Collection</span><div id="fmCollection">—</div></div>
+        </div>
+
+        <div class="attr-wrap">
+          <div class="section-title">Attributes</div>
+          <ul id="fmAttrs" class="attr-list list-scroll"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
