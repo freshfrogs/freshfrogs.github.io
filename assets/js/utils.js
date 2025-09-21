@@ -2,10 +2,10 @@
 window.FF = window.FF || {};
 
 (function(FF, CFG){
-  // ---------------- Basics ----------------
+  // ---------- Basics ----------
   FF.shorten = (a) => a ? (String(a).slice(0,6) + '…' + String(a).slice(-4)) : '';
 
-  // Back to 64x64 everywhere:
+  // Lists (sales/rarity/owned/staked) stay at 64x64
   FF.thumb64 = (src, alt) =>
     `<img class="thumb64" src="${src}" alt="${alt}" width="64" height="64" loading="lazy">`;
 
@@ -22,29 +22,21 @@ window.FF = window.FF || {};
     return res.json();
   };
 
-  // ---------------- Caches & Providers ----------------
-  const CACHE = {
-    rarityMap: null,     // id -> { rank, score }
-    traitsById: new Map(), // id -> [{trait_type, value}, ...]
-  };
-
+  // ---------- Providers / constants ----------
   const READ_RPC = 'https://cloudflare-eth.com';
   const readProvider = new ethers.providers.JsonRpcProvider(READ_RPC);
 
-  const Z = '0x0000000000000000000000000000000000000000';
-  const START_BLOCK = Number(CFG.COLLECTION_START_BLOCK || 15209637);
   const CTRL = CFG.CONTROLLER_ADDRESS;
   const COLL = CFG.COLLECTION_ADDRESS;
+  const START_BLOCK = Number(CFG.COLLECTION_START_BLOCK || 15209637);
   const KEY = CFG.FROG_API_KEY;
 
-  // Minimal interfaces
   const ERC721_MIN_ABI = [
     "event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)",
     "function ownerOf(uint256 tokenId) view returns (address)"
   ];
   const collection = new ethers.Contract(COLL, ERC721_MIN_ABI, readProvider);
 
-  // Optionally try controller read calls if they exist (no signer required for view)
   let controller = null;
   const CONTROLLER_ABI = [
     {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"stakerAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
@@ -59,68 +51,41 @@ window.FF = window.FF || {};
     return controller;
   }
   const isAddr = (x)=> /^0x[a-fA-F0-9]{40}$/.test(String(x||''));
-  const toCks = (a)=> ethers.utils.getAddress(a);
+  const toCks  = (a)=> ethers.utils.getAddress(a);
 
-  // ---------------- Rarity loader (cached) ----------------
+  // ---------- Rarity cache ----------
+  const RARITY = new Map(); let rarityLoaded=false;
   async function ensureRarity(){
-    if (CACHE.rarityMap) return;
-    const arr = await FF.fetchJSON(CFG.JSON_PATH);
-    const map = new Map();
-    for (const it of (arr||[])){
+    if(rarityLoaded) return;
+    const arr = await FF.fetchJSON(CFG.JSON_PATH).catch(()=>[]);
+    for(const it of (arr||[])){
       const id = Number(it.id); if(!Number.isFinite(id)) continue;
       const rank = Number(it.ranking ?? it.rank);
       const score = (it.rarity ?? it.score ?? null);
-      map.set(id, {
-        rank: Number.isFinite(rank) ? rank : null,
-        score: score != null ? String(score) : null
-      });
+      RARITY.set(id, { rank: Number.isFinite(rank)?rank:null, score: score!=null?String(score):null });
     }
-    CACHE.rarityMap = map;
+    rarityLoaded=true;
   }
-  async function getRarity(id){
-    await ensureRarity();
-    return CACHE.rarityMap.get(Number(id)) || { rank:null, score:null };
-  }
+  async function getRarity(id){ await ensureRarity(); return RARITY.get(Number(id)) || {rank:null,score:null}; }
 
-  // ---------------- Traits loader (cached, via Reservoir) ----------------
-  async function getTraits(id){
-    const n = Number(id);
-    if (CACHE.traitsById.has(n)) return CACHE.traitsById.get(n);
-    if (!KEY) { CACHE.traitsById.set(n, []); return []; }
-    const url = `https://api.reservoir.tools/tokens/v7?ids=${COLL}:${n}&includeAttributes=true`;
-    try{
-      const res = await fetch(url, { headers: { accept:'*/*','x-api-key': KEY } });
-      if(!res.ok) throw 0;
-      const js = await res.json();
-      const attrs = js?.tokens?.[0]?.token?.attributes || [];
-      const traits = attrs.map(a=>({ trait_type: a?.key ?? a?.traitType ?? 'Trait', value: a?.value ?? a?.val ?? '' }));
-      CACHE.traitsById.set(n, traits);
-      return traits;
-    }catch{
-      CACHE.traitsById.set(n, []); return [];
-    }
-  }
+  // ---------- Chain helpers ----------
+  async function ownerOf(id){ try{ return toCks(await collection.ownerOf(id)); }catch{ return null; } }
 
-  // ---------------- Staking helpers (chain-truth) ----------------
-  async function ownerOf(id){
-    try{ return toCks(await collection.ownerOf(id)); }catch{ return null; }
-  }
-
-  // Who staked it (true owner while staked): try controller views, else logs
   async function resolveStaker(id){
+    // controller views first
     try{
       const ctrl = getController();
       const tries = ['stakerAddress','stakerOf','stakers','tokenIdToStaker','ownerOfStaked','stakedOwnerOf'];
-      for (const fn of tries){
+      for(const fn of tries){
         try{
-          if (typeof ctrl[fn] === 'function'){
+          if(typeof ctrl[fn]==='function'){
             const a = await ctrl[fn](ethers.BigNumber.from(String(id)));
-            if (isAddr(a) && a !== Z) return toCks(a);
+            if(isAddr(a)) return toCks(a);
           }
         }catch{}
       }
     }catch{}
-    // Fallback by logs: last Transfer(* -> controller)
+    // fallback by logs (last Transfer -> controller)
     try{
       const iface = new ethers.utils.Interface(['event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)']);
       const topicTransfer = iface.getEventTopic('Transfer');
@@ -130,18 +95,15 @@ window.FF = window.FF || {};
         fromBlock: START_BLOCK, toBlock: 'latest',
         address: COLL, topics: [topicTransfer, null, toTopic, idTopic]
       });
-      if (!logs.length) return null;
-      const fromAddr = toCks('0x'+logs[logs.length-1].topics[1].slice(26));
-      return fromAddr;
+      if(!logs.length) return null;
+      return toCks('0x'+logs[logs.length-1].topics[1].slice(26));
     }catch{ return null; }
   }
 
   async function stakedSinceDate(id){
     try{
-      // verify currently staked (ownerOf == controller)
       const own = await ownerOf(id);
       if(!own || own.toLowerCase() !== CTRL.toLowerCase()) return null;
-
       const iface = new ethers.utils.Interface(['event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)']);
       const topicTransfer = iface.getEventTopic('Transfer');
       const toTopic = ethers.utils.hexZeroPad(CTRL, 32);
@@ -150,46 +112,163 @@ window.FF = window.FF || {};
         fromBlock: START_BLOCK, toBlock: 'latest',
         address: COLL, topics: [topicTransfer, null, toTopic, idTopic]
       });
-      if (!logs.length) return null;
-      const last = logs[logs.length - 1];
+      if(!logs.length) return null;
+      const last = logs[logs.length-1];
       const blk = await readProvider.getBlock(last.blockNumber);
-      return new Date(blk.timestamp * 1000);
+      return new Date(blk.timestamp*1000);
     }catch{ return null; }
   }
 
-  // ---------------- Modal (self-enriching) ----------------
-  // You may call with: FF.openFrogModal({ id, rank?, price?, buyer?, image? })
+  // ---------- Metadata + layered image helpers ----------
+  const title = s => s ? (s.charAt(0).toUpperCase() + s.slice(1)) : s;
+  const baseURL = (p) => {
+    // Prefer absolute if SOURCE_PATH is set (GitHub Pages)
+    if (/^https?:\/\//i.test(CFG.SOURCE_PATH||'')) return CFG.SOURCE_PATH.replace(/\/$/,'') + '/' + p.replace(/^\//,'');
+    return p; // relative
+  };
+
+  async function fetchMeta(id){
+    const url = baseURL(`frog/json/${id}.json`);
+    return FF.fetchJSON(url);
+  }
+
+  // Attempt to load the first image that exists among candidate paths
+  function loadFirstImage(candidates){
+    return new Promise((resolve,reject)=>{
+      let i=0;
+      const tryNext = ()=>{
+        if(i>=candidates.length) return reject(new Error('no layer found'));
+        const src=candidates[i++]; const img=new Image();
+        img.onload=()=>resolve(src); img.onerror=tryNext;
+        // keep pixelated look & crisp edges
+        img.decoding='async'; img.loading='eager'; img.src=src;
+      };
+      tryNext();
+    });
+  }
+
+  function candidatesFor(attr, value){
+    // Try exact, TitleCase, lowercase (common naming variants)
+    const A = String(attr||'').replace(/\s+/g,'');
+    const V = String(value||'').replace(/\s+/g,'');
+    const cases = [
+      [A, V],
+      [title(A), title(V)],
+      [A.toLowerCase(), V.toLowerCase()],
+    ];
+    const pngs = [];
+    const gifs = [];
+    for (const [aa,vv] of cases){
+      pngs.push(baseURL(`frog/build_files/${aa}/${vv}.png`));
+      // animations location variants:
+      gifs.push(baseURL(`frog/build_files/${aa}/animations/${vv}_animation.gif`));
+      gifs.push(baseURL(`frog/build_files/${aa}/${vv}/animations/${vv}_animation.gif`));
+    }
+    return { pngs, gifs };
+  }
+
+  // Build a layered stage (returns a DOM node)
+  async function buildLayeredStage(meta){
+    const stage = document.createElement('div');
+    Object.assign(stage.style, {
+      position:'relative',
+      width:'256px', height:'256px',
+      background:'#000', // base, change if you have transparency expectations
+      borderRadius:'8px', overflow:'hidden',
+      imageRendering:'pixelated'
+    });
+
+    const attrs = (meta?.attributes || meta?.traits || []);
+    // Expected form: [{ trait_type: "Mouth", value: "Mask" }, ...]
+    for (const a of attrs){
+      const key = a?.trait_type ?? a?.key ?? a?.traitType ?? '';
+      const val = a?.value ?? a?.val ?? '';
+      if(!key || !val) continue;
+
+      const { pngs, gifs } = candidatesFor(key, val);
+
+      // base PNG
+      try{
+        const src = await loadFirstImage(pngs);
+        const img = document.createElement('img');
+        Object.assign(img.style, {
+          position:'absolute', inset:'0',
+          width:'100%', height:'100%',
+          objectFit:'contain', imageRendering:'pixelated'
+        });
+        img.alt = `${key}: ${val}`; img.src = src; stage.appendChild(img);
+      }catch{ /* no png layer found for this attribute */ }
+
+      // optional animation GIF overlay
+      try{
+        const gif = await loadFirstImage(gifs);
+        const anim = document.createElement('img');
+        Object.assign(anim.style, {
+          position:'absolute', inset:'0',
+          width:'100%', height:'100%',
+          objectFit:'contain', imageRendering:'pixelated',
+          pointerEvents:'none'
+        });
+        anim.alt = `${key}: ${val} (animation)`; anim.src = gif; stage.appendChild(anim);
+      }catch{ /* no animation for this attribute */ }
+    }
+
+    return stage;
+  }
+
+  // ---------- Modal (layered) ----------
   FF.openFrogModal = async function(info){
     const id = Number(info?.id);
     if(!Number.isFinite(id)) return;
 
-    // parallel data fetch
-    const [rarity, own, staker, since, traits] = await Promise.all([
+    // Parallel fetch of chain + rarity + metadata
+    const [rarity, own, staker, since, meta] = await Promise.all([
       getRarity(id),
       ownerOf(id),
       resolveStaker(id),
       stakedSinceDate(id),
-      getTraits(id)
-    ]).catch(()=>[ {rank:null,score:null}, null, null, null, [] ]);
+      fetchMeta(id).catch(()=>null)
+    ]);
 
     const isStaked = !!own && own.toLowerCase() === CTRL.toLowerCase();
     const rank    = (info.rank ?? rarity.rank);
     const score   = (info.score ?? rarity.score);
-    const image   = info.image || `${CFG?.SOURCE_PATH || ''}/frog/${id}.png`;
 
-    // build traits list HTML
-    const traitsHTML = traits && traits.length
+    // traits list (from metadata)
+    const traits = (meta?.attributes || meta?.traits || []).map(a=>{
+      const key = a?.trait_type ?? a?.key ?? a?.traitType ?? 'Trait';
+      const val = a?.value ?? a?.val ?? '';
+      return { key, val };
+    });
+
+    // build the layered stage (falls back to simple image if meta missing)
+    let stageNode = null;
+    try{
+      if(meta) stageNode = await buildLayeredStage(meta);
+    }catch{}
+    if(!stageNode){
+      const img = document.createElement('img');
+      Object.assign(img.style, {
+        width:'256px', height:'256px', objectFit:'contain', imageRendering:'pixelated',
+        background:'#000', borderRadius:'8px'
+      });
+      img.alt = `Frog #${id}`;
+      img.src = baseURL(`frog/${id}.png`);
+      stageNode = img;
+    }
+
+    // Traits list HTML
+    const traitsHTML = traits.length
       ? `<div class="muted" style="margin-top:4px"><b>Traits</b></div>
          <ul style="margin:6px 0 0; padding:0; list-style:none; display:grid; gap:6px">
            ${traits.map(t=>`<li class="pill" style="display:flex;justify-content:space-between;gap:8px">
-              <span>${t.trait_type}</span><b>${t.value}</b>
+              <span>${t.key}</span><b>${t.val}</b>
             </li>`).join('')}
          </ul>`
       : '';
 
     const rankPill = (rank || rank === 0)
       ? `<span class="pill">Rank <b>#${rank}</b></span>` : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
-
     const rarityLine = (score ? `<div class="muted">Rarity Score: ${score}</div>` : '');
 
     const statusLine = isStaked
@@ -204,13 +283,14 @@ window.FF = window.FF || {};
       ? `<div class="muted">${info.price?`Price ${info.price}`:''}${info.buyer?` • Buyer ${FF.shorten(info.buyer)}`:''}${info.time?` • ${info.time} ago`:''}</div>`
       : '';
 
+    // Modal shell
     const el = document.createElement('div');
     el.className = 'modal-overlay';
     el.innerHTML = `
       <div class="modal-card">
         <button class="modal-close" aria-label="Close">×</button>
         <div class="row" style="align-items:flex-start; gap:16px;">
-          <img src="${image}" alt="Frog #${id}" class="thumb64" width="64" height="64" />
+          <div id="frogStageSlot"></div>
           <div class="stack" style="gap:6px;">
             <div><b>Frog #${id}</b> ${rankPill}</div>
             ${rarityLine}
@@ -227,6 +307,9 @@ window.FF = window.FF || {};
           </div>
         </div>
       </div>`;
+
+    // insert the layered stage
+    el.querySelector('#frogStageSlot')?.appendChild(stageNode);
 
     function close(){ el.remove(); document.removeEventListener('keydown', esc); }
     function esc(e){ if(e.key==='Escape') close(); }
