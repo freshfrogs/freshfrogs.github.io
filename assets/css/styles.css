@@ -246,6 +246,21 @@ footer.site { border-top:1px solid var(--ring); padding:26px 0; color:var(--mute
 .sw-noir{ background:#0f141a; }
 .sw-pastel{ background:#eaf5ff; }
 /* Modal shell */
+.modal-overlay{ position:fixed; inset:0; z-index:1000; display:grid; place-items:center;
+  background:rgba(0,0,0,.70); backdrop-filter: blur(6px); }
+.modal-card{ width:min(720px, 92vw); background:var(--panel); color:var(--ink);
+  border:1px solid var(--ring); border-radius:12px; padding:16px; position:relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+.modal-close{ position:absolute; top:8px; right:8px; width:34px; height:34px; border-radius:8px;
+  border:1px solid var(--ring); background:var(--panel-2); color:var(--ink); font-size:18px; line-height:1; cursor:pointer; }
+.traits-card{ border:1px solid var(--ring); border-radius:10px; background:var(--panel); overflow:hidden; }
+.traits-head{ display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--panel-2); border-bottom:1px solid var(--ring); }
+.traits-table{ display:grid; }
+.traits-row{ display:grid; grid-template-columns: 1fr 1.2fr .6fr; gap:10px; align-items:center; padding:10px 12px; border-top:1px solid var(--ring); }
+.traits-row--head{ font-weight:800; color:var(--muted); background:color-mix(in srgb, var(--panel-2) 40%, transparent); }
+.traits-row .right{ justify-self:end; }
+.chip{ display:inline-flex; align-items:center; gap:6px; padding:.12rem .5rem; border-radius:999px; border:1px solid var(--ring); background:var(--panel); }
+
 /* Modal wide layout */
 .modal-card--wide{ width:min(880px, 95vw); }
 .modal-grid{
