@@ -32,11 +32,11 @@
 </header>
 
 <main class="container">
-  <!-- Hero / 3x3 gallery -->
+  <!-- Hero / 3x3 gallery (static thumbnails, not clickable) -->
   <section class="hero" id="gallery">
     <div>
       <h1 class="section-title" style="margin:0;font-size:clamp(2rem,4.2vw,3rem);">Nine random frogs. Clean and fast.</h1>
-      <p class="muted" style="max-width:62ch">Hero grid renders standard PNGs. (Layered trait rendering used in modals.)</p>
+      <p class="muted" style="max-width:62ch">Hero grid renders standard PNGs. (Layered trait rendering is used in modals elsewhere.)</p>
       <div class="row" style="margin-top:12px;">
         <a class="btn btn-solid btn-lg" href="#trade">🐸 Mint & Staking</a>
         <a class="btn btn-outline" href="https://freshfrogs.github.io/" target="_blank" rel="noopener">Original Site</a>
@@ -53,7 +53,6 @@
       </div>
     </div>
 
-    <!-- 3x3 static thumbnails (no click) -->
     <div class="gallery" id="grid"></div>
   </section>
 
@@ -117,7 +116,6 @@
         </div>
       </div>
 
-      <!-- unified scroll container -->
       <ul id="chipWrap" class="card-list list-scroll" aria-live="polite"></ul>
 
       <div class="row" id="stakeControls" style="gap:8px;">
@@ -125,7 +123,6 @@
         <button id="clearSel"  class="btn btn-ghost btn-sm">Clear</button>
         <div class="spacer"></div>
         <button class="btn btn-solid btn-sm" id="refreshOwned">↻ Refresh Owned</button>
-        <!-- No 'Load Staked' button — we auto-load on connect -->
       </div>
       <p id="stakeStatus" class="muted">No wallet connected.</p>
     </div>
@@ -161,8 +158,8 @@
     </div>
     <div id="pondListWrap">
       <ul id="pondList" class="card-list list-scroll" aria-live="polite"></ul>
+      <!-- numbered pager will be injected here by pond.js if enabled -->
     </div>
-    <!-- numbered pager is injected here by pond.js -->
   </section>
 
   <!-- About / FAQ -->
@@ -195,8 +192,8 @@
   <button class="swatch sw-pastel" data-theme="pastel" title="Pastel"></button>
 </div>
 
-<!-- Optional lightbox for simple image previews -->
-<div id="lightbox" class="lightbox">
+<!-- Optional lightbox shell (unused for grid thumbnails; kept for future previews) -->
+<div id="lightbox" class="lightbox" style="display:none">
   <div id="lightboxStage" class="stage"></div>
 </div>
 
