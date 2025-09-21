@@ -92,3 +92,20 @@ footer.site{border-top:1px solid var(--ring);padding:26px 0;color:var(--muted);m
 .list-scroll5::-webkit-scrollbar-track{
   background: color-mix(in srgb, var(--panel-2) 70%, transparent);
 }
+/* --- Tabs for unified info panel --- */
+.tabs { display: flex; gap: .5rem; }
+.tab {
+  padding: .4rem .8rem;
+  border: 1px solid var(--border, #222);
+  border-radius: 6px;
+  cursor: pointer;
+  background: var(--panel, #0e0e0e);
+  font: inherit;
+}
+.tab.active {
+  outline: 2px solid var(--accent, #7ae);
+  background: var(--panel-strong, #151515);
+}
+
+/* Generic hidden helper */
+.hidden { display: none; }
