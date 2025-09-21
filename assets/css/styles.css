@@ -73,12 +73,24 @@ footer.site { border-top:1px solid var(--ring); padding:26px 0; color:var(--mute
 .ftr { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
 .links { display:flex; gap:12px; }
 
-/* Typography & chips */
+/* Typography & pills/chips */
 .muted { color: var(--muted); }
 .section-title { font:900 1.4rem/1 var(--font-display); letter-spacing:-.01em; }
-.pill {
+
+/* Unified pill + chip styles (single source of truth) */
+.pill{
   display:inline-flex; align-items:center; gap:6px;
-  padding:.25rem .6rem; border-radius:var(--radius-pill);
+  padding:.28rem .6rem; border-radius:var(--radius-pill);
+  border:1px solid var(--ring); background:var(--panel-2); font-weight:700;
+}
+.pill-green{
+  background:color-mix(in srgb, var(--accent) 35%, var(--panel-2));
+  color:var(--accent-ink);
+  border-color:color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.chip{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:.14rem .5rem; border-radius:var(--radius-pill);
   border:1px solid var(--ring); background:var(--panel);
 }
 
@@ -89,7 +101,7 @@ footer.site { border-top:1px solid var(--ring); padding:26px 0; color:var(--mute
 }
 .addr { font-family: ui-monospace, Menlo, Consolas, monospace; }
 
-/* Larger list thumbnails */
+/* Larger list thumbnails (if needed elsewhere) */
 .thumb128{
   width:128px; height:128px;
   min-width:128px; min-height:128px;
@@ -245,56 +257,62 @@ footer.site { border-top:1px solid var(--ring); padding:26px 0; color:var(--mute
 .swatch[aria-current="true"]{ outline:2px solid var(--accent); outline-offset:2px; }
 .sw-noir{ background:#0f141a; }
 .sw-pastel{ background:#eaf5ff; }
-/* Modal shell */
-.modal-overlay{ position:fixed; inset:0; z-index:1000; display:grid; place-items:center;
-  background:rgba(0,0,0,.70); backdrop-filter: blur(6px); }
-.modal-card{ width:min(720px, 92vw); background:var(--panel); color:var(--ink);
-  border:1px solid var(--ring); border-radius:12px; padding:16px; position:relative;
-  box-shadow: 0 10px 30px rgba(0,0,0,.35); }
-.modal-close{ position:absolute; top:8px; right:8px; width:34px; height:34px; border-radius:8px;
-  border:1px solid var(--ring); background:var(--panel-2); color:var(--ink); font-size:18px; line-height:1; cursor:pointer; }
-.traits-card{ border:1px solid var(--ring); border-radius:10px; background:var(--panel); overflow:hidden; }
-.traits-head{ display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--panel-2); border-bottom:1px solid var(--ring); }
-.traits-table{ display:grid; }
-.traits-row{ display:grid; grid-template-columns: 1fr 1.2fr .6fr; gap:10px; align-items:center; padding:10px 12px; border-top:1px solid var(--ring); }
-.traits-row--head{ font-weight:800; color:var(--muted); background:color-mix(in srgb, var(--panel-2) 40%, transparent); }
-.traits-row .right{ justify-self:end; }
-.chip{ display:inline-flex; align-items:center; gap:6px; padding:.12rem .5rem; border-radius:999px; border:1px solid var(--ring); background:var(--panel); }
 
-/* Modal wide layout */
-.modal-card--wide{ width:min(880px, 95vw); }
-.modal-grid{
-  display:grid;
-  grid-template-columns: 280px 1fr; /* image left (256 + padding), info right */
-  gap:16px;
+/* =========================
+   Modal (compact, clean)
+   ========================= */
+
+.modal-overlay{
+  position:fixed; inset:0; z-index:1000; display:grid; place-items:center;
+  background:rgba(0,0,0,.70); backdrop-filter: blur(6px);
 }
-.modal-left{}
+.modal-card{
+  background:var(--panel); color:var(--ink);
+  border:1px solid var(--ring); border-radius:12px; padding:16px; position:relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+/* narrower than before */
+.modal-card--compact { width:min(760px, 94vw); }
+
+.modal-close{
+  position:absolute; top:8px; right:8px; width:34px; height:34px; border-radius:8px;
+  border:1px solid var(--ring); background:var(--panel-2); color:var(--ink);
+  font-size:18px; line-height:1; cursor:pointer;
+}
+
+/* Two-column card */
+.modal-grid{
+  display:grid; gap:16px;
+  grid-template-columns: 280px 1fr; /* image left (256 + padding), info right */
+}
 .modal-right{ display:flex; flex-direction:column; gap:10px; }
 
-.title-row{ display:flex; align-items:center; gap:10px; }
+/* Title line with pills (rank + status) */
+.title-row{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+}
 .title-row h3{ margin:0; font-size:1.2rem; }
 
-.status-row{ display:flex; align-items:center; gap:8px; }
-.btn-row{ display:flex; gap:8px; flex-wrap:wrap; }
-
+/* Traits panel (full width) */
 .traits-panel{
-  grid-column: 1 / -1; /* full width */
-  padding:10px; border:1px solid var(--ring); border-radius:10px; background:var(--panel);
-  margin-top:4px;
+  grid-column: 1 / -1;
+  padding:10px; border:1px solid var(--ring);
+  border-radius:10px; background:var(--panel); margin-top:4px;
 }
 .traits-chips{ display:flex; gap:6px; flex-wrap:wrap; }
 
-/* Pills / chips */
-.pill{ display:inline-flex; align-items:center; gap:6px; padding:.28rem .6rem; border-radius:999px;
-  border:1px solid var(--ring); background:var(--panel-2); font-weight:700; }
-.pill-green{ background:color-mix(in srgb, var(--accent) 35%, var(--panel-2)); color:var(--accent-ink);
-  border-color:color-mix(in srgb, var(--accent) 55%, transparent); }
-
-.chip{ display:inline-flex; align-items:center; gap:6px; padding:.14rem .5rem; border-radius:999px;
-  border:1px solid var(--ring); background:var(--panel); }
+.btn-row{ display:flex; gap:8px; flex-wrap:wrap; }
 
 /* Responsive collapse */
 @media (max-width: 700px){
   .modal-grid{ grid-template-columns: 1fr; }
-  .modal-left{ justify-self:center; }
 }
+
+/* =========================
+   Pond pager
+   ========================= */
+.pond-pager{
+  display:flex; justify-content:center; gap:6px; margin-top:10px;
+}
+.pond-pager .btn{ min-width:34px; }
+.pond-pager .btn.btn-solid{ cursor:default; }

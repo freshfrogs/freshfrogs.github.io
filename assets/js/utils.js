@@ -13,6 +13,12 @@ window.FF = window.FF || {};
   };
   FF.fetchJSON = async (url)=>{ const r=await fetch(url,{cache:'no-store'}); if(!r.ok) throw new Error(String(r.status)); return r.json(); };
 
+  /* ---------- shared helpers exposed ---------- */
+  const baseURL = (p) => (/^https?:\/\//i.test(CFG.SOURCE_PATH||''))
+    ? CFG.SOURCE_PATH.replace(/\/$/,'') + '/' + p.replace(/^\//,'')
+    : p;
+  FF.baseURL = baseURL;
+
   /* ---------- chain setup ---------- */
   const READ_RPC = 'https://cloudflare-eth.com';
   const readProvider = new ethers.providers.JsonRpcProvider(READ_RPC);
@@ -42,6 +48,7 @@ window.FF = window.FF || {};
   const toCks  = (a)=> ethers.utils.getAddress(a);
 
   async function ownerOf(id){ try{ return toCks(await collection.ownerOf(id)); }catch{ return null; } }
+  FF.ownerOf = ownerOf;
 
   async function resolveStaker(id){
     try{
@@ -69,6 +76,7 @@ window.FF = window.FF || {};
       return toCks('0x'+logs[logs.length-1].topics[1].slice(26));
     }catch{ return null; }
   }
+  FF.resolveStaker = resolveStaker;
 
   async function stakedSinceDate(id){
     try{
@@ -88,8 +96,9 @@ window.FF = window.FF || {};
       return new Date(blk.timestamp*1000);
     }catch{ return null; }
   }
+  FF.stakedSinceDate = stakedSinceDate;
 
-  /* ---------- rarity cache ---------- */
+  /* ---------- rarity cache (preload & helper exported) ---------- */
   const RARITY = new Map(); let rarityLoaded=false;
   async function ensureRarity(){
     if(rarityLoaded) return;
@@ -101,138 +110,78 @@ window.FF = window.FF || {};
     }
     rarityLoaded=true;
   }
-  async function getRarity(id){ await ensureRarity(); return RARITY.get(Number(id)) || {rank:null}; }
+  FF.ensureRarity = ensureRarity;
+  FF.getRankById = async (id)=>{ await ensureRarity(); return (RARITY.get(Number(id))||{}).rank ?? null; };
+  FF.getRankSync = (id)=> (RARITY.get(Number(id))||{}).rank ?? null;
 
-  /* ---------- metadata + layered image helpers ---------- */
-  const baseURL = (p) => (/^https?:\/\//i.test(CFG.SOURCE_PATH||'')) ? CFG.SOURCE_PATH.replace(/\/$/,'') + '/' + p.replace(/^\//,'') : p;
+  /* ---------- metadata + layered image helpers (for modal only) ---------- */
   async function fetchMeta(id){ return FF.fetchJSON(baseURL(`frog/json/${id}.json`)); }
-
-  function probe(src){
-    return new Promise((resolve)=>{
-      const img=new Image();
-      img.onload=()=>resolve(src);
-      img.onerror=()=>resolve(null);
-      img.decoding='async'; img.loading='eager'; img.src=src;
-    });
-  }
-  async function firstExisting(list){
-    for(const src of list){
-      const ok = await probe(src);
-      if(ok) return ok;
-    }
-    return null;
-  }
+  function probe(src){ return new Promise((res)=>{ const i=new Image(); i.onload=()=>res(src); i.onerror=()=>res(null); i.decoding='async'; i.loading='eager'; i.src=src; }); }
+  async function firstExisting(list){ for(const s of list){ const ok=await probe(s); if(ok) return ok; } return null; }
   const cap = s => s ? (s.charAt(0).toUpperCase()+s.slice(1)) : s;
-
-  // ./frog/build_files/[ATTRIBUTE]/animations/[VALUE]_animation.gif
   function candidatesFor(attr, value){
-    const A = String(attr||'').replace(/\s+/g,'');
-    const V = String(value||'').replace(/\s+/g,'');
-    const cases = [[A,V],[cap(A),cap(V)],[A.toLowerCase(),V.toLowerCase()]];
-    const pngs=[], gifs=[];
-    for(const [aa,vv] of cases){
-      pngs.push(baseURL(`frog/build_files/${aa}/${vv}.png`));
-      gifs.push(baseURL(`frog/build_files/${aa}/animations/${vv}_animation.gif`));
-    }
-    return { pngs, gifs };
+    const A=String(attr||'').replace(/\s+/g,''), V=String(value||'').replace(/\s+/g,'');
+    const cases=[[A,V],[cap(A),cap(V)],[A.toLowerCase(),V.toLowerCase()]];
+    const pngs=[],gifs=[]; for(const [aa,vv] of cases){ pngs.push(baseURL(`frog/build_files/${aa}/${vv}.png`)); gifs.push(baseURL(`frog/build_files/${aa}/animations/${vv}_animation.gif`)); }
+    return {pngs,gifs};
   }
-
-  // Build layered stage; background = original PNG zoomed & pinned (color only), animation-first per trait
   async function buildLayeredStage(id, meta, SIZE=256){
-    const stage = document.createElement('div');
+    const stage=document.createElement('div');
     const bgImg = baseURL(`frog/${id}.png`);
-    Object.assign(stage.style, {
-      position:'relative',
-      width:SIZE+'px', height:SIZE+'px',
-      borderRadius:'12px', overflow:'hidden',
-      imageRendering:'pixelated',
-      backgroundImage: `url("${bgImg}")`,
-      backgroundRepeat: 'no-repeat',
-      backgroundSize: '1400%',     // heavy zoom to push artwork off-frame
-      backgroundPosition: '0% 0%'  // top-left (adjust if your color is elsewhere)
+    Object.assign(stage.style,{
+      position:'relative', width:SIZE+'px', height:SIZE+'px',
+      borderRadius:'12px', overflow:'hidden', imageRendering:'pixelated',
+      backgroundImage:`url("${bgImg}")`, backgroundRepeat:'no-repeat',
+      backgroundSize:'1400%', backgroundPosition:'0% 0%'
     });
-
-    const attrs = (meta?.attributes || meta?.traits || []);
+    const attrs=(meta?.attributes||meta?.traits||[]);
     for(const a of attrs){
-      const key = a?.trait_type ?? a?.key ?? a?.traitType ?? '';
-      const val = a?.value ?? a?.val ?? '';
-      if(!key || !val) continue;
-
-      const { pngs, gifs } = candidatesFor(key, val);
-
-      // prefer animation; if exists, skip PNG
-      const gifSrc = await firstExisting(gifs);
-      if(gifSrc){
-        const anim=document.createElement('img');
-        Object.assign(anim.style,{position:'absolute',inset:'0',width:'100%',height:'100%',objectFit:'contain',imageRendering:'pixelated',pointerEvents:'none'});
-        anim.alt=`${key}: ${val} (animation)`; anim.src=gifSrc;
-        stage.appendChild(anim);
-        continue;
-      }
-      // fallback PNG
-      const pngSrc = await firstExisting(pngs);
-      if(pngSrc){
-        const img=document.createElement('img');
-        Object.assign(img.style,{position:'absolute',inset:'0',width:'100%',height:'100%',objectFit:'contain',imageRendering:'pixelated'});
-        img.alt=`${key}: ${val}`; img.src=pngSrc;
-        stage.appendChild(img);
-      }
+      const key=a?.trait_type??a?.key??a?.traitType??'', val=a?.value??a?.val??''; if(!key||!val) continue;
+      const {pngs,gifs}=candidatesFor(key,val);
+      const gif=await firstExisting(gifs);
+      if(gif){ const im=document.createElement('img'); Object.assign(im.style,{position:'absolute',inset:'0',width:'100%',height:'100%',objectFit:'contain',imageRendering:'pixelated',pointerEvents:'none'}); im.alt=`${key}: ${val}`; im.src=gif; stage.appendChild(im); continue; }
+      const png=await firstExisting(pngs);
+      if(png){ const im=document.createElement('img'); Object.assign(im.style,{position:'absolute',inset:'0',width:'100%',height:'100%',objectFit:'contain',imageRendering:'pixelated'}); im.alt=`${key}: ${val}`; im.src=png; stage.appendChild(im); }
     }
     return stage;
   }
 
-  /* ---------- “Baseball card” modal (image left, details right, traits full width) ---------- */
+  /* ---------- Compact “card” modal (image left, details right; rank + status on same line) ---------- */
   FF.openFrogModal = async function(info){
-    const id = Number(info?.id);
-    if(!Number.isFinite(id)) return;
+    const id = Number(info?.id); if(!Number.isFinite(id)) return;
 
-    // Gather data in parallel
-    const [rarity, own, staker, since, meta] = await Promise.all([
-      getRarity(id),
-      ownerOf(id),
-      resolveStaker(id),
-      stakedSinceDate(id),
-      fetchMeta(id).catch(()=>null)
+    // Preload rarity to avoid N/A badges elsewhere
+    await ensureRarity();
+
+    // Gather card data
+    const [own, staker, since, meta] = await Promise.all([
+      ownerOf(id), resolveStaker(id), stakedSinceDate(id), fetchMeta(id).catch(()=>null)
     ]);
-
     const isStaked = !!own && own.toLowerCase() === CTRL.toLowerCase();
-    const rank = (info.rank ?? rarity.rank);
+    const rank = info?.rank ?? FF.getRankSync(id);
 
-    // Build layered stage
-    let stageNode = null;
-    try{ if(meta) stageNode = await buildLayeredStage(id, meta, 256); }catch{}
-    if(!stageNode){
-      const img = document.createElement('img');
-      Object.assign(img.style,{width:'256px',height:'256px',objectFit:'contain',imageRendering:'pixelated',borderRadius:'12px'});
-      img.alt=`Frog #${id}`; img.src=baseURL(`frog/${id}.png`);
-      stageNode = img;
-    }
+    // Stage
+    let stage = null;
+    try{ if(meta) stage = await buildLayeredStage(id, meta, 256); }catch{}
+    if(!stage){ const img=document.createElement('img'); Object.assign(img.style,{width:'256px',height:'256px',objectFit:'contain',imageRendering:'pixelated',borderRadius:'12px'}); img.alt=`Frog #${id}`; img.src=baseURL(`frog/${id}.png`); stage=img; }
 
     // Lines
-    const statusLine = isStaked
-      ? `<span class="pill pill-green">Staked</span>${since?` <span class="muted">• ${FF.formatAgo(Date.now()-since.getTime())} ago</span>`:''}`
+    const statusPill = isStaked
+      ? `<span class="pill pill-green">Staked${since?` • ${FF.formatAgo(Date.now()-since.getTime())} ago`:''}</span>`
       : `<span class="pill">Not staked</span>`;
-
     const ownerLine = isStaked
       ? `Staker <span class="addr">${staker?FF.shorten(staker):'—'}</span> • Held by Controller`
       : `Owner <span class="addr">${own?FF.shorten(own):'—'}</span>`;
+    const rankPill = (rank||rank===0) ? `<span class="pill">Rank <b>#${rank}</b></span>` : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
 
-    const rankPill = (rank || rank===0)
-      ? `<span class="pill">Rank <b>#${rank}</b></span>`
-      : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
-
-    // Traits → chips
-    const traits = (meta?.attributes || meta?.traits || []).map(a=>{
-      const key = a?.trait_type ?? a?.key ?? a?.traitType ?? 'Trait';
-      const val = a?.value ?? a?.val ?? '';
-      return { key, val };
+    const traits = (meta?.attributes||meta?.traits||[]).map(a=>{
+      const key=a?.trait_type??a?.key??a?.traitType??'Trait', val=a?.value??a?.val??''; return {key,val};
     });
 
-    // Modal skeleton (grid layout)
-    const el = document.createElement('div');
-    el.className = 'modal-overlay';
+    // Modal
+    const el=document.createElement('div'); el.className='modal-overlay';
     el.innerHTML = `
-      <div class="modal-card modal-card--wide">
+      <div class="modal-card modal-card--compact">
         <button class="modal-close" aria-label="Close">×</button>
 
         <div class="modal-grid">
@@ -242,9 +191,9 @@ window.FF = window.FF || {};
             <div class="title-row">
               <h3>Frog #${id}</h3>
               ${rankPill}
+              ${statusPill}
             </div>
 
-            <div class="status-row">${statusLine}</div>
             <div class="owner-row muted">${ownerLine}</div>
 
             <div class="btn-row">
@@ -263,11 +212,8 @@ window.FF = window.FF || {};
           </div>
         </div>
       </div>`;
+    el.querySelector('#frogStageSlot')?.appendChild(stage);
 
-    // Attach image
-    el.querySelector('#frogStageSlot')?.appendChild(stageNode);
-
-    // Wire close
     const close=()=>{ el.remove(); document.removeEventListener('keydown', esc); };
     const esc=(e)=>{ if(e.key==='Escape') close(); };
     el.addEventListener('click', (e)=>{ if(e.target===el) close(); });
