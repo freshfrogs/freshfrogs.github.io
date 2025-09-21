@@ -26,7 +26,6 @@
   }
   function ago(d){ return d ? (FF.formatAgo ? FF.formatAgo(Date.now()-d.getTime()) : '') : ''; }
 
-  // ---------- Reservoir transfers scan ----------
   async function fetchTransfers(params){
     const qs = new URLSearchParams(params);
     const res = await fetch(`${API}/transfers/v3?${qs.toString()}`, { headers: HDR });
@@ -111,7 +110,7 @@
     return rows;
   }
 
-  // ---------- render like Sales ----------
+  // Render all (sales-like rows)
   async function renderAll(container){
     const { ul } = hostUL(container);
     if(!ul) return;
@@ -122,7 +121,6 @@
       return;
     }
 
-    // ensure ranks present
     try{ await FF.ensureRarity?.(); }catch{}
 
     STAKED.forEach(({id, staker, since})=>{
@@ -140,13 +138,11 @@
           </div>
           <div class="muted">${since ? (ago(since)+' ago') : '—'} • Staker ${staker ? FF.shorten(String(staker)) : '—'}</div>
         </div>`;
-      // open modal like other lists
       li.addEventListener('click', ()=> FF.openFrogModal?.({ id }));
       ul.appendChild(li);
     });
   }
 
-  // ---------- public API ----------
   async function renderPond(container){
     if(!CFG.FROG_API_KEY){ console.warn('Pond: missing FROG_API_KEY'); }
     try{
@@ -158,8 +154,7 @@
     await renderAll(container);
   }
 
+  // public
   window.FF_renderPond = renderPond;
-  // backward-compat alias if your main.js was calling the paged version
-  window.FF_renderPondPaged = renderPond;
   window.FF_refreshPond = renderPond;
 })(window.FF, window.FF_CFG);

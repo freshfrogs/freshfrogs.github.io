@@ -1,50 +1,52 @@
+// assets/js/main.js
 (function(){
-  async function init(){
-    // 3x3 grid (static PNGs, non-clickable)
-    window.FF_renderGrid?.();
+  // Theme toggles, etc., are assumed to be elsewhere if you already have them
 
-    // Make sure rarity is available before others need rank badges
-    await window.FF.ensureRarity?.();
-    await window.FF_renderRarityList?.();
-
-    // Sales: fetch + render
-    await window.FF_loadSalesLive?.();
-    window.FF_renderSales?.();
-
-    // Pond: paged render (if pond.js is present)
-    const pondEl = document.getElementById('pondList');
-    if (pondEl && window.FF_renderPondPaged) window.FF_renderPondPaged(pondEl);
-
-
-    // Default staking tab to OWNED
-    if(window.FF_setTab) window.FF_setTab('owned');
-
-    // If MetaMask already has an account selected, auto-wire wallet UI and load
-    const pre = window.ethereum?.selectedAddress;
-    if(pre){
-      window.FF_setWalletUI?.(pre);
-      window.FF_fetchOwned?.(pre);
-      window.FF_loadStaked?.(); // should auto-load staked on connect
+  // Render hero grid (3x3 of 128px images, NOT clickable)
+  (function(CFG){
+    const g = document.getElementById('grid');
+    if(!g) return;
+    function ids(n){
+      const s=new Set();
+      while(s.size<n) s.add(1+Math.floor(Math.random()*CFG.SUPPLY));
+      return [...s];
     }
-
-    // Theme buttons
-    document.querySelectorAll(".theme-dock .swatch").forEach(s=>{
-      s.addEventListener("click", ()=>{
-        document.documentElement.setAttribute("data-theme", s.dataset.theme);
-        document.querySelectorAll(".theme-dock .swatch")
-          .forEach(x=>x.setAttribute("aria-current", x===s ? "true" : "false"));
-        localStorage.setItem("ff_theme", s.dataset.theme);
+    function render(){
+      g.innerHTML='';
+      ids(9).forEach(id=>{
+        const t=document.createElement('div'); t.className='tile';
+        t.innerHTML = `<img src="${CFG.SOURCE_PATH}/frog/${id}.png" alt="Frog #${id}" width="128" height="128" loading="lazy" decoding="async" style="image-rendering:pixelated">`;
+        g.appendChild(t);
       });
-    });
-    const saved = localStorage.getItem("ff_theme") || document.documentElement.getAttribute("data-theme") || "noir";
-    document.documentElement.setAttribute("data-theme", saved);
-    document.querySelectorAll(".theme-dock .swatch")
-      .forEach(x=>x.setAttribute("aria-current", x.dataset.theme===saved ? "true":"false"));
-  }
+    }
+    window.FF_renderGrid = render;
+  })(window.FF_CFG||{SUPPLY:4040,SOURCE_PATH:''});
 
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', init);
-  }else{
-    init();
-  }
+  // Wire sales + rarity if those modules expose renderers
+  document.addEventListener('DOMContentLoaded', async ()=>{
+    try{
+      // Rarity first so badges work
+      await window.FF.ensureRarity?.();
+    }catch{}
+
+    // Sales
+    try{
+      await window.FF_loadSalesLive?.();
+      window.FF_renderSales?.();
+    }catch(e){ console.warn('Sales init failed', e); }
+
+    // Rarity list
+    try{
+      await window.FF_loadRarity?.();
+    }catch(e){ console.warn('Rarity init failed', e); }
+
+    // Pond
+    try{
+      const pondEl = document.getElementById('pondList') || document.getElementById('tab-pond');
+      if (pondEl) await window.FF_renderPond?.(pondEl);
+    }catch(e){ console.warn('Pond init failed', e); }
+
+    // Grid
+    try{ window.FF_renderGrid?.(); }catch{}
+  });
 })();
