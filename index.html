@@ -232,11 +232,21 @@
             <canvas id="fmCanvas" width="128" height="128" class="hero-layer"></canvas>
           </div>
         </div>
+        <!-- Actions -->
         <div class="modal-actions">
-          <button id="fmStakeBtn" class="btn btn-solid">Stake</button>
-          <button id="fmUnstakeBtn" class="btn">Unstake</button>
-          <a id="fmOpenSea" class="btn btn-ghost" target="_blank" rel="noopener">OpenSea</a>
-          <a id="fmEtherscan" class="btn btn-ghost" target="_blank" rel="noopener">Etherscan</a>
+          <div class="action-group">
+            <button id="fmStakeBtn" class="btn btn-solid" data-no-modal>Stake</button>
+            <button id="fmUnstakeBtn" class="btn" data-no-modal>Unstake</button>
+            <button id="fmTransferBtn" class="btn" data-no-modal>Transfer</button>
+            <button id="fmMorphBtn" class="btn" data-no-modal disabled title="Coming soon">Metamorph (soon)</button>
+          </div>
+
+          <div class="link-group">
+            <a id="fmOpenSea"   class="btn btn-ghost" target="_blank" rel="noopener">OpenSea</a>
+            <a id="fmEtherscan" class="btn btn-ghost" target="_blank" rel="noopener">Etherscan</a>
+            <a id="fmMetaLink"  class="btn btn-ghost" target="_blank" rel="noopener">View metadata</a>
+            <a id="fmImageLink" class="btn btn-ghost" target="_blank" rel="noopener">Original image</a>
+          </div>
         </div>
       </div>
 
