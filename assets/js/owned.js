@@ -1,9 +1,9 @@
+// assets/js/owned.js — Flat 64px thumbnails, click-anywhere rows open modal, fast fetch & cache
 (function(CFG){
   const API_USERS = 'https://api.reservoir.tools/users';
   const ACTIVITY  = 'https://api.reservoir.tools/users/activity/v6';
   const CONTROLLER = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
   const COLLECTION = CFG.COLLECTION_ADDRESS || '';
-  const BASE = (CFG.SOURCE_PATH || '');
 
   // ------- DOM -------
   const ul         = document.getElementById('chipWrap');
@@ -56,103 +56,6 @@
     ? `<span class="pill">Rank <b>#${rank}</b></span>`
     : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
 
-  // ------- layered renderer (exported for the modal) -------
-  const NO_ANIM_FOR = new Set(['Hat','Frog','Trait']);
-  const NO_LIFT_FOR = new Set(['Frog','Trait','SpecialFrog']);
-  const safe = (s)=> encodeURIComponent(s);
-
-  function makeLayerImg(attr, value, px){
-    const allowAnim = !NO_ANIM_FOR.has(attr);
-    const base = `${BASE}/frog/build_files/${safe(attr)}`;
-    const png  = `${base}/${safe(value)}.png`;
-    const gif  = `${base}/animations/${safe(value)}_animation.gif`;
-    const img = new Image();
-    img.decoding='async'; img.loading='lazy';
-    img.dataset.attr=attr;
-    Object.assign(img.style,{
-      position:'absolute', left:'0', top:'0',
-      width:`${px}px`, height:`${px}px`,
-      imageRendering:'pixelated', zIndex:'2',
-      transition:'transform 280ms cubic-bezier(.22,.61,.36,1)'
-    });
-    if (allowAnim){ img.src=gif; img.onerror=()=>{ img.onerror=null; img.src=png; }; }
-    else img.src=png;
-
-    if (!NO_LIFT_FOR.has(attr)){
-      img.addEventListener('mouseenter', ()=>{ img.style.transform='translate(-8px,-12px)'; img.style.filter='drop-shadow(0 5px 0 rgba(0,0,0,.45))'; });
-      img.addEventListener('mouseleave', ()=>{ img.style.transform='translate(0,0)'; img.style.filter='none'; });
-    }
-    return img;
-  }
-
-  function pickBgCandidates(id){
-    // keep BASE first so it works the same on GH Pages and locally
-    const full  = `${BASE}/frog/${id}.png`;
-    const local = `frog/${id}.png`;
-    const root  = `/frog/${id}.png`;
-    return [full, local, root];
-  }
-  async function applyFrogBackground(container, tokenId){
-    Object.assign(container.style, {
-      backgroundRepeat:'no-repeat',
-      backgroundSize:'2000% 2000%',        // zoom far in
-      backgroundPosition:'100% 100%',      // bottom-right corner
-      imageRendering:'pixelated'
-    });
-    const urls = pickBgCandidates(tokenId);
-    for (const url of urls){
-      const ok = await new Promise(resolve=>{
-        const img = new Image();
-        img.crossOrigin='anonymous';
-        img.onload=()=>{
-          try{
-            const c=document.createElement('canvas'); c.width=2; c.height=2;
-            const x=c.getContext('2d'); x.drawImage(img,0,0,2,2);
-            const d=x.getImageData(0,0,1,1).data;
-            container.style.backgroundColor = `rgba(${d[0]},${d[1]},${d[2]},${(d[3]||255)/255})`;
-          }catch{}
-          container.style.backgroundImage = `url('${url}')`;
-          resolve(true);
-        };
-        img.onerror=()=>resolve(false);
-        img.src=url;
-      });
-      if (ok) return true;
-    }
-    container.style.backgroundColor='#151a1e';
-    container.style.backgroundImage='none';
-    return false;
-  }
-
-  async function buildFrog128(container, tokenId){
-    const SIZE=128;
-    Object.assign(container.style,{
-      width:`${SIZE}px`,height:`${SIZE}px`,minWidth:`${SIZE}px`,minHeight:`${SIZE}px`,
-      position:'relative',overflow:'hidden',borderRadius:'8px',imageRendering:'pixelated'
-    });
-    await applyFrogBackground(container, tokenId);
-
-    const metaUrl = `${BASE}/frog/json/${tokenId}.json`;
-    try{
-      const meta = await (await fetch(metaUrl)).json();
-      const attrs = Array.isArray(meta?.attributes)?meta.attributes:[];
-      for (const r of attrs){
-        const attr = String(r.trait_type || r.traitType || '').trim();
-        const val  = String(r.value).trim();
-        if (!attr || !val) continue;
-        container.appendChild(makeLayerImg(attr,val,SIZE));
-      }
-    }catch{
-      const [url] = pickBgCandidates(tokenId);
-      const flat = new Image(); flat.decoding='async'; flat.loading='lazy';
-      Object.assign(flat.style,{position:'absolute',inset:'0',width:`${SIZE}px`,height:`${SIZE}px`,imageRendering:'pixelated',zIndex:'2'});
-      flat.src=url; container.appendChild(flat);
-    }
-  }
-
-  // expose renderer globally so modal.js can use it
-  window.buildFrog128 = window.buildFrog128 || buildFrog128;
-
   // ------- state (with caching) -------
   const ST = {
     addr:null,
@@ -170,22 +73,26 @@
     tabStaked?.setAttribute('aria-selected', owned ? 'false' : 'true');
   }
 
-  // ------- Card builder (FAST 64×64 still, click anywhere) -------
-  function liCard(id, subtitle, ownerAddr, isStaked = false){
+  // ------- Card builder (FLAT 64px + row-click modal) -------
+  function liCard(id, subtitle, ownerAddr, isStaked = false, since=null){
     const li = document.createElement('li');
     li.className = 'list-item';
 
-    // data attrs for modal
+    // Row metadata for modal
     li.setAttribute('data-token-id', id);
     li.setAttribute('data-src', isStaked ? 'staked' : 'owned');
     li.setAttribute('data-staked', isStaked ? 'true' : 'false');
     if (ownerAddr) li.setAttribute('data-owner', ownerAddr);
+    if (since)     li.setAttribute('data-staked-since', typeof since === 'string' ? since : new Date(since).toISOString());
 
-    // LEFT: 64×64 still
-    const left = document.createElement('img');
-    left.className = 'thumb64';
-    left.alt = `Frog #${id}`;
-    left.src = `${BASE}/frog/${id}.png`;
+    // LEFT: 64×64 flat PNG
+    const left = document.createElement('div');
+    const img = new Image();
+    img.className = 'thumb64';
+    img.decoding = 'async';
+    img.loading = 'lazy';
+    img.src = `${(window.FF_CFG?.SOURCE_PATH || '')}/frog/${id}.png`;
+    left.appendChild(img);
     li.appendChild(left);
 
     // MID: title + subtitle
@@ -198,7 +105,7 @@
        <div class="muted">${subtitle || ''}</div>`;
     li.appendChild(mid);
 
-    // No RIGHT column; whole row is clickable
+    // RIGHT: nothing (keep compact)
     return li;
   }
 
@@ -276,7 +183,7 @@
     clearList();
     const ids = ST.cache.ownedIds || [];
     if (!ids.length){ setStatus('No owned frogs in this wallet for this collection.'); return; }
-    ids.forEach(id=> ul.appendChild(liCard(id, 'Not staked • Owned by You', ST.addr, false)));
+    ids.forEach(id=> ul.appendChild(liCard(id, 'Not staked • Owned by You', ST.addr, false, null)));
     setStatus(`Showing ${ids.length.toLocaleString()} owned frog(s).`);
   }
   function renderStakedFromCache(){
@@ -285,9 +192,9 @@
     if (!rows.length){ setStatus('No frogs from this wallet are currently staked.'); return; }
     rows.forEach(r=>{
       const info = r.since ? `Staked ${fmtAgoMs(Date.now()-r.since.getTime())} • Owned by You` : 'Staked • Owned by You';
-      ul.appendChild(liCard(r.id, info, ST.addr, true));
+      ul.appendChild(liCard(r.id, info, ST.addr, true, r.since || null));
     });
-    setStatus(`Showing ${rows.length} staked frog(s)..`);
+    setStatus(`Showing ${rows.length} staked frog(s).`);
   }
 
   // ------- orchestration -------
@@ -318,11 +225,15 @@
       return;
     }
     if (!RANKS) await loadRanks();
+
+    // one-time preload (then switch is instant)
     if (ST.cache.ownedIds===null || ST.cache.stakedRows===null){
       await preloadBoth();
     }
+
     ST.mode = which;
     setActiveTab(which);
+
     if (which==='owned') renderOwnedFromCache();
     else renderStakedFromCache();
   }
@@ -355,7 +266,7 @@
     setActiveTab('owned');
   });
 
-  // Initial
+  // Initial (disconnected) state
   setActiveTab('owned');
   clearList();
   setStatus('Connect your wallet to view Owned & Staked.');

@@ -1,16 +1,16 @@
-// assets/js/pond.js
-(function (FF, CFG) {
+// assets/js/pond.js — Flat 64px thumbnails, click-anywhere rows open modal, pager intact
+(function(FF, CFG){
   const wrap = document.getElementById('pondListWrap');
   const ul   = document.getElementById('pondList');
   if (!wrap || !ul) return;
 
   // ---------- config ----------
-  const API          = 'https://api.reservoir.tools/users/activity/v6';
-  const OWNERS_API   = 'https://api.reservoir.tools/owners/v2';
-  const TOKENS_API   = 'https://api.reservoir.tools/users'; // /{addr}/tokens/v8
-  const CONTROLLER   = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
-  const COLLECTION   = CFG.COLLECTION_ADDRESS || '';
-  const PAGE_SIZE    = 20;
+  const API = 'https://api.reservoir.tools/users/activity/v6';
+  const OWNERS_API = 'https://api.reservoir.tools/owners/v2';
+  const TOKENS_API = 'https://api.reservoir.tools/users'; // /{addr}/tokens/v8
+  const CONTROLLER = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
+  const COLLECTION = CFG.COLLECTION_ADDRESS || '';
+  const PAGE_SIZE  = 20;
   const PREFETCH_PAGES = 3;
 
   function apiHeaders(){
@@ -87,9 +87,8 @@
     return nav;
   }
 
-  // We fetch newest->older, but DISPLAY oldest->newest.
-  const storeIdxFromDisplay  = (dispIdx)=> (ST.pages.length - 1 - dispIdx);
-  const displayIdxFromStore  = (storeIdx)=> (ST.pages.length - 1 - storeIdx);
+  const storeIdxFromDisplay = (dispIdx)=> (ST.pages.length - 1 - dispIdx);
+  const displayIdxFromStore = (storeIdx)=> (ST.pages.length - 1 - storeIdx);
 
   // ---------- PAGER ----------
   function renderPager(){
@@ -115,7 +114,7 @@
       nav.appendChild(btn);
     }
 
-    // trailing ellipsis
+    // trailing ellipsis to fetch the next page
     if (ST.nextContinuation){
       const moreBtn = document.createElement('button');
       moreBtn.className = 'btn btn-ghost btn-sm';
@@ -125,7 +124,7 @@
       moreBtn.addEventListener('click', async ()=>{
         const ok = await fetchNextPage();
         if (ok){
-          ST.page = ST.pages.length - 1; // jump to oldest newly added
+          ST.page = ST.pages.length - 1;
           renderPage();
           renderStatsBar?.();
         }
@@ -142,15 +141,14 @@
     return el;
   }
 
-  // flat 64 for list
-  function renderFlat64(container, id){
-    container.innerHTML = '';
+  // Flat 64px frog for list
+  function flatFrog64(parent, id){
     const img = new Image();
     img.decoding = 'async';
     img.loading  = 'lazy';
     img.className = 'thumb64';
     img.src = `${(CFG.SOURCE_PATH || '')}/frog/${id}.png`;
-    container.appendChild(img);
+    parent.appendChild(img);
   }
 
   // ---------- activity selection ----------
@@ -236,10 +234,10 @@
       return;
     }
 
-    const dispIdx  = displayIdxFromStore(ST.page);
+    const dispIdx = displayIdxFromStore(ST.page);
     const storeIdx = storeIdxFromDisplay(dispIdx);
-    const page     = ST.pages[storeIdx];
-    const rows     = page?.rows || [];
+    const page = ST.pages[storeIdx];
+    const rows = page?.rows || [];
 
     if (!rows.length){
       const li = document.createElement('li');
@@ -251,33 +249,25 @@
         const rank = RANKS?.[String(r.id)] ?? null;
 
         const li = mk('li', { className:'list-item' });
-
-        // Make entire row open the modal
-        li.setAttribute('data-open-modal', '');
+        // Row metadata for modal
         li.setAttribute('data-token-id', String(r.id));
-        li.setAttribute('data-owner', r.staker || '');
-        li.setAttribute('data-staked', 'true');
-        if (r.since) li.setAttribute('data-since', String(r.since.getTime()));
+        li.setAttribute('data-staked','true');
+        if (r.staker) li.setAttribute('data-owner', r.staker);
+        if (r.since)  li.setAttribute('data-staked-since', r.since.toISOString?.() || String(r.since));
 
-        // Left: 64×64 flat PNG
-        const left = mk('div', {}, {
-          width:'64px', height:'64px', minWidth:'64px', minHeight:'64px'
-        });
+        // Left: flat 64px
+        const left = mk('div');
+        flatFrog64(left, r.id);
         li.appendChild(left);
-        renderFlat64(left, r.id);
 
         // Middle: text block
         const mid = mk('div');
         mid.innerHTML =
           `<div style="display:flex;align-items:center;gap:8px;">
-             <b>Frog #${r.id}</b> ${pillRank(rank)}
-           </div>
-           <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? shorten(r.staker) : '—'}</div>`;
+            <b>Frog #${r.id}</b> ${pillRank(rank)}
+          </div>
+          <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? shorten(r.staker) : '—'}</div>`;
         li.appendChild(mid);
-
-        // Right: status tag
-        const right = mk('div', { className:'price', textContent:'Staked' });
-        li.appendChild(right);
 
         ul.appendChild(li);
       });
