@@ -720,3 +720,64 @@ a.btn { display: inline-flex; align-items: center; justify-content: center; text
 a.btn { display:inline-flex; align-items:center; justify-content:center; text-decoration:none; }
 /* optional: force fmHero box to 256 in CSS too */
 #fmHero { width:256px; height:256px; margin:0 auto; }
+/* ===== Modal tidy (override/extend) ===== */
+
+/* Narrower panel + tighter grid */
+.modal-narrow { max-width: 640px; padding: 14px; border-radius: 16px; }
+
+/* Two columns: fixed 256px art, flexible right */
+.ffm-grid {
+  display: grid;
+  grid-template-columns: 256px 1fr;
+  gap: 14px;
+}
+@media (max-width: 800px){ .ffm-grid { grid-template-columns: 1fr; } }
+
+/* 256 × 256 layered render area */
+.ffm-hero{
+  position:relative;
+  width:256px; height:256px;
+  border:1px solid var(--ring);
+  border-radius:12px; overflow:hidden; background:var(--panel-2);
+}
+#fmHero canvas, #fmHero img {
+  position:absolute; inset:0; width:100%; height:100%;
+  image-rendering: pixelated;
+}
+
+/* Title block mirrors list rows */
+.ffm-titlerow{ display:grid; gap:6px; }
+
+/* Compact actions — 3×2 grid, unified button styling */
+.ffm-actions{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0,1fr));
+  gap:6px;
+  margin:10px 0 6px;
+}
+.btn-xs { padding: 6px 8px; border-radius: 8px; font-size: 12px; font-weight: 700; line-height: 1; }
+
+/* Attribute list = clean key–value rows, same font scale */
+#fmAttrs.ffm-attrlist{
+  display:block;
+  max-height: 280px;
+  overflow:auto;
+  border:1px solid var(--ring);
+  border-radius:10px;
+  background: var(--panel);
+  padding:6px 0;
+}
+#fmAttrs.ffm-attrlist li{
+  display:grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  padding: 8px 12px;
+  font-size: 13px;            /* matches your small UI type */
+  align-items: center;
+}
+#fmAttrs.ffm-attrlist li + li { border-top: 1px dashed var(--ring); }
+#fmAttrs.ffm-attrlist .name { font-weight: 600; opacity: .95; }
+#fmAttrs.ffm-attrlist .val  { opacity: .95; }
+
+/* Make anchors look exactly like buttons everywhere */
+a.btn { display:inline-flex; align-items:center; justify-content:center; text-decoration:none; }
