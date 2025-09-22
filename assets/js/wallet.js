@@ -1,21 +1,36 @@
 // assets/js/wallet.js
 (function(){
+  // Elements
   const connectBtn  = document.getElementById('connectBtn');
   const walletLabel = document.getElementById('walletLabel');
 
-  let current = null;
+  let current = null; // current address (string | null)
 
+  // ---------- utils ----------
   function shorten(addr){ return addr ? (addr.slice(0,6)+'…'+addr.slice(-4)) : ''; }
 
+  function setFFWallet(addr){
+    // Primary global used by newer code (modal, etc.)
+    window.FF = window.FF || {};
+    window.FF.wallet = {
+      address: addr || null,
+      connected: !!addr
+    };
+
+    // Compat globals some scripts read
+    window.FF_WALLET = { address: addr || null, connected: !!addr };
+    window.WALLET_ADDR = addr || null;
+    window.SELECTED_WALLET = addr || null;
+  }
+
   function emitConnected(addr){
-    window.FF_WALLET = { address: addr, connected: true };
-    window.user_address = addr; // compatibility for any legacy code
-    window.dispatchEvent(new CustomEvent('wallet:connected', { detail:{ address: addr }}));
-    // also emit a compat alias in case other scripts listen for it
-    window.dispatchEvent(new CustomEvent('FF:walletConnected', { detail:{ address: addr }}));
+    setFFWallet(addr);
+    window.user_address = addr; // legacy alias
+    window.dispatchEvent(new CustomEvent('wallet:connected',    { detail:{ address: addr }}));
+    window.dispatchEvent(new CustomEvent('FF:walletConnected',  { detail:{ address: addr }}));
   }
   function emitDisconnected(){
-    window.FF_WALLET = { address: null, connected: false };
+    setFFWallet(null);
     window.user_address = null;
     window.dispatchEvent(new CustomEvent('wallet:disconnected'));
     window.dispatchEvent(new CustomEvent('FF:walletDisconnected'));
@@ -45,8 +60,12 @@
   }
 
   async function requestConnect(){
-    if (!window.ethereum){ alert('No Ethereum provider found. Please install MetaMask or a compatible wallet.'); return; }
+    if (!window.ethereum){
+      alert('No Ethereum provider found. Please install MetaMask or a compatible wallet.');
+      return;
+    }
     try{
+      // Explicit, user-initiated connect only (no auto-connect elsewhere)
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       const addr = (accounts && accounts[0]) ? accounts[0] : null;
       if (!addr) return;
@@ -54,19 +73,18 @@
       uiConnected(addr);
       emitConnected(addr);
     }catch(e){
-      // user rejected / error — stay disconnected
+      // user rejected or provider error; remain disconnected
     }
   }
 
-  // Never auto-connect on page load
+  // ---------- initial (do NOT auto-connect) ----------
+  setFFWallet(null);
   uiDisconnected();
 
   // Click-to-connect only
-  if (connectBtn){
-    connectBtn.addEventListener('click', requestConnect);
-  }
+  connectBtn?.addEventListener('click', requestConnect);
 
-  // React to wallet changes after a user has connected once
+  // ---------- react to wallet/provider changes ----------
   if (window.ethereum){
     window.ethereum.on?.('accountsChanged', (arr)=>{
       const addr = (arr && arr[0]) ? arr[0] : null;
@@ -80,12 +98,20 @@
         emitConnected(addr);
       }
     });
+
     window.ethereum.on?.('chainChanged', ()=>{
-      // keep address, just re-emit state so listeners can refetch if needed
+      // Keep the address; just re-emit so listeners can refetch if needed
       if (current){
         uiConnected(current);
         emitConnected(current);
       }
+    });
+
+    // Optional: handle disconnect event from some providers
+    window.ethereum.on?.('disconnect', ()=>{
+      current = null;
+      uiDisconnected();
+      emitDisconnected();
     });
   }
 })();

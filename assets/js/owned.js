@@ -163,6 +163,7 @@
     const owned = (which==='owned');
     tabOwned?.setAttribute('aria-selected', owned ? 'true' : 'false');
     tabStaked?.setAttribute('aria-selected', owned ? 'false' : 'true');
+    document.dispatchEvent(new CustomEvent('ff-tabs-updated'));
   }
 
   // ------- Card builder (LAYERED + 3 actions) -------
@@ -170,11 +171,8 @@
     const li = document.createElement('li');
     li.className = 'list-item';
 
-    // data attrs for modal / actions
-    li.setAttribute('data-token-id', id);
-    li.setAttribute('data-src', isStaked ? 'staked' : 'owned');
-    li.setAttribute('data-staked', isStaked ? 'true' : 'false');
-    if (ownerAddr) li.setAttribute('data-owner', ownerAddr);
+    // Do NOT put data-token-id on <li> (so rows don't look clickable).
+    // Modal opens only from the "More info" button below.
 
     // LEFT: 128×128 layered render
     const left = document.createElement('div');
@@ -194,7 +192,7 @@
        <div class="muted">${subtitle || ''}</div>`;
     li.appendChild(mid);
 
-    // RIGHT: actions
+    // RIGHT: actions (More info / OpenSea / Etherscan)
     const act = document.createElement('div');
     act.className = 'card-actions';
     act.innerHTML = `

@@ -133,7 +133,7 @@
       </div>
     </div>
 
-    <!-- New: Pond stats -->
+    <!-- Pond stats -->
     <div id="pondStats" class="facts" aria-label="Pond stats">
       <div class="fact">
         <b>Total Staked</b>
@@ -213,19 +213,26 @@
     <button class="btn btn-ghost btn-sm modal-close" data-close aria-label="Close">✕</button>
 
     <section class="ffm-grid">
-      <!-- LEFT: art + 3x2 buttons -->
+      <!-- LEFT: art + 3×2 buttons -->
       <div class="ffm-left">
         <div id="fmHero" class="ffm-hero"></div>
 
         <div class="ffm-actions">
           <!-- Row 1 -->
           <button id="fmStakeBtn"    class="btn btn-solid btn-sm" data-no-modal>Stake</button>
-          <button id="fmUnstakeBtn"  class="btn btn-sm" data-no-modal>Unstake</button>
-          <button id="fmTransferBtn" class="btn btn-sm" data-no-modal>Transfer</button>
-          <!-- Row 2 (now styled exactly the same) -->
-          <a id="fmOpenSea"   class="btn btn-sm" target="_blank" rel="noopener">OpenSea</a>
-          <a id="fmEtherscan" class="btn btn-sm" target="_blank" rel="noopener">Etherscan</a>
-          <a id="fmMetaLink"  class="btn btn-sm" target="_blank" rel="noopener">Metadata</a>
+          <button id="fmUnstakeBtn"  class="btn btn-ghost btn-sm" data-no-modal>Unstake</button>
+          <button id="fmTransferBtn" class="btn btn-ghost btn-sm" data-no-modal>Transfer</button>
+          <!-- Row 2 -->
+          <a id="fmOpenSea"   class="btn btn-ghost btn-sm" target="_blank" rel="noopener">OpenSea</a>
+          <a id="fmEtherscan" class="btn btn-ghost btn-sm" target="_blank" rel="noopener">Etherscan</a>
+          <a id="fmMetaLink"  class="btn btn-ghost btn-sm" target="_blank" rel="noopener">Metadata</a>
+        </div>
+
+        <!-- Micro links under grid -->
+        <div class="ffm-micro muted" style="margin-top:6px;font-size:12px;">
+          <a id="fmImageLink" href="#" target="_blank" rel="noopener">Original image</a>
+          <span aria-hidden="true"> • </span>
+          <a id="fmMorphBtn" href="javascript:void(0)" data-no-modal>Metamorph (soon)</a>
         </div>
       </div>
 
@@ -244,12 +251,11 @@
           <ul id="fmAttrs" class="ffm-attrlist list-scroll"></ul>
         </div>
 
-        <!-- hidden-but-available extras -->
+        <!-- hidden-but-available extras for scripts -->
         <div class="sr-only">
           <div>Owner: <span id="fmOwner">—</span></div>
           <div>Rarity: <span id="fmRarityLine">—</span></div>
           <div>Collection: <span id="fmCollection">—</span></div>
-          <a id="fmImageLink" href="#" target="_blank" rel="noopener">Original image</a>
         </div>
       </div>
     </section>

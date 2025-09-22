@@ -65,14 +65,15 @@
     }
 
     async function drawFrog(id){
-      // Layered + animation; keep flat PNG as background trick just for color
+      // Layered + animation; keep flat PNG as bg just to pick/fill color
       fmHero.innerHTML = '';
 
       const flatUrl = `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
       fmHero.style.backgroundImage = `url("${flatUrl}")`;
       fmHero.style.backgroundRepeat = 'no-repeat';
-      fmHero.style.backgroundSize = '320% 320%';
-      fmHero.style.backgroundPosition = '100% 100%';
+      // Heavily zoom & offset so only background color is visible (no silhouette)
+      fmHero.style.backgroundSize = '1700% 1700%';
+      fmHero.style.backgroundPosition = '-1200% 1200%';
 
       try { await waitForRenderer(); } catch(e){ console.warn(e.message); }
 

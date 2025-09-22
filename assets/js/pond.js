@@ -74,7 +74,6 @@
     if (!nav){
       nav = document.createElement('div');
       nav.id = 'pondPager';
-      // make sure it actually shows up (some themes hide empty .row)
       Object.assign(nav.style, {
         marginTop: '8px',
         display: 'flex',
@@ -87,7 +86,7 @@
     }
     return nav;
   }
-  
+
   // We fetch pages newest->older, but DISPLAY oldest->newest.
   const storeIdxFromDisplay = (dispIdx)=> (ST.pages.length - 1 - dispIdx);
   const displayIdxFromStore = (storeIdx)=> (ST.pages.length - 1 - storeIdx);
@@ -134,63 +133,6 @@
       });
       nav.appendChild(moreBtn);
     }
-  }
-
-  function renderPage(){
-    ul.innerHTML = '';
-
-    if (!ST.pages.length){
-      const li = document.createElement('li');
-      li.className = 'list-item';
-      li.innerHTML = `<div class="muted">No frogs are currently staked.</div>`;
-      ul.appendChild(li);
-      ensurePager().innerHTML = '';
-      return;
-    }
-
-    const dispIdx = displayIdxFromStore(ST.page);
-    const storeIdx = storeIdxFromDisplay(dispIdx);
-    const page = ST.pages[storeIdx];
-    const rows = page?.rows || [];
-
-    if (!rows.length){
-      const li = document.createElement('li');
-      li.className = 'list-item';
-      li.innerHTML = `<div class="muted">No frogs on this page.</div>`;
-      ul.appendChild(li);
-    } else {
-      rows.forEach(r=>{
-        const rank = RANKS?.[String(r.id)] ?? null;
-
-        const li = document.createElement('li');
-        li.className = 'list-item';
-
-        // Left: layered 128x128 with bg trick (unchanged)
-        const left = document.createElement('div');
-        Object.assign(left.style, { width:'128px', height:'128px', minWidth:'128px', minHeight:'128px' });
-        li.appendChild(left);
-        buildFrog128(left, r.id);
-
-        // Middle: text block — (current copy: "Staker")
-        const mid = document.createElement('div');
-        mid.innerHTML =
-          `<div style="display:flex;align-items:center;gap:8px;">
-             <b>Frog #${r.id}</b> ${pillRank(rank)}
-           </div>
-           <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? shorten(r.staker) : '—'}</div>`;
-        li.appendChild(mid);
-
-        // Right: tag
-        const right = document.createElement('div');
-        right.className = 'price';
-        right.textContent = 'Staked';
-        li.appendChild(right);
-
-        ul.appendChild(li);
-      });
-    }
-
-    renderPager();
   }
 
   // ---------- background helper (uses flat PNG; sets bg image + sampled color) ----------
@@ -309,8 +251,9 @@
     // Layered build from metadata
     const metaUrl = `frog/json/${tokenId}.json`;
     let meta;
-    try { meta = await FF.fetchJSON(metaUrl); }
-    catch {
+    try {
+      meta = await (FF?.fetchJSON ? FF.fetchJSON(metaUrl) : fetch(metaUrl).then(r=>r.json()));
+    } catch {
       const [url] = pickBestBgUrl(tokenId);
       const flat = new Image();
       flat.decoding = 'async';
@@ -334,6 +277,9 @@
       container.appendChild(layer);
     }
   }
+
+  // Expose for modal/owned.js to reuse if needed
+  window.buildFrog128 = window.buildFrog128 || buildFrog128;
 
   // ---------- activity selection ----------
   function selectCurrentlyStakedFromActivities(activities){
@@ -406,6 +352,7 @@
     }
   }
 
+  // ---------- unified page renderer (with action buttons) ----------
   function renderPage(){
     ul.innerHTML = '';
 
@@ -433,6 +380,11 @@
         const rank = RANKS?.[String(r.id)] ?? null;
 
         const li = mk('li', { className:'list-item' });
+        // data attrs for modal / actions
+        li.setAttribute('data-token-id', r.id);
+        li.setAttribute('data-src', 'pond');
+        li.setAttribute('data-staked', 'true');
+        if (r.staker) li.setAttribute('data-owner', r.staker);
 
         // Left: layered 128x128 with bg trick
         const left = mk('div', {}, {
@@ -450,9 +402,20 @@
           <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? shorten(r.staker) : '—'}</div>`;
         li.appendChild(mid);
 
-        // Right: tag
-        const right = mk('div', { className:'price', textContent:'Staked' });
-        li.appendChild(right);
+        // Right: three inline actions (style matches your buttons)
+        const actions = mk('div', { className:'card-actions' });
+        actions.innerHTML = `
+          <button class="btn btn-ghost btn-sm"
+                  data-open-modal
+                  data-token-id="${r.id}"
+                  data-owner="${r.staker || ''}"
+                  data-staked="true">More info</button>
+          <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener"
+             href="https://opensea.io/assets/ethereum/${COLLECTION}/${r.id}">OpenSea</a>
+          <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener"
+             href="https://etherscan.io/token/${COLLECTION}?a=${r.id}">Etherscan</a>
+        `;
+        li.appendChild(actions);
 
         ul.appendChild(li);
       });
