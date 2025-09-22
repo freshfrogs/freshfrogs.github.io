@@ -147,10 +147,8 @@
       flat.src=url; container.appendChild(flat);
     }
   }
-
-  // make the layered renderer available to modal.js and pond.js
+  // expose renderer globally for pond.js & modal.js
   window.buildFrog128 = window.buildFrog128 || buildFrog128;
-
 
   // ------- state (with caching) -------
   const ST = {
@@ -167,16 +165,18 @@
     const owned = (which==='owned');
     tabOwned?.setAttribute('aria-selected', owned ? 'true' : 'false');
     tabStaked?.setAttribute('aria-selected', owned ? 'false' : 'true');
-    document.dispatchEvent(new CustomEvent('ff-tabs-updated'));
   }
 
-  // ------- Card builder (LAYERED + 3 actions) -------
+  // ------- Card builder (LAYERED + compact actions under subtitle) -------
   function liCard(id, subtitle, ownerAddr, isStaked = false){
     const li = document.createElement('li');
     li.className = 'list-item';
 
-    // Do NOT put data-token-id on <li> (so rows don't look clickable).
-    // Modal opens only from the "More info" button below.
+    // data attrs for modal / actions
+    li.setAttribute('data-token-id', id);
+    li.setAttribute('data-src', isStaked ? 'staked' : 'owned');
+    li.setAttribute('data-staked', isStaked ? 'true' : 'false');
+    if (ownerAddr) li.setAttribute('data-owner', ownerAddr);
 
     // LEFT: 128×128 layered render
     const left = document.createElement('div');
@@ -186,32 +186,62 @@
       window.buildFrog128(left, id);
     }
 
-    // MID: title + subtitle
+    // MID: title + subtitle + small action buttons (same row)
     const rank = (RANKS && (String(id) in RANKS)) ? RANKS[String(id)] : null;
     const mid = document.createElement('div');
-    mid.innerHTML =
-      `<div style="display:flex;align-items:center;gap:8px;">
-         <b>Frog #${id}</b> ${pillRank(rank)}
-       </div>
-       <div class="muted">${subtitle || ''}</div>`;
+
+    // header (matches your Owned/Staked style)
+    const header = document.createElement('div');
+    header.style.display = 'flex';
+    header.style.alignItems = 'center';
+    header.style.gap = '8px';
+    header.innerHTML = `<b>Frog #${id}</b> ${pillRank(rank)}`;
+    mid.appendChild(header);
+
+    // subtitle
+    const sub = document.createElement('div');
+    sub.className = 'muted';
+    sub.textContent = subtitle || '';
+    mid.appendChild(sub);
+
+    // compact actions directly under subtitle
+    const actions = document.createElement('div');
+    actions.className = 'mini-actions'; // optional; CSS can target this
+    actions.style.marginTop = '6px';
+    actions.style.display = 'flex';
+    actions.style.flexWrap = 'wrap';
+    actions.style.gap = '6px';
+
+    // More info (opens modal)
+    const moreBtn = document.createElement('button');
+    moreBtn.className = 'btn btn-ghost btn-xs';
+    moreBtn.textContent = 'More info';
+    moreBtn.setAttribute('data-open-modal','');
+    moreBtn.setAttribute('data-token-id', String(id));
+    moreBtn.setAttribute('data-owner', ownerAddr || '');
+    moreBtn.setAttribute('data-staked', isStaked ? 'true' : 'false');
+    actions.appendChild(moreBtn);
+
+    // OpenSea
+    const os = document.createElement('a');
+    os.className = 'btn btn-ghost btn-xs';
+    os.target = '_blank'; os.rel = 'noopener';
+    os.href = `https://opensea.io/assets/ethereum/${COLLECTION}/${id}`;
+    os.textContent = 'OpenSea';
+    actions.appendChild(os);
+
+    // Etherscan
+    const es = document.createElement('a');
+    es.className = 'btn btn-ghost btn-xs';
+    es.target = '_blank'; es.rel = 'noopener';
+    es.href = `https://etherscan.io/token/${COLLECTION}?a=${id}`;
+    es.textContent = 'Etherscan';
+    actions.appendChild(es);
+
+    mid.appendChild(actions);
     li.appendChild(mid);
 
-    // RIGHT: actions (More info / OpenSea / Etherscan)
-    const act = document.createElement('div');
-    act.className = 'card-actions';
-    act.innerHTML = `
-      <button class="btn btn-ghost btn-sm"
-              data-open-modal
-              data-token-id="${id}"
-              data-owner="${ownerAddr || ''}"
-              data-staked="${isStaked ? 'true' : 'false'}">More info</button>
-      <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener"
-         href="https://opensea.io/assets/ethereum/${COLLECTION}/${id}">OpenSea</a>
-      <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener"
-         href="https://etherscan.io/token/${COLLECTION}?a=${id}">Etherscan</a>
-    `;
-    li.appendChild(act);
-
+    // RIGHT column removed to keep the card narrow and uncluttered
     return li;
   }
 
