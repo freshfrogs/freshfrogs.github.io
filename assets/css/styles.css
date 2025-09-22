@@ -649,3 +649,52 @@ a.btn { display: inline-flex; align-items: center; justify-content: center; text
 
 /* Optional: align values a touch away from the right edge */
 #fmAttrs.ffm-attrlist .val { padding-right: 2px; }
+/* Narrow panel */
+.modal-narrow { max-width: 640px; padding: 14px; border-radius: 16px; }
+
+/* Grid: left = image, right = name+buttons+attributes */
+.ffm-grid {
+  display: grid; grid-template-columns: 260px 1fr; gap: 14px;
+}
+@media (max-width: 800px){ .ffm-grid{ grid-template-columns: 1fr; } }
+
+/* Left frog */
+.ffm-hero{
+  position:relative; aspect-ratio:1/1; border:1px solid var(--edge);
+  border-radius:12px; overflow:hidden; background:var(--panelSoft);
+}
+#fmHero canvas,#fmHero img{ position:absolute; inset:0; width:100%; height:100%; image-rendering:pixelated; }
+
+/* Right header (matches Owned/Staked) */
+.ffm-titlerow{ display:grid; gap:6px; }
+
+/* Buttons (3 x 2) right under the title */
+.ffm-actions{
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px; margin:10px 0 12px;
+}
+/* Make <a class="btn"> look identical to <button class="btn"> */
+a.btn{ display:inline-flex; align-items:center; justify-content:center; text-decoration:none; }
+
+/* Attributes = clean key–value list */
+.ffm-attrs .section-title{ margin: 6px 0; font-weight:700; }
+#fmAttrs.ffm-attrlist{
+  display:block; max-height:280px; overflow:auto;
+  border:1px solid var(--edge); border-radius:10px; background:var(--panelSoft); padding:6px 0;
+}
+#fmAttrs.ffm-attrlist li{
+  display:grid; grid-template-columns:1fr auto; gap:12px;
+  padding:8px 12px; font-size:13px; align-items:center;
+}
+#fmAttrs.ffm-attrlist li + li{ border-top:1px dashed var(--edge); }
+#fmAttrs.ffm-attrlist .name{ font-weight:600; opacity:.95; }
+#fmAttrs.ffm-attrlist .val{ opacity:.95; }
+
+/* Click affordance on rows that open modal */
+.list-item[data-token-id]{ cursor:pointer; }
+
+/* Always on top */
+.modal.open{ display:block !important; z-index:9999; }
+
+/* a11y helper */
+.sr-only{ position:absolute!important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,1px,1px); white-space:nowrap; border:0; }
