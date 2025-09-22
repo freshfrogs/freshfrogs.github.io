@@ -165,37 +165,32 @@
     tabStaked?.setAttribute('aria-selected', owned ? 'false' : 'true');
   }
 
-  function liCard(id, subtitle){
-    const li = document.createElement('li'); 
+  // owned.js — drop-in replacement
+  function liCard(id, subtitle, ownerAddr, isStaked = false){
+    const li = document.createElement('li');
     li.className = 'list-item';
 
-    // attributes for future-proofing (still useful)
-    const isStaked = !!(ST && ST.mode === 'staked');
-    const ownerAddr = (ST && ST.addr) ? ST.addr : '';
-
-    li.setAttribute('data-token-id', String(id));
+    // data attrs for modal / actions
+    li.setAttribute('data-token-id', id);
     li.setAttribute('data-src', isStaked ? 'staked' : 'owned');
-    li.setAttribute('data-owner', ownerAddr);
     li.setAttribute('data-staked', isStaked ? 'true' : 'false');
+    if (ownerAddr) li.setAttribute('data-owner', ownerAddr);
 
-    // 🔔 direct open: bypass delegation so clicks always work
-    li.addEventListener('click', (e) => {
-      // avoid conflicts if you add inner buttons later
-      const target = e.target.closest('a,button,[data-no-modal]');
-      if (target) return;
-      if (window.FFModal && typeof window.FFModal.openFrogModal === 'function') {
-        window.FFModal.openFrogModal({ id, owner: ownerAddr, staked: isStaked });
-      } else {
-        console.warn('FFModal not found. Make sure assets/js/modal.js is included before main.js');
-      }
-    });
-
+    // LEFT: 128×128 flat PNG
     const left = document.createElement('div');
-    Object.assign(left.style,{width:'128px',height:'128px',minWidth:'128px',minHeight:'128px'});
-    li.appendChild(left); 
-    buildFrog128(left, id);
+    Object.assign(left.style, { width:'128px',height:'128px',minWidth:'128px',minHeight:'128px' });
+    li.appendChild(left);
+    if (window.FF?.renderFlatFrog) {
+      FF.renderFlatFrog(left, id, 128);
+    } else {
+      const img = new Image();
+      img.className = 'thumb128';
+      img.src = `${(window.FF_CFG?.SOURCE_PATH || '')}/frog/${id}.png`;
+      left.appendChild(img);
+    }
 
-    const rank = (RANKS && (String(id) in RANKS)) ? RANKS[String(id)] : null;
+    // MID: title + subtitle
+    const rank = (window.RANKS && (String(id) in RANKS)) ? RANKS[String(id)] : null;
     const mid = document.createElement('div');
     mid.innerHTML =
       `<div style="display:flex;align-items:center;gap:8px;">
@@ -204,9 +199,24 @@
       <div class="muted">${subtitle || ''}</div>`;
     li.appendChild(mid);
 
+    // RIGHT: actions
+    const act = document.createElement('div');
+    act.className = 'card-actions';
+    act.innerHTML = `
+      <button class="btn btn-ghost btn-sm"
+              data-open-modal
+              data-token-id="${id}"
+              data-owner="${ownerAddr || ''}"
+              data-staked="${isStaked ? 'true' : 'false'}">More info</button>
+      <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener"
+        href="https://opensea.io/assets/ethereum/${FF_CFG.COLLECTION_ADDRESS}/${id}">OpenSea</a>
+      <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener"
+        href="https://etherscan.io/token/${FF_CFG.COLLECTION_ADDRESS}?a=${id}">Etherscan</a>
+    `;
+    li.appendChild(act);
+
     return li;
   }
-
 
   // ------- data fetchers -------
   async function fetchOwnedIds(addr){
