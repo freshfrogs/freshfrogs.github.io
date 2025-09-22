@@ -711,3 +711,10 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
 
 /* Make anchors look like buttons */
 a.btn { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.card-actions{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 6px;
+  min-width: 260px;
+}
+a.btn { display:inline-flex; align-items:center; justify-content:center; text-decoration:none; }
