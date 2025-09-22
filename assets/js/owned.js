@@ -168,30 +168,24 @@
   }
 
   // ------- Card builder (LAYERED + compact actions under subtitle) -------
-  // NEW: sinceMs param so we can put data-since on the "More info" button for staked frogs
-  function liCard(id, subtitle, ownerAddr, isStaked = false, sinceMs = NaN){
+  // ------- Card builder (LAYERED + compact actions under subtitle) -------
+  function liCard(id, subtitle, ownerAddr, isStaked = false){
     const li = document.createElement('li');
     li.className = 'list-item';
 
-    // data attrs for modal / actions
     li.setAttribute('data-token-id', id);
     li.setAttribute('data-src', isStaked ? 'staked' : 'owned');
     li.setAttribute('data-staked', isStaked ? 'true' : 'false');
     if (ownerAddr) li.setAttribute('data-owner', ownerAddr);
 
-    // LEFT: 128×128 layered render
     const left = document.createElement('div');
     Object.assign(left.style, { width:'128px', height:'128px', minWidth:'128px', minHeight:'128px' });
     li.appendChild(left);
-    if (typeof window.buildFrog128 === 'function') {
-      window.buildFrog128(left, id);
-    }
+    if (typeof window.buildFrog128 === 'function') window.buildFrog128(left, id);
 
-    // MID: title + subtitle + small action buttons (same column)
     const rank = (RANKS && (String(id) in RANKS)) ? RANKS[String(id)] : null;
     const mid = document.createElement('div');
 
-    // header (matches your Owned/Staked style)
     const header = document.createElement('div');
     header.style.display = 'flex';
     header.style.alignItems = 'center';
@@ -199,34 +193,26 @@
     header.innerHTML = `<b>Frog #${id}</b> ${pillRank(rank)}`;
     mid.appendChild(header);
 
-    // subtitle
     const sub = document.createElement('div');
     sub.className = 'muted';
     sub.textContent = subtitle || '';
     mid.appendChild(sub);
 
-    // compact actions directly under subtitle
     const actions = document.createElement('div');
     actions.style.marginTop = '6px';
     actions.style.display = 'flex';
     actions.style.flexWrap = 'wrap';
     actions.style.gap = '6px';
 
-    // More info (opens modal)
     const moreBtn = document.createElement('button');
     moreBtn.className = 'btn btn-ghost btn-xs';
-    moreBtn.textContent = 'More info';
+    moreBtn.textContent = 'See more';
     moreBtn.setAttribute('data-open-modal','');
     moreBtn.setAttribute('data-token-id', String(id));
     moreBtn.setAttribute('data-owner', ownerAddr || '');
     moreBtn.setAttribute('data-staked', isStaked ? 'true' : 'false');
-    // NEW: pass since epoch (ms) if staked so modal can show "Staked X ago"
-    if (isStaked && Number.isFinite(sinceMs)) {
-      moreBtn.setAttribute('data-since', String(sinceMs));
-    }
     actions.appendChild(moreBtn);
 
-    // OpenSea
     const os = document.createElement('a');
     os.className = 'btn btn-ghost btn-xs';
     os.target = '_blank'; os.rel = 'noopener';
@@ -234,7 +220,6 @@
     os.textContent = 'OpenSea';
     actions.appendChild(os);
 
-    // Etherscan
     const es = document.createElement('a');
     es.className = 'btn btn-ghost btn-xs';
     es.target = '_blank'; es.rel = 'noopener';
@@ -244,8 +229,6 @@
 
     mid.appendChild(actions);
     li.appendChild(mid);
-
-    // RIGHT column removed to keep the card narrow and uncluttered
     return li;
   }
 

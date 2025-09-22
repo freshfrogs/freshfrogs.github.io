@@ -306,10 +306,7 @@
         });
 
         // More info (modal) — include since + owner so modal shows "Staked X ago • Owned by ..."
-        const moreBtn = mk('button', {
-          className:'btn btn-ghost btn-xs',
-          textContent:'More info'
-        });
+        const moreBtn = mk('button', { className:'btn btn-ghost btn-xs', textContent:'See more' });
         moreBtn.setAttribute('data-open-modal', '');
         moreBtn.setAttribute('data-token-id', String(r.id));
         moreBtn.setAttribute('data-owner', r.staker || '');
