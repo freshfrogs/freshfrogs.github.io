@@ -215,7 +215,7 @@
       if (fmCollection) fmCollection.textContent = (CFG.COLLECTION_ADDRESS || '').slice(0,6)+'…'+(CFG.COLLECTION_ADDRESS || '').slice(-4);
       setLinks(id);
       setRarity(id);
-      setState(!!staked, owner || '');
+      setState({ staked: !!staked, owner: owner || '', stakedSince: current.stakedSince || null });
 
       setOpen(true);
       drawFrog(id).catch(()=>{});
