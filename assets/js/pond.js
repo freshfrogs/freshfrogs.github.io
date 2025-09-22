@@ -1,16 +1,16 @@
 // assets/js/pond.js
-(function (FF, CFG) {
+(function(FF, CFG){
   const wrap = document.getElementById('pondListWrap');
   const ul   = document.getElementById('pondList');
   if (!wrap || !ul) return;
 
   // ---------- config ----------
-  const API          = 'https://api.reservoir.tools/users/activity/v6';
-  const OWNERS_API   = 'https://api.reservoir.tools/owners/v2';
-  const TOKENS_API   = 'https://api.reservoir.tools/users'; // /{addr}/tokens/v8
-  const CONTROLLER   = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
-  const COLLECTION   = CFG.COLLECTION_ADDRESS || '';
-  const PAGE_SIZE    = 20; // reservoir max per call
+  const API = 'https://api.reservoir.tools/users/activity/v6';
+  const OWNERS_API = 'https://api.reservoir.tools/owners/v2';
+  const TOKENS_API = 'https://api.reservoir.tools/users'; // /{addr}/tokens/v8
+  const CONTROLLER = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
+  const COLLECTION = CFG.COLLECTION_ADDRESS || '';
+  const PAGE_SIZE  = 20;
   const PREFETCH_PAGES = 3;
 
   function apiHeaders(){
@@ -29,7 +29,6 @@
       try{
         const res = await fetch(url, { ...opts, signal: ctrl.signal });
         clearTimeout(t);
-
         if (res.status === 429 && i < retries){
           const ra = Number(res.headers.get('retry-after')) || (1 << i);
           await new Promise(r=>setTimeout(r, ra * 1000));
@@ -53,8 +52,8 @@
 
   // ---------- state ----------
   const ST = {
-    pages: [],                 // [{ rows: [{id, staker, since}], contIn, contOut }]
-    page: 0,                   // newest-first internal index
+    pages: [],
+    page: 0,
     nextContinuation: '',
     blockedIds: new Set(),
     acceptedIds: new Set(),
@@ -74,29 +73,19 @@
     if (!nav){
       nav = document.createElement('div');
       nav.id = 'pondPager';
-      Object.assign(nav.style, {
-        marginTop: '8px',
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: '6px',
-        alignItems: 'center'
-      });
+      Object.assign(nav.style, { marginTop:'8px', display:'flex', flexWrap:'wrap', gap:'6px', alignItems:'center' });
       nav.className = 'row';
       wrap.appendChild(nav);
     }
     return nav;
   }
 
-  // We fetch pages newest->older, but DISPLAY oldest->newest.
-  const storeIdxFromDisplay  = (dispIdx)=> (ST.pages.length - 1 - dispIdx);
-  const displayIdxFromStore  = (storeIdx)=> (ST.pages.length - 1 - storeIdx);
+  const storeIdxFromDisplay = (dispIdx)=> (ST.pages.length - 1 - dispIdx);
+  const displayIdxFromStore = (storeIdx)=> (ST.pages.length - 1 - storeIdx);
 
-  // ---------- PAGER ([1] [2] [3] …) ----------
   function renderPager(){
     const nav = ensurePager();
     nav.innerHTML = '';
-
-    // numbered buttons (oldest -> newest)
     for (let disp=0; disp<ST.pages.length; disp++){
       const sIdx = storeIdxFromDisplay(disp);
       const btn = document.createElement('button');
@@ -114,8 +103,6 @@
       });
       nav.appendChild(btn);
     }
-
-    // trailing ellipsis
     if (ST.nextContinuation){
       const moreBtn = document.createElement('button');
       moreBtn.className = 'btn btn-ghost btn-sm';
@@ -125,7 +112,7 @@
       moreBtn.addEventListener('click', async ()=>{
         const ok = await fetchNextPage();
         if (ok){
-          ST.page = ST.pages.length - 1; // jump to oldest newly added
+          ST.page = ST.pages.length - 1;
           renderPage();
           renderStatsBar?.();
         }
@@ -134,37 +121,135 @@
     }
   }
 
-  // ---------- tiny helpers ----------
+  // ---------- background (flat PNG zoom for bg-color) ----------
+  function pickBestBgUrl(id){
+    const local = `frog/${id}.png`;
+    const leading = `/frog/${id}.png`;
+    const cfg = (CFG.SOURCE_PATH ? `${CFG.SOURCE_PATH}/frog/${id}.png` : local);
+    return [local, leading, cfg];
+  }
+
+  async function applyFrogBackground(container, tokenId){
+    Object.assign(container.style, {
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: '2000% 2000%',
+      backgroundPosition: '100% 100%',
+      imageRendering: 'pixelated'
+    });
+    const urls = pickBestBgUrl(tokenId);
+    for (const url of urls){
+      const ok = await new Promise(resolve=>{
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = ()=>{
+          try{
+            const c = document.createElement('canvas');
+            c.width = 2; c.height = 2;
+            const ctx = c.getContext('2d');
+            ctx.drawImage(img, 0, 0, 2, 2);
+            const d = ctx.getImageData(0,0,1,1).data;
+            container.style.backgroundColor = `rgba(${d[0]},${d[1]},${d[2]},${(d[3]||255)/255})`;
+          }catch{}
+          container.style.backgroundImage = `url('${url}')`;
+          resolve(true);
+        };
+        img.onerror = ()=>resolve(false);
+        img.src = url;
+      });
+      if (ok) return true;
+    }
+    container.style.backgroundColor = '#151a1e';
+    container.style.backgroundImage = 'none';
+    return false;
+  }
+
+  // ---------- frog renderer (layered 128) ----------
+  const NO_ANIM_FOR = new Set(['Hat','Frog','Trait']);
+  const NO_LIFT_FOR = new Set(['Frog','Trait','SpecialFrog']);
+
   function mk(tag, props={}, style={}) {
     const el = document.createElement(tag);
     Object.assign(el, props);
     Object.assign(el.style, style);
     return el;
   }
+  function safe(part){ return encodeURIComponent(part); }
 
-  function flatFrog(leftEl, id){
+  function makeLayerImg(attr, value, sizePx){
+    const allowAnim = !NO_ANIM_FOR.has(attr);
+    const base = `/frog/build_files/${safe(attr)}`;
+    const png  = `${base}/${safe(value)}.png`;
+    const gif  = `${base}/animations/${safe(value)}_animation.gif`;
+
     const img = new Image();
     img.decoding = 'async';
-    img.loading  = 'lazy';
-    img.className = 'thumb128';
-    img.src = `${(CFG.SOURCE_PATH || '')}/frog/${id}.png`;
-    leftEl.appendChild(img);
+    img.loading = 'lazy';
+    img.dataset.attr = attr;
+    Object.assign(img.style, {
+      position:'absolute', left:'0', top:'0',
+      width:`${sizePx}px`, height:`${sizePx}px`,
+      imageRendering:'pixelated', zIndex:'2',
+      transition:'transform 280ms cubic-bezier(.22,.61,.36,1)'
+    });
+
+    if (allowAnim){
+      img.src = gif;
+      img.onerror = ()=>{ img.onerror = null; img.src = png; };
+    } else {
+      img.src = png;
+    }
+
+    if (!NO_LIFT_FOR.has(attr)){
+      img.addEventListener('mouseenter', ()=>{
+        img.style.transform = 'translate(-8px, -12px)';
+        img.style.filter = 'drop-shadow(0 5px 0 rgba(0,0,0,.45))';
+      });
+      img.addEventListener('mouseleave', ()=>{
+        img.style.transform = 'translate(0, 0)';
+        img.style.filter = 'none';
+      });
+    }
+
+    return img;
   }
 
-  function renderFrog(leftEl, id){
-    // Prefer the global layered renderer; fall back to flat PNG.
-    if (typeof window.buildFrog128 === 'function'){
-      try {
-        const r = window.buildFrog128(leftEl, id);
-        if (r && typeof r.then === 'function') {
-          r.catch(()=>{ if (!leftEl.firstChild) flatFrog(leftEl, id); });
-        }
-        return;
-      } catch {
-        // fall through to flat
+  async function buildFrog128(container, tokenId){
+    const SIZE = 128;
+    Object.assign(container.style, {
+      width: `${SIZE}px`,
+      height: `${SIZE}px`,
+      minWidth: `${SIZE}px`,
+      minHeight: `${SIZE}px`,
+      position: 'relative',
+      overflow: 'hidden',
+      borderRadius: '8px',
+      imageRendering: 'pixelated'
+    });
+    await applyFrogBackground(container, tokenId);
+
+    const metaUrl = `frog/json/${tokenId}.json`;
+    try{
+      const meta = await FF.fetchJSON(metaUrl);
+      const attrs = Array.isArray(meta?.attributes) ? meta.attributes : [];
+      for (const rec of attrs){
+        const attr = String(rec.trait_type || rec.traitType || '').trim();
+        const val  = String(rec.value).trim();
+        if (!attr || !val) continue;
+        const layer = makeLayerImg(attr, val, SIZE);
+        container.appendChild(layer);
       }
+    }catch{
+      const [url] = pickBestBgUrl(tokenId);
+      const flat = new Image();
+      flat.decoding = 'async';
+      flat.loading  = 'lazy';
+      Object.assign(flat.style, {
+        position:'absolute', inset:'0', width:`${SIZE}px`, height:`${SIZE}px`,
+        imageRendering:'pixelated', zIndex:'2'
+      });
+      flat.src = url;
+      container.appendChild(flat);
     }
-    flatFrog(leftEl, id);
   }
 
   // ---------- activity selection ----------
@@ -183,8 +268,7 @@
       const to   = (a?.toAddress   || '').toLowerCase();
       const from = (a?.fromAddress || '').toLowerCase();
 
-      if (from === CONTROLLER){ ST.blockedIds.add(id); continue; } // outbound ⇒ not staked
-
+      if (from === CONTROLLER){ ST.blockedIds.add(id); continue; }
       if (to === CONTROLLER && !ST.blockedIds.has(id) && !ST.acceptedIds.has(id)){
         const since = a?.createdAt ? new Date(a.createdAt)
                     : (a?.timestamp ? new Date(a.timestamp*1000) : null);
@@ -193,7 +277,6 @@
       }
     }
 
-    // Oldest -> newest within the page
     out.sort((a,b)=>{
       const ta = a.since ? a.since.getTime() : 0;
       const tb = b.since ? b.since.getTime() : 0;
@@ -250,10 +333,10 @@
       return;
     }
 
-    const dispIdx  = displayIdxFromStore(ST.page);
+    const dispIdx = displayIdxFromStore(ST.page);
     const storeIdx = storeIdxFromDisplay(dispIdx);
-    const page     = ST.pages[storeIdx];
-    const rows     = page?.rows || [];
+    const page = ST.pages[storeIdx];
+    const rows = page?.rows || [];
 
     if (!rows.length){
       const li = document.createElement('li');
@@ -266,26 +349,41 @@
 
         const li = mk('li', { className:'list-item' });
 
-        // Left: 128×128 (layered if available)
-        const left = mk('div', {}, {
-          width:'128px', height:'128px', minWidth:'128px', minHeight:'128px'
-        });
+        // Left: layered 128×128
+        const left = mk('div', {}, { width:'128px', height:'128px', minWidth:'128px', minHeight:'128px' });
         li.appendChild(left);
-        renderFrog(left, r.id);
+        buildFrog128(left, r.id);
 
-        // Middle: text block
+        // Middle: title + subtitle + compact actions (same style as Owned)
         const mid = mk('div');
-        mid.innerHTML =
-          `<div style="display:flex;align-items:center;gap:8px;">
-             <b>Frog #${r.id}</b> ${pillRank(rank)}
-           </div>
-           <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? shorten(r.staker) : '—'}</div>`;
+        const header = mk('div', {}, { display:'flex', alignItems:'center', gap:'8px' });
+        header.innerHTML = `<b>Frog #${r.id}</b> ${pillRank(rank)}`;
+        mid.appendChild(header);
+
+        const sub = mk('div', { className:'muted', textContent:`Staked ${fmtAgo(r.since)} • Staker ${r.staker ? shorten(r.staker) : '—'}` });
+        mid.appendChild(sub);
+
+        const actions = mk('div', {}, { marginTop:'6px', display:'flex', flexWrap:'wrap', gap:'6px' });
+
+        const more = mk('button', { className:'btn btn-ghost btn-xs', textContent:'More info' });
+        more.setAttribute('data-open-modal','');
+        more.setAttribute('data-token-id', String(r.id));
+        more.setAttribute('data-owner', r.staker || '');
+        more.setAttribute('data-staked', 'true');
+        actions.appendChild(more);
+
+        const os = mk('a', { className:'btn btn-ghost btn-xs', target:'_blank', rel:'noopener', textContent:'OpenSea' });
+        os.href = `https://opensea.io/assets/ethereum/${COLLECTION}/${r.id}`;
+        actions.appendChild(os);
+
+        const es = mk('a', { className:'btn btn-ghost btn-xs', target:'_blank', rel:'noopener', textContent:'Etherscan' });
+        es.href = `https://etherscan.io/token/${COLLECTION}?a=${r.id}`;
+        actions.appendChild(es);
+
+        mid.appendChild(actions);
         li.appendChild(mid);
 
-        // Right: tag
-        const right = mk('div', { className:'price', textContent:'Staked' });
-        li.appendChild(right);
-
+        // No separate right column; keep cards compact
         ul.appendChild(li);
       });
     }
@@ -308,7 +406,6 @@
   }
 
   async function fetchTotalStakedViaOwners(){
-    // Walk owners until we find the controller address
     let cont = '';
     for (let guard=0; guard<30; guard++){
       const qs = new URLSearchParams({ collection: COLLECTION });
@@ -324,24 +421,17 @@
       cont = json?.continuation || '';
       if (!cont) break;
     }
-    return null; // not found
+    return null;
   }
 
   async function fetchTotalStakedViaTokens(){
-    // enumerate controller's tokens for this collection and count
-    let cont = '';
-    let total = 0;
+    let cont = ''; let total = 0;
     for (let guard=0; guard<40; guard++){
-      const qs = new URLSearchParams({
-        collection: COLLECTION,
-        limit: '200',
-        includeTopBid: 'false'
-      });
+      const qs = new URLSearchParams({ collection: COLLECTION, limit:'200', includeTopBid:'false' });
       if (cont) qs.set('continuation', cont);
       const url = `${TOKENS_API}/${CONTROLLER}/tokens/v8?${qs.toString()}`;
       const json = await reservoirFetch(url, { headers: apiHeaders() });
-      const arr = json?.tokens || [];
-      total += arr.length;
+      total += (json?.tokens || []).length;
       cont = json?.continuation || '';
       if (!cont) break;
     }
@@ -391,18 +481,15 @@
         return;
       }
 
-      // ranks (optional but nice)
       try { RANKS = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json'); }
       catch { RANKS = {}; }
 
-      // reset
       ST.pages = [];
       ST.page = 0;
       ST.nextContinuation = '';
       ST.blockedIds = new Set();
       ST.acceptedIds = new Set();
 
-      // stats + list
       await refreshStats();
       await prefetchInitialPages();
 
@@ -412,7 +499,6 @@
         return;
       }
 
-      // Show the OLDEST of the preloaded pages first
       ST.page = ST.pages.length - 1;
       renderPage();
     }catch(e){
@@ -424,11 +510,9 @@
     }
   }
 
-  // autorun & expose
   loadPond();
   window.FF_reloadPond = loadPond;
 
-  // Refresh button
   const refreshBtn = document.getElementById('refreshPond');
   if (refreshBtn){
     refreshBtn.addEventListener('click', async ()=>{
