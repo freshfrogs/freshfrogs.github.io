@@ -176,7 +176,7 @@
     }
     return [...map.values()];
   }
-  async function confirmStakedByUser(addr, candidates){
+  async function confirmStakedByUser(addr, candidates, concurrency=8){
     if (!window.ethereum) return [];
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const contract = new ethers.Contract(
@@ -184,17 +184,23 @@
       ['function stakerAddress(uint256) view returns (address)'],
       provider
     );
-    const out=[];
-    for (const c of candidates){
-      try{
-        const who = await contract.stakerAddress(c.id);
-        if (who && who.toLowerCase() === addr.toLowerCase()){
-          out.push({ id:c.id, since:c.since, staker: who });
-        }
-      }catch{}
+    const out = [];
+    let i = 0;
+    async function worker(){
+      while (i < candidates.length){
+        const c = candidates[i++]; // take next
+        try{
+          const who = await contract.stakerAddress(c.id);
+          if (who && who.toLowerCase() === addr.toLowerCase()){
+            out.push({ id:c.id, since:c.since, staker: who });
+          }
+        }catch{/* ignore */}
+      }
     }
+    await Promise.all(Array.from({length: Math.min(concurrency, candidates.length)}, worker));
     return out;
   }
+
   async function fetchStakedRows(addr){
     const cands = await fetchStakeCandidates(addr);
     const rows  = await confirmStakedByUser(addr, cands);
