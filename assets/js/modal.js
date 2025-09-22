@@ -229,26 +229,68 @@
     });
 
     // actions
+    // STAKE
     fmStakeBtn?.addEventListener('click', async () => {
       if (!current.id) return;
-      if (window.FFStake?.stakeOne)      await window.FFStake.stakeOne(current.id);
-      else if (window.stakeOne)          await window.stakeOne(current.id);
+      if (fmStakeBtn.disabled) return;
+
+      // Prefer your custom flow if present
+      if (typeof window.initiate_stake === 'function') {
+        try { await window.initiate_stake(current.id); } catch(e){ console.warn(e); }
+        return;
+      }
+
+      // Fallback to previous events (if you still have them)
+      if (window.FFStake?.stakeOne)      { try{ await window.FFStake.stakeOne(current.id); }catch(e){ console.warn(e); } }
+      else if (window.stakeOne)          { try{ await window.stakeOne(current.id); }catch(e){ console.warn(e); } }
       else window.dispatchEvent(new CustomEvent('ff:stake', { detail: { ids: [current.id] } }));
     });
+
+    // UNSTAKE
     fmUnstakeBtn?.addEventListener('click', async () => {
       if (!current.id) return;
-      if (window.FFStake?.unstakeOne)    await window.FFStake.unstakeOne(current.id);
-      else if (window.unstakeOne)        await window.unstakeOne(current.id);
+      if (fmUnstakeBtn.disabled) return;
+
+      if (typeof window.initiate_withdraw === 'function') {
+        try { await window.initiiate_withdraw?.(current.id) || await window.initiate_withdraw(current.id); } catch(e){ console.warn(e); }
+        return;
+      }
+
+      if (window.FFStake?.unstakeOne)    { try{ await window.FFStake.unstakeOne(current.id); }catch(e){ console.warn(e); } }
+      else if (window.unstakeOne)        { try{ await window.unstakeOne(current.id); }catch(e){ console.warn(e); } }
       else window.dispatchEvent(new CustomEvent('ff:unstake', { detail: { ids: [current.id] } }));
     });
+
+    // TRANSFER
     fmTransferBtn?.addEventListener('click', async () => {
       if (!current.id) return;
-      const to=(prompt('Transfer to address (0x…)')||'').trim();
+      if (fmTransferBtn.disabled) return;
+
+      // If you expose a generic helper, you can wire it here.
+      // Otherwise keep the simple prompt fallback:
+      const to = (prompt('Transfer to address (0x…)') || '').trim();
       if(!/^0x[a-fA-F0-9]{40}$/.test(to)){ alert('Invalid address'); return; }
-      if (window.FFWallet?.transfer) { try{ await window.FFWallet.transfer(CFG.COLLECTION_ADDRESS,current.id,to);}catch(e){console.error(e);alert('Transfer failed');} }
-      else if (window.transferToken) { try{ await window.transferToken(CFG.COLLECTION_ADDRESS,current.id,to);}catch(e){console.error(e);alert('Transfer failed');} }
-      else window.dispatchEvent(new CustomEvent('ff:transfer',{detail:{collection:CFG.COLLECTION_ADDRESS,id:current.id,to}}));
+
+      // If you have a helper like send_write_transaction + collection instance, you could do:
+      // if (window.send_write_transaction && window.collection && window.user_address) {
+      //   try {
+      //     await send_write_transaction(window.collection.methods.safeTransferFrom(window.user_address, to, String(current.id)));
+      //     return;
+      //   } catch(e){ console.warn(e); }
+      // }
+
+      // Legacy fallbacks you already had:
+      if (window.FFWallet?.transfer) {
+        try { await window.FFWallet.transfer(CFG.COLLECTION_ADDRESS, current.id, to); }
+        catch(e){ console.error(e); alert('Transfer failed'); }
+      } else if (window.transferToken) {
+        try { await window.transferToken(CFG.COLLECTION_ADDRESS, current.id, to); }
+        catch(e){ console.error(e); alert('Transfer failed'); }
+      } else {
+        window.dispatchEvent(new CustomEvent('ff:transfer', { detail:{ collection: CFG.COLLECTION_ADDRESS, id: current.id, to } }));
+      }
     });
+
     fmMorphBtn?.addEventListener('click', ()=> alert('Metamorph coming soon ✨'));
 
     // expose
