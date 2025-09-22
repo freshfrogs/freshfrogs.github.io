@@ -206,38 +206,21 @@
 <script src="assets/js/modal.js"></script>
 <script src="assets/js/main.js"></script>
 
-<!-- Frog Modal (narrow, site-consistent) -->
+<!-- Frog Modal (compact, organized) -->
 <div id="frogModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
   <div class="modal-backdrop" data-close></div>
   <div class="modal-panel modal-narrow" role="document">
     <button class="btn btn-ghost btn-sm modal-close" data-close aria-label="Close">✕</button>
 
     <section class="ffm-grid">
-      <!-- LEFT: art + 3×2 buttons -->
+      <!-- LEFT: 256x256 layered render -->
       <div class="ffm-left">
         <div id="fmHero" class="ffm-hero"></div>
-
-        <div class="ffm-actions">
-          <!-- Row 1 -->
-          <button id="fmStakeBtn"    class="btn btn-solid btn-sm" data-no-modal>Stake</button>
-          <button id="fmUnstakeBtn"  class="btn btn-ghost btn-sm" data-no-modal>Unstake</button>
-          <button id="fmTransferBtn" class="btn btn-ghost btn-sm" data-no-modal>Transfer</button>
-          <!-- Row 2 -->
-          <a id="fmOpenSea"   class="btn btn-ghost btn-sm" target="_blank" rel="noopener">OpenSea</a>
-          <a id="fmEtherscan" class="btn btn-ghost btn-sm" target="_blank" rel="noopener">Etherscan</a>
-          <a id="fmMetaLink"  class="btn btn-ghost btn-sm" target="_blank" rel="noopener">Metadata</a>
-        </div>
-
-        <!-- Micro links under grid -->
-        <div class="ffm-micro muted" style="margin-top:6px;font-size:12px;">
-          <a id="fmImageLink" href="#" target="_blank" rel="noopener">Original image</a>
-          <span aria-hidden="true"> • </span>
-          <a id="fmMorphBtn" href="javascript:void(0)" data-no-modal>Metamorph (soon)</a>
-        </div>
       </div>
 
-      <!-- RIGHT: same typography as Owned/Staked -->
+      <!-- RIGHT: Title → buttons → attributes -->
       <div class="ffm-right">
+        <!-- Title / subtitle (matches Owned/Staked style) -->
         <div class="ffm-titlerow">
           <div style="display:flex;align-items:center;gap:8px;">
             <b>Frog <span id="fmId">#—</span></b>
@@ -246,21 +229,35 @@
           <div id="fmLine" class="muted">—</div>
         </div>
 
+        <!-- Compact action grid (3 x 2) using site buttons -->
+        <div class="ffm-actions">
+          <button id="fmStakeBtn"    class="btn btn-solid btn-xs" data-no-modal>Stake</button>
+          <button id="fmUnstakeBtn"  class="btn btn-ghost btn-xs" data-no-modal>Unstake</button>
+          <button id="fmTransferBtn" class="btn btn-ghost btn-xs" data-no-modal>Transfer</button>
+
+          <a id="fmOpenSea"   class="btn btn-ghost btn-xs" target="_blank" rel="noopener">OpenSea</a>
+          <a id="fmEtherscan" class="btn btn-ghost btn-xs" target="_blank" rel="noopener">Etherscan</a>
+          <a id="fmMetaLink"  class="btn btn-ghost btn-xs" target="_blank" rel="noopener">Metadata</a>
+        </div>
+
+        <!-- Attributes (key–value list; same font/weight as rest) -->
         <div class="ffm-attrs">
-          <div class="section-title">Attributes</div>
+          <div class="section-title" style="font-size:13px;">Attributes</div>
           <ul id="fmAttrs" class="ffm-attrlist list-scroll"></ul>
         </div>
 
-        <!-- hidden-but-available extras for scripts -->
+        <!-- extras kept but visually hidden -->
         <div class="sr-only">
           <div>Owner: <span id="fmOwner">—</span></div>
           <div>Rarity: <span id="fmRarityLine">—</span></div>
           <div>Collection: <span id="fmCollection">—</span></div>
+          <a id="fmImageLink" href="#" target="_blank" rel="noopener">Original image</a>
         </div>
       </div>
     </section>
   </div>
 </div>
+
 
 </body>
 </html>
