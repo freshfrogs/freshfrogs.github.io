@@ -796,3 +796,67 @@ a.btn { display:inline-flex; align-items:center; justify-content:center; text-de
 .ffm-hero-wrap { display:flex; justify-content:center; }
 .ffm-hero { margin: 0 auto; } /* keep the 256×256 box centered */
 #fmHero canvas, #fmHero img { width:100%; height:100%; }
+/* ===== FreshFrogs tweaks (drop at end of styles.css) ===== */
+
+/* Tiny button size (used across site) */
+.btn-xs {
+  padding: .30rem .55rem;
+  font-size: .82rem;
+  line-height: 1;
+  border-radius: 8px;
+  font-weight: 700;
+}
+a.btn { display:inline-flex; align-items:center; justify-content:center; text-decoration:none; }
+
+/* Disabled state (grays out + blocks hover) */
+.btn:disabled,
+.btn[disabled] {
+  opacity: .55;
+  cursor: not-allowed;
+  filter: grayscale(.25);
+}
+
+/* Owned/Staked tabs – use accent green for the active one */
+#stakeTabs {
+  display: flex;
+  gap: 8px;
+  background: transparent;               /* keep the segmented look */
+  border: 0;
+  padding: 0;
+}
+#stakeTabs .tab[role="tab"] {
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: 10px;
+  padding: .42rem .70rem;
+  line-height: 1;
+  background: transparent;
+  color: var(--muted);
+  transition: background .15s, color .15s, border-color .15s;
+}
+#stakeTabs .tab[role="tab"][aria-selected="true"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+/* Ensure modal hero stays 256×256 (belt & suspenders with JS) */
+#fmHero {
+  width: 256px;
+  height: 256px;
+  min-width: 256px;
+  min-height: 256px;
+}
+#fmHero canvas,
+#fmHero img {
+  width: 256px !important;
+  height: 256px !important;
+  image-rendering: pixelated;
+}
+
+/* Make rows obviously clickable (Owned/Staked/Pond) */
+.list-item[data-token-id] { cursor: pointer; }
+#stakeTabs .tab[role="tab"]:hover:not([aria-selected="true"]) {
+  border-color: color-mix(in srgb, var(--accent) 65%, transparent);
+  color: color-mix(in srgb, var(--accent) 65%, var(--muted));
+}
