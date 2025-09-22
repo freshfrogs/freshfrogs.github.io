@@ -5,12 +5,12 @@
   if (!wrap || !ul) return;
 
   // ---------- config ----------
-  const API          = 'https://api.reservoir.tools/users/activity/v6';
-  const OWNERS_API   = 'https://api.reservoir.tools/owners/v2';
-  const TOKENS_API   = 'https://api.reservoir.tools/users'; // /{addr}/tokens/v8
-  const CONTROLLER   = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
-  const COLLECTION   = CFG.COLLECTION_ADDRESS || '';
-  const PAGE_SIZE    = 20; // reservoir max per call
+  const API            = 'https://api.reservoir.tools/users/activity/v6';
+  const OWNERS_API     = 'https://api.reservoir.tools/owners/v2';
+  const TOKENS_API     = 'https://api.reservoir.tools/users'; // /{addr}/tokens/v8
+  const CONTROLLER     = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
+  const COLLECTION     = CFG.COLLECTION_ADDRESS || '';
+  const PAGE_SIZE      = 20; // reservoir max per call
   const PREFETCH_PAGES = 3;
 
   function apiHeaders(){
@@ -273,19 +273,59 @@
         li.appendChild(left);
         renderFrog(left, r.id);
 
-        // Middle: text block
+        // Middle: title + subtitle + compact action buttons (same layout as Owned)
         const mid = mk('div');
-        mid.innerHTML =
-          `<div style="display:flex;align-items:center;gap:8px;">
-             <b>Frog #${r.id}</b> ${pillRank(rank)}
-           </div>
-           <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? shorten(r.staker) : '—'}</div>`;
+
+        const header = mk('div');
+        header.style.display = 'flex';
+        header.style.alignItems = 'center';
+        header.style.gap = '8px';
+        header.innerHTML = `<b>Frog #${r.id}</b> ${pillRank(rank)}`;
+        mid.appendChild(header);
+
+        const sub = mk('div', { className:'muted' });
+        sub.textContent = `Staked ${fmtAgo(r.since)} • Staker ${r.staker ? shorten(r.staker) : '—'}`;
+        mid.appendChild(sub);
+
+        // compact actions
+        const actions = mk('div', {}, {
+          marginTop:'6px', display:'flex', flexWrap:'wrap', gap:'6px'
+        });
+
+        // More info (modal) — include since + owner so modal shows "Staked X ago • Owned by ..."
+        const moreBtn = mk('button', {
+          className:'btn btn-ghost btn-xs',
+          textContent:'More info'
+        });
+        moreBtn.setAttribute('data-open-modal', '');
+        moreBtn.setAttribute('data-token-id', String(r.id));
+        moreBtn.setAttribute('data-owner', r.staker || '');
+        moreBtn.setAttribute('data-staked', 'true');
+        if (r.since) moreBtn.setAttribute('data-since', String(r.since.getTime()));
+        actions.appendChild(moreBtn);
+
+        // OpenSea
+        const os = mk('a', {
+          className:'btn btn-ghost btn-xs',
+          target:'_blank', rel:'noopener',
+          textContent:'OpenSea',
+          href:`https://opensea.io/assets/ethereum/${COLLECTION}/${r.id}`
+        });
+        actions.appendChild(os);
+
+        // Etherscan
+        const es = mk('a', {
+          className:'btn btn-ghost btn-xs',
+          target:'_blank', rel:'noopener',
+          textContent:'Etherscan',
+          href:`https://etherscan.io/token/${COLLECTION}?a=${r.id}`
+        });
+        actions.appendChild(es);
+
+        mid.appendChild(actions);
         li.appendChild(mid);
 
-        // Right: tag
-        const right = mk('div', { className:'price', textContent:'Staked' });
-        li.appendChild(right);
-
+        // No right-side tag (keeps cards compact like Owned)
         ul.appendChild(li);
       });
     }
