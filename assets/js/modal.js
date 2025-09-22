@@ -1,4 +1,4 @@
-// assets/js/modal.js — Layered render (256px), solid-color bg (no silhouette), open via [data-open-modal] or row click
+// assets/js/modal.js — Use buildFrog128, upscale to 256×256, open via [data-open-modal]
 (function (FF, CFG) {
   const onReady = (fn) =>
     (document.readyState !== 'loading') ? fn() : document.addEventListener('DOMContentLoaded', fn);
@@ -26,16 +26,14 @@
 
     const fmOpenSea = $('#fmOpenSea');
     const fmEtherscan = $('#fmEtherscan');
-    const fmMetaLink = $('#fmMetaLink');   // may be hidden/unused if you renamed it
-    const fmImageLink = $('#fmImageLink'); // "Original" link target
+    const fmMetaLink = $('#fmMetaLink');
+    const fmImageLink = $('#fmImageLink');
 
     let current = { id:null, owner:'', staked:false, open:false };
     const metaCache = new Map(); // id -> Promise(meta)
 
     // ---------------- helpers ----------------
     const shorten = (a)=> (FF?.shorten ? FF.shorten(a) : (a ? a.slice(0,6)+'…'+a.slice(-4) : '—'));
-    const flatPng = (id)=> `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
-    const metaUrl = (id)=> `${CFG.SOURCE_PATH || ''}/frog/json/${id}.json`;
 
     const setOpen = (v) => {
       current.open = !!v;
@@ -47,26 +45,15 @@
     function setLinks(id){
       const os = `https://opensea.io/assets/ethereum/${CFG.COLLECTION_ADDRESS}/${id}`;
       const es = `https://etherscan.io/token/${CFG.COLLECTION_ADDRESS}?a=${id}`;
-      fmOpenSea   && (fmOpenSea.href   = os);
+      fmOpenSea && (fmOpenSea.href = os);
       fmEtherscan && (fmEtherscan.href = es);
       const base = CFG.SOURCE_PATH || '';
       fmMetaLink  && (fmMetaLink.href  = `${base}/frog/json/${id}.json`);
-      // "Original" still image
       fmImageLink && (fmImageLink.href = `${base}/frog/${id}.png`);
     }
 
-    function enforceHeroSize(px=256){
-      if (!fmHero) return;
-      fmHero.style.width  = px+'px';
-      fmHero.style.height = px+'px';
-      fmHero.querySelectorAll('img,canvas').forEach(el=>{
-        el.style.width  = px+'px';
-        el.style.height = px+'px';
-      });
-    }
-
-    function waitForRenderer(timeoutMs=2500){
-      return new Promise((res, rej)=>{
+    function waitForRenderer(timeoutMs=3000){
+      return new Promise((res,rej)=>{
         const t0 = performance.now();
         (function tick(){
           if (typeof window.buildFrog128 === 'function') return res(true);
@@ -76,75 +63,56 @@
       });
     }
 
-    // Sample the flat PNG’s top-left pixel and set a SOLID background (no image),
-    // so the original frog silhouette can never "peek".
-    async function setSolidHeroBgFromFlat(id){
-      if (!fmHero) return;
-      const url = flatPng(id);
-      await new Promise((resolve)=>{
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = ()=>{
-          try{
-            const c = document.createElement('canvas');
-            c.width = 2; c.height = 2;
-            const ctx = c.getContext('2d', { willReadFrequently:true });
-            ctx.drawImage(img, 0, 0, 2, 2);
-            const d = ctx.getImageData(0,0,1,1).data;
-            fmHero.style.backgroundColor = `rgba(${d[0]},${d[1]},${d[2]},1)`;
-          } catch {
-            // neutral fallback
-            fmHero.style.backgroundColor = '#11151a';
-          }
-          // IMPORTANT: remove any background image to avoid silhouette leak
-          fmHero.style.backgroundImage = 'none';
-          fmHero.style.backgroundRepeat = 'no-repeat';
-          fmHero.style.backgroundSize = 'auto';
-          fmHero.style.backgroundPosition = '0 0';
-          resolve();
-        };
-        img.onerror = ()=>{
-          fmHero.style.backgroundColor = '#11151a';
-          fmHero.style.backgroundImage = 'none';
-          resolve();
-        };
-        img.src = url;
+    // Force children (layers/canvas) to 256×256 even though buildFrog128 used 128
+    function upscaleLayers(container, px=256){
+      // Ensure container itself is 256 square
+      Object.assign(container.style, {
+        width: px + 'px',
+        height: px + 'px',
+        minWidth: px + 'px',
+        minHeight: px + 'px'
+      });
+      // Resize any <img> or <canvas> the builder injected
+      container.querySelectorAll('img,canvas').forEach(el=>{
+        el.style.width  = px + 'px';
+        el.style.height = px + 'px';
+        // Keep them positioned
+        if (!el.style.position) el.style.position = 'absolute';
+        if (!el.style.left) el.style.left = '0';
+        if (!el.style.top)  el.style.top  = '0';
+        // crisp pixels
+        el.style.imageRendering = 'pixelated';
       });
     }
 
     async function drawFrog(id){
+      if (!fmHero) return;
       fmHero.innerHTML = '';
-      await setSolidHeroBgFromFlat(id); // set solid bg first
-      enforceHeroSize(256);
 
-      // Try layered
-      let layeredOk = false;
-      try {
-        await waitForRenderer().catch(()=>{});
-        if (typeof window.buildFrog128 === 'function'){
-          const maybe = window.buildFrog128(fmHero, id);
-          if (maybe?.then) await maybe.catch(()=>{});
-          layeredOk = !!fmHero.firstChild; // something got rendered
-        }
-      } catch {}
+      // Start with the flat PNG as bg so applyFrogBackground inside build can sample color quickly
+      const flatUrl = `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
+      fmHero.style.backgroundImage = `url("${flatUrl}")`;
+      fmHero.style.backgroundRepeat = 'no-repeat';
+      fmHero.style.backgroundSize   = '2400% 2400%';   // huge zoom to reduce silhouette
+      fmHero.style.backgroundPosition = '120% 120%';   // push it further off-corner
+      fmHero.style.imageRendering = 'pixelated';
 
-      // Fallback to flat 256 if layered failed
-      if (!layeredOk){
-        const img = new Image();
-        img.decoding = 'async';
-        img.loading  = 'lazy';
-        img.alt = `Frog #${id}`;
-        Object.assign(img.style, {
-          position:'absolute', inset:'0',
-          width:'256px', height:'256px',
-          imageRendering:'pixelated'
-        });
-        img.src = flatPng(id);
-        fmHero.appendChild(img);
+      // Wait for your renderer, then build @128 and immediately upscale to 256
+      try { await waitForRenderer(); } catch(e){ console.warn(e.message); }
+
+      if (typeof window.buildFrog128 === 'function') {
+        const maybe = window.buildFrog128(fmHero, id);
+        if (maybe?.then) { try { await maybe; } catch {} }
       }
 
-      // Ensure the final size and child sizing are correct
-      enforceHeroSize(256);
+      // Next frame: enforce 256×256 on all layers and hide the bg image (keep sampled bg color)
+      await new Promise(r => requestAnimationFrame(r));
+      try {
+        upscaleLayers(fmHero, 256);
+        // buildFrog128’s applyFrogBackground already set backgroundColor from the PNG.
+        // We keep that color, but remove the background image entirely to avoid any silhouette.
+        fmHero.style.backgroundImage = 'none';
+      } catch {}
     }
 
     function setRarity(id){
@@ -160,13 +128,14 @@
       const ownerText = isYou ? 'You' : (owner ? shorten(owner) : '—');
       fmLine && (fmLine.textContent = `${staked ? 'Staked' : 'Not staked'} • Owned by ${ownerText}`);
       fmOwner && (fmOwner.textContent = owner || '—');
-      fmStakeBtn && (fmStakeBtn.disabled   = !!staked);
+      fmStakeBtn && (fmStakeBtn.disabled = !!staked);
       fmUnstakeBtn && (fmUnstakeBtn.disabled = !staked);
     }
 
     async function getMeta(id){
       if (metaCache.has(id)) return metaCache.get(id);
-      const p = (FF?.fetchJSON ? FF.fetchJSON(metaUrl(id)) : fetch(metaUrl(id)).then(r=>r.json()))
+      const url = `${CFG.SOURCE_PATH || ''}/frog/json/${id}.json`;
+      const p = (FF?.fetchJSON ? FF.fetchJSON(url) : fetch(url).then(r=>r.json()))
         .catch(e => { console.warn('meta fetch failed', id, e); return null; });
       metaCache.set(id, p);
       return p;
@@ -198,9 +167,8 @@
       setRarity(id);
       setState(!!staked, owner || '');
 
-      setOpen(true);              // open immediately
-      enforceHeroSize(256);       // size the container first
-      drawFrog(id).catch(()=>{}); // render after open
+      setOpen(true);                 // open immediately
+      drawFrog(id).catch(()=>{});    // render layered @256 after open
       fillAttributes(id).catch(()=>{});
     }
 
@@ -236,19 +204,14 @@
     // expose
     window.FFModal = { openFrogModal };
 
-    // ---------- open modal from [data-open-modal] OR row click ----------
+    // ---------- open modal only from [data-open-modal] ----------
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-open-modal]');
-      const row = e.target.closest('.list-item[data-token-id]');
-      const el = btn || row;
-      if (!el) return;
+      if (!btn) return;
 
-      // Don’t trigger from links/buttons inside the row (unless it’s the explicit open control)
-      if (!btn && e.target.closest('a,button,[data-no-modal]')) return;
-
-      const id = Number(el.getAttribute('data-token-id'));
-      const owner = el.getAttribute('data-owner') || '';
-      const staked = el.getAttribute('data-staked') === 'true';
+      const id = Number(btn.getAttribute('data-token-id'));
+      const owner = btn.getAttribute('data-owner') || '';
+      const staked = btn.getAttribute('data-staked') === 'true';
 
       if (Number.isFinite(id)) {
         e.preventDefault();
@@ -256,16 +219,19 @@
       }
     });
 
-    // warmup (rarity + hint renderer)
+    // warmup (rarity + one render path)
     window.addEventListener('load', () => {
       try { FF?.ensureRarity && FF.ensureRarity(); } catch {}
-      // JIT the renderer once offscreen if available
+      // offscreen JIT of renderer
       const tmp = document.createElement('div');
       tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;';
       document.body.appendChild(tmp);
       if (typeof window.buildFrog128 === 'function') {
-        try { const m = window.buildFrog128(tmp, 1); if (m?.then) m.finally(()=>tmp.remove()); else tmp.remove(); }
-        catch { tmp.remove(); }
+        try {
+          const m = window.buildFrog128(tmp, 1);
+          if (m?.then) m.then(()=>tmp.remove(),()=>tmp.remove());
+          else tmp.remove();
+        } catch { tmp.remove(); }
       } else { tmp.remove(); }
     });
   });
