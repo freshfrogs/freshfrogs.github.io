@@ -33,6 +33,47 @@
     let current = { id:null, owner:'', staked:false, open:false };
     const metaCache = new Map();
 
+    // Wallet helper
+    function getConnectedAddr(){
+      return (
+        window.FF_WALLET?.address ||
+        FF?.wallet?.address ||
+        window.user_address ||
+        window.WALLET_ADDR ||
+        window.SELECTED_WALLET ||
+        null
+      );
+    }
+
+    // Enable/disable + style action buttons based on ownership / staking state
+    function updateButtons(){
+      if (!fmStakeBtn || !fmUnstakeBtn || !fmTransferBtn) return;
+
+      const addr = getConnectedAddr();
+      const isConnected = !!addr;
+      const isOwner = !!(addr && current.owner && addr.toLowerCase() === current.owner.toLowerCase());
+      const isStaked = !!current.staked;
+
+      // Base: disabled by default
+      const disableAll = () => {
+        fmStakeBtn.disabled   = true;
+        fmUnstakeBtn.disabled = true;
+        fmTransferBtn.disabled= true;
+      };
+
+      if (!isConnected || !isOwner) {
+        disableAll();      // not connected or not the owner: all grayed out
+        return;
+      }
+
+      // Owner connected:
+      // - If staked: only Unstake is active
+      // - If not staked: only Stake + Transfer are active
+      fmStakeBtn.disabled    = isStaked;       // Stake enabled only when NOT staked
+      fmUnstakeBtn.disabled  = !isStaked;      // Unstake enabled only when staked
+      fmTransferBtn.disabled = isStaked;       // Transfer disabled while staked
+    }
+
     // helpers
     const shorten = (a)=> (FF?.shorten ? FF.shorten(a) : (a ? a.slice(0,6)+'…'+a.slice(-4) : '—'));
     const setOpen = (v) => {
@@ -68,15 +109,35 @@
       if (fmRarityLine) fmRarityLine.textContent = (rank!=null) ? `#${rank} of ${CFG.SUPPLY || 4040}` : '—';
     }
 
-    function setState(staked, owner){
-      current.staked = !!staked; current.owner = owner || '';
-      const you = (FF?.wallet?.address) || window.FF_WALLET?.address || window.user_address || null;
-      const isYou = you && owner && you.toLowerCase() === owner.toLowerCase();
-      const ownerText = isYou ? 'You' : (owner ? shorten(owner) : '—');
-      if (fmLine) fmLine.textContent = `${staked ? 'Staked' : 'Not staked'} • Owned by ${ownerText}`;
+    function setState({ staked, owner, stakedSince }){
+      current.staked = !!staked;
+      current.owner = owner || '';
+      current.stakedSince = stakedSince || null;
+
+      const addr = getConnectedAddr();
+      const isYou = addr && owner && addr.toLowerCase() === owner.toLowerCase();
+      const ownerText = isYou ? 'You' : (owner ? (FF?.shorten ? FF.shorten(owner) : owner.slice(0,6)+'…'+owner.slice(-4)) : '—');
+
+      let line;
+      if (staked) {
+        if (stakedSince && !Number.isNaN(stakedSince)) {
+          const ago = (function(ms){
+            const s=Math.floor(ms/1000), m=Math.floor(s/60), h=Math.floor(m/60), d=Math.floor(h/24);
+            if (d>0) return `${d}d ago`; if (h>0) return `${h}h ago`; if (m>0) return `${m}m ago`; return `${s}s ago`;
+          })(Date.now() - stakedSince);
+          line = `Staked ${ago} • Owned by ${ownerText}`;
+        } else {
+          line = `Staked • Owned by ${ownerText}`;
+        }
+      } else {
+        line = `Not staked • Owned by ${ownerText}`;
+      }
+
+      if (fmLine) fmLine.textContent = line;
       if (fmOwner) fmOwner.textContent = owner || '—';
-      if (fmStakeBtn)   fmStakeBtn.disabled   = !!staked;
-      if (fmUnstakeBtn) fmUnstakeBtn.disabled = !staked;
+
+      // Button enable/disable logic
+      updateButtons();
     }
 
     // ---- 256×256 layered render using a scaled 128×128 stage ----
