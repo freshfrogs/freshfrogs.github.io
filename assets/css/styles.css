@@ -599,3 +599,53 @@ footer.site { border-top:1px solid var(--ring); padding:26px 0; color:var(--mute
   position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0, 0, 1px, 1px); white-space: nowrap; border: 0;
 }
+/* Normalize anchors as buttons */
+a.btn { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+
+/* Six-button grid under the art */
+.ffm-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* Ensure consistent button sizing with your site's tokens */
+.btn.btn-sm { padding: 8px 10px; border-radius: 10px; line-height: 1; }
+.btn.btn-solid.btn-sm { /* primary (Stake) keeps your green theme */ }
+
+/* ----- Attribute list: clean key–value table style ----- */
+.ffm-attrs .section-title { margin: 10px 0 6px; font-weight: 700; }
+
+#fmAttrs.ffm-attrlist {
+  display: block;                /* table-like, single column list */
+  max-height: 280px;
+  overflow: auto;                /* uses your list-scroll look */
+  border: 1px solid var(--edge);
+  border-radius: 10px;
+  background: var(--panelSoft);
+  padding: 6px 0;
+}
+
+/* Each row */
+#fmAttrs.ffm-attrlist li {
+  display: grid;
+  grid-template-columns: 1fr auto;  /* name left, value right */
+  gap: 12px;
+  padding: 8px 12px;
+  font-size: 13px;
+  align-items: center;
+}
+
+/* Divider between rows */
+#fmAttrs.ffm-attrlist li + li { border-top: 1px dashed var(--edge); }
+
+/* Typography to match the header area */
+#fmAttrs.ffm-attrlist .name {
+  font-weight: 600;              /* same emphasis as title line uses <b> */
+  opacity: .95;
+}
+#fmAttrs.ffm-attrlist .val  { opacity: .95; }
+
+/* Optional: align values a touch away from the right edge */
+#fmAttrs.ffm-attrlist .val { padding-right: 2px; }
