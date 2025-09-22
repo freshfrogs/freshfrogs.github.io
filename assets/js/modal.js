@@ -1,4 +1,4 @@
-// assets/js/modal.js — Layered render (buildFrog128), fast-open, open via [data-open-modal]
+// assets/js/modal.js — Layered render (buildFrog128), 256px, "Staked X ago", no "Attributes" header
 (function (FF, CFG) {
   const onReady = (fn) =>
     (document.readyState !== 'loading') ? fn() : document.addEventListener('DOMContentLoaded', fn);
@@ -10,14 +10,14 @@
     if (!modal) { console.warn('frogModal not found in DOM'); return; }
 
     // DOM refs
-    const fmId = $('#fmId');
-    const fmRankNum = $('#fmRankNum');
-    const fmLine = $('#fmLine');
-    const fmOwner = $('#fmOwner');
-    const fmRarityLine = $('#fmRarityLine');
-    const fmCollection = $('#fmCollection');
-    const fmAttrs = $('#fmAttrs');
-    const fmHero = $('#fmHero');
+    const fmId = $('#fmId');                // e.g., "#1234"
+    const fmRankNum = $('#fmRankNum');      // e.g., "#51"
+    const fmLine = $('#fmLine');            // "Not staked • Owned by …"
+    const fmOwner = $('#fmOwner');          // hidden
+    const fmRarityLine = $('#fmRarityLine');// hidden
+    const fmCollection = $('#fmCollection');// hidden
+    const fmAttrs = $('#fmAttrs');          // <ul> Attributes
+    const fmHero = $('#fmHero');            // layered art container
 
     const fmStakeBtn = $('#fmStakeBtn');
     const fmUnstakeBtn = $('#fmUnstakeBtn');
@@ -26,11 +26,14 @@
 
     const fmOpenSea = $('#fmOpenSea');
     const fmEtherscan = $('#fmEtherscan');
-    const fmMetaLink = $('#fmMetaLink');   // repurposed to "Original"
-    const fmImageLink = $('#fmImageLink'); // hidden backup
+    const fmMetaLink = $('#fmMetaLink');
+    const fmImageLink = $('#fmImageLink');
 
-    let current = { id:null, owner:'', staked:false, open:false, since:null };
-    const metaCache = new Map();
+    // Remove the "Attributes" heading if it exists (you wanted only the table)
+    $('.ffm-attrs .section-title')?.remove();
+
+    let current = { id:null, owner:'', staked:false, sinceMs:NaN, open:false };
+    const metaCache = new Map(); // id -> Promise(meta)
 
     // ---------------- helpers ----------------
     const shorten = (a)=> (FF?.shorten ? FF.shorten(a) : (a ? a.slice(0,6)+'…'+a.slice(-4) : '—'));
@@ -45,16 +48,11 @@
     function setLinks(id){
       const os = `https://opensea.io/assets/ethereum/${CFG.COLLECTION_ADDRESS}/${id}`;
       const es = `https://etherscan.io/token/${CFG.COLLECTION_ADDRESS}?a=${id}`;
-      if (fmOpenSea) fmOpenSea.href = os;
-      if (fmEtherscan) fmEtherscan.href = es;
-
+      fmOpenSea && (fmOpenSea.href = os);
+      fmEtherscan && (fmEtherscan.href = es);
       const base = CFG.SOURCE_PATH || '';
-      const imgUrl = `${base}/frog/${id}.png`;
-      if (fmMetaLink) { // repurpose to "Original"
-        fmMetaLink.textContent = 'Original';
-        fmMetaLink.href = imgUrl;
-      }
-      if (fmImageLink) fmImageLink.href = imgUrl;
+      fmMetaLink  && (fmMetaLink.href  = `${base}/frog/json/${id}.json`);
+      fmImageLink && (fmImageLink.href = `${base}/frog/${id}.png`);
     }
 
     function waitForRenderer(timeoutMs=3000){
@@ -68,10 +66,23 @@
       });
     }
 
+    // format "X ago"
+    function fmtAgo(ms){
+      if (!Number.isFinite(ms) || ms < 0) return '';
+      const s = Math.floor(ms/1000);
+      const m = Math.floor(s/60);
+      const h = Math.floor(m/60);
+      const d = Math.floor(h/24);
+      if (d > 0) return `${d}d ago`;
+      if (h > 0) return `${h}h ago`;
+      if (m > 0) return `${m}m ago`;
+      return `${s}s ago`;
+    }
+
     async function drawFrog(id){
+      // Layered + animation; keep flat PNG as background trick just for color
       fmHero.innerHTML = '';
 
-      // flat background hint
       const flatUrl = `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
       fmHero.style.backgroundImage = `url("${flatUrl}")`;
       fmHero.style.backgroundRepeat = 'no-repeat';
@@ -81,17 +92,22 @@
       try { await waitForRenderer(); } catch(e){ console.warn(e.message); }
 
       if (typeof window.buildFrog128 === 'function') {
-        // use 128 builder but display at 256 by styling
-        fmHero.style.setProperty('--frog-size', '256px');
         const maybe = window.buildFrog128(fmHero, id);
         if (maybe?.then) { try { await maybe; } catch {} }
-        // upscale the layers to 256
-        fmHero.querySelectorAll('img[data-attr]').forEach(img=>{
-          img.style.width = '256px';
-          img.style.height = '256px';
-        });
       }
 
+      // Force all layers to 256×256 in the modal
+      requestAnimationFrame(()=>{
+        fmHero.querySelectorAll('img,canvas').forEach(el=>{
+          el.style.width = '256px';
+          el.style.height = '256px';
+        });
+        fmHero.style.setProperty('--force-size','256px');
+        fmHero.style.minWidth = '256px';
+        fmHero.style.minHeight= '256px';
+      });
+
+      // After first frame, sample canvas top-left to set solid color
       await new Promise(r => requestAnimationFrame(r));
       try{
         const cv = fmHero.querySelector('canvas');
@@ -105,34 +121,30 @@
 
     function setRarity(id){
       const rank = FF?.getRankById ? FF.getRankById(id) : null;
-      if (fmRankNum) fmRankNum.textContent = (rank!=null) ? `#${rank}` : '—';
-      if (fmRarityLine) fmRarityLine.textContent = (rank!=null) ? `#${rank} of ${CFG.SUPPLY || 4040}` : '—';
+      fmRankNum && (fmRankNum.textContent = (rank!=null) ? `#${rank}` : '—');
+      fmRarityLine && (fmRarityLine.textContent = (rank!=null) ? `#${rank} of ${CFG.SUPPLY || 4040}` : '—');
     }
 
-    function fmtAgoMs(ms){
-      const s=Math.floor(ms/1000), m=Math.floor(s/60), h=Math.floor(m/60), d=Math.floor(h/24);
-      if (d>0) return `${d}d ago`; if (h>0) return `${h}h ago`; if (m>0) return `${m}m ago`; return `${s}s ago`;
-    }
+    function setState(staked, owner, sinceMs){
+      current.staked = !!staked;
+      current.owner  = owner || '';
+      current.sinceMs= Number.isFinite(sinceMs) ? sinceMs : NaN;
 
-    function setState(staked, owner){
-      current.staked = !!staked; current.owner = owner || '';
-      const you = (FF?.wallet?.address) || window.FF_WALLET?.address || window.user_address || null;
+      const you = (FF?.wallet?.address) || window.FF_WALLET?.address || window.WALLET_ADDR || null;
       const isYou = you && owner && you.toLowerCase() === owner.toLowerCase();
       const ownerText = isYou ? 'You' : (owner ? shorten(owner) : '—');
 
-      const stakedPart = current.since ? `Staked ${fmtAgoMs(Date.now() - current.since)}`
-                                       : (staked ? 'Staked' : 'Not staked');
-      if (fmLine) fmLine.textContent = `${staked ? stakedPart : 'Not staked'} • Owned by ${ownerText}`;
-      if (fmOwner) fmOwner.textContent = owner || '—';
-
-      // Primary action color swap: Stake green when not staked, Unstake green when staked
-      if (fmStakeBtn && fmUnstakeBtn){
-        fmStakeBtn.disabled = !!staked;
-        fmUnstakeBtn.disabled = !staked;
-
-        fmStakeBtn.classList.toggle('btn-solid', !staked);
-        fmUnstakeBtn.classList.toggle('btn-solid', !!staked);
+      let left = staked ? 'Staked' : 'Not staked';
+      if (staked && Number.isFinite(current.sinceMs)) {
+        const ago = fmtAgo(Date.now() - current.sinceMs);
+        if (ago) left = `Staked ${ago}`;
       }
+
+      fmLine && (fmLine.textContent = `${left} • Owned by ${ownerText}`);
+      fmOwner && (fmOwner.textContent = owner || '—');
+
+      fmStakeBtn && (fmStakeBtn.disabled = !!staked);
+      fmUnstakeBtn && (fmUnstakeBtn.disabled = !staked);
     }
 
     async function getMeta(id){
@@ -161,15 +173,14 @@
     }
 
     // ------------- public open (instant) -------------
-    async function openFrogModal({ id, owner, staked, since }) {
-      current.id = id; current.owner = owner || '';
-      current.since = (typeof since === 'number' && Number.isFinite(since)) ? since : null;
+    async function openFrogModal({ id, owner, staked, sinceMs }) {
+      current.id = id;
 
-      if (fmId)         fmId.textContent = `#${id}`;
-      if (fmCollection) fmCollection.textContent = shorten(CFG.COLLECTION_ADDRESS);
+      fmId && (fmId.textContent = `#${id}`);
+      fmCollection && (fmCollection.textContent = shorten(CFG.COLLECTION_ADDRESS));
       setLinks(id);
       setRarity(id);
-      setState(!!staked, owner || '');
+      setState(!!staked, owner || '', sinceMs);
 
       setOpen(true);                 // open immediately
       drawFrog(id).catch(()=>{});    // layered render after open
@@ -208,7 +219,7 @@
     // expose
     window.FFModal = { openFrogModal };
 
-    // open modal only from [data-open-modal]
+    // ---------- open modal only from [data-open-modal] ----------
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-open-modal]');
       if (!btn) return;
@@ -217,17 +228,25 @@
       const owner = btn.getAttribute('data-owner') || '';
       const staked = btn.getAttribute('data-staked') === 'true';
       const sinceAttr = btn.getAttribute('data-since');
-      const since = sinceAttr ? Number(sinceAttr) : null;
+      const sinceMs = sinceAttr ? Number(sinceAttr) : NaN;
 
       if (Number.isFinite(id)) {
         e.preventDefault();
-        window.FFModal?.openFrogModal({ id, owner, staked, since });
+        window.FFModal?.openFrogModal({ id, owner, staked, sinceMs });
       }
     });
 
-    // warmup
+    // warmup (rarity + one render path)
     window.addEventListener('load', () => {
       try { FF?.ensureRarity && FF.ensureRarity(); } catch {}
+      // hint the renderer to JIT once offscreen
+      const tmp = document.createElement('div');
+      tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;';
+      document.body.appendChild(tmp);
+      if (typeof window.buildFrog128 === 'function') {
+        try { const m = window.buildFrog128(tmp, 1); if (m?.then) m.then(()=>tmp.remove(),()=>tmp.remove()); else tmp.remove(); }
+        catch { tmp.remove(); }
+      } else { tmp.remove(); }
     });
   });
 })(window.FF || (window.FF = {}), window.FF_CFG || {});
