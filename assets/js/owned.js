@@ -165,7 +165,7 @@
     tabStaked?.setAttribute('aria-selected', owned ? 'false' : 'true');
   }
 
-  // owned.js — drop-in replacement
+  // ------- Card builder (LAYERED + 3 actions) -------
   function liCard(id, subtitle, ownerAddr, isStaked = false){
     const li = document.createElement('li');
     li.className = 'list-item';
@@ -176,27 +176,22 @@
     li.setAttribute('data-staked', isStaked ? 'true' : 'false');
     if (ownerAddr) li.setAttribute('data-owner', ownerAddr);
 
-    // LEFT: 128×128 flat PNG
+    // LEFT: 128×128 layered render
     const left = document.createElement('div');
-    Object.assign(left.style, { width:'128px',height:'128px',minWidth:'128px',minHeight:'128px' });
+    Object.assign(left.style, { width:'128px', height:'128px', minWidth:'128px', minHeight:'128px' });
     li.appendChild(left);
-    if (window.FF?.renderFlatFrog) {
-      FF.renderFlatFrog(left, id, 128);
-    } else {
-      const img = new Image();
-      img.className = 'thumb128';
-      img.src = `${(window.FF_CFG?.SOURCE_PATH || '')}/frog/${id}.png`;
-      left.appendChild(img);
+    if (typeof window.buildFrog128 === 'function') {
+      window.buildFrog128(left, id);
     }
 
     // MID: title + subtitle
-    const rank = (window.RANKS && (String(id) in RANKS)) ? RANKS[String(id)] : null;
+    const rank = (RANKS && (String(id) in RANKS)) ? RANKS[String(id)] : null;
     const mid = document.createElement('div');
     mid.innerHTML =
       `<div style="display:flex;align-items:center;gap:8px;">
-        <b>Frog #${id}</b> ${pillRank(rank)}
-      </div>
-      <div class="muted">${subtitle || ''}</div>`;
+         <b>Frog #${id}</b> ${pillRank(rank)}
+       </div>
+       <div class="muted">${subtitle || ''}</div>`;
     li.appendChild(mid);
 
     // RIGHT: actions
@@ -209,9 +204,9 @@
               data-owner="${ownerAddr || ''}"
               data-staked="${isStaked ? 'true' : 'false'}">More info</button>
       <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener"
-        href="https://opensea.io/assets/ethereum/${FF_CFG.COLLECTION_ADDRESS}/${id}">OpenSea</a>
+         href="https://opensea.io/assets/ethereum/${COLLECTION}/${id}">OpenSea</a>
       <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener"
-        href="https://etherscan.io/token/${FF_CFG.COLLECTION_ADDRESS}?a=${id}">Etherscan</a>
+         href="https://etherscan.io/token/${COLLECTION}?a=${id}">Etherscan</a>
     `;
     li.appendChild(act);
 
@@ -292,7 +287,7 @@
     clearList();
     const ids = ST.cache.ownedIds || [];
     if (!ids.length){ setStatus('No owned frogs in this wallet for this collection.'); return; }
-    ids.forEach(id=> ul.appendChild(liCard(id, 'Not staked • Owned by You')));
+    ids.forEach(id=> ul.appendChild(liCard(id, 'Not staked • Owned by You', ST.addr, false)));
     setStatus(`Showing ${ids.length.toLocaleString()} owned frog(s).`);
   }
   function renderStakedFromCache(){
@@ -301,7 +296,7 @@
     if (!rows.length){ setStatus('No frogs from this wallet are currently staked.'); return; }
     rows.forEach(r=>{
       const info = r.since ? `Staked ${fmtAgoMs(Date.now()-r.since.getTime())} • Owned by You` : 'Staked • Owned by You';
-      ul.appendChild(liCard(r.id, info));
+      ul.appendChild(liCard(r.id, info, ST.addr, true));
     });
     setStatus(`Showing ${rows.length} staked frog(s).`);
   }
