@@ -795,3 +795,4 @@ a.btn { display:inline-flex; align-items:center; justify-content:center; text-de
 .ffm-grid.ffm-onecol { display:grid; grid-template-columns: 1fr; gap: 12px; }
 .ffm-hero-wrap { display:flex; justify-content:center; }
 .ffm-hero { margin: 0 auto; } /* keep the 256×256 box centered */
+#fmHero canvas, #fmHero img { width:100%; height:100%; }
