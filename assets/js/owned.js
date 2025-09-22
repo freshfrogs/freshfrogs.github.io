@@ -250,23 +250,37 @@
   }
 
   async function refresh(which=ST.mode){
-    if (!ST.connected || !ST.addr){
-      clearList();
-      setStatus('Connect your wallet to view Owned & Staked.');
-      return;
-    }
+    if (!ST.connected || !ST.addr){ clearList(); setStatus('Connect your wallet to view Owned & Staked.'); return; }
     if (!RANKS) await loadRanks();
-
-    // one-time preload (then switch is instant)
-    if (ST.cache.ownedIds===null || ST.cache.stakedRows===null){
-      await preloadBoth();
-    }
 
     ST.mode = which;
     setActiveTab(which);
 
-    if (which==='owned') renderOwnedFromCache();
-    else renderStakedFromCache();
+    // If we don't have Owned yet, fetch its first page and render ASAP
+    if (ST.cache.ownedIds === null){
+      setStatus('Loading your frogs…');
+      // fetch first page fast
+      try {
+        ST.cache.ownedIds = await fetchOwnedIds(ST.addr); // consider a firstPage variant
+      } catch { ST.cache.ownedIds = []; }
+    }
+
+    if (which === 'owned') {
+      renderOwnedFromCache();
+      setStatus(`Showing ${ (ST.cache.ownedIds||[]).length.toLocaleString() } owned frog(s).`);
+    } else {
+      // kick off staked fetch in background if empty
+      if (ST.cache.stakedRows === null){
+        setStatus('Finding staked frogs…');
+        (async ()=>{
+          try { ST.cache.stakedRows = await fetchStakedRows(ST.addr); }
+          catch { ST.cache.stakedRows = []; }
+          if (ST.mode === 'staked') renderStakedFromCache();
+        })();
+      } else {
+        renderStakedFromCache();
+      }
+    }
   }
 
   // ------- events -------
