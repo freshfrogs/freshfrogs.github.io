@@ -1,16 +1,16 @@
 // assets/js/pond.js
-(function(FF, CFG){
+(function (FF, CFG) {
   const wrap = document.getElementById('pondListWrap');
   const ul   = document.getElementById('pondList');
   if (!wrap || !ul) return;
 
   // ---------- config ----------
-  const API = 'https://api.reservoir.tools/users/activity/v6';
-  const OWNERS_API = 'https://api.reservoir.tools/owners/v2';
-  const TOKENS_API = 'https://api.reservoir.tools/users'; // /{addr}/tokens/v8
-  const CONTROLLER = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
-  const COLLECTION = CFG.COLLECTION_ADDRESS || '';
-  const PAGE_SIZE  = 20; // reservoir max per call
+  const API          = 'https://api.reservoir.tools/users/activity/v6';
+  const OWNERS_API   = 'https://api.reservoir.tools/owners/v2';
+  const TOKENS_API   = 'https://api.reservoir.tools/users'; // /{addr}/tokens/v8
+  const CONTROLLER   = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
+  const COLLECTION   = CFG.COLLECTION_ADDRESS || '';
+  const PAGE_SIZE    = 20; // reservoir max per call
   const PREFETCH_PAGES = 3;
 
   function apiHeaders(){
@@ -21,7 +21,7 @@
   const shorten = (s)=> (FF && FF.shorten) ? FF.shorten(s) :
     (s ? (s.slice(0,6)+'…'+s.slice(-4)) : '—');
 
-  // ---------- resilient fetch (timeout + retries + 429 handling) ----------
+  // ---------- resilient fetch ----------
   async function reservoirFetch(url, opts={}, retries=3, timeoutMs=9000){
     for (let i=0; i<=retries; i++){
       const ctrl = new AbortController();
@@ -88,17 +88,17 @@
   }
 
   // We fetch pages newest->older, but DISPLAY oldest->newest.
-  const storeIdxFromDisplay = (dispIdx)=> (ST.pages.length - 1 - dispIdx);
-  const displayIdxFromStore = (storeIdx)=> (ST.pages.length - 1 - storeIdx);
+  const storeIdxFromDisplay  = (dispIdx)=> (ST.pages.length - 1 - dispIdx);
+  const displayIdxFromStore  = (storeIdx)=> (ST.pages.length - 1 - storeIdx);
 
-  // ---------- PAGER (restored: [1] [2] [3] …) ----------
+  // ---------- PAGER ([1] [2] [3] …) ----------
   function renderPager(){
     const nav = ensurePager();
     nav.innerHTML = '';
 
-    // show numbered buttons for all fetched pages (oldest -> newest)
+    // numbered buttons (oldest -> newest)
     for (let disp=0; disp<ST.pages.length; disp++){
-      const sIdx = storeIdxFromDisplay(disp); // convert to internal index
+      const sIdx = storeIdxFromDisplay(disp);
       const btn = document.createElement('button');
       btn.className = 'btn btn-ghost btn-sm';
       btn.textContent = String(disp + 1);
@@ -115,7 +115,7 @@
       nav.appendChild(btn);
     }
 
-    // trailing ellipsis (…) to fetch the next page if continuation exists
+    // trailing ellipsis
     if (ST.nextContinuation){
       const moreBtn = document.createElement('button');
       moreBtn.className = 'btn btn-ghost btn-sm';
@@ -125,161 +125,47 @@
       moreBtn.addEventListener('click', async ()=>{
         const ok = await fetchNextPage();
         if (ok){
-          // jump to the oldest newly added page (end of display list)
-          ST.page = ST.pages.length - 1;
+          ST.page = ST.pages.length - 1; // jump to oldest newly added
           renderPage();
-          renderStatsBar?.(); // keeps "Last Update" fresh if present
+          renderStatsBar?.();
         }
       });
       nav.appendChild(moreBtn);
     }
   }
 
-  // ---------- background helper (uses flat PNG; sets bg image + sampled color) ----------
-  function pickBestBgUrl(id){
-    const local = `frog/${id}.png`;
-    const leading = `/frog/${id}.png`;
-    const cfg = (CFG.SOURCE_PATH ? `${CFG.SOURCE_PATH}/frog/${id}.png` : local);
-    return [local, leading, cfg];
-  }
-
-  async function applyFrogBackground(container, tokenId){
-    // style that hides the frog body by showing bottom-right corner of the flat PNG
-    Object.assign(container.style, {
-      backgroundRepeat: 'no-repeat',
-      backgroundSize: '2000% 2000%',   // huge zoom
-      backgroundPosition: '100% 100%', // bottom-right
-      imageRendering: 'pixelated'
-    });
-
-    const urls = pickBestBgUrl(tokenId);
-    for (const url of urls){
-      const ok = await new Promise(resolve=>{
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = ()=>{
-          // sample top-left pixel to set backgroundColor (extra safety)
-          try{
-            const c = document.createElement('canvas');
-            c.width = 2; c.height = 2;
-            const ctx = c.getContext('2d');
-            ctx.drawImage(img, 0, 0, 2, 2);
-            const d = ctx.getImageData(0,0,1,1).data;
-            container.style.backgroundColor = `rgba(${d[0]},${d[1]},${d[2]},${(d[3]||255)/255})`;
-          }catch{}
-          container.style.backgroundImage = `url('${url}')`;
-          resolve(true);
-        };
-        img.onerror = ()=>resolve(false);
-        img.src = url;
-      });
-      if (ok) return true;
-    }
-    // final fallback: neutral dark if all paths failed
-    container.style.backgroundColor = '#151a1e';
-    container.style.backgroundImage = 'none';
-    return false;
-  }
-
-  // ---------- frog renderer (128x128 layered, bg trick, hover lift) ----------
-  const NO_ANIM_FOR = new Set(['Hat','Frog','Trait']);
-  const NO_LIFT_FOR = new Set(['Frog','Trait','SpecialFrog']);
-
+  // ---------- tiny helpers ----------
   function mk(tag, props={}, style={}) {
     const el = document.createElement(tag);
     Object.assign(el, props);
     Object.assign(el.style, style);
     return el;
   }
-  function safe(part){ return encodeURIComponent(part); }
 
-  function makeLayerImg(attr, value, sizePx){
-    const allowAnim = !NO_ANIM_FOR.has(attr);
-    const base = `/frog/build_files/${safe(attr)}`;
-    const png  = `${base}/${safe(value)}.png`;
-    const gif  = `${base}/animations/${safe(value)}_animation.gif`;
-
+  function flatFrog(leftEl, id){
     const img = new Image();
     img.decoding = 'async';
-    img.loading = 'lazy';
-    img.dataset.attr = attr;
-    Object.assign(img.style, {
-      position:'absolute', left:'0', top:'0',
-      width:`${sizePx}px`, height:`${sizePx}px`,
-      imageRendering:'pixelated', zIndex:'2',
-      transition:'transform 280ms cubic-bezier(.22,.61,.36,1)'
-    });
-
-    if (allowAnim){
-      img.src = gif;
-      img.onerror = ()=>{ img.onerror = null; img.src = png; };
-    } else {
-      img.src = png;
-    }
-
-    if (!NO_LIFT_FOR.has(attr)){
-      img.addEventListener('mouseenter', ()=>{
-        img.style.transform = 'translate(-8px, -12px)'; // a bit more lift + left
-        img.style.filter = 'drop-shadow(0 5px 0 rgba(0,0,0,.45))';
-      });
-      img.addEventListener('mouseleave', ()=>{
-        img.style.transform = 'translate(0, 0)';
-        img.style.filter = 'none';
-      });
-    }
-
-    return img;
+    img.loading  = 'lazy';
+    img.className = 'thumb128';
+    img.src = `${(CFG.SOURCE_PATH || '')}/frog/${id}.png`;
+    leftEl.appendChild(img);
   }
 
-  async function buildFrog128(container, tokenId){
-    const SIZE = 128;
-
-    Object.assign(container.style, {
-      width: `${SIZE}px`,
-      height: `${SIZE}px`,
-      minWidth: `${SIZE}px`,
-      minHeight: `${SIZE}px`,
-      position: 'relative',
-      overflow: 'hidden',
-      borderRadius: '8px',
-      imageRendering: 'pixelated'
-    });
-
-    // Apply the background (flat PNG zoom trick + sampled color)
-    await applyFrogBackground(container, tokenId);
-
-    // Layered build from metadata
-    const metaUrl = `frog/json/${tokenId}.json`;
-    let meta;
-    try {
-      meta = await (FF?.fetchJSON ? FF.fetchJSON(metaUrl) : fetch(metaUrl).then(r=>r.json()));
-    } catch {
-      const [url] = pickBestBgUrl(tokenId);
-      const flat = new Image();
-      flat.decoding = 'async';
-      flat.loading  = 'lazy';
-      Object.assign(flat.style, {
-        position:'absolute', inset:'0', width:`${SIZE}px`, height:`${SIZE}px`,
-        imageRendering:'pixelated', zIndex:'2'
-      });
-      flat.src = url;
-      flat.onerror = ()=>{ /* ignore; bg color already applied */ };
-      container.appendChild(flat);
-      return;
+  function renderFrog(leftEl, id){
+    // Prefer the global layered renderer; fall back to flat PNG.
+    if (typeof window.buildFrog128 === 'function'){
+      try {
+        const r = window.buildFrog128(leftEl, id);
+        if (r && typeof r.then === 'function') {
+          r.catch(()=>{ if (!leftEl.firstChild) flatFrog(leftEl, id); });
+        }
+        return;
+      } catch {
+        // fall through to flat
+      }
     }
-
-    const attrs = Array.isArray(meta?.attributes) ? meta.attributes : [];
-    for (const rec of attrs){
-      const attr = String(rec.trait_type || rec.traitType || '').trim();
-      const val  = String(rec.value).trim();
-      if (!attr || !val) continue;
-      const layer = makeLayerImg(attr, val, SIZE);
-      container.appendChild(layer);
-    }
+    flatFrog(leftEl, id);
   }
-
-  // Expose for modal/owned.js to reuse if needed
-  window.buildFrog128 = window.buildFrog128 || buildFrog128;
 
   // ---------- activity selection ----------
   function selectCurrentlyStakedFromActivities(activities){
@@ -352,7 +238,6 @@
     }
   }
 
-  // ---------- unified page renderer (with action buttons) ----------
   function renderPage(){
     ul.innerHTML = '';
 
@@ -365,10 +250,10 @@
       return;
     }
 
-    const dispIdx = displayIdxFromStore(ST.page);
+    const dispIdx  = displayIdxFromStore(ST.page);
     const storeIdx = storeIdxFromDisplay(dispIdx);
-    const page = ST.pages[storeIdx];
-    const rows = page?.rows || [];
+    const page     = ST.pages[storeIdx];
+    const rows     = page?.rows || [];
 
     if (!rows.length){
       const li = document.createElement('li');
@@ -380,42 +265,26 @@
         const rank = RANKS?.[String(r.id)] ?? null;
 
         const li = mk('li', { className:'list-item' });
-        // data attrs for modal / actions
-        li.setAttribute('data-token-id', r.id);
-        li.setAttribute('data-src', 'pond');
-        li.setAttribute('data-staked', 'true');
-        if (r.staker) li.setAttribute('data-owner', r.staker);
 
-        // Left: layered 128x128 with bg trick
+        // Left: 128×128 (layered if available)
         const left = mk('div', {}, {
           width:'128px', height:'128px', minWidth:'128px', minHeight:'128px'
         });
         li.appendChild(left);
-        buildFrog128(left, r.id);
+        renderFrog(left, r.id);
 
         // Middle: text block
         const mid = mk('div');
         mid.innerHTML =
           `<div style="display:flex;align-items:center;gap:8px;">
-            <b>Frog #${r.id}</b> ${pillRank(rank)}
-          </div>
-          <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? shorten(r.staker) : '—'}</div>`;
+             <b>Frog #${r.id}</b> ${pillRank(rank)}
+           </div>
+           <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? shorten(r.staker) : '—'}</div>`;
         li.appendChild(mid);
 
-        // Right: three inline actions (style matches your buttons)
-        const actions = mk('div', { className:'card-actions' });
-        actions.innerHTML = `
-          <button class="btn btn-ghost btn-sm"
-                  data-open-modal
-                  data-token-id="${r.id}"
-                  data-owner="${r.staker || ''}"
-                  data-staked="true">More info</button>
-          <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener"
-             href="https://opensea.io/assets/ethereum/${COLLECTION}/${r.id}">OpenSea</a>
-          <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener"
-             href="https://etherscan.io/token/${COLLECTION}?a=${r.id}">Etherscan</a>
-        `;
-        li.appendChild(actions);
+        // Right: tag
+        const right = mk('div', { className:'price', textContent:'Staked' });
+        li.appendChild(right);
 
         ul.appendChild(li);
       });
@@ -522,7 +391,7 @@
         return;
       }
 
-      // ranks (optional)
+      // ranks (optional but nice)
       try { RANKS = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json'); }
       catch { RANKS = {}; }
 

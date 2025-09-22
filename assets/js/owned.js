@@ -148,6 +148,10 @@
     }
   }
 
+  // make the layered renderer available to modal.js and pond.js
+  window.buildFrog128 = window.buildFrog128 || buildFrog128;
+
+
   // ------- state (with caching) -------
   const ST = {
     addr:null,
