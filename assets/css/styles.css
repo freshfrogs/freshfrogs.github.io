@@ -347,20 +347,30 @@ footer.site { border-top:1px solid var(--ring); padding:26px 0; color:var(--mute
 .hero-layer[data-raise]:hover{
   transform: translateY(-8px);
 }
-/* Owned/Staked toggle: simpler segmented look (hide old slider) */
-#stakeTabs .tab-indicator { display: none; }
-#stakeTabs { gap: 8px; }
-#stakeTabs .tab[role="tab"] {
-  border: 1px solid var(--border, rgba(255,255,255,0.1));
-  border-radius: 10px;
-  padding: .35rem .7rem;
-  line-height: 1;
-  background: transparent;
+/* Owned/Staked segmented tabs — green selected */
+#stakeTabs { 
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  background: var(--panel-2); border: 1px solid var(--ring);
+  border-radius: var(--radius-pill); padding: 4px;
 }
-#stakeTabs .tab[role="tab"][aria-selected="true"] {
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(255,255,255,0.25);
+#stakeTabs .tab[role="tab"]{
+  appearance: none; border: 1px solid var(--ring);
+  border-radius: var(--radius-pill);
+  background: transparent; color: var(--muted);
+  padding: .45rem .9rem; font-weight: 800; cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
 }
+#stakeTabs .tab[role="tab"]:hover{
+  border-color: color-mix(in srgb, var(--ink) 18%, transparent);
+  color: var(--ink);
+}
+#stakeTabs .tab[role="tab"][aria-selected="true"]{
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+#stakeTabs .tab-indicator { display: none; } /* keep indicator hidden for segmented look */
+
 /* Modal */
 .modal { position: fixed; inset: 0; display: none; z-index: 50; }
 .modal.open { display: block; }

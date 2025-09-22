@@ -10,7 +10,7 @@
   const TOKENS_API     = 'https://api.reservoir.tools/users'; // /{addr}/tokens/v8
   const CONTROLLER     = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
   const COLLECTION     = CFG.COLLECTION_ADDRESS || '';
-  const PAGE_SIZE      = 20; // reservoir max per call
+  const PAGE_SIZE      = 20;
   const PREFETCH_PAGES = 3;
 
   function apiHeaders(){
@@ -167,6 +167,19 @@
     flatFrog(leftEl, id);
   }
 
+  // Owner label: "You" if matches connected wallet, else shortened address
+  function ownerLabel(addr){
+    if (!addr) return '—';
+    const you =
+      (FF && FF.wallet && FF.wallet.address) ||
+      (window.FF_WALLET && window.FF_WALLET.address) ||
+      window.user_address ||
+      null;
+    return (you && addr.toLowerCase() === String(you).toLowerCase())
+      ? 'You'
+      : shorten(addr);
+  }
+
   // ---------- activity selection ----------
   function selectCurrentlyStakedFromActivities(activities){
     const seenThisPage = new Set();
@@ -273,7 +286,7 @@
         li.appendChild(left);
         renderFrog(left, r.id);
 
-        // Middle: title + subtitle + compact action buttons (same layout as Owned)
+        // Middle: title + subtitle + compact actions (same layout as Owned)
         const mid = mk('div');
 
         const header = mk('div');
@@ -284,7 +297,7 @@
         mid.appendChild(header);
 
         const sub = mk('div', { className:'muted' });
-        sub.textContent = `Staked ${fmtAgo(r.since)} • Staker ${r.staker ? shorten(r.staker) : '—'}`;
+        sub.textContent = `Staked ${fmtAgo(r.since)} • Owned by ${ownerLabel(r.staker)}`;
         mid.appendChild(sub);
 
         // compact actions
