@@ -168,7 +168,8 @@
   }
 
   // ------- Card builder (LAYERED + compact actions under subtitle) -------
-  function liCard(id, subtitle, ownerAddr, isStaked = false){
+  // NEW: sinceMs param so we can put data-since on the "More info" button for staked frogs
+  function liCard(id, subtitle, ownerAddr, isStaked = false, sinceMs = NaN){
     const li = document.createElement('li');
     li.className = 'list-item';
 
@@ -186,7 +187,7 @@
       window.buildFrog128(left, id);
     }
 
-    // MID: title + subtitle + small action buttons (same row)
+    // MID: title + subtitle + small action buttons (same column)
     const rank = (RANKS && (String(id) in RANKS)) ? RANKS[String(id)] : null;
     const mid = document.createElement('div');
 
@@ -206,7 +207,6 @@
 
     // compact actions directly under subtitle
     const actions = document.createElement('div');
-    actions.className = 'mini-actions'; // optional; CSS can target this
     actions.style.marginTop = '6px';
     actions.style.display = 'flex';
     actions.style.flexWrap = 'wrap';
@@ -220,6 +220,10 @@
     moreBtn.setAttribute('data-token-id', String(id));
     moreBtn.setAttribute('data-owner', ownerAddr || '');
     moreBtn.setAttribute('data-staked', isStaked ? 'true' : 'false');
+    // NEW: pass since epoch (ms) if staked so modal can show "Staked X ago"
+    if (isStaked && Number.isFinite(sinceMs)) {
+      moreBtn.setAttribute('data-since', String(sinceMs));
+    }
     actions.appendChild(moreBtn);
 
     // OpenSea
@@ -328,7 +332,8 @@
     if (!rows.length){ setStatus('No frogs from this wallet are currently staked.'); return; }
     rows.forEach(r=>{
       const info = r.since ? `Staked ${fmtAgoMs(Date.now()-r.since.getTime())} • Owned by You` : 'Staked • Owned by You';
-      ul.appendChild(liCard(r.id, info, ST.addr, true));
+      // pass sinceMs so modal can compute "X ago" correctly from the button dataset
+      ul.appendChild(liCard(r.id, info, ST.addr, true, r.since ? r.since.getTime() : NaN));
     });
     setStatus(`Showing ${rows.length} staked frog(s).`);
   }
