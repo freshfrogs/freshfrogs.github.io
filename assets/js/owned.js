@@ -1,4 +1,4 @@
-// assets/js/owned.js — Flat 64px thumbnails, click-anywhere rows open modal, fast fetch & cache
+// assets/js/owned.js
 (function(CFG){
   const API_USERS = 'https://api.reservoir.tools/users';
   const ACTIVITY  = 'https://api.reservoir.tools/users/activity/v6';
@@ -17,7 +17,7 @@
     if (!CFG.FROG_API_KEY) throw new Error('Missing FROG_API_KEY in config.js');
     return { accept: '*/*', 'x-api-key': CFG.FROG_API_KEY };
   }
-  async function reservoirFetch(url, opts={}, retries=3, timeoutMs=9000){
+  async function reservoirFetch(url, opts={}, retries=2, timeoutMs=8000){
     for (let i=0; i<=retries; i++){
       const ctrl = new AbortController();
       const t = setTimeout(()=>ctrl.abort(new DOMException('Timeout')), timeoutMs);
@@ -30,14 +30,14 @@
           continue;
         }
         if (!res.ok){
-          if (i < retries){ await new Promise(r=>setTimeout(r, 300*(i+1))); continue; }
+          if (i < retries){ await new Promise(r=>setTimeout(r, 250*(i+1))); continue; }
           throw new Error(`HTTP ${res.status}`);
         }
         return await res.json();
       }catch(e){
         clearTimeout(t);
         if (i === retries) throw e;
-        await new Promise(r=>setTimeout(r, 350*(i+1)));
+        await new Promise(r=>setTimeout(r, 300*(i+1)));
       }
     }
   }
@@ -56,12 +56,83 @@
     ? `<span class="pill">Rank <b>#${rank}</b></span>`
     : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
 
+  // ------- 64px flat thumbnails for lists (fast) -------
+  function flatThumb64(container, id){
+    const img = new Image();
+    img.decoding='async'; img.loading='lazy';
+    img.width=64; img.height=64;
+    img.className='thumb64';
+    img.src = `${(window.FF_CFG?.SOURCE_PATH || '')}/frog/${id}.png`;
+    container.appendChild(img);
+  }
+
+  // expose buildFrog128 globally (if not already)
+  // (modal.js will use it; we still keep layered renderer in owned if you later switch back)
+  function safe(s){ return encodeURIComponent(s); }
+  const NO_ANIM_FOR = new Set(['Hat','Frog','Trait']);
+  const NO_LIFT_FOR = new Set(['Frog','Trait','SpecialFrog']);
+  function makeLayerImg(attr, value, px){
+    const allowAnim = !NO_ANIM_FOR.has(attr);
+    const base = `/frog/build_files/${safe(attr)}`;
+    const png  = `${base}/${safe(value)}.png`;
+    const gif  = `${base}/animations/${safe(value)}_animation.gif`;
+    const img = new Image();
+    img.decoding='async'; img.loading='lazy';
+    img.dataset.attr=attr;
+    Object.assign(img.style,{
+      position:'absolute', left:'0', top:'0',
+      width:`${px}px`, height:`${px}px`,
+      imageRendering:'pixelated', zIndex:'2',
+      transition:'transform 280ms cubic-bezier(.22,.61,.36,1)'
+    });
+    if (allowAnim){ img.src=gif; img.onerror=()=>{ img.onerror=null; img.src=png; }; }
+    else img.src=png;
+
+    if (!NO_LIFT_FOR.has(attr)){
+      img.addEventListener('mouseenter', ()=>{ img.style.transform='translate(-8px,-12px)'; img.style.filter='drop-shadow(0 5px 0 rgba(0,0,0,.45))'; });
+      img.addEventListener('mouseleave', ()=>{ img.style.transform='translate(0,0)'; img.style.filter='none'; });
+    }
+    return img;
+  }
+  async function buildFrog128(container, tokenId){
+    const SIZE=128;
+    Object.assign(container.style,{
+      width:`${SIZE}px`,height:`${SIZE}px`,minWidth:`${SIZE}px`,minHeight:`${SIZE}px`,
+      position:'relative',overflow:'hidden',borderRadius:'8px',imageRendering:'pixelated'
+    });
+
+    // background color from flat PNG (hidden off-corner)
+    const flatUrl = `${(window.FF_CFG?.SOURCE_PATH || '')}/frog/${tokenId}.png`;
+    container.style.backgroundRepeat='no-repeat';
+    container.style.backgroundSize='2000% 2000%';
+    container.style.backgroundPosition='100% -1200%';
+    container.style.backgroundImage=`url("${flatUrl}")`;
+
+    try{
+      const meta = await (await fetch(`frog/json/${tokenId}.json`)).json();
+      const attrs = Array.isArray(meta?.attributes)?meta.attributes:[];
+      for (const r of attrs){
+        const attr = String(r.trait_type || r.traitType || '').trim();
+        const val  = String(r.value).trim();
+        if (!attr || !val) continue;
+        container.appendChild(makeLayerImg(attr,val,SIZE));
+      }
+    }catch{
+      // fallback to flat
+      const img = new Image(); img.decoding='async'; img.loading='lazy';
+      Object.assign(img.style,{position:'absolute',inset:'0',width:`${SIZE}px`,height:`${SIZE}px`,imageRendering:'pixelated',zIndex:'2'});
+      img.src=flatUrl; container.appendChild(img);
+    }
+  }
+  window.buildFrog128 = window.buildFrog128 || buildFrog128;
+
   // ------- state (with caching) -------
   const ST = {
     addr:null,
     mode:'owned',
     cache:{ ownedIds:null, stakedRows:null },
-    loading:false,
+    loadingOwned:false,
+    loadingStaked:false,
     connected:false
   };
 
@@ -73,27 +144,22 @@
     tabStaked?.setAttribute('aria-selected', owned ? 'false' : 'true');
   }
 
-  // ------- Card builder (FLAT 64px + row-click modal) -------
-  function liCard(id, subtitle, ownerAddr, isStaked = false, since=null){
+  // ------- Card builder (flat 64 + click-to-open) -------
+  function liCard(id, subtitle, ownerAddr, isStaked = false){
     const li = document.createElement('li');
     li.className = 'list-item';
 
-    // Row metadata for modal
+    // make the whole row open the modal (and add data for modal.js)
     li.setAttribute('data-token-id', id);
-    li.setAttribute('data-src', isStaked ? 'staked' : 'owned');
+    li.setAttribute('data-open-modal','');
+    li.setAttribute('data-owner', ownerAddr || '');
     li.setAttribute('data-staked', isStaked ? 'true' : 'false');
-    if (ownerAddr) li.setAttribute('data-owner', ownerAddr);
-    if (since)     li.setAttribute('data-staked-since', typeof since === 'string' ? since : new Date(since).toISOString());
 
-    // LEFT: 64×64 flat PNG
+    // LEFT: 64×64 still image (fast)
     const left = document.createElement('div');
-    const img = new Image();
-    img.className = 'thumb64';
-    img.decoding = 'async';
-    img.loading = 'lazy';
-    img.src = `${(window.FF_CFG?.SOURCE_PATH || '')}/frog/${id}.png`;
-    left.appendChild(img);
+    Object.assign(left.style, { width:'64px', height:'64px', minWidth:'64px', minHeight:'64px' });
     li.appendChild(left);
+    flatThumb64(left, id);
 
     // MID: title + subtitle
     const rank = (RANKS && (String(id) in RANKS)) ? RANKS[String(id)] : null;
@@ -105,7 +171,6 @@
        <div class="muted">${subtitle || ''}</div>`;
     li.appendChild(mid);
 
-    // RIGHT: nothing (keep compact)
     return li;
   }
 
@@ -151,6 +216,7 @@
     }
     return [...map.values()];
   }
+
   async function confirmStakedByUser(addr, candidates){
     if (!window.ethereum) return [];
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -159,23 +225,33 @@
       ['function stakerAddress(uint256) view returns (address)'],
       provider
     );
-    const out=[];
-    for (const c of candidates){
-      try{
-        const who = await contract.stakerAddress(c.id);
-        if (who && who.toLowerCase() === addr.toLowerCase()){
-          out.push({ id:c.id, since:c.since, staker: who });
-        }
-      }catch{}
+
+    // cap concurrency (ethers calls can be slow)
+    const limit = 6;
+    let idx = 0;
+    const out = [];
+    async function next(){
+      while (idx < candidates.length){
+        const i = idx++;
+        const c = candidates[i];
+        try{
+          const who = await contract.stakerAddress(c.id);
+          if (who && who.toLowerCase() === addr.toLowerCase()){
+            out.push({ id:c.id, since:c.since, staker: who });
+          }
+        }catch{/* ignore */}
+      }
     }
-    return out;
-  }
-  async function fetchStakedRows(addr){
-    const cands = await fetchStakeCandidates(addr);
-    const rows  = await confirmStakedByUser(addr, cands);
-    return rows.sort((a,b)=>{
+    const workers = Array.from({length: Math.min(limit, candidates.length)}, ()=> next());
+    await Promise.all(workers);
+    return out.sort((a,b)=>{
       const ta=a.since? a.since.getTime():0; const tb=b.since? b.since.getTime():0; return ta - tb;
     });
+  }
+
+  async function fetchStakedRows(addr){
+    const cands = await fetchStakeCandidates(addr);
+    return await confirmStakedByUser(addr, cands);
   }
 
   // ------- renderers (from cache) -------
@@ -183,38 +259,52 @@
     clearList();
     const ids = ST.cache.ownedIds || [];
     if (!ids.length){ setStatus('No owned frogs in this wallet for this collection.'); return; }
-    ids.forEach(id=> ul.appendChild(liCard(id, 'Not staked • Owned by You', ST.addr, false, null)));
+    ids.forEach(id=> ul.appendChild(liCard(id, 'Not staked • Owned by You', ST.addr, false)));
     setStatus(`Showing ${ids.length.toLocaleString()} owned frog(s).`);
   }
+
   function renderStakedFromCache(){
     clearList();
     const rows = ST.cache.stakedRows || [];
     if (!rows.length){ setStatus('No frogs from this wallet are currently staked.'); return; }
     rows.forEach(r=>{
       const info = r.since ? `Staked ${fmtAgoMs(Date.now()-r.since.getTime())} • Owned by You` : 'Staked • Owned by You';
-      ul.appendChild(liCard(r.id, info, ST.addr, true, r.since || null));
+      ul.appendChild(liCard(r.id, info, ST.addr, true));
     });
     setStatus(`Showing ${rows.length} staked frog(s).`);
   }
 
   // ------- orchestration -------
-  async function preloadBoth(){
-    if (ST.loading) return;
-    ST.loading = true;
-    setStatus('Loading your frogs…');
+  async function refreshOwnedFast(){
+    if (ST.loadingOwned) return;
+    ST.loadingOwned = true;
+    setStatus('Loading your owned frogs…');
     try{
-      const [ownedIds, stakedRows] = await Promise.all([
-        fetchOwnedIds(ST.addr),
-        fetchStakedRows(ST.addr)
-      ]);
-      ST.cache.ownedIds  = ownedIds;
-      ST.cache.stakedRows= stakedRows;
+      const ownedIds = await fetchOwnedIds(ST.addr);
+      ST.cache.ownedIds = ownedIds;
+      if (ST.mode === 'owned') renderOwnedFromCache();
     }catch(e){
-      console.warn('Owned/Staked preload failed', e);
-      ST.cache.ownedIds  = ST.cache.ownedIds  || [];
-      ST.cache.stakedRows= ST.cache.stakedRows|| [];
+      console.warn('Owned load failed', e);
+      ST.cache.ownedIds = ST.cache.ownedIds || [];
+      if (ST.mode === 'owned') renderOwnedFromCache();
     }finally{
-      ST.loading = false;
+      ST.loadingOwned = false;
+    }
+  }
+
+  async function refreshStakedBg(){
+    if (ST.loadingStaked) return;
+    ST.loadingStaked = true;
+    try{
+      const stakedRows = await fetchStakedRows(ST.addr);
+      ST.cache.stakedRows = stakedRows;
+      if (ST.mode === 'staked') renderStakedFromCache();
+    }catch(e){
+      console.warn('Staked load failed', e);
+      ST.cache.stakedRows = ST.cache.stakedRows || [];
+      if (ST.mode === 'staked') renderStakedFromCache();
+    }finally{
+      ST.loadingStaked = false;
     }
   }
 
@@ -226,16 +316,20 @@
     }
     if (!RANKS) await loadRanks();
 
-    // one-time preload (then switch is instant)
-    if (ST.cache.ownedIds===null || ST.cache.stakedRows===null){
-      await preloadBoth();
-    }
-
     ST.mode = which;
     setActiveTab(which);
 
-    if (which==='owned') renderOwnedFromCache();
-    else renderStakedFromCache();
+    // Kick owned fast; staked in background
+    if (ST.cache.ownedIds === null) refreshOwnedFast();
+    if (ST.cache.stakedRows === null) refreshStakedBg();
+
+    if (which==='owned') {
+      if (ST.cache.ownedIds !== null) renderOwnedFromCache();
+      else setStatus('Loading your owned frogs…');
+    } else {
+      if (ST.cache.stakedRows !== null) renderStakedFromCache();
+      else setStatus('Loading your staked frogs…');
+    }
   }
 
   // ------- events -------
@@ -254,7 +348,9 @@
     ST.addr = ev?.detail?.address || null;
     ST.cache.ownedIds = null;
     ST.cache.stakedRows = null;
-    await refresh('owned'); // default to Owned on connect
+    setActiveTab('owned');
+    // render owned quickly without waiting on staked
+    refresh('owned');
   });
   window.addEventListener('wallet:disconnected', ()=>{
     ST.connected = false;

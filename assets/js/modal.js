@@ -1,4 +1,4 @@
-// assets/js/modal.js — Layered render @ 256px (via buildFrog128), open on row click or [data-open-modal]
+// assets/js/modal.js — Fast-open modal, flat-first then layered, 256×256 hero
 (function (FF, CFG) {
   const onReady = (fn) =>
     (document.readyState !== 'loading') ? fn() : document.addEventListener('DOMContentLoaded', fn);
@@ -10,34 +10,29 @@
     if (!modal) { console.warn('frogModal not found in DOM'); return; }
 
     // DOM refs
-    const fmId = $('#fmId');                // e.g., "#1234"
-    const fmRankNum = $('#fmRankNum');      // e.g., "#51"
-    const fmLine = $('#fmLine');            // "Not staked • Owned by …"
-    const fmOwner = $('#fmOwner');          // hidden (still in DOM)
-    const fmRarityLine = $('#fmRarityLine');// hidden
-    const fmCollection = $('#fmCollection');// hidden
-    const fmAttrs = $('#fmAttrs');          // <ul> Attributes
-    const fmHero = $('#fmHero');            // layered art container (we size to 256×256)
+    const fmId = $('#fmId');
+    const fmRankNum = $('#fmRankNum');
+    const fmLine = $('#fmLine');
+    const fmOwner = $('#fmOwner');
+    const fmRarityLine = $('#fmRarityLine');
+    const fmCollection = $('#fmCollection');
+    const fmAttrs = $('#fmAttrs');
+    const fmHero = $('#fmHero');
 
     const fmStakeBtn = $('#fmStakeBtn');
     const fmUnstakeBtn = $('#fmUnstakeBtn');
     const fmTransferBtn = $('#fmTransferBtn');
-    const fmMorphBtn = $('#fmMorphBtn');
 
     const fmOpenSea = $('#fmOpenSea');
     const fmEtherscan = $('#fmEtherscan');
-    const fmMetaLink = $('#fmMetaLink');    // This is labeled "Original" in the UI
+    const fmMetaLink = $('#fmMetaLink');   // repurposed to "Original" in your HTML text
+    const fmImageLink = $('#fmImageLink'); // hidden, still useful
 
-    let current = { id:null, owner:'', staked:false, open:false, since:null };
+    let current = { id:null, owner:'', staked:false, open:false };
     const metaCache = new Map(); // id -> Promise(meta)
 
     // ---------------- helpers ----------------
     const shorten = (a)=> (FF?.shorten ? FF.shorten(a) : (a ? a.slice(0,6)+'…'+a.slice(-4) : '—'));
-
-    const fmtAgoMs = (ms)=>{
-      const s=Math.floor(ms/1000), m=Math.floor(s/60), h=Math.floor(m/60), d=Math.floor(h/24);
-      if (d>0) return `${d}d ago`; if (h>0) return `${h}h ago`; if (m>0) return `${m}m ago`; return `${s}s ago`;
-    };
 
     const setOpen = (v) => {
       current.open = !!v;
@@ -49,123 +44,40 @@
     function setLinks(id){
       const os = `https://opensea.io/assets/ethereum/${CFG.COLLECTION_ADDRESS}/${id}`;
       const es = `https://etherscan.io/token/${CFG.COLLECTION_ADDRESS}?a=${id}`;
-      fmOpenSea && (fmOpenSea.href = os);
-      fmEtherscan && (fmEtherscan.href = es);
-
-      // "Original" still image link (replace previous "Metadata")
+      if (fmOpenSea) fmOpenSea.href = os;
+      if (fmEtherscan) fmEtherscan.href = es;
       const base = CFG.SOURCE_PATH || '';
-      fmMetaLink && (fmMetaLink.href = `${base}/frog/${id}.png`);
-    }
-
-    // Ensure buildFrog128 exists (owned.js defines & exposes it)
-    function waitForRenderer(timeoutMs=3000){
-      return new Promise((res,rej)=>{
-        const t0 = performance.now();
-        (function tick(){
-          if (typeof window.buildFrog128 === 'function') return res(true);
-          if (performance.now() - t0 > timeoutMs) return rej(new Error('buildFrog128 not found'));
-          requestAnimationFrame(tick);
-        })();
-      });
-    }
-
-    async function drawFrog256(id){
-      if (!fmHero) return;
-
-      // Size the hero to 256×256 and prep background (hide frog silhouette)
-      Object.assign(fmHero.style, {
-        width: '256px',
-        height: '256px',
-        minWidth: '256px',
-        minHeight: '256px',
-        position: 'relative',
-        overflow: 'hidden',
-        borderRadius: '12px',
-        imageRendering: 'pixelated',
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: '4000% 4000%',   // huge zoom
-        backgroundPosition: '3000% 3000%' // push far bottom-right so only bg color shows
-      });
-
-      fmHero.innerHTML = '';
-      const flatUrl = `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
-      fmHero.style.backgroundImage = `url("${flatUrl}")`;
-
-      // Wait for layered renderer and build
-      try { await waitForRenderer(); } catch(e){ console.warn(e.message); }
-
-      if (typeof window.buildFrog128 === 'function') {
-        // buildFrog128 returns a Promise in our implementation
-        try { await window.buildFrog128(fmHero, id); } catch {}
-
-        // Enforce 256px on layered images (if any set 128px inline)
-        [...fmHero.querySelectorAll('img,canvas')].forEach(el=>{
-          el.style.width  = '256px';
-          el.style.height = '256px';
-        });
-      }
-
-      // Sample a corner pixel from a temp <img> to set a solid bg color
-      // (in case the CSS background fails to fully hide the silhouette)
-      const sample = new Image();
-      sample.crossOrigin = 'anonymous';
-      sample.onload = ()=>{
-        try{
-          const c = document.createElement('canvas'); c.width = 2; c.height = 2;
-          const ctx = c.getContext('2d', { willReadFrequently:true });
-          ctx.drawImage(sample, 0, 0, 2, 2);
-          const d = ctx.getImageData(0,0,1,1).data;
-          fmHero.style.backgroundColor = `rgba(${d[0]},${d[1]},${d[2]},1)`;
-        }catch{}
-      };
-      sample.src = flatUrl;
+      if (fmMetaLink)  fmMetaLink.href  = `${base}/frog/${id}.png`; // "Original" still image
+      if (fmImageLink) fmImageLink.href = `${base}/frog/${id}.png`;
     }
 
     function setRarity(id){
       const rank = FF?.getRankById ? FF.getRankById(id) : null;
-      fmRankNum && (fmRankNum.textContent = (rank!=null) ? `#${rank}` : '—');
-      fmRarityLine && (fmRarityLine.textContent = (rank!=null) ? `#${rank} of ${CFG.SUPPLY || 4040}` : '—');
+      if (fmRankNum) fmRankNum.textContent = (rank!=null) ? `#${rank}` : '—';
+      if (fmRarityLine) fmRarityLine.textContent = (rank!=null) ? `#${rank} of ${CFG.SUPPLY || 4040}` : '—';
     }
 
-    function setState({ staked, owner, since }) {
-      current.staked = !!staked;
-      current.owner  = owner || '';
-      current.since  = since || null;
-
+    function setState({ staked, owner }){
+      current.staked = !!staked; current.owner = owner || '';
       const you = (FF?.wallet?.address) || window.FF_WALLET?.address || window.user_address || null;
       const isYou = you && owner && you.toLowerCase() === owner.toLowerCase();
       const ownerText = isYou ? 'You' : (owner ? shorten(owner) : '—');
+      if (fmLine) fmLine.textContent = `${staked ? 'Staked' : 'Not staked'} • Owned by ${ownerText}`;
+      if (fmOwner) fmOwner.textContent = owner || '—';
 
-      let line = `${staked ? 'Staked' : 'Not staked'}`;
-      if (staked && since){
-        const t = (since instanceof Date) ? since : new Date(since);
-        if (!isNaN(t)) line = `Staked ${fmtAgoMs(Date.now() - t.getTime())}`;
-      }
-      line += ` • Owned by ${ownerText}`;
+      // Enable/disable action buttons based on wallet & ownership
+      const connected = !!you;
+      const canStake   = connected && isYou && !staked;
+      const canUnstake = connected && isYou && staked;
+      const canTransfer= connected && isYou;
 
-      fmLine && (fmLine.textContent = line);
-      fmOwner && (fmOwner.textContent = owner || '—');
+      if (fmStakeBtn)    fmStakeBtn.disabled    = !canStake;
+      if (fmUnstakeBtn)  fmUnstakeBtn.disabled  = !canUnstake;
+      if (fmTransferBtn) fmTransferBtn.disabled = !canTransfer;
 
-      updateButtons();
-    }
-
-    function updateButtons(){
-      const addr =
-        window.FF_WALLET?.address ||
-        FF?.wallet?.address ||
-        window.user_address ||
-        null;
-
-      const isConnected = !!addr;
-      const isOwner = isConnected && current.owner && addr.toLowerCase() === current.owner.toLowerCase();
-
-      const canStake    = isConnected && isOwner && !current.staked;
-      const canUnstake  = isConnected && isOwner &&  current.staked;
-      const canTransfer = isConnected && isOwner;
-
-      fmStakeBtn     && (fmStakeBtn.disabled    = !canStake);
-      fmUnstakeBtn   && (fmUnstakeBtn.disabled  = !canUnstake);
-      fmTransferBtn  && (fmTransferBtn.disabled = !canTransfer);
+      // Accent the active action (stake or unstake)
+      fmStakeBtn?.classList.toggle('btn-solid',  canStake);
+      fmUnstakeBtn?.classList.toggle('btn-solid',canUnstake);
     }
 
     async function getMeta(id){
@@ -193,19 +105,119 @@
       fmAttrs.appendChild(frag);
     }
 
-    // ------------- public open (instant) -------------
-    async function openFrogModal({ id, owner, staked, since }) {
-      current.id = id;
+    // ---------- 256×256 hero sizing + bg hiding ----------
+    function ensureHeroBox(){
+      if (!fmHero) return;
+      Object.assign(fmHero.style, {
+        width:'256px', height:'256px', minWidth:'256px', minHeight:'256px',
+        position:'relative', overflow:'hidden', borderRadius:'12px',
+        backgroundRepeat:'no-repeat',
+        backgroundSize:'2500% 2500%',       // massive zoom so we only see bg color area
+        backgroundPosition:'1200% -1200%',  // push to corner well away from frog pixels
+        imageRendering:'pixelated'
+      });
+    }
 
-      fmId && (fmId.textContent = `#${id}`);
-      fmCollection && (fmCollection.textContent = shorten(CFG.COLLECTION_ADDRESS));
+    function drawFlat(id){
+      if (!fmHero) return;
+      fmHero.innerHTML = '';
+      ensureHeroBox();
+      // Set background to the flat asset (for color sampling / aesthetic)
+      const flatUrl = `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
+      fmHero.style.backgroundImage = `url("${flatUrl}")`;
+
+      const img = new Image();
+      img.decoding = 'async';
+      img.loading  = 'eager';
+      img.width = 256; img.height = 256;
+      img.style.position = 'absolute';
+      img.style.inset = '0';
+      img.style.width = '256px';
+      img.style.height= '256px';
+      img.style.imageRendering = 'pixelated';
+      img.src = flatUrl;
+      fmHero.appendChild(img);
+    }
+
+    function waitForRenderer(timeoutMs=1500){
+      return new Promise((res)=> {
+        if (typeof window.buildFrog128 === 'function') return res(true);
+        const t0 = performance.now();
+        (function tick(){
+          if (typeof window.buildFrog128 === 'function') return res(true);
+          if (performance.now() - t0 > timeoutMs) return res(false);
+          requestAnimationFrame(tick);
+        })();
+      });
+    }
+
+    async function drawLayered(id){
+      // Clear flat and render layered; if renderer missing, keep flat
+      const hasRenderer = await waitForRenderer();
+      if (!current.open) return;
+      if (!hasRenderer) return;
+
+      // Keep background set so we retain bg color
+      fmHero.innerHTML = '';
+      ensureHeroBox();
+
+      // Call existing 128 builder into a 256 frame.
+      // We upscale every appended layer to 256×256 for crisp pixels.
+      const maybe = window.buildFrog128(fmHero, id);
+      if (maybe && typeof maybe.then === 'function'){
+        try { await maybe; } catch {}
+      }
+
+      // Enforce 256×256 on layers (they’re created at 128 in your builder)
+      Array.from(fmHero.querySelectorAll('img,canvas')).forEach(el=>{
+        el.style.width = '256px';
+        el.style.height= '256px';
+        el.style.imageRendering = 'pixelated';
+        el.style.transform = 'none';
+      });
+
+      // After first frame, sample top-left pixel to set solid backgroundColor
+      await new Promise(r => requestAnimationFrame(r));
+      try{
+        // prefer a canvas if present
+        const cv = fmHero.querySelector('canvas');
+        if (cv){
+          const ctx = cv.getContext('2d', { willReadFrequently:true });
+          const px = ctx.getImageData(0,0,1,1).data;
+          fmHero.style.backgroundColor = `rgba(${px[0]},${px[1]},${px[2]},1)`;
+          return;
+        }
+        // fallback: sample the flat PNG
+        const flatUrl = `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
+        const img = new Image();
+        img.crossOrigin='anonymous';
+        img.onload = ()=>{
+          try{
+            const c=document.createElement('canvas'); c.width=2; c.height=2;
+            const x=c.getContext('2d'); x.drawImage(img,0,0,2,2);
+            const d=x.getImageData(0,0,1,1).data;
+            fmHero.style.backgroundColor = `rgba(${d[0]},${d[1]},${d[2]},1)`;
+          }catch{}
+        };
+        img.src = flatUrl;
+      }catch{}
+    }
+
+    // ------------- public open (instant) -------------
+    async function openFrogModal({ id, owner, staked }) {
+      current.id = id; current.owner = owner || '';
+
+      if (fmId)         fmId.textContent = `#${id}`;
+      if (fmCollection) fmCollection.textContent = shorten(CFG.COLLECTION_ADDRESS);
       setLinks(id);
       setRarity(id);
-      setState({ staked: !!staked, owner: owner || '', since: since || null });
+      setState({ staked: !!staked, owner: owner || '' });
 
-      setOpen(true);                 // open immediately
-      drawFrog256(id).catch(()=>{}); // layered render after open
-      fillAttributes(id).catch(()=>{});
+      // OPEN NOW with flat art, then upgrade to layered when ready
+      setOpen(true);
+      drawFlat(id);
+      drawLayered(id);      // fire and forget
+      fillAttributes(id);   // fire and forget
     }
 
     // close / esc
@@ -214,76 +226,71 @@
       if (e.key === 'Escape' && modal.classList.contains('open')) setOpen(false);
     });
 
-    // actions — wire to your provided functions if present (else custom events)
+    // actions (wires to your global functions if present)
     fmStakeBtn?.addEventListener('click', async () => {
       if (!current.id) return;
-      if (typeof window.initiate_stake === 'function') { try{ await window.initiate_stake(current.id); }catch(e){ alert(e?.message || 'Stake failed'); } }
-      else window.dispatchEvent(new CustomEvent('ff:stake', { detail: { ids: [current.id] } }));
+      if (window.initiate_stake) {
+        const msg = await window.initiate_stake(current.id);
+        if (msg) alert(msg);
+      } else {
+        window.dispatchEvent(new CustomEvent('ff:stake', { detail: { ids: [current.id] } }));
+      }
     });
     fmUnstakeBtn?.addEventListener('click', async () => {
       if (!current.id) return;
-      if (typeof window.initiate_withdraw === 'function') { try{ await window.initiate_withdraw(current.id); }catch(e){ alert(e?.message || 'Unstake failed'); } }
-      else window.dispatchEvent(new CustomEvent('ff:unstake', { detail: { ids: [current.id] } }));
+      if (window.initiate_withdraw) {
+        const msg = await window.initiate_withdraw(current.id);
+        if (msg) alert(msg);
+      } else {
+        window.dispatchEvent(new CustomEvent('ff:unstake', { detail: { ids: [current.id] } }));
+      }
     });
     fmTransferBtn?.addEventListener('click', async () => {
       if (!current.id) return;
       const to=(prompt('Transfer to address (0x…)')||'').trim();
       if(!/^0x[a-fA-F0-9]{40}$/.test(to)){ alert('Invalid address'); return; }
-      if (window.FFWallet?.transfer) { try{ await window.FFWallet.transfer(CFG.COLLECTION_ADDRESS,current.id,to);}catch(e){console.error(e);alert('Transfer failed');} }
-      else if (window.transferToken) { try{ await window.transferToken(CFG.COLLECTION_ADDRESS,current.id,to);}catch(e){console.error(e);alert('Transfer failed');} }
-      else window.dispatchEvent(new CustomEvent('ff:transfer',{detail:{collection:CFG.COLLECTION_ADDRESS,id:current.id,to}}));
+      if (window.FFWallet?.transfer) {
+        try{ await window.FFWallet.transfer(CFG.COLLECTION_ADDRESS,current.id,to);}catch(e){console.error(e);alert('Transfer failed');}
+      } else if (window.transferToken) {
+        try{ await window.transferToken(CFG.COLLECTION_ADDRESS,current.id,to);}catch(e){console.error(e);alert('Transfer failed');}
+      } else {
+        window.dispatchEvent(new CustomEvent('ff:transfer',{detail:{collection:CFG.COLLECTION_ADDRESS,id:current.id,to}}));
+      }
     });
-    fmMorphBtn?.addEventListener('click', ()=> alert('Metamorph coming soon ✨'));
 
     // expose
     window.FFModal = { openFrogModal };
 
-    // ---------- open modal from:
-    //  (1) Any element with [data-open-modal], OR
-    //  (2) Any list row with data-token-id (Owned/Staked/Pond rows)
+    // ---------- open modal only from [data-open-modal] ----------
     document.addEventListener('click', (e) => {
-      // Ignore clicks on links/buttons inside a row
-      if (e.target.closest('a,button,[data-no-modal]')) return;
-
-      // Preferred hook
-      const trigger = e.target.closest('[data-open-modal]');
-      if (trigger){
-        const id = Number(trigger.getAttribute('data-token-id'));
-        const owner = trigger.getAttribute('data-owner') || '';
-        const staked = trigger.getAttribute('data-staked') === 'true';
-        const sinceAttr = trigger.getAttribute('data-staked-since') || null;
-        if (Number.isFinite(id)) {
-          e.preventDefault();
-          window.FFModal?.openFrogModal({ id, owner, staked, since: sinceAttr });
-        }
-        return;
-      }
-
-      // Row click
-      const row = e.target.closest('.list-item[data-token-id]');
-      if (!row) return;
-      const id = Number(row.getAttribute('data-token-id'));
-      const owner = row.getAttribute('data-owner') || '';
-      const staked = row.getAttribute('data-staked') === 'true';
-      const sinceAttr = row.getAttribute('data-staked-since') || null;
+      const btn = e.target.closest('[data-open-modal]');
+      if (!btn) return;
+      const id = Number(btn.getAttribute('data-token-id'));
+      const owner = btn.getAttribute('data-owner') || '';
+      const staked = btn.getAttribute('data-staked') === 'true';
       if (Number.isFinite(id)) {
         e.preventDefault();
-        window.FFModal?.openFrogModal({ id, owner, staked, since: sinceAttr });
+        window.FFModal?.openFrogModal({ id, owner, staked });
       }
     });
 
-    // Keep modal buttons in sync with wallet status:
-    window.addEventListener('wallet:connected',  ()=> updateButtons());
-    window.addEventListener('wallet:disconnected',()=> updateButtons());
+    // keep buttons updated if wallet connects/disconnects while modal is open
+    function updateButtons(){
+      if (!current.open) return;
+      setState({ staked: current.staked, owner: current.owner });
+    }
+    window.addEventListener('wallet:connected',  updateButtons);
+    window.addEventListener('wallet:disconnected',updateButtons);
 
-    // warmup (rarity + JIT renderer hint)
+    // warmup
     window.addEventListener('load', () => {
       try { FF?.ensureRarity && FF.ensureRarity(); } catch {}
+      // hint renderer once offscreen (non-blocking)
       const tmp = document.createElement('div');
       tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;';
       document.body.appendChild(tmp);
       if (typeof window.buildFrog128 === 'function') {
-        try { const m = window.buildFrog128(tmp, 1); if (m?.then) m.then(()=>tmp.remove(),()=>tmp.remove()); else tmp.remove(); }
+        try { const m = window.buildFrog128(tmp, 1); if (m?.then) m.finally(()=>tmp.remove()); else tmp.remove(); }
         catch { tmp.remove(); }
       } else { tmp.remove(); }
     });
