@@ -10,24 +10,33 @@
     if (!modal) { console.warn('frogModal not found in DOM'); return; }
 
     // DOM refs
-    const fmId = $('#fmId');                // e.g., "#1234"
-    const fmRankNum = $('#fmRankNum');      // e.g., "#51"
-    const fmLine = $('#fmLine');            // "Not staked • Owned by …"
-    const fmOwner = $('#fmOwner');          // hidden
-    const fmRarityLine = $('#fmRarityLine');// hidden
-    const fmCollection = $('#fmCollection');// hidden
-    const fmAttrs = $('#fmAttrs');          // <ul> Attributes
-    const fmHero = $('#fmHero');            // layered art container
+    const fmId = $('#fmId');
+    const fmRankNum = $('#fmRankNum');
+    const fmLine = $('#fmLine');
+    const fmOwner = $('#fmOwner');
+    const fmRarityLine = $('#fmRarityLine');
+    const fmCollection = $('#fmCollection');
+    const fmAttrs = $('#fmAttrs');
+    const fmHero = $('#fmHero');
 
     const fmStakeBtn = $('#fmStakeBtn');
     const fmUnstakeBtn = $('#fmUnstakeBtn');
     const fmTransferBtn = $('#fmTransferBtn');
-    const fmMorphBtn = $('#fmMorphBtn');
 
     const fmOpenSea = $('#fmOpenSea');
     const fmEtherscan = $('#fmEtherscan');
     const fmMetaLink = $('#fmMetaLink');
     const fmImageLink = $('#fmImageLink');
+
+    // make modal action buttons compact + visually consistent
+    (function normalizeModalButtons(){
+      fmStakeBtn && (fmStakeBtn.className = 'btn btn-solid btn-xs');
+      fmUnstakeBtn && (fmUnstakeBtn.className = 'btn btn-xs');
+      fmTransferBtn && (fmTransferBtn.className = 'btn btn-xs');
+      fmOpenSea && (fmOpenSea.className = 'btn btn-ghost btn-xs');
+      fmEtherscan && (fmEtherscan.className = 'btn btn-ghost btn-xs');
+      fmMetaLink && (fmMetaLink.className = 'btn btn-ghost btn-xs');
+    })();
 
     let current = { id:null, owner:'', staked:false, open:false };
     const metaCache = new Map(); // id -> Promise(meta)
@@ -52,7 +61,7 @@
       fmImageLink && (fmImageLink.href = `${base}/frog/${id}.png`);
     }
 
-    // Wait for buildFrog128 to exist (owned.js defines it)
+    // Wait for buildFrog128 to exist (owned.js exposes it; pond.js also has it)
     function waitForRenderer(timeoutMs=3000){
       return new Promise((res,rej)=>{
         const t0 = performance.now();
@@ -65,15 +74,13 @@
     }
 
     async function drawFrog(id){
-      // Layered + animation; keep flat PNG as bg just to pick/fill color
       fmHero.innerHTML = '';
 
       const flatUrl = `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
       fmHero.style.backgroundImage = `url("${flatUrl}")`;
       fmHero.style.backgroundRepeat = 'no-repeat';
-      // Heavily zoom & offset so only background color is visible (no silhouette)
-      fmHero.style.backgroundSize = '1700% 1700%';
-      fmHero.style.backgroundPosition = '-1200% 1200%';
+      fmHero.style.backgroundSize = '320% 320%';
+      fmHero.style.backgroundPosition = '100% 100%';
 
       try { await waitForRenderer(); } catch(e){ console.warn(e.message); }
 
@@ -82,7 +89,6 @@
         if (maybe?.then) { try { await maybe; } catch {} }
       }
 
-      // After first frame, sample canvas top-left to set solid color
       await new Promise(r => requestAnimationFrame(r));
       try{
         const cv = fmHero.querySelector('canvas');
@@ -141,13 +147,13 @@
       current.id = id; current.owner = owner || '';
 
       fmId && (fmId.textContent = `#${id}`);
-      fmCollection && (fmCollection.textContent = shorten(CFG.COLLECTION_ADDRESS));
+      fmCollection && (fmCollection.textContent = (CFG.COLLECTION_ADDRESS||'').slice(0,6)+'…'+(CFG.COLLECTION_ADDRESS||'').slice(-4));
       setLinks(id);
       setRarity(id);
       setState(!!staked, owner || '');
 
-      setOpen(true);            // open immediately
-      drawFrog(id).catch(()=>{});   // layered render after open
+      setOpen(true);
+      drawFrog(id).catch(()=>{});
       fillAttributes(id).catch(()=>{});
     }
 
@@ -178,12 +184,11 @@
       else if (window.transferToken) { try{ await window.transferToken(CFG.COLLECTION_ADDRESS,current.id,to);}catch(e){console.error(e);alert('Transfer failed');} }
       else window.dispatchEvent(new CustomEvent('ff:transfer',{detail:{collection:CFG.COLLECTION_ADDRESS,id:current.id,to}}));
     });
-    fmMorphBtn?.addEventListener('click', ()=> alert('Metamorph coming soon ✨'));
 
     // expose
     window.FFModal = { openFrogModal };
 
-    // ---------- open modal only from [data-open-modal] ----------
+    // open modal only from [data-open-modal]
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-open-modal]');
       if (!btn) return;
@@ -198,10 +203,9 @@
       }
     });
 
-    // warmup (rarity + one render path)
+    // warmup
     window.addEventListener('load', () => {
       try { FF?.ensureRarity && FF.ensureRarity(); } catch {}
-      // hint the renderer to JIT once offscreen
       const tmp = document.createElement('div');
       tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;';
       document.body.appendChild(tmp);
