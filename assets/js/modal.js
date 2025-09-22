@@ -1,4 +1,4 @@
-// assets/js/modal.js — Layered render (uses buildFrog128 at 256px), fast-open, open via [data-open-modal]
+// assets/js/modal.js — Layered render (256×256), single-column modal, open via [data-open-modal]
 (function (FF, CFG) {
   const onReady = (fn) =>
     (document.readyState !== 'loading') ? fn() : document.addEventListener('DOMContentLoaded', fn);
@@ -22,7 +22,7 @@
     const fmStakeBtn = $('#fmStakeBtn');
     const fmUnstakeBtn = $('#fmUnstakeBtn');
     const fmTransferBtn = $('#fmTransferBtn');
-    const fmMorphBtn = $('#fmMorphBtn'); // optional (not in current HTML)
+    const fmMorphBtn = $('#fmMorphBtn'); // optional
 
     const fmOpenSea = $('#fmOpenSea');
     const fmEtherscan = $('#fmEtherscan');
@@ -52,7 +52,7 @@
       if (fmImageLink) fmImageLink.href = `${base}/frog/${id}.png`;
     }
 
-    // Wait for buildFrog128 to exist (pond/owned define the layered logic)
+    // Wait for buildFrog128 to exist (owned/pond define layered logic)
     function waitForRenderer(timeoutMs=3000){
       return new Promise((res,rej)=>{
         const t0 = performance.now();
@@ -64,25 +64,46 @@
       });
     }
 
-    // Layered draw at 256 × 256 (re-uses buildFrog128 but scales container)
+    // Force all child layers to SIZE×SIZE regardless of how buildFrog128 sized them
+    function resizeFrogLayers(container, SIZE){
+      container.style.width = SIZE + 'px';
+      container.style.height = SIZE + 'px';
+      const kids = container.querySelectorAll('img, canvas');
+      kids.forEach(k=>{
+        k.style.width = SIZE + 'px';
+        k.style.height = SIZE + 'px';
+        // Make sure they stay pinned at 0,0
+        k.style.left = '0';
+        k.style.top  = '0';
+        k.style.position = 'absolute';
+        // Remove any transform lift left behind
+        k.style.transform = 'translate(0,0)';
+        k.style.filter = 'none';
+      });
+    }
+
+    // Layered draw at EXACT 256 × 256
     async function drawFrog(id){
+      const SIZE = 256;
+
       fmHero.innerHTML = '';
-      // background trick using flat PNG
+      fmHero.style.width = SIZE + 'px';
+      fmHero.style.height = SIZE + 'px';
+
+      // background trick using flat PNG (zoomed to only show bg color)
       const flatUrl = `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
       fmHero.style.backgroundImage = `url("${flatUrl}")`;
       fmHero.style.backgroundRepeat = 'no-repeat';
-      fmHero.style.backgroundSize = '2000% 2000%';
+      fmHero.style.backgroundSize = '2400% 2400%';
       fmHero.style.backgroundPosition = '100% 100%';
 
       try { await waitForRenderer(); } catch(e){ console.warn(e.message); }
 
-      // Temporarily widen the container to 256 and call the 128 builder twice-size by CSS
-      // We keep the API the same and just ensure the container is 256 square (CSS already enforces it)
       if (typeof window.buildFrog128 === 'function') {
-        // build into a temporary 128 container and upscale via attributes? Not needed:
-        // our buildFrog128 reads container size for positioning, so just call it directly.
+        // build at 128, then immediately coerce to 256
         const maybe = window.buildFrog128(fmHero, id);
         if (maybe?.then) { try { await maybe; } catch {} }
+        resizeFrogLayers(fmHero, SIZE);
       }
 
       // sample top-left pixel to set solid fallback bg color

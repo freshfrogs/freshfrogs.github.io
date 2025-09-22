@@ -781,3 +781,7 @@ a.btn { display:inline-flex; align-items:center; justify-content:center; text-de
 
 /* Make anchors look exactly like buttons everywhere */
 a.btn { display:inline-flex; align-items:center; justify-content:center; text-decoration:none; }
+/* Single-column modal layout */
+.ffm-grid.ffm-onecol { display:grid; grid-template-columns: 1fr; gap: 12px; }
+.ffm-hero-wrap { display:flex; justify-content:center; }
+.ffm-hero { margin: 0 auto; } /* keep the 256×256 box centered */
