@@ -206,21 +206,21 @@
 <script src="assets/js/modal.js"></script>
 <script src="assets/js/main.js"></script>
 
-<!-- Frog Modal (compact, organized) -->
+<!-- Frog Modal (single column: image → info) -->
 <div id="frogModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
   <div class="modal-backdrop" data-close></div>
   <div class="modal-panel modal-narrow" role="document">
     <button class="btn btn-ghost btn-sm modal-close" data-close aria-label="Close">✕</button>
 
-    <section class="ffm-grid">
-      <!-- LEFT: 256x256 layered render -->
-      <div class="ffm-left">
+    <section class="ffm-grid ffm-onecol">
+      <!-- IMAGE: fixed 256×256 layered render -->
+      <div class="ffm-hero-wrap">
         <div id="fmHero" class="ffm-hero"></div>
       </div>
 
-      <!-- RIGHT: Title → buttons → attributes -->
-      <div class="ffm-right">
-        <!-- Title / subtitle (matches Owned/Staked style) -->
+      <!-- INFO: title → actions → attributes -->
+      <div class="ffm-info">
+        <!-- Title / subtitle (matches list style) -->
         <div class="ffm-titlerow">
           <div style="display:flex;align-items:center;gap:8px;">
             <b>Frog <span id="fmId">#—</span></b>
@@ -240,13 +240,13 @@
           <a id="fmMetaLink"  class="btn btn-ghost btn-xs" target="_blank" rel="noopener">Metadata</a>
         </div>
 
-        <!-- Attributes (key–value list; same font/weight as rest) -->
+        <!-- Attributes -->
         <div class="ffm-attrs">
           <div class="section-title" style="font-size:13px;">Attributes</div>
           <ul id="fmAttrs" class="ffm-attrlist list-scroll"></ul>
         </div>
 
-        <!-- extras kept but visually hidden -->
+        <!-- hidden extras -->
         <div class="sr-only">
           <div>Owner: <span id="fmOwner">—</span></div>
           <div>Rarity: <span id="fmRarityLine">—</span></div>
