@@ -1,4 +1,4 @@
-// assets/js/modal.js — Layered render (256×256 in modal), fast-open, open via [data-open-modal]
+// assets/js/modal.js — uses buildFrog128 scaled to 256×256 in modal
 (function (FF, CFG) {
   const onReady = (fn) =>
     (document.readyState !== 'loading') ? fn() : document.addEventListener('DOMContentLoaded', fn);
@@ -30,12 +30,12 @@
 
     // compact modal buttons
     (function normalizeModalButtons(){
-      fmStakeBtn && (fmStakeBtn.className = 'btn btn-solid btn-xs');
-      fmUnstakeBtn && (fmUnstakeBtn.className = 'btn btn-xs');
-      fmTransferBtn && (fmTransferBtn.className = 'btn btn-xs');
-      fmOpenSea && (fmOpenSea.className = 'btn btn-ghost btn-xs');
-      fmEtherscan && (fmEtherscan.className = 'btn btn-ghost btn-xs');
-      fmMetaLink && (fmMetaLink.className = 'btn btn-ghost btn-xs');
+      fmStakeBtn && (fmStakeBtn.className = 'btn btn-solid btn-sm');
+      fmUnstakeBtn && (fmUnstakeBtn.className = 'btn btn-sm');
+      fmTransferBtn && (fmTransferBtn.className = 'btn btn-sm');
+      fmOpenSea && (fmOpenSea.className = 'btn btn-ghost btn-sm');
+      fmEtherscan && (fmEtherscan.className = 'btn btn-ghost btn-sm');
+      fmMetaLink && (fmMetaLink.className = 'btn btn-ghost btn-sm');
     })();
 
     let current = { id:null, owner:'', staked:false, open:false };
@@ -59,118 +59,6 @@
       const base = CFG.SOURCE_PATH || '';
       fmMetaLink  && (fmMetaLink.href  = `${base}/frog/json/${id}.json`);
       fmImageLink && (fmImageLink.href = `${base}/frog/${id}.png`);
-    }
-
-    // ------- 256px layered renderer (modal-only, self-contained) -------
-    const NO_ANIM_FOR = new Set(['Hat','Frog','Trait']);
-    const NO_LIFT_FOR = new Set(['Frog','Trait','SpecialFrog']);
-    const safe = (s)=> encodeURIComponent(s);
-
-    function makeLayerImg(attr, value, sizePx){
-      const allowAnim = !NO_ANIM_FOR.has(attr);
-      const base = `/frog/build_files/${safe(attr)}`;
-      const png  = `${base}/${safe(value)}.png`;
-      const gif  = `${base}/animations/${safe(value)}_animation.gif`;
-
-      const img = new Image();
-      img.decoding = 'async';
-      img.loading  = 'lazy';
-      img.dataset.attr = attr;
-      Object.assign(img.style, {
-        position:'absolute', left:'0', top:'0',
-        width:`${sizePx}px`, height:`${sizePx}px`,
-        imageRendering:'pixelated', zIndex:'2',
-        transition:'transform 280ms cubic-bezier(.22,.61,.36,1)'
-      });
-      if (allowAnim){
-        img.src = gif;
-        img.onerror = ()=>{ img.onerror=null; img.src=png; };
-      } else {
-        img.src = png;
-      }
-      if (!NO_LIFT_FOR.has(attr)){
-        img.addEventListener('mouseenter', ()=>{
-          img.style.transform='translate(-8px,-12px)';
-          img.style.filter='drop-shadow(0 5px 0 rgba(0,0,0,.45))';
-        });
-        img.addEventListener('mouseleave', ()=>{
-          img.style.transform='translate(0,0)';
-          img.style.filter='none';
-        });
-      }
-      return img;
-    }
-
-    function setBgFromFlat(container, id){
-      // set zoomed flat image as background + sample color
-      const flatUrl = `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
-      Object.assign(container.style, {
-        backgroundImage: `url("${flatUrl}")`,
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: '320% 320%',
-        backgroundPosition: '100% 100%'
-      });
-      // sample color async (non-blocking)
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = ()=>{
-        try{
-          const c = document.createElement('canvas');
-          c.width = 2; c.height = 2;
-          const x = c.getContext('2d');
-          x.drawImage(img,0,0,2,2);
-          const d = x.getImageData(0,0,1,1).data;
-          container.style.backgroundColor = `rgba(${d[0]},${d[1]},${d[2]},${(d[3]||255)/255})`;
-        }catch{}
-      };
-      img.src = flatUrl;
-    }
-
-    async function buildFrog256(container, tokenId){
-      const SIZE = 256;
-
-      // ensure fixed 256×256 box inside modal
-      Object.assign(container.style, {
-        width:`${SIZE}px`,
-        height:`${SIZE}px`,
-        minWidth:`${SIZE}px`,
-        minHeight:`${SIZE}px`,
-        position:'relative',
-        overflow:'hidden',
-        borderRadius:'12px',
-        imageRendering:'pixelated',
-        margin:'0 auto' // center inside the left column
-      });
-
-      setBgFromFlat(container, tokenId);
-
-      // fetch attributes and layer
-      const metaUrl = `${CFG.SOURCE_PATH || ''}/frog/json/${tokenId}.json`;
-      let meta;
-      try{
-        meta = await (FF?.fetchJSON ? FF.fetchJSON(metaUrl) : fetch(metaUrl).then(r=>r.json()));
-      }catch{
-        // fallback: just drop the flat PNG on top
-        const img = new Image();
-        img.decoding='async'; img.loading='lazy';
-        Object.assign(img.style, { position:'absolute', inset:'0', width:`${SIZE}px`, height:`${SIZE}px`, imageRendering:'pixelated', zIndex:'2' });
-        img.src = `${CFG.SOURCE_PATH || ''}/frog/${tokenId}.png`;
-        container.appendChild(img);
-        return;
-      }
-
-      const attrs = Array.isArray(meta?.attributes) ? meta.attributes : [];
-      for (const rec of attrs){
-        const attr = String(rec.trait_type || rec.traitType || '').trim();
-        const val  = String(rec.value).trim();
-        if (!attr || !val) continue;
-        container.appendChild(makeLayerImg(attr, val, SIZE));
-      }
-    }
-
-    async function drawFrog(id){
-      fmHero.innerHTML = '';
-      await buildFrog256(fmHero, id);
     }
 
     function setRarity(id){
@@ -213,6 +101,68 @@
       }
       fmAttrs.innerHTML = '';
       fmAttrs.appendChild(frag);
+    }
+
+    // ------- draw frog in 256 using buildFrog128 scaled 2× -------
+    function setBgFromFlat(container, id){
+      const flatUrl = `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
+      Object.assign(container.style, {
+        backgroundImage: `url("${flatUrl}")`,
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: '320% 320%',
+        backgroundPosition: '100% 100%'
+      });
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = ()=>{
+        try{
+          const c = document.createElement('canvas');
+          c.width = 2; c.height = 2;
+          const x = c.getContext('2d');
+          x.drawImage(img,0,0,2,2);
+          const d = x.getImageData(0,0,1,1).data;
+          container.style.backgroundColor = `rgba(${d[0]},${d[1]},${d[2]},${(d[3]||255)/255})`;
+        }catch{}
+      };
+      img.src = flatUrl;
+    }
+
+    async function drawFrog(id){
+      fmHero.innerHTML = '';
+
+      // Ensure hero box is 256×256 (visual size)
+      Object.assign(fmHero.style, {
+        width:'256px', height:'256px', minWidth:'256px', minHeight:'256px',
+        position:'relative', overflow:'hidden', borderRadius:'12px', imageRendering:'pixelated', margin:'0 auto'
+      });
+
+      // Pretty background from flat PNG
+      setBgFromFlat(fmHero, id);
+
+      // Create a 128×128 inner container and SCALE it 2×
+      const scaleWrap = document.createElement('div');
+      Object.assign(scaleWrap.style, {
+        position:'absolute', left:'0', top:'0',
+        width:'128px', height:'128px',
+        transform:'scale(2)', transformOrigin:'top left',
+        imageRendering:'pixelated'
+      });
+      fmHero.appendChild(scaleWrap);
+
+      // Use your existing renderer
+      if (typeof window.buildFrog128 === 'function') {
+        try {
+          const maybe = window.buildFrog128(scaleWrap, id);
+          if (maybe?.then) await maybe;
+        } catch(e){ console.warn('buildFrog128 failed', e); }
+      } else {
+        // Fallback: show flat PNG if the renderer isn’t available yet
+        const img = new Image();
+        img.decoding='async'; img.loading='lazy';
+        Object.assign(img.style,{ position:'absolute', inset:'0', width:'256px', height:'256px', imageRendering:'pixelated', zIndex:'2' });
+        img.src = `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
+        fmHero.appendChild(img);
+      }
     }
 
     // ------------- public open (instant) -------------
