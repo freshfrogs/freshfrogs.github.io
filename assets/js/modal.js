@@ -1,4 +1,4 @@
-// assets/js/modal.js — Layered render (buildFrog128), fast-open, open via [data-open-modal]
+// assets/js/modal.js — Layered render (256×256 in modal), fast-open, open via [data-open-modal]
 (function (FF, CFG) {
   const onReady = (fn) =>
     (document.readyState !== 'loading') ? fn() : document.addEventListener('DOMContentLoaded', fn);
@@ -28,7 +28,7 @@
     const fmMetaLink = $('#fmMetaLink');
     const fmImageLink = $('#fmImageLink');
 
-    // make modal action buttons compact + visually consistent
+    // compact modal buttons
     (function normalizeModalButtons(){
       fmStakeBtn && (fmStakeBtn.className = 'btn btn-solid btn-xs');
       fmUnstakeBtn && (fmUnstakeBtn.className = 'btn btn-xs');
@@ -61,43 +61,116 @@
       fmImageLink && (fmImageLink.href = `${base}/frog/${id}.png`);
     }
 
-    // Wait for buildFrog128 to exist (owned.js exposes it; pond.js also has it)
-    function waitForRenderer(timeoutMs=3000){
-      return new Promise((res,rej)=>{
-        const t0 = performance.now();
-        (function tick(){
-          if (typeof window.buildFrog128 === 'function') return res(true);
-          if (performance.now() - t0 > timeoutMs) return rej(new Error('buildFrog128 not found'));
-          requestAnimationFrame(tick);
-        })();
+    // ------- 256px layered renderer (modal-only, self-contained) -------
+    const NO_ANIM_FOR = new Set(['Hat','Frog','Trait']);
+    const NO_LIFT_FOR = new Set(['Frog','Trait','SpecialFrog']);
+    const safe = (s)=> encodeURIComponent(s);
+
+    function makeLayerImg(attr, value, sizePx){
+      const allowAnim = !NO_ANIM_FOR.has(attr);
+      const base = `/frog/build_files/${safe(attr)}`;
+      const png  = `${base}/${safe(value)}.png`;
+      const gif  = `${base}/animations/${safe(value)}_animation.gif`;
+
+      const img = new Image();
+      img.decoding = 'async';
+      img.loading  = 'lazy';
+      img.dataset.attr = attr;
+      Object.assign(img.style, {
+        position:'absolute', left:'0', top:'0',
+        width:`${sizePx}px`, height:`${sizePx}px`,
+        imageRendering:'pixelated', zIndex:'2',
+        transition:'transform 280ms cubic-bezier(.22,.61,.36,1)'
       });
+      if (allowAnim){
+        img.src = gif;
+        img.onerror = ()=>{ img.onerror=null; img.src=png; };
+      } else {
+        img.src = png;
+      }
+      if (!NO_LIFT_FOR.has(attr)){
+        img.addEventListener('mouseenter', ()=>{
+          img.style.transform='translate(-8px,-12px)';
+          img.style.filter='drop-shadow(0 5px 0 rgba(0,0,0,.45))';
+        });
+        img.addEventListener('mouseleave', ()=>{
+          img.style.transform='translate(0,0)';
+          img.style.filter='none';
+        });
+      }
+      return img;
+    }
+
+    function setBgFromFlat(container, id){
+      // set zoomed flat image as background + sample color
+      const flatUrl = `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
+      Object.assign(container.style, {
+        backgroundImage: `url("${flatUrl}")`,
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: '320% 320%',
+        backgroundPosition: '100% 100%'
+      });
+      // sample color async (non-blocking)
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = ()=>{
+        try{
+          const c = document.createElement('canvas');
+          c.width = 2; c.height = 2;
+          const x = c.getContext('2d');
+          x.drawImage(img,0,0,2,2);
+          const d = x.getImageData(0,0,1,1).data;
+          container.style.backgroundColor = `rgba(${d[0]},${d[1]},${d[2]},${(d[3]||255)/255})`;
+        }catch{}
+      };
+      img.src = flatUrl;
+    }
+
+    async function buildFrog256(container, tokenId){
+      const SIZE = 256;
+
+      // ensure fixed 256×256 box inside modal
+      Object.assign(container.style, {
+        width:`${SIZE}px`,
+        height:`${SIZE}px`,
+        minWidth:`${SIZE}px`,
+        minHeight:`${SIZE}px`,
+        position:'relative',
+        overflow:'hidden',
+        borderRadius:'12px',
+        imageRendering:'pixelated',
+        margin:'0 auto' // center inside the left column
+      });
+
+      setBgFromFlat(container, tokenId);
+
+      // fetch attributes and layer
+      const metaUrl = `${CFG.SOURCE_PATH || ''}/frog/json/${tokenId}.json`;
+      let meta;
+      try{
+        meta = await (FF?.fetchJSON ? FF.fetchJSON(metaUrl) : fetch(metaUrl).then(r=>r.json()));
+      }catch{
+        // fallback: just drop the flat PNG on top
+        const img = new Image();
+        img.decoding='async'; img.loading='lazy';
+        Object.assign(img.style, { position:'absolute', inset:'0', width:`${SIZE}px`, height:`${SIZE}px`, imageRendering:'pixelated', zIndex:'2' });
+        img.src = `${CFG.SOURCE_PATH || ''}/frog/${tokenId}.png`;
+        container.appendChild(img);
+        return;
+      }
+
+      const attrs = Array.isArray(meta?.attributes) ? meta.attributes : [];
+      for (const rec of attrs){
+        const attr = String(rec.trait_type || rec.traitType || '').trim();
+        const val  = String(rec.value).trim();
+        if (!attr || !val) continue;
+        container.appendChild(makeLayerImg(attr, val, SIZE));
+      }
     }
 
     async function drawFrog(id){
       fmHero.innerHTML = '';
-
-      const flatUrl = `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
-      fmHero.style.backgroundImage = `url("${flatUrl}")`;
-      fmHero.style.backgroundRepeat = 'no-repeat';
-      fmHero.style.backgroundSize = '320% 320%';
-      fmHero.style.backgroundPosition = '100% 100%';
-
-      try { await waitForRenderer(); } catch(e){ console.warn(e.message); }
-
-      if (typeof window.buildFrog128 === 'function') {
-        const maybe = window.buildFrog128(fmHero, id);
-        if (maybe?.then) { try { await maybe; } catch {} }
-      }
-
-      await new Promise(r => requestAnimationFrame(r));
-      try{
-        const cv = fmHero.querySelector('canvas');
-        if (cv){
-          const ctx = cv.getContext('2d', { willReadFrequently:true });
-          const px = ctx.getImageData(0,0,1,1).data;
-          fmHero.style.backgroundColor = `rgba(${px[0]},${px[1]},${px[2]},1)`;
-        }
-      }catch{}
+      await buildFrog256(fmHero, id);
     }
 
     function setRarity(id){
@@ -147,12 +220,12 @@
       current.id = id; current.owner = owner || '';
 
       fmId && (fmId.textContent = `#${id}`);
-      fmCollection && (fmCollection.textContent = (CFG.COLLECTION_ADDRESS||'').slice(0,6)+'…'+(CFG.COLLECTION_ADDRESS||'').slice(-4));
+      fmCollection && (fmCollection.textContent = shorten(CFG.COLLECTION_ADDRESS));
       setLinks(id);
       setRarity(id);
       setState(!!staked, owner || '');
 
-      setOpen(true);
+      setOpen(true);          // open immediately
       drawFrog(id).catch(()=>{});
       fillAttributes(id).catch(()=>{});
     }
@@ -203,16 +276,9 @@
       }
     });
 
-    // warmup
+    // warmup (rarity)
     window.addEventListener('load', () => {
       try { FF?.ensureRarity && FF.ensureRarity(); } catch {}
-      const tmp = document.createElement('div');
-      tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;';
-      document.body.appendChild(tmp);
-      if (typeof window.buildFrog128 === 'function') {
-        try { const m = window.buildFrog128(tmp, 1); if (m?.then) m.then(()=>tmp.remove(),()=>tmp.remove()); else tmp.remove(); }
-        catch { tmp.remove(); }
-      } else { tmp.remove(); }
     });
   });
 })(window.FF || (window.FF = {}), window.FF_CFG || {});

@@ -718,3 +718,5 @@ a.btn { display: inline-flex; align-items: center; justify-content: center; text
   min-width: 260px;
 }
 a.btn { display:inline-flex; align-items:center; justify-content:center; text-decoration:none; }
+/* optional: force fmHero box to 256 in CSS too */
+#fmHero { width:256px; height:256px; margin:0 auto; }
