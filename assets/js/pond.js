@@ -5,12 +5,12 @@
   if (!wrap || !ul) return;
 
   // ---------- config ----------
-  const API            = 'https://api.reservoir.tools/users/activity/v6';
-  const OWNERS_API     = 'https://api.reservoir.tools/owners/v2';
-  const TOKENS_API     = 'https://api.reservoir.tools/users'; // /{addr}/tokens/v8
-  const CONTROLLER     = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
-  const COLLECTION     = CFG.COLLECTION_ADDRESS || '';
-  const PAGE_SIZE      = 20;
+  const API          = 'https://api.reservoir.tools/users/activity/v6';
+  const OWNERS_API   = 'https://api.reservoir.tools/owners/v2';
+  const TOKENS_API   = 'https://api.reservoir.tools/users'; // /{addr}/tokens/v8
+  const CONTROLLER   = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
+  const COLLECTION   = CFG.COLLECTION_ADDRESS || '';
+  const PAGE_SIZE    = 20;
   const PREFETCH_PAGES = 3;
 
   function apiHeaders(){
@@ -87,11 +87,11 @@
     return nav;
   }
 
-  // We fetch pages newest->older, but DISPLAY oldest->newest.
+  // We fetch newest->older, but DISPLAY oldest->newest.
   const storeIdxFromDisplay  = (dispIdx)=> (ST.pages.length - 1 - dispIdx);
   const displayIdxFromStore  = (storeIdx)=> (ST.pages.length - 1 - storeIdx);
 
-  // ---------- PAGER ([1] [2] [3] …) ----------
+  // ---------- PAGER ----------
   function renderPager(){
     const nav = ensurePager();
     nav.innerHTML = '';
@@ -142,42 +142,15 @@
     return el;
   }
 
-  function flatFrog(leftEl, id){
+  // flat 64 for list
+  function renderFlat64(container, id){
+    container.innerHTML = '';
     const img = new Image();
     img.decoding = 'async';
     img.loading  = 'lazy';
-    img.className = 'thumb128';
+    img.className = 'thumb64';
     img.src = `${(CFG.SOURCE_PATH || '')}/frog/${id}.png`;
-    leftEl.appendChild(img);
-  }
-
-  function renderFrog(leftEl, id){
-    // Prefer the global layered renderer; fall back to flat PNG.
-    if (typeof window.buildFrog128 === 'function'){
-      try {
-        const r = window.buildFrog128(leftEl, id);
-        if (r && typeof r.then === 'function') {
-          r.catch(()=>{ if (!leftEl.firstChild) flatFrog(leftEl, id); });
-        }
-        return;
-      } catch {
-        // fall through to flat
-      }
-    }
-    flatFrog(leftEl, id);
-  }
-
-  // Owner label: "You" if matches connected wallet, else shortened address
-  function ownerLabel(addr){
-    if (!addr) return '—';
-    const you =
-      (FF && FF.wallet && FF.wallet.address) ||
-      (window.FF_WALLET && window.FF_WALLET.address) ||
-      window.user_address ||
-      null;
-    return (you && addr.toLowerCase() === String(you).toLowerCase())
-      ? 'You'
-      : shorten(addr);
+    container.appendChild(img);
   }
 
   // ---------- activity selection ----------
@@ -279,63 +252,33 @@
 
         const li = mk('li', { className:'list-item' });
 
-        // Left: 128×128 (layered if available)
+        // Make entire row open the modal
+        li.setAttribute('data-open-modal', '');
+        li.setAttribute('data-token-id', String(r.id));
+        li.setAttribute('data-owner', r.staker || '');
+        li.setAttribute('data-staked', 'true');
+        if (r.since) li.setAttribute('data-since', String(r.since.getTime()));
+
+        // Left: 64×64 flat PNG
         const left = mk('div', {}, {
-          width:'128px', height:'128px', minWidth:'128px', minHeight:'128px'
+          width:'64px', height:'64px', minWidth:'64px', minHeight:'64px'
         });
         li.appendChild(left);
-        renderFrog(left, r.id);
+        renderFlat64(left, r.id);
 
-        // Middle: title + subtitle + compact actions (same layout as Owned)
+        // Middle: text block
         const mid = mk('div');
-
-        const header = mk('div');
-        header.style.display = 'flex';
-        header.style.alignItems = 'center';
-        header.style.gap = '8px';
-        header.innerHTML = `<b>Frog #${r.id}</b> ${pillRank(rank)}`;
-        mid.appendChild(header);
-
-        const sub = mk('div', { className:'muted' });
-        sub.textContent = `Staked ${fmtAgo(r.since)} • Owned by ${ownerLabel(r.staker)}`;
-        mid.appendChild(sub);
-
-        // compact actions
-        const actions = mk('div', {}, {
-          marginTop:'6px', display:'flex', flexWrap:'wrap', gap:'6px'
-        });
-
-        // More info (modal) — include since + owner so modal shows "Staked X ago • Owned by ..."
-        const moreBtn = mk('button', { className:'btn btn-ghost btn-xs', textContent:'See more' });
-        moreBtn.setAttribute('data-open-modal', '');
-        moreBtn.setAttribute('data-token-id', String(r.id));
-        moreBtn.setAttribute('data-owner', r.staker || '');
-        moreBtn.setAttribute('data-staked', 'true');
-        if (r.since) moreBtn.setAttribute('data-since', String(r.since.getTime()));
-        actions.appendChild(moreBtn);
-
-        // OpenSea
-        const os = mk('a', {
-          className:'btn btn-ghost btn-xs',
-          target:'_blank', rel:'noopener',
-          textContent:'OpenSea',
-          href:`https://opensea.io/assets/ethereum/${COLLECTION}/${r.id}`
-        });
-        actions.appendChild(os);
-
-        // Etherscan
-        const es = mk('a', {
-          className:'btn btn-ghost btn-xs',
-          target:'_blank', rel:'noopener',
-          textContent:'Etherscan',
-          href:`https://etherscan.io/token/${COLLECTION}?a=${r.id}`
-        });
-        actions.appendChild(es);
-
-        mid.appendChild(actions);
+        mid.innerHTML =
+          `<div style="display:flex;align-items:center;gap:8px;">
+             <b>Frog #${r.id}</b> ${pillRank(rank)}
+           </div>
+           <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? shorten(r.staker) : '—'}</div>`;
         li.appendChild(mid);
 
-        // No right-side tag (keeps cards compact like Owned)
+        // Right: status tag
+        const right = mk('div', { className:'price', textContent:'Staked' });
+        li.appendChild(right);
+
         ul.appendChild(li);
       });
     }
@@ -358,7 +301,6 @@
   }
 
   async function fetchTotalStakedViaOwners(){
-    // Walk owners until we find the controller address
     let cont = '';
     for (let guard=0; guard<30; guard++){
       const qs = new URLSearchParams({ collection: COLLECTION });
@@ -374,11 +316,10 @@
       cont = json?.continuation || '';
       if (!cont) break;
     }
-    return null; // not found
+    return null;
   }
 
   async function fetchTotalStakedViaTokens(){
-    // enumerate controller's tokens for this collection and count
     let cont = '';
     let total = 0;
     for (let guard=0; guard<40; guard++){
@@ -441,7 +382,7 @@
         return;
       }
 
-      // ranks (optional but nice)
+      // ranks (optional)
       try { RANKS = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json'); }
       catch { RANKS = {}; }
 

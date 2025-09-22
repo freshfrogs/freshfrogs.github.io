@@ -56,98 +56,20 @@
     ? `<span class="pill">Rank <b>#${rank}</b></span>`
     : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
 
-  // ------- 128px layered renderer (same as Pond) -------
-  const NO_ANIM_FOR = new Set(['Hat','Frog','Trait']);
-  const NO_LIFT_FOR = new Set(['Frog','Trait','SpecialFrog']);
-  function mk(tag, props={}, style={}){ const el=document.createElement(tag); Object.assign(el,props); Object.assign(el.style,style); return el; }
-  function safe(s){ return encodeURIComponent(s); }
-
-  function pickBgCandidates(id){
-    const local = `frog/${id}.png`;
-    const root  = `/frog/${id}.png`;
-    const cfg   = (CFG.SOURCE_PATH ? `${CFG.SOURCE_PATH}/frog/${id}.png` : local);
-    return [local, root, cfg];
-  }
-  async function applyFrogBackground(container, tokenId){
-    Object.assign(container.style, {
-      backgroundRepeat:'no-repeat',
-      backgroundSize:'2000% 2000%',
-      backgroundPosition:'100% 100%',
-      imageRendering:'pixelated'
-    });
-    const urls = pickBgCandidates(tokenId);
-    for (const url of urls){
-      const ok = await new Promise(resolve=>{
-        const img = new Image();
-        img.crossOrigin='anonymous';
-        img.onload=()=>{
-          try{
-            const c=document.createElement('canvas'); c.width=2; c.height=2;
-            const x=c.getContext('2d'); x.drawImage(img,0,0,2,2);
-            const d=x.getImageData(0,0,1,1).data;
-            container.style.backgroundColor = `rgba(${d[0]},${d[1]},${d[2]},${(d[3]||255)/255})`;
-          }catch{}
-          container.style.backgroundImage = `url('${url}')`;
-          resolve(true);
-        };
-        img.onerror=()=>resolve(false);
-        img.src=url;
-      });
-      if (ok) return true;
-    }
-    container.style.backgroundColor='#151a1e';
-    container.style.backgroundImage='none';
-    return false;
-  }
-  function makeLayerImg(attr, value, px){
-    const allowAnim = !NO_ANIM_FOR.has(attr);
-    const base = `/frog/build_files/${safe(attr)}`;
-    const png  = `${base}/${safe(value)}.png`;
-    const gif  = `${base}/animations/${safe(value)}_animation.gif`;
+  // ------- 64px flat renderer for lists -------
+  function renderFlat64(container, tokenId){
+    container.innerHTML = '';
     const img = new Image();
-    img.decoding='async'; img.loading='lazy';
-    img.dataset.attr=attr;
-    Object.assign(img.style,{
-      position:'absolute', left:'0', top:'0',
-      width:`${px}px`, height:`${px}px`,
-      imageRendering:'pixelated', zIndex:'2',
-      transition:'transform 280ms cubic-bezier(.22,.61,.36,1)'
-    });
-    if (allowAnim){ img.src=gif; img.onerror=()=>{ img.onerror=null; img.src=png; }; }
-    else img.src=png;
-
-    if (!NO_LIFT_FOR.has(attr)){
-      img.addEventListener('mouseenter', ()=>{ img.style.transform='translate(-8px,-12px)'; img.style.filter='drop-shadow(0 5px 0 rgba(0,0,0,.45))'; });
-      img.addEventListener('mouseleave', ()=>{ img.style.transform='translate(0,0)'; img.style.filter='none'; });
-    }
-    return img;
+    img.decoding = 'async';
+    img.loading  = 'lazy';
+    img.className = 'thumb64';
+    img.src = `${(CFG.SOURCE_PATH || '')}/frog/${tokenId}.png`;
+    container.appendChild(img);
   }
-  async function buildFrog128(container, tokenId){
-    const SIZE=128;
-    Object.assign(container.style,{
-      width:`${SIZE}px`,height:`${SIZE}px`,minWidth:`${SIZE}px`,minHeight:`${SIZE}px`,
-      position:'relative',overflow:'hidden',borderRadius:'8px',imageRendering:'pixelated'
-    });
-    await applyFrogBackground(container, tokenId);
 
-    const metaUrl = `frog/json/${tokenId}.json`;
-    try{
-      const meta = await (await fetch(metaUrl)).json();
-      const attrs = Array.isArray(meta?.attributes)?meta.attributes:[];
-      for (const r of attrs){
-        const attr = String(r.trait_type || r.traitType || '').trim();
-        const val  = String(r.value).trim();
-        if (!attr || !val) continue;
-        container.appendChild(makeLayerImg(attr,val,SIZE));
-      }
-    }catch{
-      const [url] = pickBgCandidates(tokenId);
-      const flat = new Image(); flat.decoding='async'; flat.loading='lazy';
-      Object.assign(flat.style,{position:'absolute',inset:'0',width:`${SIZE}px`,height:`${SIZE}px`,imageRendering:'pixelated',zIndex:'2'});
-      flat.src=url; container.appendChild(flat);
-    }
-  }
-  // expose renderer globally for pond.js & modal.js
+  // expose layered builder if other parts still need it (unused here)
+  function makeLayerImg(){/* no-op in this file now */} // kept to avoid accidental refs
+  async function buildFrog128(){/* no-op here now */}   // kept to avoid accidental refs
   window.buildFrog128 = window.buildFrog128 || buildFrog128;
 
   // ------- state (with caching) -------
@@ -167,68 +89,48 @@
     tabStaked?.setAttribute('aria-selected', owned ? 'false' : 'true');
   }
 
-  // ------- Card builder (LAYERED + compact actions under subtitle) -------
-  // ------- Card builder (LAYERED + compact actions under subtitle) -------
-  function liCard(id, subtitle, ownerAddr, isStaked = false){
+  // ------- Card builder (FLAT 64 + click-anywhere to open modal) -------
+  function liCard(id, subtitle, ownerAddr, isStaked = false, sinceMs = null){
     const li = document.createElement('li');
     li.className = 'list-item';
 
+    // Make whole row open the modal
+    li.setAttribute('data-open-modal', '');
     li.setAttribute('data-token-id', id);
     li.setAttribute('data-src', isStaked ? 'staked' : 'owned');
     li.setAttribute('data-staked', isStaked ? 'true' : 'false');
     if (ownerAddr) li.setAttribute('data-owner', ownerAddr);
+    if (sinceMs != null) li.setAttribute('data-since', String(sinceMs));
 
+    // LEFT: 64×64 flat PNG
     const left = document.createElement('div');
-    Object.assign(left.style, { width:'128px', height:'128px', minWidth:'128px', minHeight:'128px' });
+    Object.assign(left.style, { width:'64px', height:'64px', minWidth:'64px', minHeight:'64px' });
     li.appendChild(left);
-    if (typeof window.buildFrog128 === 'function') window.buildFrog128(left, id);
+    renderFlat64(left, id);
 
+    // MID: title + subtitle
     const rank = (RANKS && (String(id) in RANKS)) ? RANKS[String(id)] : null;
     const mid = document.createElement('div');
-
-    const header = document.createElement('div');
-    header.style.display = 'flex';
-    header.style.alignItems = 'center';
-    header.style.gap = '8px';
-    header.innerHTML = `<b>Frog #${id}</b> ${pillRank(rank)}`;
-    mid.appendChild(header);
-
-    const sub = document.createElement('div');
-    sub.className = 'muted';
-    sub.textContent = subtitle || '';
-    mid.appendChild(sub);
-
-    const actions = document.createElement('div');
-    actions.style.marginTop = '6px';
-    actions.style.display = 'flex';
-    actions.style.flexWrap = 'wrap';
-    actions.style.gap = '6px';
-
-    const moreBtn = document.createElement('button');
-    moreBtn.className = 'btn btn-ghost btn-xs';
-    moreBtn.textContent = 'See more';
-    moreBtn.setAttribute('data-open-modal','');
-    moreBtn.setAttribute('data-token-id', String(id));
-    moreBtn.setAttribute('data-owner', ownerAddr || '');
-    moreBtn.setAttribute('data-staked', isStaked ? 'true' : 'false');
-    actions.appendChild(moreBtn);
-
-    const os = document.createElement('a');
-    os.className = 'btn btn-ghost btn-xs';
-    os.target = '_blank'; os.rel = 'noopener';
-    os.href = `https://opensea.io/assets/ethereum/${COLLECTION}/${id}`;
-    os.textContent = 'OpenSea';
-    actions.appendChild(os);
-
-    const es = document.createElement('a');
-    es.className = 'btn btn-ghost btn-xs';
-    es.target = '_blank'; es.rel = 'noopener';
-    es.href = `https://etherscan.io/token/${COLLECTION}?a=${id}`;
-    es.textContent = 'Etherscan';
-    actions.appendChild(es);
-
-    mid.appendChild(actions);
+    mid.innerHTML =
+      `<div style="display:flex;align-items:center;gap:8px;">
+         <b>Frog #${id}</b> ${pillRank(rank)}
+       </div>
+       <div class="muted">${subtitle || ''}</div>`;
     li.appendChild(mid);
+
+    // RIGHT: (optional) simple status tag for staked
+    if (isStaked){
+      const right = document.createElement('div');
+      right.className = 'price';
+      right.textContent = 'Staked';
+      li.appendChild(right);
+    } else {
+      // keep 3-column grid structure consistent
+      const spacer = document.createElement('div');
+      spacer.style.minWidth = '1px';
+      li.appendChild(spacer);
+    }
+
     return li;
   }
 
@@ -306,7 +208,7 @@
     clearList();
     const ids = ST.cache.ownedIds || [];
     if (!ids.length){ setStatus('No owned frogs in this wallet for this collection.'); return; }
-    ids.forEach(id=> ul.appendChild(liCard(id, 'Not staked • Owned by You', ST.addr, false)));
+    ids.forEach(id=> ul.appendChild(liCard(id, 'Not staked • Owned by You', ST.addr, false, null)));
     setStatus(`Showing ${ids.length.toLocaleString()} owned frog(s).`);
   }
   function renderStakedFromCache(){
@@ -315,8 +217,7 @@
     if (!rows.length){ setStatus('No frogs from this wallet are currently staked.'); return; }
     rows.forEach(r=>{
       const info = r.since ? `Staked ${fmtAgoMs(Date.now()-r.since.getTime())} • Owned by You` : 'Staked • Owned by You';
-      // pass sinceMs so modal can compute "X ago" correctly from the button dataset
-      ul.appendChild(liCard(r.id, info, ST.addr, true, r.since ? r.since.getTime() : NaN));
+      ul.appendChild(liCard(r.id, info, ST.addr, true, r.since ? r.since.getTime() : null));
     });
     setStatus(`Showing ${rows.length} staked frog(s).`);
   }
