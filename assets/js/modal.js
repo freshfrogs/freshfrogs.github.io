@@ -1,4 +1,4 @@
-// assets/js/modal.js — Fast open (flat), upgrade to layered 256, wired actions
+// assets/js/modal.js — 256×256 layered hero via 2× scale wrapper
 (function (FF, CFG) {
   const onReady = (fn) =>
     (document.readyState !== 'loading') ? fn() : document.addEventListener('DOMContentLoaded', fn);
@@ -47,8 +47,9 @@
       fmOpenSea && (fmOpenSea.href = os);
       fmEtherscan && (fmEtherscan.href = es);
       const base = CFG.SOURCE_PATH || '';
-      fmMetaLink  && (fmMetaLink.href  = `${base}/frog/${id}.png`); // "Original"
-      fmImageLink && (fmImageLink.href = `${base}/frog/${id}.png`);
+      const still = `${base}/frog/${id}.png`;
+      fmMetaLink  && (fmMetaLink.href  = still); // "Original"
+      fmImageLink && (fmImageLink.href = still);
     }
 
     function setRarity(id){
@@ -100,69 +101,66 @@
       fmAttrs.appendChild(frag);
     }
 
-    // 256×256 hero container + “hide image” bg trick
-    function ensureHeroBox(id){
-      if (!fmHero) return;
+    // --------- HERO (exact 256×256 using a 2× scale wrapper) ---------
+    function styleHeroBgOnly(id){
       const flatUrl = `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
       Object.assign(fmHero.style, {
         width:'256px', height:'256px', minWidth:'256px', minHeight:'256px',
         position:'relative', overflow:'hidden', borderRadius:'12px',
         backgroundRepeat:'no-repeat',
-        backgroundSize:'2600% 2600%',
-        backgroundPosition:'1400% -1400%',
+        backgroundSize:'3400% 3400%',       // hide silhouette
+        backgroundPosition:'2600% -2600%',  // shove off-corner
         backgroundImage:`url("${flatUrl}")`,
         imageRendering:'pixelated'
       });
     }
 
-    function drawFlat(id){
+    // Scaled wrapper: 128→256 (preserves per-layer hover/animation from buildFrog128)
+    async function drawLayeredAt256(id){
       if (!fmHero) return;
       fmHero.innerHTML = '';
-      ensureHeroBox(id);
-      const img = new Image();
-      img.decoding = 'async';
-      img.loading  = 'eager';
-      Object.assign(img.style, { position:'absolute', inset:'0', width:'256px', height:'256px', imageRendering:'pixelated' });
-      img.src = `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
-      fmHero.appendChild(img);
-    }
+      styleHeroBgOnly(id);
 
-    function waitForRenderer(timeoutMs=1500){
-      return new Promise((res)=> {
+      // wrapper that buildFrog128 will render into at 128×128
+      const inner = document.createElement('div');
+      Object.assign(inner.style, {
+        position:'absolute', left:'0', top:'0',
+        width:'128px', height:'128px',
+        transform:'scale(2)', transformOrigin:'top left',
+        imageRendering:'pixelated'
+      });
+      fmHero.appendChild(inner);
+
+      // ensure renderer is available
+      const ready = await new Promise(res=>{
         if (typeof window.buildFrog128 === 'function') return res(true);
         const t0 = performance.now();
         (function tick(){
           if (typeof window.buildFrog128 === 'function') return res(true);
-          if (performance.now() - t0 > timeoutMs) return res(false);
+          if (performance.now() - t0 > 1800) return res(false);
           requestAnimationFrame(tick);
         })();
       });
-    }
+      if (!ready) return;
 
-    async function drawLayered(id){
-      const ready = await waitForRenderer();
-      if (!current.open || !ready) return;
+      // build layers at 128, wrapper scales to 256
+      try{
+        const maybe = window.buildFrog128(inner, id);
+        if (maybe?.then) await maybe;
+      }catch(e){ console.warn('buildFrog128 failed', e); }
 
-      fmHero.innerHTML = '';  // keep bg styles
-      ensureHeroBox(id);
-
-      const maybe = window.buildFrog128(fmHero, id);
-      if (maybe && typeof maybe.then === 'function'){
-        try { await maybe; } catch {}
-      }
-
-      // Force all layers to 256×256
-      Array.from(fmHero.querySelectorAll('img,canvas')).forEach(el=>{
-        el.style.width  = '256px';
-        el.style.height = '256px';
+      // Make sure children are crisp and not overriding layout
+      Array.from(inner.querySelectorAll('img,canvas')).forEach(el=>{
+        el.style.width  = '128px';
+        el.style.height = '128px';
         el.style.imageRendering = 'pixelated';
-        el.style.transform = 'none';
       });
 
-      // Sample top-left to solidify bg color (optional)
-      await new Promise(r => requestAnimationFrame(r));
+      // sample to set a solid bg color (optional)
+      await new Promise(r=>requestAnimationFrame(r));
       try{
-        const cv = fmHero.querySelector('canvas');
+        // prefer a canvas inside inner (layered)
+        const cv = inner.querySelector('canvas');
         if (cv){
           const ctx = cv.getContext('2d', { willReadFrequently:true });
           const px = ctx.getImageData(0,0,1,1).data;
@@ -182,8 +180,7 @@
       setState({ staked: !!staked, owner: owner || '' });
 
       setOpen(true);
-      drawFlat(id);      // immediate
-      drawLayered(id);   // non-blocking
+      await drawLayeredAt256(id);   // layered, exact 256×256
       fillAttributes(id);
     }
 
@@ -193,10 +190,9 @@
       if (e.key === 'Escape' && modal.classList.contains('open')) setOpen(false);
     });
 
-    // ----- ACTIONS (wired to your functions, with fallbacks) -----
+    // ----- ACTIONS (use your functions if present; else safe fallbacks) -----
     async function fallbackStake(id){
       if (!window.web3 || !window.collection || !window.controller || !window.user_address){ alert('Wallet or contracts not available.'); return; }
-      // approve-all check
       try{
         const approved = await collection.methods.isApprovedForAll(user_address, CFG.CONTROLLER_ADDRESS).call({ from: user_address});
         if (!approved){
@@ -280,7 +276,7 @@
     window.addEventListener('wallet:connected',  updateButtons);
     window.addEventListener('wallet:disconnected',updateButtons);
 
-    // warmup renderer once
+    // warmup once
     window.addEventListener('load', () => {
       try { FF?.ensureRarity && FF.ensureRarity(); } catch {}
       const tmp = document.createElement('div');
