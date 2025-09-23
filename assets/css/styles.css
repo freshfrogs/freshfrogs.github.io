@@ -145,8 +145,14 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
 
 /* Hero box must stay 256×256 */
 .ffm-hero{ position:relative; width:256px; height:256px; min-width:256px; min-height:256px; border:1px solid var(--edge); border-radius:12px; overflow:hidden; background:var(--panelSoft); }
-#fmHero{ width:256px; height:256px; min-width:256px; min-height:256px; }
-#fmHero canvas,#fmHero img{ width:256px !important; height:256px !important; image-rendering:pixelated; position:absolute; inset:0; }
+/* REMOVE this block */
+#fmHero canvas,
+#fmHero img {
+  width: 256px !important;
+  height: 256px !important;
+  image-rendering: pixelated;
+}
+
 
 /* Title + subtitle (matches list rows) */
 .ffm-titlerow{ display:grid; gap:6px; }
