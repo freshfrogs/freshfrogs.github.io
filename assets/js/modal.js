@@ -17,153 +17,84 @@
     const fmRarityLine = $('#fmRarityLine'); // sr-only
     const fmCollection = $('#fmCollection'); // sr-only
     const fmAttrs = $('#fmAttrs');
+    const fmHero = $('#fmHero');
 
-    const fmStakeBtn = $('#fmStakeBtn');
-    const fmUnstakeBtn = $('#fmUnstakeBtn');
+    const fmStakeBtn    = $('#fmStakeBtn');
+    const fmUnstakeBtn  = $('#fmUnstakeBtn');
     const fmTransferBtn = $('#fmTransferBtn');
 
-    const osLink = $('#fmOsLink');
-    const ethLink = $('#fmEthLink');
-    const rawLink = $('#fmRawLink');
+    const fmOpenSea   = $('#fmOpenSea');
+    const fmEtherscan = $('#fmEtherscan');
+    const fmMetaLink  = $('#fmMetaLink');   // “Original”
+    const fmImageLink = $('#fmImageLink');  // sr-only to still
 
-    const hero = $('#fmHero');
+    let current = { id:null, owner:'', staked:false, open:false };
+    const metaCache = new Map();
 
-    // current modal state
-    let current = { open:false, id:null, owner:'', staked:false, sinceMs:null };
+    // ---------- helpers ----------
+    const shorten = (a)=> (FF?.shorten ? FF.shorten(a) : (a ? a.slice(0,6)+'…'+a.slice(-4) : '—'));
+    const youAddr = ()=> (FF?.wallet?.address) || window.user_address || window.FF_WALLET?.address || null;
 
-    // --- stake age helpers ---
-    const fmtDaysAgo = (ms) => `${Math.floor(ms / 86400000)}d ago`;
-    function ownerLabel(a){ return (a && a.slice) ? (a.slice(0,6)+'…'+a.slice(-4)) : '—'; }
+    const fmtAgoMs = (ms)=>{
+      const s=Math.floor(ms/1000), m=Math.floor(s/60), h=Math.floor(m/60), d=Math.floor(h/24);
+      if (d>0) return `${d}d ago`; if (h>0) return `${h}h ago`; if (m>0) return `${m}m ago`; return `${s}s ago`;
+    };
 
-    async function fetchStakeSinceMs(id, owner){
-      try{
-        const API = 'https://api.reservoir.tools/users/activity/v6';
-        const headers = { accept:'*/*' };
-        if (CFG.FROG_API_KEY) headers['x-api-key'] = CFG.FROG_API_KEY;
-
-        const qs = (cont='')=>{
-          const p = new URLSearchParams({
-            users: owner, collection: CFG.COLLECTION_ADDRESS, types:'transfer', limit:'20'
-          });
-          if (cont) p.set('continuation', cont);
-          return p.toString();
-        };
-
-        let cont = '';
-        for (let guard = 0; guard < 20; guard++){
-          const res = await fetch(`${API}?${qs(cont)}`, { headers });
-          const json = await res.json();
-          const acts = json?.activities || [];
-          for (const a of acts){
-            const to = String(a?.toAddress || '').toLowerCase();
-            if (to !== String(CFG.CONTROLLER_ADDRESS || '').toLowerCase()) continue;
-            const tid = Number(a?.token?.tokenId);
-            if (tid !== id) continue;
-            const ms = a?.createdAt ? Date.parse(a.createdAt)
-                     : (a?.timestamp ? a.timestamp*1000 : null);
-            if (ms) return ms;
-          }
-          cont = json?.continuation || '';
-          if (!cont) break;
-        }
-      }catch(e){ console.warn('fetchStakeSinceMs failed', e); }
-      return null;
-    }
-
-    async function setStakeLine({ staked, owner }){
-      if (!fmLine) return;
-      if (!staked){
-        fmLine.textContent = `Not staked • Owned by ${ownerLabel(owner)}`;
-        return;
-      }
-      if (current?.sinceMs && !isNaN(current.sinceMs)){
-        fmLine.textContent = `Staked ${fmtDaysAgo(Date.now() - Number(current.sinceMs))} • Owned by ${ownerLabel(owner)}`;
-        return;
-      }
-      fmLine.textContent = `Staked • Owned by ${ownerLabel(owner)}`;
-      const ms = await fetchStakeSinceMs(current.id, owner);
-      if (ms && current?.open && current.id){
-        current.sinceMs = ms;
-        fmLine.textContent = `Staked ${fmtDaysAgo(Date.now() - ms)} • Owned by ${ownerLabel(owner)}`;
-      }
-    }
-
-    function setOpen(v){
+    const setOpen = (v) => {
       current.open = !!v;
       modal.classList.toggle('open', !!v);
       modal.setAttribute('aria-hidden', v ? 'false' : 'true');
-    }
+    };
 
     function setLinks(id){
       const os = `https://opensea.io/assets/ethereum/${CFG.COLLECTION_ADDRESS}/${id}`;
       const es = `https://etherscan.io/token/${CFG.COLLECTION_ADDRESS}?a=${id}`;
-      const raw = FF?.imageUrl ? FF.imageUrl(id, 1024) : (CFG.IMAGE_BASE ? `${CFG.IMAGE_BASE}/${id}.png` : '');
-      osLink && (osLink.href = os);
-      ethLink && (ethLink.href = es);
-      rawLink && (rawLink.href = raw);
+      fmOpenSea && (fmOpenSea.href = os);
+      fmEtherscan && (fmEtherscan.href = es);
+      const base = CFG.SOURCE_PATH || '';
+      const still = `${base}/frog/${id}.png`;
+      fmMetaLink  && (fmMetaLink.textContent = 'Original');
+      fmMetaLink  && (fmMetaLink.href  = still);
+      fmImageLink && (fmImageLink.href = still);
     }
 
-    function setHeroFrom(id){
-      if (!hero) return;
-      const flatUrl = FF?.imageUrl ? FF.imageUrl(id, 1024) : (CFG.IMAGE_BASE ? `${CFG.IMAGE_BASE}/${id}.png` : '');
-      hero.style.background = 'transparent';
-      hero.style.backgroundImage = `url("${flatUrl}")`;
-      hero.style.backgroundRepeat = 'no-repeat';
-      hero.style.backgroundPosition = 'center';
-      hero.style.backgroundSize = 'contain';
-      hero.style.imageRendering = 'pixelated';
-      // attempt to derive background from top-left pixel to avoid empty bg
-      try{
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = ()=>{
-          try{
-            const c = document.createElement('canvas'); c.width=2; c.height=2;
-            const x = c.getContext('2d', { willReadFrequently:true });
-            x.drawImage(img, 0, 0, 2, 2);
-            const d = x.getImageData(0,0,1,1).data;
-            hero.style.backgroundColor = `rgb(${d[0]}, ${d[1]}, ${d[2]})`;
-          }catch(e){}
-        };
-        img.src = flatUrl;
-      }catch(e){}
-    }
-
-    function setRank(id){
-      if (!fmRankNum) return;
-      try{
-        const r = (FF && FF.ranks && FF.ranks.lookup && FF.ranks.lookup[id]) || null;
-        fmRankNum.textContent = r ? `#${r.rank}` : '—';
-      }catch(e){
-        fmRankNum.textContent = '—';
+    // ---------- Rank ----------
+    let RANKS = null, ranksLoading = null;
+    async function ensureRanks(){
+      if (RANKS) return RANKS;
+      if (!ranksLoading){
+        const url = 'assets/freshfrogs_rank_lookup.json';
+        ranksLoading = (FF?.fetchJSON ? FF.fetchJSON(url) : fetch(url).then(r=>r.json()))
+          .catch(()=> ({}));
       }
+      RANKS = await ranksLoading;
+      return RANKS;
+    }
+    async function setRarity(id){
+      let rank = null;
+      if (FF?.getRankById) rank = FF.getRankById(id);
+      if (rank == null){
+        const map = await ensureRanks();
+        rank = (map && (String(id) in map)) ? map[String(id)] : null;
+      }
+      fmRankNum && (fmRankNum.textContent = (rank!=null) ? `#${rank}` : '—');
+      fmRarityLine && (fmRarityLine.textContent = (rank!=null) ? `#${rank} of ${CFG.SUPPLY || 4040}` : '—');
     }
 
-    function setAttrs(id){
-      if (!fmAttrs) return;
-      fmAttrs.innerHTML = '';
-      if (!FF || !FF.ranks || !FF.ranks.items) return;
-      const it = FF.ranks.items.find(x=> Number(x.id)===Number(id));
-      if (!it || !Array.isArray(it.attributes)) return;
-      it.attributes.forEach(a=>{
-        const row = document.createElement('div');
-        row.className = 'attr-row';
-        const k = document.createElement('div'); k.className='attr-k'; k.textContent = a.trait_type || a.type || '—';
-        const v = document.createElement('div'); v.className='attr-v'; v.textContent = a.value || '—';
-        row.appendChild(k); row.appendChild(v);
-        fmAttrs.appendChild(row);
-      });
+    // ---------- state & subtitle ----------
+    function ownerLabel(addr){
+      const you = youAddr();
+      return (you && addr && you.toLowerCase() === addr.toLowerCase()) ? 'You' : (addr ? shorten(addr) : '—');
     }
 
-    function youAddr(){
-      return (FF?.wallet?.address) || window.user_address || window.FF_WALLET?.address || null;
-    }
-
-    async function setState({ staked, owner }){
+    function setState({ staked, owner }){
       current.staked = !!staked; current.owner = owner || '';
-
-      // Render the stake line (will include "NNd ago" when available)
-      await setStakeLine({ staked, owner });
+      fmLine && (fmLine.textContent = `${staked ? 'Staked' : 'Not staked'} • Owned by ${ownerLabel(owner)}`);
+      // If staked and we know when, render 'Staked NNd ago • Owned by ...'
+      if (staked && current?.sinceMs && !isNaN(current.sinceMs)){
+        const days = Math.floor((Date.now() - Number(current.sinceMs)) / 86400000);
+        fmLine && (fmLine.textContent = `Staked ${days}d ago • Owned by ${ownerLabel(owner)}`);
+      }
 
       fmOwner && (fmOwner.textContent = owner || '—');
 
@@ -178,81 +109,169 @@
       if (fmTransferBtn) fmTransferBtn.disabled = !canTransfer;
     }
 
-    function setId(id){
+    // Use your function to compute "Staked Xd ago"
+    async function updateStakedLine(id, owner){
+      if (!current.staked || !fmLine) return;
+      try{
+        if (typeof window.timeStaked === 'function'){
+          const since = await window.timeStaked(id); // returns Date or 0.00
+          if (since && Object.prototype.toString.call(since) === '[object Date]' && !isNaN(since)){
+            fmLine.textContent = `Staked ${fmtAgoMs(Date.now()-since.getTime())} • Owned by ${ownerLabel(owner)}`;
+            return;
+          }
+        }
+      }catch{}
+      // fallback
+      fmLine.textContent = `Staked • Owned by ${ownerLabel(owner)}`;
+    }
+
+    // ---------- metadata/attributes ----------
+    async function getMeta(id){
+      if (metaCache.has(id)) return metaCache.get(id);
+      const url = `${CFG.SOURCE_PATH || ''}/frog/json/${id}.json`;
+      const p = (FF?.fetchJSON ? FF.fetchJSON(url) : fetch(url).then(r=>r.json()))
+        .catch(e => { console.warn('meta fetch failed', id, e); return null; });
+      metaCache.set(id, p);
+      return p;
+    }
+    async function fillAttributes(id){
+      if (!fmAttrs) return;
+      fmAttrs.innerHTML = '';
+      const meta = await getMeta(id);
+      if (!current.open || !meta) return;
+      const list = Array.isArray(meta.attributes) ? meta.attributes : [];
+      const frag = document.createDocumentFragment();
+      for (const a of list){
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="name">${a.trait_type}</span><span class="val">${a.value}</span>`;
+        frag.appendChild(li);
+      }
+      fmAttrs.replaceChildren(frag);
+    }
+
+    // ---------- HERO (exact 256×256 with layered 2× wrapper) ----------
+    function styleHeroBgOnly(id){
+      const flatUrl = `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
+      Object.assign(fmHero.style, {
+        width:'256px', height:'256px', minWidth:'256px', minHeight:'256px',
+        position:'relative', overflow:'hidden', borderRadius:'12px',
+        backgroundRepeat:'no-repeat',
+        backgroundSize:'3400% 3400%',      // shove the source way out
+        backgroundPosition:'2600% -2600%', // show only background color
+        backgroundImage:`url("${flatUrl}")`,
+        imageRendering:'pixelated'
+      });
+
+      // Also try to set a SOLID bg color (sample top-left) — ignore CORS errors
+      try{
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = ()=>{
+          try{
+            const c = document.createElement('canvas'); c.width=2; c.height=2;
+            const x = c.getContext('2d', { willReadFrequently:true });
+            x.drawImage(img, 0, 0, 2, 2);
+            const d = x.getImageData(0,0,1,1).data;
+            fmHero.style.backgroundColor = `rgba(${d[0]},${d[1]},${d[2]},1)`;
+          }catch{/* ignore */}
+        };
+        img.src = flatUrl;
+      }catch{}
+    }
+
+    async function drawLayeredAt256(id){
+      if (!fmHero) return;
+      fmHero.innerHTML = '';
+      styleHeroBgOnly(id);
+
+      // inner wrapper: renderer draws 128×128, we scale to 256
+      const inner = document.createElement('div');
+      Object.assign(inner.style, {
+        position:'absolute', left:'0', top:'0',
+        width:'128px', height:'128px',
+        transform:'scale(2)', transformOrigin:'top left',
+        imageRendering:'pixelated'
+      });
+      fmHero.appendChild(inner);
+
+      // wait for global buildFrog128
+      const ready = await new Promise(res=>{
+        if (typeof window.buildFrog128 === 'function') return res(true);
+        const t0 = performance.now();
+        (function tick(){
+          if (typeof window.buildFrog128 === 'function') return res(true);
+          if (performance.now() - t0 > 1800) return res(false);
+          requestAnimationFrame(tick);
+        })();
+      });
+      if (!ready) return;
+
+      try{
+        const r = window.buildFrog128(inner, id);
+        if (r?.then) await r;
+      }catch(e){ console.warn('buildFrog128 failed', e); }
+
+      // keep layer children crisp and sized for 128
+      inner.querySelectorAll('img,canvas').forEach(el=>{
+        el.style.width  = '128px';
+        el.style.height = '128px';
+        el.style.imageRendering = 'pixelated';
+      });
+    }
+
+    // ---------- open / close ----------
+    async function openFrogModal({ id, owner, staked }) {
+      current.id = id; current.owner = owner || ''; current.staked = !!staked;
+
       fmId && (fmId.textContent = `#${id}`);
-      fmCollection && (fmCollection.textContent = CFG.COLLECTION_ADDRESS);
-    }
+      fmCollection && (fmCollection.textContent = shorten(CFG.COLLECTION_ADDRESS));
+      setLinks(id);
+      setState({ staked: !!staked, owner: owner || '' });
 
-    function closeModal(){
-      setOpen(false);
-      current = { open:false, id:null, owner:'', staked:false, sinceMs:null };
-    }
-
-    // external API for other scripts
-    window.FFModal = window.FFModal || {};
-    window.FFModal.close = closeModal;
-
-    function onKey(e){ if (e.key === 'Escape') closeModal(); }
-    function onBg(e){ if (e.target === modal) closeModal(); }
-    $('#fmClose')?.addEventListener('click', closeModal);
-    modal.addEventListener('click', onBg);
-    document.addEventListener('keydown', onKey);
-
-    // Open + populate
-    function openLinks(id){ setLinks(id); }
-    function openHero(id){ setHeroFrom(id); }
-    function openRank(id){ setRank(id); }
-    function openAttrs(id){ setAttrs(id); }
-
-    function openFrogModal ({ id, owner, staked, sinceMs }){
       setOpen(true);
-      current = { id, owner, staked, sinceMs: sinceMs || null };
-      setId(id);
-      openLinks(id);
-      openHero(id);
-      openRank(id);
-      openAttrs(id);
-      setState({ staked, owner });
+      await drawLayeredAt256(id);
+      setRarity(id);
+      updateStakedLine(id, owner || '');
+      fillAttributes(id);
     }
 
-    window.FFModal.openFrogModal = openFrogModal;
+    modal.addEventListener('click', (e) => { if (e.target.matches('[data-close]')) setOpen(false); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) setOpen(false); });
 
-    // Buttons
-    fmStakeBtn?.addEventListener('click', async ()=>{
-      if (!current?.id) return;
-      try{
-        if (window.stakeSelected) {
-          await window.stakeSelected([current.id]);
-        }else{
-          alert('Stake action not wired');
-        }
-      }catch(e){ alert(e?.message || 'Stake failed'); }
+    // ---------- ACTIONS (use YOUR functions when present) ----------
+    fmStakeBtn?.addEventListener('click', async () => {
+      if (!current.id || fmStakeBtn.disabled) return;
+      if (typeof window.initiate_stake === 'function'){
+        const msg = await window.initiate_stake(current.id);
+        if (msg) alert(msg);
+      } else {
+        alert('initiate_stake(tokenId) not found.');
+      }
     });
 
-    fmUnstakeBtn?.addEventListener('click', async ()=>{
-      if (!current?.id) return;
-      try{
-        if (window.unstakeSelected) {
-          await window.unstakeSelected([current.id]);
-        }else{
-          alert('Unstake action not wired');
-        }
-      }catch(e){ alert(e?.message || 'Unstake failed'); }
+    fmUnstakeBtn?.addEventListener('click', async () => {
+      if (!current.id || fmUnstakeBtn.disabled) return;
+      if (typeof window.initiate_withdraw === 'function'){
+        const msg = await window.initiate_withdraw(current.id);
+        if (msg) alert(msg);
+      } else {
+        alert('initiate_withdraw(tokenId) not found.');
+      }
     });
 
-    fmTransferBtn?.addEventListener('click', async ()=>{
-      if (!current?.id) return;
-      try{
-        if (window.transferSingle){
-          await window.transferSingle(current.id);
-        } else {
-          if (!window.collection || !window.user_address){ alert('Wallet/contracts not available'); return; }
-          const to=(prompt('Transfer to address (0x…)')||'').trim();
-          if(!/^0x[a-fA-F0-9]{40}$/.test(to)){ alert('Invalid address'); return; }
-          try{ await collection.methods.safeTransferFrom(window.user_address, to, current.id).send({ from: window.user_address }); }
-          catch(e){ alert(e?.message || 'Transfer failed'); }
-        }
-      }catch(e){ alert(e?.message || 'Transfer failed'); }
+    fmTransferBtn?.addEventListener('click', async () => {
+      if (!current.id || fmTransferBtn.disabled) return;
+      if (typeof window.transferToken === 'function'){
+        try { await window.transferToken(CFG.COLLECTION_ADDRESS, current.id); }
+        catch(e){ alert(e?.message || 'Transfer failed'); }
+      } else {
+        // minimal inline prompt if your transfer helper isn't present
+        if (!window.collection || !window.user_address){ alert('Wallet/contracts not available'); return; }
+        const to=(prompt('Transfer to address (0x…)')||'').trim();
+        if(!/^0x[a-fA-F0-9]{40}$/.test(to)){ alert('Invalid address'); return; }
+        try{ await collection.methods.safeTransferFrom(window.user_address, to, current.id).send({ from: window.user_address }); }
+        catch(e){ alert(e?.message || 'Transfer failed'); }
+      }
     });
 
     // ---------- open from list items ----------
@@ -260,12 +279,12 @@
     document.addEventListener('click', (e) => {
       const opener = e.target.closest('[data-open-modal]');
       if (!opener) return;
-      const id     = Number(opener.getAttribute('data-token-id'));
-      const owner  = opener.getAttribute('data-owner') || '';
+      const id = Number(opener.getAttribute('data-token-id'));
+      const owner = opener.getAttribute('data-owner') || '';
       const staked = opener.getAttribute('data-staked') === 'true';
-      const sinceAttr = opener.getAttribute('data-since');
-      const sinceMs   = sinceAttr ? Number(sinceAttr) : null;
-      if (!Number.isFinite(id)) return;
+            const sinceAttr = opener.getAttribute('data-since');
+      const sinceMs = sinceAttr ? Number(sinceAttr) : null;
+if (!Number.isFinite(id)) return;
       e.preventDefault();
       window.FFModal.openFrogModal({ id, owner, staked, sinceMs });
     });
@@ -273,8 +292,17 @@
     // keep buttons in sync with wallet connection
     function updateButtons(){ if (current.open) setState({ staked: current.staked, owner: current.owner }); }
     window.addEventListener('wallet:connected',  updateButtons);
-    window.addEventListener('wallet:disconnected', updateButtons);
-    window.addEventListener('FF:walletConnected',  updateButtons);
-    window.addEventListener('FF:walletDisconnected', updateButtons);
+    window.addEventListener('wallet:disconnected',updateButtons);
+
+    // warm up renderer
+    window.addEventListener('load', () => {
+      const tmp = document.createElement('div');
+      tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;';
+      document.body.appendChild(tmp);
+      if (typeof window.buildFrog128 === 'function') {
+        try { const m = window.buildFrog128(tmp, 1); if (m?.then) m.finally(()=>tmp.remove()); else tmp.remove(); }
+        catch { tmp.remove(); }
+      } else { tmp.remove(); }
+    });
   });
-})(window.FF || (window.FF={}), window.FF_CFG);
+})(window.FF || (window.FF = {}), window.FF_CFG || {});
