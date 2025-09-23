@@ -158,11 +158,28 @@
         width:'256px', height:'256px', minWidth:'256px', minHeight:'256px',
         position:'relative', overflow:'hidden', borderRadius:'12px',
         backgroundRepeat:'no-repeat',
-        backgroundSize:'3400% 3400%',
-        backgroundPosition:'2600% -2600%',
+        backgroundSize:'3400% 3400%',      // shove the source way out
+        backgroundPosition:'2600% -2600%', // show only background color
         backgroundImage:`url("${flatUrl}")`,
-        imageRendering:'pixelated'
+        imageRendering:'pixelated',
+        backgroundColor:'#222'             // fallback so it isn't transparent
       });
+
+      // Sample top-left pixel from the flat PNG to set a solid bg color
+      try{
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = ()=>{
+          try{
+            const c = document.createElement('canvas'); c.width=2; c.height=2;
+            const x = c.getContext('2d', { willReadFrequently:true });
+            x.drawImage(img, 0, 0, 2, 2);
+            const d = x.getImageData(0,0,1,1).data;
+            fmHero.style.backgroundColor = `rgba(${d[0]},${d[1]},${d[2]},1)`;
+          }catch{/* ignore sampling errors */}
+        };
+        img.src = flatUrl;
+      }catch{/* ignore */}
     }
 
     async function drawLayeredAt256(id){
@@ -170,6 +187,7 @@
       fmHero.innerHTML = '';
       styleHeroBgOnly(id);
 
+      // inner wrapper: renderer draws 128×128, we scale to 256
       const inner = document.createElement('div');
       Object.assign(inner.style, {
         position:'absolute', left:'0', top:'0',
@@ -179,6 +197,7 @@
       });
       fmHero.appendChild(inner);
 
+      // wait for global buildFrog128
       const ready = await new Promise(res=>{
         if (typeof window.buildFrog128 === 'function') return res(true);
         const t0 = performance.now();
@@ -195,17 +214,17 @@
         if (r?.then) await r;
       }catch(e){ console.warn('buildFrog128 failed', e); }
 
+      // keep layer children crisp and sized for 128
       inner.querySelectorAll('img,canvas').forEach(el=>{
         el.style.width  = '128px';
         el.style.height = '128px';
         el.style.imageRendering = 'pixelated';
       });
 
-      // ----- Hover jiggle for layers, but SKIP: Frog / Trait / SpecialFrog -----
+      // Hover jiggle for layers, but SKIP: Frog / Trait / SpecialFrog
       const SKIP = new Set(['Frog','Trait','SpecialFrog']);
       const layers = ()=> inner.querySelectorAll('img,canvas');
       const jitter = ()=> (Math.random() * 2 - 1) * 2; // -2..2px
-
       function setJiggle(active){
         layers().forEach((el)=>{
           const attr = (el.dataset?.attr || '').trim();
@@ -228,7 +247,7 @@
       setLinks(id);
       setState({ staked: !!staked, owner: owner || '' });
 
-      modal.classList.add('open'); setOpen(true);
+      setOpen(true);
       await drawLayeredAt256(id);
       setRarity(id);
       updateStakedLine(id, owner || '');
