@@ -122,6 +122,38 @@
     </div>
   </section>
 
+  <section class="card" id="userDashboard">
+    <header class="row" style="align-items:center; gap:12px;">
+      <h2 style="margin:0;">Your Dashboard</h2>
+      <span class="muted" id="dashStatus">Connect your wallet to load your dashboard.</span>
+      <span class="pill">Addr: <b id="dashAddress"></b></span>
+      <button class="btn btn-ghost btn-sm" id="dashRefresh">Refresh</button>
+    </header>
+
+    <div class="row" style="gap:12px; margin:12px 0;">
+      <div class="stat"><div class="stat-num" id="dashOwned">—</div><div class="stat-label">Owned</div></div>
+      <div class="stat"><div class="stat-num" id="dashStaked">—</div><div class="stat-label">Staked</div></div>
+      <div class="stat"><div class="stat-num" id="dashRewards">—</div><div class="stat-label">Rewards (FLYZ)</div></div>
+    </div>
+
+    <div class="row" style="gap:12px; flex-wrap:wrap;">
+      <button class="btn" id="dashApprove">Approve Staking</button>
+      <span class="muted" id="dashApprovalNote"></span>
+      <button class="btn btn-solid" id="dashClaim" disabled>Claim Rewards</button>
+    </div>
+
+    <div class="row" style="gap:24px; margin-top:16px;">
+      <div style="flex:1; min-width:280px;">
+        <h3 style="margin:0 0 8px;">Owned (first 20)</h3>
+        <ul class="list" id="dashOwnedList"></ul>
+      </div>
+      <div style="flex:1; min-width:280px;">
+        <h3 style="margin:0 0 8px;">Staked (first 20)</h3>
+        <ul class="list" id="dashStakedList"></ul>
+      </div>
+    </div>
+  </section>
+
   <!-- Pond -->
   <section id="pond" class="panel stack" aria-label="The Pond">
     <div class="row" style="justify-content:space-between;align-items:center">
@@ -190,6 +222,7 @@
 <script src="assets/js/staking.js"></script>
 <script src="assets/js/pond.js"></script>
 <script src="assets/js/modal.js"></script>
+<script src="assets/js/dashboard.js"></script>
 <script src="assets/js/main.js"></script>
 
 <!-- Frog Modal (image ABOVE info, Original link, no extra text blocks) -->

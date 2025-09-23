@@ -13,9 +13,9 @@
     const fmId = $('#fmId');
     const fmRankNum = $('#fmRankNum');
     const fmLine = $('#fmLine');
-    const fmOwner = $('#fmOwner');           // sr-only
-    const fmRarityLine = $('#fmRarityLine'); // sr-only
-    const fmCollection = $('#fmCollection'); // sr-only
+    const fmOwner = $('#fmOwner');
+    const fmRarityLine = $('#fmRarityLine');
+    const fmCollection = $('#fmCollection');
     const fmAttrs = $('#fmAttrs');
     const fmHero = $('#fmHero');
 
@@ -25,16 +25,14 @@
 
     const fmOpenSea   = $('#fmOpenSea');
     const fmEtherscan = $('#fmEtherscan');
-    const fmMetaLink  = $('#fmMetaLink');   // “Original”
-    const fmImageLink = $('#fmImageLink');  // sr-only to still
+    const fmMetaLink  = $('#fmMetaLink');
+    const fmImageLink = $('#fmImageLink');
 
     let current = { id:null, owner:'', staked:false, open:false, sinceMs:null };
     const metaCache = new Map();
 
-    // ---------- helpers ----------
     const shorten = (a)=> (FF?.shorten ? FF.shorten(a) : (a ? a.slice(0,6)+'…'+a.slice(-4) : '—'));
     const youAddr = ()=> (FF?.wallet?.address) || window.user_address || window.FF_WALLET?.address || null;
-
     const fmtAgoMs = (ms)=>{
       const s=Math.floor(ms/1000), m=Math.floor(s/60), h=Math.floor(m/60), d=Math.floor(h/24);
       if (d>0) return `${d}d ago`; if (h>0) return `${h}h ago`; if (m>0) return `${m}m ago`; return `${s}s ago`;
@@ -86,18 +84,13 @@
       const you = youAddr();
       return (you && addr && you.toLowerCase() === addr.toLowerCase()) ? 'You' : (addr ? shorten(addr) : '—');
     }
-
     function setState({ staked, owner }){
       current.staked = !!staked; current.owner = owner || '';
-      // default line, then override below
       fmLine && (fmLine.textContent = `${staked ? 'Staked' : 'Not staked'} • Owned by ${ownerLabel(owner)}`);
-
-      // If staked and we know when, render 'Staked NNd ago • Owned by ...'
       if (staked && current?.sinceMs && !isNaN(current.sinceMs)){
         const days = Math.floor((Date.now() - Number(current.sinceMs)) / 86400000);
         fmLine && (fmLine.textContent = `Staked ${days}d ago • Owned by ${ownerLabel(owner)}`);
       }
-
       fmOwner && (fmOwner.textContent = owner || '—');
 
       const you = youAddr();
@@ -111,31 +104,19 @@
       if (fmTransferBtn) fmTransferBtn.disabled = !canTransfer;
     }
 
-    // Robust "Staked Xd ago" updater:
-    // - First uses current.sinceMs if present (from opener data-since)
-    // - Else tries window.timeStaked(id) and accepts Date | number | string
     async function updateStakedLine(id, owner){
       if (!current.staked || !fmLine) return;
-
-      // 1) sinceMs from opener
       if (current.sinceMs && !isNaN(current.sinceMs)){
         fmLine.textContent = `Staked ${fmtAgoMs(Date.now() - Number(current.sinceMs))} • Owned by ${ownerLabel(owner)}`;
         return;
       }
-
-      // 2) user-provided resolver
       try{
         if (typeof window.timeStaked === 'function'){
-          const since = await window.timeStaked(id); // Date | number | string
+          const since = await window.timeStaked(id);
           let ms = null;
           if (since instanceof Date && !isNaN(since)) ms = since.getTime();
-          else if (typeof since === 'number' && isFinite(since)){
-            // seconds or ms
-            ms = (since > 1e12) ? since : since * 1000;
-          } else if (typeof since === 'string'){
-            const p = Date.parse(since);
-            if (!isNaN(p)) ms = p;
-          }
+          else if (typeof since === 'number' && isFinite(since)) ms = (since > 1e12) ? since : since * 1000;
+          else if (typeof since === 'string'){ const p = Date.parse(since); if (!isNaN(p)) ms = p; }
           if (ms){
             current.sinceMs = ms;
             fmLine.textContent = `Staked ${fmtAgoMs(Date.now() - ms)} • Owned by ${ownerLabel(owner)}`;
@@ -143,8 +124,6 @@
           }
         }
       }catch{}
-
-      // 3) fallback
       fmLine.textContent = `Staked • Owned by ${ownerLabel(owner)}`;
     }
 
@@ -179,27 +158,11 @@
         width:'256px', height:'256px', minWidth:'256px', minHeight:'256px',
         position:'relative', overflow:'hidden', borderRadius:'12px',
         backgroundRepeat:'no-repeat',
-        backgroundSize:'3400% 3400%',      // shove the source way out
-        backgroundPosition:'2600% -2600%', // show only background color
+        backgroundSize:'3400% 3400%',
+        backgroundPosition:'2600% -2600%',
         backgroundImage:`url("${flatUrl}")`,
         imageRendering:'pixelated'
       });
-
-      // Also try to set a SOLID bg color (sample top-left) — ignore CORS errors
-      try{
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = ()=>{
-          try{
-            const c = document.createElement('canvas'); c.width=2; c.height=2;
-            const x = c.getContext('2d', { willReadFrequently:true });
-            x.drawImage(img, 0, 0, 2, 2);
-            const d = x.getImageData(0,0,1,1).data;
-            fmHero.style.backgroundColor = `rgba(${d[0]},${d[1]},${d[2]},1)`;
-          }catch{/* ignore */}
-        };
-        img.src = flatUrl;
-      }catch{}
     }
 
     async function drawLayeredAt256(id){
@@ -207,7 +170,6 @@
       fmHero.innerHTML = '';
       styleHeroBgOnly(id);
 
-      // inner wrapper: renderer draws 128×128, we scale to 256
       const inner = document.createElement('div');
       Object.assign(inner.style, {
         position:'absolute', left:'0', top:'0',
@@ -217,7 +179,6 @@
       });
       fmHero.appendChild(inner);
 
-      // wait for global buildFrog128
       const ready = await new Promise(res=>{
         if (typeof window.buildFrog128 === 'function') return res(true);
         const t0 = performance.now();
@@ -234,18 +195,21 @@
         if (r?.then) await r;
       }catch(e){ console.warn('buildFrog128 failed', e); }
 
-      // keep layer children crisp and sized for 128
       inner.querySelectorAll('img,canvas').forEach(el=>{
         el.style.width  = '128px';
         el.style.height = '128px';
         el.style.imageRendering = 'pixelated';
       });
 
-      // ----- Hover jiggle for ALL layers -----
+      // ----- Hover jiggle for layers, but SKIP: Frog / Trait / SpecialFrog -----
+      const SKIP = new Set(['Frog','Trait','SpecialFrog']);
       const layers = ()=> inner.querySelectorAll('img,canvas');
-      const jitter = ()=> (Math.random() * 2 - 1) * 2; // -2px .. 2px
+      const jitter = ()=> (Math.random() * 2 - 1) * 2; // -2..2px
+
       function setJiggle(active){
         layers().forEach((el)=>{
+          const attr = (el.dataset?.attr || '').trim();
+          if (SKIP.has(attr)) return;
           el.style.transition = 'transform 120ms ease';
           el.style.transform = active ? `translate(${jitter()}px, ${jitter()}px)` : 'translate(0,0)';
         });
@@ -257,36 +221,31 @@
     // ---------- open / close ----------
     async function openFrogModal({ id, owner, staked, sinceMs }) {
       current.id = id; current.owner = owner || ''; current.staked = !!staked;
-      current.sinceMs = sinceMs || null; // allow immediate "NNd ago" if provided
+      current.sinceMs = sinceMs || null;
 
       fmId && (fmId.textContent = `#${id}`);
       fmCollection && (fmCollection.textContent = shorten(CFG.COLLECTION_ADDRESS));
       setLinks(id);
       setState({ staked: !!staked, owner: owner || '' });
 
-      setOpen(true);
+      modal.classList.add('open'); setOpen(true);
       await drawLayeredAt256(id);
       setRarity(id);
       updateStakedLine(id, owner || '');
       fillAttributes(id);
     }
-
-    // expose (optional)
     window.FFModal = { openFrogModal };
 
     modal.addEventListener('click', (e) => { if (e.target.matches('[data-close]')) setOpen(false); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) setOpen(false); });
 
-    // ---------- open from list items ----------
     async function resolveSinceMs(id){
       try{
         if (typeof window.timeStaked === 'function'){
-          const v = await window.timeStaked(id); // Date | number | string | null
+          const v = await window.timeStaked(id);
           if (v instanceof Date && !isNaN(v)) return v.getTime();
           if (typeof v === 'number' && isFinite(v)) return (v > 1e12 ? v : v*1000);
-          if (typeof v === 'string'){
-            const p = Date.parse(v); if (!isNaN(p)) return p;
-          }
+          if (typeof v === 'string'){ const p = Date.parse(v); if (!isNaN(p)) return p; }
         }
       }catch{}
       return null;
@@ -301,24 +260,16 @@
       const staked = opener.getAttribute('data-staked') === 'true';
       let sinceAttr = opener.getAttribute('data-since');
       let sinceMs   = sinceAttr ? Number(sinceAttr) : null;
-
       if (!Number.isFinite(id)) return;
       e.preventDefault();
 
-      // If not provided (Owned/Staked view), resolve via timeStaked before opening
       if (!sinceMs && staked){
         sinceMs = await resolveSinceMs(id);
-        if (sinceMs) opener.setAttribute('data-since', String(sinceMs)); // cache on element for future clicks
+        if (sinceMs) opener.setAttribute('data-since', String(sinceMs));
       }
 
-      // IMPORTANT: call the local function directly (don’t depend on window.FFModal existing)
       openFrogModal({ id, owner, staked, sinceMs });
     });
-
-    // keep buttons in sync with wallet connection
-    function updateButtons(){ if (current.open) setState({ staked: current.staked, owner: current.owner }); }
-    window.addEventListener('wallet:connected',  updateButtons);
-    window.addEventListener('wallet:disconnected',updateButtons);
 
     // warm up renderer
     window.addEventListener('load', () => {
