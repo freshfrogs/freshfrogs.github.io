@@ -220,8 +220,9 @@
     }
 
     // ---------- open / close ----------
-    async function openFrogModal({ id, owner, staked }) {
+    async function openFrogModal({ id, owner, staked, sinceMs }) {
       current.id = id; current.owner = owner || ''; current.staked = !!staked;
+      current.sinceMs = sinceMs || null; // <-- allow modal to render "NNd ago" immediately when provided
 
       fmId && (fmId.textContent = `#${id}`);
       fmCollection && (fmCollection.textContent = shorten(CFG.COLLECTION_ADDRESS));
@@ -282,11 +283,11 @@
       const id = Number(opener.getAttribute('data-token-id'));
       const owner = opener.getAttribute('data-owner') || '';
       const staked = opener.getAttribute('data-staked') === 'true';
-            const sinceAttr = opener.getAttribute('data-since');
-      const sinceMs = sinceAttr ? Number(sinceAttr) : null;
-if (!Number.isFinite(id)) return;
+      const sinceAttr = opener.getAttribute('data-since');              // <-- added
+      const sinceMs   = sinceAttr ? Number(sinceAttr) : null;           // <-- added
+      if (!Number.isFinite(id)) return;
       e.preventDefault();
-      window.FFModal.openFrogModal({ id, owner, staked, sinceMs });
+      window.FFModal.openFrogModal({ id, owner, staked, sinceMs });     // <-- pass sinceMs through
     });
 
     // keep buttons in sync with wallet connection
