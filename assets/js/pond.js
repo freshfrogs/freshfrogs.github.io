@@ -1,16 +1,16 @@
-// assets/js/pond.js — Flat 64px thumbnails, click-anywhere rows open modal, pager intact
-(function(FF, CFG){
+// assets/js/pond.js
+(function (FF, CFG) {
   const wrap = document.getElementById('pondListWrap');
   const ul   = document.getElementById('pondList');
   if (!wrap || !ul) return;
 
   // ---------- config ----------
-  const API = 'https://api.reservoir.tools/users/activity/v6';
-  const OWNERS_API = 'https://api.reservoir.tools/owners/v2';
-  const TOKENS_API = 'https://api.reservoir.tools/users'; // /{addr}/tokens/v8
-  const CONTROLLER = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
-  const COLLECTION = CFG.COLLECTION_ADDRESS || '';
-  const PAGE_SIZE  = 20;
+  const API          = 'https://api.reservoir.tools/users/activity/v6';
+  const OWNERS_API   = 'https://api.reservoir.tools/owners/v2';
+  const TOKENS_API   = 'https://api.reservoir.tools/users'; // /{addr}/tokens/v8
+  const CONTROLLER   = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
+  const COLLECTION   = CFG.COLLECTION_ADDRESS || '';
+  const PAGE_SIZE    = 20;
   const PREFETCH_PAGES = 3;
 
   function apiHeaders(){
@@ -54,7 +54,7 @@
   // ---------- state ----------
   const ST = {
     pages: [],                 // [{ rows: [{id, staker, since}], contIn, contOut }]
-    page: 0,                   // newest-first internal index
+    page: 0,
     nextContinuation: '',
     blockedIds: new Set(),
     acceptedIds: new Set(),
@@ -87,10 +87,10 @@
     return nav;
   }
 
-  const storeIdxFromDisplay = (dispIdx)=> (ST.pages.length - 1 - dispIdx);
-  const displayIdxFromStore = (storeIdx)=> (ST.pages.length - 1 - storeIdx);
+  // internal<->display index conversions
+  const storeIdxFromDisplay  = (dispIdx)=> (ST.pages.length - 1 - dispIdx);
+  const displayIdxFromStore  = (storeIdx)=> (ST.pages.length - 1 - storeIdx);
 
-  // ---------- PAGER ----------
   function renderPager(){
     const nav = ensurePager();
     nav.innerHTML = '';
@@ -114,7 +114,7 @@
       nav.appendChild(btn);
     }
 
-    // trailing ellipsis to fetch the next page
+    // trailing ellipsis
     if (ST.nextContinuation){
       const moreBtn = document.createElement('button');
       moreBtn.className = 'btn btn-ghost btn-sm';
@@ -141,14 +141,15 @@
     return el;
   }
 
-  // Flat 64px frog for list
-  function flatFrog64(parent, id){
+  // 64×64 still image for list (fast)
+  function flatThumb64(leftEl, id){
     const img = new Image();
     img.decoding = 'async';
     img.loading  = 'lazy';
     img.className = 'thumb64';
+    img.width = 64; img.height = 64;
     img.src = `${(CFG.SOURCE_PATH || '')}/frog/${id}.png`;
-    parent.appendChild(img);
+    leftEl.appendChild(img);
   }
 
   // ---------- activity selection ----------
@@ -177,7 +178,6 @@
       }
     }
 
-    // Oldest -> newest within the page
     out.sort((a,b)=>{
       const ta = a.since ? a.since.getTime() : 0;
       const tb = b.since ? b.since.getTime() : 0;
@@ -234,10 +234,10 @@
       return;
     }
 
-    const dispIdx = displayIdxFromStore(ST.page);
+    const dispIdx  = displayIdxFromStore(ST.page);
     const storeIdx = storeIdxFromDisplay(dispIdx);
-    const page = ST.pages[storeIdx];
-    const rows = page?.rows || [];
+    const page     = ST.pages[storeIdx];
+    const rows     = page?.rows || [];
 
     if (!rows.length){
       const li = document.createElement('li');
@@ -248,27 +248,30 @@
       rows.forEach(r=>{
         const rank = RANKS?.[String(r.id)] ?? null;
 
-        const li = mk('li', { className:'list-item' });
-        // Row metadata for modal
+        const li = mk('li', { className:'list-item', tabIndex:0, role:'button' });
+        // Make the whole row open the modal
+        li.setAttribute('data-open-modal','');
         li.setAttribute('data-token-id', String(r.id));
-        li.setAttribute('data-staked','true');
-        if (r.staker) li.setAttribute('data-owner', r.staker);
-        if (r.since)  li.setAttribute('data-staked-since', r.since.toISOString?.() || String(r.since));
+        li.setAttribute('data-owner', r.staker || '');
+        li.setAttribute('data-staked', 'true');
 
-        // Left: flat 64px
-        const left = mk('div');
-        flatFrog64(left, r.id);
+        // Left: 64×64 still image
+        const left = mk('div', {}, {
+          width:'64px', height:'64px', minWidth:'64px', minHeight:'64px'
+        });
         li.appendChild(left);
+        flatThumb64(left, r.id);
 
         // Middle: text block
         const mid = mk('div');
         mid.innerHTML =
           `<div style="display:flex;align-items:center;gap:8px;">
-            <b>Frog #${r.id}</b> ${pillRank(rank)}
-          </div>
-          <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? shorten(r.staker) : '—'}</div>`;
+             <b>Frog #${r.id}</b> ${pillRank(rank)}
+           </div>
+           <div class="muted">Staked ${fmtAgo(r.since)} • Staker ${r.staker ? shorten(r.staker) : '—'}</div>`;
         li.appendChild(mid);
 
+        // No right column (keeps row compact)
         ul.appendChild(li);
       });
     }
@@ -372,7 +375,6 @@
         return;
       }
 
-      // ranks (optional)
       try { RANKS = await FF.fetchJSON('assets/freshfrogs_rank_lookup.json'); }
       catch { RANKS = {}; }
 
@@ -393,7 +395,7 @@
         return;
       }
 
-      // Show the OLDEST of the preloaded pages first
+      // Show the OLDEST first
       ST.page = ST.pages.length - 1;
       renderPage();
     }catch(e){
@@ -405,11 +407,9 @@
     }
   }
 
-  // autorun & expose
   loadPond();
   window.FF_reloadPond = loadPond;
 
-  // Refresh button
   const refreshBtn = document.getElementById('refreshPond');
   if (refreshBtn){
     refreshBtn.addEventListener('click', async ()=>{

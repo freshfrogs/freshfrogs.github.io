@@ -860,3 +860,8 @@ a.btn { display:inline-flex; align-items:center; justify-content:center; text-de
   border-color: color-mix(in srgb, var(--accent) 65%, transparent);
   color: color-mix(in srgb, var(--accent) 65%, var(--muted));
 }
+/* Disabled buttons: subtle, no hover accent */
+.btn[disabled] { opacity: .55; cursor: default; }
+.btn[disabled]:hover { background: var(--panel); border-color: color-mix(in srgb, var(--ink) 10%, transparent); color: var(--muted); }
+/* Keep green hover for enabled only (optional stricter rule) */
+.btn:not([disabled]).btn-solid:hover { filter: brightness(1.03); }
