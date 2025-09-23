@@ -135,7 +135,7 @@
 
   // ---------- tiny helpers ----------
   function mk(tag, props={}, style={}) {
-    const el = document.createElement(tag);
+    const el = document.createElement('tag' in document ? tag : 'div');
     Object.assign(el, props);
     Object.assign(el.style, style);
     return el;
@@ -269,10 +269,9 @@
           `<div style="display:flex;align-items:center;gap:8px;">
              <b>Frog #${r.id}</b> ${pillRank(rank)}
            </div>
-           <div class="muted">Staked ${fmtAgo(r.since)} • Owned by ${r.staker ? shorten(r.staker) : '—'}</div>`; // uses "Owned by"
+           <div class="muted">Staked ${fmtAgo(r.since)} • Owned by ${r.staker ? shorten(r.staker) : '—'}</div>`;
         li.appendChild(mid);
 
-        // No right column (keeps row compact)
         ul.appendChild(li);
       });
     }

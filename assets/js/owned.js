@@ -67,7 +67,6 @@
   }
 
   // expose buildFrog128 globally (if not already)
-  // (modal.js will use it; we still keep layered renderer in owned if you later switch back)
   function safe(s){ return encodeURIComponent(s); }
   const NO_ANIM_FOR = new Set(['Hat','Frog','Trait']);
   const NO_LIFT_FOR = new Set(['Frog','Trait','SpecialFrog']);
@@ -101,7 +100,6 @@
       position:'relative',overflow:'hidden',borderRadius:'8px',imageRendering:'pixelated'
     });
 
-    // background color from flat PNG (hidden off-corner)
     const flatUrl = `${(window.FF_CFG?.SOURCE_PATH || '')}/frog/${tokenId}.png`;
     container.style.backgroundRepeat='no-repeat';
     container.style.backgroundSize='2000% 2000%';
@@ -118,7 +116,6 @@
         container.appendChild(makeLayerImg(attr,val,SIZE));
       }
     }catch{
-      // fallback to flat
       const img = new Image(); img.decoding='async'; img.loading='lazy';
       Object.assign(img.style,{position:'absolute',inset:'0',width:`${SIZE}px`,height:`${SIZE}px`,imageRendering:'pixelated',zIndex:'2'});
       img.src=flatUrl; container.appendChild(img);
@@ -145,8 +142,8 @@
   }
 
   // ------- Card builder (flat 64 + click-to-open) -------
-  // (NEW): add optional sinceMs so we can set data-since for staked rows
-  function liCard(id, subtitle, ownerAddr, isStaked = false, sinceMs = null){ // (NEW)
+  // (supports sinceMs to set data-since for staked rows)
+  function liCard(id, subtitle, ownerAddr, isStaked = false, sinceMs = null){
     const li = document.createElement('li');
     li.className = 'list-item';
 
@@ -155,8 +152,8 @@
     li.setAttribute('data-open-modal','');
     li.setAttribute('data-owner', ownerAddr || '');
     li.setAttribute('data-staked', isStaked ? 'true' : 'false');
-    if (isStaked && sinceMs && isFinite(sinceMs)) {                    // (NEW)
-      li.setAttribute('data-since', String(sinceMs));                  // (NEW)
+    if (isStaked && sinceMs && isFinite(sinceMs)) {
+      li.setAttribute('data-since', String(sinceMs));
     }
 
     // LEFT: 64×64 still image (fast)
@@ -230,7 +227,6 @@
       provider
     );
 
-    // cap concurrency (ethers calls can be slow)
     const limit = 6;
     let idx = 0;
     const out = [];
@@ -272,9 +268,9 @@
     const rows = ST.cache.stakedRows || [];
     if (!rows.length){ setStatus('No frogs from this wallet are currently staked.'); return; }
     rows.forEach(r=>{
-      const sinceMs = r.since ? r.since.getTime() : null;                                   // (NEW)
+      const sinceMs = r.since ? r.since.getTime() : null;
       const info = r.since ? `Staked ${fmtAgoMs(Date.now()-sinceMs)} • Owned by You` : 'Staked • Owned by You';
-      ul.appendChild(liCard(r.id, info, ST.addr, true, sinceMs));                            // (NEW) pass sinceMs
+      ul.appendChild(liCard(r.id, info, ST.addr, true, sinceMs));
     });
     setStatus(`Showing ${rows.length} staked frog(s).`);
   }
@@ -354,7 +350,6 @@
     ST.cache.ownedIds = null;
     ST.cache.stakedRows = null;
     setActiveTab('owned');
-    // render owned quickly without waiting on staked
     refresh('owned');
   });
   window.addEventListener('wallet:disconnected', ()=>{
