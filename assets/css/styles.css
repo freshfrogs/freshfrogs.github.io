@@ -244,3 +244,5 @@ footer.site{ border-top:1px solid var(--ring); padding:26px 0; color:var(--muted
 
 /* Click affordance */
 .list-item[data-token-id]{ cursor:pointer; }
+#frogModal .sr-only { display: none !important; }
+#frogModal .ffm-attrs .section-title { display: none !important; }
