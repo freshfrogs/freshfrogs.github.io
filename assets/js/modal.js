@@ -240,6 +240,24 @@
         el.style.height = '128px';
         el.style.imageRendering = 'pixelated';
       });
+
+      // ----- Hover jiggle for ALL layers -----
+      // Applies a tiny translate to each layer on hover. Resets on leave.
+      const layers = ()=> inner.querySelectorAll('img,canvas');
+      const jitter = ()=> (Math.random() * 2 - 1) * 2; // -2px .. 2px
+      function setJiggle(active){
+        layers().forEach((el,i)=>{
+          el.style.transition = 'transform 120ms ease';
+          if (active){
+            const tx = jitter(), ty = jitter();
+            el.style.transform = `translate(${tx}px, ${ty}px)`;
+          }else{
+            el.style.transform = 'translate(0,0)';
+          }
+        });
+      }
+      fmHero.addEventListener('mouseenter', ()=> setJiggle(true));
+      fmHero.addEventListener('mouseleave', ()=> setJiggle(false));
     }
 
     // ---------- open / close ----------
@@ -299,17 +317,38 @@
     });
 
     // ---------- open from list items ----------
-    window.FFModal = { openFrogModal };
-    document.addEventListener('click', (e) => {
+    async function resolveSinceMs(id){
+      try{
+        if (typeof window.timeStaked === 'function'){
+          const v = await window.timeStaked(id); // Date | number | string | null
+          if (v instanceof Date && !isNaN(v)) return v.getTime();
+          if (typeof v === 'number' && isFinite(v)) return (v > 1e12 ? v : v*1000);
+          if (typeof v === 'string'){
+            const p = Date.parse(v); if (!isNaN(p)) return p;
+          }
+        }
+      }catch{}
+      return null;
+    }
+
+    document.addEventListener('click', async (e) => {
       const opener = e.target.closest('[data-open-modal]');
       if (!opener) return;
       const id = Number(opener.getAttribute('data-token-id'));
       const owner = opener.getAttribute('data-owner') || '';
       const staked = opener.getAttribute('data-staked') === 'true';
-      const sinceAttr = opener.getAttribute('data-since');
-      const sinceMs   = sinceAttr ? Number(sinceAttr) : null;
+      let sinceAttr = opener.getAttribute('data-since');
+      let sinceMs   = sinceAttr ? Number(sinceAttr) : null;
+
       if (!Number.isFinite(id)) return;
       e.preventDefault();
+
+      // If not provided (Owned/Staked view), resolve via timeStaked before opening
+      if (!sinceMs && staked){
+        sinceMs = await resolveSinceMs(id);
+        if (sinceMs) opener.setAttribute('data-since', String(sinceMs)); // cache on element for future clicks
+      }
+
       window.FFModal.openFrogModal({ id, owner, staked, sinceMs });
     });
 
