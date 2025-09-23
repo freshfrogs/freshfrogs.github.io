@@ -31,7 +31,7 @@
 </header>
 
 <main class="container">
-  <!-- Hero / 3x3 gallery (static 128×128 thumbnails, not clickable) -->
+  <!-- Hero / 3x3 gallery -->
   <section class="hero" id="gallery">
     <div>
       <h1 class="section-title" style="margin:0;font-size:clamp(2rem,4.2vw,3rem);">Nine random frogs. Clean and fast.</h1>
@@ -47,7 +47,6 @@
         <div style="font-size:.9rem;margin-top:4px">Pick <code>assets/freshfrogs_rarity_rankings.json</code></div>
       </div>
     </div>
-
     <div class="gallery" id="grid"></div>
   </section>
 
@@ -123,7 +122,7 @@
     </div>
   </section>
 
-  <!-- Pond (big panel below) -->
+  <!-- Pond -->
   <section id="pond" class="panel stack" aria-label="The Pond">
     <div class="row" style="justify-content:space-between;align-items:center">
       <h2 class="section-title" style="margin:0">The Pond</h2>
@@ -133,24 +132,11 @@
       </div>
     </div>
 
-    <!-- Pond stats -->
     <div id="pondStats" class="facts" aria-label="Pond stats">
-      <div class="fact">
-        <b>Total Staked</b>
-        <div class="muted"><span id="statTotal">—</span></div>
-      </div>
-      <div class="fact">
-        <b>Controller</b>
-        <div class="muted"><a id="statController" class="addr" target="_blank" rel="noopener">—</a></div>
-      </div>
-      <div class="fact">
-        <b>Collection</b>
-        <div class="muted"><a id="statCollection" class="addr" target="_blank" rel="noopener">—</a></div>
-      </div>
-      <div class="fact">
-        <b>Last Update</b>
-        <div class="muted" id="statUpdated">—</div>
-      </div>
+      <div class="fact"><b>Total Staked</b><div class="muted"><span id="statTotal">—</span></div></div>
+      <div class="fact"><b>Controller</b><div class="muted"><a id="statController" class="addr" target="_blank" rel="noopener">—</a></div></div>
+      <div class="fact"><b>Collection</b><div class="muted"><a id="statCollection" class="addr" target="_blank" rel="noopener">—</a></div></div>
+      <div class="fact"><b>Last Update</b><div class="muted" id="statUpdated">—</div></div>
     </div>
 
     <div id="pondListWrap">
@@ -189,7 +175,7 @@
   <button class="swatch sw-pastel" data-theme="pastel" title="Pastel"></button>
 </div>
 
-<!-- Optional lightbox shell (kept for future previews) -->
+<!-- Optional lightbox shell -->
 <div id="lightbox" class="lightbox" style="display:none">
   <div id="lightboxStage" class="stage"></div>
 </div>
@@ -206,21 +192,20 @@
 <script src="assets/js/modal.js"></script>
 <script src="assets/js/main.js"></script>
 
-<!-- Frog Modal (single column: image → info) -->
+<!-- Frog Modal (image ABOVE info, Original link, no extra text blocks) -->
 <div id="frogModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
   <div class="modal-backdrop" data-close></div>
   <div class="modal-panel modal-narrow" role="document">
     <button class="btn btn-ghost btn-sm modal-close" data-close aria-label="Close">✕</button>
 
-    <section class="ffm-grid ffm-onecol">
-      <!-- IMAGE: fixed 256×256 layered render -->
+    <section class="ffm-grid">
+      <!-- IMAGE (fixed 256×256 layered render) -->
       <div class="ffm-hero-wrap">
         <div id="fmHero" class="ffm-hero"></div>
       </div>
 
-      <!-- INFO: title → actions → attributes -->
+      <!-- INFO -->
       <div class="ffm-info">
-        <!-- Title / subtitle (matches list style) -->
         <div class="ffm-titlerow">
           <div style="display:flex;align-items:center;gap:8px;">
             <b>Frog <span id="fmId">#—</span></b>
@@ -229,34 +214,22 @@
           <div id="fmLine" class="muted">—</div>
         </div>
 
-        <!-- Compact action grid (3 x 2) using site buttons -->
+        <!-- actions (no solid green by default; hover shows accent) -->
         <div class="ffm-actions">
-          <button id="fmStakeBtn"    class="btn btn-xs" data-no-modal>Stake</button>
-          <button id="fmUnstakeBtn"  class="btn btn-xs" data-no-modal>Unstake</button>
-          <button id="fmTransferBtn" class="btn btn-xs" data-no-modal>Transfer</button>
+          <button id="fmStakeBtn"    class="btn btn-ghost btn-xs"  data-no-modal>Stake</button>
+          <button id="fmUnstakeBtn"  class="btn btn-ghost btn-xs"  data-no-modal>Unstake</button>
+          <button id="fmTransferBtn" class="btn btn-ghost btn-xs"  data-no-modal>Transfer</button>
 
-          <a id="fmOpenSea"   class="btn btn-xs" target="_blank" rel="noopener">OpenSea</a>
-          <a id="fmEtherscan" class="btn btn-xs" target="_blank" rel="noopener">Etherscan</a>
-          <a id="fmMetaLink"  class="btn btn-xs" target="_blank" rel="noopener">Original</a>
+          <a id="fmOpenSea"   class="btn btn-ghost btn-xs" target="_blank" rel="noopener">OpenSea</a>
+          <a id="fmEtherscan" class="btn btn-ghost btn-xs" target="_blank" rel="noopener">Etherscan</a>
+          <a id="fmOriginal"  class="btn btn-ghost btn-xs" target="_blank" rel="noopener">Original</a>
         </div>
 
-        <!-- Attributes -->
-        <div class="ffm-attrs">
-          <div class="section-title" style="font-size:13px;">Attributes</div>
-          <ul id="fmAttrs" class="ffm-attrlist list-scroll"></ul>
-        </div>
-
-        <!-- hidden extras -->
-        <div class="sr-only">
-          <div>Owner: <span id="fmOwner">—</span></div>
-          <div>Rarity: <span id="fmRarityLine">—</span></div>
-          <div>Collection: <span id="fmCollection">—</span></div>
-          <a id="fmImageLink" href="#" target="_blank" rel="noopener">Original image</a>
-        </div>
+        <!-- attributes table only (no heading) -->
+        <ul id="fmAttrs" class="ffm-attrlist list-scroll"></ul>
       </div>
     </section>
   </div>
 </div>
-
 </body>
 </html>
