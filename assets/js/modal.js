@@ -92,6 +92,11 @@
       fmLine && (fmLine.textContent = `${staked ? 'Staked' : 'Not staked'} • Owned by ${ownerLabel(owner)}`);
       fmOwner && (fmOwner.textContent = owner || '—');
 
+      // If we know when it was staked, show the age inline
+      if (staked && current.sinceMs && !isNaN(current.sinceMs)){
+        fmLine && (fmLine.textContent = `Staked ${fmtAgoMs(Date.now()-Number(current.sinceMs))} • Owned by ${ownerLabel(owner)}`);
+      }
+
       const you = youAddr();
       const isYou = !!you && !!owner && you.toLowerCase() === owner.toLowerCase();
       const canStake    = you && isYou && !staked;
@@ -214,7 +219,7 @@
     }
 
     // ---------- open / close ----------
-    async function openFrogModal({ id, owner, staked }) {
+    async function openFrogModal ({ id, owner, staked, sinceMs }) {
       current.id = id; current.owner = owner || ''; current.staked = !!staked;
 
       fmId && (fmId.textContent = `#${id}`);
@@ -276,7 +281,9 @@
       const id = Number(opener.getAttribute('data-token-id'));
       const owner = opener.getAttribute('data-owner') || '';
       const staked = opener.getAttribute('data-staked') === 'true';
-      if (!Number.isFinite(id)) return;
+            const sinceMsAttr = opener.getAttribute('data-since');
+      const sinceMs = sinceMsAttr ? Number(sinceMsAttr) : null;
+if (!Number.isFinite(id)) return;
       e.preventDefault();
       window.FFModal.openFrogModal({ id, owner, staked });
     });
