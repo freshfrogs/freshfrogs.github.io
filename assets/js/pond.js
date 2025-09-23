@@ -254,9 +254,9 @@
         li.setAttribute('data-token-id', String(r.id));
         li.setAttribute('data-owner', r.staker || '');
         li.setAttribute('data-staked', 'true');
+        if (r.since instanceof Date) li.setAttribute('data-since', String(r.since.getTime())); // <-- allow modal to show "NNd ago"
 
-                if (r.since instanceof Date) li.setAttribute('data-since', String(r.since.getTime()));
-// Left: 64×64 still image
+        // Left: 64×64 still image
         const left = mk('div', {}, {
           width:'64px', height:'64px', minWidth:'64px', minHeight:'64px'
         });
@@ -269,7 +269,7 @@
           `<div style="display:flex;align-items:center;gap:8px;">
              <b>Frog #${r.id}</b> ${pillRank(rank)}
            </div>
-           <div class="muted">Staked ${fmtAgo(r.since)} • Owned by ${r.staker ? shorten(r.staker) : '—'}</div>`;
+           <div class="muted">Staked ${fmtAgo(r.since)} • Owned by ${r.staker ? shorten(r.staker) : '—'}</div>`; // <-- "Owned by"
         li.appendChild(mid);
 
         // No right column (keeps row compact)
