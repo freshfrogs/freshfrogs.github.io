@@ -242,18 +242,12 @@
       });
 
       // ----- Hover jiggle for ALL layers -----
-      // Applies a tiny translate to each layer on hover. Resets on leave.
       const layers = ()=> inner.querySelectorAll('img,canvas');
       const jitter = ()=> (Math.random() * 2 - 1) * 2; // -2px .. 2px
       function setJiggle(active){
-        layers().forEach((el,i)=>{
+        layers().forEach((el)=>{
           el.style.transition = 'transform 120ms ease';
-          if (active){
-            const tx = jitter(), ty = jitter();
-            el.style.transform = `translate(${tx}px, ${ty}px)`;
-          }else{
-            el.style.transform = 'translate(0,0)';
-          }
+          el.style.transform = active ? `translate(${jitter()}px, ${jitter()}px)` : 'translate(0,0)';
         });
       }
       fmHero.addEventListener('mouseenter', ()=> setJiggle(true));
@@ -277,44 +271,11 @@
       fillAttributes(id);
     }
 
+    // expose (optional)
+    window.FFModal = { openFrogModal };
+
     modal.addEventListener('click', (e) => { if (e.target.matches('[data-close]')) setOpen(false); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) setOpen(false); });
-
-    // ---------- ACTIONS (use YOUR functions when present) ----------
-    fmStakeBtn?.addEventListener('click', async () => {
-      if (!current.id || fmStakeBtn.disabled) return;
-      if (typeof window.initiate_stake === 'function'){
-        const msg = await window.initiate_stake(current.id);
-        if (msg) alert(msg);
-      } else {
-        alert('initiate_stake(tokenId) not found.');
-      }
-    });
-
-    fmUnstakeBtn?.addEventListener('click', async () => {
-      if (!current.id || fmUnstakeBtn.disabled) return;
-      if (typeof window.initiate_withdraw === 'function'){
-        const msg = await window.initiate_withdraw(current.id);
-        if (msg) alert(msg);
-      } else {
-        alert('initiate_withdraw(tokenId) not found.');
-      }
-    });
-
-    fmTransferBtn?.addEventListener('click', async () => {
-      if (!current.id || fmTransferBtn.disabled) return;
-      if (typeof window.transferToken === 'function'){
-        try { await window.transferToken(CFG.COLLECTION_ADDRESS, current.id); }
-        catch(e){ alert(e?.message || 'Transfer failed'); }
-      } else {
-        // minimal inline prompt if your transfer helper isn't present
-        if (!window.collection || !window.user_address){ alert('Wallet/contracts not available'); return; }
-        const to=(prompt('Transfer to address (0x…)')||'').trim();
-        if(!/^0x[a-fA-F0-9]{40}$/.test(to)){ alert('Invalid address'); return; }
-        try{ await collection.methods.safeTransferFrom(window.user_address, to, current.id).send({ from: window.user_address }); }
-        catch(e){ alert(e?.message || 'Transfer failed'); }
-      }
-    });
 
     // ---------- open from list items ----------
     async function resolveSinceMs(id){
@@ -334,6 +295,7 @@
     document.addEventListener('click', async (e) => {
       const opener = e.target.closest('[data-open-modal]');
       if (!opener) return;
+
       const id = Number(opener.getAttribute('data-token-id'));
       const owner = opener.getAttribute('data-owner') || '';
       const staked = opener.getAttribute('data-staked') === 'true';
@@ -349,7 +311,8 @@
         if (sinceMs) opener.setAttribute('data-since', String(sinceMs)); // cache on element for future clicks
       }
 
-      window.FFModal.openFrogModal({ id, owner, staked, sinceMs });
+      // IMPORTANT: call the local function directly (don’t depend on window.FFModal existing)
+      openFrogModal({ id, owner, staked, sinceMs });
     });
 
     // keep buttons in sync with wallet connection
