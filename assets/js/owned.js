@@ -145,7 +145,8 @@
   }
 
   // ------- Card builder (flat 64 + click-to-open) -------
-  function liCard(id, subtitle, ownerAddr, isStaked = false){
+  // (NEW): add optional sinceMs so we can set data-since for staked rows
+  function liCard(id, subtitle, ownerAddr, isStaked = false, sinceMs = null){ // (NEW)
     const li = document.createElement('li');
     li.className = 'list-item';
 
@@ -154,6 +155,9 @@
     li.setAttribute('data-open-modal','');
     li.setAttribute('data-owner', ownerAddr || '');
     li.setAttribute('data-staked', isStaked ? 'true' : 'false');
+    if (isStaked && sinceMs && isFinite(sinceMs)) {                    // (NEW)
+      li.setAttribute('data-since', String(sinceMs));                  // (NEW)
+    }
 
     // LEFT: 64×64 still image (fast)
     const left = document.createElement('div');
@@ -268,8 +272,9 @@
     const rows = ST.cache.stakedRows || [];
     if (!rows.length){ setStatus('No frogs from this wallet are currently staked.'); return; }
     rows.forEach(r=>{
-      const info = r.since ? `Staked ${fmtAgoMs(Date.now()-r.since.getTime())} • Owned by You` : 'Staked • Owned by You';
-      ul.appendChild(liCard(r.id, info, ST.addr, true));
+      const sinceMs = r.since ? r.since.getTime() : null;                                   // (NEW)
+      const info = r.since ? `Staked ${fmtAgoMs(Date.now()-sinceMs)} • Owned by You` : 'Staked • Owned by You';
+      ul.appendChild(liCard(r.id, info, ST.addr, true, sinceMs));                            // (NEW) pass sinceMs
     });
     setStatus(`Showing ${rows.length} staked frog(s).`);
   }
