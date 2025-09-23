@@ -71,9 +71,10 @@
       const canUnstake  = connected && isYou &&  staked;
       const canTransfer = connected && isYou;
 
-      if (fmStakeBtn)    { fmStakeBtn.disabled    = !canStake;    fmStakeBtn.classList.toggle('btn-solid',  canStake); }
-      if (fmUnstakeBtn)  { fmUnstakeBtn.disabled  = !canUnstake;  fmUnstakeBtn.classList.toggle('btn-solid',canUnstake); }
-      if (fmTransferBtn) { fmTransferBtn.disabled = !canTransfer; }
+      if (fmStakeBtn)    fmStakeBtn.disabled    = !canStake;
+      if (fmUnstakeBtn)  fmUnstakeBtn.disabled  = !canUnstake;
+      if (fmTransferBtn) fmTransferBtn.disabled = !canTransfer;
+
     }
 
     async function getMeta(id){
