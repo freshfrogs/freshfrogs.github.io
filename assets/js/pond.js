@@ -141,13 +141,13 @@
     return el;
   }
 
-  // 64×64 still image for list (fast)
-  function flatThumb64(leftEl, id){
+  // 128×128 still image for list (fast)
+  function flatThumb128(leftEl, id){
     const img = new Image();
     img.decoding = 'async';
     img.loading  = 'lazy';
-    img.className = 'thumb64';
-    img.width = 64; img.height = 64;
+    img.className = 'thumb128';
+    img.width = 128; img.height = 128;
     img.src = `${(CFG.SOURCE_PATH || '')}/frog/${id}.png`;
     leftEl.appendChild(img);
   }
@@ -254,14 +254,14 @@
         li.setAttribute('data-token-id', String(r.id));
         li.setAttribute('data-owner', r.staker || '');
         li.setAttribute('data-staked', 'true');
-        if (r.since instanceof Date) li.setAttribute('data-since', String(r.since.getTime())); // <-- allow modal to show "NNd ago"
+        if (r.since instanceof Date) li.setAttribute('data-since', String(r.since.getTime())); // modal shows "NNd ago"
 
-        // Left: 64×64 still image
+        // Left: 128×128 still image
         const left = mk('div', {}, {
-          width:'64px', height:'64px', minWidth:'64px', minHeight:'64px'
+          width:'128px', height:'128px', minWidth:'128px', minHeight:'128px'
         });
         li.appendChild(left);
-        flatThumb64(left, r.id);
+        flatThumb128(left, r.id);
 
         // Middle: text block
         const mid = mk('div');
@@ -269,7 +269,7 @@
           `<div style="display:flex;align-items:center;gap:8px;">
              <b>Frog #${r.id}</b> ${pillRank(rank)}
            </div>
-           <div class="muted">Staked ${fmtAgo(r.since)} • Owned by ${r.staker ? shorten(r.staker) : '—'}</div>`; // <-- "Owned by"
+           <div class="muted">Staked ${fmtAgo(r.since)} • Owned by ${r.staker ? shorten(r.staker) : '—'}</div>`; // uses "Owned by"
         li.appendChild(mid);
 
         // No right column (keeps row compact)
