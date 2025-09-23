@@ -90,12 +90,13 @@
     function setState({ staked, owner }){
       current.staked = !!staked; current.owner = owner || '';
       fmLine && (fmLine.textContent = `${staked ? 'Staked' : 'Not staked'} • Owned by ${ownerLabel(owner)}`);
-      fmOwner && (fmOwner.textContent = owner || '—');
-
-      // If we know when it was staked, show the age inline
-      if (staked && current.sinceMs && !isNaN(current.sinceMs)){
-        fmLine && (fmLine.textContent = `Staked ${fmtAgoMs(Date.now()-Number(current.sinceMs))} • Owned by ${ownerLabel(owner)}`);
+      // If staked and we know when, render 'Staked NNd ago • Owned by ...'
+      if (staked && current?.sinceMs && !isNaN(current.sinceMs)){
+        const days = Math.floor((Date.now() - Number(current.sinceMs)) / 86400000);
+        fmLine && (fmLine.textContent = `Staked ${days}d ago • Owned by ${ownerLabel(owner)}`);
       }
+
+      fmOwner && (fmOwner.textContent = owner || '—');
 
       const you = youAddr();
       const isYou = !!you && !!owner && you.toLowerCase() === owner.toLowerCase();
@@ -219,7 +220,7 @@
     }
 
     // ---------- open / close ----------
-    async function openFrogModal ({ id, owner, staked, sinceMs }) {
+    async function openFrogModal({ id, owner, staked }) {
       current.id = id; current.owner = owner || ''; current.staked = !!staked;
 
       fmId && (fmId.textContent = `#${id}`);
@@ -281,11 +282,11 @@
       const id = Number(opener.getAttribute('data-token-id'));
       const owner = opener.getAttribute('data-owner') || '';
       const staked = opener.getAttribute('data-staked') === 'true';
-            const sinceMsAttr = opener.getAttribute('data-since');
-      const sinceMs = sinceMsAttr ? Number(sinceMsAttr) : null;
+            const sinceAttr = opener.getAttribute('data-since');
+      const sinceMs = sinceAttr ? Number(sinceAttr) : null;
 if (!Number.isFinite(id)) return;
       e.preventDefault();
-      window.FFModal.openFrogModal({ id, owner, staked });
+      window.FFModal.openFrogModal({ id, owner, staked, sinceMs });
     });
 
     // keep buttons in sync with wallet connection

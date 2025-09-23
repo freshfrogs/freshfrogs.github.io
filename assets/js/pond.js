@@ -254,7 +254,8 @@
         li.setAttribute('data-token-id', String(r.id));
         li.setAttribute('data-owner', r.staker || '');
         li.setAttribute('data-staked', 'true');
-        if (r.since instanceof Date) li.setAttribute('data-since', String(r.since.getTime()));
+
+                if (r.since instanceof Date) li.setAttribute('data-since', String(r.since.getTime()));
 // Left: 64×64 still image
         const left = mk('div', {}, {
           width:'64px', height:'64px', minWidth:'64px', minHeight:'64px'
