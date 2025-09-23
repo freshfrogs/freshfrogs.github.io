@@ -28,7 +28,7 @@
     const fmMetaLink  = $('#fmMetaLink');   // “Original”
     const fmImageLink = $('#fmImageLink');  // sr-only to still
 
-    let current = { id:null, owner:'', staked:false, open:false };
+    let current = { id:null, owner:'', staked:false, open:false, sinceMs:null };
     const metaCache = new Map();
 
     // ---------- helpers ----------
@@ -89,7 +89,9 @@
 
     function setState({ staked, owner }){
       current.staked = !!staked; current.owner = owner || '';
+      // default line, then override below
       fmLine && (fmLine.textContent = `${staked ? 'Staked' : 'Not staked'} • Owned by ${ownerLabel(owner)}`);
+
       // If staked and we know when, render 'Staked NNd ago • Owned by ...'
       if (staked && current?.sinceMs && !isNaN(current.sinceMs)){
         const days = Math.floor((Date.now() - Number(current.sinceMs)) / 86400000);
@@ -109,19 +111,40 @@
       if (fmTransferBtn) fmTransferBtn.disabled = !canTransfer;
     }
 
-    // Use your function to compute "Staked Xd ago"
+    // Robust "Staked Xd ago" updater:
+    // - First uses current.sinceMs if present (from opener data-since)
+    // - Else tries window.timeStaked(id) and accepts Date | number | string
     async function updateStakedLine(id, owner){
       if (!current.staked || !fmLine) return;
+
+      // 1) sinceMs from opener
+      if (current.sinceMs && !isNaN(current.sinceMs)){
+        fmLine.textContent = `Staked ${fmtAgoMs(Date.now() - Number(current.sinceMs))} • Owned by ${ownerLabel(owner)}`;
+        return;
+      }
+
+      // 2) user-provided resolver
       try{
         if (typeof window.timeStaked === 'function'){
-          const since = await window.timeStaked(id); // returns Date or 0.00
-          if (since && Object.prototype.toString.call(since) === '[object Date]' && !isNaN(since)){
-            fmLine.textContent = `Staked ${fmtAgoMs(Date.now()-since.getTime())} • Owned by ${ownerLabel(owner)}`;
+          const since = await window.timeStaked(id); // Date | number | string
+          let ms = null;
+          if (since instanceof Date && !isNaN(since)) ms = since.getTime();
+          else if (typeof since === 'number' && isFinite(since)){
+            // seconds or ms
+            ms = (since > 1e12) ? since : since * 1000;
+          } else if (typeof since === 'string'){
+            const p = Date.parse(since);
+            if (!isNaN(p)) ms = p;
+          }
+          if (ms){
+            current.sinceMs = ms;
+            fmLine.textContent = `Staked ${fmtAgoMs(Date.now() - ms)} • Owned by ${ownerLabel(owner)}`;
             return;
           }
         }
       }catch{}
-      // fallback
+
+      // 3) fallback
       fmLine.textContent = `Staked • Owned by ${ownerLabel(owner)}`;
     }
 
@@ -222,7 +245,7 @@
     // ---------- open / close ----------
     async function openFrogModal({ id, owner, staked, sinceMs }) {
       current.id = id; current.owner = owner || ''; current.staked = !!staked;
-      current.sinceMs = sinceMs || null; // <-- allow modal to render "NNd ago" immediately when provided
+      current.sinceMs = sinceMs || null; // allow immediate "NNd ago" if provided
 
       fmId && (fmId.textContent = `#${id}`);
       fmCollection && (fmCollection.textContent = shorten(CFG.COLLECTION_ADDRESS));
@@ -283,11 +306,11 @@
       const id = Number(opener.getAttribute('data-token-id'));
       const owner = opener.getAttribute('data-owner') || '';
       const staked = opener.getAttribute('data-staked') === 'true';
-      const sinceAttr = opener.getAttribute('data-since');              // <-- added
-      const sinceMs   = sinceAttr ? Number(sinceAttr) : null;           // <-- added
+      const sinceAttr = opener.getAttribute('data-since');
+      const sinceMs   = sinceAttr ? Number(sinceAttr) : null;
       if (!Number.isFinite(id)) return;
       e.preventDefault();
-      window.FFModal.openFrogModal({ id, owner, staked, sinceMs });     // <-- pass sinceMs through
+      window.FFModal.openFrogModal({ id, owner, staked, sinceMs });
     });
 
     // keep buttons in sync with wallet connection
