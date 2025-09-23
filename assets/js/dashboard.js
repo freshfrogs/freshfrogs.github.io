@@ -1,6 +1,5 @@
 // assets/js/dashboard.js
-// User dashboard: counts (owned, staked), rewards (flyz), claim, approval,
-// and quick lists of Owned/Staked that open the same modal.
+// Slim dashboard: counts (owned, staked), rewards (flyz), claim, approval. No frog lists.
 
 (function (CFG) {
   const API_USERS   = 'https://api.reservoir.tools/users';
@@ -18,8 +17,6 @@
   const claimBtn  = $('dashClaim');
   const apprBtn   = $('dashApprove');
   const apprNote  = $('dashApprovalNote');
-  const ownedList = $('dashOwnedList');   // <ul>
-  const stakedList= $('dashStakedList');  // <ul>
   const refreshBtn= $('dashRefresh');
 
   function setStatus(msg){ if (statusEl) statusEl.textContent = msg; }
@@ -54,41 +51,24 @@
       }
     }
   }
-  const fmtAgoMs = (ms)=>{
-    const s=Math.floor(ms/1000), m=Math.floor(s/60), h=Math.floor(m/60), d=Math.floor(h/24);
-    if (d>0) return `${d}d`; if (h>0) return `${h}h`; if (m>0) return `${m}m`; return `${s}s`;
-  };
 
-  // ---------- rarity (for pills) ----------
-  let RANKS = null;
-  async function ensureRanks(){
-    if (RANKS) return;
-    try { RANKS = await (await fetch('assets/freshfrogs_rank_lookup.json')).json(); }
-    catch { RANKS = {}; }
-  }
-  const pillRank = (rank)=> (rank||rank===0)
-    ? `<span class="pill">Rank <b>#${rank}</b></span>`
-    : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
-
-  // ---------- Reservoir: Owned IDs ----------
-  async function fetchOwnedIds(addr){
-    const out=[]; let cont='';
+  // ---------- Owned ----------
+  async function fetchOwnedCount(addr){
+    let cont=''; let total=0;
     for (let guard=0; guard<30; guard++){
       const qs = new URLSearchParams({ collection: COLLECTION, limit:'200', includeTopBid:'false' });
       if (cont) qs.set('continuation', cont);
       const url = `${API_USERS}/${addr}/tokens/v8?${qs.toString()}`;
       const json = await reservoirFetch(url, { headers: apiHeaders() });
-      const arr = (json?.tokens||[])
-        .map(t=>Number(t?.token?.tokenId ?? t?.tokenId ?? t?.id))
-        .filter(Number.isFinite);
-      out.push(...arr);
+      const arr = (json?.tokens||[]);
+      total += arr.length;
       cont = json?.continuation || '';
       if (!cont) break;
     }
-    return out;
+    return total;
   }
 
-  // ---------- Staked (by user): detect via activity + controller contract check ----------
+  // ---------- Staked (by user) ----------
   async function fetchStakeCandidates(addr){
     const map=new Map(); let cont='';
     for (let guard=0; guard<40; guard++){
@@ -113,37 +93,29 @@
     }
     return [...map.values()];
   }
-  async function confirmStakedByUser(addr, candidates){
-    if (!window.ethereum) return [];
+  async function countStakedByUser(addr){
+    if (!window.ethereum) return 0;
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const contract = new ethers.Contract(
       CFG.CONTROLLER_ADDRESS,
       ['function stakerAddress(uint256) view returns (address)'],
       provider
     );
+    const cands = await fetchStakeCandidates(addr);
+    let idx = 0, count = 0;
     const limit = 6;
-    let idx = 0;
-    const out = [];
     async function worker(){
-      while (idx < candidates.length){
+      while (idx < cands.length){
         const i = idx++;
-        const c = candidates[i];
+        const c = cands[i];
         try{
           const who = await contract.stakerAddress(c.id);
-          if (who && who.toLowerCase() === addr.toLowerCase()){
-            out.push({ id:c.id, since:c.since, staker: who });
-          }
-        }catch{/* ignore */}
+          if (who && who.toLowerCase() === addr.toLowerCase()) count++;
+        }catch{}
       }
     }
-    await Promise.all(Array.from({length: Math.min(limit, candidates.length)}, ()=>worker()));
-    return out.sort((a,b)=>{
-      const ta=a.since? a.since.getTime():0; const tb=b.since? b.since.getTime():0; return ta - tb;
-    });
-  }
-  async function fetchStakedRows(addr){
-    const c = await fetchStakeCandidates(addr);
-    return await confirmStakedByUser(addr, c);
+    await Promise.all(Array.from({length: Math.min(limit, cands.length)}, ()=>worker()));
+    return count;
   }
 
   // ---------- Approval ----------
@@ -172,12 +144,10 @@
     await erc721.setApprovalForAll(CFG.CONTROLLER_ADDRESS, true);
   }
 
-  // ---------- Rewards (best-effort hooks) ----------
-  // We’ll try to use your existing globals if present; otherwise show “—”.
+  // ---------- Rewards ----------
   async function readRewards(addr){
     try{
       if (typeof window.get_pending_rewards === 'function'){
-        // common pattern: returns BigNumber or number of Flyz with 18 decimals
         const v = await window.get_pending_rewards(addr);
         if (v == null) return null;
         const n = (typeof v === 'object' && v._isBigNumber) ? Number(ethers.utils.formatUnits(v, 18))
@@ -197,69 +167,7 @@
     throw new Error('No claim function found (claim_rewards / claimRewards).');
   }
 
-  // ---------- small UI helpers ----------
-  function clearLists(){
-    if (ownedList) ownedList.innerHTML = '';
-    if (stakedList) stakedList.innerHTML= '';
-  }
-  function mk(tag, props={}, style={}){
-    const el = document.createElement(tag);
-    Object.assign(el, props);
-    Object.assign(el.style, style);
-    return el;
-  }
-  function addOwnedRow(id, owner){
-    const li = mk('li', { className:'list-item', tabIndex:0, role:'button' });
-    li.setAttribute('data-open-modal','');
-    li.setAttribute('data-token-id', String(id));
-    li.setAttribute('data-owner', owner || '');
-    li.setAttribute('data-staked','false');
-
-    const left = mk('div', {}, { width:'128px',height:'128px',minWidth:'128px',minHeight:'128px' });
-    const img = new Image(); img.width=128; img.height=128; img.loading='lazy';
-    img.src = `${(CFG.SOURCE_PATH || '')}/frog/${id}.png`;
-    left.appendChild(img);
-    li.appendChild(left);
-
-    const rank = RANKS?.[String(id)] ?? null;
-    const mid = mk('div');
-    mid.innerHTML =
-      `<div style="display:flex;align-items:center;gap:8px;">
-         <b>Frog #${id}</b> ${pillRank(rank)}
-       </div>
-       <div class="muted">Not staked • Owned by You</div>`;
-    li.appendChild(mid);
-
-    ownedList?.appendChild(li);
-  }
-  function addStakedRow(r, owner){
-    const li = mk('li', { className:'list-item', tabIndex:0, role:'button' });
-    li.setAttribute('data-open-modal','');
-    li.setAttribute('data-token-id', String(r.id));
-    li.setAttribute('data-owner', owner || '');
-    li.setAttribute('data-staked','true');
-    if (r.since instanceof Date) li.setAttribute('data-since', String(r.since.getTime()));
-
-    const left = mk('div', {}, { width:'128px',height:'128px',minWidth:'128px',minHeight:'128px' });
-    const img = new Image(); img.width=128; img.height=128; img.loading='lazy';
-    img.src = `${(CFG.SOURCE_PATH || '')}/frog/${r.id}.png`;
-    left.appendChild(img);
-    li.appendChild(left);
-
-    const rank = RANKS?.[String(r.id)] ?? null;
-    const ago = r.since ? fmtAgoMs(Date.now() - r.since.getTime()) : null;
-    const mid = mk('div');
-    mid.innerHTML =
-      `<div style="display:flex;align-items:center;gap:8px;">
-         <b>Frog #${r.id}</b> ${pillRank(rank)}
-       </div>
-       <div class="muted">Staked ${ago||''}${ago?' • ':''}Owned by You</div>`;
-    li.appendChild(mid);
-
-    stakedList?.appendChild(li);
-  }
-
-  // ---------- main refresh ----------
+  // ---------- main ----------
   const st = { connected:false, addr:null, busy:false };
 
   async function refresh(){
@@ -267,8 +175,6 @@
     st.busy = true;
 
     try{
-      await ensureRanks();
-
       if (!st.connected || !st.addr){
         setStatus('Connect your wallet to load your dashboard.');
         addrEl && (addrEl.textContent = '');
@@ -278,7 +184,6 @@
         claimBtn && (claimBtn.disabled = true);
         apprBtn  && (apprBtn.disabled  = true);
         apprNote && (apprNote.textContent = '');
-        clearLists();
         return;
       }
 
@@ -298,20 +203,15 @@
         apprBtn  && (apprBtn.disabled = false);
       }
 
-      // Counts + lists
-      const [ownedIds, stakedRows] = await Promise.all([
-        fetchOwnedIds(st.addr),
-        fetchStakedRows(st.addr)
+      // Counts
+      const [ownedCount, stakedCount] = await Promise.all([
+        fetchOwnedCount(st.addr),
+        countStakedByUser(st.addr)
       ]);
+      ownedEl  && (ownedEl.textContent  = String(ownedCount));
+      stakedEl && (stakedEl.textContent = String(stakedCount));
 
-      ownedEl  && (ownedEl.textContent  = String(ownedIds.length));
-      stakedEl && (stakedEl.textContent = String(stakedRows.length));
-
-      clearLists();
-      ownedIds.slice(0, 20).forEach(id=> addOwnedRow(id, st.addr));
-      stakedRows.slice(0, 20).forEach(r => addStakedRow(r, st.addr));
-
-      // Rewards (best effort)
+      // Rewards
       const rew = await readRewards(st.addr);
       if (rew == null){
         rewardsEl && (rewardsEl.textContent = '—');
