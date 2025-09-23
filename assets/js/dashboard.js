@@ -1,5 +1,5 @@
 // assets/js/dashboard.js
-// Slim dashboard: counts (owned, staked), rewards (flyz), claim, approval. No frog lists.
+// Slim dashboard: counts (owned, staked), rewards (flyz), claim, approval. No frog lists (panel is mounted separately).
 
 (function (CFG) {
   const API_USERS   = 'https://api.reservoir.tools/users';
@@ -7,7 +7,6 @@
   const CONTROLLER  = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
   const COLLECTION  = CFG.COLLECTION_ADDRESS || '';
 
-  // ---------- DOM ----------
   const $ = (id)=> document.getElementById(id);
   const statusEl  = $('dashStatus');
   const addrEl    = $('dashAddress');
@@ -22,7 +21,6 @@
   function setStatus(msg){ if (statusEl) statusEl.textContent = msg; }
   function shorten(a){ return a ? (a.slice(0,6)+'…'+a.slice(-4)) : ''; }
 
-  // ---------- fetch helpers ----------
   function apiHeaders(){
     if (!CFG.FROG_API_KEY) throw new Error('Missing FROG_API_KEY in config.js');
     return { accept: '*/*', 'x-api-key': CFG.FROG_API_KEY };
@@ -52,7 +50,6 @@
     }
   }
 
-  // ---------- Owned ----------
   async function fetchOwnedCount(addr){
     let cont=''; let total=0;
     for (let guard=0; guard<30; guard++){
@@ -60,15 +57,13 @@
       if (cont) qs.set('continuation', cont);
       const url = `${API_USERS}/${addr}/tokens/v8?${qs.toString()}`;
       const json = await reservoirFetch(url, { headers: apiHeaders() });
-      const arr = (json?.tokens||[]);
-      total += arr.length;
+      total += (json?.tokens||[]).length;
       cont = json?.continuation || '';
       if (!cont) break;
     }
     return total;
   }
 
-  // ---------- Staked (by user) ----------
   async function fetchStakeCandidates(addr){
     const map=new Map(); let cont='';
     for (let guard=0; guard<40; guard++){
@@ -118,7 +113,6 @@
     return count;
   }
 
-  // ---------- Approval ----------
   async function checkApproval(addr){
     if (!window.ethereum) return null;
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -144,7 +138,6 @@
     await erc721.setApprovalForAll(CFG.CONTROLLER_ADDRESS, true);
   }
 
-  // ---------- Rewards ----------
   async function readRewards(addr){
     try{
       if (typeof window.get_pending_rewards === 'function'){
@@ -167,13 +160,10 @@
     throw new Error('No claim function found (claim_rewards / claimRewards).');
   }
 
-  // ---------- main ----------
   const st = { connected:false, addr:null, busy:false };
 
   async function refresh(){
-    if (st.busy) return;
-    st.busy = true;
-
+    if (st.busy) return; st.busy = true;
     try{
       if (!st.connected || !st.addr){
         setStatus('Connect your wallet to load your dashboard.');
@@ -190,20 +180,11 @@
       setStatus('Loading…');
       addrEl && (addrEl.textContent = shorten(st.addr));
 
-      // Approval
       let approved = await checkApproval(st.addr);
-      if (approved === null){
-        apprNote && (apprNote.textContent = 'Approval: Unknown');
-        apprBtn  && (apprBtn.disabled = true);
-      }else if (approved){
-        apprNote && (apprNote.textContent = 'Approval: Granted');
-        apprBtn  && (apprBtn.disabled = true);
-      }else{
-        apprNote && (apprNote.textContent = 'Approval: Not granted');
-        apprBtn  && (apprBtn.disabled = false);
-      }
+      if (approved === null){ apprNote?.(apprNote.textContent = 'Approval: Unknown'); apprBtn && (apprBtn.disabled=true); }
+      else if (approved){ apprNote && (apprNote.textContent='Approval: Granted'); apprBtn && (apprBtn.disabled=true); }
+      else { apprNote && (apprNote.textContent='Approval: Not granted'); apprBtn && (apprBtn.disabled=false); }
 
-      // Counts
       const [ownedCount, stakedCount] = await Promise.all([
         fetchOwnedCount(st.addr),
         countStakedByUser(st.addr)
@@ -211,12 +192,9 @@
       ownedEl  && (ownedEl.textContent  = String(ownedCount));
       stakedEl && (stakedEl.textContent = String(stakedCount));
 
-      // Rewards
       const rew = await readRewards(st.addr);
-      if (rew == null){
-        rewardsEl && (rewardsEl.textContent = '—');
-        claimBtn && (claimBtn.disabled = true);
-      }else{
+      if (rew == null){ rewardsEl && (rewardsEl.textContent = '—'); claimBtn && (claimBtn.disabled = true); }
+      else {
         const pretty = (Math.round(rew * 100) / 100).toLocaleString();
         rewardsEl && (rewardsEl.textContent = `${pretty} FLYZ`);
         claimBtn && (claimBtn.disabled = rew <= 0);
@@ -231,53 +209,20 @@
     }
   }
 
-  // ---------- events ----------
   refreshBtn?.addEventListener('click', refresh);
-
   apprBtn?.addEventListener('click', async ()=>{
     if (!st.connected || !st.addr) return;
-    try{
-      apprBtn.disabled = true;
-      apprBtn.textContent = 'Approving…';
-      await requestApproval(st.addr);
-      apprBtn.textContent = 'Approved';
-      await refresh();
-    }catch(e){
-      console.warn(e);
-      apprBtn.textContent = 'Approve Staking';
-      apprBtn.disabled = false;
-      alert(e?.message || 'Approval failed');
-    }
+    try{ apprBtn.disabled=true; apprBtn.textContent='Approving…'; await requestApproval(st.addr); apprBtn.textContent='Approved'; await refresh(); }
+    catch(e){ console.warn(e); apprBtn.textContent='Approve Staking'; apprBtn.disabled=false; alert(e?.message||'Approval failed'); }
   });
-
   claimBtn?.addEventListener('click', async ()=>{
     if (!st.connected || !st.addr) return;
-    try{
-      claimBtn.disabled = true;
-      claimBtn.textContent = 'Claiming…';
-      const msg = await claimRewards(st.addr);
-      if (msg) alert(msg);
-      claimBtn.textContent = 'Claim Rewards';
-      await refresh();
-    }catch(e){
-      console.warn(e);
-      claimBtn.textContent = 'Claim Rewards';
-      claimBtn.disabled = false;
-      alert(e?.message || 'Claim failed');
-    }
+    try{ claimBtn.disabled=true; claimBtn.textContent='Claiming…'; const msg = await claimRewards(st.addr); if (msg) alert(msg); claimBtn.textContent='Claim Rewards'; await refresh(); }
+    catch(e){ console.warn(e); claimBtn.textContent='Claim Rewards'; claimBtn.disabled=false; alert(e?.message||'Claim failed'); }
   });
 
-  window.addEventListener('wallet:connected', (ev)=>{
-    st.connected = true;
-    st.addr = ev?.detail?.address || null;
-    refresh();
-  });
-  window.addEventListener('wallet:disconnected', ()=>{
-    st.connected = false;
-    st.addr = null;
-    refresh();
-  });
+  window.addEventListener('wallet:connected', (ev)=>{ st.connected=true; st.addr = ev?.detail?.address || null; refresh(); });
+  window.addEventListener('wallet:disconnected', ()=>{ st.connected=false; st.addr=null; refresh(); });
 
-  // initial
   refresh();
 })(window.FF_CFG || {});
