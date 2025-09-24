@@ -58,85 +58,82 @@
     <div class="fact"><b>Mint Price</b><div class="muted">0.01 ETH</div></div>
   </section>
 
-  <!-- === User Hub (clean) === -->
-  <section class="card hub" id="userHub" aria-label="User Hub">
-    <header class="hub-header">
-      <div class="hub-title">
+  <!-- === User Hub (Minimal Pro) === -->
+  <section class="card hub-pro" id="userHub" aria-label="User Hub">
+    <header class="hub-pro__header">
+      <div class="hub-pro__title">
         <h2>My Dashboard</h2>
-        <div class="muted">Manage minting, staking and your frogs in one place.</div>
+        <p class="muted">Connect, mint, stake, and manage your frogs in one place.</p>
       </div>
-      <div class="hub-actions">
+      <div class="hub-pro__header-cta">
         <span class="pill">Address: <b id="hubAddr">—</b></span>
         <button class="btn btn-ghost btn-sm" id="hubRefresh" aria-label="Refresh dashboard">Refresh</button>
       </div>
     </header>
 
-    <!-- Overview -->
-    <div class="hub-row">
-      <div class="hub-stats">
-        <div class="stat">
-          <div class="stat-num" id="hubOwned">—</div>
-          <div class="stat-label">Owned</div>
+    <!-- Row: Stats + Actions -->
+    <div class="hub-pro__row">
+      <div class="hub-pro__stats">
+        <div class="hub-pro__stat">
+          <div class="hub-pro__stat-num" id="hubOwned">—</div>
+          <div class="hub-pro__stat-label">Owned</div>
         </div>
-        <div class="stat">
-          <div class="stat-num" id="hubStaked">—</div>
-          <div class="stat-label">Staked</div>
+        <div class="hub-pro__stat">
+          <div class="hub-pro__stat-num" id="hubStaked">—</div>
+          <div class="hub-pro__stat-label">Staked</div>
         </div>
-        <div class="stat">
-          <div class="stat-num" id="hubRewards">—</div>
-          <div class="stat-label">Rewards (FLYZ)</div>
+        <div class="hub-pro__stat">
+          <div class="hub-pro__stat-num" id="hubRewards">—</div>
+          <div class="hub-pro__stat-label">Rewards (FLYZ)</div>
         </div>
       </div>
 
-      <div class="hub-cta">
-        <div class="row" style="gap:10px;">
-          <button class="btn" id="hubApprove">Approve Staking</button>
-          <button class="btn btn-solid" id="hubClaim" disabled>Claim Rewards</button>
-        </div>
-        <div class="muted" id="hubApprovalNote"></div>
+      <div class="hub-pro__actions">
+        <button class="btn" id="hubApprove">Approve Staking</button>
+        <button class="btn btn-solid" id="hubClaim" disabled>Claim Rewards</button>
+        <div class="muted hub-pro__note" id="hubApprovalNote"></div>
       </div>
     </div>
 
-    <hr class="sep">
-
-    <!-- Mint -->
-    <div class="hub-card" id="hubMintCard">
-      <div class="hub-card-head">
-        <h3>Mint Fresh Frogs</h3>
-        <div class="hub-meta muted">
-          <span>Price: <b id="hubMintPrice">—</b></span>
-          <span>Supply: <b id="hubMintSupply">—</b></span>
-        </div>
-      </div>
-      <div class="hub-card-body">
-        <div class="hub-mint-controls">
-          <label for="hubMintQty">Quantity</label>
-          <input id="hubMintQty" type="number" min="1" value="1">
+    <!-- Row: Mint + My Frogs -->
+    <div class="hub-pro__row hub-pro__row--split">
+      <!-- Mint -->
+      <section class="hub-pro__card" id="hubMintCard" aria-labelledby="hubMintTitle">
+        <header class="hub-pro__card-head">
+          <h3 id="hubMintTitle">Mint Fresh Frogs</h3>
+          <div class="hub-pro__meta muted">
+            <span>Price: <b id="hubMintPrice">—</b></span>
+            <span>Supply: <b id="hubMintSupply">—</b></span>
+          </div>
+        </header>
+        <div class="hub-pro__card-body">
+          <div class="hub-pro__field">
+            <label for="hubMintQty">Quantity</label>
+            <input id="hubMintQty" type="number" min="1" value="1">
+          </div>
           <button class="btn btn-solid" id="hubMintBtn">Mint</button>
+          <div class="muted hub-pro__note" id="hubMintNote">Connect wallet to mint.</div>
         </div>
-        <div class="muted" id="hubMintNote">Connect wallet to mint.</div>
-      </div>
-    </div>
+      </section>
 
-    <hr class="sep">
-
-    <!-- My Frogs (owned.js uses these exact IDs) -->
-    <div class="hub-card" id="hubMyFrogs">
-      <div class="hub-card-head">
-        <h3>My Frogs</h3>
-        <div class="row" role="tablist" aria-label="My Frogs">
-          <button class="btn btn-ghost btn-sm" id="tabOwned"  role="tab" aria-selected="true">Owned</button>
-          <button class="btn btn-ghost btn-sm" id="tabStaked" role="tab" aria-selected="false">Staked</button>
-          <button class="btn btn-ghost btn-sm" id="refreshOwned" title="Refresh frogs">↻</button>
+      <!-- My Frogs (owned.js uses these IDs) -->
+      <section class="hub-pro__card" id="hubMyFrogs" aria-labelledby="hubFrogsTitle">
+        <header class="hub-pro__card-head">
+          <h3 id="hubFrogsTitle">My Frogs</h3>
+          <div class="hub-pro__tabs" role="tablist" aria-label="My Frogs">
+            <button class="btn btn-ghost btn-sm" id="tabOwned"  role="tab" aria-selected="true">Owned</button>
+            <button class="btn btn-ghost btn-sm" id="tabStaked" role="tab" aria-selected="false">Staked</button>
+            <button class="btn btn-ghost btn-sm" id="refreshOwned" title="Refresh frogs">↻</button>
+          </div>
+        </header>
+        <div class="hub-pro__card-body">
+          <div class="muted" id="stakeStatus">Connect your wallet to view Owned &amp; Staked.</div>
+          <ul class="list hub-pro__list" id="chipWrap"></ul>
         </div>
-      </div>
-      <div class="hub-card-body">
-        <div class="muted" id="stakeStatus">Connect your wallet to view Owned &amp; Staked.</div>
-        <ul class="list" id="chipWrap"></ul>
-      </div>
+      </section>
     </div>
   </section>
-  <!-- === /User Hub === -->
+  <!-- === /User Hub (Minimal Pro) === -->
 
 
   <!-- Pond -->
