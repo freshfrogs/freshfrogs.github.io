@@ -279,3 +279,34 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
 
 .hub-pro .btn { font-weight:700; }
 .hub-pro .btn-ghost { color: var(--muted); }
+/* === Hub → match Pond card shell === */
+/* Give the hub its own bordered background like the Pond */
+.hub-pro.card {
+  /* mirror your .card styles so it looks like a sibling, not a flat section */
+  background: linear-gradient(180deg, var(--card, #121826), var(--card-2, #0f1520));
+  border: 1px solid var(--border, #233349);
+  border-radius: var(--radius, 14px);
+  box-shadow: var(--shadow, 0 8px 24px rgba(0,0,0,.35));
+  padding: 16px;               /* align with Pond’s padding */
+  margin-top: 12px;            /* small gap from content above */
+}
+
+/* Make the inner blocks read as “panels” on the hub’s surface */
+.hub-pro__card {
+  background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.06));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+/* Tighten header rule so the top looks like the Pond card heading */
+.hub-pro__card-head {
+  border-bottom: 1px solid var(--border);
+}
+
+/* Nudge spacing so lists align with Pond’s rhythm */
+.hub-pro__list .list-item { padding: 12px; }
+.hub-pro__row { gap: 16px; }
+.hub-pro__row--split { gap: 16px; }
+
+/* Optional: slightly stronger top title to match Pond headings */
+.hub-pro__title h2 { font-weight: 800; font-size: 18px; letter-spacing: .2px; }
