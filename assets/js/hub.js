@@ -1,14 +1,11 @@
-// assets/js/hub.js
-// Unified hub: overview stats, approval + claim, optional mint info (uses your existing hooks if present)
-
-// Requires: ethers v5, FF_CFG present, wallet.js emits wallet:connected / wallet:disconnected
+// assets/js/hub.js — polished User Hub (overview + mint + staking). Non-breaking: uses your existing hooks if present.
 (function (CFG) {
   const API_USERS  = 'https://api.reservoir.tools/users';
   const ACTIVITY   = 'https://api.reservoir.tools/users/activity/v6';
   const CONTROLLER = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
   const COLLECTION = CFG.COLLECTION_ADDRESS || '';
 
-  // ---- DOM ----
+  // DOM
   const $ = (id)=> document.getElementById(id);
   const elAddr   = $('hubAddr');
   const elOwned  = $('hubOwned');
@@ -19,7 +16,6 @@
   const elClaim  = $('hubClaim');
   const elRef    = $('hubRefresh');
 
-  // mint
   const elMintPrice  = $('hubMintPrice');
   const elMintSupply = $('hubMintSupply');
   const elMintQty    = $('hubMintQty');
@@ -27,9 +23,7 @@
   const elMintNote   = $('hubMintNote');
 
   function shorten(a){ return a ? (a.slice(0,6)+'…'+a.slice(-4)) : '—'; }
-  function requireKey(){
-    if (!CFG.FROG_API_KEY) throw new Error('Missing FROG_API_KEY in config.js');
-  }
+  function requireKey(){ if (!CFG.FROG_API_KEY) throw new Error('Missing FROG_API_KEY in config.js'); }
   function apiHeaders(){ return { accept:'*/*', 'x-api-key': CFG.FROG_API_KEY }; }
 
   async function reservoirFetch(url, opts={}, retries=2, timeoutMs=9000){
@@ -49,7 +43,7 @@
     }
   }
 
-  // ---- Overview: owned/staked counts ----
+  // Overview counts
   async function fetchOwnedCount(addr){
     requireKey();
     let cont=''; let total=0;
@@ -64,7 +58,6 @@
     }
     return total;
   }
-
   async function fetchStakeCandidates(addr){
     requireKey();
     const map=new Map(); let cont='';
@@ -107,7 +100,7 @@
     return count;
   }
 
-  // ---- Approval / Rewards ----
+  // Approval / Rewards
   async function checkApproval(addr){
     if (!window.ethereum) return null;
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -129,13 +122,11 @@
     );
     return await erc721.setApprovalForAll(CFG.CONTROLLER_ADDRESS, true);
   }
-
   async function readRewards(addr){
     try{
       if (typeof window.get_pending_rewards === 'function'){
         const v = await window.get_pending_rewards(addr);
-        const n = (typeof v === 'object' && v?._isBigNumber) ? Number(ethers.utils.formatUnits(v, 18))
-                : Number(v);
+        const n = (typeof v === 'object' && v?._isBigNumber) ? Number(ethers.utils.formatUnits(v, 18)) : Number(v);
         if (isFinite(n)) return n;
       }
       if (typeof window.getRewards === 'function'){
@@ -151,21 +142,21 @@
     throw new Error('No claim function found (claim_rewards / claimRewards).');
   }
 
-  // ---- Mint panel (non-breaking: uses your hooks if present) ----
+  // Mint (optional)
   async function loadMintInfo(){
     try{
       if (typeof window.get_mint_info === 'function'){
-        const info = await window.get_mint_info(); // { price, supply, maxSupply } or similar
+        const info = await window.get_mint_info();
         if (info){
-          const price = info.price ?? info.mintPrice ?? info.priceWei;
+          const price  = info.price ?? info.mintPrice ?? info.priceWei;
           const supply = info.supply ?? info.total ?? info.totalSupply;
-          const max = info.maxSupply ?? info.cap ?? CFG.SUPPLY;
+          const max    = info.maxSupply ?? info.cap ?? CFG.SUPPLY;
+
           const pretty = price != null
-            ? (typeof price === 'object' && price._isBigNumber
-               ? `${ethers.utils.formatEther(price)} ETH`
+            ? (typeof price === 'object' && price._isBigNumber ? `${ethers.utils.formatEther(price)} ETH`
                : (isFinite(price) ? `${price} ETH` : String(price)))
             : '—';
-          elMintPrice && (elMintPrice.textContent = pretty);
+          elMintPrice  && (elMintPrice.textContent = pretty);
           elMintSupply && (elMintSupply.textContent = (supply!=null && max!=null) ? `${supply}/${max}` : (supply ?? '—'));
           return;
         }
@@ -174,7 +165,6 @@
     elMintPrice  && (elMintPrice.textContent  = '—');
     elMintSupply && (elMintSupply.textContent = '—');
   }
-
   async function doMint(){
     const qty = Math.max(1, Number(elMintQty?.value || 1));
     try{
@@ -192,21 +182,21 @@
     }
   }
 
-  // ---- Orchestration ----
+  // Orchestration
   const ST = { connected:false, addr:null, busy:false };
 
   async function refresh(){
     if (ST.busy) return; ST.busy = true;
     try{
       if (!ST.connected || !ST.addr){
-        elAddr   && (elAddr.textContent = '—');
-        elOwned  && (elOwned.textContent = '—');
-        elStaked && (elStaked.textContent= '—');
-        elRew    && (elRew.textContent   = '—');
-        elClaim  && (elClaim.disabled    = true);
-        elAppr   && (elAppr.disabled     = true);
-        elApprN  && (elApprN.textContent = '');
-        elMintNote && (elMintNote.textContent = 'Connect wallet to mint.');
+        elAddr?.(elAddr.textContent = '—');
+        elOwned&&(elOwned.textContent = '—');
+        elStaked&&(elStaked.textContent= '—');
+        elRew&&(elRew.textContent = '—');
+        elClaim&&(elClaim.disabled = true);
+        elAppr&&(elAppr.disabled = true);
+        elApprN&&(elApprN.textContent = '');
+        elMintNote&&(elMintNote.textContent = 'Connect wallet to mint.');
         await loadMintInfo();
         return;
       }
@@ -214,13 +204,11 @@
       elAddr && (elAddr.textContent = shorten(ST.addr));
       elMintNote && (elMintNote.textContent = '');
 
-      // Approval first
       const approved = await checkApproval(ST.addr);
-      if (approved === null){ elApprN&&(elApprN.textContent='Approval: Unknown'); elAppr&&(elAppr.disabled=true); }
-      else if (approved){ elApprN&&(elApprN.textContent='Approval: Granted'); elAppr&&(elAppr.disabled=true); }
-      else { elApprN&&(elApprN.textContent='Approval: Not granted'); elAppr&&(elAppr.disabled=false); }
+      if (approved === null){ elApprN&&(elApprN.textContent='Approval status unknown'); elAppr&&(elAppr.disabled=true); }
+      else if (approved){ elApprN&&(elApprN.textContent='Staking approved'); elAppr&&(elAppr.disabled=true); }
+      else { elApprN&&(elApprN.textContent='Staking not approved'); elAppr&&(elAppr.disabled=false); }
 
-      // Counts
       const [ownedCount, stakedCount] = await Promise.all([
         fetchOwnedCount(ST.addr),
         countStakedByUser(ST.addr)
@@ -228,14 +216,11 @@
       elOwned  && (elOwned.textContent  = String(ownedCount));
       elStaked && (elStaked.textContent = String(stakedCount));
 
-      // Rewards
       const rew = await readRewards(ST.addr);
-      if (rew == null){ elRew && (elRew.textContent='—'); elClaim && (elClaim.disabled=true); }
+      if (rew == null){ elRew && (elRew.textContent = '—'); elClaim && (elClaim.disabled = true); }
       else { const pretty = (Math.round(rew*100)/100).toLocaleString(); elRew && (elRew.textContent = `${pretty} FLYZ`); elClaim && (elClaim.disabled = rew <= 0); }
 
-      // Mint info (if available)
       await loadMintInfo();
-
     }catch(e){
       console.warn('Hub refresh failed:', e);
     }finally{
@@ -243,7 +228,7 @@
     }
   }
 
-  // ---- Events ----
+  // Events
   elRef?.addEventListener('click', refresh);
   elAppr?.addEventListener('click', async ()=>{
     if (!ST.connected || !ST.addr) return;
@@ -254,39 +239,33 @@
       await refresh();
     }catch(e){
       console.warn(e);
-      elAppr.textContent = 'Approve Staking'; elAppr.disabled = false;
+      elAppr.textContent = 'Approve Staking';
+      elAppr.disabled = false;
       alert(e?.message || 'Approval failed');
     }
   });
-
   elClaim?.addEventListener('click', async ()=>{
     if (!ST.connected || !ST.addr) return;
     try{
       elClaim.disabled = true; elClaim.textContent = 'Claiming…';
       const msg = await claimRewards(ST.addr);
       if (msg) alert(msg);
-      elClaim.textContent = 'Claim Rewards';
-      await refresh();
     }catch(e){
-      console.warn(e);
-      elClaim.textContent = 'Claim Rewards'; elClaim.disabled = false;
-      alert(e?.message || 'Claim failed');
+      console.warn(e); alert(e?.message || 'Claim failed');
+    }finally{
+      elClaim.textContent = 'Claim Rewards';
+      elClaim.disabled = false;
+      await refresh();
     }
   });
-
   elMintBtn?.addEventListener('click', ()=> doMint());
 
   window.addEventListener('wallet:connected', (ev)=>{
-    ST.connected = true;
-    ST.addr = ev?.detail?.address || null;
-    refresh();
+    ST.connected = true; ST.addr = ev?.detail?.address || null; refresh();
   });
   window.addEventListener('wallet:disconnected', ()=>{
-    ST.connected = false;
-    ST.addr = null;
-    refresh();
+    ST.connected = false; ST.addr = null; refresh();
   });
 
-  // initial
   refresh();
 })(window.FF_CFG || {});
