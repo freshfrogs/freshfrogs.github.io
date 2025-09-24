@@ -363,3 +363,58 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
   color: var(--accent-ink);
   border-color: color-mix(in srgb, var(--accent) 50%, transparent);
 }
+/* --- Fix: Hub shell should exactly match Pond --- */
+.hub-pro.card{
+  background: var(--card);           /* same as Pond */
+  border: 1px solid var(--border);   /* same token as Pond */
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  margin-top: 12px;
+}
+
+/* Inner panels keep a subtle surface; same border as Pond */
+.hub-pro__card{
+  background: var(--panel);          /* align with site cards */
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+/* --- Fix: remove the status line & reclaim space in Hub --- */
+#hubMyFrogs #stakeStatus{ display:none; }     /* hides "Showing X…" text */
+#hubMyFrogs .hub-pro__card-body{ padding-top: 12px; }
+
+/* --- Fix: Owned/Staked rows = Pond rhythm --- */
+#chipWrap .list-item{
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;                     /* match Pond row padding */
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);          /* same row surface as Pond */
+}
+#chipWrap .list-item + .list-item{ margin-top: 10px; }
+
+/* 128px thumbs styled like Pond tiles */
+#chipWrap .thumb128{
+  width:128px; height:128px; min-width:128px; min-height:128px;
+  border-radius: 12px;
+  image-rendering: pixelated;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 6px 12px rgba(0,0,0,.35);
+}
+
+/* Scroll viewport identical to Pond */
+#hubMyFrogs .hub-pro__card-body{
+  max-height: 560px;
+  overflow: auto;
+  padding-right: 6px;
+}
+#hubMyFrogs .hub-pro__card-body::-webkit-scrollbar{ width: 8px; }
+#hubMyFrogs .hub-pro__card-body::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,.15);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+#hubMyFrogs .hub-pro__card-body::-webkit-scrollbar-track{ background: transparent; }
