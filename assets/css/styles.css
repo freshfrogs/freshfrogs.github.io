@@ -310,3 +310,40 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
 
 /* Optional: slightly stronger top title to match Pond headings */
 .hub-pro__title h2 { font-weight: 800; font-size: 18px; letter-spacing: .2px; }
+/* === Owned/Staked panel → match Pond style & make scrollable === */
+
+/* Give the frogs list a fixed viewport with smooth scroll (like Pond) */
+#hubMyFrogs .hub-pro__card-body {
+  max-height: 560px;     /* adjust height to taste */
+  overflow: auto;
+  padding-right: 6px;    /* room for scrollbar */
+}
+
+/* Optional nicer scrollbar */
+#hubMyFrogs .hub-pro__card-body::-webkit-scrollbar { width: 8px; }
+#hubMyFrogs .hub-pro__card-body::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.15);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+#hubMyFrogs .hub-pro__card-body::-webkit-scrollbar-track { background: transparent; }
+
+/* Ensure list items look the same as Pond rows */
+#chipWrap .list-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.06));
+}
+#chipWrap .list-item + .list-item { margin-top: 8px; }
+
+/* Thumbs: 128 like Pond */
+#chipWrap .thumb128 {
+  image-rendering: pixelated;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 6px 12px rgba(0,0,0,.35);
+}

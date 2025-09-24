@@ -1,4 +1,5 @@
 // assets/js/owned.js
+// Owned / Staked list styled like Pond (128×128 thumbs) + passes data-since to modal
 (function(CFG){
   const API_USERS = 'https://api.reservoir.tools/users';
   const ACTIVITY  = 'https://api.reservoir.tools/users/activity/v6';
@@ -56,12 +57,12 @@
     ? `<span class="pill">Rank <b>#${rank}</b></span>`
     : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
 
-  // ------- 64px flat thumbnails for lists (fast) -------
-  function flatThumb64(container, id){
+  // ------- 128px flat thumbnails like Pond -------
+  function flatThumb128(container, id){
     const img = new Image();
     img.decoding='async'; img.loading='lazy';
-    img.width=64; img.height=64;
-    img.className='thumb64';
+    img.width=128; img.height=128;
+    img.className='thumb128';
     img.src = `${(window.FF_CFG?.SOURCE_PATH || '')}/frog/${id}.png`;
     container.appendChild(img);
   }
@@ -141,11 +142,13 @@
     tabStaked?.setAttribute('aria-selected', owned ? 'false' : 'true');
   }
 
-  // ------- Card builder (flat 64 + click-to-open) -------
-  // (supports sinceMs to set data-since for staked rows)
+  // ------- Card builder (pond-style list row, 128 thumb) -------
+  // supports sinceMs to set data-since for staked rows (modal shows "Staked NNd ago")
   function liCard(id, subtitle, ownerAddr, isStaked = false, sinceMs = null){
     const li = document.createElement('li');
     li.className = 'list-item';
+    li.setAttribute('tabindex','0');
+    li.setAttribute('role','button');
 
     // make the whole row open the modal (and add data for modal.js)
     li.setAttribute('data-token-id', id);
@@ -156,11 +159,11 @@
       li.setAttribute('data-since', String(sinceMs));
     }
 
-    // LEFT: 64×64 still image (fast)
+    // LEFT: 128×128 still image (fast)
     const left = document.createElement('div');
-    Object.assign(left.style, { width:'64px', height:'64px', minWidth:'64px', minHeight:'64px' });
+    Object.assign(left.style, { width:'128px', height:'128px', minWidth:'128px', minHeight:'128px' });
     li.appendChild(left);
-    flatThumb64(left, id);
+    flatThumb128(left, id);
 
     // MID: title + subtitle
     const rank = (RANKS && (String(id) in RANKS)) ? RANKS[String(id)] : null;
@@ -209,8 +212,11 @@
         const since = a?.createdAt ? new Date(a.createdAt) :
                       (a?.timestamp ? new Date(a.timestamp*1000) : null);
         const prev = map.get(id);
-        if (!prev || (since && prev.since && since.getTime()>prev.since.getTime())) map.set(id, {id, since});
-        else if (!prev) map.set(id,{id,since});
+        if (prev){
+          if (since && prev.since && since.getTime()>prev.since.getTime()) map.set(id, {id, since});
+        } else {
+          map.set(id,{id,since});
+        }
       }
       cont = json?.continuation || '';
       if (!cont) break;
@@ -260,7 +266,7 @@
     const ids = ST.cache.ownedIds || [];
     if (!ids.length){ setStatus('No owned frogs in this wallet for this collection.'); return; }
     ids.forEach(id=> ul.appendChild(liCard(id, 'Not staked • Owned by You', ST.addr, false)));
-    setStatus(`Showing ${ids.length.toLocaleString()} owned frog(s).`);
+    setStatus(`Showing ${ids.length.toLocaleString()} owned frog(s). Scroll for more.`);
   }
 
   function renderStakedFromCache(){
@@ -272,7 +278,7 @@
       const info = r.since ? `Staked ${fmtAgoMs(Date.now()-sinceMs)} • Owned by You` : 'Staked • Owned by You';
       ul.appendChild(liCard(r.id, info, ST.addr, true, sinceMs));
     });
-    setStatus(`Showing ${rows.length} staked frog(s).`);
+    setStatus(`Showing ${rows.length} staked frog(s). Scroll for more.`);
   }
 
   // ------- orchestration -------
