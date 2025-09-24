@@ -51,12 +51,28 @@
   </section>
 
   <!-- Facts -->
-  <section class="facts" aria-label="Key facts">
-    <div class="fact"><b>Supply</b><div class="muted">4,040 tokens</div></div>
-    <div class="fact"><b>Chain</b><div class="muted">Ethereum (ERC-721)</div></div>
-    <div class="fact"><b>Royalty</b><div class="muted">5% on secondary sales</div></div>
-    <div class="fact"><b>Mint Price</b><div class="muted">0.01 ETH</div></div>
+  <!-- === Collection Facts (inside panel like the Pond) === -->
+  <section class="card facts-card" id="collectionFacts" aria-label="Collection details">
+    <ul class="stats-grid">
+      <li class="stat-cell">
+        <div class="stat-k">Supply</div>
+        <div class="stat-v" id="cfSupply">4,040 tokens</div>
+      </li>
+      <li class="stat-cell">
+        <div class="stat-k">Chain</div>
+        <div class="stat-v" id="cfChain">Ethereum (ERC-721)</div>
+      </li>
+      <li class="stat-cell">
+        <div class="stat-k">Royalty</div>
+        <div class="stat-v" id="cfRoyalty">5% on secondary sales</div>
+      </li>
+      <li class="stat-cell">
+        <div class="stat-k">Mint Price</div>
+        <div class="stat-v" id="cfMintPrice">0.01 ETH</div>
+      </li>
+    </ul>
   </section>
+  <!-- === /Collection Facts === -->
 
   <!-- === User Hub (compact with right-side mini stats) === -->
   <section class="card hub-pro" id="userHub" aria-label="User Hub">
