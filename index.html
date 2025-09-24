@@ -58,101 +58,76 @@
     <div class="fact"><b>Mint Price</b><div class="muted">0.01 ETH</div></div>
   </section>
 
-  <!-- Mint + My Frogs -->
-  <section id="trade" class="two-col" aria-label="Mint and Staking">
-    <!-- Mint panel (UI shell; wire your mint when ready) -->
-    <div class="panel stack" aria-label="Mint">
-      <div class="row" style="justify-content:space-between;align-items:center">
-        <div>
-          <h2 class="section-title" style="margin:0">Mint</h2>
-          <div class="muted">Choose quantity, preview total, then mint.</div>
-        </div>
-        <div class="pill">Price <b>0.01Ξ</b></div>
+  <!-- === User Hub (Dashboard + Mint + My Frogs) === -->
+  <section class="card" id="userHub">
+    <header class="row" style="justify-content:space-between; gap:12px;">
+      <div class="row" style="gap:10px;">
+        <h2 class="section-title" style="margin:0;">User Hub</h2>
+        <span class="pill">Address: <b id="hubAddr">—</b></span>
       </div>
-      <div class="row" style="gap:10px;align-items:center">
-        <button id="mintDown" class="icon-btn" aria-label="Decrease">−</button>
-        <div id="mintQty" aria-live="polite">1</div>
-        <button id="mintUp" class="icon-btn" aria-label="Increase">+</button>
-        <input id="mintSlider" type="range" min="1" max="20" step="1" value="1" style="flex:1"/>
+      <div class="row" style="gap:8px;">
+        <button class="btn btn-ghost btn-sm" id="hubRefresh">Refresh</button>
       </div>
-      <div class="row" style="gap:6px;flex-wrap:wrap">
-        <button class="btn btn-ghost btn-sm" data-preset="1">x1</button>
-        <button class="btn btn-ghost btn-sm" data-preset="3">x3</button>
-        <button class="btn btn-ghost btn-sm" data-preset="5">x5</button>
-        <button class="btn btn-ghost btn-sm" data-preset="10">x10</button>
-        <button class="btn btn-ghost btn-sm" data-preset="20">x20</button>
-      </div>
-      <div class="row" style="align-items:center">
-        <div class="muted">Total</div>
-        <b style="margin-left:6px"><span id="mintTotal">0.01</span> ETH</b>
-        <div class="pill" id="gasHint" style="margin-left:10px;">≈ <span id="gasEst">0.000</span> gas ETH</div>
-        <div class="spacer"></div>
-        <button id="mintBtn" class="btn btn-solid btn-lg">Mint <u>1</u></button>
-      </div>
-      <div class="progress"><i id="mintBar"></i></div>
-      <p id="mintStatus" class="muted">Status: ready (demo)</p>
-    </div>
-
-    <!-- My Frogs (Owned / Staked) -->
-    <div class="panel stack same-height" aria-label="Staking">
-      <div class="row" style="justify-content:space-between">
-        <div>
-          <h2 class="section-title" style="margin:0">My Frogs</h2>
-          <div class="muted">Connect your wallet to view <b>Owned</b> & <b>Staked</b>.</div>
-          <div id="rewardsLine" class="muted" style="margin-top:4px;display:none;">
-            Available rewards: <b id="rewardsEth">0</b> Flyz
-          </div>
-        </div>
-        <div class="tabs" role="tablist" id="stakeTabs">
-          <span class="tab-indicator" aria-hidden="true"></span>
-          <button class="tab" id="tabOwned"  role="tab" aria-selected="true"  aria-controls="chipWrap">Owned</button>
-          <button class="tab" id="tabStaked" role="tab" aria-selected="false" aria-controls="chipWrap">Staked</button>
-        </div>
-      </div>
-
-      <ul id="chipWrap" class="card-list list-scroll" aria-live="polite"></ul>
-
-      <div class="row" id="stakeControls" style="gap:8px;">
-        <button id="selectAll" class="btn btn-ghost btn-sm">Select All</button>
-        <button id="clearSel"  class="btn btn-ghost btn-sm">Clear</button>
-        <div class="spacer"></div>
-        <button class="btn btn-solid btn-sm" id="refreshOwned">↻ Refresh Owned</button>
-      </div>
-      <p id="stakeStatus" class="muted">No wallet connected.</p>
-    </div>
-  </section>
-
-  <section class="card" id="userDashboard">
-    <header class="row" style="align-items:center; gap:12px;">
-      <h2 style="margin:0;">Your Dashboard</h2>
-      <span class="muted" id="dashStatus">Connect your wallet to load your dashboard.</span>
-      <span class="pill">Addr: <b id="dashAddress"></b></span>
-      <button class="btn btn-ghost btn-sm" id="dashRefresh">Refresh</button>
     </header>
 
-    <div class="row" style="gap:12px; margin:12px 0;">
-      <div class="stat"><div class="stat-num" id="dashOwned">—</div><div class="stat-label">Owned</div></div>
-      <div class="stat"><div class="stat-num" id="dashStaked">—</div><div class="stat-label">Staked</div></div>
-      <div class="stat"><div class="stat-num" id="dashRewards">—</div><div class="stat-label">Rewards (FLYZ)</div></div>
+    <!-- Overview: counts + staking actions + rewards -->
+    <div class="row" style="gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+      <div class="stat">
+        <div class="stat-num" id="hubOwned">—</div>
+        <div class="stat-label">Owned</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="hubStaked">—</div>
+        <div class="stat-label">Staked</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="hubRewards">—</div>
+        <div class="stat-label">Rewards (FLYZ)</div>
+      </div>
+
+      <div class="row" style="gap:8px; margin-left:auto;">
+        <button class="btn" id="hubApprove">Approve Staking</button>
+        <span class="muted" id="hubApprovalNote"></span>
+        <button class="btn btn-solid" id="hubClaim" disabled>Claim Rewards</button>
+      </div>
     </div>
 
-    <div class="row" style="gap:12px; flex-wrap:wrap;">
-      <button class="btn" id="dashApprove">Approve Staking</button>
-      <span class="muted" id="dashApprovalNote"></span>
-      <button class="btn btn-solid" id="dashClaim" disabled>Claim Rewards</button>
+    <hr class="sep">
+
+    <!-- Mint panel -->
+    <div class="card" id="hubMintCard" style="padding:12px;">
+      <div class="row" style="justify-content:space-between; gap:8px;">
+        <h3 style="margin:0;">Mint Fresh Frogs</h3>
+        <div class="row muted" style="gap:10px;">
+          <span>Price: <b id="hubMintPrice">—</b></span>
+          <span>Supply: <b id="hubMintSupply">—</b></span>
+        </div>
+      </div>
+      <div class="row" style="gap:10px; margin-top:10px;">
+        <label class="muted" for="hubMintQty">Qty</label>
+        <input id="hubMintQty" type="number" min="1" value="1" style="width:80px; padding:8px; border-radius:8px; border:1px solid var(--border); background:transparent; color:inherit;">
+        <button class="btn btn-solid" id="hubMintBtn">Mint</button>
+        <span class="muted" id="hubMintNote">Connect wallet to mint.</span>
+      </div>
     </div>
 
-    <div class="row" style="gap:24px; margin-top:16px;">
-      <div style="flex:1; min-width:280px;">
-        <h3 style="margin:0 0 8px;">Owned (first 20)</h3>
-        <ul class="list" id="dashOwnedList"></ul>
+    <hr class="sep">
+
+    <!-- My Frogs (reuses existing owned.js IDs and behaviors) -->
+    <div id="hubMyFrogs">
+      <div class="row" role="tablist" aria-label="My Frogs">
+        <button class="btn btn-ghost btn-sm" id="tabOwned"  role="tab" aria-selected="true">Owned</button>
+        <button class="btn btn-ghost btn-sm" id="tabStaked" role="tab" aria-selected="false">Staked</button>
+        <button class="btn btn-ghost btn-sm" id="refreshOwned" title="Refresh">↻</button>
+        <span class="muted" id="stakeStatus" style="margin-left:auto;">Connect your wallet to view Owned &amp; Staked.</span>
       </div>
-      <div style="flex:1; min-width:280px;">
-        <h3 style="margin:0 0 8px;">Staked (first 20)</h3>
-        <ul class="list" id="dashStakedList"></ul>
-      </div>
+
+      <ul class="list" id="chipWrap" style="margin-top:10px;">
+        <!-- owned.js will populate frogs here -->
+      </ul>
     </div>
   </section>
+  <!-- === /User Hub === -->
 
   <!-- Pond -->
   <section id="pond" class="panel stack" aria-label="The Pond">
@@ -214,19 +189,24 @@
 
 <!-- Scripts: order matters -->
 <script src="assets/js/config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/ethers@5/dist/ethers.min.js"></script>
 <script src="assets/js/utils.js"></script>
 <script src="assets/js/theme.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@5/dist/ethers.min.js"></script>
+
 <script src="assets/js/grid.js"></script>
 <script src="assets/js/wallet.js"></script>
 <script src="assets/js/owned.js"></script>
 <script src="assets/js/staking.js"></script>
 <script src="assets/js/pond.js"></script>
-<script src="assets/js/dashboard.js"></script>
-<script src="assets/js/dashboard_mount.js"></script>
+
+<!-- NEW unified hub -->
+<script src="assets/js/hub.js"></script>
+
+<!-- Modal last so click handlers attach sitewide -->
 <script src="assets/js/modal.js"></script>
-<script src="assets/js/dashboard.js"></script>
 <script src="assets/js/main.js"></script>
+
 
 <!-- Frog Modal (image ABOVE info, Original link, no extra text blocks) -->
 <div id="frogModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
