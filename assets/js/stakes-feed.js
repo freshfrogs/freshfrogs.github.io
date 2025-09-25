@@ -1,5 +1,7 @@
 // assets/js/stakes-feed.js
 // Recently Staked — scrollable with pagination + Etherscan links + stats
+// - Uses CONTROLLER_ADDRESS from FF_CFG
+// - Handles Reservoir 429 with spacing + retry backoff
 (function (FF, CFG) {
   const UL_ID   = 'recentStakes';
   const ID_TOTAL= 'stakedTotal';
@@ -14,17 +16,19 @@
 
   const API_KEY    = need('FROG_API_KEY');
   const COLLECTION = need('COLLECTION_ADDRESS');
-  const CONTROLLER = need('CONTROLLER_ADDRESS');           // ✅ your config key
+  const CONTROLLER = need('CONTROLLER_ADDRESS'); // ✅ your config key
   const CHAIN_ID   = Number(CFG.CHAIN_ID || 1);
 
-  const PAGE_SIZE  = Math.max(1, Math.min(50, Number(CFG.PAGE_SIZE || 50)));
+  const PAGE_SIZE  = Math.max(1, Math.min(50, Number(CFG.PAGE_SIZE || 5))); // your config uses 5
   const MAX_PAGES  = Math.max(1, Number(CFG.MAX_PAGES || 8));
 
+  // -------- Headers (prefer repo helper) --------
   function apiHeaders(){
     if (typeof FF.apiHeaders === 'function') return FF.apiHeaders();
     return { accept: 'application/json', 'x-api-key': API_KEY };
   }
 
+  // -------- Small utils --------
   const shorten = (a)=> (FF.shorten && FF.shorten(a)) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
   const ago     = (d)=> d ? (FF.formatAgo ? FF.formatAgo(Date.now()-d.getTime())+' ago' : d.toLocaleString()) : '';
   const imgFor  = (id)=> (CFG.SOURCE_PATH || '') + '/frog/' + id + '.png';
@@ -56,14 +60,46 @@
     root.style.maxHeight = Math.round(rowH * rows + gap * (rows - 1)) + 'px';
   }
 
-  function reservoirFetch(url){
-    return fetch(url, { headers: apiHeaders() }).then(res=>{
-      if (!res.ok) return res.text().then(t=>{ const e = new Error('HTTP '+res.status+(t?' — '+t:'')); e.url=url; throw e; });
-      return res.json();
-    });
+  // -------- Simple rate-limit scheduler + retry on 429 --------
+  const RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 650); // >= 650ms between calls
+  const BACKOFFS = Array.isArray(CFG.RETRY_BACKOFF_MS) ? CFG.RETRY_BACKOFF_MS : [800, 1600, 3200]; // on 429
+
+  let lastAt = 0;
+  function wait(ms){ return new Promise(res=> setTimeout(res, ms)); }
+
+  async function spacedFetch(url, init){
+    const now = Date.now();
+    const elapsed = now - lastAt;
+    if (elapsed < RATE_MIN_MS) {
+      await wait(RATE_MIN_MS - elapsed);
+    }
+    lastAt = Date.now();
+    return fetch(url, init);
   }
 
-  // Keep transfers TO controller (exclude zero->controller edge mints)
+  async function reservoirFetch(url, opt={}){
+    const hdrs = Object.assign({}, apiHeaders(), opt.headers||{});
+    let attempt = 0;
+    while (true){
+      const res = await spacedFetch(url, { headers: hdrs });
+      if (res.status !== 429 && !res.ok){
+        const txt = await res.text().catch(()=> '');
+        const err = new Error(`HTTP ${res.status}${txt ? ' — '+txt : ''}`);
+        err.url = url;
+        throw err;
+      }
+      if (res.status === 429){
+        const back = BACKOFFS[Math.min(attempt, BACKOFFS.length-1)];
+        attempt++;
+        // console.warn('[stakes] 429; retrying in', back, 'ms');
+        await wait(back);
+        continue;
+      }
+      return res.json();
+    }
+  }
+
+  // -------- Map activity -> "stakes": transfer TO controller (exclude zero->controller) --------
   function mapRow(a){
     if (String(a?.type || '').toLowerCase() !== 'transfer') return null;
     const to   = (a?.toAddress || '').toLowerCase();
@@ -85,16 +121,21 @@
     return { id: tokenId, from: a?.fromAddress || null, to: a?.toAddress || null, time: dt, img: imgFor(tokenId), tx: txHash };
   }
 
-  // ===== Stats =====
-  function fetchStakedTotal(){
+  // -------- Stats (use pond.js helpers if available) --------
+  async function fetchStakedTotal(){
+    // Prefer FF.pond.fetchStakedTotal if available
+    if (FF.pond && typeof FF.pond.fetchStakedTotal === 'function'){
+      try { return await FF.pond.fetchStakedTotal(COLLECTION, CONTROLLER); } catch(e){}
+    }
+    // Reservoir fallback
     const url = API_USERCOLL(CONTROLLER) + '?collections=' + encodeURIComponent(COLLECTION) + '&limit=20';
-    return reservoirFetch(url).then(json=>{
-      const rows = Array.isArray(json?.collections) ? json.collections : [];
-      const row  = rows.find(r => String(r?.collection?.id || '').toLowerCase() === String(COLLECTION).toLowerCase());
-      const n = Number(row?.ownership?.tokenCount || 0);
-      return isFinite(n) ? n : 0;
-    });
+    const json = await reservoirFetch(url);
+    const rows = Array.isArray(json?.collections) ? json.collections : [];
+    const row  = rows.find(r => String(r?.collection?.id || '').toLowerCase() === String(COLLECTION).toLowerCase());
+    const n = Number(row?.ownership?.tokenCount || 0);
+    return Number.isFinite(n) ? n : 0;
   }
+
   function setStats(obj){
     const elT = document.getElementById(ID_TOTAL);
     const elC = document.getElementById(ID_CTRL);
@@ -112,7 +153,7 @@
     if (elW) elW.textContent = obj?.updatedMs ? new Date(obj.updatedMs).toLocaleString() : '—';
   }
 
-  // ===== Infinite list =====
+  // -------- Infinite list state --------
   let items = [];
   let continuation = null;
   let pageCount = 0;
@@ -143,7 +184,7 @@
       if (!entry || !entry.isIntersecting) return;
       if (loading || !continuation || pageCount >= MAX_PAGES) return;
       loadNextPage(root);
-    }, { root, rootMargin: '120px', threshold: 0.01 });
+    }, { root, rootMargin: '160px', threshold: 0.01 }); // larger margin so we prefetch sooner and smoother
     io.observe(sentinel);
   }
 
@@ -175,51 +216,87 @@
 
     ensureSentinel(root);
     setSentinelText(root, (!continuation || pageCount >= MAX_PAGES) ? 'End of results' : 'Loading more…');
+
+    // after DOM paints, compute height for N visible rows
     requestAnimationFrame(()=> applyVisibleRows(root));
   }
 
-  function fetchPage(cont){
+  // Optionally reuse a pond.js helper for activity (if present)
+  async function fetchPage(cont){
+    if (FF.pond && typeof FF.pond.fetchStakeActivity === 'function'){
+      // expected signature: fetchStakeActivity({ collection, controller, limit, continuation })
+      try {
+        const out = await FF.pond.fetchStakeActivity({
+          collection: COLLECTION,
+          controller: CONTROLLER,
+          limit: PAGE_SIZE,
+          continuation: cont
+        });
+        const rows = (out?.activities || out?.rows || []).map(mapRow).filter(Boolean);
+        return { rows, continuation: out?.continuation || null };
+      } catch (e) {
+        // fall through to Reservoir raw call
+      }
+    }
+
     const qs = new URLSearchParams({ collection: COLLECTION, limit: String(PAGE_SIZE), types: 'transfer' });
     if (cont) qs.set('continuation', cont);
     const url = API_ACTIVITY + '?' + qs.toString();
-    return reservoirFetch(url).then(json=>{
-      const rows = (json?.activities || []).map(mapRow).filter(Boolean);
-      return { rows, continuation: json?.continuation || null };
-    });
+    const json = await reservoirFetch(url);
+    const rows = (json?.activities || []).map(mapRow).filter(Boolean);
+    return { rows, continuation: json?.continuation || null };
   }
 
-  function loadFirstPage(root){
+  async function loadFirstPage(root){
     loading = true;
-    Promise.all([ fetchStakedTotal().catch(()=>0), fetchPage(null) ])
-      .then(([total, first])=>{
-        items = first.rows.sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
-        continuation = first.continuation;
-        pageCount = 1;
-        renderAll(root);
+    try{
+      // 1) first page (avoid parallel to reduce 429 risk)
+      const first = await fetchPage(null);
+      items = first.rows.sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
+      continuation = first.continuation;
+      pageCount = 1;
+      renderAll(root);
+
+      // 2) stats shortly after (spaced by scheduler)
+      try {
+        const total = await fetchStakedTotal();
         setStats({ total, updatedMs: Date.now() });
-        attachObserver(root);
-      })
-      .catch(e=>{
-        console.warn('[stakes] failed', e, e.url ? '\nURL: '+e.url : '');
-        root.innerHTML = '<li class="row"><div class="pg-muted">Could not load recent stakes.</div></li>';
+      } catch(e) {
         setStats({ total: '—', updatedMs: null });
-      })
-      .finally(()=>{ loading = false; });
+      }
+
+      // 3) enable observer a tick later
+      setTimeout(()=> attachObserver(root), 100);
+    }catch(e){
+      console.warn('[stakes] failed', e, e.url ? '\nURL: '+e.url : '');
+      root.innerHTML = '<li class="row"><div class="pg-muted">Could not load recent stakes.</div></li>';
+      setStats({ total: '—', updatedMs: null });
+    }finally{
+      loading = false;
+    }
   }
 
-  function loadNextPage(root){
+  async function loadNextPage(root){
     if (!continuation || loading) return;
     loading = true;
-    fetchPage(continuation).then(next=>{
+    try{
+      const next = await fetchPage(continuation);
       continuation = next.continuation;
       pageCount += 1;
       items = items.concat(next.rows).sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
       renderAll(root);
-      fetchStakedTotal().then(n=> setStats({ total: n, updatedMs: Date.now() })).catch(()=>{});
-    }).catch(e=>{
+
+      // refresh total (spaced call)
+      try {
+        const total = await fetchStakedTotal();
+        setStats({ total, updatedMs: Date.now() });
+      } catch {}
+    }catch(e){
       console.warn('[stakes] next page failed', e);
       setSentinelText(root, 'Could not load more.');
-    }).finally(()=>{ loading = false; });
+    }finally{
+      loading = false;
+    }
   }
 
   window.FF_loadRecentStakes = function(){
