@@ -1,4 +1,4 @@
-// assets/js/owned-panel.js — L9-only header (bigger sidebar pad), old squares removed.
+// assets/js/owned-panel.js — Layout B only (key/value bar), removes big info squares.
 // Shows: Wallet, Owned, Staked, Rewards, Approval + actions. Cards unchanged.
 
 (function (FF, CFG) {
@@ -9,26 +9,18 @@
   const PAGE_SIZE = Math.max(1, Math.min(50, Number(CFG.OWNED_PAGE_SIZE || CFG.PAGE_SIZE || 12)));
   const COLLECTION = CFG.COLLECTION_ADDRESS;
 
-  /* ===== Styles: L9 only (bigger, cleaner) ===== */
+  /* ========== Styles: Layout B (clean inline bar) ========== */
   (function injectCSS(){
-    if (document.getElementById('owned-l9-css')) return;
+    if (document.getElementById('owned-b-css')) return;
     const css = `
 #ownedCard .oh-wrap{margin-bottom:10px}
-#ownedCard .oh-side{
-  display:grid;grid-template-columns:240px 1fr;gap:12px;
-}
-@media (max-width:900px){#ownedCard .oh-side{grid-template-columns:1fr}}
-#ownedCard .sidebox{
-  border:1px solid var(--border);border-radius:12px;background:var(--panel);
-  padding:12px;display:grid;gap:8px
-}
-#ownedCard .rowkv{display:flex;align-items:baseline;gap:8px;font-size:13px}
-#ownedCard .rowkv .k{color:var(--muted);min-width:70px}
-#ownedCard .rowkv .v b{font-size:15px}
-#ownedCard .badge{display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--border);border-radius:999px;padding:4px 10px;font-size:12px}
+#ownedCard .oh-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#ownedCard .oh-spacer{flex:1}
+#ownedCard .oh-muted{color:var(--muted)}
+#ownedCard .oh-mini{font-size:11px;line-height:1}
+#ownedCard .badge{display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--border);border-radius:999px;padding:4px 8px;font-size:12px}
 #ownedCard .ok{color:color-mix(in srgb,#22c55e 85%, #ffffff 15%)}
 #ownedCard .warn{color:color-mix(in srgb,#f59e0b 85%, #ffffff 15%)}
-#ownedCard .oh-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 #ownedCard .oh-btn{
   font-family:var(--font-ui);border:1px solid var(--border);background:transparent;color:inherit;
   border-radius:8px;padding:6px 10px;font-weight:700;font-size:12px;line-height:1;
@@ -42,10 +34,10 @@
   color: color-mix(in srgb,#ffffff 85%,#22c55e)
 }
     `;
-    const el=document.createElement('style'); el.id='owned-l9-css'; el.textContent=css; document.head.appendChild(el);
+    const el=document.createElement('style'); el.id='owned-b-css'; el.textContent=css; document.head.appendChild(el);
   })();
 
-  /* ===== Shared fetch queue (Reservoir) ===== */
+  /* ========== Shared Reservoir queue ========== */
   if (!window.FF_RES_QUEUE){
     const RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 800);
     const BACKOFFS = Array.isArray(CFG.RETRY_BACKOFF_MS) ? CFG.RETRY_BACKOFF_MS : [900,1700,3200];
@@ -57,7 +49,7 @@
     window.FF_RES_QUEUE={ fetch:(url)=> (chain = chain.then(()=> run(url))) };
   }
 
-  /* ===== Utils ===== */
+  /* ========== Utils ========== */
   const $=(s,r=document)=>r.querySelector(s);
   const shorten=(a)=> (FF.shorten?.(a)) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
   const imgFor=(id)=> (CFG.SOURCE_PATH||'')+'/frog/'+id+'.png';
@@ -72,7 +64,7 @@
   const openseaToken=(id)=>`https://opensea.io/assets/ethereum/${COLLECTION}/${id}`;
   const toast=(m)=>{ try{FF.toast?.(m);}catch{} console.log('[owned]',m); };
 
-  // Rewards formatting (18 decimals)
+  // Rewards (18 decimals → neat)
   function toBigIntSafe(v){
     try{
       if (typeof v==='bigint') return v;
@@ -83,7 +75,7 @@
   }
   function formatWei(v, decimals=18){
     const bi = toBigIntSafe(v); if (bi==null) return '—';
-    const neg = bi<0n?'-':'', abs = bi<0n? -bi: bi;
+    const neg = bi<0n?'-':'', abs = bi<0n ? -bi : bi;
     const base = 10n**BigInt(decimals);
     const whole = abs/base, frac = abs%base;
     if (whole>=100n) return neg+whole.toString();
@@ -102,7 +94,7 @@
     return s+'s ago';
   }
 
-  // Wallet & staking helpers
+  /* ========== Wallet & staking helpers ========== */
   async function getConnectedAddress(){
     try{
       if (window.FF_WALLET?.address) return window.FF_WALLET.address;
@@ -154,11 +146,16 @@
     return null;
   }
 
-  /* ===== State ===== */
+  /* ========== State ========== */
   let addr=null, continuation=null, items=[], loading=false, io=null, RANKS=null;
   let _stakedCount=null, _rewards=null, _rewardsPretty=null, _approved=null;
 
-  /* ===== Header (L9 only) ===== */
+  /* ========== Header (Layout B only) ========== */
+  function removeOldSquares(){
+    // remove the big info blocks under #ownedCard (no HTML edits needed)
+    const card=$(SEL.card); if(!card) return;
+    card.querySelectorAll('.info-grid-2').forEach(n=> n.remove());
+  }
   function headerRoot(){
     const card=$(SEL.card); if(!card) return null;
     let wrap = card.querySelector('.oh-wrap');
@@ -185,20 +182,17 @@
     const w = headerRoot(); if(!w) return;
     const d = headerData();
     w.innerHTML =
-      '<div class="oh-side">'+
-        '<div class="sidebox">'+
-          '<div class="rowkv"><span class="k">Wallet</span><span class="v"><a id="ohWalletOS" href="'+d.osHref+'" target="_blank" rel="noopener"><b id="ohWallet">'+d.walletShort+'</b></a></span></div>'+
-          '<div class="rowkv"><span class="k">Owned</span><span class="v"><b id="ohOwned">'+d.owned+'</b></span></div>'+
-          '<div class="rowkv"><span class="k">Staked</span><span class="v"><b id="ohStaked">'+d.staked+'</b></span></div>'+
-          '<div class="rowkv"><span class="k">Rewards</span><span class="v"><b id="ohRewards">'+d.rewards+'</b></span></div>'+
-          '<div>'+badge(d.approved)+'</div>'+
-        '</div>'+
-        '<div class="oh-actions">'+
-          '<button class="oh-btn" id="ohConnect">Connect</button>'+
-          '<button class="oh-btn" id="ohApprove">Approve</button>'+
-          '<button class="oh-btn" id="ohClaim">Claim</button>'+
-          '<a class="oh-btn" id="ohOS" href="'+d.osHref+'" target="_blank" rel="noopener">OpenSea</a>'+
-        '</div>'+
+      '<div class="oh-row oh-mini">'+
+        '<span class="oh-muted">Wallet</span> <a id="ohWalletOS" href="'+d.osHref+'" target="_blank" rel="noopener"><b id="ohWallet">'+d.walletShort+'</b></a>'+
+        '<span>•</span><span class="oh-muted">Owned</span> <b id="ohOwned">'+d.owned+'</b>'+
+        '<span>•</span><span class="oh-muted">Staked</span> <b id="ohStaked">'+d.staked+'</b>'+
+        '<span>•</span><span class="oh-muted">Rewards</span> <b id="ohRewards">'+d.rewards+'</b>'+
+        '<span>•</span>'+badge(d.approved)+
+        '<span class="oh-spacer"></span>'+
+        '<button class="oh-btn" id="ohConnect">Connect</button>'+
+        '<button class="oh-btn" id="ohApprove">Approve</button>'+
+        '<button class="oh-btn" id="ohClaim">Claim</button>'+
+        '<a class="oh-btn" id="ohOS" href="'+d.osHref+'" target="_blank" rel="noopener">OpenSea</a>'+
       '</div>';
 
     const bC = w.querySelector('#ohConnect'), bA = w.querySelector('#ohApprove'), bCl = w.querySelector('#ohClaim');
@@ -208,7 +202,7 @@
   }
   async function renderHeader(){ buildHeader(); }
 
-  /* ===== KPIs ===== */
+  /* ========== KPIs ========== */
   async function refreshHeaderStats(){
     try{ _approved = addr ? await isApproved(addr) : null; }catch{ _approved=null; }
     try{ const ids = addr ? await getStakedIds(addr) : null; _stakedCount = Array.isArray(ids)?ids.length:'—'; }catch{ _stakedCount='—'; }
@@ -216,14 +210,14 @@
     await renderHeader();
   }
 
-  /* ===== Cards (unchanged) ===== */
+  /* ========== Cards (unchanged) ========== */
   function rankPill(rank){ return (rank||rank===0) ? '<span class="pill">Rank #'+rank+'</span>' : '<span class="pill"><span class="muted">Rank N/A</span></span>'; }
   function attrsHTML(attrs, max=4){
     if (!Array.isArray(attrs)||!attrs.length) return '';
     const chips=[]; for (const a of attrs){ if(!a.key||a.value==null) continue; chips.push('<li class="attr">'+a.key+': <b>'+String(a.value)+'</b></li>'); if(chips.length>=max) break; }
     return chips.length? '<ul class="attr-list">'+chips.join('')+'</ul>' : '';
   }
-  function metaLine(it){
+  function fmtMeta(it){
     if (it.staked){ const ago = it.sinceMs ? fmtAgo(it.sinceMs) : null; return ago ? ('Staked '+ago+' • Owned by You') : 'Staked • Owned by You'; }
     return 'Not staked • Owned by You';
   }
@@ -238,7 +232,7 @@
             else return toast('Stake: helper not found');
             it.staked=true; it.sinceMs=Date.now();
             btn.textContent='Unstake'; btn.dataset.act='unstake';
-            const meta = scope.querySelector('.meta'); if (meta) meta.textContent = metaLine(it);
+            const meta = scope.querySelector('.meta'); if (meta) meta.textContent = fmtMeta(it);
             await refreshHeaderStats();
           }else if (act==='unstake'){
             if (FF.staking?.unstakeToken) await FF.staking.unstakeToken(it.id);
@@ -246,7 +240,7 @@
             else return toast('Unstake: helper not found');
             it.staked=false; it.sinceMs=null;
             btn.textContent='Stake'; btn.dataset.act='stake';
-            const meta = scope.querySelector('.meta'); if (meta) meta.textContent = metaLine(it);
+            const meta = scope.querySelector('.meta'); if (meta) meta.textContent = fmtMeta(it);
             await refreshHeaderStats();
           }else if (act==='transfer'){
             if (FF.wallet?.promptTransfer) await FF.wallet.promptTransfer(it.id);
@@ -256,6 +250,7 @@
       });
     });
   }
+
   async function hydrateStakedSince(batch){
     for (const it of batch){ if (!it.staked) continue; try{ it.sinceMs = await getStakeSinceMs(it.id); }catch{ it.sinceMs=null; } }
   }
@@ -272,7 +267,7 @@
       card.innerHTML =
         '<img class="thumb" src="'+imgFor(it.id)+'" alt="'+it.id+'">'+
         '<h4 class="title">Frog #'+it.id+' '+rankPill(it.rank)+'</h4>'+
-        '<div class="meta">'+metaLine(it)+'</div>'+
+        '<div class="meta">'+fmtMeta(it)+'</div>'+
         (attrsHTML(it.attrs,4))+
         '<div class="actions">'+
           '<button class="btn btn-outline-gray" data-act="'+(it.staked ? 'unstake' : 'stake')+'">'+(it.staked ? 'Unstake' : 'Stake')+'</button>'+
@@ -289,7 +284,7 @@
     const el = document.getElementById('ohOwned'); if (el) el.textContent = String(n);
   }
 
-  /* ===== Paging ===== */
+  /* ========== Paging ========== */
   async function fetchPage(){
     const qs=new URLSearchParams({ collection: COLLECTION, limit:String(PAGE_SIZE), includeTopBid:'false', includeAttributes:'true' });
     if (continuation) qs.set('continuation', continuation);
@@ -303,6 +298,15 @@
     continuation = j?.continuation || null;
     return rows;
   }
+
+  async function ensureRanks(){
+    if (FF.RANKS) return FF.RANKS;
+    const url = CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json';
+    const j = FF.fetchJSON ? await FF.fetchJSON(url) : await (await fetch(url)).json();
+    const map = Array.isArray(j) ? j.reduce((m,r)=> (m[String(r.id)]=r.ranking, m), {}) : (j||{});
+    FF.RANKS = map; return map;
+  }
+
   async function loadFirstPage(){
     try{
       const [rows, ranks] = await Promise.all([ fetchPage(), ensureRanks() ]);
@@ -314,13 +318,15 @@
       const root=$(SEL.grid); if (!root) return;
       if (!continuation) return;
       const sentinel=document.createElement('div'); sentinel.style.height='1px'; root.appendChild(sentinel);
-      const io = new IntersectionObserver(async es=>{
-        if (!es[0].isIntersecting) return;
+      io=new IntersectionObserver(async es=>{
+        if (!es[0].isIntersecting || loading) return;
+        loading=true;
         try{
           const r=await fetchPage(); r.forEach(x=> x.rank=(FF.RANKS||{})[String(x.id)]);
           await hydrateStakedSince(r);
           items=items.concat(r); renderCards();
         }catch(e){ toast('Could not load more'); }
+        finally{ loading=false; }
       },{root,rootMargin:'140px',threshold:0.01});
       io.observe(sentinel);
     }catch(e){
@@ -330,12 +336,7 @@
     }
   }
 
-  /* ===== Init / Connect ===== */
-  function removeOldSquares(){
-    // remove the big "info-grid-2" squares under the Owned panel
-    const card=$(SEL.card); if(!card) return;
-    card.querySelectorAll('.info-grid-2').forEach(n=> n.remove());
-  }
+  /* ========== Connect & Init ========== */
   async function handleConnectClick(ev){
     const btn = ev?.currentTarget; if (btn) btn.disabled = true;
     try{
@@ -349,14 +350,6 @@
     await renderHeader();
     const grid=$(SEL.grid); if (grid) grid.innerHTML='<div class="pg-muted">Loading…</div>';
     await Promise.all([ loadFirstPage(), refreshHeaderStats() ]);
-  }
-
-  async function ensureRanks(){
-    if (FF.RANKS) return FF.RANKS;
-    const url = CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json';
-    const j = FF.fetchJSON ? await FF.fetchJSON(url) : await (await fetch(url)).json();
-    const map = Array.isArray(j) ? j.reduce((m,r)=> (m[String(r.id)]=r.ranking, m), {}) : (j||{});
-    FF.RANKS = map; return map;
   }
 
   async function initOwned(){
