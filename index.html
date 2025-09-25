@@ -8,9 +8,9 @@
   <link rel="stylesheet" href="assets/css/styles.css" />
 
   <style>
+    /* Base */
     .pg-wrap{ padding:20px; }
     img{ image-rendering: pixelated; image-rendering: crisp-edges; }
-
     .pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
     .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
     .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
@@ -20,12 +20,12 @@
     .row{ display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:center; padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
     .thumb64{ width:64px; height:64px; min-width:64px; min-height:64px; border-radius:10px; object-fit:contain; background:var(--panel-2); }
 
-    /* centered single-panel layout (fixed width like original) */
+    /* Centered single-panel layout (fixed width like original) */
     :root{ --panel-width: 640px; }
     .center-wrap{ display:grid; gap:16px; justify-items:center; }
     .centered-card{ width: min(var(--panel-width), 100%); }
 
-    /* hero centered */
+    /* Hero (centered) */
     .frog-hero{ margin:28px auto 38px; width: min(var(--panel-width), 100%); }
     .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
     .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
@@ -34,7 +34,7 @@
     .frog-strip img{ width:64px; height:64px; object-fit:contain; }
     @media (max-width:520px){ .frog-hero{ margin:22px auto 30px; } .frog-strip{ gap:10px; } }
 
-    /* info blocks */
+    /* Info blocks */
     .info-grid-2{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:10px; margin-bottom:10px; }
     @media (max-width:900px){ .info-grid-2{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
     @media (max-width:520px){ .info-grid-2{ grid-template-columns: 1fr; } }
@@ -42,6 +42,28 @@
     .info-block .ik{ font-size:11px; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; }
     .info-block .iv{ font-weight:900; font-size:18px; line-height:1.1; margin-top:4px; }
     .info-block .in{ font-size:12px; color:var(--muted); }
+
+    /* Mint (Mini) inside the panel */
+    #mintMini.mint-mini{
+      border:1px solid var(--border); border-radius:12px; background: var(--panel);
+      padding:10px; margin:8px 0 12px;
+    }
+    #mintMini .mint-mini__row{ display:grid; grid-template-columns:auto auto 1fr auto; align-items:center; gap:10px; }
+    #mintMini .mint-mini__price{ border:1px solid var(--border); border-radius:10px; padding:8px 10px; background: color-mix(in srgb, var(--panel) 90%, transparent); display:grid; grid-template-columns:auto auto; gap:6px 8px; align-items:baseline; }
+    #mintMini .mint-mini__price .k{ font-size:12px; color:var(--muted); }
+    #mintMini .mint-mini__price .v{ font-weight:900; font-size:14px; }
+    #mintMini .mint-mini__stepper{ display:flex; align-items:center; gap:8px; }
+    #mintMini .mini__btn{ width:28px; height:28px; border-radius:8px; border:1px solid var(--border); background:transparent; color:inherit; font-weight:800; line-height:1; display:grid; place-items:center; }
+    #mintMini .mini__btn:active{ transform: translateY(1px); }
+    #mintMini .mini__qty{ width:64px; text-align:center; padding:6px; border-radius:8px; border:1px solid var(--border); background:transparent; color:inherit; font-family:var(--font-ui); }
+    #mintMini .mini__mint{ padding-inline:12px; }
+    #mintMini .mint-mini__total{ font-size:12px; color:var(--muted); justify-self:end; }
+    #mintMini .mint-mini__note{ margin-top:6px; font-size:12px; }
+    @media (max-width:600px){ #mintMini .mint-mini__row{ grid-template-columns: 1fr 1fr; } #mintMini .mint-mini__total{ justify-self:start; } }
+
+    /* Recent Mints list: show ~5 rows, scroll for more */
+    #recentMints.scrolling{ max-height: 440px; overflow-y:auto; padding-right:4px; }
+    #recentMints .row{ cursor:pointer; }
   </style>
 </head>
 <body>
@@ -75,16 +97,35 @@
           <div class="info-block"><div class="ik">🪙 Mint</div><div class="iv">0.01 ETH</div><div class="in">Per frog</div></div>
         </div>
 
-        <!-- Recent Activity (live) -->
-        <ul id="activityList" class="list" aria-live="polite">
-          <li class="row"><div class="pg-muted">Loading recent activity…</div></li>
+        <!-- Mint (Mini) -->
+        <section id="mintMini" class="mint-mini" aria-label="Quick mint">
+          <div class="mint-mini__row">
+            <div class="mint-mini__price">
+              <div class="k">Price</div><div class="v">0.01 ETH</div>
+            </div>
+
+            <div class="mint-mini__stepper" role="group" aria-label="Quantity">
+              <button type="button" class="mini__btn" data-delta="-1" aria-label="Decrease">−</button>
+              <input id="miniQty" class="mini__qty" type="text" inputmode="numeric" pattern="[0-9]*" value="1" aria-label="Quantity">
+              <button type="button" class="mini__btn" data-delta="1" aria-label="Increase">+</button>
+            </div>
+
+            <button type="button" class="btn mini__mint">Mint</button>
+            <div class="mint-mini__total">Total: <b id="miniTotal">0.01 ETH</b></div>
+          </div>
+          <div class="mint-mini__note pg-muted">Connect wallet to mint.</div>
+        </section>
+
+        <!-- Recent Mints (live) -->
+        <ul id="recentMints" class="list" aria-live="polite">
+          <li class="row"><div class="pg-muted">Loading recent mints…</div></li>
         </ul>
       </section>
     </div>
   </div>
 
   <script>
-    // Keep whole 64px tiles only (hero strip)
+    /* Keep whole 64px tiles only (hero strip) */
     function layoutFrogStrip(){
       var strip = document.querySelector('.frog-strip'); if(!strip) return;
       var tiles = Array.prototype.slice.call(strip.querySelectorAll('.tile'));
@@ -96,16 +137,45 @@
     }
     window.addEventListener('resize', layoutFrogStrip);
     document.addEventListener('DOMContentLoaded', layoutFrogStrip);
+
+    /* Mint (Mini): stepper + totals */
+    (function(){
+      var PRICE = 0.01;
+      function clamp(n){ n = parseInt(n||'1', 10); return isNaN(n) ? 1 : Math.max(1, n); }
+      function fmtETH(n){ return n.toFixed(2) + ' ETH'; }
+      function syncMini(){
+        var qtyEl = document.getElementById('miniQty');
+        var totalEl = document.getElementById('miniTotal');
+        if(!qtyEl || !totalEl) return;
+        var q = clamp(qtyEl.value);
+        qtyEl.value = q;
+        totalEl.textContent = fmtETH(q * PRICE);
+      }
+      document.addEventListener('click', function(e){
+        var btn = e.target.closest('#mintMini .mini__btn');
+        if(!btn) return;
+        var qtyEl = document.getElementById('miniQty'); if(!qtyEl) return;
+        var delta = parseInt(btn.getAttribute('data-delta'),10) || 0;
+        qtyEl.value = clamp((parseInt(qtyEl.value||'1',10) || 1) + delta);
+        syncMini();
+      });
+      document.addEventListener('input', function(e){
+        if(!e.target.matches('#mintMini #miniQty')) return;
+        e.target.value = e.target.value.replace(/[^0-9]/g,'');
+        syncMini();
+      });
+      document.addEventListener('DOMContentLoaded', syncMini);
+    })();
   </script>
 
-  <!-- Your shared libs (already in your repo) -->
+  <!-- Your shared libs -->
   <script src="assets/js/config.js"></script>
   <script src="assets/js/utils.js"></script>
   <script src="assets/js/rarity.js"></script>
   <script src="assets/js/modal.js"></script>
 
-  <!-- New: Recent Activity (uses your FF + FF_CFG) -->
-  <script src="assets/js/activity-feed.js"></script>
-  <script> FF_loadRecentActivity && FF_loadRecentActivity(); </script>
+  <!-- New: Recent Mints feed -->
+  <script src="assets/js/mints-feed.js"></script>
+  <script> FF_loadRecentMints && FF_loadRecentMints(); </script>
 </body>
 </html>
