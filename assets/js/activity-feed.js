@@ -1,24 +1,30 @@
 // assets/js/activity-feed.js
-// Live Recent Activity for Fresh Frogs — reuses FF + FF_CFG + your Reservoir patterns
+// Live Recent Activity for Fresh Frogs — uses FF + FF_CFG + Reservoir
 (function (FF, CFG) {
   const UL_ID = 'activityList';
-  const API   = 'https://api.reservoir.tools/users/activity/v6';
-  const HDR   = { accept: '*/*', 'x-api-key': CFG.FROG_API_KEY };
+  const API   = 'https://api.reservoir.tools/collections/activity/v6'; // ✅ correct endpoint
   const PAGE  = Math.max(1, Number(CFG.PAGE_SIZE || 20));
 
+  function requireCfg(key){
+    const v = CFG[key];
+    if (!v) throw new Error(`[activity] Missing FF_CFG.${key} (check config.js)`);
+    return v;
+  }
+  const API_KEY   = requireCfg('FROG_API_KEY');
+  const COLLECTION= requireCfg('COLLECTION_ADDRESS');
+
+  const HDR = { accept: '*/*', 'x-api-key': API_KEY };
   const shorten = (a)=> FF.shorten?.(a) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
   const ago     = (d)=> d ? (FF.formatAgo(Date.now()-d.getTime())+' ago') : '';
   const imgFor  = (id)=> `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
 
   function ul(){ return document.getElementById(UL_ID); }
-
   function pillRank(rank){
     return (rank||rank===0)
       ? `<span class="pill">Rank <b>#${rank}</b></span>`
       : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
   }
 
-  // Robust fetch with light retry/backoff (mirrors pond.js style)
   async function reservoirFetch(url, retries=2, timeoutMs=9000){
     for (let i=0; i<=retries; i++){
       const ctrl = new AbortController();
@@ -44,7 +50,7 @@
     }
   }
 
-  // Normalize a Reservoir activity row
+  // Normalize a Reservoir collection-activity row
   function mapRow(a){
     const tokenId = Number(a?.token?.tokenId);
     if (!Number.isFinite(tokenId)) return null;
@@ -53,7 +59,6 @@
     const to   = (a?.toAddress   || '').toLowerCase();
     const ctl  = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
 
-    // Type detection (mint/transfer/sale, with optional stake/unstake by controller)
     let type = a?.type || '';
     if (from === '0x0000000000000000000000000000000000000000') type = 'Mint';
     else if (to === ctl)   type = 'Stake';
@@ -61,35 +66,25 @@
     else if ((a?.price || a?.salePrice) != null) type = 'Sale';
     else if (!type) type = 'Transfer';
 
-    // Timestamp
     const ts = a?.timestamp ?? a?.createdAt;
     let dt = null;
     if (typeof ts === 'number') dt = new Date(ts < 1e12 ? ts*1000 : ts);
     else if (typeof ts === 'string') { const p = Date.parse(ts); if (!Number.isNaN(p)) dt = new Date(p); }
 
-    // Price ETH (if present)
     let priceEth = null;
     const p = a?.price ?? a?.salePrice;
     if (p?.amount?.decimal != null) priceEth = Number(p.amount.decimal);
     else if (typeof p === 'number') priceEth = p;
 
-    return {
-      id: tokenId,
-      type,
-      from: a?.fromAddress || null,
-      to:   a?.toAddress   || null,
-      priceEth,
-      time: dt,
-      img: imgFor(tokenId)
-    };
+    return { id: tokenId, type, from: a?.fromAddress || null, to: a?.toAddress || null, priceEth, time: dt, img: imgFor(tokenId) };
   }
 
-  async function fetchRecent(collection, limit = PAGE){
+  async function fetchRecent(limit = PAGE){
     const qs = new URLSearchParams({
-      collections: collection,
+      collections: COLLECTION,             // ✅ filter by collection
       limit: String(Math.min(50, Math.max(1, limit))),
-      sortBy: 'eventTimestamp'
-      // You can add `types=transfer,mint,sale` if you want to filter tighter
+      sortBy: 'eventTimestamp',
+      types: 'sale,transfer,mint'          // free mints appear here; paid mints via sales
     });
     const url = `${API}?${qs.toString()}`;
     const json = await reservoirFetch(url);
@@ -107,14 +102,11 @@
     items.slice(0, PAGE).forEach(it=>{
       const rank = FF.getRankById?.(it.id);
       const badge = pillRank(rank);
-      const metaParts = [];
-      if (it.from || it.to){
-        const from = it.from ? shorten(it.from) : '—';
-        const to   = it.to ? shorten(it.to) : null;
-        metaParts.push(to ? `${from} → ${to}` : from);
-      }
-      if (it.priceEth != null) metaParts.push(`${it.priceEth} ETH`);
-      if (it.time) metaParts.push(ago(it.time));
+      const meta = [
+        (it.from || it.to) ? [it.from ? shorten(it.from) : '—', it.to ? '→ '+shorten(it.to) : ''].join(' ') : null,
+        (it.priceEth != null) ? `${it.priceEth} ETH` : null,
+        it.time ? ago(it.time) : null
+      ].filter(Boolean).join(' • ');
 
       const li = document.createElement('li');
       li.className = 'row';
@@ -124,9 +116,8 @@
            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
              <b>${it.type}</b> • Frog #${it.id} ${badge}
            </div>
-           <div class="pg-muted">${metaParts.join(' • ')}</div>
+           <div class="pg-muted">${meta}</div>
          </div>`;
-
       li.addEventListener('click', ()=> FF.openFrogModal?.({ id: it.id }));
       root.appendChild(li);
     });
@@ -134,20 +125,14 @@
 
   async function loadAndRender(){
     try { await FF.ensureRarity?.(); } catch {}
-    if (!CFG.FROG_API_KEY){
-      render([]); // also show a helpful line if you want
-      console.warn('[activity] Missing FROG_API_KEY in config.js');
-      return;
-    }
     try{
-      const list = await fetchRecent(CFG.COLLECTION_ADDRESS, PAGE);
+      const list = await fetchRecent(PAGE);
       render(list);
     }catch(e){
       console.warn('[activity] failed', e);
-      render([]);
+      const root = ul(); if (root) root.innerHTML = `<li class="row"><div class="pg-muted">Could not load activity.</div></li>`;
     }
   }
 
-  // public entry
   window.FF_loadRecentActivity = loadAndRender;
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
