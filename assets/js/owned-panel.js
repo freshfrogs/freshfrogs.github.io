@@ -1,5 +1,4 @@
-// assets/js/owned-panel.js — Layout B only; uses getStakedTokens(); bullets for attributes;
-// header actions pruned; Connect button turns/stays green with address.
+// assets/js/owned-panel.js — Layout B; uses getStakedTokens(); bullets; no OpenSea on cards.
 
 (function (FF, CFG) {
   const SEL = { card:'#ownedCard', grid:'#ownedGrid', btnConn:'#ownedConnectBtn' };
@@ -10,7 +9,7 @@
   const PAGE_SIZE = Math.max(1, Math.min(50, Number(CFG.OWNED_PAGE_SIZE || CFG.PAGE_SIZE || 12)));
   const COLLECTION = CFG.COLLECTION_ADDRESS;
 
-  /* ===== CSS: clean header + internal scroll + bullets + green Connect ===== */
+  // ---------- CSS ----------
   (function injectCSS(){
     if (document.getElementById('owned-b-css')) return;
     const css = `
@@ -19,7 +18,6 @@
 #ownedCard .oh-spacer{flex:1}
 #ownedCard .oh-muted{color:var(--muted)}
 #ownedCard .oh-mini{font-size:11px;line-height:1}
-/* header buttons (Approve/Claim) */
 #ownedCard .oh-btn{
   font-family:var(--font-ui);border:1px solid var(--border);background:transparent;color:inherit;
   border-radius:8px;padding:6px 10px;font-weight:700;font-size:12px;line-height:1;
@@ -32,7 +30,7 @@
   border-color: color-mix(in srgb,#22c55e 80%,var(--border));
   color: color-mix(in srgb,#ffffff 85%,#22c55e)
 }
-/* top-right Connect Wallet button hover + connected state */
+/* Connect button hover + connected state */
 #ownedCard .pg-card-head .btn:hover{
   background: color-mix(in srgb,#22c55e 14%,var(--panel));
   border-color: color-mix(in srgb,#22c55e 80%,var(--border));
@@ -43,7 +41,7 @@
   border-color: color-mix(in srgb,#22c55e 85%,var(--border));
   color: color-mix(in srgb,#ffffff 90%,#22c55e)
 }
-/* internal scroll area + height sync */
+/* internal scroll */
 #ownedCard{display:flex;flex-direction:column}
 #ownedGrid{overflow:auto;-webkit-overflow-scrolling:touch;padding-right:4px}
 @media (hover:hover){
@@ -53,14 +51,14 @@
     border-radius:8px;
   }
 }
-/* bullets instead of chips for card attributes */
+/* attribute bullets */
 #ownedCard .attr-bullets{list-style:disc;margin:6px 0 0 18px;padding:0}
 #ownedCard .attr-bullets li{font-size:12px;margin:2px 0}
     `;
     const el=document.createElement('style'); el.id='owned-b-css'; el.textContent=css; document.head.appendChild(el);
   })();
 
-  /* ===== Reservoir queue ===== */
+  // ---------- Reservoir queue ----------
   if (!window.FF_RES_QUEUE){
     const RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 800);
     const BACKOFFS = Array.isArray(CFG.RETRY_BACKOFF_MS) ? CFG.RETRY_BACKOFF_MS : [900,1700,3200];
@@ -72,7 +70,7 @@
     window.FF_RES_QUEUE={ fetch:(url,init)=> (chain = chain.then(()=> run(url,init))) };
   }
 
-  /* ===== Utils ===== */
+  // ---------- Utils ----------
   const $=(s,r=document)=>r.querySelector(s);
   const shorten=(a)=> (FF.shorten?.(a)) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
   const imgFor=(id)=> (CFG.SOURCE_PATH||'')+'/frog/'+id+'.png';
@@ -84,39 +82,14 @@
       'https://etherscan.io/token/';
     return base + COLLECTION + '?a=' + id;
   };
-  const openseaToken=(id)=>`https://opensea.io/assets/ethereum/${COLLECTION}/${id}`;
   const toast=(m)=>{ try{FF.toast?.(m);}catch{} console.log('[owned]',m); };
 
-  // Rewards (18 decimals → neat)
-  function toBigIntSafe(v){
-    try{
-      if (typeof v==='bigint') return v;
-      if (typeof v==='number') return BigInt(Math.trunc(v));
-      if (typeof v==='string') return BigInt(v.split('.')[0]);
-    }catch{} return null;
-  }
-  function formatWei(v, decimals=18){
-    const bi = toBigIntSafe(v); if (bi==null) return '—';
-    const neg = bi<0n?'-':'', abs = bi<0n ? -bi : bi;
-    const base = 10n**BigInt(decimals);
-    const whole = abs/base, frac = abs%base;
-    if (whole>=100n) return neg+whole.toString();
-    const two = Number((frac*100n)/base);
-    const out = Number(whole)+two/100;
-    return (neg+out.toFixed(2)).replace(/\.00$/,'');
-  }
+  // rewards formatting
+  const toBigIntSafe=(v)=>{try{ if(typeof v==='bigint')return v; if(typeof v==='number')return BigInt(Math.trunc(v)); if(typeof v==='string')return BigInt(v.split('.')[0]); if(v&&typeof v.toString==='function') return BigInt(v.toString()); }catch{} return null;};
+  function formatWei(v,dec=18){ const bi=toBigIntSafe(v); if(bi==null) return '—'; const neg=bi<0n?'-':''; const abs=neg?-bi:bi; const base=10n**BigInt(dec); const whole=abs/base, frac=abs%base; if(whole>=100n) return neg+whole.toString(); const two=Number((frac*100n)/base); const out=Number(whole)+two/100; return (neg+out.toFixed(2)).replace(/\.00$/,''); }
+  function fmtAgo(ms){ if(!ms||!isFinite(ms))return null; const s=Math.max(0,Math.floor((Date.now()-ms)/1000)); const d=Math.floor(s/86400); if(d>=1) return d+'d ago'; const h=Math.floor((s%86400)/3600); if(h>=1) return h+'h ago'; const m=Math.floor((s%3600)/60); if(m>=1) return m+'m ago'; return s+'s ago'; }
 
-  // Time ago
-  function fmtAgo(tsMs){
-    if (!tsMs || !isFinite(tsMs)) return null;
-    const s = Math.max(0, Math.floor((Date.now()-tsMs)/1000));
-    const d = Math.floor(s/86400); if (d>=1) return d+'d ago';
-    const h = Math.floor((s%86400)/3600); if (h>=1) return h+'h ago';
-    const m = Math.floor((s%3600)/60); if (m>=1) return m+'m ago';
-    return s+'s ago';
-  }
-
-  /* ===== Wallet & staking helpers ===== */
+  // ---------- Wallet & staking helpers ----------
   async function getConnectedAddress(){
     try{
       if (window.FF_WALLET?.address) return window.FF_WALLET.address;
@@ -131,28 +104,8 @@
     }catch(e){ toast('Connect failed'); }
     throw new Error('No wallet provider found.');
   }
+
   const STK = ()=> (FF.staking || window.FF_STAKING || {});
-
-  // >>> YOUR function (primary path):
-  async function getStakedTokens_user(addr){
-    try{
-      if (typeof window.getStakedTokens === 'function') return await window.getStakedTokens(addr);
-      if (typeof STK().getStakedTokens === 'function') return await STK().getStakedTokens(addr);
-    }catch{}
-    return null;
-  }
-  function idsFromGetStakedTokens(rows){
-    if (!Array.isArray(rows)) return [];
-    // accept many shapes: {tokenId}, {id}, ['3549',...], '3549', 3549
-    return rows.map(x=>{
-      if (x==null) return NaN;
-      if (typeof x==='number' || typeof x==='string') return Number(x);
-      if (Array.isArray(x)) return Number(x[0]);
-      if (typeof x==='object') return Number(x.tokenId ?? x.id ?? x.token_id);
-      return NaN;
-    }).filter(Number.isFinite);
-  }
-
   async function isApproved(addr){
     for (const k of ['isApproved','isApprovedForAll','checkApproval'])
       if (typeof STK()[k]==='function'){ try{ return !!await STK()[k](addr);}catch{} }
@@ -173,42 +126,49 @@
       if (typeof STK()[k]==='function') return STK()[k]();
     throw new Error('Claim helper not found.');
   }
-  async function getStakeSinceMs(tokenId){
-    const S = STK();
+
+  // via adapter / direct global
+  async function getStakedIds(addr){
     try{
-      if (typeof S.getStakeSince==='function'){ const v=await S.getStakeSince(tokenId); return Number(v)>1e12?Number(v):Number(v)*1000; }
-      if (typeof S.getStakeInfo==='function'){ const i=await S.getStakeInfo(tokenId); const sec=i?.since??i?.stakedAt??i?.timestamp; if (sec!=null) return Number(sec)>1e12?Number(sec):Number(sec)*1000; }
-      if (typeof S.stakeSince==='function'){ const sec=await S.stakeSince(tokenId); return Number(sec)>1e12?Number(sec):Number(sec)*1000; }
-    }catch{} return null;
+      if (typeof window.getStakedTokens === 'function'){ const raw = await window.getStakedTokens(addr); return normalizeIds(raw); }
+      if (typeof STK().getStakedTokens === 'function'){ const raw = await STK().getStakedTokens(addr); return normalizeIds(raw); }
+      if (typeof STK().getUserStakedTokens === 'function'){ const ids = await STK().getUserStakedTokens(addr); return normalizeIds(ids); }
+    }catch(e){ console.warn('[owned] getStakedIds failed', e); }
+    return [];
+  }
+  // same normalizer as adapter
+  function normalizeIds(rows){
+    if (!Array.isArray(rows)) return [];
+    return rows.map(r=>{
+      const toNum=(x)=>{ try{
+        if(x==null) return NaN;
+        if(typeof x==='number') return x;
+        if(typeof x==='bigint') return Number(x);
+        if(typeof x==='string') return Number(x);
+        if(typeof x==='object'){
+          if(typeof x.toString==='function' && x.toString!==Object.prototype.toString) return Number(x.toString());
+          if('_hex' in x) return Number(x._hex);
+          if('hex' in x) return Number(x.hex);
+        }
+        return NaN;
+      }catch{return NaN;} };
+      if (Array.isArray(r)) return toNum(r[0]);
+      if (typeof r==='string' || typeof r==='number' || typeof r==='bigint') return toNum(r);
+      if (typeof r==='object'){ const cand=r.tokenId ?? r.id ?? r.token_id ?? r.tokenID ?? r[0]; return toNum(cand); }
+      return NaN;
+    }).filter(Number.isFinite);
   }
 
-  /* ===== State ===== */
-  let addr=null, continuation=null, items=[], loading=false, io=null, RANKS=null;
+  // ---------- State ----------
+  let addr=null, continuation=null, items=[], loading=false, io=null;
   let _stakedCount=null, _rewards=null, _rewardsPretty=null, _approved=null;
 
-  /* ===== Header (Layout B only) ===== */
-  function removeOldSquares(){
-    const card=$(SEL.card); if(!card) return;
-    card.querySelectorAll('.info-grid-2').forEach(n=> n.remove());
-  }
-  function headerRoot(){
-    const card=$(SEL.card); if(!card) return null;
-    let wrap = card.querySelector('.oh-wrap');
-    if (!wrap){ wrap=document.createElement('div'); wrap.className='oh-wrap'; card.insertBefore(wrap, $(SEL.grid, card)); }
-    wrap.innerHTML=''; return wrap;
-  }
-  function headerData(){
-    return {
-      walletShort: addr?shorten(addr):'—',
-      owned: items.length||0,
-      staked: _stakedCount==null?'—':_stakedCount,
-      rewards: _rewardsPretty ?? (_rewards==null?'—':String(_rewards)),
-      approved: _approved
-    };
-  }
+  // ---------- Header ----------
+  function removeOldSquares(){ const card=$(SEL.card); if(!card) return; card.querySelectorAll('.info-grid-2').forEach(n=> n.remove()); }
+  function headerRoot(){ const card=$(SEL.card); if(!card) return null; let w=card.querySelector('.oh-wrap'); if(!w){ w=document.createElement('div'); w.className='oh-wrap'; card.insertBefore(w,$(SEL.grid,card)); } w.innerHTML=''; return w; }
+  function headerData(){ return { walletShort: addr?shorten(addr):'—', owned: items.length||0, staked: _stakedCount==null?'—':_stakedCount, rewards: _rewardsPretty ?? (_rewards==null?'—':String(_rewards)), approved: _approved }; }
   function buildHeader(){
-    const w = headerRoot(); if(!w) return;
-    const d = headerData();
+    const w=headerRoot(); if(!w) return; const d=headerData();
     w.innerHTML =
       '<div class="oh-row oh-mini">'+
         '<span class="oh-muted">Wallet</span> <b id="ohWallet">'+d.walletShort+'</b>'+
@@ -219,55 +179,43 @@
         (d.approved===true ? '' : '<button class="oh-btn" id="ohApprove">Approve Staking</button>')+
         '<button class="oh-btn" id="ohClaim">Claim Rewards</button>'+
       '</div>';
-
-    const bA = w.querySelector('#ohApprove'), bCl = w.querySelector('#ohClaim');
-    if (bA) bA.onclick = async ()=>{ bA.disabled=true; try{ await requestApproval(); toast('Approval submitted'); await refreshHeaderStats(); }catch{ toast('Approve failed'); }finally{ bA.disabled=false; } };
-    if (bCl) bCl.onclick = async ()=>{ bCl.disabled=true; try{ await claimRewards(); toast('Claim sent'); await refreshHeaderStats(); }catch{ toast('Claim failed'); }finally{ bCl.disabled=false; } };
+    const bA=w.querySelector('#ohApprove'), bCl=w.querySelector('#ohClaim');
+    if (bA) bA.onclick=async()=>{ bA.disabled=true; try{ await requestApproval(); toast('Approval submitted'); await refreshHeaderStats(); }catch{ toast('Approve failed'); }finally{ bA.disabled=false; } };
+    if (bCl) bCl.onclick=async()=>{ bCl.disabled=true; try{ await claimRewards(); toast('Claim sent'); await refreshHeaderStats(); }catch{ toast('Claim failed'); }finally{ bCl.disabled=false; } };
   }
   async function renderHeader(){ buildHeader(); }
 
-  /* ===== Height sync (match left panel) ===== */
+  // ---------- Height sync ----------
   function syncHeights(){
     if (window.matchMedia('(max-width: 960px)').matches){ $('#ownedCard').style.height=''; $('#ownedGrid').style.maxHeight=''; return; }
-    const cards = document.querySelectorAll('.page-grid > .pg-card');
-    if (cards.length<2) return;
-    const left = cards[0], right = $('#ownedCard');
-    if (!left || !right) return;
-    right.style.height = left.offsetHeight + 'px';
-    const header = right.querySelector('.oh-wrap');
-    const headerH = header ? header.offsetHeight + 10 : 0;
-    const pad = 20;
-    const maxH = left.offsetHeight - headerH - pad;
-    const grid = $('#ownedGrid'); if (grid) grid.style.maxHeight = Math.max(160, maxH) + 'px';
+    const cards=document.querySelectorAll('.page-grid > .pg-card'); if(cards.length<2) return;
+    const left=cards[0], right=$('#ownedCard'); if(!left||!right) return;
+    right.style.height=left.offsetHeight+'px';
+    const header=right.querySelector('.oh-wrap'); const headerH=header?header.offsetHeight+10:0;
+    const pad=20; const maxH=left.offsetHeight-headerH-pad;
+    const grid=$('#ownedGrid'); if(grid) grid.style.maxHeight=Math.max(160,maxH)+'px';
   }
-  window.addEventListener('resize', ()=> setTimeout(syncHeights, 50));
+  window.addEventListener('resize',()=> setTimeout(syncHeights,50));
 
-  /* ===== KPIs ===== */
+  // ---------- KPIs ----------
   async function refreshHeaderStats(){
     try{ _approved = addr ? await isApproved(addr) : null; }catch{ _approved=null; }
-    try{
-      const raw = addr ? await getStakedTokens_user(addr) : null;
-      const ids = idsFromGetStakedTokens(raw);
-      _stakedCount = Array.isArray(ids) ? ids.length : '—';
-    }catch{ _stakedCount='—'; }
+    try{ const ids = addr ? await getStakedIds(addr) : []; _stakedCount = Array.isArray(ids)?ids.length:'—'; }catch{ _stakedCount='—'; }
     try{ _rewards = addr ? await getRewards(addr) : null; _rewardsPretty = _rewards==null?'—':formatWei(_rewards,18); }catch{ _rewards=null; _rewardsPretty='—'; }
     await renderHeader(); syncHeights();
   }
 
-  /* ===== Cards ===== */
+  // ---------- Cards ----------
   function attrsHTML(attrs, max=4){
     if (!Array.isArray(attrs)||!attrs.length) return '';
     const rows=[]; for (const a of attrs){ if(!a.key||a.value==null) continue; rows.push('<li><b>'+a.key+':</b> '+String(a.value)+'</li>'); if(rows.length>=max) break; }
     return rows.length? '<ul class="attr-bullets">'+rows.join('')+'</ul>' : '';
   }
-  function fmtMeta(it){
-    if (it.staked){ const ago = it.sinceMs ? fmtAgo(it.sinceMs) : null; return ago ? ('Staked '+ago+' • Owned by You') : 'Staked • Owned by You'; }
-    return 'Not staked • Owned by You';
-  }
-  function wireCardActions(scope, it){
+  function fmtMeta(it){ if (it.staked){ const ago=it.sinceMs?fmtAgo(it.sinceMs):null; return ago?('Staked '+ago+' • Owned by You'):'Staked • Owned by You'; } return 'Not staked • Owned by You'; }
+  function wireCardActions(scope,it){
     scope.querySelectorAll('button[data-act]').forEach(btn=>{
       btn.addEventListener('click', async ()=>{
-        const act = btn.getAttribute('data-act');
+        const act=btn.getAttribute('data-act');
         try{
           if (act==='stake'){
             if (FF.staking?.stakeToken) await FF.staking.stakeToken(it.id);
@@ -275,7 +223,7 @@
             else return toast('Stake: helper not found');
             it.staked=true; it.sinceMs=Date.now();
             btn.textContent='Unstake'; btn.dataset.act='unstake';
-            const meta = scope.querySelector('.meta'); if (meta) meta.textContent = fmtMeta(it);
+            const m=scope.querySelector('.meta'); if(m) m.textContent=fmtMeta(it);
             await refreshHeaderStats();
           }else if (act==='unstake'){
             if (FF.staking?.unstakeToken) await FF.staking.unstakeToken(it.id);
@@ -283,7 +231,7 @@
             else return toast('Unstake: helper not found');
             it.staked=false; it.sinceMs=null;
             btn.textContent='Stake'; btn.dataset.act='stake';
-            const meta = scope.querySelector('.meta'); if (meta) meta.textContent = fmtMeta(it);
+            const m=scope.querySelector('.meta'); if(m) m.textContent=fmtMeta(it);
             await refreshHeaderStats();
           }else if (act==='transfer'){
             if (FF.wallet?.promptTransfer) await FF.wallet.promptTransfer(it.id);
@@ -295,32 +243,28 @@
   }
 
   function mapTokenRow(trow){
-    const t = trow?.token || {};
-    const id = Number(t?.tokenId); if(!isFinite(id)) return null;
-    const attrs = Array.isArray(t?.attributes) ? t.attributes.map(a=>({ key:a?.key||a?.trait_type||'', value:(a?.value ?? a?.trait_value ?? '') })) : [];
+    const t=trow?.token||{}; const id=Number(t?.tokenId); if(!isFinite(id)) return null;
+    const attrs=Array.isArray(t?.attributes)?t.attributes.map(a=>({key:a?.key||a?.trait_type||'', value:(a?.value ?? a?.trait_value ?? '')})):[];
     return { id, attrs };
   }
-
   async function fetchOwnedPage(){
     const qs=new URLSearchParams({ collection: COLLECTION, limit:String(PAGE_SIZE), includeTopBid:'false', includeAttributes:'true' });
     if (continuation) qs.set('continuation', continuation);
     const j = await window.FF_RES_QUEUE.fetch(TOKENS_API_USER(addr)+'?'+qs.toString());
-    const rows = (j?.tokens||[]).map(mapTokenRow).filter(Boolean);
+    const rows=(j?.tokens||[]).map(mapTokenRow).filter(Boolean);
     continuation = j?.continuation || null;
     return rows;
   }
-
   async function fetchTokensByIds(ids){
     if (!Array.isArray(ids) || !ids.length) return [];
-    const qs = new URLSearchParams({ includeTopBid:'false', includeAttributes:'true' });
-    ids.forEach(id => qs.append('tokens', COLLECTION + ':' + String(id)));
-    const j = await window.FF_RES_QUEUE.fetch(TOKENS_API()+'?'+qs.toString());
-    const rows = (j?.tokens||[]).map(mapTokenRow).filter(Boolean);
+    const qs=new URLSearchParams({ includeTopBid:'false', includeAttributes:'true' });
+    ids.forEach(id=> qs.append('tokens', COLLECTION+':'+String(id)));
+    const j = await window.FF_RES_QUEUE.fetch(TOKENS_API()+'?'+qs.toString()).catch(()=>null);
+    const rows=(j?.tokens||[]).map(mapTokenRow).filter(Boolean);
     return rows;
   }
-
   async function hydrateStakedSince(batch){
-    for (const it of batch){ if (!it.staked) continue; try{ it.sinceMs = await getStakeSinceMs(it.id); }catch{ it.sinceMs=null; } }
+    for (const it of batch){ if (!it.staked) continue; try{ it.sinceMs = await (async()=>{ const S=FF.staking||{}; if(S.getStakeSince) return await S.getStakeSince(it.id); if(S.getStakeInfo){ const info=await S.getStakeInfo(it.id); return Number(info?.since ?? info?.stakedAt ?? info?.timestamp);} if(S.stakeSince) return await S.stakeSince(it.id); return null; })(); if(it.sinceMs && it.sinceMs<1e12) it.sinceMs*=1000; }catch{ it.sinceMs=null; } }
   }
 
   function renderCards(){
@@ -334,13 +278,13 @@
       card.setAttribute('data-token-id', String(it.id));
       card.innerHTML =
         '<img class="thumb" src="'+imgFor(it.id)+'" alt="'+it.id+'">'+
-        '<h4 class="title">Frog #'+it.id+' '+((it.rank||it.rank===0)?'<span class="pill">Rank #'+it.rank+'</span>':'')+'</h4>'+
+        '<h4 class="title">Frog #'+it.id+(it.rank||it.rank===0? ' <span class="pill">Rank #'+it.rank+'</span>':'')+'</h4>'+
         '<div class="meta">'+fmtMeta(it)+'</div>'+
         (attrsHTML(it.attrs,4))+
         '<div class="actions">'+
           '<button class="btn btn-outline-gray" data-act="'+(it.staked ? 'unstake' : 'stake')+'">'+(it.staked ? 'Unstake' : 'Stake')+'</button>'+
           '<button class="btn btn-outline-gray" data-act="transfer">Transfer</button>'+
-          '<a class="btn btn-outline-gray" href="'+openseaToken(it.id)+'" target="_blank" rel="noopener">OpenSea</a>'+
+          // REMOVED OPENSEA BUTTON
           '<a class="btn btn-outline-gray" href="'+etherscanToken(it.id)+'" target="_blank" rel="noopener">Etherscan</a>'+
           '<a class="btn btn-outline-gray" href="'+imgFor(it.id)+'" target="_blank" rel="noopener">Original</a>'+
         '</div>';
@@ -349,41 +293,37 @@
     });
     syncHeights();
   }
-  function updateHeaderOwned(n){
-    const el = document.getElementById('ohOwned'); if (el) el.textContent = String(n);
-  }
+  function updateHeaderOwned(n){ const el=document.getElementById('ohOwned'); if (el) el.textContent=String(n); }
 
   async function ensureRanks(){
     if (FF.RANKS) return FF.RANKS;
-    const url = CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json';
+    const url=CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json';
     const j = FF.fetchJSON ? await FF.fetchJSON(url) : await (await fetch(url)).json();
-    const map = Array.isArray(j) ? j.reduce((m,r)=> (m[String(r.id)]=r.ranking, m), {}) : (j||{});
-    FF.RANKS = map; return map;
+    const map=Array.isArray(j)?j.reduce((m,r)=> (m[String(r.id)]=r.ranking,m),{}):(j||{});
+    FF.RANKS=map; return map;
   }
 
   async function loadFirstPage(){
     try{
-      // owned page + ranks
       const [ownedRows, ranks] = await Promise.all([ fetchOwnedPage(), ensureRanks() ]);
-
-      // staked ids via YOUR function
-      const rawStaked = await getStakedTokens_user(addr);
-      const stakedIds = idsFromGetStakedTokens(rawStaked);
+      const stakedIds = addr ? await getStakedIds(addr) : [];
       _stakedCount = stakedIds.length;
 
-      // fetch metadata for staked not already in owned
-      const ownedIds = new Set(ownedRows.map(r=> r.id));
-      const missingStaked = stakedIds.filter(id=> !ownedIds.has(Number(id)));
-      const stakedRows = missingStaked.length ? await fetchTokensByIds(missingStaked) : [];
+      // fetch staked metadata; if fails, show minimal card fallback later
+      let stakedRows = [];
+      try{ const missing = stakedIds.filter(id=> !ownedRows.some(r=> r.id===id)); stakedRows = missing.length ? await fetchTokensByIds(missing) : []; }catch{ stakedRows = []; }
 
-      // merge + mark + rank
       const mark = (r, st)=> ({ id:r.id, attrs:r.attrs, staked:!!st, sinceMs:null, rank:(ranks||{})[String(r.id)] });
-      items = ownedRows.map(r=> mark(r, stakedIds.includes(r.id))).concat(stakedRows.map(r=> mark(r, true)));
+      items = ownedRows.map(r=> mark(r, stakedIds.includes(r.id))).concat(stakedRows.map(r=> mark(r,true)));
+
+      // Fallback: any staked IDs with no metadata at all → add minimal cards
+      const seen = new Set(items.map(x=> x.id));
+      stakedIds.forEach(id=>{ if(!seen.has(id)) items.push({ id, attrs:[], staked:true, sinceMs:null, rank:(ranks||{})[String(id)] }); });
 
       await hydrateStakedSince(items.filter(x=> x.staked));
       renderCards();
 
-      // paging for additional OWNED
+      // paging for additional OWNED only
       const root=$(SEL.grid); if (!root) return;
       if (!continuation) { syncHeights(); return; }
       const sentinel=document.createElement('div'); sentinel.style.height='1px'; root.appendChild(sentinel);
@@ -393,8 +333,7 @@
         try{
           const more = await fetchOwnedPage();
           more.forEach(r=> r.rank=(FF.RANKS||{})[String(r.id)]);
-          const seen=new Set(items.map(x=>x.id));
-          const fresh = more.filter(r=> !seen.has(r.id)).map(r=> ({...r, staked: stakedIds.includes(r.id), sinceMs:null, rank:(FF.RANKS||{})[String(r.id)] }));
+          const fresh = more.filter(r=> !items.some(x=> x.id===r.id)).map(r=> ({...r, staked: stakedIds.includes(r.id), sinceMs:null, rank:(FF.RANKS||{})[String(r.id)] }));
           items = items.concat(fresh);
           await hydrateStakedSince(fresh.filter(x=>x.staked));
           renderCards();
@@ -409,54 +348,35 @@
     }
   }
 
-  /* ===== Connect button behavior ===== */
+  // ---------- Connect button reflection ----------
   function reflectConnectButton(){
-    const btn = document.getElementById('ownedConnectBtn');
-    if (!btn) return;
-    if (addr){
-      btn.classList.add('btn-connected');
-      btn.textContent = shorten(addr);
-    }else{
-      btn.classList.remove('btn-connected');
-      btn.textContent = 'Connect Wallet';
-    }
+    const btn=document.getElementById('ownedConnectBtn'); if(!btn) return;
+    if (addr){ btn.classList.add('btn-connected'); btn.textContent=shorten(addr); }
+    else { btn.classList.remove('btn-connected'); btn.textContent='Connect Wallet'; }
   }
   async function handleConnectClick(ev){
-    const btn = ev?.currentTarget; if (btn) btn.disabled = true;
-    try{
-      addr = await requestConnect();
-      if(!addr){ toast('No address'); return; }
-      reflectConnectButton();
-      await afterConnect();
-    }catch(e){ toast('Connect failed'); }
-    finally{ if (btn) btn.disabled=false; }
+    const btn=ev?.currentTarget; if(btn) btn.disabled=true;
+    try{ addr=await requestConnect(); if(!addr){ toast('No address'); return; } reflectConnectButton(); await afterConnect(); }
+    catch(e){ toast('Connect failed'); }
+    finally{ if(btn) btn.disabled=false; }
   }
 
-  /* ===== Init / Flow ===== */
+  // ---------- Init / flow ----------
   async function afterConnect(){
     await renderHeader();
     const grid=$(SEL.grid); if (grid) grid.innerHTML='<div class="pg-muted">Loading…</div>';
     await Promise.all([ loadFirstPage(), refreshHeaderStats() ]);
   }
-
   async function initOwned(){
-    // remove old big squares
-    const card=$(SEL.card); if(card) card.querySelectorAll('.info-grid-2').forEach(n=> n.remove());
+    removeOldSquares();
     await renderHeader();
-
-    // wire top-right connect
-    const inlineBtn = document.getElementById('ownedConnectBtn');
-    if (inlineBtn){ inlineBtn.style.display='inline-flex'; inlineBtn.onclick = handleConnectClick; }
-
+    const inlineBtn=document.getElementById('ownedConnectBtn'); if (inlineBtn){ inlineBtn.style.display='inline-flex'; inlineBtn.onclick=handleConnectClick; }
     addr = await getConnectedAddress();
     reflectConnectButton();
-
     if (addr){ await afterConnect(); return; }
-
     const grid=$(SEL.grid); if (grid) grid.innerHTML='<div class="pg-muted">Connect your wallet to view owned frogs.</div>';
-    setTimeout(syncHeights, 50);
+    setTimeout(syncHeights,50);
   }
 
   window.FF_initOwnedPanel = initOwned;
-
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
