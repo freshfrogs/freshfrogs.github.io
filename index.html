@@ -62,7 +62,7 @@
     #mintMini .mint-mini__note{ margin-top:6px; font-size:12px; }
     @media (max-width:600px){ #mintMini .mint-mini__row{ grid-template-columns: 1fr 1fr; } #mintMini .mint-mini__total{ justify-self:start; } }
 
-    /* Scrollable lists: JS sets max-height to N rows */
+    /* Scrollable lists: JS sets max-height to N rows; infinite scroll appends */
     #recentMints.scrolling,
     #recentStakes.scrolling{
       overflow-y:auto;
@@ -118,18 +118,20 @@
             <div class="mint-mini__price">
               <div class="k">Price</div><div class="v">0.01 ETH</div>
             </div>
+
             <div class="mint-mini__stepper" role="group" aria-label="Quantity">
               <button type="button" class="mini__btn" data-delta="-1" aria-label="Decrease">−</button>
               <input id="miniQty" class="mini__qty" type="text" inputmode="numeric" pattern="[0-9]*" value="1" aria-label="Quantity">
               <button type="button" class="mini__btn" data-delta="1" aria-label="Increase">+</button>
             </div>
+
             <button type="button" class="btn mini__mint">Mint</button>
             <div class="mint-mini__total">Total: <b id="miniTotal">0.01 ETH</b></div>
           </div>
           <div class="mint-mini__note pg-muted">Connect wallet to mint.</div>
         </section>
 
-        <!-- Recent Mints (visible rows via data-visible; scroll for more) -->
+        <!-- Recent Mints -->
         <ul id="recentMints" class="list" aria-live="polite" data-visible="6">
           <li class="row"><div class="pg-muted">Loading recent mints…</div></li>
         </ul>
@@ -166,7 +168,7 @@
           </div>
         </div>
 
-        <!-- Recent Stakes (visible rows via data-visible; scroll for more) -->
+        <!-- Recent Stakes -->
         <ul id="recentStakes" class="list" aria-live="polite" data-visible="6">
           <li class="row"><div class="pg-muted">Loading recent stakes…</div></li>
         </ul>
@@ -217,12 +219,12 @@
     })();
   </script>
 
-  <!-- Shared libs you already have -->
+  <!-- Shared libs -->
   <script src="assets/js/config.js"></script>
   <script src="assets/js/utils.js"></script>
   <script src="assets/js/rarity.js"></script>
   <script src="assets/js/modal.js"></script>
-  <script src="assets/js/pond.js"></script> <!-- optional; used if present -->
+  <script src="assets/js/pond.js"></script>
 
   <!-- New feeds -->
   <script src="assets/js/mints-feed.js"></script>

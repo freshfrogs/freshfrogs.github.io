@@ -5,27 +5,27 @@
   const BASE  = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
   const API   = BASE + '/collections/activity/v6';
   const PAGE_SIZE = Math.max(1, Math.min(50, Number(CFG.PAGE_SIZE || 50)));
-  const MAX_PAGES = Math.max(1, Number(CFG.MAX_PAGES || 5));
+  const MAX_PAGES = Math.max(1, Number(CFG.MAX_PAGES || 8));
 
   function need(k){ if(!CFG[k]) throw new Error('[mints] Missing FF_CFG.'+k); return CFG[k]; }
   const API_KEY    = need('FROG_API_KEY');
   const COLLECTION = need('COLLECTION_ADDRESS');
   const CHAIN_ID   = Number(CFG.CHAIN_ID || 1);
 
-  // Prefer FF.apiHeaders (pond.js) if present; fallback to x-api-key
+  // Prefer repo header helper if present
   function apiHeaders(){
     if (typeof FF.apiHeaders === 'function') return FF.apiHeaders();
     return { accept: 'application/json', 'x-api-key': API_KEY };
   }
 
-  const shorten = function(a){ return (FF.shorten && FF.shorten(a)) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—'); };
-  const ago     = function(d){ return d ? (FF.formatAgo ? FF.formatAgo(Date.now()-d.getTime())+' ago' : d.toLocaleString()) : ''; };
-  const imgFor  = function(id){ return (CFG.SOURCE_PATH || '') + '/frog/' + id + '.png'; };
+  const shorten = (a)=> (FF.shorten && FF.shorten(a)) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
+  const ago     = (d)=> d ? (FF.formatAgo ? FF.formatAgo(Date.now()-d.getTime())+' ago' : d.toLocaleString()) : '';
+  const imgFor  = (id)=> (CFG.SOURCE_PATH || '') + '/frog/' + id + '.png';
 
   function txUrl(hash){
     if (!hash) return null;
     if (CFG.ETHERSCAN_TX_BASE) return CFG.ETHERSCAN_TX_BASE.replace(/\/+$/,'') + '/' + hash;
-    var base =
+    const base =
       CHAIN_ID === 1        ? 'https://etherscan.io/tx/' :
       CHAIN_ID === 11155111 ? 'https://sepolia.etherscan.io/tx/' :
       CHAIN_ID === 5        ? 'https://goerli.etherscan.io/tx/' :
@@ -39,52 +39,49 @@
     if (!root) return;
     root.classList.add('scrolling');
     root.style.overflowY = 'auto';
-    var visible = Number(root.getAttribute('data-visible')) || Number(CFG.MINTS_VISIBLE || 6);
-    var firstRow = root.querySelector('.row');
+    const visible = Number(root.getAttribute('data-visible')) || Number(CFG.MINTS_VISIBLE || 6);
+    const firstRow = root.querySelector('.row');
     if (!firstRow){ root.style.maxHeight = ''; return; }
-    var csUL = getComputedStyle(root);
-    var gap  = parseFloat(csUL.gap || '0') || 0;
-    var rowH = firstRow.getBoundingClientRect().height || 84;
-    var rows = Math.max(1, visible);
-    var maxH = rowH * rows + gap * (rows - 1);
-    root.style.maxHeight = Math.round(maxH) + 'px';
+    const csUL = getComputedStyle(root);
+    const gap  = parseFloat(csUL.gap || '0') || 0;
+    const rowH = firstRow.getBoundingClientRect().height || 84;
+    const rows = Math.max(1, visible);
+    root.style.maxHeight = Math.round(rowH * rows + gap * (rows - 1)) + 'px';
   }
 
   function reservoirFetch(url){
-    return fetch(url, { headers: apiHeaders() }).then(function(res){
-      if (!res.ok) return res.text().then(function(t){ var e = new Error('HTTP '+res.status+(t?' — '+t:'')); e.url=url; throw e; });
+    return fetch(url, { headers: apiHeaders() }).then(res=>{
+      if (!res.ok) return res.text().then(t=>{ const e = new Error('HTTP '+res.status+(t?' — '+t:'')); e.url=url; throw e; });
       return res.json();
     });
   }
 
   function mapRow(a){
-    var tokenId = Number(a && a.token && a.token.tokenId);
+    const tokenId = Number(a?.token?.tokenId);
     if (!isFinite(tokenId)) return null;
-
-    var from = (a && a.fromAddress || '').toLowerCase();
-    var zero = '0x0000000000000000000000000000000000000000';
-    var reported = String(a && a.type || '').toLowerCase();
-    var isMint = (reported === 'mint') || (from === zero);
+    const from = (a?.fromAddress || '').toLowerCase();
+    const zero = '0x0000000000000000000000000000000000000000';
+    const reported = String(a?.type || '').toLowerCase();
+    const isMint = (reported === 'mint') || (from === zero);
     if (!isMint) return null;
 
-    var ts = a.timestamp != null ? a.timestamp : a.createdAt;
-    var dt = null;
+    const ts = a?.timestamp ?? a?.createdAt;
+    let dt = null;
     if (typeof ts === 'number') dt = new Date(ts < 1e12 ? ts*1000 : ts);
-    else if (typeof ts === 'string'){ var p = Date.parse(ts); if (!isNaN(p)) dt = new Date(p); }
+    else if (typeof ts === 'string'){ const p = Date.parse(ts); if (!isNaN(p)) dt = new Date(p); }
+    const txHash = a?.txHash || a?.transactionHash || null;
 
-    var txHash = a.txHash || a.transactionHash || null;
-
-    return { id: tokenId, to: a && a.toAddress || null, time: dt, img: imgFor(tokenId), tx: txHash };
+    return { id: tokenId, to: a?.toAddress || null, time: dt, img: imgFor(tokenId), tx: txHash };
   }
 
-  var items = [];
-  var continuation = null;
-  var pageCount = 0;
-  var loading = false;
-  var io = null;
+  let items = [];
+  let continuation = null;
+  let pageCount = 0;
+  let loading = false;
+  let io = null;
 
   function ensureSentinel(root){
-    var s = root.querySelector('li[data-sentinel]');
+    let s = root.querySelector('li[data-sentinel]');
     if (!s){
       s = document.createElement('li');
       s.setAttribute('data-sentinel','true');
@@ -96,19 +93,18 @@
     return s;
   }
   function setSentinelText(root, text){
-    var s = root.querySelector('li[data-sentinel]');
+    const s = root.querySelector('li[data-sentinel]');
     if (s) s.innerHTML = '<div class="pg-muted">'+text+'</div>';
   }
-
   function attachObserver(root){
     if (io) io.disconnect();
-    var sentinel = ensureSentinel(root);
-    io = new IntersectionObserver(function(entries){
-      var entry = entries[0];
+    const sentinel = ensureSentinel(root);
+    io = new IntersectionObserver(entries=>{
+      const entry = entries[0];
       if (!entry || !entry.isIntersecting) return;
       if (loading || !continuation || pageCount >= MAX_PAGES) return;
       loadNextPage(root);
-    }, { root: root, rootMargin: '120px', threshold: 0.01 });
+    }, { root, rootMargin: '120px', threshold: 0.01 });
     io.observe(sentinel);
   }
 
@@ -119,70 +115,68 @@
       applyVisibleRows(root);
       return;
     }
-    items.forEach(function(it){
-      var meta = [ it.to ? '→ '+shorten(it.to) : null, it.time ? ago(it.time) : null ].filter(Boolean).join(' • ');
-      var li = document.createElement('li');
+    items.forEach(it=>{
+      const meta = [ it.to ? '→ '+shorten(it.to) : null, it.time ? ago(it.time) : null ].filter(Boolean).join(' • ');
+      const li = document.createElement('li');
       li.className = 'row';
-      var href = txUrl(it.tx);
+      const href = txUrl(it.tx);
       if (href){
         li.title = 'View transaction on Etherscan';
-        li.addEventListener('click', function(){ window.open(href, '_blank', 'noopener'); });
+        li.addEventListener('click', ()=> window.open(href, '_blank', 'noopener'));
       }else{
-        li.addEventListener('click', function(){ if (FF.openFrogModal) FF.openFrogModal({ id: it.id }); });
+        li.addEventListener('click', ()=> FF.openFrogModal && FF.openFrogModal({ id: it.id }));
       }
-      li.innerHTML = (FF.thumb64 ? FF.thumb64(it.img, 'Frog '+it.id) : '<img class="thumb64" src="'+it.img+'" alt="'+it.id+'">') +
+      li.innerHTML =
+        (FF.thumb64 ? FF.thumb64(it.img, 'Frog '+it.id) : '<img class="thumb64" src="'+it.img+'" alt="'+it.id+'">') +
         '<div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b>Mint</b> • Frog #'+it.id+
         '</div><div class="pg-muted">'+meta+(href ? ' • Etherscan' : '')+'</div></div>';
       root.appendChild(li);
     });
     ensureSentinel(root);
-    if (!continuation || pageCount >= MAX_PAGES) setSentinelText(root, 'End of results');
-    else setSentinelText(root, 'Loading more…');
-    requestAnimationFrame(function(){ applyVisibleRows(root); });
+    setSentinelText(root, (!continuation || pageCount >= MAX_PAGES) ? 'End of results' : 'Loading more…');
+    requestAnimationFrame(()=> applyVisibleRows(root));
   }
 
   function fetchPage(cont){
-    var qs = new URLSearchParams({ collection: COLLECTION, limit: String(PAGE_SIZE), types: 'mint' });
+    const qs = new URLSearchParams({ collection: COLLECTION, limit: String(PAGE_SIZE), types: 'mint' });
     if (cont) qs.set('continuation', cont);
-    var url = API + '?' + qs.toString();
-    return reservoirFetch(url).then(function(json){
-      var rows = ((json && json.activities) || []).map(mapRow).filter(Boolean);
-      return { rows: rows, continuation: json && json.continuation || null };
+    const url = API + '?' + qs.toString();
+    return reservoirFetch(url).then(json=>{
+      const rows = (json?.activities || []).map(mapRow).filter(Boolean);
+      return { rows, continuation: json?.continuation || null };
     });
   }
 
   function loadFirstPage(root){
     loading = true;
-    fetchPage(null).then(function(first){
-      items = first.rows.sort(function(a,b){ return (b.time && b.time.getTime() || 0) - (a.time && a.time.getTime() || 0); });
+    fetchPage(null).then(first=>{
+      items = first.rows.sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
       continuation = first.continuation;
       pageCount = 1;
       renderAll(root);
       attachObserver(root);
-    }).catch(function(e){
+    }).catch(e=>{
       console.warn('[mints] failed', e, e.url ? '\nURL: '+e.url : '');
       root.innerHTML = '<li class="row"><div class="pg-muted">Could not load recent mints.</div></li>';
-    }).finally(function(){ loading = false; });
+    }).finally(()=>{ loading = false; });
   }
 
   function loadNextPage(root){
     if (!continuation || loading) return;
     loading = true;
-    fetchPage(continuation).then(function(next){
+    fetchPage(continuation).then(next=>{
       continuation = next.continuation;
       pageCount += 1;
-      items = items.concat(next.rows).sort(function(a,b){ return (b.time && b.time.getTime() || 0) - (a.time && a.time.getTime() || 0); });
+      items = items.concat(next.rows).sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
       renderAll(root);
-    }).catch(function(e){
+    }).catch(e=>{
       console.warn('[mints] next page failed', e);
       setSentinelText(root, 'Could not load more.');
-    }).finally(function(){ loading = false; });
+    }).finally(()=>{ loading = false; });
   }
 
-  function loadAndRender(){
-    var root = ul(); if (!root) return;
+  window.FF_loadRecentMints = function(){
+    const root = ul(); if (!root) return;
     loadFirstPage(root);
-  }
-
-  window.FF_loadRecentMints = loadAndRender;
+  };
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
