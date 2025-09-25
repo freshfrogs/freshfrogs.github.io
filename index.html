@@ -76,6 +76,22 @@
         border-radius:8px;
       }
     }
+    /* Recent Mints: show N rows (JS sets max-height), scroll for more */
+#recentMints.scrolling{
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 4px;
+}
+#recentMints .row{ cursor: pointer; }
+
+@media (hover:hover){
+  #recentMints.scrolling::-webkit-scrollbar{ width:8px; }
+  #recentMints.scrolling::-webkit-scrollbar-thumb{
+    background: color-mix(in srgb, var(--muted) 35%, transparent);
+    border-radius:8px;
+  }
+}
+
   </style>
 </head>
 <body>
