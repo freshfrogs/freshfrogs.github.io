@@ -1,34 +1,35 @@
 // assets/js/owned-panel.js
+// Shows ALL frogs for the connected user (owned ∪ staked), loads more pages,
+// shows Unclaimed Rewards, and wires Stake/Unstake/Claim using staking-adapter.
+
 (function (FF, CFG) {
   'use strict';
 
-  var SEL = { card:'#ownedCard', grid:'#ownedGrid', btnConn:'#ownedConnectBtn' };
-  var CHAIN_ID  = Number(CFG.CHAIN_ID || 1);
-  var RESV_HOST = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
-  var PAGE_SIZE = Math.max(1, Math.min(50, Number(CFG.OWNED_PAGE_SIZE || CFG.PAGE_SIZE || 12)));
-  var COLLECTION = CFG.COLLECTION_ADDRESS;
-  var REWARD_SYMBOL   = (CFG.REWARD_TOKEN_SYMBOL || '$FLYZ');
-  var REWARD_DECIMALS = Number.isFinite(Number(CFG.REWARD_DECIMALS)) ? Number(CFG.REWARD_DECIMALS) : 18;
-  var REWARDS_METHOD  = (CFG.REWARDS_METHOD || null); // optional override
-  var BASEPATH = (CFG.SOURCE_PATH || '').replace(/\/+$/,'');
+  var SEL = { card:'#ownedCard', grid:'#ownedGrid', btnConn:'#ownedConnectBtn', more:'#ownedMore' };
+  var C = window.FF_CFG || CFG || {};
+  var RESV = (C.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
+  var COLLECTION = C.COLLECTION_ADDRESS;
+  var PAGE_SIZE = Math.max(1, Math.min(50, Number(C.OWNED_PAGE_SIZE || C.PAGE_SIZE || 24)));
+  var REWARD_SYMBOL   = (C.REWARD_TOKEN_SYMBOL || '$FLYZ');
+  var REWARD_DECIMALS = Number.isFinite(Number(C.REWARD_DECIMALS)) ? Number(C.REWARD_DECIMALS) : 18;
+  var BASEPATH = (C.SOURCE_PATH || '').replace(/\/+$/,'');
 
   function imgFor(id){ return BASEPATH + '/frog/' + id + '.png'; }
-  function jsonFor(id){ return BASEPATH + '/frog/json/' + id + '.json'; }
-  function tokensApiUser(addr){ return RESV_HOST + '/users/' + addr + '/tokens/v8'; }
+  function metaFor(id){ return BASEPATH + '/frog/json/' + id + '.json'; }
   function etherscanToken(id){
+    var chain = Number(C.CHAIN_ID || 1);
     var base =
-      CHAIN_ID===1?'https://etherscan.io/token/':
-      CHAIN_ID===11155111?'https://sepolia.etherscan.io/token/':
-      CHAIN_ID===5?'https://goerli.etherscan.io/token/':
-      'https://etherscan.io/token/';
+      chain===1?'https://etherscan.io/token/':
+      chain===11155111?'https://sepolia.etherscan.io/token/':
+      chain===5?'https://goerli.etherscan.io/token/':'https://etherscan.io/token/';
     return base + COLLECTION + '?a=' + id;
   }
 
-  // CSS (scoped)
-  (function injectCSS(){
+  // ---- CSS (scoped) ----
+  (function css(){
     if (document.getElementById('owned-clean-css')) return;
-    var el=document.createElement('style'); el.id='owned-clean-css';
-    el.textContent = [
+    var s=document.createElement('style'); s.id='owned-clean-css';
+    s.textContent = [
       '#ownedCard .oh-wrap{margin-bottom:10px}',
       '#ownedCard .oh-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}',
       '#ownedCard .oh-mini{font-size:11px;line-height:1}',
@@ -38,40 +39,26 @@
       '#ownedCard .oh-btn:hover{background: color-mix(in srgb,#22c55e 14%,var(--panel));border-color: color-mix(in srgb,#22c55e 80%,var(--border));color: color-mix(in srgb,#ffffff 85%,#22c55e)}',
       '#ownedCard{display:flex;flex-direction:column}',
       '#ownedGrid{overflow:auto;-webkit-overflow-scrolling:touch;padding-right:4px}',
-      '@media (hover:hover){#ownedGrid::-webkit-scrollbar{width:8px}#ownedGrid::-webkit-scrollbar-thumb{background: color-mix(in srgb,var(--muted) 35%, transparent); border-radius:8px}}',
       '#ownedCard .attr-bullets{list-style:disc;margin:6px 0 0 18px;padding:0}',
       '#ownedCard .attr-bullets li{font-size:12px;margin:2px 0}'
     ].join('');
-    document.head.appendChild(el);
+    document.head.appendChild(s);
   })();
 
-  // Reservoir queue
+  // ---- Minimal queue for Reservoir ----
   if (!window.FF_RES_QUEUE){
-    var RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 800);
-    var BACKOFFS = Array.isArray(CFG.RETRY_BACKOFF_MS) ? CFG.RETRY_BACKOFF_MS : [900,1700,3200];
-    var lastAt=0, chain=Promise.resolve();
+    var RATE = Number(C.RATE_MIN_MS || 800), last=0, chain=Promise.resolve();
     function sleep(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
-    function headers(){ return (FF.apiHeaders && FF.apiHeaders()) || { accept:'application/json', 'x-api-key': CFG.FROG_API_KEY }; }
-    function spaced(url,init){ var d=Date.now()-lastAt; var wait = d<RATE_MIN_MS ? (RATE_MIN_MS-d) : 0; return sleep(wait).then(function(){ lastAt=Date.now(); return fetch(url,{headers:headers(), ...(init||{})}); }); }
-    function run(url,init){
-      var i=0;
-      function loop(){
-        return spaced(url,init).then(function(res){
-          if (res.status===429){ var ms=BACKOFFS[Math.min(i++,BACKOFFS.length-1)]; return sleep(ms).then(loop); }
-          if (!res.ok){ return res.text().catch(function(){return'';}).then(function(t){ throw new Error('HTTP '+res.status+(t?' — '+t:'')); }); }
-          return res.json();
-        });
-      }
-      return loop();
-    }
-    window.FF_RES_QUEUE={ fetch:function(url,init){ return (chain = chain.then(function(){ return run(url,init); })); } };
+    function headers(){ return (FF.apiHeaders && FF.apiHeaders()) || { accept:'application/json', 'x-api-key': C.FROG_API_KEY }; }
+    function spaced(url){ var d=Date.now()-last; var wait = d<RATE ? (RATE-d) : 0; return sleep(wait).then(function(){ last=Date.now(); return fetch(url,{headers:headers()}); }); }
+    function run(url){ return spaced(url).then(function(r){ if(!r.ok) return r.text().then(function(t){ throw new Error('HTTP '+r.status+(t?' — '+t:'')); }); return r.json(); }); }
+    window.FF_RES_QUEUE = { fetch: function(url){ return (chain = chain.then(function(){ return run(url); })); } };
   }
 
-  // Utils
+  // ---- Utils ----
   function $(s,r){ return (r||document).querySelector(s); }
   function shorten(a){ return (FF.shorten && FF.shorten(a)) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—'); }
   function toast(m){ try{ if (FF.toast) FF.toast(m); }catch(e){} console.log('[owned]',m); }
-
   function fmtAgo(ms){
     if(!ms||!isFinite(ms))return null;
     var s=Math.max(0,Math.floor((Date.now()-ms)/1000));
@@ -80,243 +67,80 @@
     var m=Math.floor((s%3600)/60); if(m>=1) return m+'m ago';
     return s+'s ago';
   }
-
-  function formatToken(raw,dec){
-    var DEC = Number.isFinite(Number(dec)) ? Number(dec) : REWARD_DECIMALS;
-    function toBigInt(v){
-      try{
-        if(typeof v==='bigint') return v;
-        if(typeof v==='number') return BigInt(Math.trunc(v));
-        if(typeof v==='string'){ if(/^0x/i.test(v)) return BigInt(v); if(/^-?\d+/.test(v)) return BigInt(v.split('.')[0]); }
-        if(v && typeof v.toString==='function' && v.toString!==Object.prototype.toString){ var s=v.toString(); if(/^\d+$/.test(s)) return BigInt(s); }
-        if(v && typeof v._hex==='string') return BigInt(v._hex);
-      }catch(e){}
-      return null;
-    }
-    if (raw && typeof raw==='object'){
-      if ('formatted' in raw) return String(raw.formatted);
-      if ('value' in raw && 'decimals' in raw) return formatToken(raw.value, Number(raw.decimals));
-      if ('amount' in raw && 'decimals' in raw) return formatToken(raw.amount, Number(raw.decimals));
-    }
-    if (typeof raw==='string' && raw.indexOf('.')>-1) return raw;
-    var bi = toBigInt(raw); if (bi==null) return '—';
-    var base = (function(n){ var out=1n; for(var i=0;i<n;i++) out*=10n; return out; })(BigInt(DEC));
-    var whole = bi / base, frac = bi % base;
-    if (whole>=100n) return whole.toString();
-    var cents = Number((frac*100n)/base);
-    var out = Number(whole)+cents/100;
-    return (out%1===0 ? out.toFixed(0) : out.toFixed(2));
-  }
-
-  // ==== Staking + Rewards ====
-  function STK(){ return (FF.staking || window.FF_STAKING || {}); }
-
-  function extractId(any){
-    function toNum(x){
-      try{
-        if(x==null) return NaN;
-        if(typeof x==='number') return x;
-        if(typeof x==='bigint') return Number(x);
-        if(typeof x==='string'){ if(/^0x/i.test(x)) return Number(BigInt(x)); const n=Number(x); return Number.isFinite(n)?n:NaN; }
-        if(typeof x==='object'){
-          if(typeof x.toString==='function' && x.toString!==Object.prototype.toString){ var s=x.toString(); if(/^\d+$/.test(s)) return Number(s); }
-          if('_hex' in x) return Number(x._hex);
-          if('hex'  in x) return Number(x.hex);
-        }
-      }catch(e){}
-      return NaN;
-    }
-    var n = toNum(any); if (Number.isFinite(n)) return n;
-    if (any && typeof any==='object'){
-      var keys=['tokenId','id','token_id','tokenID','value','_value','0'];
-      for (var i=0;i<keys.length;i++){
-        var k=keys[i]; if (k in any){ var v=toNum(any[k]); if (Number.isFinite(v)) return v; }
-      }
-      if (Array.isArray(any)){
-        for (var j=0;j<any.length;j++){ var v2 = toNum(any[j]); if (Number.isFinite(v2)) return v2; }
-      }
-      for (var p in any){ if (!Object.prototype.hasOwnProperty.call(any,p)) continue;
-        var deep = extractId(any[p]); if (Number.isFinite(deep)) return deep;
-      }
-    }
-    return NaN;
-  }
-  function normalizeIds(rows){
-    if (!Array.isArray(rows)) {
-      if (rows && typeof rows==='object' && Array.isArray(rows.tokenIds)) return normalizeIds(rows.tokenIds);
-      return [];
-    }
-    var out=[];
-    for (var i=0;i<rows.length;i++){
-      var v=extractId(rows[i]); if (Number.isFinite(v)) out.push(v);
-    }
-    return out;
-  }
-
-  async function getStakedIds(addr){
+  function formatToken(raw){
+    // raw is uint256 wei (string)
     try{
-      if (typeof window.getStakedTokens === 'function'){ var raw=await window.getStakedTokens(addr); var ids=normalizeIds(raw); console.log('[owned] window.getStakedTokens ->', ids.length); return ids; }
-      var S=STK();
-      if (typeof S.getStakedTokens === 'function'){ var raw2=await S.getStakedTokens(addr); var ids2=normalizeIds(raw2); console.log('[owned] STK.getStakedTokens ->', ids2.length); return ids2; }
-      if (typeof S.getUserStakedTokens === 'function'){ var ids3=await S.getUserStakedTokens(addr); var norm=normalizeIds(ids3); console.log('[owned] STK.getUserStakedTokens ->', norm.length); return norm; }
-      if (window.controller && window.controller.methods){
-        var method = (CFG.STAKED_METHOD || 'getStakedTokens');
-        if (window.controller.methods[method]){ var raw3=await window.controller.methods[method](addr).call(); var ids4=normalizeIds(raw3); console.log('[owned] controller.'+method+' ->', ids4.length); return ids4; }
-      }
-    }catch(e){ console.warn('[owned] getStakedIds failed', e); }
-    return [];
+      if (raw==null) return '—';
+      if (typeof raw==='object' && 'toString' in raw) raw = raw.toString();
+      if (typeof raw==='string' && raw.indexOf('.')>-1) return raw;
+      var bi = (typeof raw==='bigint') ? raw : BigInt(String(raw));
+      var base = 1n; for (var i=0;i<REWARD_DECIMALS;i++) base*=10n;
+      var whole = bi / base, frac = bi % base;
+      if (whole>=100n) return whole.toString();
+      var cents = Number((frac*100n)/base);
+      var out = Number(whole)+cents/100;
+      return (out%1===0? out.toFixed(0): out.toFixed(2));
+    }catch(e){ return '—'; }
   }
 
-  async function isApproved(addr){
-    var s = STK();
-    var keys=['isApproved','isApprovedForAll','checkApproval'];
-    for (var i=0;i<keys.length;i++){
-      var k=keys[i];
-      if (typeof s[k]==='function'){
-        try{ var v=await s[k](addr); return !!v; }catch(e){}
-      }
-    }
-    return null;
-  }
-
-  async function requestApproval(){
-    var s = STK();
-    var keys=['approve','approveIfNeeded','requestApproval','setApproval'];
-    for (var i=0;i<keys.length;i++){
-      var k=keys[i];
-      if (typeof s[k]==='function') return s[k]();
-    }
-    throw new Error('Approval helper not found.');
-  }
-
-  async function getRewards(addr){
-    var s = STK();
-    // 1) explicit override first
-    if (REWARDS_METHOD){
-      try{
-        if (s[REWARDS_METHOD]){ console.log('[owned] rewards via STK.'+REWARDS_METHOD); return await s[REWARDS_METHOD](addr); }
-        if (window.controller && window.controller.methods && window.controller.methods[REWARDS_METHOD]){
-          console.log('[owned] rewards via controller.'+REWARDS_METHOD);
-          return await window.controller.methods[REWARDS_METHOD](addr).call();
-        }
-      }catch(e){ console.warn('[owned] override rewards failed', e); }
-    }
-    // 2) common staking helpers
-    var helpers=['getAvailableRewards','getRewards','claimableRewards','getUnclaimedRewards','pendingRewards','rewardsOf','earned','balanceOfRewards'];
-    for (var i=0;i<helpers.length;i++){
-      var k=helpers[i];
-      try{
-        if (typeof s[k]==='function'){ console.log('[owned] rewards via STK.'+k); return await s[k](addr); }
-      }catch(e){}
-    }
-    // 3) direct controller call variants
-    if (window.controller && window.controller.methods){
-      var meths=['getAvailableRewards','pendingRewards','earned','rewardsOf','getRewards'];
-      for (var j=0;j<meths.length;j++){
-        var m = meths[j];
-        try{
-          if (window.controller.methods[m]){ console.log('[owned] rewards via controller.'+m); return await window.controller.methods[m](addr).call(); }
-        }catch(e){}
-      }
-    }
-    return null;
-  }
-
-  async function claimRewards(){
-    var s = STK();
-    var keys=['claimRewards','claim','harvest'];
-    for (var i=0;i<keys.length;i++){ var k=keys[i]; if (typeof s[k]==='function') return s[k](); }
-    throw new Error('Claim helper not found.');
-  }
-
-  async function getStakeSinceMs(tokenId){
-    var s=STK();
+  // ---- Ranks (optional local JSON) ----
+  async function ensureRanks(){
+    if (FF.RANKS) return FF.RANKS;
     try{
-      if (typeof s.getStakeSince==='function'){ var v=await s.getStakeSince(tokenId); return Number(v)>1e12?Number(v):Number(v)*1000; }
-      if (typeof s.getStakeInfo==='function'){ var i=await s.getStakeInfo(tokenId); var t=(i && (i.since||i.stakedAt||i.timestamp)); if (t!=null) return Number(t)>1e12?Number(t):Number(t)*1000; }
-      if (typeof s.stakeSince==='function'){ var s2=await s.stakeSince(tokenId); return Number(s2)>1e12?Number(s2):Number(s2)*1000; }
-      if (window.controller && window.controller.methods && window.controller.methods.stakeSince){ var s3=await window.controller.methods.stakeSince(tokenId).call(); return Number(s3)*1000; }
-    }catch(e){}
-    return null;
+      var url = C.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json';
+      var r = await fetch(url); if(!r.ok) throw 0;
+      var j = await r.json();
+      FF.RANKS = Array.isArray(j) ? j.reduce(function(m,rr){ m[String(rr.id)]=rr.ranking; return m; }, {}) : (j||{});
+    }catch(e){ FF.RANKS = {}; }
+    return FF.RANKS;
   }
 
-  // State
-  var addr=null, items=[], stakedIdsGlobal=[];
-  var continuation=null;
-  var _stakedCount=null, _rewardsPretty='—', _approved=null;
+  // ---- State ----
+  var addr=null, continuation=null, idsOwned=[], idsStaked=[], items=[];
+  var _approved=null, _rewards='—';
 
-  // Metadata cache
-  var META = new Map();
-  async function fetchMeta(id){
-    if (META.has(id)) return META.get(id);
-    try{
-      var r = await fetch(jsonFor(id));
-      var j = r.ok ? await r.json() : null;
-      var attrs = (j && Array.isArray(j.attributes)) ? j.attributes.map(function(a){
-        return { key:(a && (a.key||a.trait_type))||'', value:(a && (a.value!=null ? a.value : a.trait_value)) };
-      }) : [];
-      var out = { id:id, attrs:attrs };
-      META.set(id,out); return out;
-    }catch(e){
-      var out2={ id:id, attrs:[] }; META.set(id,out2); return out2;
-    }
-  }
-
-  // Header
+  // ---- Header ----
   function headerRoot(){
-    var card=$(SEL.card); if(!card) return null;
-    var w=card.querySelector('.oh-wrap'); if(!w){ w=document.createElement('div'); w.className='oh-wrap'; card.insertBefore(w,$(SEL.grid,card)); }
-    w.innerHTML=''; return w;
+    var w = $('#ownedCard .oh-wrap'); if (!w){ w=document.createElement('div'); w.className='oh-wrap'; var grid=$(SEL.grid, $(SEL.card)); $(SEL.card).insertBefore(w, grid); }
+    w.innerHTML='';
+    return w;
   }
   function renderHeader(){
     var w=headerRoot(); if(!w) return;
     var owned = items.length||0;
-    var staked = (_stakedCount==null?'—':_stakedCount);
-    var rewards = _rewardsPretty;
-    var needsApprove = _approved !== true;
-
+    var staked = idsStaked.length||0;
     w.innerHTML =
       '<div class="oh-row oh-mini">'+
-        '<span class="oh-muted">Owned</span> <b id="ohOwned">'+owned+'</b>'+
-        '<span>•</span><span class="oh-muted">Staked</span> <b id="ohStaked">'+staked+'</b>'+
-        '<span>•</span><span class="oh-muted">Unclaimed Rewards</span> <b id="ohRewards">'+rewards+' '+REWARD_SYMBOL+'</b>'+
+        '<span class="oh-muted">Owned</span> <b>'+owned+'</b>'+
+        '<span>•</span><span class="oh-muted">Staked</span> <b>'+staked+'</b>'+
+        '<span>•</span><span class="oh-muted">Unclaimed Rewards</span> <b>'+_rewards+' '+(C.REWARD_TOKEN_SYMBOL||'$FLYZ')+'</b>'+
         '<span class="oh-spacer"></span>'+
-        (needsApprove ? '<button class="oh-btn" id="ohApprove">Approve Staking</button>' : '')+
+        (_approved===false ? '<button class="oh-btn" id="ohApprove">Approve Staking</button>' : '')+
         '<button class="oh-btn" id="ohClaim">Claim Rewards</button>'+
       '</div>';
 
-    var bA=w.querySelector('#ohApprove');
-    var bC=w.querySelector('#ohClaim');
-    if (bA) bA.onclick = async function(){ bA.disabled=true; try{ await requestApproval(); await refreshHeaderStats(); }catch(e){ toast('Approve failed'); }finally{ bA.disabled=false; } };
-    if (bC) bC.onclick = async function(){ bC.disabled=true; try{ await claimRewards(); await refreshHeaderStats(); }catch(e){ toast('Claim failed'); }finally{ bC.disabled=false; } };
+    var bA = $('#ohApprove', w);
+    var bC = $('#ohClaim', w);
+    if (bA) bA.onclick = async function(){ bA.disabled=true; try{ await FF.staking.setApprovalForAll(); await refreshKPIs(); }catch(e){ toast('Approve failed'); }finally{ bA.disabled=false; } };
+    if (bC) bC.onclick = async function(){ bC.disabled=true; try{ await FF.staking.claimRewards(); await refreshKPIs(); }catch(e){ toast('Claim failed'); }finally{ bC.disabled=false; } };
   }
 
-  // Sizing
   function syncHeights(){
     if (window.matchMedia('(max-width: 960px)').matches){
       var oc=document.getElementById('ownedCard'); if(oc) oc.style.height='';
-      var og=document.getElementById('ownedGrid'); if(og) og.style.maxHeight=''; return;
+      var og=document.getElementById('ownedGrid'); if(og) og.style.maxHeight='';
+      return;
     }
     var left=document.querySelectorAll('.page-grid > .pg-card')[0];
-    var right=document.getElementById('ownedCard');
-    if(!left||!right) return;
+    var right=document.getElementById('ownedCard'); if(!left||!right) return;
     right.style.height=left.offsetHeight+'px';
     var header=right.querySelector('.oh-wrap'); var headerH=header?header.offsetHeight+10:0;
     var pad=20; var maxH=left.offsetHeight-headerH-pad;
     var grid=document.getElementById('ownedGrid'); if(grid) grid.style.maxHeight=Math.max(160,maxH)+'px';
   }
-  window.addEventListener('resize',function(){ setTimeout(syncHeights,50); });
+  window.addEventListener('resize', function(){ setTimeout(syncHeights,60); });
 
-  // KPIs
-  async function refreshHeaderStats(){
-    try{ _approved = addr ? await isApproved(addr) : null; }catch(e){ _approved=null; }
-    try{ stakedIdsGlobal = addr ? await getStakedIds(addr) : []; _stakedCount = stakedIdsGlobal.length; }catch(e){ stakedIdsGlobal=[]; _stakedCount='—'; }
-    try{ var raw = addr ? await getRewards(addr) : null; _rewardsPretty = formatToken(raw, REWARD_DECIMALS); }catch(e){ _rewardsPretty='—'; }
-    console.log('[owned] KPIs ->', { approved:_approved, staked:_stakedCount, rewards:_rewardsPretty });
-    renderHeader(); syncHeights();
-  }
-
-  // Cards
+  // ---- Cards ----
   function attrsHTML(attrs, max){
     if (!Array.isArray(attrs)||!attrs.length) return '';
     var cap = Number.isFinite(Number(max)) ? Number(max) : 4;
@@ -335,15 +159,41 @@
     }
     return 'Not staked • Owned by You';
   }
+  function wireCardActions(scope, it){
+    var btns = scope.querySelectorAll('button[data-act]');
+    for (var i=0;i<btns.length;i++){
+      (function(btn){
+        btn.addEventListener('click', async function(){
+          var act = btn.getAttribute('data-act');
+          try{
+            if (act==='stake'){
+              await FF.staking.stakeToken(it.id);
+              it.staked=true; btn.textContent='Unstake'; btn.setAttribute('data-act','unstake');
+              scope.querySelector('.meta').textContent = fmtMeta(it);
+              await refreshKPIs();
+            } else if (act==='unstake'){
+              await FF.staking.unstakeToken(it.id);
+              it.staked=false; btn.textContent='Stake'; btn.setAttribute('data-act','stake');
+              scope.querySelector('.meta').textContent = fmtMeta(it);
+              await refreshKPIs();
+            } else if (act==='transfer'){
+              if (FF.wallet && FF.wallet.promptTransfer) await FF.wallet.promptTransfer(it.id);
+            }
+          }catch(e){ toast('Action failed'); }
+        });
+      })(btns[i]);
+    }
+  }
 
   function renderCards(){
     var root=$(SEL.grid); if (!root) return;
     root.innerHTML='';
     if (!items.length){
-      var div=document.createElement('div'); div.className='pg-muted'; div.textContent='No frogs found for this wallet.'; root.appendChild(div);
+      root.innerHTML = '<div class="pg-muted">No frogs found for this wallet.</div>';
       renderHeader(); syncHeights(); return;
     }
-    items.forEach(function(it){
+    for (var i=0;i<items.length;i++){
+      var it = items[i];
       var card=document.createElement('article'); card.className='frog-card'; card.setAttribute('data-token-id', String(it.id));
       card.innerHTML =
         '<img class="thumb" src="'+imgFor(it.id)+'" alt="'+it.id+'">'+
@@ -357,11 +207,35 @@
           '<a class="btn btn-outline-gray" href="'+imgFor(it.id)+'" target="_blank" rel="noopener">Original</a>'+
         '</div>';
       root.appendChild(card);
-    });
+      wireCardActions(card, it);
+    }
+    // Load-more fallback button (in case IntersectionObserver cannot run within a scrollable grid)
+    var more = document.getElementById('ownedMore');
+    if (more){
+      more.style.display = continuation ? 'block' : 'none';
+      more.textContent = 'Load more';
+      more.onclick = loadMoreOwned;
+    }
     renderHeader(); syncHeights();
   }
 
-  // Owned IDs page (IDs only; metadata is local JSON)
+  // ---- Data fetchers ----
+  var META = new Map();
+  async function fetchMeta(id){
+    if (META.has(id)) return META.get(id);
+    try{
+      var r = await fetch(metaFor(id));
+      var j = r.ok ? await r.json() : null;
+      var attrs = (j && Array.isArray(j.attributes)) ? j.attributes.map(function(a){
+        return { key:(a && (a.key||a.trait_type))||'', value:(a && (a.value!=null?a.value:a.trait_value)) };
+      }) : [];
+      var out = { id:id, attrs:attrs }; META.set(id,out); return out;
+    }catch(e){ var out2={ id:id, attrs:[] }; META.set(id,out2); return out2; }
+  }
+
+  function tokensApiUser(addr){
+    return RESV + '/users/' + addr + '/tokens/v8';
+  }
   async function fetchOwnedIdsPage(address){
     try{
       var qs = new URLSearchParams({ collection: COLLECTION, limit:String(PAGE_SIZE), includeTopBid:'false', includeAttributes:'false' });
@@ -373,130 +247,135 @@
       continuation = (j && j.continuation) || null;
       return ids;
     }catch(e){
-      console.warn('[owned] Reservoir unavailable, falling back to staked only', e);
+      console.warn('[owned] Reservoir unavailable; showing staked + loaded IDs only', e);
       continuation = null;
       return [];
     }
   }
 
-  // Ranks (optional)
-  async function ensureRanks(){
-    if (FF.RANKS) return FF.RANKS;
+  async function getStakeSinceMs(tokenId){
     try{
-      var url = CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json';
-      var r = await fetch(url); if (!r.ok) throw new Error('no ranks');
-      var j = await r.json();
-      FF.RANKS = Array.isArray(j) ? j.reduce(function(m,rk){ m[String(rk.id)] = rk.ranking; return m; }, {}) : (j||{});
-      return FF.RANKS;
-    }catch(e){ FF.RANKS = {}; return FF.RANKS; }
+      // Best-effort: compute from Transfer to controller
+      if (!window.collection || !window.collection.getPastEvents) return null;
+      var controllerAddr = (C.CONTROLLER_ADDRESS || window.CONTROLLER_ADDRESS || '').toLowerCase();
+      var evs = await window.collection.getPastEvents('Transfer', { filter:{ to: C.CONTROLLER_ADDRESS }, fromBlock: 0, toBlock: 'latest' });
+      for (var i=evs.length-1;i>=0;i--){
+        var e = evs[i];
+        if (String(e.returnValues.tokenId)===String(tokenId)) {
+          var blk = await (window.web3 || (window.Web3? new window.Web3(window.ethereum):null)).eth.getBlock(e.blockNumber);
+          return Number(blk.timestamp)*1000;
+        }
+      }
+    }catch(e){}
+    return null;
   }
 
-  // Flow
-  async function loadFirstPage(address){
-    var ranks = await ensureRanks();
-    var ownedIds = await fetchOwnedIdsPage(address);
-    if (!Array.isArray(stakedIdsGlobal)) stakedIdsGlobal = await getStakedIds(address);
-
-    var idSet = new Set(ownedIds);
-    stakedIdsGlobal.forEach(function(id){ idSet.add(id); });
-    var allIds = Array.from(idSet);
-
-    items = [];
-    for (var i=0;i<allIds.length;i++){
-      var id = allIds[i];
-      var m = await fetchMeta(id);
-      items.push({ id:id, attrs:m.attrs, staked: stakedIdsGlobal.indexOf(id)>-1, sinceMs:null, rank:ranks[String(id)] });
-    }
-
-    // hydrate stake times
-    for (var j=0;j<items.length;j++){
-      var it = items[j];
-      if (it.staked){
-        try{
-          var ms = await getStakeSinceMs(it.id);
-          it.sinceMs = (ms && ms<1e12) ? ms*1000 : ms;
-        }catch(e){ it.sinceMs = null; }
+  // ---- KPIs ----
+  async function refreshKPIs(){
+    _approved = null; _rewards = '—';
+    try{
+      var a = addr || await FF.wallet.getAddress();
+      if (a && FF.staking && FF.staking.isApprovedForAll) {
+        var ap = await FF.staking.isApprovedForAll(a, C.CONTROLLER_ADDRESS || window.CONTROLLER_ADDRESS);
+        _approved = (ap===true);
       }
+    }catch(e){ _approved=null; }
+    try{
+      var r = addr ? await FF.staking.availableRewards(addr) : null;
+      _rewards = formatToken(r);
+    }catch(e){ _rewards = '—'; }
+    renderHeader(); // reflect updated KPIs
+  }
+
+  // ---- Flow ----
+  async function loadFirstPage(){
+    var ranks = await ensureRanks();
+    // 1) pull owned IDs page 1
+    var owned = await fetchOwnedIdsPage(addr);
+    // 2) pull staked IDs (controller)
+    idsStaked = await (FF.staking.getUserStakedTokens ? FF.staking.getUserStakedTokens(addr) : (async function(){ return []; })());
+
+    // Merge sets
+    var set = new Set(owned);
+    for (var i=0;i<idsStaked.length;i++) set.add(idsStaked[i]);
+    var all = Array.from(set);
+
+    // Hydrate metadata
+    items = [];
+    for (var j=0;j<all.length;j++){
+      var id = all[j];
+      var m = await fetchMeta(id);
+      items.push({ id:id, attrs:m.attrs, staked: idsStaked.indexOf(id)>-1, sinceMs:null, rank:ranks[String(id)] });
     }
-
+    // Stake since
+    for (var k=0;k<items.length;k++){
+      if (items[k].staked) items[k].sinceMs = await getStakeSinceMs(items[k].id);
+    }
     renderCards();
+    // Attach IO for automatic “more”
+    attachOwnedObserver();
+    await refreshKPIs();
+  }
 
-    // infinite scroll (more OWNED pages)
-    var root=$(SEL.grid); if (!root) return;
+  async function loadMoreOwned(){
     if (!continuation) return;
+    var ranks = await ensureRanks();
+    var moreIds = await fetchOwnedIdsPage(addr);
+    var add = moreIds.filter(function(id){ return !items.some(function(x){ return x.id===id; }); });
+    for (var i=0;i<add.length;i++){
+      var id=add[i]; var m=await fetchMeta(id);
+      items.push({ id:id, attrs:m.attrs, staked: idsStaked.indexOf(id)>-1, sinceMs: (idsStaked.indexOf(id)>-1 ? await getStakeSinceMs(id) : null), rank:ranks[String(id)] });
+    }
+    renderCards();
+  }
+
+  function attachOwnedObserver(){
+    var root=$(SEL.grid); if (!root || !continuation) return;
+    // If the grid itself scrolls, a viewport-based IO may never fire.
+    // So we also add a manual "Load more" button; IO is a nice-to-have.
     var sentinel=document.createElement('div'); sentinel.style.height='1px'; root.appendChild(sentinel);
     var io = new IntersectionObserver(function(es){
       if (!es[0].isIntersecting) return;
-      io.disconnect();
-      (async function(){
-        try{
-          var moreIds = await fetchOwnedIdsPage(address);
-          var add = moreIds.filter(function(id){ return !items.some(function(x){ return x.id===id; }); });
-          for (var k=0;k<add.length;k++){
-            var id2 = add[k]; var m2 = await fetchMeta(id2);
-            items.push({ id:id2, attrs:m2.attrs, staked: stakedIdsGlobal.indexOf(id2)>-1, sinceMs: await getStakeSinceMs(id2), rank:ranks[String(id2)] });
-          }
-          renderCards();
-        }catch(err){ console.warn('[owned] paging failed', err); }
-      })();
+      io.disconnect(); loadMoreOwned();
     },{root:root,rootMargin:'140px',threshold:0.01});
     io.observe(sentinel);
   }
 
-  async function afterConnect(address){
-    var grid=$(SEL.grid); if (grid){ grid.innerHTML='<div class="pg-muted">Loading…</div>'; }
-    await Promise.all([ refreshHeaderStats(), loadFirstPage(address) ]);
-  }
-
-  async function getConnectedAddress(){
-    try{
-      if (window.FF_WALLET && window.FF_WALLET.address) return window.FF_WALLET.address;
-      if (FF.wallet && FF.wallet.getAddress){ var a=await FF.wallet.getAddress(); if(a) return a; }
-      if (window.ethereum && window.ethereum.request){ var arr=await window.ethereum.request({method:'eth_accounts'}); return (arr && arr[0])||null; }
-    }catch(e){}
-    return null;
-  }
-  async function requestConnect(){
-    try{
-      if (FF.wallet && FF.wallet.connect){ var a=await FF.wallet.connect(); if(a) return a; }
-      if (window.ethereum && window.ethereum.request){ var arr=await window.ethereum.request({method:'eth_requestAccounts'}); return (arr && arr[0])||null; }
-    }catch(e){ toast('Connect failed'); }
-    throw new Error('No wallet provider found.');
-  }
-
   async function init(){
-    // remove legacy info squares
-    var olds = document.querySelectorAll('#ownedCard .info-grid-2');
-    for (var i=0;i<olds.length;i++){ olds[i].remove(); }
+    // Remove any legacy info squares under the owned panel
+    var junk=document.querySelectorAll('#ownedCard .info-grid-2'); for (var i=0;i<junk.length;i++) junk[i].remove();
 
-    var btn = document.getElementById('ownedConnectBtn');
+    // Connect button behavior
+    var btn = $(SEL.btnConn);
     if (btn){
       btn.style.display='inline-flex';
+      btn.addEventListener('mouseenter', function(){ btn.classList.add('hover'); });
+      btn.addEventListener('mouseleave', function(){ btn.classList.remove('hover'); });
       btn.addEventListener('click', async function(){
         btn.disabled=true;
         try{
-          var a = await requestConnect();
-          if (!a) return;
-          btn.classList.add('btn-connected');
+          var a = await FF.wallet.connect();
+          if (!a) return; addr = a;
           btn.textContent = shorten(a);
-          addr = a;
-          await afterConnect(a);
+          btn.classList.add('btn-connected');
+          $('#ownedGrid').innerHTML = '<div class="pg-muted">Loading…</div>';
+          await loadFirstPage();
         } finally { btn.disabled=false; }
       });
     }
 
-    addr = await getConnectedAddress();
-    if (btn && addr){ btn.classList.add('btn-connected'); btn.textContent = shorten(addr); }
-    if (addr){ await afterConnect(addr); }
-    else {
-      var grid=$(SEL.grid);
-      if (grid){ grid.innerHTML = '<div class="pg-muted">Connect your wallet to view owned frogs.</div>'; }
+    // If already connected
+    var a0 = await FF.wallet.getAddress();
+    if (a0){
+      addr = a0;
+      if (btn){ btn.textContent = shorten(a0); btn.classList.add('btn-connected'); }
+      $('#ownedGrid').innerHTML = '<div class="pg-muted">Loading…</div>';
+      await loadFirstPage();
+    } else {
+      $('#ownedGrid').innerHTML = '<div class="pg-muted">Connect your wallet to view owned frogs.</div>';
     }
 
-    // keep heights aligned with The Pond card
-    function syncLater(){ syncHeights(); }
-    setTimeout(syncLater, 50);
-    window.addEventListener('resize', function(){ setTimeout(syncHeights,50); });
+    setTimeout(syncHeights, 50);
   }
 
   window.FF_initOwnedPanel = init;
