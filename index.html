@@ -1,272 +1,181 @@
 <!doctype html>
-<html lang="en" data-theme="noir">
+<html lang="en" data-theme="t1">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>FreshFrogs — Wallet, Staking & The Pond</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>freshfrogs.github.io — Layout 3</title>
 
-  <!-- Fonts + Ethers -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Grotesk:wght@600;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js" crossorigin="anonymous"></script>
+  <!-- Site tokens/styles -->
+  <link rel="stylesheet" href="assets/css/styles.css" />
 
-  <!-- Site styles -->
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    /* ---------- Base ---------- */
+    .pg-wrap{ padding:20px; }
+    img{ image-rendering: pixelated; image-rendering: crisp-edges; }
+
+    .pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
+    .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
+    .pg-muted{ color:var(--muted); font-size:13px; }
+
+    .list{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+    .row{ display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:center; padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
+    .thumb64{ width:64px; height:64px; min-width:64px; min-height:64px; border-radius:10px; object-fit:contain; background:var(--panel-2); }
+
+    /* ---------- Centered single-panel layout ---------- */
+    :root{ --panel-width: 640px; } /* tune this if you want slightly wider/narrower */
+    .center-wrap{ display:grid; gap:16px; justify-items:center; }
+    .centered-card{ width: min(var(--panel-width), 100%); }
+
+    /* ---------- Frog strip hero (reduced + centered) ---------- */
+    .frog-hero{ margin:28px auto 38px; width: min(var(--panel-width), 100%); }
+    .frog-title{
+      margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em;
+      text-align:center;
+    }
+    .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
+    .frog-strip .tile{ flex:0 0 auto; width:64px; height:64px; border-radius:10px; overflow:hidden; border:0; background:transparent; box-shadow:none; }
+    .frog-strip .tile.hide{ display:none !important; }
+    .frog-strip img{ width:64px; height:64px; object-fit:contain; }
+    @media (max-width:520px){ .frog-hero{ margin:22px auto 30px; } .frog-strip{ gap:10px; } }
+
+    /* ---------- Info blocks ---------- */
+    .info-grid-2{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:10px; margin-bottom:10px; }
+    @media (max-width:900px){ .info-grid-2{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    @media (max-width:520px){ .info-grid-2{ grid-template-columns: 1fr; } }
+    .info-block{ border:1px solid var(--border); border-radius:12px; padding:10px; background:var(--panel); }
+    .info-block .ik{ font-size:11px; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; }
+    .info-block .iv{ font-weight:900; font-size:18px; line-height:1.1; margin-top:4px; }
+    .info-block .in{ font-size:12px; color:var(--muted); }
+
+    /* ---------- Mint (Mini) inside the panel (kept) ---------- */
+    #mintMini.mint-mini{
+      border:1px solid var(--border); border-radius:12px; background: var(--panel);
+      padding:10px; margin:8px 0 12px;
+    }
+    #mintMini .mint-mini__row{ display:grid; grid-template-columns:auto auto 1fr auto; align-items:center; gap:10px; }
+    #mintMini .mint-mini__price{ border:1px solid var(--border); border-radius:10px; padding:8px 10px; background: color-mix(in srgb, var(--panel) 90%, transparent); display:grid; grid-template-columns:auto auto; gap:6px 8px; align-items:baseline; }
+    #mintMini .mint-mini__price .k{ font-size:12px; color:var(--muted); }
+    #mintMini .mint-mini__price .v{ font-weight:900; font-size:14px; }
+    #mintMini .mint-mini__stepper{ display:flex; align-items:center; gap:8px; }
+    #mintMini .mini__btn{ width:28px; height:28px; border-radius:8px; border:1px solid var(--border); background:transparent; color:inherit; font-weight:800; line-height:1; display:grid; place-items:center; }
+    #mintMini .mini__btn:active{ transform: translateY(1px); }
+    #mintMini .mini__qty{ width:64px; text-align:center; padding:6px; border-radius:8px; border:1px solid var(--border); background:transparent; color:inherit; font-family:var(--font-ui); }
+    #mintMini .mini__mint{ padding-inline:12px; }
+    #mintMini .mint-mini__total{ font-size:12px; color:var(--muted); justify-self:end; }
+    #mintMini .mint-mini__note{ margin-top:6px; font-size:12px; }
+    @media (max-width:600px){ #mintMini .mint-mini__row{ grid-template-columns: 1fr 1fr; } #mintMini .mint-mini__total{ justify-self:start; } }
+  </style>
 </head>
 <body>
-<header class="site">
-  <div class="container hdr">
-    <div class="brand">FreshFrogs</div>
-    <nav class="nav">
-      <a href="#gallery">Collection</a>
-      <a href="#trade">Mint & Staking</a>
-      <a href="#pond">The Pond</a>
-      <a href="#about">About</a>
-      <a href="#faq">FAQ</a>
-    </nav>
-    <div class="row">
-      <span id="walletLabel" class="muted" style="display:none;"></span>
-      <button id="connectBtn" class="btn btn-solid btn-sm">Connect Wallet</button>
-    </div>
-  </div>
-</header>
+  <div class="pg-wrap container">
 
-<main class="container">
-  <!-- Hero / 3x3 gallery -->
-  <section class="hero" id="gallery">
-    <div>
-      <h1 class="section-title" style="margin:0;font-size:clamp(2rem,4.2vw,3rem);">Nine random frogs. Clean and fast.</h1>
-      <p class="muted" style="max-width:62ch">The grid shows static PNGs. Wallet, staking, and The Pond live below.</p>
-
-      <!-- Local rarity JSON helper (visible only on file:// for testing local JSON) -->
-      <div id="localLoad" class="muted" style="margin-top:8px;display:none;">
-        <div><b>Testing locally?</b> Load your rarity JSON:</div>
-        <div class="row" style="margin-top:6px">
-          <input id="rarityFile" type="file" accept="application/json,.json"/>
-          <button id="useLocalBtn" class="btn btn-outline btn-sm">Use selected JSON</button>
-        </div>
-        <div style="font-size:.9rem;margin-top:4px">Pick <code>assets/freshfrogs_rarity_rankings.json</code></div>
-      </div>
-    </div>
-    <div class="gallery" id="grid"></div>
-  </section>
-
-  <!-- Facts -->
-  <!-- === Collection Facts (inside panel like the Pond) === -->
-  <!-- === /Collection Facts === -->
-
-  <!-- === User Hub (compact with right-side mini stats) === -->
-  <section class="card hub-pro" id="userHub" aria-label="User Hub">
-    <ul class="stats-grid">
-      <li class="stat-cell">
-        <div class="stat-k">Supply</div>
-        <div class="stat-v" id="cfSupply">4,040 tokens</div>
-      </li>
-      <li class="stat-cell">
-        <div class="stat-k">Chain</div>
-        <div class="stat-v" id="cfChain">Ethereum (ERC-721)</div>
-      </li>
-      <li class="stat-cell">
-        <div class="stat-k">Royalty</div>
-        <div class="stat-v" id="cfRoyalty">5% on secondary sales</div>
-      </li>
-      <li class="stat-cell">
-        <div class="stat-k">Mint Price</div>
-        <div class="stat-v" id="cfMintPrice">0.01 ETH</div>
-      </li>
-    </ul>
-    <header class="hub-pro__header hub-pro__header--split">
-      <!-- Left: title & actions -->
-      <div class="hub-pro__title">
-        <h2>My Dashboard</h2>
-        <p class="muted">Connect, mint, stake, and manage your frogs in one place.</p>
-        <div class="row" style="gap:10px; margin-top:8px;">
-          <span class="pill">Address: <b id="hubAddr">—</b></span>
-          <button class="btn btn-ghost btn-sm" id="hubRefresh" aria-label="Refresh dashboard">Refresh</button>
-        </div>
-      </div>
-
-      <!-- Right: compact mini-stats -->
-      <ul class="mini-stats">
-        <li>
-          <div class="mini-k">Owned</div>
-          <div class="mini-v" id="hubOwned">—</div>
-        </li>
-        <li>
-          <div class="mini-k">Staked</div>
-          <div class="mini-v" id="hubStaked">—</div>
-        </li>
-        <li>
-          <div class="mini-k">Rewards (FLYZ)</div>
-          <div class="mini-v" id="hubRewards">—</div>
-        </li>
-      </ul>
-    </header>
-
-    <!-- Approval / claim actions -->
-    <div class="row hub-pro__actions" style="margin-bottom:8px;">
-      <button class="btn" id="hubApprove">Approve Staking</button>
-      <button class="btn btn-solid" id="hubClaim" disabled>Claim Rewards</button>
-      <div class="muted hub-pro__note" id="hubApprovalNote"></div>
-    </div>
-
-    <!-- Split: Mint (left) + My Frogs (right) -->
-    <div class="hub-pro__row hub-pro__row--split">
-      <!-- Mint -->
-      <section class="hub-pro__card" id="hubMintCard" aria-labelledby="hubMintTitle">
-        <header class="hub-pro__card-head">
-          <h3 id="hubMintTitle">Mint Fresh Frogs</h3>
-          <div class="hub-pro__meta muted">
-            <span>Price: <b id="hubMintPrice">—</b></span>
-            <span>Supply: <b id="hubMintSupply">—</b></span>
-          </div>
-        </header>
-        <div class="hub-pro__card-body">
-          <div class="hub-pro__field">
-            <label for="hubMintQty">Quantity</label>
-            <input id="hubMintQty" type="number" min="1" value="1">
-          </div>
-          <button class="btn btn-solid" id="hubMintBtn">Mint</button>
-          <div class="muted hub-pro__note" id="hubMintNote">Connect wallet to mint.</div>
+    <div class="center-wrap">
+      <!-- HERO (reduced & centered) -->
+      <section class="frog-hero">
+        <h1 class="frog-title">freshfrogs.github.io</h1>
+        <div class="frog-strip">
+          <!-- Reduced selection; script still trims to whole tiles if needed -->
+          <div class="tile"><img src="frog/12.png"  alt="12"></div>
+          <div class="tile"><img src="frog/77.png"  alt="77"></div>
+          <div class="tile"><img src="frog/404.png" alt="404"></div>
+          <div class="tile"><img src="frog/256.png" alt="256"></div>
+          <div class="tile"><img src="frog/999.png" alt="999"></div>
+          <div class="tile"><img src="frog/1.png"   alt="1"></div>
         </div>
       </section>
 
-      <!-- My Frogs -->
-      <section class="hub-pro__card" id="hubMyFrogs" aria-labelledby="hubFrogsTitle">
-        <header class="hub-pro__card-head">
-          <h3 id="hubFrogsTitle">My Frogs</h3>
-          <div class="hub-pro__tabs" role="tablist" aria-label="My Frogs">
-            <button class="btn btn-ghost btn-sm" id="tabOwned"  role="tab" aria-selected="true">Owned</button>
-            <button class="btn btn-ghost btn-sm" id="tabStaked" role="tab" aria-selected="false">Staked</button>
-            <button class="btn btn-ghost btn-sm" id="refreshOwned" title="Refresh frogs">↻</button>
-          </div>
-        </header>
-        <div class="hub-pro__card-body">
-          <div class="muted" id="stakeStatus"></div><!-- we’ll hide text via CSS -->
-          <ul class="list hub-pro__list" id="chipWrap"></ul>
+      <!-- Fresh Frogs NFT (centered, fixed width) -->
+      <section class="pg-card centered-card l3-activity">
+        <div class="pg-card-head"><h3>Fresh Frogs NFT</h3></div>
+        <p class="pg-muted" style="margin:6px 0 12px 0; max-width:70ch;">
+          Pixel-perfect frogs hopping around the Ethereum pond. Mint, stake to earn FLYZ, and explore the collection’s quirks and traits.
+        </p>
+
+        <div class="info-grid-2">
+          <div class="info-block"><div class="ik">🐸 Supply</div><div class="iv">4,040</div><div class="in">Total tokens</div></div>
+          <div class="info-block"><div class="ik">⛓️ Chain</div><div class="iv">Ethereum</div><div class="in">ERC-721</div></div>
+          <div class="info-block"><div class="ik">🎧 Royalty</div><div class="iv">5%</div><div class="in">Secondary sales</div></div>
+          <div class="info-block"><div class="ik">🪙 Mint</div><div class="iv">0.01 ETH</div><div class="in">Per frog</div></div>
         </div>
+
+        <!-- Mint (Mini) -->
+        <section id="mintMini" class="mint-mini" aria-label="Quick mint">
+          <div class="mint-mini__row">
+            <div class="mint-mini__price">
+              <div class="k">Price</div><div class="v">0.01 ETH</div>
+            </div>
+
+            <div class="mint-mini__stepper" role="group" aria-label="Quantity">
+              <button type="button" class="mini__btn" data-delta="-1" aria-label="Decrease">−</button>
+              <input id="miniQty" class="mini__qty" type="text" inputmode="numeric" pattern="[0-9]*" value="1" aria-label="Quantity">
+              <button type="button" class="mini__btn" data-delta="1" aria-label="Increase">+</button>
+            </div>
+
+            <button type="button" class="btn mini__mint">Mint</button>
+            <div class="mint-mini__total">Total: <b id="miniTotal">0.01 ETH</b></div>
+          </div>
+          <div class="mint-mini__note pg-muted">Connect wallet to mint.</div>
+        </section>
+
+        <!-- Activity feed placeholder (we’ll wire this next) -->
+        <ul id="activityList" class="list" aria-live="polite">
+          <li class="row"><div class="pg-muted">Recent activity will appear here.</div></li>
+        </ul>
       </section>
     </div>
-  </section>
-  <!-- === /User Hub === -->
-
-
-  <!-- Pond -->
-  <section id="pond" class="panel stack" aria-label="The Pond">
-    <div class="row" style="justify-content:space-between;align-items:center">
-      <h2 class="section-title" style="margin:0">The Pond</h2>
-      <div class="row" style="gap:8px;align-items:center">
-        <div class="muted">Frogs currently staked in the controller</div>
-        <button id="refreshPond" class="btn btn-ghost btn-sm">Refresh</button>
-      </div>
-    </div>
-
-    <div id="pondStats" class="facts" aria-label="Pond stats">
-      <div class="fact"><b>Total Staked</b><div class="muted"><span id="statTotal">—</span></div></div>
-      <div class="fact"><b>Controller</b><div class="muted"><a id="statController" class="addr" target="_blank" rel="noopener">—</a></div></div>
-      <div class="fact"><b>Collection</b><div class="muted"><a id="statCollection" class="addr" target="_blank" rel="noopener">—</a></div></div>
-      <div class="fact"><b>Last Update</b><div class="muted" id="statUpdated">—</div></div>
-    </div>
-
-    <div id="pondListWrap">
-      <ul id="pondList" class="card-list list-scroll" aria-live="polite"></ul>
-      <!-- pager injected by pond.js -->
-    </div>
-  </section>
-
-  <!-- About / FAQ -->
-  <section id="about" class="panel stack">
-    <h2 class="section-title" style="margin:0">About FreshFrogs</h2>
-    <p class="muted">FreshFrogs is a collection of pixel frogs with on-chain provenance. All secondary sales carry a 5% royalty.</p>
-  </section>
-
-  <section id="faq" class="panel stack">
-    <h2 class="section-title" style="margin:0">FAQ</h2>
-    <details><summary><b>How do I mint?</b></summary><p class="muted">Connect a Web3 wallet and call the contract mint function. This template includes UI only; add your mint logic when ready.</p></details>
-    <details><summary><b>Where can I view the collection?</b></summary><p class="muted">OpenSea or the original site’s gallery.</p></details>
-  </section>
-</main>
-
-<footer class="site">
-  <div class="container ftr">
-    <div>© FreshFrogs 2025</div>
-    <div class="links">
-      <a href="https://x.com" target="_blank" rel="noopener">Twitter</a>
-      <a href="#" target="_blank" rel="noopener">Discord</a>
-      <a href="https://freshfrogs.github.io/" target="_blank" rel="noopener">Docs</a>
-    </div>
   </div>
-</footer>
 
-<!-- Theme chooser -->
-<div class="theme-dock" role="toolbar" aria-label="Theme chooser">
-  <button class="swatch sw-noir"   data-theme="noir"   title="Noir"></button>
-  <button class="swatch sw-pastel" data-theme="pastel" title="Pastel"></button>
-</div>
+  <script>
+    /* --- Frog strip: keep whole 64px tiles only --- */
+    function layoutFrogStrip(){
+      var strip = document.querySelector('.frog-strip');
+      if(!strip) return;
+      var tiles = Array.prototype.slice.call(strip.querySelectorAll('.tile'));
+      var styles = window.getComputedStyle(strip);
+      var gap = parseFloat(styles.gap || 12) || 12;
+      var tileW = 64;
+      var innerW = strip.clientWidth;
+      var count = Math.max(1, Math.floor((innerW + gap) / (tileW + gap)));
+      tiles.forEach(function(t,i){ t.classList.toggle('hide', i >= count); });
+    }
+    window.addEventListener('resize', layoutFrogStrip);
+    document.addEventListener('DOMContentLoaded', layoutFrogStrip);
 
-<!-- Optional lightbox shell -->
-<div id="lightbox" class="lightbox" style="display:none">
-  <div id="lightboxStage" class="stage"></div>
-</div>
+    /* --- Mint (Mini): stepper + totals (scoped) --- */
+    (function(){
+      var PRICE = 0.01;
+      function clamp(n){ n = parseInt(n||'1', 10); return isNaN(n) ? 1 : Math.max(1, n); }
+      function fmtETH(n){ return n.toFixed(2) + ' ETH'; }
 
-<!-- Scripts: order matters -->
-<script src="assets/js/config.js"></script>
-<script src="assets/js/utils.js"></script>
-<script src="assets/js/theme.js"></script>
+      function syncMini(){
+        var qtyEl = document.getElementById('miniQty');
+        var totalEl = document.getElementById('miniTotal');
+        if(!qtyEl || !totalEl) return;
+        var q = clamp(qtyEl.value);
+        qtyEl.value = q;
+        totalEl.textContent = fmtETH(q * PRICE);
+      }
 
-<script src="https://cdn.jsdelivr.net/npm/ethers@5/dist/ethers.min.js"></script>
+      document.addEventListener('click', function(e){
+        var btn = e.target.closest('#mintMini .mini__btn');
+        if(!btn) return;
+        var qtyEl = document.getElementById('miniQty'); if(!qtyEl) return;
+        var delta = parseInt(btn.getAttribute('data-delta'),10) || 0;
+        qtyEl.value = clamp((parseInt(qtyEl.value||'1',10) || 1) + delta);
+        syncMini();
+      });
 
-<script src="assets/js/grid.js"></script>
-<script src="assets/js/wallet.js"></script>
-<script src="assets/js/owned.js"></script>
-<script src="assets/js/staking.js"></script>
-<script src="assets/js/pond.js"></script>
+      document.addEventListener('input', function(e){
+        if(!e.target.matches('#mintMini #miniQty')) return;
+        e.target.value = e.target.value.replace(/[^0-9]/g,'');
+        syncMini();
+      });
 
-<!-- NEW unified hub -->
-<script src="assets/js/hub.js"></script>
-
-<!-- Modal last so click handlers attach sitewide -->
-<script src="assets/js/modal.js"></script>
-<script src="assets/js/main.js"></script>
-
-
-<!-- Frog Modal (image ABOVE info, Original link, no extra text blocks) -->
-<div id="frogModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
-  <div class="modal-backdrop" data-close></div>
-  <div class="modal-panel modal-narrow" role="document">
-    <button class="btn btn-ghost btn-sm modal-close" data-close aria-label="Close">✕</button>
-
-    <section class="ffm-grid">
-      <!-- IMAGE (fixed 256×256 layered render) -->
-      <div class="ffm-hero-wrap">
-        <div id="fmHero" class="ffm-hero"></div>
-      </div>
-
-      <!-- INFO -->
-      <div class="ffm-info">
-        <div class="ffm-titlerow">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <b>Frog <span id="fmId">#—</span></b>
-            <span id="fmRank" class="pill">Rank <b id="fmRankNum">—</b></span>
-          </div>
-          <div id="fmLine" class="muted">—</div>
-        </div>
-
-        <!-- actions (no solid green by default; hover shows accent) -->
-        <div class="ffm-actions">
-          <button id="fmStakeBtn"    class="btn btn-ghost btn-xs"  data-no-modal>Stake</button>
-          <button id="fmUnstakeBtn"  class="btn btn-ghost btn-xs"  data-no-modal>Unstake</button>
-          <button id="fmTransferBtn" class="btn btn-ghost btn-xs"  data-no-modal>Transfer</button>
-
-          <a id="fmOpenSea"   class="btn btn-ghost btn-xs" target="_blank" rel="noopener">OpenSea</a>
-          <a id="fmEtherscan" class="btn btn-ghost btn-xs" target="_blank" rel="noopener">Etherscan</a>
-          <a id="fmOriginal"  class="btn btn-ghost btn-xs" target="_blank" rel="noopener">Original</a>
-        </div>
-
-        <!-- attributes table only (no heading) -->
-        <ul id="fmAttrs" class="ffm-attrlist list-scroll"></ul>
-      </div>
-    </section>
-  </div>
-</div>
+      document.addEventListener('DOMContentLoaded', syncMini);
+    })();
+  </script>
+  <script src="assets/js/activity-feed.js"></script>
+  <script> FF_loadRecentActivity?.(); </script>
 </body>
 </html>
