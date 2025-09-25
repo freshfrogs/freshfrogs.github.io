@@ -1,18 +1,25 @@
-// assets/js/mints-feed.js
-// Recent Mints — scrollable with pagination (Reservoir continuation) + Etherscan links
+// assets/js/stakes-feed.js
+// Recently Staked — scrollable with pagination (Reservoir continuation) + Etherscan links + stats
 (function (FF, CFG) {
-  const UL_ID = 'recentMints';
-  const BASE  = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
-  const API   = BASE + '/collections/activity/v6';
-  const PAGE_SIZE = Math.max(1, Math.min(50, Number(CFG.PAGE_SIZE || 50)));
-  const MAX_PAGES = Math.max(1, Number(CFG.MAX_PAGES || 5));
+  const UL_ID = 'recentStakes';
+  const ID_TOTAL = 'stakedTotal';
+  const ID_CTRL  = 'stakedController';
+  const ID_WHEN  = 'stakedUpdated';
 
-  function need(k){ if(!CFG[k]) throw new Error('[mints] Missing FF_CFG.'+k); return CFG[k]; }
+  function need(k){ if(!CFG[k]) throw new Error('[stakes] Missing FF_CFG.'+k); return CFG[k]; }
+
+  const BASE  = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
+  const API_ACTIVITY = BASE + '/collections/activity/v6';
+  const API_USERCOLL = function(addr){ return BASE + '/users/' + addr + '/collections/v2'; };
+
   const API_KEY    = need('FROG_API_KEY');
   const COLLECTION = need('COLLECTION_ADDRESS');
+  const CONTROLLER = need('STAKING_CONTROLLER');
   const CHAIN_ID   = Number(CFG.CHAIN_ID || 1);
 
-  // Prefer FF.apiHeaders (pond.js) if present; fallback to x-api-key
+  const PAGE_SIZE  = Math.max(1, Math.min(50, Number(CFG.PAGE_SIZE || 50)));
+  const MAX_PAGES  = Math.max(1, Number(CFG.MAX_PAGES || 5));
+
   function apiHeaders(){
     if (typeof FF.apiHeaders === 'function') return FF.apiHeaders();
     return { accept: 'application/json', 'x-api-key': API_KEY };
@@ -39,7 +46,7 @@
     if (!root) return;
     root.classList.add('scrolling');
     root.style.overflowY = 'auto';
-    var visible = Number(root.getAttribute('data-visible')) || Number(CFG.MINTS_VISIBLE || 6);
+    var visible = Number(root.getAttribute('data-visible')) || Number(CFG.STAKES_VISIBLE || CFG.MINTS_VISIBLE || 6);
     var firstRow = root.querySelector('.row');
     if (!firstRow){ root.style.maxHeight = ''; return; }
     var csUL = getComputedStyle(root);
@@ -57,15 +64,17 @@
     });
   }
 
+  // Keep transfers TO controller (exclude zero->controller edge mints)
   function mapRow(a){
-    var tokenId = Number(a && a.token && a.token.tokenId);
-    if (!isFinite(tokenId)) return null;
-
+    if (String(a && a.type || '').toLowerCase() !== 'transfer') return null;
+    var to   = (a && a.toAddress || '').toLowerCase();
     var from = (a && a.fromAddress || '').toLowerCase();
     var zero = '0x0000000000000000000000000000000000000000';
-    var reported = String(a && a.type || '').toLowerCase();
-    var isMint = (reported === 'mint') || (from === zero);
-    if (!isMint) return null;
+    if (to !== String(CONTROLLER || '').toLowerCase()) return null;
+    if (from === zero) return null;
+
+    var tokenId = Number(a && a.token && a.token.tokenId);
+    if (!isFinite(tokenId)) return null;
 
     var ts = a.timestamp != null ? a.timestamp : a.createdAt;
     var dt = null;
@@ -74,9 +83,42 @@
 
     var txHash = a.txHash || a.transactionHash || null;
 
-    return { id: tokenId, to: a && a.toAddress || null, time: dt, img: imgFor(tokenId), tx: txHash };
+    return { id: tokenId, from: a && a.fromAddress || null, to: a && a.toAddress || null, time: dt, img: imgFor(tokenId), tx: txHash };
   }
 
+  // ===== Stats =====
+  function fetchStakedTotal(){
+    var url = API_USERCOLL(CONTROLLER) + '?collections=' + encodeURIComponent(COLLECTION) + '&limit=20';
+    return reservoirFetch(url).then(function(json){
+      var rows = Array.isArray(json && json.collections) ? json.collections : [];
+      var row  = null;
+      for (var i=0;i<rows.length;i++){
+        var id = rows[i] && rows[i].collection && rows[i].collection.id || '';
+        if (String(id).toLowerCase() === String(COLLECTION).toLowerCase()){ row = rows[i]; break; }
+      }
+      var n = Number(row && row.ownership && row.ownership.tokenCount || 0);
+      return isFinite(n) ? n : 0;
+    });
+  }
+
+  function setStats(obj){
+    var elT = document.getElementById(ID_TOTAL);
+    var elC = document.getElementById(ID_CTRL);
+    var elW = document.getElementById(ID_WHEN);
+    if (elT) elT.textContent = String(obj && obj.total != null ? obj.total : '—');
+    if (elC){
+      elC.textContent = shorten(CONTROLLER);
+      var base =
+        CHAIN_ID === 1        ? 'https://etherscan.io/address/' :
+        CHAIN_ID === 11155111 ? 'https://sepolia.etherscan.io/address/' :
+        CHAIN_ID === 5        ? 'https://goerli.etherscan.io/address/' :
+                                'https://etherscan.io/address/';
+      elC.href = base + CONTROLLER;
+    }
+    if (elW) elW.textContent = obj && obj.updatedMs ? new Date(obj.updatedMs).toLocaleString() : '—';
+  }
+
+  // ===== Infinite list =====
   var items = [];
   var continuation = null;
   var pageCount = 0;
@@ -99,7 +141,6 @@
     var s = root.querySelector('li[data-sentinel]');
     if (s) s.innerHTML = '<div class="pg-muted">'+text+'</div>';
   }
-
   function attachObserver(root){
     if (io) io.disconnect();
     var sentinel = ensureSentinel(root);
@@ -115,12 +156,12 @@
   function renderAll(root){
     root.innerHTML = '';
     if (!items.length){
-      root.innerHTML = '<li class="row"><div class="pg-muted">No recent mints yet.</div></li>';
+      root.innerHTML = '<li class="row"><div class="pg-muted">No recent stakes yet.</div></li>';
       applyVisibleRows(root);
       return;
     }
     items.forEach(function(it){
-      var meta = [ it.to ? '→ '+shorten(it.to) : null, it.time ? ago(it.time) : null ].filter(Boolean).join(' • ');
+      var meta = [ it.from ? shorten(it.from) + ' → ' + shorten(it.to) : null, it.time ? ago(it.time) : null ].filter(Boolean).join(' • ');
       var li = document.createElement('li');
       li.className = 'row';
       var href = txUrl(it.tx);
@@ -131,7 +172,7 @@
         li.addEventListener('click', function(){ if (FF.openFrogModal) FF.openFrogModal({ id: it.id }); });
       }
       li.innerHTML = (FF.thumb64 ? FF.thumb64(it.img, 'Frog '+it.id) : '<img class="thumb64" src="'+it.img+'" alt="'+it.id+'">') +
-        '<div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b>Mint</b> • Frog #'+it.id+
+        '<div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b>Stake</b> • Frog #'+it.id+
         '</div><div class="pg-muted">'+meta+(href ? ' • Etherscan' : '')+'</div></div>';
       root.appendChild(li);
     });
@@ -142,9 +183,9 @@
   }
 
   function fetchPage(cont){
-    var qs = new URLSearchParams({ collection: COLLECTION, limit: String(PAGE_SIZE), types: 'mint' });
+    var qs = new URLSearchParams({ collection: COLLECTION, limit: String(PAGE_SIZE), types: 'transfer' });
     if (cont) qs.set('continuation', cont);
-    var url = API + '?' + qs.toString();
+    var url = API_ACTIVITY + '?' + qs.toString();
     return reservoirFetch(url).then(function(json){
       var rows = ((json && json.activities) || []).map(mapRow).filter(Boolean);
       return { rows: rows, continuation: json && json.continuation || null };
@@ -153,16 +194,23 @@
 
   function loadFirstPage(root){
     loading = true;
-    fetchPage(null).then(function(first){
-      items = first.rows.sort(function(a,b){ return (b.time && b.time.getTime() || 0) - (a.time && a.time.getTime() || 0); });
-      continuation = first.continuation;
-      pageCount = 1;
-      renderAll(root);
-      attachObserver(root);
-    }).catch(function(e){
-      console.warn('[mints] failed', e, e.url ? '\nURL: '+e.url : '');
-      root.innerHTML = '<li class="row"><div class="pg-muted">Could not load recent mints.</div></li>';
-    }).finally(function(){ loading = false; });
+    Promise.all([ fetchStakedTotal().catch(function(){ return 0; }), fetchPage(null) ])
+      .then(function(pair){
+        var total = pair[0];
+        var first = pair[1];
+        items = first.rows.sort(function(a,b){ return (b.time && b.time.getTime() || 0) - (a.time && a.time.getTime() || 0); });
+        continuation = first.continuation;
+        pageCount = 1;
+        renderAll(root);
+        setStats({ total: total, updatedMs: Date.now() });
+        attachObserver(root);
+      })
+      .catch(function(e){
+        console.warn('[stakes] failed', e, e.url ? '\nURL: '+e.url : '');
+        root.innerHTML = '<li class="row"><div class="pg-muted">Could not load recent stakes.</div></li>';
+        setStats({ total: '—', updatedMs: null });
+      })
+      .finally(function(){ loading = false; });
   }
 
   function loadNextPage(root){
@@ -173,8 +221,9 @@
       pageCount += 1;
       items = items.concat(next.rows).sort(function(a,b){ return (b.time && b.time.getTime() || 0) - (a.time && a.time.getTime() || 0); });
       renderAll(root);
+      fetchStakedTotal().then(function(n){ setStats({ total: n, updatedMs: Date.now() }); }).catch(function(){});
     }).catch(function(e){
-      console.warn('[mints] next page failed', e);
+      console.warn('[stakes] next page failed', e);
       setSentinelText(root, 'Could not load more.');
     }).finally(function(){ loading = false; });
   }
@@ -184,5 +233,5 @@
     loadFirstPage(root);
   }
 
-  window.FF_loadRecentMints = loadAndRender;
+  window.FF_loadRecentStakes = loadAndRender;
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});

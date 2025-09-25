@@ -62,36 +62,23 @@
     #mintMini .mint-mini__note{ margin-top:6px; font-size:12px; }
     @media (max-width:600px){ #mintMini .mint-mini__row{ grid-template-columns: 1fr 1fr; } #mintMini .mint-mini__total{ justify-self:start; } }
 
-    /* Recent Mints: JS sets max-height; enable scrolling */
-    #recentMints.scrolling{
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      padding-right: 4px;
+    /* Scrollable lists: JS sets max-height to N rows */
+    #recentMints.scrolling,
+    #recentStakes.scrolling{
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      padding-right:4px;
     }
-    #recentMints .row{ cursor:pointer; }
+    #recentMints .row, #recentStakes .row{ cursor:pointer; }
     @media (hover:hover){
-      #recentMints.scrolling::-webkit-scrollbar{ width:8px; }
-      #recentMints.scrolling::-webkit-scrollbar-thumb{
+      #recentMints.scrolling::-webkit-scrollbar,
+      #recentStakes.scrolling::-webkit-scrollbar{ width:8px; }
+      #recentMints.scrolling::-webkit-scrollbar-thumb,
+      #recentStakes.scrolling::-webkit-scrollbar-thumb{
         background: color-mix(in srgb, var(--muted) 35%, transparent);
         border-radius:8px;
       }
     }
-    /* Recent Mints: show N rows (JS sets max-height), scroll for more */
-#recentMints.scrolling{
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-right: 4px;
-}
-#recentMints .row{ cursor: pointer; }
-
-@media (hover:hover){
-  #recentMints.scrolling::-webkit-scrollbar{ width:8px; }
-  #recentMints.scrolling::-webkit-scrollbar-thumb{
-    background: color-mix(in srgb, var(--muted) 35%, transparent);
-    border-radius:8px;
-  }
-}
-
   </style>
 </head>
 <body>
@@ -111,8 +98,8 @@
         </div>
       </section>
 
-      <!-- Main card -->
-      <section class="pg-card centered-card l3-activity">
+      <!-- Fresh Frogs NFT -->
+      <section class="pg-card centered-card">
         <div class="pg-card-head"><h3>Fresh Frogs NFT</h3></div>
         <p class="pg-muted" style="margin:6px 0 12px 0; max-width:70ch;">
           Pixel-perfect frogs hopping around the Ethereum pond. Mint, stake to earn FLYZ, and explore the collection’s quirks and traits.
@@ -131,23 +118,57 @@
             <div class="mint-mini__price">
               <div class="k">Price</div><div class="v">0.01 ETH</div>
             </div>
-
             <div class="mint-mini__stepper" role="group" aria-label="Quantity">
               <button type="button" class="mini__btn" data-delta="-1" aria-label="Decrease">−</button>
               <input id="miniQty" class="mini__qty" type="text" inputmode="numeric" pattern="[0-9]*" value="1" aria-label="Quantity">
               <button type="button" class="mini__btn" data-delta="1" aria-label="Increase">+</button>
             </div>
-
             <button type="button" class="btn mini__mint">Mint</button>
             <div class="mint-mini__total">Total: <b id="miniTotal">0.01 ETH</b></div>
           </div>
           <div class="mint-mini__note pg-muted">Connect wallet to mint.</div>
         </section>
 
-        <!-- Recent Mints (live) -->
-        <!-- data-visible controls how many rows are visible before scrolling -->
+        <!-- Recent Mints (visible rows via data-visible; scroll for more) -->
         <ul id="recentMints" class="list" aria-live="polite" data-visible="6">
           <li class="row"><div class="pg-muted">Loading recent mints…</div></li>
+        </ul>
+      </section>
+
+      <!-- Recently Staked -->
+      <section class="pg-card centered-card" style="margin-top:12px;">
+        <div class="pg-card-head"><h3>Recently Staked</h3></div>
+        <p class="pg-muted" style="margin:6px 0 12px 0; max-width:70ch;">
+          Live feed of frogs newly staked into the controller.
+        </p>
+
+        <!-- Stats -->
+        <div class="info-grid-2" style="margin-bottom:10px;">
+          <div class="info-block">
+            <div class="ik">🪵 Total Frogs Staked</div>
+            <div class="iv" id="stakedTotal">—</div>
+            <div class="in">Across the collection</div>
+          </div>
+          <div class="info-block">
+            <div class="ik">🧰 Controller</div>
+            <div class="iv"><a id="stakedController" href="#" target="_blank" rel="noopener">—</a></div>
+            <div class="in">Staking contract</div>
+          </div>
+          <div class="info-block">
+            <div class="ik">⏱ Last Update</div>
+            <div class="iv" id="stakedUpdated">—</div>
+            <div class="in">Stats refresh time</div>
+          </div>
+          <div class="info-block">
+            <div class="ik">ℹ️ Notes</div>
+            <div class="iv">Transfers → Controller</div>
+            <div class="in">Click a row for Etherscan</div>
+          </div>
+        </div>
+
+        <!-- Recent Stakes (visible rows via data-visible; scroll for more) -->
+        <ul id="recentStakes" class="list" aria-live="polite" data-visible="6">
+          <li class="row"><div class="pg-muted">Loading recent stakes…</div></li>
         </ul>
       </section>
     </div>
@@ -196,14 +217,20 @@
     })();
   </script>
 
-  <!-- Your shared libs -->
+  <!-- Shared libs you already have -->
   <script src="assets/js/config.js"></script>
   <script src="assets/js/utils.js"></script>
   <script src="assets/js/rarity.js"></script>
   <script src="assets/js/modal.js"></script>
+  <script src="assets/js/pond.js"></script> <!-- optional; used if present -->
 
-  <!-- Recent Mints feed -->
+  <!-- New feeds -->
   <script src="assets/js/mints-feed.js"></script>
-  <script> FF_loadRecentMints && FF_loadRecentMints(); </script>
+  <script src="assets/js/stakes-feed.js"></script>
+
+  <script>
+    FF_loadRecentMints && FF_loadRecentMints();
+    FF_loadRecentStakes && FF_loadRecentStakes();
+  </script>
 </body>
 </html>
