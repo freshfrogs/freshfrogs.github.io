@@ -9,6 +9,7 @@
   var COLLECTION = CFG.COLLECTION_ADDRESS;
   var REWARD_SYMBOL   = (CFG.REWARD_TOKEN_SYMBOL || '$FLYZ');
   var REWARD_DECIMALS = Number.isFinite(Number(CFG.REWARD_DECIMALS)) ? Number(CFG.REWARD_DECIMALS) : 18;
+  var REWARDS_METHOD  = (CFG.REWARDS_METHOD || null); // optional override
   var BASEPATH = (CFG.SOURCE_PATH || '').replace(/\/+$/,'');
 
   function imgFor(id){ return BASEPATH + '/frog/' + id + '.png'; }
@@ -23,7 +24,7 @@
     return base + COLLECTION + '?a=' + id;
   }
 
-  // CSS
+  // CSS (scoped)
   (function injectCSS(){
     if (document.getElementById('owned-clean-css')) return;
     var el=document.createElement('style'); el.id='owned-clean-css';
@@ -44,7 +45,7 @@
     document.head.appendChild(el);
   })();
 
-  // Reservoir queue (IDs only)
+  // Reservoir queue
   if (!window.FF_RES_QUEUE){
     var RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 800);
     var BACKOFFS = Array.isArray(CFG.RETRY_BACKOFF_MS) ? CFG.RETRY_BACKOFF_MS : [900,1700,3200];
@@ -107,32 +108,16 @@
     return (out%1===0 ? out.toFixed(0) : out.toFixed(2));
   }
 
-  // Wallet & staking helpers
-  async function getConnectedAddress(){
-    try{
-      if (window.FF_WALLET && window.FF_WALLET.address) return window.FF_WALLET.address;
-      if (FF.wallet && FF.wallet.getAddress){ var a=await FF.wallet.getAddress(); if(a) return a; }
-      if (window.ethereum && window.ethereum.request){ var arr=await window.ethereum.request({method:'eth_accounts'}); return (arr && arr[0])||null; }
-    }catch(e){}
-    return null;
-  }
-  async function requestConnect(){
-    try{
-      if (FF.wallet && FF.wallet.connect){ var a=await FF.wallet.connect(); if(a) return a; }
-      if (window.ethereum && window.ethereum.request){ var arr=await window.ethereum.request({method:'eth_requestAccounts'}); return (arr && arr[0])||null; }
-    }catch(e){ toast('Connect failed'); }
-    throw new Error('No wallet provider found.');
-  }
+  // ==== Staking + Rewards ====
   function STK(){ return (FF.staking || window.FF_STAKING || {}); }
 
-  function normalizeIds(rows){
-    if (!Array.isArray(rows)) return [];
+  function extractId(any){
     function toNum(x){
       try{
         if(x==null) return NaN;
         if(typeof x==='number') return x;
         if(typeof x==='bigint') return Number(x);
-        if(typeof x==='string'){ if(/^0x/i.test(x)) return Number(BigInt(x)); return Number(x); }
+        if(typeof x==='string'){ if(/^0x/i.test(x)) return Number(BigInt(x)); const n=Number(x); return Number.isFinite(n)?n:NaN; }
         if(typeof x==='object'){
           if(typeof x.toString==='function' && x.toString!==Object.prototype.toString){ var s=x.toString(); if(/^\d+$/.test(s)) return Number(s); }
           if('_hex' in x) return Number(x._hex);
@@ -141,21 +126,43 @@
       }catch(e){}
       return NaN;
     }
-    return rows.map(function(r){
-      if (Array.isArray(r)) return toNum(r[0]);
-      if (typeof r==='string' || typeof r==='number' || typeof r==='bigint') return toNum(r);
-      if (typeof r==='object'){ var cand=r.tokenId || r.id || r.token_id || r.tokenID || r[0]; return toNum(cand); }
-      return NaN;
-    }).filter(function(n){ return Number.isFinite(n); });
+    var n = toNum(any); if (Number.isFinite(n)) return n;
+    if (any && typeof any==='object'){
+      var keys=['tokenId','id','token_id','tokenID','value','_value','0'];
+      for (var i=0;i<keys.length;i++){
+        var k=keys[i]; if (k in any){ var v=toNum(any[k]); if (Number.isFinite(v)) return v; }
+      }
+      if (Array.isArray(any)){
+        for (var j=0;j<any.length;j++){ var v2 = toNum(any[j]); if (Number.isFinite(v2)) return v2; }
+      }
+      for (var p in any){ if (!Object.prototype.hasOwnProperty.call(any,p)) continue;
+        var deep = extractId(any[p]); if (Number.isFinite(deep)) return deep;
+      }
+    }
+    return NaN;
+  }
+  function normalizeIds(rows){
+    if (!Array.isArray(rows)) {
+      if (rows && typeof rows==='object' && Array.isArray(rows.tokenIds)) return normalizeIds(rows.tokenIds);
+      return [];
+    }
+    var out=[];
+    for (var i=0;i<rows.length;i++){
+      var v=extractId(rows[i]); if (Number.isFinite(v)) out.push(v);
+    }
+    return out;
   }
 
   async function getStakedIds(addr){
     try{
-      if (typeof window.getStakedTokens === 'function'){ var raw1=await window.getStakedTokens(addr); return normalizeIds(raw1); }
-      var S = STK();
-      if (typeof S.getStakedTokens === 'function'){ var raw2=await S.getStakedTokens(addr); return normalizeIds(raw2); }
-      if (typeof S.getUserStakedTokens === 'function'){ var ids=await S.getUserStakedTokens(addr); return normalizeIds(ids); }
-      if (window.controller && window.controller.methods && window.controller.methods.getStakedTokens){ var raw3=await window.controller.methods.getStakedTokens(addr).call(); return normalizeIds(raw3); }
+      if (typeof window.getStakedTokens === 'function'){ var raw=await window.getStakedTokens(addr); var ids=normalizeIds(raw); console.log('[owned] window.getStakedTokens ->', ids.length); return ids; }
+      var S=STK();
+      if (typeof S.getStakedTokens === 'function'){ var raw2=await S.getStakedTokens(addr); var ids2=normalizeIds(raw2); console.log('[owned] STK.getStakedTokens ->', ids2.length); return ids2; }
+      if (typeof S.getUserStakedTokens === 'function'){ var ids3=await S.getUserStakedTokens(addr); var norm=normalizeIds(ids3); console.log('[owned] STK.getUserStakedTokens ->', norm.length); return norm; }
+      if (window.controller && window.controller.methods){
+        var method = (CFG.STAKED_METHOD || 'getStakedTokens');
+        if (window.controller.methods[method]){ var raw3=await window.controller.methods[method](addr).call(); var ids4=normalizeIds(raw3); console.log('[owned] controller.'+method+' ->', ids4.length); return ids4; }
+      }
     }catch(e){ console.warn('[owned] getStakedIds failed', e); }
     return [];
   }
@@ -177,35 +184,48 @@
     var keys=['approve','approveIfNeeded','requestApproval','setApproval'];
     for (var i=0;i<keys.length;i++){
       var k=keys[i];
-      if (typeof s[k]==='function'){ return s[k](); }
+      if (typeof s[k]==='function') return s[k]();
     }
     throw new Error('Approval helper not found.');
   }
 
   async function getRewards(addr){
     var s = STK();
-    var keys=['getAvailableRewards','getRewards','claimableRewards','getUnclaimedRewards'];
-    for (var i=0;i<keys.length;i++){
-      var k=keys[i];
-      if (typeof s[k]==='function'){
-        try{ return await s[k](addr); }catch(e){}
+    // 1) explicit override first
+    if (REWARDS_METHOD){
+      try{
+        if (s[REWARDS_METHOD]){ console.log('[owned] rewards via STK.'+REWARDS_METHOD); return await s[REWARDS_METHOD](addr); }
+        if (window.controller && window.controller.methods && window.controller.methods[REWARDS_METHOD]){
+          console.log('[owned] rewards via controller.'+REWARDS_METHOD);
+          return await window.controller.methods[REWARDS_METHOD](addr).call();
+        }
+      }catch(e){ console.warn('[owned] override rewards failed', e); }
+    }
+    // 2) common staking helpers
+    var helpers=['getAvailableRewards','getRewards','claimableRewards','getUnclaimedRewards','pendingRewards','rewardsOf','earned','balanceOfRewards'];
+    for (var i=0;i<helpers.length;i++){
+      var k=helpers[i];
+      try{
+        if (typeof s[k]==='function'){ console.log('[owned] rewards via STK.'+k); return await s[k](addr); }
+      }catch(e){}
+    }
+    // 3) direct controller call variants
+    if (window.controller && window.controller.methods){
+      var meths=['getAvailableRewards','pendingRewards','earned','rewardsOf','getRewards'];
+      for (var j=0;j<meths.length;j++){
+        var m = meths[j];
+        try{
+          if (window.controller.methods[m]){ console.log('[owned] rewards via controller.'+m); return await window.controller.methods[m](addr).call(); }
+        }catch(e){}
       }
     }
-    try{
-      if (window.controller && window.controller.methods && window.controller.methods.getAvailableRewards){
-        return await window.controller.methods.getAvailableRewards(addr).call();
-      }
-    }catch(e){}
     return null;
   }
 
   async function claimRewards(){
     var s = STK();
     var keys=['claimRewards','claim','harvest'];
-    for (var i=0;i<keys.length;i++){
-      var k=keys[i];
-      if (typeof s[k]==='function') return s[k]();
-    }
+    for (var i=0;i<keys.length;i++){ var k=keys[i]; if (typeof s[k]==='function') return s[k](); }
     throw new Error('Claim helper not found.');
   }
 
@@ -292,6 +312,7 @@
     try{ _approved = addr ? await isApproved(addr) : null; }catch(e){ _approved=null; }
     try{ stakedIdsGlobal = addr ? await getStakedIds(addr) : []; _stakedCount = stakedIdsGlobal.length; }catch(e){ stakedIdsGlobal=[]; _stakedCount='—'; }
     try{ var raw = addr ? await getRewards(addr) : null; _rewardsPretty = formatToken(raw, REWARD_DECIMALS); }catch(e){ _rewardsPretty='—'; }
+    console.log('[owned] KPIs ->', { approved:_approved, staked:_stakedCount, rewards:_rewardsPretty });
     renderHeader(); syncHeights();
   }
 
@@ -340,7 +361,7 @@
     renderHeader(); syncHeights();
   }
 
-  // Owned IDs page (IDs only)
+  // Owned IDs page (IDs only; metadata is local JSON)
   async function fetchOwnedIdsPage(address){
     try{
       var qs = new URLSearchParams({ collection: COLLECTION, limit:String(PAGE_SIZE), includeTopBid:'false', includeAttributes:'false' });
@@ -358,7 +379,7 @@
     }
   }
 
-  // Ranks
+  // Ranks (optional)
   async function ensureRanks(){
     if (FF.RANKS) return FF.RANKS;
     try{
@@ -380,7 +401,6 @@
     stakedIdsGlobal.forEach(function(id){ idSet.add(id); });
     var allIds = Array.from(idSet);
 
-    // metadata
     items = [];
     for (var i=0;i<allIds.length;i++){
       var id = allIds[i];
@@ -428,6 +448,22 @@
     await Promise.all([ refreshHeaderStats(), loadFirstPage(address) ]);
   }
 
+  async function getConnectedAddress(){
+    try{
+      if (window.FF_WALLET && window.FF_WALLET.address) return window.FF_WALLET.address;
+      if (FF.wallet && FF.wallet.getAddress){ var a=await FF.wallet.getAddress(); if(a) return a; }
+      if (window.ethereum && window.ethereum.request){ var arr=await window.ethereum.request({method:'eth_accounts'}); return (arr && arr[0])||null; }
+    }catch(e){}
+    return null;
+  }
+  async function requestConnect(){
+    try{
+      if (FF.wallet && FF.wallet.connect){ var a=await FF.wallet.connect(); if(a) return a; }
+      if (window.ethereum && window.ethereum.request){ var arr=await window.ethereum.request({method:'eth_requestAccounts'}); return (arr && arr[0])||null; }
+    }catch(e){ toast('Connect failed'); }
+    throw new Error('No wallet provider found.');
+  }
+
   async function init(){
     // remove legacy info squares
     var olds = document.querySelectorAll('#ownedCard .info-grid-2');
@@ -457,7 +493,10 @@
       if (grid){ grid.innerHTML = '<div class="pg-muted">Connect your wallet to view owned frogs.</div>'; }
     }
 
-    syncHeights();
+    // keep heights aligned with The Pond card
+    function syncLater(){ syncHeights(); }
+    setTimeout(syncLater, 50);
+    window.addEventListener('resize', function(){ setTimeout(syncHeights,50); });
   }
 
   window.FF_initOwnedPanel = init;
