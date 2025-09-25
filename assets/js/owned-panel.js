@@ -1,4 +1,5 @@
-// assets/js/owned-panel.js — Layout B only; shows staked frogs; synced height + internal scroll.
+// assets/js/owned-panel.js — Layout B only; uses getStakedTokens(); bullets for attributes;
+// header actions pruned; Connect button turns/stays green with address.
 
 (function (FF, CFG) {
   const SEL = { card:'#ownedCard', grid:'#ownedGrid', btnConn:'#ownedConnectBtn' };
@@ -9,7 +10,7 @@
   const PAGE_SIZE = Math.max(1, Math.min(50, Number(CFG.OWNED_PAGE_SIZE || CFG.PAGE_SIZE || 12)));
   const COLLECTION = CFG.COLLECTION_ADDRESS;
 
-  /* ========== Styles: Layout B (clean inline bar) + internal scroll ========== */
+  /* ===== CSS: clean header + internal scroll + bullets + green Connect ===== */
   (function injectCSS(){
     if (document.getElementById('owned-b-css')) return;
     const css = `
@@ -18,6 +19,7 @@
 #ownedCard .oh-spacer{flex:1}
 #ownedCard .oh-muted{color:var(--muted)}
 #ownedCard .oh-mini{font-size:11px;line-height:1}
+/* header buttons (Approve/Claim) */
 #ownedCard .oh-btn{
   font-family:var(--font-ui);border:1px solid var(--border);background:transparent;color:inherit;
   border-radius:8px;padding:6px 10px;font-weight:700;font-size:12px;line-height:1;
@@ -30,9 +32,20 @@
   border-color: color-mix(in srgb,#22c55e 80%,var(--border));
   color: color-mix(in srgb,#ffffff 85%,#22c55e)
 }
-/* internal scroll area */
+/* top-right Connect Wallet button hover + connected state */
+#ownedCard .pg-card-head .btn:hover{
+  background: color-mix(in srgb,#22c55e 14%,var(--panel));
+  border-color: color-mix(in srgb,#22c55e 80%,var(--border));
+  color: color-mix(in srgb,#ffffff 85%,#22c55e)
+}
+#ownedCard .pg-card-head .btn.btn-connected{
+  background: color-mix(in srgb,#22c55e 18%,var(--panel));
+  border-color: color-mix(in srgb,#22c55e 85%,var(--border));
+  color: color-mix(in srgb,#ffffff 90%,#22c55e)
+}
+/* internal scroll area + height sync */
 #ownedCard{display:flex;flex-direction:column}
-#ownedGrid{overflow:auto; -webkit-overflow-scrolling:touch; padding-right:4px}
+#ownedGrid{overflow:auto;-webkit-overflow-scrolling:touch;padding-right:4px}
 @media (hover:hover){
   #ownedGrid::-webkit-scrollbar{width:8px}
   #ownedGrid::-webkit-scrollbar-thumb{
@@ -40,11 +53,14 @@
     border-radius:8px;
   }
 }
+/* bullets instead of chips for card attributes */
+#ownedCard .attr-bullets{list-style:disc;margin:6px 0 0 18px;padding:0}
+#ownedCard .attr-bullets li{font-size:12px;margin:2px 0}
     `;
     const el=document.createElement('style'); el.id='owned-b-css'; el.textContent=css; document.head.appendChild(el);
   })();
 
-  /* ========== Shared Reservoir queue ========== */
+  /* ===== Reservoir queue ===== */
   if (!window.FF_RES_QUEUE){
     const RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 800);
     const BACKOFFS = Array.isArray(CFG.RETRY_BACKOFF_MS) ? CFG.RETRY_BACKOFF_MS : [900,1700,3200];
@@ -56,7 +72,7 @@
     window.FF_RES_QUEUE={ fetch:(url,init)=> (chain = chain.then(()=> run(url,init))) };
   }
 
-  /* ========== Utils ========== */
+  /* ===== Utils ===== */
   const $=(s,r=document)=>r.querySelector(s);
   const shorten=(a)=> (FF.shorten?.(a)) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
   const imgFor=(id)=> (CFG.SOURCE_PATH||'')+'/frog/'+id+'.png';
@@ -77,8 +93,7 @@
       if (typeof v==='bigint') return v;
       if (typeof v==='number') return BigInt(Math.trunc(v));
       if (typeof v==='string') return BigInt(v.split('.')[0]);
-    }catch{}
-    return null;
+    }catch{} return null;
   }
   function formatWei(v, decimals=18){
     const bi = toBigIntSafe(v); if (bi==null) return '—';
@@ -101,7 +116,7 @@
     return s+'s ago';
   }
 
-  /* ========== Wallet & staking helpers ========== */
+  /* ===== Wallet & staking helpers ===== */
   async function getConnectedAddress(){
     try{
       if (window.FF_WALLET?.address) return window.FF_WALLET.address;
@@ -117,6 +132,27 @@
     throw new Error('No wallet provider found.');
   }
   const STK = ()=> (FF.staking || window.FF_STAKING || {});
+
+  // >>> YOUR function (primary path):
+  async function getStakedTokens_user(addr){
+    try{
+      if (typeof window.getStakedTokens === 'function') return await window.getStakedTokens(addr);
+      if (typeof STK().getStakedTokens === 'function') return await STK().getStakedTokens(addr);
+    }catch{}
+    return null;
+  }
+  function idsFromGetStakedTokens(rows){
+    if (!Array.isArray(rows)) return [];
+    // accept many shapes: {tokenId}, {id}, ['3549',...], '3549', 3549
+    return rows.map(x=>{
+      if (x==null) return NaN;
+      if (typeof x==='number' || typeof x==='string') return Number(x);
+      if (Array.isArray(x)) return Number(x[0]);
+      if (typeof x==='object') return Number(x.tokenId ?? x.id ?? x.token_id);
+      return NaN;
+    }).filter(Number.isFinite);
+  }
+
   async function isApproved(addr){
     for (const k of ['isApproved','isApprovedForAll','checkApproval'])
       if (typeof STK()[k]==='function'){ try{ return !!await STK()[k](addr);}catch{} }
@@ -137,30 +173,21 @@
       if (typeof STK()[k]==='function') return STK()[k]();
     throw new Error('Claim helper not found.');
   }
-  async function getStakedIds(addr){
-    // Try several helper shapes you might already have
-    if (window.FF_WALLET?.stakedIds?.values) return Array.from(window.FF_WALLET.stakedIds.values());
-    for (const k of ['getStakedTokenIds','getUserStakedTokens','stakedTokenIds','stakedIds'])
-      if (typeof STK()[k]==='function'){ try{ return await STK()[k](addr);}catch{} }
-    return null;
-  }
   async function getStakeSinceMs(tokenId){
     const S = STK();
     try{
       if (typeof S.getStakeSince==='function'){ const v=await S.getStakeSince(tokenId); return Number(v)>1e12?Number(v):Number(v)*1000; }
       if (typeof S.getStakeInfo==='function'){ const i=await S.getStakeInfo(tokenId); const sec=i?.since??i?.stakedAt??i?.timestamp; if (sec!=null) return Number(sec)>1e12?Number(sec):Number(sec)*1000; }
       if (typeof S.stakeSince==='function'){ const sec=await S.stakeSince(tokenId); return Number(sec)>1e12?Number(sec):Number(sec)*1000; }
-    }catch{}
-    return null;
+    }catch{} return null;
   }
 
-  /* ========== State ========== */
+  /* ===== State ===== */
   let addr=null, continuation=null, items=[], loading=false, io=null, RANKS=null;
   let _stakedCount=null, _rewards=null, _rewardsPretty=null, _approved=null;
 
-  /* ========== Header (Layout B only) ========== */
+  /* ===== Header (Layout B only) ===== */
   function removeOldSquares(){
-    // remove the big info blocks under #ownedCard (no HTML edits needed)
     const card=$(SEL.card); if(!card) return;
     card.querySelectorAll('.info-grid-2').forEach(n=> n.remove());
   }
@@ -182,7 +209,6 @@
   function buildHeader(){
     const w = headerRoot(); if(!w) return;
     const d = headerData();
-    // Approve shown only when not approved; no OpenSea, no extra Connect; Claim label updated
     w.innerHTML =
       '<div class="oh-row oh-mini">'+
         '<span class="oh-muted">Wallet</span> <b id="ohWallet">'+d.walletShort+'</b>'+
@@ -200,39 +226,39 @@
   }
   async function renderHeader(){ buildHeader(); }
 
-  /* ========== Height sync (match Staking Activity card) ========== */
+  /* ===== Height sync (match left panel) ===== */
   function syncHeights(){
-    // Only on desktop two-column layout
     if (window.matchMedia('(max-width: 960px)').matches){ $('#ownedCard').style.height=''; $('#ownedGrid').style.maxHeight=''; return; }
     const cards = document.querySelectorAll('.page-grid > .pg-card');
     if (cards.length<2) return;
     const left = cards[0], right = $('#ownedCard');
     if (!left || !right) return;
-    // set the whole panel height to match left
     right.style.height = left.offsetHeight + 'px';
-    // compute header height to size the scroll area
     const header = right.querySelector('.oh-wrap');
     const headerH = header ? header.offsetHeight + 10 : 0;
-    const pad = 20; // inner paddings and safe gap
+    const pad = 20;
     const maxH = left.offsetHeight - headerH - pad;
     const grid = $('#ownedGrid'); if (grid) grid.style.maxHeight = Math.max(160, maxH) + 'px';
   }
   window.addEventListener('resize', ()=> setTimeout(syncHeights, 50));
 
-  /* ========== KPIs ========== */
+  /* ===== KPIs ===== */
   async function refreshHeaderStats(){
     try{ _approved = addr ? await isApproved(addr) : null; }catch{ _approved=null; }
-    try{ const ids = addr ? await getStakedIds(addr) : null; _stakedCount = Array.isArray(ids)?ids.length:'—'; }catch{ _stakedCount='—'; }
+    try{
+      const raw = addr ? await getStakedTokens_user(addr) : null;
+      const ids = idsFromGetStakedTokens(raw);
+      _stakedCount = Array.isArray(ids) ? ids.length : '—';
+    }catch{ _stakedCount='—'; }
     try{ _rewards = addr ? await getRewards(addr) : null; _rewardsPretty = _rewards==null?'—':formatWei(_rewards,18); }catch{ _rewards=null; _rewardsPretty='—'; }
     await renderHeader(); syncHeights();
   }
 
-  /* ========== Cards (unchanged UI) ========== */
-  function rankPill(rank){ return (rank||rank===0) ? '<span class="pill">Rank #'+rank+'</span>' : '<span class="pill"><span class="muted">Rank N/A</span></span>'; }
+  /* ===== Cards ===== */
   function attrsHTML(attrs, max=4){
     if (!Array.isArray(attrs)||!attrs.length) return '';
-    const chips=[]; for (const a of attrs){ if(!a.key||a.value==null) continue; chips.push('<li class="attr">'+a.key+': <b>'+String(a.value)+'</b></li>'); if(chips.length>=max) break; }
-    return chips.length? '<ul class="attr-list">'+chips.join('')+'</ul>' : '';
+    const rows=[]; for (const a of attrs){ if(!a.key||a.value==null) continue; rows.push('<li><b>'+a.key+':</b> '+String(a.value)+'</li>'); if(rows.length>=max) break; }
+    return rows.length? '<ul class="attr-bullets">'+rows.join('')+'</ul>' : '';
   }
   function fmtMeta(it){
     if (it.staked){ const ago = it.sinceMs ? fmtAgo(it.sinceMs) : null; return ago ? ('Staked '+ago+' • Owned by You') : 'Staked • Owned by You'; }
@@ -268,7 +294,6 @@
     });
   }
 
-  /* ========== Fetch & merge: owned + staked ========== */
   function mapTokenRow(trow){
     const t = trow?.token || {};
     const id = Number(t?.tokenId); if(!isFinite(id)) return null;
@@ -287,7 +312,6 @@
 
   async function fetchTokensByIds(ids){
     if (!Array.isArray(ids) || !ids.length) return [];
-    // reservoir /tokens/v7?tokens=0x...:id&tokens=0x...:id
     const qs = new URLSearchParams({ includeTopBid:'false', includeAttributes:'true' });
     ids.forEach(id => qs.append('tokens', COLLECTION + ':' + String(id)));
     const j = await window.FF_RES_QUEUE.fetch(TOKENS_API()+'?'+qs.toString());
@@ -302,15 +326,15 @@
   function renderCards(){
     const root=$(SEL.grid); if (!root) return;
     root.innerHTML='';
-    if (!items.length){ root.innerHTML='<div class="pg-muted">No frogs found for this wallet.</div>'; awaitHeaderOwned(0); syncHeights(); return; }
-    awaitHeaderOwned(items.length);
+    if (!items.length){ root.innerHTML='<div class="pg-muted">No frogs found for this wallet.</div>'; updateHeaderOwned(0); syncHeights(); return; }
+    updateHeaderOwned(items.length);
     items.forEach(it=>{
       const card=document.createElement('article');
       card.className='frog-card';
       card.setAttribute('data-token-id', String(it.id));
       card.innerHTML =
         '<img class="thumb" src="'+imgFor(it.id)+'" alt="'+it.id+'">'+
-        '<h4 class="title">Frog #'+it.id+' '+((it.rank||it.rank===0)?'<span class="pill">Rank #'+it.rank+'</span>':'<span class="pill"><span class="muted">Rank N/A</span></span>')+'</h4>'+
+        '<h4 class="title">Frog #'+it.id+' '+((it.rank||it.rank===0)?'<span class="pill">Rank #'+it.rank+'</span>':'')+'</h4>'+
         '<div class="meta">'+fmtMeta(it)+'</div>'+
         (attrsHTML(it.attrs,4))+
         '<div class="actions">'+
@@ -325,7 +349,7 @@
     });
     syncHeights();
   }
-  function awaitHeaderOwned(n){
+  function updateHeaderOwned(n){
     const el = document.getElementById('ohOwned'); if (el) el.textContent = String(n);
   }
 
@@ -339,22 +363,27 @@
 
   async function loadFirstPage(){
     try{
+      // owned page + ranks
       const [ownedRows, ranks] = await Promise.all([ fetchOwnedPage(), ensureRanks() ]);
-      // get staked ids and fetch metadata for those not in ownedRows
-      const stakedIds = Array.isArray(await getStakedIds(addr)) ? await getStakedIds(addr) : [];
+
+      // staked ids via YOUR function
+      const rawStaked = await getStakedTokens_user(addr);
+      const stakedIds = idsFromGetStakedTokens(rawStaked);
       _stakedCount = stakedIds.length;
+
+      // fetch metadata for staked not already in owned
       const ownedIds = new Set(ownedRows.map(r=> r.id));
       const missingStaked = stakedIds.filter(id=> !ownedIds.has(Number(id)));
       const stakedRows = missingStaked.length ? await fetchTokensByIds(missingStaked) : [];
 
-      // merge, mark flags & ranks
+      // merge + mark + rank
       const mark = (r, st)=> ({ id:r.id, attrs:r.attrs, staked:!!st, sinceMs:null, rank:(ranks||{})[String(r.id)] });
       items = ownedRows.map(r=> mark(r, stakedIds.includes(r.id))).concat(stakedRows.map(r=> mark(r, true)));
 
       await hydrateStakedSince(items.filter(x=> x.staked));
       renderCards();
 
-      // paging for additional OWNED (staked already covered)
+      // paging for additional OWNED
       const root=$(SEL.grid); if (!root) return;
       if (!continuation) { syncHeights(); return; }
       const sentinel=document.createElement('div'); sentinel.style.height='1px'; root.appendChild(sentinel);
@@ -364,7 +393,6 @@
         try{
           const more = await fetchOwnedPage();
           more.forEach(r=> r.rank=(FF.RANKS||{})[String(r.id)]);
-          // avoid duplicating already-present (owned or staked)
           const seen=new Set(items.map(x=>x.id));
           const fresh = more.filter(r=> !seen.has(r.id)).map(r=> ({...r, staked: stakedIds.includes(r.id), sinceMs:null, rank:(FF.RANKS||{})[String(r.id)] }));
           items = items.concat(fresh);
@@ -377,20 +405,34 @@
     }catch(e){
       console.warn('[owned] first page failed',e);
       const root=$(SEL.grid); if(root) root.innerHTML='<div class="pg-muted">Failed to load owned frogs.</div>';
-      awaitHeaderOwned('—'); syncHeights();
+      updateHeaderOwned('—'); syncHeights();
     }
   }
 
-  /* ========== Connect & Init ========== */
+  /* ===== Connect button behavior ===== */
+  function reflectConnectButton(){
+    const btn = document.getElementById('ownedConnectBtn');
+    if (!btn) return;
+    if (addr){
+      btn.classList.add('btn-connected');
+      btn.textContent = shorten(addr);
+    }else{
+      btn.classList.remove('btn-connected');
+      btn.textContent = 'Connect Wallet';
+    }
+  }
   async function handleConnectClick(ev){
     const btn = ev?.currentTarget; if (btn) btn.disabled = true;
     try{
       addr = await requestConnect();
       if(!addr){ toast('No address'); return; }
+      reflectConnectButton();
       await afterConnect();
     }catch(e){ toast('Connect failed'); }
     finally{ if (btn) btn.disabled=false; }
   }
+
+  /* ===== Init / Flow ===== */
   async function afterConnect(){
     await renderHeader();
     const grid=$(SEL.grid); if (grid) grid.innerHTML='<div class="pg-muted">Loading…</div>';
@@ -398,19 +440,20 @@
   }
 
   async function initOwned(){
-    // remove the big squares and build header
-    removeOldSquares();
+    // remove old big squares
+    const card=$(SEL.card); if(card) card.querySelectorAll('.info-grid-2').forEach(n=> n.remove());
     await renderHeader();
 
-    // keep the top-right inline "Connect Wallet" working
+    // wire top-right connect
     const inlineBtn = document.getElementById('ownedConnectBtn');
     if (inlineBtn){ inlineBtn.style.display='inline-flex'; inlineBtn.onclick = handleConnectClick; }
 
     addr = await getConnectedAddress();
+    reflectConnectButton();
+
     if (addr){ await afterConnect(); return; }
 
     const grid=$(SEL.grid); if (grid) grid.innerHTML='<div class="pg-muted">Connect your wallet to view owned frogs.</div>';
-    // even when not connected, keep panel heights aligned
     setTimeout(syncHeights, 50);
   }
 
