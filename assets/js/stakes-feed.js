@@ -238,3 +238,30 @@
     loadFirstPage(root);
   };
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
+// --- The Pond: heading + info-box tweaks ---
+(function(){
+  const card = document.querySelector('.page-grid > section.pg-card'); // left card
+  if (!card) return;
+
+  // Rename title to "The Pond"
+  const h = card.querySelector('.pg-card-head h3');
+  if (h) h.textContent = 'The Pond';
+
+  // Info blocks (assumes the same order as in your HTML)
+  const blocks = card.querySelectorAll('.info-block');
+  if (blocks[0]) {
+    // Total Frogs Staked (remove emoji)
+    const ik = blocks[0].querySelector('.ik'); if (ik) ik.textContent = 'Total Frogs Staked';
+  }
+  if (blocks[2]) {
+    // Replace "Last Update" with Rewards token details
+    const ik = blocks[2].querySelector('.ik');
+    const iv = blocks[2].querySelector('.iv');
+    const inn = blocks[2].querySelector('.in');
+    if (ik) ik.textContent = 'Rewards';
+    if (iv) iv.textContent = (window.FF_CFG?.REWARD_TOKEN_SYMBOL || '$FLYZ');
+    if (inn) inn.textContent = 'Earnings token';
+    // optional: give it an id if you want to update live later
+    blocks[2].id = 'pondRewardsBox';
+  }
+})();

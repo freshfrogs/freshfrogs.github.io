@@ -1,4 +1,5 @@
-// assets/js/owned-panel.js — Layout B; uses getStakedTokens(); bullets; no OpenSea on cards.
+// assets/js/owned-panel.js — Layout B; robust rewards; no wallet text in header;
+// no OpenSea on cards; bullets; staked via getStakedTokens(); connect button stays green with address.
 
 (function (FF, CFG) {
   const SEL = { card:'#ownedCard', grid:'#ownedGrid', btnConn:'#ownedConnectBtn' };
@@ -8,6 +9,8 @@
   const TOKENS_API      = ()=> BASE + '/tokens/v7';
   const PAGE_SIZE = Math.max(1, Math.min(50, Number(CFG.OWNED_PAGE_SIZE || CFG.PAGE_SIZE || 12)));
   const COLLECTION = CFG.COLLECTION_ADDRESS;
+  const REWARD_SYMBOL = (CFG.REWARD_TOKEN_SYMBOL || '$FLYZ');
+  const REWARD_DECIMALS = Number.isFinite(Number(CFG.REWARD_DECIMALS)) ? Number(CFG.REWARD_DECIMALS) : 18;
 
   // ---------- CSS ----------
   (function injectCSS(){
@@ -18,6 +21,7 @@
 #ownedCard .oh-spacer{flex:1}
 #ownedCard .oh-muted{color:var(--muted)}
 #ownedCard .oh-mini{font-size:11px;line-height:1}
+/* header buttons */
 #ownedCard .oh-btn{
   font-family:var(--font-ui);border:1px solid var(--border);background:transparent;color:inherit;
   border-radius:8px;padding:6px 10px;font-weight:700;font-size:12px;line-height:1;
@@ -84,9 +88,34 @@
   };
   const toast=(m)=>{ try{FF.toast?.(m);}catch{} console.log('[owned]',m); };
 
-  // rewards formatting
-  const toBigIntSafe=(v)=>{try{ if(typeof v==='bigint')return v; if(typeof v==='number')return BigInt(Math.trunc(v)); if(typeof v==='string')return BigInt(v.split('.')[0]); if(v&&typeof v.toString==='function') return BigInt(v.toString()); }catch{} return null;};
-  function formatWei(v,dec=18){ const bi=toBigIntSafe(v); if(bi==null) return '—'; const neg=bi<0n?'-':''; const abs=neg?-bi:bi; const base=10n**BigInt(dec); const whole=abs/base, frac=abs%base; if(whole>=100n) return neg+whole.toString(); const two=Number((frac*100n)/base); const out=Number(whole)+two/100; return (neg+out.toFixed(2)).replace(/\.00$/,''); }
+  // Rewards formatting (robust)
+  const toBigIntSafe=(v)=>{try{
+    if(typeof v==='bigint')return v;
+    if(typeof v==='number')return BigInt(Math.trunc(v));
+    if(typeof v==='string'){ if(/^\s*-?\d+(\.\d+)?\s*$/.test(v)) return BigInt(v.split('.')[0]); if(/^0x/i.test(v)) return BigInt(v); }
+    if(v&&typeof v.toString==='function' && v.toString!==Object.prototype.toString){ const s=v.toString(); if(/^\d+$/.test(s)) return BigInt(s); }
+    if(v&&typeof v._hex==='string') return BigInt(v._hex);
+  }catch{} return null;};
+  function formatWei(v,dec=REWARD_DECIMALS){
+    const bi=toBigIntSafe(v);
+    if(bi==null){
+      if (v && typeof v==='object'){
+        if ('formatted' in v) return String(v.formatted);
+        if ('value' in v && 'decimals' in v) return formatWei(v.value, Number(v.decimals));
+        if ('amount' in v && 'decimals' in v) return formatWei(v.amount, Number(v.decimals));
+      }
+      if (typeof v==='string' && v.includes('.')) return v; // already human
+      return '—';
+    }
+    const sign=bi<0n?'-':''; const abs=sign? -bi: bi;
+    const base=10n**BigInt(dec);
+    const whole=abs/base, frac=abs%base;
+    if(whole>=100n) return sign+whole.toString();
+    const cents=Number((frac*100n)/base);
+    const out=Number(whole)+cents/100;
+    return (sign+out.toFixed(2)).replace(/\.00$/,'');
+  }
+
   function fmtAgo(ms){ if(!ms||!isFinite(ms))return null; const s=Math.max(0,Math.floor((Date.now()-ms)/1000)); const d=Math.floor(s/86400); if(d>=1) return d+'d ago'; const h=Math.floor((s%86400)/3600); if(h>=1) return h+'h ago'; const m=Math.floor((s%3600)/60); if(m>=1) return m+'m ago'; return s+'s ago'; }
 
   // ---------- Wallet & staking helpers ----------
@@ -106,6 +135,14 @@
   }
 
   const STK = ()=> (FF.staking || window.FF_STAKING || {});
+  async function getStakedIds(addr){
+    try{
+      if (typeof window.getStakedTokens === 'function'){ const raw=await window.getStakedTokens(addr); return normalizeIds(raw); }
+      if (typeof STK().getStakedTokens === 'function'){ const raw=await STK().getStakedTokens(addr); return normalizeIds(raw); }
+      if (typeof STK().getUserStakedTokens === 'function'){ const ids=await STK().getUserStakedTokens(addr); return normalizeIds(ids); }
+    }catch(e){ console.warn('[owned] getStakedIds failed', e); }
+    return [];
+  }
   async function isApproved(addr){
     for (const k of ['isApproved','isApprovedForAll','checkApproval'])
       if (typeof STK()[k]==='function'){ try{ return !!await STK()[k](addr);}catch{} }
@@ -126,32 +163,30 @@
       if (typeof STK()[k]==='function') return STK()[k]();
     throw new Error('Claim helper not found.');
   }
-
-  // via adapter / direct global
-  async function getStakedIds(addr){
+  async function getStakeSinceMs(tokenId){
+    const S = STK();
     try{
-      if (typeof window.getStakedTokens === 'function'){ const raw = await window.getStakedTokens(addr); return normalizeIds(raw); }
-      if (typeof STK().getStakedTokens === 'function'){ const raw = await STK().getStakedTokens(addr); return normalizeIds(raw); }
-      if (typeof STK().getUserStakedTokens === 'function'){ const ids = await STK().getUserStakedTokens(addr); return normalizeIds(ids); }
-    }catch(e){ console.warn('[owned] getStakedIds failed', e); }
-    return [];
+      if (typeof S.getStakeSince==='function'){ const v=await S.getStakeSince(tokenId); return Number(v)>1e12?Number(v):Number(v)*1000; }
+      if (typeof S.getStakeInfo==='function'){ const i=await S.getStakeInfo(tokenId); const sec=i?.since??i?.stakedAt??i?.timestamp; if (sec!=null) return Number(sec)>1e12?Number(sec):Number(sec)*1000; }
+      if (typeof S.stakeSince==='function'){ const sec=await S.stakeSince(tokenId); return Number(sec)>1e12?Number(sec):Number(sec)*1000; }
+    }catch{} return null;
   }
-  // same normalizer as adapter
   function normalizeIds(rows){
     if (!Array.isArray(rows)) return [];
+    const toNum=(x)=>{ try{
+      if(x==null) return NaN;
+      if(typeof x==='number') return x;
+      if(typeof x==='bigint') return Number(x);
+      if(typeof x==='string'){ if(/^0x/i.test(x)) return Number(BigInt(x)); return Number(x); }
+      if(typeof x==='object'){
+        if(typeof x.toString==='function' && x.toString!==Object.prototype.toString){ const s=x.toString(); if(/^\d+$/.test(s)) return Number(s); }
+        if('_hex' in x) return Number(x._hex);
+        if('hex' in x) return Number(x.hex);
+      }
+      return NaN;
+    }catch{return NaN;} };
+
     return rows.map(r=>{
-      const toNum=(x)=>{ try{
-        if(x==null) return NaN;
-        if(typeof x==='number') return x;
-        if(typeof x==='bigint') return Number(x);
-        if(typeof x==='string') return Number(x);
-        if(typeof x==='object'){
-          if(typeof x.toString==='function' && x.toString!==Object.prototype.toString) return Number(x.toString());
-          if('_hex' in x) return Number(x._hex);
-          if('hex' in x) return Number(x.hex);
-        }
-        return NaN;
-      }catch{return NaN;} };
       if (Array.isArray(r)) return toNum(r[0]);
       if (typeof r==='string' || typeof r==='number' || typeof r==='bigint') return toNum(r);
       if (typeof r==='object'){ const cand=r.tokenId ?? r.id ?? r.token_id ?? r.tokenID ?? r[0]; return toNum(cand); }
@@ -161,20 +196,19 @@
 
   // ---------- State ----------
   let addr=null, continuation=null, items=[], loading=false, io=null;
-  let _stakedCount=null, _rewards=null, _rewardsPretty=null, _approved=null;
+  let _stakedCount=null, _rewardsPretty='—', _approved=null;
 
   // ---------- Header ----------
-  function removeOldSquares(){ const card=$(SEL.card); if(!card) return; card.querySelectorAll('.info-grid-2').forEach(n=> n.remove()); }
   function headerRoot(){ const card=$(SEL.card); if(!card) return null; let w=card.querySelector('.oh-wrap'); if(!w){ w=document.createElement('div'); w.className='oh-wrap'; card.insertBefore(w,$(SEL.grid,card)); } w.innerHTML=''; return w; }
-  function headerData(){ return { walletShort: addr?shorten(addr):'—', owned: items.length||0, staked: _stakedCount==null?'—':_stakedCount, rewards: _rewardsPretty ?? (_rewards==null?'—':String(_rewards)), approved: _approved }; }
+  function headerData(){ return { owned: items.length||0, staked: _stakedCount==null?'—':_stakedCount, rewards:_rewardsPretty, approved:_approved }; }
   function buildHeader(){
     const w=headerRoot(); if(!w) return; const d=headerData();
     w.innerHTML =
       '<div class="oh-row oh-mini">'+
-        '<span class="oh-muted">Wallet</span> <b id="ohWallet">'+d.walletShort+'</b>'+
-        '<span>•</span><span class="oh-muted">Owned</span> <b id="ohOwned">'+d.owned+'</b>'+
+        // NOTE: wallet removed per request
+        '<span class="oh-muted">Owned</span> <b id="ohOwned">'+d.owned+'</b>'+
         '<span>•</span><span class="oh-muted">Staked</span> <b id="ohStaked">'+d.staked+'</b>'+
-        '<span>•</span><span class="oh-muted">Unclaimed Rewards</span> <b id="ohRewards">'+d.rewards+'</b>'+
+        '<span>•</span><span class="oh-muted">Unclaimed Rewards</span> <b id="ohRewards">'+d.rewards+' '+REWARD_SYMBOL+'</b>'+
         '<span class="oh-spacer"></span>'+
         (d.approved===true ? '' : '<button class="oh-btn" id="ohApprove">Approve Staking</button>')+
         '<button class="oh-btn" id="ohClaim">Claim Rewards</button>'+
@@ -201,7 +235,10 @@
   async function refreshHeaderStats(){
     try{ _approved = addr ? await isApproved(addr) : null; }catch{ _approved=null; }
     try{ const ids = addr ? await getStakedIds(addr) : []; _stakedCount = Array.isArray(ids)?ids.length:'—'; }catch{ _stakedCount='—'; }
-    try{ _rewards = addr ? await getRewards(addr) : null; _rewardsPretty = _rewards==null?'—':formatWei(_rewards,18); }catch{ _rewards=null; _rewardsPretty='—'; }
+    try{
+      const raw = addr ? await getRewards(addr) : null;
+      _rewardsPretty = formatWei(raw, REWARD_DECIMALS);
+    }catch{ _rewardsPretty = '—'; }
     await renderHeader(); syncHeights();
   }
 
@@ -284,7 +321,7 @@
         '<div class="actions">'+
           '<button class="btn btn-outline-gray" data-act="'+(it.staked ? 'unstake' : 'stake')+'">'+(it.staked ? 'Unstake' : 'Stake')+'</button>'+
           '<button class="btn btn-outline-gray" data-act="transfer">Transfer</button>'+
-          // REMOVED OPENSEA BUTTON
+          // OpenSea removed
           '<a class="btn btn-outline-gray" href="'+etherscanToken(it.id)+'" target="_blank" rel="noopener">Etherscan</a>'+
           '<a class="btn btn-outline-gray" href="'+imgFor(it.id)+'" target="_blank" rel="noopener">Original</a>'+
         '</div>';
@@ -309,14 +346,16 @@
       const stakedIds = addr ? await getStakedIds(addr) : [];
       _stakedCount = stakedIds.length;
 
-      // fetch staked metadata; if fails, show minimal card fallback later
       let stakedRows = [];
-      try{ const missing = stakedIds.filter(id=> !ownedRows.some(r=> r.id===id)); stakedRows = missing.length ? await fetchTokensByIds(missing) : []; }catch{ stakedRows = []; }
+      try{
+        const missing = stakedIds.filter(id=> !ownedRows.some(r=> r.id===id));
+        stakedRows = missing.length ? await fetchTokensByIds(missing) : [];
+      }catch{ stakedRows = []; }
 
       const mark = (r, st)=> ({ id:r.id, attrs:r.attrs, staked:!!st, sinceMs:null, rank:(ranks||{})[String(r.id)] });
       items = ownedRows.map(r=> mark(r, stakedIds.includes(r.id))).concat(stakedRows.map(r=> mark(r,true)));
 
-      // Fallback: any staked IDs with no metadata at all → add minimal cards
+      // Fallback minimal cards for any staked id without metadata
       const seen = new Set(items.map(x=> x.id));
       stakedIds.forEach(id=>{ if(!seen.has(id)) items.push({ id, attrs:[], staked:true, sinceMs:null, rank:(ranks||{})[String(id)] }); });
 
@@ -368,12 +407,17 @@
     await Promise.all([ loadFirstPage(), refreshHeaderStats() ]);
   }
   async function initOwned(){
-    removeOldSquares();
+    // remove old big squares
+    const card=$(SEL.card); if(card) card.querySelectorAll('.info-grid-2').forEach(n=> n.remove());
     await renderHeader();
+
     const inlineBtn=document.getElementById('ownedConnectBtn'); if (inlineBtn){ inlineBtn.style.display='inline-flex'; inlineBtn.onclick=handleConnectClick; }
+
     addr = await getConnectedAddress();
     reflectConnectButton();
+
     if (addr){ await afterConnect(); return; }
+
     const grid=$(SEL.grid); if (grid) grid.innerHTML='<div class="pg-muted">Connect your wallet to view owned frogs.</div>';
     setTimeout(syncHeights,50);
   }
