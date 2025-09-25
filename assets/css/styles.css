@@ -358,3 +358,10 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
 }
 .stat-k{ font-size:12px; color:var(--muted); margin-bottom:6px; }
 .stat-v{ font-weight:800; }
+/* Show about 5 activity rows, scroll for more */
+#activityList.scrolling{
+  max-height: 440px;           /* ~5 rows */
+  overflow-y: auto;
+  padding-right: 4px;
+}
+#activityList .row{ cursor: pointer; }
