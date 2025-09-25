@@ -1,23 +1,71 @@
 // assets/js/mints-feed.js
-// Recent Mints — scrollable with pagination (Reservoir continuation) + Etherscan links
+// Recent Mints — uses pond.js helpers when available; otherwise Reservoir fallback.
+// Global queue prevents 429s across all modules on the page.
 (function (FF, CFG) {
   const UL_ID = 'recentMints';
+
+  // ==== Config ====
   const BASE  = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
   const API   = BASE + '/collections/activity/v6';
-  const PAGE_SIZE = Math.max(1, Math.min(50, Number(CFG.PAGE_SIZE || 50)));
+  const PAGE_SIZE = Math.max(1, Math.min(50, Number(CFG.PAGE_SIZE || 5))); // you have 5 in config
   const MAX_PAGES = Math.max(1, Number(CFG.MAX_PAGES || 8));
+  const CHAIN_ID  = Number(CFG.CHAIN_ID || 1);
 
-  function need(k){ if(!CFG[k]) throw new Error('[mints] Missing FF_CFG.'+k); return CFG[k]; }
-  const API_KEY    = need('FROG_API_KEY');
-  const COLLECTION = need('COLLECTION_ADDRESS');
-  const CHAIN_ID   = Number(CFG.CHAIN_ID || 1);
-
-  // Prefer repo header helper if present
+  // ==== Headers (prefer pond helper) ====
   function apiHeaders(){
-    if (typeof FF.apiHeaders === 'function') return FF.apiHeaders();
-    return { accept: 'application/json', 'x-api-key': API_KEY };
+    if (FF.apiHeaders && typeof FF.apiHeaders === 'function') return FF.apiHeaders();
+    return { accept: 'application/json', 'x-api-key': CFG.FROG_API_KEY };
   }
 
+  // ==== Global Reservoir queue (shared) ====
+  // Creates window.FF_RES_QUEUE once; both mints & stakes re-use it.
+  (function ensureQueue(){
+    if (window.FF_RES_QUEUE) return;
+    const RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 800); // >=800ms between requests
+    const BACKOFFS = Array.isArray(CFG.RETRY_BACKOFF_MS) ? CFG.RETRY_BACKOFF_MS : [900, 1700, 3200];
+    let lastAt = 0;
+    let chain = Promise.resolve();
+
+    async function spacedFetch(url, init){
+      const now = Date.now();
+      const elapsed = now - lastAt;
+      if (elapsed < RATE_MIN_MS) {
+        await new Promise(r=>setTimeout(r, RATE_MIN_MS - elapsed));
+      }
+      lastAt = Date.now();
+      return fetch(url, init);
+    }
+
+    async function run(url, init){
+      const hdrs = Object.assign({}, apiHeaders(), init && init.headers || {});
+      let attempt = 0;
+      while (true){
+        const res = await spacedFetch(url, { headers: hdrs });
+        if (res.status === 429) {
+          const back = BACKOFFS[Math.min(attempt, BACKOFFS.length-1)];
+          attempt++;
+          await new Promise(r=>setTimeout(r, back));
+          continue;
+        }
+        if (!res.ok){
+          const t = await res.text().catch(()=> '');
+          const err = new Error(`HTTP ${res.status}${t ? ' — '+t : ''}`);
+          err.url = url;
+          throw err;
+        }
+        return res.json();
+      }
+    }
+
+    window.FF_RES_QUEUE = {
+      fetch(url, init){
+        chain = chain.then(()=> run(url, init));
+        return chain;
+      }
+    };
+  })();
+
+  // ==== Utils ====
   const shorten = (a)=> (FF.shorten && FF.shorten(a)) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
   const ago     = (d)=> d ? (FF.formatAgo ? FF.formatAgo(Date.now()-d.getTime())+' ago' : d.toLocaleString()) : '';
   const imgFor  = (id)=> (CFG.SOURCE_PATH || '') + '/frog/' + id + '.png';
@@ -49,13 +97,29 @@
     root.style.maxHeight = Math.round(rowH * rows + gap * (rows - 1)) + 'px';
   }
 
-  function reservoirFetch(url){
-    return fetch(url, { headers: apiHeaders() }).then(res=>{
-      if (!res.ok) return res.text().then(t=>{ const e = new Error('HTTP '+res.status+(t?' — '+t:'')); e.url=url; throw e; });
-      return res.json();
-    });
+  // ==== pond.js adapters (try these first) ====
+  // We try multiple common names so we don't need to guess your exact function names.
+  async function pondFetchMints({ collection, limit, continuation }){
+    if (!FF.pond) return null;
+    // Candidates, in order:
+    const fns = [
+      FF.pond.fetchMintsActivity,
+      FF.pond.fetchMintActivity,
+      FF.pond.fetchActivityMints,
+      FF.pond.activityMints,
+      FF.pond.getMintActivity,
+      FF.pond.getActivityMints
+    ].filter(fn => typeof fn === 'function');
+    for (const fn of fns){
+      try {
+        const out = await fn({ collection, limit, continuation });
+        if (out) return out;
+      } catch(e){ /* try next */ }
+    }
+    return null;
   }
 
+  // ==== Reservoir fallback ====
   function mapRow(a){
     const tokenId = Number(a?.token?.tokenId);
     if (!isFinite(tokenId)) return null;
@@ -74,6 +138,23 @@
     return { id: tokenId, to: a?.toAddress || null, time: dt, img: imgFor(tokenId), tx: txHash };
   }
 
+  async function fetchPage(cont){
+    // Try pond.js first
+    const pond = await pondFetchMints({ collection: CFG.COLLECTION_ADDRESS, limit: PAGE_SIZE, continuation: cont });
+    if (pond){
+      const rows = (pond.activities || pond.rows || []).map(mapRow).filter(Boolean);
+      return { rows, continuation: pond.continuation || null };
+    }
+    // Fallback to Reservoir
+    const qs = new URLSearchParams({ collection: CFG.COLLECTION_ADDRESS, limit: String(PAGE_SIZE), types: 'mint' });
+    if (cont) qs.set('continuation', cont);
+    const url = API + '?' + qs.toString();
+    const json = await window.FF_RES_QUEUE.fetch(url); // queued, spaced, retried
+    const rows = (json?.activities || []).map(mapRow).filter(Boolean);
+    return { rows, continuation: json?.continuation || null };
+  }
+
+  // ==== Render + Infinite scroll ====
   let items = [];
   let continuation = null;
   let pageCount = 0;
@@ -104,7 +185,7 @@
       if (!entry || !entry.isIntersecting) return;
       if (loading || !continuation || pageCount >= MAX_PAGES) return;
       loadNextPage(root);
-    }, { root, rootMargin: '120px', threshold: 0.01 });
+    }, { root, rootMargin: '140px', threshold: 0.01 });
     io.observe(sentinel);
   }
 
@@ -112,67 +193,62 @@
     root.innerHTML = '';
     if (!items.length){
       root.innerHTML = '<li class="row"><div class="pg-muted">No recent mints yet.</div></li>';
-      applyVisibleRows(root);
-      return;
+    } else {
+      items.forEach(it=>{
+        const meta = [ it.to ? '→ '+shorten(it.to) : null, it.time ? ago(it.time) : null ].filter(Boolean).join(' • ');
+        const li = document.createElement('li');
+        li.className = 'row';
+        const href = txUrl(it.tx);
+        if (href){
+          li.title = 'View transaction on Etherscan';
+          li.addEventListener('click', ()=> window.open(href, '_blank', 'noopener'));
+        } else {
+          li.addEventListener('click', ()=> FF.openFrogModal && FF.openFrogModal({ id: it.id }));
+        }
+        li.innerHTML =
+          (FF.thumb64 ? FF.thumb64(it.img, 'Frog '+it.id) : '<img class="thumb64" src="'+it.img+'" alt="'+it.id+'">') +
+          '<div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b>Mint</b> • Frog #'+it.id+
+          '</div><div class="pg-muted">'+meta+(href ? ' • Etherscan' : '')+'</div></div>';
+        root.appendChild(li);
+      });
+      ensureSentinel(root);
+      setSentinelText(root, (!continuation || pageCount >= MAX_PAGES) ? 'End of results' : 'Loading more…');
     }
-    items.forEach(it=>{
-      const meta = [ it.to ? '→ '+shorten(it.to) : null, it.time ? ago(it.time) : null ].filter(Boolean).join(' • ');
-      const li = document.createElement('li');
-      li.className = 'row';
-      const href = txUrl(it.tx);
-      if (href){
-        li.title = 'View transaction on Etherscan';
-        li.addEventListener('click', ()=> window.open(href, '_blank', 'noopener'));
-      }else{
-        li.addEventListener('click', ()=> FF.openFrogModal && FF.openFrogModal({ id: it.id }));
-      }
-      li.innerHTML =
-        (FF.thumb64 ? FF.thumb64(it.img, 'Frog '+it.id) : '<img class="thumb64" src="'+it.img+'" alt="'+it.id+'">') +
-        '<div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b>Mint</b> • Frog #'+it.id+
-        '</div><div class="pg-muted">'+meta+(href ? ' • Etherscan' : '')+'</div></div>';
-      root.appendChild(li);
-    });
-    ensureSentinel(root);
-    setSentinelText(root, (!continuation || pageCount >= MAX_PAGES) ? 'End of results' : 'Loading more…');
     requestAnimationFrame(()=> applyVisibleRows(root));
   }
 
-  function fetchPage(cont){
-    const qs = new URLSearchParams({ collection: COLLECTION, limit: String(PAGE_SIZE), types: 'mint' });
-    if (cont) qs.set('continuation', cont);
-    const url = API + '?' + qs.toString();
-    return reservoirFetch(url).then(json=>{
-      const rows = (json?.activities || []).map(mapRow).filter(Boolean);
-      return { rows, continuation: json?.continuation || null };
-    });
-  }
-
-  function loadFirstPage(root){
+  async function loadFirstPage(root){
     loading = true;
-    fetchPage(null).then(first=>{
+    try{
+      const first = await fetchPage(null);
       items = first.rows.sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
       continuation = first.continuation;
       pageCount = 1;
       renderAll(root);
-      attachObserver(root);
-    }).catch(e=>{
+      setTimeout(()=> attachObserver(root), 150); // arm observer after initial paint
+    }catch(e){
       console.warn('[mints] failed', e, e.url ? '\nURL: '+e.url : '');
       root.innerHTML = '<li class="row"><div class="pg-muted">Could not load recent mints.</div></li>';
-    }).finally(()=>{ loading = false; });
+    }finally{
+      loading = false;
+    }
   }
 
-  function loadNextPage(root){
+  async function loadNextPage(root){
     if (!continuation || loading) return;
     loading = true;
-    fetchPage(continuation).then(next=>{
+    try{
+      const next = await fetchPage(continuation);
       continuation = next.continuation;
       pageCount += 1;
       items = items.concat(next.rows).sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
       renderAll(root);
-    }).catch(e=>{
+    }catch(e){
       console.warn('[mints] next page failed', e);
       setSentinelText(root, 'Could not load more.');
-    }).finally(()=>{ loading = false; });
+    }finally{
+      loading = false;
+    }
   }
 
   window.FF_loadRecentMints = function(){

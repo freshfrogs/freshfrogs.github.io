@@ -1,41 +1,74 @@
 // assets/js/stakes-feed.js
-// Recently Staked — scrollable with pagination + Etherscan links + stats
-// - Uses CONTROLLER_ADDRESS from FF_CFG
-// - Handles Reservoir 429 with spacing + retry backoff
+// Recently Staked — uses pond.js helpers when available; otherwise Reservoir fallback.
+// Shares the global request queue with mints (prevents 429s).
 (function (FF, CFG) {
   const UL_ID   = 'recentStakes';
   const ID_TOTAL= 'stakedTotal';
   const ID_CTRL = 'stakedController';
   const ID_WHEN = 'stakedUpdated';
 
-  function need(k){ if(!CFG[k]) throw new Error('[stakes] Missing FF_CFG.'+k); return CFG[k]; }
-
+  // ==== Config ====
   const BASE  = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
   const API_ACTIVITY = BASE + '/collections/activity/v6';
   const API_USERCOLL = (addr)=> BASE + '/users/' + addr + '/collections/v2';
-
-  const API_KEY    = need('FROG_API_KEY');
-  const COLLECTION = need('COLLECTION_ADDRESS');
-  const CONTROLLER = need('CONTROLLER_ADDRESS'); // ✅ your config key
+  const PAGE_SIZE  = Math.max(1, Math.min(50, Number(CFG.PAGE_SIZE || 5)));
+  const MAX_PAGES  = Math.max(1, Number(CFG.MAX_PAGES || 8));
   const CHAIN_ID   = Number(CFG.CHAIN_ID || 1);
 
-  const PAGE_SIZE  = Math.max(1, Math.min(50, Number(CFG.PAGE_SIZE || 5))); // your config uses 5
-  const MAX_PAGES  = Math.max(1, Number(CFG.MAX_PAGES || 8));
+  // ==== Required keys ====
+  const API_KEY    = CFG.FROG_API_KEY;
+  const COLLECTION = CFG.COLLECTION_ADDRESS;
+  const CONTROLLER = CFG.CONTROLLER_ADDRESS;
 
-  // -------- Headers (prefer repo helper) --------
+  if (!API_KEY || !COLLECTION || !CONTROLLER){
+    console.warn('[stakes] Missing config: FROG_API_KEY / COLLECTION_ADDRESS / CONTROLLER_ADDRESS');
+  }
+
+  // ==== Headers ====
   function apiHeaders(){
-    if (typeof FF.apiHeaders === 'function') return FF.apiHeaders();
+    if (FF.apiHeaders && typeof FF.apiHeaders === 'function') return FF.apiHeaders();
     return { accept: 'application/json', 'x-api-key': API_KEY };
   }
 
-  // -------- Small utils --------
+  // (global queue is created by mints-feed.js; if this file is first, create it here too)
+  if (!window.FF_RES_QUEUE){
+    const RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 800);
+    const BACKOFFS = Array.isArray(CFG.RETRY_BACKOFF_MS) ? CFG.RETRY_BACKOFF_MS : [900, 1700, 3200];
+    let lastAt = 0;
+    let chain = Promise.resolve();
+    async function spacedFetch(url, init){
+      const now = Date.now(), elapsed = now - lastAt;
+      if (elapsed < RATE_MIN_MS) await new Promise(r=>setTimeout(r, RATE_MIN_MS - elapsed));
+      lastAt = Date.now();
+      return fetch(url, init);
+    }
+    async function run(url, init){
+      const hdrs = Object.assign({}, apiHeaders(), init && init.headers || {});
+      let attempt = 0;
+      while (true){
+        const res = await spacedFetch(url, { headers: hdrs });
+        if (res.status === 429){
+          const back = BACKOFFS[Math.min(attempt, BACKOFFS.length-1)];
+          attempt++; await new Promise(r=>setTimeout(r, back)); continue;
+        }
+        if (!res.ok){
+          const t = await res.text().catch(()=> '');
+          const err = new Error(`HTTP ${res.status}${t ? ' — '+t : ''}`); err.url = url; throw err;
+        }
+        return res.json();
+      }
+    }
+    window.FF_RES_QUEUE = { fetch(url, init){ chain = chain.then(()=> run(url, init)); return chain; } };
+  }
+
+  // ==== Utils ====
   const shorten = (a)=> (FF.shorten && FF.shorten(a)) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
   const ago     = (d)=> d ? (FF.formatAgo ? FF.formatAgo(Date.now()-d.getTime())+' ago' : d.toLocaleString()) : '';
   const imgFor  = (id)=> (CFG.SOURCE_PATH || '') + '/frog/' + id + '.png';
 
   function txUrl(hash){
     if (!hash) return null;
-    if (CFG.ETHERSCAN_TX_BASE) return CFG.ETHERSCAN_TX_BASE.replace(/\/+$/, '') + '/' + hash;
+    if (CFG.ETHERSCAN_TX_BASE) return CFG.ETHERSCAN_TX_BASE.replace(/\/+$/,'') + '/' + hash;
     const base =
       CHAIN_ID === 1        ? 'https://etherscan.io/tx/' :
       CHAIN_ID === 11155111 ? 'https://sepolia.etherscan.io/tx/' :
@@ -60,46 +93,31 @@
     root.style.maxHeight = Math.round(rowH * rows + gap * (rows - 1)) + 'px';
   }
 
-  // -------- Simple rate-limit scheduler + retry on 429 --------
-  const RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 650); // >= 650ms between calls
-  const BACKOFFS = Array.isArray(CFG.RETRY_BACKOFF_MS) ? CFG.RETRY_BACKOFF_MS : [800, 1600, 3200]; // on 429
-
-  let lastAt = 0;
-  function wait(ms){ return new Promise(res=> setTimeout(res, ms)); }
-
-  async function spacedFetch(url, init){
-    const now = Date.now();
-    const elapsed = now - lastAt;
-    if (elapsed < RATE_MIN_MS) {
-      await wait(RATE_MIN_MS - elapsed);
+  // ==== pond.js adapters ====
+  async function pondFetchStakeActivity({ collection, controller, limit, continuation }){
+    if (!FF.pond) return null;
+    const fns = [
+      FF.pond.fetchStakeActivity,
+      FF.pond.activityStakes,
+      FF.pond.getStakeActivity,
+      FF.pond.fetchActivityStakes
+    ].filter(fn => typeof fn === 'function');
+    for (const fn of fns){
+      try {
+        const out = await fn({ collection, controller, limit, continuation });
+        if (out) return out;
+      } catch(e){ /* try next */ }
     }
-    lastAt = Date.now();
-    return fetch(url, init);
+    return null;
+  }
+  async function pondFetchStakedTotal(collection, controller){
+    if (FF.pond && typeof FF.pond.fetchStakedTotal === 'function'){
+      try { return await FF.pond.fetchStakedTotal(collection, controller); } catch(e){}
+    }
+    return null;
   }
 
-  async function reservoirFetch(url, opt={}){
-    const hdrs = Object.assign({}, apiHeaders(), opt.headers||{});
-    let attempt = 0;
-    while (true){
-      const res = await spacedFetch(url, { headers: hdrs });
-      if (res.status !== 429 && !res.ok){
-        const txt = await res.text().catch(()=> '');
-        const err = new Error(`HTTP ${res.status}${txt ? ' — '+txt : ''}`);
-        err.url = url;
-        throw err;
-      }
-      if (res.status === 429){
-        const back = BACKOFFS[Math.min(attempt, BACKOFFS.length-1)];
-        attempt++;
-        // console.warn('[stakes] 429; retrying in', back, 'ms');
-        await wait(back);
-        continue;
-      }
-      return res.json();
-    }
-  }
-
-  // -------- Map activity -> "stakes": transfer TO controller (exclude zero->controller) --------
+  // ==== Fallbacks ====
   function mapRow(a){
     if (String(a?.type || '').toLowerCase() !== 'transfer') return null;
     const to   = (a?.toAddress || '').toLowerCase();
@@ -107,7 +125,6 @@
     const zero = '0x0000000000000000000000000000000000000000';
     if (to !== String(CONTROLLER || '').toLowerCase()) return null;
     if (from === zero) return null;
-
     const tokenId = Number(a?.token?.tokenId);
     if (!isFinite(tokenId)) return null;
 
@@ -117,19 +134,34 @@
     else if (typeof ts === 'string'){ const p = Date.parse(ts); if (!isNaN(p)) dt = new Date(p); }
 
     const txHash = a?.txHash || a?.transactionHash || null;
-
     return { id: tokenId, from: a?.fromAddress || null, to: a?.toAddress || null, time: dt, img: imgFor(tokenId), tx: txHash };
   }
 
-  // -------- Stats (use pond.js helpers if available) --------
-  async function fetchStakedTotal(){
-    // Prefer FF.pond.fetchStakedTotal if available
-    if (FF.pond && typeof FF.pond.fetchStakedTotal === 'function'){
-      try { return await FF.pond.fetchStakedTotal(COLLECTION, CONTROLLER); } catch(e){}
+  async function fetchPage(cont){
+    // Try pond helper first
+    const pond = await pondFetchStakeActivity({
+      collection: COLLECTION, controller: CONTROLLER, limit: PAGE_SIZE, continuation: cont
+    });
+    if (pond){
+      const rows = (pond.activities || pond.rows || []).map(mapRow).filter(Boolean);
+      return { rows, continuation: pond.continuation || null };
     }
     // Reservoir fallback
+    const qs = new URLSearchParams({ collection: COLLECTION, limit: String(PAGE_SIZE), types: 'transfer' });
+    if (cont) qs.set('continuation', cont);
+    const url = API_ACTIVITY + '?' + qs.toString();
+    const json = await window.FF_RES_QUEUE.fetch(url);
+    const rows = (json?.activities || []).map(mapRow).filter(Boolean);
+    return { rows, continuation: json?.continuation || null };
+  }
+
+  async function fetchStakedTotal(){
+    const fromPond = await pondFetchStakedTotal(COLLECTION, CONTROLLER);
+    if (typeof fromPond === 'number') return fromPond;
+
+    // Reservoir fallback
     const url = API_USERCOLL(CONTROLLER) + '?collections=' + encodeURIComponent(COLLECTION) + '&limit=20';
-    const json = await reservoirFetch(url);
+    const json = await window.FF_RES_QUEUE.fetch(url);
     const rows = Array.isArray(json?.collections) ? json.collections : [];
     const row  = rows.find(r => String(r?.collection?.id || '').toLowerCase() === String(COLLECTION).toLowerCase());
     const n = Number(row?.ownership?.tokenCount || 0);
@@ -153,7 +185,7 @@
     if (elW) elW.textContent = obj?.updatedMs ? new Date(obj.updatedMs).toLocaleString() : '—';
   }
 
-  // -------- Infinite list state --------
+  // ==== Render + Infinite scroll ====
   let items = [];
   let continuation = null;
   let pageCount = 0;
@@ -184,7 +216,7 @@
       if (!entry || !entry.isIntersecting) return;
       if (loading || !continuation || pageCount >= MAX_PAGES) return;
       loadNextPage(root);
-    }, { root, rootMargin: '160px', threshold: 0.01 }); // larger margin so we prefetch sooner and smoother
+    }, { root, rootMargin: '140px', threshold: 0.01 });
     io.observe(sentinel);
   }
 
@@ -192,81 +224,51 @@
     root.innerHTML = '';
     if (!items.length){
       root.innerHTML = '<li class="row"><div class="pg-muted">No recent stakes yet.</div></li>';
-      applyVisibleRows(root);
-      return;
+    } else {
+      items.forEach(it=>{
+        const meta = [ it.from ? (shorten(it.from)+' → '+shorten(it.to)) : null, it.time ? ago(it.time) : null ]
+          .filter(Boolean).join(' • ');
+        const li = document.createElement('li');
+        li.className = 'row';
+        const href = txUrl(it.tx);
+        if (href){
+          li.title = 'View transaction on Etherscan';
+          li.addEventListener('click', ()=> window.open(href, '_blank', 'noopener'));
+        } else {
+          li.addEventListener('click', ()=> FF.openFrogModal && FF.openFrogModal({ id: it.id }));
+        }
+        li.innerHTML =
+          (FF.thumb64 ? FF.thumb64(it.img, 'Frog '+it.id) : '<img class="thumb64" src="'+it.img+'" alt="'+it.id+'">') +
+          '<div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b>Stake</b> • Frog #'+it.id+
+          '</div><div class="pg-muted">'+meta+(href ? ' • Etherscan' : '')+'</div></div>';
+        root.appendChild(li);
+      });
+      ensureSentinel(root);
+      setSentinelText(root, (!continuation || pageCount >= MAX_PAGES) ? 'End of results' : 'Loading more…');
     }
-    items.forEach(it=>{
-      const meta = [ it.from ? (shorten(it.from)+' → '+shorten(it.to)) : null, it.time ? ago(it.time) : null ]
-        .filter(Boolean).join(' • ');
-      const li = document.createElement('li');
-      li.className = 'row';
-      const href = txUrl(it.tx);
-      if (href){
-        li.title = 'View transaction on Etherscan';
-        li.addEventListener('click', ()=> window.open(href, '_blank', 'noopener'));
-      }else{
-        li.addEventListener('click', ()=> FF.openFrogModal && FF.openFrogModal({ id: it.id }));
-      }
-      li.innerHTML =
-        (FF.thumb64 ? FF.thumb64(it.img, 'Frog '+it.id) : '<img class="thumb64" src="'+it.img+'" alt="'+it.id+'">') +
-        '<div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b>Stake</b> • Frog #'+it.id+
-        '</div><div class="pg-muted">'+meta+(href ? ' • Etherscan' : '')+'</div></div>';
-      root.appendChild(li);
-    });
-
-    ensureSentinel(root);
-    setSentinelText(root, (!continuation || pageCount >= MAX_PAGES) ? 'End of results' : 'Loading more…');
-
-    // after DOM paints, compute height for N visible rows
     requestAnimationFrame(()=> applyVisibleRows(root));
-  }
-
-  // Optionally reuse a pond.js helper for activity (if present)
-  async function fetchPage(cont){
-    if (FF.pond && typeof FF.pond.fetchStakeActivity === 'function'){
-      // expected signature: fetchStakeActivity({ collection, controller, limit, continuation })
-      try {
-        const out = await FF.pond.fetchStakeActivity({
-          collection: COLLECTION,
-          controller: CONTROLLER,
-          limit: PAGE_SIZE,
-          continuation: cont
-        });
-        const rows = (out?.activities || out?.rows || []).map(mapRow).filter(Boolean);
-        return { rows, continuation: out?.continuation || null };
-      } catch (e) {
-        // fall through to Reservoir raw call
-      }
-    }
-
-    const qs = new URLSearchParams({ collection: COLLECTION, limit: String(PAGE_SIZE), types: 'transfer' });
-    if (cont) qs.set('continuation', cont);
-    const url = API_ACTIVITY + '?' + qs.toString();
-    const json = await reservoirFetch(url);
-    const rows = (json?.activities || []).map(mapRow).filter(Boolean);
-    return { rows, continuation: json?.continuation || null };
   }
 
   async function loadFirstPage(root){
     loading = true;
     try{
-      // 1) first page (avoid parallel to reduce 429 risk)
+      // First page (avoid doing stats in parallel to stay under rate cap)
       const first = await fetchPage(null);
       items = first.rows.sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
       continuation = first.continuation;
       pageCount = 1;
       renderAll(root);
 
-      // 2) stats shortly after (spaced by scheduler)
+      // Fetch stats second
       try {
         const total = await fetchStakedTotal();
         setStats({ total, updatedMs: Date.now() });
-      } catch(e) {
+      } catch {
         setStats({ total: '—', updatedMs: null });
       }
 
-      // 3) enable observer a tick later
-      setTimeout(()=> attachObserver(root), 100);
+      // Arm observer later to avoid immediate 2-in-1s burst
+      setTimeout(()=> attachObserver(root), 200);
     }catch(e){
       console.warn('[stakes] failed', e, e.url ? '\nURL: '+e.url : '');
       root.innerHTML = '<li class="row"><div class="pg-muted">Could not load recent stakes.</div></li>';
@@ -286,7 +288,7 @@
       items = items.concat(next.rows).sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
       renderAll(root);
 
-      // refresh total (spaced call)
+      // refresh stats (queued)
       try {
         const total = await fetchStakedTotal();
         setStats({ total, updatedMs: Date.now() });
@@ -301,6 +303,17 @@
 
   window.FF_loadRecentStakes = function(){
     const root = ul(); if (!root) return;
+    // Link Controller now (even before stats)
+    const a = document.getElementById(ID_CTRL);
+    if (a){
+      const base =
+        CHAIN_ID === 1        ? 'https://etherscan.io/address/' :
+        CHAIN_ID === 11155111 ? 'https://sepolia.etherscan.io/address/' :
+        CHAIN_ID === 5        ? 'https://goerli.etherscan.io/address/' :
+                                'https://etherscan.io/address/';
+      a.href = base + CONTROLLER;
+      a.textContent = (FF.shorten ? FF.shorten(CONTROLLER) : CONTROLLER);
+    }
     loadFirstPage(root);
   };
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
