@@ -1,22 +1,24 @@
 // assets/js/mints-feed.js
-// Recent Mints — scroll to see more (visible rows configurable) + Etherscan links
+// Recent Mints — scrollable with pagination (Reservoir continuation) + Etherscan links
 (function (FF, CFG) {
   const UL_ID = 'recentMints';
   const BASE  = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
   const API   = `${BASE}/collections/activity/v6`;
-  const PAGE  = Math.max(1, Number(CFG.PAGE_SIZE || 50)); // fetch plenty; scroll through all
+  const PAGE_SIZE = Math.max(1, Math.min(50, Number(CFG.PAGE_SIZE || 50))); // Reservoir max 50/page
+  const MAX_PAGES = Math.max(1, Number(CFG.MAX_PAGES || 5)); // safety cap
 
   function need(k){ if(!CFG[k]) throw new Error(`[mints] Missing FF_CFG.${k}`); return CFG[k]; }
   const API_KEY    = need('FROG_API_KEY');
   const COLLECTION = need('COLLECTION_ADDRESS');
   const CHAIN_ID   = Number(CFG.CHAIN_ID || 1);
 
-  const HDR      = { accept: 'application/json', 'x-api-key': API_KEY };
-  const shorten  = (a)=> FF.shorten?.(a) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
-  const ago      = (d)=> d ? (FF.formatAgo(Date.now()-d.getTime())+' ago') : '';
-  const imgFor   = (id)=> `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
+  const HDR = { accept: 'application/json', 'x-api-key': API_KEY };
 
-  // Etherscan tx URL (supports custom explorer base)
+  const shorten = (a)=> FF.shorten?.(a) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
+  const ago     = (d)=> d ? (FF.formatAgo(Date.now()-d.getTime())+' ago') : '';
+  const imgFor  = (id)=> `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
+
+  // Block explorer links (override with FF_CFG.ETHERSCAN_TX_BASE if needed)
   function txUrl(hash){
     if (!hash) return null;
     if (CFG.ETHERSCAN_TX_BASE) return `${CFG.ETHERSCAN_TX_BASE.replace(/\/+$/,'')}/${hash}`;
@@ -38,17 +40,16 @@
 
     const visible =
       Number(root.getAttribute('data-visible')) ||
-      Number(CFG.MINTS_VISIBLE || 6); // default 6 visible rows
+      Number(CFG.MINTS_VISIBLE || 6);
 
     const firstRow = root.querySelector('.row');
     if (!firstRow){ root.style.maxHeight = ''; return; }
 
-    const csUL  = getComputedStyle(root);
-    const gap   = parseFloat(csUL.gap || '0') || 0;
-    const rowH  = firstRow.getBoundingClientRect().height || 84;
-
-    const rows  = Math.max(1, visible);
-    const maxH  = rowH * rows + gap * (rows - 1);
+    const csUL = getComputedStyle(root);
+    const gap  = parseFloat(csUL.gap || '0') || 0;
+    const rowH = firstRow.getBoundingClientRect().height || 84;
+    const rows = Math.max(1, visible);
+    const maxH = rowH * rows + gap * (rows - 1);
 
     root.style.maxHeight = `${Math.round(maxH)}px`;
   }
@@ -63,18 +64,17 @@
     return res.json();
   }
 
-  // Only keep mints (or zero-address transfers)
+  // Keep only mints (or zero-address transfers)
   function mapRow(a){
     const tokenId = Number(a?.token?.tokenId);
     if (!Number.isFinite(tokenId)) return null;
 
     const from = (a?.fromAddress || '').toLowerCase();
     const zero = '0x0000000000000000000000000000000000000000';
-    const reportedType = (a?.type || '').toLowerCase();
-    const isMint = (reportedType === 'mint') || (from === zero);
+    const reported = (a?.type || '').toLowerCase();
+    const isMint = reported === 'mint' || from === zero;
     if (!isMint) return null;
 
-    // Timestamp
     const ts = a?.timestamp ?? a?.createdAt;
     let dt = null;
     if (typeof ts === 'number') dt = new Date(ts < 1e12 ? ts*1000 : ts);
@@ -91,22 +91,45 @@
     };
   }
 
-  async function fetchMints(limit = PAGE){
-    const qs = new URLSearchParams({
-      collection: COLLECTION,
-      limit: String(Math.min(50, Math.max(1, limit))),
-      types: 'mint'
-    });
-    const url = `${API}?${qs.toString()}`;
-    const json = await reservoirFetch(url);
-    const rows = (json?.activities || []).map(mapRow).filter(Boolean);
-    return rows.sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
+  // State for infinite scroll
+  let items = [];
+  let continuation = null;
+  let pageCount = 0;
+  let loading = false;
+  let io = null; // IntersectionObserver for sentinel
+
+  function ensureSentinel(root){
+    let s = root.querySelector('li[data-sentinel]');
+    if (!s){
+      s = document.createElement('li');
+      s.setAttribute('data-sentinel', 'true');
+      s.className = 'row';
+      s.style.justifyContent = 'center';
+      s.innerHTML = `<div class="pg-muted">Loading more…</div>`;
+      root.appendChild(s);
+    }
+    return s;
   }
 
-  function render(items){
-    const root = ul(); if (!root) return;
-    root.innerHTML = '';
+  function setSentinelText(root, text){
+    const s = root.querySelector('li[data-sentinel]');
+    if (s) s.innerHTML = `<div class="pg-muted">${text}</div>`;
+  }
 
+  function attachObserver(root){
+    if (io) io.disconnect();
+    const sentinel = ensureSentinel(root);
+    io = new IntersectionObserver(async (entries)=>{
+      const entry = entries[0];
+      if (!entry?.isIntersecting) return;
+      if (loading || !continuation || pageCount >= MAX_PAGES) return;
+      await loadNextPage(root); // appends more items
+    }, { root, rootMargin: '120px', threshold: 0.01 });
+    io.observe(sentinel);
+  }
+
+  function renderAll(root){
+    root.innerHTML = '';
     if (!items.length){
       root.innerHTML = `<li class="row"><div class="pg-muted">No recent mints yet.</div></li>`;
       applyVisibleRows(root);
@@ -138,22 +161,77 @@
            </div>
            <div class="pg-muted">${meta}${href ? ' • Etherscan' : ''}</div>
          </div>`;
-
       root.appendChild(li);
     });
 
-    // after items are in DOM, set the viewport height to N rows (scroll for more)
+    // Add/update sentinel at end
+    const s = ensureSentinel(root);
+    if (!continuation || pageCount >= MAX_PAGES){
+      setSentinelText(root, 'End of results');
+    } else {
+      setSentinelText(root, 'Loading more…');
+    }
+
+    // After DOM is ready, set viewport height to N rows (scroll enabled)
     requestAnimationFrame(()=> applyVisibleRows(root));
   }
 
-  async function loadAndRender(){
-    try { await FF.ensureRarity?.(); } catch { /* not required for mints */ }
-    try { render(await fetchMints(PAGE)); }
-    catch(e){
+  async function fetchPage(cont){
+    const qs = new URLSearchParams({
+      collection: COLLECTION,
+      limit: String(PAGE_SIZE),
+      types: 'mint'
+    });
+    if (cont) qs.set('continuation', cont);
+    const url = `${API}?${qs.toString()}`;
+    const json = await reservoirFetch(url);
+    return {
+      rows: (json?.activities || []).map(mapRow).filter(Boolean),
+      continuation: json?.continuation || null
+    };
+  }
+
+  async function loadFirstPage(root){
+    loading = true;
+    try{
+      const { rows, continuation: next } = await fetchPage(null);
+      items = rows.sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
+      continuation = next;
+      pageCount = 1;
+      renderAll(root);
+      attachObserver(root);
+    }catch(e){
       console.warn('[mints] failed', e, e.url ? `\nURL: ${e.url}` : '');
-      const root = ul(); if (root) root.innerHTML = `<li class="row"><div class="pg-muted">Could not load recent mints.</div></li>`;
+      root.innerHTML = `<li class="row"><div class="pg-muted">Could not load recent mints.</div></li>`;
+    }finally{
+      loading = false;
     }
   }
 
+  async function loadNextPage(root){
+    if (!continuation || loading) return;
+    loading = true;
+    try{
+      const { rows, continuation: next } = await fetchPage(continuation);
+      continuation = next;
+      pageCount += 1;
+      // Append and keep newest-first ordering
+      items = items.concat(rows).sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
+      renderAll(root);
+    }catch(e){
+      console.warn('[mints] next page failed', e);
+      setSentinelText(root, 'Could not load more.');
+    }finally{
+      loading = false;
+    }
+  }
+
+  async function loadAndRender(){
+    try { await FF.ensureRarity?.(); } catch { /* not required */ }
+    const root = ul(); if (!root) return;
+    await loadFirstPage(root);
+  }
+
+  // public
   window.FF_loadRecentMints = loadAndRender;
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
