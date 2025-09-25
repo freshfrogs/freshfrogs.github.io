@@ -4,7 +4,7 @@
   const UL_ID = 'recentMints';
   const BASE  = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
   const API   = `${BASE}/collections/activity/v6`;
-  const PAGE  = Math.max(1, Number(CFG.PAGE_SIZE || 40)); // fetch a good chunk
+  const PAGE  = Math.max(1, Number(CFG.PAGE_SIZE || 50)); // fetch plenty; scroll through all
 
   function need(k){ if(!CFG[k]) throw new Error(`[mints] Missing FF_CFG.${k}`); return CFG[k]; }
   const API_KEY    = need('FROG_API_KEY');
@@ -34,19 +34,18 @@
   function applyVisibleRows(root){
     if (!root) return;
     root.classList.add('scrolling');
-    root.style.overflowY = 'auto'; // ensure scroll is enabled
+    root.style.overflowY = 'auto';
 
     const visible =
       Number(root.getAttribute('data-visible')) ||
-      Number(CFG.MINTS_VISIBLE || 5);
+      Number(CFG.MINTS_VISIBLE || 6); // default 6 visible rows
 
-    // Need at least one real row in DOM to measure height/gap
     const firstRow = root.querySelector('.row');
     if (!firstRow){ root.style.maxHeight = ''; return; }
 
     const csUL  = getComputedStyle(root);
     const gap   = parseFloat(csUL.gap || '0') || 0;
-    const rowH  = firstRow.getBoundingClientRect().height || 84; // fallback
+    const rowH  = firstRow.getBoundingClientRect().height || 84;
 
     const rows  = Math.max(1, visible);
     const maxH  = rowH * rows + gap * (rows - 1);
@@ -143,12 +142,12 @@
       root.appendChild(li);
     });
 
-    // after items are in DOM, set the viewport height to N rows
+    // after items are in DOM, set the viewport height to N rows (scroll for more)
     requestAnimationFrame(()=> applyVisibleRows(root));
   }
 
   async function loadAndRender(){
-    try { await FF.ensureRarity?.(); } catch { /* not required */ }
+    try { await FF.ensureRarity?.(); } catch { /* not required for mints */ }
     try { render(await fetchMints(PAGE)); }
     catch(e){
       console.warn('[mints] failed', e, e.url ? `\nURL: ${e.url}` : '');

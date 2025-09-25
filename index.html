@@ -11,6 +11,7 @@
     /* Base */
     .pg-wrap{ padding:20px; }
     img{ image-rendering: pixelated; image-rendering: crisp-edges; }
+
     .pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
     .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
     .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
@@ -20,7 +21,7 @@
     .row{ display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:center; padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
     .thumb64{ width:64px; height:64px; min-width:64px; min-height:64px; border-radius:10px; object-fit:contain; background:var(--panel-2); }
 
-    /* Centered single-panel layout (fixed width like original) */
+    /* Centered single-panel layout (fixed width) */
     :root{ --panel-width: 640px; }
     .center-wrap{ display:grid; gap:16px; justify-items:center; }
     .centered-card{ width: min(var(--panel-width), 100%); }
@@ -43,7 +44,7 @@
     .info-block .iv{ font-weight:900; font-size:18px; line-height:1.1; margin-top:4px; }
     .info-block .in{ font-size:12px; color:var(--muted); }
 
-    /* Mint (Mini) inside the panel */
+    /* Mint (Mini) */
     #mintMini.mint-mini{
       border:1px solid var(--border); border-radius:12px; background: var(--panel);
       padding:10px; margin:8px 0 12px;
@@ -61,16 +62,27 @@
     #mintMini .mint-mini__note{ margin-top:6px; font-size:12px; }
     @media (max-width:600px){ #mintMini .mint-mini__row{ grid-template-columns: 1fr 1fr; } #mintMini .mint-mini__total{ justify-self:start; } }
 
-    /* Recent Mints list: show ~5 rows, scroll for more */
-    #recentMints.scrolling{ max-height: 440px; overflow-y:auto; padding-right:4px; }
+    /* Recent Mints: JS sets max-height; enable scrolling */
+    #recentMints.scrolling{
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-right: 4px;
+    }
     #recentMints .row{ cursor:pointer; }
+    @media (hover:hover){
+      #recentMints.scrolling::-webkit-scrollbar{ width:8px; }
+      #recentMints.scrolling::-webkit-scrollbar-thumb{
+        background: color-mix(in srgb, var(--muted) 35%, transparent);
+        border-radius:8px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="pg-wrap container">
     <div class="center-wrap">
 
-      <!-- HERO (reduced & centered) -->
+      <!-- HERO -->
       <section class="frog-hero">
         <h1 class="frog-title">freshfrogs.github.io</h1>
         <div class="frog-strip">
@@ -83,7 +95,7 @@
         </div>
       </section>
 
-      <!-- Fresh Frogs NFT (centered) -->
+      <!-- Main card -->
       <section class="pg-card centered-card l3-activity">
         <div class="pg-card-head"><h3>Fresh Frogs NFT</h3></div>
         <p class="pg-muted" style="margin:6px 0 12px 0; max-width:70ch;">
@@ -117,7 +129,8 @@
         </section>
 
         <!-- Recent Mints (live) -->
-        <ul id="recentMints" class="list" aria-live="polite">
+        <!-- data-visible controls how many rows are visible before scrolling -->
+        <ul id="recentMints" class="list" aria-live="polite" data-visible="6">
           <li class="row"><div class="pg-muted">Loading recent mints…</div></li>
         </ul>
       </section>
@@ -152,8 +165,7 @@
         totalEl.textContent = fmtETH(q * PRICE);
       }
       document.addEventListener('click', function(e){
-        var btn = e.target.closest('#mintMini .mini__btn');
-        if(!btn) return;
+        var btn = e.target.closest('#mintMini .mini__btn'); if(!btn) return;
         var qtyEl = document.getElementById('miniQty'); if(!qtyEl) return;
         var delta = parseInt(btn.getAttribute('data-delta'),10) || 0;
         qtyEl.value = clamp((parseInt(qtyEl.value||'1',10) || 1) + delta);
@@ -174,7 +186,7 @@
   <script src="assets/js/rarity.js"></script>
   <script src="assets/js/modal.js"></script>
 
-  <!-- New: Recent Mints feed -->
+  <!-- Recent Mints feed -->
   <script src="assets/js/mints-feed.js"></script>
   <script> FF_loadRecentMints && FF_loadRecentMints(); </script>
 </body>
