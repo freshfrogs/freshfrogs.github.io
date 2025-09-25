@@ -1,56 +1,36 @@
 // assets/js/activity-feed.js
-// Live Recent Activity for Fresh Frogs — uses FF + FF_CFG + Reservoir
 (function (FF, CFG) {
   const UL_ID = 'activityList';
-  const API   = 'https://api.reservoir.tools/collections/activity/v6'; // ✅ correct endpoint
+  const BASE  = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
+  const API   = `${BASE}/collections/activity/v6`;
   const PAGE  = Math.max(1, Number(CFG.PAGE_SIZE || 20));
 
-  function requireCfg(key){
-    const v = CFG[key];
-    if (!v) throw new Error(`[activity] Missing FF_CFG.${key} (check config.js)`);
-    return v;
-  }
-  const API_KEY   = requireCfg('FROG_API_KEY');
-  const COLLECTION= requireCfg('COLLECTION_ADDRESS');
+  function need(k){ if(!CFG[k]) throw new Error(`[activity] Missing FF_CFG.${k}`); return CFG[k]; }
+  const API_KEY    = need('FROG_API_KEY');
+  const COLLECTION = need('COLLECTION_ADDRESS');
 
-  const HDR = { accept: '*/*', 'x-api-key': API_KEY };
+  const HDR = { accept: 'application/json', 'x-api-key': API_KEY };
+
   const shorten = (a)=> FF.shorten?.(a) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
   const ago     = (d)=> d ? (FF.formatAgo(Date.now()-d.getTime())+' ago') : '';
   const imgFor  = (id)=> `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
 
   function ul(){ return document.getElementById(UL_ID); }
-  function pillRank(rank){
-    return (rank||rank===0)
-      ? `<span class="pill">Rank <b>#${rank}</b></span>`
-      : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
-  }
+  const pillRank = (rank)=> (rank||rank===0)
+    ? `<span class="pill">Rank <b>#${rank}</b></span>`
+    : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
 
-  async function reservoirFetch(url, retries=2, timeoutMs=9000){
-    for (let i=0; i<=retries; i++){
-      const ctrl = new AbortController();
-      const t = setTimeout(()=>ctrl.abort(new DOMException('Timeout')), timeoutMs);
-      try{
-        const res = await fetch(url, { headers: HDR, signal: ctrl.signal });
-        clearTimeout(t);
-        if (res.status === 429 && i < retries){
-          const ra = Number(res.headers.get('retry-after')) || (1<<i);
-          await new Promise(r=>setTimeout(r, ra*1000));
-          continue;
-        }
-        if (!res.ok){
-          if (i < retries){ await new Promise(r=>setTimeout(r, 300*(i+1))); continue; }
-          throw new Error(`HTTP ${res.status}`);
-        }
-        return await res.json();
-      }catch(e){
-        clearTimeout(t);
-        if (i === retries) throw e;
-        await new Promise(r=>setTimeout(r, 300*(i+1)));
-      }
+  async function reservoirFetch(url){
+    const res = await fetch(url, { headers: HDR });
+    if (!res.ok){
+      let body = null;
+      try { body = await res.text(); } catch {}
+      const err = new Error(`HTTP ${res.status}${body ? ` — ${body}` : ''}`);
+      err.url = url; throw err;
     }
+    return res.json();
   }
 
-  // Normalize a Reservoir collection-activity row
   function mapRow(a){
     const tokenId = Number(a?.token?.tokenId);
     if (!Number.isFinite(tokenId)) return null;
@@ -81,10 +61,9 @@
 
   async function fetchRecent(limit = PAGE){
     const qs = new URLSearchParams({
-      collections: COLLECTION,             // ✅ filter by collection
-      limit: String(Math.min(50, Math.max(1, limit))),
-      sortBy: 'eventTimestamp',
-      types: 'sale,transfer,mint'          // free mints appear here; paid mints via sales
+      collection: COLLECTION,                 // ✅ singular
+      limit: String(Math.min(50, Math.max(1, limit)))
+      // keep it minimal while debugging; add types/sortBy later if desired
     });
     const url = `${API}?${qs.toString()}`;
     const json = await reservoirFetch(url);
@@ -101,7 +80,6 @@
     }
     items.slice(0, PAGE).forEach(it=>{
       const rank = FF.getRankById?.(it.id);
-      const badge = pillRank(rank);
       const meta = [
         (it.from || it.to) ? [it.from ? shorten(it.from) : '—', it.to ? '→ '+shorten(it.to) : ''].join(' ') : null,
         (it.priceEth != null) ? `${it.priceEth} ETH` : null,
@@ -114,7 +92,7 @@
         FF.thumb64(it.img, `Frog ${it.id}`) +
         `<div>
            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-             <b>${it.type}</b> • Frog #${it.id} ${badge}
+             <b>${it.type}</b> • Frog #${it.id} ${pillRank(rank)}
            </div>
            <div class="pg-muted">${meta}</div>
          </div>`;
@@ -124,12 +102,10 @@
   }
 
   async function loadAndRender(){
-    try { await FF.ensureRarity?.(); } catch {}
-    try{
-      const list = await fetchRecent(PAGE);
-      render(list);
-    }catch(e){
-      console.warn('[activity] failed', e);
+    try { await FF.ensureRarity?.(); } catch (e) { console.warn('Rarity load failed (non-blocking)', e); }
+    try{ render(await fetchRecent(PAGE)); }
+    catch(e){
+      console.warn('[activity] failed', e, e.url ? `\nURL: ${e.url}` : '');
       const root = ul(); if (root) root.innerHTML = `<li class="row"><div class="pg-muted">Could not load activity.</div></li>`;
     }
   }
