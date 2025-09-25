@@ -1,31 +1,45 @@
 // assets/js/app-collection.js
-// FreshFrogs: single-file runtime for Collection page.
+// FreshFrogs collection runtime (single file)
 //
-// Fixes in this build:
-// - Adds RPC fallback (FF_CFG.RPC_URL or a default per CHAIN_ID) so The Pond works without a connected wallet.
-// - Shows explicit diagnostics in The Pond when RPC/addresses are missing.
-// - Keeps owned ∪ staked panel, KPIs, and actions intact.
+// Panels:
+//  - The Pond (recent activity): Reservoir-first (no wallet/RPC required)
+//      • Stake   = ERC721 Transfer(to == CONTROLLER_ADDRESS)
+//      • Unstake = ERC721 Transfer(from == CONTROLLER_ADDRESS)
+//      • (Optional) augment with RewardsClaimed via RPC logs if available
+//  - Owned ∪ Staked panel: merges Reservoir owned tokens with controller.getStakedTokens
+//      • Stake/Unstake/Claim actions
+//      • Unclaimed Rewards KPI
+//
+// Requirements in window.FF_CFG (from assets/js/config.js):
+//   CHAIN_ID, COLLECTION_ADDRESS, CONTROLLER_ADDRESS
+//   RESERVOIR_HOST, FROG_API_KEY (required for reliable owned + pond via Reservoir)
+//   SOURCE_PATH (where /frog/<id>.png and /frog/json/<id>.json live)
+//   REWARD_TOKEN_SYMBOL, REWARD_DECIMALS (optional defaults)
+//   RPC_URL (optional; only needed for claim-logs augmentation and contract reads if wallet not connected)
 
 (function(){
 'use strict';
 
 /* -------------------------------------------------------
-   Config + Web3 (with robust RPC fallback)
+   Config
 ------------------------------------------------------- */
 var C = window.FF_CFG = window.FF_CFG || {};
 var CHAIN_ID  = Number(C.CHAIN_ID || 1);
-var NFT_ADDR_RAW  = C.COLLECTION_ADDRESS || window.COLLECTION_ADDRESS || '';
-var CTRL_ADDR_RAW = C.CONTROLLER_ADDRESS || window.CONTROLLER_ADDRESS || '';
-var NFT_ADDR  = (NFT_ADDR_RAW || '').toLowerCase();
-var CTRL_ADDR = (CTRL_ADDR_RAW || '').toLowerCase();
+var NFT_ADDR_RAW  = C.COLLECTION_ADDRESS || '';
+var CTRL_ADDR_RAW = C.CONTROLLER_ADDRESS || '';
+var NFT_ADDR  = NFT_ADDR_RAW.toLowerCase();
+var CTRL_ADDR = CTRL_ADDR_RAW.toLowerCase();
 var RESV_HOST = (C.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
-var API_KEY   = C.FROG_API_KEY;
+var API_KEY   = C.FROG_API_KEY || '';
 var BASE_PATH = (C.SOURCE_PATH || '').replace(/\/+$/,'');
 var SYM       = C.REWARD_TOKEN_SYMBOL || '$FLYZ';
 var DEC       = Number.isFinite(Number(C.REWARD_DECIMALS)) ? Number(C.REWARD_DECIMALS) : 18;
 var PAGE      = Math.max(1, Math.min(50, Number(C.OWNED_PAGE_SIZE || C.PAGE_SIZE || 24)));
 var ACT_WINDOW = Number(C.ACTIVITY_BLOCK_WINDOW || 1500);
 
+/* -------------------------------------------------------
+   Web3 (optional; used for controller reads/writes + claims augmentation)
+------------------------------------------------------- */
 function defaultRpcFor(chainId){
   switch (Number(chainId||1)) {
     case 1:          return 'https://cloudflare-eth.com';
@@ -43,7 +57,7 @@ var WEB3 = window.web3;
     window.web3 = WEB3;
     return;
   }
-  // Fallback: public/provider RPC (READ-ONLY)
+  // Fallback RPC (read-only) to enable controller reads/claims augmentation without a wallet
   if (window.Web3) {
     var rpc = C.RPC_URL || defaultRpcFor(CHAIN_ID);
     try {
@@ -56,6 +70,9 @@ var WEB3 = window.web3;
   }
 })();
 
+/* -------------------------------------------------------
+   Helpers
+------------------------------------------------------- */
 function etherscanBase(kind){
   if (CHAIN_ID===1) return 'https://etherscan.io/'+kind+'/';
   if (CHAIN_ID===11155111) return 'https://sepolia.etherscan.io/'+kind+'/';
@@ -82,7 +99,7 @@ function formatToken(raw){
 }
 
 /* -------------------------------------------------------
-   ABI & controller (activity uses logs, not contract)
+   ABI & controller (for reads/writes; pond uses Reservoir)
 ------------------------------------------------------- */
 var CONTROLLER_ABI = window.CONTROLLER_ABI || window.controller_abi || window.FF_CONTROLLER_ABI || [
   {"inputs":[],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},
@@ -96,8 +113,8 @@ var CONTROLLER_ABI = window.CONTROLLER_ABI || window.controller_abi || window.FF
 ];
 
 var controller;
-if (WEB3 && CTRL_ADDR) {
-  try { controller = new WEB3.eth.Contract(CONTROLLER_ABI, CTRL_ADDR); } catch(e){ /* noop */ }
+if (WEB3 && CTRL_ADDR_RAW) {
+  try { controller = new WEB3.eth.Contract(CONTROLLER_ABI, CTRL_ADDR_RAW); } catch(e){ /* noop */ }
 }
 
 /* -------------------------------------------------------
@@ -188,136 +205,150 @@ async function unstakeToken(id){
 }
 
 /* -------------------------------------------------------
-   The Pond: activity via eth_getLogs (with diagnostics)
+   The Pond: Reservoir-first activity (stake/unstake)
+   - No wallet/RPC required
+   - Optional: augment with claim events via RPC logs
 ------------------------------------------------------- */
 var POND = (function(){
   var UL = '#recentStakes';
-  var busy=false, done=false, from=null, to=null;
+  var busy=false, done=false;
+  var continuation=null;
   var MAX_ROWS=250;
 
-  // topics
-  var T_TRANSFER = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+  var CTRL_LC = CTRL_ADDR;
+
+  // topic0 for optional claims
   var T_REWARD = (function(){
-    if (!WEB3 || !controller) return null;
-    try { return WEB3.utils.sha3('RewardsClaimed(address,uint256)'); }
+    try { return (WEB3 && WEB3.utils) ? WEB3.utils.sha3('RewardsClaimed(address,uint256)') : null; }
     catch(e){ return null; }
   })();
 
-  function numHexToDec(hex){ try{ return Number(BigInt(hex)); } catch(e){ return NaN; } }
-  async function latest(){ if (!WEB3?.eth) return null; return WEB3.eth.getBlockNumber(); }
-  async function getLogs(params){ if (!WEB3?.eth) return []; try{ return await WEB3.eth.getPastLogs(params); }catch(e){ return []; } }
+  function diag(msg){
+    var ul = document.querySelector(UL); if (!ul) return;
+    ul.innerHTML = '<li class="row"><div class="pg-muted">'+msg+'</div></li>';
+  }
 
   function rowHTML(e){
     var title = e.kind==='stake' ? 'Staked' : (e.kind==='unstake' ? 'Unstaked' : 'Claimed');
     var when = e.time ? new Date(e.time*1000).toLocaleString() : '—';
-    var img = BASE_PATH + '/frog/' + (e.id || 0) + '.png';
     var meta = e.kind==='claim'
       ? (shorten(e.user)+' claimed '+e.amountPretty)
       : (shorten(e.from)+' → '+shorten(e.to));
+    var lead = e.kind==='claim'
+      ? '<div class="thumb64" style="display:flex;align-items:center;justify-content:center">💰</div>'
+      : '<img class="thumb64" src="'+imgFor(e.id)+'" alt="'+e.id+'">';
     return (
       '<li class="row" data-kind="'+e.kind+'">'+
-        (e.id ? '<img class="thumb64" src="'+img+'" alt="'+e.id+'">' : '<div class="thumb64" style="display:flex;align-items:center;justify-content:center">💰</div>')+
+        lead+
         '<div><div><b>'+title+'</b>'+(e.id?(' Frog #'+e.id):'')+'</div>'+
         '<div class="pg-muted">'+when+' • '+meta+'</div></div>'+
       '</li>'
     );
   }
 
-  var timeCache = new Map();
-  async function stamp(events){
-    if (!WEB3?.eth) return events;
-    var blocks = Array.from(new Set(events.map(function(e){return e.blockNumber;})));
-    for (var i=0;i<blocks.length;i++){
-      var b = blocks[i];
-      if (!timeCache.has(b)){
-        var blk = await WEB3.eth.getBlock(b).catch(function(){ return null; });
-        timeCache.set(b, blk && blk.timestamp || null);
-      }
-    }
-    for (var j=0;j<events.length;j++){ events[j].time = timeCache.get(events[j].blockNumber)||null; }
-    return events;
-  }
-
-  function setKPIs(){
+  function setStaticKPIs(){
     var a=$('#stakedController');
     if (a && CTRL_ADDR_RAW){ a.textContent = shorten(CTRL_ADDR_RAW); a.href = escAddr(CTRL_ADDR_RAW); }
     var sym=$('#pondRewardsSymbol'); if (sym) sym.textContent = SYM;
   }
 
-  function showDiag(msg){
-    var ul = document.querySelector(UL); if (!ul) return;
-    ul.innerHTML = '<li class="row"><div class="pg-muted">'+msg+'</div></li>';
+  // -------- Reservoir transfers page
+  async function fetchReservoirPage(){
+    var url = new URL(RESV_HOST + '/transfers/v1');
+    url.searchParams.set('collection', NFT_ADDR_RAW);
+    url.searchParams.set('limit', '50');
+    url.searchParams.set('sortBy', 'timestamp');
+    url.searchParams.set('sortDirection', 'desc');
+    if (continuation) url.searchParams.set('continuation', continuation);
+
+    var headers = { accept:'application/json' };
+    if (API_KEY) headers['x-api-key'] = API_KEY;
+
+    var res = await fetch(url.toString(), { headers });
+    if (!res.ok) throw new Error('Reservoir transfers failed: '+res.status);
+    var j = await res.json();
+
+    var rows = Array.isArray(j.transfers) ? j.transfers
+             : (Array.isArray(j.activities) ? j.activities : []);
+    continuation = j.continuation || null;
+
+    var out = [];
+    for (var i=0;i<rows.length;i++){
+      var r = rows[i] || {};
+      var from = (r.from || r.fromAddress || '').toLowerCase();
+      var to   = (r.to || r.toAddress || '').toLowerCase();
+      var id   = Number(r.token?.tokenId || r.tokenId);
+      if (!Number.isFinite(id)) continue;
+
+      if (to === CTRL_LC){
+        out.push({ kind:'stake', id, from:r.from || r.fromAddress || '', to:r.to || r.toAddress || '', tx:r.txHash || r.txhash || r.transactionHash || '', time: Number(r.timestamp || r.blockTimestamp || (r.createdAt && Math.floor(new Date(r.createdAt).getTime()/1000))) || null });
+      } else if (from === CTRL_LC){
+        out.push({ kind:'unstake', id, from:r.from || r.fromAddress || '', to:r.to || r.toAddress || '', tx:r.txHash || r.txhash || r.transactionHash || '', time: Number(r.timestamp || r.blockTimestamp || (r.createdAt && Math.floor(new Date(r.createdAt).getTime()/1000))) || null });
+      }
+    }
+    return out;
   }
 
-  async function windowLoad(listEl){
+  // -------- Optional: claims via RPC (augmentation; not required)
+  async function fetchClaimsRPC(){
+    if (!WEB3?.eth || !T_REWARD || !CTRL_ADDR_RAW) return [];
+    try{
+      var tip = await WEB3.eth.getBlockNumber();
+      var from = Math.max(0, tip - Number(ACT_WINDOW));
+      var to   = tip;
+      var logs = await WEB3.eth.getPastLogs({
+        fromBlock: '0x'+from.toString(16),
+        toBlock:   '0x'+to.toString(16),
+        address: CTRL_ADDR_RAW,
+        topics: [ T_REWARD ]
+      });
+      var out=[];
+      for (var i=0;i<logs.length;i++){
+        var l = logs[i];
+        var user = '0x'+l.topics[1].slice(26);
+        var amt  = BigInt(l.data);
+        var blk  = await WEB3.eth.getBlock(l.blockNumber).catch(function(){ return null; });
+        out.push({ kind:'claim', user, amount: amt.toString(), amountPretty: formatToken(amt), tx: l.transactionHash, time: blk && blk.timestamp || null });
+      }
+      return out;
+    }catch(e){ return []; }
+  }
+
+  async function loadNext(listEl){
     if (busy || done) return;
     busy=true;
     try{
-      if (!WEB3?.eth) { showDiag('No RPC available. Set FF_CFG.RPC_URL or connect a wallet.'); done=true; return; }
-      if (!NFT_ADDR || !CTRL_ADDR){ showDiag('Missing collection or controller address in config.'); done=true; return; }
-
-      var tip = await latest(); if (tip==null){ showDiag('Could not read latest block.'); done=true; return; }
-      if (from==null){ to=tip; from=Math.max(0, to-ACT_WINDOW); }
-      else { to=from-1; if (to<=0){ done=true; return; } from=Math.max(0,to-ACT_WINDOW); }
-
-      var toTopic   = '0x000000000000000000000000'+CTRL_ADDR.slice(2);
-      var fromTopic = '0x000000000000000000000000'+CTRL_ADDR.slice(2);
-
-      // Stake: Transfer to controller
-      var logsStake = await getLogs({
-        fromBlock: '0x'+from.toString(16),
-        toBlock:   '0x'+to.toString(16),
-        address: NFT_ADDR_RAW, // keep original case; providers accept both
-        topics: [ T_TRANSFER, null, toTopic ]
-      });
-
-      // Unstake: Transfer from controller
-      var logsUnstake = await getLogs({
-        fromBlock: '0x'+from.toString(16),
-        toBlock:   '0x'+to.toString(16),
-        address: NFT_ADDR_RAW,
-        topics: [ T_TRANSFER, fromTopic ]
-      });
-
-      var rows=[], i, l, id;
-      for (i=0;i<logsStake.length;i++){
-        l=logsStake[i];
-        id = numHexToDec(l.topics[3]); // tokenId indexed
-        rows.push({ kind:'stake', id:id, from:'0x'+l.topics[1].slice(26), to:'0x'+l.topics[2].slice(26), tx:l.transactionHash, blockNumber:Number(l.blockNumber) });
+      if (!NFT_ADDR_RAW || !CTRL_ADDR_RAW){
+        diag('Missing FF_CFG.COLLECTION_ADDRESS or FF_CFG.CONTROLLER_ADDRESS'); done=true; return;
       }
-      for (i=0;i<logsUnstake.length;i++){
-        l=logsUnstake[i];
-        id = numHexToDec(l.topics[3]);
-        rows.push({ kind:'unstake', id:id, from:'0x'+l.topics[1].slice(26), to:'0x'+l.topics[2].slice(26), tx:l.transactionHash, blockNumber:Number(l.blockNumber) });
+      // Require API key for Reservoir-first experience
+      if (!API_KEY){
+        diag('Reservoir API key missing (FF_CFG.FROG_API_KEY).'); done=true; return;
       }
 
-      // Optional claims
-      if (controller && T_REWARD){
-        var logsClaim = await getLogs({
-          fromBlock: '0x'+from.toString(16),
-          toBlock:   '0x'+to.toString(16),
-          address: CTRL_ADDR_RAW,
-          topics: [ T_REWARD ]
-        });
-        for (i=0;i<logsClaim.length;i++){
-          l=logsClaim[i];
-          var user = '0x'+l.topics[1].slice(26);
-          var amt  = BigInt(l.data);
-          rows.push({ kind:'claim', user:user, amount:amt.toString(), amountPretty:formatToken(amt), tx:l.transactionHash, blockNumber:Number(l.blockNumber) });
-        }
-      }
+      var rows = await fetchReservoirPage();
 
-      if (rows.length){
-        rows.sort(function(a,b){ return b.blockNumber - a.blockNumber; });
-        rows = await stamp(rows);
-
+      // augment with claim events (non-blocking)
+      fetchClaimsRPC().then(function(claims){
+        if (!claims.length) return;
         var frag=document.createDocumentFragment();
-        for (i=0;i<rows.length;i++){
-          var li=document.createElement('li'); li.className='row'; li.innerHTML=rowHTML(rows[i]);
-          (function(tx){ li.addEventListener('click', function(){ window.open(escTx(tx), '_blank'); }); })(rows[i].tx);
+        claims.sort(function(a,b){ return (b.time||0)-(a.time||0); });
+        for (var i=0;i<claims.length;i++){
+          var li=document.createElement('li'); li.className='row'; li.innerHTML=rowHTML(claims[i]);
+          (function(tx){ li.addEventListener('click', function(){ window.open(escTx(tx),'_blank'); }); })(claims[i].tx);
           frag.appendChild(li);
         }
-        // append or replace first load
+        listEl.prepend(frag);
+      });
+
+      if (rows.length){
+        rows.sort(function(a,b){ return (b.time||0)-(a.time||0); });
+        var frag=document.createDocumentFragment();
+        for (var k=0;k<rows.length;k++){
+          var li=document.createElement('li'); li.className='row'; li.innerHTML=rowHTML(rows[k]);
+          (function(tx){ li.addEventListener('click', function(){ window.open(escTx(tx),'_blank'); }); })(rows[k].tx);
+          frag.appendChild(li);
+        }
         if (listEl.firstElementChild && listEl.firstElementChild.classList.contains('row') && listEl.firstElementChild.textContent.includes('Loading')) {
           listEl.innerHTML='';
         }
@@ -326,11 +357,13 @@ var POND = (function(){
         var lis=listEl.querySelectorAll('li.row');
         if (lis.length>MAX_ROWS){
           var excess = lis.length-MAX_ROWS;
-          for (i=0;i<excess;i++) listEl.removeChild(lis[i]);
+          for (var z=0; z<excess; z++) listEl.removeChild(lis[z]);
         }
       } else if (!listEl.querySelector('li.row')) {
-        showDiag('No activity found in the scanned window.');
+        diag('No activity found.');
       }
+
+      if (!continuation) done = true; // Reservoir paging finished
     } finally {
       busy=false;
     }
@@ -341,25 +374,15 @@ var POND = (function(){
     listEl.addEventListener('scroll', function(){
       if (busy || done) return;
       if (listEl.scrollTop + listEl.clientHeight >= listEl.scrollHeight - 80)
-        windowLoad(listEl);
+        loadNext(listEl);
     });
-    windowLoad(listEl).then(function(){ setTimeout(function(){ windowLoad(listEl); }, 120); });
+    loadNext(listEl).then(function(){ setTimeout(function(){ loadNext(listEl); }, 120); });
   }
 
   function init(){
-    var a=$('#stakedController'); if (a) { a.textContent='—'; a.removeAttribute('href'); }
-    setKPIs();
+    setStaticKPIs();
     var ul = document.querySelector(UL); if(!ul) return;
     ul.innerHTML = '<li class="row"><div class="pg-muted">Loading recent activity…</div></li>';
-
-    // Early diagnostics
-    if (!NFT_ADDR) { showDiag('Missing FF_CFG.COLLECTION_ADDRESS'); return; }
-    if (!CTRL_ADDR){ showDiag('Missing FF_CFG.CONTROLLER_ADDRESS'); return; }
-    if (!WEB3?.eth){
-      var rpcMsg = C.RPC_URL ? 'RPC_URL seems unreachable.' : 'No wallet or RPC available.';
-      showDiag(rpcMsg + ' Set FF_CFG.RPC_URL for fallback.');
-      return;
-    }
 
     attachScroll(ul);
   }
@@ -368,13 +391,31 @@ var POND = (function(){
 })();
 
 /* -------------------------------------------------------
-   Owned ∪ Staked Panel (unchanged logic)
+   Owned ∪ Staked Panel
 ------------------------------------------------------- */
 var OWNED = (function(){
   var SEL = { card:'#ownedCard', grid:'#ownedGrid', btn:'#ownedConnectBtn', more:'#ownedMore' };
 
   var idsStaked=[], items=[], cont=null;
   var rewards='—';
+
+  // Small scoped CSS for bullets + header
+  (function injectOwnedCSS(){
+    if (document.getElementById('owned-clean-css')) return;
+    var s=document.createElement('style'); s.id='owned-clean-css';
+    s.textContent=[
+      '#ownedCard .oh-wrap{margin-bottom:10px}',
+      '#ownedCard .oh-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}',
+      '#ownedCard .oh-mini{font-size:11px;line-height:1}',
+      '#ownedCard .oh-spacer{flex:1}',
+      '#ownedCard .oh-btn{font-family:var(--font-ui);border:1px solid var(--border);background:transparent;color:inherit;border-radius:8px;padding:6px 10px;font-weight:700;font-size:12px;line-height:1;display:inline-flex;align-items:center;gap:6px;text-decoration:none;letter-spacing:.01em;transition:background .15s,border-color .15s,color .15s,transform .05s}',
+      '#ownedCard .oh-btn:hover{background: color-mix(in srgb,#22c55e 14%,var(--panel));border-color: color-mix(in srgb,#22c55e 80%,var(--border));color: color-mix(in srgb,#ffffff 85%,#22c55e)}',
+      '#ownedGrid{overflow:auto;-webkit-overflow-scrolling:touch;padding-right:4px}',
+      '#ownedCard .attr-bullets{list-style:disc;margin:6px 0 0 18px;padding:0}',
+      '#ownedCard .attr-bullets li{font-size:12px;margin:2px 0}'
+    ].join('');
+    document.head.appendChild(s);
+  })();
 
   // Ranks (optional)
   async function ensureRanks(){
@@ -488,7 +529,7 @@ var OWNED = (function(){
     renderHeader(); syncHeights();
   }
 
-  // Data
+  // Data & fetch
   var META = new Map();
   async function fetchMeta(id){
     if (META.has(id)) return META.get(id);
@@ -505,10 +546,15 @@ var OWNED = (function(){
   function tokensApiUser(a){ return RESV_HOST + '/users/' + a + '/tokens/v8'; }
   async function fetchOwnedIdsPage(a){
     if (!NFT_ADDR_RAW) return [];
+    if (!API_KEY){
+      var grid = $('#ownedGrid');
+      if (grid) grid.innerHTML = '<div class="pg-muted">Reservoir API key missing. Set FF_CFG.FROG_API_KEY.</div>';
+      cont = null; return [];
+    }
     try{
       var qs = new URLSearchParams({ collection: NFT_ADDR_RAW, limit:String(PAGE), includeTopBid:'false', includeAttributes:'false' });
       if (cont) qs.set('continuation', cont);
-      var hdr = { accept:'application/json' }; if (API_KEY) hdr['x-api-key'] = API_KEY;
+      var hdr = { accept:'application/json', 'x-api-key': API_KEY };
       var r = await fetch(tokensApiUser(a)+'?'+qs.toString(), { headers: hdr });
       if (!r.ok) throw 0;
       var data = await r.json();
@@ -569,7 +615,7 @@ var OWNED = (function(){
   }
 
   async function init(){
-    // Remove legacy info grid if present
+    // Remove legacy info grid if present (prevents duplicate blocks)
     document.querySelectorAll('#ownedCard .info-grid-2').forEach(function(n){ n.remove(); });
 
     var btn = $('#ownedConnectBtn');
