@@ -1,10 +1,10 @@
 // assets/js/mints-feed.js
-// Recent Mints only — dynamic visible rows + Etherscan links
+// Recent Mints — scroll to see more (visible rows configurable) + Etherscan links
 (function (FF, CFG) {
   const UL_ID = 'recentMints';
   const BASE  = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
   const API   = `${BASE}/collections/activity/v6`;
-  const PAGE  = Math.max(1, Number(CFG.PAGE_SIZE || 20)); // fetch size
+  const PAGE  = Math.max(1, Number(CFG.PAGE_SIZE || 40)); // fetch a good chunk
 
   function need(k){ if(!CFG[k]) throw new Error(`[mints] Missing FF_CFG.${k}`); return CFG[k]; }
   const API_KEY    = need('FROG_API_KEY');
@@ -30,28 +30,26 @@
 
   function ul(){ return document.getElementById(UL_ID); }
 
-  // Dynamically set how many rows are visible (max-height = rows*rowHeight + gaps)
+  // Make the UL show exactly N rows, then allow scrolling for the rest
   function applyVisibleRows(root){
     if (!root) return;
     root.classList.add('scrolling');
-    const desired =
+    root.style.overflowY = 'auto'; // ensure scroll is enabled
+
+    const visible =
       Number(root.getAttribute('data-visible')) ||
       Number(CFG.MINTS_VISIBLE || 5);
 
-    // measure after content is in DOM
+    // Need at least one real row in DOM to measure height/gap
     const firstRow = root.querySelector('.row');
-    if (!firstRow) return; // nothing to measure yet
+    if (!firstRow){ root.style.maxHeight = ''; return; }
 
-    // get computed styles
-    const csUL   = getComputedStyle(root);
-    const csRow  = getComputedStyle(firstRow);
-    const gap    = parseFloat(csUL.gap || '0') || 0;
-    const rowH   = firstRow.getBoundingClientRect().height
-                || parseFloat(csRow.height || '0')
-                || 84; // fallback guess
+    const csUL  = getComputedStyle(root);
+    const gap   = parseFloat(csUL.gap || '0') || 0;
+    const rowH  = firstRow.getBoundingClientRect().height || 84; // fallback
 
-    const rows   = Math.max(1, desired);
-    const maxH   = rowH * rows + gap * (rows - 1);
+    const rows  = Math.max(1, visible);
+    const maxH  = rowH * rows + gap * (rows - 1);
 
     root.style.maxHeight = `${Math.round(maxH)}px`;
   }
@@ -66,7 +64,7 @@
     return res.json();
   }
 
-  // Normalize activity -> only mints
+  // Only keep mints (or zero-address transfers)
   function mapRow(a){
     const tokenId = Number(a?.token?.tokenId);
     if (!Number.isFinite(tokenId)) return null;
@@ -109,11 +107,13 @@
   function render(items){
     const root = ul(); if (!root) return;
     root.innerHTML = '';
+
     if (!items.length){
       root.innerHTML = `<li class="row"><div class="pg-muted">No recent mints yet.</div></li>`;
       applyVisibleRows(root);
       return;
     }
+
     items.forEach(it=>{
       const meta = [
         it.to ? `→ ${shorten(it.to)}` : null,
@@ -143,12 +143,12 @@
       root.appendChild(li);
     });
 
-    // set scroll window to N rows (after DOM is ready)
+    // after items are in DOM, set the viewport height to N rows
     requestAnimationFrame(()=> applyVisibleRows(root));
   }
 
   async function loadAndRender(){
-    try { await FF.ensureRarity?.(); } catch (e) { /* not required here */ }
+    try { await FF.ensureRarity?.(); } catch { /* not required */ }
     try { render(await fetchMints(PAGE)); }
     catch(e){
       console.warn('[mints] failed', e, e.url ? `\nURL: ${e.url}` : '');
