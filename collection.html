@@ -28,7 +28,7 @@
     }
     @media (max-width:960px){ .page-grid{ grid-template-columns: 1fr; } }
 
-    /* Hero (centered width) */
+    /* Hero (centered) */
     .frog-hero{ margin:28px auto 38px; max-width:1100px; }
     .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
     .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
@@ -57,7 +57,7 @@
       }
     }
 
-    /* Owned Frogs panel styles */
+    /* Owned Frogs panel (old look) */
     #ownedCard .grid-cards{ display:grid; gap:10px; grid-template-columns: 1fr; }
     .frog-card{
       border:1px solid var(--border);
@@ -103,7 +103,6 @@
 </head>
 <body>
   <div class="pg-wrap container">
-
     <!-- HERO -->
     <section class="frog-hero">
       <h1 class="frog-title">freshfrogs.github.io</h1>
@@ -117,10 +116,10 @@
       </div>
     </section>
 
-    <!-- PAGE GRID: Left (Fresh Frogs + Recent Stakes) | Right (Owned Frogs) -->
+    <!-- GRID -->
     <div class="page-grid">
 
-      <!-- Left: Fresh Frogs NFT + Recent Stakes (with stats) -->
+      <!-- Left: Fresh Frogs + Recent Stakes (with stats) -->
       <section class="pg-card">
         <div class="pg-card-head"><h3>Fresh Frogs NFT</h3></div>
         <p class="pg-muted" style="margin:6px 0 12px 0; max-width:70ch;">
@@ -157,16 +156,14 @@
         </ul>
       </section>
 
-      <!-- Right: Owned Frogs -->
+      <!-- Right: Owned Frogs (old rich card style) -->
       <section id="ownedCard" class="pg-card">
         <div class="pg-card-head">
           <h3>My Frogs (Owned)</h3>
-          <div>
-            <button id="ownedConnectBtn" class="btn">Connect Wallet</button>
-          </div>
+          <div><button id="ownedConnectBtn" class="btn">Connect Wallet</button></div>
         </div>
 
-        <!-- Owned stats -->
+        <!-- Info summary -->
         <div class="info-grid-2" style="margin-bottom:10px;">
           <div class="info-block">
             <div class="ik">Total Owned</div>
@@ -214,7 +211,7 @@
     document.addEventListener('DOMContentLoaded', layoutFrogStrip);
   </script>
 
-  <!-- Your existing libs -->
+  <!-- Your libs -->
   <script src="assets/js/config.js"></script>
   <script src="assets/js/utils.js"></script>
   <script src="assets/js/rarity.js"></script>
