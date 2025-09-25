@@ -84,6 +84,53 @@
   const openseaToken=(id)=>`https://opensea.io/assets/ethereum/${COLLECTION}/${id}`;
   const toast=(m)=>{ try{FF.toast?.(m);}catch{} console.log('[owned]',m); };
 
+  // Format big token amounts (e.g., 18 decimals → human)
+  function toBigIntSafe(v){
+    try{
+      if (typeof v === 'bigint') return v;
+      if (typeof v === 'number') return BigInt(Math.trunc(v));
+      if (typeof v === 'string'){
+        // allow plain integers; if contains '.', strip for simplicity
+        const s = v.includes('.') ? v.split('.')[0] : v;
+        return BigInt(s);
+      }
+    }catch{}
+    return null;
+  }
+  function formatAmountWeiLike(v, decimals=18){
+    // Accept bigint/number/string; move `decimals` left; smart rounding
+    const bi = toBigIntSafe(v);
+    if (bi == null) return '—';
+    const neg = bi < 0n ? '-' : '';
+    const abs = bi < 0n ? -bi : bi;
+    const pow = 10n ** BigInt(decimals);
+    const whole = abs / pow;
+    const frac = abs % pow;
+
+    // If large (>=100), show whole number; if smaller, show up to 2 decimals
+    if (whole >= 100n) return neg + whole.toString();
+
+    // two decimals rounded
+    const two = 10n ** 2n;
+    const rounded = ((frac * two) + (pow/ (2n* (pow/pow)))) / (pow/1n); // avoid zero; simple rounding
+    const d2 = Number(rounded) / 100;
+    const out = Number(whole) + d2;
+    return neg + out.toFixed(out < 1 ? 2 : 2).replace(/\.00$/,'');
+  }
+
+  // time ago helper
+  function fmtAgo(tsMs){
+    if (!tsMs || !isFinite(tsMs)) return null;
+    const s = Math.max(0, Math.floor((Date.now() - tsMs)/1000));
+    const d = Math.floor(s/86400);
+    if (d >= 1) return `${d}d ago`;
+    const h = Math.floor((s%86400)/3600);
+    if (h >= 1) return `${h}h ago`;
+    const m = Math.floor((s%3600)/60);
+    if (m >= 1) return `${m}m ago`;
+    return `${s}s ago`;
+  }
+
   // Wallet & staking helpers (best-effort)
   async function getConnectedAddress(){
     try{ if (window.FF_WALLET?.address) return window.FF_WALLET.address;
@@ -122,6 +169,26 @@
       if (typeof STK()[k]==='function'){ try{ return await STK()[k](addr);}catch{} }
     return null;
   }
+  // Try to fetch "staked since" timestamp in ms for a token id
+  async function getStakeSinceMs(tokenId){
+    const S = STK();
+    try{
+      if (typeof S.getStakeSince === 'function'){
+        const v = await S.getStakeSince(tokenId); // seconds or ms?
+        return Number(v) > 1e12 ? Number(v) : Number(v)*1000;
+      }
+      if (typeof S.getStakeInfo === 'function'){
+        const info = await S.getStakeInfo(tokenId);
+        const sec = info?.since ?? info?.stakedAt ?? info?.timestamp;
+        if (sec != null) return Number(sec) > 1e12 ? Number(sec) : Number(sec)*1000;
+      }
+      if (typeof S.stakeSince === 'function'){
+        const sec = await S.stakeSince(tokenId);
+        return Number(sec) > 1e12 ? Number(sec) : Number(sec)*1000;
+      }
+    }catch{}
+    return null;
+  }
 
   // ---------- State ----------
   let addr=null, continuation=null, items=[], loading=false, io=null, RANKS=null;
@@ -144,7 +211,7 @@
     const t=row?.token||{}; const id=Number(t?.tokenId); if(!isFinite(id)) return null;
     const attrs = Array.isArray(t?.attributes) ? t.attributes.map(a=>({ key:a?.key||a?.trait_type||'', value:(a?.value ?? a?.trait_value ?? '') })) : [];
     const staked = !!(window.FF_WALLET?.stakedIds?.has?.(id));
-    return { id, attrs, staked };
+    return { id, attrs, staked, sinceMs:null };
   }
   async function fetchPage(){
     const qs=new URLSearchParams({ collection: COLLECTION, limit:String(PAGE_SIZE), includeTopBid:'false', includeAttributes:'true' });
@@ -167,11 +234,23 @@
     wrap.innerHTML = ''; // clear
     return wrap;
   }
+
   function asStr(v){
     if (v==null) return '—';
     if (typeof v==='object' && v.formatted) return v.formatted;
     if (typeof v==='bigint') return v.toString();
     return String(v);
+  }
+
+  function headerData(){
+    const osHref = addr ? ('https://opensea.io/'+addr+'/collections') : '#';
+    return {
+      owned: items.length || 0,
+      staked: _stakedCount == null ? '—' : _stakedCount,
+      rewards: _rewardsPretty ?? asStr(_rewards),
+      wallet: addr,
+      osHref
+    };
   }
 
   function buildLayout(layout, data){
@@ -204,7 +283,7 @@
         </div>`;
     }
 
-    // L2 — Mini row (very small typography)
+    // L2 — Mini row
     if (layout==='L2'){
       w.innerHTML = `
         <div class="oh-row oh-mini">
@@ -220,7 +299,7 @@
         </div>`;
     }
 
-    // L3 — Slim toolbar (labels above values)
+    // L3 — Slim toolbar
     if (layout==='L3'){
       w.innerHTML = `
         <div class="oh-row oh-slim">
@@ -234,7 +313,7 @@
         </div>`;
     }
 
-    // L4 — Grid tiles (compact)
+    // L4 — Grid tiles
     if (layout==='L4'){
       w.innerHTML = `
         <div class="oh-grid cols-4">
@@ -250,7 +329,7 @@
         </div>`;
     }
 
-    // L5 — Inline pills with thin separators
+    // L5 — Inline pills
     if (layout==='L5'){
       w.innerHTML = `
         <div class="oh-row">
@@ -276,14 +355,14 @@
         </div>`;
     }
 
-    // L7 — Subtle table block
+    // L7 — Subtle table
     if (layout==='L7'){
       w.innerHTML = `
         <div class="oh-table">
           <div class="r"><div class="oh-muted">Owned</div><div id="ohOwned">${owned}</div></div>
           <div class="r"><div class="oh-muted">Staked</div><div id="ohStaked">${staked}</div></div>
           <div class="r"><div class="oh-muted">Rewards</div><div id="ohRewards">${rewards}</div></div>
-          <div class="r"><div class="oh-muted">Wallet</div><div><a id="ohWalletOS" href="${osHref}" target="_blank" rel="noopener" id="ohWalletLink"><span id="ohWallet">${walletShort}</span></a></div></div>
+          <div class="r"><div class="oh-muted">Wallet</div><div><a id="ohWalletOS" href="${osHref}" target="_blank" rel="noopener"><span id="ohWallet">${walletShort}</span></a></div></div>
         </div>
         <div class="oh-row" style="margin-top:6px">${actions}</div>`;
     }
@@ -300,7 +379,7 @@
         </div>`;
     }
 
-    // L9 — Sidebar (stats left, actions right)
+    // L9 — Sidebar
     if (layout==='L9'){
       w.innerHTML = `
         <div class="oh-side">
@@ -316,7 +395,7 @@
         </div>`;
     }
 
-    // L10 — Tabs (Summary tab only here; actions on right)
+    // L10 — Tabs
     if (layout==='L10'){
       w.innerHTML = `
         <div class="oh-tabs">
@@ -335,31 +414,19 @@
         </div>`;
     }
 
-    // wire selector + actions
+    // layout selector + actions
     const sel = $('#ohLayout', w);
     if (sel) sel.addEventListener('change', e=>{ setLayout(e.target.value); renderHeader(); });
     const bC = $('#ohConnect', w), bA = $('#ohApprove', w), bCl = $('#ohClaim', w);
     if (bC) bC.onclick = async ()=>{ bC.disabled=true; try{ addr = await requestConnect(); if(!addr) return; await afterConnect(); } finally{ bC.disabled=false; } };
     if (bA) bA.onclick = async ()=>{ bA.disabled=true; try{ await requestApproval(); toast('Approval submitted'); await refreshHeaderStats(); } catch{ toast('Approve failed'); } finally{ bA.disabled=false; } };
     if (bCl) bCl.onclick = async ()=>{ bCl.disabled=true; try{ await claimRewards(); toast('Claim sent'); await refreshHeaderStats(); } catch{ toast('Claim failed'); } finally{ bCl.disabled=false; } };
-  }
 
-  function headerData(){
-    const osHref = wallet ? ('https://opensea.io/'+wallet+'/collections') : '#';
-    return {
-      owned: items.length || 0,
-      staked: _stakedCount == null ? '—' : _stakedCount,
-      rewards: asStr(_rewards),
-      wallet: addr,
-      osHref
-    };
-  }
-
-  function asStr(v){
-    if (v==null) return '—';
-    if (typeof v==='object' && v.formatted) return v.formatted;
-    if (typeof v==='bigint') return v.toString();
-    return String(v);
+    // ensure wallet text/links reflect current addr
+    if (addr){
+      const ow = document.getElementById('ohWallet'); if (ow) ow.textContent = shorten(addr);
+      const os = document.getElementById('ohWalletOS'); if (os) os.href = 'https://opensea.io/'+addr+'/collections';
+    }
   }
 
   async function renderHeader(){
@@ -370,17 +437,19 @@
   // Live KPI values held here:
   let _stakedCount = null;
   let _rewards = null;
+  let _rewardsPretty = null;
 
   async function refreshHeaderStats(){
-    // staked
+    // staked count
     try{
       const ids = addr ? await getStakedIds(addr) : null;
       _stakedCount = Array.isArray(ids) ? ids.length : '—';
     }catch{ _stakedCount = '—'; }
-    // rewards
+    // rewards (pretty)
     try{
       _rewards = addr ? await getRewards(addr) : null;
-    }catch{ _rewards = '—'; }
+      _rewardsPretty = _rewards == null ? '—' : formatAmountWeiLike(_rewards, 18);
+    }catch{ _rewards = null; _rewardsPretty = '—'; }
     await renderHeader();
   }
 
@@ -398,6 +467,16 @@
     const chips=[]; for (const a of attrs){ if(!a.key||a.value==null) continue; chips.push(`<li class="attr">${a.key}: <b>${String(a.value)}</b></li>`); if(chips.length>=max) break; }
     return chips.length? `<ul class="attr-list">${chips.join('')}</ul>` : '';
   }
+
+  function metaLine(it){
+    // Try to show "Staked X ago • Owned by You" if sinceMs available
+    if (it.staked){
+      const ago = it.sinceMs ? fmtAgo(it.sinceMs) : null;
+      return ago ? `Staked ${ago} • Owned by You` : `Staked • Owned by You`;
+    }
+    return 'Not staked • Owned by You';
+  }
+
   function wireCardActions(scope, it){
     scope.querySelectorAll('button[data-act]').forEach(btn=>{
       btn.addEventListener('click', async ()=>{
@@ -407,12 +486,17 @@
             if (FF.staking?.stakeToken) await FF.staking.stakeToken(it.id);
             else if (FF.staking?.stakeTokens) await FF.staking.stakeTokens([it.id]);
             else return toast('Stake: helper not found');
-            it.staked=true; btn.textContent='Unstake'; btn.dataset.act='unstake'; scope.querySelector('.meta')?.replaceChildren(document.createTextNode('Staked • Owned by You'));
+            it.staked=true;
+            it.sinceMs=Date.now();
+            btn.textContent='Unstake'; btn.dataset.act='unstake';
+            const meta = scope.querySelector('.meta'); if (meta) meta.textContent = metaLine(it);
           }else if (act==='unstake'){
             if (FF.staking?.unstakeToken) await FF.staking.unstakeToken(it.id);
             else if (FF.staking?.unstakeTokens) await FF.staking.unstakeTokens([it.id]);
             else return toast('Unstake: helper not found');
-            it.staked=false; btn.textContent='Stake'; btn.dataset.act='stake'; scope.querySelector('.meta')?.replaceChildren(document.createTextNode('Not staked • Owned by You'));
+            it.staked=false; it.sinceMs=null;
+            btn.textContent='Stake'; btn.dataset.act='stake';
+            const meta = scope.querySelector('.meta'); if (meta) meta.textContent = metaLine(it);
           }else if (act==='transfer'){
             if (FF.wallet?.promptTransfer) await FF.wallet.promptTransfer(it.id);
             else return toast('Transfer: helper not found');
@@ -420,6 +504,14 @@
         }catch(e){ toast('Action failed'); }
       });
     });
+  }
+
+  async function hydrateStakedSince(batch){
+    // fetch staked-since timestamps (best-effort)
+    for (const it of batch){
+      if (!it.staked) continue;
+      try{ it.sinceMs = await getStakeSinceMs(it.id); }catch{ it.sinceMs=null; }
+    }
   }
 
   function renderCards(){
@@ -435,7 +527,7 @@
       card.innerHTML =
         `<img class="thumb" src="${imgFor(it.id)}" alt="${it.id}">
          <h4 class="title">Frog #${it.id} ${rankPill(it.rank)}</h4>
-         <div class="meta">${it.staked ? 'Staked' : 'Not staked'} • Owned by You</div>
+         <div class="meta">${metaLine(it)}</div>
          ${attrsHTML(it.attrs,4)}
          <div class="actions">
            <button class="btn btn-outline-gray" data-act="${it.staked ? 'unstake' : 'stake'}">${it.staked ? 'Unstake' : 'Stake'}</button>
@@ -450,7 +542,6 @@
   }
 
   function awaitHeaderOwned(n){
-    // Update "Owned" value in header if present
     const el = document.getElementById('ohOwned'); if (el) el.textContent = String(n);
   }
 
@@ -460,6 +551,7 @@
     try{
       const [rows, ranks] = await Promise.all([ fetchPage(), ensureRanks() ]);
       rows.forEach(r=> r.rank = ranks?.[String(r.id)]);
+      await hydrateStakedSince(rows);
       items = rows;
       renderCards();
 
@@ -472,6 +564,7 @@
         loading=true;
         try{
           const r=await fetchPage(); r.forEach(x=> x.rank=(FF.RANKS||{})[String(x.id)]);
+          await hydrateStakedSince(r);
           items=items.concat(r); renderCards();
         }catch(e){ toast('Could not load more'); }
         finally{ loading=false; }
@@ -491,13 +584,17 @@
 
     addr = await getConnectedAddress();
     if (addr){
+      // also reflect addr immediately in header
+      const ow = document.getElementById('ohWallet'); if (ow) ow.textContent = shorten(addr);
+      const os = document.getElementById('ohWalletOS'); if (os) os.href = 'https://opensea.io/'+addr+'/collections';
+
       await afterConnect();
       return;
     }
 
     // Not connected yet
     const grid=$(SEL.grid); if (grid) grid.innerHTML='<div class="pg-muted">Connect your wallet to view owned frogs.</div>';
-    // Keep any inline "Connect Wallet" button working too
+    // Keep inline "Connect Wallet" button working too
     const inlineBtn = document.getElementById('ownedConnectBtn');
     if (inlineBtn){
       inlineBtn.style.display='inline-flex';
