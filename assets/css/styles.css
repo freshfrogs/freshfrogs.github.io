@@ -365,3 +365,9 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
   padding-right: 4px;
 }
 #activityList .row{ cursor: pointer; }
+/* Recent Mints: height will be set dynamically via JS */
+#recentMints.scrolling{
+  overflow-y: auto;
+  padding-right: 4px;
+}
+#recentMints .row{ cursor: pointer; }

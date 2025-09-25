@@ -1,10 +1,10 @@
 // assets/js/mints-feed.js
-// Recent Mints only — Reservoir + your FF helpers (Etherscan links + scroll)
+// Recent Mints only — dynamic visible rows + Etherscan links
 (function (FF, CFG) {
   const UL_ID = 'recentMints';
   const BASE  = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
   const API   = `${BASE}/collections/activity/v6`;
-  const PAGE  = Math.max(1, Number(CFG.PAGE_SIZE || 20)); // fetch up to 20; we show ~5 visible (scrollable)
+  const PAGE  = Math.max(1, Number(CFG.PAGE_SIZE || 20)); // fetch size
 
   function need(k){ if(!CFG[k]) throw new Error(`[mints] Missing FF_CFG.${k}`); return CFG[k]; }
   const API_KEY    = need('FROG_API_KEY');
@@ -28,17 +28,38 @@
     return base + hash;
   }
 
-  function ul(){
-    const root = document.getElementById(UL_ID);
-    if (root) root.classList.add('scrolling'); // enable scroll styling (~5 rows visible)
-    return root;
+  function ul(){ return document.getElementById(UL_ID); }
+
+  // Dynamically set how many rows are visible (max-height = rows*rowHeight + gaps)
+  function applyVisibleRows(root){
+    if (!root) return;
+    root.classList.add('scrolling');
+    const desired =
+      Number(root.getAttribute('data-visible')) ||
+      Number(CFG.MINTS_VISIBLE || 5);
+
+    // measure after content is in DOM
+    const firstRow = root.querySelector('.row');
+    if (!firstRow) return; // nothing to measure yet
+
+    // get computed styles
+    const csUL   = getComputedStyle(root);
+    const csRow  = getComputedStyle(firstRow);
+    const gap    = parseFloat(csUL.gap || '0') || 0;
+    const rowH   = firstRow.getBoundingClientRect().height
+                || parseFloat(csRow.height || '0')
+                || 84; // fallback guess
+
+    const rows   = Math.max(1, desired);
+    const maxH   = rowH * rows + gap * (rows - 1);
+
+    root.style.maxHeight = `${Math.round(maxH)}px`;
   }
 
   async function reservoirFetch(url){
     const res = await fetch(url, { headers: HDR });
     if (!res.ok){
-      let body = '';
-      try { body = await res.text(); } catch {}
+      let body = ''; try { body = await res.text(); } catch {}
       const err = new Error(`HTTP ${res.status}${body ? ` — ${body}` : ''}`);
       err.url = url; throw err;
     }
@@ -52,13 +73,8 @@
 
     const from = (a?.fromAddress || '').toLowerCase();
     const zero = '0x0000000000000000000000000000000000000000';
-
-    // Only keep events that are mints:
-    // - Explicit type 'mint'
-    // - Or transfer where 'from' is zero address (some backfills label as transfer)
     const reportedType = (a?.type || '').toLowerCase();
     const isMint = (reportedType === 'mint') || (from === zero);
-
     if (!isMint) return null;
 
     // Timestamp
@@ -71,7 +87,6 @@
 
     return {
       id: tokenId,
-      from: a?.fromAddress || null,
       to:   a?.toAddress   || null,
       time: dt,
       img:  imgFor(tokenId),
@@ -80,8 +95,6 @@
   }
 
   async function fetchMints(limit = PAGE){
-    // Ask Reservoir for activity; include types=mint to reduce payload.
-    // We still guard with mapRow() for cases where a mint is reported as a zero-address transfer.
     const qs = new URLSearchParams({
       collection: COLLECTION,
       limit: String(Math.min(50, Math.max(1, limit))),
@@ -90,7 +103,6 @@
     const url = `${API}?${qs.toString()}`;
     const json = await reservoirFetch(url);
     const rows = (json?.activities || []).map(mapRow).filter(Boolean);
-    // newest first
     return rows.sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
   }
 
@@ -99,6 +111,7 @@
     root.innerHTML = '';
     if (!items.length){
       root.innerHTML = `<li class="row"><div class="pg-muted">No recent mints yet.</div></li>`;
+      applyVisibleRows(root);
       return;
     }
     items.forEach(it=>{
@@ -110,7 +123,6 @@
       const li = document.createElement('li');
       li.className = 'row';
 
-      // Click → Etherscan if tx hash exists; else open frog modal
       const href = txUrl(it.tx);
       if (href) {
         li.title = 'View transaction on Etherscan';
@@ -130,11 +142,13 @@
 
       root.appendChild(li);
     });
+
+    // set scroll window to N rows (after DOM is ready)
+    requestAnimationFrame(()=> applyVisibleRows(root));
   }
 
   async function loadAndRender(){
-    // Rarity isn’t needed for mints list, but we keep it non-blocking in case you want to add rank later.
-    try { await FF.ensureRarity?.(); } catch (e) { /* non-blocking */ }
+    try { await FF.ensureRarity?.(); } catch (e) { /* not required here */ }
     try { render(await fetchMints(PAGE)); }
     catch(e){
       console.warn('[mints] failed', e, e.url ? `\nURL: ${e.url}` : '');
