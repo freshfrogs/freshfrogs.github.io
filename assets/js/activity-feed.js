@@ -1,4 +1,5 @@
 // assets/js/activity-feed.js
+// Live Recent Activity — Reservoir + your FF helpers
 (function (FF, CFG) {
   const UL_ID = 'activityList';
   const BASE  = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
@@ -9,16 +10,29 @@
   const API_KEY    = need('FROG_API_KEY');
   const COLLECTION = need('COLLECTION_ADDRESS');
 
-  const HDR = { accept: 'application/json', 'x-api-key': API_KEY };
+  const HDR      = { accept: 'application/json', 'x-api-key': API_KEY };
+  const shorten  = (a)=> FF.shorten?.(a) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
+  const ago      = (d)=> d ? (FF.formatAgo(Date.now()-d.getTime())+' ago') : '';
+  const imgFor   = (id)=> `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
 
-  const shorten = (a)=> FF.shorten?.(a) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
-  const ago     = (d)=> d ? (FF.formatAgo(Date.now()-d.getTime())+' ago') : '';
-  const imgFor  = (id)=> `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
+  // Etherscan tx URL
+  function txUrl(hash){
+    if (!hash) return null;
+    if (CFG.ETHERSCAN_TX_BASE) return `${CFG.ETHERSCAN_TX_BASE.replace(/\/+$/,'')}/${hash}`;
+    const chainId = Number(CFG.CHAIN_ID || 1);
+    const base =
+      chainId === 1         ? 'https://etherscan.io/tx/' :
+      chainId === 11155111  ? 'https://sepolia.etherscan.io/tx/' :
+      chainId === 5         ? 'https://goerli.etherscan.io/tx/' :
+                              'https://etherscan.io/tx/';
+    return base + hash;
+  }
 
-  function ul(){ return document.getElementById(UL_ID); }
-  const pillRank = (rank)=> (rank||rank===0)
-    ? `<span class="pill">Rank <b>#${rank}</b></span>`
-    : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
+  function ul(){
+    const root = document.getElementById(UL_ID);
+    if (root) root.classList.add('scrolling');     // enable scrolling
+    return root;
+  }
 
   async function reservoirFetch(url){
     const res = await fetch(url, { headers: HDR });
@@ -31,6 +45,7 @@
     return res.json();
   }
 
+  // Normalize one activity row
   function mapRow(a){
     const tokenId = Number(a?.token?.tokenId);
     if (!Number.isFinite(tokenId)) return null;
@@ -56,19 +71,28 @@
     if (p?.amount?.decimal != null) priceEth = Number(p.amount.decimal);
     else if (typeof p === 'number') priceEth = p;
 
-    return { id: tokenId, type, from: a?.fromAddress || null, to: a?.toAddress || null, priceEth, time: dt, img: imgFor(tokenId) };
+    // tx hash (Reservoir returns txHash on activity rows)
+    const txHash = a?.txHash || a?.transactionHash || null;
+
+    return { id: tokenId, type, from: a?.fromAddress || null, to: a?.toAddress || null, priceEth, time: dt, img: imgFor(tokenId), tx: txHash };
   }
 
   async function fetchRecent(limit = PAGE){
     const qs = new URLSearchParams({
-      collection: COLLECTION,                 // ✅ singular
+      collection: COLLECTION,
       limit: String(Math.min(50, Math.max(1, limit)))
-      // keep it minimal while debugging; add types/sortBy later if desired
+      // keep minimal; add filters if desired later
     });
     const url = `${API}?${qs.toString()}`;
     const json = await reservoirFetch(url);
     return (json?.activities || []).map(mapRow).filter(Boolean)
       .sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
+  }
+
+  function pillRank(rank){
+    return (rank||rank===0)
+      ? `<span class="pill">Rank <b>#${rank}</b></span>`
+      : `<span class="pill"><span class="muted">Rank N/A</span></span>`;
   }
 
   function render(items){
@@ -88,15 +112,25 @@
 
       const li = document.createElement('li');
       li.className = 'row';
+
+      // Make the entire row open Etherscan if tx is available; else open your modal
+      const href = txUrl(it.tx);
+      if (href) {
+        li.title = 'View transaction on Etherscan';
+        li.addEventListener('click', ()=> window.open(href, '_blank', 'noopener'));
+      } else {
+        li.addEventListener('click', ()=> FF.openFrogModal?.({ id: it.id }));
+      }
+
       li.innerHTML =
         FF.thumb64(it.img, `Frog ${it.id}`) +
         `<div>
            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
              <b>${it.type}</b> • Frog #${it.id} ${pillRank(rank)}
            </div>
-           <div class="pg-muted">${meta}</div>
+           <div class="pg-muted">${meta}${href ? ' • Etherscan' : ''}</div>
          </div>`;
-      li.addEventListener('click', ()=> FF.openFrogModal?.({ id: it.id }));
+
       root.appendChild(li);
     });
   }
