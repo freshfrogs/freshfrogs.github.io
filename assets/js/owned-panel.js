@@ -1,7 +1,6 @@
 // assets/js/owned-panel.js
-// Renders: Owned + Staked. Owned IDs from Reservoir; Staked IDs from controller.
-// Metadata always from frog/json/{id}.json. No OpenSea button. Attribute chips → bullets.
-// Header: Owned • Staked • Unclaimed Rewards (+ Approve/Claim). Connect btn stays green.
+// Shows owned frogs (Reservoir) + staked frogs (controller ABI).
+// Cards/visuals unchanged. Adds "Staked {time-ago} • Owned by You". Header "Owned" counts wallet-only.
 
 (function (FF, CFG) {
   'use strict';
@@ -27,7 +26,7 @@
     return base + COLLECTION + '?a=' + id;
   };
 
-  // --- CSS (scoped) ---
+  // --- CSS (scoped; same style you liked) ---
   (function injectCSS(){
     if (document.getElementById('owned-clean-css')) return;
     const css = `
@@ -53,7 +52,7 @@
     const el=document.createElement('style'); el.id='owned-clean-css'; el.textContent=css; document.head.appendChild(el);
   })();
 
-  // --- Reservoir fetch queue (used only to list owned IDs) ---
+  // --- Reservoir fetch queue (owned IDs only) ---
   if (!window.FF_RES_QUEUE){
     const RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 800);
     const BACKOFFS = Array.isArray(CFG.RETRY_BACKOFF_MS) ? CFG.RETRY_BACKOFF_MS : [900,1700,3200];
@@ -103,7 +102,8 @@
     return s+'s ago';
   }
 
-  // --- Wallet & staking helpers ---
+  // --- Wallet & staking helpers (via adapter) ---
+  const STK = ()=> (FF.staking || window.FF_STAKING || {});
   async function getConnectedAddress(){
     try{
       if (window.FF_WALLET?.address) return window.FF_WALLET.address;
@@ -118,7 +118,6 @@
     }catch(e){ toast('Connect failed'); }
     throw new Error('No wallet provider found.');
   }
-  const STK = ()=> (FF.staking || window.FF_STAKING || {});
   async function getStakedIds(addr){
     try{
       if (typeof window.getStakedTokens === 'function'){ const raw=await window.getStakedTokens(addr); return normalizeIds(raw); }
@@ -149,54 +148,27 @@
     }).filter(Number.isFinite);
   }
   async function isApproved(addr){
-    for (const k of ['isApproved','isApprovedForAll','checkApproval'])
-      if (typeof STK()[k]==='function'){ try{ return !!await STK()[k](addr);}catch{} }
+    if (typeof STK().isApproved==='function'){ try{ return !!await STK().isApproved(addr);}catch{} }
+    if (typeof STK().checkApproval==='function'){ try{ return !!await STK().checkApproval(addr);}catch{} }
     return null;
-  }
-  async function requestApproval(){
-    for (const k of ['approve','approveIfNeeded','requestApproval','setApproval'])
-      if (typeof STK()[k]==='function') return STK()[k]();
-    throw new Error('Approval helper not found.');
   }
   async function getRewards(addr){
     for (const k of ['getAvailableRewards','getRewards','claimableRewards','getUnclaimedRewards'])
       if (typeof STK()[k]==='function'){ try{ return await STK()[k](addr);}catch{} }
     return null;
   }
-  async function claimRewards(){
-    for (const k of ['claimRewards','claim','harvest'])
-      if (typeof STK()[k]==='function') return STK()[k]();
-    throw new Error('Claim helper not found.');
-  }
   async function getStakeSinceMs(tokenId){
     const S=STK();
     try{
-      if (typeof S.getStakeSince==='function'){ const v=await S.getStakeSince(tokenId); return Number(v)>1e12?Number(v):Number(v)*1000; }
-      if (typeof S.getStakeInfo==='function'){ const i=await S.getStakeInfo(tokenId); const sec=i?.since??i?.stakedAt??i?.timestamp; if (sec!=null) return Number(sec)>1e12?Number(sec):Number(sec)*1000; }
-      if (typeof S.stakeSince==='function'){ const sec=await S.stakeSince(tokenId); return Number(sec)>1e12?Number(sec):Number(sec)*1000; }
-    }catch{} return null;
-  }
-
-  // NEW: fallback via Transfer(to=controller) events → ms epoch or null
-  async function stakeSinceViaEvents(tokenId){
+      if (typeof S.getStakeSince==='function'){ const sec=await S.getStakeSince(tokenId); if (sec) return Number(sec)>1e12?Number(sec):Number(sec)*1000; }
+    }catch{}
     try{
-      if (!window.Web3) return null;
-      const provider = window.ethereum || (CFG?.RPC_URL ? new Web3.providers.HttpProvider(CFG.RPC_URL) : null);
-      if (!provider) return null;
-      const web3 = new Web3(provider);
-      const erc721 = new web3.eth.Contract([
-        {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"}
-      ], CFG.COLLECTION_ADDRESS);
-
-      const evs = await erc721.getPastEvents('Transfer', {
-        filter: { to: CFG.CONTROLLER_ADDRESS, tokenId: tokenId },
-        fromBlock: 0, toBlock: 'latest'
-      });
-      if (!evs.length) return null;
-      const last = evs[evs.length - 1];
-      const b = await web3.eth.getBlock(last.blockNumber);
-      return Number(b.timestamp) * 1000;
-    }catch(_){ return null; }
+      if (window.StakingAdapter?.getStakeSince){
+        const sec = await window.StakingAdapter.getStakeSince(tokenId);
+        if (sec) return Number(sec)*1000;
+      }
+    }catch{}
+    return null;
   }
 
   // --- State ---
@@ -241,8 +213,32 @@
         '<button class="oh-btn" id="ohClaim">Claim Rewards</button>'+
       '</div>';
     const bA=w.querySelector('#ohApprove'), bCl=w.querySelector('#ohClaim');
-    if (bA) bA.addEventListener('click', async ()=>{ bA.disabled=true; try{ await requestApproval(); toast('Approval submitted'); await refreshHeaderStats(); }catch{ toast('Approve failed'); }finally{ bA.disabled=false; } });
-    if (bCl) bCl.addEventListener('click', async ()=>{ bCl.disabled=true; try{ await claimRewards(); toast('Claim sent'); await refreshHeaderStats(); }catch{ toast('Claim failed'); }finally{ bCl.disabled=false; } });
+
+    if (bA) bA.addEventListener('click', async ()=>{
+      bA.disabled = true;
+      try {
+        const fn = STK().approve || STK().approveIfNeeded || STK().requestApproval || STK().setApproval;
+        if (typeof fn === 'function') await fn();
+        await refreshHeaderStats();
+      } catch (e) {
+        toast('Approve failed');
+      } finally {
+        bA.disabled = false;
+      }
+    });
+
+    if (bCl) bCl.addEventListener('click', async ()=>{
+      bCl.disabled = true;
+      try {
+        const fn = STK().claimRewards || STK().claim || STK().harvest;
+        if (typeof fn === 'function') await fn();
+        await refreshHeaderStats();
+      } catch (e) {
+        toast('Claim failed');
+      } finally {
+        bCl.disabled = false;
+      }
+    });
   }
   async function renderHeader(){ buildHeader(); }
 
@@ -368,17 +364,16 @@
       const [ownedIds, ranks] = await Promise.all([ fetchOwnedIdsPage(), ensureRanks() ]);
       const stakedIds = addr ? await getStakedIds(addr) : [];
       const stakedSet = new Set(stakedIds);
-      // header KPI (staked count)
       _stakedCount = stakedIds.length;
 
-      // Combine (add staked IDs not in owned)
+      // Merge: add any staked not already in owned
       const seen = new Set(ownedIds);
       const idsForThisPage = ownedIds.concat(stakedIds.filter(id => !seen.has(id)));
 
-      // Load local JSON for those IDs
+      // Metadata
       const metas = await loadMetaBatch(idsForThisPage);
 
-      // Compose
+      // Compose items
       items = metas.map(m => ({
         id: m.id,
         attrs: m.attrs,
@@ -387,18 +382,14 @@
         rank: (ranks||{})[String(m.id)]
       }));
 
-      // Fill stake times (adapter first; else fall back to events)
-      await (async ()=>{
-        const stakedBatch = items.filter(x=> x.staked);
-        for (const it of stakedBatch){
-          try{
-            let ms = await getStakeSinceMs(it.id);          // may be null for this ABI
-            if (!ms) ms = await stakeSinceViaEvents(it.id); // fallback from Transfer events
-            if (ms && ms < 1e12) ms = ms * 1000;            // normalize to ms if seconds
-            it.sinceMs = ms || null;
-          }catch{ it.sinceMs = null; }
-        }
-      })();
+      // Hydrate stake times
+      const stakedBatch = items.filter(x=> x.staked);
+      for (const it of stakedBatch){
+        try{
+          const ms = await getStakeSinceMs(it.id);
+          it.sinceMs = ms || null;
+        }catch{ it.sinceMs = null; }
+      }
 
       renderCards();
 
@@ -416,15 +407,9 @@
             .filter(m=> !items.some(x=> x.id===m.id))
             .map(m=> ({ id:m.id, attrs:m.attrs, staked: stakedSet.has(m.id), sinceMs:null, rank:(FF.RANKS||{})[String(m.id)] }));
           items = items.concat(more);
-          // hydrate staked times for the new batch
           for (const it of more){
             if (it.staked){
-              try{
-                let ms = await getStakeSinceMs(it.id);
-                if (!ms) ms = await stakeSinceViaEvents(it.id);
-                if (ms && ms < 1e12) ms = ms * 1000;
-                it.sinceMs = ms || null;
-              }catch{}
+              try{ const ms=await getStakeSinceMs(it.id); it.sinceMs=ms||null; }catch{}
             }
           }
           renderCards();
@@ -434,12 +419,12 @@
       observer.observe(sentinel);
     }catch(e){
       console.warn('[owned] first page failed', e);
-      const root=$(SEL.grid); if (root) root.innerHTML='<div class="pg-muted">Failed to load owned frogs.</div>';
+      const root=$(SEL.grid); if (root) root.innerHTML='<div class="pg-muted">Failed to load frogs for this wallet.</div>';
       updateHeaderOwned(); syncHeights();
     }
   }
 
-  // --- Connect button ---
+  // --- Connect button / flow ---
   function reflectConnectButton(){
     const btn=document.getElementById('ownedConnectBtn'); if(!btn) return;
     if (addr){ btn.classList.add('btn-connected'); btn.textContent=shorten(addr); }
@@ -452,7 +437,6 @@
     finally{ if(btn) btn.disabled=false; }
   }
 
-  // --- Flow ---
   async function refreshAndRender(){ await Promise.all([ loadFirstPage(), refreshHeaderStats() ]); }
   async function afterConnect(){
     await renderHeader();
@@ -460,7 +444,7 @@
     await refreshAndRender();
   }
   async function initOwned(){
-    // nuke any old info squares under this card
+    // remove any old info squares under this card
     const card=$(SEL.card); if (card) card.querySelectorAll('.info-grid-2').forEach(n=> n.remove());
     await renderHeader();
 
@@ -471,7 +455,7 @@
     reflectConnectButton();
 
     if (addr){ await afterConnect(); return; }
-    const grid=$(SEL.grid); if (grid) grid.innerHTML='<div class="pg-muted">Connect your wallet to view owned frogs.</div>';
+    const grid=$(SEL.grid); if (grid) grid.innerHTML='<div class="pg-muted">Connect your wallet to view frogs you own or have staked.</div>';
     setTimeout(syncHeights,50);
   }
 

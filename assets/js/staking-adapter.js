@@ -1,6 +1,6 @@
 // assets/js/staking-adapter.js
-// Uses the user's wallet provider (window.ethereum) or FF_CFG.RPC_URL for reads.
-// Exposes BOTH modern `window.StakingAdapter` and legacy-compatible `FF.staking`.
+// Uses wallet provider or FF_CFG.RPC_URL. Exposes both modern and legacy APIs
+// so the Dashboard can always read staked frogs via controller.getStakedTokens.
 
 (function (FF = (window.FF = window.FF || {}), CFG = (window.FF_CFG = window.FF_CFG || {})) {
   'use strict';
@@ -8,14 +8,13 @@
   const log  = (...a) => console.log('[staking-adapter]', ...a);
   const warn = (...a) => console.warn('[staking-adapter]', ...a);
 
-  // ---- Config / ABIs --------------------------------------------------------
   const CONTROLLER_ADDR = CFG.CONTROLLER_ADDRESS;
   const COLLECTION_ADDR = CFG.COLLECTION_ADDRESS;
-  const CONTROLLER_ABI  = window.CONTROLLER_ABI || [];      // from assets/abi/controller_abi.js
+  const CONTROLLER_ABI  = window.CONTROLLER_ABI || [];
+
   const ERC721_MIN_ABI  = [
     {"constant":true,"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":""}],"stateMutability":"view","type":"function"},
     {"constant":true,"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":""}],"stateMutability":"view","type":"function"},
-    // event for fallback timestamp lookup:
     {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"}
   ];
 
@@ -35,13 +34,11 @@
     return { web3, controller, erc721 };
   }
 
-  // ---- Core reads -----------------------------------------------------------
+  // ---- Reads ---------------------------------------------------------------
 
-  // Required by owned-panel.js
   async function getStakedTokens(userAddress) {
     try {
       const { controller } = ensureContracts();
-      // ABI you provided defines getStakedTokens(address) -> tuple[] { staker, tokenId }
       const rows = await controller.methods.getStakedTokens(userAddress).call();
       return (rows || []).map(r => Number(r.tokenId)).filter(Number.isFinite);
     } catch (e) {
@@ -50,20 +47,16 @@
     }
   }
 
-  // Optional helper used for header KPI
   async function getAvailableRewards(userAddress) {
     try {
       const { controller } = ensureContracts();
-      const v = await controller.methods.availableRewards(userAddress).call();
-      // return raw (string/BN-ish). owned-panel formats it.
-      return v;
+      return await controller.methods.availableRewards(userAddress).call();
     } catch (e) {
       warn('availableRewards', e);
       return '0';
     }
   }
 
-  // Legacy name expected by owned-panel.js: `isApproved`
   async function isApproved(userAddress) {
     try {
       const { erc721 } = ensureContracts();
@@ -74,7 +67,6 @@
     }
   }
 
-  // For Pond KPI "Total Frogs Staked": balanceOf(controller) on the ERC721
   async function getTotalStaked() {
     try {
       const { erc721 } = ensureContracts();
@@ -86,7 +78,7 @@
     }
   }
 
-  // Nice-to-have for "Staked Xd ago": infer by last Transfer(to=controller, tokenId)
+  // infer stake timestamp via Transfer(to=controller, tokenId)
   async function getStakeSince(tokenId) {
     try {
       const { web3 } = ensureContracts();
@@ -98,17 +90,14 @@
       if (!evs.length) return null;
       const last = evs[evs.length - 1];
       const b = await web3.eth.getBlock(last.blockNumber);
-      // return seconds (owned-panel will convert to ms if needed)
-      return Number(b?.timestamp) || null;
+      return Number(b?.timestamp) || null; // seconds
     } catch (e) {
       warn('getStakeSince', e);
       return null;
     }
   }
 
-  // ---- Expose both modern and legacy-compatible APIs -----------------------
-
-  // Modern
+  // Modern API
   window.StakingAdapter = {
     getStakedTokens,
     getAvailableRewards,
@@ -117,14 +106,12 @@
     getStakeSince
   };
 
-  // Legacy shim consumed by owned-panel.js via STK() helper
-  // owned-panel looks for: STK().getStakedTokens, STK().getAvailableRewards, STK().isApproved, STK().getStakeSince
+  // Legacy shim
   const legacy = {
     getStakedTokens,
     getAvailableRewards,
     isApproved,
     getStakeSince,
-    // compatible names it also probes:
     getRewards: getAvailableRewards,
     checkApproval: isApproved
   };

@@ -1,5 +1,5 @@
 // assets/js/pond-kpis.js
-// Updates the Pond KPIs: Total Frogs Staked, Controller link, Rewards symbol.
+// Updates: Total Frogs Staked, Controller link, Rewards link.
 
 (function (FF, CFG) {
   'use strict';
@@ -8,7 +8,6 @@
   const CONTROLLER = CFG.CONTROLLER_ADDRESS;
   const CHAIN_ID   = Number(CFG.CHAIN_ID || 1);
 
-  // Minimal ERC-721 ABI: balanceOf(address)
   const ERC721_MIN_ABI = [
     {"constant":true,"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":""}],"stateMutability":"view","type":"function"}
   ];
@@ -49,15 +48,16 @@
     el.href = etherscanBase() + '/address/' + CONTROLLER;
   }
 
-  function setRewardsSymbol() {
-    const sym = CFG.REWARD_TOKEN_SYMBOL || '$FLYZ';
-    const el  = $('#pondRewardsSymbol');
-    if (el) el.textContent = sym;
+  function setRewardsLink() {
+    const el = $('#pondRewardsLink');
+    if (!el) return;
+    // Keep href as provided in HTML; nothing else needed.
+    el.textContent = CFG.REWARD_TOKEN_SYMBOL || '$FLYZ';
   }
 
   async function refreshPondKPIs() {
     setControllerLink();
-    setRewardsSymbol();
+    setRewardsLink();
 
     const el = $('#stakedTotal');
     if (!el) return;
@@ -68,7 +68,7 @@
 
   window.FF_initPondKPIs = function(){
     refreshPondKPIs();
-    // Optional live refresh:
+    // Optional: auto-refresh
     // setInterval(refreshPondKPIs, 60000);
   };
 
