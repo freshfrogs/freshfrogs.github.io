@@ -1,6 +1,6 @@
 // assets/js/stakes-feed.js
-// Pond "Recent Staking Activity" — users/activity filtered by users+collection.
-// No visual changes: renders into <ul id="recentStakes"> using your .row styles.
+// Pond "Recent Staking Activity" — users+collection filter (Reservoir).
+// Renders into <ul id="recentStakes"> using your existing .row styles.
 
 (function(){
   'use strict';
@@ -61,7 +61,7 @@
     if (continuation) qs.set('continuation', continuation);
 
     const res = await fetch(`${HOST}/users/activity/v6?${qs.toString()}`, {
-      headers: { accept: '*/*', ...(KEY ? { 'x-api-key': KEY } : {}) }
+      headers: { accept: 'application/json', ...(KEY ? { 'x-api-key': KEY } : {}) }
     });
     if (!res.ok) {
       const t = await res.text().catch(()=> '');
@@ -69,7 +69,6 @@
     }
     const j = await res.json();
 
-    // Classify stakes/unstakes by controller side
     const rows = (j.activities || []).flatMap(a => {
       const ev = a.event || {};
       if (ev.kind !== 'transfer') return [];
@@ -105,7 +104,7 @@
 
       if (!booted){
         listEl.innerHTML = '';
-        listEl.classList.add('scrolling'); // you already style this
+        listEl.classList.add('scrolling');
         booted = true;
       }
 
@@ -139,7 +138,7 @@
     wrap.addEventListener('scroll', onScroll);
   }
 
-  // Public hook (you already call this in collection.html)
+  // Public hook you already call in collection.html
   window.FF_loadRecentStakes = function(){
     listEl = el(LIST_ID) || $('[data-pond-list]');
     if (!listEl) return;
