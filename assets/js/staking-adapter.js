@@ -1,218 +1,135 @@
-/* global Web3, CONFIG */
+// assets/js/staking-adapter.js
+// Uses the user's wallet provider (window.ethereum) or FF_CFG.RPC_URL for reads.
+// Exposes BOTH modern `window.StakingAdapter` and legacy-compatible `FF.staking`.
 
-// Lightweight staking adapter that works off the user's wallet provider.
-// No RPC URL needed — we use window.ethereum / current provider.
-(() => {
-  const log = (...args) => console.log('[staking-adapter]', ...args);
-  const warn = (...args) => console.warn('[staking-adapter]', ...args);
-  const err = (...args) => console.error('[staking-adapter]', ...args);
+(function (FF = (window.FF = window.FF || {}), CFG = (window.FF_CFG = window.FF_CFG || {})) {
+  'use strict';
 
-  // ---- Config resolution ----------------------------------------------------
-  function getCfg() {
-    // Expected in CONFIG:
-    // - NFT_ADDRESS
-    // - NFT_ABI
-    // - STAKING_CONTROLLER_ADDRESS
-    // - STAKING_CONTROLLER_ABI
-    const c = (typeof CONFIG !== 'undefined' && CONFIG) ? CONFIG : {};
-    const must = ['NFT_ADDRESS','NFT_ABI','STAKING_CONTROLLER_ADDRESS','STAKING_CONTROLLER_ABI'];
-    for (const k of must) {
-      if (!c[k]) {
-        throw new Error(`Missing ${k} in CONFIG`);
-      }
-    }
-    return c;
+  const log  = (...a) => console.log('[staking-adapter]', ...a);
+  const warn = (...a) => console.warn('[staking-adapter]', ...a);
+
+  // ---- Config / ABIs --------------------------------------------------------
+  const CONTROLLER_ADDR = CFG.CONTROLLER_ADDRESS;
+  const COLLECTION_ADDR = CFG.COLLECTION_ADDRESS;
+  const CONTROLLER_ABI  = window.CONTROLLER_ABI || [];      // from assets/abi/controller_abi.js
+  const ERC721_MIN_ABI  = [
+    {"constant":true,"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":""}],"stateMutability":"view","type":"function"},
+    {"constant":true,"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":""}],"stateMutability":"view","type":"function"},
+    // event for fallback timestamp lookup:
+    {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"}
+  ];
+
+  function getWeb3() {
+    if (!window.Web3) throw new Error('Web3 library not loaded');
+    const provider = window.ethereum || (CFG.RPC_URL ? new Web3.providers.HttpProvider(CFG.RPC_URL) : null);
+    if (!provider) throw new Error('No provider (wallet or FF_CFG.RPC_URL)');
+    return new Web3(provider);
   }
-
-  const web3 = new Web3(window.ethereum || Web3.givenProvider);
-
-  // Safe method check for web3 contract instances
-  const hasMethod = (contract, name) => {
-    try {
-      return !!(contract && contract.methods && contract.methods[name]);
-    } catch {
-      return false;
-    }
-  };
-
-  // ---- Contracts ------------------------------------------------------------
-  let nft, staking;
 
   function ensureContracts() {
-    const CFG = getCfg();
-    if (!nft) {
-      nft = new web3.eth.Contract(CFG.NFT_ABI, CFG.NFT_ADDRESS);
-    }
-    if (!staking) {
-      staking = new web3.eth.Contract(CFG.STAKING_CONTROLLER_ABI, CFG.STAKING_CONTROLLER_ADDRESS);
-    }
+    if (!CONTROLLER_ADDR || !CONTROLLER_ABI.length) throw new Error('Missing controller address/ABI');
+    if (!COLLECTION_ADDR) throw new Error('Missing collection address');
+    const web3 = getWeb3();
+    const controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDR);
+    const erc721     = new web3.eth.Contract(ERC721_MIN_ABI, COLLECTION_ADDR);
+    return { web3, controller, erc721 };
   }
 
-  // ---- Public API -----------------------------------------------------------
+  // ---- Core reads -----------------------------------------------------------
 
-  // Get token IDs staked by an account
-  async function getStakedTokens(account) {
+  // Required by owned-panel.js
+  async function getStakedTokens(userAddress) {
     try {
-      ensureContracts();
-
-      // Support several common method names:
-      // - tokensOf(address)          -> uint256[]
-      // - getStakedTokens(address)   -> uint256[]
-      // - stakedTokensOf(address)    -> uint256[]
-      const candidates = ['tokensOf', 'getStakedTokens', 'stakedTokensOf'];
-      for (const m of candidates) {
-        if (hasMethod(staking, m)) {
-          const ids = await staking.methods[m](account).call();
-          // Ensure array of strings (web3 can return BN)
-          return (ids || []).map(x => x.toString());
-        }
-      }
-
-      // Some controllers keep per-token owner mappings and expose balanceOf(address)
-      // plus tokenOfOwnerByIndex-like function
-      if (hasMethod(staking, 'balanceOf') && hasMethod(staking, 'tokenOfOwnerByIndex')) {
-        const bal = await staking.methods.balanceOf(account).call();
-        const out = [];
-        for (let i = 0; i < Number(bal); i++) {
-          const id = await staking.methods.tokenOfOwnerByIndex(account, i).call();
-          out.push(id.toString());
-        }
-        return out;
-      }
-
-      throw new Error('No supported staking read method was found on controller');
+      const { controller } = ensureContracts();
+      // ABI you provided defines getStakedTokens(address) -> tuple[] { staker, tokenId }
+      const rows = await controller.methods.getStakedTokens(userAddress).call();
+      return (rows || []).map(r => Number(r.tokenId)).filter(Number.isFinite);
     } catch (e) {
-      err('getStakedTokens Error:', e);
+      warn('getStakedTokens', e);
       return [];
     }
   }
 
-  // Optional: per-token stake timestamp (for "xd ago")
-  async function getStakeTimestamps(account) {
+  // Optional helper used for header KPI
+  async function getAvailableRewards(userAddress) {
     try {
-      ensureContracts();
-
-      // Common patterns:
-      // - stakeStarted(tokenId) -> uint256 timestamp
-      // - stakes(tokenId) -> struct { owner, startedAt, ... }
-      // - stakeInfo(tokenId) -> (startedAt, …) or struct
-      const ids = await getStakedTokens(account);
-      const map = {};
-
-      // Helper to safely call and coerce to number
-      const callTs = async (method, tokenId) => {
-        try {
-          const v = await staking.methods[method](tokenId).call();
-          if (v && typeof v === 'object' && ('startedAt' in v)) {
-            return Number(v.startedAt);
-          }
-          if (Array.isArray(v) && v.length > 0) {
-            // first value often startedAt
-            return Number(v[0]);
-          }
-          return Number(v);
-        } catch {
-          return 0;
-        }
-      };
-
-      const hasStakeStarted = hasMethod(staking, 'stakeStarted');
-      const hasStakes = hasMethod(staking, 'stakes');
-      const hasStakeInfo = hasMethod(staking, 'stakeInfo');
-
-      for (const id of ids) {
-        let ts = 0;
-        if (hasStakeStarted) ts ||= await callTs('stakeStarted', id);
-        if (!ts && hasStakes) ts ||= await callTs('stakes', id);
-        if (!ts && hasStakeInfo) ts ||= await callTs('stakeInfo', id);
-        map[id] = ts; // 0 if unknown
-      }
-      return map;
+      const { controller } = ensureContracts();
+      const v = await controller.methods.availableRewards(userAddress).call();
+      // return raw (string/BN-ish). owned-panel formats it.
+      return v;
     } catch (e) {
-      warn('getStakeTimestamps Error:', e);
-      return {};
+      warn('availableRewards', e);
+      return '0';
     }
   }
 
-  // Is controller approved to transfer user's tokens?
-  async function isApprovedForAll(account) {
+  // Legacy name expected by owned-panel.js: `isApproved`
+  async function isApproved(userAddress) {
     try {
-      ensureContracts();
-      const CFG = getCfg();
-      if (!hasMethod(nft, 'isApprovedForAll')) return false;
-      return await nft.methods.isApprovedForAll(account, CFG.STAKING_CONTROLLER_ADDRESS).call();
+      const { erc721 } = ensureContracts();
+      return await erc721.methods.isApprovedForAll(userAddress, CONTROLLER_ADDR).call({ from: userAddress });
     } catch (e) {
-      err('isApproved', e);
+      warn('isApproved', e);
       return false;
     }
   }
 
-  // Available rewards (best-effort; returns string number, "0" if unsupported)
-  async function getAvailableRewards(account) {
-    try {
-      ensureContracts();
-      const candidates = ['availableRewards', 'rewards', 'pendingRewards', 'earned'];
-      for (const m of candidates) {
-        if (hasMethod(staking, m)) {
-          const v = await staking.methods[m](account).call();
-          return (typeof v === 'object' && v._hex) ? web3.utils.toBN(v._hex).toString() : v.toString();
-        }
-      }
-      return '0';
-    } catch (e) {
-      err('rewards', e);
-      return '0';
-    }
-  }
-
-  // Total currently staked across the pond (for KPIs / pond panel)
+  // For Pond KPI "Total Frogs Staked": balanceOf(controller) on the ERC721
   async function getTotalStaked() {
     try {
-      ensureContracts();
-      const candidates = [
-        'totalStaked',
-        'totalCurrentlyStaked',
-        'stakedSupply',
-        'totalSupplyStaked',
-        'getTotalStaked'
-      ];
-      for (const m of candidates) {
-        if (hasMethod(staking, m)) {
-          const v = await staking.methods[m]().call();
-          return Number(v);
-        }
-      }
-
-      // Fallback: sum of staked by all? Not feasible without an indexer — return null.
-      return null;
+      const { erc721 } = ensureContracts();
+      const n = await erc721.methods.balanceOf(CONTROLLER_ADDR).call();
+      return Number(n) || 0;
     } catch (e) {
       warn('total staked failed', e);
       return null;
     }
   }
 
-  // Pure ERC721 balance (wallet-held only; staked not included)
-  async function getWalletOwnedCount(account) {
+  // Nice-to-have for "Staked Xd ago": infer by last Transfer(to=controller, tokenId)
+  async function getStakeSince(tokenId) {
     try {
-      ensureContracts();
-      if (!hasMethod(nft, 'balanceOf')) return 0;
-      const v = await nft.methods.balanceOf(account).call();
-      return Number(v);
-    } catch {
-      return 0;
+      const { web3 } = ensureContracts();
+      const erc721 = new web3.eth.Contract(ERC721_MIN_ABI, COLLECTION_ADDR);
+      const evs = await erc721.getPastEvents('Transfer', {
+        filter: { to: CONTROLLER_ADDR, tokenId: tokenId },
+        fromBlock: 0, toBlock: 'latest'
+      });
+      if (!evs.length) return null;
+      const last = evs[evs.length - 1];
+      const b = await web3.eth.getBlock(last.blockNumber);
+      // return seconds (owned-panel will convert to ms if needed)
+      return Number(b?.timestamp) || null;
+    } catch (e) {
+      warn('getStakeSince', e);
+      return null;
     }
   }
 
-  // Expose globally
+  // ---- Expose both modern and legacy-compatible APIs -----------------------
+
+  // Modern
   window.StakingAdapter = {
     getStakedTokens,
-    getStakeTimestamps,
-    isApprovedForAll,
     getAvailableRewards,
+    isApprovedForAll: isApproved,
     getTotalStaked,
-    getWalletOwnedCount,
-    web3
+    getStakeSince
   };
+
+  // Legacy shim consumed by owned-panel.js via STK() helper
+  // owned-panel looks for: STK().getStakedTokens, STK().getAvailableRewards, STK().isApproved, STK().getStakeSince
+  const legacy = {
+    getStakedTokens,
+    getAvailableRewards,
+    isApproved,
+    getStakeSince,
+    // compatible names it also probes:
+    getRewards: getAvailableRewards,
+    checkApproval: isApproved
+  };
+  window.FF_STAKING = legacy;
+  FF.staking = legacy;
 
   log('ready');
 })();
