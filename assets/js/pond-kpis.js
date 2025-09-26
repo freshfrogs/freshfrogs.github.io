@@ -1,116 +1,128 @@
-// assets/js/pond-kpis.js — hard-proof Σ balanceOf(controller) and write into KPI.
-// Only uses JSON-RPC; no wallet/Web3/ABI. Adds clear console logs.
-// Addresses are read from window.CFG; if missing, it uses the hard-wired defaults below.
+// assets/js/pond-kpis.js — Total Staked via Reservoir (no wallet/RPC)
+// Counts tokens owned by your staking controller(s) using Reservoir owners API,
+// falls back to tokens/v10 if needed. Optional API key via CFG.RESERVOIR_API_KEY.
 
-(function(){
+(function () {
   'use strict';
 
-  // ---- REQUIRED ADDRS (overridden by window.CFG if present) ----
-  const DEFAULTS = {
-    COLLECTION_ADDRESS: (window.CFG && window.CFG.COLLECTION_ADDRESS) || '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b',
-    CONTROLLER_ADDRESSES: (window.CFG && (window.CFG.CONTROLLER_ADDRESSES || (window.CFG.CONTROLLER_ADDRESS ? [window.CFG.CONTROLLER_ADDRESS] : null))) || ['0xcb1ee125cff4051a10a55a09b10613876c4ef199'],
-    RPC_URL: (window.CFG && window.CFG.RPC_URL) || 'https://cloudflare-eth.com'
-  };
+  // ---------- CFG ----------
+  var CFG = (window.CFG || window.FF_CFG || window.CONFIG || {});
+  var COLLECTION = (CFG.COLLECTION_ADDRESS || '').toLowerCase();
+  var CONTROLLERS = (CFG.CONTROLLER_ADDRESSES || (CFG.CONTROLLER_ADDRESS ? [CFG.CONTROLLER_ADDRESS] : [])).map(function(a){return String(a||'').toLowerCase();});
+  var RES_KEY = CFG.RESERVOIR_API_KEY || null;
 
-  // ---- tiny utils ----
-  const $ = (s,p)=> (p||document).querySelector(s);
-  const $$ = (s,p)=> Array.from((p||document).querySelectorAll(s));
+  // Defaults (safe fallbacks if CFG not loaded yet)
+  if (!COLLECTION) COLLECTION = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
+  if (!CONTROLLERS.length) CONTROLLERS = ['0xcb1ee125cff4051a10a55a09b10613876c4ef199'];
 
-  function hexToBI(hex){ if(!hex || hex==='0x') return 0n; return BigInt(hex); }
-  function pad32(addr){ const a = String(addr).replace(/^0x/,'').toLowerCase(); return '0'.repeat(64-a.length)+a; }
-  function fmtInt(v){ try{ const n = typeof v==='bigint' ? v : BigInt(String(v)); return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,','); }catch{ return String(v); } }
+  var HEAD = { accept:'*/*' };
+  if (RES_KEY) HEAD['x-api-key'] = RES_KEY;
 
-  async function rpc(url, body){
-    const r = await fetch(url, {method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify(body)});
-    if (!r.ok) throw new Error('RPC HTTP '+r.status);
-    const j = await r.json();
-    if (j.error) throw new Error(j.error.message||'RPC error');
-    return j.result;
+  // ---------- DOM helpers ----------
+  function $(s, p){ return (p||document).querySelector(s); }
+  function $$ (s, p){ return Array.prototype.slice.call((p||document).querySelectorAll(s)); }
+  function fmt(n){
+    try{ return (+n).toLocaleString(); }catch(_){ try{ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,','); }catch(_2){ return String(n); } }
   }
-
-  async function balanceOf(collection, owner, rpcUrl){
-    const data = '0x70a08231' + pad32(owner); // balanceOf(address)
-    const res = await rpc(rpcUrl, {jsonrpc:'2.0', id:1, method:'eth_call', params:[{to:collection, data}, 'latest']});
-    return hexToBI(res);
-  }
-
-  // find the KPI value node robustly
-  function getTotalTarget(){
-    // prefer #stakedTotal if it exists
-    const el = document.getElementById('stakedTotal');
+  function targetNode(){
+    var el = document.getElementById('stakedTotal');
     if (el) return el;
-    // else: first .info-grid-2 .info-block value cell
-    const guess = $('.info-grid-2 .info-block:nth-child(1) .iv');
+    var guess = $('.info-grid-2 .info-block:nth-child(1) .iv');
     if (guess) return guess;
-    // final: any .info-block containing the word "Total" as label
-    const blocks = $$('.info-grid-2 .info-block');
-    for (const b of blocks){
-      const label = b.querySelector('.ik'); if (label && /total/i.test(label.textContent||'')) {
-        const v = b.querySelector('.iv'); if (v) return v;
-      }
-    }
     return null;
   }
+  function setLabel(){
+    var ik = $('.info-grid-2 .info-block:nth-child(1) .ik');
+    if (ik) ik.textContent = '🌿 Total Staked';
+  }
+  function setControllerBox(){
+    var a = document.getElementById('stakedController');
+    if (!a) return;
+    var addr = CONTROLLERS[0];
+    if (!addr) return;
+    a.href = 'https://etherscan.io/address/' + addr;
+    a.textContent = addr.slice(0,6)+'…'+addr.slice(-4);
+  }
+  function setFLYZ(){
+    var box = $('.info-grid-2 .info-block:nth-child(3)');
+    if (!box) return;
+    var lab = box.querySelector('.ik'); if (lab) lab.textContent = '🪙 Rewards';
+    var iv  = box.querySelector('.iv'); if (!iv) return;
+    var a = iv.querySelector('#pondRewardsLink');
+    if (!a){ a = document.createElement('a'); a.id='pondRewardsLink'; iv.textContent=''; iv.appendChild(a); }
+    a.href='https://etherscan.io/token/0xd71d2f57819ae4be6924a36591ec6c164e087e63';
+    a.target='_blank'; a.rel='noopener';
+    a.innerHTML='<span id="pondRewardsSymbol">$FLYZ</span>';
+  }
+  function removeFourthBox(){
+    var blocks = $$('.info-grid-2 .info-block');
+    if (blocks[3]) blocks[3].remove();
+  }
 
-  async function fill(){
-    const collection = (window.CFG?.COLLECTION_ADDRESS || DEFAULTS.COLLECTION_ADDRESS || '').toLowerCase();
-    let controllers = window.CFG?.CONTROLLER_ADDRESSES || DEFAULTS.CONTROLLER_ADDRESSES || [];
-    controllers = Array.isArray(controllers) ? controllers : [controllers];
-    controllers = controllers.map(a => String(a||'').toLowerCase()).filter(Boolean);
+  // ---------- Reservoir fetchers ----------
+  // Fast aggregate count per controller
+  function ownersCount(controller){
+    var url = 'https://api.reservoir.tools/owners/v2?collection='+COLLECTION+'&owner='+controller+'&limit=1';
+    return fetch(url, {method:'GET', headers:HEAD}).then(function(res){
+      if (!res.ok) throw new Error('owners/v2 '+res.status);
+      return res.json();
+    }).then(function(j){
+      var row = (j.owners && j.owners[0]) || (j.ownerships && j.ownerships[0]) || j.ownership || null;
+      var cnt = row ? (row.tokenCount!=null ? row.tokenCount :
+                       row.ownership && row.ownership.tokenCount!=null ? row.ownership.tokenCount :
+                       0) : 0;
+      return Number(cnt||0);
+    }).catch(function(){ return 0; });
+  }
 
-    const out = getTotalTarget();
-    if (!out){ console.warn('[pond-kpis] KPI target not found.'); return; }
-
-    // label enforcement (optional)
-    const label = $('.info-grid-2 .info-block:nth-child(1) .ik');
-    if (label) label.textContent = '🌿 Total Staked';
-
-    // sanity logs
-    console.log('[pond-kpis] collection:', collection);
-    console.log('[pond-kpis] controllers:', controllers);
-    console.log('[pond-kpis] rpc:', (window.CFG?.RPC_URL || DEFAULTS.RPC_URL));
-
-    // guard rails
-    const addrOk = a => /^0x[a-f0-9]{40}$/.test(a);
-    if (!addrOk(collection)){ console.error('[pond-kpis] bad collection address'); out.textContent='—'; return; }
-    if (!controllers.length || !controllers.every(addrOk)){ console.error('[pond-kpis] bad controller address(es)'); out.textContent='—'; return; }
-
-    // try primary RPC, then a couple of common fallbacks if blocked
-    const rpcCandidates = [
-      (window.CFG?.RPC_URL || DEFAULTS.RPC_URL),
-      'https://mainnet.gateway.tenderly.co',
-      'https://rpc.ankr.com/eth'
-    ];
-
-    let total = 0n, lastErr=null;
-    for (const rpcUrl of rpcCandidates){
-      try{
-        const parts = await Promise.all(controllers.map(c => balanceOf(collection, c, rpcUrl).catch(()=>0n)));
-        total = parts.reduce((a,b)=>a+b, 0n);
-        console.log('[pond-kpis] parts:', parts.map(x=>x.toString()), 'sum:', total.toString(), 'via', rpcUrl);
-        break;
-      }catch(e){
-        lastErr = e;
-        console.warn('[pond-kpis] RPC failed at', rpcUrl, e?.message||e);
-      }
+  // Exact count fallback via tokens/v10 (paged)
+  function tokensCount(controller){
+    var total = 0, cont = null, guard = 0;
+    function once(){
+      var base = 'https://api.reservoir.tools/tokens/v10?collection='+COLLECTION+'&owner='+controller+'&limit=1000&includeTopBid=false';
+      var url  = cont ? base + '&continuation=' + encodeURIComponent(cont) : base;
+      return fetch(url, {method:'GET', headers:HEAD}).then(function(res){
+        if (!res.ok) throw new Error('tokens/v10 '+res.status);
+        return res.json();
+      }).then(function(j){
+        total += (j.tokens || []).length;
+        cont = j.continuation || null;
+        guard++;
+        if (cont && guard < 20) return once();
+        return total;
+      }).catch(function(){ return total; });
     }
+    return once();
+  }
 
-    if (total === 0n && lastErr){
-      // likely blocked RPC; keep UI graceful
+  function fetchTotalStaked(){
+    // First try owners/v2 for all controllers, then fallback to tokens/v10 for any zeroes.
+    return Promise.all(CONTROLLERS.map(ownersCount)).then(function(ownersArr){
+      var sum = ownersArr.reduce(function(a,b){return a + (b||0);}, 0);
+      // If sum > 0, good enough (fast). If 0, try exact tokens/v10 (slower).
+      if (sum > 0) return sum;
+      return Promise.all(CONTROLLERS.map(tokensCount)).then(function(tokensArr){
+        return tokensArr.reduce(function(a,b){return a + (b||0);}, 0);
+      });
+    });
+  }
+
+  function fillTotal(){
+    var out = targetNode(); if (!out) return;
+    out.textContent = '…';
+    fetchTotalStaked().then(function(n){
+      out.textContent = fmt(n);
+    }).catch(function(){
       out.textContent = '—';
-      return;
-    }
-    out.textContent = fmtInt(total);
+    });
   }
 
   function init(){
-    // set controller box if present
-    const a = document.getElementById('stakedController');
-    if (a){
-      const ctrl = (window.CFG?.CONTROLLER_ADDRESSES || window.CFG?.CONTROLLER_ADDRESS || DEFAULTS.CONTROLLER_ADDRESSES[0]);
-      if (ctrl) { a.href = 'https://etherscan.io/address/'+ctrl; a.textContent = (ctrl.slice(0,6)+'…'+ctrl.slice(-4)); }
-    }
-    fill().catch(e=>{ console.warn('[pond-kpis] fill error', e); });
+    setLabel();
+    setControllerBox();
+    setFLYZ();
+    removeFourthBox();
+    fillTotal();
   }
 
   document.addEventListener('DOMContentLoaded', init);
