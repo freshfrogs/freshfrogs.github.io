@@ -1,199 +1,161 @@
-// assets/js/pond-kpis.js — Reservoir-based KPIs (no ABI, no wallet needed)
+// assets/js/pond-kpis.js — robust KPIs (on-chain with public RPC, Reservoir fallback)
 (function () {
   'use strict';
 
-  // ---- constants ----
+  const C = window.FF_CFG || {};
+  const FALLBACK_RPC = 'https://cloudflare-eth.com';
   const FLYZ_URL = 'https://etherscan.io/token/0xd71d2f57819ae4be6924a36591ec6c164e087e63';
 
-  // Fallbacks so KPIs work even if config hasn't hydrated yet
-  const FALLBACK_CONTROLLER = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
-  const FALLBACK_COLLECTION = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
-
-  // ---- dom helpers ----
-  const $  = (s, p=document) => p.querySelector(s);
-  const $$ = (s, p=document) => Array.from(p.querySelectorAll(s));
-
-  // ---- formatting ----
-  const shorten = (addr) => !addr ? '—' : String(addr).slice(0,6) + '…' + String(addr).slice(-4);
-  function formatInt(v){
-    try {
-      if (v && typeof v === 'object' && 'toString' in v) v = v.toString();
-      if (typeof v === 'string') {
-        if (v.includes('.')) v = v.split('.')[0];
-        return Number.isSafeInteger(+v) ? (+v).toLocaleString() : v.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-      }
-      if (typeof v === 'bigint') return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-      if (typeof v === 'number') return Math.floor(v).toLocaleString();
+  // DOM helpers
+  const byId = (id) => document.getElementById(id);
+  const $ = (sel, p=document) => p.querySelector(sel);
+  const $$ = (sel, p=document) => Array.from(p.querySelectorAll(sel));
+  const shorten = (a)=>!a?'—':String(a).slice(0,6)+'…'+String(a).slice(-4);
+  const fmtInt = (v)=> {
+    try{
+      if (v && typeof v==='object' && 'toString' in v) v = v.toString();
+      if (typeof v==='string'){ if (v.includes('.')) v=v.split('.')[0]; return Number.isFinite(+v)?(+v).toLocaleString():v.replace(/\B(?=(\d{3})+(?!\d))/g,','); }
+      if (typeof v==='bigint') return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g,',');
+      if (typeof v==='number') return Math.floor(v).toLocaleString();
       return String(v ?? '—');
-    } catch { return String(v ?? '—'); }
-  }
+    }catch{ return String(v ?? '—'); }
+  };
 
-  // ---- config discovery ----
-  function getCollection(){
-    const col = window?.CFG?.COLLECTION_ADDRESS || window?.CONFIG?.COLLECTION_ADDRESS || FALLBACK_COLLECTION;
-    return String(col).toLowerCase();
-  }
-  function getControllers(){
-    // Support one or many controller addresses
-    const many = window?.CFG?.CONTROLLER_ADDRESSES
-              || window?.CONFIG?.CONTROLLER_ADDRESSES
-              || window?.FF_CONFIG?.CONTROLLER_ADDRESSES;
-    const one  = window?.CFG?.CONTROLLER_ADDRESS
-              || window?.CONFIG?.CONTROLLER_ADDRESS
-              || window?.FF_CONFIG?.CONTROLLER_ADDRESS
-              || FALLBACK_CONTROLLER;
-    const arr = (Array.isArray(many) ? many : [one]).filter(Boolean);
-    return [...new Set(arr.map(a => String(a).toLowerCase()))];
-  }
+  // API headers (Reservoir optional)
   function apiHeaders(){
-    const h = { accept: '*/*' };
-    const key = window?.CFG?.FROG_API_KEY || window?.RESERVOIR_API_KEY;
-    if (key) h['x-api-key'] = key; // optional
+    const h={accept:'*/*'};
+    const key = C.FROG_API_KEY || window.RESERVOIR_API_KEY;
+    if (key) h['x-api-key']=key;
     return h;
   }
 
-  // ---- UI priming (labels, links, blurb, remove notes, rename header) ----
+  // UI priming: label, flyz link, remove Notes, rename Owned->Dashboard (if present)
   function primeUI(){
-    // Pond blurb
     const blurb = $('.pg-muted');
     if (blurb) blurb.textContent = 'Live view of staking activity in the FreshFrogs pond — track total staked, the controller contract, and FLYZ rewards.';
 
-    // First KPI label → '🌿 Totak Staked' (requested exact wording)
     const firstLabel = $('.info-grid-2 .info-block:nth-child(1) .ik');
-    if (firstLabel) firstLabel.textContent = '🌿 Totak Staked';
+    if (firstLabel) firstLabel.textContent = '🌿 Total Staked';
 
-    // Rewards → ensure emoji + link to FLYZ
     const third = $('.info-grid-2 .info-block:nth-child(3)');
-    if (third) {
-      const label = third.querySelector('.ik');
-      if (label) label.textContent = '🪙 Rewards';
+    if (third){
+      const lab = third.querySelector('.ik'); if (lab) lab.textContent = '🪙 Rewards';
       const iv = third.querySelector('.iv');
-      if (iv) {
+      if (iv){
         let a = iv.querySelector('#pondRewardsLink');
-        if (!a) {
-          a = document.createElement('a');
-          a.id = 'pondRewardsLink';
-          a.target = '_blank';
-          a.rel = 'noopener';
-          a.href = FLYZ_URL;
-          a.innerHTML = '<span id="pondRewardsSymbol">$FLYZ</span>';
-          iv.textContent = '';
-          iv.appendChild(a);
-        } else {
-          a.href = FLYZ_URL;
-          a.target = '_blank';
-          a.rel = 'noopener';
-          if (!a.querySelector('#pondRewardsSymbol')) {
-            a.innerHTML = '<span id="pondRewardsSymbol">$FLYZ</span>';
-          }
-        }
+        if (!a){ a=document.createElement('a'); a.id='pondRewardsLink'; a.target='_blank'; a.rel='noopener'; a.href=FLYZ_URL; a.innerHTML='<span id="pondRewardsSymbol">$FLYZ</span>'; iv.textContent=''; iv.appendChild(a); }
+        else { a.href=FLYZ_URL; a.target='_blank'; a.rel='noopener'; if (!a.querySelector('#pondRewardsSymbol')) a.innerHTML='<span id="pondRewardsSymbol">$FLYZ</span>'; }
       }
     }
 
-    // Remove 4th info box (Notes), if present
     const blocks = $$('.info-grid-2 .info-block');
     if (blocks[3]) blocks[3].remove();
 
-    // Rename "My Frogs (Owned)" → Dashboard (if applicable)
-    const heads = Array.from(document.querySelectorAll('#ownedPanel .panel-title, .owned-panel .panel-title, h2.panel-title'));
-    const ownedHead = heads.find(h => /My Frogs\s*\(Owned\)/i.test(h.textContent));
-    if (ownedHead) ownedHead.textContent = 'Dashboard';
+    // Optional rename of "My Frogs (Owned)" if that header exists
+    const heads = $$('#ownedPanel .panel-title, .owned-panel .panel-title, h2.panel-title');
+    const owned = heads.find(h=>/My Frogs\s*\(Owned\)/i.test(h.textContent));
+    if (owned) owned.textContent = 'Dashboard';
   }
 
-  // ---- controller box fill ----
+  // Controller box
   function fillControllerBox(){
-    const a = $('#stakedController');
-    if (!a) return;
-    const controllers = getControllers();
-    const addr = controllers[0];
-    if (!addr) return;
+    const a = byId('stakedController');
+    const addr = (C.CONTROLLER_ADDRESS || '').toLowerCase();
+    if (!a || !addr) return;
     a.href = 'https://etherscan.io/address/' + addr;
     a.textContent = shorten(addr);
   }
 
-  // ---- Reservoir fetchers ----
-  // Fast aggregate via owners/v2 (sum across controllers if needed)
-  async function ownersCount(){
-    const collection = getCollection();
-    const controllers = getControllers();
-    if (!controllers.length) throw new Error('No controller address');
-
-    let total = 0;
-    for (const c of controllers){
-      const url = `https://api.reservoir.tools/owners/v2?collection=${collection}&owner=${c}&limit=1`;
-      const res = await fetch(url, { method:'GET', headers: apiHeaders() });
-      if (!res.ok) throw new Error(`owners/v2 ${res.status}`);
-      const j = await res.json();
-      const row = (j.owners || j.ownerships || [])[0] || {};
-      const cnt = row.tokenCount ?? row?.ownership?.tokenCount ?? row?.ownerships?.[0]?.tokenCount ?? 0;
-      total += Number(cnt || 0);
-    }
-    return total;
+  // Web3 provider (wallet -> FF_CFG.RPC_URL -> public)
+  function makeWeb3(){
+    if (!window.Web3){ console.warn('[pond-kpis] Web3 not on page'); return null; }
+    const provider =
+      (window.web3 && window.web3.currentProvider) ||
+      window.ethereum ||
+      (C.RPC_URL ? new window.Web3.providers.HttpProvider(C.RPC_URL) : new window.Web3.providers.HttpProvider(FALLBACK_RPC));
+    try{ return new window.Web3(provider); }catch(e){ console.warn('[pond-kpis] Web3 init failed', e); return null; }
   }
 
-  // Exact but slower via tokens/v10 paging (sum across controllers)
-  async function tokensCount(){
-    const collection = getCollection();
-    const controllers = getControllers();
-    if (!controllers.length) throw new Error('No controller address');
-
-    let grand = 0;
-    for (const c of controllers){
-      let continuation = null, subtotal = 0, guard = 0;
-      do {
-        const base = `https://api.reservoir.tools/tokens/v10?collection=${collection}&owner=${c}&limit=1000&includeTopBid=false`;
-        const url  = continuation ? `${base}&continuation=${encodeURIComponent(continuation)}` : base;
-        const res  = await fetch(url, { method:'GET', headers: apiHeaders() });
-        if (!res.ok) throw new Error(`tokens/v10 ${res.status}`);
-        const j = await res.json();
-        subtotal += (j.tokens || []).length;
-        continuation = j.continuation || null;
-        guard++;
-      } while (continuation && guard < 10); // safety cap (supply 4040)
-      grand += subtotal;
-    }
-    return grand;
+  // On-chain: ERC-721 balanceOf(controller)
+  async function getTotalStakedOnChain(){
+    if (!C.COLLECTION_ADDRESS || !C.CONTROLLER_ADDRESS) throw new Error('Missing COLLECTION_ADDRESS or CONTROLLER_ADDRESS');
+    const w3 = makeWeb3(); if (!w3) throw new Error('No web3');
+    const erc721 = new w3.eth.Contract(
+      [{"constant":true,"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":""}],"stateMutability":"view","type":"function"}],
+      C.COLLECTION_ADDRESS
+    );
+    const n = await erc721.methods.balanceOf(C.CONTROLLER_ADDRESS).call();
+    return n;
   }
 
-  // ---- total staked fill + cross-check ----
+  // Reservoir fallback: owners aggregate (fast) or tokens paging (exact)
+  async function getTotalStakedReservoir(){
+    const collection = (C.COLLECTION_ADDRESS || '').toLowerCase();
+    const controller = (C.CONTROLLER_ADDRESS || '').toLowerCase();
+    if (!collection || !controller) throw new Error('Missing addresses');
+
+    // try owners/v2 (fast)
+    try{
+      const u = `https://api.reservoir.tools/owners/v2?collection=${collection}&owner=${controller}&limit=1`;
+      const r = await fetch(u, {headers: apiHeaders()});
+      if (r.ok){
+        const j = await r.json();
+        const row = (j.owners || j.ownerships || [])[0] || {};
+        const cnt = row.tokenCount ?? row?.ownership?.tokenCount ?? row?.ownerships?.[0]?.tokenCount ?? 0;
+        return String(cnt);
+      }
+    }catch(_){}
+
+    // fallback tokens/v10 (paged)
+    let cont=null, total=0, guard=0;
+    do{
+      const base=`https://api.reservoir.tools/tokens/v10?collection=${collection}&owner=${controller}&limit=1000&includeTopBid=false`;
+      const url = cont ? `${base}&continuation=${encodeURIComponent(cont)}` : base;
+      const r = await fetch(url, {headers: apiHeaders()});
+      if (!r.ok) throw new Error('tokens/v10 failed '+r.status);
+      const j = await r.json();
+      total += (j.tokens||[]).length;
+      cont = j.continuation || null;
+      guard++;
+    }while(cont && guard<10);
+    return String(total);
+  }
+
   async function fillTotalStaked(){
-    const outEl = $('#stakedTotal');
-    if (!outEl) return;
+    const out = byId('stakedTotal'); if (!out) return;
 
-    // Try owners (fast)
-    let fast = null;
-    try { fast = await ownersCount(); } catch(e){ /* fall through */ }
+    // 1) Try on-chain (authoritative)
+    try{
+      const raw = await getTotalStakedOnChain();
+      out.textContent = fmtInt(raw);
+      const stamp = byId('stakedUpdated'); if (stamp) stamp.textContent = new Date().toLocaleTimeString();
+      return;
+    }catch(e){
+      console.warn('[pond-kpis] on-chain balanceOf fallback to Reservoir', e?.message || e);
+    }
 
-    // Try tokens (exact)
-    let slow = null;
-    try { slow = await tokensCount(); } catch(e){ /* fall through */ }
-
-    // Decide what to show
-    const decided =
-      (typeof slow === 'number' && !Number.isNaN(slow)) ? slow :
-      (typeof fast === 'number' && !Number.isNaN(fast)) ? fast :
-      null;
-
-    if (decided != null) outEl.textContent = formatInt(decided);
-    else if (!outEl.textContent || outEl.textContent.trim() === '') outEl.textContent = '—';
-
-    // Optional: if both exist and differ, choose larger and log
-    if (typeof fast === 'number' && typeof slow === 'number' && fast !== slow){
-      outEl.textContent = formatInt(Math.max(fast, slow));
-      console.warn('[PondKPIs] owners vs tokens mismatch', { owners_v2: fast, tokens_v10: slow, shown: outEl.textContent });
+    // 2) Fallback to Reservoir
+    try{
+      const raw = await getTotalStakedReservoir();
+      out.textContent = fmtInt(raw);
+      const stamp = byId('stakedUpdated'); if (stamp) stamp.textContent = new Date().toLocaleTimeString();
+    }catch(e){
+      console.warn('[pond-kpis] Reservoir failed', e);
+      if (!out.textContent || out.textContent.trim()==='') out.textContent = '—';
     }
   }
 
-  // ---- public API + init ----
   async function refresh(){
     primeUI();
     fillControllerBox();
     await fillTotalStaked();
   }
 
+  // expose manual trigger
   window.PondKPIs = { refresh };
 
-  function kick(){ refresh().catch(()=>{}); }
+  // init / re-run
+  const kick = ()=> refresh().catch(()=>{});
   document.addEventListener('DOMContentLoaded', kick);
   window.addEventListener('load', kick);
   document.addEventListener('ff:wallet:ready', kick);
