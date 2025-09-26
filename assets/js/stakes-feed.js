@@ -1,29 +1,32 @@
 // assets/js/stakes-feed.js
-// Recent Staking Activity — mirrors mints-feed rendering & behaviour.
-// Data source: Reservoir users+collection filter; classifies stake/unstake by controller.
-// Renders into <ul id="recentStakes">. No visual changes required.
+// Recent Staking Activity — EXACT same renderer/behaviour as mints-feed.
+// Source: Reservoir users+collection activity; classifies stake/unstake by controller.
+// Renders into <ul id="recentStakes">.
 
 (function (FF, CFG) {
-  const UL_ID = 'recentStakes';
+  'use strict';
 
-  // ---- Config ---------------------------------------------------------------
+  // --------- REQUIRED CONFIG ----------
   const BASE  = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
   const API   = BASE + '/users/activity/v6';
-  const PAGE_SIZE = Math.max(1, Math.min(50, Number(CFG.PAGE_SIZE || 5)));
-  const MAX_PAGES = Math.max(1, Number(CFG.MAX_PAGES || 8));
+  const API_KEY    = (CFG.FROG_API_KEY || CFG.RESERVOIR_API_KEY || '').trim();
+  const CONTROLLER = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
+  const COLLECTION = (CFG.COLLECTION_ADDRESS || '').trim();
+  if (!API_KEY || !CONTROLLER || !COLLECTION) {
+    console.warn('[stakes] Missing API key / CONTROLLER_ADDRESS / COLLECTION_ADDRESS in config.js');
+  }
 
-  function need(k){ if(!CFG[k]) throw new Error('[stakes] Missing FF_CFG.'+k); return CFG[k]; }
-  const API_KEY    = need('FROG_API_KEY');
-  const CONTROLLER = need('CONTROLLER_ADDRESS').toLowerCase();
-  const COLLECTION = need('COLLECTION_ADDRESS');
+  // --------- TUNING (match mints-feed defaults) ----------
+  const PAGE_SIZE = Math.max(1, Math.min(50, Number(CFG.STAKES_PAGE_SIZE || 10)));
+  const MAX_PAGES = Math.max(1, Number(CFG.STAKES_MAX_PAGES || 8));
 
-  // ---- Headers --------------------------------------------------------------
+  // --------- Headers (share with mints-feed if present) ----------
   function apiHeaders(){
     if (FF.apiHeaders && typeof FF.apiHeaders === 'function') return FF.apiHeaders();
     return { accept: 'application/json', 'x-api-key': API_KEY };
   }
 
-  // ---- Shared queue (same as mints-feed) ------------------------------------
+  // --------- Shared rate-limited fetch queue (identical to mints) ----------
   (function ensureQueue(){
     if (window.FF_RES_QUEUE) return;
     const RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 800);
@@ -49,7 +52,7 @@
     window.FF_RES_QUEUE = { fetch(url, init){ chain = chain.then(()=> run(url, init)); return chain; } };
   })();
 
-  // ---- Utils ----------------------------------------------------------------
+  // --------- Small utils (identical outputs to mints-feed) ----------
   const shorten = (a)=> (FF.shorten && FF.shorten(a)) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
   const ago     = (d)=> d ? (FF.formatAgo ? FF.formatAgo(Date.now()-d.getTime())+' ago' : d.toLocaleString()) : '';
   const imgFor  = (id)=> (CFG.SOURCE_PATH || '') + '/frog/' + id + '.png';
@@ -61,37 +64,41 @@
     const base =
       chainId === 1        ? 'https://etherscan.io/tx/' :
       chainId === 11155111 ? 'https://sepolia.etherscan.io/tx/' :
-      'https://etherscan.io/tx/';
+                              'https://etherscan.io/tx/';
     return base + hash;
   }
 
-  // ---- DOM helpers (identical behaviour to mints) ---------------------------
-  function ul(){ return document.getElementById(UL_ID); }
-  function applyVisibleRows(root){
-    if (!root) return;
-    root.classList.add('scrolling'); root.style.overflowY='auto';
-    const visible = Number(root.getAttribute('data-visible')) || Number(CFG.STAKES_VISIBLE || 6);
-    const r0 = root.querySelector('.row'); if (!r0){ root.style.maxHeight=''; return; }
-    const gap = parseFloat(getComputedStyle(root).gap || '0') || 0;
+  // --------- DOM helpers (same behaviour as mints) ----------
+  const UL_ID = 'recentStakes';
+  function root(){ return document.getElementById(UL_ID); }
+
+  function applyVisibleRows(ul){
+    if (!ul) return;
+    ul.classList.add('scrolling'); ul.style.overflowY='auto';
+    const visible = Number(ul.getAttribute('data-visible')) || Number(CFG.STAKES_VISIBLE || 6);
+    const r0 = ul.querySelector('.row'); if (!r0){ ul.style.maxHeight=''; return; }
+    const gap = parseFloat(getComputedStyle(ul).gap || '0') || 0;
     const h = r0.getBoundingClientRect().height || 84;
-    root.style.maxHeight = Math.round(h*visible + gap*(visible-1))+'px';
+    ul.style.maxHeight = Math.round(h*visible + gap*(visible-1))+'px';
   }
-  function ensureSentinel(root){
-    let s = root.querySelector('li[data-sentinel]');
-    if (!s){ s=document.createElement('li'); s.setAttribute('data-sentinel','1'); s.innerHTML = '<div class="pg-muted">Loading more…</div>'; root.appendChild(s); }
+  function ensureSentinel(ul){
+    let s = ul.querySelector('li[data-sentinel]');
+    if (!s){ s=document.createElement('li'); s.setAttribute('data-sentinel','1'); s.innerHTML='<div class="pg-muted">Loading more…</div>'; ul.appendChild(s); }
     return s;
   }
-  function setSentinelText(root, t){ const s=root.querySelector('li[data-sentinel]'); if (s) s.innerHTML = '<div class="pg-muted">'+t+'</div>'; }
+  function setSentinelText(ul, t){ const s=ul.querySelector('li[data-sentinel]'); if (s) s.innerHTML = '<div class="pg-muted">'+t+'</div>'; }
 
-  // ---- Mapping --------------------------------------------------------------
+  // --------- Map API activity → row model (mirrors mints style) ----------
   function mapRow(a){
-    const type = a?.event?.kind || a?.type;                 // "transfer"
+    const type = a?.event?.kind || a?.type;   // "transfer"
     if (type !== 'transfer') return null;
 
+    // Robust address extraction
     const from = (a?.event?.fromAddress || a?.fromAddress || a?.from || '').toLowerCase();
     const to   = (a?.event?.toAddress   || a?.toAddress   || a?.to   || '').toLowerCase();
 
-    let kind=null, other=null;                               // show the non-controller address like mints list
+    // Classify stake/unstake by controller side; show counterparty like mints feed does
+    let kind=null, other=null;
     if (to === CONTROLLER){ kind='stake';   other = from; }
     else if (from === CONTROLLER){ kind='unstake'; other = to; }
     else return null;
@@ -106,87 +113,102 @@
     return { id: tokenId, other, time: dt, img: imgFor(tokenId), tx, kind };
   }
 
-  // ---- Fetch page (users + collection + transfer) ---------------------------
-  async function fetchPage(cont){
+  // --------- Fetch a page (users + collection + transfer) ----------
+  async function fetchPage(continuation){
     const qs = new URLSearchParams({
       users: CONTROLLER,
       collection: COLLECTION,
       types: 'transfer',
       limit: String(PAGE_SIZE)
     });
-    if (cont) qs.set('continuation', cont);
+    if (continuation) qs.set('continuation', continuation);
     const json = await window.FF_RES_QUEUE.fetch(API + '?' + qs.toString());
     const rows = (json?.activities || []).map(mapRow).filter(Boolean);
     return { rows, continuation: json?.continuation || null };
   }
 
-  // ---- Render + infinite scroll --------------------------------------------
-  let items=[], continuation=null, pageCount=0, loading=false, io=null;
+  // --------- Render (EXACT mints-card layout) ----------
+  function renderOne(it){
+    const li = document.createElement('li'); li.className = 'row';
+    const href = txUrl(it.tx);
+    if (href){ li.title='View transaction on Etherscan'; li.addEventListener('click', ()=> window.open(href,'_blank','noopener')); }
 
-  function renderAll(root){
-    root.innerHTML='';
-    if (!items.length){
-      root.innerHTML = '<li class="row"><div class="pg-muted">No recent stakes yet.</div></li>';
-    } else {
-      items.forEach(it=>{
-        const meta = [ it.other ? '→ '+shorten(it.other) : null, it.time ? ago(it.time) : null ].filter(Boolean).join(' • ');
-        const li = document.createElement('li'); li.className='row';
-        const href = txUrl(it.tx);
-        if (href){ li.title='View transaction on Etherscan'; li.addEventListener('click', ()=> window.open(href,'_blank','noopener')); }
-        li.innerHTML =
-          (FF.thumb64 ? FF.thumb64(it.img, 'Frog '+it.id) : '<img class="thumb64" src="'+it.img+'" alt="'+it.id+'">') +
-          '<div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b>'+ (it.kind==='stake'?'Staked':'Unstaked') +'</b> • Frog #'+it.id+
-          '</div><div class="pg-muted">'+meta+(href?' • Etherscan':'')+'</div></div>';
-        root.appendChild(li);
-      });
-      ensureSentinel(root);
-      setSentinelText(root, (!continuation || pageCount>=MAX_PAGES) ? 'End of results' : 'Loading more…');
-    }
-    requestAnimationFrame(()=> applyVisibleRows(root));
+    // left thumb matches mints-feed (uses FF.thumb64 helper if present)
+    const thumb = (FF.thumb64 ? FF.thumb64(it.img, 'Frog '+it.id) : `<img class="thumb64" src="${it.img}" alt="${it.id}">`);
+    const label = `<b>${it.kind==='stake' ? 'Staked' : 'Unstaked'}</b> • Frog #${it.id}`;
+    const meta  = [ it.other ? '→ '+shorten(it.other) : null, it.time ? ago(it.time) : null, href ? 'Etherscan' : null ]
+                  .filter(Boolean).join(' • ');
+
+    li.innerHTML = thumb + `<div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${label}</div><div class="pg-muted">${meta}</div></div>`;
+    return li;
   }
 
-  async function loadFirstPage(root){
+  // --------- State + infinite scroll ----------
+  let items=[], continuation=null, pageCount=0, loading=false, io=null;
+
+  function paint(ul){
+    ul.innerHTML = '';
+    if (!items.length){
+      ul.innerHTML = '<li class="row"><div class="pg-muted">No recent stakes yet.</div></li>';
+    } else {
+      const frag = document.createDocumentFragment();
+      items.forEach(it => frag.appendChild(renderOne(it)));
+      ul.appendChild(frag);
+      ensureSentinel(ul);
+      setSentinelText(ul, (!continuation || pageCount>=MAX_PAGES) ? 'End of results' : 'Loading more…');
+    }
+    requestAnimationFrame(()=> applyVisibleRows(ul));
+  }
+
+  async function loadFirst(ul){
     loading=true;
     try{
       const first = await fetchPage(null);
-      items = first.rows.sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
+      // show newest first, like mints
+      items = first.rows.sort((a,b) => (b.time?.getTime()||0) - (a.time?.getTime()||0));
       continuation = first.continuation; pageCount = 1;
-      renderAll(root);
+      paint(ul);
     }catch(e){
       console.warn('[stakes] first page failed', e);
-      root.innerHTML = '<li class="row"><div class="pg-muted">Could not load recent stakes.</div></li>';
+      ul.innerHTML = '<li class="row"><div class="pg-muted">Could not load recent stakes.</div></li>';
     }finally{ loading=false; }
   }
 
-  async function loadNextPage(root){
-    if (!continuation || loading) return;
+  async function loadMore(ul){
+    if (!continuation || loading || pageCount>=MAX_PAGES) return;
     loading=true;
     try{
       const next = await fetchPage(continuation);
       continuation = next.continuation; pageCount += 1;
       items = items.concat(next.rows).sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
-      renderAll(root);
+      paint(ul);
     }catch(e){
       console.warn('[stakes] next page failed', e);
-      setSentinelText(root, 'Could not load more.');
+      setSentinelText(ul, 'Could not load more.');
     }finally{ loading=false; }
   }
 
-  function attachObserver(root){
+  function observe(ul){
     if (io) { try { io.disconnect(); } catch{} io=null; }
-    const s = ensureSentinel(root);
+    const s = ensureSentinel(ul);
     io = new IntersectionObserver((entries)=>{
-      entries.forEach(en=>{
-        if (en.isIntersecting){ loadNextPage(root); }
-      });
-    }, { root, rootMargin: '100px' });
+      entries.forEach(en => { if (en.isIntersecting) loadMore(ul); });
+    }, { root: ul, rootMargin: '100px' });
     io.observe(s);
   }
 
-  // ---- Public init ----------------------------------------------------------
+  // --------- Public init (same name as index feed pattern) ----------
   window.FF_loadRecentStakes = function(){
-    const root = ul(); if (!root) return;
-    loadFirstPage(root);
-    attachObserver(root);
+    const ul = root(); if (!ul) return;
+    loadFirst(ul);
+    observe(ul);
   };
+
+  // auto-boot (harmless if also called inline)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => window.FF_loadRecentStakes && window.FF_loadRecentStakes());
+  } else {
+    window.FF_loadRecentStakes && window.FF_loadRecentStakes();
+  }
+
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
