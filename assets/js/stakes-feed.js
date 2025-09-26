@@ -1,10 +1,12 @@
 // assets/js/stakes-feed.js
-// Pond "Recent Staking Activity" — users+collection filter (Reservoir).
-// Renders into <ul id="recentStakes"> using your existing .row styles.
+// Pond — Recent Staking Activity (Reservoir users+collection filter)
+// Renders into <ul id="recentStakes"> using existing .row / .pill styles.
+// No visual changes.
 
 (function(){
   'use strict';
 
+  // --- Config ---------------------------------------------------------------
   const C    = (window.FF_CFG || {});
   const HOST = (C.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
   const KEY  = C.FROG_API_KEY || C.RESERVOIR_API_KEY || '';
@@ -14,8 +16,9 @@
   const LIST_ID   = 'recentStakes';
   const PAGE_SIZE = 20;
 
-  function $(sel){ return document.querySelector(sel); }
-  function el(id){ return document.getElementById(id); }
+  // --- DOM helpers ----------------------------------------------------------
+  const $  = (sel) => document.querySelector(sel);
+  const el = (id)  => document.getElementById(id);
 
   function fmtAgo(tsSec){
     if (!tsSec) return '';
@@ -48,6 +51,7 @@
     return li;
   }
 
+  // --- Data fetch (Reservoir) -----------------------------------------------
   async function fetchActivityPage(continuation=null){
     if (!CTRL) throw new Error('Missing FF_CFG.CONTROLLER_ADDRESS');
     if (!COLL) throw new Error('Missing FF_CFG.COLLECTION_ADDRESS');
@@ -69,19 +73,22 @@
     }
     const j = await res.json();
 
+    // Robust mapping: support event.from/to OR top-level fromAddress/toAddress
     const rows = (j.activities || []).flatMap(a => {
-      const ev = a.event || {};
-      if (ev.kind !== 'transfer') return [];
-      const from = (ev.fromAddress||'').toLowerCase();
-      const to   = (ev.toAddress||'').toLowerCase();
+      const type = a.event?.kind || a.type;           // "transfer"
+      if (type !== 'transfer') return [];
+      const from = (a.event?.fromAddress || a.fromAddress || a.from || '').toLowerCase();
+      const to   = (a.event?.toAddress   || a.toAddress   || a.to   || '').toLowerCase();
+
       let kind = null;
-      if (to === CTRL) kind = 'stake';
+      if (to === CTRL)        kind = 'stake';
       else if (from === CTRL) kind = 'unstake';
       else return [];
+
       return [{
         kind,
-        tokenId: Number(a.token?.tokenId) || null,
-        tx: a.txHash || null,
+        tokenId: Number(a.token?.tokenId ?? a.tokenId) || null,
+        tx: a.txHash || a.transactionHash || null,
         timestamp: a.timestamp || null
       }];
     });
@@ -89,7 +96,7 @@
     return { rows, continuation: j.continuation || null };
   }
 
-  // Mount + infinite scroll
+  // --- Mount / infinite scroll ---------------------------------------------
   let cont = null, busy = false, booted = false, listEl = null;
 
   async function loadPage(){
@@ -104,7 +111,7 @@
 
       if (!booted){
         listEl.innerHTML = '';
-        listEl.classList.add('scrolling');
+        listEl.classList.add('scrolling'); // you already style this id
         booted = true;
       }
 
@@ -138,7 +145,7 @@
     wrap.addEventListener('scroll', onScroll);
   }
 
-  // Public hook you already call in collection.html
+  // Public hook already called in your collection.html
   window.FF_loadRecentStakes = function(){
     listEl = el(LIST_ID) || $('[data-pond-list]');
     if (!listEl) return;
@@ -146,7 +153,7 @@
     attachInfiniteScroll();
   };
 
-  // Also auto-boot if the page forgets to call it
+  // Also auto-boot (harmless if you keep the explicit call)
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => window.FF_loadRecentStakes());
   } else {
