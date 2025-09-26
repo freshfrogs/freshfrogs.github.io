@@ -186,28 +186,23 @@
     document.addEventListener('DOMContentLoaded', layoutFrogStrip);
   </script>
 
-  <!-- Config & shared helpers -->
+  <!-- Config & helpers -->
   <script src="assets/js/config.js"></script>
   <script src="assets/js/utils.js"></script>
   <script src="assets/js/rarity.js"></script>
   <script src="assets/js/modal.js"></script>
 
-  <!-- ABIs (must be before the adapter) -->
+  <!-- ABIs (must be before adapter) -->
   <script src="assets/abi/collection_abi.js"></script>
   <script src="assets/abi/controller_abi.js"></script>
 
-  <!-- NEW/Fixed: staking adapter (defines FF.staking helpers) -->
+  <!-- Adapter (this file) -->
   <script src="assets/js/staking-adapter.js"></script>
 
-  <!-- Your existing feeds/panels (unchanged UI) -->
+  <!-- Your existing panels/feeds -->
   <script src="assets/js/stakes-feed.js"></script>
   <script src="assets/js/pond-tweaks.js"></script>
   <script src="assets/js/owned-panel.js"></script>
-
-  <script>
-    window.FF_loadRecentStakes && window.FF_loadRecentStakes();
-    window.FF_initOwnedPanel && window.FF_initOwnedPanel();
-  </script>
 
 </body>
 </html>
