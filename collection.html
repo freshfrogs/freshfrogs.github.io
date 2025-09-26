@@ -57,7 +57,7 @@
       }
     }
 
-    /* Owned Frogs panel (old look) */
+    /* Cards (Owned Frogs) */
     #ownedCard .grid-cards{ display:grid; gap:10px; grid-template-columns: 1fr; }
     .frog-card{
       border:1px solid var(--border);
@@ -74,9 +74,6 @@
     .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
     .pill{ display:inline-block; padding:3px 10px; border-radius:999px; background: color-mix(in srgb, var(--panel) 85%, transparent); border:1px solid var(--border); font-size:12px; }
     .meta{ color:var(--muted); font-size:12px; }
-    .attr-list{ list-style:none; margin:6px 0 0 0; padding:0; display:flex; gap:6px; flex-wrap:wrap; }
-    .attr{ border:1px dashed var(--border); border-radius:999px; padding:4px 10px; font-size:12px; background: color-mix(in srgb, var(--panel) 85%, transparent); }
-
     .actions{ grid-column:1 / -1; display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
     .btn{
       font-family: var(--font-ui);
@@ -119,17 +116,17 @@
     <!-- GRID -->
     <div class="page-grid">
 
-      <!-- Left: Fresh Frogs + Recent Stakes (with stats) -->
+      <!-- Left: The Pond (activity + KPIs) -->
       <section class="pg-card">
-        <div class="pg-card-head"><h3>Fresh Frogs NFT</h3></div>
+        <div class="pg-card-head"><h3>The Pond</h3></div>
         <p class="pg-muted" style="margin:6px 0 12px 0; max-width:70ch;">
           Pixel-perfect frogs hopping around the Ethereum pond. Stake to earn FLYZ and explore the collection’s quirks and traits.
         </p>
 
-        <!-- Stakes stats -->
+        <!-- KPIs -->
         <div class="info-grid-2" style="margin-bottom:10px;">
           <div class="info-block">
-            <div class="ik">🪵 Total Frogs Staked</div>
+            <div class="ik">🐸  Total Frogs Staked</div>
             <div class="iv" id="stakedTotal">—</div>
             <div class="in">Across the collection</div>
           </div>
@@ -139,9 +136,9 @@
             <div class="in">Staking contract</div>
           </div>
           <div class="info-block">
-            <div class="ik">⏱ Last Update</div>
-            <div class="iv" id="stakedUpdated">—</div>
-            <div class="in">Stats refresh time</div>
+            <div class="ik">Rewards</div>
+            <div class="iv" id="pondRewardsSymbol">$FLYZ</div>
+            <div class="in">Earnings token</div>
           </div>
           <div class="info-block">
             <div class="ik">ℹ️ Notes</div>
@@ -156,36 +153,14 @@
         </ul>
       </section>
 
-      <!-- Right: Owned Frogs (old rich card style) -->
+      <!-- Right: My Frogs (header + cards) -->
       <section id="ownedCard" class="pg-card">
         <div class="pg-card-head">
           <h3>My Frogs (Owned)</h3>
           <div><button id="ownedConnectBtn" class="btn">Connect Wallet</button></div>
         </div>
 
-        <!-- Info summary -->
-        <div class="info-grid-2" style="margin-bottom:10px;">
-          <div class="info-block">
-            <div class="ik">Total Owned</div>
-            <div class="iv" id="ownedCount">—</div>
-            <div class="in">In this collection</div>
-          </div>
-          <div class="info-block">
-            <div class="ik">Wallet</div>
-            <div class="iv" id="ownedWallet">—</div>
-            <div class="in"><span class="pg-muted">Connected</span></div>
-          </div>
-          <div class="info-block">
-            <div class="ik">Links</div>
-            <div class="iv"><a id="ownedWalletOS" href="#" target="_blank" rel="noopener">OpenSea</a></div>
-            <div class="in">Owner’s items</div>
-          </div>
-          <div class="info-block">
-            <div class="ik">Sort</div>
-            <div class="iv" id="ownedSort">Newest</div>
-            <div class="in">Client-side</div>
-          </div>
-        </div>
+        <!-- Header for KPIs is injected by owned-panel.js; remove old info squares -->
 
         <div class="grid-cards" id="ownedGrid">
           <div class="pg-muted">Connect your wallet to view owned frogs.</div>
@@ -211,7 +186,7 @@
     document.addEventListener('DOMContentLoaded', layoutFrogStrip);
   </script>
 
-  <!-- Your libs -->
+  <!-- Config & shared helpers -->
   <script src="assets/js/config.js"></script>
   <script src="assets/js/utils.js"></script>
   <script src="assets/js/rarity.js"></script>
@@ -220,13 +195,18 @@
   <script src="assets/js/wallet-state.js"></script>
   <script src="assets/js/wallet.js"></script>
 
-  <!-- Panels/feeds -->
+  <!-- Staking controller ABI, adapter, and panels -->
+  <script src="assets/js/controller_abi.js"></script>
+  <script src="assets/js/staking-adapter.js"></script>
+
   <script src="assets/js/stakes-feed.js"></script>
+  <script src="assets/js/pond-tweaks.js"></script>
+
   <script src="assets/js/owned-panel.js"></script>
 
   <script>
-    FF_loadRecentStakes && FF_loadRecentStakes();
-    FF_initOwnedPanel && FF_initOwnedPanel();
+    if (window.FF_loadRecentStakes) FF_loadRecentStakes();
+    if (window.FF_initOwnedPanel) FF_initOwnedPanel();
   </script>
 </body>
 </html>
