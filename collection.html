@@ -191,22 +191,27 @@
   <script src="assets/js/utils.js"></script>
   <script src="assets/js/rarity.js"></script>
   <script src="assets/js/modal.js"></script>
+
+  <!-- ABIs MUST load from assets/abi -->
+  <script src="assets/abi/collection_abi.js"></script>
+  <script src="assets/abi/controller_abi.js"></script>
+
+  <!-- Shared API (new) -->
+  <script src="assets/js/api-frogs.js"></script>
+
+  <!-- Panels / features -->
   <script src="assets/js/pond.js"></script>
   <script src="assets/js/wallet-state.js"></script>
   <script src="assets/js/wallet.js"></script>
-
-  <!-- Staking controller ABI, adapter, and panels -->
-  <script src="assets/js/controller_abi.js"></script>
   <script src="assets/js/staking-adapter.js"></script>
-
   <script src="assets/js/stakes-feed.js"></script>
   <script src="assets/js/pond-tweaks.js"></script>
-
   <script src="assets/js/owned-panel.js"></script>
 
   <script>
     if (window.FF_loadRecentStakes) FF_loadRecentStakes();
-    if (window.FF_initOwnedPanel) FF_initOwnedPanel();
+    if (window.FF_initOwnedPanel)   FF_initOwnedPanel(); /* (no-op in new file; kept for BC) */
   </script>
+
 </body>
 </html>
