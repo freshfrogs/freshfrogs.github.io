@@ -1,168 +1,202 @@
-// assets/js/stakes-feed.js
-// The Pond — Reservoir-only recent activity (+ total staked via ERC721.balanceOf)
-// Classic row style; 20 per page; continuation on scroll; no wallet needed.
+// assets/js/stakes-feed.js  (DROP-IN)
+// Recent activity: stake (to controller), unstake (from controller), optional claim (RewardsClaimed).
+// Also fills KPIs incl. "Total Frogs Staked" from ERC721.balanceOf(controller).
 
 (function(FF, CFG){
   'use strict';
 
-  var C     = window.FF_CFG || CFG || {};
-  var UL    = '#recentStakes';
-  var HOST  = (C.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
-  var KEY   = C.FROG_API_KEY || '';
-  var CTRL  = (C.CONTROLLER_ADDRESS || '').toLowerCase();
-  var COLL  = (C.COLLECTION_ADDRESS || '').toLowerCase();
-  var CHAIN = Number(C.CHAIN_ID || 1);
+  var C = window.FF_CFG || CFG || {};
+  var UL_SEL   = '#recentStakes';
+  var CTRL     = (C.CONTROLLER_ADDRESS || window.CONTROLLER_ADDRESS || '').toLowerCase();
+  var BLOCK_WIN = Number(C.ACTIVITY_BLOCK_WINDOW || 1500);
+  var MAX_ROWS  = 250;
+  var TIME_CONC = 4;
 
-  var busy=false, done=false, continuation=null;
+  var WEB3 = window.web3 || (window.Web3 ? new window.Web3(window.ethereum) : null);
+
+  // Minimal ERC721 bits: Transfer + balanceOf for KPI
+  var ERC721_ABI = [
+    {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},
+    {"constant":true,"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"type":"function","stateMutability":"view"}
+  ];
+
+  (function ensureCollection(){
+    if (!window.collection && WEB3 && (C.COLLECTION_ADDRESS || window.COLLECTION_ADDRESS)){
+      try {
+        window.collection = new WEB3.eth.Contract(ERC721_ABI, (C.COLLECTION_ADDRESS||window.COLLECTION_ADDRESS));
+      } catch(e){ console.warn('[pond] could not init collection', e); }
+    }
+  })();
 
   function $(s,r){ return (r||document).querySelector(s); }
   function shorten(a){ return a ? a.slice(0,6)+'…'+a.slice(-4) : '—'; }
-  function etherscan(kind){
-    if (CHAIN===1) return 'https://etherscan.io/'+kind+'/';
-    if (CHAIN===11155111) return 'https://sepolia.etherscan.io/'+kind+'/';
-    if (CHAIN===5) return 'https://goerli.etherscan.io/'+kind+'/';
-    return 'https://etherscan.io/'+kind+'/';
+  function etherscanTx(hash){
+    var chain = Number(C.CHAIN_ID || 1);
+    var base = chain===1 ? 'https://etherscan.io/tx/' :
+               chain===11155111 ? 'https://sepolia.etherscan.io/tx/' :
+               chain===5 ? 'https://goerli.etherscan.io/tx/' : 'https://etherscan.io/tx/';
+    return base + hash;
   }
-  function escTx(h){ return etherscan('tx') + h; }
-  function age(ts){
-    if (!ts) return '—';
-    var diff = Math.max(0, (Date.now()/1000) - ts);
-    var d = Math.floor(diff/86400), h = Math.floor((diff%86400)/3600);
-    if (d>0) return d+'d ago';
-    if (h>0) return h+'h ago';
-    var m = Math.floor((diff%3600)/60);
-    return m+'m ago';
+  function etherscanAddr(a){
+    var chain = Number(C.CHAIN_ID || 1);
+    var base = chain===1 ? 'https://etherscan.io/address/' :
+               chain===11155111 ? 'https://sepolia.etherscan.io/address/' :
+               chain===5 ? 'https://goerli.etherscan.io/address/' : 'https://etherscan.io/address/';
+    return base + a;
   }
 
-  // KPIs — controller link + rewards symbol; total staked via balanceOf(controller)
+  // ===== KPIs / header wiring =====
   async function setKPIs(){
-    // Controller link
+    // Controller chip
     var a = $('#stakedController');
-    if (a && CTRL){
-      a.textContent = shorten(CTRL);
-      a.href = etherscan('address') + C.CONTROLLER_ADDRESS;
-    }
+    if (a && CTRL){ a.textContent = shorten(CTRL); a.href = etherscanAddr(CTRL); }
+
+    // Rewards symbol (defaults)
     var sym = $('#pondRewardsSymbol'); if (sym) sym.textContent = (C.REWARD_TOKEN_SYMBOL || '$FLYZ');
 
+    // Transfers → Controller quick link
+    var tl = $('#pondTransfersLink');
+    if (tl && CTRL) tl.href = etherscanAddr(CTRL) + '#tokentxns';
+
     // Total Frogs Staked = ERC721.balanceOf(controller)
-    try{
-      if (!window.Web3 || !C.COLLECTION_ADDRESS || !C.CONTROLLER_ADDRESS) return;
-      var provider = window.ethereum
-        ? window.ethereum
-        : (C.RPC_URL ? new window.Web3.providers.HttpProvider(C.RPC_URL, { keepAlive:true }) : null);
-      if (!provider) return;
-      var web3 = new window.Web3(provider);
-      var ABI  = [{"constant":true,"inputs":[{"name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}];
-      var erc721 = new web3.eth.Contract(ABI, C.COLLECTION_ADDRESS);
-      var bal = await erc721.methods.balanceOf(C.CONTROLLER_ADDRESS).call();
-      var n = Number(bal||0);
-      var el = $('#stakedTotal'); if (el) el.textContent = String(n);
-    }catch(e){
-      console.warn('[pond] balanceOf failed', e);
+    var out = $('#pondTotalStaked');
+    if (out && window.collection && CTRL){
+      try{
+        var n = await window.collection.methods.balanceOf(CTRL).call();
+        out.textContent = String(n);
+      }catch(e){
+        console.warn('[pond] balanceOf(controller) failed', e);
+        out.textContent = '—';
+      }
     }
   }
 
-  // Classic row look to match your screenshot
   function rowHTML(e){
-    var thumb = (C.SOURCE_PATH||'') + '/frog/' + (e.id || 0) + '.png';
-    var line1 = (e.kind==='stake'?'Stake':'Unstake') + ' • Frog #' + e.id;
-    var line2 = shorten(e.from)+' → '+shorten(e.to)+' • '+age(e.time)+' • '+'Etherscan';
+    var title = e.kind==='stake' ? 'Stake' : (e.kind==='unstake' ? 'Unstake' : 'Claim');
+    var when = e.time ? new Date(e.time*1000).toLocaleString() : '—';
+    var img = (C.SOURCE_PATH||'') + '/frog/' + (e.id || 0) + '.png';
+    var meta = e.kind==='claim'
+      ? (shorten(e.user)+' claimed '+(e.amountPretty||e.amount))
+      : (shorten(e.from)+' → '+shorten(e.to));
     return (
       '<li class="row" data-kind="'+e.kind+'">'+
-        '<img class="thumb64" src="'+thumb+'" alt="'+e.id+'">'+
-        '<div><div><b>'+line1+'</b></div>'+
-        '<div class="pg-muted">'+line2+'</div></div>'+
+        (e.id ? '<img class="thumb64" src="'+img+'" alt="'+e.id+'">' : '<div class="thumb64" style="display:flex;align-items:center;justify-content:center">💰</div>')+
+        '<div><div><b>'+title+'</b>'+(e.id?(' Frog #'+e.id):'')+'</div>'+
+        '<div class="pg-muted">'+when+' • '+meta+'</div></div>'+
       '</li>'
     );
   }
 
-  async function fetchPage(){
-    if (!KEY) throw new Error('Missing FF_CFG.FROG_API_KEY');
-
-    var u = new URL(HOST + '/users/activity/v6');
-    u.searchParams.set('users', C.CONTROLLER_ADDRESS);
-    u.searchParams.set('types', 'transfer');
-    if (C.COLLECTION_ADDRESS) u.searchParams.set('collections', C.COLLECTION_ADDRESS);
-    u.searchParams.set('limit', '20');
-    if (continuation) u.searchParams.set('continuation', continuation);
-
-    var res = await fetch(u.toString(), { headers:{ accept:'application/json', 'x-api-key': KEY }});
-    if (!res.ok){
-      var txt = await res.text().catch(function(){ return ''; });
-      throw new Error('Reservoir activity '+res.status+' '+txt);
+  var st = { from:null, to:null, busy:false, done:false };
+  var timeCache = new Map();
+  async function getBlockTime(bn){
+    if (!WEB3 || !WEB3.eth) return null;
+    if (timeCache.has(bn)) return timeCache.get(bn);
+    var b = await WEB3.eth.getBlock(bn).catch(function(){ return null; });
+    var t = b && b.timestamp || null;
+    timeCache.set(bn, t);
+    return t;
+  }
+  async function stampEvents(events){
+    var blocks = []; var i;
+    for (i=0;i<events.length;i++){ var bn=events[i].blockNumber; if (blocks.indexOf(bn)===-1) blocks.push(bn); }
+    var idx=0;
+    async function worker(){
+      while(idx<blocks.length){
+        var bn = blocks[idx++]; await getBlockTime(bn);
+      }
     }
-    var j = await res.json();
-    continuation = j.continuation || null;
-
-    var out=[], rows = Array.isArray(j.activities) ? j.activities : [];
-    for (var i=0;i<rows.length;i++){
-      var r = rows[i] || {};
-      var token   = r.token || {};
-      var id      = Number(token.tokenId || r.tokenId);
-      var from    = (r.fromAddress || r.from || '').toLowerCase();
-      var to      = (r.toAddress   || r.to   || '').toLowerCase();
-      var ts      = Number(r.timestamp || (r.createdAt && Math.floor(new Date(r.createdAt).getTime()/1000))) || null;
-      var tx      = r.txHash || r.transactionHash || '';
-      if (!Number.isFinite(id) || !from || !to) continue;
-
-      // restrict to our contract
-      var contract = (token.contract || r.contract || '').toLowerCase();
-      if (COLL && contract && contract !== COLL) continue;
-
-      var kind = (to===CTRL) ? 'stake' : (from===CTRL ? 'unstake' : null);
-      if (!kind) continue;
-
-      out.push({ kind, id, from:r.fromAddress||r.from||'', to:r.toAddress||r.to||'', time:ts, tx:tx });
-    }
-    out.sort(function(a,b){ return (b.time||0)-(a.time||0); });
-    return out;
+    var workers=[]; var n = Math.min(TIME_CONC, blocks.length);
+    for (i=0;i<n;i++) workers.push(worker());
+    await Promise.all(workers);
+    for (i=0;i<events.length;i++){ events[i].time = timeCache.get(events[i].blockNumber) || null; }
+    return events;
   }
 
-  async function loadNext(listEl){
-    if (busy || done) return; busy=true;
+  async function loadWindow(listEl){
+    if (st.busy || st.done) return;
+    st.busy = true;
     try{
-      var rows = await fetchPage();
-      if (!rows.length && !continuation){
-        if (!listEl.children.length){
-          var li=document.createElement('li'); li.className='row';
-          li.innerHTML='<div class="pg-muted">No recent activity.</div>'; listEl.appendChild(li);
+      if (!WEB3 || !WEB3.eth || !window.collection){ st.done=true; return; }
+      var latest = await WEB3.eth.getBlockNumber();
+      if (st.from==null){ st.to = latest; st.from = Math.max(0, st.to - BLOCK_WIN); }
+      else { st.to = st.from - 1; if (st.to <= 0){ st.done=true; return; } st.from = Math.max(0, st.to - BLOCK_WIN); }
+
+      var toCtrl   = await window.collection.getPastEvents('Transfer', { filter:{ to: CTRL },   fromBlock: st.from, toBlock: st.to });
+      var fromCtrl = await window.collection.getPastEvents('Transfer', { filter:{ from: CTRL }, fromBlock: st.from, toBlock: st.to });
+
+      var rows = [], i;
+      for (i=0;i<toCtrl.length;i++){
+        var ev = toCtrl[i];
+        rows.push({ kind:'stake',   id:Number(ev.returnValues.tokenId), from:ev.returnValues.from, to:ev.returnValues.to, tx:ev.transactionHash, blockNumber:ev.blockNumber });
+      }
+      for (i=0;i<fromCtrl.length;i++){
+        var ev2 = fromCtrl[i];
+        rows.push({ kind:'unstake', id:Number(ev2.returnValues.tokenId), from:ev2.returnValues.from, to:ev2.returnValues.to, tx:ev2.transactionHash, blockNumber:ev2.blockNumber });
+      }
+
+      // Optional: RewardsClaimed event on controller
+      try{
+        if (window.controller && window.controller.getPastEvents){
+          var claims = await window.controller.getPastEvents('RewardsClaimed', { fromBlock: st.from, toBlock: st.to });
+          for (i=0;i<claims.length;i++){
+            var ce = claims[i]; rows.push({ kind:'claim', user:ce.returnValues.user, amount:ce.returnValues.amount, amountPretty:ce.returnValues.amount, tx:ce.transactionHash, blockNumber:ce.blockNumber });
+          }
         }
-        done = true; return;
+      }catch(e){}
+
+      if (rows.length){
+        await stampEvents(rows);
+        rows.sort(function(a,b){ return b.blockNumber - a.blockNumber; });
+
+        var frag = document.createDocumentFragment();
+        for (i=0;i<rows.length;i++){
+          var li=document.createElement('li'); li.className='row'; li.innerHTML=rowHTML(rows[i]);
+          (function(tx){ li.addEventListener('click', function(){ window.open(etherscanTx(tx), '_blank'); }); })(rows[i].tx);
+          frag.appendChild(li);
+        }
+        listEl.appendChild(frag);
+
+        // prune DOM
+        var items = listEl.querySelectorAll('li.row');
+        if (items.length > MAX_ROWS){
+          var excess = items.length - MAX_ROWS;
+          for (i=0;i<excess;i++) listEl.removeChild(items[i]);
+        }
       }
-      var frag=document.createDocumentFragment();
-      rows.forEach(function(r){
-        var li=document.createElement('li'); li.className='row'; li.innerHTML=rowHTML(r);
-        if (r.tx){ li.addEventListener('click', function(){ window.open(escTx(r.tx), '_blank'); }); }
-        frag.appendChild(li);
-      });
-      listEl.appendChild(frag);
-      if (!continuation) done = true;
     }catch(e){
-      console.warn('[pond] load failed', e);
-      if (!listEl.children.length){
-        var li=document.createElement('li'); li.className='row';
-        li.innerHTML='<div class="pg-muted">Couldn’t load activity.</div>'; listEl.appendChild(li);
-      }
-      done = true;
-    }finally{ busy=false; }
+      console.warn('[pond] load window failed', e);
+      st.done = true;
+    }finally{
+      st.busy = false;
+    }
   }
 
   function attachScroll(listEl){
     listEl.classList.add('scrolling');
-    listEl.addEventListener('scroll', function(){
-      if (busy || done) return;
-      if (listEl.scrollTop + listEl.clientHeight >= listEl.scrollHeight - 80) loadNext(listEl);
-    });
-    loadNext(listEl).then(function(){ setTimeout(function(){ loadNext(listEl); }, 120); });
+    function onScroll(){
+      if (st.busy || st.done) return;
+      if (listEl.scrollTop + listEl.clientHeight >= listEl.scrollHeight - 80) loadWindow(listEl);
+    }
+    listEl.addEventListener('scroll', onScroll);
+    loadWindow(listEl).then(function(){ setTimeout(function(){ loadWindow(listEl); }, 60); });
   }
 
   function init(){
     setKPIs();
-    var ul = $(UL); if (!ul) return;
+    var ul = document.querySelector(UL_SEL);
+    if (!ul) return;
     ul.innerHTML = '';
-    done = false; busy = false; continuation = null;
     attachScroll(ul);
   }
 
   window.FF_loadRecentStakes = init;
+
+  // Auto-run on DOM ready when #recentStakes exists
+  if (document.readyState === 'complete' || document.readyState === 'interactive'){
+    if ($(UL_SEL)) init();
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ if ($(UL_SEL)) init(); });
+  }
+
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
