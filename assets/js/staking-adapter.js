@@ -1,193 +1,218 @@
-// assets/js/staking-adapter.js
-// Uses CONTROLLER_ABI (assets/abi/controller_abi.js) + FF_CFG.{CONTROLLER_ADDRESS,COLLECTION_ADDRESS}.
-// Works with either Web3 OR Ethers if present. Reads require wallet or FF_CFG.RPC_URL; writes need a wallet.
+/* global Web3, CONFIG */
 
-(function (FF, CFG) {
-  'use strict';
+// Lightweight staking adapter that works off the user's wallet provider.
+// No RPC URL needed — we use window.ethereum / current provider.
+(() => {
+  const log = (...args) => console.log('[staking-adapter]', ...args);
+  const warn = (...args) => console.warn('[staking-adapter]', ...args);
+  const err = (...args) => console.error('[staking-adapter]', ...args);
 
-  const CTRL = CFG.CONTROLLER_ADDRESS;
-  const COLL = CFG.COLLECTION_ADDRESS;
-
-  // Export API immediately so owned-panel.js can call it anytime.
-  const api = {
-    // READS
-    async getStakedTokens(owner){ try { return await _getStakedTokens(owner); } catch (e){ console.warn('[staking-adapter] getStakedTokens', e); return []; } },
-    async getUserStakedTokens(owner){ return api.getStakedTokens(owner); }, // alias
-    async getAvailableRewards(owner){ try { return await _getAvailableRewards(owner); } catch(e){ console.warn('[staking-adapter] rewards', e); return '0'; } },
-    async isApproved(owner){ try { return await _isApproved(owner); } catch(e){ console.warn('[staking-adapter] isApproved', e); return null; } },
-
-    // ACTIONS
-    async approve(){ return _approve(); },
-    async claimRewards(){ return _claim(); },
-    async stakeToken(id){ return _stake(id); },
-    async unstakeToken(id){ return _withdraw(id); },
-
-    // Not in this ABI
-    async getStakeSince(){ return null; },
-    async getStakeInfo(){ return null; }
-  };
-  FF.staking = api;
-  window.FF_STAKING = api;
-
-  // ---------- provider factories ----------
-  function haveEthers(){ return !!window.ethers; }
-  function haveWeb3(){ return !!window.Web3; }
-
-  function readProvider(){
-    if (window.ethereum) return window.ethereum; // wallet
-    if (CFG.RPC_URL && haveWeb3()) return new Web3.providers.HttpProvider(CFG.RPC_URL); // web3 http
-    if (CFG.RPC_URL && haveEthers()) return new ethers.providers.JsonRpcProvider(CFG.RPC_URL); // ethers http
-    throw new Error('No provider: connect a wallet or set FF_CFG.RPC_URL');
-  }
-
-  // ---------- contract helpers (dual stack) ----------
-  function ctrlW3(){
-    if (!haveWeb3()) throw new Error('Web3 library not loaded');
-    const w3 = new Web3(readProvider());
-    return new w3.eth.Contract(window.CONTROLLER_ABI || [], CTRL);
-  }
-  function nftW3(){
-    if (!haveWeb3()) throw new Error('Web3 library not loaded');
-    const w3 = new Web3(readProvider());
-    return new w3.eth.Contract([
-      {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":""}],"stateMutability":"view","type":"function"},
-      {"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"}
-    ], COLL);
-  }
-  function ctrlEth(){
-    if (!haveEthers()) throw new Error('Ethers library not loaded');
-    const provider = window.ethereum
-      ? new ethers.providers.Web3Provider(window.ethereum)
-      : new ethers.providers.JsonRpcProvider(CFG.RPC_URL);
-    return new ethers.Contract(CTRL, window.CONTROLLER_ABI || [], provider);
-  }
-  function signerEth(){
-    if (!haveEthers() || !window.ethereum) throw new Error('No wallet for writes');
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    return provider.getSigner();
-  }
-  function nftEth(){
-    const s = signerEth();
-    return new ethers.Contract(COLL, [
-      "function isApprovedForAll(address owner,address operator) view returns (bool)",
-      "function setApprovalForAll(address operator,bool approved)"
-    ], s);
-  }
-
-  // ---------- utils ----------
-  const toNum = (x)=> {
-    try{
-      if (x==null) return NaN;
-      if (typeof x==='number') return x;
-      if (typeof x==='bigint') return Number(x);
-      if (typeof x==='string') { if (/^0x/i.test(x)) return Number(BigInt(x)); return Number(x); }
-      if (typeof x==='object') {
-        if ('tokenId' in x) return toNum(x.tokenId);
-        if ('id' in x)      return toNum(x.id);
-        if ('_hex' in x)    return Number(x._hex);
-        const s = x.toString?.(); if (s && /^\d+$/.test(s)) return Number(s);
+  // ---- Config resolution ----------------------------------------------------
+  function getCfg() {
+    // Expected in CONFIG:
+    // - NFT_ADDRESS
+    // - NFT_ABI
+    // - STAKING_CONTROLLER_ADDRESS
+    // - STAKING_CONTROLLER_ABI
+    const c = (typeof CONFIG !== 'undefined' && CONFIG) ? CONFIG : {};
+    const must = ['NFT_ADDRESS','NFT_ABI','STAKING_CONTROLLER_ADDRESS','STAKING_CONTROLLER_ABI'];
+    for (const k of must) {
+      if (!c[k]) {
+        throw new Error(`Missing ${k} in CONFIG`);
       }
-    }catch{}
-    return NaN;
+    }
+    return c;
+  }
+
+  const web3 = new Web3(window.ethereum || Web3.givenProvider);
+
+  // Safe method check for web3 contract instances
+  const hasMethod = (contract, name) => {
+    try {
+      return !!(contract && contract.methods && contract.methods[name]);
+    } catch {
+      return false;
+    }
   };
 
-  // ---------- READS ----------
-  async function _getStakedTokens(owner){
-    if (!CTRL || !window.CONTROLLER_ABI) throw new Error('Missing controller address/ABI');
-    // Prefer Web3 if present; else Ethers
-    if (haveWeb3()){
-      const c = ctrlW3();
-      const rows = await c.methods.getStakedTokens(owner).call();
-      return Array.isArray(rows) ? rows.map(r => toNum(r && r.tokenId)).filter(Number.isFinite) : [];
-    } else if (haveEthers()){
-      const c = ctrlEth();
-      const rows = await c.getStakedTokens(owner);
-      return Array.isArray(rows) ? rows.map(r => toNum(r && r.tokenId)).filter(Number.isFinite) : [];
+  // ---- Contracts ------------------------------------------------------------
+  let nft, staking;
+
+  function ensureContracts() {
+    const CFG = getCfg();
+    if (!nft) {
+      nft = new web3.eth.Contract(CFG.NFT_ABI, CFG.NFT_ADDRESS);
     }
-    throw new Error('No Web3 or Ethers library loaded');
+    if (!staking) {
+      staking = new web3.eth.Contract(CFG.STAKING_CONTROLLER_ABI, CFG.STAKING_CONTROLLER_ADDRESS);
+    }
   }
 
-  async function _getAvailableRewards(owner){
-    if (haveWeb3()){
-      const c = ctrlW3();
-      return await c.methods.availableRewards(owner).call();
-    } else if (haveEthers()){
-      const c = ctrlEth();
-      const v = await c.availableRewards(owner);
-      return v?.toString?.() ?? String(v);
+  // ---- Public API -----------------------------------------------------------
+
+  // Get token IDs staked by an account
+  async function getStakedTokens(account) {
+    try {
+      ensureContracts();
+
+      // Support several common method names:
+      // - tokensOf(address)          -> uint256[]
+      // - getStakedTokens(address)   -> uint256[]
+      // - stakedTokensOf(address)    -> uint256[]
+      const candidates = ['tokensOf', 'getStakedTokens', 'stakedTokensOf'];
+      for (const m of candidates) {
+        if (hasMethod(staking, m)) {
+          const ids = await staking.methods[m](account).call();
+          // Ensure array of strings (web3 can return BN)
+          return (ids || []).map(x => x.toString());
+        }
+      }
+
+      // Some controllers keep per-token owner mappings and expose balanceOf(address)
+      // plus tokenOfOwnerByIndex-like function
+      if (hasMethod(staking, 'balanceOf') && hasMethod(staking, 'tokenOfOwnerByIndex')) {
+        const bal = await staking.methods.balanceOf(account).call();
+        const out = [];
+        for (let i = 0; i < Number(bal); i++) {
+          const id = await staking.methods.tokenOfOwnerByIndex(account, i).call();
+          out.push(id.toString());
+        }
+        return out;
+      }
+
+      throw new Error('No supported staking read method was found on controller');
+    } catch (e) {
+      err('getStakedTokens Error:', e);
+      return [];
     }
-    throw new Error('No Web3 or Ethers library loaded');
   }
 
-  async function _isApproved(owner){
-    if (haveWeb3()){
-      const n = nftW3();
-      return !!(await n.methods.isApprovedForAll(owner, CTRL).call({ from: owner }));
-    } else if (haveEthers()){
-      const provider = window.ethereum
-        ? new ethers.providers.Web3Provider(window.ethereum)
-        : new ethers.providers.JsonRpcProvider(CFG.RPC_URL);
-      const c = new ethers.Contract(COLL, ["function isApprovedForAll(address,address) view returns (bool)"], provider);
-      return !!(await c.isApprovedForAll(owner, CTRL));
+  // Optional: per-token stake timestamp (for "xd ago")
+  async function getStakeTimestamps(account) {
+    try {
+      ensureContracts();
+
+      // Common patterns:
+      // - stakeStarted(tokenId) -> uint256 timestamp
+      // - stakes(tokenId) -> struct { owner, startedAt, ... }
+      // - stakeInfo(tokenId) -> (startedAt, …) or struct
+      const ids = await getStakedTokens(account);
+      const map = {};
+
+      // Helper to safely call and coerce to number
+      const callTs = async (method, tokenId) => {
+        try {
+          const v = await staking.methods[method](tokenId).call();
+          if (v && typeof v === 'object' && ('startedAt' in v)) {
+            return Number(v.startedAt);
+          }
+          if (Array.isArray(v) && v.length > 0) {
+            // first value often startedAt
+            return Number(v[0]);
+          }
+          return Number(v);
+        } catch {
+          return 0;
+        }
+      };
+
+      const hasStakeStarted = hasMethod(staking, 'stakeStarted');
+      const hasStakes = hasMethod(staking, 'stakes');
+      const hasStakeInfo = hasMethod(staking, 'stakeInfo');
+
+      for (const id of ids) {
+        let ts = 0;
+        if (hasStakeStarted) ts ||= await callTs('stakeStarted', id);
+        if (!ts && hasStakes) ts ||= await callTs('stakes', id);
+        if (!ts && hasStakeInfo) ts ||= await callTs('stakeInfo', id);
+        map[id] = ts; // 0 if unknown
+      }
+      return map;
+    } catch (e) {
+      warn('getStakeTimestamps Error:', e);
+      return {};
     }
-    throw new Error('No Web3 or Ethers library loaded');
   }
 
-  // ---------- WRITES (wallet required) ----------
-  async function _approve(){
-    if (haveWeb3()){
-      const n = nftW3();
-      const from = (window.ethereum && window.ethereum.selectedAddress);
-      if (!from) throw new Error('Connect wallet');
-      return n.methods.setApprovalForAll(CTRL, true).send({ from });
-    } else if (haveEthers()){
-      const n = nftEth();
-      const tx = await n.setApprovalForAll(CTRL, true);
-      return tx.wait?.() ?? tx;
+  // Is controller approved to transfer user's tokens?
+  async function isApprovedForAll(account) {
+    try {
+      ensureContracts();
+      const CFG = getCfg();
+      if (!hasMethod(nft, 'isApprovedForAll')) return false;
+      return await nft.methods.isApprovedForAll(account, CFG.STAKING_CONTROLLER_ADDRESS).call();
+    } catch (e) {
+      err('isApproved', e);
+      return false;
     }
-    throw new Error('No Web3 or Ethers library loaded');
   }
 
-  async function _stake(id){
-    if (haveWeb3()){
-      const c = ctrlW3();
-      const from = (window.ethereum && window.ethereum.selectedAddress);
-      if (!from) throw new Error('Connect wallet');
-      return c.methods.stake(String(id)).send({ from });
-    } else if (haveEthers()){
-      const s = signerEth();
-      const c = new ethers.Contract(CTRL, window.CONTROLLER_ABI || [], s);
-      const tx = await c.stake(String(id)); return tx.wait?.() ?? tx;
+  // Available rewards (best-effort; returns string number, "0" if unsupported)
+  async function getAvailableRewards(account) {
+    try {
+      ensureContracts();
+      const candidates = ['availableRewards', 'rewards', 'pendingRewards', 'earned'];
+      for (const m of candidates) {
+        if (hasMethod(staking, m)) {
+          const v = await staking.methods[m](account).call();
+          return (typeof v === 'object' && v._hex) ? web3.utils.toBN(v._hex).toString() : v.toString();
+        }
+      }
+      return '0';
+    } catch (e) {
+      err('rewards', e);
+      return '0';
     }
-    throw new Error('No Web3 or Ethers library loaded');
   }
 
-  async function _withdraw(id){
-    if (haveWeb3()){
-      const c = ctrlW3();
-      const from = (window.ethereum && window.ethereum.selectedAddress);
-      if (!from) throw new Error('Connect wallet');
-      return c.methods.withdraw(String(id)).send({ from });
-    } else if (haveEthers()){
-      const s = signerEth();
-      const c = new ethers.Contract(CTRL, window.CONTROLLER_ABI || [], s);
-      const tx = await c.withdraw(String(id)); return tx.wait?.() ?? tx;
+  // Total currently staked across the pond (for KPIs / pond panel)
+  async function getTotalStaked() {
+    try {
+      ensureContracts();
+      const candidates = [
+        'totalStaked',
+        'totalCurrentlyStaked',
+        'stakedSupply',
+        'totalSupplyStaked',
+        'getTotalStaked'
+      ];
+      for (const m of candidates) {
+        if (hasMethod(staking, m)) {
+          const v = await staking.methods[m]().call();
+          return Number(v);
+        }
+      }
+
+      // Fallback: sum of staked by all? Not feasible without an indexer — return null.
+      return null;
+    } catch (e) {
+      warn('total staked failed', e);
+      return null;
     }
-    throw new Error('No Web3 or Ethers library loaded');
   }
 
-  async function _claim(){
-    if (haveWeb3()){
-      const c = ctrlW3();
-      const from = (window.ethereum && window.ethereum.selectedAddress);
-      if (!from) throw new Error('Connect wallet');
-      return c.methods.claimRewards().send({ from });
-    } else if (haveEthers()){
-      const s = signerEth();
-      const c = new ethers.Contract(CTRL, window.CONTROLLER_ABI || [], s);
-      const tx = await c.claimRewards(); return tx.wait?.() ?? tx;
+  // Pure ERC721 balance (wallet-held only; staked not included)
+  async function getWalletOwnedCount(account) {
+    try {
+      ensureContracts();
+      if (!hasMethod(nft, 'balanceOf')) return 0;
+      const v = await nft.methods.balanceOf(account).call();
+      return Number(v);
+    } catch {
+      return 0;
     }
-    throw new Error('No Web3 or Ethers library loaded');
   }
 
-})(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
+  // Expose globally
+  window.StakingAdapter = {
+    getStakedTokens,
+    getStakeTimestamps,
+    isApprovedForAll,
+    getAvailableRewards,
+    getTotalStaked,
+    getWalletOwnedCount,
+    web3
+  };
+
+  log('ready');
+})();
