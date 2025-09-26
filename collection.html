@@ -123,28 +123,33 @@
             Live view of staking activity in the FreshFrogs pond — track total staked, the controller contract, and FLYZ rewards.
           </p>
 
-
         <!-- KPIs -->
         <div class="info-grid-2" style="margin-bottom:10px;">
+          <!-- 1) Total Frogs Staked (emoji changed) -->
           <div class="info-block">
-            <div class="ik">🐸  Total Frogs Staked</div>
+            <div class="ik">🌿 Total Frogs Staked</div>
             <div class="iv" id="stakedTotal">—</div>
             <div class="in">Across the collection</div>
           </div>
+
+          <!-- 2) Controller (unchanged) -->
           <div class="info-block">
             <div class="ik">🧰 Controller</div>
-            <div class="iv"><a id="stakedController" href="#" target="_blank" rel="noopener">—</a></div>
+            <div class="iv">
+              <a id="stakedController" href="#" target="_blank" rel="noopener">—</a>
+            </div>
             <div class="in">Staking contract</div>
           </div>
+
+          <!-- 3) Rewards with emoji + link to FLYZ -->
           <div class="info-block">
-            <div class="ik">Rewards</div>
-            <div class="iv" id="pondRewardsSymbol">$FLYZ</div>
+            <div class="ik">🪙 Rewards</div>
+            <div class="iv">
+              <a id="pondRewardsLink" href="https://etherscan.io/token/0xd71d2f57819ae4be6924a36591ec6c164e087e63" target="_blank" rel="noopener">
+                <span id="pondRewardsSymbol">$FLYZ</span>
+              </a>
+            </div>
             <div class="in">Earnings token</div>
-          </div>
-          <div class="info-block">
-            <div class="ik">ℹ️ Notes</div>
-            <div class="iv">Transfers → Controller</div>
-            <div class="in">Click a row for Etherscan</div>
           </div>
         </div>
 
