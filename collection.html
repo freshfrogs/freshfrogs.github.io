@@ -196,26 +196,16 @@
 <script src="assets/abi/collection_abi.js"></script>
 <script src="assets/abi/controller_abi.js"></script>
 
-<!-- Pond + Wallet + Staking -->
-<script src="assets/js/pond.js"></script>
-<script src="assets/js/wallet-state.js"></script>
-<script src="assets/js/wallet.js"></script>
+<!-- Optional: staking adapter (AFTER ABI + config). If not needed, remove. -->
 <script src="assets/js/staking-adapter.js"></script>
 
-<!-- NEW: KPIs (top of Pond) -->
+<!-- Pond -->
 <script src="assets/js/pond-kpis.js"></script>
-
-<!-- Feeds -->
 <script src="assets/js/stakes-feed.js"></script>
 <script src="assets/js/pond-tweaks.js"></script>
 
-<!-- OWNED/STAKED PANEL (drop-in replacement) -->
-<script src="assets/js/owned-panel.js"></script>
-
-<script>
-  if (window.FF_loadRecentStakes) FF_loadRecentStakes();
-  if (window.FF_initOwnedPanel)   FF_initOwnedPanel(); /* harmless if not defined */
-</script>
+<!-- Owned/Staked panel (DROP-IN below) -->
+<script src="assets/js/owned-panel.js?v=2"></script>
 
 </body>
 </html>
