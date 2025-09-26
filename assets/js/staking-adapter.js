@@ -1,71 +1,89 @@
 // assets/js/staking-adapter.js
-// Adapter used by owned-panel.js. NO UI code.
-// Reads from controller via getStakedTokens(_user) & availableRewards(_staker).
-// Requires: window.CONTROLLER_ABI (assets/abi/controller_abi.js),
-//           FF_CFG.CONTROLLER_ADDRESS, FF_CFG.COLLECTION_ADDRESS.
-// Reads work with window.ethereum OR FF_CFG.RPC_URL; writes need a wallet.
+// Uses CONTROLLER_ABI (assets/abi/controller_abi.js) + FF_CFG.{CONTROLLER_ADDRESS,COLLECTION_ADDRESS}.
+// Works with either Web3 OR Ethers if present. Reads require wallet or FF_CFG.RPC_URL; writes need a wallet.
 
 (function (FF, CFG) {
   'use strict';
 
-  const CTRL_ADDR = CFG.CONTROLLER_ADDRESS;
-  const COLL_ADDR = CFG.COLLECTION_ADDRESS;
+  const CTRL = CFG.CONTROLLER_ADDRESS;
+  const COLL = CFG.COLLECTION_ADDRESS;
 
-  // Export a stable API immediately so the panel can call it any time.
+  // Export API immediately so owned-panel.js can call it anytime.
   const api = {
-    // ---- reads expected by owned-panel.js ----
-    async getStakedTokens(owner){ try { return await _getStakedTokens(owner); } catch { return []; } },
-    async getUserStakedTokens(owner){ try { return await _getStakedTokens(owner); } catch { return []; } }, // alias
-    async getAvailableRewards(owner){ try { return await _getAvailableRewards(owner); } catch { return '0'; } },
-    async isApproved(owner){ try { return await _isApproved(owner); } catch { return null; } },
+    // READS
+    async getStakedTokens(owner){ try { return await _getStakedTokens(owner); } catch (e){ console.warn('[staking-adapter] getStakedTokens', e); return []; } },
+    async getUserStakedTokens(owner){ return api.getStakedTokens(owner); }, // alias
+    async getAvailableRewards(owner){ try { return await _getAvailableRewards(owner); } catch(e){ console.warn('[staking-adapter] rewards', e); return '0'; } },
+    async isApproved(owner){ try { return await _isApproved(owner); } catch(e){ console.warn('[staking-adapter] isApproved', e); return null; } },
 
-    // ---- actions (used by the card buttons / header) ----
+    // ACTIONS
     async approve(){ return _approve(); },
     async claimRewards(){ return _claim(); },
     async stakeToken(id){ return _stake(id); },
     async unstakeToken(id){ return _withdraw(id); },
 
-    // Not present in this ABI; panel handles null.
-    async getStakeSince(/*id*/){ return null; },
-    async getStakeInfo(/*id*/){ return null; }
+    // Not in this ABI
+    async getStakeSince(){ return null; },
+    async getStakeInfo(){ return null; }
   };
   FF.staking = api;
-  window.FF_STAKING = api; // legacy alias some code checks
+  window.FF_STAKING = api;
 
-  // ---------------- internals ----------------
-  function _provider() {
-    if (window.ethereum) return window.ethereum;                       // wallet (reads+writes)
-    if (window.Web3 && CFG.RPC_URL) return new window.Web3.providers.HttpProvider(CFG.RPC_URL); // read-only
+  // ---------- provider factories ----------
+  function haveEthers(){ return !!window.ethers; }
+  function haveWeb3(){ return !!window.Web3; }
+
+  function readProvider(){
+    if (window.ethereum) return window.ethereum; // wallet
+    if (CFG.RPC_URL && haveWeb3()) return new Web3.providers.HttpProvider(CFG.RPC_URL); // web3 http
+    if (CFG.RPC_URL && haveEthers()) return new ethers.providers.JsonRpcProvider(CFG.RPC_URL); // ethers http
     throw new Error('No provider: connect a wallet or set FF_CFG.RPC_URL');
   }
-  function _web3() {
-    if (!window.Web3) throw new Error('Web3 library not loaded');
-    return new window.Web3(_provider());
+
+  // ---------- contract helpers (dual stack) ----------
+  function ctrlW3(){
+    if (!haveWeb3()) throw new Error('Web3 library not loaded');
+    const w3 = new Web3(readProvider());
+    return new w3.eth.Contract(window.CONTROLLER_ABI || [], CTRL);
   }
-  function _account() {
-    return (FF.wallet && FF.wallet.address) ||
-           (window.ethereum && window.ethereum.selectedAddress) || null;
-  }
-  function _controller(w3) {
-    if (!CTRL_ADDR || !window.CONTROLLER_ABI) throw new Error('Missing controller address/ABI');
-    return new w3.eth.Contract(window.CONTROLLER_ABI || [], CTRL_ADDR);
-  }
-  function _erc721(w3) {
-    if (!COLL_ADDR) throw new Error('Missing collection address');
+  function nftW3(){
+    if (!haveWeb3()) throw new Error('Web3 library not loaded');
+    const w3 = new Web3(readProvider());
     return new w3.eth.Contract([
       {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":""}],"stateMutability":"view","type":"function"},
       {"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"}
-    ], COLL_ADDR);
+    ], COLL);
   }
-  const _toNum = (x)=> {
+  function ctrlEth(){
+    if (!haveEthers()) throw new Error('Ethers library not loaded');
+    const provider = window.ethereum
+      ? new ethers.providers.Web3Provider(window.ethereum)
+      : new ethers.providers.JsonRpcProvider(CFG.RPC_URL);
+    return new ethers.Contract(CTRL, window.CONTROLLER_ABI || [], provider);
+  }
+  function signerEth(){
+    if (!haveEthers() || !window.ethereum) throw new Error('No wallet for writes');
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    return provider.getSigner();
+  }
+  function nftEth(){
+    const s = signerEth();
+    return new ethers.Contract(COLL, [
+      "function isApprovedForAll(address owner,address operator) view returns (bool)",
+      "function setApprovalForAll(address operator,bool approved)"
+    ], s);
+  }
+
+  // ---------- utils ----------
+  const toNum = (x)=> {
     try{
       if (x==null) return NaN;
       if (typeof x==='number') return x;
       if (typeof x==='bigint') return Number(x);
       if (typeof x==='string') { if (/^0x/i.test(x)) return Number(BigInt(x)); return Number(x); }
       if (typeof x==='object') {
-        if ('tokenId' in x) return _toNum(x.tokenId);
-        if ('id' in x)      return _toNum(x.id);
+        if ('tokenId' in x) return toNum(x.tokenId);
+        if ('id' in x)      return toNum(x.id);
         if ('_hex' in x)    return Number(x._hex);
         const s = x.toString?.(); if (s && /^\d+$/.test(s)) return Number(s);
       }
@@ -73,56 +91,103 @@
     return NaN;
   };
 
-  // ---- controller reads ----
+  // ---------- READS ----------
   async function _getStakedTokens(owner){
-    const w3 = _web3();
-    const ctrl = _controller(w3);
-    // ABI: getStakedTokens(address) returns tuple[] { staker, tokenId }
-    const rows = await ctrl.methods.getStakedTokens(owner).call();
-    return Array.isArray(rows) ? rows.map(r => _toNum(r && r.tokenId)).filter(Number.isFinite) : [];
+    if (!CTRL || !window.CONTROLLER_ABI) throw new Error('Missing controller address/ABI');
+    // Prefer Web3 if present; else Ethers
+    if (haveWeb3()){
+      const c = ctrlW3();
+      const rows = await c.methods.getStakedTokens(owner).call();
+      return Array.isArray(rows) ? rows.map(r => toNum(r && r.tokenId)).filter(Number.isFinite) : [];
+    } else if (haveEthers()){
+      const c = ctrlEth();
+      const rows = await c.getStakedTokens(owner);
+      return Array.isArray(rows) ? rows.map(r => toNum(r && r.tokenId)).filter(Number.isFinite) : [];
+    }
+    throw new Error('No Web3 or Ethers library loaded');
   }
+
   async function _getAvailableRewards(owner){
-    const w3 = _web3();
-    const ctrl = _controller(w3);
-    // ABI: availableRewards(address) -> uint256 (raw wei string expected by panel)
-    return await ctrl.methods.availableRewards(owner).call();
+    if (haveWeb3()){
+      const c = ctrlW3();
+      return await c.methods.availableRewards(owner).call();
+    } else if (haveEthers()){
+      const c = ctrlEth();
+      const v = await c.availableRewards(owner);
+      return v?.toString?.() ?? String(v);
+    }
+    throw new Error('No Web3 or Ethers library loaded');
   }
 
-  // ---- approval (ERC-721 over the collection contract) ----
   async function _isApproved(owner){
-    const w3 = _web3();
-    const nft = _erc721(w3);
-    return !!(await nft.methods.isApprovedForAll(owner, CTRL_ADDR).call({ from: owner }));
-  }
-  async function _approve(){
-    const w3 = _web3();
-    const from = _account();
-    if (!from) throw new Error('Connect wallet to approve');
-    const nft = _erc721(w3);
-    return nft.methods.setApprovalForAll(CTRL_ADDR, true).send({ from });
+    if (haveWeb3()){
+      const n = nftW3();
+      return !!(await n.methods.isApprovedForAll(owner, CTRL).call({ from: owner }));
+    } else if (haveEthers()){
+      const provider = window.ethereum
+        ? new ethers.providers.Web3Provider(window.ethereum)
+        : new ethers.providers.JsonRpcProvider(CFG.RPC_URL);
+      const c = new ethers.Contract(COLL, ["function isApprovedForAll(address,address) view returns (bool)"], provider);
+      return !!(await c.isApprovedForAll(owner, CTRL));
+    }
+    throw new Error('No Web3 or Ethers library loaded');
   }
 
-  // ---- actions on controller ----
+  // ---------- WRITES (wallet required) ----------
+  async function _approve(){
+    if (haveWeb3()){
+      const n = nftW3();
+      const from = (window.ethereum && window.ethereum.selectedAddress);
+      if (!from) throw new Error('Connect wallet');
+      return n.methods.setApprovalForAll(CTRL, true).send({ from });
+    } else if (haveEthers()){
+      const n = nftEth();
+      const tx = await n.setApprovalForAll(CTRL, true);
+      return tx.wait?.() ?? tx;
+    }
+    throw new Error('No Web3 or Ethers library loaded');
+  }
+
   async function _stake(id){
-    const w3 = _web3();
-    const from = _account();
-    if (!from) throw new Error('Connect wallet to stake');
-    const ctrl = _controller(w3);
-    return ctrl.methods.stake(String(id)).send({ from });
+    if (haveWeb3()){
+      const c = ctrlW3();
+      const from = (window.ethereum && window.ethereum.selectedAddress);
+      if (!from) throw new Error('Connect wallet');
+      return c.methods.stake(String(id)).send({ from });
+    } else if (haveEthers()){
+      const s = signerEth();
+      const c = new ethers.Contract(CTRL, window.CONTROLLER_ABI || [], s);
+      const tx = await c.stake(String(id)); return tx.wait?.() ?? tx;
+    }
+    throw new Error('No Web3 or Ethers library loaded');
   }
+
   async function _withdraw(id){
-    const w3 = _web3();
-    const from = _account();
-    if (!from) throw new Error('Connect wallet to withdraw');
-    const ctrl = _controller(w3);
-    return ctrl.methods.withdraw(String(id)).send({ from });
+    if (haveWeb3()){
+      const c = ctrlW3();
+      const from = (window.ethereum && window.ethereum.selectedAddress);
+      if (!from) throw new Error('Connect wallet');
+      return c.methods.withdraw(String(id)).send({ from });
+    } else if (haveEthers()){
+      const s = signerEth();
+      const c = new ethers.Contract(CTRL, window.CONTROLLER_ABI || [], s);
+      const tx = await c.withdraw(String(id)); return tx.wait?.() ?? tx;
+    }
+    throw new Error('No Web3 or Ethers library loaded');
   }
+
   async function _claim(){
-    const w3 = _web3();
-    const from = _account();
-    if (!from) throw new Error('Connect wallet to claim');
-    const ctrl = _controller(w3);
-    return ctrl.methods.claimRewards().send({ from });
+    if (haveWeb3()){
+      const c = ctrlW3();
+      const from = (window.ethereum && window.ethereum.selectedAddress);
+      if (!from) throw new Error('Connect wallet');
+      return c.methods.claimRewards().send({ from });
+    } else if (haveEthers()){
+      const s = signerEth();
+      const c = new ethers.Contract(CTRL, window.CONTROLLER_ABI || [], s);
+      const tx = await c.claimRewards(); return tx.wait?.() ?? tx;
+    }
+    throw new Error('No Web3 or Ethers library loaded');
   }
 
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
