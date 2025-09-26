@@ -57,7 +57,7 @@
       }
     }
 
-    /* Cards (Dashboard) */
+    /* Cards (Owned Frogs) */
     #ownedCard .grid-cards{ display:grid; gap:10px; grid-template-columns: 1fr; }
     .frog-card{
       border:1px solid var(--border);
@@ -120,13 +120,13 @@
       <section class="pg-card">
         <div class="pg-card-head"><h3>The Pond</h3></div>
         <p class="pg-muted" style="margin:6px 0 12px 0; max-width:70ch;">
-          Live feed of frogs flowing into staking. Watch new stakes and track the collection’s staking stats.
+          Pixel-perfect frogs hopping around the Ethereum pond. Stake to earn FLYZ and explore the collection’s quirks and traits.
         </p>
 
-        <!-- KPIs (updated) -->
+        <!-- KPIs -->
         <div class="info-grid-2" style="margin-bottom:10px;">
           <div class="info-block">
-            <div class="ik">🪵 Total Frogs Staked</div>
+            <div class="ik">🐸  Total Frogs Staked</div>
             <div class="iv" id="stakedTotal">—</div>
             <div class="in">Across the collection</div>
           </div>
@@ -136,9 +136,14 @@
             <div class="in">Staking contract</div>
           </div>
           <div class="info-block">
-            <div class="ik">🪙 Rewards</div>
-            <div class="iv"><a id="pondRewardsLink" href="https://etherscan.io/token/0xd71d2f57819ae4be6924a36591ec6c164e087e63" target="_blank" rel="noopener">$FLYZ</a></div>
+            <div class="ik">Rewards</div>
+            <div class="iv" id="pondRewardsSymbol">$FLYZ</div>
             <div class="in">Earnings token</div>
+          </div>
+          <div class="info-block">
+            <div class="ik">ℹ️ Notes</div>
+            <div class="iv">Transfers → Controller</div>
+            <div class="in">Click a row for Etherscan</div>
           </div>
         </div>
 
@@ -148,17 +153,17 @@
         </ul>
       </section>
 
-      <!-- Right: Dashboard -->
+      <!-- Right: My Frogs (header + cards) -->
       <section id="ownedCard" class="pg-card">
         <div class="pg-card-head">
-          <h3>Dashboard</h3>
+          <h3>My Frogs (Owned)</h3>
           <div><button id="ownedConnectBtn" class="btn">Connect Wallet</button></div>
         </div>
 
-        <!-- Header (rendered by owned-panel.js) -->
+        <!-- Header for KPIs is injected by owned-panel.js; remove old info squares -->
 
         <div class="grid-cards" id="ownedGrid">
-          <div class="pg-muted">Connect your wallet to view your frogs.</div>
+          <div class="pg-muted">Connect your wallet to view owned frogs.</div>
         </div>
         <div class="pg-muted" id="ownedMore" style="margin-top:8px; text-align:center; display:none;">Loading more…</div>
       </section>
@@ -181,34 +186,31 @@
     document.addEventListener('DOMContentLoaded', layoutFrogStrip);
   </script>
 
-  <!-- Web3 -->
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.4/dist/web3.min.js"></script>
+<!-- Config & shared helpers -->
+<script src="https://cdn.jsdelivr.net/npm/web3@1.10.4/dist/web3.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/rarity.js"></script>
+<script src="assets/js/modal.js"></script>
 
-  <!-- Config & shared helpers -->
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/utils.js"></script>
-  <script src="assets/js/rarity.js"></script>
-  <script src="assets/js/modal.js"></script>
-  <script src="assets/js/pond.js"></script>
-  <script src="assets/js/wallet-state.js"></script>
-  <script src="assets/js/wallet.js"></script>
+<!-- ABIs must come from /assets/abi -->
+<script src="assets/abi/collection_abi.js"></script>
+<script src="assets/abi/controller_abi.js"></script>
 
-  <!-- ABIs -->
-  <script src="assets/abi/controller_abi.js"></script>
-  <script src="assets/abi/collection_abi.js"></script>
+<!-- Panels / features (all from /assets/js) -->
+<script src="assets/js/pond.js"></script>
+<script src="assets/js/wallet-state.js"></script>
+<script src="assets/js/wallet.js"></script>
+<script src="assets/js/staking-adapter.js"></script>  <!-- ✅ correct path -->
+<script src="assets/js/pond-kpis.js"></script>
+<script src="assets/js/stakes-feed.js"></script>
+<script src="assets/js/pond-tweaks.js"></script>
+<script src="assets/js/owned-panel.js"></script>
 
-  <!-- Adapter + panels -->
-  <script src="assets/js/staking-adapter.js"></script>
+<script>
+  if (window.FF_loadRecentStakes) FF_loadRecentStakes();
+  if (window.FF_initOwnedPanel)   FF_initOwnedPanel();
+</script>
 
-  <script src="assets/js/stakes-feed.js"></script>
-  <script src="assets/js/pond-kpis.js"></script>
-
-  <script src="assets/js/owned-panel.js"></script>
-
-  <script>
-    if (window.FF_loadRecentStakes) FF_loadRecentStakes();
-    if (window.FF_initOwnedPanel)   FF_initOwnedPanel();
-    if (window.FF_initPondKPIs)     FF_initPondKPIs();
-  </script>
 </body>
 </html>
