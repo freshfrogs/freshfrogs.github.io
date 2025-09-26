@@ -1,6 +1,5 @@
 // assets/js/pond-kpis.js
 // Updates the Pond KPIs: Total Frogs Staked, Controller link, Rewards symbol.
-// NO UI changes. Safe if wallet not connected; uses wallet or optional RPC_URL.
 
 (function (FF, CFG) {
   'use strict';
@@ -14,7 +13,6 @@
     {"constant":true,"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":""}],"stateMutability":"view","type":"function"}
   ];
 
-  // Etherscan base by chain
   function etherscanBase() {
     if (CHAIN_ID === 1) return 'https://etherscan.io';
     if (CHAIN_ID === 11155111) return 'https://sepolia.etherscan.io';
@@ -68,10 +66,9 @@
     el.textContent = (val == null) ? '—' : String(val);
   }
 
-  // Public init
   window.FF_initPondKPIs = function(){
     refreshPondKPIs();
-    // Optional: refresh every 60s (comment out if not desired)
+    // Optional live refresh:
     // setInterval(refreshPondKPIs, 60000);
   };
 

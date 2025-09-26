@@ -71,7 +71,6 @@
   const toast=(m)=>{ try{FF.toast?.(m);}catch{} console.log('[owned]',m); };
 
   function formatToken(raw,dec=REWARD_DECIMALS){
-    // Accept: bigint/number/hex; {formatted}; {value|amount,decimals}; or human string.
     const toBigInt=(v)=>{ try{
       if(typeof v==='bigint') return v;
       if(typeof v==='number') return BigInt(Math.trunc(v));
@@ -178,8 +177,7 @@
     }catch{} return null;
   }
 
-  // --- NEW: fallback to infer stake time via Transfer(to=controller) events ---
-  // Returns ms epoch or null
+  // NEW: fallback via Transfer(to=controller) events → ms epoch or null
   async function stakeSinceViaEvents(tokenId){
     try{
       if (!window.Web3) return null;
@@ -202,7 +200,7 @@
   }
 
   // --- State ---
-  let addr=null, continuation=null, items=[], io=null;
+  let addr=null, continuation=null, items=[];
   let _stakedCount=null, _rewardsPretty='—', _approved=null;
 
   // --- Local metadata cache ---
@@ -369,6 +367,8 @@
     try{
       const [ownedIds, ranks] = await Promise.all([ fetchOwnedIdsPage(), ensureRanks() ]);
       const stakedIds = addr ? await getStakedIds(addr) : [];
+      const stakedSet = new Set(stakedIds);
+      // header KPI (staked count)
       _stakedCount = stakedIds.length;
 
       // Combine (add staked IDs not in owned)
@@ -382,7 +382,7 @@
       items = metas.map(m => ({
         id: m.id,
         attrs: m.attrs,
-        staked: stakedIds.includes(m.id),
+        staked: stakedSet.has(m.id),
         sinceMs: null,
         rank: (ranks||{})[String(m.id)]
       }));
@@ -414,7 +414,7 @@
           const moreMetas = await loadMetaBatch(moreIds);
           const more = moreMetas
             .filter(m=> !items.some(x=> x.id===m.id))
-            .map(m=> ({ id:m.id, attrs:m.attrs, staked: stakedIds.includes(m.id), sinceMs:null, rank:(FF.RANKS||{})[String(m.id)] }));
+            .map(m=> ({ id:m.id, attrs:m.attrs, staked: stakedSet.has(m.id), sinceMs:null, rank:(FF.RANKS||{})[String(m.id)] }));
           items = items.concat(more);
           // hydrate staked times for the new batch
           for (const it of more){
