@@ -1,19 +1,18 @@
-// assets/js/pond-kpis.js — Total Staked = balanceOf(controller) on the collection.
-// No wallet/web3 needed: direct JSON-RPC eth_call. Multi-controller supported (sum).
+// assets/js/pond-kpis.js — exact Total Staked via direct JSON-RPC: balanceOf(controller) on collection.
+// No wallet/web3/ABI required. Also robustly finds the KPI element if #stakedTotal is missing.
 (function () {
   'use strict';
 
-  // --- RPC + constants ---
   var CFG = (window.CFG || window.FF_CFG || window.CONFIG || {});
   var RPC_URL = CFG.RPC_URL || 'https://cloudflare-eth.com';
   var FLYZ_URL = 'https://etherscan.io/token/0xd71d2f57819ae4be6924a36591ec6c164e087e63';
-  var FALLBACK_CONTROLLER = '0xcb1ee125cff4051a10a55a09b10613876c4ef199'; // provided
+  var FALLBACK_CONTROLLER = '0xcb1ee125cff4051a10a55a09b10613876c4ef199'; // your staking controller
 
-  // --- tiny helpers ---
+  // ---------- tiny utils ----------
   function $(s, p){ return (p||document).querySelector(s); }
   function $all(s, p){ return Array.prototype.slice.call((p||document).querySelectorAll(s)); }
   function byId(id){ return document.getElementById(id); }
-  function shorten(a){ return !a ? '—' : String(a).slice(0,6)+'…'+String(a).slice(-4); }
+  function shorten(a){ return !a ? '—' : (String(a).slice(0,6)+'…'+String(a).slice(-4)); }
   function fmtInt(v){
     try{
       if (v && typeof v==='object' && v.toString) v = v.toString();
@@ -38,7 +37,7 @@
     return '000000000000000000000000'+a;
   }
 
-  // --- config readers ---
+  // ---------- config readers ----------
   function getCollection(){
     return (CFG.COLLECTION_ADDRESS || CFG.collectionAddress || '').toLowerCase();
   }
@@ -46,7 +45,6 @@
     var many = CFG.CONTROLLER_ADDRESSES || CFG.controllerAddresses;
     var one  = CFG.CONTROLLER_ADDRESS  || CFG.controllerAddress  || FALLBACK_CONTROLLER;
     if (!Array.isArray(many)) many = one ? [one] : [];
-    // dedupe + lowercase
     var out = [];
     for (var i=0;i<many.length;i++){
       var a = String(many[i]||'').toLowerCase();
@@ -55,7 +53,7 @@
     return out;
   }
 
-  // --- UI priming per your spec ---
+  // ---------- UI priming ----------
   function primeUI(){
     var firstLabel = $('.info-grid-2 .info-block:nth-child(1) .ik');
     if (firstLabel) firstLabel.textContent = '🌿 Total Staked';
@@ -63,7 +61,7 @@
     var blurb = $('.pg-muted');
     if (blurb) blurb.textContent = 'Live view of staking activity in the FreshFrogs pond — track total staked, the controller contract, and FLYZ rewards.';
 
-    // Rewards link ($FLYZ with link)
+    // Rewards link
     var third = $('.info-grid-2 .info-block:nth-child(3)');
     if (third){
       var lab = third.querySelector('.ik'); if (lab) lab.textContent = '🪙 Rewards';
@@ -72,7 +70,8 @@
         var a = iv.querySelector('#pondRewardsLink');
         if (!a){
           a = document.createElement('a');
-          a.id='pondRewardsLink'; a.target='_blank'; a.rel='noopener'; a.href=FLYZ_URL; a.innerHTML='<span id="pondRewardsSymbol">$FLYZ</span>';
+          a.id='pondRewardsLink'; a.target='_blank'; a.rel='noopener';
+          a.href=FLYZ_URL; a.innerHTML='<span id="pondRewardsSymbol">$FLYZ</span>';
           iv.textContent=''; iv.appendChild(a);
         } else {
           a.href=FLYZ_URL; a.target='_blank'; a.rel='noopener';
@@ -81,7 +80,7 @@
       }
     }
 
-    // Remove Notes box if a 4th exists
+    // Remove Notes if a 4th box exists
     var blocks = $all('.info-grid-2 .info-block'); if (blocks[3]) blocks[3].remove();
   }
 
@@ -92,9 +91,9 @@
     a.textContent = shorten(addr);
   }
 
-  // --- on-chain reads (direct eth_call) ---
-  // balanceOf(address) selector = 0x70a08231
+  // ---------- exact on-chain read: balanceOf(controller) ----------
   function balanceOf(collection, controller){
+    // 0x70a08231 = keccak("balanceOf(address)") first 4 bytes
     var data = '0x70a08231' + toHex32(controller);
     var body = { jsonrpc:'2.0', id:1, method:'eth_call', params:[ { to: collection, data: data }, 'latest' ] };
     return rpc(body).then(function(resp){
@@ -106,7 +105,8 @@
   function fetchTotalStaked(){
     var collection = getCollection();
     var controllers = getControllers();
-    if (!collection || !controllers.length) return Promise.reject(new Error('Missing collection/controller'));
+    if (!collection || !controllers.length)
+      return Promise.reject(new Error('Missing collection/controller address(es).'));
 
     var calls = controllers.map(function(c){ return balanceOf(collection, c).catch(function(){ return 0n; }); });
     return Promise.all(calls).then(function(parts){
@@ -114,8 +114,16 @@
     });
   }
 
+  // robust target: prefer #stakedTotal, else first KPI value in row 1
+  function getTotalTarget(){
+    var el = byId('stakedTotal');
+    if (el) return el;
+    var guess = $('.info-grid-2 .info-block:nth-child(1) .iv');
+    return guess || null;
+  }
+
   function fillTotalStaked(){
-    var out = byId('stakedTotal'); if (!out) return;
+    var out = getTotalTarget(); if (!out) return;
     fetchTotalStaked().then(function(totalBI){
       out.textContent = fmtInt(totalBI.toString());
     }).catch(function(err){
