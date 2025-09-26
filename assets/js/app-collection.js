@@ -238,7 +238,7 @@ var POND = (function(){
     // users=controller address (treat controller as a “user”) — we want transfers in/out of controller
     var u = new URL(RESV_HOST + '/users/activity/v6');
     u.searchParams.set('users', CFG.CONTROLLER_ADDRESS);
-    u.searchParams.set('limit', '50');
+    u.searchParams.set('limit', '20');
     // We’ll filter transfers client-side; v6 supports multiple types, not all installations expose type filters.
     if (continuation) u.searchParams.set('continuation', continuation);
 
