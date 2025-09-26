@@ -1,6 +1,5 @@
 // assets/js/stakes-feed.js
-// Populates the "Recent Stakes" list without changing styles.
-// Uses FFAPI + read-only Web3 fallback so no wallet is required.
+// Populates the Pond "Recent Activity" list (stake/unstake via Reservoir).
 (function(){
   'use strict';
 
@@ -10,11 +9,13 @@
     if (w3) window.WEB3 = w3;
   }
 
-  function el(id){ return document.getElementById(id); }
-  const list = el('recentStakes');
-  if (!list) return;
-
-  let cont = null, busy = false, booted = false;
+  function $(sel){ return document.querySelector(sel); }
+  function findListEl(){
+    // Support both markup variants:
+    //  - <ul id="recentStakes">…</ul>
+    //  - <ul id="pondList">…</ul>
+    return $('#recentStakes') || $('#pondList') || $('[data-pond-list]') || null;
+  }
 
   function fmtAgo(tsSec){
     if (!tsSec) return '';
@@ -29,7 +30,7 @@
 
   function renderRow(r){
     const li = document.createElement('li');
-    li.className = 'row';
+    li.className = 'row'; // matches your existing CSS
     const pillClass = r.kind === 'stake' ? 'pill-green' : 'pill-gray';
     const label = r.kind === 'stake' ? 'Staked' : 'Unstaked';
     const ago = fmtAgo(r.timestamp);
@@ -47,35 +48,39 @@
     return li;
   }
 
+  let cont = null, busy = false, booted = false, listEl = null;
+
   async function loadPage(){
-    if (busy) return; busy = true;
+    if (!window.FFAPI) return;
+    if (!listEl) listEl = findListEl();
+    if (!listEl || busy) return;
+    busy = true;
     try{
       const got = await window.FFAPI.fetchPondActivityPage(cont, 20);
       cont = got.continuation || null;
 
-      // Clear placeholder on first real load
       if (!booted){
-        list.innerHTML = '';
+        listEl.innerHTML = '';
         booted = true;
       }
 
       const frag = document.createDocumentFragment();
-      (got.rows || []).forEach(r => { if (r && r.tokenId != null) frag.appendChild(renderRow(r)); });
-      list.appendChild(frag);
+      (got.rows || []).forEach(r => {
+        if (r && r.tokenId != null) frag.appendChild(renderRow(r));
+      });
+      listEl.appendChild(frag);
     } catch(e){
       console.warn('[pond] load activity failed', e);
-      if (!booted){
-        list.innerHTML = `<li class="row"><div class="pg-muted">Unable to load recent activity.</div></li>`;
+      if (!booted && listEl){
+        listEl.innerHTML = `<li class="row"><div class="pg-muted">Unable to load recent activity.</div></li>`;
       }
-    } finally { busy = false; }
+    } finally {
+      busy = false;
+    }
   }
 
-  // Public hook already called by collection.html
-  window.FF_loadRecentStakes = function(){
-    loadPage();
-
-    // simple infinite scroll (list container or page)
-    const wrap = el('pondListWrap') || list.parentElement || window;
+  function attachInfiniteScroll(){
+    const wrap = $('#pondListWrap') || (listEl ? listEl.parentElement : null) || window;
     const target = wrap === window ? document.documentElement : wrap;
 
     function onScroll(){
@@ -85,5 +90,20 @@
       if (nearBottom && cont) loadPage();
     }
     wrap.addEventListener('scroll', onScroll);
+  }
+
+  // Public hook (kept for backward compatibility)
+  window.FF_loadRecentStakes = function(){
+    listEl = findListEl();
+    if (!listEl) return;
+    loadPage();
+    attachInfiniteScroll();
   };
+
+  // Also auto-boot when DOM is ready (in case the page forgot to call the hook)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => window.FF_loadRecentStakes());
+  } else {
+    window.FF_loadRecentStakes();
+  }
 })();
