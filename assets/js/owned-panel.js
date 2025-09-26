@@ -1,11 +1,11 @@
 // assets/js/owned-panel.js
-// Reverted: show ONLY frogs owned by the connected user (Reservoir).
-// No Web3, no HUD, no extra badges beyond "Owned by You". Keeps the original card look.
+// Rollback: render ONLY frogs owned by the connected user (Reservoir).
+// No HUD, no totals, no rewards, no Web3. Preserves original card layout.
 
 (function(){
   'use strict';
 
-  const C = window.FF_CFG || {};
+  const C    = window.FF_CFG || {};
   const HOST = (C.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
   const KEY  = C.FROG_API_KEY || C.RESERVOIR_API_KEY || '';
 
@@ -15,20 +15,21 @@
 
   if (!GRID) return;
 
-  // Basic helpers
-  const apiHeaders = { accept: 'application/json', ...(KEY ? { 'x-api-key': KEY } : {}) };
-  const img = (id)=> (C.SOURCE_PATH || '') + `/frog/${id}.png`;
-  function setLoading(on, msg){
+  // ----- helpers -----
+  const headers = { accept: 'application/json', ...(KEY ? { 'x-api-key': KEY } : {}) };
+  const imgSrc  = (id)=> (C.SOURCE_PATH || '') + `/frog/${id}.png`;
+
+  function setLoading(show, text){
     if (!MORE) return;
-    MORE.style.display = on ? 'block' : 'none';
-    MORE.textContent   = on ? (msg || 'Loading more…') : '';
+    MORE.style.display = show ? 'block' : 'none';
+    MORE.textContent   = show ? (text || 'Loading more…') : '';
   }
 
   function renderCard(id){
     const el = document.createElement('div');
     el.className = 'frog-card';
     el.innerHTML = `
-      <img class="thumb" loading="lazy" decoding="async" src="${img(id)}" alt="#${id}">
+      <img class="thumb" loading="lazy" decoding="async" src="${imgSrc(id)}" alt="#${id}">
       <h4 class="title mono">#${id}</h4>
       <div class="meta">Owned by You</div>
       <div class="actions"></div>
@@ -36,8 +37,7 @@
     return el;
   }
 
-  // Reservoir: owned page
-  async function fetchOwnedPage(user, continuation=null, limit=20){
+  async function fetchOwnedPage(owner, continuation=null, limit=20){
     const qs = new URLSearchParams({
       collection: C.COLLECTION_ADDRESS,
       limit: String(limit),
@@ -48,15 +48,16 @@
     });
     if (continuation) qs.set('continuation', continuation);
 
-    const res = await fetch(`${HOST}/users/${user}/tokens/v8?${qs.toString()}`, { headers: apiHeaders });
+    const url = `${HOST}/users/${owner}/tokens/v8?${qs.toString()}`;
+    const res = await fetch(url, { headers });
     if (!res.ok) throw new Error(`owned tokens HTTP ${res.status}`);
     const j = await res.json();
     const items = (j.tokens || []).map(r => Number(r?.token?.tokenId)).filter(Number.isFinite);
     return { items, continuation: j.continuation || null };
   }
 
-  // State + flow
-  let state = { addr:null, cont:null, loading:false };
+  // ----- state & flow -----
+  let state = { addr:null, cont:null, busy:false };
 
   async function loadFirst(addr){
     GRID.innerHTML = '';
@@ -77,8 +78,8 @@
   }
 
   async function loadMore(){
-    if (!state.addr || !state.cont || state.loading) return;
-    state.loading = true;
+    if (!state.addr || !state.cont || state.busy) return;
+    state.busy = true;
     setLoading(true, 'Loading more…');
     try{
       const page = await fetchOwnedPage(state.addr, state.cont, 20);
@@ -91,11 +92,11 @@
       console.warn('[owned-panel] loadMore failed', e);
       setLoading(false, '');
     }finally{
-      state.loading = false;
+      state.busy = false;
     }
   }
 
-  // Connect button: use your main connect if present; else request accounts
+  // Connect button: use global connect if present; else request accounts
   if (BTN){
     BTN.addEventListener('click', async ()=>{
       const mainBtn = document.getElementById('connectBtn');
@@ -110,24 +111,24 @@
     });
   }
 
-  // Wallet event from your wallet.js
+  // Wallet event
   window.addEventListener('wallet:connected', (ev)=>{
     const addr = ev?.detail?.address; if (!addr) return;
     state.addr = addr;
     loadFirst(addr);
   });
 
-  // Infinite scroll within the card
+  // Infinite scroll inside the card container
   const wrap = GRID.parentElement;
   wrap.addEventListener('scroll', ()=>{
     const nearBottom = wrap.scrollTop + wrap.clientHeight >= wrap.scrollHeight - 100;
     if (nearBottom) loadMore();
   });
 
-  // Bootstrap if already connected
+  // If already connected, bootstrap immediately
   const maybeAddr = window?.FF?.wallet?.address || window?.WALLET_ADDR;
   if (maybeAddr){ state.addr = maybeAddr; loadFirst(maybeAddr); }
 
-  // Public noop (for compatibility with your inline call)
-  window.FF_initOwnedPanel = function(){ /* no-op in reverted build */ };
+  // Compatibility no-op
+  window.FF_initOwnedPanel = function(){ /* no-op */ };
 })();
