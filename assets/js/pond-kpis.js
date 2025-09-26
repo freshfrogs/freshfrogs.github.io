@@ -1,35 +1,29 @@
-// assets/js/pond-kpis.js — Total Staked via Reservoir (no wallet/RPC)
-// Counts tokens owned by your staking controller(s) using Reservoir owners API,
-// falls back to tokens/v10 if needed. Optional API key via CFG.RESERVOIR_API_KEY.
+// assets/js/pond-kpis.js — Total Staked via Reservoir owners/v2 (read the row for the controller address).
+// If the controller row isn't present, falls back to exact tokens/v10 counting.
+// Needs window.CFG.COLLECTION_ADDRESS and window.CFG.CONTROLLER_ADDRESS/CONTROLLER_ADDRESSES.
+// Optional: window.CFG.RESERVOIR_API_KEY.
 
 (function () {
   'use strict';
 
-  // ---------- CFG ----------
   var CFG = (window.CFG || window.FF_CFG || window.CONFIG || {});
-  var COLLECTION = (CFG.COLLECTION_ADDRESS || '').toLowerCase();
+  var CONTRACT = (CFG.COLLECTION_ADDRESS || '').toLowerCase();
   var CONTROLLERS = (CFG.CONTROLLER_ADDRESSES || (CFG.CONTROLLER_ADDRESS ? [CFG.CONTROLLER_ADDRESS] : [])).map(function(a){return String(a||'').toLowerCase();});
   var RES_KEY = CFG.RESERVOIR_API_KEY || null;
 
-  // Defaults (safe fallbacks if CFG not loaded yet)
-  if (!COLLECTION) COLLECTION = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
+  // Safety fallbacks (you can remove if you always set CFG)
+  if (!CONTRACT) CONTRACT = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
   if (!CONTROLLERS.length) CONTROLLERS = ['0xcb1ee125cff4051a10a55a09b10613876c4ef199'];
 
   var HEAD = { accept:'*/*' };
   if (RES_KEY) HEAD['x-api-key'] = RES_KEY;
 
-  // ---------- DOM helpers ----------
-  function $(s, p){ return (p||document).querySelector(s); }
-  function $$ (s, p){ return Array.prototype.slice.call((p||document).querySelectorAll(s)); }
-  function fmt(n){
-    try{ return (+n).toLocaleString(); }catch(_){ try{ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,','); }catch(_2){ return String(n); } }
-  }
+  function $(s,p){ return (p||document).querySelector(s); }
+  function $$(s,p){ return Array.prototype.slice.call((p||document).querySelectorAll(s)); }
+  function fmt(n){ try{ return (+n).toLocaleString(); }catch(_){ return String(n); } }
+
   function targetNode(){
-    var el = document.getElementById('stakedTotal');
-    if (el) return el;
-    var guess = $('.info-grid-2 .info-block:nth-child(1) .iv');
-    if (guess) return guess;
-    return null;
+    return document.getElementById('stakedTotal') || $('.info-grid-2 .info-block:nth-child(1) .iv') || null;
   }
   function setLabel(){
     var ik = $('.info-grid-2 .info-block:nth-child(1) .ik');
@@ -44,8 +38,7 @@
     a.textContent = addr.slice(0,6)+'…'+addr.slice(-4);
   }
   function setFLYZ(){
-    var box = $('.info-grid-2 .info-block:nth-child(3)');
-    if (!box) return;
+    var box = $('.info-grid-2 .info-block:nth-child(3)'); if (!box) return;
     var lab = box.querySelector('.ik'); if (lab) lab.textContent = '🪙 Rewards';
     var iv  = box.querySelector('.iv'); if (!iv) return;
     var a = iv.querySelector('#pondRewardsLink');
@@ -55,54 +48,67 @@
     a.innerHTML='<span id="pondRewardsSymbol">$FLYZ</span>';
   }
   function removeFourthBox(){
-    var blocks = $$('.info-grid-2 .info-block');
-    if (blocks[3]) blocks[3].remove();
+    var blocks = $$('.info-grid-2 .info-block'); if (blocks[3]) blocks[3].remove();
   }
 
-  // ---------- Reservoir fetchers ----------
-  // Fast aggregate count per controller
-  function ownersCount(controller){
-    var url = 'https://api.reservoir.tools/owners/v2?collection='+COLLECTION+'&owner='+controller+'&limit=1';
-    return fetch(url, {method:'GET', headers:HEAD}).then(function(res){
-      if (!res.ok) throw new Error('owners/v2 '+res.status);
-      return res.json();
-    }).then(function(j){
-      var row = (j.owners && j.owners[0]) || (j.ownerships && j.ownerships[0]) || j.ownership || null;
-      var cnt = row ? (row.tokenCount!=null ? row.tokenCount :
-                       row.ownership && row.ownership.tokenCount!=null ? row.ownership.tokenCount :
-                       0) : 0;
-      return Number(cnt||0);
-    }).catch(function(){ return 0; });
+  // ---- owners/v2: read ONLY the row matching the controller address ----
+  function ownersCountFor(controller){
+    var url = 'https://api.reservoir.tools/owners/v2?collection=' + CONTRACT + '&owner=' + controller + '&limit=1';
+    return fetch(url, { method:'GET', headers:HEAD })
+      .then(function(res){ if (!res.ok) throw new Error('owners/v2 '+res.status); return res.json(); })
+      .then(function(j){
+        // API can return { owners:[{address, tokenCount, ...}, ...] } or { ownerships:[{owner:{address,tokenCount}}] }
+        var rows = Array.isArray(j.owners) ? j.owners
+                 : Array.isArray(j.ownerships) ? j.ownerships.map(function(o){ return o.owner || o.ownership || o; })
+                 : [];
+        var row = rows.find(function(r){
+          var addr = (r.address || r.owner || r.wallet || r?.ownership?.address || '').toLowerCase();
+          return addr === controller;
+        });
+        // If exact controller row found, take its tokenCount
+        if (row && row.tokenCount != null) return Number(row.tokenCount) || 0;
+        if (row && row.ownership && row.ownership.tokenCount != null) return Number(row.ownership.tokenCount) || 0;
+        // If not found, return null so caller can decide to fallback
+        return null;
+      })
+      .catch(function(){ return null; });
   }
 
-  // Exact count fallback via tokens/v10 (paged)
-  function tokensCount(controller){
+  // ---- tokens/v10 fallback: exact count for (contract + owner) ----
+  function tokensCountFor(controller){
     var total = 0, cont = null, guard = 0;
-    function once(){
-      var base = 'https://api.reservoir.tools/tokens/v10?collection='+COLLECTION+'&owner='+controller+'&limit=1000&includeTopBid=false';
+    function page(){
+      // Use contracts=<addr> to force single-contract scope (avoid collection-set ambiguity)
+      var base = 'https://api.reservoir.tools/tokens/v10?contracts=' + CONTRACT + '&owner=' + controller + '&limit=1000&includeTopBid=false';
       var url  = cont ? base + '&continuation=' + encodeURIComponent(cont) : base;
-      return fetch(url, {method:'GET', headers:HEAD}).then(function(res){
-        if (!res.ok) throw new Error('tokens/v10 '+res.status);
-        return res.json();
-      }).then(function(j){
-        total += (j.tokens || []).length;
-        cont = j.continuation || null;
-        guard++;
-        if (cont && guard < 20) return once();
-        return total;
-      }).catch(function(){ return total; });
+      return fetch(url, { method:'GET', headers:HEAD })
+        .then(function(res){ if (!res.ok) throw new Error('tokens/v10 '+res.status); return res.json(); })
+        .then(function(j){
+          total += (j.tokens || []).length;
+          cont = j.continuation || null;
+          guard++;
+          if (cont && guard < 50) return page();
+          return total;
+        })
+        .catch(function(){ return total; });
     }
-    return once();
+    return page();
   }
 
   function fetchTotalStaked(){
-    // First try owners/v2 for all controllers, then fallback to tokens/v10 for any zeroes.
-    return Promise.all(CONTROLLERS.map(ownersCount)).then(function(ownersArr){
-      var sum = ownersArr.reduce(function(a,b){return a + (b||0);}, 0);
-      // If sum > 0, good enough (fast). If 0, try exact tokens/v10 (slower).
-      if (sum > 0) return sum;
-      return Promise.all(CONTROLLERS.map(tokensCount)).then(function(tokensArr){
-        return tokensArr.reduce(function(a,b){return a + (b||0);}, 0);
+    // Try owners/v2 first (but only the row with the controller address).
+    return Promise.all(CONTROLLERS.map(ownersCountFor)).then(function(arr){
+      var needFallback = [];
+      var sum = 0;
+      for (var i=0;i<arr.length;i++){
+        if (arr[i] == null) needFallback.push(CONTROLLERS[i]);  // no matching row: fallback
+        else sum += arr[i];
+      }
+      if (!needFallback.length) return sum;
+      // For controllers that didn't return a row, compute via tokens/v10 and add
+      return Promise.all(needFallback.map(tokensCountFor)).then(function(parts){
+        var extra = parts.reduce(function(a,b){return a+(b||0);},0);
+        return sum + extra;
       });
     });
   }
