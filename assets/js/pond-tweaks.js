@@ -1,23 +1,22 @@
 // assets/js/pond-tweaks.js
-(function(){
-  'use strict';
-  const card = document.querySelector('.page-grid > section.pg-card'); // first/left card
-  if (!card) return;
-
-  const h = card.querySelector('.pg-card-head h3');
-  if (h) h.textContent = 'The Pond';
-
-  const blocks = card.querySelectorAll('.info-block');
-  if (blocks[0]) {
-    const ik = blocks[0].querySelector('.ik');
-    if (ik) ik.textContent = 'Total Frogs Staked';
+(function(CFG){
+  const C = window.FF_CFG || CFG || {};
+  function etherscanAddr(a){
+    const chain = Number(C.CHAIN_ID||1);
+    const base = chain===1 ? 'https://etherscan.io/address/' :
+               chain===11155111 ? 'https://sepolia.etherscan.io/address/' :
+               'https://etherscan.io/address/';
+    return base + a;
   }
-  if (blocks[2]) {
-    const ik = blocks[2].querySelector('.ik');
-    const iv = blocks[2].querySelector('.iv');
-    const inn= blocks[2].querySelector('.in');
-    if (ik) ik.textContent = 'Rewards';
-    if (iv) iv.textContent = (window.FF_CFG?.REWARD_TOKEN_SYMBOL || '$FLYZ');
-    if (inn) inn.textContent = 'Earnings token';
-  }
-})();
+  // Link
+  const a = document.getElementById('pondTransfersLink');
+  if (a && C.CONTROLLER_ADDRESS) a.href = etherscanAddr(C.CONTROLLER_ADDRESS)+'#tokentxns';
+
+  // De-nest rows if some legacy script double-wraps them
+  const ul = document.getElementById('recentStakes');
+  if (!ul) return;
+  const fix = ()=> ul.querySelectorAll('li.row li.row').forEach(inner=>{
+    const outer = inner.closest('li.row'); if (outer && outer!==inner) outer.replaceWith(inner);
+  });
+  new MutationObserver(fix).observe(ul, { childList:true, subtree:true }); fix();
+})(window.FF_CFG);
