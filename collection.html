@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="assets/css/styles.css" />
 
   <style>
-    /* Layout shell (unchanged look) */
+    /* Base */
     .pg-wrap{ padding:20px; }
     img{ image-rendering: pixelated; image-rendering: crisp-edges; }
 
@@ -28,7 +28,7 @@
     }
     @media (max-width:960px){ .page-grid{ grid-template-columns: 1fr; } }
 
-    /* Hero */
+    /* Hero (centered) */
     .frog-hero{ margin:28px auto 38px; max-width:1100px; }
     .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
     .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
@@ -37,7 +37,7 @@
     .frog-strip img{ width:64px; height:64px; object-fit:contain; }
     @media (max-width:520px){ .frog-hero{ margin:22px auto 30px; } .frog-strip{ gap:10px; } }
 
-    /* Info blocks (Pond top stats) */
+    /* Info blocks */
     .info-grid-2{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:10px; margin-bottom:10px; }
     @media (max-width:900px){ .info-grid-2{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
     @media (max-width:520px){ .info-grid-2{ grid-template-columns: 1fr; } }
@@ -46,21 +46,18 @@
     .info-block .iv{ font-weight:900; font-size:18px; line-height:1.1; margin-top:4px; }
     .info-block .in{ font-size:12px; color:var(--muted); }
 
-    /* Scroll containers to keep panel heights neat */
-    #recentStakes.list{ max-height:520px; overflow:auto; -webkit-overflow-scrolling:touch; padding-right:4px; }
-    #ownedGrid{ max-height:520px; overflow:auto; -webkit-overflow-scrolling:touch; padding-right:4px; }
-
+    /* Scrollable list (Recent Stakes) */
+    #recentStakes.scrolling{ overflow-y:auto; -webkit-overflow-scrolling:touch; padding-right:4px; }
+    #recentStakes .row{ cursor:pointer; }
     @media (hover:hover){
-      #recentStakes.list::-webkit-scrollbar,
-      #ownedGrid::-webkit-scrollbar{ width:8px; }
-      #recentStakes.list::-webkit-scrollbar-thumb,
-      #ownedGrid::-webkit-scrollbar-thumb{
+      #recentStakes.scrolling::-webkit-scrollbar{ width:8px; }
+      #recentStakes.scrolling::-webkit-scrollbar-thumb{
         background: color-mix(in srgb, var(--muted) 35%, transparent);
         border-radius:8px;
       }
     }
 
-    /* Frog cards (as you liked) */
+    /* Owned Frogs panel (old look) */
     #ownedCard .grid-cards{ display:grid; gap:10px; grid-template-columns: 1fr; }
     .frog-card{
       border:1px solid var(--border);
@@ -102,13 +99,6 @@
       border-color: color-mix(in srgb, #22c55e 80%, var(--border));
       color: color-mix(in srgb, #ffffff 85%, #22c55e);
     }
-
-    /* My Frogs header row — exactly like screenshot */
-    #ownedHeaderRow{ display:flex; gap:18px; align-items:baseline; color:var(--muted); margin:-2px 0 8px; }
-    #ownedHeaderRow b{ color:var(--fg); font-weight:800; }
-    #walletChip{ background: color-mix(in srgb, var(--panel) 85%, transparent); border:1px solid var(--border); }
-    #ownedHeaderActions{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
-    .btn-connected{ background: color-mix(in srgb, #22c55e 16%, var(--panel)); border-color: color-mix(in srgb, #22c55e 80%, var(--border)); color: color-mix(in srgb, #ffffff 90%, #22c55e); }
   </style>
 </head>
 <body>
@@ -129,65 +119,72 @@
     <!-- GRID -->
     <div class="page-grid">
 
-      <!-- Left: The Pond -->
-      <section class="pg-card" id="pondPanel">
-        <div class="pg-card-head"><h3>The Pond</h3></div>
+      <!-- Left: Fresh Frogs + Recent Stakes (with stats) -->
+      <section class="pg-card">
+        <div class="pg-card-head"><h3>Fresh Frogs NFT</h3></div>
         <p class="pg-muted" style="margin:6px 0 12px 0; max-width:70ch;">
           Pixel-perfect frogs hopping around the Ethereum pond. Stake to earn FLYZ and explore the collection’s quirks and traits.
         </p>
 
-        <!-- Pond stats -->
+        <!-- Stakes stats -->
         <div class="info-grid-2" style="margin-bottom:10px;">
           <div class="info-block">
-            <div class="ik">Total Frogs Staked</div>
-            <div class="iv"><span id="pondTotalStaked">—</span></div>
+            <div class="ik">🪵 Total Frogs Staked</div>
+            <div class="iv" id="stakedTotal">—</div>
             <div class="in">Across the collection</div>
           </div>
           <div class="info-block">
-            <div class="ik">Controller</div>
+            <div class="ik">🧰 Controller</div>
             <div class="iv"><a id="stakedController" href="#" target="_blank" rel="noopener">—</a></div>
             <div class="in">Staking contract</div>
           </div>
           <div class="info-block">
-            <div class="ik">Rewards</div>
-            <div class="iv"><span id="pondRewardsSymbol">$FLYZ</span></div>
-            <div class="in"><a id="pondTransfersLink" href="#" target="_blank" rel="noopener">Transfers → Controller</a></div>
+            <div class="ik">⏱ Last Update</div>
+            <div class="iv" id="stakedUpdated">—</div>
+            <div class="in">Stats refresh time</div>
           </div>
           <div class="info-block">
-            <div class="ik">Notes</div>
-            <div class="iv">Click a row for Etherscan</div>
-            <div class="in">Live staking activity</div>
+            <div class="ik">ℹ️ Notes</div>
+            <div class="iv">Transfers → Controller</div>
+            <div class="in">Click a row for Etherscan</div>
           </div>
         </div>
 
-        <!-- Recent Activity (scrollable) -->
+        <!-- Recent Stakes (scrollable) -->
         <ul id="recentStakes" class="list" aria-live="polite" data-visible="6">
-          <!-- populated by stakes-feed.js -->
+          <li class="row"><div class="pg-muted">Loading recent stakes…</div></li>
         </ul>
       </section>
 
-      <!-- Right: My Frogs (Owned) -->
+      <!-- Right: Owned Frogs (old rich card style) -->
       <section id="ownedCard" class="pg-card">
         <div class="pg-card-head">
           <h3>My Frogs (Owned)</h3>
-          <div>
-            <button id="ownedConnectBtn" class="btn">Connect Wallet</button>
+          <div><button id="ownedConnectBtn" class="btn">Connect Wallet</button></div>
+        </div>
+
+        <!-- Info summary -->
+        <div class="info-grid-2" style="margin-bottom:10px;">
+          <div class="info-block">
+            <div class="ik">Total Owned</div>
+            <div class="iv" id="ownedCount">—</div>
+            <div class="in">In this collection</div>
           </div>
-        </div>
-
-        <!-- Wallet chip + compact KPI row exactly like screenshot -->
-        <div id="ownedHeaderRow">
-          <div>Owned&nbsp;<b id="ownedCount">0</b></div>
-          <div>•&nbsp;Staked&nbsp;<b id="ownedStakedCount">0</b></div>
-          <div>•&nbsp;Unclaimed Rewards&nbsp;<b id="ownedRewards">—</b></div>
-          <div class="spacer"></div>
-          <a id="walletChip" class="pill" href="#" target="_blank" rel="noopener">—</a>
-          <span class="pill">$FLYZ</span>
-        </div>
-
-        <div id="ownedHeaderActions">
-          <button id="btnApproveStaking" class="btn btn-outline-gray">Approve Staking</button>
-          <button id="btnClaimRewards" class="btn btn-outline-gray">Claim Rewards</button>
+          <div class="info-block">
+            <div class="ik">Wallet</div>
+            <div class="iv" id="ownedWallet">—</div>
+            <div class="in"><span class="pg-muted">Connected</span></div>
+          </div>
+          <div class="info-block">
+            <div class="ik">Links</div>
+            <div class="iv"><a id="ownedWalletOS" href="#" target="_blank" rel="noopener">OpenSea</a></div>
+            <div class="in">Owner’s items</div>
+          </div>
+          <div class="info-block">
+            <div class="ik">Sort</div>
+            <div class="iv" id="ownedSort">Newest</div>
+            <div class="in">Client-side</div>
+          </div>
         </div>
 
         <div class="grid-cards" id="ownedGrid">
@@ -219,40 +216,17 @@
   <script src="assets/js/utils.js"></script>
   <script src="assets/js/rarity.js"></script>
   <script src="assets/js/modal.js"></script>
+  <script src="assets/js/pond.js"></script>
+  <script src="assets/js/wallet-state.js"></script>
+  <script src="assets/js/wallet.js"></script>
 
   <!-- Panels/feeds -->
   <script src="assets/js/stakes-feed.js"></script>
-  <script src="assets/js/app-collection.js"></script>
+  <script src="assets/js/owned-panel.js"></script>
 
-  <!-- Init + small fix to avoid double-wrapped <li> rows in Pond list -->
   <script>
-    function unwrapPondRows(){
-      var ul = document.getElementById('recentStakes'); if(!ul) return;
-      // If any <li.row> contains another <li.row>, replace parent with inner
-      ul.querySelectorAll('li.row li.row').forEach(function(inner){
-        var outer = inner.closest('li.row'); if (outer && outer !== inner) outer.replaceWith(inner);
-      });
-    }
-
-    function hookOwnedHeader(){
-      // If your app populates counters, keep chip & counts in sync
-      var chip = document.getElementById('walletChip');
-      if (window.user_address && chip){
-        var a=window.user_address; chip.textContent = a.slice(0,6)+'…'+a.slice(-4);
-        chip.href = (Number(FF_CFG?.CHAIN_ID||1)===1?'https://etherscan.io/address/':'https://sepolia.etherscan.io/address/') + a;
-      }
-    }
-
-    // Call existing initializers
     FF_loadRecentStakes && FF_loadRecentStakes();
     FF_initOwnedPanel && FF_initOwnedPanel();
-
-    // Patch nested rows if any older feed renderer added <li> inside <li>
-    const mo = new MutationObserver(function(){ unwrapPondRows(); });
-    const rs = document.getElementById('recentStakes');
-    if (rs){ mo.observe(rs, { childList:true, subtree:true }); }
-    unwrapPondRows();
-    hookOwnedHeader();
   </script>
 </body>
 </html>
