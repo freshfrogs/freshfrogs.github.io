@@ -1,557 +1,252 @@
-// assets/js/app-collection.js
-// FreshFrogs — resilient, lazy-initialized runtime
-//
-// • Defines FF_loadRecentStakes / FF_initOwnedPanel even if Web3 isn't present, so the page never crashes.
-// • Pond = Reservoir users/activity/v6 with users=<CONTROLLER_ADDRESS>, limit=20, continuation on scroll.
-// • Owned = Reservoir owned; Staked = controller.getStakedTokens(address) (lazy Web3/controller creation).
-// • No top-level Web3/contract usage; all guarded. MetaMask not injecting window.web3 no longer breaks load.
-// • UI style matches the original compact list (thumb, bold title, subtle meta, click to etherscan).
-//
-(function(){
-'use strict';
+// assets/js/stakes-feed.js
+// Recent activity (The Pond): stake (to controller), unstake (from controller), optional claim (RewardsClaimed).
+// Windowed block scanning + capped timestamp lookups. Resilient to missing injected web3.
 
-/* ------------------- Config ------------------- */
-var CFG = window.FF_CFG = window.FF_CFG || {};
-var CHAIN_ID  = Number(CFG.CHAIN_ID || 1);
-var NFT_ADDR  = (CFG.COLLECTION_ADDRESS || '').toLowerCase();
-var CTRL_ADDR = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
-var RESV_HOST = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
-var API_KEY   = CFG.FROG_API_KEY || '';
-var BASE_PATH = (CFG.SOURCE_PATH || '').replace(/\/+$/,'');
-var SYM       = CFG.REWARD_TOKEN_SYMBOL || '$FLYZ';
-var DEC       = Number.isFinite(Number(CFG.REWARD_DECIMALS)) ? Number(CFG.REWARD_DECIMALS) : 18;
-var PAGE      = Math.max(1, Math.min(50, Number(CFG.OWNED_PAGE_SIZE || CFG.PAGE_SIZE || 24)));
-var DEPLOY_BLOCK = Number(CFG.CONTROLLER_DEPLOY_BLOCK || 0);
+(function(FF, CFG){
+  'use strict';
 
-/* ------------------- Utilities ------------------- */
-function etherscanBase(kind){
-  if (CHAIN_ID===1) return 'https://etherscan.io/'+kind+'/';
-  if (CHAIN_ID===11155111) return 'https://sepolia.etherscan.io/'+kind+'/';
-  if (CHAIN_ID===5) return 'https://goerli.etherscan.io/'+kind+'/';
-  return 'https://etherscan.io/'+kind+'/';
-}
-function escTx(h){ return etherscanBase('tx')+h; }
-function escAddr(a){ return etherscanBase('address')+a; }
-function shorten(a){ return a ? a.slice(0,6)+'…'+a.slice(-4) : '—'; }
-function $(s,r){ return (r||document).querySelector(s); }
-function imgFor(id){ return BASE_PATH + '/frog/' + id + '.png'; }
-function metaFor(id){ return BASE_PATH + '/frog/json/' + id + '.json'; }
-function formatToken(raw){
-  try{
-    if (raw==null) return '—';
-    var bi = (typeof raw==='bigint') ? raw : BigInt(String(raw));
-    var base = 1n; for (var i=0;i<DEC;i++) base*=10n;
-    var whole= bi/base, frac = bi%base;
-    if (whole>=100n) return whole.toString();
-    var cents = Number((frac*100n)/base);
-    var n = Number(whole)+cents/100;
-    return (n%1===0? n.toFixed(0) : n.toFixed(2));
-  }catch(e){ return '—'; }
-}
-function timeAgo(ts){
-  if (!ts) return '—';
-  var diff = Math.max(0, (Date.now()/1000) - ts);
-  var d = Math.floor(diff/86400), h = Math.floor((diff%86400)/3600), m = Math.floor((diff%3600)/60);
-  if (d>0) return d+'d '+h+'h ago';
-  if (h>0) return h+'h '+m+'m ago';
-  return m+'m ago';
-}
+  var C = window.FF_CFG || CFG || {};
+  var UL_SEL   = '#recentStakes';
+  var CTRL     = (C.CONTROLLER_ADDRESS || window.CONTROLLER_ADDRESS || '').toLowerCase();
+  var COLL     = (C.COLLECTION_ADDRESS || window.COLLECTION_ADDRESS || '');
+  var CHAIN_ID = Number(C.CHAIN_ID || 1);
 
-/* ------------------- Web3 / Controller (lazy) ------------------- */
-var WEB3 = null;           // set after connect() or if a global Web3 lib exists
-var controller = null;     // set when we can build it
-var CONTROLLER_ABI = window.CONTROLLER_ABI || window.controller_abi || window.FF_CONTROLLER_ABI || [
-  {"inputs":[],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},
-  {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"stake","outputs":[],"stateMutability":"nonpayable","type":"function"},
-  {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},
-  {"inputs":[{"internalType":"address","name":"_staker","type":"address"}],"name":"availableRewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-  {"inputs":[{"internalType":"address","name":"_user","type":"address"}],"name":"getStakedTokens","outputs":[{"components":[{"internalType":"address","name":"staker","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"internalType":"struct FreshFrogsController.StakedToken[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},
-  {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"stakerAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
-  {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakers","outputs":[{"internalType":"uint256","name":"amountStaked","type":"uint256"},{"internalType":"uint256","name":"timeOfLastUpdate","type":"uint256"},{"internalType":"uint256","name":"unclaimedRewards","type":"uint256"}],"stateMutability":"view","type":"function"}
-];
+  // scanning behavior
+  var BLOCK_WIN = Number(C.ACTIVITY_BLOCK_WINDOW || 1500);
+  var MAX_ROWS  = Number(C.ACTIVITY_MAX_ROWS || 250);
+  var TIME_CONC = Number(C.ACTIVITY_TS_CONCURRENCY || 4);
 
-function canUseWeb3(){
-  return !!(window.Web3 && (window.ethereum || window.web3));
-}
-function ensureWeb3BoundToWallet(){
-  try{
-    if (!window.Web3 || !window.ethereum) return false;
-    WEB3 = new window.Web3(window.ethereum);   // EIP-1193 provider
-    window.web3 = WEB3;
-    return true;
-  }catch(e){ return false; }
-}
-function ensureController(){
-  try{
-    if (!WEB3 || !CFG.CONTROLLER_ADDRESS) return false;
-    controller = new WEB3.eth.Contract(CONTROLLER_ABI, CFG.CONTROLLER_ADDRESS);
-    return true;
-  }catch(e){ console.warn('[FF] ensureController failed', e); return false; }
-}
-
-/* ------------------- Wallet helpers ------------------- */
-async function getAddress(){
-  try{
-    if (window.FF_WALLET?.address) return window.FF_WALLET.address;
-    if (window.user_address) return window.user_address;
-    if (window.ethereum?.request){
-      var a = await window.ethereum.request({ method:'eth_accounts' });
-      return a?.[0] || null;
-    }
-  }catch(e){}
-  return null;
-}
-async function connect(){
-  if (!window.ethereum?.request) throw new Error('No wallet provider');
-  var a = await window.ethereum.request({ method:'eth_requestAccounts' });
-  var addr = a?.[0] || null;
-  if (addr) window.user_address = addr;
-  // bind Web3 & controller after connect (no MetaMask injection expected)
-  if (ensureWeb3BoundToWallet()) ensureController();
-  return addr;
-}
-
-/* ------------------- Staking adapter ------------------- */
-function toNum(x){
-  try{
-    if (x==null) return NaN;
-    if (typeof x==='number') return x;
-    if (typeof x==='bigint') return Number(x);
-    if (typeof x==='string'){ if(/^0x/i.test(x)) return Number(BigInt(x)); var n=Number(x); return Number.isFinite(n)?n:NaN; }
-    if (typeof x==='object'){
-      if (typeof x.toString==='function'){ var s=x.toString(); if(/^\d+$/.test(s)) return Number(s); }
-      if ('_hex' in x) return Number(x._hex);
-    }
-  }catch(e){}
-  return NaN;
-}
-function normalizeIds(rows){
-  if (!Array.isArray(rows)) return [];
-  var out=[]; for (var i=0;i<rows.length;i++){
-    var r = rows[i]||{};
-    var v = ('tokenId' in r) ? r.tokenId : r;
-    var n = toNum(v);
-    if (Number.isFinite(n)) out.push(n);
-  } return out;
-}
-async function getUserStakedTokens(user){
-  try{
-    if (!controller) return [];
-    var raw = await controller.methods.getStakedTokens(user).call();
-    return normalizeIds(raw);
-  }catch(e){ console.warn('[FF] getStakedTokens failed', e); return []; }
-}
-async function availableRewards(user){
-  if (!controller) return '0';
-  try { return await controller.methods.availableRewards(user).call(); }
-  catch(e){
-    try{ var s=await controller.methods.stakers(user).call(); return s?.unclaimedRewards ?? '0'; }
-    catch(e2){ return '0'; }
+  // ---------- Utilities ----------
+  function $(s,r){ return (r||document).querySelector(s); }
+  function shorten(a){ return a ? a.slice(0,6)+'…'+a.slice(-4) : '—'; }
+  function etherscanTx(hash){
+    var base = CHAIN_ID===1 ? 'https://etherscan.io/tx/' :
+               CHAIN_ID===11155111 ? 'https://sepolia.etherscan.io/tx/' :
+               CHAIN_ID===5 ? 'https://goerli.etherscan.io/tx/' : 'https://etherscan.io/tx/';
+    return base + hash;
   }
-}
-async function claimRewards(){
-  if (!controller || !WEB3) throw new Error('controller not ready');
-  var a = window.user_address || await getAddress();
-  var gp = await WEB3.eth.getGasPrice(); gp = Math.round(gp*1.05);
-  var est = await controller.methods.claimRewards().estimateGas({ from:a }).catch(()=> 200000);
-  return controller.methods.claimRewards().send({ from:a, gas:WEB3.utils.toHex(est), gasPrice:WEB3.utils.toHex(gp) });
-}
-async function stakeToken(id){
-  if (!controller || !WEB3) throw new Error('controller not ready');
-  var a = window.user_address || await getAddress();
-  var gp = await WEB3.eth.getGasPrice(); gp = Math.round(gp*1.05);
-  var est = await controller.methods.stake(id).estimateGas({ from:a }).catch(()=> 200000);
-  return controller.methods.stake(id).send({ from:a, gas:WEB3.utils.toHex(est), gasPrice:WEB3.utils.toHex(gp) });
-}
-async function unstakeToken(id){
-  if (!controller || !WEB3) throw new Error('controller not ready');
-  var a = window.user_address || await getAddress();
-  var gp = await WEB3.eth.getGasPrice(); gp = Math.round(gp*1.05);
-  var est = await controller.methods.withdraw(id).estimateGas({ from:a }).catch(()=> 200000);
-  return controller.methods.withdraw(id).send({ from:a, gas:WEB3.utils.toHex(est), gasPrice:WEB3.utils.toHex(gp) });
-}
-
-/* Optional "staked X ago" */
-var stakeTimeCache = new Map();
-async function getStakeTimestamp(tokenId){
-  if (!WEB3?.eth) return null;
-  if (stakeTimeCache.has(tokenId)) return stakeTimeCache.get(tokenId);
-  try{
-    var TRANSFER = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
-    var toTopic   = '0x000000000000000000000000'+CTRL_ADDR.slice(2);
-    var idTopic   = '0x'+BigInt(tokenId).toString(16).padStart(64,'0');
-    var fromBlk   = DEPLOY_BLOCK ? '0x'+DEPLOY_BLOCK.toString(16) : '0x0';
-    var logs = await WEB3.eth.getPastLogs({ fromBlock: fromBlk, toBlock:'latest', address: CFG.COLLECTION_ADDRESS, topics:[TRANSFER, null, toTopic, idTopic] });
-    if (!logs.length){ stakeTimeCache.set(tokenId,null); return null; }
-    var last = logs[logs.length-1];
-    var blk  = await WEB3.eth.getBlock(last.blockNumber).catch(()=>null);
-    var ts   = blk && blk.timestamp || null;
-    stakeTimeCache.set(tokenId, ts);
-    return ts;
-  }catch(e){ return null; }
-}
-
-/* ------------------- Pond: users/activity/v6 (limit=20) ------------------- */
-var POND = (function(){
-  var UL = '#recentStakes';
-  var busy=false, done=false, continuation=null;
-  var MAX_ROWS=250;
-
-  function diag(msg){
-    var ul = document.querySelector(UL); if (!ul) return;
-    ul.innerHTML = '<li class="row"><div class="pg-muted">'+msg+'</div></li>';
+  function etherscanAddr(a){
+    var base = CHAIN_ID===1 ? 'https://etherscan.io/address/' :
+               CHAIN_ID===11155111 ? 'https://sepolia.etherscan.io/address/' :
+               CHAIN_ID===5 ? 'https://goerli.etherscan.io/address/' : 'https://etherscan.io/address/';
+    return base + a;
   }
-  // Row style close to the original compact list
+  function defaultRpcFor(id){
+    if (id===1) return 'https://cloudflare-eth.com';
+    if (id===11155111) return 'https://rpc.sepolia.org';
+    if (id===5) return 'https://rpc.ankr.com/eth_goerli';
+    return 'https://cloudflare-eth.com';
+  }
+
+  // ---------- Web3 provider (resilient) ----------
+  // Requires the Web3 library on the page (e.g., web3.min.js). We’ll gracefully fall back to public RPC.
+  var WEB3 = null;
+  (function initWeb3(){
+    try{
+      if (window.Web3 && window.ethereum){
+        WEB3 = new window.Web3(window.ethereum);            // EIP-1193 wallet
+        window.web3 = WEB3;
+        return;
+      }
+      if (window.Web3){
+        var rpc = C.RPC_URL || defaultRpcFor(CHAIN_ID);
+        WEB3 = new window.Web3(new window.Web3.providers.HttpProvider(rpc, { keepAlive:true }));
+        window.web3 = WEB3;
+        return;
+      }
+      // No Web3 library loaded — we can’t scan, but do NOT crash:
+      console.warn('[pond] Web3 library not found; please include web3.min.js or set FF_CFG.RPC_URL and include Web3.');
+    }catch(e){
+      console.warn('[pond] initWeb3 failed', e);
+      WEB3 = null;
+    }
+  })();
+
+  // Build a minimal collection contract for Transfer events
+  var ERC721_TRANSFER_ABI = [
+    {"anonymous":false,"inputs":[
+      {"indexed":true,"internalType":"address","name":"from","type":"address"},
+      {"indexed":true,"internalType":"address","name":"to","type":"address"},
+      {"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],
+     "name":"Transfer","type":"event"}
+  ];
+  // Optional: RewardsClaimed event on controller
+  var REWARDS_EVENT_ABI = [
+    {"anonymous":false,"inputs":[
+      {"indexed":true,"internalType":"address","name":"user","type":"address"},
+      {"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],
+     "name":"RewardsClaimed","type":"event"}
+  ];
+
+  function ensureContracts(){
+    try{
+      if (WEB3 && !window.collection && COLL){
+        window.collection = new WEB3.eth.Contract(ERC721_TRANSFER_ABI, COLL);
+      }
+      if (WEB3 && !window.controller && CTRL){
+        window.controller = new WEB3.eth.Contract(REWARDS_EVENT_ABI, CTRL);
+      }
+    }catch(e){ console.warn('[pond] ensureContracts failed', e); }
+  }
+  ensureContracts();
+
+  // ---------- KPIs ----------
+  function setKPIs(){
+    var a = $('#stakedController');
+    if (a && CTRL){ a.textContent = shorten(CTRL); a.href = etherscanAddr(CTRL); }
+    var sym = $('#pondRewardsSymbol'); if (sym) sym.textContent = (C.REWARD_TOKEN_SYMBOL || '$FLYZ');
+  }
+
+  // ---------- Row rendering (classic look) ----------
   function rowHTML(e){
+    var title = e.kind==='stake' ? 'Staked' : (e.kind==='unstake' ? 'Unstaked' : 'Claimed');
     var when = e.time ? new Date(e.time*1000).toLocaleString() : '—';
-    var title = (e.kind==='stake' ? 'Staked' : 'Unstaked') + ' • Frog #'+e.id;
+    var img = (C.SOURCE_PATH||'') + '/frog/' + (e.id || 0) + '.png';
+    var meta = e.kind==='claim'
+      ? (shorten(e.user)+' claimed '+(e.amountPretty||e.amount))
+      : (shorten(e.from)+' → '+shorten(e.to));
     return (
       '<li class="row" data-kind="'+e.kind+'">'+
-        '<div class="tile"><img class="thumb64" src="'+imgFor(e.id)+'" alt="'+e.id+'"></div>'+
-        '<div>'+
-          '<div style="font-weight:800">'+title+'</div>'+
-          '<div class="pg-muted">'+when+' • '+shorten(e.from)+' → '+shorten(e.to)+'</div>'+
-        '</div>'+
+        (e.id ? '<img class="thumb64" src="'+img+'" alt="'+e.id+'">' : '<div class="thumb64" style="display:flex;align-items:center;justify-content:center">💰</div>')+
+        '<div><div><b>'+title+'</b>'+(e.id?(' Frog #'+e.id):'')+'</div>'+
+        '<div class="pg-muted">'+when+' • '+meta+'</div></div>'+
       '</li>'
     );
   }
 
-  async function fetchUserActivityPage(){
-    if (!API_KEY){ throw new Error('Missing Reservoir API key'); }
-    var headers = { accept:'application/json', 'x-api-key': API_KEY };
-    var u = new URL(RESV_HOST + '/users/activity/v6');
-    u.searchParams.set('users', CFG.CONTROLLER_ADDRESS);
-    u.searchParams.set('limit', '20');
-    if (continuation) u.searchParams.set('continuation', continuation);
-
-    var res = await fetch(u.toString(), { headers });
-    if (!res.ok){
-      var txt = await res.text().catch(function(){return '';});
-      throw new Error('Reservoir users/activity failed: '+res.status+' '+txt);
+  // ---------- Time stamping ----------
+  var timeCache = new Map();
+  async function getBlockTime(bn){
+    if (!WEB3 || !WEB3.eth) return null;
+    if (timeCache.has(bn)) return timeCache.get(bn);
+    var b = await WEB3.eth.getBlock(bn).catch(function(){ return null; });
+    var t = b && b.timestamp || null;
+    timeCache.set(bn, t);
+    return t;
+  }
+  async function stampEvents(events){
+    var blocks = []; var i;
+    for (i=0;i<events.length;i++){ var bn=events[i].blockNumber; if (blocks.indexOf(bn)===-1) blocks.push(bn); }
+    var idx=0;
+    async function worker(){
+      while(idx<blocks.length){
+        var bn = blocks[idx++]; await getBlockTime(bn);
+      }
     }
-    var j = await res.json();
-    continuation = j.continuation || null;
-
-    var out=[], rows = Array.isArray(j.activities) ? j.activities : [];
-    for (var i=0;i<rows.length;i++){
-      var r = rows[i]||{};
-      var from=(r.fromAddress||r.from||'').toLowerCase();
-      var to  =(r.toAddress||r.to||'').toLowerCase();
-      var id  =Number(r.token?.tokenId || r.tokenId);
-      if (!Number.isFinite(id)) continue;
-
-      // keep only our collection
-      var col = (r.contract || r.collection || r.collectionAddress || r.token?.contract)?.toLowerCase?.() || '';
-      if (NFT_ADDR && col && col!==NFT_ADDR) continue;
-
-      var ts  = Number(r.timestamp || r.blockTimestamp || (r.createdAt && Math.floor(new Date(r.createdAt).getTime()/1000))) || null;
-      var tx  = r.txHash || r.txhash || r.transactionHash || '';
-      if (!from || !to) continue;
-
-      if (to===CTRL_ADDR) out.push({ kind:'stake',   id, from:r.fromAddress||r.from||'', to:r.toAddress||r.to||'', time:ts, tx });
-      else if (from===CTRL_ADDR) out.push({ kind:'unstake', id, from:r.fromAddress||r.from||'', to:r.toAddress||r.to||'', time:ts, tx });
-    }
-    return out;
+    var workers=[]; var n = Math.min(TIME_CONC, blocks.length);
+    for (i=0;i<n;i++) workers.push(worker());
+    await Promise.all(workers);
+    for (i=0;i<events.length;i++){ events[i].time = timeCache.get(events[i].blockNumber) || null; }
+    return events;
   }
 
-  async function loadNext(listEl){
-    if (busy || done) return; busy=true;
+  // ---------- Loader state ----------
+  var st = { from:null, to:null, busy:false, done:false };
+
+  async function loadWindow(listEl){
+    if (st.busy || st.done) return;
+    st.busy = true;
     try{
-      if (!CFG.CONTROLLER_ADDRESS || !CFG.COLLECTION_ADDRESS){ diag('Missing addresses'); done=true; return; }
-      var rows = await fetchUserActivityPage();
+      if (!WEB3 || !WEB3.eth){
+        if (!listEl.querySelector('.pg-muted')){
+          var li=document.createElement('li'); li.className='row';
+          li.innerHTML = '<div class="pg-muted">No RPC/Web3 available. Include Web3 and set FF_CFG.RPC_URL if needed.</div>';
+          listEl.appendChild(li);
+        }
+        st.done = true; return;
+      }
+      ensureContracts();
+      if (!window.collection){
+        var li2=document.createElement('li'); li2.className='row';
+        li2.innerHTML='<div class="pg-muted">Missing collection address.</div>'; listEl.appendChild(li2);
+        st.done=true; return;
+      }
+
+      var latest = await WEB3.eth.getBlockNumber();
+      if (st.from==null){ st.to = latest; st.from = Math.max(0, st.to - BLOCK_WIN); }
+      else { st.to = st.from - 1; if (st.to <= 0){ st.done=true; return; } st.from = Math.max(0, st.to - BLOCK_WIN); }
+
+      var toCtrl   = await window.collection.getPastEvents('Transfer', { filter:{ to: CTRL },   fromBlock: st.from, toBlock: st.to });
+      var fromCtrl = await window.collection.getPastEvents('Transfer', { filter:{ from: CTRL }, fromBlock: st.from, toBlock: st.to });
+
+      var rows = [], i;
+      for (i=0;i<toCtrl.length;i++){
+        var ev = toCtrl[i];
+        rows.push({ kind:'stake',   id:Number(ev.returnValues.tokenId), from:ev.returnValues.from, to:ev.returnValues.to, tx:ev.transactionHash, blockNumber:ev.blockNumber });
+      }
+      for (i=0;i<fromCtrl.length;i++){
+        var ev2 = fromCtrl[i];
+        rows.push({ kind:'unstake', id:Number(ev2.returnValues.tokenId), from:ev2.returnValues.from, to:ev2.returnValues.to, tx:ev2.transactionHash, blockNumber:ev2.blockNumber });
+      }
+
+      // Optional: RewardsClaimed events on controller (if ABI/address available)
+      try{
+        if (window.controller && window.controller.getPastEvents){
+          var claims = await window.controller.getPastEvents('RewardsClaimed', { fromBlock: st.from, toBlock: st.to });
+          for (i=0;i<claims.length;i++){
+            var ce = claims[i];
+            rows.push({
+              kind:'claim',
+              user:ce.returnValues.user,
+              amount:ce.returnValues.amount,
+              amountPretty:ce.returnValues.amount,
+              tx:ce.transactionHash,
+              blockNumber:ce.blockNumber
+            });
+          }
+        }
+      }catch(e){ /* non-fatal */ }
 
       if (rows.length){
-        rows.sort(function(a,b){ return (b.time||0)-(a.time||0); });
-        var frag=document.createDocumentFragment();
-        for (var k=0;k<rows.length;k++){
-          var li=document.createElement('li'); li.className='row'; li.innerHTML=rowHTML(rows[k]);
-          (function(tx){ li.addEventListener('click', function(){ if (tx) window.open(escTx(tx),'_blank'); }); })(rows[k].tx);
+        await stampEvents(rows);
+        rows.sort(function(a,b){ return b.blockNumber - a.blockNumber; });
+
+        var frag = document.createDocumentFragment();
+        for (i=0;i<rows.length;i++){
+          var li=document.createElement('li'); li.className='row'; li.innerHTML=rowHTML(rows[i]);
+          (function(tx){ li.addEventListener('click', function(){ window.open(etherscanTx(tx), '_blank'); }); })(rows[i].tx);
           frag.appendChild(li);
         }
-        if (listEl.firstElementChild && listEl.firstElementChild.classList.contains('row') && listEl.firstElementChild.textContent.includes('Loading')) {
-          listEl.innerHTML='';
-        }
         listEl.appendChild(frag);
-        var lis=listEl.querySelectorAll('li.row');
-        if (lis.length>MAX_ROWS){
-          var excess=lis.length-MAX_ROWS; for (var z=0; z<excess; z++) listEl.removeChild(lis[z]);
+
+        // prune DOM
+        var items = listEl.querySelectorAll('li.row');
+        if (items.length > MAX_ROWS){
+          var excess = items.length - MAX_ROWS;
+          for (i=0;i<excess;i++) listEl.removeChild(items[i]);
         }
-      } else if (!listEl.querySelector('li.row')) {
-        diag('No activity yet.');
+      } else {
+        // If first window had nothing, keep scanning backward on next scroll
       }
-      if (!continuation) done = true;
-    } finally { busy=false; }
+    }catch(e){
+      console.warn('[pond] load window failed', e);
+      // Fail softly but try not to loop forever
+      st.done = true;
+    }finally{
+      st.busy = false;
+    }
   }
 
   function attachScroll(listEl){
     listEl.classList.add('scrolling');
-    listEl.addEventListener('scroll', function(){
-      if (busy || done) return;
-      if (listEl.scrollTop + listEl.clientHeight >= listEl.scrollHeight - 80) loadNext(listEl);
-    });
-    loadNext(listEl).then(function(){ setTimeout(function(){ loadNext(listEl); }, 120); });
+    function onScroll(){
+      if (st.busy || st.done) return;
+      if (listEl.scrollTop + listEl.clientHeight >= listEl.scrollHeight - 80) loadWindow(listEl);
+    }
+    listEl.addEventListener('scroll', onScroll);
+    // Kick off two windows to fill the viewport
+    loadWindow(listEl).then(function(){ setTimeout(function(){ loadWindow(listEl); }, 80); });
   }
 
   function init(){
-    var ul = document.querySelector(UL); if(!ul) return;
-    ul.innerHTML = '<li class="row"><div class="pg-muted">Loading recent activity…</div></li>';
+    setKPIs();
+    var ul = document.querySelector(UL_SEL);
+    if (!ul) return;
+    ul.innerHTML = ''; // match your original (no "loading..." row)
     attachScroll(ul);
-    // set controller link if present
-    var a=$('#stakedController'); if (a && CFG.CONTROLLER_ADDRESS){ a.textContent=shorten(CFG.CONTROLLER_ADDRESS); a.href=escAddr(CFG.CONTROLLER_ADDRESS); }
   }
 
-  return { init };
-})();
+  // Export init the same as your original
+  window.FF_loadRecentStakes = init;
 
-/* ------------------- Owned ∪ Staked ------------------- */
-var OWNED = (function(){
-  var SEL = { grid:'#ownedGrid', btn:'#ownedConnectBtn', more:'#ownedMore' };
-  var idsStaked=[], items=[], cont=null, rewards='—';
-
-  // Scoped CSS (owned grid scroll + bullets)
-  (function css(){
-    if (document.getElementById('owned-clean-css')) return;
-    var s=document.createElement('style'); s.id='owned-clean-css';
-    s.textContent=[
-      '#ownedCard{display:flex;flex-direction:column}',
-      '#ownedCard .oh-wrap{margin-bottom:10px}',
-      '#ownedCard .oh-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}',
-      '#ownedCard .oh-mini{font-size:11px;line-height:1}',
-      '#ownedCard .oh-spacer{flex:1}',
-      '#ownedCard .oh-btn{font-family:var(--font-ui);border:1px solid var(--border);background:transparent;color:inherit;border-radius:8px;padding:6px 10px;font-weight:700;font-size:12px;line-height:1;display:inline-flex;align-items:center;gap:6px;text-decoration:none;letter-spacing:.01em;transition:background .15s,border-color .15s,color .15s,transform .05s}',
-      '#ownedCard .oh-btn:hover{background: color-mix(in srgb,#22c55e 14%,var(--panel));border-color: color-mix(in srgb,#22c55e 80%,var(--border));color: color-mix(in srgb,#ffffff 85%,#22c55e)}',
-      '#ownedGrid{flex:1 1 auto;max-height:60vh;overflow:auto;-webkit-overflow-scrolling:touch;padding-right:4px}',
-      '#ownedCard .attr-bullets{list-style:disc;margin:6px 0 0 18px;padding:0}',
-      '#ownedCard .attr-bullets li{font-size:12px;margin:2px 0}',
-      '#ownedCard .staked-ago{font-size:12px;color:var(--muted)}'
-    ].join('');
-    document.head.appendChild(s);
-  })();
-
-  // Ranks (optional)
-  async function ranks(){
-    if (window.FF?.RANKS) return window.FF.RANKS;
-    try{
-      var r = await fetch(CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json');
-      var j = r.ok ? await r.json() : null;
-      var map = Array.isArray(j) ? j.reduce(function(m,rr){ m[String(rr.id)]=rr.ranking; return m; }, {}) : (j||{});
-      window.FF = window.FF || {}; window.FF.RANKS = map; return map;
-    }catch(e){ window.FF = window.FF || {}; window.FF.RANKS={}; return {}; }
-  }
-
-  // Header
-  function headerRoot(){
-    var card = document.getElementById('ownedCard'); if(!card) return null;
-    var w = card.querySelector('.oh-wrap'); if (!w){ w=document.createElement('div'); w.className='oh-wrap'; card.insertBefore(w, $(SEL.grid, card)); }
-    w.innerHTML=''; return w;
-  }
-  function renderHeader(){
-    var w = headerRoot(); if(!w) return;
-    var stCount = idsStaked ? idsStaked.length : 0;
-    w.innerHTML =
-      '<div class="oh-row oh-mini">'+
-      '<span class="oh-muted">Owned</span> <b>'+(items.length||0)+'</b>'+
-      '<span>•</span><span class="oh-muted">Staked</span> <b>'+stCount+'</b>'+
-      '<span>•</span><span class="oh-muted">Unclaimed Rewards</span> <b>'+rewards+' '+SYM+'</b>'+
-      '<span class="oh-spacer"></span>'+
-      '<button class="oh-btn" id="ohClaim">Claim Rewards</button>'+
-      '</div>';
-    var bC = $('#ohClaim', w);
-    if (bC) bC.onclick = async function(){ bC.disabled=true; try{ await claimRewards(); await refreshKPIs(); } finally { bC.disabled=false; } };
-  }
-
-  // Cards
-  function attrsHTML(attrs, max){
-    if (!Array.isArray(attrs)||!attrs.length) return '';
-    var rows=[], cap = Number.isFinite(Number(max))?Number(max):4;
-    for (var i=0;i<attrs.length && rows.length<cap;i++){
-      var a=attrs[i]; if(!a||!a.key||a.value==null) continue;
-      rows.push('<li><b>'+String(a.key)+':</b> '+String(a.value)+'</li>');
-    }
-    return rows.length? '<ul class="attr-bullets">'+rows.join('')+'</ul>' : '';
-  }
-  function fmtMeta(it){
-    var base = (it.staked ? 'Staked' : 'Not staked') + ' • Owned by You';
-    if (it.stakedTs){
-      var dt = new Date(it.stakedTs*1000);
-      var mm = String(dt.getMonth()+1).padStart(2,'0'), dd = String(dt.getDate()).padStart(2,'0'), yy = String(dt.getFullYear()).slice(-2);
-      base += ' • <span class="staked-ago" title="'+dt.toLocaleString()+'">Staked '+timeAgo(it.stakedTs)+' ('+mm+'/'+dd+'/'+yy+')</span>';
-    }
-    return base;
-  }
-  function wireActions(scope, it){
-    scope.querySelectorAll('button[data-act]').forEach(function(btn){
-      btn.addEventListener('click', async function(){
-        var act = btn.getAttribute('data-act');
-        try{
-          if (act==='stake'){
-            await stakeToken(it.id);
-            it.staked = true; it.stakedTs = await getStakeTimestamp(it.id);
-            btn.textContent='Unstake'; btn.setAttribute('data-act','unstake');
-            scope.querySelector('.meta').innerHTML = fmtMeta(it);
-            await refreshKPIs();
-          } else if (act==='unstake'){
-            await unstakeToken(it.id);
-            it.staked = false; it.stakedTs = null;
-            btn.textContent='Stake'; btn.setAttribute('data-act','stake');
-            scope.querySelector('.meta').innerHTML = fmtMeta(it);
-            await refreshKPIs();
-          }
-        }catch(e){ console.warn('[FF] action failed', e); }
-      });
-    });
-  }
-  function etherscanToken(id){
-    return etherscanBase('token') + CFG.COLLECTION_ADDRESS + '?a=' + id;
-  }
-  function renderCards(){
-    var root = $(SEL.grid); if (!root) return;
-    root.innerHTML='';
-    if (!items.length){ root.innerHTML='<div class="pg-muted">No frogs found for this wallet.</div>'; renderHeader(); return; }
-    for (var i=0;i<items.length;i++){
-      var it = items[i];
-      var el=document.createElement('article'); el.className='frog-card'; el.setAttribute('data-token-id', String(it.id));
-      el.innerHTML =
-        '<img class="thumb" src="'+imgFor(it.id)+'" alt="'+it.id+'">'+
-        '<h4 class="title">Frog #'+it.id+( (it.rank||it.rank===0)? (' <span class="pill">Rank #'+it.rank+'</span>') : '' )+'</h4>'+
-        '<div class="meta">'+fmtMeta(it)+'</div>'+
-        attrsHTML(it.attrs,4)+
-        '<div class="actions">'+
-          '<button class="btn btn-outline-gray" data-act="'+(it.staked?'unstake':'stake')+'">'+(it.staked?'Unstake':'Stake')+'</button>'+
-          '<a class="btn btn-outline-gray" href="'+etherscanToken(it.id)+'" target="_blank" rel="noopener">Etherscan</a>'+
-          '<a class="btn btn-outline-gray" href="'+imgFor(it.id)+'" target="_blank" rel="noopener">Original</a>'+
-        '</div>';
-      root.appendChild(el);
-      wireActions(el, it);
-    }
-    var more = $(SEL.more);
-    if (more){ more.style.display = cont ? 'block' : 'none'; more.textContent='Load more'; more.onclick = loadMore; }
-    renderHeader();
-  }
-
-  // Fetch / data
-  var META = new Map();
-  async function fetchMeta(id){
-    if (META.has(id)) return META.get(id);
-    try{
-      var r = await fetch(metaFor(id)); var j = r.ok ? await r.json() : null;
-      var attrs = (j && Array.isArray(j.attributes)) ? j.attributes.map(function(a){
-        return { key:(a && (a.key||a.trait_type))||'', value:(a && (a.value!=null?a.value:a.trait_value)) };
-      }) : [];
-      var out = { id:id, attrs:attrs }; META.set(id,out); return out;
-    }catch(e){ var out2={ id:id, attrs:[] }; META.set(id,out2); return out2; }
-  }
-
-  function tokensApiUser(a){ return RESV_HOST + '/users/' + a + '/tokens/v8'; }
-  async function fetchOwnedIdsPage(a){
-    if (!API_KEY){
-      var g=$(SEL.grid); if (g) g.innerHTML='<div class="pg-muted">Reservoir API key missing (FF_CFG.FROG_API_KEY).</div>';
-      cont=null; return [];
-    }
-    try{
-      var qs=new URLSearchParams({ collection: CFG.COLLECTION_ADDRESS, limit:String(PAGE), includeTopBid:'false', includeAttributes:'false' });
-      if (cont) qs.set('continuation', cont);
-      var r = await fetch(tokensApiUser(a)+'?'+qs.toString(), { headers:{ accept:'application/json', 'x-api-key': API_KEY }});
-      if (!r.ok) throw 0;
-      var data = await r.json();
-      var ids = (data.tokens||[]).map(function(x){ return Number(x?.token?.tokenId); }).filter(Number.isFinite);
-      cont = data.continuation || null;
-      return ids;
-    }catch(e){ cont=null; return []; }
-  }
-
-  async function refreshKPIs(addr){
-    try{
-      var a = addr || (await getAddress());
-      var raw = await availableRewards(a);
-      rewards = formatToken(raw);
-    }catch(e){ rewards='—'; }
-    renderHeader();
-  }
-
-  async function hydrate(ids, rankMap){
-    var out=[];
-    for (var i=0;i<ids.length;i++){
-      var id = ids[i];
-      var m = await fetchMeta(id);
-      var st = idsStaked.includes(id);
-      var ts = st ? await getStakeTimestamp(id) : null;
-      out.push({ id, attrs:m.attrs, staked:st, stakedTs:ts, rank:rankMap[String(id)] });
-    }
-    return out;
-  }
-
-  async function loadFirst(addr){
-    var rankMap = await ranks();
-    var ownedIds = await fetchOwnedIdsPage(addr);
-
-    // If controller isn't ready yet, try to build it silently (no crash if Web3 missing)
-    if (!controller && canUseWeb3()){ if (!WEB3) ensureWeb3BoundToWallet(); ensureController(); }
-
-    idsStaked = controller ? await getUserStakedTokens(addr) : [];
-
-    var set = new Set(ownedIds); for (var i=0;i<idsStaked.length;i++) set.add(idsStaked[i]);
-    items = await hydrate(Array.from(set), rankMap);
-    renderCards();
-    await refreshKPIs(addr);
-    attachObserver();
-  }
-
-  async function loadMore(){
-    var rankMap = await ranks();
-    var addr = await getAddress(); if (!addr) return;
-    var more = await fetchOwnedIdsPage(addr);
-    var add = more.filter(function(id){ return !items.some(function(x){ return x.id===id; }); });
-    var extra = await hydrate(add, rankMap);
-    items = items.concat(extra);
-    renderCards();
-  }
-
-  function attachObserver(){
-    var root = $(SEL.grid); if (!root || !cont) return;
-    var sentinel=document.createElement('div'); sentinel.style.height='1px'; root.appendChild(sentinel);
-    var io=new IntersectionObserver(function(es){
-      if (!es[0].isIntersecting) return;
-      io.disconnect(); loadMore();
-    },{ root, rootMargin:'140px', threshold:0.01 });
-    io.observe(sentinel);
-  }
-
-  async function init(){
-    // remove legacy info grid (keeps header clean)
-    document.querySelectorAll('#ownedCard .info-grid-2').forEach(function(n){ n.remove(); });
-
-    var btn = $(SEL.btn);
-    if (btn){
-      btn.addEventListener('mouseenter', function(){ btn.classList.add('hover'); });
-      btn.addEventListener('mouseleave', function(){ btn.classList.remove('hover'); });
-      btn.addEventListener('click', async function(){
-        btn.disabled=true;
-        try{
-          var a = await connect(); if (!a) return;
-          btn.textContent = shorten(a);
-          $(SEL.grid).innerHTML = '<div class="pg-muted">Loading…</div>';
-          await loadFirst(a);
-        } finally { btn.disabled=false; }
-      });
-    }
-
-    // Auto-hydrate if already connected (doesn't require Web3 until staked fetch)
-    var a0 = await getAddress();
-    if (a0){
-      if (btn) btn.textContent = shorten(a0);
-      $(SEL.grid).innerHTML = '<div class="pg-muted">Loading…</div>';
-      await loadFirst(a0);
-    } else {
-      $(SEL.grid).innerHTML = '<div class="pg-muted">Connect your wallet to view owned frogs.</div>';
-    }
-  }
-
-  return { init };
-})();
-
-/* ------------------- Boot exports (never crash) ------------------- */
-window.FF_loadRecentStakes = function(){ try{ POND.init(); }catch(e){ console.error('[FF] Pond init failed', e); } };
-window.FF_initOwnedPanel  = function(){ try{ OWNED.init(); }catch(e){ console.error('[FF] Owned init failed', e); } };
-
-})(); // IIFE
+})(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
