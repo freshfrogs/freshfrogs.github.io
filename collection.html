@@ -186,26 +186,30 @@
     document.addEventListener('DOMContentLoaded', layoutFrogStrip);
   </script>
 
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/utils.js"></script>
-  <script src="assets/js/rarity.js"></script>
-  <script src="assets/js/modal.js"></script>
+<!-- Config & shared helpers -->
+<script src="assets/js/config.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/rarity.js"></script>
+<script src="assets/js/modal.js"></script>
 
-  <!-- Your wallet / Web3 loader must be before the adapter -->
-  <script src="assets/js/wallet-state.js"></script>
-  <script src="assets/js/wallet.js"></script>
+<!-- ABIs must come from /assets/abi -->
+<script src="assets/abi/collection_abi.js"></script>
+<script src="assets/abi/controller_abi.js"></script>
 
-  <!-- ABIs -->
-  <script src="assets/abi/collection_abi.js"></script>
-  <script src="assets/abi/controller_abi.js"></script>
+<!-- Panels / features (all from /assets/js) -->
+<script src="assets/js/pond.js"></script>
+<script src="assets/js/wallet-state.js"></script>
+<script src="assets/js/wallet.js"></script>
+<script src="assets/js/staking-adapter.js"></script>  <!-- ✅ correct path -->
+<script src="assets/js/pond-kpis.js"></script>
+<script src="assets/js/stakes-feed.js"></script>
+<script src="assets/js/pond-tweaks.js"></script>
+<script src="assets/js/owned-panel.js"></script>
 
-  <!-- Adapter (this file) -->
-  <script src="assets/js/staking-adapter.js"></script>
-
-  <!-- Panels (unchanged UI) -->
-  <script src="assets/js/stakes-feed.js"></script>
-  <script src="assets/js/pond-tweaks.js"></script>
-  <script src="assets/js/owned-panel.js"></script>
+<script>
+  if (window.FF_loadRecentStakes) FF_loadRecentStakes();
+  if (window.FF_initOwnedPanel)   FF_initOwnedPanel();
+</script>
 
 </body>
 </html>
