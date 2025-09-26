@@ -14,6 +14,16 @@
 
   var WEB3 = window.web3 || (window.Web3 ? new window.Web3(window.ethereum) : null);
 
+  // Add this fallback:
+  if ((!WEB3 || !WEB3.eth) && window.Web3 && C.RPC_URL) {
+    try {
+      WEB3 = new window.Web3(new window.Web3.providers.HttpProvider(C.RPC_URL));
+    } catch (e) {
+      console.warn('[pond] could not init RPC provider', e);
+    }
+  }
+
+
   // Minimal ERC721 bits: Transfer + balanceOf for KPI
   var ERC721_ABI = [
     {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},
@@ -21,10 +31,17 @@
   ];
 
   (function ensureCollection(){
-    if (!window.collection && WEB3 && (C.COLLECTION_ADDRESS || window.COLLECTION_ADDRESS)){
-      try {
-        window.collection = new WEB3.eth.Contract(ERC721_ABI, (C.COLLECTION_ADDRESS||window.COLLECTION_ADDRESS));
-      } catch(e){ console.warn('[pond] could not init collection', e); }
+    try {
+      if (WEB3 && WEB3.eth && typeof WEB3.eth.Contract === 'function' && typeof ERC721_ABI !== 'undefined') {
+        window.collection = new WEB3.eth.Contract(
+          ERC721_ABI,
+          (C.COLLECTION_ADDRESS || window.COLLECTION_ADDRESS)
+        );
+      } else {
+        console.warn('[pond] web3/ABI not ready; skipping collection init');
+      }
+    } catch(e) {
+      console.warn('[pond] could not init collection', e);
     }
   })();
 
