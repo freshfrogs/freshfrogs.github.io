@@ -1,19 +1,15 @@
-// assets/js/frog-thumbs.js
-// Force attribute-built thumbnails ONLY in the Dashboard (owned/staked).
+// Layered attribute thumbnails ONLY inside the Dashboard (owned/staked).
 // Uses buildFrog128 (shifted flat PNG background + per-trait layers).
-// Leaves all other pages/images untouched.
-
 (function(){
   'use strict';
 
-  // ----- ONLY apply inside these dashboard roots -----
+  // dashboard roots only (won’t touch left-side Pond feed)
   var ROOTS = [
     '#ownedPanel', '#dashboardPanel', '[data-panel="owned"]',
     '.owned-panel', '.wallet-owned', '.cards-owned',
     '.owned-grid', '.owned-cards', '.owned-list', '.dashboard-owned', '.my-frogs'
   ];
 
-  // ----- asset paths -----
   var CFG = (window.FF_CFG || window.CFG || {});
   var SRC = (CFG.SOURCE_PATH || '').replace(/\/+$/,'');
   var LAYERS = (SRC?SRC:'') + '/frog/build_files';
@@ -28,7 +24,7 @@
   function qq(s,p){ return Array.prototype.slice.call((p||document).querySelectorAll(s)); }
   function safe(s){ return encodeURIComponent(String(s)); }
 
-  // ---- builder (exactly your buildFrog128 with the shifted bg) ----
+  // ---- builder (your function) ----
   const NO_ANIM_FOR = new Set(['Hat','Frog','Trait']);
   const NO_LIFT_FOR = new Set(['Frog','Trait','SpecialFrog']);
   function makeLayerImg(attr, value, px){
@@ -86,7 +82,7 @@
   }
   window.buildFrog128 = window.buildFrog128 || buildFrog128;
 
-  // ---- detect tokenId & replace only inside dashboard ----
+  // ---- detect tokenId from the existing <img> ----
   function tokenIdFrom(img){
     if (!img) return null;
     const ds = img.dataset || {};
@@ -121,7 +117,6 @@
   }
 
   function observe(){
-    // Observe the whole document to catch late inserts from your dashboard code
     const mo = new MutationObserver(function(muts){
       for (var i=0;i<muts.length;i++){
         const m = muts[i];
@@ -136,7 +131,6 @@
   }
 
   function kick(){ scan(document); observe(); }
-
   document.addEventListener('DOMContentLoaded', kick);
   window.addEventListener('load', kick);
   document.addEventListener('ff:owned:updated', kick);
