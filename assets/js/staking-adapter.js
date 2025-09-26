@@ -1,48 +1,48 @@
 // assets/js/staking-adapter.js
-// Adapter that talks to your controller using CONTROLLER_ABI from assets/abi/controller_abi.js.
-// Provides the helpers used by your owned-panel.js without touching the UI.
+// Minimal adapter that exposes the helpers expected by owned-panel.js.
+// Reads via RPC or injected wallet; writes require window.ethereum + user account.
 
 (function (FF, CFG) {
   'use strict';
 
-  const CTRL_ADDR = CFG.CONTROLLER_ADDRESS;
-  const COLL_ADDR = CFG.COLLECTION_ADDRESS;
+  const C = CFG || {};
+  const CTRL_ADDR = C.CONTROLLER_ADDRESS;
+  const COLL_ADDR = C.COLLECTION_ADDRESS;
 
-  if (!window.Web3) { console.warn('[staking-adapter] Web3 not found'); return; }
   if (!CTRL_ADDR || !window.CONTROLLER_ABI) {
     console.warn('[staking-adapter] Missing controller address or ABI');
-    return;
+    return; // keep page running; panel will just skip staked section
   }
 
-  // -------- provider / web3 ----------
+  // ---- web3 helpers ---------------------------------------------------------
   function getProvider() {
     if (window.ethereum) return window.ethereum;
-    if (CFG.RPC_URL) return new window.Web3.providers.HttpProvider(CFG.RPC_URL);
+    if (window.Web3 && C.RPC_URL) return new window.Web3.providers.HttpProvider(C.RPC_URL);
     return null;
   }
   function getWeb3() {
     const p = getProvider();
-    if (!p) throw new Error('No RPC provider (ethereum or CFG.RPC_URL)');
+    if (!window.Web3 || !p) throw new Error('Web3 provider not available');
     return new window.Web3(p);
   }
   function getAccount() {
-    // used for write ops (approve/stake/withdraw/claim)
-    return (FF.wallet && FF.wallet.address) || (window.ethereum && window.ethereum.selectedAddress) || null;
+    // For write ops; prefer cached wallet state if your site sets it
+    if (FF.wallet?.address) return FF.wallet.address;
+    return (window.ethereum && window.ethereum.selectedAddress) || null;
   }
 
-  // -------- contracts ----------
+  // ---- contracts ------------------------------------------------------------
   function controller(web3) {
     return new web3.eth.Contract(window.CONTROLLER_ABI || [], CTRL_ADDR);
   }
   function erc721(web3) {
-    // Use CFG.COLLECTION_ADDRESS directly (you also have nftCollection() if needed)
     return new web3.eth.Contract([
       {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":""}],"stateMutability":"view","type":"function"},
-      {"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"}
+      {"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"},
     ], COLL_ADDR);
   }
 
-  // -------- utils ----------
+  // ---- normalization --------------------------------------------------------
   function toNumber(x) {
     try {
       if (x == null) return NaN;
@@ -58,28 +58,72 @@
     } catch {}
     return NaN;
   }
+  function normIds(arr) {
+    if (!Array.isArray(arr)) return [];
+    return arr.map(toNumber).filter(Number.isFinite);
+  }
 
-  // -------- reads your panel calls ----------
+  // ---- core reads expected by owned-panel.js --------------------------------
   async function getStakedTokens(owner) {
-    // ABI: function getStakedTokens(address _user) returns (StakedToken[] {staker, tokenId})
     const web3 = getWeb3();
     const ctrl = controller(web3);
-    const rows = await ctrl.methods.getStakedTokens(owner).call();
-    // Normalize to [Number tokenId]
-    const ids = Array.isArray(rows) ? rows.map(r => toNumber(r && r.tokenId)).filter(Number.isFinite) : [];
-    return ids;
+
+    // Try common method names; return first non-empty result
+    const candidates = [
+      'getStakedTokens',
+      'stakedTokensOf',
+      'stakedOf',
+      'depositsOf',
+      'tokensOfOwner',
+      'getUserTokens',
+      'getUserStakedTokens'
+    ];
+    for (const m of candidates) {
+      if (ctrl.methods[m]) {
+        try {
+          const out = await ctrl.methods[m](owner).call();
+          const ids = normIds(out);
+          if (ids.length) return ids;
+        } catch {}
+      }
+    }
+    // Nothing matched; return empty (panel will still show owned frogs)
+    return [];
   }
 
-  async function getAvailableRewards(owner) {
+  async function getStakeSince(tokenId) {
     const web3 = getWeb3();
     const ctrl = controller(web3);
-    // ABI: function availableRewards(address _staker) view returns (uint256)
-    return await ctrl.methods.availableRewards(owner).call();
-  }
 
-  // You don't have stakeSince in the ABI; panel will gracefully handle null.
-  async function getStakeSince(/* tokenId */) {
-    return null; // not available in this controller
+    // Try common shapes that return "since" timestamp (sec or ms)
+    const tryRead = async () => {
+      if (ctrl.methods.getStakeSince) {
+        try { return await ctrl.methods.getStakeSince(tokenId).call(); } catch {}
+      }
+      if (ctrl.methods.stakeSince) {
+        try { return await ctrl.methods.stakeSince(tokenId).call(); } catch {}
+      }
+      if (ctrl.methods.getStakeInfo) {
+        try {
+          const info = await ctrl.methods.getStakeInfo(tokenId).call();
+          return info?.since ?? info?.stakedAt ?? info?.timestamp ?? null;
+        } catch {}
+      }
+      if (ctrl.methods.stakes) { // mapping(tokenId => { since })
+        try {
+          const info = await ctrl.methods.stakes(tokenId).call();
+          return info?.since ?? info?.stakedAt ?? info?.timestamp ?? null;
+        } catch {}
+      }
+      return null;
+    };
+
+    const v = await tryRead();
+    if (v == null) return null;
+    const n = Number(v);
+    if (!Number.isFinite(n) || n <= 0) return null;
+    // Normalize to ms
+    return n < 1e12 ? n * 1000 : n;
   }
 
   async function isApproved(owner) {
@@ -89,60 +133,76 @@
     catch { return null; }
   }
 
-  // -------- writes used by your card buttons ----------
   async function approve() {
     const web3 = getWeb3();
-    const from = getAccount();
-    if (!from) throw new Error('No connected account for approve()');
+    const acct = getAccount();
+    if (!acct) throw new Error('No connected account for approve()');
     const nft = erc721(web3);
-    return nft.methods.setApprovalForAll(CTRL_ADDR, true).send({ from });
+    return nft.methods.setApprovalForAll(CTRL_ADDR, true).send({ from: acct });
   }
 
-  async function stakeToken(tokenId) {
+  async function getAvailableRewards(owner) {
     const web3 = getWeb3();
-    const from = getAccount();
-    if (!from) throw new Error('No connected account for stake');
     const ctrl = controller(web3);
-    // ABI: stake(uint256 _tokenId)
-    return ctrl.methods.stake(String(tokenId)).send({ from });
-  }
-
-  async function unstakeToken(tokenId) {
-    const web3 = getWeb3();
-    const from = getAccount();
-    if (!from) throw new Error('No connected account for withdraw');
-    const ctrl = controller(web3);
-    // ABI: withdraw(uint256 _tokenId)
-    return ctrl.methods.withdraw(String(tokenId)).send({ from });
+    // try common names
+    const names = ['availableRewards', 'getAvailableRewards', 'claimableRewards', 'pendingRewards'];
+    for (const n of names) {
+      if (ctrl.methods[n]) {
+        try { return await ctrl.methods[n](owner).call(); } catch {}
+      }
+    }
+    return '0';
   }
 
   async function claimRewards() {
     const web3 = getWeb3();
-    const from = getAccount();
-    if (!from) throw new Error('No connected account for claimRewards');
+    const acct = getAccount();
+    if (!acct) throw new Error('No connected account for claim');
     const ctrl = controller(web3);
-    return ctrl.methods.claimRewards().send({ from });
+    const names = ['claimRewards', 'claim', 'harvest'];
+    for (const n of names) {
+      if (ctrl.methods[n]) {
+        return ctrl.methods[n]().send({ from: acct });
+      }
+    }
+    throw new Error('No claim method on controller');
   }
 
-  // -------- export under the names your panel tries ----------
+  // Optional stake/unstake helpers for your action buttons
+  async function stakeToken(tokenId) {
+    const web3 = getWeb3();
+    const acct = getAccount();
+    if (!acct) throw new Error('No connected account for stake');
+    const ctrl = controller(web3);
+    if (ctrl.methods.stake)        return ctrl.methods.stake(tokenId).send({ from: acct });
+    if (ctrl.methods.stakeToken)   return ctrl.methods.stakeToken(tokenId).send({ from: acct });
+    if (ctrl.methods.stakeTokens)  return ctrl.methods.stakeTokens([tokenId]).send({ from: acct });
+    throw new Error('No stake method');
+  }
+  async function unstakeToken(tokenId) {
+    const web3 = getWeb3();
+    const acct = getAccount();
+    if (!acct) throw new Error('No connected account for unstake');
+    const ctrl = controller(web3);
+    if (ctrl.methods.unstake)        return ctrl.methods.unstake(tokenId).send({ from: acct });
+    if (ctrl.methods.unstakeToken)   return ctrl.methods.unstakeToken(tokenId).send({ from: acct });
+    if (ctrl.methods.unstakeTokens)  return ctrl.methods.unstakeTokens([tokenId]).send({ from: acct });
+    throw new Error('No unstake method');
+  }
+
+  // ---- export (both names your panel checks) --------------------------------
   FF.staking = {
-    // lists / stats
     getStakedTokens,
-    getUserStakedTokens: getStakedTokens,  // alias
-    getAvailableRewards,
-
-    // staking timestamps (not available in this ABI -> null)
+    getUserStakedTokens: getStakedTokens, // alias
     getStakeSince,
-
-    // approvals
+    getStakeInfo: getStakeSince, // your panel can consume either
     isApproved,
     approve,
-
-    // actions
+    getAvailableRewards,
+    claimRewards,
     stakeToken,
-    unstakeToken,
-    claimRewards
+    unstakeToken
   };
-  window.FF_STAKING = FF.staking; // legacy alias some code checks
+  window.FF_STAKING = FF.staking; // legacy alias
 
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
