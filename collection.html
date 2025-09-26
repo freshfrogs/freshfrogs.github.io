@@ -12,16 +12,11 @@
     .pg-wrap{ padding:20px; }
     img{ image-rendering: pixelated; image-rendering: crisp-edges; }
 
-    /* Cards become vertical flex so headers stay fixed and inner lists scroll */
-    .pg-card{
-      padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel);
-      display:flex; flex-direction:column; min-height:320px;
-    }
+    .pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
     .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
     .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
     .pg-muted{ color:var(--muted); font-size:13px; }
 
-    /* Lists inside cards should flex and scroll */
     .list{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
     .row{ display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:center; padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
     .thumb64{ width:64px; height:64px; min-width:64px; min-height:64px; border-radius:10px; object-fit:contain; background:var(--panel-2); }
@@ -29,11 +24,11 @@
     /* Two-column page layout */
     .page-grid{
       display:grid; gap:16px; grid-template-columns: 1.2fr 0.8fr;
-      align-items:stretch; max-width:1100px; margin:0 auto;
+      align-items:start; max-width:1100px; margin:0 auto;
     }
     @media (max-width:960px){ .page-grid{ grid-template-columns: 1fr; } }
 
-    /* Hero */
+    /* Hero (centered) */
     .frog-hero{ margin:28px auto 38px; max-width:1100px; }
     .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
     .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
@@ -42,7 +37,7 @@
     .frog-strip img{ width:64px; height:64px; object-fit:contain; }
     @media (max-width:520px){ .frog-hero{ margin:22px auto 30px; } .frog-strip{ gap:10px; } }
 
-    /* KPI blocks */
+    /* Info blocks */
     .info-grid-2{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:10px; margin-bottom:10px; }
     @media (max-width:900px){ .info-grid-2{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
     @media (max-width:520px){ .info-grid-2{ grid-template-columns: 1fr; } }
@@ -51,21 +46,19 @@
     .info-block .iv{ font-weight:900; font-size:18px; line-height:1.1; margin-top:4px; }
     .info-block .in{ font-size:12px; color:var(--muted); }
 
-    /* Make the Pond list fill the card and scroll */
-    #recentStakes{ flex:1 1 auto; min-height:220px; overflow:auto; -webkit-overflow-scrolling:touch; padding-right:4px; }
+    /* Scrollable list (The Pond) */
+    #recentStakes.scrolling{ overflow-y:auto; -webkit-overflow-scrolling:touch; padding-right:4px; }
     #recentStakes .row{ cursor:pointer; }
     @media (hover:hover){
-      #recentStakes::-webkit-scrollbar{ width:8px; }
-      #recentStakes::-webkit-scrollbar-thumb{
+      #recentStakes.scrolling::-webkit-scrollbar{ width:8px; }
+      #recentStakes.scrolling::-webkit-scrollbar-thumb{
         background: color-mix(in srgb, var(--muted) 35%, transparent);
         border-radius:8px;
       }
     }
 
-    /* Owned Frogs panel */
+    /* Owned Frogs */
     #ownedCard .grid-cards{ display:grid; gap:10px; grid-template-columns: 1fr; }
-    #ownedGrid{ flex:1 1 auto; min-height:220px; overflow:auto; -webkit-overflow-scrolling:touch; padding-right:4px; }
-
     .frog-card{
       border:1px solid var(--border);
       background: var(--panel);
@@ -82,9 +75,9 @@
     .pill{ display:inline-block; padding:3px 10px; border-radius:999px; background: color-mix(in srgb, var(--panel) 85%, transparent); border:1px solid var(--border); font-size:12px; }
     .meta{ color:var(--muted); font-size:12px; }
 
-    /* Attribute bullets (used by JS) */
-    #ownedCard .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; }
-    #ownedCard .attr-bullets li{ font-size:12px; margin:2px 0; }
+    /* Convert attribute chips to bullets in owned cards */
+    .attr-list{ list-style:disc; margin:6px 0 0 18px; padding:0; display:block; }
+    .attr{ border:none; border-radius:0; padding:0; font-size:12px; background:transparent; margin:2px 0; }
 
     .actions{ grid-column:1 / -1; display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
     .btn{
@@ -109,14 +102,14 @@
       border-color: color-mix(in srgb, #22c55e 80%, var(--border));
       color: color-mix(in srgb, #ffffff 85%, #22c55e);
     }
-
-    /* Small utility for the header KPIs injected by JS */
-    #ownedCard .oh-wrap{ margin-bottom:10px; }
-    #ownedCard .oh-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-    #ownedCard .oh-mini{ font-size:11px; line-height:1; }
-    #ownedCard .oh-spacer{ flex:1; }
-    #ownedCard .oh-btn{ font-family:var(--font-ui); border:1px solid var(--border); background:transparent; color:inherit; border-radius:8px; padding:6px 10px; font-weight:700; font-size:12px; line-height:1; display:inline-flex; align-items:center; gap:6px; text-decoration:none; letter-spacing:.01em; transition:background .15s,border-color .15s,color .15s,transform .05s; }
-    #ownedCard .oh-btn:hover{ background: color-mix(in srgb,#22c55e 14%,var(--panel)); border-color: color-mix(in srgb,#22c55e 80%,var(--border)); color: color-mix(in srgb,#ffffff 85%,#22c55e); }
+    /* Connected look for the Connect Wallet button (JS adds .btn-connected) */
+    #ownedConnectBtn.btn-connected{
+      background: color-mix(in srgb, #22c55e 20%, var(--panel));
+      border-color: color-mix(in srgb, #22c55e 80%, var(--border));
+      color: color-mix(in srgb, #ffffff 85%, #22c55e);
+    }
+    /* Keep owned panel height aligned with pond; inner grid scrolls */
+    #ownedGrid{ max-height:60vh; overflow:auto; -webkit-overflow-scrolling:touch; padding-right:4px; }
   </style>
 </head>
 <body>
@@ -136,14 +129,15 @@
 
     <!-- GRID -->
     <div class="page-grid">
-      <!-- Left: The Pond -->
+
+      <!-- Left: The Pond (recent activity + KPIs) -->
       <section class="pg-card">
         <div class="pg-card-head"><h3>The Pond</h3></div>
         <p class="pg-muted" style="margin:6px 0 12px 0; max-width:70ch;">
-          Pixel-perfect frogs hopping around the Ethereum pond. Stake to earn FLYZ and explore the collection’s quirks and traits.
+          Staking and unstaking activity from the Fresh Frogs controller.
         </p>
 
-        <!-- Stakes stats -->
+        <!-- KPIs -->
         <div class="info-grid-2" style="margin-bottom:10px;">
           <div class="info-block">
             <div class="ik">🐸 Total Frogs Staked</div>
@@ -156,39 +150,35 @@
             <div class="in">Staking contract</div>
           </div>
           <div class="info-block">
-            <div class="ik">Rewards</div>
-            <div class="iv" id="pondRewardsSymbol">$FLYZ</div>
+            <div class="ik">💎 Rewards</div>
+            <div class="iv"><span id="pondRewardsSymbol">$FLYZ</span></div>
             <div class="in">Earnings token</div>
           </div>
           <div class="info-block">
             <div class="ik">ℹ️ Notes</div>
-            <div class="iv">Transfers → Controller</div>
-            <div class="in">Click a row for Etherscan</div>
+            <div class="iv">Tap a row to view TX</div>
+            <div class="in">Etherscan opens in a new tab</div>
           </div>
         </div>
 
-        <!-- Recent Activity (fills remaining space and scrolls) -->
-        <ul id="recentStakes" class="list" aria-live="polite">
-          <li class="row"><div class="pg-muted">Loading recent activity…</div></li>
-        </ul>
+        <!-- Recent Activity (scrollable) -->
+        <ul id="recentStakes" class="list" aria-live="polite" data-visible="6"></ul>
       </section>
 
-      <!-- Right: Owned Frogs -->
+      <!-- Right: Owned + Staked (cards) -->
       <section id="ownedCard" class="pg-card">
         <div class="pg-card-head">
           <h3>My Frogs (Owned)</h3>
           <div><button id="ownedConnectBtn" class="btn">Connect Wallet</button></div>
         </div>
 
-        <!-- Header KPIs injected here by JS -->
-
-        <!-- Cards (fills remaining space and scrolls) -->
+        <!-- Header summary will be injected above this grid by JS -->
         <div class="grid-cards" id="ownedGrid">
           <div class="pg-muted">Connect your wallet to view owned frogs.</div>
         </div>
-
         <div class="pg-muted" id="ownedMore" style="margin-top:8px; text-align:center; display:none;">Loading more…</div>
       </section>
+
     </div>
   </div>
 
@@ -207,15 +197,32 @@
     document.addEventListener('DOMContentLoaded', layoutFrogStrip);
   </script>
 
-  <!-- Your config (must define FF_CFG.{CHAIN_ID,COLLECTION_ADDRESS,CONTROLLER_ADDRESS}, optional API key) -->
+  <!-- Config FIRST -->
   <script src="assets/js/config.js"></script>
 
-  <!-- Single runtime that powers both panels -->
+  <!-- Web3 library (required for block scanning in stakes-feed.js) -->
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+  <!-- Shared utils (if you use them elsewhere) -->
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/rarity.js"></script>
+  <script src="assets/js/modal.js"></script>
+
+  <!-- Owned/Staked + Wallet helpers (optional; app handles connect state too) -->
+  <script src="assets/js/wallet-state.js"></script>
+  <script src="assets/js/wallet.js"></script>
+
+  <!-- Panels/feeds -->
+  <!-- The Pond (block-scan based, classic layout) -->
+  <script src="assets/js/stakes-feed.js"></script>
+
+  <!-- Owned/Staked panel runtime (Reservoir + controller integration) -->
   <script src="assets/js/app-collection.js"></script>
 
   <script>
-    FF_loadRecentStakes && FF_loadRecentStakes();
-    FF_initOwnedPanel && FF_initOwnedPanel();
+    // Boot both panels (exports are defined defensively)
+    try { FF_loadRecentStakes && FF_loadRecentStakes(); } catch(e){ console.error(e); }
+    try { FF_initOwnedPanel && FF_initOwnedPanel(); } catch(e){ console.error(e); }
   </script>
 </body>
 </html>
