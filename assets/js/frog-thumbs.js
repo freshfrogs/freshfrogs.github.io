@@ -1,9 +1,6 @@
-// assets/js/frog-thumbs.js
-// Layer-by-layer 128px frog thumbnails (trait images stacked), with shifted flat PNG background.
-// Works two ways:
-//  1) Overrides flatThumb128(container, id) if your code calls it.
-//  2) Upgrades already-rendered dashboard images by scanning & swapping them in place.
-// No changes needed elsewhere.
+// assets/js/frog-thumbs.js — v3 "no-excuses" layered frogs for dashboard cards.
+// Works with <img>, CSS background-image, or arbitrary markup. Detects tokenId via many heuristics.
+// Adds FF.forceFrogLayering() for manual re-run.
 
 (function(){
   'use strict';
@@ -15,19 +12,35 @@
   const META_BASE   = (SRC ? `${SRC}` : '') + `/frog/json`;
   const SIZE = 128;
 
-  // ---------- HELPERS ----------
-  const safe = s => encodeURIComponent(String(s));
-  const q = (s,p)=> (p||document).querySelector(s);
-  const qq = (s,p)=> Array.from((p||document).querySelectorAll(s));
+  // Common dashboard roots (try all)
+  const DASH_ROOTS = [
+    '#ownedPanel', '#dashboardPanel', '.owned-panel', '.wallet-owned',
+    '.cards-owned', '.cards-grid', '.pond-owned', '.module-owned'
+  ];
 
-  function makeContainer(){
+  // ---------- UTIL ----------
+  const q  = (s,p)=> (p||document).querySelector(s);
+  const qq = (s,p)=> Array.from((p||document).querySelectorAll(s));
+  const safe = s => encodeURIComponent(String(s));
+
+  function mkContainer(){
     const d = document.createElement('div');
-    Object.assign(d.style, {
-      width:`${SIZE}px`, height:`${SIZE}px`, minWidth:`${SIZE}px`, minHeight:`${SIZE}px`,
-      position:'relative', overflow:'hidden', borderRadius:'8px', imageRendering:'pixelated'
-    });
     d.className = 'frog-128-layered';
+    Object.assign(d.style, {
+      width:`${SIZE}px`, height:`${SIZE}px`,
+      minWidth:`${SIZE}px`, minHeight:`${SIZE}px`,
+      position:'relative', overflow:'hidden', borderRadius:'8px',
+      imageRendering:'pixelated', zIndex:'0'
+    });
     return d;
+  }
+
+  function setShiftedBackground(el, tokenId){
+    const flatUrl = `${FLAT_BASE}/${tokenId}.png`;
+    el.style.backgroundRepeat = 'no-repeat';
+    el.style.backgroundSize   = '2000% 2000%';
+    el.style.backgroundPosition = '100% -1200%';
+    el.style.backgroundImage  = `url("${flatUrl}")`;
   }
 
   const NO_ANIM_FOR = new Set(['Hat','Frog','Trait']);
@@ -40,10 +53,9 @@
     const gif  = `${base}/animations/${safe(value)}_animation.gif`;
 
     const img = new Image();
-    img.decoding = 'async';
-    img.loading  = 'lazy';
+    img.decoding='async'; img.loading='lazy';
     img.dataset.attr = attr;
-    Object.assign(img.style, {
+    Object.assign(img.style,{
       position:'absolute', left:'0', top:'0',
       width:`${SIZE}px`, height:`${SIZE}px`,
       imageRendering:'pixelated', zIndex:'2',
@@ -52,7 +64,7 @@
 
     if (allowAnim){
       img.src = gif;
-      img.onerror = ()=>{ img.onerror = null; img.src = png; };
+      img.onerror = ()=>{ img.onerror=null; img.src = png; };
     } else {
       img.src = png;
     }
@@ -63,8 +75,7 @@
         img.style.filter='drop-shadow(0 5px 0 rgba(0,0,0,.45))';
       });
       img.addEventListener('mouseleave', ()=>{
-        img.style.transform='translate(0,0)';
-        img.style.filter='none';
+        img.style.transform='translate(0,0)'; img.style.filter='none';
       });
     }
     return img;
@@ -76,25 +87,16 @@
     return r.json();
   }
 
-  function setShiftedBackground(el, tokenId){
-    const flatUrl = `${FLAT_BASE}/${tokenId}.png`;
-    el.style.backgroundRepeat = 'no-repeat';
-    el.style.backgroundSize   = '2000% 2000%';
-    el.style.backgroundPosition = '100% -1200%';
-    el.style.backgroundImage  = `url("${flatUrl}")`;
-  }
-
   async function buildFrog128(container, tokenId){
-    // clear existing children
+    // clear children (if any)
     while (container.firstChild) container.removeChild(container.firstChild);
 
-    // shifted flat background as the canvas
+    // shifted background
     setShiftedBackground(container, tokenId);
 
-    // build from metadata
+    // layers
     try{
-      const metaUrl = `${META_BASE}/${tokenId}.json`;
-      const meta = await fetchJSON(metaUrl);
+      const meta = await fetchJSON(`${META_BASE}/${tokenId}.json`);
       const attrs = Array.isArray(meta?.attributes) ? meta.attributes : [];
       for (const r of attrs){
         const attr = String(r.trait_type || r.traitType || '').trim();
@@ -103,10 +105,10 @@
         container.appendChild(makeLayerImg(attr, val));
       }
     }catch(err){
-      // fallback: flat image over the bg so user still sees a frog
+      // fallback to flat visible image if metadata missing
       const img = new Image();
       img.decoding='async'; img.loading='lazy';
-      Object.assign(img.style, {
+      Object.assign(img.style,{
         position:'absolute', inset:'0',
         width:`${SIZE}px`, height:`${SIZE}px`,
         imageRendering:'pixelated', zIndex:'2'
@@ -116,105 +118,194 @@
     }
   }
 
-  // ---------- AUTO-HOOK: replace global flatThumb128 if used anywhere ----------
-  const oldFlat = window.flatThumb128;
-  window.buildFrog128 = window.buildFrog128 || buildFrog128;
-  window.flatThumb128 = function(container, id){
-    try{
-      // If caller passed a plain container, make sure it has sizing
-      if (!container.classList.contains('frog-128-layered')){
-        Object.assign(container.style, {
-          width:`${SIZE}px`, height:`${SIZE}px`,
-          minWidth:`${SIZE}px`, minHeight:`${SIZE}px`,
-          position:'relative', overflow:'hidden', borderRadius:'8px', imageRendering:'pixelated'
-        });
-      }
-      return buildFrog128(container, id);
-    }catch(e){
-      if (typeof oldFlat === 'function') return oldFlat(container, id);
-    }
-  };
-
-  // ---------- UPGRADE-IN-PLACE: scan existing dashboard images and swap ----------
-  // Heuristics to get tokenId:
-  //  - data-token-id, data-id
-  //  - src ending with /frog/<id>.png
-  function extractTokenIdFromEl(img){
-    let id = img?.dataset?.tokenId || img?.dataset?.id;
-    if (id) return String(id).replace(/\D/g,'');
-    const src = img?.getAttribute?.('src') || '';
-    const m = src.match(/\/frog\/(\d+)\.png(?:\?.*)?$/i);
+  // ---------- TOKEN ID HEURISTICS ----------
+  function extractIdFromURL(url){
+    if (!url) return null;
+    // matches .../frog/1234.png  OR any .../1234.png
+    let m = url.match(/\/frog\/(\d+)\.png(?:\?.*)?$/i);
     if (m) return m[1];
-    // try title/alt
-    const alt = (img.getAttribute('alt')||'').match(/\d+/);
-    if (alt) return alt[0];
+    m = url.match(/\/(\d+)\.png(?:\?.*)?$/i);
+    if (m) return m[1];
     return null;
+  }
+  function extractIdNearby(el){
+    // look for a #1234 in the same card/container
+    const txt = (el.closest('.card, .owned-card, .item, .grid-item') || el).textContent || '';
+    const m = txt.match(/#\s*(\d{1,6})/);
+    return m ? m[1] : null;
+  }
+  function extractTokenId(node){
+    if (!node || node.nodeType !== 1) return null;
+    // data attributes on either the image or card
+    const ds = node.dataset || {};
+    const dIds = [ds.tokenId, ds.id, ds.token, ds.tokenid, ds.frogId, ds.frogid].filter(Boolean);
+    if (dIds.length) return String(dIds[0]).replace(/\D/g,'') || null;
+
+    // <img src="..."> case
+    if (node.tagName === 'IMG'){
+      const src = node.getAttribute('src') || '';
+      const id = extractIdFromURL(src);
+      if (id) return id;
     }
 
-  function upgradeOneImage(img){
-    const tokenId = extractTokenIdFromEl(img);
-    if (!tokenId) return false;
+    // background-image case
+    const bg = getComputedStyle(node).backgroundImage;
+    if (bg && bg !== 'none'){
+      const m = bg.match(/url\(["']?([^"')]+)["']?\)/i);
+      if (m){
+        const id = extractIdFromURL(m[1]); if (id) return id;
+      }
+    }
 
-    // Avoid double work
-    if (img.closest('.frog-128-layered')) return true;
+    // try nearby text like #1234
+    return extractIdNearby(node);
+  }
 
-    // Make a layered container and replace the <img>
-    const wrapper = makeContainer();
-    // keep parent layout width/height
+  // ---------- UPGRADE MECHANICS ----------
+  function alreadyLayered(el){
+    return el.classList.contains('frog-128-layered') || el.closest?.('.frog-128-layered');
+  }
+
+  function replaceImgWithLayer(img, tokenId){
+    const wrapper = mkContainer();
     const parent = img.parentNode;
     if (!parent) return false;
 
-    // If parent is a fixed-size thumb cell, use it; else wrap just the image.
+    // try replace; fall back to insert & hide
     try{
       parent.replaceChild(wrapper, img);
     }catch(_){
-      // fallback: insert before and hide original
       parent.insertBefore(wrapper, img);
       img.style.display = 'none';
     }
-
-    // Build layered frog
     buildFrog128(wrapper, tokenId);
     return true;
   }
 
-  function scanAndUpgrade(root){
-    const scope = root || document;
-    // Likely thumb markers on your site:
-    // - img.thumb128
-    // - any img with /frog/<id>.png
-    const imgs = qq('img.thumb128, img[src*="/frog/"]', scope);
-    imgs.forEach(upgradeOneImage);
+  function overlayLayerOn(el, tokenId){
+    // For elements that use background-image (e.g., card tile)
+    if (alreadyLayered(el)) return true;
+    el.style.position = el.style.position || 'relative';
+
+    const wrapper = mkContainer();
+    // fit wrapper to the element’s content box
+    Object.assign(wrapper.style, {
+      position:'absolute', left:'0', top:'0', width:'100%', height:'100%', zIndex:'2', borderRadius: getComputedStyle(el).borderRadius || '8px'
+    });
+
+    el.appendChild(wrapper);
+    buildFrog128(wrapper, tokenId);
+    return true;
   }
 
-  // ---------- Observe dynamic dashboard rendering ----------
-  const observeTargets = [
-    '#ownedPanel', '#dashboardPanel', '.owned-panel', '.wallet-owned', '.cards-owned', '.cards-grid'
-  ];
-  function startObserver(){
-    const container = q(observeTargets.join(', '));
-    if (!container) return;
-    const mo = new MutationObserver((muts)=>{
+  function upgradeNode(node){
+    if (!node || node.nodeType!==1) return false;
+
+    // IMG case
+    if (node.tagName === 'IMG'){
+      const id = extractTokenId(node);
+      if (!id) return false;
+      if (alreadyLayered(node)) return true;
+      return replaceImgWithLayer(node, id);
+    }
+
+    // Any element with a background-image
+    const bg = getComputedStyle(node).backgroundImage;
+    if (bg && bg !== 'none'){
+      const id = extractTokenId(node);
+      if (!id) return false;
+      return overlayLayerOn(node, id);
+    }
+
+    // Otherwise scan children for imgs that match
+    let touched = false;
+    qq('img', node).forEach(img=>{
+      const id = extractTokenId(img);
+      if (id && !alreadyLayered(img)){ touched = replaceImgWithLayer(img, id) || touched; }
+    });
+    return touched;
+  }
+
+  function scanAndUpgrade(root){
+    const scope = root || document;
+    let hits = 0;
+
+    // 1) obvious candidates in known roots
+    DASH_ROOTS.forEach(sel=>{
+      qq(sel, scope).forEach(rootEl=>{
+        // try direct node (bg-image tiles)
+        if (upgradeNode(rootEl)) hits++;
+        // then scan its descendants
+        qq('img, .card, .owned-card, .grid-item, .tile', rootEl).forEach(n=>{
+          if (upgradeNode(n)) hits++;
+        });
+      });
+    });
+
+    // 2) global fallback: any likely thumb
+    qq('img.thumb128, img[src*=".png"]', scope).forEach(img=>{
+      if (upgradeNode(img)) hits++;
+    });
+
+    return hits;
+  }
+
+  // ---------- OVERRIDE LEGACY API (if used anywhere) ----------
+  const oldFlat = window.flatThumb128;
+  window.buildFrog128 = window.buildFrog128 || function(container, tokenId){
+    // make sure container has the chrome
+    if (!container.classList.contains('frog-128-layered')){
+      Object.assign(container.style, {
+        width:`${SIZE}px`, height:`${SIZE}px`,
+        minWidth:`${SIZE}px`, minHeight:`${SIZE}px`,
+        position:'relative', overflow:'hidden', borderRadius:'8px', imageRendering:'pixelated'
+      });
+      container.classList.add('frog-128-layered');
+    }
+    return buildFrog128(container, tokenId);
+  };
+  window.flatThumb128 = function(container, id){
+    try{ return window.buildFrog128(container, id); }
+    catch(e){ if (typeof oldFlat==='function') return oldFlat(container, id); }
+  };
+
+  // ---------- OBSERVE + RETRY ----------
+  function observeDash(){
+    const roots = qq(DASH_ROOTS.join(', '));
+    const target = roots[0] || document.body;
+    const mo = new MutationObserver(muts=>{
       for (const m of muts){
         if (m.addedNodes && m.addedNodes.length){
           m.addedNodes.forEach(n=>{
             if (n.nodeType===1) scanAndUpgrade(n);
           });
         }
+        if (m.type==='attributes' && (m.attributeName==='style' || m.attributeName==='src' || m.attributeName==='class')){
+          scanAndUpgrade(m.target);
+        }
       }
     });
-    mo.observe(container, {childList:true, subtree:true});
+    mo.observe(target, {childList:true, subtree:true, attributes:true, attributeFilter:['style','src','class','data-token-id','data-id']});
   }
 
-  // ---------- Kick ----------
   function kick(){
-    // Pass 1: upgrade anything already on the page
+    // first pass
     scanAndUpgrade(document);
-    // Start watching for future inserts
-    startObserver();
+    observeDash();
+    // quick retries for slower UIs
+    let tries = 0;
+    const tick = setInterval(()=>{
+      tries++;
+      const added = scanAndUpgrade(document);
+      if (tries>8 || added===0) clearInterval(tick);
+    }, 600);
   }
 
-  // Also listen to app-specific events if they exist
+  // expose a manual trigger for debugging
+  window.FF = Object.assign(window.FF||{}, {
+    forceFrogLayering: ()=>scanAndUpgrade(document)
+  });
+
   document.addEventListener('DOMContentLoaded', kick);
   window.addEventListener('load', kick);
   document.addEventListener('ff:wallet:ready', kick);
