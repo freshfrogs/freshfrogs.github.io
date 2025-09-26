@@ -1,8 +1,6 @@
 // assets/js/stakes-feed.js
-// The Pond (recent activity) — Reservoir-only (no wallet)
-// • Shows stake (to controller) and unstake (from controller) transfer events
-// • Endpoint: /users/activity/v6?users=<controller>&types=transfer&collections=<collection>&limit=20
-// • Classic row look; click -> Etherscan; continuation on scroll
+// The Pond — Reservoir-only recent activity (+ total staked via ERC721.balanceOf)
+// Classic row style; 20 per page; continuation on scroll; no wallet needed.
 
 (function(FF, CFG){
   'use strict';
@@ -19,34 +17,61 @@
 
   function $(s,r){ return (r||document).querySelector(s); }
   function shorten(a){ return a ? a.slice(0,6)+'…'+a.slice(-4) : '—'; }
-  function escTx(h){
-    var base = CHAIN===1 ? 'https://etherscan.io/tx/' :
-               CHAIN===11155111 ? 'https://sepolia.etherscan.io/tx/' :
-               CHAIN===5 ? 'https://goerli.etherscan.io/tx/' : 'https://etherscan.io/tx/';
-    return base + h;
+  function etherscan(kind){
+    if (CHAIN===1) return 'https://etherscan.io/'+kind+'/';
+    if (CHAIN===11155111) return 'https://sepolia.etherscan.io/'+kind+'/';
+    if (CHAIN===5) return 'https://goerli.etherscan.io/'+kind+'/';
+    return 'https://etherscan.io/'+kind+'/';
   }
-  function setKPIs(){
-    var a = $('#stakedController');
-    if (a && CTRL){
-      var base = CHAIN===1 ? 'https://etherscan.io/address/' :
-                 CHAIN===11155111 ? 'https://sepolia.etherscan.io/address/' :
-                 CHAIN===5 ? 'https://goerli.etherscan.io/address/' : 'https://etherscan.io/address/';
-      a.textContent = shorten(CTRL);
-      a.href = base + C.CONTROLLER_ADDRESS;
-    }
-    var sym = $('#pondRewardsSymbol'); if (sym) sym.textContent = (C.REWARD_TOKEN_SYMBOL || '$FLYZ');
+  function escTx(h){ return etherscan('tx') + h; }
+  function age(ts){
+    if (!ts) return '—';
+    var diff = Math.max(0, (Date.now()/1000) - ts);
+    var d = Math.floor(diff/86400), h = Math.floor((diff%86400)/3600);
+    if (d>0) return d+'d ago';
+    if (h>0) return h+'h ago';
+    var m = Math.floor((diff%3600)/60);
+    return m+'m ago';
   }
 
-  // Classic look
+  // KPIs — controller link + rewards symbol; total staked via balanceOf(controller)
+  async function setKPIs(){
+    // Controller link
+    var a = $('#stakedController');
+    if (a && CTRL){
+      a.textContent = shorten(CTRL);
+      a.href = etherscan('address') + C.CONTROLLER_ADDRESS;
+    }
+    var sym = $('#pondRewardsSymbol'); if (sym) sym.textContent = (C.REWARD_TOKEN_SYMBOL || '$FLYZ');
+
+    // Total Frogs Staked = ERC721.balanceOf(controller)
+    try{
+      if (!window.Web3 || !C.COLLECTION_ADDRESS || !C.CONTROLLER_ADDRESS) return;
+      var provider = window.ethereum
+        ? window.ethereum
+        : (C.RPC_URL ? new window.Web3.providers.HttpProvider(C.RPC_URL, { keepAlive:true }) : null);
+      if (!provider) return;
+      var web3 = new window.Web3(provider);
+      var ABI  = [{"constant":true,"inputs":[{"name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}];
+      var erc721 = new web3.eth.Contract(ABI, C.COLLECTION_ADDRESS);
+      var bal = await erc721.methods.balanceOf(C.CONTROLLER_ADDRESS).call();
+      var n = Number(bal||0);
+      var el = $('#stakedTotal'); if (el) el.textContent = String(n);
+    }catch(e){
+      console.warn('[pond] balanceOf failed', e);
+    }
+  }
+
+  // Classic row look to match your screenshot
   function rowHTML(e){
-    var title = e.kind==='stake' ? 'Staked' : 'Unstaked';
-    var when  = e.time ? new Date(e.time*1000).toLocaleString() : '—';
-    var img   = (C.SOURCE_PATH||'') + '/frog/' + (e.id || 0) + '.png';
+    var thumb = (C.SOURCE_PATH||'') + '/frog/' + (e.id || 0) + '.png';
+    var line1 = (e.kind==='stake'?'Stake':'Unstake') + ' • Frog #' + e.id;
+    var line2 = shorten(e.from)+' → '+shorten(e.to)+' • '+age(e.time)+' • '+'Etherscan';
     return (
       '<li class="row" data-kind="'+e.kind+'">'+
-        '<img class="thumb64" src="'+img+'" alt="'+e.id+'">'+
-        '<div><div><b>'+title+'</b> Frog #'+e.id+'</div>'+
-        '<div class="pg-muted">'+when+' • '+shorten(e.from)+' → '+shorten(e.to)+'</div></div>'+
+        '<img class="thumb64" src="'+thumb+'" alt="'+e.id+'">'+
+        '<div><div><b>'+line1+'</b></div>'+
+        '<div class="pg-muted">'+line2+'</div></div>'+
       '</li>'
     );
   }
@@ -55,10 +80,10 @@
     if (!KEY) throw new Error('Missing FF_CFG.FROG_API_KEY');
 
     var u = new URL(HOST + '/users/activity/v6');
-    u.searchParams.set('users', C.CONTROLLER_ADDRESS);   // controller-centric activity
-    u.searchParams.set('types', 'transfer');             // we only want transfers
-    if (C.COLLECTION_ADDRESS) u.searchParams.set('collections', C.COLLECTION_ADDRESS); // just our frogs
-    u.searchParams.set('limit', '20');                   // page size
+    u.searchParams.set('users', C.CONTROLLER_ADDRESS);
+    u.searchParams.set('types', 'transfer');
+    if (C.COLLECTION_ADDRESS) u.searchParams.set('collections', C.COLLECTION_ADDRESS);
+    u.searchParams.set('limit', '20');
     if (continuation) u.searchParams.set('continuation', continuation);
 
     var res = await fetch(u.toString(), { headers:{ accept:'application/json', 'x-api-key': KEY }});
@@ -72,17 +97,15 @@
     var out=[], rows = Array.isArray(j.activities) ? j.activities : [];
     for (var i=0;i<rows.length;i++){
       var r = rows[i] || {};
-      // Defensively read fields across schema variants
       var token   = r.token || {};
       var id      = Number(token.tokenId || r.tokenId);
       var from    = (r.fromAddress || r.from || '').toLowerCase();
       var to      = (r.toAddress   || r.to   || '').toLowerCase();
       var ts      = Number(r.timestamp || (r.createdAt && Math.floor(new Date(r.createdAt).getTime()/1000))) || null;
       var tx      = r.txHash || r.transactionHash || '';
-
       if (!Number.isFinite(id) || !from || !to) continue;
 
-      // Restrict to our collection if API returns mixed collections
+      // restrict to our contract
       var contract = (token.contract || r.contract || '').toLowerCase();
       if (COLL && contract && contract !== COLL) continue;
 
@@ -91,7 +114,6 @@
 
       out.push({ kind, id, from:r.fromAddress||r.from||'', to:r.toAddress||r.to||'', time:ts, tx:tx });
     }
-    // newest first
     out.sort(function(a,b){ return (b.time||0)-(a.time||0); });
     return out;
   }
@@ -131,13 +153,13 @@
       if (busy || done) return;
       if (listEl.scrollTop + listEl.clientHeight >= listEl.scrollHeight - 80) loadNext(listEl);
     });
-    loadNext(listEl).then(function(){ setTimeout(function(){ loadNext(listEl); }, 100); });
+    loadNext(listEl).then(function(){ setTimeout(function(){ loadNext(listEl); }, 120); });
   }
 
   function init(){
     setKPIs();
     var ul = $(UL); if (!ul) return;
-    ul.innerHTML = ''; // no "loading..." line, matches classic look
+    ul.innerHTML = '';
     done = false; busy = false; continuation = null;
     attachScroll(ul);
   }
