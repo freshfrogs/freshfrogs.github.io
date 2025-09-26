@@ -192,23 +192,29 @@
 <script src="assets/js/rarity.js"></script>
 <script src="assets/js/modal.js"></script>
 
-<!-- ABIs must come from /assets/abi -->
+<!-- ABIs -->
 <script src="assets/abi/collection_abi.js"></script>
 <script src="assets/abi/controller_abi.js"></script>
 
-<!-- Panels / features (all from /assets/js) -->
+<!-- Pond + Wallet + Staking -->
 <script src="assets/js/pond.js"></script>
 <script src="assets/js/wallet-state.js"></script>
 <script src="assets/js/wallet.js"></script>
-<script src="assets/js/staking-adapter.js"></script>  <!-- ✅ correct path -->
+<script src="assets/js/staking-adapter.js"></script>
+
+<!-- NEW: KPIs (top of Pond) -->
 <script src="assets/js/pond-kpis.js"></script>
+
+<!-- Feeds -->
 <script src="assets/js/stakes-feed.js"></script>
 <script src="assets/js/pond-tweaks.js"></script>
+
+<!-- OWNED/STAKED PANEL (drop-in replacement) -->
 <script src="assets/js/owned-panel.js"></script>
 
 <script>
   if (window.FF_loadRecentStakes) FF_loadRecentStakes();
-  if (window.FF_initOwnedPanel)   FF_initOwnedPanel();
+  if (window.FF_initOwnedPanel)   FF_initOwnedPanel(); /* harmless if not defined */
 </script>
 
 </body>
