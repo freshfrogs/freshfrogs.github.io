@@ -160,6 +160,7 @@
   async function getStakeSinceMs(tokenId){
     const S=STK();
     try{
+<<<<<<< HEAD
       if (typeof S.getStakeSince==='function'){ const sec=await S.getStakeSince(tokenId); if (sec) return Number(sec)>1e12?Number(sec):Number(sec)*1000; }
     }catch{}
     try{
@@ -169,6 +170,12 @@
       }
     }catch{}
     return null;
+=======
+      if (typeof S.getStakeSince==='function'){ const v=await S.getStakeSince(tokenId); return Number(v)>1e12?Number(v):Number(v)*1000; }
+      if (typeof S.getStakeInfo==='function'){ const i=await S.getStakeInfo(tokenId); const sec=i?.since??i?.stakedAt??i?.timestamp; if (sec!=null) return Number(sec)>1e12?Number(sec):Number(sec)*1000; }
+      if (typeof S.stakeSince==='function'){ const sec=await S.stakeSince(tokenId); return Number(sec)>1e12?Number(sec):Number(sec)*1000; }
+    }catch{} return null;
+>>>>>>> parent of a42dbe177 (WORKING BACKUP)
   }
 
   // --- State ---
@@ -197,10 +204,7 @@
 
   // --- Header ---
   function headerRoot(){ const card=$(SEL.card); if(!card) return null; let w=card.querySelector('.oh-wrap'); if(!w){ w=document.createElement('div'); w.className='oh-wrap'; card.insertBefore(w,$(SEL.grid,card)); } w.innerHTML=''; return w; }
-  function headerData(){
-    const ownedOnly = Array.isArray(items) ? items.filter(x => !x.staked).length : 0;
-    return { owned: ownedOnly, staked:(_stakedCount==null?'—':_stakedCount), rewards:_rewardsPretty, approved:_approved };
-  }
+  function headerData(){ return { owned: items.length||0, staked:(_stakedCount==null?'—':_stakedCount), rewards:_rewardsPretty, approved:_approved }; }
   function buildHeader(){
     const w=headerRoot(); if(!w) return; const d=headerData();
     w.innerHTML =
@@ -308,8 +312,8 @@
   function renderCards(){
     const root=$(SEL.grid); if (!root) return;
     root.innerHTML='';
-    if (!items.length){ root.innerHTML='<div class="pg-muted">No frogs found for this wallet.</div>'; updateHeaderOwned(); syncHeights(); return; }
-    updateHeaderOwned();
+    if (!items.length){ root.innerHTML='<div class="pg-muted">No frogs found for this wallet.</div>'; updateHeaderOwned(0); syncHeights(); return; }
+    updateHeaderOwned(items.length);
     items.forEach(it=>{
       const card=document.createElement('article');
       card.className='frog-card';
@@ -330,11 +334,7 @@
     });
     syncHeights();
   }
-  function updateHeaderOwned(){
-    const el=document.getElementById('ohOwned'); if (!el) return;
-    const ownedOnly = Array.isArray(items) ? items.filter(x => !x.staked).length : 0;
-    el.textContent = String(ownedOnly);
-  }
+  function updateHeaderOwned(n){ const el=document.getElementById('ohOwned'); if (el) el.textContent=String(n); }
 
   // Owned IDs page from Reservoir (metadata comes from local JSON)
   function tokensApiUser(addr){ return RESV_HOST + '/users/' + addr + '/tokens/v8'; }
@@ -382,6 +382,7 @@
         rank: (ranks||{})[String(m.id)]
       }));
 
+<<<<<<< HEAD
       // Hydrate stake times
       const stakedBatch = items.filter(x=> x.staked);
       for (const it of stakedBatch){
@@ -390,6 +391,18 @@
           it.sinceMs = ms || null;
         }catch{ it.sinceMs = null; }
       }
+=======
+      // Fill stake times
+      await (async ()=>{
+        const stakedBatch = items.filter(x=> x.staked);
+        for (const it of stakedBatch){
+          try{
+            const ms = await getStakeSinceMs(it.id);
+            it.sinceMs = (ms && ms<1e12) ? ms*1000 : ms;
+          }catch{ it.sinceMs = null; }
+        }
+      })();
+>>>>>>> parent of a42dbe177 (WORKING BACKUP)
 
       renderCards();
 
@@ -407,11 +420,16 @@
             .filter(m=> !items.some(x=> x.id===m.id))
             .map(m=> ({ id:m.id, attrs:m.attrs, staked: stakedSet.has(m.id), sinceMs:null, rank:(FF.RANKS||{})[String(m.id)] }));
           items = items.concat(more);
+<<<<<<< HEAD
           for (const it of more){
             if (it.staked){
               try{ const ms=await getStakeSinceMs(it.id); it.sinceMs=ms||null; }catch{}
             }
           }
+=======
+          // hydrate staked times for the new batch
+          for (const it of more){ if (it.staked){ try{ const ms=await getStakeSinceMs(it.id); it.sinceMs=(ms&&ms<1e12)?ms*1000:ms; }catch{} } }
+>>>>>>> parent of a42dbe177 (WORKING BACKUP)
           renderCards();
         }catch{ toast('Could not load more'); }
       };
@@ -419,8 +437,13 @@
       observer.observe(sentinel);
     }catch(e){
       console.warn('[owned] first page failed', e);
+<<<<<<< HEAD
       const root=$(SEL.grid); if (root) root.innerHTML='<div class="pg-muted">Failed to load frogs for this wallet.</div>';
       updateHeaderOwned(); syncHeights();
+=======
+      const root=$(SEL.grid); if (root) root.innerHTML='<div class="pg-muted">Failed to load owned frogs.</div>';
+      updateHeaderOwned('—'); syncHeights();
+>>>>>>> parent of a42dbe177 (WORKING BACKUP)
     }
   }
 
