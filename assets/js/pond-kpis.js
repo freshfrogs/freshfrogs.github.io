@@ -1,13 +1,14 @@
-// assets/js/pond-kpis.js — Total Staked via Reservoir only (no wallet/web3)
-// Uses tokens/v10 (exact, paginated) then owners/v2 (fast, aggregate) as fallback.
+// assets/js/pond-kpis.js — Total Staked via direct JSON-RPC (no wallet, no Web3)
+// Computes Σ balanceOf(controller_i) on the ERC-721 collection.
 // Also: sets label "🌿 Total Staked", fills Controller link, enforces FLYZ link.
 (function () {
   'use strict';
 
   // ---- constants ----
+  var RPC_URL = (window.CFG && window.CFG.RPC_URL) || 'https://cloudflare-eth.com';
   var FLYZ_URL = 'https://etherscan.io/token/0xd71d2f57819ae4be6924a36591ec6c164e087e63';
 
-  // ---- helpers ----
+  // ---- tiny helpers ----
   function $(s, p){ return (p||document).querySelector(s); }
   function $all(s, p){ return Array.prototype.slice.call((p||document).querySelectorAll(s)); }
   function byId(id){ return document.getElementById(id); }
@@ -15,15 +16,36 @@
   function fmtInt(v){
     try{
       if (v && typeof v==='object' && v.toString) v = v.toString();
-      if (typeof v==='string'){ if (v.indexOf('.')>-1) v=v.split('.')[0]; return isFinite(+v)?(+v).toLocaleString():v.replace(/\B(?=(\d{3})+(?!\d))/g,','); }
+      if (typeof v==='string'){ if (v.indexOf('.')>-1) v=v.split('.')[0];
+        return isFinite(+v) ? (+v).toLocaleString() : v.replace(/\B(?=(\d{3})+(?!\d))/g,','); }
       if (typeof v==='number') return Math.floor(v).toLocaleString();
+      if (typeof v==='bigint') return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g,',');
       return String(v||'—');
     }catch(_){ return String(v||'—'); }
   }
+  function toHex32(addr){ // 32-byte ABI word for address
+    var a = String(addr||'').toLowerCase();
+    if (a.startsWith('0x')) a = a.slice(2);
+    if (a.length !== 40) throw new Error('Bad address: ' + addr);
+    return '000000000000000000000000' + a; // left-pad to 32 bytes
+  }
+  function rpc(body){
+    return fetch(RPC_URL, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function(r){ return r.json(); });
+  }
+  function hexToBigInt(hex){
+    if (!hex) return 0n;
+    var s = String(hex);
+    if (s.startsWith('0x')) s = s.slice(2);
+    if (!s) return 0n;
+    return BigInt('0x' + s);
+  }
 
-  // ---- config ----
+  // ---- config (from window.CFG / window.FF_CFG / window.CONFIG) ----
   var CFG = (window.CFG || window.FF_CFG || window.CONFIG || {});
-
   function getCollection(){
     return (CFG.COLLECTION_ADDRESS || CFG.collectionAddress || '').toLowerCase();
   }
@@ -46,12 +68,6 @@
       if (m) return m[0];
     }
     return '';
-  }
-  function apiHeaders(){
-    var h = { accept: '*/*' };
-    var key = (CFG.FROG_API_KEY || window.RESERVOIR_API_KEY);
-    if (key) h['x-api-key'] = key; // optional
-    return h;
   }
 
   // ---- UI priming ----
@@ -101,89 +117,38 @@
     a.textContent = shorten(addr);
   }
 
-  // ---- Reservoir fetchers ----
-  // Exact but slower: tokens/v10 paging across all controllers
-  function tokensCount(){
-    var collection = getCollection();
-    var controllers = getControllers();
-    if (!collection || !controllers.length) return Promise.reject(new Error('missing addresses'));
-
-    var headers = apiHeaders();
-    function fetchOneController(c){
-      return new Promise(function(resolve, reject){
-        var total = 0;
-        var continuation = null;
-        var guard = 0;
-        function loop(){
-          var base = 'https://api.reservoir.tools/tokens/v10?collection='+collection+'&owner='+c+'&limit=1000&includeTopBid=false';
-          var url  = continuation ? (base + '&continuation=' + encodeURIComponent(continuation)) : base;
-          fetch(url, { method:'GET', headers: headers }).then(function(res){
-            if (!res.ok) throw new Error('tokens/v10 ' + res.status);
-            return res.json();
-          }).then(function(j){
-            var items = j.tokens || [];
-            total += items.length;
-            continuation = j.continuation || null;
-            guard++;
-            if (continuation && guard < 10) loop();
-            else resolve(total);
-          }).catch(reject);
-        }
-        loop();
-      });
-    }
-
-    var promises = [];
-    for (var i=0;i<controllers.length;i++) promises.push(fetchOneController(controllers[i]));
-    return Promise.all(promises).then(function(parts){
-      var sum = 0; for (var k=0;k<parts.length;k++) sum += (parts[k]||0);
-      return sum;
+  // ---- On-chain: Σ balanceOf(controller_i) via direct eth_call ----
+  function balanceOfCall(collection, controller){
+    // function selector: 0x70a08231 (balanceOf(address))
+    var data = '0x70a08231' + toHex32(controller);
+    var body = { jsonrpc: '2.0', id: 1, method: 'eth_call',
+      params: [ { to: collection, data: data }, 'latest' ] };
+    return rpc(body).then(function(resp){
+      if (resp && resp.result != null) return hexToBigInt(resp.result);
+      throw new Error('eth_call error ' + JSON.stringify(resp));
     });
   }
 
-  // Fast aggregate (may lag slightly): owners/v2
-  function ownersCount(){
+  function fetchTotalStaked(){
     var collection = getCollection();
     var controllers = getControllers();
-    if (!collection || !controllers.length) return Promise.reject(new Error('missing addresses'));
-
-    var headers = apiHeaders();
-    function fetchOne(c){
-      var url = 'https://api.reservoir.tools/owners/v2?collection='+collection+'&owner='+c+'&limit=1';
-      return fetch(url, { method:'GET', headers: headers })
-        .then(function(res){ if (!res.ok) throw new Error('owners/v2 ' + res.status); return res.json(); })
-        .then(function(j){
-          var arr = j.owners || j.ownerships || [];
-          if (!arr.length) return 0;
-          var row = arr[0];
-          var cnt = (row.tokenCount!=null) ? row.tokenCount
-                   : (row.ownership && row.ownership.tokenCount!=null) ? row.ownership.tokenCount
-                   : (row.ownerships && row.ownerships[0] && row.ownerships[0].tokenCount!=null) ? row.ownerships[0].tokenCount
-                   : 0;
-          return Number(cnt||0);
-        });
+    if (!collection || !controllers.length) {
+      return Promise.reject(new Error('Missing collection/controller address'));
     }
-
-    var p = [];
-    for (var i=0;i<controllers.length;i++) p.push(fetchOne(controllers[i]));
-    return Promise.all(p).then(function(parts){
-      var sum = 0; for (var k=0;k<parts.length;k++) sum += (parts[k]||0);
-      return sum;
+    // Sum all controller balances in parallel
+    var calls = controllers.map(function(c){ return balanceOfCall(collection, c).catch(function(){ return 0n; }); });
+    return Promise.all(calls).then(function(nums){
+      return nums.reduce(function(acc, n){ return acc + n; }, 0n);
     });
   }
 
   function fillTotalStaked(){
     var out = byId('stakedTotal'); if (!out) return;
-
-    // Prefer exact paged count; fallback to owners aggregate
-    tokensCount().then(function(exact){
-      out.textContent = fmtInt(exact);
-    }).catch(function(){
-      ownersCount().then(function(fast){
-        out.textContent = fmtInt(fast);
-      }).catch(function(){
-        if (!out.textContent || out.textContent.trim()==='') out.textContent = '—';
-      });
+    fetchTotalStaked().then(function(totalBI){
+      out.textContent = fmtInt(totalBI.toString());
+    }).catch(function(err){
+      console.warn('[pond-kpis] RPC total failed:', err && err.message || err);
+      if (!out.textContent || out.textContent.trim()==='') out.textContent = '—';
     });
   }
 
