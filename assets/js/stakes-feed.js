@@ -1,21 +1,21 @@
 // assets/js/stakes-feed.js
-// The Pond (recent activity) — Reservoir-only implementation (no wallet required)
-// Shows stake/unstake activity where the Fresh Frogs controller is either the sender or receiver.
-// Continuation paging (limit=20), classic list look, click row → Etherscan TX.
+// The Pond (recent activity) — Reservoir-only (no wallet)
+// • Shows stake (to controller) and unstake (from controller) transfer events
+// • Endpoint: /users/activity/v6?users=<controller>&types=transfer&collections=<collection>&limit=20
+// • Classic row look; click -> Etherscan; continuation on scroll
 
 (function(FF, CFG){
   'use strict';
 
-  var C = window.FF_CFG || CFG || {};
-  var UL_SEL = '#recentStakes';
-  var HOST   = (C.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
-  var KEY    = C.FROG_API_KEY || '';
-  var CTRL   = (C.CONTROLLER_ADDRESS || '').toLowerCase();
-  var COLL   = (C.COLLECTION_ADDRESS || '').toLowerCase();
-  var CHAIN  = Number(C.CHAIN_ID || 1);
+  var C     = window.FF_CFG || CFG || {};
+  var UL    = '#recentStakes';
+  var HOST  = (C.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
+  var KEY   = C.FROG_API_KEY || '';
+  var CTRL  = (C.CONTROLLER_ADDRESS || '').toLowerCase();
+  var COLL  = (C.COLLECTION_ADDRESS || '').toLowerCase();
+  var CHAIN = Number(C.CHAIN_ID || 1);
 
-  var continuation = null;
-  var busy = false, done = false;
+  var busy=false, done=false, continuation=null;
 
   function $(s,r){ return (r||document).querySelector(s); }
   function shorten(a){ return a ? a.slice(0,6)+'…'+a.slice(-4) : '—'; }
@@ -25,18 +25,23 @@
                CHAIN===5 ? 'https://goerli.etherscan.io/tx/' : 'https://etherscan.io/tx/';
     return base + h;
   }
-
   function setKPIs(){
-    // Controller link & symbol (optional nodes in HTML)
-    var a = $('#stakedController'); if (a && CTRL){ a.textContent = shorten(CTRL); a.href = (CHAIN===1?'https://etherscan.io/address/':CHAIN===11155111?'https://sepolia.etherscan.io/address/':CHAIN===5?'https://goerli.etherscan.io/address/':'https://etherscan.io/address/') + C.CONTROLLER_ADDRESS; }
+    var a = $('#stakedController');
+    if (a && CTRL){
+      var base = CHAIN===1 ? 'https://etherscan.io/address/' :
+                 CHAIN===11155111 ? 'https://sepolia.etherscan.io/address/' :
+                 CHAIN===5 ? 'https://goerli.etherscan.io/address/' : 'https://etherscan.io/address/';
+      a.textContent = shorten(CTRL);
+      a.href = base + C.CONTROLLER_ADDRESS;
+    }
     var sym = $('#pondRewardsSymbol'); if (sym) sym.textContent = (C.REWARD_TOKEN_SYMBOL || '$FLYZ');
   }
 
-  // Row template (classic)
+  // Classic look
   function rowHTML(e){
     var title = e.kind==='stake' ? 'Staked' : 'Unstaked';
-    var when = e.time ? new Date(e.time*1000).toLocaleString() : '—';
-    var img = (C.SOURCE_PATH||'') + '/frog/' + (e.id || 0) + '.png';
+    var when  = e.time ? new Date(e.time*1000).toLocaleString() : '—';
+    var img   = (C.SOURCE_PATH||'') + '/frog/' + (e.id || 0) + '.png';
     return (
       '<li class="row" data-kind="'+e.kind+'">'+
         '<img class="thumb64" src="'+img+'" alt="'+e.id+'">'+
@@ -47,11 +52,13 @@
   }
 
   async function fetchPage(){
-    if (!KEY) throw new Error('Missing Reservoir API key (FF_CFG.FROG_API_KEY)');
-    // Using users/activity keeps this walletless; we filter to our collection and classify stake/unstake
+    if (!KEY) throw new Error('Missing FF_CFG.FROG_API_KEY');
+
     var u = new URL(HOST + '/users/activity/v6');
-    u.searchParams.set('users', C.CONTROLLER_ADDRESS);
-    u.searchParams.set('limit', '20');
+    u.searchParams.set('users', C.CONTROLLER_ADDRESS);   // controller-centric activity
+    u.searchParams.set('types', 'transfer');             // we only want transfers
+    if (C.COLLECTION_ADDRESS) u.searchParams.set('collections', C.COLLECTION_ADDRESS); // just our frogs
+    u.searchParams.set('limit', '20');                   // page size
     if (continuation) u.searchParams.set('continuation', continuation);
 
     var res = await fetch(u.toString(), { headers:{ accept:'application/json', 'x-api-key': KEY }});
@@ -65,23 +72,24 @@
     var out=[], rows = Array.isArray(j.activities) ? j.activities : [];
     for (var i=0;i<rows.length;i++){
       var r = rows[i] || {};
-      var id = Number(r.token?.tokenId || r.tokenId);
-      if (!Number.isFinite(id)) continue;
+      // Defensively read fields across schema variants
+      var token   = r.token || {};
+      var id      = Number(token.tokenId || r.tokenId);
+      var from    = (r.fromAddress || r.from || '').toLowerCase();
+      var to      = (r.toAddress   || r.to   || '').toLowerCase();
+      var ts      = Number(r.timestamp || (r.createdAt && Math.floor(new Date(r.createdAt).getTime()/1000))) || null;
+      var tx      = r.txHash || r.transactionHash || '';
 
-      // keep only our collection
-      var col = (r.token?.contract || r.collection || r.contract || '').toLowerCase();
-      if (COLL && col && col !== COLL) continue;
+      if (!Number.isFinite(id) || !from || !to) continue;
 
-      var from = (r.fromAddress || r.from || '').toLowerCase();
-      var to   = (r.toAddress   || r.to   || '').toLowerCase();
-      if (!from || !to) continue;
+      // Restrict to our collection if API returns mixed collections
+      var contract = (token.contract || r.contract || '').toLowerCase();
+      if (COLL && contract && contract !== COLL) continue;
 
-      // Classify: stake = to===controller; unstake = from===controller
-      var kind = to===CTRL ? 'stake' : (from===CTRL ? 'unstake' : null);
+      var kind = (to===CTRL) ? 'stake' : (from===CTRL ? 'unstake' : null);
       if (!kind) continue;
 
-      var ts = Number(r.timestamp || (r.createdAt && Math.floor(new Date(r.createdAt).getTime()/1000))) || null;
-      out.push({ kind, id, from:r.fromAddress||r.from||'', to:r.toAddress||r.to||'', time:ts, tx:r.txHash||r.transactionHash||'' });
+      out.push({ kind, id, from:r.fromAddress||r.from||'', to:r.toAddress||r.to||'', time:ts, tx:tx });
     }
     // newest first
     out.sort(function(a,b){ return (b.time||0)-(a.time||0); });
@@ -128,8 +136,9 @@
 
   function init(){
     setKPIs();
-    var ul = $(UL_SEL); if (!ul) return;
-    ul.innerHTML = ''; // classic: no “loading…” row
+    var ul = $(UL); if (!ul) return;
+    ul.innerHTML = ''; // no "loading..." line, matches classic look
+    done = false; busy = false; continuation = null;
     attachScroll(ul);
   }
 
