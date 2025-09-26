@@ -186,25 +186,21 @@
     document.addEventListener('DOMContentLoaded', layoutFrogStrip);
   </script>
 
-<!-- Config & shared helpers -->
+<!-- libs (Web3 or Ethers BEFORE adapter) -->
 <script src="https://cdn.jsdelivr.net/npm/web3@1.10.4/dist/web3.min.js"></script>
+
+<!-- config & utils -->
 <script src="assets/js/config.js"></script>
 <script src="assets/js/utils.js"></script>
-<script src="assets/js/rarity.js"></script>
-<script src="assets/js/modal.js"></script>
 
-<!-- ABIs must come from /assets/abi -->
-<script src="assets/abi/collection_abi.js"></script>
+<!-- ABIs MUST be before the adapter -->
 <script src="assets/abi/controller_abi.js"></script>
+<script src="assets/abi/collection_abi.js"></script>
 
-<!-- Panels / features (all from /assets/js) -->
-<script src="assets/js/pond.js"></script>
-<script src="assets/js/wallet-state.js"></script>
-<script src="assets/js/wallet.js"></script>
-<script src="assets/js/staking-adapter.js"></script>  <!-- ✅ correct path -->
-<script src="assets/js/pond-kpis.js"></script>
-<script src="assets/js/stakes-feed.js"></script>
-<script src="assets/js/pond-tweaks.js"></script>
+<!-- adapter (uses FF_CFG + window.CONTROLLER_ABI) -->
+<script src="assets/js/staking-adapter.js"></script>
+
+<!-- your existing panels (owned-panel.js uses FF.staking) -->
 <script src="assets/js/owned-panel.js"></script>
 
 <script>
