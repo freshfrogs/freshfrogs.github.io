@@ -1,154 +1,192 @@
 // assets/js/stakes-feed.js
-// Recent Staking Activity (Reservoir) — mirrors mints-feed style.
-// Renders into <ul id="recentStakes"> using your existing .row / .pill styles.
+// Recent Staking Activity — mirrors mints-feed rendering & behaviour.
+// Data source: Reservoir users+collection filter; classifies stake/unstake by controller.
+// Renders into <ul id="recentStakes">. No visual changes required.
 
-(function () {
-  'use strict';
+(function (FF, CFG) {
+  const UL_ID = 'recentStakes';
 
-  // --- Config ---------------------------------------------------------------
-  const C     = window.FF_CFG || {};
-  const HOST  = (C.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
-  const KEY   = C.FROG_API_KEY || C.RESERVOIR_API_KEY || '';
-  const CTRL  = (C.CONTROLLER_ADDRESS || '').toLowerCase();
-  const COLL  = (C.COLLECTION_ADDRESS || '').toLowerCase();
-  const LIMIT = 20;
+  // ---- Config ---------------------------------------------------------------
+  const BASE  = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
+  const API   = BASE + '/users/activity/v6';
+  const PAGE_SIZE = Math.max(1, Math.min(50, Number(CFG.PAGE_SIZE || 5)));
+  const MAX_PAGES = Math.max(1, Number(CFG.MAX_PAGES || 8));
 
-  // --- DOM helpers ----------------------------------------------------------
-  const $  = s => document.querySelector(s);
-  const el = id => document.getElementById(id);
+  function need(k){ if(!CFG[k]) throw new Error('[stakes] Missing FF_CFG.'+k); return CFG[k]; }
+  const API_KEY    = need('FROG_API_KEY');
+  const CONTROLLER = need('CONTROLLER_ADDRESS').toLowerCase();
+  const COLLECTION = need('COLLECTION_ADDRESS');
 
-  function fmtAgo(ts){
-    if (!ts) return '';
-    const ms = Date.now() - ts * 1000;
-    const d = Math.floor(ms / 86400000); if (d > 0) return `${d}d ago`;
-    const h = Math.floor(ms % 86400000 / 3600000); if (h > 0) return `${h}h ago`;
-    const m = Math.max(0, Math.floor(ms % 3600000 / 60000)); return `${m}m ago`;
+  // ---- Headers --------------------------------------------------------------
+  function apiHeaders(){
+    if (FF.apiHeaders && typeof FF.apiHeaders === 'function') return FF.apiHeaders();
+    return { accept: 'application/json', 'x-api-key': API_KEY };
   }
 
-  function rowHTML({ kind, tokenId, tx, timestamp }) {
-    const pill = kind === 'stake' ? 'pill-green' : 'pill-gray';
-    const label = kind === 'stake' ? 'Staked' : 'Unstaked';
-    const ago = fmtAgo(timestamp);
-    return `
-      <div class="mono">#${tokenId}</div>
-      <div class="muted">${ago}</div>
-      <div class="pill ${pill}" style="margin-left:auto;">${label}</div>
-    `;
-  }
-
-  function renderRow(targetUL, data) {
-    const li = document.createElement('li');
-    li.className = 'row';
-    li.innerHTML = rowHTML(data);
-    if (data.tx) {
-      li.style.cursor = 'pointer';
-      li.addEventListener('click', () => window.open(`https://etherscan.io/tx/${data.tx}`, '_blank'));
+  // ---- Shared queue (same as mints-feed) ------------------------------------
+  (function ensureQueue(){
+    if (window.FF_RES_QUEUE) return;
+    const RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 800);
+    const BACKOFFS = Array.isArray(CFG.RETRY_BACKOFF_MS) ? CFG.RETRY_BACKOFF_MS : [900, 1700, 3200];
+    let lastAt = 0, chain = Promise.resolve();
+    const sleep = (ms)=> new Promise(r=>setTimeout(r, ms));
+    async function spacedFetch(url, init){
+      const delta = Date.now() - lastAt;
+      if (delta < RATE_MIN_MS) await sleep(RATE_MIN_MS - delta);
+      lastAt = Date.now();
+      return fetch(url, init);
     }
-    targetUL.appendChild(li);
+    async function run(url, init){
+      const hdrs = Object.assign({}, apiHeaders(), init && init.headers || {});
+      let i = 0;
+      while (true){
+        const res = await spacedFetch(url, { headers: hdrs });
+        if (res.status === 429){ await sleep(BACKOFFS[Math.min(i++, BACKOFFS.length-1)]); continue; }
+        if (!res.ok){ const t = await res.text().catch(()=> ''); const e = new Error(`HTTP ${res.status}${t?' — '+t:''}`); e.url=url; throw e; }
+        return res.json();
+      }
+    }
+    window.FF_RES_QUEUE = { fetch(url, init){ chain = chain.then(()=> run(url, init)); return chain; } };
+  })();
+
+  // ---- Utils ----------------------------------------------------------------
+  const shorten = (a)=> (FF.shorten && FF.shorten(a)) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
+  const ago     = (d)=> d ? (FF.formatAgo ? FF.formatAgo(Date.now()-d.getTime())+' ago' : d.toLocaleString()) : '';
+  const imgFor  = (id)=> (CFG.SOURCE_PATH || '') + '/frog/' + id + '.png';
+
+  function txUrl(hash){
+    if (!hash) return null;
+    if (CFG.ETHERSCAN_TX_BASE) return CFG.ETHERSCAN_TX_BASE.replace(/\/+$/,'') + '/' + hash;
+    const chainId = Number(CFG.CHAIN_ID || 1);
+    const base =
+      chainId === 1        ? 'https://etherscan.io/tx/' :
+      chainId === 11155111 ? 'https://sepolia.etherscan.io/tx/' :
+      'https://etherscan.io/tx/';
+    return base + hash;
   }
 
-  // --- Fetch (users + collection + transfer) --------------------------------
-  async function fetchPage(continuation = null) {
-    if (!CTRL) throw new Error('Missing FF_CFG.CONTROLLER_ADDRESS');
-    if (!COLL) throw new Error('Missing FF_CFG.COLLECTION_ADDRESS');
+  // ---- DOM helpers (identical behaviour to mints) ---------------------------
+  function ul(){ return document.getElementById(UL_ID); }
+  function applyVisibleRows(root){
+    if (!root) return;
+    root.classList.add('scrolling'); root.style.overflowY='auto';
+    const visible = Number(root.getAttribute('data-visible')) || Number(CFG.STAKES_VISIBLE || 6);
+    const r0 = root.querySelector('.row'); if (!r0){ root.style.maxHeight=''; return; }
+    const gap = parseFloat(getComputedStyle(root).gap || '0') || 0;
+    const h = r0.getBoundingClientRect().height || 84;
+    root.style.maxHeight = Math.round(h*visible + gap*(visible-1))+'px';
+  }
+  function ensureSentinel(root){
+    let s = root.querySelector('li[data-sentinel]');
+    if (!s){ s=document.createElement('li'); s.setAttribute('data-sentinel','1'); s.innerHTML = '<div class="pg-muted">Loading more…</div>'; root.appendChild(s); }
+    return s;
+  }
+  function setSentinelText(root, t){ const s=root.querySelector('li[data-sentinel]'); if (s) s.innerHTML = '<div class="pg-muted">'+t+'</div>'; }
 
+  // ---- Mapping --------------------------------------------------------------
+  function mapRow(a){
+    const type = a?.event?.kind || a?.type;                 // "transfer"
+    if (type !== 'transfer') return null;
+
+    const from = (a?.event?.fromAddress || a?.fromAddress || a?.from || '').toLowerCase();
+    const to   = (a?.event?.toAddress   || a?.toAddress   || a?.to   || '').toLowerCase();
+
+    let kind=null, other=null;                               // show the non-controller address like mints list
+    if (to === CONTROLLER){ kind='stake';   other = from; }
+    else if (from === CONTROLLER){ kind='unstake'; other = to; }
+    else return null;
+
+    const tokenId = Number(a?.token?.tokenId ?? a?.tokenId);
+    const ts = a?.timestamp ?? a?.createdAt;
+    let dt = null;
+    if (typeof ts === 'number') dt = new Date(ts < 1e12 ? ts*1000 : ts);
+    else if (typeof ts === 'string'){ const p = Date.parse(ts); if (!isNaN(p)) dt = new Date(p); }
+    const tx = a?.txHash || a?.transactionHash || null;
+
+    return { id: tokenId, other, time: dt, img: imgFor(tokenId), tx, kind };
+  }
+
+  // ---- Fetch page (users + collection + transfer) ---------------------------
+  async function fetchPage(cont){
     const qs = new URLSearchParams({
-      users: C.CONTROLLER_ADDRESS,
-      collection: C.COLLECTION_ADDRESS,
+      users: CONTROLLER,
+      collection: COLLECTION,
       types: 'transfer',
-      limit: String(LIMIT)
+      limit: String(PAGE_SIZE)
     });
-    if (continuation) qs.set('continuation', continuation);
-
-    const res = await fetch(`${HOST}/users/activity/v6?${qs.toString()}`, {
-      headers: { accept: 'application/json', ...(KEY ? { 'x-api-key': KEY } : {}) }
-    });
-    if (!res.ok) throw new Error(`Reservoir ${res.status}`);
-
-    const j = await res.json();
-
-    // Robust address extraction: event.* or top-level *Address/* fields
-    const rows = (j.activities || []).flatMap(a => {
-      const type = a.event?.kind || a.type;
-      if (type !== 'transfer') return [];
-      const from = (a.event?.fromAddress || a.fromAddress || a.from || '').toLowerCase();
-      const to   = (a.event?.toAddress   || a.toAddress   || a.to   || '').toLowerCase();
-
-      let kind = null;
-      if (to === CTRL) kind = 'stake';
-      else if (from === CTRL) kind = 'unstake';
-      else return [];
-
-      return [{
-        kind,
-        tokenId: Number(a.token?.tokenId ?? a.tokenId) || null,
-        tx: a.txHash || a.transactionHash || null,
-        timestamp: a.timestamp || null
-      }];
-    });
-
-    return { rows, continuation: j.continuation || null };
+    if (cont) qs.set('continuation', cont);
+    const json = await window.FF_RES_QUEUE.fetch(API + '?' + qs.toString());
+    const rows = (json?.activities || []).map(mapRow).filter(Boolean);
+    return { rows, continuation: json?.continuation || null };
   }
 
-  // --- Mount + infinite scroll ----------------------------------------------
-  let cont = null, busy = false, booted = false, listEl = null;
+  // ---- Render + infinite scroll --------------------------------------------
+  let items=[], continuation=null, pageCount=0, loading=false, io=null;
 
-  async function loadPage() {
-    if (busy) return;
-    if (!listEl) listEl = el('recentStakes') || $('[data-pond-list]');
-    if (!listEl) return;
-
-    busy = true;
-    try {
-      const { rows, continuation } = await fetchPage(cont);
-      cont = continuation;
-
-      if (!booted) {
-        listEl.innerHTML = '';
-        listEl.classList.add('scrolling'); // matches your CSS
-        booted = true;
-      }
-
-      if (!rows.length && !cont && !listEl.children.length) {
-        listEl.innerHTML = `<li class="row"><div class="pg-muted">No recent stakes/unstakes found.</div></li>`;
-        return;
-      }
-
-      const frag = document.createDocumentFragment();
-      rows.forEach(r => { if (r && r.tokenId != null) renderRow(frag, r); });
-      listEl.appendChild(frag);
-    } catch (e) {
-      console.warn('[pond] recent activity failed:', e);
-      if (!booted && listEl) {
-        const hint = location.protocol === 'file:' ? ' (file:// origin blocked)' : '';
-        listEl.innerHTML = `<li class="row"><div class="pg-muted">Unable to load recent activity${hint}. Check API key / origin.</div></li>`;
-      }
-    } finally { busy = false; }
+  function renderAll(root){
+    root.innerHTML='';
+    if (!items.length){
+      root.innerHTML = '<li class="row"><div class="pg-muted">No recent stakes yet.</div></li>';
+    } else {
+      items.forEach(it=>{
+        const meta = [ it.other ? '→ '+shorten(it.other) : null, it.time ? ago(it.time) : null ].filter(Boolean).join(' • ');
+        const li = document.createElement('li'); li.className='row';
+        const href = txUrl(it.tx);
+        if (href){ li.title='View transaction on Etherscan'; li.addEventListener('click', ()=> window.open(href,'_blank','noopener')); }
+        li.innerHTML =
+          (FF.thumb64 ? FF.thumb64(it.img, 'Frog '+it.id) : '<img class="thumb64" src="'+it.img+'" alt="'+it.id+'">') +
+          '<div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b>'+ (it.kind==='stake'?'Staked':'Unstaked') +'</b> • Frog #'+it.id+
+          '</div><div class="pg-muted">'+meta+(href?' • Etherscan':'')+'</div></div>';
+        root.appendChild(li);
+      });
+      ensureSentinel(root);
+      setSentinelText(root, (!continuation || pageCount>=MAX_PAGES) ? 'End of results' : 'Loading more…');
+    }
+    requestAnimationFrame(()=> applyVisibleRows(root));
   }
 
-  function attachInfiniteScroll() {
-    const wrap = el('pondListWrap') || (listEl ? listEl.parentElement : null) || window;
-    const target = wrap === window ? document.documentElement : wrap;
-    wrap.addEventListener('scroll', () => {
-      const nearBottom = (wrap === window)
-        ? (window.scrollY + window.innerHeight >= target.scrollHeight - 200)
-        : (wrap.scrollTop + wrap.clientHeight >= wrap.scrollHeight - 50);
-      if (nearBottom && cont) loadPage();
-    });
+  async function loadFirstPage(root){
+    loading=true;
+    try{
+      const first = await fetchPage(null);
+      items = first.rows.sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
+      continuation = first.continuation; pageCount = 1;
+      renderAll(root);
+    }catch(e){
+      console.warn('[stakes] first page failed', e);
+      root.innerHTML = '<li class="row"><div class="pg-muted">Could not load recent stakes.</div></li>';
+    }finally{ loading=false; }
   }
 
-  // Public init (same as index.html feed)
-  window.FF_loadRecentStakes = function () {
-    listEl = el('recentStakes') || $('[data-pond-list]');
-    if (!listEl) return;
-    loadPage();
-    attachInfiniteScroll();
+  async function loadNextPage(root){
+    if (!continuation || loading) return;
+    loading=true;
+    try{
+      const next = await fetchPage(continuation);
+      continuation = next.continuation; pageCount += 1;
+      items = items.concat(next.rows).sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
+      renderAll(root);
+    }catch(e){
+      console.warn('[stakes] next page failed', e);
+      setSentinelText(root, 'Could not load more.');
+    }finally{ loading=false; }
+  }
+
+  function attachObserver(root){
+    if (io) { try { io.disconnect(); } catch{} io=null; }
+    const s = ensureSentinel(root);
+    io = new IntersectionObserver((entries)=>{
+      entries.forEach(en=>{
+        if (en.isIntersecting){ loadNextPage(root); }
+      });
+    }, { root, rootMargin: '100px' });
+    io.observe(s);
+  }
+
+  // ---- Public init ----------------------------------------------------------
+  window.FF_loadRecentStakes = function(){
+    const root = ul(); if (!root) return;
+    loadFirstPage(root);
+    attachObserver(root);
   };
-
-  // Auto-boot (safe if you also call it explicitly)
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => window.FF_loadRecentStakes && window.FF_loadRecentStakes());
-  } else {
-    window.FF_loadRecentStakes && window.FF_loadRecentStakes();
-  }
-})();
+})(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
