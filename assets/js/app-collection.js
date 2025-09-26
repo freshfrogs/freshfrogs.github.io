@@ -2,20 +2,22 @@
 // FreshFrogs collection runtime (single file)
 //
 // Panels:
-//  - The Pond (recent activity): Reservoir-first (no wallet/RPC required)
-//      • Stake   = ERC721 Transfer(to == CONTROLLER_ADDRESS)
-//      • Unstake = ERC721 Transfer(from == CONTROLLER_ADDRESS)
-//      • (Optional) augment with RewardsClaimed via RPC logs if available
+//  - The Pond (recent activity): Reservoir Activities first (no wallet/RPC required)
+//      • Stake   = activity.transfer with toAddress == CONTROLLER_ADDRESS
+//      • Unstake = activity.transfer with fromAddress == CONTROLLER_ADDRESS
+//      • (Optional) augment with RewardsClaimed via RPC logs
 //  - Owned ∪ Staked panel: merges Reservoir owned tokens with controller.getStakedTokens
 //      • Stake/Unstake/Claim actions
 //      • Unclaimed Rewards KPI
+//      • "Staked X ago (MM/DD/YY)" per staked card
 //
-// Requirements in window.FF_CFG (from assets/js/config.js):
-//   CHAIN_ID, COLLECTION_ADDRESS, CONTROLLER_ADDRESS
-//   RESERVOIR_HOST, FROG_API_KEY (required for reliable owned + pond via Reservoir)
+// Requires window.FF_CFG (assets/js/config.js):
+//   CHAIN_ID, COLLECTION_ADDRESS, CONTROLLER_ADDRESS (required)
+//   RESERVOIR_HOST, FROG_API_KEY (required for Reservoir calls)
 //   SOURCE_PATH (where /frog/<id>.png and /frog/json/<id>.json live)
-//   REWARD_TOKEN_SYMBOL, REWARD_DECIMALS (optional defaults)
-//   RPC_URL (optional; only needed for claim-logs augmentation and contract reads if wallet not connected)
+//   REWARD_TOKEN_SYMBOL, REWARD_DECIMALS
+//   CONTROLLER_DEPLOY_BLOCK (first block to scan for stake timestamps)
+//   RPC_URL (optional; used for contract reads + claims augmentation)
 
 (function(){
 'use strict';
@@ -36,9 +38,10 @@ var SYM       = C.REWARD_TOKEN_SYMBOL || '$FLYZ';
 var DEC       = Number.isFinite(Number(C.REWARD_DECIMALS)) ? Number(C.REWARD_DECIMALS) : 18;
 var PAGE      = Math.max(1, Math.min(50, Number(C.OWNED_PAGE_SIZE || C.PAGE_SIZE || 24)));
 var ACT_WINDOW = Number(C.ACTIVITY_BLOCK_WINDOW || 1500);
+var DEPLOY_BLOCK = Number(C.CONTROLLER_DEPLOY_BLOCK || 0);
 
 /* -------------------------------------------------------
-   Web3 (optional; used for controller reads/writes + claims augmentation)
+   Web3 (optional; used for controller reads/writes + claims + stake timestamps)
 ------------------------------------------------------- */
 function defaultRpcFor(chainId){
   switch (Number(chainId||1)) {
@@ -57,7 +60,6 @@ var WEB3 = window.web3;
     window.web3 = WEB3;
     return;
   }
-  // Fallback RPC (read-only) to enable controller reads/claims augmentation without a wallet
   if (window.Web3) {
     var rpc = C.RPC_URL || defaultRpcFor(CHAIN_ID);
     try {
@@ -96,6 +98,14 @@ function formatToken(raw){
     var out = Number(whole)+cents/100;
     return (out%1===0? out.toFixed(0) : out.toFixed(2));
   }catch(e){ return '—'; }
+}
+function timeAgo(ts){
+  if (!ts) return '—';
+  var diff = Math.max(0, (Date.now()/1000) - ts);
+  var d = Math.floor(diff/86400), h = Math.floor((diff%86400)/3600), m = Math.floor((diff%3600)/60);
+  if (d>0) return d+'d '+h+'h ago';
+  if (h>0) return h+'h '+m+'m ago';
+  return m+'m ago';
 }
 
 /* -------------------------------------------------------
@@ -172,7 +182,7 @@ async function getUserStakedTokens(user){
     if (!controller) return [];
     var raw = await controller.methods.getStakedTokens(user).call();
     return normalizeIds(raw);
-  }catch(e){ return []; }
+  }catch(e){ console.warn('[owned] getStakedTokens failed', e); return []; }
 }
 async function availableRewards(user){
   if (!controller) return '0';
@@ -204,8 +214,31 @@ async function unstakeToken(id){
   return controller.methods.withdraw(id).send({ from:a, gas:WEB3.utils.toHex(est), gasPrice:WEB3.utils.toHex(gp) });
 }
 
+/* Stake timestamp (for "staked X ago") */
+var stakeTimeCache = new Map();
+async function getStakeTimestamp(tokenId){
+  if (!WEB3?.eth) return null;
+  if (stakeTimeCache.has(tokenId)) return stakeTimeCache.get(tokenId);
+  try{
+    var TRANSFER = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+    var toTopic   = '0x000000000000000000000000'+CTRL_ADDR.slice(2);
+    var logs = await WEB3.eth.getPastLogs({
+      fromBlock: DEPLOY_BLOCK ? '0x'+DEPLOY_BLOCK.toString(16) : '0x0',
+      toBlock:   'latest',
+      address: NFT_ADDR_RAW,
+      topics: [ TRANSFER, null, toTopic, '0x'+BigInt(tokenId).toString(16).padStart(64,'0') ]
+    });
+    if (!logs.length){ stakeTimeCache.set(tokenId,null); return null; }
+    var last = logs[logs.length-1];
+    var blk = await WEB3.eth.getBlock(last.blockNumber).catch(function(){return null;});
+    var ts = blk && blk.timestamp || null;
+    stakeTimeCache.set(tokenId, ts);
+    return ts;
+  }catch(e){ console.warn('stake time fail', tokenId, e); return null; }
+}
+
 /* -------------------------------------------------------
-   The Pond: Reservoir-first activity (stake/unstake)
+   The Pond: Reservoir Activities first (stake/unstake)
    - No wallet/RPC required
    - Optional: augment with claim events via RPC logs
 ------------------------------------------------------- */
@@ -252,46 +285,71 @@ var POND = (function(){
     var sym=$('#pondRewardsSymbol'); if (sym) sym.textContent = SYM;
   }
 
-  // -------- Reservoir transfers page
-  async function fetchReservoirPage(){
-    var url = new URL(RESV_HOST + '/transfers/v1');
-    url.searchParams.set('collection', NFT_ADDR_RAW);
-    url.searchParams.set('limit', '50');
-    url.searchParams.set('sortBy', 'timestamp');
-    url.searchParams.set('sortDirection', 'desc');
-    if (continuation) url.searchParams.set('continuation', continuation);
-
+  // ---- Reservoir activities (multi-version fallback)
+  async function fetchActivitiesPage(){
     var headers = { accept:'application/json' };
     if (API_KEY) headers['x-api-key'] = API_KEY;
 
-    var res = await fetch(url.toString(), { headers });
-    if (!res.ok) throw new Error('Reservoir transfers failed: '+res.status);
-    var j = await res.json();
+    // Try v6
+    var u6 = new URL(RESV_HOST + '/activities/v6');
+    u6.searchParams.set('collection', NFT_ADDR_RAW);
+    u6.searchParams.set('limit', '50');
+    u6.searchParams.set('types', 'transfer'); // filter to transfers
+    if (continuation) u6.searchParams.set('continuation', continuation);
 
-    var rows = Array.isArray(j.transfers) ? j.transfers
-             : (Array.isArray(j.activities) ? j.activities : []);
+    var res = await fetch(u6.toString(), { headers });
+    if (res.status === 404) {
+      // v5 fallback
+      var u5 = new URL(RESV_HOST + '/activities/v5');
+      u5.searchParams.set('collection', NFT_ADDR_RAW);
+      u5.searchParams.set('limit', '50');
+      u5.searchParams.set('types', 'transfer');
+      if (continuation) u5.searchParams.set('continuation', continuation);
+      res = await fetch(u5.toString(), { headers });
+
+      if (res.status === 404) {
+        // legacy collections activity
+        var ul = new URL(RESV_HOST + '/events/collections/activity/v5');
+        ul.searchParams.set('collection', NFT_ADDR_RAW);
+        ul.searchParams.set('limit', '50');
+        ul.searchParams.set('types', 'transfer');
+        if (continuation) ul.searchParams.set('continuation', continuation);
+        res = await fetch(ul.toString(), { headers });
+      }
+    }
+    if (!res.ok) {
+      var txt = await res.text().catch(function(){return '';});
+      throw new Error('Reservoir activities failed: '+res.status+' '+txt);
+    }
+    var j = await res.json();
+    var rows = Array.isArray(j.activities) ? j.activities : (Array.isArray(j.events) ? j.events : []);
     continuation = j.continuation || null;
 
     var out = [];
     for (var i=0;i<rows.length;i++){
       var r = rows[i] || {};
-      var from = (r.from || r.fromAddress || '').toLowerCase();
-      var to   = (r.to || r.toAddress || '').toLowerCase();
+      var from = (r.fromAddress || r.from || '').toLowerCase();
+      var to   = (r.toAddress || r.to || '').toLowerCase();
       var id   = Number(r.token?.tokenId || r.tokenId);
       if (!Number.isFinite(id)) continue;
 
+      var ts = Number(r.timestamp || r.blockTimestamp || (r.createdAt && Math.floor(new Date(r.createdAt).getTime()/1000))) || null;
+      var tx = r.txHash || r.txhash || r.transactionHash || '';
+
       if (to === CTRL_LC){
-        out.push({ kind:'stake', id, from:r.from || r.fromAddress || '', to:r.to || r.toAddress || '', tx:r.txHash || r.txhash || r.transactionHash || '', time: Number(r.timestamp || r.blockTimestamp || (r.createdAt && Math.floor(new Date(r.createdAt).getTime()/1000))) || null });
+        out.push({ kind:'stake', id, from: r.fromAddress || r.from || '', to: r.toAddress || r.to || '', tx, time: ts });
       } else if (from === CTRL_LC){
-        out.push({ kind:'unstake', id, from:r.from || r.fromAddress || '', to:r.to || r.toAddress || '', tx:r.txHash || r.txhash || r.transactionHash || '', time: Number(r.timestamp || r.blockTimestamp || (r.createdAt && Math.floor(new Date(r.createdAt).getTime()/1000))) || null });
+        out.push({ kind:'unstake', id, from: r.fromAddress || r.from || '', to: r.toAddress || r.to || '', tx, time: ts });
       }
     }
     return out;
   }
 
-  // -------- Optional: claims via RPC (augmentation; not required)
+  // ---- Optional claims via RPC (augmentation)
   async function fetchClaimsRPC(){
-    if (!WEB3?.eth || !T_REWARD || !CTRL_ADDR_RAW) return [];
+    if (!WEB3?.eth) return [];
+    var T_REWARD;
+    try { T_REWARD = WEB3.utils.sha3('RewardsClaimed(address,uint256)'); } catch(e){ return []; }
     try{
       var tip = await WEB3.eth.getBlockNumber();
       var from = Math.max(0, tip - Number(ACT_WINDOW));
@@ -321,12 +379,11 @@ var POND = (function(){
       if (!NFT_ADDR_RAW || !CTRL_ADDR_RAW){
         diag('Missing FF_CFG.COLLECTION_ADDRESS or FF_CFG.CONTROLLER_ADDRESS'); done=true; return;
       }
-      // Require API key for Reservoir-first experience
       if (!API_KEY){
         diag('Reservoir API key missing (FF_CFG.FROG_API_KEY).'); done=true; return;
       }
 
-      var rows = await fetchReservoirPage();
+      var rows = await fetchActivitiesPage();
 
       // augment with claim events (non-blocking)
       fetchClaimsRPC().then(function(claims){
@@ -383,7 +440,6 @@ var POND = (function(){
     setStaticKPIs();
     var ul = document.querySelector(UL); if(!ul) return;
     ul.innerHTML = '<li class="row"><div class="pg-muted">Loading recent activity…</div></li>';
-
     attachScroll(ul);
   }
 
@@ -399,20 +455,22 @@ var OWNED = (function(){
   var idsStaked=[], items=[], cont=null;
   var rewards='—';
 
-  // Small scoped CSS for bullets + header
+  // Scoped CSS + fixed max height (wheel-scroll)
   (function injectOwnedCSS(){
     if (document.getElementById('owned-clean-css')) return;
     var s=document.createElement('style'); s.id='owned-clean-css';
     s.textContent=[
+      '#ownedCard{display:flex;flex-direction:column}',
       '#ownedCard .oh-wrap{margin-bottom:10px}',
       '#ownedCard .oh-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}',
       '#ownedCard .oh-mini{font-size:11px;line-height:1}',
       '#ownedCard .oh-spacer{flex:1}',
       '#ownedCard .oh-btn{font-family:var(--font-ui);border:1px solid var(--border);background:transparent;color:inherit;border-radius:8px;padding:6px 10px;font-weight:700;font-size:12px;line-height:1;display:inline-flex;align-items:center;gap:6px;text-decoration:none;letter-spacing:.01em;transition:background .15s,border-color .15s,color .15s,transform .05s}',
       '#ownedCard .oh-btn:hover{background: color-mix(in srgb,#22c55e 14%,var(--panel));border-color: color-mix(in srgb,#22c55e 80%,var(--border));color: color-mix(in srgb,#ffffff 85%,#22c55e)}',
-      '#ownedGrid{overflow:auto;-webkit-overflow-scrolling:touch;padding-right:4px}',
+      '#ownedGrid{flex:1 1 auto;max-height:60vh;overflow:auto;-webkit-overflow-scrolling:touch;padding-right:4px}',
       '#ownedCard .attr-bullets{list-style:disc;margin:6px 0 0 18px;padding:0}',
-      '#ownedCard .attr-bullets li{font-size:12px;margin:2px 0}'
+      '#ownedCard .attr-bullets li{font-size:12px;margin:2px 0}',
+      '#ownedCard .staked-ago{font-size:12px;color:var(--muted)}'
     ].join('');
     document.head.appendChild(s);
   })();
@@ -452,19 +510,9 @@ var OWNED = (function(){
   }
 
   function syncHeights(){
-    if (window.matchMedia('(max-width: 960px)').matches){
-      var oc=document.getElementById('ownedCard'); if(oc) oc.style.height='';
-      var og=document.getElementById('ownedGrid'); if(og) og.style.maxHeight='';
-      return;
-    }
-    var left=document.querySelectorAll('.page-grid > .pg-card')[0];
-    var right=document.getElementById('ownedCard'); if(!left||!right) return;
-    right.style.height=left.offsetHeight+'px';
-    var header=right.querySelector('.oh-wrap'); var headerH=header?header.offsetHeight+10:0;
-    var pad=20; var maxH=left.offsetHeight-headerH-pad;
-    var grid=document.getElementById('ownedGrid'); if(grid) grid.style.maxHeight=Math.max(160,maxH)+'px';
+    // Left card height is flexible now; just ensure owned stays under viewport (handled by max-height)
+    // This function can be used to adjust if needed in the future.
   }
-  window.addEventListener('resize', function(){ setTimeout(syncHeights,60); });
 
   // Cards
   function attrsHTML(attrs, max){
@@ -476,7 +524,15 @@ var OWNED = (function(){
     }
     return rows.length? '<ul class="attr-bullets">'+rows.join('')+'</ul>' : '';
   }
-  function fmtMeta(it){ return (it.staked ? 'Staked' : 'Not staked') + ' • Owned by You'; }
+  function fmtMeta(it){
+    var base = (it.staked ? 'Staked' : 'Not staked') + ' • Owned by You';
+    if (it.stakedTs){
+      var dt = new Date(it.stakedTs*1000);
+      var mm = String(dt.getMonth()+1).padStart(2,'0'), dd = String(dt.getDate()).padStart(2,'0'), yy = String(dt.getFullYear()).slice(-2);
+      base += ' • <span class="staked-ago" title="'+dt.toLocaleString()+'">Staked '+timeAgo(it.stakedTs)+' ('+mm+'/'+dd+'/'+yy+')</span>';
+    }
+    return base;
+  }
   function wireActions(scope, it){
     scope.querySelectorAll('button[data-act]').forEach(function(btn){
       btn.addEventListener('click', async function(){
@@ -485,12 +541,14 @@ var OWNED = (function(){
           if (act==='stake'){
             await stakeToken(it.id);
             it.staked = true; btn.textContent='Unstake'; btn.setAttribute('data-act','unstake');
-            scope.querySelector('.meta').textContent = fmtMeta(it);
+            // get fresh timestamp
+            it.stakedTs = await getStakeTimestamp(it.id);
+            scope.querySelector('.meta').innerHTML = fmtMeta(it);
             await refreshKPIs();
           } else if (act==='unstake'){
             await unstakeToken(it.id);
-            it.staked = false; btn.textContent='Stake'; btn.setAttribute('data-act','stake');
-            scope.querySelector('.meta').textContent = fmtMeta(it);
+            it.staked = false; it.stakedTs = null; btn.textContent='Stake'; btn.setAttribute('data-act','stake');
+            scope.querySelector('.meta').innerHTML = fmtMeta(it);
             await refreshKPIs();
           }
         }catch(e){ console.log('[owned] action failed', e); }
@@ -503,7 +561,7 @@ var OWNED = (function(){
   function renderCards(){
     var root = $('#ownedGrid'); if (!root) return;
     root.innerHTML='';
-    if (!items.length){ root.innerHTML='<div class="pg-muted">No frogs found for this wallet.</div>'; renderHeader(); syncHeights(); return; }
+    if (!items.length){ root.innerHTML='<div class="pg-muted">No frogs found for this wallet.</div>'; renderHeader(); return; }
     for (var i=0;i<items.length;i++){
       var it = items[i];
       var card=document.createElement('article'); card.className='frog-card'; card.setAttribute('data-token-id', String(it.id));
@@ -526,7 +584,7 @@ var OWNED = (function(){
       more.textContent = 'Load more';
       more.onclick = loadMore;
     }
-    renderHeader(); syncHeights();
+    renderHeader();
   }
 
   // Data & fetch
@@ -578,7 +636,8 @@ var OWNED = (function(){
     for (i=0;i<ids.length;i++){
       id = ids[i];
       var m = await fetchMeta(id);
-      arr.push({ id:id, attrs:m.attrs, staked: idsStaked.indexOf(id)>-1, rank:ranks[String(id)] });
+      var stTs = idsStaked.indexOf(id)>-1 ? await getStakeTimestamp(id) : null;
+      arr.push({ id:id, attrs:m.attrs, staked: idsStaked.indexOf(id)>-1, stakedTs: stTs, rank:ranks[String(id)] });
     }
     return arr;
   }
@@ -615,7 +674,7 @@ var OWNED = (function(){
   }
 
   async function init(){
-    // Remove legacy info grid if present (prevents duplicate blocks)
+    // Remove legacy info grid if present
     document.querySelectorAll('#ownedCard .info-grid-2').forEach(function(n){ n.remove(); });
 
     var btn = $('#ownedConnectBtn');
@@ -641,8 +700,6 @@ var OWNED = (function(){
     } else {
       $('#ownedGrid').innerHTML = '<div class="pg-muted">Connect your wallet to view owned frogs.</div>';
     }
-
-    setTimeout(syncHeights, 60);
   }
 
   return { init:init };
