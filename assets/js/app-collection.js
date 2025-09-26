@@ -1,14 +1,16 @@
 // assets/js/app-collection.js
-// FreshFrogs (single runtime)
-// - Pond (recent activity): Reservoir users/activity/v6 with users=<CONTROLLER_ADDRESS>
-// - Owned ∪ Staked: Reservoir owned + controller.getStakedTokens(address)
-// - Stake/Unstake/Claim, Unclaimed Rewards KPI
-// - Scrollable owned grid; optional "Staked X ago" label if RPC available
-
+// FreshFrogs — resilient, lazy-initialized runtime
+//
+// • Defines FF_loadRecentStakes / FF_initOwnedPanel even if Web3 isn't present, so the page never crashes.
+// • Pond = Reservoir users/activity/v6 with users=<CONTROLLER_ADDRESS>, limit=20, continuation on scroll.
+// • Owned = Reservoir owned; Staked = controller.getStakedTokens(address) (lazy Web3/controller creation).
+// • No top-level Web3/contract usage; all guarded. MetaMask not injecting window.web3 no longer breaks load.
+// • UI style matches the original compact list (thumb, bold title, subtle meta, click to etherscan).
+//
 (function(){
 'use strict';
 
-/* ---------- Config ---------- */
+/* ------------------- Config ------------------- */
 var CFG = window.FF_CFG = window.FF_CFG || {};
 var CHAIN_ID  = Number(CFG.CHAIN_ID || 1);
 var NFT_ADDR  = (CFG.COLLECTION_ADDRESS || '').toLowerCase();
@@ -21,33 +23,7 @@ var DEC       = Number.isFinite(Number(CFG.REWARD_DECIMALS)) ? Number(CFG.REWARD
 var PAGE      = Math.max(1, Math.min(50, Number(CFG.OWNED_PAGE_SIZE || CFG.PAGE_SIZE || 24)));
 var DEPLOY_BLOCK = Number(CFG.CONTROLLER_DEPLOY_BLOCK || 0);
 
-/* ---------- Web3 boot (fallback) ---------- */
-function defaultRpcFor(id){
-  id = Number(id||1);
-  if (id===1) return 'https://cloudflare-eth.com';
-  if (id===11155111) return 'https://rpc.sepolia.org';
-  if (id===5) return 'https://rpc.ankr.com/eth_goerli';
-  return 'https://cloudflare-eth.com';
-}
-var WEB3 = window.web3;
-(function initWeb3(){
-  if (WEB3) return;
-  if (window.ethereum && window.Web3){
-    WEB3 = new window.Web3(window.ethereum);
-    window.web3 = WEB3;
-    return;
-  }
-  if (window.Web3){
-    var rpc = CFG.RPC_URL || defaultRpcFor(CHAIN_ID);
-    try{
-      WEB3 = new window.Web3(new window.Web3.providers.HttpProvider(rpc, { keepAlive:true }));
-      window.web3 = WEB3;
-      console.log('[FF] RPC fallback:', rpc);
-    }catch(e){ console.warn('[FF] RPC fallback failed', e); }
-  }
-})();
-
-/* ---------- Helpers ---------- */
+/* ------------------- Utilities ------------------- */
 function etherscanBase(kind){
   if (CHAIN_ID===1) return 'https://etherscan.io/'+kind+'/';
   if (CHAIN_ID===11155111) return 'https://sepolia.etherscan.io/'+kind+'/';
@@ -81,7 +57,9 @@ function timeAgo(ts){
   return m+'m ago';
 }
 
-/* ---------- ABI / Controller ---------- */
+/* ------------------- Web3 / Controller (lazy) ------------------- */
+var WEB3 = null;           // set after connect() or if a global Web3 lib exists
+var controller = null;     // set when we can build it
 var CONTROLLER_ABI = window.CONTROLLER_ABI || window.controller_abi || window.FF_CONTROLLER_ABI || [
   {"inputs":[],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},
   {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"stake","outputs":[],"stateMutability":"nonpayable","type":"function"},
@@ -92,9 +70,26 @@ var CONTROLLER_ABI = window.CONTROLLER_ABI || window.controller_abi || window.FF
   {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakers","outputs":[{"internalType":"uint256","name":"amountStaked","type":"uint256"},{"internalType":"uint256","name":"timeOfLastUpdate","type":"uint256"},{"internalType":"uint256","name":"unclaimedRewards","type":"uint256"}],"stateMutability":"view","type":"function"}
 ];
 
-var controller = (WEB3 && CFG.CONTROLLER_ADDRESS) ? new WEB3.eth.Contract(CONTROLLER_ABI, CFG.CONTROLLER_ADDRESS) : null;
+function canUseWeb3(){
+  return !!(window.Web3 && (window.ethereum || window.web3));
+}
+function ensureWeb3BoundToWallet(){
+  try{
+    if (!window.Web3 || !window.ethereum) return false;
+    WEB3 = new window.Web3(window.ethereum);   // EIP-1193 provider
+    window.web3 = WEB3;
+    return true;
+  }catch(e){ return false; }
+}
+function ensureController(){
+  try{
+    if (!WEB3 || !CFG.CONTROLLER_ADDRESS) return false;
+    controller = new WEB3.eth.Contract(CONTROLLER_ABI, CFG.CONTROLLER_ADDRESS);
+    return true;
+  }catch(e){ console.warn('[FF] ensureController failed', e); return false; }
+}
 
-/* ---------- Wallet helpers ---------- */
+/* ------------------- Wallet helpers ------------------- */
 async function getAddress(){
   try{
     if (window.FF_WALLET?.address) return window.FF_WALLET.address;
@@ -111,17 +106,12 @@ async function connect(){
   var a = await window.ethereum.request({ method:'eth_requestAccounts' });
   var addr = a?.[0] || null;
   if (addr) window.user_address = addr;
-
-  // IMPORTANT: rebind Web3 + controller to wallet provider so contract reads work immediately
-  if (window.Web3){
-    WEB3 = new window.Web3(window.ethereum);
-    window.web3 = WEB3;
-    controller = new WEB3.eth.Contract(CONTROLLER_ABI, CFG.CONTROLLER_ADDRESS);
-  }
+  // bind Web3 & controller after connect (no MetaMask injection expected)
+  if (ensureWeb3BoundToWallet()) ensureController();
   return addr;
 }
 
-/* ---------- Staking adapter ---------- */
+/* ------------------- Staking adapter ------------------- */
 function toNum(x){
   try{
     if (x==null) return NaN;
@@ -181,7 +171,7 @@ async function unstakeToken(id){
   return controller.methods.withdraw(id).send({ from:a, gas:WEB3.utils.toHex(est), gasPrice:WEB3.utils.toHex(gp) });
 }
 
-/* "Staked X ago" — optional RPC scan */
+/* Optional "staked X ago" */
 var stakeTimeCache = new Map();
 async function getStakeTimestamp(tokenId){
   if (!WEB3?.eth) return null;
@@ -190,12 +180,8 @@ async function getStakeTimestamp(tokenId){
     var TRANSFER = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
     var toTopic   = '0x000000000000000000000000'+CTRL_ADDR.slice(2);
     var idTopic   = '0x'+BigInt(tokenId).toString(16).padStart(64,'0');
-    var logs = await WEB3.eth.getPastLogs({
-      fromBlock: DEPLOY_BLOCK ? '0x'+DEPLOY_BLOCK.toString(16) : '0x0',
-      toBlock:   'latest',
-      address: CFG.COLLECTION_ADDRESS,
-      topics: [ TRANSFER, null, toTopic, idTopic ]
-    });
+    var fromBlk   = DEPLOY_BLOCK ? '0x'+DEPLOY_BLOCK.toString(16) : '0x0';
+    var logs = await WEB3.eth.getPastLogs({ fromBlock: fromBlk, toBlock:'latest', address: CFG.COLLECTION_ADDRESS, topics:[TRANSFER, null, toTopic, idTopic] });
     if (!logs.length){ stakeTimeCache.set(tokenId,null); return null; }
     var last = logs[logs.length-1];
     var blk  = await WEB3.eth.getBlock(last.blockNumber).catch(()=>null);
@@ -205,7 +191,7 @@ async function getStakeTimestamp(tokenId){
   }catch(e){ return null; }
 }
 
-/* ---------- The Pond (users/activity/v6) ---------- */
+/* ------------------- Pond: users/activity/v6 (limit=20) ------------------- */
 var POND = (function(){
   var UL = '#recentStakes';
   var busy=false, done=false, continuation=null;
@@ -215,31 +201,27 @@ var POND = (function(){
     var ul = document.querySelector(UL); if (!ul) return;
     ul.innerHTML = '<li class="row"><div class="pg-muted">'+msg+'</div></li>';
   }
+  // Row style close to the original compact list
   function rowHTML(e){
-    var title = e.kind==='stake' ? 'Staked' : (e.kind==='unstake' ? 'Unstaked' : 'Activity');
     var when = e.time ? new Date(e.time*1000).toLocaleString() : '—';
-    var meta = shorten(e.from)+' → '+shorten(e.to);
+    var title = (e.kind==='stake' ? 'Staked' : 'Unstaked') + ' • Frog #'+e.id;
     return (
       '<li class="row" data-kind="'+e.kind+'">'+
-        '<img class="thumb64" src="'+imgFor(e.id)+'" alt="'+e.id+'">'+
-        '<div><div><b>'+title+'</b> Frog #'+e.id+'</div>'+
-        '<div class="pg-muted">'+when+' • '+meta+'</div></div>'+
+        '<div class="tile"><img class="thumb64" src="'+imgFor(e.id)+'" alt="'+e.id+'"></div>'+
+        '<div>'+
+          '<div style="font-weight:800">'+title+'</div>'+
+          '<div class="pg-muted">'+when+' • '+shorten(e.from)+' → '+shorten(e.to)+'</div>'+
+        '</div>'+
       '</li>'
     );
-  }
-  function setStaticKPIs(){
-    var a=$('#stakedController'); if (a && CFG.CONTROLLER_ADDRESS){ a.textContent = shorten(CFG.CONTROLLER_ADDRESS); a.href=escAddr(CFG.CONTROLLER_ADDRESS); }
-    var notes=$('.info-block .in'); if (notes) notes.textContent='Click a row for Etherscan';
   }
 
   async function fetchUserActivityPage(){
     if (!API_KEY){ throw new Error('Missing Reservoir API key'); }
     var headers = { accept:'application/json', 'x-api-key': API_KEY };
-    // users=controller address (treat controller as a “user”) — we want transfers in/out of controller
     var u = new URL(RESV_HOST + '/users/activity/v6');
     u.searchParams.set('users', CFG.CONTROLLER_ADDRESS);
     u.searchParams.set('limit', '20');
-    // We’ll filter transfers client-side; v6 supports multiple types, not all installations expose type filters.
     if (continuation) u.searchParams.set('continuation', continuation);
 
     var res = await fetch(u.toString(), { headers });
@@ -250,17 +232,15 @@ var POND = (function(){
     var j = await res.json();
     continuation = j.continuation || null;
 
-    // Normalize
-    var out=[];
-    var rows = Array.isArray(j.activities) ? j.activities : [];
+    var out=[], rows = Array.isArray(j.activities) ? j.activities : [];
     for (var i=0;i<rows.length;i++){
       var r = rows[i]||{};
-      // Only consider transfer-like entries with token + addresses
       var from=(r.fromAddress||r.from||'').toLowerCase();
       var to  =(r.toAddress||r.to||'').toLowerCase();
       var id  =Number(r.token?.tokenId || r.tokenId);
       if (!Number.isFinite(id)) continue;
-      // Only keep events for our NFT collection
+
+      // keep only our collection
       var col = (r.contract || r.collection || r.collectionAddress || r.token?.contract)?.toLowerCase?.() || '';
       if (NFT_ADDR && col && col!==NFT_ADDR) continue;
 
@@ -268,7 +248,6 @@ var POND = (function(){
       var tx  = r.txHash || r.txhash || r.transactionHash || '';
       if (!from || !to) continue;
 
-      // stake = transfer TO controller, unstake = transfer FROM controller
       if (to===CTRL_ADDR) out.push({ kind:'stake',   id, from:r.fromAddress||r.from||'', to:r.toAddress||r.to||'', time:ts, tx });
       else if (from===CTRL_ADDR) out.push({ kind:'unstake', id, from:r.fromAddress||r.from||'', to:r.toAddress||r.to||'', time:ts, tx });
     }
@@ -314,21 +293,22 @@ var POND = (function(){
   }
 
   function init(){
-    setStaticKPIs();
     var ul = document.querySelector(UL); if(!ul) return;
     ul.innerHTML = '<li class="row"><div class="pg-muted">Loading recent activity…</div></li>';
     attachScroll(ul);
+    // set controller link if present
+    var a=$('#stakedController'); if (a && CFG.CONTROLLER_ADDRESS){ a.textContent=shorten(CFG.CONTROLLER_ADDRESS); a.href=escAddr(CFG.CONTROLLER_ADDRESS); }
   }
 
   return { init };
 })();
 
-/* ---------- Owned ∪ Staked panel ---------- */
+/* ------------------- Owned ∪ Staked ------------------- */
 var OWNED = (function(){
   var SEL = { grid:'#ownedGrid', btn:'#ownedConnectBtn', more:'#ownedMore' };
   var idsStaked=[], items=[], cont=null, rewards='—';
 
-  // Scoped CSS (scrollable owned grid + bullets)
+  // Scoped CSS (owned grid scroll + bullets)
   (function css(){
     if (document.getElementById('owned-clean-css')) return;
     var s=document.createElement('style'); s.id='owned-clean-css';
@@ -504,7 +484,12 @@ var OWNED = (function(){
   async function loadFirst(addr){
     var rankMap = await ranks();
     var ownedIds = await fetchOwnedIdsPage(addr);
-    idsStaked = await getUserStakedTokens(addr);       // ← ensures staked show after connect
+
+    // If controller isn't ready yet, try to build it silently (no crash if Web3 missing)
+    if (!controller && canUseWeb3()){ if (!WEB3) ensureWeb3BoundToWallet(); ensureController(); }
+
+    idsStaked = controller ? await getUserStakedTokens(addr) : [];
+
     var set = new Set(ownedIds); for (var i=0;i<idsStaked.length;i++) set.add(idsStaked[i]);
     items = await hydrate(Array.from(set), rankMap);
     renderCards();
@@ -533,7 +518,7 @@ var OWNED = (function(){
   }
 
   async function init(){
-    // blow away any legacy info grid to avoid double KPIs
+    // remove legacy info grid (keeps header clean)
     document.querySelectorAll('#ownedCard .info-grid-2').forEach(function(n){ n.remove(); });
 
     var btn = $(SEL.btn);
@@ -551,6 +536,7 @@ var OWNED = (function(){
       });
     }
 
+    // Auto-hydrate if already connected (doesn't require Web3 until staked fetch)
     var a0 = await getAddress();
     if (a0){
       if (btn) btn.textContent = shorten(a0);
@@ -564,8 +550,8 @@ var OWNED = (function(){
   return { init };
 })();
 
-/* ---------- Boot ---------- */
-window.FF_loadRecentStakes = function(){ POND.init(); };
-window.FF_initOwnedPanel  = function(){ OWNED.init(); };
+/* ------------------- Boot exports (never crash) ------------------- */
+window.FF_loadRecentStakes = function(){ try{ POND.init(); }catch(e){ console.error('[FF] Pond init failed', e); } };
+window.FF_initOwnedPanel  = function(){ try{ OWNED.init(); }catch(e){ console.error('[FF] Owned init failed', e); } };
 
 })(); // IIFE
