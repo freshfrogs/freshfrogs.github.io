@@ -1,23 +1,14 @@
 // assets/js/app-collection.js
 // FreshFrogs (single runtime)
-//
-// • Pond (recent activity) — Reservoir Activities first (stake/unstake via transfers)
-// • Owned ∪ Staked — merges Reservoir "owned" with controller.getStakedTokens(address)
-// • Stake / Unstake / Claim Rewards actions
-// • Scrollable owned grid; optional "Staked X ago" label if RPC available
-//
-// Requires window.FF_CFG (from assets/js/config.js):
-//   CHAIN_ID, COLLECTION_ADDRESS, CONTROLLER_ADDRESS
-//   RESERVOIR_HOST, FROG_API_KEY
-//   SOURCE_PATH (where /frog/<id>.png & /frog/json/<id>.json live)
-//   REWARD_TOKEN_SYMBOL, REWARD_DECIMALS
-//   CONTROLLER_DEPLOY_BLOCK (for staked-since scan)
-//   RPC_URL (optional)
+// - Pond (recent activity): Reservoir users/activity/v6 with users=<CONTROLLER_ADDRESS>
+// - Owned ∪ Staked: Reservoir owned + controller.getStakedTokens(address)
+// - Stake/Unstake/Claim, Unclaimed Rewards KPI
+// - Scrollable owned grid; optional "Staked X ago" label if RPC available
 
 (function(){
 'use strict';
 
-/* ---------------- Config ---------------- */
+/* ---------- Config ---------- */
 var CFG = window.FF_CFG = window.FF_CFG || {};
 var CHAIN_ID  = Number(CFG.CHAIN_ID || 1);
 var NFT_ADDR  = (CFG.COLLECTION_ADDRESS || '').toLowerCase();
@@ -28,10 +19,9 @@ var BASE_PATH = (CFG.SOURCE_PATH || '').replace(/\/+$/,'');
 var SYM       = CFG.REWARD_TOKEN_SYMBOL || '$FLYZ';
 var DEC       = Number.isFinite(Number(CFG.REWARD_DECIMALS)) ? Number(CFG.REWARD_DECIMALS) : 18;
 var PAGE      = Math.max(1, Math.min(50, Number(CFG.OWNED_PAGE_SIZE || CFG.PAGE_SIZE || 24)));
-var ACT_WINDOW = Number(CFG.ACTIVITY_BLOCK_WINDOW || 1500);
 var DEPLOY_BLOCK = Number(CFG.CONTROLLER_DEPLOY_BLOCK || 0);
 
-/* ---------------- Web3 (optional) ---------------- */
+/* ---------- Web3 boot (fallback) ---------- */
 function defaultRpcFor(id){
   id = Number(id||1);
   if (id===1) return 'https://cloudflare-eth.com';
@@ -57,7 +47,7 @@ var WEB3 = window.web3;
   }
 })();
 
-/* ---------------- Small helpers ---------------- */
+/* ---------- Helpers ---------- */
 function etherscanBase(kind){
   if (CHAIN_ID===1) return 'https://etherscan.io/'+kind+'/';
   if (CHAIN_ID===11155111) return 'https://sepolia.etherscan.io/'+kind+'/';
@@ -91,7 +81,7 @@ function timeAgo(ts){
   return m+'m ago';
 }
 
-/* ---------------- ABI / Controller ---------------- */
+/* ---------- ABI / Controller ---------- */
 var CONTROLLER_ABI = window.CONTROLLER_ABI || window.controller_abi || window.FF_CONTROLLER_ABI || [
   {"inputs":[],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},
   {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"stake","outputs":[],"stateMutability":"nonpayable","type":"function"},
@@ -99,16 +89,12 @@ var CONTROLLER_ABI = window.CONTROLLER_ABI || window.controller_abi || window.FF
   {"inputs":[{"internalType":"address","name":"_staker","type":"address"}],"name":"availableRewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
   {"inputs":[{"internalType":"address","name":"_user","type":"address"}],"name":"getStakedTokens","outputs":[{"components":[{"internalType":"address","name":"staker","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"internalType":"struct FreshFrogsController.StakedToken[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},
   {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"stakerAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
-  {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakers","outputs":[{"internalType":"uint256","name":"amountStaked","type":"uint256"},{"internalType":"uint256","name":"timeOfLastUpdate","type":"uint256"},{"internalType":"uint256","name":"unclaimedRewards","type":"uint256"}],"stateMutability":"view","type":"function"},
-  {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardsClaimed","type":"event"}
+  {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakers","outputs":[{"internalType":"uint256","name":"amountStaked","type":"uint256"},{"internalType":"uint256","name":"timeOfLastUpdate","type":"uint256"},{"internalType":"uint256","name":"unclaimedRewards","type":"uint256"}],"stateMutability":"view","type":"function"}
 ];
 
-var controller;
-if (WEB3 && CFG.CONTROLLER_ADDRESS){
-  try { controller = new WEB3.eth.Contract(CONTROLLER_ABI, CFG.CONTROLLER_ADDRESS); } catch(e){}
-}
+var controller = (WEB3 && CFG.CONTROLLER_ADDRESS) ? new WEB3.eth.Contract(CONTROLLER_ABI, CFG.CONTROLLER_ADDRESS) : null;
 
-/* ---------------- Wallet helpers ---------------- */
+/* ---------- Wallet helpers ---------- */
 async function getAddress(){
   try{
     if (window.FF_WALLET?.address) return window.FF_WALLET.address;
@@ -125,10 +111,17 @@ async function connect(){
   var a = await window.ethereum.request({ method:'eth_requestAccounts' });
   var addr = a?.[0] || null;
   if (addr) window.user_address = addr;
+
+  // IMPORTANT: rebind Web3 + controller to wallet provider so contract reads work immediately
+  if (window.Web3){
+    WEB3 = new window.Web3(window.ethereum);
+    window.web3 = WEB3;
+    controller = new WEB3.eth.Contract(CONTROLLER_ABI, CFG.CONTROLLER_ADDRESS);
+  }
   return addr;
 }
 
-/* ---------------- Staking adapter ---------------- */
+/* ---------- Staking adapter ---------- */
 function toNum(x){
   try{
     if (x==null) return NaN;
@@ -188,7 +181,7 @@ async function unstakeToken(id){
   return controller.methods.withdraw(id).send({ from:a, gas:WEB3.utils.toHex(est), gasPrice:WEB3.utils.toHex(gp) });
 }
 
-/* "Staked X ago" — needs RPC (optional) */
+/* "Staked X ago" — optional RPC scan */
 var stakeTimeCache = new Map();
 async function getStakeTimestamp(tokenId){
   if (!WEB3?.eth) return null;
@@ -212,7 +205,7 @@ async function getStakeTimestamp(tokenId){
   }catch(e){ return null; }
 }
 
-/* ---------------- Pond (Reservoir Activities) ---------------- */
+/* ---------- The Pond (users/activity/v6) ---------- */
 var POND = (function(){
   var UL = '#recentStakes';
   var busy=false, done=false, continuation=null;
@@ -223,125 +216,90 @@ var POND = (function(){
     ul.innerHTML = '<li class="row"><div class="pg-muted">'+msg+'</div></li>';
   }
   function rowHTML(e){
-    var title = e.kind==='stake' ? 'Staked' : (e.kind==='unstake' ? 'Unstaked' : 'Claimed');
+    var title = e.kind==='stake' ? 'Staked' : (e.kind==='unstake' ? 'Unstaked' : 'Activity');
     var when = e.time ? new Date(e.time*1000).toLocaleString() : '—';
-    var meta = e.kind==='claim'
-      ? (shorten(e.user)+' claimed '+e.amountPretty)
-      : (shorten(e.from)+' → '+shorten(e.to));
-    var lead = e.kind==='claim'
-      ? '<div class="thumb64" style="display:flex;align-items:center;justify-content:center">💰</div>'
-      : '<img class="thumb64" src="'+imgFor(e.id)+'" alt="'+e.id+'">';
+    var meta = shorten(e.from)+' → '+shorten(e.to);
     return (
       '<li class="row" data-kind="'+e.kind+'">'+
-        lead+
-        '<div><div><b>'+title+'</b>'+(e.id?(' Frog #'+e.id):'')+'</div>'+
+        '<img class="thumb64" src="'+imgFor(e.id)+'" alt="'+e.id+'">'+
+        '<div><div><b>'+title+'</b> Frog #'+e.id+'</div>'+
         '<div class="pg-muted">'+when+' • '+meta+'</div></div>'+
       '</li>'
     );
   }
   function setStaticKPIs(){
     var a=$('#stakedController'); if (a && CFG.CONTROLLER_ADDRESS){ a.textContent = shorten(CFG.CONTROLLER_ADDRESS); a.href=escAddr(CFG.CONTROLLER_ADDRESS); }
-    var sym=$('#pondRewardsSymbol'); if (sym) sym.textContent = SYM;
+    var notes=$('.info-block .in'); if (notes) notes.textContent='Click a row for Etherscan';
   }
 
-  async function fetchActivitiesPage(){
-    var headers = { accept:'application/json' };
-    if (API_KEY) headers['x-api-key'] = API_KEY;
+  async function fetchUserActivityPage(){
+    if (!API_KEY){ throw new Error('Missing Reservoir API key'); }
+    var headers = { accept:'application/json', 'x-api-key': API_KEY };
+    // users=controller address (treat controller as a “user”) — we want transfers in/out of controller
+    var u = new URL(RESV_HOST + '/users/activity/v6');
+    u.searchParams.set('users', CFG.CONTROLLER_ADDRESS);
+    u.searchParams.set('limit', '50');
+    // We’ll filter transfers client-side; v6 supports multiple types, not all installations expose type filters.
+    if (continuation) u.searchParams.set('continuation', continuation);
 
-    // v6 → v5 → legacy fallback
-    var tryList = ['/activities/v6','/activities/v5','/events/collections/activity/v5'];
-    var res, j=null, rows=null;
-
-    for (var i=0;i<tryList.length;i++){
-      var u = new URL(RESV_HOST + tryList[i]);
-      u.searchParams.set('collection', CFG.COLLECTION_ADDRESS);
-      u.searchParams.set('limit', '50');
-      u.searchParams.set('types', 'transfer');
-      if (continuation) u.searchParams.set('continuation', continuation);
-      res = await fetch(u.toString(), { headers });
-      if (res.status===404) continue;
-      if (!res.ok){
-        // try next version
-        continue;
-      }
-      j = await res.json();
-      rows = Array.isArray(j.activities) ? j.activities : (Array.isArray(j.events) ? j.events : null);
-      if (rows) { continuation = j.continuation || null; break; }
+    var res = await fetch(u.toString(), { headers });
+    if (!res.ok){
+      var txt = await res.text().catch(function(){return '';});
+      throw new Error('Reservoir users/activity failed: '+res.status+' '+txt);
     }
-    if (!rows) throw new Error('Reservoir activities not available');
+    var j = await res.json();
+    continuation = j.continuation || null;
 
-    var out=[], CTRL=CTRL_ADDR;
-    for (var k=0;k<rows.length;k++){
-      var r=rows[k]||{};
+    // Normalize
+    var out=[];
+    var rows = Array.isArray(j.activities) ? j.activities : [];
+    for (var i=0;i<rows.length;i++){
+      var r = rows[i]||{};
+      // Only consider transfer-like entries with token + addresses
       var from=(r.fromAddress||r.from||'').toLowerCase();
       var to  =(r.toAddress||r.to||'').toLowerCase();
       var id  =Number(r.token?.tokenId || r.tokenId);
       if (!Number.isFinite(id)) continue;
+      // Only keep events for our NFT collection
+      var col = (r.contract || r.collection || r.collectionAddress || r.token?.contract)?.toLowerCase?.() || '';
+      if (NFT_ADDR && col && col!==NFT_ADDR) continue;
+
       var ts  = Number(r.timestamp || r.blockTimestamp || (r.createdAt && Math.floor(new Date(r.createdAt).getTime()/1000))) || null;
       var tx  = r.txHash || r.txhash || r.transactionHash || '';
-      if (to===CTRL){ out.push({ kind:'stake', id, from:r.fromAddress||r.from||'', to:r.toAddress||r.to||'', time:ts, tx }); }
-      else if (from===CTRL){ out.push({ kind:'unstake', id, from:r.fromAddress||r.from||'', to:r.toAddress||r.to||'', time:ts, tx }); }
+      if (!from || !to) continue;
+
+      // stake = transfer TO controller, unstake = transfer FROM controller
+      if (to===CTRL_ADDR) out.push({ kind:'stake',   id, from:r.fromAddress||r.from||'', to:r.toAddress||r.to||'', time:ts, tx });
+      else if (from===CTRL_ADDR) out.push({ kind:'unstake', id, from:r.fromAddress||r.from||'', to:r.toAddress||r.to||'', time:ts, tx });
     }
     return out;
-  }
-
-  async function fetchClaimsRPC(){
-    if (!WEB3?.eth) return [];
-    var T; try{ T = WEB3.utils.sha3('RewardsClaimed(address,uint256)'); }catch(e){ return []; }
-    try{
-      var tip=await WEB3.eth.getBlockNumber(); var from=Math.max(0, tip - ACT_WINDOW);
-      var logs=await WEB3.eth.getPastLogs({ fromBlock:'0x'+from.toString(16), toBlock:'latest', address: CFG.CONTROLLER_ADDRESS, topics:[T] });
-      var out=[];
-      for (var i=0;i<logs.length;i++){
-        var l=logs[i]; var user='0x'+l.topics[1].slice(26); var amt=BigInt(l.data);
-        var blk=await WEB3.eth.getBlock(l.blockNumber).catch(()=>null);
-        out.push({ kind:'claim', user, amount:amt.toString(), amountPretty:formatToken(amt), time: blk && blk.timestamp || null, tx:l.transactionHash });
-      } return out;
-    }catch(e){ return []; }
   }
 
   async function loadNext(listEl){
     if (busy || done) return; busy=true;
     try{
-      if (!CFG.COLLECTION_ADDRESS || !CFG.CONTROLLER_ADDRESS){ diag('Missing addresses'); done=true; return; }
-      if (!API_KEY){ diag('Set FF_CFG.FROG_API_KEY'); done=true; return; }
-
-      var rows = await fetchActivitiesPage();
-
-      // augment (non-blocking) with claims
-      fetchClaimsRPC().then(function(claims){
-        if (!claims.length) return;
-        var frag=document.createDocumentFragment();
-        claims.sort(function(a,b){ return (b.time||0)-(a.time||0); });
-        for (var i=0;i<claims.length;i++){
-          var li=document.createElement('li'); li.className='row'; li.innerHTML=rowHTML(claims[i]);
-          (function(tx){ li.addEventListener('click', function(){ window.open(escTx(tx),'_blank'); }); })(claims[i].tx);
-          frag.appendChild(li);
-        }
-        listEl.prepend(frag);
-      });
+      if (!CFG.CONTROLLER_ADDRESS || !CFG.COLLECTION_ADDRESS){ diag('Missing addresses'); done=true; return; }
+      var rows = await fetchUserActivityPage();
 
       if (rows.length){
         rows.sort(function(a,b){ return (b.time||0)-(a.time||0); });
         var frag=document.createDocumentFragment();
         for (var k=0;k<rows.length;k++){
           var li=document.createElement('li'); li.className='row'; li.innerHTML=rowHTML(rows[k]);
-          (function(tx){ li.addEventListener('click', function(){ window.open(escTx(tx),'_blank'); }); })(rows[k].tx);
+          (function(tx){ li.addEventListener('click', function(){ if (tx) window.open(escTx(tx),'_blank'); }); })(rows[k].tx);
           frag.appendChild(li);
         }
         if (listEl.firstElementChild && listEl.firstElementChild.classList.contains('row') && listEl.firstElementChild.textContent.includes('Loading')) {
           listEl.innerHTML='';
         }
         listEl.appendChild(frag);
-
         var lis=listEl.querySelectorAll('li.row');
         if (lis.length>MAX_ROWS){
           var excess=lis.length-MAX_ROWS; for (var z=0; z<excess; z++) listEl.removeChild(lis[z]);
         }
       } else if (!listEl.querySelector('li.row')) {
-        diag('No activity found.');
+        diag('No activity yet.');
       }
-
       if (!continuation) done = true;
     } finally { busy=false; }
   }
@@ -365,12 +323,12 @@ var POND = (function(){
   return { init };
 })();
 
-/* ---------------- Owned ∪ Staked panel ---------------- */
+/* ---------- Owned ∪ Staked panel ---------- */
 var OWNED = (function(){
   var SEL = { grid:'#ownedGrid', btn:'#ownedConnectBtn', more:'#ownedMore' };
   var idsStaked=[], items=[], cont=null, rewards='—';
 
-  // Scoped CSS: scrollable container + bullets
+  // Scoped CSS (scrollable owned grid + bullets)
   (function css(){
     if (document.getElementById('owned-clean-css')) return;
     var s=document.createElement('style'); s.id='owned-clean-css';
@@ -546,7 +504,7 @@ var OWNED = (function(){
   async function loadFirst(addr){
     var rankMap = await ranks();
     var ownedIds = await fetchOwnedIdsPage(addr);
-    idsStaked = await getUserStakedTokens(addr);
+    idsStaked = await getUserStakedTokens(addr);       // ← ensures staked show after connect
     var set = new Set(ownedIds); for (var i=0;i<idsStaked.length;i++) set.add(idsStaked[i]);
     items = await hydrate(Array.from(set), rankMap);
     renderCards();
@@ -575,7 +533,7 @@ var OWNED = (function(){
   }
 
   async function init(){
-    // Remove legacy info grid if present
+    // blow away any legacy info grid to avoid double KPIs
     document.querySelectorAll('#ownedCard .info-grid-2').forEach(function(n){ n.remove(); });
 
     var btn = $(SEL.btn);
@@ -606,7 +564,7 @@ var OWNED = (function(){
   return { init };
 })();
 
-/* ---------------- Boot ---------------- */
+/* ---------- Boot ---------- */
 window.FF_loadRecentStakes = function(){ POND.init(); };
 window.FF_initOwnedPanel  = function(){ OWNED.init(); };
 
