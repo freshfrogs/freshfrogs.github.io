@@ -453,3 +453,4 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
   font-size: 12px;          /* harmonizes with header chrome */
   letter-spacing: .01em;
 }
+.pg-card-head .dash-addr{ font-weight:400; color:var(--muted); font-size:12px; letter-spacing:.01em; }
