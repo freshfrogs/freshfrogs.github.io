@@ -414,3 +414,36 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
   .ff-pill{ padding: 8px 12px; }
 }
 .pg-card-head .dash-addr{ font-weight:800; font-size:14px; color:inherit; letter-spacing:.01em; }
+/* Global scrollbar polish */
+:root{
+  /* tweak as you like */
+  --scrollbar-w: 10px;
+  --scrollbar-thumb: color-mix(in srgb, var(--muted) 45%, transparent);
+  --scrollbar-thumb-hover: color-mix(in srgb, var(--muted) 70%, transparent);
+  --scrollbar-track: color-mix(in srgb, var(--panel) 88%, transparent);
+}
+
+/* Firefox */
+*{
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* WebKit/Blink */
+*::-webkit-scrollbar{
+  width: var(--scrollbar-w);
+  height: var(--scrollbar-w);
+}
+*::-webkit-scrollbar-track{
+  background: var(--scrollbar-track);
+  border-radius: 12px;
+}
+*::-webkit-scrollbar-thumb{
+  background: var(--scrollbar-thumb);
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover{
+  background: var(--scrollbar-thumb-hover);
+}
