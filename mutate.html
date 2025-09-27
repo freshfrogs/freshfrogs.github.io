@@ -5,90 +5,67 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>freshfrogs — Mutate</title>
 
-  <!-- EXACT stylesheet used by collection.html -->
+  <!-- Use the exact same stylesheet as collection.html -->
   <link rel="stylesheet" href="assets/css/styles.css" />
 
   <style>
-    .pg-wrap{ padding:20px; }
-    img{ image-rendering: pixelated; image-rendering: crisp-edges; }
+    /* Only a centered card on the page */
+    .center-wrap { max-width: 740px; margin: 44px auto; padding: 0 16px; }
+    img { image-rendering: pixelated; image-rendering: crisp-edges; }
 
-    /* Single centered column like the right dashboard */
-    .page-grid{
-      display:grid; gap:16px; grid-template-columns: 1fr;
-      align-items:start; max-width:1100px; margin:0 auto;
-    }
-    #mutateCard.pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); max-width:700px; justify-self:center; width:100%; }
-    .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
-    .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
+    /* Use the same frog-card styles; just keep width tidy */
+    .frog-card { max-width: 700px; margin: 0 auto; }
 
-    /* Frog card EXACTLY like collection (same classes + sizes) */
-    #mutateCard .grid-cards{ display:grid; gap:10px; grid-template-columns: 1fr; }
-    .frog-card{
-      border:1px solid var(--border);
-      background: var(--panel);
-      border-radius:14px;
-      padding:12px;
-      display:grid; grid-template-columns:auto 1fr; column-gap:12px; row-gap:6px; align-items:start;
-      color:inherit; max-width:700px;
-    }
-    .frog-card .thumb{
-      width:128px;height:128px;border-radius:12px;background:var(--panel-2);object-fit:contain;grid-row: span 3;
+    /* Mutated build “thumb” uses the SAME classes/sizing as .thumb */
+    .thumb.thumb-build {
+      position: relative;
+      width: 128px; height: 128px;
+      border-radius: 12px;
+      overflow: hidden;
+      display: none; /* hidden until we mutate */
+      /* its backgroundColor is set in JS by sampling the PNG */
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 6px 12px rgba(0,0,0,.25);
     }
-    /* Mutated build "thumb" (same class so it looks identical) */
-    .thumb-build{ position:relative; overflow:hidden; display:none; background-repeat:no-repeat; background-position:center; background-size:2600%; }
-    .thumb-build .layers img{
-      position:absolute; left:0; top:0; width:128px; height:128px; object-fit:contain;
-      image-rendering: pixelated; pointer-events:none;
+    .thumb.thumb-build .layers img {
+      position: absolute; left: 0; top: 0;
+      width: 128px; height: 128px; object-fit: contain;
+      image-rendering: pixelated; pointer-events: none; display: block;
     }
 
-    .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
-    .meta{ color:var(--muted); font-size:12px; }
-    .actions{ grid-column:1 / -1; display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+    /* Optional: hide rank pill unless provided */
+    #mutateRankPill[hidden] { display: none !important; }
   </style>
 </head>
 <body>
-  <div class="pg-wrap container">
-    <div id="ffTopbarMount"></div>
+  <div class="center-wrap">
+    <!-- EXACT frog-card structure/order like your collection cards -->
+    <article class="frog-card" id="mutateCard" data-token-id="">
+      <!-- Normal thumb (shown pre-mutation) -->
+      <img class="thumb" id="mutateThumb" src="" alt="frog">
 
-    <div class="page-grid">
-      <section id="mutateCard" class="pg-card">
-        <div class="pg-card-head">
-          <h3>Dashboard</h3>
-          <div id="mutateWalletAddr" class="dash-addr" style="display:none;"></div>
-        </div>
+      <!-- Mutated build thumb (same class/size; shown during mutation) -->
+      <div class="thumb thumb-build" id="mutateThumbBuild">
+        <div class="layers" id="mutateLayers"></div>
+      </div>
 
-        <div class="grid-cards">
-          <article class="frog-card" id="mutateFrogCard" data-token-id="">
-            <!-- Normal thumb (shown on Refresh / non-mutated) -->
-            <img class="thumb" id="mutateThumb" src="" alt="frog">
-            <!-- Mutated build thumb (identical class + size; shown only during mutation) -->
-            <div class="thumb thumb-build" id="mutateThumbBuild">
-              <div class="layers" id="mutateLayers"></div>
-            </div>
+      <h4 class="title" id="mutateTitle">
+        Frog #—
+        <span class="pill" id="mutateRankPill" hidden></span>
+      </h4>
 
-            <h4 class="title" id="mutateTitle">Frog #—</h4>
-            <div class="meta" id="mutateMeta">Random preview</div>
+      <div class="meta" id="mutateMeta">Random preview</div>
 
-            <ul class="attr-bullets" id="mutateAttrs"></ul>
+      <ul class="attr-bullets" id="mutateAttrs"></ul>
 
-            <div class="actions">
-              <button class="btn btn-outline-gray" id="btnRefresh">Refresh</button>
-              <button class="btn btn-outline-gray" id="btnMutate">Mutate</button>
-            </div>
-          </article>
-        </div>
-      </section>
-    </div>
+      <div class="actions">
+        <button class="btn btn-outline-gray" id="btnRefresh">Refresh</button>
+        <button class="btn btn-outline-gray" id="btnMutate">Mutate</button>
+      </div>
+    </article>
   </div>
 
-  <!-- minimal script set (order consistent with collection page) -->
   <script src="assets/js/config.js"></script>
   <script src="assets/js/utils.js"></script>
-  <script src="assets/js/topbar.js"></script>
   <script src="assets/js/mutate.js"></script>
-  <script>
-    if (window.FF?.initTopbar) try { FF.initTopbar(); } catch {}
-  </script>
 </body>
 </html>
