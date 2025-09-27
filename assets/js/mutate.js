@@ -1,54 +1,73 @@
 // assets/js/mutate.js
-// 256×256 crisp render; buttons under image; info below.
-// Background comes from the original still, scaled/pushed to show only the solid color.
+// Mutate page: 256px crisp preview, centered layout, buttons under image,
+// info to the right, partner frog must have rank >= 2000.
 
 (function (FF, CFG) {
   'use strict';
 
-  const SIZE = 256;                        // ← 256px canvas & <img>
+  const SIZE = 256;
   const TOTAL = Number(CFG.TOTAL_SUPPLY || 4040);
   const ROOT  = String(CFG.SOURCE_PATH || '').replace(/\/+$/, '');
-  const RANKS_URL = CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json';
+  const RANK_LOOKUP_URL = 'assets/freshfrogs_rank_lookup.json';
 
-  // Tune background push/zoom
-  const BG_SCALE_FACTOR = 36;              // ≈3600%
-  const BG_SHIFT_FACTOR = 26;              // ≈2600%
+  // Background treatment: draw the original still, zoomed and pushed right
+  const BG_SCALE = 36;   // 3600%
+  const BG_SHIFT = 26;   // 2600%
 
   const $ = (s, r=document)=> r.querySelector(s);
-  const thumb = $('#mutateThumb');
-  const title = $('#mutateTitle');
-  const rank  = $('#mutateRank');
-  const meta  = $('#mutateMeta');
-  const attrs = $('#mutateAttrs');
-  const btnR  = $('#btnRefresh');
-  const btnM  = $('#btnMutate');
+
+  // DOM (matches mutate.html you've been using)
+  const wrap  = $('#mutateCenter') || document.body; // just to ensure page exists
+  const card  = $('#mutateCard')   || $('.frog-card.mutate') || document.body;
+  // left side
+  const thumb = $('#mutateThumb')  || (function(){
+    // create one if missing; expect markup like:
+    // <article class="frog-card mutate" id="mutateCard">
+    //   <div class="mut-left"><img id="mutateThumb">...</div><div class="mut-right">...</div>
+    const left = $('.mut-left') || (function(){
+      const d=document.createElement('div'); d.className='mut-left';
+      card.prepend(d); return d;
+    })();
+    const img=document.createElement('img'); img.id='mutateThumb'; img.className='thumb';
+    left.prepend(img);
+    return img;
+  })();
+  const btnRefresh = $('#btnRefresh');
+  const btnMutate  = $('#btnMutate');
+  // right side
+  const title = $('#mutateTitle') || $('#mutTitle') || (function(){
+    const d=$('.mut-right') || (function(){ const x=document.createElement('div'); x.className='mut-right'; card.appendChild(x); return x; })();
+    const h=document.createElement('h4'); h.id='mutateTitle'; h.className='title'; d.appendChild(h); return h;
+  })();
+  const meta  = $('#mutateMeta') || $('#mutMeta') || (function(){ const h=document.createElement('div'); h.id='mutateMeta'; h.className='meta'; title.parentNode.appendChild(h); return h; })();
+  const attrs = $('#mutateAttrs') || $('#mutAttrs') || (function(){ const u=document.createElement('ul'); u.id='mutateAttrs'; u.className='attr-bullets'; meta.parentNode.appendChild(u); return u; })();
 
   const imgFor  = id => `${ROOT}/frog/${id}.png`;
   const jsonFor = id => `${ROOT}/frog/json/${id}.json`;
 
-  let currentId, RANKS=null;
-
+  // ------- Ranks (lookup: { "1": 1234, ... }) -------
+  let RANKS=null;
   async function ensureRanks(){
     if (RANKS) return RANKS;
-    try{
-      const r = await fetch(RANKS_URL); const j = await r.json();
-      RANKS = Array.isArray(j) ? j.reduce((m,row)=> (m[String(row.id)]=row.ranking, m), {}) : (j||{});
-    }catch{ RANKS = {}; }
+    try{ const r=await fetch(`${ROOT}/${RANK_LOOKUP_URL}`); RANKS=await r.json(); }
+    catch{ RANKS={}; }
     return RANKS;
   }
 
-  function renderAttrs(list){
-    attrs.innerHTML = '';
-    if (!Array.isArray(list)) return;
-    list.forEach(a=>{
-      const k=a?.trait_type||a?.key; if(!k) return;
-      const v=a?.value||a?.trait_value||'';
-      const li=document.createElement('li');
-      li.innerHTML = `<b>${k}:</b> ${String(v)}`;
-      attrs.appendChild(li);
-    });
+  // partner with rank >= minRank (less rare)
+  async function pickPartnerId(minRank=2000){
+    const ranks = await ensureRanks();
+    const ok = Object.entries(ranks)
+      .filter(([_,rk]) => Number(rk) >= minRank)
+      .map(([id]) => Number(id))
+      .filter(n => Number.isFinite(n) && n>=1 && n<=TOTAL);
+    if (!ok.length){ // fallback: random
+      return 1 + Math.floor(Math.random()*TOTAL);
+    }
+    return ok[Math.floor(Math.random()*ok.length)];
   }
 
+  // ------- Helpers -------
   function loadImage(src){
     return new Promise(res=>{
       const im=new Image(); im.crossOrigin='anonymous'; im.decoding='async';
@@ -57,10 +76,10 @@
   }
 
   function drawShiftedBackground(ctx, baseImg){
-    const scale = BG_SCALE_FACTOR;
-    const dw = SIZE*scale, dh = SIZE*scale;
-    const dx = -dw + BG_SHIFT_FACTOR*SIZE;
-    const dy = -dh + BG_SHIFT_FACTOR*SIZE;
+    // zoom base still and push to right/down so we only see flat color
+    const dw = SIZE*BG_SCALE, dh = SIZE*BG_SCALE;
+    const dx = -dw + BG_SHIFT*SIZE;
+    const dy = -dh + BG_SHIFT*SIZE;
     ctx.clearRect(0,0,SIZE,SIZE);
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(baseImg, dx, dy, dw, dh);
@@ -90,47 +109,20 @@
     return cnv.toDataURL('image/png');
   }
 
-  function randId(except){
-    let id = Math.floor(Math.random()*TOTAL)+1;
-    if(except && TOTAL>1){ while(id===except) id = Math.floor(Math.random()*TOTAL)+1; }
-    return id;
+  function setAttrs(list){
+    attrs.innerHTML='';
+    (list||[]).forEach(a=>{
+      const k=a?.trait_type||a?.key; if(!k) return;
+      const v=a?.value||a?.trait_value||'';
+      const li=document.createElement('li'); li.innerHTML=`<b>${k}:</b> ${String(v)}`;
+      attrs.appendChild(li);
+    });
   }
 
-  async function showFrog(id){
-    currentId=id;
-    thumb.width=SIZE; thumb.height=SIZE; thumb.src = imgFor(id); thumb.alt=String(id);
-
-    try{
-      const [rMeta, ranks] = await Promise.all([fetch(jsonFor(id)), ensureRanks()]);
-      const metaJson = rMeta.ok ? await rMeta.json() : null;
-      const rk = ranks[String(id)];
-
-      title.innerHTML = `Frog #${id} <span class="pill" id="mutateRank"${rk==null?' style="display:none"':''}>${rk!=null?`Rank #${rk}`:''}</span>`;
-      meta.textContent = 'Not staked • Owned by You';
-      renderAttrs(metaJson?.attributes || []);
-    }catch{
-      title.textContent = `Frog #${id}`;
-      meta.textContent  = 'Preview • —';
-      attrs.innerHTML   = '';
-      rank && (rank.style.display='none');
-    }
-  }
-
-  async function mutateNow(){
-    const a = currentId; if(!a) return;
-    const b = randId(a);
-
-    const ja = await (await fetch(jsonFor(a))).json();
-    const jb = await (await fetch(jsonFor(b))).json();
-
-    const A={Frog:"",SpecialFrog:"",Trait:"",Accessory:"",Eyes:"",Hat:"",Mouth:""};
-    const B={Frog:"",SpecialFrog:"",Trait:"",Accessory:"",Eyes:"",Hat:"",Mouth:""};
-    ja.attributes.forEach(x=> A[x.trait_type]=x.value);
-    jb.attributes.forEach(x=> B[x.trait_type]=x.value);
-
+  // ------- Mutation logic (your rules, condensed to match previous flow) -------
+  function buildMetadataC(A,B){
     const C={Frog:"",SpecialFrog:"",Subset:"",Trait:"",Accessory:"",Eyes:"",Hat:"",Mouth:""};
 
-    // Special rules
     if (A.SpecialFrog || B.SpecialFrog){
       if (A.SpecialFrog && B.SpecialFrog){
         B.SpecialFrog = A.SpecialFrog + '/SpecialFrog/' + B.SpecialFrog; B.Trait='';
@@ -150,10 +142,37 @@
     C.Eyes       = A.Eyes       || B.Eyes       || '';
     C.Hat        = A.Hat        || B.Hat        || '';
     C.Mouth      = A.Mouth      || B.Mouth      || '';
+    return C;
+  }
 
-    const dataUrl = await composeToDataURL(a, C);
+  async function randomBaseId(){ return 1 + Math.floor(Math.random()*TOTAL); }
+
+  async function showBase(id){
+    const r = await fetch(jsonFor(id)); const j = r.ok ? await r.json() : null;
+    thumb.width=SIZE; thumb.height=SIZE; thumb.src = imgFor(id); thumb.alt=String(id);
+    title.textContent = `Frog #${id}`;
+    meta.textContent  = 'Not staked • Owned by You';
+    setAttrs(j?.attributes || []);
+    return j;
+  }
+
+  async function mutate(){
+    const aId = Number(thumb.alt) || await randomBaseId();
+    const bId = await pickPartnerId(2000);
+
+    const ja = await (await fetch(jsonFor(aId))).json();
+    const jb = await (await fetch(jsonFor(bId))).json();
+
+    const A={Frog:"",SpecialFrog:"",Trait:"",Accessory:"",Eyes:"",Hat:"",Mouth:""};
+    const B={Frog:"",SpecialFrog:"",Trait:"",Accessory:"",Eyes:"",Hat:"",Mouth:""};
+    ja.attributes.forEach(x=> A[x.trait_type]=x.value);
+    jb.attributes.forEach(x=> B[x.trait_type]=x.value);
+
+    const C = buildMetadataC(A,B);
+    const dataUrl = await composeToDataURL(aId, C);
     thumb.src = dataUrl;
 
+    // attributes list for preview
     const out=[];
     if (C.Frog) out.push({trait_type:'Frog', value:C.Frog}); else if (C.SpecialFrog) out.push({trait_type:'SpecialFrog', value:C.SpecialFrog});
     if (C.Subset)    out.push({trait_type:'Subset',    value:C.Subset});
@@ -162,17 +181,25 @@
     if (C.Eyes)      out.push({trait_type:'Eyes',      value:C.Eyes});
     if (C.Hat)       out.push({trait_type:'Hat',       value:C.Hat});
     if (C.Mouth)     out.push({trait_type:'Mouth',     value:C.Mouth});
-    renderAttrs(out);
+    setAttrs(out);
 
-    title.innerHTML = `Frog #${a} × #${b} <span class="pill" style="display:none"></span>`;
-    meta.textContent = 'Mutated preview';
+    title.textContent = `Frog #${aId} × #${bId}`;
+    meta.textContent  = 'Mutated preview';
+  }
+
+  async function refresh(){
+    const id = await randomBaseId();
+    await showBase(id);
   }
 
   async function init(){
-    await showFrog(randId());
-    btnR.addEventListener('click', ()=> showFrog(randId()));
-    btnM.addEventListener('click', ()=> mutateNow());
+    await refresh();
+    btnRefresh && btnRefresh.addEventListener('click', refresh);
+    btnMutate  && btnMutate.addEventListener('click', mutate);
   }
-  (document.readyState==='loading') ? document.addEventListener('DOMContentLoaded', init) : init();
+
+  (document.readyState === 'loading')
+    ? document.addEventListener('DOMContentLoaded', init)
+    : init();
 
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
