@@ -5,22 +5,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>freshfrogs — Mutate</title>
 
-  <!-- Your site CSS already contains the frog-card styles -->
   <link rel="stylesheet" href="assets/css/styles.css" />
 
+  <!-- Copy of the frog-card CSS from collection.html so the card looks EXACTLY the same -->
   <style>
-    /* Only center the card; everything else comes from existing CSS */
-    .center-wrap{ max-width:740px; margin:44px auto; padding:0 16px; }
+    /* Base */
+    .pg-wrap{ padding:20px; }
     img{ image-rendering: pixelated; image-rendering: crisp-edges; }
+
+    .pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
+    .pg-muted{ color:var(--muted); font-size:13px; }
+
+    /* Cards (Owned Frogs) — EXACT */
+    .frog-card{
+      border:1px solid var(--border);
+      background: var(--panel);
+      border-radius:14px;
+      padding:12px;
+      display:grid; grid-template-columns:auto 1fr; column-gap:12px; row-gap:6px; align-items:start;
+      color:inherit;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .frog-card .thumb{
+      width:128px;height:128px;border-radius:12px;background:var(--panel-2);object-fit:contain;grid-row: span 3;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 6px 12px rgba(0,0,0,.25);
+    }
+    .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
+    .pill{ display:inline-block; padding:3px 10px; border-radius:999px; background: color-mix(in srgb, var(--panel) 85%, transparent); border:1px solid var(--border); font-size:12px; }
+    .meta{ color:var(--muted); font-size:12px; }
+    .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; }
+    .attr-bullets li{ font-size:12px; margin:2px 0; }
+    .actions{ grid-column:1 / -1; display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+    .btn{
+      font-family: var(--font-ui);
+      border:1px solid var(--border);
+      background:transparent;
+      color:inherit;
+      border-radius:8px;
+      padding:6px 10px;
+      font-weight:700;
+      font-size:12px;
+      line-height:1;
+      display:inline-flex; align-items:center; gap:6px;
+      text-decoration:none; letter-spacing:.01em;
+      transition: background .15s ease, border-color .15s ease, color .15s ease, transform .05s ease;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn-outline-gray{ border-color: color-mix(in srgb, #9ca3af 70%, var(--border)); color: color-mix(in srgb, #ffffff 65%, #9ca3af); }
+    .actions .btn:hover{
+      background: color-mix(in srgb, #22c55e 14%, var(--panel));
+      border-color: color-mix(in srgb, #22c55e 80%, var(--border));
+      color: color-mix(in srgb, #ffffff 85%, #22c55e);
+    }
+
+    /* Page scaffold: center the one card */
+    .center-wrap{ max-width:980px; margin:44px auto; padding:0 16px; }
   </style>
 </head>
 <body>
   <div class="center-wrap">
-    <!-- EXACT frog-card structure/order used in your dashboard -->
     <article class="frog-card" id="mutateCard" data-token-id="">
       <img class="thumb" id="mutateThumb" src="" alt="" />
       <h4 class="title" id="mutateTitle">Frog #— <span class="pill" id="mutateRank" style="display:none"></span></h4>
-      <div class="meta" id="mutateMeta">Random preview</div>
+      <div class="meta" id="mutateMeta">Not staked • Owned by You</div>
       <ul class="attr-bullets" id="mutateAttrs"></ul>
       <div class="actions">
         <button class="btn btn-outline-gray" id="btnRefresh">Refresh</button>

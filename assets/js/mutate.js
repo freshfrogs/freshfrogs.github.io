@@ -1,167 +1,136 @@
 // assets/js/mutate.js
-// Render EXACT frog-card markup by drawing the mutated frog to a 128x128 canvas
-// and setting the result as the <img.thumb> src. Background uses the ORIGINAL
-// base PNG scaled & shifted far right/down (so only the solid bg color shows).
+// Draws the mutated frog into the SAME <img.thumb> so spacing/shadows match.
+// Background = original still PNG scaled and pushed far bottom-right.
 
 (function (FF, CFG) {
   'use strict';
 
-  const TOTAL = Number(CFG.TOTAL_SUPPLY || 4040);
-  const SOURCE_PATH = String(CFG.SOURCE_PATH || '').replace(/\/+$/, '');
-  const RANKS_URL   = CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json';
-
-  // Background placement (mirrors your CSS idea: 3600% @ 2600%/2600%)
-  const BG_SCALE_FACTOR = 36;    // 3600% / 100
-  const BG_SHIFT_FACTOR = 26;    // 2600% / 100
   const SIZE = 128;
+  const TOTAL = Number(CFG.TOTAL_SUPPLY || 4040);
+  const ROOT  = String(CFG.SOURCE_PATH || '').replace(/\/+$/, '');
+  const RANKS_URL = CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json';
+
+  // Tune if you want the bg pushed more
+  const BG_SCALE_FACTOR = 36;   // ≈3600%
+  const BG_SHIFT_FACTOR = 26;   // ≈2600%
 
   const $ = (s, r=document)=> r.querySelector(s);
-  const thumbImg   = $('#mutateThumb');
-  const titleEl    = $('#mutateTitle');
-  const rankEl     = $('#mutateRank');
-  const metaEl     = $('#mutateMeta');
-  const attrsEl    = $('#mutateAttrs');
-  const btnRefresh = $('#btnRefresh');
-  const btnMutate  = $('#btnMutate');
+  const thumb = $('#mutateThumb');
+  const title = $('#mutateTitle');
+  const rank  = $('#mutateRank');
+  const meta  = $('#mutateMeta');
+  const attrs = $('#mutateAttrs');
+  const btnR  = $('#btnRefresh');
+  const btnM  = $('#btnMutate');
 
-  let currentId = null, RANKS = null;
+  const imgFor  = id => `${ROOT}/frog/${id}.png`;
+  const jsonFor = id => `${ROOT}/frog/json/${id}.json`;
 
-  const imgFor  = (id)=> `${SOURCE_PATH}/frog/${id}.png`;
-  const jsonFor = (id)=> `${SOURCE_PATH}/frog/json/${id}.json`;
+  let currentId, RANKS=null;
 
   async function ensureRanks(){
     if (RANKS) return RANKS;
     try{
-      const r = await fetch(RANKS_URL);
-      const j = await r.json();
+      const r = await fetch(RANKS_URL); const j = await r.json();
       RANKS = Array.isArray(j) ? j.reduce((m,row)=> (m[String(row.id)]=row.ranking, m), {}) : (j||{});
     }catch{ RANKS = {}; }
     return RANKS;
   }
 
-  function renderAttrs(attrs){
-    attrsEl.innerHTML = '';
-    if (!Array.isArray(attrs)) return;
-    for (const a of attrs){
-      const key = a?.trait_type || a?.key; if (!key) continue;
-      const val = a?.value || a?.trait_value || '';
-      const li = document.createElement('li');
-      li.innerHTML = `<b>${key}:</b> ${String(val)}`;
-      attrsEl.appendChild(li);
-    }
-  }
-
-  // Draw background as original still, scaled & pushed to the right/bottom
-  function drawShiftedBackground(ctx, baseImg){
-    // Scale huge, then translate left/up so the visible area is the far bottom-right
-    const scale = BG_SCALE_FACTOR;
-    const drawW = SIZE * scale;
-    const drawH = SIZE * scale;
-
-    // Shift by a factor of the canvas size
-    const shiftPixX = (BG_SHIFT_FACTOR * SIZE) / 1;  // e.g., 26 * 128 = 3328px
-    const shiftPixY = (BG_SHIFT_FACTOR * SIZE) / 1;
-
-    // Start far negative so the "bottom-right color" fills the canvas
-    const dx = -drawW + shiftPixX;
-    const dy = -drawH + shiftPixY;
-
-    // Fill transparent first in case the image has alpha
-    ctx.clearRect(0,0,SIZE,SIZE);
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(baseImg, dx, dy, drawW, drawH);
-  }
-
-  function loadImage(src){
-    return new Promise((resolve)=> {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.decoding = 'async';
-      img.onload = ()=> resolve(img);
-      img.onerror = ()=> resolve(img); // still resolve; we can fail gracefully
-      img.src = src;
+  function renderAttrs(list){
+    attrs.innerHTML = '';
+    if (!Array.isArray(list)) return;
+    list.forEach(a=>{
+      const k=a?.trait_type||a?.key; if(!k) return;
+      const v=a?.value||a?.trait_value||'';
+      const li=document.createElement('li');
+      li.innerHTML = `<b>${k}:</b> ${String(v)}`;
+      attrs.appendChild(li);
     });
   }
 
-  // Layer helper → /frog/build_files/<family>/<attribute>.png
-  async function drawTrait(ctx, trait, attribute){
-    if (!attribute) return;
-    const url = `${SOURCE_PATH}/frog/build_files/${trait}/${attribute}.png`;
-    const img = await loadImage(url);
-    ctx.drawImage(img, 0, 0, SIZE, SIZE);
+  function loadImage(src){
+    return new Promise(res=>{
+      const im=new Image(); im.crossOrigin='anonymous'; im.decoding='async';
+      im.onload=()=>res(im); im.onerror=()=>res(im); im.src=src;
+    });
   }
 
-  async function buildCompositeIntoDataURL(baseId, composite){
-    // baseId: which frog's background image we use
-    // composite: object with selected attributes to layer
-
-    const baseImg = await loadImage(imgFor(baseId));
-    const cnv = document.createElement('canvas');
-    cnv.width = SIZE; cnv.height = SIZE;
-    const ctx = cnv.getContext('2d', { willReadFrequently:true });
+  function drawShiftedBackground(ctx, baseImg){
+    const scale = BG_SCALE_FACTOR;
+    const dw = SIZE*scale, dh = SIZE*scale;
+    const dx = -dw + BG_SHIFT_FACTOR*SIZE;
+    const dy = -dh + BG_SHIFT_FACTOR*SIZE;
+    ctx.clearRect(0,0,SIZE,SIZE);
     ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(baseImg, dx, dy, dw, dh);
+  }
 
-    // Background from original still
-    drawShiftedBackground(ctx, baseImg);
+  async function drawTrait(ctx, trait, attr){
+    if(!attr) return;
+    const im = await loadImage(`${ROOT}/frog/build_files/${trait}/${attr}.png`);
+    ctx.drawImage(im, 0, 0, SIZE, SIZE);
+  }
 
-    // Layer order (matches your builder)
-    if (composite.Frog)             await drawTrait(ctx, 'Frog',        composite.Frog);
-    else if (composite.SpecialFrog) await drawTrait(ctx, 'SpecialFrog', composite.SpecialFrog);
+  async function composeToDataURL(baseId, C){
+    const base = await loadImage(imgFor(baseId));
+    const cnv=document.createElement('canvas'); cnv.width=SIZE; cnv.height=SIZE;
+    const ctx = cnv.getContext('2d', { willReadFrequently:true });
+    ctx.imageSmoothingEnabled=false;
 
-    if (composite.Subset)           await drawTrait(ctx, 'Frog/subset', composite.Subset);
-    if (composite.Trait)            await drawTrait(ctx, 'Trait',       composite.Trait);
-    if (composite.Accessory)        await drawTrait(ctx, 'Accessory',   composite.Accessory);
-    if (composite.Eyes)             await drawTrait(ctx, 'Eyes',        composite.Eyes);
-    if (composite.Hat)              await drawTrait(ctx, 'Hat',         composite.Hat);
-    if (composite.Mouth)            await drawTrait(ctx, 'Mouth',       composite.Mouth);
+    drawShiftedBackground(ctx, base);
+    if (C.Frog) await drawTrait(ctx,'Frog',C.Frog); else if (C.SpecialFrog) await drawTrait(ctx,'SpecialFrog',C.SpecialFrog);
+    if (C.Subset) await drawTrait(ctx,'Frog/subset',C.Subset);
+    if (C.Trait) await drawTrait(ctx,'Trait',C.Trait);
+    if (C.Accessory) await drawTrait(ctx,'Accessory',C.Accessory);
+    if (C.Eyes) await drawTrait(ctx,'Eyes',C.Eyes);
+    if (C.Hat) await drawTrait(ctx,'Hat',C.Hat);
+    if (C.Mouth) await drawTrait(ctx,'Mouth',C.Mouth);
 
     return cnv.toDataURL('image/png');
   }
 
-  async function showFrog(id){
-    currentId = id;
-
-    // Show original PNG directly (exact dashboard look)
-    thumbImg.width = SIZE; thumbImg.height = SIZE;
-    thumbImg.src = imgFor(id);
-    thumbImg.alt = String(id);
-
-    try{
-      const [rM, ranks] = await Promise.all([ fetch(jsonFor(id)), ensureRanks() ]);
-      const meta = rM.ok ? await rM.json() : null;
-      const rk = ranks[String(id)];
-      titleEl.innerHTML = `Frog #${id} <span class="pill" id="mutateRank"${rk==null?' style="display:none"':''}>${rk!=null?`Rank #${rk}`:''}</span>`;
-      metaEl.textContent = 'Not staked • Owned by You';
-      renderAttrs(meta?.attributes || []);
-    }catch{
-      titleEl.textContent = `Frog #${id}`;
-      metaEl.textContent  = 'Preview • —';
-      attrsEl.innerHTML   = '';
-      if (rankEl) rankEl.style.display = 'none';
-    }
-  }
-
   function randId(except){
-    if (!TOTAL || TOTAL<1) return 1;
     let id = Math.floor(Math.random()*TOTAL)+1;
-    if (except && TOTAL>1){ while(id===except) id = Math.floor(Math.random()*TOTAL)+1; }
+    if(except && TOTAL>1){ while(id===except) id = Math.floor(Math.random()*TOTAL)+1; }
     return id;
   }
 
-  async function mutateBuild(aId, bId){
-    // Load A & B metadata
-    const ja = await (await fetch(jsonFor(aId))).json();
-    const jb = await (await fetch(jsonFor(bId))).json();
+  async function showFrog(id){
+    currentId=id;
+    thumb.width=SIZE; thumb.height=SIZE; thumb.src = imgFor(id); thumb.alt=String(id);
 
-    // Flatten to maps
-    const A = { Frog:"", SpecialFrog:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
-    const B = { Frog:"", SpecialFrog:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
-    for (const at of ja.attributes) A[at.trait_type] = at.value;
-    for (const at of jb.attributes) B[at.trait_type] = at.value;
+    try{
+      const [rMeta, ranks] = await Promise.all([fetch(jsonFor(id)), ensureRanks()]);
+      const metaJson = rMeta.ok ? await rMeta.json() : null;
+      const rk = ranks[String(id)];
 
-    const C = { Frog:"", SpecialFrog:"", Subset:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
+      title.innerHTML = `Frog #${id} <span class="pill" id="mutateRank"${rk==null?' style="display:none"':''}>${rk!=null?`Rank #${rk}`:''}</span>`;
+      meta.textContent = 'Not staked • Owned by You';
+      renderAttrs(metaJson?.attributes || []);
+    }catch{
+      title.textContent = `Frog #${id}`;
+      meta.textContent  = 'Preview • —';
+      attrs.innerHTML   = '';
+      rank && (rank.style.display='none');
+    }
+  }
 
-    // Your special rules
+  async function mutateNow(){
+    const a = currentId; if(!a) return;
+    const b = randId(a);
+
+    // load metadata for A & B
+    const ja = await (await fetch(jsonFor(a))).json();
+    const jb = await (await fetch(jsonFor(b))).json();
+
+    const A={Frog:"",SpecialFrog:"",Trait:"",Accessory:"",Eyes:"",Hat:"",Mouth:""};
+    const B={Frog:"",SpecialFrog:"",Trait:"",Accessory:"",Eyes:"",Hat:"",Mouth:""};
+    ja.attributes.forEach(x=> A[x.trait_type]=x.value);
+    jb.attributes.forEach(x=> B[x.trait_type]=x.value);
+
+    const C={Frog:"",SpecialFrog:"",Subset:"",Trait:"",Accessory:"",Eyes:"",Hat:"",Mouth:""};
+
     if (A.SpecialFrog || B.SpecialFrog){
       if (A.SpecialFrog && B.SpecialFrog){
         B.SpecialFrog = A.SpecialFrog + '/SpecialFrog/' + B.SpecialFrog; B.Trait='';
@@ -182,11 +151,11 @@
     C.Hat        = A.Hat        || B.Hat        || '';
     C.Mouth      = A.Mouth      || B.Mouth      || '';
 
-    // Draw composite into the exact <img.thumb>
-    const dataUrl = await buildCompositeIntoDataURL(aId, C);
-    thumbImg.src = dataUrl;
+    // draw into the SAME <img.thumb> (so card looks identical)
+    const dataUrl = await composeToDataURL(a, C);
+    thumb.src = dataUrl;
 
-    // Update bullets with C
+    // update bullets + title text
     const out=[];
     if (C.Frog) out.push({trait_type:'Frog', value:C.Frog}); else if (C.SpecialFrog) out.push({trait_type:'SpecialFrog', value:C.SpecialFrog});
     if (C.Subset)    out.push({trait_type:'Subset',    value:C.Subset});
@@ -196,30 +165,16 @@
     if (C.Hat)       out.push({trait_type:'Hat',       value:C.Hat});
     if (C.Mouth)     out.push({trait_type:'Mouth',     value:C.Mouth});
     renderAttrs(out);
-  }
 
-  async function onRefresh(){
-    btnRefresh.disabled = true;
-    try{ await showFrog(randId()); } finally{ btnRefresh.disabled=false; }
-  }
-
-  async function onMutate(){
-    if (!currentId) return;
-    btnMutate.disabled = true;
-    try{
-      const b = randId(currentId);
-      await mutateBuild(currentId, b);
-      // Title mirrors your structure exactly
-      titleEl.innerHTML = `Frog #${currentId} × #${b} <span class="pill" style="display:none"></span>`;
-      metaEl.textContent = 'Mutated preview';
-    } finally{ btnMutate.disabled = false; }
+    title.innerHTML = `Frog #${a} × #${b} <span class="pill" style="display:none"></span>`;
+    meta.textContent = 'Mutated preview';
   }
 
   async function init(){
-    await onRefresh();
-    btnRefresh?.addEventListener('click', onRefresh);
-    btnMutate?.addEventListener('click', onMutate);
+    await showFrog(randId());
+    btnR.addEventListener('click', ()=> showFrog(randId()));
+    btnM.addEventListener('click', ()=> mutateNow());
   }
-  (document.readyState === 'loading') ? document.addEventListener('DOMContentLoaded', init) : init();
+  (document.readyState==='loading') ? document.addEventListener('DOMContentLoaded', init) : init();
 
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
