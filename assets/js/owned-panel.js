@@ -434,18 +434,22 @@
 
   // --- Stake / Unstake / Approve modals ---
   function openApprovePanel(owner, stats){
-    const approvalText = stats?.approved ? 'Approved' : 'Not Approved';
+    const approvalText = stats?.approved ? 'Approved' : 'Not approved';
     const stCount = Number(stats?.staked || 0);
     const rewards = (typeof stats?.rewards === 'string') ? stats.rewards : formatToken(stats?.rewards, REWARD_DECIMALS);
 
     const body = `
-      <p><b>📃 FreshFrogsNFT Staking</b></p>
-      <p>Stake your Frogs and start earning rewards like ${REWARD_SYMBOL}, and more! Staking works by sending your Frog to a smart contract that will keep it safe. Frogs that are staked can’t be listed on secondary market places, like Rarible.</p>
-      <p><b>✍️ Sign Contract Approval</b><br>To start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.</p>
-      <p class="om-mono">Approval Status: ${approvalText}<br>Staked Tokens: (${stCount}) | Rewards: ${rewards} ${REWARD_SYMBOL}</p>
+      <div class="om-copy">
+        <p><b>Approve staking</b></p>
+        <p>To start staking, give the staking contract permission to access your Frogs. This is a one-time transaction and requires a gas fee.</p>
+        <p class="om-mono" style="margin-top:8px">
+          Status: ${approvalText}<br>
+          Staked: ${stCount} &nbsp;|&nbsp; Rewards: ${rewards} ${REWARD_SYMBOL}
+        </p>
+      </div>
     `;
     openModal({
-      title: 'Approve Staking Contract',
+      title: '',
       bodyHTML: body,
       actions: [
         { label:'Cancel', onClick:()=>{}, primary:false },
@@ -490,20 +494,23 @@
 
   function openUnstakePanel(owner, tokenId){
     const body = `
-      <p><b>🤏 Withdraw Frog #${tokenId}</b></p>
-      <p>Un-staking (withdrawing) this Frog will return it to your wallet. The staking level will be reset to zero!</p>
-      <p>Confirm the ID of the token you would like to withdraw.</p>
-      <label>Token ID</label>
-      <input id="omUnstakeInput" class="om-input om-mono" value="${tokenId}">
+      <div class="om-media">
+        <img class="om-thumb" src="${imgFor(tokenId)}" alt="Frog #${tokenId}">
+        <div class="om-meta">
+          <div class="om-name">Frog #${tokenId}</div>
+          <div class="om-sub">Withdraw from staking</div>
+        </div>
+      </div>
+      <div class="om-copy">
+        <p>Withdrawing returns this Frog to your wallet. The staking level will reset to zero.</p>
+      </div>
     `;
     openModal({
-      title: `Withdraw #${tokenId}`,
+      title: '',
       bodyHTML: body,
       actions: [
         { label:'Cancel', onClick:()=>{}, primary:false },
         { label:`Withdraw Frog #${tokenId}`, primary:true, keepOpen:true, onClick: async ()=>{
-            const val = document.getElementById('omUnstakeInput')?.value?.trim();
-            if (String(val) !== String(tokenId)) { toast('Token ID does not match.'); return; }
             try{
               await sendUnstake(owner, tokenId);
               toast(`Withdraw tx sent for #${tokenId}`);

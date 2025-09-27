@@ -454,3 +454,19 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
   letter-spacing: .01em;
 }
 .pg-card-head .dash-addr{ font-weight:400; color:var(--muted); font-size:12px; letter-spacing:.01em; }
+/* Hide header area if title is empty */
+#ownedModal .om-title:empty { display:none }
+#ownedModal .om-title:empty ~ .om-body { border-top: 1px solid var(--border); } /* keep a subtle divider */
+#ownedModal .om-head { display:flex; align-items:center; gap:10px; min-height:0; }
+#ownedModal .om-title { display:block } /* restored when non-empty */
+
+/* Media block for frog preview */
+#ownedModal .om-media{display:flex;align-items:center;gap:14px;margin:6px 0 12px 0}
+#ownedModal .om-media .om-thumb{width:72px;height:72px;border-radius:10px;border:1px solid var(--border);object-fit:cover;background:#111}
+#ownedModal .om-media .om-meta{display:flex;flex-direction:column}
+#ownedModal .om-media .om-name{font-weight:700;font-size:14px}
+#ownedModal .om-media .om-sub{color:var(--muted);font-size:12px}
+
+/* Body text tone like dashboard */
+#ownedModal .om-copy{color:var(--muted);font-size:13px;line-height:1.5}
+#ownedModal .om-copy p{margin:0 0 10px 0}
