@@ -1,10 +1,6 @@
 // assets/js/mutate.js
-// Mutate Lab page: show one random frog (attributes). Buttons:
-// - Refresh: new random frog
-// - Mutate: pick another random frog and build a composite by layering attribute images
-// Uses your config:
-//   SOURCE_PATH: "https://freshfrogs.github.io" (absolute base)
-//   TOTAL_SUPPLY: 4040
+// Mirrors the frog card look/feel from collection.html,
+// shows 1 random frog with attributes, and supports Refresh + Mutate (layered composite).
 
 (function (FF, CFG) {
   'use strict';
@@ -12,7 +8,6 @@
   const TOTAL = Number(CFG.TOTAL_SUPPLY || 4040);
   const SOURCE_PATH = String(CFG.SOURCE_PATH || '').replace(/\/+$/, ''); // e.g. "https://freshfrogs.github.io"
 
-  // DOM references
   const $ = (s, r=document)=> r.querySelector(s);
   const baseImg     = $('#mutateBase');
   const layersRoot  = $('#mutateLayers');
@@ -25,21 +20,17 @@
 
   let currentId = null;
 
-  // ---- Paths
+  // paths identical to the collection page
   const imgFor  = (id)=> `${SOURCE_PATH}/frog/${id}.png`;
   const jsonFor = (id)=> `${SOURCE_PATH}/frog/json/${id}.json`;
 
-  // ---- Attribute list (like existing cards)
   function renderAttrs(attrs){
     attrsEl.innerHTML = '';
     if (!Array.isArray(attrs)) return;
-    const max = 8;
-    let n = 0;
+    const max = 8; let n = 0;
     for (const a of attrs){
-      if (!a) continue;
-      const key = a.trait_type || a.key || '';
-      const val = a.value || a.trait_value || '';
-      if (!key) continue;
+      const key = a?.trait_type || a?.key; if (!key) continue;
+      const val = a?.value || a?.trait_value || '';
       const li = document.createElement('li');
       li.innerHTML = `<b>${key}:</b> ${String(val)}`;
       attrsEl.appendChild(li);
@@ -47,25 +38,24 @@
     }
   }
 
-  // ---- Layering helper (used by mutate)
+  // layering helper used during mutation
   function build_trait(part, value, locationId){
     const root = document.getElementById(locationId) || layersRoot;
     if (!root) return;
 
     const cleanVal  = String(value || '').replace(/^\/+/, '');
     const cleanPart = String(part || '').replace(/^\/+/, '');
-    const path = `${SOURCE_PATH}/frog/${cleanPart}/${cleanVal}.png`;
+    const url = `${SOURCE_PATH}/frog/${cleanPart}/${cleanVal}.png`;
 
     const img = document.createElement('img');
     img.alt = `${part}:${value}`;
-    img.src = path;
+    img.src = url;
     root.appendChild(img);
   }
 
-  // ---- Show a normal frog by ID
   async function showFrog(id){
     currentId = id;
-    layersRoot.innerHTML = ''; // clear any previous composite layers
+    layersRoot.innerHTML = ''; // clear composite layers
 
     baseImg.src = imgFor(id);
     baseImg.alt = `Frog #${id}`;
@@ -92,154 +82,108 @@
     return id;
   }
 
-  // ---- Mutate (your metamorph_build logic, adapted)
+  // Your metamorph logic, adapted to draw layers into #mutateLayers
   async function metamorph_build(token_a, token_b, locationId) {
     const loc = locationId || 'mutateLayers';
     document.getElementById(loc).innerHTML = '';
 
-    let metadata_a = { Frog:"", SpecialFrog:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
-    let metadata_b = { Frog:"", SpecialFrog:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
-    let metadata_c = { Frog:"", SpecialFrog:"", Subset:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
+    let A = { Frog:"", SpecialFrog:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
+    let B = { Frog:"", SpecialFrog:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
+    let C = { Frog:"", SpecialFrog:"", Subset:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
 
-    // Fetch A
-    const a_raw = await (await fetch(`${SOURCE_PATH}/frog/json/${token_a}.json`)).json();
-    for (let i=0; i<a_raw.attributes.length; i++){
-      const attribute = a_raw.attributes[i];
-      metadata_a[attribute.trait_type] = attribute.value;
-    }
+    // fetch A
+    const ja = await (await fetch(`${SOURCE_PATH}/frog/json/${token_a}.json`)).json();
+    for (const at of ja.attributes){ A[at.trait_type] = at.value; }
+    // fetch B
+    const jb = await (await fetch(`${SOURCE_PATH}/frog/json/${token_b}.json`)).json();
+    for (const at of jb.attributes){ B[at.trait_type] = at.value; }
 
-    // Fetch B
-    const b_raw = await (await fetch(`${SOURCE_PATH}/frog/json/${token_b}.json`)).json();
-    for (let j=0; j<b_raw.attributes.length; j++){
-      const attribute = b_raw.attributes[j];
-      metadata_b[attribute.trait_type] = attribute.value;
-    }
-
-    // SpecialFrog rules (as provided)
-    if (metadata_a['SpecialFrog'] !== '' || metadata_b['SpecialFrog'] !== '') {
-      if (metadata_a['SpecialFrog'] !== '' && metadata_b['SpecialFrog'] !== '') {
-        metadata_b['SpecialFrog'] = metadata_a['SpecialFrog']+'/SpecialFrog/'+metadata_b['SpecialFrog'];
-        metadata_b['Trait'] = '';
-      } else if (metadata_b['Frog'] !== '') {
-        metadata_b['Trait'] = 'SpecialFrog/'+metadata_a['SpecialFrog']+'/'+metadata_b['Trait'];
-        metadata_b['SpecialFrog'] = metadata_a['SpecialFrog']+'/'+metadata_b['Frog'];
-        metadata_b['Frog'] = '';
-      } else if (metadata_a['Frog'] !== '') {
-        metadata_b['Trait'] = 'SpecialFrog/'+metadata_b['SpecialFrog']+'/'+metadata_a['Trait'];
-        metadata_a['SpecialFrog'] = metadata_b['SpecialFrog'];
-        metadata_b['SpecialFrog'] = metadata_b['SpecialFrog']+'/'+metadata_a['Frog'];
-        metadata_a['Frog'] = '';
+    // SpecialFrog rules
+    if (A.SpecialFrog || B.SpecialFrog){
+      if (A.SpecialFrog && B.SpecialFrog){
+        B.SpecialFrog = A.SpecialFrog + '/SpecialFrog/' + B.SpecialFrog;
+        B.Trait = '';
+      } else if (B.Frog){
+        B.Trait = 'SpecialFrog/' + A.SpecialFrog + '/' + B.Trait;
+        B.SpecialFrog = A.SpecialFrog + '/' + B.Frog;
+        B.Frog = '';
+      } else if (A.Frog){
+        B.Trait = 'SpecialFrog/' + B.SpecialFrog + '/' + A.Trait;
+        A.SpecialFrog = B.SpecialFrog;
+        B.SpecialFrog = B.SpecialFrog + '/' + A.Frog;
+        A.Frog = '';
       }
     }
 
-    // Compose C
-    if (metadata_a['Frog'] !== '') { metadata_c['Frog'] = metadata_b['Frog']; }
-    else if (metadata_a['SpecialFrog'] !== '') { metadata_c['SpecialFrog'] = '/bottom/'+metadata_a['SpecialFrog']; }
+    if (A.Frog) C.Frog = B.Frog; else if (A.SpecialFrog) C.SpecialFrog = '/bottom/' + A.SpecialFrog;
+    if (B.Frog) C.Subset = A.Frog; else if (B.SpecialFrog) C.SpecialFrog = B.SpecialFrog;
 
-    if (metadata_b['Frog'] !== '') { metadata_c['Subset'] = metadata_a['Frog']; }
-    else if (metadata_b['SpecialFrog'] !== '') { metadata_c['SpecialFrog'] = metadata_b['SpecialFrog']; }
+    C.Trait      = B.Trait      || A.Trait      || '';
+    C.Accessory  = A.Accessory  || B.Accessory  || '';
+    C.Eyes       = A.Eyes       || B.Eyes       || '';
+    C.Hat        = A.Hat        || B.Hat        || '';
+    C.Mouth      = A.Mouth      || B.Mouth      || '';
 
-    if (metadata_b['Trait'] !== '') { metadata_c['Trait'] = metadata_b['Trait']; }
-    else if (metadata_a['Trait'] !== '') { metadata_c['Trait'] = metadata_a['Trait']; }
-
-    if (metadata_a['Accessory'] !== '') { metadata_c['Accessory'] = metadata_a['Accessory']; }
-    else if (metadata_b['Accessory'] !== '') { metadata_c['Accessory'] = metadata_b['Accessory']; }
-
-    if (metadata_a['Eyes'] !== '') { metadata_c['Eyes'] = metadata_a['Eyes']; }
-    else if (metadata_b['Eyes'] !== '') { metadata_c['Eyes'] = metadata_b['Eyes']; }
-
-    if (metadata_a['Hat'] !== '') { metadata_c['Hat'] = metadata_a['Hat']; }
-    else if (metadata_b['Hat'] !== '') { metadata_c['Hat'] = metadata_b['Hat']; }
-
-    if (metadata_a['Mouth'] !== '') { metadata_c['Mouth'] = metadata_a['Mouth']; }
-    else if (metadata_b['Mouth'] !== '') { metadata_c['Mouth'] = metadata_b['Mouth']; }
-
-    // Build layers (and return composed attributes)
-    const resultAttrs = [];
-    if (metadata_c['Frog'] !== '') {
-      resultAttrs.push({trait_type:'Frog', value:metadata_c['Frog']});
-      build_trait('Frog', metadata_c['Frog'], loc);
-    } else if (metadata_c['SpecialFrog'] !== '') {
-      resultAttrs.push({trait_type:'SpecialFrog', value:metadata_c['SpecialFrog']});
-      build_trait('SpecialFrog', metadata_c['SpecialFrog'], loc);
+    // draw layers & return composed attributes (used to fill the attributes list)
+    const result = [];
+    if (C.Frog){
+      result.push({trait_type:'Frog', value:C.Frog});
+      build_trait('Frog', C.Frog, loc);
+    } else if (C.SpecialFrog){
+      result.push({trait_type:'SpecialFrog', value:C.SpecialFrog});
+      build_trait('SpecialFrog', C.SpecialFrog, loc);
     }
+    if (C.Subset)    { result.push({trait_type:'Subset',    value:C.Subset});    build_trait('Frog/subset', C.Subset,    loc); }
+    if (C.Trait)     { result.push({trait_type:'Trait',     value:C.Trait});     build_trait('Trait',       C.Trait,     loc); }
+    if (C.Accessory) { result.push({trait_type:'Accessory', value:C.Accessory}); build_trait('Accessory',   C.Accessory, loc); }
+    if (C.Eyes)      { result.push({trait_type:'Eyes',      value:C.Eyes});      build_trait('Eyes',        C.Eyes,      loc); }
+    if (C.Hat)       { result.push({trait_type:'Hat',       value:C.Hat});       build_trait('Hat',         C.Hat,       loc); }
+    if (C.Mouth)     { result.push({trait_type:'Mouth',     value:C.Mouth});     build_trait('Mouth',       C.Mouth,     loc); }
 
-    if (metadata_c['Subset']    !== '') { resultAttrs.push({trait_type:'Subset',    value:metadata_c['Subset']});    build_trait('Frog/subset', metadata_c['Subset'],    loc); }
-    if (metadata_c['Trait']     !== '') { resultAttrs.push({trait_type:'Trait',     value:metadata_c['Trait']});     build_trait('Trait',       metadata_c['Trait'],     loc); }
-    if (metadata_c['Accessory'] !== '') { resultAttrs.push({trait_type:'Accessory', value:metadata_c['Accessory']}); build_trait('Accessory',   metadata_c['Accessory'], loc); }
-    if (metadata_c['Eyes']      !== '') { resultAttrs.push({trait_type:'Eyes',      value:metadata_c['Eyes']});      build_trait('Eyes',        metadata_c['Eyes'],      loc); }
-    if (metadata_c['Hat']       !== '') { resultAttrs.push({trait_type:'Hat',       value:metadata_c['Hat']});       build_trait('Hat',         metadata_c['Hat'],       loc); }
-    if (metadata_c['Mouth']     !== '') { resultAttrs.push({trait_type:'Mouth',     value:metadata_c['Mouth']});     build_trait('Mouth',       metadata_c['Mouth'],     loc); }
-
-    const outEl = document.getElementById('morph-json');
-    if (outEl) outEl.textContent = JSON.stringify(resultAttrs, null, 2);
-    return resultAttrs;
+    return result;
   }
 
-  // ---- Buttons
-  async function handleRefresh(){
+  // buttons
+  async function onRefresh(){
     btnRefresh.disabled = true;
     try{
-      const id = randId();
-      await showFrog(id);
-    }finally{
-      btnRefresh.disabled = false;
-    }
+      await showFrog(randId());
+    } finally { btnRefresh.disabled = false; }
   }
 
-  async function handleMutate(){
+  async function onMutate(){
     if (!currentId) return;
     btnMutate.disabled = true;
     try{
       const b = randId(currentId);
-      // Keep base (A) visible; overlay composite (C) via layers:
-      const resultAttrs = await metamorph_build(currentId, b, 'mutateLayers');
+      const composed = await metamorph_build(currentId, b, 'mutateLayers');
       titleEl.textContent = `Frog #${currentId} × #${b}`;
       metaEl.textContent = 'Mutated preview (composite layers)';
-      renderAttrs(resultAttrs);
-    }catch(e){
-      console.warn('[mutate] failed', e);
-    }finally{
-      btnMutate.disabled = false;
-    }
+      renderAttrs(composed);
+    } finally { btnMutate.disabled = false; }
   }
 
-  // ---- Optional wallet chip (same style as other pages)
+  // optional wallet chip (kept muted on this page)
   async function initWalletChip(){
-    const btn = btnWallet;
-    if (!btn) return;
+    const btn = btnWallet; if (!btn) return;
     try{
       const arr = await (window.ethereum?.request?.({method:'eth_accounts'}) || []);
       const a = arr?.[0] || null;
-      btn.style.display = 'inline-flex';
       if (a){
+        btn.style.display = 'inline-flex';
         btn.classList.add('btn-connected');
         btn.textContent = a;
         btn.style.pointerEvents = 'none';
-      }else{
-        btn.textContent = 'Connect Wallet';
-        btn.addEventListener('click', async ()=>{
-          try{
-            const got = await window.ethereum.request({ method:'eth_requestAccounts' });
-            const addr = got?.[0] || null;
-            if (addr){
-              btn.classList.add('btn-connected');
-              btn.textContent = addr;
-              btn.style.pointerEvents = 'none';
-            }
-          }catch{}
-        });
       }
     }catch{}
   }
 
-  // ---- Boot
   async function init(){
     if (FF?.initTopbar) try { FF.initTopbar(); } catch {}
     await initWalletChip();
-    await handleRefresh();
-    btnRefresh?.addEventListener('click', handleRefresh);
-    btnMutate?.addEventListener('click', handleMutate);
+    await onRefresh();
+    btnRefresh?.addEventListener('click', onRefresh);
+    btnMutate?.addEventListener('click', onMutate);
   }
 
   if (document.readyState === 'loading'){
