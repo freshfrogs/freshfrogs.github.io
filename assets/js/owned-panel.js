@@ -464,20 +464,23 @@
 
   function openStakePanel(owner, tokenId){
     const body = `
-      <p><b>📌 Stake Frog #${tokenId}</b></p>
-      <p>While this Frog is staked you will not be able to sell it on secondary market places, like Rarible. To do this you will have to un-stake directly from this site. Once a Frog is un-staked its level will reset to zero!</p>
-      <p>Confirm the ID of the Frog you would like to stake.</p>
-      <label>Token ID</label>
-      <input id="omStakeInput" class="om-input om-mono" value="${tokenId}">
+      <div class="om-media">
+        <img class="om-thumb" src="${imgFor(tokenId)}" alt="Frog #${tokenId}">
+        <div class="om-meta">
+          <div class="om-name">Frog #${tokenId}</div>
+          <div class="om-sub">Ready to stake</div>
+        </div>
+      </div>
+      <div class="om-copy">
+        <p>While staked, your Frog can’t be listed or sold on marketplaces. You can un-stake here at any time. When a Frog is un-staked its level resets to zero.</p>
+      </div>
     `;
     openModal({
-      title: `Stake #${tokenId}`,
+      title: '', // no bold header line
       bodyHTML: body,
       actions: [
         { label:'Cancel', onClick:()=>{}, primary:false },
         { label:`Stake Frog #${tokenId}`, primary:true, keepOpen:true, onClick: async ()=>{
-            const val = document.getElementById('omStakeInput')?.value?.trim();
-            if (String(val) !== String(tokenId)) { toast('Token ID does not match.'); return; }
             try{
               await sendStake(owner, tokenId);
               toast(`Stake tx sent for #${tokenId}`);
