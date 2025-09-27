@@ -470,3 +470,101 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
 /* Body text tone like dashboard */
 #ownedModal .om-copy{color:var(--muted);font-size:13px;line-height:1.5}
 #ownedModal .om-copy p{margin:0 0 10px 0}
+/* assets/css/clean-overrides.css */
+
+/* global page bg stays; we remove panel/card chrome */
+.pg-card,
+.panel,
+.card,
+.facts-card,
+.stat-cell,
+.info-block,
+.row,
+.frog-card {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* lists/rows still need spacing */
+.row { padding: 12px 0 !important; }
+
+/* tiles & thumbs keep rounded corners but no inner bg */
+.thumb64, .thumb128, .frog-card .thumb {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* topbar keeps layout, no chrome */
+.ff-topbar {
+  background: transparent !important;
+  border-bottom: 0 !important;
+  backdrop-filter: none !important;
+}
+
+/* info blocks grid spacing still nice */
+.info-grid-2 { gap: 10px; }
+/* assets/css/mutate-overrides.css */
+
+/* perfect center */
+#mutateCenter{
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+/* use the same frog-card typography, but no outer chrome */
+.frog-card--mutate{
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  column-gap: 24px;
+}
+
+/* left stack = 256 preview + buttons */
+.mutate-left{ display:flex; flex-direction:column; gap:10px; align-items:center; }
+
+/* exact 256 × 256 preview, crisp pixels */
+.mutate-hero{
+  width:256px; height:256px; min-width:256px; min-height:256px;
+  border-radius:12px;
+  overflow:hidden;              /* crop the original still bg */
+  position:relative;
+  image-rendering: pixelated; image-rendering: crisp-edges;
+}
+
+/* layered parts you append here should be 128×128; we scale 2× */
+.mutate-hero .layer{
+  position:absolute; inset:0;
+  width:128px; height:128px;
+  transform: scale(2);          /* 128 -> 256 */
+  transform-origin: top left;
+  image-rendering: pixelated; image-rendering: crisp-edges;
+}
+
+/* use the *original* still image as background; push it to the right
+   so only the plain bg color shows */
+.mutate-hero{
+  background-repeat:no-repeat;
+  background-size: 240%;        /* big zoom-in so we see only flat color */
+  background-position: 180% 60%;/* far right & slightly down */
+}
+
+/* keep your existing button look */
+.actions{ display:flex; gap:8px; }
+
+/* right side = title/meta/attrs, same metrics as dashboard cards */
+.mutate-right .title{ margin:0 0 4px 0; font-weight:900; font-size:18px; letter-spacing:-.01em; }
+.mutate-right .meta{ color:var(--muted); font-size:12px; }
+.mutate-right .attr-bullets{ list-style:disc; margin:10px 0 0 18px; padding:0; }
+.mutate-right .attr-bullets li{ font-size:12px; margin:2px 0; }
+
+@media (max-width:720px){
+  .frog-card--mutate{ grid-template-columns: 1fr; row-gap: 14px; }
+  .mutate-left{ align-items:flex-start; }
+}

@@ -82,22 +82,22 @@
   </style>
 </head>
 <body>
-  <div class="screen-center">
-    <article class="frog-card mutate" id="mutateCard" data-token-id="">
-      <!-- Left: image + buttons -->
-      <div class="mut-left">
-        <img class="thumb" id="mutateThumb" src="" alt="" />
+  <div id="mutateCenter">
+    <article class="frog-card frog-card--mutate" id="mutateCard">
+      <div class="mutate-left">
+        <div class="mutate-hero" id="mutateHero">
+          <!-- your layered <img> parts get appended here -->
+        </div>
         <div class="actions">
           <button class="btn btn-outline-gray" id="btnRefresh">Refresh</button>
           <button class="btn btn-outline-gray" id="btnMutate">Mutate</button>
         </div>
       </div>
 
-      <!-- Right: info -->
-      <div class="mut-right">
-        <h4 class="title" id="mutateTitle">Frog #— <span class="pill" id="mutateRank" style="display:none"></span></h4>
-        <div class="meta" id="mutateMeta">Not staked • Owned by You</div>
-        <ul class="attr-bullets" id="mutateAttrs"></ul>
+      <div class="mutate-right">
+        <h4 class="title" id="mutTitle">Frog #—</h4>
+        <div class="meta" id="mutMeta">Not staked • Owned by You</div>
+        <ul class="attr-bullets" id="mutAttrs"></ul>
       </div>
     </article>
   </div>
