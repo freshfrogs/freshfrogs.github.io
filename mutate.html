@@ -7,19 +7,19 @@
   <link rel="icon" href="assets/frog.png">
   <link rel="stylesheet" href="assets/styles.css">
 
-  <!-- Core config & shared helpers already used by the site -->
+  <!-- Core site config + helpers (already in your repo) -->
   <script src="assets/js/config.js"></script>
   <script src="assets/js/utils.js"></script>
   <script src="assets/js/wallet.js"></script>
   <script src="assets/js/wallet-state.js"></script>
   <script src="assets/js/topbar.js"></script>
 
-  <!-- ABIs / Web3 just in case we wire wallet later -->
+  <!-- ABIs / Web3 only if you later want on-chain actions on this page -->
   <script src="assets/js/collection_abi.js"></script>
   <script src="assets/js/controller_abi.js"></script>
   <script src="https://unpkg.com/web3@1.10.0/dist/web3.min.js"></script>
 
-  <!-- Mutate logic -->
+  <!-- Mutate page logic -->
   <script src="assets/js/mutate.js" defer></script>
 
   <style>
@@ -27,6 +27,8 @@
     .page-wrap{max-width:1100px;margin:0 auto;padding:16px}
     .page-grid{display:grid;grid-template-columns:1fr;gap:20px;justify-items:center}
     .pg-card{max-width:880px;width:100%}
+
+    /* Image area: base image + layered build */
     .frog-preview{
       position:relative;
       width:100%;
@@ -37,12 +39,11 @@
       background:#0b0b0b;
     }
     .frog-preview img, .frog-preview .layers img{
-      display:block; width:100%; height:100%; object-fit:contain; image-rendering:auto;
+      display:block; width:100%; height:100%; object-fit:contain;
     }
-    .frog-preview .layers{
-      position:absolute; inset:0; pointer-events:none;
-    }
-    /* keep actions compact */
+    .frog-preview .layers{ position:absolute; inset:0; pointer-events:none; }
+
+    /* Actions */
     .mutate-actions{display:flex; gap:8px; flex-wrap:wrap}
   </style>
 </head>
@@ -53,37 +54,37 @@
   <main class="page-wrap">
     <div class="page-grid">
 
-      <!-- Single, centered dashboard card -->
+      <!-- Single centered dashboard-like card (pond panel removed) -->
       <section class="pg-card" id="mutateCard">
         <div class="pg-card-head">
           <h3>Mutate Lab</h3>
           <div class="spacer"></div>
-          <!-- Optional: keep wallet chip if you want -->
+          <!-- Optional wallet chip (kept off by default; mutate.js can enable it) -->
           <button class="btn" id="mutateWalletBtn" style="display:none">Connect Wallet</button>
         </div>
 
-        <!-- Random frog card -->
+        <!-- One frog card -->
         <article class="frog-card" id="mutateFrogCard">
           <div class="frog-preview">
-            <!-- Base (full PNG) -->
+            <!-- Base PNG of the currently shown frog -->
             <img id="mutateBase" alt="Frog" src="" />
-            <!-- Layered build (for mutation) -->
+            <!-- Layered build goes above base when mutating -->
             <div class="layers" id="mutateLayers"></div>
           </div>
 
           <h4 class="title" id="mutateTitle">Frog #—</h4>
           <div class="meta" id="mutateMeta">Random preview</div>
 
-          <!-- Attributes -->
+          <!-- Attribute bullets (same style as the site) -->
           <ul class="attr-bullets" id="mutateAttrs"></ul>
 
-          <!-- Actions -->
+          <!-- Only two buttons -->
           <div class="actions mutate-actions">
             <button class="btn btn-outline-gray" id="btnRefresh">Refresh</button>
             <button class="btn btn-outline-gray" id="btnMutate">Mutate</button>
           </div>
 
-          <!-- Optional debug: final composed JSON from morph -->
+          <!-- Optional debug: composed JSON from morph (hidden) -->
           <pre id="morph-json" class="pg-muted" style="display:none;"></pre>
         </article>
       </section>
@@ -92,7 +93,7 @@
   </main>
 
   <script>
-    // Initialize topbar (existing helper)
+    // Initialize topbar (uses your existing helper)
     if (window.FF?.initTopbar) try { window.FF.initTopbar(); } catch {}
   </script>
 </body>
