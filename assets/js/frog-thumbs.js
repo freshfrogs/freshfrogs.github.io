@@ -1,146 +1,176 @@
-// assets/js/frog-thumbs.js — DASHBOARD LAYERING (assertive)
-(function(){
+// assets/js/frog-thumbs.js
+// Dashboard: render each <article.frog-card> as a layered frog + darkened card bg.
+
+(function () {
   'use strict';
 
-  console.log('[frog-thumbs] loaded');
+  // --- config/paths (adjustable via window.CFG.SOURCE_PATH if you have one) ---
+  var SRC   = (window.CFG && window.CFG.SOURCE_PATH ? String(window.CFG.SOURCE_PATH).replace(/\/+$/,'') : '');
+  var FLAT  = (SRC ? SRC : '') + '/frog';
+  var META  = (SRC ? SRC : '') + '/frog/json';
+  var LAYER = (SRC ? SRC : '') + '/frog/build_files';
 
-  // dashboard roots
-  var ROOTS = ['#dashboardPanel','#ownedPanel','[data-panel="owned"]','.dashboard-owned','.owned-panel','.wallet-owned','.owned-grid','.owned-cards','.owned-list','.cards-owned','.my-frogs'];
-  var SRC = (window.FF_CFG?.SOURCE_PATH || window.CFG?.SOURCE_PATH || '').replace(/\/+$/,'');
-  var FLAT   = (SRC?SRC:'') + '/frog';
-  var META   = (SRC?SRC:'') + '/frog/json';
-  var LAYERS = (SRC?SRC:'') + '/frog/build_files';
-
-  function insideDash(n){ if(!n||n.nodeType!==1) return false; for (var i=0;i<ROOTS.length;i++) if (n.closest && n.closest(ROOTS[i])) return true; return false; }
-  function qq(s,p){ return Array.from((p||document).querySelectorAll(s)); }
+  // --- utilities ---
+  function qsa(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
   function safe(s){ return encodeURIComponent(String(s)); }
+  function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
 
-  // builder
-  var NO_ANIM_FOR=new Set(['Hat','Frog','Trait']), NO_LIFT_FOR=new Set(['Frog','Trait','SpecialFrog']);
-  function makeLayerImg(attr,val,px){
-    var allow=!NO_ANIM_FOR.has(attr);
-    var base=LAYERS+'/'+safe(attr), png=base+'/'+safe(val)+'.png', gif=base+'/animations/'+safe(val)+'_animation.gif';
-    var img=new Image(); img.decoding='async'; img.loading='lazy'; img.dataset.attr=attr;
-    Object.assign(img.style,{position:'absolute',left:'0',top:'0',width:px+'px',height:px+'px',imageRendering:'pixelated',zIndex:'2',transition:'transform .28s cubic-bezier(.22,.61,.36,1)'});
-    if(allow){ img.src=gif; img.onerror=()=>{ img.onerror=null; img.src=png; }; } else { img.src=png; }
-    if(!NO_LIFT_FOR.has(attr)){
-      img.addEventListener('mouseenter',()=>{ img.style.transform='translate(-8px,-12px)'; img.style.filter='drop-shadow(0 5px 0 rgba(0,0,0,.45))'; });
-      img.addEventListener('mouseleave',()=>{ img.style.transform=''; img.style.filter=''; });
+  // --- tiny layered builder (fresh, self-contained) ---
+  var NO_ANIM_FOR = new Set(['Hat','Frog','Trait']);
+  var NO_LIFT_FOR = new Set(['Frog','Trait','SpecialFrog']);
+
+  function makeLayer(attr, value, size){
+    var allowAnim = !NO_ANIM_FOR.has(attr);
+    var base = LAYER + '/' + safe(attr);
+    var png  = base + '/' + safe(value) + '.png';
+    var gif  = base + '/animations/' + safe(value) + '_animation.gif';
+
+    var img = new Image();
+    img.decoding = 'async';
+    img.loading  = 'lazy';
+    Object.assign(img.style, {
+      position:'absolute', left:'0', top:'0',
+      width:size+'px', height:size+'px',
+      imageRendering:'pixelated', zIndex:'2',
+      transition:'transform 280ms cubic-bezier(.22,.61,.36,1)'
+    });
+
+    if (allowAnim){ img.src = gif; img.onerror = function(){ img.onerror = null; img.src = png; }; }
+    else { img.src = png; }
+
+    if (!NO_LIFT_FOR.has(attr)){
+      img.addEventListener('mouseenter', function(){
+        img.style.transform = 'translate(-8px,-12px)';
+        img.style.filter = 'drop-shadow(0 5px 0 rgba(0,0,0,.45))';
+      });
+      img.addEventListener('mouseleave', function(){
+        img.style.transform = 'translate(0,0)';
+        img.style.filter = 'none';
+      });
     }
     return img;
   }
-  async function buildFrog128(container, id){
-    const SIZE=128, flatUrl=`${FLAT}/${id}.png`;
-    Object.assign(container.style,{width:SIZE+'px',height:SIZE+'px',minWidth:SIZE+'px',minHeight:SIZE+'px',position:'relative',overflow:'hidden',borderRadius:'8px',imageRendering:'pixelated',
-      background:`url("${flatUrl}") no-repeat`,backgroundSize:'2000% 2000%',backgroundPosition:'100% -1200%'});
+
+  async function buildLayered(container, tokenId, size){
+    var flatUrl = FLAT + '/' + tokenId + '.png';
+
+    // shifted flat BG (like the Pond)
+    Object.assign(container.style, {
+      position:'relative', overflow:'hidden', borderRadius:'8px', imageRendering:'pixelated',
+      width:size+'px', height:size+'px', minWidth:size+'px', minHeight:size+'px',
+      backgroundImage: 'url("'+flatUrl+'")',
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: '2000% 2000%',
+      backgroundPosition: '100% -1200%'
+    });
+
     while (container.firstChild) container.removeChild(container.firstChild);
+
     try{
-      const meta = await (await fetch(`${META}/${id}.json`,{cache:'force-cache'})).json();
-      const attrs = Array.isArray(meta?.attributes)?meta.attributes:[];
-      for(const r of attrs){
-        const a=String(r.trait_type||r.traitType||'').trim(), v=String(r.value).trim();
-        if(!a||!v) continue;
-        container.appendChild(makeLayerImg(a,v,SIZE));
-      }
+      var meta = await (await fetch(META + '/' + tokenId + '.json', {cache:'force-cache'})).json();
+      var attrs = Array.isArray(meta && meta.attributes) ? meta.attributes : [];
+      attrs.forEach(function(row){
+        var attr = String(row.trait_type || row.traitType || '').trim();
+        var val  = String(row.value).trim();
+        if (attr && val) container.appendChild(makeLayer(attr, val, size));
+      });
     }catch{
-      const img=new Image(); img.decoding='async'; img.loading='lazy'; Object.assign(img.style,{position:'absolute',inset:'0',width:SIZE+'px',height:SIZE+'px',imageRendering:'pixelated',zIndex:'2'});
-      img.src=flatUrl; container.appendChild(img);
-    }
-    // darken card bg ~20%
-    const card = container.closest('.card, .owned-card, .grid-item, .dashboard-card, .item, .tile, .module-card, .ff-card') || container.parentElement;
-    if (card && !card.dataset.bgApplied) {
-      card.style.backgroundImage = `linear-gradient(rgba(0,0,0,.2), rgba(0,0,0,.2)), url("${flatUrl}")`;
-      card.style.backgroundRepeat = 'no-repeat';
-      card.style.backgroundSize = '2000% 2000%';
-      card.style.backgroundPosition = '100% -1200%';
-      card.style.backgroundBlendMode = 'multiply';
-      card.dataset.bgApplied = '1';
+      // fallback: flat image on top
+      var img = new Image(); img.decoding='async'; img.loading='lazy';
+      Object.assign(img.style, { position:'absolute', inset:'0', width:size+'px', height:size+'px', imageRendering:'pixelated', zIndex:'2' });
+      img.src = flatUrl; container.appendChild(img);
     }
   }
-  window.buildFrog128 = window.buildFrog128 || buildFrog128;
 
-  function tokenIdFrom(node){
-    if (!node || node.nodeType!==1) return null;
-    // data-* on node/ancestors
-    let p=node, hops=0;
-    while(p && p.nodeType===1 && hops++<3){
-      const d=p.dataset||{};
-      const cand=d.tokenId||d.id||d.frogId||d.token||d.tokenid||d.frogid;
-      if(cand) return String(cand).replace(/\D/g,'') || null;
-      p=p.parentNode;
-    }
-    // <img src=".../1234.png">
-    if (node.tagName==='IMG'){
-      const m=(node.getAttribute('src')||'').match(/\/(\d+)\.png(?:\?.*)?$/i);
-      if (m) return m[1];
-    }
-    // background-image url(.../1234.png)
-    const bg=getComputedStyle(node).backgroundImage;
-    if (bg && bg!=='none'){
-      const u=(bg.match(/url\(["']?([^"')]+)["']?\)/i)||[])[1]||'';
-      const m=u.match(/\/(\d+)\.png(?:\?.*)?$/i);
-      if (m) return m[1];
-    }
-    return null;
+  function darkenCardBackground(card, tokenId){
+    if (!card || card.dataset.bgApplied === '1') return;
+    var flatUrl = FLAT + '/' + tokenId + '.png';
+    card.style.backgroundImage    = 'linear-gradient(rgba(0,0,0,.20), rgba(0,0,0,.20)), url("'+flatUrl+'")';
+    card.style.backgroundRepeat   = 'no-repeat';
+    card.style.backgroundSize     = '2000% 2000%';
+    card.style.backgroundPosition = '100% -1200%';
+    card.style.backgroundBlendMode = 'multiply';
+    card.dataset.bgApplied = '1';
   }
 
-  function upgradeNode(node){
-    if (!insideDash(node)) return false;
-    if (node.closest && node.closest('.frog-128-layered')) return true;
+  function tokenIdFromCard(card){
+    // explicit data attr (present in your markup)
+    var ds = card && card.dataset || {};
+    if (ds.tokenId) return String(ds.tokenId).replace(/\D/g,'') || null;
 
-    // case A: <img>
-    if (node.tagName==='IMG'){
-      const id = tokenIdFrom(node); if (!id) return false;
-      const wrap=document.createElement('div'); wrap.className='frog-128-layered';
-      try{ node.parentNode.replaceChild(wrap,node); }catch{ node.parentNode.insertBefore(wrap,node); node.style.display='none'; }
-      buildFrog128(wrap,id);
-      console.log('[frog-thumbs] layered <img> token', id);
-      return true;
+    // fallback: from the <img class="thumb" src=".../1234.png">
+    var img = card.querySelector('img.thumb');
+    if (img){
+      var m = (img.getAttribute('src')||'').match(/\/(\d+)\.png(?:\?.*)?$/i);
+      if (m) return m[1];
     }
 
-    // case B: tile with bg-image
-    const id2 = tokenIdFrom(node);
-    if (id2){
-      // overlay a child container to render layers
-      if (getComputedStyle(node).position==='static') node.style.position='relative';
-      const wrap=document.createElement('div'); wrap.className='frog-128-layered';
-      Object.assign(wrap.style,{position:'absolute',left:0,top:0,width:'128px',height:'128px'});
-      node.appendChild(wrap);
-      buildFrog128(wrap,id2);
-      console.log('[frog-thumbs] layered tile token', id2);
-      return true;
+    // fallback: from title text "Frog #1234"
+    var t = (card.querySelector('.title') || card).textContent || '';
+    var m2 = t.match(/#\s*(\d{1,6})/);
+    return m2 ? m2[1] : null;
+  }
+
+  function thumbSizeFromCard(card){
+    // try to respect current thumbnail size; default 128
+    var img = card.querySelector('img.thumb');
+    if (img){
+      var r = img.getBoundingClientRect();
+      if (r.width && r.height) return clamp(Math.round(Math.max(r.width, r.height)), 96, 160);
     }
-    return false;
+    return 128;
+  }
+
+  function upgradeCard(card){
+    if (!card || card.dataset.layered === '1') return false;
+
+    var tokenId = tokenIdFromCard(card);
+    if (!tokenId) return false;
+
+    var size = thumbSizeFromCard(card);
+
+    // Replace the <img.thumb> with layered container
+    var img = card.querySelector('img.thumb');
+    var host = img ? img.parentNode : card;
+    var wrap = document.createElement('div');
+    wrap.className = 'frog-layered-thumb';
+    if (img){
+      try { host.replaceChild(wrap, img); }
+      catch(_) { host.insertBefore(wrap, img); img.style.display='none'; }
+    } else {
+      host.insertBefore(wrap, host.firstChild);
+    }
+
+    buildLayered(wrap, tokenId, size);
+    darkenCardBackground(card, tokenId);
+    card.dataset.layered = '1';
+    return true;
   }
 
   function scan(root){
-    let hits=0;
-    ROOTS.forEach(sel=>{
-      qq(sel, root||document).forEach(scope=>{
-        // imgs
-        qq('img', scope).forEach(img=>{ if (upgradeNode(img)) hits++; });
-        // tiles (divs with background-image)
-        qq('.thumb, .tile, .card-thumb, .owned-thumb, .grid-item, .card', scope).forEach(div=>{
-          const bg = getComputedStyle(div).backgroundImage;
-          if (bg && bg!=='none') { if (upgradeNode(div)) hits++; }
-        });
-      });
+    var hits = 0;
+    qsa('article.frog-card', root||document).forEach(function(card){
+      if (upgradeCard(card)) hits++;
     });
-    if (hits) console.log('[frog-thumbs] upgraded nodes:', hits);
     return hits;
   }
 
+  // Mutation observer to catch dynamic inserts
   function observe(){
-    const mo = new MutationObserver(muts=>{
-      for (const m of muts){
-        if (m.addedNodes) for (const n of m.addedNodes){ if (n.nodeType===1) scan(n); }
-        if (m.type==='attributes' && (m.attributeName==='src' || m.attributeName==='style' || m.attributeName==='class' || m.attributeName?.startsWith('data-'))) scan(m.target);
-      }
+    var mo = new MutationObserver(function(muts){
+      muts.forEach(function(m){
+        if (m.addedNodes && m.addedNodes.length){
+          m.addedNodes.forEach(function(n){ if (n.nodeType===1) scan(n); });
+        }
+      });
     });
-    mo.observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:['src','style','class','data-token-id','data-id','data-token','data-frog-id']});
+    mo.observe(document.body, { childList:true, subtree:true });
   }
 
-  function kick(){ scan(document); observe(); setTimeout(()=>scan(document), 700); setTimeout(()=>scan(document), 1500); }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', kick);
-  else kick();
+  // kick once ready
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){ scan(document); observe(); });
+  } else {
+    scan(document); observe();
+  }
 })();
