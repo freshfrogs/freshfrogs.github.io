@@ -197,5 +197,51 @@
     FF_loadRecentMints && FF_loadRecentMints();
     FF_loadRecentStakes && FF_loadRecentStakes();
   </script>
+
+  <script>
+  // Randomize the hero frog images on each load.
+  (function () {
+    const CFG = window.FF_CFG || {};
+    const TOTAL = Number(CFG.TOTAL_SUPPLY || 4040);
+    const ROOT  = String(CFG.SOURCE_PATH || '').replace(/\/+$/,'') || '';
+
+    function pickUniqueIds(n, max){
+      // Fisher–Yates shuffle of a small sample for uniqueness
+      const pool = Array.from({length:max}, (_,i)=> i+1);
+      for (let i = pool.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+      return pool.slice(0, n);
+    }
+
+    function randomizeStrip(selector){
+      const strip = document.querySelector(selector);
+      if (!strip) return;
+      const imgs = Array.from(strip.querySelectorAll('.tile img'));
+      if (!imgs.length) return;
+
+      const ids = pickUniqueIds(imgs.length, TOTAL);
+      imgs.forEach((img, idx) => {
+        const id = ids[idx];
+        img.src = ROOT + '/frog/' + id + '.png';
+        img.alt = String(id);
+      });
+    }
+
+    function init(){
+      randomizeStrip('.frog-strip');
+      // If you have a layout function on this page, call it after randomizing
+      if (typeof layoutFrogStrip === 'function') {
+        layoutFrogStrip();
+      }
+    }
+
+    (document.readyState === 'loading')
+      ? document.addEventListener('DOMContentLoaded', init)
+      : init();
+  })();
+</script>
+
 </body>
 </html>
