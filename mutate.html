@@ -1,187 +1,99 @@
-/*
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>FreshFrogs • Mutate Lab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="assets/frog.png">
+  <link rel="stylesheet" href="assets/styles.css">
 
-    Morph Token(s)
-    Combine and Render NFT Tokens
+  <!-- Core config & shared helpers already used by the site -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/wallet.js"></script>
+  <script src="assets/js/wallet-state.js"></script>
+  <script src="assets/js/topbar.js"></script>
 
-    Token(A) + Token(B) = Token(C)
-    Alpha + Bravo = Charlie
+  <!-- ABIs / Web3 just in case we wire wallet later -->
+  <script src="assets/js/collection_abi.js"></script>
+  <script src="assets/js/controller_abi.js"></script>
+  <script src="https://unpkg.com/web3@1.10.0/dist/web3.min.js"></script>
 
-*/
+  <!-- Mutate logic -->
+  <script src="assets/js/mutate.js" defer></script>
 
-async function metamorph_build(token_a, token_b, location) {
-
-    console.log('=-=-=-=-=-=-=-=-=-= Morphing =-=-=-=-=-=-=-=-=-=');
-    console.log('= Morphing Frog #'+token_a+' & Frog #'+token_b);
-    console.log('= Fetching Metadata...');
-    console.log('= ');
-
-    //document.getElementById(location).style.backgroundImage = 'url("'+SOURCE_PATH+'/frog/'+token_a+'.png'+'")';
-
-    // Token (Alpha) Metdata
-    let metadata_a = {
-        "Frog": "",
-        "SpecialFrog": "",
-        "Trait": "",
-        "Accessory": "",
-        "Eyes": "",
-        "Hat": "",
-        "Mouth": ""
+  <style>
+    /* Center the single dashboard card */
+    .page-wrap{max-width:1100px;margin:0 auto;padding:16px}
+    .page-grid{display:grid;grid-template-columns:1fr;gap:20px;justify-items:center}
+    .pg-card{max-width:880px;width:100%}
+    .frog-preview{
+      position:relative;
+      width:100%;
+      aspect-ratio:1/1;
+      border:1px solid var(--border);
+      border-radius:12px;
+      overflow:hidden;
+      background:#0b0b0b;
     }
-
-    // Token (Bravo) Metdata
-    let metadata_b = {
-        "Frog": "",
-        "SpecialFrog": "",
-        "Trait": "",
-        "Accessory": "",
-        "Eyes": "",
-        "Hat": "",
-        "Mouth": ""
+    .frog-preview img, .frog-preview .layers img{
+      display:block; width:100%; height:100%; object-fit:contain; image-rendering:auto;
     }
-
-    // Token (Charlie) Metdata
-    let metadata_c = {
-        "Frog": "",
-        "SpecialFrog": "",
-        "Subset": "",
-        "Trait": "",
-        "Accessory": "",
-        "Eyes": "",
-        "Hat": "",
-        "Mouth": ""
+    .frog-preview .layers{
+      position:absolute; inset:0; pointer-events:none;
     }
-    
-    document.getElementById(location).innerHTML = '';
-    
-    console.log('= TOKEN #'+token_a);
-    console.log('= ');
-    // Fetch Alpha Metadata ------>
-    let metadata_a_raw = await (await fetch(SOURCE_PATH+'/frog/json/'+token_a+".json")).json();
-    for (i = 0; i < metadata_a_raw.attributes.length; i++) {
+    /* keep actions compact */
+    .mutate-actions{display:flex; gap:8px; flex-wrap:wrap}
+  </style>
+</head>
+<body class="theme-dark">
 
-        let attribute = metadata_a_raw.attributes[i];
+  <header id="siteTopbar"></header>
 
-        metadata_a[attribute.trait_type] = attribute.value
-        console.log('= '+attribute.trait_type+' : '+attribute.value);
+  <main class="page-wrap">
+    <div class="page-grid">
 
-    }
-    console.log(JSON.stringify(metadata_a_raw.attributes, null, 4))
+      <!-- Single, centered dashboard card -->
+      <section class="pg-card" id="mutateCard">
+        <div class="pg-card-head">
+          <h3>Mutate Lab</h3>
+          <div class="spacer"></div>
+          <!-- Optional: keep wallet chip if you want -->
+          <button class="btn" id="mutateWalletBtn" style="display:none">Connect Wallet</button>
+        </div>
 
-    console.log('= ');
-    console.log('= TOKEN #'+token_b);
-    console.log('= ');
-    // Fetch Bravo Metadata ------>
-    let metadata_b_raw = await (await fetch(SOURCE_PATH+'/frog/json/'+token_b+".json")).json();
-    for (j = 0; j < metadata_b_raw.attributes.length; j++) {
+        <!-- Random frog card -->
+        <article class="frog-card" id="mutateFrogCard">
+          <div class="frog-preview">
+            <!-- Base (full PNG) -->
+            <img id="mutateBase" alt="Frog" src="" />
+            <!-- Layered build (for mutation) -->
+            <div class="layers" id="mutateLayers"></div>
+          </div>
 
-        let attribute = metadata_b_raw.attributes[j];
-        
-        metadata_b[attribute.trait_type] = attribute.value
-        console.log('= '+attribute.trait_type+' : '+attribute.value);
+          <h4 class="title" id="mutateTitle">Frog #—</h4>
+          <div class="meta" id="mutateMeta">Random preview</div>
 
-    }
-    console.log(JSON.stringify(metadata_b_raw.attributes, null, "\t"))
+          <!-- Attributes -->
+          <ul class="attr-bullets" id="mutateAttrs"></ul>
 
-    console.log('= ');
-    console.log('= Generating New Metadata...');
-    console.log('= ');
+          <!-- Actions -->
+          <div class="actions mutate-actions">
+            <button class="btn btn-outline-gray" id="btnRefresh">Refresh</button>
+            <button class="btn btn-outline-gray" id="btnMutate">Mutate</button>
+          </div>
 
-    // BUILD NEW METADATA ------>
+          <!-- Optional debug: final composed JSON from morph -->
+          <pre id="morph-json" class="pg-muted" style="display:none;"></pre>
+        </article>
+      </section>
 
-    // Special Frogs
-    if (metadata_a['SpecialFrog'] !== '' || metadata_b['SpecialFrog'] !== '') {
+    </div>
+  </main>
 
-        // Base Special Frog AND Sub Special Frog
-        if (metadata_a['SpecialFrog'] !== '' && metadata_b['SpecialFrog'] !== '') {
-            metadata_b['SpecialFrog'] = metadata_a['SpecialFrog']+'/SpecialFrog/'+metadata_b['SpecialFrog'];
-            metadata_b['Trait'] = '';
-        }
-
-        // Base Special Frog
-        else if (metadata_b['Frog'] !== '') {
-            metadata_b['Trait'] = 'SpecialFrog/'+metadata_a['SpecialFrog']+'/'+metadata_b['Trait'];
-            metadata_b['SpecialFrog'] = metadata_a['SpecialFrog']+'/'+metadata_b['Frog'];
-            metadata_b['Frog'] = '';
-        }
-
-        // Sub Special Frog
-        else if (metadata_a['Frog'] !== '') {
-            metadata_b['Trait'] = 'SpecialFrog/'+metadata_b['SpecialFrog']+'/'+metadata_a['Trait'];
-            metadata_a['SpecialFrog'] = metadata_b['SpecialFrog'];
-            metadata_b['SpecialFrog'] = metadata_b['SpecialFrog']+'/'+metadata_a['Frog'];
-            metadata_a['Frog'] = '';
-        }
-
-    }
-    
-    // Select Attributes!
-    if (metadata_a['Frog'] !== '') {metadata_c['Frog'] = metadata_b['Frog']}
-    else if (metadata_a['SpecialFrog'] !== '') { metadata_c['SpecialFrog'] = '/bottom/'+metadata_a['SpecialFrog']; }
-
-    if (metadata_b['Frog'] !== '') {metadata_c['Subset'] = metadata_a['Frog']}
-    else if (metadata_b['SpecialFrog'] !== '') { metadata_c['SpecialFrog'] = metadata_b['SpecialFrog'] }
-
-    console.log('= Frog : '+metadata_c['Frog']);
-    console.log('= SpecialFrog : '+metadata_c['SpecialFrog']);
-    console.log('= Subset : '+metadata_c['Subset']);
-
-    if (metadata_b['Trait'] !== '') {metadata_c['Trait'] = metadata_b['Trait']}
-    else if (metadata_a['Trait'] !== '') { metadata_c['Trait'] = metadata_a['Trait']; }
-    console.log('= Trait : '+metadata_c['Trait']);
-
-    if (metadata_a['Accessory'] !== '') { metadata_c['Accessory'] = metadata_a['Accessory']; }
-    else if (metadata_b['Accessory'] !== '') { metadata_c['Accessory'] = metadata_b['Accessory']; }
-    console.log('= Accessory : '+metadata_c['Accessory']);
-
-    if (metadata_a['Eyes'] !== '') { metadata_c['Eyes'] = metadata_a['Eyes']; }
-    else if (metadata_b['Eyes'] !== '') { metadata_c['Eyes'] = metadata_b['Eyes']; }
-    console.log('= Eyes : '+metadata_c['Eyes']);
-
-    if (metadata_a['Hat'] !== '') { metadata_c['Hat'] = metadata_a['Hat']; }
-    else if (metadata_b['Hat'] !== '') { metadata_c['Hat'] = metadata_b['Hat']; }
-    console.log('= Hat : '+metadata_c['Hat']);
-
-    if (metadata_a['Mouth'] !== '') { metadata_c['Mouth'] = metadata_a['Mouth']; }
-    else if (metadata_b['Mouth'] !== '') { metadata_c['Mouth'] = metadata_b['Mouth']; }
-    console.log('= Mouth : '+metadata_c['Mouth']);
-
-    // CREATE NEW JSON ELEMENT
-
-    var morophMetadataJsonString = '{"attributes":[]}'; // {"trait_type":"Frog","value":"blueDartFrog"}
-    var morophMetadataJsonObject = JSON.parse(morophMetadataJsonString);
-    
-    // BUILD NEW IMAGE ------>
-    
-    // FROG A
-    if (metadata_c['Frog'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Frog","value":metadata_c['Frog']}); build_trait('Frog', metadata_c['Frog'], location); }
-    
-    // SPECIALFROG
-    else if (metadata_c['SpecialFrog'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"SpecialFrog","value":metadata_c['SpecialFrog']}); build_trait('SpecialFrog', metadata_c['SpecialFrog'], location); }
-    
-    // FROG B (SUBSET)
-    if (metadata_c['Subset'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Subset","value":metadata_c['Subset']}); build_trait('Frog/subset', metadata_c['Subset'], location); }
-
-    // TRAIT
-    if (metadata_c['Trait'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Trait","value":metadata_c['Trait']}); build_trait('Trait', metadata_c['Trait'], location); }
-
-    // ACCESSORY
-    if (metadata_c['Accessory'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Accessory","value":metadata_c['Accessory']}); build_trait('Accessory', metadata_c['Accessory'], location); }
-    
-    // EYES
-    if (metadata_c['Eyes'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Eyes","value":metadata_c['Eyes']}); build_trait('Eyes', metadata_c['Eyes'], location); }
-    
-    // HAT
-    if (metadata_c['Hat'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Hat","value":metadata_c['Hat']}); build_trait('Hat', metadata_c['Hat'], location); }
-    
-    // MOUTH
-    if (metadata_c['Mouth'] !== '') { morophMetadataJsonObject['attributes'].push({"trait_type":"Mouth","value":metadata_c['Mouth']}); build_trait('Mouth', metadata_c['Mouth'], location); }
-
-    morophMetadataJsonString = JSON.stringify(morophMetadataJsonObject.attributes, null, 4);
-    //console.log(morophMetadataJsonString)
-
-    console.log('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=')
-    console.log(morophMetadataJsonString)
-
-    document.getElementById('morph-json').innerHTML = morophMetadataJsonString
-
-}
+  <script>
+    // Initialize topbar (existing helper)
+    if (window.FF?.initTopbar) try { window.FF.initTopbar(); } catch {}
+  </script>
+</body>
+</html>
