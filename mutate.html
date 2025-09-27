@@ -7,55 +7,51 @@
 
   <link rel="stylesheet" href="assets/css/styles.css" />
 
-  <!-- Page-specific overrides for layout (card centered, no bg/border) -->
   <style>
-    img{ image-rendering: pixelated; image-rendering: crisp-edges; }
-
-    .center-wrap{
-      max-width: 980px;
-      margin: 48px auto;
-      padding: 0 16px;
-      display: flex;
-      justify-content: center;
+    /* Center the single card both vertically and horizontally */
+    html, body { height: 100%; }
+    body { margin: 0; }
+    .screen-center {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
     }
 
-    /* Override frog-card to be a clean, centered vertical stack */
-    .frog-card{
-      border: none !important;
+    /* Use the same frog-card typography, but remove panel chrome */
+    .frog-card.mutate {
+      border: 0 !important;
       background: transparent !important;
       box-shadow: none !important;
       padding: 0;
-      display: flex !important;
-      flex-direction: column;
-      align-items: center;
-      text-align: left; /* bullets keep left alignment */
-      gap: 10px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 16px 18px;
+      align-items: start;
+      max-width: 980px;
       width: 100%;
-      max-width: 540px;  /* keeps a nice readable measure */
-      margin: 0 auto;
     }
 
-    .frog-card .thumb{
-      width:256px; height:256px;
-      border-radius: 12px;
+    /* Left column: image (256) with buttons under it */
+    .mut-left { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .mut-left .thumb{
+      width:256px; height:256px; border-radius:12px;
       background: var(--panel-2);
       object-fit: contain;
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 6px 12px rgba(0,0,0,.25);
+      image-rendering: pixelated; image-rendering: crisp-edges;
     }
+    .mut-left .actions{ display:flex; gap:8px; flex-wrap:wrap; }
 
-    /* Move the action buttons directly under the image */
-    .actions{
-      display:flex; gap:8px; flex-wrap:wrap;
-      margin: 6px 0 4px 0;
-    }
-
-    /* Keep the original card typography */
-    .title{ margin:6px 0 0 0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
+    /* Right column: info stack */
+    .mut-right{ display:flex; flex-direction:column; gap:6px; }
+    .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
     .pill{ display:inline-block; padding:3px 10px; border-radius:999px; background: color-mix(in srgb, var(--panel) 85%, transparent); border:1px solid var(--border); font-size:12px; }
     .meta{ color:var(--muted); font-size:12px; }
     .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; }
     .attr-bullets li{ font-size:12px; margin:2px 0; }
 
+    /* Buttons (same style as collection) */
     .btn{
       font-family: var(--font-ui);
       border:1px solid var(--border);
@@ -77,22 +73,32 @@
       border-color: color-mix(in srgb, #22c55e 80%, var(--border));
       color: color-mix(in srgb, #ffffff 85%, #22c55e);
     }
+
+    @media (max-width: 720px){
+      /* Stack on small screens: image+buttons then info below */
+      .frog-card.mutate{ grid-template-columns: 1fr; }
+      .mut-right{ margin-top: 4px; }
+    }
   </style>
 </head>
 <body>
-  <div class="center-wrap">
-    <!-- Same frog-card classes; vertical order: image → buttons → info -->
-    <article class="frog-card" id="mutateCard" data-token-id="">
-      <img class="thumb" id="mutateThumb" src="" alt="" />
-
-      <div class="actions">
-        <button class="btn btn-outline-gray" id="btnRefresh">Refresh</button>
-        <button class="btn btn-outline-gray" id="btnMutate">Mutate</button>
+  <div class="screen-center">
+    <article class="frog-card mutate" id="mutateCard" data-token-id="">
+      <!-- Left: image + buttons -->
+      <div class="mut-left">
+        <img class="thumb" id="mutateThumb" src="" alt="" />
+        <div class="actions">
+          <button class="btn btn-outline-gray" id="btnRefresh">Refresh</button>
+          <button class="btn btn-outline-gray" id="btnMutate">Mutate</button>
+        </div>
       </div>
 
-      <h4 class="title" id="mutateTitle">Frog #— <span class="pill" id="mutateRank" style="display:none"></span></h4>
-      <div class="meta" id="mutateMeta">Not staked • Owned by You</div>
-      <ul class="attr-bullets" id="mutateAttrs"></ul>
+      <!-- Right: info -->
+      <div class="mut-right">
+        <h4 class="title" id="mutateTitle">Frog #— <span class="pill" id="mutateRank" style="display:none"></span></h4>
+        <div class="meta" id="mutateMeta">Not staked • Owned by You</div>
+        <ul class="attr-bullets" id="mutateAttrs"></ul>
+      </div>
     </article>
   </div>
 
