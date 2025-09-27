@@ -1,6 +1,8 @@
 // assets/js/staking-adapter.js
-// FreshFrogs staking adapter wired to your ABI.
-// Exposes both FF.staking and legacy globals used by owned-panel.js.
+// FreshFrogs staking adapter wired to your ABI names, but tolerant to result shapes.
+// Exact calls used: stake(uint256), withdraw(uint256), getStakedTokens(address), availableRewards(address), claimRewards().
+// Adds robust number parsing (strings, BigInt, ethers BigNumber {_hex}, web3 BN via toString()).
+// Adds __debug() to quickly verify network, addresses, and raw returns.
 
 (function (FF, CFG) {
   'use strict';
@@ -72,23 +74,59 @@
     try { if (window.ethereum?.request) { const a=await window.ethereum.request({method:'eth_accounts'}); return a?.[0]||null; } } catch(_){}
     return null;
   }
-  const toNumArr = (arr) => (arr||[]).map(v=>{
+
+  function numFromAny(v){
     try{
-      if (typeof v === 'number') return v;
+      if (typeof v === 'number') return Number.isFinite(v) ? v : NaN;
       if (typeof v === 'bigint') return Number(v);
       if (typeof v === 'string') return Number(/^0x/i.test(v) ? BigInt(v) : v);
+      if (v && typeof v._hex === 'string') return Number(BigInt(v._hex));          // ethers BigNumber
+      if (v && typeof v.toString === 'function'){                                  // web3 BN, custom BN
+        const s = v.toString();
+        if (/^0x/i.test(s)) return Number(BigInt(s));
+        if (/^-?\d+$/.test(s)) return Number(s);
+      }
     }catch(_){}
     return NaN;
-  }).filter(Number.isFinite);
+  }
+  function toNumArr(maybeArr){
+    if (Array.isArray(maybeArr)) return maybeArr.map(numFromAny).filter(Number.isFinite);
+    // Some ABIs return tuple where index 0 is the array
+    if (maybeArr && Array.isArray(maybeArr[0])) return maybeArr[0].map(numFromAny).filter(Number.isFinite);
+    // Some return object with a named field
+    for (const k in (maybeArr||{})){
+      if (Array.isArray(maybeArr[k])){
+        const out = maybeArr[k].map(numFromAny).filter(Number.isFinite);
+        if (out.length) return out;
+      }
+    }
+    return [];
+  }
 
-  // ---- Reads (exact to your ABI) ----
+  // ---- Reads (exact to your ABI name but tolerant of shape) ----
   async function getStakedTokens(owner) {
     owner = owner || await getAddress();
     if (!owner) return [];
-    if (haveWeb3())  { try { const arr = await ctrlW3().methods.getStakedTokens(owner).call(); const out=toNumArr(arr); if(DEBUG) console.log('[FF] staked IDs (web3):', out); return out; } catch(e){ if(DEBUG) console.warn('[FF] web3 getStakedTokens failed', e); } }
-    if (haveEthers()){ try { const arr = await ctrlEth(true).getStakedTokens(owner); const out=toNumArr(arr); if(DEBUG) console.log('[FF] staked IDs (ethers):', out); return out; } catch(e){ if(DEBUG) console.warn('[FF] ethers getStakedTokens failed', e); } }
+    // exact: getStakedTokens(address)
+    if (haveWeb3())  {
+      try {
+        const raw = await ctrlW3().methods.getStakedTokens(owner).call();
+        const out = toNumArr(raw);
+        if (DEBUG) console.log('[FF] staked IDs (web3):', out, {raw});
+        return out;
+      } catch(e){ if (DEBUG) console.warn('[FF] web3 getStakedTokens failed', e); }
+    }
+    if (haveEthers()){
+      try {
+        const raw = await ctrlEth(true).getStakedTokens(owner);
+        const out = toNumArr(raw);
+        if (DEBUG) console.log('[FF] staked IDs (ethers):', out, {raw});
+        return out;
+      } catch(e){ if (DEBUG) console.warn('[FF] ethers getStakedTokens failed', e); }
+    }
     return [];
   }
+
   async function getAvailableRewards(owner) {
     owner = owner || await getAddress();
     if (!owner) return '0';
@@ -96,7 +134,8 @@
     if (haveEthers()){ try { return await ctrlEth(true).availableRewards(owner); } catch(_){ } }
     return '0';
   }
-  async function getStakeSince(){ return null; } // not in your ABI
+
+  async function getStakeSince(){ return null; } // not in ABI; owned-panel has an events fallback
 
   // ---- Approvals (defensive) ----
   async function isApproved(address) {
@@ -113,7 +152,7 @@
     throw new Error('No Web3 or Ethers library loaded');
   }
 
-  // ---- Writes (exact to your ABI) ----
+  // ---- Writes (exact to your ABI names) ----
   async function stakeToken(tokenId) {
     const id=String(tokenId);
     if (haveWeb3())  { const from=(window.ethereum && window.ethereum.selectedAddress); if(!from) throw new Error('Connect wallet'); await approveIfNeeded(); return ctrlW3().methods.stake(id).send({ from }); }
@@ -142,12 +181,34 @@
     stakeToken, stakeTokens, unstakeToken, unstakeTokens,
     getStakedTokens, getUserStakedTokens: getStakedTokens,
     getAvailableRewards, claimRewards,
-    getStakeSince
+    getStakeSince,
+
+    // Debug helper: prints chain, controller, and raw returns to console
+    async __debug(addr){
+      try{
+        const provider = window.ethereum || null;
+        const chainId = provider && provider.request ? await provider.request({ method:'eth_chainId' }).catch(()=>null) : null;
+        const address = addr || await getAddress();
+        const raw = haveWeb3()
+          ? await ctrlW3().methods.getStakedTokens(address||'0x0000000000000000000000000000000000000000').call().catch(e=>({error:String(e)}))
+          : haveEthers()
+            ? await ctrlEth(true).getStakedTokens(address||'0x0000000000000000000000000000000000000000').catch(e=>({error:String(e)}))
+            : '(no web3/ethers)';
+        const parsed = toNumArr(raw);
+        console.log('[FF DEBUG] chainId=', chainId, ' address=', address, ' CTRL=', CTRL_ADDR, ' COLL=', COLL_ADDR);
+        console.log('[FF DEBUG] getStakedTokens RAW →', raw);
+        console.log('[FF DEBUG] parsed IDs →', parsed);
+        return parsed;
+      }catch(e){
+        console.warn('[FF DEBUG] error', e);
+        return [];
+      }
+    }
   };
   FF.staking = api;
   window.FF_STAKING = api;
 
-  // Legacy globals so owned-panel.js can call them if it prefers window.*
+  // Legacy globals for owned-panel convenience
   window.getStakedTokens      = api.getStakedTokens;
   window.getAvailableRewards  = api.getAvailableRewards;
   window.claimRewards         = api.claimRewards;
