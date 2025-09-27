@@ -122,81 +122,56 @@
   }
   const STK = ()=> (FF.staking || window.FF_STAKING || {});
   // --- Wallet & staking helpers ---
-  async function getStakedIds(addr){
-    // Helper: normalize values -> numbers
-    const toNum = (v)=> {
-      try{
-        if (typeof v === 'number') return v;
-        if (typeof v === 'bigint') return Number(v);
-        if (typeof v === 'string') return Number(/^0x/i.test(v) ? BigInt(v) : v);
-        if (v && typeof v._hex === 'string') return Number(BigInt(v._hex)); // ethers.BigNumber
-        if (v && typeof v.toString === 'function'){
-          const s = v.toString();
-          if (/^0x/i.test(s)) return Number(BigInt(s));
-          if (/^-?\d+$/.test(s)) return Number(s);
-        }
-      }catch(_) {}
-      return NaN;
-    };
-    const toNums = (arr)=> Array.isArray(arr) ? arr.map(toNum).filter(Number.isFinite) : [];
-
-    // 1) Ethers via RPC (preferred if you set FF_CFG.RPC_URL)
+// --- Wallet & staking helpers ---
+async function getStakedIds(addr){
+  const toNum = (v)=> {
     try{
-      if (window.ethers && window.FF_CFG?.RPC_URL && window.CONTROLLER_ABI && window.FF_CFG.CONTROLLER_ADDRESS){
-        const provider = new ethers.providers.JsonRpcProvider(window.FF_CFG.RPC_URL);
-        const ctrl = new ethers.Contract(window.FF_CFG.CONTROLLER_ADDRESS, window.CONTROLLER_ABI, provider);
-        const raw = await ctrl.getStakedTokens(addr);
-        const ids = toNums(raw);
-        if (ids.length) return ids;
+      if (typeof v === 'number') return v;
+      if (typeof v === 'bigint') return Number(v);
+      if (typeof v === 'string') return Number(/^0x/i.test(v) ? BigInt(v) : v);
+      if (v && typeof v._hex === 'string') return Number(BigInt(v._hex)); // ethers BigNumber
+      if (v && typeof v.toString === 'function'){
+        const s = v.toString();
+        if (/^0x/i.test(s)) return Number(BigInt(s));
+        if (/^-?\d+$/.test(s)) return Number(s);
       }
-    }catch(e){ console.warn('[owned] ethers RPC getStakedTokens failed', e); }
+    }catch(_){}
+    return NaN;
+  };
+  const toNums = (arr)=> Array.isArray(arr) ? arr.map(toNum).filter(Number.isFinite) : [];
 
-    // 2) Web3 via RPC
-    try{
-      if (window.Web3 && window.FF_CFG?.RPC_URL && window.CONTROLLER_ABI && window.FF_CFG.CONTROLLER_ADDRESS){
-        const w3 = new Web3(new Web3.providers.HttpProvider(window.FF_CFG.RPC_URL));
-        const ctrl = new w3.eth.Contract(window.CONTROLLER_ABI, window.FF_CFG.CONTROLLER_ADDRESS);
-        const raw = await ctrl.methods.getStakedTokens(addr).call({ from: addr });
-        const ids = toNums(raw);
-        if (ids.length) return ids;
-      }
-    }catch(e){ console.warn('[owned] web3 RPC getStakedTokens failed', e); }
-
-    // 3) Web3 via wallet provider (may fail if wallet is on another chain)
-    try{
-      if (window.Web3 && window.ethereum && window.CONTROLLER_ABI && window.FF_CFG?.CONTROLLER_ADDRESS){
-        const w3 = new Web3(window.ethereum);
-        const ctrl = new w3.eth.Contract(window.CONTROLLER_ABI, window.FF_CFG.CONTROLLER_ADDRESS);
-        const raw = await ctrl.methods.getStakedTokens(addr).call({ from: addr });
-        const ids = toNums(raw);
-        if (ids.length) return ids;
-      }
-    }catch(e){ console.warn('[owned] web3 wallet getStakedTokens failed', e); }
-
-    // 4) Ethers via wallet provider
-    try{
-      if (window.ethers && (window.ethereum || window.FF_CFG?.RPC_URL) && window.CONTROLLER_ABI && window.FF_CFG?.CONTROLLER_ADDRESS){
-        const provider = window.ethereum
-          ? new ethers.providers.Web3Provider(window.ethereum)
-          : new ethers.providers.JsonRpcProvider(window.FF_CFG.RPC_URL);
-        const ctrl = new ethers.Contract(window.FF_CFG.CONTROLLER_ADDRESS, window.CONTROLLER_ABI, provider);
-        const raw = await ctrl.getStakedTokens(addr);
-        return toNums(raw);
-      }
-    }catch(e){ console.warn('[owned] ethers wallet getStakedTokens failed', e); }
-
-    // 5) Final fallback to any adapter/globals you might have
-    try{
-      if (typeof window.getStakedTokens === 'function'){ return toNums(await window.getStakedTokens(addr)); }
-    }catch(e){ console.warn('[owned] window.getStakedTokens fallback failed', e); }
-    try{
-      const S = STK();
-      if (typeof S.getStakedTokens === 'function') return toNums(await S.getStakedTokens(addr));
-      if (typeof S.getUserStakedTokens === 'function') return toNums(await S.getUserStakedTokens(addr));
-    }catch(e){ console.warn('[owned] adapter fallbacks failed', e); }
-
+  if (!window.ethereum || !window.Web3 || !window.CONTROLLER_ABI || !window.FF_CFG?.CONTROLLER_ADDRESS){
+    console.warn('[owned] missing wallet/web3/ABI/controller address');
     return [];
   }
+
+  // 1) Ensure wallet is on the correct chain
+  try{
+    const targetDec = Number(window.FF_CFG.CHAIN_ID || 1);
+    const targetHex = '0x' + targetDec.toString(16);
+    const curHex = await window.ethereum.request({ method: 'eth_chainId' });
+    if (curHex?.toLowerCase() !== targetHex.toLowerCase()){
+      // attempt to switch; if it fails, we’ll still try the call (may revert)
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: targetHex }]
+      }).catch(()=> {});
+    }
+  }catch(e){ console.warn('[owned] chain check/switch skipped', e); }
+
+  // 2) Read staked IDs via the wallet provider (no RPC key needed)
+  try{
+    const web3 = new Web3(window.ethereum);
+    const ctrl = new web3.eth.Contract(window.CONTROLLER_ABI, window.FF_CFG.CONTROLLER_ADDRESS);
+    const raw = await ctrl.methods.getStakedTokens(addr).call({ from: addr });
+    const ids = toNums(raw);
+    return ids;
+  }catch(e){
+    console.warn('[owned] wallet getStakedTokens failed', e);
+    return [];
+  }
+}
+
 
   function normalizeIds(rows){
     if (!Array.isArray(rows)) return [];
