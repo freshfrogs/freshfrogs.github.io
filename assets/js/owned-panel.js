@@ -1,7 +1,7 @@
 // assets/js/owned-panel.js
 // Renders: Owned + Staked. Owned IDs from Reservoir; Staked IDs from controller.
-// Metadata always from frog/json/{id}.json. No OpenSea button. Attribute chips → bullets.
-// Header: Owned • Staked • Unclaimed Rewards (+ Approve/Claim). Connect button shows muted address when connected.
+// Metadata from frog/json/{id}.json. No OpenSea button. Attribute chips → bullets.
+// Header: Owned • Staked • Unclaimed Rewards (+ Approve/Claim). Connect btn shows muted address.
 
 (function (FF, CFG) {
   'use strict';
@@ -74,16 +74,22 @@
 #ownedModal.show{display:flex}
 #ownedModal .om-backdrop{position:absolute;inset:0;background:color-mix(in srgb, var(--panel) 35%, #000);backdrop-filter: blur(2px)}
 #ownedModal .om-card{position:relative;min-width:320px;max-width:640px;margin:16px;border:1px solid var(--border);background:var(--panel);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.35);overflow:hidden}
-#ownedModal .om-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-#ownedModal .om-title{font-weight:700;font-size:14px}
-#ownedModal .om-body{padding:14px 16px;color:var(--muted);font-size:13px;line-height:1.4}
-#ownedModal .om-body p{margin:0 0 10px 0}
+#ownedModal .om-head{padding:0;border-bottom:0}
+#ownedModal .om-title:empty{display:none}
+#ownedModal .om-body{padding:22px}
 #ownedModal .om-actions{display:flex;gap:8px;justify-content:flex-end;padding:14px 16px;border-top:1px solid var(--border)}
 #ownedModal .om-btn{font-family:var(--font-ui);border:1px solid var(--border);background:transparent;color:inherit;border-radius:8px;padding:8px 12px;font-weight:700;font-size:12px;line-height:1;display:inline-flex;align-items:center;gap:6px;text-decoration:none;letter-spacing:.01em;transition:background .15s,border-color .15s,color .15s,transform .05s}
 #ownedModal .om-btn:hover{background: color-mix(in srgb,#22c55e 14%,var(--panel));border-color: color-mix(in srgb,#22c55e 80%,var(--border));color: color-mix(in srgb,#ffffff 85%,#22c55e)}
 #ownedModal .om-btn.primary{background: color-mix(in srgb,#22c55e 18%,var(--panel));border-color: color-mix(in srgb,#22c55e 85%,var(--border));color: color-mix(in srgb,#ffffff 90%,#22c55e)}
 #ownedModal .om-input{width:100%;border:1px solid var(--border);background:transparent;color:inherit;border-radius:8px;padding:8px 10px;font-size:13px}
 #ownedModal .om-mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+
+/* Centered stack layout for stake/unstake + approval */
+#ownedModal .om-col{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px}
+#ownedModal .om-thumb{width:64px;height:64px;border-radius:10px;border:1px solid var(--border);object-fit:cover;background:#111}
+#ownedModal .om-name{font-weight:700;font-size:14px;color:#fff}
+#ownedModal .om-copy{color:#fff;font-size:13px;line-height:1.5;max-width:52ch}
+#ownedModal .om-copy p{margin:0 0 10px 0}
     `;
     const el=document.createElement('style'); el.id='owned-clean-css'; el.textContent=css; document.head.appendChild(el);
   })();
@@ -176,7 +182,7 @@
     if (m) m.classList.remove('show');
   }
 
-  // --- Wallet / ABIs / Contracts (wallet-only, no RPC) ---
+  // --- Wallet / ABIs / Contracts (wallet-only) ---
   function getWeb3(){ if (!window.Web3 || !window.ethereum) throw new Error('Wallet not found'); return new Web3(window.ethereum); }
 
   // ABIs may be defined as top-level consts or attached to window; resolve robustly.
@@ -296,7 +302,6 @@
       const ctrl = ctrlContract();
       return await ctrl.methods.availableRewards(addr).call({ from: addr });
     }catch(e){
-      // fallback to any adapter that might exist
       for (const k of ['getAvailableRewards','getRewards','claimableRewards','getUnclaimedRewards']){
         try{
           const S=(FF.staking||window.FF_STAKING||{}); if (typeof S[k]==='function') return await S[k](addr);
@@ -434,22 +439,13 @@
 
   // --- Stake / Unstake / Approve modals ---
   function openApprovePanel(owner, stats){
-    const approvalText = stats?.approved ? 'Approved' : 'Not approved';
-    const stCount = Number(stats?.staked || 0);
-    const rewards = (typeof stats?.rewards === 'string') ? stats.rewards : formatToken(stats?.rewards, REWARD_DECIMALS);
-
     const body = `
-      <div class="om-flex">
-        <div class="om-left">
-          <div style="width:88px;height:88px;border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;background:#111">📃</div>
-          <div class="om-meta">
-            <div class="om-name">Approve staking</div>
-            <div class="om-sub">${approvalText}</div>
-          </div>
-        </div>
+      <div class="om-col">
+        <div class="om-name">Approve Staking</div>
         <div class="om-copy">
-          <p>Allow the staking contract to access your Frogs. One-time transaction; requires gas.</p>
-          <p class="om-mono" style="margin-top:8px">Staked: ${stCount} &nbsp;|&nbsp; Rewards: ${rewards} ${REWARD_SYMBOL}</p>
+          <p><b>FreshFrogsNFT Staking</b></p>
+          <p>Stake your Frogs and start earning rewards like $FLYZ, and more! Staking works by sending your Frog to a smart contract that will keep it safe. Frogs that are staked can’t be listed on secondary marketplaces, like Rarible.</p>
+          <p><b>✍️ Sign Contract Approval</b><br>To start staking you must first give the staking contract permission to access your Frogs. This is a one-time transaction that requires a gas fee.</p>
         </div>
       </div>
     `;
@@ -469,14 +465,9 @@
 
   function openStakePanel(owner, tokenId){
     const body = `
-      <div class="om-flex">
-        <div class="om-left">
-          <img class="om-thumb" src="${imgFor(tokenId)}" alt="Frog #${tokenId}">
-          <div class="om-meta">
-            <div class="om-name">Frog #${tokenId}</div>
-            <div class="om-sub">Ready to stake</div>
-          </div>
-        </div>
+      <div class="om-col">
+        <img class="om-thumb" src="${imgFor(tokenId)}" alt="Frog #${tokenId}">
+        <div class="om-name">Frog #${tokenId}</div>
         <div class="om-copy">
           <p>While staked, your Frog can’t be listed or sold. You can un-stake here any time. Un-staking resets level to zero.</p>
         </div>
@@ -504,14 +495,9 @@
 
   function openUnstakePanel(owner, tokenId){
     const body = `
-      <div class="om-flex">
-        <div class="om-left">
-          <img class="om-thumb" src="${imgFor(tokenId)}" alt="Frog #${tokenId}">
-          <div class="om-meta">
-            <div class="om-name">Frog #${tokenId}</div>
-            <div class="om-sub">Withdraw from staking</div>
-          </div>
-        </div>
+      <div class="om-col">
+        <img class="om-thumb" src="${imgFor(tokenId)}" alt="Frog #${tokenId}">
+        <div class="om-name">Frog #${tokenId}</div>
         <div class="om-copy">
           <p>Withdrawing returns this Frog to your wallet. Level resets to zero.</p>
         </div>
@@ -759,7 +745,6 @@
     const btn=document.getElementById('ownedConnectBtn');
     if (btn){ btn.style.display='inline-flex'; btn.addEventListener('click', handleConnectClick); }
 
-    // React to wallet connect events
     document.addEventListener('ff:wallet:ready', async (e) => {
       const a = e?.detail?.address; if (!a) return;
       addr = a; reflectConnectButton(); await afterConnect();
@@ -778,7 +763,6 @@
     setTimeout(syncHeights,50);
   }
 
-  // Public init
   window.FF_initOwnedPanel = initOwned;
 
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});

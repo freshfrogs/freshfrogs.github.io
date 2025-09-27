@@ -1,26 +1,14 @@
 // assets/js/staking-adapter.js
-// Minimal adapter bound to your exact ABIs & wallet provider.
-// Provides FF.staking + legacy globals for other modules.
-
 (function (FF, CFG) {
   'use strict';
 
   const CHAIN_ID = Number(CFG.CHAIN_ID || 1);
 
   function getWeb3(){ if (!window.Web3 || !window.ethereum) throw new Error('Wallet not found'); return new Web3(window.ethereum); }
-
-  function resolveCollectionAbi(){
-    if (typeof COLLECTION_ABI !== 'undefined') return COLLECTION_ABI;
-    return (window.COLLECTION_ABI || window.collection_abi || []);
-  }
-  function resolveControllerAbi(){
-    if (typeof CONTROLLER_ABI !== 'undefined') return CONTROLLER_ABI;
-    return (window.CONTROLLER_ABI || window.controller_abi || []);
-  }
-
+  function resolveCollectionAbi(){ if (typeof COLLECTION_ABI !== 'undefined') return COLLECTION_ABI; return (window.COLLECTION_ABI || window.collection_abi || []); }
+  function resolveControllerAbi(){ if (typeof CONTROLLER_ABI !== 'undefined') return CONTROLLER_ABI; return (window.CONTROLLER_ABI || window.controller_abi || []); }
   function nft(){ const w3 = getWeb3(); return new w3.eth.Contract(resolveCollectionAbi(), CFG.COLLECTION_ADDRESS); }
   function ctrl(){ const w3 = getWeb3(); return new w3.eth.Contract(resolveControllerAbi(), CFG.CONTROLLER_ADDRESS); }
-
   async function ensureCorrectChain(){
     const targetHex = '0x' + CHAIN_ID.toString(16);
     const curHex = await ethereum.request({ method:'eth_chainId' }).catch(()=>null);
@@ -50,7 +38,6 @@
     return rows.map(pick).filter(Number.isFinite);
   };
 
-  // Reads
   async function getStakedTokens(owner){
     owner = owner || await addr(); if (!owner) return [];
     await ensureCorrectChain();
@@ -63,7 +50,6 @@
     return await ctrl().methods.availableRewards(owner).call({ from: owner });
   }
 
-  // Approvals (Collection)
   async function isApproved(owner){
     owner = owner || await addr(); if (!owner) return false;
     await ensureCorrectChain();
@@ -76,11 +62,9 @@
     return nft().methods.setApprovalForAll(CFG.CONTROLLER_ADDRESS, true).send({ from: owner });
   }
 
-  // Writes (Controller)
   async function stakeToken(tokenId){
     const owner = await addr(); if (!owner) throw new Error('Connect wallet');
     await ensureCorrectChain();
-    // caller should have ensured approval; we still attempt
     return ctrl().methods.stake(String(tokenId)).send({ from: owner });
   }
   async function unstakeToken(tokenId){
@@ -107,7 +91,7 @@
   FF.staking = api;
   window.FF_STAKING = api;
 
-  // Legacy globals some modules probe:
+  // Legacy convenience:
   window.getStakedTokens     = api.getStakedTokens;
   window.getAvailableRewards = api.getAvailableRewards;
   window.claimRewards        = api.claimRewards;
