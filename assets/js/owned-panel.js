@@ -121,56 +121,58 @@
     throw new Error('No wallet provider found.');
   }
   const STK = ()=> (FF.staking || window.FF_STAKING || {});
+
   // --- Wallet & staking helpers ---
-// --- Wallet & staking helpers ---
-async function getStakedIds(addr){
-  const toNum = (v)=> {
-    try{
-      if (typeof v === 'number') return v;
-      if (typeof v === 'bigint') return Number(v);
-      if (typeof v === 'string') return Number(/^0x/i.test(v) ? BigInt(v) : v);
-      if (v && typeof v._hex === 'string') return Number(BigInt(v._hex)); // ethers BigNumber
-      if (v && typeof v.toString === 'function'){
-        const s = v.toString();
-        if (/^0x/i.test(s)) return Number(BigInt(s));
-        if (/^-?\d+$/.test(s)) return Number(s);
-      }
-    }catch(_){}
-    return NaN;
-  };
-  const toNums = (arr)=> Array.isArray(arr) ? arr.map(toNum).filter(Number.isFinite) : [];
+  async function getStakedIds(addr){
+    const toNum = (v)=> {
+      try{
+        if (typeof v === 'number') return v;
+        if (typeof v === 'bigint') return Number(v);
+        if (typeof v === 'string') return Number(/^0x/i.test(v) ? BigInt(v) : v);
+        if (v && typeof v._hex === 'string') return Number(BigInt(v._hex)); // ethers BigNumber
+        if (v && typeof v.toString === 'function'){
+          const s = v.toString();
+          if (/^0x/i.test(s)) return Number(BigInt(s));
+          if (/^-?\d+$/.test(s)) return Number(s);
+        }
+      }catch(_){}
+      return NaN;
+    };
+    const toNums = (arr)=> Array.isArray(arr) ? arr.map(toNum).filter(Number.isFinite) : [];
 
-  if (!window.ethereum || !window.Web3 || !window.CONTROLLER_ABI || !window.FF_CFG?.CONTROLLER_ADDRESS){
-    console.warn('[owned] missing wallet/web3/ABI/controller address');
-    return [];
-  }
-
-  // 1) Ensure wallet is on the correct chain
-  try{
-    const targetDec = Number(window.FF_CFG.CHAIN_ID || 1);
-    const targetHex = '0x' + targetDec.toString(16);
-    const curHex = await window.ethereum.request({ method: 'eth_chainId' });
-    if (curHex?.toLowerCase() !== targetHex.toLowerCase()){
-      // attempt to switch; if it fails, we’ll still try the call (may revert)
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: targetHex }]
-      }).catch(()=> {});
+    if (!window.ethereum || !window.Web3 || !window.CONTROLLER_ABI || !window.FF_CFG?.CONTROLLER_ADDRESS){
+      console.warn('[owned] missing wallet/web3/ABI/controller address');
+      return [];
     }
-  }catch(e){ console.warn('[owned] chain check/switch skipped', e); }
 
-  // 2) Read staked IDs via the wallet provider (no RPC key needed)
-  try{
-    const web3 = new Web3(window.ethereum);
-    const ctrl = new web3.eth.Contract(window.CONTROLLER_ABI, window.FF_CFG.CONTROLLER_ADDRESS);
-    const raw = await ctrl.methods.getStakedTokens(addr).call({ from: addr });
-    const ids = toNums(raw);
-    return ids;
-  }catch(e){
-    console.warn('[owned] wallet getStakedTokens failed', e);
-    return [];
+    // 1) Ensure wallet is on the correct chain
+    try{
+      const targetDec = Number(window.FF_CFG.CHAIN_ID || 1);
+      const targetHex = '0x' + targetDec.toString(16);
+      const curHex = await window.ethereum.request({ method: 'eth_chainId' });
+      if (curHex?.toLowerCase() !== targetHex.toLowerCase()){
+        // attempt to switch; if it fails, we’ll still try the call (may revert)
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: targetHex }]
+        }).catch(()=> {});
+      }
+    }catch(e){ console.warn('[owned] chain check/switch skipped', e); }
+
+    // 2) Read staked IDs via the wallet provider (no RPC key needed)
+    try{
+      const web3 = new Web3(window.ethereum);
+      const ctrl = new web3.eth.Contract(window.CONTROLLER_ABI, window.FF_CFG.CONTROLLER_ADDRESS);
+      const raw = await ctrl.methods.getStakedTokens(addr).call({ from: addr });
+      const ids = toNums(raw);
+      return ids;
+    }catch(e){
+      console.warn('[owned] wallet getStakedTokens failed', e);
+      return [];
+    }
   }
-}
+  // debug helper (so you can call it from the console)
+  window.FF_getStakedIds = getStakedIds;
 
 
   function normalizeIds(rows){
