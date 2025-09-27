@@ -1,7 +1,7 @@
 // assets/js/owned-panel.js
 // Renders: Owned + Staked. Owned IDs from Reservoir; Staked IDs from controller.
 // Metadata always from frog/json/{id}.json. No OpenSea button. Attribute chips → bullets.
-// Header: Owned • Staked • Unclaimed Rewards (+ Approve/Claim). Connect btn stays green.
+// Header: Owned • Staked • Unclaimed Rewards (+ Approve/Claim). Connect btn stays green (if present).
 
 (function (FF, CFG) {
   'use strict';
@@ -86,7 +86,8 @@
     }
     if (typeof raw==='string' && raw.includes('.')) return raw;
     const bi = toBigInt(raw); if (bi==null) return '—';
-    const sign = bi<0n?'-':''; const abs=sign?-bi:bi;
+    const sign = bi<0n?'-':'';
+    const abs=sign?-bi:bi;
     const base=10n**BigInt(dec);
     const whole=abs/base, frac=abs%base;
     if (whole>=100n) return sign+whole.toString();
@@ -200,6 +201,27 @@
       return Number(b.timestamp) * 1000;
     }catch(_){ return null; }
   }
+
+  // --- Dashboard head wallet label (top-right) ---
+  (function initDashWalletLabel(){
+    var slot = document.getElementById('ownedWalletAddr');
+    if (!slot) return; // safe no-op if the slot isn't present
+    function short(a){ return a ? (String(a).slice(0,6)+'…'+String(a).slice(-4)) : ''; }
+    function update(addr){
+      if (addr){ slot.textContent = short(addr); slot.style.display = ''; }
+      else { slot.textContent = ''; slot.style.display = 'none'; }
+    }
+    // initial best-effort
+    (async ()=>{ try{ update(await getConnectedAddress()); }catch{} })();
+    // events from your wallet/topbar modules
+    document.addEventListener('ff:wallet:ready', function(e){ update(e && e.detail && e.detail.address); });
+    window.addEventListener('wallet:connected', function(e){ update(e && e.detail && e.detail.address); });
+    if (window.ethereum && window.ethereum.on){
+      window.ethereum.on('accountsChanged', function(acc){ update((acc && acc[0]) || ''); });
+    }
+    // expose for internal calls below
+    window.__FF_updateOwnedAddrSlot = update;
+  })();
 
   // --- State ---
   let addr=null, continuation=null, items=[], io=null;
@@ -439,16 +461,23 @@
     }
   }
 
-  // --- Connect button ---
+  // --- Connect button (optional, safe if removed from DOM) ---
   function reflectConnectButton(){
-    const btn=document.getElementById('ownedConnectBtn'); if(!btn) return;
+    const btn=document.getElementById('ownedConnectBtn');
+    // If top-right slot exists, update it too
+    try{ if (typeof window.__FF_updateOwnedAddrSlot === 'function') window.__FF_updateOwnedAddrSlot(addr || ''); }catch(_){}
+    if(!btn) return; // button may not exist anymore
     if (addr){ btn.classList.add('btn-connected'); btn.textContent=shorten(addr); }
     else { btn.classList.remove('btn-connected'); btn.textContent='Connect Wallet'; }
   }
   async function handleConnectClick(ev){
     const btn=ev?.currentTarget; if(btn) btn.disabled=true;
-    try{ addr = await requestConnect(); if (!addr){ toast('No address'); return; } reflectConnectButton(); await afterConnect(); }
-    catch{ toast('Connect failed'); }
+    try{
+      addr = await requestConnect();
+      if (!addr){ toast('No address'); return; }
+      reflectConnectButton();
+      await afterConnect();
+    }catch{ toast('Connect failed'); }
     finally{ if(btn) btn.disabled=false; }
   }
 
@@ -464,6 +493,7 @@
     const card=$(SEL.card); if (card) card.querySelectorAll('.info-grid-2').forEach(n=> n.remove());
     await renderHeader();
 
+    // OPTIONAL: if the old connect button still exists, keep it functioning.
     const btn=document.getElementById('ownedConnectBtn');
     if (btn){ btn.style.display='inline-flex'; btn.addEventListener('click', handleConnectClick); }
 
