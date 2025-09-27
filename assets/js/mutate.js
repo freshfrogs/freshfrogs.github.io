@@ -1,16 +1,18 @@
 // assets/js/mutate.js
-// Looks/feels like collection.html; shows 1 frog, Refresh + Mutate.
-// Mutate builds the new frog by layering attribute images
-// via SOURCE_PATH + "/frog/build_files/<TraitFamily>/<Attribute>.png"
-// using class "trait_overlay" or "attribute_overlay".
+// Mutate page that mirrors collection.html frog card exactly.
+// - 128x128 pixelated layers
+// - Background uses original frog PNG scaled so only the background color is visible
+// - Top-right wallet chip matches dashboard style
+// - Buttons: Refresh (random new A), Mutate (A x B => layered composite)
 
 (function (FF, CFG) {
   'use strict';
 
   const TOTAL = Number(CFG.TOTAL_SUPPLY || 4040);
-  const SOURCE_PATH = String(CFG.SOURCE_PATH || '').replace(/\/+$/, ''); // e.g. "https://freshfrogs.github.io"
+  const SOURCE_PATH = String(CFG.SOURCE_PATH || '').replace(/\/+$/, ''); // e.g. https://freshfrogs.github.io
 
   const $ = (s, r=document)=> r.querySelector(s);
+  const thumbWrap   = $('#mutateThumbWrap');
   const baseImg     = $('#mutateBase');
   const layersRoot  = $('#mutateLayers');
   const titleEl     = $('#mutateTitle');
@@ -18,16 +20,15 @@
   const attrsEl     = $('#mutateAttrs');
   const btnRefresh  = $('#btnRefresh');
   const btnMutate   = $('#btnMutate');
-  const btnWallet   = $('#mutateWalletBtn');
-  const debugEl     = $('#morph-json');
+  const addrChip    = $('#mutateWalletAddr');
 
   let currentId = null;
 
-  // Paths identical to live site
+  // Paths identical to collection
   const imgFor  = (id)=> `${SOURCE_PATH}/frog/${id}.png`;
   const jsonFor = (id)=> `${SOURCE_PATH}/frog/json/${id}.json`;
 
-  // Attribute list (bullet list like collection)
+  // identical attr list style
   function renderAttrs(attrs){
     attrsEl.innerHTML = '';
     if (!Array.isArray(attrs)) return;
@@ -42,42 +43,51 @@
     }
   }
 
-  // --- Your exact build_trait signature/behavior ---
-  // build_trait(_traitFamily, _attribute, _whereElementId)
-  function build_trait(trait_type, attribute, location){
-    const root = document.getElementById(location);
-    if (!root) return;
-
-    const newAttribute = document.createElement('img');
-    if (trait_type === 'Trait' || trait_type === 'Frog' || trait_type === 'SpecialFrog'){
-      newAttribute.className = 'trait_overlay';
-    } else {
-      newAttribute.className = 'attribute_overlay';
-    }
-    if (location === 'randomLogo'){ newAttribute.style.width = '128px'; newAttribute.style.height = '128px'; }
-
-    // IMPORTANT: use /frog/build_files/<family>/<attribute>.png
-    newAttribute.src = `${SOURCE_PATH}/frog/build_files/${trait_type}/${attribute}.png`;
-
-    root.appendChild(newAttribute);
+  // background = original PNG scaled so frog goes out of frame (just the solid bg remains)
+  function setBackColorFromPNG(id){
+    if (!thumbWrap) return;
+    const url = imgFor(id);
+    thumbWrap.style.backgroundImage = `url("${url}")`;
+    // huge size pushes the frog outside the 128×128 viewport so you effectively see only its solid background color
+    thumbWrap.style.backgroundSize = '1200%';
+    thumbWrap.style.backgroundPosition = 'center';
+    thumbWrap.style.backgroundRepeat = 'no-repeat';
   }
 
-  // Show a standard frog by ID
+  // Your exact build_trait logic but targeting /frog/build_files
+  function build_trait(trait_type, attribute, location){
+    const root = document.getElementById(location) || layersRoot;
+    if (!root) return;
+
+    const img = document.createElement('img');
+    img.className = (trait_type === 'Trait' || trait_type === 'Frog' || trait_type === 'SpecialFrog') ? 'trait_overlay' : 'attribute_overlay';
+    img.src = `${SOURCE_PATH}/frog/build_files/${trait_type}/${attribute}.png`;
+    img.alt = `${trait_type}:${attribute}`;
+    // Guarantee 128×128 + pixelated
+    img.style.width = '128px'; img.style.height = '128px';
+    img.style.imageRendering = 'pixelated';
+    root.appendChild(img);
+  }
+
   async function showFrog(id){
     currentId = id;
-    // Reset: show base PNG, clear layers, remove any leftover debug text
     layersRoot.innerHTML = '';
     baseImg.style.visibility = 'visible';
-    if (debugEl) debugEl.textContent = '';
 
+    // set 128×128 base and background “color” from the same PNG
     baseImg.src = imgFor(id);
     baseImg.alt = `Frog #${id}`;
+    baseImg.style.width = '128px';
+    baseImg.style.height = '128px';
+    baseImg.style.imageRendering = 'pixelated';
+
+    setBackColorFromPNG(id);
 
     try{
       const r = await fetch(jsonFor(id));
       const j = r.ok ? await r.json() : null;
       titleEl.textContent = `Frog #${id}`;
-      metaEl.textContent = 'Preview • Unstaked';
+      metaEl.textContent = 'Random preview';
       renderAttrs(j?.attributes || []);
     }catch{
       titleEl.textContent = `Frog #${id}`;
@@ -95,24 +105,23 @@
     return id;
   }
 
-  // Mutate: combine A + B → C (and actually layer the image using build_trait)
+  // Morph logic (A × B -> C) + build layered composite at 128×128
   async function metamorph_build(token_a, token_b, locationId) {
     const loc = locationId || 'mutateLayers';
-    document.getElementById(loc).innerHTML = '';
+    const layers = document.getElementById(loc) || layersRoot;
+    layers.innerHTML = '';
 
     let A = { Frog:"", SpecialFrog:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
     let B = { Frog:"", SpecialFrog:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
     let C = { Frog:"", SpecialFrog:"", Subset:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
 
-    // Fetch A
-    const ja = await (await fetch(`${SOURCE_PATH}/frog/json/${token_a}.json`)).json();
+    const ja = await (await fetch(jsonFor(token_a))).json();
     for (const at of ja.attributes){ A[at.trait_type] = at.value; }
 
-    // Fetch B
-    const jb = await (await fetch(`${SOURCE_PATH}/frog/json/${token_b}.json`)).json();
+    const jb = await (await fetch(jsonFor(token_b))).json();
     for (const at of jb.attributes){ B[at.trait_type] = at.value; }
 
-    // SpecialFrog handling (as provided)
+    // SpecialFrog handling
     if (A.SpecialFrog || B.SpecialFrog){
       if (A.SpecialFrog && B.SpecialFrog){
         B.SpecialFrog = A.SpecialFrog + '/SpecialFrog/' + B.SpecialFrog;
@@ -129,7 +138,6 @@
       }
     }
 
-    // Compose C
     if (A.Frog) C.Frog = B.Frog; else if (A.SpecialFrog) C.SpecialFrog = '/bottom/' + A.SpecialFrog;
     if (B.Frog) C.Subset = A.Frog; else if (B.SpecialFrog) C.SpecialFrog = B.SpecialFrog;
 
@@ -139,39 +147,33 @@
     C.Hat        = A.Hat        || B.Hat        || '';
     C.Mouth      = A.Mouth      || B.Mouth      || '';
 
-    // Actually build layered image (replace the base visually)
-    // We hide the base PNG so only the composed layers are visible.
+    // hide base; show only layers for the composite
     baseImg.style.visibility = 'hidden';
 
-    // Build order is important: base → subset → trait → accessory → eyes → hat → mouth
-    const resultAttrs = [];
-
+    const result = [];
+    // Order: base → subset → trait → accessory → eyes → hat → mouth
     if (C.Frog){
-      resultAttrs.push({trait_type:'Frog', value:C.Frog});
+      result.push({trait_type:'Frog', value:C.Frog});
       build_trait('Frog', C.Frog, loc);
     } else if (C.SpecialFrog){
-      resultAttrs.push({trait_type:'SpecialFrog', value:C.SpecialFrog});
+      result.push({trait_type:'SpecialFrog', value:C.SpecialFrog});
       build_trait('SpecialFrog', C.SpecialFrog, loc);
     }
+    if (C.Subset)    { result.push({trait_type:'Subset',    value:C.Subset});    build_trait('Frog/subset', C.Subset,    loc); }
+    if (C.Trait)     { result.push({trait_type:'Trait',     value:C.Trait});     build_trait('Trait',       C.Trait,     loc); }
+    if (C.Accessory) { result.push({trait_type:'Accessory', value:C.Accessory}); build_trait('Accessory',   C.Accessory, loc); }
+    if (C.Eyes)      { result.push({trait_type:'Eyes',      value:C.Eyes});      build_trait('Eyes',        C.Eyes,      loc); }
+    if (C.Hat)       { result.push({trait_type:'Hat',       value:C.Hat});       build_trait('Hat',         C.Hat,       loc); }
+    if (C.Mouth)     { result.push({trait_type:'Mouth',     value:C.Mouth});     build_trait('Mouth',       C.Mouth,     loc); }
 
-    if (C.Subset)    { resultAttrs.push({trait_type:'Subset',    value:C.Subset});    build_trait('Frog/subset', C.Subset,    loc); }
-    if (C.Trait)     { resultAttrs.push({trait_type:'Trait',     value:C.Trait});     build_trait('Trait',       C.Trait,     loc); }
-    if (C.Accessory) { resultAttrs.push({trait_type:'Accessory', value:C.Accessory}); build_trait('Accessory',   C.Accessory, loc); }
-    if (C.Eyes)      { resultAttrs.push({trait_type:'Eyes',      value:C.Eyes});      build_trait('Eyes',        C.Eyes,      loc); }
-    if (C.Hat)       { resultAttrs.push({trait_type:'Hat',       value:C.Hat});       build_trait('Hat',         C.Hat,       loc); }
-    if (C.Mouth)     { resultAttrs.push({trait_type:'Mouth',     value:C.Mouth});     build_trait('Mouth',       C.Mouth,     loc); }
-
-    // Keep debug hidden but available if you toggle CSS later
-    if (debugEl) debugEl.textContent = JSON.stringify(resultAttrs, null, 2);
-
-    return resultAttrs;
+    return result;
   }
 
-  // Buttons
   async function onRefresh(){
     btnRefresh.disabled = true;
     try{
-      await showFrog(randId());
+      const id = randId();
+      await showFrog(id);
     } finally { btnRefresh.disabled = false; }
   }
 
@@ -182,22 +184,22 @@
       const b = randId(currentId);
       const composed = await metamorph_build(currentId, b, 'mutateLayers');
       titleEl.textContent = `Frog #${currentId} × #${b}`;
-      metaEl.textContent = 'Mutated preview (composite layers)';
+      metaEl.textContent = 'Mutated preview';
       renderAttrs(composed);
+      // keep the background “color” of A (looks good), or switch to B’s background:
+      // setBackColorFromPNG(b);
     } finally { btnMutate.disabled = false; }
   }
 
-  // Optional wallet chip (kept hidden unless connected)
+  // Minimal wallet chip to match dashboard style
   async function initWalletChip(){
-    const btn = btnWallet; if (!btn) return;
+    const el = addrChip; if (!el) return;
     try{
       const arr = await (window.ethereum?.request?.({method:'eth_accounts'}) || []);
       const a = arr?.[0] || null;
       if (a){
-        btn.style.display = 'inline-flex';
-        btn.classList.add('btn','btn-connected');
-        btn.textContent = a;
-        btn.style.pointerEvents = 'none';
+        el.style.display = 'inline-flex';
+        el.textContent = a; // full address, same as your dashboard behavior
       }
     }catch{}
   }

@@ -3,98 +3,144 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>freshfrogs — Mutate Lab</title>
+  <title>freshfrogs — Mutate</title>
 
-  <!-- IMPORTANT: use the SAME stylesheet as collection.html -->
-  <link rel="stylesheet" href="assets/styles.css" />
+  <!-- EXACT same stylesheet as collection.html -->
+  <link rel="stylesheet" href="assets/css/styles.css" />
 
-  <!-- Page-local micro tweaks only -->
   <style>
+    /* Keep page look identical to collection layout */
     .pg-wrap{ padding:20px; }
+    img{ image-rendering: pixelated; image-rendering: crisp-edges; }
+
+    /* same page grid but only one column centered */
     .page-grid{
       display:grid; gap:16px; grid-template-columns: 1fr;
       align-items:start; max-width:1100px; margin:0 auto;
     }
-    /* Match the right dashboard card look/width from collection */
-    #mutateCard.pg-card{ max-width:700px; justify-self:center; }
 
-    /* Keep frog card at a set width (same feel as collection card column) */
-    #mutateFrogCard{ max-width:700px; }
+    /* Card styling == collection.html */
+    .pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
+    .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
+    .pg-muted{ color:var(--muted); font-size:13px; }
 
-    /* Layering area inside the frog card (replaces the plain .thumb when mutating) */
-    .frog-preview{
-      position:relative; width:128px; height:128px; border-radius:12px;
-      background:var(--panel-2); grid-row: span 3;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 6px 12px rgba(0,0,0,.25);
+    /* Center the “dashboard” card width identical to the right column in collection.html */
+    #mutateCard{ max-width:700px; justify-self:center; width:100%; }
+
+    /* Frog card EXACTLY like collection.html */
+    #mutateCard .grid-cards{ display:grid; gap:10px; grid-template-columns: 1fr; }
+    .frog-card{
+      border:1px solid var(--border);
+      background: var(--panel);
+      border-radius:14px;
+      padding:12px;
+      display:grid; grid-template-columns:auto 1fr; column-gap:12px; row-gap:6px; align-items:start;
+      color:inherit;
+      max-width:700px;
     }
-    .frog-preview img{ width:128px; height:128px; object-fit:contain; display:block; }
 
-    /* Your build layering classes */
+    /* 128×128, pixelated, with “background color” using the original PNG */
+    .frog-card .thumb-wrap{
+      position:relative;
+      width:128px; height:128px; grid-row: span 3;
+      border-radius:12px; overflow:hidden;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 6px 12px rgba(0,0,0,.25);
+      background: var(--panel-2);
+      /* the backdrop (original PNG scaled) is set inline by JS via background-image */
+      background-repeat:no-repeat; background-position:center; background-size:1200%;
+      /* 1200% makes the frog itself go off-frame so you effectively see only the solid BG color */
+    }
+    /* base frog and layered parts render at 128×128, pixelated */
+    .frog-card .thumb-wrap img{ width:128px; height:128px; object-fit:contain; image-rendering: pixelated; image-rendering: crisp-edges; display:block; }
     .trait_overlay, .attribute_overlay{
       position:absolute; left:0; top:0; width:128px; height:128px; object-fit:contain;
-      pointer-events:none;
+      pointer-events:none; image-rendering: pixelated; image-rendering: crisp-edges;
     }
 
-    /* Hide debug JSON completely on this page */
-    #morph-json{ display:none !important; }
-  </style>
+    .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
+    .pill{ display:inline-block; padding:3px 10px; border-radius:999px; background: color-mix(in srgb, var(--panel) 85%, transparent); border:1px solid var(--border); font-size:12px; }
+    .meta{ color:var(--muted); font-size:12px; }
+    .actions{ grid-column:1 / -1; display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
 
-  <!-- Site config + helpers (same order style as collection page) -->
+    .btn{
+      font-family: var(--font-ui);
+      border:1px solid var(--border);
+      background:transparent;
+      color:inherit;
+      border-radius:8px;
+      padding:6px 10px;
+      font-weight:700;
+      font-size:12px;
+      line-height:1;
+      display:inline-flex; align-items:center; gap:6px;
+      text-decoration:none; letter-spacing:.01em;
+      transition: background .15s ease, border-color .15s ease, color .15s ease, transform .05s ease;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn-outline-gray{ border-color: color-mix(in srgb, #9ca3af 70%, var(--border)); color: color-mix(in srgb, #ffffff 65%, #9ca3af); }
+    #mutateCard .actions .btn:hover{
+      background: color-mix(in srgb, #22c55e 14%, var(--panel));
+      border-color: color-mix(in srgb, #22c55e 80%, var(--border));
+      color: color-mix(in srgb, #ffffff 85%, #22c55e);
+    }
+  </style>
+</head>
+<body>
+  <div class="pg-wrap container">
+    <!-- (Optional) same hero strip not included to keep page focused -->
+    <div id="ffTopbarMount"></div>
+
+    <!-- GRID (single centered column) -->
+    <div class="page-grid">
+
+      <!-- Centered “Dashboard” card -->
+      <section id="mutateCard" class="pg-card">
+        <div class="pg-card-head">
+          <h3>Dashboard</h3>
+          <!-- Use same top-right wallet chip styling -->
+          <div id="mutateWalletAddr" class="dash-addr" style="display:none;"></div>
+        </div>
+
+        <!-- Single frog card container to mirror collection look -->
+        <div class="grid-cards">
+          <article class="frog-card" id="mutateFrogCard">
+            <div class="thumb-wrap" id="mutateThumbWrap">
+              <!-- Base frog (hidden during mutate to show only layers) -->
+              <img id="mutateBase" alt="Frog" src="" />
+              <!-- Layered build goes here -->
+              <div id="mutateLayers"></div>
+            </div>
+
+            <h4 class="title" id="mutateTitle">Frog #—</h4>
+            <div class="meta" id="mutateMeta">Random preview</div>
+
+            <!-- Attributes (bulleted, same style) -->
+            <ul class="attr-bullets" id="mutateAttrs"></ul>
+
+            <!-- Only two actions -->
+            <div class="actions">
+              <button class="btn btn-outline-gray" id="btnRefresh">Refresh</button>
+              <button class="btn btn-outline-gray" id="btnMutate">Mutate</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Config & helpers (order consistent with collection.html minimal needs) -->
   <script src="assets/js/config.js"></script>
   <script src="assets/js/utils.js"></script>
   <script src="assets/js/topbar.js"></script>
 
   <!-- Mutate logic -->
-  <script src="assets/js/mutate.js" defer></script>
-</head>
-<body class="theme-dark">
-
-  <header id="siteTopbar"></header>
-
-  <main class="pg-wrap">
-    <div class="page-grid">
-
-      <!-- Centered dashboard card (pond column removed) -->
-      <section class="pg-card" id="mutateCard">
-        <div class="pg-card-head">
-          <h3>Mutate Lab</h3>
-          <div class="spacer"></div>
-          <!-- Optional wallet chip (same button class; enabled dynamically if desired) -->
-          <button class="btn" id="mutateWalletBtn" style="display:none">Connect Wallet</button>
-        </div>
-
-        <!-- One frog info card (same structure/classes as collection) -->
-        <article class="frog-card" id="mutateFrogCard">
-          <!-- preview block that starts with base PNG; layers added on mutate -->
-          <div class="frog-preview">
-            <img id="mutateBase" class="thumb" alt="Frog" src="" />
-            <!-- layered build gets appended here -->
-            <div id="mutateLayers"></div>
-          </div>
-
-          <h4 class="title" id="mutateTitle">Frog #—</h4>
-          <div class="meta" id="mutateMeta">Random preview</div>
-
-          <!-- Attributes (bulleted, same style) -->
-          <ul class="attr-bullets" id="mutateAttrs"></ul>
-
-          <!-- Only two actions -->
-          <div class="actions">
-            <button class="btn btn-outline-gray" id="btnRefresh">Refresh</button>
-            <button class="btn btn-outline-gray" id="btnMutate">Mutate</button>
-          </div>
-
-          <!-- Debug JSON is present but forced hidden via CSS above -->
-          <pre id="morph-json" class="pg-muted"></pre>
-        </article>
-      </section>
-
-    </div>
-  </main>
+  <script src="assets/js/mutate.js"></script>
 
   <script>
-    // initialize your existing topbar (same as other pages)
-    if (window.FF?.initTopbar) try { window.FF.initTopbar(); } catch {}
+    // initialize same topbar
+    if (window.FF?.initTopbar) try { FF.initTopbar(); } catch {}
   </script>
 </body>
 </html>
