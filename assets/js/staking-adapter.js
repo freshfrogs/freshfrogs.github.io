@@ -1,6 +1,6 @@
 // assets/js/staking-adapter.js
 // Provides FF.staking with controller + ERC721 helpers, using Web3.
-// Flexible: detects method names across different controller ABIs.
+// Detects method names across different controller ABIs and falls back to stakers(address).
 
 ;(function(FF, CFG){
   'use strict';
@@ -43,65 +43,66 @@
     try{
       const ok = await ERC721.methods.isApprovedForAll(from, CTRL_ADDR).call();
       if (ok) return true;
-    }catch(e){ /* some ERC721s don’t implement it; we still try setApproval */ }
+    }catch(e){ /* some ERC721s throw; keep going to setApproval */ }
     await ERC721.methods.setApprovalForAll(CTRL_ADDR, true).send({ from });
     return true;
+  }
+  function toNums(arr){
+    return (arr||[]).map(v => {
+      try{
+        if (typeof v === 'number') return v;
+        if (typeof v === 'bigint') return Number(v);
+        if (typeof v === 'string') return Number(/^0x/i.test(v) ? BigInt(v) : v);
+      }catch(_){}
+      return NaN;
+    }).filter(Number.isFinite);
   }
 
   // --- method discovery ---
   const M = {
-    // staking
-    stakeOne:  pickMethod(CTRL, ['stake','deposit','stakeToken']),
-    stakeMany: pickMethod(CTRL, ['stakeMany','stakeTokens','depositMany','stakeBatch']),
-    // unstaking
+    // stake/unstake variants
+    stakeOne:    pickMethod(CTRL, ['stake','deposit','stakeToken']),
+    stakeMany:   pickMethod(CTRL, ['stakeMany','stakeTokens','depositMany','stakeBatch']),
     unstakeOne:  pickMethod(CTRL, ['unstake','withdraw','withdrawToken']),
     unstakeMany: pickMethod(CTRL, ['unstakeMany','withdrawMany','unstakeTokens','withdrawTokens','unstakeBatch']),
     // views
     getUserStaked: pickMethod(CTRL, ['getStakedTokens','tokensOf','getUserStakedTokens','stakedTokens']),
+    stakersView:   pickMethod(CTRL, ['stakers']), // struct fallback
     rewardsView:   pickMethod(CTRL, ['availableRewards','getAvailableRewards','claimableRewards','rewards','getRewards']),
     // claim
     claim: pickMethod(CTRL, ['claimRewards','claim','harvest']),
-    // since / info
+    // since/info
     sinceOne: pickMethod(CTRL, ['stakeSince','stakedAt']),
     infoOne:  pickMethod(CTRL, ['getStakeInfo','stakeInfo'])
   };
 
+  // --- core actions ---
   async function stakeToken(tokenId){
-    const from = await getAddress();
-    if (!from) throw new Error('No wallet');
+    const from = await getAddress(); if (!from) throw new Error('No wallet');
     await ensureApproval(from);
-
-    // prefer batch if available (gas-efficient for single too on some controllers)
-    if (M.stakeMany) {
-      return CTRL.methods[M.stakeMany]([String(tokenId)]).send({ from });
-    }
-    if (M.stakeOne) {
-      // Some ABIs expect uint256, others expect (address,uint256). Try common ones.
+    if (M.stakeMany) return CTRL.methods[M.stakeMany]([String(tokenId)]).send({ from });
+    if (M.stakeOne){
       try { return CTRL.methods[M.stakeOne](String(tokenId)).send({ from }); }
       catch(_){ return CTRL.methods[M.stakeOne](from, String(tokenId)).send({ from }); }
     }
     throw new Error('No stake method on controller');
   }
-
   async function stakeTokens(ids){
     const from = await getAddress(); if (!from) throw new Error('No wallet');
     await ensureApproval(from);
     const arr = (ids||[]).map(String);
     if (M.stakeMany) return CTRL.methods[M.stakeMany](arr).send({ from });
-    // fallback: loop one by one
     const out=[]; for (const id of arr){ out.push(await stakeToken(id)); } return out;
   }
-
   async function unstakeToken(tokenId){
     const from = await getAddress(); if (!from) throw new Error('No wallet');
     if (M.unstakeMany) return CTRL.methods[M.unstakeMany]([String(tokenId)]).send({ from });
-    if (M.unstakeOne) {
+    if (M.unstakeOne){
       try { return CTRL.methods[M.unstakeOne](String(tokenId)).send({ from }); }
       catch(_){ return CTRL.methods[M.unstakeOne](from, String(tokenId)).send({ from }); }
     }
     throw new Error('No unstake/withdraw method on controller');
   }
-
   async function unstakeTokens(ids){
     const from = await getAddress(); if (!from) throw new Error('No wallet');
     const arr = (ids||[]).map(String);
@@ -109,21 +110,40 @@
     const out=[]; for (const id of arr){ out.push(await unstakeToken(id)); } return out;
   }
 
+  // --- views ---
   async function getUserStakedTokens(address){
     const addr = address || await getAddress();
     if (!addr) return [];
-    if (!M.getUserStaked) return [];
-    const res = await CTRL.methods[M.getUserStaked](addr).call();
-    return Array.isArray(res) ? res.map(x => Number(x)) : [];
+    // Primary: explicit list function
+    if (M.getUserStaked){
+      try{
+        const res = await CTRL.methods[M.getUserStaked](addr).call();
+        return Array.isArray(res) ? toNums(res) : [];
+      }catch(e){ console.warn('[staking-adapter] getUserStakedTokens primary failed', e); }
+    }
+    // Fallback: stakers(address) struct → find any array of uints in return tuple
+    if (M.stakersView){
+      try{
+        const r = await CTRL.methods[M.stakersView](addr).call();
+        // r can be an object with numeric keys "0","1",... and/or named fields.
+        // Find any array that parses cleanly into numbers.
+        for (const k of Object.keys(r)){
+          const v = r[k];
+          if (Array.isArray(v)){
+            const ids = toNums(v);
+            if (ids.length) return ids;
+          }
+        }
+      }catch(e){ console.warn('[staking-adapter] stakers() fallback failed', e); }
+    }
+    return [];
   }
 
   async function getAvailableRewards(address){
     const addr = address || await getAddress();
     if (!addr || !M.rewardsView) return null;
-    try {
-      const v = await CTRL.methods[M.rewardsView](addr).call();
-      return v; // owned-panel will format (decimals) safely
-    } catch(e){ console.warn('[staking-adapter] rewards', e); return null; }
+    try { return await CTRL.methods[M.rewardsView](addr).call(); }
+    catch(e){ console.warn('[staking-adapter] rewards', e); return null; }
   }
 
   async function claimRewards(){
@@ -158,17 +178,13 @@
 
   // Expose adapter (without clobbering existing)
   FF.staking = Object.assign({}, FF.staking || {}, {
-    // Approvals
     isApproved, approveIfNeeded,
-    // Stake/Unstake
     stakeToken, stakeTokens, unstakeToken, unstakeTokens,
-    // Views & actions
     getUserStakedTokens, getAvailableRewards, claimRewards,
-    // Since
     getStakeSince
   });
 
-  // Optional: event for other modules
+  // Signal readiness
   (async ()=> {
     try {
       const addr = await getAddress();

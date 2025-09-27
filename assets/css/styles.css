@@ -413,7 +413,6 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
   .ff-topbar{ gap: 6px; padding: 8px 10px; }
   .ff-pill{ padding: 8px 12px; }
 }
-.pg-card-head .dash-addr{ font-weight:800; font-size:14px; color:inherit; letter-spacing:.01em; }
 /* Global scrollbar polish */
 :root{
   /* tweak as you like */
@@ -446,4 +445,11 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
 }
 *::-webkit-scrollbar-thumb:hover{
   background: var(--scrollbar-thumb-hover);
+}
+/* Dashboard header wallet label */
+.pg-card-head .dash-addr{
+  font-weight: 400;         /* not bold */
+  color: var(--muted);      /* same gray tone used in dashboard module */
+  font-size: 12px;          /* harmonizes with header chrome */
+  letter-spacing: .01em;
 }
