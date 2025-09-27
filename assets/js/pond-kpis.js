@@ -1,122 +1,98 @@
-// assets/js/pond-kpis.js
-// Pond header + KPIs helpers:
-// - Set concise description
-// - Render controller box with truncated Etherscan link
-// - Render 4th KPI: % of collection staked (needs FF_CFG.TOTAL_SUPPLY)
-//   Falls back gracefully if data not present.
-
-(function (FF, CFG) {
+// assets/js/pond-kpis.js — labels/links + total staked (limit=3)
+(function () {
   'use strict';
 
-  const CHAIN_ID = Number(CFG.CHAIN_ID || 1);
-  const TOTAL_SUPPLY = Number(CFG.TOTAL_SUPPLY || 0);
+  var CFG = (window.CFG || window.FF_CFG || window.CONFIG || {});
+  var CONTRACT   = String(CFG.COLLECTION_ADDRESS || '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b').toLowerCase();
+  var CONTROLLER = String(CFG.CONTROLLER_ADDRESS || (CFG.CONTROLLER_ADDRESSES && CFG.CONTROLLER_ADDRESSES[0]) || '0xcb1ee125cff4051a10a55a09b10613876c4ef199').toLowerCase();
+  var API_KEY    = CFG.RESERVOIR_API_KEY || null;
 
-  // --- DOM helpers ---
-  const $  = (s, r=document)=> r.querySelector(s);
-  const $$ = (s, r=document)=> Array.from(r.querySelectorAll(s));
-  const pick = (sels)=> sels.map(sel=> $(sel)).find(Boolean);
+  var HEADERS = { accept: '*/*' };
+  if (API_KEY) HEADERS['x-api-key'] = API_KEY;
 
-  function setText(el, text){ if (el) el.textContent = text; }
-  function setHTML(el, html){ if (el) el.innerHTML = html; }
+  function $(s, p){ return (p||document).querySelector(s); }
 
-  // --- Formatters ---
-  function shortAddr(a){ return a ? a.slice(0,6) + '…' + a.slice(-4) : '—'; }
-  function etherscanBase(){
-    if (CHAIN_ID === 1) return 'https://etherscan.io';
-    if (CHAIN_ID === 11155111) return 'https://sepolia.etherscan.io';
-    if (CHAIN_ID === 5) return 'https://goerli.etherscan.io';
-    return 'https://etherscan.io';
-  }
-  function etherscanAddr(a){ return etherscanBase() + '/address/' + a; }
-
-  // --- Description (short, more informative) ---
-  function updateDescription(){
-    const el = pick(['#pondDesc','[data-pond-desc]']);
-    if (!el) return;
-    setText(el,
-      'Live staking dashboard for the FreshFrogs pond — total frogs staked, active controller, and cumulative $FLYZ rewards.'
-    );
-  }
-
-  // --- Controller KPI (🧰 Controller) ---
-  function renderController(){
-    const ctrl = CFG.CONTROLLER_ADDRESS || '';
-    const target = pick(['#pondController','[data-kpi="controller"]']);
-    if (!target) return;
-
-    if (!ctrl){
-      // show placeholder if address missing
-      setHTML(target, '🧰 Controller<br><span class="pg-muted">Staking contract • </span>—');
-      return;
+  // ---------- set labels/links/hide ----------
+  function setStaticBits(){
+    // 1) Total Staked label with lily pad
+    var block1 = $('.info-grid-2 .info-block:nth-child(1)');
+    if (block1){
+      var ik1 = $('.ik', block1); if (ik1) ik1.textContent = '🪷 Total Staked';
+      var in1 = $('.in', block1); if (in1) in1.textContent = 'Across the collection';
     }
-    const html =
-      '🧰 Controller<br>' +
-      '<span class="pg-muted">Staking contract • </span>' +
-      `<a href="${etherscanAddr(ctrl)}" target="_blank" rel="noopener">${shortAddr(ctrl)}</a>`;
-    setHTML(target, html);
-  }
 
-  // --- % of Collection Staked (4th KPI) ---
-  function parseStakedCount(){
-    // Try a few likely locations and parse an integer
-    const src = pick(['[data-kpi="staked"]', '#pondKpiStaked', '#pondStakedCount']);
-    if (!src) return null;
-    const txt = (src.textContent || '').replace(/[, ]+/g,' ').trim();
-    // Try to extract last number in the string
-    const m = txt.match(/(\d[\d,\.]*)\s*$/);
-    const raw = m ? m[1] : txt;
-    const val = Number(String(raw).replace(/[^\d.-]/g,''));
-    return Number.isFinite(val) ? val : null;
-    // Note: If your staked KPI is a pure number, this will grab it cleanly.
-  }
-
-  function ensurePctKpiSlot(){
-    // Try existing placeholders
-    let el = pick(['#pondKpiStakedPct','[data-kpi="stakedPct"]']);
-    if (el) return el;
-
-    // Try to inject a new KPI box if we can find the KPI grid container
-    const grid = $('.pond-kpis, .pond-kpi-grid, .kpi-grid, .info-grid-2, .info-grid-4, .page-kpis');
-    if (!grid) return null;
-
-    el = document.createElement('div');
-    el.id = 'pondKpiStakedPct';
-    el.setAttribute('data-kpi','stakedPct');
-    el.className = 'kpi'; // trust your existing styles; falls back harmlessly
-    grid.appendChild(el);
-    return el;
-  }
-
-  function renderStakedPct(){
-    const slot = ensurePctKpiSlot();
-    if (!slot) return;
-
-    const stakedCount = parseStakedCount();
-    if (!TOTAL_SUPPLY || !Number.isFinite(stakedCount) || stakedCount < 0){
-      // No data => show muted dash
-      setHTML(slot, '📊 Collection Staked<br><span class="pg-muted">—</span>');
-      return;
+    // 2) Controller block (leave as-is but ensure link exists if you have an anchor)
+    var block2 = $('.info-grid-2 .info-block:nth-child(2)');
+    if (block2){
+      var in2 = $('.in', block2);
+      if (in2 && !in2.querySelector('a')){
+        // optional: add a small link to controller address if you want
+        var a = document.createElement('a');
+        a.href = 'https://etherscan.io/address/'+CONTROLLER;
+        a.textContent = (CONTROLLER.slice(0,6)+'…'+CONTROLLER.slice(-4));
+        a.target = '_blank'; a.rel='noopener';
+        in2.appendChild(document.createTextNode(' • '));
+        in2.appendChild(a);
+      }
     }
-    const pct = Math.max(0, Math.min(100, (stakedCount / TOTAL_SUPPLY) * 100));
-    const pretty = pct.toFixed(pct < 1 ? 2 : 1) + '%';
-    setHTML(slot, '📊 Collection Staked<br><span class="pg-muted">' + pretty + '</span>');
-  }
 
-  // --- Boot ---
-  function init(){
-    try {
-      updateDescription();
-      renderController();
-      renderStakedPct();
-    } catch (e) {
-      console.warn('[pond-kpis] init failed', e);
+    // 3) Rewards $FLYZ with emoji + link to token
+    var block3 = $('.info-grid-2 .info-block:nth-child(3)');
+    if (block3){
+      var ik3 = $('.ik', block3);
+      var iv3 = $('.iv', block3);
+      var in3 = $('.in', block3);
+      if (ik3) ik3.textContent = '🪰 Rewards';
+      if (iv3){
+        iv3.innerHTML = ''; // clear
+        var a3 = document.createElement('a');
+        a3.href = 'https://etherscan.io/token/0xd71d2f57819ae4be6924a36591ec6c164e087e63';
+        a3.textContent = '$FLYZ';
+        a3.target = '_blank'; a3.rel = 'noopener';
+        iv3.appendChild(a3);
+      }
+      if (in3) in3.textContent = 'Earnings token';
     }
+
+    // 4) Remove the 4th box entirely
+    var block4 = $('.info-grid-2 .info-block:nth-child(4)');
+    if (block4 && block4.parentNode) block4.parentNode.removeChild(block4);
   }
 
-  if (document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
+  function fmt(n){ try{ return (+n).toLocaleString(); } catch(_){ return String(n); } }
+
+  // ---------- total staked from Reservoir owners/v2 (limit=3) ----------
+  function fetchOwners(){
+    var url = 'https://api.reservoir.tools/owners/v2'
+            + '?collection=' + encodeURIComponent(CONTRACT)
+            + '&limit=3&sortBy=tokenCount&sortDirection=desc';
+    return fetch(url, { method:'GET', headers: HEADERS })
+      .then(function(res){ if (!res.ok) throw new Error('owners/v2 '+res.status); return res.json(); });
+  }
+  function extractCount(json){
+    var owners = Array.isArray(json.owners) ? json.owners : [];
+    var row = owners.find(function(r){ return String(r.address||'').toLowerCase() === CONTROLLER; });
+    if (!row) return null;
+    var tc = row.ownership && row.ownership.tokenCount;
+    if (tc == null && row.tokenCount != null) tc = row.tokenCount;
+    return (tc == null) ? null : Number(tc);
+  }
+  function targetNode(){
+    return document.getElementById('stakedTotal') ||
+           $('.info-grid-2 .info-block:nth-child(1) .iv') || null;
+  }
+  function fill(){
+    var out = targetNode(); if (!out) return;
+    out.textContent = '…';
+    fetchOwners()
+      .then(function(j){
+        var n = extractCount(j);
+        out.textContent = (n == null) ? '—' : fmt(n);
+      })
+      .catch(function(){ out.textContent = '—'; });
   }
 
-})(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
+  function init(){ setStaticBits(); fill(); }
+  document.addEventListener('DOMContentLoaded', init);
+  window.addEventListener('load', init);
+})();
