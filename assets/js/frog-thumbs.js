@@ -1,4 +1,4 @@
-// assets/js/frog-thumbs.js — dashboard frogs layered + "color-only" backgrounds
+// assets/js/frog-thumbs.js — dashboard frogs layered + transparent cards
 (function(){
   'use strict';
 
@@ -10,9 +10,9 @@
   const NO_ANIM = new Set(['Hat','Frog','Trait']);
   const NO_LIFT = new Set(['Frog','Trait','SpecialFrog']);
 
-  // >>> New: zoom/pin so ONLY the flat background color is visible
-  const COLOR_ONLY_BG_SIZE = '10000% 10000%';   // very large zoom
-  const COLOR_ONLY_BG_POS  = '0% 0%';           // pin to a solid corner (top-left)
+  // Thumb backdrop: use flat image but zoom/pin so only its solid bg color shows
+  const COLOR_ONLY_BG_SIZE = '10000% 10000%';
+  const COLOR_ONLY_BG_POS  = '0% 0%';
 
   function makeLayer(a,v,size){
     const img=new Image(); img.decoding='async'; img.loading='lazy';
@@ -31,7 +31,6 @@
 
   async function build(container, id, size){
     const flat=`${FLAT}/${id}.png`;
-    // >>> Changed: force color-only background for the thumb container
     Object.assign(container.style,{
       width:size+'px',height:size+'px',minWidth:size+'px',minHeight:size+'px',
       position:'relative',overflow:'hidden',borderRadius:'8px',imageRendering:'pixelated',
@@ -55,14 +54,20 @@
     }
   }
 
-  function darken(card, id){
-    const flat=`${FLAT}/${id}.png`;
-    // >>> Changed: card uses the SAME color-only recipe, plus ~20% darken
-    card.style.backgroundImage = `linear-gradient(rgba(0,0,0,.20), rgba(0,0,0,.20)), url("${flat}")`;
-    card.style.backgroundRepeat = 'no-repeat';
-    card.style.backgroundSize = COLOR_ONLY_BG_SIZE;
-    card.style.backgroundPosition = COLOR_ONLY_BG_POS;
-    card.style.backgroundBlendMode = 'multiply';
+  // Make card background transparent and clear any previous styles
+  function makeCardTransparent(card){
+    if (!card) return;
+    card.classList.remove('ff-card-bg');
+    card.style.removeProperty('--ff-card-bg-url');
+    card.style.removeProperty('--ff-card-bg-size');
+    card.style.removeProperty('--ff-card-bg-pos');
+    card.style.removeProperty('--ff-card-bg-darken');
+    card.style.backgroundImage = 'none';
+    card.style.backgroundColor = 'transparent';
+    card.style.removeProperty('background-repeat');
+    card.style.removeProperty('background-size');
+    card.style.removeProperty('background-position');
+    card.style.removeProperty('background-blend-mode');
   }
 
   function tokenId(card){
@@ -74,42 +79,43 @@
   }
 
   function upgrade(card){
-    if (!card || card.dataset.layered==='1') return false;
-    const id = tokenId(card); if (!id) return false;
+    if (!card || card.dataset.layered==='1') { makeCardTransparent(card); return false; }
 
-    // Preserve original .thumb layout so no extra spacing
+    const id = tokenId(card); if (!id){ makeCardTransparent(card); return false; }
+
+    // preserve original <img.thumb> layout
     const img = card.querySelector('img.thumb');
     const host = img ? img.parentNode : card;
     const size = img ? Math.max(128, Math.round(Math.max(img.width||0, img.height||0))) : 128;
 
     const wrap = document.createElement('div');
-    // >>> Keep the original .thumb class to inherit existing layout styles
     wrap.className = (img && img.className ? img.className + ' ' : '') + 'frog-layered-thumb';
 
-    // Copy basic box metrics from the old <img> so the layout stays identical
     if (img){
       const cs = getComputedStyle(img);
       wrap.style.display = cs.display || 'inline-block';
       wrap.style.margin  = cs.margin  || '';
       wrap.style.width   = (parseFloat(cs.width)||img.width||size) + 'px';
       wrap.style.height  = (parseFloat(cs.height)||img.height||size) + 'px';
+      try{ host.replaceChild(wrap, img); }catch{ host.insertBefore(wrap, img); img.style.display='none'; }
     } else {
       wrap.style.width = wrap.style.height = size + 'px';
       wrap.style.display = 'inline-block';
+      host.insertBefore(wrap, host.firstChild);
     }
 
-    if (img){ try{ host.replaceChild(wrap,img); }catch{ host.insertBefore(wrap,img); img.style.display='none'; } }
-    else { host.insertBefore(wrap, host.firstChild); }
-
     build(wrap, id, size);
-    darken(card, id);
+    makeCardTransparent(card); // ensure transparent bg
     card.dataset.layered='1';
     return true;
   }
 
   function run(root){
     let hits=0;
-    document.querySelectorAll('article.frog-card').forEach(card=>{ if (upgrade(card)) hits++; });
+    (root||document).querySelectorAll('article.frog-card').forEach(card=>{
+      if (upgrade(card)) hits++;
+      else makeCardTransparent(card); // always keep transparent
+    });
     if (hits) console.log('[frog-thumbs] upgraded', hits, 'card(s)');
   }
 
