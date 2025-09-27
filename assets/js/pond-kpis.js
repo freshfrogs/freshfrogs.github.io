@@ -1,5 +1,6 @@
 // assets/js/pond-kpis.js
-// Minimal + safe: update pond description, Total Frogs, and Controller value only.
+// Hotfix: write pond description, Total Frogs (from config), and Controller link.
+// Zero CSS changes. Defensive selectors. Only fills when blank/missing.
 
 (function (FF, CFG) {
   'use strict';
@@ -8,13 +9,13 @@
   const TOTAL_SUPPLY = (CFG.TOTAL_SUPPLY != null) ? Number(CFG.TOTAL_SUPPLY) : NaN;
   const CTRL_ADDR    = String(CFG.CONTROLLER_ADDRESS || '').trim();
 
-  // ---- tiny DOM helpers
+  // ---- tiny helpers
   const $  = (s, r=document)=> r.querySelector(s);
-  const pick = (arr)=> arr.map(sel => $(sel)).find(Boolean);
+  const $$ = (s, r=document)=> Array.from(r.querySelectorAll(s));
+  const pick = (sels)=> sels.map(sel=> $(sel)).find(Boolean);
   const setText = (el, v)=> { if (el) el.textContent = v; };
   const setHTML = (el, v)=> { if (el) el.innerHTML   = v; };
 
-  // ---- formatters
   function shortAddr(a){ return a ? a.slice(0,6) + '…' + a.slice(-4) : '—'; }
   function etherscanBase(){
     if (CHAIN_ID === 1) return 'https://etherscan.io';
@@ -24,70 +25,86 @@
   }
   function etherscanAddr(a){ return `${etherscanBase()}/address/${a}`; }
 
-  // ---- 1) Description
+  // ---- Description (only if target exists)
   function updateDescription(){
     const el = pick(['#pondDesc','[data-pond-desc]']);
     if (!el) return;
-    el.textContent = 'Live staking dashboard for the FreshFrogs pond — total frogs staked, active controller, and cumulative $FLYZ rewards.';
+    // Only set if empty or clearly default-ish
+    const cur = (el.textContent || '').trim();
+    if (!cur || /live view of staking/i.test(cur)){
+      el.textContent = 'Live staking dashboard for the FreshFrogs pond — total frogs staked, active controller, and cumulative $FLYZ rewards.';
+    }
   }
 
-  // ---- 2) Total Frogs (from config TOTAL_SUPPLY)
+  // ---- Try to find a "value" cell inside a KPI box
+  function findValueNode(box){
+    if (!box) return null;
+    return box.querySelector('.kpi-value, .value, .pg-kpi-value, .pg-muted:last-child') || null;
+  }
+
+  // ---- Total Frogs (from config)
   function updateTotalFrogs(){
     if (!Number.isFinite(TOTAL_SUPPLY)) return;
 
-    // Prefer updating just the "value" span if it exists
-    let val = pick([
-      '[data-kpi="total"] .kpi-value',
-      '#pondTotal .kpi-value',
-      '#pondTotalFrogs .kpi-value',
-      '[data-kpi="total"] .value',
-      '#pondTotal .value',
-      '#pondTotalFrogs .value'
-    ]);
+    // 1) ID/data-kpi if present
+    let box = pick(['#pondTotal', '#pondTotalFrogs', '[data-kpi="total"]']);
+    if (!box){
+      // 2) Fallback: find any KPI whose heading looks like "Total Frogs"
+      box = $$('.kpi, .info, .card, .pg-kpi, div').find(n => {
+        const t = (n.textContent || '').toLowerCase();
+        return /total\s+frogs/.test(t) || /🐸\s*total/.test(t);
+      }) || null;
+    }
+    if (!box) return;
 
-    if (val){
-      setText(val, String(TOTAL_SUPPLY));
+    const valNode = findValueNode(box);
+    const pretty = String(TOTAL_SUPPLY);
+
+    if (valNode){
+      // only overwrite if empty or numeric-looking placeholder
+      const cur = (valNode.textContent || '').trim();
+      if (!cur || cur === '—' || /^\d*$/.test(cur)) setText(valNode, pretty);
       return;
     }
 
-    // Fall back to replacing the whole box content (still minimal)
-    const box = pick(['#pondTotal','[data-kpi="total"]','#pondTotalFrogs']);
-    if (!box) return;
-
-    setHTML(box,
-      '🐸 Total Frogs<br>' +
-      `<span class="pg-muted">${TOTAL_SUPPLY}</span>`
-    );
+    // If no explicit value node and box is blank-ish, render a safe two-line fallback
+    const txt = (box.textContent || '').replace(/\s+/g,' ').trim();
+    if (!txt || txt === '—'){
+      setHTML(box, '🐸 Total Frogs<br><span class="pg-muted">'+pretty+'</span>');
+    }
   }
 
-  // ---- 3) Controller (truncate + link)
+  // ---- Controller (truncate + link)
   function updateController(){
     if (!CTRL_ADDR) return;
 
-    // Prefer updating just a value node inside the box
-    let val = pick([
-      '[data-kpi="controller"] .kpi-value',
-      '#pondController .kpi-value',
-      '[data-kpi="controller"] .value',
-      '#pondController .value'
-    ]);
+    // 1) ID/data-kpi if present
+    let box = pick(['#pondController','[data-kpi="controller"]']);
+    if (!box){
+      // 2) Fallback: find KPI with wording "Controller"
+      box = $$('.kpi, .info, .card, .pg-kpi, div').find(n => {
+        const t = (n.textContent || '').toLowerCase();
+        return /controller/.test(t) || /🧰/.test(t);
+      }) || null;
+    }
+    if (!box) return;
 
-    if (val){
-      setHTML(val,
-        `<a href="${etherscanAddr(CTRL_ADDR)}" target="_blank" rel="noopener">${shortAddr(CTRL_ADDR)}</a>`
-      );
+    const valNode = findValueNode(box);
+    const linkHTML = `<a href="${etherscanAddr(CTRL_ADDR)}" target="_blank" rel="noopener">${shortAddr(CTRL_ADDR)}</a>`;
+
+    if (valNode){
+      const cur = (valNode.innerHTML || valNode.textContent || '').trim();
+      if (!cur || cur === '—' || /0x[0-9a-f]{40}/i.test(cur)){
+        setHTML(valNode, linkHTML);
+      }
       return;
     }
 
-    // Fall back to replacing the whole box content (still minimal, keeps emoji/text simple)
-    const box = pick(['#pondController','[data-kpi="controller"]']);
-    if (!box) return;
-
-    setHTML(box,
-      '🧰 Controller<br>' +
-      '<span class="pg-muted">Staking contract • </span>' +
-      `<a href="${etherscanAddr(CTRL_ADDR)}" target="_blank" rel="noopener">${shortAddr(CTRL_ADDR)}</a>`
-    );
+    // If no value node and box is blank-ish, write a safe two-line fallback
+    const txt = (box.textContent || '').replace(/\s+/g,' ').trim();
+    if (!txt || txt === '—'){
+      setHTML(box, '🧰 Controller<br><span class="pg-muted">Staking contract • </span>' + linkHTML);
+    }
   }
 
   function init(){
@@ -96,7 +113,7 @@
       updateTotalFrogs();
       updateController();
     }catch(e){
-      console.warn('[pond-kpis] init failed', e);
+      console.warn('[pond-kpis] hotfix init failed', e);
     }
   }
 
