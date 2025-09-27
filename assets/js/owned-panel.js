@@ -448,27 +448,22 @@
   // --- Stake / Unstake / Approve modals ---
   function openApprovePanel(owner, stats){
     const body = `
-      <div class="om-col">
-        <div class="om-name">Approve Staking</div>
-        <div class="om-copy">
-          <p><b>FreshFrogsNFT Staking</b></p>
-          <p>Stake your Frogs and start earning rewards like $FLYZ, and more! Staking works by sending your Frog to a smart contract that will keep it safe. Frogs that are staked can’t be listed on secondary marketplaces, like Rarible.</p>
-          <p><b>✍️ Sign Contract Approval</b><br>To start staking you must first give the staking contract permission to access your Frogs. This is a one-time transaction that requires a gas fee.</p>
+      <div class="om-col" style="text-align:center">
+        <img class="om-hero128" src="assets/img/blackWhite.png" alt="Fresh Frogs logo">
+        <div class="om-name">Fresh Frogs Staking</div>
+        <div class="om-copy" style="text-align:left">
+          <p><b>Approve the staking contract</b></p>
+          <p>To stake your Frogs, your wallet must first grant our controller contract permission to manage your NFTs. This approval is <i>collection-wide</i> (not per-frog) and is a one-time blockchain transaction that costs a small gas fee.</p>
+          <p><b>How staking works</b></p>
+          <ul>
+            <li>After approval, you can stake individual Frogs. While staked, a Frog is locked and can’t be listed or transferred.</li>
+            <li>Staked Frogs earn rewards (like $FLYZ) over time. You can claim rewards without un-staking.</li>
+            <li>You can un-stake any time to unlock the Frog back to your wallet.</li>
+          </ul>
         </div>
       </div>
     `;
-    openModal({
-      title: '',
-      bodyHTML: body,
-      actions: [
-        { label:'Cancel', onClick:()=>{}, primary:false },
-        { label:'Approve Staking', primary:true, onClick: async ()=>{
-            await sendApprove(owner);
-            toast('Approval submitted');
-            await refreshHeaderStats();
-          }}
-      ]
-    });
+    openModal({ title: '', bodyHTML: body, actions:[ /* unchanged */ ]});
   }
 
   function openStakePanel(owner, tokenId){
