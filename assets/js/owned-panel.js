@@ -121,14 +121,63 @@
     throw new Error('No wallet provider found.');
   }
   const STK = ()=> (FF.staking || window.FF_STAKING || {});
+  // Replace the existing getStakedIds with this direct-onchain reader
   async function getStakedIds(addr){
+    // 1) Direct read via controller: getStakedTokens(address) -> uint256[]
     try{
-      if (typeof window.getStakedTokens === 'function'){ const raw=await window.getStakedTokens(addr); return normalizeIds(raw); }
-      if (typeof STK().getStakedTokens === 'function'){ const raw=await STK().getStakedTokens(addr); return normalizeIds(raw); }
-      if (typeof STK().getUserStakedTokens === 'function'){ const ids=await STK().getUserStakedTokens(addr); return normalizeIds(ids); }
-    }catch(e){ console.warn('[owned] getStakedIds failed',e); }
+      if (addr && window.CONTROLLER_ABI && window.FF_CFG?.CONTROLLER_ADDRESS){
+        // Prefer a JSON-RPC read if provided (so wallet chain mismatch can't break reads)
+        let web3 = null;
+        if (window.Web3){
+          if (window.FF_CFG.RPC_URL) {
+            web3 = new Web3(new Web3.providers.HttpProvider(window.FF_CFG.RPC_URL));
+          } else if (window.ethereum) {
+            web3 = new Web3(window.ethereum);
+          }
+        }
+        if (web3){
+          const ctrl = new web3.eth.Contract(window.CONTROLLER_ABI, window.FF_CFG.CONTROLLER_ADDRESS);
+          const raw = await ctrl.methods.getStakedTokens(addr).call();
+          const ids = Array.isArray(raw) ? raw.map(v=>{
+            try{
+              if (typeof v==='number') return v;
+              if (typeof v==='bigint') return Number(v);
+              if (typeof v==='string') return Number(/^0x/i.test(v)? BigInt(v): v);
+              if (v && typeof v._hex==='string') return Number(BigInt(v._hex));
+              if (v && typeof v.toString==='function'){ const s=v.toString(); if(/^0x/i.test(s)) return Number(BigInt(s)); if(/^\d+$/.test(s)) return Number(s); }
+            }catch(_){}
+            return NaN;
+          }).filter(Number.isFinite) : [];
+          if (ids.length) return ids;
+        }
+      }
+    }catch(e){
+      console.warn('[owned] direct getStakedTokens failed (will try adapter fallbacks)', e);
+    }
+
+    // 2) Fallback to any adapter/globals you already have wired
+    try{
+      if (typeof window.getStakedTokens === 'function'){ 
+        const raw = await window.getStakedTokens(addr); 
+        return normalizeIds(raw); 
+      }
+    }catch(e){ console.warn('[owned] getStakedTokens(window) failed', e); }
+
+    try{
+      const S = STK(); // FF.staking or window.FF_STAKING
+      if (typeof S.getStakedTokens === 'function'){ 
+        const raw = await S.getStakedTokens(addr); 
+        return normalizeIds(raw); 
+      }
+      if (typeof S.getUserStakedTokens === 'function'){ 
+        const raw = await S.getUserStakedTokens(addr); 
+        return normalizeIds(raw); 
+      }
+    }catch(e){ console.warn('[owned] adapter getStakedTokens failed', e); }
+
     return [];
   }
+
   function normalizeIds(rows){
     if (!Array.isArray(rows)) return [];
     const toNum=(x)=>{ try{
