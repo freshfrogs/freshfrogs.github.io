@@ -1,7 +1,7 @@
 // assets/js/owned-panel.js
 // Renders: Owned + Staked. Owned IDs from Reservoir; Staked IDs from controller.
 // Metadata always from frog/json/{id}.json. No OpenSea button. Attribute chips → bullets.
-// Header: Owned • Staked • Unclaimed Rewards (+ Approve/Claim). Connect btn stays green (if present).
+// Header: Owned • Staked • Unclaimed Rewards (+ Approve/Claim). Connect btn stays green.
 
 (function (FF, CFG) {
   'use strict';
@@ -86,8 +86,7 @@
     }
     if (typeof raw==='string' && raw.includes('.')) return raw;
     const bi = toBigInt(raw); if (bi==null) return '—';
-    const sign = bi<0n?'-':'';
-    const abs=sign?-bi:bi;
+    const sign = bi<0n?'-':''; const abs=sign?-bi:bi;
     const base=10n**BigInt(dec);
     const whole=abs/base, frac=abs%base;
     if (whole>=100n) return sign+whole.toString();
@@ -106,118 +105,128 @@
   }
 
   // --- Wallet & staking helpers ---
-  async function getConnectedAddress(){
-    try{
-      if (window.FF_WALLET?.address) return window.FF_WALLET.address;
-      if (FF.wallet?.getAddress){ const a=await FF.wallet.getAddress(); if(a) return a; }
-      if (window.ethereum?.request){ const arr=await window.ethereum.request({method:'eth_accounts'}); return arr?.[0]||null; }
-    }catch{} return null;
-  }
-  async function requestConnect(){
-    try{
-      if (FF.wallet?.connect){ const a=await FF.wallet.connect(); if(a) return a; }
-      if (window.ethereum?.request){ const arr=await window.ethereum.request({method:'eth_requestAccounts'}); return arr?.[0]||null; }
-    }catch(e){ toast('Connect failed'); }
-    throw new Error('No wallet provider found.');
-  }
-  const STK = ()=> (FF.staking || window.FF_STAKING || {});
 
-  // --- Wallet & staking helpers ---
-  async function getStakedIds(addr){
-    const toNum = (v)=> {
-      try{
-        if (typeof v === 'number') return v;
-        if (typeof v === 'bigint') return Number(v);
-        if (typeof v === 'string') return Number(/^0x/i.test(v) ? BigInt(v) : v);
-        if (v && typeof v._hex === 'string') return Number(BigInt(v._hex)); // ethers BigNumber
-        if (v && typeof v.toString === 'function'){
-          const s = v.toString();
-          if (/^0x/i.test(s)) return Number(BigInt(s));
-          if (/^-?\d+$/.test(s)) return Number(s);
-        }
-      }catch(_){}
-      return NaN;
-    };
-    const toNums = (arr)=> Array.isArray(arr) ? arr.map(toNum).filter(Number.isFinite) : [];
-
-    if (!window.ethereum || !window.Web3 || !window.CONTROLLER_ABI || !window.FF_CFG?.CONTROLLER_ADDRESS){
-      console.warn('[owned] missing wallet/web3/ABI/controller address');
-      return [];
-    }
-
-    // 1) Ensure wallet is on the correct chain
-    try{
-      const targetDec = Number(window.FF_CFG.CHAIN_ID || 1);
-      const targetHex = '0x' + targetDec.toString(16);
-      const curHex = await window.ethereum.request({ method: 'eth_chainId' });
-      if (curHex?.toLowerCase() !== targetHex.toLowerCase()){
-        // attempt to switch; if it fails, we’ll still try the call (may revert)
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: targetHex }]
-        }).catch(()=> {});
-      }
-    }catch(e){ console.warn('[owned] chain check/switch skipped', e); }
-
-    // 2) Read staked IDs via the wallet provider (no RPC key needed)
-    try{
-      const web3 = new Web3(window.ethereum);
-      const ctrl = new web3.eth.Contract(window.CONTROLLER_ABI, window.FF_CFG.CONTROLLER_ADDRESS);
-      const raw = await ctrl.methods.getStakedTokens(addr).call({ from: addr });
-      const ids = toNums(raw);
-      return ids;
-    }catch(e){
-      console.warn('[owned] wallet getStakedTokens failed', e);
-      return [];
-    }
-  }
-  // debug helper (so you can call it from the console)
-  window.FF_getStakedIds = getStakedIds;
-
-
+  // UPDATED: tuple-aware normalization
   function normalizeIds(rows){
     if (!Array.isArray(rows)) return [];
     const toNum=(x)=>{ try{
-      if(x==null) return NaN;
-      if(typeof x==='number') return x;
-      if(typeof x==='bigint') return Number(x);
-      if(typeof x==='string'){ if(/^0x/i.test(x)) return Number(BigInt(x)); return Number(x); }
-      if(typeof x==='object'){
-        if(typeof x.toString==='function' && x.toString!==Object.prototype.toString){ const s=x.toString(); if(/^\d+$/.test(s)) return Number(s); }
-        if('_hex' in x) return Number(x._hex);
-        if('hex'  in x) return Number(x.hex);
+      if (x==null) return NaN;
+      if (typeof x==='number') return Number.isFinite(x) ? x : NaN;
+      if (typeof x==='bigint') return Number(x);
+      if (typeof x==='string'){ // hex or decimal
+        if (/^0x[0-9a-f]+$/i.test(x)) return Number(BigInt(x));
+        if (/^-?\d+$/.test(x)) return Number(x);
+        return NaN;
+      }
+      if (Array.isArray(x)) {                   // tuple like [owner, tokenId] → take last
+        return toNum(x[x.length-1]);
+      }
+      if (typeof x==='object'){
+        if (typeof x._hex==='string') return Number(BigInt(x._hex)); // ethers BigNumber
+        if (typeof x.toString==='function'){
+          const s=x.toString();
+          if (/^0x/i.test(s)) return Number(BigInt(s));
+          if (/^-?\d+$/.test(s)) return Number(s);
+        }
+        const cand = x.tokenId ?? x.id ?? x.token_id ?? x.tokenID ?? x.value ?? x[1] ?? x[0];
+        return toNum(cand);
       }
       return NaN;
-    }catch{ return NaN; }};
-    return rows.map(r=>{
-      if (Array.isArray(r)) return toNum(r[0]);
-      if (typeof r==='string' || typeof r==='number' || typeof r==='bigint') return toNum(r);
-      if (typeof r==='object'){ const cand=r.tokenId ?? r.id ?? r.token_id ?? r.tokenID ?? r[0]; return toNum(cand); }
-      return NaN;
-    }).filter(Number.isFinite);
+    }catch{ return NaN; } };
+    return rows.map(toNum).filter(Number.isFinite);
   }
+
+  // NEW: wallet-only direct reader for staked IDs (supports tuple returns)
+  async function getStakedIds(addr){
+    // Ensure required globals
+    if (!window.ethereum || !window.Web3 || !window.CONTROLLER_ABI || !window.FF_CFG?.CONTROLLER_ADDRESS) return [];
+
+    // Make sure wallet is on the intended chain (best effort)
+    try{
+      const targetHex = '0x' + Number(window.FF_CFG.CHAIN_ID || 1).toString(16);
+      const curHex = await window.ethereum.request({ method:'eth_chainId' }).catch(()=>null);
+      if (curHex && curHex.toLowerCase() !== targetHex.toLowerCase()){
+        await window.ethereum.request({
+          method:'wallet_switchEthereumChain',
+          params:[{ chainId: targetHex }]
+        }).catch(()=>{ /* user may decline; we still attempt the call */ });
+      }
+    }catch{ /* ignore */ }
+
+    // Direct contract read via wallet provider
+    try{
+      const web3 = new Web3(window.ethereum);
+      const ctrl = new web3.eth.Contract(window.CONTROLLER_ABI, window.FF_CFG.CONTROLLER_ADDRESS);
+      const raw  = await ctrl.methods.getStakedTokens(addr).call({ from: addr });
+      // raw is array of tuples [owner, tokenId] → map to ids
+      if (Array.isArray(raw) && raw.length && Array.isArray(raw[0])) {
+        return raw.map(t => {
+          const v = t[t.length-1];
+          try {
+            if (typeof v==='number') return v;
+            if (typeof v==='string') return Number(/^\d+$/.test(v) ? v : BigInt(v));
+            if (typeof v==='bigint') return Number(v);
+            if (v && typeof v._hex==='string') return Number(BigInt(v._hex));
+            if (v && typeof v.toString==='function'){
+              const s=v.toString();
+              if (/^0x/i.test(s)) return Number(BigInt(s));
+              if (/^\d+$/.test(s)) return Number(s);
+            }
+          } catch {}
+          return NaN;
+        }).filter(Number.isFinite);
+      }
+      // or already a simple array of ids
+      return normalizeIds(raw);
+    }catch(e){
+      console.warn('[owned] wallet getStakedTokens failed', e);
+    }
+
+    // Fallbacks to any adapter/globals if present
+    try{
+      if (typeof window.getStakedTokens === 'function'){
+        const raw = await window.getStakedTokens(addr);
+        return normalizeIds(raw);
+      }
+    }catch(e){ console.warn('[owned] window.getStakedTokens fallback failed', e); }
+
+    try{
+      const S = (FF.staking || window.FF_STAKING || {});
+      if (typeof S.getStakedTokens === 'function'){
+        const raw = await S.getStakedTokens(addr);
+        return normalizeIds(raw);
+      }
+      if (typeof S.getUserStakedTokens === 'function'){
+        const raw = await S.getUserStakedTokens(addr);
+        return normalizeIds(raw);
+      }
+    }catch(e){ console.warn('[owned] adapter getStakedTokens fallback failed', e); }
+
+    return [];
+  }
+
   async function isApproved(addr){
     for (const k of ['isApproved','isApprovedForAll','checkApproval'])
-      if (typeof STK()[k]==='function'){ try{ return !!await STK()[k](addr);}catch{} }
+      if (typeof (FF.staking || window.FF_STAKING || {})[k]==='function'){ try{ return !!await (FF.staking || window.FF_STAKING)[k](addr);}catch{} }
     return null;
   }
   async function requestApproval(){
     for (const k of ['approve','approveIfNeeded','requestApproval','setApproval'])
-      if (typeof STK()[k]==='function') return STK()[k]();
+      if (typeof (FF.staking || window.FF_STAKING || {})[k]==='function') return (FF.staking || window.FF_STAKING)[k]();
     throw new Error('Approval helper not found.');
   }
   async function getRewards(addr){
     for (const k of ['getAvailableRewards','getRewards','claimableRewards','getUnclaimedRewards'])
-      if (typeof STK()[k]==='function'){ try{ return await STK()[k](addr);}catch{} }
+      if (typeof (FF.staking || window.FF_STAKING || {})[k]==='function'){ try{ return await (FF.staking || window.FF_STAKING)[k](addr);}catch{} }
     return null;
   }
   async function claimRewards(){
     for (const k of ['claimRewards','claim','harvest'])
-      if (typeof STK()[k]==='function') return STK()[k]();
+      if (typeof (FF.staking || window.FF_STAKING || {})[k]==='function') return (FF.staking || window.FF_STAKING)[k]();
     throw new Error('Claim helper not found.');
   }
   async function getStakeSinceMs(tokenId){
-    const S=STK();
+    const S=(FF.staking || window.FF_STAKING || {});
     try{
       if (typeof S.getStakeSince==='function'){ const v=await S.getStakeSince(tokenId); return Number(v)>1e12?Number(v):Number(v)*1000; }
       if (typeof S.getStakeInfo==='function'){ const i=await S.getStakeInfo(tokenId); const sec=i?.since??i?.stakedAt??i?.timestamp; if (sec!=null) return Number(sec)>1e12?Number(sec):Number(sec)*1000; }
@@ -225,8 +234,7 @@
     }catch{} return null;
   }
 
-  // --- NEW: fallback to infer stake time via Transfer(to=controller) events ---
-  // Returns ms epoch or null
+  // --- Fallback via Transfer(to=controller) events ---
   async function stakeSinceViaEvents(tokenId){
     try{
       if (!window.Web3) return null;
@@ -247,27 +255,6 @@
       return Number(b.timestamp) * 1000;
     }catch(_){ return null; }
   }
-
-  // --- Dashboard head wallet label (top-right) ---
-  (function initDashWalletLabel(){
-    var slot = document.getElementById('ownedWalletAddr');
-    if (!slot) return; // safe no-op if the slot isn't present
-    function short(a){ return a ? (String(a).slice(0,6)+'…'+String(a).slice(-4)) : ''; }
-    function update(addr){
-      if (addr){ slot.textContent = short(addr); slot.style.display = ''; }
-      else { slot.textContent = ''; slot.style.display = 'none'; }
-    }
-    // initial best-effort
-    (async ()=>{ try{ update(await getConnectedAddress()); }catch{} })();
-    // events from your wallet/topbar modules
-    document.addEventListener('ff:wallet:ready', function(e){ update(e && e.detail && e.detail.address); });
-    window.addEventListener('wallet:connected', function(e){ update(e && e.detail && e.detail.address); });
-    if (window.ethereum && window.ethereum.on){
-      window.ethereum.on('accountsChanged', function(acc){ update((acc && acc[0]) || ''); });
-    }
-    // expose for internal calls below
-    window.__FF_updateOwnedAddrSlot = update;
-  })();
 
   // --- State ---
   let addr=null, continuation=null, items=[], io=null;
@@ -390,9 +377,9 @@
       card.setAttribute('data-token-id', String(it.id));
       card.innerHTML =
         '<img class="thumb" src="'+imgFor(it.id)+'" alt="'+it.id+'">'+
-        '<h4 class="title">Frog #'+it.id+(it.rank||it.rank===0?' <span class="pill">Rank #'+it.rank+'</span>':'')+'</h4>'+
-        '<div class="meta">'+fmtMeta(it)+'</div>'+
-        (attrsHTML(it.attrs,4))+
+        '<h4 class="title">Frog #'+it.id+(it.rank||it.rank===0?' <span class="pill">Rank #'+it.rank+'</span>':'')+'</h4>'+-
+        '<div class="meta">'+fmtMeta(it)+'</div>'+-
+        (attrsHTML(it.attrs,4))+-
         '<div class="actions">'+
           '<button class="btn btn-outline-gray" data-act="'+(it.staked ? 'unstake' : 'stake')+'">'+(it.staked ? 'Unstake' : 'Stake')+'</button>'+
           '<button class="btn btn-outline-gray" data-act="transfer">Transfer</button>'+
@@ -452,7 +439,7 @@
         attrs: m.attrs,
         staked: stakedIds.includes(m.id),
         sinceMs: null,
-        rank: (ranks||{})[String(m.id)]
+        rank: (FF.RANKS||{})[String(m.id)]
       }));
 
       // Fill stake times (adapter first; else fall back to events)
@@ -507,23 +494,23 @@
     }
   }
 
-  // --- Connect button (optional, safe if removed from DOM) ---
+  // --- Connect button ---
   function reflectConnectButton(){
-    const btn=document.getElementById('ownedConnectBtn');
-    // If top-right slot exists, update it too
-    try{ if (typeof window.__FF_updateOwnedAddrSlot === 'function') window.__FF_updateOwnedAddrSlot(addr || ''); }catch(_){}
-    if(!btn) return; // button may not exist anymore
+    const btn=document.getElementById('ownedConnectBtn'); if(!btn) return;
     if (addr){ btn.classList.add('btn-connected'); btn.textContent=shorten(addr); }
     else { btn.classList.remove('btn-connected'); btn.textContent='Connect Wallet'; }
   }
+  async function requestConnect(){
+    try{
+      if (FF.wallet?.connect){ const a=await FF.wallet.connect(); if(a) return a; }
+      if (window.ethereum?.request){ const arr=await window.ethereum.request({method:'eth_requestAccounts'}); return arr?.[0]||null; }
+    }catch(e){ toast('Connect failed'); }
+    throw new Error('No wallet provider found.');
+  }
   async function handleConnectClick(ev){
     const btn=ev?.currentTarget; if(btn) btn.disabled=true;
-    try{
-      addr = await requestConnect();
-      if (!addr){ toast('No address'); return; }
-      reflectConnectButton();
-      await afterConnect();
-    }catch{ toast('Connect failed'); }
+    try{ addr = await requestConnect(); if (!addr){ toast('No address'); return; } reflectConnectButton(); await afterConnect(); }
+    catch{ toast('Connect failed'); }
     finally{ if(btn) btn.disabled=false; }
   }
 
@@ -539,30 +526,28 @@
     const card=$(SEL.card); if (card) card.querySelectorAll('.info-grid-2').forEach(n=> n.remove());
     await renderHeader();
 
-    // OPTIONAL: if the old connect button still exists, keep it functioning.
     const btn=document.getElementById('ownedConnectBtn');
     if (btn){ btn.style.display='inline-flex'; btn.addEventListener('click', handleConnectClick); }
 
-    addr = await getConnectedAddress();
-    reflectConnectButton();
-
-    // React to wallet connect events from topbar
+    // Listen for wallet connect events to auto-refresh
     document.addEventListener('ff:wallet:ready', async (e) => {
-      const a = e?.detail?.address;
-      if (!a) return;
-      addr = a;
-      try { if (typeof window.__FF_updateOwnedAddrSlot === 'function') window.__FF_updateOwnedAddrSlot(addr); } catch {}
-      await afterConnect();
+      const a = e?.detail?.address; if (!a) return;
+      addr = a; reflectConnectButton(); await afterConnect();
     });
-
     window.addEventListener('wallet:connected', async (e) => {
       const a = e?.detail?.address || (window.ethereum && window.ethereum.selectedAddress);
       if (!a) return;
-      addr = a;
-      try { if (typeof window.__FF_updateOwnedAddrSlot === 'function') window.__FF_updateOwnedAddrSlot(addr); } catch {}
-      await afterConnect();
+      addr = a; reflectConnectButton(); await afterConnect();
     });
 
+    addr = await (async ()=>{
+      try{
+        if (window.FF_WALLET?.address) return window.FF_WALLET.address;
+        if (FF.wallet?.getAddress){ const a=await FF.wallet.getAddress(); if(a) return a; }
+        if (window.ethereum?.request){ const arr=await window.ethereum.request({method:'eth_accounts'}); return arr?.[0]||null; }
+      }catch{} return null;
+    })();
+    reflectConnectButton();
 
     if (addr){ await afterConnect(); return; }
     const grid=$(SEL.grid); if (grid) grid.innerHTML='<div class="pg-muted">Connect your wallet to view owned frogs.</div>';
@@ -570,4 +555,5 @@
   }
 
   window.FF_initOwnedPanel = initOwned;
+
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
