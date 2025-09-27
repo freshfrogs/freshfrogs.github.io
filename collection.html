@@ -101,6 +101,10 @@
       white-space: normal;
       word-break: break-all;   /* allows 0x… addresses to wrap cleanly */
     }
+    .kpi{display:inline-grid;gap:4px;margin:8px 12px 0 0}
+    .kpi-label{font-size:.9rem;color:var(--muted,#97a0b2)}
+    .kpi-value{font-weight:700}
+
   </style>
 </head>
 <body>
@@ -157,6 +161,11 @@
             </div>
             <div class="in">Earnings token</div>
           </div>
+          <div class="kpi">
+            <div class="kpi-label">$FLYZ claimed (community total)</div>
+            <div class="kpi-value" id="kpiFlyzTotal">—</div>
+          </div>
+
         </div>
 
         <!-- Recent Stakes (scrollable) -->
@@ -223,6 +232,13 @@
 <script>
   if (window.FF_loadRecentStakes) FF_loadRecentStakes();
   if (window.FF_initOwnedPanel)   FF_initOwnedPanel();
+</script>
+<script src="assets/js/community-flyz.js" defer></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const el = document.getElementById('kpiFlyzTotal');
+    if (window.FF?.communityFLYZ) FF.communityFLYZ.refresh(el);
+  });
 </script>
 
 </body>
