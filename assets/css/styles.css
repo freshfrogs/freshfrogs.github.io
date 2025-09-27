@@ -604,3 +604,16 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
    <div class="no-scrollbar"> … </div> */
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .no-scrollbar::-webkit-scrollbar { width:0 !important; height:0 !important; }
+/* Show full addresses; only truncate if there's no room */
+.addr-clip{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Make sure text columns are allowed to shrink so ellipsis can work */
+#recentStakes .row > *, 
+#recentMints  .row > *, 
+#activityList .row > * { 
+  min-width: 0; 
+}
