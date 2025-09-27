@@ -439,13 +439,18 @@
     const rewards = (typeof stats?.rewards === 'string') ? stats.rewards : formatToken(stats?.rewards, REWARD_DECIMALS);
 
     const body = `
-      <div class="om-copy">
-        <p><b>Approve staking</b></p>
-        <p>To start staking, give the staking contract permission to access your Frogs. This is a one-time transaction and requires a gas fee.</p>
-        <p class="om-mono" style="margin-top:8px">
-          Status: ${approvalText}<br>
-          Staked: ${stCount} &nbsp;|&nbsp; Rewards: ${rewards} ${REWARD_SYMBOL}
-        </p>
+      <div class="om-flex">
+        <div class="om-left">
+          <div style="width:88px;height:88px;border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;background:#111">📃</div>
+          <div class="om-meta">
+            <div class="om-name">Approve staking</div>
+            <div class="om-sub">${approvalText}</div>
+          </div>
+        </div>
+        <div class="om-copy">
+          <p>Allow the staking contract to access your Frogs. One-time transaction; requires gas.</p>
+          <p class="om-mono" style="margin-top:8px">Staked: ${stCount} &nbsp;|&nbsp; Rewards: ${rewards} ${REWARD_SYMBOL}</p>
+        </div>
       </div>
     `;
     openModal({
@@ -464,19 +469,21 @@
 
   function openStakePanel(owner, tokenId){
     const body = `
-      <div class="om-media">
-        <img class="om-thumb" src="${imgFor(tokenId)}" alt="Frog #${tokenId}">
-        <div class="om-meta">
-          <div class="om-name">Frog #${tokenId}</div>
-          <div class="om-sub">Ready to stake</div>
+      <div class="om-flex">
+        <div class="om-left">
+          <img class="om-thumb" src="${imgFor(tokenId)}" alt="Frog #${tokenId}">
+          <div class="om-meta">
+            <div class="om-name">Frog #${tokenId}</div>
+            <div class="om-sub">Ready to stake</div>
+          </div>
         </div>
-      </div>
-      <div class="om-copy">
-        <p>While staked, your Frog can’t be listed or sold on marketplaces. You can un-stake here at any time. When a Frog is un-staked its level resets to zero.</p>
+        <div class="om-copy">
+          <p>While staked, your Frog can’t be listed or sold. You can un-stake here any time. Un-staking resets level to zero.</p>
+        </div>
       </div>
     `;
     openModal({
-      title: '', // no bold header line
+      title: '',
       bodyHTML: body,
       actions: [
         { label:'Cancel', onClick:()=>{}, primary:false },
@@ -489,7 +496,7 @@
               if (item){ item.staked=true; item.sinceMs=Date.now(); }
               renderCards();
               await refreshHeaderStats();
-            }catch(e){ toast('Stake failed'); }
+            }catch{ toast('Stake failed'); }
           }}
       ]
     });
@@ -497,15 +504,17 @@
 
   function openUnstakePanel(owner, tokenId){
     const body = `
-      <div class="om-media">
-        <img class="om-thumb" src="${imgFor(tokenId)}" alt="Frog #${tokenId}">
-        <div class="om-meta">
-          <div class="om-name">Frog #${tokenId}</div>
-          <div class="om-sub">Withdraw from staking</div>
+      <div class="om-flex">
+        <div class="om-left">
+          <img class="om-thumb" src="${imgFor(tokenId)}" alt="Frog #${tokenId}">
+          <div class="om-meta">
+            <div class="om-name">Frog #${tokenId}</div>
+            <div class="om-sub">Withdraw from staking</div>
+          </div>
         </div>
-      </div>
-      <div class="om-copy">
-        <p>Withdrawing returns this Frog to your wallet. The staking level will reset to zero.</p>
+        <div class="om-copy">
+          <p>Withdrawing returns this Frog to your wallet. Level resets to zero.</p>
+        </div>
       </div>
     `;
     openModal({
@@ -522,7 +531,7 @@
               if (item){ item.staked=false; item.sinceMs=null; }
               renderCards();
               await refreshHeaderStats();
-            }catch(e){ toast('Withdraw failed'); }
+            }catch{ toast('Withdraw failed'); }
           }}
       ]
     });
