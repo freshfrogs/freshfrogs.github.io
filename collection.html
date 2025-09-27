@@ -96,6 +96,11 @@
       border-color: color-mix(in srgb, #22c55e 80%, var(--border));
       color: color-mix(in srgb, #ffffff 85%, #22c55e);
     }
+    /* Let long addresses wrap instead of hard-truncating on desktop */
+    #recentStakes .pg-muted { 
+      white-space: normal;
+      word-break: break-all;   /* allows 0x… addresses to wrap cleanly */
+    }
   </style>
 </head>
 <body>

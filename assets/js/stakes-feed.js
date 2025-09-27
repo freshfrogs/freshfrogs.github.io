@@ -136,8 +136,13 @@
     // left thumb matches mints-feed (uses FF.thumb64 helper if present)
     const thumb = (FF.thumb64 ? FF.thumb64(it.img, 'Frog '+it.id) : `<img class="thumb64" src="${it.img}" alt="${it.id}">`);
     const label = `<b>${it.kind==='stake' ? 'Staked' : 'Unstaked'}</b> • Frog #${it.id}`;
-    const meta  = [ it.other ? '→ '+shorten(it.other) : null, it.time ? ago(it.time) : null, href ? 'Etherscan' : null ]
-                  .filter(Boolean).join(' • ');
+    const isNarrow = window.matchMedia('(max-width: 700px)').matches;
+    const meta = [
+      it.other ? ('→ ' + (isNarrow ? shorten(it.other) : it.other)) : null,
+      it.time ? ago(it.time) : null,
+      href ? 'Etherscan' : null
+    ].filter(Boolean).join(' • ');
+
 
     li.innerHTML = thumb + `<div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${label}</div><div class="pg-muted">${meta}</div></div>`;
     return li;
