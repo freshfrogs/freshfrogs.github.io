@@ -1,38 +1,36 @@
 // assets/js/mutate.js
-// Mutate page that mirrors collection.html frog card exactly.
-// - 128x128 pixelated layers
-// - Background uses original frog PNG scaled so only the background color is visible
-// - Top-right wallet chip matches dashboard style
-// - Buttons: Refresh (random new A), Mutate (A x B => layered composite)
+// Match collection frog-card exactly, build 128×128 pixelated layers,
+// and push the background PNG out of frame so only the bg color shows.
 
 (function (FF, CFG) {
   'use strict';
 
   const TOTAL = Number(CFG.TOTAL_SUPPLY || 4040);
-  const SOURCE_PATH = String(CFG.SOURCE_PATH || '').replace(/\/+$/, ''); // e.g. https://freshfrogs.github.io
+  const SOURCE_PATH = String(CFG.SOURCE_PATH || '').replace(/\/+$/, '');
 
   const $ = (s, r=document)=> r.querySelector(s);
-  const thumbWrap   = $('#mutateThumbWrap');
-  const baseImg     = $('#mutateBase');
-  const layersRoot  = $('#mutateLayers');
-  const titleEl     = $('#mutateTitle');
-  const metaEl      = $('#mutateMeta');
-  const attrsEl     = $('#mutateAttrs');
-  const btnRefresh  = $('#btnRefresh');
-  const btnMutate   = $('#btnMutate');
-  const addrChip    = $('#mutateWalletAddr');
+
+  const thumbImg   = $('#mutateThumb');       // <img class="thumb">
+  const thumbBuild = $('#mutateThumbBuild');  // <div class="thumb thumb-build">
+  const layersRoot = $('#mutateLayers');
+
+  const titleEl    = $('#mutateTitle');
+  const metaEl     = $('#mutateMeta');
+  const attrsEl    = $('#mutateAttrs');
+
+  const btnRefresh = $('#btnRefresh');
+  const btnMutate  = $('#btnMutate');
+  const addrChip   = $('#mutateWalletAddr');
 
   let currentId = null;
 
-  // Paths identical to collection
   const imgFor  = (id)=> `${SOURCE_PATH}/frog/${id}.png`;
   const jsonFor = (id)=> `${SOURCE_PATH}/frog/json/${id}.json`;
 
-  // identical attr list style
   function renderAttrs(attrs){
     attrsEl.innerHTML = '';
     if (!Array.isArray(attrs)) return;
-    const max = 8; let n = 0;
+    const max = 8; let n=0;
     for (const a of attrs){
       const key = a?.trait_type || a?.key; if (!key) continue;
       const val = a?.value || a?.trait_value || '';
@@ -43,27 +41,21 @@
     }
   }
 
-  // background = original PNG scaled so frog goes out of frame (just the solid bg remains)
-  function setBackColorFromPNG(id){
-    if (!thumbWrap) return;
-    const url = imgFor(id);
-    thumbWrap.style.backgroundImage = `url("${url}")`;
-    // huge size pushes the frog outside the 128×128 viewport so you effectively see only its solid background color
-    thumbWrap.style.backgroundSize = '1200%';
-    thumbWrap.style.backgroundPosition = 'center';
-    thumbWrap.style.backgroundRepeat = 'no-repeat';
+  function setBackOnlyFrom(id){
+    // Use PNG as background but blow it up so only its bg color shows.
+    thumbBuild.style.backgroundImage = `url("${imgFor(id)}")`;
+    thumbBuild.style.backgroundSize = '2600%'; // push frog out of 128x128
+    thumbBuild.style.backgroundPosition = 'center';
+    thumbBuild.style.backgroundRepeat = 'no-repeat';
   }
 
-  // Your exact build_trait logic but targeting /frog/build_files
-  function build_trait(trait_type, attribute, location){
-    const root = document.getElementById(location) || layersRoot;
+  // Your build_trait, targeting /frog/build_files
+  function build_trait(trait_type, attribute, locationId){
+    const root = document.getElementById(locationId) || layersRoot;
     if (!root) return;
-
     const img = document.createElement('img');
-    img.className = (trait_type === 'Trait' || trait_type === 'Frog' || trait_type === 'SpecialFrog') ? 'trait_overlay' : 'attribute_overlay';
     img.src = `${SOURCE_PATH}/frog/build_files/${trait_type}/${attribute}.png`;
     img.alt = `${trait_type}:${attribute}`;
-    // Guarantee 128×128 + pixelated
     img.style.width = '128px'; img.style.height = '128px';
     img.style.imageRendering = 'pixelated';
     root.appendChild(img);
@@ -71,28 +63,29 @@
 
   async function showFrog(id){
     currentId = id;
+
+    // Show normal <img.thumb>, hide build
+    thumbImg.style.display   = 'block';
+    thumbBuild.style.display = 'none';
     layersRoot.innerHTML = '';
-    baseImg.style.visibility = 'visible';
 
-    // set 128×128 base and background “color” from the same PNG
-    baseImg.src = imgFor(id);
-    baseImg.alt = `Frog #${id}`;
-    baseImg.style.width = '128px';
-    baseImg.style.height = '128px';
-    baseImg.style.imageRendering = 'pixelated';
-
-    setBackColorFromPNG(id);
+    // 128×128 pixelated image
+    thumbImg.src = imgFor(id);
+    thumbImg.alt = String(id);
+    thumbImg.style.width = '128px';
+    thumbImg.style.height = '128px';
+    thumbImg.style.imageRendering = 'pixelated';
 
     try{
       const r = await fetch(jsonFor(id));
       const j = r.ok ? await r.json() : null;
       titleEl.textContent = `Frog #${id}`;
-      metaEl.textContent = 'Random preview';
+      metaEl.textContent  = 'Random preview';
       renderAttrs(j?.attributes || []);
     }catch{
       titleEl.textContent = `Frog #${id}`;
-      metaEl.textContent = 'Preview • —';
-      attrsEl.innerHTML = '';
+      metaEl.textContent  = 'Preview • —';
+      attrsEl.innerHTML   = '';
     }
   }
 
@@ -105,23 +98,26 @@
     return id;
   }
 
-  // Morph logic (A × B -> C) + build layered composite at 128×128
-  async function metamorph_build(token_a, token_b, locationId) {
-    const loc = locationId || 'mutateLayers';
-    const layers = document.getElementById(loc) || layersRoot;
-    layers.innerHTML = '';
+  // A × B => C, draw layered composite into thumbBuild (128×128)
+  async function mutateBuild(aId, bId){
+    layersRoot.innerHTML = '';
+    setBackOnlyFrom(aId); // keep A's background tint; swap to setBackOnlyFrom(bId) if you prefer B
+
+    // Show build thumb, hide base img
+    thumbImg.style.display   = 'none';
+    thumbBuild.style.display = 'block';
 
     let A = { Frog:"", SpecialFrog:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
     let B = { Frog:"", SpecialFrog:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
     let C = { Frog:"", SpecialFrog:"", Subset:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
 
-    const ja = await (await fetch(jsonFor(token_a))).json();
+    const ja = await (await fetch(jsonFor(aId))).json();
     for (const at of ja.attributes){ A[at.trait_type] = at.value; }
 
-    const jb = await (await fetch(jsonFor(token_b))).json();
+    const jb = await (await fetch(jsonFor(bId))).json();
     for (const at of jb.attributes){ B[at.trait_type] = at.value; }
 
-    // SpecialFrog handling
+    // SpecialFrog logic
     if (A.SpecialFrog || B.SpecialFrog){
       if (A.SpecialFrog && B.SpecialFrog){
         B.SpecialFrog = A.SpecialFrog + '/SpecialFrog/' + B.SpecialFrog;
@@ -147,26 +143,28 @@
     C.Hat        = A.Hat        || B.Hat        || '';
     C.Mouth      = A.Mouth      || B.Mouth      || '';
 
-    // hide base; show only layers for the composite
-    baseImg.style.visibility = 'hidden';
+    // Build order: base → subset → trait → accessory → eyes → hat → mouth
+    if (C.Frog)       build_trait('Frog',       C.Frog,       'mutateLayers');
+    else if (C.SpecialFrog) build_trait('SpecialFrog', C.SpecialFrog, 'mutateLayers');
 
-    const result = [];
-    // Order: base → subset → trait → accessory → eyes → hat → mouth
-    if (C.Frog){
-      result.push({trait_type:'Frog', value:C.Frog});
-      build_trait('Frog', C.Frog, loc);
-    } else if (C.SpecialFrog){
-      result.push({trait_type:'SpecialFrog', value:C.SpecialFrog});
-      build_trait('SpecialFrog', C.SpecialFrog, loc);
-    }
-    if (C.Subset)    { result.push({trait_type:'Subset',    value:C.Subset});    build_trait('Frog/subset', C.Subset,    loc); }
-    if (C.Trait)     { result.push({trait_type:'Trait',     value:C.Trait});     build_trait('Trait',       C.Trait,     loc); }
-    if (C.Accessory) { result.push({trait_type:'Accessory', value:C.Accessory}); build_trait('Accessory',   C.Accessory, loc); }
-    if (C.Eyes)      { result.push({trait_type:'Eyes',      value:C.Eyes});      build_trait('Eyes',        C.Eyes,      loc); }
-    if (C.Hat)       { result.push({trait_type:'Hat',       value:C.Hat});       build_trait('Hat',         C.Hat,       loc); }
-    if (C.Mouth)     { result.push({trait_type:'Mouth',     value:C.Mouth});     build_trait('Mouth',       C.Mouth,     loc); }
+    if (C.Subset)     build_trait('Frog/subset', C.Subset,    'mutateLayers');
+    if (C.Trait)      build_trait('Trait',       C.Trait,     'mutateLayers');
+    if (C.Accessory)  build_trait('Accessory',   C.Accessory, 'mutateLayers');
+    if (C.Eyes)       build_trait('Eyes',        C.Eyes,      'mutateLayers');
+    if (C.Hat)        build_trait('Hat',         C.Hat,       'mutateLayers');
+    if (C.Mouth)      build_trait('Mouth',       C.Mouth,     'mutateLayers');
 
-    return result;
+    // Fill attributes list with the composite result
+    const out = [];
+    if (C.Frog) out.push({trait_type:'Frog', value:C.Frog}); else if (C.SpecialFrog) out.push({trait_type:'SpecialFrog', value:C.SpecialFrog});
+    if (C.Subset)     out.push({trait_type:'Subset',    value:C.Subset});
+    if (C.Trait)      out.push({trait_type:'Trait',     value:C.Trait});
+    if (C.Accessory)  out.push({trait_type:'Accessory', value:C.Accessory});
+    if (C.Eyes)       out.push({trait_type:'Eyes',      value:C.Eyes});
+    if (C.Hat)        out.push({trait_type:'Hat',       value:C.Hat});
+    if (C.Mouth)      out.push({trait_type:'Mouth',     value:C.Mouth});
+
+    renderAttrs(out);
   }
 
   async function onRefresh(){
@@ -182,16 +180,12 @@
     btnMutate.disabled = true;
     try{
       const b = randId(currentId);
-      const composed = await metamorph_build(currentId, b, 'mutateLayers');
+      await mutateBuild(currentId, b);
       titleEl.textContent = `Frog #${currentId} × #${b}`;
-      metaEl.textContent = 'Mutated preview';
-      renderAttrs(composed);
-      // keep the background “color” of A (looks good), or switch to B’s background:
-      // setBackColorFromPNG(b);
+      metaEl.textContent  = 'Mutated preview';
     } finally { btnMutate.disabled = false; }
   }
 
-  // Minimal wallet chip to match dashboard style
   async function initWalletChip(){
     const el = addrChip; if (!el) return;
     try{
@@ -199,7 +193,7 @@
       const a = arr?.[0] || null;
       if (a){
         el.style.display = 'inline-flex';
-        el.textContent = a; // full address, same as your dashboard behavior
+        el.textContent = a;  // full address like your dashboard
       }
     }catch{}
   }
