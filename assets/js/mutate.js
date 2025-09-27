@@ -1,18 +1,18 @@
 // assets/js/mutate.js
-// Draws the mutated frog into the SAME <img.thumb> so spacing/shadows match.
-// Background = original still PNG scaled and pushed far bottom-right.
+// 256×256 crisp render; buttons under image; info below.
+// Background comes from the original still, scaled/pushed to show only the solid color.
 
 (function (FF, CFG) {
   'use strict';
 
-  const SIZE = 128;
+  const SIZE = 256;                        // ← 256px canvas & <img>
   const TOTAL = Number(CFG.TOTAL_SUPPLY || 4040);
   const ROOT  = String(CFG.SOURCE_PATH || '').replace(/\/+$/, '');
   const RANKS_URL = CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json';
 
-  // Tune if you want the bg pushed more
-  const BG_SCALE_FACTOR = 36;   // ≈3600%
-  const BG_SHIFT_FACTOR = 26;   // ≈2600%
+  // Tune background push/zoom
+  const BG_SCALE_FACTOR = 36;              // ≈3600%
+  const BG_SHIFT_FACTOR = 26;              // ≈2600%
 
   const $ = (s, r=document)=> r.querySelector(s);
   const thumb = $('#mutateThumb');
@@ -120,7 +120,6 @@
     const a = currentId; if(!a) return;
     const b = randId(a);
 
-    // load metadata for A & B
     const ja = await (await fetch(jsonFor(a))).json();
     const jb = await (await fetch(jsonFor(b))).json();
 
@@ -131,6 +130,7 @@
 
     const C={Frog:"",SpecialFrog:"",Subset:"",Trait:"",Accessory:"",Eyes:"",Hat:"",Mouth:""};
 
+    // Special rules
     if (A.SpecialFrog || B.SpecialFrog){
       if (A.SpecialFrog && B.SpecialFrog){
         B.SpecialFrog = A.SpecialFrog + '/SpecialFrog/' + B.SpecialFrog; B.Trait='';
@@ -151,11 +151,9 @@
     C.Hat        = A.Hat        || B.Hat        || '';
     C.Mouth      = A.Mouth      || B.Mouth      || '';
 
-    // draw into the SAME <img.thumb> (so card looks identical)
     const dataUrl = await composeToDataURL(a, C);
     thumb.src = dataUrl;
 
-    // update bullets + title text
     const out=[];
     if (C.Frog) out.push({trait_type:'Frog', value:C.Frog}); else if (C.SpecialFrog) out.push({trait_type:'SpecialFrog', value:C.SpecialFrog});
     if (C.Subset)    out.push({trait_type:'Subset',    value:C.Subset});
