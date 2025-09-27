@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-// assets/js/dashboard.js — Baseline: leave your logic intact, safe address badge swap
-(function(){
-  'use strict';
-
-  // ---- SAFE address badge (won't throw, won't block) ----
-  function short(a){ return a && a.length>10 ? (a.slice(0,6)+'…'+a.slice(-4)) : (a||'Not connected'); }
-  function readAddr(){
-=======
 // assets/js/dashboard.js
 // Slim dashboard: counts (owned, staked), rewards (flyz), claim, approval. No frog lists (panel is mounted separately).
 
@@ -131,38 +122,44 @@
        'function setApprovalForAll(address operator, bool approved)'],
       provider
     );
->>>>>>> parent of 41113a01a (Working backup)
     try{
-      return (window.walletState && window.walletState.address)
-          || (window.FF_WALLET && window.FF_WALLET.address)
-          || (window.ethereum && (window.ethereum.selectedAddress || (Array.isArray(window.ethereum.accounts)&&window.ethereum.accounts[0])))
-          || localStorage.getItem('ff:lastAddress')
-          || '';
-    }catch{ return ''; }
+      const ok = await erc721.isApprovedForAll(addr, CFG.CONTROLLER_ADDRESS);
+      return !!ok;
+    }catch{ return null; }
   }
-  function setOwnedHeaderBadge(){
-    try{
-      const el=document.getElementById('ownedConnectBtn');
-      if(!el) return;
-      el.textContent=short(readAddr());
-      el.classList.add('btn','btn-connected');
-      el.style.pointerEvents='none';
-      el.setAttribute('aria-disabled','true');
-      el.removeAttribute('onclick'); el.removeAttribute('href');
-    }catch(e){ console.warn('[dashboard] badge',e); }
+  async function requestApproval(addr){
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer   = provider.getSigner();
+    const erc721   = new ethers.Contract(
+      CFG.COLLECTION_ADDRESS,
+      ['function setApprovalForAll(address operator, bool approved)'],
+      signer
+    );
+    await erc721.setApprovalForAll(CFG.CONTROLLER_ADDRESS, true);
   }
 
-<<<<<<< HEAD
-  function start(){
-    setOwnedHeaderBadge();
+  async function readRewards(addr){
+    try{
+      if (typeof window.get_pending_rewards === 'function'){
+        const v = await window.get_pending_rewards(addr);
+        if (v == null) return null;
+        const n = (typeof v === 'object' && v._isBigNumber) ? Number(ethers.utils.formatUnits(v, 18))
+                : (typeof v === 'string' ? Number(v) : Number(v));
+        if (isFinite(n)) return n;
+      }
+      if (typeof window.getRewards === 'function'){
+        const n = Number(await window.getRewards(addr));
+        if (isFinite(n)) return n;
+      }
+    }catch{}
+    return null;
   }
-  document.addEventListener('DOMContentLoaded', start);
-  window.addEventListener('load', start);
-  window.addEventListener('ff:wallet:changed', start);
-  window.addEventListener('wallet:connected', start);
-  window.addEventListener('wallet:disconnected', start);
-})();
-=======
+  async function claimRewards(addr){
+    if (typeof window.claim_rewards === 'function') return await window.claim_rewards(addr);
+    if (typeof window.claimRewards  === 'function') return await window.claimRewards(addr);
+    throw new Error('No claim function found (claim_rewards / claimRewards).');
+  }
+
   const st = { connected:false, addr:null, busy:false };
 
   async function refresh(){
@@ -229,4 +226,3 @@
 
   refresh();
 })(window.FF_CFG || {});
->>>>>>> parent of 41113a01a (Working backup)

@@ -193,35 +193,17 @@
     document.addEventListener('DOMContentLoaded', layoutFrogStrip);
   </script>
 
-  <!-- Config + shared helpers -->
-  <script src="assets/js/config.js?v=baseline"></script>
-  <script src="assets/js/utils.js?v=baseline"></script>
+<!-- Config & shared helpers -->
+<script src="https://cdn.jsdelivr.net/npm/web3@1.10.4/dist/web3.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/rarity.js"></script>
+<script src="assets/js/modal.js"></script>
 
-  <!-- Wallet (whatever you already use) -->
-  <script src="assets/js/wallet.js?v=baseline"></script>
-  <script src="assets/js/wallet-state.js?v=baseline"></script>
+<!-- ABIs must come from /assets/abi -->
+<script src="assets/abi/collection_abi.js"></script>
+<script src="assets/abi/controller_abi.js"></script>
 
-  <!-- App code -->
-  <script src="assets/js/rarity.js?v=baseline"></script>
-  <script src="assets/js/modal.js?v=baseline"></script>
-  <script src="assets/js/pond.js?v=baseline"></script>
-  <script src="assets/js/stakes-feed.js?v=baseline"></script>
-  <script src="assets/js/mints-feed.js?v=baseline"></script>
-
-  <!-- Dashboard logic (the one you just uploaded) -->
-  <script src="assets/js/dashboard.js?v=baseline"></script>
-
-  <!-- Layered thumbnails (stable, no card background tweaks) -->
-  <script src="assets/js/frog-thumbs.js?v=baseline"></script>
-
-  <script>
-    // If your feeds are on this page
-    window.FF_loadRecentMints && FF_loadRecentMints();
-    window.FF_loadRecentStakes && FF_loadRecentStakes();
-  </script>
-
-<<<<<<< HEAD
-=======
 <!-- Panels / features (all from /assets/js) -->
 <script src="assets/js/pond.js"></script>
 <script src="assets/js/wallet-state.js"></script>
@@ -237,7 +219,6 @@
   if (window.FF_loadRecentStakes) FF_loadRecentStakes();
   if (window.FF_initOwnedPanel)   FF_initOwnedPanel();
 </script>
->>>>>>> parent of 41113a01a (Working backup)
 
 </body>
 </html>
