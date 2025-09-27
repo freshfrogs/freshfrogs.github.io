@@ -62,7 +62,7 @@
     #mintMini .mint-mini__note{ margin-top:6px; font-size:12px; }
     @media (max-width:600px){ #mintMini .mint-mini__row{ grid-template-columns: 1fr 1fr; } #mintMini .mint-mini__total{ justify-self:start; } }
 
-    /* Scrollable lists: JS sets max-height to N rows; infinite scroll appends */
+    /* Scrollable lists */
     #recentMints.scrolling,
     #recentStakes.scrolling{
       overflow-y:auto;
@@ -79,6 +79,19 @@
         border-radius:8px;
       }
     }
+
+    /* NEW: compact, centered button bar */
+    .top-actions{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:10px 0 16px; }
+    .btn-chip{ font-weight:800; font-size:13px; padding:6px 12px; border-radius:10px; border:1px solid var(--border); display:inline-flex; align-items:center; gap:8px; text-decoration:none; }
+    .btn-chip:active{ transform: translateY(1px); }
+
+    /* Color fills tuned to theme */
+    .chip-green{ background: color-mix(in srgb, #1aa15b 28%, var(--panel)); color: inherit; }
+    .chip-darkgreen{ background: color-mix(in srgb, #147a45 28%, var(--panel)); color: inherit; }
+    .chip-blue{ background: color-mix(in srgb, #3aa8ff 28%, var(--panel)); color: inherit; }
+    .chip-gray{ background: color-mix(in srgb, #8b8b8b 24%, var(--panel)); color: inherit; }
+    .chip-yellow{ background: color-mix(in srgb, #f5b301 28%, var(--panel)); color: inherit; }
+    .chip-orange{ background: color-mix(in srgb, #ff6a3d 28%, var(--panel)); color: inherit; }
   </style>
 </head>
 <body>
@@ -104,6 +117,16 @@
         <p class="pg-muted" style="margin:6px 0 12px 0; max-width:70ch;">
           Pixel-perfect frogs hopping around the Ethereum pond. Mint, stake to earn FLYZ, and explore the collection’s quirks and traits.
         </p>
+
+        <!-- NEW: compact top action buttons -->
+        <div class="top-actions">
+          <button id="idxConnect" class="btn btn-chip chip-green">Connect wallet</button>
+          <a class="btn btn-chip chip-blue" href="https://opensea.io/collection/freshfrogs" target="_blank" rel="noopener">Shop on OpenSea</a>
+          <a class="btn btn-chip chip-gray" href="https://etherscan.io/token/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b" target="_blank" rel="noopener">Etherscan</a>
+          <a class="btn btn-chip chip-yellow" href="collection.html">Rankings</a>
+          <a class="btn btn-chip chip-darkgreen" href="pond.html">The Pond</a>
+          <a class="btn btn-chip chip-orange" href="mutate.html">Mutate</a>
+        </div>
 
         <div class="info-grid-2">
           <div class="info-block"><div class="ik">🐸 Supply</div><div class="iv">4,040</div><div class="in">Total tokens</div></div>
@@ -179,6 +202,14 @@
         syncMini();
       });
       document.addEventListener('DOMContentLoaded', syncMini);
+    })();
+
+    /* NEW: Connect wallet button hook (no-op if wallet isn't present) */
+    (function(){
+      document.addEventListener('click', function(e){
+        var btn = e.target.closest('#idxConnect'); if(!btn) return;
+        if (window.FF_connect) { try{ window.FF_connect(); }catch(_){ /* ignore */ } }
+      });
     })();
   </script>
 
