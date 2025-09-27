@@ -5,42 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>freshfrogs — Mutate</title>
 
-  <!-- Use your site’s shared CSS (it already contains the frog-card styles you pasted) -->
+  <!-- Your site CSS already contains the frog-card styles -->
   <link rel="stylesheet" href="assets/css/styles.css" />
 
   <style>
-    /* Just center a single frog-card on the page */
+    /* Only center the card; everything else comes from existing CSS */
     .center-wrap{ max-width:740px; margin:44px auto; padding:0 16px; }
     img{ image-rendering: pixelated; image-rendering: crisp-edges; }
-
-    /* Mutated build “thumb” uses the SAME class/size as .thumb */
-    .thumb.thumb-build{
-      width:128px; height:128px; border-radius:12px;
-      background: var(--panel-2); /* replaced in JS with sampled solid color */
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 6px 12px rgba(0,0,0,.25);
-      overflow:hidden; grid-row: span 3; display:none; position:relative;
-    }
-    .thumb.thumb-build .layers img{
-      position:absolute; inset:0; width:128px; height:128px; object-fit:contain; image-rendering:pixelated;
-      pointer-events:none;
-    }
   </style>
 </head>
 <body>
   <div class="center-wrap">
-    <!-- EXACT frog-card structure/order you provided -->
+    <!-- EXACT frog-card structure/order used in your dashboard -->
     <article class="frog-card" id="mutateCard" data-token-id="">
-      <!-- normal image thumb (shown before mutate) -->
       <img class="thumb" id="mutateThumb" src="" alt="" />
-
-      <!-- layered build thumb (shown after mutate) -->
-      <div class="thumb thumb-build" id="mutateThumbBuild"><div class="layers" id="mutateLayers"></div></div>
-
       <h4 class="title" id="mutateTitle">Frog #— <span class="pill" id="mutateRank" style="display:none"></span></h4>
       <div class="meta" id="mutateMeta">Random preview</div>
-
       <ul class="attr-bullets" id="mutateAttrs"></ul>
-
       <div class="actions">
         <button class="btn btn-outline-gray" id="btnRefresh">Refresh</button>
         <button class="btn btn-outline-gray" id="btnMutate">Mutate</button>
