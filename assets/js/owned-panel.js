@@ -500,6 +500,24 @@
     addr = await getConnectedAddress();
     reflectConnectButton();
 
+    // React to wallet connect events from topbar
+    document.addEventListener('ff:wallet:ready', async (e) => {
+      const a = e?.detail?.address;
+      if (!a) return;
+      addr = a;
+      try { if (typeof window.__FF_updateOwnedAddrSlot === 'function') window.__FF_updateOwnedAddrSlot(addr); } catch {}
+      await afterConnect();
+    });
+
+    window.addEventListener('wallet:connected', async (e) => {
+      const a = e?.detail?.address || (window.ethereum && window.ethereum.selectedAddress);
+      if (!a) return;
+      addr = a;
+      try { if (typeof window.__FF_updateOwnedAddrSlot === 'function') window.__FF_updateOwnedAddrSlot(addr); } catch {}
+      await afterConnect();
+    });
+
+
     if (addr){ await afterConnect(); return; }
     const grid=$(SEL.grid); if (grid) grid.innerHTML='<div class="pg-muted">Connect your wallet to view owned frogs.</div>';
     setTimeout(syncHeights,50);
