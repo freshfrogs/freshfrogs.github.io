@@ -1,21 +1,25 @@
 // assets/js/pond-kpis.js
-// Hotfix: write pond description, Total Frogs (from config), and Controller link.
-// Zero CSS changes. Defensive selectors. Only fills when blank/missing.
+// Pond header + KPIs helpers:
+// - Set concise description
+// - Render controller box with truncated Etherscan link
+// - Render 4th KPI: % of collection staked (needs FF_CFG.TOTAL_SUPPLY)
+//   Falls back gracefully if data not present.
 
 (function (FF, CFG) {
   'use strict';
 
-  const CHAIN_ID     = Number(CFG.CHAIN_ID || 1);
-  const TOTAL_SUPPLY = (CFG.TOTAL_SUPPLY != null) ? Number(CFG.TOTAL_SUPPLY) : NaN;
-  const CTRL_ADDR    = String(CFG.CONTROLLER_ADDRESS || '').trim();
+  const CHAIN_ID = Number(CFG.CHAIN_ID || 1);
+  const TOTAL_SUPPLY = Number(CFG.TOTAL_SUPPLY || 0);
 
-  // ---- tiny helpers
+  // --- DOM helpers ---
   const $  = (s, r=document)=> r.querySelector(s);
   const $$ = (s, r=document)=> Array.from(r.querySelectorAll(s));
   const pick = (sels)=> sels.map(sel=> $(sel)).find(Boolean);
-  const setText = (el, v)=> { if (el) el.textContent = v; };
-  const setHTML = (el, v)=> { if (el) el.innerHTML   = v; };
 
+  function setText(el, text){ if (el) el.textContent = text; }
+  function setHTML(el, html){ if (el) el.innerHTML = html; }
+
+  // --- Formatters ---
   function shortAddr(a){ return a ? a.slice(0,6) + '…' + a.slice(-4) : '—'; }
   function etherscanBase(){
     if (CHAIN_ID === 1) return 'https://etherscan.io';
@@ -23,97 +27,89 @@
     if (CHAIN_ID === 5) return 'https://goerli.etherscan.io';
     return 'https://etherscan.io';
   }
-  function etherscanAddr(a){ return `${etherscanBase()}/address/${a}`; }
+  function etherscanAddr(a){ return etherscanBase() + '/address/' + a; }
 
-  // ---- Description (only if target exists)
+  // --- Description (short, more informative) ---
   function updateDescription(){
     const el = pick(['#pondDesc','[data-pond-desc]']);
     if (!el) return;
-    // Only set if empty or clearly default-ish
-    const cur = (el.textContent || '').trim();
-    if (!cur || /live view of staking/i.test(cur)){
-      el.textContent = 'Live staking dashboard for the FreshFrogs pond — total frogs staked, active controller, and cumulative $FLYZ rewards.';
-    }
+    setText(el,
+      'Live staking dashboard for the FreshFrogs pond — total frogs staked, active controller, and cumulative $FLYZ rewards.'
+    );
   }
 
-  // ---- Try to find a "value" cell inside a KPI box
-  function findValueNode(box){
-    if (!box) return null;
-    return box.querySelector('.kpi-value, .value, .pg-kpi-value, .pg-muted:last-child') || null;
-  }
+  // --- Controller KPI (🧰 Controller) ---
+  function renderController(){
+    const ctrl = CFG.CONTROLLER_ADDRESS || '';
+    const target = pick(['#pondController','[data-kpi="controller"]']);
+    if (!target) return;
 
-  // ---- Total Frogs (from config)
-  function updateTotalFrogs(){
-    if (!Number.isFinite(TOTAL_SUPPLY)) return;
-
-    // 1) ID/data-kpi if present
-    let box = pick(['#pondTotal', '#pondTotalFrogs', '[data-kpi="total"]']);
-    if (!box){
-      // 2) Fallback: find any KPI whose heading looks like "Total Frogs"
-      box = $$('.kpi, .info, .card, .pg-kpi, div').find(n => {
-        const t = (n.textContent || '').toLowerCase();
-        return /total\s+frogs/.test(t) || /🐸\s*total/.test(t);
-      }) || null;
-    }
-    if (!box) return;
-
-    const valNode = findValueNode(box);
-    const pretty = String(TOTAL_SUPPLY);
-
-    if (valNode){
-      // only overwrite if empty or numeric-looking placeholder
-      const cur = (valNode.textContent || '').trim();
-      if (!cur || cur === '—' || /^\d*$/.test(cur)) setText(valNode, pretty);
+    if (!ctrl){
+      // show placeholder if address missing
+      setHTML(target, '🧰 Controller<br><span class="pg-muted">Staking contract • </span>—');
       return;
     }
-
-    // If no explicit value node and box is blank-ish, render a safe two-line fallback
-    const txt = (box.textContent || '').replace(/\s+/g,' ').trim();
-    if (!txt || txt === '—'){
-      setHTML(box, '🐸 Total Frogs<br><span class="pg-muted">'+pretty+'</span>');
-    }
+    const html =
+      '🧰 Controller<br>' +
+      '<span class="pg-muted">Staking contract • </span>' +
+      `<a href="${etherscanAddr(ctrl)}" target="_blank" rel="noopener">${shortAddr(ctrl)}</a>`;
+    setHTML(target, html);
   }
 
-  // ---- Controller (truncate + link)
-  function updateController(){
-    if (!CTRL_ADDR) return;
+  // --- % of Collection Staked (4th KPI) ---
+  function parseStakedCount(){
+    // Try a few likely locations and parse an integer
+    const src = pick(['[data-kpi="staked"]', '#pondKpiStaked', '#pondStakedCount']);
+    if (!src) return null;
+    const txt = (src.textContent || '').replace(/[, ]+/g,' ').trim();
+    // Try to extract last number in the string
+    const m = txt.match(/(\d[\d,\.]*)\s*$/);
+    const raw = m ? m[1] : txt;
+    const val = Number(String(raw).replace(/[^\d.-]/g,''));
+    return Number.isFinite(val) ? val : null;
+    // Note: If your staked KPI is a pure number, this will grab it cleanly.
+  }
 
-    // 1) ID/data-kpi if present
-    let box = pick(['#pondController','[data-kpi="controller"]']);
-    if (!box){
-      // 2) Fallback: find KPI with wording "Controller"
-      box = $$('.kpi, .info, .card, .pg-kpi, div').find(n => {
-        const t = (n.textContent || '').toLowerCase();
-        return /controller/.test(t) || /🧰/.test(t);
-      }) || null;
-    }
-    if (!box) return;
+  function ensurePctKpiSlot(){
+    // Try existing placeholders
+    let el = pick(['#pondKpiStakedPct','[data-kpi="stakedPct"]']);
+    if (el) return el;
 
-    const valNode = findValueNode(box);
-    const linkHTML = `<a href="${etherscanAddr(CTRL_ADDR)}" target="_blank" rel="noopener">${shortAddr(CTRL_ADDR)}</a>`;
+    // Try to inject a new KPI box if we can find the KPI grid container
+    const grid = $('.pond-kpis, .pond-kpi-grid, .kpi-grid, .info-grid-2, .info-grid-4, .page-kpis');
+    if (!grid) return null;
 
-    if (valNode){
-      const cur = (valNode.innerHTML || valNode.textContent || '').trim();
-      if (!cur || cur === '—' || /0x[0-9a-f]{40}/i.test(cur)){
-        setHTML(valNode, linkHTML);
-      }
+    el = document.createElement('div');
+    el.id = 'pondKpiStakedPct';
+    el.setAttribute('data-kpi','stakedPct');
+    el.className = 'kpi'; // trust your existing styles; falls back harmlessly
+    grid.appendChild(el);
+    return el;
+  }
+
+  function renderStakedPct(){
+    const slot = ensurePctKpiSlot();
+    if (!slot) return;
+
+    const stakedCount = parseStakedCount();
+    if (!TOTAL_SUPPLY || !Number.isFinite(stakedCount) || stakedCount < 0){
+      // No data => show muted dash
+      setHTML(slot, '📊 Collection Staked<br><span class="pg-muted">—</span>');
       return;
     }
-
-    // If no value node and box is blank-ish, write a safe two-line fallback
-    const txt = (box.textContent || '').replace(/\s+/g,' ').trim();
-    if (!txt || txt === '—'){
-      setHTML(box, '🧰 Controller<br><span class="pg-muted">Staking contract • </span>' + linkHTML);
-    }
+    const pct = Math.max(0, Math.min(100, (stakedCount / TOTAL_SUPPLY) * 100));
+    const pretty = pct.toFixed(pct < 1 ? 2 : 1) + '%';
+    setHTML(slot, '📊 Collection Staked<br><span class="pg-muted">' + pretty + '</span>');
   }
 
+  // --- Boot ---
   function init(){
-    try{
+    try {
       updateDescription();
-      updateTotalFrogs();
-      updateController();
-    }catch(e){
-      console.warn('[pond-kpis] hotfix init failed', e);
+      renderController();
+      renderStakedPct();
+    } catch (e) {
+      console.warn('[pond-kpis] init failed', e);
     }
   }
 
