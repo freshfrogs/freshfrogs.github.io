@@ -193,33 +193,30 @@
     document.addEventListener('DOMContentLoaded', layoutFrogStrip);
   </script>
 
-<!-- Config & shared helpers -->
-<script src="https://cdn.jsdelivr.net/npm/web3@1.10.4/dist/web3.min.js"></script>
-<script src="assets/js/config.js"></script>
-<script src="assets/js/utils.js"></script>
-<script src="assets/js/rarity.js"></script>
-<script src="assets/js/modal.js"></script>
+  <!-- Config + shared helpers -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/utils.js"></script>
 
-<!-- ABIs must come from /assets/abi -->
-<script src="assets/abi/collection_abi.js"></script>
-<script src="assets/abi/controller_abi.js"></script>
+  <!-- (If you already include ethers elsewhere, keep that. 
+      If not, add a build you use, e.g.):
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+  -->
 
-<!-- Panels / features (all from /assets/js) -->
-<script src="assets/js/pond.js"></script>
-<script src="assets/js/wallet-state.js"></script>
-<script src="assets/js/wallet.js"></script>
-<script src="assets/js/staking-adapter.js"></script>  <!-- ✅ correct path -->
-<script src="assets/js/pond-kpis.js"></script>
-<script src="assets/js/topbar.js"></script>
-<script src="assets/js/stakes-feed.js"></script>
-<script src="assets/js/pond-tweaks.js"></script>
-<script src="assets/js/owned-panel.js"></script>
-<script src="assets/js/frog-thumbs.js"></script>
-<script src="assets/js/dashboard.js"></script>
-<script>
-  if (window.FF_loadRecentStakes) FF_loadRecentStakes();
-  if (window.FF_initOwnedPanel)   FF_initOwnedPanel();
-</script>
+  <!-- Wallet layer (your existing files) -->
+  <script src="assets/js/wallet.js"></script>
+  <script src="assets/js/wallet-state.js"></script>
+
+  <!-- Collection / Pond / Dashboard app code -->
+  <script src="assets/js/rarity.js"></script>
+  <script src="assets/js/modal.js"></script>
+  <script src="assets/js/pond.js"></script>
+
+  <!-- Your updated dashboard logic (also fixes Pond KPI labels/links and
+      turns the Connect button into an address badge) -->
+  <script src="assets/js/dashboard.js?v=latest"></script>
+
+  <!-- Layered thumbs for the Dashboard cards (keep last so it runs after DOM is built) -->
+  <script src="assets/js/frog-thumbs.js?v=latest"></script>
 
 </body>
 </html>
