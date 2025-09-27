@@ -1,4 +1,4 @@
-// assets/js/frog-thumbs.js — Layered thumbs ON, card background transparent
+// assets/js/frog-thumbs.js — Layered thumbs ON, cards transparent
 (function(){
   'use strict';
 
@@ -10,7 +10,7 @@
   const NO_ANIM = new Set(['Hat','Frog','Trait']);
   const NO_LIFT = new Set(['Frog','Trait','SpecialFrog']);
 
-  // Show only the flat PNG's solid color behind the layers
+  // Backdrop inside the thumb = only the flat PNG's solid color (zoom + pin)
   const COLOR_ONLY_BG_SIZE = '10000% 10000%';
   const COLOR_ONLY_BG_POS  = '0% 0%';
 
@@ -18,18 +18,18 @@
   const safe = s => encodeURIComponent(String(s||''));
 
   function ensureCardTransparent(card){
-    // Always keep cards transparent (undo any previous styles/classes)
-    card?.classList.remove('ff-card-bg');
-    card?.style.removeProperty('--ff-card-bg-url');
-    card?.style.removeProperty('--ff-card-bg-size');
-    card?.style.removeProperty('--ff-card-bg-pos');
-    card?.style.removeProperty('--ff-card-bg-darken');
-    card?.style.setProperty('background', 'transparent');
-    card?.style.removeProperty('background-image');
-    card?.style.removeProperty('background-repeat');
-    card?.style.removeProperty('background-size');
-    card?.style.removeProperty('background-position');
-    card?.style.removeProperty('background-blend-mode');
+    if (!card) return;
+    card.classList.remove('ff-card-bg');
+    card.style.setProperty('background','transparent');
+    card.style.removeProperty('--ff-card-bg-url');
+    card.style.removeProperty('--ff-card-bg-size');
+    card.style.removeProperty('--ff-card-bg-pos');
+    card.style.removeProperty('--ff-card-bg-darken');
+    card.style.removeProperty('background-image');
+    card.style.removeProperty('background-repeat');
+    card.style.removeProperty('background-size');
+    card.style.removeProperty('background-position');
+    card.style.removeProperty('background-blend-mode');
   }
 
   function makeLayer(attr, val, size){
@@ -53,7 +53,7 @@
   async function buildThumb(container, tokenId, size){
     const flat = `${FLAT}/${tokenId}.png`;
 
-    // backdrop = color-only from the flat image
+    // backdrop (color-only from the flat)
     Object.assign(container.style,{
       width:size+'px', height:size+'px', minWidth:size+'px', minHeight:size+'px',
       position:'relative', overflow:'hidden', borderRadius:'8px', imageRendering:'pixelated',
@@ -63,7 +63,6 @@
       backgroundPosition: COLOR_ONLY_BG_POS
     });
 
-    // clear and layer attributes
     while (container.firstChild) container.removeChild(container.firstChild);
 
     try{
@@ -76,9 +75,7 @@
         const val  = String(row.value).trim();
         if (attr && val) container.appendChild(makeLayer(attr, val, size));
       }
-      // success
     }catch(e){
-      // fallback to the flat so users see *something*
       const img = new Image(); img.decoding='async'; img.loading='lazy';
       Object.assign(img.style,{position:'absolute', inset:0, width:size+'px', height:size+'px', imageRendering:'pixelated', zIndex:2});
       img.src = flat; container.appendChild(img);
@@ -98,7 +95,7 @@
 
   function upgradeCard(card){
     ensureCardTransparent(card);
-    if (!card || card.dataset.layered === '1') return false;
+    if (card.dataset.layered === '1') return false;
 
     const id = tokenIdFromCard(card);
     if (!id){ console.warn('[frog-thumbs] no token id in card', card); return false; }
@@ -127,7 +124,6 @@
       host.insertBefore(wrap, host.firstChild);
     }
 
-    // build layered thumb
     buildThumb(wrap, id, size);
     card.dataset.layered = '1';
     console.log('[frog-thumbs] layered #'+id);

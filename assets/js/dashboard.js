@@ -1,5 +1,6 @@
 // assets/js/dashboard.js
-// Slim dashboard: counts (owned, staked), rewards (flyz), claim, approval. No frog lists (panel is mounted separately).
+// Slim dashboard: counts (owned, staked), rewards (flyz), claim, approval.
+// + UI tweaks: replace connect button with address; fix Pond KPI labels/links.
 
 (function (CFG) {
   const API_USERS   = 'https://api.reservoir.tools/users';
@@ -18,12 +19,17 @@
   const apprNote  = $('dashApprovalNote');
   const refreshBtn= $('dashRefresh');
 
+  // NEW: top-right connect button element we convert into an address badge
+  const connectBtnEl = document.getElementById('ownedConnectBtn');
+
   function setStatus(msg){ if (statusEl) statusEl.textContent = msg; }
   function shorten(a){ return a ? (a.slice(0,6)+'…'+a.slice(-4)) : ''; }
 
+  // ------- Reservoir fetch helpers -------
   function apiHeaders(){
     if (!CFG.FROG_API_KEY) throw new Error('Missing FROG_API_KEY in config.js');
     return { accept: '*/*', 'x-api-key': CFG.FROG_API_KEY };
+    // NOTE: You said not to keep/use any other API key here; this uses your existing FROG_API_KEY
   }
   async function reservoirFetch(url, opts={}, retries=2, timeoutMs=9000){
     for (let i=0; i<=retries; i++){
@@ -50,6 +56,7 @@
     }
   }
 
+  // ------- Dashboard data -------
   async function fetchOwnedCount(addr){
     let cont=''; let total=0;
     for (let guard=0; guard<30; guard++){
@@ -80,14 +87,18 @@
         const since = a?.createdAt ? new Date(a.createdAt) :
                       (a?.timestamp ? new Date(a.timestamp*1000) : null);
         const prev = map.get(id);
-        if (!prev || (since && prev.since && since.getTime()>prev.since.getTime())) map.set(id, {id, since});
-        else if (!prev) map.set(id,{id,since});
+        if (prev) {
+          if (since && prev.since && since.getTime()>prev.since.getTime()) map.set(id, {id, since});
+        } else {
+          map.set(id,{id,since});
+        }
       }
       cont = json?.continuation || '';
       if (!cont) break;
     }
     return [...map.values()];
   }
+
   async function countStakedByUser(addr){
     if (!window.ethereum) return 0;
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -160,11 +171,64 @@
     throw new Error('No claim function found (claim_rewards / claimRewards).');
   }
 
+  // ------- UI: replace connect button with address badge -------
+  function setOwnedHeaderBadge(addr){
+    if (!connectBtnEl) return;
+    const label = addr ? shorten(addr) : 'Not connected';
+    connectBtnEl.textContent = label;
+    connectBtnEl.classList.add('btn-connected');     // keep your pill style
+    connectBtnEl.style.pointerEvents = 'none';       // make it non-clickable
+    connectBtnEl.removeAttribute('onclick');
+    connectBtnEl.removeAttribute('href');
+    connectBtnEl.setAttribute('aria-disabled', 'true');
+  }
+
+  // ------- Pond KPIs: labels + controller link + FLYZ link -------
+  function applyPondKpiLabels(){
+    // expects the top info boxes to be in .info-grid-2 as earlier
+    const grid = document.querySelector('.info-grid-2');
+    if (!grid) return;
+
+    // Box 1: 🪷 Total Staked (keep value as-is; other code fills it)
+    const b1 = grid.querySelector('.info-block:nth-child(1)');
+    if (b1){
+      const ik = b1.querySelector('.ik'); if (ik) ik.textContent = '🪷 Total Staked';
+      const inn= b1.querySelector('.in'); if (inn) inn.textContent = 'Across the collection';
+    }
+
+    // Box 2: 🧰 Controller (never "-")
+    const b2 = grid.querySelector('.info-block:nth-child(2)');
+    if (b2){
+      const ik = b2.querySelector('.ik'); if (ik) ik.textContent = '🧰 Controller';
+      const iv = b2.querySelector('.iv');
+      const inn= b2.querySelector('.in');
+      if (iv){
+        iv.innerHTML = `<a href="https://etherscan.io/address/${CONTROLLER}" target="_blank" rel="noopener">${shorten(CONTROLLER)}</a>`;
+      }
+      if (inn){ inn.textContent = 'Staking contract'; }
+    }
+
+    // Box 3: 🪰 Rewards → $FLYZ link
+    const b3 = grid.querySelector('.info-block:nth-child(3)');
+    if (b3){
+      const ik = b3.querySelector('.ik'); if (ik) ik.textContent = '🪰 Rewards';
+      const iv = b3.querySelector('.iv');
+      const inn= b3.querySelector('.in');
+      if (iv){
+        iv.innerHTML = `<a href="https://etherscan.io/token/0xd71d2f57819ae4be6924a36591ec6c164e087e63" target="_blank" rel="noopener">$FLYZ</a>`;
+      }
+      if (inn){ inn.textContent = 'Earnings token'; }
+    }
+  }
+
+  // ------- State + refresh -------
   const st = { connected:false, addr:null, busy:false };
 
   async function refresh(){
     if (st.busy) return; st.busy = true;
     try{
+      applyPondKpiLabels(); // make sure Pond headers are correct on every pass
+
       if (!st.connected || !st.addr){
         setStatus('Connect your wallet to load your dashboard.');
         addrEl && (addrEl.textContent = '');
@@ -174,14 +238,16 @@
         claimBtn && (claimBtn.disabled = true);
         apprBtn  && (apprBtn.disabled  = true);
         apprNote && (apprNote.textContent = '');
+        setOwnedHeaderBadge(null); // show "Not connected" pill
         return;
       }
 
       setStatus('Loading…');
       addrEl && (addrEl.textContent = shorten(st.addr));
+      setOwnedHeaderBadge(st.addr); // show address in the header pill
 
       let approved = await checkApproval(st.addr);
-      if (approved === null){ apprNote?.(apprNote.textContent = 'Approval: Unknown'); apprBtn && (apprBtn.disabled=true); }
+      if (approved === null){ apprNote && (apprNote.textContent = 'Approval: Unknown'); apprBtn && (apprBtn.disabled=true); }
       else if (approved){ apprNote && (apprNote.textContent='Approval: Granted'); apprBtn && (apprBtn.disabled=true); }
       else { apprNote && (apprNote.textContent='Approval: Not granted'); apprBtn && (apprBtn.disabled=false); }
 
@@ -221,8 +287,11 @@
     catch(e){ console.warn(e); claimBtn.textContent='Claim Rewards'; claimBtn.disabled=false; alert(e?.message||'Claim failed'); }
   });
 
+  // Wallet lifecycle hooks
   window.addEventListener('wallet:connected', (ev)=>{ st.connected=true; st.addr = ev?.detail?.address || null; refresh(); });
   window.addEventListener('wallet:disconnected', ()=>{ st.connected=false; st.addr=null; refresh(); });
 
+  // First paint
+  document.addEventListener('DOMContentLoaded', ()=>{ applyPondKpiLabels(); setOwnedHeaderBadge(null); });
   refresh();
 })(window.FF_CFG || {});
