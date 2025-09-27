@@ -11,73 +11,58 @@
     /* Center the single card both vertically and horizontally */
     html, body { height: 100%; }
     body { margin: 0; }
-    .screen-center {
+    #mutateCenter{
       min-height: 100vh;
       display: grid;
       place-items: center;
       padding: 24px;
     }
 
-    /* Use the same frog-card typography, but remove panel chrome */
-    .frog-card.mutate {
-      border: 0 !important;
-      background: transparent !important;
-      box-shadow: none !important;
-      padding: 0;
+    /* Two-column layout: left = frog + buttons, right = info */
+    #mutateCard{
       display: grid;
       grid-template-columns: auto 1fr;
-      gap: 16px 18px;
       align-items: start;
+      gap: 16px 18px;
       max-width: 980px;
       width: 100%;
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      padding: 0;
     }
 
-    /* Left column: image (256) with buttons under it */
-    .mut-left { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-    .mut-left .thumb{
-      width:256px; height:256px; border-radius:12px;
+    /* Left column: 256×256 build area + buttons underneath */
+    .mutate-left{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    #mutateHero{
+      position: relative;
+      width: 256px; height: 256px;
+      border-radius: 12px;
       background: var(--panel-2);
-      object-fit: contain;
+      overflow: hidden;
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 6px 12px rgba(0,0,0,.25);
       image-rendering: pixelated; image-rendering: crisp-edges;
     }
-    .mut-left .actions{ display:flex; gap:8px; flex-wrap:wrap; }
-
-    /* Right column: info stack */
-    .mut-right{ display:flex; flex-direction:column; gap:6px; }
-    .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
-    .pill{ display:inline-block; padding:3px 10px; border-radius:999px; background: color-mix(in srgb, var(--panel) 85%, transparent); border:1px solid var(--border); font-size:12px; }
-    .meta{ color:var(--muted); font-size:12px; }
-    .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; }
-    .attr-bullets li{ font-size:12px; margin:2px 0; }
-
-    /* Buttons (same style as collection) */
-    .btn{
-      font-family: var(--font-ui);
-      border:1px solid var(--border);
-      background:transparent;
-      color:inherit;
-      border-radius:8px;
-      padding:6px 10px;
-      font-weight:700;
-      font-size:12px;
-      line-height:1;
-      display:inline-flex; align-items:center; gap:6px;
-      text-decoration:none; letter-spacing:.01em;
-      transition: background .15s ease, border-color .15s ease, color .15s ease, transform .05s ease;
+    /* ensure layered child imgs are crisp + fill the hero */
+    #mutateHero img, #mutateHero canvas{
+      position: absolute; inset: 0;
+      width: 256px; height: 256px;
+      image-rendering: pixelated; image-rendering: crisp-edges;
     }
-    .btn:active{ transform: translateY(1px); }
-    .btn-outline-gray{ border-color: color-mix(in srgb, #9ca3af 70%, var(--border)); color: color-mix(in srgb, #ffffff 65%, #9ca3af); }
-    .actions .btn:hover{
-      background: color-mix(in srgb, #22c55e 14%, var(--panel));
-      border-color: color-mix(in srgb, #22c55e 80%, var(--border));
-      color: color-mix(in srgb, #ffffff 85%, #22c55e);
-    }
+    .mutate-left .actions{ display:flex; gap:8px; flex-wrap:wrap; }
+
+    /* Right column: info stack (uses your existing card text styles) */
+    .mutate-right{ display:flex; flex-direction:column; gap:6px; }
+    .mutate-right .title{ margin:0; }
 
     @media (max-width: 720px){
-      /* Stack on small screens: image+buttons then info below */
-      .frog-card.mutate{ grid-template-columns: 1fr; }
-      .mut-right{ margin-top: 4px; }
+      #mutateCard{ grid-template-columns: 1fr; }
+      .mutate-right{ margin-top: 4px; }
     }
   </style>
 </head>
@@ -86,7 +71,7 @@
     <article class="frog-card frog-card--mutate" id="mutateCard">
       <div class="mutate-left">
         <div class="mutate-hero" id="mutateHero">
-          <!-- your layered <img> parts get appended here -->
+          <!-- layered <img> parts get appended here by mutate.js -->
         </div>
         <div class="actions">
           <button class="btn btn-outline-gray" id="btnRefresh">Refresh</button>
