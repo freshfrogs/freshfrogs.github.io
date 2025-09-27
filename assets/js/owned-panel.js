@@ -367,30 +367,48 @@
   }
 
   function renderCards(){
-    const root=$(SEL.grid); if (!root) return;
-    root.innerHTML='';
-    if (!items.length){ root.innerHTML='<div class="pg-muted">No frogs found for this wallet.</div>'; updateHeaderOwned(); syncHeights(); return; }
+    const root = document.querySelector('#ownedGrid');
+    if (!root) return;
+
+    root.innerHTML = '';
+
+    if (!items.length){
+      root.innerHTML = '<div class="pg-muted">No frogs found for this wallet.</div>';
+      updateHeaderOwned();
+      syncHeights();
+      return;
+    }
+
     updateHeaderOwned();
-    items.forEach(it=>{
-      const card=document.createElement('article');
-      card.className='frog-card';
+
+    items.forEach(it => {
+      const card = document.createElement('article');
+      card.className = 'frog-card';
       card.setAttribute('data-token-id', String(it.id));
-      card.innerHTML =
-        '<img class="thumb" src="'+imgFor(it.id)+'" alt="'+it.id+'">'+
-        '<h4 class="title">Frog #'+it.id+(it.rank||it.rank===0?' <span class="pill">Rank #'+it.rank+'</span>':'')+'</h4>'+-
-        '<div class="meta">'+fmtMeta(it)+'</div>'+-
-        (attrsHTML(it.attrs,4))+-
-        '<div class="actions">'+
-          '<button class="btn btn-outline-gray" data-act="'+(it.staked ? 'unstake' : 'stake')+'">'+(it.staked ? 'Unstake' : 'Stake')+'</button>'+
-          '<button class="btn btn-outline-gray" data-act="transfer">Transfer</button>'+
-          '<a class="btn btn-outline-gray" href="'+etherscanToken(it.id)+'" target="_blank" rel="noopener">Etherscan</a>'+
-          '<a class="btn btn-outline-gray" href="'+imgFor(it.id)+'" target="_blank" rel="noopener">Original</a>'+
-        '</div>';
+
+      const rankPill = (it.rank || it.rank === 0) ? ` <span class="pill">Rank #${it.rank}</span>` : '';
+      const attrs = attrsHTML(it.attrs, 4);
+
+      card.innerHTML = [
+        `<img class="thumb" src="${imgFor(it.id)}" alt="${it.id}">`,
+        `<h4 class="title">Frog #${it.id}${rankPill}</h4>`,
+        `<div class="meta">${fmtMeta(it)}</div>`,
+        attrs,
+        `<div class="actions">
+          <button class="btn btn-outline-gray" data-act="${it.staked ? 'unstake' : 'stake'}">${it.staked ? 'Unstake' : 'Stake'}</button>
+          <button class="btn btn-outline-gray" data-act="transfer">Transfer</button>
+          <a class="btn btn-outline-gray" href="${etherscanToken(it.id)}" target="_blank" rel="noopener">Etherscan</a>
+          <a class="btn btn-outline-gray" href="${imgFor(it.id)}" target="_blank" rel="noopener">Original</a>
+        </div>`
+      ].join('');
+
       root.appendChild(card);
-      wireCardActions(card,it);
+      wireCardActions(card, it);
     });
+
     syncHeights();
   }
+
   function updateHeaderOwned(){
     const el=document.getElementById('ohOwned'); if (!el) return;
     const ownedOnly = Array.isArray(items) ? items.filter(x => !x.staked).length : 0;
