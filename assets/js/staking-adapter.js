@@ -1,193 +1,179 @@
 // assets/js/staking-adapter.js
-// Uses CONTROLLER_ABI (assets/abi/controller_abi.js) + FF_CFG.{CONTROLLER_ADDRESS,COLLECTION_ADDRESS}.
-// Works with either Web3 OR Ethers if present. Reads require wallet or FF_CFG.RPC_URL; writes need a wallet.
+// Provides FF.staking with controller + ERC721 helpers, using Web3.
+// Flexible: detects method names across different controller ABIs.
 
-(function (FF, CFG) {
+;(function(FF, CFG){
   'use strict';
 
-  const CTRL = CFG.CONTROLLER_ADDRESS;
-  const COLL = CFG.COLLECTION_ADDRESS;
+  if (!window.Web3) { console.warn('[staking-adapter] Web3 missing'); return; }
 
-  // Export API immediately so owned-panel.js can call it anytime.
-  const api = {
-    // READS
-    async getStakedTokens(owner){ try { return await _getStakedTokens(owner); } catch (e){ console.warn('[staking-adapter] getStakedTokens', e); return []; } },
-    async getUserStakedTokens(owner){ return api.getStakedTokens(owner); }, // alias
-    async getAvailableRewards(owner){ try { return await _getAvailableRewards(owner); } catch(e){ console.warn('[staking-adapter] rewards', e); return '0'; } },
-    async isApproved(owner){ try { return await _isApproved(owner); } catch(e){ console.warn('[staking-adapter] isApproved', e); return null; } },
+  const CHAIN_ID   = Number(CFG.CHAIN_ID || 1);
+  const COLL_ADDR  = CFG.COLLECTION_ADDRESS;
+  const CTRL_ADDR  = CFG.CONTROLLER_ADDRESS;
 
-    // ACTIONS
-    async approve(){ return _approve(); },
-    async claimRewards(){ return _claim(); },
-    async stakeToken(id){ return _stake(id); },
-    async unstakeToken(id){ return _withdraw(id); },
+  const COLLECTION_ABI = (window.COLLECTION_ABI || window.collection_abi || []);
+  const CONTROLLER_ABI = (window.CONTROLLER_ABI || window.controller_abi || []);
 
-    // Not in this ABI
-    async getStakeSince(){ return null; },
-    async getStakeInfo(){ return null; }
-  };
-  FF.staking = api;
-  window.FF_STAKING = api;
+  const provider = window.ethereum || null;
+  const web3     = new Web3(provider || (CFG.RPC_URL ? new Web3.providers.HttpProvider(CFG.RPC_URL) : null));
+  if (!web3) { console.warn('[staking-adapter] No provider'); return; }
 
-  // ---------- provider factories ----------
-  function haveEthers(){ return !!window.ethers; }
-  function haveWeb3(){ return !!window.Web3; }
+  const ERC721 = COLL_ADDR ? new web3.eth.Contract(COLLECTION_ABI, COLL_ADDR) : null;
+  const CTRL   = CTRL_ADDR ? new web3.eth.Contract(CONTROLLER_ABI, CTRL_ADDR) : null;
 
-  function readProvider(){
-    if (window.ethereum) return window.ethereum; // wallet
-    if (CFG.RPC_URL && haveWeb3()) return new Web3.providers.HttpProvider(CFG.RPC_URL); // web3 http
-    if (CFG.RPC_URL && haveEthers()) return new ethers.providers.JsonRpcProvider(CFG.RPC_URL); // ethers http
-    throw new Error('No provider: connect a wallet or set FF_CFG.RPC_URL');
-  }
-
-  // ---------- contract helpers (dual stack) ----------
-  function ctrlW3(){
-    if (!haveWeb3()) throw new Error('Web3 library not loaded');
-    const w3 = new Web3(readProvider());
-    return new w3.eth.Contract(window.CONTROLLER_ABI || [], CTRL);
-  }
-  function nftW3(){
-    if (!haveWeb3()) throw new Error('Web3 library not loaded');
-    const w3 = new Web3(readProvider());
-    return new w3.eth.Contract([
-      {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":""}],"stateMutability":"view","type":"function"},
-      {"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"}
-    ], COLL);
-  }
-  function ctrlEth(){
-    if (!haveEthers()) throw new Error('Ethers library not loaded');
-    const provider = window.ethereum
-      ? new ethers.providers.Web3Provider(window.ethereum)
-      : new ethers.providers.JsonRpcProvider(CFG.RPC_URL);
-    return new ethers.Contract(CTRL, window.CONTROLLER_ABI || [], provider);
-  }
-  function signerEth(){
-    if (!haveEthers() || !window.ethereum) throw new Error('No wallet for writes');
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    return provider.getSigner();
-  }
-  function nftEth(){
-    const s = signerEth();
-    return new ethers.Contract(COLL, [
-      "function isApprovedForAll(address owner,address operator) view returns (bool)",
-      "function setApprovalForAll(address operator,bool approved)"
-    ], s);
-  }
-
-  // ---------- utils ----------
-  const toNum = (x)=> {
+  // --- utils ---
+  async function getAddress(){
     try{
-      if (x==null) return NaN;
-      if (typeof x==='number') return x;
-      if (typeof x==='bigint') return Number(x);
-      if (typeof x==='string') { if (/^0x/i.test(x)) return Number(BigInt(x)); return Number(x); }
-      if (typeof x==='object') {
-        if ('tokenId' in x) return toNum(x.tokenId);
-        if ('id' in x)      return toNum(x.id);
-        if ('_hex' in x)    return Number(x._hex);
-        const s = x.toString?.(); if (s && /^\d+$/.test(s)) return Number(s);
+      if (FF.wallet?.getAddress) return await FF.wallet.getAddress();
+      if (provider?.request){
+        const acc = await provider.request({ method: 'eth_requestAccounts' });
+        return acc?.[0] || null;
       }
-    }catch{}
-    return NaN;
+      const acc2 = await web3.eth.getAccounts();
+      return acc2?.[0] || null;
+    }catch(e){ console.warn('[staking-adapter] getAddress', e); return null; }
+  }
+  function pickMethod(contract, names){
+    if (!contract?.methods) return null;
+    for (const n of names) if (contract.methods[n]) return n;
+    return null;
+  }
+  async function ensureApproval(from){
+    if (!ERC721 || !from) throw new Error('ERC721 not ready');
+    try{
+      const ok = await ERC721.methods.isApprovedForAll(from, CTRL_ADDR).call();
+      if (ok) return true;
+    }catch(e){ /* some ERC721s don’t implement it; we still try setApproval */ }
+    await ERC721.methods.setApprovalForAll(CTRL_ADDR, true).send({ from });
+    return true;
+  }
+
+  // --- method discovery ---
+  const M = {
+    // staking
+    stakeOne:  pickMethod(CTRL, ['stake','deposit','stakeToken']),
+    stakeMany: pickMethod(CTRL, ['stakeMany','stakeTokens','depositMany','stakeBatch']),
+    // unstaking
+    unstakeOne:  pickMethod(CTRL, ['unstake','withdraw','withdrawToken']),
+    unstakeMany: pickMethod(CTRL, ['unstakeMany','withdrawMany','unstakeTokens','withdrawTokens','unstakeBatch']),
+    // views
+    getUserStaked: pickMethod(CTRL, ['getStakedTokens','tokensOf','getUserStakedTokens','stakedTokens']),
+    rewardsView:   pickMethod(CTRL, ['availableRewards','getAvailableRewards','claimableRewards','rewards','getRewards']),
+    // claim
+    claim: pickMethod(CTRL, ['claimRewards','claim','harvest']),
+    // since / info
+    sinceOne: pickMethod(CTRL, ['stakeSince','stakedAt']),
+    infoOne:  pickMethod(CTRL, ['getStakeInfo','stakeInfo'])
   };
 
-  // ---------- READS ----------
-  async function _getStakedTokens(owner){
-    if (!CTRL || !window.CONTROLLER_ABI) throw new Error('Missing controller address/ABI');
-    // Prefer Web3 if present; else Ethers
-    if (haveWeb3()){
-      const c = ctrlW3();
-      const rows = await c.methods.getStakedTokens(owner).call();
-      return Array.isArray(rows) ? rows.map(r => toNum(r && r.tokenId)).filter(Number.isFinite) : [];
-    } else if (haveEthers()){
-      const c = ctrlEth();
-      const rows = await c.getStakedTokens(owner);
-      return Array.isArray(rows) ? rows.map(r => toNum(r && r.tokenId)).filter(Number.isFinite) : [];
+  async function stakeToken(tokenId){
+    const from = await getAddress();
+    if (!from) throw new Error('No wallet');
+    await ensureApproval(from);
+
+    // prefer batch if available (gas-efficient for single too on some controllers)
+    if (M.stakeMany) {
+      return CTRL.methods[M.stakeMany]([String(tokenId)]).send({ from });
     }
-    throw new Error('No Web3 or Ethers library loaded');
+    if (M.stakeOne) {
+      // Some ABIs expect uint256, others expect (address,uint256). Try common ones.
+      try { return CTRL.methods[M.stakeOne](String(tokenId)).send({ from }); }
+      catch(_){ return CTRL.methods[M.stakeOne](from, String(tokenId)).send({ from }); }
+    }
+    throw new Error('No stake method on controller');
   }
 
-  async function _getAvailableRewards(owner){
-    if (haveWeb3()){
-      const c = ctrlW3();
-      return await c.methods.availableRewards(owner).call();
-    } else if (haveEthers()){
-      const c = ctrlEth();
-      const v = await c.availableRewards(owner);
-      return v?.toString?.() ?? String(v);
-    }
-    throw new Error('No Web3 or Ethers library loaded');
+  async function stakeTokens(ids){
+    const from = await getAddress(); if (!from) throw new Error('No wallet');
+    await ensureApproval(from);
+    const arr = (ids||[]).map(String);
+    if (M.stakeMany) return CTRL.methods[M.stakeMany](arr).send({ from });
+    // fallback: loop one by one
+    const out=[]; for (const id of arr){ out.push(await stakeToken(id)); } return out;
   }
 
-  async function _isApproved(owner){
-    if (haveWeb3()){
-      const n = nftW3();
-      return !!(await n.methods.isApprovedForAll(owner, CTRL).call({ from: owner }));
-    } else if (haveEthers()){
-      const provider = window.ethereum
-        ? new ethers.providers.Web3Provider(window.ethereum)
-        : new ethers.providers.JsonRpcProvider(CFG.RPC_URL);
-      const c = new ethers.Contract(COLL, ["function isApprovedForAll(address,address) view returns (bool)"], provider);
-      return !!(await c.isApprovedForAll(owner, CTRL));
+  async function unstakeToken(tokenId){
+    const from = await getAddress(); if (!from) throw new Error('No wallet');
+    if (M.unstakeMany) return CTRL.methods[M.unstakeMany]([String(tokenId)]).send({ from });
+    if (M.unstakeOne) {
+      try { return CTRL.methods[M.unstakeOne](String(tokenId)).send({ from }); }
+      catch(_){ return CTRL.methods[M.unstakeOne](from, String(tokenId)).send({ from }); }
     }
-    throw new Error('No Web3 or Ethers library loaded');
+    throw new Error('No unstake/withdraw method on controller');
   }
 
-  // ---------- WRITES (wallet required) ----------
-  async function _approve(){
-    if (haveWeb3()){
-      const n = nftW3();
-      const from = (window.ethereum && window.ethereum.selectedAddress);
-      if (!from) throw new Error('Connect wallet');
-      return n.methods.setApprovalForAll(CTRL, true).send({ from });
-    } else if (haveEthers()){
-      const n = nftEth();
-      const tx = await n.setApprovalForAll(CTRL, true);
-      return tx.wait?.() ?? tx;
-    }
-    throw new Error('No Web3 or Ethers library loaded');
+  async function unstakeTokens(ids){
+    const from = await getAddress(); if (!from) throw new Error('No wallet');
+    const arr = (ids||[]).map(String);
+    if (M.unstakeMany) return CTRL.methods[M.unstakeMany](arr).send({ from });
+    const out=[]; for (const id of arr){ out.push(await unstakeToken(id)); } return out;
   }
 
-  async function _stake(id){
-    if (haveWeb3()){
-      const c = ctrlW3();
-      const from = (window.ethereum && window.ethereum.selectedAddress);
-      if (!from) throw new Error('Connect wallet');
-      return c.methods.stake(String(id)).send({ from });
-    } else if (haveEthers()){
-      const s = signerEth();
-      const c = new ethers.Contract(CTRL, window.CONTROLLER_ABI || [], s);
-      const tx = await c.stake(String(id)); return tx.wait?.() ?? tx;
-    }
-    throw new Error('No Web3 or Ethers library loaded');
+  async function getUserStakedTokens(address){
+    const addr = address || await getAddress();
+    if (!addr) return [];
+    if (!M.getUserStaked) return [];
+    const res = await CTRL.methods[M.getUserStaked](addr).call();
+    return Array.isArray(res) ? res.map(x => Number(x)) : [];
   }
 
-  async function _withdraw(id){
-    if (haveWeb3()){
-      const c = ctrlW3();
-      const from = (window.ethereum && window.ethereum.selectedAddress);
-      if (!from) throw new Error('Connect wallet');
-      return c.methods.withdraw(String(id)).send({ from });
-    } else if (haveEthers()){
-      const s = signerEth();
-      const c = new ethers.Contract(CTRL, window.CONTROLLER_ABI || [], s);
-      const tx = await c.withdraw(String(id)); return tx.wait?.() ?? tx;
-    }
-    throw new Error('No Web3 or Ethers library loaded');
+  async function getAvailableRewards(address){
+    const addr = address || await getAddress();
+    if (!addr || !M.rewardsView) return null;
+    try {
+      const v = await CTRL.methods[M.rewardsView](addr).call();
+      return v; // owned-panel will format (decimals) safely
+    } catch(e){ console.warn('[staking-adapter] rewards', e); return null; }
   }
 
-  async function _claim(){
-    if (haveWeb3()){
-      const c = ctrlW3();
-      const from = (window.ethereum && window.ethereum.selectedAddress);
-      if (!from) throw new Error('Connect wallet');
-      return c.methods.claimRewards().send({ from });
-    } else if (haveEthers()){
-      const s = signerEth();
-      const c = new ethers.Contract(CTRL, window.CONTROLLER_ABI || [], s);
-      const tx = await c.claimRewards(); return tx.wait?.() ?? tx;
-    }
-    throw new Error('No Web3 or Ethers library loaded');
+  async function claimRewards(){
+    const from = await getAddress(); if (!from) throw new Error('No wallet');
+    if (!M.claim) throw new Error('No claim method');
+    return CTRL.methods[M.claim]().send({ from });
   }
+
+  async function isApproved(address){
+    const from = address || await getAddress(); if (!from) return false;
+    try { return await ERC721.methods.isApprovedForAll(from, CTRL_ADDR).call(); }
+    catch(e){ console.warn('[staking-adapter] isApproved', e); return false; }
+  }
+
+  async function approveIfNeeded(){
+    const from = await getAddress(); if (!from) throw new Error('No wallet');
+    return ensureApproval(from);
+  }
+
+  async function getStakeSince(tokenId){
+    if (M.sinceOne) {
+      const sec = await CTRL.methods[M.sinceOne](String(tokenId)).call();
+      const n = Number(sec); return n>1e12 ? n : n*1000;
+    }
+    if (M.infoOne) {
+      const info = await CTRL.methods[M.infoOne](String(tokenId)).call();
+      const sec = Number(info?.since || info?.stakedAt || info?.timestamp || 0);
+      return sec>1e12 ? sec : sec*1000;
+    }
+    return null;
+  }
+
+  // Expose adapter (without clobbering existing)
+  FF.staking = Object.assign({}, FF.staking || {}, {
+    // Approvals
+    isApproved, approveIfNeeded,
+    // Stake/Unstake
+    stakeToken, stakeTokens, unstakeToken, unstakeTokens,
+    // Views & actions
+    getUserStakedTokens, getAvailableRewards, claimRewards,
+    // Since
+    getStakeSince
+  });
+
+  // Optional: event for other modules
+  (async ()=> {
+    try {
+      const addr = await getAddress();
+      document.dispatchEvent(new CustomEvent('ff:staking:ready', { detail:{ address: addr, controller: CTRL_ADDR, collection: COLL_ADDR } }));
+    } catch(_){}
+  })();
 
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
