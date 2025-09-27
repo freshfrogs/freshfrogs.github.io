@@ -90,6 +90,14 @@
 #ownedModal .om-name{font-weight:700;font-size:14px;color:#fff}
 #ownedModal .om-copy{color:#fff;font-size:13px;line-height:1.5;max-width:52ch}
 #ownedModal .om-copy p{margin:0 0 10px 0}
+#ownedModal .om-logo{
+  width:128px;height:128px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  object-fit:cover;
+  background:#111;
+}
+
     `;
     const el=document.createElement('style'); el.id='owned-clean-css'; el.textContent=css; document.head.appendChild(el);
   })();
