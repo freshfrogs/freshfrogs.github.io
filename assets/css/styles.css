@@ -634,3 +634,42 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
   background:color-mix(in srgb, var(--ink) 8%, transparent);
   border-color:color-mix(in srgb, var(--ink) 28%, transparent);
 }
+/* freshfrogs modal tweaks */
+.ff-frog-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5rem;
+  margin-bottom: .5rem;
+}
+
+.ff-frog-128 {
+  width: 128px; height: 128px;
+  image-rendering: pixelated; /* keep that crisp pixel-art look */
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px var(--border) inset;
+}
+
+.ff-frog-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-strong, #fff);
+  text-align: center;
+}
+
+.ff-frog-desc {
+  margin: .25rem 0 .75rem;
+  color: var(--text-muted, #b6b6b6);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.ff-modal-actions {
+  display: flex;
+  gap: .5rem;
+  margin-top: .5rem;
+}
+
+.ff-modal-actions .btn {
+  min-width: 7rem;
+}
