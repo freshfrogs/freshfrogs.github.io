@@ -2,7 +2,7 @@
 // Renders: Owned + Staked. Owned IDs from Reservoir; Staked IDs from controller.
 // Metadata from frog/json/{id}.json. Attribute bullets. Header shows Owned • Staked • Unclaimed Rewards.
 // Includes: 128×128 modal images, approve/stake/unstake/transfer panels, disabled transfer on staked,
-// rarity sort (lowest rank first) + colored rarity pill.
+// rarity sort (lowest rank first) + colored rarity pill, green "Staked … ago" meta.
 
 (function (FF, CFG) {
   'use strict';
@@ -114,6 +114,9 @@
 .rank-rare::before{ color:#38bdf8; }
 .rank-common{ color:inherit; border-color:var(--border); }
 .rank-common::before{ color:var(--muted); }
+
+/* Green highlight for "Staked … ago" */
+#ownedCard .meta .staked-flag{ color:#22c55e; font-weight:700; }
     `;
     const el=document.createElement('style'); el.id='owned-clean-css'; el.textContent=css; document.head.appendChild(el);
   })();
@@ -178,11 +181,12 @@
     return (a.id||0) - (b.id||0);                  // tie-break by id
   }
   function rankTier(rank){
-    if (!Number.isFinite(rank)) return 'common';
+    const r = Number(rank);
+    if (!Number.isFinite(r)) return 'common';
     const T = (CFG.RARITY_TIERS) || { legendary: 50, epic: 250, rare: 800 };
-    if (rank <= T.legendary) return 'legendary';
-    if (rank <= T.epic)      return 'epic';
-    if (rank <= T.rare)      return 'rare';
+    if (r <= T.legendary) return 'legendary';
+    if (r <= T.epic)      return 'epic';
+    if (r <= T.rare)      return 'rare';
     return 'common';
   }
 
@@ -608,7 +612,9 @@
   function fmtMeta(it){
     if (it.staked){
       const ago = it.sinceMs ? fmtAgo(it.sinceMs) : null;
-      return ago ? ('Staked '+ago+' • Owned by You') : 'Staked • Owned by You';
+      return ago
+        ? ('<span class="staked-flag">Staked '+ago+'</span> • Owned by You')
+        : '<span class="staked-flag">Staked</span> • Owned by You';
     }
     return 'Not staked • Owned by You';
   }
@@ -664,9 +670,11 @@
       card.setAttribute('data-token-id', String(it.id));
       if (it.staked) card.setAttribute('data-staked','1');
 
-      const tier = Number.isFinite(it.rank) ? rankTier(it.rank) : 'common';
-      const rankPill = Number.isFinite(it.rank)
-        ? ` <span class="rank-pill rank-${tier}">#${it.rank}</span>`
+      const r = Number(it.rank);
+      const hasRank = Number.isFinite(r);
+      const tier = hasRank ? rankTier(r) : 'common';
+      const rankPill = hasRank
+        ? ` <span class="rank-pill rank-${tier}">#${r}</span>`
         : '';
 
       const attrs = attrsHTML(it.attrs, 4);
@@ -733,14 +741,18 @@
       // Load local JSON for those IDs
       const metas = await loadMetaBatch(idsForThisPage);
 
-      // Compose
-      items = metas.map(m => ({
-        id: m.id,
-        attrs: m.attrs,
-        staked: stakedIds.includes(m.id),
-        sinceMs: null,
-        rank: (FF.RANKS||{})[String(m.id)]
-      }));
+      // Compose (normalize rank to a number for coloring/sorting)
+      items = metas.map(m => {
+        const rkRaw = (FF.RANKS||{})[String(m.id)];
+        const rkNum = Number(rkRaw);
+        return {
+          id: m.id,
+          attrs: m.attrs,
+          staked: stakedIds.includes(m.id),
+          sinceMs: null,
+          rank: Number.isFinite(rkNum) ? rkNum : undefined
+        };
+      });
 
       // Sort by rarity now
       items.sort(compareByRarity);
@@ -772,7 +784,16 @@
           const moreMetas = await loadMetaBatch(moreIds);
           const more = moreMetas
             .filter(m=> !items.some(x=> x.id===m.id))
-            .map(m=> ({ id:m.id, attrs:m.attrs, staked: stakedIds.includes(m.id), sinceMs:null, rank:(FF.RANKS||{})[String(m.id)] }));
+            .map(m=> {
+              const rkRaw = (FF.RANKS||{})[String(m.id)];
+              const rkNum = Number(rkRaw);
+              return {
+                id:m.id, attrs:m.attrs,
+                staked: stakedIds.includes(m.id),
+                sinceMs:null,
+                rank: Number.isFinite(rkNum) ? rkNum : undefined
+              };
+            });
           items = items.concat(more);
           items.sort(compareByRarity);
           for (const it of more){
