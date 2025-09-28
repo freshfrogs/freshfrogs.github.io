@@ -445,34 +445,15 @@
     await renderHeader(); syncHeights();
   }
 
-  // --- Stake / Unstake / Approve modals ---
   function openApprovePanel(owner, stats){
     const body = `
       <div class="om-col" style="text-align:center">
-        <img class="om-hero128" src="assets/img/blackWhite.png" alt="Fresh Frogs logo">
+        <img class="om-logo" src="assets/img/blackWhite.png" alt="Fresh Frogs" width="128" height="128">
         <div class="om-name">Fresh Frogs Staking</div>
         <div class="om-copy" style="text-align:left">
-          <p><b>Approve the staking contract</b></p>
-          <p>To stake your Frogs, your wallet must first grant our controller contract permission to manage your NFTs. This approval is <i>collection-wide</i> (not per-frog) and is a one-time blockchain transaction that costs a small gas fee.</p>
-          <p><b>How staking works</b></p>
-          <ul>
-            <li>After approval, you can stake individual Frogs. While staked, a Frog is locked and can’t be listed or transferred.</li>
-            <li>Staked Frogs earn rewards (like $FLYZ) over time. You can claim rewards without un-staking.</li>
-            <li>You can un-stake any time to unlock the Frog back to your wallet.</li>
-          </ul>
-        </div>
-      </div>
-    `;
-    openModal({ title: '', bodyHTML: body, actions:[ /* unchanged */ ]});
-  }
-
-  function openStakePanel(owner, tokenId){
-    const body = `
-      <div class="om-col">
-        <img class="om-thumb" src="${imgFor(tokenId)}" alt="Frog #${tokenId}">
-        <div class="om-name">Frog #${tokenId}</div>
-        <div class="om-copy">
-          <p>While staked, your Frog can’t be listed or sold. You can un-stake here any time. Un-staking resets level to zero.</p>
+          <p><b>Why approval?</b> This one-time permission lets the staking contract move your Frogs between your wallet and the vault when you stake or unstake. It does <i>not</i> grant access to your ETH or other tokens.</p>
+          <p><b>How it works.</b> After approval, you can stake a Frog to start earning <b>$FLYZ</b>. While staked, a Frog can’t be listed or transferred. You can unstake anytime; rewards remain claimable.</p>
+          <p class="pg-muted">Requires a single on-chain transaction (small gas fee).</p>
         </div>
       </div>
     `;
@@ -480,29 +461,28 @@
       title: '',
       bodyHTML: body,
       actions: [
-        { label:'Cancel', onClick:()=>{}, primary:false },
-        { label:`Stake Frog #${tokenId}`, primary:true, keepOpen:true, onClick: async ()=>{
-            try{
-              await sendStake(owner, tokenId);
-              toast(`Stake tx sent for #${tokenId}`);
-              closeModal();
-              const item = items.find(x=>x.id===tokenId);
-              if (item){ item.staked=true; item.sinceMs=Date.now(); }
-              renderCards();
-              await refreshHeaderStats();
-            }catch{ toast('Stake failed'); }
-          }}
+        { label: 'Cancel', primary:false, onClick: ()=>{} },
+        { label: 'Approve Staking', primary:true, onClick: async ()=>{
+            await sendApprove(owner);   // keep your existing approve flow
+            toast('Approval submitted');
+            await refreshHeaderStats?.();
+          } }
       ]
     });
   }
 
-  function openUnstakePanel(owner, tokenId){
+  function openStakePanel(tokenId, imgUrl){
     const body = `
-      <div class="om-col">
-        <img class="om-thumb" src="${imgFor(tokenId)}" alt="Frog #${tokenId}">
-        <div class="om-name">Frog #${tokenId}</div>
-        <div class="om-copy">
-          <p>Withdrawing returns this Frog to your wallet. Level resets to zero.</p>
+      <div class="om-col" style="text-align:center">
+        <img class="om-thumb" src="${imgUrl}" alt="Frog #${tokenId}" width="128" height="128">
+        <div class="om-name">Stake Frog #${tokenId}</div>
+        <div class="om-copy" style="text-align:left">
+          <p>Staking locks this Frog in the vault so it can’t be listed or transferred, and it begins earning <b>$FLYZ</b> rewards over time.</p>
+          <ul>
+            <li>Rewards accrue while staked and can be claimed anytime.</li>
+            <li>You can unstake whenever you like.</li>
+          </ul>
+          <p class="pg-muted">One on-chain transaction (gas required).</p>
         </div>
       </div>
     `;
@@ -510,18 +490,41 @@
       title: '',
       bodyHTML: body,
       actions: [
-        { label:'Cancel', onClick:()=>{}, primary:false },
-        { label:`Withdraw Frog #${tokenId}`, primary:true, keepOpen:true, onClick: async ()=>{
-            try{
-              await sendUnstake(owner, tokenId);
-              toast(`Withdraw tx sent for #${tokenId}`);
-              closeModal();
-              const item = items.find(x=>x.id===tokenId);
-              if (item){ item.staked=false; item.sinceMs=null; }
-              renderCards();
-              await refreshHeaderStats();
-            }catch{ toast('Withdraw failed'); }
-          }}
+        { label: 'Cancel', primary:false, onClick: ()=>{} },
+        { label: 'Stake', primary:true, onClick: async ()=>{
+            await sendStake(tokenId);   // call your existing stake helper
+            toast('Stake submitted');
+            await refreshOwnedPanel?.();
+          } }
+      ]
+    });
+  }
+
+  function openUnstakePanel(tokenId, imgUrl){
+    const body = `
+      <div class="om-col" style="text-align:center">
+        <img class="om-thumb" src="${imgUrl}" alt="Frog #${tokenId}" width="128" height="128">
+        <div class="om-name">Unstake Frog #${tokenId}</div>
+        <div class="om-copy" style="text-align:left">
+          <p>Unstaking returns the Frog to your wallet and restores normal transfers/listings. Any <b>$FLYZ</b> already accrued remains claimable.</p>
+          <ul>
+            <li>Frog becomes tradable again after the transaction confirms.</li>
+            <li>Rewards are not lost when unstaking.</li>
+          </ul>
+          <p class="pg-muted">One on-chain transaction (gas required).</p>
+        </div>
+      </div>
+    `;
+    openModal({
+      title: '',
+      bodyHTML: body,
+      actions: [
+        { label: 'Cancel', primary:false, onClick: ()=>{} },
+        { label: 'Unstake', primary:true, onClick: async ()=>{
+            await sendUnstake(tokenId); // call your existing unstake helper
+            toast('Unstake submitted');
+            await refreshOwnedPanel?.();
+          } }
       ]
     });
   }

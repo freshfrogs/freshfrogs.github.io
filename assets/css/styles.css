@@ -640,3 +640,7 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* Modal thumbs and footer */
+#ownedModal .om-thumb{ width:128px; height:128px; border-radius:10px; border:1px solid var(--border); background:#111; object-fit:cover; }
+#ownedModal .om-logo { width:128px; height:128px; border-radius:12px; border:1px solid var(--border); background:#111; object-fit:cover; }
+#ownedModal .om-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:14px; } /* ensure buttons show */
