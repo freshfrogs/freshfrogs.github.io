@@ -663,3 +663,6 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
   background: var(--accent, #22c55e);
 }
 .dash-wallet-push{ margin-left: auto; }   /* pushes to top-right inside a flex header */
+#ownedModal .om-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}
+#ownedModal .om-thumb{width:128px;height:128px;border-radius:10px;border:1px solid var(--border);background:#111;object-fit:cover}
+.btn[disabled], .btn.disabled{opacity:.45;pointer-events:none;filter:saturate(.5)}

@@ -529,6 +529,112 @@
     });
   }
 
+  function openClaimPanel(){
+    const body = `
+      <div class="om-col" style="text-align:center">
+        <img class="om-thumb" src="assets/img/blackWhite.png" alt="Fresh Frogs" width="128" height="128">
+        <div class="om-name">Claim $FLYZ</div>
+        <div class="om-copy" style="text-align:left">
+          <p>Claim the <b>$FLYZ</b> your staked Frogs have accrued. This will send a single transaction from your wallet.</p>
+          <p class="pg-muted">Gas required. Claiming does not unstake your Frogs.</p>
+        </div>
+      </div>
+    `;
+    let inFlight = false;
+    openModal({
+      title: '',
+      bodyHTML: body,
+      actions: [
+        { label: 'Cancel', primary:false, onClick: ()=>{} },
+        { label: 'Claim Rewards', primary:true, onClick: async (btn)=>{
+            if (inFlight) return;
+            try{
+              inFlight = true; btn.disabled = true; btn.textContent = 'Claiming…';
+              await FF.staking?.claimRewards();
+              toast('Claim submitted');
+              // refresh any headers/panels you use:
+              window.refreshOwnedPanel?.();
+              window.refreshHeaderStats?.();
+            } catch(e){
+              console.error(e); toast('Claim failed');
+            } finally {
+              inFlight = false; btn.disabled = false; btn.textContent = 'Claim Rewards';
+            }
+          } }
+      ]
+    });
+  }
+
+  function openTransferPanel(tokenId, imgUrl){
+    const ctl = (window.FF_CFG && window.FF_CFG.CONTROLLER_ADDRESS || '').toLowerCase();
+    const body = `
+      <div class="om-col" style="text-align:center">
+        <img class="om-thumb" src="${imgUrl}" alt="Frog #${tokenId}" width="128" height="128">
+        <div class="om-name">Transfer Frog #${tokenId}</div>
+        <div class="om-copy" style="text-align:left">
+          <p>Send this Frog to another address. <b>Transfers are final</b> once confirmed.</p>
+          <div class="pg-input">
+            <label for="xferTo">Recipient address</label>
+            <input id="xferTo" placeholder="0x…" autocomplete="off" spellcheck="false" />
+            <div id="xferErr" class="pg-error" style="display:none;margin-top:6px"></div>
+          </div>
+          <p class="pg-muted">Do not send to contracts you do not control.</p>
+        </div>
+      </div>
+    `;
+
+    let inFlight = false;
+    openModal({
+      title: '',
+      bodyHTML: body,
+      actions: [
+        { label: 'Cancel', primary:false, onClick: ()=>{} },
+        { label: 'Send', primary:true, onClick: async (btn)=>{
+            if (inFlight) return;
+            const input = document.getElementById('xferTo');
+            const err = document.getElementById('xferErr');
+            const to = (input.value || '').trim();
+            const { ethers } = window;
+
+            function showErr(msg){ err.textContent = msg; err.style.display = 'block'; }
+            err.style.display = 'none';
+
+            if (!ethers?.isAddress?.(to)) return showErr('Enter a valid address.');
+            if (ctl && to.toLowerCase() === ctl) return showErr('Cannot transfer to the staking contract address.');
+            // optional: prevent self-transfer
+            if (FF?.wallet?.address && to.toLowerCase() === FF.wallet.address.toLowerCase())
+              return showErr('Recipient is already the current owner.');
+
+            try{
+              inFlight = true; btn.disabled = true; btn.textContent = 'Sending…';
+                await FF.nft?.transfer(tokenId, to);
+              toast('Transfer submitted');
+              window.refreshOwnedPanel?.();
+            } catch(e){
+              console.error(e); toast('Transfer failed');
+            } finally {
+              inFlight = false; btn.disabled = false; btn.textContent = 'Send';
+            }
+          } }
+      ]
+    });
+
+    // Enable/disable button live as user types
+    setTimeout(()=>{
+      const input = document.getElementById('xferTo');
+      const ok = ()=> {
+        const v = (input.value||'').trim();
+        const { ethers } = window;
+        const valid = ethers?.isAddress?.(v) && (!ctl || v.toLowerCase() !== ctl);
+        const footer = document.querySelector('#ownedModal .om-actions');
+        const sendBtn = footer?.lastElementChild;
+        if (sendBtn) sendBtn.disabled = !valid;
+      };
+      input?.addEventListener('input', ok); ok();
+    }, 0);
+  } 
+
+
   // --- Cards ---
   function attrsHTML(attrs, max=4){
     if (!Array.isArray(attrs)||!attrs.length) return '';
@@ -543,31 +649,21 @@
     return 'Not staked • Owned by You';
   }
   function wireCardActions(scope,it){
-    scope.querySelectorAll('button[data-act]').forEach(btn=>{
-      btn.addEventListener('click', async ()=>{
-        const act = btn.getAttribute('data-act');
-        try{
-          const a = addr || await getConnectedAddress();
-          if (!a) { toast('Connect wallet first'); return; }
+    // Example wiring inside your card renderer:
+    stakeBtn.onclick   = () => openStakePanel(tokenId, imgFor(tokenId));
+    unstakeBtn.onclick = () => openUnstakePanel(tokenId, imgFor(tokenId));
+    claimBtn.onclick   = () => openClaimPanel();
+    transferBtn.onclick= () => openTransferPanel(tokenId, imgFor(tokenId));
 
-          if (act==='stake'){
-            const approved = await checkApproved(a);
-            if (!approved){
-              const stakedIds = await getStakedIds(a).catch(()=>[]);
-              const rewardsRaw = await getRewards(a).catch(()=>null);
-              openApprovePanel(a, { approved:false, staked: stakedIds.length, rewards: rewardsRaw });
-            }else{
-              openStakePanel(a, it.id);
-            }
-          }else if (act==='unstake'){
-            openUnstakePanel(a, it.id);
-          }else if (act==='transfer'){
-            if (FF.wallet?.promptTransfer) await FF.wallet.promptTransfer(it.id);
-            else toast('Transfer: helper not found');
-          }
-        }catch{ toast('Action failed'); }
-      });
-    });
+    // Disable/gray Transfer for staked frogs:
+    if (frog.staked){
+      transferBtn.disabled = true;              // native disabled
+      transferBtn.classList.add('disabled');    // visual fallback
+    } else {
+      transferBtn.disabled = false;
+      transferBtn.classList.remove('disabled');
+    }
+
   }
 
   function renderCards(){

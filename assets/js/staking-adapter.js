@@ -98,3 +98,57 @@
   window.approveIfNeeded     = api.approveIfNeeded;
 
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
+// ---- Claim rewards (controller) ----
+(function(FF, CFG){
+  const { ethers } = window;
+  let _claiming = false;
+
+  async function getControllerWithSigner(){
+    if (!window.ethereum) throw new Error('No wallet');
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const addr = CFG.CONTROLLER_ADDRESS;
+    if (!addr || !window.CONTROLLER_ABI) throw new Error('Missing controller config/ABI');
+    return new ethers.Contract(addr, window.CONTROLLER_ABI, signer);
+  }
+
+  async function claimRewardsOnce(){
+    if (_claiming) return null;   // guard against double clicks
+    _claiming = true;
+    try{
+      const ctl = await getControllerWithSigner();
+      const tx = await ctl.claimRewards();  // <- your controller claim fn
+      return await tx.wait();
+    } finally {
+      _claiming = false;
+    }
+  }
+
+  FF.staking = Object.assign(FF.staking || {}, {
+    claimRewards: claimRewardsOnce
+  });
+})(window.FF||(window.FF={}), window.FF_CFG||(window.FF_CFG={}));
+
+// ---- Transfer (collection) ----
+(function(FF, CFG){
+  const { ethers } = window;
+  async function getCollectionWithSigner(){
+    if (!window.ethereum) throw new Error('No wallet');
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const addr = CFG.COLLECTION_ADDRESS;
+    if (!addr || !window.COLLECTION_ABI) throw new Error('Missing collection config/ABI');
+    const c = new ethers.Contract(addr, window.COLLECTION_ABI, signer);
+    return { c, signer };
+  }
+
+  async function transferToken(tokenId, to){
+    const { c, signer } = await getCollectionWithSigner();
+    const from = await signer.getAddress();
+    // Use explicit signature to avoid overload ambiguity
+    const tx = await c['safeTransferFrom(address,address,uint256)'](from, to, tokenId);
+    return await tx.wait();
+  }
+
+  FF.nft = Object.assign(FF.nft || {}, { transfer: transferToken });
+})(window.FF||(window.FF={}), window.FF_CFG||(window.FF_CFG={}));
