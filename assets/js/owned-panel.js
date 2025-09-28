@@ -1,6 +1,6 @@
 // assets/js/owned-panel.js
 // Renders: Owned + Staked. Owned IDs from Reservoir; Staked IDs from controller.
-// Metadata from frog/json/{id}.json. No OpenSea button. Attribute chips → bullets.
+// Metadata from frog/json/{id}.json. Attribute chips → bullets.
 // Header: Owned • Staked • Unclaimed Rewards (+ Approve/Claim). Connect btn shows muted address.
 
 (function (FF, CFG) {
@@ -13,7 +13,7 @@
   const COLLECTION = CFG.COLLECTION_ADDRESS;
   const REWARD_SYMBOL   = (CFG.REWARD_TOKEN_SYMBOL || '$FLYZ');
   const REWARD_DECIMALS = Number.isFinite(Number(CFG.REWARD_DECIMALS)) ? Number(CFG.REWARD_DECIMALS) : 18;
-  const BASEPATH = (CFG.SOURCE_PATH || '').replace(/\/+$/,''); // prefix for /frog assets if any
+  const BASEPATH = (CFG.SOURCE_PATH || '').replace(/\/+$/,'');
 
   // Paths
   const imgFor  = (id)=> `${BASEPATH}/frog/${id}.png`;
@@ -78,7 +78,7 @@
 #ownedModal .om-title:empty{display:none}
 #ownedModal .om-body{padding:22px}
 #ownedModal .om-actions{display:flex;gap:8px;justify-content:flex-end;padding:14px 16px;border-top:1px solid var(--border)}
-#ownedModal .om-btn{font-family:var(--font-ui);border:1px solid var(--border);background:transparent;color:inherit;border-radius:8px;padding:8px 12px;font-weight:700;font-size:12px;line-height:1;display:inline-flex;align-items:center;gap:6px;text-decoration:none;letter-spacing:.01em;transition:background .15s,border-color .15s,color .15s,transform .05s}
+#ownedModal .om-btn{font-family:var(--font-ui);border:1px solid var(--border);background:transparent;color:inherit;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;line-height:1;display:inline-flex;align-items:center;gap:6px;text-decoration:none;letter-spacing:.01em;transition:background .15s,border-color .15s,color .15s,transform .05s}
 #ownedModal .om-btn:hover{background: color-mix(in srgb,#22c55e 14%,var(--panel));border-color: color-mix(in srgb,#22c55e 80%,var(--border));color: color-mix(in srgb,#ffffff 85%,#22c55e)}
 #ownedModal .om-btn.primary{background: color-mix(in srgb,#22c55e 18%,var(--panel));border-color: color-mix(in srgb,#22c55e 85%,var(--border));color: color-mix(in srgb,#ffffff 90%,#22c55e)}
 #ownedModal .om-input{width:100%;border:1px solid var(--border);background:transparent;color:inherit;border-radius:8px;padding:8px 10px;font-size:13px}
@@ -86,7 +86,7 @@
 
 /* Centered stack layout for stake/unstake + approval */
 #ownedModal .om-col{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px}
-#ownedModal .om-thumb{width:64px;height:64px;border-radius:10px;border:1px solid var(--border);object-fit:cover;background:#111}
+#ownedModal .om-thumb{width:128px;height:128px;border-radius:10px;border:1px solid var(--border);object-fit:cover;background:#111;image-rendering:pixelated}
 #ownedModal .om-name{font-weight:700;font-size:14px;color:#fff}
 #ownedModal .om-copy{color:#fff;font-size:13px;line-height:1.5;max-width:52ch}
 #ownedModal .om-copy p{margin:0 0 10px 0}
@@ -98,11 +98,13 @@
   background:#111;
 }
 
+/* Disabled buttons */
+.btn[disabled], .btn-disabled{opacity:.45;pointer-events:none;filter:grayscale(.8)}
     `;
     const el=document.createElement('style'); el.id='owned-clean-css'; el.textContent=css; document.head.appendChild(el);
   })();
 
-  // --- Reservoir fetch queue (used only to list owned IDs) ---
+  // --- Reservoir fetch queue ---
   if (!window.FF_RES_QUEUE){
     const RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 800);
     const BACKOFFS = Array.isArray(CFG.RETRY_BACKOFF_MS) ? CFG.RETRY_BACKOFF_MS : [900,1700,3200];
@@ -192,16 +194,8 @@
 
   // --- Wallet / ABIs / Contracts (wallet-only) ---
   function getWeb3(){ if (!window.Web3 || !window.ethereum) throw new Error('Wallet not found'); return new Web3(window.ethereum); }
-
-  // ABIs may be defined as top-level consts or attached to window; resolve robustly.
-  function resolveCollectionAbi(){
-    if (typeof COLLECTION_ABI !== 'undefined') return COLLECTION_ABI;
-    return (window.COLLECTION_ABI || window.collection_abi || []);
-  }
-  function resolveControllerAbi(){
-    if (typeof CONTROLLER_ABI !== 'undefined') return CONTROLLER_ABI;
-    return (window.CONTROLLER_ABI || window.controller_abi || []);
-  }
+  function resolveCollectionAbi(){ if (typeof COLLECTION_ABI !== 'undefined') return COLLECTION_ABI; return (window.COLLECTION_ABI || window.collection_abi || []); }
+  function resolveControllerAbi(){ if (typeof CONTROLLER_ABI !== 'undefined') return CONTROLLER_ABI; return (window.CONTROLLER_ABI || window.controller_abi || []); }
 
   function nftContract(){ const w3 = getWeb3(); return new w3.eth.Contract(resolveCollectionAbi(), CFG.COLLECTION_ADDRESS); }
   function ctrlContract(){ const w3 = getWeb3(); return new w3.eth.Contract(resolveControllerAbi(), CFG.CONTROLLER_ADDRESS); }
@@ -230,47 +224,31 @@
     throw new Error('No wallet provider found.');
   }
 
-  // Tuple-aware normalization (e.g., [owner, tokenId] -> tokenId)
-  function normalizeIds(rows){
-    if (!Array.isArray(rows)) return [];
-    const toNum=(x)=>{ try{
-      if (x==null) return NaN;
-      if (typeof x==='number') return Number.isFinite(x)?x:NaN;
-      if (typeof x==='bigint') return Number(x);
-      if (typeof x==='string'){ if(/^0x[0-9a-f]+$/i.test(x)) return Number(BigInt(x)); if(/^-?\d+$/.test(x)) return Number(x); return NaN; }
-      if (Array.isArray(x)) return toNum(x[x.length-1]); // tuple -> last is tokenId
-      if (typeof x==='object'){
-        if (typeof x._hex==='string') return Number(BigInt(x._hex));
-        if (typeof x.toString==='function'){ const s=x.toString(); if(/^0x/i.test(s)) return Number(BigInt(s)); if(/^-?\d+$/.test(s)) return Number(s); }
-        const cand = x.tokenId ?? x.id ?? x.token_id ?? x.tokenID ?? x.value ?? x[1] ?? x[0];
-        return toNum(cand);
-      }
-      return NaN;
-    }catch{ return NaN; }};
-    return rows.map(toNum).filter(Number.isFinite);
-  }
-
-  // Direct controller read via wallet provider (returns plain number[] of tokenIds)
+  // Controller reads
   async function getStakedIds(addr){
     if (!window.ethereum || !window.Web3) return [];
     try{
       await ensureCorrectChain();
       const ctrl = ctrlContract();
       const raw  = await ctrl.methods.getStakedTokens(addr).call({ from: addr });
-      if (Array.isArray(raw) && raw.length && Array.isArray(raw[0])) {
-        return raw.map(t => {
-          const v = t[t.length-1];
-          try{
-            if (typeof v==='number') return v;
-            if (typeof v==='string') return Number(/^\d+$/.test(v) ? v : BigInt(v));
-            if (typeof v==='bigint') return Number(v);
-            if (v && typeof v._hex==='string') return Number(BigInt(v._hex));
-            if (v && typeof v.toString==='function'){ const s=v.toString(); if(/^0x/i.test(s)) return Number(BigInt(s)); if(/^\d+$/.test(s)) return Number(s); }
-          }catch{}
-          return NaN;
-        }).filter(Number.isFinite);
-      }
-      return normalizeIds(raw);
+      // normalize
+      const arr = Array.isArray(raw) ? raw : [];
+      const out = arr.map(v=>{
+        try{
+          if (typeof v==='number') return v;
+          if (typeof v==='string'){ return /^\d+$/.test(v) ? Number(v) : Number(BigInt(v)); }
+          if (typeof v==='bigint') return Number(v);
+          if (v && typeof v._hex==='string') return Number(BigInt(v._hex));
+          if (Array.isArray(v)) return Number(v[v.length-1]);
+          if (v && typeof v.toString==='function'){
+            const s=v.toString();
+            if (/^\d+$/.test(s)) return Number(s);
+            if (/^0x/i.test(s)) return Number(BigInt(s));
+          }
+        }catch{}
+        return NaN;
+      }).filter(Number.isFinite);
+      return out;
     }catch(e){
       console.warn('[owned] wallet getStakedTokens failed', e);
       return [];
@@ -303,7 +281,14 @@
     return ctrl.methods.withdraw(String(tokenId)).send({ from: owner });
   }
 
-  // Rewards on CONTROLLER (view + claim)
+  // Transfer on COLLECTION
+  async function sendTransfer(owner, to, tokenId){
+    await ensureCorrectChain();
+    const nft = nftContract();
+    return nft.methods.safeTransferFrom(owner, to, String(tokenId)).send({ from: owner });
+  }
+
+  // Rewards (view)
   async function getRewards(addr){
     try{
       await ensureCorrectChain();
@@ -318,20 +303,6 @@
       return null;
     }
   }
-  async function claimRewards(){
-    try{
-      await ensureCorrectChain();
-      const ctrl = ctrlContract();
-      return await ctrl.methods.claimRewards().send({ from: addr });
-    }catch(e){
-      for (const k of ['claimRewards','claim','harvest']){
-        try{
-          const S=(FF.staking||window.FF_STAKING||{}); if (typeof S[k]==='function') return await S[k]();
-        }catch{}
-      }
-      throw new Error('Claim helper not found.');
-    }
-  }
 
   async function getStakeSinceMs(tokenId){
     const S=(FF.staking || window.FF_STAKING || {});
@@ -342,7 +313,7 @@
     }catch{} return null;
   }
 
-  // --- Fallback via Transfer(to=controller) events (for since time) ---
+  // Fallback via Transfer(to=controller) events (for since time)
   async function stakeSinceViaEvents(tokenId){
     try{
       if (!window.Web3) return null;
@@ -418,7 +389,19 @@
     });
     if (bCl) bCl.addEventListener('click', async ()=>{
       bCl.disabled=true;
-      try{ await claimRewards(); toast('Claim sent'); await refreshHeaderStats(); }
+      try{
+        // prefer adapter if present
+        const S=(FF.staking||window.FF_STAKING||{});
+        if (typeof S.claimRewards==='function'){
+          await S.claimRewards();
+        }else{
+          await ensureCorrectChain();
+          const ctrl = ctrlContract();
+          await ctrl.methods.claimRewards().send({ from: addr });
+        }
+        toast('Claim sent');
+        await refreshHeaderStats();
+      }
       catch{ toast('Claim failed'); }
       finally{ bCl.disabled=false; }
     });
@@ -445,40 +428,80 @@
     await renderHeader(); syncHeights();
   }
 
-  // --- Stake / Unstake / Approve modals ---
-  function openApprovePanel(owner, stats){
-    const body = `
+  // --- Panels (Approve / Stake / Unstake / Transfer) ---
+  function approveCopyShort(){
+    return `
       <div class="om-col" style="text-align:center">
-        <img class="om-hero128" src="assets/img/blackWhite.png" alt="Fresh Frogs logo">
+        <img class="om-logo" src="assets/img/blackWhite.png" alt="Fresh Frogs">
         <div class="om-name">Fresh Frogs Staking</div>
         <div class="om-copy" style="text-align:left">
           <p><b>Approve the staking contract</b></p>
-          <p>To stake your Frogs, your wallet must first grant our controller contract permission to manage your NFTs. This approval is <i>collection-wide</i> (not per-frog) and is a one-time blockchain transaction that costs a small gas fee.</p>
-          <p><b>How staking works</b></p>
-          <ul>
-            <li>After approval, you can stake individual Frogs. While staked, a Frog is locked and can’t be listed or transferred.</li>
-            <li>Staked Frogs earn rewards (like $FLYZ) over time. You can claim rewards without un-staking.</li>
-            <li>You can un-stake any time to unlock the Frog back to your wallet.</li>
-          </ul>
+          <p>Allow the controller to manage your Frogs for staking. This is a <i>one-time, collection-wide</i> approval and does <b>not</b> transfer ownership.</p>
         </div>
       </div>
     `;
-    openModal({ title: '', bodyHTML: body, actions:[ /* unchanged */ ]});
+  }
+
+  function stakeCopy(id){
+    return `
+      <div class="om-col">
+        <img class="om-thumb" src="${imgFor(id)}" alt="Frog #${id}">
+        <div class="om-name">Frog #${id}</div>
+        <div class="om-copy">
+          <p>Stake this frog to start earning ${REWARD_SYMBOL}. You can unstake any time. Gas fees apply.</p>
+        </div>
+      </div>
+    `;
+  }
+
+  function unstakeCopy(id){
+    return `
+      <div class="om-col">
+        <img class="om-thumb" src="${imgFor(id)}" alt="Frog #${id}">
+        <div class="om-name">Frog #${id}</div>
+        <div class="om-copy">
+          <p>Unstake to stop earning ${REWARD_SYMBOL} and return this frog to your wallet. Unclaimed rewards stay claimable.</p>
+        </div>
+      </div>
+    `;
+  }
+
+  function transferCopy(id){
+    return `
+      <div class="om-col">
+        <img class="om-thumb" src="${imgFor(id)}" alt="Frog #${id}">
+        <div class="om-name">Frog #${id}</div>
+        <div class="om-copy">
+          <p>Send this frog to another wallet. <strong>Transfers are permanent</strong> — once sent, it can’t be undone.</p>
+          <label class="om-mono" style="font-size:12px;margin:8px 0 4px">Recipient (0x…)</label>
+          <input id="omTransferTo" class="om-input" placeholder="0xRecipient…" spellcheck="false" autocomplete="off">
+        </div>
+      </div>
+    `;
+  }
+
+  function openApprovePanel(owner, stats){
+    openModal({
+      title: '',
+      bodyHTML: approveCopyShort(),
+      actions: [
+        { label:'Cancel', onClick:()=>{}, primary:false },
+        { label:'Approve', primary:true, keepOpen:true, onClick: async ()=>{
+            try{
+              await sendApprove(owner);
+              toast('Approved!');
+              closeModal();
+              await refreshHeaderStats();
+            }catch{ toast('Approval failed'); }
+          }}
+      ]
+    });
   }
 
   function openStakePanel(owner, tokenId){
-    const body = `
-      <div class="om-col">
-        <img class="om-thumb" src="${imgFor(tokenId)}" alt="Frog #${tokenId}">
-        <div class="om-name">Frog #${tokenId}</div>
-        <div class="om-copy">
-          <p>While staked, your Frog can’t be listed or sold. You can un-stake here any time. Un-staking resets level to zero.</p>
-        </div>
-      </div>
-    `;
     openModal({
-      title: '',
-      bodyHTML: body,
+      title:'',
+      bodyHTML: stakeCopy(tokenId),
       actions: [
         { label:'Cancel', onClick:()=>{}, primary:false },
         { label:`Stake Frog #${tokenId}`, primary:true, keepOpen:true, onClick: async ()=>{
@@ -497,30 +520,55 @@
   }
 
   function openUnstakePanel(owner, tokenId){
-    const body = `
-      <div class="om-col">
-        <img class="om-thumb" src="${imgFor(tokenId)}" alt="Frog #${tokenId}">
-        <div class="om-name">Frog #${tokenId}</div>
-        <div class="om-copy">
-          <p>Withdrawing returns this Frog to your wallet. Level resets to zero.</p>
-        </div>
-      </div>
-    `;
     openModal({
-      title: '',
-      bodyHTML: body,
+      title:'',
+      bodyHTML: unstakeCopy(tokenId),
       actions: [
         { label:'Cancel', onClick:()=>{}, primary:false },
-        { label:`Withdraw Frog #${tokenId}`, primary:true, keepOpen:true, onClick: async ()=>{
+        { label:`Unstake Frog #${tokenId}`, primary:true, keepOpen:true, onClick: async ()=>{
             try{
               await sendUnstake(owner, tokenId);
-              toast(`Withdraw tx sent for #${tokenId}`);
+              toast(`Unstake tx sent for #${tokenId}`);
               closeModal();
               const item = items.find(x=>x.id===tokenId);
               if (item){ item.staked=false; item.sinceMs=null; }
               renderCards();
               await refreshHeaderStats();
-            }catch{ toast('Withdraw failed'); }
+            }catch{ toast('Unstake failed'); }
+          }}
+      ]
+    });
+  }
+
+  function isValidEthAddress(addr){
+    try{
+      if (!window.Web3) return /^0x[a-fA-F0-9]{40}$/.test(addr);
+      return new Web3().utils.isAddress(addr);
+    }catch{ return false; }
+  }
+
+  function openTransferPanel(owner, tokenId){
+    openModal({
+      title:'',
+      bodyHTML: transferCopy(tokenId),
+      actions: [
+        { label:'Cancel', onClick:()=>{}, primary:false },
+        { label:'Send', primary:true, keepOpen:true, onClick: async ()=>{
+            const inp = document.getElementById('omTransferTo');
+            const to = (inp?.value||'').trim();
+            if (!isValidEthAddress(to)){ toast('Enter a valid recipient address'); inp?.focus(); return; }
+            if (to.toLowerCase() === owner.toLowerCase()){ toast('Recipient is your own address'); return; }
+            if (to.toLowerCase() === String(CFG.CONTROLLER_ADDRESS||'').toLowerCase()){ toast('Cannot send to the controller address'); return; }
+
+            try{
+              await sendTransfer(owner, to, tokenId);
+              toast(`Transfer sent for #${tokenId}`);
+              closeModal();
+              // Optimistic: remove from owned if sent elsewhere (and not staked)
+              const idx = items.findIndex(x=>x.id===tokenId && !x.staked);
+              if (idx>=0){ items.splice(idx,1); renderCards(); }
+              await refreshHeaderStats();
+            }catch{ toast('Transfer failed'); }
           }}
       ]
     });
@@ -559,8 +607,11 @@
           }else if (act==='unstake'){
             openUnstakePanel(a, it.id);
           }else if (act==='transfer'){
-            if (FF.wallet?.promptTransfer) await FF.wallet.promptTransfer(it.id);
-            else toast('Transfer: helper not found');
+            if (it.staked){
+              toast('This frog is staked. Unstake before transferring.');
+              return;
+            }
+            openTransferPanel(a, it.id);
           }
         }catch{ toast('Action failed'); }
       });
@@ -586,9 +637,12 @@
       const card = document.createElement('article');
       card.className = 'frog-card';
       card.setAttribute('data-token-id', String(it.id));
+      if (it.staked) card.setAttribute('data-staked','1');
 
       const rankPill = (it.rank || it.rank === 0) ? ` <span class="pill">Rank #${it.rank}</span>` : '';
       const attrs = attrsHTML(it.attrs, 4);
+
+      const disabledAttrs = it.staked ? ' disabled aria-disabled="true" title="Unstake before transferring"' : '';
 
       card.innerHTML = [
         `<img class="thumb" src="${imgFor(it.id)}" alt="${it.id}">`,
@@ -597,7 +651,7 @@
         attrs,
         `<div class="actions">
            <button class="btn btn-outline-gray" data-act="${it.staked ? 'unstake' : 'stake'}">${it.staked ? 'Unstake' : 'Stake'}</button>
-           <button class="btn btn-outline-gray" data-act="transfer">Transfer</button>
+           <button class="btn btn-outline-gray ${it.staked ? 'btn-disabled' : ''}" data-act="transfer"${disabledAttrs}>Transfer</button>
            <a class="btn btn-outline-gray" href="${etherscanToken(it.id)}" target="_blank" rel="noopener">Etherscan</a>
            <a class="btn btn-outline-gray" href="${imgFor(it.id)}" target="_blank" rel="noopener">Original</a>
          </div>`
@@ -660,7 +714,7 @@
         rank: (FF.RANKS||{})[String(m.id)]
       }));
 
-      // Fill stake times (adapter first; else fall back to events)
+      // Fill stake times
       await (async ()=>{
         const stakedBatch = items.filter(x=> x.staked);
         for (const it of stakedBatch){
