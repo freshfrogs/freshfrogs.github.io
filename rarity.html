@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>FreshFrogs — Rarity Rankings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- If you have a shared stylesheet with index.html, include it here -->
+  <style>
+    :root { color-scheme: dark; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; background:#0b0b0f; color:#eaeaf2; }
+    header { position: sticky; top: 0; z-index: 10; background: linear-gradient(180deg, rgba(11,11,15,.95), rgba(11,11,15,.75)); backdrop-filter: blur(6px); border-bottom: 1px solid rgba(255,255,255,.06); }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 16px; }
+    .titlebar { display:flex; align-items:center; gap:16px; }
+    .titlebar h1 { font-size: 1.25rem; margin: 0; letter-spacing:.2px; }
+    .searchbar { margin-top: 12px; display:flex; gap:8px; }
+    .searchbar input { flex:1; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:#11131a; color:#eaeaf2; }
+    .btn { padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:#141722; color:#fff; cursor:pointer; }
+    .btn:hover { background:#1a1f2d; }
+    main .list { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:14px; padding: 18px 16px 90px; }
+    .card { border:1px solid rgba(255,255,255,.08); background:#10131b; border-radius:14px; overflow:hidden; display:flex; flex-direction:column; }
+    .thumb { aspect-ratio: 1/1; background:#0e1118; display:grid; place-items:center; font-size: 14px; color:#7b7f93; }
+    .thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+    .meta { padding:12px; display:grid; gap:6px; }
+    .row { display:flex; justify-content:space-between; font-size:.95rem; }
+    .id { color:#aab0c5; }
+    .pill { font-size:.8rem; padding:4px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:#121523; color:#cad0e8; }
+    .loadmore { display:flex; justify-content:center; padding: 8px 0 28px; }
+    .hidden { display:none !important; }
+    .footerpad { height: 30vh; }
+    .muted { color:#8b90a6; font-size:.9rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="titlebar">
+        <h1>Rarity Rankings</h1>
+        <span class="muted">From most rare → less rare</span>
+      </div>
+      <div class="searchbar">
+        <input id="query" placeholder="Search by Rank (e.g. 1) or ID (e.g. 3090)" />
+        <button class="btn" id="searchBtn">Search</button>
+        <button class="btn" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <div id="count" class="muted">Loading...</div>
+    </div>
+    <section class="list" id="list"></section>
+    <div class="loadmore">
+      <button class="btn" id="loadMoreBtn">Load more</button>
+    </div>
+    <div class="footerpad"></div>
+  </main>
+
+  <script>
+    // ---- Configuration you may want to align with index.html ----
+    function buildImageUrl(id) {
+      // TODO: adjust this to your actual image path/template:
+      // return `./images/${id}.png`;
+      // or IPFS, or CDN
+      return `https://picsum.photos/seed/frog-${id}/600`; // placeholder so layout works
+    }
+
+    const RANKINGS_URL = 'assets/freshfrogs_rarity_rankings.json';
+    const RANK_LOOKUP_URL = 'assets/freshfrogs_rank_lookup.json';
+
+    const state = {
+      rankings: [],        // full array: [{ id, rarity, type, ranking }]
+      lookup: {},          // id -> rank (if needed)
+      page: 0,
+      pageSize: 36,
+      filtered: null       // array when searching
+    };
+
+    const els = {
+      list: document.getElementById('list'),
+      count: document.getElementById('count'),
+      loadMore: document.getElementById('loadMoreBtn'),
+      query: document.getElementById('query'),
+      searchBtn: document.getElementById('searchBtn'),
+      resetBtn: document.getElementById('resetBtn')
+    };
+
+    async function boot() {
+      const [rankings, lookup] = await Promise.all([
+        fetch(RANKINGS_URL).then(r => r.json()),
+        fetch(RANK_LOOKUP_URL).then(r => r.json()).catch(() => ({}))
+      ]);
+
+      // Defensive: ensure sorted by 'ranking' ascending
+      rankings.sort((a, b) => a.ranking - b.ranking);
+
+      state.rankings = rankings;
+      state.lookup = lookup || {};
+      state.page = 0;
+
+      renderCount();
+      renderNextPage();
+    }
+
+    function dataSource() {
+      return state.filtered ?? state.rankings;
+    }
+
+    function renderCount() {
+      const total = dataSource().length;
+      const shown = Math.min((state.page + 1) * state.pageSize, total);
+      els.count.textContent = `${shown}/${total} shown`;
+      els.loadMore.classList.toggle('hidden', shown >= total);
+    }
+
+    function renderNextPage() {
+      const data = dataSource();
+      const start = state.page * state.pageSize;
+      const end = Math.min(start + state.pageSize, data.length);
+      const slice = data.slice(start, end);
+
+      const frag = document.createDocumentFragment();
+      for (const item of slice) {
+        frag.appendChild(renderCard(item));
+      }
+      els.list.appendChild(frag);
+
+      renderCount();
+    }
+
+    function renderCard(item) {
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="thumb">
+          <img alt="Frog ${item.id}" loading="lazy" src="${buildImageUrl(item.id)}" onerror="this.parentNode.textContent='No image';" />
+        </div>
+        <div class="meta">
+          <div class="row"><strong>#${item.ranking}</strong><span class="pill">${(item.type || '').replace(/([A-Z])/g,' $1')}</span></div>
+          <div class="row"><span class="id">ID: ${item.id}</span><span>Rarity: ${item.rarity}</span></div>
+        </div>
+      `;
+      // Quick copy ID on click
+      card.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(String(item.id));
+        } catch {}
+      });
+      return card;
+    }
+
+    function resetList() {
+      state.page = 0;
+      els.list.innerHTML = '';
+    }
+
+    function doSearch() {
+      const q = els.query.value.trim();
+      if (!q) {
+        state.filtered = null;
+        resetList();
+        renderNextPage();
+        return;
+      }
+
+      // Allow search by rank OR id (numeric)
+      const num = Number(q);
+      let matches = [];
+      if (!Number.isNaN(num) && num > 0) {
+        // try as rank
+        const byRank = state.rankings.find(r => r.ranking === num);
+        if (byRank) matches.push(byRank);
+
+        // also try as id (unique)
+        const byId = state.rankings.find(r => r.id === num);
+        if (byId && (!byRank || byId.id !== byRank.id)) matches.push(byId);
+      } else {
+        // text search on type
+        const ql = q.toLowerCase();
+        matches = state.rankings.filter(r =>
+          (r.type || '').toLowerCase().includes(ql)
+        );
+      }
+
+      state.filtered = matches;
+      resetList();
+      renderNextPage();
+    }
+
+    // UI hooks
+    els.loadMore.addEventListener('click', () => {
+      state.page++;
+      renderNextPage();
+    });
+
+    els.searchBtn.addEventListener('click', doSearch);
+    els.resetBtn.addEventListener('click', () => {
+      els.query.value = '';
+      state.filtered = null;
+      resetList();
+      renderNextPage();
+    });
+    els.query.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') doSearch();
+    });
+
+    // Go!
+    boot().catch(err => {
+      console.error(err);
+      els.count.textContent = 'Failed to load rankings.';
+    });
+  </script>
+</body>
+</html>
