@@ -1,7 +1,7 @@
 // assets/js/owned-panel.js
 // Renders: Owned + Staked. Owned IDs from Reservoir; Staked IDs from controller.
-// Metadata from frog/json/{id}.json. Attribute chips → bullets.
-// Header: Owned • Staked • Unclaimed Rewards (+ Approve/Claim). Connect btn shows muted address.
+// Metadata from frog/json/{id}.json. Attribute bullets. Header shows Owned • Staked • Unclaimed Rewards.
+// Includes: 128×128 modal images, approve/stake/unstake/transfer panels, disabled transfer on staked, rarity sort.
 
 (function (FF, CFG) {
   'use strict';
@@ -91,37 +91,8 @@
 #ownedModal .om-copy{color:#fff;font-size:13px;line-height:1.5;max-width:52ch}
 #ownedModal .om-copy p{margin:0 0 10px 0}
 #ownedModal .om-logo{
-  width:128px;height:128px;
-  border-radius:12px;
-  border:1px solid var(--border);
-  object-fit:cover;
-  background:#111;
+  width:128px;height:128px;border-radius:12px;border:1px solid var(--border);object-fit:cover;background:#111;
 }
-
-/* Rank rarity colors */
-.rank-pill{
-  display:inline-flex; align-items:center; gap:6px;
-  border:1px solid var(--border); border-radius:999px; padding:3px 8px;
-  font-size:11px; font-weight:700; letter-spacing:.01em;
-  background:color-mix(in srgb, var(--panel) 35%, transparent);
-}
-.rank-pill::before{
-  content:'◆'; font-size:12px; line-height:1;
-}
-
-/* Tiers (colors picked to match your screenshots) */
-.rank-legendary{ color:#f59e0b; border-color: color-mix(in srgb, #f59e0b 70%, var(--border)); }
-.rank-legendary::before{ color:#f59e0b; }
-
-.rank-epic{ color:#a855f7; border-color: color-mix(in srgb, #a855f7 70%, var(--border)); }
-.rank-epic::before{ color:#a855f7; }
-
-.rank-rare{ color:#38bdf8; border-color: color-mix(in srgb, #38bdf8 70%, var(--border)); }
-.rank-rare::before{ color:#38bdf8; }
-
-/* Common → no special color (keeps your default) */
-.rank-common{ color:inherit; border-color:var(--border); }
-.rank-common::before{ color:var(--muted); }
 
 /* Disabled buttons */
 .btn[disabled], .btn-disabled{opacity:.45;pointer-events:none;filter:grayscale(.8)}
@@ -143,7 +114,6 @@
 
   // --- Utils ---
   const $=(s,r=document)=>r.querySelector(s);
-  const shorten=(a)=> (FF.shorten?.(a)) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
   const toast=(m)=>{ try{FF.toast?.(m);}catch{} console.log('[owned]',m); };
 
   function formatToken(raw,dec=REWARD_DECIMALS){
@@ -179,18 +149,16 @@
     return s+'s ago';
   }
 
-  // Map numeric rank to a color tier
-  function rankTier(rank){
-    if (!Number.isFinite(rank)) return 'common';
-    // Defaults; tweak or move to CFG if you like
-    const size = Number(CFG.COLLECTION_SIZE || 4040);
-    const T = CFG.RARITY_TIERS || { legendary: 50, epic: 250, rare: 800 }; // top-N cutoffs
-    if (rank <= T.legendary) return 'legendary';         // most rare → orange
-    if (rank <= T.epic)      return 'epic';              // next → purple
-    if (rank <= T.rare)      return 'rare';              // next → blue
-    return 'common';                                      // rest → default
+  // --- Rarity sort helpers (lower rank number = rarer) ---
+  function rarityVal(x){
+    const r = Number((x && x.rank) ?? Infinity);
+    return Number.isFinite(r) ? r : Infinity;
   }
-
+  function compareByRarity(a,b){
+    const ra=rarityVal(a), rb=rarityVal(b);
+    if (ra !== rb) return ra - rb;                 // rarer first
+    return (a.id||0) - (b.id||0);                  // tie-break by id
+  }
 
   // --- Minimal themed modal ---
   function ensureOwnedModalRoot(){
@@ -269,7 +237,6 @@
       await ensureCorrectChain();
       const ctrl = ctrlContract();
       const raw  = await ctrl.methods.getStakedTokens(addr).call({ from: addr });
-      // normalize
       const arr = Array.isArray(raw) ? raw : [];
       const out = arr.map(v=>{
         try{
@@ -374,7 +341,7 @@
   }
 
   // --- State ---
-  let addr=null, continuation=null, items=[], io=null;
+  let addr=null, continuation=null, items=[];
   let _stakedCount=null, _rewardsPretty='—', _approved=null;
 
   // --- Local metadata cache ---
@@ -428,7 +395,6 @@
     if (bCl) bCl.addEventListener('click', async ()=>{
       bCl.disabled=true;
       try{
-        // prefer adapter if present
         const S=(FF.staking||window.FF_STAKING||{});
         if (typeof S.claimRewards==='function'){
           await S.claimRewards();
@@ -466,8 +432,7 @@
     await renderHeader(); syncHeights();
   }
 
-  // --- Panels (Approve / Stake / Unstake / Transfer) ---
-  // 1) Staking Approval
+  // --- Panel templates (final copy) ---
   function approveCopyShort(){
     return `
       <div class="om-col" style="text-align:center">
@@ -479,8 +444,6 @@
       </div>
     `;
   }
-
-  // 2) Stake
   function stakeCopy(id){
     return `
       <div class="om-col">
@@ -492,8 +455,6 @@
       </div>
     `;
   }
-
-  // 3) Unstake
   function unstakeCopy(id){
     return `
       <div class="om-col">
@@ -505,8 +466,6 @@
       </div>
     `;
   }
-
-  // 4) Transfer
   function transferCopy(id){
     return `
       <div class="om-col">
@@ -521,7 +480,8 @@
     `;
   }
 
-  function openApprovePanel(owner, stats){
+  // --- Panels with actions ---
+  function openApprovePanel(owner){
     openModal({
       title: '',
       bodyHTML: approveCopyShort(),
@@ -538,7 +498,6 @@
       ]
     });
   }
-
   function openStakePanel(owner, tokenId){
     openModal({
       title:'',
@@ -552,6 +511,7 @@
               closeModal();
               const item = items.find(x=>x.id===tokenId);
               if (item){ item.staked=true; item.sinceMs=Date.now(); }
+              items.sort(compareByRarity);
               renderCards();
               await refreshHeaderStats();
             }catch{ toast('Stake failed'); }
@@ -559,7 +519,6 @@
       ]
     });
   }
-
   function openUnstakePanel(owner, tokenId){
     openModal({
       title:'',
@@ -573,6 +532,7 @@
               closeModal();
               const item = items.find(x=>x.id===tokenId);
               if (item){ item.staked=false; item.sinceMs=null; }
+              items.sort(compareByRarity);
               renderCards();
               await refreshHeaderStats();
             }catch{ toast('Unstake failed'); }
@@ -580,14 +540,12 @@
       ]
     });
   }
-
   function isValidEthAddress(addr){
     try{
       if (!window.Web3) return /^0x[a-fA-F0-9]{40}$/.test(addr);
       return new Web3().utils.isAddress(addr);
     }catch{ return false; }
   }
-
   function openTransferPanel(owner, tokenId){
     openModal({
       title:'',
@@ -600,14 +558,15 @@
             if (!isValidEthAddress(to)){ toast('Enter a valid recipient address'); inp?.focus(); return; }
             if (to.toLowerCase() === owner.toLowerCase()){ toast('Recipient is your own address'); return; }
             if (to.toLowerCase() === String(CFG.CONTROLLER_ADDRESS||'').toLowerCase()){ toast('Cannot send to the controller address'); return; }
-
             try{
               await sendTransfer(owner, to, tokenId);
               toast(`Transfer sent for #${tokenId}`);
               closeModal();
-              // Optimistic: remove from owned if sent elsewhere (and not staked)
+              // Optimistic remove if it was an owned (unstaked) frog
               const idx = items.findIndex(x=>x.id===tokenId && !x.staked);
-              if (idx>=0){ items.splice(idx,1); renderCards(); }
+              if (idx>=0){ items.splice(idx,1); }
+              items.sort(compareByRarity);
+              renderCards();
               await refreshHeaderStats();
             }catch{ toast('Transfer failed'); }
           }}
@@ -648,10 +607,7 @@
           }else if (act==='unstake'){
             openUnstakePanel(a, it.id);
           }else if (act==='transfer'){
-            if (it.staked){
-              toast('This frog is staked. Unstake before transferring.');
-              return;
-            }
+            if (it.staked){ toast('This frog is staked. Unstake before transferring.'); return; }
             openTransferPanel(a, it.id);
           }
         }catch{ toast('Action failed'); }
@@ -662,6 +618,9 @@
   function renderCards(){
     const root = document.querySelector('#ownedGrid');
     if (!root) return;
+
+    // keep list sorted even after optimistic updates
+    items.sort(compareByRarity);
 
     root.innerHTML = '';
 
@@ -680,13 +639,11 @@
       card.setAttribute('data-token-id', String(it.id));
       if (it.staked) card.setAttribute('data-staked','1');
 
-      const tier = Number.isFinite(it.rank) ? rankTier(it.rank) : 'common';
-      const rankPill = Number.isFinite(it.rank)
-        ? ` <span class="rank-pill rank-${tier}">#${it.rank}</span>`
+      const rankPill = (Number.isFinite(it.rank))
+        ? ` <span class="pill">Rank #${it.rank}</span>`
         : '';
 
       const attrs = attrsHTML(it.attrs, 4);
-
       const disabledAttrs = it.staked ? ' disabled aria-disabled="true" title="Unstake before transferring"' : '';
 
       card.innerHTML = [
@@ -739,7 +696,7 @@
 
   async function loadFirstPage(){
     try{
-      const [ownedIds, ranks] = await Promise.all([ fetchOwnedIdsPage(), ensureRanks() ]);
+      const [ownedIds] = await Promise.all([ fetchOwnedIdsPage(), ensureRanks() ]);
       const stakedIds = addr ? await getStakedIds(addr) : [];
       _stakedCount = stakedIds.length;
 
@@ -758,6 +715,9 @@
         sinceMs: null,
         rank: (FF.RANKS||{})[String(m.id)]
       }));
+
+      // Sort by rarity now
+      items.sort(compareByRarity);
 
       // Fill stake times
       await (async ()=>{
@@ -788,6 +748,7 @@
             .filter(m=> !items.some(x=> x.id===m.id))
             .map(m=> ({ id:m.id, attrs:m.attrs, staked: stakedIds.includes(m.id), sinceMs:null, rank:(FF.RANKS||{})[String(m.id)] }));
           items = items.concat(more);
+          items.sort(compareByRarity);             // keep order by rarity as more load
           for (const it of more){
             if (it.staked){
               try{
