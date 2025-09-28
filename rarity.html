@@ -3,70 +3,51 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>freshfrogs.github.io — Rarity</title>
+  <title>Fresh Frogs — Rarity Rankings</title>
 
   <link rel="stylesheet" href="assets/css/styles.css" />
 
   <style>
-    /* Base */
+    /* Page shell to match collection */
     .pg-wrap{ padding:20px; }
     img{ image-rendering: pixelated; image-rendering: crisp-edges; }
-
     .pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
     .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
     .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
     .pg-muted{ color:var(--muted); font-size:13px; }
 
-    .list{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
-    .row{ display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center; padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
-    .thumb64{ width:64px; height:64px; min-width:64px; min-height:64px; border-radius:10px; object-fit:contain; background:var(--panel-2); }
-
-    /* Centered single-panel layout (fixed width) */
-    :root{ --panel-width: 640px; }
+    /* Centered width like collection */
+    :root{ --panel-width: 1100px; }
     .center-wrap{ display:grid; gap:16px; justify-items:center; }
     .centered-card{ width: min(var(--panel-width), 100%); }
 
-    /* Hero (centered) */
-    .frog-hero{ margin:28px auto 38px; width: min(var(--panel-width), 100%); }
+    /* Hero */
+    .frog-hero{ margin:28px auto 10px; width: min(var(--panel-width), 100%); }
     .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
     .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
     .frog-strip .tile{ flex:0 0 auto; width:64px; height:64px; border-radius:10px; }
     .frog-strip .tile.hide{ display:none !important; }
     .frog-strip img{ width:64px; height:64px; object-fit:contain; }
-    @media (max-width:520px){ .frog-hero{ margin:22px auto 30px; } .frog-strip{ gap:10px; } }
 
-    /* Info blocks */
-    .info-grid-2{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:10px; margin-bottom:10px; }
-    @media (max-width:900px){ .info-grid-2{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
-    @media (max-width:520px){ .info-grid-2{ grid-template-columns: 1fr; } }
-    .info-block{ border:1px solid var(--border); border-radius:12px; padding:10px; background:var(--panel); }
-    .info-block .ik{ font-size:11px; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; }
-    .info-block .iv{ font-weight:900; font-size:18px; line-height:1.1; margin-top:4px; }
-    .info-block .in{ font-size:12px; color:var(--muted); }
-
-    /* Rank pill colors (Legendary / Epic / Rare / Common) */
-    .rank-pill{
-      display:inline-flex; align-items:center; gap:6px;
-      border:1px solid var(--border); border-radius:999px; padding:4px 10px;
-      font-size:11px; font-weight:800; letter-spacing:.02em;
-      background: color-mix(in srgb, var(--panel) 35%, transparent);
-    }
-    .rank-pill::before{ content:'◆'; font-size:12px; line-height:1; }
-    .rank-legendary{ color:#f59e0b; border-color: color-mix(in srgb, #f59e0b 70%, var(--border)); }
-    .rank-legendary::before{ color:#f59e0b; }
-    .rank-epic{ color:#a855f7; border-color: color-mix(in srgb, #a855f7 70%, var(--border)); }
-    .rank-epic::before{ color:#a855f7; }
-    .rank-rare{ color:#38bdf8; border-color: color-mix(in srgb, #38bdf8 70%, var(--border)); }
-    .rank-rare::before{ color:#38bdf8; }
-    .rank-common{ color:inherit; border-color: var(--border); }
-    .rank-common::before{ color:var(--muted); }
-
-    /* Scrollable list (optional: limit visible rows via data-visible) */
-    #rarityList.scrolling{ overflow-y:auto; -webkit-overflow-scrolling:touch; padding-right:4px; }
+    /* Grid area for frog-cards (reuses your .frog-card styles from styles.css) */
+    #rarityGrid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:12px; }
+    #rarityGrid.scrolling{ overflow:auto; -webkit-overflow-scrolling:touch; padding-right:4px; max-height: 70vh; }
     @media (hover:hover){
-      #rarityList.scrolling::-webkit-scrollbar{ width:8px; }
-      #rarityList.scrolling::-webkit-scrollbar-thumb{ background: color-mix(in srgb, var(--muted) 35%, transparent); border-radius:8px; }
+      #rarityGrid.scrolling::-webkit-scrollbar{ width:8px; }
+      #rarityGrid.scrolling::-webkit-scrollbar-thumb{ background: color-mix(in srgb,var(--muted) 35%, transparent); border-radius:8px; }
     }
+
+    /* Rank pill color grades (additive to your .pill) */
+    .pill.rk-legendary{ color:#f59e0b; border-color: color-mix(in srgb,#f59e0b 70%, var(--border)); }
+    .pill.rk-epic{ color:#a855f7; border-color: color-mix(in srgb,#a855f7 70%, var(--border)); }
+    .pill.rk-rare{ color:#38bdf8; border-color: color-mix(in srgb,#38bdf8 70%, var(--border)); }
+
+    /* Meta line subtlety */
+    .frog-card .meta{ color:var(--muted); font-size:12px; }
+
+    /* Clip long attribute values */
+    .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; }
+    .attr-bullets li{ font-size:12px; margin:2px 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   </style>
 </head>
 <body>
@@ -75,7 +56,7 @@
 
       <!-- HERO -->
       <section class="frog-hero">
-        <h1 class="frog-title">freshfrogs.github.io</h1>
+        <h1 class="frog-title">Rarity Rankings</h1>
         <div class="frog-strip">
           <div class="tile"><img src="frog/12.png"  alt="12"></div>
           <div class="tile"><img src="frog/77.png"  alt="77"></div>
@@ -86,159 +67,192 @@
         </div>
       </section>
 
-      <!-- Fresh Frogs NFT -->
-      <section class="pg-card centered-card">
-        <div class="pg-card-head"><h3>Fresh Frogs NFT</h3></div>
-        <p class="pg-muted" style="margin:6px 0 12px 0; max-width:70ch;">
-          Pixel-perfect frogs hopping around the Ethereum pond. Mint, stake to earn FLYZ, and explore the collection’s quirks and traits.
-        </p>
-
-        <div class="info-grid-2">
-          <div class="info-block"><div class="ik">🐸 Supply</div><div class="iv">4,040</div><div class="in">Total tokens</div></div>
-          <div class="info-block"><div class="ik">⛓️ Chain</div><div class="iv">Ethereum</div><div class="in">ERC-721</div></div>
-          <div class="info-block"><div class="ik">🎧 Royalty</div><div class="iv">5%</div><div class="in">Secondary sales</div></div>
-          <div class="info-block"><div class="ik">🪙 Mint</div><div class="iv">0.01 ETH</div><div class="in">Per frog</div></div>
-        </div>
-
-        <!-- Rarity Rankings -->
-        <div class="pg-card-head" style="margin-top:10px;"><h3>Rarity Rankings</h3></div>
-        <ul id="rarityList" class="list" aria-live="polite" data-visible="10">
-          <li class="row"><div class="pg-muted">Loading rarity…</div></li>
-        </ul>
-      </section>
+      <!-- Action buttons row (your current topbar.js renders here) -->
     </div>
+
+    <!-- Rankings panel -->
+    <section class="pg-card centered-card" style="margin-top:10px">
+      <div class="pg-card-head">
+        <h3>All Frogs by Rarity</h3>
+        <div class="pg-muted" id="rankCount">Loading…</div>
+      </div>
+
+      <div id="rarityGrid" class="scrolling" aria-live="polite">
+        <div class="pg-muted" style="padding:8px">Loading rankings…</div>
+      </div>
+    </section>
   </div>
 
+  <!-- Shared libs (same family as collection.html) -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/rarity.js"></script>
+  <script src="assets/js/topbar.js"></script>
+
   <script>
-    /* Keep whole 64px tiles only (hero strip) */
+  (function(){
+    'use strict';
+
+    var CFG = window.FF_CFG || {};
+    var ROOT = String(CFG.SOURCE_PATH || '').replace(/\/+$/,'');
+    var RANKS_JSON = CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json';
+
+    var GRID = document.getElementById('rarityGrid');
+    var COUNT = document.getElementById('rankCount');
+
+    var PAGE = 36;     // cards per append
+    var cursor = 0;    // next index to render
+    var rows = [];     // [{id, ranking}]
+    var observer = null;
+
+    function imgFor(id){ return ROOT + '/frog/' + id + '.png'; }
+    function jsonFor(id){ return ROOT + '/frog/json/' + id + '.json'; }
+
+    function tierFor(rank){
+      var T = (CFG.RARITY_TIERS) || { legendary: 50, epic: 250, rare: 800 };
+      if (typeof rank !== 'number' || !isFinite(rank)) return 'common';
+      if (rank <= T.legendary) return 'legendary';
+      if (rank <= T.epic) return 'epic';
+      if (rank <= T.rare) return 'rare';
+      return 'common';
+    }
+
+    function attrsHTML(attrs, max){
+      if (!Array.isArray(attrs)||!attrs.length) return '';
+      var out=[], n=0;
+      for (var i=0;i<attrs.length;i++){
+        var a=attrs[i]||{}, k=a.key||a.trait_type||a.traitType||a.type||'', v=(a.value!=null?a.value:a.trait_value);
+        if (!k || v==null) continue;
+        out.push('<li><b>'+String(k)+':</b> '+String(v)+'</li>');
+        if (++n>= (max||4)) break;
+      }
+      return out.length ? '<ul class="attr-bullets">'+out.join('')+'</ul>' : '';
+    }
+
+    function cardHTML(id, rank, meta){
+      var tier = tierFor(rank);
+      var pillCls = tier==='legendary'?'rk-legendary':tier==='epic'?'rk-epic':tier==='rare'?'rk-rare':'';
+      var rankPill = '<span class="pill '+pillCls+'">Rank #'+rank+'</span>';
+      var metaLine = 'Rarity • ' + rankPill;
+
+      return ''+
+      '<article class="frog-card" data-token-id="'+id+'">'+
+        '<img class="thumb" src="'+imgFor(id)+'" alt="'+id+'">'+
+        '<h4 class="title">Frog #'+id+' '+rankPill+'</h4>'+
+        '<div class="meta">'+metaLine+'</div>'+
+        (meta && meta.attrsHTML ? meta.attrsHTML : '')+
+      '</article>';
+    }
+
+    function appendNext(){
+      if (cursor >= rows.length) return;
+      var end = Math.min(rows.length, cursor + PAGE);
+      var frag = document.createDocumentFragment();
+
+      for (var i=cursor; i<end; i++){
+        (function(row){
+          var holder = document.createElement('div'); // temp
+          holder.innerHTML = cardHTML(row.id, row.ranking, null);
+          var el = holder.firstChild;
+          frag.appendChild(el);
+
+          // lazy load a few attributes per card (non-blocking)
+          fetch(jsonFor(row.id)).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
+            if (!j) return;
+            var attrs = Array.isArray(j.attributes) ? j.attributes : [];
+            var html = attrsHTML(attrs, 4);
+            if (!html) return;
+            var meta = el.querySelector('.meta');
+            meta.insertAdjacentHTML('afterend', html);
+          }).catch(function(){});
+        })(rows[i]);
+      }
+      GRID.appendChild(frag);
+      cursor = end;
+
+      if (cursor >= rows.length && observer){
+        observer.disconnect();
+      }
+    }
+
+    function setupInfinite(){
+      var sentinel = document.createElement('div');
+      sentinel.style.height = '1px';
+      GRID.appendChild(sentinel);
+
+      observer = new IntersectionObserver(function(es){
+        if (es[0].isIntersecting) appendNext();
+      }, { root: GRID, rootMargin: '240px', threshold: 0.01 });
+
+      observer.observe(sentinel);
+    }
+
+    function loadJSON(path){
+      return fetch(path).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
+    }
+
+    function normalizeRanks(raw){
+      var out=[];
+      if (Array.isArray(raw)){
+        for (var i=0;i<raw.length;i++){
+          var it = raw[i]||{};
+          var id = Number(it.id); var rk = Number(it.ranking!=null?it.ranking:it.rank);
+          if (isFinite(id) && isFinite(rk)) out.push({id:id, ranking:rk});
+        }
+      }else if (raw && typeof raw === 'object'){
+        for (var k in raw){ if (!raw.hasOwnProperty(k)) continue;
+          var id2 = Number(k); var rk2 = Number(raw[k]);
+          if (isFinite(id2) && isFinite(rk2)) out.push({id:id2, ranking:rk2});
+        }
+      }
+      // lowest ranking number = most rare (1 first)
+      out.sort(function(a,b){ return a.ranking - b.ranking || a.id - b.id; });
+      return out;
+    }
+
+    // Hero layout keeps whole tiles visible
     function layoutFrogStrip(){
       var strip = document.querySelector('.frog-strip'); if(!strip) return;
-      var tiles = Array.prototype.slice.call(strip.querySelectorAll('.tile'));
-      var styles = window.getComputedStyle(strip);
-      var gap = parseFloat(styles.gap || 12) || 12;
+      var tiles = Array.from(strip.querySelectorAll('.tile'));
+      var gap = parseFloat(getComputedStyle(strip).gap || 12) || 12;
       var tileW = 64, innerW = strip.clientWidth;
       var count = Math.max(1, Math.floor((innerW + gap) / (tileW + gap)));
       tiles.forEach(function(t,i){ t.classList.toggle('hide', i >= count); });
     }
     window.addEventListener('resize', layoutFrogStrip);
-    document.addEventListener('DOMContentLoaded', layoutFrogStrip);
-  </script>
 
-  <!-- Shared libs (same order as index.html) -->
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/utils.js"></script>
-  <script src="assets/js/rarity.js"></script>
-  <script src="assets/js/modal.js"></script>
-  <script src="assets/js/pond.js"></script>
-
-  <script>
-    (function(){
-      var CFG = window.FF_CFG || {};
-      var ROOT = String(CFG.SOURCE_PATH || '').replace(/\/+$/,'') || '';
-      var TOTAL = Number(CFG.TOTAL_SUPPLY || 4040);
-
-      function pickUniqueIds(n, max){
-        var pool = Array.from({length:max}, function(_,i){ return i+1; });
-        for (var i = pool.length - 1; i > 0; i--){
-          var j = Math.floor(Math.random()*(i+1));
-          var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
-        }
-        return pool.slice(0, n);
-      }
-
-      function randomizeStrip(selector){
-        var strip = document.querySelector(selector);
-        if (!strip) return;
-        var imgs = Array.prototype.slice.call(strip.querySelectorAll('.tile img'));
-        if (!imgs.length) return;
-        var ids = pickUniqueIds(imgs.length, TOTAL);
+    // Init
+    (function init(){
+      // Randomize hero strip
+      (function randomizeStrip(){
+        var TOTAL = Number((window.FF_CFG||{}).TOTAL_SUPPLY || 4040);
+        var strip = document.querySelector('.frog-strip'); if (!strip) return;
+        var imgs = Array.from(strip.querySelectorAll('.tile img')); if (!imgs.length) return;
+        var pool = Array.from({length:TOTAL}, function(_,i){ return i+1; });
+        for (var i=pool.length-1; i>0; i--){ var j=(Math.random()* (i+1))|0; var t=pool[i]; pool[i]=pool[j]; pool[j]=t; }
         imgs.forEach(function(img, idx){
-          var id = ids[idx];
+          var id = pool[idx];
           img.src = ROOT + '/frog/' + id + '.png';
           img.alt = String(id);
         });
-      }
+        layoutFrogStrip();
+      })();
 
-      function tierFor(rank){
-        var T = (CFG.RARITY_TIERS) || { legendary: 50, epic: 250, rare: 800 };
-        if (typeof rank !== 'number' || !isFinite(rank)) return 'common';
-        if (rank <= T.legendary) return 'legendary';
-        if (rank <= T.epic) return 'epic';
-        if (rank <= T.rare) return 'rare';
-        return 'common';
-      }
-
-      function imgFor(id){ return ROOT + '/frog/' + id + '.png'; }
-
-      function loadJSON(path){
-        return fetch(path).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
-      }
-
-      function normalizeRanks(raw){
-        // Accept array of objects [{id, ranking, score?}] OR a map { "id": rank }
-        var out = [];
-        if (Array.isArray(raw)){
-          for (var i=0;i<raw.length;i++){
-            var it = raw[i] || {};
-            var id = Number(it.id); var rk = Number(it.ranking != null ? it.ranking : it.rank);
-            if (isFinite(id) && isFinite(rk)) out.push({ id:id, ranking:rk, score: (it.score!=null?Number(it.score):undefined) });
-          }
-        }else if (raw && typeof raw === 'object'){
-          for (var k in raw){ if(!raw.hasOwnProperty(k)) continue;
-            var id2 = Number(k); var rk2 = Number(raw[k]);
-            if (isFinite(id2) && isFinite(rk2)) out.push({ id:id2, ranking:rk2 });
-          }
-        }
-        out.sort(function(a,b){ return a.ranking - b.ranking || a.id - b.id; }); // lowest rank first
-        return out;
-      }
-
-      function renderList(rows){
-        var list = document.getElementById('rarityList');
-        if (!list) return;
-        if (!rows.length){ list.innerHTML = '<div class="pg-muted">No rarity data found.</div>'; return; }
-
-        // Optional scrolling clamp if data-visible is set
-        var vis = Number(list.getAttribute('data-visible') || 0);
-        if (vis > 0){
-          var rowH = 88; // rough height per row inc. gaps
-          list.classList.add('scrolling');
-          list.style.maxHeight = (vis * rowH) + 'px';
-        }
-
-        list.innerHTML = rows.map(function(r){
-          var t = tierFor(r.ranking);
-          var pill = '<span class="rank-pill rank-'+t+'">Rank #'+r.ranking+'</span>';
-          return ''+
-            '<li class="row" data-id="'+r.id+'">'+
-              '<img class="thumb64" src="'+imgFor(r.id)+'" alt="'+r.id+'">'+
-              '<div>'+
-                '<div style="font-weight:900">Frog #'+r.id+'</div>'+
-                '<div class="pg-muted">Rarity '+pill+'</div>'+
-              '</div>'+
-              '<div style="white-space:nowrap; font-weight:800; font-size:12px; color:var(--muted)">#'+r.ranking+'</div>'+
-            '</li>';
-        }).join('');
-      }
-
-      function init(){
-        randomizeStrip('.frog-strip');
-
-        var jsonPath = CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json';
-        loadJSON(jsonPath)
-          .then(normalizeRanks)
-          .then(renderList)
-          .catch(function(err){
-            console.warn('[rarity] load failed', err);
-            var list = document.getElementById('rarityList');
-            if (list) list.innerHTML = '<div class="pg-muted">Failed to load rarity.</div>';
-          });
-      }
-
-      (document.readyState === 'loading')
-        ? document.addEventListener('DOMContentLoaded', init)
-        : init();
+      // Load rankings → render incrementally
+      loadJSON(RANKS_JSON).then(normalizeRanks).then(function(arr){
+        rows = arr;
+        COUNT.textContent = (rows.length ? rows.length : 0) + ' frogs';
+        GRID.innerHTML = ''; // clear
+        appendNext();
+        setupInfinite();
+      }).catch(function(err){
+        console.warn('[rarity] failed', err);
+        GRID.innerHTML = '<div class="pg-muted" style="padding:8px">Failed to load rarity.</div>';
+        COUNT.textContent = '—';
+      });
     })();
+
+  })();
   </script>
 </body>
 </html>
