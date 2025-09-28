@@ -5,158 +5,114 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>freshfrogs — Mutate</title>
 
-  <!-- site styles -->
   <link rel="stylesheet" href="assets/css/styles.css" />
 
   <style>
-    /* ===== Mutate page layout (scoped) ===== */
-    :root { color-scheme: dark; }
-
+    /* Center the single card both vertically and horizontally */
+    html, body { height: 100%; }
+    body { margin: 0; }
     #mutateCenter{
-      /* bulletproof centering */
-      min-height: 100svh;
+      min-height: 100vh;
       display: grid;
       place-items: center;
       padding: 24px;
+    }
+
+    /* Two-column layout: left = frog + buttons, right = info */
+    #mutateCard{
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: start;
+      gap: 16px 18px;
+      max-width: 980px;
       width: 100%;
+      /* keep card chrome off for this page */
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      padding: 0;
     }
 
-    #mutatePage{
-      width: min(1100px, 96vw);
-      background: var(--panel,#0e1117);
-      border: 1px solid var(--border, rgba(255,255,255,.08));
-      border-radius: 16px;
-      box-shadow: 0 18px 42px rgba(0,0,0,.35);
-      overflow: hidden;
-    }
-
-    .mutate-grid{
-      display: grid;
-      grid-template-columns: 420px 1fr; /* frog | info */
-      gap: 28px;
-      padding: 24px;
-    }
-
-    /* Stack on small screens */
-    @media (max-width: 860px){
-      .mutate-grid{ grid-template-columns: 1fr; }
-    }
-
-    /* Left column */
-    .mutate-left{
-      display: grid;
-      grid-template-rows: auto auto;
-      gap: 16px;
-      align-content: start;
-    }
-
-    .mutate-card{
-      background: #0f1320;
-      border: 1px solid rgba(255,255,255,.06);
+    /* Left column: 256×256 build area + buttons below it */
+    .mutate-left{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+    #mutateHero{
+      position: relative;
+      width: 256px; height: 256px;
       border-radius: 12px;
-      padding: 16px;
-      display: grid;
-      place-items: center;
-    }
-
-    .mutate-thumb{
-      width: 100%;
-      max-width: 384px;
-      aspect-ratio: 1/1;
-      image-rendering: pixelated;
-      border-radius: 10px;
-      background: #0b0f1a;
       overflow: hidden;
-      display: grid;
-      place-items: center;
+      background: var(--panel-2);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 6px 12px rgba(0,0,0,.25);
+      image-rendering: pixelated; image-rendering: crisp-edges;
     }
-    .mutate-thumb img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* keep layered children crisp */
+    #mutateHero img, #mutateHero canvas{
+      position: absolute; inset: 0;
+      width: 256px; height: 256px;
+      image-rendering: pixelated; image-rendering: crisp-edges;
+    }
+    /* If a hero container ends up empty, don't show a blank box */
+    .mutate-hero:empty { display:none; }
 
-    .mutate-actions{
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
+    /* Right column: info stack (uses frog-card typography already in styles.css) */
+    .mutate-right{ display:flex; flex-direction:column; gap:6px; }
+    .mutate-right .title{ margin:0; }
+
+    @media (max-width: 720px){
+      #mutateCard{ grid-template-columns: 1fr; }
+      .mutate-right{ margin-top: 4px; }
+    }
+    #mutateCenter{
+      min-height:100svh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      width:100%;
     }
 
-    /* Button look restored — neutral outline that turns green on hover */
-    .mutate-actions .btn{
-      border: 1px solid color-mix(in srgb, var(--ink, #d9e1f7) 18%, transparent);
-      background: transparent;
-      color: var(--ink, #e7ecff);
-      padding: 9px 14px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background .15s ease, border-color .15s ease, color .15s ease, transform .02s ease;
-    }
-    .mutate-actions .btn:hover{
-      background: color-mix(in srgb, var(--accent, #22c55e) 14%, transparent);
-      border-color: color-mix(in srgb, var(--accent, #22c55e) 40%, transparent);
-    }
-    .mutate-actions .btn:active{ transform: translateY(1px); }
-
-    /* Right column (info) */
-    .mutate-info h2{
-      margin: 0 0 6px 0;
-      font-size: 20px;
-      letter-spacing: .2px;
-    }
-    .mutate-sub{
-      color: var(--muted, #97a0b2);
-      font-size: .95rem;
-      margin-bottom: 12px;
-    }
-    .mutate-list{
-      margin: 0; padding: 0 0 0 18px;
-      display: grid; gap: 6px;
-    }
-    .mutate-kv{ margin: 8px 0 0 0; color: #b8c0d6; }
-    .mutate-kv b{ color: #e6ebff; }
   </style>
 </head>
 <body>
   <div id="mutateCenter">
-    <main id="mutatePage" aria-label="Mutate Frog">
-      <section class="mutate-grid">
-        <!-- LEFT: frog + buttons (buttons below the frog) -->
-        <div class="mutate-left">
-          <div class="mutate-card">
-            <div class="mutate-thumb">
-              <!-- mutate.js will replace src with the selected frog image -->
-              <img id="mutateImg" src="assets/img/placeholder-frog.png" alt="Frog preview" />
-            </div>
-          </div>
-          <div class="mutate-actions">
-            <button id="btnRefresh" class="btn">Refresh</button>
-            <button id="btnMutate" class="btn">Mutate</button>
-          </div>
+    <article class="frog-card frog-card--mutate" id="mutateCard">
+      <div class="mutate-left">
+        <!-- Single, canonical hero container -->
+        <div class="mutate-hero" id="mutateHero"></div>
+
+        <!-- Buttons directly under the image (keep your existing button styles) -->
+        <div class="actions">
+          <button class="btn btn-outline-gray" id="btnRefresh">Refresh</button>
+          <button class="btn btn-outline-gray" id="btnMutate">Mutate</button>
         </div>
+      </div>
 
-        <!-- RIGHT: details -->
-        <div class="mutate-info">
-          <h2 id="mutateTitle">Frog #—</h2>
-          <div class="mutate-sub" id="mutateStatus">Loading…</div>
-
-          <ul class="mutate-list" id="mutateTraits">
-            <!-- populated by mutate.js -->
-          </ul>
-
-          <p class="mutate-kv" id="mutateOwner"></p>
-          <p class="mutate-kv" id="mutateNotes"></p>
-        </div>
-      </section>
-    </main>
+      <!-- Info on the right -->
+      <div class="mutate-right">
+        <h4 class="title" id="mutTitle">Frog #—</h4>
+        <div class="meta" id="mutMeta">Not staked • Owned by You</div>
+        <ul class="attr-bullets" id="mutAttrs"></ul>
+      </div>
+    </article>
   </div>
 
-  <!-- shared JS used across the site (order preserved) -->
-  <script src="assets/js/theme.js" defer></script>
-  <script src="assets/js/topbar.js" defer></script>
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/utils.js" defer></script>
-  <script src="assets/js/wallet.js" defer></script>
-  <script src="assets/js/modal.js" defer></script>
+  <!-- Tiny guard to prevent a duplicate/blank hero container -->
+  <script>
+    (function(){
+      // If multiple hero nodes exist for any reason, remove extras and normalize the id.
+      var heroes = Array.from(document.querySelectorAll('.mutate-hero, #mutateHero'));
+      if (heroes.length > 1){
+        heroes.forEach(function(el, i){ if (i > 0 && el.parentNode) el.parentNode.removeChild(el); });
+      }
+      var first = heroes[0] || document.querySelector('#mutateHero');
+      if (first && first.id !== 'mutateHero') first.id = 'mutateHero';
+      // Expose a stable getter for mutate.js (optional, harmless if unused)
+      window.getMutateHero = function(){ return document.getElementById('mutateHero'); };
+    })();
+  </script>
 
-  <!-- mutate logic (drop-in below) -->
-  <script src="assets/js/mutate.js" defer></script>
+  <!-- Your existing scripts -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/mutate.js"></script>
 </body>
 </html>
