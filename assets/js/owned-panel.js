@@ -467,50 +467,53 @@
   }
 
   // --- Panels (Approve / Stake / Unstake / Transfer) ---
+  // 1) Staking Approval
   function approveCopyShort(){
     return `
       <div class="om-col" style="text-align:center">
         <img class="om-logo" src="assets/img/blackWhite.png" alt="Fresh Frogs">
-        <div class="om-name">Fresh Frogs Staking</div>
+        <div class="om-name">Staking Approval</div>
         <div class="om-copy" style="text-align:left">
-          <p><b>Approve the staking contract</b></p>
-          <p>Allow the controller to manage your Frogs for staking. This is a <i>one-time, collection-wide</i> approval and does <b>not</b> transfer ownership.</p>
+          <p>Give the controller contract permission to manage your Frogs for staking. While staked, Frogs can’t be listed or transferred on marketplaces like OpenSea. You can unstake anytime on this site.</p>
         </div>
       </div>
     `;
   }
 
+  // 2) Stake
   function stakeCopy(id){
     return `
       <div class="om-col">
         <img class="om-thumb" src="${imgFor(id)}" alt="Frog #${id}">
         <div class="om-name">Frog #${id}</div>
         <div class="om-copy">
-          <p>Stake this frog to start earning ${REWARD_SYMBOL}. You can unstake any time. Gas fees apply.</p>
+          <p>Stake Frog #${id} to start earning rewards. While staked, it can’t be transferred or listed. Unstake anytime.</p>
         </div>
       </div>
     `;
   }
 
+  // 3) Unstake
   function unstakeCopy(id){
     return `
       <div class="om-col">
         <img class="om-thumb" src="${imgFor(id)}" alt="Frog #${id}">
         <div class="om-name">Frog #${id}</div>
         <div class="om-copy">
-          <p>Unstake to stop earning ${REWARD_SYMBOL} and return this frog to your wallet. Unclaimed rewards stay claimable.</p>
+          <p>Return Frog #${id} from the staking contract to your wallet. Its staking level resets to 0.</p>
         </div>
       </div>
     `;
   }
 
+  // 4) Transfer
   function transferCopy(id){
     return `
       <div class="om-col">
         <img class="om-thumb" src="${imgFor(id)}" alt="Frog #${id}">
         <div class="om-name">Frog #${id}</div>
         <div class="om-copy">
-          <p>Send this frog to another wallet. <strong>Transfers are permanent</strong> — once sent, it can’t be undone.</p>
+          <p>Transfer Frog #${id} to another wallet. Transfers are permanent—double-check the address before sending.</p>
           <label class="om-mono" style="font-size:12px;margin:8px 0 4px">Recipient (0x…)</label>
           <input id="omTransferTo" class="om-input" placeholder="0xRecipient…" spellcheck="false" autocomplete="off">
         </div>
