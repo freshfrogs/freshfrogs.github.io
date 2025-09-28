@@ -1,104 +1,194 @@
-// assets/js/mints-feed.js  (DROP-IN)
+// assets/js/mints-feed.js
+// Recent Mints — prefers pond.js helpers if available; otherwise Reservoir fallback.
+// Uses a global spaced queue to avoid 429s across modules.
+(function (FF, CFG) {
+  const UL_ID = 'recentMints';
 
-(function(FF, CFG){
-  'use strict';
+  // ---- Config
+  const BASE  = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
+  const API   = BASE + '/collections/activity/v6';
+  const PAGE_SIZE = Math.max(1, Math.min(50, Number(CFG.PAGE_SIZE || 5)));
+  const MAX_PAGES = Math.max(1, Number(CFG.MAX_PAGES || 8));
+  const CHAIN_ID  = Number(CFG.CHAIN_ID || 1);
 
-  var RES  = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
-  var API  = RES + '/collections/activity/v6';
-  var COLL = (CFG.COLLECTION_ADDRESS || '').trim();
-  var API_KEY = (CFG.FROG_API_KEY || CFG.RESERVOIR_API_KEY || '').trim();
-  var PAGE_SIZE = Math.max(1, Math.min(20, Number(CFG.MINTS_PAGE_SIZE || 12)));
-
-  // NEW: short address helper
-  function shorten(a){
-    if (!a || typeof a !== 'string') return '—';
-    if (a.length <= 12) return a;
-    return a.slice(0, 6) + '…' + a.slice(-4);
+  // ---- Headers
+  function apiHeaders(){
+    if (FF.apiHeaders && typeof FF.apiHeaders === 'function') return FF.apiHeaders();
+    return { accept: 'application/json', 'x-api-key': CFG.FROG_API_KEY };
   }
 
-  // Basic queue (reuse if present)
-  if (!window.FF_RES_QUEUE){
-    (function(){
-      var RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 800);
-      var lastAt = 0, chain = Promise.resolve();
-      function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
-      function spaced(url, init){
-        var d = Date.now() - lastAt;
-        var wait = d < RATE_MIN_MS ? (RATE_MIN_MS - d) : 0;
-        return sleep(wait).then(function(){
-          lastAt = Date.now();
-          var headers = (FF.apiHeaders && FF.apiHeaders()) || { accept:'application/json', 'x-api-key': API_KEY };
-          init = init || {};
-          init.headers = headers;
-          return fetch(url, init);
-        });
+  // ---- Global queue (shared with stakes)
+  (function ensureQueue(){
+    if (window.FF_RES_QUEUE) return;
+    const RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 800);
+    const BACKOFFS = Array.isArray(CFG.RETRY_BACKOFF_MS) ? CFG.RETRY_BACKOFF_MS : [900, 1700, 3200];
+    let lastAt = 0, chain = Promise.resolve();
+
+    const sleep = (ms)=> new Promise(r=>setTimeout(r, ms));
+    async function spacedFetch(url, init){
+      const delta = Date.now() - lastAt;
+      if (delta < RATE_MIN_MS) await sleep(RATE_MIN_MS - delta);
+      lastAt = Date.now();
+      return fetch(url, init);
+    }
+    async function run(url, init){
+      const hdrs = Object.assign({}, apiHeaders(), init && init.headers || {});
+      let i = 0;
+      while (true){
+        const res = await spacedFetch(url, { headers: hdrs });
+        if (res.status === 429){ await sleep(BACKOFFS[Math.min(i++, BACKOFFS.length-1)]); continue; }
+        if (!res.ok){ const t = await res.text().catch(()=> ''); const e = new Error(`HTTP ${res.status}${t?' — '+t:''}`); e.url=url; throw e; }
+        return res.json();
       }
-      function run(url, init){
-        return spaced(url, init).then(function(res){
-          if (res.status === 429){
-            return sleep(1000).then(function(){ return run(url, init); });
-          }
-          if (!res.ok){ return res.text().then(function(t){ throw new Error('HTTP '+res.status+(t?(' — '+t):'')); }); }
-          return res.json();
-        });
-      }
-      window.FF_RES_QUEUE = { fetch: function(url, init){ return (chain = chain.then(function(){ return run(url, init); })); } };
-    })();
+    }
+    window.FF_RES_QUEUE = { fetch(url, init){ chain = chain.then(()=> run(url, init)); return chain; } };
+  })();
+
+  // ---- Utils
+  const shorten = (a)=> (FF.shorten && FF.shorten(a)) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
+  const ago     = (d)=> d ? (FF.formatAgo ? FF.formatAgo(Date.now()-d.getTime())+' ago' : d.toLocaleString()) : '';
+  const imgFor  = (id)=> (CFG.SOURCE_PATH || '') + '/frog/' + id + '.png';
+
+  function txUrl(hash){
+    if (!hash) return null;
+    if (CFG.ETHERSCAN_TX_BASE) return CFG.ETHERSCAN_TX_BASE.replace(/\/+$/,'') + '/' + hash;
+    const base =
+      CHAIN_ID === 1        ? 'https://etherscan.io/tx/' :
+      CHAIN_ID === 11155111 ? 'https://sepolia.etherscan.io/tx/' :
+      CHAIN_ID === 5        ? 'https://goerli.etherscan.io/tx/' :
+                              'https://etherscan.io/tx/';
+    return base + hash;
   }
 
-  function root(){ return document.getElementById('mintsFeed'); } // your feed <ul>/<ol> id
-
-  function liHTML(row){
-    var tx  = (row && row.txHash) || (row && row.txHashHex) || '';
-    var minter = (row && (row.toAddress || (row.to && row.to.address))) || '';
-    var when = (row && row.createdAt) || (row && row.timestamp) || '';
-
-    var href = tx ? ('https://etherscan.io/tx/'+tx) : '#';
-    var whenTxt = when ? new Date(when).toLocaleString() : '';
-
-    return (
-      '<li class="mint-row">'+
-        '<div class="mint-main">'+
-          '<b class="minter">'+ shorten(minter) +'</b>'+
-          ' minted '+
-          '<span class="mint-token">#'+ String(row.token && row.token.tokenId || row.tokenId || '') +'</span>'+
-        '</div>'+
-        '<div class="mint-sub">'+
-          '<a class="mint-link" href="'+href+'" target="_blank" rel="noopener">Etherscan</a>'+
-          (whenTxt ? '<span class="mint-time">'+whenTxt+'</span>' : '')+
-        '</div>'+
-      '</li>'
-    );
+  // ---- pond adapters (try first)
+  async function pondFetchMints({ collection, limit, continuation }){
+    if (!FF.pond) return null;
+    const fns = [
+      FF.pond.fetchMintsActivity,
+      FF.pond.fetchMintActivity,
+      FF.pond.fetchActivityMints,
+      FF.pond.activityMints,
+      FF.pond.getMintActivity,
+      FF.pond.getActivityMints
+    ].filter(fn => typeof fn === 'function');
+    for (const fn of fns){
+      try { const out = await fn({ collection, limit, continuation }); if (out) return out; } catch {}
+    }
+    return null;
   }
 
-  function paint(rows){
-    var el = root(); if (!el) return;
-    if (!rows || !rows.length){ el.innerHTML = '<div class="pg-muted">No recent mints.</div>'; return; }
-    el.innerHTML = rows.map(liHTML).join('');
+  function ul(){ return document.getElementById(UL_ID); }
+  function applyVisibleRows(root){
+    if (!root) return;
+    root.classList.add('scrolling'); root.style.overflowY='auto';
+    const visible = Number(root.getAttribute('data-visible')) || Number(CFG.MINTS_VISIBLE || 6);
+    const r0 = root.querySelector('.row'); if (!r0){ root.style.maxHeight=''; return; }
+    const gap = parseFloat(getComputedStyle(root).gap || '0') || 0;
+    const h = r0.getBoundingClientRect().height || 84;
+    root.style.maxHeight = Math.round(h*visible + gap*(visible-1))+'px';
   }
 
-  function fetchPage(continuation){
-    var qs = new URLSearchParams({
-      collection: COLL,
-      types: 'mint',
-      limit: String(PAGE_SIZE)
-    });
-    if (continuation) qs.set('continuation', continuation);
-    return window.FF_RES_QUEUE.fetch(API + '?' + qs.toString());
+  function mapRow(a){
+    const tokenId = Number(a?.token?.tokenId);
+    if (!isFinite(tokenId)) return null;
+    const from = (a?.fromAddress || '').toLowerCase();
+    const zero = '0x0000000000000000000000000000000000000000';
+    const isMint = String(a?.type||'').toLowerCase()==='mint' || from===zero;
+    if (!isMint) return null;
+
+    const ts = a?.timestamp ?? a?.createdAt;
+    let dt = null;
+    if (typeof ts === 'number') dt = new Date(ts < 1e12 ? ts*1000 : ts);
+    else if (typeof ts === 'string'){ const p = Date.parse(ts); if (!isNaN(p)) dt = new Date(p); }
+    const tx = a?.txHash || a?.transactionHash || null;
+    return { id: tokenId, to: a?.toAddress || null, time: dt, img: imgFor(tokenId), tx };
   }
 
-  function load(){
-    var el = root(); if (!el) return;
-    el.innerHTML = '<div class="pg-muted">Loading…</div>';
-    fetchPage(null).then(function(j){
-      var rows = (j && j.activities) || [];
-      paint(rows);
-    }).catch(function(e){
-      console.warn('[mints-feed] failed', e);
-      el.innerHTML = '<div class="pg-muted">Failed to load mints.</div>';
-    });
+  async function fetchPage(cont){
+    const pond = await pondFetchMints({ collection: CFG.COLLECTION_ADDRESS, limit: PAGE_SIZE, continuation: cont });
+    if (pond){
+      const rows = (pond.activities || pond.rows || []).map(mapRow).filter(Boolean);
+      return { rows, continuation: pond.continuation || null };
+    }
+    const qs = new URLSearchParams({ collection: CFG.COLLECTION_ADDRESS, limit: String(PAGE_SIZE), types: 'mint' });
+    if (cont) qs.set('continuation', cont);
+    const json = await window.FF_RES_QUEUE.fetch(API + '?' + qs.toString());
+    const rows = (json?.activities || []).map(mapRow).filter(Boolean);
+    return { rows, continuation: json?.continuation || null };
   }
 
-  document.addEventListener('DOMContentLoaded', load);
+  // ---- Render + infinite scroll
+  let items=[], continuation=null, pageCount=0, loading=false, io=null;
+  function ensureSentinel(root){
+    let s = root.querySelector('li[data-sentinel]');
+    if (!s){ s=document.createElement('li'); s.setAttribute('data-sentinel','true'); s.className='row'; s.style.justifyContent='center'; s.innerHTML='<div class="pg-muted">Loading more…</div>'; root.appendChild(s); }
+    return s;
+  }
+  function setSentinelText(root, t){ const s=root.querySelector('li[data-sentinel]'); if (s) s.innerHTML = '<div class="pg-muted">'+t+'</div>'; }
+  function attachObserver(root){
+    if (io) io.disconnect();
+    const s = ensureSentinel(root);
+    io = new IntersectionObserver(entries=>{
+      const e=entries[0]; if (!e||!e.isIntersecting) return;
+      if (loading || !continuation || pageCount>=MAX_PAGES) return;
+      loadNextPage(root);
+    }, { root, rootMargin:'140px', threshold:0.01 });
+    io.observe(s);
+  }
 
+  function renderAll(root){
+    root.innerHTML='';
+    if (!items.length){
+      root.innerHTML = '<li class="row"><div class="pg-muted">No recent mints yet.</div></li>';
+    } else {
+      items.forEach(it=>{
+        const meta = [ it.to ? '→ '+shorten(it.to) : null, it.time ? ago(it.time) : null ].filter(Boolean).join(' • ');
+        const li = document.createElement('li'); li.className='row';
+        const href = txUrl(it.tx);
+        if (href){ li.title='View transaction on Etherscan'; li.addEventListener('click', ()=> window.open(href,'_blank','noopener')); }
+        else { li.addEventListener('click', ()=> FF.openFrogModal && FF.openFrogModal({ id: it.id })); }
+        li.innerHTML =
+          (FF.thumb64 ? FF.thumb64(it.img, 'Frog '+it.id) : '<img class="thumb64" src="'+it.img+'" alt="'+it.id+'">') +
+          '<div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b>Mint</b> • Frog #'+it.id+
+          '</div><div class="pg-muted">'+meta+(href?' • Etherscan':'')+'</div></div>';
+        root.appendChild(li);
+      });
+      ensureSentinel(root);
+      setSentinelText(root, (!continuation || pageCount>=MAX_PAGES) ? 'End of results' : 'Loading more…');
+    }
+    requestAnimationFrame(()=> applyVisibleRows(root));
+  }
+
+  async function loadFirstPage(root){
+    loading=true;
+    try{
+      const first = await fetchPage(null);
+      items = first.rows.sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
+      continuation = first.continuation; pageCount=1;
+      renderAll(root);
+      setTimeout(()=> attachObserver(root), 150);
+    }catch(e){
+      console.warn('[mints] failed', e, e.url ? '\nURL: '+e.url : '');
+      root.innerHTML = '<li class="row"><div class="pg-muted">Could not load recent mints.</div></li>';
+    }finally{ loading=false; }
+  }
+
+  async function loadNextPage(root){
+    if (!continuation || loading) return;
+    loading=true;
+    try{
+      const next = await fetchPage(continuation);
+      continuation = next.continuation; pageCount += 1;
+      items = items.concat(next.rows).sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
+      renderAll(root);
+    }catch(e){
+      console.warn('[mints] next page failed', e);
+      setSentinelText(root, 'Could not load more.');
+    }finally{ loading=false; }
+  }
+
+  window.FF_loadRecentMints = function(){
+    const root = ul(); if (!root) return;
+    loadFirstPage(root);
+  };
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
