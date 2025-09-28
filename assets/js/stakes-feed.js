@@ -137,12 +137,19 @@
     const thumb = (FF.thumb64 ? FF.thumb64(it.img, 'Frog '+it.id) : `<img class="thumb64" src="${it.img}" alt="${it.id}">`);
     const label = `<b>${it.kind==='stake' ? 'Staked' : 'Unstaked'}</b> • Frog #${it.id}`;
     const isNarrow = window.matchMedia('(max-width: 700px)').matches;
+    // Build "addr → controller • time • Etherscan"
+    const userAddr =
+      it.other || it.from || it.maker || it.owner || it.user || null;
+    const controllerAddr = (CFG && CFG.CONTROLLER_ADDRESS) ? CFG.CONTROLLER_ADDRESS : null;
+
+    const left  = userAddr ? shorten(userAddr) : '—';
+    const right = controllerAddr ? shorten(controllerAddr) : '—';
+
     const meta = [
-      it.other ? ('→ ' + (isNarrow ? shorten(it.other) : it.other)) : null,
+      `${left} → ${right}`,
       it.time ? ago(it.time) : null,
       href ? 'Etherscan' : null
     ].filter(Boolean).join(' • ');
-
 
     li.innerHTML = thumb + `<div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${label}</div><div class="pg-muted">${meta}</div></div>`;
     return li;

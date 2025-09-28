@@ -634,3 +634,9 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
   background:color-mix(in srgb, var(--ink) 8%, transparent);
   border-color:color-mix(in srgb, var(--ink) 28%, transparent);
 }
+/* Staking activity meta: single line with ellipsis if needed */
+#recentStakes .pg-muted{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
