@@ -461,11 +461,33 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
 #ownedModal .om-title { display:block } /* restored when non-empty */
 
 /* Media block for frog preview */
-#ownedModal .om-media{display:flex;align-items:center;gap:14px;margin:6px 0 12px 0}
-#ownedModal .om-media .om-thumb{width:72px;height:72px;border-radius:10px;border:1px solid var(--border);object-fit:cover;background:#111}
-#ownedModal .om-media .om-meta{display:flex;flex-direction:column}
-#ownedModal .om-media .om-name{font-weight:700;font-size:14px}
-#ownedModal .om-media .om-sub{color:var(--muted);font-size:12px}
+/* Owned modal — 128 × 128 frog + vertical media layout */
+#ownedModal .om-media{
+  display:flex;
+  flex-direction:column;       /* stack: image, then name/desc */
+  align-items:center;
+  justify-content:flex-start;
+  gap:14px;
+  margin:6px 0 12px 0;
+  text-align:center;
+}
+#ownedModal .om-media .om-thumb{
+  width:128px;
+  height:128px;
+  min-width:128px;
+  min-height:128px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  object-fit:cover;
+  background:#111;
+  image-rendering: pixelated;
+}
+#ownedModal .om-media .om-name{
+  font-weight:700;
+  font-size:14px;
+  margin-top:6px; /* put a little space under the image */
+}
+
 
 /* Body text tone like dashboard */
 #ownedModal .om-copy{color:var(--muted);font-size:13px;line-height:1.5}
