@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en" data-theme="t1">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fresh Frogs — Build Rarity Rankings (Natural-aware)</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <style>
+    .pg-wrap{ padding:20px; }
+    .pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); max-width:860px; margin:auto; }
+    .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
+    .pg-muted{ color:var(--muted); font-size:13px; }
+    .btn{ cursor:pointer; }
+    .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px; border:1px solid var(--border); border-radius:10px; margin-top:8px; }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+    progress{ width:100%; height:12px; }
+    .grid{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:10px; }
+    @media (max-width:880px){ .grid{ grid-template-columns: 1fr; } }
+    .field{ border:1px solid var(--border); border-radius:10px; padding:10px; }
+    .field label{ font-size:12px; color:var(--muted); display:block; margin-bottom:6px; }
+    .field input{ width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:8px; background:transparent; color:inherit; font-family:var(--font-ui); }
+    .toggles{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  </style>
+</head>
+<body>
+  <div class="pg-wrap">
+    <section class="pg-card">
+      <div class="pg-card-head">
+        <h3>Build Rarity Rankings</h3>
+        <button id="btnBuild" class="btn">Build Rankings</button>
+      </div>
+      <p class="pg-muted" style="margin:6px 0 12px 0; max-width:75ch;">
+        Fetches each frog’s <span class="mono">/frog/json/{id}.json</span>, computes rarity by trait frequencies, then adds extra weight
+        for <b>Natural</b> frogs and for <b>species + Natural</b> combos (e.g., <i>blueDartFrog + Natural</i>).
+        Outputs: <span class="mono">freshfrogs_rarity_rankings.json</span> and <span class="mono">freshfrogs_rank_lookup.json</span>.
+      </p>
+
+      <div class="grid">
+        <div class="field">
+          <label>Total Supply</label>
+          <input id="inpTotal" type="number" min="1" value="4040" class="mono">
+        </div>
+        <div class="field">
+          <label>Source Path (prefix for /frog)</label>
+          <input id="inpRoot" type="text" value="" class="mono" placeholder="/assets">
+        </div>
+        <div class="field">
+          <label>Max concurrent fetches</label>
+          <input id="inpConc" type="number" min="1" max="12" value="6" class="mono">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <div class="pg-muted">Base scoring</div>
+          <div class="mono" style="font-size:12px">
+            Score = Σ(1 / freq(trait=value)) + bonuses
+          </div>
+        </div>
+        <div class="toggles">
+          <label><input id="chkOneOfOneBonus" type="checkbox" checked> 1/1 bonus (+0.25 each)</label>
+          <label><input id="chkUltraRareBoost" type="checkbox" checked> ultra-rare boost (+0.10 each ≤0.5%)</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div style="flex:1">
+          <div class="pg-muted"><b>Natural weighting</b> (applies when a frog has “Natural” as a trait key or value)</div>
+          <div class="grid">
+            <div class="field">
+              <label>NATURAL_BASE_BONUS</label>
+              <input id="inpNaturalBase" type="number" step="0.01" value="0.60" class="mono">
+            </div>
+            <div class="field">
+              <label>NATURAL_FREQ_SCALE × (1 / freq(Natural))</label>
+              <input id="inpNaturalFreqScale" type="number" step="0.01" value="1.20" class="mono">
+            </div>
+            <div class="field">
+              <label>NATURAL_COMBO_WEIGHT × (1 / freq(species+Natural))</label>
+              <input id="inpNaturalCombo" type="number" step="0.01" value="2.00" class="mono">
+            </div>
+          </div>
+          <div class="grid" style="margin-top:10px">
+            <div class="field">
+              <label>UNIQUE_COMBO_BONUS (species+Natural appears once)</label>
+              <input id="inpUniqueCombo" type="number" step="0.01" value="0.75" class="mono">
+            </div>
+            <div class="field">
+              <label>Species keys to scan (comma-sep)</label>
+              <input id="inpSpeciesKeys" type="text" class="mono" value="species,type,base,frog,body">
+            </div>
+            <div class="field">
+              <label>Natural match (regex, case-insens.)</label>
+              <input id="inpNaturalRegex" type="text" class="mono" value="^natural$">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div style="flex:1">
+          <div class="pg-muted">Progress</div>
+          <progress id="prog" max="100" value="0"></progress>
+          <div id="status" class="mono pg-muted" style="margin-top:6px">Idle</div>
+        </div>
+      </div>
+
+      <div class="row" id="dlRow" style="display:none">
+        <div class="pg-muted">Downloads</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap">
+          <a id="dlRanks" class="btn" download="freshfrogs_rarity_rankings.json">freshfrogs_rarity_rankings.json</a>
+          <a id="dlLookup" class="btn" download="freshfrogs_rank_lookup.json">freshfrogs_rank_lookup.json</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function(){
+      'use strict';
+
+      var CFG = window.FF_CFG || {};
+      var btn = document.getElementById('btnBuild');
+      var statusEl = document.getElementById('status');
+      var prog = document.getElementById('prog');
+      var dlRow = document.getElementById('dlRow');
+      var aRanks = document.getElementById('dlRanks');
+      var aLookup = document.getElementById('dlLookup');
+
+      // defaults from FF_CFG if available
+      var inpTotal = document.getElementById('inpTotal');
+      var inpRoot  = document.getElementById('inpRoot');
+      var inpConc  = document.getElementById('inpConc');
+      inpTotal.value = Number(CFG.TOTAL_SUPPLY || 4040);
+      inpRoot.value  = String(CFG.SOURCE_PATH || '').replace(/\/+$/,'');
+
+      // natural controls
+      var inpNaturalBase      = document.getElementById('inpNaturalBase');
+      var inpNaturalFreqScale = document.getElementById('inpNaturalFreqScale');
+      var inpNaturalCombo     = document.getElementById('inpNaturalCombo');
+      var inpUniqueCombo      = document.getElementById('inpUniqueCombo');
+      var inpSpeciesKeys      = document.getElementById('inpSpeciesKeys');
+      var inpNaturalRegex     = document.getElementById('inpNaturalRegex');
+
+      function setStatus(t){ statusEl.textContent = t; }
+      function pct(n,d){ return d ? Math.round((n/d)*100) : 0; }
+      function getJSON(url){
+        return fetch(url, { headers: { accept: 'application/json' } })
+          .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status+' '+url); return r.json(); });
+      }
+
+      function normAttrs(j){
+        var out = [];
+        var arr = Array.isArray(j && j.attributes) ? j.attributes : [];
+        for (var i=0;i<arr.length;i++){
+          var a = arr[i] || {};
+          var k = a.key || a.trait_type || a.traitType || a.type || '';
+          var v = (a.value != null ? a.value : a.trait_value);
+          if (!k || v == null) continue;
+          out.push({k:String(k), v:String(v)});
+        }
+        return out;
+      }
+
+      function buildURLs(root, total){
+        var r = root ? root.replace(/\/+$/,'') : '';
+        var urls = [];
+        for (var id=1; id<=total; id++){
+          urls.push({ id:id, url: r + '/frog/json/' + id + '.json' });
+        }
+        return urls;
+      }
+
+      function fetchAll(urls, conc, onStep){
+        var out = new Array(urls.length);
+        var next = 0, inFlight = 0, done = 0;
+        return new Promise(function(resolve){
+          function pump(){
+            while (inFlight < conc && next < urls.length){
+              (function(ix){
+                inFlight++;
+                getJSON(urls[ix].url).then(function(j){
+                  out[ix] = { ok:true, id: urls[ix].id, json:j };
+                }).catch(function(){
+                  out[ix] = { ok:false, id: urls[ix].id, json:null };
+                }).finally(function(){
+                  inFlight--; done++;
+                  onStep && onStep(done, urls.length);
+                  if (done === urls.length) resolve(out);
+                  else pump();
+                });
+              })(next++);
+            }
+          }
+          pump();
+        });
+      }
+
+      function countFrequencies(rows){
+        var freq = Object.create(null);
+        for (var i=0;i<rows.length;i++){
+          var r = rows[i];
+          if (!r || !r.ok || !r.attrs) continue;
+          var seen = Object.create(null);
+          for (var j=0;j<r.attrs.length;j++){
+            var kv = r.attrs[j]; var key = kv.k+'|'+kv.v;
+            if (seen[key]) continue; seen[key] = true;
+            var tk = kv.k, tv = kv.v;
+            if (!freq[tk]) freq[tk] = Object.create(null);
+            freq[tk][tv] = (freq[tk][tv] || 0) + 1;
+          }
+        }
+        return freq;
+      }
+
+      // Detect Natural + species
+      function parseNaturalParams(){
+        var keys = (inpSpeciesKeys.value || 'species,type,base,frog,body')
+                    .split(',').map(function(s){return s.trim().toLowerCase();}).filter(Boolean);
+        var rx;
+        try { rx = new RegExp(inpNaturalRegex.value || '^natural$', 'i'); } catch(_){ rx = /^natural$/i; }
+        return { speciesKeys: keys, natRx: rx };
+      }
+      function hasNatural(attrs, natRx){
+        for (var i=0;i<attrs.length;i++){
+          var k = attrs[i].k||'', v = attrs[i].v||'';
+          if (natRx.test(k) || natRx.test(v)) return true;
+        }
+        return false;
+      }
+      function getSpecies(attrs, speciesKeys){
+        var best = null;
+        for (var i=0;i<attrs.length;i++){
+          var k = (attrs[i].k||'').toLowerCase();
+          if (speciesKeys.indexOf(k) !== -1){ best = String(attrs[i].v||'').trim(); break; }
+        }
+        return best;
+      }
+      function naturalStats(rows, params){
+        var freqNatural = 0;
+        var comboCounts = Object.create(null);
+        for (var i=0;i<rows.length;i++){
+          var r = rows[i]; if (!r || !r.ok) continue;
+          var attrs = r.attrs || [];
+          var nat   = hasNatural(attrs, params.natRx);
+          if (!nat){ r._nat = { has:false }; continue; }
+          freqNatural++;
+          var sp = getSpecies(attrs, params.speciesKeys);
+          if (sp){
+            var key = sp.toLowerCase() + '|NATURAL';
+            comboCounts[key] = (comboCounts[key] || 0) + 1;
+            r._nat = { has:true, species: sp, comboKey: key };
+          }else{
+            r._nat = { has:true, species: null, comboKey: null };
+          }
+        }
+        return { freqNatural: freqNatural, comboCounts: comboCounts };
+      }
+
+      function computeScores(rows, freq, total, flags, natParams, natWeights, natInfo){
+        var ULTRA_PCT = 0.005;
+
+        for (var i=0;i<rows.length;i++){
+          var r = rows[i]; if (!r || !r.ok) { rows[i] && (rows[i].score = -1); continue; }
+          var attrs = r.attrs || [];
+          var s = 0, oneOfOnes = 0, ultra = 0;
+
+          for (var j=0;j<attrs.length;j++){
+            var kv = attrs[j];
+            var f = (freq[kv.k] && freq[kv.k][kv.v]) || 0;
+            if (f > 0) s += 1 / f;
+            if (f === 1) oneOfOnes++;
+            if (f > 0 && (f/total) <= ULTRA_PCT) ultra++;
+          }
+
+          if (flags.oneOfOne && oneOfOnes > 0) s += oneOfOnes * 0.25;
+          if (flags.ultraRare && ultra > 0)   s += ultra * 0.10;
+
+          var n = r._nat || { has:false };
+          if (n.has){
+            if (natWeights.baseBonus) s += natWeights.baseBonus;
+            if (natInfo.freqNatural > 0 && natWeights.freqScale){
+              s += natWeights.freqScale * (1 / natInfo.freqNatural);
+            }
+            if (n.comboKey){
+              var c = natInfo.comboCounts[n.comboKey] || 0;
+              if (c > 0 && natWeights.comboWeight){
+                s += natWeights.comboWeight * (1 / c);
+              }
+              if (c === 1 && natWeights.uniqueComboBonus){
+                s += natWeights.uniqueComboBonus;
+              }
+            }
+          }
+
+          r.score = s;
+          r.rankHint = { oneOfOnes: oneOfOnes, ultra: ultra, traits: attrs.length, nat: !!n.has };
+        }
+        return rows;
+      }
+
+      function rankRows(rows){
+        var alive = rows.filter(function(r){ return r && r.ok; });
+        alive.sort(function(a,b){
+          if (b.score !== a.score) return b.score - a.score;
+          if (b.rankHint.oneOfOnes !== a.rankHint.oneOfOnes) return b.rankHint.oneOfOnes - a.rankHint.oneOfOnes;
+          if (b.rankHint.ultra !== a.rankHint.ultra) return b.rankHint.ultra - a.rankHint.ultra;
+          if (a.rankHint.traits !== b.rankHint.traits) return a.rankHint.traits - b.rankHint.traits;
+          return a.id - b.id;
+        });
+        for (var i=0;i<alive.length;i++){ alive[i].ranking = i+1; }
+        return alive;
+      }
+
+      function toDownloads(ranked){
+        var arr = ranked.map(function(r){ return { id:r.id, ranking:r.ranking, score:Number(r.score.toFixed(6)) }; });
+        var map = {};
+        for (var i=0;i<arr.length;i++){ map[String(arr[i].id)] = arr[i].ranking; }
+
+        function mk(name, obj){
+          var blob = new Blob([JSON.stringify(obj, null, 2)], {type:'application/json'});
+          var url = URL.createObjectURL(blob);
+          return { name:name, url:url };
+        }
+        return {
+          ranks: mk('freshfrogs_rarity_rankings.json', arr),
+          lookup: mk('freshfrogs_rank_lookup.json', map),
+        };
+      }
+
+      async function build(){
+        btn.disabled = true; dlRow.style.display='none';
+        var total = Math.max(1, Number(inpTotal.value||4040));
+        var root  = String(inpRoot.value||'').replace(/\/+$/,'');
+        var conc  = Math.max(1, Math.min(12, Number(inpConc.value||6)));
+        var flags = { oneOfOne: document.getElementById('chkOneOfOneBonus').checked,
+                      ultraRare: document.getElementById('chkUltraRareBoost').checked };
+
+        var natParams = (function(){
+          var keys = (inpSpeciesKeys.value || 'species,type,base,frog,body')
+                      .split(',').map(function(s){return s.trim().toLowerCase();}).filter(Boolean);
+          var rx; try{ rx = new RegExp(inpNaturalRegex.value || '^natural$', 'i'); }catch(_){ rx = /^natural$/i; }
+          return { speciesKeys: keys, natRx: rx };
+        })();
+        var natWeights = {
+          baseBonus: Number(inpNaturalBase.value || 0),
+          freqScale: Number(inpNaturalFreqScale.value || 0),
+          comboWeight: Number(inpNaturalCombo.value || 0),
+          uniqueComboBonus: Number(inpUniqueCombo.value || 0)
+        };
+
+        setStatus('Preparing…'); prog.value = 0;
+
+        var urls = buildURLs(root, total);
+        setStatus('Fetching metadata… 0/'+total);
+        var rows = await fetchAll(urls, conc, function(done, all){
+          prog.value = pct(done, all);
+          setStatus('Fetching metadata… '+done+'/'+all);
+        });
+
+        for (var i=0;i<rows.length;i++){
+          if (!rows[i]) continue;
+          rows[i].attrs = normAttrs(rows[i].json || {});
+        }
+
+        setStatus('Counting trait frequencies…');
+        var freq = countFrequencies(rows);
+
+        setStatus('Analyzing Natural & combos…');
+        var natInfo = naturalStats(rows, natParams);
+
+        setStatus('Scoring…');
+        computeScores(rows, freq, total, flags, natParams, natWeights, natInfo);
+
+        setStatus('Ranking…');
+        var ranked = rankRows(rows);
+
+        var packs = toDownloads(ranked);
+        aRanks.href = packs.ranks.url;
+        aLookup.href = packs.lookup.url;
+        dlRow.style.display = '';
+        setStatus('Done! Download your JSON files.');
+      }
+
+      btn.addEventListener('click', function(){
+        build().catch(function(e){
+          console.error(e);
+          setStatus('Failed: '+(e && e.message || e));
+          btn.disabled = false;
+        }).finally(function(){
+          btn.disabled = false;
+        });
+      });
+
+      function setStatus(t){ statusEl.textContent = t; }
+
+      document.addEventListener('DOMContentLoaded', function(){
+        if (CFG.TOTAL_SUPPLY) inpTotal.value = Number(CFG.TOTAL_SUPPLY);
+        if (CFG.SOURCE_PATH)  inpRoot.value  = String(CFG.SOURCE_PATH).replace(/\/+$/,'');
+      });
+    })();
+  </script>
+</body>
+</html>
