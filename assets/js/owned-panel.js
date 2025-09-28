@@ -1,7 +1,8 @@
 // assets/js/owned-panel.js
 // Renders: Owned + Staked. Owned IDs from Reservoir; Staked IDs from controller.
 // Metadata from frog/json/{id}.json. Attribute bullets. Header shows Owned • Staked • Unclaimed Rewards.
-// Includes: 128×128 modal images, approve/stake/unstake/transfer panels, disabled transfer on staked, rarity sort.
+// Includes: 128×128 modal images, approve/stake/unstake/transfer panels, disabled transfer on staked,
+// rarity sort (lowest rank first) + colored rarity pill.
 
 (function (FF, CFG) {
   'use strict';
@@ -96,6 +97,23 @@
 
 /* Disabled buttons */
 .btn[disabled], .btn-disabled{opacity:.45;pointer-events:none;filter:grayscale(.8)}
+
+/* Rank rarity colors */
+.rank-pill{
+  display:inline-flex; align-items:center; gap:6px;
+  border:1px solid var(--border); border-radius:999px; padding:3px 8px;
+  font-size:11px; font-weight:700; letter-spacing:.01em;
+  background:color-mix(in srgb, var(--panel) 35%, transparent);
+}
+.rank-pill::before{ content:'◆'; font-size:12px; line-height:1; }
+.rank-legendary{ color:#f59e0b; border-color: color-mix(in srgb, #f59e0b 70%, var(--border)); }
+.rank-legendary::before{ color:#f59e0b; }
+.rank-epic{ color:#a855f7; border-color: color-mix(in srgb, #a855f7 70%, var(--border)); }
+.rank-epic::before{ color:#a855f7; }
+.rank-rare{ color:#38bdf8; border-color: color-mix(in srgb, #38bdf8 70%, var(--border)); }
+.rank-rare::before{ color:#38bdf8; }
+.rank-common{ color:inherit; border-color:var(--border); }
+.rank-common::before{ color:var(--muted); }
     `;
     const el=document.createElement('style'); el.id='owned-clean-css'; el.textContent=css; document.head.appendChild(el);
   })();
@@ -149,7 +167,7 @@
     return s+'s ago';
   }
 
-  // --- Rarity sort helpers (lower rank number = rarer) ---
+  // --- Rarity helpers (lower rank # = rarer) ---
   function rarityVal(x){
     const r = Number((x && x.rank) ?? Infinity);
     return Number.isFinite(r) ? r : Infinity;
@@ -158,6 +176,14 @@
     const ra=rarityVal(a), rb=rarityVal(b);
     if (ra !== rb) return ra - rb;                 // rarer first
     return (a.id||0) - (b.id||0);                  // tie-break by id
+  }
+  function rankTier(rank){
+    if (!Number.isFinite(rank)) return 'common';
+    const T = (CFG.RARITY_TIERS) || { legendary: 50, epic: 250, rare: 800 };
+    if (rank <= T.legendary) return 'legendary';
+    if (rank <= T.epic)      return 'epic';
+    if (rank <= T.rare)      return 'rare';
+    return 'common';
   }
 
   // --- Minimal themed modal ---
@@ -562,7 +588,6 @@
               await sendTransfer(owner, to, tokenId);
               toast(`Transfer sent for #${tokenId}`);
               closeModal();
-              // Optimistic remove if it was an owned (unstaked) frog
               const idx = items.findIndex(x=>x.id===tokenId && !x.staked);
               if (idx>=0){ items.splice(idx,1); }
               items.sort(compareByRarity);
@@ -639,8 +664,9 @@
       card.setAttribute('data-token-id', String(it.id));
       if (it.staked) card.setAttribute('data-staked','1');
 
-      const rankPill = (Number.isFinite(it.rank))
-        ? ` <span class="pill">Rank #${it.rank}</span>`
+      const tier = Number.isFinite(it.rank) ? rankTier(it.rank) : 'common';
+      const rankPill = Number.isFinite(it.rank)
+        ? ` <span class="rank-pill rank-${tier}">#${it.rank}</span>`
         : '';
 
       const attrs = attrsHTML(it.attrs, 4);
@@ -748,7 +774,7 @@
             .filter(m=> !items.some(x=> x.id===m.id))
             .map(m=> ({ id:m.id, attrs:m.attrs, staked: stakedIds.includes(m.id), sinceMs:null, rank:(FF.RANKS||{})[String(m.id)] }));
           items = items.concat(more);
-          items.sort(compareByRarity);             // keep order by rarity as more load
+          items.sort(compareByRarity);
           for (const it of more){
             if (it.staked){
               try{
