@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fresh Frogs — Build Rarity Rankings (Natural-aware)</title>
+  <title>Fresh Frogs — Build Rarity Rankings (Natural whitelist)</title>
   <link rel="stylesheet" href="assets/css/styles.css" />
   <style>
     .pg-wrap{ padding:20px; }
@@ -31,9 +31,9 @@
         <button id="btnBuild" class="btn">Build Rankings</button>
       </div>
       <p class="pg-muted" style="margin:6px 0 12px 0; max-width:75ch;">
-        Fetches each frog’s <span class="mono">/frog/json/{id}.json</span>, computes rarity by trait frequencies, then adds extra weight
-        for <b>Natural</b> frogs and for <b>species + Natural</b> combos (e.g., <i>blueDartFrog + Natural</i>).
-        Outputs: <span class="mono">freshfrogs_rarity_rankings.json</span> and <span class="mono">freshfrogs_rank_lookup.json</span>.
+        Computes rarity by trait frequencies, then (optionally) adds extra weight for specific
+        <b>species + Natural</b> combos only. No bonus for “Natural” alone.
+        Outputs <span class="mono">freshfrogs_rarity_rankings.json</span> and <span class="mono">freshfrogs_rank_lookup.json</span>.
       </p>
 
       <div class="grid">
@@ -66,15 +66,15 @@
 
       <div class="row">
         <div style="flex:1">
-          <div class="pg-muted"><b>Natural weighting</b> (applies when a frog has “Natural” as a trait key or value)</div>
+          <div class="pg-muted"><b>Natural combo weighting (whitelist only)</b></div>
           <div class="grid">
             <div class="field">
-              <label>NATURAL_BASE_BONUS</label>
-              <input id="inpNaturalBase" type="number" step="0.01" value="0.60" class="mono">
+              <label>NATURAL_BASE_BONUS (set 0 to disable)</label>
+              <input id="inpNaturalBase" type="number" step="0.01" value="0" class="mono">
             </div>
             <div class="field">
-              <label>NATURAL_FREQ_SCALE × (1 / freq(Natural))</label>
-              <input id="inpNaturalFreqScale" type="number" step="0.01" value="1.20" class="mono">
+              <label>NATURAL_FREQ_SCALE × (1 / freq(Natural)) (set 0 to disable)</label>
+              <input id="inpNaturalFreqScale" type="number" step="0.01" value="0" class="mono">
             </div>
             <div class="field">
               <label>NATURAL_COMBO_WEIGHT × (1 / freq(species+Natural))</label>
@@ -93,6 +93,13 @@
             <div class="field">
               <label>Natural match (regex, case-insens.)</label>
               <input id="inpNaturalRegex" type="text" class="mono" value="^natural$">
+            </div>
+          </div>
+          <div class="grid" style="margin-top:10px">
+            <div class="field" style="grid-column:1 / -1">
+              <label>Natural Species Whitelist (exact values, comma-sep; case-insensitive)</label>
+              <input id="inpNaturalWhitelist" type="text" class="mono"
+                     value="grayTreeFrog, lightBrownTreeFrog, redEyedTreeFrog, splendidLeafFrog, strawberryDartFrog, stawberryDartFrog, blueDartFrog, goldenDartFrog, unknown">
             </div>
           </div>
         </div>
@@ -128,20 +135,19 @@
       var aRanks = document.getElementById('dlRanks');
       var aLookup = document.getElementById('dlLookup');
 
-      // defaults from FF_CFG if available
       var inpTotal = document.getElementById('inpTotal');
       var inpRoot  = document.getElementById('inpRoot');
       var inpConc  = document.getElementById('inpConc');
       inpTotal.value = Number(CFG.TOTAL_SUPPLY || 4040);
       inpRoot.value  = String(CFG.SOURCE_PATH || '').replace(/\/+$/,'');
 
-      // natural controls
       var inpNaturalBase      = document.getElementById('inpNaturalBase');
       var inpNaturalFreqScale = document.getElementById('inpNaturalFreqScale');
       var inpNaturalCombo     = document.getElementById('inpNaturalCombo');
       var inpUniqueCombo      = document.getElementById('inpUniqueCombo');
       var inpSpeciesKeys      = document.getElementById('inpSpeciesKeys');
       var inpNaturalRegex     = document.getElementById('inpNaturalRegex');
+      var inpNaturalWhitelist = document.getElementById('inpNaturalWhitelist');
 
       function setStatus(t){ statusEl.textContent = t; }
       function pct(n,d){ return d ? Math.round((n/d)*100) : 0; }
@@ -214,13 +220,13 @@
         return freq;
       }
 
-      // Detect Natural + species
       function parseNaturalParams(){
         var keys = (inpSpeciesKeys.value || 'species,type,base,frog,body')
                     .split(',').map(function(s){return s.trim().toLowerCase();}).filter(Boolean);
-        var rx;
-        try { rx = new RegExp(inpNaturalRegex.value || '^natural$', 'i'); } catch(_){ rx = /^natural$/i; }
-        return { speciesKeys: keys, natRx: rx };
+        var rx; try { rx = new RegExp(inpNaturalRegex.value || '^natural$', 'i'); } catch(_){ rx = /^natural$/i; }
+        var wl = (inpNaturalWhitelist.value || '')
+                  .split(',').map(function(s){return s.trim().toLowerCase();}).filter(Boolean);
+        return { speciesKeys: keys, natRx: rx, whitelist: wl };
       }
       function hasNatural(attrs, natRx){
         for (var i=0;i<attrs.length;i++){
@@ -237,22 +243,22 @@
         }
         return best;
       }
+
       function naturalStats(rows, params){
         var freqNatural = 0;
-        var comboCounts = Object.create(null);
+        var comboCounts = Object.create(null); // key: species|NATURAL -> count
         for (var i=0;i<rows.length;i++){
           var r = rows[i]; if (!r || !r.ok) continue;
           var attrs = r.attrs || [];
           var nat   = hasNatural(attrs, params.natRx);
-          if (!nat){ r._nat = { has:false }; continue; }
-          freqNatural++;
-          var sp = getSpecies(attrs, params.speciesKeys);
-          if (sp){
+          var sp    = getSpecies(attrs, params.speciesKeys);
+          if (nat) freqNatural++;
+          if (nat && sp){
             var key = sp.toLowerCase() + '|NATURAL';
             comboCounts[key] = (comboCounts[key] || 0) + 1;
             r._nat = { has:true, species: sp, comboKey: key };
           }else{
-            r._nat = { has:true, species: null, comboKey: null };
+            r._nat = { has: !!nat, species: sp || null, comboKey: null };
           }
         }
         return { freqNatural: freqNatural, comboCounts: comboCounts };
@@ -260,6 +266,7 @@
 
       function computeScores(rows, freq, total, flags, natParams, natWeights, natInfo){
         var ULTRA_PCT = 0.005;
+        var wl = natParams.whitelist || [];
 
         for (var i=0;i<rows.length;i++){
           var r = rows[i]; if (!r || !r.ok) { rows[i] && (rows[i].score = -1); continue; }
@@ -277,25 +284,24 @@
           if (flags.oneOfOne && oneOfOnes > 0) s += oneOfOnes * 0.25;
           if (flags.ultraRare && ultra > 0)   s += ultra * 0.10;
 
+          // Natural-aware: ONLY species in whitelist get combo/unique bonuses.
           var n = r._nat || { has:false };
-          if (n.has){
-            if (natWeights.baseBonus) s += natWeights.baseBonus;
-            if (natInfo.freqNatural > 0 && natWeights.freqScale){
-              s += natWeights.freqScale * (1 / natInfo.freqNatural);
+          var sp = (n.species || '').toLowerCase();
+          var allowCombo = (n.has === true) && sp && (wl.indexOf(sp) !== -1);
+
+          // Ignore baseBonus/freqScale entirely unless you purposely set them > 0.
+          if (allowCombo && n.comboKey){
+            var c = natInfo.comboCounts[n.comboKey] || 0;
+            if (c > 0 && natWeights.comboWeight){
+              s += natWeights.comboWeight * (1 / c);
             }
-            if (n.comboKey){
-              var c = natInfo.comboCounts[n.comboKey] || 0;
-              if (c > 0 && natWeights.comboWeight){
-                s += natWeights.comboWeight * (1 / c);
-              }
-              if (c === 1 && natWeights.uniqueComboBonus){
-                s += natWeights.uniqueComboBonus;
-              }
+            if (c === 1 && natWeights.uniqueComboBonus){
+              s += natWeights.uniqueComboBonus;
             }
           }
 
           r.score = s;
-          r.rankHint = { oneOfOnes: oneOfOnes, ultra: ultra, traits: attrs.length, nat: !!n.has };
+          r.rankHint = { oneOfOnes: oneOfOnes, ultra: ultra, traits: attrs.length, nat: allowCombo };
         }
         return rows;
       }
@@ -315,18 +321,13 @@
 
       function toDownloads(ranked){
         var arr = ranked.map(function(r){ return { id:r.id, ranking:r.ranking, score:Number(r.score.toFixed(6)) }; });
-        var map = {};
-        for (var i=0;i<arr.length;i++){ map[String(arr[i].id)] = arr[i].ranking; }
-
+        var map = {}; for (var i=0;i<arr.length;i++){ map[String(arr[i].id)] = arr[i].ranking; }
         function mk(name, obj){
           var blob = new Blob([JSON.stringify(obj, null, 2)], {type:'application/json'});
-          var url = URL.createObjectURL(blob);
-          return { name:name, url:url };
+          var url = URL.createObjectURL(blob); return { name:name, url:url };
         }
-        return {
-          ranks: mk('freshfrogs_rarity_rankings.json', arr),
-          lookup: mk('freshfrogs_rank_lookup.json', map),
-        };
+        return { ranks: mk('freshfrogs_rarity_rankings.json', arr),
+                 lookup: mk('freshfrogs_rank_lookup.json', map) };
       }
 
       async function build(){
@@ -337,15 +338,10 @@
         var flags = { oneOfOne: document.getElementById('chkOneOfOneBonus').checked,
                       ultraRare: document.getElementById('chkUltraRareBoost').checked };
 
-        var natParams = (function(){
-          var keys = (inpSpeciesKeys.value || 'species,type,base,frog,body')
-                      .split(',').map(function(s){return s.trim().toLowerCase();}).filter(Boolean);
-          var rx; try{ rx = new RegExp(inpNaturalRegex.value || '^natural$', 'i'); }catch(_){ rx = /^natural$/i; }
-          return { speciesKeys: keys, natRx: rx };
-        })();
+        var natParams = parseNaturalParams();
         var natWeights = {
-          baseBonus: Number(inpNaturalBase.value || 0),
-          freqScale: Number(inpNaturalFreqScale.value || 0),
+          baseBonus: Number(inpNaturalBase.value || 0),        // left in for completeness (defaults 0)
+          freqScale: Number(inpNaturalFreqScale.value || 0),   // left in for completeness (defaults 0)
           comboWeight: Number(inpNaturalCombo.value || 0),
           uniqueComboBonus: Number(inpUniqueCombo.value || 0)
         };
@@ -392,8 +388,6 @@
           btn.disabled = false;
         });
       });
-
-      function setStatus(t){ statusEl.textContent = t; }
 
       document.addEventListener('DOMContentLoaded', function(){
         if (CFG.TOTAL_SUPPLY) inpTotal.value = Number(CFG.TOTAL_SUPPLY);
