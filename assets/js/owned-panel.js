@@ -179,6 +179,19 @@
     return s+'s ago';
   }
 
+  // Map numeric rank to a color tier
+  function rankTier(rank){
+    if (!Number.isFinite(rank)) return 'common';
+    // Defaults; tweak or move to CFG if you like
+    const size = Number(CFG.COLLECTION_SIZE || 4040);
+    const T = CFG.RARITY_TIERS || { legendary: 50, epic: 250, rare: 800 }; // top-N cutoffs
+    if (rank <= T.legendary) return 'legendary';         // most rare → orange
+    if (rank <= T.epic)      return 'epic';              // next → purple
+    if (rank <= T.rare)      return 'rare';              // next → blue
+    return 'common';                                      // rest → default
+  }
+
+
   // --- Minimal themed modal ---
   function ensureOwnedModalRoot(){
     let m = document.getElementById('ownedModal');
@@ -664,7 +677,11 @@
       card.setAttribute('data-token-id', String(it.id));
       if (it.staked) card.setAttribute('data-staked','1');
 
-      const rankPill = (it.rank || it.rank === 0) ? ` <span class="pill">Rank #${it.rank}</span>` : '';
+      const tier = Number.isFinite(it.rank) ? rankTier(it.rank) : 'common';
+      const rankPill = Number.isFinite(it.rank)
+        ? ` <span class="rank-pill rank-${tier}">#${it.rank}</span>`
+        : '';
+
       const attrs = attrsHTML(it.attrs, 4);
 
       const disabledAttrs = it.staked ? ' disabled aria-disabled="true" title="Unstake before transferring"' : '';
