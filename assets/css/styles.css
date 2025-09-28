@@ -461,33 +461,11 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
 #ownedModal .om-title { display:block } /* restored when non-empty */
 
 /* Media block for frog preview */
-/* Owned modal — 128 × 128 frog + vertical media layout */
-#ownedModal .om-media{
-  display:flex;
-  flex-direction:column;       /* stack: image, then name/desc */
-  align-items:center;
-  justify-content:flex-start;
-  gap:14px;
-  margin:6px 0 12px 0;
-  text-align:center;
-}
-#ownedModal .om-media .om-thumb{
-  width:128px;
-  height:128px;
-  min-width:128px;
-  min-height:128px;
-  border-radius:12px;
-  border:1px solid var(--border);
-  object-fit:cover;
-  background:#111;
-  image-rendering: pixelated;
-}
-#ownedModal .om-media .om-name{
-  font-weight:700;
-  font-size:14px;
-  margin-top:6px; /* put a little space under the image */
-}
-
+#ownedModal .om-media{display:flex;align-items:center;gap:14px;margin:6px 0 12px 0}
+#ownedModal .om-media .om-thumb{width:72px;height:72px;border-radius:10px;border:1px solid var(--border);object-fit:cover;background:#111}
+#ownedModal .om-media .om-meta{display:flex;flex-direction:column}
+#ownedModal .om-media .om-name{font-weight:700;font-size:14px}
+#ownedModal .om-media .om-sub{color:var(--muted);font-size:12px}
 
 /* Body text tone like dashboard */
 #ownedModal .om-copy{color:var(--muted);font-size:13px;line-height:1.5}
@@ -655,43 +633,4 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
 .btn-outline-gray:hover{
   background:color-mix(in srgb, var(--ink) 8%, transparent);
   border-color:color-mix(in srgb, var(--ink) 28%, transparent);
-}
-/* freshfrogs modal tweaks */
-.ff-frog-head {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: .5rem;
-  margin-bottom: .5rem;
-}
-
-.ff-frog-128 {
-  width: 128px; height: 128px;
-  image-rendering: pixelated; /* keep that crisp pixel-art look */
-  border-radius: 6px;
-  box-shadow: 0 0 0 1px var(--border) inset;
-}
-
-.ff-frog-name {
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: var(--text-strong, #fff);
-  text-align: center;
-}
-
-.ff-frog-desc {
-  margin: .25rem 0 .75rem;
-  color: var(--text-muted, #b6b6b6);
-  font-size: 0.9rem;
-  line-height: 1.35;
-}
-
-.ff-modal-actions {
-  display: flex;
-  gap: .5rem;
-  margin-top: .5rem;
-}
-
-.ff-modal-actions .btn {
-  min-width: 7rem;
 }
