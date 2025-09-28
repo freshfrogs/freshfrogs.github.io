@@ -161,6 +161,10 @@
             </div>
             <div class="in">Earnings token</div>
           </div>
+          <div class="kpi">
+            <div class="kpi-label">$FLYZ claimed (community total)</div>
+            <div class="kpi-value" id="kpiFlyzTotal">—</div>
+          </div>
 
         </div>
 
@@ -228,6 +232,13 @@
 <script>
   if (window.FF_loadRecentStakes) FF_loadRecentStakes();
   if (window.FF_initOwnedPanel)   FF_initOwnedPanel();
+</script>
+<script src="assets/js/community-flyz.js" defer></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const el = document.getElementById('kpiFlyzTotal');
+    if (window.FF?.communityFLYZ) FF.communityFLYZ.refresh(el);
+  });
 </script>
 
 </body>
