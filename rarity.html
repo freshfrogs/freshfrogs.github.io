@@ -1,214 +1,244 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="t1">
 <head>
   <meta charset="utf-8" />
-  <title>FreshFrogs — Rarity Rankings</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- If you have a shared stylesheet with index.html, include it here -->
+  <title>freshfrogs.github.io — Rarity</title>
+
+  <link rel="stylesheet" href="assets/css/styles.css" />
+
   <style>
-    :root { color-scheme: dark; }
-    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; background:#0b0b0f; color:#eaeaf2; }
-    header { position: sticky; top: 0; z-index: 10; background: linear-gradient(180deg, rgba(11,11,15,.95), rgba(11,11,15,.75)); backdrop-filter: blur(6px); border-bottom: 1px solid rgba(255,255,255,.06); }
-    .wrap { max-width: 1100px; margin: 0 auto; padding: 16px; }
-    .titlebar { display:flex; align-items:center; gap:16px; }
-    .titlebar h1 { font-size: 1.25rem; margin: 0; letter-spacing:.2px; }
-    .searchbar { margin-top: 12px; display:flex; gap:8px; }
-    .searchbar input { flex:1; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:#11131a; color:#eaeaf2; }
-    .btn { padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:#141722; color:#fff; cursor:pointer; }
-    .btn:hover { background:#1a1f2d; }
-    main .list { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:14px; padding: 18px 16px 90px; }
-    .card { border:1px solid rgba(255,255,255,.08); background:#10131b; border-radius:14px; overflow:hidden; display:flex; flex-direction:column; }
-    .thumb { aspect-ratio: 1/1; background:#0e1118; display:grid; place-items:center; font-size: 14px; color:#7b7f93; }
-    .thumb img { width:100%; height:100%; object-fit:cover; display:block; }
-    .meta { padding:12px; display:grid; gap:6px; }
-    .row { display:flex; justify-content:space-between; font-size:.95rem; }
-    .id { color:#aab0c5; }
-    .pill { font-size:.8rem; padding:4px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:#121523; color:#cad0e8; }
-    .loadmore { display:flex; justify-content:center; padding: 8px 0 28px; }
-    .hidden { display:none !important; }
-    .footerpad { height: 30vh; }
-    .muted { color:#8b90a6; font-size:.9rem; }
+    /* Base */
+    .pg-wrap{ padding:20px; }
+    img{ image-rendering: pixelated; image-rendering: crisp-edges; }
+
+    .pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
+    .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
+    .pg-muted{ color:var(--muted); font-size:13px; }
+
+    .list{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+    .row{ display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center; padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
+    .thumb64{ width:64px; height:64px; min-width:64px; min-height:64px; border-radius:10px; object-fit:contain; background:var(--panel-2); }
+
+    /* Centered single-panel layout (fixed width) */
+    :root{ --panel-width: 640px; }
+    .center-wrap{ display:grid; gap:16px; justify-items:center; }
+    .centered-card{ width: min(var(--panel-width), 100%); }
+
+    /* Hero (centered) */
+    .frog-hero{ margin:28px auto 38px; width: min(var(--panel-width), 100%); }
+    .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
+    .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
+    .frog-strip .tile{ flex:0 0 auto; width:64px; height:64px; border-radius:10px; }
+    .frog-strip .tile.hide{ display:none !important; }
+    .frog-strip img{ width:64px; height:64px; object-fit:contain; }
+    @media (max-width:520px){ .frog-hero{ margin:22px auto 30px; } .frog-strip{ gap:10px; } }
+
+    /* Info blocks */
+    .info-grid-2{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:10px; margin-bottom:10px; }
+    @media (max-width:900px){ .info-grid-2{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    @media (max-width:520px){ .info-grid-2{ grid-template-columns: 1fr; } }
+    .info-block{ border:1px solid var(--border); border-radius:12px; padding:10px; background:var(--panel); }
+    .info-block .ik{ font-size:11px; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; }
+    .info-block .iv{ font-weight:900; font-size:18px; line-height:1.1; margin-top:4px; }
+    .info-block .in{ font-size:12px; color:var(--muted); }
+
+    /* Rank pill colors (Legendary / Epic / Rare / Common) */
+    .rank-pill{
+      display:inline-flex; align-items:center; gap:6px;
+      border:1px solid var(--border); border-radius:999px; padding:4px 10px;
+      font-size:11px; font-weight:800; letter-spacing:.02em;
+      background: color-mix(in srgb, var(--panel) 35%, transparent);
+    }
+    .rank-pill::before{ content:'◆'; font-size:12px; line-height:1; }
+    .rank-legendary{ color:#f59e0b; border-color: color-mix(in srgb, #f59e0b 70%, var(--border)); }
+    .rank-legendary::before{ color:#f59e0b; }
+    .rank-epic{ color:#a855f7; border-color: color-mix(in srgb, #a855f7 70%, var(--border)); }
+    .rank-epic::before{ color:#a855f7; }
+    .rank-rare{ color:#38bdf8; border-color: color-mix(in srgb, #38bdf8 70%, var(--border)); }
+    .rank-rare::before{ color:#38bdf8; }
+    .rank-common{ color:inherit; border-color: var(--border); }
+    .rank-common::before{ color:var(--muted); }
+
+    /* Scrollable list (optional: limit visible rows via data-visible) */
+    #rarityList.scrolling{ overflow-y:auto; -webkit-overflow-scrolling:touch; padding-right:4px; }
+    @media (hover:hover){
+      #rarityList.scrolling::-webkit-scrollbar{ width:8px; }
+      #rarityList.scrolling::-webkit-scrollbar-thumb{ background: color-mix(in srgb, var(--muted) 35%, transparent); border-radius:8px; }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <div class="wrap">
-      <div class="titlebar">
-        <h1>Rarity Rankings</h1>
-        <span class="muted">From most rare → less rare</span>
-      </div>
-      <div class="searchbar">
-        <input id="query" placeholder="Search by Rank (e.g. 1) or ID (e.g. 3090)" />
-        <button class="btn" id="searchBtn">Search</button>
-        <button class="btn" id="resetBtn">Reset</button>
-      </div>
-    </div>
-  </header>
+  <div class="pg-wrap container">
+    <div class="center-wrap">
 
-  <main>
-    <div class="wrap">
-      <div id="count" class="muted">Loading...</div>
+      <!-- HERO -->
+      <section class="frog-hero">
+        <h1 class="frog-title">freshfrogs.github.io</h1>
+        <div class="frog-strip">
+          <div class="tile"><img src="frog/12.png"  alt="12"></div>
+          <div class="tile"><img src="frog/77.png"  alt="77"></div>
+          <div class="tile"><img src="frog/404.png" alt="404"></div>
+          <div class="tile"><img src="frog/256.png" alt="256"></div>
+          <div class="tile"><img src="frog/999.png" alt="999"></div>
+          <div class="tile"><img src="frog/1.png"   alt="1"></div>
+        </div>
+      </section>
+
+      <!-- Fresh Frogs NFT -->
+      <section class="pg-card centered-card">
+        <div class="pg-card-head"><h3>Fresh Frogs NFT</h3></div>
+        <p class="pg-muted" style="margin:6px 0 12px 0; max-width:70ch;">
+          Pixel-perfect frogs hopping around the Ethereum pond. Mint, stake to earn FLYZ, and explore the collection’s quirks and traits.
+        </p>
+
+        <div class="info-grid-2">
+          <div class="info-block"><div class="ik">🐸 Supply</div><div class="iv">4,040</div><div class="in">Total tokens</div></div>
+          <div class="info-block"><div class="ik">⛓️ Chain</div><div class="iv">Ethereum</div><div class="in">ERC-721</div></div>
+          <div class="info-block"><div class="ik">🎧 Royalty</div><div class="iv">5%</div><div class="in">Secondary sales</div></div>
+          <div class="info-block"><div class="ik">🪙 Mint</div><div class="iv">0.01 ETH</div><div class="in">Per frog</div></div>
+        </div>
+
+        <!-- Rarity Rankings -->
+        <div class="pg-card-head" style="margin-top:10px;"><h3>Rarity Rankings</h3></div>
+        <ul id="rarityList" class="list" aria-live="polite" data-visible="10">
+          <li class="row"><div class="pg-muted">Loading rarity…</div></li>
+        </ul>
+      </section>
     </div>
-    <section class="list" id="list"></section>
-    <div class="loadmore">
-      <button class="btn" id="loadMoreBtn">Load more</button>
-    </div>
-    <div class="footerpad"></div>
-  </main>
+  </div>
 
   <script>
-    // ---- Configuration you may want to align with index.html ----
-    function buildImageUrl(id) {
-      // TODO: adjust this to your actual image path/template:
-      // return `./images/${id}.png`;
-      // or IPFS, or CDN
-      return `https://picsum.photos/seed/frog-${id}/600`; // placeholder so layout works
+    /* Keep whole 64px tiles only (hero strip) */
+    function layoutFrogStrip(){
+      var strip = document.querySelector('.frog-strip'); if(!strip) return;
+      var tiles = Array.prototype.slice.call(strip.querySelectorAll('.tile'));
+      var styles = window.getComputedStyle(strip);
+      var gap = parseFloat(styles.gap || 12) || 12;
+      var tileW = 64, innerW = strip.clientWidth;
+      var count = Math.max(1, Math.floor((innerW + gap) / (tileW + gap)));
+      tiles.forEach(function(t,i){ t.classList.toggle('hide', i >= count); });
     }
+    window.addEventListener('resize', layoutFrogStrip);
+    document.addEventListener('DOMContentLoaded', layoutFrogStrip);
+  </script>
 
-    const RANKINGS_URL = 'assets/freshfrogs_rarity_rankings.json';
-    const RANK_LOOKUP_URL = 'assets/freshfrogs_rank_lookup.json';
+  <!-- Shared libs (same order as index.html) -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/rarity.js"></script>
+  <script src="assets/js/modal.js"></script>
+  <script src="assets/js/pond.js"></script>
 
-    const state = {
-      rankings: [],        // full array: [{ id, rarity, type, ranking }]
-      lookup: {},          // id -> rank (if needed)
-      page: 0,
-      pageSize: 36,
-      filtered: null       // array when searching
-    };
+  <script>
+    (function(){
+      var CFG = window.FF_CFG || {};
+      var ROOT = String(CFG.SOURCE_PATH || '').replace(/\/+$/,'') || '';
+      var TOTAL = Number(CFG.TOTAL_SUPPLY || 4040);
 
-    const els = {
-      list: document.getElementById('list'),
-      count: document.getElementById('count'),
-      loadMore: document.getElementById('loadMoreBtn'),
-      query: document.getElementById('query'),
-      searchBtn: document.getElementById('searchBtn'),
-      resetBtn: document.getElementById('resetBtn')
-    };
-
-    async function boot() {
-      const [rankings, lookup] = await Promise.all([
-        fetch(RANKINGS_URL).then(r => r.json()),
-        fetch(RANK_LOOKUP_URL).then(r => r.json()).catch(() => ({}))
-      ]);
-
-      // Defensive: ensure sorted by 'ranking' ascending
-      rankings.sort((a, b) => a.ranking - b.ranking);
-
-      state.rankings = rankings;
-      state.lookup = lookup || {};
-      state.page = 0;
-
-      renderCount();
-      renderNextPage();
-    }
-
-    function dataSource() {
-      return state.filtered ?? state.rankings;
-    }
-
-    function renderCount() {
-      const total = dataSource().length;
-      const shown = Math.min((state.page + 1) * state.pageSize, total);
-      els.count.textContent = `${shown}/${total} shown`;
-      els.loadMore.classList.toggle('hidden', shown >= total);
-    }
-
-    function renderNextPage() {
-      const data = dataSource();
-      const start = state.page * state.pageSize;
-      const end = Math.min(start + state.pageSize, data.length);
-      const slice = data.slice(start, end);
-
-      const frag = document.createDocumentFragment();
-      for (const item of slice) {
-        frag.appendChild(renderCard(item));
-      }
-      els.list.appendChild(frag);
-
-      renderCount();
-    }
-
-    function renderCard(item) {
-      const card = document.createElement('article');
-      card.className = 'card';
-      card.innerHTML = `
-        <div class="thumb">
-          <img alt="Frog ${item.id}" loading="lazy" src="${buildImageUrl(item.id)}" onerror="this.parentNode.textContent='No image';" />
-        </div>
-        <div class="meta">
-          <div class="row"><strong>#${item.ranking}</strong><span class="pill">${(item.type || '').replace(/([A-Z])/g,' $1')}</span></div>
-          <div class="row"><span class="id">ID: ${item.id}</span><span>Rarity: ${item.rarity}</span></div>
-        </div>
-      `;
-      // Quick copy ID on click
-      card.addEventListener('click', async () => {
-        try {
-          await navigator.clipboard.writeText(String(item.id));
-        } catch {}
-      });
-      return card;
-    }
-
-    function resetList() {
-      state.page = 0;
-      els.list.innerHTML = '';
-    }
-
-    function doSearch() {
-      const q = els.query.value.trim();
-      if (!q) {
-        state.filtered = null;
-        resetList();
-        renderNextPage();
-        return;
+      function pickUniqueIds(n, max){
+        var pool = Array.from({length:max}, function(_,i){ return i+1; });
+        for (var i = pool.length - 1; i > 0; i--){
+          var j = Math.floor(Math.random()*(i+1));
+          var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+        }
+        return pool.slice(0, n);
       }
 
-      // Allow search by rank OR id (numeric)
-      const num = Number(q);
-      let matches = [];
-      if (!Number.isNaN(num) && num > 0) {
-        // try as rank
-        const byRank = state.rankings.find(r => r.ranking === num);
-        if (byRank) matches.push(byRank);
-
-        // also try as id (unique)
-        const byId = state.rankings.find(r => r.id === num);
-        if (byId && (!byRank || byId.id !== byRank.id)) matches.push(byId);
-      } else {
-        // text search on type
-        const ql = q.toLowerCase();
-        matches = state.rankings.filter(r =>
-          (r.type || '').toLowerCase().includes(ql)
-        );
+      function randomizeStrip(selector){
+        var strip = document.querySelector(selector);
+        if (!strip) return;
+        var imgs = Array.prototype.slice.call(strip.querySelectorAll('.tile img'));
+        if (!imgs.length) return;
+        var ids = pickUniqueIds(imgs.length, TOTAL);
+        imgs.forEach(function(img, idx){
+          var id = ids[idx];
+          img.src = ROOT + '/frog/' + id + '.png';
+          img.alt = String(id);
+        });
       }
 
-      state.filtered = matches;
-      resetList();
-      renderNextPage();
-    }
+      function tierFor(rank){
+        var T = (CFG.RARITY_TIERS) || { legendary: 50, epic: 250, rare: 800 };
+        if (typeof rank !== 'number' || !isFinite(rank)) return 'common';
+        if (rank <= T.legendary) return 'legendary';
+        if (rank <= T.epic) return 'epic';
+        if (rank <= T.rare) return 'rare';
+        return 'common';
+      }
 
-    // UI hooks
-    els.loadMore.addEventListener('click', () => {
-      state.page++;
-      renderNextPage();
-    });
+      function imgFor(id){ return ROOT + '/frog/' + id + '.png'; }
 
-    els.searchBtn.addEventListener('click', doSearch);
-    els.resetBtn.addEventListener('click', () => {
-      els.query.value = '';
-      state.filtered = null;
-      resetList();
-      renderNextPage();
-    });
-    els.query.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') doSearch();
-    });
+      function loadJSON(path){
+        return fetch(path).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
+      }
 
-    // Go!
-    boot().catch(err => {
-      console.error(err);
-      els.count.textContent = 'Failed to load rankings.';
-    });
+      function normalizeRanks(raw){
+        // Accept array of objects [{id, ranking, score?}] OR a map { "id": rank }
+        var out = [];
+        if (Array.isArray(raw)){
+          for (var i=0;i<raw.length;i++){
+            var it = raw[i] || {};
+            var id = Number(it.id); var rk = Number(it.ranking != null ? it.ranking : it.rank);
+            if (isFinite(id) && isFinite(rk)) out.push({ id:id, ranking:rk, score: (it.score!=null?Number(it.score):undefined) });
+          }
+        }else if (raw && typeof raw === 'object'){
+          for (var k in raw){ if(!raw.hasOwnProperty(k)) continue;
+            var id2 = Number(k); var rk2 = Number(raw[k]);
+            if (isFinite(id2) && isFinite(rk2)) out.push({ id:id2, ranking:rk2 });
+          }
+        }
+        out.sort(function(a,b){ return a.ranking - b.ranking || a.id - b.id; }); // lowest rank first
+        return out;
+      }
+
+      function renderList(rows){
+        var list = document.getElementById('rarityList');
+        if (!list) return;
+        if (!rows.length){ list.innerHTML = '<div class="pg-muted">No rarity data found.</div>'; return; }
+
+        // Optional scrolling clamp if data-visible is set
+        var vis = Number(list.getAttribute('data-visible') || 0);
+        if (vis > 0){
+          var rowH = 88; // rough height per row inc. gaps
+          list.classList.add('scrolling');
+          list.style.maxHeight = (vis * rowH) + 'px';
+        }
+
+        list.innerHTML = rows.map(function(r){
+          var t = tierFor(r.ranking);
+          var pill = '<span class="rank-pill rank-'+t+'">Rank #'+r.ranking+'</span>';
+          return ''+
+            '<li class="row" data-id="'+r.id+'">'+
+              '<img class="thumb64" src="'+imgFor(r.id)+'" alt="'+r.id+'">'+
+              '<div>'+
+                '<div style="font-weight:900">Frog #'+r.id+'</div>'+
+                '<div class="pg-muted">Rarity '+pill+'</div>'+
+              '</div>'+
+              '<div style="white-space:nowrap; font-weight:800; font-size:12px; color:var(--muted)">#'+r.ranking+'</div>'+
+            '</li>';
+        }).join('');
+      }
+
+      function init(){
+        randomizeStrip('.frog-strip');
+
+        var jsonPath = CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json';
+        loadJSON(jsonPath)
+          .then(normalizeRanks)
+          .then(renderList)
+          .catch(function(err){
+            console.warn('[rarity] load failed', err);
+            var list = document.getElementById('rarityList');
+            if (list) list.innerHTML = '<div class="pg-muted">Failed to load rarity.</div>';
+          });
+      }
+
+      (document.readyState === 'loading')
+        ? document.addEventListener('DOMContentLoaded', init)
+        : init();
+    })();
   </script>
 </body>
 </html>
