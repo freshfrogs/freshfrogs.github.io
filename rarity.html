@@ -37,15 +37,18 @@
       #rarityGrid.scrolling::-webkit-scrollbar-thumb{ background: color-mix(in srgb,var(--muted) 35%, transparent); border-radius:8px; }
     }
 
+    /* Force 128×128 thumbs on these cards */
+    .frog-card .thumb{
+      width:128px; height:128px; min-width:128px; min-height:128px;
+      border-radius:10px; object-fit:contain; background:var(--panel-2);
+    }
+
     /* Rank pill color grades (additive to your .pill) */
     .pill.rk-legendary{ color:#f59e0b; border-color: color-mix(in srgb,#f59e0b 70%, var(--border)); }
     .pill.rk-epic{ color:#a855f7; border-color: color-mix(in srgb,#a855f7 70%, var(--border)); }
     .pill.rk-rare{ color:#38bdf8; border-color: color-mix(in srgb,#38bdf8 70%, var(--border)); }
 
-    /* Meta line subtlety */
-    .frog-card .meta{ color:var(--muted); font-size:12px; }
-
-    /* Clip long attribute values */
+    /* Attributes list */
     .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; }
     .attr-bullets li{ font-size:12px; margin:2px 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   </style>
@@ -53,7 +56,6 @@
 <body>
   <div class="pg-wrap container">
     <div class="center-wrap">
-
       <!-- HERO -->
       <section class="frog-hero">
         <h1 class="frog-title">Rarity Rankings</h1>
@@ -66,8 +68,6 @@
           <div class="tile"><img src="frog/1.png"   alt="1"></div>
         </div>
       </section>
-
-      <!-- Action buttons row (your current topbar.js renders here) -->
     </div>
 
     <!-- Rankings panel -->
@@ -100,9 +100,9 @@
     var GRID = document.getElementById('rarityGrid');
     var COUNT = document.getElementById('rankCount');
 
-    var PAGE = 36;     // cards per append
-    var cursor = 0;    // next index to render
-    var rows = [];     // [{id, ranking}]
+    var PAGE = 36;
+    var cursor = 0;
+    var rows = [];
     var observer = null;
 
     function imgFor(id){ return ROOT + '/frog/' + id + '.png'; }
@@ -129,18 +129,15 @@
       return out.length ? '<ul class="attr-bullets">'+out.join('')+'</ul>' : '';
     }
 
-    function cardHTML(id, rank, meta){
+    function cardHTML(id, rank){
       var tier = tierFor(rank);
       var pillCls = tier==='legendary'?'rk-legendary':tier==='epic'?'rk-epic':tier==='rare'?'rk-rare':'';
       var rankPill = '<span class="pill '+pillCls+'">Rank #'+rank+'</span>';
-      var metaLine = 'Rarity • ' + rankPill;
 
       return ''+
       '<article class="frog-card" data-token-id="'+id+'">'+
         '<img class="thumb" src="'+imgFor(id)+'" alt="'+id+'">'+
         '<h4 class="title">Frog #'+id+' '+rankPill+'</h4>'+
-        '<div class="meta">'+metaLine+'</div>'+
-        (meta && meta.attrsHTML ? meta.attrsHTML : '')+
       '</article>';
     }
 
@@ -151,8 +148,8 @@
 
       for (var i=cursor; i<end; i++){
         (function(row){
-          var holder = document.createElement('div'); // temp
-          holder.innerHTML = cardHTML(row.id, row.ranking, null);
+          var holder = document.createElement('div');
+          holder.innerHTML = cardHTML(row.id, row.ranking);
           var el = holder.firstChild;
           frag.appendChild(el);
 
@@ -162,8 +159,8 @@
             var attrs = Array.isArray(j.attributes) ? j.attributes : [];
             var html = attrsHTML(attrs, 4);
             if (!html) return;
-            var meta = el.querySelector('.meta');
-            meta.insertAdjacentHTML('afterend', html);
+            var title = el.querySelector('.title');
+            title.insertAdjacentHTML('afterend', html);
           }).catch(function(){});
         })(rows[i]);
       }
@@ -205,12 +202,11 @@
           if (isFinite(id2) && isFinite(rk2)) out.push({id:id2, ranking:rk2});
         }
       }
-      // lowest ranking number = most rare (1 first)
       out.sort(function(a,b){ return a.ranking - b.ranking || a.id - b.id; });
       return out;
     }
 
-    // Hero layout keeps whole tiles visible
+    /* Keep whole 64px tiles only (hero strip) */
     function layoutFrogStrip(){
       var strip = document.querySelector('.frog-strip'); if(!strip) return;
       var tiles = Array.from(strip.querySelectorAll('.tile'));
@@ -221,7 +217,6 @@
     }
     window.addEventListener('resize', layoutFrogStrip);
 
-    // Init
     (function init(){
       // Randomize hero strip
       (function randomizeStrip(){
@@ -242,7 +237,7 @@
       loadJSON(RANKS_JSON).then(normalizeRanks).then(function(arr){
         rows = arr;
         COUNT.textContent = (rows.length ? rows.length : 0) + ' frogs';
-        GRID.innerHTML = ''; // clear
+        GRID.innerHTML = '';
         appendNext();
         setupInfinite();
       }).catch(function(err){
