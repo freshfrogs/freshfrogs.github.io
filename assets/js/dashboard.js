@@ -226,3 +226,74 @@
 
   refresh();
 })(window.FF_CFG || {});
+// === Dashboard: top-right wallet chip ===
+(function(FF){
+  const shorten = (a)=> a ? (a.slice(0,6)+'…'+a.slice(-4)) : '—';
+
+  // Try a few common header selectors used in the project
+  function findHeader(){
+    return document.querySelector(
+      '#dashboardPanel .panel-head, ' +
+      '#dashboard .panel-head, ' +
+      '.dashboard-panel .panel-head, ' +
+      '#dashboardPanel .panel-header, ' +
+      '.dashboard-panel .panel-header'
+    );
+  }
+
+  function ensureChip(){
+    const head = findHeader();
+    if (!head) return null;
+
+    // Make sure header can right-align things
+    const style = window.getComputedStyle(head);
+    if (style.display !== 'flex') {
+      head.style.display = 'flex';
+      head.style.alignItems = 'center';
+    }
+
+    let chip = head.querySelector('.dash-wallet-chip');
+    if (!chip){
+      chip = document.createElement('div');
+      chip.className = 'dash-wallet-chip dash-wallet-push';
+      chip.innerHTML = `<span class="dot" aria-hidden="true"></span><span class="addr">—</span>`;
+      head.appendChild(chip);
+    }
+    return chip;
+  }
+
+  function currentAddr(){
+    return (FF && FF.wallet && FF.wallet.address) || null;
+  }
+
+  function render(){
+    const chip = ensureChip();
+    if (!chip) return;
+
+    const addrEl = chip.querySelector('.addr');
+    const addr = currentAddr();
+    if (!addr) {
+      addrEl.textContent = 'Not connected';
+      chip.style.opacity = .6;
+      return;
+    }
+    addrEl.textContent = shorten(addr);
+    chip.style.opacity = .95;
+  }
+
+  // Initial paint
+  document.addEventListener('DOMContentLoaded', render);
+
+  // Refresh when wallet changes (wallet.js typically sets FF.wallet + emits events)
+  window.addEventListener('ff:wallet:connected', render);
+  window.addEventListener('ff:wallet:changed', render);
+  window.addEventListener('ff:wallet:disconnected', render);
+
+  // Fallback: also react to MetaMask account changes if exposed
+  if (window.ethereum && window.ethereum.on) {
+    window.ethereum.on('accountsChanged', render);
+  }
+
+  // Safety: small delayed pass (in case header renders after DOMContentLoaded)
+  window.addEventListener('load', ()=> setTimeout(render, 50));
+})(window.FF || (window.FF = {}));
