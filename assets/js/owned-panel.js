@@ -98,6 +98,31 @@
   background:#111;
 }
 
+/* Rank rarity colors */
+.rank-pill{
+  display:inline-flex; align-items:center; gap:6px;
+  border:1px solid var(--border); border-radius:999px; padding:3px 8px;
+  font-size:11px; font-weight:700; letter-spacing:.01em;
+  background:color-mix(in srgb, var(--panel) 35%, transparent);
+}
+.rank-pill::before{
+  content:'◆'; font-size:12px; line-height:1;
+}
+
+/* Tiers (colors picked to match your screenshots) */
+.rank-legendary{ color:#f59e0b; border-color: color-mix(in srgb, #f59e0b 70%, var(--border)); }
+.rank-legendary::before{ color:#f59e0b; }
+
+.rank-epic{ color:#a855f7; border-color: color-mix(in srgb, #a855f7 70%, var(--border)); }
+.rank-epic::before{ color:#a855f7; }
+
+.rank-rare{ color:#38bdf8; border-color: color-mix(in srgb, #38bdf8 70%, var(--border)); }
+.rank-rare::before{ color:#38bdf8; }
+
+/* Common → no special color (keeps your default) */
+.rank-common{ color:inherit; border-color:var(--border); }
+.rank-common::before{ color:var(--muted); }
+
 /* Disabled buttons */
 .btn[disabled], .btn-disabled{opacity:.45;pointer-events:none;filter:grayscale(.8)}
     `;
