@@ -445,86 +445,213 @@
     await renderHeader(); syncHeights();
   }
 
-  // --- Stake / Unstake / Approve modals ---
-  function openApprovePanel(owner, stats){
-    const body = `
-      <div class="om-col" style="text-align:center">
-        <img class="om-hero128" src="assets/img/blackWhite.png" alt="Fresh Frogs logo">
-        <div class="om-name">Fresh Frogs Staking</div>
-        <div class="om-copy" style="text-align:left">
-          <p><b>Approve the staking contract</b></p>
-          <p>To stake your Frogs, your wallet must first grant our controller contract permission to manage your NFTs. This approval is <i>collection-wide</i> (not per-frog) and is a one-time blockchain transaction that costs a small gas fee.</p>
-          <p><b>How staking works</b></p>
-          <ul>
-            <li>After approval, you can stake individual Frogs. While staked, a Frog is locked and can’t be listed or transferred.</li>
-            <li>Staked Frogs earn rewards (like $FLYZ) over time. You can claim rewards without un-staking.</li>
-            <li>You can un-stake any time to unlock the Frog back to your wallet.</li>
-          </ul>
-        </div>
-      </div>
-    `;
-    openModal({ title: '', bodyHTML: body, actions:[ /* unchanged */ ]});
-  }
+// --- Owned Panel: Modal helpers ------------------------------------------------
 
-  function openStakePanel(owner, tokenId){
-    const body = `
-      <div class="om-col">
-        <img class="om-thumb" src="${imgFor(tokenId)}" alt="Frog #${tokenId}">
-        <div class="om-name">Frog #${tokenId}</div>
-        <div class="om-copy">
-          <p>While staked, your Frog can’t be listed or sold. You can un-stake here any time. Un-staking resets level to zero.</p>
-        </div>
-      </div>
-    `;
-    openModal({
-      title: '',
-      bodyHTML: body,
-      actions: [
-        { label:'Cancel', onClick:()=>{}, primary:false },
-        { label:`Stake Frog #${tokenId}`, primary:true, keepOpen:true, onClick: async ()=>{
-            try{
-              await sendStake(owner, tokenId);
-              toast(`Stake tx sent for #${tokenId}`);
-              closeModal();
-              const item = items.find(x=>x.id===tokenId);
-              if (item){ item.staked=true; item.sinceMs=Date.now(); }
-              renderCards();
-              await refreshHeaderStats();
-            }catch{ toast('Stake failed'); }
-          }}
-      ]
-    });
-  }
+function frogNameFromId(tokenId) {
+  // Prefer your metadata name if you already fetch it elsewhere; fallback to "Frog #ID"
+  return `Frog #${tokenId}`;
+}
 
-  function openUnstakePanel(owner, tokenId){
-    const body = `
-      <div class="om-col">
-        <img class="om-thumb" src="${imgFor(tokenId)}" alt="Frog #${tokenId}">
-        <div class="om-name">Frog #${tokenId}</div>
-        <div class="om-copy">
-          <p>Withdrawing returns this Frog to your wallet. Level resets to zero.</p>
-        </div>
+function frogImgMarkup128(imgUrl, tokenId) {
+  const name = frogNameFromId(tokenId);
+  return `
+    <div class="owned-modal-hero">
+      <img class="owned-modal-frog" src="${imgUrl}" alt="${name}" width="128" height="128" loading="lazy" />
+      <div class="owned-modal-name">${name}</div>
+    </div>
+  `;
+}
+
+function modalShell({ title, bodyHTML, primary, secondary }) {
+  // Uses your existing modal.js API. If you use a different call signature,
+  // keep the HTML body the same and map the button callbacks to your API.
+  FF.modal.open({
+    title,
+    body: `
+      <div class="owned-modal">
+        ${bodyHTML}
       </div>
-    `;
-    openModal({
-      title: '',
-      bodyHTML: body,
-      actions: [
-        { label:'Cancel', onClick:()=>{}, primary:false },
-        { label:`Withdraw Frog #${tokenId}`, primary:true, keepOpen:true, onClick: async ()=>{
-            try{
-              await sendUnstake(owner, tokenId);
-              toast(`Withdraw tx sent for #${tokenId}`);
-              closeModal();
-              const item = items.find(x=>x.id===tokenId);
-              if (item){ item.staked=false; item.sinceMs=null; }
-              renderCards();
-              await refreshHeaderStats();
-            }catch{ toast('Withdraw failed'); }
-          }}
-      ]
-    });
-  }
+    `,
+    actions: [
+      secondary && {
+        label: secondary.label || 'Cancel',
+        variant: secondary.variant || 'ghost',
+        onClick: secondary.onClick || (() => FF.modal.close()),
+      },
+      primary && {
+        label: primary.label || 'Confirm',
+        variant: primary.variant || 'primary',
+        onClick: primary.onClick,
+      },
+    ].filter(Boolean),
+    // Optional: close on backdrop click / Esc; keep whatever your default is.
+  });
+}
+
+// --- Approve -------------------------------------------------------------------
+
+function openApprovePanel() {
+  const short = `
+    Allow the staking controller to manage your frogs for staking.
+    This is a one-time approval and does not transfer ownership.
+  `.trim();
+
+  modalShell({
+    title: 'Approve Staking',
+    bodyHTML: `
+      <p class="owned-modal-desc">
+        ${short}
+      </p>
+    `,
+    primary: {
+      label: 'Approve',
+      variant: 'primary',
+      onClick: async () => {
+        try {
+          await FF.staking.approveForAll(true);
+          FF.modal.close();
+          // If you already have these helpers, keep them:
+          if (window.refreshHeaderStats) refreshHeaderStats();
+          if (window.updateHeaderOwned) updateHeaderOwned();
+        } catch (err) {
+          console.error('approveForAll failed', err);
+          FF.modal.error('Approval failed. Please try again or check your wallet.');
+        }
+      },
+    },
+    secondary: { label: 'Cancel', variant: 'ghost' },
+  });
+}
+
+// --- Stake ---------------------------------------------------------------------
+
+function openStakePanel(tokenId, imgUrl) {
+  const name = frogNameFromId(tokenId);
+  const desc = `Stake ${name} to start earning $FLYZ. You can unstake anytime.`;
+
+  modalShell({
+    title: 'Stake Frog',
+    bodyHTML: `
+      ${frogImgMarkup128(imgUrl, tokenId)}
+      <p class="owned-modal-desc">${desc}</p>
+    `,
+    primary: {
+      label: 'Confirm Stake',
+      onClick: async () => {
+        try {
+          await FF.staking.stake(tokenId);
+          FF.modal.close();
+          if (window.loadOwned) loadOwned();
+          if (window.loadStaked) loadStaked();
+          if (window.refreshHeaderStats) refreshHeaderStats();
+        } catch (err) {
+          console.error('stake failed', err);
+          FF.modal.error('Stake failed. Check your wallet and try again.');
+        }
+      },
+    },
+    secondary: { label: 'Cancel', variant: 'ghost' },
+  });
+}
+
+// --- Unstake -------------------------------------------------------------------
+
+function openUnstakePanel(tokenId, imgUrl) {
+  const name = frogNameFromId(tokenId);
+  const desc = `Unstake ${name}. Your $FLYZ earnings remain claimable.`;
+
+  modalShell({
+    title: 'Unstake Frog',
+    bodyHTML: `
+      ${frogImgMarkup128(imgUrl, tokenId)}
+      <p class="owned-modal-desc">${desc}</p>
+    `,
+    primary: {
+      label: 'Confirm Unstake',
+      onClick: async () => {
+        try {
+          await FF.staking.unstake(tokenId); // a.k.a. withdraw
+          FF.modal.close();
+          if (window.loadOwned) loadOwned();
+          if (window.loadStaked) loadStaked();
+          if (window.refreshHeaderStats) refreshHeaderStats();
+        } catch (err) {
+          console.error('unstake failed', err);
+          FF.modal.error('Unstake failed. Check your wallet and try again.');
+        }
+      },
+    },
+    secondary: { label: 'Cancel', variant: 'ghost' },
+  });
+}
+
+// --- Claim ---------------------------------------------------------------------
+
+function openClaimPanel() {
+  const desc = `Claim your accrued $FLYZ rewards from all staked frogs.`;
+
+  modalShell({
+    title: 'Claim Rewards',
+    bodyHTML: `
+      <p class="owned-modal-desc">${desc}</p>
+    `,
+    primary: {
+      label: 'Claim $FLYZ',
+      onClick: async () => {
+        try {
+          await FF.staking.claimRewards();
+          FF.modal.close();
+          if (window.refreshHeaderStats) refreshHeaderStats();
+        } catch (err) {
+          console.error('claim failed', err);
+          FF.modal.error('Claim failed. Check your wallet and try again.');
+        }
+      },
+    },
+    secondary: { label: 'Cancel', variant: 'ghost' },
+  });
+}
+
+// --- Transfer ------------------------------------------------------------------
+
+function openTransferPanel(tokenId) {
+  const name = frogNameFromId(tokenId);
+  const desc = `Transfer ${name} to another address. Transfers are on-chain and irreversible.`;
+
+  // Build a simple input field (keep your current markup if you already have one)
+  const inputId = 'owned-transfer-to';
+  const bodyHTML = `
+    <p class="owned-modal-desc">${desc}</p>
+    <label class="owned-modal-label" for="${inputId}">Recipient Address</label>
+    <input id="${inputId}" class="owned-modal-input" placeholder="0x…" spellcheck="false" />
+  `;
+
+  modalShell({
+    title: 'Transfer Frog',
+    bodyHTML,
+    primary: {
+      label: 'Send',
+      onClick: async () => {
+        const to = (document.getElementById(inputId)?.value || '').trim();
+        if (!to) {
+          FF.modal.warn('Please enter a recipient address.');
+          return;
+        }
+        try {
+          await FF.nft.transfer(tokenId, to);
+          FF.modal.close();
+          if (window.loadOwned) loadOwned();
+          if (window.refreshHeaderStats) refreshHeaderStats();
+        } catch (err) {
+          console.error('transfer failed', err);
+          FF.modal.error('Transfer failed. Check the address and try again.');
+        }
+      },
+    },
+    secondary: { label: 'Cancel', variant: 'ghost' },
+  });
+}
+
 
   // --- Cards ---
   function attrsHTML(attrs, max=4){
