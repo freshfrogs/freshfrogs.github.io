@@ -896,3 +896,130 @@ function openTransferPanel(tokenId) {
   window.FF_initOwnedPanel = initOwned;
 
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
+// ---- Owned Modal Panel Tweaks: 128×128 preview + simplified copy + ensure buttons ----
+(function(CFG){
+  const root = document.getElementById('ownedModal');
+  if (!root) return;
+
+  function getAddr(){
+    return (window.FF && window.FF.wallet && window.FF.wallet.address) || null;
+  }
+
+  async function approveNow(){
+    const addr = getAddr();
+    if (!addr){ window.dispatchEvent(new CustomEvent('ff:toast',{detail:'Connect wallet first'})); return; }
+    try{
+      // Prefer staking adapter if present
+      const S = (window.FF && window.FF.staking) || window.FF_STAKING || {};
+      if (typeof S.approveIfNeeded === 'function'){
+        await S.approveIfNeeded(addr);
+      }else if (window.Web3 && window.COLLECTION_ABI){
+        const web3 = new Web3(window.ethereum);
+        const col = new web3.eth.Contract(window.COLLECTION_ABI, CFG.COLLECTION_ADDRESS);
+        await col.methods.setApprovalForAll(CFG.CONTROLLER_ADDRESS, true).send({ from: addr });
+      }else{
+        throw new Error('Approval helper not available');
+      }
+      window.dispatchEvent(new CustomEvent('ff:toast',{detail:'Approved!'}));
+      closeModal();
+    }catch(e){
+      console.warn('approve failed', e);
+      window.dispatchEvent(new CustomEvent('ff:toast',{detail:'Approval failed'}));
+    }
+  }
+
+  function closeModal(){
+    const bd = root.querySelector('.om-backdrop');
+    if (bd){ bd.click(); return; }
+    root.style.display = 'none';
+  }
+
+  function ensureButtons(type){
+    const actions = root.querySelector('.om-actions');
+    if (!actions) return;
+    if (actions.children.length > 0) return;
+
+    const primary = document.createElement('button');
+    primary.className = 'btn';
+    primary.textContent = (type==='approve'?'Approve':type==='stake'?'Stake':'Unstake');
+
+    const cancel = document.createElement('button');
+    cancel.className = 'btn-secondary';
+    cancel.textContent = 'Cancel';
+
+    actions.append(primary, cancel);
+
+    cancel.addEventListener('click', closeModal);
+
+    if (type==='approve'){
+      primary.addEventListener('click', approveNow);
+    }else{
+      // Stake / Unstake: call adapter if available, else fall back to any existing [data-act] button
+      primary.addEventListener('click', async ()=>{
+        const id = Number(root.getAttribute('data-token-id') || root.querySelector('[data-token-id]')?.getAttribute('data-token-id'));
+        const addr = getAddr();
+        if (!addr || !Number.isFinite(id)){ window.dispatchEvent(new CustomEvent('ff:toast',{detail:'Missing wallet or token id'})); return; }
+        try{
+          const S = (window.FF && window.FF.staking) || window.FF_STAKING || {};
+          if (type==='stake' && typeof S.stake === 'function'){
+            await S.stake(id);
+            window.dispatchEvent(new CustomEvent('ff:toast',{detail:'Staked!'}));
+          }else if (type==='unstake' && typeof S.unstake === 'function'){
+            await S.unstake(id);
+            window.dispatchEvent(new CustomEvent('ff:toast',{detail:'Unstaked!'}));
+          }else{
+            const fallback = root.querySelector(`button[data-act="${type}"]`);
+            if (fallback){ fallback.click(); return; }
+            throw new Error('No staking adapter available');
+          }
+          closeModal();
+        }catch(e){
+          console.warn(type+' failed', e);
+          window.dispatchEvent(new CustomEvent('ff:toast',{detail:(type.charAt(0).toUpperCase()+type.slice(1))+' failed'}));
+        }
+      });
+    }
+  }
+
+  function tweakCopy(title){
+    const body = root.querySelector('.om-copy');
+    if (!body) return;
+    const t = (title||'').toLowerCase();
+    if (t.includes('approve')){
+      body.innerHTML = `<p>First-time setup: allow the controller to move your frogs for staking. This doesn’t transfer ownership and you only do it once per wallet.</p>`;
+      ensureButtons('approve');
+    }else if (t.includes('unstake')){
+      body.innerHTML = `<p>Unstake to stop earning ${CFG.REWARD_TOKEN_SYMBOL || '$FLYZ'} and return this frog to your wallet. Unclaimed rewards remain claimable.</p>`;
+      ensureButtons('unstake');
+    }else if (t.includes('stake')){
+      body.innerHTML = `<p>Stake this frog to start earning ${CFG.REWARD_TOKEN_SYMBOL || '$FLYZ'}. You can unstake any time. Gas fees apply.</p>`;
+      ensureButtons('stake');
+    }
+  }
+
+  function tweakMedia(){
+    // CSS now makes media vertical + 128px; ensure name exists if the panel omitted it.
+    const nameEl = root.querySelector('.om-media .om-name');
+    const title = root.querySelector('.om-title')?.textContent || '';
+    if (!nameEl){
+      const media = root.querySelector('.om-media');
+      const img = media?.querySelector('.om-thumb');
+      if (media && img){
+        const nm = document.createElement('div');
+        nm.className = 'om-name';
+        const m = title.match(/#\s?(\d{1,5})/);
+        nm.textContent = m ? `Frog #${m[1]}` : 'Frog';
+        media.appendChild(nm);
+      }
+    }
+  }
+
+  const obs = new MutationObserver(()=>{
+    const title = root.querySelector('.om-title')?.textContent || '';
+    if (!title) return;
+    tweakMedia();
+    tweakCopy(title);
+  });
+  obs.observe(root, { childList:true, subtree:true });
+
+})(window.FF_CFG || {});
