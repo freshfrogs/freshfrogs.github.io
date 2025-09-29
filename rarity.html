@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="assets/css/styles.css" />
 
   <style>
-    /* Base (matches index/collection look) */
+    /* Base (match site look) */
     .pg-wrap{ padding:20px; }
     img{ image-rendering: pixelated; image-rendering: crisp-edges; }
 
@@ -22,16 +22,16 @@
     .center-wrap{ display:grid; gap:16px; justify-items:center; }
     .centered-card{ width: min(var(--panel-width), 100%); }
 
-    /* Hero (centered) */
-    .frog-hero{ margin:28px auto 22px; width: min(var(--panel-width), 100%); }
+    /* Hero (same as collection.html) */
+    .frog-hero{ margin:28px auto 38px; width: min(var(--panel-width), 100%); }
     .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
     .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
     .frog-strip .tile{ flex:0 0 auto; width:64px; height:64px; border-radius:10px; }
     .frog-strip .tile.hide{ display:none !important; }
     .frog-strip img{ width:64px; height:64px; object-fit:contain; }
-    @media (max-width:520px){ .frog-hero{ margin:22px auto 18px; } .frog-strip{ gap:10px; } }
+    @media (max-width:520px){ .frog-hero{ margin:22px auto 30px; } .frog-strip{ gap:10px; } }
 
-    /* List area (cards injected by FF.renderFrogCards) */
+    /* Rankings list */
     #rankList{ width:100%; }
 
     /* Load more row */
@@ -43,9 +43,9 @@
   <div class="pg-wrap container">
     <div class="center-wrap">
 
-      <!-- HERO -->
+      <!-- HERO (same structure as collection.html so topbar.js can inject the same pill buttons) -->
       <section class="frog-hero">
-        <h1 class="frog-title">Fresh Frogs — Rarity Rankings</h1>
+        <h1 class="frog-title">freshfrogs.github.io</h1>
         <div class="frog-strip">
           <div class="tile"><img src="frog/12.png"  alt="12"></div>
           <div class="tile"><img src="frog/77.png"  alt="77"></div>
@@ -62,9 +62,11 @@
           <h3>Rarity Rankings</h3>
           <div class="pg-muted">Top of the pond, from most to least rare</div>
         </div>
+
         <div id="rankList" aria-live="polite">
           <div class="pg-muted">Loading rankings…</div>
         </div>
+
         <div class="load-row" id="loadRow" style="display:none">
           <button class="btn" id="btnMore">Load more</button>
         </div>
@@ -87,15 +89,21 @@
     document.addEventListener('DOMContentLoaded', layoutFrogStrip);
   </script>
 
-  <!-- Shared libs / config -->
+  <!-- Config + ABIs (must be before adapter) -->
   <script src="assets/js/config.js"></script>
-  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/controller_abi.js"></script>
+  <script src="assets/js/collection_abi.js"></script>
 
-  <!-- Layered renderer + reusable cards -->
+  <!-- Helpers + wallet -->
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/wallet.js"></script>
+
+  <!-- On-chain adapter + renderers + cards -->
+  <script src="assets/js/staking-adapter.js"></script>
   <script src="assets/js/frog-renderer.js"></script>
   <script src="assets/js/frog-cards.js"></script>
 
-  <!-- Top navigation row -->
+  <!-- Top navigation row (same buttons as collection.html) -->
   <script src="assets/js/topbar.js"></script>
 
   <script>
@@ -104,15 +112,14 @@
 
     var CFG = window.FF_CFG || {};
     var ROOT = String(CFG.SOURCE_PATH || '').replace(/\/+$/,'') || '';
-    var RANKS_URL = 'assets/freshfrogs_rarity_rankings.json'; // expects [{id, ranking, score}, ...]
-    var PAGE = 24; // cards per load
-    var allRanks = []; // [{id, ranking, score}]
+    var RANKS_URL = 'assets/freshfrogs_rarity_rankings.json'; // [{id, ranking, score}, ...]
+    var PAGE = 24;
+
+    var allRanks = [];
     var cursor = 0;
     var listEl = document.getElementById('rankList');
     var btnMore = document.getElementById('btnMore');
     var loadRow = document.getElementById('loadRow');
-
-    function metaURL(id){ return ROOT + '/frog/json/' + id + '.json'; }
 
     function getJSON(url){
       return fetch(url, { headers:{accept:'application/json'} }).then(function(r){
@@ -120,26 +127,115 @@
         return r.json();
       });
     }
+    function metaURL(id){ return ROOT + '/frog/json/' + id + '.json'; }
 
-    async function fetchBatchMeta(ids){
-      const out = [];
-      for (let i=0;i<ids.length;i++){
-        const id = ids[i];
-        try{
-          const meta = await getJSON(metaURL(id));
-          const attrs = Array.isArray(meta?.attributes)
-            ? meta.attributes.map(function(a){ return { key:(a.key||a.trait_type||''), value:(a.value ?? a.trait_value ?? '') }; })
-            : [];
-          out.push({ id:id, attrs:attrs, metaRaw:meta });
-        }catch(_){
-          out.push({ id:id, attrs:[], metaRaw:null });
+    // --- chain access (read-only) ---
+    function getWeb3(){
+      if (window.Web3 && window.ethereum) return new Web3(window.ethereum);
+      // read-only fallback via injected provider-less (won't work without provider)
+      if (window.Web3 && (CFG.RPC_URL||'')) return new Web3(CFG.RPC_URL);
+      return null;
+    }
+    function nftContract(){
+      var w3 = getWeb3(); if(!w3) return null;
+      var abi = (window.COLLECTION_ABI || window.collection_abi || []);
+      return new w3.eth.Contract(abi, CFG.COLLECTION_ADDRESS);
+    }
+    function ctrlContract(){
+      var w3 = getWeb3(); if(!w3) return null;
+      var abi = (window.CONTROLLER_ABI || window.controller_abi || []);
+      return new w3.eth.Contract(abi, CFG.CONTROLLER_ADDRESS);
+    }
+
+    function short(a){ return a ? (a.slice(0,6)+'…'+a.slice(-4)) : '—'; }
+
+    async function ownerOf(id){
+      try{
+        var nft = nftContract(); if(!nft) return null;
+        return await nft.methods.ownerOf(String(id)).call();
+      }catch(_){ return null; }
+    }
+
+    async function tryStakeInfo(tokenId){
+      var ctrl = ctrlContract(); if(!ctrl) return null;
+      // Try a few common shapes
+      // 1) getStakeInfo(tokenId) -> {owner, since} or tuple
+      try{
+        var i = await ctrl.methods.getStakeInfo(String(tokenId)).call();
+        var out = {};
+        if (i){
+          // tuple or object
+          out.owner = i.owner || i.staker || i.user || i[0] || null;
+          var since = i.since || i.stakedAt || i.timestamp || i[1] || null;
+          if (since!=null) out.sinceMs = Number(since)>1e12 ? Number(since) : Number(since)*1000;
         }
+        if (out.owner || out.sinceMs) return out;
+      }catch(_){}
+      // 2) stakerOf(tokenId)
+      try{
+        var s = await ctrl.methods.stakerOf(String(tokenId)).call();
+        if (s) return { owner:s, sinceMs:null };
+      }catch(_){}
+      // 3) stakes(tokenId) -> tuple
+      try{
+        var t = await ctrl.methods.stakes(String(tokenId)).call();
+        if (t){
+          var o = t.owner || t.staker || t.user || t[0] || null;
+          var ts = t.since || t.stakedAt || t.timestamp || t[1] || null;
+          return { owner:o||null, sinceMs: ts? (Number(ts)>1e12?Number(ts):Number(ts)*1000) : null };
+        }
+      }catch(_){}
+      return null;
+    }
+
+    async function enrichOne(id){
+      // 1) metadata (for attributes & DOM layering)
+      var meta=null, attrs=[];
+      try{
+        meta = await getJSON(metaURL(id));
+        attrs = Array.isArray(meta?.attributes)
+          ? meta.attributes.map(function(a){ return { key:(a.key||a.trait_type||''), value:(a.value ?? a.trait_value ?? '') }; })
+          : [];
+      }catch(_){}
+
+      // 2) determine staking/owner
+      var currentOwner = await ownerOf(id);
+      var isStaked = currentOwner && CFG.CONTROLLER_ADDRESS && (currentOwner.toLowerCase() === CFG.CONTROLLER_ADDRESS.toLowerCase());
+      var staker = null, sinceMs = null;
+      if (isStaked){
+        try{
+          var info = await tryStakeInfo(id);
+          if (info){ staker = info.owner || null; sinceMs = info.sinceMs || null; }
+        }catch(_){}
       }
-      return out;
+
+      return {
+        id: id,
+        attrs: attrs,
+        metaRaw: meta || null,
+        rank: null,          // we set below
+        staked: !!isStaked,
+        sinceMs: sinceMs,
+        owner: isStaked ? (staker || null) : (currentOwner || null)
+      };
+    }
+
+    function metaLineFor(it){
+      if (it.staked){
+        var ago = (it.sinceMs && isFinite(it.sinceMs))
+          ? (function(ms){ var s=Math.max(0,Math.floor((Date.now()-ms)/1000));
+              var d=Math.floor(s/86400); if(d>=1)return d+'d ago';
+              var h=Math.floor((s%86400)/3600); if(h>=1)return h+'h ago';
+              var m=Math.floor((s%3600)/60); if(m>=1)return m+'m ago';
+              return s+'s ago'; })(it.sinceMs)
+          : null;
+        var who = it.owner ? short(it.owner) : 'unknown';
+        return (ago ? ('Staked '+ago) : 'Staked') + ' • by ' + who;
+      }
+      return 'Owned by ' + (it.owner ? short(it.owner) : 'unknown');
     }
 
     function sortRanks(arr){
-      // Make sure: lowest ranking number (1) first
       return arr.slice().sort(function(a,b){
         return a.ranking - b.ranking || a.id - b.id;
       });
@@ -153,31 +249,29 @@
       var slice = allRanks.slice(cursor, cursor + take);
       cursor += take;
 
-      // fetch metadata for this slice
-      var ids = slice.map(function(r){ return r.id; });
-      var metas = await fetchBatchMeta(ids);
+      // Fetch + enrich each id
+      var out = [];
+      for (let i=0;i<slice.length;i++){
+        var id = slice[i].id;
+        var row = await enrichOne(id);
+        row.rank = slice[i].ranking;
+        out.push(row);
+      }
 
-      // merge rank into items and append
-      var rows = metas.map(function(m){
-        var rk = slice.find(function(r){ return r.id === m.id; });
-        return { id:m.id, attrs:m.attrs, metaRaw:m.metaRaw, rank: rk ? rk.ranking : null, staked:false, sinceMs:null };
-      });
-
-      // append to container using reusable cards
-      // (no actions, show etherscan + original)
+      // Use reusable cards; inject custom meta line (staked/owner)
       var temp = document.createElement('div');
-      FF.renderFrogCards(temp, rows, {
+      FF.renderFrogCards(temp, out, {
         showActions: false,
         linkOriginal: true,
-        linkEtherscan: true
+        linkEtherscan: true,
+        metaLine: metaLineFor
       });
+
       if (listEl.firstElementChild && listEl.firstElementChild.classList.contains('pg-muted')){
         listEl.innerHTML = '';
       }
-      // move children over
       while (temp.firstChild){ listEl.appendChild(temp.firstChild); }
 
-      // toggle “load more”
       loadRow.style.display = (cursor < allRanks.length) ? '' : 'none';
     }
 
