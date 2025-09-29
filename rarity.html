@@ -37,6 +37,29 @@
     /* Load more row */
     .load-row{ display:flex; justify-content:center; margin:12px 0 2px; }
     .load-row .btn{ font-family:var(--font-ui); border:1px solid var(--border); background:transparent; color:inherit; border-radius:8px; padding:8px 12px; font-weight:700; font-size:12px; }
+    #ffTopRow{
+      display:flex; justify-content:center; align-items:center;
+      gap:10px; padding:10px 0; flex-wrap:nowrap; overflow-x:auto;
+      scrollbar-width:none; -webkit-overflow-scrolling:touch; margin-bottom:14px;
+    }
+    #ffTopRow::-webkit-scrollbar{ display:none; }
+
+    #ffTopRow .btn.btn-connected{ white-space:nowrap; }
+
+    /* Same role colors as your working collection pills */
+    #ffTopRow .ffc-connect { background:#144c2b !important; border-color:#2ec56a !important; color:#eaffef !important; }
+    #ffTopRow .ffc-pond    { background:#0f3c25 !important; border-color:#20a35d !important; color:#e6f9ee !important; }
+    #ffTopRow .ffc-opensea { background:#0e2a44 !important; border-color:#58afff !important; color:#eaf4ff !important; }
+    #ffTopRow .ffc-ethers  { background:#22262d !important; border-color:#9aa0aa !important; color:#edf0f5 !important; }
+    #ffTopRow .ffc-mutate  { background:#3b1a11 !important; border-color:#ff7a4f !important; color:#ffefe9 !important; }
+    #ffTopRow .ffc-rank    { background:#3a2a0f !important; border-color:#ffc262 !important; color:#fff7e6 !important; }
+
+    #ffTopRow .btn.btn-connected:hover{ filter:brightness(1.05); }
+    #ffTopRow .ff-sep{ padding:0 2px; color:var(--muted,#9aa0aa); opacity:.7; user-select:none; }
+
+    @media (max-width:720px){
+      #ffTopRow{ gap:8px; padding:8px 0; margin-bottom:12px; }
+    }
   </style>
 </head>
 <body>
@@ -55,6 +78,19 @@
           <div class="tile"><img src="frog/1.png"   alt="1"></div>
         </div>
       </section>
+      <div id="ffTopRow">
+        <button class="btn btn-connected ffc-connect" data-act="connect">Connect Wallet</button>
+        <span class="ff-sep">•</span>
+        <a class="btn btn-connected ffc-opensea" href="#" target="_blank" rel="noopener">Shop on OpenSea</a>
+        <span class="ff-sep">•</span>
+        <a class="btn btn-connected ffc-ethers" href="#" target="_blank" rel="noopener">Etherscan</a>
+        <span class="ff-sep">•</span>
+        <button class="btn btn-connected ffc-rank" data-act="rankings">Rankings</button>
+        <span class="ff-sep">•</span>
+        <button class="btn btn-connected ffc-pond" data-act="pond">The Pond</button>
+        <span class="ff-sep">•</span>
+        <button class="btn btn-connected ffc-mutate" data-act="mutate">Mutate</button>
+      </div>
 
       <!-- Rankings -->
       <section class="pg-card centered-card" id="rankings">
