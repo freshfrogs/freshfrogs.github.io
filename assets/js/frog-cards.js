@@ -98,24 +98,52 @@
   function mountMedia(el, item, options, hoverKey){
     const box = el.querySelector('.thumb-wrap');
     if (!box) return;
-    const meta = item.metaRaw || null;
-    const hasRenderer = (typeof (window.FF && window.FF.renderFrog) === 'function');
-    if (hasRenderer){
-      const canvas = box.querySelector('canvas.frog-canvas') || document.createElement('canvas');
-      canvas.className = 'frog-canvas';
-      canvas.width = 128; canvas.height = 128;
-      if (!canvas.parentNode) { box.innerHTML = ''; box.appendChild(canvas); }
-      (async ()=>{
-        try{
-          await window.FF.renderFrog(canvas, meta, { size:128, tokenId:item.id, hoverKey: hoverKey || '' });
-        }catch(e){
-          box.innerHTML = `<img class="thumb" src="${(options.imgForId||imgFor)(item.id)}" alt="${item.id}">`;
+
+    // Prefer DOM renderer
+    if (window.FF && typeof window.FF.renderFrogDOM === 'function'){
+        // ensure container element inside .thumb-wrap for the stack
+        let host = box.querySelector('.frog-stack-host');
+        if (!host){
+        host = document.createElement('div');
+        host.className = 'frog-stack-host';
+        host.style.position = 'relative';
+        host.style.width = '128px';
+        host.style.height = '128px';
+        host.style.borderRadius = '10px';
+        host.style.overflow = 'hidden';
+        box.innerHTML = '';
+        box.appendChild(host);
         }
-      })();
-    }else{
-      box.innerHTML = `<img class="thumb" src="${(options.imgForId||imgFor)(item.id)}" alt="${item.id}">`;
+        // render (in exact metadata order)
+        (async ()=>{
+        try{
+            await window.FF.renderFrogDOM(host, item.metaRaw || null, { tokenId: item.id, size:128, hoverKey: hoverKey || '' });
+        }catch(_){
+            box.innerHTML = `<img class="thumb" src="${(options.imgForId || (id => (window.FF_CFG?.SOURCE_PATH?.replace(/\/+$/,'')||'') + '/frog/' + id + '.png'))(item.id)}" alt="${item.id}">`;
+        }
+        })();
+        return;
     }
-  }
+
+    // Fallback to canvas renderer (if present)
+    if (window.FF && typeof window.FF.renderFrog === 'function'){
+        const canvas = box.querySelector('canvas.frog-canvas') || document.createElement('canvas');
+        canvas.className = 'frog-canvas';
+        canvas.width = 128; canvas.height = 128;
+        if (!canvas.parentNode) { box.innerHTML = ''; box.appendChild(canvas); }
+        (async ()=>{
+        try{
+            await window.FF.renderFrog(canvas, item.metaRaw || null, { size:128, tokenId:item.id, hoverKey: hoverKey || '' });
+        }catch(_){
+            box.innerHTML = `<img class="thumb" src="${(options.imgForId || (id => (window.FF_CFG?.SOURCE_PATH?.replace(/\/+$/,'')||'') + '/frog/' + id + '.png'))(item.id)}" alt="${item.id}">`;
+        }
+        })();
+        return;
+    }
+
+    // Final fallback: static PNG
+    box.innerHTML = `<img class="thumb" src="${(options.imgForId || (id => (window.FF_CFG?.SOURCE_PATH?.replace(/\/+$/,'')||'') + '/frog/' + id + '.png'))(item.id)}" alt="${item.id}">`;
+    }
 
   function metaLineDefault(it){
     if (it.staked){
