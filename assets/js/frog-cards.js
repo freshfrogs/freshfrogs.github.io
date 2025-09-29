@@ -1,44 +1,23 @@
 // assets/js/frog-cards.js
-// Reusable frog info cards (same look/feel as dashboard).
-// Uses optional FF.renderFrog(canvas, meta, {size:128, tokenId}) hook for layered builds.
-// If the hook isn't present, falls back to /frog/{id}.png.
-
-// API:
-//   FF.renderFrogCards(container, frogs, options)
-//     - container: DOM element or selector
-//     - frogs: array of ids or objects:
-//         { id, staked?:bool, sinceMs?:number, attrs?:[{key,value}], rank?:number, metaRaw?:object }
-//     - options:
-//         imgBasePath?: string        // defaults to FF_CFG.SOURCE_PATH or ''
-//         showActions?: boolean       // default false
-//         disableTransferWhenStaked?: boolean // default true
-//         onStake?: (id)=>Promise|void
-//         onUnstake?: (id)=>Promise|void
-//         onTransfer?: (id)=>Promise|void
-//         linkOriginal?: boolean      // default true
-//         linkEtherscan?: boolean     // default true
-//         levelSeconds?: number       // default FF_CFG.STAKE_LEVEL_SECONDS || 86400
-//         rarityTiers?: {legendary:number,epic:number,rare:number}
-//         // formatting overrides:
-//         metaLine?: (frog)=>string
-//         imgForId?: (id)=>string
-//         etherscanForId?: (id)=>string
+// Renders dashboard-style frog cards (view-only or with actions),
+// and now supports attribute-hover re-renders (lift effect) + animated overlays.
 
 (function(){
   'use strict';
 
   const CFG = window.FF_CFG || {};
   const CHAIN_ID = Number(CFG.CHAIN_ID || 1);
-  const BASEPATH = (CFG.SOURCE_PATH || '').replace(/\/+$/,''); // prefix for /frog
+  const BASEPATH = (CFG.SOURCE_PATH || '').replace(/\/+$/,'');
   const LEVEL_SECS = Math.max(1, Number(CFG.STAKE_LEVEL_SECONDS || 86400));
+  const NO_HOVER_KEYS = new Set(['Trait','Frog','SpecialFrog']);
 
-  // --- tiny CSS (safe, class-scoped; matches owned-panel look) ---
   (function injectCSS(){
     if (document.getElementById('ff-frog-cards-css')) return;
     const css = `
 .frog-cards{ display:grid; gap:10px; }
 .frog-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
-.frog-card .thumb-wrap{ width:128px; min-width:128px; }
+.frog-card .row{ display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:start; }
+.frog-card .thumb-wrap{ width:128px; min-width:128px; position:relative; } /* relative for GIF overlays */
 .frog-card .thumb, .frog-card canvas.frog-canvas{
   width:128px; height:128px; min-width:128px; min-height:128px;
   border-radius:10px; object-fit:contain; background:var(--panel-2); display:block;
@@ -50,11 +29,11 @@
 .frog-card .pill.rk-rare{ color:#38bdf8; border-color: color-mix(in srgb,#38bdf8 70%, var(--border)); }
 .frog-card .meta{ margin:0; color:#22c55e; } /* staked line in green */
 .frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; }
-.frog-card .attr-bullets li{ font-size:12px; margin:2px 0; }
+.frog-card .attr-bullets li{ font-size:12px; margin:2px 0; cursor:default; }
+.frog-card .attr-bullets li[data-hoverable="1"]{ cursor:pointer; }
 .frog-card .actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
 .frog-card .btn{ font-family:var(--font-ui); border:1px solid var(--border); background:transparent; color:inherit; border-radius:8px; padding:6px 10px; font-weight:700; font-size:12px; line-height:1; }
 .frog-card .btn:disabled{ opacity:.5; cursor:not-allowed; }
-.frog-cards .row{ display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:start; }
 .fc-level{ display:grid; grid-template-columns:auto 1fr auto; gap:8px; align-items:center; margin:4px 0 0; }
 .fc-level .lab{ font-size:12px; color:var(--muted); }
 .fc-level .val{ font-size:12px; font-weight:700; }
@@ -65,7 +44,6 @@
     s.id='ff-frog-cards-css'; s.textContent=css; document.head.appendChild(s);
   })();
 
-  // --- helpers ---
   function imgFor(id){ return `${BASEPATH}/frog/${id}.png`; }
   function etherscanFor(id){
     const base =
@@ -107,24 +85,29 @@
   }
   function attrsHTML(attrs, max=4){
     if (!Array.isArray(attrs)||!attrs.length) return '';
-    const rows=[]; for (const a of attrs){ if(!a.key||a.value==null) continue; rows.push('<li><b>'+a.key+':</b> '+String(a.value)+'</li>'); if(rows.length>=max) break; }
+    const rows=[];
+    for (let i=0;i<attrs.length;i++){
+      const a = attrs[i]; if(!a.key||a.value==null) continue;
+      const hoverable = NO_HOVER_KEYS.has(a.key) ? '0' : '1';
+      rows.push(`<li data-attr-key="${String(a.key)}" data-hoverable="${hoverable}"><b>${a.key}:</b> ${String(a.value)}</li>`);
+      if(rows.length>=max) break;
+    }
     return rows.length? '<ul class="attr-bullets">'+rows.join('')+'</ul>' : '';
   }
 
-  // Mount media (canvas via FF.renderFrog or fallback PNG)
-  function mountMedia(el, item, options){
+  function mountMedia(el, item, options, hoverKey){
     const box = el.querySelector('.thumb-wrap');
     if (!box) return;
     const meta = item.metaRaw || null;
     const hasRenderer = (typeof (window.FF && window.FF.renderFrog) === 'function');
     if (hasRenderer){
-      const canvas = document.createElement('canvas');
-      canvas.width = 128; canvas.height = 128;
+      const canvas = box.querySelector('canvas.frog-canvas') || document.createElement('canvas');
       canvas.className = 'frog-canvas';
-      box.innerHTML = ''; box.appendChild(canvas);
+      canvas.width = 128; canvas.height = 128;
+      if (!canvas.parentNode) { box.innerHTML = ''; box.appendChild(canvas); }
       (async ()=>{
         try{
-          await window.FF.renderFrog(canvas, meta, { size:128, tokenId:item.id });
+          await window.FF.renderFrog(canvas, meta, { size:128, tokenId:item.id, hoverKey: hoverKey || '' });
         }catch(e){
           box.innerHTML = `<img class="thumb" src="${(options.imgForId||imgFor)(item.id)}" alt="${item.id}">`;
         }
@@ -158,7 +141,7 @@
     const tiers = options.rarityTiers;
     const pill = (item.rank || item.rank===0) ? rankPill(item.rank, tiers) : '';
     const metaLine = (options.metaLine || metaLineDefault)(item);
-    const attrs = attrsHTML(item.attrs || [], 4);
+    const attrs = attrsHTML(item.attrs || [], 8); // show more so hover has targets
     const secsPer = Number(options.levelSeconds || LEVEL_SECS);
     const disableTransfer = (options.disableTransferWhenStaked !== false) && item.staked;
 
@@ -185,8 +168,28 @@
       </div>
     `;
 
-    // media
-    mountMedia(article, item, options);
+    // hover wiring (per attribute)
+    let hoverKey = '';
+    function rerender(){ mountMedia(article, item, options, hoverKey); }
+    const list = article.querySelector('.attr-bullets');
+    if (list){
+      list.addEventListener('mousemove', (e)=>{
+        const li = e.target.closest('li[data-attr-key]'); if(!li) return;
+        const key = li.getAttribute('data-attr-key') || '';
+        const hoverable = li.getAttribute('data-hoverable') === '1';
+        const nextKey = hoverable ? key : '';
+        if (nextKey !== hoverKey){
+          hoverKey = nextKey;
+          rerender();
+        }
+      });
+      list.addEventListener('mouseleave', ()=>{
+        if (hoverKey){ hoverKey = ''; rerender(); }
+      });
+    }
+
+    // initial media
+    rerender();
 
     // actions
     if (options.showActions){
@@ -226,7 +229,6 @@
     return null;
   }
 
-  // Public API
   window.FF = window.FF || {};
   window.FF.buildFrogCard = buildCard;
   window.FF.renderFrogCards = function renderFrogCards(container, frogs, options){
@@ -235,14 +237,12 @@
     const opts = options || {};
     root.classList.add('frog-cards');
 
-    // Normalize array
     const rows = Array.isArray(frogs) ? frogs.map(normalizeFrog).filter(Boolean) : [];
     if (!rows.length){
       root.innerHTML = '<div class="pg-muted">No frogs to display.</div>';
       return;
     }
 
-    // Clear + render
     root.innerHTML = '';
     for (const it of rows){
       root.appendChild(buildCard(it, opts));
