@@ -337,5 +337,42 @@
       : init();
   })();
   </script>
+  <script>
+(function(){
+  function short(a){ return a ? (a.slice(0,6)+'…'+a.slice(-4)) : ''; }
+  function go(kind){
+    // Match collection behavior: scroll to section on collection.html, navigate for mutate
+    var map = { rankings:'#rankings', pond:'#pond', mutate:'mutate.html' };
+    var t = map[kind]; if (!t) return;
+    if (t.endsWith('.html')) location.href = t;
+    else document.querySelector(t)?.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  var row = document.getElementById('ffTopRow'); if (!row) return;
+  row.addEventListener('click', function(e){
+    var el = e.target.closest('[data-act]'); if(!el) return;
+    var act = el.getAttribute('data-act');
+    if (act==='connect'){
+      if (window.Wallet?.connect){
+        window.Wallet.connect().then(a=>{ if(a) el.textContent = short(a); });
+      } else if (window.ethereum?.request){
+        window.ethereum.request({method:'eth_requestAccounts'}).then(arr=>{
+          var a = arr && arr[0]; if (a) el.textContent = short(a);
+        });
+      } else alert('No Ethereum wallet detected.');
+    }
+    if (act==='rankings') go('rankings');
+    if (act==='pond')     go('pond');
+    if (act==='mutate')   go('mutate');
+  });
+
+  // Pre-fill address if already connected
+  if (window.ethereum?.selectedAddress){
+    var btn = row.querySelector('[data-act="connect"]');
+    if (btn) btn.textContent = short(window.ethereum.selectedAddress);
+  }
+})();
+</script>
+
 </body>
 </html>
