@@ -244,17 +244,33 @@
 
   function getWeb3(){
     if (_web3) return _web3;
+    if (!global.Web3) return null;
+
     var provider = null;
-    if (global.ethereum) provider = global.ethereum;
-    else if (global.Web3 && global.Web3.givenProvider) provider = global.Web3.givenProvider;
-    _web3 = new global.Web3(provider || '');
+    if (global.ethereum) {
+      provider = global.ethereum;
+    } else if (global.Web3.givenProvider) {
+      provider = global.Web3.givenProvider;
+    } else if (CFG.RPC_URL && global.Web3 && global.Web3.providers && global.Web3.providers.HttpProvider) {
+      try {
+        provider = new global.Web3.providers.HttpProvider(CFG.RPC_URL);
+      } catch (err) {
+        console.warn('[rarity] failed to build HttpProvider', err);
+      }
+    }
+
+    if (!provider) return null;
+
+    _web3 = new global.Web3(provider);
     return _web3;
   }
 
   function getCollectionContract(){
     if (_collection) return _collection;
     if (!CFG.COLLECTION_ADDRESS || !global.COLLECTION_ABI) return null;
-    _collection = new (getWeb3()).eth.Contract(global.COLLECTION_ABI, CFG.COLLECTION_ADDRESS);
+    var web3 = getWeb3();
+    if (!web3 || !web3.eth || !web3.eth.Contract) return null;
+    _collection = new web3.eth.Contract(global.COLLECTION_ABI, CFG.COLLECTION_ADDRESS);
     return _collection;
   }
 
@@ -345,8 +361,11 @@
   }
 
   function metaLineForCard(item){
-    var ownerLabel = item.ownerYou ? 'You' : (item.ownerShort || shortAddr(item.owner));
-    if (!ownerLabel) ownerLabel = '\u2014';
+    var ownerLabel = null;
+    if (item.ownerYou) ownerLabel = 'You';
+    else if (item.ownerShort && item.ownerShort !== '\u2014') ownerLabel = item.ownerShort;
+    else if (item.owner) ownerLabel = shortAddr(item.owner);
+    if (!ownerLabel) ownerLabel = 'Unknown';
     if (item.staked) {
       var ago = item.sinceMs ? fmtAgo(item.sinceMs) : null;
       return (ago ? 'Staked ' + ago : 'Staked') + ' • Owned by ' + ownerLabel;
@@ -444,7 +463,7 @@
               var owner = owners[i] || null;
               var stake = normalizeStake(stakes[i] || null);
               var attrs = normalizeAttrs(meta);
-              var ownerShort = shortAddr(owner);
+              var ownerShort = owner ? shortAddr(owner) : null;
               var ownerYou = false;
               if (currentUser && owner && typeof currentUser === 'string' && typeof owner === 'string') {
                 ownerYou = currentUser.toLowerCase() === owner.toLowerCase();
