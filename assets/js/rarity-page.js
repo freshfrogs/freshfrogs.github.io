@@ -1,10 +1,4 @@
-// assets/js/rarity-page.js
-// Uses your files:
-//   - assets/freshfrogs_rarity_rankings.json
-//   - assets/freshfrogs_rank_lookup.json
-//
-// Renders cards with the same look as the dashboard via frog-cards.js if available.
-
+// assets/js/rarity-page.js — robust version
 (function(FF = window.FF || {}, CFG = window.CFG || {}) {
   const GRID = document.getElementById('rarityGrid');
   const BTN_MORE = document.getElementById('btnMore');
@@ -12,110 +6,155 @@
   const BTN_SCORE = document.getElementById('btnSortScore');
   const FIND_INPUT = document.getElementById('raritySearchId');
   const BTN_GO = document.getElementById('btnGo');
-
   if (!GRID) return;
 
-  // -------- config (your two files first)
   const PRIMARY_RANK_FILE = 'assets/freshfrogs_rarity_rankings.json';
   const LOOKUP_FILE       = 'assets/freshfrogs_rank_lookup.json';
-
-  // extra fallbacks if needed
   const FALLBACKS = [
     'assets/freshfrogs_rarity_rankings/ranks.json',
     'assets/freshfrogs_rarity_rankings/rarity.json',
     'assets/freshfrogs_rarity_rankings/frogs_ranks.json',
     'assets/freshfrogs_rarity_rankings/ranks.csv'
   ];
-
   const PAGE = 60;
 
-  // -------- state
-  let all = [];     // [{id, rank, score}]
-  let view = [];    // sorted list
-  let idxById = new Map();
+  let all = [];
+  let view = [];
   let offset = 0;
-  let sortMode = 'rank'; // 'rank' | 'score'
-  let lookupMap = null;  // Map(id -> {rank, score})
+  let sortMode = 'rank';
+  let lookupMap = null;
 
-  // -------- load helpers
+  function uiError(msg) {
+    GRID.innerHTML = `<div class="pg-muted" style="padding:10px">${msg}</div>`;
+  }
+  function clearGrid(){ GRID.innerHTML = ''; }
+  function ensureMoreBtn() {
+    if (!BTN_MORE) return;
+    BTN_MORE.style.display = offset < view.length ? 'inline-flex' : 'none';
+  }
+
   async function fetchJson(url) {
     const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${url}`);
     return await res.json();
   }
 
-  async function loadLookup() {
+  async function tryLoadJson(url) {
     try {
-      const j = await fetchJson(LOOKUP_FILE);
-      // Accept either { "123": {...}, "124": {...} } or {items:[...]} or array
-      const items = Array.isArray(j) ? j
-                  : Array.isArray(j?.items) ? j.items
-                  : (j && typeof j === 'object') ? Object.keys(j).map(k => ({ id: Number(k), ...(j[k]||{}) }))
-                  : [];
-      lookupMap = new Map(
-        items
-          .map(x => ({
-            id: Number(x.id ?? x.tokenId ?? x.token_id ?? x.frogId ?? x.frog_id),
-            rank: Number(x.rank ?? x.position ?? x.place),
-            score: Number(x.score ?? x.rarityScore ?? x.points ?? 0)
-          }))
-          .filter(x => Number.isFinite(x.id))
-          .map(x => [x.id, { rank: x.rank, score: x.score }])
-      );
-    } catch(_) {
-      lookupMap = null;
+      const j = await fetchJson(url);
+      console.log('[rarity] loaded', url, j);
+      return j;
+    } catch (e) {
+      console.warn('[rarity] failed', url, e);
+      return null;
     }
   }
 
-  async function loadPrimaryRanks() {
-    // Try your primary JSON first
-    try {
-      const j = await fetchJson(PRIMARY_RANK_FILE);
-      return normalizeJson(j);
-    } catch(_) {
-      // fallbacks
-      for (const url of FALLBACKS) {
-        try {
-          const res = await fetch(url, { cache: 'no-store' });
-          if (!res.ok) continue;
-          const ct = (res.headers.get('content-type') || '').toLowerCase();
-          if (url.endsWith('.csv') || ct.includes('text/csv')) {
-            const text = await res.text();
-            return parseCsv(text);
-          } else {
-            const json = await res.json();
-            return normalizeJson(json);
-          }
-        } catch(_) {}
+  function asNumber(x) { return Number.isFinite(Number(x)) ? Number(x) : NaN; }
+
+  function normalizeFromAnyShape(data, label='primary') {
+    // Returns [{id, rank, score}]
+    let out = [];
+
+    if (!data) return out;
+
+    // 1) Array case
+    if (Array.isArray(data)) {
+      if (data.length && typeof data[0] === 'number') {
+        // array of ids ordered by rank
+        out = data.map((id, i) => ({ id: asNumber(id), rank: i+1, score: 0 }));
+        console.log(`[rarity] parsed ${label}: array of ids -> ${out.length} entries`);
+      } else if (data.length && typeof data[0] === 'object') {
+        // array of objects
+        out = data.map(x => ({
+          id: asNumber(x.id ?? x.tokenId ?? x.token_id ?? x.frogId ?? x.frog_id),
+          rank: asNumber(x.rank ?? x.position ?? x.place),
+          score: asNumber(x.score ?? x.rarityScore ?? x.points ?? x.total ?? 0)
+        }));
+        console.log(`[rarity] parsed ${label}: array of objects -> ${out.length} entries`);
       }
-      throw new Error('No rarity file found.');
     }
-  }
-
-  function normalizeJson(j) {
-    // Accept: array, {items:[...]}, or object map
-    let arr = [];
-    if (Array.isArray(j)) arr = j;
-    else if (j && Array.isArray(j.items)) arr = j.items;
-    else if (j && typeof j === 'object') arr = Object.values(j);
-
-    const out = arr.map(x => ({
-      id: Number(x.id ?? x.tokenId ?? x.token_id ?? x.frogId ?? x.frog_id),
-      rank: Number(x.rank ?? x.position ?? x.place),
-      score: Number(x.score ?? x.rarityScore ?? x.points ?? 0)
-    })).filter(x => Number.isFinite(x.id) && Number.isFinite(x.rank));
-
-    // If a separate lookup exists, enrich/override missing scores/ranks
-    if (lookupMap) {
-      for (const r of out) {
-        const lk = lookupMap.get(r.id);
-        if (lk) {
-          if (!Number.isFinite(r.rank) && Number.isFinite(lk.rank)) r.rank = lk.rank;
-          if (!Number.isFinite(r.score) && Number.isFinite(lk.score)) r.score = lk.score;
+    // 2) {items:[...]}
+    else if (Array.isArray(data?.items)) {
+      out = normalizeFromAnyShape(data.items, `${label}.items`);
+    }
+    // 3) Object map
+    else if (typeof data === 'object') {
+      const keys = Object.keys(data);
+      if (keys.length) {
+        const sample = data[keys[0]];
+        if (typeof sample === 'number') {
+          // map id -> rank number
+          out = keys.map(k => ({ id: asNumber(k), rank: asNumber(data[k]), score: 0 }));
+          console.log(`[rarity] parsed ${label}: map id->rank -> ${out.length} entries`);
+        } else if (typeof sample === 'object') {
+          out = keys.map(k => {
+            const v = data[k] || {};
+            return {
+              id: asNumber(k),
+              rank: asNumber(v.rank ?? v.position ?? v.place),
+              score: asNumber(v.score ?? v.rarityScore ?? v.points ?? 0)
+            };
+          });
+          console.log(`[rarity] parsed ${label}: map id->{rank,score} -> ${out.length} entries`);
         }
       }
     }
-    return out.sort((a,b) => a.rank - b.rank);
+
+    // Final filter/sort
+    out = out.filter(r => Number.isFinite(r.id) && Number.isFinite(r.rank) && r.rank > 0)
+             .sort((a,b) => a.rank - b.rank);
+    return out;
+  }
+
+  async function loadLookup() {
+    const j = await tryLoadJson(LOOKUP_FILE);
+    if (!j) { lookupMap = null; return; }
+
+    const arr = normalizeFromAnyShape(j, 'lookup');
+    lookupMap = new Map(arr.map(r => [r.id, { rank: r.rank, score: Number.isFinite(r.score) ? r.score : 0 }]));
+    console.log('[rarity] lookup entries:', lookupMap.size);
+  }
+
+  async function loadPrimaryRanks() {
+    // Prefer your explicit file; then fallbacks (incl. CSV)
+    const j = await tryLoadJson(PRIMARY_RANK_FILE);
+    if (j) {
+      const arr = normalizeFromAnyShape(j, 'primary');
+      if (arr.length) return enrichWithLookup(arr);
+    }
+    // Try fallbacks
+    for (const url of FALLBACKS) {
+      try {
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) continue;
+        const ct = (res.headers.get('content-type') || '').toLowerCase();
+        if (url.endsWith('.csv') || ct.includes('text/csv')) {
+          const text = await res.text();
+          const arr = parseCsv(text);
+          if (arr.length) return enrichWithLookup(arr);
+        } else {
+          const json = await res.json();
+          const arr = normalizeFromAnyShape(json, url.split('/').pop());
+          if (arr.length) return enrichWithLookup(arr);
+        }
+      } catch (e) {
+        console.warn('[rarity] fallback load failed', url, e);
+      }
+    }
+    return [];
+  }
+
+  function enrichWithLookup(arr) {
+    if (!lookupMap) return arr;
+    for (const r of arr) {
+      const lk = lookupMap.get(r.id);
+      if (lk) {
+        if (!Number.isFinite(r.rank) && Number.isFinite(lk.rank)) r.rank = lk.rank;
+        if (!Number.isFinite(r.score) && Number.isFinite(lk.score)) r.score = lk.score;
+      }
+    }
+    return arr.sort((a,b) => a.rank - b.rank);
   }
 
   function parseCsv(csv) {
@@ -130,20 +169,9 @@
       const score = Number(cells[ix.score] || 0);
       if (Number.isFinite(id) && Number.isFinite(rank)) out.push({ id, rank, score });
     }
-    // Enrich with lookup if available
-    if (lookupMap) {
-      for (const r of out) {
-        const lk = lookupMap.get(r.id);
-        if (lk) {
-          if (!Number.isFinite(r.rank) && Number.isFinite(lk.rank)) r.rank = lk.rank;
-          if (!Number.isFinite(r.score) && Number.isFinite(lk.score)) r.score = lk.score;
-        }
-      }
-    }
     return out.sort((a,b) => a.rank - b.rank);
   }
 
-  // -------- metadata
   async function fetchMeta(id) {
     const tries = [
       `frog/json/${id}.json`,
@@ -156,39 +184,11 @@
         if (res.ok) return await res.json();
       } catch(_) {}
     }
-    // fallback
     return { name: `Frog #${id}`, image: `frog/${id}.png`, attributes: [] };
-  }
-
-  // -------- render
-  function clearGrid(){ GRID.innerHTML = ''; }
-  function ensureMoreBtn() {
-    const hasMore = offset < view.length;
-    if (BTN_MORE) BTN_MORE.style.display = hasMore ? 'inline-flex' : 'none';
-  }
-
-  async function loadMore() {
-    const slice = view.slice(offset, offset + PAGE);
-    if (slice.length === 0){ ensureMoreBtn(); return; }
-
-    // Resolve metas in parallel
-    const metas = await Promise.all(slice.map(x => fetchMeta(x.id)));
-    for (let i=0;i<slice.length;i++) slice[i].meta = metas[i];
-
-    // Append cards
-    const frag = document.createDocumentFragment();
-    slice.forEach(rec => frag.appendChild(buildCard(rec)));
-    GRID.appendChild(frag);
-
-    offset += slice.length;
-    ensureMoreBtn();
   }
 
   function buildCard(rec) {
     const { id, rank, score, meta } = rec;
-
-    // Prefer your shared card renderer from frog-cards.js if available.
-    // Common export in your repo is window.FF_renderFrogCard(meta, opts)
     try {
       if (typeof window.FF_renderFrogCard === 'function') {
         return window.FF_renderFrogCard(meta, {
@@ -197,9 +197,8 @@
           showRarity: true
         });
       }
-    } catch(_) {}
-
-    // Fallback: minimal clone of dashboard card
+    } catch (_) {}
+    // Minimal fallback (matches your dashboard style)
     const card = document.createElement('div');
     card.className = 'frog-card';
 
@@ -209,13 +208,13 @@
     img.loading = 'lazy';
     img.src = meta?.image || `frog/${id}.png`;
 
-    // rank badge
     const wrap = document.createElement('div');
     wrap.className = 'img-wrap';
     wrap.style.width = '128px';
     wrap.style.height = '128px';
     wrap.style.gridRow = 'span 3';
     wrap.appendChild(img);
+
     const badge = document.createElement('div');
     badge.className = 'rank-badge';
     badge.textContent = `#${rank}${Number.isFinite(score) ? ` • ${score.toFixed(2)}` : ''}`;
@@ -233,18 +232,13 @@
     actions.className = 'actions';
     const btnOS = document.createElement('a');
     btnOS.href = `https://opensea.io/assets/ethereum/${CFG.COLLECTION_ADDRESS}/${id}`;
-    btnOS.target = '_blank';
-    btnOS.rel = 'noopener';
-    btnOS.className = 'btn btn-outline-gray';
-    btnOS.textContent = 'OpenSea';
+    btnOS.target = '_blank'; btnOS.rel = 'noopener';
+    btnOS.className = 'btn btn-outline-gray'; btnOS.textContent = 'OpenSea';
     const btnScan = document.createElement('a');
     btnScan.href = `https://etherscan.io/token/${CFG.COLLECTION_ADDRESS}?a=${id}`;
-    btnScan.target = '_blank';
-    btnScan.rel = 'noopener';
-    btnScan.className = 'btn btn-outline-gray';
-    btnScan.textContent = 'Etherscan';
-    actions.appendChild(btnOS);
-    actions.appendChild(btnScan);
+    btnScan.target = '_blank'; btnScan.rel = 'noopener';
+    btnScan.className = 'btn btn-outline-gray'; btnScan.textContent = 'Etherscan';
+    actions.appendChild(btnOS); actions.appendChild(btnScan);
 
     card.appendChild(wrap);
     card.appendChild(title);
@@ -253,67 +247,57 @@
     return card;
   }
 
-  // -------- sorting / navigation
+  async function loadMore() {
+    const slice = view.slice(offset, offset + PAGE);
+    if (slice.length === 0) { ensureMoreBtn(); return; }
+    const metas = await Promise.all(slice.map(x => fetchMeta(x.id)));
+    slice.forEach((x, i) => x.meta = metas[i]);
+    const frag = document.createDocumentFragment();
+    slice.forEach(rec => frag.appendChild(buildCard(rec)));
+    GRID.appendChild(frag);
+    offset += slice.length;
+    ensureMoreBtn();
+  }
+
   function resort() {
-    if (sortMode === 'rank') {
-      view = all.slice().sort((a,b) => a.rank - b.rank);
-    } else {
-      view = all.slice().sort((a,b) => (b.score - a.score) || (a.rank - b.rank));
-    }
-    offset = 0;
-    clearGrid();
-    loadMore();
+    view.sort((a,b) => sortMode === 'rank'
+      ? (a.rank - b.rank)
+      : ((b.score - a.score) || (a.rank - b.rank))
+    );
+    offset = 0; clearGrid(); loadMore();
   }
 
   function jumpToId(id) {
-    // Use lookup for direct jumps if present
-    if (lookupMap?.has(id)) {
-      const rec = lookupMap.get(id);
-      // find index by rank match if all list present
-      const ix = all.findIndex(x => x.id === id) >= 0
-        ? all.findIndex(x => x.id === id)
-        : all.findIndex(x => x.rank === rec.rank);
-      if (ix >= 0) {
-        sortMode = 'rank';
-        view = all.slice().sort((a,b) => a.rank - b.rank);
-        offset = Math.floor(ix / PAGE) * PAGE;
-        clearGrid();
-        loadMore();
-        return;
-      }
-    }
-    // fallback: linear search in current view
-    const ix2 = view.findIndex(x => x.id === id);
-    if (ix2 >= 0) {
-      offset = Math.floor(ix2 / PAGE) * PAGE;
-      clearGrid();
-      loadMore();
-    }
+    const ix = view.findIndex(x => x.id === id);
+    if (ix < 0) return;
+    offset = Math.floor(ix / PAGE) * PAGE;
+    clearGrid(); loadMore();
   }
 
-  // -------- init
+  // init
   (async function init() {
     try {
-      await loadLookup();          // optional
-      all = await loadPrimaryRanks();
-      idxById = new Map(all.map(r => [r.id, r]));
-      view = all.slice();          // already rank-sorted
+      await loadLookup();
+      const ranks = await loadPrimaryRanks();
+      if (!ranks.length) {
+        uiError(`Could not load rarity data. Check that <code>${PRIMARY_RANK_FILE}</code> exists and has a supported shape.
+          Open the browser console for details.`);
+        console.error('[rarity] No parsed entries from ranks.');
+        return;
+      }
+      all = ranks.slice();
+      view = all.slice();
       offset = 0;
       clearGrid();
       await loadMore();
       if (BTN_MORE) BTN_MORE.style.display = 'inline-flex';
-    } catch (err) {
-      console.error(err);
-      GRID.innerHTML = `<div class="pg-muted">
-        Could not load rarity data. Ensure
-        <code>assets/freshfrogs_rarity_rankings.json</code>
-        (and optional <code>assets/freshfrogs_rank_lookup.json</code>)
-        exist and are valid JSON.
-      </div>`;
+    } catch (e) {
+      console.error('[rarity] init error', e);
+      uiError('Failed to initialize rarity view. See console for details.');
     }
   })();
 
-  // -------- UI events
+  // UI events
   BTN_MORE?.addEventListener('click', loadMore);
   BTN_RANK?.addEventListener('click', () => { sortMode = 'rank'; resort(); });
   BTN_SCORE?.addEventListener('click', () => { sortMode = 'score'; resort(); });
