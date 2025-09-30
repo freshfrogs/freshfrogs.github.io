@@ -265,12 +265,22 @@
     return _web3;
   }
 
+  function resolveCollectionAbi(){
+    if (typeof global.COLLECTION_ABI !== 'undefined') return global.COLLECTION_ABI;
+    if (typeof global.collection_abi !== 'undefined') return global.collection_abi;
+    if (typeof COLLECTION_ABI !== 'undefined') return COLLECTION_ABI;
+    if (typeof collection_abi !== 'undefined') return collection_abi;
+    return null;
+  }
+
   function getCollectionContract(){
     if (_collection) return _collection;
-    if (!CFG.COLLECTION_ADDRESS || !global.COLLECTION_ABI) return null;
+    if (!CFG.COLLECTION_ADDRESS) return null;
+    var abi = resolveCollectionAbi();
+    if (!abi || !abi.length) return null;
     var web3 = getWeb3();
     if (!web3 || !web3.eth || !web3.eth.Contract) return null;
-    _collection = new web3.eth.Contract(global.COLLECTION_ABI, CFG.COLLECTION_ADDRESS);
+    _collection = new web3.eth.Contract(abi, CFG.COLLECTION_ADDRESS);
     return _collection;
   }
 
