@@ -70,8 +70,10 @@
       overflow: 'hidden',
       imageRendering: 'pixelated',
       backgroundRepeat: 'no-repeat',
-      backgroundPosition: '80% 90%',
-      backgroundSize: '240% 240%'
+      // Zoom way into the bottom-right of the original PNG so only the
+      // backdrop color is visible behind the layered attributes.
+      backgroundPosition: '140% 140%',
+      backgroundSize: '800% 800%'
     });
     return host;
   }
