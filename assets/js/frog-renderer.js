@@ -78,6 +78,47 @@
     return host;
   }
 
+  const BACKDROP_COLOR_CACHE = new Map();
+  function applyBackdrop(host, tokenId){
+    if (!host) return;
+    if (!tokenId){
+      host.style.backgroundImage = 'none';
+      host.style.backgroundColor = 'transparent';
+      return;
+    }
+
+    const url = basePNG(tokenId);
+    host.style.backgroundImage = `url("${url}")`;
+
+    if (BACKDROP_COLOR_CACHE.has(tokenId)){
+      host.style.backgroundColor = BACKDROP_COLOR_CACHE.get(tokenId);
+      return;
+    }
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function(){
+      try {
+        const w = img.naturalWidth || img.width || 1;
+        const h = img.naturalHeight || img.height || 1;
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('no ctx');
+        ctx.drawImage(img, 0, 0, w, h);
+        const data = ctx.getImageData(Math.max(0, w - 1), Math.max(0, h - 1), 1, 1).data;
+        const color = `rgba(${data[0]}, ${data[1]}, ${data[2]}, ${data[3] / 255})`;
+        BACKDROP_COLOR_CACHE.set(tokenId, color);
+        host.style.backgroundColor = color;
+      } catch(_){
+        BACKDROP_COLOR_CACHE.set(tokenId, 'transparent');
+      }
+    };
+    img.onerror = function(){ BACKDROP_COLOR_CACHE.set(tokenId, 'transparent'); };
+    img.src = url;
+  }
+
   const ANIM_CACHE = new Map();
   function hasAnimation(k,v){
     const key = `${k}::${v}`;
@@ -142,7 +183,7 @@
     const host = ensureHost(canvasEl, size);
 
     // Background from the original PNG (zoom bottom-right pixel)
-    host.style.backgroundImage = tokenId ? `url("${basePNG(tokenId)}")` : 'none';
+    applyBackdrop(host, tokenId);
 
     // Metadata
     let meta = metaOrNull;
