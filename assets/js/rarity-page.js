@@ -40,30 +40,14 @@
     const css = `
 .frog-cards{ display:grid; gap:10px; }
 .frog-card{
-  border:1px solid var(--card-border, var(--border));
-  background:var(--card-surface, var(--panel));
+  border:1px solid var(--border);
+  background:var(--panel);
   border-radius:14px;
   padding:12px;
   display:flex;
   flex-direction:column;
   gap:10px;
   color:inherit;
-  box-shadow:var(--card-shadow, 0 6px 12px rgba(0,0,0,.25));
-  backdrop-filter:var(--card-blur, none);
-}
-.frog-card .card-body{
-  display:grid;
-  grid-template-columns:auto 1fr;
-  column-gap:12px;
-  row-gap:6px;
-  align-items:start;
-}
-.frog-card .card-body{
-  display:grid;
-  grid-template-columns:auto 1fr;
-  column-gap:12px;
-  row-gap:6px;
-  align-items:start;
 }
 .frog-card .thumb-wrap{ width:${SIZE}px; min-width:${SIZE}px; position:relative; }
 
@@ -95,47 +79,6 @@
     `;
     const s=document.createElement('style'); s.id='rarity-cards-css'; s.textContent=css; document.head.appendChild(s);
   })();
-
-  // ---------- Themes ----------
-  const THEMES = [
-    { id:'emerald', name:'Emerald Depths', tagline:'Verdant glow with deep lagoon panels' },
-    { id:'midnight', name:'Midnight Bloom', tagline:'Dusky violets with neon magenta borders' },
-    { id:'sunset', name:'Sunset Oasis', tagline:'Warm coral gradient with sand highlights' },
-    { id:'retro', name:'Retro Console', tagline:'Muted teal grids with amber text glow' },
-    { id:'cyber', name:'Cyber Bloom', tagline:'High-contrast noir with electric cyan edges' }
-  ];
-  const THEME_KEY = 'ff-rarity-theme';
-  let themeIndex = 0;
-
-  function applyTheme(theme){
-    if (!theme) return;
-    document.documentElement.setAttribute('data-theme', theme.id);
-    if (BTN_THEME){
-      BTN_THEME.textContent = `Theme: ${theme.name}`;
-    }
-    if (THEME_LABEL){
-      THEME_LABEL.textContent = theme.tagline || theme.name;
-    }
-  }
-
-  function initTheme(){
-    let desired = null;
-    try{ desired = localStorage.getItem(THEME_KEY); }catch{}
-    const attr = document.documentElement.getAttribute('data-theme');
-    const initialId = desired || attr;
-    const idx = THEMES.findIndex(t => t.id === initialId);
-    themeIndex = idx >= 0 ? idx : 0;
-    applyTheme(THEMES[themeIndex]);
-  }
-
-  BTN_THEME?.addEventListener('click', () => {
-    themeIndex = (themeIndex + 1) % THEMES.length;
-    const theme = THEMES[themeIndex];
-    applyTheme(theme);
-    try{ localStorage.setItem(THEME_KEY, theme.id); }catch{}
-  });
-
-  initTheme();
 
   // ---------- Utils ----------
   const asNum = (x)=> { const n = Number(x); return Number.isFinite(n)?n:NaN; };
