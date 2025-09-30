@@ -58,7 +58,15 @@
   row-gap:6px;
   align-items:start;
 }
+.frog-card .card-body{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  column-gap:12px;
+  row-gap:6px;
+  align-items:start;
+}
 .frog-card .thumb-wrap{ width:${SIZE}px; min-width:${SIZE}px; position:relative; }
+
 .frog-card canvas.frog-canvas{ width:${SIZE}px; height:${SIZE}px; border-radius:12px; background:var(--card-thumb, var(--panel-2)); display:block; box-shadow:var(--thumb-shadow, inset 0 0 0 1px rgba(255,255,255,.06)); }
 .frog-card .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
 .frog-card .meta{ color:var(--muted); font-size:12px; }
