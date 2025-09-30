@@ -1,5 +1,5 @@
-// assets/js/rarity-page.js — rarity grid with dashboard-style cards, layered 128x128 image,
-// rank pill beside title, subtitle = staking status + owner, and bullet-list attributes.
+// assets/js/rarity-page.js — rarity grid with layered 128x128, sampled bg color,
+// dashboard-style subtitle, and vertical bullet-list attributes.
 
 (function(FF = window.FF || {}, CFG = window.CFG || {}) {
   const GRID = document.getElementById('rarityGrid');
@@ -51,15 +51,23 @@
   function traitVal(t){ return (t?.value ?? t?.trait_value ?? '').toString().trim(); }
   function layerPath(traitType, value){ return `${LAYER_BASE}/${sanitizePart(traitType)}/${sanitizePart(value)}.png`; }
 
-  // Title rank pill color (simple mapping; tweak if you have your theme tokens handy)
+  // Title rank pill color
   function rankPillStyle(rank){
-    if (rank === 1) return 'background:#f59e0b; color:#0b0b0d; border:1px solid #a16207;'; // gold
-    if (rank <= 50) return 'background:#8b5cf6; color:#0b0b0d; border:1px solid #6d28d9;';  // purple
+    if (rank === 1) return 'background:#f59e0b; color:#0b0b0d; border:1px solid #a16207;';
+    if (rank <= 50) return 'background:#8b5cf6; color:#0b0b0d; border:1px solid #6d28d9;';
     return 'background: color-mix(in srgb, var(--panel) 85%, transparent); border:1px solid var(--border);';
   }
 
-  // ---- Wallet helper (to highlight "Owned by You")
+  // ---- Wallet (to show "Owned by You")
   async function getUserAddress(){
+    // Prefer any site helper if present
+    try {
+      if (typeof window.FF_getUserAddress === 'function') {
+        const a = await window.FF_getUserAddress();
+        if (a) return a;
+      }
+    } catch {}
+    // Fallback to eth_accounts (won't prompt connect)
     try{
       if (window.ethereum?.request){
         const accts = await window.ethereum.request({ method:'eth_accounts' });
@@ -182,7 +190,7 @@
     } catch { return []; }
   }
 
-  // ---- Layered Frog (strict 128×128)
+  // ---- Layered Frog (strict 128×128, background color sampled from original PNG)
   function buildLayeredFrog(meta, id){
     const wrap = document.createElement('div');
     wrap.className = 'img-wrap';
@@ -191,12 +199,26 @@
       height: `${CANVAS_SIZE}px`,
       position: 'relative',
       gridRow: 'span 3',
-      backgroundImage: `url(frog/${id}.png)`,
-      backgroundRepeat: 'no-repeat',
-      backgroundSize: '280% 280%',   // scaled so only the bg color shows
-      backgroundPosition: '120% 120%',
-      imageRendering: 'pixelated'
+      imageRendering: 'pixelated',
+      borderRadius: '12px',
+      overflow: 'hidden'
     });
+
+    // sample bg color from frog/{id}.png (top-left pixel)
+    const bg = new Image();
+    bg.src = `frog/${id}.png`;
+    bg.crossOrigin = 'anonymous';
+    bg.onload = () => {
+      try {
+        const c = document.createElement('canvas');
+        c.width = 2; c.height = 2;
+        const ctx = c.getContext('2d', { willReadFrequently: true });
+        // Draw scaled down to 2x2, then read 0,0
+        ctx.drawImage(bg, 0, 0, 2, 2);
+        const d = ctx.getImageData(0, 0, 1, 1).data;
+        wrap.style.backgroundColor = `rgb(${d[0]}, ${d[1]}, ${d[2]})`;
+      } catch {}
+    };
 
     const attrs = Array.isArray(meta?.attributes) ? sortByLayerOrder(meta.attributes) : [];
     for (const a of attrs){
@@ -215,7 +237,7 @@
         height: `${CANVAS_SIZE}px`,
         imageRendering: 'pixelated'
       });
-      img.onerror = () => { img.remove(); }; // skip missing layers silently
+      img.onerror = () => { img.remove(); }; // skip missing layers
       wrap.appendChild(img);
     }
     return wrap;
@@ -234,7 +256,7 @@
 
   // ---- Card (dashboard style)
   function buildCard(rec, userAddr){
-    const { id, rank, score, meta, owner, stake } = rec;
+    const { id, rank, meta, owner, stake } = rec;
     const stakedDays = daysAgoFromUnix(stake?.since);
 
     // Title with rank pill
@@ -249,7 +271,7 @@
     title.appendChild(tName);
     title.appendChild(tRank);
 
-    // Subtitle: staking status (green only when staked) • owner text
+    // Subtitle: staked status • owner
     const subtitle = document.createElement('div');
     subtitle.className = 'meta';
     subtitle.style.color = 'var(--muted)';
@@ -257,11 +279,10 @@
     const status = document.createElement('span');
     if (stake?.staked && stakedDays != null) {
       status.textContent = `Staked ${stakedDays}d ago`;
-      status.style.color = 'color-mix(in srgb, #22c55e 85%, #ffffff)'; // green tone
+      status.style.color = 'color-mix(in srgb, #22c55e 85%, #ffffff)';
       status.style.fontWeight = '700';
     } else {
       status.textContent = 'Not staked';
-      // keep muted
     }
 
     const sep = document.createElement('span'); sep.textContent = ' • ';
@@ -270,7 +291,7 @@
     const ownerSpan = document.createElement('span');
     ownerSpan.textContent = you ? 'Owned by You' : `Owned by ${shortAddr(owner)}`;
     if (you) {
-      ownerSpan.style.color = 'color-mix(in srgb, #22c55e 85%, #ffffff)'; // same green as your dashboard
+      ownerSpan.style.color = 'color-mix(in srgb, #22c55e 85%, #ffffff)';
       ownerSpan.style.fontWeight = '700';
     }
 
@@ -278,7 +299,7 @@
     subtitle.appendChild(sep);
     subtitle.appendChild(ownerSpan);
 
-    // Attributes — bullet list, muted, each on its own line: "Trait: Value"
+    // Attributes — vertical list (force list-item display)
     const attrsBlock = document.createElement('ul');
     attrsBlock.style.margin = '6px 0 0 0';
     attrsBlock.style.paddingLeft = '18px';
@@ -290,6 +311,7 @@
         if (!k || !v) return;
         const li = document.createElement('li');
         li.textContent = `${k}: ${v}`;
+        li.style.display = 'list-item';       // <-- force vertical bullets
         attrsBlock.appendChild(li);
       });
     }
@@ -300,7 +322,7 @@
     const btnOS = document.createElement('a');
     btnOS.href = `https://opensea.io/assets/ethereum/${CFG.COLLECTION_ADDRESS}/${id}`;
     btnOS.target = '_blank'; btnOS.rel = 'noopener';
-    btnOS.className = 'btn btn-outline-gray'; btnOS.textContent = 'Etherscan' ? 'OpenSea' : 'OpenSea';
+    btnOS.className = 'btn btn-outline-gray'; btnOS.textContent = 'OpenSea';
     const btnScan = document.createElement('a');
     btnScan.href = `https://etherscan.io/token/${CFG.COLLECTION_ADDRESS}?a=${id}`;
     btnScan.target = '_blank'; btnScan.rel = 'noopener';
@@ -389,6 +411,11 @@
         const id = Number(FIND_INPUT.value);
         if (Number.isFinite(id)) jumpToId(id, userAddr);
       });
+
+      // Also react to account changes to show "Owned by You" live
+      if (window.ethereum?.on) {
+        window.ethereum.on('accountsChanged', () => location.reload());
+      }
     } catch (e) {
       console.error('[rarity] init error', e);
       uiError('Failed to initialize rarity view.');
