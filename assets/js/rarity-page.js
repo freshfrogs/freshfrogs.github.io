@@ -9,12 +9,14 @@
   const CFG = window.FF_CFG || {};
 
   // ---------- DOM ----------
-  const GRID       = document.getElementById('rarityGrid');
-  const BTN_MORE   = document.getElementById('btnMore');
-  const BTN_RANK   = document.getElementById('btnSortRank');
-  const BTN_SCORE  = document.getElementById('btnSortScore');
-  const FIND_INPUT = document.getElementById('raritySearchId');
-  const BTN_GO     = document.getElementById('btnGo');
+  const GRID        = document.getElementById('rarityGrid');
+  const BTN_MORE    = document.getElementById('btnMore');
+  const BTN_RANK    = document.getElementById('btnSortRank');
+  const BTN_SCORE   = document.getElementById('btnSortScore');
+  const FIND_INPUT  = document.getElementById('raritySearchId');
+  const BTN_GO      = document.getElementById('btnGo');
+  const BTN_THEME   = document.getElementById('btnThemeCycle');
+  const THEME_LABEL = document.getElementById('themeLabel');
   if (!GRID) return;
 
   // ---------- Config ----------
@@ -38,14 +40,23 @@
     const css = `
 .frog-cards{ display:grid; gap:10px; }
 .frog-card{
-  border:1px solid var(--border);
-  background:var(--panel);
+  border:1px solid var(--card-border, var(--border));
+  background:var(--card-surface, var(--panel));
   border-radius:14px;
   padding:12px;
   display:flex;
   flex-direction:column;
   gap:10px;
   color:inherit;
+  box-shadow:var(--card-shadow, 0 6px 12px rgba(0,0,0,.25));
+  backdrop-filter:var(--card-blur, none);
+}
+.frog-card .card-body{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  column-gap:12px;
+  row-gap:6px;
+  align-items:start;
 }
 .frog-card .card-body{
   display:grid;
@@ -55,17 +66,14 @@
   align-items:start;
 }
 .frog-card .thumb-wrap{ width:${SIZE}px; min-width:${SIZE}px; position:relative; }
-.frog-card canvas.frog-canvas{ width:${SIZE}px; height:${SIZE}px; border-radius:12px; background:var(--panel-2); display:block;
-}
-.frog-card .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px;
-}
-.frog-card .meta{ color:var(--muted); font-size:12px; }
 
-.frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; color:var(--muted); font:400 12px/1.4 var(--font-ui);
- }
+.frog-card canvas.frog-canvas{ width:${SIZE}px; height:${SIZE}px; border-radius:12px; background:var(--card-thumb, var(--panel-2)); display:block; box-shadow:var(--thumb-shadow, inset 0 0 0 1px rgba(255,255,255,.06)); }
+.frog-card .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
+.frog-card .meta{ color:var(--muted); font-size:12px; }
+.frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; color:var(--muted); font:400 12px/1.4 var(--font-ui); }
 .frog-card .attr-bullets li{ display:list-item; font:inherit; color:inherit; margin:2px 0; transition:color .15s ease; }
 .frog-card .attr-bullets li[data-hoverable="1"]{ cursor:pointer; }
-.frog-card .attr-bullets li[data-hoverable="1"]:hover{ color:var(--fg); }
+.frog-card .attr-bullets li[data-hoverable="1"]:hover{ color:var(--fg, #fff); }
 
 .rank-pill{
   display:inline-flex; align-items:center; gap:6px;
@@ -84,17 +92,61 @@
 .rank-common::before{ color:var(--muted); }
 
 .meta .staked-flag{ color:#22c55e; font-weight:700; }
-.actions{ display:flex; gap:8px; flex-wrap:wrap; }
-.btn{ font-family:var(--font-ui); border:1px solid var(--border); background:transparent; color:inherit; border-radius:8px; padding:6px 10px; font-weight:700; font-size:12px; line-height:1; }
-.btn-outline-gray{ border-color: color-mix(in srgb, #9ca3af 70%, var(--border)); color: color-mix(in srgb, #ffffff 65%, #9ca3af); }
     `;
     const s=document.createElement('style'); s.id='rarity-cards-css'; s.textContent=css; document.head.appendChild(s);
   })();
+
+  // ---------- Themes ----------
+  const THEMES = [
+    { id:'emerald', name:'Emerald Depths', tagline:'Verdant glow with deep lagoon panels' },
+    { id:'midnight', name:'Midnight Bloom', tagline:'Dusky violets with neon magenta borders' },
+    { id:'sunset', name:'Sunset Oasis', tagline:'Warm coral gradient with sand highlights' },
+    { id:'retro', name:'Retro Console', tagline:'Muted teal grids with amber text glow' },
+    { id:'cyber', name:'Cyber Bloom', tagline:'High-contrast noir with electric cyan edges' }
+  ];
+  const THEME_KEY = 'ff-rarity-theme';
+  let themeIndex = 0;
+
+  function applyTheme(theme){
+    if (!theme) return;
+    document.documentElement.setAttribute('data-theme', theme.id);
+    if (BTN_THEME){
+      BTN_THEME.textContent = `Theme: ${theme.name}`;
+    }
+    if (THEME_LABEL){
+      THEME_LABEL.textContent = theme.tagline || theme.name;
+    }
+  }
+
+  function initTheme(){
+    let desired = null;
+    try{ desired = localStorage.getItem(THEME_KEY); }catch{}
+    const attr = document.documentElement.getAttribute('data-theme');
+    const initialId = desired || attr;
+    const idx = THEMES.findIndex(t => t.id === initialId);
+    themeIndex = idx >= 0 ? idx : 0;
+    applyTheme(THEMES[themeIndex]);
+  }
+
+  BTN_THEME?.addEventListener('click', () => {
+    themeIndex = (themeIndex + 1) % THEMES.length;
+    const theme = THEMES[themeIndex];
+    applyTheme(theme);
+    try{ localStorage.setItem(THEME_KEY, theme.id); }catch{}
+  });
+
+  initTheme();
 
   // ---------- Utils ----------
   const asNum = (x)=> { const n = Number(x); return Number.isFinite(n)?n:NaN; };
   const getRankLike = (o)=> asNum(o.rank ?? o.ranking ?? o.position ?? o.place);
   const shortAddr = (a)=> a && typeof a==='string' ? (a.length>10 ? (a.slice(0,6)+'…'+a.slice(-4)) : a) : '—';
+  const ownerLabel = (addr, you)=> {
+    if (!addr) return 'Unknown';
+    if (you && addr && you.toLowerCase() === addr.toLowerCase()) return 'You';
+    if (typeof addr === 'string' && addr.startsWith('0x')) return shortAddr(addr);
+    return addr;
+  };
   const traitKey  = (t)=> (t?.key ?? t?.trait_type ?? t?.traitType ?? t?.trait ?? '').toString().trim();
   const traitVal  = (t)=> (t?.value ?? t?.trait_value ?? '').toString().trim();
 
@@ -366,9 +418,11 @@
 
     const metaLine = document.createElement('div');
     metaLine.className = 'meta';
-    const resolvedOwner = typeof owner === 'string' ? owner : '';
-    const me = userAddr && resolvedOwner && userAddr.toLowerCase() === resolvedOwner.toLowerCase();
-    const stakeInfo = stake || { staked:false, sinceMs:null };
+    const stakeInfo = Object.assign({ staked:false, sinceMs:null, owner:null }, stake);
+    const knownOwner = stakeInfo.owner || owner;
+    const resolvedOwner = (typeof knownOwner === 'string' && knownOwner) ? knownOwner : '';
+    if (!stakeInfo.owner && resolvedOwner) stakeInfo.owner = resolvedOwner;
+    const ownerText = ownerLabel(resolvedOwner, userAddr);
 
     const stakeSpan = document.createElement('span');
     if (stakeInfo.staked) {
@@ -380,7 +434,7 @@
     }
     const sep = document.createElement('span'); sep.textContent = ' • ';
     const ownerSpan = document.createElement('span');
-    ownerSpan.textContent = `Owned by ${resolvedOwner ? (me ? 'You' : shortAddr(resolvedOwner)) : '—'}`;
+    ownerSpan.textContent = `Owned by ${ownerText}`;
 
     metaLine.appendChild(stakeSpan);
     metaLine.appendChild(sep);
@@ -388,7 +442,7 @@
 
     const list = document.createElement('ul');
     list.className = 'attr-bullets';
-    const attrs = Array.isArray(meta?.attributes) ? meta.attributes : [];
+    const attrs = Array.isArray(meta?.attributes) ? meta.attributes.slice() : [];
     attrs.forEach(a => {
       const k = traitKey(a), v = traitVal(a);
       if (!k || !v) return;
@@ -407,16 +461,6 @@
     body.appendChild(media);
     body.appendChild(info);
     card.appendChild(body);
-
-    const actions = document.createElement('div'); actions.className='actions';
-    const aOS  = document.createElement('a'); aOS.className='btn btn-outline-gray'; aOS.textContent='OpenSea';
-    aOS.href = `https://opensea.io/assets/ethereum/${CFG.COLLECTION_ADDRESS}/${id}`; aOS.target='_blank'; aOS.rel='noopener';
-    const aScan= document.createElement('a'); aScan.className='btn btn-outline-gray'; aScan.textContent='Etherscan';
-    aScan.href = `https://etherscan.io/token/${CFG.COLLECTION_ADDRESS}?a=${id}`; aScan.target='_blank'; aScan.rel='noopener';
-    const aOrig= document.createElement('a'); aOrig.className='btn btn-outline-gray'; aOrig.textContent='Original';
-    aOrig.href = `frog/${id}.png`; aOrig.target='_blank'; aOrig.rel='noopener';
-    actions.appendChild(aOS); actions.appendChild(aScan); actions.appendChild(aOrig);
-    card.appendChild(actions);
 
     const metaSource = rec.metaRaw || meta;
     let rendererReady = typeof FF.renderFrog === 'function';
@@ -488,10 +532,10 @@
     for (let i=0;i<slice.length;i++){
       slice[i].meta = metas[i];
       slice[i].metaRaw = metas[i]; // pass through for renderer
-      const stakeInfo = stakes[i] || { staked:false, sinceMs:null, owner:null };
-      const resolvedOwner = stakeInfo.staked
-        ? (stakeInfo.owner || owners[i] || onchainOwners[i] || null)
-        : (owners[i] || stakeInfo.owner || onchainOwners[i] || null);
+      const stakeInfo = Object.assign({ staked:false, sinceMs:null, owner:null }, stakes[i]);
+      const fallbackOwner = owners[i] || onchainOwners[i] || null;
+      if (!stakeInfo.owner && fallbackOwner) stakeInfo.owner = fallbackOwner;
+      const resolvedOwner = stakeInfo.owner || fallbackOwner || null;
       slice[i].owner = resolvedOwner;
       slice[i].stake = stakeInfo;
     }

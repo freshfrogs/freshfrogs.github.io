@@ -15,6 +15,7 @@
   const ROOT = String(CFG.SOURCE_PATH || '').replace(/\/+$/,'');
   const DISALLOW_HOVER = new Set(['Trait','Frog','SpecialFrog']);
   const DISALLOW_ANIM  = new Set(['Frog','Hat']);
+  const ENABLE_ANIMATIONS = (CFG && CFG.ENABLE_FROG_ANIMATIONS === true);
 
   function metaURL(id){ return `${ROOT}/frog/json/${id}.json`; }
   function basePNG(id){ return `${ROOT}/frog/${id}.png`; }
@@ -144,10 +145,11 @@
       addLayer(host, layerPNG(a.key, a.value), lift);
     }
 
-    // Animated overlays (skip Frog/Hat)
-    for (const a of attrs){
-      if (DISALLOW_ANIM.has(a.key)) continue;
-      addAnim(host, layerGIF(a.key, a.value));
+    if (ENABLE_ANIMATIONS){
+      for (const a of attrs){
+        if (DISALLOW_ANIM.has(a.key)) continue;
+        addAnim(host, layerGIF(a.key, a.value));
+      }
     }
   };
 
