@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="t1">
+<html lang="en" data-theme="emerald">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,7 +8,69 @@
   <link rel="stylesheet" href="assets/css/styles.css" />
 
   <style>
-    /* mirror collection.html base feel */
+    :root{
+      --page-bg: var(--bg);
+      --card-surface: var(--panel);
+      --card-border: var(--border);
+      --card-shadow: var(--shadow, 0 6px 12px rgba(0,0,0,.25));
+      --card-blur: none;
+      --card-thumb: var(--panel-2);
+      --thumb-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+    }
+
+    html[data-theme="emerald"]{
+      --bg:#031511; --ink:#dfffee; --muted:#7bbba5;
+      --panel:#08211b; --panel-2:#0e2f24;
+      --card-surface:rgba(12,49,38,.88);
+      --card-border:rgba(88,199,158,.45);
+      --card-shadow:0 18px 32px rgba(6,32,24,.55);
+      --card-blur:blur(12px);
+      --card-thumb:rgba(11,43,33,.9);
+      --thumb-shadow:0 10px 22px rgba(5,15,12,.6);
+      --page-bg:radial-gradient(circle at top,#123d2b 0%,#041410 65%,#010807 100%);
+    }
+    html[data-theme="midnight"]{
+      --bg:#0b0614; --ink:#f5e9ff; --muted:#a48fc7;
+      --panel:#130a25; --panel-2:#1c1233;
+      --card-surface:rgba(33,14,63,.92);
+      --card-border:rgba(197,119,255,.35);
+      --card-shadow:0 20px 38px rgba(9,3,28,.55);
+      --card-thumb:rgba(25,12,48,.85);
+      --thumb-shadow:0 14px 28px rgba(9,3,28,.55);
+      --page-bg:radial-gradient(circle at 20% 20%,#29144b 0%,#0a0618 70%,#04020c 100%);
+    }
+    html[data-theme="sunset"]{
+      --bg:#1a0a05; --ink:#fff1e8; --muted:#f0b9a4;
+      --panel:#26120a; --panel-2:#33180d;
+      --card-surface:rgba(57,23,11,.9);
+      --card-border:rgba(255,140,105,.45);
+      --card-shadow:0 20px 36px rgba(36,10,4,.6);
+      --card-thumb:rgba(41,15,8,.85);
+      --thumb-shadow:0 14px 28px rgba(24,7,3,.55);
+      --page-bg:linear-gradient(160deg,#62261d 0%,#2f0c0b 45%,#0f0608 100%);
+    }
+    html[data-theme="retro"]{
+      --bg:#061416; --ink:#d4f2f2; --muted:#7db3b3;
+      --panel:#0b2224; --panel-2:#103033;
+      --card-surface:rgba(13,40,44,.95);
+      --card-border:rgba(255,203,112,.35);
+      --card-shadow:0 16px 30px rgba(6,20,22,.55);
+      --card-thumb:rgba(10,32,34,.9);
+      --thumb-shadow:0 12px 24px rgba(4,14,16,.55);
+      --page-bg:radial-gradient(circle at bottom,#143f45 0%,#071b1f 60%,#031013 100%);
+    }
+    html[data-theme="cyber"]{
+      --bg:#03060f; --ink:#e9faff; --muted:#7aa0cc;
+      --panel:#071221; --panel-2:#0c1d34;
+      --card-surface:rgba(12,29,52,.9);
+      --card-border:rgba(0,232,255,.45);
+      --card-shadow:0 22px 40px rgba(3,10,22,.6);
+      --card-thumb:rgba(7,18,33,.85);
+      --thumb-shadow:0 16px 32px rgba(3,10,22,.6);
+      --page-bg:radial-gradient(circle at 80% 10%,rgba(0,255,200,.25) 0%,rgba(3,10,20,.95) 55%,#02050d 100%);
+    }
+
+    body{ background:var(--page-bg, var(--bg)); background-attachment:fixed; background-size:cover; color:var(--ink); }
     .pg-wrap{ padding:20px; }
     img{ image-rendering: pixelated; image-rendering: crisp-edges; }
 
@@ -16,6 +78,36 @@
     .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; flex-wrap:wrap; }
     .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
     .pg-muted{ color:var(--muted); font-size:13px; }
+    .theme-switch{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .theme-switch .theme-note{ font-size:12px; color:var(--muted); }
+
+    .btn{
+      font-family: var(--font-ui);
+      border:1px solid var(--card-border, var(--border));
+      background: color-mix(in srgb, var(--panel) 25%, transparent);
+      color: var(--ink);
+      border-radius:8px;
+      padding:6px 10px;
+      font-weight:700;
+      font-size:12px;
+      line-height:1;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      text-decoration:none;
+      transition: background .15s ease, border-color .15s ease, color .15s ease, transform .05s ease;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn-outline-gray{
+      border-color: color-mix(in srgb, var(--muted) 45%, transparent);
+      color: color-mix(in srgb, var(--ink) 85%, var(--muted));
+      background: color-mix(in srgb, var(--panel) 12%, transparent);
+    }
+    .btn:hover{
+      background: color-mix(in srgb, var(--accent, #22c55e) 14%, var(--panel));
+      border-color: color-mix(in srgb, var(--accent, #22c55e) 65%, var(--border));
+      color: color-mix(in srgb, #ffffff 82%, var(--ink));
+    }
 
     .btn{
       font-family: var(--font-ui);
@@ -100,8 +192,12 @@
           <div class="control-row" style="display:flex;gap:8px;flex-wrap:wrap;">
             <button id="btnSortRank"  class="btn btn-outline-gray">Sort: Rank ↑</button>
             <button id="btnSortScore" class="btn btn-outline-gray">Sort: Score ↓</button>
-            <input id="raritySearchId" type="number" min="1" placeholder="Find Frog ID…" style="width:140px; padding:6px 10px; border:1px solid var(--border); border-radius:8px; background:var(--panel-2); color:inherit;">
+            <input id="raritySearchId" type="number" min="1" placeholder="Find Frog ID…" style="width:140px; padding:6px 10px; border:1px solid var(--card-border, var(--border)); border-radius:8px; background:var(--card-thumb, var(--panel-2)); color:inherit;">
             <button id="btnGo" class="btn btn-outline-gray">Go</button>
+          </div>
+          <div class="theme-switch">
+            <button id="btnThemeCycle" class="btn btn-outline-gray">Theme: Emerald Depths</button>
+            <span id="themeLabel" class="theme-note">Verdant glow with deep lagoon panels</span>
           </div>
         </div>
 
