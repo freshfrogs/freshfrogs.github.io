@@ -8,7 +8,7 @@
   const CFG = window.FF_CFG || {};
   const CHAIN_ID = Number(CFG.CHAIN_ID || 1);
   const BASEPATH = (CFG.SOURCE_PATH || '').replace(/\/+$/,'');
-  const LEVEL_SECS = Math.max(1, Number(CFG.STAKE_LEVEL_SECONDS || 86400));
+  const LEVEL_SECS = Math.max(1, Number(CFG.STAKE_LEVEL_SECONDS || (30 * 86400)));
   const NO_HOVER_KEYS = new Set(['Trait','Frog','SpecialFrog']);
 
   (function injectCSS(){
@@ -27,7 +27,8 @@
 .frog-card .pill.rk-legendary{ color:#f59e0b; border-color: color-mix(in srgb,#f59e0b 70%, var(--border)); }
 .frog-card .pill.rk-epic{ color:#a855f7; border-color: color-mix(in srgb,#a855f7 70%, var(--border)); }
 .frog-card .pill.rk-rare{ color:#38bdf8; border-color: color-mix(in srgb,#38bdf8 70%, var(--border)); }
-.frog-card .meta{ margin:0; color:#22c55e; } /* staked line in green */
+.frog-card .meta{ margin:0; color:var(--muted); font-size:12px; }
+.frog-card .meta .staked-flag{ color:#22c55e; font-weight:700; }
 .frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; }
 .frog-card .attr-bullets li{ font-size:12px; margin:2px 0; cursor:default; }
 .frog-card .attr-bullets li[data-hoverable="1"]{ cursor:pointer; }
@@ -61,6 +62,33 @@
     const m=Math.floor((s%3600)/60); if(m>=1) return m+'m ago';
     return s+'s ago';
   }
+  function escapeHtml(str){
+    return String(str)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;');
+  }
+  function attrEscape(str){
+    return String(str).replace(/"/g,'&quot;');
+  }
+  function shortAddr(addr){
+    if(!addr||typeof addr!=='string') return '—';
+    const a = addr.trim();
+    if (!a) return '—';
+    if(a.length<=10) return a;
+    return a.slice(0,6)+'…'+a.slice(-4);
+  }
+  function ownerLabelFor(it){
+    if (it == null || typeof it !== 'object') return 'Unknown';
+    if (it.ownerLabel) return escapeHtml(it.ownerLabel);
+    if (it.ownerYou) return 'You';
+    if (it.ownerShort && it.ownerShort !== '—') return escapeHtml(it.ownerShort);
+    if (it.owner) return escapeHtml(shortAddr(it.owner));
+    if (it.holder) return escapeHtml(shortAddr(it.holder));
+    return 'Unknown';
+  }
   function levelInfo(sinceMs, secsPerLevel){
     if (!sinceMs) return { level:0, pct:0 };
     const el = Math.max(0, Math.floor((Date.now() - sinceMs)/1000));
@@ -81,15 +109,16 @@
     if (rank==null) return '';
     const t=tierFor(rank, tiers);
     const cls = t==='legendary'?'rk-legendary':t==='epic'?'rk-epic':t==='rare'?'rk-rare':'';
-    return ` <span class="pill ${cls}">Rank #${rank}</span>`;
+    return ` <span class="pill ${cls}">♦ #${rank}</span>`;
   }
   function attrsHTML(attrs, max=4){
     if (!Array.isArray(attrs)||!attrs.length) return '';
     const rows=[];
     for (let i=0;i<attrs.length;i++){
       const a = attrs[i]; if(!a.key||a.value==null) continue;
-      const hoverable = NO_HOVER_KEYS.has(a.key) ? '0' : '1';
-      rows.push(`<li data-attr-key="${String(a.key)}" data-hoverable="${hoverable}"><b>${a.key}:</b> ${String(a.value)}</li>`);
+      const keyStr = String(a.key);
+      const hoverable = NO_HOVER_KEYS.has(keyStr) ? '0' : '1';
+      rows.push(`<li data-attr-key="${attrEscape(keyStr)}" data-hoverable="${hoverable}"><b>${escapeHtml(keyStr)}:</b> ${escapeHtml(String(a.value))}</li>`);
       if(rows.length>=max) break;
     }
     return rows.length? '<ul class="attr-bullets">'+rows.join('')+'</ul>' : '';
@@ -146,11 +175,13 @@
     }
 
   function metaLineDefault(it){
+    const ownerLabel = ownerLabelFor(it);
     if (it.staked){
-      const ago = it.sinceMs ? fmtAgo(it.sinceMs) : null;
-      return (ago ? `Staked ${ago}` : 'Staked') + ' • Owned by You';
+      const agoRaw = it.sinceMs ? fmtAgo(it.sinceMs) : null;
+      const ago = agoRaw ? ' '+escapeHtml(agoRaw) : '';
+      return `<span class="staked-flag">Staked${ago}</span> • Owned by ${ownerLabel}`;
     }
-    return 'Not staked • Owned by You';
+    return 'Not staked • Owned by '+ownerLabel;
   }
 
   function levelRowHTML(it, secsPerLevel){
@@ -184,16 +215,16 @@
           <div class="meta">${metaLine}</div>
           ${levelRowHTML(item, secsPer)}
           ${attrs}
-          ${options.showActions ? `
-            <div class="actions">
-              <button class="btn" data-act="${item.staked ? 'unstake' : 'stake'}">${item.staked ? 'Unstake' : 'Stake'}</button>
-              <button class="btn" data-act="transfer" ${disableTransfer ? 'disabled title="Transfer disabled while staked"' : ''}>Transfer</button>
-              ${options.linkEtherscan !== false ? `<a class="btn" href="${(options.etherscanForId||etherscanFor)(item.id)}" target="_blank" rel="noopener">Etherscan</a>`:''}
-              ${options.linkOriginal !== false ? `<a class="btn" href="${(options.imgForId||imgFor)(item.id)}" target="_blank" rel="noopener">Original</a>`:''}
-            </div>
-          `:``}
         </div>
       </div>
+      ${options.showActions ? `
+        <div class="actions">
+          <button class="btn" data-act="${item.staked ? 'unstake' : 'stake'}">${item.staked ? 'Unstake' : 'Stake'}</button>
+          <button class="btn" data-act="transfer" ${disableTransfer ? 'disabled title="Transfer disabled while staked"' : ''}>Transfer</button>
+          ${options.linkEtherscan !== false ? `<a class="btn" href="${(options.etherscanForId||etherscanFor)(item.id)}" target="_blank" rel="noopener">Etherscan</a>`:''}
+          ${options.linkOriginal !== false ? `<a class="btn" href="${(options.imgForId||imgFor)(item.id)}" target="_blank" rel="noopener">Original</a>`:''}
+        </div>
+      `:``}
     `;
 
     // hover wiring (per attribute)
@@ -244,7 +275,12 @@
         sinceMs: Number(x.sinceMs||0) || null,
         attrs: Array.isArray(x.attrs)? x.attrs : [],
         rank: (x.rank==null? null : Number(x.rank)),
-        metaRaw: x.metaRaw || null
+        metaRaw: x.metaRaw || null,
+        owner: x.owner || null,
+        ownerShort: x.ownerShort || null,
+        ownerYou: !!x.ownerYou,
+        holder: x.holder || null,
+        ownerLabel: x.ownerLabel || null
       };
     }
     return null;
@@ -258,6 +294,8 @@
   }
 
   window.FF = window.FF || {};
+  window.FF.shortAddress = shortAddr;
+  window.FF.formatOwnerLine = metaLineDefault;
   window.FF.buildFrogCard = buildCard;
   window.FF.renderFrogCards = function renderFrogCards(container, frogs, options){
     const root = resolveContainer(container);
