@@ -122,7 +122,8 @@
       } else {
         lookupMap = null;
       }
-    } catch {
+    } catch (err) {
+      console.warn('[rarity] lookup load failed', err);
       lookupMap = null; // optional
     }
   }
@@ -145,7 +146,8 @@
         return arr;
       }
       return [];
-    } catch {
+    } catch (err) {
+      console.warn('[rarity] primary rankings load failed', err);
       return [];
     }
   }
@@ -216,7 +218,8 @@
       const json = await res.json();
       const owner = json?.owners?.[0]?.owner;
       return (typeof owner === 'string' && owner.startsWith('0x')) ? owner : null;
-    } catch {
+    } catch (err) {
+      console.warn('[rarity] reservoir owner lookup failed', err);
       return null;
     }
   }
@@ -231,10 +234,14 @@
   async function fetchStakeInfo(id){
     try {
       if (FF.staking?.getStakeInfo) return await FF.staking.getStakeInfo(id);
-    } catch {}
+    } catch (err) {
+      console.warn('[rarity] staking info via FF.staking failed', err);
+    }
     try {
       if (window.STAKING_ADAPTER?.getStakeInfo) return await window.STAKING_ADAPTER.getStakeInfo(id);
-    } catch {}
+    } catch (err) {
+      console.warn('[rarity] staking adapter lookup failed', err);
+    }
     return { staked:false, since:null };
   }
 
