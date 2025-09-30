@@ -81,7 +81,7 @@
     if (rank==null) return '';
     const t=tierFor(rank, tiers);
     const cls = t==='legendary'?'rk-legendary':t==='epic'?'rk-epic':t==='rare'?'rk-rare':'';
-    return ` <span class="pill ${cls}">Rank #${rank}</span>`;
+    return ` <span class="pill ${cls}">♦ #${rank}</span>`;
   }
   function attrsHTML(attrs, max=4){
     if (!Array.isArray(attrs)||!attrs.length) return '';
