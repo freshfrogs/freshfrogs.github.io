@@ -5,41 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Fresh Frogs — Rarity Rankings</title>
 
+  <!-- Use the same base styles as collection.html -->
   <link rel="stylesheet" href="assets/css/styles.css" />
-
-  <style>
-    /* Base (match site look) */
-    .pg-wrap{ padding:20px; }
-    img{ image-rendering: pixelated; image-rendering: crisp-edges; }
-
-    .pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
-    .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
-    .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
-    .pg-muted{ color:var(--muted); font-size:13px; }
-
-    /* Centered single-panel layout (fixed width) */
-    :root{ --panel-width: 960px; }
-    .center-wrap{ display:grid; gap:16px; justify-items:center; }
-    .centered-card{ width: min(var(--panel-width), 100%); }
-
-    /* Hero (same as collection.html) */
-    .frog-hero{ margin:28px auto 38px; width: min(var(--panel-width), 100%); }
-    .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
-    .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
-    .frog-strip .tile{ flex:0 0 auto; width:64px; height:64px; border-radius:10px; }
-    .frog-strip .tile.hide{ display:none !important; }
-    .frog-strip img{ width:64px; height:64px; object-fit:contain; }
-    @media (max-width:520px){ .frog-hero{ margin:22px auto 30px; } .frog-strip{ gap:10px; } }
-
-    /* Rankings list */
-    #rankList{ width:100%; }
-  </style>
 </head>
 <body>
   <div class="pg-wrap container">
     <div class="center-wrap">
 
-      <!-- HERO (same structure as collection.html so topbar.js can inject the same pill buttons) -->
+      <!-- HERO (identical structure so topbar.js inserts the same pill row) -->
       <section class="frog-hero">
         <h1 class="frog-title">freshfrogs.github.io</h1>
         <div class="frog-strip">
@@ -51,40 +24,29 @@
           <div class="tile"><img src="frog/1.png"   alt="1"></div>
         </div>
       </section>
-      <div id="ffTopRow">
-        <button class="btn btn-connected ffc-connect" data-act="connect">Connect Wallet</button>
-        <span class="ff-sep">•</span>
-        <a class="btn btn-connected ffc-opensea" href="#" target="_blank" rel="noopener">Shop on OpenSea</a>
-        <span class="ff-sep">•</span>
-        <a class="btn btn-connected ffc-ethers" href="#" target="_blank" rel="noopener">Etherscan</a>
-        <span class="ff-sep">•</span>
-        <button class="btn btn-connected ffc-rank" data-act="rankings">Rankings</button>
-        <span class="ff-sep">•</span>
-        <button class="btn btn-connected ffc-pond" data-act="pond">The Pond</button>
-        <span class="ff-sep">•</span>
-        <button class="btn btn-connected ffc-mutate" data-act="mutate">Mutate</button>
-      </div>
 
-      <!-- Rankings -->
+      <!-- Rankings (cards look exactly like dashboard cards) -->
       <section class="pg-card centered-card" id="rankings">
         <div class="pg-card-head">
           <h3>Rarity Rankings</h3>
           <div class="pg-muted">Top of the pond, from most to least rare</div>
         </div>
 
+        <!-- Cards will be injected here using the same card builder as the dashboard -->
         <div id="rankList" aria-live="polite">
           <div class="pg-muted">Loading rankings…</div>
         </div>
 
-        <div class="load-row" id="loadRow" style="display:none">
-          <button class="btn" id="btnMore">Load more</button>
+        <div style="display:flex; justify-content:center; margin:12px 0 2px;">
+          <button class="btn" id="btnMore" style="display:none">Load more</button>
         </div>
       </section>
+
     </div>
   </div>
 
   <script>
-    /* Keep whole 64px tiles only (hero strip) */
+    // Keep whole 64px tiles only (same as collection)
     function layoutFrogStrip(){
       var strip = document.querySelector('.frog-strip'); if(!strip) return;
       var tiles = Array.prototype.slice.call(strip.querySelectorAll('.tile'));
@@ -98,19 +60,22 @@
     document.addEventListener('DOMContentLoaded', layoutFrogStrip);
   </script>
 
-  <!-- Config + ABIs (must be before adapter) -->
+  <!-- Config + ABIs (before adapter) -->
   <script src="assets/js/config.js"></script>
   <script src="assets/js/controller_abi.js"></script>
   <script src="assets/js/collection_abi.js"></script>
 
-  <!-- Helpers + wallet -->
+  <!-- Helpers + wallet (same stack collection uses) -->
   <script src="assets/js/utils.js"></script>
   <script src="assets/js/wallet.js"></script>
 
-  <!-- On-chain adapter + renderers + cards -->
+  <!-- Adapter + renderers + the dashboard card builder -->
   <script src="assets/js/staking-adapter.js"></script>
   <script src="assets/js/frog-renderer.js"></script>
   <script src="assets/js/frog-cards.js"></script>
+
+  <!-- The exact same top buttons as collection.html -->
+  <script src="assets/js/topbar.js"></script>
 
   <script>
   (function(){
@@ -118,14 +83,13 @@
 
     var CFG = window.FF_CFG || {};
     var ROOT = String(CFG.SOURCE_PATH || '').replace(/\/+$/,'') || '';
-    var RANKS_URL = 'assets/freshfrogs_rarity_rankings.json'; // [{id, ranking, score}, ...]
+    var RANKS_URL = 'assets/freshfrogs_rarity_rankings.json';
     var PAGE = 24;
 
     var allRanks = [];
     var cursor = 0;
     var listEl = document.getElementById('rankList');
     var btnMore = document.getElementById('btnMore');
-    var loadRow = document.getElementById('loadRow');
 
     function getJSON(url){
       return fetch(url, { headers:{accept:'application/json'} }).then(function(r){
@@ -135,10 +99,9 @@
     }
     function metaURL(id){ return ROOT + '/frog/json/' + id + '.json'; }
 
-    // --- chain access (read-only) ---
+    // Chain reads (read-only)
     function getWeb3(){
       if (window.Web3 && window.ethereum) return new Web3(window.ethereum);
-      // read-only fallback via injected provider-less (won't work without provider)
       if (window.Web3 && (CFG.RPC_URL||'')) return new Web3(CFG.RPC_URL);
       return null;
     }
@@ -152,37 +115,27 @@
       var abi = (window.CONTROLLER_ABI || window.controller_abi || []);
       return new w3.eth.Contract(abi, CFG.CONTROLLER_ADDRESS);
     }
-
     function short(a){ return a ? (a.slice(0,6)+'…'+a.slice(-4)) : '—'; }
 
     async function ownerOf(id){
-      try{
-        var nft = nftContract(); if(!nft) return null;
+      try{ var nft = nftContract(); if(!nft) return null;
         return await nft.methods.ownerOf(String(id)).call();
       }catch(_){ return null; }
     }
-
     async function tryStakeInfo(tokenId){
       var ctrl = ctrlContract(); if(!ctrl) return null;
-      // Try a few common shapes
-      // 1) getStakeInfo(tokenId) -> {owner, since} or tuple
       try{
         var i = await ctrl.methods.getStakeInfo(String(tokenId)).call();
-        var out = {};
         if (i){
-          // tuple or object
-          out.owner = i.owner || i.staker || i.user || i[0] || null;
-          var since = i.since || i.stakedAt || i.timestamp || i[1] || null;
-          if (since!=null) out.sinceMs = Number(since)>1e12 ? Number(since) : Number(since)*1000;
+          var who = i.owner || i.staker || i.user || i[0] || null;
+          var ts  = i.since || i.stakedAt || i.timestamp || i[1] || null;
+          return { owner: who||null, sinceMs: ts? (Number(ts)>1e12?Number(ts):Number(ts)*1000) : null };
         }
-        if (out.owner || out.sinceMs) return out;
       }catch(_){}
-      // 2) stakerOf(tokenId)
       try{
         var s = await ctrl.methods.stakerOf(String(tokenId)).call();
         if (s) return { owner:s, sinceMs:null };
       }catch(_){}
-      // 3) stakes(tokenId) -> tuple
       try{
         var t = await ctrl.methods.stakes(String(tokenId)).call();
         if (t){
@@ -194,47 +147,17 @@
       return null;
     }
 
-    async function enrichOne(id){
-      // 1) metadata (for attributes & DOM layering)
-      var meta=null, attrs=[];
-      try{
-        meta = await getJSON(metaURL(id));
-        attrs = Array.isArray(meta?.attributes)
-          ? meta.attributes.map(function(a){ return { key:(a.key||a.trait_type||''), value:(a.value ?? a.trait_value ?? '') }; })
-          : [];
-      }catch(_){}
-
-      // 2) determine staking/owner
-      var currentOwner = await ownerOf(id);
-      var isStaked = currentOwner && CFG.CONTROLLER_ADDRESS && (currentOwner.toLowerCase() === CFG.CONTROLLER_ADDRESS.toLowerCase());
-      var staker = null, sinceMs = null;
-      if (isStaked){
-        try{
-          var info = await tryStakeInfo(id);
-          if (info){ staker = info.owner || null; sinceMs = info.sinceMs || null; }
-        }catch(_){}
-      }
-
-      return {
-        id: id,
-        attrs: attrs,
-        metaRaw: meta || null,
-        rank: null,          // we set below
-        staked: !!isStaked,
-        sinceMs: sinceMs,
-        owner: isStaked ? (staker || null) : (currentOwner || null)
-      };
+    function fmtAgo(ms){
+      if(!ms||!isFinite(ms))return null;
+      var s=Math.max(0,Math.floor((Date.now()-ms)/1000));
+      var d=Math.floor(s/86400); if(d>=1) return d+'d ago';
+      var h=Math.floor((s%86400)/3600); if(h>=1) return h+'h ago';
+      var m=Math.floor((s%3600)/60); if(m>=1) return m+'m ago';
+      return s+'s ago';
     }
-
     function metaLineFor(it){
       if (it.staked){
-        var ago = (it.sinceMs && isFinite(it.sinceMs))
-          ? (function(ms){ var s=Math.max(0,Math.floor((Date.now()-ms)/1000));
-              var d=Math.floor(s/86400); if(d>=1)return d+'d ago';
-              var h=Math.floor((s%86400)/3600); if(h>=1)return h+'h ago';
-              var m=Math.floor((s%3600)/60); if(m>=1)return m+'m ago';
-              return s+'s ago'; })(it.sinceMs)
-          : null;
+        var ago = it.sinceMs ? fmtAgo(it.sinceMs) : null;
         var who = it.owner ? short(it.owner) : 'unknown';
         return (ago ? ('Staked '+ago) : 'Staked') + ' • by ' + who;
       }
@@ -247,26 +170,55 @@
       });
     }
 
+    async function enrichOne(id){
+      // metadata for attributes + layered render
+      var meta=null, attrs=[];
+      try{
+        meta = await getJSON(metaURL(id));
+        attrs = Array.isArray(meta?.attributes)
+          ? meta.attributes.map(function(a){ return { key:(a.key||a.trait_type||''), value:(a.value ?? a.trait_value ?? '') }; })
+          : [];
+      }catch(_){}
+
+      // on-chain owner / staker
+      var currentOwner = await ownerOf(id);
+      var isStaked = currentOwner && CFG.CONTROLLER_ADDRESS && (currentOwner.toLowerCase() === CFG.CONTROLLER_ADDRESS.toLowerCase());
+      var staker = null, sinceMs = null;
+      if (isStaked){
+        var info = await tryStakeInfo(id).catch(()=>null);
+        if (info){ staker = info.owner || null; sinceMs = info.sinceMs || null; }
+      }
+
+      return {
+        id: id,
+        attrs: attrs,
+        metaRaw: meta || null,
+        rank: null,
+        staked: !!isStaked,
+        sinceMs: sinceMs,
+        owner: isStaked ? (staker || null) : (currentOwner || null)
+      };
+    }
+
     async function renderNext(){
       var remain = allRanks.length - cursor;
-      if (remain <= 0){ loadRow.style.display='none'; return; }
+      if (remain <= 0){ btnMore.style.display='none'; return; }
 
       var take = Math.min(PAGE, remain);
       var slice = allRanks.slice(cursor, cursor + take);
       cursor += take;
 
-      // Fetch + enrich each id
-      var out = [];
+      var rows = [];
       for (let i=0;i<slice.length;i++){
         var id = slice[i].id;
         var row = await enrichOne(id);
         row.rank = slice[i].ranking;
-        out.push(row);
+        rows.push(row);
       }
 
-      // Use reusable cards; inject custom meta line (staked/owner)
       var temp = document.createElement('div');
-      FF.renderFrogCards(temp, out, {
+      // Use the SAME card builder as the dashboard; actions off
+      FF.renderFrogCards(temp, rows, {
         showActions: false,
         linkOriginal: true,
         linkEtherscan: true,
@@ -278,7 +230,7 @@
       }
       while (temp.firstChild){ listEl.appendChild(temp.firstChild); }
 
-      loadRow.style.display = (cursor < allRanks.length) ? '' : 'none';
+      btnMore.style.display = (cursor < allRanks.length) ? '' : 'none';
     }
 
     async function init(){
@@ -289,7 +241,6 @@
           return;
         }
         allRanks = sortRanks(ranks);
-        loadRow.style.display = '';
         await renderNext();
       }catch(e){
         console.warn('Ranks load failed', e);
@@ -297,52 +248,18 @@
       }
     }
 
+    // Wire "Load more"
     btnMore && btnMore.addEventListener('click', function(){
       btnMore.disabled = true;
       renderNext().finally(function(){ btnMore.disabled = false; });
     });
 
+    // Init
     (document.readyState === 'loading')
       ? document.addEventListener('DOMContentLoaded', init)
       : init();
+
   })();
   </script>
-  <script>
-(function(){
-  function short(a){ return a ? (a.slice(0,6)+'…'+a.slice(-4)) : ''; }
-  function go(kind){
-    // Match collection behavior: scroll to section on collection.html, navigate for mutate
-    var map = { rankings:'#rankings', pond:'#pond', mutate:'mutate.html' };
-    var t = map[kind]; if (!t) return;
-    if (t.endsWith('.html')) location.href = t;
-    else document.querySelector(t)?.scrollIntoView({behavior:'smooth', block:'start'});
-  }
-
-  var row = document.getElementById('ffTopRow'); if (!row) return;
-  row.addEventListener('click', function(e){
-    var el = e.target.closest('[data-act]'); if(!el) return;
-    var act = el.getAttribute('data-act');
-    if (act==='connect'){
-      if (window.Wallet?.connect){
-        window.Wallet.connect().then(a=>{ if(a) el.textContent = short(a); });
-      } else if (window.ethereum?.request){
-        window.ethereum.request({method:'eth_requestAccounts'}).then(arr=>{
-          var a = arr && arr[0]; if (a) el.textContent = short(a);
-        });
-      } else alert('No Ethereum wallet detected.');
-    }
-    if (act==='rankings') go('rankings');
-    if (act==='pond')     go('pond');
-    if (act==='mutate')   go('mutate');
-  });
-
-  // Pre-fill address if already connected
-  if (window.ethereum?.selectedAddress){
-    var btn = row.querySelector('[data-act="connect"]');
-    if (btn) btn.textContent = short(window.ethereum.selectedAddress);
-  }
-})();
-</script>
-
 </body>
 </html>
