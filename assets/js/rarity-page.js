@@ -549,17 +549,29 @@
     return { staked: staked, sinceMs: sinceMs(since) };
   }
 
-  function metaLineForCard(item){
+  function fallbackMetaLine(item){
     var ownerLabel = null;
     if (item.ownerYou) ownerLabel = 'You';
     else if (item.ownerShort && item.ownerShort !== '\u2014') ownerLabel = item.ownerShort;
     else if (item.owner) ownerLabel = shortAddr(item.owner);
+    else if (item.holder) ownerLabel = shortAddr(item.holder);
     if (!ownerLabel) ownerLabel = 'Unknown';
     if (item.staked) {
       var ago = item.sinceMs ? fmtAgo(item.sinceMs) : null;
-      return (ago ? 'Staked ' + ago : 'Staked') + ' • Owned by ' + ownerLabel;
+      return '<span class="staked-flag">' + (ago ? ('Staked ' + ago) : 'Staked') + '</span> • Owned by ' + ownerLabel;
     }
     return 'Not staked • Owned by ' + ownerLabel;
+  }
+
+  function metaLineForCard(item){
+    try {
+      if (global.FF && typeof global.FF.formatOwnerLine === 'function') {
+        return global.FF.formatOwnerLine(item);
+      }
+    } catch (err) {
+      console.warn('[rarity] meta line formatter failed', err);
+    }
+    return fallbackMetaLine(item);
   }
 
   function buildFallbackCard(rec) {
@@ -592,7 +604,7 @@
     }
     var metaLine = document.createElement('div');
     metaLine.className = 'meta';
-    metaLine.textContent = metaLineForCard(rec);
+    metaLine.innerHTML = metaLineForCard(rec);
 
     right.appendChild(title);
     right.appendChild(metaLine);
@@ -625,7 +637,8 @@
         metaRaw: rec.metaRaw,
         owner: rec.owner,
         ownerShort: rec.ownerShort,
-        ownerYou: rec.ownerYou
+        ownerYou: rec.ownerYou,
+        holder: rec.holder
       }, {
         showActions: false,
         rarityTiers: CFG.RARITY_TIERS,
@@ -684,7 +697,8 @@
                 sinceMs: since,
                 owner: actualOwner,
                 ownerShort: ownerShort,
-                ownerYou: ownerYou
+                ownerYou: ownerYou,
+                holder: ownerInfo && ownerInfo.holder ? ownerInfo.holder : null
               };
               frag.appendChild(buildCard(rec));
             }

@@ -19,13 +19,7 @@
   function metaURL(id){ return `${ROOT}/frog/json/${id}.json`; }
   function basePNG(id){ return `${ROOT}/frog/${id}.png`; }
   function layerPNG(k,v){ return `${ROOT}/frog/build_files/${k}/${v}.png`; }
-  function layerGIF(k,v){
-    const base = `${ROOT}/frog/build_files/${k}`;
-    return [
-      `${base}/animations/${v}_animation.gif`,
-      `${base}/${v}_animation.gif`
-    ];
-  }
+  function layerGIF(k,v){ return `${ROOT}/frog/build_files/${k}/animations/${v}_animation.gif`; }
 
   const JSON_CACHE = new Map(); // id -> Promise(json|null)
 
@@ -76,10 +70,32 @@
       overflow: 'hidden',
       imageRendering: 'pixelated',
       backgroundRepeat: 'no-repeat',
-      backgroundPosition: '100% 100%', // bottom-right
-      backgroundSize: '10000% 10000%'  // zoom to 1px corner color
+      backgroundPosition: '80% 90%',
+      backgroundSize: '240% 240%'
     });
     return host;
+  }
+
+  const ANIM_CACHE = new Map();
+  function hasAnimation(k,v){
+    const key = `${k}::${v}`;
+    if (ANIM_CACHE.has(key)) {
+      const cached = ANIM_CACHE.get(key);
+      if (typeof cached === 'boolean') return Promise.resolve(cached);
+      return cached;
+    }
+    const url = layerGIF(k,v);
+    const probe = new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+      img.src = url;
+    }).then(result => {
+      ANIM_CACHE.set(key, result);
+      return result;
+    });
+    ANIM_CACHE.set(key, probe);
+    return probe;
   }
 
   function addLayer(host, url, lift){
@@ -99,23 +115,18 @@
     host.appendChild(img);
   }
 
-  function addAnim(host, url){
+  function addAnim(host, url, lift){
     const img = document.createElement('img');
+    img.src = url;
     img.alt = '';
     Object.assign(img.style, {
       position:'absolute', left:0, top:0, width:'100%', height:'100%',
-      imageRendering:'pixelated', pointerEvents:'none'
+      imageRendering:'pixelated', pointerEvents:'none',
+      transform: lift ? 'translate(-2px,-2px)' : 'none',
+      filter: lift ? 'drop-shadow(0 0 2px rgba(255,255,255,.15))' : 'none'
     });
     img.className = 'frog-anim';
-    const urls = Array.isArray(url) ? url.filter(Boolean) : [url];
-    let idx = 0;
-    function tryNext(){
-      if (idx >= urls.length){ img.remove(); return; }
-      img.src = urls[idx++];
-    }
-    img.onerror = tryNext;
-    tryNext();
-    if (!urls.length) return;
+    img.onerror = () => img.remove();
     host.appendChild(img);
   }
 
@@ -138,16 +149,27 @@
     const attrs = attrsInOrder(meta);
     if (!attrs.length) throw new Error('no attributes');
 
-    // Static layers in EXACT metadata order
-    for (const a of attrs){
+    const animFlags = await Promise.all(attrs.map(a => {
+      if (!a || DISALLOW_ANIM.has(a.key)) return Promise.resolve(false);
+      return hasAnimation(a.key, a.value).catch(() => false);
+    }));
+
+    // Static layers in EXACT metadata order (skip when animation exists)
+    for (let i=0;i<attrs.length;i++){
+      const a = attrs[i];
+      if (!a) continue;
+      if (animFlags[i]) continue;
       const lift = !!hoverKey && a.key === hoverKey && !DISALLOW_HOVER.has(a.key);
       addLayer(host, layerPNG(a.key, a.value), lift);
     }
 
     // Animated overlays (skip Frog/Hat)
-    for (const a of attrs){
-      if (DISALLOW_ANIM.has(a.key)) continue;
-      addAnim(host, layerGIF(a.key, a.value));
+    for (let i=0;i<attrs.length;i++){
+      const a = attrs[i];
+      if (!a || DISALLOW_ANIM.has(a.key)) continue;
+      if (!animFlags[i]) continue;
+      const lift = !!hoverKey && a.key === hoverKey && !DISALLOW_HOVER.has(a.key);
+      addAnim(host, layerGIF(a.key, a.value), lift);
     }
   };
 
