@@ -24,6 +24,8 @@
 
   var RESERVOIR_HOST = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/, '');
   var RESERVOIR_KEY  = CFG.FROG_API_KEY || CFG.RESERVOIR_API_KEY || '';
+  var CTRL_ADDR      = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
+  var CTRL_DEPLOY    = Number(CFG.CONTROLLER_DEPLOY_BLOCK);
 
   var allItems   = [];
   var viewItems  = [];
@@ -241,6 +243,9 @@
 
   var _web3 = null;
   var _collection = null;
+  var _controller = null;
+  var _stakeSinceCache = new Map();
+  var _stakerCache = new Map();
 
   function getWeb3(){
     if (_web3) return _web3;
@@ -273,6 +278,14 @@
     return null;
   }
 
+  function resolveControllerAbi(){
+    if (typeof global.CONTROLLER_ABI !== 'undefined') return global.CONTROLLER_ABI;
+    if (typeof global.controller_abi !== 'undefined') return global.controller_abi;
+    if (typeof CONTROLLER_ABI !== 'undefined') return CONTROLLER_ABI;
+    if (typeof controller_abi !== 'undefined') return controller_abi;
+    return null;
+  }
+
   function getCollectionContract(){
     if (_collection) return _collection;
     if (!CFG.COLLECTION_ADDRESS) return null;
@@ -282,6 +295,117 @@
     if (!web3 || !web3.eth || !web3.eth.Contract) return null;
     _collection = new web3.eth.Contract(abi, CFG.COLLECTION_ADDRESS);
     return _collection;
+  }
+
+  function getControllerContract(){
+    if (_controller) return _controller;
+    if (!CFG.CONTROLLER_ADDRESS) return null;
+    var abi = resolveControllerAbi();
+    if (!abi || !abi.length) return null;
+    var web3 = getWeb3();
+    if (!web3 || !web3.eth || !web3.eth.Contract) return null;
+    _controller = new web3.eth.Contract(abi, CFG.CONTROLLER_ADDRESS);
+    return _controller;
+  }
+
+  function isHexAddress(addr){
+    return typeof addr === 'string' && addr.indexOf('0x') === 0 && addr.length === 42;
+  }
+
+  function padTokenHex(id){
+    var n = Number(id);
+    if (!isFinite(n) || n < 0) n = 0;
+    var hex = n.toString(16);
+    while (hex.length < 64) hex = '0' + hex;
+    return '0x' + hex;
+  }
+
+  function fetchStakeTimestamp(id){
+    if (_stakeSinceCache.has(id)) return Promise.resolve(_stakeSinceCache.get(id));
+
+    return new Promise(function(resolve){
+      try {
+        var web3 = getWeb3();
+        if (!web3 || !web3.eth || !web3.eth.getPastLogs || !CFG.COLLECTION_ADDRESS || !CTRL_ADDR) {
+          _stakeSinceCache.set(id, null);
+          resolve(null);
+          return;
+        }
+
+        var topics = [
+          '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+          null,
+          '0x000000000000000000000000' + CTRL_ADDR.slice(2),
+          padTokenHex(id)
+        ];
+
+        var fromBlock = isFinite(CTRL_DEPLOY) && CTRL_DEPLOY > 0 ? '0x' + CTRL_DEPLOY.toString(16) : '0x0';
+
+        web3.eth.getPastLogs({
+          fromBlock: fromBlock,
+          toBlock: 'latest',
+          address: CFG.COLLECTION_ADDRESS,
+          topics: topics
+        }).then(function(logs){
+          if (!logs || !logs.length) {
+            _stakeSinceCache.set(id, null);
+            resolve(null);
+            return;
+          }
+          var last = logs[logs.length - 1];
+          web3.eth.getBlock(last.blockNumber).then(function(block){
+            var ts = block && block.timestamp != null ? Number(block.timestamp) : null;
+            var ms = ts ? (ts > 1e12 ? ts : ts * 1000) : null;
+            _stakeSinceCache.set(id, ms);
+            resolve(ms);
+          }).catch(function(err){
+            console.warn('[rarity] stake block lookup failed', err);
+            _stakeSinceCache.set(id, null);
+            resolve(null);
+          });
+        }).catch(function(err2){
+          console.warn('[rarity] stake log lookup failed', err2);
+          _stakeSinceCache.set(id, null);
+          resolve(null);
+        });
+      } catch (err3) {
+        console.warn('[rarity] stake timestamp error', err3);
+        _stakeSinceCache.set(id, null);
+        resolve(null);
+      }
+    });
+  }
+
+  function fetchStakerAddress(id){
+    if (_stakerCache.has(id)) return Promise.resolve(_stakerCache.get(id));
+
+    return new Promise(function(resolve){
+      try {
+        var ctrl = getControllerContract();
+        if (!ctrl || !ctrl.methods || !ctrl.methods.stakerAddress) {
+          _stakerCache.set(id, null);
+          resolve(null);
+          return;
+        }
+        ctrl.methods.stakerAddress(String(id)).call().then(function(addr){
+          if (!addr || !isHexAddress(addr) || addr === '0x0000000000000000000000000000000000000000') {
+            _stakerCache.set(id, null);
+            resolve(null);
+            return;
+          }
+          _stakerCache.set(id, addr);
+          resolve(addr);
+        }).catch(function(err){
+          console.warn('[rarity] staker lookup failed', err);
+          _stakerCache.set(id, null);
+          resolve(null);
+        });
+      } catch (err2) {
+        console.warn('[rarity] staker error', err2);
+        _stakerCache.set(id, null);
+        resolve(null);
+      }
+    });
   }
 
   function ownerFromContract(id){
@@ -322,8 +446,63 @@
 
   function fetchOwnerOf(id){
     return ownerFromContract(id).then(function(onchain){
-      if (onchain) return onchain;
-      return ownerFromReservoir(id);
+      var holder = isHexAddress(onchain) ? onchain : null;
+      var controllerOwned = !!(holder && CTRL_ADDR && holder.toLowerCase() === CTRL_ADDR);
+
+      if (controllerOwned) {
+        return fetchStakerAddress(id).then(function(staker){
+          return (staker ? Promise.resolve(staker) : ownerFromReservoir(id)).then(function(ownerGuess){
+            return fetchStakeTimestamp(id).then(function(since){
+              return {
+                owner: staker || ownerGuess || null,
+                holder: holder,
+                controllerOwned: true,
+                stakeSinceMs: since,
+                staker: staker || null
+              };
+            });
+          });
+        });
+      }
+
+      if (holder) {
+        return {
+          owner: holder,
+          holder: holder,
+          controllerOwned: false,
+          stakeSinceMs: null,
+          staker: null
+        };
+      }
+
+      return ownerFromReservoir(id).then(function(resOwner){
+        return {
+          owner: resOwner || null,
+          holder: holder,
+          controllerOwned: false,
+          stakeSinceMs: null,
+          staker: null
+        };
+      });
+    }).catch(function(err){
+      console.warn('[rarity] owner lookup fallback', err);
+      return ownerFromReservoir(id).then(function(resOwner){
+        return {
+          owner: resOwner || null,
+          holder: null,
+          controllerOwned: false,
+          stakeSinceMs: null,
+          staker: null
+        };
+      }).catch(function(){
+        return {
+          owner: null,
+          holder: null,
+          controllerOwned: false,
+          stakeSinceMs: null,
+          staker: null
+        };
+      });
     });
   }
 
@@ -408,7 +587,7 @@
     if (rec.rank != null) {
       var pill = document.createElement('span');
       pill.className = 'pill';
-      pill.textContent = '#' + rec.rank;
+      pill.textContent = '♦ #' + rec.rank;
       title.appendChild(pill);
     }
     var metaLine = document.createElement('div');
@@ -470,23 +649,40 @@
             var frag = document.createDocumentFragment();
             for (var i = 0; i < slice.length; i++) {
               var meta = metas[i] || { attributes: [] };
-              var owner = owners[i] || null;
+              var ownerInfo = owners[i] || {};
+              if (ownerInfo && typeof ownerInfo === 'string') {
+                ownerInfo = { owner: ownerInfo, holder: ownerInfo, controllerOwned: false, stakeSinceMs: null, staker: null };
+              }
               var stake = normalizeStake(stakes[i] || null);
               var attrs = normalizeAttrs(meta);
-              var ownerShort = owner ? shortAddr(owner) : null;
-              var ownerYou = false;
-              if (currentUser && owner && typeof currentUser === 'string' && typeof owner === 'string') {
-                ownerYou = currentUser.toLowerCase() === owner.toLowerCase();
+
+              var isStaked = stake.staked || !!ownerInfo.controllerOwned;
+              var since = stake.sinceMs || ownerInfo.stakeSinceMs || null;
+              var actualOwner = ownerInfo.owner || null;
+              if (!actualOwner && !isStaked && ownerInfo.holder) {
+                actualOwner = ownerInfo.holder;
               }
+              if (!actualOwner && ownerInfo.staker) {
+                actualOwner = ownerInfo.staker;
+              }
+
+              var ownerShort = actualOwner ? shortAddr(actualOwner) : null;
+              var ownerYou = false;
+              if (currentUser && actualOwner && typeof currentUser === 'string' && typeof actualOwner === 'string') {
+                ownerYou = currentUser.toLowerCase() === actualOwner.toLowerCase();
+              } else if (currentUser && !actualOwner && ownerInfo.holder && typeof ownerInfo.holder === 'string') {
+                ownerYou = currentUser.toLowerCase() === ownerInfo.holder.toLowerCase();
+              }
+
               var rec = {
                 id: slice[i].id,
                 rank: slice[i].rank,
                 score: slice[i].score,
                 metaRaw: meta,
                 attrs: attrs,
-                staked: stake.staked,
-                sinceMs: stake.sinceMs,
-                owner: owner,
+                staked: isStaked,
+                sinceMs: since,
+                owner: actualOwner,
                 ownerShort: ownerShort,
                 ownerYou: ownerYou
               };
