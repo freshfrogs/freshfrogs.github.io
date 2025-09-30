@@ -2,8 +2,11 @@
 // Rarity list that matches dashboard card visuals (rank pill tiers, staked line),
 // and uses the same 128×128 DOM layering from frog-renderer.js
 
-(function(FF = window.FF || {}, CFG = window.FF_CFG || {}) {
+(function(){
   'use strict';
+
+  const FF = window.FF || (window.FF = {});
+  const CFG = window.FF_CFG || {};
 
   // ---------- DOM ----------
   const GRID       = document.getElementById('rarityGrid');
@@ -24,6 +27,10 @@
     HOST: (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,''),
     KEY:  (CFG.FROG_API_KEY || CFG.RESERVOIR_API_KEY || '')
   };
+  const RPC_URL = CFG.RPC_URL || '';
+  const CONTROLLER_ADDR = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
+  const ZERO_ADDR = '0x0000000000000000000000000000000000000000';
+  const HOVER_SKIP = new Set(['Frog','Trait','SpecialFrog']);
 
   // ---------- CSS (rank pill + green staked like dashboard) ----------
   (function injectCSS(){
@@ -35,15 +42,29 @@
   background:var(--panel);
   border-radius:14px;
   padding:12px;
-  display:grid; grid-template-columns:auto 1fr; column-gap:12px; row-gap:6px; align-items:start;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
   color:inherit;
 }
+.frog-card .card-body{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  column-gap:12px;
+  row-gap:6px;
+  align-items:start;
+}
 .frog-card .thumb-wrap{ width:${SIZE}px; min-width:${SIZE}px; position:relative; }
-.frog-card canvas.frog-canvas{ width:${SIZE}px; height:${SIZE}px; border-radius:12px; background:var(--panel-2); display:block; }
-.frog-card .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
+.frog-card canvas.frog-canvas{ width:${SIZE}px; height:${SIZE}px; border-radius:12px; background:var(--panel-2); display:block;
+}
+.frog-card .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px;
+}
 .frog-card .meta{ color:var(--muted); font-size:12px; }
-.frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; color:var(--muted); }
-.frog-card .attr-bullets li{ display:list-item; font-size:12px; margin:2px 0; }
+.frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; color:var(--muted); font:400 12px/1.4 var(--font-ui);
+ }
+.frog-card .attr-bullets li{ display:list-item; font:inherit; color:inherit; margin:2px 0; transition:color .15s ease; }
+.frog-card .attr-bullets li[data-hoverable="1"]{ cursor:pointer; }
+.frog-card .attr-bullets li[data-hoverable="1"]:hover{ color:var(--fg); }
 
 .rank-pill{
   display:inline-flex; align-items:center; gap:6px;
@@ -62,7 +83,7 @@
 .rank-common::before{ color:var(--muted); }
 
 .meta .staked-flag{ color:#22c55e; font-weight:700; }
-.actions{ grid-column:1 / -1; display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+.actions{ display:flex; gap:8px; flex-wrap:wrap; }
 .btn{ font-family:var(--font-ui); border:1px solid var(--border); background:transparent; color:inherit; border-radius:8px; padding:6px 10px; font-weight:700; font-size:12px; line-height:1; }
 .btn-outline-gray{ border-color: color-mix(in srgb, #9ca3af 70%, var(--border)); color: color-mix(in srgb, #ffffff 65%, #9ca3af); }
     `;
@@ -110,13 +131,40 @@
   }
 
   // On-chain owner (fallback to Reservoir)
-  let _web3,_col;
-  function getWeb3(){ if (_web3) return _web3; _web3 = new Web3(window.ethereum || Web3.givenProvider || ""); return _web3; }
+  let _web3,_col,_ctrl,_transfer;
+  function getWeb3(){
+    if (_web3) return _web3;
+    let provider = null;
+    if (window.ethereum) provider = window.ethereum;
+    else if (Web3.givenProvider) provider = Web3.givenProvider;
+    else if (RPC_URL) provider = new Web3.providers.HttpProvider(RPC_URL);
+    if (!provider) throw new Error('No web3 provider');
+    _web3 = new Web3(provider);
+    return _web3;
+  }
   function getCollectionContract(){
     if (_col) return _col;
     if (!CFG.COLLECTION_ADDRESS || !window.COLLECTION_ABI) return null;
     _col = new (getWeb3()).eth.Contract(window.COLLECTION_ABI, CFG.COLLECTION_ADDRESS);
     return _col;
+  }
+  function getControllerContract(){
+    if (_ctrl) return _ctrl;
+    if (!CFG.CONTROLLER_ADDRESS) return null;
+    const abi = Array.isArray(window.CONTROLLER_ABI) ? window.CONTROLLER_ABI : [
+      {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"stakerAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}
+    ];
+    _ctrl = new (getWeb3()).eth.Contract(abi, CFG.CONTROLLER_ADDRESS);
+    return _ctrl;
+  }
+  function getTransferContract(){
+    if (_transfer) return _transfer;
+    if (!CFG.COLLECTION_ADDRESS) return null;
+    const abi = [
+      {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"}
+    ];
+    _transfer = new (getWeb3()).eth.Contract(abi, CFG.COLLECTION_ADDRESS);
+    return _transfer;
   }
   async function ownerFromContract(id){
     try{ const c=getCollectionContract(); if (!c) return null; return await c.methods.ownerOf(String(id)).call(); }
@@ -133,26 +181,121 @@
       return (typeof own==='string' && own.startsWith('0x')) ? own : null;
     }catch{ return null; }
   }
-  async function fetchOwnerOf(id){
-    const onchain = await ownerFromContract(id);
-    if (onchain) return onchain;
-    const api = await ownerFromReservoir(id);
-    return api || null;
+  function toMs(value){
+    if (value == null) return null;
+    const n = Number(value);
+    if (!Number.isFinite(n) || n <= 0) return null;
+    return n > 1e12 ? n : n * 1000;
+  }
+
+  const stakerCache = new Map();
+  async function stakerAddressFromContract(id){
+    const numId = Number(id);
+    if (!Number.isFinite(numId)) return null;
+    const cached = stakerCache.get(numId);
+    if (cached !== undefined) return cached instanceof Promise ? await cached : cached;
+    const prom = (async()=>{
+      try{
+        const ctrl = getControllerContract();
+        if (!ctrl) return null;
+        const who = await ctrl.methods.stakerAddress(String(numId)).call();
+        if (!who || who === ZERO_ADDR) return null;
+        return who;
+      }catch{ return null; }
+    })();
+    stakerCache.set(numId, prom);
+    const res = await prom;
+    stakerCache.set(numId, res ?? null);
+    return res;
+  }
+
+  async function stakeSinceFromAdapters(id){
+    const S = window.FF?.staking || window.FF_STAKING || window.STAKING_ADAPTER || {};
+    try{
+      if (typeof S.getStakeSince === 'function'){
+        return toMs(await S.getStakeSince(id));
+      }
+      if (typeof S.getStakeInfo === 'function'){
+        const info = await S.getStakeInfo(id);
+        const sec = info?.since ?? info?.stakedAt ?? info?.timestamp ?? info?.sinceSeconds;
+        return toMs(sec);
+      }
+      if (typeof S.stakeSince === 'function'){
+        return toMs(await S.stakeSince(id));
+      }
+    }catch{}
+    return null;
+  }
+
+  const stakeEventCache = new Map();
+  async function stakeSinceViaEvents(id){
+    const numId = Number(id);
+    if (!Number.isFinite(numId)) return null;
+    const cached = stakeEventCache.get(numId);
+    if (cached !== undefined) return cached instanceof Promise ? await cached : cached;
+    const prom = (async()=>{
+      try{
+        const contract = getTransferContract();
+        if (!contract || !CFG.CONTROLLER_ADDRESS) return null;
+        const fromBlock = Number(CFG.CONTROLLER_DEPLOY_BLOCK) || 0;
+        const events = await contract.getPastEvents('Transfer', {
+          filter: { to: CFG.CONTROLLER_ADDRESS, tokenId: String(numId) },
+          fromBlock,
+          toBlock: 'latest'
+        });
+        if (!events.length) return null;
+        const last = events[events.length - 1];
+        const block = await getWeb3().eth.getBlock(last.blockNumber);
+        const ts = Number(block?.timestamp);
+        return Number.isFinite(ts) ? ts * 1000 : null;
+      }catch{ return null; }
+    })();
+    stakeEventCache.set(numId, prom);
+    const res = await prom;
+    stakeEventCache.set(numId, res ?? null);
+    return res;
   }
 
   // staking info (reuses any adapter if present)
-  async function fetchStakeInfo(id){
-    try {
-      if (FF.staking?.getStakeInfo) return await FF.staking.getStakeInfo(id);
-      if (window.STAKING_ADAPTER?.getStakeInfo) return await window.STAKING_ADAPTER.getStakeInfo(id);
-    } catch {}
-    return { staked:false, since:null };
+  async function fetchStakeInfo(id, onchainOwner){
+    const out = { staked:false, sinceMs:null, owner:null };
+
+    const stakingApi = window.FF?.staking || window.FF_STAKING || window.STAKING_ADAPTER || {};
+    try{
+      if (typeof stakingApi.getStakeInfo === 'function'){
+        const info = await stakingApi.getStakeInfo(id);
+        if (info && typeof info === 'object'){
+          if (info.staked != null) out.staked = !!info.staked;
+          const owner = info.owner ?? info.staker ?? info.wallet ?? info.account ?? info.address;
+          if (owner && owner !== ZERO_ADDR) out.owner = owner;
+          const ms = toMs(info.since ?? info.stakedAt ?? info.timestamp ?? info.sinceSeconds);
+          if (ms) out.sinceMs = ms;
+        }
+      }
+    }catch{}
+
+    if (!out.sinceMs){
+      const ms = await stakeSinceFromAdapters(id);
+      if (ms) out.sinceMs = ms;
+    }
+
+    if (!out.owner){
+      const staker = await stakerAddressFromContract(id);
+      if (staker) out.owner = staker;
+    }
+
+    if (!out.staked){
+      if (out.owner) out.staked = true;
+      else if (onchainOwner && CONTROLLER_ADDR && String(onchainOwner).toLowerCase() === CONTROLLER_ADDR) out.staked = true;
+    }
+
+    if (out.staked && !out.sinceMs){
+      const viaEvents = await stakeSinceViaEvents(id);
+      if (viaEvents) out.sinceMs = viaEvents;
+    }
+
+    return out;
   }
-  const sinceMs = (sec)=> {
-    if (sec==null) return null;
-    const n = Number(sec); if (!Number.isFinite(n)) return null;
-    return n > 1e12 ? n : n*1000;
-  };
 
   // metadata
   async function fetchMeta(id){
@@ -203,28 +346,32 @@
     card.className = 'frog-card';
     card.setAttribute('data-token-id', String(id));
 
-    // media: host a hidden canvas; FF.renderFrog will stack DOM layers in the same order as metadata
+    const body = document.createElement('div');
+    body.className = 'card-body';
+
     const media = document.createElement('div');
     media.className = 'thumb-wrap';
     const cv = document.createElement('canvas');
     cv.className = 'frog-canvas'; cv.width = SIZE; cv.height = SIZE;
     media.appendChild(cv);
 
-    // title: Frog #id + rank pill (dashboard style)
+    const info = document.createElement('div');
+
     const title = document.createElement('h4');
     title.className = 'title';
     title.textContent = meta?.name || `Frog #${id}`;
     const pill = rankPill(rank);
     title.appendChild(pill);
 
-    // subtitle: staked line + owner
     const metaLine = document.createElement('div');
     metaLine.className = 'meta';
-    const me = userAddr && owner && userAddr.toLowerCase() === owner.toLowerCase();
+    const resolvedOwner = typeof owner === 'string' ? owner : '';
+    const me = userAddr && resolvedOwner && userAddr.toLowerCase() === resolvedOwner.toLowerCase();
+    const stakeInfo = stake || { staked:false, sinceMs:null };
 
     const stakeSpan = document.createElement('span');
-    if (stake?.staked) {
-      const ago = sinceMs(stake?.since) ? fmtAgo(sinceMs(stake?.since)) : null;
+    if (stakeInfo.staked) {
+      const ago = stakeInfo.sinceMs ? fmtAgo(stakeInfo.sinceMs) : null;
       stakeSpan.className = 'staked-flag';
       stakeSpan.textContent = ago ? `Staked ${ago}` : 'Staked';
     } else {
@@ -232,21 +379,34 @@
     }
     const sep = document.createElement('span'); sep.textContent = ' • ';
     const ownerSpan = document.createElement('span');
-    ownerSpan.textContent = `Owned by ${me ? 'You' : shortAddr(owner)}`;
+    ownerSpan.textContent = `Owned by ${resolvedOwner ? (me ? 'You' : shortAddr(resolvedOwner)) : '—'}`;
 
     metaLine.appendChild(stakeSpan);
     metaLine.appendChild(sep);
     metaLine.appendChild(ownerSpan);
 
-    // attributes (vertical)
     const list = document.createElement('ul');
     list.className = 'attr-bullets';
-    (Array.isArray(meta?.attributes)? meta.attributes: []).forEach(a=>{
-      const k=traitKey(a), v=traitVal(a); if(!k||!v) return;
-      const li=document.createElement('li'); li.innerHTML = `<b>${k}:</b> ${v}`; list.appendChild(li);
+    const attrs = Array.isArray(meta?.attributes) ? meta.attributes : [];
+    attrs.forEach(a => {
+      const k = traitKey(a), v = traitVal(a);
+      if (!k || !v) return;
+      const li = document.createElement('li');
+      li.innerHTML = `<b>${k}:</b> ${v}`;
+      li.setAttribute('data-attr-key', k);
+      const hoverable = HOVER_SKIP.has(k) ? '0' : '1';
+      li.setAttribute('data-hoverable', hoverable);
+      list.appendChild(li);
     });
 
-    // actions (view-only)
+    info.appendChild(title);
+    info.appendChild(metaLine);
+    if (list.childNodes.length) info.appendChild(list);
+
+    body.appendChild(media);
+    body.appendChild(info);
+    card.appendChild(body);
+
     const actions = document.createElement('div'); actions.className='actions';
     const aOS  = document.createElement('a'); aOS.className='btn btn-outline-gray'; aOS.textContent='OpenSea';
     aOS.href = `https://opensea.io/assets/ethereum/${CFG.COLLECTION_ADDRESS}/${id}`; aOS.target='_blank'; aOS.rel='noopener';
@@ -255,26 +415,57 @@
     const aOrig= document.createElement('a'); aOrig.className='btn btn-outline-gray'; aOrig.textContent='Original';
     aOrig.href = `frog/${id}.png`; aOrig.target='_blank'; aOrig.rel='noopener';
     actions.appendChild(aOS); actions.appendChild(aScan); actions.appendChild(aOrig);
+    card.appendChild(actions);
 
-    // compose
-    card.appendChild(media);
-    const right = document.createElement('div');
-    right.appendChild(title);
-    right.appendChild(metaLine);
-    if (list.childNodes.length) right.appendChild(list);
-    right.appendChild(actions);
-    card.appendChild(right);
+    const metaSource = rec.metaRaw || meta;
+    let rendererReady = typeof FF.renderFrog === 'function';
+    let currentHover = '';
+    let renderToken = 0;
 
-    // render layered frog (metadata order) at 128×128
-    (async ()=>{
-      try{
-        await (FF.renderFrog ? FF.renderFrog(cv, rec.metaRaw || meta, { size: SIZE, tokenId: id }) : Promise.reject());
-      }catch{
-        // fallback to still image if renderer not available
-        const img = document.createElement('img'); img.src = `frog/${id}.png`; img.alt = String(id); img.className = 'frog-canvas';
-        media.innerHTML=''; media.appendChild(img);
+    function mountFallback(){
+      if (media.querySelector('img')) return;
+      const img = document.createElement('img');
+      img.src = `frog/${id}.png`;
+      img.alt = String(id);
+      img.className = 'frog-canvas';
+      media.innerHTML = '';
+      media.appendChild(img);
+    }
+
+    async function render(hoverKey){
+      const token = ++renderToken;
+      if (!rendererReady){
+        mountFallback();
+        return;
       }
-    })();
+      try{
+        await FF.renderFrog(cv, metaSource, { size: SIZE, tokenId: id, hoverKey });
+        if (token !== renderToken) return;
+      }catch{
+        rendererReady = false;
+        mountFallback();
+      }
+    }
+
+    render('');
+
+    if (rendererReady && list.childNodes.length){
+      list.addEventListener('mousemove', (e)=>{
+        const li = e.target.closest('li[data-attr-key]'); if(!li) return;
+        const hoverable = li.getAttribute('data-hoverable') === '1';
+        const key = hoverable ? (li.getAttribute('data-attr-key') || '') : '';
+        if (key !== currentHover){
+          currentHover = key;
+          render(key);
+        }
+      });
+      list.addEventListener('mouseleave', ()=>{
+        if (currentHover){
+          currentHover = '';
+          render('');
+        }
+      });
+    }
 
     return card;
   }
@@ -289,14 +480,19 @@
     if (!slice.length) { ensureMoreBtn(); return; }
 
     const metas  = await Promise.all(slice.map(x => fetchMeta(x.id)));
-    const owners = await Promise.all(slice.map(x => fetchOwnerOf(x.id)));
-    const stakes = await Promise.all(slice.map(x => fetchStakeInfo(x.id)));
+    const onchainOwners = await Promise.all(slice.map(x => ownerFromContract(x.id)));
+    const owners = await Promise.all(slice.map((x, idx) => onchainOwners[idx] || ownerFromReservoir(x.id)));
+    const stakes = await Promise.all(slice.map((x, idx) => fetchStakeInfo(x.id, onchainOwners[idx])));
 
     for (let i=0;i<slice.length;i++){
       slice[i].meta = metas[i];
       slice[i].metaRaw = metas[i]; // pass through for renderer
-      slice[i].owner = owners[i] || null;
-      slice[i].stake = stakes[i] || {staked:false, since:null};
+      const stakeInfo = stakes[i] || { staked:false, sinceMs:null, owner:null };
+      const resolvedOwner = stakeInfo.staked
+        ? (stakeInfo.owner || owners[i] || onchainOwners[i] || null)
+        : (owners[i] || stakeInfo.owner || onchainOwners[i] || null);
+      slice[i].owner = resolvedOwner;
+      slice[i].stake = stakeInfo;
     }
 
     const frag=document.createDocumentFragment();
@@ -352,4 +548,4 @@
     }
   })();
 
-})(window.FF, window.FF_CFG);
+})();
