@@ -1,268 +1,414 @@
-// assets/js/rarity-page.js — renders rarity cards using the shared frog card
-// component, restores owner + staking info, and re-enables attribute hover
-// lifts from the layered renderer.
+// assets/js/rarity-page.js — vanilla ES5-compatible rarity loader used by
+// rarity.html. This version intentionally avoids optional chaining, default
+// parameters, and other newer syntax so that the cards render in older
+// browsers.
 
-(function(FF = window.FF || {}, CFG = window.FF_CFG || {}) {
+(function(global){
   'use strict';
 
-  const GRID = document.getElementById('rarityGrid');
-  const BTN_MORE = document.getElementById('btnMore');
-  const BTN_RANK = document.getElementById('btnSortRank');
-  const BTN_SCORE = document.getElementById('btnSortScore');
-  const FIND_INPUT = document.getElementById('raritySearchId');
-  const BTN_GO = document.getElementById('btnGo');
+  var FF  = global.FF     || {};
+  var CFG = global.FF_CFG || {};
+
+  var GRID       = document.getElementById('rarityGrid');
+  var BTN_MORE   = document.getElementById('btnMore');
+  var BTN_RANK   = document.getElementById('btnSortRank');
+  var BTN_SCORE  = document.getElementById('btnSortScore');
+  var FIND_INPUT = document.getElementById('raritySearchId');
+  var BTN_GO     = document.getElementById('btnGo');
   if (!GRID) return;
 
-  const PRIMARY_RANK_FILE = CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json';
-  const LOOKUP_FILE = 'assets/freshfrogs_rank_lookup.json';
-  const PAGE = 60;
-  const SOURCE_PATH = (CFG.SOURCE_PATH || '').replace(/\/+$/,'');
+  var PRIMARY_RANK_FILE = CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json';
+  var LOOKUP_FILE       = 'assets/freshfrogs_rank_lookup.json';
+  var PAGE_SIZE         = 60;
+  var SOURCE_PATH       = (CFG.SOURCE_PATH || '').replace(/\/+$/, '');
 
-  const RESERVOIR = {
-    HOST: (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,''),
-    KEY:  CFG.FROG_API_KEY || CFG.RESERVOIR_API_KEY || ''
-  };
+  var RESERVOIR_HOST = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/, '');
+  var RESERVOIR_KEY  = CFG.FROG_API_KEY || CFG.RESERVOIR_API_KEY || '';
 
-  let all = [];     // [{id, rank, score}]
-  let view = [];
-  let offset = 0;
-  let sortMode = 'rank';
-  let lookupMap = null; // Map(id -> {rank, score})
-  let currentUser = null;
+  var allItems   = [];
+  var viewItems  = [];
+  var offset     = 0;
+  var sortMode   = 'rank';
+  var lookupMap  = null; // Map<id, {rank, score}>
+  var currentUser = null;
 
   function uiError(msg) {
-    GRID.innerHTML = `<div class="pg-muted" style="padding:10px">${msg}</div>`;
+    GRID.innerHTML = '<div class="pg-muted" style="padding:10px">' + msg + '</div>';
   }
-  function clearGrid(){
+
+  function clearGrid() {
     GRID.innerHTML = '';
-    GRID.classList.add('frog-cards');
+    if (GRID.classList && GRID.classList.add) {
+      GRID.classList.add('frog-cards');
+    }
   }
+
   function ensureMoreBtn() {
     if (!BTN_MORE) return;
-    BTN_MORE.style.display = offset < view.length ? 'inline-flex' : 'none';
-  }
-  function asNum(x){ const n = Number(x); return Number.isFinite(n) ? n : NaN; }
-  function getRankLike(o){ return asNum(o.rank ?? o.ranking ?? o.position ?? o.place); }
-
-  const shortAddr = (a)=> a && typeof a==='string'
-    ? (a.length>10 ? `${a.slice(0,6)}…${a.slice(-4)}` : a)
-    : '—';
-
-  const traitKey  = (t)=> (t?.key ?? t?.trait_type ?? t?.traitType ?? t?.trait ?? '').toString().trim();
-  const traitVal  = (t)=> (t?.value ?? t?.trait_value ?? '').toString().trim();
-
-  function fmtAgo(ms){
-    if(!ms||!isFinite(ms))return null;
-    const s=Math.max(0,Math.floor((Date.now()-ms)/1000));
-    const d=Math.floor(s/86400); if(d>=1) return d+'d ago';
-    const h=Math.floor((s%86400)/3600); if(h>=1) return h+'h ago';
-    const m=Math.floor((s%3600)/60); if(m>=1) return m+'m ago';
-    return s+'s ago';
+    BTN_MORE.style.display = offset < viewItems.length ? 'inline-flex' : 'none';
   }
 
-  const sinceMs = (sec)=> {
-    if (sec==null) return null;
-    const n = Number(sec);
-    if (!Number.isFinite(n)) return null;
-    return n > 1e12 ? n : n*1000;
-  };
-
-  async function getUserAddress(){
-    try{ if (window.FF_WALLET?.address) return window.FF_WALLET.address; }catch{}
-    try{ if (window.ethereum?.request){ const a=await window.ethereum.request({method:'eth_accounts'}); return a?.[0]||null; } }
-    catch{}
-    return null;
+  function asNum(x) {
+    var n = Number(x);
+    return isFinite(n) ? n : NaN;
   }
 
-  async function fetchJson(url) {
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${url}`);
-    return res.json();
+  function getRankLike(obj) {
+    if (!obj) return NaN;
+    if (obj.rank != null) return asNum(obj.rank);
+    if (obj.ranking != null) return asNum(obj.ranking);
+    if (obj.position != null) return asNum(obj.position);
+    if (obj.place != null) return asNum(obj.place);
+    return NaN;
   }
 
-  // Parse rank->id map into Map(id -> {rank})
-  function parseRankToIdMap(obj) {
-    const m = new Map();
-    const keys = Object.keys(obj);
-    for (const k of keys) {
-      const rank = asNum(k);
-      const id   = asNum(obj[k]);
-      if (Number.isFinite(rank) && Number.isFinite(id)) {
-        m.set(id, { rank, score: 0 });
+  function shortAddr(addr) {
+    if (!addr || typeof addr !== 'string') return '\u2014';
+    if (addr.length <= 10) return addr;
+    return addr.slice(0, 6) + '\u2026' + addr.slice(-4);
+  }
+
+  function traitKey(t) {
+    if (!t) return '';
+    var keys = ['key', 'trait_type', 'traitType', 'trait'];
+    for (var i = 0; i < keys.length; i++) {
+      if (t[keys[i]] != null) {
+        return String(t[keys[i]]).trim();
       }
     }
-    return m.size ? m : null;
+    return '';
   }
 
-  // Normalize the main rankings array (array of objects)
-  function normalizeRankingsArray(arr) {
-    return arr.map(x => ({
-      id:   asNum(x.id ?? x.tokenId ?? x.token_id ?? x.frogId ?? x.frog_id),
-      rank: getRankLike(x),
-      score: asNum(x.score ?? x.rarityScore ?? x.points ?? 0)
-    }))
-    .filter(r => Number.isFinite(r.id) && Number.isFinite(r.rank) && r.rank > 0)
-    .sort((a,b) => a.rank - b.rank);
+  function traitVal(t) {
+    if (!t) return '';
+    var keys = ['value', 'trait_value'];
+    for (var i = 0; i < keys.length; i++) {
+      if (t[keys[i]] != null) {
+        return String(t[keys[i]]).trim();
+      }
+    }
+    return '';
   }
 
-  async function loadLookup() {
-    try {
-      const j = await fetchJson(LOOKUP_FILE);
-      if (Array.isArray(j)) {
-        // array of ids ordered by rank
-        const m = new Map();
-        for (let i=0;i<j.length;i++){
-          const id = asNum(j[i]);
-          if (Number.isFinite(id)) m.set(id, { rank: i+1, score: 0 });
+  function fmtAgo(ms) {
+    if (!ms || !isFinite(ms)) return null;
+    var s = Math.max(0, Math.floor((Date.now() - ms) / 1000));
+    var d = Math.floor(s / 86400);
+    if (d >= 1) return d + 'd ago';
+    var h = Math.floor((s % 86400) / 3600);
+    if (h >= 1) return h + 'h ago';
+    var m = Math.floor((s % 3600) / 60);
+    if (m >= 1) return m + 'm ago';
+    return s + 's ago';
+  }
+
+  function sinceMs(sec) {
+    if (sec == null) return null;
+    var n = Number(sec);
+    if (!isFinite(n)) return null;
+    return n > 1e12 ? n : n * 1000;
+  }
+
+  function getUserAddress() {
+    return new Promise(function(resolve){
+      try {
+        if (global.FF_WALLET && global.FF_WALLET.address) {
+          resolve(global.FF_WALLET.address);
+          return;
         }
-        lookupMap = m.size ? m : null;
-      } else if (j && typeof j === 'object') {
-        // your shape: rank -> id
-        lookupMap = parseRankToIdMap(j);
+      } catch (err) {}
+
+      try {
+        if (global.ethereum && typeof global.ethereum.request === 'function') {
+          global.ethereum.request({ method: 'eth_accounts' }).then(function(arr){
+            resolve(arr && arr.length ? arr[0] : null);
+          }).catch(function(){ resolve(null); });
+          return;
+        }
+      } catch (err2) {}
+
+      resolve(null);
+    });
+  }
+
+  function fetchJson(url) {
+    return fetch(url, { cache: 'no-store' }).then(function(res){
+      if (!res.ok) throw new Error('HTTP ' + res.status + ' fetching ' + url);
+      return res.json();
+    });
+  }
+
+  function parseRankToIdMap(obj) {
+    var map = new Map();
+    for (var key in obj) {
+      if (!obj.hasOwnProperty(key)) continue;
+      var rank = asNum(key);
+      var id = asNum(obj[key]);
+      if (isFinite(rank) && isFinite(id)) {
+        map.set(id, { rank: rank, score: 0 });
+      }
+    }
+    return map.size ? map : null;
+  }
+
+  function normalizeRankingsArray(arr) {
+    return arr
+      .map(function(x){
+        var id = asNum(x && (x.id != null ? x.id : (x.tokenId != null ? x.tokenId : (x.token_id != null ? x.token_id : (x.frogId != null ? x.frogId : x.frog_id)))));
+        var rank = getRankLike(x);
+        var score = asNum(x && (x.score != null ? x.score : (x.rarityScore != null ? x.rarityScore : x.points)));
+        if (!isFinite(score)) score = 0;
+        return { id: id, rank: rank, score: score };
+      })
+      .filter(function(r){ return isFinite(r.id) && isFinite(r.rank) && r.rank > 0; })
+      .sort(function(a, b){ return a.rank - b.rank; });
+  }
+
+  function loadLookup() {
+    return fetchJson(LOOKUP_FILE).then(function(json){
+      if (Array.isArray(json)) {
+        var map = new Map();
+        for (var i = 0; i < json.length; i++) {
+          var id = asNum(json[i]);
+          if (isFinite(id)) map.set(id, { rank: i + 1, score: 0 });
+        }
+        lookupMap = map.size ? map : null;
+      } else if (json && typeof json === 'object') {
+        lookupMap = parseRankToIdMap(json);
       } else {
         lookupMap = null;
       }
-    } catch (err) {
+    }).catch(function(err){
       console.warn('[rarity] lookup load failed', err);
-      lookupMap = null; // optional
-    }
+      lookupMap = null;
+    });
   }
 
-  async function loadPrimaryRanks() {
-    try {
-      const j = await fetchJson(PRIMARY_RANK_FILE);
-      if (Array.isArray(j)) {
-        let arr = normalizeRankingsArray(j);
-        if (lookupMap) {
-          for (const r of arr) {
-            const lk = lookupMap.get(r.id);
-            if (lk) {
-              if (!Number.isFinite(r.rank) && Number.isFinite(lk.rank)) r.rank = lk.rank;
-              if (!Number.isFinite(r.score) && Number.isFinite(lk.score)) r.score = lk.score;
-            }
-          }
-          arr.sort((a,b)=>a.rank-b.rank);
-        }
-        return arr;
+  function loadPrimaryRanks() {
+    return fetchJson(PRIMARY_RANK_FILE).then(function(json){
+      if (!Array.isArray(json)) return [];
+      var arr = normalizeRankingsArray(json);
+      if (lookupMap) {
+        arr.forEach(function(r){
+          var lk = lookupMap.get(r.id);
+          if (!lk) return;
+          if (!isFinite(r.rank) && isFinite(lk.rank)) r.rank = lk.rank;
+          if (!isFinite(r.score) && isFinite(lk.score)) r.score = lk.score;
+        });
+        arr.sort(function(a, b){ return a.rank - b.rank; });
       }
-      return [];
-    } catch (err) {
+      return arr;
+    }).catch(function(err){
       console.warn('[rarity] primary rankings load failed', err);
       return [];
-    }
+    });
   }
 
-  // ---- metadata fetch
-  async function fetchMeta(id) {
-    const tries = [
-      `frog/json/${id}.json`,
-      `frog/${id}.json`,
-      `assets/frogs/${id}.json`
+  function fetchMeta(id) {
+    var tries = [
+      'frog/json/' + id + '.json',
+      'frog/' + id + '.json',
+      'assets/frogs/' + id + '.json'
     ];
-    for (const u of tries) {
-      try {
-        const res = await fetch(u, { cache: 'no-store' });
-        if (res.ok) return await res.json();
-      } catch(_) {}
-    }
-    return { name: `Frog #${id}`, image: `frog/${id}.png`, attributes: [] };
+
+    var next = function(ix){
+      if (ix >= tries.length) {
+        return Promise.resolve({ name: 'Frog #' + id, image: 'frog/' + id + '.png', attributes: [] });
+      }
+      var url = tries[ix];
+      return fetch(url, { cache: 'no-store' }).then(function(res){
+        if (!res.ok) return next(ix + 1);
+        return res.json();
+      }).catch(function(){
+        return next(ix + 1);
+      });
+    };
+
+    return next(0);
   }
 
-  function normalizeAttrs(meta){
-    const out = [];
-    const arr = Array.isArray(meta?.attributes) ? meta.attributes : [];
-    for (const a of arr) {
-      const key = traitKey(a);
-      const val = traitVal(a);
+  function normalizeAttrs(meta) {
+    var out = [];
+    var arr = meta && Array.isArray(meta.attributes) ? meta.attributes : [];
+    for (var i = 0; i < arr.length; i++) {
+      var key = traitKey(arr[i]);
+      var val = traitVal(arr[i]);
       if (!key || !val) continue;
-      out.push({ key, value: val });
+      out.push({ key: key, value: val });
     }
     return out;
   }
 
-  // ---- owner + staking helpers ----
-  let _web3,_collection;
+  var _web3 = null;
+  var _collection = null;
+
   function getWeb3(){
     if (_web3) return _web3;
-    _web3 = new Web3(window.ethereum || Web3.givenProvider || '');
+    var provider = null;
+    if (global.ethereum) provider = global.ethereum;
+    else if (global.Web3 && global.Web3.givenProvider) provider = global.Web3.givenProvider;
+    _web3 = new global.Web3(provider || '');
     return _web3;
   }
+
   function getCollectionContract(){
     if (_collection) return _collection;
-    if (!CFG.COLLECTION_ADDRESS || !window.COLLECTION_ABI) return null;
-    _collection = new (getWeb3()).eth.Contract(window.COLLECTION_ABI, CFG.COLLECTION_ADDRESS);
+    if (!CFG.COLLECTION_ADDRESS || !global.COLLECTION_ABI) return null;
+    _collection = new (getWeb3()).eth.Contract(global.COLLECTION_ABI, CFG.COLLECTION_ADDRESS);
     return _collection;
   }
 
-  async function ownerFromContract(id){
-    try{
-      const contract = getCollectionContract();
-      if (!contract) return null;
-      return await contract.methods.ownerOf(String(id)).call();
-    }catch{
-      return null;
-    }
+  function ownerFromContract(id){
+    return new Promise(function(resolve){
+      try {
+        var contract = getCollectionContract();
+        if (!contract) { resolve(null); return; }
+        contract.methods.ownerOf(String(id)).call().then(function(addr){
+          resolve(addr || null);
+        }).catch(function(){ resolve(null); });
+      } catch (err) {
+        resolve(null);
+      }
+    });
   }
 
-  async function ownerFromReservoir(id){
-    if (!RESERVOIR.KEY || !CFG.COLLECTION_ADDRESS) return null;
-    const url = `${RESERVOIR.HOST}/owners/v2?tokens=${encodeURIComponent(`${CFG.COLLECTION_ADDRESS}:${id}`)}&limit=1`;
-    try {
-      const res = await fetch(url, {
-        headers: {
-          accept: 'application/json',
-          'x-api-key': RESERVOIR.KEY
-        }
-      });
+  function ownerFromReservoir(id){
+    if (!RESERVOIR_KEY || !CFG.COLLECTION_ADDRESS) return Promise.resolve(null);
+    var token = CFG.COLLECTION_ADDRESS + ':' + id;
+    var url = RESERVOIR_HOST + '/owners/v2?tokens=' + encodeURIComponent(token) + '&limit=1';
+    return fetch(url, {
+      headers: {
+        accept: 'application/json',
+        'x-api-key': RESERVOIR_KEY
+      }
+    }).then(function(res){
       if (!res.ok) return null;
-      const json = await res.json();
-      const owner = json?.owners?.[0]?.owner;
-      return (typeof owner === 'string' && owner.startsWith('0x')) ? owner : null;
-    } catch (err) {
+      return res.json();
+    }).then(function(json){
+      if (!json || !json.owners || !json.owners.length) return null;
+      var owner = json.owners[0] && json.owners[0].owner;
+      return (typeof owner === 'string' && owner.indexOf('0x') === 0) ? owner : null;
+    }).catch(function(err){
       console.warn('[rarity] reservoir owner lookup failed', err);
       return null;
-    }
+    });
   }
 
-  async function fetchOwnerOf(id){
-    const onchain = await ownerFromContract(id);
-    if (onchain) return onchain;
-    const api = await ownerFromReservoir(id);
-    return api || null;
+  function fetchOwnerOf(id){
+    return ownerFromContract(id).then(function(onchain){
+      if (onchain) return onchain;
+      return ownerFromReservoir(id);
+    });
   }
 
-  async function fetchStakeInfo(id){
-    try {
-      if (FF.staking?.getStakeInfo) return await FF.staking.getStakeInfo(id);
-    } catch (err) {
-      console.warn('[rarity] staking info via FF.staking failed', err);
-    }
-    try {
-      if (window.STAKING_ADAPTER?.getStakeInfo) return await window.STAKING_ADAPTER.getStakeInfo(id);
-    } catch (err) {
-      console.warn('[rarity] staking adapter lookup failed', err);
-    }
-    return { staked:false, since:null };
+  function fetchStakeInfo(id){
+    return new Promise(function(resolve){
+      var done = false;
+      function finish(info){
+        if (done) return;
+        done = true;
+        resolve(info || { staked: false, since: null });
+      }
+
+      try {
+        if (FF.staking && typeof FF.staking.getStakeInfo === 'function') {
+          FF.staking.getStakeInfo(id).then(function(info){ finish(info); }).catch(function(){ finish(null); });
+          return;
+        }
+      } catch (err) {
+        console.warn('[rarity] staking info via FF.staking failed', err);
+      }
+
+      try {
+        if (global.STAKING_ADAPTER && typeof global.STAKING_ADAPTER.getStakeInfo === 'function') {
+          global.STAKING_ADAPTER.getStakeInfo(id).then(function(info){ finish(info); }).catch(function(){ finish(null); });
+          return;
+        }
+      } catch (err2) {
+        console.warn('[rarity] staking adapter lookup failed', err2);
+      }
+
+      finish(null);
+    });
   }
 
   function normalizeStake(info){
-    const staked = !!info?.staked;
-    const since = info?.since ?? info?.sinceMs ?? info?.since_ms ?? info?.stakedSince ?? null;
-    return { staked, sinceMs: sinceMs(since) };
+    var staked = info && !!info.staked;
+    var since = null;
+    if (info) {
+      if (info.since != null) since = info.since;
+      else if (info.sinceMs != null) since = info.sinceMs;
+      else if (info.since_ms != null) since = info.since_ms;
+      else if (info.stakedSince != null) since = info.stakedSince;
+    }
+    return { staked: staked, sinceMs: sinceMs(since) };
   }
 
   function metaLineForCard(item){
-    const ownerLabel = item.ownerYou ? 'You' : (item.ownerShort || shortAddr(item.owner));
-    if (item.staked){
-      const ago = item.sinceMs ? fmtAgo(item.sinceMs) : null;
-      return `${ago ? `Staked ${ago}` : 'Staked'} • Owned by ${ownerLabel}`;
+    var ownerLabel = item.ownerYou ? 'You' : (item.ownerShort || shortAddr(item.owner));
+    if (!ownerLabel) ownerLabel = '\u2014';
+    if (item.staked) {
+      var ago = item.sinceMs ? fmtAgo(item.sinceMs) : null;
+      return (ago ? 'Staked ' + ago : 'Staked') + ' • Owned by ' + ownerLabel;
     }
-    return `Not staked • Owned by ${ownerLabel}`;
+    return 'Not staked • Owned by ' + ownerLabel;
+  }
+
+  function buildFallbackCard(rec) {
+    var card = document.createElement('article');
+    card.className = 'frog-card';
+    card.setAttribute('data-token-id', String(rec.id));
+
+    var row = document.createElement('div');
+    row.className = 'row';
+
+    var thumbWrap = document.createElement('div');
+    thumbWrap.className = 'thumb-wrap';
+
+    var img = document.createElement('img');
+    img.className = 'thumb';
+    img.alt = (rec.metaRaw && rec.metaRaw.name) ? rec.metaRaw.name : ('Frog #' + rec.id);
+    img.loading = 'lazy';
+    img.src = (rec.metaRaw && rec.metaRaw.image) ? rec.metaRaw.image : (SOURCE_PATH + '/frog/' + rec.id + '.png');
+    thumbWrap.appendChild(img);
+
+    var right = document.createElement('div');
+    var title = document.createElement('h4');
+    title.className = 'title';
+    title.textContent = (rec.metaRaw && rec.metaRaw.name) ? rec.metaRaw.name : ('Frog #' + rec.id);
+    if (rec.rank != null) {
+      var pill = document.createElement('span');
+      pill.className = 'pill';
+      pill.textContent = '#' + rec.rank;
+      title.appendChild(pill);
+    }
+    var metaLine = document.createElement('div');
+    metaLine.className = 'meta';
+    metaLine.textContent = metaLineForCard(rec);
+
+    right.appendChild(title);
+    right.appendChild(metaLine);
+
+    if (rec.attrs && rec.attrs.length) {
+      var list = document.createElement('ul');
+      list.className = 'attr-bullets';
+      rec.attrs.forEach(function(attr){
+        var li = document.createElement('li');
+        li.innerHTML = '<b>' + attr.key + ':</b> ' + attr.value;
+        list.appendChild(li);
+      });
+      right.appendChild(list);
+    }
+
+    row.appendChild(thumbWrap);
+    row.appendChild(right);
+    card.appendChild(row);
+    return card;
   }
 
   function buildCard(rec) {
-    if (window.FF?.buildFrogCard) {
-      return window.FF.buildFrogCard({
+    if (global.FF && typeof global.FF.buildFrogCard === 'function') {
+      return global.FF.buildFrogCard({
         id: rec.id,
         rank: rec.rank,
         attrs: rec.attrs,
@@ -278,141 +424,121 @@
         metaLine: metaLineForCard
       });
     }
-
-    // Fallback: minimal card
-    const card = document.createElement('article');
-    card.className = 'frog-card';
-    card.setAttribute('data-token-id', String(rec.id));
-
-    const row = document.createElement('div');
-    row.className = 'row';
-
-    const thumbWrap = document.createElement('div');
-    thumbWrap.className = 'thumb-wrap';
-    const img = document.createElement('img');
-    img.className = 'thumb';
-    img.alt = rec.metaRaw?.name || `Frog #${rec.id}`;
-    img.loading = 'lazy';
-    img.src = rec.metaRaw?.image || `${SOURCE_PATH}/frog/${rec.id}.png`;
-    thumbWrap.appendChild(img);
-
-    const right = document.createElement('div');
-    const title = document.createElement('h4');
-    title.className = 'title';
-    title.textContent = rec.metaRaw?.name || `Frog #${rec.id}`;
-    if (rec.rank != null) {
-      const pill = document.createElement('span');
-      pill.className = 'pill';
-      pill.textContent = `#${rec.rank}`;
-      title.appendChild(pill);
-    }
-    const metaLine = document.createElement('div');
-    metaLine.className = 'meta';
-    metaLine.textContent = metaLineForCard(rec);
-
-    right.appendChild(title);
-    right.appendChild(metaLine);
-
-    if (rec.attrs?.length) {
-      const list = document.createElement('ul');
-      list.className = 'attr-bullets';
-      rec.attrs.forEach(attr => {
-        const li = document.createElement('li');
-        li.innerHTML = `<b>${attr.key}:</b> ${attr.value}`;
-        list.appendChild(li);
-      });
-      right.appendChild(list);
-    }
-
-    row.appendChild(thumbWrap);
-    row.appendChild(right);
-    card.appendChild(row);
-    return card;
+    return buildFallbackCard(rec);
   }
 
-  async function loadMore() {
-    const slice = view.slice(offset, offset + PAGE);
-    if (slice.length === 0) { ensureMoreBtn(); return; }
-    const metas = await Promise.all(slice.map(x => fetchMeta(x.id)));
-    const owners = await Promise.all(slice.map(x => fetchOwnerOf(x.id)));
-    const stakes = await Promise.all(slice.map(x => fetchStakeInfo(x.id)));
-
-    const frag = document.createDocumentFragment();
-    for (let i = 0; i < slice.length; i++) {
-      const meta = metas[i] || { attributes: [] };
-      const owner = owners[i] || null;
-      const stake = normalizeStake(stakes[i] || null);
-      const attrs = normalizeAttrs(meta);
-      const rec = {
-        id: slice[i].id,
-        rank: slice[i].rank,
-        score: slice[i].score,
-        metaRaw: meta,
-        attrs,
-        staked: stake.staked,
-        sinceMs: stake.sinceMs,
-        owner,
-        ownerShort: shortAddr(owner),
-        ownerYou: currentUser && owner && currentUser.toLowerCase() === owner.toLowerCase()
-      };
-      frag.appendChild(buildCard(rec));
+  function loadMore() {
+    var slice = viewItems.slice(offset, offset + PAGE_SIZE);
+    if (!slice.length) {
+      ensureMoreBtn();
+      return Promise.resolve();
     }
 
-    GRID.appendChild(frag);
-    offset += slice.length;
-    ensureMoreBtn();
+    return Promise.all(slice.map(function(x){ return fetchMeta(x.id); }))
+      .then(function(metas){
+        return Promise.all(slice.map(function(x){ return fetchOwnerOf(x.id); })).then(function(owners){
+          return Promise.all(slice.map(function(x){ return fetchStakeInfo(x.id); })).then(function(stakes){
+            var frag = document.createDocumentFragment();
+            for (var i = 0; i < slice.length; i++) {
+              var meta = metas[i] || { attributes: [] };
+              var owner = owners[i] || null;
+              var stake = normalizeStake(stakes[i] || null);
+              var attrs = normalizeAttrs(meta);
+              var ownerShort = shortAddr(owner);
+              var ownerYou = false;
+              if (currentUser && owner && typeof currentUser === 'string' && typeof owner === 'string') {
+                ownerYou = currentUser.toLowerCase() === owner.toLowerCase();
+              }
+              var rec = {
+                id: slice[i].id,
+                rank: slice[i].rank,
+                score: slice[i].score,
+                metaRaw: meta,
+                attrs: attrs,
+                staked: stake.staked,
+                sinceMs: stake.sinceMs,
+                owner: owner,
+                ownerShort: ownerShort,
+                ownerYou: ownerYou
+              };
+              frag.appendChild(buildCard(rec));
+            }
+
+            GRID.appendChild(frag);
+            offset += slice.length;
+            ensureMoreBtn();
+          });
+        });
+      }).catch(function(err){
+        console.error('[rarity] loadMore failed', err);
+        uiError('Failed to load frogs.');
+      });
   }
 
   function resort() {
-    view.sort((a,b) => sortMode === 'rank'
-      ? (a.rank - b.rank)
-      : ((b.score - a.score) || (a.rank - b.rank))
-    );
-    offset = 0; clearGrid(); loadMore();
+    viewItems.sort(function(a, b){
+      if (sortMode === 'rank') return a.rank - b.rank;
+      var diff = (b.score - a.score);
+      if (diff) return diff;
+      return a.rank - b.rank;
+    });
+    offset = 0;
+    clearGrid();
+    loadMore();
   }
 
   function jumpToId(id) {
-    const ix = view.findIndex(x => x.id === id);
+    var ix = -1;
+    for (var i = 0; i < viewItems.length; i++) {
+      if (viewItems[i].id === id) { ix = i; break; }
+    }
     if (ix < 0) return;
-    offset = Math.floor(ix / PAGE) * PAGE;
-    clearGrid(); loadMore();
+    offset = Math.floor(ix / PAGE_SIZE) * PAGE_SIZE;
+    clearGrid();
+    loadMore();
   }
 
-  async function init() {
-    try {
-      await loadLookup();
-      const primary = await loadPrimaryRanks();
-      if (primary.length) {
-        all = primary;
+  function init() {
+    loadLookup().then(function(){
+      return loadPrimaryRanks();
+    }).then(function(primary){
+      if (primary && primary.length) {
+        allItems = primary;
       } else if (lookupMap && lookupMap.size) {
-        all = Array.from(lookupMap, ([id, v]) => ({ id, rank: v.rank, score: v.score || 0 }))
-          .sort((a,b)=>a.rank-b.rank);
+        allItems = Array.from(lookupMap).map(function(entry){
+          return { id: entry[0], rank: entry[1].rank, score: entry[1].score || 0 };
+        }).sort(function(a, b){ return a.rank - b.rank; });
       } else {
-        uiError(`Could not load rarity data. Check both JSON files' shapes.`);
-        return;
+        uiError('Could not load rarity data. Check both JSON files\' shapes.');
+        return null;
       }
 
-      view = all.slice();
+      viewItems = allItems.slice(0);
       offset = 0;
       clearGrid();
 
-      currentUser = await getUserAddress();
-      await loadMore();
+      return getUserAddress().then(function(addr){
+        currentUser = addr;
+        return loadMore();
+      });
+    }).then(function(){
       if (BTN_MORE) BTN_MORE.style.display = 'inline-flex';
 
-      BTN_MORE?.addEventListener('click', () => loadMore());
-      BTN_RANK?.addEventListener('click', () => { sortMode = 'rank'; resort(); });
-      BTN_SCORE?.addEventListener('click', () => { sortMode = 'score'; resort(); });
-      BTN_GO?.addEventListener('click', () => {
-        const id = Number(FIND_INPUT.value);
-        if (Number.isFinite(id)) jumpToId(id);
+      if (BTN_MORE) BTN_MORE.addEventListener('click', function(){ loadMore(); });
+      if (BTN_RANK) BTN_RANK.addEventListener('click', function(){ sortMode = 'rank'; resort(); });
+      if (BTN_SCORE) BTN_SCORE.addEventListener('click', function(){ sortMode = 'score'; resort(); });
+      if (BTN_GO) BTN_GO.addEventListener('click', function(){
+        var id = Number(FIND_INPUT && FIND_INPUT.value);
+        if (isFinite(id)) jumpToId(id);
       });
 
-      if (window.ethereum?.on) window.ethereum.on('accountsChanged', () => location.reload());
-    } catch (e) {
-      console.error('[rarity] init error', e);
+      if (global.ethereum && typeof global.ethereum.on === 'function') {
+        global.ethereum.on('accountsChanged', function(){ global.location.reload(); });
+      }
+    }).catch(function(err){
+      console.error('[rarity] init error', err);
       uiError('Failed to initialize rarity view. See console for details.');
-    }
+    });
   }
 
   if (document.readyState === 'loading') {
@@ -420,4 +546,5 @@
   } else {
     init();
   }
-})(window.FF, window.FF_CFG);
+
+})(window);
