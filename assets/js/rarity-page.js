@@ -15,6 +15,8 @@
   const BTN_SCORE   = document.getElementById('btnSortScore');
   const FIND_INPUT  = document.getElementById('raritySearchId');
   const BTN_GO      = document.getElementById('btnGo');
+  const BTN_THEME   = document.getElementById('btnThemeCycle');
+  const THEME_LABEL = document.getElementById('themeLabel');
   if (!GRID) return;
 
   // ---------- Config ----------
@@ -30,7 +32,7 @@
   const RPC_URL = CFG.RPC_URL || '';
   const CONTROLLER_ADDR = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
   const ZERO_ADDR = '0x0000000000000000000000000000000000000000';
-  const HOVER_IMAGE_SKIP = new Set(['Frog','Trait','SpecialFrog']);
+  const HOVER_SKIP = new Set(['Frog','Trait','SpecialFrog']);
 
   // ---------- CSS (rank pill + green staked like dashboard) ----------
   (function injectCSS(){
@@ -63,21 +65,15 @@
   row-gap:6px;
   align-items:start;
 }
-.frog-card .card-body{
-  display:grid;
-  grid-template-columns:auto 1fr;
-  column-gap:12px;
-  row-gap:6px;
-  align-items:start;
-}
-.frog-card .thumb-wrap{ width:${SIZE}px; min-width:${SIZE}px; position:relative; border-radius:12px; overflow:hidden; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 6px 12px rgba(0,0,0,.25); background:var(--panel-2); }
-.frog-card canvas.frog-canvas{ width:${SIZE}px; height:${SIZE}px; border-radius:12px; display:block; }
+.frog-card .thumb-wrap{ width:${SIZE}px; min-width:${SIZE}px; position:relative; }
+
+.frog-card canvas.frog-canvas{ width:${SIZE}px; height:${SIZE}px; border-radius:12px; background:var(--card-thumb, var(--panel-2)); display:block; box-shadow:var(--thumb-shadow, inset 0 0 0 1px rgba(255,255,255,.06)); }
 .frog-card .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
 .frog-card .meta{ color:var(--muted); font-size:12px; }
 .frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; color:var(--muted); font:400 12px/1.4 var(--font-ui); }
-.frog-card .attr-bullets li{ display:list-item; font:inherit; color:inherit; margin:2px 0; transition:color .15s ease, transform .18s ease; }
+.frog-card .attr-bullets li{ display:list-item; font:inherit; color:inherit; margin:2px 0; transition:color .15s ease; }
 .frog-card .attr-bullets li[data-hoverable="1"]{ cursor:pointer; }
-.frog-card .attr-bullets li[data-hoverable="1"]:hover{ color:var(--fg, #fff); transform:translate3d(4px,-2px,0); }
+.frog-card .attr-bullets li[data-hoverable="1"]:hover{ color:var(--fg, #fff); }
 
 .rank-pill{
   display:inline-flex; align-items:center; gap:6px;
@@ -146,7 +142,7 @@
   const getRankLike = (o)=> asNum(o.rank ?? o.ranking ?? o.position ?? o.place);
   const shortAddr = (a)=> a && typeof a==='string' ? (a.length>10 ? (a.slice(0,6)+'…'+a.slice(-4)) : a) : '—';
   const ownerLabel = (addr, you)=> {
-    if (!addr) return '—';
+    if (!addr) return 'Unknown';
     if (you && addr && you.toLowerCase() === addr.toLowerCase()) return 'You';
     if (typeof addr === 'string' && addr.startsWith('0x')) return shortAddr(addr);
     return addr;
@@ -423,9 +419,9 @@
     const metaLine = document.createElement('div');
     metaLine.className = 'meta';
     const stakeInfo = Object.assign({ staked:false, sinceMs:null, owner:null }, stake);
-    const fallbackOwner = (typeof owner === 'string' && owner) ? owner : '';
-    if (!stakeInfo.owner && fallbackOwner) stakeInfo.owner = fallbackOwner;
-    const resolvedOwner = (typeof stakeInfo.owner === 'string' && stakeInfo.owner) ? stakeInfo.owner : fallbackOwner;
+    const knownOwner = stakeInfo.owner || owner;
+    const resolvedOwner = (typeof knownOwner === 'string' && knownOwner) ? knownOwner : '';
+    if (!stakeInfo.owner && resolvedOwner) stakeInfo.owner = resolvedOwner;
     const ownerText = ownerLabel(resolvedOwner, userAddr);
 
     const stakeSpan = document.createElement('span');
@@ -453,9 +449,8 @@
       const li = document.createElement('li');
       li.innerHTML = `<b>${k}:</b> ${v}`;
       li.setAttribute('data-attr-key', k);
-      const allowLift = HOVER_IMAGE_SKIP.has(k) ? '0' : '1';
-      li.setAttribute('data-hoverable', '1');
-      li.setAttribute('data-hover-image', allowLift);
+      const hoverable = HOVER_SKIP.has(k) ? '0' : '1';
+      li.setAttribute('data-hoverable', hoverable);
       list.appendChild(li);
     });
 
@@ -503,8 +498,7 @@
       list.addEventListener('mousemove', (e)=>{
         const li = e.target.closest('li[data-attr-key]'); if(!li) return;
         const hoverable = li.getAttribute('data-hoverable') === '1';
-        const allowImage = li.getAttribute('data-hover-image') !== '0';
-        const key = (hoverable && allowImage) ? (li.getAttribute('data-attr-key') || '') : '';
+        const key = hoverable ? (li.getAttribute('data-attr-key') || '') : '';
         if (key !== currentHover){
           currentHover = key;
           render(key);
@@ -532,13 +526,7 @@
 
     const metas  = await Promise.all(slice.map(x => fetchMeta(x.id)));
     const onchainOwners = await Promise.all(slice.map(x => ownerFromContract(x.id)));
-    const owners = await Promise.all(slice.map((x, idx) => {
-      const onchain = onchainOwners[idx];
-      if (onchain && CONTROLLER_ADDR && String(onchain).toLowerCase() === CONTROLLER_ADDR) {
-        return ownerFromReservoir(x.id);
-      }
-      return onchain || ownerFromReservoir(x.id);
-    }));
+    const owners = await Promise.all(slice.map((x, idx) => onchainOwners[idx] || ownerFromReservoir(x.id)));
     const stakes = await Promise.all(slice.map((x, idx) => fetchStakeInfo(x.id, onchainOwners[idx])));
 
     for (let i=0;i<slice.length;i++){

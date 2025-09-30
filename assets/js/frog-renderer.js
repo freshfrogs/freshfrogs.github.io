@@ -92,8 +92,8 @@
     Object.assign(img.style, {
       position:'absolute', left:0, top:0, width:'100%', height:'100%',
       imageRendering:'pixelated', pointerEvents:'none',
-      transform: lift ? 'translate(-6px,-6px) scale(1.04)' : 'none',
-      filter: lift ? 'drop-shadow(0 14px 18px rgba(0,0,0,.35))' : 'none'
+      transform: lift ? 'translate(-2px,-2px)' : 'none',
+      filter: lift ? 'drop-shadow(0 0 2px rgba(255,255,255,.15))' : 'none'
     });
     img.className = 'frog-layer';
     img.onerror = () => img.remove();
