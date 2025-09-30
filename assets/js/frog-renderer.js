@@ -19,7 +19,13 @@
   function metaURL(id){ return `${ROOT}/frog/json/${id}.json`; }
   function basePNG(id){ return `${ROOT}/frog/${id}.png`; }
   function layerPNG(k,v){ return `${ROOT}/frog/build_files/${k}/${v}.png`; }
-  function layerGIF(k,v){ return `${ROOT}/frog/build_files/${k}/${v}_animation.gif`; }
+  function layerGIF(k,v){
+    const base = `${ROOT}/frog/build_files/${k}`;
+    return [
+      `${base}/animations/${v}_animation.gif`,
+      `${base}/${v}_animation.gif`
+    ];
+  }
 
   const JSON_CACHE = new Map(); // id -> Promise(json|null)
 
@@ -95,14 +101,21 @@
 
   function addAnim(host, url){
     const img = document.createElement('img');
-    img.src = url;
     img.alt = '';
     Object.assign(img.style, {
       position:'absolute', left:0, top:0, width:'100%', height:'100%',
       imageRendering:'pixelated', pointerEvents:'none'
     });
     img.className = 'frog-anim';
-    img.onerror = () => img.remove();
+    const urls = Array.isArray(url) ? url.filter(Boolean) : [url];
+    let idx = 0;
+    function tryNext(){
+      if (idx >= urls.length){ img.remove(); return; }
+      img.src = urls[idx++];
+    }
+    img.onerror = tryNext;
+    tryNext();
+    if (!urls.length) return;
     host.appendChild(img);
   }
 
