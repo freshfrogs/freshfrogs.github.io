@@ -60,6 +60,7 @@
 .frog-card .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px;
 }
 .frog-card .meta{ color:var(--muted); font-size:12px; }
+
 .frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; color:var(--muted); font:400 12px/1.4 var(--font-ui);
  }
 .frog-card .attr-bullets li{ display:list-item; font:inherit; color:inherit; margin:2px 0; transition:color .15s ease; }
