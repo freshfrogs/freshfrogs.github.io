@@ -68,7 +68,7 @@
         // array of objects
         out = data.map(x => ({
           id: asNumber(x.id ?? x.tokenId ?? x.token_id ?? x.frogId ?? x.frog_id),
-          rank: asNumber(x.rank ?? x.position ?? x.place),
+          rank: asNumber(x.rank ?? x.ranking ?? x.position ?? x.place),
           score: asNumber(x.score ?? x.rarityScore ?? x.points ?? x.total ?? 0)
         }));
         console.log(`[rarity] parsed ${label}: array of objects -> ${out.length} entries`);
@@ -92,7 +92,7 @@
             const v = data[k] || {};
             return {
               id: asNumber(k),
-              rank: asNumber(v.rank ?? v.position ?? v.place),
+              rank: asNumber(v.rank ?? v.ranking ?? v.position ?? v.place),
               score: asNumber(v.score ?? v.rarityScore ?? v.points ?? 0)
             };
           });
