@@ -1,5 +1,5 @@
-// assets/js/rarity-page.js
-// Rarity page with layered 128x128 render, dashboard-style cards, correct subtitle & attributes color.
+// assets/js/rarity-page.js — rarity grid with dashboard-style cards, layered 128x128 image,
+// rank pill beside title, subtitle = staking status + owner, and bullet-list attributes.
 
 (function(FF = window.FF || {}, CFG = window.CFG || {}) {
   const GRID = document.getElementById('rarityGrid');
@@ -15,17 +15,13 @@
   const LOOKUP_FILE       = 'assets/freshfrogs_rank_lookup.json';     // { "rank": id, ... }
   const PAGE = 60;
   const CANVAS_SIZE = 128;
-
-  // Trait layer base (override in config.js if needed: CFG.LAYER_BASE = '...'):
   const LAYER_BASE = (CFG.LAYER_BASE || 'frog/build_files'); // frog/build_files/{TRAIT}/{VALUE}.png
 
-  // Optional: Reservoir (owners) — only used if web3 ownerOf is unavailable
   const RESERVOIR = {
-    OWNERS: 'https://api.reservoir.tools/owners/v2', // ?tokens=<addr>%3A<id>&limit=1
+    OWNERS: 'https://api.reservoir.tools/owners/v2',
     KEY: CFG.FROG_API_KEY || CFG.RESERVOIR_API_KEY || ''
   };
 
-  // Z-order hint (unknown traits go near the end but before FX)
   const LAYER_ORDER = [
     'Body','Base','Skin','Torso','Belly',
     'Mouth','Eyes','Nose','Ears',
@@ -55,15 +51,22 @@
   function traitVal(t){ return (t?.value ?? t?.trait_value ?? '').toString().trim(); }
   function layerPath(traitType, value){ return `${LAYER_BASE}/${sanitizePart(traitType)}/${sanitizePart(value)}.png`; }
 
-  function sortByLayerOrder(attrs){
-    const idx = new Map(LAYER_ORDER.map((k,i)=>[k.toLowerCase(), i]));
-    return attrs.slice().sort((a,b)=>{
-      const ak = traitKey(a).toLowerCase(), bk = traitKey(b).toLowerCase();
-      const ai = idx.has(ak) ? idx.get(ak) : 999, bi = idx.has(bk) ? idx.get(bk) : 999;
-      if (ai !== bi) return ai - bi;
-      const an = ak.localeCompare(bk); if (an) return an;
-      return traitVal(a).localeCompare(traitVal(b));
-    });
+  // Title rank pill color (simple mapping; tweak if you have your theme tokens handy)
+  function rankPillStyle(rank){
+    if (rank === 1) return 'background:#f59e0b; color:#0b0b0d; border:1px solid #a16207;'; // gold
+    if (rank <= 50) return 'background:#8b5cf6; color:#0b0b0d; border:1px solid #6d28d9;';  // purple
+    return 'background: color-mix(in srgb, var(--panel) 85%, transparent); border:1px solid var(--border);';
+  }
+
+  // ---- Wallet helper (to highlight "Owned by You")
+  async function getUserAddress(){
+    try{
+      if (window.ethereum?.request){
+        const accts = await window.ethereum.request({ method:'eth_accounts' });
+        if (accts && accts[0]) return accts[0];
+      }
+    }catch{}
+    return (CFG.USER_ADDRESS || '').toString();
   }
 
   // ---- Web3 + owners
@@ -91,7 +94,6 @@
     }catch{ return null; }
   }
   async function fetchOwnerOf(id){
-    // Try on-chain first (if provider present), else Reservoir (if key present).
     const onchain = await ownerFromContract(id);
     if (onchain) return onchain;
     const api = await ownerFromReservoir(id);
@@ -191,10 +193,8 @@
       gridRow: 'span 3',
       backgroundImage: `url(frog/${id}.png)`,
       backgroundRepeat: 'no-repeat',
-      // scale & offset so only the original bg color shows
-      backgroundSize: '280% 280%',
+      backgroundSize: '280% 280%',   // scaled so only the bg color shows
       backgroundPosition: '120% 120%',
-      // ensure pixel feel
       imageRendering: 'pixelated'
     });
 
@@ -221,30 +221,21 @@
     return wrap;
   }
 
+  function sortByLayerOrder(attrs){
+    const idx = new Map(LAYER_ORDER.map((k,i)=>[k.toLowerCase(), i]));
+    return attrs.slice().sort((a,b)=>{
+      const ak = traitKey(a).toLowerCase(), bk = traitKey(b).toLowerCase();
+      const ai = idx.has(ak) ? idx.get(ak) : 999, bi = idx.has(bk) ? idx.get(bk) : 999;
+      if (ai !== bi) return ai - bi;
+      const an = ak.localeCompare(bk); if (an) return an;
+      return traitVal(a).localeCompare(traitVal(b));
+    });
+  }
+
   // ---- Card (dashboard style)
-  function buildCard(rec){
+  function buildCard(rec, userAddr){
     const { id, rank, score, meta, owner, stake } = rec;
     const stakedDays = daysAgoFromUnix(stake?.since);
-
-    // Status (only green when staked)
-    const statusSpan = document.createElement('span');
-    statusSpan.textContent = (stake?.staked && stakedDays != null)
-      ? `Staked ${stakedDays}d ago`
-      : 'Not staked';
-    if (stake?.staked && stakedDays != null) {
-      // green tone aligned with your theme hover
-      statusSpan.style.color = 'color-mix(in srgb, #22c55e 85%, #ffffff)';
-      statusSpan.style.fontWeight = '700';
-    } // else inherit muted via .meta container
-
-    // Subtitle container: status • owner
-    const subtitle = document.createElement('div');
-    subtitle.className = 'meta';
-    subtitle.style.color = 'var(--muted)'; // ensure it never goes green
-    const dot = document.createElement('span');
-    dot.textContent = ' • ';
-    const ownerSpan = document.createElement('span');
-    ownerSpan.textContent = `Owned by ${shortAddr(owner)}`;
 
     // Title with rank pill
     const title = document.createElement('h4');
@@ -253,22 +244,54 @@
     tName.textContent = meta?.name || `Frog #${id}`;
     const tRank = document.createElement('span');
     tRank.className = 'pill';
-    tRank.textContent = `Rank #${rank}`;
+    tRank.style.cssText = rankPillStyle(rank);
+    tRank.textContent = `#${rank}`;
     title.appendChild(tName);
     title.appendChild(tRank);
 
-    // Attributes (muted)
-    const attrsLine = document.createElement('div');
-    attrsLine.className = 'meta';
-    attrsLine.style.color = 'var(--muted)'; // explicitly muted (no green)
-    if (Array.isArray(meta?.attributes) && meta.attributes.length){
-      const parts = meta.attributes.map(a => {
-        const k = traitKey(a), v = traitVal(a);
-        return (k && v) ? `${k}: ${v}` : '';
-      }).filter(Boolean);
-      attrsLine.textContent = parts.join(' • ');
+    // Subtitle: staking status (green only when staked) • owner text
+    const subtitle = document.createElement('div');
+    subtitle.className = 'meta';
+    subtitle.style.color = 'var(--muted)';
+
+    const status = document.createElement('span');
+    if (stake?.staked && stakedDays != null) {
+      status.textContent = `Staked ${stakedDays}d ago`;
+      status.style.color = 'color-mix(in srgb, #22c55e 85%, #ffffff)'; // green tone
+      status.style.fontWeight = '700';
     } else {
-      attrsLine.textContent = '';
+      status.textContent = 'Not staked';
+      // keep muted
+    }
+
+    const sep = document.createElement('span'); sep.textContent = ' • ';
+
+    const you = (userAddr && owner && userAddr.toLowerCase() === owner.toLowerCase());
+    const ownerSpan = document.createElement('span');
+    ownerSpan.textContent = you ? 'Owned by You' : `Owned by ${shortAddr(owner)}`;
+    if (you) {
+      ownerSpan.style.color = 'color-mix(in srgb, #22c55e 85%, #ffffff)'; // same green as your dashboard
+      ownerSpan.style.fontWeight = '700';
+    }
+
+    subtitle.appendChild(status);
+    subtitle.appendChild(sep);
+    subtitle.appendChild(ownerSpan);
+
+    // Attributes — bullet list, muted, each on its own line: "Trait: Value"
+    const attrsBlock = document.createElement('ul');
+    attrsBlock.style.margin = '6px 0 0 0';
+    attrsBlock.style.paddingLeft = '18px';
+    attrsBlock.style.color = 'var(--muted)';
+    attrsBlock.style.listStyle = 'disc';
+    if (Array.isArray(meta?.attributes) && meta.attributes.length){
+      meta.attributes.forEach(a => {
+        const k = traitKey(a), v = traitVal(a);
+        if (!k || !v) return;
+        const li = document.createElement('li');
+        li.textContent = `${k}: ${v}`;
+        attrsBlock.appendChild(li);
+      });
     }
 
     // Actions
@@ -277,32 +300,31 @@
     const btnOS = document.createElement('a');
     btnOS.href = `https://opensea.io/assets/ethereum/${CFG.COLLECTION_ADDRESS}/${id}`;
     btnOS.target = '_blank'; btnOS.rel = 'noopener';
-    btnOS.className = 'btn btn-outline-gray'; btnOS.textContent = 'OpenSea';
+    btnOS.className = 'btn btn-outline-gray'; btnOS.textContent = 'Etherscan' ? 'OpenSea' : 'OpenSea';
     const btnScan = document.createElement('a');
     btnScan.href = `https://etherscan.io/token/${CFG.COLLECTION_ADDRESS}?a=${id}`;
     btnScan.target = '_blank'; btnScan.rel = 'noopener';
     btnScan.className = 'btn btn-outline-gray'; btnScan.textContent = 'Etherscan';
-    actions.appendChild(btnOS); actions.appendChild(btnScan);
+    const btnOrig = document.createElement('a');
+    btnOrig.href = `frog/${id}.png`;
+    btnOrig.target = '_blank'; btnOrig.rel = 'noopener';
+    btnOrig.className = 'btn btn-outline-gray'; btnOrig.textContent = 'Original';
+    actions.appendChild(btnOS); actions.appendChild(btnScan); actions.appendChild(btnOrig);
 
     // Compose card
     const card = document.createElement('div');
     card.className = 'frog-card';
     const layered = buildLayeredFrog(meta, id);
-
-    subtitle.appendChild(statusSpan);
-    subtitle.appendChild(dot);
-    subtitle.appendChild(ownerSpan);
-
     card.appendChild(layered);
     card.appendChild(title);
     card.appendChild(subtitle);
-    if (attrsLine.textContent) card.appendChild(attrsLine);
+    if (attrsBlock.childNodes.length) card.appendChild(attrsBlock);
     card.appendChild(actions);
     return card;
   }
 
   // ---- Paging / render
-  async function loadMore(){
+  async function loadMore(userAddr){
     const slice = view.slice(offset, offset + PAGE);
     if (!slice.length){ ensureMoreBtn(); return; }
 
@@ -317,25 +339,25 @@
     }
 
     const frag = document.createDocumentFragment();
-    slice.forEach(rec => frag.appendChild(buildCard(rec)));
+    slice.forEach(rec => frag.appendChild(buildCard(rec, userAddr)));
     GRID.appendChild(frag);
     offset += slice.length;
     ensureMoreBtn();
   }
 
-  function resort(){
+  function resort(userAddr){
     view.sort((a,b)=> sortMode==='rank'
       ? (a.rank - b.rank)
       : ((b.score - a.score) || (a.rank - b.rank))
     );
-    offset = 0; clearGrid(); loadMore();
+    offset = 0; clearGrid(); loadMore(userAddr);
   }
 
-  function jumpToId(id){
+  function jumpToId(id, userAddr){
     const ix = view.findIndex(x => x.id === id);
     if (ix < 0) return;
     offset = Math.floor(ix / PAGE) * PAGE;
-    clearGrid(); loadMore();
+    clearGrid(); loadMore(userAddr);
   }
 
   // ---- Init
@@ -355,15 +377,17 @@
       view = all.slice();
       offset = 0;
       clearGrid();
-      await loadMore();
+
+      const userAddr = await getUserAddress();
+      await loadMore(userAddr);
       if (BTN_MORE) BTN_MORE.style.display = 'inline-flex';
 
-      BTN_MORE?.addEventListener('click', loadMore);
-      BTN_RANK?.addEventListener('click', ()=>{ sortMode='rank'; resort(); });
-      BTN_SCORE?.addEventListener('click', ()=>{ sortMode='score'; resort(); });
+      BTN_MORE?.addEventListener('click', () => loadMore(userAddr));
+      BTN_RANK?.addEventListener('click', ()=>{ sortMode='rank'; resort(userAddr); });
+      BTN_SCORE?.addEventListener('click', ()=>{ sortMode='score'; resort(userAddr); });
       BTN_GO?.addEventListener('click', ()=>{
         const id = Number(FIND_INPUT.value);
-        if (Number.isFinite(id)) jumpToId(id);
+        if (Number.isFinite(id)) jumpToId(id, userAddr);
       });
     } catch (e) {
       console.error('[rarity] init error', e);
