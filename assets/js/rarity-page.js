@@ -1,5 +1,5 @@
-// assets/js/rarity-page.js — rarity grid with layered 128x128, sampled bg color,
-// dashboard-style subtitle, and vertical bullet-list attributes.
+// assets/js/rarity-page.js — metadata-order layering (128x128), rank pill beside title,
+// dashboard-style subtitle + vertical attributes, owner/staked info.
 
 (function(FF = window.FF || {}, CFG = window.CFG || {}) {
   const GRID = document.getElementById('rarityGrid');
@@ -22,16 +22,6 @@
     KEY: CFG.FROG_API_KEY || CFG.RESERVOIR_API_KEY || ''
   };
 
-  const LAYER_ORDER = [
-    'Body','Base','Skin','Torso','Belly',
-    'Mouth','Eyes','Nose','Ears',
-    'Clothes','Shirt','Jacket','Hoodie','Armor',
-    'Accessory','Glasses','Mask',
-    'Hat','Headwear','Crown',
-    'Held','Hand','Weapon',
-    'BackgroundFX','FX'
-  ];
-
   // ---- State
   let all = [];   // [{id, rank, score}]
   let view = [];
@@ -51,23 +41,34 @@
   function traitVal(t){ return (t?.value ?? t?.trait_value ?? '').toString().trim(); }
   function layerPath(traitType, value){ return `${LAYER_BASE}/${sanitizePart(traitType)}/${sanitizePart(value)}.png`; }
 
-  // Title rank pill color
-  function rankPillStyle(rank){
-    if (rank === 1) return 'background:#f59e0b; color:#0b0b0d; border:1px solid #a16207;';
-    if (rank <= 50) return 'background:#8b5cf6; color:#0b0b0d; border:1px solid #6d28d9;';
-    return 'background: color-mix(in srgb, var(--panel) 85%, transparent); border:1px solid var(--border);';
+  // Pill color: try to use your dashboard function if it exists; fallback to simple tiers
+  function makeRankPill(rank){
+    // If your renderer exposes a badge factory, use it
+    try {
+      if (FF.rankBadgeForRank && typeof FF.rankBadgeForRank === 'function') {
+        const el = FF.rankBadgeForRank(rank); // expected to return an Element
+        if (el) return el;
+      }
+    } catch {}
+    const pill = document.createElement('span');
+    pill.className = 'pill';
+    pill.textContent = `#${rank}`;
+    pill.style.marginLeft = '8px';
+    // fallback colors (will be overridden later if you give me your exact classes)
+    if (rank === 1) { pill.style.background = '#f59e0b'; pill.style.border = '1px solid #a16207'; pill.style.color = '#0b0b0d'; }
+    else if (rank <= 50) { pill.style.background = '#8b5cf6'; pill.style.border = '1px solid #6d28d9'; pill.style.color = '#0b0b0d'; }
+    else { pill.style.background = 'color-mix(in srgb, var(--panel) 85%, transparent)'; pill.style.border = '1px solid var(--border)'; }
+    return pill;
   }
 
-  // ---- Wallet (to show "Owned by You")
+  // ---- Wallet (for "Owned by You")
   async function getUserAddress(){
-    // Prefer any site helper if present
     try {
       if (typeof window.FF_getUserAddress === 'function') {
         const a = await window.FF_getUserAddress();
         if (a) return a;
       }
     } catch {}
-    // Fallback to eth_accounts (won't prompt connect)
     try{
       if (window.ethereum?.request){
         const accts = await window.ethereum.request({ method:'eth_accounts' });
@@ -213,14 +214,14 @@
         const c = document.createElement('canvas');
         c.width = 2; c.height = 2;
         const ctx = c.getContext('2d', { willReadFrequently: true });
-        // Draw scaled down to 2x2, then read 0,0
         ctx.drawImage(bg, 0, 0, 2, 2);
         const d = ctx.getImageData(0, 0, 1, 1).data;
         wrap.style.backgroundColor = `rgb(${d[0]}, ${d[1]}, ${d[2]})`;
       } catch {}
     };
 
-    const attrs = Array.isArray(meta?.attributes) ? sortByLayerOrder(meta.attributes) : [];
+    // IMPORTANT: draw in the SAME ORDER as metadata provides
+    const attrs = Array.isArray(meta?.attributes) ? meta.attributes : [];
     for (const a of attrs){
       const t = traitKey(a), v = traitVal(a);
       if (!t || !v) continue;
@@ -243,31 +244,17 @@
     return wrap;
   }
 
-  function sortByLayerOrder(attrs){
-    const idx = new Map(LAYER_ORDER.map((k,i)=>[k.toLowerCase(), i]));
-    return attrs.slice().sort((a,b)=>{
-      const ak = traitKey(a).toLowerCase(), bk = traitKey(b).toLowerCase();
-      const ai = idx.has(ak) ? idx.get(ak) : 999, bi = idx.has(bk) ? idx.get(bk) : 999;
-      if (ai !== bi) return ai - bi;
-      const an = ak.localeCompare(bk); if (an) return an;
-      return traitVal(a).localeCompare(traitVal(b));
-    });
-  }
-
   // ---- Card (dashboard style)
   function buildCard(rec, userAddr){
     const { id, rank, meta, owner, stake } = rec;
     const stakedDays = daysAgoFromUnix(stake?.since);
 
-    // Title with rank pill
+    // Title with rank pill (proper spacing)
     const title = document.createElement('h4');
     title.className = 'title';
     const tName = document.createElement('span');
     tName.textContent = meta?.name || `Frog #${id}`;
-    const tRank = document.createElement('span');
-    tRank.className = 'pill';
-    tRank.style.cssText = rankPillStyle(rank);
-    tRank.textContent = `#${rank}`;
+    const tRank = makeRankPill(rank);
     title.appendChild(tName);
     title.appendChild(tRank);
 
@@ -299,7 +286,7 @@
     subtitle.appendChild(sep);
     subtitle.appendChild(ownerSpan);
 
-    // Attributes — vertical list (force list-item display)
+    // Attributes — vertical bullet list (force list-item)
     const attrsBlock = document.createElement('ul');
     attrsBlock.style.margin = '6px 0 0 0';
     attrsBlock.style.paddingLeft = '18px';
@@ -311,7 +298,7 @@
         if (!k || !v) return;
         const li = document.createElement('li');
         li.textContent = `${k}: ${v}`;
-        li.style.display = 'list-item';       // <-- force vertical bullets
+        li.style.display = 'list-item';
         attrsBlock.appendChild(li);
       });
     }
@@ -412,7 +399,6 @@
         if (Number.isFinite(id)) jumpToId(id, userAddr);
       });
 
-      // Also react to account changes to show "Owned by You" live
       if (window.ethereum?.on) {
         window.ethereum.on('accountsChanged', () => location.reload());
       }
