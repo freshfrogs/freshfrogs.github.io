@@ -2,8 +2,11 @@
 // Rarity list that matches dashboard card visuals (rank pill tiers, staked line),
 // and uses the same 128×128 DOM layering from frog-renderer.js
 
-(function(FF = window.FF || {}, CFG = window.FF_CFG || {}) {
+(function(){
   'use strict';
+
+  const FF = window.FF || (window.FF = {});
+  const CFG = window.FF_CFG || {};
 
   // ---------- DOM ----------
   const GRID       = document.getElementById('rarityGrid');
@@ -42,8 +45,8 @@
 .frog-card canvas.frog-canvas{ width:${SIZE}px; height:${SIZE}px; border-radius:12px; background:var(--panel-2); display:block; }
 .frog-card .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
 .frog-card .meta{ color:var(--muted); font-size:12px; }
-.frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; color:var(--muted); }
-.frog-card .attr-bullets li{ display:list-item; font-size:12px; margin:2px 0; }
+.frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; color:var(--muted); font:400 12px/1.4 var(--font-ui); }
+.frog-card .attr-bullets li{ display:list-item; font:inherit; color:inherit; margin:2px 0; }
 
 .rank-pill{
   display:inline-flex; align-items:center; gap:6px;
@@ -352,4 +355,4 @@
     }
   })();
 
-})(window.FF, window.FF_CFG);
+})();
