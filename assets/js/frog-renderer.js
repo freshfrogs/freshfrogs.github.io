@@ -15,11 +15,18 @@
   const ROOT = String(CFG.SOURCE_PATH || '').replace(/\/+$/,'');
   const DISALLOW_HOVER = new Set(['Trait','Frog','SpecialFrog']);
   const DISALLOW_ANIM  = new Set(['Frog','Hat']);
+  const ENABLE_ANIMATIONS = (CFG && CFG.ENABLE_FROG_ANIMATIONS === true);
 
   function metaURL(id){ return `${ROOT}/frog/json/${id}.json`; }
   function basePNG(id){ return `${ROOT}/frog/${id}.png`; }
   function layerPNG(k,v){ return `${ROOT}/frog/build_files/${k}/${v}.png`; }
-  function layerGIF(k,v){ return `${ROOT}/frog/build_files/${k}/${v}_animation.gif`; }
+  function layerGIF(k,v){
+    const base = `${ROOT}/frog/build_files/${k}`;
+    return [
+      `${base}/animations/${v}_animation.gif`,
+      `${base}/${v}_animation.gif`
+    ];
+  }
 
   const JSON_CACHE = new Map(); // id -> Promise(json|null)
 
@@ -85,8 +92,8 @@
     Object.assign(img.style, {
       position:'absolute', left:0, top:0, width:'100%', height:'100%',
       imageRendering:'pixelated', pointerEvents:'none',
-      transform: lift ? 'translate(-2px,-2px)' : 'none',
-      filter: lift ? 'drop-shadow(0 0 2px rgba(255,255,255,.15))' : 'none'
+      transform: lift ? 'translate(-6px,-6px) scale(1.04)' : 'none',
+      filter: lift ? 'drop-shadow(0 14px 18px rgba(0,0,0,.35))' : 'none'
     });
     img.className = 'frog-layer';
     img.onerror = () => img.remove();
@@ -95,14 +102,21 @@
 
   function addAnim(host, url){
     const img = document.createElement('img');
-    img.src = url;
     img.alt = '';
     Object.assign(img.style, {
       position:'absolute', left:0, top:0, width:'100%', height:'100%',
       imageRendering:'pixelated', pointerEvents:'none'
     });
     img.className = 'frog-anim';
-    img.onerror = () => img.remove();
+    const urls = Array.isArray(url) ? url.filter(Boolean) : [url];
+    let idx = 0;
+    function tryNext(){
+      if (idx >= urls.length){ img.remove(); return; }
+      img.src = urls[idx++];
+    }
+    img.onerror = tryNext;
+    tryNext();
+    if (!urls.length) return;
     host.appendChild(img);
   }
 
@@ -131,10 +145,11 @@
       addLayer(host, layerPNG(a.key, a.value), lift);
     }
 
-    // Animated overlays (skip Frog/Hat)
-    for (const a of attrs){
-      if (DISALLOW_ANIM.has(a.key)) continue;
-      addAnim(host, layerGIF(a.key, a.value));
+    if (ENABLE_ANIMATIONS){
+      for (const a of attrs){
+        if (DISALLOW_ANIM.has(a.key)) continue;
+        addAnim(host, layerGIF(a.key, a.value));
+      }
     }
   };
 

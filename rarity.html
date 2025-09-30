@@ -13,33 +13,10 @@
     img{ image-rendering: pixelated; image-rendering: crisp-edges; }
 
     .pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
-    .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; flex-wrap:wrap; }
     .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
     .pg-muted{ color:var(--muted); font-size:13px; }
 
-    /* Hero (identical structure so topbar.js pills work) */
-    .frog-hero{ margin:28px auto 38px; max-width:1100px; }
-    .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
-    .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
-    .frog-strip .tile{ flex:0 0 auto; width:64px; height:64px; border-radius:10px; }
-    .frog-strip .tile.hide{ display:none !important; }
-    .frog-strip img{ width:64px; height:64px; object-fit:contain; }
-    @media (max-width:520px){ .frog-hero{ margin:22px auto 30px; } .frog-strip{ gap:10px; } }
-
-    /* Single main panel with the grid */
-    .page-grid{ max-width:1100px; margin:0 auto; display:grid; gap:16px; grid-template-columns: 1fr; }
-
-    /* Use the same card styles defined in collection.html */
-    .frog-card{ border:1px solid var(--border); background:var(--panel); border-radius:14px; padding:12px;
-      display:grid; grid-template-columns:auto 1fr; column-gap:12px; row-gap:6px; align-items:start; color:inherit; }
-    .frog-card .thumb{
-      width:128px;height:128px;border-radius:12px;background:var(--panel-2);object-fit:contain;grid-row: span 3;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 6px 12px rgba(0,0,0,.25);
-    }
-    .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
-    .pill{ display:inline-block; padding:3px 10px; border-radius:999px; background: color-mix(in srgb, var(--panel) 85%, transparent); border:1px solid var(--border); font-size:12px; }
-    .meta{ color:var(--muted); font-size:12px; }
-    .actions{ grid-column:1 / -1; display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
     .btn{
       font-family: var(--font-ui);
       border:1px solid var(--border);
@@ -50,8 +27,11 @@
       font-weight:700;
       font-size:12px;
       line-height:1;
-      display:inline-flex; align-items:center; gap:6px;
-      text-decoration:none; letter-spacing:.01em;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      text-decoration:none;
+      letter-spacing:.01em;
       transition: background .15s ease, border-color .15s ease, color .15s ease, transform .05s ease;
     }
     .btn:active{ transform: translateY(1px); }
@@ -62,12 +42,32 @@
       color: color-mix(in srgb, #ffffff 85%, #22c55e);
     }
 
-    /* Grid */
+    /* Hero (identical structure so topbar.js pills work) */
+    .frog-hero{ margin:28px auto 38px; max-width:1100px; }
+    .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
+    .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
+    .frog-strip .tile{ flex:0 0 auto; width:64px; height:64px; border-radius:10px; }
+    .frog-strip .tile.hide{ display:none !important; }
+    .frog-strip img{ width:64px; height:64px; object-fit:contain; }
+    @media (max-width:520px){ .frog-hero{ margin:22px auto 30px; } .frog-strip{ gap:10px; } }
+
+    .page-grid{ max-width:1100px; margin:0 auto; display:grid; gap:16px; grid-template-columns: 1fr; }
+
+    .frog-card{ border:1px solid var(--border); background:var(--panel); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:10px; color:inherit; }
+    .frog-card .card-body{ display:grid; grid-template-columns:auto 1fr; column-gap:12px; row-gap:6px; align-items:start; }
+    .frog-card .thumb-wrap{ width:128px; height:128px; border-radius:12px; background:var(--panel-2); position:relative; overflow:hidden; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 6px 12px rgba(0,0,0,.25); }
+    .frog-card canvas.frog-canvas{ width:100%; height:100%; border-radius:12px; display:block; }
+    .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
+    .pill{ display:inline-block; padding:3px 10px; border-radius:999px; background: color-mix(in srgb, var(--panel) 85%, transparent); border:1px solid var(--border); font-size:12px; }
+    .meta{ color:var(--muted); font-size:12px; }
+    .frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; color:var(--muted); font:400 12px/1.4 var(--font-ui); }
+    .frog-card .attr-bullets li{ font:inherit; color:inherit; margin:2px 0; }
+    .frog-card .attr-bullets b{ font-weight:700; }
+
     #rarityGrid{ display:grid; gap:10px; grid-template-columns: 1fr; }
     @media (min-width:720px){ #rarityGrid{ grid-template-columns: 1fr 1fr; } }
     @media (min-width:1024px){ #rarityGrid{ grid-template-columns: 1fr 1fr 1fr; } }
 
-    /* Rank badge for image (optional; your card renderer can also inject this) */
     .rank-badge{
       position:absolute; top:8px; left:8px;
       background:var(--ink,#0c0c0f); color:var(--fg,#eaeaea);
@@ -97,7 +97,7 @@
       <section class="pg-card">
         <div class="pg-card-head">
           <h3>Rarity Rankings</h3>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <div class="control-row" style="display:flex;gap:8px;flex-wrap:wrap;">
             <button id="btnSortRank"  class="btn btn-outline-gray">Sort: Rank ↑</button>
             <button id="btnSortScore" class="btn btn-outline-gray">Sort: Score ↓</button>
             <input id="raritySearchId" type="number" min="1" placeholder="Find Frog ID…" style="width:140px; padding:6px 10px; border:1px solid var(--border); border-radius:8px; background:var(--panel-2); color:inherit;">
