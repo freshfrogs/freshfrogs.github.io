@@ -197,22 +197,16 @@
       return hasAnimation(a.key, a.value).catch(() => false);
     }));
 
-    // Static layers in EXACT metadata order (skip when animation exists)
+    // Render each layer exactly in metadata order, swapping to animations when available
     for (let i=0;i<attrs.length;i++){
       const a = attrs[i];
       if (!a) continue;
-      if (animFlags[i]) continue;
       const lift = !!hoverKey && a.key === hoverKey && !DISALLOW_HOVER.has(a.key);
-      addLayer(host, layerPNG(a.key, a.value), lift);
-    }
-
-    // Animated overlays (skip Frog/Hat)
-    for (let i=0;i<attrs.length;i++){
-      const a = attrs[i];
-      if (!a || DISALLOW_ANIM.has(a.key)) continue;
-      if (!animFlags[i]) continue;
-      const lift = !!hoverKey && a.key === hoverKey && !DISALLOW_HOVER.has(a.key);
-      addAnim(host, layerGIF(a.key, a.value), lift);
+      if (animFlags[i] && !DISALLOW_ANIM.has(a.key)){
+        addAnim(host, layerGIF(a.key, a.value), lift);
+      } else {
+        addLayer(host, layerPNG(a.key, a.value), lift);
+      }
     }
   };
 
