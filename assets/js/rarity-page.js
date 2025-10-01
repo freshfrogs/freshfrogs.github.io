@@ -558,7 +558,7 @@
     if (!ownerLabel) ownerLabel = 'Unknown';
     if (item.staked) {
       var ago = item.sinceMs ? fmtAgo(item.sinceMs) : null;
-      return '<span class="staked-flag">Staked</span> by ' + ownerLabel + (ago ? (' ' + ago) : '');
+      return '<span class="staked-flag">Staked</span>' + (ago ? (' ' + ago) : '') + ' by ' + ownerLabel;
     }
     return 'Owned by ' + ownerLabel;
   }

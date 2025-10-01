@@ -275,7 +275,8 @@
     if (!rows.length){ setStatus('No frogs from this wallet are currently staked.'); return; }
     rows.forEach(r=>{
       const sinceMs = r.since ? r.since.getTime() : null;
-      const info = r.since ? `Staked by You ${fmtAgoMs(Date.now()-sinceMs)}` : 'Staked by You';
+      const agoLabel = sinceMs ? fmtAgoMs(Date.now()-sinceMs) : null;
+      const info = agoLabel ? `Staked ${agoLabel} by You` : 'Staked by You';
       ul.appendChild(liCard(r.id, info, ST.addr, true, sinceMs));
     });
     setStatus(`Showing ${rows.length} staked frog(s). Scroll for more.`);

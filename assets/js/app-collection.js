@@ -1,7 +1,7 @@
 // assets/js/app-collection.js
 // "My Frogs (Owned)" — restore mini header (Owned • Staked • Unclaimed Rewards)
 // Approve shows only when needed; Claim Rewards action; cards unchanged;
-// Meta shows "Owned by You" / "Staked by You NNd ago". Owned=Reservoir, Staked=controller.
+// Meta shows "Owned by You" / "Staked NNd ago by You". Owned=Reservoir, Staked=controller.
 
 (function(){
   'use strict';
@@ -176,7 +176,7 @@
   function metaLine(it){
     if (!it.staked) return 'Owned by You';
     var days = it.stakedTs ? timeAgoDays(it.stakedTs) : null;
-    return days!=null ? ('Staked by You '+days+'d ago') : 'Staked by You';
+    return days!=null ? ('Staked '+days+'d ago by You') : 'Staked by You';
   }
 
   function headerRoot(){

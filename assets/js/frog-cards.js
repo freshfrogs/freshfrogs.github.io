@@ -194,7 +194,7 @@
     if (it.staked){
       const agoRaw = it.sinceMs ? fmtAgo(it.sinceMs) : null;
       const ago = agoRaw ? ' ' + escapeHtml(agoRaw) : '';
-      return `<span class="staked-flag">Staked</span> by ${ownerLabel}${ago}`;
+      return `<span class="staked-flag">Staked</span>${ago} by ${ownerLabel}`;
     }
     return 'Owned by ' + ownerLabel;
   }

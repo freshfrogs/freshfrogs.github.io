@@ -265,11 +265,13 @@
 
         // Middle: text block
         const mid = mk('div');
+        const sinceLabel = fmtAgo(r.since);
+        const sinceText = sinceLabel ? ' ' + sinceLabel : '';
         mid.innerHTML =
           `<div style="display:flex;align-items:center;gap:8px;">
              <b>Frog #${r.id}</b> ${pillRank(rank)}
            </div>
-           <div class="muted">Staked by ${r.staker ? shorten(r.staker) : '—'} ${fmtAgo(r.since)}</div>`;
+           <div class="muted">Staked${sinceText} by ${r.staker ? shorten(r.staker) : '—'}</div>`;
         li.appendChild(mid);
 
         ul.appendChild(li);
