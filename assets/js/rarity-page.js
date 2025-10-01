@@ -36,18 +36,17 @@
   var currentUser = null;
   var STORAGE_KEY_LAYOUT = 'ff_card_layout';
   var DEFAULT_CARD_LAYOUTS = [
-    { id: 'classic',   label: 'Classic' },
-    { id: 'spotlight', label: 'Spotlight' },
-    { id: 'aurora',    label: 'Aurora' },
-    { id: 'ember',     label: 'Ember' },
-    { id: 'midnight',  label: 'Midnight' },
-    { id: 'glass',     label: 'Glass' },
-    { id: 'forest',    label: 'Forest Canopy' },
-    { id: 'retro',     label: 'Retro Pop' },
-    { id: 'oasis',     label: 'Oasis' },
-    { id: 'parchment', label: 'Parchment' },
-    { id: 'circuit',   label: 'Circuit' },
-    { id: 'sunset',    label: 'Sunset Glow' }
+    { id: 'classic',  label: 'Classic' },
+    { id: 'heritage', label: 'Heritage' },
+    { id: 'nocturne', label: 'Nocturne' },
+    { id: 'sunburst', label: 'Sunburst' },
+    { id: 'tidal',    label: 'Tidal' },
+    { id: 'vintage',  label: 'Vintage' },
+    { id: 'obsidian', label: 'Obsidian' },
+    { id: 'skyline',  label: 'Skyline' },
+    { id: 'verdant',  label: 'Verdant' },
+    { id: 'monument', label: 'Monument' },
+    { id: 'neon',     label: 'Neon Grid' }
   ];
   var CARD_LAYOUTS = DEFAULT_CARD_LAYOUTS.slice();
   var layoutIndex = 0;
