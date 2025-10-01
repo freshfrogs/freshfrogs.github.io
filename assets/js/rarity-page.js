@@ -9,6 +9,9 @@
   var FF  = global.FF     || {};
   var CFG = global.FF_CFG || {};
 
+  var PAGE_CFG = global.FF_RARITY_PAGE_CONFIG || {};
+  try { delete global.FF_RARITY_PAGE_CONFIG; } catch (errCfg) {}
+
   var GRID       = document.getElementById('rarityGrid');
   var BTN_MORE   = document.getElementById('btnMore');
   var BTN_RANK   = document.getElementById('btnSortRank');
@@ -20,7 +23,14 @@
 
   var PRIMARY_RANK_FILE = CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json';
   var LOOKUP_FILE       = 'assets/freshfrogs_rank_lookup.json';
-  var PAGE_SIZE         = 60;
+  var STAKED_ONLY       = !!PAGE_CFG.stakedOnly;
+  var DEFAULT_SORT_MODE = (PAGE_CFG.defaultSortMode || 'rank');
+  var SECOND_SORT_MODE  = PAGE_CFG.secondSortMode === false ? null : (PAGE_CFG.secondSortMode || (STAKED_ONLY ? 'time' : 'score'));
+  var SECOND_SORT_LABEL = PAGE_CFG.secondSortLabel || null;
+  var AUTO_MIN_RENDER   = Number(PAGE_CFG.autoLoadMin) || 0;
+  DEFAULT_SORT_MODE = String(DEFAULT_SORT_MODE || 'rank').toLowerCase();
+  if (SECOND_SORT_MODE) SECOND_SORT_MODE = String(SECOND_SORT_MODE).toLowerCase();
+  var PAGE_SIZE         = Number(PAGE_CFG.pageSize || 60);
   var SOURCE_PATH       = (CFG.SOURCE_PATH || '').replace(/\/+$/, '');
 
   var RESERVOIR_HOST = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/, '');
@@ -31,7 +41,11 @@
   var allItems   = [];
   var viewItems  = [];
   var offset     = 0;
-  var sortMode   = 'rank';
+  var sortMode   = DEFAULT_SORT_MODE;
+  if (sortMode !== 'rank' && sortMode !== 'score' && sortMode !== 'time') {
+    sortMode = 'rank';
+  }
+  var renderCount = 0;
   var lookupMap  = null; // Map<id, {rank, score}>
   var currentUser = null;
   var STORAGE_KEY_LAYOUT = 'ff_card_layout';
@@ -53,10 +67,12 @@
 
   function uiError(msg) {
     GRID.innerHTML = '<div class="pg-muted" style="padding:10px">' + msg + '</div>';
+    renderCount = 0;
   }
 
   function clearGrid() {
     GRID.innerHTML = '';
+    renderCount = 0;
     if (GRID.classList && GRID.classList.add) {
       GRID.classList.add('frog-cards');
     }
@@ -70,6 +86,13 @@
   function asNum(x) {
     var n = Number(x);
     return isFinite(n) ? n : NaN;
+  }
+
+  function labelForSort(mode) {
+    if (mode === 'rank') return 'Sort: Rank ↑';
+    if (mode === 'score') return 'Sort: Score ↓';
+    if (mode === 'time' || mode === 'stakedTime') return 'Sort: Time ↑';
+    return 'Sort';
   }
 
   function getRankLike(obj) {
@@ -690,8 +713,8 @@
     if (!ownerLabel) ownerLabel = 'Unknown';
     if (item.staked) {
       var ago = item.sinceMs ? fmtAgo(item.sinceMs) : null;
-      var agoHtml = ago ? (' ' + ago) : '';
-      return '<span class="staked-flag">Staked' + agoHtml + ' by ' + ownerLabel + '</span>';
+      var agoHtml = ago ? ('<span class="ago-line">' + ago + '</span>') : '';
+      return '<span class="staked-flag">Staked</span> by ' + ownerLabel + agoHtml;
     }
     return 'Owned by ' + ownerLabel;
   }
@@ -793,6 +816,7 @@
         return Promise.all(slice.map(function(x){ return fetchOwnerOf(x.id); })).then(function(owners){
           return Promise.all(slice.map(function(x){ return fetchStakeInfo(x.id); })).then(function(stakes){
             var frag = document.createDocumentFragment();
+            var appended = 0;
             for (var i = 0; i < slice.length; i++) {
               var meta = metas[i] || { attributes: [] };
               var ownerInfo = owners[i] || {};
@@ -820,6 +844,19 @@
                 ownerYou = currentUser.toLowerCase() === ownerInfo.holder.toLowerCase();
               }
 
+              slice[i].staked = isStaked;
+              slice[i].sinceMs = since;
+              slice[i].owner = actualOwner;
+              slice[i].ownerShort = ownerShort;
+              slice[i].ownerYou = ownerYou;
+              slice[i].holder = ownerInfo && ownerInfo.holder ? ownerInfo.holder : null;
+              slice[i].metaRaw = meta;
+              slice[i].attrs = attrs;
+
+              if (STAKED_ONLY && !isStaked) {
+                continue;
+              }
+
               var rec = {
                 id: slice[i].id,
                 rank: slice[i].rank,
@@ -834,11 +871,28 @@
                 holder: ownerInfo && ownerInfo.holder ? ownerInfo.holder : null
               };
               frag.appendChild(buildCard(rec));
+              appended += 1;
             }
 
-            GRID.appendChild(frag);
+            if (appended) {
+              GRID.appendChild(frag);
+              renderCount += appended;
+            }
             offset += slice.length;
             ensureMoreBtn();
+            if (STAKED_ONLY) {
+              if (!appended && offset < viewItems.length) {
+                return loadMore();
+              }
+              if (!appended && offset >= viewItems.length && renderCount === 0) {
+                uiError('No staked frogs found.');
+                if (BTN_MORE) BTN_MORE.style.display = 'none';
+                return;
+              }
+              if (AUTO_MIN_RENDER > 0 && renderCount < AUTO_MIN_RENDER && offset < viewItems.length) {
+                return loadMore();
+              }
+            }
           });
         });
       }).catch(function(err){
@@ -849,10 +903,29 @@
 
   function resort() {
     viewItems.sort(function(a, b){
-      if (sortMode === 'rank') return a.rank - b.rank;
-      var diff = (b.score - a.score);
-      if (diff) return diff;
-      return a.rank - b.rank;
+      var aRank = (a && a.rank != null) ? a.rank : Number.POSITIVE_INFINITY;
+      var bRank = (b && b.rank != null) ? b.rank : Number.POSITIVE_INFINITY;
+      if (sortMode === 'time') {
+        var aStaked = !!(a && a.staked);
+        var bStaked = !!(b && b.staked);
+        if (aStaked !== bStaked) {
+          return bStaked - aStaked;
+        }
+        var ta = (a && a.sinceMs != null) ? a.sinceMs : null;
+        var tb = (b && b.sinceMs != null) ? b.sinceMs : null;
+        if (ta == null && tb != null) return 1;
+        if (tb == null && ta != null) return -1;
+        if (ta != null && tb != null && ta !== tb) return ta - tb;
+        return aRank - bRank;
+      }
+      if (sortMode === 'score') {
+        var sa = (a && a.score != null) ? a.score : -Infinity;
+        var sb = (b && b.score != null) ? b.score : -Infinity;
+        var diff = (sb - sa);
+        if (diff) return diff;
+        return aRank - bRank;
+      }
+      return aRank - bRank;
     });
     offset = 0;
     clearGrid();
@@ -897,8 +970,18 @@
       if (BTN_MORE) BTN_MORE.style.display = 'inline-flex';
 
       if (BTN_MORE) BTN_MORE.addEventListener('click', function(){ loadMore(); });
-      if (BTN_RANK) BTN_RANK.addEventListener('click', function(){ sortMode = 'rank'; resort(); });
-      if (BTN_SCORE) BTN_SCORE.addEventListener('click', function(){ sortMode = 'score'; resort(); });
+      if (BTN_RANK) {
+        BTN_RANK.textContent = labelForSort('rank');
+        BTN_RANK.addEventListener('click', function(){ sortMode = 'rank'; resort(); });
+      }
+      if (BTN_SCORE) {
+        if (!SECOND_SORT_MODE) {
+          BTN_SCORE.style.display = 'none';
+        } else {
+          BTN_SCORE.textContent = SECOND_SORT_LABEL || labelForSort(SECOND_SORT_MODE);
+          BTN_SCORE.addEventListener('click', function(){ sortMode = SECOND_SORT_MODE; resort(); });
+        }
+      }
       if (BTN_GO) BTN_GO.addEventListener('click', function(){
         var id = Number(FIND_INPUT && FIND_INPUT.value);
         if (isFinite(id)) jumpToId(id);
