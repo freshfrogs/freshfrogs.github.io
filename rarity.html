@@ -39,6 +39,9 @@
     .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
     .pill{ display:inline-block; padding:3px 10px; border-radius:999px; background: color-mix(in srgb, var(--panel) 85%, transparent); border:1px solid var(--border); font-size:12px; }
     .meta{ color:var(--muted); font-size:12px; }
+    .frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; color:var(--muted); font:400 12px/1.4 var(--font-ui); }
+    .frog-card .attr-bullets li{ font:inherit; color:inherit; margin:2px 0; }
+    .frog-card .attr-bullets b{ font-weight:700; }
     .actions{ grid-column:1 / -1; display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
     .btn{
       font-family: var(--font-ui);
@@ -102,6 +105,7 @@
             <button id="btnSortScore" class="btn btn-outline-gray">Sort: Score ↓</button>
             <input id="raritySearchId" type="number" min="1" placeholder="Find Frog ID…" style="width:140px; padding:6px 10px; border:1px solid var(--border); border-radius:8px; background:var(--panel-2); color:inherit;">
             <button id="btnGo" class="btn btn-outline-gray">Go</button>
+            <button id="btnLayoutCycle" class="btn btn-outline-gray">Layout: Classic</button>
           </div>
         </div>
 
