@@ -8,8 +8,26 @@
   const CFG = window.FF_CFG || {};
   const CHAIN_ID = Number(CFG.CHAIN_ID || 1);
   const BASEPATH = (CFG.SOURCE_PATH || '').replace(/\/+$/,'');
-  const LEVEL_SECS = Math.max(1, Number(CFG.STAKE_LEVEL_SECONDS || 86400));
+  const LEVEL_SECS = Math.max(1, Number(CFG.STAKE_LEVEL_SECONDS || (30 * 86400)));
   const NO_HOVER_KEYS = new Set(['Trait','Frog','SpecialFrog']);
+  const CARD_LAYOUTS = [
+    'classic','spotlight','aurora','ember','midnight','glass',
+    'forest','retro','oasis','parchment','circuit','sunset'
+  ];
+  const CARD_LAYOUT_LABELS = {
+    classic: 'Classic',
+    spotlight: 'Spotlight',
+    aurora: 'Aurora',
+    ember: 'Ember',
+    midnight: 'Midnight',
+    glass: 'Glass',
+    forest: 'Forest Canopy',
+    retro: 'Retro Pop',
+    oasis: 'Oasis',
+    parchment: 'Parchment',
+    circuit: 'Circuit',
+    sunset: 'Sunset Glow'
+  };
 
   (function injectCSS(){
     if (document.getElementById('ff-frog-cards-css')) return;
@@ -27,7 +45,8 @@
 .frog-card .pill.rk-legendary{ color:#f59e0b; border-color: color-mix(in srgb,#f59e0b 70%, var(--border)); }
 .frog-card .pill.rk-epic{ color:#a855f7; border-color: color-mix(in srgb,#a855f7 70%, var(--border)); }
 .frog-card .pill.rk-rare{ color:#38bdf8; border-color: color-mix(in srgb,#38bdf8 70%, var(--border)); }
-.frog-card .meta{ margin:0; color:#22c55e; } /* staked line in green */
+.frog-card .meta{ margin:0; color:var(--muted); font-size:12px; }
+.frog-card .meta .staked-flag{ color:#22c55e; font-weight:700; }
 .frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; }
 .frog-card .attr-bullets li{ font-size:12px; margin:2px 0; cursor:default; }
 .frog-card .attr-bullets li[data-hoverable="1"]{ cursor:pointer; }
@@ -39,9 +58,91 @@
 .fc-level .val{ font-size:12px; font-weight:700; }
 .fc-level .bar{ height:6px; border:1px solid var(--border); border-radius:999px; background:color-mix(in srgb, var(--panel) 90%, transparent); overflow:hidden; }
 .fc-level .bar > i{ display:block; height:100%; width:0%; background:linear-gradient(90deg, #16a34a, #4ade80); }
+:root[data-card-layout="spotlight"] .frog-card{ display:flex; flex-direction:column; align-items:center; text-align:center; padding:22px 18px 18px; gap:14px; border-radius:16px; }
+:root[data-card-layout="spotlight"] .frog-card .row{ display:flex; flex-direction:column; align-items:center; gap:12px; width:100%; }
+:root[data-card-layout="spotlight"] .frog-card .thumb-wrap{ width:auto; min-width:0; }
+:root[data-card-layout="spotlight"] .frog-card .thumb-wrap > *{ margin:0 auto; }
+:root[data-card-layout="spotlight"] .frog-card .title{ justify-content:center; }
+:root[data-card-layout="spotlight"] .frog-card .row > div:last-child{ width:100%; }
+:root[data-card-layout="spotlight"] .frog-card .attr-bullets{ list-style:none; padding:0; margin:12px 0 0; display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+:root[data-card-layout="spotlight"] .frog-card .attr-bullets li{ margin:0; padding:6px 12px; border-radius:999px; border:1px solid color-mix(in srgb, var(--border) 70%, transparent); background:color-mix(in srgb, var(--panel) 82%, transparent); }
+:root[data-card-layout="spotlight"] .frog-card .actions{ width:100%; justify-content:center; }
+:root[data-card-layout="spotlight"] .frog-card .thumb, :root[data-card-layout="spotlight"] .frog-card canvas.frog-canvas{ box-shadow:0 10px 30px rgba(0,0,0,.35); }
+:root[data-card-layout="aurora"] .frog-card{ background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 55%,#312e81 100%); border:1px solid rgba(96,165,250,.45); color:#e0f2fe; box-shadow:0 18px 40px rgba(59,130,246,.35); }
+:root[data-card-layout="aurora"] .frog-card .title{ color:#f8fafc; }
+:root[data-card-layout="aurora"] .frog-card .meta{ color:#bfdbfe; }
+:root[data-card-layout="aurora"] .frog-card .attr-bullets{ list-style:none; padding:0; margin:12px 0 0; display:flex; flex-wrap:wrap; gap:8px; }
+:root[data-card-layout="aurora"] .frog-card .attr-bullets li{ background:rgba(15,23,42,.55); border:1px solid rgba(148,163,184,.4); padding:6px 10px; border-radius:8px; }
+:root[data-card-layout="aurora"] .frog-card .thumb, :root[data-card-layout="aurora"] .frog-card canvas.frog-canvas{ background:rgba(15,23,42,.7); box-shadow:0 12px 30px rgba(59,130,246,.4); }
+:root[data-card-layout="aurora"] .frog-card .actions{ justify-content:center; }
+:root[data-card-layout="ember"] .frog-card{ background:linear-gradient(130deg,#3f1d0b 0%,#b91c1c 60%,#f97316 100%); border:1px solid rgba(251,191,36,.45); color:#ffedd5; box-shadow:0 20px 36px rgba(194,65,12,.35); }
+:root[data-card-layout="ember"] .frog-card .title{ color:#fef3c7; }
+:root[data-card-layout="ember"] .frog-card .meta{ color:#fde68a; }
+:root[data-card-layout="ember"] .frog-card .attr-bullets{ list-style:none; padding:0; margin:10px 0 0; display:grid; gap:6px; }
+:root[data-card-layout="ember"] .frog-card .attr-bullets li{ background:rgba(30,12,4,.45); border:1px solid rgba(253,224,71,.35); padding:6px 10px; border-radius:6px; }
+:root[data-card-layout="ember"] .frog-card .thumb, :root[data-card-layout="ember"] .frog-card canvas.frog-canvas{ background:rgba(30,12,4,.65); box-shadow:0 14px 34px rgba(249,115,22,.45); }
+:root[data-card-layout="midnight"] .frog-card{ position:relative; border:1px solid rgba(168,85,247,.4); background:radial-gradient(circle at top,#1e1b4b,#020617 65%); color:#ede9fe; box-shadow:0 22px 44px rgba(67,56,202,.35); }
+:root[data-card-layout="midnight"] .frog-card::before{ content:''; position:absolute; inset:12px; border:1px dashed rgba(192,132,252,.35); pointer-events:none; }
+:root[data-card-layout="midnight"] .frog-card .row, :root[data-card-layout="midnight"] .frog-card .actions{ position:relative; }
+:root[data-card-layout="midnight"] .frog-card .title{ color:#f5f3ff; }
+:root[data-card-layout="midnight"] .frog-card .meta{ color:#c4b5fd; }
+:root[data-card-layout="midnight"] .frog-card .attr-bullets{ list-style:none; padding:0; margin:12px 0 0; display:flex; flex-direction:column; gap:6px; }
+:root[data-card-layout="midnight"] .frog-card .attr-bullets li{ background:rgba(15,23,42,.55); border-radius:8px; padding:6px 12px; border:1px solid rgba(129,140,248,.35); }
+:root[data-card-layout="midnight"] .frog-card .thumb, :root[data-card-layout="midnight"] .frog-card canvas.frog-canvas{ background:rgba(15,23,42,.7); box-shadow:0 16px 40px rgba(79,70,229,.45); }
+:root[data-card-layout="glass"] .frog-card{ backdrop-filter:blur(12px); background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.45); color:#0f172a; box-shadow:0 22px 40px rgba(15,23,42,.12); }
+:root[data-card-layout="glass"] .frog-card .title{ color:#0f172a; }
+:root[data-card-layout="glass"] .frog-card .meta{ color:rgba(15,23,42,.65); }
+:root[data-card-layout="glass"] .frog-card .attr-bullets{ list-style:none; padding:0; margin:10px 0 0; display:flex; flex-wrap:wrap; gap:8px; }
+:root[data-card-layout="glass"] .frog-card .attr-bullets li{ background:rgba(255,255,255,.45); border-radius:999px; padding:6px 14px; border:1px solid rgba(148,163,184,.35); }
+:root[data-card-layout="glass"] .frog-card .thumb, :root[data-card-layout="glass"] .frog-card canvas.frog-canvas{ background:rgba(255,255,255,.6); box-shadow:0 12px 28px rgba(148,163,184,.35); }
+:root[data-card-layout="forest"] .frog-card{ background:linear-gradient(140deg,#064e3b,#15803d); border:1px solid rgba(74,222,128,.45); color:#ecfdf5; box-shadow:0 20px 36px rgba(21,128,61,.35); }
+:root[data-card-layout="forest"] .frog-card .title{ color:#bbf7d0; }
+:root[data-card-layout="forest"] .frog-card .meta{ color:#86efac; }
+:root[data-card-layout="forest"] .frog-card .attr-bullets{ list-style:none; padding:0; margin:10px 0 0; display:flex; flex-wrap:wrap; gap:8px; }
+:root[data-card-layout="forest"] .frog-card .attr-bullets li{ background:rgba(6,78,59,.55); border:1px solid rgba(134,239,172,.35); padding:6px 12px; border-radius:10px; }
+:root[data-card-layout="forest"] .frog-card .thumb, :root[data-card-layout="forest"] .frog-card canvas.frog-canvas{ background:rgba(6,78,59,.7); box-shadow:0 18px 38px rgba(22,163,74,.45); }
+:root[data-card-layout="retro"] .frog-card{ background:linear-gradient(160deg,#fef08a,#f97316 55%,#db2777 100%); border:1px solid rgba(244,114,182,.45); color:#451a03; box-shadow:0 22px 40px rgba(251,191,36,.35); }
+:root[data-card-layout="retro"] .frog-card .title{ color:#7f1d1d; }
+:root[data-card-layout="retro"] .frog-card .meta{ color:#78350f; }
+:root[data-card-layout="retro"] .frog-card .attr-bullets{ list-style:none; padding:0; margin:12px 0 0; display:flex; flex-wrap:wrap; gap:10px; }
+:root[data-card-layout="retro"] .frog-card .attr-bullets li{ background:rgba(255,255,255,.6); border-radius:12px; padding:6px 12px; border:1px solid rgba(249,168,212,.5); }
+:root[data-card-layout="retro"] .frog-card .thumb, :root[data-card-layout="retro"] .frog-card canvas.frog-canvas{ background:rgba(255,255,255,.75); box-shadow:0 16px 30px rgba(251,113,133,.35); }
+:root[data-card-layout="oasis"] .frog-card{ background:linear-gradient(150deg,#0f766e,#2dd4bf 55%,#fde68a 100%); border:1px solid rgba(16,185,129,.45); color:#042f2e; box-shadow:0 22px 38px rgba(13,148,136,.3); }
+:root[data-card-layout="oasis"] .frog-card .title{ color:#0f172a; }
+:root[data-card-layout="oasis"] .frog-card .meta{ color:#065f46; }
+:root[data-card-layout="oasis"] .frog-card .attr-bullets{ list-style:none; padding:0; margin:10px 0 0; display:flex; flex-wrap:wrap; gap:8px; }
+:root[data-card-layout="oasis"] .frog-card .attr-bullets li{ background:rgba(255,255,255,.55); border-radius:14px; padding:6px 12px; border:1px solid rgba(94,234,212,.45); }
+:root[data-card-layout="oasis"] .frog-card .thumb, :root[data-card-layout="oasis"] .frog-card canvas.frog-canvas{ background:rgba(6,95,70,.6); box-shadow:0 14px 32px rgba(20,184,166,.35); }
+:root[data-card-layout="parchment"] .frog-card{ background:linear-gradient(120deg,#fef3c7,#fef9c3 60%,#fde68a); border:1px solid rgba(202,138,4,.45); color:#78350f; box-shadow:0 14px 28px rgba(202,138,4,.25); }
+:root[data-card-layout="parchment"] .frog-card .title{ color:#92400e; }
+:root[data-card-layout="parchment"] .frog-card .meta{ color:#b45309; }
+:root[data-card-layout="parchment"] .frog-card .attr-bullets{ list-style:none; padding:0; margin:10px 0 0; display:flex; flex-direction:column; gap:6px; }
+:root[data-card-layout="parchment"] .frog-card .attr-bullets li{ background:rgba(254,243,199,.85); border-radius:6px; padding:6px 10px; border:1px solid rgba(217,119,6,.35); box-shadow:0 2px 6px rgba(146,64,14,.15); }
+:root[data-card-layout="parchment"] .frog-card .thumb, :root[data-card-layout="parchment"] .frog-card canvas.frog-canvas{ background:rgba(254,240,138,.9); box-shadow:0 10px 26px rgba(217,119,6,.28); }
+:root[data-card-layout="circuit"] .frog-card{ position:relative; border:1px solid rgba(56,189,248,.6); background:linear-gradient(160deg,#020617,#0f172a); color:#e0f2fe; box-shadow:0 24px 44px rgba(14,116,144,.45); overflow:hidden; }
+:root[data-card-layout="circuit"] .frog-card::before{ content:''; position:absolute; inset:-40% -30%; background-image:linear-gradient(90deg, rgba(56,189,248,.18) 1px, transparent 1px), linear-gradient(0deg, rgba(56,189,248,.18) 1px, transparent 1px); background-size:32px 32px; opacity:.55; transform:rotate(6deg); pointer-events:none; }
+:root[data-card-layout="circuit"] .frog-card .row, :root[data-card-layout="circuit"] .frog-card .actions{ position:relative; }
+:root[data-card-layout="circuit"] .frog-card .title{ color:#bae6fd; }
+:root[data-card-layout="circuit"] .frog-card .meta{ color:#7dd3fc; }
+:root[data-card-layout="circuit"] .frog-card .attr-bullets{ list-style:none; padding:0; margin:12px 0 0; display:flex; flex-wrap:wrap; gap:8px; }
+:root[data-card-layout="circuit"] .frog-card .attr-bullets li{ background:rgba(2,6,23,.65); border:1px solid rgba(56,189,248,.55); border-radius:10px; padding:6px 12px; }
+:root[data-card-layout="circuit"] .frog-card .thumb, :root[data-card-layout="circuit"] .frog-card canvas.frog-canvas{ background:rgba(15,23,42,.75); box-shadow:0 20px 40px rgba(6,182,212,.45); }
+:root[data-card-layout="sunset"] .frog-card{ background:linear-gradient(140deg,#f472b6,#c084fc 45%,#60a5fa 100%); border:1px solid rgba(192,132,252,.45); color:#312e81; box-shadow:0 22px 44px rgba(236,72,153,.35); }
+:root[data-card-layout="sunset"] .frog-card .title{ color:#1e1b4b; }
+:root[data-card-layout="sunset"] .frog-card .meta{ color:#4338ca; }
+:root[data-card-layout="sunset"] .frog-card .attr-bullets{ list-style:none; padding:0; margin:10px 0 0; display:flex; flex-wrap:wrap; gap:8px; }
+:root[data-card-layout="sunset"] .frog-card .attr-bullets li{ background:rgba(255,255,255,.65); border-radius:999px; padding:6px 14px; border:1px solid rgba(192,132,252,.4); }
+:root[data-card-layout="sunset"] .frog-card .thumb, :root[data-card-layout="sunset"] .frog-card canvas.frog-canvas{ background:rgba(255,255,255,.75); box-shadow:0 16px 36px rgba(147,197,253,.4); }
     `;
     const s = document.createElement('style');
     s.id='ff-frog-cards-css'; s.textContent=css; document.head.appendChild(s);
+  })();
+
+  (function ensureLayoutAttribute(){
+    const root = document.documentElement;
+    if (root && !root.getAttribute('data-card-layout')){
+      root.setAttribute('data-card-layout', 'classic');
+    }
   })();
 
   function imgFor(id){ return `${BASEPATH}/frog/${id}.png`; }
@@ -60,6 +161,48 @@
     const h=Math.floor((s%86400)/3600); if(h>=1) return h+'h ago';
     const m=Math.floor((s%3600)/60); if(m>=1) return m+'m ago';
     return s+'s ago';
+  }
+  function escapeHtml(str){
+    return String(str)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;');
+  }
+  function attrEscape(str){
+    return String(str).replace(/"/g,'&quot;');
+  }
+  function shortAddr(addr){
+    if(!addr||typeof addr!=='string') return '—';
+    const a = addr.trim();
+    if (!a) return '—';
+    if(a.length<=10) return a;
+    return a.slice(0,6)+'…'+a.slice(-4);
+  }
+  function ownerLabelFor(it){
+    if (it == null || typeof it !== 'object') return 'Unknown';
+    if (it.ownerLabel) return escapeHtml(it.ownerLabel);
+    if (it.ownerYou) return 'You';
+    if (it.ownerShort && it.ownerShort !== '—') return escapeHtml(it.ownerShort);
+    if (it.owner) return escapeHtml(shortAddr(it.owner));
+    if (it.holder) return escapeHtml(shortAddr(it.holder));
+    return 'Unknown';
+  }
+  function attrsFromMeta(meta){
+    const arr = meta && Array.isArray(meta.attributes) ? meta.attributes : null;
+    if (!arr || !arr.length) return null;
+    const out = [];
+    for (let i = 0; i < arr.length; i++){
+      const row = arr[i] || {};
+      const keyRaw = row.key ?? row.trait_type ?? row.traitType ?? row.type ?? null;
+      const valRaw = row.value ?? row.trait_value ?? row.traitValue ?? null;
+      const key = keyRaw != null ? String(keyRaw).trim() : '';
+      const val = valRaw != null ? String(valRaw).trim() : '';
+      if (!key || !val) continue;
+      out.push({ key, value: val });
+    }
+    return out.length ? out : null;
   }
   function levelInfo(sinceMs, secsPerLevel){
     if (!sinceMs) return { level:0, pct:0 };
@@ -81,15 +224,16 @@
     if (rank==null) return '';
     const t=tierFor(rank, tiers);
     const cls = t==='legendary'?'rk-legendary':t==='epic'?'rk-epic':t==='rare'?'rk-rare':'';
-    return ` <span class="pill ${cls}">Rank #${rank}</span>`;
+    return ` <span class="pill ${cls}">♦ #${rank}</span>`;
   }
   function attrsHTML(attrs, max=4){
     if (!Array.isArray(attrs)||!attrs.length) return '';
     const rows=[];
     for (let i=0;i<attrs.length;i++){
       const a = attrs[i]; if(!a.key||a.value==null) continue;
-      const hoverable = NO_HOVER_KEYS.has(a.key) ? '0' : '1';
-      rows.push(`<li data-attr-key="${String(a.key)}" data-hoverable="${hoverable}"><b>${a.key}:</b> ${String(a.value)}</li>`);
+      const keyStr = String(a.key);
+      const hoverable = NO_HOVER_KEYS.has(keyStr) ? '0' : '1';
+      rows.push(`<li data-attr-key="${attrEscape(keyStr)}" data-hoverable="${hoverable}"><b>${escapeHtml(keyStr)}:</b> ${escapeHtml(String(a.value))}</li>`);
       if(rows.length>=max) break;
     }
     return rows.length? '<ul class="attr-bullets">'+rows.join('')+'</ul>' : '';
@@ -146,11 +290,13 @@
     }
 
   function metaLineDefault(it){
+    const ownerLabel = ownerLabelFor(it);
     if (it.staked){
-      const ago = it.sinceMs ? fmtAgo(it.sinceMs) : null;
-      return (ago ? `Staked ${ago}` : 'Staked') + ' • Owned by You';
+      const agoRaw = it.sinceMs ? fmtAgo(it.sinceMs) : null;
+      const agoHtml = agoRaw ? ' ' + escapeHtml(agoRaw) : '';
+      return `<span class="staked-flag">Staked${agoHtml} by ${ownerLabel}</span>`;
     }
-    return 'Not staked • Owned by You';
+    return 'Owned by ' + ownerLabel;
   }
 
   function levelRowHTML(it, secsPerLevel){
@@ -184,16 +330,16 @@
           <div class="meta">${metaLine}</div>
           ${levelRowHTML(item, secsPer)}
           ${attrs}
-          ${options.showActions ? `
-            <div class="actions">
-              <button class="btn" data-act="${item.staked ? 'unstake' : 'stake'}">${item.staked ? 'Unstake' : 'Stake'}</button>
-              <button class="btn" data-act="transfer" ${disableTransfer ? 'disabled title="Transfer disabled while staked"' : ''}>Transfer</button>
-              ${options.linkEtherscan !== false ? `<a class="btn" href="${(options.etherscanForId||etherscanFor)(item.id)}" target="_blank" rel="noopener">Etherscan</a>`:''}
-              ${options.linkOriginal !== false ? `<a class="btn" href="${(options.imgForId||imgFor)(item.id)}" target="_blank" rel="noopener">Original</a>`:''}
-            </div>
-          `:``}
         </div>
       </div>
+      ${options.showActions ? `
+        <div class="actions">
+          <button class="btn" data-act="${item.staked ? 'unstake' : 'stake'}">${item.staked ? 'Unstake' : 'Stake'}</button>
+          <button class="btn" data-act="transfer" ${disableTransfer ? 'disabled title="Transfer disabled while staked"' : ''}>Transfer</button>
+          ${options.linkEtherscan !== false ? `<a class="btn" href="${(options.etherscanForId||etherscanFor)(item.id)}" target="_blank" rel="noopener">Etherscan</a>`:''}
+          ${options.linkOriginal !== false ? `<a class="btn" href="${(options.imgForId||imgFor)(item.id)}" target="_blank" rel="noopener">Original</a>`:''}
+        </div>
+      `:``}
     `;
 
     // hover wiring (per attribute)
@@ -242,9 +388,18 @@
         id: Number(x.id),
         staked: !!x.staked,
         sinceMs: Number(x.sinceMs||0) || null,
-        attrs: Array.isArray(x.attrs)? x.attrs : [],
+        attrs: (()=>{
+          const metaAttrs = attrsFromMeta(x.metaRaw || null);
+          if (metaAttrs) return metaAttrs;
+          return Array.isArray(x.attrs)? x.attrs : [];
+        })(),
         rank: (x.rank==null? null : Number(x.rank)),
-        metaRaw: x.metaRaw || null
+        metaRaw: x.metaRaw || null,
+        owner: x.owner || null,
+        ownerShort: x.ownerShort || null,
+        ownerYou: !!x.ownerYou,
+        holder: x.holder || null,
+        ownerLabel: x.ownerLabel || null
       };
     }
     return null;
@@ -257,7 +412,15 @@
     return null;
   }
 
+  function normalizeLayoutId(id){
+    if (!id || typeof id !== 'string') return 'classic';
+    const lower = id.toLowerCase();
+    return CARD_LAYOUTS.indexOf(lower) >= 0 ? lower : 'classic';
+  }
+
   window.FF = window.FF || {};
+  window.FF.shortAddress = shortAddr;
+  window.FF.formatOwnerLine = metaLineDefault;
   window.FF.buildFrogCard = buildCard;
   window.FF.renderFrogCards = function renderFrogCards(container, frogs, options){
     const root = resolveContainer(container);
@@ -275,5 +438,22 @@
     for (const it of rows){
       root.appendChild(buildCard(it, opts));
     }
+  };
+  window.FF.setCardLayout = function setCardLayout(id){
+    const root = document.documentElement;
+    if (!root) return;
+    root.setAttribute('data-card-layout', normalizeLayoutId(id));
+  };
+  window.FF.getCardLayout = function getCardLayout(){
+    const root = document.documentElement;
+    if (!root) return 'classic';
+    return normalizeLayoutId(root.getAttribute('data-card-layout'));
+  };
+  window.FF.availableCardLayouts = function availableCardLayouts(){
+    return CARD_LAYOUTS.map((id)=>({ id, label: CARD_LAYOUT_LABELS[id] || id }));
+  };
+  window.FF.cardLayoutLabel = function cardLayoutLabel(id){
+    const key = normalizeLayoutId(id);
+    return CARD_LAYOUT_LABELS[key] || key;
   };
 })();
