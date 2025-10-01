@@ -3,12 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>freshfrogs — Rarity</title>
+  <title>freshfrogs — Pond</title>
 
   <link rel="stylesheet" href="assets/css/styles.css" />
 
   <style>
-    /* mirror collection.html base feel */
     .pg-wrap{ padding:20px; }
     img{ image-rendering: pixelated; image-rendering: crisp-edges; }
 
@@ -17,7 +16,6 @@
     .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
     .pg-muted{ color:var(--muted); font-size:13px; }
 
-    /* Hero (identical structure so topbar.js pills work) */
     .frog-hero{ margin:28px auto 38px; max-width:1100px; }
     .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
     .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
@@ -26,10 +24,8 @@
     .frog-strip img{ width:64px; height:64px; object-fit:contain; }
     @media (max-width:520px){ .frog-hero{ margin:22px auto 30px; } .frog-strip{ gap:10px; } }
 
-    /* Single main panel with the grid */
     .page-grid{ max-width:1100px; margin:0 auto; display:grid; gap:16px; grid-template-columns: 1fr; }
 
-    /* Use the same card styles defined in collection.html */
     .frog-card{ border:1px solid var(--border); background:var(--panel); border-radius:14px; padding:12px;
       display:grid; grid-template-columns:auto 1fr; column-gap:12px; row-gap:6px; align-items:start; color:inherit; }
     .frog-card .thumb{
@@ -62,12 +58,10 @@
       color: color-mix(in srgb, #ffffff 85%, #22c55e);
     }
 
-    /* Grid */
     #rarityGrid{ display:grid; gap:10px; grid-template-columns: 1fr; }
     @media (min-width:720px){ #rarityGrid{ grid-template-columns: 1fr 1fr; } }
     @media (min-width:1024px){ #rarityGrid{ grid-template-columns: 1fr 1fr 1fr; } }
 
-    /* Rank badge for image (optional; your card renderer can also inject this) */
     .rank-badge{
       position:absolute; top:8px; left:8px;
       background:var(--ink,#0c0c0f); color:var(--fg,#eaeaea);
@@ -79,9 +73,8 @@
 </head>
 <body>
   <div class="pg-wrap container">
-    <!-- HERO (keep identical so topbar pills render) -->
     <section class="frog-hero">
-      <h1 class="frog-title">freshfrogs.github.io</h1>
+      <h1 class="frog-title">Staked Frogs</h1>
       <div class="frog-strip">
         <div class="tile"><img src="frog/12.png"  alt="12"></div>
         <div class="tile"><img src="frog/77.png"  alt="77"></div>
@@ -96,17 +89,17 @@
     <div class="page-grid">
       <section class="pg-card">
         <div class="pg-card-head">
-          <h3>Rarity Rankings</h3>
+          <h3>Currently Staked</h3>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button id="btnSortRank"  class="btn btn-outline-gray">Sort: Rank ↑</button>
-            <button id="btnSortScore" class="btn btn-outline-gray">Sort: Score ↓</button>
+            <button id="btnSortScore" class="btn btn-outline-gray">Sort: Time ↑</button>
             <input id="raritySearchId" type="number" min="1" placeholder="Find Frog ID…" style="width:140px; padding:6px 10px; border:1px solid var(--border); border-radius:8px; background:var(--panel-2); color:inherit;">
             <button id="btnGo" class="btn btn-outline-gray">Go</button>
           </div>
         </div>
 
         <div id="rarityGrid">
-          <div class="pg-muted">Loading rarity…</div>
+          <div class="pg-muted">Loading staked frogs…</div>
         </div>
 
         <div style="display:grid; place-items:center; margin-top:10px;">
@@ -117,7 +110,6 @@
   </div>
 
   <script>
-    /* keep hero strip behavior the same */
     function layoutFrogStrip(){
       var strip = document.querySelector('.frog-strip'); if(!strip) return;
       var tiles = Array.prototype.slice.call(strip.querySelectorAll('.tile'));
@@ -131,28 +123,30 @@
     document.addEventListener('DOMContentLoaded', layoutFrogStrip);
   </script>
 
-  <!-- match your collection.html script stack/order (only what we need here) -->
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.4/dist/web3.min.js"></script>
   <script src="assets/js/config.js"></script>
   <script src="assets/js/utils.js"></script>
   <script src="assets/js/rarity.js"></script>
   <script src="assets/js/modal.js"></script>
 
-  <!-- ABIs (some renderers or links reference addresses) -->
   <script src="assets/abi/collection_abi.js"></script>
   <script src="assets/abi/controller_abi.js"></script>
 
-  <!-- Shared staking adapter so we can resolve stake owners/age like collection.html -->
   <script src="assets/js/staking-adapter.js"></script>
 
-  <!-- Card + renderer (same as dashboard) -->
   <script src="assets/js/frog-renderer.js"></script>
   <script src="assets/js/frog-cards.js" defer></script>
 
-  <!-- Top bar pills -->
   <script src="assets/js/topbar.js"></script>
 
-  <!-- Rarity page glue -->
+  <script>
+    window.FF_RARITY_PAGE_CONFIG = {
+      stakedOnly: true,
+      defaultSortMode: 'rank',
+      secondSortMode: 'time',
+      autoLoadMin: 9
+    };
+  </script>
   <script src="assets/js/rarity-page.js"></script>
 </body>
 </html>

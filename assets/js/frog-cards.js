@@ -8,14 +8,18 @@
   const CFG = window.FF_CFG || {};
   const CHAIN_ID = Number(CFG.CHAIN_ID || 1);
   const BASEPATH = (CFG.SOURCE_PATH || '').replace(/\/+$/,'');
-  const LEVEL_SECS = Math.max(1, Number(CFG.STAKE_LEVEL_SECONDS || 86400));
+  const LEVEL_SECS = Math.max(1, Number(CFG.STAKE_LEVEL_SECONDS || (30 * 86400)));
   const NO_HOVER_KEYS = new Set(['Trait','Frog','SpecialFrog']);
+  const CARD_LAYOUTS = ['classic'];
+  const CARD_LAYOUT_LABELS = {
+    classic: 'Classic'
+  };
 
   (function injectCSS(){
     if (document.getElementById('ff-frog-cards-css')) return;
     const css = `
 .frog-cards{ display:grid; gap:10px; }
-.frog-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
+.frog-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); --fc-muted: color-mix(in srgb, var(--muted) 70%, #ffffff 30%); }
 .frog-card .row{ display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:start; }
 .frog-card .thumb-wrap{ width:128px; min-width:128px; position:relative; } /* relative for GIF overlays */
 .frog-card .thumb, .frog-card canvas.frog-canvas{
@@ -26,22 +30,26 @@
 .frog-card .pill{ font-size:12px; padding:2px 8px; border:1px solid var(--border); border-radius:999px; vertical-align:middle; }
 .frog-card .pill.rk-legendary{ color:#f59e0b; border-color: color-mix(in srgb,#f59e0b 70%, var(--border)); }
 .frog-card .pill.rk-epic{ color:#a855f7; border-color: color-mix(in srgb,#a855f7 70%, var(--border)); }
-.frog-card .pill.rk-rare{ color:#38bdf8; border-color: color-mix(in srgb,#38bdf8 70%, var(--border)); }
-.frog-card .meta{ margin:0; color:#22c55e; } /* staked line in green */
-.frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; }
-.frog-card .attr-bullets li{ font-size:12px; margin:2px 0; cursor:default; }
+  .frog-card .pill.rk-rare{ color:#38bdf8; border-color: color-mix(in srgb,#38bdf8 70%, var(--border)); }
+  .frog-card .meta{ margin:0; color:var(--muted); font-size:12px; }
+  .frog-card .meta .staked-flag{ color:#22c55e; font-weight:700; }
+  .frog-card .meta .ago-line{ display:block; margin-top:2px; color:var(--fc-muted); font-weight:600; }
+  .frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; }
+.frog-card .attr-bullets li{ font-size:12px; margin:2px 0; cursor:default; color:var(--fc-muted); }
 .frog-card .attr-bullets li[data-hoverable="1"]{ cursor:pointer; }
 .frog-card .actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
 .frog-card .btn{ font-family:var(--font-ui); border:1px solid var(--border); background:transparent; color:inherit; border-radius:8px; padding:6px 10px; font-weight:700; font-size:12px; line-height:1; }
 .frog-card .btn:disabled{ opacity:.5; cursor:not-allowed; }
 .fc-level{ display:grid; grid-template-columns:auto 1fr auto; gap:8px; align-items:center; margin:4px 0 0; }
-.fc-level .lab{ font-size:12px; color:var(--muted); }
+.fc-level .lab{ font-size:12px; color:var(--fc-muted); }
 .fc-level .val{ font-size:12px; font-weight:700; }
 .fc-level .bar{ height:6px; border:1px solid var(--border); border-radius:999px; background:color-mix(in srgb, var(--panel) 90%, transparent); overflow:hidden; }
 .fc-level .bar > i{ display:block; height:100%; width:0%; background:linear-gradient(90deg, #16a34a, #4ade80); }
-    `;
-    const s = document.createElement('style');
-    s.id='ff-frog-cards-css'; s.textContent=css; document.head.appendChild(s);
+  (function ensureLayoutAttribute(){
+    const root = document.documentElement;
+    if (root && !root.getAttribute('data-card-layout')){
+      root.setAttribute('data-card-layout', 'classic');
+    }
   })();
 
   function imgFor(id){ return `${BASEPATH}/frog/${id}.png`; }
@@ -60,6 +68,48 @@
     const h=Math.floor((s%86400)/3600); if(h>=1) return h+'h ago';
     const m=Math.floor((s%3600)/60); if(m>=1) return m+'m ago';
     return s+'s ago';
+  }
+  function escapeHtml(str){
+    return String(str)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;');
+  }
+  function attrEscape(str){
+    return String(str).replace(/"/g,'&quot;');
+  }
+  function shortAddr(addr){
+    if(!addr||typeof addr!=='string') return '—';
+    const a = addr.trim();
+    if (!a) return '—';
+    if(a.length<=10) return a;
+    return a.slice(0,6)+'…'+a.slice(-4);
+  }
+  function ownerLabelFor(it){
+    if (it == null || typeof it !== 'object') return 'Unknown';
+    if (it.ownerLabel) return escapeHtml(it.ownerLabel);
+    if (it.ownerYou) return 'You';
+    if (it.ownerShort && it.ownerShort !== '—') return escapeHtml(it.ownerShort);
+    if (it.owner) return escapeHtml(shortAddr(it.owner));
+    if (it.holder) return escapeHtml(shortAddr(it.holder));
+    return 'Unknown';
+  }
+  function attrsFromMeta(meta){
+    const arr = meta && Array.isArray(meta.attributes) ? meta.attributes : null;
+    if (!arr || !arr.length) return null;
+    const out = [];
+    for (let i = 0; i < arr.length; i++){
+      const row = arr[i] || {};
+      const keyRaw = row.key ?? row.trait_type ?? row.traitType ?? row.type ?? null;
+      const valRaw = row.value ?? row.trait_value ?? row.traitValue ?? null;
+      const key = keyRaw != null ? String(keyRaw).trim() : '';
+      const val = valRaw != null ? String(valRaw).trim() : '';
+      if (!key || !val) continue;
+      out.push({ key, value: val });
+    }
+    return out.length ? out : null;
   }
   function levelInfo(sinceMs, secsPerLevel){
     if (!sinceMs) return { level:0, pct:0 };
@@ -81,15 +131,16 @@
     if (rank==null) return '';
     const t=tierFor(rank, tiers);
     const cls = t==='legendary'?'rk-legendary':t==='epic'?'rk-epic':t==='rare'?'rk-rare':'';
-    return ` <span class="pill ${cls}">Rank #${rank}</span>`;
+    return ` <span class="pill ${cls}">♦ #${rank}</span>`;
   }
   function attrsHTML(attrs, max=4){
     if (!Array.isArray(attrs)||!attrs.length) return '';
     const rows=[];
     for (let i=0;i<attrs.length;i++){
       const a = attrs[i]; if(!a.key||a.value==null) continue;
-      const hoverable = NO_HOVER_KEYS.has(a.key) ? '0' : '1';
-      rows.push(`<li data-attr-key="${String(a.key)}" data-hoverable="${hoverable}"><b>${a.key}:</b> ${String(a.value)}</li>`);
+      const keyStr = String(a.key);
+      const hoverable = NO_HOVER_KEYS.has(keyStr) ? '0' : '1';
+      rows.push(`<li data-attr-key="${attrEscape(keyStr)}" data-hoverable="${hoverable}"><b>${escapeHtml(keyStr)}:</b> ${escapeHtml(String(a.value))}</li>`);
       if(rows.length>=max) break;
     }
     return rows.length? '<ul class="attr-bullets">'+rows.join('')+'</ul>' : '';
@@ -146,11 +197,13 @@
     }
 
   function metaLineDefault(it){
+    const ownerLabel = ownerLabelFor(it);
     if (it.staked){
-      const ago = it.sinceMs ? fmtAgo(it.sinceMs) : null;
-      return (ago ? `Staked ${ago}` : 'Staked') + ' • Owned by You';
+      const agoRaw = it.sinceMs ? fmtAgo(it.sinceMs) : null;
+      const agoHtml = agoRaw ? `<span class="ago-line">${escapeHtml(agoRaw)}</span>` : '';
+      return `<span class="staked-flag">Staked</span> by ${ownerLabel}${agoHtml}`;
     }
-    return 'Not staked • Owned by You';
+    return 'Owned by ' + ownerLabel;
   }
 
   function levelRowHTML(it, secsPerLevel){
@@ -184,16 +237,16 @@
           <div class="meta">${metaLine}</div>
           ${levelRowHTML(item, secsPer)}
           ${attrs}
-          ${options.showActions ? `
-            <div class="actions">
-              <button class="btn" data-act="${item.staked ? 'unstake' : 'stake'}">${item.staked ? 'Unstake' : 'Stake'}</button>
-              <button class="btn" data-act="transfer" ${disableTransfer ? 'disabled title="Transfer disabled while staked"' : ''}>Transfer</button>
-              ${options.linkEtherscan !== false ? `<a class="btn" href="${(options.etherscanForId||etherscanFor)(item.id)}" target="_blank" rel="noopener">Etherscan</a>`:''}
-              ${options.linkOriginal !== false ? `<a class="btn" href="${(options.imgForId||imgFor)(item.id)}" target="_blank" rel="noopener">Original</a>`:''}
-            </div>
-          `:``}
         </div>
       </div>
+      ${options.showActions ? `
+        <div class="actions">
+          <button class="btn" data-act="${item.staked ? 'unstake' : 'stake'}">${item.staked ? 'Unstake' : 'Stake'}</button>
+          <button class="btn" data-act="transfer" ${disableTransfer ? 'disabled title="Transfer disabled while staked"' : ''}>Transfer</button>
+          ${options.linkEtherscan !== false ? `<a class="btn" href="${(options.etherscanForId||etherscanFor)(item.id)}" target="_blank" rel="noopener">Etherscan</a>`:''}
+          ${options.linkOriginal !== false ? `<a class="btn" href="${(options.imgForId||imgFor)(item.id)}" target="_blank" rel="noopener">Original</a>`:''}
+        </div>
+      `:``}
     `;
 
     // hover wiring (per attribute)
@@ -242,9 +295,18 @@
         id: Number(x.id),
         staked: !!x.staked,
         sinceMs: Number(x.sinceMs||0) || null,
-        attrs: Array.isArray(x.attrs)? x.attrs : [],
+        attrs: (()=>{
+          const metaAttrs = attrsFromMeta(x.metaRaw || null);
+          if (metaAttrs) return metaAttrs;
+          return Array.isArray(x.attrs)? x.attrs : [];
+        })(),
         rank: (x.rank==null? null : Number(x.rank)),
-        metaRaw: x.metaRaw || null
+        metaRaw: x.metaRaw || null,
+        owner: x.owner || null,
+        ownerShort: x.ownerShort || null,
+        ownerYou: !!x.ownerYou,
+        holder: x.holder || null,
+        ownerLabel: x.ownerLabel || null
       };
     }
     return null;
@@ -257,7 +319,15 @@
     return null;
   }
 
+  function normalizeLayoutId(id){
+    if (!id || typeof id !== 'string') return 'classic';
+    const lower = id.toLowerCase();
+    return CARD_LAYOUTS.indexOf(lower) >= 0 ? lower : 'classic';
+  }
+
   window.FF = window.FF || {};
+  window.FF.shortAddress = shortAddr;
+  window.FF.formatOwnerLine = metaLineDefault;
   window.FF.buildFrogCard = buildCard;
   window.FF.renderFrogCards = function renderFrogCards(container, frogs, options){
     const root = resolveContainer(container);
@@ -275,5 +345,22 @@
     for (const it of rows){
       root.appendChild(buildCard(it, opts));
     }
+  };
+  window.FF.setCardLayout = function setCardLayout(id){
+    const root = document.documentElement;
+    if (!root) return;
+    root.setAttribute('data-card-layout', normalizeLayoutId(id));
+  };
+  window.FF.getCardLayout = function getCardLayout(){
+    const root = document.documentElement;
+    if (!root) return 'classic';
+    return normalizeLayoutId(root.getAttribute('data-card-layout'));
+  };
+  window.FF.availableCardLayouts = function availableCardLayouts(){
+    return CARD_LAYOUTS.map((id)=>({ id, label: CARD_LAYOUT_LABELS[id] || id }));
+  };
+  window.FF.cardLayoutLabel = function cardLayoutLabel(id){
+    const key = normalizeLayoutId(id);
+    return CARD_LAYOUT_LABELS[key] || key;
   };
 })();
