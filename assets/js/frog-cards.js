@@ -30,11 +30,11 @@
 .frog-card .pill{ font-size:12px; padding:2px 8px; border:1px solid var(--border); border-radius:999px; vertical-align:middle; }
 .frog-card .pill.rk-legendary{ color:#f59e0b; border-color: color-mix(in srgb,#f59e0b 70%, var(--border)); }
 .frog-card .pill.rk-epic{ color:#a855f7; border-color: color-mix(in srgb,#a855f7 70%, var(--border)); }
-  .frog-card .pill.rk-rare{ color:#38bdf8; border-color: color-mix(in srgb,#38bdf8 70%, var(--border)); }
-  .frog-card .meta{ margin:0; color:var(--muted); font-size:12px; }
-  .frog-card .meta .staked-flag{ color:#22c55e; font-weight:700; }
-  .frog-card .meta .ago-line{ display:block; margin-top:2px; color:var(--fc-muted); font-weight:600; }
-  .frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; }
+.frog-card .pill.rk-rare{ color:#38bdf8; border-color: color-mix(in srgb,#38bdf8 70%, var(--border)); }
+.frog-card .meta{ margin:0; color:var(--muted); font-size:12px; }
+.frog-card .meta .staked-flag{ color:#22c55e; font-weight:700; }
+.frog-card .meta .ago-line{ display:block; margin-top:2px; color:var(--fc-muted); font-weight:600; }
+.frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; }
 .frog-card .attr-bullets li{ font-size:12px; margin:2px 0; cursor:default; color:var(--fc-muted); }
 .frog-card .attr-bullets li[data-hoverable="1"]{ cursor:pointer; }
 .frog-card .actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
@@ -45,6 +45,13 @@
 .fc-level .val{ font-size:12px; font-weight:700; }
 .fc-level .bar{ height:6px; border:1px solid var(--border); border-radius:999px; background:color-mix(in srgb, var(--panel) 90%, transparent); overflow:hidden; }
 .fc-level .bar > i{ display:block; height:100%; width:0%; background:linear-gradient(90deg, #16a34a, #4ade80); }
+`;
+    const s = document.createElement('style');
+    s.id = 'ff-frog-cards-css';
+    s.textContent = css;
+    document.head.appendChild(s);
+  })();
+
   (function ensureLayoutAttribute(){
     const root = document.documentElement;
     if (root && !root.getAttribute('data-card-layout')){
