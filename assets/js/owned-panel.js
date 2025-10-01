@@ -626,9 +626,9 @@
     const ownerLabel = ownerLabelRaw && ownerLabelRaw !== '—' ? ownerLabelRaw : 'Unknown';
     if (it.staked){
       const ago = it.sinceMs ? fmtAgo(it.sinceMs) : null;
-      return '<span class="staked-flag">' + (ago ? ('Staked ' + ago) : 'Staked') + '</span> • Owned by ' + ownerLabel;
+      return '<span class="staked-flag">Staked</span> by ' + ownerLabel + (ago ? (' ' + ago) : '');
     }
-    return 'Not staked • Owned by ' + ownerLabel;
+    return 'Owned by ' + ownerLabel;
   }
   async function handleStake(id){
     try{

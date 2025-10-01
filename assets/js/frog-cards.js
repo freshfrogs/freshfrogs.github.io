@@ -89,6 +89,21 @@
     if (it.holder) return escapeHtml(shortAddr(it.holder));
     return 'Unknown';
   }
+  function attrsFromMeta(meta){
+    const arr = meta && Array.isArray(meta.attributes) ? meta.attributes : null;
+    if (!arr || !arr.length) return null;
+    const out = [];
+    for (let i = 0; i < arr.length; i++){
+      const row = arr[i] || {};
+      const keyRaw = row.key ?? row.trait_type ?? row.traitType ?? row.type ?? null;
+      const valRaw = row.value ?? row.trait_value ?? row.traitValue ?? null;
+      const key = keyRaw != null ? String(keyRaw).trim() : '';
+      const val = valRaw != null ? String(valRaw).trim() : '';
+      if (!key || !val) continue;
+      out.push({ key, value: val });
+    }
+    return out.length ? out : null;
+  }
   function levelInfo(sinceMs, secsPerLevel){
     if (!sinceMs) return { level:0, pct:0 };
     const el = Math.max(0, Math.floor((Date.now() - sinceMs)/1000));
@@ -178,10 +193,10 @@
     const ownerLabel = ownerLabelFor(it);
     if (it.staked){
       const agoRaw = it.sinceMs ? fmtAgo(it.sinceMs) : null;
-      const ago = agoRaw ? ' '+escapeHtml(agoRaw) : '';
-      return `<span class="staked-flag">Staked${ago}</span> • Owned by ${ownerLabel}`;
+      const ago = agoRaw ? ' ' + escapeHtml(agoRaw) : '';
+      return `<span class="staked-flag">Staked</span> by ${ownerLabel}${ago}`;
     }
-    return 'Not staked • Owned by '+ownerLabel;
+    return 'Owned by ' + ownerLabel;
   }
 
   function levelRowHTML(it, secsPerLevel){
@@ -273,7 +288,11 @@
         id: Number(x.id),
         staked: !!x.staked,
         sinceMs: Number(x.sinceMs||0) || null,
-        attrs: Array.isArray(x.attrs)? x.attrs : [],
+        attrs: (()=>{
+          const metaAttrs = attrsFromMeta(x.metaRaw || null);
+          if (metaAttrs) return metaAttrs;
+          return Array.isArray(x.attrs)? x.attrs : [];
+        })(),
         rank: (x.rank==null? null : Number(x.rank)),
         metaRaw: x.metaRaw || null,
         owner: x.owner || null,

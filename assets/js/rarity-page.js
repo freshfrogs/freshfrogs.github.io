@@ -558,9 +558,9 @@
     if (!ownerLabel) ownerLabel = 'Unknown';
     if (item.staked) {
       var ago = item.sinceMs ? fmtAgo(item.sinceMs) : null;
-      return '<span class="staked-flag">' + (ago ? ('Staked ' + ago) : 'Staked') + '</span> • Owned by ' + ownerLabel;
+      return '<span class="staked-flag">Staked</span> by ' + ownerLabel + (ago ? (' ' + ago) : '');
     }
-    return 'Not staked • Owned by ' + ownerLabel;
+    return 'Owned by ' + ownerLabel;
   }
 
   function metaLineForCard(item){
