@@ -269,7 +269,7 @@
           `<div style="display:flex;align-items:center;gap:8px;">
              <b>Frog #${r.id}</b> ${pillRank(rank)}
            </div>
-           <div class="muted">Staked ${fmtAgo(r.since)} • Owned by ${r.staker ? shorten(r.staker) : '—'}</div>`;
+           <div class="muted">Staked by ${r.staker ? shorten(r.staker) : '—'} ${fmtAgo(r.since)}</div>`;
         li.appendChild(mid);
 
         ul.appendChild(li);
