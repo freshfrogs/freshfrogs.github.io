@@ -18,7 +18,7 @@
   var BTN_SCORE  = document.getElementById('btnSortScore');
   var FIND_INPUT = document.getElementById('raritySearchId');
   var BTN_GO     = document.getElementById('btnGo');
-  var BTN_THEME  = document.getElementById('btnThemeCycle');
+  var BTN_LAYOUT = document.getElementById('btnLayoutCycle');
   if (!GRID) return;
 
   var PRIMARY_RANK_FILE = CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json';
@@ -48,20 +48,22 @@
   var renderCount = 0;
   var lookupMap  = null; // Map<id, {rank, score}>
   var currentUser = null;
-  var STORAGE_KEY_THEME = 'ff_rarity_theme';
-  var THEMES = [
-    { id: 'noir',     label: 'Noir Night' },
-    { id: 'aurora',   label: 'Aurora Glow' },
-    { id: 'ember',    label: 'Ember Forge' },
-    { id: 'midnight', label: 'Midnight Dusk' },
-    { id: 'glacier',  label: 'Glacier Drift' },
-    { id: 'grove',    label: 'Grove Canopy' },
-    { id: 'retro',    label: 'Retro Pop' },
-    { id: 'oasis',    label: 'Desert Oasis' },
-    { id: 'parchment',label: 'Archivist' },
-    { id: 'circuit',  label: 'Circuit Breaker' }
+  var STORAGE_KEY_LAYOUT = 'ff_card_layout';
+  var DEFAULT_CARD_LAYOUTS = [
+    { id: 'classic',   label: 'Classic' },
+    { id: 'aurora',    label: 'Aurora Glow' },
+    { id: 'ember',     label: 'Ember Forge' },
+    { id: 'midnight',  label: 'Midnight Noir' },
+    { id: 'glass',     label: 'Glass Vault' },
+    { id: 'grove',     label: 'Canopy Grove' },
+    { id: 'retro',     label: 'Retro Pop' },
+    { id: 'oasis',     label: 'Desert Oasis' },
+    { id: 'parchment', label: 'Archivist' },
+    { id: 'circuit',   label: 'Circuit Breaker' },
+    { id: 'sunset',    label: 'Sunset Mirage' }
   ];
-  var themeIndex = 0;
+  var CARD_LAYOUTS = DEFAULT_CARD_LAYOUTS.slice();
+  var layoutIndex = 0;
 
   function uiError(msg) {
     GRID.innerHTML = '<div class="pg-muted" style="padding:10px">' + msg + '</div>';
@@ -149,72 +151,117 @@
     return n > 1e12 ? n : n * 1000;
   }
 
-  function readStoredTheme() {
+  function readStoredLayout() {
     try {
       if (global.localStorage) {
-        return global.localStorage.getItem(STORAGE_KEY_THEME);
+        return global.localStorage.getItem(STORAGE_KEY_LAYOUT);
       }
     } catch (err) {}
     return null;
   }
 
-  function storeTheme(id) {
+  function storeLayout(id) {
     try {
       if (global.localStorage) {
-        global.localStorage.setItem(STORAGE_KEY_THEME, id);
+        global.localStorage.setItem(STORAGE_KEY_LAYOUT, id);
       }
     } catch (err) {}
   }
 
-  function applyTheme(idx) {
-    if (!THEMES.length) return;
+  function applyLayout(idx) {
+    if (!CARD_LAYOUTS.length) return;
     if (idx < 0) idx = 0;
-    if (idx >= THEMES.length) idx = 0;
-    themeIndex = idx;
-    var theme = THEMES[idx];
+    if (idx >= CARD_LAYOUTS.length) idx = 0;
+    layoutIndex = idx;
+    var layout = CARD_LAYOUTS[idx];
     try {
       if (document && document.documentElement) {
-        document.documentElement.setAttribute('data-theme', theme.id);
+        document.documentElement.setAttribute('data-card-layout', layout.id);
       }
     } catch (err1) {}
-    if (BTN_THEME) {
-      BTN_THEME.textContent = 'Theme: ' + theme.label + ' (' + (idx + 1) + '/' + THEMES.length + ')';
+    if (BTN_LAYOUT) {
+      BTN_LAYOUT.textContent = 'Layout: ' + layout.label + ' (' + (idx + 1) + '/' + CARD_LAYOUTS.length + ')';
     }
-    storeTheme(theme.id);
+    storeLayout(layout.id);
+    try {
+      if (global.FF && typeof global.FF.setCardLayout === 'function') {
+        global.FF.setCardLayout(layout.id);
+      }
+    } catch (err2) {}
   }
 
-  function applyThemeById(id) {
+  function applyLayoutById(id) {
     if (!id) {
-      applyTheme(0);
+      applyLayout(0);
       return;
     }
-    for (var i = 0; i < THEMES.length; i++) {
-      if (THEMES[i].id === id) {
-        applyTheme(i);
+    for (var i = 0; i < CARD_LAYOUTS.length; i++) {
+      if (CARD_LAYOUTS[i].id === id) {
+        applyLayout(i);
         return;
       }
     }
-    applyTheme(0);
+    applyLayout(0);
   }
 
-  function initThemeCycle() {
-    if (!THEMES.length) return;
+  function initLayoutCycle() {
+    try {
+      if (global.FF && typeof global.FF.availableCardLayouts === 'function') {
+        var avail = global.FF.availableCardLayouts();
+        if (Array.isArray(avail) && avail.length) {
+          var next = [];
+          for (var i = 0; i < avail.length; i++) {
+            var row = avail[i];
+            if (!row) continue;
+            var id = null;
+            var label = null;
+            if (typeof row === 'string') {
+              id = row;
+            } else if (typeof row === 'object') {
+              if (row.id != null) id = row.id;
+              else if (row.layout != null) id = row.layout;
+              else if (row[0] != null) id = row[0];
+              label = row.label || row.name || null;
+            }
+            if (!id) continue;
+            id = String(id);
+            if (!label) {
+              try {
+                if (global.FF && typeof global.FF.cardLayoutLabel === 'function') {
+                  label = global.FF.cardLayoutLabel(id);
+                }
+              } catch (errLabel) {}
+            }
+            if (!label) {
+              label = id.charAt(0).toUpperCase() + id.slice(1);
+            }
+            next.push({ id: id, label: label });
+          }
+          if (next.length) {
+            CARD_LAYOUTS = next;
+          }
+        }
+      }
+    } catch (errFetch) {}
+    if (!CARD_LAYOUTS.length) {
+      CARD_LAYOUTS = DEFAULT_CARD_LAYOUTS.slice();
+    }
     var startId = null;
     try {
       if (document && document.documentElement) {
-        startId = document.documentElement.getAttribute('data-theme');
+        startId = document.documentElement.getAttribute('data-card-layout');
       }
     } catch (err) {}
     if (!startId) {
-      startId = readStoredTheme();
+      startId = readStoredLayout();
     }
     if (!startId) {
-      startId = THEMES[0].id;
+      startId = CARD_LAYOUTS.length ? CARD_LAYOUTS[0].id : 'classic';
     }
-    applyThemeById(startId);
-    if (BTN_THEME) {
-      BTN_THEME.addEventListener('click', function(){
-        applyTheme((themeIndex + 1) % THEMES.length);
+    applyLayoutById(startId);
+    if (BTN_LAYOUT) {
+      BTN_LAYOUT.addEventListener('click', function(){
+        applyLayout((layoutIndex + 1) % CARD_LAYOUTS.length);
       });
     }
   }
@@ -949,7 +996,7 @@
     });
   }
 
-  initThemeCycle();
+  initLayoutCycle();
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
