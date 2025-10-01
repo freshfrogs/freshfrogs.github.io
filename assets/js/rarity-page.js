@@ -37,7 +37,16 @@
   var STORAGE_KEY_LAYOUT = 'ff_card_layout';
   var DEFAULT_CARD_LAYOUTS = [
     { id: 'classic',   label: 'Classic' },
-    { id: 'collector', label: 'Collector Foil' }
+    { id: 'aurora',    label: 'Aurora Glow' },
+    { id: 'ember',     label: 'Ember Forge' },
+    { id: 'midnight',  label: 'Midnight Noir' },
+    { id: 'glass',     label: 'Glass Vault' },
+    { id: 'grove',     label: 'Canopy Grove' },
+    { id: 'retro',     label: 'Retro Pop' },
+    { id: 'oasis',     label: 'Desert Oasis' },
+    { id: 'parchment', label: 'Archivist' },
+    { id: 'circuit',   label: 'Circuit Breaker' },
+    { id: 'sunset',    label: 'Sunset Mirage' }
   ];
   var CARD_LAYOUTS = DEFAULT_CARD_LAYOUTS.slice();
   var layoutIndex = 0;
