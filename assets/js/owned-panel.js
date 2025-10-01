@@ -384,10 +384,10 @@
       const attrs = Array.isArray(j?.attributes)
         ? j.attributes.map(a=>({ key:a?.key||a?.trait_type||'', value:(a?.value ?? a?.trait_value ?? '') }))
         : [];
-      const out = { id, attrs };
+      const out = { id, attrs, metaRaw: j };
       META.set(id,out); return out;
     }catch{
-      const out={ id, attrs:[] }; META.set(id,out); return out;
+      const out={ id, attrs:[], metaRaw:null }; META.set(id,out); return out;
     }
   }
   async function loadMetaBatch(ids){
@@ -604,53 +604,68 @@
   }
 
   // --- Cards ---
-  function attrsHTML(attrs, max=4){
-    if (!Array.isArray(attrs)||!attrs.length) return '';
-    const rows=[]; for (const a of attrs){ if(!a.key||a.value==null) continue; rows.push('<li><b>'+a.key+':</b> '+String(a.value)+'</li>'); if(rows.length>=max) break; }
-    return rows.length? '<ul class="attr-bullets">'+rows.join('')+'</ul>' : '';
+  function shortAddrLocal(a){
+    try{
+      if (window.FF && typeof window.FF.shortAddress === 'function'){
+        return window.FF.shortAddress(a);
+      }
+    }catch(_){ }
+    if (!a || typeof a !== 'string') return '—';
+    const t = a.trim();
+    if (!t) return '—';
+    if (t.length <= 10) return t;
+    return t.slice(0,6)+'…'+t.slice(-4);
   }
-  function fmtMeta(it){
+  function formatMetaLineForOwned(it){
+    try{
+      if (window.FF && typeof window.FF.formatOwnerLine === 'function'){
+        return window.FF.formatOwnerLine(it);
+      }
+    }catch(_){ }
+    const ownerLabelRaw = it.ownerYou ? 'You' : shortAddrLocal(it.owner);
+    const ownerLabel = ownerLabelRaw && ownerLabelRaw !== '—' ? ownerLabelRaw : 'Unknown';
     if (it.staked){
       const ago = it.sinceMs ? fmtAgo(it.sinceMs) : null;
-      return ago
-        ? ('<span class="staked-flag">Staked '+ago+'</span> • Owned by You')
-        : '<span class="staked-flag">Staked</span> • Owned by You';
+      const agoHtml = ago ? (' ' + ago) : '';
+      return '<span class="staked-flag">Staked' + agoHtml + ' by ' + ownerLabel + '</span>';
     }
-    return 'Not staked • Owned by You';
+    return 'Owned by ' + ownerLabel;
   }
-  function wireCardActions(scope,it){
-    scope.querySelectorAll('button[data-act]').forEach(btn=>{
-      btn.addEventListener('click', async ()=>{
-        const act = btn.getAttribute('data-act');
-        try{
-          const a = addr || await getConnectedAddress();
-          if (!a) { toast('Connect wallet first'); return; }
-
-          if (act==='stake'){
-            const approved = await checkApproved(a);
-            if (!approved){
-              const stakedIds = await getStakedIds(a).catch(()=>[]);
-              const rewardsRaw = await getRewards(a).catch(()=>null);
-              openApprovePanel(a, { approved:false, staked: stakedIds.length, rewards: rewardsRaw });
-            }else{
-              openStakePanel(a, it.id);
-            }
-          }else if (act==='unstake'){
-            openUnstakePanel(a, it.id);
-          }else if (act==='transfer'){
-            if (it.staked){ toast('This frog is staked. Unstake before transferring.'); return; }
-            openTransferPanel(a, it.id);
-          }
-        }catch{ toast('Action failed'); }
-      });
-    });
+  async function handleStake(id){
+    try{
+      const a = addr || await getConnectedAddress();
+      if (!a){ toast('Connect wallet first'); return; }
+      const approved = await checkApproved(a);
+      if (!approved){
+        const stakedIds = await getStakedIds(a).catch(()=>[]);
+        const rewardsRaw = await getRewards(a).catch(()=>null);
+        openApprovePanel(a, { approved:false, staked: stakedIds.length, rewards: rewardsRaw });
+      }else{
+        openStakePanel(a, id);
+      }
+    }catch{ toast('Action failed'); }
+  }
+  async function handleUnstake(id){
+    try{
+      const a = addr || await getConnectedAddress();
+      if (!a){ toast('Connect wallet first'); return; }
+      openUnstakePanel(a, id);
+    }catch{ toast('Action failed'); }
+  }
+  async function handleTransfer(id){
+    try{
+      const a = addr || await getConnectedAddress();
+      if (!a){ toast('Connect wallet first'); return; }
+      const target = items.find(x=>x.id===id);
+      if (target && target.staked){ toast('This frog is staked. Unstake before transferring.'); return; }
+      openTransferPanel(a, id);
+    }catch{ toast('Action failed'); }
   }
 
   function renderCards(){
     const root = document.querySelector('#ownedGrid');
     if (!root) return;
 
-    // keep list sorted even after optimistic updates
     items.sort(compareByRarity);
 
     root.innerHTML = '';
@@ -664,38 +679,34 @@
 
     updateHeaderOwned();
 
-    items.forEach(it => {
-      const card = document.createElement('article');
-      card.className = 'frog-card';
-      card.setAttribute('data-token-id', String(it.id));
-      if (it.staked) card.setAttribute('data-staked','1');
+    const ownerAddr = addr || null;
+    const ownerShort = ownerAddr ? shortAddrLocal(ownerAddr) : null;
+    const frogs = items.map(it => ({
+      id: it.id,
+      rank: it.rank,
+      attrs: it.attrs,
+      staked: it.staked,
+      sinceMs: it.sinceMs,
+      metaRaw: it.metaRaw,
+      owner: ownerAddr,
+      ownerShort: ownerShort,
+      ownerYou: !!ownerAddr,
+      holder: ownerAddr
+    }));
 
-      const r = Number(it.rank);
-      const hasRank = Number.isFinite(r);
-      const tier = hasRank ? rankTier(r) : 'common';
-      const rankPill = hasRank
-        ? ` <span class="rank-pill rank-${tier}">#${r}</span>`
-        : '';
-
-      const attrs = attrsHTML(it.attrs, 4);
-      const disabledAttrs = it.staked ? ' disabled aria-disabled="true" title="Unstake before transferring"' : '';
-
-      card.innerHTML = [
-        `<img class="thumb" src="${imgFor(it.id)}" alt="${it.id}">`,
-        `<h4 class="title">Frog #${it.id}${rankPill}</h4>`,
-        `<div class="meta">${fmtMeta(it)}</div>`,
-        attrs,
-        `<div class="actions">
-           <button class="btn btn-outline-gray" data-act="${it.staked ? 'unstake' : 'stake'}">${it.staked ? 'Unstake' : 'Stake'}</button>
-           <button class="btn btn-outline-gray ${it.staked ? 'btn-disabled' : ''}" data-act="transfer"${disabledAttrs}>Transfer</button>
-           <a class="btn btn-outline-gray" href="${etherscanToken(it.id)}" target="_blank" rel="noopener">Etherscan</a>
-           <a class="btn btn-outline-gray" href="${imgFor(it.id)}" target="_blank" rel="noopener">Original</a>
-         </div>`
-      ].join('');
-
-      root.appendChild(card);
-      wireCardActions(card, it);
-    });
+    if (window.FF && typeof window.FF.renderFrogCards === 'function'){
+      window.FF.renderFrogCards(root, frogs, {
+        showActions: true,
+        rarityTiers: CFG.RARITY_TIERS,
+        metaLine: formatMetaLineForOwned,
+        onStake: handleStake,
+        onUnstake: handleUnstake,
+        onTransfer: handleTransfer,
+        levelSeconds: Number(CFG.STAKE_LEVEL_SECONDS || (30 * 86400))
+      });
+    }else{
+      root.innerHTML = '<div class="pg-muted">Frog cards unavailable.</div>';
+    }
 
     syncHeights();
   }
@@ -750,7 +761,8 @@
           attrs: m.attrs,
           staked: stakedIds.includes(m.id),
           sinceMs: null,
-          rank: Number.isFinite(rkNum) ? rkNum : undefined
+          rank: Number.isFinite(rkNum) ? rkNum : undefined,
+          metaRaw: m.metaRaw || null
         };
       });
 
@@ -791,7 +803,8 @@
                 id:m.id, attrs:m.attrs,
                 staked: stakedIds.includes(m.id),
                 sinceMs:null,
-                rank: Number.isFinite(rkNum) ? rkNum : undefined
+                rank: Number.isFinite(rkNum) ? rkNum : undefined,
+                metaRaw: m.metaRaw || null
               };
             });
           items = items.concat(more);

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="t1">
+<html lang="en" data-theme="t1" data-card-layout="classic">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -102,6 +102,7 @@
             <button id="btnSortScore" class="btn btn-outline-gray">Sort: Score ↓</button>
             <input id="raritySearchId" type="number" min="1" placeholder="Find Frog ID…" style="width:140px; padding:6px 10px; border:1px solid var(--border); border-radius:8px; background:var(--panel-2); color:inherit;">
             <button id="btnGo" class="btn btn-outline-gray">Go</button>
+            <button id="btnLayoutCycle" class="btn btn-outline-gray">Layout: Classic</button>
           </div>
         </div>
 
@@ -141,6 +142,9 @@
   <!-- ABIs (some renderers or links reference addresses) -->
   <script src="assets/abi/collection_abi.js"></script>
   <script src="assets/abi/controller_abi.js"></script>
+
+  <!-- Shared staking adapter so we can resolve stake owners/age like collection.html -->
+  <script src="assets/js/staking-adapter.js"></script>
 
   <!-- Card + renderer (same as dashboard) -->
   <script src="assets/js/frog-renderer.js"></script>
