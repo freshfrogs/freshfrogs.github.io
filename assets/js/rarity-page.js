@@ -38,9 +38,16 @@
   var DEFAULT_CARD_LAYOUTS = [
     { id: 'classic',   label: 'Classic' },
     { id: 'spotlight', label: 'Spotlight' },
-    { id: 'compact',   label: 'Compact' },
-    { id: 'poster',    label: 'Poster' },
-    { id: 'blueprint', label: 'Blueprint' }
+    { id: 'aurora',    label: 'Aurora' },
+    { id: 'ember',     label: 'Ember' },
+    { id: 'midnight',  label: 'Midnight' },
+    { id: 'glass',     label: 'Glass' },
+    { id: 'forest',    label: 'Forest Canopy' },
+    { id: 'retro',     label: 'Retro Pop' },
+    { id: 'oasis',     label: 'Oasis' },
+    { id: 'parchment', label: 'Parchment' },
+    { id: 'circuit',   label: 'Circuit' },
+    { id: 'sunset',    label: 'Sunset Glow' }
   ];
   var CARD_LAYOUTS = DEFAULT_CARD_LAYOUTS.slice();
   var layoutIndex = 0;
@@ -684,7 +691,8 @@
     if (!ownerLabel) ownerLabel = 'Unknown';
     if (item.staked) {
       var ago = item.sinceMs ? fmtAgo(item.sinceMs) : null;
-      return '<span class="staked-flag">Staked</span>' + (ago ? (' ' + ago) : '') + ' by ' + ownerLabel;
+      var agoHtml = ago ? (' ' + ago) : '';
+      return '<span class="staked-flag">Staked' + agoHtml + ' by ' + ownerLabel + '</span>';
     }
     return 'Owned by ' + ownerLabel;
   }

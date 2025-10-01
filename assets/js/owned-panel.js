@@ -626,7 +626,8 @@
     const ownerLabel = ownerLabelRaw && ownerLabelRaw !== '—' ? ownerLabelRaw : 'Unknown';
     if (it.staked){
       const ago = it.sinceMs ? fmtAgo(it.sinceMs) : null;
-      return '<span class="staked-flag">Staked</span>' + (ago ? (' ' + ago) : '') + ' by ' + ownerLabel;
+      const agoHtml = ago ? (' ' + ago) : '';
+      return '<span class="staked-flag">Staked' + agoHtml + ' by ' + ownerLabel + '</span>';
     }
     return 'Owned by ' + ownerLabel;
   }
