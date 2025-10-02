@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fresh Frogs — Glass Layout</title>
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <style>
+    body{ margin:0; min-height:100vh; background:url('../frog/1.png') center/cover fixed, radial-gradient(circle at top,#06203d,#02060b); color:#edfcff; font-family:var(--font-ui); }
+    .overlay{ backdrop-filter:blur(28px); background:linear-gradient(160deg,rgba(8,35,68,.6),rgba(3,10,20,.85)); min-height:100vh; }
+    header{ padding:48px 8vw 0; }
+    header h1{ margin:0; font:900 58px/0.95 var(--font-display); letter-spacing:-.02em; }
+    header p{ margin:14px 0 0; max-width:60ch; color:rgba(237,252,255,.7); }
+    .cards{ padding:48px 8vw 80px; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:26px; }
+    .card{ position:relative; padding:24px; border-radius:24px; border:1px solid rgba(255,255,255,.25); background:linear-gradient(140deg,rgba(73,208,255,.3),rgba(12,41,71,.85)); box-shadow:0 25px 80px rgba(0,0,0,.45); display:grid; gap:18px; }
+    .card::after{ content:""; position:absolute; inset:-1px; border-radius:inherit; border:1px solid rgba(255,255,255,.25); mix-blend-mode:screen; pointer-events:none; }
+    .card img{ width:100%; border-radius:18px; background:rgba(5,14,26,.8); }
+    .card h2{ margin:0; font-size:22px; font-weight:800; }
+    .card p{ margin:0; color:rgba(237,252,255,.8); font-size:14px; }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <header>
+      <h1>Glass Pond Showcase</h1>
+      <p>Futuristic glassmorphism layout with glowing edges, ideal for a premium reveal of legendary frogs.</p>
+    </header>
+
+    <section class="cards">
+      <article class="card">
+        <img src="../frog/501.png" alt="Frog 501" />
+        <h2>Frog #501 — Glacier Pulse</h2>
+        <p>Placeholder description emphasising icy animation overlays and aurora-laced backgrounds.</p>
+      </article>
+      <article class="card">
+        <img src="../frog/640.png" alt="Frog 640" />
+        <h2>Frog #640 — Vapor Bloom</h2>
+        <p>Imagine a vapor trail effect swirling around the frog’s silhouette for a dynamic hover state.</p>
+      </article>
+      <article class="card">
+        <img src="../frog/777.png" alt="Frog 777" />
+        <h2>Frog #777 — Halo Drift</h2>
+        <p>Halo-style ring animation idea for future enhancement; placeholder copy for now.</p>
+      </article>
+    </section>
+  </div>
+</body>
+</html>
