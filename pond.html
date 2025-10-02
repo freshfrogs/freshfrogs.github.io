@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en" data-theme="atlas" data-card-layout="classic">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fresh Frogs — Staking pond</title>
+
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body class="ff-body">
+  <div class="ff-site">
+    <header class="ff-masthead">
+      <div class="ff-container ff-masthead__inner">
+        <a class="ff-logo" href="index.html"><span>🐸</span>Fresh Frogs</a>
+        <nav class="ff-nav" aria-label="Primary">
+          <a href="collection.html">Collection</a>
+          <a href="rarity.html">Rarity</a>
+          <a href="pond.html" aria-current="page">Pond</a>
+          <a href="mutate.html">Mutate</a>
+        </nav>
+        <a class="ff-button ff-button--ghost" href="collection.html">Manage frogs</a>
+      </div>
+    </header>
+
+    <main class="ff-main">
+      <section class="ff-page-hero">
+        <div class="ff-container ff-page-hero__inner">
+          <div>
+            <span class="ff-eyebrow">Staking overview</span>
+            <h1 class="ff-page-hero__title">Every frog currently relaxing in the pond</h1>
+            <p class="ff-page-hero__lead">
+              Filter the roster of staked frogs, sort by rarity rank or staking duration, and inspect layered artwork without
+              leaving the dashboard.
+            </p>
+            <div class="ff-page-hero__meta">
+              <span class="ff-pill">Live staking feed</span>
+              <span class="ff-pill">Controller-powered ownership</span>
+              <span class="ff-pill">Metadata-true layering</span>
+            </div>
+          </div>
+          <div class="ff-hero__media">
+            <div class="ff-card-stack">
+              <div class="ff-card-stack__layer" data-layer="1">
+                <img data-pond-frog="1" src="frog/210.png" alt="Frog 210" />
+                <p class="ff-card-stack__label">Track staking age with animated progress bars and accurate owner labels.</p>
+              </div>
+              <div class="ff-card-stack__layer" data-layer="2">
+                <img data-pond-frog="2" src="frog/415.png" alt="Frog 415" />
+              </div>
+              <div class="ff-card-stack__layer" data-layer="3">
+                <img data-pond-frog="3" src="frog/37.png" alt="Frog 37" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="ff-container" id="ffTopbarMount"></div>
+
+      <section class="ff-page-content">
+        <div class="ff-container">
+          <section class="ff-panel" aria-labelledby="pondControls">
+            <div class="ff-toolbar">
+              <div class="ff-toolbar__group">
+                <h2 id="pondControls" style="margin:0;">Currently staked frogs</h2>
+                <p class="muted" style="margin:0; max-width:36ch;">Sort the roster and jump directly to any frog ID to view its staking details.</p>
+              </div>
+              <div class="ff-toolbar__group">
+                <button id="btnSortRank" class="ff-button">Sort: Rank ↑</button>
+                <button id="btnSortScore" class="ff-button">Sort: Time ↑</button>
+              </div>
+            </div>
+
+            <div class="ff-toolbar" style="margin-top:18px;">
+              <div class="ff-toolbar__group">
+                <label class="sr-only" for="raritySearchId">Find frog ID</label>
+                <input id="raritySearchId" class="ff-input" type="number" min="1" placeholder="Find frog ID…" />
+                <button id="btnGo" class="ff-button ff-button--solid">Go</button>
+              </div>
+            </div>
+
+            <div id="rarityGrid" class="ff-grid-cards">
+              <div class="pg-muted">Loading staked frogs…</div>
+            </div>
+
+            <div class="ff-toolbar" style="justify-content:center; margin-top:28px;">
+              <button id="btnMore" class="ff-button ff-button--ghost" style="display:none;">Load more</button>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer class="ff-footer">
+      <div class="ff-container ff-footer__inner">
+        <span>© Fresh Frogs</span>
+        <span>Keep an eye on the staking pond.</span>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    (function(){
+      const CFG = window.FF_CFG || {};
+      const TOTAL = Number(CFG.TOTAL_SUPPLY || 4040);
+      const ROOT  = String(CFG.SOURCE_PATH || '').replace(/\/+$/,'');
+      function shuffle(n,max){
+        const pool = Array.from({length:max}, (_,i)=> i+1);
+        for(let i=pool.length-1;i>0;i--){
+          const j=Math.floor(Math.random()*(i+1));
+          const t=pool[i]; pool[i]=pool[j]; pool[j]=t;
+        }
+        return pool.slice(0,n);
+      }
+      function randomize(){
+        const imgs = Array.from(document.querySelectorAll('[data-pond-frog]'));
+        if(!imgs.length) return;
+        const ids = shuffle(imgs.length, TOTAL);
+        imgs.forEach(function(img, idx){
+          const id = ids[idx];
+          img.src = ROOT + '/frog/' + id + '.png';
+          img.alt = 'Frog ' + id;
+        });
+      }
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', randomize); else randomize();
+    })();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.4/dist/web3.min.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/rarity.js"></script>
+  <script src="assets/js/modal.js"></script>
+  <script src="assets/abi/collection_abi.js"></script>
+  <script src="assets/abi/controller_abi.js"></script>
+  <script src="assets/js/staking-adapter.js"></script>
+  <script src="assets/js/frog-renderer.js"></script>
+  <script src="assets/js/frog-cards.js" defer></script>
+  <script src="assets/js/topbar.js"></script>
+  <script>
+    window.FF_RARITY_PAGE_CONFIG = {
+      stakedOnly: true,
+      defaultSortMode: 'rank',
+      secondSortMode: 'time',
+      autoLoadMin: 9
+    };
+  </script>
+  <script src="assets/js/rarity-page.js"></script>
+</body>
+</html>
