@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fresh Frogs — Sidebar Layout</title>
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <style>
+    body{ margin:0; background:#0b121a; color:#e4f1ff; font-family:var(--font-ui); display:grid; grid-template-columns:280px 1fr; min-height:100vh; }
+    aside{ background:#050a11; padding:36px 28px; border-right:1px solid rgba(255,255,255,.05); display:grid; gap:24px; }
+    aside h1{ margin:0; font:900 28px/1 var(--font-display); }
+    aside nav{ display:grid; gap:12px; font-size:14px; }
+    aside nav a{ color:rgba(228,241,255,.75); text-decoration:none; padding:8px 12px; border-radius:10px; }
+    aside nav a.active{ background:linear-gradient(120deg,#2ea9ff,#86fccc); color:#031320; font-weight:700; }
+    main{ padding:48px 48px 64px; display:grid; gap:40px; }
+    .board{ display:grid; gap:20px; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); }
+    .card{ border-radius:20px; border:1px solid rgba(255,255,255,.06); background:rgba(9,24,36,.7); padding:20px; display:grid; gap:14px; }
+    .card img{ width:100%; border-radius:14px; background:#0f1f2c; }
+    .meta{ font-size:13px; color:rgba(228,241,255,.65); display:flex; justify-content:space-between; }
+    .meta span:first-child{ font-weight:700; color:#fff; }
+    @media (max-width:920px){ body{ grid-template-columns:1fr; } aside{ border-right:none; border-bottom:1px solid rgba(255,255,255,.05); grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); align-items:center; text-align:center; } aside nav{ grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); } }
+  </style>
+</head>
+<body>
+  <aside>
+    <h1>Fresh Frogs HQ</h1>
+    <nav>
+      <a href="#" class="active">Dashboard</a>
+      <a href="#">Collection</a>
+      <a href="#">Rarity</a>
+      <a href="#">Pond</a>
+      <a href="#">Activity</a>
+    </nav>
+    <div style="font-size:12px; color:rgba(228,241,255,.55);">Placeholder copy: show wallet status, quick stats, and mint timers.</div>
+  </aside>
+  <main>
+    <section>
+      <h2 style="margin:0 0 18px; font-size:26px;">Featured Frogs</h2>
+      <div class="board">
+        <article class="card">
+          <img src="../frog/120.png" alt="Frog 120" />
+          <div class="meta"><span>#0120</span><span>Legendary</span></div>
+        </article>
+        <article class="card">
+          <img src="../frog/740.png" alt="Frog 740" />
+          <div class="meta"><span>#0740</span><span>Epic</span></div>
+        </article>
+        <article class="card">
+          <img src="../frog/333.png" alt="Frog 333" />
+          <div class="meta"><span>#0333</span><span>Rare</span></div>
+        </article>
+        <article class="card">
+          <img src="../frog/908.png" alt="Frog 908" />
+          <div class="meta"><span>#0908</span><span>Uncommon</span></div>
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
