@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Layout 07 – Retro Gridwave</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    html, body { margin: 0; height: 100%; }
+    body {
+      background: linear-gradient(180deg, #1f0037, #02010f);
+      font-family: "Press Start 2P", "Courier New", monospace;
+      color: #fef2ff;
+      display: flex;
+      flex-direction: column;
+      padding: 48px 24px;
+      gap: 36px;
+    }
+    header { text-align: center; }
+    header h1 { margin: 0 0 12px; font-size: clamp(1.6rem, 5vw, 2.6rem); text-transform: uppercase; letter-spacing: 0.4em; }
+    header p { margin: 0; color: rgba(254, 242, 255, 0.7); font-size: 0.8rem; }
+    .gridwave {
+      position: relative;
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: rgba(25, 5, 45, 0.92);
+      border: 2px solid #ff4da6;
+      border-radius: 12px;
+      box-shadow: 0 12px 0 #4dffe0;
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+    }
+    .card h2 { margin: 0; font-size: 1rem; }
+    .card span { font-size: 0.7rem; color: rgba(254, 242, 255, 0.7); }
+    .traits { font-size: 0.65rem; line-height: 1.6; }
+    .scanlines::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,0.04) 50%, transparent 0);
+      background-size: 100% 3px;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      opacity: 0.4;
+    }
+  </style>
+</head>
+<body class="scanlines">
+  <header>
+    <h1>Retro Gridwave</h1>
+    <p>Neon cards with CRT scanlines and bold colors. Ideal for playful rarity dashboards.</p>
+  </header>
+  <section class="gridwave">
+    <article class="card"><h2>Frog #777</h2><span>Score 133.7</span><div class="traits">Synth Crown<br>Laser Tongue<br>Night Drive</div></article>
+    <article class="card"><h2>Frog #808</h2><span>Score 129.5</span><div class="traits">Vapor Skin<br>Retro Shades<br>Arcade Aura</div></article>
+    <article class="card"><h2>Frog #909</h2><span>Score 121.4</span><div class="traits">Pixel Spots<br>Nova Backdrop<br>Wireframe Cape</div></article>
+  </section>
+</body>
+</html>

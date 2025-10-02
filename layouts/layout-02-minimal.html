@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Layout 02 – Zen Columns</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f0f4f8, #dbe7ff);
+      font-family: "Poppins", system-ui, sans-serif;
+      color: #0e223d;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 32px;
+      padding: 48px clamp(24px, 8vw, 120px);
+    }
+    header { max-width: 720px; }
+    header h1 { margin: 0 0 12px; font-size: clamp(2rem, 4vw, 3.2rem); }
+    header p { margin: 0; line-height: 1.6; color: rgba(14, 34, 61, 0.72); }
+    .columns {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px;
+    }
+    @media (max-width: 960px) {
+      .columns { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    }
+    .column {
+      background: rgba(255, 255, 255, 0.86);
+      border-radius: 24px;
+      box-shadow: 0 20px 45px rgba(22, 36, 59, 0.12);
+      padding: 28px;
+      display: grid;
+      gap: 18px;
+    }
+    .column h2 { margin: 0; font-size: 1.2rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .card {
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(219, 231, 255, 0.45), rgba(255, 255, 255, 0.9));
+      border: 1px solid rgba(14, 34, 61, 0.05);
+      display: grid;
+      gap: 8px;
+    }
+    .card strong { font-size: 1rem; }
+    .traits { display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.8rem; color: rgba(14, 34, 61, 0.7); }
+    .trait {
+      background: rgba(14, 34, 61, 0.06);
+      border-radius: 999px;
+      padding: 4px 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Zen Columns</h1>
+    <p>A calm three-column layout for presenting frogs alongside collection stats and rarity notes.</p>
+  </header>
+  <section class="columns">
+    <div class="column">
+      <h2>Highlights</h2>
+      <div class="card">
+        <strong>Frog #1098</strong>
+        <span>Rarity Score 98.6</span>
+        <div class="traits">
+          <span class="trait">Midnight Skin</span>
+          <span class="trait">Lotus Crown</span>
+          <span class="trait">Zen Garden</span>
+        </div>
+      </div>
+      <div class="card">
+        <strong>Frog #2211</strong>
+        <span>Rarity Score 87.4</span>
+        <div class="traits">
+          <span class="trait">Cloud Aura</span>
+          <span class="trait">Amber Eyes</span>
+        </div>
+      </div>
+    </div>
+    <div class="column">
+      <h2>Market Pulse</h2>
+      <div class="card">
+        <strong>Floor Price</strong>
+        <span>Ξ 1.23</span>
+      </div>
+      <div class="card">
+        <strong>24h Volume</strong>
+        <span>Ξ 21.5</span>
+      </div>
+    </div>
+    <div class="column">
+      <h2>Notes</h2>
+      <div class="card">
+        <strong>Collector Tip</strong>
+        <span>Pair serene backgrounds with glowing accessories for balanced compositions.</span>
+      </div>
+      <div class="card">
+        <strong>Upcoming Drop</strong>
+        <span>Limited lotus-themed airdrop arriving next full moon.</span>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
