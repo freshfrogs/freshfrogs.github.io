@@ -15,11 +15,12 @@
   const ROOT = String(CFG.SOURCE_PATH || '').replace(/\/+$/,'');
   const DISALLOW_HOVER = new Set(['Trait','Frog','SpecialFrog']);
   const DISALLOW_ANIM  = new Set(['Frog','Hat']);
+  const ENABLE_ANIMATIONS = false;
 
   function metaURL(id){ return `${ROOT}/frog/json/${id}.json`; }
   function basePNG(id){ return `${ROOT}/frog/${id}.png`; }
   function layerPNG(k,v){ return `${ROOT}/frog/build_files/${k}/${v}.png`; }
-  function layerGIF(k,v){ return `${ROOT}/frog/build_files/${k}/${v}_animation.gif`; }
+  function layerGIF(k,v){ return `${ROOT}/frog/build_files/${k}/animations/${v}_animation.gif`; }
 
   const JSON_CACHE = new Map(); // id -> Promise(json|null)
 
@@ -70,10 +71,75 @@
       overflow: 'hidden',
       imageRendering: 'pixelated',
       backgroundRepeat: 'no-repeat',
-      backgroundPosition: '100% 100%', // bottom-right
-      backgroundSize: '10000% 10000%'  // zoom to 1px corner color
+      // Zoom way into the bottom-right of the original PNG so only the
+      // backdrop color is visible behind the layered attributes.
+      backgroundPosition: '140% 140%',
+      backgroundSize: '800% 800%'
     });
     return host;
+  }
+
+  const BACKDROP_COLOR_CACHE = new Map();
+  function applyBackdrop(host, tokenId){
+    if (!host) return;
+    if (!tokenId){
+      host.style.backgroundImage = 'none';
+      host.style.backgroundColor = 'transparent';
+      return;
+    }
+
+    const url = basePNG(tokenId);
+    host.style.backgroundImage = `url("${url}")`;
+
+    if (BACKDROP_COLOR_CACHE.has(tokenId)){
+      host.style.backgroundColor = BACKDROP_COLOR_CACHE.get(tokenId);
+      return;
+    }
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function(){
+      try {
+        const w = img.naturalWidth || img.width || 1;
+        const h = img.naturalHeight || img.height || 1;
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('no ctx');
+        ctx.drawImage(img, 0, 0, w, h);
+        const data = ctx.getImageData(Math.max(0, w - 1), Math.max(0, h - 1), 1, 1).data;
+        const color = `rgba(${data[0]}, ${data[1]}, ${data[2]}, ${data[3] / 255})`;
+        BACKDROP_COLOR_CACHE.set(tokenId, color);
+        host.style.backgroundColor = color;
+      } catch(_){
+        BACKDROP_COLOR_CACHE.set(tokenId, 'transparent');
+      }
+    };
+    img.onerror = function(){ BACKDROP_COLOR_CACHE.set(tokenId, 'transparent'); };
+    img.src = url;
+  }
+
+  const ANIM_CACHE = new Map();
+  function hasAnimation(k,v){
+    const key = `${k}::${v}`;
+    if (ANIM_CACHE.has(key)) {
+      const cached = ANIM_CACHE.get(key);
+      if (typeof cached === 'boolean') return Promise.resolve(cached);
+      return cached;
+    }
+    const url = layerGIF(k,v);
+    const probe = new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+      img.src = url;
+    }).then(result => {
+      ANIM_CACHE.set(key, result);
+      return result;
+    });
+    ANIM_CACHE.set(key, probe);
+    return probe;
   }
 
   function addLayer(host, url, lift){
@@ -93,13 +159,15 @@
     host.appendChild(img);
   }
 
-  function addAnim(host, url){
+  function addAnim(host, url, lift){
     const img = document.createElement('img');
     img.src = url;
     img.alt = '';
     Object.assign(img.style, {
       position:'absolute', left:0, top:0, width:'100%', height:'100%',
-      imageRendering:'pixelated', pointerEvents:'none'
+      imageRendering:'pixelated', pointerEvents:'none',
+      transform: lift ? 'translate(-2px,-2px)' : 'none',
+      filter: lift ? 'drop-shadow(0 0 2px rgba(255,255,255,.15))' : 'none'
     });
     img.className = 'frog-anim';
     img.onerror = () => img.remove();
@@ -116,7 +184,7 @@
     const host = ensureHost(canvasEl, size);
 
     // Background from the original PNG (zoom bottom-right pixel)
-    host.style.backgroundImage = tokenId ? `url("${basePNG(tokenId)}")` : 'none';
+    applyBackdrop(host, tokenId);
 
     // Metadata
     let meta = metaOrNull;
@@ -125,16 +193,23 @@
     const attrs = attrsInOrder(meta);
     if (!attrs.length) throw new Error('no attributes');
 
-    // Static layers in EXACT metadata order
-    for (const a of attrs){
-      const lift = !!hoverKey && a.key === hoverKey && !DISALLOW_HOVER.has(a.key);
-      addLayer(host, layerPNG(a.key, a.value), lift);
-    }
+    const animFlags = ENABLE_ANIMATIONS
+      ? await Promise.all(attrs.map(a => {
+          if (!a || DISALLOW_ANIM.has(a.key)) return Promise.resolve(false);
+          return hasAnimation(a.key, a.value).catch(() => false);
+        }))
+      : attrs.map(() => false);
 
-    // Animated overlays (skip Frog/Hat)
-    for (const a of attrs){
-      if (DISALLOW_ANIM.has(a.key)) continue;
-      addAnim(host, layerGIF(a.key, a.value));
+    // Render each layer exactly in metadata order, swapping to animations when available
+    for (let i=0;i<attrs.length;i++){
+      const a = attrs[i];
+      if (!a) continue;
+      const lift = !!hoverKey && a.key === hoverKey && !DISALLOW_HOVER.has(a.key);
+      if (ENABLE_ANIMATIONS && animFlags[i] && !DISALLOW_ANIM.has(a.key)){
+        addAnim(host, layerGIF(a.key, a.value), lift);
+      } else {
+        addLayer(host, layerPNG(a.key, a.value), lift);
+      }
     }
   };
 

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="t1">
+<html lang="en" data-theme="atlas">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,80 +8,193 @@
   <link rel="stylesheet" href="assets/css/styles.css" />
 
   <style>
-    /* mirror collection.html base feel */
-    .pg-wrap{ padding:20px; }
     img{ image-rendering: pixelated; image-rendering: crisp-edges; }
 
-    .pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
-    .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
-    .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
-    .pg-muted{ color:var(--muted); font-size:13px; }
-
-    /* Hero (identical structure so topbar.js pills work) */
-    .frog-hero{ margin:28px auto 38px; max-width:1100px; }
-    .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
-    .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
-    .frog-strip .tile{ flex:0 0 auto; width:64px; height:64px; border-radius:10px; }
-    .frog-strip .tile.hide{ display:none !important; }
-    .frog-strip img{ width:64px; height:64px; object-fit:contain; }
-    @media (max-width:520px){ .frog-hero{ margin:22px auto 30px; } .frog-strip{ gap:10px; } }
-
-    /* Single main panel with the grid */
-    .page-grid{ max-width:1100px; margin:0 auto; display:grid; gap:16px; grid-template-columns: 1fr; }
-
-    /* Use the same card styles defined in collection.html */
-    .frog-card{ border:1px solid var(--border); background:var(--panel); border-radius:14px; padding:12px;
-      display:grid; grid-template-columns:auto 1fr; column-gap:12px; row-gap:6px; align-items:start; color:inherit; }
-    .frog-card .thumb{
-      width:128px;height:128px;border-radius:12px;background:var(--panel-2);object-fit:contain;grid-row: span 3;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 6px 12px rgba(0,0,0,.25);
+    .rarity-shell{ padding:68px 0 96px; display:grid; gap:40px; }
+    .rarity-panel{
+      position:relative;
+      border-radius:28px;
+      padding:36px;
+      background:color-mix(in srgb, var(--panel) 88%, transparent);
+      border:1px solid color-mix(in srgb, var(--card-frame) 35%, var(--border));
+      box-shadow:var(--card-shadow);
+      overflow:hidden;
+      isolation:isolate;
     }
-    .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
-    .pill{ display:inline-block; padding:3px 10px; border-radius:999px; background: color-mix(in srgb, var(--panel) 85%, transparent); border:1px solid var(--border); font-size:12px; }
-    .meta{ color:var(--muted); font-size:12px; }
-    .actions{ grid-column:1 / -1; display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
-    .btn{
-      font-family: var(--font-ui);
-      border:1px solid var(--border);
-      background:transparent;
-      color:inherit;
-      border-radius:8px;
-      padding:6px 10px;
+    .rarity-panel::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:var(--hero-gradient);
+      opacity:.9;
+      pointer-events:none;
+    }
+    .rarity-panel::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      border:1px solid color-mix(in srgb, var(--hero-ring) 80%, transparent);
+      border-radius:inherit;
+      mix-blend-mode:screen;
+      pointer-events:none;
+      opacity:.4;
+    }
+    .rarity-panel > *{ position:relative; z-index:1; }
+
+    .rarity-shell .rarity-panel:nth-of-type(n+2)::before{
+      background:linear-gradient(160deg, color-mix(in srgb, var(--panelSoft) 90%, transparent) 0%, color-mix(in srgb, var(--card-2) 85%, transparent) 100%);
+      opacity:1;
+    }
+    .rarity-shell .rarity-panel:nth-of-type(n+2)::after{ opacity:.25; }
+
+    .rarity-hero{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) minmax(0,380px);
+      align-items:center;
+      gap:32px;
+    }
+    .rarity-hero .copy{ display:grid; gap:18px; max-width:520px; }
+    .rarity-hero .frog-title{ margin:0; font:900 38px/1.1 var(--font-display); letter-spacing:-.02em; }
+    .rarity-hero .frog-sub{ margin:0; color:var(--muted); font-size:16px; }
+    .rarity-hero .frog-strip{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(90px, 1fr));
+      gap:14px;
+      justify-items:stretch;
+    }
+    .rarity-hero .tile{
+      aspect-ratio:1;
+      border-radius:20px;
+      background:linear-gradient(155deg, color-mix(in srgb, var(--card-2) 90%, transparent) 0%, color-mix(in srgb, var(--panelSoft) 85%, transparent) 100%);
+      border:1px solid color-mix(in srgb, var(--thumb-border) 65%, transparent);
+      box-shadow:0 18px 30px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    .rarity-hero .tile img{ width:100%; height:100%; object-fit:contain; padding:10px; }
+    .rarity-hero .tile.hide{ display:none !important; }
+    @media (max-width:960px){
+      .rarity-panel{ padding:28px; }
+      .rarity-hero{ grid-template-columns:1fr; text-align:center; }
+      .rarity-hero .copy{ justify-self:center; }
+      .rarity-hero .frog-strip{ grid-template-columns:repeat(3, minmax(70px,1fr)); }
+    }
+    @media (max-width:540px){
+      .rarity-panel{ border-radius:20px; padding:24px; }
+      .rarity-hero .frog-title{ font-size:28px; }
+      .rarity-hero .frog-strip{ grid-template-columns:repeat(3, minmax(58px,1fr)); gap:10px; }
+    }
+
+    .panel-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:20px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+    .panel-head h3{ margin:0; font:800 22px/1 var(--font-display); letter-spacing:-.01em; }
+    .panel-head p{ margin:6px 0 0; color:var(--muted); max-width:420px; font-size:14px; }
+
+    .tool-btn{
+      border-radius:999px;
+      border:1px solid color-mix(in srgb, var(--card-frame) 40%, var(--border));
+      background:linear-gradient(135deg, color-mix(in srgb, var(--card-2) 80%, transparent) 0%, color-mix(in srgb, var(--panelSoft) 80%, transparent) 100%);
+      color:var(--ink);
       font-weight:700;
-      font-size:12px;
-      line-height:1;
-      display:inline-flex; align-items:center; gap:6px;
-      text-decoration:none; letter-spacing:.01em;
-      transition: background .15s ease, border-color .15s ease, color .15s ease, transform .05s ease;
+      letter-spacing:.01em;
+      padding:7px 16px;
+      transition:background .15s ease, transform .15s ease;
     }
-    .btn:active{ transform: translateY(1px); }
-    .btn-outline-gray{ border-color: color-mix(in srgb, #9ca3af 70%, var(--border)); color: color-mix(in srgb, #ffffff 65%, #9ca3af); }
-    .btn:hover{
-      background: color-mix(in srgb, #22c55e 14%, var(--panel));
-      border-color: color-mix(in srgb, #22c55e 80%, var(--border));
-      color: color-mix(in srgb, #ffffff 85%, #22c55e);
+    .tool-btn:hover{
+      transform:translateY(-2px);
+      border-color:color-mix(in srgb, var(--accent) 45%, transparent);
+      background:linear-gradient(135deg, color-mix(in srgb, var(--accent) 22%, var(--card-2)) 0%, color-mix(in srgb, var(--accent) 12%, var(--panelSoft)) 100%);
+    }
+    .tool-btn.btn-solid{
+      background:linear-gradient(135deg, color-mix(in srgb, var(--accent) 75%, transparent) 0%, color-mix(in srgb, var(--accent) 40%, transparent) 100%);
+      color:var(--accent-ink);
+      border-color:color-mix(in srgb, var(--accent) 60%, transparent);
+      box-shadow:0 10px 30px color-mix(in srgb, var(--accent) 35%, transparent);
+    }
+    .tool-btn:focus-visible{
+      outline:none;
+      box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 26%, transparent);
     }
 
-    /* Grid */
-    #rarityGrid{ display:grid; gap:10px; grid-template-columns: 1fr; }
-    @media (min-width:720px){ #rarityGrid{ grid-template-columns: 1fr 1fr; } }
-    @media (min-width:1024px){ #rarityGrid{ grid-template-columns: 1fr 1fr 1fr; } }
+    .filter-row{ display:flex; flex-wrap:wrap; gap:12px; margin-bottom:26px; }
 
-    /* Rank badge for image (optional; your card renderer can also inject this) */
-    .rank-badge{
-      position:absolute; top:8px; left:8px;
-      background:var(--ink,#0c0c0f); color:var(--fg,#eaeaea);
-      border:1px solid var(--border,#2a2a2f); border-radius:999px; padding:4px 10px; font-size:12px;
-      letter-spacing:.2px; opacity:.96;
+    .search-input{
+      width:180px;
+      padding:8px 14px;
+      border-radius:14px;
+      border:1px solid color-mix(in srgb, var(--border) 80%, transparent);
+      background:color-mix(in srgb, var(--card-2) 85%, transparent);
+      color:var(--ink);
+      font:600 14px/1 var(--font-ui);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
     }
-    .img-wrap{ position:relative; }
+    .search-input::placeholder{ color:color-mix(in srgb, var(--muted) 70%, transparent); }
+    .search-input:focus{
+      outline:none;
+      border-color:color-mix(in srgb, var(--accent) 40%, transparent);
+      box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent);
+    }
+
+    .rarity-grid{
+      display:grid;
+      gap:26px;
+      grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .load-more{ display:grid; place-items:center; margin-top:26px; }
+    #rarityGrid .pg-muted{ text-align:center; padding:36px 0; color:var(--muted); font-weight:600; letter-spacing:.02em; }
+
+    .rarity-grid .frog-card{
+      background:color-mix(in srgb, var(--card-inner) 88%, var(--card));
+      border:1px solid color-mix(in srgb, var(--card-frame) 50%, transparent);
+      box-shadow:var(--card-shadow);
+    }
+    .rarity-grid .frog-card::before{ background:var(--card-foil); opacity:.55; }
+    .rarity-grid .frog-card .thumb-wrap{ border-radius:16px; }
+    .rarity-grid .frog-card .thumb,
+    .rarity-grid .frog-card canvas.frog-canvas{
+      border-radius:14px;
+      box-shadow:0 10px 22px rgba(0,0,0,.35);
+    }
+    .rarity-grid .frog-card .attr-bullets{
+      margin:10px 0 0 0;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:8px;
+    }
+    .rarity-grid .frog-card .attr-bullets li{
+      font-size:13px;
+      background:color-mix(in srgb, var(--panelSoft) 82%, transparent);
+      border:1px solid color-mix(in srgb, var(--border) 80%, transparent);
+      padding:8px 10px;
+      border-radius:10px;
+      color:color-mix(in srgb, var(--ink) 82%, var(--muted));
+      display:flex;
+      gap:6px;
+      align-items:center;
+      transition:transform .2s ease, box-shadow .2s ease;
+    }
+    .rarity-grid .frog-card .attr-bullets li b{ font-size:12px; letter-spacing:.02em; }
+    .rarity-grid .frog-card .attr-bullets li[data-hoverable="1"]{ cursor:pointer; }
+    .rarity-grid .frog-card .attr-bullets li[data-hoverable="1"]:hover{
+      transform:translate(-4px,-6px);
+      box-shadow:0 16px 24px rgba(0,0,0,.35);
+    }
   </style>
 </head>
 <body>
-  <div class="pg-wrap container">
-    <!-- HERO (keep identical so topbar pills render) -->
-    <section class="frog-hero">
-      <h1 class="frog-title">freshfrogs.github.io</h1>
+  <div class="rarity-shell container">
+    <section class="rarity-hero rarity-panel frog-hero">
+      <div class="copy">
+        <h1 class="frog-title">freshfrogs — Rarity Lab</h1>
+        <p class="frog-sub">Explore every frog with a collector-grade presentation. Swap between ten layouts, check ownership, and inspect layered traits in place.</p>
+      </div>
       <div class="frog-strip">
         <div class="tile"><img src="frog/12.png"  alt="12"></div>
         <div class="tile"><img src="frog/77.png"  alt="77"></div>
@@ -91,29 +204,33 @@
         <div class="tile"><img src="frog/1.png"   alt="1"></div>
       </div>
     </section>
+
     <div id="ffTopbarMount"></div>
 
-    <div class="page-grid">
-      <section class="pg-card">
-        <div class="pg-card-head">
+    <section class="rarity-panel">
+      <header class="panel-head">
+        <div>
           <h3>Rarity Rankings</h3>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button id="btnSortRank"  class="btn btn-outline-gray">Sort: Rank ↑</button>
-            <button id="btnSortScore" class="btn btn-outline-gray">Sort: Score ↓</button>
-            <input id="raritySearchId" type="number" min="1" placeholder="Find Frog ID…" style="width:140px; padding:6px 10px; border:1px solid var(--border); border-radius:8px; background:var(--panel-2); color:inherit;">
-            <button id="btnGo" class="btn btn-outline-gray">Go</button>
-          </div>
+          <p class="pg-muted">Sort by rarity score or staking age, jump to any frog ID, and explore the layered art.</p>
         </div>
+        <button id="btnThemeCycle" class="btn btn-sm btn-outline tool-btn">Theme Sampler</button>
+      </header>
 
-        <div id="rarityGrid">
-          <div class="pg-muted">Loading rarity…</div>
-        </div>
+      <div class="filter-row">
+        <button id="btnSortRank"  class="btn btn-sm btn-outline tool-btn">Sort: Rank ↑</button>
+        <button id="btnSortScore" class="btn btn-sm btn-outline tool-btn">Sort: Score ↓</button>
+        <input id="raritySearchId" type="number" min="1" placeholder="Find Frog ID…" class="search-input">
+        <button id="btnGo" class="btn btn-sm btn-solid tool-btn">Go</button>
+      </div>
 
-        <div style="display:grid; place-items:center; margin-top:10px;">
-          <button id="btnMore" class="btn btn-outline-gray" style="display:none;">Load More</button>
-        </div>
-      </section>
-    </div>
+      <div id="rarityGrid" class="rarity-grid">
+        <div class="pg-muted">Loading rarity…</div>
+      </div>
+
+      <div class="load-more">
+        <button id="btnMore" class="btn btn-sm btn-outline tool-btn" style="display:none;">Load More</button>
+      </div>
+    </section>
   </div>
 
   <script>
@@ -123,7 +240,9 @@
       var tiles = Array.prototype.slice.call(strip.querySelectorAll('.tile'));
       var styles = window.getComputedStyle(strip);
       var gap = parseFloat(styles.gap || 12) || 12;
-      var tileW = 64, innerW = strip.clientWidth;
+      var sample = tiles.length ? tiles[0].offsetWidth : 72;
+      var tileW = sample || 72;
+      var innerW = strip.clientWidth;
       var count = Math.max(1, Math.floor((innerW + gap) / (tileW + gap)));
       tiles.forEach(function(t,i){ t.classList.toggle('hide', i >= count); });
     }
@@ -141,6 +260,9 @@
   <!-- ABIs (some renderers or links reference addresses) -->
   <script src="assets/abi/collection_abi.js"></script>
   <script src="assets/abi/controller_abi.js"></script>
+
+  <!-- Shared staking adapter so we can resolve stake owners/age like collection.html -->
+  <script src="assets/js/staking-adapter.js"></script>
 
   <!-- Card + renderer (same as dashboard) -->
   <script src="assets/js/frog-renderer.js"></script>

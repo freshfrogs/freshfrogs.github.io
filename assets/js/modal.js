@@ -90,12 +90,16 @@
     function setState({ staked, owner }){
       current.staked = !!staked; current.owner = owner || '';
       // default line, then override below
-      fmLine && (fmLine.textContent = `${staked ? 'Staked' : 'Not staked'} • Owned by ${ownerLabel(owner)}`);
+      if (fmLine){
+        fmLine.textContent = staked
+          ? `Staked by ${ownerLabel(owner)}`
+          : `Owned by ${ownerLabel(owner)}`;
+      }
 
-      // If staked and we know when, render 'Staked NNd ago • Owned by ...'
+      // If staked and we know when, render 'Staked … ago by …'
       if (staked && current?.sinceMs && !isNaN(current.sinceMs)){
         const days = Math.floor((Date.now() - Number(current.sinceMs)) / 86400000);
-        fmLine && (fmLine.textContent = `Staked ${days}d ago • Owned by ${ownerLabel(owner)}`);
+        fmLine && (fmLine.textContent = `Staked ${days}d ago by ${ownerLabel(owner)}`);
       }
 
       fmOwner && (fmOwner.textContent = owner || '—');
@@ -118,7 +122,7 @@
       if (!current.staked || !fmLine) return;
 
       if (current.sinceMs && !isNaN(current.sinceMs)){
-        fmLine.textContent = `Staked ${fmtAgoMs(Date.now() - Number(current.sinceMs))} • Owned by ${ownerLabel(owner)}`;
+        fmLine.textContent = `Staked ${fmtAgoMs(Date.now() - Number(current.sinceMs))} by ${ownerLabel(owner)}`;
         return;
       }
 
@@ -135,12 +139,12 @@
           }
           if (ms){
             current.sinceMs = ms;
-            fmLine.textContent = `Staked ${fmtAgoMs(Date.now() - ms)} • Owned by ${ownerLabel(owner)}`;
+            fmLine.textContent = `Staked ${fmtAgoMs(Date.now() - ms)} by ${ownerLabel(owner)}`;
             return;
           }
         }
       }catch{}
-      fmLine.textContent = `Staked • Owned by ${ownerLabel(owner)}`;
+      fmLine.textContent = `Staked by ${ownerLabel(owner)}`;
     }
 
     // ---------- metadata/attributes ----------
