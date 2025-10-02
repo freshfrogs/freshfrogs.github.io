@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Layout 01 – Classic Gallery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{font-family:'Space Grotesk',sans-serif;background:#0c0c10;color:#f4f4f8;margin:0;padding:40px;}
+    header{text-align:center;margin-bottom:32px;}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;}
+    .card{border:1px solid #24242c;border-radius:14px;background:#14141b;padding:16px;box-shadow:0 12px 28px rgba(0,0,0,.28);} 
+    .card h3{margin:0 0 8px;font-weight:700;font-size:18px;}
+    .card p{margin:0;color:#a3a3b3;font-size:14px;}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Classic Gallery Layout</h1>
+    <p>Placeholder data arranged in a clean card grid.</p>
+  </header>
+  <section class="grid">
+    <article class="card"><h3>Card Title</h3><p>Use this space for rarity data.</p></article>
+    <article class="card"><h3>Card Title</h3><p>Hover effects and stats go here.</p></article>
+    <article class="card"><h3>Card Title</h3><p>Each placeholder showcases the style.</p></article>
+  </section>
+</body>
+</html>

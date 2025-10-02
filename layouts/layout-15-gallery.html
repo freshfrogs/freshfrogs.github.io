@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Layout 15 – Gallery Wall</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{margin:0;background:#14110f;color:#f1ede1;font-family:'Libre Baskerville',serif;padding:64px;}
+    .wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:30px;max-width:1080px;margin:0 auto;}
+    .frame{border:12px solid #b99470;border-radius:18px;background:#1f1b18;box-shadow:0 26px 48px rgba(0,0,0,.5);padding:16px;text-align:center;}
+    .frame h3{margin:16px 0 0;font-size:18px;letter-spacing:.08em;text-transform:uppercase;}
+    .frame span{display:block;margin-top:6px;font-size:13px;color:#e8d7c2;}
+  </style>
+</head>
+<body>
+  <section class="wall">
+    <article class="frame"><div style="height:140px;background:#fbbf24;"></div><h3>Frog #11</h3><span>Legendary</span></article>
+    <article class="frame"><div style="height:140px;background:#60a5fa;"></div><h3>Frog #84</h3><span>Epic</span></article>
+    <article class="frame"><div style="height:140px;background:#f472b6;"></div><h3>Frog #230</h3><span>Rare</span></article>
+    <article class="frame"><div style="height:140px;background:#34d399;"></div><h3>Frog #377</h3><span>Uncommon</span></article>
+  </section>
+</body>
+</html>

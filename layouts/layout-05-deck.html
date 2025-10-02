@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Layout 05 – Deck Spread</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{margin:0;background:#1a101f;color:#fdf9ff;font-family:'Montserrat',sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+    .deck{position:relative;width:900px;height:520px;}
+    .card{position:absolute;width:280px;height:360px;background:radial-gradient(circle at top,#f9d423,#ff4e50);border-radius:20px;box-shadow:0 30px 50px rgba(0,0,0,.5);padding:24px;backdrop-filter:blur(6px);color:#1b1120;transform-origin:center 120%;transition:transform .4s ease;}
+    .card:nth-child(1){top:50px;left:20px;transform:rotate(-10deg);} 
+    .card:nth-child(2){top:40px;left:180px;transform:rotate(-2deg);} 
+    .card:nth-child(3){top:60px;left:340px;transform:rotate(6deg);} 
+    .card h2{margin:0;font-size:24px;font-weight:800;}
+    .card p{margin:12px 0 0;font-size:14px;line-height:1.6;}
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <article class="card"><h2>Legendary</h2><p>Frog #01<br>Score 990<br>Staked 4d ago</p></article>
+    <article class="card"><h2>Epic</h2><p>Frog #77<br>Score 870<br>Owned by 0x123…789</p></article>
+    <article class="card"><h2>Rare</h2><p>Frog #256<br>Score 742<br>Ready to stake</p></article>
+  </div>
+</body>
+</html>

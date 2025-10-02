@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Layout 04 – Mosaic Blocks</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{margin:0;background:#060607;color:#fafbff;font-family:'Poppins',sans-serif;}
+    .board{display:grid;grid-template-columns:2fr 1fr;min-height:100vh;}
+    .highlight{padding:60px;background:radial-gradient(circle at top,#1b9aaa,#060607 60%);}
+    .highlight h1{font-size:42px;margin:0 0 24px;text-transform:uppercase;letter-spacing:.24em;}
+    .highlight p{font-size:16px;max-width:420px;line-height:1.7;color:rgba(255,255,255,.78);} 
+    .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;padding:60px;background:#0b0c12;}
+    .tile{background:#161828;border-radius:18px;padding:18px;border:1px solid rgba(90,134,255,.32);box-shadow:0 16px 32px rgba(10,20,60,.4);} 
+    .tile strong{display:block;font-size:20px;margin-bottom:12px;}
+    .tile span{display:block;font-size:13px;color:#a9b4ff;text-transform:uppercase;letter-spacing:.14em;}
+  </style>
+</head>
+<body>
+  <div class="board">
+    <section class="highlight">
+      <h1>Mosaic Blocks</h1>
+      <p>Combine rarity text, imagery, and controls with a split hero + grid canvas.</p>
+    </section>
+    <section class="tiles">
+      <div class="tile"><span>Legendary</span><strong>Frog #12</strong>Score 986</div>
+      <div class="tile"><span>Epic</span><strong>Frog #77</strong>Score 842</div>
+      <div class="tile"><span>Rare</span><strong>Frog #404</strong>Score 720</div>
+    </section>
+  </div>
+</body>
+</html>

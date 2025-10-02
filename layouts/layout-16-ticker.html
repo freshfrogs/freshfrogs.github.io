@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Layout 16 – Vertical Ticker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{margin:0;background:#0e0f19;color:#f7f7fb;font-family:'Barlow',sans-serif;display:flex;justify-content:center;padding:60px;}
+    .ticker{width:360px;border:2px solid #3f3d56;border-radius:24px;overflow:hidden;background:#16172b;box-shadow:0 24px 44px rgba(0,0,0,.4);}
+    .ticker header{padding:20px 24px;background:#2d2f4c;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:13px;border-bottom:1px solid rgba(255,255,255,.08);} 
+    ul{list-style:none;margin:0;padding:0;}
+    li{padding:24px;border-bottom:1px solid rgba(255,255,255,.08);}
+    li strong{display:block;font-size:20px;margin-bottom:10px;}
+    li span{display:block;font-size:13px;color:#c7c7dd;}
+  </style>
+</head>
+<body>
+  <section class="ticker">
+    <header>Live rarity feed</header>
+    <ul>
+      <li><strong>Frog #002</strong><span>Score 995 • Staked 3d ago</span></li>
+      <li><strong>Frog #211</strong><span>Score 882 • Owner 0xFACE…BEEF</span></li>
+      <li><strong>Frog #349</strong><span>Score 764 • Ready to stake</span></li>
+    </ul>
+  </section>
+</body>
+</html>

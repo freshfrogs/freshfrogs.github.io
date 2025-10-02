@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Layout 03 – Metro Cards</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{color-scheme:dark light;}
+    body{margin:0;font-family:'DM Sans',sans-serif;background:linear-gradient(135deg,#1b1c30,#121219);color:#f0f4ff;padding:60px;}
+    header{max-width:720px;margin:0 auto 40px;text-align:left;}
+    header h1{margin:0 0 12px;font-size:40px;letter-spacing:-.02em;}
+    .metro{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;}
+    .tile{padding:24px;border-radius:22px;background:linear-gradient(145deg,rgba(88,101,242,.28),rgba(15,23,42,.65));backdrop-filter:blur(14px);box-shadow:0 40px 60px rgba(15,18,40,.35);}
+    .tile h2{margin:0 0 10px;font-size:22px;font-weight:700;}
+    .tag{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.08);font-size:12px;text-transform:uppercase;letter-spacing:.12em;}
+    .details{margin:14px 0 0;font-size:14px;line-height:1.6;color:rgba(230,233,255,.82);}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Metro Cards Layout</h1>
+    <p>This concept leans into neon gradients and large typography.</p>
+  </header>
+  <section class="metro">
+    <article class="tile">
+      <span class="tag">Legendary</span>
+      <h2>Frog #001</h2>
+      <p class="details">Score 982 • Staked 4d ago • Hover for actions.</p>
+    </article>
+    <article class="tile">
+      <span class="tag">Epic</span>
+      <h2>Frog #077</h2>
+      <p class="details">Score 845 • Owned by 0xBEEF…5678</p>
+    </article>
+  </section>
+</body>
+</html>

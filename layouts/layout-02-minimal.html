@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Layout 02 – Minimal Ledger</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{margin:0;font-family:'Inter',sans-serif;background:#f4f6fb;color:#1e2230;padding:48px;}
+    .wrap{max-width:960px;margin:0 auto;}
+    h1{font-size:32px;margin:0 0 24px;font-weight:700;}
+    table{width:100%;border-collapse:collapse;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 24px 40px rgba(15,23,42,.12);}
+    th,td{padding:16px 20px;text-align:left;border-bottom:1px solid #e2e8f0;font-size:14px;}
+    th{background:#0ea5e9;color:#fff;font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:12px;}
+    tr:last-child td{border-bottom:none;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Minimal Ledger Layout</h1>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Owner</th><th>Score</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>#001</td><td>0xABCD…1234</td><td>987.4</td><td>Staked</td></tr>
+        <tr><td>#077</td><td>0xBEEF…5678</td><td>876.1</td><td>Owned</td></tr>
+        <tr><td>#404</td><td>0xFROG…4040</td><td>765.0</td><td>Claimable</td></tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

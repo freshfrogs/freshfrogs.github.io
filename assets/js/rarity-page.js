@@ -18,7 +18,6 @@
   const JSON_RANKS  = CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json'; // [{id, ranking, score}]
   const LOOKUP_FILE = 'assets/freshfrogs_rank_lookup.json';                      // optional
   const PAGE_SIZE   = 60;
-  const SIZE        = 128;
 
   const RESERVOIR = {
     HOST: (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,''),
@@ -30,27 +29,8 @@
     if (document.getElementById('rarity-cards-css')) return;
     const css = `
 .frog-cards{ display:grid; gap:10px; }
-.frog-card{
-  border:1px solid var(--border);
-  background:var(--panel);
-  border-radius:14px;
-  padding:12px;
-  display:grid; grid-template-columns:auto 1fr; column-gap:12px; row-gap:6px; align-items:start;
-  color:inherit;
-}
-.frog-card .thumb-wrap{ width:${SIZE}px; min-width:${SIZE}px; position:relative; }
-.frog-card canvas.frog-canvas{ width:${SIZE}px; height:${SIZE}px; border-radius:12px; background:var(--panel-2); display:block; }
-.frog-card .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
-.frog-card .meta{ color:var(--muted); font-size:12px; }
-.frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; color:var(--muted); }
-.frog-card .attr-bullets li{ display:list-item; font-size:12px; margin:2px 0; }
-
-.rank-pill{
-  display:inline-flex; align-items:center; gap:6px;
-  border:1px solid var(--border); border-radius:999px; padding:3px 8px;
-  font-size:11px; font-weight:700; letter-spacing:.01em;
-  background:color-mix(in srgb, var(--panel) 35%, transparent);
-}
+.meta .staked-flag{ color:#22c55e; font-weight:700; }
+.rank-pill{ display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border); border-radius:999px; padding:3px 8px; font-size:11px; font-weight:700; letter-spacing:.01em; background:color-mix(in srgb, var(--panel) 35%, transparent); }
 .rank-pill::before{ content:'◆'; font-size:12px; line-height:1; }
 .rank-legendary{ color:#f59e0b; border-color: color-mix(in srgb, #f59e0b 70%, var(--border)); }
 .rank-legendary::before{ color:#f59e0b; }
@@ -60,11 +40,6 @@
 .rank-rare::before{ color:#38bdf8; }
 .rank-common{ color:inherit; border-color:var(--border); }
 .rank-common::before{ color:var(--muted); }
-
-.meta .staked-flag{ color:#22c55e; font-weight:700; }
-.actions{ grid-column:1 / -1; display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
-.btn{ font-family:var(--font-ui); border:1px solid var(--border); background:transparent; color:inherit; border-radius:8px; padding:6px 10px; font-weight:700; font-size:12px; line-height:1; }
-.btn-outline-gray{ border-color: color-mix(in srgb, #9ca3af 70%, var(--border)); color: color-mix(in srgb, #ffffff 65%, #9ca3af); }
     `;
     const s=document.createElement('style'); s.id='rarity-cards-css'; s.textContent=css; document.head.appendChild(s);
   })();
@@ -196,87 +171,52 @@
   }
 
   // ---------- Card ----------
-  function buildCard(rec, userAddr){
-    const { id, rank, meta, owner, stake } = rec;
+  function attrsForCard(meta){
+    const src = Array.isArray(meta?.attributes) ? meta.attributes : [];
+    return src.map(a => ({ key: traitKey(a), value: traitVal(a) }))
+      .filter(a => a.key && a.value != null);
+  }
 
-    const card = document.createElement('article');
-    card.className = 'frog-card';
-    card.setAttribute('data-token-id', String(id));
-
-    // media: host a hidden canvas; FF.renderFrog will stack DOM layers in the same order as metadata
-    const media = document.createElement('div');
-    media.className = 'thumb-wrap';
-    const cv = document.createElement('canvas');
-    cv.className = 'frog-canvas'; cv.width = SIZE; cv.height = SIZE;
-    media.appendChild(cv);
-
-    // title: Frog #id + rank pill (dashboard style)
-    const title = document.createElement('h4');
-    title.className = 'title';
-    title.textContent = meta?.name || `Frog #${id}`;
-    const pill = rankPill(rank);
-    title.appendChild(pill);
-
-    // subtitle: staked line + owner
-    const metaLine = document.createElement('div');
-    metaLine.className = 'meta';
-    const me = userAddr && owner && userAddr.toLowerCase() === owner.toLowerCase();
-
-    const stakeSpan = document.createElement('span');
-    if (stake?.staked) {
-      const ago = sinceMs(stake?.since) ? fmtAgo(sinceMs(stake?.since)) : null;
-      stakeSpan.className = 'staked-flag';
-      stakeSpan.textContent = ago ? `Staked ${ago}` : 'Staked';
-    } else {
-      stakeSpan.textContent = 'Not staked';
+  function metaLineForCard(it){
+    const owner = it.ownerLabel || it.ownerShort || (it.owner ? shortAddr(it.owner) : 'Unknown');
+    if (it.staked){
+      const ago = it.sinceMs ? fmtAgo(it.sinceMs) : null;
+      return `<span class="staked-flag">Staked</span>${ago ? ` ${ago}` : ''} by ${owner}`;
     }
-    const sep = document.createElement('span'); sep.textContent = ' • ';
-    const ownerSpan = document.createElement('span');
-    ownerSpan.textContent = `Owned by ${me ? 'You' : shortAddr(owner)}`;
+    return `Owned by ${owner}`;
+  }
 
-    metaLine.appendChild(stakeSpan);
-    metaLine.appendChild(sep);
-    metaLine.appendChild(ownerSpan);
+  function buildCard(rec, userAddr){
+    const meta = rec.metaRaw || rec.meta || {};
+    const ownerAddr = rec.owner || null;
+    const me = userAddr && ownerAddr && userAddr.toLowerCase() === ownerAddr.toLowerCase();
+    const ownerLabel = me ? 'You' : (ownerAddr ? shortAddr(ownerAddr) : 'Unknown');
 
-    // attributes (vertical)
-    const list = document.createElement('ul');
-    list.className = 'attr-bullets';
-    (Array.isArray(meta?.attributes)? meta.attributes: []).forEach(a=>{
-      const k=traitKey(a), v=traitVal(a); if(!k||!v) return;
-      const li=document.createElement('li'); li.innerHTML = `<b>${k}:</b> ${v}`; list.appendChild(li);
-    });
+    const item = {
+      id: rec.id,
+      rank: rec.rank,
+      attrs: attrsForCard(meta),
+      staked: !!(rec.stake && rec.stake.staked),
+      sinceMs: sinceMs(rec.stake?.since),
+      owner: ownerAddr,
+      ownerLabel,
+      ownerShort: ownerLabel,
+      metaRaw: meta
+    };
 
-    // actions (view-only)
-    const actions = document.createElement('div'); actions.className='actions';
-    const aOS  = document.createElement('a'); aOS.className='btn btn-outline-gray'; aOS.textContent='OpenSea';
-    aOS.href = `https://opensea.io/assets/ethereum/${CFG.COLLECTION_ADDRESS}/${id}`; aOS.target='_blank'; aOS.rel='noopener';
-    const aScan= document.createElement('a'); aScan.className='btn btn-outline-gray'; aScan.textContent='Etherscan';
-    aScan.href = `https://etherscan.io/token/${CFG.COLLECTION_ADDRESS}?a=${id}`; aScan.target='_blank'; aScan.rel='noopener';
-    const aOrig= document.createElement('a'); aOrig.className='btn btn-outline-gray'; aOrig.textContent='Original';
-    aOrig.href = `frog/${id}.png`; aOrig.target='_blank'; aOrig.rel='noopener';
-    actions.appendChild(aOS); actions.appendChild(aScan); actions.appendChild(aOrig);
+    if (window.FF && typeof window.FF.buildFrogCard === 'function'){
+      return window.FF.buildFrogCard(item, {
+        showActions: false,
+        rarityTiers: CFG.RARITY_TIERS,
+        levelSeconds: Number(CFG.STAKE_LEVEL_SECONDS || (30 * 86400)),
+        metaLine: metaLineForCard
+      });
+    }
 
-    // compose
-    card.appendChild(media);
-    const right = document.createElement('div');
-    right.appendChild(title);
-    right.appendChild(metaLine);
-    if (list.childNodes.length) right.appendChild(list);
-    right.appendChild(actions);
-    card.appendChild(right);
-
-    // render layered frog (metadata order) at 128×128
-    (async ()=>{
-      try{
-        await (FF.renderFrog ? FF.renderFrog(cv, rec.metaRaw || meta, { size: SIZE, tokenId: id }) : Promise.reject());
-      }catch{
-        // fallback to still image if renderer not available
-        const img = document.createElement('img'); img.src = `frog/${id}.png`; img.alt = String(id); img.className = 'frog-canvas';
-        media.innerHTML=''; media.appendChild(img);
-      }
-    })();
-
-    return card;
+    const fallback = document.createElement('article');
+    fallback.className = 'frog-card';
+    fallback.textContent = `Frog #${rec.id}`;
+    return fallback;
   }
 
   // ---------- Paging / render ----------

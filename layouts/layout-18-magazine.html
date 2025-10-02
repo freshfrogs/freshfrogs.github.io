@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Layout 18 – Magazine Spread</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{margin:0;background:#ffffff;color:#161616;font-family:'Playfair Display',serif;}
+    .spread{display:grid;grid-template-columns:1.2fr 1fr;min-height:100vh;}
+    .feature{padding:80px;background:#f3f3f3;display:flex;flex-direction:column;justify-content:center;}
+    .feature h1{margin:0;font-size:56px;line-height:1.1;}
+    .feature p{margin:24px 0 0;font-size:18px;line-height:1.8;max-width:460px;font-family:'Source Sans Pro',sans-serif;}
+    .sidebar{padding:80px;background:#161616;color:#f9f9f9;display:grid;gap:32px;}
+    .sidebar article{border-top:1px solid rgba(249,249,249,.2);padding-top:24px;}
+    .sidebar h2{margin:0 0 8px;font-size:22px;font-family:'Source Sans Pro',sans-serif;text-transform:uppercase;letter-spacing:.16em;}
+    .sidebar p{margin:0;font-size:14px;line-height:1.6;color:rgba(249,249,249,.78);}
+  </style>
+</head>
+<body>
+  <div class="spread">
+    <section class="feature"><h1>Frog Futures</h1><p>Feature article style hero describing rarity movements and staking strategies.</p></section>
+    <aside class="sidebar">
+      <article><h2>Legendary Moves</h2><p>Frog #8 reclaims the throne with a perfect score.</p></article>
+      <article><h2>Epic Heat</h2><p>Frog #109 edges closer to the top 50 lineup.</p></article>
+      <article><h2>Rare Watch</h2><p>Frog #278 shows steady growth in collector demand.</p></article>
+    </aside>
+  </div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Layout 06 – Aurora Timeline</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{margin:0;font-family:'Source Sans Pro',sans-serif;background:#050608;color:#ecf5ff;}
+    .timeline{max-width:880px;margin:0 auto;padding:80px 32px;position:relative;}
+    .timeline::before{content:"";position:absolute;left:calc(50% - 1px);top:60px;bottom:60px;width:2px;background:linear-gradient(#3b82f6,#22d3ee);} 
+    .entry{position:relative;width:48%;padding:24px;border-radius:18px;background:rgba(17,24,39,.72);box-shadow:0 20px 40px rgba(2,8,23,.4);}
+    .entry:nth-child(odd){margin-left:52%;}
+    .entry:nth-child(even){margin-right:52%;}
+    .entry h3{margin:0 0 8px;font-size:20px;}
+    .entry span{display:block;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#60a5fa;margin-bottom:8px;}
+    .entry p{margin:0;color:#dce7ff;line-height:1.6;}
+    .entry::after{content:"";position:absolute;top:24px;width:16px;height:16px;border-radius:50%;background:#22d3ee;border:3px solid #0f172a;}
+    .entry:nth-child(odd)::after{left:-48px;}
+    .entry:nth-child(even)::after{right:-48px;}
+  </style>
+</head>
+<body>
+  <div class="timeline">
+    <article class="entry"><span>Day 0</span><h3>Mint Frog #1</h3><p>Assign initial rarity metrics and metadata.</p></article>
+    <article class="entry"><span>Day 30</span><h3>Stake Activated</h3><p>Display timer, owner, and rewards summary.</p></article>
+    <article class="entry"><span>Day 60</span><h3>Level Up</h3><p>Highlight progress and attribute boosts.</p></article>
+  </div>
+</body>
+</html>
