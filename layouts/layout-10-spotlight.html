@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fresh Frogs — Spotlight Layout</title>
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <style>
+    body{ background:#060708; color:#fefbff; font-family:var(--font-ui); margin:0; }
+    .wrap{ display:grid; gap:40px; padding:60px 10vw 80px; }
+    .spotlight{ display:grid; gap:24px; grid-template-columns:1.2fr 1fr; align-items:center; }
+    .spotlight figure{ margin:0; position:relative; }
+    .spotlight figure::before{ content:""; position:absolute; inset:-14%; border-radius:50%; background:radial-gradient(circle,#ffb34755,#ff5d9355,#4f00ff22); filter:blur(20px); }
+    .spotlight img{ position:relative; width:100%; border-radius:24px; box-shadow:0 30px 80px rgba(79,0,255,.35); }
+    .spotlight article{ display:grid; gap:16px; }
+    .spotlight h1{ margin:0; font:900 56px/0.95 var(--font-display); letter-spacing:-.02em; }
+    .spotlight p{ margin:0; max-width:60ch; color:rgba(254,251,255,.72); }
+    .stats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; }
+    .stats .card{ border-radius:20px; padding:20px; background:#0c0f18; border:1px solid rgba(255,255,255,.08); display:grid; gap:8px; }
+    .stats .card span{ font-size:12px; color:rgba(254,251,255,.5); text-transform:uppercase; letter-spacing:.2em; }
+    .stats .card strong{ font-size:26px; }
+    .timeline{ border-left:2px solid rgba(255,255,255,.12); padding-left:28px; display:grid; gap:24px; }
+    .timeline article{ position:relative; }
+    .timeline article::before{ content:""; position:absolute; left:-39px; top:2px; width:16px; height:16px; border-radius:50%; background:#ff8fb8; box-shadow:0 0 0 4px rgba(255,143,184,.25); }
+    .timeline h3{ margin:0 0 6px; font-size:18px; }
+    .timeline p{ margin:0; color:rgba(254,251,255,.65); font-size:14px; }
+    @media (max-width:980px){ .spotlight{ grid-template-columns:1fr; text-align:center; } .spotlight article{ justify-items:center; } .spotlight figure::before{ inset:-20%; } }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="spotlight">
+      <figure>
+        <img src="../frog/1111.png" alt="Frog 1111" />
+      </figure>
+      <article>
+        <h1>Legendary Spotlight</h1>
+        <p>Hero spotlight layout for an individual frog drop. Combine bold headlines with glowy backgrounds for dramatic reveals.</p>
+      </article>
+    </section>
+
+    <section class="stats">
+      <div class="card"><span>Minted</span><strong>4,040</strong></div>
+      <div class="card"><span>Staked</span><strong>2,980</strong></div>
+      <div class="card"><span>Flyz earned</span><strong>12.4M</strong></div>
+      <div class="card"><span>Unique holders</span><strong>1,780</strong></div>
+    </section>
+
+    <section class="timeline">
+      <article>
+        <h3>Day 1 — Launch</h3>
+        <p>Introduce the frog collection with a bold hero section and call to action.</p>
+      </article>
+      <article>
+        <h3>Day 7 — Staking opens</h3>
+        <p>Highlight staking timeline entries and reward tiers in this vertical flow.</p>
+      </article>
+      <article>
+        <h3>Day 30 — Pond party</h3>
+        <p>Use timeline beats to share lore events, community updates, and trait spotlights.</p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
