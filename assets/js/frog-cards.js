@@ -8,7 +8,7 @@
   const CFG = window.FF_CFG || {};
   const CHAIN_ID = Number(CFG.CHAIN_ID || 1);
   const BASEPATH = (CFG.SOURCE_PATH || '').replace(/\/+$/,'');
-  const LEVEL_SECS = Math.max(1, Number(CFG.STAKE_LEVEL_SECONDS || 86400));
+  const LEVEL_SECS = Math.max(1, Number(CFG.STAKE_LEVEL_SECONDS || (30 * 86400)));
   const NO_HOVER_KEYS = new Set(['Trait','Frog','SpecialFrog']);
 
   (function injectCSS(){
@@ -17,18 +17,25 @@
 .frog-cards{ display:grid; gap:10px; }
 .frog-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
 .frog-card .row{ display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:start; }
-.frog-card .thumb-wrap{ width:128px; min-width:128px; position:relative; } /* relative for GIF overlays */
+.frog-card .thumb-wrap{ width:128px; min-width:128px; position:relative; }
 .frog-card .thumb, .frog-card canvas.frog-canvas{
   width:128px; height:128px; min-width:128px; min-height:128px;
   border-radius:10px; object-fit:contain; background:var(--panel-2); display:block;
 }
 .frog-card .title{ margin:0 0 4px 0; font-weight:800; font-size:16px; }
-.frog-card .pill{ font-size:12px; padding:2px 8px; border:1px solid var(--border); border-radius:999px; vertical-align:middle; }
-.frog-card .pill.rk-legendary{ color:#f59e0b; border-color: color-mix(in srgb,#f59e0b 70%, var(--border)); }
-.frog-card .pill.rk-epic{ color:#a855f7; border-color: color-mix(in srgb,#a855f7 70%, var(--border)); }
-.frog-card .pill.rk-rare{ color:#38bdf8; border-color: color-mix(in srgb,#38bdf8 70%, var(--border)); }
-.frog-card .meta{ margin:0; color:#22c55e; } /* staked line in green */
-.frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; }
+.frog-card .rank-pill{
+  display:inline-flex; align-items:center; gap:6px;
+  border:1px solid var(--border); border-radius:999px; padding:3px 8px;
+  font-size:11px; font-weight:700; letter-spacing:.01em;
+  background:color-mix(in srgb, var(--panel) 35%, transparent);
+}
+.frog-card .rank-pill::before{ content:'◆'; font-size:12px; line-height:1; }
+.frog-card .rank-pill.rank-legendary{ color:#f59e0b; border-color: color-mix(in srgb,#f59e0b 70%, var(--border)); }
+.frog-card .rank-pill.rank-epic{ color:#a855f7; border-color: color-mix(in srgb,#a855f7 70%, var(--border)); }
+.frog-card .rank-pill.rank-rare{ color:#38bdf8; border-color: color-mix(in srgb,#38bdf8 70%, var(--border)); }
+.frog-card .meta{ margin:0; color:var(--muted); }
+.frog-card .meta .staked-flag{ color:#22c55e; font-weight:700; }
+.frog-card .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; color:var(--muted); }
 .frog-card .attr-bullets li{ font-size:12px; margin:2px 0; cursor:default; }
 .frog-card .attr-bullets li[data-hoverable="1"]{ cursor:pointer; }
 .frog-card .actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
@@ -80,8 +87,8 @@
   function rankPill(rank, tiers){
     if (rank==null) return '';
     const t=tierFor(rank, tiers);
-    const cls = t==='legendary'?'rk-legendary':t==='epic'?'rk-epic':t==='rare'?'rk-rare':'';
-    return ` <span class="pill ${cls}">Rank #${rank}</span>`;
+    const cls = t==='legendary'?'rank-legendary':t==='epic'?'rank-epic':t==='rare'?'rank-rare':'rank-common';
+    return ` <span class="rank-pill ${cls}">#${rank}</span>`;
   }
   function attrsHTML(attrs, max=4){
     if (!Array.isArray(attrs)||!attrs.length) return '';
@@ -145,12 +152,20 @@
     box.innerHTML = `<img class="thumb" src="${(options.imgForId || (id => (window.FF_CFG?.SOURCE_PATH?.replace(/\/+$/,'')||'') + '/frog/' + id + '.png'))(item.id)}" alt="${item.id}">`;
     }
 
+  function ownerLabel(it){
+    if (it.ownerLabel) return String(it.ownerLabel);
+    if (it.ownerShort) return String(it.ownerShort);
+    if (typeof it.owner === 'string' && it.owner) return it.owner;
+    return 'Unknown';
+  }
+
   function metaLineDefault(it){
+    const owner = ownerLabel(it);
     if (it.staked){
       const ago = it.sinceMs ? fmtAgo(it.sinceMs) : null;
-      return (ago ? `Staked ${ago}` : 'Staked') + ' • Owned by You';
+      return `<span class="staked-flag">Staked</span>${ago ? ` ${ago}` : ''} by ${owner}`;
     }
-    return 'Not staked • Owned by You';
+    return `Owned by ${owner}`;
   }
 
   function levelRowHTML(it, secsPerLevel){
