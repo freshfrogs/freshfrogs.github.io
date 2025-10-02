@@ -2,24 +2,93 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Layout 20 – Horizon Carousel</title>
+  <title>Layout 20 – Museum Plinths</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body{margin:0;background:#030712;color:#e2e8f0;font-family:'Karla',sans-serif;display:flex;flex-direction:column;align-items:center;gap:40px;padding:80px 0;}
-    h1{margin:0;font-size:34px;letter-spacing:.14em;text-transform:uppercase;}
-    .carousel{display:flex;gap:30px;align-items:flex-end;}
-    .slide{width:220px;height:320px;border-radius:24px;background:linear-gradient(160deg,#1d4ed8,#9333ea);box-shadow:0 32px 60px rgba(59,130,246,.4);display:flex;flex-direction:column;justify-content:flex-end;padding:22px;transition:transform .3s ease,box-shadow .3s ease;}
-    .slide:nth-child(2){transform:scale(1.1);box-shadow:0 40px 80px rgba(147,51,234,.5);}
-    .slide h2{margin:0;font-size:22px;}
-    .slide p{margin:10px 0 0;font-size:13px;color:rgba(226,232,240,.8);} 
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Cinzel", serif;
+      background: linear-gradient(180deg, #f2efe6 0%, #e4e0d3 100%);
+      color: #2e2416;
+      padding: 72px clamp(24px, 7vw, 160px);
+      display: grid;
+      gap: 48px;
+    }
+    header { text-align: center; }
+    header h1 { margin: 0 0 12px; font-size: clamp(2.6rem, 6vw, 4.2rem); letter-spacing: 0.12em; text-transform: uppercase; }
+    header p { margin: 0; font-size: 1rem; color: rgba(46, 36, 22, 0.7); }
+    .plinths {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 32px;
+    }
+    .plinth {
+      position: relative;
+      background: #fff;
+      border-radius: 32px 32px 12px 12px;
+      padding: 28px;
+      box-shadow: 0 45px 60px rgba(46, 36, 22, 0.18);
+      display: grid;
+      gap: 14px;
+    }
+    .plinth::after {
+      content: "";
+      position: absolute;
+      left: 12%;
+      right: 12%;
+      bottom: -24px;
+      height: 24px;
+      background: rgba(46, 36, 22, 0.1);
+      border-radius: 50%;
+      filter: blur(12px);
+      z-index: -1;
+    }
+    .bust {
+      height: 200px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(158, 126, 76, 0.18), rgba(210, 190, 150, 0.3));
+    }
+    h2 { margin: 0; font-size: 1.4rem; }
+    span { font-size: 0.9rem; color: rgba(46, 36, 22, 0.68); }
+    ul { margin: 0; padding-left: 18px; line-height: 1.7; font-size: 0.9rem; }
   </style>
 </head>
 <body>
-  <h1>Horizon Carousel</h1>
-  <div class="carousel">
-    <article class="slide"><h2>Frog #05</h2><p>Legendary • Score 995</p></article>
-    <article class="slide"><h2>Frog #38</h2><p>Epic • Score 884</p></article>
-    <article class="slide"><h2>Frog #302</h2><p>Rare • Score 756</p></article>
-  </div>
+  <header>
+    <h1>Museum Plinths</h1>
+    <p>Each frog becomes an artifact displayed on individual plinths with soft gallery lighting.</p>
+  </header>
+  <section class="plinths">
+    <article class="plinth">
+      <div class="bust"></div>
+      <h2>Frog #021</h2>
+      <span>Rarity 138.6 · Staked 64d</span>
+      <ul>
+        <li>Marble Shell</li>
+        <li>Antique Crown</li>
+        <li>Gallery Tongue</li>
+      </ul>
+    </article>
+    <article class="plinth">
+      <div class="bust"></div>
+      <h2>Frog #064</h2>
+      <span>Rarity 130.2 · Owned by 0x8A...3F</span>
+      <ul>
+        <li>Bronze Patina</li>
+        <li>Curator Cloak</li>
+      </ul>
+    </article>
+    <article class="plinth">
+      <div class="bust"></div>
+      <h2>Frog #107</h2>
+      <span>Rarity 122.8</span>
+      <ul>
+        <li>Velvet Backdrop</li>
+        <li>Golden Plaque</li>
+      </ul>
+    </article>
+  </section>
 </body>
 </html>

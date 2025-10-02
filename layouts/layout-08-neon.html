@@ -2,25 +2,83 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Layout 08 – Neon Scroll</title>
+  <title>Layout 08 – Botanica Showcase</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body{margin:0;background:#020617;color:#f8fafc;font-family:'Orbitron',sans-serif;}
-    .marquee{white-space:nowrap;overflow:hidden;border-bottom:2px solid rgba(94,234,212,.4);padding:16px;background:rgba(15,23,42,.9);position:sticky;top:0;}
-    .marquee span{display:inline-block;padding-left:100%;animation:scroll 16s linear infinite;font-size:18px;letter-spacing:.32em;text-transform:uppercase;color:#5eead4;}
-    @keyframes scroll{to{transform:translateX(-100%);}}
-    .list{padding:60px;display:flex;flex-direction:column;gap:32px;}
-    .panel{border:1px solid rgba(94,234,212,.3);border-radius:20px;padding:28px;background:linear-gradient(120deg,rgba(14,165,233,.12),rgba(94,234,212,.08));box-shadow:0 24px 50px rgba(2,6,23,.6);}
-    .panel h2{margin:0 0 12px;font-size:24px;}
-    .panel p{margin:0;font-size:14px;line-height:1.6;color:rgba(226,232,240,.8);}
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #f7f5f1 0%, #e3f7f2 100%);
+      font-family: "Playfair Display", serif;
+      color: #274139;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 36px;
+      padding: 56px clamp(24px, 7vw, 120px);
+    }
+    header { text-align: center; }
+    header h1 { margin: 0 0 12px; font-size: clamp(2.4rem, 6vw, 3.6rem); }
+    header p { margin: 0; color: rgba(39, 65, 57, 0.7); font-size: 1rem; font-family: "Mulish", sans-serif; }
+    .showcase {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+    }
+    figure {
+      margin: 0;
+      background: rgba(255, 255, 255, 0.82);
+      border-radius: 28px;
+      border: 1px solid rgba(39, 65, 57, 0.16);
+      box-shadow: 0 24px 55px rgba(39, 65, 57, 0.12);
+      padding: 28px;
+      display: grid;
+      gap: 18px;
+    }
+    figure img {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      border-radius: 18px;
+      object-fit: cover;
+      background: rgba(39, 65, 57, 0.08);
+    }
+    figcaption { display: grid; gap: 6px; font-family: "Mulish", sans-serif; }
+    figcaption strong { font-size: 1.2rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    figcaption span { color: rgba(39, 65, 57, 0.72); font-size: 0.9rem; }
+    ul { margin: 12px 0 0; padding-left: 18px; line-height: 1.6; font-size: 0.9rem; }
   </style>
 </head>
 <body>
-  <div class="marquee"><span>freshfrogs rarity feed • neon concept • placeholder data •</span></div>
-  <main class="list">
-    <article class="panel"><h2>Frog #010</h2><p>Legendary status, score 990, staked 12d ago.</p></article>
-    <article class="panel"><h2>Frog #088</h2><p>Epic status, owner 0xDEAD…BEEF, ready to stake.</p></article>
-    <article class="panel"><h2>Frog #312</h2><p>Rare status, showing static art block preview.</p></article>
-  </main>
+  <header>
+    <h1>Botanica Showcase</h1>
+    <p>Elegant editorial layout pairing frog imagery with rarity narratives and attribute notes.</p>
+  </header>
+  <section class="showcase">
+    <figure>
+      <img alt="Placeholder frog art" />
+      <figcaption>
+        <strong>Frog #320</strong>
+        <span>Rarity Score 112.5 · Owned by 0x98...CC</span>
+        <ul>
+          <li>Verdant Vines</li>
+          <li>Marble Pond</li>
+          <li>Blooming Crown</li>
+        </ul>
+      </figcaption>
+    </figure>
+    <figure>
+      <img alt="Placeholder frog art" />
+      <figcaption>
+        <strong>Frog #541</strong>
+        <span>Rarity Score 105.8 · Staked 45d</span>
+        <ul>
+          <li>Lavender Mist</li>
+          <li>Petal Cape</li>
+          <li>Garden Spirits</li>
+        </ul>
+      </figcaption>
+    </figure>
+  </section>
 </body>
 </html>

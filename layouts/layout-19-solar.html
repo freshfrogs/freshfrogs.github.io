@@ -2,25 +2,83 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Layout 19 – Solar Orbit</title>
+  <title>Layout 19 – Orbit Matrix</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body{margin:0;background:#02040a;color:#fefefe;font-family:'Exo 2',sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;}
-    .orbit{position:relative;width:680px;height:680px;border:1px dashed rgba(255,255,255,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;}
-    .orbit::before{content:"";position:absolute;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,#fcd34d,#f59e0b);box-shadow:0 0 40px rgba(252,211,77,.6);} 
-    .planet{position:absolute;width:140px;height:140px;border-radius:24px;background:linear-gradient(135deg,#6366f1,#a855f7);display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;box-shadow:0 18px 30px rgba(99,102,241,.4);} 
-    .planet:nth-child(2){top:40px;left:calc(50% - 70px);} 
-    .planet:nth-child(3){right:60px;top:calc(50% - 70px);} 
-    .planet:nth-child(4){bottom:60px;left:calc(50% - 70px);} 
-    .planet h2{margin:0;font-size:18px;}
-    .planet span{display:block;margin-top:6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#e9e7ff;}
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Exo", system-ui, sans-serif;
+      background: radial-gradient(circle at 30% 20%, rgba(255, 202, 70, 0.25), transparent 55%), #040308;
+      color: #fef4e6;
+      padding: 60px clamp(24px, 7vw, 160px);
+      display: grid;
+      gap: 40px;
+    }
+    header { text-align: center; }
+    header h1 { margin: 0 0 12px; font-size: clamp(2.2rem, 5vw, 3.6rem); text-transform: uppercase; letter-spacing: 0.18em; }
+    header p { margin: 0; color: rgba(254, 244, 230, 0.7); }
+    .matrix {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 26px;
+    }
+    .cell {
+      position: relative;
+      padding: 24px;
+      border-radius: 22px;
+      background: rgba(14, 11, 20, 0.86);
+      border: 1px solid rgba(255, 202, 70, 0.4);
+      box-shadow: 0 20px 50px rgba(14, 11, 20, 0.55);
+      display: grid;
+      gap: 12px;
+    }
+    .cell::before {
+      content: "";
+      position: absolute;
+      inset: 16px;
+      border-radius: 50%;
+      border: 1px dashed rgba(255, 202, 70, 0.35);
+      opacity: 0.6;
+    }
+    .cell h2 { margin: 0; font-size: 1.4rem; }
+    .cell span { font-size: 0.9rem; color: rgba(254, 244, 230, 0.72); }
+    .cell ul { margin: 0; padding-left: 18px; font-size: 0.86rem; line-height: 1.6; }
   </style>
 </head>
 <body>
-  <div class="orbit">
-    <div class="planet"><div><h2>Frog #01</h2><span>Legendary</span></div></div>
-    <div class="planet"><div><h2>Frog #77</h2><span>Epic</span></div></div>
-    <div class="planet"><div><h2>Frog #203</h2><span>Rare</span></div></div>
-  </div>
+  <header>
+    <h1>Orbit Matrix</h1>
+    <p>Planets of data revolve inside dotted halos. Connect to live rarity info to animate orbits.</p>
+  </header>
+  <section class="matrix">
+    <article class="cell">
+      <h2>Frog #101</h2>
+      <span>Rarity 135.7 · Staked 85d</span>
+      <ul>
+        <li>Solar Crest</li>
+        <li>Comet Trail</li>
+        <li>Nova Tongue</li>
+      </ul>
+    </article>
+    <article class="cell">
+      <h2>Frog #142</h2>
+      <span>Rarity 128.9 · Owned by 0xDD...22</span>
+      <ul>
+        <li>Helios Skin</li>
+        <li>Orbit Crown</li>
+        <li>Golden Mist</li>
+      </ul>
+    </article>
+    <article class="cell">
+      <h2>Frog #188</h2>
+      <span>Rarity 121.5</span>
+      <ul>
+        <li>Umbra Cape</li>
+        <li>Stardust Spots</li>
+      </ul>
+    </article>
+  </section>
 </body>
 </html>

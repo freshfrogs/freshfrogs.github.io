@@ -2,23 +2,73 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Layout 13 – Panel Storyboard</title>
+  <title>Layout 13 – Spotlight Panels</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body{margin:0;background:#111;color:#f5f5f5;font-family:'Work Sans',sans-serif;padding:56px;}
-    .storyboard{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1080px;margin:0 auto;}
-    .panel{border-radius:18px;overflow:hidden;box-shadow:0 24px 40px rgba(0,0,0,.35);display:flex;flex-direction:column;}
-    .panel figure{margin:0;height:200px;background:linear-gradient(135deg,#06b6d4,#3b82f6);}
-    .panel div{flex:1;background:#18181b;padding:20px;}
-    .panel h2{margin:0 0 12px;font-size:20px;}
-    .panel p{margin:0;color:#c4c4d1;line-height:1.6;}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #050505;
+      color: #f6f6f6;
+      font-family: "Work Sans", system-ui, sans-serif;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto 1fr;
+      gap: 32px;
+      padding: 54px clamp(24px, 8vw, 160px);
+    }
+    header { display: grid; gap: 12px; text-align: center; }
+    header h1 { margin: 0; font-size: clamp(2.2rem, 5vw, 3.6rem); }
+    header p { margin: 0; color: rgba(246, 246, 246, 0.65); }
+    .panels {
+      display: grid;
+      gap: 24px;
+    }
+    .panel {
+      display: grid;
+      gap: 22px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      align-items: center;
+      padding: 28px;
+      border-radius: 24px;
+      background: linear-gradient(110deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .panel h2 { margin: 0; font-size: 1.6rem; }
+    .panel .meta { font-size: 0.9rem; color: rgba(246, 246, 246, 0.7); }
+    .panel ul { margin: 0; padding-left: 18px; line-height: 1.6; font-size: 0.88rem; }
+    .panel aside { font-size: 0.8rem; color: rgba(246, 246, 246, 0.55); letter-spacing: 0.1em; text-transform: uppercase; }
   </style>
 </head>
 <body>
-  <div class="storyboard">
-    <article class="panel"><figure></figure><div><h2>Hero Frog</h2><p>Use this frame to showcase top-ranked frogs and stats.</p></div></article>
-    <article class="panel"><figure></figure><div><h2>Stacked Rewards</h2><p>Explain staking multipliers and durations here.</p></div></article>
-    <article class="panel"><figure></figure><div><h2>Community Picks</h2><p>Highlight curated frogs from wallet holders.</p></div></article>
-  </div>
+  <header>
+    <h1>Spotlight Panels</h1>
+    <p>Large cinematic panels highlight a few frogs at a time with ample room for storytelling.</p>
+  </header>
+  <section class="panels">
+    <div class="panel">
+      <div>
+        <h2>Frog #018</h2>
+        <div class="meta">Rarity 145.5 · Staked 310d</div>
+        <ul>
+          <li>Obsidian Scales</li>
+          <li>Solar Crown</li>
+          <li>Cathedral Cape</li>
+        </ul>
+      </div>
+      <aside>Prime Spotlight</aside>
+    </div>
+    <div class="panel">
+      <div>
+        <h2>Frog #064</h2>
+        <div class="meta">Rarity 136.2 · Owned by 0x98...DA</div>
+        <ul>
+          <li>Luminescent Eyes</li>
+          <li>Pulse Tongue</li>
+        </ul>
+      </div>
+      <aside>Secondary Feature</aside>
+    </div>
+  </section>
 </body>
 </html>

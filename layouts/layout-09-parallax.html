@@ -2,29 +2,75 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Layout 09 – Parallax Stacks</title>
+  <title>Layout 09 – Canyon Parallax</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body{margin:0;background:#020202;color:#f0f0f0;font-family:'Manrope',sans-serif;perspective:1200px;height:100vh;display:flex;align-items:center;justify-content:center;}
-    .stack{position:relative;width:860px;height:480px;}
-    .layer{position:absolute;inset:0;border-radius:28px;padding:40px;display:grid;place-items:center;}
-    .layer:nth-child(1){background:linear-gradient(135deg,#22d3ee,#6366f1);transform:rotateY(-14deg) translateZ(-60px);}
-    .layer:nth-child(2){background:linear-gradient(135deg,#0ea5e9,#6366f1);transform:rotateY(-6deg) translateZ(-20px);box-shadow:0 35px 60px rgba(99,102,241,.4);}
-    .layer:nth-child(3){background:rgba(17,24,39,.92);transform:rotateY(0deg);box-shadow:0 40px 80px rgba(15,23,42,.6);}
-    h1{margin:0;font-size:42px;text-align:center;}
-    p{margin:18px 0 0;text-align:center;font-size:16px;max-width:420px;color:rgba(226,232,240,.82);}
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Rubik", system-ui, sans-serif;
+      background: #030508;
+      color: #f3f6ff;
+      overflow-x: hidden;
+    }
+    header {
+      padding: 96px clamp(24px, 8vw, 160px) 48px;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(226, 127, 88, 0.7), rgba(3,5,8,0));
+    }
+    header h1 { margin: 0 0 18px; font-size: clamp(2.2rem, 6vw, 4rem); }
+    header p { margin: 0 auto; max-width: 620px; color: rgba(243, 246, 255, 0.72); }
+    .layers {
+      position: relative;
+      min-height: 60vh;
+      padding: 0 clamp(24px, 7vw, 120px) 96px;
+    }
+    .layer {
+      position: sticky;
+      top: 120px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      margin-bottom: 120px;
+      opacity: 0.85;
+      transition: transform 0.6s ease, opacity 0.6s ease;
+    }
+    .layer:nth-child(odd) { transform: translateY(0); }
+    .layer:nth-child(even) { transform: translateY(60px); }
+    .card {
+      padding: 22px;
+      border-radius: 20px;
+      background: rgba(13, 16, 22, 0.9);
+      border: 1px solid rgba(226, 127, 88, 0.35);
+      box-shadow: 0 24px 60px rgba(5, 8, 12, 0.65);
+      display: grid;
+      gap: 12px;
+    }
+    .card h2 { margin: 0; font-size: 1.3rem; }
+    .card span { color: rgba(243, 246, 255, 0.7); font-size: 0.88rem; }
+    .traits { display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.78rem; }
+    .traits em { font-style: normal; background: rgba(226, 127, 88, 0.16); border-radius: 999px; padding: 4px 10px; }
   </style>
 </head>
 <body>
-  <div class="stack">
-    <div class="layer"></div>
-    <div class="layer"></div>
-    <div class="layer">
-      <div>
-        <h1>Parallax Stacks</h1>
-        <p>Imagine card data floating across multiple depth planes with layered imagery.</p>
-      </div>
-    </div>
-  </div>
+  <header>
+    <h1>Canyon Parallax</h1>
+    <p>Sectioned rarity groups float at different depths, letting visitors scroll through canyon-like layers of frogs.</p>
+  </header>
+  <main class="layers">
+    <section class="layer">
+      <article class="card"><h2>Frog #012</h2><span>Rarity 147.2 · Staked 180d</span><div class="traits"><em>Dune Skin</em><em>Quartz Crown</em><em>Glide Cape</em></div></article>
+      <article class="card"><h2>Frog #087</h2><span>Rarity 139.0 · Owned by 0xAA...11</span><div class="traits"><em>Sunset Aura</em><em>Caravan Staff</em></div></article>
+    </section>
+    <section class="layer">
+      <article class="card"><h2>Frog #144</h2><span>Rarity 128.6</span><div class="traits"><em>Mirage Eyes</em><em>Echo Band</em><em>Nomad Cloak</em></div></article>
+      <article class="card"><h2>Frog #178</h2><span>Rarity 124.3</span><div class="traits"><em>Sandveil</em><em>Compass Tongue</em></div></article>
+    </section>
+    <section class="layer">
+      <article class="card"><h2>Frog #220</h2><span>Rarity 118.9</span><div class="traits"><em>Oasis Ripple</em><em>Starlit Scarab</em></div></article>
+      <article class="card"><h2>Frog #245</h2><span>Rarity 114.2</span><div class="traits"><em>Spiced Wind</em><em>Nomad Drum</em></div></article>
+    </section>
+  </main>
 </body>
 </html>

@@ -2,26 +2,86 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Layout 12 – Gridlines Blueprint</title>
+  <title>Layout 12 – Blueprint Rack</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body{margin:0;background:#0b1826 url('https://dummyimage.com/600x600/0b1826/102a43&text=Grid');color:#c7e0ff;font-family:'Roboto Mono',monospace;padding:64px;}
-    .blueprint{max-width:960px;margin:0 auto;border:2px solid #3b82f6;border-radius:18px;padding:36px;background:rgba(11,24,38,.85);box-shadow:0 30px 50px rgba(0,0,0,.5);}
-    h1{margin:0 0 20px;font-size:32px;text-transform:uppercase;letter-spacing:.32em;color:#60a5fa;}
-    .rows{display:grid;gap:16px;}
-    .row{display:grid;grid-template-columns:120px 1fr 120px;gap:20px;align-items:center;padding:16px;border:1px dashed rgba(96,165,250,.5);border-radius:12px;background:rgba(14,42,66,.6);}
-    .row span{display:block;}
-    .row strong{font-size:20px;color:#fefefe;}
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #0b1c32;
+      color: #e3f3ff;
+      font-family: "Fira Sans", system-ui, sans-serif;
+      padding: 52px clamp(24px, 8vw, 140px);
+      display: grid;
+      gap: 28px;
+    }
+    header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px; }
+    header h1 { margin: 0; font-size: clamp(2rem, 5vw, 3.2rem); }
+    header span { color: rgba(227, 243, 255, 0.6); letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.8rem; }
+    .rack {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 22px;
+    }
+    .sheet {
+      background: rgba(10, 31, 53, 0.92);
+      border: 1px solid rgba(71, 158, 255, 0.35);
+      border-radius: 18px;
+      padding: 24px;
+      display: grid;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .sheet::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(71,158,255,0.18) 1px, transparent 1px), linear-gradient(90deg, rgba(71,158,255,0.18) 1px, transparent 1px);
+      background-size: 28px 28px;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .sheet h2 { margin: 0; font-size: 1.2rem; }
+    .sheet .meta { font-size: 0.85rem; color: rgba(227, 243, 255, 0.72); }
+    .specs { display: grid; gap: 8px; font-size: 0.82rem; }
+    .specs span { display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(227, 243, 255, 0.2); padding-bottom: 6px; }
   </style>
 </head>
 <body>
-  <div class="blueprint">
-    <h1>Blueprint Gridlines</h1>
-    <div class="rows">
-      <div class="row"><span>#012</span><strong>Legendary Builder</strong><span>Score 992</span></div>
-      <div class="row"><span>#144</span><strong>Epic Engineer</strong><span>Score 875</span></div>
-      <div class="row"><span>#377</span><strong>Rare Architect</strong><span>Score 744</span></div>
-    </div>
-  </div>
+  <header>
+    <h1>Blueprint Rack</h1>
+    <span>Concept layout · placeholder copy</span>
+  </header>
+  <section class="rack">
+    <article class="sheet">
+      <h2>Frog #210</h2>
+      <span class="meta">Rarity 123.7 · Owned by 0xC1...9B</span>
+      <div class="specs">
+        <span><b>Primary</b><em>Nautical Skin</em></span>
+        <span><b>Secondary</b><em>Compass Eyes</em></span>
+        <span><b>Accent</b><em>Blueprint Cape</em></span>
+      </div>
+    </article>
+    <article class="sheet">
+      <h2>Frog #368</h2>
+      <span class="meta">Rarity 118.4 · Staked 33d</span>
+      <div class="specs">
+        <span><b>Primary</b><em>Titanium Scales</em></span>
+        <span><b>Secondary</b><em>Drafting Ink</em></span>
+        <span><b>Accent</b><em>Architect Tongue</em></span>
+      </div>
+    </article>
+    <article class="sheet">
+      <h2>Frog #401</h2>
+      <span class="meta">Rarity 112.1</span>
+      <div class="specs">
+        <span><b>Primary</b><em>Blueprint Glow</em></span>
+        <span><b>Secondary</b><em>Measurement Crown</em></span>
+        <span><b>Accent</b><em>Grid Boots</em></span>
+      </div>
+    </article>
+  </section>
 </body>
 </html>

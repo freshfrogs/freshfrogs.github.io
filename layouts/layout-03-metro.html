@@ -2,36 +2,111 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Layout 03 – Metro Cards</title>
+  <title>Layout 03 – Hologram Carousel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    :root{color-scheme:dark light;}
-    body{margin:0;font-family:'DM Sans',sans-serif;background:linear-gradient(135deg,#1b1c30,#121219);color:#f0f4ff;padding:60px;}
-    header{max-width:720px;margin:0 auto 40px;text-align:left;}
-    header h1{margin:0 0 12px;font-size:40px;letter-spacing:-.02em;}
-    .metro{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;}
-    .tile{padding:24px;border-radius:22px;background:linear-gradient(145deg,rgba(88,101,242,.28),rgba(15,23,42,.65));backdrop-filter:blur(14px);box-shadow:0 40px 60px rgba(15,18,40,.35);}
-    .tile h2{margin:0 0 10px;font-size:22px;font-weight:700;}
-    .tag{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.08);font-size:12px;text-transform:uppercase;letter-spacing:.12em;}
-    .details{margin:14px 0 0;font-size:14px;line-height:1.6;color:rgba(230,233,255,.82);}
+    :root {
+      --bg: #02010f;
+      --fg: #f9faff;
+      --glow: #c77dff;
+      --glow-2: #6dffcb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "DM Sans", system-ui, sans-serif;
+      background: radial-gradient(circle at 20% -10%, rgba(109, 255, 203, 0.18), transparent 45%),
+        radial-gradient(circle at 80% 0%, rgba(199, 125, 255, 0.22), transparent 52%),
+        var(--bg);
+      color: var(--fg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 0 120px;
+      gap: 40px;
+    }
+    header { text-align: center; max-width: 640px; padding: 0 24px; }
+    header h1 { margin: 0 0 10px; font-size: clamp(2.4rem, 5vw, 3.6rem); }
+    header p { margin: 0; color: rgba(249, 250, 255, 0.7); }
+    .carousel {
+      position: relative;
+      width: min(920px, 92vw);
+      aspect-ratio: 3 / 2;
+      perspective: 1800px;
+    }
+    .ring {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      animation: spin 18s infinite linear;
+    }
+    @keyframes spin {
+      from { transform: rotateY(0deg); }
+      to { transform: rotateY(-360deg); }
+    }
+    .panel {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 280px;
+      height: 360px;
+      transform-style: preserve-3d;
+      transform-origin: center center -420px;
+      border-radius: 20px;
+      background: linear-gradient(160deg, rgba(199, 125, 255, 0.22), rgba(109, 255, 203, 0.08));
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(12px);
+      padding: 24px;
+      display: grid;
+      align-content: space-between;
+    }
+    .panel::after {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      background: linear-gradient(120deg, rgba(199, 125, 255, 0.4), rgba(109, 255, 203, 0.4));
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+    .panel:hover::after { opacity: 0.6; }
+    .panel h3 { margin: 0; font-size: 1.5rem; }
+    .panel span { font-size: 0.9rem; color: rgba(249, 250, 255, 0.68); }
+    .panel:nth-child(1) { transform: translate(-50%, -50%) rotateY(0deg); }
+    .panel:nth-child(2) { transform: translate(-50%, -50%) rotateY(36deg); }
+    .panel:nth-child(3) { transform: translate(-50%, -50%) rotateY(72deg); }
+    .panel:nth-child(4) { transform: translate(-50%, -50%) rotateY(108deg); }
+    .panel:nth-child(5) { transform: translate(-50%, -50%) rotateY(144deg); }
+    .panel:nth-child(6) { transform: translate(-50%, -50%) rotateY(180deg); }
+    .panel:nth-child(7) { transform: translate(-50%, -50%) rotateY(216deg); }
+    .panel:nth-child(8) { transform: translate(-50%, -50%) rotateY(252deg); }
+    .panel:nth-child(9) { transform: translate(-50%, -50%) rotateY(288deg); }
+    .panel:nth-child(10) { transform: translate(-50%, -50%) rotateY(324deg); }
+    footer { color: rgba(249, 250, 255, 0.55); font-size: 0.8rem; }
   </style>
 </head>
 <body>
   <header>
-    <h1>Metro Cards Layout</h1>
-    <p>This concept leans into neon gradients and large typography.</p>
+    <h1>Hologram Carousel</h1>
+    <p>Floating panels orbit through space to preview frogs in a 3D carousel. Replace the placeholder panels with live rarity data.</p>
   </header>
-  <section class="metro">
-    <article class="tile">
-      <span class="tag">Legendary</span>
-      <h2>Frog #001</h2>
-      <p class="details">Score 982 • Staked 4d ago • Hover for actions.</p>
-    </article>
-    <article class="tile">
-      <span class="tag">Epic</span>
-      <h2>Frog #077</h2>
-      <p class="details">Score 845 • Owned by 0xBEEF…5678</p>
-    </article>
-  </section>
+  <div class="carousel">
+    <div class="ring">
+      <article class="panel"><h3>Frog #0021</h3><span>Score 142.7</span></article>
+      <article class="panel"><h3>Frog #0314</h3><span>Score 135.5</span></article>
+      <article class="panel"><h3>Frog #0410</h3><span>Score 129.1</span></article>
+      <article class="panel"><h3>Frog #0528</h3><span>Score 125.6</span></article>
+      <article class="panel"><h3>Frog #0666</h3><span>Score 120.9</span></article>
+      <article class="panel"><h3>Frog #0722</h3><span>Score 118.4</span></article>
+      <article class="panel"><h3>Frog #0880</h3><span>Score 117.1</span></article>
+      <article class="panel"><h3>Frog #0999</h3><span>Score 113.2</span></article>
+      <article class="panel"><h3>Frog #1042</h3><span>Score 109.6</span></article>
+      <article class="panel"><h3>Frog #1200</h3><span>Score 105.3</span></article>
+    </div>
+  </div>
+  <footer>Tip: Slow the spin or snap to a selected frog when wiring up the live carousel.</footer>
 </body>
 </html>

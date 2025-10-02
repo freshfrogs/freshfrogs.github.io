@@ -2,34 +2,77 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Layout 10 – Newsprint Digest</title>
+  <title>Layout 10 – Newsprint Ledger</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body{margin:0;background:#fdf8ef;color:#2b2116;font-family:'IBM Plex Serif',serif;padding:50px;}
-    header{text-align:center;margin-bottom:40px;border-bottom:2px solid #2b2116;padding-bottom:16px;}
-    header h1{margin:0;font-size:46px;letter-spacing:.12em;text-transform:uppercase;}
-    .columns{display:grid;grid-template-columns:2fr 1fr;gap:36px;}
-    article{background:#fff;border:1px solid #2b2116;padding:24px;box-shadow:12px 12px 0 rgba(43,33,22,.18);} 
-    article h2{margin:0;font-size:24px;text-transform:uppercase;}
-    article p{margin:12px 0 0;line-height:1.7;font-size:15px;}
-    aside{display:grid;gap:24px;}
-    .ticker{background:#2b2116;color:#fdf8ef;padding:16px;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:13px;letter-spacing:.2em;text-transform:uppercase;}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Libre Baskerville", serif;
+      background: #f5f0e8;
+      color: #2d2012;
+      padding: 64px clamp(24px, 10vw, 200px);
+      display: grid;
+      gap: 32px;
+    }
+    header { text-align: center; border-bottom: 2px solid #2d2012; padding-bottom: 24px; }
+    header h1 { margin: 0 0 12px; font-size: clamp(2rem, 5vw, 3.2rem); letter-spacing: 0.12em; text-transform: uppercase; }
+    header p { margin: 0; font-style: italic; color: rgba(45, 32, 18, 0.75); }
+    .ledger {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 28px;
+    }
+    article {
+      background: #fff;
+      border: 1px solid rgba(45, 32, 18, 0.25);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 18px 40px rgba(87, 60, 24, 0.12);
+      display: grid;
+      gap: 12px;
+    }
+    article h2 { margin: 0; font-size: 1.4rem; }
+    article h3 { margin: 0; font-size: 0.9rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(45, 32, 18, 0.6); }
+    article p { margin: 0; line-height: 1.6; font-size: 0.9rem; }
+    ul { margin: 0; padding-left: 18px; line-height: 1.7; font-size: 0.9rem; }
   </style>
 </head>
 <body>
   <header>
-    <h1>Fresh Frogs Daily</h1>
-    <p>Preview of rarity insights laid out like a vintage newspaper.</p>
+    <h1>Newsprint Ledger</h1>
+    <p>Imagine rarity stats laid out like a Sunday collectible insert with serif typography and columned cards.</p>
   </header>
-  <div class="columns">
+  <section class="ledger">
     <article>
-      <h2>Legendary Spotlight</h2>
-      <p>Frog #21 leaps to the top with a rarity score of 998. Owners weigh staking options.</p>
+      <h3>Featured</h3>
+      <h2>Frog #045</h2>
+      <p>Rarity Score 134.2 · Owned by 0xEA...19</p>
+      <ul>
+        <li>Marbled Skin</li>
+        <li>Ceramic Trinket</li>
+        <li>Vintage Locket</li>
+      </ul>
     </article>
-    <aside>
-      <div class="ticker">Staked Frogs • 120 • Avg Level 6</div>
-      <div class="ticker">New Listings • 14 • Floor 0.42Ξ</div>
-    </aside>
-  </div>
+    <article>
+      <h3>Column II</h3>
+      <h2>Frog #090</h2>
+      <p>Rarity Score 129.8 · Staked 62d</p>
+      <ul>
+        <li>Sepia Aura</li>
+        <li>Collector's Coat</li>
+      </ul>
+    </article>
+    <article>
+      <h3>Column III</h3>
+      <h2>Frog #133</h2>
+      <p>Rarity Score 122.4 · Owned by 0x55...AA</p>
+      <ul>
+        <li>Inkblot Spots</li>
+        <li>Pressed Flower</li>
+        <li>Storyteller Cane</li>
+      </ul>
+    </article>
+  </section>
 </body>
 </html>

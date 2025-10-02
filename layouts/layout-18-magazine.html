@@ -5,25 +5,73 @@
   <title>Layout 18 – Magazine Spread</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body{margin:0;background:#ffffff;color:#161616;font-family:'Playfair Display',serif;}
-    .spread{display:grid;grid-template-columns:1.2fr 1fr;min-height:100vh;}
-    .feature{padding:80px;background:#f3f3f3;display:flex;flex-direction:column;justify-content:center;}
-    .feature h1{margin:0;font-size:56px;line-height:1.1;}
-    .feature p{margin:24px 0 0;font-size:18px;line-height:1.8;max-width:460px;font-family:'Source Sans Pro',sans-serif;}
-    .sidebar{padding:80px;background:#161616;color:#f9f9f9;display:grid;gap:32px;}
-    .sidebar article{border-top:1px solid rgba(249,249,249,.2);padding-top:24px;}
-    .sidebar h2{margin:0 0 8px;font-size:22px;font-family:'Source Sans Pro',sans-serif;text-transform:uppercase;letter-spacing:.16em;}
-    .sidebar p{margin:0;font-size:14px;line-height:1.6;color:rgba(249,249,249,.78);}
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Raleway", system-ui, sans-serif;
+      background: #faf7f2;
+      color: #2a1f17;
+      padding: 60px clamp(24px, 8vw, 180px);
+      display: grid;
+      gap: 48px;
+    }
+    header { text-align: center; }
+    header h1 { margin: 0 0 14px; font-size: clamp(2.4rem, 6vw, 4rem); letter-spacing: 0.08em; text-transform: uppercase; }
+    header p { margin: 0; color: rgba(42, 31, 23, 0.7); }
+    .spread {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 36px;
+      align-items: start;
+    }
+    .feature {
+      background: #fff;
+      border-radius: 32px;
+      padding: 32px;
+      box-shadow: 0 32px 60px rgba(42, 31, 23, 0.12);
+      display: grid;
+      gap: 18px;
+    }
+    .feature .image {
+      aspect-ratio: 3 / 2;
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(255, 199, 141, 0.22), rgba(141, 198, 255, 0.22));
+    }
+    .feature h2 { margin: 0; font-size: 1.6rem; }
+    .feature span { color: rgba(42, 31, 23, 0.7); font-size: 0.95rem; }
+    .feature p { margin: 0; line-height: 1.8; font-size: 0.95rem; }
+    .feature ul { margin: 0; padding-left: 20px; line-height: 1.7; font-size: 0.9rem; }
   </style>
 </head>
 <body>
-  <div class="spread">
-    <section class="feature"><h1>Frog Futures</h1><p>Feature article style hero describing rarity movements and staking strategies.</p></section>
-    <aside class="sidebar">
-      <article><h2>Legendary Moves</h2><p>Frog #8 reclaims the throne with a perfect score.</p></article>
-      <article><h2>Epic Heat</h2><p>Frog #109 edges closer to the top 50 lineup.</p></article>
-      <article><h2>Rare Watch</h2><p>Frog #278 shows steady growth in collector demand.</p></article>
-    </aside>
-  </div>
+  <header>
+    <h1>Magazine Spread</h1>
+    <p>Editorial hero card paired with supporting articles for layered storytelling.</p>
+  </header>
+  <section class="spread">
+    <article class="feature">
+      <div class="image"></div>
+      <h2>Frog #011 – The Oracle</h2>
+      <span>Rarity 149.9 · Staked 420d</span>
+      <p>The Oracle blends ancient runes with neon circuitry. This hero layout can hold lore, stats, and call-to-action buttons.</p>
+      <ul>
+        <li>Rune Skin</li>
+        <li>Future Sight Eyes</li>
+        <li>Astral Cape</li>
+      </ul>
+    </article>
+    <article class="feature">
+      <div class="image"></div>
+      <h2>Frog #057 – The Cartographer</h2>
+      <span>Rarity 133.5 · Owned by 0xAA...77</span>
+      <p>Maps every pond and portal. Pair this column with transaction history or ownership lineage.</p>
+      <ul>
+        <li>Compass Tongue</li>
+        <li>Velvet Cloak</li>
+        <li>Star Charts</li>
+      </ul>
+    </article>
+  </section>
 </body>
 </html>

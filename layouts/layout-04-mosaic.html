@@ -2,31 +2,94 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Layout 04 – Mosaic Blocks</title>
+  <title>Layout 04 – Constellation Grid</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body{margin:0;background:#060607;color:#fafbff;font-family:'Poppins',sans-serif;}
-    .board{display:grid;grid-template-columns:2fr 1fr;min-height:100vh;}
-    .highlight{padding:60px;background:radial-gradient(circle at top,#1b9aaa,#060607 60%);}
-    .highlight h1{font-size:42px;margin:0 0 24px;text-transform:uppercase;letter-spacing:.24em;}
-    .highlight p{font-size:16px;max-width:420px;line-height:1.7;color:rgba(255,255,255,.78);} 
-    .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;padding:60px;background:#0b0c12;}
-    .tile{background:#161828;border-radius:18px;padding:18px;border:1px solid rgba(90,134,255,.32);box-shadow:0 16px 32px rgba(10,20,60,.4);} 
-    .tile strong{display:block;font-size:20px;margin-bottom:12px;}
-    .tile span{display:block;font-size:13px;color:#a9b4ff;text-transform:uppercase;letter-spacing:.14em;}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #010409;
+      color: #f5f7ff;
+      font-family: "IBM Plex Mono", monospace;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 24px;
+      padding: 48px clamp(24px, 6vw, 80px);
+    }
+    header { max-width: 780px; }
+    header h1 { margin: 0 0 8px; font-size: clamp(2rem, 5vw, 3rem); }
+    header p { margin: 0; color: rgba(245, 247, 255, 0.7); }
+    .grid {
+      position: relative;
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+    .grid::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 0);
+      background-size: 24px 24px;
+      mask: linear-gradient(180deg, rgba(0,0,0,0.85), rgba(0,0,0,0.2));
+      pointer-events: none;
+      z-index: 0;
+    }
+    .card {
+      position: relative;
+      padding: 24px;
+      border-radius: 20px;
+      background: rgba(8, 14, 24, 0.92);
+      border: 1px solid rgba(88, 168, 255, 0.35);
+      box-shadow: 0 18px 45px rgba(12, 24, 44, 0.45);
+      display: grid;
+      gap: 14px;
+      z-index: 1;
+    }
+    .card h3 { margin: 0; letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.82rem; color: #58a8ff; }
+    .card strong { font-size: 1.4rem; }
+    .meta { display: flex; gap: 16px; font-size: 0.8rem; color: rgba(245, 247, 255, 0.62); }
+    .traits { display: grid; gap: 6px; font-size: 0.82rem; }
+    .traits span { display: inline-flex; align-items: center; gap: 8px; }
+    .traits span::before { content: "✦"; color: #58a8ff; font-size: 0.7rem; }
   </style>
 </head>
 <body>
-  <div class="board">
-    <section class="highlight">
-      <h1>Mosaic Blocks</h1>
-      <p>Combine rarity text, imagery, and controls with a split hero + grid canvas.</p>
-    </section>
-    <section class="tiles">
-      <div class="tile"><span>Legendary</span><strong>Frog #12</strong>Score 986</div>
-      <div class="tile"><span>Epic</span><strong>Frog #77</strong>Score 842</div>
-      <div class="tile"><span>Rare</span><strong>Frog #404</strong>Score 720</div>
-    </section>
-  </div>
+  <header>
+    <h1>Constellation Grid</h1>
+    <p>Stars connect frogs in a celestial lattice. Each card can plot rarity data like coordinates in the night sky.</p>
+  </header>
+  <section class="grid">
+    <article class="card">
+      <h3>Sector A-01</h3>
+      <strong>Frog #404</strong>
+      <div class="meta"><span>Score 131.4</span><span>Owner 0xAB...10</span></div>
+      <div class="traits">
+        <span>Starlit Pond</span>
+        <span>Lumina Eyes</span>
+        <span>Nebula Cloak</span>
+      </div>
+    </article>
+    <article class="card">
+      <h3>Sector A-02</h3>
+      <strong>Frog #618</strong>
+      <div class="meta"><span>Score 126.1</span><span>Owner 0xDE...77</span></div>
+      <div class="traits">
+        <span>Cosmic Spots</span>
+        <span>Oracle Staff</span>
+        <span>Orbit Crown</span>
+      </div>
+    </article>
+    <article class="card">
+      <h3>Sector A-03</h3>
+      <strong>Frog #792</strong>
+      <div class="meta"><span>Score 119.3</span><span>Owner 0x9F...C2</span></div>
+      <div class="traits">
+        <span>Deep Space</span>
+        <span>Prism Tongue</span>
+        <span>Tail Comet</span>
+      </div>
+    </article>
+  </section>
 </body>
 </html>

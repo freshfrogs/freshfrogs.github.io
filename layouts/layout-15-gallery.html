@@ -2,22 +2,98 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Layout 15 – Gallery Wall</title>
+  <title>Layout 15 – Gallery Rail</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body{margin:0;background:#14110f;color:#f1ede1;font-family:'Libre Baskerville',serif;padding:64px;}
-    .wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:30px;max-width:1080px;margin:0 auto;}
-    .frame{border:12px solid #b99470;border-radius:18px;background:#1f1b18;box-shadow:0 26px 48px rgba(0,0,0,.5);padding:16px;text-align:center;}
-    .frame h3{margin:16px 0 0;font-size:18px;letter-spacing:.08em;text-transform:uppercase;}
-    .frame span{display:block;margin-top:6px;font-size:13px;color:#e8d7c2;}
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Manrope", system-ui, sans-serif;
+      background: #101417;
+      color: #f5f9fc;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+    }
+    aside {
+      background: #0b0e10;
+      padding: 48px 32px;
+      display: grid;
+      gap: 24px;
+      border-right: 1px solid rgba(245, 249, 252, 0.08);
+    }
+    aside h1 { margin: 0; font-size: 1.8rem; }
+    aside p { margin: 0; color: rgba(245, 249, 252, 0.65); }
+    main {
+      padding: 48px clamp(24px, 6vw, 120px);
+      display: grid;
+      gap: 32px;
+    }
+    .rail {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(280px, 320px);
+      gap: 24px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      scroll-snap-type: x mandatory;
+    }
+    .rail::-webkit-scrollbar { height: 10px; }
+    .rail::-webkit-scrollbar-thumb { background: rgba(245, 249, 252, 0.2); border-radius: 999px; }
+    .card {
+      scroll-snap-align: start;
+      background: linear-gradient(140deg, rgba(46, 184, 255, 0.18), rgba(245, 249, 252, 0.06));
+      border-radius: 26px;
+      padding: 24px;
+      display: grid;
+      gap: 12px;
+      border: 1px solid rgba(245, 249, 252, 0.12);
+    }
+    .card h2 { margin: 0; font-size: 1.3rem; }
+    .card span { font-size: 0.9rem; color: rgba(245, 249, 252, 0.7); }
+    .card ul { margin: 0; padding-left: 18px; line-height: 1.6; font-size: 0.85rem; }
   </style>
 </head>
 <body>
-  <section class="wall">
-    <article class="frame"><div style="height:140px;background:#fbbf24;"></div><h3>Frog #11</h3><span>Legendary</span></article>
-    <article class="frame"><div style="height:140px;background:#60a5fa;"></div><h3>Frog #84</h3><span>Epic</span></article>
-    <article class="frame"><div style="height:140px;background:#f472b6;"></div><h3>Frog #230</h3><span>Rare</span></article>
-    <article class="frame"><div style="height:140px;background:#34d399;"></div><h3>Frog #377</h3><span>Uncommon</span></article>
-  </section>
+  <aside>
+    <h1>Gallery Rail</h1>
+    <p>Horizontal scroll of frog cards, perfect for featured rarity picks.</p>
+  </aside>
+  <main>
+    <section class="rail">
+      <article class="card">
+        <h2>Frog #023</h2>
+        <span>Rarity 140.9 · Staked 88d</span>
+        <ul>
+          <li>Frostbite Skin</li>
+          <li>Aurora Helm</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h2>Frog #094</h2>
+        <span>Rarity 132.5 · Owned by 0x71...DD</span>
+        <ul>
+          <li>Glacier Aura</li>
+          <li>Shard Cape</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h2>Frog #138</h2>
+        <span>Rarity 128.1</span>
+        <ul>
+          <li>Polar Glow</li>
+          <li>Starlit Tongue</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h2>Frog #176</h2>
+        <span>Rarity 122.9</span>
+        <ul>
+          <li>Ice Bloom</li>
+          <li>Winter Wrap</li>
+        </ul>
+      </article>
+    </section>
+  </main>
 </body>
 </html>
