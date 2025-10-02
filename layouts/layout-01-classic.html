@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Layout 01 – Capsule Gallery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070a12;
+      --accent: #4ad8ff;
+      --accent-soft: rgba(74, 216, 255, 0.16);
+      --card-bg: rgba(19, 26, 43, 0.92);
+      --text: #f4f8ff;
+      --muted: #90a4c6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+      background: radial-gradient(circle at top, rgba(74, 216, 255, 0.12), transparent 55%), var(--bg);
+      color: var(--text);
+      padding: 56px 6vw;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+    header { text-align: center; }
+    header h1 { font-size: clamp(2rem, 4vw, 3.4rem); letter-spacing: 0.08em; margin-bottom: 12px; text-transform: uppercase; }
+    header p { margin: 0; color: var(--muted); }
+    .grid {
+      display: grid;
+      gap: 26px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+    .card {
+      position: relative;
+      padding: 24px;
+      border-radius: 28px;
+      background: var(--card-bg);
+      border: 1px solid rgba(74, 216, 255, 0.28);
+      box-shadow: 0 28px 68px rgba(4, 12, 28, 0.55);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(74, 216, 255, 0.72), transparent 45%, rgba(255, 255, 255, 0.2));
+      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      mask-composite: exclude;
+      pointer-events: none;
+      opacity: 0.4;
+    }
+    .badge {
+      align-self: flex-start;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .title { font-size: 1.4rem; margin: 0; font-weight: 600; }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 18px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .pill {
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(74, 216, 255, 0.12);
+      border: 1px solid rgba(74, 216, 255, 0.24);
+      color: var(--text);
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Capsule Gallery</h1>
+    <p>Futuristic capsules presenting each frog as an artifact.</p>
+  </header>
+  <section class="grid">
+    <article class="card">
+      <span class="badge">Prototype</span>
+      <h2 class="title">Frog #0001</h2>
+      <div class="stat-grid">
+        <div>Rarity Score</div><div>123.45</div>
+        <div>Owner</div><div>0xAB...1234</div>
+        <div>Status</div><div>Staked</div>
+        <div>Level</div><div>37</div>
+      </div>
+      <div class="pill-row">
+        <span class="pill">Emerald Skin</span>
+        <span class="pill">Cyber Eyes</span>
+        <span class="pill">Holo Crown</span>
+      </div>
+    </article>
+    <article class="card">
+      <span class="badge">Prototype</span>
+      <h2 class="title">Frog #0002</h2>
+      <div class="stat-grid">
+        <div>Rarity Score</div><div>118.02</div>
+        <div>Owner</div><div>0xCD...5678</div>
+        <div>Status</div><div>Owned</div>
+        <div>Level</div><div>22</div>
+      </div>
+      <div class="pill-row">
+        <span class="pill">Mystic Aura</span>
+        <span class="pill">Silver Tongue</span>
+        <span class="pill">Lotus Drift</span>
+      </div>
+    </article>
+  </section>
+</body>
+</html>
