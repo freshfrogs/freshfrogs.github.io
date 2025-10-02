@@ -15,6 +15,7 @@
   const ROOT = String(CFG.SOURCE_PATH || '').replace(/\/+$/,'');
   const DISALLOW_HOVER = new Set(['Trait','Frog','SpecialFrog']);
   const DISALLOW_ANIM  = new Set(['Frog','Hat']);
+  const ENABLE_ANIMATIONS = false;
 
   function metaURL(id){ return `${ROOT}/frog/json/${id}.json`; }
   function basePNG(id){ return `${ROOT}/frog/${id}.png`; }
@@ -192,17 +193,19 @@
     const attrs = attrsInOrder(meta);
     if (!attrs.length) throw new Error('no attributes');
 
-    const animFlags = await Promise.all(attrs.map(a => {
-      if (!a || DISALLOW_ANIM.has(a.key)) return Promise.resolve(false);
-      return hasAnimation(a.key, a.value).catch(() => false);
-    }));
+    const animFlags = ENABLE_ANIMATIONS
+      ? await Promise.all(attrs.map(a => {
+          if (!a || DISALLOW_ANIM.has(a.key)) return Promise.resolve(false);
+          return hasAnimation(a.key, a.value).catch(() => false);
+        }))
+      : attrs.map(() => false);
 
     // Render each layer exactly in metadata order, swapping to animations when available
     for (let i=0;i<attrs.length;i++){
       const a = attrs[i];
       if (!a) continue;
       const lift = !!hoverKey && a.key === hoverKey && !DISALLOW_HOVER.has(a.key);
-      if (animFlags[i] && !DISALLOW_ANIM.has(a.key)){
+      if (ENABLE_ANIMATIONS && animFlags[i] && !DISALLOW_ANIM.has(a.key)){
         addAnim(host, layerGIF(a.key, a.value), lift);
       } else {
         addLayer(host, layerPNG(a.key, a.value), lift);
