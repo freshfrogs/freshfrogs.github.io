@@ -3,49 +3,449 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fresh Frogs — Deck Layout</title>
-  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <title>Fresh Frogs — Deck Fan-Out</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
-    body{ background:#040404; color:#f5f5f5; font-family:var(--font-ui); }
-    .wrap{ padding:60px 6vw; }
-    .title{ text-transform:uppercase; letter-spacing:.4em; font-size:13px; color:#777; }
-    h1{ margin:8px 0 40px; font:900 52px/1 var(--font-display); }
-    .deck{ position:relative; height:420px; }
-    .card{ position:absolute; top:0; width:320px; height:420px; padding:24px; border-radius:24px; background:#111; border:1px solid rgba(255,255,255,.08); display:grid; gap:16px; box-shadow:0 30px 80px rgba(0,0,0,.45); }
-    .card:nth-child(1){ left:0; transform:rotate(-6deg); }
-    .card:nth-child(2){ left:180px; transform:rotate(-2deg); }
-    .card:nth-child(3){ left:360px; transform:rotate(4deg); }
-    .card img{ width:100%; border-radius:18px; background:#1c1c1c; }
-    .card h2{ margin:0; font-size:22px; font-weight:800; }
-    .card p{ margin:0; font-size:14px; color:#aaa; }
-    .card footer{ font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:#6df4a7; }
-    @media (max-width:1100px){ .deck{ height:auto; display:grid; gap:20px; } .card{ position:static; transform:none; width:auto; height:auto; } }
+    :root{
+      color-scheme: dark;
+      --bg: #03050a;
+      --panel: rgba(12, 17, 28, 0.9);
+      --accent: #6df4a7;
+      --border: rgba(255, 255, 255, 0.14);
+      --muted: rgba(255, 255, 255, 0.6);
+      --font-display: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    *{ box-sizing: border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      background: radial-gradient(circle at top, rgba(32, 122, 189, 0.2), transparent 60%), var(--bg);
+      color:#f5f8ff;
+      font-family: var(--font-display);
+      display:flex;
+      align-items:stretch;
+      justify-content:center;
+      padding:48px 24px 64px;
+    }
+
+    main.wrap{
+      width:min(1180px, 100%);
+      display:grid;
+      gap:36px;
+    }
+
+    .hero{ text-align:center; display:grid; gap:12px; }
+    .hero .eyebrow{
+      margin:0;
+      text-transform:uppercase;
+      letter-spacing:0.35em;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .hero h1{ margin:0; font-weight:700; font-size:44px; letter-spacing:-0.02em; }
+    .hero p{ margin:0 auto; max-width:720px; color:var(--muted); font-size:16px; line-height:1.5; }
+
+    section.panel{
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding:32px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 30px 80px rgba(5, 10, 18, 0.55);
+      display:grid;
+      gap:24px;
+    }
+
+    .panel-head{
+      display:flex;
+      flex-wrap:wrap;
+      gap:16px;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    .panel-head h2{ margin:0; font-size:20px; letter-spacing:0.08em; text-transform:uppercase; }
+
+    .controls{ display:flex; gap:10px; align-items:center; }
+    .controls button{
+      border:1px solid var(--border);
+      background:rgba(18, 29, 40, 0.85);
+      color:#f5f8ff;
+      font:600 13px/1 var(--font-display);
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+      padding:12px 18px;
+      border-radius:999px;
+      cursor:pointer;
+      transition:background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+    .controls button:hover:not(:disabled){
+      background:rgba(33, 53, 78, 0.9);
+      transform:translateY(-2px);
+    }
+    .controls button:disabled{
+      opacity:0.45;
+      cursor:not-allowed;
+    }
+
+    #deckStatus{ font-size:14px; color:var(--muted); min-height:18px; }
+
+    .deck{
+      position:relative;
+      min-height:520px;
+      perspective:1800px;
+    }
+
+    .card{
+      position:absolute;
+      top:0;
+      left:50%;
+      width:340px;
+      max-width:75vw;
+      background:rgba(8, 13, 22, 0.92);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:24px;
+      padding:26px;
+      display:grid;
+      gap:18px;
+      transform-origin:center 120%;
+      box-shadow:0 35px 70px rgba(3,6,12,0.55);
+      transition:transform 0.45s ease, filter 0.45s ease, opacity 0.45s ease;
+      opacity:0.94;
+    }
+
+    .card[data-focus="true"]{
+      filter: drop-shadow(0 35px 90px rgba(54, 236, 162, 0.45));
+      opacity:1;
+    }
+
+    .card figure{
+      margin:0;
+      width:100%;
+      height:220px;
+      border-radius:18px;
+      background:radial-gradient(circle at top, rgba(127, 255, 212, 0.24), rgba(10, 18, 28, 0.6));
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+    }
+
+    .card img{
+      width:90%;
+      height:90%;
+      object-fit:contain;
+      image-rendering:pixelated;
+    }
+
+    .meta{
+      display:grid;
+      gap:10px;
+    }
+
+    .rank-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:0.12em;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(109, 244, 167, 0.4);
+      color:var(--accent);
+      background:rgba(61, 199, 140, 0.08);
+      width:max-content;
+    }
+
+    .meta h3{
+      margin:0;
+      font-size:24px;
+      font-weight:700;
+      letter-spacing:-0.01em;
+    }
+
+    .meta p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    .traits{ list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+    .traits li{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      font-size:13px;
+      color:var(--muted);
+    }
+    .traits span.key{ font-weight:600; color:#f5f8ff; text-transform:uppercase; font-size:12px; letter-spacing:0.08em; }
+
+    @media (max-width: 1100px){
+      .deck{ min-height: auto; display:grid; gap:18px; }
+      .card{
+        position:relative;
+        left:0;
+        transform:none !important;
+        max-width:100%;
+        margin:0 auto;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .card{ transition:none; }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="title">Fresh Frogs concept deck</div>
-    <h1>Layered Trading Card Fan-Out</h1>
-    <div class="deck">
-      <article class="card">
-        <img src="../frog/45.png" alt="Frog 45" />
-        <h2>Frog #45 — Neon Cipher</h2>
-        <p>A luminous cipher frog with holographic glyph overlays and a midnight mist backdrop.</p>
-        <footer>Mint slot: 1</footer>
-      </article>
-      <article class="card">
-        <img src="../frog/888.png" alt="Frog 888" />
-        <h2>Frog #888 — Crystal Tide</h2>
-        <p>Shimmering crystalline frog poised in a prismatic stream. Perfect for collectors chasing gleam.</p>
-        <footer>Mint slot: 2</footer>
-      </article>
-      <article class="card">
-        <img src="../frog/1024.png" alt="Frog 1024" />
-        <h2>Frog #1024 — Arcane Shade</h2>
-        <p>Shadow-cloaked frog with arcane runes, ideal for a dramatic landing page hero moment.</p>
-        <footer>Mint slot: 3</footer>
-      </article>
-    </div>
-  </div>
+  <main class="wrap">
+    <header class="hero">
+      <p class="eyebrow">Fresh Frogs layout exploration</p>
+      <h1>Deck Fan-Out</h1>
+      <p>Sample how a handful of top-ranked frogs feel when presented like a premium trading card spread. Cycle through the collection to browse fresh combinations.</p>
+    </header>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Featured Frogs</h2>
+        <div class="controls">
+          <button type="button" id="prevBtn" disabled>&larr; Previous</button>
+          <button type="button" id="nextBtn">Next &rarr;</button>
+        </div>
+      </div>
+      <div id="deckStatus">Loading frogs…</div>
+      <div class="deck" id="deck" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <script src="../assets/js/config.js"></script>
+  <script>
+    (function(){
+      'use strict';
+
+      var CFG = window.FF_CFG || {};
+      var root = '';
+      if (CFG && CFG.SOURCE_PATH) {
+        root = String(CFG.SOURCE_PATH).replace(/\/+$/, '');
+      }
+
+      function fullPath(rel){
+        rel = String(rel || '');
+        if (/^https?:/i.test(rel)) return rel;
+        if (root) return root + '/' + rel.replace(/^\/+/, '');
+        return '../' + rel.replace(/^\/+/, '');
+      }
+
+      var ranksPath = fullPath(CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json');
+      var deckEl = document.getElementById('deck');
+      var statusEl = document.getElementById('deckStatus');
+      var prevBtn = document.getElementById('prevBtn');
+      var nextBtn = document.getElementById('nextBtn');
+
+      var frogs = [];
+      var metaCache = Object.create(null);
+      var pageSize = 5;
+      var cursor = 0;
+
+      function offsetForIndex(i){
+        if (i === 0) return 0;
+        var step = Math.ceil(i / 2);
+        return (i % 2 === 1) ? step : -step;
+      }
+
+      function frogImg(id){
+        return fullPath('frog/' + id + '.png');
+      }
+
+      function frogJSON(id){
+        return fullPath('frog/json/' + id + '.json');
+      }
+
+      function normalizeRanks(raw){
+        var list = [];
+        var i, item, id, rank;
+        if (Array.isArray(raw)) {
+          for (i = 0; i < raw.length; i++) {
+            item = raw[i] || {};
+            id = Number(item.id || item.tokenId || item.token_id);
+            rank = Number(item.ranking != null ? item.ranking : item.rank);
+            if (isFinite(id) && isFinite(rank)) {
+              list.push({ id: id, ranking: rank });
+            }
+          }
+        } else if (raw && typeof raw === 'object') {
+          for (var key in raw) {
+            if (!Object.prototype.hasOwnProperty.call(raw, key)) continue;
+            item = raw[key] || {};
+            id = Number(item.id || key);
+            rank = Number(item.ranking != null ? item.ranking : item.rank);
+            if (isFinite(id) && isFinite(rank)) {
+              list.push({ id: id, ranking: rank });
+            }
+          }
+        }
+        list.sort(function(a, b){ return a.ranking - b.ranking; });
+        if (list.length > 60) list = list.slice(0, 60);
+        return list;
+      }
+
+      function ensureMeta(id){
+        if (metaCache[id]) return Promise.resolve(metaCache[id]);
+        return fetch(frogJSON(id)).then(function(resp){
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          return resp.json();
+        }).then(function(data){
+          metaCache[id] = data;
+          return data;
+        }).catch(function(err){
+          console.warn('Failed to fetch metadata for frog', id, err);
+          metaCache[id] = null;
+          return null;
+        });
+      }
+
+      function renderDeck(slice, startIndex){
+        deckEl.innerHTML = '';
+        if (!slice.length){
+          statusEl.textContent = 'No frogs available.';
+          return;
+        }
+
+        var fragment = document.createDocumentFragment();
+        var spread = 120;
+        var tilt = 6;
+
+        slice.forEach(function(entry, index){
+          var meta = metaCache[entry.id] || {};
+          var name = meta.name || ('Frog #' + entry.id);
+          var desc = meta.description || 'Fresh Frog #' + entry.id + ' from the on-chain pond.';
+          var traits = Array.isArray(meta.attributes) ? meta.attributes.slice(0, 4) : [];
+
+          var card = document.createElement('article');
+          card.className = 'card';
+          card.setAttribute('data-id', entry.id);
+
+          var offset = offsetForIndex(index);
+          var translate = 'translateX(' + (offset * spread) + 'px) rotate(' + (offset * tilt) + 'deg)';
+          card.style.transform = translate;
+          card.style.zIndex = String(100 - Math.abs(offset));
+          if (offset === 0) card.setAttribute('data-focus', 'true');
+
+          var fig = document.createElement('figure');
+          fig.className = 'art';
+          var img = document.createElement('img');
+          img.src = frogImg(entry.id);
+          img.alt = name;
+          fig.appendChild(img);
+
+          var metaBox = document.createElement('div');
+          metaBox.className = 'meta';
+
+          var pill = document.createElement('div');
+          pill.className = 'rank-pill';
+          pill.textContent = 'Rank #' + entry.ranking;
+          metaBox.appendChild(pill);
+
+          var title = document.createElement('h3');
+          title.textContent = name;
+          metaBox.appendChild(title);
+
+          var copy = document.createElement('p');
+          copy.textContent = desc;
+          metaBox.appendChild(copy);
+
+          if (traits.length){
+            var list = document.createElement('ul');
+            list.className = 'traits';
+            traits.forEach(function(attr){
+              if (!attr) return;
+              var key = attr.key || attr.trait_type || attr.traitType || attr.type || '';
+              var val = attr.value != null ? attr.value : attr.trait_value;
+              if (!key || val == null) return;
+              var li = document.createElement('li');
+              var keySpan = document.createElement('span');
+              keySpan.className = 'key';
+              keySpan.textContent = String(key);
+              var valSpan = document.createElement('span');
+              valSpan.textContent = String(val);
+              li.appendChild(keySpan);
+              li.appendChild(valSpan);
+              list.appendChild(li);
+            });
+            if (list.childNodes.length){
+              metaBox.appendChild(list);
+            }
+          }
+
+          card.appendChild(fig);
+          card.appendChild(metaBox);
+          fragment.appendChild(card);
+        });
+
+        deckEl.appendChild(fragment);
+        var start = startIndex + 1;
+        var end = startIndex + slice.length;
+        statusEl.textContent = 'Showing frogs ' + start + '–' + end + ' of ' + frogs.length + ' top-ranked frogs';
+      }
+
+      function updateButtons(){
+        prevBtn.disabled = cursor <= 0;
+        nextBtn.disabled = (cursor + pageSize) >= frogs.length;
+      }
+
+      function showSlice(){
+        if (!frogs.length){
+          statusEl.textContent = 'No frogs available.';
+          deckEl.innerHTML = '';
+          prevBtn.disabled = true;
+          nextBtn.disabled = true;
+          return;
+        }
+        if (cursor >= frogs.length) cursor = Math.max(0, frogs.length - pageSize);
+        var slice = frogs.slice(cursor, cursor + pageSize);
+        var startIndex = cursor;
+        var endIndex = Math.min(cursor + slice.length, frogs.length);
+        statusEl.textContent = 'Loading frogs ' + (startIndex + 1) + '–' + endIndex + '…';
+        Promise.all(slice.map(function(entry){ return ensureMeta(entry.id); })).then(function(){
+          renderDeck(slice, startIndex);
+          updateButtons();
+        });
+      }
+
+      function loadRanks(){
+        statusEl.textContent = 'Fetching rankings…';
+        fetch(ranksPath).then(function(resp){
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          return resp.json();
+        }).then(function(data){
+          frogs = normalizeRanks(data);
+          cursor = 0;
+          showSlice();
+        }).catch(function(err){
+          console.error('Unable to load rankings', err);
+          statusEl.textContent = 'Failed to load frogs. Please try again later.';
+          prevBtn.disabled = true;
+          nextBtn.disabled = true;
+        });
+      }
+
+      prevBtn.addEventListener('click', function(){
+        if (cursor <= 0) return;
+        cursor = Math.max(0, cursor - pageSize);
+        showSlice();
+      });
+
+      nextBtn.addEventListener('click', function(){
+        if ((cursor + pageSize) >= frogs.length) return;
+        cursor = cursor + pageSize;
+        showSlice();
+      });
+
+      loadRanks();
+    })();
+  </script>
 </body>
 </html>
