@@ -1,149 +1,131 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="t1">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fresh Frogs — Terminal</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <title>freshfrogs — Terminal</title>
+
+  <link rel="stylesheet" href="assets/css/styles.css" />
+
   <style>
-    :root{
-      color-scheme: dark;
-      --bg:#010304;
-      --panel:#021b11;
-      --border:#0f5030;
-      --text:#92ffcf;
-      --accent:#47ff9c;
-      --alert:#ffed7a;
-      --error:#ff7a7a;
-      --mono:'JetBrains Mono', SFMono-Regular, Menlo, Consolas, monospace;
-    }
+    .term-wrap{ padding:24px; display:grid; gap:20px; }
+    .term-header{ display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:space-between; gap:16px; }
+    .term-header h1{ margin:0; font:900 28px/1.1 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; }
+    .term-header p{ margin:6px 0 0; max-width:60ch; color:var(--muted); }
+    .wallet-chip{ border:1px solid var(--border); border-radius:10px; padding:6px 12px; font-family:var(--font-ui); font-size:12px; display:inline-flex; align-items:center; gap:8px; }
 
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      min-height:100vh;
-      background:radial-gradient(circle at 20% 15%, rgba(57, 255, 182, 0.16), transparent 55%), var(--bg);
-      font-family:var(--mono);
-      display:grid;
-      place-items:center;
-      padding:48px 16px 64px;
-      color:var(--text);
-    }
+    .term-main{ display:grid; gap:20px; grid-template-columns: minmax(240px,280px) minmax(0,1fr); align-items:start; }
+    @media (max-width:960px){ .term-main{ grid-template-columns: 1fr; } }
 
-    .terminal{
-      width:min(960px, 100%);
-      border:2px solid var(--border);
-      border-radius:22px;
-      box-shadow:0 40px 90px rgba(11, 80, 50, 0.45);
-      background:linear-gradient(135deg, rgba(2, 27, 17, 0.95), rgba(2, 12, 10, 0.9));
-      overflow:hidden;
-      display:grid;
-      grid-template-rows:auto 1fr auto;
-    }
+    .term-panel{ border:1px solid var(--border); border-radius:12px; background:var(--panel); padding:16px; display:grid; gap:16px; }
+    .term-panel h2{ margin:0; font-size:16px; font-weight:800; }
 
-    header{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      padding:16px 20px;
-      border-bottom:2px solid var(--border);
-      background:rgba(4, 32, 22, 0.85);
-    }
+    .cmd-groups{ display:grid; gap:16px; }
+    .cmd-group{ display:grid; gap:8px; }
+    .cmd-group .group-title{ font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+    .cmd-button{ font-family:var(--font-ui); border:1px solid var(--border); background:transparent; color:inherit; border-radius:10px; padding:10px 12px; text-align:left; font-weight:700; font-size:13px; display:flex; justify-content:space-between; align-items:center; transition: background .15s, border-color .15s, color .15s; }
+    .cmd-button span{ font-weight:500; font-size:12px; color:var(--muted); }
+    .cmd-button:hover{ background:color-mix(in srgb,#22c55e 18%, var(--panel)); border-color:color-mix(in srgb,#22c55e 80%, var(--border)); color:color-mix(in srgb,#ffffff 85%, #22c55e); }
+    .cmd-button[disabled]{ opacity:.45; pointer-events:none; }
 
-    header span.dot{
-      width:12px; height:12px; border-radius:50%; background:var(--accent); opacity:0.6;
-    }
+    .term-content{ display:grid; gap:20px; }
+    .cards-panel, .console-panel{ border:1px solid var(--border); border-radius:12px; background:var(--panel); }
+    .cards-head, .console-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px; border-bottom:1px solid var(--border); }
+    .cards-head h3, .console-head h3{ margin:0; font-size:16px; font-weight:800; }
+    .cards-body{ padding:16px; }
+    #terminalCards{ min-height:160px; }
+    .cards-empty{ color:var(--muted); font-size:13px; }
 
-    header h1{ margin:0; font-size:16px; letter-spacing:0.12em; text-transform:uppercase; }
+    .console-body{ display:grid; gap:12px; padding:16px; }
+    #terminalOutput{ margin:0; max-height:280px; overflow:auto; border:1px solid var(--border); border-radius:10px; padding:12px; background:color-mix(in srgb, var(--panel) 85%, transparent); font:12px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; }
+    #terminalOutput strong{ color:#22c55e; }
+    .console-form{ display:flex; gap:10px; }
+    .console-input{ flex:1; border:1px solid var(--border); border-radius:10px; background:transparent; color:inherit; padding:10px 12px; font:500 13px/1 var(--font-ui); }
+    .console-run{ font-family:var(--font-ui); border:1px solid var(--border); background:transparent; color:inherit; border-radius:10px; padding:10px 16px; font-weight:700; }
+    .console-run:hover{ background:color-mix(in srgb,#22c55e 18%, var(--panel)); border-color:color-mix(in srgb,#22c55e 80%, var(--border)); color:color-mix(in srgb,#ffffff 85%, #22c55e); }
 
-    pre{
-      margin:0;
-      padding:24px 26px 18px;
-      font-size:14px;
-      line-height:1.6;
-      white-space:pre-wrap;
-      overflow-y:auto;
-      max-height:520px;
-    }
-
-    pre strong{ color:var(--accent); }
-    pre em{ color:var(--alert); font-style:normal; }
-    pre .error{ color:var(--error); }
-
-    form{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      padding:16px 20px 20px;
-      border-top:2px solid var(--border);
-      background:rgba(3, 22, 16, 0.8);
-    }
-
-    label{ font-size:12px; letter-spacing:0.2em; text-transform:uppercase; color:rgba(146,255,207,0.65); }
-
-    input[type="text"]{
-      flex:1;
-      background:rgba(0,0,0,0.35);
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:12px 16px;
-      color:var(--text);
-      font:600 14px/1 var(--mono);
-    }
-
-    input[type="text"]::placeholder{ color:rgba(146,255,207,0.45); }
-
-    button{
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:12px 18px;
-      font:600 13px/1 var(--mono);
-      text-transform:uppercase;
-      letter-spacing:0.12em;
-      background:rgba(4, 42, 26, 0.8);
-      color:var(--accent);
-      cursor:pointer;
-      transition:background 0.2s ease, transform 0.2s ease;
-    }
-
-    button:disabled{ opacity:0.6; cursor:not-allowed; }
-
-    button:hover:not(:disabled){ background:rgba(11, 78, 46, 0.8); transform:translateY(-1px); }
-
-    @media (max-width:720px){
-      pre{ max-height:400px; font-size:13px; }
-      form{ flex-direction:column; align-items:stretch; }
-      label{ align-self:flex-start; }
-      button{ width:100%; }
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      button{ transition:none; }
-    }
+    .tag-pill{ display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); }
   </style>
 </head>
 <body>
-  <div class="terminal">
-    <header>
-      <span class="dot"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
-      <h1>freshfrogs://terminal</h1>
+  <div class="term-wrap container">
+    <header class="term-header">
+      <div>
+        <h1>Fresh Frogs Terminal</h1>
+        <p>Run staking actions, inspect rarity, and manage your frogs directly from the collector console. Click a shortcut or type a command below.</p>
+      </div>
+      <div style="display:grid; gap:10px; justify-items:end;">
+        <div id="terminalWallet" class="wallet-chip" style="display:none;"></div>
+        <button id="terminalConnect" class="cmd-button" style="justify-content:center;">Connect Wallet</button>
+      </div>
     </header>
-    <pre id="terminalOutput" aria-live="polite"></pre>
-    <form id="terminalForm" autocomplete="off">
-      <label for="command">Command</label>
-      <input id="command" type="text" name="command" placeholder="Try: list 5  | show 404  | help" spellcheck="false" />
-      <button type="submit">Run</button>
-    </form>
+
+    <main class="term-main">
+      <aside class="term-panel">
+        <h2>Quick Commands</h2>
+        <div class="cmd-groups">
+          <div class="cmd-group">
+            <div class="group-title">Browse</div>
+            <button class="cmd-button" data-command="list" data-args="5">Next 5 by rarity<span>list 5</span></button>
+            <button class="cmd-button" data-command="list" data-args="20">Next 20 by rarity<span>list 20</span></button>
+            <button class="cmd-button" data-command="reset">Reset rarity cursor<span>reset</span></button>
+            <button class="cmd-button" data-command="show" data-prompt="Enter a frog ID" data-prompt-name="id">Inspect frog<span>show &lt;id&gt;</span></button>
+          </div>
+          <div class="cmd-group">
+            <div class="group-title">My Wallet</div>
+            <button class="cmd-button" data-command="owned" data-requires-wallet="1">My frogs<span>owned</span></button>
+            <button class="cmd-button" data-command="staked" data-requires-wallet="1">My staked frogs<span>staked</span></button>
+            <button class="cmd-button" data-command="status" data-requires-wallet="1">Wallet status<span>status</span></button>
+            <button class="cmd-button" data-command="rewards" data-requires-wallet="1">Rewards summary<span>rewards</span></button>
+          </div>
+          <div class="cmd-group">
+            <div class="group-title">Actions</div>
+            <button class="cmd-button" data-command="approve" data-requires-wallet="1">Approve staking<span>approve</span></button>
+            <button class="cmd-button" data-command="stake" data-requires-wallet="1" data-prompt="Stake which frog?" data-prompt-name="id">Stake frog<span>stake &lt;id&gt;</span></button>
+            <button class="cmd-button" data-command="unstake" data-requires-wallet="1" data-prompt="Unstake which frog?" data-prompt-name="id">Unstake frog<span>unstake &lt;id&gt;</span></button>
+            <button class="cmd-button" data-command="transfer" data-requires-wallet="1" data-prompt="Transfer which frog?" data-prompt-name="id" data-prompt2="Recipient address" data-prompt2-name="address">Transfer frog<span>transfer &lt;id&gt; &lt;addr&gt;</span></button>
+            <button class="cmd-button" data-command="claim" data-requires-wallet="1">Claim rewards<span>claim</span></button>
+          </div>
+        </div>
+      </aside>
+
+      <section class="term-content">
+        <div class="cards-panel">
+          <div class="cards-head">
+            <h3 id="cardsTitle">Latest results</h3>
+            <div class="tag-pill" id="cardsTag" style="display:none;"></div>
+          </div>
+          <div class="cards-body">
+            <div id="terminalCards" class="frog-cards"></div>
+            <div id="terminalCardsEmpty" class="cards-empty" style="display:none;">Run a command to preview frogs here.</div>
+          </div>
+        </div>
+
+        <div class="console-panel">
+          <div class="console-head">
+            <h3>Terminal log</h3>
+            <button class="cmd-button" data-command="clear" style="max-width:140px; justify-content:center;">Clear log</button>
+          </div>
+          <div class="console-body">
+            <pre id="terminalOutput" aria-live="polite">freshfrogs terminal online. type `help` to explore commands.
+</pre>
+            <form id="terminalForm" class="console-form" autocomplete="off">
+              <input id="command" class="console-input" type="text" placeholder="Type a command and press Enter…" autocomplete="off" />
+              <button class="console-run" type="submit">Run</button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.4/dist/web3.min.js"></script>
   <script src="assets/js/config.js"></script>
   <script src="assets/js/utils.js"></script>
   <script src="assets/js/api-frogs.js"></script>
+  <script src="assets/js/rarity.js"></script>
+  <script src="assets/js/frog-renderer.js"></script>
+  <script src="assets/js/frog-cards.js"></script>
   <script src="assets/abi/collection_abi.js"></script>
   <script src="assets/abi/controller_abi.js"></script>
   <script src="assets/js/staking-adapter.js"></script>
