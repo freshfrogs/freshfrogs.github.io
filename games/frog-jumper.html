@@ -4,52 +4,56 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>FreshFrogs — Frog Jumper</title>
+
+  <!-- Reuse your site styles -->
   <link rel="stylesheet" href="../assets/css/styles.css" />
+
   <style>
     .stage { display:flex; gap:16px; align-items:flex-start; }
     .side { width:320px; }
-    canvas { image-rendering: pixelated; border:1px solid #333; width:720px; height:360px; }
-    .btn { padding:.6rem 1rem; border:1px solid var(--border); background:var(--panel); cursor:pointer; }
-    .btn:hover { filter:brightness(1.2); }
-    .stat { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    canvas { image-rendering: pixelated; border:1px solid var(--border, #333); width:720px; height:360px; }
+    .btn { padding:.6rem 1rem; border:1px solid var(--border, #333); background:var(--panel, #0e1116); cursor:pointer; width:100%; }
+    .btn:hover { filter:brightness(1.15); }
+    .stat { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.95rem; }
+    .muted { opacity:.8 }
+    .row { display:flex; gap:8px; align-items:center; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
   </style>
 </head>
 <body>
   <div class="pg-wrap container">
-    <section class="frog-hero"><h1 class="frog-title">Frog Jumper</h1></section>
+    <section class="frog-hero">
+      <h1 class="frog-title">Frog Jumper</h1>
+      <p class="muted mono">Pick a Frog you own and jump over obstacles. Space / ↑ to jump.</p>
+    </section>
 
     <div class="stage">
       <div class="side">
         <button id="connectBtn" class="btn">Connect Wallet</button>
-        <div id="addr" class="stat"></div>
+        <div id="addr" class="stat" style="margin:.5rem 0 1rem;"></div>
 
         <h3>Your Frogs</h3>
-        <select id="frogSelect" class="btn" style="width:100%"></select>
+        <select id="frogSelect" class="btn"></select>
         <div id="frogPreview" style="margin-top:8px"></div>
 
         <h3>Controls</h3>
-        <p class="stat">Space / Up = Jump · Double-jump if allowed</p>
-        <button id="startBtn" class="btn" style="width:100%">Start Game</button>
+        <p class="stat">Space / Up = Jump · Some traits unlock double-jump</p>
+        <div class="row">
+          <button id="startBtn" class="btn">Start Game</button>
+        </div>
 
         <h3>Scores</h3>
         <div class="stat">Best (local): <span id="bestScore">0</span></div>
         <div class="stat">Last: <span id="lastScore">0</span></div>
+
+        <div id="msg" class="stat muted" style="margin-top:12px;"></div>
       </div>
 
       <canvas id="game" width="240" height="120"></canvas>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.11.1/dist/ethers.min.js"></script>
-  <script>
-    // Basic config you likely already have
-    const FROG_BASE = '../frog'; // pngs + json live here, e.g., frog/json/{id}.json
-    const COLLECTION_ADDRESS = '0xYOUR_FROG_ERC721';
-    const ABI_ENUMERABLE = [
-      "function balanceOf(address) view returns (uint256)",
-      "function tokenOfOwnerByIndex(address,uint256) view returns (uint256)"
-    ];
-  </script>
-  <script src="../assets/js/frog-jumper.js"></script>
+  <!-- IMPORTANT: load our game as a module so ethers is imported ESM and avoids SES globals -->
+  <script type="module" src="../assets/js/frog-jumper.js"></script>
 </body>
 </html>
