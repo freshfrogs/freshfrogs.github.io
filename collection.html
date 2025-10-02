@@ -1,237 +1,198 @@
 <!doctype html>
-<html lang="en" data-theme="t1">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>freshfrogs — Collection</title>
+  <title>Fresh Frogs — Collection dashboard</title>
 
   <link rel="stylesheet" href="assets/css/styles.css" />
-
-  <style>
-    /* Base */
-    .pg-wrap{ padding:20px; }
-    img{ image-rendering: pixelated; image-rendering: crisp-edges; }
-
-    .pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
-    .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
-    .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
-    .pg-muted{ color:var(--muted); font-size:13px; }
-
-    .list{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
-    .row{ display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:center; padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
-    .thumb64{ width:64px; height:64px; min-width:64px; min-height:64px; border-radius:10px; object-fit:contain; background:var(--panel-2); }
-
-    /* Two-column page layout */
-    .page-grid{
-      display:grid; gap:16px; grid-template-columns: 1.2fr 0.8fr;
-      align-items:start; max-width:1100px; margin:0 auto;
-    }
-    @media (max-width:960px){ .page-grid{ grid-template-columns: 1fr; } }
-
-    /* Hero (centered) */
-    .frog-hero{ margin:28px auto 38px; max-width:1100px; }
-    .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
-    .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
-    .frog-strip .tile{ flex:0 0 auto; width:64px; height:64px; border-radius:10px; }
-    .frog-strip .tile.hide{ display:none !important; }
-    .frog-strip img{ width:64px; height:64px; object-fit:contain; }
-    @media (max-width:520px){ .frog-hero{ margin:22px auto 30px; } .frog-strip{ gap:10px; } }
-
-    /* Info blocks */
-    .info-grid-2{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:10px; margin-bottom:10px; }
-    @media (max-width:900px){ .info-grid-2{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
-    @media (max-width:520px){ .info-grid-2{ grid-template-columns: 1fr; } }
-    .info-block{ border:1px solid var(--border); border-radius:12px; padding:10px; background:var(--panel); }
-    .info-block .ik{ font-size:11px; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; }
-    .info-block .iv{ font-weight:900; font-size:18px; line-height:1.1; margin-top:4px; }
-    .info-block .in{ font-size:12px; color:var(--muted); }
-
-    /* Scrollable list (Recent Stakes) */
-    #recentStakes.scrolling{ overflow-y:auto; -webkit-overflow-scrolling:touch; padding-right:4px; }
-    #recentStakes .row{ cursor:pointer; }
-    @media (hover:hover){
-      #recentStakes.scrolling::-webkit-scrollbar{ width:8px; }
-      #recentStakes.scrolling::-webkit-scrollbar-thumb{
-        background: color-mix(in srgb, var(--muted) 35%, transparent);
-        border-radius:8px;
-      }
-    }
-
-    /* Cards (Owned Frogs) */
-    #ownedCard .grid-cards{ display:grid; gap:10px; grid-template-columns: 1fr; }
-    .frog-card{
-      border:1px solid var(--border);
-      background: var(--panel);
-      border-radius:14px;
-      padding:12px;
-      display:grid; grid-template-columns:auto 1fr; column-gap:12px; row-gap:6px; align-items:start;
-      color:inherit;
-    }
-    .frog-card .thumb{
-      width:128px;height:128px;border-radius:12px;background:var(--panel-2);object-fit:contain;grid-row: span 3;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 6px 12px rgba(0,0,0,.25);
-    }
-    .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
-    .pill{ display:inline-block; padding:3px 10px; border-radius:999px; background: color-mix(in srgb, var(--panel) 85%, transparent); border:1px solid var(--border); font-size:12px; }
-    .meta{ color:var(--muted); font-size:12px; }
-    .actions{ grid-column:1 / -1; display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
-    .btn{
-      font-family: var(--font-ui);
-      border:1px solid var(--border);
-      background:transparent;
-      color:inherit;
-      border-radius:8px;
-      padding:6px 10px;
-      font-weight:700;
-      font-size:12px;
-      line-height:1;
-      display:inline-flex; align-items:center; gap:6px;
-      text-decoration:none; letter-spacing:.01em;
-      transition: background .15s ease, border-color .15s ease, color .15s ease, transform .05s ease;
-    }
-    .btn:active{ transform: translateY(1px); }
-    .btn-outline-gray{ border-color: color-mix(in srgb, #9ca3af 70%, var(--border)); color: color-mix(in srgb, #ffffff 65%, #9ca3af); }
-    #ownedCard .actions .btn:hover{
-      background: color-mix(in srgb, #22c55e 14%, var(--panel));
-      border-color: color-mix(in srgb, #22c55e 80%, var(--border));
-      color: color-mix(in srgb, #ffffff 85%, #22c55e);
-    }
-    /* Let long addresses wrap instead of hard-truncating on desktop */
-    #recentStakes .pg-muted { 
-      white-space: normal;
-      word-break: break-all;   /* allows 0x… addresses to wrap cleanly */
-    }
-    .kpi{display:inline-grid;gap:4px;margin:8px 12px 0 0}
-    .kpi-label{font-size:.9rem;color:var(--muted,#97a0b2)}
-    .kpi-value{font-weight:700}
-
-  </style>
 </head>
-<body>
-  <div class="pg-wrap container">
-    <!-- HERO -->
-    <section class="frog-hero">
-      <h1 class="frog-title">freshfrogs.github.io</h1>
-      <div class="frog-strip">
-        <div class="tile"><img src="frog/12.png"  alt="12"></div>
-        <div class="tile"><img src="frog/77.png"  alt="77"></div>
-        <div class="tile"><img src="frog/404.png" alt="404"></div>
-        <div class="tile"><img src="frog/256.png" alt="256"></div>
-        <div class="tile"><img src="frog/999.png" alt="999"></div>
-        <div class="tile"><img src="frog/1.png"   alt="1"></div>
+<body class="ff-body">
+  <div class="ff-site">
+    <header class="ff-masthead">
+      <div class="ff-container ff-masthead__inner">
+        <a class="ff-logo" href="index.html"><span>🐸</span>Fresh Frogs</a>
+        <nav class="ff-nav" aria-label="Primary">
+          <a href="collection.html" aria-current="page">Collection</a>
+          <a href="rarity.html">Rarity</a>
+          <a href="pond.html">Pond</a>
+          <a href="mutate.html">Mutate</a>
+        </nav>
+        <a class="ff-button ff-button--ghost" href="rarity.html">Compare rarity</a>
       </div>
-    </section>
-    <div id="ffTopbarMount"></div>
+    </header>
 
-    <!-- GRID -->
-    <div class="page-grid">
-
-      <!-- Left: The Pond (activity + KPIs) -->
-      <section class="pg-card">
-        <div class="pg-card-head"><h3>The Pond</h3></div>
-          <p class="pg-muted" style="margin:6px 0 12px 0; max-width:70ch;">
-            Live view of staking activity in the FreshFrogs pond — track total staked, the controller contract, and FLYZ rewards.
-          </p>
-
-        <!-- KPIs -->
-        <div class="info-grid-2" style="margin-bottom:10px;">
-          <!-- 1) Total Frogs Staked (emoji changed) -->
-          <div class="info-block">
-            <div class="ik">🌿 Total Frogs Staked</div>
-            <div class="iv" id="stakedTotal">—</div>
-            <div class="in">Across the collection</div>
-          </div>
-
-          <!-- 2) Controller (unchanged) -->
-          <div class="info-block">
-            <div class="ik">🧰 Controller</div>
-            <div class="iv">
-              <a id="stakedController" href="#" target="_blank" rel="noopener">—</a>
+    <main class="ff-main">
+      <section class="ff-page-hero">
+        <div class="ff-container ff-page-hero__inner">
+          <div>
+            <span class="ff-eyebrow">Dashboard</span>
+            <h1 class="ff-page-hero__title">Command center for your frogs</h1>
+            <p class="ff-page-hero__lead">
+              Track staking rewards, view ownership status, and manage every frog in your wallet from a single responsive hub.
+              The dashboard mirrors live blockchain data so you always act on the latest state.
+            </p>
+            <div class="ff-page-hero__meta">
+              <span class="ff-pill">4,040 total supply</span>
+              <span class="ff-pill">Stake to earn $FLYZ</span>
+              <span class="ff-pill">Controller <span class="addr">0x7dfb…f1b2</span></span>
             </div>
-            <div class="in">Staking contract</div>
           </div>
-
-          <!-- 3) Rewards with emoji + link to FLYZ -->
-          <div class="info-block">
-            <div class="ik">🪙 Rewards</div>
-            <div class="iv">
-              <a id="pondRewardsLink" href="https://etherscan.io/token/0xd71d2f57819ae4be6924a36591ec6c164e087e63" target="_blank" rel="noopener">
-                <span id="pondRewardsSymbol">$FLYZ</span>
-              </a>
+          <div class="ff-hero__media">
+            <div class="ff-card-stack">
+              <div class="ff-card-stack__layer" data-layer="1">
+                <img data-dashboard-frog="1" src="frog/11.png" alt="Frog 11" />
+                <p class="ff-card-stack__label">Manage staking, transfers, and approvals with layered card controls.</p>
+              </div>
+              <div class="ff-card-stack__layer" data-layer="2">
+                <img data-dashboard-frog="2" src="frog/256.png" alt="Frog 256" />
+              </div>
+              <div class="ff-card-stack__layer" data-layer="3">
+                <img data-dashboard-frog="3" src="frog/999.png" alt="Frog 999" />
+              </div>
             </div>
-            <div class="in">Earnings token</div>
           </div>
-
         </div>
-
-        <!-- Recent Stakes (scrollable) -->
-        <ul id="recentStakes" class="list" aria-live="polite" data-visible="6">
-          <li class="row"><div class="pg-muted">Loading recent stakes…</div></li>
-        </ul>
       </section>
 
-      <!-- Right: My Frogs (header + cards) -->
-      <section id="ownedCard" class="pg-card">
-        <div class="pg-card-head">
-          <h3>Dashboard</h3>
-          <div id="ownedWalletAddr" class="dash-addr" style="display:none;"></div>
-        </div>
+      <div class="ff-container" id="ffTopbarMount"></div>
 
-        <!-- Header for KPIs is injected by owned-panel.js; remove old info squares -->
+      <section class="ff-page-content">
+        <div class="ff-container">
+          <div class="ff-page-grid">
+            <div class="ff-main-panel">
+              <section class="ff-panel" aria-labelledby="pondOverviewTitle">
+                <div>
+                  <h2 id="pondOverviewTitle">The pond at a glance</h2>
+                  <p class="muted">Live staking metrics and controller details pulled directly from the Fresh Frogs contracts.</p>
+                </div>
+                <dl class="ff-stat-bar">
+                  <div class="ff-stat"><dt>Total frogs staked</dt><dd id="stakedTotal">—</dd></div>
+                  <div class="ff-stat"><dt>Controller</dt><dd><a id="stakedController" href="#" target="_blank" rel="noopener">—</a></dd></div>
+                  <div class="ff-stat"><dt>Rewards token</dt><dd><a id="pondRewardsLink" href="#" target="_blank" rel="noopener"><span id="pondRewardsSymbol">$FLYZ</span></a></dd></div>
+                  <div class="ff-stat"><dt>Latest activity</dt><dd id="pondLatest">Updating…</dd></div>
+                </dl>
+                <ul id="recentStakes" class="ff-feed" aria-live="polite" data-visible="5">
+                  <li class="row"><div class="pg-muted">Loading recent stakes…</div></li>
+                </ul>
+              </section>
 
-        <div class="grid-cards" id="ownedGrid">
-          <div class="pg-muted">Connect your wallet to view owned frogs.</div>
+              <section id="ownedCard" class="ff-panel" aria-labelledby="ownedPanelTitle">
+                <div class="ff-toolbar">
+                  <div class="ff-toolbar__group">
+                    <h2 id="ownedPanelTitle" style="margin:0;">Your frogs</h2>
+                    <p class="muted" style="margin:0; max-width:32ch;">Connect your wallet to fetch owned tokens, staking status, and claimable rewards.</p>
+                  </div>
+                  <button id="ownedConnectBtn" class="ff-button ff-button--solid">Connect wallet</button>
+                </div>
+                <div class="ff-grid" id="ownedGrid">
+                  <div class="ff-empty">Connect your wallet to view owned frogs.</div>
+                </div>
+                <div class="ff-toolbar" style="justify-content:center; display:none;" id="ownedMore">Loading more…</div>
+              </section>
+            </div>
+
+            <aside class="ff-side-panel">
+              <section class="ff-panel" aria-labelledby="activityTitle">
+                <div>
+                  <h2 id="activityTitle">Activity highlights</h2>
+                  <p class="muted">Quick links to staking guides, contract addresses, and support resources.</p>
+                </div>
+                <ul class="ff-list-compact">
+                  <li>
+                    <strong>Need help staking?</strong>
+                    <span class="meta">Review the step-by-step staking walkthrough from the docs.</span>
+                  </li>
+                  <li>
+                    <strong>Controller contract</strong>
+                    <span class="meta"><a id="controllerLink" href="#" target="_blank" rel="noopener">View on Etherscan</a></span>
+                  </li>
+                  <li>
+                    <strong>Reward token</strong>
+                    <span class="meta"><a href="https://etherscan.io/token/0xd71d2f57819ae4be6924a36591ec6c164e087e63" target="_blank" rel="noopener">$FLYZ contract</a></span>
+                  </li>
+                </ul>
+              </section>
+            </aside>
+          </div>
         </div>
-        <div class="pg-muted" id="ownedMore" style="margin-top:8px; text-align:center; display:none;">Loading more…</div>
       </section>
+    </main>
 
-    </div>
+    <footer class="ff-footer">
+      <div class="ff-container ff-footer__inner">
+        <span>© Fresh Frogs</span>
+        <span>Stake, claim rewards, and evolve your collection.</span>
+      </div>
+    </footer>
   </div>
 
   <script>
-    /* Hero strip: keep whole 64px tiles only */
-    function layoutFrogStrip(){
-      var strip = document.querySelector('.frog-strip'); if(!strip) return;
-      var tiles = Array.prototype.slice.call(strip.querySelectorAll('.tile'));
-      var styles = window.getComputedStyle(strip);
-      var gap = parseFloat(styles.gap || 12) || 12;
-      var tileW = 64, innerW = strip.clientWidth;
-      var count = Math.max(1, Math.floor((innerW + gap) / (tileW + gap)));
-      tiles.forEach(function(t,i){ t.classList.toggle('hide', i >= count); });
-    }
-    window.addEventListener('resize', layoutFrogStrip);
-    document.addEventListener('DOMContentLoaded', layoutFrogStrip);
+    (function(){
+      const CFG = window.FF_CFG || {};
+      const TOTAL = Number(CFG.TOTAL_SUPPLY || 4040);
+      const ROOT  = String(CFG.SOURCE_PATH || '').replace(/\/+$/,'');
+      function pick(n,max){
+        const pool = Array.from({length:max}, (_,i)=> i+1);
+        for(let i=pool.length-1;i>0;i--){
+          const j=Math.floor(Math.random()*(i+1));
+          const tmp=pool[i]; pool[i]=pool[j]; pool[j]=tmp;
+        }
+        return pool.slice(0,n);
+      }
+      function randomize(){
+        const imgs = Array.from(document.querySelectorAll('[data-dashboard-frog]'));
+        if(!imgs.length) return;
+        const ids = pick(imgs.length, TOTAL);
+        imgs.forEach(function(img, idx){
+          const id = ids[idx];
+          img.src = ROOT + '/frog/' + id + '.png';
+          img.alt = 'Frog ' + id;
+        });
+      }
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', randomize); else randomize();
+    })();
   </script>
 
-<!-- Config & shared helpers -->
-<script src="https://cdn.jsdelivr.net/npm/web3@1.10.4/dist/web3.min.js"></script>
-<script src="assets/js/config.js"></script>
-<script src="assets/js/utils.js"></script>
-<script src="assets/js/rarity.js"></script>
-<script src="assets/js/modal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.4/dist/web3.min.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/rarity.js"></script>
+  <script src="assets/js/modal.js"></script>
+  <script src="assets/abi/collection_abi.js"></script>
+  <script src="assets/abi/controller_abi.js"></script>
+  <script src="assets/js/pond.js"></script>
+  <script src="assets/js/wallet-state.js"></script>
+  <script src="assets/js/wallet.js"></script>
+  <script src="assets/js/staking-adapter.js"></script>
+  <script src="assets/js/pond-kpis.js"></script>
+  <script src="assets/js/topbar.js"></script>
+  <script src="assets/js/frog-renderer.js"></script>
+  <script src="assets/js/frog-cards.js" defer></script>
+  <script src="assets/js/stakes-feed.js"></script>
+  <script src="assets/js/pond-tweaks.js"></script>
+  <script src="assets/js/owned-panel.js"></script>
+  <script src="assets/js/frog-thumbs.js"></script>
 
-<!-- ABIs must come from /assets/abi -->
-<script src="assets/abi/collection_abi.js"></script>
-<script src="assets/abi/controller_abi.js"></script>
+  <script>
+    if (window.FF_loadRecentStakes) FF_loadRecentStakes();
+    if (window.FF_initOwnedPanel)   FF_initOwnedPanel();
+  </script>
 
-<!-- Panels / features (all from /assets/js) -->
-<script src="assets/js/pond.js"></script>
-<script src="assets/js/wallet-state.js"></script>
-<script src="assets/js/wallet.js"></script>
-<script src="assets/js/staking-adapter.js"></script>  <!-- ✅ correct path -->
-<script src="assets/js/pond-kpis.js"></script>
-<script src="assets/js/topbar.js"></script>
-<script src="assets/js/frog-renderer.js"></script>
-<script src="assets/js/frog-cards.js" defer></script>
-<script src="assets/js/stakes-feed.js"></script>
-<script src="assets/js/pond-tweaks.js"></script>
-<script src="assets/js/owned-panel.js"></script>
-<script src="assets/js/frog-thumbs.js"></script>
-
-<script>
-  if (window.FF_loadRecentStakes) FF_loadRecentStakes();
-  if (window.FF_initOwnedPanel)   FF_initOwnedPanel();
-</script>
-
+  <script>
+    (function(){
+      const cfg = window.FF_CFG || {};
+      const addr = (cfg.CONTROLLER_ADDRESS || '').trim();
+      const link = document.getElementById('controllerLink');
+      if (!link || !addr) return;
+      const chain = Number(cfg.CHAIN_ID || 1);
+      let base = 'https://etherscan.io/address/';
+      if (chain === 11155111) base = 'https://sepolia.etherscan.io/address/';
+      else if (chain === 5) base = 'https://goerli.etherscan.io/address/';
+      link.href = base + addr;
+      link.textContent = addr.slice(0,6) + '…' + addr.slice(-4);
+      link.setAttribute('data-addr', addr);
+    })();
+  </script>
 </body>
 </html>
