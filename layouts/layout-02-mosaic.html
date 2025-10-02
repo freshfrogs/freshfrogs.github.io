@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fresh Frogs — Mosaic Layout</title>
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <style>
+    body{ background:linear-gradient(160deg,#08131f,#031820); color:#f3f8ff; font-family:var(--font-ui); }
+    .nav{ display:flex; justify-content:space-between; align-items:center; padding:24px 8vw; text-transform:uppercase; letter-spacing:.08em; font-size:12px; }
+    .nav a{ color:inherit; text-decoration:none; }
+    .stage{ display:grid; grid-template-columns:2fr 1fr; gap:32px; align-items:start; padding:0 8vw 8vw; }
+    .hero{ background:rgba(6,30,44,.65); border:1px solid rgba(255,255,255,.12); border-radius:28px; padding:40px; display:grid; gap:28px; backdrop-filter:blur(16px); }
+    .hero h1{ font:900 48px/1.05 var(--font-display); margin:0; }
+    .hero p{ margin:0; max-width:48ch; color:rgba(243,248,255,.75); font-size:15px; }
+    .hero .cta{ display:flex; gap:16px; }
+    .hero .cta button{ padding:12px 24px; border-radius:999px; border:none; font-weight:700; cursor:pointer; }
+    .hero .cta button:first-child{ background:#45d0ff; color:#021725; }
+    .hero .cta button:last-child{ background:transparent; color:#45d0ff; border:1px solid currentColor; }
+    .mosaic{ display:grid; gap:20px; grid-template-columns:repeat(2, minmax(0,1fr)); }
+    .tile{ position:relative; overflow:hidden; border-radius:22px; background:#112636; min-height:180px; }
+    .tile img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.35; }
+    .tile h2{ position:absolute; bottom:18px; left:18px; margin:0; font:800 20px/1.1 var(--font-display); }
+    @media (max-width:960px){ .stage{ grid-template-columns:1fr; } .mosaic{ grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); } }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <span>Fresh Frogs</span>
+    <div class="links"><a href="#">Collection</a> · <a href="#">Stake</a> · <a href="#">Pond</a></div>
+  </nav>
+
+  <div class="stage">
+    <section class="hero">
+      <h1>Mosaic Universe</h1>
+      <p>Layered hero with accent actions and a glassmorphism wrapper. Showcases a highlight reel of rare frogs alongside quick actions.</p>
+      <div class="cta">
+        <button type="button">Explore Frogs</button>
+        <button type="button">View Pond</button>
+      </div>
+    </section>
+
+    <aside class="mosaic">
+      <div class="tile"><img src="../frog/12.png" alt="Frog" /><h2>Mint Window</h2></div>
+      <div class="tile"><img src="../frog/204.png" alt="Frog" /><h2>Live Trades</h2></div>
+      <div class="tile"><img src="../frog/301.png" alt="Frog" /><h2>Top Stakers</h2></div>
+      <div class="tile"><img src="../frog/88.png" alt="Frog" /><h2>Featured Trait</h2></div>
+    </aside>
+  </div>
+</body>
+</html>

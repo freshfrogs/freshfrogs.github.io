@@ -1,129 +1,136 @@
 <!doctype html>
-<html lang="en" data-theme="atlas" data-card-layout="classic">
+<html lang="en" data-theme="t1">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fresh Frogs — Staking pond</title>
+  <title>Fresh Frogs — Staking Pond</title>
 
   <link rel="stylesheet" href="assets/css/styles.css" />
+
+  <style>
+    .pg-wrap{ padding:20px; }
+    img{ image-rendering: pixelated; image-rendering: crisp-edges; }
+    .pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
+    .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
+    .pg-muted{ color:var(--muted); font-size:13px; }
+
+    :root{ --panel-width: 1100px; }
+    .center-wrap{ display:grid; gap:16px; justify-items:center; }
+    .centered-card{ width: min(var(--panel-width), 100%); }
+
+    .frog-hero{ margin:28px auto 10px; width: min(var(--panel-width), 100%); }
+    .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
+    .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
+    .frog-strip .tile{ flex:0 0 auto; width:64px; height:64px; border-radius:10px; }
+    .frog-strip img{ width:64px; height:64px; object-fit:contain; }
+    .frog-strip .tile.hide{ display:none !important; }
+
+    .controls{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:12px 0 16px; }
+    .controls .btn{ padding:8px 14px; font-size:13px; }
+    .controls .search{ display:flex; gap:8px; align-items:center; }
+    .controls input{ width:160px; padding:8px 10px; border-radius:10px; border:1px solid var(--border); background:transparent; color:inherit; font-family:var(--font-ui); }
+    .controls input:focus{ outline:none; box-shadow:var(--focus); }
+    .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+
+    #rarityGrid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:12px; }
+    #rarityGrid .pg-muted{ padding:8px; }
+    #btnMore{ margin:20px auto 0; display:block; }
+  </style>
 </head>
-<body class="ff-body">
-  <div class="ff-site">
-    <header class="ff-masthead">
-      <div class="ff-container ff-masthead__inner">
-        <a class="ff-logo" href="index.html"><span>🐸</span>Fresh Frogs</a>
-        <nav class="ff-nav" aria-label="Primary">
-          <a href="collection.html">Collection</a>
-          <a href="rarity.html">Rarity</a>
-          <a href="pond.html" aria-current="page">Pond</a>
-          <a href="mutate.html">Mutate</a>
-        </nav>
-        <a class="ff-button ff-button--ghost" href="collection.html">Manage frogs</a>
-      </div>
-    </header>
-
-    <main class="ff-main">
-      <section class="ff-page-hero">
-        <div class="ff-container ff-page-hero__inner">
-          <div>
-            <span class="ff-eyebrow">Staking overview</span>
-            <h1 class="ff-page-hero__title">Every frog currently relaxing in the pond</h1>
-            <p class="ff-page-hero__lead">
-              Filter the roster of staked frogs, sort by rarity rank or staking duration, and inspect layered artwork without
-              leaving the dashboard.
-            </p>
-            <div class="ff-page-hero__meta">
-              <span class="ff-pill">Live staking feed</span>
-              <span class="ff-pill">Controller-powered ownership</span>
-              <span class="ff-pill">Metadata-true layering</span>
-            </div>
-          </div>
-          <div class="ff-hero__media">
-            <div class="ff-card-stack">
-              <div class="ff-card-stack__layer" data-layer="1">
-                <img data-pond-frog="1" src="frog/210.png" alt="Frog 210" />
-                <p class="ff-card-stack__label">Track staking age with animated progress bars and accurate owner labels.</p>
-              </div>
-              <div class="ff-card-stack__layer" data-layer="2">
-                <img data-pond-frog="2" src="frog/415.png" alt="Frog 415" />
-              </div>
-              <div class="ff-card-stack__layer" data-layer="3">
-                <img data-pond-frog="3" src="frog/37.png" alt="Frog 37" />
-              </div>
-            </div>
-          </div>
+<body>
+  <div class="pg-wrap container">
+    <div class="center-wrap">
+      <section class="frog-hero">
+        <h1 class="frog-title">Staking Pond</h1>
+        <p class="pg-muted" style="text-align:center; max-width:70ch; margin:8px auto 16px;">
+          Browse every frog currently soaking in the pond. Sort by rarity rank or how long they have been staked,
+          then jump straight to any token ID for a closer look.
+        </p>
+        <div class="frog-strip">
+          <div class="tile"><img src="frog/12.png"  alt="12"></div>
+          <div class="tile"><img src="frog/88.png"  alt="88"></div>
+          <div class="tile"><img src="frog/415.png" alt="415"></div>
+          <div class="tile"><img src="frog/777.png" alt="777"></div>
+          <div class="tile"><img src="frog/256.png" alt="256"></div>
+          <div class="tile"><img src="frog/999.png" alt="999"></div>
         </div>
       </section>
+    </div>
 
-      <div class="ff-container" id="ffTopbarMount"></div>
-
-      <section class="ff-page-content">
-        <div class="ff-container">
-          <section class="ff-panel" aria-labelledby="pondControls">
-            <div class="ff-toolbar">
-              <div class="ff-toolbar__group">
-                <h2 id="pondControls" style="margin:0;">Currently staked frogs</h2>
-                <p class="muted" style="margin:0; max-width:36ch;">Sort the roster and jump directly to any frog ID to view its staking details.</p>
-              </div>
-              <div class="ff-toolbar__group">
-                <button id="btnSortRank" class="ff-button">Sort: Rank ↑</button>
-                <button id="btnSortScore" class="ff-button">Sort: Time ↑</button>
-              </div>
-            </div>
-
-            <div class="ff-toolbar" style="margin-top:18px;">
-              <div class="ff-toolbar__group">
-                <label class="sr-only" for="raritySearchId">Find frog ID</label>
-                <input id="raritySearchId" class="ff-input" type="number" min="1" placeholder="Find frog ID…" />
-                <button id="btnGo" class="ff-button ff-button--solid">Go</button>
-              </div>
-            </div>
-
-            <div id="rarityGrid" class="ff-grid-cards">
-              <div class="pg-muted">Loading staked frogs…</div>
-            </div>
-
-            <div class="ff-toolbar" style="justify-content:center; margin-top:28px;">
-              <button id="btnMore" class="ff-button ff-button--ghost" style="display:none;">Load more</button>
-            </div>
-          </section>
-        </div>
-      </section>
-    </main>
-
-    <footer class="ff-footer">
-      <div class="ff-container ff-footer__inner">
-        <span>© Fresh Frogs</span>
-        <span>Keep an eye on the staking pond.</span>
+    <section class="pg-card centered-card" id="pondListWrap">
+      <div class="pg-card-head">
+        <h3>Currently staked frogs</h3>
+        <div class="pg-muted" id="pondCount">Loading…</div>
       </div>
-    </footer>
+
+      <div class="controls">
+        <button id="btnSortRank" class="btn btn-ghost btn-sm">Sort: Rank ↑</button>
+        <button id="btnSortScore" class="btn btn-ghost btn-sm">Sort: Time ↑</button>
+        <div class="search">
+          <label class="sr-only" for="raritySearchId">Find frog ID</label>
+          <input id="raritySearchId" type="number" min="1" placeholder="Find frog ID…" />
+          <button id="btnGo" class="btn btn-solid btn-sm">Go</button>
+        </div>
+        <button id="btnThemeCycle" class="btn btn-ghost btn-sm" style="margin-left:auto;">Theme: Classic</button>
+      </div>
+
+      <div id="rarityGrid">
+        <div class="pg-muted">Loading pond…</div>
+      </div>
+
+      <button id="btnMore" class="btn btn-outline btn-sm" style="display:none;">Load more</button>
+    </section>
   </div>
 
   <script>
     (function(){
-      const CFG = window.FF_CFG || {};
-      const TOTAL = Number(CFG.TOTAL_SUPPLY || 4040);
-      const ROOT  = String(CFG.SOURCE_PATH || '').replace(/\/+$/,'');
-      function shuffle(n,max){
-        const pool = Array.from({length:max}, (_,i)=> i+1);
-        for(let i=pool.length-1;i>0;i--){
-          const j=Math.floor(Math.random()*(i+1));
-          const t=pool[i]; pool[i]=pool[j]; pool[j]=t;
+      var CFG = window.FF_CFG || {};
+      var ROOT = String(CFG.SOURCE_PATH || '').replace(/\/+$/,'');
+      var TOTAL = Number(CFG.TOTAL_SUPPLY || 4040);
+      function shuffle(count, max){
+        var pool = [];
+        for (var i=1;i<=max;i++) pool.push(i);
+        for (var j=pool.length-1;j>0;j--){
+          var k = Math.floor(Math.random()*(j+1));
+          var t = pool[j]; pool[j]=pool[k]; pool[k]=t;
         }
-        return pool.slice(0,n);
+        return pool.slice(0,count);
       }
-      function randomize(){
-        const imgs = Array.from(document.querySelectorAll('[data-pond-frog]'));
+      function randomizeStrip(){
+        var strip = document.querySelector('.frog-strip'); if(!strip) return;
+        var imgs = Array.prototype.slice.call(strip.querySelectorAll('img'));
         if(!imgs.length) return;
-        const ids = shuffle(imgs.length, TOTAL);
+        var ids = shuffle(imgs.length, TOTAL);
         imgs.forEach(function(img, idx){
-          const id = ids[idx];
+          var id = ids[idx];
           img.src = ROOT + '/frog/' + id + '.png';
           img.alt = 'Frog ' + id;
         });
+        layoutStrip();
       }
-      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', randomize); else randomize();
+      function layoutStrip(){
+        var strip = document.querySelector('.frog-strip'); if(!strip) return;
+        var tiles = Array.prototype.slice.call(strip.querySelectorAll('.tile'));
+        var gap = parseFloat(getComputedStyle(strip).gap || 12) || 12;
+        var tileW = 64;
+        var inner = strip.clientWidth;
+        var count = Math.max(1, Math.floor((inner + gap) / (tileW + gap)));
+        tiles.forEach(function(tile, i){ tile.classList.toggle('hide', i >= count); });
+      }
+      window.addEventListener('resize', layoutStrip);
+      if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', randomizeStrip);
+      else randomizeStrip();
     })();
+  </script>
+
+  <script>
+    window.FF_RARITY_PAGE_CONFIG = {
+      stakedOnly: true,
+      defaultSortMode: 'rank',
+      secondSortMode: 'time',
+      autoLoadMin: 9
+    };
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.4/dist/web3.min.js"></script>
@@ -137,14 +144,22 @@
   <script src="assets/js/frog-renderer.js"></script>
   <script src="assets/js/frog-cards.js" defer></script>
   <script src="assets/js/topbar.js"></script>
-  <script>
-    window.FF_RARITY_PAGE_CONFIG = {
-      stakedOnly: true,
-      defaultSortMode: 'rank',
-      secondSortMode: 'time',
-      autoLoadMin: 9
-    };
-  </script>
   <script src="assets/js/rarity-page.js"></script>
+  <script>
+    (function(){
+      var grid = document.getElementById('rarityGrid');
+      var countEl = document.getElementById('pondCount');
+      if(!grid || !countEl) return;
+      function update(){
+        var cards = grid.querySelectorAll('.frog-card');
+        if(cards.length){
+          countEl.textContent = cards.length + ' frogs loaded';
+        }
+      }
+      var obs = new MutationObserver(function(){ update(); });
+      obs.observe(grid, { childList:true, subtree:true });
+      update();
+    })();
+  </script>
 </body>
 </html>
