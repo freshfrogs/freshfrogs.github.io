@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Layout 12 – Gridlines Blueprint</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{margin:0;background:#0b1826 url('https://dummyimage.com/600x600/0b1826/102a43&text=Grid');color:#c7e0ff;font-family:'Roboto Mono',monospace;padding:64px;}
+    .blueprint{max-width:960px;margin:0 auto;border:2px solid #3b82f6;border-radius:18px;padding:36px;background:rgba(11,24,38,.85);box-shadow:0 30px 50px rgba(0,0,0,.5);}
+    h1{margin:0 0 20px;font-size:32px;text-transform:uppercase;letter-spacing:.32em;color:#60a5fa;}
+    .rows{display:grid;gap:16px;}
+    .row{display:grid;grid-template-columns:120px 1fr 120px;gap:20px;align-items:center;padding:16px;border:1px dashed rgba(96,165,250,.5);border-radius:12px;background:rgba(14,42,66,.6);}
+    .row span{display:block;}
+    .row strong{font-size:20px;color:#fefefe;}
+  </style>
+</head>
+<body>
+  <div class="blueprint">
+    <h1>Blueprint Gridlines</h1>
+    <div class="rows">
+      <div class="row"><span>#012</span><strong>Legendary Builder</strong><span>Score 992</span></div>
+      <div class="row"><span>#144</span><strong>Epic Engineer</strong><span>Score 875</span></div>
+      <div class="row"><span>#377</span><strong>Rare Architect</strong><span>Score 744</span></div>
+    </div>
+  </div>
+</body>
+</html>

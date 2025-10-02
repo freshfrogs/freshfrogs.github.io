@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Layout 09 – Parallax Stacks</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{margin:0;background:#020202;color:#f0f0f0;font-family:'Manrope',sans-serif;perspective:1200px;height:100vh;display:flex;align-items:center;justify-content:center;}
+    .stack{position:relative;width:860px;height:480px;}
+    .layer{position:absolute;inset:0;border-radius:28px;padding:40px;display:grid;place-items:center;}
+    .layer:nth-child(1){background:linear-gradient(135deg,#22d3ee,#6366f1);transform:rotateY(-14deg) translateZ(-60px);}
+    .layer:nth-child(2){background:linear-gradient(135deg,#0ea5e9,#6366f1);transform:rotateY(-6deg) translateZ(-20px);box-shadow:0 35px 60px rgba(99,102,241,.4);}
+    .layer:nth-child(3){background:rgba(17,24,39,.92);transform:rotateY(0deg);box-shadow:0 40px 80px rgba(15,23,42,.6);}
+    h1{margin:0;font-size:42px;text-align:center;}
+    p{margin:18px 0 0;text-align:center;font-size:16px;max-width:420px;color:rgba(226,232,240,.82);}
+  </style>
+</head>
+<body>
+  <div class="stack">
+    <div class="layer"></div>
+    <div class="layer"></div>
+    <div class="layer">
+      <div>
+        <h1>Parallax Stacks</h1>
+        <p>Imagine card data floating across multiple depth planes with layered imagery.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

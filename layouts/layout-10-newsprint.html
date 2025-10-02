@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Layout 10 – Newsprint Digest</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{margin:0;background:#fdf8ef;color:#2b2116;font-family:'IBM Plex Serif',serif;padding:50px;}
+    header{text-align:center;margin-bottom:40px;border-bottom:2px solid #2b2116;padding-bottom:16px;}
+    header h1{margin:0;font-size:46px;letter-spacing:.12em;text-transform:uppercase;}
+    .columns{display:grid;grid-template-columns:2fr 1fr;gap:36px;}
+    article{background:#fff;border:1px solid #2b2116;padding:24px;box-shadow:12px 12px 0 rgba(43,33,22,.18);} 
+    article h2{margin:0;font-size:24px;text-transform:uppercase;}
+    article p{margin:12px 0 0;line-height:1.7;font-size:15px;}
+    aside{display:grid;gap:24px;}
+    .ticker{background:#2b2116;color:#fdf8ef;padding:16px;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:13px;letter-spacing:.2em;text-transform:uppercase;}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Fresh Frogs Daily</h1>
+    <p>Preview of rarity insights laid out like a vintage newspaper.</p>
+  </header>
+  <div class="columns">
+    <article>
+      <h2>Legendary Spotlight</h2>
+      <p>Frog #21 leaps to the top with a rarity score of 998. Owners weigh staking options.</p>
+    </article>
+    <aside>
+      <div class="ticker">Staked Frogs • 120 • Avg Level 6</div>
+      <div class="ticker">New Listings • 14 • Floor 0.42Ξ</div>
+    </aside>
+  </div>
+</body>
+</html>

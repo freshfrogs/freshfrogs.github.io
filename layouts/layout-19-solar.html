@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Layout 19 – Solar Orbit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{margin:0;background:#02040a;color:#fefefe;font-family:'Exo 2',sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+    .orbit{position:relative;width:680px;height:680px;border:1px dashed rgba(255,255,255,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+    .orbit::before{content:"";position:absolute;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,#fcd34d,#f59e0b);box-shadow:0 0 40px rgba(252,211,77,.6);} 
+    .planet{position:absolute;width:140px;height:140px;border-radius:24px;background:linear-gradient(135deg,#6366f1,#a855f7);display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;box-shadow:0 18px 30px rgba(99,102,241,.4);} 
+    .planet:nth-child(2){top:40px;left:calc(50% - 70px);} 
+    .planet:nth-child(3){right:60px;top:calc(50% - 70px);} 
+    .planet:nth-child(4){bottom:60px;left:calc(50% - 70px);} 
+    .planet h2{margin:0;font-size:18px;}
+    .planet span{display:block;margin-top:6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#e9e7ff;}
+  </style>
+</head>
+<body>
+  <div class="orbit">
+    <div class="planet"><div><h2>Frog #01</h2><span>Legendary</span></div></div>
+    <div class="planet"><div><h2>Frog #77</h2><span>Epic</span></div></div>
+    <div class="planet"><div><h2>Frog #203</h2><span>Rare</span></div></div>
+  </div>
+</body>
+</html>

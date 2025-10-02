@@ -1,61 +1,27 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
+  <title>Layout 01 – Classic Gallery</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fresh Frogs — Classic Layout</title>
-  <link rel="stylesheet" href="../assets/css/styles.css" />
   <style>
-    body{ background:var(--bg); color:var(--text); font-family:var(--font-ui); }
-    .wrap{ max-width:1100px; margin:0 auto; padding:32px 16px; display:grid; gap:24px; }
-    .hero{ text-align:center; }
-    .hero h1{ font:900 32px/1.1 var(--font-display); margin:0 0 12px; }
-    .hero p{ margin:0 auto; max-width:60ch; color:var(--muted); }
-    .grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap:16px; }
-    .card{ border:1px solid var(--border); border-radius:16px; padding:18px; background:var(--panel); display:grid; gap:12px; }
-    .card img{ width:100%; border-radius:12px; background:var(--panel-2); }
-    .traits{ list-style:none; margin:0; padding:0; display:grid; gap:4px; font-size:12px; color:var(--muted); }
-    .footer{ text-align:center; color:var(--muted); font-size:13px; padding:32px 0 12px; }
+    body{font-family:'Space Grotesk',sans-serif;background:#0c0c10;color:#f4f4f8;margin:0;padding:40px;}
+    header{text-align:center;margin-bottom:32px;}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;}
+    .card{border:1px solid #24242c;border-radius:14px;background:#14141b;padding:16px;box-shadow:0 12px 28px rgba(0,0,0,.28);} 
+    .card h3{margin:0 0 8px;font-weight:700;font-size:18px;}
+    .card p{margin:0;color:#a3a3b3;font-size:14px;}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header class="hero">
-      <h1>Classic Collector Grid</h1>
-      <p>Familiar gallery layout with balanced spacing, perfect for scanning frogs by rarity, species, and vibes.</p>
-    </header>
-
-    <section class="grid">
-      <article class="card">
-        <img src="../frog/1.png" alt="Frog 1" />
-        <h2>#0001 • Legendary</h2>
-        <ul class="traits">
-          <li>Frog: Classic Green</li>
-          <li>Trait: Golden Crown</li>
-          <li>Background: Deep Marsh</li>
-        </ul>
-      </article>
-      <article class="card">
-        <img src="../frog/2.png" alt="Frog 2" />
-        <h2>#0002 • Epic</h2>
-        <ul class="traits">
-          <li>Frog: Azure Ripple</li>
-          <li>Trait: Meteor Shades</li>
-          <li>Background: Sunset Fade</li>
-        </ul>
-      </article>
-      <article class="card">
-        <img src="../frog/3.png" alt="Frog 3" />
-        <h2>#0003 • Rare</h2>
-        <ul class="traits">
-          <li>Frog: Ember Tide</li>
-          <li>Trait: Orchid Bloom</li>
-          <li>Background: Twilight Mists</li>
-        </ul>
-      </article>
-    </section>
-
-    <footer class="footer">Classic layout preview • Placeholder content</footer>
-  </div>
+  <header>
+    <h1>Classic Gallery Layout</h1>
+    <p>Placeholder data arranged in a clean card grid.</p>
+  </header>
+  <section class="grid">
+    <article class="card"><h3>Card Title</h3><p>Use this space for rarity data.</p></article>
+    <article class="card"><h3>Card Title</h3><p>Hover effects and stats go here.</p></article>
+    <article class="card"><h3>Card Title</h3><p>Each placeholder showcases the style.</p></article>
+  </section>
 </body>
 </html>

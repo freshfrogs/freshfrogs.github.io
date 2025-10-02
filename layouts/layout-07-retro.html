@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Layout 07 – Retro Arcade</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{margin:0;background:#050303 url('https://dummyimage.com/800x600/050303/161616&text=CRT+Scanlines') repeat;color:#f6f1d3;font-family:'Press Start 2P',cursive;padding:32px;}
+    h1{text-align:center;font-size:28px;letter-spacing:4px;margin-bottom:30px;text-shadow:0 0 8px #ff5c77,0 0 16px #ff5c77;}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;}
+    .cabinet{background:#1a1a1a;border:6px solid #ff5c77;border-radius:18px;padding:18px;box-shadow:0 0 12px rgba(255,92,119,.5),0 20px 40px rgba(0,0,0,.6);} 
+    .cabinet h2{margin:0;font-size:14px;line-height:1.4;}
+    .stats{margin-top:14px;font-size:10px;line-height:1.8;text-transform:uppercase;}
+    .stats span{display:block;}
+  </style>
+</head>
+<body>
+  <h1>Retro Arcade Layout</h1>
+  <section class="grid">
+    <article class="cabinet"><h2>Frog #101 – Boss Battle</h2><div class="stats"><span>Score: 9999</span><span>Owner: 0xACED…C0DE</span><span>Status: Staked</span></div></article>
+    <article class="cabinet"><h2>Frog #202 – Speed Run</h2><div class="stats"><span>Score: 8400</span><span>Owner: 0xF00D…1234</span><span>Status: Ready</span></div></article>
+  </section>
+</body>
+</html>
