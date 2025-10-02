@@ -59,7 +59,12 @@
     { id: 'horizon',   label: 'High Horizon' },
     { id: 'embercore', label: 'Ember Core' },
     { id: 'frostbite', label: 'Frostbite Veil' },
-    { id: 'citrine',   label: 'Citrine Flash' }
+    { id: 'citrine',   label: 'Citrine Flash' },
+    { id: 'aurora',    label: 'Aurora Drift' },
+    { id: 'midnight',  label: 'Midnight Pulse' },
+    { id: 'opal',      label: 'Opal Gleam' },
+    { id: 'verdant',   label: 'Verdant Bloom' },
+    { id: 'royal',     label: 'Royal Crest' }
   ];
   var themeIndex = 0;
 
