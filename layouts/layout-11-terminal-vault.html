@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Terminal Layout – Vault Control</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080b06;
+      --panel: rgba(10, 21, 8, 0.92);
+      --accent: #7bdc68;
+      --accent-soft: rgba(123, 220, 104, 0.15);
+      --border: rgba(123, 220, 104, 0.3);
+      --text: #e8ffe1;
+      --muted: #96b98d;
+      font-family: "Overpass Mono", monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at bottom right, rgba(123, 220, 104, 0.18), transparent 60%), var(--bg);
+      color: var(--text);
+      padding: 58px clamp(24px, 6vw, 84px);
+      display: flex;
+      flex-direction: column;
+      gap: 36px;
+    }
+    header { text-align: center; }
+    h1 { margin: 0; letter-spacing: 0.12em; text-transform: uppercase; }
+    p { margin: 10px auto 0; max-width: 560px; color: var(--muted); }
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 28px;
+    }
+    .panel {
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      padding: 26px;
+      display: grid;
+      gap: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(123, 220, 104, 0.14), transparent 60%);
+      pointer-events: none;
+    }
+    .panel h2 {
+      margin: 0;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .command-table {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      font-size: 0.85rem;
+    }
+    .command-table span {
+      background: rgba(123, 220, 104, 0.1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .log {
+      border-radius: 16px;
+      border: 1px dashed rgba(123, 220, 104, 0.3);
+      background: rgba(123, 220, 104, 0.08);
+      padding: 16px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .preview {
+      display: grid;
+      gap: 14px;
+    }
+    .preview img { width: 100%; border-radius: 18px; border: 1px solid var(--border); background: rgba(123, 220, 104, 0.12); }
+    .stats { display: grid; gap: 6px; font-size: 0.85rem; color: var(--muted); }
+    .traits { display: flex; flex-wrap: wrap; gap: 8px; }
+    .traits span { padding: 6px 10px; border-radius: 10px; background: rgba(123, 220, 104, 0.18); border: 1px solid var(--border); }
+    .actions { display: flex; flex-direction: column; gap: 10px; }
+    .actions button {
+      font: inherit;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      padding: 10px 18px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--accent-soft);
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Vault Control Terminal</h1>
+    <p>Secure green-room interface with lockbox command grid, audit log, and frog security dossier.</p>
+  </header>
+  <section class="grid">
+    <article class="panel">
+      <h2>Command Grid</h2>
+      <div class="command-table">
+        <span>connect</span>
+        <span>vault status</span>
+        <span>owned</span>
+        <span>staked</span>
+        <span>stake #402</span>
+        <span>unstake #144</span>
+      </div>
+    </article>
+    <article class="panel">
+      <h2>Audit Log</h2>
+      <div class="log">
+&gt; vault status
+locked frogs: 14
+rewards ready: 328.4 FFLY
+
+&gt; stake 402
+success — tx 0xabc…123
+      </div>
+    </article>
+    <article class="panel">
+      <h2>Security dossier</h2>
+      <div class="preview">
+        <img src="https://placehold.co/360x360/0f1f0e/7bdc68?text=Frog+Preview" alt="Frog preview" />
+        <div class="stats">
+          <strong>Frog #0402</strong>
+          <span>Staked 4d ago by 0xF01e…16E8</span>
+          <span>Rarity 168.2</span>
+        </div>
+        <div class="traits">
+          <span>Frog: Vault Warden</span>
+          <span>Trait: Sentinel Lens</span>
+          <span>Accessory: Aegis Beacon</span>
+        </div>
+        <div class="actions">
+          <button>Stake</button>
+          <button>Unstake</button>
+          <button>Transfer</button>
+        </div>
+      </div>
+    </article>
+  </section>
+</body>
+</html>

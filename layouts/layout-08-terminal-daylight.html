@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Terminal Layout – Daylight Analyst</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --border: #d4dff0;
+      --accent: #2c7be5;
+      --accent-soft: rgba(44, 123, 229, 0.08);
+      --text: #172236;
+      --muted: #5c6a80;
+      font-family: "DM Mono", monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(180deg, rgba(44, 123, 229, 0.08), transparent 40%), var(--bg);
+      color: var(--text);
+      padding: 60px clamp(24px, 6vw, 80px);
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+    header { text-align: center; }
+    h1 { margin: 0; letter-spacing: 0.12em; text-transform: uppercase; }
+    p { margin: 12px auto 0; max-width: 580px; color: var(--muted); }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 32px;
+    }
+    .panel {
+      background: var(--panel);
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 64px rgba(15, 32, 63, 0.08);
+      padding: 32px;
+      display: grid;
+      gap: 22px;
+    }
+    .panel h2 {
+      margin: 0;
+      font-size: 0.95rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .commands {
+      display: grid;
+      gap: 12px;
+    }
+    .commands button {
+      font: inherit;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      border-radius: 14px;
+      border: 1px solid rgba(44, 123, 229, 0.25);
+      background: var(--accent-soft);
+      padding: 12px 18px;
+      text-align: left;
+      color: var(--text);
+    }
+    .output {
+      border-radius: 18px;
+      border: 1px dashed rgba(44, 123, 229, 0.35);
+      background: rgba(44, 123, 229, 0.04);
+      padding: 20px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .frog-card {
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(44, 123, 229, 0.08), rgba(44, 123, 229, 0));
+      padding: 24px;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+    .frog-card img { border-radius: 16px; width: 100%; background: #eff3fb; }
+    .frog-card h3 { margin: 0; }
+    .frog-card small { color: var(--muted); }
+    .traits { display: flex; flex-wrap: wrap; gap: 10px; }
+    .traits span {
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(44, 123, 229, 0.12);
+      border: 1px solid rgba(44, 123, 229, 0.18);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Daylight Analyst Terminal</h1>
+    <p>Bright control room aesthetic with clean panels, button-style commands, and airy frog dossier.</p>
+  </header>
+  <main class="layout">
+    <section class="panel">
+      <h2>Command Shortcuts</h2>
+      <div class="commands">
+        <button>Connect Wallet</button>
+        <button>Show Rarity Leaderboard</button>
+        <button>View My Frogs</button>
+        <button>Stake Selected Frog</button>
+      </div>
+      <div class="output">
+&gt; connect wallet
+connected: 0x431b…1397
+
+&gt; show rarity
+#0001 score 214.5 staked
+#0022 score 209.7 owned
+      </div>
+    </section>
+    <aside class="panel">
+      <h2>Frog dossier</h2>
+      <article class="frog-card">
+        <img src="https://placehold.co/420x420/eff3fb/2c7be5?text=Frog+Preview" alt="Frog preview" />
+        <h3>Frog #0001</h3>
+        <small>Staked 88d ago by 0x431b…1397 • Rarity 214.5</small>
+        <div class="traits">
+          <span>Frog: Azure Scholar</span>
+          <span>Trait: Data Visor</span>
+          <span>Accessory: Insight Tablet</span>
+        </div>
+      </article>
+    </aside>
+  </main>
+</body>
+</html>
