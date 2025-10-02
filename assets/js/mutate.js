@@ -39,7 +39,10 @@
 
   function setInfo(id, data) {
     els.title.textContent = `Frog #${id}`;
-    els.status.textContent = `${data.staked ? 'Staked' : 'Not staked'} • ${data.ownerYou ? 'Owned by You' : 'Owner ' + short(data.owner)}`;
+    const ownerLabel = data.ownerYou ? 'You' : (data.owner ? short(data.owner) : '—');
+    els.status.textContent = data.staked
+      ? `Staked by ${ownerLabel}`
+      : `Owned by ${ownerLabel}`;
 
     // Traits list
     els.traits.innerHTML = '';
