@@ -32,42 +32,39 @@
   (function injectCSS(){
     if (document.getElementById('owned-clean-css')) return;
     const css = `
-#ownedCard .oh-wrap{margin-bottom:10px}
-#ownedCard .oh-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-#ownedCard .oh-mini{font-size:11px;line-height:1}
+#ownedCard .oh-wrap{margin-bottom:16px}
+#ownedCard .oh-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+#ownedCard .oh-mini{font-size:12px;line-height:1}
 #ownedCard .oh-spacer{flex:1}
 #ownedCard .oh-muted{color:var(--muted)}
-#ownedCard .oh-btn{font-family:var(--font-ui);border:1px solid var(--border);background:transparent;color:inherit;border-radius:8px;padding:6px 10px;font-weight:700;font-size:12px;line-height:1;display:inline-flex;align-items:center;gap:6px;text-decoration:none;letter-spacing:.01em;transition:background .15s,border-color .15s,color .15s,transform .05s}
+#ownedCard .oh-btn{display:inline-flex;align-items:center;gap:8px;padding:.55rem .95rem;border-radius:12px;border:1px solid color-mix(in srgb,var(--accent) 35%, transparent);background:transparent;color:var(--ink);font-weight:700;font-size:.9rem;letter-spacing:.01em;transition:background .15s ease,border-color .15s ease,color .15s ease,transform .05s ease}
 #ownedCard .oh-btn:active{transform:translateY(1px)}
-#ownedCard .oh-btn:hover{background: color-mix(in srgb,#22c55e 14%,var(--panel));border-color: color-mix(in srgb,#22c55e 80%,var(--border));color: color-mix(in srgb,#ffffff 85%,#22c55e)}
-#ownedCard .pg-card-head .btn:hover{background: color-mix(in srgb,#22c55e 14%,var(--panel));border-color: color-mix(in srgb,#22c55e 80%,var(--border));color: color-mix(in srgb,#ffffff 85%,#22c55e)}
-#ownedCard .pg-card-head .btn.btn-connected{background: color-mix(in srgb,#22c55e 18%,var(--panel));border-color: color-mix(in srgb,#22c55e 85%,var(--border));color: color-mix(in srgb,#ffffff 90%,#22c55e)}
+#ownedCard .oh-btn:hover{background:color-mix(in srgb,var(--accent) 18%, transparent);border-color:color-mix(in srgb,var(--accent) 55%, transparent)}
+#ownedCard .ff-toolbar .ff-button.btn-connected{background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 80%, transparent) 0%,color-mix(in srgb,var(--accent) 45%, transparent) 100%);color:var(--accent-ink);border-color:color-mix(in srgb,var(--accent) 70%, transparent)}
+#ownedCard .ff-toolbar .ff-button.btn-connected.address-chip{max-width:40ch;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--font-ui)}
 #ownedGrid{overflow:auto;-webkit-overflow-scrolling:touch;padding-right:4px}
 @media (hover:hover){
   #ownedGrid::-webkit-scrollbar{width:8px}
   #ownedGrid::-webkit-scrollbar-thumb{background: color-mix(in srgb,var(--muted) 35%, transparent); border-radius:8px}
 }
-#ownedCard .attr-bullets{list-style:disc;margin:6px 0 0 18px;padding:0}
-#ownedCard .attr-bullets li{font-size:12px;margin:2px 0}
+#ownedCard .attr-bullets{list-style:none;margin:10px 0 0 0;padding:0;display:grid;gap:8px}
+#ownedCard .attr-bullets li{font-size:13px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--panelSoft) 80%, transparent);border:1px solid color-mix(in srgb,var(--border) 78%, transparent)}
 
 /* Address label */
 #ownedCard .address-chip{
-  font-family: var(--font-ui);
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--muted);
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-weight: 500;
-  font-size: 12px;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  max-width: 40ch;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  cursor: default;
+  font-family:var(--font-ui);
+  border-radius:12px;
+  padding:.55rem .95rem;
+  border:1px solid color-mix(in srgb,var(--accent) 38%, transparent);
+  background:transparent;
+  color:color-mix(in srgb,var(--muted) 70%, var(--ink) 20%);
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  max-width:40ch;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 /* Owned modal */
@@ -444,13 +441,17 @@
 
   // --- Height sync with left panel ---
   function syncHeights(){
-    if (window.matchMedia('(max-width: 960px)').matches){ $('#ownedCard').style.height=''; $('#ownedGrid').style.maxHeight=''; return; }
-    const cards=document.querySelectorAll('.page-grid > .pg-card'); if(cards.length<2) return;
-    const left=cards[0], right=$('#ownedCard'); if(!left||!right) return;
+    const right=$('#ownedCard');
+    if (!right) return;
+    if (window.matchMedia('(max-width: 960px)').matches){ right.style.height=''; $('#ownedGrid').style.maxHeight=''; return; }
+    const cards=document.querySelectorAll('.ff-main-panel > .ff-panel');
+    if(cards.length<2) return;
+    const left=cards[0];
+    if(!left) return;
     right.style.height=left.offsetHeight+'px';
-    const header=right.querySelector('.oh-wrap'); const headerH=header?header.offsetHeight+10:0;
-    const pad=20; const maxH=left.offsetHeight-headerH-pad;
-    const grid=$('#ownedGrid'); if(grid) grid.style.maxHeight=Math.max(160,maxH)+'px';
+    const header=right.querySelector('.oh-wrap'); const headerH=header?header.offsetHeight+14:0;
+    const pad=28; const maxH=left.offsetHeight-headerH-pad;
+    const grid=$('#ownedGrid'); if(grid) grid.style.maxHeight=Math.max(200,maxH)+'px';
   }
   window.addEventListener('resize',()=> setTimeout(syncHeights,50));
 
