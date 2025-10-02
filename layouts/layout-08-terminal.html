@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fresh Frogs — Terminal Feed</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      color-scheme: dark;
+      --bg:#010304;
+      --panel:#021b11;
+      --border:#0f5030;
+      --text:#92ffcf;
+      --accent:#47ff9c;
+      --alert:#ffed7a;
+      --mono:'JetBrains Mono', SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      background:radial-gradient(circle at 20% 15%, rgba(57, 255, 182, 0.16), transparent 55%), var(--bg);
+      font-family:var(--mono);
+      display:grid;
+      place-items:center;
+      padding:48px 16px 64px;
+      color:var(--text);
+    }
+
+    .terminal{
+      width:min(960px, 100%);
+      border:2px solid var(--border);
+      border-radius:22px;
+      box-shadow:0 40px 90px rgba(11, 80, 50, 0.45);
+      background:linear-gradient(135deg, rgba(2, 27, 17, 0.95), rgba(2, 12, 10, 0.9));
+      overflow:hidden;
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:16px 20px;
+      border-bottom:2px solid var(--border);
+      background:rgba(4, 32, 22, 0.85);
+    }
+
+    header span.dot{
+      width:12px; height:12px; border-radius:50%; background:var(--accent); opacity:0.6;
+    }
+
+    header h1{ margin:0; font-size:16px; letter-spacing:0.12em; text-transform:uppercase; }
+
+    pre{
+      margin:0;
+      padding:24px 26px 18px;
+      font-size:14px;
+      line-height:1.6;
+      white-space:pre-wrap;
+      overflow-y:auto;
+      max-height:520px;
+    }
+
+    pre strong{ color:var(--accent); }
+    pre em{ color:var(--alert); font-style:normal; }
+
+    form{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      padding:16px 20px 20px;
+      border-top:2px solid var(--border);
+      background:rgba(3, 22, 16, 0.8);
+    }
+
+    label{ font-size:12px; letter-spacing:0.2em; text-transform:uppercase; color:rgba(146,255,207,0.65); }
+
+    input[type="text"]{
+      flex:1;
+      background:rgba(0,0,0,0.35);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px 16px;
+      color:var(--text);
+      font:600 14px/1 var(--mono);
+    }
+
+    input[type="text"]::placeholder{ color:rgba(146,255,207,0.45); }
+
+    button{
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px 18px;
+      font:600 13px/1 var(--mono);
+      text-transform:uppercase;
+      letter-spacing:0.12em;
+      background:rgba(4, 42, 26, 0.8);
+      color:var(--accent);
+      cursor:pointer;
+      transition:background 0.2s ease, transform 0.2s ease;
+    }
+
+    button:hover{ background:rgba(11, 78, 46, 0.8); transform:translateY(-1px); }
+
+    @media (max-width:720px){
+      pre{ max-height:400px; font-size:13px; }
+      form{ flex-direction:column; align-items:stretch; }
+      label{ align-self:flex-start; }
+      button{ width:100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      button{ transition:none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="terminal">
+    <header>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <h1>freshfrogs://terminal</h1>
+    </header>
+    <pre id="terminalOutput" aria-live="polite"></pre>
+    <form id="terminalForm" autocomplete="off">
+      <label for="command">Command</label>
+      <input id="command" type="text" name="command" placeholder="Try: list 5  | show 404  | help" spellcheck="false" />
+      <button type="submit">Run</button>
+    </form>
+  </div>
+
+  <script src="../assets/js/config.js"></script>
+  <script>
+    (function(){
+      'use strict';
+
+      var CFG = window.FF_CFG || {};
+      var root = '';
+      if (CFG && CFG.SOURCE_PATH) {
+        root = String(CFG.SOURCE_PATH).replace(/\/+$/, '');
+      }
+
+      function fullPath(rel){
+        rel = String(rel || '');
+        if (/^https?:/i.test(rel)) return rel;
+        if (root) return root + '/' + rel.replace(/^\/+/, '');
+        return '../' + rel.replace(/^\/+/, '');
+      }
+
+      var ranksPath = fullPath(CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json');
+      var output = document.getElementById('terminalOutput');
+      var form = document.getElementById('terminalForm');
+      var input = document.getElementById('command');
+
+      var frogs = [];
+      var metaCache = Object.create(null);
+      var cursor = 0;
+      var defaultBatch = 5;
+
+      function write(line){
+        output.textContent += line + '\n';
+        output.scrollTop = output.scrollHeight;
+      }
+
+      function promptLine(cmd){
+        write('$ ' + cmd);
+      }
+
+      function normalizeRanks(raw){
+        var list = [];
+        var i, item, id, rank;
+        if (Array.isArray(raw)){
+          for (i = 0; i < raw.length; i++){
+            item = raw[i] || {};
+            id = Number(item.id || item.tokenId || item.token_id);
+            rank = Number(item.ranking != null ? item.ranking : item.rank);
+            if (isFinite(id) && isFinite(rank)){
+              list.push({ id: id, ranking: rank });
+            }
+          }
+        } else if (raw && typeof raw === 'object'){
+          for (var key in raw){
+            if (!Object.prototype.hasOwnProperty.call(raw, key)) continue;
+            item = raw[key] || {};
+            id = Number(item.id || key);
+            rank = Number(item.ranking != null ? item.ranking : item.rank);
+            if (isFinite(id) && isFinite(rank)){
+              list.push({ id: id, ranking: rank });
+            }
+          }
+        }
+        list.sort(function(a, b){ return a.ranking - b.ranking; });
+        return list;
+      }
+
+      function ensureMeta(id){
+        if (metaCache[id]) return Promise.resolve(metaCache[id]);
+        return fetch(fullPath('frog/json/' + id + '.json')).then(function(resp){
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          return resp.json();
+        }).then(function(data){
+          metaCache[id] = data;
+          return data;
+        }).catch(function(err){
+          console.warn('Failed to fetch metadata for frog', id, err);
+          metaCache[id] = null;
+          return null;
+        });
+      }
+
+      function traitSummary(meta){
+        if (!meta || !Array.isArray(meta.attributes)) return 'traits unavailable';
+        var out = [];
+        for (var i = 0; i < meta.attributes.length; i++){
+          var attr = meta.attributes[i] || {};
+          var key = attr.key || attr.trait_type || attr.traitType || attr.type;
+          var val = attr.value != null ? attr.value : attr.trait_value;
+          if (!key || val == null) continue;
+          out.push(key + ': ' + val);
+          if (out.length >= 4) break;
+        }
+        return out.length ? out.join('  |  ') : 'traits unavailable';
+      }
+
+      function loadRanks(){
+        write('$ connect rarity');
+        write('> establishing link…');
+        return fetch(ranksPath).then(function(resp){
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          return resp.json();
+        }).then(function(data){
+          frogs = normalizeRanks(data);
+          write('> received ' + frogs.length + ' frog entries.');
+          cursor = 0;
+          write('> type `help` for available commands.');
+        }).catch(function(err){
+          write('> error: unable to fetch rankings (' + err.message + ')');
+        });
+      }
+
+      function listNext(count){
+        if (!frogs.length){
+          write('> no data loaded. try `reload`.');
+          return;
+        }
+        if (cursor >= frogs.length){
+          write('> end of list reached. use `reset` to restart.');
+          return;
+        }
+        var slice = frogs.slice(cursor, cursor + count);
+        cursor += slice.length;
+        write('> listing ' + slice.length + ' frogs from position ' + (cursor - slice.length + 1) + '…');
+        Promise.all(slice.map(function(entry){
+          return ensureMeta(entry.id).then(function(meta){
+            return { entry: entry, meta: meta };
+          });
+        })).then(function(items){
+          items.forEach(function(item){
+            var entry = item.entry;
+            var meta = item.meta;
+            var name = meta && meta.name ? meta.name : ('Frog #' + entry.id);
+            var traits = traitSummary(meta);
+            write('> #' + String(entry.id).padStart(4, '0') + '  rank ' + entry.ranking + '  :: ' + name);
+            write('    ' + traits);
+          });
+          if (cursor < frogs.length){
+            write('> more available — run `list` again.');
+          } else {
+            write('> reached the tail of the rankings.');
+          }
+        });
+      }
+
+      function showFrog(id){
+        if (!frogs.length){
+          write('> no data loaded. try `reload`.');
+          return;
+        }
+        var entry = null;
+        for (var i = 0; i < frogs.length; i++){
+          if (frogs[i].id === id){
+            entry = frogs[i];
+            break;
+          }
+        }
+        if (!entry){
+          write('> frog #' + id + ' not found in current ranking set.');
+          return;
+        }
+        ensureMeta(id).then(function(meta){
+          var name = meta && meta.name ? meta.name : ('Frog #' + id);
+          write('> detail for #' + String(id).padStart(4, '0'));
+          write('    rank: ' + entry.ranking);
+          if (meta && meta.description){
+            write('    description: ' + meta.description);
+          }
+          if (meta && Array.isArray(meta.attributes) && meta.attributes.length){
+            write('    attributes:');
+            meta.attributes.forEach(function(attr){
+              if (!attr) return;
+              var key = attr.key || attr.trait_type || attr.traitType || attr.type;
+              var val = attr.value != null ? attr.value : attr.trait_value;
+              if (!key || val == null) return;
+              write('      - ' + key + ': ' + val);
+            });
+          } else {
+            write('    attributes unavailable');
+          }
+        });
+      }
+
+      function handleCommand(cmd){
+        var trimmed = cmd.trim();
+        if (!trimmed){
+          write('$');
+          return;
+        }
+        promptLine(trimmed);
+        var parts = trimmed.split(/\s+/);
+        var verb = parts[0].toLowerCase();
+        if (verb === 'list'){
+          var count = Number(parts[1]);
+          if (!isFinite(count) || count <= 0) count = defaultBatch;
+          listNext(count);
+        } else if (verb === 'show'){
+          var id = Number(parts[1]);
+          if (!isFinite(id)){
+            write('> usage: show <frogId>');
+          } else {
+            showFrog(id);
+          }
+        } else if (verb === 'reset'){
+          cursor = 0;
+          write('> cursor reset. next `list` starts from the top.');
+        } else if (verb === 'reload'){
+          cursor = 0;
+          loadRanks();
+        } else if (verb === 'help'){
+          write('> commands:');
+          write('    list [n]   — stream the next n frogs (default ' + defaultBatch + ')');
+          write('    show <id>  — inspect a specific frog by ID');
+          write('    reset      — restart the list cursor');
+          write('    reload     — refetch rankings');
+          write('    clear      — clear the terminal output');
+        } else if (verb === 'clear'){
+          output.textContent = '';
+        } else {
+          write('> unknown command. type `help` to see options.');
+        }
+      }
+
+      form.addEventListener('submit', function(ev){
+        ev.preventDefault();
+        var value = input.value;
+        input.value = '';
+        handleCommand(value);
+      });
+
+      loadRanks().then(function(){
+        input.focus();
+      });
+    })();
+  </script>
+</body>
+</html>

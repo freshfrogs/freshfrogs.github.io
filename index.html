@@ -1,159 +1,181 @@
 <!doctype html>
-<html lang="en" data-theme="t1">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>freshfrogs.github.io — Layout 3</title>
+  <title>Fresh Frogs — Collect, stake, and evolve</title>
 
   <link rel="stylesheet" href="assets/css/styles.css" />
-
-  <style>
-    /* Base */
-    .pg-wrap{ padding:20px; }
-    img{ image-rendering: pixelated; image-rendering: crisp-edges; }
-
-    .pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
-    .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
-    .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
-    .pg-muted{ color:var(--muted); font-size:13px; }
-
-    .list{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
-    .row{ display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:center; padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
-    .thumb64{ width:64px; height:64px; min-width:64px; min-height:64px; border-radius:10px; object-fit:contain; background:var(--panel-2); }
-
-    /* Centered single-panel layout (fixed width) */
-    :root{ --panel-width: 640px; }
-    .center-wrap{ display:grid; gap:16px; justify-items:center; }
-    .centered-card{ width: min(var(--panel-width), 100%); }
-
-    /* Hero (centered) */
-    .frog-hero{ margin:28px auto 38px; width: min(var(--panel-width), 100%); }
-    .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
-    .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
-    .frog-strip .tile{ flex:0 0 auto; width:64px; height:64px; border-radius:10px; }
-    .frog-strip .tile.hide{ display:none !important; }
-    .frog-strip img{ width:64px; height:64px; object-fit:contain; }
-    @media (max-width:520px){ .frog-hero{ margin:22px auto 30px; } .frog-strip{ gap:10px; } }
-
-    /* Info blocks */
-    .info-grid-2{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:10px; margin-bottom:10px; }
-    @media (max-width:900px){ .info-grid-2{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
-    @media (max-width:520px){ .info-grid-2{ grid-template-columns: 1fr; } }
-    .info-block{ border:1px solid var(--border); border-radius:12px; padding:10px; background:var(--panel); }
-    .info-block .ik{ font-size:11px; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; }
-    .info-block .iv{ font-weight:900; font-size:18px; line-height:1.1; margin-top:4px; }
-    .info-block .in{ font-size:12px; color:var(--muted); }
-
-    /* Mint (Mini) */
-    #mintMini.mint-mini{
-      border:1px solid var(--border); border-radius:12px; background: var(--panel);
-      padding:10px; margin:8px 0 12px;
-    }
-    #mintMini .mint-mini__row{ display:grid; grid-template-columns:auto auto 1fr auto; align-items:center; gap:10px; }
-    #mintMini .mint-mini__price{ border:1px solid var(--border); border-radius:10px; padding:8px 10px; background: color-mix(in srgb, var(--panel) 90%, transparent); display:grid; grid-template-columns:auto auto; gap:6px 8px; align-items:baseline; }
-    #mintMini .mint-mini__price .k{ font-size:12px; color:var(--muted); }
-    #mintMini .mint-mini__price .v{ font-weight:900; font-size:14px; }
-    #mintMini .mint-mini__stepper{ display:flex; align-items:center; gap:8px; }
-    #mintMini .mini__btn{ width:28px; height:28px; border-radius:8px; border:1px solid var(--border); background:transparent; color:inherit; font-weight:800; line-height:1; display:grid; place-items:center; }
-    #mintMini .mini__btn:active{ transform: translateY(1px); }
-    #mintMini .mini__qty{ width:64px; text-align:center; padding:6px; border-radius:8px; border:1px solid var(--border); background:transparent; color:inherit; font-family:var(--font-ui); }
-    #mintMini .mini__mint{ padding-inline:12px; }
-    #mintMini .mint-mini__total{ font-size:12px; color:var(--muted); justify-self:end; }
-    #mintMini .mint-mini__note{ margin-top:6px; font-size:12px; }
-    @media (max-width:600px){ #mintMini .mint-mini__row{ grid-template-columns: 1fr 1fr; } #mintMini .mint-mini__total{ justify-self:start; } }
-
-    /* Scrollable lists: JS sets max-height to N rows; infinite scroll appends */
-    #recentMints.scrolling,
-    #recentStakes.scrolling{
-      overflow-y:auto;
-      -webkit-overflow-scrolling:touch;
-      padding-right:4px;
-    }
-    #recentMints .row, #recentStakes .row{ cursor:pointer; }
-    @media (hover:hover){
-      #recentMints.scrolling::-webkit-scrollbar,
-      #recentStakes.scrolling::-webkit-scrollbar{ width:8px; }
-      #recentMints.scrolling::-webkit-scrollbar-thumb,
-      #recentStakes.scrolling::-webkit-scrollbar-thumb{
-        background: color-mix(in srgb, var(--muted) 35%, transparent);
-        border-radius:8px;
-      }
-    }
-  </style>
 </head>
-<body>
-  <div class="pg-wrap container">
-    <div class="center-wrap">
+<body class="ff-body">
+  <div class="ff-site">
+    <header class="ff-masthead">
+      <div class="ff-container ff-masthead__inner">
+        <a class="ff-logo" href="index.html"><span>🐸</span>Fresh Frogs</a>
+        <nav class="ff-nav" aria-label="Primary">
+          <a href="collection.html">Collection</a>
+          <a href="rarity.html">Rarity</a>
+          <a href="pond.html">Pond</a>
+          <a href="mutate.html">Mutate</a>
+        </nav>
+        <a class="ff-button ff-button--ghost" href="collection.html">Enter app</a>
+      </div>
+    </header>
 
-      <!-- HERO -->
-      <section class="frog-hero">
-        <h1 class="frog-title">freshfrogs.github.io</h1>
-        <div class="frog-strip">
-          <div class="tile"><img src="frog/12.png"  alt="12"></div>
-          <div class="tile"><img src="frog/77.png"  alt="77"></div>
-          <div class="tile"><img src="frog/404.png" alt="404"></div>
-          <div class="tile"><img src="frog/256.png" alt="256"></div>
-          <div class="tile"><img src="frog/999.png" alt="999"></div>
-          <div class="tile"><img src="frog/1.png"   alt="1"></div>
-        </div>
-      </section>
-
-      <!-- Fresh Frogs NFT -->
-      <section class="pg-card centered-card">
-        <div class="pg-card-head"><h3>Fresh Frogs NFT</h3></div>
-        <p class="pg-muted" style="margin:6px 0 12px 0; max-width:70ch;">
-          Pixel-perfect frogs hopping around the Ethereum pond. Mint, stake to earn FLYZ, and explore the collection’s quirks and traits.
-        </p>
-
-        <div class="info-grid-2">
-          <div class="info-block"><div class="ik">🐸 Supply</div><div class="iv">4,040</div><div class="in">Total tokens</div></div>
-          <div class="info-block"><div class="ik">⛓️ Chain</div><div class="iv">Ethereum</div><div class="in">ERC-721</div></div>
-          <div class="info-block"><div class="ik">🎧 Royalty</div><div class="iv">5%</div><div class="in">Secondary sales</div></div>
-          <div class="info-block"><div class="ik">🪙 Mint</div><div class="iv">0.01 ETH</div><div class="in">Per frog</div></div>
-        </div>
-
-        <!-- Mint (Mini) -->
-        <section id="mintMini" class="mint-mini" aria-label="Quick mint">
-          <div class="mint-mini__row">
-            <div class="mint-mini__price">
-              <div class="k">Price</div><div class="v">0.01 ETH</div>
+    <main class="ff-main">
+      <section class="ff-hero">
+        <div class="ff-container ff-hero__inner">
+          <div class="ff-hero__content">
+            <span class="ff-eyebrow">Ethereum collection</span>
+            <h1 class="ff-headline">Collect, stake, and evolve Fresh Frogs</h1>
+            <p class="ff-hero__lead">
+              Fresh Frogs is a hand-crafted set of 4,040 pixel amphibians. Stake your frog to earn $FLYZ,
+              hunt for legendary traits, and combine attributes to mint custom mutations.
+            </p>
+            <div class="ff-hero__actions">
+              <a class="ff-button ff-button--solid" href="collection.html">Explore collection</a>
+              <a class="ff-button" href="rarity.html">View rarity rankings</a>
             </div>
-
-            <div class="mint-mini__stepper" role="group" aria-label="Quantity">
-              <button type="button" class="mini__btn" data-delta="-1" aria-label="Decrease">−</button>
-              <input id="miniQty" class="mini__qty" type="text" inputmode="numeric" pattern="[0-9]*" value="1" aria-label="Quantity">
-              <button type="button" class="mini__btn" data-delta="1" aria-label="Increase">+</button>
-            </div>
-
-            <button type="button" class="btn mini__mint">Mint</button>
-            <div class="mint-mini__total">Total: <b id="miniTotal">0.01 ETH</b></div>
+            <dl class="ff-stat-bar">
+              <div class="ff-stat"><dt>Supply</dt><dd>4,040</dd></div>
+              <div class="ff-stat"><dt>Staking rewards</dt><dd>$FLYZ / day</dd></div>
+              <div class="ff-stat"><dt>Controller</dt><dd class="addr">0x7dfb…f1b2</dd></div>
+            </dl>
           </div>
-          <div class="mint-mini__note pg-muted">Connect wallet to mint.</div>
-        </section>
-
-        <!-- Recent Mints -->
-        <ul id="recentMints" class="list" aria-live="polite" data-visible="6">
-          <li class="row"><div class="pg-muted">Loading recent mints…</div></li>
-        </ul>
+          <div class="ff-hero__media">
+            <div class="ff-card-stack">
+              <div class="ff-card-stack__layer" data-layer="1">
+                <img data-hero-frog="1" src="frog/12.png" alt="Frog 12" />
+                <p class="ff-card-stack__label">Legendary traits, layered animations, and collectible card frames.</p>
+              </div>
+              <div class="ff-card-stack__layer" data-layer="2">
+                <img data-hero-frog="2" src="frog/404.png" alt="Frog 404" />
+              </div>
+              <div class="ff-card-stack__layer" data-layer="3">
+                <img data-hero-frog="3" src="frog/77.png" alt="Frog 77" />
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
-    </div>
+
+      <section class="ff-section">
+        <div class="ff-container">
+          <div class="ff-section__head">
+            <span class="ff-eyebrow">Why Fresh Frogs?</span>
+            <h2 class="ff-section__title">A world of utility packed into pixel-perfect collectibles</h2>
+            <p class="ff-section__intro">From on-chain rarity data to live staking dashboards, the Fresh Frogs hub keeps every holder in the loop.</p>
+          </div>
+          <div class="ff-feature-grid">
+            <article class="ff-feature-card">
+              <h3>Stake to earn</h3>
+              <p>Lock your frogs into the pond to accrue $FLYZ rewards, unlock levels, and climb the staking leaderboard.</p>
+            </article>
+            <article class="ff-feature-card">
+              <h3>Live rarity intelligence</h3>
+              <p>Track rarity ranks, trait combos, and real owner data with a responsive interface designed for collectors.</p>
+            </article>
+            <article class="ff-feature-card">
+              <h3>Mutations &amp; mashups</h3>
+              <p>Combine two parent frogs to build a custom hybrid with inherited metadata and animated layers.</p>
+            </article>
+            <article class="ff-feature-card">
+              <h3>On-chain provenance</h3>
+              <p>Each frog is sourced directly from our verified contract and IPFS metadata, ensuring authenticity forever.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="ff-section ff-section--alt">
+        <div class="ff-container">
+          <div class="ff-panel-grid">
+            <div class="ff-panel">
+              <h2>Mint directly from the pond</h2>
+              <p>Choose your quantity, preview the total, and mint instantly when the drop is live. Connect a wallet to get started.</p>
+
+              <section id="mintMini" class="mint-mini" aria-label="Quick mint">
+                <div class="mint-mini__row">
+                  <div class="mint-mini__price">
+                    <div class="k">Price</div><div class="v">0.01 ETH</div>
+                  </div>
+
+                  <div class="mint-mini__stepper" role="group" aria-label="Quantity">
+                    <button type="button" class="mini__btn" data-delta="-1" aria-label="Decrease quantity">−</button>
+                    <input id="miniQty" class="mini__qty" type="text" inputmode="numeric" pattern="[0-9]*" value="1" aria-label="Quantity">
+                    <button type="button" class="mini__btn" data-delta="1" aria-label="Increase quantity">+</button>
+                  </div>
+
+                  <button type="button" class="ff-button ff-button--solid mini__mint">Mint</button>
+                  <div class="mint-mini__total">Total: <b id="miniTotal">0.01 ETH</b></div>
+                </div>
+                <div class="mint-mini__note muted">Connect wallet to mint.</div>
+              </section>
+
+              <div class="stack">
+                <h3 class="section-title">Recent mints</h3>
+                <ul id="recentMints" class="ff-feed" aria-live="polite" data-visible="6">
+                  <li class="row"><div class="pg-muted">Loading recent mints…</div></li>
+                </ul>
+              </div>
+            </div>
+
+            <aside class="ff-panel">
+              <h2>Live from the staking pond</h2>
+              <p class="muted">See who is staking, unstaking, and moving frogs around the ecosystem in real time.</p>
+              <ul id="recentStakes" class="ff-feed" aria-live="polite" data-visible="6">
+                <li class="row"><div class="pg-muted">Loading staking activity…</div></li>
+              </ul>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="ff-section">
+        <div class="ff-container">
+          <div class="ff-section__head">
+            <span class="ff-eyebrow">How it works</span>
+            <h2 class="ff-section__title">Three easy steps to join the pond</h2>
+            <p class="ff-section__intro">Collect, stake, and experiment with your frogs using the streamlined Fresh Frogs dashboard.</p>
+          </div>
+          <div class="ff-step-grid">
+            <article class="ff-step">
+              <h3>1. Mint or buy a frog</h3>
+              <p>Grab a freshly minted frog or scoop one from the secondary market. Each frog comes with unique layered traits.</p>
+            </article>
+            <article class="ff-step">
+              <h3>2. Stake to earn $FLYZ</h3>
+              <p>Send your frog to the staking pond to accumulate daily rewards, unlock levels, and reveal time-based badges.</p>
+            </article>
+            <article class="ff-step">
+              <h3>3. Combine &amp; mutate</h3>
+              <p>When inspiration strikes, fuse two parents to craft a custom mutation with inherited metadata and animations.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="ff-cta">
+        <div class="ff-container ff-cta__inner">
+          <h2>Ready to dive into the pond?</h2>
+          <p>Browse rarity ranks, manage your staking positions, and experiment with mutations — all from the Fresh Frogs dashboard.</p>
+          <div class="ff-cta__actions">
+            <a class="ff-button ff-button--solid" href="collection.html">Open the collection app</a>
+            <a class="ff-button" href="rarity.html">Compare rarity cards</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="ff-footer">
+      <div class="ff-container ff-footer__inner">
+        <span>© Fresh Frogs</span>
+        <span>Made for the community — stake, earn, and evolve.</span>
+      </div>
+    </footer>
   </div>
 
   <script>
-    /* Keep whole 64px tiles only (hero strip) */
-    function layoutFrogStrip(){
-      var strip = document.querySelector('.frog-strip'); if(!strip) return;
-      var tiles = Array.prototype.slice.call(strip.querySelectorAll('.tile'));
-      var styles = window.getComputedStyle(strip);
-      var gap = parseFloat(styles.gap || 12) || 12;
-      var tileW = 64, innerW = strip.clientWidth;
-      var count = Math.max(1, Math.floor((innerW + gap) / (tileW + gap)));
-      tiles.forEach(function(t,i){ t.classList.toggle('hide', i >= count); });
-    }
-    window.addEventListener('resize', layoutFrogStrip);
-    document.addEventListener('DOMContentLoaded', layoutFrogStrip);
-
-    /* Mint (Mini): stepper + totals */
     (function(){
       var PRICE = 0.01;
       function clamp(n){ n = parseInt(n||'1', 10); return isNaN(n) ? 1 : Math.max(1, n); }
@@ -199,49 +221,39 @@
   </script>
 
   <script>
-  // Randomize the hero frog images on each load.
   (function () {
     const CFG = window.FF_CFG || {};
     const TOTAL = Number(CFG.TOTAL_SUPPLY || 4040);
-    const ROOT  = String(CFG.SOURCE_PATH || '').replace(/\/+$/,'') || '';
+    const ROOT  = String(CFG.SOURCE_PATH || '').replace(/\/+$/,'');
 
     function pickUniqueIds(n, max){
-      // Fisher–Yates shuffle of a small sample for uniqueness
       const pool = Array.from({length:max}, (_,i)=> i+1);
       for (let i = pool.length - 1; i > 0; i--){
         const j = Math.floor(Math.random()*(i+1));
-        [pool[i], pool[j]] = [pool[j], pool[i]];
+        const tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
       }
       return pool.slice(0, n);
     }
 
-    function randomizeStrip(selector){
-      const strip = document.querySelector(selector);
-      if (!strip) return;
-      const imgs = Array.from(strip.querySelectorAll('.tile img'));
+    function randomizeCards(){
+      const imgs = Array.from(document.querySelectorAll('[data-hero-frog]'));
       if (!imgs.length) return;
-
       const ids = pickUniqueIds(imgs.length, TOTAL);
-      imgs.forEach((img, idx) => {
+      imgs.forEach(function(img, idx){
         const id = ids[idx];
         img.src = ROOT + '/frog/' + id + '.png';
-        img.alt = String(id);
+        img.alt = 'Frog ' + id;
       });
     }
 
-    function init(){
-      randomizeStrip('.frog-strip');
-      // If you have a layout function on this page, call it after randomizing
-      if (typeof layoutFrogStrip === 'function') {
-        layoutFrogStrip();
-      }
+    function init(){ randomizeCards(); }
+
+    if (document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
     }
-
-    (document.readyState === 'loading')
-      ? document.addEventListener('DOMContentLoaded', init)
-      : init();
   })();
-</script>
-
+  </script>
 </body>
 </html>
