@@ -10,15 +10,13 @@
   const connectBtn = document.getElementById('connectBtn');
   const shell      = document.getElementById('terminalShell');
   const logEl      = document.getElementById('terminalLog');
-  const previewEl  = document.getElementById('terminalPreview');
   const form       = document.getElementById('terminalForm');
   const input      = document.getElementById('terminalInput');
   const subtitle   = document.getElementById('terminalSubtitle');
   const statusChip = document.getElementById('terminalStatus');
-  const shortcuts  = document.getElementById('terminalShortcuts');
   const bodyEl     = document.body;
 
-  if (!landing || !connectBtn || !shell || !logEl || !previewEl || !form || !input) {
+  if (!landing || !connectBtn || !shell || !logEl || !form || !input) {
     return;
   }
 
@@ -60,6 +58,57 @@
   function shorten(addr){
     if (!addr || typeof addr !== 'string') return '—';
     return addr.length > 10 ? `${addr.slice(0,6)}…${addr.slice(-4)}` : addr;
+  }
+
+  function fmtAgo(ms){
+    const value = Number(ms);
+    if (!Number.isFinite(value) || value <= 0) return null;
+    const elapsed = Math.max(0, Math.floor((Date.now() - value) / 1000));
+    const days = Math.floor(elapsed / 86400);
+    if (days >= 1) return `${days}d ago`;
+    const hours = Math.floor((elapsed % 86400) / 3600);
+    if (hours >= 1) return `${hours}h ago`;
+    const mins = Math.floor((elapsed % 3600) / 60);
+    if (mins >= 1) return `${mins}m ago`;
+    return `${elapsed}s ago`;
+  }
+
+  function ownerDisplay(model){
+    if (model.owner && typeof model.owner === 'string'){
+      return shorten(model.owner);
+    }
+    if (model.ownerLabel) return String(model.ownerLabel);
+    if (model.ownerShort) return String(model.ownerShort);
+    return 'Unknown';
+  }
+
+  function attributesBlock(model){
+    const attrs = Array.isArray(model.attrs) ? model.attrs : [];
+    if (!attrs.length) return null;
+    const rows = [];
+    for (const attr of attrs){
+      if (!attr || attr.key == null || attr.value == null) continue;
+      rows.push(`&nbsp;&nbsp;- <strong>${escapeHtml(attr.key)}</strong>: ${escapeHtml(attr.value)}`);
+    }
+    return rows.length ? rows.join('<br>') : null;
+  }
+
+  function describeFrog(model){
+    const header = model.rank ? `Frog #${model.id} — Rank #${model.rank}` : `Frog #${model.id}`;
+    const ago = fmtAgo(model.sinceMs);
+    const status = model.staked
+      ? `<span class="log-success">Staked</span>${ago ? ` ${escapeHtml(ago)}` : ''} by ${escapeHtml(ownerDisplay(model))}`
+      : `Owned by ${escapeHtml(ownerDisplay(model))}`;
+    const attrBlock = attributesBlock(model);
+    const pieces = [
+      `<strong>${escapeHtml(header)}</strong>`,
+      status
+    ];
+    if (attrBlock){
+      pieces.push('Attributes:');
+      pieces.push(attrBlock);
+    }
+    log.html(pieces.join('<br>'));
   }
 
   function setFFWallet(addr){
@@ -478,52 +527,15 @@
     };
   }
 
-  function fallbackCard(model){
-    const article = document.createElement('article');
-    article.className = 'frog-card';
-    article.style.border = '1px solid var(--border)';
-    article.style.borderRadius = '14px';
-    article.style.padding = '12px';
-    const ownerText = model.staked ? `Staked by ${model.ownerLabel || 'Unknown'}` : `Owned by ${model.ownerLabel || 'Unknown'}`;
-    article.innerHTML = `<h4 style="margin:0 0 6px 0">Frog #${model.id}</h4><p class="meta">${escapeHtml(ownerText)}</p>`;
-    return article;
-  }
-
-  function promptTransfer(id){
-    const to = window.prompt(`Transfer Frog #${id} to address:`);
-    if (!to) return null;
-    return to.trim();
-  }
-
   async function renderFrogs(ids, options){
-    const opts = options || {};
-    const overrides = opts.overrides || new Map();
-    previewEl.innerHTML = '';
-    if (!ids || !ids.length) return;
+    const overrides = options?.overrides || new Map();
+    if (!ids || !ids.length) return [];
     const tasks = ids.map((tokenId)=> buildCardModel(tokenId, overrides.get(tokenId)));
     const models = await Promise.all(tasks);
-    const frag = document.createDocumentFragment();
     for (const model of models){
-      let card;
-      if (window.FF && typeof window.FF.buildFrogCard === 'function'){
-        card = window.FF.buildFrogCard(model, {
-          showActions: !!opts.actions,
-          rarityTiers: CFG.RARITY_TIERS,
-          levelSeconds: Number(CFG.STAKE_LEVEL_SECONDS || (30 * 86400)),
-          onStake: async (tokenId)=>{ await stakeToken(tokenId); },
-          onUnstake: async (tokenId)=>{ await unstakeToken(tokenId); },
-          onTransfer: async (tokenId)=>{
-            const addr = promptTransfer(tokenId);
-            if (addr) await transferToken(tokenId, addr);
-          }
-        });
-      } else {
-        card = fallbackCard(model);
-      }
-      frag.appendChild(card);
+      describeFrog(model);
     }
-    previewEl.appendChild(frag);
-    previewEl.scrollTop = 0;
+    return models;
   }
 
   async function loadOwnedFrogIds(addr, max=12){
@@ -712,7 +724,7 @@
         'my frogs — list frogs owned by your wallet',
         'staked — list frogs you currently have staked',
         'rarity [count] — show top rarity ranks (default 9)',
-        'view &lt;id…&gt; — preview specific frogs',
+        'view &lt;id…&gt; — show specific frogs',
         'stake &lt;id&gt; — stake a frog by token ID',
         'unstake &lt;id&gt; — unstake a frog by token ID',
         'approve — grant the controller staking approval',
@@ -720,7 +732,7 @@
         'rewards — show available staking rewards',
         'claim — claim earned staking rewards',
         'mint [qty] — trigger the mint flow if available',
-        'refresh — rerun the last preview command',
+        'refresh — rerun the last frog listing command',
         'clear — clear the terminal output'
       ];
       log.html(lines.join('<br>'));
@@ -728,7 +740,6 @@
 
     clear: async ()=>{
       logEl.innerHTML = '';
-      previewEl.innerHTML = '';
       lastPreview = null;
     },
 
@@ -741,12 +752,11 @@
       if (!ctx.silent) log.muted('Loading frogs owned by your wallet…');
       const ids = await loadOwnedFrogIds(account, 12);
       if (!ids.length){
-        previewEl.innerHTML = '';
         if (!ctx.silent) log.info('No frogs found for this wallet.');
         lastPreview = null;
         return;
       }
-      await renderFrogs(ids, { actions:true });
+      await renderFrogs(ids);
       if (!ctx.silent) log.success(`Showing ${ids.length} owned frog${ids.length === 1 ? '' : 's'}.`);
       if (ctx.remember !== false) lastPreview = ()=> handlers['my-frogs'](args, { silent:true, remember:false });
     },
@@ -756,13 +766,12 @@
       if (!ctx.silent) log.muted('Loading staked frogs…');
       const details = await loadUserStakedDetails(account);
       if (!details.length){
-        previewEl.innerHTML = '';
         if (!ctx.silent) log.info('No frogs from this wallet are currently staked.');
         lastPreview = null;
         return;
       }
       const overrides = new Map(details.map((row)=> [row.id, row] ));
-      await renderFrogs(details.map((row)=> row.id), { actions:true, overrides });
+      await renderFrogs(details.map((row)=> row.id), { overrides });
       if (!ctx.silent) log.success(`Showing ${details.length} staked frog${details.length === 1 ? '' : 's'}.`);
       if (ctx.remember !== false) lastPreview = ()=> handlers.staked(args, { silent:true, remember:false });
     },
@@ -773,7 +782,7 @@
       const ranks = await ensureRankData();
       const slice = ranks.slice(0, count);
       const overrides = new Map(slice.map((row)=> [row.id, {}]));
-      await renderFrogs(slice.map((row)=> row.id), { actions: !!account, overrides });
+      await renderFrogs(slice.map((row)=> row.id), { overrides });
       if (!ctx.silent) log.success(`Showing top ${slice.length} frogs by rarity.`);
       if (ctx.remember !== false) lastPreview = ()=> handlers.rarity([String(count)], { silent:true, remember:false });
     },
@@ -781,9 +790,9 @@
     view: async (args, ctx={})=>{
       const ids = parseIds(args);
       if (!ids.length) throw new Error('Usage: view <tokenId …>');
-      if (!ctx.silent) log.muted(`Rendering ${ids.length} frog${ids.length===1?'':'s'}…`);
-      await renderFrogs(ids, { actions: !!account });
-      if (!ctx.silent) log.success('Preview ready.');
+      if (!ctx.silent) log.muted(`Fetching details for ${ids.length} frog${ids.length===1?'':'s'}…`);
+      await renderFrogs(ids);
+      if (!ctx.silent) log.success('Details ready.');
       if (ctx.remember !== false) lastPreview = ()=> handlers.view(ids.map(String), { silent:true, remember:false });
     },
 
@@ -854,7 +863,7 @@
       if (typeof lastPreview === 'function'){
         await lastPreview();
       } else {
-        log.muted('Nothing to refresh yet. Run a preview command first.');
+        log.muted('Nothing to refresh yet. Run a frog listing command first.');
       }
     }
   };
@@ -893,14 +902,6 @@
     const value = input.value;
     input.value = '';
     runCommand(value);
-  });
-
-  shortcuts?.addEventListener('click', (evt)=>{
-    const btn = evt.target.closest('button[data-run]');
-    if (!btn) return;
-    const cmd = btn.getAttribute('data-run') || '';
-    input.value = '';
-    runCommand(cmd);
   });
 
   connectBtn.addEventListener('click', ()=>{
