@@ -8,22 +8,33 @@
   <link rel="stylesheet" href="assets/css/styles.css" />
 
   <style>
-    :root{
-      color-scheme: dark;
-    }
+    :root{ color-scheme: dark; }
     body{
       margin:0;
       min-height:100vh;
       display:flex;
+      flex-direction:column;
       align-items:center;
       justify-content:center;
-      background:radial-gradient(circle at top,#1a2431 0%,#0b0f13 60%,#07090c 100%);
-      color:var(--ink);
+      background:#000;
+      color:#fff;
       font-family:var(--font-ui);
-      padding:40px 18px;
+      padding:64px 18px;
+      transition:justify-content .2s ease;
     }
     body.show-terminal{
-      align-items:flex-start;
+      justify-content:flex-start;
+      align-items:stretch;
+    }
+    main{
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:48px;
+    }
+    body.show-terminal main{
+      align-items:stretch;
     }
     .sr-only{
       position:absolute;
@@ -42,66 +53,56 @@
       flex-direction:column;
       align-items:center;
       justify-content:center;
-      gap:18px;
-      padding:38px 42px;
-      background:color-mix(in srgb,var(--panel) 92%, transparent);
-      border:1px solid color-mix(in srgb,var(--border) 70%, transparent);
-      border-radius:22px;
-      box-shadow:0 18px 42px rgba(0,0,0,.45);
-      max-width:420px;
-      width:100%;
+      gap:20px;
     }
     .landing-screen img{
-      width:140px;
+      width:200px;
       height:auto;
-      filter:drop-shadow(0 8px 20px rgba(0,0,0,.45));
     }
     .landing-title{
-      font:900 28px/1.2 var(--font-display);
-      letter-spacing:-.01em;
+      margin:0;
+      font:900 32px/1.1 var(--font-display);
+      letter-spacing:-.015em;
     }
-    .landing-copy{
-      color:var(--muted);
-      font-size:15px;
-      max-width:30ch;
-    }
-    .btn-primary{
+    .landing-screen button{
       appearance:none;
-      border:1px solid color-mix(in srgb,var(--accent) 85%, transparent);
-      background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 85%, transparent) 0%, color-mix(in srgb,var(--accent) 20%, transparent) 100%);
-      color:var(--ink);
-      font-weight:800;
-      font-size:15px;
-      letter-spacing:.02em;
-      padding:12px 26px;
-      border-radius:999px;
+      border:0;
+      background:transparent;
+      color:#fff;
+      font:700 18px/1 var(--font-ui);
       text-transform:uppercase;
+      letter-spacing:.18em;
+      padding:10px 0 6px;
       cursor:pointer;
-      transition:transform .16s ease, box-shadow .16s ease;
-      box-shadow:0 10px 18px rgba(31, 201, 143, .22);
+      position:relative;
     }
-    .btn-primary:hover{
-      transform:translateY(-1px) scale(1.01);
-      box-shadow:0 16px 26px rgba(31, 201, 143, .30);
+    .landing-screen button::after{
+      content:"";
+      position:absolute;
+      left:0;
+      bottom:0;
+      width:100%;
+      height:2px;
+      background:#fff;
+      transform-origin:left;
+      transform:scaleX(.4);
+      transition:transform .2s ease;
     }
-    .btn-primary:active{
-      transform:translateY(1px);
-      box-shadow:0 8px 16px rgba(31, 201, 143, .25);
+    .landing-screen button:hover::after,
+    .landing-screen button:focus-visible::after{
+      transform:scaleX(1);
     }
 
     .terminal-shell{
-      width:min(1100px, 100%);
+      width:min(1080px, 100%);
       margin:0 auto;
       display:none;
     }
     .terminal-card{
-      background:color-mix(in srgb,var(--panel) 96%, transparent);
-      border:1px solid color-mix(in srgb,var(--border) 80%, transparent);
-      border-radius:24px;
-      box-shadow:0 28px 46px rgba(0,0,0,.48);
-      padding:34px 34px 24px;
+      padding:0;
       display:grid;
-      gap:26px;
+      gap:28px;
+      color:#fff;
     }
     .terminal-header{
       display:flex;
@@ -113,25 +114,27 @@
     .terminal-header h1{
       margin:0;
       font:900 30px/1.1 var(--font-display);
-      letter-spacing:-.01em;
+      letter-spacing:-.015em;
+      color:#fff;
     }
     .terminal-header p{
-      margin:8px 0 0 0;
-      color:var(--muted);
+      margin:8px 0 0;
+      color:rgba(255,255,255,.6);
       font-size:14px;
     }
     .status-chip{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding:8px 14px;
-      border-radius:999px;
-      border:1px solid color-mix(in srgb,var(--border) 70%, transparent);
-      background:color-mix(in srgb,var(--panel-2) 90%, transparent);
       font-size:13px;
-      letter-spacing:.01em;
+      letter-spacing:.02em;
+      color:#38bdf8;
     }
-    .status-chip strong{ font-weight:700; font-family:ui-monospace,Menlo,Consolas,monospace; }
+    .status-chip strong{
+      font-weight:700;
+      font-family:ui-monospace,Menlo,Consolas,monospace;
+      color:#fff;
+    }
     .terminal-main{
       display:grid;
       gap:22px;
@@ -140,10 +143,7 @@
       min-height:240px;
       max-height:340px;
       overflow:auto;
-      padding:18px;
-      border-radius:18px;
-      border:1px solid color-mix(in srgb,var(--border) 70%, transparent);
-      background:color-mix(in srgb,#050708 45%, var(--panel) 55%);
+      padding:0;
       font-family:ui-monospace, Menlo, Consolas, monospace;
       font-size:14px;
       line-height:1.6;
@@ -155,10 +155,10 @@
     .terminal-log::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.08); border-radius:999px; }
     .log-line{ display:flex; gap:12px; align-items:flex-start; }
     .log-time{ color:rgba(255,255,255,.35); min-width:64px; text-align:right; }
-    .log-info{ color:var(--ink); }
+    .log-info{ color:#fff; }
     .log-error{ color:#f87171; }
     .log-success{ color:#4ade80; }
-    .log-muted{ color:var(--muted); }
+    .log-muted{ color:rgba(255,255,255,.55); }
     .log-command{ color:#38bdf8; }
 
     .terminal-preview{
@@ -173,44 +173,37 @@
     }
     .terminal-preview:empty::before{
       content:'Command output will appear here with frog previews.';
-      color:var(--muted);
+      color:rgba(255,255,255,.45);
       font-size:14px;
     }
 
     .terminal-shortcuts{
       display:flex;
       flex-wrap:wrap;
-      gap:10px;
-      border-radius:16px;
-      padding:12px;
-      background:color-mix(in srgb,var(--panel-2) 84%, transparent);
-      border:1px solid color-mix(in srgb,var(--border) 70%, transparent);
+      gap:14px;
+      padding:0;
     }
     .terminal-shortcuts button{
       appearance:none;
-      border:1px solid color-mix(in srgb,var(--border) 75%, transparent);
-      background:color-mix(in srgb,var(--panel) 85%, transparent);
-      color:var(--ink);
-      padding:8px 16px;
-      border-radius:12px;
-      font-weight:600;
-      font-size:13px;
+      border:0;
+      background:transparent;
+      color:#38bdf8;
+      font:600 14px/1 var(--font-ui);
+      letter-spacing:.08em;
+      text-transform:uppercase;
       cursor:pointer;
-      transition:background .14s ease, transform .12s ease;
+      padding:0;
     }
-    .terminal-shortcuts button:hover{
-      background:color-mix(in srgb,var(--accent) 25%, var(--panel));
-      transform:translateY(-1px);
+    .terminal-shortcuts button:hover,
+    .terminal-shortcuts button:focus-visible{
+      color:#7dd3fc;
     }
 
     .terminal-form{
       display:flex;
       align-items:center;
       gap:12px;
-      border-radius:16px;
-      border:1px solid color-mix(in srgb,var(--border) 75%, transparent);
-      padding:8px 12px;
-      background:color-mix(in srgb,var(--panel) 88%, transparent);
+      padding:0;
     }
     .terminal-form .prompt{
       font-family:ui-monospace, Menlo, Consolas, monospace;
@@ -229,21 +222,22 @@
     .terminal-input::placeholder{ color:rgba(255,255,255,.35); }
     .terminal-submit{
       appearance:none;
-      border:1px solid color-mix(in srgb,var(--accent) 70%, transparent);
-      background:color-mix(in srgb,var(--accent) 20%, transparent);
-      color:var(--ink);
-      font-weight:700;
-      padding:8px 18px;
-      border-radius:12px;
+      border:0;
+      background:transparent;
+      color:#38bdf8;
+      font:600 14px/1 var(--font-ui);
+      text-transform:uppercase;
+      letter-spacing:.12em;
       cursor:pointer;
+      padding:0;
     }
-    .terminal-submit:hover{
-      background:color-mix(in srgb,var(--accent) 30%, transparent);
+    .terminal-submit:hover,
+    .terminal-submit:focus-visible{
+      color:#7dd3fc;
     }
 
     @media (max-width:720px){
-      body{ padding:28px 14px; }
-      .terminal-card{ padding:26px 22px 20px; }
+      body{ padding:48px 14px; }
       .terminal-log{ min-height:200px; }
     }
   </style>
@@ -253,8 +247,7 @@
     <section id="landingScreen" class="landing-screen" aria-labelledby="landingTitle">
       <img src="assets/img/blackWhite.png" alt="Fresh Frogs wordmark" />
       <h1 id="landingTitle" class="landing-title">freshfrogs.github.io</h1>
-      <p class="landing-copy">Connect your wallet to enter the Fresh Frogs terminal and explore your collection.</p>
-      <button id="connectBtn" type="button" class="btn-primary">Connect Wallet</button>
+      <button id="connectBtn" type="button">Connect Wallet</button>
     </section>
 
     <section id="terminalShell" class="terminal-shell" hidden>
