@@ -1,0 +1,20 @@
+freshfrogs.github.io/
+├─ index.html
+├─ assets/
+│  ├─ css/
+│  │  └─ styles.css
+│  ├─ js/
+│  │  ├─ config.js
+│  │  ├─ theme.js
+│  │  ├─ utils.js
+│  │  ├─ grid.js
+│  │  ├─ sales.js
+│  │  ├─ rarity.js
+│  │  ├─ wallet.js
+│  │  ├─ owned.js
+│  │  ├─ staking.js
+│  │  └─ main.js
+│  ├─ abi/
+│  │  └─ controller_abi.json
+│  │  └─ collection_abi.json
+│  └─ freshfrogs_rarity_rankings.json

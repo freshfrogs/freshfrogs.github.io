@@ -3,7 +3,7 @@
   'use strict';
 
   var CFG = (window.CFG || window.FF_CFG || window.CONFIG || {});
-  var OPENSEA_URL   = CFG.OPENSEA_COLLECTION_URL || CFG.OPENSEA_URL || 'https://opensea.io/';
+  var OPENSEA_URL   = CFG.OPENSEA_COLLECTION_URL || CFG.OPENSEA_URL || 'https://opensea.io/collection/fresh-frogs';
   var ETHERSCAN_URL = CFG.ETHERSCAN_COLLECTION_URL ||
                       (CFG.COLLECTION_ADDRESS ? ('https://etherscan.io/address/' + CFG.COLLECTION_ADDRESS) : 'https://etherscan.io/');
 
