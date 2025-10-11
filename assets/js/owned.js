@@ -265,7 +265,7 @@
     clearList();
     const ids = ST.cache.ownedIds || [];
     if (!ids.length){ setStatus('No owned frogs in this wallet for this collection.'); return; }
-    ids.forEach(id=> ul.appendChild(liCard(id, 'Owned by You', ST.addr, false)));
+    ids.forEach(id=> ul.appendChild(liCard(id, 'Not staked • Owned by You', ST.addr, false)));
     setStatus(`Showing ${ids.length.toLocaleString()} owned frog(s). Scroll for more.`);
   }
 
@@ -275,8 +275,7 @@
     if (!rows.length){ setStatus('No frogs from this wallet are currently staked.'); return; }
     rows.forEach(r=>{
       const sinceMs = r.since ? r.since.getTime() : null;
-      const agoLabel = sinceMs ? fmtAgoMs(Date.now()-sinceMs) : null;
-      const info = agoLabel ? `Staked ${agoLabel} by You` : 'Staked by You';
+      const info = r.since ? `Staked ${fmtAgoMs(Date.now()-sinceMs)} • Owned by You` : 'Staked • Owned by You';
       ul.appendChild(liCard(r.id, info, ST.addr, true, sinceMs));
     });
     setStatus(`Showing ${rows.length} staked frog(s). Scroll for more.`);
