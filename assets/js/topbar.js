@@ -68,7 +68,7 @@
       '<button class="btn btn-connected ffc-mutate" data-act="mutate">Mutate</button>';
 
     // Mount directly under the hero strip (title/small frogs)
-    var hero = document.querySelector('.ff-page-hero, .ff-hero, .frog-hero');
+    var hero = $('.frog-hero');
     if (hero && hero.parentNode) {
       if (hero.nextSibling) hero.parentNode.insertBefore(row, hero.nextSibling);
       else hero.parentNode.appendChild(row);

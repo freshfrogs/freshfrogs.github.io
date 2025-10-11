@@ -1,80 +1,66 @@
 <!doctype html>
-<html lang="en" data-theme="t1">
+<html lang="en" data-theme="noir">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>freshfrogs — Rarity Rankings</title>
+  <title>freshfrogs — Rarity</title>
 
   <link rel="stylesheet" href="assets/css/styles.css" />
 
   <style>
-    /* Base (same tone as collection.html) */
-    .pg-wrap{ padding:20px; }
     img{ image-rendering: pixelated; image-rendering: crisp-edges; }
 
-    /* Centered wide page like collection’s hero + topbar */
-    .frog-hero{ margin:28px auto 38px; max-width:1100px; }
-    .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
-    .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
-    .frog-strip .tile{ flex:0 0 auto; width:64px; height:64px; border-radius:10px; }
+    .rarity-shell{ padding:48px 0 72px; display:grid; gap:28px; }
+    .rarity-panel{
+      background:linear-gradient(160deg, color-mix(in srgb, var(--panel) 92%, transparent) 0%, color-mix(in srgb, var(--panel-2) 70%, transparent) 100%);
+      border:1px solid color-mix(in srgb, var(--border) 80%, transparent);
+      border-radius:20px;
+      padding:28px;
+      box-shadow:0 22px 45px color-mix(in srgb, rgba(0,0,0,.65) 45%, transparent);
+    }
+
+    .frog-hero{ display:grid; gap:22px; justify-items:center; text-align:center; }
+    .frog-title{ margin:0; font:900 32px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; }
+    .frog-sub{ margin:0; color:var(--muted); max-width:540px; }
+    .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; flex-wrap:wrap; }
+    .frog-strip .tile{ width:72px; height:72px; border-radius:16px; background:color-mix(in srgb, var(--panel-2) 70%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--border) 65%, transparent); overflow:hidden; }
     .frog-strip .tile.hide{ display:none !important; }
-    .frog-strip img{ width:64px; height:64px; object-fit:contain; }
-    @media (max-width:520px){ .frog-hero{ margin:22px auto 30px; } .frog-strip{ gap:10px; } }
+    .frog-strip img{ width:100%; height:100%; object-fit:contain; }
+    @media (max-width:520px){ .frog-strip .tile{ width:60px; height:60px; } .frog-title{ font-size:26px; } }
 
-    /* Card wrapper like dashboard */
-    .pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
-    .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
-    .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
-    .pg-muted{ color:var(--muted); font-size:13px; }
+    .panel-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:18px; flex-wrap:wrap; margin-bottom:18px; }
+    .panel-head h3{ margin:0; font-weight:800; font-size:20px; letter-spacing:-.01em; }
+    .pg-muted{ color:var(--muted); font-size:14px; }
 
-    /* Frog cards (match dashboard) */
-    .frog-cards{ display:grid; gap:10px; }
-    .frog-card{
-      border:1px solid var(--border);
-      background: var(--panel);
-      border-radius:14px;
-      padding:12px;
-      display:grid; grid-template-columns:auto 1fr; column-gap:12px; row-gap:6px; align-items:start;
-      color:inherit;
-    }
-    .frog-card .thumb{
-      width:128px;height:128px;border-radius:12px;background:var(--panel-2);object-fit:contain;grid-row: span 3;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 6px 12px rgba(0,0,0,.25);
-      display:block;
-    }
-    .frog-card .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
-    .pill{ display:inline-block; padding:3px 10px; border-radius:999px; background: color-mix(in srgb, var(--panel) 85%, transparent); border:1px solid var(--border); font-size:12px; }
-    .meta{ color:var(--muted); font-size:12px; }
-    .attr-bullets{ list-style:disc; margin:6px 0 0 18px; padding:0; }
-    .attr-bullets li{ font-size:12px; margin:2px 0; }
+    .filter-row{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
 
-    /* Rank rarity colors (identical to collection) */
-    .rank-pill{
-      display:inline-flex; align-items:center; gap:6px;
-      border:1px solid var(--border); border-radius:999px; padding:3px 8px;
-      font-size:11px; font-weight:700; letter-spacing:.01em;
-      background:color-mix(in srgb, var(--panel) 35%, transparent);
-    }
-    .rank-pill::before{ content:'◆'; font-size:12px; line-height:1; }
-    .rank-legendary{ color:#f59e0b; border-color: color-mix(in srgb, #f59e0b 70%, var(--border)); }
-    .rank-legendary::before{ color:#f59e0b; }
-    .rank-epic{ color:#a855f7; border-color: color-mix(in srgb, #a855f7 70%, var(--border)); }
-    .rank-epic::before{ color:#a855f7; }
-    .rank-rare{ color:#38bdf8; border-color: color-mix(in srgb, #38bdf8 70%, var(--border)); }
-    .rank-rare::before{ color:#38bdf8; }
-    .rank-common{ color:inherit; border-color:var(--border); }
-    .rank-common::before{ color:var(--muted); }
+    .tool-btn{ border-color: color-mix(in srgb, var(--ink) 14%, transparent); background: color-mix(in srgb, var(--panel) 85%, transparent); color: var(--ink); box-shadow: 0 6px 12px rgba(0,0,0,.18); }
+    .tool-btn:hover{ border-color: color-mix(in srgb, var(--accent) 45%, transparent); background: color-mix(in srgb, var(--panel-2) 70%, var(--panel)); color: var(--ink); }
+    .tool-btn:focus-visible{ outline:none; box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
+    .tool-btn.btn-solid{ background: var(--accent); color: var(--accent-ink); border-color: color-mix(in srgb, var(--accent) 50%, transparent); box-shadow:0 10px 20px color-mix(in srgb, var(--accent) 35%, transparent); }
 
-    /* Green “staked … ago” highlight (match dashboard tweak) */
-    .meta .staked-flag{ color:#22c55e; font-weight:700; }
+    .search-input{ width:160px; padding:6px 12px; border-radius:10px; border:1px solid color-mix(in srgb, var(--border) 85%, transparent); background: color-mix(in srgb, var(--panel-2) 75%, transparent); color: var(--ink); font:600 14px/1 var(--font-ui); box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
+    .search-input::placeholder{ color: color-mix(in srgb, var(--muted) 70%, transparent); }
+    .search-input:focus{ outline:none; border-color: color-mix(in srgb, var(--accent) 45%, transparent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
+
+    .rarity-grid{ display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .load-more{ display:grid; place-items:center; margin-top:22px; }
+    #rarityGrid .pg-muted{ text-align:center; padding:30px 0; }
+
+    .rarity-grid .frog-card{ background: color-mix(in srgb, var(--card) 92%, transparent); border:1px solid color-mix(in srgb, var(--border) 85%, transparent); box-shadow:0 12px 25px rgba(0,0,0,.22); }
+    .rarity-grid .frog-card .thumb{ box-shadow: inset 0 0 0 1px color-mix(in srgb, rgba(255,255,255,.08) 80%, transparent), 0 10px 20px rgba(0,0,0,.35); }
+    .rarity-grid .frog-card .meta{ font-size:13px; }
+    .rarity-grid .frog-card .attr-bullets li{ font-size:13px; }
+    .rarity-grid .frog-card .attr-bullets li[data-hoverable="1"]:hover{ transform: translate(-2px, -2px); filter: drop-shadow(0 4px 6px rgba(0,0,0,.35)); }
   </style>
 </head>
 <body>
-  <div class="pg-wrap container">
-
-    <!-- HERO (same markup as collection) -->
-    <section class="frog-hero">
-      <h1 class="frog-title">freshfrogs.github.io</h1>
+  <div class="rarity-shell container">
+    <section class="frog-hero rarity-panel">
+      <div>
+        <h1 class="frog-title">freshfrogs — Rarity Explorer</h1>
+        <p class="frog-sub">Discover how every frog stacks up across the pond. Sample traits, owners, and staking progress without leaving the page.</p>
+      </div>
       <div class="frog-strip">
         <div class="tile"><img src="frog/12.png"  alt="12"></div>
         <div class="tile"><img src="frog/77.png"  alt="77"></div>
@@ -85,31 +71,44 @@
       </div>
     </section>
 
-    <!-- Top pills are injected by assets/js/topbar.js exactly like on collection.html -->
+    <div id="ffTopbarMount"></div>
 
-    <!-- Rarity rankings panel -->
-    <section class="pg-card" style="max-width:1100px; margin:0 auto;">
-      <div class="pg-card-head">
-        <h3>Rarity Rankings</h3>
+    <section class="rarity-panel">
+      <header class="panel-head">
+        <div>
+          <h3>Rarity Rankings</h3>
+          <p class="pg-muted">Sort by rarity score or staking age, jump to any frog ID, and explore the layered art.</p>
+        </div>
+        <button id="btnThemeCycle" class="btn btn-sm btn-outline tool-btn">Theme</button>
+      </header>
+
+      <div class="filter-row">
+        <button id="btnSortRank"  class="btn btn-sm btn-outline tool-btn">Sort: Rank ↑</button>
+        <button id="btnSortScore" class="btn btn-sm btn-outline tool-btn">Sort: Score ↓</button>
+        <input id="raritySearchId" type="number" min="1" placeholder="Find Frog ID…" class="search-input">
+        <button id="btnGo" class="btn btn-sm btn-solid tool-btn">Go</button>
       </div>
-      <p class="pg-muted" style="margin:6px 0 12px 0; max-width:70ch;">
-        Top frogs across the collection, ordered by rarity. Status will show if a frog is currently staked and who holds it.
-      </p>
 
-      <div id="rankGrid" class="frog-cards" aria-live="polite">
-        <div class="pg-muted">Loading rankings…</div>
+      <div id="rarityGrid" class="rarity-grid">
+        <div class="pg-muted">Loading rarity…</div>
+      </div>
+
+      <div class="load-more">
+        <button id="btnMore" class="btn btn-sm btn-outline tool-btn" style="display:none;">Load More</button>
       </div>
     </section>
   </div>
 
   <script>
-    /* Keep whole 64px tiles only (hero strip) */
+    /* keep hero strip behavior the same */
     function layoutFrogStrip(){
       var strip = document.querySelector('.frog-strip'); if(!strip) return;
       var tiles = Array.prototype.slice.call(strip.querySelectorAll('.tile'));
       var styles = window.getComputedStyle(strip);
       var gap = parseFloat(styles.gap || 12) || 12;
-      var tileW = 64, innerW = strip.clientWidth;
+      var sample = tiles.length ? tiles[0].offsetWidth : 72;
+      var tileW = sample || 72;
+      var innerW = strip.clientWidth;
       var count = Math.max(1, Math.floor((innerW + gap) / (tileW + gap)));
       tiles.forEach(function(t,i){ t.classList.toggle('hide', i >= count); });
     }
@@ -117,182 +116,28 @@
     document.addEventListener('DOMContentLoaded', layoutFrogStrip);
   </script>
 
-  <!-- Scripts (mirror collection.html order for a pixel-perfect match) -->
+  <!-- match your collection.html script stack/order (only what we need here) -->
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.4/dist/web3.min.js"></script>
   <script src="assets/js/config.js"></script>
   <script src="assets/js/utils.js"></script>
   <script src="assets/js/rarity.js"></script>
   <script src="assets/js/modal.js"></script>
 
-  <!-- ABIs (same paths as collection) -->
+  <!-- ABIs (some renderers or links reference addresses) -->
   <script src="assets/abi/collection_abi.js"></script>
   <script src="assets/abi/controller_abi.js"></script>
 
-  <!-- Shared UI bits -->
-  <script src="assets/js/topbar.js"></script>
+  <!-- Shared staking adapter so we can resolve stake owners/age like collection.html -->
+  <script src="assets/js/staking-adapter.js"></script>
+
+  <!-- Card + renderer (same as dashboard) -->
   <script src="assets/js/frog-renderer.js"></script>
+  <script src="assets/js/frog-cards.js" defer></script>
 
-  <script>
-    (function(){
-      const CFG = window.FF_CFG || {};
-      const TOTAL = Number(CFG.TOTAL_SUPPLY || 4040);
-      const ROOT  = String(CFG.SOURCE_PATH || '').replace(/\/+$/,'') || '';
-      const COLL  = String(CFG.COLLECTION_ADDRESS || '');
-      const CTRL  = String(CFG.CONTROLLER_ADDRESS || '');
+  <!-- Top bar pills -->
+  <script src="assets/js/topbar.js"></script>
 
-      // Randomize the hero frog images on each load (same as index/collection).
-      function pickUniqueIds(n, max){
-        const pool = Array.from({length:max}, (_,i)=> i+1);
-        for (let i = pool.length - 1; i > 0; i--){
-          const j = Math.floor(Math.random()*(i+1));
-          [pool[i], pool[j]] = [pool[j], pool[i]];
-        }
-        return pool.slice(0, n);
-      }
-      function randomizeStrip(selector){
-        const strip = document.querySelector(selector);
-        if (!strip) return;
-        const imgs = Array.from(strip.querySelectorAll('.tile img'));
-        if (!imgs.length) return;
-        const ids = pickUniqueIds(imgs.length, TOTAL);
-        imgs.forEach((img, idx) => {
-          const id = ids[idx];
-          img.src = ROOT + '/frog/' + id + '.png';
-          img.alt = String(id);
-        });
-      }
-      (document.readyState === 'loading')
-        ? document.addEventListener('DOMContentLoaded', () => randomizeStrip('.frog-strip'))
-        : randomizeStrip('.frog-strip');
-
-      // Helper: rank → color class (identical to collection)
-      function rankClass(rank){
-        if (!Number.isFinite(rank)) return 'rank-common';
-        if (rank <= 50) return 'rank-legendary';
-        if (rank <= 150) return 'rank-epic';
-        if (rank <= 500) return 'rank-rare';
-        return 'rank-common';
-      }
-
-      // Web3 provider (RPC if configured, else wallet if present)
-      function makeWeb3(){
-        try{
-          if (CFG.RPC_URL) return new Web3(new Web3.providers.HttpProvider(CFG.RPC_URL));
-          if (window.ethereum) return new Web3(window.ethereum);
-        }catch(_){}
-        return null;
-      }
-
-      // Fetch minimal meta
-      async function getMeta(id){
-        try{
-          const r = await fetch(ROOT + '/frog/json/' + id + '.json');
-          if (!r.ok) throw new Error('meta ' + id);
-          const j = await r.json();
-          const attrs = Array.isArray(j?.attributes) ? j.attributes : [];
-          return { id, attrs };
-        }catch{ return { id, attrs: [] }; }
-      }
-
-      // ownerOf; staked if owner === controller
-      async function getOwnerAndStake(w3, id){
-        if (!w3 || !COLL) return { owner: null, staked:false, sinceMs:null };
-        try{
-          const nft = new w3.eth.Contract((window.COLLECTION_ABI||[]), COLL);
-          const owner = await nft.methods.ownerOf(String(id)).call();
-          const staked = owner && CTRL && owner.toLowerCase() === CTRL.toLowerCase();
-          return { owner, staked, sinceMs:null };
-        }catch{
-          return { owner:null, staked:false, sinceMs:null };
-        }
-      }
-
-      function attrsHTML(attrs, max=4){
-        if (!Array.isArray(attrs)||!attrs.length) return '';
-        const rows=[]; for (const a of attrs){
-          const k = a.trait_type || a.key || '';
-          const v = (a.value ?? a.trait_value ?? '');
-          if (!k || v==null) continue;
-          rows.push('<li><b>'+k+':</b> '+String(v)+'</li>');
-          if (rows.length>=max) break;
-        }
-        return rows.length? '<ul class="attr-bullets">'+rows.join('')+'</ul>' : '';
-      }
-
-      function metaLine(staked, sinceMs, owner, youAddr){
-        const you = youAddr ? String(youAddr).toLowerCase() : '';
-        const short = (a)=> a ? (a.slice(0,6)+'…'+a.slice(-4)) : '—';
-        const who = owner ? (you && owner.toLowerCase()===you ? 'You' : short(owner)) : 'Unknown';
-        if (staked){
-          // We don’t know exact since time cheaply here; show staked flag only
-          return '<span class="staked-flag">Staked</span> • Owned by '+who;
-        }
-        return 'Not staked • Owned by '+who;
-      }
-
-      function cardHTML(it, youAddr){
-        const rk = Number(it.rank);
-        const rkClass = rankClass(rk);
-        const pill = '<span class="rank-pill '+rkClass+'">#'+rk+'</span>';
-        const title = 'Frog #'+it.id+' '+pill;
-        return [
-          '<article class="frog-card" data-token-id="'+it.id+'">',
-            '<img class="thumb" src="'+(ROOT+'/frog/'+it.id+'.png')+'" alt="'+it.id+'">',
-            '<h4 class="title">'+title+'</h4>',
-            '<div class="meta">'+metaLine(it.staked, it.sinceMs, it.owner, youAddr)+'</div>',
-            attrsHTML(it.attrs, 4),
-          '</article>'
-        ].join('');
-      }
-
-      async function loadRankings(){
-        const mount = document.getElementById('rankGrid');
-        if (!mount) return;
-
-        // Ensure ranks (FF.RANKS provided by assets/js/rarity.js)
-        const ranks = window.FF && FF.RANKS ? FF.RANKS : {};
-        const pairs = Object.entries(ranks)
-          .map(([id, rank]) => ({ id: Number(id), rank: Number(rank) }))
-          .filter(x => Number.isFinite(x.id) && Number.isFinite(x.rank))
-          .sort((a,b) => a.rank - b.rank)
-          .slice(0, 100); // top 100 for the page
-
-        if (!pairs.length){
-          mount.innerHTML = '<div class="pg-muted">No rankings loaded.</div>';
-          return;
-        }
-
-        const w3 = makeWeb3();
-        const youAddr = (window.Wallet && Wallet.getAddress && Wallet.getAddress()) || (window.ethereum && window.ethereum.selectedAddress) || '';
-
-        // Load in small batches so we don’t jam RPC
-        const batchSize = 10;
-        const out = [];
-        for (let i=0; i<pairs.length; i+=batchSize){
-          const chunk = pairs.slice(i, i+batchSize);
-          const metas = await Promise.all(chunk.map(p => getMeta(p.id)));
-          const owns  = await Promise.all(chunk.map(p => getOwnerAndStake(w3, p.id)));
-
-          chunk.forEach((p, idx) => {
-            out.push({
-              id: p.id,
-              rank: p.rank,
-              attrs: metas[idx].attrs || [],
-              owner: owns[idx].owner,
-              staked: owns[idx].staked,
-              sinceMs: owns[idx].sinceMs || null
-            });
-          });
-        }
-
-        // Render
-        mount.innerHTML = out.map(it => cardHTML(it, youAddr)).join('');
-      }
-
-      (document.readyState === 'loading')
-        ? document.addEventListener('DOMContentLoaded', loadRankings)
-        : loadRankings();
-    })();
-  </script>
+  <!-- Rarity page glue -->
+  <script src="assets/js/rarity-page.js"></script>
 </body>
 </html>
