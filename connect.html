@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fresh Frogs — Connect Wallet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #040404;
+      --panel: rgba(10, 12, 12, 0.88);
+      --border: rgba(255, 255, 255, 0.12);
+      --fg: #f2f6f3;
+      --muted: rgba(242, 246, 243, 0.64);
+      --accent: #7dff9f;
+      --accent-soft: rgba(125, 255, 159, 0.18);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(32px, 6vw, 72px);
+      background:
+        radial-gradient(circle at top, rgba(125, 255, 159, 0.12), transparent 55%),
+        linear-gradient(160deg, rgba(4, 4, 4, 0.95), rgba(3, 3, 3, 0.96)),
+        url('assets/img/blackWhite.png') center/contain no-repeat fixed;
+      background-color: #020202;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: var(--fg);
+    }
+
+    main.screen {
+      width: min(520px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55);
+      display: grid;
+      gap: 28px;
+      padding: clamp(28px, 6vw, 48px);
+      justify-items: center;
+      text-align: center;
+    }
+
+    .brand {
+      font-family: 'Space Grotesk', var(--font-ui, 'Inter');
+      font-size: 0.85rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    img.hero {
+      width: min(260px, 100%);
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.45);
+    }
+
+    h1 {
+      margin: 0;
+      font-family: 'Space Grotesk', var(--font-ui, 'Inter');
+      font-size: clamp(2.3rem, 6vw, 2.9rem);
+      line-height: 1.05;
+      letter-spacing: -0.015em;
+    }
+
+    p.lead {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.02rem;
+      line-height: 1.6;
+      max-width: 36ch;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(4, 4, 4, 0.55);
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 86, 86, 0.9);
+      box-shadow: 0 0 12px rgba(255, 86, 86, 0.65);
+      transition: background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .status-dot.connected {
+      background: rgba(125, 255, 159, 0.9);
+      box-shadow: 0 0 16px rgba(125, 255, 159, 0.75);
+    }
+
+    #walletLabel.address {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+      letter-spacing: 0.08em;
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+
+    button.primary {
+      font-family: 'Space Grotesk', var(--font-ui, 'Inter');
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.82rem;
+      padding: 14px 36px;
+      border-radius: 999px;
+      border: 1px solid rgba(125, 255, 159, 0.65);
+      background: var(--accent-soft);
+      color: var(--accent);
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button.primary:hover {
+      transform: translateY(-1px);
+      background: rgba(125, 255, 159, 0.28);
+      box-shadow: 0 18px 40px rgba(125, 255, 159, 0.16);
+    }
+
+    button.primary:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .links a {
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 520px) {
+      main.screen {
+        gap: 24px;
+        padding: 28px;
+      }
+      button.primary {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="screen" role="main">
+    <div class="brand">Fresh Frogs</div>
+    <img class="hero" src="assets/img/blackWhite.png" alt="Fresh Frogs black &amp; white illustration" />
+    <h1>Connect your wallet</h1>
+    <p class="lead">Link your Ethereum wallet to unlock the staking console and manage your frogs in the terminal.</p>
+    <div class="status" role="status" aria-live="polite">
+      <span class="status-dot" id="statusDot" aria-hidden="true"></span>
+      <span id="statusText">Not connected</span>
+    </div>
+    <div id="walletLabel" class="address" style="display:none;" aria-live="polite"></div>
+    <button id="connectBtn" class="primary" type="button">Connect Wallet</button>
+    <div class="links">
+      <span>Need a wallet? <a href="https://metamask.io/" target="_blank" rel="noopener">Install MetaMask</a></span>
+      <span>Ready to explore? <a href="index.html">Enter the terminal</a></span>
+    </div>
+  </main>
+
+  <script src="assets/js/wallet.js"></script>
+  <script>
+    (function(){
+      const statusText = document.getElementById('statusText');
+      const statusDot = document.getElementById('statusDot');
+
+      function short(addr){
+        return addr ? `${addr.slice(0, 6)}\u2026${addr.slice(-4)}` : 'Connected';
+      }
+
+      function setStatus(label, connected){
+        if (statusText) statusText.textContent = label;
+        statusDot?.classList.toggle('connected', !!connected);
+      }
+
+      setStatus('Not connected', false);
+
+      window.addEventListener('wallet:connected', (event)=>{
+        const addr = event?.detail?.address;
+        setStatus('Connected', true);
+        const label = short(addr);
+        const walletLabel = document.getElementById('walletLabel');
+        if (walletLabel){
+          walletLabel.textContent = label;
+          walletLabel.style.display = '';
+        }
+        setTimeout(()=>{
+          window.location.href = 'index.html';
+        }, 900);
+      });
+
+      window.addEventListener('wallet:disconnected', ()=>{
+        setStatus('Not connected', false);
+        const walletLabel = document.getElementById('walletLabel');
+        if (walletLabel){
+          walletLabel.textContent = '';
+          walletLabel.style.display = 'none';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
