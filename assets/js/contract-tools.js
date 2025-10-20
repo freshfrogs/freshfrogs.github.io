@@ -5,6 +5,7 @@
   // ---------- Config ----------
   const CONTROLLER = (window.CONTROLLER_ADDRESS || "0xCB1eE125cFf4051A10A55a09B10613876C4eF199").trim();
   const TARGET_CHAIN_ID = 1; // Ethereum mainnet
+  const SESSION_KEY = 'ff:connected';
 
   // Controller ABI (from your message)
   const CONTROLLER_ABI = [
@@ -33,19 +34,36 @@
   ];
 
   // ---------- State ----------
-  let provider, signer, userAddr;
-  let controller, nftAddress, rewardsAddress;
-  let rewardsMeta = {decimals:18, symbol:"TOKEN", loaded:false};
+  const state = {
+    provider: null,
+    signer: null,
+    account: null,
+    network: null,
+    controller: null,
+    nftAddress: null,
+    rewardsAddress: null,
+    eventsBound: false
+  };
+
+  const rewardsMeta = {decimals:18, symbol:"TOKEN", loaded:false};
 
   // ---------- DOM ----------
   const $ = (id)=>document.getElementById(id);
-  const terminal = $("terminal");
-  const acct = $("acct");
+  const legacyTerminal = $("terminal");
+  const cliLog = $("terminal-log");
+  const cliScroll = $("terminal-scroll");
+  const cliForm = $("terminal-form");
+  const cliInput = $("terminal-input");
+  const statusAddress = $("status-address");
+  const statusNetwork = $("status-network");
+  const statusDot = $("status-dot");
+
+  const CLI_MODE = !!cliLog;
+
   const chipController = $("chipController");
   const chipNetwork = $("chipNetwork");
   const linkNFT = $("linkNFT");
   const linkRewards = $("linkRewards");
-
   const btnConnect = $("btnConnect");
   const btnClaim = $("btnClaim");
   const btnStake = $("btnStake");
@@ -54,6 +72,7 @@
   const btnGetStaked = $("btnGetStaked");
   const btnStakerOf = $("btnStakerOf");
   const btnStakers = $("btnStakers");
+  const acct = $("acct");
 
   const inStakeId = $("in-stake-id");
   const inWithdrawId = $("in-withdraw-id");
@@ -62,18 +81,86 @@
   const inStakerOf = $("in-staker-of");
   const inStakers = $("in-stakers");
 
-  // ---------- Helpers ----------
-  function log(line, type="info"){
-    const prefix = type==="error" ? "❌ " : type==="ok" ? "✅ " : "• ";
-    terminal.textContent = `${prefix}${line}\n${terminal.textContent}`;
+  // ---------- Logging ----------
+  function scrollToBottom(){
+    if (CLI_MODE && cliScroll){
+      cliScroll.scrollTop = cliScroll.scrollHeight;
+    }
   }
+
+  function decorate(line, type){
+    if (CLI_MODE) return line;
+    const prefix = type === "error" ? "❌ " : type === "ok" ? "✅ " : "• ";
+    return `${prefix}${line}`;
+  }
+
+  function appendLine(target, text, className){
+    if (!target) return;
+    const div = document.createElement('div');
+    div.className = `line${className ? ' ' + className : ''}`;
+    div.textContent = text;
+    target.appendChild(div);
+  }
+
+  function log(line, type="info"){
+    if (CLI_MODE && cliLog){
+      appendLine(cliLog, line, type);
+      scrollToBottom();
+    } else if (legacyTerminal){
+      const text = decorate(line, type);
+      legacyTerminal.textContent = `${text}\n${legacyTerminal.textContent || ''}`;
+    } else {
+      console.log(line);
+    }
+  }
+
+  function logPrompt(line){
+    if (CLI_MODE && cliLog){
+      appendLine(cliLog, `> ${line}`, 'prompt');
+      scrollToBottom();
+    } else if (legacyTerminal){
+      legacyTerminal.textContent = `> ${line}\n${legacyTerminal.textContent || ''}`;
+    }
+  }
+
+  function clearLog(){
+    if (CLI_MODE && cliLog){
+      cliLog.textContent = '';
+      scrollToBottom();
+    } else if (legacyTerminal){
+      legacyTerminal.textContent = '';
+    }
+  }
+
+  function setStatusLabels(){
+    if (statusAddress){
+      statusAddress.textContent = state.account ? short(state.account) : 'wallet not connected';
+    }
+    if (statusNetwork){
+      statusNetwork.textContent = state.network ? `${state.network.name} (#${state.network.chainId})` : 'offline';
+    }
+    if (statusDot){
+      statusDot.classList.toggle('online', !!state.account);
+    }
+    if (acct){
+      acct.textContent = state.account ? `${short(state.account)} on ${state.network?.name || ''}` : '';
+    }
+    if (chipNetwork){
+      chipNetwork.textContent = state.network ? (state.network.chainId === 1 ? 'Ethereum' : `${state.network.name} (#${state.network.chainId})`) : '—';
+    }
+  }
+
+  const history = [];
+  let historyIndex = 0;
+
+  // ---------- Helpers ----------
   const linkAddr = (a)=>`https://etherscan.io/address/${a}`;
   function short(a){ return a ? a.slice(0,6)+"…"+a.slice(-4) : ""; }
 
   async function ensureRewardsMeta(){
-    if (rewardsMeta.loaded || !rewardsAddress) return rewardsMeta;
+    if (rewardsMeta.loaded || !state.rewardsAddress) return rewardsMeta;
     try{
-      const erc20 = new ethers.Contract(rewardsAddress, ERC20_ABI, provider);
+      const erc20 = new ethers.Contract(state.rewardsAddress, ERC20_ABI, state.provider);
       const [d,s] = await Promise.all([erc20.decimals(), erc20.symbol()]);
       rewardsMeta.decimals = d; rewardsMeta.symbol = s || "TOKEN"; rewardsMeta.loaded = true;
     }catch{}
@@ -85,144 +172,339 @@
     catch{ return raw.toString(); }
   }
 
-  // ---------- Init ----------
-  function init(){
-    chipController.textContent = CONTROLLER;
-    chipController.href = linkAddr(CONTROLLER);
+  function requireController(){
+    if (!state.controller) throw new Error('Connect wallet first.');
+    return state.controller;
   }
 
+  function bindProviderEvents(){
+    if (state.eventsBound || !window.ethereum) return;
+    const provider = window.ethereum;
+    provider.on?.('accountsChanged', async (arr)=>{
+      const next = (arr && arr[0]) ? arr[0] : null;
+      if (!next){
+        state.account = null;
+        state.controller = null;
+        sessionStorage.removeItem(SESSION_KEY);
+        setStatusLabels();
+        log('Wallet disconnected.', 'error');
+      } else {
+        state.account = next;
+        state.signer = state.provider.getSigner();
+        state.controller = new ethers.Contract(CONTROLLER, CONTROLLER_ABI, state.signer);
+        state.network = await state.provider.getNetwork();
+        sessionStorage.setItem(SESSION_KEY, '1');
+        setStatusLabels();
+        log(`Account changed to ${short(next)}.`, 'info');
+      }
+    });
+
+    provider.on?.('chainChanged', async ()=>{
+      if (state.provider){
+        state.provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
+        state.signer = state.provider.getSigner();
+        if (state.account){
+          state.controller = new ethers.Contract(CONTROLLER, CONTROLLER_ABI, state.signer);
+          state.network = await state.provider.getNetwork();
+          setStatusLabels();
+          log(`Network changed to ${state.network.name} (#${state.network.chainId}).`, 'info');
+        }
+      }
+    });
+
+    provider.on?.('disconnect', ()=>{
+      state.account = null;
+      state.controller = null;
+      sessionStorage.removeItem(SESSION_KEY);
+      setStatusLabels();
+      log('Provider disconnected.', 'error');
+    });
+
+    state.eventsBound = true;
+  }
+
+  // ---------- Init ----------
+  function init(){
+    if (chipController){
+      chipController.textContent = CONTROLLER;
+      chipController.href = linkAddr(CONTROLLER);
+    }
+    if (linkNFT){ linkNFT.href = '#'; }
+    if (linkRewards){ linkRewards.href = '#'; }
+    setStatusLabels();
+    if (CLI_MODE){
+      log('Fresh Frogs :: staking console ready.', 'header');
+      log('Type "help" to list available commands.', 'muted');
+      if (!sessionStorage.getItem(SESSION_KEY)){
+        log('Connect your wallet via the onboarding screen or by entering "connect".', 'muted');
+      }
+    }
+  }
+
+  // ---------- Connection ----------
   async function connect(){
     try{
-      if(!window.ethereum) return log("MetaMask not found.", "error");
-      provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-      await provider.send("eth_requestAccounts", []);
-      signer = provider.getSigner();
-      userAddr = await signer.getAddress();
-      const net = await provider.getNetwork();
+      if(!window.ethereum) throw new Error('MetaMask not found.');
+      state.provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
+      await state.provider.send('eth_requestAccounts', []);
+      state.signer = state.provider.getSigner();
+      state.account = await state.signer.getAddress();
+      state.network = await state.provider.getNetwork();
+      state.controller = new ethers.Contract(CONTROLLER, CONTROLLER_ABI, state.signer);
+      [state.nftAddress, state.rewardsAddress] = await Promise.all([
+        state.controller.nftCollection(),
+        state.controller.rewardsToken()
+      ]);
 
-      acct.textContent = `${short(userAddr)} on ${net.name} (#${net.chainId})`;
-      chipNetwork.textContent = net.chainId===1 ? "Ethereum" : `${net.name} (#${net.chainId})`;
-      if (net.chainId !== TARGET_CHAIN_ID) log(`Warning: expected chainId ${TARGET_CHAIN_ID} (Ethereum). You are on ${net.name}.`, "error");
-
-      controller = new ethers.Contract(CONTROLLER, CONTROLLER_ABI, signer);
-      [nftAddress, rewardsAddress] = await Promise.all([controller.nftCollection(), controller.rewardsToken()]);
-
-      linkNFT.href = linkAddr(nftAddress);
-      linkRewards.href = linkAddr(rewardsAddress);
-      log("Connected.", "ok");
-
-      if (window.ethereum && window.ethereum.on) {
-        window.ethereum.on("accountsChanged", ()=>location.reload());
-        window.ethereum.on("chainChanged", ()=>location.reload());
+      if (linkNFT){ linkNFT.href = linkAddr(state.nftAddress); }
+      if (linkRewards){ linkRewards.href = linkAddr(state.rewardsAddress); }
+      if (chipController){ chipController.textContent = CONTROLLER; chipController.href = linkAddr(CONTROLLER); }
+      if (chipNetwork){
+        chipNetwork.textContent = state.network.chainId === 1 ? 'Ethereum' : `${state.network.name} (#${state.network.chainId})`;
       }
-    }catch(e){ log(e.message||String(e), "error"); }
+
+      sessionStorage.setItem(SESSION_KEY, '1');
+      setStatusLabels();
+      bindProviderEvents();
+
+      log(`Connected as ${state.account} on ${state.network.name} (#${state.network.chainId}).`, 'ok');
+      if (state.network.chainId !== TARGET_CHAIN_ID){
+        log(`Warning: expected chainId ${TARGET_CHAIN_ID} (Ethereum). You are on ${state.network.name}.`, 'error');
+      }
+    }catch(e){ log(e.message||String(e), 'error'); }
   }
 
   // ---------- Actions ----------
   async function approveIfNeeded(tokenId){
-    const nft = new ethers.Contract(nftAddress, ERC721_ABI, signer);
+    const nft = new ethers.Contract(state.nftAddress, ERC721_ABI, state.signer);
     const owner = (await nft.ownerOf(tokenId)).toLowerCase();
-    if (owner !== userAddr.toLowerCase()) throw new Error(`You do not own tokenId ${tokenId}.`);
+    if (owner !== state.account.toLowerCase()) throw new Error(`You do not own tokenId ${tokenId}.`);
     const approved = (await nft.getApproved(tokenId)).toLowerCase();
-    if (approved === CONTROLLER.toLowerCase()) return "already-approved";
+    if (approved === CONTROLLER.toLowerCase()) return 'already-approved';
     const tx = await nft.approve(CONTROLLER, tokenId);
-    log(`approve() sent: ${tx.hash}`);
+    log(`approve(${tokenId}) sent: ${tx.hash}`, 'info');
     const rec = await tx.wait();
-    log(`approve() confirmed. status=${rec.status}`, "ok");
-    return "approve-token";
+    log(`approve(${tokenId}) confirmed. status=${rec.status}`, rec.status === 1 ? 'ok' : 'error');
+    return 'approve-token';
   }
 
   async function doClaim(){
     try{
-      if(!controller) throw new Error("Connect wallet first.");
+      const controller = requireController();
       const tx = await controller.claimRewards();
-      log(`claimRewards() tx: ${tx.hash}`);
+      log(`claimRewards() tx: ${tx.hash}`, 'info');
       const rec = await tx.wait();
-      log(`claimRewards() confirmed. status=${rec.status}`, "ok");
-    }catch(e){ log(e.message||String(e), "error"); }
+      log(`claimRewards() confirmed. status=${rec.status}`, rec.status === 1 ? 'ok' : 'error');
+    }catch(e){ log(e.message||String(e), 'error'); }
   }
 
-  async function doStake(){
+  async function doStake(tokenId){
     try{
-      if(!controller) throw new Error("Connect wallet first.");
-      const tokenId = inStakeId.value.trim();
-      if(tokenId==="") throw new Error("Enter a tokenId.");
-      if(!nftAddress) nftAddress = await controller.nftCollection();
+      const controller = requireController();
+      if(!tokenId && !inStakeId) throw new Error('Enter a tokenId.');
+      const id = tokenId || inStakeId.value.trim();
+      if(id === '') throw new Error('Enter a tokenId.');
+      if(!state.nftAddress) state.nftAddress = await controller.nftCollection();
 
-      const how = await approveIfNeeded(tokenId);
-      log(`Approval: ${how}`);
+      const how = await approveIfNeeded(id);
+      log(`Approval: ${how}`, 'info');
 
-      const tx = await controller.stake(tokenId);
-      log(`stake(${tokenId}) tx: ${tx.hash}`);
+      const tx = await controller.stake(id);
+      log(`stake(${id}) tx: ${tx.hash}`, 'info');
       const rec = await tx.wait();
-      log(`stake(${tokenId}) confirmed. status=${rec.status}`, "ok");
-    }catch(e){ log(e.message||String(e), "error"); }
+      log(`stake(${id}) confirmed. status=${rec.status}`, rec.status === 1 ? 'ok' : 'error');
+    }catch(e){ log(e.message||String(e), 'error'); }
   }
 
-  async function doWithdraw(){
+  async function doWithdraw(tokenId){
     try{
-      if(!controller) throw new Error("Connect wallet first.");
-      const tokenId = inWithdrawId.value.trim();
-      if(tokenId==="") throw new Error("Enter a tokenId.");
-      const tx = await controller.withdraw(tokenId);
-      log(`withdraw(${tokenId}) tx: ${tx.hash}`);
+      const controller = requireController();
+      const id = tokenId || (inWithdrawId ? inWithdrawId.value.trim() : '');
+      if(id === '') throw new Error('Enter a tokenId.');
+      const tx = await controller.withdraw(id);
+      log(`withdraw(${id}) tx: ${tx.hash}`, 'info');
       const rec = await tx.wait();
-      log(`withdraw(${tokenId}) confirmed. status=${rec.status}`, "ok");
-    }catch(e){ log(e.message||String(e), "error"); }
+      log(`withdraw(${id}) confirmed. status=${rec.status}`, rec.status === 1 ? 'ok' : 'error');
+    }catch(e){ log(e.message||String(e), 'error'); }
   }
 
-  async function doAvailableRewards(){
+  async function doAvailableRewards(addressArg){
     try{
-      if(!controller) throw new Error("Connect wallet first.");
-      const who = inRewardsAddr.value.trim() || userAddr;
+      const controller = requireController();
+      const who = addressArg || (inRewardsAddr ? inRewardsAddr.value.trim() : '') || state.account;
       const raw = await controller.availableRewards(who);
       const pretty = await fmtRewards(raw);
-      log(`availableRewards(${who}) → ${raw.toString()} (${pretty})`, "ok");
-    }catch(e){ log(e.message||String(e), "error"); }
+      log(`availableRewards(${who}) → ${raw.toString()} (${pretty})`, 'ok');
+    }catch(e){ log(e.message||String(e), 'error'); }
   }
 
-  async function doGetStakedTokens(){
+  async function doGetStakedTokens(addressArg){
     try{
-      if(!controller) throw new Error("Connect wallet first.");
-      const who = inStakedAddr.value.trim() || userAddr;
+      const controller = requireController();
+      const who = addressArg || (inStakedAddr ? inStakedAddr.value.trim() : '') || state.account;
       const arr = await controller.getStakedTokens(who);
-      if(!arr || !arr.length) { log(`getStakedTokens(${who}) → none`, "ok"); return; }
-      const lines = arr.map((x,i)=>`${i+1}. staker=${x.staker} tokenId=${x.tokenId.toString()}`).join("\n");
-      log(`getStakedTokens(${who}):\n${lines}`, "ok");
-    }catch(e){ log(e.message||String(e), "error"); }
+      if(!arr || !arr.length) { log(`getStakedTokens(${who}) → none`, 'ok'); return; }
+      const lines = arr.map((x,i)=>`${i+1}. staker=${x.staker} tokenId=${x.tokenId.toString()}`).join('\n');
+      log(`getStakedTokens(${who}):\n${lines}`, 'ok');
+    }catch(e){ log(e.message||String(e), 'error'); }
   }
 
-  async function doStakerOf(){
+  async function doStakerOf(tokenId){
     try{
-      if(!controller) throw new Error("Connect wallet first.");
-      const tokenId = inStakerOf.value.trim();
-      if(tokenId==="") throw new Error("Enter a tokenId.");
-      const who = await controller.stakerAddress(tokenId);
-      log(`stakerAddress(${tokenId}) → ${who}`, "ok");
-    }catch(e){ log(e.message||String(e), "error"); }
+      const controller = requireController();
+      const id = tokenId || (inStakerOf ? inStakerOf.value.trim() : '');
+      if(id === '') throw new Error('Enter a tokenId.');
+      const who = await controller.stakerAddress(id);
+      log(`stakerAddress(${id}) → ${who}`, 'ok');
+    }catch(e){ log(e.message||String(e), 'error'); }
   }
 
-  async function doStakers(){
+  async function doStakers(addressArg){
     try{
-      if(!controller) throw new Error("Connect wallet first.");
-      const who = inStakers.value.trim() || userAddr;
+      const controller = requireController();
+      const who = addressArg || (inStakers ? inStakers.value.trim() : '') || state.account;
       const r = await controller.stakers(who);
       const pretty = await fmtRewards(r.unclaimedRewards);
       log(
         `stakers(${who}): amountStaked=${r.amountStaked.toString()}, timeOfLastUpdate=${r.timeOfLastUpdate.toString()}, unclaimedRewards=${r.unclaimedRewards.toString()} (${pretty})`,
-        "ok"
+        'ok'
       );
-    }catch(e){ log(e.message||String(e), "error"); }
+    }catch(e){ log(e.message||String(e), 'error'); }
+  }
+
+  function showStatus(){
+    if (!state.account){
+      log('Wallet not connected.', 'muted');
+      return;
+    }
+    log(`Wallet: ${state.account}`, 'info');
+    log(`Network: ${state.network?.name || 'unknown'} (#${state.network?.chainId ?? '?'})`, 'info');
+    if (state.nftAddress) log(`NFT collection: ${state.nftAddress}`, 'info');
+    if (state.rewardsAddress) log(`Rewards token: ${state.rewardsAddress}`, 'info');
+  }
+
+  function showLinks(){
+    if (state.nftAddress) log(`NFT collection → ${linkAddr(state.nftAddress)}`, 'info');
+    if (state.rewardsAddress) log(`Rewards token → ${linkAddr(state.rewardsAddress)}`, 'info');
+    log(`Controller → ${linkAddr(CONTROLLER)}`, 'info');
+  }
+
+  function handleLogout(){
+    sessionStorage.removeItem(SESSION_KEY);
+    log('Session cleared. Redirecting to connect screen…', 'muted');
+    setTimeout(()=>{ window.location.href = 'connect.html'; }, 400);
+  }
+
+  // ---------- CLI Mode ----------
+  async function handleCommand(raw){
+    const line = raw.trim();
+    if (!line) return;
+    logPrompt(line);
+    const parts = line.split(/\s+/);
+    const cmd = parts[0].toLowerCase();
+    const args = parts.slice(1);
+
+    try{
+      switch(cmd){
+        case 'help':
+          log('Available commands:', 'muted');
+          log(' connect               → connect wallet', 'info');
+          log(' claim                 → claimRewards()', 'info');
+          log(' stake <tokenId>       → stake(tokenId)', 'info');
+          log(' withdraw <tokenId>    → withdraw(tokenId)', 'info');
+          log(' rewards [address]     → availableRewards(address)', 'info');
+          log(' staked [address]      → getStakedTokens(address)', 'info');
+          log(' stakerof <tokenId>    → stakerAddress(tokenId)', 'info');
+          log(' stats [address]       → stakers(address)', 'info');
+          log(' status                → show current session info', 'info');
+          log(' links                 → show etherscan links', 'info');
+          log(' clear                 → clear the console', 'info');
+          log(' logout                → return to wallet onboarding', 'info');
+          break;
+        case 'connect':
+          await connect();
+          break;
+        case 'claim':
+          await doClaim();
+          break;
+        case 'stake':
+          await doStake(args[0]);
+          break;
+        case 'withdraw':
+          await doWithdraw(args[0]);
+          break;
+        case 'rewards':
+          await doAvailableRewards(args[0]);
+          break;
+        case 'staked':
+          await doGetStakedTokens(args[0]);
+          break;
+        case 'stakerof':
+          await doStakerOf(args[0]);
+          break;
+        case 'stats':
+          await doStakers(args[0]);
+          break;
+        case 'status':
+          showStatus();
+          break;
+        case 'links':
+          showLinks();
+          break;
+        case 'clear':
+          clearLog();
+          init();
+          break;
+        case 'logout':
+          handleLogout();
+          break;
+        default:
+          log(`Unknown command: ${cmd}. Type "help" to list commands.`, 'error');
+      }
+    }catch(e){
+      log(e.message||String(e), 'error');
+    }
+  }
+
+  function setupCli(){
+    if (!CLI_MODE || !cliForm || !cliInput) return;
+    cliInput.focus();
+    cliForm.addEventListener('submit', async (event)=>{
+      event.preventDefault();
+      const value = cliInput.value;
+      if (!value.trim()) { cliInput.value = ''; return; }
+      history.push(value);
+      historyIndex = history.length;
+      cliInput.value = '';
+      await handleCommand(value);
+    });
+
+    cliInput.addEventListener('keydown', (event)=>{
+      if (history.length === 0) return;
+      if (event.key === 'ArrowUp'){
+        event.preventDefault();
+        historyIndex = Math.max(0, historyIndex - 1);
+        cliInput.value = history[historyIndex] || '';
+        setTimeout(()=>{ cliInput.setSelectionRange(cliInput.value.length, cliInput.value.length); }, 0);
+      } else if (event.key === 'ArrowDown'){
+        event.preventDefault();
+        historyIndex = Math.min(history.length, historyIndex + 1);
+        cliInput.value = historyIndex === history.length ? '' : (history[historyIndex] || '');
+        setTimeout(()=>{ cliInput.setSelectionRange(cliInput.value.length, cliInput.value.length); }, 0);
+      }
+    });
   }
 
   // ---------- Wire up ----------
   init();
-  btnConnect?.addEventListener("click", connect);
-  btnClaim?.addEventListener("click", doClaim);
-  btnStake?.addEventListener("click", doStake);
-  btnWithdraw?.addEventListener("click", doWithdraw);
-  btnRewards?.addEventListener("click", doAvailableRewards);
-  btnGetStaked?.addEventListener("click", doGetStakedTokens);
-  btnStakerOf?.addEventListener("click", doStakerOf);
-  btnStakers?.addEventListener("click", doStakers);
+  setupCli();
+
+  btnConnect?.addEventListener('click', connect);
+  btnClaim?.addEventListener('click', doClaim);
+  btnStake?.addEventListener('click', ()=>doStake());
+  btnWithdraw?.addEventListener('click', ()=>doWithdraw());
+  btnRewards?.addEventListener('click', ()=>doAvailableRewards());
+  btnGetStaked?.addEventListener('click', ()=>doGetStakedTokens());
+  btnStakerOf?.addEventListener('click', ()=>doStakerOf());
+  btnStakers?.addEventListener('click', ()=>doStakers());
 })();

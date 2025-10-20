@@ -3,7 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fresh Frogs — Terminal Console</title>
+  <title>Fresh Frogs — Staking Console</title>
+  <script>
+    if (!sessionStorage.getItem('ff:connected')) {
+      window.location.replace('connect.html');
+    }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -12,19 +17,17 @@
   <style>
     :root {
       color-scheme: dark;
-      --bg: #030303;
+      --bg: #010101;
       --bg-panel: #050505;
-      --bg-panel-soft: #0b0b0b;
-      --fg: #e8f1ea;
-      --fg-muted: #6f7c75;
+      --bg-panel-soft: #090909;
+      --fg: #e6f6ec;
+      --fg-muted: #5c7067;
       --accent: #7dff9f;
-      --accent-soft: rgba(125, 255, 159, 0.16);
-      --border: rgba(255, 255, 255, 0.08);
-      --radius: 18px;
+      --error: #ff7d7d;
+      --border: rgba(125, 255, 159, 0.12);
+      --shadow: 0 28px 60px rgba(0, 0, 0, 0.6);
       --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
       --ui: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      --shadow-strong: 0 35px 60px rgba(0, 0, 0, 0.55);
-      --shadow-soft: 0 18px 30px rgba(0, 0, 0, 0.35);
     }
 
     *, *::before, *::after {
@@ -34,392 +37,198 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: radial-gradient(circle at top, rgba(125, 255, 159, 0.06), transparent 55%),
-        linear-gradient(160deg, #030303 0%, #050505 55%, #020202 100%);
-      color: var(--fg);
-      font-family: var(--mono);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: clamp(24px, 6vw, 60px);
+      padding: clamp(24px, 6vw, 72px);
+      background:
+        radial-gradient(circle at top, rgba(125, 255, 159, 0.12), transparent 60%),
+        linear-gradient(160deg, #020202, #010101 55%, #000 100%);
+      color: var(--fg);
+      font-family: var(--mono);
     }
 
-    main.viewport {
-      width: min(1100px, 100%);
-    }
-
-    .shell {
+    main.console {
+      width: min(960px, 100%);
+      min-height: clamp(520px, 70vh, 820px);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
       background: var(--bg-panel);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: 0 0 25px rgba(125, 255, 159, 0.32), var(--shadow-strong);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      min-height: clamp(520px, 70vh, 800px);
     }
 
-    .shell-header {
+    header.status-bar {
       display: flex;
-      align-items: center;
-      gap: 18px;
       justify-content: space-between;
-      padding: 18px 22px;
-      background: rgba(255, 255, 255, 0.03);
+      align-items: center;
+      gap: 16px;
+      padding: 20px 26px;
+      background: var(--bg-panel-soft);
       border-bottom: 1px solid var(--border);
       font-family: var(--ui);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      color: var(--fg-muted);
     }
 
-    .shell-header .left {
+    header.status-bar .brand {
+      font-weight: 600;
+      color: var(--fg);
+      letter-spacing: 0.12em;
+    }
+
+    header.status-bar .status {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    header.status-bar .status span {
+      white-space: nowrap;
+    }
+
+    header.status-bar .status .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 118, 118, 0.9);
+      box-shadow: 0 0 12px rgba(255, 118, 118, 0.45);
+      transition: background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    header.status-bar .status .dot.online {
+      background: rgba(125, 255, 159, 0.9);
+      box-shadow: 0 0 14px rgba(125, 255, 159, 0.6);
+    }
+
+    section.terminal {
+      position: relative;
+      background: linear-gradient(135deg, rgba(125, 255, 159, 0.04), transparent 65%), #020202;
+      padding: 28px 26px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #terminal-log .line {
+      margin: 0;
+      font-size: clamp(0.88rem, 1vw, 0.96rem);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: var(--fg);
+    }
+
+    #terminal-log .line.muted {
+      color: var(--fg-muted);
+    }
+
+    #terminal-log .line.prompt {
+      color: var(--accent);
+    }
+
+    #terminal-log .line.ok {
+      color: var(--accent);
+      text-shadow: 0 0 14px rgba(125, 255, 159, 0.28);
+    }
+
+    #terminal-log .line.error {
+      color: var(--error);
+      text-shadow: 0 0 10px rgba(255, 125, 125, 0.28);
+    }
+
+    #terminal-log .line.header {
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    form.console-input {
       display: flex;
       align-items: center;
       gap: 14px;
-    }
-
-    .lights {
-      display: flex;
-      gap: 8px;
-    }
-
-    .lights span {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      display: block;
-      background: currentColor;
-      opacity: 0.6;
-    }
-
-    .lights span:nth-child(1) { color: #ff6464; }
-    .lights span:nth-child(2) { color: #ffc764; }
-    .lights span:nth-child(3) { color: #64ff9c; }
-
-    .path {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .path strong {
-      font-size: 0.95rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .path span {
-      font-size: 0.8rem;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      color: var(--fg-muted);
-    }
-
-    .session {
-      font-size: 0.85rem;
-      color: var(--fg-muted);
-      letter-spacing: 0.04em;
-    }
-
-    .session strong {
-      color: var(--fg);
-      font-weight: 600;
-    }
-
-    button.primary {
-      font-family: var(--ui);
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      font-size: 0.75rem;
-      padding: 10px 20px;
-      border-radius: 999px;
-      border: 1px solid rgba(125, 255, 159, 0.5);
-      background: color-mix(in srgb, rgba(125, 255, 159, 0.08) 40%, transparent);
-      color: var(--accent);
-      cursor: pointer;
-      transition: background 0.2s ease, transform 0.1s ease;
-    }
-
-    button.primary:hover {
-      background: rgba(125, 255, 159, 0.22);
-      transform: translateY(-1px);
-    }
-
-    button.primary:disabled {
-      cursor: not-allowed;
-      opacity: 0.55;
-      transform: none;
-    }
-
-    .chips {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      padding: 16px 22px;
-      background: linear-gradient(90deg, rgba(125, 255, 159, 0.08), transparent 65%);
-      border-bottom: 1px solid var(--border);
-      font-family: var(--ui);
-    }
-
-    .chip {
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px 14px;
-      background: color-mix(in srgb, var(--bg-panel-soft) 90%, transparent);
-      min-width: 160px;
-    }
-
-    .chip .label {
-      display: block;
-      font-size: 0.68rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--fg-muted);
-    }
-
-    .chip .value, .chip a {
-      display: block;
-      margin-top: 6px;
-      font-size: 0.82rem;
-      letter-spacing: 0.04em;
-      color: var(--fg);
-      text-decoration: none;
-      word-break: break-all;
-    }
-
-    .chip a:hover {
-      color: var(--accent);
-    }
-
-    .terminal-screen {
-      padding: 24px 22px 14px;
-      background: radial-gradient(circle at top left, rgba(125, 255, 159, 0.06), transparent 60%), var(--bg-panel);
-    }
-
-    .terminal-output {
-      margin: 0;
-      padding: 20px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      background: rgba(4, 4, 4, 0.85);
-      color: var(--accent);
-      font-size: clamp(0.85rem, 1.2vw, 0.95rem);
-      line-height: 1.7;
-      min-height: clamp(220px, 30vh, 320px);
-      overflow-y: auto;
-      white-space: pre-wrap;
-      text-shadow: 0 0 12px rgba(125, 255, 159, 0.45);
-    }
-
-    .command-panel {
-      padding: 0 22px 30px;
-      display: grid;
-      gap: 16px;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    }
-
-    .command {
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: color-mix(in srgb, var(--bg-panel-soft) 86%, transparent);
-      padding: 18px;
-      display: grid;
-      gap: 12px;
-      font-family: var(--ui);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .command header {
-      font-size: 0.82rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--fg-muted);
-    }
-
-    .command p {
-      margin: 0;
-      font-size: 0.85rem;
-      color: rgba(232, 241, 234, 0.85);
-      line-height: 1.5;
-    }
-
-    .command input {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: rgba(10, 10, 10, 0.85);
-      color: var(--fg);
-      font-family: var(--mono);
-      font-size: 0.85rem;
-      letter-spacing: 0.05em;
-    }
-
-    .command input::placeholder {
-      color: rgba(232, 241, 234, 0.45);
-    }
-
-    .command button {
-      justify-self: start;
-      padding: 8px 16px;
-      border-radius: 999px;
-      border: 1px solid rgba(125, 255, 159, 0.45);
-      background: rgba(125, 255, 159, 0.14);
-      color: var(--accent);
-      font-family: var(--ui);
-      font-size: 0.78rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s ease, transform 0.1s ease;
-    }
-
-    .command button:hover {
-      background: rgba(125, 255, 159, 0.24);
-      transform: translateY(-1px);
-    }
-
-    .command button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .shell-footer {
-      margin-top: auto;
-      padding: 18px 22px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
+      padding: 18px 24px;
       border-top: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.03);
-      font-family: var(--ui);
-      font-size: 0.78rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      background: var(--bg-panel-soft);
+    }
+
+    form.console-input label {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.95rem;
       color: var(--fg-muted);
     }
 
-    .shell-footer a {
-      color: var(--fg);
-      text-decoration: none;
-      transition: color 0.2s ease;
+    form.console-input span.prompt-symbol {
+      color: var(--accent);
+      font-weight: 600;
     }
 
-    .shell-footer a:hover {
-      color: var(--accent);
+    form.console-input input {
+      flex: 1;
+      padding: 10px 12px;
+      border: none;
+      background: transparent;
+      color: var(--fg);
+      font: inherit;
+      letter-spacing: 0.04em;
+    }
+
+    form.console-input input:focus {
+      outline: none;
+    }
+
+    form.console-input input::placeholder {
+      color: rgba(230, 246, 236, 0.35);
     }
 
     @media (max-width: 720px) {
       body {
-        padding: 16px;
+        padding: 12px;
       }
 
-      .shell-header {
+      main.console {
+        min-height: calc(100vh - 24px);
+      }
+
+      header.status-bar {
         flex-direction: column;
         align-items: flex-start;
-      }
-
-      .command-panel {
-        grid-template-columns: 1fr;
+        gap: 8px;
       }
     }
   </style>
 </head>
 <body>
-  <main class="viewport">
-    <div class="shell" role="application" aria-label="Fresh Frogs staking console">
-      <header class="shell-header">
-        <div class="left">
-          <div class="lights" aria-hidden="true">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-          <div class="path">
-            <strong>freshfrogs ▸ console</strong>
-            <span>staking controller tools</span>
-          </div>
-        </div>
-        <div class="session">
-          <strong id="acct">Not connected</strong>
-        </div>
-        <button id="btnConnect" class="primary" type="button">Connect Wallet</button>
-      </header>
+  <main class="console" role="application" aria-label="Fresh Frogs staking console">
+    <header class="status-bar">
+      <div class="brand">freshfrogs ▸ console</div>
+      <div class="status">
+        <span class="dot" id="status-dot" aria-hidden="true"></span>
+        <span id="status-network">offline</span>
+        <span id="status-address">wallet not connected</span>
+      </div>
+    </header>
 
-      <section class="chips" aria-label="Connection details">
-        <div class="chip">
-          <span class="label">Controller</span>
-          <a id="chipController" class="value" href="#" target="_blank" rel="noopener">—</a>
-        </div>
-        <div class="chip">
-          <span class="label">Network</span>
-          <span id="chipNetwork" class="value">—</span>
-        </div>
-      </section>
+    <section id="terminal-scroll" class="terminal" aria-live="polite" aria-label="Terminal output">
+      <div id="terminal-log"></div>
+    </section>
 
-      <section class="terminal-screen">
-        <pre id="terminal" class="terminal-output" aria-live="polite" aria-label="Terminal output">• Ready. Connect wallet to begin.
-</pre>
-      </section>
-
-      <section class="command-panel" aria-label="Contract actions">
-        <article class="command">
-          <header>claimRewards()</header>
-          <p>Claim accrued rewards for the connected wallet.</p>
-          <button id="btnClaim" type="button">Claim Rewards</button>
-        </article>
-
-        <article class="command">
-          <header>stake(uint256 tokenId)</header>
-          <p>Approve if needed and stake a frog by its token ID.</p>
-          <input id="in-stake-id" type="number" min="0" placeholder="tokenId" aria-label="Token ID to stake" />
-          <button id="btnStake" type="button">Stake</button>
-        </article>
-
-        <article class="command">
-          <header>withdraw(uint256 tokenId)</header>
-          <p>Withdraw a previously staked frog back to your wallet.</p>
-          <input id="in-withdraw-id" type="number" min="0" placeholder="tokenId" aria-label="Token ID to withdraw" />
-          <button id="btnWithdraw" type="button">Withdraw</button>
-        </article>
-
-        <article class="command">
-          <header>availableRewards(address)</header>
-          <p>Check unclaimed rewards for an address (default is you).</p>
-          <input id="in-rewards-addr" type="text" placeholder="0x… (optional)" aria-label="Address to inspect rewards" />
-          <button id="btnRewards" type="button">Check</button>
-        </article>
-
-        <article class="command">
-          <header>getStakedTokens(address)</header>
-          <p>List every staked frog for an address (defaults to you).</p>
-          <input id="in-staked-addr" type="text" placeholder="0x… (optional)" aria-label="Address to list staked tokens" />
-          <button id="btnGetStaked" type="button">Query</button>
-        </article>
-
-        <article class="command">
-          <header>stakerAddress(uint256)</header>
-          <p>Look up which wallet currently stakes a given token ID.</p>
-          <input id="in-staker-of" type="number" min="0" placeholder="tokenId" aria-label="Token ID to look up staker" />
-          <button id="btnStakerOf" type="button">Lookup</button>
-        </article>
-
-        <article class="command">
-          <header>stakers(address)</header>
-          <p>Read raw staking stats for an address (amount, update time, rewards).</p>
-          <input id="in-stakers" type="text" placeholder="0x… (optional)" aria-label="Address to inspect staker mapping" />
-          <button id="btnStakers" type="button">Inspect</button>
-        </article>
-      </section>
-
-      <footer class="shell-footer">
-        <a id="linkNFT" href="#" target="_blank" rel="noopener">NFT Collection</a>
-        <a id="linkRewards" href="#" target="_blank" rel="noopener">Rewards Token</a>
-        <span aria-hidden="true">•</span>
-        <a href="connect.html">Wallet onboarding</a>
-      </footer>
-    </div>
+    <form id="terminal-form" class="console-input" autocomplete="off">
+      <label for="terminal-input">
+        <span class="prompt-symbol" aria-hidden="true">&gt;</span>
+        <input id="terminal-input" type="text" inputmode="text" spellcheck="false" autocapitalize="off"
+          autocomplete="off" aria-label="Command input" placeholder="type help for available commands" />
+      </label>
+    </form>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js" crossorigin="anonymous"></script>
