@@ -3,920 +3,429 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fresh Frogs — Layout Explorations</title>
+  <title>Fresh Frogs — Terminal Console</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@500;600&display=swap"
     rel="stylesheet">
   <style>
     :root {
       color-scheme: dark;
-      --bg: #04060b;
-      --surface: rgba(12, 18, 28, 0.86);
-      --surface-soft: rgba(16, 24, 36, 0.72);
-      --surface-pop: rgba(20, 30, 46, 0.92);
-      --fg: #f5f8ff;
-      --muted: #8a97b3;
-      --border: rgba(255, 255, 255, 0.14);
-      --accent: #39f19e;
-      --accent-soft: rgba(57, 241, 158, 0.22);
-      --accent-2: #3cb6ff;
-      --danger: #ff6b81;
-      --shadow-lg: 0 28px 80px rgba(2, 10, 24, 0.65);
-      --shadow-md: 0 18px 40px rgba(1, 8, 22, 0.45);
-      --radius-lg: 26px;
-      --radius-md: 20px;
-      --radius-sm: 12px;
+      --bg: #030303;
+      --bg-panel: #050505;
+      --bg-panel-soft: #0b0b0b;
+      --fg: #e8f1ea;
+      --fg-muted: #6f7c75;
+      --accent: #7dff9f;
+      --accent-soft: rgba(125, 255, 159, 0.16);
+      --border: rgba(255, 255, 255, 0.08);
+      --radius: 18px;
+      --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+      --ui: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --shadow-strong: 0 35px 60px rgba(0, 0, 0, 0.55);
+      --shadow-soft: 0 18px 30px rgba(0, 0, 0, 0.35);
     }
 
-    *, *::before, *::after { box-sizing: border-box; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
       min-height: 100vh;
-      background: radial-gradient(circle at top left, rgba(57, 241, 158, 0.12), transparent 46%),
-        radial-gradient(circle at 88% 12%, rgba(60, 182, 255, 0.09), transparent 52%),
-        var(--bg);
+      background: radial-gradient(circle at top, rgba(125, 255, 159, 0.06), transparent 55%),
+        linear-gradient(160deg, #030303 0%, #050505 55%, #020202 100%);
       color: var(--fg);
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: var(--mono);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(24px, 6vw, 60px);
+    }
+
+    main.viewport {
+      width: min(1100px, 100%);
+    }
+
+    .shell {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 0 25px rgba(125, 255, 159, 0.32), var(--shadow-strong);
+      overflow: hidden;
       display: flex;
       flex-direction: column;
-      padding-bottom: 120px;
+      min-height: clamp(520px, 70vh, 800px);
     }
 
-    a { color: inherit; text-decoration: none; }
-
-    header.top-bar {
+    .shell-header {
       display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      padding: 32px clamp(18px, 5vw, 72px) 12px;
-      gap: 32px;
-      flex-wrap: wrap;
-    }
-
-    .brand {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 18px;
       align-items: center;
-    }
-
-    .brand-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, var(--accent), rgba(60, 182, 255, 0.72));
-      display: grid;
-      place-items: center;
-      font-family: 'Space Grotesk', 'Inter', sans-serif;
-      font-weight: 700;
-      font-size: 1.2rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #02130e;
-      box-shadow: 0 18px 42px rgba(57, 241, 158, 0.32);
-    }
-
-    .brand h1 {
-      margin: 0;
-      font-family: 'Space Grotesk', 'Inter', sans-serif;
-      font-size: clamp(1.45rem, 2.2vw, 1.9rem);
-      letter-spacing: -0.015em;
-    }
-
-    .brand p {
-      margin: 6px 0 0 0;
-      color: var(--muted);
-      font-size: 0.98rem;
-    }
-
-    .layout-tabs {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .layout-tab {
+      gap: 18px;
+      justify-content: space-between;
+      padding: 18px 22px;
       background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--muted);
-      border-radius: 999px;
-      padding: 10px 18px;
-      font: inherit;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.18s ease;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--ui);
     }
 
-    .layout-tab:hover {
-      color: var(--fg);
-      border-color: rgba(255, 255, 255, 0.18);
-    }
-
-    .layout-tab.active {
-      background: var(--accent-soft);
-      border-color: var(--accent);
-      color: #02341c;
-    }
-
-    .top-actions {
+    .shell-header .left {
       display: flex;
       align-items: center;
       gap: 14px;
     }
 
-    .ghost-btn, .primary-btn {
-      font: inherit;
-      border-radius: 999px;
-      border: 1px solid transparent;
-      padding: 11px 20px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: transform 0.16s ease, filter 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    .lights {
+      display: flex;
+      gap: 8px;
     }
 
-    .ghost-btn {
-      background: transparent;
-      border-color: rgba(255, 255, 255, 0.14);
+    .lights span {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: block;
+      background: currentColor;
+      opacity: 0.6;
+    }
+
+    .lights span:nth-child(1) { color: #ff6464; }
+    .lights span:nth-child(2) { color: #ffc764; }
+    .lights span:nth-child(3) { color: #64ff9c; }
+
+    .path {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .path strong {
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .path span {
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+    }
+
+    .session {
+      font-size: 0.85rem;
+      color: var(--fg-muted);
+      letter-spacing: 0.04em;
+    }
+
+    .session strong {
       color: var(--fg);
+      font-weight: 600;
     }
 
-    .ghost-btn:hover {
-      border-color: var(--accent);
+    button.primary {
+      font-family: var(--ui);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      padding: 10px 20px;
+      border-radius: 999px;
+      border: 1px solid rgba(125, 255, 159, 0.5);
+      background: color-mix(in srgb, rgba(125, 255, 159, 0.08) 40%, transparent);
       color: var(--accent);
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
     }
 
-    .primary-btn {
-      background: var(--accent);
-      color: #02130e;
-      box-shadow: 0 16px 34px rgba(57, 241, 158, 0.28);
-    }
-
-    .primary-btn:hover {
-      filter: brightness(1.03);
+    button.primary:hover {
+      background: rgba(125, 255, 159, 0.22);
       transform: translateY(-1px);
     }
 
-    main.layout-stage {
-      width: min(1200px, 94vw);
-      margin: 0 auto;
-      display: grid;
-      gap: 42px;
+    button.primary:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+      transform: none;
     }
 
-    .layout {
-      display: none;
-      gap: 28px;
-    }
-
-    .layout.active { display: grid; }
-
-    .panel {
-      background: var(--surface);
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      padding: clamp(20px, 4vw, 28px);
-      box-shadow: var(--shadow-md);
-      display: grid;
-      gap: 18px;
-    }
-
-    .panel h3 {
-      margin: 0;
-      font-family: 'Space Grotesk', 'Inter', sans-serif;
-      font-size: 1.15rem;
-      letter-spacing: -0.01em;
-    }
-
-    .panel p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.55;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-size: 0.82rem;
-      color: var(--muted);
-    }
-
-    .stat-grid {
-      display: grid;
-      gap: 18px;
-    }
-
-    .stat-grid.cols-3 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
-    .stat-grid.cols-2 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-
-    .stat-card {
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: var(--radius-sm);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 18px 20px;
-      display: grid;
-      gap: 8px;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-    }
-
-    .stat-card h4 {
-      margin: 0;
-      font-size: 0.78rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .stat-card strong {
-      font-size: clamp(1.15rem, 2.2vw, 1.6rem);
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .stat-card span { color: var(--muted); font-size: 0.9rem; }
-
-    .sales-feed, .activity-grid, .terminal-grid { display: grid; gap: 16px; }
-
-    .sale-item, .activity-item {
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: center;
-      gap: 16px;
-      padding: 14px 18px;
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: var(--radius-sm);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .sale-item strong { font-weight: 600; }
-    .sale-item span, .activity-item span { color: var(--muted); font-size: 0.9rem; }
-
-    .avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, rgba(57, 241, 158, 0.32), rgba(60, 182, 255, 0.42));
-      display: grid;
-      place-items: center;
-      font-family: 'Space Grotesk', 'Inter', sans-serif;
-      font-weight: 600;
-      color: #02130e;
-    }
-
-    .terminal {
-      background: var(--surface-pop);
-      border-radius: var(--radius-lg);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: var(--shadow-lg);
-      overflow: hidden;
-      display: grid;
-      grid-template-rows: auto 1fr;
-    }
-
-    .terminal-header {
+    .chips {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
       padding: 16px 22px;
-      background: rgba(255, 255, 255, 0.04);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(90deg, rgba(125, 255, 159, 0.08), transparent 65%);
+      border-bottom: 1px solid var(--border);
+      font-family: var(--ui);
     }
 
-    .terminal-dots { display: flex; gap: 8px; }
-    .terminal-dots span {
-      width: 12px; height: 12px; border-radius: 50%;
-      background: rgba(255, 255, 255, 0.12);
-    }
-    .terminal-dots span:nth-child(1) { background: #ff5f57; }
-    .terminal-dots span:nth-child(2) { background: #fdbc2e; }
-    .terminal-dots span:nth-child(3) { background: #28c840; }
-
-    .terminal-title {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
-      color: var(--muted);
+    .chip {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      background: color-mix(in srgb, var(--bg-panel-soft) 90%, transparent);
+      min-width: 160px;
     }
 
-    .terminal-body {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.92rem;
-      padding: 24px clamp(18px, 4vw, 32px);
-      background: linear-gradient(135deg, rgba(2, 6, 14, 0.94), rgba(10, 20, 32, 0.88));
-      color: #d6fbe7;
+    .chip .label {
+      display: block;
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+    }
+
+    .chip .value, .chip a {
+      display: block;
+      margin-top: 6px;
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      color: var(--fg);
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .chip a:hover {
+      color: var(--accent);
+    }
+
+    .terminal-screen {
+      padding: 24px 22px 14px;
+      background: radial-gradient(circle at top left, rgba(125, 255, 159, 0.06), transparent 60%), var(--bg-panel);
+    }
+
+    .terminal-output {
+      margin: 0;
+      padding: 20px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(4, 4, 4, 0.85);
+      color: var(--accent);
+      font-size: clamp(0.85rem, 1.2vw, 0.95rem);
+      line-height: 1.7;
+      min-height: clamp(220px, 30vh, 320px);
+      overflow-y: auto;
+      white-space: pre-wrap;
+      text-shadow: 0 0 12px rgba(125, 255, 159, 0.45);
+    }
+
+    .command-panel {
+      padding: 0 22px 30px;
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .command {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--bg-panel-soft) 86%, transparent);
+      padding: 18px;
       display: grid;
       gap: 12px;
+      font-family: var(--ui);
+      box-shadow: var(--shadow-soft);
     }
 
-    .terminal-body .command { color: var(--accent); }
-    .terminal-body .muted { color: rgba(214, 251, 231, 0.56); }
-
-    .terminal-stack { display: grid; gap: 20px; }
-    .terminal-stack.two { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-
-    .terminal-mini {
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(5, 10, 18, 0.86);
-      overflow: hidden;
-      display: grid;
-      grid-template-rows: auto 1fr;
-      box-shadow: var(--shadow-md);
+    .command header {
+      font-size: 0.82rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--fg-muted);
     }
 
-    .terminal-mini .terminal-body { font-size: 0.82rem; padding: 18px; }
+    .command p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: rgba(232, 241, 234, 0.85);
+      line-height: 1.5;
+    }
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 10px;
+    .command input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(10, 10, 10, 0.85);
+      color: var(--fg);
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+    }
+
+    .command input::placeholder {
+      color: rgba(232, 241, 234, 0.45);
+    }
+
+    .command button {
+      justify-self: start;
+      padding: 8px 16px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.05);
-      font-size: 0.75rem;
+      border: 1px solid rgba(125, 255, 159, 0.45);
+      background: rgba(125, 255, 159, 0.14);
+      color: var(--accent);
+      font-family: var(--ui);
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    .command button:hover {
+      background: rgba(125, 255, 159, 0.24);
+      transform: translateY(-1px);
+    }
+
+    .command button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .shell-footer {
+      margin-top: auto;
+      padding: 18px 22px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      border-top: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.03);
+      font-family: var(--ui);
+      font-size: 0.78rem;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: var(--fg-muted);
     }
 
-    .layout-mosaic {
-      display: grid;
-      gap: 22px;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    .shell-footer a {
+      color: var(--fg);
+      text-decoration: none;
+      transition: color 0.2s ease;
     }
 
-    .mosaic-card {
-      background: var(--surface);
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      padding: 24px;
-      display: grid;
-      gap: 16px;
-      position: relative;
-      overflow: hidden;
+    .shell-footer a:hover {
+      color: var(--accent);
     }
-
-    .mosaic-card::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(120deg, rgba(57, 241, 158, 0.08), transparent 45%);
-      opacity: 0.9;
-      pointer-events: none;
-    }
-
-    .mosaic-card h4 { margin: 0; font-family: 'Space Grotesk', 'Inter', sans-serif; font-size: 1.1rem; }
-    .mosaic-card p { margin: 0; color: var(--muted); line-height: 1.5; }
-
-    .double-column {
-      display: grid;
-      gap: 28px;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    }
-
-    .triple-column {
-      display: grid;
-      gap: 24px;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    }
-
-    footer.site-foot {
-      width: min(1200px, 94vw);
-      margin: 32px auto 0;
-      color: var(--muted);
-      font-size: 0.88rem;
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-      flex-wrap: wrap;
-      padding-bottom: 42px;
-    }
-
-    footer.site-foot span { opacity: 0.7; }
 
     @media (max-width: 720px) {
-      header.top-bar {
-        flex-direction: column;
-        align-items: stretch;
+      body {
+        padding: 16px;
       }
-      .top-actions { width: 100%; justify-content: space-between; }
-      .layout-tab { flex: 1 1 auto; text-align: center; }
+
+      .shell-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .command-panel {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <header class="top-bar">
-    <div class="brand">
-      <div class="brand-icon">FF</div>
-      <div>
-        <h1>Fresh Frogs Layout Lab</h1>
-        <p>Explore alternate dashboard and terminal-first concepts before wiring real data.</p>
-      </div>
+  <main class="viewport">
+    <div class="shell" role="application" aria-label="Fresh Frogs staking console">
+      <header class="shell-header">
+        <div class="left">
+          <div class="lights" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="path">
+            <strong>freshfrogs ▸ console</strong>
+            <span>staking controller tools</span>
+          </div>
+        </div>
+        <div class="session">
+          <strong id="acct">Not connected</strong>
+        </div>
+        <button id="btnConnect" class="primary" type="button">Connect Wallet</button>
+      </header>
+
+      <section class="chips" aria-label="Connection details">
+        <div class="chip">
+          <span class="label">Controller</span>
+          <a id="chipController" class="value" href="#" target="_blank" rel="noopener">—</a>
+        </div>
+        <div class="chip">
+          <span class="label">Network</span>
+          <span id="chipNetwork" class="value">—</span>
+        </div>
+      </section>
+
+      <section class="terminal-screen">
+        <pre id="terminal" class="terminal-output" aria-live="polite" aria-label="Terminal output">• Ready. Connect wallet to begin.
+</pre>
+      </section>
+
+      <section class="command-panel" aria-label="Contract actions">
+        <article class="command">
+          <header>claimRewards()</header>
+          <p>Claim accrued rewards for the connected wallet.</p>
+          <button id="btnClaim" type="button">Claim Rewards</button>
+        </article>
+
+        <article class="command">
+          <header>stake(uint256 tokenId)</header>
+          <p>Approve if needed and stake a frog by its token ID.</p>
+          <input id="in-stake-id" type="number" min="0" placeholder="tokenId" aria-label="Token ID to stake" />
+          <button id="btnStake" type="button">Stake</button>
+        </article>
+
+        <article class="command">
+          <header>withdraw(uint256 tokenId)</header>
+          <p>Withdraw a previously staked frog back to your wallet.</p>
+          <input id="in-withdraw-id" type="number" min="0" placeholder="tokenId" aria-label="Token ID to withdraw" />
+          <button id="btnWithdraw" type="button">Withdraw</button>
+        </article>
+
+        <article class="command">
+          <header>availableRewards(address)</header>
+          <p>Check unclaimed rewards for an address (default is you).</p>
+          <input id="in-rewards-addr" type="text" placeholder="0x… (optional)" aria-label="Address to inspect rewards" />
+          <button id="btnRewards" type="button">Check</button>
+        </article>
+
+        <article class="command">
+          <header>getStakedTokens(address)</header>
+          <p>List every staked frog for an address (defaults to you).</p>
+          <input id="in-staked-addr" type="text" placeholder="0x… (optional)" aria-label="Address to list staked tokens" />
+          <button id="btnGetStaked" type="button">Query</button>
+        </article>
+
+        <article class="command">
+          <header>stakerAddress(uint256)</header>
+          <p>Look up which wallet currently stakes a given token ID.</p>
+          <input id="in-staker-of" type="number" min="0" placeholder="tokenId" aria-label="Token ID to look up staker" />
+          <button id="btnStakerOf" type="button">Lookup</button>
+        </article>
+
+        <article class="command">
+          <header>stakers(address)</header>
+          <p>Read raw staking stats for an address (amount, update time, rewards).</p>
+          <input id="in-stakers" type="text" placeholder="0x… (optional)" aria-label="Address to inspect staker mapping" />
+          <button id="btnStakers" type="button">Inspect</button>
+        </article>
+      </section>
+
+      <footer class="shell-footer">
+        <a id="linkNFT" href="#" target="_blank" rel="noopener">NFT Collection</a>
+        <a id="linkRewards" href="#" target="_blank" rel="noopener">Rewards Token</a>
+        <span aria-hidden="true">•</span>
+        <a href="connect.html">Wallet onboarding</a>
+      </footer>
     </div>
-    <div class="layout-tabs" role="tablist" aria-label="Layout previews">
-      <button class="layout-tab active" data-target="overview" role="tab" aria-selected="true">Overview Grid</button>
-      <button class="layout-tab" data-target="showcase" role="tab" aria-selected="false">Showcase Spread</button>
-      <button class="layout-tab" data-target="terminal-control" role="tab" aria-selected="false">Terminal Control</button>
-      <button class="layout-tab" data-target="terminal-stacks" role="tab" aria-selected="false">Terminal Stacks</button>
-      <button class="layout-tab" data-target="terminal-matrix" role="tab" aria-selected="false">Terminal Matrix</button>
-    </div>
-    <div class="top-actions">
-      <button class="ghost-btn">View Brand Kit</button>
-      <button class="primary-btn">Connect Wallet</button>
-    </div>
-  </header>
-
-  <main class="layout-stage">
-    <!-- Layout 1: Overview Grid -->
-    <section class="layout active" id="layout-overview" role="tabpanel" aria-labelledby="overview">
-      <article class="panel" style="background: linear-gradient(140deg, rgba(57, 241, 158, 0.16), rgba(5, 10, 18, 0.92));">
-        <div class="pill">Live preview · Mock data</div>
-        <h2 style="margin: 0; font-family: 'Space Grotesk', 'Inter', sans-serif; font-size: clamp(2.2rem, 4.4vw, 3.2rem); letter-spacing: -0.02em;">
-          Fresh Frogs Intelligence Center
-        </h2>
-        <p style="max-width: 64ch;">A clean control hub that keeps recent sales, wallet health, and staking momentum close by. Swap any module once we finalize which live metrics matter most.</p>
-        <div class="stat-grid cols-3">
-          <div class="stat-card">
-            <h4>Floor</h4>
-            <strong>4.27 Ξ</strong>
-            <span>↑ 6.3% vs 24h</span>
-          </div>
-          <div class="stat-card">
-            <h4>Staked</h4>
-            <strong>1,824 Frogs</strong>
-            <span>Collective boost: 18.2%</span>
-          </div>
-          <div class="stat-card">
-            <h4>Rewards Paid</h4>
-            <strong>612.4 $FLY</strong>
-            <span>Last refresh ~15m ago</span>
-          </div>
-        </div>
-      </article>
-
-      <div class="double-column">
-        <article class="panel">
-          <div class="badge">Recent sales</div>
-          <div class="sales-feed">
-            <div class="sale-item">
-              <div class="avatar">#721</div>
-              <div>
-                <strong>Swamp Sovereign</strong>
-                <span>Sold to 0xfade…a9 for 4.78 Ξ</span>
-              </div>
-              <span>2 mins ago</span>
-            </div>
-            <div class="sale-item">
-              <div class="avatar">#188</div>
-              <div>
-                <strong>Pepper Prism</strong>
-                <span>Sold to 0x9ace…f4 for 4.51 Ξ</span>
-              </div>
-              <span>8 mins ago</span>
-            </div>
-            <div class="sale-item">
-              <div class="avatar">#602</div>
-              <div>
-                <strong>Night Drift</strong>
-                <span>Sold to 0x6dab…1c for 4.36 Ξ</span>
-              </div>
-              <span>24 mins ago</span>
-            </div>
-          </div>
-        </article>
-        <article class="panel">
-          <div class="badge">Wallet snapshot</div>
-          <p>Connect a wallet to surface holdings, staked vs claimable assets, and reward history. For now, the placeholders hint at the final breakdown.</p>
-          <div class="stat-grid cols-2">
-            <div class="stat-card">
-              <h4>Owned</h4>
-              <strong>12 Frogs</strong>
-              <span>4 legendary · 8 rare</span>
-            </div>
-            <div class="stat-card">
-              <h4>Staked</h4>
-              <strong>8 Frogs</strong>
-              <span>Boost locked until 28 Feb</span>
-            </div>
-            <div class="stat-card">
-              <h4>Claimable</h4>
-              <strong>182 $FLY</strong>
-              <span>Last claimed 4 days ago</span>
-            </div>
-            <div class="stat-card">
-              <h4>Expeditions</h4>
-              <strong>2 Active</strong>
-              <span>Ends in 36h</span>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <div class="double-column">
-        <article class="panel">
-          <div class="badge">Collection staking</div>
-          <p>Bring in the live staking contract feed once ready. Mock tiles below capture the kinds of signals we can spotlight.</p>
-          <div class="stat-grid cols-3">
-            <div class="stat-card">
-              <h4>APY Snapshot</h4>
-              <strong>22.4%</strong>
-              <span>Projected with current pool</span>
-            </div>
-            <div class="stat-card">
-              <h4>Lockers</h4>
-              <strong>418 Wallets</strong>
-              <span>+32 in last 24h</span>
-            </div>
-            <div class="stat-card">
-              <h4>Boost Pools</h4>
-              <strong>4 Active</strong>
-              <span>Sunset Bay resets in 6d</span>
-            </div>
-          </div>
-        </article>
-        <article class="panel">
-          <div class="badge">Terminal teaser</div>
-          <div class="terminal-mini">
-            <div class="terminal-header">
-              <div class="terminal-dots"><span></span><span></span><span></span></div>
-              <div class="terminal-title">ff@preview: ~</div>
-            </div>
-            <div class="terminal-body">
-              <div><span class="command">ff status --summary</span></div>
-              <div class="muted">> floor 4.27 Ξ · listed 4.8%</div>
-              <div class="muted">> staking yield 22.4% est.</div>
-              <div class="muted">> 3 recent mints waiting review</div>
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <!-- Layout 2: Showcase Spread -->
-    <section class="layout" id="layout-showcase" role="tabpanel" aria-labelledby="showcase">
-      <article class="panel" style="background: radial-gradient(circle at top right, rgba(60, 182, 255, 0.22), transparent 62%), var(--surface);">
-        <div class="pill">Concept · Hybrid hero</div>
-        <h2 style="margin: 0; font-family: 'Space Grotesk', 'Inter', sans-serif; font-size: clamp(2.4rem, 4.6vw, 3.4rem); letter-spacing: -0.022em;">Holdings at a glance, stories up front.</h2>
-        <p style="max-width: 70ch;">This direction pushes a more editorial hero with quick stats, a rotating highlight card, and an activity rail to the side for glanceable context.</p>
-      </article>
-
-      <div class="double-column" style="align-items: start;">
-        <article class="panel" style="gap: 22px;">
-          <div class="badge">Featured frog</div>
-          <div class="mosaic-card" style="background: rgba(255, 255, 255, 0.02);">
-            <h4>Moonlit Navigator</h4>
-            <p>Legendary amphib with celestial routing. Perfect candidate for staking boosts and lore-driven quests.</p>
-            <div class="pill" style="background: rgba(57, 241, 158, 0.12); color: var(--accent);">Boost eligible</div>
-          </div>
-          <div class="stat-grid cols-2">
-            <div class="stat-card">
-              <h4>Rarity Rank</h4>
-              <strong>#18 / 5k</strong>
-              <span>Traits: astral · aurora · navigator</span>
-            </div>
-            <div class="stat-card">
-              <h4>Synergy Score</h4>
-              <strong>92%</strong>
-              <span>Pairs with Expedition Set B</span>
-            </div>
-          </div>
-        </article>
-        <article class="panel" style="gap: 24px;">
-          <div class="badge">Activity rail</div>
-          <div class="activity-grid">
-            <div class="activity-item">
-              <div class="avatar">#455</div>
-              <div>
-                <strong>Staked in Sunken Labs</strong>
-                <span>Lock boost +2.2%</span>
-              </div>
-              <span>5m</span>
-            </div>
-            <div class="activity-item">
-              <div class="avatar">#991</div>
-              <div>
-                <strong>Minted with Portal Pass</strong>
-                <span>Claim window closes soon</span>
-              </div>
-              <span>18m</span>
-            </div>
-            <div class="activity-item">
-              <div class="avatar">#112</div>
-              <div>
-                <strong>Reward claimed</strong>
-                <span>260 $FLY transferred</span>
-              </div>
-              <span>43m</span>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <div class="layout-mosaic">
-        <div class="mosaic-card">
-          <div class="badge">Wallet breakdown</div>
-          <h4>Energy &amp; alignment</h4>
-          <p>Placeholder gauge for long-form stats like frog alignment, quest cooldowns, and synergy pairings.</p>
-        </div>
-        <div class="mosaic-card">
-          <div class="badge" style="background: rgba(60, 182, 255, 0.16); color: var(--accent-2);">Sales pulse</div>
-          <h4>Last 24h</h4>
-          <p>27 sales · 4.42 Ξ avg · 4 mints pending verification. Plot sparkline here to show the cadence.</p>
-        </div>
-        <div class="mosaic-card">
-          <div class="badge" style="background: rgba(255, 107, 129, 0.16); color: var(--danger);">Alerts</div>
-          <h4>Signals</h4>
-          <p>Reserve this tile for automation: price threshold pings, expedition invites, or stake expiry notices.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Layout 3: Terminal Control -->
-    <section class="layout" id="layout-terminal-control" role="tabpanel" aria-labelledby="terminal-control">
-      <div class="double-column" style="align-items: stretch;">
-        <article class="panel" style="gap: 24px;">
-          <div class="badge">Command center</div>
-          <h2 style="margin: 0; font-family: 'Space Grotesk', 'Inter', sans-serif; font-size: clamp(2rem, 4vw, 3rem);">Terminal-first cockpit</h2>
-          <p>Leaning fully into the terminal. Primary column is the command canvas, with contextual cards on the right. Ideal if power users live in CLI land.</p>
-          <div class="stat-grid cols-2">
-            <div class="stat-card">
-              <h4>Profile</h4>
-              <strong>0xfade…a9</strong>
-              <span>Connect wallet → load profile</span>
-            </div>
-            <div class="stat-card">
-              <h4>Mode</h4>
-              <strong>Pro Terminal</strong>
-              <span>Auto-exec scripts enabled</span>
-            </div>
-          </div>
-        </article>
-        <article class="panel" style="gap: 22px;">
-          <div class="badge">Quick metrics</div>
-          <div class="stat-grid cols-2">
-            <div class="stat-card">
-              <h4>Holdings</h4>
-              <strong>12</strong>
-              <span>Value 52.7 Ξ</span>
-            </div>
-            <div class="stat-card">
-              <h4>Staked</h4>
-              <strong>8</strong>
-              <span>Boost 18.2%</span>
-            </div>
-            <div class="stat-card">
-              <h4>Claimable</h4>
-              <strong>182 $FLY</strong>
-              <span>Unlock 14:22 UTC</span>
-            </div>
-            <div class="stat-card">
-              <h4>Energy</h4>
-              <strong>68%</strong>
-              <span>Projected full in 3h</span>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <div class="double-column" style="align-items: stretch;">
-        <div class="terminal">
-          <div class="terminal-header">
-            <div class="terminal-dots"><span></span><span></span><span></span></div>
-            <div class="terminal-title">ff@control: ~</div>
-            <div class="pill" style="background: rgba(57, 241, 158, 0.14); color: var(--accent);">Live preview</div>
-          </div>
-          <div class="terminal-body">
-            <div><span class="command">ff sync wallet --address 0xfade...a9</span></div>
-            <div class="muted">▸ fetching 12 tokens · 4 legendary · 8 rare</div>
-            <div class="muted">▸ staking status: 8 locked · next expiry 2024-02-28</div>
-            <div class="muted">▸ rewards: 182 $FLY claimable · est. 22.4% apy</div>
-            <div><span class="command">ff market watch --range 24h</span></div>
-            <div class="muted">▸ sales: 27 · floor 4.27 Ξ · avg 4.42 Ξ · listings 4.8%</div>
-            <div class="muted">▸ alerts queued: 2 price · 1 expedition invite</div>
-            <div><span class="command">ff stake plan --optimize</span></div>
-            <div class="muted">▸ suggest: move #602 to Sunken Labs pool for +1.8%</div>
-          </div>
-        </div>
-        <article class="panel" style="gap: 22px;">
-          <div class="badge">Context cards</div>
-          <div class="stat-grid cols-1" style="gap: 16px;">
-            <div class="stat-card">
-              <h4>Expedition queue</h4>
-              <strong>3 slots</strong>
-              <span>#455, #602, #991 prepped for launch</span>
-            </div>
-            <div class="stat-card">
-              <h4>Scripts</h4>
-              <strong>6</strong>
-              <span>Triggers: auto-claim, sweep alerts, rarity ping</span>
-            </div>
-            <div class="stat-card">
-              <h4>Notes</h4>
-              <span>Reserve this area for markdown or pinned queries.</span>
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <!-- Layout 4: Terminal Stacks -->
-    <section class="layout" id="layout-terminal-stacks" role="tabpanel" aria-labelledby="terminal-stacks">
-      <article class="panel" style="gap: 24px;">
-        <div class="badge">Terminal stacks</div>
-        <h2 style="margin: 0; font-family: 'Space Grotesk', 'Inter', sans-serif; font-size: clamp(2rem, 4vw, 3rem);">Layered terminals for multi-tasking</h2>
-        <p>Split the canvas into stacked panes. Keep a live feed running, script drafting on the side, and quick stats anchored above.</p>
-        <div class="stat-grid cols-3">
-          <div class="stat-card">
-            <h4>Focus</h4>
-            <strong>Trading</strong>
-            <span>Mint radar armed</span>
-          </div>
-          <div class="stat-card">
-            <h4>Hotlist</h4>
-            <strong>5 targets</strong>
-            <span>Auto-bid paused</span>
-          </div>
-          <div class="stat-card">
-            <h4>Watchers</h4>
-            <strong>3 scripts</strong>
-            <span>Latency &lt; 280ms</span>
-          </div>
-        </div>
-      </article>
-
-      <div class="double-column" style="align-items: stretch;">
-        <div class="terminal-stack">
-          <div class="terminal">
-            <div class="terminal-header">
-              <div class="terminal-dots"><span></span><span></span><span></span></div>
-              <div class="terminal-title">ff@stacks: feed</div>
-              <div class="pill" style="background: rgba(60, 182, 255, 0.18); color: var(--accent-2);">Auto scroll</div>
-            </div>
-            <div class="terminal-body">
-              <div class="muted">[04:12:08] sale #721 → 4.78 Ξ (legendary)</div>
-              <div class="muted">[04:09:47] stake +#455 Sunken Labs boost</div>
-              <div class="muted">[04:07:22] mint queued portal pass · needs verify</div>
-              <div class="muted">[04:05:10] sale #188 → 4.51 Ξ (rare)</div>
-              <div class="muted">[04:03:01] expedition invite #991</div>
-              <div class="muted">[04:00:16] reward claim 260 $FLY by 0x39a…74</div>
-              <div><span class="command">press ⌘K to pause feed</span></div>
-            </div>
-          </div>
-          <div class="terminal-mini">
-            <div class="terminal-header">
-              <div class="terminal-dots"><span></span><span></span><span></span></div>
-              <div class="terminal-title">draft script</div>
-            </div>
-            <div class="terminal-body">
-              <div class="muted">#!/bin/frog</div>
-              <div class="muted">watch floor --notify &lt;4.1</div>
-              <div class="muted">stake plan --pool "Sunken Labs"</div>
-              <div class="muted">mint scout --traits "aurora"</div>
-              <div><span class="command"># next: integrate auto-hedge</span></div>
-            </div>
-          </div>
-        </div>
-        <article class="panel">
-          <div class="badge">Companion stats</div>
-          <div class="sales-feed">
-            <div class="sale-item">
-              <div class="avatar">#334</div>
-              <div>
-                <strong>Listed</strong>
-                <span>4.12 Ξ on Lagoon</span>
-              </div>
-              <span>now</span>
-            </div>
-            <div class="sale-item">
-              <div class="avatar">#118</div>
-              <div>
-                <strong>Bid</strong>
-                <span>4.01 Ξ from 0x992…1f</span>
-              </div>
-              <span>3m</span>
-            </div>
-            <div class="sale-item">
-              <div class="avatar">#778</div>
-              <div>
-                <strong>Delisted</strong>
-                <span>floor squeeze incoming</span>
-              </div>
-              <span>6m</span>
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <!-- Layout 5: Terminal Matrix -->
-    <section class="layout" id="layout-terminal-matrix" role="tabpanel" aria-labelledby="terminal-matrix">
-      <article class="panel" style="gap: 22px;">
-        <div class="badge">Terminal grid</div>
-        <h2 style="margin: 0; font-family: 'Space Grotesk', 'Inter', sans-serif; font-size: clamp(2rem, 4vw, 3rem);">Matrix view for operators</h2>
-        <p>Four synchronized panes let you monitor holdings, staking performance, alerts, and manual commands simultaneously.</p>
-      </article>
-
-      <div class="terminal-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
-        <div class="terminal-mini">
-          <div class="terminal-header">
-            <div class="terminal-dots"><span></span><span></span><span></span></div>
-            <div class="terminal-title">wallet watch</div>
-          </div>
-          <div class="terminal-body">
-            <div class="muted">holdings: 12 frogs</div>
-            <div class="muted">staked: 8 (boost 18.2%)</div>
-            <div class="muted">claimable: 182 $FLY</div>
-            <div class="muted">cooldown: 3 frogs &lt; 24h</div>
-          </div>
-        </div>
-        <div class="terminal-mini">
-          <div class="terminal-header">
-            <div class="terminal-dots"><span></span><span></span><span></span></div>
-            <div class="terminal-title">staking ops</div>
-          </div>
-          <div class="terminal-body">
-            <div class="muted">pool: Sunken Labs APY 22.4%</div>
-            <div class="muted">lockers: 418 wallets</div>
-            <div class="muted">boost pools: 4 active</div>
-            <div class="muted">next reset: 6d</div>
-          </div>
-        </div>
-        <div class="terminal-mini">
-          <div class="terminal-header">
-            <div class="terminal-dots"><span></span><span></span><span></span></div>
-            <div class="terminal-title">alerts</div>
-          </div>
-          <div class="terminal-body">
-            <div class="muted">! floor drop guard 4.10 Ξ</div>
-            <div class="muted">! reward claim window 14:22 UTC</div>
-            <div class="muted">! expedition invite expires 02:00</div>
-            <div class="muted">! new listing trait match</div>
-          </div>
-        </div>
-        <div class="terminal-mini">
-          <div class="terminal-header">
-            <div class="terminal-dots"><span></span><span></span><span></span></div>
-            <div class="terminal-title">manual input</div>
-          </div>
-          <div class="terminal-body">
-            <div><span class="command">ff sweep --traits "aurora, navigator"</span></div>
-            <div><span class="command">ff stake move #602 --pool "Labs"</span></div>
-            <div class="muted">confirm? y/n</div>
-            <div class="muted">› awaiting wallet signature</div>
-          </div>
-        </div>
-      </div>
-
-      <article class="panel" style="gap: 18px;">
-        <div class="badge">Notes &amp; integrations</div>
-        <p>Use the strip below to link to rarity explorer, quest log, or external dashboards. Modules can be swapped without disrupting the matrix.</p>
-        <div class="layout-mosaic" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-          <div class="mosaic-card" style="background: rgba(57, 241, 158, 0.12); color: #022918;">
-            <h4 style="color: inherit;">Rarity view</h4>
-            <p style="color: inherit;">Open rarity.html for deep trait analytics.</p>
-          </div>
-          <div class="mosaic-card" style="background: rgba(60, 182, 255, 0.14); color: #032137;">
-            <h4 style="color: inherit;">Quest log</h4>
-            <p style="color: inherit;">Hook mutate.html quests for quick actions.</p>
-          </div>
-          <div class="mosaic-card" style="background: rgba(255, 255, 255, 0.08);">
-            <h4>Custom slot</h4>
-            <p>Placeholder for analytics embed or partner feed.</p>
-          </div>
-        </div>
-      </article>
-    </section>
   </main>
 
-  <footer class="site-foot">
-    <span>Fresh Frogs mock lab · crafted for preview only.</span>
-    <span>Toggle layouts above to compare tone, density, and terminal emphasis.</span>
-  </footer>
-
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js" crossorigin="anonymous"></script>
   <script>
-    const tabs = document.querySelectorAll('.layout-tab');
-    const layouts = document.querySelectorAll('.layout');
-
-    tabs.forEach((tab) => {
-      tab.addEventListener('click', () => {
-        const target = tab.getAttribute('data-target');
-
-        tabs.forEach((btn) => {
-          const isActive = btn === tab;
-          btn.classList.toggle('active', isActive);
-          btn.setAttribute('aria-selected', String(isActive));
-        });
-
-        layouts.forEach((layout) => {
-          layout.classList.toggle('active', layout.id === `layout-${target}`);
-        });
-      });
-    });
+    window.CONTROLLER_ADDRESS = "0xCB1eE125cFf4051A10A55a09B10613876C4eF199";
   </script>
+  <script src="assets/js/contract-tools.js"></script>
 </body>
 </html>
