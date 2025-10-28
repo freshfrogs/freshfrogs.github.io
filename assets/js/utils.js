@@ -22,6 +22,15 @@
     return r.json();
   };
 
+  FF.apiHeaders = ()=>{
+    const CFG = window.FF_CFG || {};
+    const key = (CFG.ALCHEMY_API_KEY || CFG.FROG_API_KEY || '').trim();
+    // Alchemy encodes API keys in the request path, so headers are informational only.
+    const headers = { accept: 'application/json' };
+    if (key) headers['x-api-key'] = key;
+    return headers;
+  };
+
   // ---- Rarity loader (one-time) ----
   let _rarityList = null;
   let _rankMap = null;
