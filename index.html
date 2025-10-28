@@ -1,201 +1,641 @@
 <!doctype html>
-<html lang="en" data-theme="t1">
+<html lang="en" data-theme="noir">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>freshfrogs.github.io — Layout 3</title>
-
-  <link rel="stylesheet" href="assets/css/styles.css" />
-
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>FreshFrogs — Wallet, Sales, Rarity, Staking</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Grotesk:wght@600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js" crossorigin="anonymous"></script>
   <style>
-    /* Base */
-    .pg-wrap{ padding:20px; }
-    img{ image-rendering: pixelated; image-rendering: crisp-edges; }
-
-    .pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
-    .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
-    .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
-    .pg-muted{ color:var(--muted); font-size:13px; }
-
-    .list{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
-    .row{ display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:center; padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
-    .thumb64{ width:64px; height:64px; min-width:64px; min-height:64px; border-radius:10px; object-fit:contain; background:var(--panel-2); }
-
-    /* Centered single-panel layout (fixed width) */
-    :root{ --panel-width: 640px; }
-    .center-wrap{ display:grid; gap:16px; justify-items:center; }
-    .centered-card{ width: min(var(--panel-width), 100%); }
-
-    /* Hero (centered) */
-    .frog-hero{ margin:28px auto 38px; width: min(var(--panel-width), 100%); }
-    .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
-    .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
-    .frog-strip .tile{ flex:0 0 auto; width:64px; height:64px; border-radius:10px; }
-    .frog-strip .tile.hide{ display:none !important; }
-    .frog-strip img{ width:64px; height:64px; object-fit:contain; }
-    @media (max-width:520px){ .frog-hero{ margin:22px auto 30px; } .frog-strip{ gap:10px; } }
-
-    /* Info blocks */
-    .info-grid-2{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:10px; margin-bottom:10px; }
-    @media (max-width:900px){ .info-grid-2{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
-    @media (max-width:520px){ .info-grid-2{ grid-template-columns: 1fr; } }
-    .info-block{ border:1px solid var(--border); border-radius:12px; padding:10px; background:var(--panel); }
-    .info-block .ik{ font-size:11px; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; }
-    .info-block .iv{ font-weight:900; font-size:18px; line-height:1.1; margin-top:4px; }
-    .info-block .in{ font-size:12px; color:var(--muted); }
-
-    /* Mint (Mini) */
-    #mintMini.mint-mini{
-      border:1px solid var(--border); border-radius:12px; background: var(--panel);
-      padding:10px; margin:8px 0 12px;
+    :root{
+      --font-ui:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      --font-display:'Space Grotesk',var(--font-ui);
+      --bg:#0b0f13; --ink:#e9f2ff; --muted:#90a3b3;
+      --ring:rgba(255,255,255,.08); --panel:#0f141a; --panel-2:#121821;
+      --accent:#35d49a; --accent-ink:#051311;
+      --radius:10px; --radius-pill:999px;
+      --focus:0 0 0 3px color-mix(in srgb,var(--accent) 26%,transparent);
+      --list-max: 420px; /* unified panel list height */
     }
-    #mintMini .mint-mini__row{ display:grid; grid-template-columns:auto auto 1fr auto; align-items:center; gap:10px; }
-    #mintMini .mint-mini__price{ border:1px solid var(--border); border-radius:10px; padding:8px 10px; background: color-mix(in srgb, var(--panel) 90%, transparent); display:grid; grid-template-columns:auto auto; gap:6px 8px; align-items:baseline; }
-    #mintMini .mint-mini__price .k{ font-size:12px; color:var(--muted); }
-    #mintMini .mint-mini__price .v{ font-weight:900; font-size:14px; }
-    #mintMini .mint-mini__stepper{ display:flex; align-items:center; gap:8px; }
-    #mintMini .mini__btn{ width:28px; height:28px; border-radius:8px; border:1px solid var(--border); background:transparent; color:inherit; font-weight:800; line-height:1; display:grid; place-items:center; }
-    #mintMini .mini__btn:active{ transform: translateY(1px); }
-    #mintMini .mini__qty{ width:64px; text-align:center; padding:6px; border-radius:8px; border:1px solid var(--border); background:transparent; color:inherit; font-family:var(--font-ui); }
-    #mintMini .mini__mint{ padding-inline:12px; }
-    #mintMini .mint-mini__total{ font-size:12px; color:var(--muted); justify-self:end; }
-    #mintMini .mint-mini__note{ margin-top:6px; font-size:12px; }
-    @media (max-width:600px){ #mintMini .mint-mini__row{ grid-template-columns: 1fr 1fr; } #mintMini .mint-mini__total{ justify-self:start; } }
-
-    /* Scrollable lists: JS sets max-height to N rows; infinite scroll appends */
-    #recentMints.scrolling,
-    #recentStakes.scrolling{
-      overflow-y:auto;
-      -webkit-overflow-scrolling:touch;
-      padding-right:4px;
+    html[data-theme=pastel]{
+      --bg:#f6fbff; --ink:#11202b; --muted:#5d7a8a; --ring:rgba(0,0,0,.1);
+      --panel:#fff; --panel-2:#eaf5ff; --accent:#8ad1ff; --accent-ink:#08121a;
     }
-    #recentMints .row, #recentStakes .row{ cursor:pointer; }
-    @media (hover:hover){
-      #recentMints.scrolling::-webkit-scrollbar,
-      #recentStakes.scrolling::-webkit-scrollbar{ width:8px; }
-      #recentMints.scrolling::-webkit-scrollbar-thumb,
-      #recentStakes.scrolling::-webkit-scrollbar-thumb{
-        background: color-mix(in srgb, var(--muted) 35%, transparent);
-        border-radius:8px;
-      }
-    }
+    *{box-sizing:border-box} html,body{margin:0}
+    body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--font-ui)}
+    a{color:inherit;text-decoration:none} img{max-width:100%;display:block;image-rendering:pixelated}
+    .container{width:min(1140px,100%);margin:0 auto;padding:0 20px}
+    header.site{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--panel) 70%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--ring)}
+    .hdr{height:64px;display:flex;align-items:center;justify-content:space-between}.brand{font:900 18px/1 var(--font-display)}.nav{display:flex;gap:18px;align-items:center}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.muted{color:var(--muted)}.section-title{font:900 1.4rem/1 var(--font-display);letter-spacing:-.01em}
+    .stack{display:flex;flex-direction:column;gap:12px}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:900px){.two-col{grid-template-columns:1fr}}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:.25rem .6rem;border-radius:var(--radius-pill);border:1px solid var(--ring);background:var(--panel)}
+    .spacer{flex:1}
+    .thumb64{width:64px;height:64px;min-width:64px;min-height:64px;border-radius:8px;object-fit:cover;aspect-ratio:1/1;image-rendering:pixelated}
+    .addr{font-family:ui-monospace,Menlo,Consolas,monospace}
+    .hero{padding:56px 0 22px;display:grid;gap:24px;grid-template-columns:1.05fr .95fr;align-items:center}
+    @media(max-width:960px){.hero{grid-template-columns:1fr}}
+    .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+    .tile{position:relative;aspect-ratio:1/1;overflow:hidden}
+    .tile img{width:100%;height:100%;object-fit:contain}
+    .facts{padding:8px 0 6px;display:grid;gap:12px;grid-template-columns:repeat(4,1fr)}
+    @media(max-width:1100px){.facts{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:580px){.facts{grid-template-columns:1fr}}
+    .fact,.panel{background:var(--panel);border:1px solid var(--ring);border-radius:var(--radius);padding:14px;box-shadow:0 1px 0 rgba(0,0,0,.3) inset}
+    .panel{margin-block:12px}
+    .same-height{display:flex;flex-direction:column}
+    .same-height .card-list{flex:1;min-height:0} /* allow scroll section to size correctly */
+    .card-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+    .list-item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:12px 14px;border-radius:8px;border:1px solid var(--ring);background:var(--panel)}
+    .price{font-weight:800}
+    .tabs{--tab-i:0;position:relative;display:grid;grid-template-columns:1fr 1fr;padding:4px;border-radius:var(--radius-pill);background:var(--panel-2);border:1px solid var(--ring);min-width:220px;isolation:isolate}
+    .tab{position:relative;z-index:1;appearance:none;background:transparent;border:0;padding:.5rem 1rem;border-radius:var(--radius-pill);font-weight:800;cursor:pointer;color:var(--muted);transition:color .15s}
+    .tab[aria-selected=true]{color:var(--accent-ink)}
+    .tab-indicator{position:absolute;z-index:0;inset:4px;width:calc(50% - 0px);border-radius:var(--radius-pill);background:var(--accent);box-shadow:0 6px 18px color-mix(in srgb,var(--accent) 40%,transparent);transform:translateX(calc(var(--tab-i) * 100%));transition:transform .22s cubic-bezier(.22,.8,.3,1)}
+    footer.site{border-top:1px solid var(--ring);padding:26px 0;color:var(--muted);margin-top:26px}
+    .ftr{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.links{display:flex;gap:12px}
+    .lightbox{place-items:center;background:rgba(0,0,0,.75);position:fixed;inset:0;z-index:50}
+    .stage{position:relative;width:min(90vmin,520px);aspect-ratio:1/1;background:#000}
+    .theme-dock{position:fixed;right:14px;bottom:14px;z-index:30;display:flex;gap:8px;flex-wrap:wrap;background:color-mix(in srgb,var(--panel) 82%,transparent);border:1px solid var(--ring);border-radius:12px;padding:8px;backdrop-filter:blur(6px)}
+    .swatch{width:28px;height:28px;border-radius:8px;border:1px solid var(--ring);cursor:pointer;display:inline-block}
+    .swatch[aria-current=true]{outline:2px solid var(--accent);outline-offset:2px}
+    .sw-noir{background:#0f141a}.sw-pastel{background:#eaf5ff}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.62rem;padding:.62rem .9rem;border-radius:var(--radius);border:1px solid color-mix(in srgb,var(--ink) 12%,transparent);background:var(--panel);color:var(--ink);font-weight:800;letter-spacing:.02em;cursor:pointer;transition:background .15s,border-color .15s,transform .05s,color .15s;user-select:none}
+    .btn:hover{background:color-mix(in srgb,var(--panel-2) 55%,var(--panel));border-color:color-mix(in srgb,var(--ink) 18%,transparent)}
+    .btn:active{transform:translateY(1px)} .btn:focus-visible{outline:none;box-shadow:var(--focus)}
+    .btn-solid{background:var(--accent);color:var(--accent-ink);border-color:color-mix(in srgb,var(--accent) 50%,transparent)}
+    .btn-outline{background:transparent;color:var(--ink);border-color:color-mix(in srgb,var(--ink) 18%,transparent)}
+    .btn-ghost{background:transparent;color:var(--muted);border-color:color-mix(in srgb,var(--ink) 10%,transparent)}
+    .btn-sm{padding:.48rem .7rem;border-radius:8px;font-weight:700}.btn-lg{padding:.85rem 1.1rem;font-size:1.05rem}
+    .icon-btn{width:40px;height:40px;border-radius:8px;display:inline-grid;place-items:center;border:1px solid color-mix(in srgb,var(--ink) 12%,transparent);background:var(--panel);color:var(--ink)}
+    .progress{height:6px;background:var(--panel-2);border-radius:8px;border:1px solid var(--ring);overflow:hidden}
+    .progress i{display:block;width:22%;height:100%;background:var(--accent)}
+    /* Unified scroll height across lists (shows ~5, scrolls for more) */
+    .list-scroll{max-height:var(--list-max);overflow-y:auto;overscroll-behavior:contain}
+    .list-scroll::-webkit-scrollbar{ width: 10px }
+    .list-scroll::-webkit-scrollbar-thumb{ background: color-mix(in srgb, var(--ink) 18%, transparent); border-radius: 8px; }
+    .list-scroll::-webkit-scrollbar-track{ background: color-mix(in srgb, var(--panel-2) 70%, transparent); }
   </style>
 </head>
 <body>
-  <div class="pg-wrap container">
-    <div class="center-wrap">
-
-      <!-- HERO -->
-      <section class="frog-hero">
-        <h1 class="frog-title">freshfrogs.github.io</h1>
-        <div class="frog-strip">
-          <div class="tile"><img src="frog/12.png"  alt="12"></div>
-          <div class="tile"><img src="frog/77.png"  alt="77"></div>
-          <div class="tile"><img src="frog/404.png" alt="404"></div>
-          <div class="tile"><img src="frog/256.png" alt="256"></div>
-          <div class="tile"><img src="frog/999.png" alt="999"></div>
-          <div class="tile"><img src="frog/1.png"   alt="1"></div>
-        </div>
-      </section>
-
-      <!-- Fresh Frogs NFT -->
-      <section class="pg-card centered-card">
-        <div class="pg-card-head"><h3>Fresh Frogs NFT</h3></div>
-        <p class="pg-muted" style="margin:6px 0 12px 0; max-width:70ch;">
-          Pixel-perfect frogs hopping around the Ethereum pond. Mint, stake to earn FLYZ, and explore the collection’s quirks and traits.
-        </p>
-
-        <div class="info-grid-2">
-          <div class="info-block"><div class="ik">🐸 Supply</div><div class="iv">4,040</div><div class="in">Total tokens</div></div>
-          <div class="info-block"><div class="ik">⛓️ Chain</div><div class="iv">Ethereum</div><div class="in">ERC-721</div></div>
-          <div class="info-block"><div class="ik">🎧 Royalty</div><div class="iv">5%</div><div class="in">Secondary sales</div></div>
-          <div class="info-block"><div class="ik">🪙 Mint</div><div class="iv">0.01 ETH</div><div class="in">Per frog</div></div>
-        </div>
-
-        <!-- Mint (Mini) -->
-        <section id="mintMini" class="mint-mini" aria-label="Quick mint">
-          <div class="mint-mini__row">
-            <div class="mint-mini__price">
-              <div class="k">Price</div><div class="v">0.01 ETH</div>
-            </div>
-
-            <div class="mint-mini__stepper" role="group" aria-label="Quantity">
-              <button type="button" class="mini__btn" data-delta="-1" aria-label="Decrease">−</button>
-              <input id="miniQty" class="mini__qty" type="text" inputmode="numeric" pattern="[0-9]*" value="1" aria-label="Quantity">
-              <button type="button" class="mini__btn" data-delta="1" aria-label="Increase">+</button>
-            </div>
-
-            <button type="button" class="btn mini__mint">Mint</button>
-            <div class="mint-mini__total">Total: <b id="miniTotal">0.01 ETH</b></div>
-          </div>
-          <div class="mint-mini__note pg-muted">Connect wallet to mint.</div>
-        </section>
-
-        <!-- Recent Mints -->
-        <ul id="recentMints" class="list" aria-live="polite" data-visible="6">
-          <li class="row"><div class="pg-muted">Loading recent mints…</div></li>
-        </ul>
-      </section>
+<header class="site">
+  <div class="container hdr">
+    <div class="brand">FreshFrogs</div>
+    <nav class="nav">
+      <a href="#gallery">Collection</a>
+      <a href="#trade">Mint & Staking</a>
+      <a href="#features">Features</a>
+      <a href="#about">About</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="row">
+      <span id="walletLabel" class="muted" style="display:none;"></span>
+      <button id="connectBtn" class="btn btn-solid btn-sm">Connect Wallet</button>
     </div>
   </div>
+</header>
 
-  <script>
-    /* Keep whole 64px tiles only (hero strip) */
-    function layoutFrogStrip(){
-      var strip = document.querySelector('.frog-strip'); if(!strip) return;
-      var tiles = Array.prototype.slice.call(strip.querySelectorAll('.tile'));
-      var styles = window.getComputedStyle(strip);
-      var gap = parseFloat(styles.gap || 12) || 12;
-      var tileW = 64, innerW = strip.clientWidth;
-      var count = Math.max(1, Math.floor((innerW + gap) / (tileW + gap)));
-      tiles.forEach(function(t,i){ t.classList.toggle('hide', i >= count); });
-    }
-    window.addEventListener('resize', layoutFrogStrip);
-    document.addEventListener('DOMContentLoaded', layoutFrogStrip);
+<main class="container">
+  <section class="hero">
+    <div>
+      <h1 class="section-title" style="margin:0;font-size:clamp(2rem,4.2vw,3rem);">Nine random frogs. Clean and fast.</h1>
+      <p class="muted" style="max-width:62ch">Hero grid renders standard PNGs. (Trait-layer code kept for later.)</p>
+      <div class="row" style="margin-top:12px;">
+        <a class="btn btn-solid btn-lg" href="#trade">🐸 Mint & Staking</a>
+        <a class="btn btn-outline" href="https://freshfrogs.github.io/" target="_blank" rel="noopener">Original Site</a>
+      </div>
+      <div id="localLoad" class="muted" style="margin-top:8px;display:none;">
+        <div><b>Testing locally?</b> Load your rarity JSON:</div>
+        <div class="row" style="margin-top:6px">
+          <input id="rarityFile" type="file" accept="application/json,.json"/>
+          <button id="useLocalBtn" class="btn btn-outline btn-sm">Use selected JSON</button>
+        </div>
+        <div style="font-size:.9rem;margin-top:4px">Pick <code>assets/freshfrogs_rarity_rankings.json</code></div>
+      </div>
+    </div>
+    <div id="gallery"><div class="gallery" id="grid"></div></div>
+  </section>
 
-    /* Mint (Mini): stepper + totals */
-    (function(){
-      var PRICE = 0.01;
-      function clamp(n){ n = parseInt(n||'1', 10); return isNaN(n) ? 1 : Math.max(1, n); }
-      function fmtETH(n){ return n.toFixed(2) + ' ETH'; }
-      function syncMini(){
-        var qtyEl = document.getElementById('miniQty');
-        var totalEl = document.getElementById('miniTotal');
-        if(!qtyEl || !totalEl) return;
-        var q = clamp(qtyEl.value);
-        qtyEl.value = q;
-        totalEl.textContent = fmtETH(q * PRICE);
+  <section class="facts" aria-label="Key facts">
+    <div class="fact"><b>Supply</b><div class="muted">4,040 tokens</div></div>
+    <div class="fact"><b>Chain</b><div class="muted">Ethereum (ERC-721)</div></div>
+    <div class="fact"><b>Royalty</b><div class="muted">5% on secondary sales</div></div>
+    <div class="fact"><b>Mint Price</b><div class="muted">0.01 ETH</div></div>
+  </section>
+
+  <section id="trade" class="two-col" aria-label="Mint and Staking">
+    <div class="panel stack" aria-label="Mint">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div><h2 class="section-title" style="margin:0">Mint</h2><div class="muted">Choose quantity, preview total, then mint.</div></div>
+        <div class="pill">Price <b>0.01Ξ</b></div>
+      </div>
+      <div class="row" style="gap:10px;align-items:center">
+        <button id="mintDown" class="icon-btn" aria-label="Decrease">−</button>
+        <div id="mintQty" aria-live="polite">1</div>
+        <button id="mintUp" class="icon-btn" aria-label="Increase">+</button>
+        <input id="mintSlider" type="range" min="1" max="20" step="1" value="1" style="flex:1"/>
+      </div>
+      <div class="row" style="gap:6px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" data-preset="1">x1</button>
+        <button class="btn btn-ghost btn-sm" data-preset="3">x3</button>
+        <button class="btn btn-ghost btn-sm" data-preset="5">x5</button>
+        <button class="btn btn-ghost btn-sm" data-preset="10">x10</button>
+        <button class="btn btn-ghost btn-sm" data-preset="20">x20</button>
+      </div>
+      <div class="row" style="align-items:center">
+        <div class="muted">Total</div>
+        <b style="margin-left:6px"><span id="mintTotal">0.01</span> ETH</b>
+        <div class="pill" id="gasHint" style="margin-left:10px;">≈ <span id="gasEst">0.000</span> gas ETH</div>
+        <div class="spacer"></div>
+        <button id="mintBtn" class="btn btn-solid btn-lg">Mint <u>1</u></button>
+      </div>
+      <div class="progress"><i id="mintBar"></i></div>
+      <p id="mintStatus" class="muted">Status: ready (demo)</p>
+    </div>
+
+    <!-- My Frogs panel height & scrolling now matches Sales/Rarity -->
+    <div class="panel stack same-height" aria-label="Staking">
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <h2 class="section-title" style="margin:0">My Frogs</h2>
+          <div class="muted">Connect your wallet to view <b>Owned</b> & <b>Staked</b>.</div>
+          <div id="rewardsLine" class="muted" style="margin-top:4px;display:none;">Available rewards: <b id="rewardsEth">0</b> Flyz</div>
+        </div>
+        <div class="tabs" role="tablist" id="stakeTabs">
+          <span class="tab-indicator" aria-hidden="true"></span>
+          <button class="tab" id="tabOwned"  role="tab" aria-selected="true"  aria-controls="chipWrap">Owned</button>
+          <button class="tab" id="tabStaked" role="tab" aria-selected="false" aria-controls="chipWrap">Staked</button>
+        </div>
+      </div>
+      <!-- unified scroll container -->
+      <ul id="chipWrap" class="card-list list-scroll" aria-live="polite"></ul>
+
+      <div class="row" id="stakeControls" style="gap:8px;">
+        <button id="selectAll" class="btn btn-ghost btn-sm">Select All</button>
+        <button id="clearSel"  class="btn btn-ghost btn-sm">Clear</button>
+        <div class="spacer"></div>
+        <button class="btn btn-solid btn-sm" id="refreshOwned">↻ Refresh Owned</button>
+        <button class="btn btn-outline btn-sm" id="loadStakedBtn">Load Staked</button>
+      </div>
+      <p id="stakeStatus" class="muted">No wallet connected.</p>
+    </div>
+  </section>
+
+  <section id="features" class="panel stack" aria-label="Features">
+    <h2 class="section-title" style="margin:0">Features</h2>
+    <p class="muted" style="margin-top:0">If testing from desktop, click “Use selected JSON” above to load <code>assets/freshfrogs_rarity_rankings.json</code>.</p>
+
+    <div class="two-col">
+      <div class="panel stack same-height" aria-label="Recent Sales">
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <b>Recent Sales</b><span class="pill"><span class="muted">Live</span></span>
+        </div>
+        <ul id="recentSales" class="card-list list-scroll" aria-live="polite"></ul>
+        <div class="row" style="gap:8px;">
+          <button class="btn btn-outline" id="refreshBtn">Refresh</button>
+          <button class="btn btn-ghost" id="fetchLiveBtn">Fetch Live</button>
+        </div>
+      </div>
+
+      <div class="panel stack same-height" aria-label="Rarity Rankings">
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <b>Rarity Rankings</b><span class="pill"><span class="muted">Sorted</span></span>
+        </div>
+        <ul id="rarityList" class="card-list list-scroll" aria-live="polite"></ul>
+        <div class="row" style="gap:8px;">
+          <button class="btn btn-outline" id="sortRankBtn">Sort by Rank</button>
+          <button class="btn btn-outline" id="sortScoreBtn">Sort by Score</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="panel stack">
+    <h2 class="section-title" style="margin:0">About FreshFrogs</h2>
+    <p class="muted">FreshFrogs is a collection of pixel frogs with on-chain provenance. All secondary sales carry a 5% royalty.</p>
+  </section>
+
+  <section id="faq" class="panel stack">
+    <h2 class="section-title" style="margin:0">FAQ</h2>
+    <details><summary><b>How do I mint?</b></summary><p class="muted">Connect a Web3 wallet and call the contract mint function. This template includes UI only; add your mint logic when ready.</p></details>
+    <details><summary><b>Where can I view the collection?</b></summary><p class="muted">OpenSea or the original site’s gallery.</p></details>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="container ftr">
+    <div>© FreshFrogs 2025</div>
+    <div class="links">
+      <a href="https://x.com" target="_blank" rel="noopener">Twitter</a>
+      <a href="#" target="_blank" rel="noopener">Discord</a>
+      <a href="https://freshfrogs.github.io/" target="_blank" rel="noopener">Docs</a>
+    </div>
+  </div>
+</footer>
+
+<div id="lightbox" class="lightbox" style="display:none">
+  <div id="lightboxStage" class="stage"></div>
+</div>
+
+<!-- Theme chooser (Noir + Pastel) -->
+<div class="theme-dock" role="toolbar" aria-label="Theme chooser">
+  <button class="swatch sw-noir"   data-theme="noir"   title="Noir"></button>
+  <button class="swatch sw-pastel" data-theme="pastel" title="Pastel"></button>
+</div>
+
+<script>
+/* ======================= CONFIG ======================= */
+window.FF_CFG = {
+  SOURCE_PATH: "https://freshfrogs.github.io",
+  SUPPLY: 4040,
+  COLLECTION_ADDRESS: "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b",
+  CONTROLLER_ADDRESS: "0xCB1ee125CFf4051a10a55a09B10613876C4Ef199",
+  JSON_PATH: "assets/freshfrogs_rarity_rankings.json",
+  FROG_API_KEY: (window.frog_api || "3105c552-60b6-5252-bca7-291c724a54bf")
+};
+/* ======================= THEME ======================= */
+(function(){
+  const K="ff_theme",root=document.documentElement;
+  function set(t){
+    root.setAttribute("data-theme",t);
+    document.querySelectorAll(".theme-dock .swatch").forEach(s=>s.setAttribute("aria-current",s.dataset.theme===t?"true":"false"));
+    localStorage.setItem(K,t);
+  }
+  set(localStorage.getItem(K)||root.getAttribute("data-theme")||"noir");
+  document.querySelectorAll(".theme-dock .swatch").forEach(s=>s.addEventListener("click",()=>set(s.dataset.theme)));
+})();
+/* ======================= UTILS ======================= */
+window.FF = window.FF || {};
+(function(FF,CFG){
+  FF.shorten = a => a?(a.slice(0,6)+'…'+a.slice(-4)):'';
+  FF.thumb64 = (src,alt)=>`<img class="thumb64" src="${src}" alt="${alt}" width="64" height="64" loading="lazy">`;
+  FF.formatAgo = (ms)=>{
+    const s=Math.floor(ms/1e3); if(s<60) return s+'s';
+    const m=Math.floor(s/60); if(m<60) return m+'m';
+    const h=Math.floor(m/60); if(h<24) return h+'h';
+    const d=Math.floor(h/24); return d+'d';
+  };
+  FF.fetchJSON = async (p)=>{ const r=await fetch(p,{cache:"no-store"}); if(!r.ok) throw new Error(r.status); return r.json(); };
+})(window.FF, window.FF_CFG);
+/* ======================= GRID ======================= */
+(function(C){
+  const g=document.getElementById('grid'), L=document.getElementById('lightbox'), S=document.getElementById('lightboxStage');
+  function ids(n){ const s=new Set(); while(s.size<n) s.add(1+Math.floor(Math.random()*C.SUPPLY)); return [...s]; }
+  function render(){
+    g.innerHTML='';
+    ids(9).forEach(id=>{
+      const t=document.createElement('div'); t.className='tile';
+      t.innerHTML = `<img src="${C.SOURCE_PATH}/frog/${id}.png" alt="Frog #${id}" loading="lazy" decoding="async">`;
+      t.addEventListener('click',()=>{
+        S.innerHTML=''; const b=document.createElement('img');
+        b.src=`${C.SOURCE_PATH}/frog/${id}.png`; b.alt=`Frog #${id}`;
+        Object.assign(b.style,{width:'100%',height:'100%',objectFit:'contain',imageRendering:'pixelated'});
+        S.appendChild(b); L.style.display='grid';
+      });
+      g.appendChild(t);
+    });
+  }
+  L.addEventListener('click',()=>L.style.display='none');
+  window.FF_renderGrid = render;
+})(window.FF_CFG);
+/* ======================= SALES ======================= */
+(function(FF,C){
+  const opt={method:'GET',headers:{accept:'*/*','x-api-key':C.FROG_API_KEY}};
+  let data=[];
+  function addr(s){const c=s?.toAddress||s?.to?.address||s?.to;if(!c)return'—';const h=String(c);return /^0x[a-fA-F0-9]{40}$/.test(h)?(h.slice(0,6)+'…'+h.slice(-4)):(h.length>16?h.slice(0,6)+'…'+h.slice(-2):h)}
+  function ts(s){let r=s?.timestamp??s?.createdAt;if(r==null)return null;if(typeof r==='number'){const ms=r<1e12?r*1000:r;return new Date(ms)}const t=Date.parse(r);return Number.isNaN(t)?null:new Date(t)}
+  function map(res){return(res||[]).map(s=>{const tid=s?.token?.tokenId??s?.tokenId;const id=tid!=null?parseInt(String(tid),10):null;const b=addr(s);const d=ts(s);const p=s?.price?.amount?.decimal??s?.price?.gross?.decimal??null;if(!id)return null;return{id,time:d?FF.formatAgo(Date.now()-d.getTime()):'—',price:p!=null?p.toFixed(3)+' ETH':'—',buyer:b}}).filter(Boolean)}
+  async function fetchSales({limit=50,continuation=""}={}){const base="https://api.reservoir.tools/sales/v6";const q=new URLSearchParams({collection:C.COLLECTION_ADDRESS,limit:String(limit),sortBy:"time",sortDirection:"desc"});if(continuation)q.set("continuation",continuation);const r=await fetch(base+'?'+q.toString(),opt);if(!r.ok)throw new Error(r.status);return r.json()}
+  function renderAll(list=data){
+    const ul=document.getElementById('recentSales'); if(!ul) return; ul.innerHTML='';
+    const arr=(list&&list.length)?list:[{id:3250,time:"3m",price:"0.080 ETH",buyer:"0x9a…D1"}];
+    // render ALL; panel scrolls
+    arr.forEach(x=>{
+      const rank=(window.FF_getRankById?window.FF_getRankById(x.id):null);
+      const badge=(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`;
+      const li=document.createElement('li'); li.className='list-item';
+      li.innerHTML = FF.thumb64(`${C.SOURCE_PATH}/frog/${x.id}.png`,`Frog ${x.id}`)+
+        `<div>
+          <div style="display:flex;align-items:center;gap:8px;"><b>Frog #${x.id}</b> ${badge}</div>
+          <div class="muted">${x.time!=="—"?x.time+" ago":"—"} • Buyer ${x.buyer}</div>
+        </div>
+        <div class="price">${x.price}</div>`;
+      ul.appendChild(li);
+    });
+  }
+  async function live(){try{if(!C.FROG_API_KEY||C.FROG_API_KEY==="YOUR_RESERVOIR_API_KEY_HERE")throw new Error("Missing Reservoir API key");const f=await fetchSales({limit:50});const m=map(f.sales||[]);if(m.length){data=m;renderAll();return true}return false}catch(e){console.warn('Sales fetch failed',e);return false}}
+  document.getElementById('refreshBtn')?.addEventListener('click',()=>renderAll());
+  document.getElementById('fetchLiveBtn')?.addEventListener('click',live);
+  window.FF_renderSales=()=>renderAll();
+  window.FF_loadSalesLive=live;
+})(window.FF,window.FF_CFG);
+/* ======================= RARITY ======================= */
+(function(FF,C){
+  let LIST=null,LOOK=null; let sortBy='rank';
+  function setL(a){LIST=a;LOOK=Object.fromEntries(a.map(x=>[String(x.id),Number(x.ranking??x.rank??NaN)]).filter(([,v])=>!Number.isNaN(v)))}
+  async function loadFetch(){try{const a=await FF.fetchJSON(C.JSON_PATH);if(!Array.isArray(a))throw 0;setL(a);return true}catch{return false}}
+  function sorted(){if(!LIST?.length)return[];const a=[...LIST];if(sortBy==='score')a.sort((x,y)=>Number(y.rarity??y.score??0)-Number(x.rarity??x.score??0));else a.sort((x,y)=>Number(x.ranking??x.rank??1e9)-Number(y.ranking??y.rank??1e9));return a}
+  function renderAll(){
+    const ul=document.getElementById('rarityList'); if(!ul) return; ul.innerHTML='';
+    const data=sorted(); if(!data.length){ ul.innerHTML='<li class="list-item"><div class="muted">No data yet</div></li>'; return; }
+    // render ALL; panel scrolls
+    data.forEach(it=>{
+      const id=it.id, rank=it.ranking??it.rank??'?', score=(it.rarity??it.score??'').toString();
+      const li=document.createElement('li'); li.className='list-item';
+      li.innerHTML = FF.thumb64(`${C.SOURCE_PATH}/frog/${id}.png`,`Frog ${id}`)+
+        `<div>
+          <div><b>Frog #${id}</b></div>
+          <div class="muted">${score?`Rarity Score: ${score}`:`Rarity Score: N/A`}</div>
+        </div>
+        <span class="pill">#${rank}</span>`;
+      ul.appendChild(li);
+    });
+  }
+  document.getElementById('sortRankBtn')?.addEventListener('click',()=>{sortBy='rank';renderAll()});
+  document.getElementById('sortScoreBtn')?.addEventListener('click',()=>{sortBy='score';renderAll()});
+  function showPick(){document.getElementById('localLoad').style.display='block'}
+  function wire(){
+    const f=document.getElementById('rarityFile'), b=document.getElementById('useLocalBtn');
+    b?.addEventListener('click', ()=>{
+      const file=f?.files?.[0]; if(!file){ alert("Choose assets/freshfrogs_rarity_rankings.json"); return; }
+      const rd=new FileReader();
+      rd.onload=()=>{ try{
+        const arr=JSON.parse(rd.result); if(!Array.isArray(arr)) throw 0;
+        setL(arr); renderAll();
+        window.FF_getRankById = (id)=> LOOK ? (LOOK[String(id)] ?? null) : null;
+        document.getElementById('localLoad').style.display='none';
+      }catch{ alert("Invalid rarity JSON"); } };
+      rd.readAsText(file);
+    });
+  }
+  window.FF_loadRarity = async ()=>{
+    let ok=false; if(location.protocol!=='file:'){ ok = await loadFetch(); }
+    if(!ok){ showPick(); wire(); }
+    window.FF_getRankById = (id)=> LOOK ? (LOOK[String(id)] ?? null) : null;
+    renderAll();
+  };
+})(window.FF,window.FF_CFG);
+/* ======================= WALLET ======================= */
+(function(FF){
+  let user=null;
+  function ui(a){
+    const l=document.getElementById('walletLabel'), b=document.getElementById('connectBtn');
+    if(a){ l.textContent='Connected: '+FF.shorten(a); l.style.display=''; b.textContent='Disconnect'; }
+    else { l.style.display='none'; b.textContent='Connect Wallet'; }
+  }
+  async function connect(){
+    if(location.protocol==='file:'){ alert('Open the site over http(s) to enable wallet.'); return; }
+    const p=window.ethereum; if(!p){ alert("No Ethereum provider found. Install/enable MetaMask."); return; }
+    try{
+      const acc=await p.request({method:'eth_requestAccounts'}); user=acc?.[0]||null; ui(user);
+      if(user){
+        window.FF_clearOwned?.(); window.FF_fetchOwned?.(user);
+        // Auto-load staked on connect
+        window.FF_loadStaked?.();
+        document.getElementById('stakeStatus').textContent='Connected. Loading Owned/Staked…';
       }
-      document.addEventListener('click', function(e){
-        var btn = e.target.closest('#mintMini .mini__btn'); if(!btn) return;
-        var qtyEl = document.getElementById('miniQty'); if(!qtyEl) return;
-        var delta = parseInt(btn.getAttribute('data-delta'),10) || 0;
-        qtyEl.value = clamp((parseInt(qtyEl.value||'1',10) || 1) + delta);
-        syncMini();
-      });
-      document.addEventListener('input', function(e){
-        if(!e.target.matches('#mintMini #miniQty')) return;
-        e.target.value = e.target.value.replace(/[^0-9]/g,'');
-        syncMini();
-      });
-      document.addEventListener('DOMContentLoaded', syncMini);
-    })();
-  </script>
+    }catch(e){ console.warn(e); }
+  }
+  function disconnect(){
+    user=null; ui(null);
+    window.FF_clearOwned?.(); window.FF_clearStaked?.();
+    document.getElementById('stakeStatus').textContent='Disconnected.';
+  }
+  document.getElementById('connectBtn')?.addEventListener('click', ()=>{ user?disconnect():connect(); });
+  if(window.ethereum){
+    window.ethereum.on?.('accountsChanged', a=>{
+      user = a?.[0]||null; ui(user);
+      if(user){ window.FF_clearOwned?.(); window.FF_fetchOwned?.(user); window.FF_loadStaked?.(); }
+      else { window.FF_clearOwned?.(); window.FF_clearStaked?.(); }
+    });
+  }
+  window.FF_getUser = ()=> user;
+  window.FF_setWalletUI = ui;
+})(window.FF);
+/* ======================= OWNED ======================= */
+(function(FF, CFG){
+  let heldTokens = [];
+  let heldContinuation = '';
 
-  <!-- Shared libs -->
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/utils.js"></script>
-  <script src="assets/js/rarity.js"></script>
-  <script src="assets/js/modal.js"></script>
-  <script src="assets/js/pond.js"></script>
+  function renderOwned(){
+    const list=document.getElementById('chipWrap'); if(!list) return;
+    if(window.FF_getTab && window.FF_getTab()!=='owned') return; // render only on 'owned'
+    list.innerHTML='';
+    const user = window.FF_getUser();
+    if(!user){ list.innerHTML='<li class="list-item"><div class="muted">Connect your wallet to view owned tokens.</div></li>'; return; }
+    if(!heldTokens.length){ list.innerHTML='<li class="list-item"><div class="muted">No tokens loaded yet. Click “Refresh Owned”.</div></li>'; return; }
 
-  <!-- New feeds -->
-  <script src="assets/js/mints-feed.js"></script>
-  <script src="assets/js/stakes-feed.js"></script>
+    // render ALL; container scrolls
+    heldTokens.forEach(({id,image})=>{
+      const rank = window.FF_getRankById ? window.FF_getRankById(id) : null;
+      const li=document.createElement('li'); li.className='list-item';
+      li.innerHTML = FF.thumb64(image || (`${CFG.SOURCE_PATH}/frog/${id}.png`), `Frog ${id}`) +
+        `<div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <b>Frog #${id}</b>
+            ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`}
+          </div>
+          <div class="muted">Owned by <span class="addr">${FF.shorten(user)}</span></div>
+        </div>
+        <div class="row" style="gap:6px;">
+          <button class="btn btn-outline btn-sm" disabled title="Stake flow wired later">🔒 Stake</button>
+        </div>`;
+      list.appendChild(li);
+    });
+  }
 
-  <script>
-    FF_loadRecentMints && FF_loadRecentMints();
-    FF_loadRecentStakes && FF_loadRecentStakes();
-  </script>
+  async function fetchOwned(wallet, limit=50, nextStr){
+    try{
+      wallet = wallet || window.FF_getUser();
+      if(!wallet){ document.getElementById('stakeStatus').textContent='Connect a wallet to load owned tokens.'; return; }
+      const cont = nextStr || heldContinuation || '';
+      const qs = cont ? '&continuation='+encodeURIComponent(cont) : '';
+      const url = `https://api.reservoir.tools/users/${wallet}/tokens/v8?collection=${CFG.COLLECTION_ADDRESS}&limit=${limit}${qs}`;
+      const res = await fetch(url, { method:'GET', headers:{ accept:'*/*','x-api-key': CFG.FROG_API_KEY } });
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const data = await res.json();
+      const items = (data.tokens||[]).map(t=>{
+        const tokenId = t?.token?.tokenId ?? t?.tokenId ?? t?.id;
+        const id = tokenId!=null?parseInt(String(tokenId),10):null;
+        const img = t?.token?.image ?? (`${CFG.SOURCE_PATH}/frog/${tokenId}.png`);
+        return id ? { id, image: img } : null;
+      }).filter(Boolean);
+
+      heldTokens = heldTokens.concat(items);
+      heldContinuation = data.continuation || '';
+
+      if(window.FF_getTab && window.FF_getTab()==='owned') renderOwned();
+      const ss=document.getElementById('stakeStatus');
+      ss.textContent = `Owned: ${heldTokens.length}` + (heldContinuation ? ' • more available' : '');
+
+      // Optional "Load more" button
+      const anchor = document.getElementById('stakeControls');
+      let btn = document.getElementById('heldMoreBtn');
+      if(!heldContinuation){ if(btn) btn.remove(); }
+      else {
+        if(!btn){
+          btn=document.createElement('button');
+          btn.id='heldMoreBtn'; btn.className='btn btn-outline btn-sm'; btn.textContent='Load more Owned';
+          anchor?.appendChild(btn);
+        }
+        btn.onclick = ()=> fetchOwned(wallet, limit, heldContinuation);
+      }
+    }catch(e){
+      console.warn(e);
+      document.getElementById('stakeStatus').textContent='Failed to fetch owned tokens.';
+    }
+  }
+
+  document.getElementById('refreshOwned')?.addEventListener('click', ()=>{
+    const u = window.FF_getUser();
+    if(!u){ document.getElementById('stakeStatus').textContent='Connect a wallet first.'; return; }
+    heldTokens=[]; heldContinuation=''; fetchOwned(u);
+  });
+  document.getElementById('selectAll')?.addEventListener('click',()=>{ document.getElementById('stakeStatus').textContent='Selected all visible tokens (demo).'; });
+  document.getElementById('clearSel')?.addEventListener('click',()=>{ document.getElementById('stakeStatus').textContent='Cleared selection (demo).'; });
+
+  window.FF_fetchOwned = fetchOwned;
+  window.FF_clearOwned = ()=>{ heldTokens=[]; heldContinuation=''; if(window.FF_getTab && window.FF_getTab()==='owned') renderOwned(); };
+  window.FF_renderOwned = renderOwned;
+})(window.FF, window.FF_CFG);
+/* ======================= STAKING ======================= */
+(function(FF, CFG){
+  const ST = { items:[] };
+  let provider, signer, controller;
+
+  let currentTab='owned';
+  const tabOwned=document.getElementById('tabOwned');
+  const tabStaked=document.getElementById('tabStaked');
+  const tabsWrap=document.getElementById('stakeTabs');
+
+  function setTab(which){
+    currentTab=which;
+    const owned=(which==='owned');
+    tabOwned?.setAttribute('aria-selected', owned?'true':'false');
+    tabStaked?.setAttribute('aria-selected', owned?'false':'true');
+    tabsWrap?.style.setProperty('--tab-i', owned?0:1);
+    render();
+  }
+  tabOwned?.addEventListener('click', ()=> setTab('owned'));
+  tabStaked?.addEventListener('click', ()=> setTab('staked'));
+  window.FF_getTab = ()=> currentTab;
+
+  function stakingReady(){ return controller && signer && window.FF_getUser(); }
+  async function initEthers(){
+    if(!window.ethereum) return false;
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    signer = provider.getSigner();
+    // minimal ABI for this page
+    const abi = [
+      {"inputs":[{"internalType":"address","name":"_user","type":"address"}],"name":"getStakedTokens","outputs":[{"components":[{"internalType":"address","name":"staker","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"internalType":"struct FreshFrogsController.StakedToken[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},
+      {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"inputs":[{"internalType":"address","name":"_staker","type":"address"}],"name":"availableRewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
+    ];
+    controller = new ethers.Contract(CFG.CONTROLLER_ADDRESS, abi, signer);
+    return true;
+  }
+
+  async function loadStaked(){
+    const status=document.getElementById('stakeStatus');
+    const user = window.FF_getUser();
+    if(!user){ status.textContent='Connect a wallet first.'; return; }
+    if(!await initEthers()){ status.textContent='Ethereum provider not available.'; return; }
+    try{
+      status.textContent='Loading staked…';
+      const rows = await controller.getStakedTokens(user);
+      ST.items = (rows||[]).map(r => ({ id: Number(r.tokenId), owner: r.staker || user }));
+
+      const rewards = await controller.availableRewards(user);
+      const rewardsLine = document.getElementById('rewardsLine');
+      if(rewardsLine){
+        rewardsLine.style.display='block';
+        document.getElementById('rewardsEth').textContent =
+          ethers.BigNumber.isBigNumber(rewards) ? rewards.toString() : String(rewards);
+      }
+
+      if(currentTab==='staked') render();
+      status.textContent=`Owned/Staked ready • Staked: ${ST.items.length}`;
+    }catch(err){
+      console.warn(err);
+      status.textContent='Failed to load staked tokens.';
+    }
+  }
+  document.getElementById('loadStakedBtn')?.addEventListener('click', loadStaked);
+
+  async function unstake(tokenId){
+    if(!stakingReady()) { alert('Wallet/contract not ready'); return; }
+    try{
+      const tx = await controller.withdraw(ethers.BigNumber.from(String(tokenId)));
+      document.getElementById('stakeStatus').textContent = 'Tx sent: '+tx.hash.slice(0,10)+'…';
+      await tx.wait();
+      ST.items = ST.items.filter(t => t.id !== Number(tokenId));
+      render();
+      document.getElementById('stakeStatus').textContent = 'Un-staked #'+tokenId;
+    }catch(err){
+      console.warn(err);
+      alert('Failed to un-stake: '+(err?.message||err));
+    }
+  }
+
+  function render(){
+    const list=document.getElementById('chipWrap'); if(!list) return;
+    list.innerHTML='';
+
+    if(currentTab==='owned'){ window.FF_renderOwned?.(); return; }
+
+    const items=ST.items||[];
+    if(!window.FF_getUser()){ list.innerHTML='<li class="list-item"><div class="muted">Connect your wallet to load staked tokens.</div></li>'; return; }
+    if(!items.length){ list.innerHTML='<li class="list-item"><div class="muted">No staked tokens yet.</div></li>'; return; }
+
+    items.forEach(({id,owner})=>{
+      const rank = window.FF_getRankById ? window.FF_getRankById(id) : null;
+      const li=document.createElement('li'); li.className='list-item';
+      li.innerHTML = FF.thumb64(`${CFG.SOURCE_PATH}/frog/${id}.png`, `Frog ${id}`) +
+        `<div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <b>Frog #${id}</b>
+            ${(rank||rank===0)?`<span class="pill">Rank <b>#${rank}</b></span>`:`<span class="pill"><span class="muted">Rank N/A</span></span>`}
+          </div>
+          <div class="muted">Owner <span class="addr">${owner?FF.shorten(String(owner)):'—'}</span></div>
+        </div>
+        <div class="row" style="gap:6px;">
+          <button class="btn btn-outline btn-sm" data-unstake="${id}">Un-stake</button>
+        </div>`;
+      list.appendChild(li);
+    });
+
+    list.querySelectorAll('[data-unstake]').forEach(btn=>{
+      btn.addEventListener('click',()=> unstake(btn.getAttribute('data-unstake')));
+    });
+  }
+
+  // expose so wallet.js can auto-load on connect
+  window.FF_loadStaked = loadStaked;
+  window.FF_clearStaked = ()=>{ ST.items=[]; if(window.FF_getTab && window.FF_getTab()==='staked'){ render(); } };
+  window.FF_setTab = setTab;
+})(window.FF, window.FF_CFG);
+/* ======================= MAIN ======================= */
+(async function(){
+  await window.FF_loadRarity();
+  const ok = await window.FF_loadSalesLive();
+  const b=document.getElementById('fetchLiveBtn');
+  if(ok && b){ b.textContent="Live loaded"; b.disabled=true; b.classList.add('btn-ghost'); }
+  window.FF_renderSales();
+  window.FF_renderGrid();
+
+  // Default to OWNED tab but load both datasets if wallet is already connected
+  window.FF_setTab('owned');
+
+  // If MetaMask already injected with a selected address, auto-init UI and load both lists
+  const pre = window.ethereum?.selectedAddress;
+  if(pre){
+    window.FF_setWalletUI(pre);
+    window.FF_fetchOwned?.(pre);
+    window.FF_loadStaked?.();
+  }
+})();
+</script>
 </body>
 </html>

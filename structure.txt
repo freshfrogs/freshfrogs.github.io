@@ -16,5 +16,4 @@ freshfrogs.github.io/
 │  │  └─ main.js
 │  ├─ abi/
 │  │  └─ controller_abi.json
-│  │  └─ collection_abi.json
-│  └─ freshfrogs_rarity_rankings.json
+│  └─ freshfrogs_rarity_rankings.json   ← your existing JSON

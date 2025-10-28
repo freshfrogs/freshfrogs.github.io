@@ -1,50 +1,35 @@
-// Simple 3×3 grid of static PNGs (128×128), no click handlers.
-(function (CFG) {
-  const root = document.getElementById('grid');
-  if (!root) return;
+(function(CFG){
+  const gridEl = document.getElementById('grid');
+  const lightbox = document.getElementById('lightbox');
+  const stage = document.getElementById('lightboxStage');
 
-  // Ensure the layout is exactly 3×3 @ 128px cells
-  function ensureLayout() {
-    root.style.display = 'grid';
-    root.style.gridTemplateColumns = 'repeat(3, 128px)';
-    root.style.gridAutoRows = '128px';
-    root.style.gap = '0';
-    root.style.placeItems = 'center';
-  }
-
-  function randIds(n) {
-    const max = Math.max(1, Number(CFG.SUPPLY || 4040));
-    const s = new Set();
-    while (s.size < n) s.add(1 + Math.floor(Math.random() * max));
+  function randomIds(n){
+    const s=new Set();
+    while(s.size<n) s.add(1+Math.floor(Math.random()*CFG.SUPPLY));
     return [...s];
   }
 
-  function render() {
-    ensureLayout();
-    root.innerHTML = '';
-    const ids = randIds(9);
-    ids.forEach(id => {
-      const wrap = document.createElement('div');
-      wrap.className = 'tile';
-      wrap.style.width = '128px';
-      wrap.style.height = '128px';
-      wrap.style.overflow = 'hidden';
-
-      const img = document.createElement('img');
-      img.src = `${CFG.SOURCE_PATH}/frog/${id}.png`;
-      img.alt = `Frog #${id}`;
-      img.width = 128;
-      img.height = 128;
-      img.loading = 'lazy';
-      img.decoding = 'async';
-      img.style.imageRendering = 'pixelated';
-      img.style.objectFit = 'contain';
-      img.onerror = () => { wrap.style.display = 'none'; };
-
-      wrap.appendChild(img);
-      root.appendChild(wrap);
+  function renderSimpleGrid(){
+    gridEl.innerHTML='';
+    randomIds(9).forEach(id=>{
+      const tile=document.createElement('div');
+      tile.className='tile';
+      tile.innerHTML=`<img src="${CFG.SOURCE_PATH}/frog/${id}.png" alt="Frog #${id}" loading="lazy" decoding="async">`;
+      tile.addEventListener('click', ()=>{
+        stage.innerHTML='';
+        const big=document.createElement('img');
+        big.src=`${CFG.SOURCE_PATH}/frog/${id}.png`;
+        big.alt=`Frog #${id}`;
+        big.style.width='100%'; big.style.height='100%';
+        big.style.objectFit='contain'; big.style.imageRendering='pixelated';
+        stage.appendChild(big);
+        lightbox.style.display='grid';
+      });
+      gridEl.appendChild(tile);
     });
   }
 
-  window.FF_renderGrid = render;
+  lightbox.addEventListener('click',()=> lightbox.style.display='none');
+
+  window.FF_renderGrid = renderSimpleGrid;
 })(window.FF_CFG);
