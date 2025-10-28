@@ -2,15 +2,11 @@
 // Live Recent Activity — Reservoir + your FF helpers
 (function (FF, CFG) {
   const UL_ID = 'activityList';
-  const BASE  = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
-  const API   = `${BASE}/collections/activity/v6`;
   const PAGE  = Math.max(1, Number(CFG.PAGE_SIZE || 20));
 
   function need(k){ if(!CFG[k]) throw new Error(`[activity] Missing FF_CFG.${k}`); return CFG[k]; }
-  const API_KEY    = need('FROG_API_KEY');
   const COLLECTION = need('COLLECTION_ADDRESS');
 
-  const HDR      = { accept: 'application/json', 'x-api-key': API_KEY };
   const shorten  = (a)=> FF.shorten?.(a) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
   const ago      = (d)=> d ? (FF.formatAgo(Date.now()-d.getTime())+' ago') : '';
   const imgFor   = (id)=> `${CFG.SOURCE_PATH || ''}/frog/${id}.png`;
@@ -34,58 +30,69 @@
     return root;
   }
 
-  async function reservoirFetch(url){
-    const res = await fetch(url, { headers: HDR });
-    if (!res.ok){
-      let body = null;
-      try { body = await res.text(); } catch {}
-      const err = new Error(`HTTP ${res.status}${body ? ` — ${body}` : ''}`);
-      err.url = url; throw err;
-    }
-    return res.json();
-  }
-
   // Normalize one activity row
   function mapRow(a){
-    const tokenId = Number(a?.token?.tokenId);
+    let tokenId = null;
+    let from = '';
+    let to   = '';
+    let ts   = null;
+    let priceEth = null;
+    let txHash = null;
+    let rawType = '';
+
+    if (a && a.token && a.token.tokenId != null){
+      tokenId = Number(a.token.tokenId);
+      from = (a.fromAddress || '').toLowerCase();
+      to   = (a.toAddress   || '').toLowerCase();
+      ts   = a.timestamp ?? a.createdAt;
+      rawType = a.type || '';
+      const p = a?.price ?? a?.salePrice;
+      if (p?.amount?.decimal != null) priceEth = Number(p.amount.decimal);
+      else if (typeof p === 'number') priceEth = p;
+      txHash = a?.txHash || a?.transactionHash || null;
+    } else if (a && typeof a.id !== 'undefined'){
+      tokenId = Number(a.id);
+      from = (a.from || '').toLowerCase();
+      to   = (a.to   || '').toLowerCase();
+      ts   = a.blockTimestamp || null;
+      rawType = 'transfer';
+      txHash = a.txHash || null;
+    }
+
     if (!Number.isFinite(tokenId)) return null;
 
-    const from = (a?.fromAddress || '').toLowerCase();
-    const to   = (a?.toAddress   || '').toLowerCase();
     const ctl  = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
 
-    let type = a?.type || '';
+    let type = rawType || '';
     if (from === '0x0000000000000000000000000000000000000000') type = 'Mint';
     else if (to === ctl)   type = 'Stake';
     else if (from === ctl) type = 'Unstake';
     else if ((a?.price || a?.salePrice) != null) type = 'Sale';
     else if (!type) type = 'Transfer';
 
-    const ts = a?.timestamp ?? a?.createdAt;
     let dt = null;
     if (typeof ts === 'number') dt = new Date(ts < 1e12 ? ts*1000 : ts);
     else if (typeof ts === 'string') { const p = Date.parse(ts); if (!Number.isNaN(p)) dt = new Date(p); }
 
-    let priceEth = null;
-    const p = a?.price ?? a?.salePrice;
-    if (p?.amount?.decimal != null) priceEth = Number(p.amount.decimal);
-    else if (typeof p === 'number') priceEth = p;
-
-    // tx hash (Reservoir returns txHash on activity rows)
-    const txHash = a?.txHash || a?.transactionHash || null;
-
-    return { id: tokenId, type, from: a?.fromAddress || null, to: a?.toAddress || null, priceEth, time: dt, img: imgFor(tokenId), tx: txHash };
+    return {
+      id: tokenId,
+      type,
+      from: a?.fromAddress || from || null,
+      to: a?.toAddress || to || null,
+      priceEth,
+      time: dt,
+      img: imgFor(tokenId),
+      tx: txHash
+    };
   }
 
   async function fetchRecent(limit = PAGE){
-    const qs = new URLSearchParams({
-      collection: COLLECTION,
-      limit: String(Math.min(50, Math.max(1, limit)))
-      // keep minimal; add filters if desired later
+    if (!window.FF_ALCH) throw new Error('Alchemy helper not loaded');
+    const { transfers } = await window.FF_ALCH.getCollectionTransfers({
+      maxCount: Math.min(200, Math.max(20, limit * 4)),
+      order: 'desc'
     });
-    const url = `${API}?${qs.toString()}`;
-    const json = await reservoirFetch(url);
-    return (json?.activities || []).map(mapRow).filter(Boolean)
+    return transfers.map(mapRow).filter(Boolean)
       .sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
   }
 

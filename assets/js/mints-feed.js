@@ -5,44 +5,9 @@
   const UL_ID = 'recentMints';
 
   // ---- Config
-  const BASE  = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
-  const API   = BASE + '/collections/activity/v6';
   const PAGE_SIZE = Math.max(1, Math.min(50, Number(CFG.PAGE_SIZE || 5)));
   const MAX_PAGES = Math.max(1, Number(CFG.MAX_PAGES || 8));
   const CHAIN_ID  = Number(CFG.CHAIN_ID || 1);
-
-  // ---- Headers
-  function apiHeaders(){
-    if (FF.apiHeaders && typeof FF.apiHeaders === 'function') return FF.apiHeaders();
-    return { accept: 'application/json', 'x-api-key': CFG.FROG_API_KEY };
-  }
-
-  // ---- Global queue (shared with stakes)
-  (function ensureQueue(){
-    if (window.FF_RES_QUEUE) return;
-    const RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 800);
-    const BACKOFFS = Array.isArray(CFG.RETRY_BACKOFF_MS) ? CFG.RETRY_BACKOFF_MS : [900, 1700, 3200];
-    let lastAt = 0, chain = Promise.resolve();
-
-    const sleep = (ms)=> new Promise(r=>setTimeout(r, ms));
-    async function spacedFetch(url, init){
-      const delta = Date.now() - lastAt;
-      if (delta < RATE_MIN_MS) await sleep(RATE_MIN_MS - delta);
-      lastAt = Date.now();
-      return fetch(url, init);
-    }
-    async function run(url, init){
-      const hdrs = Object.assign({}, apiHeaders(), init && init.headers || {});
-      let i = 0;
-      while (true){
-        const res = await spacedFetch(url, { headers: hdrs });
-        if (res.status === 429){ await sleep(BACKOFFS[Math.min(i++, BACKOFFS.length-1)]); continue; }
-        if (!res.ok){ const t = await res.text().catch(()=> ''); const e = new Error(`HTTP ${res.status}${t?' — '+t:''}`); e.url=url; throw e; }
-        return res.json();
-      }
-    }
-    window.FF_RES_QUEUE = { fetch(url, init){ chain = chain.then(()=> run(url, init)); return chain; } };
-  })();
 
   // ---- Utils
   const shorten = (a)=> (FF.shorten && FF.shorten(a)) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
@@ -89,19 +54,35 @@
   }
 
   function mapRow(a){
-    const tokenId = Number(a?.token?.tokenId);
+    let tokenId = null;
+    let from = '';
+    let to = '';
+    let ts = null;
+    let tx = null;
+
+    if (a && a.token && a.token.tokenId != null){
+      tokenId = Number(a.token.tokenId);
+      from = (a.fromAddress || '').toLowerCase();
+      to   = (a.toAddress   || '').toLowerCase();
+      ts   = a.timestamp ?? a.createdAt;
+      tx   = a.txHash || a.transactionHash || null;
+    } else if (a && typeof a.id !== 'undefined'){ // Alchemy shape
+      tokenId = Number(a.id);
+      from = (a.from || '').toLowerCase();
+      to   = (a.to   || '').toLowerCase();
+      ts   = a.blockTimestamp || null;
+      tx   = a.txHash || null;
+    }
+
     if (!isFinite(tokenId)) return null;
-    const from = (a?.fromAddress || '').toLowerCase();
     const zero = '0x0000000000000000000000000000000000000000';
-    const isMint = String(a?.type||'').toLowerCase()==='mint' || from===zero;
+    const isMint = from === zero || String(a?.type||'').toLowerCase()==='mint';
     if (!isMint) return null;
 
-    const ts = a?.timestamp ?? a?.createdAt;
     let dt = null;
     if (typeof ts === 'number') dt = new Date(ts < 1e12 ? ts*1000 : ts);
     else if (typeof ts === 'string'){ const p = Date.parse(ts); if (!isNaN(p)) dt = new Date(p); }
-    const tx = a?.txHash || a?.transactionHash || null;
-    return { id: tokenId, to: a?.toAddress || null, time: dt, img: imgFor(tokenId), tx };
+    return { id: tokenId, to: to || null, time: dt, img: imgFor(tokenId), tx };
   }
 
   async function fetchPage(cont){
@@ -110,11 +91,14 @@
       const rows = (pond.activities || pond.rows || []).map(mapRow).filter(Boolean);
       return { rows, continuation: pond.continuation || null };
     }
-    const qs = new URLSearchParams({ collection: CFG.COLLECTION_ADDRESS, limit: String(PAGE_SIZE), types: 'mint' });
-    if (cont) qs.set('continuation', cont);
-    const json = await window.FF_RES_QUEUE.fetch(API + '?' + qs.toString());
-    const rows = (json?.activities || []).map(mapRow).filter(Boolean);
-    return { rows, continuation: json?.continuation || null };
+    if (!window.FF_ALCH) throw new Error('Alchemy helper not loaded');
+    const { transfers, pageKey } = await window.FF_ALCH.getCollectionTransfers({
+      pageKey: cont || undefined,
+      maxCount: PAGE_SIZE * 4,
+      order: 'desc'
+    });
+    const rows = transfers.map(mapRow).filter(Boolean);
+    return { rows, continuation: pageKey || null };
   }
 
   // ---- Render + infinite scroll
