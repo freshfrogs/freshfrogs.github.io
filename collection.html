@@ -211,5 +211,46 @@
   if (window.FF_initOwnedPanel)   FF_initOwnedPanel();
 </script>
 
+  <!-- Frog modal shell (shared sitewide) -->
+  <div id="frogModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-panel modal-narrow" role="document">
+      <button class="btn btn-ghost btn-sm modal-close" data-close aria-label="Close">✕</button>
+
+      <section class="ffm-grid">
+        <div class="ffm-hero-wrap">
+          <div id="fmHero" class="ffm-hero"></div>
+        </div>
+
+        <div class="ffm-info">
+          <div class="ffm-titlerow">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <b>Frog <span id="fmId">#—</span></b>
+              <span id="fmRank" class="pill">Rank <b id="fmRankNum">—</b></span>
+            </div>
+            <div id="fmLine" class="muted">—</div>
+          </div>
+
+          <div class="ffm-actions">
+            <button id="fmStakeBtn"    class="btn btn-ghost btn-xs"  data-no-modal>Stake</button>
+            <button id="fmUnstakeBtn"  class="btn btn-ghost btn-xs"  data-no-modal>Unstake</button>
+            <button id="fmTransferBtn" class="btn btn-ghost btn-xs"  data-no-modal>Transfer</button>
+
+            <a id="fmOpenSea"   class="btn btn-ghost btn-xs" target="_blank" rel="noopener">OpenSea</a>
+            <a id="fmEtherscan" class="btn btn-ghost btn-xs" target="_blank" rel="noopener">Etherscan</a>
+            <a id="fmMetaLink"  class="btn btn-ghost btn-xs" target="_blank" rel="noopener">Original</a>
+          </div>
+
+          <p id="fmOwner" class="sr-only"></p>
+          <p id="fmRarityLine" class="sr-only"></p>
+          <p id="fmCollection" class="sr-only"></p>
+          <a id="fmImageLink" class="sr-only" href="#" tabindex="-1">View frog image</a>
+
+          <ul id="fmAttrs" class="ffm-attrlist list-scroll"></ul>
+        </div>
+      </section>
+    </div>
+  </div>
+
 </body>
 </html>
