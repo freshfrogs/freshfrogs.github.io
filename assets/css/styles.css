@@ -45,6 +45,17 @@ body{ background:var(--bg); color:var(--ink); font:16px/1.55 var(--font-ui); }
 a{ color:inherit; text-decoration:none; }
 img{ max-width:100%; display:block; image-rendering:pixelated; }
 .addr{ font-family: ui-monospace, Menlo, Consolas, monospace; }
+.sr-only{
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0;
+}
 
 /* ---------- Layout ---------- */
 .container{ width:min(1140px,100%); margin:0 auto; padding:0 20px; }

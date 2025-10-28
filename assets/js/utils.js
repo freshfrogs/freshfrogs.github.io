@@ -22,6 +22,14 @@
     return r.json();
   };
 
+  FF.apiHeaders = ()=>{
+    const CFG = window.FF_CFG || {};
+    const key = (CFG.FROG_API_KEY || CFG.RESERVOIR_API_KEY || '').trim();
+    const headers = { accept: 'application/json' };
+    if (key) headers['x-api-key'] = key;
+    return headers;
+  };
+
   // ---- Rarity loader (one-time) ----
   let _rarityList = null;
   let _rankMap = null;
