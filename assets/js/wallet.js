@@ -1,7 +1,5 @@
 // assets/js/wallet.js
 (function(){
-  const SESSION_KEY = 'ff:connected';
-
   // Elements
   const connectBtn  = document.getElementById('connectBtn');
   const walletLabel = document.getElementById('walletLabel');
@@ -27,14 +25,12 @@
 
   function emitConnected(addr){
     setFFWallet(addr);
-    sessionStorage.setItem(SESSION_KEY, '1');
     window.user_address = addr; // legacy alias
     window.dispatchEvent(new CustomEvent('wallet:connected',    { detail:{ address: addr }}));
     window.dispatchEvent(new CustomEvent('FF:walletConnected',  { detail:{ address: addr }}));
   }
   function emitDisconnected(){
     setFFWallet(null);
-    sessionStorage.removeItem(SESSION_KEY);
     window.user_address = null;
     window.dispatchEvent(new CustomEvent('wallet:disconnected'));
     window.dispatchEvent(new CustomEvent('FF:walletDisconnected'));
@@ -83,7 +79,6 @@
 
   // ---------- initial (do NOT auto-connect) ----------
   setFFWallet(null);
-  sessionStorage.removeItem(SESSION_KEY);
   uiDisconnected();
 
   // Click-to-connect only

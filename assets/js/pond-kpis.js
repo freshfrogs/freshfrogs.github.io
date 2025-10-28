@@ -1,88 +1,54 @@
-// assets/js/pond-kpis.js — 🪷 Total Staked, 🧰 Controller (linked), 🪰 $FLYZ (linked)
+// assets/js/pond-kpis.js
+// Pond KPIs (read-only): total staked, controller link, rewards symbol.
+
 (function () {
   'use strict';
+  const C = window.FF_CFG || {};
 
-  const CFG = (window.CFG || window.FF_CFG || {});
-  const CONTRACT =
-    String(CFG.COLLECTION_ADDRESS || '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b').toLowerCase();
-  const CONTROLLER =
-    String(CFG.CONTROLLER_ADDRESS || (CFG.CONTROLLER_ADDRESSES && CFG.CONTROLLER_ADDRESSES[0]) || '0xcb1ee125cff4051a10a55a09b10613876c4ef199').toLowerCase();
-  const API_KEY = CFG.RESERVOIR_API_KEY || null;
-
-  const HEADERS = { accept: '*/*' };
-  if (API_KEY) HEADERS['x-api-key'] = API_KEY;
-
-  const $ = (s, r) => (r||document).querySelector(s);
-  const cut = a => (a && a.length > 10) ? (a.slice(0,6)+'…'+a.slice(-4)) : (a || '');
-  const fmt = n => { try { return (+n).toLocaleString(); } catch { return String(n); } };
-
-  function setLabels(){
-    // 1) 🪷 Total Staked
-    const b1 = $('.info-grid-2 .info-block:nth-child(1)');
-    if (b1){
-      const ik = $('.ik', b1); if (ik) ik.textContent = '🪷 Total Staked';
-      const inn = $('.in', b1); if (inn) inn.textContent = 'Across the collection';
-    }
-
-    // 2) 🧰 Controller (linked)
-    const b2 = $('.info-grid-2 .info-block:nth-child(2)');
-    if (b2){
-      const ik = $('.ik', b2); if (ik) ik.textContent = '🧰 Controller';
-      const iv = $('.iv', b2);
-      const inn = $('.in', b2);
-      if (iv){
-        iv.innerHTML = `<a href="https://etherscan.io/address/${CONTROLLER}" target="_blank" rel="noopener">${cut(CONTROLLER)}</a>`;
-      }
-      if (inn) inn.textContent = 'Staking contract';
-    }
-
-    // 3) 🪰 Rewards → $FLYZ linked
-    const b3 = $('.info-grid-2 .info-block:nth-child(3)');
-    if (b3){
-      const ik = $('.ik', b3); if (ik) ik.textContent = '🪰 Rewards';
-      const iv = $('.iv', b3);
-      const inn = $('.in', b3);
-      if (iv){
-        iv.innerHTML = `<a href="https://etherscan.io/token/0xd71d2f57819ae4be6924a36591ec6c164e087e63" target="_blank" rel="noopener">$FLYZ</a>`;
-      }
-      if (inn) inn.textContent = 'Earnings token';
-    }
+  // Write helpers
+  const $ = (id) => document.getElementById(id);
+  function setText(id, v){ const el = $(id); if (el) el.textContent = v; }
+  function setHref(id, href, text){
+    const el = $(id); if (!el) return;
+    if (href) el.href = href;
+    if (text) el.textContent = text;
   }
 
-  // Optional: Reservoir fallback for total staked (owners/v2; limit=3)
-  function fetchStakedViaReservoir(){
-    const url = 'https://api.reservoir.tools/owners/v2'
-      + '?collection=' + encodeURIComponent(CONTRACT)
-      + '&limit=3&sortBy=tokenCount&sortDirection=desc';
-    return fetch(url, { method:'GET', headers: HEADERS })
-      .then(r => { if (!r.ok) throw new Error('owners/v2 '+r.status); return r.json(); })
-      .then(j => {
-        const owners = Array.isArray(j.owners) ? j.owners : [];
-        const row = owners.find(o => String(o.address||'').toLowerCase() === CONTROLLER);
-        const cnt = row?.ownership?.tokenCount ?? row?.tokenCount;
-        return (cnt == null) ? null : Number(cnt);
-      })
-      .catch(() => null);
-  }
+  // Rewards symbol
+  setText('pondRewardsSymbol', C.REWARD_TOKEN_SYMBOL || '$FLYZ');
 
-  function putTotal(n){
-    const out = document.getElementById('stakedTotal')
-      || $('.info-grid-2 .info-block:nth-child(1) .iv');
-    if (!out) return;
-    out.textContent = (n == null) ? '—' : fmt(n);
-  }
+  // Controller link
+  (function(){
+    const a = (C.CONTROLLER_ADDRESS || '').trim();
+    if (!a) return;
+    const chainId = Number(C.CHAIN_ID || 1);
+    const base = chainId === 1 ? 'https://etherscan.io/address/' :
+                 chainId === 11155111 ? 'https://sepolia.etherscan.io/address/' :
+                 'https://etherscan.io/address/';
+    setHref('stakedController', base + a, a.slice(0,6) + '…' + a.slice(-4));
+  })();
 
-  async function init(){
-    setLabels();
-    // If your own code already sets the total, leave it; otherwise try Reservoir:
-    const current = ($('.info-grid-2 .info-block:nth-child(1) .iv')||{}).textContent || '';
-    if (!current || current.trim()==='—' || current.trim()===''){
-      putTotal('…');
-      const n = await fetchStakedViaReservoir();
-      putTotal(n);
+  // Total Frogs Staked = ERC-721 balanceOf(controller)
+  (async function(){
+    try{
+      if (!window.Web3 || !C.COLLECTION_ADDRESS || !C.CONTROLLER_ADDRESS) return;
+      const provider =
+        window.ethereum ||
+        (C.RPC_URL ? new window.Web3.providers.HttpProvider(C.RPC_URL) : null);
+      if (!provider) return;
+      const web3 = new window.Web3(provider);
+      const erc721 = new web3.eth.Contract([
+        {"constant":true,"inputs":[{"internalType":"address","name":"owner","type":"address"}],
+         "name":"balanceOf","outputs":[{"internalType":"uint256","name":""}],
+         "stateMutability":"view","type":"function"}
+      ], C.COLLECTION_ADDRESS);
+      const n = await erc721.methods.balanceOf(C.CONTROLLER_ADDRESS).call();
+      setText('stakedTotal', String(n));
+      // refresh timestamp for display if present
+      const stamp = document.getElementById('stakedUpdated');
+      if (stamp) stamp.textContent = new Date().toLocaleTimeString();
+    }catch(e){
+      console.warn('[pond-kpis] total staked failed', e);
     }
-  }
-
-  document.addEventListener('DOMContentLoaded', init);
-  window.addEventListener('load', init);
+  })();
 })();

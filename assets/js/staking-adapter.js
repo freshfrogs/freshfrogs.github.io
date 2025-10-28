@@ -1,100 +1,90 @@
 // assets/js/staking-adapter.js
+// Wires controller.getStakedTokens(user) and exposes numeric ID helpers.
+
 (function (FF, CFG) {
   'use strict';
 
-  const CHAIN_ID = Number(CFG.CHAIN_ID || 1);
+  const ADDR = CFG.CONTROLLER_ADDRESS || CFG.STAKING_CONTROLLER || window.FF_CONTROLLER_ADDRESS;
+  const ABI  = window.FF_CONTROLLER_ABI || window.controller_abi || window.CONTROLLER_ABI;
 
-  function getWeb3(){ if (!window.Web3 || !window.ethereum) throw new Error('Wallet not found'); return new Web3(window.ethereum); }
-  function resolveCollectionAbi(){ if (typeof COLLECTION_ABI !== 'undefined') return COLLECTION_ABI; return (window.COLLECTION_ABI || window.collection_abi || []); }
-  function resolveControllerAbi(){ if (typeof CONTROLLER_ABI !== 'undefined') return CONTROLLER_ABI; return (window.CONTROLLER_ABI || window.controller_abi || []); }
-  function nft(){ const w3 = getWeb3(); return new w3.eth.Contract(resolveCollectionAbi(), CFG.COLLECTION_ADDRESS); }
-  function ctrl(){ const w3 = getWeb3(); return new w3.eth.Contract(resolveControllerAbi(), CFG.CONTROLLER_ADDRESS); }
-  async function ensureCorrectChain(){
-    const targetHex = '0x' + CHAIN_ID.toString(16);
-    const curHex = await ethereum.request({ method:'eth_chainId' }).catch(()=>null);
-    if (!curHex || curHex.toLowerCase() !== targetHex.toLowerCase()){
-      await ethereum.request({ method:'wallet_switchEthereumChain', params:[{ chainId: targetHex }] }).catch(()=>{});
-    }
+  if (!ADDR || !ABI) {
+    console.warn('[staking-adapter] Missing controller address or ABI');
+    return;
   }
-  async function addr(){ try{ const a = await ethereum.request({ method:'eth_accounts' }); return a?.[0]||null; }catch{ return null; } }
 
-  const toNumArr = (rows)=> {
+  function getEthers(){ return window.ethers || null; }
+  function ethersProvider(){
+    const e=getEthers(); if(!e || !window.ethereum) return null;
+    try{ if (e.BrowserProvider) return new e.BrowserProvider(window.ethereum); }catch{}
+    try{ if (e.providers?.Web3Provider) return new e.providers.Web3Provider(window.ethereum); }catch{}
+    return null;
+  }
+  async function ethersContract(readOnly=true){
+    const e=getEthers(), p=ethersProvider(); if(!e || !p) return null;
+    try{ // v6
+      if (e.Contract && p.getSigner){
+        const signer = readOnly ? null : await p.getSigner();
+        return new e.Contract(ADDR, ABI, signer || p);
+      }
+    }catch{}
+    try{ // v5
+      if (e.Contract && p.getSigner){
+        const signer = readOnly ? p : p.getSigner();
+        return new e.Contract(ADDR, ABI, signer);
+      }
+    }catch{}
+    return null;
+  }
+  function web3Contract(){
+    const W = window.web3 || (window.Web3 ? new window.Web3(window.ethereum) : null);
+    try{ return W ? new W.eth.Contract(ABI, ADDR) : null; }catch{ return null; }
+  }
+
+  // Normalize many tuple/BN/hex shapes → number
+  function normalizeIds(rows){
     if (!Array.isArray(rows)) return [];
-    const pick = (x)=> {
-      try{
-        if (x==null) return NaN;
-        if (typeof x==='number') return Number.isFinite(x)?x:NaN;
-        if (typeof x==='bigint') return Number(x);
-        if (typeof x==='string') return Number(/^0x/i.test(x) ? BigInt(x) : x);
-        if (Array.isArray(x)) return pick(x[x.length-1]);
-        if (typeof x==='object'){
-          if (typeof x._hex==='string') return Number(BigInt(x._hex));
-          if (typeof x.toString==='function'){ const s=x.toString(); if(/^0x/i.test(s)) return Number(BigInt(s)); if(/^\d+$/.test(s)) return Number(s); }
-          return pick(x.tokenId ?? x.id ?? x.value ?? x[1] ?? x[0]);
+    const toNum=(x)=>{ try{
+      if (x==null) return NaN;
+      if (typeof x==='number') return x;
+      if (typeof x==='bigint') return Number(x);
+      if (typeof x==='string'){ if(/^0x/i.test(x)) return Number(BigInt(x)); return Number(x); }
+      if (typeof x==='object'){
+        if (typeof x.toString==='function' && x.toString!==Object.prototype.toString){
+          const s=x.toString(); if(/^\d+$/.test(s)) return Number(s);
         }
-      }catch{}
+        if ('_hex' in x) return Number(x._hex);
+        if ('hex'  in x) return Number(x.hex);
+      }
       return NaN;
-    };
-    return rows.map(pick).filter(Number.isFinite);
-  };
-
-  async function getStakedTokens(owner){
-    owner = owner || await addr(); if (!owner) return [];
-    await ensureCorrectChain();
-    const raw = await ctrl().methods.getStakedTokens(owner).call({ from: owner });
-    return toNumArr(raw);
-  }
-  async function getAvailableRewards(owner){
-    owner = owner || await addr(); if (!owner) return '0';
-    await ensureCorrectChain();
-    return await ctrl().methods.availableRewards(owner).call({ from: owner });
+    }catch{ return NaN; }};
+    return rows.map(r=>{
+      if (Array.isArray(r)) return toNum(r[0]);
+      if (typeof r==='string' || typeof r==='number' || typeof r==='bigint') return toNum(r);
+      if (typeof r==='object'){
+        const cand = r.tokenId ?? r.id ?? r.token_id ?? r.tokenID ?? r[0];
+        return toNum(cand);
+      }
+      return NaN;
+    }).filter(Number.isFinite);
   }
 
-  async function isApproved(owner){
-    owner = owner || await addr(); if (!owner) return false;
-    await ensureCorrectChain();
-    try{ return !!(await nft().methods.isApprovedForAll(owner, CFG.CONTROLLER_ADDRESS).call({ from: owner })); }
-    catch{ return false; }
+  async function getStakedTokens(user){
+    const ec = await ethersContract(true);
+    if (ec?.getStakedTokens) return await ec.getStakedTokens(user);
+    const wc = web3Contract();
+    if (wc?.methods?.getStakedTokens) return await wc.methods.getStakedTokens(user).call();
+    throw new Error('getStakedTokens() not found on controller');
   }
-  async function approveIfNeeded(){
-    const owner = await addr(); if (!owner) throw new Error('Connect wallet');
-    await ensureCorrectChain();
-    return nft().methods.setApprovalForAll(CFG.CONTROLLER_ADDRESS, true).send({ from: owner });
-  }
-
-  async function stakeToken(tokenId){
-    const owner = await addr(); if (!owner) throw new Error('Connect wallet');
-    await ensureCorrectChain();
-    return ctrl().methods.stake(String(tokenId)).send({ from: owner });
-  }
-  async function unstakeToken(tokenId){
-    const owner = await addr(); if (!owner) throw new Error('Connect wallet');
-    await ensureCorrectChain();
-    return ctrl().methods.withdraw(String(tokenId)).send({ from: owner });
-  }
-  async function stakeTokens(ids){ const out=[]; for (const id of (ids||[])) out.push(await stakeToken(id)); return out; }
-  async function unstakeTokens(ids){ const out=[]; for (const id of (ids||[])) out.push(await unstakeToken(id)); return out; }
-  async function claimRewards(){
-    const owner = await addr(); if (!owner) throw new Error('Connect wallet');
-    await ensureCorrectChain();
-    return ctrl().methods.claimRewards().send({ from: owner });
+  async function getStakedIds(user){
+    const raw = await getStakedTokens(user);
+    return normalizeIds(raw);
   }
 
-  const api = {
-    isApproved, approveIfNeeded,
-    stakeToken, stakeTokens, unstakeToken, unstakeTokens,
-    getStakedTokens, getUserStakedTokens: getStakedTokens,
-    getAvailableRewards, claimRewards,
-    getStakeSince: async ()=> null
-  };
+  // Expose
+  FF.staking = FF.staking || {};
+  if (!FF.staking.getStakedTokens)      FF.staking.getStakedTokens      = getStakedTokens;
+  if (!FF.staking.getUserStakedTokens)  FF.staking.getUserStakedTokens  = getStakedIds;
+  if (!window.getStakedTokens)          window.getStakedTokens          = getStakedTokens;
 
-  FF.staking = api;
-  window.FF_STAKING = api;
-
-  // Legacy convenience:
-  window.getStakedTokens     = api.getStakedTokens;
-  window.getAvailableRewards = api.getAvailableRewards;
-  window.claimRewards        = api.claimRewards;
-  window.approveIfNeeded     = api.approveIfNeeded;
-
+  console.log('[staking-adapter] ready', ADDR);
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});

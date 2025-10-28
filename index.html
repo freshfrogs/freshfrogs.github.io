@@ -1,240 +1,201 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="t1">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fresh Frogs — Staking Console</title>
-  <script>
-    if (!sessionStorage.getItem('ff:connected')) {
-      window.location.replace('connect.html');
-    }
-  </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@500;600&display=swap"
-    rel="stylesheet">
+  <title>freshfrogs.github.io — Layout 3</title>
+
+  <link rel="stylesheet" href="assets/css/styles.css" />
+
   <style>
-    :root {
-      color-scheme: dark;
-      --bg: #010101;
-      --bg-panel: #050505;
-      --bg-panel-soft: #090909;
-      --fg: #e6f6ec;
-      --fg-muted: #5c7067;
-      --accent: #7dff9f;
-      --error: #ff7d7d;
-      --border: rgba(125, 255, 159, 0.12);
-      --shadow: 0 28px 60px rgba(0, 0, 0, 0.6);
-      --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
-      --ui: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    /* Base */
+    .pg-wrap{ padding:20px; }
+    img{ image-rendering: pixelated; image-rendering: crisp-edges; }
+
+    .pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
+    .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
+    .pg-muted{ color:var(--muted); font-size:13px; }
+
+    .list{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+    .row{ display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:center; padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
+    .thumb64{ width:64px; height:64px; min-width:64px; min-height:64px; border-radius:10px; object-fit:contain; background:var(--panel-2); }
+
+    /* Centered single-panel layout (fixed width) */
+    :root{ --panel-width: 640px; }
+    .center-wrap{ display:grid; gap:16px; justify-items:center; }
+    .centered-card{ width: min(var(--panel-width), 100%); }
+
+    /* Hero (centered) */
+    .frog-hero{ margin:28px auto 38px; width: min(var(--panel-width), 100%); }
+    .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
+    .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
+    .frog-strip .tile{ flex:0 0 auto; width:64px; height:64px; border-radius:10px; }
+    .frog-strip .tile.hide{ display:none !important; }
+    .frog-strip img{ width:64px; height:64px; object-fit:contain; }
+    @media (max-width:520px){ .frog-hero{ margin:22px auto 30px; } .frog-strip{ gap:10px; } }
+
+    /* Info blocks */
+    .info-grid-2{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:10px; margin-bottom:10px; }
+    @media (max-width:900px){ .info-grid-2{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    @media (max-width:520px){ .info-grid-2{ grid-template-columns: 1fr; } }
+    .info-block{ border:1px solid var(--border); border-radius:12px; padding:10px; background:var(--panel); }
+    .info-block .ik{ font-size:11px; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; }
+    .info-block .iv{ font-weight:900; font-size:18px; line-height:1.1; margin-top:4px; }
+    .info-block .in{ font-size:12px; color:var(--muted); }
+
+    /* Mint (Mini) */
+    #mintMini.mint-mini{
+      border:1px solid var(--border); border-radius:12px; background: var(--panel);
+      padding:10px; margin:8px 0 12px;
     }
+    #mintMini .mint-mini__row{ display:grid; grid-template-columns:auto auto 1fr auto; align-items:center; gap:10px; }
+    #mintMini .mint-mini__price{ border:1px solid var(--border); border-radius:10px; padding:8px 10px; background: color-mix(in srgb, var(--panel) 90%, transparent); display:grid; grid-template-columns:auto auto; gap:6px 8px; align-items:baseline; }
+    #mintMini .mint-mini__price .k{ font-size:12px; color:var(--muted); }
+    #mintMini .mint-mini__price .v{ font-weight:900; font-size:14px; }
+    #mintMini .mint-mini__stepper{ display:flex; align-items:center; gap:8px; }
+    #mintMini .mini__btn{ width:28px; height:28px; border-radius:8px; border:1px solid var(--border); background:transparent; color:inherit; font-weight:800; line-height:1; display:grid; place-items:center; }
+    #mintMini .mini__btn:active{ transform: translateY(1px); }
+    #mintMini .mini__qty{ width:64px; text-align:center; padding:6px; border-radius:8px; border:1px solid var(--border); background:transparent; color:inherit; font-family:var(--font-ui); }
+    #mintMini .mini__mint{ padding-inline:12px; }
+    #mintMini .mint-mini__total{ font-size:12px; color:var(--muted); justify-self:end; }
+    #mintMini .mint-mini__note{ margin-top:6px; font-size:12px; }
+    @media (max-width:600px){ #mintMini .mint-mini__row{ grid-template-columns: 1fr 1fr; } #mintMini .mint-mini__total{ justify-self:start; } }
 
-    *, *::before, *::after {
-      box-sizing: border-box;
+    /* Scrollable lists: JS sets max-height to N rows; infinite scroll appends */
+    #recentMints.scrolling,
+    #recentStakes.scrolling{
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      padding-right:4px;
     }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: clamp(24px, 6vw, 72px);
-      background:
-        radial-gradient(circle at top, rgba(125, 255, 159, 0.12), transparent 60%),
-        linear-gradient(160deg, #020202, #010101 55%, #000 100%);
-      color: var(--fg);
-      font-family: var(--mono);
-    }
-
-    main.console {
-      width: min(960px, 100%);
-      min-height: clamp(520px, 70vh, 820px);
-      display: grid;
-      grid-template-rows: auto 1fr auto;
-      background: var(--bg-panel);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    header.status-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      padding: 20px 26px;
-      background: var(--bg-panel-soft);
-      border-bottom: 1px solid var(--border);
-      font-family: var(--ui);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-size: 0.78rem;
-      color: var(--fg-muted);
-    }
-
-    header.status-bar .brand {
-      font-weight: 600;
-      color: var(--fg);
-      letter-spacing: 0.12em;
-    }
-
-    header.status-bar .status {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    header.status-bar .status span {
-      white-space: nowrap;
-    }
-
-    header.status-bar .status .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: rgba(255, 118, 118, 0.9);
-      box-shadow: 0 0 12px rgba(255, 118, 118, 0.45);
-      transition: background 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    header.status-bar .status .dot.online {
-      background: rgba(125, 255, 159, 0.9);
-      box-shadow: 0 0 14px rgba(125, 255, 159, 0.6);
-    }
-
-    section.terminal {
-      position: relative;
-      background: linear-gradient(135deg, rgba(125, 255, 159, 0.04), transparent 65%), #020202;
-      padding: 28px 26px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    #terminal-log .line {
-      margin: 0;
-      font-size: clamp(0.88rem, 1vw, 0.96rem);
-      line-height: 1.6;
-      white-space: pre-wrap;
-      word-break: break-word;
-      color: var(--fg);
-    }
-
-    #terminal-log .line.muted {
-      color: var(--fg-muted);
-    }
-
-    #terminal-log .line.prompt {
-      color: var(--accent);
-    }
-
-    #terminal-log .line.ok {
-      color: var(--accent);
-      text-shadow: 0 0 14px rgba(125, 255, 159, 0.28);
-    }
-
-    #terminal-log .line.error {
-      color: var(--error);
-      text-shadow: 0 0 10px rgba(255, 125, 125, 0.28);
-    }
-
-    #terminal-log .line.header {
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-    }
-
-    form.console-input {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 18px 24px;
-      border-top: 1px solid var(--border);
-      background: var(--bg-panel-soft);
-    }
-
-    form.console-input label {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 0.95rem;
-      color: var(--fg-muted);
-    }
-
-    form.console-input span.prompt-symbol {
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    form.console-input input {
-      flex: 1;
-      padding: 10px 12px;
-      border: none;
-      background: transparent;
-      color: var(--fg);
-      font: inherit;
-      letter-spacing: 0.04em;
-    }
-
-    form.console-input input:focus {
-      outline: none;
-    }
-
-    form.console-input input::placeholder {
-      color: rgba(230, 246, 236, 0.35);
-    }
-
-    @media (max-width: 720px) {
-      body {
-        padding: 12px;
-      }
-
-      main.console {
-        min-height: calc(100vh - 24px);
-      }
-
-      header.status-bar {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
+    #recentMints .row, #recentStakes .row{ cursor:pointer; }
+    @media (hover:hover){
+      #recentMints.scrolling::-webkit-scrollbar,
+      #recentStakes.scrolling::-webkit-scrollbar{ width:8px; }
+      #recentMints.scrolling::-webkit-scrollbar-thumb,
+      #recentStakes.scrolling::-webkit-scrollbar-thumb{
+        background: color-mix(in srgb, var(--muted) 35%, transparent);
+        border-radius:8px;
       }
     }
   </style>
 </head>
 <body>
-  <main class="console" role="application" aria-label="Fresh Frogs staking console">
-    <header class="status-bar">
-      <div class="brand">freshfrogs ▸ console</div>
-      <div class="status">
-        <span class="dot" id="status-dot" aria-hidden="true"></span>
-        <span id="status-network">offline</span>
-        <span id="status-address">wallet not connected</span>
-      </div>
-    </header>
+  <div class="pg-wrap container">
+    <div class="center-wrap">
 
-    <section id="terminal-scroll" class="terminal" aria-live="polite" aria-label="Terminal output">
-      <div id="terminal-log"></div>
-    </section>
+      <!-- HERO -->
+      <section class="frog-hero">
+        <h1 class="frog-title">freshfrogs.github.io</h1>
+        <div class="frog-strip">
+          <div class="tile"><img src="frog/12.png"  alt="12"></div>
+          <div class="tile"><img src="frog/77.png"  alt="77"></div>
+          <div class="tile"><img src="frog/404.png" alt="404"></div>
+          <div class="tile"><img src="frog/256.png" alt="256"></div>
+          <div class="tile"><img src="frog/999.png" alt="999"></div>
+          <div class="tile"><img src="frog/1.png"   alt="1"></div>
+        </div>
+      </section>
 
-    <form id="terminal-form" class="console-input" autocomplete="off">
-      <label for="terminal-input">
-        <span class="prompt-symbol" aria-hidden="true">&gt;</span>
-        <input id="terminal-input" type="text" inputmode="text" spellcheck="false" autocapitalize="off"
-          autocomplete="off" aria-label="Command input" placeholder="type help for available commands" />
-      </label>
-    </form>
-  </main>
+      <!-- Fresh Frogs NFT -->
+      <section class="pg-card centered-card">
+        <div class="pg-card-head"><h3>Fresh Frogs NFT</h3></div>
+        <p class="pg-muted" style="margin:6px 0 12px 0; max-width:70ch;">
+          Pixel-perfect frogs hopping around the Ethereum pond. Mint, stake to earn FLYZ, and explore the collection’s quirks and traits.
+        </p>
 
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js" crossorigin="anonymous"></script>
+        <div class="info-grid-2">
+          <div class="info-block"><div class="ik">🐸 Supply</div><div class="iv">4,040</div><div class="in">Total tokens</div></div>
+          <div class="info-block"><div class="ik">⛓️ Chain</div><div class="iv">Ethereum</div><div class="in">ERC-721</div></div>
+          <div class="info-block"><div class="ik">🎧 Royalty</div><div class="iv">5%</div><div class="in">Secondary sales</div></div>
+          <div class="info-block"><div class="ik">🪙 Mint</div><div class="iv">0.01 ETH</div><div class="in">Per frog</div></div>
+        </div>
+
+        <!-- Mint (Mini) -->
+        <section id="mintMini" class="mint-mini" aria-label="Quick mint">
+          <div class="mint-mini__row">
+            <div class="mint-mini__price">
+              <div class="k">Price</div><div class="v">0.01 ETH</div>
+            </div>
+
+            <div class="mint-mini__stepper" role="group" aria-label="Quantity">
+              <button type="button" class="mini__btn" data-delta="-1" aria-label="Decrease">−</button>
+              <input id="miniQty" class="mini__qty" type="text" inputmode="numeric" pattern="[0-9]*" value="1" aria-label="Quantity">
+              <button type="button" class="mini__btn" data-delta="1" aria-label="Increase">+</button>
+            </div>
+
+            <button type="button" class="btn mini__mint">Mint</button>
+            <div class="mint-mini__total">Total: <b id="miniTotal">0.01 ETH</b></div>
+          </div>
+          <div class="mint-mini__note pg-muted">Connect wallet to mint.</div>
+        </section>
+
+        <!-- Recent Mints -->
+        <ul id="recentMints" class="list" aria-live="polite" data-visible="6">
+          <li class="row"><div class="pg-muted">Loading recent mints…</div></li>
+        </ul>
+      </section>
+    </div>
+  </div>
+
   <script>
-    window.CONTROLLER_ADDRESS = "0xCB1eE125cFf4051A10A55a09B10613876C4eF199";
+    /* Keep whole 64px tiles only (hero strip) */
+    function layoutFrogStrip(){
+      var strip = document.querySelector('.frog-strip'); if(!strip) return;
+      var tiles = Array.prototype.slice.call(strip.querySelectorAll('.tile'));
+      var styles = window.getComputedStyle(strip);
+      var gap = parseFloat(styles.gap || 12) || 12;
+      var tileW = 64, innerW = strip.clientWidth;
+      var count = Math.max(1, Math.floor((innerW + gap) / (tileW + gap)));
+      tiles.forEach(function(t,i){ t.classList.toggle('hide', i >= count); });
+    }
+    window.addEventListener('resize', layoutFrogStrip);
+    document.addEventListener('DOMContentLoaded', layoutFrogStrip);
+
+    /* Mint (Mini): stepper + totals */
+    (function(){
+      var PRICE = 0.01;
+      function clamp(n){ n = parseInt(n||'1', 10); return isNaN(n) ? 1 : Math.max(1, n); }
+      function fmtETH(n){ return n.toFixed(2) + ' ETH'; }
+      function syncMini(){
+        var qtyEl = document.getElementById('miniQty');
+        var totalEl = document.getElementById('miniTotal');
+        if(!qtyEl || !totalEl) return;
+        var q = clamp(qtyEl.value);
+        qtyEl.value = q;
+        totalEl.textContent = fmtETH(q * PRICE);
+      }
+      document.addEventListener('click', function(e){
+        var btn = e.target.closest('#mintMini .mini__btn'); if(!btn) return;
+        var qtyEl = document.getElementById('miniQty'); if(!qtyEl) return;
+        var delta = parseInt(btn.getAttribute('data-delta'),10) || 0;
+        qtyEl.value = clamp((parseInt(qtyEl.value||'1',10) || 1) + delta);
+        syncMini();
+      });
+      document.addEventListener('input', function(e){
+        if(!e.target.matches('#mintMini #miniQty')) return;
+        e.target.value = e.target.value.replace(/[^0-9]/g,'');
+        syncMini();
+      });
+      document.addEventListener('DOMContentLoaded', syncMini);
+    })();
   </script>
-  <script src="assets/js/contract-tools.js"></script>
+
+  <!-- Shared libs -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/rarity.js"></script>
+  <script src="assets/js/modal.js"></script>
+  <script src="assets/js/pond.js"></script>
+
+  <!-- New feeds -->
+  <script src="assets/js/mints-feed.js"></script>
+  <script src="assets/js/stakes-feed.js"></script>
+
+  <script>
+    FF_loadRecentMints && FF_loadRecentMints();
+    FF_loadRecentStakes && FF_loadRecentStakes();
+  </script>
 </body>
 </html>
