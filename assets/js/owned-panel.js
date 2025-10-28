@@ -41,7 +41,7 @@
 #ownedCard .pg-card-head .btn:hover{background: color-mix(in srgb,#22c55e 14%,var(--panel));border-color: color-mix(in srgb,#22c55e 80%,var(--border));color: color-mix(in srgb,#ffffff 85%,#22c55e)}
 #ownedCard .pg-card-head .btn.btn-connected{background: color-mix(in srgb,#22c55e 18%,var(--panel));border-color: color-mix(in srgb,#22c55e 85%,var(--border));color: color-mix(in srgb,#ffffff 90%,#22c55e)}
 #ownedCard{display:flex;flex-direction:column}
-#ownedGrid{overflow:auto;-webkit-overflow-scrolling:touch;padding-right:4px}
+#ownedGrid{overflow:visible;padding-right:0}
 @media (hover:hover){
   #ownedGrid::-webkit-scrollbar{width:8px}
   #ownedGrid::-webkit-scrollbar-thumb{background: color-mix(in srgb,var(--muted) 35%, transparent); border-radius:8px}
@@ -237,13 +237,10 @@
 
   // --- Height sync with left panel ---
   function syncHeights(){
-    if (window.matchMedia('(max-width: 960px)').matches){ $('#ownedCard').style.height=''; $('#ownedGrid').style.maxHeight=''; return; }
-    const cards=document.querySelectorAll('.page-grid > .pg-card'); if(cards.length<2) return;
-    const left=cards[0], right=$('#ownedCard'); if(!left||!right) return;
-    right.style.height=left.offsetHeight+'px';
-    const header=right.querySelector('.oh-wrap'); const headerH=header?header.offsetHeight+10:0;
-    const pad=20; const maxH=left.offsetHeight-headerH-pad;
-    const grid=$('#ownedGrid'); if(grid) grid.style.maxHeight=Math.max(160,maxH)+'px';
+    const card = $(SEL.card);
+    const grid = $(SEL.grid);
+    if (card){ card.style.height=''; card.style.minHeight=''; }
+    if (grid){ grid.style.maxHeight=''; }
   }
   window.addEventListener('resize',()=> setTimeout(syncHeights,50));
 
@@ -418,7 +415,7 @@
           renderCards();
         }catch{ toast('Could not load more'); }
       };
-      const observer = new IntersectionObserver(ioCb, {root:root,rootMargin:'140px',threshold:0.01});
+      const observer = new IntersectionObserver(ioCb, {root:null,rootMargin:'140px',threshold:0.01});
       observer.observe(sentinel);
     }catch(e){
       console.warn('[owned] first page failed', e);
