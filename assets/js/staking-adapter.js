@@ -1,90 +1,193 @@
 // assets/js/staking-adapter.js
-// Wires controller.getStakedTokens(user) and exposes numeric ID helpers.
+// Uses CONTROLLER_ABI (assets/abi/controller_abi.js) + FF_CFG.{CONTROLLER_ADDRESS,COLLECTION_ADDRESS}.
+// Works with either Web3 OR Ethers if present. Reads require wallet or FF_CFG.RPC_URL; writes need a wallet.
 
 (function (FF, CFG) {
   'use strict';
 
-  const ADDR = CFG.CONTROLLER_ADDRESS || CFG.STAKING_CONTROLLER || window.FF_CONTROLLER_ADDRESS;
-  const ABI  = window.FF_CONTROLLER_ABI || window.controller_abi || window.CONTROLLER_ABI;
+  const CTRL = CFG.CONTROLLER_ADDRESS;
+  const COLL = CFG.COLLECTION_ADDRESS;
 
-  if (!ADDR || !ABI) {
-    console.warn('[staking-adapter] Missing controller address or ABI');
-    return;
+  // Export API immediately so owned-panel.js can call it anytime.
+  const api = {
+    // READS
+    async getStakedTokens(owner){ try { return await _getStakedTokens(owner); } catch (e){ console.warn('[staking-adapter] getStakedTokens', e); return []; } },
+    async getUserStakedTokens(owner){ return api.getStakedTokens(owner); }, // alias
+    async getAvailableRewards(owner){ try { return await _getAvailableRewards(owner); } catch(e){ console.warn('[staking-adapter] rewards', e); return '0'; } },
+    async isApproved(owner){ try { return await _isApproved(owner); } catch(e){ console.warn('[staking-adapter] isApproved', e); return null; } },
+
+    // ACTIONS
+    async approve(){ return _approve(); },
+    async claimRewards(){ return _claim(); },
+    async stakeToken(id){ return _stake(id); },
+    async unstakeToken(id){ return _withdraw(id); },
+
+    // Not in this ABI
+    async getStakeSince(){ return null; },
+    async getStakeInfo(){ return null; }
+  };
+  FF.staking = api;
+  window.FF_STAKING = api;
+
+  // ---------- provider factories ----------
+  function haveEthers(){ return !!window.ethers; }
+  function haveWeb3(){ return !!window.Web3; }
+
+  function readProvider(){
+    if (window.ethereum) return window.ethereum; // wallet
+    if (CFG.RPC_URL && haveWeb3()) return new Web3.providers.HttpProvider(CFG.RPC_URL); // web3 http
+    if (CFG.RPC_URL && haveEthers()) return new ethers.providers.JsonRpcProvider(CFG.RPC_URL); // ethers http
+    throw new Error('No provider: connect a wallet or set FF_CFG.RPC_URL');
   }
 
-  function getEthers(){ return window.ethers || null; }
-  function ethersProvider(){
-    const e=getEthers(); if(!e || !window.ethereum) return null;
-    try{ if (e.BrowserProvider) return new e.BrowserProvider(window.ethereum); }catch{}
-    try{ if (e.providers?.Web3Provider) return new e.providers.Web3Provider(window.ethereum); }catch{}
-    return null;
+  // ---------- contract helpers (dual stack) ----------
+  function ctrlW3(){
+    if (!haveWeb3()) throw new Error('Web3 library not loaded');
+    const w3 = new Web3(readProvider());
+    return new w3.eth.Contract(window.CONTROLLER_ABI || [], CTRL);
   }
-  async function ethersContract(readOnly=true){
-    const e=getEthers(), p=ethersProvider(); if(!e || !p) return null;
-    try{ // v6
-      if (e.Contract && p.getSigner){
-        const signer = readOnly ? null : await p.getSigner();
-        return new e.Contract(ADDR, ABI, signer || p);
-      }
-    }catch{}
-    try{ // v5
-      if (e.Contract && p.getSigner){
-        const signer = readOnly ? p : p.getSigner();
-        return new e.Contract(ADDR, ABI, signer);
-      }
-    }catch{}
-    return null;
+  function nftW3(){
+    if (!haveWeb3()) throw new Error('Web3 library not loaded');
+    const w3 = new Web3(readProvider());
+    return new w3.eth.Contract([
+      {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":""}],"stateMutability":"view","type":"function"},
+      {"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"}
+    ], COLL);
   }
-  function web3Contract(){
-    const W = window.web3 || (window.Web3 ? new window.Web3(window.ethereum) : null);
-    try{ return W ? new W.eth.Contract(ABI, ADDR) : null; }catch{ return null; }
+  function ctrlEth(){
+    if (!haveEthers()) throw new Error('Ethers library not loaded');
+    const provider = window.ethereum
+      ? new ethers.providers.Web3Provider(window.ethereum)
+      : new ethers.providers.JsonRpcProvider(CFG.RPC_URL);
+    return new ethers.Contract(CTRL, window.CONTROLLER_ABI || [], provider);
+  }
+  function signerEth(){
+    if (!haveEthers() || !window.ethereum) throw new Error('No wallet for writes');
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    return provider.getSigner();
+  }
+  function nftEth(){
+    const s = signerEth();
+    return new ethers.Contract(COLL, [
+      "function isApprovedForAll(address owner,address operator) view returns (bool)",
+      "function setApprovalForAll(address operator,bool approved)"
+    ], s);
   }
 
-  // Normalize many tuple/BN/hex shapes → number
-  function normalizeIds(rows){
-    if (!Array.isArray(rows)) return [];
-    const toNum=(x)=>{ try{
+  // ---------- utils ----------
+  const toNum = (x)=> {
+    try{
       if (x==null) return NaN;
       if (typeof x==='number') return x;
       if (typeof x==='bigint') return Number(x);
-      if (typeof x==='string'){ if(/^0x/i.test(x)) return Number(BigInt(x)); return Number(x); }
-      if (typeof x==='object'){
-        if (typeof x.toString==='function' && x.toString!==Object.prototype.toString){
-          const s=x.toString(); if(/^\d+$/.test(s)) return Number(s);
-        }
-        if ('_hex' in x) return Number(x._hex);
-        if ('hex'  in x) return Number(x.hex);
+      if (typeof x==='string') { if (/^0x/i.test(x)) return Number(BigInt(x)); return Number(x); }
+      if (typeof x==='object') {
+        if ('tokenId' in x) return toNum(x.tokenId);
+        if ('id' in x)      return toNum(x.id);
+        if ('_hex' in x)    return Number(x._hex);
+        const s = x.toString?.(); if (s && /^\d+$/.test(s)) return Number(s);
       }
-      return NaN;
-    }catch{ return NaN; }};
-    return rows.map(r=>{
-      if (Array.isArray(r)) return toNum(r[0]);
-      if (typeof r==='string' || typeof r==='number' || typeof r==='bigint') return toNum(r);
-      if (typeof r==='object'){
-        const cand = r.tokenId ?? r.id ?? r.token_id ?? r.tokenID ?? r[0];
-        return toNum(cand);
-      }
-      return NaN;
-    }).filter(Number.isFinite);
+    }catch{}
+    return NaN;
+  };
+
+  // ---------- READS ----------
+  async function _getStakedTokens(owner){
+    if (!CTRL || !window.CONTROLLER_ABI) throw new Error('Missing controller address/ABI');
+    // Prefer Web3 if present; else Ethers
+    if (haveWeb3()){
+      const c = ctrlW3();
+      const rows = await c.methods.getStakedTokens(owner).call();
+      return Array.isArray(rows) ? rows.map(r => toNum(r && r.tokenId)).filter(Number.isFinite) : [];
+    } else if (haveEthers()){
+      const c = ctrlEth();
+      const rows = await c.getStakedTokens(owner);
+      return Array.isArray(rows) ? rows.map(r => toNum(r && r.tokenId)).filter(Number.isFinite) : [];
+    }
+    throw new Error('No Web3 or Ethers library loaded');
   }
 
-  async function getStakedTokens(user){
-    const ec = await ethersContract(true);
-    if (ec?.getStakedTokens) return await ec.getStakedTokens(user);
-    const wc = web3Contract();
-    if (wc?.methods?.getStakedTokens) return await wc.methods.getStakedTokens(user).call();
-    throw new Error('getStakedTokens() not found on controller');
-  }
-  async function getStakedIds(user){
-    const raw = await getStakedTokens(user);
-    return normalizeIds(raw);
+  async function _getAvailableRewards(owner){
+    if (haveWeb3()){
+      const c = ctrlW3();
+      return await c.methods.availableRewards(owner).call();
+    } else if (haveEthers()){
+      const c = ctrlEth();
+      const v = await c.availableRewards(owner);
+      return v?.toString?.() ?? String(v);
+    }
+    throw new Error('No Web3 or Ethers library loaded');
   }
 
-  // Expose
-  FF.staking = FF.staking || {};
-  if (!FF.staking.getStakedTokens)      FF.staking.getStakedTokens      = getStakedTokens;
-  if (!FF.staking.getUserStakedTokens)  FF.staking.getUserStakedTokens  = getStakedIds;
-  if (!window.getStakedTokens)          window.getStakedTokens          = getStakedTokens;
+  async function _isApproved(owner){
+    if (haveWeb3()){
+      const n = nftW3();
+      return !!(await n.methods.isApprovedForAll(owner, CTRL).call({ from: owner }));
+    } else if (haveEthers()){
+      const provider = window.ethereum
+        ? new ethers.providers.Web3Provider(window.ethereum)
+        : new ethers.providers.JsonRpcProvider(CFG.RPC_URL);
+      const c = new ethers.Contract(COLL, ["function isApprovedForAll(address,address) view returns (bool)"], provider);
+      return !!(await c.isApprovedForAll(owner, CTRL));
+    }
+    throw new Error('No Web3 or Ethers library loaded');
+  }
 
-  console.log('[staking-adapter] ready', ADDR);
+  // ---------- WRITES (wallet required) ----------
+  async function _approve(){
+    if (haveWeb3()){
+      const n = nftW3();
+      const from = (window.ethereum && window.ethereum.selectedAddress);
+      if (!from) throw new Error('Connect wallet');
+      return n.methods.setApprovalForAll(CTRL, true).send({ from });
+    } else if (haveEthers()){
+      const n = nftEth();
+      const tx = await n.setApprovalForAll(CTRL, true);
+      return tx.wait?.() ?? tx;
+    }
+    throw new Error('No Web3 or Ethers library loaded');
+  }
+
+  async function _stake(id){
+    if (haveWeb3()){
+      const c = ctrlW3();
+      const from = (window.ethereum && window.ethereum.selectedAddress);
+      if (!from) throw new Error('Connect wallet');
+      return c.methods.stake(String(id)).send({ from });
+    } else if (haveEthers()){
+      const s = signerEth();
+      const c = new ethers.Contract(CTRL, window.CONTROLLER_ABI || [], s);
+      const tx = await c.stake(String(id)); return tx.wait?.() ?? tx;
+    }
+    throw new Error('No Web3 or Ethers library loaded');
+  }
+
+  async function _withdraw(id){
+    if (haveWeb3()){
+      const c = ctrlW3();
+      const from = (window.ethereum && window.ethereum.selectedAddress);
+      if (!from) throw new Error('Connect wallet');
+      return c.methods.withdraw(String(id)).send({ from });
+    } else if (haveEthers()){
+      const s = signerEth();
+      const c = new ethers.Contract(CTRL, window.CONTROLLER_ABI || [], s);
+      const tx = await c.withdraw(String(id)); return tx.wait?.() ?? tx;
+    }
+    throw new Error('No Web3 or Ethers library loaded');
+  }
+
+  async function _claim(){
+    if (haveWeb3()){
+      const c = ctrlW3();
+      const from = (window.ethereum && window.ethereum.selectedAddress);
+      if (!from) throw new Error('Connect wallet');
+      return c.methods.claimRewards().send({ from });
+    } else if (haveEthers()){
+      const s = signerEth();
+      const c = new ethers.Contract(CTRL, window.CONTROLLER_ABI || [], s);
+      const tx = await c.claimRewards(); return tx.wait?.() ?? tx;
+    }
+    throw new Error('No Web3 or Ethers library loaded');
+  }
+
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});

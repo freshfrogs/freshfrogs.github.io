@@ -382,3 +382,45 @@ a.btn{ display:inline-flex; align-items:center; justify-content:center; text-dec
   padding-right: 4px;
 }
 #recentMints .row{ cursor: pointer; }
+/* --- Top action bar --- */
+.ff-topbar{
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--panel, #0f0f12);
+  border-bottom: 1px solid var(--border, #26262b);
+  backdrop-filter: blur(6px);
+}
+.ff-pill{
+  -webkit-tap-highlight-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font: inherit;
+  line-height: 1;
+  color: var(--ink, #d7d7df);
+  background: transparent;
+  border: 1px solid var(--border, #2a2a31);
+  border-radius: 9999px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform .04s ease, background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+.ff-pill:hover{
+  --ff-green: var(--green, #35c46a);
+  background: color-mix(in srgb, var(--ff-green), transparent 88%);
+  border-color: color-mix(in srgb, var(--ff-green), transparent 40%);
+  color: var(--ink, #e6ffe6);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ff-green), transparent 85%);
+}
+.ff-pill:active{ transform: translateY(1px); }
+@media (max-width: 720px){
+  .ff-topbar{ gap: 6px; padding: 8px 10px; }
+  .ff-pill{ padding: 8px 12px; }
+}
