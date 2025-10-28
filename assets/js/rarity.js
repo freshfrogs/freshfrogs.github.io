@@ -1,69 +1,77 @@
 (function(FF, CFG){
-  let RARITY_LIST=null, RANK_LOOKUP=null;
-  let page=0, sortBy='rank';
+  let LIST = null;      // full rarity items
+  let LOOK = null;      // id -> rank
+  let sortBy = 'rank';  // 'rank' | 'score'
 
-  function setRarity(list){
-    RARITY_LIST = list;
-    RANK_LOOKUP = Object.fromEntries(list.map(it=>[String(it.id), Number(it.ranking ?? it.rank ?? NaN)]).filter(([,v])=>!Number.isNaN(v)));
+  function setData(arr){
+    LIST = Array.isArray(arr) ? arr : [];
+    LOOK = Object.fromEntries(
+      LIST.map(x => [ String(x.id), Number(x.ranking ?? x.rank ?? NaN) ])
+          .filter(([,v]) => !Number.isNaN(v))
+    );
   }
 
-  async function loadFromFetch(){
+  async function loadOnce(){
+    if(LIST) return true;
     try{
       const arr = await FF.fetchJSON(CFG.JSON_PATH);
-      if(!Array.isArray(arr)) throw new Error('not array');
-      setRarity(arr);
+      if(!Array.isArray(arr)) throw new Error('bad rarity json');
+      setData(arr);
       return true;
-    }catch{ return false; }
+    }catch(e){
+      console.warn('Rarity load failed', e);
+      LIST = []; LOOK = {};
+      return false;
+    }
   }
 
-  function getSorted(){
-    if(!RARITY_LIST?.length) return [];
-    const a=[...RARITY_LIST];
-    if(sortBy==='score') a.sort((x,y)=>Number(y.rarity??y.score??0)-Number(x.rarity??x.score??0));
-    else a.sort((x,y)=>Number(x.ranking??x.rank??1e9)-Number(y.ranking??y.rank??1e9));
+  function sorted(){
+    if(!LIST?.length) return [];
+    const a = [...LIST];
+    if(sortBy==='score'){
+      a.sort((x,y)=> Number(y.rarity??y.score??0) - Number(x.rarity??x.score??0));
+    }else{
+      a.sort((x,y)=> Number(x.ranking??x.rank??1e9) - Number(y.ranking??y.rank??1e9));
+    }
     return a;
   }
 
-  function renderPage(i=0){
-    page=i;
-    const ul=document.getElementById('rarityList'); if(!ul) return; ul.innerHTML='';
-    const data=getSorted();
-    if(!data.length){ ul.innerHTML='<li class="list-item"><div class="muted">No data yet</div></li>'; FF.togglePagerBtns('rarity',0,0); return; }
-    const start=page*CFG.PAGE_SIZE, end=start+CFG.PAGE_SIZE;
-    data.slice(start,end).forEach(item=>{
-      const id=item.id, rank=item.ranking??item.rank??'?', score=(item.rarity??item.score??'').toString();
-      const li=document.createElement('li'); li.className='list-item';
-      li.innerHTML = FF.thumb64(`${CFG.SOURCE_PATH}/frog/${id}.png`, `Frog ${id}`) +
-        `<div><div><b>Frog #${id}</b></div><div class="muted">${score?`Rarity Score: ${score}`:`Rarity Score: N/A`}</div></div><span class="pill">#${rank}</span>`;
+  function render(){
+    const ul = document.getElementById('rarityList');
+    if(!ul) return;
+    ul.innerHTML = '';
+    const data = sorted();
+    if(!data.length){
+      ul.innerHTML = '<li class="list-item"><div class="muted">No rarity data yet.</div></li>';
+      return;
+    }
+    data.forEach(it=>{
+      const id = Number(it.id);
+      const rank = it.ranking ?? it.rank ?? '?';
+      const li = document.createElement('li'); li.className='list-item';
+      li.innerHTML =
+        FF.thumb64(`${CFG.SOURCE_PATH}/frog/${id}.png`, `Frog ${id}`) +
+        `<div>
+           <div><b>Frog #${id}</b></div>
+           <div class="muted">Rarity Rank</div>
+         </div>
+         <span class="pill">#${rank}</span>`;
+      li.addEventListener('click', ()=> FF.openFrogModal?.({ id }));
       ul.appendChild(li);
     });
-    FF.togglePagerBtns('rarity', page, data.length);
   }
 
-  // sort & pager
-  document.getElementById('sortRankBtn')?.addEventListener('click',()=>{ sortBy='rank'; renderPage(0); });
-  document.getElementById('sortScoreBtn')?.addEventListener('click',()=>{ sortBy='score'; renderPage(0); });
-  document.getElementById('rarityMore')?.addEventListener('click',()=>{ const pages=Math.ceil(getSorted().length/CFG.PAGE_SIZE); if(page<pages-1) page++; renderPage(page); });
-  document.getElementById('rarityLess')?.addEventListener('click',()=>{ if(page>0) page--; renderPage(page); });
+  // Sorting buttons
+  document.getElementById('sortRankBtn')?.addEventListener('click', ()=>{ sortBy='rank'; render(); });
+  document.getElementById('sortScoreBtn')?.addEventListener('click',()=>{ sortBy='score'; render(); });
 
-  // local file picker (for file:// testing)
-  function showLocalPicker(){ document.getElementById('localLoad').style.display='block'; }
-  function wireLocalPicker(){
-    const pick=document.getElementById('rarityFile'), btn=document.getElementById('useLocalBtn');
-    btn?.addEventListener('click', ()=>{
-      const f=pick?.files?.[0]; if(!f){ alert("Choose assets/freshfrogs_rarity_rankings.json"); return; }
-      const rd=new FileReader();
-      rd.onload=()=>{ try{ const arr=JSON.parse(rd.result); if(!Array.isArray(arr)) throw 0; setRarity(arr); renderPage(0); window.FF_getRankById = (id)=> RANK_LOOKUP ? (RANK_LOOKUP[String(id)] ?? null) : null; document.getElementById('localLoad').style.display='none'; }catch{ alert("Invalid rarity JSON"); } };
-      rd.readAsText(f);
-    });
-  }
+  // Public helpers used by other modules
+  window.FF.ensureRarity = async ()=> { await loadOnce(); };
+  window.FF.getRankById = (id)=> LOOK ? (LOOK[String(id)] ?? null) : null;
 
-  // expose
-  window.FF_loadRarity = async ()=>{
-    let ok = false;
-    if(location.protocol !== 'file:'){ ok = await loadFromFetch(); }
-    if(!ok){ showLocalPicker(); wireLocalPicker(); }
-    window.FF_getRankById = (id)=> RANK_LOOKUP ? (RANK_LOOKUP[String(id)] ?? null) : null;
-    renderPage(0);
+  // Public: render list now
+  window.FF_renderRarityList = async ()=>{
+    await loadOnce();
+    render();
   };
 })(window.FF, window.FF_CFG);

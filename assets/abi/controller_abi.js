@@ -174,3 +174,5 @@ const CONTROLLER_ABI =
   "type": "function"
   }
 ]
+
+window.CONTROLLER_ABI = CONTROLLER_ABI;

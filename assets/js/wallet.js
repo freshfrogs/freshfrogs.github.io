@@ -1,51 +1,117 @@
-(function(FF){
-  let user_address = null;
+// assets/js/wallet.js
+(function(){
+  // Elements
+  const connectBtn  = document.getElementById('connectBtn');
+  const walletLabel = document.getElementById('walletLabel');
 
-  function setWalletUI(addr){
-    const label=document.getElementById('walletLabel');
-    const btn=document.getElementById('connectBtn');
-    if(addr){ label.textContent='Connected: '+FF.shorten(addr); label.style.display=''; btn.textContent='Disconnect'; }
-    else { label.style.display='none'; btn.textContent='Connect Wallet'; }
+  let current = null; // current address (string | null)
+
+  // ---------- utils ----------
+  function shorten(addr){ return addr ? (addr.slice(0,6)+'…'+addr.slice(-4)) : ''; }
+
+  function setFFWallet(addr){
+    // Primary global used by newer code (modal, etc.)
+    window.FF = window.FF || {};
+    window.FF.wallet = {
+      address: addr || null,
+      connected: !!addr
+    };
+
+    // Compat globals some scripts read
+    window.FF_WALLET = { address: addr || null, connected: !!addr };
+    window.WALLET_ADDR = addr || null;
+    window.SELECTED_WALLET = addr || null;
   }
 
-  async function connectWallet(){
-    if(location.protocol==='file:'){ alert('Open the site over http(s) to enable wallet connections.'); return; }
-    const provider = window.ethereum;
-    if(!provider){ alert("No Ethereum provider found. Install/enable MetaMask."); return; }
+  function emitConnected(addr){
+    setFFWallet(addr);
+    window.user_address = addr; // legacy alias
+    window.dispatchEvent(new CustomEvent('wallet:connected',    { detail:{ address: addr }}));
+    window.dispatchEvent(new CustomEvent('FF:walletConnected',  { detail:{ address: addr }}));
+  }
+  function emitDisconnected(){
+    setFFWallet(null);
+    window.user_address = null;
+    window.dispatchEvent(new CustomEvent('wallet:disconnected'));
+    window.dispatchEvent(new CustomEvent('FF:walletDisconnected'));
+  }
+
+  function uiConnected(addr){
+    if (walletLabel){
+      walletLabel.style.display = '';
+      walletLabel.textContent = shorten(addr);
+    }
+    if (connectBtn){
+      connectBtn.textContent = 'Connected';
+      connectBtn.disabled = true;
+      connectBtn.classList.add('btn-disabled');
+    }
+  }
+  function uiDisconnected(){
+    if (walletLabel){
+      walletLabel.style.display = 'none';
+      walletLabel.textContent = '';
+    }
+    if (connectBtn){
+      connectBtn.textContent = 'Connect Wallet';
+      connectBtn.disabled = false;
+      connectBtn.classList.remove('btn-disabled');
+    }
+  }
+
+  async function requestConnect(){
+    if (!window.ethereum){
+      alert('No Ethereum provider found. Please install MetaMask or a compatible wallet.');
+      return;
+    }
     try{
-      const accounts = await provider.request({ method: 'eth_requestAccounts' });
-      user_address = accounts?.[0] || null;
-      setWalletUI(user_address);
-      if(user_address){
-        window.FF_clearOwned();
-        window.FF_fetchOwned(user_address);
-        document.getElementById('stakeStatus').textContent='Connected. Load Owned/Staked below.';
+      // Explicit, user-initiated connect only (no auto-connect elsewhere)
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const addr = (accounts && accounts[0]) ? accounts[0] : null;
+      if (!addr) return;
+      current = addr;
+      uiConnected(addr);
+      emitConnected(addr);
+    }catch(e){
+      // user rejected or provider error; remain disconnected
+    }
+  }
+
+  // ---------- initial (do NOT auto-connect) ----------
+  setFFWallet(null);
+  uiDisconnected();
+
+  // Click-to-connect only
+  connectBtn?.addEventListener('click', requestConnect);
+
+  // ---------- react to wallet/provider changes ----------
+  if (window.ethereum){
+    window.ethereum.on?.('accountsChanged', (arr)=>{
+      const addr = (arr && arr[0]) ? arr[0] : null;
+      if (!addr){
+        current = null;
+        uiDisconnected();
+        emitDisconnected();
+      } else {
+        current = addr;
+        uiConnected(addr);
+        emitConnected(addr);
       }
-    }catch(e){ console.warn(e); }
-  }
+    });
 
-  function disconnectWallet(){
-    user_address = null;
-    setWalletUI(null);
-    window.FF_clearOwned();
-    window.FF_clearStaked();
-    document.getElementById('stakeStatus').textContent='Disconnected.';
-  }
+    window.ethereum.on?.('chainChanged', ()=>{
+      // Keep the address; just re-emit so listeners can refetch if needed
+      if (current){
+        uiConnected(current);
+        emitConnected(current);
+      }
+    });
 
-  // buttons
-  document.getElementById('connectBtn')?.addEventListener('click', ()=>{ user_address ? disconnectWallet() : connectWallet(); });
-
-  // accountsChanged
-  if(window.ethereum){
-    window.ethereum.on?.('accountsChanged',(a)=>{
-      user_address = a?.[0] || null;
-      setWalletUI(user_address);
-      if(user_address){ window.FF_clearOwned(); window.FF_fetchOwned(user_address); }
-      else { window.FF_clearOwned(); window.FF_clearStaked(); }
+    // Optional: handle disconnect event from some providers
+    window.ethereum.on?.('disconnect', ()=>{
+      current = null;
+      uiDisconnected();
+      emitDisconnected();
     });
   }
-
-  // expose
-  window.FF_getUser = ()=> user_address;
-  window.FF_setWalletUI = setWalletUI;
-})(window.FF);
+})();
