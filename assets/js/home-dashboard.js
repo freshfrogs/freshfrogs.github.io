@@ -12,11 +12,11 @@
     connectBtn: document.getElementById('homeConnectBtn'),
     approveBtn: document.getElementById('homeApproveBtn'),
     claimBtn: document.getElementById('homeClaimBtn'),
-    walletShortTop: document.getElementById('homeWalletShort'),
     walletLabel: document.getElementById('homeWalletLabel'),
     ownedTop: document.getElementById('homeOwnedTop'),
     stakedTop: document.getElementById('homeStakedTop'),
     rewardsTop: document.getElementById('homeRewardsTop'),
+    rewardsSymbol: document.getElementById('homeRewardSymbol'),
     barStatus: document.getElementById('homeBarStatus'),
     ownedCount: document.getElementById('homeOwnedCount'),
     stakedCount: document.getElementById('homeStakedCount'),
@@ -77,7 +77,6 @@
   function updateUI(){
     const connected = Boolean(state.addr);
 
-    setText(els.walletShortTop, connected ? shorten(state.addr) : '—');
     setText(els.walletLabel, connected ? `Wallet: ${shorten(state.addr)}` : 'Wallet: —');
     setText(els.ownedTop, formatCount(state.owned));
     setText(els.ownedCount, formatCount(state.owned));
@@ -86,6 +85,7 @@
 
     const rewardsDisplay = state.rewards != null ? formatToken(state.rewards, REWARD_DECIMALS) : '—';
     setText(els.rewardsTop, rewardsDisplay);
+    if (els.rewardsSymbol) els.rewardsSymbol.textContent = REWARD_SYMBOL ? (' ' + REWARD_SYMBOL) : '';
     setText(els.rewardsAmount, rewardsDisplay);
 
     if (els.connectBtn){
