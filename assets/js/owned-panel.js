@@ -8,7 +8,6 @@
 
   const SEL = { card:'#ownedCard', grid:'#ownedGrid', btnConn:'#ownedConnectBtn' };
   const CHAIN_ID  = Number(CFG.CHAIN_ID || 1);
-  const RESV_HOST = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
   const PAGE_SIZE = Math.max(1, Math.min(50, Number(CFG.OWNED_PAGE_SIZE || CFG.PAGE_SIZE || 12)));
   const COLLECTION = CFG.COLLECTION_ADDRESS;
   const REWARD_SYMBOL   = (CFG.REWARD_TOKEN_SYMBOL || '$FLYZ');
@@ -42,7 +41,7 @@
 #ownedCard .pg-card-head .btn:hover{background: color-mix(in srgb,#22c55e 14%,var(--panel));border-color: color-mix(in srgb,#22c55e 80%,var(--border));color: color-mix(in srgb,#ffffff 85%,#22c55e)}
 #ownedCard .pg-card-head .btn.btn-connected{background: color-mix(in srgb,#22c55e 18%,var(--panel));border-color: color-mix(in srgb,#22c55e 85%,var(--border));color: color-mix(in srgb,#ffffff 90%,#22c55e)}
 #ownedCard{display:flex;flex-direction:column}
-#ownedGrid{overflow:auto;-webkit-overflow-scrolling:touch;padding-right:4px}
+#ownedGrid{overflow:visible;padding-right:0}
 @media (hover:hover){
   #ownedGrid::-webkit-scrollbar{width:8px}
   #ownedGrid::-webkit-scrollbar-thumb{background: color-mix(in srgb,var(--muted) 35%, transparent); border-radius:8px}
@@ -52,18 +51,6 @@
     `;
     const el=document.createElement('style'); el.id='owned-clean-css'; el.textContent=css; document.head.appendChild(el);
   })();
-
-  // --- Reservoir fetch queue (used only to list owned IDs) ---
-  if (!window.FF_RES_QUEUE){
-    const RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 800);
-    const BACKOFFS = Array.isArray(CFG.RETRY_BACKOFF_MS) ? CFG.RETRY_BACKOFF_MS : [900,1700,3200];
-    let lastAt=0, chain=Promise.resolve();
-    const sleep=(ms)=> new Promise(r=>setTimeout(r,ms));
-    const headers=()=> (FF.apiHeaders?.() || { accept:'application/json', 'x-api-key': CFG.FROG_API_KEY });
-    async function spaced(url,init){ const d=Date.now()-lastAt; if(d<RATE_MIN_MS) await sleep(RATE_MIN_MS-d); lastAt=Date.now(); return fetch(url,{headers:headers(), ...init}); }
-    async function run(url,init){ let i=0; while(true){ const res=await spaced(url,init); if(res.status===429){ await sleep(BACKOFFS[Math.min(i++,BACKOFFS.length-1)]); continue; } if(!res.ok){ const t=await res.text().catch(()=> ''); throw new Error('HTTP '+res.status+(t?' — '+t:'')); } return res.json(); } }
-    window.FF_RES_QUEUE={ fetch:(url,init)=> (chain = chain.then(()=> run(url,init))) };
-  }
 
   // --- Utils ---
   const $=(s,r=document)=>r.querySelector(s);
@@ -224,13 +211,10 @@
 
   // --- Height sync with left panel ---
   function syncHeights(){
-    if (window.matchMedia('(max-width: 960px)').matches){ $('#ownedCard').style.height=''; $('#ownedGrid').style.maxHeight=''; return; }
-    const cards=document.querySelectorAll('.page-grid > .pg-card'); if(cards.length<2) return;
-    const left=cards[0], right=$('#ownedCard'); if(!left||!right) return;
-    right.style.height=left.offsetHeight+'px';
-    const header=right.querySelector('.oh-wrap'); const headerH=header?header.offsetHeight+10:0;
-    const pad=20; const maxH=left.offsetHeight-headerH-pad;
-    const grid=$('#ownedGrid'); if(grid) grid.style.maxHeight=Math.max(160,maxH)+'px';
+    const card = $(SEL.card);
+    const grid = $(SEL.grid);
+    if (card){ card.style.height=''; card.style.minHeight=''; }
+    if (grid){ grid.style.maxHeight=''; }
   }
   window.addEventListener('resize',()=> setTimeout(syncHeights,50));
 
@@ -313,14 +297,15 @@
   function updateHeaderOwned(n){ const el=document.getElementById('ohOwned'); if (el) el.textContent=String(n); }
 
   // Owned IDs page from Reservoir (metadata comes from local JSON)
-  function tokensApiUser(addr){ return RESV_HOST + '/users/' + addr + '/tokens/v8'; }
   async function fetchOwnedIdsPage(){
-    const qs = new URLSearchParams({ collection: COLLECTION, limit:String(PAGE_SIZE), includeTopBid:'false', includeAttributes:'false' });
-    if (continuation) qs.set('continuation', continuation);
-    const j = await window.FF_RES_QUEUE.fetch(tokensApiUser(addr)+'?'+qs.toString());
-    const ids = (j?.tokens||[]).map(r => Number(r?.token?.tokenId)).filter(Number.isFinite);
-    continuation = j?.continuation || null;
-    return ids;
+    if (!window.FF_ALCH) throw new Error('Alchemy helper not loaded');
+    const { tokens, pageKey } = await window.FF_ALCH.getOwnerTokens(addr, {
+      pageKey: continuation || undefined,
+      pageSize: PAGE_SIZE,
+      withMetadata: false
+    });
+    continuation = pageKey || null;
+    return tokens.map(t => Number(t.id)).filter(Number.isFinite);
   }
 
   // Optional: ranks JSON if available
@@ -389,7 +374,7 @@
           renderCards();
         }catch{ toast('Could not load more'); }
       };
-      const observer = new IntersectionObserver(ioCb, {root:root,rootMargin:'140px',threshold:0.01});
+      const observer = new IntersectionObserver(ioCb, {root:null,rootMargin:'140px',threshold:0.01});
       observer.observe(sentinel);
     }catch(e){
       console.warn('[owned] first page failed', e);

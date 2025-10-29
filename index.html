@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="assets/css/styles.css" />
 
   <style>
-    /* Base */
     .pg-wrap{ padding:20px; }
     img{ image-rendering: pixelated; image-rendering: crisp-edges; }
 
@@ -17,17 +16,8 @@
     .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
     .pg-muted{ color:var(--muted); font-size:13px; }
 
-    .list{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
-    .row{ display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:center; padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
-    .thumb64{ width:64px; height:64px; min-width:64px; min-height:64px; border-radius:10px; object-fit:contain; background:var(--panel-2); }
-
-    /* Centered single-panel layout (fixed width) */
-    :root{ --panel-width: 640px; }
-    .center-wrap{ display:grid; gap:16px; justify-items:center; }
-    .centered-card{ width: min(var(--panel-width), 100%); }
-
-    /* Hero (centered) */
-    .frog-hero{ margin:28px auto 38px; width: min(var(--panel-width), 100%); }
+    /* Hero */
+    .frog-hero{ margin:28px auto 38px; max-width:1100px; }
     .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
     .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
     .frog-strip .tile{ flex:0 0 auto; width:64px; height:64px; border-radius:10px; }
@@ -62,44 +52,45 @@
     #mintMini .mint-mini__note{ margin-top:6px; font-size:12px; }
     @media (max-width:600px){ #mintMini .mint-mini__row{ grid-template-columns: 1fr 1fr; } #mintMini .mint-mini__total{ justify-self:start; } }
 
-    /* Scrollable lists: JS sets max-height to N rows; infinite scroll appends */
-    #recentMints.scrolling,
-    #recentStakes.scrolling{
-      overflow-y:auto;
-      -webkit-overflow-scrolling:touch;
-      padding-right:4px;
-    }
-    #recentMints .row, #recentStakes .row{ cursor:pointer; }
-    @media (hover:hover){
-      #recentMints.scrolling::-webkit-scrollbar,
-      #recentStakes.scrolling::-webkit-scrollbar{ width:8px; }
-      #recentMints.scrolling::-webkit-scrollbar-thumb,
-      #recentStakes.scrolling::-webkit-scrollbar-thumb{
-        background: color-mix(in srgb, var(--muted) 35%, transparent);
-        border-radius:8px;
-      }
-    }
+    .home-summary .status{ font-size:12px; color:var(--muted); }
   </style>
 </head>
 <body>
   <div class="pg-wrap container">
-    <div class="center-wrap">
 
-      <!-- HERO -->
-      <section class="frog-hero">
-        <h1 class="frog-title">freshfrogs.github.io</h1>
-        <div class="frog-strip">
-          <div class="tile"><img src="frog/12.png"  alt="12"></div>
-          <div class="tile"><img src="frog/77.png"  alt="77"></div>
-          <div class="tile"><img src="frog/404.png" alt="404"></div>
-          <div class="tile"><img src="frog/256.png" alt="256"></div>
-          <div class="tile"><img src="frog/999.png" alt="999"></div>
-          <div class="tile"><img src="frog/1.png"   alt="1"></div>
+    <section class="pg-card home-topbar" id="homeTopBar">
+      <div class="pg-card-head">
+        <h2>Frog Controls</h2>
+        <button id="homeConnectBtn" class="btn">Connect Wallet</button>
+      </div>
+      <div class="oh-wrap">
+        <div class="oh-row oh-mini" id="homeSummaryRow">
+          <span class="oh-muted">Wallet</span> <b id="homeWalletShort">—</b>
+          <span>•</span><span class="oh-muted">Owned</span> <b id="homeOwnedTop">—</b>
+          <span>•</span><span class="oh-muted">Staked</span> <b id="homeStakedTop">—</b>
+          <span>•</span><span class="oh-muted">Rewards</span> <b><span id="homeRewardsTop">—</span> $FLYZ</b>
+          <span class="oh-spacer"></span>
+          <button class="oh-btn" id="homeApproveBtn">Approve Staking</button>
+          <button class="oh-btn" id="homeClaimBtn">Claim Rewards</button>
         </div>
-      </section>
+      </div>
+      <div class="pg-muted status" id="homeBarStatus">Connect your wallet to manage frogs.</div>
+    </section>
 
-      <!-- Fresh Frogs NFT -->
-      <section class="pg-card centered-card">
+    <section class="frog-hero">
+      <h1 class="frog-title">freshfrogs.github.io</h1>
+      <div class="frog-strip">
+        <div class="tile"><img src="frog/12.png"  alt="12"></div>
+        <div class="tile"><img src="frog/77.png"  alt="77"></div>
+        <div class="tile"><img src="frog/404.png" alt="404"></div>
+        <div class="tile"><img src="frog/256.png" alt="256"></div>
+        <div class="tile"><img src="frog/999.png" alt="999"></div>
+        <div class="tile"><img src="frog/1.png"   alt="1"></div>
+      </div>
+    </section>
+
+    <div class="home-grid">
+      <section class="pg-card home-main" id="homeMainCard">
         <div class="pg-card-head"><h3>Fresh Frogs NFT</h3></div>
         <p class="pg-muted" style="margin:6px 0 12px 0; max-width:70ch;">
           Pixel-perfect frogs hopping around the Ethereum pond. Mint, stake to earn FLYZ, and explore the collection’s quirks and traits.
@@ -112,7 +103,6 @@
           <div class="info-block"><div class="ik">🪙 Mint</div><div class="iv">0.01 ETH</div><div class="in">Per frog</div></div>
         </div>
 
-        <!-- Mint (Mini) -->
         <section id="mintMini" class="mint-mini" aria-label="Quick mint">
           <div class="mint-mini__row">
             <div class="mint-mini__price">
@@ -130,13 +120,37 @@
           </div>
           <div class="mint-mini__note pg-muted">Connect wallet to mint.</div>
         </section>
+      </section>
 
-        <!-- Recent Mints -->
-        <ul id="recentMints" class="list" aria-live="polite" data-visible="6">
-          <li class="row"><div class="pg-muted">Loading recent mints…</div></li>
+      <section class="pg-card home-summary" id="homeSummaryCard">
+        <div class="pg-card-head">
+          <h3>Wallet Overview</h3>
+          <span class="pill" id="homeWalletLabel">Wallet: —</span>
+        </div>
+        <p class="status" id="homeSummaryStatus">Connect your wallet to view holdings.</p>
+        <ul class="home-stats">
+          <li><span class="label">Owned</span><span class="value" id="homeOwnedCount">—</span></li>
+          <li><span class="label">Staked</span><span class="value" id="homeStakedCount">—</span></li>
+          <li><span class="label">Rewards</span><span class="value"><span id="homeRewardsAmount">—</span> <span class="muted">$FLYZ</span></span></li>
         </ul>
+        <p class="home-note" id="homeSummaryNote">Stats refresh automatically after actions.</p>
       </section>
     </div>
+
+    <section class="pg-card home-mints" id="homeMintsCard">
+      <div class="pg-card-head">
+        <h3>Recent Mints</h3>
+        <button id="recentMintsRefresh" class="btn btn-ghost btn-sm" type="button">Refresh</button>
+      </div>
+      <div id="recentMints" class="frog-card-grid" aria-live="polite">
+        <div class="pg-muted">Loading recent mints…</div>
+      </div>
+      <div class="load-more" id="recentMintsMore" style="display:none;">
+        <button class="btn btn-outline-gray" type="button">Load more</button>
+      </div>
+      <div class="pg-muted" id="recentMintsStatus" style="display:none;">Loading…</div>
+    </section>
+
   </div>
 
   <script>
@@ -183,19 +197,64 @@
   </script>
 
   <!-- Shared libs -->
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/utils.js"></script>
-  <script src="assets/js/rarity.js"></script>
-  <script src="assets/js/modal.js"></script>
-  <script src="assets/js/pond.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/alchemy.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js" crossorigin="anonymous"></script>
+<script src="assets/abi/collection_abi.js"></script>
+<script src="assets/abi/controller_abi.js"></script>
+<script src="assets/js/rarity.js"></script>
+<script src="assets/js/modal.js"></script>
+<script src="assets/js/wallet.js"></script>
+<script src="assets/js/home-dashboard.js"></script>
+<script src="assets/js/pond.js"></script>
 
-  <!-- New feeds -->
+  <!-- Feeds -->
   <script src="assets/js/mints-feed.js"></script>
-  <script src="assets/js/stakes-feed.js"></script>
 
   <script>
     FF_loadRecentMints && FF_loadRecentMints();
-    FF_loadRecentStakes && FF_loadRecentStakes();
   </script>
+
+  <!-- Frog modal shell (shared sitewide) -->
+  <div id="frogModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-panel modal-narrow" role="document">
+      <button class="btn btn-ghost btn-sm modal-close" data-close aria-label="Close">✕</button>
+
+      <section class="ffm-grid">
+        <div class="ffm-hero-wrap">
+          <div id="fmHero" class="ffm-hero"></div>
+        </div>
+
+        <div class="ffm-info">
+          <div class="ffm-titlerow">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <b>Frog <span id="fmId">#—</span></b>
+              <span id="fmRank" class="pill">Rank <b id="fmRankNum">—</b></span>
+            </div>
+            <div id="fmLine" class="muted">—</div>
+          </div>
+
+          <div class="ffm-actions">
+            <button id="fmStakeBtn"    class="btn btn-ghost btn-xs"  data-no-modal>Stake</button>
+            <button id="fmUnstakeBtn"  class="btn btn-ghost btn-xs"  data-no-modal>Unstake</button>
+            <button id="fmTransferBtn" class="btn btn-ghost btn-xs"  data-no-modal>Transfer</button>
+
+            <a id="fmOpenSea"   class="btn btn-ghost btn-xs" target="_blank" rel="noopener">OpenSea</a>
+            <a id="fmEtherscan" class="btn btn-ghost btn-xs" target="_blank" rel="noopener">Etherscan</a>
+            <a id="fmMetaLink"  class="btn btn-ghost btn-xs" target="_blank" rel="noopener">Original</a>
+          </div>
+
+          <p id="fmOwner" class="sr-only"></p>
+          <p id="fmRarityLine" class="sr-only"></p>
+          <p id="fmCollection" class="sr-only"></p>
+          <a id="fmImageLink" class="sr-only" href="#" tabindex="-1">View frog image</a>
+
+          <ul id="fmAttrs" class="ffm-attrlist list-scroll"></ul>
+        </div>
+      </section>
+    </div>
+  </div>
 </body>
 </html>
