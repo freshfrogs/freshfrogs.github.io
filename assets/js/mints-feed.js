@@ -1,53 +1,27 @@
 // assets/js/mints-feed.js
-// Recent Mints — prefers pond.js helpers if available; otherwise Reservoir fallback.
-// Uses a global spaced queue to avoid 429s across modules.
+// Renders recent mints as frog cards with a load-more button.
 (function (FF, CFG) {
-  const UL_ID = 'recentMints';
+  const ROOT_ID = 'recentMints';
+  const MORE_ID = 'recentMintsMore';
+  const STATUS_ID = 'recentMintsStatus';
+  const REFRESH_ID = 'recentMintsRefresh';
 
-  // ---- Config
-  const BASE  = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
-  const API   = BASE + '/collections/activity/v6';
-  const PAGE_SIZE = Math.max(1, Math.min(50, Number(CFG.PAGE_SIZE || 5)));
-  const MAX_PAGES = Math.max(1, Number(CFG.MAX_PAGES || 8));
-  const CHAIN_ID  = Number(CFG.CHAIN_ID || 1);
+  const PAGE_SIZE = Math.max(1, Math.min(36, Number(CFG.PAGE_SIZE || 6)));
+  const MAX_PAGES = Math.max(1, Number(CFG.MAX_PAGES || 6));
+  const CHAIN_ID = Number(CFG.CHAIN_ID || 1);
 
-  // ---- Headers
-  function apiHeaders(){
-    if (FF.apiHeaders && typeof FF.apiHeaders === 'function') return FF.apiHeaders();
-    return { accept: 'application/json', 'x-api-key': CFG.FROG_API_KEY };
-  }
-
-  // ---- Global queue (shared with stakes)
-  (function ensureQueue(){
-    if (window.FF_RES_QUEUE) return;
-    const RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 800);
-    const BACKOFFS = Array.isArray(CFG.RETRY_BACKOFF_MS) ? CFG.RETRY_BACKOFF_MS : [900, 1700, 3200];
-    let lastAt = 0, chain = Promise.resolve();
-
-    const sleep = (ms)=> new Promise(r=>setTimeout(r, ms));
-    async function spacedFetch(url, init){
-      const delta = Date.now() - lastAt;
-      if (delta < RATE_MIN_MS) await sleep(RATE_MIN_MS - delta);
-      lastAt = Date.now();
-      return fetch(url, init);
-    }
-    async function run(url, init){
-      const hdrs = Object.assign({}, apiHeaders(), init && init.headers || {});
-      let i = 0;
-      while (true){
-        const res = await spacedFetch(url, { headers: hdrs });
-        if (res.status === 429){ await sleep(BACKOFFS[Math.min(i++, BACKOFFS.length-1)]); continue; }
-        if (!res.ok){ const t = await res.text().catch(()=> ''); const e = new Error(`HTTP ${res.status}${t?' — '+t:''}`); e.url=url; throw e; }
-        return res.json();
-      }
-    }
-    window.FF_RES_QUEUE = { fetch(url, init){ chain = chain.then(()=> run(url, init)); return chain; } };
-  })();
-
-  // ---- Utils
   const shorten = (a)=> (FF.shorten && FF.shorten(a)) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
-  const ago     = (d)=> d ? (FF.formatAgo ? FF.formatAgo(Date.now()-d.getTime())+' ago' : d.toLocaleString()) : '';
-  const imgFor  = (id)=> (CFG.SOURCE_PATH || '') + '/frog/' + id + '.png';
+  const ago = (d)=> d ? (FF.formatAgo ? FF.formatAgo(Date.now()-d.getTime())+' ago' : d.toLocaleString()) : '';
+  const imgFor = (id)=> (CFG.SOURCE_PATH || '') + '/frog/' + id + '.png';
+  const metaFor = (id)=> (CFG.SOURCE_PATH || '') + '/frog/json/' + id + '.json';
+
+  const root = document.getElementById(ROOT_ID);
+  const moreWrap = document.getElementById(MORE_ID);
+  const moreBtn = moreWrap ? moreWrap.querySelector('button') : null;
+  const statusEl = document.getElementById(STATUS_ID);
+  const refreshBtn = document.getElementById(REFRESH_ID);
+
+  if (!root) return;
 
   function txUrl(hash){
     if (!hash) return null;
@@ -60,7 +34,6 @@
     return base + hash;
   }
 
-  // ---- pond adapters (try first)
   async function pondFetchMints({ collection, limit, continuation }){
     if (!FF.pond) return null;
     const fns = [
@@ -77,31 +50,36 @@
     return null;
   }
 
-  function ul(){ return document.getElementById(UL_ID); }
-  function applyVisibleRows(root){
-    if (!root) return;
-    root.classList.add('scrolling'); root.style.overflowY='auto';
-    const visible = Number(root.getAttribute('data-visible')) || Number(CFG.MINTS_VISIBLE || 6);
-    const r0 = root.querySelector('.row'); if (!r0){ root.style.maxHeight=''; return; }
-    const gap = parseFloat(getComputedStyle(root).gap || '0') || 0;
-    const h = r0.getBoundingClientRect().height || 84;
-    root.style.maxHeight = Math.round(h*visible + gap*(visible-1))+'px';
-  }
-
   function mapRow(a){
-    const tokenId = Number(a?.token?.tokenId);
-    if (!isFinite(tokenId)) return null;
-    const from = (a?.fromAddress || '').toLowerCase();
+    let tokenId = null;
+    let from = '';
+    let to = '';
+    let ts = null;
+    let tx = null;
+
+    if (a && a.token && a.token.tokenId != null){
+      tokenId = Number(a.token.tokenId);
+      from = (a.fromAddress || '').toLowerCase();
+      to   = (a.toAddress   || '').toLowerCase();
+      ts   = a.timestamp ?? a.createdAt;
+      tx   = a.txHash || a.transactionHash || null;
+    } else if (a && typeof a.id !== 'undefined'){
+      tokenId = Number(a.id);
+      from = (a.from || '').toLowerCase();
+      to   = (a.to   || '').toLowerCase();
+      ts   = a.blockTimestamp || null;
+      tx   = a.txHash || null;
+    }
+
+    if (!Number.isFinite(tokenId)) return null;
     const zero = '0x0000000000000000000000000000000000000000';
-    const isMint = String(a?.type||'').toLowerCase()==='mint' || from===zero;
+    const isMint = from === zero || String(a?.type||'').toLowerCase()==='mint';
     if (!isMint) return null;
 
-    const ts = a?.timestamp ?? a?.createdAt;
     let dt = null;
     if (typeof ts === 'number') dt = new Date(ts < 1e12 ? ts*1000 : ts);
-    else if (typeof ts === 'string'){ const p = Date.parse(ts); if (!isNaN(p)) dt = new Date(p); }
-    const tx = a?.txHash || a?.transactionHash || null;
-    return { id: tokenId, to: a?.toAddress || null, time: dt, img: imgFor(tokenId), tx };
+    else if (typeof ts === 'string'){ const p = Date.parse(ts); if (!Number.isNaN(p)) dt = new Date(p); }
+    return { id: tokenId, to: to || null, time: dt, img: imgFor(tokenId), tx };
   }
 
   async function fetchPage(cont){
@@ -110,85 +88,137 @@
       const rows = (pond.activities || pond.rows || []).map(mapRow).filter(Boolean);
       return { rows, continuation: pond.continuation || null };
     }
-    const qs = new URLSearchParams({ collection: CFG.COLLECTION_ADDRESS, limit: String(PAGE_SIZE), types: 'mint' });
-    if (cont) qs.set('continuation', cont);
-    const json = await window.FF_RES_QUEUE.fetch(API + '?' + qs.toString());
-    const rows = (json?.activities || []).map(mapRow).filter(Boolean);
-    return { rows, continuation: json?.continuation || null };
+    if (!window.FF_ALCH) throw new Error('Alchemy helper not loaded');
+    const { transfers, pageKey } = await window.FF_ALCH.getCollectionTransfers({
+      pageKey: cont || undefined,
+      maxCount: PAGE_SIZE * 4,
+      order: 'desc'
+    });
+    const rows = transfers.map(mapRow).filter(Boolean);
+    return { rows, continuation: pageKey || null };
   }
 
-  // ---- Render + infinite scroll
-  let items=[], continuation=null, pageCount=0, loading=false, io=null;
-  function ensureSentinel(root){
-    let s = root.querySelector('li[data-sentinel]');
-    if (!s){ s=document.createElement('li'); s.setAttribute('data-sentinel','true'); s.className='row'; s.style.justifyContent='center'; s.innerHTML='<div class="pg-muted">Loading more…</div>'; root.appendChild(s); }
-    return s;
-  }
-  function setSentinelText(root, t){ const s=root.querySelector('li[data-sentinel]'); if (s) s.innerHTML = '<div class="pg-muted">'+t+'</div>'; }
-  function attachObserver(root){
-    if (io) io.disconnect();
-    const s = ensureSentinel(root);
-    io = new IntersectionObserver(entries=>{
-      const e=entries[0]; if (!e||!e.isIntersecting) return;
-      if (loading || !continuation || pageCount>=MAX_PAGES) return;
-      loadNextPage(root);
-    }, { root, rootMargin:'140px', threshold:0.01 });
-    io.observe(s);
+  function setStatus(text){
+    if (!statusEl) return;
+    statusEl.textContent = text || '';
+    statusEl.style.display = text ? 'block' : 'none';
   }
 
-  function renderAll(root){
-    root.innerHTML='';
-    if (!items.length){
-      root.innerHTML = '<li class="row"><div class="pg-muted">No recent mints yet.</div></li>';
+  function showLoading(v){
+    if (v) {
+      if (statusEl) statusEl.style.display = 'block';
+      setStatus('Loading…');
     } else {
-      items.forEach(it=>{
-        const meta = [ it.to ? '→ '+shorten(it.to) : null, it.time ? ago(it.time) : null ].filter(Boolean).join(' • ');
-        const li = document.createElement('li'); li.className='row';
-        const href = txUrl(it.tx);
-        if (href){ li.title='View transaction on Etherscan'; li.addEventListener('click', ()=> window.open(href,'_blank','noopener')); }
-        else { li.addEventListener('click', ()=> FF.openFrogModal && FF.openFrogModal({ id: it.id })); }
-        li.innerHTML =
-          (FF.thumb64 ? FF.thumb64(it.img, 'Frog '+it.id) : '<img class="thumb64" src="'+it.img+'" alt="'+it.id+'">') +
-          '<div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b>Mint</b> • Frog #'+it.id+
-          '</div><div class="pg-muted">'+meta+(href?' • Etherscan':'')+'</div></div>';
-        root.appendChild(li);
-      });
-      ensureSentinel(root);
-      setSentinelText(root, (!continuation || pageCount>=MAX_PAGES) ? 'End of results' : 'Loading more…');
+      if (statusEl) statusEl.style.display = 'none';
     }
-    requestAnimationFrame(()=> applyVisibleRows(root));
   }
 
-  async function loadFirstPage(root){
-    loading=true;
-    try{
+  let items = [];
+  let continuation = null;
+  let pageCount = 0;
+  let loading = false;
+
+  function renderCards(){
+    root.innerHTML = '';
+    if (!items.length){
+      const empty = document.createElement('div');
+      empty.className = 'pg-muted';
+      empty.textContent = 'No recent mints yet.';
+      root.appendChild(empty);
+      if (moreWrap) moreWrap.style.display = 'none';
+      return;
+    }
+
+    for (const it of items){
+      const card = document.createElement('article');
+      card.className = 'frog-card';
+      const metaParts = [];
+      if (it.to) metaParts.push('Owner ' + shorten(it.to));
+      if (it.time) metaParts.push(ago(it.time));
+      const metaLine = metaParts.join(' • ');
+      const txHref = txUrl(it.tx);
+      const imgHref = imgFor(it.id);
+      const metaHref = metaFor(it.id);
+
+      card.innerHTML = `
+        <img class="thumb" src="${imgHref}" alt="Frog #${it.id}">
+        <h4 class="title">Frog #${it.id} <span class="pill">Minted</span></h4>
+        <div class="meta">${metaLine || 'Mint detected on chain.'}</div>
+        <div class="actions">
+          <button class="btn btn-outline-gray" type="button" data-modal>View details</button>
+          ${txHref ? `<a class="btn btn-outline-gray" href="${txHref}" target="_blank" rel="noopener">Etherscan</a>` : ''}
+          <a class="btn btn-outline-gray" href="${imgHref}" target="_blank" rel="noopener">Image</a>
+          <a class="btn btn-outline-gray" href="${metaHref}" target="_blank" rel="noopener">Metadata</a>
+        </div>
+      `;
+
+      card.querySelector('[data-modal]')?.addEventListener('click', (ev)=>{
+        ev.stopPropagation();
+        if (FF.openFrogModal) FF.openFrogModal({ id: it.id });
+      });
+
+      card.addEventListener('click', (ev)=>{
+        if (ev.target.closest('.actions a, .actions button')) return;
+        if (FF.openFrogModal) FF.openFrogModal({ id: it.id });
+      });
+
+      root.appendChild(card);
+    }
+
+    if (moreWrap){
+      moreWrap.style.display = continuation ? 'block' : 'none';
+      if (moreBtn) moreBtn.disabled = loading;
+    }
+  }
+
+  async function loadFirstPage(){
+    if (loading) return;
+    loading = true;
+    showLoading(true);
+    if (moreBtn) moreBtn.disabled = true;
+    try {
       const first = await fetchPage(null);
       items = first.rows.sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
-      continuation = first.continuation; pageCount=1;
-      renderAll(root);
-      setTimeout(()=> attachObserver(root), 150);
-    }catch(e){
-      console.warn('[mints] failed', e, e.url ? '\nURL: '+e.url : '');
-      root.innerHTML = '<li class="row"><div class="pg-muted">Could not load recent mints.</div></li>';
-    }finally{ loading=false; }
+      continuation = first.continuation;
+      pageCount = 1;
+      renderCards();
+      showLoading(false);
+      if (!items.length) setStatus('No recent mints yet.');
+    } catch (err){
+      console.warn('[mints] failed', err);
+      root.innerHTML = '<div class="pg-muted">Could not load recent mints.</div>';
+      setStatus('');
+    } finally {
+      loading = false;
+      if (moreBtn) moreBtn.disabled = false;
+    }
   }
 
-  async function loadNextPage(root){
-    if (!continuation || loading) return;
-    loading=true;
-    try{
+  async function loadNextPage(){
+    if (!continuation || loading || pageCount >= MAX_PAGES) return;
+    loading = true;
+    if (moreBtn) moreBtn.disabled = true;
+    showLoading(true);
+    try {
       const next = await fetchPage(continuation);
-      continuation = next.continuation; pageCount += 1;
+      continuation = next.continuation;
+      pageCount += 1;
       items = items.concat(next.rows).sort((a,b)=> (b.time?.getTime()||0) - (a.time?.getTime()||0));
-      renderAll(root);
-    }catch(e){
-      console.warn('[mints] next page failed', e);
-      setSentinelText(root, 'Could not load more.');
-    }finally{ loading=false; }
+      renderCards();
+    } catch (err){
+      console.warn('[mints] next page failed', err);
+      setStatus('Could not load more.');
+    } finally {
+      loading = false;
+      showLoading(false);
+      if (moreBtn) moreBtn.disabled = false;
+    }
   }
+
+  refreshBtn?.addEventListener('click', ()=>{ loadFirstPage(); });
+  moreBtn?.addEventListener('click', ()=>{ loadNextPage(); });
 
   window.FF_loadRecentMints = function(){
-    const root = ul(); if (!root) return;
-    loadFirstPage(root);
+    loadFirstPage();
   };
 })(window.FF = window.FF || {}, window.FF_CFG = window.FF_CFG || {});
