@@ -7,50 +7,15 @@
   'use strict';
 
   // --------- REQUIRED CONFIG ----------
-  const BASE  = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
-  const API   = BASE + '/users/activity/v6';
-  const API_KEY    = (CFG.FROG_API_KEY || CFG.RESERVOIR_API_KEY || '').trim();
   const CONTROLLER = (CFG.CONTROLLER_ADDRESS || '').toLowerCase();
   const COLLECTION = (CFG.COLLECTION_ADDRESS || '').trim();
-  if (!API_KEY || !CONTROLLER || !COLLECTION) {
-    console.warn('[stakes] Missing API key / CONTROLLER_ADDRESS / COLLECTION_ADDRESS in config.js');
+  if (!CONTROLLER || !COLLECTION) {
+    console.warn('[stakes] Missing CONTROLLER_ADDRESS / COLLECTION_ADDRESS in config.js');
   }
 
   // --------- TUNING (match mints-feed defaults) ----------
   const PAGE_SIZE = Math.max(1, Math.min(50, Number(CFG.STAKES_PAGE_SIZE || 10)));
   const MAX_PAGES = Math.max(1, Number(CFG.STAKES_MAX_PAGES || 8));
-
-  // --------- Headers (share with mints-feed if present) ----------
-  function apiHeaders(){
-    if (FF.apiHeaders && typeof FF.apiHeaders === 'function') return FF.apiHeaders();
-    return { accept: 'application/json', 'x-api-key': API_KEY };
-  }
-
-  // --------- Shared rate-limited fetch queue (identical to mints) ----------
-  (function ensureQueue(){
-    if (window.FF_RES_QUEUE) return;
-    const RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 800);
-    const BACKOFFS = Array.isArray(CFG.RETRY_BACKOFF_MS) ? CFG.RETRY_BACKOFF_MS : [900, 1700, 3200];
-    let lastAt = 0, chain = Promise.resolve();
-    const sleep = (ms)=> new Promise(r=>setTimeout(r, ms));
-    async function spacedFetch(url, init){
-      const delta = Date.now() - lastAt;
-      if (delta < RATE_MIN_MS) await sleep(RATE_MIN_MS - delta);
-      lastAt = Date.now();
-      return fetch(url, init);
-    }
-    async function run(url, init){
-      const hdrs = Object.assign({}, apiHeaders(), init && init.headers || {});
-      let i = 0;
-      while (true){
-        const res = await spacedFetch(url, { headers: hdrs });
-        if (res.status === 429){ await sleep(BACKOFFS[Math.min(i++, BACKOFFS.length-1)]); continue; }
-        if (!res.ok){ const t = await res.text().catch(()=> ''); const e = new Error(`HTTP ${res.status}${t?' — '+t:''}`); e.url=url; throw e; }
-        return res.json();
-      }
-    }
-    window.FF_RES_QUEUE = { fetch(url, init){ chain = chain.then(()=> run(url, init)); return chain; } };
-  })();
 
   // --------- Small utils (identical outputs to mints-feed) ----------
   const shorten = (a)=> (FF.shorten && FF.shorten(a)) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
@@ -89,42 +54,42 @@
   function setSentinelText(ul, t){ const s=ul.querySelector('li[data-sentinel]'); if (s) s.innerHTML = '<div class="pg-muted">'+t+'</div>'; }
 
   // --------- Map API activity → row model (mirrors mints style) ----------
-  function mapRow(a){
-    const type = a?.event?.kind || a?.type;   // "transfer"
-    if (type !== 'transfer') return null;
-
-    // Robust address extraction
-    const from = (a?.event?.fromAddress || a?.fromAddress || a?.from || '').toLowerCase();
-    const to   = (a?.event?.toAddress   || a?.toAddress   || a?.to   || '').toLowerCase();
-
-    // Classify stake/unstake by controller side; show counterparty like mints feed does
-    let kind=null, other=null;
-    if (to === CONTROLLER){ kind='stake';   other = from; }
-    else if (from === CONTROLLER){ kind='unstake'; other = to; }
+  function mapTransfer(t){
+    if (!t) return null;
+    const from = (t.from || '').toLowerCase();
+    const to   = (t.to   || '').toLowerCase();
+    let kind = null, other = null;
+    if (to === CONTROLLER){ kind = 'stake'; other = from; }
+    else if (from === CONTROLLER){ kind = 'unstake'; other = to; }
     else return null;
 
-    const tokenId = Number(a?.token?.tokenId ?? a?.tokenId);
-    const ts = a?.timestamp ?? a?.createdAt;
+    const tokenId = Number(t.id);
+    if (!Number.isFinite(tokenId)) return null;
+
+    const ts = t.blockTimestamp;
     let dt = null;
     if (typeof ts === 'number') dt = new Date(ts < 1e12 ? ts*1000 : ts);
-    else if (typeof ts === 'string'){ const p = Date.parse(ts); if (!isNaN(p)) dt = new Date(p); }
-    const tx = a?.txHash || a?.transactionHash || null;
+    else if (typeof ts === 'string'){ const parsed = Date.parse(ts); if (!Number.isNaN(parsed)) dt = new Date(parsed); }
 
-    return { id: tokenId, other, time: dt, img: imgFor(tokenId), tx, kind };
+    return {
+      id: tokenId,
+      other,
+      time: dt,
+      img: imgFor(tokenId),
+      tx: t.txHash || null,
+      kind
+    };
   }
 
-  // --------- Fetch a page (users + collection + transfer) ----------
   async function fetchPage(continuation){
-    const qs = new URLSearchParams({
-      users: CONTROLLER,
-      collection: COLLECTION,
-      types: 'transfer',
-      limit: String(PAGE_SIZE)
+    if (!window.FF_ALCH){ throw new Error('Alchemy helper not loaded'); }
+    const { transfers, pageKey } = await window.FF_ALCH.getCollectionTransfers({
+      pageKey: continuation || undefined,
+      maxCount: PAGE_SIZE * 4,
+      order: 'desc'
     });
-    if (continuation) qs.set('continuation', continuation);
-    const json = await window.FF_RES_QUEUE.fetch(API + '?' + qs.toString());
-    const rows = (json?.activities || []).map(mapRow).filter(Boolean);
-    return { rows, continuation: json?.continuation || null };
+    const rows = transfers.map(mapTransfer).filter(Boolean);
+    return { rows, continuation: pageKey || null };
   }
 
   // --------- Render (EXACT mints-card layout) ----------
