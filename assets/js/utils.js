@@ -22,10 +22,29 @@
     return r.json();
   };
 
+  FF.apiHeaders = ()=>{
+    const CFG = window.FF_CFG || {};
+    const key = (CFG.ALCHEMY_API_KEY || CFG.FROG_API_KEY || '').trim();
+    // Alchemy encodes API keys in the request path, so headers are informational only.
+    const headers = { accept: 'application/json' };
+    if (key) headers['x-api-key'] = key;
+    return headers;
+  };
+
   // ---- Rarity loader (one-time) ----
   let _rarityList = null;
   let _rankMap = null;
   let _rarityPromise = null;
+
+  FF.setRarityData = (arr)=>{
+    if (!Array.isArray(arr)) return;
+    _rarityList = arr;
+    _rankMap = Object.fromEntries(
+      arr.map(x=> [ String(x?.id), Number(x?.ranking ?? x?.rank ?? NaN) ]).filter(([,v])=>!Number.isNaN(v))
+    );
+  };
+
+  FF.getRarityList = ()=> Array.isArray(_rarityList) ? [..._rarityList] : [];
 
   FF.ensureRarity = async ()=>{
     if (_rankMap) return true;
@@ -34,12 +53,7 @@
     _rarityPromise = (async ()=>{
       try{
         const arr = await FF.fetchJSON(CFG.JSON_PATH || 'assets/freshfrogs_rarity_rankings.json');
-        if(Array.isArray(arr)){
-          _rarityList = arr;
-          _rankMap = Object.fromEntries(
-            arr.map(x=>[ String(x.id), Number(x.ranking ?? x.rank ?? NaN) ]).filter(([,v])=>!Number.isNaN(v))
-          );
-        }
+        if(Array.isArray(arr)) FF.setRarityData(arr);
       }catch(e){ console.warn('ensureRarity failed', e); }
     })();
     await _rarityPromise;
