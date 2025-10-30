@@ -58,24 +58,6 @@
 <body>
   <div class="pg-wrap container">
 
-    <section class="pg-card home-topbar" id="homeTopBar">
-      <div class="pg-card-head">
-        <h3>My Frogs (Owned)</h3>
-        <div><button id="homeConnectBtn" class="btn">Connect Wallet</button></div>
-      </div>
-      <div class="oh-wrap">
-        <div class="oh-row oh-mini">
-          <span class="oh-muted">Owned</span> <b id="homeOwnedTop">—</b>
-          <span>•</span><span class="oh-muted">Staked</span> <b id="homeStakedTop">—</b>
-          <span>•</span><span class="oh-muted">Unclaimed Rewards</span> <b id="homeRewardsTop">—</b> <span id="homeRewardSymbol">$FLYZ</span>
-          <span class="oh-spacer"></span>
-          <button class="oh-btn" id="homeApproveBtn">Approve Staking</button>
-          <button class="oh-btn" id="homeClaimBtn">Claim Rewards</button>
-        </div>
-      </div>
-      <div class="pg-muted status" id="homeBarStatus">Connect your wallet to manage frogs.</div>
-    </section>
-
     <section class="frog-hero">
       <h1 class="frog-title">freshfrogs.github.io</h1>
       <div class="frog-strip">
@@ -122,16 +104,56 @@
       </section>
 
       <section class="pg-card home-summary" id="homeSummaryCard">
-        <div class="pg-card-head">
-          <h3>Wallet Overview</h3>
-          <span class="pill" id="homeWalletLabel">Wallet: —</span>
+        <div class="home-summary-head">
+          <div class="pg-card-head">
+            <h3>My Frogs (Owned)</h3>
+            <div class="home-summary-actions">
+              <button id="homeConnectBtn" class="btn">Connect Wallet</button>
+              <button id="homeDisconnectBtn" class="btn btn-outline-gray" disabled>Disconnect</button>
+            </div>
+          </div>
+          <p class="status" id="homeSummaryStatus">Connect your wallet to manage frogs.</p>
         </div>
-        <p class="status" id="homeSummaryStatus">Connect your wallet to view holdings.</p>
-        <ul class="home-stats">
-          <li><span class="label">Owned</span><span class="value" id="homeOwnedCount">—</span></li>
-          <li><span class="label">Staked</span><span class="value" id="homeStakedCount">—</span></li>
-          <li><span class="label">Rewards</span><span class="value"><span id="homeRewardsAmount">—</span> <span class="muted">$FLYZ</span></span></li>
-        </ul>
+
+        <div class="oh-wrap">
+          <div class="oh-row oh-mini" id="homeSummaryRow">
+            <span class="oh-muted">Owned</span> <b id="homeOwnedBadge">—</b>
+            <span>•</span><span class="oh-muted">Staked</span> <b id="homeStakedBadge">—</b>
+            <span>•</span><span class="oh-muted">Unclaimed Rewards</span>
+            <b><span id="homeRewardsBadge">—</span> <span class="muted" id="homeRewardsBadgeSymbol">$FLYZ</span></b>
+            <span class="oh-spacer"></span>
+            <button class="oh-btn" id="homeApproveBtn" type="button">Approve Staking</button>
+            <button class="oh-btn" id="homeClaimBtn" type="button">Claim Rewards</button>
+          </div>
+        </div>
+
+        <dl class="wallet-list">
+          <div class="wallet-row">
+            <dt>Wallet</dt>
+            <dd id="homeWalletAddress">—</dd>
+          </div>
+          <div class="wallet-row">
+            <dt>Total Frogs Owned</dt>
+            <dd id="homeOwnedCount">—</dd>
+          </div>
+          <div class="wallet-row">
+            <dt>Frogs Staked</dt>
+            <dd id="homeStakedCount">—</dd>
+          </div>
+          <div class="wallet-row">
+            <dt>FLYZ Balance</dt>
+            <dd id="homeFlyzBalance">—</dd>
+          </div>
+          <div class="wallet-row">
+            <dt>Rewards Available</dt>
+            <dd id="homeRewardsAvailable">—</dd>
+          </div>
+          <div class="wallet-row">
+            <dt>Unclaimed Rewards</dt>
+            <dd><span id="homeRewardsAmount">—</span> <span class="muted" id="homeRewardsSymbol">$FLYZ</span></dd>
+          </div>
+        </dl>
+
         <p class="home-note" id="homeSummaryNote">Stats refresh automatically after actions.</p>
       </section>
     </div>

@@ -6,7 +6,7 @@
   const CFG = window.FF_CFG = window.FF_CFG || {};
   const API_KEY = String(CFG.ALCHEMY_API_KEY || CFG.FROG_API_KEY || '').trim();
   const NETWORK = String(CFG.ALCHEMY_NETWORK || 'eth-mainnet');
-  const VERSION = String(CFG.ALCHEMY_NFT_VERSION || 'v2');
+  const VERSION = String(CFG.ALCHEMY_NFT_VERSION || 'v3');
 
   function assertKey(){
     if (!API_KEY) throw new Error('Missing FF_CFG.ALCHEMY_API_KEY');
@@ -91,7 +91,7 @@
       pageKey: opts.pageKey,
       'contractAddresses[]': CFG.COLLECTION_ADDRESS ? [CFG.COLLECTION_ADDRESS] : undefined
     };
-    const json = await alchemyFetch('/getNFTs', params);
+    const json = await alchemyFetch('/getNFTsForOwner', params);
     const tokens = Array.isArray(json?.ownedNfts) ? json.ownedNfts : [];
     const items = tokens.map(t => ({
       id: hexToId(t?.id?.tokenId),
@@ -122,19 +122,23 @@
 
   async function getCollectionTransfers(opts={}){
     if (!CFG.COLLECTION_ADDRESS) return { transfers: [], pageKey: null };
+    const pageSize = opts.pageSize || opts.maxCount;
     const params = {
+      contractAddress: CFG.COLLECTION_ADDRESS,
       order: opts.order || 'desc',
-      maxCount: opts.maxCount ? String(opts.maxCount) : undefined,
+      pageSize: pageSize ? String(pageSize) : undefined,
       pageKey: opts.pageKey,
       withMetadata: false,
-      excludeZeroValue: true,
-      category: ['erc721'],
-      'contractAddresses[]': [CFG.COLLECTION_ADDRESS],
+      excludeZeroValue: opts.excludeZeroValue ?? false,
       toAddress: opts.toAddress,
       fromAddress: opts.fromAddress,
-      fromBlock: opts.fromBlock
+      fromBlock: opts.fromBlock,
+      toBlock: opts.toBlock
     };
-    const json = await alchemyFetch('/getNFTTransfers', params);
+    if (opts.category){
+      params.category = Array.isArray(opts.category) ? opts.category.join(',') : opts.category;
+    }
+    const json = await alchemyFetch('/getTransfersByContract', params);
     const transfers = Array.isArray(json?.transfers) ? json.transfers : [];
     const items = transfers.map(t => ({
       id: hexToId(t?.tokenId),
@@ -154,19 +158,22 @@
     if (!CFG.COLLECTION_ADDRESS) return { transfers: [], pageKey: null };
     const hexId = idToHex(tokenId);
     if (!hexId) return { transfers: [], pageKey: null };
+    const pageSize = opts.pageSize || opts.maxCount;
     const params = {
+      contractAddress: CFG.COLLECTION_ADDRESS,
+      tokenId: hexId,
       order: opts.order || 'desc',
-      maxCount: opts.maxCount ? String(opts.maxCount) : undefined,
+      pageSize: pageSize ? String(pageSize) : undefined,
       pageKey: opts.pageKey,
       withMetadata: false,
-      excludeZeroValue: true,
-      category: ['erc721'],
-      tokenId: hexId,
-      'contractAddresses[]': [CFG.COLLECTION_ADDRESS],
+      excludeZeroValue: opts.excludeZeroValue ?? false,
       toAddress: opts.toAddress,
       fromAddress: opts.fromAddress
     };
-    const json = await alchemyFetch('/getNFTTransfers', params);
+    if (opts.category){
+      params.category = Array.isArray(opts.category) ? opts.category.join(',') : opts.category;
+    }
+    const json = await alchemyFetch('/getTransfersByToken', params);
     const transfers = Array.isArray(json?.transfers) ? json.transfers : [];
     const items = transfers.map(t => ({
       id: hexToId(t?.tokenId),
