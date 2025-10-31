@@ -199,6 +199,7 @@ body {
 .frog-card img.thumb {
     width: 128px;
     height: 128px;
+    aspect-ratio: 1 / 1;
     border-radius: 12px;
     border: 1px solid black;
     background: rgba(0, 0, 0, 0.3);
@@ -296,13 +297,13 @@ body {
     }
 
     .frog-card {
-        grid-template-columns: 112px 1fr;
+        grid-template-columns: 128px 1fr;
         padding: 10px;
     }
 
     .frog-card img.thumb {
-        width: 112px;
-        height: 112px;
+        width: 128px;
+        height: 128px;
     }
 
     .frog-card .title {
@@ -332,8 +333,8 @@ body {
 
     .frog-card img.thumb {
         grid-row: auto;
-        width: 140px;
-        height: 140px;
+        width: 128px;
+        height: 128px;
         justify-self: center;
     }
 
