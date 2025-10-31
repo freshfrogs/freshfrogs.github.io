@@ -263,6 +263,24 @@ function parseAlchemyPrice(priceObject) {
     return { eth: eth || 0, usd: usd || 0 };
 }
 
+function formatEthDisplay(value) {
+    const numeric = Number(value);
+    if (!numeric || Number.isNaN(numeric)) { return '0Ξ'; }
+    const formatted = numeric >= 1 ? numeric.toFixed(2) : numeric.toFixed(3);
+    return `${formatted.replace(/\.0+$/, '').replace(/(\.\d*?)0+$/, '$1')}Ξ`;
+}
+
+function formatUsdDisplay(value) {
+    const numeric = Number(value);
+    if (Number.isNaN(numeric) || numeric <= 0) { return ''; }
+    return `$${numeric.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+function formatTxnHash(hash) {
+    if (!hash) { return '--'; }
+    return `${hash.substring(0, 6)}…${hash.substring(hash.length - 4)}`;
+}
+
 function normalizeAlchemySale(sale) {
     const { eth, usd } = parseAlchemyPrice(sale.salePrice);
     const normalizedTimestamp = sale.blockTimestamp ? Math.floor(new Date(sale.blockTimestamp).getTime() / 1000) : Math.floor(Date.now() / 1000);
@@ -373,58 +391,53 @@ function findRankingById(id) {
 
 */
 async function render_token_sales(contract, sales) {
-    sales.forEach(async (token) => {
+    for (const token of sales) {
 
         var { createdAt, timestamp, from, to, token: { tokenId }, price: { amount: { decimal, usd } }, txHash } = token
         var sale_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
 
+        let saleOrMint, txn_string, receiverLabel;
         if (from !== '0x0000000000000000000000000000000000000000') {
-            saleOrMint = 'Last Sale'
-            txn_string = 'sale'; from = truncateAddress(from)
-            net_income_usd = net_income_usd + (Number(usd))*0.025
+            saleOrMint = 'Last Sale';
+            txn_string = 'sale'; from = truncateAddress(from) || '--';
+            net_income_usd = net_income_usd + (Number(usd))*0.025;
             sales_volume_eth = sales_volume_eth + Number(decimal);
             sales_volume_usd = sales_volume_usd + Number(usd);
-            receiver = 'Owner'
+            receiverLabel = 'Buyer';
         } else {
-            saleOrMint = 'Birthday'
+            saleOrMint = 'Minted';
             txn_string = 'mint'; from = 'FreshFrogsNFT';
-            net_income_usd = net_income_usd + Number(usd)
+            net_income_usd = net_income_usd + Number(usd);
             mint_volume_eth = mint_volume_eth + Number(decimal);
             mint_volume_usd = mint_volume_usd + Number(usd);
-            receiver = 'Creator'
+            receiverLabel = 'Collector';
         }
 
-        //if (txn_string == 'sale') {
+        const formattedEth = formatEthDisplay(decimal);
+        const formattedUsd = formatUsdDisplay(usd);
+        const metaSegments = [
+            `<span class="recent-sale-tag">${saleOrMint}</span>`,
+            `<span>${sale_date}</span>`,
+            `<span class="recent-sale-price">${formattedEth}</span>`
+        ];
+        if (formattedUsd) { metaSegments.push(`<span class="recent-sale-usd">${formattedUsd}</span>`); }
 
-        
-            var html_elements = 
-                
-                '<div class="infobox_left">'+
-                    '<text class="card_text">'+receiver+'</text>'+'<br>'+
-                    '<text class="card_bold">'+truncateAddress(to)+'</text>'+
-                '</div>'+
-                '<div class="infobox_right">'+
-                    '<text class="card_text">Last Sale</text>'+'<br>'+
-                    '<text id="frog_type" class="card_bold">'+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
-                '</div>'+
-                '<br>'+
-                '<div class="infobox_left">'+
-                    '<text class="card_text">Frog Type</text>'+'<br>'+
-                    '<text class="card_bold" id="'+tokenId+'_frogType"></text>'+
-                '</div>'+
-                '<div class="infobox_right">'+
-                    '<text class="card_text">Rarity</text>'+'<br>'+
-                    '<text id="rarityRanking_'+tokenId+'" class="card_bold">--</text>'+
-                '</div>'+
-                '<div id="buttonsPanel_'+tokenId+'" class="card_buttonbox">'+
-                    '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
-                    '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
-                '</div>';
+        const buyerDisplay = truncateAddress(to) || '--';
+        const saleCardData = {
+            meta: metaSegments.join(' · '),
+            sellerLabel: saleOrMint === 'Minted' ? 'Creator' : 'Seller',
+            sellerValue: from,
+            buyerLabel: receiverLabel,
+            buyerValue: buyerDisplay,
+            txnDisplay: formatTxnHash(txHash),
+            actionsHtml:
+                `<a href="https://opensea.io/assets/ethereum/${COLLECTION_ADDRESS}/${tokenId}" target="_blank" rel="noopener"><button class="opensea_button">Opensea</button></a>`+
+                `<a href="https://etherscan.io/nft/${COLLECTION_ADDRESS}/${tokenId}" target="_blank" rel="noopener"><button class="etherscan_button">Etherscan</button></a>`+
+                (txHash ? `<a href="https://etherscan.io/tx/${txHash}" target="_blank" rel="noopener"><button class="etherscan_button">Txn</button></a>` : '')
+        };
 
-            await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash);
-
-        //}
-    })
+        await build_token(saleCardData, tokenId, tokenId+':'+createdAt, txn_string, txHash, undefined, 'recent-sale');
+    }
 
 }
 
@@ -896,14 +909,15 @@ async function metamorph_build(token_a, token_b, location) {
     Render NFT token by layered attirubtes obtained through metadata.
 
 */
-async function build_token(html_elements, token_id, element_id, txn, txn_hash, location) {
+async function build_token(html_elements, token_id, element_id, txn, txn_hash, location, template) {
     if (! element_id) { var element_id = 'Frog #'+token_id }
     if (! location) { location = 'frogs'; }
+    if (! template) { template = 'default'; }
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
 
     // <-- Begin Element
     var token_doc = document.getElementById(location);
-    var token_element = document.createElement('div');
+    var token_element = document.createElement(template === 'recent-sale' ? 'article' : 'div');
 
     var staked_title = '';
     if (staked_ids.includes(token_id)) {
@@ -912,20 +926,58 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
 
     // Element Details -->
     token_element.id = element_id;
-    token_element.className = 'index-card';
-    token_element.innerHTML = 
+    if (template === 'recent-sale') {
+        const safeElementId = String(element_id).replace(/[^a-zA-Z0-9_-]/g, '_');
+        const attributesContainerId = 'recent-sale-attributes-'+safeElementId;
+        token_element.className = 'recent-sale-card';
+        token_element.innerHTML =
+            '<div class="recent-sale-thumb-wrapper">'+
+                '<div id="index-card-img-cont-'+token_id+'" class="recent-sale-thumb" style="background-image: url('+image_link+');"></div>'+
+            '</div>'+
+            '<div class="recent-sale-body">'+
+                '<div class="recent-sale-header">'+
+                    '<h3 class="recent-sale-title">Frog #'+token_id+'</h3>'+ 
+                    '<span class="recent-sale-rank" id="rarityRanking_'+token_id+'">#--</span>'+ 
+                '</div>'+ 
+                '<p class="recent-sale-meta">'+html_elements.meta+'</p>'+ 
+                '<div class="recent-sale-details">'+
+                    '<div>'+ 
+                        '<span class="recent-sale-label">'+html_elements.sellerLabel+'</span>'+ 
+                        '<span class="recent-sale-value">'+html_elements.sellerValue+'</span>'+ 
+                    '</div>'+ 
+                    '<div>'+ 
+                        '<span class="recent-sale-label">'+html_elements.buyerLabel+'</span>'+ 
+                        '<span class="recent-sale-value">'+html_elements.buyerValue+'</span>'+ 
+                    '</div>'+ 
+                    '<div>'+ 
+                        '<span class="recent-sale-label">Frog Type</span>'+ 
+                        '<span class="recent-sale-value" id="'+token_id+'_frogType">--</span>'+ 
+                    '</div>'+ 
+                    '<div>'+ 
+                        '<span class="recent-sale-label">Txn</span>'+ 
+                        '<span class="recent-sale-value recent-sale-value--mono">'+html_elements.txnDisplay+'</span>'+ 
+                    '</div>'+ 
+                '</div>'+ 
+                '<div class="recent-sale-attributes" id="'+attributesContainerId+'"></div>'+ 
+                '<div id="buttonsPanel_'+token_id+'" class="recent-sale-actions">'+html_elements.actionsHtml+'</div>'+ 
+            '</div>';
+        token_element.dataset.recentSaleAttributesId = attributesContainerId;
+    } else {
+        token_element.className = 'index-card';
+        token_element.innerHTML =
 
-        //'<img src="https://freshfrogs.github.io/frog/'+token_id+'.png" alt="Example Image">'+
-        '<div id="index-card-img-cont-'+token_id+'" class="index-card-img-cont" style="background-image: url(../frog/'+token_id+'.png);";></div>'+
-        '<div class="index-card-text">'+
-            '<div id="traits_'+element_id+'" class="trait_list">'+
-                //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
-                '<strong style="color: white;"><u>Frog #'+token_id+'</strong></u>'+'<text style="color: lightcoral; font-weight: bold; padding-left: 10px;">'+staked_title+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
-            '</div>'+
-            '<div id="prop_'+element_id+'" class="properties">'+
-                html_elements+
-            '</div>'+
-        '</div>';
+            //'<img src="https://freshfrogs.github.io/frog/'+token_id+'.png" alt="Example Image">'+
+            '<div id="index-card-img-cont-'+token_id+'" class="index-card-img-cont" style="background-image: url(../frog/'+token_id+'.png);";></div>'+
+            '<div class="index-card-text">'+
+                '<div id="traits_'+element_id+'" class="trait_list">'+
+                    //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
+                    '<strong style="color: white;"><u>Frog #'+token_id+'</strong></u>'+'<text style="color: lightcoral; font-weight: bold; padding-left: 10px;">'+staked_title+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+                '</div>'+
+                '<div id="prop_'+element_id+'" class="properties">'+
+                    html_elements+
+                '</div>'+
+            '</div>';
+    }
         
         /*
         '<div class="display_token_cont">'+
@@ -949,6 +1001,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     //if (staked_ids.includes(token_id)) {}
     
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
+    const saleAttributes = [];
     for (let i = 0; i < metadata.attributes.length; i++) {
         var attribute = metadata.attributes[i].value;
         var trait_type = metadata.attributes[i].trait_type;
@@ -956,6 +1009,24 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
             document.getElementById(token_id+'_frogType').innerHTML = attribute;
         }
         build_trait(trait_type, attribute, 'index-card-img-cont-'+token_id);
+        if (template === 'recent-sale' && trait_type !== 'Frog' && trait_type !== 'SpecialFrog' && trait_type !== 'Trait') {
+            saleAttributes.push({ trait: trait_type, value: attribute });
+        }
+    }
+
+    if (template === 'recent-sale') {
+        const attributesContainerId = token_element.dataset.recentSaleAttributesId;
+        if (attributesContainerId) {
+            const container = document.getElementById(attributesContainerId);
+            if (container) {
+                saleAttributes.slice(0, 3).forEach(({ trait, value }) => {
+                    const row = document.createElement('div');
+                    row.className = 'recent-sale-attribute';
+                    row.innerHTML = '<span class="recent-sale-label">'+trait+'</span><span class="recent-sale-value">'+value+'</span>';
+                    container.appendChild(row);
+                });
+            }
+        }
     }
     
 
