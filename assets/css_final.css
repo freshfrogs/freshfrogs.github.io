@@ -362,6 +362,11 @@ body {
 .bottom-section p {
     font-size: 1.1em;
     color: white;
+    background: #2f4f4f;
+    padding: 8px;
+    border: 1px solid black;
+    border-radius: 5PX;
+    box-shadow: 2px 2px #417871;
 }
 
 /* Responsive styling for smaller screens */
