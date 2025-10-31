@@ -264,6 +264,38 @@ function parseAlchemyPrice(priceObject) {
     const openSeaPrice = priceObject.openSea || {};
     const priceValue = priceObject.price || {};
 
+    function addDirectCandidates(container, decimals, list) {
+        if (container === undefined || container === null) { return; }
+        if (typeof container === 'string' || typeof container === 'number') {
+            const value = container;
+            const numeric = normalizeNumericValue(value);
+            if (Number.isNaN(numeric) || numeric === 0) { return; }
+            if (typeof value === 'string' && value.includes('.')) {
+                list.push({ value: numeric, decimals: 'eth' });
+            } else {
+                list.push({ value: numeric, decimals: decimals !== undefined ? decimals : 18 });
+                if (numeric < 1000000) { // Also treat smaller numbers as already in ETH.
+                    list.push({ value: numeric, decimals: 'eth' });
+                }
+            }
+            return;
+        }
+        if (Array.isArray(container)) {
+            container.forEach((entry) => addDirectCandidates(entry, decimals, list));
+            return;
+        }
+        if (typeof container === 'object') {
+            const objectDecimals = container.decimals !== undefined ? container.decimals : decimals;
+            addDirectCandidates(container.decimal, 'eth', list);
+            addDirectCandidates(container.amount, objectDecimals, list);
+            addDirectCandidates(container.value, objectDecimals, list);
+            addDirectCandidates(container.raw, objectDecimals, list);
+            addDirectCandidates(container.total, objectDecimals, list);
+            addDirectCandidates(container.quantity, objectDecimals, list);
+            addDirectCandidates(container.wei, 18, list);
+        }
+    }
+
     const candidates = [
         { value: amount.decimal, decimals: 'eth' },
         { value: amount.amount, decimals: 'eth' },
@@ -288,6 +320,12 @@ function parseAlchemyPrice(priceObject) {
         { value: openSeaPrice.price, decimals: openSeaPrice.decimals },
         { value: openSeaPrice.value, decimals: openSeaPrice.decimals }
     ];
+
+    addDirectCandidates(amount, amount.decimals, candidates);
+    addDirectCandidates(priceObject, priceObject.decimals, candidates);
+    addDirectCandidates(totalPrice, totalPrice.decimals, candidates);
+    addDirectCandidates(unitPrice, unitPrice.decimals, candidates);
+    addDirectCandidates(nativePrice, nativePrice.decimals, candidates);
 
     let eth = 0;
     for (const { value, decimals } of candidates) {
@@ -319,6 +357,10 @@ function parseAlchemyPrice(priceObject) {
         openSeaPrice.usd,
         openSeaPrice.usdPrice
     ];
+    if (priceObject.usdValue !== undefined) { usdCandidates.push(priceObject.usdValue); }
+    if (totalPrice.usdValue !== undefined) { usdCandidates.push(totalPrice.usdValue); }
+    if (nativePrice.usdValue !== undefined) { usdCandidates.push(nativePrice.usdValue); }
+
     let usd = 0;
     for (const candidate of usdCandidates) {
         const numeric = normalizeNumericValue(candidate);
@@ -329,6 +371,64 @@ function parseAlchemyPrice(priceObject) {
     }
 
     return { eth: eth || 0, usd: usd || 0 };
+}
+
+function parseTimestampInput(input) {
+    if (input === undefined || input === null) { return null; }
+    if (input instanceof Date) { return Math.floor(input.getTime() / 1000); }
+    if (typeof input === 'number') {
+        if (!Number.isFinite(input) || input <= 0) { return null; }
+        return input > 1e12 ? Math.floor(input / 1000) : Math.floor(input);
+    }
+    if (typeof input === 'string') {
+        const trimmed = input.trim();
+        if (!trimmed) { return null; }
+        const numeric = Number(trimmed);
+        if (!Number.isNaN(numeric)) {
+            if (trimmed.includes('.')) {
+                return Math.floor(numeric);
+            }
+            return numeric > 1e12 ? Math.floor(numeric / 1000) : Math.floor(numeric);
+        }
+        const parsed = new Date(trimmed);
+        const ms = parsed.getTime();
+        if (!Number.isNaN(ms)) { return Math.floor(ms / 1000); }
+    }
+    return null;
+}
+
+function resolveSaleTimestamp(sale) {
+    const timestampCandidates = [
+        sale.blockTimestamp,
+        sale.transactionTimestamp,
+        sale.transactionTime,
+        sale.transaction?.timestamp,
+        sale.transaction?.blockTimestamp,
+        sale.marketplace?.timestamp,
+        sale.marketplace?.blockTimestamp,
+        sale.metadata?.timestamp,
+        sale.metadata?.blockTimestamp,
+        sale.order?.timestamp,
+        sale.order?.blockTimestamp,
+        sale.createdAt,
+        sale.updatedAt,
+        sale.signedAt,
+        sale.saleTimestamp,
+        sale.eventTimestamp
+    ];
+
+    for (const candidate of timestampCandidates) {
+        const seconds = parseTimestampInput(candidate);
+        if (seconds) {
+            const iso = (typeof candidate === 'string' && !/^\d+$/.test(candidate.trim()))
+                ? candidate
+                : new Date(seconds * 1000).toISOString();
+            return { seconds, iso };
+        }
+    }
+
+    const fallback = Math.floor(Date.now() / 1000);
+    return { seconds: fallback, iso: new Date(fallback * 1000).toISOString() };
 }
 
 function formatEthDisplay(value) {
@@ -351,10 +451,10 @@ function formatTxnHash(hash) {
 
 function normalizeAlchemySale(sale) {
     const { eth, usd } = parseAlchemyPrice(sale.salePrice);
-    const normalizedTimestamp = sale.blockTimestamp ? Math.floor(new Date(sale.blockTimestamp).getTime() / 1000) : Math.floor(Date.now() / 1000);
+    const { seconds, iso } = resolveSaleTimestamp(sale);
     return {
-        createdAt: sale.blockTimestamp || '',
-        timestamp: normalizedTimestamp,
+        createdAt: iso,
+        timestamp: seconds,
         from: sale.sellerAddress || '',
         to: sale.buyerAddress || '',
         token: { tokenId: hexToDecimal(sale.tokenId) },
@@ -365,10 +465,10 @@ function normalizeAlchemySale(sale) {
 
 function normalizeAlchemyMint(sale) {
     const { eth, usd } = parseAlchemyPrice(sale.salePrice);
-    const normalizedTimestamp = sale.blockTimestamp ? Math.floor(new Date(sale.blockTimestamp).getTime() / 1000) : Math.floor(Date.now() / 1000);
+    const { seconds, iso } = resolveSaleTimestamp(sale);
     return {
-        createdAt: sale.blockTimestamp || '',
-        timestamp: normalizedTimestamp,
+        createdAt: iso,
+        timestamp: seconds,
         fromAddress: sale.sellerAddress || '',
         toAddress: sale.buyerAddress || '',
         token: { tokenId: hexToDecimal(sale.tokenId), rarityScore: null },
