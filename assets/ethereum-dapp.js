@@ -463,20 +463,27 @@ async function render_token_sales(contract, sales) {
         const formattedEth = formatEthDisplay(decimal);
         const formattedUsd = formatUsdDisplay(usd);
         const buyerDisplay = truncateAddress(to) || '--';
+        const actionLinks = [
+            `<a class="btn btn-outline-gray" href="https://opensea.io/assets/ethereum/${COLLECTION_ADDRESS}/${tokenId}" target="_blank" rel="noopener">OpenSea</a>`,
+            `<a class="btn btn-outline-gray" href="https://etherscan.io/nft/${COLLECTION_ADDRESS}/${tokenId}" target="_blank" rel="noopener">Etherscan</a>`
+        ];
+        if (txHash) {
+            actionLinks.push(`<a class="btn btn-outline-gray" href="https://etherscan.io/tx/${txHash}" target="_blank" rel="noopener">Txn</a>`);
+        }
+
+        const metaLines = [
+            `${saleOrMint} • ${sale_date}`,
+            formattedUsd ? `${formattedEth} (${formattedUsd})` : formattedEth,
+            `${saleOrMint === 'Minted' ? 'Creator' : 'Seller'}: ${from}`,
+            `${receiverLabel}: ${buyerDisplay}`
+        ];
+        if (txHash) {
+            metaLines.push(`Txn: ${formatTxnHash(txHash)}`);
+        }
+
         const saleCardData = {
-            saleType: saleOrMint,
-            saleDate: sale_date,
-            priceEth: formattedEth,
-            priceUsd: formattedUsd,
-            sellerLabel: saleOrMint === 'Minted' ? 'Creator' : 'Seller',
-            sellerValue: from,
-            buyerLabel: receiverLabel,
-            buyerValue: buyerDisplay,
-            txnDisplay: formatTxnHash(txHash),
-            actionsHtml:
-                `<a href="https://opensea.io/assets/ethereum/${COLLECTION_ADDRESS}/${tokenId}" target="_blank" rel="noopener"><button class="opensea_button">Opensea</button></a>`+
-                `<a href="https://etherscan.io/nft/${COLLECTION_ADDRESS}/${tokenId}" target="_blank" rel="noopener"><button class="etherscan_button">Etherscan</button></a>`+
-                (txHash ? `<a href="https://etherscan.io/tx/${txHash}" target="_blank" rel="noopener"><button class="etherscan_button">Txn</button></a>` : '')
+            metaLines,
+            actionsHtml: actionLinks.join('')
         };
 
         await build_token(saleCardData, tokenId, tokenId+':'+createdAt, txn_string, txHash, undefined, 'recent-sale');
@@ -971,39 +978,17 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     token_element.id = element_id;
     if (template === 'recent-sale') {
         const safeElementId = String(element_id).replace(/[^a-zA-Z0-9_-]/g, '_');
-        const attributesContainerId = 'recent-sale-attributes-'+safeElementId;
-        token_element.className = 'recent-sale-card';
-        const priceLine = 'Sold For <span class="recent-sale-price-value">'+html_elements.priceEth+'</span>'+
-            (html_elements.priceUsd ? '<span class="recent-sale-price-usd">('+html_elements.priceUsd+')</span>' : '');
+        const attributesListId = 'recent-sale-attrs-'+safeElementId;
+        const metaSection = (html_elements.metaLines || []).map(line => '<div>'+line+'</div>').join('');
+        token_element.className = 'frog-card frog-card--sale';
+        token_element.setAttribute('data-token-id', token_id);
         token_element.innerHTML =
-            '<div class="recent-sale-thumb-wrapper">'+
-                '<div id="index-card-img-cont-'+token_id+'" class="recent-sale-thumb" style="background-image: url('+image_link+');"></div>'+
-            '</div>'+
-            '<div class="recent-sale-body">'+
-                '<div class="recent-sale-header">'+
-                    '<h3 class="recent-sale-title">Frog #'+token_id+'</h3>'+
-                    '<p class="recent-sale-meta">'+html_elements.saleType+' · '+html_elements.saleDate+'</p>'+
-                    '<p class="recent-sale-price">'+priceLine+'</p>'+
-                    '<p class="recent-sale-rarity">Rarity Rank: <span id="rarityRanking_'+token_id+'">--</span></p>'+
-                '</div>'+
-                '<div class="recent-sale-details">'+
-                    '<div class="recent-sale-detail">'+
-                        '<span class="recent-sale-label">'+html_elements.sellerLabel+'</span>'+
-                        '<span class="recent-sale-value">'+html_elements.sellerValue+'</span>'+
-                    '</div>'+
-                    '<div class="recent-sale-detail">'+
-                        '<span class="recent-sale-label">'+html_elements.buyerLabel+'</span>'+
-                        '<span class="recent-sale-value">'+html_elements.buyerValue+'</span>'+
-                    '</div>'+
-                    '<div class="recent-sale-detail">'+
-                        '<span class="recent-sale-label">Txn</span>'+
-                        '<span class="recent-sale-value recent-sale-value--mono">'+html_elements.txnDisplay+'</span>'+
-                    '</div>'+
-                '</div>'+
-                '<div class="recent-sale-attributes" id="'+attributesContainerId+'"></div>'+
-                '<div id="buttonsPanel_'+token_id+'" class="recent-sale-actions">'+html_elements.actionsHtml+'</div>'+
-            '</div>';
-        token_element.dataset.recentSaleAttributesId = attributesContainerId;
+            '<img class="thumb" src="'+image_link+'" alt="Frog #'+token_id+'">'+
+            '<h4 class="title">Frog #'+token_id+' <span class="pill">Rank <span id="rarityRanking_'+token_id+'">--</span></span></h4>'+
+            '<div class="meta">'+metaSection+'</div>'+
+            '<ul class="attr-bullets" id="'+attributesListId+'"></ul>'+
+            '<div id="buttonsPanel_'+token_id+'" class="actions">'+html_elements.actionsHtml+'</div>';
+        token_element.dataset.recentSaleAttrsId = attributesListId;
     } else {
         token_element.className = 'index-card';
         token_element.innerHTML =
@@ -1058,20 +1043,18 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     }
 
     if (template === 'recent-sale') {
-        const attributesContainerId = token_element.dataset.recentSaleAttributesId;
-        if (attributesContainerId) {
-            const container = document.getElementById(attributesContainerId);
+        const attributesListId = token_element.dataset.recentSaleAttrsId;
+        if (attributesListId) {
+            const container = document.getElementById(attributesListId);
             if (container) {
                 saleAttributes.forEach(({ trait, value }) => {
-                    const row = document.createElement('div');
-                    row.className = 'recent-sale-attribute';
-                    row.innerHTML = '<span class="recent-sale-label">'+trait+'</span><span class="recent-sale-value">'+value+'</span>';
+                    const row = document.createElement('li');
+                    row.innerHTML = '<b>'+trait+':</b> '+value;
                     container.appendChild(row);
                 });
                 if (frogTypeValue) {
-                    const frogRow = document.createElement('div');
-                    frogRow.className = 'recent-sale-attribute';
-                    frogRow.innerHTML = '<span class="recent-sale-label">Frog Type</span><span class="recent-sale-value">'+frogTypeValue+'</span>';
+                    const frogRow = document.createElement('li');
+                    frogRow.innerHTML = '<b>Frog:</b> '+frogTypeValue;
                     container.appendChild(frogRow);
                 }
             }

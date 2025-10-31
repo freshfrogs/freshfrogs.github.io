@@ -159,17 +159,19 @@ body {
     text-align: left;
 }
 
+
 .recent-sales-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 8px;
-    width: 92%;
-    margin: 10px auto 24px;
+    gap: 12px;
+    width: 95%;
+    margin: 12px auto 24px;
+    justify-items: center;
 }
 
-.recent-sales-grid > .recent-sale-card,
-.recent-sales-grid > .index-card {
+.recent-sales-grid > .frog-card {
     width: 100%;
+    max-width: 180px;
 }
 
 .recent-sales-grid > .connectButton {
@@ -177,199 +179,133 @@ body {
     justify-self: center;
 }
 
-.recent-sale-card {
-    display: grid;
-    grid-template-columns: 64px 1fr;
-    gap: 6px;
-    padding: 8px 9px;
-    background-color: #5f9ea0;
+.frog-card {
     border: 1px solid black;
-    border-radius: 5px;
-    box-shadow: none;
+    background-color: #5f9ea0;
+    border-radius: 6px;
+    padding: 9px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
     color: white;
     font-family: inherit;
-    max-width: 210px;
+    text-align: left;
+    box-shadow: 3px 3px #355c5f;
 }
 
-.recent-sale-thumb-wrapper {
-    width: 64px;
-}
-
-.recent-sale-thumb {
+.frog-card img.thumb {
     width: 100%;
     aspect-ratio: 1 / 1;
-    border-radius: 5px;
+    border-radius: 4px;
     border: 1px solid black;
-    background-size: cover;
-    background-position: center;
-    box-shadow: 2px 2px #417871;
+    background: #13383a;
+    object-fit: cover;
     image-rendering: pixelated;
-    overflow: hidden;
+    box-shadow: 2px 2px #24484a;
 }
 
-.recent-sale-body {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    width: 100%;
-}
-
-.recent-sale-header {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.recent-sale-title {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: inherit;
-    letter-spacing: 0.03em;
+.frog-card .title {
     margin: 0;
+    font-weight: 800;
+    font-size: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
 }
 
-.recent-sale-meta {
-    font-size: 0.6rem;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.85);
-}
-
-.recent-sale-price {
-    font-size: 0.74rem;
+.frog-card .pill {
+    font-size: 10px;
     font-weight: 700;
-    color: #ffe09a;
+    color: #ffeccc;
 }
 
-.recent-sale-price-value {
-    color: inherit;
-}
-
-.recent-sale-price-usd {
-    margin-left: 4px;
-    font-size: 0.6rem;
-    font-weight: 600;
-    color: #dff4ff;
-}
-
-.recent-sale-rarity {
-    font-size: 0.6rem;
-    color: white;
-}
-
-.recent-sale-rarity span {
-    font-weight: 700;
-}
-
-.recent-sale-details {
+.frog-card .meta {
+    font-size: 10px;
+    line-height: 1.3;
     display: flex;
     flex-direction: column;
     gap: 2px;
-    padding: 3px 0;
-    border-top: 1px solid rgba(0, 0, 0, 0.35);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.35);
 }
 
-.recent-sale-detail {
-    display: flex;
-    justify-content: space-between;
-    gap: 4px;
-    align-items: baseline;
+.frog-card .attr-bullets {
+    margin: 2px 0 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 10px;
+    line-height: 1.25;
 }
 
-.recent-sale-label {
-    font-size: 0.55rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.75);
-    flex: 0 0 auto;
+.frog-card .attr-bullets li + li {
+    margin-top: 2px;
 }
 
-.recent-sale-label::after {
-    content: ':';
-    margin-left: 4px;
+.frog-card .attr-bullets b {
+    color: #ffeccc;
 }
 
-.recent-sale-value {
-    font-size: 0.66rem;
-    font-weight: 700;
-    color: white;
-    word-break: break-word;
-    text-align: left;
-    flex: 1 1 auto;
-}
-
-.recent-sale-value--mono {
-    font-family: inherit;
-    font-size: 0.58rem;
-    letter-spacing: 0.02em;
-    opacity: 0.85;
-}
-
-.recent-sale-attributes {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-}
-
-.recent-sale-attributes:not(:empty)::before {
-    content: 'Attributes';
-    font-size: 0.55rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.75);
-    display: block;
-    margin-bottom: 1px;
-}
-
-.recent-sale-attribute {
-    display: flex;
-    justify-content: space-between;
-    gap: 4px;
-    align-items: baseline;
-}
-
-.recent-sale-actions {
+.frog-card .actions {
+    margin-top: 4px;
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
-    margin-top: auto;
+    gap: 6px;
+    justify-content: center;
 }
 
-.recent-sale-actions a {
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 10px;
+    padding: 4px 6px;
+    border-radius: 4px;
     text-decoration: none;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: inherit;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
 }
 
-.recent-sale-actions .etherscan_button,
-.recent-sale-actions .opensea_button {
-    margin: 0;
+.btn-outline-gray {
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background: rgba(0, 0, 0, 0.2);
+    color: #fff;
+    box-shadow: 1px 1px #1f3a3c;
 }
 
-@media (max-width: 768px) {
-    .recent-sale-card {
-        grid-template-columns: 1fr;
-        justify-items: center;
-        text-align: center;
-        max-width: 100%;
+.btn-outline-gray:hover {
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.btn-outline-gray:active {
+    transform: translateY(1px);
+}
+
+@media (max-width: 720px) {
+    .recent-sales-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px;
     }
 
-    .recent-sale-body {
-        align-items: center;
+    .recent-sales-grid > .frog-card {
+        max-width: 160px;
     }
 
-    .recent-sale-details,
-    .recent-sale-attributes {
-        width: 100%;
-        text-align: left;
+    .frog-card {
+        padding: 8px;
+        box-shadow: 2px 2px #2a5052;
     }
 
-    .recent-sale-detail,
-    .recent-sale-attribute {
-        width: 100%;
+    .frog-card .title {
+        font-size: 11px;
     }
 
-    .recent-sale-actions {
-        justify-content: center;
+    .frog-card .meta,
+    .frog-card .attr-bullets {
+        font-size: 9px;
     }
 }
 
