@@ -117,8 +117,28 @@ const SOURCE_PATH = 'https://freshfrogs.github.io'
 const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
-const ALCHEMY_BASE_V2 = 'https://eth-mainnet.g.alchemy.com/nft/v2/'+frog_api;
-const ALCHEMY_BASE_V3 = 'https://eth-mainnet.g.alchemy.com/nft/v3/'+frog_api;
+const ALCHEMY_BASE_V2 = 'https://eth-mainnet.g.alchemy.com/nft/v2';
+const ALCHEMY_BASE_V3 = 'https://eth-mainnet.g.alchemy.com/nft/v3';
+const ALCHEMY_DEFAULT_HEADERS = frog_api ? { 'X-Alchemy-Token': frog_api, 'accept': 'application/json' } : { 'accept': 'application/json' };
+
+async function alchemyRequest(endpoint, { params, version = 'v3', fetchOptions = {} } = {}) {
+    const baseUrl = version === 'v2' ? ALCHEMY_BASE_V2 : ALCHEMY_BASE_V3;
+    const queryString = params ? `?${params.toString()}` : '';
+    const response = await fetch(`${baseUrl}${endpoint}${queryString}`, {
+        ...fetchOptions,
+        headers: {
+            ...ALCHEMY_DEFAULT_HEADERS,
+            ...(fetchOptions.headers || {})
+        }
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Alchemy request failed (${response.status} ${response.statusText}): ${errorText}`);
+    }
+
+    return response.json();
+}
 
 /*
 
@@ -134,16 +154,16 @@ async function fetch_token_sales(contract, limit, next_string) {
         order: 'desc'
     });
     if (next_string) { params.append('pageKey', next_string); }
-    fetch(ALCHEMY_BASE_V3+'/getNFTSales?'+params.toString())
-    .then((data) => data.json())
-    .then((data) => {
+    try {
+        const data = await alchemyRequest('/getNFTSales', { params });
         console.log(data)
         const sales = (data.nftSales || []).map(normalizeAlchemySale);
         render_token_sales(contract, sales);
         if (! data.pageKey) { return }
         else { sales_load_button('sales', contract, limit, data.pageKey); }
-    })
-    .catch(err => console.error(err));
+    } catch (err) {
+        console.error('Failed to fetch token sales', err);
+    }
 }
 
 async function fetch_token_mints(contract, limit, next_string) {
@@ -156,16 +176,16 @@ async function fetch_token_mints(contract, limit, next_string) {
         sellerAddress: ZERO_ADDRESS
     });
     if (next_string) { params.append('pageKey', next_string); }
-    fetch(ALCHEMY_BASE_V3+'/getNFTSales?'+params.toString())
-    .then((data) => data.json())
-    .then((data) => {
+    try {
+        const data = await alchemyRequest('/getNFTSales', { params });
         console.log(data)
         const mints = (data.nftSales || []).map(normalizeAlchemyMint);
         render_token_mints(contract, mints);
         if (! data.pageKey) { return }
         else { sales_load_button('mints', contract, limit, data.pageKey); }
-    })
-    .catch(err => console.error(err));
+    } catch (err) {
+        console.error('Failed to fetch token mints', err);
+    }
 }
 
 function timestampToDate(timestamp) {
@@ -251,9 +271,8 @@ async function fetch_held_tokens(wallet, limit, next_string) {
     });
     params.append('contractAddresses[]', COLLECTION_ADDRESS);
     if (next_string) { params.append('pageKey', next_string); }
-    fetch(ALCHEMY_BASE_V3+'/getNFTsForOwner?'+params.toString())
-    .then((data) => data.json())
-    .then((data) => {
+    try {
+        const data = await alchemyRequest('/getNFTsForOwner', { params });
         console.log(data);
         const formattedTokens = (data.ownedNfts || []).map((token) => ({ token: { tokenId: hexToDecimal(token.id?.tokenId) } }));
         render_held_tokens(wallet, formattedTokens);
@@ -262,8 +281,9 @@ async function fetch_held_tokens(wallet, limit, next_string) {
         }
         if (! data.pageKey) { return }
         else { load_more_button(wallet, limit, data.pageKey); }
-    })
-    .catch(err => console.error(err));
+    } catch (err) {
+        console.error('Failed to fetch held tokens', err);
+    }
 }
 
 /*
@@ -962,16 +982,16 @@ async function gather_staked_ids(wallet, limit, next_string) {
     });
     params.append('contractAddresses[]', COLLECTION_ADDRESS);
     if (next_string) { params.append('pageKey', next_string); }
-    fetch(ALCHEMY_BASE_V3+'/getNFTsForOwner?'+params.toString())
-    .then((data) => data.json())
-    .then((data) => {
+    try {
+        const data = await alchemyRequest('/getNFTsForOwner', { params });
         (data.ownedNfts || []).forEach(async (token) => {
             staked_ids.push(hexToDecimal(token.id?.tokenId));
         })
         if (! data.pageKey) { return }
         else { gather_staked_ids(wallet, limit, data.pageKey); }
-    })
-    .catch(err => console.error(err));
+    } catch (err) {
+        console.error('Failed to gather staked ids', err);
+    }
 }
 
 async function meta_morph_preset() {
@@ -1169,27 +1189,6 @@ async function get_user_invites(wallet_address) {
 }
 
 async function fetch_staking_stats() {
-    try {
-        const params = new URLSearchParams({
-            owner: CONTROLLER_ADDRESS,
-            withMetadata: 'false',
-            pageSize: '1'
-        });
-        params.append('contractAddresses[]', COLLECTION_ADDRESS);
-        fetch(ALCHEMY_BASE_V3+'/getNFTsForOwner?'+params.toString())
-        .then(data => data.json())
-        .then(data => {
-            console.log(data);
-            const tokenCount = data.totalCount !== undefined ? Number(data.totalCount) : (data.ownedNfts ? data.ownedNfts.length : 0);
-            document.getElementById('total_staked_tokens').innerHTML = tokenCount;
-        })
-        .catch(err => console.error(err));
-    } catch (err) {
-        console.error(err);
-    }
-}
-
-async function fetch_staking_stats() {
 
     try {
         const params = new URLSearchParams({
@@ -1198,8 +1197,7 @@ async function fetch_staking_stats() {
             pageSize: '1'
         });
         params.append('contractAddresses[]', COLLECTION_ADDRESS);
-        const response = await fetch(ALCHEMY_BASE_V3+'/getNFTsForOwner?'+params.toString());
-        const data = await response.json();
+        const data = await alchemyRequest('/getNFTsForOwner', { params });
         console.log(data);
         const tokenCount = data.totalCount !== undefined ? Number(data.totalCount) : (data.ownedNfts ? data.ownedNfts.length : 0);
         document.getElementById('total_staked_tokens').innerHTML = tokenCount ? tokenCount : '0';
@@ -1210,8 +1208,8 @@ async function fetch_staking_stats() {
 
 async function fetch_collection_stats(){
     try {
-        const response = await fetch(ALCHEMY_BASE_V2+'/getContractMetadata?contractAddress='+COLLECTION_ADDRESS);
-        const stats = await response.json();
+        const params = new URLSearchParams({ contractAddress: COLLECTION_ADDRESS });
+        const stats = await alchemyRequest('/getContractMetadata', { params, version: 'v2' });
         console.log(stats)
         const metadata = stats.contractMetadata || {};
         const totalSupply = metadata.totalSupply ? Number(metadata.totalSupply) : 0;
