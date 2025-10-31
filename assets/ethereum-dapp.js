@@ -260,18 +260,33 @@ function parseAlchemyPrice(priceObject) {
     const totalPrice = priceObject.totalPrice || priceObject || {};
     const amount = totalPrice.amount || priceObject.amount || {};
     const nativePrice = totalPrice.nativePrice || priceObject.nativePrice || {};
+    const unitPrice = priceObject.unitPrice || totalPrice.unitPrice || {};
+    const openSeaPrice = priceObject.openSea || {};
+    const priceValue = priceObject.price || {};
 
     const candidates = [
         { value: amount.decimal, decimals: 'eth' },
         { value: amount.amount, decimals: 'eth' },
         { value: amount.value, decimals: amount.decimals },
         { value: amount.raw, decimals: amount.decimals },
+        { value: unitPrice.decimal, decimals: 'eth' },
+        { value: unitPrice.amount, decimals: 'eth' },
+        { value: unitPrice.value, decimals: unitPrice.decimals },
+        { value: priceObject.decimal, decimals: 'eth' },
+        { value: priceObject.amount, decimals: 'eth' },
+        { value: priceObject.value, decimals: priceObject.decimals },
+        { value: priceObject.quantity, decimals: priceObject.decimals },
+        { value: priceObject.total, decimals: priceObject.decimals },
+        { value: priceValue.value, decimals: priceValue.decimals },
         { value: nativePrice.eth, decimals: 'eth' },
         { value: totalPrice.eth, decimals: 'eth' },
         { value: nativePrice.value, decimals: nativePrice.decimals },
         { value: totalPrice.value, decimals: totalPrice.decimals },
+        { value: totalPrice.quantity, decimals: totalPrice.decimals },
         { value: totalPrice.wei, decimals: 18 },
-        { value: totalPrice.raw, decimals: totalPrice.decimals }
+        { value: totalPrice.raw, decimals: totalPrice.decimals },
+        { value: openSeaPrice.price, decimals: openSeaPrice.decimals },
+        { value: openSeaPrice.value, decimals: openSeaPrice.decimals }
     ];
 
     let eth = 0;
@@ -296,7 +311,13 @@ function parseAlchemyPrice(priceObject) {
         nativePrice.usd,
         nativePrice.usdPrice,
         priceObject.usd,
-        priceObject.usdPrice
+        priceObject.usdPrice,
+        unitPrice.usd,
+        unitPrice.usdPrice,
+        totalPrice.usdValue,
+        priceValue.usd,
+        openSeaPrice.usd,
+        openSeaPrice.usdPrice
     ];
     let usd = 0;
     for (const candidate of usdCandidates) {
@@ -443,25 +464,24 @@ async function render_token_sales(contract, sales) {
         var { createdAt, timestamp, from, to, token: { tokenId }, price: { amount: { decimal, usd } }, txHash } = token
         var sale_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
 
-        let saleOrMint, txn_string, receiverLabel;
+        let saleOrMint, txn_string;
         if (from !== '0x0000000000000000000000000000000000000000') {
             saleOrMint = 'Last Sale';
             txn_string = 'sale'; from = truncateAddress(from) || '--';
             net_income_usd = net_income_usd + (Number(usd))*0.025;
             sales_volume_eth = sales_volume_eth + Number(decimal);
             sales_volume_usd = sales_volume_usd + Number(usd);
-            receiverLabel = 'Buyer';
         } else {
             saleOrMint = 'Minted';
             txn_string = 'mint'; from = 'FreshFrogsNFT';
             net_income_usd = net_income_usd + Number(usd);
             mint_volume_eth = mint_volume_eth + Number(decimal);
             mint_volume_usd = mint_volume_usd + Number(usd);
-            receiverLabel = 'Collector';
         }
 
         const formattedEth = formatEthDisplay(decimal);
         const formattedUsd = formatUsdDisplay(usd);
+        const numericEth = Number(decimal);
         const buyerDisplay = truncateAddress(to) || '--';
         const actionLinks = [
             `<a class="btn btn-outline-gray" href="https://opensea.io/assets/ethereum/${COLLECTION_ADDRESS}/${tokenId}" target="_blank" rel="noopener">OpenSea</a>`,
@@ -471,25 +491,22 @@ async function render_token_sales(contract, sales) {
             actionLinks.push(`<a class="btn btn-outline-gray" href="https://etherscan.io/tx/${txHash}" target="_blank" rel="noopener">Txn</a>`);
         }
 
-        const metaSegments = [
-            saleOrMint,
-            sale_date,
-            formattedUsd ? `${formattedEth} (${formattedUsd})` : formattedEth
-        ].filter(Boolean);
-        const metaLines = [];
-        if (metaSegments.length) {
-            metaLines.push(metaSegments.join(' • '));
-        }
-        metaLines.push(
-            `${saleOrMint === 'Minted' ? 'Creator' : 'Seller'}: ${from}`,
-            `${receiverLabel}: ${buyerDisplay}`
-        );
-        if (txHash) {
-            metaLines.push(`Txn: ${formatTxnHash(txHash)}`);
-        }
+        const amountLabel = saleOrMint === 'Minted' ? 'Mint Price' : 'Last Sale';
+        const dateLabel = saleOrMint === 'Minted' ? 'Minted on' : 'Sold on';
+        const buyerLabel = saleOrMint === 'Minted' ? 'Collector' : 'Buyer';
+        const hasEthValue = Number.isFinite(numericEth) && numericEth > 0;
+        const hasUsdValue = Boolean(formattedUsd);
+        const priceLine = hasEthValue
+            ? (hasUsdValue ? `${formattedEth} (${formattedUsd})` : formattedEth)
+            : (hasUsdValue ? formattedUsd : '--');
+        const metaLines = [
+            `<div><b>${amountLabel}:</b> ${priceLine}</div>`,
+            `<div><b>${dateLabel}:</b> ${sale_date || '--'}</div>`,
+            `<div><b>${buyerLabel}:</b> ${buyerDisplay}</div>`
+        ];
 
         const saleCardData = {
-            metaHtml: metaLines.map(line => `<div>${line}</div>`).join(''),
+            metaHtml: metaLines.join(''),
             actionsHtml: actionLinks.join('')
         };
 
