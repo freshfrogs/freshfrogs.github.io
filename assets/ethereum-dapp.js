@@ -116,41 +116,111 @@ var animated = [
 const SOURCE_PATH = 'https://freshfrogs.github.io'
 const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
-const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': frog_api}};
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+const ALCHEMY_BASE_V2 = 'https://eth-mainnet.g.alchemy.com/nft/v2';
+const ALCHEMY_BASE_V3 = 'https://eth-mainnet.g.alchemy.com/nft/v3';
+
+function getGlobalContext() {
+    if (typeof globalThis !== 'undefined') { return globalThis; }
+    if (typeof window !== 'undefined') { return window; }
+    return this;
+}
+
+function getAlchemyApiKey() {
+    const ctx = getGlobalContext();
+    if (ctx && ctx.frog_api) {
+        return ctx.frog_api;
+    }
+
+    // Fallback to embedded key to ensure authenticated calls even if the ABI bundle fails to load first.
+    return 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
+}
+
+function buildAlchemyHeaders(existingHeaders) {
+    const apiKey = getAlchemyApiKey();
+    const baseHeaders = { 'accept': 'application/json' };
+    if (apiKey) {
+        baseHeaders['X-Alchemy-Token'] = apiKey;
+    }
+    return {
+        ...baseHeaders,
+        ...(existingHeaders || {})
+    };
+}
+
+function buildAlchemyUrl(version, endpoint, params) {
+    const apiKey = getAlchemyApiKey();
+    if (!apiKey) {
+        throw new Error('Missing Alchemy API key (frog_api) for request');
+    }
+
+    const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const baseUrl = version === 'v2' ? ALCHEMY_BASE_V2 : ALCHEMY_BASE_V3;
+    const queryString = params ? `?${params.toString()}` : '';
+    return `${baseUrl}/${apiKey}${normalizedEndpoint}${queryString}`;
+}
+
+async function alchemyRequest(endpoint, { params, version = 'v3', fetchOptions = {} } = {}) {
+    const url = buildAlchemyUrl(version, endpoint, params);
+    const response = await fetch(url, {
+        ...fetchOptions,
+        headers: buildAlchemyHeaders(fetchOptions.headers)
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Alchemy request failed (${response.status} ${response.statusText}): ${errorText}`);
+    }
+
+    return response.json();
+}
 
 /*
 
-    Fetch NFT token sales (initial & secondary) using Reservoir API. Returns => Object
-    'https://api.reservoir.tools/collections/activity/v6?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&types=mint', options
+    Fetch NFT token sales (initial & secondary) using Alchemy NFT API. Returns => Object
+
 */
 async function fetch_token_sales(contract, limit, next_string) {
     if (! contract) { contract = COLLECTION_ADDRESS; }
     if (! limit) { limit = '50'; }
-    if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
-    fetch('https://api.reservoir.tools/sales/v6?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?sortBy=time&sortDirection=asc&limit='+limit+next+'', options)
-    .then((data) => data.json())
-    .then((data) => {
+    const params = new URLSearchParams({
+        contractAddress: contract,
+        limit: limit,
+        order: 'desc'
+    });
+    if (next_string) { params.append('pageKey', next_string); }
+    try {
+        const data = await alchemyRequest('/getNFTSales', { params });
         console.log(data)
-        render_token_sales(contract, data.sales);
-        if (! data.continuation) { return }
-        else { sales_load_button('sales', contract, limit, data.continuation); }
-    })
-    .catch(err => console.error(err));
+        const sales = (data.nftSales || []).map(normalizeAlchemySale);
+        render_token_sales(contract, sales);
+        if (! data.pageKey) { return }
+        else { sales_load_button('sales', contract, limit, data.pageKey); }
+    } catch (err) {
+        console.error('Failed to fetch token sales', err);
+    }
 }
 
 async function fetch_token_mints(contract, limit, next_string) {
     if (! contract) { contract = COLLECTION_ADDRESS; }
     if (! limit) { limit = '50'; }
-    if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
-    fetch('https://api.reservoir.tools/collections/activity/v6?collection='+contract+'&types=sale'+next, options)
-    .then((data) => data.json())
-    .then((data) => {
+    const params = new URLSearchParams({
+        contractAddress: contract,
+        limit: limit,
+        order: 'desc',
+        sellerAddress: ZERO_ADDRESS
+    });
+    if (next_string) { params.append('pageKey', next_string); }
+    try {
+        const data = await alchemyRequest('/getNFTSales', { params });
         console.log(data)
-        render_token_mints(contract, data.activities);
-        if (! data.continuation) { return }
-        else { sales_load_button('mints', contract, limit, data.continuation); }
-    })
-    .catch(err => console.error(err));
+        const mints = (data.nftSales || []).map(normalizeAlchemyMint);
+        render_token_mints(contract, mints);
+        if (! data.pageKey) { return }
+        else { sales_load_button('mints', contract, limit, data.pageKey); }
+    } catch (err) {
+        console.error('Failed to fetch token mints', err);
+    }
 }
 
 function timestampToDate(timestamp) {
@@ -158,33 +228,162 @@ function timestampToDate(timestamp) {
     const mm = date.getMonth() + 1; // JavaScript months are 0-indexed
     const dd = date.getDate();
     const yy = date.getFullYear().toString().slice(-2);
-  
+
     return `${mm}/${dd}/${yy}`;
   }
 
+function hexToDecimal(hexString) {
+    if (!hexString) { return '0'; }
+    try {
+        const parsed = hexString.startsWith('0x') ? parseInt(hexString, 16) : parseInt(hexString, 10);
+        if (isNaN(parsed)) { return '0'; }
+        return parsed.toString();
+    } catch (e) {
+        console.log(e.message);
+        return '0';
+    }
+}
+
+function normalizeNumericValue(value) {
+    if (value === undefined || value === null) { return NaN; }
+    if (typeof value === 'string' && value.startsWith('0x')) {
+        const parsedHex = parseInt(value, 16);
+        return Number.isNaN(parsedHex) ? NaN : parsedHex;
+    }
+    const numeric = Number(value);
+    return Number.isFinite(numeric) ? numeric : NaN;
+}
+
+function parseAlchemyPrice(priceObject) {
+    if (!priceObject) { return { eth: 0, usd: 0 }; }
+
+    const totalPrice = priceObject.totalPrice || priceObject || {};
+    const amount = totalPrice.amount || priceObject.amount || {};
+    const nativePrice = totalPrice.nativePrice || priceObject.nativePrice || {};
+
+    const candidates = [
+        { value: amount.decimal, decimals: 'eth' },
+        { value: amount.amount, decimals: 'eth' },
+        { value: amount.value, decimals: amount.decimals },
+        { value: amount.raw, decimals: amount.decimals },
+        { value: nativePrice.eth, decimals: 'eth' },
+        { value: totalPrice.eth, decimals: 'eth' },
+        { value: nativePrice.value, decimals: nativePrice.decimals },
+        { value: totalPrice.value, decimals: totalPrice.decimals },
+        { value: totalPrice.wei, decimals: 18 },
+        { value: totalPrice.raw, decimals: totalPrice.decimals }
+    ];
+
+    let eth = 0;
+    for (const { value, decimals } of candidates) {
+        const numeric = normalizeNumericValue(value);
+        if (!Number.isNaN(numeric) && numeric !== 0) {
+            if (decimals === 'eth') {
+                eth = numeric;
+            } else {
+                const safeDecimals = decimals !== undefined ? decimals : 18;
+                eth = numeric / Math.pow(10, safeDecimals);
+            }
+            break;
+        }
+    }
+
+    const usdCandidates = [
+        amount.usd,
+        amount.usdPrice,
+        totalPrice.usd,
+        totalPrice.usdPrice,
+        nativePrice.usd,
+        nativePrice.usdPrice,
+        priceObject.usd,
+        priceObject.usdPrice
+    ];
+    let usd = 0;
+    for (const candidate of usdCandidates) {
+        const numeric = normalizeNumericValue(candidate);
+        if (!Number.isNaN(numeric) && numeric > 0) {
+            usd = numeric;
+            break;
+        }
+    }
+
+    return { eth: eth || 0, usd: usd || 0 };
+}
+
+function formatEthDisplay(value) {
+    const numeric = Number(value);
+    if (!numeric || Number.isNaN(numeric)) { return '0Ξ'; }
+    const formatted = numeric >= 1 ? numeric.toFixed(2) : numeric.toFixed(3);
+    return `${formatted.replace(/\.0+$/, '').replace(/(\.\d*?)0+$/, '$1')}Ξ`;
+}
+
+function formatUsdDisplay(value) {
+    const numeric = Number(value);
+    if (Number.isNaN(numeric) || numeric <= 0) { return ''; }
+    return `$${numeric.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+function formatTxnHash(hash) {
+    if (!hash) { return '--'; }
+    return `${hash.substring(0, 6)}…${hash.substring(hash.length - 4)}`;
+}
+
+function normalizeAlchemySale(sale) {
+    const { eth, usd } = parseAlchemyPrice(sale.salePrice);
+    const normalizedTimestamp = sale.blockTimestamp ? Math.floor(new Date(sale.blockTimestamp).getTime() / 1000) : Math.floor(Date.now() / 1000);
+    return {
+        createdAt: sale.blockTimestamp || '',
+        timestamp: normalizedTimestamp,
+        from: sale.sellerAddress || '',
+        to: sale.buyerAddress || '',
+        token: { tokenId: hexToDecimal(sale.tokenId) },
+        price: { amount: { decimal: eth, usd: usd } },
+        txHash: sale.transactionHash || ''
+    };
+}
+
+function normalizeAlchemyMint(sale) {
+    const { eth, usd } = parseAlchemyPrice(sale.salePrice);
+    const normalizedTimestamp = sale.blockTimestamp ? Math.floor(new Date(sale.blockTimestamp).getTime() / 1000) : Math.floor(Date.now() / 1000);
+    return {
+        createdAt: sale.blockTimestamp || '',
+        timestamp: normalizedTimestamp,
+        fromAddress: sale.sellerAddress || '',
+        toAddress: sale.buyerAddress || '',
+        token: { tokenId: hexToDecimal(sale.tokenId), rarityScore: null },
+        price: { amount: { decimal: eth, usd: usd } },
+        txHash: sale.transactionHash || ''
+    };
+}
+
 /*
 
-    Fetch NFT tokens held by user using Reservoir API. Returns => Object
+    Fetch NFT tokens held by user using Alchemy NFT API. Returns => Object
 
 */
 async function fetch_held_tokens(wallet, limit, next_string) {
     if (! wallet) { wallet = user_address}
     if (! limit) { limit = '50'; }
-    if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
-    //fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v6?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
-    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
-    .then((data) => data.json())
-    .then((data) => {
+    const params = new URLSearchParams({
+        owner: wallet,
+        withMetadata: 'false',
+        pageSize: limit
+    });
+    params.append('contractAddresses[]', COLLECTION_ADDRESS);
+    if (next_string) { params.append('pageKey', next_string); }
+    try {
+        const data = await alchemyRequest('/getNFTsForOwner', { params });
         console.log(data);
-        console.log(data.tokens);
-        render_held_tokens(wallet, data.tokens);
-        if (wallet == CONTROLLER_ADDRESS) {
-            update_staked_tokens(data.tokens)
+        const formattedTokens = (data.ownedNfts || []).map((token) => ({ token: { tokenId: hexToDecimal(token.id?.tokenId) } }));
+        render_held_tokens(wallet, formattedTokens);
+        if (wallet.toLowerCase() == CONTROLLER_ADDRESS.toLowerCase()) {
+            update_staked_tokens(formattedTokens)
         }
-        if (! data.continuation) { return }
-        else { load_more_button(wallet, limit, data.continuation); }
-    })
-    .catch(err => console.error(err));
+        if (! data.pageKey) { return }
+        else { load_more_button(wallet, limit, data.pageKey); }
+    } catch (err) {
+        console.error('Failed to fetch held tokens', err);
+    }
 }
 
 /*
@@ -239,58 +438,63 @@ function findRankingById(id) {
 
 */
 async function render_token_sales(contract, sales) {
-    sales.forEach(async (token) => {
+    for (const token of sales) {
 
         var { createdAt, timestamp, from, to, token: { tokenId }, price: { amount: { decimal, usd } }, txHash } = token
         var sale_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
 
+        let saleOrMint, txn_string, receiverLabel;
         if (from !== '0x0000000000000000000000000000000000000000') {
-            saleOrMint = 'Last Sale'
-            txn_string = 'sale'; from = truncateAddress(from)
-            net_income_usd = net_income_usd + (Number(usd))*0.025
+            saleOrMint = 'Last Sale';
+            txn_string = 'sale'; from = truncateAddress(from) || '--';
+            net_income_usd = net_income_usd + (Number(usd))*0.025;
             sales_volume_eth = sales_volume_eth + Number(decimal);
             sales_volume_usd = sales_volume_usd + Number(usd);
-            receiver = 'Owner'
+            receiverLabel = 'Buyer';
         } else {
-            saleOrMint = 'Birthday'
+            saleOrMint = 'Minted';
             txn_string = 'mint'; from = 'FreshFrogsNFT';
-            net_income_usd = net_income_usd + Number(usd)
+            net_income_usd = net_income_usd + Number(usd);
             mint_volume_eth = mint_volume_eth + Number(decimal);
             mint_volume_usd = mint_volume_usd + Number(usd);
-            receiver = 'Creator'
+            receiverLabel = 'Collector';
         }
 
-        //if (txn_string == 'sale') {
+        const formattedEth = formatEthDisplay(decimal);
+        const formattedUsd = formatUsdDisplay(usd);
+        const buyerDisplay = truncateAddress(to) || '--';
+        const actionLinks = [
+            `<a class="btn btn-outline-gray" href="https://opensea.io/assets/ethereum/${COLLECTION_ADDRESS}/${tokenId}" target="_blank" rel="noopener">OpenSea</a>`,
+            `<a class="btn btn-outline-gray" href="https://etherscan.io/nft/${COLLECTION_ADDRESS}/${tokenId}" target="_blank" rel="noopener">Etherscan</a>`
+        ];
+        if (txHash) {
+            actionLinks.push(`<a class="btn btn-outline-gray" href="https://etherscan.io/tx/${txHash}" target="_blank" rel="noopener">Txn</a>`);
+        }
 
-        
-            var html_elements = 
-                
-                '<div class="infobox_left">'+
-                    '<text class="card_text">'+receiver+'</text>'+'<br>'+
-                    '<text class="card_bold">'+truncateAddress(to)+'</text>'+
-                '</div>'+
-                '<div class="infobox_right">'+
-                    '<text class="card_text">Last Sale</text>'+'<br>'+
-                    '<text id="frog_type" class="card_bold">'+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
-                '</div>'+
-                '<br>'+
-                '<div class="infobox_left">'+
-                    '<text class="card_text">Frog Type</text>'+'<br>'+
-                    '<text class="card_bold" id="'+tokenId+'_frogType"></text>'+
-                '</div>'+
-                '<div class="infobox_right">'+
-                    '<text class="card_text">Rarity</text>'+'<br>'+
-                    '<text id="rarityRanking_'+tokenId+'" class="card_bold">--</text>'+
-                '</div>'+
-                '<div id="buttonsPanel_'+tokenId+'" class="card_buttonbox">'+
-                    '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
-                    '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
-                '</div>';
+        const metaSegments = [
+            saleOrMint,
+            sale_date,
+            formattedUsd ? `${formattedEth} (${formattedUsd})` : formattedEth
+        ].filter(Boolean);
+        const metaLines = [];
+        if (metaSegments.length) {
+            metaLines.push(metaSegments.join(' • '));
+        }
+        metaLines.push(
+            `${saleOrMint === 'Minted' ? 'Creator' : 'Seller'}: ${from}`,
+            `${receiverLabel}: ${buyerDisplay}`
+        );
+        if (txHash) {
+            metaLines.push(`Txn: ${formatTxnHash(txHash)}`);
+        }
 
-            await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash);
+        const saleCardData = {
+            metaHtml: metaLines.map(line => `<div>${line}</div>`).join(''),
+            actionsHtml: actionLinks.join('')
+        };
 
-        //}
-    })
+        await build_token(saleCardData, tokenId, tokenId+':'+createdAt, txn_string, txHash, undefined, 'recent-sale');
+    }
 
 }
 
@@ -762,14 +966,15 @@ async function metamorph_build(token_a, token_b, location) {
     Render NFT token by layered attirubtes obtained through metadata.
 
 */
-async function build_token(html_elements, token_id, element_id, txn, txn_hash, location) {
+async function build_token(html_elements, token_id, element_id, txn, txn_hash, location, template) {
     if (! element_id) { var element_id = 'Frog #'+token_id }
     if (! location) { location = 'frogs'; }
+    if (! template) { template = 'default'; }
     var image_link = SOURCE_PATH+'/frog/'+token_id+'.png'
 
     // <-- Begin Element
     var token_doc = document.getElementById(location);
-    var token_element = document.createElement('div');
+    var token_element = document.createElement(template === 'recent-sale' ? 'article' : 'div');
 
     var staked_title = '';
     if (staked_ids.includes(token_id)) {
@@ -778,20 +983,35 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
 
     // Element Details -->
     token_element.id = element_id;
-    token_element.className = 'index-card';
-    token_element.innerHTML = 
+    if (template === 'recent-sale') {
+        const safeElementId = String(element_id).replace(/[^a-zA-Z0-9_-]/g, '_');
+        const attributesListId = 'recent-sale-attrs-'+safeElementId;
+        const metaSection = html_elements.metaHtml || (html_elements.metaLines || []).map(line => '<div>'+line+'</div>').join('');
+        token_element.className = 'frog-card frog-card--sale';
+        token_element.setAttribute('data-token-id', token_id);
+        token_element.innerHTML =
+            '<img class="thumb" src="'+image_link+'" alt="Frog #'+token_id+'">'+
+            '<h4 class="title">Frog #'+token_id+' <span class="pill">Rank <span id="rarityRanking_'+token_id+'">--</span></span></h4>'+
+            '<div class="meta">'+metaSection+'</div>'+
+            '<ul class="attr-bullets" id="'+attributesListId+'"></ul>'+
+            '<div id="buttonsPanel_'+token_id+'" class="actions">'+html_elements.actionsHtml+'</div>';
+        token_element.dataset.recentSaleAttrsId = attributesListId;
+    } else {
+        token_element.className = 'index-card';
+        token_element.innerHTML =
 
-        //'<img src="https://freshfrogs.github.io/frog/'+token_id+'.png" alt="Example Image">'+
-        '<div id="index-card-img-cont-'+token_id+'" class="index-card-img-cont" style="background-image: url(../frog/'+token_id+'.png);";></div>'+
-        '<div class="index-card-text">'+
-            '<div id="traits_'+element_id+'" class="trait_list">'+
-                //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
-                '<strong style="color: white;"><u>Frog #'+token_id+'</strong></u>'+'<text style="color: lightcoral; font-weight: bold; padding-left: 10px;">'+staked_title+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
-            '</div>'+
-            '<div id="prop_'+element_id+'" class="properties">'+
-                html_elements+
-            '</div>'+
-        '</div>';
+            //'<img src="https://freshfrogs.github.io/frog/'+token_id+'.png" alt="Example Image">'+
+            '<div id="index-card-img-cont-'+token_id+'" class="index-card-img-cont" style="background-image: url(../frog/'+token_id+'.png);";></div>'+
+            '<div class="index-card-text">'+
+                '<div id="traits_'+element_id+'" class="trait_list">'+
+                    //'<b>'+name+'</b>'+'<text style="color: #1ac486; float: right;">'+opensea_username+'</text>'+
+                    '<strong style="color: white;"><u>Frog #'+token_id+'</strong></u>'+'<text style="color: lightcoral; font-weight: bold; padding-left: 10px;">'+staked_title+'</text>'+//'<text style="color: #1ac486; float: right;">'+rarity_rank+'%</text>'+
+                '</div>'+
+                '<div id="prop_'+element_id+'" class="properties">'+
+                    html_elements+
+                '</div>'+
+            '</div>';
+    }
         
         /*
         '<div class="display_token_cont">'+
@@ -815,13 +1035,37 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     //if (staked_ids.includes(token_id)) {}
     
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
+    const saleAttributes = [];
+    let frogTypeValue = '';
     for (let i = 0; i < metadata.attributes.length; i++) {
         var attribute = metadata.attributes[i].value;
         var trait_type = metadata.attributes[i].trait_type;
         if(trait_type == "Frog" || trait_type == "SpecialFrog"){
-            document.getElementById(token_id+'_frogType').innerHTML = attribute;
+            frogTypeValue = attribute;
         }
         build_trait(trait_type, attribute, 'index-card-img-cont-'+token_id);
+        if (template === 'recent-sale' && trait_type !== 'Frog' && trait_type !== 'SpecialFrog') {
+            saleAttributes.push({ trait: trait_type, value: attribute });
+        }
+    }
+
+    if (template === 'recent-sale') {
+        const attributesListId = token_element.dataset.recentSaleAttrsId;
+        if (attributesListId) {
+            const container = document.getElementById(attributesListId);
+            if (container) {
+                saleAttributes.forEach(({ trait, value }) => {
+                    const row = document.createElement('li');
+                    row.innerHTML = '<b>'+trait+':</b> '+value;
+                    container.appendChild(row);
+                });
+                if (frogTypeValue) {
+                    const frogRow = document.createElement('li');
+                    frogRow.innerHTML = '<b>Frog:</b> '+frogTypeValue;
+                    container.appendChild(frogRow);
+                }
+            }
+        }
     }
     
 
@@ -873,46 +1117,26 @@ async function meta_morph_select(selected, token_id) {
 
 }
 
-/*
-
-async function fetch_held_tokens(wallet, limit, next_string) {
-    if (! wallet) { wallet = user_address}
-    if (! limit) { limit = '50'; }
-    if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
-    //fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v6?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
-    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
-    .then((data) => data.json())
-    .then((data) => {
-        console.log(data);
-        console.log(data.tokens);
-        render_held_tokens(wallet, data.tokens);
-        if (wallet == CONTROLLER_ADDRESS) {
-            update_staked_tokens(data.tokens)
-        }
-        if (! data.continuation) { return }
-        else { load_more_button(wallet, limit, data.continuation); }
-    })
-    .catch(err => console.error(err));
-}
-
-*/
-
 async function gather_staked_ids(wallet, limit, next_string) {
     if (! wallet) { wallet = CONTROLLER_ADDRESS}
     if (! limit) { limit = '50'; }
-    if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
-    //fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v6?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
-    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
-    .then((data) => data.json())
-    .then((data) => {
-        data.tokens.forEach(async (token) => {
-            var { token: { tokenId } } = token
-            staked_ids.push(tokenId);
+    const params = new URLSearchParams({
+        owner: wallet,
+        withMetadata: 'false',
+        pageSize: limit
+    });
+    params.append('contractAddresses[]', COLLECTION_ADDRESS);
+    if (next_string) { params.append('pageKey', next_string); }
+    try {
+        const data = await alchemyRequest('/getNFTsForOwner', { params });
+        (data.ownedNfts || []).forEach(async (token) => {
+            staked_ids.push(hexToDecimal(token.id?.tokenId));
         })
-        if (! data.continuation) { return }
-        else { gather_staked_ids(wallet, limit, data.continuation); }
-    })
-    .catch(err => console.error(err));
+        if (! data.pageKey) { return }
+        else { gather_staked_ids(wallet, limit, data.pageKey); }
+    } catch (err) {
+        console.error('Failed to gather staked ids', err);
+    }
 }
 
 async function meta_morph_preset() {
@@ -1110,53 +1334,38 @@ async function get_user_invites(wallet_address) {
 }
 
 async function fetch_staking_stats() {
-    fetch('https://api.reservoir.tools/owners/v2?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
-    .then(data => data.json())
-    .then(data => {
-        console.log(data)
-        var owner = data.owners.find(owner => owner.address === CONTROLLER_ADDRESS);
-        var tokenCount = owner ? owner.ownership.tokenCount : null;
-        console.log(tokenCount);
-        document.getElementById('total_staked_tokens').innerHTML = tokenCount;
-    })
-    .catch(err => console.error(err));
-}
-
-async function fetch_staking_stats() {
 
     try {
-        // Fetch data from the API
-        var response = await fetch('https://api.reservoir.tools/owners/v2?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options);
-        var data = await response.json();
+        const params = new URLSearchParams({
+            owner: CONTROLLER_ADDRESS,
+            withMetadata: 'false',
+            pageSize: '1'
+        });
+        params.append('contractAddresses[]', COLLECTION_ADDRESS);
+        const data = await alchemyRequest('/getNFTsForOwner', { params });
         console.log(data);
-
-        // Find the owner with the specified CONTROLLER_ADDRESS
-        const owner = data.owners.find(owner => owner.address === CONTROLLER_ADDRESS.toLocaleLowerCase());
-
-        // Get token count from the owner object if found, otherwise set to null
-        const tokenCount = owner ? owner.ownership.tokenCount : null;
-
-        // Log the token count for debugging
-        console.log(tokenCount);
-
-        // Set the token count in the HTML element with the id 'total_staked_tokens'
-        document.getElementById('total_staked_tokens').innerHTML = tokenCount ? tokenCount : '0'; // Default to 0 if not found
+        const tokenCount = data.totalCount !== undefined ? Number(data.totalCount) : (data.ownedNfts ? data.ownedNfts.length : 0);
+        document.getElementById('total_staked_tokens').innerHTML = tokenCount ? tokenCount : '0';
     } catch (err) {
         console.error(err);  // Log any errors that occur during the fetch or processing
     }
 }
 
 async function fetch_collection_stats(){
-    fetch('https://api.reservoir.tools/collections/v7?id=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
-      .then(stats => stats.json())
-      .then(stats => {
+    try {
+        const params = new URLSearchParams({ contractAddress: COLLECTION_ADDRESS });
+        const stats = await alchemyRequest('/getContractMetadata', { params, version: 'v2' });
         console.log(stats)
-        var { tokenCount, ownerCount } = stats.collections[0]
-        document.getElementById('remainingSupply').innerHTML = 4040 - parseInt(tokenCount);
-        document.getElementById('totalSupply').innerHTML = tokenCount+' / 4040';
+        const metadata = stats.contractMetadata || {};
+        const totalSupply = metadata.totalSupply ? Number(metadata.totalSupply) : 0;
+        const ownerCount = metadata.openSea && metadata.openSea.collectionStats ? Number(metadata.openSea.collectionStats.numOwners || 0) : 0;
+        const remaining = 4040 - parseInt(totalSupply);
+        document.getElementById('remainingSupply').innerHTML = remaining > 0 ? remaining : 0;
+        document.getElementById('totalSupply').innerHTML = totalSupply+' / 4040';
         document.getElementById('totalCollectors').innerHTML = ownerCount;
-      })
-      .catch(err => console.error(err));
+    } catch (err) {
+        console.error(err);
+    }
 
       // What IDs are currently staked?
       await gather_staked_ids();
@@ -1780,12 +1989,15 @@ function truncateAddress(address) {
 
 */
 function build_trait(trait_type, attribute, location) {
+    const target = document.getElementById(location);
+    if (!target) { return; }
+
     newAttribute = document.createElement("img");
-    if (trait_type == 'Trait' || trait_type == 'Frog' || trait_type == 'SpecialFrog') { newAttribute.className = "trait_overlay"; } 
+    if (trait_type == 'Trait' || trait_type == 'Frog' || trait_type == 'SpecialFrog') { newAttribute.className = "trait_overlay"; }
     else { newAttribute.className = "attribute_overlay"; }
     if (location == 'randomLogo') { newAttribute.style.width = '128px'; newAttribute.style.height = '128px';}
     newAttribute.src = SOURCE_PATH+"/frog/build_files/"+trait_type+"/"+attribute+".png";
-    
+
     /*
     if (animate) {
         for (y = 0; y < animated.length; y++) {
@@ -1796,6 +2008,6 @@ function build_trait(trait_type, attribute, location) {
         }
     }
     */
-    
-    document.getElementById(location).appendChild(newAttribute);
+
+    target.appendChild(newAttribute);
 }
