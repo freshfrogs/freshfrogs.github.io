@@ -159,6 +159,220 @@ body {
     text-align: left;
 }
 
+.recent-sales-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+    width: 92%;
+    margin: 10px auto 24px;
+}
+
+.recent-sales-grid > .recent-sale-card,
+.recent-sales-grid > .index-card {
+    width: 100%;
+}
+
+.recent-sales-grid > .connectButton {
+    grid-column: 1 / -1;
+    justify-self: center;
+}
+
+.recent-sale-card {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 6px;
+    padding: 8px 9px;
+    background-color: #5f9ea0;
+    border: 1px solid black;
+    border-radius: 5px;
+    box-shadow: none;
+    color: white;
+    font-family: inherit;
+    max-width: 210px;
+}
+
+.recent-sale-thumb-wrapper {
+    width: 64px;
+}
+
+.recent-sale-thumb {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 5px;
+    border: 1px solid black;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 2px 2px #417871;
+    image-rendering: pixelated;
+    overflow: hidden;
+}
+
+.recent-sale-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+}
+
+.recent-sale-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.recent-sale-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: inherit;
+    letter-spacing: 0.03em;
+    margin: 0;
+}
+
+.recent-sale-meta {
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.recent-sale-price {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #ffe09a;
+}
+
+.recent-sale-price-value {
+    color: inherit;
+}
+
+.recent-sale-price-usd {
+    margin-left: 4px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: #dff4ff;
+}
+
+.recent-sale-rarity {
+    font-size: 0.6rem;
+    color: white;
+}
+
+.recent-sale-rarity span {
+    font-weight: 700;
+}
+
+.recent-sale-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 3px 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.35);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+}
+
+.recent-sale-detail {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+    align-items: baseline;
+}
+
+.recent-sale-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
+    flex: 0 0 auto;
+}
+
+.recent-sale-label::after {
+    content: ':';
+    margin-left: 4px;
+}
+
+.recent-sale-value {
+    font-size: 0.66rem;
+    font-weight: 700;
+    color: white;
+    word-break: break-word;
+    text-align: left;
+    flex: 1 1 auto;
+}
+
+.recent-sale-value--mono {
+    font-family: inherit;
+    font-size: 0.58rem;
+    letter-spacing: 0.02em;
+    opacity: 0.85;
+}
+
+.recent-sale-attributes {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.recent-sale-attributes:not(:empty)::before {
+    content: 'Attributes';
+    font-size: 0.55rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
+    display: block;
+    margin-bottom: 1px;
+}
+
+.recent-sale-attribute {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+    align-items: baseline;
+}
+
+.recent-sale-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: auto;
+}
+
+.recent-sale-actions a {
+    text-decoration: none;
+}
+
+.recent-sale-actions .etherscan_button,
+.recent-sale-actions .opensea_button {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .recent-sale-card {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+        max-width: 100%;
+    }
+
+    .recent-sale-body {
+        align-items: center;
+    }
+
+    .recent-sale-details,
+    .recent-sale-attributes {
+        width: 100%;
+        text-align: left;
+    }
+
+    .recent-sale-detail,
+    .recent-sale-attribute {
+        width: 100%;
+    }
+
+    .recent-sale-actions {
+        justify-content: center;
+    }
+}
+
 .bottom-section h2 {
     font-size: 1.8em;
     margin-bottom: 10px;
