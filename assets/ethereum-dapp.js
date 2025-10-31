@@ -255,9 +255,17 @@ function normalizeNumericValue(value) {
 }
 
 function parseAlchemyPrice(priceObject) {
-    const totalPrice = priceObject?.totalPrice || priceObject || {};
-    const nativePrice = totalPrice.nativePrice || {};
+    if (!priceObject) { return { eth: 0, usd: 0 }; }
+
+    const totalPrice = priceObject.totalPrice || priceObject || {};
+    const amount = totalPrice.amount || priceObject.amount || {};
+    const nativePrice = totalPrice.nativePrice || priceObject.nativePrice || {};
+
     const candidates = [
+        { value: amount.decimal, decimals: 'eth' },
+        { value: amount.amount, decimals: 'eth' },
+        { value: amount.value, decimals: amount.decimals },
+        { value: amount.raw, decimals: amount.decimals },
         { value: nativePrice.eth, decimals: 'eth' },
         { value: totalPrice.eth, decimals: 'eth' },
         { value: nativePrice.value, decimals: nativePrice.decimals },
@@ -281,12 +289,14 @@ function parseAlchemyPrice(priceObject) {
     }
 
     const usdCandidates = [
+        amount.usd,
+        amount.usdPrice,
         totalPrice.usd,
         totalPrice.usdPrice,
         nativePrice.usd,
         nativePrice.usdPrice,
-        priceObject?.usd,
-        priceObject?.usdPrice
+        priceObject.usd,
+        priceObject.usdPrice
     ];
     let usd = 0;
     for (const candidate of usdCandidates) {
@@ -963,18 +973,17 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
         const safeElementId = String(element_id).replace(/[^a-zA-Z0-9_-]/g, '_');
         const attributesContainerId = 'recent-sale-attributes-'+safeElementId;
         token_element.className = 'recent-sale-card';
+        const priceLine = 'Sold For <span class="recent-sale-price-value">'+html_elements.priceEth+'</span>'+
+            (html_elements.priceUsd ? '<span class="recent-sale-price-usd">('+html_elements.priceUsd+')</span>' : '');
         token_element.innerHTML =
             '<div class="recent-sale-thumb-wrapper">'+
                 '<div id="index-card-img-cont-'+token_id+'" class="recent-sale-thumb" style="background-image: url('+image_link+');"></div>'+
             '</div>'+
             '<div class="recent-sale-body">'+
                 '<div class="recent-sale-header">'+
-                    '<div class="recent-sale-title-row">'+
-                        '<h3 class="recent-sale-title">Frog #'+token_id+'</h3>'+
-                        '<span class="recent-sale-price">'+html_elements.priceEth+'</span>'+
-                    '</div>'+
-                    '<p class="recent-sale-subtitle">'+html_elements.saleType+' · '+html_elements.saleDate+'</p>'+
-                    (html_elements.priceUsd ? '<p class="recent-sale-usd">'+html_elements.priceUsd+'</p>' : '')+
+                    '<h3 class="recent-sale-title">Frog #'+token_id+'</h3>'+
+                    '<p class="recent-sale-meta">'+html_elements.saleType+' · '+html_elements.saleDate+'</p>'+
+                    '<p class="recent-sale-price">'+priceLine+'</p>'+
                     '<p class="recent-sale-rarity">Rarity Rank: <span id="rarityRanking_'+token_id+'">--</span></p>'+
                 '</div>'+
                 '<div class="recent-sale-details">'+
@@ -1053,7 +1062,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
         if (attributesContainerId) {
             const container = document.getElementById(attributesContainerId);
             if (container) {
-                saleAttributes.slice(0, 4).forEach(({ trait, value }) => {
+                saleAttributes.forEach(({ trait, value }) => {
                     const row = document.createElement('div');
                     row.className = 'recent-sale-attribute';
                     row.innerHTML = '<span class="recent-sale-label">'+trait+'</span><span class="recent-sale-value">'+value+'</span>';

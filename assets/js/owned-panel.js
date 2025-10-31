@@ -1,5 +1,5 @@
 // assets/js/owned-panel.js
-// Renders: Owned + Staked. Owned IDs from Reservoir; Staked IDs from controller.
+// Renders: Owned + Staked. Owned IDs from Alchemy NFT API; Staked IDs from controller.
 // Metadata always from frog/json/{id}.json. No OpenSea button. Attribute chips → bullets.
 // Header: Owned • Staked • Unclaimed Rewards (+ Approve/Claim). Connect btn stays green.
 
@@ -8,12 +8,13 @@
 
   const SEL = { card:'#ownedCard', grid:'#ownedGrid', btnConn:'#ownedConnectBtn' };
   const CHAIN_ID  = Number(CFG.CHAIN_ID || 1);
-  const RESV_HOST = (CFG.RESERVOIR_HOST || 'https://api.reservoir.tools').replace(/\/+$/,'');
   const PAGE_SIZE = Math.max(1, Math.min(50, Number(CFG.OWNED_PAGE_SIZE || CFG.PAGE_SIZE || 12)));
   const COLLECTION = CFG.COLLECTION_ADDRESS;
   const REWARD_SYMBOL   = (CFG.REWARD_TOKEN_SYMBOL || '$FLYZ');
   const REWARD_DECIMALS = Number.isFinite(Number(CFG.REWARD_DECIMALS)) ? Number(CFG.REWARD_DECIMALS) : 18;
   const BASEPATH = (CFG.SOURCE_PATH || '').replace(/\/+$/,''); // prefix for /frog assets if any
+  const DEFAULT_ALCHEMY_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
+  const ALCHEMY_V3_BASE = 'https://eth-mainnet.g.alchemy.com/nft/v3';
 
   // Paths
   const imgFor  = (id)=> `${BASEPATH}/frog/${id}.png`;
@@ -42,7 +43,7 @@
 #ownedCard .pg-card-head .btn:hover{background: color-mix(in srgb,#22c55e 14%,var(--panel));border-color: color-mix(in srgb,#22c55e 80%,var(--border));color: color-mix(in srgb,#ffffff 85%,#22c55e)}
 #ownedCard .pg-card-head .btn.btn-connected{background: color-mix(in srgb,#22c55e 18%,var(--panel));border-color: color-mix(in srgb,#22c55e 85%,var(--border));color: color-mix(in srgb,#ffffff 90%,#22c55e)}
 #ownedCard{display:flex;flex-direction:column}
-#ownedGrid{overflow:auto;-webkit-overflow-scrolling:touch;padding-right:4px}
+#ownedGrid{overflow:visible;padding-right:0}
 @media (hover:hover){
   #ownedGrid::-webkit-scrollbar{width:8px}
   #ownedGrid::-webkit-scrollbar-thumb{background: color-mix(in srgb,var(--muted) 35%, transparent); border-radius:8px}
@@ -53,22 +54,73 @@
     const el=document.createElement('style'); el.id='owned-clean-css'; el.textContent=css; document.head.appendChild(el);
   })();
 
-  // --- Reservoir fetch queue (used only to list owned IDs) ---
-  if (!window.FF_RES_QUEUE){
-    const RATE_MIN_MS = Number(CFG.RATE_MIN_MS || 800);
-    const BACKOFFS = Array.isArray(CFG.RETRY_BACKOFF_MS) ? CFG.RETRY_BACKOFF_MS : [900,1700,3200];
-    let lastAt=0, chain=Promise.resolve();
-    const sleep=(ms)=> new Promise(r=>setTimeout(r,ms));
-    const headers=()=> (FF.apiHeaders?.() || { accept:'application/json', 'x-api-key': CFG.FROG_API_KEY });
-    async function spaced(url,init){ const d=Date.now()-lastAt; if(d<RATE_MIN_MS) await sleep(RATE_MIN_MS-d); lastAt=Date.now(); return fetch(url,{headers:headers(), ...init}); }
-    async function run(url,init){ let i=0; while(true){ const res=await spaced(url,init); if(res.status===429){ await sleep(BACKOFFS[Math.min(i++,BACKOFFS.length-1)]); continue; } if(!res.ok){ const t=await res.text().catch(()=> ''); throw new Error('HTTP '+res.status+(t?' — '+t:'')); } return res.json(); } }
-    window.FF_RES_QUEUE={ fetch:(url,init)=> (chain = chain.then(()=> run(url,init))) };
-  }
-
   // --- Utils ---
   const $=(s,r=document)=>r.querySelector(s);
   const shorten=(a)=> (FF.shorten?.(a)) || (a ? a.slice(0,6)+'…'+a.slice(-4) : '—');
   const toast=(m)=>{ try{FF.toast?.(m);}catch{} console.log('[owned]',m); };
+
+  function getAlchemyApiKey(){
+    const cfgKey = typeof CFG.ALCHEMY_API_KEY === 'string' ? CFG.ALCHEMY_API_KEY.trim() : '';
+    if (cfgKey) return cfgKey;
+    try{
+      if (typeof globalThis !== 'undefined' && globalThis.frog_api) return globalThis.frog_api;
+    }catch{}
+    if (typeof window !== 'undefined' && window.frog_api) return window.frog_api;
+    if (typeof self !== 'undefined' && self.frog_api) return self.frog_api;
+    if (typeof global !== 'undefined' && global.frog_api) return global.frog_api;
+    return DEFAULT_ALCHEMY_KEY;
+  }
+
+  function buildOwnerUrl(){
+    if (!addr) throw new Error('No connected address for owner fetch');
+    const apiKey = getAlchemyApiKey();
+    if (!apiKey) throw new Error('Missing Alchemy API key');
+    const params = new URLSearchParams({
+      owner: addr,
+      withMetadata: 'false',
+      pageSize: String(PAGE_SIZE)
+    });
+    params.append('contractAddresses[]', COLLECTION);
+    if (continuation) params.set('pageKey', continuation);
+    return `${ALCHEMY_V3_BASE}/${apiKey}/getNFTsForOwner?${params.toString()}`;
+  }
+
+  function parseTokenId(raw){
+    if (raw == null) return NaN;
+    if (typeof raw === 'number') return raw;
+    if (typeof raw === 'bigint') return Number(raw);
+    if (typeof raw === 'string'){
+      const val = raw.trim();
+      if (!val) return NaN;
+      try{
+        if (/^0x/i.test(val)) return Number(BigInt(val));
+        if (/^-?\d+$/.test(val)) return Number(val);
+      }catch{return NaN;}
+      return NaN;
+    }
+    if (typeof raw === 'object'){
+      if ('tokenId' in raw) return parseTokenId(raw.tokenId);
+      if ('token_id' in raw) return parseTokenId(raw.token_id);
+      if ('id' in raw) return parseTokenId(raw.id);
+      if (Array.isArray(raw) && raw.length) return parseTokenId(raw[0]);
+    }
+    return NaN;
+  }
+
+  function extractTokenId(token){
+    if (!token) return NaN;
+    if (typeof token === 'object'){
+      if (token.id){
+        const nested = token.id.tokenId ?? token.id.token_id ?? token.id.id ?? token.id;
+        const parsed = parseTokenId(nested);
+        if (Number.isFinite(parsed)) return parsed;
+      }
+      const fallback = token.tokenId ?? token.token_id ?? token.id ?? token.token?.tokenId ?? token.token?.id;
+      const parsed = parseTokenId(fallback);
+      if (Number.isFinite(parsed)) return parsed;
+    }
+    return parseTokenId(token);
+  }
 
   function formatToken(raw,dec=REWARD_DECIMALS){
     // Accept: bigint/number/hex; {formatted}; {value|amount,decimals}; or human string.
@@ -178,6 +230,29 @@
     }catch{} return null;
   }
 
+  // --- NEW: fallback to infer stake time via Transfer(to=controller) events ---
+  // Returns ms epoch or null
+  async function stakeSinceViaEvents(tokenId){
+    try{
+      if (!window.Web3) return null;
+      const provider = window.ethereum || (CFG?.RPC_URL ? new Web3.providers.HttpProvider(CFG.RPC_URL) : null);
+      if (!provider) return null;
+      const web3 = new Web3(provider);
+      const erc721 = new web3.eth.Contract([
+        {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"}
+      ], CFG.COLLECTION_ADDRESS);
+
+      const evs = await erc721.getPastEvents('Transfer', {
+        filter: { to: CFG.CONTROLLER_ADDRESS, tokenId: tokenId },
+        fromBlock: 0, toBlock: 'latest'
+      });
+      if (!evs.length) return null;
+      const last = evs[evs.length - 1];
+      const b = await web3.eth.getBlock(last.blockNumber);
+      return Number(b.timestamp) * 1000;
+    }catch(_){ return null; }
+  }
+
   // --- State ---
   let addr=null, continuation=null, items=[], io=null;
   let _stakedCount=null, _rewardsPretty='—', _approved=null;
@@ -204,7 +279,10 @@
 
   // --- Header ---
   function headerRoot(){ const card=$(SEL.card); if(!card) return null; let w=card.querySelector('.oh-wrap'); if(!w){ w=document.createElement('div'); w.className='oh-wrap'; card.insertBefore(w,$(SEL.grid,card)); } w.innerHTML=''; return w; }
-  function headerData(){ return { owned: items.length||0, staked:(_stakedCount==null?'—':_stakedCount), rewards:_rewardsPretty, approved:_approved }; }
+  function headerData(){
+    const ownedOnly = Array.isArray(items) ? items.filter(x => !x.staked).length : 0;
+    return { owned: ownedOnly, staked:(_stakedCount==null?'—':_stakedCount), rewards:_rewardsPretty, approved:_approved };
+  }
   function buildHeader(){
     const w=headerRoot(); if(!w) return; const d=headerData();
     w.innerHTML =
@@ -224,13 +302,10 @@
 
   // --- Height sync with left panel ---
   function syncHeights(){
-    if (window.matchMedia('(max-width: 960px)').matches){ $('#ownedCard').style.height=''; $('#ownedGrid').style.maxHeight=''; return; }
-    const cards=document.querySelectorAll('.page-grid > .pg-card'); if(cards.length<2) return;
-    const left=cards[0], right=$('#ownedCard'); if(!left||!right) return;
-    right.style.height=left.offsetHeight+'px';
-    const header=right.querySelector('.oh-wrap'); const headerH=header?header.offsetHeight+10:0;
-    const pad=20; const maxH=left.offsetHeight-headerH-pad;
-    const grid=$('#ownedGrid'); if(grid) grid.style.maxHeight=Math.max(160,maxH)+'px';
+    const card = $(SEL.card);
+    const grid = $(SEL.grid);
+    if (card){ card.style.height=''; card.style.minHeight=''; }
+    if (grid){ grid.style.maxHeight=''; }
   }
   window.addEventListener('resize',()=> setTimeout(syncHeights,50));
 
@@ -288,8 +363,8 @@
   function renderCards(){
     const root=$(SEL.grid); if (!root) return;
     root.innerHTML='';
-    if (!items.length){ root.innerHTML='<div class="pg-muted">No frogs found for this wallet.</div>'; updateHeaderOwned(0); syncHeights(); return; }
-    updateHeaderOwned(items.length);
+    if (!items.length){ root.innerHTML='<div class="pg-muted">No frogs found for this wallet.</div>'; updateHeaderOwned(); syncHeights(); return; }
+    updateHeaderOwned();
     items.forEach(it=>{
       const card=document.createElement('article');
       card.className='frog-card';
@@ -310,17 +385,24 @@
     });
     syncHeights();
   }
-  function updateHeaderOwned(n){ const el=document.getElementById('ohOwned'); if (el) el.textContent=String(n); }
+  function updateHeaderOwned(){
+    const el=document.getElementById('ohOwned'); if (!el) return;
+    const ownedOnly = Array.isArray(items) ? items.filter(x => !x.staked).length : 0;
+    el.textContent = String(ownedOnly);
+  }
 
   // Owned IDs page from Reservoir (metadata comes from local JSON)
-  function tokensApiUser(addr){ return RESV_HOST + '/users/' + addr + '/tokens/v8'; }
   async function fetchOwnedIdsPage(){
-    const qs = new URLSearchParams({ collection: COLLECTION, limit:String(PAGE_SIZE), includeTopBid:'false', includeAttributes:'false' });
-    if (continuation) qs.set('continuation', continuation);
-    const j = await window.FF_RES_QUEUE.fetch(tokensApiUser(addr)+'?'+qs.toString());
-    const ids = (j?.tokens||[]).map(r => Number(r?.token?.tokenId)).filter(Number.isFinite);
-    continuation = j?.continuation || null;
-    return ids;
+    if (!addr) return [];
+    const url = buildOwnerUrl();
+    const res = await fetch(url, { headers: { accept: 'application/json' } });
+    if (!res.ok){
+      throw new Error(`Alchemy owner fetch failed (${res.status})`);
+    }
+    const data = await res.json();
+    continuation = data?.pageKey || null;
+    const list = Array.isArray(data?.ownedNfts) ? data.ownedNfts : Array.isArray(data?.nfts) ? data.nfts : [];
+    return list.map(extractTokenId).filter(Number.isFinite);
   }
 
   // Optional: ranks JSON if available
@@ -337,6 +419,8 @@
 
   async function loadFirstPage(){
     try{
+      continuation = null;
+      items = [];
       const [ownedIds, ranks] = await Promise.all([ fetchOwnedIdsPage(), ensureRanks() ]);
       const stakedIds = addr ? await getStakedIds(addr) : [];
       _stakedCount = stakedIds.length;
@@ -357,13 +441,15 @@
         rank: (ranks||{})[String(m.id)]
       }));
 
-      // Fill stake times
+      // Fill stake times (adapter first; else fall back to events)
       await (async ()=>{
         const stakedBatch = items.filter(x=> x.staked);
         for (const it of stakedBatch){
           try{
-            const ms = await getStakeSinceMs(it.id);
-            it.sinceMs = (ms && ms<1e12) ? ms*1000 : ms;
+            let ms = await getStakeSinceMs(it.id);          // may be null for this ABI
+            if (!ms) ms = await stakeSinceViaEvents(it.id); // fallback from Transfer events
+            if (ms && ms < 1e12) ms = ms * 1000;            // normalize to ms if seconds
+            it.sinceMs = ms || null;
           }catch{ it.sinceMs = null; }
         }
       })();
@@ -385,16 +471,25 @@
             .map(m=> ({ id:m.id, attrs:m.attrs, staked: stakedIds.includes(m.id), sinceMs:null, rank:(FF.RANKS||{})[String(m.id)] }));
           items = items.concat(more);
           // hydrate staked times for the new batch
-          for (const it of more){ if (it.staked){ try{ const ms=await getStakeSinceMs(it.id); it.sinceMs=(ms&&ms<1e12)?ms*1000:ms; }catch{} } }
+          for (const it of more){
+            if (it.staked){
+              try{
+                let ms = await getStakeSinceMs(it.id);
+                if (!ms) ms = await stakeSinceViaEvents(it.id);
+                if (ms && ms < 1e12) ms = ms * 1000;
+                it.sinceMs = ms || null;
+              }catch{}
+            }
+          }
           renderCards();
         }catch{ toast('Could not load more'); }
       };
-      const observer = new IntersectionObserver(ioCb, {root:root,rootMargin:'140px',threshold:0.01});
+      const observer = new IntersectionObserver(ioCb, {root:null,rootMargin:'140px',threshold:0.01});
       observer.observe(sentinel);
     }catch(e){
       console.warn('[owned] first page failed', e);
       const root=$(SEL.grid); if (root) root.innerHTML='<div class="pg-muted">Failed to load owned frogs.</div>';
-      updateHeaderOwned('—'); syncHeights();
+      updateHeaderOwned(); syncHeights();
     }
   }
 
