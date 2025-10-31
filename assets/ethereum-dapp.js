@@ -471,18 +471,25 @@ async function render_token_sales(contract, sales) {
             actionLinks.push(`<a class="btn btn-outline-gray" href="https://etherscan.io/tx/${txHash}" target="_blank" rel="noopener">Txn</a>`);
         }
 
-        const metaLines = [
-            `${saleOrMint} • ${sale_date}`,
-            formattedUsd ? `${formattedEth} (${formattedUsd})` : formattedEth,
+        const metaSegments = [
+            saleOrMint,
+            sale_date,
+            formattedUsd ? `${formattedEth} (${formattedUsd})` : formattedEth
+        ].filter(Boolean);
+        const metaLines = [];
+        if (metaSegments.length) {
+            metaLines.push(metaSegments.join(' • '));
+        }
+        metaLines.push(
             `${saleOrMint === 'Minted' ? 'Creator' : 'Seller'}: ${from}`,
             `${receiverLabel}: ${buyerDisplay}`
-        ];
+        );
         if (txHash) {
             metaLines.push(`Txn: ${formatTxnHash(txHash)}`);
         }
 
         const saleCardData = {
-            metaLines,
+            metaHtml: metaLines.map(line => `<div>${line}</div>`).join(''),
             actionsHtml: actionLinks.join('')
         };
 
@@ -979,7 +986,7 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     if (template === 'recent-sale') {
         const safeElementId = String(element_id).replace(/[^a-zA-Z0-9_-]/g, '_');
         const attributesListId = 'recent-sale-attrs-'+safeElementId;
-        const metaSection = (html_elements.metaLines || []).map(line => '<div>'+line+'</div>').join('');
+        const metaSection = html_elements.metaHtml || (html_elements.metaLines || []).map(line => '<div>'+line+'</div>').join('');
         token_element.className = 'frog-card frog-card--sale';
         token_element.setAttribute('data-token-id', token_id);
         token_element.innerHTML =
@@ -1982,12 +1989,15 @@ function truncateAddress(address) {
 
 */
 function build_trait(trait_type, attribute, location) {
+    const target = document.getElementById(location);
+    if (!target) { return; }
+
     newAttribute = document.createElement("img");
-    if (trait_type == 'Trait' || trait_type == 'Frog' || trait_type == 'SpecialFrog') { newAttribute.className = "trait_overlay"; } 
+    if (trait_type == 'Trait' || trait_type == 'Frog' || trait_type == 'SpecialFrog') { newAttribute.className = "trait_overlay"; }
     else { newAttribute.className = "attribute_overlay"; }
     if (location == 'randomLogo') { newAttribute.style.width = '128px'; newAttribute.style.height = '128px';}
     newAttribute.src = SOURCE_PATH+"/frog/build_files/"+trait_type+"/"+attribute+".png";
-    
+
     /*
     if (animate) {
         for (y = 0; y < animated.length; y++) {
@@ -1998,6 +2008,6 @@ function build_trait(trait_type, attribute, location) {
         }
     }
     */
-    
-    document.getElementById(location).appendChild(newAttribute);
+
+    target.appendChild(newAttribute);
 }
