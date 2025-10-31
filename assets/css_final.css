@@ -159,6 +159,214 @@ body {
     text-align: left;
 }
 
+.recent-sales-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+    width: 95%;
+    margin: 20px auto 40px;
+}
+
+.recent-sales-grid > .recent-sale-card,
+.recent-sales-grid > .index-card {
+    width: 100%;
+}
+
+.recent-sales-grid > .connectButton {
+    grid-column: 1 / -1;
+    justify-self: center;
+}
+
+.recent-sale-card {
+    display: grid;
+    grid-template-columns: 128px 1fr;
+    gap: 18px;
+    padding: 18px;
+    background-color: #5f9ea0;
+    border: 1px solid black;
+    border-radius: 6px;
+    box-shadow: none;
+    color: white;
+    font-family: inherit;
+}
+
+.recent-sale-thumb-wrapper {
+    position: relative;
+}
+
+.recent-sale-thumb {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 5px;
+    border: 1px solid black;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 2px 2px #417871;
+    overflow: hidden;
+}
+
+.recent-sale-thumb img {
+    width: 100%;
+    height: 100%;
+}
+
+.recent-sale-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 100%;
+}
+
+.recent-sale-header {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.recent-sale-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.recent-sale-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: inherit;
+}
+
+.recent-sale-price {
+    font-weight: 700;
+    font-size: 1rem;
+    color: palegoldenrod;
+}
+
+.recent-sale-subtitle {
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.recent-sale-usd {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #dff4ff;
+}
+
+.recent-sale-rarity {
+    font-size: 0.78rem;
+    color: white;
+}
+
+.recent-sale-rarity span {
+    font-weight: 700;
+}
+
+.recent-sale-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px 16px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.recent-sale-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.recent-sale-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.recent-sale-value {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: white;
+    word-break: break-word;
+}
+
+.recent-sale-value--mono {
+    font-family: inherit;
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+    opacity: 0.85;
+}
+
+.recent-sale-attributes {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: rgba(0, 0, 0, 0.18);
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.recent-sale-attributes:not(:empty)::before {
+    content: 'Attributes';
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.recent-sale-attribute {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.recent-sale-attributes .recent-sale-label {
+    text-transform: none;
+    letter-spacing: 0.02em;
+    font-size: 0.75rem;
+}
+
+.recent-sale-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 8px;
+}
+
+.recent-sale-actions a {
+    text-decoration: none;
+}
+
+.recent-sale-actions .etherscan_button,
+.recent-sale-actions .opensea_button {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .recent-sale-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .recent-sale-title-row {
+        justify-content: center;
+    }
+
+    .recent-sale-details {
+        text-align: left;
+    }
+
+    .recent-sale-actions {
+        justify-content: center;
+    }
+}
+
 .bottom-section h2 {
     font-size: 1.8em;
     margin-bottom: 10px;
