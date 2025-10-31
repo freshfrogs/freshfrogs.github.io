@@ -941,4 +941,11 @@ const COLLECTION_ABI =
       "signature": "0xcdc18424"
     }
   ]
-  const frog_api = '3105c552-60b6-5252-bca7-291c724a54bf'
+
+  // Alchemy NFT API key
+  const ALCHEMY_FROG_API_KEY = '3105c552-60b6-5252-bca7-291c724a54bf'
+  if (typeof globalThis !== 'undefined') {
+    globalThis.frog_api = ALCHEMY_FROG_API_KEY
+  } else {
+    this.frog_api = ALCHEMY_FROG_API_KEY
+  }
