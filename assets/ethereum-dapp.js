@@ -244,22 +244,59 @@ function hexToDecimal(hexString) {
     }
 }
 
+function normalizeNumericValue(value) {
+    if (value === undefined || value === null) { return NaN; }
+    if (typeof value === 'string' && value.startsWith('0x')) {
+        const parsedHex = parseInt(value, 16);
+        return Number.isNaN(parsedHex) ? NaN : parsedHex;
+    }
+    const numeric = Number(value);
+    return Number.isFinite(numeric) ? numeric : NaN;
+}
+
 function parseAlchemyPrice(priceObject) {
     const totalPrice = priceObject?.totalPrice || priceObject || {};
     const nativePrice = totalPrice.nativePrice || {};
+    const candidates = [
+        { value: nativePrice.eth, decimals: 'eth' },
+        { value: totalPrice.eth, decimals: 'eth' },
+        { value: nativePrice.value, decimals: nativePrice.decimals },
+        { value: totalPrice.value, decimals: totalPrice.decimals },
+        { value: totalPrice.wei, decimals: 18 },
+        { value: totalPrice.raw, decimals: totalPrice.decimals }
+    ];
+
     let eth = 0;
-    if (nativePrice.eth !== undefined) {
-        eth = Number(nativePrice.eth);
-    } else if (nativePrice.value !== undefined) {
-        const decimals = nativePrice.decimals !== undefined ? nativePrice.decimals : 18;
-        eth = Number(nativePrice.value) / Math.pow(10, decimals);
-    } else if (totalPrice.wei !== undefined) {
-        eth = Number(totalPrice.wei) / Math.pow(10, 18);
-    } else if (totalPrice.raw !== undefined) {
-        const decimals = totalPrice.decimals !== undefined ? totalPrice.decimals : 18;
-        eth = Number(totalPrice.raw) / Math.pow(10, decimals);
+    for (const { value, decimals } of candidates) {
+        const numeric = normalizeNumericValue(value);
+        if (!Number.isNaN(numeric) && numeric !== 0) {
+            if (decimals === 'eth') {
+                eth = numeric;
+            } else {
+                const safeDecimals = decimals !== undefined ? decimals : 18;
+                eth = numeric / Math.pow(10, safeDecimals);
+            }
+            break;
+        }
     }
-    const usd = totalPrice.usd !== undefined ? Number(totalPrice.usd) : (totalPrice.usdPrice !== undefined ? Number(totalPrice.usdPrice) : 0);
+
+    const usdCandidates = [
+        totalPrice.usd,
+        totalPrice.usdPrice,
+        nativePrice.usd,
+        nativePrice.usdPrice,
+        priceObject?.usd,
+        priceObject?.usdPrice
+    ];
+    let usd = 0;
+    for (const candidate of usdCandidates) {
+        const numeric = normalizeNumericValue(candidate);
+        if (!Number.isNaN(numeric) && numeric > 0) {
+            usd = numeric;
+            break;
+        }
+    }
+
     return { eth: eth || 0, usd: usd || 0 };
 }
 
@@ -415,16 +452,12 @@ async function render_token_sales(contract, sales) {
 
         const formattedEth = formatEthDisplay(decimal);
         const formattedUsd = formatUsdDisplay(usd);
-        const metaSegments = [
-            `<span class="recent-sale-tag">${saleOrMint}</span>`,
-            `<span>${sale_date}</span>`,
-            `<span class="recent-sale-price">${formattedEth}</span>`
-        ];
-        if (formattedUsd) { metaSegments.push(`<span class="recent-sale-usd">${formattedUsd}</span>`); }
-
         const buyerDisplay = truncateAddress(to) || '--';
         const saleCardData = {
-            meta: metaSegments.join(' · '),
+            saleType: saleOrMint,
+            saleDate: sale_date,
+            priceEth: formattedEth,
+            priceUsd: formattedUsd,
             sellerLabel: saleOrMint === 'Minted' ? 'Creator' : 'Seller',
             sellerValue: from,
             buyerLabel: receiverLabel,
@@ -936,30 +969,30 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
             '</div>'+
             '<div class="recent-sale-body">'+
                 '<div class="recent-sale-header">'+
-                    '<h3 class="recent-sale-title">Frog #'+token_id+'</h3>'+ 
-                    '<span class="recent-sale-rank" id="rarityRanking_'+token_id+'">#--</span>'+ 
-                '</div>'+ 
-                '<p class="recent-sale-meta">'+html_elements.meta+'</p>'+ 
+                    '<div class="recent-sale-title-row">'+
+                        '<h3 class="recent-sale-title">Frog #'+token_id+'</h3>'+
+                        '<span class="recent-sale-price">'+html_elements.priceEth+'</span>'+
+                    '</div>'+
+                    '<p class="recent-sale-subtitle">'+html_elements.saleType+' · '+html_elements.saleDate+'</p>'+
+                    (html_elements.priceUsd ? '<p class="recent-sale-usd">'+html_elements.priceUsd+'</p>' : '')+
+                    '<p class="recent-sale-rarity">Rarity Rank: <span id="rarityRanking_'+token_id+'">--</span></p>'+
+                '</div>'+
                 '<div class="recent-sale-details">'+
-                    '<div>'+ 
-                        '<span class="recent-sale-label">'+html_elements.sellerLabel+'</span>'+ 
-                        '<span class="recent-sale-value">'+html_elements.sellerValue+'</span>'+ 
-                    '</div>'+ 
-                    '<div>'+ 
-                        '<span class="recent-sale-label">'+html_elements.buyerLabel+'</span>'+ 
-                        '<span class="recent-sale-value">'+html_elements.buyerValue+'</span>'+ 
-                    '</div>'+ 
-                    '<div>'+ 
-                        '<span class="recent-sale-label">Frog Type</span>'+ 
-                        '<span class="recent-sale-value" id="'+token_id+'_frogType">--</span>'+ 
-                    '</div>'+ 
-                    '<div>'+ 
-                        '<span class="recent-sale-label">Txn</span>'+ 
-                        '<span class="recent-sale-value recent-sale-value--mono">'+html_elements.txnDisplay+'</span>'+ 
-                    '</div>'+ 
-                '</div>'+ 
-                '<div class="recent-sale-attributes" id="'+attributesContainerId+'"></div>'+ 
-                '<div id="buttonsPanel_'+token_id+'" class="recent-sale-actions">'+html_elements.actionsHtml+'</div>'+ 
+                    '<div class="recent-sale-detail">'+
+                        '<span class="recent-sale-label">'+html_elements.sellerLabel+'</span>'+
+                        '<span class="recent-sale-value">'+html_elements.sellerValue+'</span>'+
+                    '</div>'+
+                    '<div class="recent-sale-detail">'+
+                        '<span class="recent-sale-label">'+html_elements.buyerLabel+'</span>'+
+                        '<span class="recent-sale-value">'+html_elements.buyerValue+'</span>'+
+                    '</div>'+
+                    '<div class="recent-sale-detail">'+
+                        '<span class="recent-sale-label">Txn</span>'+
+                        '<span class="recent-sale-value recent-sale-value--mono">'+html_elements.txnDisplay+'</span>'+
+                    '</div>'+
+                '</div>'+
+                '<div class="recent-sale-attributes" id="'+attributesContainerId+'"></div>'+
+                '<div id="buttonsPanel_'+token_id+'" class="recent-sale-actions">'+html_elements.actionsHtml+'</div>'+
             '</div>';
         token_element.dataset.recentSaleAttributesId = attributesContainerId;
     } else {
@@ -1002,14 +1035,15 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
     
     let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
     const saleAttributes = [];
+    let frogTypeValue = '';
     for (let i = 0; i < metadata.attributes.length; i++) {
         var attribute = metadata.attributes[i].value;
         var trait_type = metadata.attributes[i].trait_type;
         if(trait_type == "Frog" || trait_type == "SpecialFrog"){
-            document.getElementById(token_id+'_frogType').innerHTML = attribute;
+            frogTypeValue = attribute;
         }
         build_trait(trait_type, attribute, 'index-card-img-cont-'+token_id);
-        if (template === 'recent-sale' && trait_type !== 'Frog' && trait_type !== 'SpecialFrog' && trait_type !== 'Trait') {
+        if (template === 'recent-sale' && trait_type !== 'Frog' && trait_type !== 'SpecialFrog') {
             saleAttributes.push({ trait: trait_type, value: attribute });
         }
     }
@@ -1019,12 +1053,18 @@ async function build_token(html_elements, token_id, element_id, txn, txn_hash, l
         if (attributesContainerId) {
             const container = document.getElementById(attributesContainerId);
             if (container) {
-                saleAttributes.slice(0, 3).forEach(({ trait, value }) => {
+                saleAttributes.slice(0, 4).forEach(({ trait, value }) => {
                     const row = document.createElement('div');
                     row.className = 'recent-sale-attribute';
                     row.innerHTML = '<span class="recent-sale-label">'+trait+'</span><span class="recent-sale-value">'+value+'</span>';
                     container.appendChild(row);
                 });
+                if (frogTypeValue) {
+                    const frogRow = document.createElement('div');
+                    frogRow.className = 'recent-sale-attribute';
+                    frogRow.innerHTML = '<span class="recent-sale-label">Frog Type</span><span class="recent-sale-value">'+frogTypeValue+'</span>';
+                    container.appendChild(frogRow);
+                }
             }
         }
     }

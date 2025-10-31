@@ -179,15 +179,15 @@ body {
 
 .recent-sale-card {
     display: grid;
-    grid-template-columns: 132px 1fr;
-    gap: 16px;
-    padding: 16px;
+    grid-template-columns: 128px 1fr;
+    gap: 18px;
+    padding: 18px;
     background-color: #5f9ea0;
     border: 1px solid black;
     border-radius: 6px;
     box-shadow: none;
     color: white;
-    font-family: monospace;
+    font-family: inherit;
 }
 
 .recent-sale-thumb-wrapper {
@@ -214,99 +214,109 @@ body {
 .recent-sale-body {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
+    min-height: 100%;
 }
 
 .recent-sale-header {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.recent-sale-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     gap: 10px;
 }
 
 .recent-sale-title {
-    font-size: 1.1rem;
-    color: white;
-}
-
-.recent-sale-rank {
-    margin-left: auto;
-    padding: 2px 10px;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    background: rgba(0, 0, 0, 0.35);
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
-}
-
-.recent-sale-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    font-size: 0.85rem;
-    align-items: center;
-}
-
-.recent-sale-tag {
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.7rem;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 999px;
-    padding: 2px 8px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: inherit;
 }
 
 .recent-sale-price {
-    font-weight: bold;
+    font-weight: 700;
+    font-size: 1rem;
     color: palegoldenrod;
 }
 
+.recent-sale-subtitle {
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+    color: rgba(255, 255, 255, 0.85);
+}
+
 .recent-sale-usd {
-    font-weight: bold;
-    color: lightseagreen;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #dff4ff;
+}
+
+.recent-sale-rarity {
+    font-size: 0.78rem;
+    color: white;
+}
+
+.recent-sale-rarity span {
+    font-weight: 700;
 }
 
 .recent-sale-details {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 8px 12px;
-    font-size: 0.82rem;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px 16px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.recent-sale-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .recent-sale-label {
-    display: block;
-    font-size: 0.7rem;
-    letter-spacing: 0.05em;
-    opacity: 0.85;
-}
-
-.recent-sale-details .recent-sale-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
 }
 
 .recent-sale-value {
-    font-weight: bold;
+    font-size: 0.85rem;
+    font-weight: 700;
     color: white;
     word-break: break-word;
 }
 
 .recent-sale-value--mono {
-    font-family: monospace;
+    font-family: inherit;
     font-size: 0.75rem;
+    letter-spacing: 0.03em;
     opacity: 0.85;
 }
 
 .recent-sale-attributes {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 6px;
-    font-size: 0.78rem;
+    background: rgba(0, 0, 0, 0.18);
+    padding: 12px;
+    border-radius: 6px;
 }
 
 .recent-sale-attributes:not(:empty)::before {
     content: 'Attributes';
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    opacity: 0.7;
+    color: rgba(255, 255, 255, 0.75);
+    display: block;
+    margin-bottom: 4px;
 }
 
 .recent-sale-attribute {
@@ -315,11 +325,18 @@ body {
     gap: 12px;
 }
 
+.recent-sale-attributes .recent-sale-label {
+    text-transform: none;
+    letter-spacing: 0.02em;
+    font-size: 0.75rem;
+}
+
 .recent-sale-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 4px;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 8px;
 }
 
 .recent-sale-actions a {
@@ -337,12 +354,8 @@ body {
         text-align: center;
     }
 
-    .recent-sale-header {
+    .recent-sale-title-row {
         justify-content: center;
-    }
-
-    .recent-sale-rank {
-        margin-left: 0;
     }
 
     .recent-sale-details {
