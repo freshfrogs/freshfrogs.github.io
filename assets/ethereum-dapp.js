@@ -117,30 +117,54 @@ const SOURCE_PATH = 'https://freshfrogs.github.io'
 const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
-const FROG_API_KEY = (typeof frog_api !== 'undefined' && frog_api) ? frog_api : null;
 const ALCHEMY_BASE_V2 = 'https://eth-mainnet.g.alchemy.com/nft/v2';
 const ALCHEMY_BASE_V3 = 'https://eth-mainnet.g.alchemy.com/nft/v3';
-const ALCHEMY_DEFAULT_HEADERS = FROG_API_KEY ? { 'X-Alchemy-Token': FROG_API_KEY, 'accept': 'application/json' } : { 'accept': 'application/json' };
+
+function getGlobalContext() {
+    if (typeof globalThis !== 'undefined') { return globalThis; }
+    if (typeof window !== 'undefined') { return window; }
+    return this;
+}
+
+function getAlchemyApiKey() {
+    const ctx = getGlobalContext();
+    if (ctx && ctx.frog_api) {
+        return ctx.frog_api;
+    }
+
+    // Fallback to embedded key to ensure authenticated calls even if the ABI bundle fails to load first.
+    return 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
+}
+
+function buildAlchemyHeaders(existingHeaders) {
+    const apiKey = getAlchemyApiKey();
+    const baseHeaders = { 'accept': 'application/json' };
+    if (apiKey) {
+        baseHeaders['X-Alchemy-Token'] = apiKey;
+    }
+    return {
+        ...baseHeaders,
+        ...(existingHeaders || {})
+    };
+}
 
 function buildAlchemyUrl(version, endpoint, params) {
-    if (!FROG_API_KEY) {
+    const apiKey = getAlchemyApiKey();
+    if (!apiKey) {
         throw new Error('Missing Alchemy API key (frog_api) for request');
     }
 
     const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
     const baseUrl = version === 'v2' ? ALCHEMY_BASE_V2 : ALCHEMY_BASE_V3;
     const queryString = params ? `?${params.toString()}` : '';
-    return `${baseUrl}/${FROG_API_KEY}${normalizedEndpoint}${queryString}`;
+    return `${baseUrl}/${apiKey}${normalizedEndpoint}${queryString}`;
 }
 
 async function alchemyRequest(endpoint, { params, version = 'v3', fetchOptions = {} } = {}) {
     const url = buildAlchemyUrl(version, endpoint, params);
     const response = await fetch(url, {
         ...fetchOptions,
-        headers: {
-            ...ALCHEMY_DEFAULT_HEADERS,
-            ...(fetchOptions.headers || {})
-        }
+        headers: buildAlchemyHeaders(fetchOptions.headers)
     });
 
     if (!response.ok) {

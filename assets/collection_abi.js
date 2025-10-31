@@ -943,4 +943,9 @@ const COLLECTION_ABI =
   ]
 
   // Alchemy NFT API key
-  const frog_api = '3105c552-60b6-5252-bca7-291c724a54bf'
+  const ALCHEMY_FROG_API_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ'
+  if (typeof globalThis !== 'undefined') {
+    globalThis.frog_api = ALCHEMY_FROG_API_KEY
+  } else {
+    this.frog_api = ALCHEMY_FROG_API_KEY
+  }
