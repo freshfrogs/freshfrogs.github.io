@@ -224,13 +224,31 @@ async function fetch_token_mints(contract, limit, next_string) {
 }
 
 function timestampToDate(timestamp) {
-    const date = new Date(timestamp * 1000); // Convert to milliseconds
-    const mm = date.getMonth() + 1; // JavaScript months are 0-indexed
-    const dd = date.getDate();
-    const yy = date.getFullYear().toString().slice(-2);
+    if (timestamp === undefined || timestamp === null) { return '--'; }
 
-    return `${mm}/${dd}/${yy}`;
-  }
+    const coerceNumber = Number(timestamp);
+    if (Number.isFinite(coerceNumber) && coerceNumber > 0) {
+        const date = new Date(coerceNumber * 1000); // Convert to milliseconds
+        if (!Number.isNaN(date.getTime())) {
+            const mm = String(date.getMonth() + 1).padStart(2, '0');
+            const dd = String(date.getDate()).padStart(2, '0');
+            const yy = date.getFullYear().toString().slice(-2);
+            return `${mm}/${dd}/${yy}`;
+        }
+    }
+
+    if (typeof timestamp === 'string') {
+        const parsed = new Date(timestamp);
+        if (!Number.isNaN(parsed.getTime())) {
+            const mm = String(parsed.getMonth() + 1).padStart(2, '0');
+            const dd = String(parsed.getDate()).padStart(2, '0');
+            const yy = parsed.getFullYear().toString().slice(-2);
+            return `${mm}/${dd}/${yy}`;
+        }
+    }
+
+    return '--';
+}
 
 function hexToDecimal(hexString) {
     if (!hexString) { return '0'; }
@@ -331,11 +349,16 @@ function parseAlchemyPrice(priceObject) {
     for (const { value, decimals } of candidates) {
         const numeric = normalizeNumericValue(value);
         if (!Number.isNaN(numeric) && numeric !== 0) {
-            if (decimals === 'eth') {
+            const isEthUnit = decimals === 'eth' || decimals === null || decimals === undefined || decimals === '';
+            if (isEthUnit) {
                 eth = numeric;
             } else {
-                const safeDecimals = decimals !== undefined ? decimals : 18;
-                eth = numeric / Math.pow(10, safeDecimals);
+                const parsedDecimals = Number(decimals);
+                if (!Number.isFinite(parsedDecimals) || parsedDecimals === 0) {
+                    eth = numeric;
+                } else {
+                    eth = numeric / Math.pow(10, parsedDecimals);
+                }
             }
             break;
         }
@@ -1361,7 +1384,7 @@ async function fetch_eth_usd() {
 */
 async function initiate_web3_connection() {
     if (typeof window.ethereum !== "undefined") {
-        //document.getElementById('connected_status').innerHTML = 'Connecting...'
+        document.getElementById('connected_status').innerHTML = 'Connecting...'
         await connect_user();
     } else {
         // WEB3 browser extenstion could not be found!
@@ -1510,8 +1533,8 @@ async function update_frontend() {
     document.getElementById('remainingSupply').style.color = 'palegreen';
     document.getElementById('totalSupply').style.color = 'palegreen';
     document.getElementById('totalCollectors').style.color = 'palegreen';
-    //document.getElementById('connected_status').innerHTML = truncateAddress(user_address);
-    //document.getElementById('connected_status').style.color = 'palegreen'
+    document.getElementById('connected_status').innerHTML = truncateAddress(user_address);
+    document.getElementById('connected_status').style.color = 'palegreen'
     //document.getElementById('address_owned_tokens').innerHTML = user_tokenBalance+' FROG(s)'
     //document.getElementById('address_owned_tokens').style.color = 'palegreen'
     //document.getElementById('address_staked_tokens').innerHTML = user_stakedBalance+' FROG(s)'
