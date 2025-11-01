@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en" data-theme="t1">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>freshfrogs — Collection</title>
+
+  <link rel="stylesheet" href="assets/css/styles.css" />
+
+  <style>
+    /* Base */
+    .pg-wrap{ padding:20px; }
+    img{ image-rendering: pixelated; image-rendering: crisp-edges; }
+
+    .pg-card{ padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
+    .pg-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .pg-card-head h3{ margin:0; font-weight:800; font-size:16px; }
+    .pg-muted{ color:var(--muted); font-size:13px; }
+
+    .list{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+    .row{ display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:center; padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
+    .thumb64{ width:64px; height:64px; min-width:64px; min-height:64px; border-radius:10px; object-fit:contain; background:var(--panel-2); }
+
+    /* Two-column page layout */
+    .page-grid{
+      display:grid; gap:16px; grid-template-columns: 1.2fr 0.8fr;
+      align-items:start; max-width:1100px; margin:0 auto;
+    }
+    @media (max-width:960px){ .page-grid{ grid-template-columns: 1fr; } }
+
+    /* Hero (centered) */
+    .frog-hero{ margin:28px auto 38px; max-width:1100px; }
+    .frog-title{ margin:0 0 6px 0; font:900 28px/1.15 'Space Grotesk', var(--font-ui); letter-spacing:-.01em; text-align:center; }
+    .frog-strip{ display:flex; gap:12px; align-items:center; justify-content:center; overflow:hidden; padding:0; }
+    .frog-strip .tile{ flex:0 0 auto; width:64px; height:64px; border-radius:10px; }
+    .frog-strip .tile.hide{ display:none !important; }
+    .frog-strip img{ width:64px; height:64px; object-fit:contain; }
+    @media (max-width:520px){ .frog-hero{ margin:22px auto 30px; } .frog-strip{ gap:10px; } }
+
+    /* Info blocks */
+    .info-grid-2{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:10px; margin-bottom:10px; }
+    @media (max-width:900px){ .info-grid-2{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    @media (max-width:520px){ .info-grid-2{ grid-template-columns: 1fr; } }
+    .info-block{ border:1px solid var(--border); border-radius:12px; padding:10px; background:var(--panel); }
+    .info-block .ik{ font-size:11px; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; }
+    .info-block .iv{ font-weight:900; font-size:18px; line-height:1.1; margin-top:4px; }
+    .info-block .in{ font-size:12px; color:var(--muted); }
+
+    /* Scrollable list (Recent Stakes) */
+    #recentStakes.scrolling{ overflow-y:auto; -webkit-overflow-scrolling:touch; padding-right:4px; }
+    #recentStakes .row{ cursor:pointer; }
+    @media (hover:hover){
+      #recentStakes.scrolling::-webkit-scrollbar{ width:8px; }
+      #recentStakes.scrolling::-webkit-scrollbar-thumb{
+        background: color-mix(in srgb, var(--muted) 35%, transparent);
+        border-radius:8px;
+      }
+    }
+
+    /* Cards (Owned Frogs) */
+    #ownedCard .grid-cards{ display:grid; gap:10px; grid-template-columns: 1fr; }
+    .frog-card{
+      border:1px solid var(--border);
+      background: var(--panel);
+      border-radius:14px;
+      padding:12px;
+      display:grid; grid-template-columns:auto 1fr; column-gap:12px; row-gap:6px; align-items:start;
+      color:inherit;
+    }
+    .frog-card .thumb{
+      width:128px;height:128px;border-radius:12px;background:var(--panel-2);object-fit:contain;grid-row: span 3;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 6px 12px rgba(0,0,0,.25);
+    }
+    .title{ margin:0; font-weight:900; font-size:18px; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
+    .pill{ display:inline-block; padding:3px 10px; border-radius:999px; background: color-mix(in srgb, var(--panel) 85%, transparent); border:1px solid var(--border); font-size:12px; }
+    .meta{ color:var(--muted); font-size:12px; }
+    .actions{ grid-column:1 / -1; display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+    .btn{
+      font-family: var(--font-ui);
+      border:1px solid var(--border);
+      background:transparent;
+      color:inherit;
+      border-radius:8px;
+      padding:6px 10px;
+      font-weight:700;
+      font-size:12px;
+      line-height:1;
+      display:inline-flex; align-items:center; gap:6px;
+      text-decoration:none; letter-spacing:.01em;
+      transition: background .15s ease, border-color .15s ease, color .15s ease, transform .05s ease;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn-outline-gray{ border-color: color-mix(in srgb, #9ca3af 70%, var(--border)); color: color-mix(in srgb, #ffffff 65%, #9ca3af); }
+    #ownedCard .actions .btn:hover{
+      background: color-mix(in srgb, #22c55e 14%, var(--panel));
+      border-color: color-mix(in srgb, #22c55e 80%, var(--border));
+      color: color-mix(in srgb, #ffffff 85%, #22c55e);
+    }
+  </style>
+</head>
+<body>
+  <div class="pg-wrap container">
+    <!-- HERO -->
+    <section class="frog-hero">
+      <h1 class="frog-title">freshfrogs.github.io</h1>
+      <div class="frog-strip">
+        <div class="tile"><img src="frog/12.png"  alt="12"></div>
+        <div class="tile"><img src="frog/77.png"  alt="77"></div>
+        <div class="tile"><img src="frog/404.png" alt="404"></div>
+        <div class="tile"><img src="frog/256.png" alt="256"></div>
+        <div class="tile"><img src="frog/999.png" alt="999"></div>
+        <div class="tile"><img src="frog/1.png"   alt="1"></div>
+      </div>
+    </section>
+
+    <!-- GRID -->
+    <div class="page-grid">
+
+      <!-- Left: The Pond (activity + KPIs) -->
+      <section class="pg-card">
+        <div class="pg-card-head"><h3>The Pond</h3></div>
+        <p class="pg-muted" style="margin:6px 0 12px 0; max-width:70ch;">
+          Pixel-perfect frogs hopping around the Ethereum pond. Stake to earn FLYZ and explore the collection’s quirks and traits.
+        </p>
+
+        <!-- KPIs -->
+        <div class="info-grid-2" style="margin-bottom:10px;">
+          <div class="info-block">
+            <div class="ik">🐸  Total Frogs Staked</div>
+            <div class="iv" id="stakedTotal">—</div>
+            <div class="in">Across the collection</div>
+          </div>
+          <div class="info-block">
+            <div class="ik">🧰 Controller</div>
+            <div class="iv"><a id="stakedController" href="#" target="_blank" rel="noopener">—</a></div>
+            <div class="in">Staking contract</div>
+          </div>
+          <div class="info-block">
+            <div class="ik">Rewards</div>
+            <div class="iv" id="pondRewardsSymbol">$FLYZ</div>
+            <div class="in">Earnings token</div>
+          </div>
+          <div class="info-block">
+            <div class="ik">ℹ️ Notes</div>
+            <div class="iv">Transfers → Controller</div>
+            <div class="in">Click a row for Etherscan</div>
+          </div>
+        </div>
+
+        <!-- Recent Stakes (scrollable) -->
+        <ul id="recentStakes" class="list" aria-live="polite" data-visible="6">
+          <li class="row"><div class="pg-muted">Loading recent stakes…</div></li>
+        </ul>
+      </section>
+
+      <!-- Right: My Frogs (header + cards) -->
+      <section id="ownedCard" class="pg-card">
+        <div class="pg-card-head">
+          <h3>My Frogs (Owned)</h3>
+          <div><button id="ownedConnectBtn" class="btn">Connect Wallet</button></div>
+        </div>
+
+        <!-- Header for KPIs is injected by owned-panel.js; remove old info squares -->
+
+        <div class="grid-cards" id="ownedGrid">
+          <div class="pg-muted">Connect your wallet to view owned frogs.</div>
+        </div>
+        <div class="pg-muted" id="ownedMore" style="margin-top:8px; text-align:center; display:none;">Loading more…</div>
+      </section>
+
+    </div>
+  </div>
+
+  <script>
+    /* Hero strip: keep whole 64px tiles only */
+    function layoutFrogStrip(){
+      var strip = document.querySelector('.frog-strip'); if(!strip) return;
+      var tiles = Array.prototype.slice.call(strip.querySelectorAll('.tile'));
+      var styles = window.getComputedStyle(strip);
+      var gap = parseFloat(styles.gap || 12) || 12;
+      var tileW = 64, innerW = strip.clientWidth;
+      var count = Math.max(1, Math.floor((innerW + gap) / (tileW + gap)));
+      tiles.forEach(function(t,i){ t.classList.toggle('hide', i >= count); });
+    }
+    window.addEventListener('resize', layoutFrogStrip);
+    document.addEventListener('DOMContentLoaded', layoutFrogStrip);
+  </script>
+
+<!-- Config & shared helpers -->
+<script src="assets/js/config.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/rarity.js"></script>
+<script src="assets/js/modal.js"></script>
+
+<!-- ABIs must come from /assets/abi -->
+<script src="assets/abi/collection_abi.js"></script>
+<script src="assets/abi/controller_abi.js"></script>
+
+<!-- Panels / features (all from /assets/js) -->
+<script src="assets/js/pond.js"></script>
+<script src="assets/js/wallet-state.js"></script>
+<script src="assets/js/wallet.js"></script>
+<script src="assets/js/staking-adapter.js"></script>  <!-- ✅ correct path -->
+<script src="assets/js/pond-kpis.js"></script>
+<script src="assets/js/stakes-feed.js"></script>
+<script src="assets/js/pond-tweaks.js"></script>
+<script src="assets/js/owned-panel.js"></script>
+
+<script>
+  if (window.FF_loadRecentStakes) FF_loadRecentStakes();
+  if (window.FF_initOwnedPanel)   FF_initOwnedPanel();
+</script>
+
+</body>
+</html>
