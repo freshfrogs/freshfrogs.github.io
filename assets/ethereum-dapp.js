@@ -250,6 +250,30 @@ function timestampToDate(timestamp) {
     return '--';
 }
 
+function coerceStatNumber(value) {
+    if (value === undefined || value === null) { return null; }
+    if (typeof value === 'number') {
+        return Number.isFinite(value) ? value : null;
+    }
+    if (typeof value === 'string') {
+        const normalized = value.replace(/,/g, '').trim();
+        if (!normalized) { return null; }
+        const numeric = Number(normalized);
+        return Number.isFinite(numeric) ? numeric : null;
+    }
+    return null;
+}
+
+function pickStatNumber(candidates) {
+    for (const candidate of candidates) {
+        const numeric = coerceStatNumber(candidate);
+        if (numeric !== null && numeric >= 0) {
+            return numeric;
+        }
+    }
+    return null;
+}
+
 function hexToDecimal(hexString) {
     if (!hexString) { return '0'; }
     try {
@@ -473,7 +497,8 @@ function formatTxnHash(hash) {
 }
 
 function normalizeAlchemySale(sale) {
-    const { eth, usd } = parseAlchemyPrice(sale.salePrice);
+    const priceSource = sale.salePrice || sale.price || sale.totalPrice || sale.amount || sale.value;
+    const { eth, usd } = parseAlchemyPrice(priceSource || sale);
     const { seconds, iso } = resolveSaleTimestamp(sale);
     return {
         createdAt: iso,
@@ -487,7 +512,8 @@ function normalizeAlchemySale(sale) {
 }
 
 function normalizeAlchemyMint(sale) {
-    const { eth, usd } = parseAlchemyPrice(sale.salePrice);
+    const priceSource = sale.salePrice || sale.price || sale.totalPrice || sale.amount || sale.value;
+    const { eth, usd } = parseAlchemyPrice(priceSource || sale);
     const { seconds, iso } = resolveSaleTimestamp(sale);
     return {
         createdAt: iso,
@@ -1497,12 +1523,29 @@ async function fetch_collection_stats(){
         const stats = await alchemyRequest('/getContractMetadata', { params, version: 'v2' });
         console.log(stats)
         const metadata = stats.contractMetadata || {};
-        const totalSupply = metadata.totalSupply ? Number(metadata.totalSupply) : 0;
-        const ownerCount = metadata.openSea && metadata.openSea.collectionStats ? Number(metadata.openSea.collectionStats.numOwners || 0) : 0;
-        const remaining = 4040 - parseInt(totalSupply);
-        document.getElementById('remainingSupply').innerHTML = remaining > 0 ? remaining : 0;
-        document.getElementById('totalSupply').innerHTML = totalSupply+' / 4040';
-        document.getElementById('totalCollectors').innerHTML = ownerCount;
+        const mintedCandidate = pickStatNumber([
+            stats.totalMinted,
+            stats.totalSupply,
+            metadata.totalSupply,
+            metadata.circulatingSupply,
+            metadata.symbolTotalSupply,
+            metadata.openSea && metadata.openSea.collectionStats ? metadata.openSea.collectionStats.totalSupply : null,
+            metadata.openSea && metadata.openSea.collectionStats ? metadata.openSea.collectionStats.count : null
+        ]);
+        const ownerCandidate = pickStatNumber([
+            stats.totalOwners,
+            stats.ownerCount,
+            metadata.openSea && metadata.openSea.collectionStats ? metadata.openSea.collectionStats.numOwners : null,
+            metadata.openSea && metadata.openSea.collectionStats ? metadata.openSea.collectionStats.owners : null,
+            metadata.openSea && metadata.openSea.collectionStats ? metadata.openSea.collectionStats.ownersTotal : null
+        ]);
+        const minted = mintedCandidate !== null ? Math.round(mintedCandidate) : 0;
+        const cappedMinted = Math.min(Math.max(minted, 0), 4040);
+        const remaining = Math.max(4040 - cappedMinted, 0);
+        const ownerCount = ownerCandidate !== null ? Math.max(Math.round(ownerCandidate), 0) : null;
+        document.getElementById('remainingSupply').innerHTML = remaining.toLocaleString();
+        document.getElementById('totalSupply').innerHTML = cappedMinted.toLocaleString()+' / 4040';
+        document.getElementById('totalCollectors').innerHTML = ownerCount !== null ? ownerCount.toLocaleString() : '--';
     } catch (err) {
         console.error(err);
     }

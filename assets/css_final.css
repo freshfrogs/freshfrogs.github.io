@@ -437,6 +437,31 @@ body {
     }
 }
 
+@media (max-width: 1024px) {
+    .top-section-copy {
+        padding-right: 24px;
+    }
+}
+
+@media (max-width: 900px) {
+    body {
+        padding: 20px 16px;
+    }
+
+    .top-section {
+        padding: 18px;
+    }
+
+    .top-section-copy {
+        padding-right: 16px;
+    }
+
+    #icons_container.image-grid {
+        width: 100%;
+        max-width: 360px;
+    }
+}
+
 /* Responsive styling for smaller screens */
 @media (max-width: 768px) {
     .bottom-sections {
@@ -719,6 +744,10 @@ body {
   width: 100%;
   border-radius: 5px;
   box-shadow: 2px 2px #417871;
+  text-align: center;
+}
+.metrics-panel,
+.mint-status-panel {
   text-align: center;
 }
 .infobox_left{
