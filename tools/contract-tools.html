@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FreshFrogs • Contract Tools</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="assets/css/contract-tools.css">
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">🐸 FreshFrogs <span class="muted">• Contract Tools</span></div>
+    <div class="wallet">
+      <button id="btnConnect" class="btn primary">Connect Wallet</button>
+      <span id="acct" class="acct"></span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- Stat chips (like your Pond) -->
+    <div class="stats">
+      <div class="chip">
+        <div class="k">Contract</div>
+        <div class="v"><a id="chipController" target="_blank" rel="noopener"></a></div>
+      </div>
+      <div class="chip">
+        <div class="k">Network</div>
+        <div class="v" id="chipNetwork">—</div>
+      </div>
+    </div>
+
+    <!-- Global terminal -->
+    <section class="terminal" id="terminal" aria-live="polite"></section>
+
+    <!-- ONE panel that contains all functions -->
+    <section class="panel">
+      <!-- claimRewards -->
+      <div class="fn-block">
+        <h3>claimRewards()</h3>
+        <div class="desc scroll">
+          Claim any accumulated rewards for the connected wallet.
+        </div>
+        <div class="ctrl">
+          <button id="btnClaim" class="btn">Claim Rewards</button>
+        </div>
+      </div>
+
+      <!-- stake -->
+      <div class="divider"></div>
+      <div class="fn-block">
+        <h3>stake(uint256 _tokenId)</h3>
+        <div class="desc scroll">
+          Stake a specific NFT by its <code>tokenId</code>. If the controller isn’t approved for this token,
+          we’ll first call <code>approve(controller, tokenId)</code>.
+        </div>
+        <div class="ctrl">
+          <input id="in-stake-id" class="input" type="number" min="0" placeholder="tokenId">
+          <button id="btnStake" class="btn">Stake</button>
+        </div>
+      </div>
+
+      <!-- withdraw -->
+      <div class="divider"></div>
+      <div class="fn-block">
+        <h3>withdraw(uint256 _tokenId)</h3>
+        <div class="desc scroll">
+          Unstake a previously staked NFT by its <code>tokenId</code>.
+        </div>
+        <div class="ctrl">
+          <input id="in-withdraw-id" class="input" type="number" min="0" placeholder="tokenId">
+          <button id="btnWithdraw" class="btn">Withdraw</button>
+        </div>
+      </div>
+
+      <!-- availableRewards -->
+      <div class="divider"></div>
+      <div class="fn-block">
+        <h3>availableRewards(address _staker) → uint256</h3>
+        <div class="desc scroll">
+          Read unclaimed rewards for any address (leave blank to use your wallet).
+        </div>
+        <div class="ctrl">
+          <input id="in-rewards-addr" class="input" type="text" placeholder="0x... (optional)">
+          <button id="btnRewards" class="btn">Check</button>
+        </div>
+      </div>
+
+      <!-- getStakedTokens -->
+      <div class="divider"></div>
+      <div class="fn-block">
+        <h3>getStakedTokens(address _user) → (staker, tokenId)[]</h3>
+        <div class="desc scroll">
+          List staked tokens for a user (leave blank to use your wallet).
+        </div>
+        <div class="ctrl">
+          <input id="in-staked-addr" class="input" type="text" placeholder="0x... (optional)">
+          <button id="btnGetStaked" class="btn">Query</button>
+        </div>
+      </div>
+
+      <!-- stakerAddress -->
+      <div class="divider"></div>
+      <div class="fn-block">
+        <h3>stakerAddress(uint256 tokenId)</h3>
+        <div class="desc scroll">
+          Lookup the staker address for a given <code>tokenId</code>.
+        </div>
+        <div class="ctrl">
+          <input id="in-staker-of" class="input" type="number" min="0" placeholder="tokenId">
+          <button id="btnStakerOf" class="btn">Lookup</button>
+        </div>
+      </div>
+
+      <!-- stakers -->
+      <div class="divider"></div>
+      <div class="fn-block">
+        <h3>stakers(address user)</h3>
+        <div class="desc scroll">
+          Read the mapping for a user: <code>(amountStaked, timeOfLastUpdate, unclaimedRewards)</code>.
+        </div>
+        <div class="ctrl">
+          <input id="in-stakers" class="input" type="text" placeholder="0x... (optional)">
+          <button id="btnStakers" class="btn">Lookup</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <a id="linkNFT" target="_blank" rel="noopener">NFT Collection</a> •
+      <a id="linkRewards" target="_blank" rel="noopener">Rewards Token</a>
+    </footer>
+  </main>
+
+  <script>
+    window.CONTROLLER_ADDRESS = "0xCB1eE125cFf4051A10A55a09B10613876C4eF199";
+  </script>
+  <script src="assets/js/contract-tools.js"></script>
+</body>
+</html>

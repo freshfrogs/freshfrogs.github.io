@@ -130,6 +130,12 @@ body {
 .top-section p {
     font-size: 1.1em;
     margin-bottom: 20px;
+    color: white;
+    background: #2f4f4f;
+    padding: 8px;
+    border: 1px solid black;
+    border-radius: 5PX;
+    box-shadow: 2px 2px #417871;
 }
 
 /* Image grid to the right */
@@ -374,6 +380,61 @@ body {
 .bottom-section p {
     font-size: 1.1em;
     color: white;
+    background: #2f4f4f;
+    padding: 8px;
+    border: 1px solid black;
+    border-radius: 5PX;
+    box-shadow: 2px 2px #417871;
+}
+
+@media (max-width: 1024px) {
+    .top-section-copy {
+        padding-right: 24px;
+    }
+}
+
+@media (max-width: 900px) {
+    body {
+        padding: 20px 16px;
+    }
+
+    .top-section {
+        padding: 18px;
+    }
+
+    .top-section-copy {
+        padding-right: 16px;
+    }
+
+    #icons_container.image-grid {
+        width: 100%;
+        max-width: 360px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .top-section-copy {
+        padding-right: 24px;
+    }
+}
+
+@media (max-width: 900px) {
+    body {
+        padding: 20px 16px;
+    }
+
+    .top-section {
+        padding: 18px;
+    }
+
+    .top-section-copy {
+        padding-right: 16px;
+    }
+
+    #icons_container.image-grid {
+        width: 100%;
+        max-width: 360px;
+    }
 }
 
 @media (max-width: 1024px) {
@@ -683,6 +744,7 @@ body {
   width: 100%;
   border-radius: 5px;
   box-shadow: 2px 2px #417871;
+  text-align: center;
 }
 .metrics-panel,
 .mint-status-panel {
