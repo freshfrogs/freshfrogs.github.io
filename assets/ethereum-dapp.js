@@ -191,7 +191,7 @@ async function fetch_token_sales(contract, limit, next_string) {
     if (next_string) { params.append('pageKey', next_string); }
     try {
         const data = await alchemyRequest('/getNFTSales', { params });
-        console.log(data)
+        console.log('Alchemy sales response', data);
         const sales = (data.nftSales || []).map(normalizeAlchemySale);
         render_token_sales(contract, sales);
         if (! data.pageKey) { return }
@@ -213,7 +213,7 @@ async function fetch_token_mints(contract, limit, next_string) {
     if (next_string) { params.append('pageKey', next_string); }
     try {
         const data = await alchemyRequest('/getNFTSales', { params });
-        console.log(data)
+        console.log('Alchemy mint sales response', data);
         const mints = (data.nftSales || []).map(normalizeAlchemyMint);
         render_token_mints(contract, mints);
         if (! data.pageKey) { return }
@@ -226,25 +226,32 @@ async function fetch_token_mints(contract, limit, next_string) {
 function timestampToDate(timestamp) {
     if (timestamp === undefined || timestamp === null) { return '--'; }
 
-    const coerceNumber = Number(timestamp);
-    if (Number.isFinite(coerceNumber) && coerceNumber > 0) {
-        const date = new Date(coerceNumber * 1000); // Convert to milliseconds
-        if (!Number.isNaN(date.getTime())) {
-            const mm = String(date.getMonth() + 1).padStart(2, '0');
-            const dd = String(date.getDate()).padStart(2, '0');
-            const yy = date.getFullYear().toString().slice(-2);
-            return `${mm}/${dd}/${yy}`;
-        }
+    const formatDate = (date) => {
+        if (Number.isNaN(date.getTime())) { return '--'; }
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        const yy = date.getFullYear().toString().slice(-2);
+        return `${mm}/${dd}/${yy}`;
+    };
+
+    if (timestamp instanceof Date) {
+        return formatDate(timestamp);
+    }
+
+    if (typeof timestamp === 'number') {
+        if (!Number.isFinite(timestamp) || timestamp <= 0) { return '--'; }
+        const ms = timestamp > 1e12 ? timestamp : timestamp * 1000;
+        return formatDate(new Date(ms));
     }
 
     if (typeof timestamp === 'string') {
-        const parsed = new Date(timestamp);
-        if (!Number.isNaN(parsed.getTime())) {
-            const mm = String(parsed.getMonth() + 1).padStart(2, '0');
-            const dd = String(parsed.getDate()).padStart(2, '0');
-            const yy = parsed.getFullYear().toString().slice(-2);
-            return `${mm}/${dd}/${yy}`;
+        const trimmed = timestamp.trim();
+        if (!trimmed) { return '--'; }
+        const numeric = Number(trimmed);
+        if (Number.isFinite(numeric) && numeric > 0) {
+            return timestampToDate(numeric);
         }
+        return formatDate(new Date(trimmed));
     }
 
     return '--';
@@ -302,244 +309,204 @@ function hexToDecimal(hexString) {
     }
 }
 
-function normalizeNumericValue(value) {
-    if (value === undefined || value === null) { return NaN; }
-    if (typeof value === 'string' && value.startsWith('0x')) {
-        const parsedHex = parseInt(value, 16);
-        return Number.isNaN(parsedHex) ? NaN : parsedHex;
+function toNumberOrNull(value) {
+    if (value === undefined || value === null) { return null; }
+    if (typeof value === 'number') { return Number.isFinite(value) ? value : null; }
+    if (typeof value === 'string') {
+        const trimmed = value.trim();
+        if (!trimmed) { return null; }
+        const numeric = Number(trimmed);
+        return Number.isFinite(numeric) ? numeric : null;
     }
-    const numeric = Number(value);
-    return Number.isFinite(numeric) ? numeric : NaN;
+    return null;
 }
 
-function parseAlchemyPrice(priceObject, saleContext) {
-    if (!priceObject) { return { eth: 0, usd: 0 }; }
+function positiveNumber(value) {
+    const numeric = toNumberOrNull(value);
+    return (numeric !== null && numeric > 0) ? numeric : null;
+}
 
-    const totalPrice = priceObject.totalPrice || priceObject || {};
-    const amount = totalPrice.amount || priceObject.amount || {};
-    const nativePrice = totalPrice.nativePrice || priceObject.nativePrice || {};
-    const unitPrice = priceObject.unitPrice || totalPrice.unitPrice || {};
-    const openSeaPrice = priceObject.openSea || {};
-    const priceValue = priceObject.price || {};
+function divideUsingDecimals(raw, decimals) {
+    const rawNumber = toNumberOrNull(raw);
+    if (rawNumber === null) { return null; }
+    const decimalsNumber = toNumberOrNull(decimals);
+    if (decimalsNumber === null || decimalsNumber === 0) { return rawNumber; }
+    return rawNumber / Math.pow(10, decimalsNumber);
+}
 
-    function addDirectCandidates(container, decimals, list) {
-        if (container === undefined || container === null) { return; }
-        if (typeof container === 'string' || typeof container === 'number') {
-            const value = container;
-            const numeric = normalizeNumericValue(value);
-            if (Number.isNaN(numeric) || numeric === 0) { return; }
-            if (typeof value === 'string' && value.includes('.')) {
-                list.push({ value: numeric, decimals: 'eth' });
-            } else {
-                list.push({ value: numeric, decimals: decimals !== undefined ? decimals : 18 });
-                if (numeric < 1000000) { // Also treat smaller numbers as already in ETH.
-                    list.push({ value: numeric, decimals: 'eth' });
-                }
-            }
-            return;
+function readEthAmount(source, decimalsHint, seen) {
+    if (!source) { return null; }
+    if (!seen) { seen = new Set(); }
+
+    if (Array.isArray(source)) {
+        for (const entry of source) {
+            const value = readEthAmount(entry, decimalsHint, seen);
+            if (value !== null && value > 0) { return value; }
         }
-        if (Array.isArray(container)) {
-            container.forEach((entry) => addDirectCandidates(entry, decimals, list));
-            return;
-        }
-        if (typeof container === 'object') {
-            const objectDecimals = container.decimals !== undefined ? container.decimals : decimals;
-            addDirectCandidates(container.decimal, 'eth', list);
-            addDirectCandidates(container.amount, objectDecimals, list);
-            addDirectCandidates(container.value, objectDecimals, list);
-            addDirectCandidates(container.raw, objectDecimals, list);
-            addDirectCandidates(container.total, objectDecimals, list);
-            addDirectCandidates(container.quantity, objectDecimals, list);
-            addDirectCandidates(container.wei, 18, list);
-        }
+        return null;
     }
 
-    const candidates = [
-        { value: amount.decimal, decimals: 'eth' },
-        { value: amount.amount, decimals: 'eth' },
-        { value: amount.value, decimals: amount.decimals },
-        { value: amount.raw, decimals: amount.decimals },
-        { value: unitPrice.decimal, decimals: 'eth' },
-        { value: unitPrice.amount, decimals: 'eth' },
-        { value: unitPrice.value, decimals: unitPrice.decimals },
-        { value: priceObject.decimal, decimals: 'eth' },
-        { value: priceObject.amount, decimals: 'eth' },
-        { value: priceObject.value, decimals: priceObject.decimals },
-        { value: priceObject.quantity, decimals: priceObject.decimals },
-        { value: priceObject.total, decimals: priceObject.decimals },
-        { value: priceValue.value, decimals: priceValue.decimals },
-        { value: nativePrice.eth, decimals: 'eth' },
-        { value: totalPrice.eth, decimals: 'eth' },
-        { value: nativePrice.value, decimals: nativePrice.decimals },
-        { value: totalPrice.value, decimals: totalPrice.decimals },
-        { value: totalPrice.quantity, decimals: totalPrice.decimals },
-        { value: totalPrice.wei, decimals: 18 },
-        { value: totalPrice.raw, decimals: totalPrice.decimals },
-        { value: openSeaPrice.price, decimals: openSeaPrice.decimals },
-        { value: openSeaPrice.value, decimals: openSeaPrice.decimals }
+    if (typeof source === 'number' || typeof source === 'string') {
+        const numeric = positiveNumber(source);
+        if (numeric !== null) {
+            if (decimalsHint !== undefined && decimalsHint !== null && decimalsHint > 0 && numeric >= 1e6) {
+                const converted = divideUsingDecimals(numeric, decimalsHint);
+                return positiveNumber(converted);
+            }
+            return numeric;
+        }
+        return null;
+    }
+
+    if (typeof source !== 'object' || source instanceof Date) { return null; }
+    if (seen.has(source)) { return null; }
+    seen.add(source);
+
+    const decimals = toNumberOrNull(source.decimals ?? source.currency?.decimals ?? decimalsHint);
+
+    const direct = positiveNumber(
+        source.decimal ??
+        source.eth ??
+        source.quantity ??
+        source.amount ??
+        source.value ??
+        source.price ??
+        source.total
+    );
+    if (direct !== null) { return direct; }
+
+    const rawDivided = divideUsingDecimals(
+        source.rawAmount ?? source.raw ?? source.base ?? source.tokenAmount,
+        decimals
+    );
+    const rawPositive = positiveNumber(rawDivided);
+    if (rawPositive !== null) { return rawPositive; }
+
+    const nestedKeys = [
+        'amount',
+        'totalPrice',
+        'nativePrice',
+        'unitPrice',
+        'price',
+        'value',
+        'paymentToken',
+        'paymentTokens',
+        'consideration',
+        'offers',
+        'sellerFee',
+        'buyerFee',
+        'protocolFee',
+        'royaltyFee',
+        'openSea',
+        'salePrice',
+        'marketplace',
+        'order',
+        'transaction'
     ];
 
-    addDirectCandidates(amount, amount.decimals, candidates);
-    addDirectCandidates(priceObject, priceObject.decimals, candidates);
-    addDirectCandidates(totalPrice, totalPrice.decimals, candidates);
-    addDirectCandidates(unitPrice, unitPrice.decimals, candidates);
-    addDirectCandidates(nativePrice, nativePrice.decimals, candidates);
-    if (saleContext) {
-        addDirectCandidates(saleContext, saleContext.decimals, candidates);
-        const fallbackContainers = [
-            saleContext.salePrice,
-            saleContext.price,
-            saleContext.totalPrice,
-            saleContext.amount,
-            saleContext.value,
-            saleContext.paymentToken,
-            saleContext.paymentTokens,
-            saleContext.consideration,
-            saleContext.offers,
-            saleContext.nativePrice,
-            saleContext.unitPrice,
-            saleContext.sellerFee,
-            saleContext.buyerFee,
-            saleContext.protocolFee,
-            saleContext.royaltyFee,
-            saleContext.marketplace && saleContext.marketplace.price,
-            saleContext.marketplace && saleContext.marketplace.paymentToken,
-            saleContext.order,
-            saleContext.order && saleContext.order.price,
-            saleContext.order && saleContext.order.currentPrice,
-            saleContext.order && saleContext.order.startingPrice,
-            saleContext.transaction && saleContext.transaction.price,
-            saleContext.transaction && saleContext.transaction.paymentToken
-        ];
-        fallbackContainers.forEach((container) => {
-            if (container !== undefined && container !== null) {
-                addDirectCandidates(container, container.decimals, candidates);
-            }
-        });
+    for (const key of nestedKeys) {
+        if (source[key] !== undefined) {
+            const nested = readEthAmount(source[key], decimals, seen);
+            if (nested !== null && nested > 0) { return nested; }
+        }
     }
+
+    return null;
+}
+
+function readUsdAmount(source, seen) {
+    if (!source) { return null; }
+    if (!seen) { seen = new Set(); }
+
+    if (Array.isArray(source)) {
+        for (const entry of source) {
+            const value = readUsdAmount(entry, seen);
+            if (value !== null && value > 0) { return value; }
+        }
+        return null;
+    }
+
+    if (typeof source === 'number' || typeof source === 'string') {
+        const numeric = positiveNumber(source);
+        return numeric !== null ? numeric : null;
+    }
+
+    if (typeof source !== 'object' || source instanceof Date) { return null; }
+    if (seen.has(source)) { return null; }
+    seen.add(source);
+
+    const direct = positiveNumber(
+        source.usd ??
+        source.usdPrice ??
+        source.usdValue ??
+        source.fiatValue
+    );
+    if (direct !== null) { return direct; }
+
+    const nestedKeys = [
+        'amount',
+        'totalPrice',
+        'nativePrice',
+        'unitPrice',
+        'price',
+        'value',
+        'paymentToken',
+        'paymentTokens',
+        'consideration',
+        'offers',
+        'sellerFee',
+        'buyerFee',
+        'protocolFee',
+        'royaltyFee',
+        'openSea',
+        'salePrice',
+        'marketplace',
+        'order',
+        'transaction'
+    ];
+
+    for (const key of nestedKeys) {
+        if (source[key] !== undefined) {
+            const nested = readUsdAmount(source[key], seen);
+            if (nested !== null && nested > 0) { return nested; }
+        }
+    }
+
+    return null;
+}
+
+function parseAlchemyPrice(sale) {
+    if (!sale) { return { eth: 0, usd: 0 }; }
+
+    const sources = [
+        sale.salePrice,
+        sale.price,
+        sale.totalPrice,
+        sale.amount,
+        sale.value,
+        sale.paymentToken,
+        sale.paymentTokens,
+        sale.consideration,
+        sale.offers,
+        sale.marketplace && sale.marketplace.price,
+        sale.marketplace,
+        sale.order && sale.order.price,
+        sale.order,
+        sale.transaction && sale.transaction.price,
+        sale.transaction,
+        sale
+    ];
 
     let eth = 0;
-    for (const { value, decimals } of candidates) {
-        const numeric = normalizeNumericValue(value);
-        if (!Number.isNaN(numeric) && numeric !== 0) {
-            const isEthUnit = decimals === 'eth' || decimals === null || decimals === undefined || decimals === '';
-            if (isEthUnit) {
-                eth = numeric;
-            } else {
-                const parsedDecimals = Number(decimals);
-                if (!Number.isFinite(parsedDecimals) || parsedDecimals === 0) {
-                    eth = numeric;
-                } else {
-                    eth = numeric / Math.pow(10, parsedDecimals);
-                }
-            }
-            break;
-        }
-    }
-
-    const usdCandidates = [
-        amount.usd,
-        amount.usdPrice,
-        totalPrice.usd,
-        totalPrice.usdPrice,
-        nativePrice.usd,
-        nativePrice.usdPrice,
-        priceObject.usd,
-        priceObject.usdPrice,
-        unitPrice.usd,
-        unitPrice.usdPrice,
-        totalPrice.usdValue,
-        priceValue.usd,
-        openSeaPrice.usd,
-        openSeaPrice.usdPrice
-    ];
-    if (priceObject.usdValue !== undefined) { usdCandidates.push(priceObject.usdValue); }
-    if (totalPrice.usdValue !== undefined) { usdCandidates.push(totalPrice.usdValue); }
-    if (nativePrice.usdValue !== undefined) { usdCandidates.push(nativePrice.usdValue); }
-    if (saleContext) {
-        const pushUsd = (container) => {
-            if (!container) { return; }
-            if (Array.isArray(container)) { container.forEach(pushUsd); return; }
-            if (typeof container === 'object') {
-                if (container.usd !== undefined) { usdCandidates.push(container.usd); }
-                if (container.usdPrice !== undefined) { usdCandidates.push(container.usdPrice); }
-                if (container.usdValue !== undefined) { usdCandidates.push(container.usdValue); }
-            }
-        };
-        [
-            saleContext,
-            saleContext.salePrice,
-            saleContext.price,
-            saleContext.totalPrice,
-            saleContext.amount,
-            saleContext.paymentToken,
-            saleContext.paymentTokens,
-            saleContext.consideration,
-            saleContext.offers,
-            saleContext.nativePrice,
-            saleContext.unitPrice,
-            saleContext.sellerFee,
-            saleContext.buyerFee,
-            saleContext.protocolFee,
-            saleContext.royaltyFee,
-            saleContext.marketplace && saleContext.marketplace.price,
-            saleContext.marketplace && saleContext.marketplace.paymentToken,
-            saleContext.order,
-            saleContext.order && saleContext.order.price,
-            saleContext.order && saleContext.order.currentPrice,
-            saleContext.order && saleContext.order.startingPrice,
-            saleContext.transaction && saleContext.transaction.price,
-            saleContext.transaction && saleContext.transaction.paymentToken
-        ].forEach(pushUsd);
+    for (const source of sources) {
+        const parsed = readEthAmount(source, sale?.paymentToken?.decimals);
+        if (parsed !== null && parsed > 0) { eth = parsed; break; }
     }
 
     let usd = 0;
-    for (const candidate of usdCandidates) {
-        const numeric = normalizeNumericValue(candidate);
-        if (!Number.isNaN(numeric) && numeric > 0) {
-            usd = numeric;
-            break;
-        }
-    }
-
-    if ((!eth || eth === 0) && saleContext) {
-        const paymentContainers = [];
-        const pushContainer = (container) => {
-            if (container === undefined || container === null) { return; }
-            if (Array.isArray(container)) { container.forEach(pushContainer); return; }
-            paymentContainers.push(container);
-        };
-        pushContainer(saleContext.paymentToken);
-        pushContainer(saleContext.paymentTokens);
-        pushContainer(saleContext.consideration);
-        pushContainer(saleContext.offers);
-        pushContainer(saleContext.nativePrice);
-        pushContainer(saleContext.unitPrice);
-
-        for (const container of paymentContainers) {
-            if (typeof container === 'object') {
-                const directValue = normalizeNumericValue(container.amount);
-                if (Number.isFinite(directValue) && directValue > 0) {
-                    eth = directValue;
-                    break;
-                }
-                const rawAmount = normalizeNumericValue(container.rawAmount || container.raw);
-                const decimals = normalizeNumericValue(container.decimals);
-                if (Number.isFinite(rawAmount) && Number.isFinite(decimals) && decimals > 0) {
-                    const parsed = rawAmount / Math.pow(10, decimals);
-                    if (parsed > 0) {
-                        eth = parsed;
-                        break;
-                    }
-                }
-            } else {
-                const direct = normalizeNumericValue(container);
-                if (Number.isFinite(direct) && direct > 0) {
-                    eth = direct;
-                    break;
-                }
-            }
-        }
+    for (const source of sources) {
+        const parsedUsd = readUsdAmount(source);
+        if (parsedUsd !== null && parsedUsd > 0) { usd = parsedUsd; break; }
     }
 
     return { eth: eth || 0, usd: usd || 0 };
@@ -622,8 +589,7 @@ function formatTxnHash(hash) {
 }
 
 function normalizeAlchemySale(sale) {
-    const priceSource = sale.salePrice || sale.price || sale.totalPrice || sale.amount || sale.value;
-    const { eth, usd } = parseAlchemyPrice(priceSource || sale, sale);
+    const { eth, usd } = parseAlchemyPrice(sale);
     const { seconds, iso } = resolveSaleTimestamp(sale);
     return {
         createdAt: iso,
@@ -637,8 +603,7 @@ function normalizeAlchemySale(sale) {
 }
 
 function normalizeAlchemyMint(sale) {
-    const priceSource = sale.salePrice || sale.price || sale.totalPrice || sale.amount || sale.value;
-    const { eth, usd } = parseAlchemyPrice(priceSource || sale, sale);
+    const { eth, usd } = parseAlchemyPrice(sale);
     const { seconds, iso } = resolveSaleTimestamp(sale);
     return {
         createdAt: iso,
