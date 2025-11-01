@@ -1361,7 +1361,7 @@ async function fetch_eth_usd() {
 */
 async function initiate_web3_connection() {
     if (typeof window.ethereum !== "undefined") {
-        document.getElementById('connected_status').innerHTML = 'Connecting...'
+        //document.getElementById('connected_status').innerHTML = 'Connecting...'
         await connect_user();
     } else {
         // WEB3 browser extenstion could not be found!
@@ -1510,8 +1510,8 @@ async function update_frontend() {
     document.getElementById('remainingSupply').style.color = 'palegreen';
     document.getElementById('totalSupply').style.color = 'palegreen';
     document.getElementById('totalCollectors').style.color = 'palegreen';
-    document.getElementById('connected_status').innerHTML = truncateAddress(user_address);
-    document.getElementById('connected_status').style.color = 'palegreen'
+    //document.getElementById('connected_status').innerHTML = truncateAddress(user_address);
+    //document.getElementById('connected_status').style.color = 'palegreen'
     //document.getElementById('address_owned_tokens').innerHTML = user_tokenBalance+' FROG(s)'
     //document.getElementById('address_owned_tokens').style.color = 'palegreen'
     //document.getElementById('address_staked_tokens').innerHTML = user_stakedBalance+' FROG(s)'
