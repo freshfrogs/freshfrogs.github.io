@@ -87,14 +87,7 @@
             <a href="https://etherscan.io/address/0xcb1ee125cff4051a10a55a09b10613876c4ef199" target="_blank">Live Staking Contract</a><br>
           </p>
           <br>
-          <button id="connectButton" class="connectButton" style="background: lightcoral; color: white;">Connect to Web3</button>
-          <a href="https://github.com/freshfrogs/freshfrogs.github.io" target="_blank"><button id="githubButton" class="connectButton" style="background: lightsteelblue; color: black;">View on Github</button></a>
-          <a href="https://opensea.io/collection/fresh-frogs" target="_blank"><button id="raribleButton" class="connectButton" style="background: rgb(0, 134, 255); color: white;">Shop on Opensea</button></a>
-          <a href="https://freshfrogs.github.io/wallet/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍃 My Holdings</button></a>
-          <br><br>
           <p class="terminal_op">
-            <b>Connected:</b>
-            <text id="connected_status" style="color: salmon;">False</text><br>
             <b>Network: </b><text id="address_network">Ethereum Main</text><br>
             <b>Total Supply: </b><text id="totalSupply">-- / 4040</text><br>
             <b>Total Collectors: </b><text id="totalCollectors">--</text><br>
@@ -102,6 +95,12 @@
             <b>Staked Tokens: </b><text id="total_staked_tokens">--</text><br>
             <!-- <b>Unclaimed Rewards: </b><text id="address_unclaimed_rewards">--</text> -->
           </p>
+          <br>
+          <button id="connectButton" class="connectButton" style="background: lightcoral; color: white;">Connect to Web3</button>
+          <a href="https://github.com/freshfrogs/freshfrogs.github.io" target="_blank"><button id="githubButton" class="connectButton" style="background: lightsteelblue; color: black;">View on Github</button></a>
+          <a href="https://opensea.io/collection/fresh-frogs" target="_blank"><button id="raribleButton" class="connectButton" style="background: rgb(0, 134, 255); color: white;">Shop on Opensea</button></a>
+          <a href="https://freshfrogs.github.io/wallet/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍃 My Holdings</button></a>
+          <br><br>
         </div>
         <div id="icons_container" class="image-grid">
           <img src="https://freshfrogs.github.io/frog/500.png">
@@ -125,6 +124,13 @@
               ERC-721 powered by Factoria, verified and stored on IPFS ✔️
             </p>
             <br>
+            <p class="terminal_op" id="mint_terminal">
+              <b>Status: </b><text id="mint_status" style="color: salmon;">Please connect an ethereum wallet!</text><br>
+              <b>Remaining: </b><text id="remainingSupply">--</text><br>
+              <b>Mint Summary: </b><text id="mint_status_total">1 FROG(s) @ 0.01Ξ</text><br>
+              <b>Totaling: </b><text id="mint_status_cost">0.01Ξ + gas fee</text>
+            </p>
+            <br>
             <button id="mintDown" class="connectButton" style="background: steelblue; color: white; margin: 0px;">
               <span>&#8722;</span>
             </button>
@@ -134,13 +140,7 @@
             </button>
             <a href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><button class="connectButton" style="background: lightsteelblue; color: black;">View Etherscan</button></a>
             <!-- <button class="connectButton" onclick="redeem_free_mint()" style="background: teal; color: white;">🎁 1 FREE Mint</button> -->
-            <br><br>
-            <p class="terminal_op" id="mint_terminal">
-              <b>Status: </b><text id="mint_status" style="color: salmon;">Please connect an ethereum wallet!</text><br>
-              <b>Remaining: </b><text id="remainingSupply">--</text><br>
-              <b>Mint Summary: </b><text id="mint_status_total">1 FROG(s) @ 0.01Ξ</text><br>
-              <b>Totaling: </b><text id="mint_status_cost">0.01Ξ + gas fee</text>
-            </p>
+            <br>
           </div>
           <div class="bottom-section">
             <p style="color: white;">

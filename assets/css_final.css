@@ -694,6 +694,7 @@ body {
   width: 100%;
   border-radius: 5px;
   box-shadow: 2px 2px #417871;
+  text-align: center;
 }
 .infobox_left{
     margin: 8px;
