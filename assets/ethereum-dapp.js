@@ -274,6 +274,22 @@ function pickStatNumber(candidates) {
     return null;
 }
 
+function pickPositiveStat(candidates) {
+    let zeroFound = false;
+    for (const candidate of candidates) {
+        const numeric = coerceStatNumber(candidate);
+        if (numeric !== null) {
+            if (numeric > 0) {
+                return numeric;
+            }
+            if (numeric === 0) {
+                zeroFound = true;
+            }
+        }
+    }
+    return zeroFound ? 0 : null;
+}
+
 function hexToDecimal(hexString) {
     if (!hexString) { return '0'; }
     try {
@@ -296,7 +312,7 @@ function normalizeNumericValue(value) {
     return Number.isFinite(numeric) ? numeric : NaN;
 }
 
-function parseAlchemyPrice(priceObject) {
+function parseAlchemyPrice(priceObject, saleContext) {
     if (!priceObject) { return { eth: 0, usd: 0 }; }
 
     const totalPrice = priceObject.totalPrice || priceObject || {};
@@ -368,6 +384,39 @@ function parseAlchemyPrice(priceObject) {
     addDirectCandidates(totalPrice, totalPrice.decimals, candidates);
     addDirectCandidates(unitPrice, unitPrice.decimals, candidates);
     addDirectCandidates(nativePrice, nativePrice.decimals, candidates);
+    if (saleContext) {
+        addDirectCandidates(saleContext, saleContext.decimals, candidates);
+        const fallbackContainers = [
+            saleContext.salePrice,
+            saleContext.price,
+            saleContext.totalPrice,
+            saleContext.amount,
+            saleContext.value,
+            saleContext.paymentToken,
+            saleContext.paymentTokens,
+            saleContext.consideration,
+            saleContext.offers,
+            saleContext.nativePrice,
+            saleContext.unitPrice,
+            saleContext.sellerFee,
+            saleContext.buyerFee,
+            saleContext.protocolFee,
+            saleContext.royaltyFee,
+            saleContext.marketplace && saleContext.marketplace.price,
+            saleContext.marketplace && saleContext.marketplace.paymentToken,
+            saleContext.order,
+            saleContext.order && saleContext.order.price,
+            saleContext.order && saleContext.order.currentPrice,
+            saleContext.order && saleContext.order.startingPrice,
+            saleContext.transaction && saleContext.transaction.price,
+            saleContext.transaction && saleContext.transaction.paymentToken
+        ];
+        fallbackContainers.forEach((container) => {
+            if (container !== undefined && container !== null) {
+                addDirectCandidates(container, container.decimals, candidates);
+            }
+        });
+    }
 
     let eth = 0;
     for (const { value, decimals } of candidates) {
@@ -407,6 +456,42 @@ function parseAlchemyPrice(priceObject) {
     if (priceObject.usdValue !== undefined) { usdCandidates.push(priceObject.usdValue); }
     if (totalPrice.usdValue !== undefined) { usdCandidates.push(totalPrice.usdValue); }
     if (nativePrice.usdValue !== undefined) { usdCandidates.push(nativePrice.usdValue); }
+    if (saleContext) {
+        const pushUsd = (container) => {
+            if (!container) { return; }
+            if (Array.isArray(container)) { container.forEach(pushUsd); return; }
+            if (typeof container === 'object') {
+                if (container.usd !== undefined) { usdCandidates.push(container.usd); }
+                if (container.usdPrice !== undefined) { usdCandidates.push(container.usdPrice); }
+                if (container.usdValue !== undefined) { usdCandidates.push(container.usdValue); }
+            }
+        };
+        [
+            saleContext,
+            saleContext.salePrice,
+            saleContext.price,
+            saleContext.totalPrice,
+            saleContext.amount,
+            saleContext.paymentToken,
+            saleContext.paymentTokens,
+            saleContext.consideration,
+            saleContext.offers,
+            saleContext.nativePrice,
+            saleContext.unitPrice,
+            saleContext.sellerFee,
+            saleContext.buyerFee,
+            saleContext.protocolFee,
+            saleContext.royaltyFee,
+            saleContext.marketplace && saleContext.marketplace.price,
+            saleContext.marketplace && saleContext.marketplace.paymentToken,
+            saleContext.order,
+            saleContext.order && saleContext.order.price,
+            saleContext.order && saleContext.order.currentPrice,
+            saleContext.order && saleContext.order.startingPrice,
+            saleContext.transaction && saleContext.transaction.price,
+            saleContext.transaction && saleContext.transaction.paymentToken
+        ].forEach(pushUsd);
+    }
 
     let usd = 0;
     for (const candidate of usdCandidates) {
@@ -414,6 +499,46 @@ function parseAlchemyPrice(priceObject) {
         if (!Number.isNaN(numeric) && numeric > 0) {
             usd = numeric;
             break;
+        }
+    }
+
+    if ((!eth || eth === 0) && saleContext) {
+        const paymentContainers = [];
+        const pushContainer = (container) => {
+            if (container === undefined || container === null) { return; }
+            if (Array.isArray(container)) { container.forEach(pushContainer); return; }
+            paymentContainers.push(container);
+        };
+        pushContainer(saleContext.paymentToken);
+        pushContainer(saleContext.paymentTokens);
+        pushContainer(saleContext.consideration);
+        pushContainer(saleContext.offers);
+        pushContainer(saleContext.nativePrice);
+        pushContainer(saleContext.unitPrice);
+
+        for (const container of paymentContainers) {
+            if (typeof container === 'object') {
+                const directValue = normalizeNumericValue(container.amount);
+                if (Number.isFinite(directValue) && directValue > 0) {
+                    eth = directValue;
+                    break;
+                }
+                const rawAmount = normalizeNumericValue(container.rawAmount || container.raw);
+                const decimals = normalizeNumericValue(container.decimals);
+                if (Number.isFinite(rawAmount) && Number.isFinite(decimals) && decimals > 0) {
+                    const parsed = rawAmount / Math.pow(10, decimals);
+                    if (parsed > 0) {
+                        eth = parsed;
+                        break;
+                    }
+                }
+            } else {
+                const direct = normalizeNumericValue(container);
+                if (Number.isFinite(direct) && direct > 0) {
+                    eth = direct;
+                    break;
+                }
+            }
         }
     }
 
@@ -498,7 +623,7 @@ function formatTxnHash(hash) {
 
 function normalizeAlchemySale(sale) {
     const priceSource = sale.salePrice || sale.price || sale.totalPrice || sale.amount || sale.value;
-    const { eth, usd } = parseAlchemyPrice(priceSource || sale);
+    const { eth, usd } = parseAlchemyPrice(priceSource || sale, sale);
     const { seconds, iso } = resolveSaleTimestamp(sale);
     return {
         createdAt: iso,
@@ -513,7 +638,7 @@ function normalizeAlchemySale(sale) {
 
 function normalizeAlchemyMint(sale) {
     const priceSource = sale.salePrice || sale.price || sale.totalPrice || sale.amount || sale.value;
-    const { eth, usd } = parseAlchemyPrice(priceSource || sale);
+    const { eth, usd } = parseAlchemyPrice(priceSource || sale, sale);
     const { seconds, iso } = resolveSaleTimestamp(sale);
     return {
         createdAt: iso,
@@ -612,6 +737,9 @@ async function render_token_sales(contract, sales) {
 
         var { createdAt, timestamp, from, to, token: { tokenId }, price: { amount: { decimal, usd } }, txHash } = token
         var sale_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
+        if (sale_date === '--' && createdAt) {
+            sale_date = timestampToDate(createdAt);
+        }
 
         let saleOrMint, txn_string;
         if (from !== '0x0000000000000000000000000000000000000000') {
@@ -1410,7 +1538,10 @@ async function fetch_eth_usd() {
 */
 async function initiate_web3_connection() {
     if (typeof window.ethereum !== "undefined") {
-        document.getElementById('connected_status').innerHTML = 'Connecting...'
+        const connectedStatus = document.getElementById('connected_status');
+        if (connectedStatus) {
+            connectedStatus.innerHTML = 'Connecting...';
+        }
         await connect_user();
     } else {
         // WEB3 browser extenstion could not be found!
@@ -1523,25 +1654,54 @@ async function fetch_collection_stats(){
         const stats = await alchemyRequest('/getContractMetadata', { params, version: 'v2' });
         console.log(stats)
         const metadata = stats.contractMetadata || {};
-        const mintedCandidate = pickStatNumber([
+        const openSeaStats = metadata.openSea && metadata.openSea.collectionStats ? metadata.openSea.collectionStats : {};
+        const mintedCandidate = pickPositiveStat([
             stats.totalMinted,
+            metadata.totalMinted,
+            metadata.circulatingSupply,
+            openSeaStats.count,
+            openSeaStats.totalSupply,
             stats.totalSupply,
             metadata.totalSupply,
-            metadata.circulatingSupply,
-            metadata.symbolTotalSupply,
-            metadata.openSea && metadata.openSea.collectionStats ? metadata.openSea.collectionStats.totalSupply : null,
-            metadata.openSea && metadata.openSea.collectionStats ? metadata.openSea.collectionStats.count : null
+            metadata.symbolTotalSupply
         ]);
-        const ownerCandidate = pickStatNumber([
+        const mintedValue = mintedCandidate !== null ? mintedCandidate : 0;
+        const cappedMinted = Math.min(Math.max(Math.round(mintedValue), 0), 4040);
+        const remaining = Math.max(4040 - cappedMinted, 0);
+
+        let ownerCandidate = pickPositiveStat([
             stats.totalOwners,
             stats.ownerCount,
-            metadata.openSea && metadata.openSea.collectionStats ? metadata.openSea.collectionStats.numOwners : null,
-            metadata.openSea && metadata.openSea.collectionStats ? metadata.openSea.collectionStats.owners : null,
-            metadata.openSea && metadata.openSea.collectionStats ? metadata.openSea.collectionStats.ownersTotal : null
+            metadata.ownerCount,
+            openSeaStats.numOwners,
+            openSeaStats.owners,
+            openSeaStats.ownersTotal
         ]);
-        const minted = mintedCandidate !== null ? Math.round(mintedCandidate) : 0;
-        const cappedMinted = Math.min(Math.max(minted, 0), 4040);
-        const remaining = Math.max(4040 - cappedMinted, 0);
+        if (ownerCandidate === null && openSeaStats && openSeaStats.ownerCount !== undefined) {
+            const openSeaOwnerCount = coerceStatNumber(openSeaStats.ownerCount);
+            if (openSeaOwnerCount !== null) { ownerCandidate = openSeaOwnerCount; }
+        }
+        if (ownerCandidate === null) {
+            try {
+                const ownerParams = new URLSearchParams({
+                    contractAddress: COLLECTION_ADDRESS,
+                    withTokenBalances: 'false',
+                    pageSize: '1'
+                });
+                const ownerStats = await alchemyRequest('/getOwnersForCollection', { params: ownerParams, version: 'v2' });
+                if (ownerStats && ownerStats.totalCount !== undefined) {
+                    const totalCount = coerceStatNumber(ownerStats.totalCount);
+                    if (totalCount !== null) { ownerCandidate = totalCount; }
+                } else if (Array.isArray(ownerStats?.ownerAddresses)) {
+                    ownerCandidate = ownerStats.ownerAddresses.length;
+                } else if (Array.isArray(ownerStats?.owners)) {
+                    ownerCandidate = ownerStats.owners.length;
+                }
+            } catch (ownerErr) {
+                console.error('Failed to fetch owner stats', ownerErr);
+            }
+        }
+
         const ownerCount = ownerCandidate !== null ? Math.max(Math.round(ownerCandidate), 0) : null;
         document.getElementById('remainingSupply').innerHTML = remaining.toLocaleString();
         document.getElementById('totalSupply').innerHTML = cappedMinted.toLocaleString()+' / 4040';
@@ -1576,8 +1736,11 @@ async function update_frontend() {
     document.getElementById('remainingSupply').style.color = 'palegreen';
     document.getElementById('totalSupply').style.color = 'palegreen';
     document.getElementById('totalCollectors').style.color = 'palegreen';
-    document.getElementById('connected_status').innerHTML = truncateAddress(user_address);
-    document.getElementById('connected_status').style.color = 'palegreen'
+    const connectedStatus = document.getElementById('connected_status');
+    if (connectedStatus) {
+        connectedStatus.innerHTML = truncateAddress(user_address);
+        connectedStatus.style.color = 'palegreen';
+    }
     //document.getElementById('address_owned_tokens').innerHTML = user_tokenBalance+' FROG(s)'
     //document.getElementById('address_owned_tokens').style.color = 'palegreen'
     //document.getElementById('address_staked_tokens').innerHTML = user_stakedBalance+' FROG(s)'
