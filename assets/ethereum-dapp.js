@@ -20,6 +20,30 @@ var mint_volume_usd = 0;
 
 var staked_ids = [];
 
+function formatVolumeDisplay(ethValue, usdValue) {
+    const numericEth = Number(ethValue);
+    const numericUsd = Number(usdValue);
+
+    if (!Number.isFinite(numericEth)) {
+        return '--';
+    }
+
+    const ethText = numericEth.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+
+    if (Number.isFinite(numericUsd) && numericUsd > 0) {
+        const usdText = numericUsd.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
+        return `${ethText}Ξ ($${usdText})`;
+    }
+
+    return `${ethText}Ξ`;
+}
+
 var frogArray = [
     'blueDartFrog',
     'blueTreeFrog',
@@ -116,41 +140,51 @@ var animated = [
 const SOURCE_PATH = 'https://freshfrogs.github.io'
 const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
-const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': frog_api}};
 
 /*
 
-    Fetch NFT token sales (initial & secondary) using Reservoir API. Returns => Object
-    'https://api.reservoir.tools/collections/activity/v6?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&types=mint', options
+    Fetch NFT token sales (initial & secondary) using the Alchemy API.
+
 */
-async function fetch_token_sales(contract, limit, next_string) {
-    if (! contract) { contract = COLLECTION_ADDRESS; }
-    if (! limit) { limit = '50'; }
-    if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
-    fetch('https://api.reservoir.tools/sales/v6?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?sortBy=time&sortDirection=asc&limit='+limit+next+'', options)
-    .then((data) => data.json())
-    .then((data) => {
-        console.log(data)
-        render_token_sales(contract, data.sales);
-        if (! data.continuation) { return }
-        else { sales_load_button('sales', contract, limit, data.continuation); }
-    })
-    .catch(err => console.error(err));
+async function fetch_token_sales(contract, limit, continuation) {
+    try {
+        const targetContract = contract || COLLECTION_ADDRESS;
+        const pageSize = limit || '50';
+        if (!continuation) {
+            sales_volume_eth = 0;
+            sales_volume_usd = 0;
+            mint_volume_eth = 0;
+            mint_volume_usd = 0;
+            net_income_usd = 0;
+        }
+        const { sales, continuation: nextPage } = await alchemyFetchNFTSales(targetContract, pageSize, continuation);
+
+        console.log('Alchemy sales response', sales);
+        render_token_sales(targetContract, sales);
+
+        if (nextPage) {
+            sales_load_button('sales', targetContract, pageSize, nextPage);
+        }
+    } catch (error) {
+        console.error('Failed to fetch token sales', error);
+    }
 }
 
-async function fetch_token_mints(contract, limit, next_string) {
-    if (! contract) { contract = COLLECTION_ADDRESS; }
-    if (! limit) { limit = '50'; }
-    if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
-    fetch('https://api.reservoir.tools/collections/activity/v6?collection='+contract+'&types=sale'+next, options)
-    .then((data) => data.json())
-    .then((data) => {
-        console.log(data)
-        render_token_mints(contract, data.activities);
-        if (! data.continuation) { return }
-        else { sales_load_button('mints', contract, limit, data.continuation); }
-    })
-    .catch(err => console.error(err));
+async function fetch_token_mints(contract, limit, continuation) {
+    try {
+        const targetContract = contract || COLLECTION_ADDRESS;
+        const pageSize = limit || '50';
+        const { mints, continuation: nextPage } = await alchemyFetchNFTMints(targetContract, pageSize, continuation);
+
+        console.log('Alchemy mint response', mints);
+        render_token_mints(targetContract, mints);
+
+        if (nextPage) {
+            sales_load_button('mints', targetContract, pageSize, nextPage);
+        }
+    } catch (error) {
+        console.error('Failed to fetch token mints', error);
+    }
 }
 
 function timestampToDate(timestamp) {
@@ -164,27 +198,28 @@ function timestampToDate(timestamp) {
 
 /*
 
-    Fetch NFT tokens held by user using Reservoir API. Returns => Object
+    Fetch NFT tokens held by user using the Alchemy API. Returns => Object
 
 */
-async function fetch_held_tokens(wallet, limit, next_string) {
-    if (! wallet) { wallet = user_address}
-    if (! limit) { limit = '50'; }
-    if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
-    //fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v6?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
-    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
-    .then((data) => data.json())
-    .then((data) => {
-        console.log(data);
-        console.log(data.tokens);
-        render_held_tokens(wallet, data.tokens);
-        if (wallet == CONTROLLER_ADDRESS) {
-            update_staked_tokens(data.tokens)
+async function fetch_held_tokens(wallet, limit, continuation) {
+    try {
+        const owner = wallet || user_address;
+        const pageSize = limit || '50';
+        const { tokens, continuation: nextPage } = await alchemyFetchNFTsForOwner(owner, COLLECTION_ADDRESS, continuation, pageSize);
+
+        console.log('Alchemy held tokens response', tokens);
+        render_held_tokens(owner, tokens);
+
+        if (owner === CONTROLLER_ADDRESS) {
+            update_staked_tokens(tokens);
         }
-        if (! data.continuation) { return }
-        else { load_more_button(wallet, limit, data.continuation); }
-    })
-    .catch(err => console.error(err));
+
+        if (nextPage) {
+            load_more_button(owner, pageSize, nextPage);
+        }
+    } catch (error) {
+        console.error('Failed to fetch held tokens', error);
+    }
 }
 
 /*
@@ -242,21 +277,23 @@ async function render_token_sales(contract, sales) {
     sales.forEach(async (token) => {
 
         var { createdAt, timestamp, from, to, token: { tokenId }, price: { amount: { decimal, usd } }, txHash } = token
-        var sale_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
+        const safeDecimal = Number.isFinite(Number(decimal)) ? Number(decimal) : 0;
+        const safeUsd = Number.isFinite(Number(usd)) ? Number(usd) : 0;
+        var sale_date = timestamp ? timestampToDate(timestamp) : (createdAt ? createdAt.substring(0, 10) : '--');
 
         if (from !== '0x0000000000000000000000000000000000000000') {
             saleOrMint = 'Last Sale'
             txn_string = 'sale'; from = truncateAddress(from)
-            net_income_usd = net_income_usd + (Number(usd))*0.025
-            sales_volume_eth = sales_volume_eth + Number(decimal);
-            sales_volume_usd = sales_volume_usd + Number(usd);
+            net_income_usd = net_income_usd + (Number(safeUsd))*0.025
+            sales_volume_eth = sales_volume_eth + Number(safeDecimal);
+            sales_volume_usd = sales_volume_usd + Number(safeUsd);
             receiver = 'Owner'
         } else {
             saleOrMint = 'Birthday'
             txn_string = 'mint'; from = 'FreshFrogsNFT';
-            net_income_usd = net_income_usd + Number(usd)
-            mint_volume_eth = mint_volume_eth + Number(decimal);
-            mint_volume_usd = mint_volume_usd + Number(usd);
+            net_income_usd = net_income_usd + Number(safeUsd)
+            mint_volume_eth = mint_volume_eth + Number(safeDecimal);
+            mint_volume_usd = mint_volume_usd + Number(safeUsd);
             receiver = 'Creator'
         }
 
@@ -271,7 +308,7 @@ async function render_token_sales(contract, sales) {
                 '</div>'+
                 '<div class="infobox_right">'+
                     '<text class="card_text">Last Sale</text>'+'<br>'+
-                    '<text id="frog_type" class="card_bold">'+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
+                    '<text id="frog_type" class="card_bold">'+'</text>'+'<text id="usd_price" class="usd_price">$'+safeUsd.toFixed(2)+'</text>'+
                 '</div>'+
                 '<br>'+
                 '<div class="infobox_left">'+
@@ -287,7 +324,7 @@ async function render_token_sales(contract, sales) {
                     '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
                 '</div>';
 
-            await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash);
+            await build_token(html_elements, tokenId, tokenId+':'+(createdAt || sale_date), txn_string, txHash);
 
         //}
     })
@@ -298,13 +335,15 @@ async function render_token_mints(contract, mints) {
     mints.forEach(async (token) => {
 
         var { createdAt, timestamp, fromAddress, toAddress, token: { tokenId, rarityScore }, price: { amount: { decimal, usd } }, txHash } = token
-        var txn_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
+        const safeDecimal = Number.isFinite(Number(decimal)) ? Number(decimal) : 0;
+        const safeUsd = Number.isFinite(Number(usd)) ? Number(usd) : 0;
+        var txn_date = timestamp ? timestampToDate(timestamp) : (createdAt ? createdAt.substring(0, 10) : '--');
         txn_string = 'mint';
 
-        var html_elements = 
+        var html_elements =
             '<div class="infobox_left">'+
                 '<text class="card_text">Last Sale</text>'+'<br>'+
-                '<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+' (</text>'+'<text id="frog_type" class="card_bold">'+decimal+'Ξ)'+'</text>'+
+                '<text id="usd_price" class="usd_price">$'+safeUsd.toFixed(2)+' (</text>'+'<text id="frog_type" class="card_bold">'+safeDecimal+'Ξ)'+'</text>'+
             '</div>'+
             '<div class="infobox_right">'+
                 '<text class="card_text">Owned by</text>'+'<br>'+
@@ -324,7 +363,7 @@ async function render_token_mints(contract, mints) {
                 '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
             '</div>';
 
-        await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash);
+        await build_token(html_elements, tokenId, tokenId+':'+(createdAt || txn_date), txn_string, txHash);
 
     })
 
@@ -386,7 +425,7 @@ async function sales_load_button(type, contract, limit, next_string) {
             loadMore.onclick = async function(){
                 document.getElementById('loadMore').remove(); await fetch_token_sales(contract, '150', next_string);
             }
-        } else if (type = 'mints') {
+        } else if (type == 'mints') {
             loadMore.onclick = async function(){
                 document.getElementById('loadMore').remove(); await fetch_token_mints(contract, '150', next_string);
             }
@@ -897,22 +936,28 @@ async function fetch_held_tokens(wallet, limit, next_string) {
 
 */
 
-async function gather_staked_ids(wallet, limit, next_string) {
-    if (! wallet) { wallet = CONTROLLER_ADDRESS}
-    if (! limit) { limit = '50'; }
-    if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
-    //fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v6?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
-    fetch('https://api.reservoir.tools/users/'+wallet+'/tokens/v8?collection='+COLLECTION_ADDRESS+'&limit='+limit+next, options)
-    .then((data) => data.json())
-    .then((data) => {
-        data.tokens.forEach(async (token) => {
-            var { token: { tokenId } } = token
-            staked_ids.push(tokenId);
-        })
-        if (! data.continuation) { return }
-        else { gather_staked_ids(wallet, limit, data.continuation); }
-    })
-    .catch(err => console.error(err));
+async function gather_staked_ids(wallet, limit, continuation) {
+    try {
+        const owner = wallet || CONTROLLER_ADDRESS;
+        const pageSize = limit || '50';
+        if (!continuation) {
+            staked_ids = [];
+        }
+        const { tokens, continuation: nextPage } = await alchemyFetchNFTsForOwner(owner, COLLECTION_ADDRESS, continuation, pageSize);
+
+        tokens.forEach((token) => {
+            const tokenId = token?.token?.tokenId;
+            if (tokenId) {
+                staked_ids.push(tokenId);
+            }
+        });
+
+        if (nextPage) {
+            await gather_staked_ids(owner, pageSize, nextPage);
+        }
+    } catch (error) {
+        console.error('Failed to gather staked ids', error);
+    }
 }
 
 async function meta_morph_preset() {
@@ -1110,56 +1155,68 @@ async function get_user_invites(wallet_address) {
 }
 
 async function fetch_staking_stats() {
-    fetch('https://api.reservoir.tools/owners/v2?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
-    .then(data => data.json())
-    .then(data => {
-        console.log(data)
-        var owner = data.owners.find(owner => owner.address === CONTROLLER_ADDRESS);
-        var tokenCount = owner ? owner.ownership.tokenCount : null;
-        console.log(tokenCount);
-        document.getElementById('total_staked_tokens').innerHTML = tokenCount;
-    })
-    .catch(err => console.error(err));
-}
-
-async function fetch_staking_stats() {
-
     try {
-        // Fetch data from the API
-        var response = await fetch('https://api.reservoir.tools/owners/v2?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options);
-        var data = await response.json();
-        console.log(data);
-
-        // Find the owner with the specified CONTROLLER_ADDRESS
-        const owner = data.owners.find(owner => owner.address === CONTROLLER_ADDRESS.toLocaleLowerCase());
-
-        // Get token count from the owner object if found, otherwise set to null
-        const tokenCount = owner ? owner.ownership.tokenCount : null;
-
-        // Log the token count for debugging
-        console.log(tokenCount);
-
-        // Set the token count in the HTML element with the id 'total_staked_tokens'
-        document.getElementById('total_staked_tokens').innerHTML = tokenCount ? tokenCount : '0'; // Default to 0 if not found
-    } catch (err) {
-        console.error(err);  // Log any errors that occur during the fetch or processing
+        const totalCount = await alchemyFetchOwnerTokenCount(CONTROLLER_ADDRESS, COLLECTION_ADDRESS);
+        document.getElementById('total_staked_tokens').innerHTML = totalCount ? totalCount : '0';
+    } catch (error) {
+        console.error('Failed to fetch staking stats', error);
     }
 }
 
 async function fetch_collection_stats(){
-    fetch('https://api.reservoir.tools/collections/v7?id=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b', options)
-      .then(stats => stats.json())
-      .then(stats => {
-        console.log(stats)
-        var { tokenCount, ownerCount } = stats.collections[0]
-        document.getElementById('remainingSupply').innerHTML = 4040 - parseInt(tokenCount);
-        document.getElementById('totalSupply').innerHTML = tokenCount+' / 4040';
-        document.getElementById('totalCollectors').innerHTML = ownerCount;
-      })
-      .catch(err => console.error(err));
+    try {
+        const stats = await alchemyFetchContractStats(COLLECTION_ADDRESS);
+        console.log('Alchemy collection stats', stats);
 
-      // What IDs are currently staked?
-      await gather_staked_ids();
+        const minted = stats.totalSupply !== null && !Number.isNaN(stats.totalSupply)
+            ? Number(stats.totalSupply)
+            : null;
+        const ownerCount = stats.ownerCount !== null && !Number.isNaN(stats.ownerCount)
+            ? Number(stats.ownerCount)
+            : null;
+
+        if (minted !== null) {
+            const cappedMinted = Math.max(0, Math.min(4040, Math.floor(minted)));
+            const remaining = Math.max(0, 4040 - cappedMinted);
+            const remainingElement = document.getElementById('remainingSupply');
+            if (remainingElement) {
+                remainingElement.innerHTML = remaining;
+            }
+            const totalSupplyElement = document.getElementById('totalSupply');
+            if (totalSupplyElement) {
+                totalSupplyElement.innerHTML = `${cappedMinted} / 4040`;
+            }
+        }
+
+        if (ownerCount !== null) {
+            const ownersElement = document.getElementById('totalCollectors');
+            if (ownersElement) {
+                ownersElement.innerHTML = ownerCount.toLocaleString();
+            }
+        }
+
+        try {
+            const volumeSummary = await alchemyFetchCollectionVolumeBreakdown(COLLECTION_ADDRESS, {
+                expectedSales: stats?.totalSales ?? null,
+            });
+
+            const secondaryElement = document.getElementById('totalSecondaryVolume');
+            if (secondaryElement) {
+                secondaryElement.innerHTML = formatVolumeDisplay(volumeSummary.secondaryVolumeEth, volumeSummary.secondaryVolumeUsd);
+            }
+
+            const mintedElement = document.getElementById('totalMintVolume');
+            if (mintedElement) {
+                mintedElement.innerHTML = formatVolumeDisplay(volumeSummary.mintedVolumeEth, volumeSummary.mintedVolumeUsd);
+            }
+        } catch (volumeError) {
+            console.error('Failed to fetch collection volume summary', volumeError);
+        }
+    } catch (error) {
+        console.error('Failed to fetch collection stats', error);
+    }
+
+    await gather_staked_ids(CONTROLLER_ADDRESS);
 }
 
 /*
