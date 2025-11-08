@@ -2,6 +2,28 @@ const ALCHEMY_API_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
 const ALCHEMY_NFT_BASE = `https://eth-mainnet.g.alchemy.com/nft/v3/${ALCHEMY_API_KEY}`;
 const ALCHEMY_BASE = `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`;
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+const COLLECTION_VOLUME_CACHE = new Map();
+
+function normaliseNumber(value) {
+  if (value === null || value === undefined || value === '') {
+    return null;
+  }
+
+  const numeric = Number(value);
+  if (Number.isFinite(numeric)) {
+    return numeric;
+  }
+
+  if (typeof value === 'string') {
+    const cleaned = value.replace(/,/g, '');
+    const parsed = Number(cleaned);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+
+  return null;
+}
 
 function buildQuery(params) {
   const searchParams = new URLSearchParams();
@@ -75,29 +97,52 @@ async function alchemyFetchContractStats(contractAddress) {
       alchemyFetchJson(ownersUrl),
     ]);
 
+    const openSeaStats = metadata?.contractMetadata?.openSea?.collectionStats ?? {};
+
     const totalSupplyCandidate = metadata?.contractMetadata?.totalSupply
-      ?? metadata?.contractMetadata?.openSea?.collectionStats?.totalSupply
-      ?? metadata?.contractMetadata?.openSea?.collectionStats?.count
+      ?? openSeaStats.totalSupply
+      ?? openSeaStats.count
       ?? null;
 
-    const totalSupply = totalSupplyCandidate !== null && totalSupplyCandidate !== undefined
-      ? Number(totalSupplyCandidate)
-      : null;
+    const ownerCountCandidate = owners?.totalCount
+      ?? owners?.owners?.length
+      ?? openSeaStats.numOwners
+      ?? null;
 
-    const ownerCountCandidate = owners?.totalCount ?? owners?.owners?.length ?? null;
-    const ownerCount = ownerCountCandidate !== null && ownerCountCandidate !== undefined
-      ? Number(ownerCountCandidate)
-      : null;
+    const totalVolumeCandidate = openSeaStats.totalVolume ?? null;
+    const totalSalesCandidate = openSeaStats.totalSales
+      ?? openSeaStats.count
+      ?? null;
+
+    const totalSupply = normaliseNumber(totalSupplyCandidate);
+    const ownerCount = normaliseNumber(ownerCountCandidate);
+    const totalVolumeEth = normaliseNumber(totalVolumeCandidate);
+    const totalSales = normaliseNumber(totalSalesCandidate);
+    const floorPrice = normaliseNumber(openSeaStats.floorPrice);
+
+    const averagePrice = normaliseNumber(openSeaStats.averagePrice);
+
+    const totalVolumeUsdCandidate = normaliseNumber(openSeaStats.totalVolumeUSD);
 
     return {
       totalSupply,
       ownerCount,
+      totalVolumeEth,
+      totalVolumeUsd: totalVolumeUsdCandidate,
+      totalSales,
+      floorPrice,
+      averagePrice,
     };
   } catch (error) {
     console.error('Failed to fetch Alchemy contract stats', error);
     return {
       totalSupply: null,
       ownerCount: null,
+      totalVolumeEth: null,
+      totalVolumeUsd: null,
+      totalSales: null,
+      floorPrice: null,
+      averagePrice: null,
     };
   }
 }
@@ -239,4 +284,89 @@ async function alchemyFetchNFTMints(contractAddress, limit, pageKey) {
 async function alchemyFetchOwnerTokenCount(owner, contractAddress) {
   const result = await alchemyFetchNFTsForOwner(owner, contractAddress, null, 1);
   return result.totalCount ?? 0;
+}
+
+async function alchemyFetchCollectionVolumeBreakdown(contractAddress, options) {
+  const safeContract = contractAddress;
+  const settings = options || {};
+  const cacheKey = `${safeContract?.toLowerCase() || ''}`;
+
+  if (!settings.force && COLLECTION_VOLUME_CACHE.has(cacheKey)) {
+    return COLLECTION_VOLUME_CACHE.get(cacheKey);
+  }
+
+  const limit = settings.limit ? Number(settings.limit) : 100;
+  const maxPages = settings.maxPages ? Number(settings.maxPages) : 50;
+  const expectedSales = settings.expectedSales ? Number(settings.expectedSales) : null;
+
+  let pageKey = settings.pageKey ?? null;
+  let pagesFetched = 0;
+  let processedSales = 0;
+  let hasMore = false;
+  let mintedVolumeEth = 0;
+  let mintedVolumeUsd = 0;
+  let mintedCount = 0;
+  let secondaryVolumeEth = 0;
+  let secondaryVolumeUsd = 0;
+  let secondaryCount = 0;
+
+  while (pagesFetched < maxPages) {
+    const { sales, continuation } = await alchemyFetchNFTSales(safeContract, limit, pageKey);
+
+    if (!sales.length) {
+      break;
+    }
+
+    sales.forEach((sale) => {
+      const seller = sale?.from ? sale.from.toLowerCase() : null;
+      const priceEth = normaliseNumber(sale?.price?.amount?.decimal) ?? 0;
+      const priceUsd = normaliseNumber(sale?.price?.amount?.usd) ?? 0;
+
+      if (seller === ZERO_ADDRESS) {
+        mintedVolumeEth += priceEth;
+        mintedVolumeUsd += priceUsd;
+        mintedCount += 1;
+      } else {
+        secondaryVolumeEth += priceEth;
+        secondaryVolumeUsd += priceUsd;
+        secondaryCount += 1;
+      }
+    });
+
+    processedSales += sales.length;
+    pagesFetched += 1;
+
+    hasMore = Boolean(continuation);
+
+    if (!continuation) {
+      break;
+    }
+
+    if (expectedSales !== null && processedSales >= expectedSales) {
+      break;
+    }
+
+    pageKey = continuation;
+  }
+
+  const summary = {
+    mintedVolumeEth,
+    mintedVolumeUsd,
+    mintedCount,
+    secondaryVolumeEth,
+    secondaryVolumeUsd,
+    secondaryCount,
+    processedSales,
+    pagesFetched,
+    hasMore,
+    updatedAt: Date.now(),
+  };
+
+  const isComplete = !hasMore || (expectedSales !== null && processedSales >= expectedSales);
+
+  if (!settings.force && isComplete) {
+    COLLECTION_VOLUME_CACHE.set(cacheKey, summary);
+  }
+
+  return summary;
 }

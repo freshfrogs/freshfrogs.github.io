@@ -20,6 +20,30 @@ var mint_volume_usd = 0;
 
 var staked_ids = [];
 
+function formatVolumeDisplay(ethValue, usdValue) {
+    const numericEth = Number(ethValue);
+    const numericUsd = Number(usdValue);
+
+    if (!Number.isFinite(numericEth)) {
+        return '--';
+    }
+
+    const ethText = numericEth.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+
+    if (Number.isFinite(numericUsd) && numericUsd > 0) {
+        const usdText = numericUsd.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
+        return `${ethText}Ξ ($${usdText})`;
+    }
+
+    return `${ethText}Ξ`;
+}
+
 var frogArray = [
     'blueDartFrog',
     'blueTreeFrog',
@@ -126,6 +150,13 @@ async function fetch_token_sales(contract, limit, continuation) {
     try {
         const targetContract = contract || COLLECTION_ADDRESS;
         const pageSize = limit || '50';
+        if (!continuation) {
+            sales_volume_eth = 0;
+            sales_volume_usd = 0;
+            mint_volume_eth = 0;
+            mint_volume_usd = 0;
+            net_income_usd = 0;
+        }
         const { sales, continuation: nextPage } = await alchemyFetchNFTSales(targetContract, pageSize, continuation);
 
         console.log('Alchemy sales response', sales);
@@ -394,7 +425,7 @@ async function sales_load_button(type, contract, limit, next_string) {
             loadMore.onclick = async function(){
                 document.getElementById('loadMore').remove(); await fetch_token_sales(contract, '150', next_string);
             }
-        } else if (type = 'mints') {
+        } else if (type == 'mints') {
             loadMore.onclick = async function(){
                 document.getElementById('loadMore').remove(); await fetch_token_mints(contract, '150', next_string);
             }
@@ -909,6 +940,9 @@ async function gather_staked_ids(wallet, limit, continuation) {
     try {
         const owner = wallet || CONTROLLER_ADDRESS;
         const pageSize = limit || '50';
+        if (!continuation) {
+            staked_ids = [];
+        }
         const { tokens, continuation: nextPage } = await alchemyFetchNFTsForOwner(owner, COLLECTION_ADDRESS, continuation, pageSize);
 
         tokens.forEach((token) => {
@@ -1142,18 +1176,47 @@ async function fetch_collection_stats(){
             : null;
 
         if (minted !== null) {
-            document.getElementById('remainingSupply').innerHTML = 4040 - parseInt(minted);
-            document.getElementById('totalSupply').innerHTML = minted+' / 4040';
+            const cappedMinted = Math.max(0, Math.min(4040, Math.floor(minted)));
+            const remaining = Math.max(0, 4040 - cappedMinted);
+            const remainingElement = document.getElementById('remainingSupply');
+            if (remainingElement) {
+                remainingElement.innerHTML = remaining;
+            }
+            const totalSupplyElement = document.getElementById('totalSupply');
+            if (totalSupplyElement) {
+                totalSupplyElement.innerHTML = `${cappedMinted} / 4040`;
+            }
         }
 
         if (ownerCount !== null) {
-            document.getElementById('totalCollectors').innerHTML = ownerCount;
+            const ownersElement = document.getElementById('totalCollectors');
+            if (ownersElement) {
+                ownersElement.innerHTML = ownerCount.toLocaleString();
+            }
+        }
+
+        try {
+            const volumeSummary = await alchemyFetchCollectionVolumeBreakdown(COLLECTION_ADDRESS, {
+                expectedSales: stats?.totalSales ?? null,
+            });
+
+            const secondaryElement = document.getElementById('totalSecondaryVolume');
+            if (secondaryElement) {
+                secondaryElement.innerHTML = formatVolumeDisplay(volumeSummary.secondaryVolumeEth, volumeSummary.secondaryVolumeUsd);
+            }
+
+            const mintedElement = document.getElementById('totalMintVolume');
+            if (mintedElement) {
+                mintedElement.innerHTML = formatVolumeDisplay(volumeSummary.mintedVolumeEth, volumeSummary.mintedVolumeUsd);
+            }
+        } catch (volumeError) {
+            console.error('Failed to fetch collection volume summary', volumeError);
         }
     } catch (error) {
         console.error('Failed to fetch collection stats', error);
     }
 
-    await gather_staked_ids();
+    await gather_staked_ids(CONTROLLER_ADDRESS);
 }
 
 /*
