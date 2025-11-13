@@ -134,7 +134,7 @@ body {
     height: 100% !important;
     object-fit: cover;
     border-radius: 5px;
-    box-shadow: 2px 2px white;
+    box-shadow: 0px 0px white;
     image-rendering: pixelated;
     border: 1px solid black;
 }
@@ -391,7 +391,7 @@ body {
     font-size: small;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 2px 2px white;
+    box-shadow: 0px 0px white;
     transition: all .3s;
     font-family: monospace;
     font-size: initial;
