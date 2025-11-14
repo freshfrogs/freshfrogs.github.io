@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreshFrogs NFT Card Demo</title>
+  <link rel="stylesheet" href="css_final.css">
+  <style>
+    body {
+      background: url("background.png");
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 40px 16px;
+      font-family: monospace;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="frog-card">
+    <div class="frog-card__media">
+      <img src="../frog/123.png" alt="Frog #123" loading="lazy">
+      <span class="frog-card__badge">Recently Sold</span>
+    </div>
+    <div class="frog-card__body">
+      <header class="frog-card__header">
+        <h2>Frog #123</h2>
+        <span class="frog-card__price">Last Sale · 0.42Ξ</span>
+      </header>
+      <p class="frog-card__subtitle">Genesis FreshFrog with Neon Eyes and Leaf Cape. Perfect for staking boosts.</p>
+      <dl class="frog-card__meta">
+        <div>
+          <dt>Owner</dt>
+          <dd>0xABCD...7890</dd>
+        </div>
+        <div>
+          <dt>Last Trade</dt>
+          <dd>Listed 3d ago</dd>
+        </div>
+        <div>
+          <dt>Staking</dt>
+          <dd>Opted In · 12d</dd>
+        </div>
+        <div>
+          <dt>Rarity</dt>
+          <dd>Top 12%</dd>
+        </div>
+      </dl>
+      <div class="frog-card__stats">
+        <div>
+          <span class="frog-card__label">Rewards</span>
+          <span class="frog-card__value">48 $FLY</span>
+        </div>
+        <div>
+          <span class="frog-card__label">Level</span>
+          <span class="frog-card__value">5</span>
+        </div>
+        <div>
+          <span class="frog-card__label">Floor Delta</span>
+          <span class="frog-card__value">+0.08Ξ</span>
+        </div>
+      </div>
+      <ul class="frog-card__actions">
+        <li>👑 Current Holder <span>0xABCD...7890</span></li>
+        <li>🪙 Purchase Price <span>0.37Ξ</span></li>
+        <li>📈 24h Volume <span>2.3Ξ</span></li>
+      </ul>
+      <a class="frog-card__cta" href="#">🐸 View on OpenSea</a>
+    </div>
+  </div>
+</body>
+</html>
