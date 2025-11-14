@@ -127,10 +127,11 @@ function buildStat(label, value) {
   return wrapper;
 }
 
-function buildActionRow(label, value, href) {
+function buildActionRow(icon, label, value, href) {
   const item = document.createElement('li');
   const spanLabel = document.createElement('span');
-  spanLabel.textContent = label;
+  spanLabel.className = 'frog-card__actions-label';
+  spanLabel.textContent = `${icon ? `${icon} ` : ''}${label}`;
 
   let valueNode;
   if (href) {
@@ -139,9 +140,11 @@ function buildActionRow(label, value, href) {
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
     link.textContent = value;
+    link.className = 'frog-card__actions-value';
     valueNode = link;
   } else {
     const spanValue = document.createElement('span');
+    spanValue.className = 'frog-card__actions-value';
     spanValue.textContent = value;
     valueNode = spanValue;
   }
@@ -160,6 +163,28 @@ function toTitleCase(value) {
     .join(' ');
 }
 
+function findAttributeValue(attributes, traitNames) {
+  if (!Array.isArray(attributes)) return null;
+  const targets = Array.isArray(traitNames) ? traitNames : [traitNames];
+  const loweredTargets = targets.map((name) => String(name).toLowerCase());
+
+  for (const attribute of attributes) {
+    const traitRaw =
+      attribute?.trait_type ?? attribute?.traitType ?? attribute?.type ?? attribute?.label ?? '';
+    const trait = String(traitRaw).toLowerCase();
+
+    if (loweredTargets.includes(trait)) {
+      const value = attribute?.value ?? attribute?.display_value ?? attribute?.displayValue;
+      if (value === undefined || value === null || value === '') {
+        continue;
+      }
+      return String(value);
+    }
+  }
+
+  return null;
+}
+
 function createFrogSaleCard(sale) {
   const tokenId = parseTokenId(sale?.nft?.tokenId ?? sale?.tokenId);
   const name = sale?.nft?.metadata?.name || (tokenId !== '--' ? `Frog #${tokenId}` : 'FreshFrog');
@@ -174,10 +199,31 @@ function createFrogSaleCard(sale) {
   const buyer = formatAddress(sale?.buyerAddress);
   const seller = formatAddress(sale?.sellerAddress);
   const txHash = sale?.transactionHash;
-  const txShort = txHash ? `${txHash.slice(0, 6)}…${txHash.slice(-4)}` : '—';
   const buyerUrl = sale?.buyerAddress ? `https://etherscan.io/address/${sale.buyerAddress}` : null;
   const sellerUrl = sale?.sellerAddress ? `https://etherscan.io/address/${sale.sellerAddress}` : null;
-  const txUrl = txHash ? `https://etherscan.io/tx/${txHash}` : null;
+
+  const attributes =
+    sale?.nft?.metadata?.attributes || sale?.nft?.rawMetadata?.attributes || sale?.nft?.traits || [];
+
+  const stakingStatus =
+    findAttributeValue(attributes, ['staking', 'staked']) || findAttributeValue(attributes, ['stake status']);
+  const rarityRank =
+    findAttributeValue(attributes, ['rarity', 'rank', 'ranking', 'rarity rank']) ||
+    sale?.nft?.rarity?.rank?.toString();
+  const rewardsRaw = findAttributeValue(attributes, ['rewards', '$fly earned', 'rewards earned']);
+  const levelRaw = findAttributeValue(attributes, ['level']);
+  const floorDeltaRaw = findAttributeValue(attributes, ['floor delta', 'floor change']);
+
+  const rewardsDisplay = rewardsRaw ? (isNaN(Number(rewardsRaw)) ? rewardsRaw : `${rewardsRaw} $FLY`) : '—';
+  const levelDisplay = levelRaw || '—';
+  const floorDeltaDisplay = floorDeltaRaw || '—';
+  const stakingDisplay = stakingStatus || '—';
+  const rarityDisplay = rarityRank ? `#${rarityRank}` : '—';
+  const ownerDisplay = buyer !== '—' ? buyer : seller;
+  const lastTradeDisplay = saleType ? `${saleType} · ${timeAgo}` : timeAgo;
+  const purchasePriceDisplay = salePrice;
+  const rewardsActionValue = rewardsDisplay;
+  const levelActionValue = levelDisplay;
 
   const card = document.createElement('article');
   card.className = 'frog-card';
@@ -213,31 +259,32 @@ function createFrogSaleCard(sale) {
 
   const subtitle = document.createElement('p');
   subtitle.className = 'frog-card__subtitle';
-  subtitle.textContent = `${saleType} ${timeAgo} on ${saleMarketplace}`;
+  subtitle.textContent = `Sale ${timeAgo} on ${saleMarketplace}`;
 
   const meta = document.createElement('dl');
   meta.className = 'frog-card__meta';
   meta.append(
-    buildMetaItem('Token', tokenId !== '--' ? `#${tokenId}` : '—'),
-    buildMetaItem('Buyer', buyer),
-    buildMetaItem('Seller', seller),
-    buildMetaItem('Tx Hash', txShort)
+    buildMetaItem('Owner', ownerDisplay || '—'),
+    buildMetaItem('Last Trade', lastTradeDisplay || '—'),
+    buildMetaItem('Staking', stakingDisplay),
+    buildMetaItem('Rarity', rarityDisplay)
   );
 
   const stats = document.createElement('div');
   stats.className = 'frog-card__stats';
   stats.append(
-    buildStat('Marketplace', saleMarketplace),
-    buildStat('Type', saleType),
-    buildStat('Block', sale?.blockNumber ? `#${sale.blockNumber}` : '—')
+    buildStat('Rewards', rewardsDisplay),
+    buildStat('Level', levelDisplay),
+    buildStat('Floor Delta', floorDeltaDisplay)
   );
 
   const actions = document.createElement('ul');
   actions.className = 'frog-card__actions';
   actions.append(
-    buildActionRow('Buyer', buyer, buyerUrl),
-    buildActionRow('Seller', seller, sellerUrl),
-    buildActionRow('Tx', txShort, txUrl)
+    buildActionRow('👑', 'Current Holder', ownerDisplay || '—', buyerUrl || sellerUrl),
+    buildActionRow('🪙', 'Purchase Price', purchasePriceDisplay || '—'),
+    buildActionRow('🎁', 'Rewards', rewardsActionValue),
+    buildActionRow('🎚', 'Level', levelActionValue)
   );
 
   const cta = document.createElement('a');

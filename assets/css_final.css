@@ -168,19 +168,24 @@
   box-shadow: 2px 2px white;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   font-size: 0.85rem;
 }
 
 .frog-card__actions li {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 12px;
 }
 
-.frog-card__actions li span {
+.frog-card__actions-label {
   color: darkseagreen;
   font-weight: bold;
+}
+
+.frog-card__actions-value {
+  color: white;
 }
 
 .frog-card__actions a {
