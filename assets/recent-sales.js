@@ -170,18 +170,6 @@ function deriveSalePriceInfo(sale) {
   };
 }
 
-function buildStat(label, value) {
-  const wrapper = document.createElement('div');
-  const spanLabel = document.createElement('span');
-  spanLabel.className = 'frog-card__label';
-  spanLabel.textContent = label;
-  const spanValue = document.createElement('span');
-  spanValue.className = 'frog-card__value';
-  spanValue.textContent = value;
-  wrapper.append(spanLabel, spanValue);
-  return wrapper;
-}
-
 function buildActionRow(icon, label, value, href) {
   const item = document.createElement('li');
   const spanLabel = document.createElement('span');
@@ -274,6 +262,51 @@ function findAttributeValue(attributes, traitNames) {
   return null;
 }
 
+function formatTraitList(attributes, { limit = 6 } = {}) {
+  if (!Array.isArray(attributes)) {
+    return '';
+  }
+
+  const parts = [];
+
+  for (const attribute of attributes) {
+    if (!attribute) continue;
+
+    const rawTrait =
+      attribute?.trait_type ?? attribute?.traitType ?? attribute?.type ?? attribute?.label ?? '';
+    const rawValue =
+      attribute?.value ??
+      attribute?.display_value ??
+      attribute?.displayValue ??
+      attribute?.traitValue ??
+      attribute?.trait_value;
+
+    if (rawTrait === undefined && rawValue === undefined) {
+      continue;
+    }
+
+    const traitLabel = rawTrait
+      ? toTitleCase(String(rawTrait).replace(/[\s_-]+/g, ' ').trim())
+      : '';
+    const valueLabel = rawValue !== undefined && rawValue !== null ? String(rawValue).trim() : '';
+
+    if (!traitLabel && !valueLabel) {
+      continue;
+    }
+
+    const entry = traitLabel ? `${traitLabel}: ${valueLabel || '—'}` : valueLabel;
+    if (entry) {
+      parts.push(entry);
+    }
+
+    if (parts.length >= limit) {
+      break;
+    }
+  }
+
+  return parts.join(' • ');
+}
+
 async function getControllerContractForSales() {
   if (typeof controller !== 'undefined' && controller?.methods?.stakerAddress) {
     return controller;
@@ -304,27 +337,27 @@ async function getControllerContractForSales() {
   return readOnlyControllerForSales;
 }
 
-async function resolveCurrentHolderAddress(tokenId, fallbackAddress) {
+async function resolveHolderDetails(tokenId, fallbackAddress) {
   const normalizedTokenId = Number.parseInt(tokenId, 10);
   if (!Number.isFinite(normalizedTokenId)) {
-    return fallbackAddress;
+    return { holderAddress: fallbackAddress, isStaked: false };
   }
 
   try {
     const contract = await getControllerContractForSales();
     if (!contract || !contract.methods?.stakerAddress) {
-      return fallbackAddress;
+      return { holderAddress: fallbackAddress, isStaked: false };
     }
 
     const holder = await contract.methods.stakerAddress(normalizedTokenId).call();
     if (!holder || /^0x0{40}$/i.test(holder)) {
-      return fallbackAddress;
+      return { holderAddress: fallbackAddress, isStaked: false };
     }
 
-    return holder;
+    return { holderAddress: holder, isStaked: true };
   } catch (error) {
     console.warn('Unable to resolve staker address', tokenId, error);
-    return fallbackAddress;
+    return { holderAddress: fallbackAddress, isStaked: false };
   }
 }
 
@@ -341,6 +374,8 @@ function createFrogSaleCard(sale) {
 
   const attributes =
     sale?.nft?.metadata?.attributes || sale?.nft?.rawMetadata?.attributes || sale?.nft?.traits || [];
+
+  const traitSummary = formatTraitList(attributes, { limit: 6 });
 
   const rarityRank =
     findAttributeValue(attributes, ['rarity', 'rank', 'ranking', 'rarity rank']) ||
@@ -415,20 +450,23 @@ function createFrogSaleCard(sale) {
   heading.textContent = name;
   header.append(heading);
 
-  const stats = document.createElement('div');
-  stats.className = 'frog-card__stats';
-  stats.append(
-    buildStat('Rewards', rewardsDisplay),
-    buildStat('Level', levelDisplay),
-    buildStat('Rarity', rarityDisplay)
-  );
-
   const actions = document.createElement('ul');
   actions.className = 'frog-card__actions';
 
   const holderRow = buildActionRow('👑', 'Current Holder', fallbackHolderDisplay || '—', fallbackHolderUrl);
   const priceRow = buildActionRow('🪙', 'Purchase Price', purchasePriceDisplay);
-  actions.append(holderRow.item, priceRow.item);
+  const stakingRow = buildActionRow('🛡️', 'Staking Status', fallbackHolderAddress ? 'Checking…' : '—');
+  const rewardsRow = buildActionRow('💰', 'Rewards', rewardsDisplay);
+  const levelRow = buildActionRow('📈', 'Staking Level', levelDisplay);
+  const rarityRow = buildActionRow('🏅', 'Rarity', rarityDisplay);
+  actions.append(
+    holderRow.item,
+    priceRow.item,
+    stakingRow.item,
+    rewardsRow.item,
+    levelRow.item,
+    rarityRow.item
+  );
 
   const cta = document.createElement('a');
   cta.className = 'frog-card__cta';
@@ -442,29 +480,31 @@ function createFrogSaleCard(sale) {
     cta.dataset.tx = txHash;
   }
 
-  body.append(header, stats, actions, cta);
+  if (traitSummary) {
+    const traitsBlock = document.createElement('p');
+    traitsBlock.className = 'frog-card__traits';
+    traitsBlock.textContent = traitSummary;
+    body.append(header, traitsBlock, actions, cta);
+  } else {
+    body.append(header, actions, cta);
+  }
   card.append(media, body);
 
-  const fallbackHolderNormalized = fallbackHolderAddress ? fallbackHolderAddress.toLowerCase() : null;
-  resolveCurrentHolderAddress(tokenId, fallbackHolderAddress)
-    .then((holderAddress) => {
-      if (!holderAddress) {
-        return;
+  resolveHolderDetails(tokenId, fallbackHolderAddress)
+    .then(({ holderAddress, isStaked }) => {
+      if (holderAddress) {
+        updateActionRow(
+          holderRow,
+          formatAddress(holderAddress),
+          `https://etherscan.io/address/${holderAddress}`
+        );
       }
 
-      const normalized = holderAddress.toLowerCase();
-      if (fallbackHolderNormalized && normalized === fallbackHolderNormalized) {
-        return;
-      }
-
-      updateActionRow(
-        holderRow,
-        formatAddress(holderAddress),
-        `https://etherscan.io/address/${holderAddress}`
-      );
+      updateActionRow(stakingRow, isStaked ? 'Staked' : 'Not Staked');
     })
     .catch((error) => {
       console.warn('Unable to update holder for frog', tokenId, error);
+      updateActionRow(stakingRow, fallbackHolderAddress ? 'Not Staked' : '—');
     });
 
   return card;

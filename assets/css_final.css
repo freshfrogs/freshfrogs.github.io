@@ -80,7 +80,7 @@
 .frog-card__body {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .frog-card__header {
@@ -93,6 +93,18 @@
 .frog-card__header h2 {
   margin: 0;
   font-size: 1.1rem;
+}
+
+.frog-card__traits {
+  margin: 0;
+  padding: 12px;
+  border: 1px solid #0f2e2b;
+  border-radius: 10px;
+  background: rgba(8, 33, 31, 0.65);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #d4f5e7;
 }
 
 .frog-card__stats {
@@ -139,7 +151,7 @@
 .frog-card__actions li {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   padding: 8px 12px;
   border-radius: 8px;
@@ -151,12 +163,15 @@
 .frog-card__actions-label {
   color: #f6d77a;
   font-weight: 700;
+  flex: 0 0 auto;
 }
 
 .frog-card__actions-value {
   color: #f4fffa;
   font-weight: 600;
   text-align: right;
+  margin-left: auto;
+  line-height: 1.4;
 }
 
 .frog-card__actions a {
