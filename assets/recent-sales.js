@@ -6,6 +6,15 @@ const FROG_COLLECTION_ADDRESS =
     : '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const FROG_SOURCE_PATH =
   typeof SOURCE_PATH !== 'undefined' ? SOURCE_PATH : 'https://freshfrogs.github.io';
+const CONTROLLER_ADDRESS_FOR_SALES =
+  typeof CONTROLLER_ADDRESS !== 'undefined'
+    ? CONTROLLER_ADDRESS
+    : '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
+const CONTROLLER_ABI_FOR_SALES = typeof CONTROLLER_ABI !== 'undefined' ? CONTROLLER_ABI : null;
+const ALCHEMY_MAINNET_RPC_URL = `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`;
+
+let readOnlyWeb3ForSales = null;
+let readOnlyControllerForSales = null;
 
 async function fetchRecentFrogSales({ limit = 6, contractAddress = FROG_COLLECTION_ADDRESS } = {}) {
   const params = new URLSearchParams({
@@ -44,75 +53,121 @@ function formatAddress(address) {
   return `${address.slice(0, 6)}…${address.slice(-4)}`;
 }
 
-function formatSalePrice(salePrice) {
-  if (!salePrice) return '--';
-
-  const valueRaw = salePrice.value ?? salePrice.amount ?? salePrice.totalPrice ?? salePrice.price;
-  if (!valueRaw) return '--';
-
-  const token = salePrice.token ?? salePrice.paymentToken ?? salePrice.unitPrice?.token ?? {};
-  const decimals = Number(token.decimals ?? salePrice.decimals ?? 18);
-  const symbol = token.symbol ?? salePrice.currency ?? salePrice.unitPrice?.currencySymbol ?? 'Ξ';
+function formatPriceValue(valueBigInt, decimals, symbol, { includeSign = false } = {}) {
+  if (typeof decimals !== 'number' || Number.isNaN(decimals)) {
+    decimals = 18;
+  }
 
   try {
-    const valueBigInt = BigInt(valueRaw);
     const base = 10n ** BigInt(decimals);
-    const whole = valueBigInt / base;
-    const fraction = valueBigInt % base;
+    const absoluteValue = valueBigInt < 0n ? -valueBigInt : valueBigInt;
+    const whole = absoluteValue / base;
+    const fraction = absoluteValue % base;
     let fractionStr = fraction.toString().padStart(decimals, '0').slice(0, 4);
     fractionStr = fractionStr.replace(/0+$/, '');
     const displayFraction = fractionStr ? `.${fractionStr}` : '';
-    return `${whole.toString()}${displayFraction} ${symbol}`;
-  } catch (error) {
-    console.warn('Unable to format sale price', salePrice, error);
-    return `${valueRaw} ${symbol}`;
-  }
-}
-
-function formatRelativeTime(timestamp) {
-  if (!timestamp) return 'recently';
-  try {
-    const saleDate = new Date(timestamp);
-    const now = new Date();
-    const diffMs = saleDate.getTime() - now.getTime();
-    const diffMinutes = Math.round(diffMs / 60000);
-
-    const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
-
-    if (Math.abs(diffMinutes) < 1) {
-      return 'just now';
-    }
-
-    const ranges = [
-      { limit: 60, divisor: 1, unit: 'minute' },
-      { limit: 24 * 60, divisor: 60, unit: 'hour' },
-      { limit: 30 * 24 * 60, divisor: 60 * 24, unit: 'day' },
-      { limit: 12 * 30 * 24 * 60, divisor: 60 * 24 * 30, unit: 'month' },
-    ];
-
-    for (const range of ranges) {
-      if (Math.abs(diffMinutes) < range.limit) {
-        const value = Math.round(diffMinutes / range.divisor);
-        return rtf.format(value, range.unit);
+    let prefix = '';
+    if (includeSign) {
+      if (valueBigInt > 0n) {
+        prefix = '+';
+      } else if (valueBigInt < 0n) {
+        prefix = '-';
       }
     }
 
-    const years = Math.round(diffMinutes / (60 * 24 * 365));
-    return rtf.format(years, 'year');
+    return `${prefix}${whole.toString()}${displayFraction} ${symbol}`;
   } catch (error) {
-    console.warn('Unable to format relative time', timestamp, error);
-    return 'recently';
+    console.warn('Unable to format price value', valueBigInt, decimals, symbol, error);
+    return `${valueBigInt} ${symbol}`;
   }
 }
 
-function buildMetaItem(dtText, ddText) {
-  const wrapper = document.createElement('div');
-  const dt = document.createElement('dt');
-  dt.textContent = dtText;
-  const dd = document.createElement('dd');
-  dd.textContent = ddText;
-  wrapper.append(dt, dd);
-  return wrapper;
+function extractPriceInfo(priceLike) {
+  if (!priceLike && priceLike !== 0) return null;
+
+  if (typeof priceLike === 'string' || typeof priceLike === 'number' || typeof priceLike === 'bigint') {
+    try {
+      const valueBigInt = BigInt(priceLike);
+      const decimals = 18;
+      const symbol = 'Ξ';
+      return {
+        valueBigInt,
+        decimals,
+        symbol,
+        formatted: formatPriceValue(valueBigInt, decimals, symbol)
+      };
+    } catch (error) {
+      console.warn('Unable to parse primitive price info', priceLike, error);
+      return null;
+    }
+  }
+
+  const token = priceLike.token ?? priceLike.paymentToken ?? priceLike.unitPrice?.token ?? {};
+  const decimals = Number(token.decimals ?? priceLike.decimals ?? priceLike.tokenDecimals ?? 18);
+  const symbol = token.symbol ?? priceLike.currency ?? priceLike.unitPrice?.currencySymbol ?? priceLike.symbol ?? 'Ξ';
+  const valueRaw =
+    priceLike.value ??
+    priceLike.amount ??
+    priceLike.totalPrice ??
+    priceLike.price ??
+    priceLike.basePrice ??
+    priceLike.quantity ??
+    priceLike.netAmount;
+
+  if (valueRaw === undefined || valueRaw === null) {
+    return null;
+  }
+
+  try {
+    const valueBigInt = BigInt(valueRaw);
+    return {
+      valueBigInt,
+      decimals,
+      symbol,
+      formatted: formatPriceValue(valueBigInt, decimals, symbol)
+    };
+  } catch (error) {
+    console.warn('Unable to parse price info', priceLike, error);
+    return null;
+  }
+}
+
+function deriveSalePriceInfo(sale) {
+  const direct =
+    extractPriceInfo(sale?.salePrice) ||
+    extractPriceInfo(sale?.price) ||
+    extractPriceInfo(sale?.totalPrice) ||
+    extractPriceInfo(sale?.buyerPrice);
+
+  if (direct) {
+    return direct;
+  }
+
+  const sellerInfo = extractPriceInfo(sale?.sellerFee);
+  const protocolInfo = extractPriceInfo(sale?.protocolFee);
+  const royaltyInfo = extractPriceInfo(sale?.royaltyFee);
+
+  const components = [sellerInfo, protocolInfo, royaltyInfo].filter(Boolean);
+  if (!components.length) {
+    return null;
+  }
+
+  const base = components[0];
+  const mixedSymbols = components.some(
+    (info) => info.symbol !== base.symbol || info.decimals !== base.decimals
+  );
+
+  if (mixedSymbols) {
+    return base;
+  }
+
+  const total = components.reduce((sum, info) => sum + info.valueBigInt, 0n);
+  return {
+    valueBigInt: total,
+    decimals: base.decimals,
+    symbol: base.symbol,
+    formatted: formatPriceValue(total, base.decimals, base.symbol)
+  };
 }
 
 function buildStat(label, value) {
@@ -150,7 +205,41 @@ function buildActionRow(icon, label, value, href) {
   }
 
   item.append(spanLabel, valueNode);
-  return item;
+  return { item, valueNode };
+}
+
+function updateActionRow(row, value, href) {
+  if (!row || !row.item || !row.valueNode) {
+    return;
+  }
+
+  const displayValue = value || '—';
+
+  if (href) {
+    if (row.valueNode.tagName !== 'A') {
+      const link = document.createElement('a');
+      link.className = 'frog-card__actions-value';
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = displayValue;
+      link.href = href;
+      row.item.replaceChild(link, row.valueNode);
+      row.valueNode = link;
+    } else {
+      row.valueNode.href = href;
+      row.valueNode.target = '_blank';
+      row.valueNode.rel = 'noopener noreferrer';
+      row.valueNode.textContent = displayValue;
+    }
+  } else if (row.valueNode.tagName === 'A') {
+    const span = document.createElement('span');
+    span.className = 'frog-card__actions-value';
+    span.textContent = displayValue;
+    row.item.replaceChild(span, row.valueNode);
+    row.valueNode = span;
+  } else {
+    row.valueNode.textContent = displayValue;
+  }
 }
 
 function toTitleCase(value) {
@@ -185,45 +274,123 @@ function findAttributeValue(attributes, traitNames) {
   return null;
 }
 
+async function getControllerContractForSales() {
+  if (typeof controller !== 'undefined' && controller?.methods?.stakerAddress) {
+    return controller;
+  }
+
+  if (readOnlyControllerForSales) {
+    return readOnlyControllerForSales;
+  }
+
+  if (!CONTROLLER_ABI_FOR_SALES) {
+    return null;
+  }
+
+  const Web3Constructor = typeof Web3 !== 'undefined' ? Web3 : window?.Web3;
+  if (!Web3Constructor) {
+    return null;
+  }
+
+  if (!readOnlyWeb3ForSales) {
+    readOnlyWeb3ForSales = new Web3Constructor(ALCHEMY_MAINNET_RPC_URL);
+  }
+
+  readOnlyControllerForSales = new readOnlyWeb3ForSales.eth.Contract(
+    CONTROLLER_ABI_FOR_SALES,
+    CONTROLLER_ADDRESS_FOR_SALES
+  );
+
+  return readOnlyControllerForSales;
+}
+
+async function resolveCurrentHolderAddress(tokenId, fallbackAddress) {
+  const normalizedTokenId = Number.parseInt(tokenId, 10);
+  if (!Number.isFinite(normalizedTokenId)) {
+    return fallbackAddress;
+  }
+
+  try {
+    const contract = await getControllerContractForSales();
+    if (!contract || !contract.methods?.stakerAddress) {
+      return fallbackAddress;
+    }
+
+    const holder = await contract.methods.stakerAddress(normalizedTokenId).call();
+    if (!holder || /^0x0{40}$/i.test(holder)) {
+      return fallbackAddress;
+    }
+
+    return holder;
+  } catch (error) {
+    console.warn('Unable to resolve staker address', tokenId, error);
+    return fallbackAddress;
+  }
+}
+
 function createFrogSaleCard(sale) {
   const tokenId = parseTokenId(sale?.nft?.tokenId ?? sale?.tokenId);
   const name = sale?.nft?.metadata?.name || (tokenId !== '--' ? `Frog #${tokenId}` : 'FreshFrog');
   const imageFromMetadata = sale?.nft?.metadata?.image || sale?.nft?.imageUrl || sale?.nft?.rawMetadata?.image;
   const fallbackImageToken = tokenId !== '--' ? tokenId : '1';
   const imageSrc = imageFromMetadata || `${FROG_SOURCE_PATH}/frog/${fallbackImageToken}.png`;
-  const salePrice = formatSalePrice(sale?.salePrice);
-  const saleMarketplace = sale?.marketplace || sale?.marketplaceInfo?.name || 'Marketplace';
-  const saleTypeRaw = sale?.saleType ? sale.saleType.replace(/_/g, ' ') : 'Sale';
-  const saleType = toTitleCase(saleTypeRaw);
-  const timeAgo = formatRelativeTime(sale?.blockTimestamp);
-  const buyer = formatAddress(sale?.buyerAddress);
-  const seller = formatAddress(sale?.sellerAddress);
+  const salePriceInfo = deriveSalePriceInfo(sale);
+  const salePrice = salePriceInfo?.formatted ?? '--';
+  const purchasePriceDisplay = salePrice === '--' ? '—' : salePrice;
   const txHash = sale?.transactionHash;
-  const buyerUrl = sale?.buyerAddress ? `https://etherscan.io/address/${sale.buyerAddress}` : null;
-  const sellerUrl = sale?.sellerAddress ? `https://etherscan.io/address/${sale.sellerAddress}` : null;
 
   const attributes =
     sale?.nft?.metadata?.attributes || sale?.nft?.rawMetadata?.attributes || sale?.nft?.traits || [];
 
-  const stakingStatus =
-    findAttributeValue(attributes, ['staking', 'staked']) || findAttributeValue(attributes, ['stake status']);
   const rarityRank =
     findAttributeValue(attributes, ['rarity', 'rank', 'ranking', 'rarity rank']) ||
     sale?.nft?.rarity?.rank?.toString();
+  const rarityPercentileRaw = findAttributeValue(attributes, [
+    'rarity percentile',
+    'rarity percent',
+    'rarity_percentile',
+    'percentile'
+  ]);
+  const rarityTier = findAttributeValue(attributes, ['rarity tier', 'tier']);
   const rewardsRaw = findAttributeValue(attributes, ['rewards', '$fly earned', 'rewards earned']);
   const levelRaw = findAttributeValue(attributes, ['level']);
-  const floorDeltaRaw = findAttributeValue(attributes, ['floor delta', 'floor change']);
 
   const rewardsDisplay = rewardsRaw ? (isNaN(Number(rewardsRaw)) ? rewardsRaw : `${rewardsRaw} $FLY`) : '—';
   const levelDisplay = levelRaw || '—';
-  const floorDeltaDisplay = floorDeltaRaw || '—';
-  const stakingDisplay = stakingStatus || '—';
-  const rarityDisplay = rarityRank ? `#${rarityRank}` : '—';
-  const ownerDisplay = buyer !== '—' ? buyer : seller;
-  const lastTradeDisplay = saleType ? `${saleType} · ${timeAgo}` : timeAgo;
-  const purchasePriceDisplay = salePrice;
-  const rewardsActionValue = rewardsDisplay;
-  const levelActionValue = levelDisplay;
+
+  let rarityDisplay = '—';
+  if (rarityPercentileRaw) {
+    const numeric = Number(String(rarityPercentileRaw).replace(/[^0-9.]/g, ''));
+    if (!Number.isNaN(numeric) && numeric > 0) {
+      const hasPercentSymbol = String(rarityPercentileRaw).includes('%');
+      const numericDisplay = Number.isInteger(numeric)
+        ? numeric.toString()
+        : Number(numeric.toFixed(2))
+            .toString()
+            .replace(/\.0+$/, '')
+            .replace(/(\.\d*[1-9])0+$/, '$1');
+      rarityDisplay = `Top ${numericDisplay}${hasPercentSymbol ? '' : '%'}`;
+    } else {
+      rarityDisplay = rarityPercentileRaw;
+    }
+  } else if (rarityRank) {
+    rarityDisplay = rarityRank.startsWith('#') ? rarityRank : `#${rarityRank}`;
+  } else if (rarityTier) {
+    rarityDisplay = toTitleCase(rarityTier);
+  } else if (sale?.nft?.rarity?.rank) {
+    rarityDisplay = `#${sale.nft.rarity.rank}`;
+  }
+
+  const fallbackHolderAddress =
+    sale?.buyerAddress ||
+    sale?.nft?.owner?.address ||
+    sale?.ownerAddress ||
+    sale?.sellerAddress ||
+    null;
+  const fallbackHolderDisplay = formatAddress(fallbackHolderAddress);
+  const fallbackHolderUrl = fallbackHolderAddress
+    ? `https://etherscan.io/address/${fallbackHolderAddress}`
+    : null;
 
   const card = document.createElement('article');
   card.className = 'frog-card';
@@ -236,11 +403,7 @@ function createFrogSaleCard(sale) {
   img.alt = name;
   img.loading = 'lazy';
 
-  const badge = document.createElement('span');
-  badge.className = 'frog-card__badge';
-  badge.textContent = 'Recently Sold';
-
-  media.append(img, badge);
+  media.append(img);
 
   const body = document.createElement('div');
   body.className = 'frog-card__body';
@@ -250,42 +413,22 @@ function createFrogSaleCard(sale) {
 
   const heading = document.createElement('h2');
   heading.textContent = name;
-
-  const price = document.createElement('span');
-  price.className = 'frog-card__price';
-  price.textContent = `Last Sale · ${salePrice}`;
-
-  header.append(heading, price);
-
-  const subtitle = document.createElement('p');
-  subtitle.className = 'frog-card__subtitle';
-  subtitle.textContent = `Sale ${timeAgo} on ${saleMarketplace}`;
-
-  const meta = document.createElement('dl');
-  meta.className = 'frog-card__meta';
-  meta.append(
-    buildMetaItem('Owner', ownerDisplay || '—'),
-    buildMetaItem('Last Trade', lastTradeDisplay || '—'),
-    buildMetaItem('Staking', stakingDisplay),
-    buildMetaItem('Rarity', rarityDisplay)
-  );
+  header.append(heading);
 
   const stats = document.createElement('div');
   stats.className = 'frog-card__stats';
   stats.append(
     buildStat('Rewards', rewardsDisplay),
     buildStat('Level', levelDisplay),
-    buildStat('Floor Delta', floorDeltaDisplay)
+    buildStat('Rarity', rarityDisplay)
   );
 
   const actions = document.createElement('ul');
   actions.className = 'frog-card__actions';
-  actions.append(
-    buildActionRow('👑', 'Current Holder', ownerDisplay || '—', buyerUrl || sellerUrl),
-    buildActionRow('🪙', 'Purchase Price', purchasePriceDisplay || '—'),
-    buildActionRow('🎁', 'Rewards', rewardsActionValue),
-    buildActionRow('🎚', 'Level', levelActionValue)
-  );
+
+  const holderRow = buildActionRow('👑', 'Current Holder', fallbackHolderDisplay || '—', fallbackHolderUrl);
+  const priceRow = buildActionRow('🪙', 'Purchase Price', purchasePriceDisplay);
+  actions.append(holderRow.item, priceRow.item);
 
   const cta = document.createElement('a');
   cta.className = 'frog-card__cta';
@@ -299,8 +442,30 @@ function createFrogSaleCard(sale) {
     cta.dataset.tx = txHash;
   }
 
-  body.append(header, subtitle, meta, stats, actions, cta);
+  body.append(header, stats, actions, cta);
   card.append(media, body);
+
+  const fallbackHolderNormalized = fallbackHolderAddress ? fallbackHolderAddress.toLowerCase() : null;
+  resolveCurrentHolderAddress(tokenId, fallbackHolderAddress)
+    .then((holderAddress) => {
+      if (!holderAddress) {
+        return;
+      }
+
+      const normalized = holderAddress.toLowerCase();
+      if (fallbackHolderNormalized && normalized === fallbackHolderNormalized) {
+        return;
+      }
+
+      updateActionRow(
+        holderRow,
+        formatAddress(holderAddress),
+        `https://etherscan.io/address/${holderAddress}`
+      );
+    })
+    .catch((error) => {
+      console.warn('Unable to update holder for frog', tokenId, error);
+    });
 
   return card;
 }
