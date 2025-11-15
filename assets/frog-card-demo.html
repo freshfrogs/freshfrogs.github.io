@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreshFrogs NFT Card Demo</title>
+  <link rel="stylesheet" href="css_final.css">
+  <style>
+    body {
+      background: url("background.png");
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 40px 16px;
+      font-family: monospace;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="frog-card">
+    <div class="frog-card__media">
+      <img src="../frog/123.png" alt="Frog #123" loading="lazy">
+    </div>
+    <div class="frog-card__body">
+      <header class="frog-card__header">
+        <h2>Frog #123</h2>
+      </header>
+      <div class="frog-card__stats">
+        <div>
+          <span class="frog-card__label">Rewards</span>
+          <span class="frog-card__value">48 $FLY</span>
+        </div>
+        <div>
+          <span class="frog-card__label">Level</span>
+          <span class="frog-card__value">5</span>
+        </div>
+        <div>
+          <span class="frog-card__label">Rarity</span>
+          <span class="frog-card__value">Top 12%</span>
+        </div>
+      </div>
+      <ul class="frog-card__actions">
+        <li>
+          <span class="frog-card__actions-label">👑 Current Holder</span>
+          <span class="frog-card__actions-value">0xABCD...7890</span>
+        </li>
+        <li>
+          <span class="frog-card__actions-label">🪙 Purchase Price</span>
+          <span class="frog-card__actions-value">0.37Ξ</span>
+        </li>
+      </ul>
+      <a class="frog-card__cta" href="#">🐸 View on OpenSea</a>
+    </div>
+  </div>
+</body>
+</html>
