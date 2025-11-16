@@ -137,7 +137,7 @@ async function fetch_token_sales(contract, limit, next_string) {
         params.append('pageKey', next_string);
     }
 
-    const endpoint = `https://eth-mainnet.g.alchemy.com/nft/v3/${frog_api}/getNFTSales?${params.toString()}`;
+    const endpoint = `https://eth-mainnet.g.alchemy.com/nft/v3/C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ/getNFTSales?${params.toString()}`;
 
     try {
         const response = await fetch(endpoint);
