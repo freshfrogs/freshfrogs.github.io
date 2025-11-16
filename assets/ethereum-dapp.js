@@ -313,7 +313,6 @@ async function render_token_sales(contract, sales) {
         cardElement.insertBefore(mediaColumn, textColumn);
     };
 
-    const canCheckCollectionOwner = Boolean(collection && collection.methods && typeof collection.methods.ownerOf === 'function');
     const canCheckController = Boolean(controller && controller.methods && typeof controller.methods.stakerAddress === 'function');
 
     for (const sale of sales) {
@@ -358,19 +357,7 @@ async function render_token_sales(contract, sales) {
             let holderAddress = sale.buyerAddress;
             let stakingStatus = 'Not Staked';
             try {
-                if (canCheckCollectionOwner) {
-                    const onChainOwner = await collection.methods.ownerOf(tokenId).call();
-                    if (onChainOwner) {
-                        holderAddress = onChainOwner;
-                        if (onChainOwner.toLowerCase() === CONTROLLER_ADDRESS.toLowerCase() && canCheckController) {
-                            const stakedOwner = await stakerAddress(tokenId);
-                            if (stakedOwner && stakedOwner !== false) {
-                                holderAddress = stakedOwner;
-                                stakingStatus = 'Staked';
-                            }
-                        }
-                    }
-                } else if (canCheckController) {
+                if (typeof stakerAddress === 'function' && canCheckController) {
                     const stakedOwner = await stakerAddress(tokenId);
                     if (stakedOwner && stakedOwner !== false) {
                         holderAddress = stakedOwner;
