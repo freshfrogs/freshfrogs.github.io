@@ -24,6 +24,95 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.index-card.sales-card {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  max-width: 940px;
+  width: 100%;
+  padding: 16px;
+}
+
+.index-card.sales-card .trait_list {
+  text-align: left;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+
+.index-card.sales-card .trait_list strong {
+  display: inline-block;
+  font-size: 1.2em;
+}
+
+.index-card.sales-card .properties {
+  width: 100%;
+  padding-top: 4px;
+}
+
+.sales-card__media {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 128px;
+  flex-shrink: 0;
+}
+
+.index-card.sales-card .index-card-img-cont {
+  margin: 0;
+}
+
+.index-card.sales-card .sales-card__media .card_buttonbox {
+  margin: 0;
+  width: 128px;
+}
+
+.index-card.sales-card .sales-card__media .etherscan_button {
+  width: 100%;
+}
+
+.index-card.sales-card .sales-card__details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 24px;
+  width: 100%;
+}
+
+.index-card.sales-card .sales-card__detail-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.index-card.sales-card .card_info_row {
+  width: 100%;
+  float: none;
+  text-align: left;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.index-card.sales-card .card_info_row .card_text {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.index-card.sales-card .card_info_row .card_bold {
+  display: block;
+}
+
+.index-card.sales-card .infobox_left,
+.index-card.sales-card .infobox_right {
+  margin: 0;
+  width: 100%;
+  float: none;
+  text-align: left;
+}
+
 /*.index-card:hover {
   transform: scale(1.02);
   box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.15);
@@ -49,6 +138,10 @@
   .index-card {
     flex-direction: column;
     text-align: center;
+  }
+
+  .index-card.sales-card .sales-card__details {
+    grid-template-columns: 1fr;
   }
 
   .index-card img {

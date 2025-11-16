@@ -137,7 +137,7 @@ async function fetch_token_sales(contract, limit, next_string) {
         params.append('pageKey', next_string);
     }
 
-    const endpoint = `https://eth-mainnet.g.alchemy.com/nft/v3/C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ/getNFTSales?${params.toString()}`;
+    const endpoint = `https://eth-mainnet.g.alchemy.com/nft/v3/${frog_api}/getNFTSales?${params.toString()}`;
 
     try {
         const response = await fetch(endpoint);
@@ -279,6 +279,53 @@ async function render_token_sales(contract, sales) {
             .replace(/>/g, '&gt;');
     };
 
+    const buildValueMarkup = (value, id) => {
+        const safeValue = sanitize(value);
+        if (id) { return '<text id="'+id+'" class="card_bold">'+safeValue+'</text>'; }
+        return '<text class="card_bold">'+safeValue+'</text>';
+    };
+
+    const infoRow = (label, valueMarkup) => {
+        return '<div class="card_info_row">'
+            +'<text class="card_text">'+sanitize(label)+'</text>'
+            +valueMarkup
+            +'</div>';
+    };
+
+    const buildColumnsMarkup = (rows) => {
+        if (!rows.length) { return ''; }
+        const midpoint = Math.ceil(rows.length / 2);
+        const columns = [
+            rows.slice(0, midpoint),
+            rows.slice(midpoint)
+        ].filter((column) => column.length);
+
+        return columns.map((columnRows) => {
+            return '<div class="sales-card__detail-col">'+columnRows.join('')+'</div>';
+        }).join('');
+    };
+
+    const applySalesCardLayout = (elementId) => {
+        const cardElement = document.getElementById(elementId);
+        if (!cardElement) { return; }
+
+        cardElement.classList.add('sales-card');
+        const imageContainer = cardElement.querySelector('.index-card-img-cont');
+        const textColumn = cardElement.querySelector('.index-card-text');
+        if (!imageContainer || !textColumn) { return; }
+
+        const mediaColumn = document.createElement('div');
+        mediaColumn.className = 'sales-card__media';
+        mediaColumn.appendChild(imageContainer);
+
+        const buttonBox = textColumn.querySelector('.card_buttonbox');
+        if (buttonBox) {
+            mediaColumn.appendChild(buttonBox);
+        }
+
+        cardElement.insertBefore(mediaColumn, textColumn);
+    };
+
     for (const sale of sales) {
         try {
             const rawTokenId = sale.tokenId || (sale.token && sale.token.tokenId);
@@ -341,26 +388,34 @@ async function render_token_sales(contract, sales) {
             const saleValue = pricePieces.length ? pricePieces.join(' / ') : 'Unknown';
             const saleDetail = saleDate ? saleValue+' • '+saleDate : saleValue;
 
+            const traitRows = [];
+            try {
+                const metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+tokenId+'.json')).json();
+                if (metadata && Array.isArray(metadata.attributes)) {
+                    metadata.attributes.forEach((attribute) => {
+                        const traitLabel = attribute.trait_type || 'Trait';
+                        const traitValue = attribute.value || '--';
+                        traitRows.push(infoRow(traitLabel, buildValueMarkup(traitValue)));
+                    });
+                }
+            } catch (error) {
+                console.warn('Unable to fetch metadata for Frog #'+tokenId, error);
+            }
+
+            const detailRows = [
+                infoRow('Staking Status', buildValueMarkup(stakingStatus)+'<span id="'+tokenId+'_frogType" style="display:none;"></span>'),
+                infoRow('Current Holder', buildValueMarkup(ownerDisplay)),
+                infoRow(saleLabel, buildValueMarkup(saleDetail || 'Unknown')),
+                infoRow('Rarity', buildValueMarkup(rarityDisplay, 'rarityRanking_'+tokenId))
+            ];
+
+            if (traitRows.length) {
+                detailRows.push(...traitRows);
+            }
+
             const html_elements =
-                '<div class="infobox_left" style="width: 120px; text-align: left;">'+
-                    '<text class="card_text">Staking Status</text><br>'+
-                    '<text class="card_bold">'+sanitize(stakingStatus)+'</text>'+
-                    '<span id="'+tokenId+'_frogType" style="display:none;"></span>'+
-                '</div>'+
-                '<div class="infobox_right" style="width: calc(100% - 140px); text-align: left;">'+
-                    '<text class="card_text">Current Holder</text><br>'+
-                    '<text class="card_bold">'+sanitize(ownerDisplay)+'</text>'+
-                '</div>'+
-                '<br style="clear: both;">'+
-                '<div class="infobox_left" style="width: 120px; text-align: left;">'+
-                    '<text class="card_text">'+saleLabel+'</text><br>'+
-                    '<text class="card_bold">'+sanitize(saleDetail || 'Unknown')+'</text>'+
-                '</div>'+
-                '<div class="infobox_right" style="width: calc(100% - 140px); text-align: left;">'+
-                    '<text class="card_text">Rarity</text><br>'+
-                    '<text id="rarityRanking_'+tokenId+'" class="card_bold">'+sanitize(rarityDisplay)+'</text>'+
-                '</div>'+
-                '<div class="card_buttonbox" style="clear: both;">'+
+                '<div class="sales-card__details">'+buildColumnsMarkup(detailRows)+'</div>'+
+                '<div class="card_buttonbox">'+
                     '<a href="https://etherscan.io/nft/'+targetContract+'/'+tokenId+'" target="_blank" rel="noopener">'+
                         '<button class="etherscan_button" style="width: 128px;">Etherscan</button>'+
                     '</a>'+
@@ -368,6 +423,7 @@ async function render_token_sales(contract, sales) {
 
             const elementId = tokenId+':'+(sale.blockTimestamp || sale.transactionHash || Date.now());
             await build_token(html_elements, tokenId, elementId, txn_string, sale.transactionHash);
+            applySalesCardLayout(elementId);
         } catch (error) {
             console.error('Failed to render sale card', error);
         }
