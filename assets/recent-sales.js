@@ -170,11 +170,13 @@ function deriveSalePriceInfo(sale) {
   };
 }
 
-function buildActionRow(icon, label, value, href) {
+function buildDetailLine(icon, label, value, { href } = {}) {
   const item = document.createElement('li');
+  item.className = 'frog-card__detail-line';
+
   const spanLabel = document.createElement('span');
-  spanLabel.className = 'frog-card__actions-label';
-  spanLabel.textContent = `${icon ? `${icon} ` : ''}${label}`;
+  spanLabel.className = 'frog-card__detail-label';
+  spanLabel.textContent = `${icon ? `${icon} ` : ''}${label}:`;
 
   let valueNode;
   if (href) {
@@ -183,20 +185,22 @@ function buildActionRow(icon, label, value, href) {
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
     link.textContent = value;
-    link.className = 'frog-card__actions-value';
+    link.className = 'frog-card__detail-value-link';
     valueNode = link;
   } else {
     const spanValue = document.createElement('span');
-    spanValue.className = 'frog-card__actions-value';
+    spanValue.className = 'frog-card__detail-value';
     spanValue.textContent = value;
     valueNode = spanValue;
   }
 
-  item.append(spanLabel, valueNode);
+  item.append(spanLabel);
+  item.append(valueNode);
+
   return { item, valueNode };
 }
 
-function updateActionRow(row, value, href) {
+function updateDetailLine(row, value, { href } = {}) {
   if (!row || !row.item || !row.valueNode) {
     return;
   }
@@ -206,7 +210,7 @@ function updateActionRow(row, value, href) {
   if (href) {
     if (row.valueNode.tagName !== 'A') {
       const link = document.createElement('a');
-      link.className = 'frog-card__actions-value';
+      link.className = 'frog-card__detail-value-link';
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
       link.textContent = displayValue;
@@ -215,13 +219,11 @@ function updateActionRow(row, value, href) {
       row.valueNode = link;
     } else {
       row.valueNode.href = href;
-      row.valueNode.target = '_blank';
-      row.valueNode.rel = 'noopener noreferrer';
       row.valueNode.textContent = displayValue;
     }
   } else if (row.valueNode.tagName === 'A') {
     const span = document.createElement('span');
-    span.className = 'frog-card__actions-value';
+    span.className = 'frog-card__detail-value';
     span.textContent = displayValue;
     row.item.replaceChild(span, row.valueNode);
     row.valueNode = span;
@@ -387,12 +389,6 @@ function createFrogSaleCard(sale) {
     'percentile'
   ]);
   const rarityTier = findAttributeValue(attributes, ['rarity tier', 'tier']);
-  const rewardsRaw = findAttributeValue(attributes, ['rewards', '$fly earned', 'rewards earned']);
-  const levelRaw = findAttributeValue(attributes, ['level']);
-
-  const rewardsDisplay = rewardsRaw ? (isNaN(Number(rewardsRaw)) ? rewardsRaw : `${rewardsRaw} $FLY`) : '—';
-  const levelDisplay = levelRaw || '—';
-
   let rarityDisplay = '—';
   if (rarityPercentileRaw) {
     const numeric = Number(String(rarityPercentileRaw).replace(/[^0-9.]/g, ''));
@@ -430,6 +426,9 @@ function createFrogSaleCard(sale) {
   const card = document.createElement('article');
   card.className = 'frog-card';
 
+  const aside = document.createElement('div');
+  aside.className = 'frog-card__aside';
+
   const media = document.createElement('div');
   media.className = 'frog-card__media';
 
@@ -439,6 +438,23 @@ function createFrogSaleCard(sale) {
   img.loading = 'lazy';
 
   media.append(img);
+  aside.append(media);
+
+  const cta = document.createElement('a');
+  cta.className = 'frog-card__cta';
+  cta.textContent = 'View on Etherscan';
+  cta.target = '_blank';
+  const tokenUrl =
+    tokenId !== '--' ? `https://etherscan.io/nft/${FROG_COLLECTION_ADDRESS}/${tokenId}` : '#';
+  cta.href = tokenUrl;
+  cta.rel = 'noopener noreferrer';
+
+  if (tokenId === '--') {
+    cta.setAttribute('aria-disabled', 'true');
+    cta.tabIndex = -1;
+  }
+
+  aside.append(cta);
 
   const body = document.createElement('div');
   body.className = 'frog-card__body';
@@ -449,62 +465,50 @@ function createFrogSaleCard(sale) {
   const heading = document.createElement('h2');
   heading.textContent = name;
   header.append(heading);
-
-  const actions = document.createElement('ul');
-  actions.className = 'frog-card__actions';
-
-  const holderRow = buildActionRow('👑', 'Current Holder', fallbackHolderDisplay || '—', fallbackHolderUrl);
-  const priceRow = buildActionRow('🪙', 'Purchase Price', purchasePriceDisplay);
-  const stakingRow = buildActionRow('🛡️', 'Staking Status', fallbackHolderAddress ? 'Checking…' : '—');
-  const rewardsRow = buildActionRow('💰', 'Rewards', rewardsDisplay);
-  const levelRow = buildActionRow('📈', 'Staking Level', levelDisplay);
-  const rarityRow = buildActionRow('🏅', 'Rarity', rarityDisplay);
-  actions.append(
-    holderRow.item,
-    priceRow.item,
-    stakingRow.item,
-    rewardsRow.item,
-    levelRow.item,
-    rarityRow.item
-  );
-
-  const cta = document.createElement('a');
-  cta.className = 'frog-card__cta';
-  cta.textContent = '🐸 View on OpenSea';
-  cta.target = '_blank';
-  const tokenUrl = tokenId !== '--' ? `https://opensea.io/assets/ethereum/${FROG_COLLECTION_ADDRESS}/${tokenId}` : '#';
-  cta.href = tokenUrl;
-  cta.rel = 'noopener noreferrer';
-
-  if (txHash) {
-    cta.dataset.tx = txHash;
-  }
+  body.append(header);
 
   if (traitSummary) {
     const traitsBlock = document.createElement('p');
     traitsBlock.className = 'frog-card__traits';
     traitsBlock.textContent = traitSummary;
-    body.append(header, traitsBlock, actions, cta);
-  } else {
-    body.append(header, actions, cta);
+    body.append(traitsBlock);
   }
-  card.append(media, body);
+
+  const details = document.createElement('ul');
+  details.className = 'frog-card__details';
+
+  const stakingLine = buildDetailLine(
+    '🛡️',
+    'Staking Status',
+    fallbackHolderAddress ? 'Checking…' : '—'
+  );
+  const holderLine = buildDetailLine(
+    '👑',
+    'Current Holder',
+    fallbackHolderDisplay || '—',
+    fallbackHolderUrl ? { href: fallbackHolderUrl } : undefined
+  );
+  const saleLine = buildDetailLine('🪙', 'Recent Sale', purchasePriceDisplay);
+  const rarityLine = buildDetailLine('🏅', 'Rarity', rarityDisplay);
+
+  details.append(stakingLine.item, holderLine.item, saleLine.item, rarityLine.item);
+  body.append(details);
+
+  card.append(aside, body);
 
   resolveHolderDetails(tokenId, fallbackHolderAddress)
     .then(({ holderAddress, isStaked }) => {
       if (holderAddress) {
-        updateActionRow(
-          holderRow,
-          formatAddress(holderAddress),
-          `https://etherscan.io/address/${holderAddress}`
-        );
+        updateDetailLine(holderLine, formatAddress(holderAddress), {
+          href: `https://etherscan.io/address/${holderAddress}`
+        });
       }
 
-      updateActionRow(stakingRow, isStaked ? 'Staked' : 'Not Staked');
+      updateDetailLine(stakingLine, isStaked ? 'Staked' : 'Not Staked');
     })
     .catch((error) => {
       console.warn('Unable to update holder for frog', tokenId, error);
-      updateActionRow(stakingRow, fallbackHolderAddress ? 'Not Staked' : '—');
+      updateDetailLine(stakingLine, fallbackHolderAddress ? 'Not Staked' : '—');
     });
 
   return card;
