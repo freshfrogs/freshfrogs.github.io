@@ -120,9 +120,134 @@ const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': frog_api}}
 
 /*
 
+ Updated functions using chatgpt/codex and alchemy api
+
+*/
+async function fetch_token_sales(contract, limit, next_string) {
+    const targetContract = contract || COLLECTION_ADDRESS;
+    const targetLimit = limit || '50';
+
+    const params = new URLSearchParams({
+        contractAddress: targetContract,
+        order: 'desc',
+        limit: targetLimit
+    });
+
+    if (next_string) {
+        params.append('pageKey', next_string);
+    }
+
+    const endpoint = `https://eth-mainnet.g.alchemy.com/nft/v3/${frog_api}/getNFTSales?${params.toString()}`;
+
+    try {
+        const response = await fetch(endpoint);
+        if (!response.ok) {
+            throw new Error(`Alchemy NFT sales request failed (${response.status})`);
+        }
+
+        const payload = await response.json();
+        console.log(payload);
+
+        await render_token_sales(targetContract, payload.nftSales || []);
+
+        if (payload.pageKey) {
+            sales_load_button('sales', targetContract, targetLimit, payload.pageKey);
+        }
+    } catch (err) {
+        console.error('Failed to fetch token sales', err);
+    }
+}
+
+async function render_token_sales(contract, sales) {
+    if (!Array.isArray(sales) || sales.length === 0) { return; }
+
+    const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+
+    const toEth = (fee) => {
+        if (!fee || !fee.amount) { return 0; }
+        const decimals = typeof fee.decimals === 'number' ? fee.decimals : 18;
+        return parseFloat(fee.amount) / Math.pow(10, decimals);
+    };
+
+    for (const token of sales) {
+        const {
+            tokenId,
+            buyerAddress,
+            sellerAddress,
+            transactionHash,
+            blockTimestamp
+        } = token;
+
+        const saleTimestamp = blockTimestamp ? Math.floor(new Date(blockTimestamp).getTime() / 1000) : null;
+        const sale_date = saleTimestamp ? timestampToDate(saleTimestamp) : '';
+
+        const rawPrice = toEth(token.sellerFee) || toEth(token.buyerFee);
+        const decimal = Number.isFinite(rawPrice) ? rawPrice : 0;
+        const usd = (typeof eth_usd === 'number' && Number.isFinite(decimal)) ? decimal * eth_usd : null;
+
+        const toAddress = buyerAddress ? truncateAddress(buyerAddress) : 'Unknown';
+        const sellerIsMint = !sellerAddress || sellerAddress.toLowerCase() === ZERO_ADDRESS;
+
+        let saleOrMint, txn_string, receiver;
+        if (!sellerIsMint) {
+            saleOrMint = 'Last Sale';
+            txn_string = 'sale';
+            receiver = 'Owner';
+            if (Number.isFinite(usd)) {
+                net_income_usd = net_income_usd + (Number(usd) * 0.025);
+                sales_volume_usd = sales_volume_usd + Number(usd);
+            }
+            sales_volume_eth = sales_volume_eth + Number(decimal);
+        } else {
+            saleOrMint = 'Birthday';
+            txn_string = 'mint';
+            receiver = 'Creator';
+            if (Number.isFinite(usd)) {
+                net_income_usd = net_income_usd + Number(usd);
+                mint_volume_usd = mint_volume_usd + Number(usd);
+            }
+            mint_volume_eth = mint_volume_eth + Number(decimal);
+        }
+
+        const usdDisplay = Number.isFinite(usd) ? usd.toFixed(2) : '--';
+        const ethDisplay = Number.isFinite(decimal) ? Number(decimal).toFixed(3) : '--';
+
+        const html_elements =
+
+            '<div class="infobox_left">'+
+                '<text class="card_text">'+receiver+'</text>'+'<br>'+
+                '<text class="card_bold">'+toAddress+'</text>'+
+            '</div>'+
+            '<div class="infobox_right">'+
+                '<text class="card_text">'+saleOrMint+'</text>'+'<br>'+
+                '<text id="frog_type" class="card_bold">'+ethDisplay+'Ξ </text>'+'<text id="usd_price" class="usd_price">$'+usdDisplay+'</text>'+
+            '</div>'+
+            '<br>'+
+            '<div class="infobox_left">'+
+                '<text class="card_text">Frog Type</text>'+'<br>'+
+                '<text class="card_bold" id="'+tokenId+'_frogType"></text>'+
+            '</div>'+
+            '<div class="infobox_right">'+
+                '<text class="card_text">Rarity</text>'+'<br>'+
+                '<text id="rarityRanking_'+tokenId+'" class="card_bold">--</text>'+
+            '</div>'+
+            '<div id="buttonsPanel_'+tokenId+'" class="card_buttonbox">'+
+                '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
+                '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
+            '</div>';
+
+        const elementId = tokenId+':'+(blockTimestamp || transactionHash || Date.now());
+        await build_token(html_elements, tokenId, elementId, txn_string, transactionHash);
+    }
+
+}
+
+
+/*
+
     Fetch NFT token sales (initial & secondary) using Reservoir API. Returns => Object
     'https://api.reservoir.tools/collections/activity/v6?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&types=mint', options
-*/
+
 async function fetch_token_sales(contract, limit, next_string) {
     if (! contract) { contract = COLLECTION_ADDRESS; }
     if (! limit) { limit = '50'; }
@@ -136,7 +261,7 @@ async function fetch_token_sales(contract, limit, next_string) {
         else { sales_load_button('sales', contract, limit, data.continuation); }
     })
     .catch(err => console.error(err));
-}
+}*/
 
 async function fetch_token_mints(contract, limit, next_string) {
     if (! contract) { contract = COLLECTION_ADDRESS; }
@@ -237,7 +362,7 @@ function findRankingById(id) {
 
     Create html objects for token sales from fetch_token_sales()
 
-*/
+
 async function render_token_sales(contract, sales) {
     sales.forEach(async (token) => {
 
@@ -292,7 +417,7 @@ async function render_token_sales(contract, sales) {
         //}
     })
 
-}
+}*/
 
 async function render_token_mints(contract, mints) {
     mints.forEach(async (token) => {
