@@ -45,6 +45,183 @@
   color: #555;
 }
 
+.frog-card {
+  width: min(520px, 100%);
+  background: darkslategray;
+  border: 1px solid black;
+  border-radius: 5px;
+  color: white;
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  font-family: inherit;
+  box-shadow: none;
+}
+
+.frog-card__aside {
+  width: 128px;
+  flex: 0 0 128px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.frog-card__media {
+  width: 128px;
+  height: 128px;
+  border: 1px solid black;
+  border-radius: 5px;
+  overflow: hidden;
+  background: #0d1f1c;
+}
+
+.frog-card__media img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+  object-fit: cover;
+}
+
+.frog-card__cta {
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+  color: white;
+  background: teal;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 6px 8px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  font-family: inherit;
+  box-shadow: none;
+}
+
+.frog-card__cta:hover {
+  background: darkcyan;
+}
+
+.frog-card__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.frog-card__header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: darkseagreen;
+}
+
+.frog-card__traits {
+  margin: 0;
+  font-size: 0.9rem;
+  color: seashell;
+}
+
+.frog-card__details {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.frog-card__detail-line {
+  display: flex;
+  gap: 6px;
+  font-size: 0.95rem;
+}
+
+.frog-card__detail-label {
+  color: darkseagreen;
+  font-weight: bold;
+  min-width: 130px;
+}
+
+.frog-card__detail-value {
+  color: white;
+  word-break: break-word;
+}
+
+.frog-card__detail-value a,
+.frog-card__detail-value-link {
+  color: white;
+  text-decoration: underline;
+}
+
+.frog-card__detail-value a:hover,
+.frog-card__detail-value-link:hover {
+  color: darkseagreen;
+}
+
+@media (max-width: 640px) {
+  .frog-card {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .frog-card__body {
+    width: 100%;
+  }
+
+  .frog-card__detail-line {
+    flex-direction: column;
+  }
+
+  .frog-card__detail-label {
+    min-width: 0;
+  }
+}
+
+.recent-sales {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.recent-sales__header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: white;
+}
+
+.recent-sales__header h2 {
+  font-size: 1.4rem;
+  color: darkseagreen;
+}
+
+.recent-sales__header p {
+  font-size: 0.9rem;
+  color: seashell;
+}
+
+.recent-sales__grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.recent-sales__status {
+  padding: 16px;
+  border: 1px solid black;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.35);
+  color: darkseagreen;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.recent-sales__status--error {
+  color: salmon;
+}
+
 @media (max-width: 600px) {
   .index-card {
     flex-direction: column;

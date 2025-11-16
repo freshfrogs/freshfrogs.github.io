@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreshFrogs NFT Card Demo</title>
+  <link rel="stylesheet" href="css_final.css">
+  <style>
+    body {
+      background: url("background.png");
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 40px 16px;
+      font-family: monospace;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="frog-card">
+    <div class="frog-card__aside">
+      <div class="frog-card__media">
+        <img src="../frog/123.png" alt="Frog #123" loading="lazy">
+      </div>
+      <a class="frog-card__cta" href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/123" target="_blank" rel="noopener noreferrer">View on Etherscan</a>
+    </div>
+    <div class="frog-card__body">
+      <header class="frog-card__header">
+        <h2>Frog #123</h2>
+      </header>
+      <p class="frog-card__traits">Background: Night Market • Eyes: Neon Glow • Outfit: Leaf Cape • Companion: Glowfly</p>
+      <ul class="frog-card__details">
+        <li class="frog-card__detail-line">
+          <span class="frog-card__detail-label">🛡️ Staking Status:</span>
+          <span class="frog-card__detail-value">Staked</span>
+        </li>
+        <li class="frog-card__detail-line">
+          <span class="frog-card__detail-label">👑 Current Holder:</span>
+          <span class="frog-card__detail-value">0xABCD…7890</span>
+        </li>
+        <li class="frog-card__detail-line">
+          <span class="frog-card__detail-label">🪙 Recent Sale:</span>
+          <span class="frog-card__detail-value">0.37Ξ</span>
+        </li>
+        <li class="frog-card__detail-line">
+          <span class="frog-card__detail-label">🏅 Rarity:</span>
+          <span class="frog-card__detail-value">Top 12%</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

@@ -14,6 +14,7 @@
       <script src="https://freshfrogs.github.io/assets/controller_abi.js"></script>
       <script src="https://freshfrogs.github.io/assets/collection_abi.js"></script>
       <script src="https://freshfrogs.github.io/assets/ethereum-dapp.js"></script>
+      <script src="https://freshfrogs.github.io/assets/recent-sales.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
       <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
       <script src="https://unpkg.com/f0js/dist/f0.js"></script>
@@ -32,6 +33,7 @@
           await fetch_collection_stats();
           await fetch_staking_stats();
           await fetch_token_sales(COLLECTION_ADDRESS, 150);
+          await populateRecentFrogSales({ limit: 6 });
           document.getElementById('connectButton').onclick = async function (e) { await initiate_web3_connection(); }
 
         mint_quantity = 1;
@@ -154,10 +156,17 @@
               View all the Frogs staked by the community! Explore, track, and discover rare frogs while unlocking potential rewards!
             </p>
             <br>
-            <button id="stakeButton" class="connectButton" onclick="initiate_setApprovalForAll();" style="color: white; background: lightseagreen;">🌱 Stake & Earn!</button>
-            <a href="https://freshfrogs.github.io/pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍀 The Pond</button></a>
-          </div>
+          <button id="stakeButton" class="connectButton" onclick="initiate_setApprovalForAll();" style="color: white; background: lightseagreen;">🌱 Stake & Earn!</button>
+          <a href="https://freshfrogs.github.io/pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍀 The Pond</button></a>
+        </div>
       </div>
+      <section class="recent-sales" aria-labelledby="recentSalesHeading">
+        <div class="recent-sales__header">
+          <h2 id="recentSalesHeading">Recent Frog Sales</h2>
+          <p>Live updates fetched from the Alchemy NFT Sales API.</p>
+        </div>
+        <div id="recentSales" class="recent-sales__content" role="region" aria-live="polite"></div>
+      </section>
       <section id="frogs" class="image-gallery">
     </section>
     </div>
