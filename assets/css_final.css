@@ -678,10 +678,11 @@ body {
 .card_text {
     color: darkseagreen;
     font-weight: normal !important;
+    font-size: 1.1em;
 }
 .card_bold {
     color: white;
-    font-weight: bold;
+    font-size: 1.1em;
 }
 .usd_price {
   color: lightseagreen;
