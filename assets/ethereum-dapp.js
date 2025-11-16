@@ -313,6 +313,9 @@ async function render_token_sales(contract, sales) {
         cardElement.insertBefore(mediaColumn, textColumn);
     };
 
+    const canCheckCollectionOwner = Boolean(collection && collection.methods && typeof collection.methods.ownerOf === 'function');
+    const canCheckController = Boolean(controller && controller.methods && typeof controller.methods.stakerAddress === 'function');
+
     for (const sale of sales) {
         try {
             const rawTokenId = sale.tokenId || (sale.token && sale.token.tokenId);
@@ -355,10 +358,24 @@ async function render_token_sales(contract, sales) {
             let holderAddress = sale.buyerAddress;
             let stakingStatus = 'Not Staked';
             try {
-                const stakedOwner = await stakerAddress(tokenId);
-                if (stakedOwner) {
-                    holderAddress = stakedOwner;
-                    stakingStatus = 'Staked';
+                if (canCheckCollectionOwner) {
+                    const onChainOwner = await collection.methods.ownerOf(tokenId).call();
+                    if (onChainOwner) {
+                        holderAddress = onChainOwner;
+                        if (onChainOwner.toLowerCase() === CONTROLLER_ADDRESS.toLowerCase() && canCheckController) {
+                            const stakedOwner = await stakerAddress(tokenId);
+                            if (stakedOwner && stakedOwner !== false) {
+                                holderAddress = stakedOwner;
+                                stakingStatus = 'Staked';
+                            }
+                        }
+                    }
+                } else if (canCheckController) {
+                    const stakedOwner = await stakerAddress(tokenId);
+                    if (stakedOwner && stakedOwner !== false) {
+                        holderAddress = stakedOwner;
+                        stakingStatus = 'Staked';
+                    }
                 }
             } catch (error) {
                 console.warn('Unable to resolve staking data for Frog #'+tokenId, error);
@@ -413,7 +430,7 @@ async function render_token_sales(contract, sales) {
             const html_elements =
                 '<div class="sales-card__body">'
                     +'<div class="sales-card__title-row">'
-                        +'<b style="color: white; font-size: 1.1em">Frog #'+tokenId+'</b>'
+                        +'<h3>Frog #'+tokenId+'</h3>'
                         +(subtitle ? '<span>'+sanitize(subtitle)+'</span>' : '')
                     +'</div>'
                     +'<div class="sales-card__details">'+detailRows.join('')+'</div>'
@@ -422,9 +439,6 @@ async function render_token_sales(contract, sales) {
                 '<div class="card_buttonbox">'+
                     '<a href="https://etherscan.io/nft/'+targetContract+'/'+tokenId+'" target="_blank" rel="noopener">'+
                         '<button class="etherscan_button" style="width: 128px;">Etherscan</button>'+
-                    '</a>'+
-                    '<a href="https://opensea.io/assets/ethereum/'+targetContract+'/'+tokenId+'" target="_blank" rel="noopener">'+
-                        '<button class="opensea_button" style="width: 128px;">Opensea</button>'+
                     '</a>'+
                 '</div>';
 
