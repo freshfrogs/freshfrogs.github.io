@@ -388,30 +388,12 @@ async function render_token_sales(contract, sales) {
             const saleValue = pricePieces.length ? pricePieces.join(' / ') : 'Unknown';
             const saleDetail = saleDate ? saleValue+' • '+saleDate : saleValue;
 
-            const traitRows = [];
-            try {
-                const metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+tokenId+'.json')).json();
-                if (metadata && Array.isArray(metadata.attributes)) {
-                    metadata.attributes.forEach((attribute) => {
-                        const traitLabel = attribute.trait_type || 'Trait';
-                        const traitValue = attribute.value || '--';
-                        traitRows.push(infoRow(traitLabel, buildValueMarkup(traitValue)));
-                    });
-                }
-            } catch (error) {
-                console.warn('Unable to fetch metadata for Frog #'+tokenId, error);
-            }
-
             const detailRows = [
                 infoRow('Staking Status', buildValueMarkup(stakingStatus)+'<span id="'+tokenId+'_frogType" style="display:none;"></span>'),
                 infoRow('Current Holder', buildValueMarkup(ownerDisplay)),
                 infoRow(saleLabel, buildValueMarkup(saleDetail || 'Unknown')),
                 infoRow('Rarity', buildValueMarkup(rarityDisplay, 'rarityRanking_'+tokenId))
             ];
-
-            if (traitRows.length) {
-                detailRows.push(...traitRows);
-            }
 
             const html_elements =
                 '<div class="sales-card__details">'+buildColumnsMarkup(detailRows)+'</div>'+
