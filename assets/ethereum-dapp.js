@@ -292,19 +292,6 @@ async function render_token_sales(contract, sales) {
             +'</div>';
     };
 
-    const buildColumnsMarkup = (rows) => {
-        if (!rows.length) { return ''; }
-        const midpoint = Math.ceil(rows.length / 2);
-        const columns = [
-            rows.slice(0, midpoint),
-            rows.slice(midpoint)
-        ].filter((column) => column.length);
-
-        return columns.map((columnRows) => {
-            return '<div class="sales-card__detail-col">'+columnRows.join('')+'</div>';
-        }).join('');
-    };
-
     const applySalesCardLayout = (elementId) => {
         const cardElement = document.getElementById(elementId);
         if (!cardElement) { return; }
@@ -395,11 +382,49 @@ async function render_token_sales(contract, sales) {
                 infoRow('Rarity', buildValueMarkup(rarityDisplay, 'rarityRanking_'+tokenId))
             ];
 
+            let badgeMarkup = '';
+            try {
+                const metadataResponse = await fetch(SOURCE_PATH+'/frog/json/'+tokenId+'.json');
+                if (metadataResponse.ok) {
+                    const metadata = await metadataResponse.json();
+                    const attributes = Array.isArray(metadata.attributes) ? metadata.attributes : [];
+                    const badgeValues = attributes
+                        .map((attribute) => attribute && attribute.value ? attribute.value.toString() : '')
+                        .filter((value) => value && value !== 'None')
+                        .slice(0, 6);
+
+                    if (badgeValues.length) {
+                        badgeMarkup = '<div class="sales-card__badge-stack">'
+                            +badgeValues.map((value) => '<span class="sales-card__badge">'+sanitize(value)+'</span>').join('')
+                            +'</div>';
+                    }
+                }
+            } catch (error) {
+                console.warn('Unable to load trait badges for Frog #'+tokenId, error);
+            }
+
+            const subtitlePieces = [];
+            if (stakingStatus) {
+                subtitlePieces.push(stakingStatus === 'Staked' ? 'Vaulted' : stakingStatus);
+            }
+            if (saleDate) { subtitlePieces.push(saleDate); }
+            const subtitle = subtitlePieces.filter(Boolean).join(' · ');
+
             const html_elements =
-                '<div class="sales-card__details">'+buildColumnsMarkup(detailRows)+'</div>'+
+                '<div class="sales-card__body">'
+                    +'<div class="sales-card__title-row">'
+                        +'<h3>Frog #'+tokenId+'</h3>'
+                        +(subtitle ? '<span>'+sanitize(subtitle)+'</span>' : '')
+                    +'</div>'
+                    +'<div class="sales-card__details">'+detailRows.join('')+'</div>'
+                    +badgeMarkup+
+                '</div>'+
                 '<div class="card_buttonbox">'+
                     '<a href="https://etherscan.io/nft/'+targetContract+'/'+tokenId+'" target="_blank" rel="noopener">'+
                         '<button class="etherscan_button" style="width: 128px;">Etherscan</button>'+
+                    '</a>'+
+                    '<a href="https://opensea.io/assets/ethereum/'+targetContract+'/'+tokenId+'" target="_blank" rel="noopener">'+
+                        '<button class="opensea_button" style="width: 128px;">Opensea</button>'+
                     '</a>'+
                 '</div>';
 
