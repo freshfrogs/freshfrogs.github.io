@@ -413,7 +413,7 @@ async function render_token_sales(contract, sales) {
             const html_elements =
                 '<div class="sales-card__body">'
                     +'<div class="sales-card__title-row">'
-                        +'<h3>Frog #'+tokenId+'</h3>'
+                        +'<b style="color: white; font-size: 1.1em">Frog #'+tokenId+'</b>'
                         +(subtitle ? '<span>'+sanitize(subtitle)+'</span>' : '')
                     +'</div>'
                     +'<div class="sales-card__details">'+detailRows.join('')+'</div>'

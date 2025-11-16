@@ -729,12 +729,12 @@ body {
     text-align: center;
 }
 .card_text {
-    color: darkseagreen;
+    color: white;
     font-weight: normal !important;
 }
 .card_bold {
     color: white;
-    font-weight: bold;
+    font-weight: normal;
 }
 .usd_price {
   color: lightseagreen;
