@@ -28,9 +28,18 @@
   display: flex;
   gap: 16px;
   align-items: flex-start;
-  max-width: 760px;
-  width: 100%;
+  flex: 1 1 420px;
+  max-width: 500px;
+  width: auto;
   padding: 12px;
+  vertical-align: top;
+}
+
+@media (max-width: 1000px) {
+  .index-card.sales-card {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
 }
 
 .index-card.sales-card .trait_list {
@@ -61,6 +70,7 @@
 
 .index-card.sales-card .index-card-img-cont {
   margin: 0;
+  box-shadow: none;
 }
 
 .index-card.sales-card .sales-card__media .card_buttonbox {
@@ -91,9 +101,9 @@
   text-align: left;
   margin: 0;
   padding: 8px 10px;
-  border: 1px solid rgba(0, 0, 0, 0.6);
-  border-radius: 5px;
-  background: rgba(0, 0, 0, 0.2);
+  border: none;
+  border-radius: 0;
+  background: transparent;
 }
 
 .index-card.sales-card .card_info_row .card_text {
@@ -148,7 +158,7 @@
     width: 128px;
     height: 128px;
     border-radius: 5px;
-    box-shadow: 2px 2px darkslategray;
+    box-shadow: none;
     image-rendering: pixelated;
     border: 1px solid black;
     margin-right: auto;
@@ -181,7 +191,7 @@ body {
 .frog-data-card {
     display: flex;
     flex: 1 1 420px;
-    max-width: 520px;
+    max-width: 500px;
     background-color: darkslategray;
     border: 1px solid black;
     border-radius: 5px;
@@ -524,7 +534,7 @@ body {
     font-size: small;
     padding: 0px !important;
     cursor: pointer;
-    box-shadow: 2px 2px white;
+    box-shadow: none;
     transition: all .3s;
     font-family: monospace;
     font-size: initial;
@@ -532,7 +542,7 @@ body {
   .etherscan_button:hover {
     top: 2px;
     position: relative;
-    box-shadow: 1px 1px white;
+    box-shadow: none;
   }
   .opensea_button {
     margin: 4px;
@@ -641,7 +651,7 @@ body {
   margin-right: auto;
   border: 1px solid black;
   border-radius: 5px;
-  box-shadow: 2px 2px white;
+  box-shadow: none;
 }
 .terminal_op {
   color: seashell;
@@ -666,11 +676,11 @@ body {
     text-align: center;
 }
 .card_text {
-    color: white;
+    color: darkseagreen;
     font-weight: normal !important;
 }
 .card_bold {
-    color: lightseagreen;
+    color: white;
     font-weight: bold;
 }
 .usd_price {
