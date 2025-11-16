@@ -77,6 +77,137 @@ body {
     padding: 20px; /* Added padding around the content */
 }
 
+#frogs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+    padding: 8px 0;
+}
+
+.frog-data-card {
+    display: flex;
+    flex: 1 1 420px;
+    max-width: 520px;
+    background-color: darkslategray;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 12px;
+    color: white;
+    box-shadow: none;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.frog-data-card__media {
+    width: 128px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.frog-data-card__media img {
+    width: 128px;
+    height: 128px;
+    border-radius: 5px;
+    border: 1px solid black;
+    image-rendering: pixelated;
+    object-fit: cover;
+}
+
+.frog-button {
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+    background: #e9ecef;
+    color: black;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 6px 10px;
+    font-weight: bold;
+    font-family: monospace;
+    text-decoration: none;
+}
+
+.frog-button:hover {
+    background: #d6dde5;
+}
+
+.frog-data-card__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.frog-data-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.frog-data-card__header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: white;
+}
+
+.frog-data-card__timestamp {
+    font-size: 0.9rem;
+    color: #8ff3db;
+}
+
+.frog-data-card__traits {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #dff8f0;
+}
+
+.frog-data-card__details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.frog-data-card__detail {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.95rem;
+}
+
+.frog-data-card__label {
+    color: #a7ffef;
+    font-weight: bold;
+}
+
+.frog-data-card__value {
+    color: white;
+    text-align: right;
+}
+
+@media (max-width: 640px) {
+    .frog-data-card {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .frog-data-card__body {
+        width: 100%;
+    }
+
+    .frog-data-card__detail {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .frog-data-card__value {
+        text-align: left;
+    }
+}
+
 /* Container for overall layout */
 .container {
     display: flex;
