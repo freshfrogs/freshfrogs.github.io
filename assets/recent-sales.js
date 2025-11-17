@@ -91,15 +91,11 @@ function applySalesCardLayout(elementId) {
   const titleRow = body ? body.querySelector('.sales-card__title-row') : null;
   const details = body ? body.querySelector('.sales-card__details') : null;
   if (!imageContainer || !textColumn || !body || !titleRow || !details) { return; }
+  if (body.querySelector('.sales-card__top')) { return; }
 
   const mediaColumn = document.createElement('div');
   mediaColumn.className = 'sales-card__media';
   mediaColumn.appendChild(imageContainer);
-
-  const buttonBox = textColumn.querySelector('.card_buttonbox');
-  if (buttonBox) {
-    mediaColumn.appendChild(buttonBox);
-  }
 
   const topRow = document.createElement('div');
   topRow.className = 'sales-card__top';
@@ -232,8 +228,8 @@ async function render_token_sales(contract, sales) {
 
       const holderAddress = staking.holder || sale.buyerAddress;
       const holderLabel = holderAddress ? truncateAddress(holderAddress) : 'Unknown';
+      const subtitle = price.date ? 'Sold '+price.date+' · '+price.display : price.display;
       const saleRowValue = price.date ? price.display+' · '+price.date : price.display;
-      const saleBadge = price.date ? 'Sold '+price.date : '';
 
       const rarityId = parseInt(tokenId, 10);
       const rarityRank = Number.isFinite(rarityId) ? findRankingById(rarityId) : null;
@@ -252,9 +248,9 @@ async function render_token_sales(contract, sales) {
           +'<div class="sales-card__title-row">'
             +'<div class="sales-card__title-block">'
               +'<h3>Frog #'+tokenId+'</h3>'
+              +(subtitle ? '<p class="sales-card__subtitle">'+escapeHtml(subtitle)+'</p>' : '')
               +traitMarkup
             +'</div>'
-            +(saleBadge ? '<span>'+escapeHtml(saleBadge)+'</span>' : '')
           +'</div>'
           +'<div class="sales-card__details">'
             +infoRow('Staking Status', wrapValue(stakingLabel)+'<span id="'+tokenId+'_frogType" style="display:none;"></span>')
@@ -262,11 +258,14 @@ async function render_token_sales(contract, sales) {
             +infoRow(isMint ? 'Minted' : 'Recent Sale', wrapValue(saleRowValue))
             +infoRow('Rarity', wrapValue(rarityLabel, 'rarityRanking_'+tokenId))
           +'</div>'
-        +'</div>'
-        +'<div class="card_buttonbox">'
-          +'<a href="https://etherscan.io/nft/'+targetContract+'/'+tokenId+'" target="_blank" rel="noopener">'
-            +'<button class="etherscan_button" style="width: 128px;">Etherscan</button>'
-          +'</a>'
+          +'<div class="card_buttonbox sales-card__actions">'
+            +'<a href="https://etherscan.io/nft/'+targetContract+'/'+tokenId+'" target="_blank" rel="noopener">'
+              +'<button class="etherscan_button card-button">Etherscan</button>'
+            +'</a>'
+            +'<a href="https://opensea.io/assets/ethereum/'+targetContract+'/'+tokenId+'" target="_blank" rel="noopener">'
+              +'<button class="opensea_button card-button card-button--secondary">OpenSea</button>'
+            +'</a>'
+          +'</div>'
         +'</div>';
 
       await build_token(html_elements, tokenId, elementId, isMint ? 'mint' : 'sale', sale.transactionHash);
