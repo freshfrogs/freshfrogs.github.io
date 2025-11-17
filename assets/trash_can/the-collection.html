@@ -564,7 +564,7 @@
             // Load Fresh Frog (elementID. tokenID)
             loadFreshFrog(thisToken);
 
-            let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
+            let jsonLink = 'https://freshfrogs.github.io/frog/json/'+thisToken+'.json' 
             var metadata = await (await fetch(jsonLink)).json();
 
             (async () => { // Pull Metadata
@@ -635,13 +635,13 @@
         newAttribute.className = "frogImg2" //shadesAnimation
         newAttribute.style.cursor = "pointer"
         if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") { 
-          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".gif"
         } else if (attribute === "morphAnimation") {
-          newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/Frog/loadMorph.gif"
         } else if (attribute === "shadesAnimation") {
-          newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/Eyes/shadesAnimation.gif"
         } else {
-          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
         }
         newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)

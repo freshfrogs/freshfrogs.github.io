@@ -2,22 +2,22 @@
 layout: wiki
 ---
 
-<title>freshfrogs.io/wiki 🍀</title>
+<title>freshfrogs.github.io/wiki 🍀</title>
 
 <div style="margin-left: auto; margin-right: auto; text-align: center;">
     <div id="recent_sales" class="recent_sales"></div>
 </div>
 
-## [freshfrogs.io](https://freshfrogs.io/)
+## [freshfrogs.github.io](https://freshfrogs.github.io/)
 
 Fresh Frogs NFT is a collection of 4,040 randomly generated Frogs living on the Ethereum Blockchain! The collection is randomly generated, with each Frog being individually unique! There are a total of 30 different Frog types, and 60 traits! Resulting in 2.8 million total possible combinations!
 
 Deployed following the ERC-721 standard, stored on IPFS, and verified on [etherscan.io](https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b) :white_check_mark:
 
-Fresh Frog holders can connect to [freshfrogs.io/the-pad ](https://freshfrogs.io/the-pad/):four_leaf_clover: and view held FROG Tokens! Each Frog will be rendered with trait rarities and more! Two Fresh Frogs can soon be used create a brand new NFT through morphing! In addition, some traits will be animated upon creation!
+Fresh Frog holders can connect to [freshfrogs.github.io/the-pad ](https://freshfrogs.github.io/the-pad/):four_leaf_clover: and view held FROG Tokens! Each Frog will be rendered with trait rarities and more! Two Fresh Frogs can soon be used create a brand new NFT through morphing! In addition, some traits will be animated upon creation!
 
 ### Official Links
-* Official Website: [https://freshfrogs.io/](https://freshfrogs.io/)
+* Official Website: [https://freshfrogs.github.io/](https://freshfrogs.github.io/)
 * Official Twitter: [https://twitter.com/FreshFrogs_NFT](https://twitter.com/FreshFrogs_NFT)
 * Etherscan: [https://etherscan.io/address/0xbe4b](https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b)
 * OpenSea Collection: [https://opensea.io/collection/fresh-frogs](https://opensea.io/collection/fresh-frogs)

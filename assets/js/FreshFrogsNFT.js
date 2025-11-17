@@ -6,26 +6,12 @@
   var CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
   var CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
   var NETWORK = 'main';
-  var morphing = sub_frog = base_frog = false;
-
-  // Staking Leaderboard
-  var render_vault;
-  var leaderboard_totalStaked_owner;
-  var leaderboard_streak_token, leaderboard_streak_owner;
-  var leaderboard_totalStaked = leaderboard_streak = 0;
+  var morph = sub_frog = base_frog = false;
 
   const _0x3c6cb7=_0x455b;(function(_0x10c095,_0x4ebf79){const _0x128040=_0x455b,_0x558e9b=_0x10c095();while(!![]){try{const _0x151436=parseInt(_0x128040(0x1ec))/0x1*(parseInt(_0x128040(0x1f1))/0x2)+-parseInt(_0x128040(0x1f6))/0x3*(parseInt(_0x128040(0x1f5))/0x4)+parseInt(_0x128040(0x1f4))/0x5*(parseInt(_0x128040(0x1eb))/0x6)+parseInt(_0x128040(0x1ea))/0x7*(-parseInt(_0x128040(0x1ed))/0x8)+parseInt(_0x128040(0x1f3))/0x9+-parseInt(_0x128040(0x1ef))/0xa*(parseInt(_0x128040(0x1f2))/0xb)+parseInt(_0x128040(0x1f0))/0xc;if(_0x151436===_0x4ebf79)break;else _0x558e9b['push'](_0x558e9b['shift']());}catch(_0x163f3d){_0x558e9b['push'](_0x558e9b['shift']());}}}(_0x46a6,0x6aab1));const options={'method':'GET','headers':{'X-API-KEY':_0x3c6cb7(0x1ee)}};function _0x455b(_0x52da3f,_0x147a14){const _0x46a6d7=_0x46a6();return _0x455b=function(_0x455bdd,_0x1ee73a){_0x455bdd=_0x455bdd-0x1ea;let _0x5885ff=_0x46a6d7[_0x455bdd];return _0x5885ff;},_0x455b(_0x52da3f,_0x147a14);}function _0x46a6(){const _0x2e9797=['188216XwkUNa','1b80881e422a49d393113ede33c81211','5097090qszEib','11422152wzRNKi','1946jfhPGQ','11FRRONZ','1433718usknQF','75575VtUmze','88HamPWj','100911myKlsh','119cKmLbR','264AwALcZ','319AyvMxB'];_0x46a6=function(){return _0x2e9797;};return _0x46a6();}
 
   // connect() | Connect Wallet | Update Collection Data
   async function connect() {
-
-    // Connecting
-    consoleOutput(
-      '<div style="text-align: left;">'+
-        'Connecting please wait...<br>'+
-      '</div>'
-    );
-
     // Fetch Collection Data via OpenSea API
     fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
     .then(collection => collection.json())
@@ -35,7 +21,6 @@
     })
     .catch(e => {
       console.log('Error: Failed to fetch OpenSea collection data!');
-      
     });
 
     // Staking Contract ABI
@@ -219,256 +204,206 @@
     // Connect WEB3, Factoria
     const web3 = new Web3(window.ethereum);
     const f0 = new F0();
-
     // Connect Collection Smart Contract, Staking Smart Contract
     CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
     COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
-
     try { // Attempt to Connect!
       await f0.init({
         web3: web3,
         contract: CONTRACT_ADDRESS,
         network: NETWORK
       })
-
       // User Variables
       user_address = await web3.currentProvider.selectedAddress;
       user_invites = await f0.myInvites();
       user_keys = Object.keys(user_invites);
       is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-
+      staker_info = await controller.methods.availableRewards(user_address).call();
+      staker_rewards = (staker_info / 1000000000000000000);
+      staker_rewards = String(staker_rewards).slice(0, 6);
       // Collection Variables
-      collection_name = await f0.api.name().call();
+      collection_name = await f0.api.name().call(); //
       collection_symbol = await f0.api.symbol().call();
       next_id = await f0.api.nextId().call();
       next_id = parseInt(next_id);
-
-      // Connected!
-      consoleOutput(
-        '<div style="text-align: left;">'+
-          'Connected! Fetching user data...<br>'+
-        '</div>'
-      );
-
+      console.log('Connected: '+user_address);
+      //Output('<br><button onclick="claim_rewards()" style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frog(s) Staked '+''+stakers_rewards+' $FLYZ 🡥</button>'+'<br><hr style="background: black;">'+'<div class="console_pre" id="console-pre"></div>');
     } catch (e) { // Something Went Wrong!
-      consoleOutput(
-        '<div style="text-align: left;">'+
-          '❌ '+e.message+
-        '</div>'
-      );
+      console.log('Connection Failed! '+e.message);
+      //consoleOutput('<strong></strong><br>Something went wrong!<br>'+e.message+'<a class="pointer" href=""><b id="connected">🔌 Connect Wallet</b></a>');
     }
   }
 
-  // fetch_user_tokens() | Fetch User Tokens | Staked & Otherwise |
+  // fetch_user_tokens() | Fetch User Tokens | Staked & Otherwise
   async function fetch_user_data(fetch_address) {
-    if (! fetch_address) { fetch_address = user_address; }
-    if (fetch_address.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) { render_vault = true; } else { render_vault = false; }
 
-    // No. of Frogs staked by fetch_address
-    let staker_tokens = await stakers(fetch_address, 'amountStaked')
+    // No. STAKED Frogs owned by fetch_address
+    let staker_tokens = await controller.methods.getStakedTokens(fetch_address).call();
 
     // No. Frogs owned by fetch_address
     let user_tokens = await collection.methods.balanceOf(fetch_address).call();
 
     // Must own atleast one Frog or atleast one Staked!
-    if (user_tokens >= 1 || staker_tokens >= 1) {
-
-      let staker_info = await availableRewards(fetch_address);
-      let staker_rewards = (staker_info / 1000000000000000000);
-      staker_rewards = String(staker_rewards).slice(0, 6);
-
-      if (render_vault) {
-        Output(
-          '<button style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+
-            '<strong>FreshFrogsNFT Staking Vault</strong><br>'+user_tokens+' Total Frogs Staked!'+
-          '</button>'+'<br>'+
-          '<hr style="background: black;">'+
-          '<div class="console_pre" id="console-pre"></div>');
-      } else {
-        Output(
-          '<button onclick="claimRewards_init()" style="list-style: none; min-height: 40px; padding: 8px; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+
-            '<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(fetch_address)+' ]</acc><br>'+staker_tokens+' Frog(s) Staked '+''+staker_rewards+' $FLYZ 🡥'+
-          '</button>'+'<br>'+
-          //'<button class="frog_button" onclick="randomMorph()">Rando Morph</button>'+//'<button class="frog_button" onclick="">Custom Banner</button>'+'<button class="frog_button" onclick="">Staking Vault</button>'+
-          '<hr style="background: black;">'+
-          '<div class="console_pre" id="console-pre"></div>');
-      }
+    if (user_tokens >= 1 || staker_tokens.length >= 1) {
 
       // Render Frogs Staked by User
-      if (staker_tokens >= 1) {
-        let staker_tokens_array = await getStakedTokens(fetch_address);
-        try { // Fetch staked token data
-          for (var i = 0; i < staker_tokens_array.length; i++) {
-            tokenId = staker_tokens_array[i].tokenId
+      if (staker_tokens.length >= 1) {
+
+        try {
+
+          // Loop Staked Frogs
+          for (var i = 0; i < staker_tokens.length; i++) {
+
+            tokenId = staker_tokens[i].tokenId
             render_token(tokenId)
 
           }
+
         } catch (e) {
+
           console.log('Failed to talk to FreshFrogsController!');
           console.log(e.message);
 
         }
+
       }
 
       // Render Frogs Held by Fetch Address
       if (user_tokens >= 1) {
+
+        // Interations of 50
         let pages = parseInt(user_tokens/50) + 1;
+
+        // Loop Pages
         for (var i = 0; i < pages; i++) {
 
           // Fetch OpenSea Data
           fetch('https://api.opensea.io/api/v1/assets?owner='+fetch_address+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+(i * 50)+'&limit=50&include_orders=false', options)
           .then((tokens) => tokens.json())
           .then((tokens) => {
+
+            // For Each Token
             var { assets } = tokens
             assets.forEach((frog) => {
 
+              // Retrieve Token Data
               try { var { token_id, last_sale: { payment_token: { decimals }, total_price }} = frog } catch (e) {}
 
+              // Calculate recent sale price if applicable
               if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
+
                 let sale_price = total_price / Math.pow(10, decimals);
                 render_token(token_id, sale_price);
 
               } else {
+
                 render_token(token_id);
 
               }
+
             })
+
           })
           .catch(e => {
-            
-            consoleOutput(
-              '<div style="text-align: left;">'+
-                'Failed to fetch user data (partial). Try refreshing the page!<br>'+
-              '</div>'
-            );
+
+            console.log('Failed to talk to OpenSea!');
+            console.log(e.message);
 
           })
+
         }
+
       }
 
-    // Does not own atleast one Frog!
     } else {
+      
+      // Does not own atleast one Frog!
       Output('<br>'+'<strong>Connected!</strong> ❌ It seems you do not own any FROGS! <br><hr>'+'<div class="console_pre" id="console-pre"></div>')
       return;
 
     }
 
-    // Staked Leader Board
-    //if (render_vault) {
-    //  console.log(' -- Staked Leaderboard -- ');
-    //  console.log(' Longest Streak: Frog #'+leaderboard_streak_token+' '+parseInt(leaderboard_streak/24)+' days');
-    //  console.log(' Staked By: '+truncateAddress(leaderboard_streak_owner));
-    //  console.log(' ');
-    //  console.log(' Most Staked: '+leaderboard_totalStaked+' Frogs');
-    //  console.log(' Staked By: '+truncateAddress(leaderboard_totalStaked_owner));
-    //}
-    
-  }
-
-  // Render Display
-  async function render_display(tokenId) {
-
-    // Update Display Image
-    document.getElementById('thisheader').style.backgroundImage = 'url('+'https://freshfrogs.io/frog/'+tokenId+'.png'+')';
-    document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
-    document.getElementById('frogContainer4').innerHTML = '';
-
-    var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+tokenId+".json")).json();
-    for (var i = 0; i < metadata.attributes.length; i++) {
-      var attribute = metadata.attributes[i];
-      loadTrait(attribute.trait_type, attribute.value, 'frogContainer4');
-    }
-
   }
 
   // Display Frog Token
-  async function display_token(tokenId, morph) {
-
-    // Is Frog Currently Staked?
-    let staked = await stakerAddress(tokenId);
-    let owner = await collection.methods.ownerOf(tokenId).call();
+  async function display_token(tokenId) {
 
     // Assign Variables
     var button_left = document.getElementById('button_left');
     var button_middle = document.getElementById('button_middle');
     var button_right = document.getElementById('button_right');
     
-    // Links
     let openseaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
     let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
-    let gemxyzLink = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId;
-    let displayImg = 'https://freshfrogs.io/frog/'+tokenId+'.png'
+    let displayImg = 'https://freshfrogs.github.io/frog/'+tokenId+'.png'
     let displayName = 'Frog #'+tokenId
 
-    // Morphing
-    if (morphing) {
+    // Is this token currently staked?
+    let staked = await stakerAddress(tokenId)
 
-      let frogType = document.getElementById('frogType_'+tokenId).innerHTML
-
-      // Button Properties
-      button_middle.innerHTML = '<strong>Frog #'+tokenId+'</strong>'+frogType.slice(0, 11);
-      button_middle.removeAttribute('href');
-      button_middle.onclick = function() { scroll_to('traits_'+tokenId); }
-
-      // Morph
-      morphFrogs(base_frog, tokenId, 'frogContainer4');
-      return;
-
-    }
-
-    // Update Token Display
-    await render_display(tokenId);
-
-    var frogType = document.getElementById('frogType_'+tokenId).innerHTML
-
-    // Button Properties
-    button_left.innerHTML = '<strong>'+displayName+'</strong>'+frogType.slice(0, 11);
-    button_left.removeAttribute('href');
-    button_left.onclick = function() { scroll_to('traits_'+tokenId); }
-
-    if (morph) {
-
-      morphing = true;
-      base_frog = tokenId;
-
-      // Update Button Variables
-      button_middle.innerHTML = '<strong>Select</strong>2nd Frog';
-      button_middle.removeAttribute('href');
-
-      button_right.innerHTML = '<strong>Morph</strong>Reset';
-      button_right.removeAttribute('href');
-      button_right.onclick = function () {
-        morphing = false;
-        display_token(base_frog);
-      }
-      return
-
+    if (!staked) {
+      // NOT Staked
     } else {
-  
-      button_middle.innerHTML = '<strong>Opensea</strong>View On';
-      button_middle.href = openseaLink;
+
+      // Get Total Hours Staked
+      let stakedHours = await timeStaked(tokenId);
+
+      // Update Button Properties
+      // Left Most Button
+      button_left.href = etherscanLink;
+      button_left.target = '_blank';
+
+      // Middle Button
+      button_middle.innerHTML = '<strong>Owned By</strong>'+truncateAddress(staked);
+      button_middle.href = 'https://opensea.io/'+staked;
       button_middle.target = '_blank';
 
-      button_right.innerHTML = '<strong>Image</strong>View';
-      button_right.href = 'https://freshfrogs.io/frog/'+tokenId+'.png';
-      button_right.target = '_blank';
+      // Right Button
+      button_right.innerHTML = '<strong>Time Staked</strong>'+stakedHours+' hours';
+      button_right.removeAttribute('href');
 
     }
+
+    // Update Header Background Img
+    document.getElementById('thisheader').style.backgroundImage = 'url('+displayImg+')';
+    document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
+
+    // Update Preview Img
+    document.getElementById('frogContainer4').innerHTML = '';
+
+    // Fetch Metadata
+    var metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+tokenId+".json")).json();
+
+    // Loop Attributes and Build Frog
+    for (var i = 0; i < metadata.attributes.length; i++) {
+
+      var attribute = metadata.attributes[i];
+      load_trait(attribute.trait_type, attribute.value, 'frogContainer4');
+
+      // Update Display Button
+      if (attribute.trait_type == 'Frog' || attribute.trait_type == 'SpecialFrog') {
+
+        button_left.innerHTML = '<strong>'+displayName+'</strong>'+attribute.value.slice(0, 11);
+
+      }
+
+    }
+
   }
 
   // render_token()
   async function render_token(frog_id, recent_sale) {
-    if (! recent_sale) { recent_sale = ''; } else { recent_sale = 'Ξ'+recent_sale; }
 
-    // Is Frog Currently Staked?
+    if (! recent_sale) { recent_sale = '' } else { recent_sale = 'Ξ'+recent_sale }
+
+    // Is Frog Currently Staked? //
     let staked = await stakerAddress(frog_id);
-    let owner = await collection.methods.ownerOf(frog_id).call();
 
     // Token Variable Links
     let frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
     let frog_etherscan = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
     let frog_gemxyz = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
-    let frog_external = 'https://freshfrogs.io/frog/'+frog_id+'.png';
+    let frog_external = 'https://freshfrogs.github.io/frog/'+frog_id+'.png';
     let frog_name = 'Frog #'+frog_id;
 
     // <-- Begin Element
@@ -476,7 +411,7 @@
     frog_token = document.createElement('div');
     frog_token.id = frog_name;
     frog_token.className = 'frog_token';
-    //frog_token.onclick = function() { display_token(frog_id); }
+    frog_token.onclick = function() { display_token(frog_id, true); }
 
     // Element Inner HTML
     frog_token.innerHTML =
@@ -484,107 +419,138 @@
         '<div style="text-align: left; margin: 8px; height: 16px;">'+
           '<strong id="frog_'+frog_id+'" class="frog_name">'+frog_name+'</strong><strong id="price_'+frog_id+'" class="frog_price">'+recent_sale+'</strong>'+
         '</div>'+
-        '<div class="frog_imgContainer" id="cont_'+frog_id+'" onclick="display_token('+frog_id+')">'+
+        '<div class="frog_imgContainer" id="cont_'+frog_id+'">'+
           //'<img src="'+frog_external+'" class="frog_img"/>'+
         '</div>'+
+        '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
+        '<strong id="level_'+frog_id+'" class="frog_level"><i>not staked</i></strong>'+
         '<div id="traits_'+frog_id+'" class="trait_list">'+
-          '<strong>Properties</strong><div id="owner_'+frog_id+'"style="float:right;">'+truncateAddress(owner)+'</div><div id="prop_'+frog_id+'" class="properties"></div>'+
+          '<b>Properties</b><div id="prop_'+frog_id+'" class="properties"></div>'+
         '</div>'+
-        '<div id="staked_'+frog_id+'"></div>'+
       '</div>';
 
     // Create Element -->
     frog_doc.appendChild(frog_token);
+
+    // Update Recent Sale Price
+    //await get_asset_price(frog_id);
+
+    //document.getElementById('price_'+tokenId).innerHTML = 'Ξ'+recent_sale;
+    // Update Header Background Img
     document.getElementById('cont_'+frog_id).style.backgroundImage = 'url('+frog_external+')';
     document.getElementById('cont_'+frog_id).style.backgroundSize = "2048px 2048px";
 
     // Update Metadata!
-    let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
+    let metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+frog_id+".json")).json();
+
+    // Loop Each Attribute
     for (let i = 0; i < metadata.attributes.length; i++) {
 
       // attribute.trait_type : attribute.value
       let attribute = metadata.attributes[i]
-      loadTrait(attribute.trait_type, attribute.value, 'cont_'+frog_id);
 
+      // Render Attribute
+      load_trait(attribute.trait_type, attribute.value, 'cont_'+frog_id);
+
+      // Calculate Trait Rarity
       try { trait_rarity = ((traits_list[attribute.trait_type][attribute.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) { trait_rarity = 'e'; }
+
+      // Tune Rarity
       if (trait_rarity < 1) { trait_rarity = '<1%' } else { trait_rarity = trait_rarity+'%' }
 
-      var trait_text = document.createElement('div')
-      if (attribute.trait_type == 'Frog' || attribute.trait_type == 'SpecialFrog') { trait_text.innerHTML = attribute.trait_type+': <frog id="frogType_'+frog_id+'">'+attribute.value+'</frog> <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>'; }
-      else { trait_text.innerHTML = attribute.trait_type+': '+attribute.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>'; }
+      // Create Attribute Text Element
+      var trait_text = document.createElement('i')
+      trait_text.innerHTML = attribute.trait_type+': '+attribute.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>';
       document.getElementById('prop_'+frog_id).appendChild(trait_text);
 
     }
 
+    /*
     // Create Button Element(s)
     var button_b = document.createElement('div');
     button_b.style.width = 'fit-content';
-    button_b.style.margin = '8px';
     button_b.style.marginLeft = 'auto';
     button_b.style.marginRight = 'auto';
+    */
 
-    if (!staked) { // NOT Staked
-      if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
-        button_b.innerHTML = 
-          '<button class="frog_button" style="background: lightgreen; border: 1px solid black;" onclick="stake_init('+frog_id+')">Stake 🡥</button>'+
-          '<button class="frog_button" style="border: 1px solid black;" onclick="display_token('+frog_id+', true)">Morph 🡥</button>';
-        document.getElementById('staked_'+frog_id).appendChild(button_b);
-      }
+    if (!staked) {
 
-    } else { // STAKED
+      /*
+      // Stake Button
+      button_b.innerHTML = 
+        '<br>'+
+        '<button class="frog_button" style="background: lightgreen; border: 1px solid black; font-weight: bold;" onclick="stake('+frog_id+')">Stake 🡥</button>'+
+        '<a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button" style="font-weight: bold;">Rankings 🡥</button></a>';
+      document.getElementById('traits_'+frog_id).appendChild(button_b);
+      */
+
+    } else { 
+
+      /*
+      // Or Un-stake Button
+      button_b.innerHTML = '<br><button class="frog_button" style="background: coral; border: 1px solid black; font-weight: bold;" onclick="withdraw('+frog_id+')">UnStake 🡥</button> <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="'+frog_gemxyz+'" target="_blank"><button class="frog_button" style="font-weight: bold;">Rankings 🡥</button></a>';
+      document.getElementById('traits_'+frog_id).appendChild(button_b);
+      */
+
+      // Create Owner Element and Staking Level //
+      var trait_text = document.createElement('i')
+      trait_text.innerHTML = 'Owner: '+truncateAddress(staked)+'<br>';
+      document.getElementById('prop_'+frog_id).appendChild(trait_text);
+
+      // Insert Owner if staked
+      //document.getElementById('price_'+frog_id).innerHTML = truncateAddress(staked);
 
       // Check Staked Time / Calculate Level
       let staked_time_bool = await timeStaked(frog_id);
       if (staked_time_bool >= 2000) { staked_level = 3; } else if (staked_time_bool >= 1000) { staked_level = 2; } else { staked_level = 1; }
-
-      document.getElementById('staked_'+frog_id).innerHTML = 
-        '<b id="progress_'+frog_id+'"></b><div class="myProgress" id="myProgress_'+frog_id+'"><div class="myBar" id="myBar_'+frog_id+'"></div></div>'+
-        '<div style="color:tomato;" class="frog_level">Staked Level '+staked_level+'</div>';
-
-      var trait_text = document.createElement('div')
-      if (staked_time_bool >= 720) { trait_text.innerHTML = 'Staked: '+parseInt(staked_time_bool/24)+' days 🔥<br>'; } 
-      else { trait_text.innerHTML = 'Staked: '+parseInt(staked_time_bool/24)+' days<br>'; }
-      document.getElementById('prop_'+frog_id).appendChild(trait_text);
-
-      // Owner
-      document.getElementById('owner_'+frog_id).innerHTML = truncateAddress(staked);
 
       // Update Progress Bar
       let percent = parseInt((staked_time_bool/(1000*staked_level))*100);
       let elem = document.getElementById('myBar_'+frog_id);
       let width = percent;
       elem.style.width = width + "%";
-
-      if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
-        button_b.innerHTML = 
-          '<button class="frog_button" style="background: salmon; border: 1px solid black;" onclick="withdraw_init('+frog_id+')">UnStake 🡧</button>'+
-          '<button class="frog_button" id="morph_'+frog_id+'" style="border: 1px solid black;" onclick="display_token('+frog_id+', true)">Morph 🡥</button>';
-        document.getElementById('staked_'+frog_id).appendChild(button_b);
-        
-      }
+      document.getElementById('level_'+frog_id).innerHTML = 'Staked Level '+staked_level+'';
+      document.getElementById('level_'+frog_id).style.color = 'coral';
+      
     }
+
   }
 
-  // loadTrait(_trait(family), _attribute(type), _where(element))
-  function loadTrait(trait, attribute, where) {
+  // load_trait(_trait(family), _attribute(type), _where(element))
+  function load_trait(trait, attribute, where) {
 
+    // Create Img Element
     newAttribute = document.createElement("img");
-    newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
-    newAttribute.alt = attribute
 
     if (where.includes('cont_')) {
+      // Assign Class
+      
       newAttribute.className = "frogImg3";
 
     } else {
-      if (trait == 'Trait') {
-        newAttribute.className = "frogImg5";
 
-      } else {
-        newAttribute.className = "frogImg4";
+      // Assign Class
+      if (trait == 'Trait') { newAttribute.className = "frogImg5"; } else { newAttribute.className = "frogImg4"; }
 
-      }
     }
 
+    // Smoking Animations
+    if (attribute.includes('smoking')) {
+
+      newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+"2.gif"
+
+    } else if (attribute.includes('shades') || attribute.includes('Shades')) {
+
+      newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+"_animation.gif"
+
+    } else {
+
+      // Assign Source
+      newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+".png";
+
+    }
+
+    // Render Trait Image
     document.getElementById(where).appendChild(newAttribute);
 
   }
@@ -602,393 +568,290 @@
   // Shorten Ethereum Address
   function truncateAddress(address) {
     if (!address) { return ""; }
-    return `${address.substr(0, 5)}..${address.substr(
+    return `${address.substr(0, 5)}...${address.substr(
       address.length - 5,
       address.length
     )}`;
   }
 
-  // Random Int
-  function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min) + min);
-  }
+  // Recent Sale Price
+  async function get_asset_price(tokenId) {
 
-  async function randomMorph() {
-    morphFrogs(getRandomInt(0, 4040), getRandomInt(0, 4040), 'frogContainer4');
-  }
+    const options = {method: 'GET'};
 
-  // Scroll Into view
-  function scroll_to(element) {
-    console_pre = document.getElementById(element);
-    console_pre.scrollIntoView({behavior: "smooth", block: "end", inline: "start"});
+    fetch('https://api.opensea.io/api/v1/asset/'+CONTRACT_ADDRESS+'/'+tokenId+'/?include_orders=false', options)
+    .then(token => token.json())
+    .then((token) => {
+
+      try {
+
+        // Retrieve Token Data //
+        var { last_sale: { payment_token: { decimals }, total_price } } = token
+
+        // If recent sale price is found
+        if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
+
+          // Calculate recent sale price
+          var recent_sale = total_price / Math.pow(10, decimals);
+
+          // Return recent sale price
+          document.getElementById('price_'+tokenId).innerHTML = 'Ξ'+recent_sale;
+
+        }
+
+      } catch (e) {}
+
+    })
+
   }
 
   // FreshFrogsController | NFT Staking Smart Contract | 0xCB1ee125CFf4051a10a55a09B10613876C4Ef199
-
-  async function claimRewards_init() {
-
-    // Scroll Into View
-    morphing = false; base_frog = false; sub_frog = false;
-    scroll_to('pre');
-    display_token(tokenId);
-
-    // Begin Withdraw Txn
-    consoleOutput(
-      '<strong>Claiming Rewards...</strong>'+'<br>'+
-      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-      '<br><div style="text-align: left;">'+
-        '<strong>Claim Rewards</strong><br> Retrieve $FLYZ from staking protocol.'+
-      '</div>'
-    );
-
-    // Submit Txn
-    let claimRewards_txn = await claimRewards();
-
-    consoleOutput(
-      '<strong>Claiming Rewards...</strong>'+'<br>'+
-      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-      '<br><div style="text-align: left;">'+
-        '<strong>Claim Rewards</strong><br> '+claimRewards_txn+
-      '</div>'
-    );
-  }
-
-  async function withdraw_init(tokenId) {
-
-    // Scroll Into View
-    morphing = false; base_frog = false; sub_frog = false;
-    scroll_to('pre');
-    display_token(tokenId);
-
-    // Begin Withdraw Txn
-    consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-      '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
-      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-      '<br><div style="text-align: left;">'+
-        '<strong>Withdraw NFT</strong><br> Return Frog #'+tokenId+' from staking protocol.'+
-      '</div>'
-    );
-
-    // Submit Txn
-    let withdraw_txn = await withdraw(tokenId);
-
-    // Begin Withdraw Txn
-    consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-      '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
-      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-      '<br><div style="text-align: left;">'+
-        '<strong>Withdraw NFT</strong><br> '+withdraw_txn+
-      '</div>'
-    );
-
-  }
-
-  async function stake_init(tokenId) {
-
-    // Scroll Into View
-    morphing = false; base_frog = false; sub_frog = false;
-    scroll_to('pre');
-    display_token(tokenId);
-
-    // Check Contract Approval
-    let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-
-    // Not Approved
-    if (!is_approved) {
-
-      consoleOutput(
-        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-        '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
-        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-        '<br><div style="text-align: left;">'+
-          '<strong>Approve Staking</strong> (1/2)<br>This is a one time transaction to allow staking, requires a gas fee.<br>'+
-          '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
-        '</div>'
-      );
-
-      // Submit Txn
-      let set_approval = await setApprovalForAll();
-
-      if (set_approval !==true) {
-
-        consoleOutput(
-          '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-          '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
-          'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-          '<br><div style="text-align: left;">'+
-            '<strong>Approve Staking</strong> (1/2)<br>'+set_approval+'<br>'+
-            '<br><strong>Please Read</strong><br>While your Frog is staked, you will not be able to sell it on secondary market places. To do this you will have to un-stake your Frog directly from this site. When a Frog is un-staked the staking level will reset to zero.'+
-          '</div>'
-        );
-
-        // Catch Error
-        return
-
-      }
-    }
-
-    // Begin Stake Txn
-    consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-      '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
-      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-      '<br><div style="text-align: left;">'+
-        '<strong>Stake NFT</strong><br> Transfer Frog #'+tokenId+' to staking protocol.'+
-      '</div>'
-    );
-
-    // Submit Txn
-    let stake_txn = await stake(tokenId);
-
-    // Complete
-    consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-      '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
-      'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-      '<br><div style="text-align: left;">'+
-        '<strong>Stake NFT</strong><br> '+stake_txn+
-      '</div>'
-    );
-
-  }
-
-  // setApproval | set staking contract approval
-  async function setApprovalForAll() {
-
-    // Check Approval Status
-    let is_approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-    if (!is_approved) { 
-      try {
-        
-        // Send Txn
-        let set_approval = await collection.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: user_address });
-        return true;
-
-      // Catch Errors
-      } catch (e) { return '❌ '+e.message; }
-    
-    // Already Approved
-    } else { return true; }
-  }
   
-  // <-----
-  // SEND()
-  // ----->
+  // SEND() FUNCTIONS
 
   // claimRewards(_user (address)) | send =>
-  async function claimRewards() {
+  async function claimRewards(userAddress) {
 
-    // Check Available Rewards
-    let available_rewards = await availableRewards(user_address);
-    if (available_rewards > 0) {
-      try {
+    try {
 
-        // Send Txn
-        let claimRewards = await controller.methods.claimRewards().send({ from: user_address });
-        return '✅ Rewards have succesfully been claimed!';
-  
-      // Catch Errors!
-      } catch (e) { return '❌ '+e.message; }
-    
-    // No Rewards
-    } else { return '❌ No rewards available to claim!'; }
+      // Send function to FreshFrogsController Staking Contract
+      let claimRewards = await controller.methods.claimRewards().send({ from: userAddress });
+      return 'Rewards have succesfully been claimed!';
+
+    } catch (e) {
+      
+      // Catch Error
+      console.log('Failed to withdraw(): '+e.message);
+
+    }
   }
 
   // withdraw(_tokenId (uint256), _user (address)) | send =>
-  async function withdraw(tokenId) {
+  async function withdraw(tokenId, userAddress) {
 
-    // Check Staked/Approval Status
+    // Frog is currently staked and belongs to user
     let staked = await stakerAddress(tokenId);
-    let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
 
-    // Invalid Approval / Not Staked
-    if (!approved) { return '❌ Staking contract not approved for token transfer!'; }
-    if (!staked) { return '❌ Frog #'+tokenId+' is not currently staked!'; } 
+    if (!staked) {
 
-    // Valid ownership
-    else if (staked.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+      // Frog is not currently staked!
+      return;
+
+    // Frog is currently staked by user
+    } else if (staked == userAddress) {
+
       try {
+
+        // Send Function to FreshFrogsController Staking Contract
+        let withdraw = await controller.methods.withdraw(tokenId).send({ from: userAddress });
+        return 'Frog #'+tokenId+' has succesfully been un-staked!';
+
+      } catch (e) {
         
-        // Send Txn
-        let withdraw = await controller.methods.withdraw(tokenId).send({ from: user_address });
-        return '✅ Frog #'+tokenId+' has succesfully been un-staked!';
-
-      // Catch Errors
-      } catch (e) { return '❌ '+e.message; }
-
-    // Invalid Ownership
-    } else { return '❌ Frog #'+tokenId+' does not belong to user!'; }
-  }
-
-  // Initiate Transfer Txn
-  async function transfer_init(tokenId) {
-
-    // Scroll Into View
-    morphing = false; base_frog = false; sub_frog = false;
-    scroll_to('pre');
-    display_token(tokenId);
-
-    // Begin Withdraw Txn
-    consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-      '<strong>Transferring Frog #'+tokenId+'...</strong>'+'<br>'+
-      '<input style="margin: 4px; width: 256px; padding: 4px; border: 1px solid black; border-radius: 5px;" id="receiver" placeholder="receiver address"><br>'+
-      '<button id="receiver_button" class="frog_button" style="background: #7cc1ff; color: white; border: 1px solid black;">Send 🡥</button><br>'+
-      '<br><div style="text-align: left;">'+
-        '<strong>Transfer NFT</strong>'+
-        '<br>Items sent to the wrong address cannot be recovered!'+
-      '</div>'
-    );
-
-    document.querySelector("#receiver_button").addEventListener("click", async (e) => {
-
-      // Token Reciever
-      let receiver = document.querySelector("#receiver").value
-
-      consoleOutput(
-        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-        '<strong>Transferring Frog #'+tokenId+'...</strong>'+'<br>'+
-        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-        '<br><div style="text-align: left;">'+
-          '<strong>Transfer NFT</strong><br> Transferring Frog #'+tokenId+' to '+truncateAddress(receiver)+
-        '</div>'
-      );
-
-      // Send Transfer Txn
-      let transfer_txn = await safeTransferFrom(receiver, tokenId)
-
-      consoleOutput(
-        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
-        '<strong>Transferring Frog #'+tokenId+'...</strong>'+'<br>'+
-        'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
-        '<br><div style="text-align: left;">'+
-          '<strong>Transfer NFT</strong><br> '+transfer_txn+
-        '</div>'
-      );
-
-    })
-  }
-
-  // Transfer Function
-  async function safeTransferFrom(receiver, tokenId) {
-
-    web3 = new Web3(window.ethereum);
-
-    // Validate Receiver
-    let receiver_address = await Web3.utils.isAddress(receiver)
-    if (!receiver_address) { return '❌ Invalid receiver address!'; }
-    if (receiver.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) { return '❌ Invalid receiver address! Please use the stake() function!'; }
-
-    // Check Ownership
-    let owner = await collection.methods.ownerOf(tokenId).call();
-    if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
-      try {
-
-        // Send Txn
-        let safeTransfer_txn = await collection.methods.safeTransferFrom(user_address, receiver, tokenId).send({ from: user_address});
-        return '✅ Frog #'+tokenId+' has succesfully been transferred!';
+        // Catch Error
+        console.log('Failed to withdraw(): '+e.message);
       
-      // Catch Errors
-      } catch (e) { return '❌ '+e.message; }
+      }
 
-    // Invalid Ownership
-    } else { return '❌ Frog #'+tokenId+' does not belong to user!'; }
+    } else {
+
+      // Frog does not belong to user!
+      return;
+
+    }
+
   }
 
   // stake(_tokenId (uint256), _user (address)) | send =>
-  async function stake(tokenId) {
+  async function stake(tokenId, userAddress) {
 
-    // Check Ownership / Approval Status
-    let owner = await collection.methods.ownerOf(tokenId).call();
-    let approved = await collection.methods.isApprovedForAll(user_address, CONTROLLER_ADDRESS).call({ from: user_address});
-    if (!approved) { return '❌ Staking contract not approved for token transfer!'; }
+    // Frog Ownership Status
+    let owned = await collection.methods.ownerOf(tokenId).call();
+    owned = owned.toString();
 
-    // Valid ownership
-    if (owner.toString().toLowerCase() == user_address.toString().toLowerCase()) {
+    // Owned by User attempting to Stake
+    if (owned.toString().toLowerCase() == userAddress.toString().toLowerCase()) {
+
       try {
 
-        // Send Txn
-        let stake = await controller.methods.stake(tokenId).send({ from: user_address });
-        return '✅ Frog #'+tokenId+' has succesfully been staked!';
+        // Send function to FreshFrogsController Staking Contract
+        let stake = await controller.methods.stake(tokenId).send({ from: userAddress });
+        return 'Frog #'+tokenId+' has succesfully been staked!';
 
-      // Catch Errors
-      } catch (e) { return '❌ '+e.message; }
+      } catch (e) {
 
-    // Token already Staked
-    } else if (owner.toString().toLowerCase() == CONTROLLER_ADDRESS.toString().toLowerCase()) {
-      return '❌ Frog #'+tokenId+' is already staked!';
-    } 
+        // Catch Error
+        console.log('Failed to stake(): '+e.message);
 
-    // Invalid Ownership
-    else { return '❌ Frog #'+tokenId+' does not belong to user!'; }
+      }
+
+    } else {
+
+      if (owned == CONTROLLER_ADDRESS) {
+
+        // Already Staked!
+
+      }
+
+      // Token does not belong to user
+      return;
+
+    }
+
   }
 
-  // <-----
-  // CALL()
-  // ----->
+  // CALL() Functions
 
   // availableRewards(_staker (address)) | return uint256
   async function availableRewards(userAddress) {
-    return await controller.methods.availableRewards(userAddress).call();
+
+    try {
+
+      // Call function from within FreshFrogsController Staking Contract
+      let availableRewards = await controller.methods.availableRewards(userAddress).call();
+
+      // Return available rewards belonging to user
+      return availableRewards;
+
+    } catch (e) {
+      
+      // Catch Error
+      console.log('Failed to call availableRewards(): '+e.message);
+    
+    }
 
   }
 
   // getStakedTokens(_user (address)) | return tuple[]
   async function getStakedTokens(userAddress) {
-    return await controller.methods.getStakedTokens(userAddress).call();
+
+    try {
+
+      // Call function from within FreshFrogsController Staking Contract
+      let getStakedTokens = await controller.methods.getStakedTokens(userAddress).call();
+
+      // Return Array of Staked Tokens
+      return getStakedTokens;
+
+    } catch (e) {
+      
+      // Catch Error
+      console.log('Failed to call getStakedTokens(): '+e.message);
+    
+    }
 
   }
   
   // nftCollection() | return address
   async function nftCollection() {
-    return await controller.methods.nftCollection().call();
+    
+    try {
+
+      // Call function from within FreshFrogsController Staking Contract
+      let nftCollection = await controller.methods.nftCollection().call();
+
+      // Return NFT Collection Contract Address
+      return nftCollection;
+
+    } catch (e) {
+      
+      // Catch Error
+      console.log('Failed to call nftCollection(): '+e.message);
+    
+    }
 
   }
 
   // rewardsToken() | return address
   async function rewardsToken() {
-    return await controller.methods.rewardsToken().call();
+
+    try {
+
+      // Call function from within FreshFrogsController Staking Contract
+      let rewardsToken = await controller.methods.rewardsToken().call();
+
+      // Return Reward Token ERC720 Contract Address
+      return rewardsToken;
+
+    } catch (e) {
+
+      // Catch Error
+      console.log('Failed to call rewardsToken(): '+e.message);
+
+    }
 
   }
 
   // stakerAddress(<input> (uint256)) | return address
   async function stakerAddress(tokenId) {
-    let stakerAddress = await controller.methods.stakerAddress(tokenId).call();
 
-    // Return staker's address
-    if (stakerAddress !== '0x0000000000000000000000000000000000000000') {
-      return stakerAddress;
-    }
+    try {
+
+      // Call function from within FreshFrogsController Staking Contract
+      let stakerAddress = await controller.methods.stakerAddress(tokenId).call();
+
+      // stakedAddress does NOT belong to a Null Address, therefore IS currently Staked!
+      if (stakerAddress !== '0x0000000000000000000000000000000000000000') {
+
+        return stakerAddress
+
+      // TokenId Not Currently Staked!
+      } else {
+
+        return false
+
+      }
+
+    } catch (e) {
+      
+      // Catch Error
+      console.log('Failed to call stakerAddress(): '+e.message);
     
-    // Token is Not Currently Staked!
-    else { return false; }
+    }
+
   }
 
   // stakers(<input> (address), <input> (dataFetch)) | return ( amountStaked, timeOfLastUpdate, unclaimedRewards )
   async function stakers(userAddress, _data) {
-    let stakers = await controller.methods.stakers(userAddress).call();
 
-    // Total Tokens Staked by User
-    if (_data == 'amountStaked') {
-      return stakers.amountStaked
+    try {
 
-    // Time since Last Update from user
-    } else if (_data == 'timeOfLastUpdate') {
-      return stakers.timeOfLastUpdate
+      // Call function from within FreshFrogsController Staking Contract
+      let stakers = await controller.methods.stakers(userAddress).call();
 
-    // Total unclaimed Rewards from User
-    } else if (_data == 'unclaimedRewards') {
-      return stakers.unclaimedRewards
+      console.log('amountStaked: '+stakers.amountStaked);
+      console.log('timeOfLastUpdate: '+stakers.timeOfLastUpdate);
+      console.log('unclaimedRewards: '+stakers.unclaimedRewards);
 
-    // Invalid arguments
-    } else {
-      return
+      if (_data == 'amountStaked') {
+
+        // Total Tokens Staked by User
+        return stakers.amountStaked
+
+      } else if (_data == 'timeOfLastUpdate') {
+
+        // Time since Last Update from user
+        return stakers.timeOfLastUpdate
+
+      } else if (_data == 'unclaimedRewards') {
+
+        // Total unclaimed Rewards from User
+        return stakers.unclaimedRewards
+
+      } else {
+
+        // Invalid Arguments
+        return
+
+      }
+
+    } catch (e) {
+      
+      // Catch Error
+      console.log('Failed to call stakers(): '+e.message);
 
     }
+
   }
 
   // Custom Front-End Functions
@@ -996,170 +859,41 @@
   // Calculate total time a Frog has been staked (Hours)
   async function timeStaked(tokenId) {
 
-    // Check Staked Status
+    // Re-establish web3 connection variable
     web3 = new Web3(window.ethereum);
+
+    // Is Frog currently staked?
     let staked = await stakerAddress(tokenId);
 
-    // Token is not currently staked
+    // False, NOT currently staked
     if (!staked) {
 
       return 0.00
 
-    // Valid staked status
+    // IS Currently Staked!
     } else {
-      try {
 
-        // Loop blockchain transactions per parameters [NFT Transfer From: User ==> To: Staking Controller] & NFT is Currently Staked
-        let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'tokenId': tokenId}, fromBlock: 0, toBlock: 'latest'});
-        let mostRecentTxn = (stakingEvents.length) - 1;
+      // Loop blockchain transactions per parameters [NFT Transfer From: User ==> To: Staking Controller] & NFT is Currently Staked
+      let stakingEvents = await collection.getPastEvents('Transfer', { filter: {'to': CONTROLLER_ADDRESS, 'tokenId': tokenId}, fromBlock: 0, toBlock: 'latest'});
 
-        // Fetch Block Number from Txn
-        let staked_block = parseInt(stakingEvents[mostRecentTxn].blockNumber);
+      // Fetch Block Number from Txn
+      let staked_block = parseInt(stakingEvents[0].blockNumber);
 
-        // Fetch Timestamp for block txn
-        let staked_time = await web3.eth.getBlock(staked_block);
-        let staked_date = new Date(staked_time.timestamp*1000);
+      // Fetch Timestamp for block txn
+      let staked_time = await web3.eth.getBlock(staked_block);
+      let staked_date = new Date(staked_time.timestamp*1000);
 
-        // Calculate Time Staked in Hours
-        let staked_duration = Date.now() - staked_date;
-        let staked_hours = Math.floor(staked_duration/1000/60/60);
+      // Calculate Time Staked in Hours
+      let staked_duration = Date.now() - staked_date;
+      let staked_hours = Math.floor(staked_duration/1000/60/60);
 
-        //console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
+      //console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
 
-        // Return time staked in (Hours)
-        return staked_hours;
-
-      // Catch Errors, Return 0.00
-      } catch (e) { return 0.00; }
-    }
-  }
-
-
-  // Token Combinations / Rebuild Token
-  async function morphFrogs(baseId, subId, build_loc) {
-    
-    var baseFrog, baseSpecialFrog, baseTrait, baseAccessory, baseEyes, baseHat, baseMouth;
-    var subFrog, subSpecialFrog, subTrait, subAccessory, subEyes, subHat, subMouth;
-    var renderFrog, renderSpecialFrog, renderTrait, renderSecondaryTrait, renderAccessory, renderEyes, renderHat, renderMouth, renderOverlay;
-    
-    document.getElementById(build_loc).innerHTML = '';
-
-    // <------ FETCH METADATA (baseId, subId) ------>
-    let baseMetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseId+".json")).json();
-    for (i = 0; i < baseMetadata.attributes.length; i++) {
-
-      let attribute = baseMetadata.attributes[i];
-      if (attribute.trait_type == 'Frog') { var baseFrog = attribute.value; } 
-      else if (attribute.trait_type == 'SpecialFrog') { var baseSpecialFrog = attribute.value; } 
-      else if (attribute.trait_type == 'Trait') { var baseTrait = attribute.value; } 
-      else if (attribute.trait_type == 'Accessory') { var baseAccessory = attribute.value; } 
-      else if (attribute.trait_type == 'Eyes') { var baseEyes = attribute.value; } 
-      else if (attribute.trait_type == 'Hat') { var baseHat = attribute.value; } 
-      else if (attribute.trait_type == 'Mouth') { var baseMouth = attribute.value; }
+      // Return time staked in (Hours)
+      return staked_hours;
 
     }
 
-    let subMetadata = await (await fetch("https://freshfrogs.io/frog/json/"+subId+".json")).json();
-    for (j = 0; j < subMetadata.attributes.length; j++) {
-
-      let attribute = subMetadata.attributes[j];
-      if (attribute.trait_type == 'Frog') { var subFrog = attribute.value; } 
-      else if (attribute.trait_type == 'SpecialFrog') { var subSpecialFrog = attribute.value; } 
-      else if (attribute.trait_type == 'Trait') { var subTrait = attribute.value; } 
-      else if (attribute.trait_type == 'Accessory') { var subAccessory = attribute.value; } 
-      else if (attribute.trait_type == 'Eyes') { var subEyes = attribute.value; } 
-      else if (attribute.trait_type == 'Hat') { var subHat = attribute.value; } 
-      else if (attribute.trait_type == 'Mouth') {var subMouth = attribute.value; }
-
-    }
-
-    // <------ DETERMINE NEW METADATA (baseId, subId) ------> //
-    // https://freshfrogs.io/frog/preset_/ [ trait_type/value ] .png
-
-    // Base Adaptative Frog
-    //if (baseFrog == 'splendidLeafFrog' || baseFrog == 'stawberryDartFrog' || baseFrog == 'redEyedTreeFrog' && typeof subTrait !== 'undefined') { renderOverlay = baseFrog+'/'+baseTrait; } 
-    
-    // Sub Adaptative Frog
-    //else if (subFrog == 'splendidLeafFrog' || subFrog == 'stawberryDartFrog' || subFrog == 'redEyedTreeFrog' && typeof baseTrait !== 'undefined') { renderOverlay = subFrog+'/'+baseTrait; }
-    
-    // Special Frogs
-    if (typeof baseSpecialFrog !== 'undefined' || typeof subSpecialFrog !== 'undefined') {
-
-      // Base Special Frog
-      if (typeof subFrog !== 'undefined') {
-        subTrait = 'SpecialFrog/'+baseSpecialFrog+'/'+subTrait;
-        subSpecialFrog = baseSpecialFrog+'/'+subFrog;
-        subFrog = undefined;
-      }
-
-      // Sub Special Frog
-      else if (typeof baseFrog !== 'undefined') {
-        subTrait = 'SpecialFrog/'+subSpecialFrog+'/'+baseTrait;
-        baseSpecialFrog = subSpecialFrog;
-        subSpecialFrog = subSpecialFrog+'/'+baseFrog;
-        baseFrog = undefined;
-      }
-
-    }
-    
-    // Select Attributes!
-    if (typeof baseAccessory !== 'undefined') { var renderAccessory = baseAccessory; }
-    else if (typeof subAccessory !== 'undefined') { var renderAccessory = subAccessory; }
-    if (typeof baseEyes !== 'undefined') { var renderEyes = baseEyes; }
-    else if (typeof subEyes !== 'undefined') { var renderEyes = subEyes; }
-    if (typeof baseHat !== 'undefined') { var renderHat = baseHat; }
-    else if (typeof subHat !== 'undefined') {var renderHat = subHat;}
-    if (typeof baseMouth !== 'undefined') { var renderMouth = baseMouth; }
-    else if (typeof subMouth !== 'undefined') { var renderMouth = subMouth; }
-
-    // <------ BUILD NEW METADATA (baseId, subId) ------>
-    
-    // SUB FROG (UNDERLAY)
-    if (typeof subFrog !== 'undefined') { loadTrait('Frog', subFrog, build_loc); }
-    else if (typeof subSpecialFrog !== 'undefined') { loadTrait('SpecialFrog', subSpecialFrog, build_loc); }
-
-    // ADD ON OVERLAY
-    //if (typeof renderOverlay !== 'undefined') { loadTrait('Trait/Overlay', renderOverlay, build_loc); }
-
-    // BASE FROG (OVERLAY)
-    if (typeof baseFrog !== 'undefined') { loadTrait('Frog/base', baseFrog, build_loc); }
-    else if (typeof baseSpecialFrog !== 'undefined') { loadTrait('SpecialFrog/bottom', baseSpecialFrog, build_loc); }
-
-    // TRAIT(S)
-    if (typeof subTrait !== 'undefined') { loadTrait('Trait', subTrait, build_loc); }
-    else if (typeof baseTrait !== 'undefined') { loadTrait('Trait', baseTrait, build_loc); }
-
-    // ACCESSORIES
-    if (typeof renderAccessory !== 'undefined') { loadTrait('Accessory', renderAccessory, build_loc); }
-    if (typeof renderEyes !== 'undefined') { loadTrait('Eyes', renderEyes, build_loc); }
-    if (typeof renderHat !== 'undefined') { loadTrait('Hat', renderHat, build_loc); }
-    if (typeof renderMouth !== 'undefined') { loadTrait('Mouth', renderMouth, build_loc); }
-
-  }
-
-  // Leaderboard
-  async function stakedLeaderboard(tokenId) {
-    let leaderboard_staker = await stakerAddress(tokenId);
-    if (!leaderboard_staker) { return; }
-
-    // Total Staked Leader
-    let leaderboard_ammount = await stakers(leaderboard_staker, 'amountStaked');
-    if (leaderboard_ammount > leaderboard_totalStaked) {
-
-      leaderboard_totalStaked = leaderboard_ammount;
-      leaderboard_totalStaked_owner = leaderboard_staker;
-      
-    } 
-
-    // Time Staked Leader
-    let leaderboard_time = await timeStaked(tokenId);
-    if (leaderboard_time > leaderboard_streak) {
-
-      leaderboard_streak_owner = leaderboard_staker;
-      leaderboard_streak_token = tokenId;
-      leaderboard_streak = leaderboard_streak;
-
-    }
   }
 
 // Coded by NF7UOS

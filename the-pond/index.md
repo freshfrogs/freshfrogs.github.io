@@ -1,4 +1,4 @@
 ---
 layout: the-pond
 ---
-<title>freshfrogs.io/the-pond 🍀</title>
+<title>freshfrogs.github.io/the-pond 🍀</title>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <style>
 
-  @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
   
     html{
       background-image: url("/assets/background.png");
@@ -10,22 +10,21 @@
       font-family: 'Open Sans', sans-serif !important;
     }
     .myProgress {
-      width: 213px;
+      width: 50%;
       background: transparent;
       margin: 8px;
       margin-left: auto;
       margin-right: auto;
-      margin-bottom: 0px;
-      margin-top: 0px;
+      margin-bottom: 16px;
       border: 1px solid black;
       border-radius: 5px;
       overflow: hidden;
-      height: 5px;
+      height: 4px;
     }
     .myBar {
       width: 1%;
       height: 18px;
-      background-color: tomato;
+      background-color: coral;
       border-radius: 1px;
     }
     .wrapper {
@@ -261,7 +260,6 @@
       line-height: 1;
       text-align: center;
       vertical-align: middle;
-      font-size: small !important;
     }
     section {
       font-family: 'Open Sans', sans-serif !important;
@@ -273,7 +271,6 @@
       padding: 0px !important;
       overflow: hidden;
       margin-bottom: 16px;
-      font-size: small !important;
     }
     header {
       overflow: hidden;
@@ -297,9 +294,6 @@
       bottom: 32px;
       margin-bottom: 0px;
     }
-    .downloads a strong {
-      font-size: small !important;
-    }
     .downloads {
       margin-top: 0%;
       margin-bottom: 4%;
@@ -312,9 +306,6 @@
       font-family: 'Open Sans', sans-serif !important;
       font-size: inherit !important;
       color: inherit !important;
-    }
-    .downloads li {
-      border-right: none;
     }
     .pre h1{
       margin-top: 8px;
@@ -354,8 +345,15 @@
       image-rendering: pixelated;
       overflow: hidden;
     }
+    .frogImg2:hover{
+      -ms-transform: scale(1.5); /* IE 9 */
+      -webkit-transform: scale(1.5); /* Safari 3-8 */
+      transform: scale(1.5);
+      box-shadow: none;
+      border: none;
+    }
     .frogImg2 {
-      transition: all .2s;
+      transition: transform .2s;
       display: block;
       image-rendering: pixelated;
       overflow: hidden;
@@ -363,24 +361,19 @@
       width: 128px;
       height: 128px;
       border-radius: 5px;
-      cursor: pointer;
-    }
-    .frogImg2:hover{
-      -ms-transform: scale(1.1); /* IE 9 */
-      -webkit-transform: scale(1.1); /* Safari 3-8 */
-      transform: scale(1.1);
-      opacity: 0.4;
     }
     .frogImg3 {
-      transition: all .2s;
+      transition: transform .2s;
       display: block;
       image-rendering: pixelated;
       overflow: hidden;
       position: absolute;
-      width: 128px;
-      height: 128px;
-      border-radius: 100%;
-      cursor: pointer;
+      width: 1024px !important;
+      height: 1024px !important;
+      border-radius: 5px;
+      border-bottom-left-radius: 0px;
+      border-bottom-right-radius: 0px;
+      max-width: 400% !important;
     }
     .frogImg4 {
       transition: all .2s;
@@ -588,7 +581,6 @@
       margin-left: auto;
       margin-right: auto;
       overflow: hidden;
-      font-size: small !important;
     }
     #banner_image {
       width: 100%;
@@ -622,16 +614,17 @@
       background-color: white;
       color: #333;
       border-radius: 5px;
-      padding: 2px;
-      margin-left: 8px;
-      margin-right: 8px;
+      padding: 3px;
+      box-shadow: 1px 1px rgb(122 122 122 / 20%);
+      margin-left: 2px;
+      margin-right: 2px;
       cursor: pointer;
       transition: all .2s;
       font-family: 'Open Sans', sans-serif !important;
       min-width: 100px;
   }
     .frog_button:hover {
-      background-color: #7cc1ff;
+      background-color: #7cc1ff;;
       color: white;
     }
     .staked_token {
@@ -668,8 +661,8 @@
       overflow: hidden;
       margin-left: auto;
       margin-right: auto;
-      border-bottom-left-radius: 100%;
-      border-bottom-right-radius: 100%;
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 5px;
     }
     .frog_token {
       display: block;
@@ -684,27 +677,23 @@
       margin-left: auto;
       margin-right: auto;
       overflow: hidden;
-      width: 256px;
+      width: auto;
       border: 1px solid black;
       margin: 16px;
       box-shadow: 3px 3px rgb(122 122 122 / 20%);
-      font-size: small;
-      transition: all .2s;
-      padding-bottom: 8px;
     }
     .trait_list {
       min-width: 50%;
       margin: auto;
       text-align: left;
-      padding: 8px;
-      padding-top: 8px;
+      padding: 16px;
+      padding-top: 0px;
     }
     .properties {
       border-top: 1px solid black;
       border-left: 1px solid black;
       padding: 8px;
       border-top-left-radius: 5px;
-      padding-bottom: 0px;
     }
     .print_img {
       width: 128px;
@@ -720,36 +709,32 @@
       text-align: right;
       float: right;
     }
-    .frog_level {
-      text-align: middle;
-      float: none;
-      font-size: small;
-    }
   </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
   <head>
-
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{{ "../assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
-
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
     
-    <script src="https://freshfrogs.io/the-pond/banner/FileSaver.js"></script>
-    <script src="https://freshfrogs.io/the-pond/banner/dom-to-image.js"></script>
-    <script src="https://freshfrogs.io/assets/js/FreshFrogsNFT.js"></script>
+    <script>
+      window.ALCHEMY_API_KEY = {{ site.alchemy_api_key | default: '' | jsonify }};
+    </script>
+    <script src="https://freshfrogs.github.io/the-pond/banner/FileSaver.js"></script>
+    <script src="https://freshfrogs.github.io/the-pond/banner/dom-to-image.js"></script>
+    <script src="https://freshfrogs.github.io/assets/js/fresh-frogs.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
+    <script src="https://freshfrogs.github.io/assets/abi/controller_abi.js"></script>
+    <script src="https://freshfrogs.github.io/assets/abi/collection_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
-
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
     <script>
-      // C 0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38 | A 0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25
       // <-- [Google Analytics]
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -759,42 +744,26 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
 
-        document.getElementById('displayImg1').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(1, 4040)+'.png');
-        document.getElementById('displayImg2').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(1, 4040)+'.png');
-        document.getElementById('displayImg3').setAttribute('src', 'https://freshfrogs.io/frog/'+getRandomInt(1, 4040)+'.png');
-
-        await connect_init();
+        connect();
 
       })
 
-      function getRandomInt(min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min) + min);
-      }
-
-      async function connect_init() {
-        await connect();
-        await fetch_user_data(user_address);
-      }
-
     </script>
-    
   </head>
   <body class="bodyb">
     <div class="wrapper">
       <header id="thisheader">
         <div class="downloads pre">
           <ul class="downloads2">
-            <li><a id="button_left" class="pointer" href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><strong>Etherscan</strong>Contract</a></li>
-            <li><a id="button_middle" class="pointer" href="https://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong>Server</a></li>
-            <li><a id="button_right" class="pointer" href="https://www.gem.xyz/collection/fresh-frogs" target="_blank"><strong>Gemxyz</strong>Rankings</a></li>
+            <li><a id="morphFrogs" class="pointer" href="https://freshfrogs.github.io"><strong id="display_name">Fresh Frogs</strong><div id="display_type">ΞEthereum</div></a></li>
+            <li><a id="selectBase" class="pointer" href="https://discord.gg/xWMFWgpvd3" target="_blank"><strong>Discord</strong><frog id="baseText">Support</frog></a></li>
+            <li><a id="selectSub" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>OpenSea</strong><frog id="subText">Marketplace</frog></a></li>
           </ul>
           <div id="mintingTray" class="mintingTray">
             <div class="bigContainer">
               <div id="frogContainer3" class="containerMint">
                 <div id="frogContainer4" class="imgWrapperMint">
-                  <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/FLY.gif"/>
+                  <img id="previewImg" class="frogImgMint" src="https://freshfrogs.github.io/assets/frogs/FLY.gif"/>
                 </div>
               </div>
             </div>
@@ -805,22 +774,13 @@
         <div class="top">{{ content }}</div>
         <div class="downloads pre">
           <div id="netStatus" class="netStatus">
-            <div id="recent_mints" class="recent_mints"><img src="https://freshfrogs.github.io/frog/1205.png" class="recentMint" id="displayImg1"><img src="https://freshfrogs.github.io/frog/1206.png" class="recentMint" id="displayImg2"><img src="https://freshfrogs.github.io/frog/1207.png" class="recentMint" id="displayImg3"></div>
+            <div id="recent_mints" class="recent_mints"><img src="https://freshfrogs.github.io/frog/1205.png" class="recentMint"><img src="https://freshfrogs.github.io/frog/1206.png" class="recentMint"><img src="https://freshfrogs.github.io/frog/1207.png" class="recentMint"></div>
             <br>
-            <h1 style="color: white !important;">FreshFrogsNFT</h1>
+            <h2 style="color: white !important;"><b>FreshFrogsNFT</b></h2>
             <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
-            opensea.io/collection/fresh-frogs<a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong style="color: white;">Shop on OpenSea ⛵</strong></a>
+            opensea.io/collection/fresh-frogs<a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><b id="connected">Shop on OpenSea ⛵</b></a>
             <br>
-            <div id="pre" class="mintingTextWhite2">
-              <a style="margin: 0px !important; width: fit-content; height: auto; display: initial;" href="https://freshfrogs.io/the-pond">
-                <button onclick="connect_init()" style="list-style: none; min-height: 40px; padding: 8px; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">
-                  <strong>Stake and Earn Rewards!</strong>Connect Ethereum Wallet
-                </button>
-              </a>
-              <br>
-              <hr style="background: black;">
-              <div class="console_pre" id="console-pre"></div>
-            </div>
+            <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a class="pointer" href="https://freshfrogs.github.io/the-pond"><b id="connected">Connect Wallet 🔌</b></a></div>
           </div>
           <br>
           <div id="thePad" class="thePad"></div>
