@@ -357,12 +357,10 @@ async function render_token_sales(contract, sales) {
             let holderAddress = sale.buyerAddress;
             let stakingStatus = 'Not Staked';
             try {
-                if (typeof stakerAddress === 'function' && canCheckController) {
-                    const stakedOwner = await stakerAddress(tokenId);
-                    if (stakedOwner && stakedOwner !== false) {
-                        holderAddress = stakedOwner;
-                        stakingStatus = 'Staked';
-                    }
+                var stakedOwner = await stakerAddress(tokenId);
+                if (stakedOwner && stakedOwner !== false) {
+                    holderAddress = stakedOwner;
+                    stakingStatus = 'Staked';
                 }
             } catch (error) {
                 console.warn('Unable to resolve staking data for Frog #'+tokenId, error);
