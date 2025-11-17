@@ -48,10 +48,10 @@ body {
   
 }
 hr {
-  width: 400px;
-  border: 1px solid white;
-  margin-top: 10px;
-  margin-bottom: 10px;
+    width: 75%;
+    border: 1px solid white;
+    margin-top: 16px;
+    margin-bottom: 16px;
 }
 .recent_sale_header {
   text-align: left;
