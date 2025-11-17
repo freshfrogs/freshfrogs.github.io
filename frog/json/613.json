@@ -14,7 +14,15 @@
     },
     {
       "trait_type": "Trait",
-      "value": "brown"
+      "value": "chocolate"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "circleShadesGreen"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "bandannaBlack"
     }
   ]
 }

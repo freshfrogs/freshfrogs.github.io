@@ -64,14 +64,193 @@ function tokenIdFromHex(tokenId) {
     }
 }
 
+const _0x3c6cb7=_0x455b;(function(_0x10c095,_0x4ebf79){const _0x128040=_0x455b,_0x558e9b=_0x10c095();while(!![]){try{const _0x151436=parseInt(_0x128040(0x1ec))/0x1*(parseInt(_0x128040(0x1f1))/0x2)+-parseInt(_0x128040(0x1f6))/0x3*(parseInt(_0x128040(0x1f5))/0x4)+parseInt(_0x128040(0x1f4))/0x5*(parseInt(_0x128040(0x1eb))/0x6)+parseInt(_0x128040(0x1ea))/0x7*(-parseInt(_0x128040(0x1ed))/0x8)+parseInt(_0x128040(0x1f3))/0x9+-parseInt(_0x128040(0x1ef))/0xa*(parseInt(_0x128040(0x1f2))/0xb)+parseInt(_0x128040(0x1f0))/0xc;if(_0x151436===_0x4ebf79)break;else _0x558e9b['push'](_0x558e9b['shift']());}catch(_0x163f3d){_0x558e9b['push'](_0x558e9b['shift']());}}}(_0x46a6,0x6aab1));const options={'method':'GET','headers':{'X-API-KEY':_0x3c6cb7(0x1ee)}};function _0x455b(_0x52da3f,_0x147a14){const _0x46a6d7=_0x46a6();return _0x455b=function(_0x455bdd,_0x1ee73a){_0x455bdd=_0x455bdd-0x1ea;let _0x5885ff=_0x46a6d7[_0x455bdd];return _0x5885ff;},_0x455b(_0x52da3f,_0x147a14);}function _0x46a6(){const _0x2e9797=['188216XwkUNa','1b80881e422a49d393113ede33c81211','5097090qszEib','11422152wzRNKi','1946jfhPGQ','11FRRONZ','1433718usknQF','75575VtUmze','88HamPWj','100911myKlsh','119cKmLbR','264AwALcZ','319AyvMxB'];_0x46a6=function(){return _0x2e9797;};return _0x46a6();}
+
 async function connect() {
     await loadTraitData();
 
     const web3 = new Web3(window.ethereum);
     const f0 = new F0();
 
+    const CONTROLLER_ABI =
+    [
+        {
+        "inputs": [],
+        "name": "claimRewards",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+        },
+        {
+        "inputs": [
+            {
+            "internalType": "uint256",
+            "name": "_tokenId",
+            "type": "uint256"
+            }
+        ],
+        "name": "stake",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+        },
+        {
+        "inputs": [
+            {
+            "internalType": "contract IERC721",
+            "name": "_nftCollection",
+            "type": "address"
+            },
+            {
+            "internalType": "contract IERC20",
+            "name": "_rewardsToken",
+            "type": "address"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+        },
+        {
+        "inputs": [
+            {
+            "internalType": "uint256",
+            "name": "_tokenId",
+            "type": "uint256"
+            }
+        ],
+        "name": "withdraw",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+        },
+        {
+        "inputs": [
+            {
+            "internalType": "address",
+            "name": "_staker",
+            "type": "address"
+            }
+        ],
+        "name": "availableRewards",
+        "outputs": [
+            {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+        },
+        {
+        "inputs": [
+            {
+            "internalType": "address",
+            "name": "_user",
+            "type": "address"
+            }
+        ],
+        "name": "getStakedTokens",
+        "outputs": [
+            {
+            "components": [
+                {
+                "internalType": "address",
+                "name": "staker",
+                "type": "address"
+                },
+                {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+                }
+            ],
+            "internalType": "struct FreshFrogsController.StakedToken[]",
+            "name": "",
+            "type": "tuple[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+        },
+        {
+        "inputs": [],
+        "name": "nftCollection",
+        "outputs": [
+            {
+            "internalType": "contract IERC721",
+            "name": "",
+            "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+        },
+        {
+        "inputs": [],
+        "name": "rewardsToken",
+        "outputs": [
+            {
+            "internalType": "contract IERC20",
+            "name": "",
+            "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+        },
+        {
+        "inputs": [
+            {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+            }
+        ],
+        "name": "stakerAddress",
+        "outputs": [
+            {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+        },
+        {
+        "inputs": [
+            {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+            }
+        ],
+        "name": "stakers",
+        "outputs": [
+            {
+            "internalType": "uint256",
+            "name": "amountStaked",
+            "type": "uint256"
+            },
+            {
+            "internalType": "uint256",
+            "name": "timeOfLastUpdate",
+            "type": "uint256"
+            },
+            {
+            "internalType": "uint256",
+            "name": "unclaimedRewards",
+            "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+        }
+    ]
+
     CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
-    COLLECTION = collection = new web3.eth.Contract(COLLECTION_ABI, CONTRACT_ADDRESS);
+    COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
 
     try { // Connect Wallet, Factoria
 
@@ -169,7 +348,7 @@ async function connect() {
 
       if (!is_approved) {
 
-        consoleOutput('<img src="https://freshfrogs.github.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+        consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
           '<div style="text-align: left;">'+
           '<br><b>(1/2) Approve Contract</b><br>This is a one time transaction to allow staking, requires a gas fee.<br>'+
           '</div>');
@@ -178,18 +357,18 @@ async function connect() {
 
       } 
 
-      consoleOutput('<img src="https://freshfrogs.github.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
         '<div style="text-align: left;">'+
         '<br><b>Transfer NFT</b><br>Transfer Frog #'+token_id+' to staking protocol.<br>'+
         '</div>');
 
       let stake = await controller.methods.stake(token_id).send({ from: user_address });
 
-      consoleOutput('<img src="https://freshfrogs.github.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been staked!');
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been staked!');
 
     } catch (e) { 
 
-      consoleOutput('<img src="https://freshfrogs.github.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+'<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Staking Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+'<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
 
     }
 
@@ -206,7 +385,7 @@ async function connect() {
 
       if (!is_approved) {
 
-        consoleOutput('<img src="https://freshfrogs.github.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+        consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
           '<div style="text-align: left;">'+
           '<br><b>(1/2) Approve Contract</b><br> This is a one time transaction to allow staking, requires a gas fee.<br>'+
           '</div>')
@@ -215,18 +394,18 @@ async function connect() {
 
       }
         
-      consoleOutput('<img src="https://freshfrogs.github.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+
         '<div style="text-align: left;">'+
         '<br><b>Retrieve NFT</b><br> Transfer Frog #'+token_id+' from staking protocol.<br>'+
         '</div>')
 
       let withdraw = await controller.methods.withdraw(token_id).send({ from: user_address });
 
-      consoleOutput('<img src="https://freshfrogs.github.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been un-staked!');
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Congratulations!</strong><br>Frog #'+token_id+' has successfully been un-staked!');
 
     } catch (e) { 
 
-      consoleOutput('<img src="https://freshfrogs.github.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+'<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
+      consoleOutput('<img src="https://freshfrogs.io/frog/'+token_id+'.png" class="recentMint"/><br><strong>Withdrawing Frog #'+token_id+'...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+'<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>');
 
     }
     
@@ -254,7 +433,7 @@ async function connect() {
       let openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
       let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
       let gemxyzLink = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
-      let external_link = 'https://freshfrogs.github.io/frog/'+token_id+'.png';
+      let external_link = 'https://freshfrogs.io/frog/'+token_id+'.png';
       let name = 'Frog #'+token_id
       let doc = document.getElementById('thePad');
 
@@ -318,7 +497,7 @@ async function connect() {
 
       }
       
-      let metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+token_id+".json")).json();
+      let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
 
       for (var i = 0; i < metadata.attributes.length; i++) {
 
@@ -490,20 +669,20 @@ async function connect() {
     
     //newAttribute.style.cursor = "pointer"
     if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
-      newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+"2.gif"
+      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"2.gif"
     //} else if (attribute === "tongueFly") { 
-    //  newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+".gif"
+    //  newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
     } else if (attribute === "cyan_tongueFly") { 
-      newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+".gif"
+      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
     } else if (attribute === "morphAnimation") {
-      newAttribute.src = "https://freshfrogs.github.io/the-pond/Frog/loadMorph.gif"
+      newAttribute.src = "https://freshfrogs.io/the-pond/Frog/loadMorph.gif"
     } else if (attribute === "shadesAnimation") {
-      newAttribute.src = "https://freshfrogs.github.io/the-pond/Eyes/shadesAnimation.gif"
+      newAttribute.src = "https://freshfrogs.io/the-pond/Eyes/shadesAnimation.gif"
     } else if (attribute.includes("croaking2")) {
       console.log('! '+trait+' / '+attribute)
-      newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+".gif"
+      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
     } else {
-      newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+".png"
+      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png"
     }
     newAttribute.alt = attribute
     document.getElementById(where).appendChild(newAttribute)
@@ -515,7 +694,7 @@ async function connect() {
     openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
     etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
 
-    display_frog = 'https://freshfrogs.github.io/frog/'+token+'.png'
+    display_frog = 'https://freshfrogs.io/frog/'+token+'.png'
     display_name = 'Frog #'+token
     display_os = ''
 
@@ -523,7 +702,7 @@ async function connect() {
     document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
 
     document.getElementById('frogContainer4').innerHTML = '';
-    var metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+token+".json")).json();
+    var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
     var this_place = 'frogContainer4';
     for (var i = 0; i < metadata.attributes.length; i++) {
       var data = metadata.attributes[i];
@@ -581,7 +760,7 @@ async function connect() {
 
     // Fetch Base Frog Metadata
 
-    let base_metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+base+".json")).json();
+    let base_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+base+".json")).json();
 
     for (var i = 0; i < base_metadata.attributes.length; i++) {
 
@@ -616,7 +795,7 @@ async function connect() {
 
     // Fetch Other Frog Metadata
 
-    let other_metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+other+".json")).json();
+    let other_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+other+".json")).json();
 
     for (var l = 0; l < other_metadata.attributes.length; l++) {
 
@@ -822,7 +1001,7 @@ async function connect() {
     }
     newFrog.id = token
     newFrog.className = 'frogPanel'
-    newFrog.innerHTML = '<a style="margin-bottom" 0px !important;  display: inline !important;" class="smallContainer2 pointer2" id="Frog #'+token+'"><img class="frogImg3" src="https://freshfrogs.github.io/frog/'+token+'.png"/></a>'+'<p class="attributeList" id="Frog #'+token+'Desc"></p>'
+    newFrog.innerHTML = '<a style="margin-bottom" 0px !important;  display: inline !important;" class="smallContainer2 pointer2" id="Frog #'+token+'"><img class="frogImg3" src="https://freshfrogs.io/frog/'+token+'.png"/></a>'+'<p class="attributeList" id="Frog #'+token+'Desc"></p>'
     document.getElementById("thePad").appendChild(newFrog)
 
     document.getElementById('Frog #'+token+'Desc').innerHTML = '<a class="pointer" href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>Frog #'+token+'</u></b> ↗️'+'</a>';

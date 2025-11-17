@@ -1,4 +1,4 @@
 ---
 layout: default
 ---
-<title>freshfrogs.github.io</title>
+<title>freshfrogs.io</title>
