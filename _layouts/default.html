@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
+
+  html{
+    background-image: url("/assets/background.png");
+  }
+  html,h1,h2,h3 {
+    font-family: 'Open Sans', sans-serif !important;
+  }
+  #myProgress {
+    width: 50%;
+    background: white;
+    margin-top: 8px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid #7cc1ff;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  #myBar {
+    width: 1%;
+    height: 18px;
+    background-color: #7cc1ff;
+    border-radius: 1px;
+  }
+
+  .wrapper {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .bodyb {
+    background-color: transparent;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 8px;
+    margin-top: 5%;
+  }
+  .top {
+    margin: 0%;
+    image-rendering: pixelated;
+    text-align: center;
+  }
+  .smallContainer{
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: transparent;
+    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
+    width: 128px;
+  }
+  .smallContainer2 {
+    border-radius: 0px;
+    overflow: hidden;
+    background-color: transparent;
+    width: 128px;
+    padding: 0px !important;
+    height: 128px !important;
+    display: inline-block !important;
+    position: relative;
+    image-rendering: pixelated;
+  }
+  .frogContainer {
+    border-radius: 200px;
+    overflow: hidden;
+    width: 256px;
+    padding-top: 0px !important;
+    height: 256px !important;
+    display: inline-block !important;
+    position: relative;
+    margin-left: 2%;
+    margin-right: 2%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    image-rendering: pixelated;
+    transition: .2s;
+  }
+  .smallContainer3 {
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: transparent;
+    width: 128px;
+    padding-top: 0px !important;
+    height: 128px !important;
+    display: inline-block !important;
+    position: relative;
+    margin-left: 1%;
+    margin-right: 1%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    image-rendering: pixelated;
+    transition: .2s;
+  }
+  .mintingTray {
+    text-align: center;
+    vertical-align: center;
+    height: auto;
+    border-radius: 5px;
+    overflow: hidden;
+    transition: box-shadow .2s;
+    width: 256px;
+    margin-left: auto;
+    margin-right: auto;
+    color: white !important;
+  }
+  .label_name {
+      text-align: left;
+      float: left;
+      margin-left: 2.5%;
+      padding: 5%;
+      padding-bottom: 0%;
+      color: gray;
+  }
+  .label_price {
+      text-align: right;
+      float: right;
+      margin-right: 2.5%;
+      padding: 5%;
+      padding-bottom: 0%;
+      color: gray;
+  }
+  .switch_button {
+      margin-left: auto;
+      margin-right: auto;
+      background: transparent;
+      margin-top: 5%;
+      border: 1px solid lightgray;
+      padding: 0px;
+      width: 20px;
+      height: 20px;
+      border-radius: 100%;
+      font-family: inherit;
+      transition: all .2s ease;
+      text-align: center;
+      cursor: pointer;
+  }
+  .switch_button:hover {
+      box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);
+      background-color: #7cc1ff;
+      color: white;
+  }
+  .frog_name {
+      text-align: left;
+      font-weight: bold;
+      float: left;
+      padding: 5%;
+      padding-top: 0%;
+      margin-left: 2.5%;
+  }
+  .frog_price {
+      text-align: right;
+      font-weight: bold;
+      float: right;
+      padding: 5%;
+      padding-top: 0%;
+      margin-right: 2.5%;
+  }
+  .bigContainer {
+      overflow: hidden;
+      width: 256px;
+      height: 256px;
+      image-rendering: pixelated !important;
+  }
+  .containerMint {
+      width: auto;
+      margin-bottom: 0px;
+      margin-top: 0px;
+      background-color: transparent;
+
+      display: -webkit-box;
+      -webkit-box-orient: horizontal;
+      -webkit-box-pack: center;
+      -webkit-box-align: center;
+
+      display: -moz-box;
+      -moz-box-orient: horizontal;
+      -moz-box-pack: center;
+      -moz-box-align: center;
+
+      display: box;
+      box-orient: horizontal;
+      box-pack: center;
+      box-align: center;
+      overflow: hidden;
+  }
+
+  .imgWrapperMint {
+      -webkit-box-flex: 13;
+      -moz-box-flex: 1;
+      box-flex: 1;
+      overflow: hidden;
+  }
+  .frogImgMint {
+      transition: transform .2s;
+      height: auto;
+      display: block;
+      image-rendering: pixelated;
+      overflow: hidden;
+  }
+  .headLine{
+    color: transparent;
+    image-rendering: crisp-edges;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 2%;
+    margin-top: auto;
+    vertical-align: top;
+  }
+  .headLine2 {
+    margin-left: auto;
+    margin-right: auto;
+    image-rendering: crisp-edges;
+    margin-bottom: 2%;
+  }
+  .headLineImg {
+    float: none;
+    image-rendering: crisp-edges;
+    height: 18px;
+    vertical-align: middle;
+    border-radius: 100%;
+    padding: 0px;
+    transition: transform .2s;
+    margin-left: 2%;
+    margin-right: 2%;
+    margin-bottom: 2%;
+    margin-top: 2%;
+    background-color: transparent;
+  }
+  .headLineImg:hover{
+    -ms-transform: scale(1.1); /* IE 9 */
+    -webkit-transform: scale(1.1); /* Safari 3-8 */
+    transform: scale(1.1);
+    box-shadow: none;
+    border: none;
+  }
+  .h1 {
+    font-family: 'Open Sans', sans-serif !important;
+    font-weight: 800;
+    color: white;
+    text-align: center;
+    image-rendering: pixelated;
+    padding: 0%;
+    font-size: xx-large;
+  }
+  .supply{
+    font-family: 'Open Sans', sans-serif !important;
+    color: #333;
+    border-radius: 5px;
+    border: 1px solid #e0e0e0;
+    padding: 5px;
+    background: #f4f4f4;
+    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
+    border-bottom: 0px solid #e0e0e0;
+    border-bottom-left-radius: 0%;
+    border-bottom-right-radius: 0%;
+    width: 270px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2%;
+    padding: 0px;
+  }
+  ul.downloads2 {
+    list-style: none;
+    height: 40px;
+    padding: 0;
+    background: white;
+    border-radius: 5px;
+    border: 1px solid black;
+    width: 270px;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 16px;
+    margin-bottom: 0px;
+    line-height: 1;
+    text-align: center;
+    vertical-align: middle;
+  }
+  section {
+    font-family: 'Open Sans', sans-serif !important;
+    font-size: auto;
+    color: white !important;
+    background-color: #7cc1ff;
+    text-align: center;
+    border-radius: 7px;
+    padding: 0px !important;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  header {
+    overflow: hidden;
+    background-color: #7cc1ff;
+    text-align: center;
+    border-radius: 5px;
+    width: auto;
+    font-family: 'Open Sans', sans-serif !important;
+    font-size: auto !important;
+    margin-bottom: 16px !important;
+    color: #333;
+    padding-bottom: 0px !important;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .desc {
+    position: relative;
+    background-color: inherit;
+    height: 0%;
+    width: 100%;
+    bottom: 32px;
+    margin-bottom: 0px;
+  }
+  .downloads {
+    margin-top: 0%;
+    margin-bottom: 4%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 14px;
+    image-rendering: pixelated;
+  }
+  .downloads a{
+    font-family: 'Open Sans', sans-serif !important;
+    font-size: inherit !important;
+    color: inherit !important;
+  }
+  .pre h1{
+    margin-top: 8px;
+  }
+  .container {
+    height: 256px;
+    width: auto;
+    margin-bottom: auto;
+    margin-top: auto;
+    background-color: transparent;
+
+    display: -webkit-box;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+
+    display: -moz-box;
+    -moz-box-orient: horizontal;
+    -moz-box-pack: center;
+    -moz-box-align: center;
+
+    display: box;
+    box-orient: horizontal;
+    box-pack: center;
+    box-align: center;
+  }
+  .imgWrapper {
+    -webkit-box-flex: 13;
+    -moz-box-flex: 1;
+    box-flex: 1;
+  }
+  .frogImg {
+    transition: transform .2s;
+    height: auto;
+    width: auto;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+  }
+  .frogImg2:hover{
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Safari 3-8 */
+    transform: scale(1.5);
+    box-shadow: none;
+    border: none;
+  }
+  .frogImg2 {
+    transition: transform .2s;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    width: 128px;
+    height: 128px;
+    border-radius: 5px;
+  }
+  .frogImg3 {
+    transition: transform .2s;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    width: 1024px !important;
+    height: 1024px !important;
+    border-radius: 5px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    max-width: 400% !important;
+  }
+  .frogImg4 {
+    transition: transform .2s;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    width: 256px;
+    height: 256px;
+    border-radius: 5px;
+  }
+  .frogImg4:hover{
+    -ms-transform: scale(1.1); /* IE 9 */
+    -webkit-transform: scale(1.1); /* Safari 3-8 */
+    transform: scale(1.1);
+    opacity: 0.2;
+  }
+  .frogImg5 {
+    transition: all .2s;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    width: 256px;
+    height: 256px;
+    border-radius: 5px;
+  }
+  .smallContainer3:hover{
+    -ms-transform: scale(1.1); /* IE 9 */
+    -webkit-transform: scale(1.1); /* Safari 3-8 */
+    transform: scale(1.1);
+    box-shadow: none;
+    border: none;
+  }
+  .pointer2 {
+    transition: transform .2s;
+    cursor: pointer;
+  }
+  .pointer {
+    transition: transform .2s;
+    cursor: pointer;
+  }
+  .pointer:hover{
+    -ms-transform: scale(1.1); /* IE 9 */
+    -webkit-transform: scale(1.1); /* Safari 3-8 */
+    transform: scale(1.1);
+  }
+  .pre {
+    border-radius: 2%;
+    text-align: center;
+    padding: 0px;
+    margin-bottom: 8px;
+    width: 100%;
+    height: 100%;
+    box-shadow: none;
+  }
+  .frogType {
+    transition: transform .2s;
+    width: 128px;
+    display: block;
+    image-rendering: pixelated;
+    box-shadow: none;
+    border: none;
+    position: absolute;
+  }
+  .hr2{
+    width: 128px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 1%;
+  }
+  .h2 {
+    font-family: 'Open Sans', sans-serif !important;
+    font-weight: 750;
+    text-align: center;
+    padding: 0%;
+    font-size: large;
+    font: "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+    margin-top: 8px;
+    margin-bottom: 0px;
+    line-height: 1.1;
+  }
+  .frogType2 {
+    border-radius: 5px;
+    border: 0px solid #e0e0e0;
+    overflow: hidden;
+    background-color: transparent;
+    width: 128px;
+    padding-top: 0px !important;
+    height: 100% !important;
+    display: inline-block !important;
+  }
+  .learnMoreFM {
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
+    background: white;
+    border: 1px solid white;
+    border-radius: 5px;
+    padding: 5px;
+    color: #333
+  }
+  .myProgress {
+    width: 50%;
+    background: #f4f4f4;
+    margin-top: 8px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid #324d64;
+    border-radius: 5px;
+    height: 18px;
+    font-family: 'Open Sans', sans-serif !important;
+    font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    vertical-align: middle;
+  }
+  .mintingTextGreen {
+    background-color: #99ffc5;
+    border-radius: 5px;
+    border: 0px solid white;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
+    padding: 4px;
+  }
+  .mintingTextWhite {
+    background-color: white;
+    border-radius: 5px;
+    border-top-left-radius: 0%;
+    border-top-right-radius: 0%;
+    border: 0px solid white;
+    margin: 8px;
+    color: #333 !important;
+    box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);
+    overflow: hidden;
+  }
+  .mintingTextRed {
+    background-color: #ff99b6;
+    border-radius: 5px;
+    border: 0px solid white;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
+    padding: 4px;
+  }
+  .thePad {
+    border-radius: 5px;
+    padding: 4px;
+    background-color: #7cc1ff;
+    vertical-align: bottom;
+  }
+  .headerDiv {
+    border-bottom: 2px solid #7cc1ff;
+    padding: 4px;
+    border-radius: 5px;
+    color: white !important;
+  }
+  .frogPanel {
+    display: inline-block !important;
+    image-rendering: pixelated;
+    text-align: center;
+    border-radius: 5px;
+    padding: 0px !important;
+    margin: 8px;
+    background-color: white;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
+    overflow: hidden;
+    border: 0px solid white;
+  }
+  .frogPanel2 {
+    display: inline-block !important;
+    image-rendering: pixelated;
+    text-align: center;
+    border-radius: 5px;
+    padding: 0px !important;
+    margin: 8px;
+    background-color: white;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
+    overflow: hidden;
+    border: 0px solid white;
+    transition: all .2s;
+  }
+  .frogPanel2:hover {
+    box-shadow: 0px 0px 6px 6px #7cc1ff;
+  }
+  .attributeList {
+    border: 1px solid white;
+    border-radius: 5px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    padding: 0px !important;
+    padding-bottom: 4px !important;
+    overflow: hidden;
+    background-color: white;
+    color: #333;
+    width: 100%;
+    margin: 0px !important;
+  }
+  .trait {
+    border-radius: 2px;
+    background: white;
+    color: rgba(126, 183, 128, 1);
+    font-size: x-small;
+    padding: 1px;
+  }
+  .userAddress {
+    padding-left: 1px;
+    padding-right: 1px;
+    border-radius: 5px;
+    background: white;
+    color: #7cc1ff;
+  }
+  .mintingTextWhite2 {
+    background-color: antiquewhite;
+    border: 1px solid black;
+    padding: 16px;
+    color: #333 !important;
+    box-shadow: 3px 3px rgb(122 122 122 / 20%);
+    margin: auto;
+    border-radius: 5px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
+  }
+  #banner_image {
+    width: 100%;
+    padding: 0% !important;
+    margin: 0% !important;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    transform: scale(1.5);
+    image-rendering: auto;
+    overflow: hidden;
+  }
+  .recentMint {
+    width: 128px;
+    height: 128px;
+    border-radius: 5px;
+    box-shadow: 3px 3px rgb(122 122 122 / 20%);
+    margin: 4px;
+    border: 1px solid black;
+  }
+  .recent_mints {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5%;
+    margin-bottom: auto;
+    width: 90%;
+  }
+</style>
+<html lang="{{ site.lang | default: "en-US" }}">
+  <link rel="icon" href="../assets/logo.png">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ "../assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+    <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
+    <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
+    <script>
+      // <-- [Google Analytics]
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-6PB0WKB4SH');
+      // -- >
+
+      /*
+        Assign Public Variables
+      */
+
+      //
+      function _0x4c8f(_0x537bb9,_0x5717b3){const _0x514c09=_0x514c();return _0x4c8f=function(_0x4c8fdb,_0x35dfe7){_0x4c8fdb=_0x4c8fdb-0x105;let _0x148042=_0x514c09[_0x4c8fdb];return _0x148042;},_0x4c8f(_0x537bb9,_0x5717b3);}function _0x514c(){const _0x40e000=['2259356QOnldH','2175464xLKhJr','17864384ktXQNC','767604KHzlFZ','2011625ZhSeNC','1124079ayylfy','application/json','GET','1b80881e422a49d393113ede33c81211','1MAYIBX','2352105WeQtuy'];_0x514c=function(){return _0x40e000;};return _0x514c();}const _0xa10661=_0x4c8f;(function(_0x1abeda,_0x2455f4){const _0x1fd961=_0x4c8f,_0x3248bb=_0x1abeda();while(!![]){try{const _0x55c792=-parseInt(_0x1fd961(0x10e))/0x1*(parseInt(_0x1fd961(0x106))/0x2)+-parseInt(_0x1fd961(0x10a))/0x3+parseInt(_0x1fd961(0x105))/0x4+-parseInt(_0x1fd961(0x10f))/0x5+parseInt(_0x1fd961(0x108))/0x6+-parseInt(_0x1fd961(0x109))/0x7+parseInt(_0x1fd961(0x107))/0x8;if(_0x55c792===_0x2455f4)break;else _0x3248bb['push'](_0x3248bb['shift']());}catch(_0x512bd3){_0x3248bb['push'](_0x3248bb['shift']());}}}(_0x514c,0xac440));const options={'method':_0xa10661(0x10c),'headers':{'Accept':_0xa10661(0x10b),'X-API-KEY':_0xa10661(0x10d)}};
+      //
+
+      // User Variables
+
+      var user_address, user_invites, user_inviteKeys, user_tokens, user_invite;
+
+      // Function Variables
+
+      var mint_id, opensea_failed;
+      var mint_price = 0.01;
+      var mint_quantity = 1;
+
+      // Contract Variables
+
+      var contract_name, contract_symbol, contract_id, collection, COLLECTION, traits_list, controller, CONTROLLER;
+      var CONTRACT_ADDRESS = contract_address = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"; // main: 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b | rinkeby: 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524
+      var NETWORK = "main";
+
+      /*
+        Load web page
+      */
+
+      document.addEventListener("DOMContentLoaded", async () => {
+
+        const web3 = new Web3(window.ethereum);
+        const f0 = new F0();
+
+        COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
+
+        fetch_opensea_data();
+
+        try { // Connect
+
+          await f0.init({
+
+            web3: web3,
+            contract: CONTRACT_ADDRESS,
+            network: NETWORK
+
+          })
+
+          // Assign variables
+
+          user_address = await web3.currentProvider.selectedAddress;
+          user_invites = await f0.myInvites();
+          user_inviteKeys = Object.keys(user_invites);
+          user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
+
+          user_tokens = await collection.methods.balanceOf(user_address).call();
+
+          contract_name = await f0.api.name().call();
+          contract_symbol = await f0.api.symbol().call();
+          contract_id = await f0.api.nextId().call();
+          mint_id = contract_id = parseInt(contract_id);
+
+          if (opensea_failed){
+
+            display_token(contract_id);
+            console.log('Nex token_id : ' + contract_id);
+
+          }
+
+          getInvites();
+
+          console.log('Connected  Smart Contract : '+contract_name+'('+contract_symbol+')');
+          console.log('Ethereum : '+contract_address);
+          console.log('Connected User : '+user_address);
+
+          // Update minting ui
+
+          // Remove token from minting tray
+
+          document.querySelector("#remove_token").addEventListener("click", async (e) => {
+            if (mint_quantity <= 1) {
+              return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
+            } else {
+              mint_quantity = mint_quantity - 1;
+              document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
+              document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
+            }
+          })
+
+          // Add token to minting tray mint_total
+
+          document.querySelector("#add_token").addEventListener("click", async (e) => {
+            if (mint_quantity >= 9) {
+              return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
+            } else {
+              mint_quantity = mint_quantity + 1;
+              document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
+              document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
+            }
+
+            //if (mint_quantity <= (mint_limit - user_tokens)) {
+            //} else { console.log('User mint limit reached!'); console.log('Mint Limit '+mint_limit+' : '+user_tokens+' User Tokens'); }
+
+          })
+
+          // Send mint transaction to provider!
+
+          document.querySelector("#mint_total").addEventListener("click", async (e) => {
+
+            console.log('Sending mint transaction!');
+            console.log(mint_quantity+' FROGS @ Ξ'+mint_price+' : ['+(mint_price*mint_quantity)+']');
+            
+            try {
+                
+              consoleOutput('<br>'+'<strong>Minting ('+mint_quantity+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
+              document.getElementById('pre').style.backgroundColor = '#99ffc5'
+                
+              let tokens = await f0.mint(user_invite, mint_quantity)
+              
+              // AWAIT RESPONSE!
+
+              consoleOutput('<br>'+'<strong>Congratulations</strong><br><b>'+mint_quantity+' FROG(s)</b> have successfully been minted!'+'<p></p>');
+              document.getElementById('pre').style.backgroundColor = '#99ffc5'
+              return; // BREAK!
+
+            } catch (e) {
+                
+              // Something went wrong!
+              
+              consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
+              document.getElementById('pre').style.backgroundColor = '#ff99b6'
+              return; // BREAK!
+
+            }
+
+          })
+
+        } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a class="pointer" href="https://freshfrogs.io/"><b id="connected">🔌 Connect Wallet</b></a>'); }
+
+      })
+
+
+      function consoleOutput(output) {
+        document.getElementById("pre").innerHTML = output
+      }
+
+      function truncateAddress(address) {
+        if (!address) {
+          return "";
+        }
+        return `${address.substr(0, 5)}...${address.substr(
+          address.length - 5,
+          address.length
+        )}`;
+      }
+
+      /*
+        Fetch OpenSea collection data
+      */
+
+      function fetch_opensea_data() {
+
+        // Collection variables
+        // Trait list and rarities
+
+        fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
+        .then(collection => collection.json())
+        .then(collection => {
+
+          var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
+
+          traits_list = traits;
+
+        })
+        .catch(e => {
+
+            console.log('Error: Could not talk to Opensea. (1)');
+            console.error('Error : ' + e.message)
+      
+        });
+        
+        // Pull next available token ID prior to web3 connection
+        //
+
+        fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=12&include_orders=false', options)
+        .then((assets) => assets.json())
+        .then((assets) => {
+
+          var { assets } = assets
+          var contract_id = mint_id = parseInt(assets[0].name.replace('Frog #', '')) + 1;
+
+          display_token(contract_id);
+          console.log('Nex token_id : ' + contract_id);
+
+        })
+        .catch(e => {
+
+          opensea_failed = true;
+          console.log('Error: Could not talk to Opensea. (2)');
+          console.error('Error : ' + e.message)
+
+        });
+
+      }
+
+      // Check invites
+      async function getInvites() {
+
+        mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1);
+        mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1);
+
+        for (var i = 0; i < 10; i++) { 
+
+          if (user_inviteKeys[i] === "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064") {
+
+            if (user_address === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || user_address === "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359_0".toLowerCase() || user_address === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8_0".toLowerCase() || user_address === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
+
+              user_invite = "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064";
+              mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1);
+              mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1);
+
+              break;
+
+            }
+          }
+        }
+        
+        document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
+        consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'Frog #'+mint_id+' is now available to mint!<br>Maximum of <u>'+mint_limit+'</u> Frogs @ Ξ'+mint_price+'<br>'+'<p></p>')
+
+      }
+
+      function load_trait(trait, attribute, where) {
+        newAttribute = document.createElement("img")
+        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
+        newAttribute.id = attribute
+        newAttribute.target = "_blank"
+        if (where == 'frogContainer4') {
+          newAttribute.className = "frogImg4" //shadesAnimation
+        } else {
+          newAttribute.className = "frogImg2" //shadesAnimation
+        }
+        
+        //newAttribute.style.cursor = "pointer"
+        if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
+          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"2.gif"
+        //} else if (attribute === "tongueFly") { 
+        //  newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
+        } else if (attribute === "cyan_tongueFly") { 
+          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
+        } else if (attribute === "morphAnimation") {
+          newAttribute.src = "https://freshfrogs.io/the-pond/Frog/loadMorph.gif"
+        } else if (attribute === "shadesAnimation") {
+          newAttribute.src = "https://freshfrogs.io/the-pond/Eyes/shadesAnimation.gif"
+        } else if (attribute.includes("croaking2")) {
+          console.log('! '+trait+' / '+attribute)
+          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
+        } else {
+          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png"
+        }
+        newAttribute.alt = attribute
+        document.getElementById(where).appendChild(newAttribute)
+      }
+
+      // Display Frog
+      async function display_token(token){
+
+          token_img = 'https://freshfrogs.io/frog/'+token+'.png'
+          token_name = 'Frog #'+token
+
+          document.getElementById('thisheader').style.backgroundImage = 'url('+token_img+')';
+          document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
+
+          var this_place = 'frogContainer4';
+
+          document.getElementById('mint_token').innerHTML = '<strong>'+token_name+'</strong>4040 supply'//+token_type;
+          document.getElementById('mint_token').removeAttribute('href');
+
+          document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ<b id="mint_total_actual">'+(mint_price*mint_quantity)+'</b> +gas';
+          document.getElementById('mint_total').removeAttribute('href');
+
+          document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> <b id="mint_quantity_actual">'+mint_quantity+'</b> <b id="add_token">+</b></strong>quantity';
+          document.getElementById('mint_quantity').removeAttribute('href');
+
+          document.getElementById('frogContainer4').innerHTML = '';
+          
+          try {
+
+            var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
+          
+            for (var i = 0; i < metadata.attributes.length; i++) {
+              var data = metadata.attributes[i];
+              load_trait(data.trait_type, data.value, this_place);
+            }
+
+          } catch (e) { console.log('MetaData Fetch Failed! ' + e.message); }
+
+      }
+
+    </script>
+  </head>
+  <body class="bodyb">
+    <div class="wrapper">
+      <header id="thisheader">
+        <div class="downloads pre">
+          <ul class="downloads2">
+            <li><a id="mint_token" class="pointer" href=""><strong>MINT</strong>Ξ0.01 +gas</a></li>
+            <li><a id="mint_total" class="pointer" href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b"><strong>Etherscan</strong>view on</a></li>
+            <li><a id="mint_quantity" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>OpenSea</strong>view on</a></li>
+          </ul>
+          <div id="mintingTray" class="mintingTray">
+            <div class="bigContainer">
+              <div id="frogContainer3" class="containerMint">
+                <div id="frogContainer4" class="imgWrapperMint">
+                  <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/FLY.gif"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+      <section>
+        <div class="top">{{ content }}</div>
+        <div class="downloads pre">
+          <div id="netStatus" class="netStatus">
+            <div id="recent_mints" class="recent_mints"><img src="https://freshfrogs.github.io/frog/1205.png" class="recentMint"><img src="https://freshfrogs.github.io/frog/1206.png" class="recentMint"><img src="https://freshfrogs.github.io/frog/1207.png" class="recentMint"></div>
+            <br>
+            <h2 style="color: white !important;"><b>FreshFrogsNFT</b></h2>
+            <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
+            opensea.io/collection/fresh-frogs<a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><b id="connected">Shop on OpenSea ⛵</b></a>
+            <hr class="hr2">already own a Frog?<a class="pointer" href="https://freshfrogs.io/the-pond"><b>Stake and Earn Rewards! 🐸</b></a>
+            <br>
+            <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a class="pointer" href="https://freshfrogs.io/"><b id="connected">Connect Wallet 🔌</b></a></div>
+          </div>
+          <br>
+          <div id="thePad" class="thePad"></div>
+        </div>
+      </section>
+    </div>
+    <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
+  </body>
+</html>
