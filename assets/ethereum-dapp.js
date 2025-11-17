@@ -7,10 +7,11 @@
 */
 
 // Public Variables
-var controller, collection, 
-user_address, user_rewards, 
-user_tokenBalance, user_stakedBalance, 
-is_approved, web3, f0, network, eth_usd, next, mint_quantity, user_price, user_limit;
+var controller, collection,
+user_address, user_rewards,
+user_tokenBalance, user_stakedBalance,
+is_approved, web3, f0, network, eth_usd, next, mint_quantity, user_price, user_limit,
+read_only_web3, read_only_controller, read_only_collection;
 
 var sales_volume_eth = 0;
 var sales_volume_usd = 0;
@@ -118,26 +119,6 @@ const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 const options = {method: 'GET', headers: {accept: '*/*', 'x-api-key': frog_api}};
 
-/*
-
-    Fetch NFT token sales (initial & secondary) using Reservoir API. Returns => Object
-    'https://api.reservoir.tools/collections/activity/v6?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&types=mint', options
-*/
-async function fetch_token_sales(contract, limit, next_string) {
-    if (! contract) { contract = COLLECTION_ADDRESS; }
-    if (! limit) { limit = '50'; }
-    if (! next_string) { next = ''; } else { next = '&continuation='+next_string; }
-    fetch('https://api.reservoir.tools/sales/v6?collection=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b?sortBy=time&sortDirection=asc&limit='+limit+next+'', options)
-    .then((data) => data.json())
-    .then((data) => {
-        console.log(data)
-        render_token_sales(contract, data.sales);
-        if (! data.continuation) { return }
-        else { sales_load_button('sales', contract, limit, data.continuation); }
-    })
-    .catch(err => console.error(err));
-}
-
 async function fetch_token_mints(contract, limit, next_string) {
     if (! contract) { contract = COLLECTION_ADDRESS; }
     if (! limit) { limit = '50'; }
@@ -231,67 +212,6 @@ async function update_staked_tokens(tokens) {
 function findRankingById(id) {
     const frog = freshfrogs_rarity_rankings.find(frog => frog.id === id);
     return frog ? frog.ranking : "Error"; // Returns the ranking or a message if ID isn't found
-}
-
-/*
-
-    Create html objects for token sales from fetch_token_sales()
-
-*/
-async function render_token_sales(contract, sales) {
-    sales.forEach(async (token) => {
-
-        var { createdAt, timestamp, from, to, token: { tokenId }, price: { amount: { decimal, usd } }, txHash } = token
-        var sale_date = timestampToDate(timestamp); // createdAt.substring(0, 10);
-
-        if (from !== '0x0000000000000000000000000000000000000000') {
-            saleOrMint = 'Last Sale'
-            txn_string = 'sale'; from = truncateAddress(from)
-            net_income_usd = net_income_usd + (Number(usd))*0.025
-            sales_volume_eth = sales_volume_eth + Number(decimal);
-            sales_volume_usd = sales_volume_usd + Number(usd);
-            receiver = 'Owner'
-        } else {
-            saleOrMint = 'Birthday'
-            txn_string = 'mint'; from = 'FreshFrogsNFT';
-            net_income_usd = net_income_usd + Number(usd)
-            mint_volume_eth = mint_volume_eth + Number(decimal);
-            mint_volume_usd = mint_volume_usd + Number(usd);
-            receiver = 'Creator'
-        }
-
-        //if (txn_string == 'sale') {
-
-        
-            var html_elements = 
-                
-                '<div class="infobox_left">'+
-                    '<text class="card_text">'+receiver+'</text>'+'<br>'+
-                    '<text class="card_bold">'+truncateAddress(to)+'</text>'+
-                '</div>'+
-                '<div class="infobox_right">'+
-                    '<text class="card_text">Last Sale</text>'+'<br>'+
-                    '<text id="frog_type" class="card_bold">'+'</text>'+'<text id="usd_price" class="usd_price">$'+usd.toFixed(2)+'</text>'+
-                '</div>'+
-                '<br>'+
-                '<div class="infobox_left">'+
-                    '<text class="card_text">Frog Type</text>'+'<br>'+
-                    '<text class="card_bold" id="'+tokenId+'_frogType"></text>'+
-                '</div>'+
-                '<div class="infobox_right">'+
-                    '<text class="card_text">Rarity</text>'+'<br>'+
-                    '<text id="rarityRanking_'+tokenId+'" class="card_bold">--</text>'+
-                '</div>'+
-                '<div id="buttonsPanel_'+tokenId+'" class="card_buttonbox">'+
-                    '<a href="https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="etherscan_button">Etherscan</button></a>'+
-                    '<a href="https://opensea.io/assets/ethereum/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId+'" target="_blank"><button class="opensea_button">Opensea</button></a>'+
-                '</div>';
-
-            await build_token(html_elements, tokenId, tokenId+':'+createdAt, txn_string, txHash);
-
-        //}
-    })
-
 }
 
 async function render_token_mints(contract, mints) {
@@ -1661,12 +1581,79 @@ async function stakingValues(tokenId) {
     stakerAddress(<input> (uint256)) | return staker's address or false
 
 */
+function getReadOnlyWeb3() {
+    if (web3) { return web3; }
+    if (read_only_web3) { return read_only_web3; }
+    if (typeof Web3 === 'undefined') { return null; }
+    try {
+        const providerUrl = 'https://eth-mainnet.g.alchemy.com/v2/'+frog_api;
+        read_only_web3 = new Web3(new Web3.providers.HttpProvider(providerUrl));
+        return read_only_web3;
+    } catch (error) {
+        console.warn('Unable to initialize read-only web3 provider', error);
+        return null;
+    }
+}
+
+function getControllerContract() {
+    if (controller && controller.methods && typeof controller.methods.stakerAddress === 'function') {
+        return controller;
+    }
+    if (read_only_controller && read_only_controller.methods && typeof read_only_controller.methods.stakerAddress === 'function') {
+        return read_only_controller;
+    }
+    const provider = getReadOnlyWeb3();
+    if (!provider) { return null; }
+    try {
+        read_only_controller = new provider.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
+        return read_only_controller;
+    } catch (error) {
+        console.warn('Unable to initialize controller contract', error);
+        return null;
+    }
+}
+
+function getCollectionContract() {
+    if (collection && collection.methods && typeof collection.methods.ownerOf === 'function') {
+        return collection;
+    }
+    if (read_only_collection && read_only_collection.methods && typeof read_only_collection.methods.ownerOf === 'function') {
+        return read_only_collection;
+    }
+    const provider = getReadOnlyWeb3();
+    if (!provider) { return null; }
+    try {
+        read_only_collection = new provider.eth.Contract(COLLECTION_ABI, COLLECTION_ADDRESS);
+        return read_only_collection;
+    } catch (error) {
+        console.warn('Unable to initialize collection contract', error);
+        return null;
+    }
+}
+
+async function getCurrentOwner(tokenId) {
+    const contract = getCollectionContract();
+    if (!contract) { return null; }
+
+    try {
+        return await contract.methods.ownerOf(tokenId).call();
+    } catch (error) {
+        console.warn('Unable to resolve owner for Frog #'+tokenId, error);
+        return null;
+    }
+}
+
 async function stakerAddress(tokenId) {
+    const contract = getControllerContract();
+    if (!contract) { return false; }
 
-    let stakerAddress = await controller.methods.stakerAddress(tokenId).call();
-    if (stakerAddress !== '0x0000000000000000000000000000000000000000') { return stakerAddress; }
-    else { return false; }
-
+    try {
+        let stakerAddress = await contract.methods.stakerAddress(tokenId).call();
+        if (stakerAddress && stakerAddress !== '0x0000000000000000000000000000000000000000') { return stakerAddress; }
+    } catch (error) {
+        console.warn('Unable to fetch staker for Frog #'+tokenId, error);
+    }
+    return false;
 }
 
 /*
