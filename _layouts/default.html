@@ -1,28 +1,35 @@
 <!DOCTYPE html>
+<!-- Twitter universal website tag code -->
+<script>
+  !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+  },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='//static.ads-twitter.com/uwt.js',
+  a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+  // Insert Twitter Pixel ID and Standard Event data below
+  twq('init','o8j78');
+  twq('track','PageView');
+  </script>
+  <!-- End Twitter universal website tag code -->
 <style>
-
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
-
   html{
     background-image: url("/assets/background.png");
   }
   html,h1,h2,h3 {
-    font-family: 'Open Sans', sans-serif !important;
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
   }
   #myProgress {
     width: 50%;
-    background: white;
+    background: #7cc1ff;
     margin-top: 8px;
     margin-left: auto;
     margin-right: auto;
-    border: 1px solid #7cc1ff;
+    border: 1px solid white;
     border-radius: 5px;
     overflow: hidden;
   }
   #myBar {
     width: 1%;
     height: 18px;
-    background-color: #7cc1ff;
+    background-color: white;
     border-radius: 1px;
   }
 
@@ -38,7 +45,7 @@
     margin-top: 5%;
   }
   .top {
-    margin: 0%;
+    margin: 0% !important;
     image-rendering: pixelated;
     text-align: center;
   }
@@ -50,7 +57,7 @@
     width: 128px;
   }
   .smallContainer2 {
-    border-radius: 0px;
+    border-radius: 5px;
     overflow: hidden;
     background-color: transparent;
     width: 128px;
@@ -91,111 +98,17 @@
     image-rendering: pixelated;
     transition: .2s;
   }
-  .mintingTray {
-    text-align: center;
-    vertical-align: center;
-    height: auto;
+  .bigContainer {
     border-radius: 5px;
+    border: 0px solid #e0e0e0;
     overflow: hidden;
-    transition: box-shadow .2s;
-    width: 256px;
+    background-color: rgba(122, 122, 122, 0.20);
     margin-left: auto;
     margin-right: auto;
-    color: white !important;
-  }
-  .label_name {
-      text-align: left;
-      float: left;
-      margin-left: 2.5%;
-      padding: 5%;
-      padding-bottom: 0%;
-      color: gray;
-  }
-  .label_price {
-      text-align: right;
-      float: right;
-      margin-right: 2.5%;
-      padding: 5%;
-      padding-bottom: 0%;
-      color: gray;
-  }
-  .switch_button {
-      margin-left: auto;
-      margin-right: auto;
-      background: transparent;
-      margin-top: 5%;
-      border: 1px solid lightgray;
-      padding: 0px;
-      width: 20px;
-      height: 20px;
-      border-radius: 100%;
-      font-family: inherit;
-      transition: all .2s ease;
-      text-align: center;
-      cursor: pointer;
-  }
-  .switch_button:hover {
-      box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);
-      background-color: #7cc1ff;
-      color: white;
-  }
-  .frog_name {
-      text-align: left;
-      font-weight: bold;
-      float: left;
-      padding: 5%;
-      padding-top: 0%;
-      margin-left: 2.5%;
-  }
-  .frog_price {
-      text-align: right;
-      font-weight: bold;
-      float: right;
-      padding: 5%;
-      padding-top: 0%;
-      margin-right: 2.5%;
-  }
-  .bigContainer {
-      overflow: hidden;
-      width: 256px;
-      height: 256px;
-      image-rendering: pixelated !important;
-  }
-  .containerMint {
-      width: auto;
-      margin-bottom: 0px;
-      margin-top: 0px;
-      background-color: transparent;
-
-      display: -webkit-box;
-      -webkit-box-orient: horizontal;
-      -webkit-box-pack: center;
-      -webkit-box-align: center;
-
-      display: -moz-box;
-      -moz-box-orient: horizontal;
-      -moz-box-pack: center;
-      -moz-box-align: center;
-
-      display: box;
-      box-orient: horizontal;
-      box-pack: center;
-      box-align: center;
-      overflow: hidden;
-  }
-
-  .imgWrapperMint {
-      -webkit-box-flex: 13;
-      -moz-box-flex: 1;
-      box-flex: 1;
-      overflow: hidden;
-  }
-  .frogImgMint {
-      transition: transform .2s;
-      height: auto;
-      display: block;
-      image-rendering: pixelated;
-      overflow: hidden;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    width: 256px;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
   }
   .headLine{
     color: transparent;
@@ -210,32 +123,32 @@
   .headLine2 {
     margin-left: auto;
     margin-right: auto;
-    image-rendering: crisp-edges;
+    image-rendering: auto !important;
     margin-bottom: 2%;
   }
   .headLineImg {
     float: none;
     image-rendering: crisp-edges;
-    height: 18px;
-    vertical-align: middle;
+    height: 32px;
+    vertical-align: top;
     border-radius: 100%;
     padding: 0px;
     transition: transform .2s;
-    margin-left: 2%;
-    margin-right: 2%;
-    margin-bottom: 2%;
-    margin-top: 2%;
-    background-color: transparent;
+    margin-left: 3%;
+    margin-right: 3%;
+    margin-bottom: 3%;
+    margin-top: 3%;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
   }
   .headLineImg:hover{
-    -ms-transform: scale(1.1); /* IE 9 */
-    -webkit-transform: scale(1.1); /* Safari 3-8 */
-    transform: scale(1.1);
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Safari 3-8 */
+    transform: scale(1.5);
     box-shadow: none;
     border: none;
   }
   .h1 {
-    font-family: 'Open Sans', sans-serif !important;
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
     font-weight: 800;
     color: white;
     text-align: center;
@@ -244,7 +157,7 @@
     font-size: xx-large;
   }
   .supply{
-    font-family: 'Open Sans', sans-serif !important;
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
     color: #333;
     border-radius: 5px;
     border: 1px solid #e0e0e0;
@@ -266,41 +179,43 @@
     padding: 0;
     background: white;
     border-radius: 5px;
-    border: 1px solid black;
+    border: 1px solid white;
     width: 270px;
     box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
     margin-left: auto;
     margin-right: auto;
-    margin-top: 16px;
-    margin-bottom: 0px;
+    margin-top: 2%;
     line-height: 1;
     text-align: center;
     vertical-align: middle;
   }
   section {
-    font-family: 'Open Sans', sans-serif !important;
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
     font-size: auto;
     color: white !important;
     background-color: #7cc1ff;
     text-align: center;
     border-radius: 7px;
-    padding: 0px !important;
+    padding: 14px;
+    padding-bottom: 16px !important;
+    padding-top: 0px !important;
+    width: auto;
     overflow: hidden;
     margin-bottom: 16px;
   }
   header {
+    border: 4px solid #7cc1ff;
     overflow: hidden;
+
     background-color: #7cc1ff;
     text-align: center;
-    border-radius: 5px;
+    border-radius: 7px;
+    padding: 14px;
     width: auto;
-    font-family: 'Open Sans', sans-serif !important;
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
     font-size: auto !important;
-    margin-bottom: 16px !important;
+
     color: #333;
-    padding-bottom: 0px !important;
-    padding-left: 14px;
-    padding-right: 14px;
   }
   .desc {
     position: relative;
@@ -316,10 +231,9 @@
     margin-left: auto;
     margin-right: auto;
     padding: 14px;
-    image-rendering: pixelated;
   }
   .downloads a{
-    font-family: 'Open Sans', sans-serif !important;
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
     font-size: inherit !important;
     color: inherit !important;
   }
@@ -380,42 +294,13 @@
   }
   .frogImg3 {
     transition: transform .2s;
+    height: auto;
     display: block;
     image-rendering: pixelated;
     overflow: hidden;
     position: absolute;
-    width: 1024px !important;
-    height: 1024px !important;
-    border-radius: 5px;
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
-    max-width: 400% !important;
-  }
-  .frogImg4 {
-    transition: transform .2s;
-    display: block;
-    image-rendering: pixelated;
-    overflow: hidden;
-    position: absolute;
-    width: 256px;
-    height: 256px;
-    border-radius: 5px;
-  }
-  .frogImg4:hover{
-    -ms-transform: scale(1.1); /* IE 9 */
-    -webkit-transform: scale(1.1); /* Safari 3-8 */
-    transform: scale(1.1);
-    opacity: 0.2;
-  }
-  .frogImg5 {
-    transition: all .2s;
-    display: block;
-    image-rendering: pixelated;
-    overflow: hidden;
-    position: absolute;
-    width: 256px;
-    height: 256px;
-    border-radius: 5px;
+    height: auto;
+    width: auto;
   }
   .smallContainer3:hover{
     -ms-transform: scale(1.1); /* IE 9 */
@@ -423,10 +308,6 @@
     transform: scale(1.1);
     box-shadow: none;
     border: none;
-  }
-  .pointer2 {
-    transition: transform .2s;
-    cursor: pointer;
   }
   .pointer {
     transition: transform .2s;
@@ -462,7 +343,7 @@
     margin-top: 1%;
   }
   .h2 {
-    font-family: 'Open Sans', sans-serif !important;
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
     font-weight: 750;
     text-align: center;
     padding: 0%;
@@ -470,7 +351,7 @@
     font: "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
     margin-top: 8px;
     margin-bottom: 0px;
-    line-height: 1.1;
+    line-height: 1.25;
   }
   .frogType2 {
     border-radius: 5px;
@@ -483,12 +364,11 @@
     display: inline-block !important;
   }
   .learnMoreFM {
-    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
-    background: white;
-    border: 1px solid white;
+    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
+    background: #f4f4f4;
+    border: 1px solid lightgray;
     border-radius: 5px;
     padding: 5px;
-    color: #333
   }
   .myProgress {
     width: 50%;
@@ -499,7 +379,7 @@
     border: 1px solid #324d64;
     border-radius: 5px;
     height: 18px;
-    font-family: 'Open Sans', sans-serif !important;
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
     font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     vertical-align: middle;
   }
@@ -509,17 +389,15 @@
     border: 0px solid white;
     box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
     padding: 4px;
+    color: #333 !important;
   }
   .mintingTextWhite {
-    background-color: white;
+    background-color: #faff99;
     border-radius: 5px;
-    border-top-left-radius: 0%;
-    border-top-right-radius: 0%;
     border: 0px solid white;
-    margin: 8px;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
+    padding: 4px;
     color: #333 !important;
-    box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);
-    overflow: hidden;
   }
   .mintingTextRed {
     background-color: #ff99b6;
@@ -527,132 +405,158 @@
     border: 0px solid white;
     box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
     padding: 4px;
+    color: #333 !important;
   }
   .thePad {
     border-radius: 5px;
     padding: 4px;
     background-color: #7cc1ff;
-    vertical-align: bottom;
   }
   .headerDiv {
-    border-bottom: 2px solid #7cc1ff;
     padding: 4px;
     border-radius: 5px;
     color: white !important;
+    margin: 0px !important;
   }
   .frogPanel {
     display: inline-block !important;
     image-rendering: pixelated;
     text-align: center;
+    border: 1px solid #7cc1ff;
     border-radius: 5px;
-    padding: 0px !important;
-    margin: 8px;
-    background-color: white;
-    box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
-    overflow: hidden;
-    border: 0px solid white;
-  }
-  .frogPanel2 {
-    display: inline-block !important;
-    image-rendering: pixelated;
-    text-align: center;
-    border-radius: 5px;
-    padding: 0px !important;
-    margin: 8px;
-    background-color: white;
-    box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
-    overflow: hidden;
-    border: 0px solid white;
-    transition: all .2s;
-  }
-  .frogPanel2:hover {
-    box-shadow: 0px 0px 6px 6px #7cc1ff;
+    padding: 4px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin: 2px;
+    background-color: #7cc1ff;
   }
   .attributeList {
     border: 1px solid white;
     border-radius: 5px;
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px;
-    padding: 0px !important;
-    padding-bottom: 4px !important;
+    padding: 6px;
     overflow: hidden;
     background-color: white;
     color: #333;
-    width: 100%;
-    margin: 0px !important;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
+    width: 128px;
   }
-  .trait {
+  .trait{
     border-radius: 2px;
     background: white;
     color: rgba(126, 183, 128, 1);
     font-size: x-small;
     padding: 1px;
   }
-  .userAddress {
-    padding-left: 1px;
-    padding-right: 1px;
-    border-radius: 5px;
-    background: white;
-    color: #7cc1ff;
-  }
-  .mintingTextWhite2 {
-    background-color: antiquewhite;
-    border: 1px solid black;
-    padding: 16px;
-    color: #333 !important;
-    box-shadow: 3px 3px rgb(122 122 122 / 20%);
+  .divTimeline {
+    width: 300px;
     margin: auto;
-    border-radius: 5px;
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
-    overflow: hidden;
   }
-  #banner_image {
-    width: 100%;
-    padding: 0% !important;
-    margin: 0% !important;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
+  .pTimeline {
+    border-top: 2px dashed;
+    border-color: white !important;
+    margin:0; padding: 30px;
+  }
+  .pTimeline:nth-child(even) {
+    border-left: 2px dashed;
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+    margin-right: 30px; 
+    padding-right: 0;
+  }
+  .pTimeline:nth-child(odd) {
+    border-right: 2px dashed;
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+    margin-left: 30px; 
+    padding-left: 0;
+  }
+  .pTimeline:first-child {
+    border-top: 0;
+    border-top-right-radius:0;
+    border-top-left-radius:0;
+  }
+  .pTimeline:last-child {
+    border-bottom-right-radius:0;
+    border-bottom-left-radius:0;
+  }
+  #growTray {
+    -moz-transition: height .5s;
+    -ms-transition: height .5s;
+    -o-transition: height .5s;
+    -webkit-transition: height .5s;
+    transition: height .5s;
+    height: 0;
+  }
+  #growTerminal {
+    -moz-transition: height .5s;
+    -ms-transition: height .5s;
+    -o-transition: height .5s;
+    -webkit-transition: height .5s;
+    transition: height .5s;
+    height: 0;
+  }
+  .containerMint {
+    width: auto;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    background-color: transparent;
+
+    display: -webkit-box;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+
+    display: -moz-box;
+    -moz-box-orient: horizontal;
+    -moz-box-pack: center;
+    -moz-box-align: center;
+
+    display: box;
+    box-orient: horizontal;
+    box-pack: center;
+    box-align: center;
+  }
+  .imgWrapperMint {
+    -webkit-box-flex: 13;
+    -moz-box-flex: 1;
+    box-flex: 1;
+  }
+  .frogImgMint {
+    transition: transform .2s;
+    height: auto;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    border-radius: 5px;
+  }
+  .frogImgMint:hover{
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Safari 3-8 */
     transform: scale(1.5);
-    image-rendering: auto;
-    overflow: hidden;
+    box-shadow: none;
+    border: none;
   }
-  .recentMint {
-    width: 128px;
-    height: 128px;
+  .consoleOutput {
     border-radius: 5px;
-    box-shadow: 3px 3px rgb(122 122 122 / 20%);
-    margin: 4px;
-    border: 1px solid black;
-  }
-  .recent_mints {
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 5%;
-    margin-bottom: auto;
-    width: 90%;
+    padding: 8px;
+    background: transparent;
+    color: white;
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
-  <link rel="icon" href="../assets/logo.png">
+  <link rel="icon" href="./assets/logo.png">
   <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ "../assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
+    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
     
-    <script>
-      window.ALCHEMY_API_KEY = {{ site.alchemy_api_key | default: '' | jsonify }};
-    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
-    <script src="https://freshfrogs.github.io/assets/abi/controller_abi.js"></script>
-    <script src="https://freshfrogs.github.io/assets/abi/collection_abi.js"></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
     <script>
@@ -662,351 +566,461 @@
       gtag('js', new Date());
       gtag('config', 'G-6PB0WKB4SH');
       // -- >
+      // Assign Global Variables
 
-      /*
-        Assign Public Variables
-      */
-
-      //
-      const ALCHEMY_API_KEY = window.ALCHEMY_API_KEY || 'demo';
-      const ALCHEMY_BASE_URL = 'https://eth-mainnet.g.alchemy.com/nft/v2/' + ALCHEMY_API_KEY;
-      const TRAIT_DATA_URL = 'https://freshfrogs.github.io/assets/data/traits.json';
-      let traitDataPromise;
-      //
-
-      // User Variables
-
-      var user_address, user_invites, user_inviteKeys, user_tokens, user_invite;
-
-      // Function Variables
-
-      var mint_id, alchemy_failed;
-      var mint_price = 0.01;
-      var mint_quantity = 1;
-
-      // Contract Variables
-
-      var contract_name, contract_symbol, contract_id, collection, COLLECTION, traits_list, controller, CONTROLLER;
-      var CONTRACT_ADDRESS = contract_address = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b"; // main: 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b | rinkeby: 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524
-      var NETWORK = "main";
-
-      /*
-        Load web page
-      */
+      var frogCount;
 
       document.addEventListener("DOMContentLoaded", async () => {
+        // Connect Wallet / Load Minting Terminal
+        //connectWallet();
+        // Connect Ethereum Wallet
 
-        const web3 = new Web3(window.ethereum);
-        const f0 = new F0();
+        const web3 = new Web3(window.ethereum);   // Open WEB3.0 Browsner Exentions Window
+        const f0 = new F0();    // Connect to Factoria
+        const CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";    // Contract Address (Ethereum Mainnet) 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b // Rinkeby: 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524
+        const COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
+        const NETWORK = "main";   // Which Network?
 
-        COLLECTION = collection = new web3.eth.Contract(COLLECTION_ABI, CONTRACT_ADDRESS);
+        // Rarities
+        // Attribute Rarities
+        var attributesTotal = {
+          'goldChain' : 0,
+          'goldDollarChain' : 0,
+          'silverChain' : 0,
+          'silverEthChain' : 0,
+          'circleGlasses' : 0,
+          'circleNightVision' : 0,
+          'circleShadesPurple' : 0,
+          'circleShadesRed' : 0,
+          'shades' : 0,
+          'shadesPurple' : 0,
+          'shadesThreeD' : 0,
+          'shadesWhite' : 0,
+          'blueDartFrog' : 0,
+          'blueTreeFrog' : 0,
+          'brownTreeFrog' : 0,
+          'cyanTreeFrog' : 0,
+          'goldenDartFrog' : 0,
+          'goldenTreeFrog' : 0,
+          'grayTreeFrog' : 0,
+          'greenTreeFrog' : 0,
+          'lightBrownTreeFrog' : 0,
+          'natural' : 0,
+          'orangeTreeFrog' : 0,
+          'pinkTreeFrog' : 0,
+          'purpleTreeFrog' : 0,
+          'redEyedTreeFrog' : 0,
+          'splendidLeafFrog' : 0,
+          'stawberryDartFrog' : 0,
+          'tomatoFrog' : 0,
+          'treeFrog(1)' : 0,
+          'treeFrog(2)' : 0,
+          'treeFrog(2)' : 0,
+          'treeFrog(4)' : 0,
+          'treeFrog(5)' : 0,
+          'treeFrog(6)' : 0,
+          'treeFrog(7)' : 0,
+          'treeFrog(8)' : 0,
+          'unknown' : 0,
+          'baseballCapBlue' : 0,
+          'baseballCapRed' : 0,
+          'baseballCapWhite' : 0,
+          'cowboyHatBlack' : 0,
+          'cowboyHatBrown' : 0,
+          'cowboyHatTan' : 0,
+          'cowboyHatWhite' : 0,
+          'crown' : 0,
+          'stockingCap' : 0,
+          'topHatBlue' : 0,
+          'topHatRed' : 0,
+          'topHatYellow' : 0,
+          'witchBlack' : 0,
+          'witchBrown' : 0,
+          'witchStraw' : 0,
+          'bandannaBlue' : 0,
+          'bandannaRed' : 0,
+          'mask' : 0,
+          'smoking' : 0,
+          'smokingCigar' : 0,
+          'smokingPipe' : 0,
+          'tongue' : 0,
+          'tongueFly' : 0,
+          'tongueSpider' : 0,
+          'tongueSpiderRed' : 0,
+          'closedEyes' : 0,
+          'croaking' : 0,
+          'inversedEyes' : 0,
+          'peace' : 0,
+          'thirdEye' : 0,
+          'blue(2)' : 0,
+          'blue' : 0,
+          'brown' : 0,
+          'cyan' : 0,
+          'darkGreen' : 0,
+          'green' : 0,
+          'orange(2)' : 0,
+          'orange' : 0,
+          'pink' : 0,
+          'purple(2)' : 0,
+          'purple' : 0,
+          'red(2)' : 0,
+          'red' : 0,
+          'sand' : 0,
+          'white(2)' : 0,
+          'white' : 0,
+          'yellow(2)' : 0,
+          'yellow' : 0
+        } // Start at 0
 
-        fetch_alchemy_data();
+        // CONST Website Variables
+        var frogCount = 1;
 
-        try { // Connect
+        // Load OpenSea API :)
 
+        const options = {
+          method: 'GET',
+          headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
+        };
+        
+        fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=3&include_orders=false', options)
+        .then((res) => res.json())
+        .then((res) => {
+          //console.log(res)
+          var { assets } = res
+          var nextIdC = parseInt(assets[0].name.replace('Frog #', '')) + 1;
+          // Messages Sent to Terminal
+          document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
+          document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.io/frog/"+nextIdC+".png");
+
+          assets.forEach((frog) => { // For Each FROG
+            var { name, token_metadata, permalink, traits } = frog
+
+            // Attribute Rarities
+            //console.log('Loading... '+name);
+            for (var i = 0; i < traits.length; i++) {
+              attributesTotal[traits[i].value] = traits[i].trait_count
+            }
+            //console.log('Next ID: '+nextIdC)
+            let thisToken = frog.name.replace('Frog #', '');
+
+            loadFreshFrog(thisToken);
+            openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
+            document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a class="pointer" href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+frog.name+'</u></b> ↗️'+'</a>';
+            
+            fetch(token_metadata)
+            .then((metadata) => metadata.json())
+            .then((metadata) => {
+              // Loop Attributes
+              for (var i = 0; i < metadata.attributes.length; i++){
+                //console.log(metadata.attributes[i]);
+
+                // Trait_Type : Value
+                var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                let trait_type = attribute.trait_type
+                let value = attribute.value
+                let trait_rarity = ((attributesTotal[value]/nextIdC)*100).toFixed(2);
+
+                // Build Fresh Frogs Attributes
+                loadAttribute(trait_type, value, frog.name)
+                newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
+                if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
+                  else { newAttribute.innerHTML = value.slice(0, 10) + '...' + ' <b><i class="trait">'+trait_rarity+'%</i></b>'; }
+                newAttribute.className = value;
+                space = document.createElement('br')
+                document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
+                document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
+              }
+            })
+          })
+        }) // End OpenSea API
+        .catch((e) => {
+          console.log('Could not talk to OpenSea! '+e.message)
+        })
+
+
+        try {   // Connect Wallet
           await f0.init({
-
             web3: web3,
             contract: CONTRACT_ADDRESS,
             network: NETWORK
-
           })
 
-          // Assign variables
+          // Assign Variables (Fetch from Connect)
+          // CONNECTED USER'S WALLET ADDRESS; AND INVITES
+          userAcc = await web3.currentProvider.selectedAddress;
+          addressCut = userAcc.substring(0, 5)+".."+userAcc.slice(-4);
+          userInviteList = await f0.myInvites();
+          userInviteKeys = Object.keys(userInviteList);
 
-          user_address = await web3.currentProvider.selectedAddress;
-          user_invites = await f0.myInvites();
-          user_inviteKeys = Object.keys(user_invites);
-          user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
+          // CONTRACT NAME, SYMBOL, NEXT ID
+          name = await f0.api.name().call();
+          symbol = await f0.api.symbol().call();
+          nextId = await f0.api.nextId().call();
+          nextIdC = parseInt(nextId);
 
-          user_tokens = await collection.methods.balanceOf(user_address).call();
+          userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
+          getInvites(); // Check and Confirm Invite Keys
+          
+          console.log('Wallet Connected! '+userAcc);
+          console.log('Contract Connected! '+name+' | '+symbol);
 
-          contract_name = await f0.api.name().call();
-          contract_symbol = await f0.api.symbol().call();
-          contract_id = await f0.api.nextId().call();
-          mint_id = contract_id = parseInt(contract_id);
+          // Clear Status
 
-          if (alchemy_failed){
+          document.getElementById('netStatus').innerHTML = '';
+          
+          // Messages Sent to Terminal (Again)
+          document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
+          document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.io/frog/"+nextIdC+".png");
 
-            display_token(contract_id);
-            console.log('Nex token_id : ' + contract_id);
+          // ----------------------------->
 
+          mint = 1; // <--- Mint On or Off? 1 / 0
+
+          // <-----------------------------
+
+          // Done! Ready to mint!
+        } catch (e) { // Failed; Send Error Code!
+          consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><b>''</b>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
+          return;
+        }
+
+        //document.getElementById("nextTokenImg").setAttribute("src", nextToken.converted.image)                // Set preview image to next token ID
+        //document.getElementById("supply").innerHTML = "<b><strong><a style='color: #222 !important;' href='https://opensea.io/collection/fresh-frogs' target='_blank'>ℹ️ ("+nextIdC+"/4040) Total Supply</a></strong></b>"
+        //consoleOutput("<hr><b><strong>FROG #"+nextIdC+"</strong></b> is now available to mint...");//\n<br>\nSet recommended gas fee to lowest setting... <b><a id='HTP' class='pointer'>Set safeLow</a></b>")
+        //document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"                 // Update Mint button <div class='popup'><span class='popuptext show' id='myPopup'>MAX 16 FROG per Wallet</span></div>
+        document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
+        document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
+        //document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
+        consoleOutput("<div id='mintingText'>Please connect an Ethereum wallet... <b><i>"+addressCut+" ✔️</b></i>"+"<br><b>FROG #"+nextIdC+"</b> available to mint... Limit: <b>"+mintLimit+" Frogs</b> per Wallet")
+
+        consoleOutput('<br><hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.io/the-pad">🍀 <b>freshfrogs.io/the-pad</b> ↗️</a>');
+        // Recent Mints
+        // Event Listeners 
+        // MINT -- Send the transaction to mint!
+        document.querySelector("#mintTransact").addEventListener("click", async (e) => {
+          if (mint === 0) { // || nextIdC >= 3021
+            consoleOutput("<div class='mintingTextRed'><b>Mint Open 04/22/22 8:00 PM (UTC)</b>"+"<b><u><a class='pointer' target='_blank' href='https://discord.gg/xWMFWgpvd3'>Join Discord!</b></u></a></div>")
+            return; // BREAK!
+
+          } else { // SEND MINT TX!
+
+            try { // Attempt to Send!
+              document.getElementById('mintingText').innerHTML = "<strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the page!"
+              document.getElementById('mintingText').className = "mintingTextWhite"
+              
+              let tokens = await f0.mint(userInvite, frogCount) // AWAIT RESPONSE!
+
+            } catch (e) { // Something went wrong!
+              //consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><b>''</b>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
+              document.getElementById('mintingText').innerHTML = "Something went wrong! <br><b>''</b>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a>"
+              document.getElementById('mintingText').className = "mintingTextRed"
+              return; // BREAK!
+            }
+            // MINT SENT NO PROBLEMS!
+            document.getElementById('mintingText').innerHTML = "<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3> <b>"+frogCount+" FROG(s) </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>"
+            document.getElementById('mintingText').className = "mintingTextGreen"
+            return; // BREAK!
           }
-
-          getInvites();
-
-          console.log('Connected  Smart Contract : '+contract_name+'('+contract_symbol+')');
-          console.log('Ethereum : '+contract_address);
-          console.log('Connected User : '+user_address);
-
-          // Update minting ui
-
-          // Remove token from minting tray
-
-          document.querySelector("#remove_token").addEventListener("click", async (e) => {
-            if (mint_quantity <= 1) {
-              return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
-            } else {
-              mint_quantity = mint_quantity - 1;
-              document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
-              document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
-            }
-          })
-
-          // Add token to minting tray mint_total
-
-          document.querySelector("#add_token").addEventListener("click", async (e) => {
-            if (mint_quantity >= 9) {
-              return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
-            } else {
-              mint_quantity = mint_quantity + 1;
-              document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
-              document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
-            }
-
-            //if (mint_quantity <= (mint_limit - user_tokens)) {
-            //} else { console.log('User mint limit reached!'); console.log('Mint Limit '+mint_limit+' : '+user_tokens+' User Tokens'); }
-
-          })
-
-          // Send mint transaction to provider!
-
-          document.querySelector("#mint_total").addEventListener("click", async (e) => {
-
-            console.log('Sending mint transaction!');
-            console.log(mint_quantity+' FROGS @ Ξ'+mint_price+' : ['+(mint_price*mint_quantity)+']');
-            
-            try {
-                
-              consoleOutput('<br>'+'<strong>Minting ('+mint_quantity+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
-              document.getElementById('pre').style.backgroundColor = '#99ffc5'
-                
-              let tokens = await f0.mint(user_invite, mint_quantity)
-              
-              // AWAIT RESPONSE!
-
-              consoleOutput('<br>'+'<strong>Congratulations</strong><br><b>'+mint_quantity+' FROG(s)</b> have successfully been minted!'+'<p></p>');
-              document.getElementById('pre').style.backgroundColor = '#99ffc5'
-              return; // BREAK!
-
-            } catch (e) {
-                
-              // Something went wrong!
-              
-              consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
-              document.getElementById('pre').style.backgroundColor = '#ff99b6'
-              return; // BREAK!
-
-            }
-
-          })
-
-        } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a class="pointer" href="https://freshfrogs.github.io/"><b id="connected">🔌 Connect Wallet</b></a>'); }
-
-      })
-
-
-      function consoleOutput(output) {
-        document.getElementById("pre").innerHTML = output
-      }
-
-      function load_trait_data() {
-        if (traits_list) {
-          return Promise.resolve(traits_list);
-        }
-        if (!traitDataPromise) {
-          traitDataPromise = fetch(TRAIT_DATA_URL)
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error('Failed to load trait data');
-              }
-              return response.json();
-            })
-            .then((traits) => {
-              traits_list = traits;
-              return traits;
-            })
-            .catch((error) => {
-              console.error('Trait data unavailable', error);
-              traits_list = {};
-              return traits_list;
-            });
-        }
-        return traitDataPromise;
-      }
-
-      function truncateAddress(address) {
-        if (!address) {
-          return "";
-        }
-        return `${address.substr(0, 5)}...${address.substr(
-          address.length - 5,
-          address.length
-        )}`;
-      }
-
-      /*
-        Fetch collection data via Alchemy
-      */
-
-      function fetch_alchemy_data() {
-
-        load_trait_data();
-
-        fetch(ALCHEMY_BASE_URL + '/getContractMetadata/?contractAddress=' + CONTRACT_ADDRESS)
-        .then((metadata) => metadata.json())
-        .then((metadata) => {
-
-          var contractMetadata = metadata.contractMetadata || {};
-          var totalSupply = parseInt(contractMetadata.totalSupply || 0);
-          var contract_id = mint_id = totalSupply + 1;
-
-          display_token(contract_id);
-          console.log('Next token_id : ' + contract_id);
-
         })
-        .catch(e => {
-
-          alchemy_failed = true;
-          console.log('Error: Could not talk to Alchemy.');
-          console.error('Error : ' + e.message)
-
-        });
-
+        // Remove FROG from minting tray
+        document.querySelector("#removeFrog").addEventListener("click", async (e) => {
+          if (frogCount >= 7) {
+            var select = document.getElementById("frogContainer");
+            select.removeChild(select.lastChild);
+            frogCount = frogCount - 1
+          } else if (frogCount >= 4) {
+            var select = document.getElementById("frogContainer2");
+            select.removeChild(select.lastChild);
+            frogCount = frogCount - 1
+          } else if (frogCount >= 2) {
+            var select = document.getElementById("frogContainer3");
+            select.removeChild(select.lastChild);
+            frogCount = frogCount - 1
+          }
+          if (frogCount <= 1) {
+            mintList = nextIdC
+          } else {
+            mintList = nextIdC+" - "+((nextIdC-1)+frogCount)
+          }
+          document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
+          document.getElementById("frogQuant").innerHTML = "  "+frogCount+"  "
+          document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
+          document.getElementById("supply").innerHTML = "FROG(s) # "+mintList // Supply
+        })
+        // ADD FROG to minting tray
+        document.querySelector("#addFrog").addEventListener("click", async (e) => {
+          if (frogCount !== 9) {
+            if (frogCount <= 2) {
+              newFrog = document.createElement("div")
+              newFrog.className = "imgWrapperMint"
+              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frogCount)+".png'/>"
+              document.getElementById("frogContainer3").appendChild(newFrog)
+              frogCount = frogCount + 1
+            } else if (frogCount <= 5) {
+              newFrog = document.createElement("div")
+              newFrog.className = "imgWrapperMint"
+              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frogCount)+".png'/>"
+              document.getElementById("frogContainer2").appendChild(newFrog)
+              frogCount = frogCount + 1
+            } else if (frogCount <= 8) {
+              newFrog = document.createElement("div")
+              newFrog.className = "imgWrapperMint"
+              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frogCount)+".png'/>"
+              document.getElementById("frogContainer").appendChild(newFrog)
+              frogCount = frogCount + 1
+            }
+            
+            if (frogCount <= 1) {
+              mintList = nextIdC
+            } else {
+              mintList = nextIdC+" - "+((nextIdC-1)+frogCount)
+            }
+            document.getElementById("mintTotal").innerHTML = "<strong>"+(frogCount*mintPrice)+" ΞETH</strong>plus gas"
+            document.getElementById("frogQuant").innerHTML = "  "+frogCount+"  "
+            document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
+            document.getElementById("supply").innerHTML = "FROG(s) # "+mintList // Supply
+          }
+        })
+      })
+      function roundToTwo(number) { // Round Numbers
+        let result = Math.round((number + Number.EPSILON) * 100)
+        if (result < 1) { return '<1' } else { return result }
       }
-
-      // Check invites
+      
+      // Get User's Invite Codes
       async function getInvites() {
-
-        mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1);
-        mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1);
-
-        for (var i = 0; i < 10; i++) { 
-
-          if (user_inviteKeys[i] === "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064") {
-
-            if (user_address === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || user_address === "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359_0".toLowerCase() || user_address === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8_0".toLowerCase() || user_address === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
-
-              user_invite = "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064";
-              mint_price = JSON.stringify(user_invites[user_invite].condition.converted.eth, user_invite, 1);
-              mint_limit = JSON.stringify(user_invites[user_invite].condition.converted.limit, user_invite, 1);
-
+        for (var i = 0; i < 5; i++) { // Loop Five Times; Check First Five Invites
+          let thisInvite = userInviteKeys[i]
+          if (thisInvite === "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d") { // Main: 0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d / Rinkeby: 0x98469878d3ea48d71e828da43d41d9ffcc8b974d712d3fee969274e52b180275
+            // NF7UOS / C7AR Bypass
+            if (userAcc === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase()) {
+              // Unlimited Free Mints
+              userInvite = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4";
+              //consoleOutput("<div> Invite code applied... Valid for <b>"+mintLimit+" FROG(s) @ 0.00 ΞETH</b></div>"+"<br>")
               break;
-
+            } else {
+              break;
             }
           }
         }
-        
-        document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
-        consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'Frog #'+mint_id+' is now available to mint!<br>Maximum of <u>'+mint_limit+'</u> Frogs @ Ξ'+mint_price+'<br>'+'<p></p>')
-
+        // Assign Variables, Update UI
+        mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
+        mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
+        document.getElementById("mintTotal").innerHTML = "<strong>"+(mintPrice)+" ΞETH</strong>plus gas"
+        //consoleOutput("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>"+frogMintMax+" FROG(s) @ 0.00 ΞETH</strong></div>")
       }
 
-      function load_trait(trait, attribute, where) {
+      // Output to minting terminal
+      function consoleOutput(output) {
+        newLine = document.createElement("div")
+        newLine.innerHTML = output
+        document.getElementById("pre").appendChild(newLine)
+      }
+      // Random Number
+      function randomNumber(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+      // Load Fresh Frog
+      function loadFreshFrog(tokenID) {
+        newFrog = document.createElement("div")
+        newFrog_href = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenID;
+        newFrog.id = tokenID
+        newFrog.className = 'frogPanel'
+        newFrog.innerHTML = '<a href="'+newFrog_href+'" target="_blank" class="smallContainer2 pointer" id="Frog #'+tokenID+'"></a>'+'<p class="attributeList" id="Frog #'+tokenID+'Desc"></p>'
+        document.getElementById("thePad").appendChild(newFrog)
+      }
+      // Load attribute
+      function loadAttribute(trait, attribute, where) {
         newAttribute = document.createElement("img")
         newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
         newAttribute.id = attribute
         newAttribute.target = "_blank"
-        if (where == 'frogContainer4') {
-          newAttribute.className = "frogImg4" //shadesAnimation
-        } else {
-          newAttribute.className = "frogImg2" //shadesAnimation
-        }
-        
-        //newAttribute.style.cursor = "pointer"
-        if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
-          newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+"2.gif"
-        //} else if (attribute === "tongueFly") { 
-        //  newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+".gif"
-        } else if (attribute === "cyan_tongueFly") { 
-          newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+".gif"
+        newAttribute.className = "frogImg2" //shadesAnimation
+        newAttribute.style.cursor = "pointer"
+        if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") { 
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
         } else if (attribute === "morphAnimation") {
-          newAttribute.src = "https://freshfrogs.github.io/the-pond/Frog/loadMorph.gif"
+          newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
         } else if (attribute === "shadesAnimation") {
-          newAttribute.src = "https://freshfrogs.github.io/the-pond/Eyes/shadesAnimation.gif"
-        } else if (attribute.includes("croaking2")) {
-          console.log('! '+trait+' / '+attribute)
-          newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+".gif"
+          newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
         } else {
-          newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+".png"
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
         }
         newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
       }
-
-      // Display Frog
-      async function display_token(token){
-
-          token_img = 'https://freshfrogs.github.io/frog/'+token+'.png'
-          token_name = 'Frog #'+token
-
-          document.getElementById('thisheader').style.backgroundImage = 'url('+token_img+')';
-          document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
-
-          var this_place = 'frogContainer4';
-
-          document.getElementById('mint_token').innerHTML = '<strong>'+token_name+'</strong>4040 supply'//+token_type;
-          document.getElementById('mint_token').removeAttribute('href');
-
-          document.getElementById('mint_total').innerHTML = '<strong>MINT</strong>Ξ<b id="mint_total_actual">'+(mint_price*mint_quantity)+'</b> +gas';
-          document.getElementById('mint_total').removeAttribute('href');
-
-          document.getElementById('mint_quantity').innerHTML = '<strong><b id="remove_token">-</b> <b id="mint_quantity_actual">'+mint_quantity+'</b> <b id="add_token">+</b></strong>quantity';
-          document.getElementById('mint_quantity').removeAttribute('href');
-
-          document.getElementById('frogContainer4').innerHTML = '';
-          
-          try {
-
-            var metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+token+".json")).json();
-          
-            for (var i = 0; i < metadata.attributes.length; i++) {
-              var data = metadata.attributes[i];
-              load_trait(data.trait_type, data.value, this_place);
-            }
-
-          } catch (e) { console.log('MetaData Fetch Failed! ' + e.message); }
-
-      }
-
+      // -- END FUNCTIONS ------------------------------------------------------------------------------------------------------------------------------
     </script>
   </head>
   <body class="bodyb">
     <div class="wrapper">
-      <header id="thisheader">
+      <header>
         <div class="downloads pre">
-          <ul class="downloads2">
-            <li><a id="mint_token" class="pointer" href=""><strong>MINT</strong>Ξ0.01 +gas</a></li>
-            <li><a id="mint_total" class="pointer" href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b"><strong>Etherscan</strong>view on</a></li>
-            <li><a id="mint_quantity" class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><strong>OpenSea</strong>view on</a></li>
-          </ul>
-          <div id="mintingTray" class="mintingTray">
+          <div id="mintingTray">
+            <ul class="downloads2">
+              <li><a id="mintTransact" href="https://freshfrogs.io/" class="pointer"><strong>LINK WALLET</strong></a></li>
+              <li><a id="mintTotal"><strong>0 ΞETH</strong>Plus gas</a></li>
+              <li><a class="pointer"><strong><b id="removeFrog" class="pointer">−</b><frogQuant id="frogQuant">  1  </frogQuant><b id="addFrog" class="pointer">+</b></strong>Quantity</a></li>
+            </ul>
             <div class="bigContainer">
+              <div id="frogContainer" class="containerMint"></div>
+              <div id="frogContainer2" class="containerMint"></div>
               <div id="frogContainer3" class="containerMint">
-                <div id="frogContainer4" class="imgWrapperMint">
-                  <img id="previewImg" class="frogImgMint" src="https://freshfrogs.github.io/assets/frogs/FLY.gif"/>
-                </div>
+                <div class="imgWrapperMint"><img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/preview2.gif"/></div>
               </div>
             </div>
+            <h3 class="headerDiv" id="supply">FROG 4,040 Total Supply</h3>
           </div>
         </div>
       </header>
       <section>
-        <div class="top">{{ content }}</div>
+        <div class="top">{{ content }}<h2 style="color: white !important;"><b>freshfrogs.io</b></h2></div>
         <div class="downloads pre">
-          <div id="netStatus" class="netStatus">
-            <div id="recent_mints" class="recent_mints"><img src="https://freshfrogs.github.io/frog/1205.png" class="recentMint"><img src="https://freshfrogs.github.io/frog/1206.png" class="recentMint"><img src="https://freshfrogs.github.io/frog/1207.png" class="recentMint"></div>
+          <div id="netStatus" style="color: white;">
             <br>
-            <h2 style="color: white !important;"><b>FreshFrogsNFT</b></h2>
-            <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
-            opensea.io/collection/fresh-frogs<a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><b id="connected">Shop on OpenSea ⛵</b></a>
-            <hr class="hr2">already own a Frog?<a class="pointer" href="https://freshfrogs.github.io/the-pond"><b>Stake and Earn Rewards! 🐸</b></a>
-            <br>
-            <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a class="pointer" href="https://freshfrogs.github.io/"><b id="connected">Connect Wallet 🔌</b></a></div>
+            Please connect an Ethereum wallet...
+            <b><a class="pointer" href="https://freshfrogs.io/">Connect Wallet</a></b>
+            <hr class="hr2">Don't have a wallet?...
+            <b><a class="pointer" href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b>
+            <hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>
           </div>
+          <div id="pre" class="consoleOutput"></div>
           <br>
           <div id="thePad" class="thePad"></div>
+          <br>
+          <div class="divTimeline">
+            <img style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="./assets/frogs/FLY.gif">
+            <h3 class="headerDiv">What is Fresh Frogs NFT?</h3><br>
+            <div class="pTimeline">
+              <p>Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
+              <b>Ethereum Blockchain</b><a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b">ERC-721 Standard 0xBE4B..C51b ↗️</a>
+              <hr class="hr2">
+              <headline class="headLine2">
+                <a href="https://twitter.com/FreshFrogs_NFT" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/twitter.png"></a>
+                <a href="https://discord.gg/t84NyjpS3H" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/discord.png"></a>
+                <a href="https://opensea.io/collection/fresh-frogs" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/opensea.png"></a>
+                <a href="https://nftcalendar.io/event/fresh-frogs-nft-collection-release/" target="_blank" style="display: inline !important;"><img background="white" class="headLineImg" src="./assets/nftCalendar.png"></a>
+                <a href="https://nftdroops.com/nft/fresh-frogs/" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/droops2.png"></a>
+                <a href="https://rarible.com/fresh-frogs/" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/Rarible.png"></a>
+                <a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/etherScan.png"></a>
+              </headline>
+            </div>
+            <div class="pTimeline">
+              <p>Unbelievably, over 200,000 acres of rainforest are burned every day. That is over 150 acres lost every minute of every day, and 78 million acres are lost every year! A portion of every sale will be donated to <a style="display: inline !important;" class="pointer" href="https://rainforestfoundation.org/" target="_blank">The Rainforest Foundation</a></p>
+            </div>
+            <div class="pTimeline">
+              <h3 class="headerDiv">Frog Token Combinations!</h3><br>
+              <img href="./the-pad" style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="./assets/frogs/previewMorph5.png"><br>
+              <p>After the full collection of <b>4,040 Frogs</b> has been minted, Frog holders will be able to "Morph" their Frogs into a new NFT on Ethereum, combining their attributes and traits!</p>
+              <p>Owners can try out this feature at <a class="pointer" href="https://freshfrogs.io/the-pad">🍀 <b>freshfrogs.io/the-pad</b> ↗️</a></p>
+            </div>
+          </div>
         </div>
       </section>
     </div>
