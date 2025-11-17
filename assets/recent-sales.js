@@ -33,7 +33,7 @@ function feeToEth(fee) {
 
 function infoRow(label, valueMarkup) {
   return '<div class="info-row">'
-    +'<span class="label">'+escapeHtml(label)+'</span>'
+    +'<span class="card_text label">'+escapeHtml(label)+'</span>'
     +'<span class="value">'+valueMarkup+'</span>'
     +'</div>';
 }
@@ -41,7 +41,7 @@ function infoRow(label, valueMarkup) {
 function wrapValue(value, id) {
   const safeValue = escapeHtml(value === undefined || value === null ? '--' : value);
   const idAttr = id ? ' id="'+id+'"' : '';
-  return '<span class="value-text"'+idAttr+'>'+safeValue+'</span>';
+  return '<span class="value-text card_bold"'+idAttr+'>'+safeValue+'</span>';
 }
 
 function trackSaleVolumes(ethValue, usdValue, isMint) {
@@ -260,8 +260,12 @@ async function render_token_sales(contract, sales) {
             +infoRow('Rarity', wrapValue(rarityLabel, 'rarityRanking_'+tokenId))
           +'</div>'
           +'<div class="frog-card__actions">'
-            +'<a class="card-button" href="https://etherscan.io/nft/'+targetContract+'/'+tokenId+'" target="_blank" rel="noopener">Etherscan</a>'
-            +'<a class="card-button card-button--secondary" href="https://opensea.io/assets/ethereum/'+targetContract+'/'+tokenId+'" target="_blank" rel="noopener">OpenSea</a>'
+            +'<a href="https://etherscan.io/nft/'+targetContract+'/'+tokenId+'" target="_blank" rel="noopener">'
+              +'<button class="etherscan_button">Etherscan</button>'
+            +'</a>'
+            +'<a href="https://opensea.io/assets/ethereum/'+targetContract+'/'+tokenId+'" target="_blank" rel="noopener">'
+              +'<button class="opensea_button">OpenSea</button>'
+            +'</a>'
           +'</div>'
         +'</div>';
 

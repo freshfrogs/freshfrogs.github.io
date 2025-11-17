@@ -28,7 +28,7 @@
   display: block;
   max-width: 500px;
   width: 100%;
-  padding: 14px;
+  padding: 8px 10px;
   vertical-align: top;
 }
 
@@ -55,18 +55,19 @@
 }
 
 .index-card.sales-card .frog-card {
-  border: 1px solid black;
-  border-radius: 5px;
-  background: #1a2625;
-  padding: 16px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
+  font-family: inherit;
 }
 
 .index-card.sales-card .frog-card__top {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   align-items: flex-start;
 }
 
@@ -81,7 +82,7 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
 }
 
@@ -89,58 +90,69 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .index-card.sales-card .frog-card__title h3 {
   margin: 0;
   font-size: 1.35rem;
   color: white;
+  text-align: left;
 }
 
 .index-card.sales-card .frog-card__subtitle {
-  color: #8fb8ab;
-  font-size: 0.95rem;
+  color: darkseagreen;
+  font-size: 0.9rem;
+  font-weight: bold;
 }
 
 .index-card.sales-card .trait-stack {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .index-card.sales-card .trait {
-  padding: 3px 8px;
-  border-radius: 4px;
-  border: 1px solid rgba(135, 248, 214, 0.4);
-  background: rgba(135, 248, 214, 0.12);
-  font-size: 0.8rem;
-  color: #e5fff6;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  font-size: 0.85rem;
+  color: lightseagreen;
+  font-family: inherit;
 }
 
 .index-card.sales-card .frog-card__details {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.6);
+  padding-top: 10px;
   display: grid;
-  gap: 8px;
+  gap: 4px;
 }
 
 .index-card.sales-card .info-row {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  align-items: center;
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.index-card.sales-card .info-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
 }
 
 .index-card.sales-card .info-row .label {
-  color: #72d6bb;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.75rem;
+  color: darkseagreen;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 0.85rem;
 }
 
 .index-card.sales-card .info-row .value {
-  color: #f4fff8;
+  color: white;
   font-weight: 600;
   text-align: right;
   display: flex;
@@ -149,33 +161,24 @@
 
 .index-card.sales-card .info-row .value-text {
   color: inherit;
+  font-weight: inherit;
 }
 
 .index-card.sales-card .frog-card__actions {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding-top: 10px;
+  border-top: 1px solid rgba(0, 0, 0, 0.6);
+  padding-top: 8px;
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  justify-content: center;
 }
 
-.index-card.sales-card .card-button {
-  flex: 1;
-  text-align: center;
+.index-card.sales-card .frog-card__actions a {
   text-decoration: none;
-  border: 1px solid black;
-  border-radius: 5px;
-  background: white;
-  color: #0a2c2a;
-  font-weight: 700;
-  padding: 6px 0;
-  font-family: inherit;
-  box-shadow: none;
 }
 
-.index-card.sales-card .card-button--secondary {
-  background: transparent;
-  color: #e5fff6;
-  border-color: rgba(150, 247, 216, 0.6);
+.index-card.sales-card .frog-card__actions .etherscan_button,
+.index-card.sales-card .frog-card__actions .opensea_button {
+  width: 128px;
 }
 
 .index-card.sales-card .infobox_left,
