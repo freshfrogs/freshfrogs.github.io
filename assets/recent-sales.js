@@ -31,17 +31,17 @@ function feeToEth(fee) {
   return Number(fee.amount) / divisor;
 }
 
-function infoRow(label, valueMarkup) {
-  return '<div class="info-row">'
-    +'<span class="card_text label">'+escapeHtml(label)+'</span>'
-    +'<span class="value">'+valueMarkup+'</span>'
-    +'</div>';
-}
-
-function wrapValue(value, id) {
+function timelineValue(value, id) {
   const safeValue = escapeHtml(value === undefined || value === null ? '--' : value);
   const idAttr = id ? ' id="'+id+'"' : '';
-  return '<span class="value-text card_bold"'+idAttr+'>'+safeValue+'</span>';
+  return '<span class="timeline-value-text card_bold"'+idAttr+'>'+safeValue+'</span>';
+}
+
+function timelineEntry(label, valueMarkup) {
+  return '<div class="timeline-entry">'
+    +'<span class="card_text">'+escapeHtml(label)+'</span>'
+    +'<div class="timeline-value">'+valueMarkup+'</div>'
+    +'</div>';
 }
 
 function trackSaleVolumes(ethValue, usdValue, isMint) {
@@ -96,7 +96,12 @@ function applySalesCardLayout(elementId) {
   }
 
   if (!mediaColumn.contains(imageContainer)) {
-    mediaColumn.appendChild(imageContainer);
+    const firstChild = mediaColumn.firstChild;
+    if (firstChild) {
+      mediaColumn.insertBefore(imageContainer, firstChild);
+    } else {
+      mediaColumn.appendChild(imageContainer);
+    }
   }
 
   const traitList = cardElement.querySelector('.trait_list');
@@ -221,7 +226,7 @@ async function render_token_sales(contract, sales) {
 
       const staking = await getFrogStakingSnapshot(tokenId);
       const stakingLabel = staking.isStaked
-        ? 'Staked · L'+(staking.level || '--')+' · '+(staking.daysStaked || 0)+'d'
+        ? 'Vaulted for '+(staking.daysStaked || 0)+' days (Lvl '+(staking.level || '--')+')'
         : 'Not Staked';
 
       const holderAddress = staking.holder || sale.buyerAddress;
@@ -241,10 +246,20 @@ async function render_token_sales(contract, sales) {
         : '';
 
       const elementId = tokenId+':'+(sale.blockTimestamp || sale.transactionHash || Date.now());
+      const timelineMarkup =
+        timelineEntry('Staking', timelineValue(stakingLabel)+'<span id="'+tokenId+'_frogType" style="display:none;"></span>')
+        +timelineEntry('Current Holder', timelineValue(holderLabel))
+        +timelineEntry(isMint ? 'Minted' : 'Recent Sale', timelineValue(saleRowValue))
+        +timelineEntry('Rarity', timelineValue(rarityLabel, 'rarityRanking_'+tokenId));
+
       const html_elements =
         '<div class="frog-card">'
           +'<div class="frog-card__top">'
-            +'<div class="frog-card__media"></div>'
+            +'<div class="frog-card__media">'
+              +'<a href="https://etherscan.io/nft/'+targetContract+'/'+tokenId+'" target="_blank" rel="noopener">'
+                +'<button class="etherscan_button">Etherscan</button>'
+              +'</a>'
+            +'</div>'
             +'<div class="frog-card__headline">'
               +'<div class="frog-card__title">'
                 +'<h3>Frog #'+tokenId+'</h3>'
@@ -254,18 +269,7 @@ async function render_token_sales(contract, sales) {
             +'</div>'
           +'</div>'
           +'<div class="frog-card__details">'
-            +infoRow('Staking Status', wrapValue(stakingLabel)+'<span id="'+tokenId+'_frogType" style="display:none;"></span>')
-            +infoRow('Current Holder', wrapValue(holderLabel))
-            +infoRow(isMint ? 'Minted' : 'Recent Sale', wrapValue(saleRowValue))
-            +infoRow('Rarity', wrapValue(rarityLabel, 'rarityRanking_'+tokenId))
-          +'</div>'
-          +'<div class="frog-card__actions">'
-            +'<a href="https://etherscan.io/nft/'+targetContract+'/'+tokenId+'" target="_blank" rel="noopener">'
-              +'<button class="etherscan_button">Etherscan</button>'
-            +'</a>'
-            +'<a href="https://opensea.io/assets/ethereum/'+targetContract+'/'+tokenId+'" target="_blank" rel="noopener">'
-              +'<button class="opensea_button">OpenSea</button>'
-            +'</a>'
+            +'<div class="timeline">'+timelineMarkup+'</div>'
           +'</div>'
         +'</div>';
 
