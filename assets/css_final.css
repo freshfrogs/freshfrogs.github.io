@@ -88,22 +88,42 @@
 
 .index-card.sales-card .sales-card__title-row {
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  padding-bottom: 6px;
+  padding-bottom: 8px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.index-card.sales-card .sales-card__title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .index-card.sales-card .sales-card__title-row h3 {
   margin: 0;
   font-size: 1.25em;
   color: white;
+  text-align: left;
 }
 
 .index-card.sales-card .sales-card__title-row span {
   color: #8ff3db;
   font-size: 0.95em;
+}
+
+.index-card.sales-card .sales-card__traits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  color: #cfeee4;
+  font-size: 0.9em;
+  line-height: 1.2;
+}
+
+.index-card.sales-card .sales-card__traits li + li {
+  margin-top: 2px;
 }
 
 .index-card.sales-card .sales-card__details {

@@ -186,6 +186,22 @@ async function fetch_token_sales(contract, limit, next_string) {
   }
 }
 
+async function fetchTokenTraits(tokenId) {
+  try {
+    const response = await fetch(SOURCE_PATH+'/frog/json/'+tokenId+'.json');
+    if (!response.ok) { return []; }
+    const metadata = await response.json();
+    if (!metadata || !Array.isArray(metadata.attributes)) { return []; }
+
+    return metadata.attributes
+      .filter((attr) => attr && attr.trait_type && attr.value)
+      .map((attr) => attr.trait_type+': '+attr.value);
+  } catch (error) {
+    console.warn('Unable to fetch traits for Frog #'+tokenId, error);
+    return [];
+  }
+}
+
 async function render_token_sales(contract, sales) {
   const saleList = Array.isArray(sales) ? sales : [];
   if (!saleList.length) { return; }
@@ -214,11 +230,21 @@ async function render_token_sales(contract, sales) {
       const rarityRank = Number.isFinite(rarityId) ? findRankingById(rarityId) : null;
       const rarityLabel = rarityRank ? '#'+rarityRank : '--';
 
+      const traits = await fetchTokenTraits(tokenId);
+      const traitMarkup = traits.length
+        ? '<ul class="sales-card__traits">'
+            +traits.slice(0, 4).map((trait) => '<li>'+escapeHtml(trait)+'</li>').join('')
+          +'</ul>'
+        : '';
+
       const elementId = tokenId+':'+(sale.blockTimestamp || sale.transactionHash || Date.now());
       const html_elements =
         '<div class="sales-card__body">'
           +'<div class="sales-card__title-row">'
-            +'<h3>Frog #'+tokenId+'</h3>'
+            +'<div class="sales-card__title-block">'
+              +'<h3>Frog #'+tokenId+'</h3>'
+              +traitMarkup
+            +'</div>'
             +(staking.since ? '<span>'+escapeHtml(staking.since)+'</span>' : '')
           +'</div>'
           +'<div class="sales-card__details">'
