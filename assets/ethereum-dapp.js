@@ -11,7 +11,7 @@ var controller, collection,
 user_address, user_rewards,
 user_tokenBalance, user_stakedBalance,
 is_approved, web3, f0, network, eth_usd, next, mint_quantity, user_price, user_limit,
-read_only_web3, read_only_controller;
+read_only_web3, read_only_controller, read_only_collection;
 
 var sales_volume_eth = 0;
 var sales_volume_usd = 0;
@@ -353,7 +353,7 @@ async function render_token_sales(contract, sales) {
                 }
             }
 
-            let holderAddress = sale.buyerAddress;
+            let holderAddress = null;
             let stakingStatus = 'Not Staked';
             try {
                 if (typeof stakerAddress === 'function') {
@@ -365,6 +365,18 @@ async function render_token_sales(contract, sales) {
                 }
             } catch (error) {
                 console.warn('Unable to resolve staking data for Frog #'+tokenId, error);
+            }
+
+            if (!holderAddress) {
+                try {
+                    holderAddress = await getCurrentOwner(tokenId);
+                } catch (error) {
+                    console.warn('Unable to resolve owner for Frog #'+tokenId, error);
+                }
+            }
+
+            if (!holderAddress) {
+                holderAddress = sale.buyerAddress;
             }
 
             const ownerDisplay = holderAddress ? truncateAddress(holderAddress) : 'Unknown';
@@ -1832,6 +1844,36 @@ function getControllerContract() {
         return read_only_controller;
     } catch (error) {
         console.warn('Unable to initialize controller contract', error);
+        return null;
+    }
+}
+
+function getCollectionContract() {
+    if (collection && collection.methods && typeof collection.methods.ownerOf === 'function') {
+        return collection;
+    }
+    if (read_only_collection && read_only_collection.methods && typeof read_only_collection.methods.ownerOf === 'function') {
+        return read_only_collection;
+    }
+    const provider = getReadOnlyWeb3();
+    if (!provider) { return null; }
+    try {
+        read_only_collection = new provider.eth.Contract(COLLECTION_ABI, COLLECTION_ADDRESS);
+        return read_only_collection;
+    } catch (error) {
+        console.warn('Unable to initialize collection contract', error);
+        return null;
+    }
+}
+
+async function getCurrentOwner(tokenId) {
+    const contract = getCollectionContract();
+    if (!contract) { return null; }
+
+    try {
+        return await contract.methods.ownerOf(tokenId).call();
+    } catch (error) {
+        console.warn('Unable to resolve owner for Frog #'+tokenId, error);
         return null;
     }
 }
