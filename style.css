@@ -10,13 +10,15 @@ body {
     padding: 20px; /* Added padding around the content */
 }
 .main_panel {
-  background-color: #7cc1ff;
-  width: 90%;
-  height: 90%;
-  max-width: 800px;
-  text-align: center;
-  padding: 48px;
-  color: white;
+    background-color: #7cc1ff;
+    width: 90%;
+    height: 90%;
+    max-width: 600px;
+    text-align: center;
+    padding: 48px;
+    color: white;
+    padding-left: 32px;
+    padding-right: 32px;
 }
 .display_img {
   height: 128px;
@@ -34,7 +36,9 @@ body {
   margin-right: auto;
 }
 .desc_cont {
-
+  width: 75%;
+  margin-left: auto;
+  margin-right: auto;
 }
 .pointer {
   
