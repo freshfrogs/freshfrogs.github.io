@@ -15,10 +15,8 @@ body {
     height: 90%;
     max-width: 600px;
     text-align: center;
-    padding: 48px;
+    padding: 32px;
     color: white;
-    padding-left: 32px;
-    padding-right: 32px;
 }
 .display_img {
   height: 128px;
