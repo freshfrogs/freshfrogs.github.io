@@ -4,7 +4,7 @@ var CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
 var NETWORK = "main";
 var morph = sub_frog = base_frog = false;
-const ALCHEMY_API_KEY = window.ALCHEMY_API_KEY || 'demo';
+const ALCHEMY_API_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
 const ALCHEMY_BASE_URL = 'https://eth-mainnet.g.alchemy.com/nft/v2/' + ALCHEMY_API_KEY;
 const TRAIT_DATA_URL = 'https://freshfrogs.github.io/assets/data/traits.json';
 let traitDataPromise;
