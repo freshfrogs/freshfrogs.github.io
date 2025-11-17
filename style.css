@@ -15,12 +15,14 @@ body {
   height: 90%;
   max-width: 800px;
   text-align: center;
-  padding: 32px;
+  padding: 48px;
   color: white;
 }
 .display_img {
   height: 128px;
   width: 128px;
+  box-shadow: 4px 4px cornflowerblue;
+  margin: 2px;
 }
 .display_cont {
   margin-left: auto;
