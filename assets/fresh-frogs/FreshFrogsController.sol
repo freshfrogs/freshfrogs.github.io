@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.4;
 
-import "https://freshfrogs.io/assets/fresh-frogs/FreshFrogsFLYZ.sol";
+import "https://freshfrogs.github.io/assets/fresh-frogs/FreshFrogsFLYZ.sol";
 import "https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/master/contracts/token/ERC721/IERC721Upgradeable.sol";
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/IERC721Receiver.sol";
 

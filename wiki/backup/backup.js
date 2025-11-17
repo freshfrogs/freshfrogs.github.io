@@ -12,7 +12,7 @@ async function load_mintingTerminal() {
         '    <div id="frogContainer" class="containerMint"></div>' +
         '    <div id="frogContainer2" class="containerMint"></div>' +
         '    <div id="frogContainer3" class="containerMint">' +
-        '        <div class="imgWrapperMint"><img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/preview2.gif"/></div>' +
+        '        <div class="imgWrapperMint"><img id="previewImg" class="frogImgMint" src="https://freshfrogs.github.io/assets/frogs/preview2.gif"/></div>' +
         '    </div>' +
         '</div>';
 
@@ -59,11 +59,11 @@ function load_morph() {
         '<div class="bigContainer">' +
         '    <div id="frogContainer" class="containerMint"></div>' +
         '    <div id="frogContainer2" class="containerMint">' +
-        '        <div class="imgWrapperMint"><img id="base_frog_img" class="frogImgMint" src="https://freshfrogs.io/frog/606.png"/></div>' + // 603 605
-        '        <div class="imgWrapperMint"><img id="sub_frog_img" class="frogImgMint" src="https://freshfrogs.io/frog/407.png"/></div>' +
+        '        <div class="imgWrapperMint"><img id="base_frog_img" class="frogImgMint" src="https://freshfrogs.github.io/frog/606.png"/></div>' + // 603 605
+        '        <div class="imgWrapperMint"><img id="sub_frog_img" class="frogImgMint" src="https://freshfrogs.github.io/frog/407.png"/></div>' +
         '    </div>' +
         '    <div id="frogContainer3" class="containerMint"><div class="imgWrapperMint">' +
-        '       <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/morph-preview.png"/></div>' +
+        '       <img id="previewImg" class="frogImgMint" src="https://freshfrogs.github.io/assets/frogs/morph-preview.png"/></div>' +
         '    </div>' +
         '</div>';
 
@@ -100,9 +100,9 @@ async function selectSubFrog(selected_sub){
 
     document.getElementById(sub_frog_ID).style.boxShadow = '0px 0px 6px 6px lightsalmon'
     
-    document.getElementById("sub_frog_img").setAttribute('src', 'https://freshfrogs.io/frog/'+sub_frog+'.png')
+    document.getElementById("sub_frog_img").setAttribute('src', 'https://freshfrogs.github.io/frog/'+sub_frog+'.png')
 
-    let subFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+selected_sub+".json")).json();
+    let subFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selected_sub+".json")).json();
     for (var i = 0; i < subFrogmetadata.attributes.length; i++){
         var data = subFrogmetadata.attributes[i]
         //loadAttribute(data.trait_type, data.value, 'subDisplay')
@@ -153,9 +153,9 @@ async function selectBaseFrog(selected_base){
 
     document.getElementById(base_frog_ID).style.boxShadow = '0px 0px 6px 6px lightcoral'
 
-    document.getElementById("base_frog_img").setAttribute('src', 'https://freshfrogs.io/frog/'+base_frog+'.png')
+    document.getElementById("base_frog_img").setAttribute('src', 'https://freshfrogs.github.io/frog/'+base_frog+'.png')
 
-    let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+selected_base+".json")).json();
+    let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+selected_base+".json")).json();
     for (var i = 0; i < baseFrogmetadata.attributes.length; i++){
         var data = baseFrogmetadata.attributes[i]
         //loadAttribute(data.trait_type, data.value, 'baseDisplay')
@@ -176,7 +176,7 @@ async function combineTokens(baseFrog, otherFrog) {
     var baseFrog_Frog, baseFrog_SpecialFrog, baseFrog_Trait, baseFrog_Accessory, baseFrog_Eyes, baseFrog_Hat, baseFrog_Mouth = undefined;
     var otherFrog_Frog, otherFrog_SpecialFrog, otherFrog_Trait, otherFrog_Accessory, otherFrog_Eyes, otherFrog_Hat, otherFrog_Mouth = undefined;
 
-    let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseFrog+".json")).json();
+    let baseFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+baseFrog+".json")).json();
 
     for (var baseFrogi = 0; baseFrogi < baseFrogmetadata.attributes.length; baseFrogi++) {
 
@@ -203,7 +203,7 @@ async function combineTokens(baseFrog, otherFrog) {
         }
     }
 
-    let otherFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+otherFrog+".json")).json();
+    let otherFrogmetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+otherFrog+".json")).json();
 
     for (var otherFrogi = 0; otherFrogi < otherFrogmetadata.attributes.length; otherFrogi++){
         var data2 = otherFrogmetadata.attributes[otherFrogi]
@@ -370,13 +370,13 @@ function loadAttribute(trait, attribute, where) {
     newAttribute.className = "frogImg2" //shadesAnimation
     newAttribute.style.cursor = "pointer"
     if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") { 
-        newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
+        newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".gif"
     } else if (attribute === "morphAnimation") {
-        newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
+        newAttribute.src = "https://freshfrogs.github.io/the-pad/Frog/loadMorph.gif"
     } else if (attribute === "shadesAnimation") {
-        newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
+        newAttribute.src = "https://freshfrogs.github.io/the-pad/Eyes/shadesAnimation.gif"
     } else {
-        newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
+        newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
     }
     newAttribute.alt = attribute
     document.getElementById(where).appendChild(newAttribute)
@@ -790,19 +790,19 @@ function add_frog() {
         if (frog_count <= 2) {
             newFrog = document.createElement("div")
             newFrog.className = "imgWrapperMint"
-            newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frog_count)+".png'/>"
+            newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.github.io/frog/"+(nextIdC+frog_count)+".png'/>"
             document.getElementById("frogContainer3").appendChild(newFrog)
             frog_count = frog_count + 1
         } else if (frog_count <= 5) {
             newFrog = document.createElement("div")
             newFrog.className = "imgWrapperMint"
-            newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frog_count)+".png'/>"
+            newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.github.io/frog/"+(nextIdC+frog_count)+".png'/>"
             document.getElementById("frogContainer2").appendChild(newFrog)
             frog_count = frog_count + 1
         } else if (frog_count <= 8) {
             newFrog = document.createElement("div")
             newFrog.className = "imgWrapperMint"
-            newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frog_count)+".png'/>"
+            newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.github.io/frog/"+(nextIdC+frog_count)+".png'/>"
             document.getElementById("frogContainer").appendChild(newFrog)
             frog_count = frog_count + 1
         }
@@ -848,7 +848,7 @@ async function connect() {
 
         console.log('Done! Loading FROG tokens...')
 
-        if (!morph) { document.getElementById('mint-button').innerHTML = '<b><a href="https://freshfrogs.io">Mint freshfrogs.io</a></b>'; }
+        if (!morph) { document.getElementById('mint-button').innerHTML = '<b><a href="https://freshfrogs.github.io">Mint freshfrogs.github.io</a></b>'; }
         document.getElementById('user-add').innerHTML = userAddress
 
         ownedFrogs = await collection.methods.balanceOf(userAddress).call();

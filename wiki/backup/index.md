@@ -2,7 +2,7 @@
 layout: wiki
 ---
 
-<title>freshfrogs.io/wiki 🍀</title>
+<title>freshfrogs.github.io/wiki 🍀</title>
 
 <div style="margin-left: auto; margin-right: auto; text-align: center;">
     <div id="recent_sales" class="recent_sales"></div>
@@ -34,7 +34,7 @@ layout: wiki
                 <div id="frogContainer" class="containerMint"></div>
                 <div id="frogContainer2" class="containerMint"></div>
                 <div id="frogContainer3" class="containerMint">
-                    <div class="imgWrapperMint"><img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/preview2.gif"/></div>
+                    <div class="imgWrapperMint"><img id="previewImg" class="frogImgMint" src="https://freshfrogs.github.io/assets/frogs/preview2.gif"/></div>
                 </div>
             </div>
         </div>
@@ -89,7 +89,7 @@ layout: wiki
 
 ---
 
-- View your Frogs on **[OpenSea](https://opensea.io/account)** or at **[freshfrogs.io/the-pad](https://freshfrogs.io/the-pad)**
+- View your Frogs on **[OpenSea](https://opensea.io/account)** or at **[freshfrogs.github.io/the-pad](https://freshfrogs.github.io/the-pad)**
 
 - Connect an Ethereum wallet to display your Frogs below!
 

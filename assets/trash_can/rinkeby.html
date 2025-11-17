@@ -720,11 +720,11 @@
         document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         //document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
-        document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.io/frog/"+nextIdC+".png");
+        document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
         
         consoleOutput("<div id='mintingText'>Please connect an Ethereum wallet... <b><i>"+addressCut+" ✓</b></i>"+"<br><b>FROG #"+nextIdC+"</b> is now available to mint...")
 
-        consoleOutput('<br><hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>');
+        consoleOutput('<br><hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>');
         // Recent Mints
         // Event Listeners 
         // MINT -- Send the transaction to mint!
@@ -743,7 +743,7 @@
               document.getElementById('mintingText').className = "mintingTextWhite"
               
               let tokens = await f0.mint(userInvite, frogCount)
-              document.getElementById('mintingText').innerHTML = "<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3> <b>"+frogCount+" FROG(s) </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>"
+              document.getElementById('mintingText').innerHTML = "<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3> <b>"+frogCount+" FROG(s) </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.github.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>"
               document.getElementById('mintingText').className = "mintingTextGreen"
             } catch (e) {
               document.getElementById('mintingText').innerHTML = "<br>\n<strong><b>❌Transaction Failed!</b></strong> <br>\n"+JSON.stringify(e.message)
@@ -782,19 +782,19 @@
             if (frogCount <= 2) {
               newFrog = document.createElement("div")
               newFrog.className = "imgWrapperMint"
-              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frogCount)+".png'/>"
+              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.github.io/frog/"+(nextIdC+frogCount)+".png'/>"
               document.getElementById("frogContainer3").appendChild(newFrog)
               frogCount = frogCount + 1
             } else if (frogCount <= 5) {
               newFrog = document.createElement("div")
               newFrog.className = "imgWrapperMint"
-              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frogCount)+".png'/>"
+              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.github.io/frog/"+(nextIdC+frogCount)+".png'/>"
               document.getElementById("frogContainer2").appendChild(newFrog)
               frogCount = frogCount + 1
             } else if (frogCount <= 8) {
               newFrog = document.createElement("div")
               newFrog.className = "imgWrapperMint"
-              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frogCount)+".png'/>"
+              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.github.io/frog/"+(nextIdC+frogCount)+".png'/>"
               document.getElementById("frogContainer").appendChild(newFrog)
               frogCount = frogCount + 1
             }
@@ -817,7 +817,7 @@
           loadFreshFrog(thisToken);
           document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<b><u>'+tokenName+'</u></b>';
 
-          let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
+          let jsonLink = 'https://freshfrogs.github.io/frog/json/'+thisToken+'.json' 
           var metadata = await (await fetch(jsonLink)).json();
 
           (async () => { // Pull Metadata
@@ -846,7 +846,7 @@
         // Loop
         var loop_to = nextIdC;
         for (var thisToken = 1; thisToken < loop_to; thisToken++) {
-          let jsonLink = 'https://freshfrogs.io/frog/json/'+thisToken+'.json' 
+          let jsonLink = 'https://freshfrogs.github.io/frog/json/'+thisToken+'.json' 
           var metadata = await (await fetch(jsonLink)).json();
 
           (async () => { // Pull Metadata
@@ -869,7 +869,7 @@
         for (var i = 0; i < frogPanel.length; i++) {
           let frog = frogPanel[i].id
           //frogPanel[i].style.background =
-          let jsonLink = 'https://freshfrogs.io/frog/json/'+frog+'.json' 
+          let jsonLink = 'https://freshfrogs.github.io/frog/json/'+frog+'.json' 
           var metadata = await (await fetch(jsonLink)).json();
           total = 1;
           (async () => { // Pull Metadata
@@ -971,7 +971,7 @@
         '  <div id="frogContainer2" class="containerMint">' +
         '  </div>' +
         '  <div id="frogContainer3" class="containerMint">' +
-        '    <div class="imgWrapperMint"><img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/preview2.gif"/></div>' +
+        '    <div class="imgWrapperMint"><img id="previewImg" class="frogImgMint" src="https://freshfrogs.github.io/assets/frogs/preview2.gif"/></div>' +
         '  </div>' +
         '</div>';
         document.getElementById("netStatus").innerHTML = '';
@@ -1009,13 +1009,13 @@
         newAttribute.className = "frogImg2" //shadesAnimation
         newAttribute.style.cursor = "pointer"
         if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") { 
-          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".gif"
         } else if (attribute === "morphAnimation") {
-          newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/Frog/loadMorph.gif"
         } else if (attribute === "shadesAnimation") {
-          newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/Eyes/shadesAnimation.gif"
         } else {
-          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
+          newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
         }
         newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
@@ -1029,13 +1029,13 @@
         <div class="downloads pre">
           <div id="mintingTray"></div>
           <div id="netStatus" style="color: white;">
-            <h2 class="headerDiv">mint.freshfrogs.io</h2>
+            <h2 class="headerDiv">mint.freshfrogs.github.io</h2>
             <hr class="hr2">
             Please connect an Ethereum wallet...
-            <b><a class="pointer" href="https://freshfrogs.io/">Connect Wallet</a></b>
+            <b><a class="pointer" href="https://freshfrogs.github.io/">Connect Wallet</a></b>
             <hr class="hr2">Don't have a wallet?...
             <b><a class="pointer" href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b>
-            <hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>
+            <hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>
           </div>
         </div>
       </header>
@@ -1072,7 +1072,7 @@
             </div>
             <div class="pTimeline">
               <h3 class="headerDiv">Frog Token Combinations!</h3>
-              <p>After the full collection of <b>4,040 Frogs</b> has been minted, Frog holders will be able to "Morph" their Frogs into a new NFT on Ethereum, combining their attributes and traits! Owners can try out this feature at <a class="pointer" href="https://freshfrogs.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a></p>
+              <p>After the full collection of <b>4,040 Frogs</b> has been minted, Frog holders will be able to "Morph" their Frogs into a new NFT on Ethereum, combining their attributes and traits! Owners can try out this feature at <a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a></p>
               <img href="../the-pad" style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="../assets/frogs/previewMorph.png">
             </div>
           </div>

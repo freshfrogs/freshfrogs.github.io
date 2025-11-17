@@ -404,7 +404,7 @@ async function connect() {
       let openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
       let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
       let gemxyzLink = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token_id;
-      let external_link = 'https://freshfrogs.io/frog/'+token_id+'.png';
+      let external_link = 'https://freshfrogs.github.io/frog/'+token_id+'.png';
       let name = 'Frog #'+token_id
       let doc = document.getElementById('thePad');
 
@@ -430,7 +430,7 @@ async function connect() {
         document.getElementById('traits_'+token_id).innerHTML = '<strong style="color: #222 !important;"><u>'+name+'</u></strong>';
       }
 
-      let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token_id+".json")).json();
+      let metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+token_id+".json")).json();
 
       for (var i = 0; i < metadata.attributes.length; i++) {
 
@@ -585,20 +585,20 @@ async function connect() {
     
     //newAttribute.style.cursor = "pointer"
     if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"2.gif"
+      newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+"2.gif"
     } else if (attribute === "tongueFly") { 
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
+      newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+".gif"
     } else if (attribute === "cyan_tongueFly") { 
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
+      newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+".gif"
     } else if (attribute === "morphAnimation") {
-      newAttribute.src = "https://freshfrogs.io/the-pond/Frog/loadMorph.gif"
+      newAttribute.src = "https://freshfrogs.github.io/the-pond/Frog/loadMorph.gif"
     } else if (attribute === "shadesAnimation") {
-      newAttribute.src = "https://freshfrogs.io/the-pond/Eyes/shadesAnimation.gif"
+      newAttribute.src = "https://freshfrogs.github.io/the-pond/Eyes/shadesAnimation.gif"
     } else if (attribute.includes("croaking2")) {
       console.log('! '+trait+' / '+attribute)
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
+      newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+".gif"
     } else {
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png"
+      newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+".png"
     }
     newAttribute.alt = attribute
     document.getElementById(where).appendChild(newAttribute)
@@ -610,7 +610,7 @@ async function connect() {
     openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
     etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
 
-    display_frog = 'https://freshfrogs.io/frog/'+token+'.png'
+    display_frog = 'https://freshfrogs.github.io/frog/'+token+'.png'
     display_name = 'Frog #'+token
     display_os = ''
 
@@ -618,7 +618,7 @@ async function connect() {
     document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
 
     document.getElementById('frogContainer4').innerHTML = '';
-    var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
+    var metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+token+".json")).json();
     var this_place = 'frogContainer4';
     for (var i = 0; i < metadata.attributes.length; i++) {
       var data = metadata.attributes[i];
@@ -676,7 +676,7 @@ async function connect() {
 
     // Fetch Base Frog Metadata
 
-    let base_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+base+".json")).json();
+    let base_metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+base+".json")).json();
 
     for (var i = 0; i < base_metadata.attributes.length; i++) {
 
@@ -711,7 +711,7 @@ async function connect() {
 
     // Fetch Other Frog Metadata
 
-    let other_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+other+".json")).json();
+    let other_metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+other+".json")).json();
 
     for (var l = 0; l < other_metadata.attributes.length; l++) {
 
@@ -919,7 +919,7 @@ async function connect() {
     }
     newFrog.id = token
     newFrog.className = 'frogPanel'
-    newFrog.innerHTML = '<a style="margin-bottom" 0px !important;  display: inline !important;" class="smallContainer2 pointer2" id="Frog #'+token+'"><img class="frogImg3" src="https://freshfrogs.io/frog/'+token+'.png"/></a>'+'<p class="attributeList" id="Frog #'+token+'Desc"></p>'
+    newFrog.innerHTML = '<a style="margin-bottom" 0px !important;  display: inline !important;" class="smallContainer2 pointer2" id="Frog #'+token+'"><img class="frogImg3" src="https://freshfrogs.github.io/frog/'+token+'.png"/></a>'+'<p class="attributeList" id="Frog #'+token+'Desc"></p>'
     document.getElementById("thePad").appendChild(newFrog)
 
     document.getElementById('Frog #'+token+'Desc').innerHTML = '<a class="pointer" href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>Frog #'+token+'</u></b> ↗️'+'</a>';

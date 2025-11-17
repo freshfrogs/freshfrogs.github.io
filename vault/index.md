@@ -1,4 +1,4 @@
 ---
 layout: vault
 ---
-<title>freshfrogs.io/vault</title>
+<title>freshfrogs.github.io/vault</title>

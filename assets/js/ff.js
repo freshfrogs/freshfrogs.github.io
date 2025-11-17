@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         // AWAIT RESPONSE!
 
-        consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>'+mint_quantity+' FROG(s)</b> have successfully been minted! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>View "FROG" Tokens</a></b></div><br>')
+        consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>'+mint_quantity+' FROG(s)</b> have successfully been minted! <a class="pointer" href="https://freshfrogs.github.io/the-pond"><b>View "FROG" Tokens</a></b></div><br>')
         document.getElementById('pre').style.backgroundColor = '#99ffc5'
         return; // BREAK!
 
@@ -277,7 +277,7 @@ async function getInvites() {
 // Display Frog
 async function display_token(token){
 
-    token_img = 'https://freshfrogs.io/frog/'+token+'.png'
+    token_img = 'https://freshfrogs.github.io/frog/'+token+'.png'
     token_name = 'Frog #'+token
 
     document.getElementById('thisheader').style.backgroundImage = 'url('+token_img+')';
@@ -285,7 +285,7 @@ async function display_token(token){
     document.getElementById('previewImg').setAttribute('src', token_img)
 
     /*
-    let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
+    let token_metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+token+".json")).json();
     for (var i = 0; i < token_metadata.attributes.length; i++){
         var data = token_metadata.attributes[i]
         //load_trait(data.trait_type, data.value, 'subDisplay')

@@ -335,7 +335,7 @@
     
     let openseaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
     let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
-    let displayImg = 'https://freshfrogs.io/frog/'+tokenId+'.png'
+    let displayImg = 'https://freshfrogs.github.io/frog/'+tokenId+'.png'
     let displayName = 'Frog #'+tokenId
 
     // Is this token currently staked?
@@ -372,7 +372,7 @@
     document.getElementById('frogContainer4').innerHTML = '';
 
     // Fetch Metadata
-    var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+tokenId+".json")).json();
+    var metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+tokenId+".json")).json();
 
     // Loop Attributes and Build Frog
     for (var i = 0; i < metadata.attributes.length; i++) {
@@ -403,7 +403,7 @@
     let frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
     let frog_etherscan = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
     let frog_gemxyz = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
-    let frog_external = 'https://freshfrogs.io/frog/'+frog_id+'.png';
+    let frog_external = 'https://freshfrogs.github.io/frog/'+frog_id+'.png';
     let frog_name = 'Frog #'+frog_id;
 
     // <-- Begin Element
@@ -441,7 +441,7 @@
     document.getElementById('cont_'+frog_id).style.backgroundSize = "2048px 2048px";
 
     // Update Metadata!
-    let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
+    let metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+frog_id+".json")).json();
 
     // Loop Each Attribute
     for (let i = 0; i < metadata.attributes.length; i++) {
@@ -537,16 +537,16 @@
     // Smoking Animations
     if (attribute.includes('smoking')) {
 
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"2.gif"
+      newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+"2.gif"
 
     } else if (attribute.includes('shades') || attribute.includes('Shades')) {
 
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"_animation.gif"
+      newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+"_animation.gif"
 
     } else {
 
       // Assign Source
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
+      newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+".png";
 
     }
 
