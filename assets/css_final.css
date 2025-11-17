@@ -119,7 +119,7 @@
   margin: 0;
   padding: 0;
   border: none;
-  border-bottom: 1px dashed white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 0;
   background: transparent;
   display: flex;
@@ -729,12 +729,12 @@ body {
     text-align: center;
 }
 .card_text {
-    color: white;
+    color: darkseagreen;
     font-weight: normal !important;
 }
 .card_bold {
     color: white;
-    font-weight: normal;
+    font-weight: bold;
 }
 .usd_price {
   color: lightseagreen;

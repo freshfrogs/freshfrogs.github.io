@@ -7,10 +7,11 @@
 */
 
 // Public Variables
-var controller, collection, 
-user_address, user_rewards, 
-user_tokenBalance, user_stakedBalance, 
-is_approved, web3, f0, network, eth_usd, next, mint_quantity, user_price, user_limit;
+var controller, collection,
+user_address, user_rewards,
+user_tokenBalance, user_stakedBalance,
+is_approved, web3, f0, network, eth_usd, next, mint_quantity, user_price, user_limit,
+read_only_web3, read_only_controller;
 
 var sales_volume_eth = 0;
 var sales_volume_usd = 0;
@@ -313,8 +314,6 @@ async function render_token_sales(contract, sales) {
         cardElement.insertBefore(mediaColumn, textColumn);
     };
 
-    const canCheckController = Boolean(controller && controller.methods && typeof controller.methods.stakerAddress === 'function');
-
     for (const sale of sales) {
         try {
             const rawTokenId = sale.tokenId || (sale.token && sale.token.tokenId);
@@ -357,10 +356,12 @@ async function render_token_sales(contract, sales) {
             let holderAddress = sale.buyerAddress;
             let stakingStatus = 'Not Staked';
             try {
-                var stakedOwner = await stakerAddress(tokenId);
-                if (stakedOwner !== false) {
-                    holderAddress = stakedOwner;
-                    stakingStatus = 'Staked';
+                if (typeof stakerAddress === 'function') {
+                    const stakedOwner = await stakerAddress(tokenId);
+                    if (stakedOwner && stakedOwner !== false) {
+                        holderAddress = stakedOwner;
+                        stakingStatus = 'Staked';
+                    }
                 }
             } catch (error) {
                 console.warn('Unable to resolve staking data for Frog #'+tokenId, error);
@@ -415,7 +416,8 @@ async function render_token_sales(contract, sales) {
             const html_elements =
                 '<div class="sales-card__body">'
                     +'<div class="sales-card__title-row">'
-                        +'<b style="color: white; font-size: 1.1em;">Frog #'+tokenId+'</b>'
+                        +'<h3>Frog #'+tokenId+'</h3>'
+                        +(subtitle ? '<span>'+sanitize(subtitle)+'</span>' : '')
                     +'</div>'
                     +'<div class="sales-card__details">'+detailRows.join('')+'</div>'
                     +badgeMarkup+
@@ -1802,12 +1804,49 @@ async function stakingValues(tokenId) {
     stakerAddress(<input> (uint256)) | return staker's address or false
 
 */
+function getReadOnlyWeb3() {
+    if (web3) { return web3; }
+    if (read_only_web3) { return read_only_web3; }
+    if (typeof Web3 === 'undefined') { return null; }
+    try {
+        const providerUrl = 'https://eth-mainnet.g.alchemy.com/v2/'+frog_api;
+        read_only_web3 = new Web3(new Web3.providers.HttpProvider(providerUrl));
+        return read_only_web3;
+    } catch (error) {
+        console.warn('Unable to initialize read-only web3 provider', error);
+        return null;
+    }
+}
+
+function getControllerContract() {
+    if (controller && controller.methods && typeof controller.methods.stakerAddress === 'function') {
+        return controller;
+    }
+    if (read_only_controller && read_only_controller.methods && typeof read_only_controller.methods.stakerAddress === 'function') {
+        return read_only_controller;
+    }
+    const provider = getReadOnlyWeb3();
+    if (!provider) { return null; }
+    try {
+        read_only_controller = new provider.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
+        return read_only_controller;
+    } catch (error) {
+        console.warn('Unable to initialize controller contract', error);
+        return null;
+    }
+}
+
 async function stakerAddress(tokenId) {
+    const contract = getControllerContract();
+    if (!contract) { return false; }
 
-    let stakerAddress = await controller.methods.stakerAddress(tokenId).call();
-    if (stakerAddress !== '0x0000000000000000000000000000000000000000') { return stakerAddress; }
-    else { return false; }
-
+    try {
+        let stakerAddress = await contract.methods.stakerAddress(tokenId).call();
+        if (stakerAddress && stakerAddress !== '0x0000000000000000000000000000000000000000') { return stakerAddress; }
+    } catch (error) {
+        console.warn('Unable to fetch staker for Frog #'+tokenId, error);
+    }
+    return false;
 }
 
 /*
