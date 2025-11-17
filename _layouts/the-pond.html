@@ -721,6 +721,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
     
+    <script>
+      window.ALCHEMY_API_KEY = {{ site.alchemy_api_key | default: '' | jsonify }};
+    </script>
     <script src="https://freshfrogs.github.io/the-pond/banner/FileSaver.js"></script>
     <script src="https://freshfrogs.github.io/the-pond/banner/dom-to-image.js"></script>
     <script src="https://freshfrogs.github.io/assets/js/fresh-frogs.js"></script>

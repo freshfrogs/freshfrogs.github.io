@@ -4,24 +4,68 @@ var CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 var CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
 var NETWORK = "main";
 var morph = sub_frog = base_frog = false;
+const ALCHEMY_API_KEY = window.ALCHEMY_API_KEY || 'demo';
+const ALCHEMY_BASE_URL = 'https://eth-mainnet.g.alchemy.com/nft/v2/' + ALCHEMY_API_KEY;
+const TRAIT_DATA_URL = 'https://freshfrogs.github.io/assets/data/traits.json';
+let traitDataPromise;
+
+async function loadTraitData() {
+    if (traits_list) {
+        return traits_list;
+    }
+    if (!traitDataPromise) {
+        traitDataPromise = fetch(TRAIT_DATA_URL)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Failed to load trait data');
+            }
+            return response.json();
+        })
+        .then((traits) => {
+            traits_list = traits;
+            return traits;
+        })
+        .catch((error) => {
+            console.error('Trait data unavailable', error);
+            traits_list = {};
+            return traits_list;
+        });
+    }
+    return traitDataPromise;
+}
+
+function buildNFTQuery(owner, pageKey) {
+    const params = new URLSearchParams({
+        owner: owner,
+        withMetadata: 'false',
+        pageSize: '100'
+    });
+    params.append('contractAddresses[]', CONTRACT_ADDRESS);
+    if (pageKey) {
+        params.append('pageKey', pageKey);
+    }
+    return params.toString();
+}
+
+function tokenIdFromHex(tokenId) {
+    if (!tokenId) {
+        return null;
+    }
+    try {
+        const normalized = tokenId.startsWith('0x') ? tokenId : '0x' + tokenId;
+        const parsed = parseInt(normalized, 16);
+        if (Number.isNaN(parsed)) {
+            return null;
+        }
+        return parsed.toString();
+    } catch (e) {
+        console.log('Unable to parse token id', tokenId, e.message);
+        return null;
+    }
+}
 
 async function connect() {
-
-    fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
-    .then(collection => collection.json())
-    .then(collection => {
-
-        var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
-
-        traits_list = traits;
-
-    })
-    .catch(e => {
-
-        console.log('Error: Could not talk to OpenSea!');
-        console.error(e.message);
-  
-    }); // End data pull / first paid Frog 3,236
+    await loadTraitData();
 
     const web3 = new Web3(window.ethereum);
     const f0 = new F0();
@@ -66,28 +110,12 @@ async function connect() {
         console.log('Staking isApprovedForAll : ' + is_approved);
         console.log('Total Staked Tokens : ' + staked_tokens);
         console.log('UnClaimed Rewards : ' + stakers_rewards + '('+temp+')');
-        console.log('Loading data from OpenSea...');
+        console.log('Loading data from Alchemy...');
 
         Output('<br><button onclick="claim_rewards()" style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frog(s) Staked '+''+stakers_rewards+' $FLYZ 🡥</button>'+'<br><hr style="background: black;">'+'<div class="console_pre" id="console-pre"></div>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
 
         console.log(owned_frogs)
-        fetch_user_tokens(0);
-
-        if (owned_frogs > 50){
-          fetch_user_tokens(50);
-        }
-
-        if (owned_frogs > 100){
-          fetch_user_tokens(100);
-        }
-
-        if (owned_frogs > 150){
-          fetch_user_tokens(150);
-        }
-
-        if (owned_frogs > 200){
-          fetch_user_tokens(200);
-        }
+        fetch_user_tokens();
 
     }
 
@@ -405,43 +433,33 @@ async function connect() {
 
   // Check owned tokens
 
-  function fetch_user_tokens(offset) {
+  function fetch_user_tokens(pageKey) {
 
-    fetch('https://api.opensea.io/api/v1/assets?owner='+user_address+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+offset+'&limit=50&include_orders=false', options)
+    const query = buildNFTQuery(user_address, pageKey);
+
+    fetch(ALCHEMY_BASE_URL + '/getNFTs/?' + query)
     .then((tokens) => tokens.json())
     .then((tokens) => {
 
-      //consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<div id="display_frog"></div><hr>')
+      var assets = tokens.ownedNfts || [];
+      assets.forEach((frog) => {
 
-      var { assets } = tokens
-      assets.forEach((frog) => { // console.log(frog)
+        const token_id = tokenIdFromHex(frog.id && frog.id.tokenId ? frog.id.tokenId : frog.token_id);
+        if (!token_id) { return; }
+        render_token(token_id);
 
-        try {
-
-          var sale_price = false;
-
-          var { name, token_metadata, permalink, traits, external_link, token_id, last_sale: { payment_token: { decimals }, total_price } } = frog
-
-          if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
-            sale_price = total_price / Math.pow(10, decimals);
-          }
-
-        } catch (e) {}
-
-        if (!sale_price) {
-          render_token(token_id)
-        } else {
-          render_token(token_id, false, sale_price)
-        }
-        
       })
+
+      if (tokens.pageKey) {
+        fetch_user_tokens(tokens.pageKey);
+      }
 
     })
     .catch(e => {
 
       console.log(e.message);
-      console.log('Error: OpenSea Error! fetch_user_tokens()');
-  
+      console.log('Error: Alchemy Error! fetch_user_tokens()');
+
     })
   }
 
@@ -811,28 +829,35 @@ async function connect() {
 
   }
 
-  async function fetch_staked_frogs() {
-    
-    fetch('https://api.opensea.io/api/v1/assets?owner='+'0xd302B8B0Dc965553b1D8c247E2cdA5E1F600640f'+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+  async function fetch_staked_frogs(pageKey) {
+
+    const query = buildNFTQuery('0xd302B8B0Dc965553b1D8c247E2cdA5E1F600640f', pageKey);
+
+    fetch(ALCHEMY_BASE_URL + '/getNFTs/?' + query)
     .then((tokens) => tokens.json())
     .then((tokens) => {
 
-      console.log('Connecting to FreshFrogsController via OpenSea...')
-      var { assets } = tokens
-      assets.forEach((frog) => { 
+      console.log('Connecting to FreshFrogsController via Alchemy...')
+      var assets = tokens.ownedNfts || [];
+      assets.forEach((frog) => {
 
-        var { token_id } = frog
+        const token_id = tokenIdFromHex(frog.id && frog.id.tokenId ? frog.id.tokenId : frog.token_id);
+        if (!token_id) { return; }
 
         // append multiple values to the array
         frog_array.push(token_id);
 
       })
 
+      if (tokens.pageKey) {
+        fetch_staked_frogs(tokens.pageKey);
+      }
+
     })
     .catch(e => {
 
-      console.log('Error: Could not talk to OpenSea! '+e.message);
-  
+      console.log('Error: Could not talk to Alchemy! '+e.message);
+
     })
   }
 // Coded by NF7UOS
