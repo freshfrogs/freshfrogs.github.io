@@ -648,6 +648,8 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
+    <script src="https://freshfrogs.github.io/assets/abi/controller_abi.js"></script>
+    <script src="https://freshfrogs.github.io/assets/abi/collection_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
@@ -664,7 +666,7 @@
       */
 
       //
-      const ALCHEMY_API_KEY = window.ALCHEMY_API_KEY || 'demo';
+      const ALCHEMY_API_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ'
       const ALCHEMY_BASE_URL = 'https://eth-mainnet.g.alchemy.com/nft/v2/' + ALCHEMY_API_KEY;
       const TRAIT_DATA_URL = 'https://freshfrogs.github.io/assets/data/traits.json';
       let traitDataPromise;
@@ -699,7 +701,7 @@
         const web3 = new Web3(window.ethereum);
         const f0 = new F0();
 
-        COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
+        COLLECTION = collection = new web3.eth.Contract(COLLECTION_ABI, CONTRACT_ADDRESS);
 
         fetch_alchemy_data();
 
