@@ -4,58 +4,54 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Frog Card Template Showcase</title>
-  <link rel="preload" href="/assets/background.png" as="image">
   <style>
     :root {
-      --panel-bg: #253635;
+      --panel-bg: #1a2625;
       --panel-border: #000;
       --panel-radius: 5px;
-      --panel-shadow: none;
-      --fg: #f2fff8;
-      --accent: #7ef7cf;
-      --accent-dark: #3ac499;
+      --fg: #f4fff8;
+      --accent: #87f8d6;
+      --accent-dark: #3ecfa5;
+      --muted: #8fb8ab;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      padding: 32px;
       min-height: 100vh;
-      font-family: monospace;
-      background: #0c1414 url("/assets/background.png") center/cover fixed;
+      padding: 32px clamp(16px, 4vw, 48px);
+      font-family: "IBM Plex Mono", "Roboto Mono", monospace;
+      background: #0c1414 url('/assets/background.png') center/cover fixed;
       color: var(--fg);
     }
 
-    h1 {
-      margin-bottom: 12px;
-      font-size: clamp(1.8rem, 3vw, 2.6rem);
-    }
+    main { max-width: 1400px; margin: 0 auto; }
+
+    h1 { margin-bottom: 12px; font-size: clamp(2rem, 3vw, 2.8rem); }
 
     p.lead {
       margin-top: 0;
       margin-bottom: 32px;
-      color: #d4f8e9;
-      max-width: 720px;
+      color: #cfeee1;
+      max-width: 800px;
     }
 
     .template-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 24px;
+      gap: 28px;
     }
 
     .template-card {
       border: 1px solid var(--panel-border);
       border-radius: var(--panel-radius);
-      background: var(--panel-bg);
+      background: rgba(16, 30, 29, 0.95);
       padding: 20px;
-      box-shadow: var(--panel-shadow);
       display: flex;
       flex-direction: column;
       gap: 16px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
     }
 
     .template-card header {
@@ -65,43 +61,27 @@
       gap: 12px;
     }
 
-    .template-card header h2 {
-      margin: 0;
-      font-size: 1.35rem;
-    }
+    .template-card header h2 { margin: 0; font-size: 1.35rem; }
+    .template-card header span { color: var(--muted); font-size: 0.95rem; }
 
-    .template-card header span {
-      font-size: 0.95rem;
-      color: #9ee7d3;
-    }
-
-    .card-preview {
-      border: 1px solid #0f211f;
+    .frog-card {
+      border: 1px solid var(--panel-border);
       border-radius: var(--panel-radius);
-      background: #162322;
+      background: var(--panel-bg);
       padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: min(500px, 100%);
+    }
+
+    .frog-card__top {
       display: flex;
       gap: 18px;
       align-items: flex-start;
-      min-height: 200px;
     }
 
-    .preview-a,
-    .preview-b,
-    .preview-c,
-    .preview-d,
-    .preview-e,
-    .preview-f,
-    .preview-g,
-    .preview-h,
-    .preview-i,
-    .preview-j {
-      border: 1px solid rgba(255,255,255,0.05);
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35);
-      background: linear-gradient(145deg, rgba(30,47,46,0.95), rgba(17,28,27,0.9));
-    }
-
-    .card-media {
+    .frog-card__media {
       width: 128px;
       flex-shrink: 0;
       display: flex;
@@ -110,254 +90,206 @@
       align-items: center;
     }
 
-    .card-media img {
+    .frog-card__media img {
       width: 128px;
       height: 128px;
       border-radius: 5px;
       border: 1px solid #000;
-      image-rendering: pixelated;
       object-fit: cover;
+      image-rendering: pixelated;
+      background: #081110;
     }
 
-    .card-media .etherscan-btn {
+    .frog-card__media a,
+    .card-button {
       width: 100%;
-      border: 1px solid #000;
-      border-radius: 5px;
-      background: #a1ffe1;
-      color: #062623;
-      font-weight: 700;
-      padding: 6px;
       text-align: center;
       text-decoration: none;
+      border: 1px solid #000;
+      border-radius: 5px;
+      background: #96f7d8;
+      color: #062623;
+      font-weight: 700;
+      padding: 6px 0;
     }
 
-    .card-media .etherscan-btn:hover {
-      background: #7fe6c5;
+    .card-button--secondary {
+      background: transparent;
+      color: var(--fg);
+      border-color: rgba(150, 247, 216, 0.6);
     }
 
-    .card-body {
-      flex: 1;
+    .frog-card__actions {
       display: flex;
-      flex-direction: column;
-      gap: 12px;
+      justify-content: flex-start;
+      gap: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.08);
     }
 
-    .title-row {
+    .frog-card__headline { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+
+    .frog-card__title h3 { margin: 0; font-size: 1.35rem; color: var(--fg); }
+    .frog-card__subtitle { color: var(--muted); font-size: 0.95rem; }
+
+    .trait-stack {
       display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 16px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      padding-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 6px;
     }
 
-    .title-row h3 {
-      margin: 0;
-      font-size: 1.35rem;
+    .trait {
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid rgba(135,248,214,0.4);
+      background: rgba(135,248,214,0.12);
+      font-size: 0.8rem;
     }
 
-    .title-row span {
-      font-size: 0.95rem;
-      color: #8ff3db;
-    }
-
-    .details,
-    .details-grid,
-    .pill-grid,
-    .info-columns,
-    .spec-grid,
-    .ledger,
-    .timeline,
-    .stat-grid,
-    .badge-ledger {
+    .frog-card__details {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 12px;
       display: grid;
       gap: 8px;
     }
 
-    .details-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .pill-grid {
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    }
-
-    .info-columns {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .spec-grid {
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    }
-
-    .ledger {
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 4px;
-      padding: 10px;
-    }
-
-    .timeline {
-      grid-template-columns: 1fr;
-      border-left: 2px solid rgba(126,247,207,0.5);
-      padding-left: 16px;
-    }
-
-    .timeline li {
-      list-style: none;
-      padding-bottom: 10px;
-    }
-
-    .stat-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .badge-ledger {
-      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-    }
-
-    .detail-row {
-      padding: 6px 8px;
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 4px;
-    }
-
-    .detail-row strong {
-      display: block;
-      color: var(--accent);
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .detail-row span {
-      font-size: 1.05rem;
-      color: var(--fg);
-    }
-
-    .trait-row {
+    .info-row {
       display: flex;
       justify-content: space-between;
       gap: 12px;
-      border-bottom: 1px dashed rgba(255,255,255,0.12);
-      padding-bottom: 6px;
+      font-size: 0.95rem;
     }
 
-    .trait-row:last-child {
-      border-bottom: none;
+    .info-row .label {
+      color: #72d6bb;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.75rem;
     }
 
-    .trait-row strong {
+    .info-row .value { color: var(--fg); font-weight: 600; text-align: right; }
+
+    .detail-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .info-panel {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 4px;
+      padding: 10px 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .info-ledger { display: grid; gap: 6px; }
+    .info-ledger .info-row { border: 1px solid rgba(255,255,255,0.08); padding: 6px 8px; border-radius: 4px; }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(135,248,214,0.4);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
       color: var(--accent);
     }
 
-    .badge-stack {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
 
-    .badge {
-      background: rgba(126,247,207,0.12);
-      border: 1px solid rgba(126,247,207,0.4);
-      border-radius: 3px;
-      padding: 4px 8px;
-      font-size: 0.85rem;
-    }
+    .stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 
-    .split-panel {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 10px;
-    }
-
-    .split-panel section {
+    .stat-card {
       border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 4px;
+      padding: 10px 12px;
+    }
+
+    .stat-card span { display: block; }
+    .stat-card .label { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; }
+    .stat-card .value { font-size: 1.1rem; font-weight: 700; }
+
+    .timeline {
+      display: grid;
+      gap: 10px;
+      border-left: 2px solid rgba(135,248,214,0.6);
+      padding-left: 14px;
+    }
+
+    .timeline-entry {
+      font-size: 0.9rem;
+    }
+
+    .timeline-entry strong { color: var(--accent); display: block; }
+
+    .badge-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .badge {
+      padding: 2px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      font-size: 0.78rem;
+      background: rgba(12,26,24,0.9);
+    }
+
+    .divider { border-top: 1px dashed rgba(255,255,255,0.12); margin: 4px 0; }
+
+    .callout {
+      border: 1px solid rgba(135,248,214,0.5);
       border-radius: 4px;
       padding: 10px;
+      background: rgba(4, 12, 11, 0.9);
     }
 
-    .chip-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .chip {
-      background: rgba(8,32,28,0.9);
-      border: 1px solid rgba(126,247,207,0.4);
-      border-radius: 999px;
-      padding: 2px 10px;
-      font-size: 0.85rem;
-    }
-
-    .status-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 4px;
-      padding: 8px 12px;
-    }
-
-    .status-bar strong {
-      color: var(--accent);
-      letter-spacing: 0.05em;
-    }
-
-    @media (max-width: 700px) {
-      .card-preview {
-        flex-direction: column;
-      }
-
-      .card-media {
-        width: 100%;
-      }
-
-      .card-media img,
-      .card-media .etherscan-btn {
-        width: 128px;
-      }
-    }
+    .callout strong { color: var(--accent); }
   </style>
 </head>
 <body>
   <main>
     <h1>Frog Card Concepts</h1>
-    <p class="lead">Ten layout explorations that keep the Fresh Frogs palette and typography while showcasing different ways to organize the same data. Mix and match elements or use them as-is for inspiration.</p>
+    <p class="lead">Ten Template&nbsp;B inspired compositions that keep the Fresh Frogs palette, 128×128 art column, and staking
+      ledger but explore different stacking, spacing, and data groupings. Use any layout as-is or mix sections to craft the
+      perfect frog data card.</p>
+
     <div class="template-grid">
       <article class="template-card">
         <header>
-          <h2>Template A</h2>
-          <span>Compact Stat Card</span>
+          <h2>Template 1</h2>
+          <span>Classic Ledger</span>
         </header>
-        <div class="card-preview preview-a">
-          <div class="card-media">
-            <img src="/frog/1.png" alt="Frog #1">
-            <a class="etherscan-btn" href="#">Etherscan</a>
-          </div>
-          <div class="card-body">
-            <div class="title-row">
-              <h3>Frog #123</h3>
-              <span>Sold 2h ago · 0.42Ξ</span>
+        <div class="frog-card">
+          <div class="frog-card__top">
+            <div class="frog-card__media">
+              <img src="/frog/12.png" alt="Frog #12">
+              <a href="#">Etherscan</a>
             </div>
-            <div class="details-grid">
-              <div class="detail-row">
-                <strong>Staking</strong>
-                <span>Active (Vault)</span>
+            <div class="frog-card__headline">
+              <div class="frog-card__title">
+                <h3>Frog #12</h3>
+                <span class="frog-card__subtitle">Sold 2h ago · 0.42Ξ</span>
               </div>
-              <div class="detail-row">
-                <strong>Current Holder</strong>
-                <span>0xABCD...5678</span>
+              <div class="trait-stack">
+                <span class="trait">Neon Eyes</span>
+                <span class="trait">Leaf Cape</span>
+                <span class="trait">Cyber Crown</span>
               </div>
-              <div class="detail-row">
-                <strong>Recent Sale</strong>
-                <span>0.42Ξ / $1,240</span>
-              </div>
-              <div class="detail-row">
-                <strong>Rarity</strong>
-                <span>Top 12%</span>
-              </div>
+            </div>
+          </div>
+          <div class="frog-card__details detail-grid-2">
+            <div class="info-row">
+              <span class="label">Staking</span>
+              <span class="value">Vaulted · 18d</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Holder</span>
+              <span class="value">0xABCD...12EF</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Recent Sale</span>
+              <span class="value">0.42Ξ / $1,240</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Rarity</span>
+              <span class="value">Top 12%</span>
             </div>
           </div>
         </div>
@@ -365,83 +297,44 @@
 
       <article class="template-card">
         <header>
-          <h2>Template B</h2>
+          <h2>Template 2</h2>
           <span>Trait Ledger</span>
         </header>
-        <div class="card-preview preview-b">
-          <div class="card-media">
-            <img src="/frog/42.png" alt="Frog #42">
-            <a class="etherscan-btn" href="#">Etherscan</a>
-          </div>
-          <div class="card-body">
-            <div class="title-row">
-              <h3>Frog #420</h3>
-              <span>Vaulted · Level 5</span>
+        <div class="frog-card">
+          <div class="frog-card__top">
+            <div class="frog-card__media">
+              <img src="/frog/420.png" alt="Frog #420">
+              <a href="#">Etherscan</a>
             </div>
-            <div class="details">
-              <div class="trait-row">
-                <strong>Holder</strong>
-                <span>Stakehouse Vault</span>
+            <div class="frog-card__headline">
+              <div class="frog-card__title">
+                <h3>Frog #420</h3>
+                <span class="frog-card__subtitle">Vaulted · Level 5</span>
               </div>
-              <div class="trait-row">
-                <strong>Sale</strong>
-                <span>0.37Ξ · 4d ago</span>
+              <div class="trait-stack">
+                <span class="trait">Genesis</span>
+                <span class="trait">Holo Skin</span>
+                <span class="trait">Fireflies</span>
+                <span class="trait">+12% Boost</span>
               </div>
-              <div class="trait-row">
-                <strong>Rarity</strong>
-                <span>#512 / 7777</span>
-              </div>
-            </div>
-            <div class="badge-stack">
-              <span class="badge">Neon Eyes</span>
-              <span class="badge">Leaf Cape</span>
-              <span class="badge">Cyber Crown</span>
-              <span class="badge">Trait Boost +12%</span>
             </div>
           </div>
-        </div>
-      </article>
-
-      <article class="template-card">
-        <header>
-          <h2>Template C</h2>
-          <span>Rewards Focus</span>
-        </header>
-        <div class="card-preview preview-c">
-          <div class="card-media">
-            <img src="/frog/128.png" alt="Frog #128">
-            <a class="etherscan-btn" href="#">Etherscan</a>
-          </div>
-          <div class="card-body">
-            <div class="title-row">
-              <h3>Frog #987</h3>
-              <span>Staked · +18 $FLY</span>
+          <div class="frog-card__details info-ledger">
+            <div class="info-row">
+              <span class="label">Staking Status</span>
+              <span class="value">Stakehouse Vault</span>
             </div>
-            <div class="pill-grid">
-              <div class="detail-row">
-                <strong>Status</strong>
-                <span>Compounding</span>
-              </div>
-              <div class="detail-row">
-                <strong>Holder</strong>
-                <span>0xFACE...B00K</span>
-              </div>
-              <div class="detail-row">
-                <strong>Sale</strong>
-                <span>0.55Ξ · 1d ago</span>
-              </div>
-              <div class="detail-row">
-                <strong>Rarity</strong>
-                <span>Top 5%</span>
-              </div>
-              <div class="detail-row">
-                <strong>Rewards</strong>
-                <span>142 $FLY</span>
-              </div>
-              <div class="detail-row">
-                <strong>Level</strong>
-                <span>7</span>
-              </div>
+            <div class="info-row">
+              <span class="label">Current Holder</span>
+              <span class="value">Vault Proxy</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Recent Sale</span>
+              <span class="value">0.37Ξ · 4d</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Rarity</span>
+              <span class="value">#512 / 7777</span>
             </div>
           </div>
         </div>
@@ -449,271 +342,350 @@
 
       <article class="template-card">
         <header>
-          <h2>Template D</h2>
-          <span>Dual Column Spec</span>
+          <h2>Template 3</h2>
+          <span>Status Pills</span>
         </header>
-        <div class="card-preview preview-d">
-          <div class="card-media">
-            <img src="/frog/333.png" alt="Frog #333">
-            <a class="etherscan-btn" href="#">Etherscan</a>
-          </div>
-          <div class="card-body">
-            <div class="title-row">
-              <h3>Frog #333</h3>
-              <span>Vault · 0.33Ξ</span>
+        <div class="frog-card">
+          <div class="frog-card__top">
+            <div class="frog-card__media">
+              <img src="/frog/1337.png" alt="Frog #1337">
+              <a href="#">Etherscan</a>
             </div>
-            <div class="info-columns">
-              <div class="detail-row">
+            <div class="frog-card__headline">
+              <div class="frog-card__title">
+                <h3>Frog #1337</h3>
+                <span class="frog-card__subtitle">Sold yesterday · 0.64Ξ</span>
+              </div>
+              <div class="pill-row">
+                <span class="status-pill">Legendary</span>
+                <span class="status-pill">Boost +24%</span>
+                <span class="status-pill">Aura Trait</span>
+              </div>
+            </div>
+          </div>
+          <div class="frog-card__details detail-grid-2">
+            <div class="info-row">
+              <span class="label">Staking</span>
+              <span class="value">Not Staked</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Holder</span>
+              <span class="value">0xF00D...F00D</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Recent Sale</span>
+              <span class="value">0.64Ξ / $1,880</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Rarity</span>
+              <span class="value">Top 3%</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="template-card">
+        <header>
+          <h2>Template 4</h2>
+          <span>Timeline Callout</span>
+        </header>
+        <div class="frog-card">
+          <div class="frog-card__top">
+            <div class="frog-card__media">
+              <img src="/frog/8.png" alt="Frog #8">
+              <a href="#">Etherscan</a>
+            </div>
+            <div class="frog-card__headline">
+              <div class="frog-card__title">
+                <h3>Frog #8</h3>
+                <span class="frog-card__subtitle">Genesis · Crown Council</span>
+              </div>
+              <div class="trait-stack">
+                <span class="trait">Emerald Skin</span>
+                <span class="trait">Royal Cloak</span>
+                <span class="trait">Mythic Voice</span>
+              </div>
+            </div>
+          </div>
+          <div class="frog-card__details">
+            <div class="timeline">
+              <div class="timeline-entry">
                 <strong>Staking</strong>
-                <span>Compounding</span>
+                Vaulted for 92 days (Lvl 6)
               </div>
-              <div class="detail-row">
+              <div class="timeline-entry">
                 <strong>Holder</strong>
-                <span>0xBEEF...CAFE</span>
+                Stakehouse · 0xA11C...BEEF
               </div>
-              <div class="detail-row">
-                <strong>Sale</strong>
-                <span>0.33Ξ · 6h ago</span>
-              </div>
-              <div class="detail-row">
-                <strong>Rarity</strong>
-                <span>#210 / 4040</span>
-              </div>
-            </div>
-            <div class="status-bar">
-              <strong>Boost</strong>
-              <span>+14 $FLY / day</span>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <article class="template-card">
-        <header>
-          <h2>Template E</h2>
-          <span>Ledger Timeline</span>
-        </header>
-        <div class="card-preview preview-e">
-          <div class="card-media">
-            <img src="/frog/777.png" alt="Frog #777">
-            <a class="etherscan-btn" href="#">Etherscan</a>
-          </div>
-          <div class="card-body">
-            <div class="title-row">
-              <h3>Frog #777</h3>
-              <span>Ascended</span>
-            </div>
-            <div class="ledger">
-              <div class="detail-row">
-                <strong>Staking</strong>
-                <span>Vaulted</span>
-              </div>
-              <div class="detail-row">
-                <strong>Holder</strong>
-                <span>Stakehouse</span>
-              </div>
-              <div class="detail-row">
-                <strong>Sale</strong>
-                <span>0.72Ξ · 1d</span>
-              </div>
-              <div class="detail-row">
-                <strong>Rarity</strong>
-                <span>Top 3%</span>
-              </div>
-            </div>
-            <ul class="timeline">
-              <li><strong>Rewards</strong> 185 $FLY claimed</li>
-              <li><strong>Level</strong> 8 · +20% boost</li>
-            </ul>
-          </div>
-        </div>
-      </article>
-
-      <article class="template-card">
-        <header>
-          <h2>Template F</h2>
-          <span>Market Pulse</span>
-        </header>
-        <div class="card-preview preview-f">
-          <div class="card-media">
-            <img src="/frog/999.png" alt="Frog #999">
-            <a class="etherscan-btn" href="#">Etherscan</a>
-          </div>
-          <div class="card-body">
-            <div class="title-row">
-              <h3>Frog #999</h3>
-              <span>Sold 45m ago</span>
-            </div>
-            <div class="stat-grid">
-              <div class="detail-row">
-                <strong>Status</strong>
-                <span>Unstaked</span>
-              </div>
-              <div class="detail-row">
-                <strong>Holder</strong>
-                <span>0xF00D...F00D</span>
-              </div>
-              <div class="detail-row">
-                <strong>Sale</strong>
-                <span>0.61Ξ</span>
-              </div>
-              <div class="detail-row">
-                <strong>USD</strong>
-                <span>$1,860</span>
-              </div>
-              <div class="detail-row">
-                <strong>Rarity</strong>
-                <span>#742</span>
-              </div>
-              <div class="detail-row">
-                <strong>Rewards</strong>
-                <span>+9/day</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <article class="template-card">
-        <header>
-          <h2>Template G</h2>
-          <span>Badge Ledger</span>
-        </header>
-        <div class="card-preview preview-g">
-          <div class="card-media">
-            <img src="/frog/404.png" alt="Frog #404">
-            <a class="etherscan-btn" href="#">Etherscan</a>
-          </div>
-          <div class="card-body">
-            <div class="title-row">
-              <h3>Frog #404</h3>
-              <span>Explorer</span>
-            </div>
-            <div class="badge-ledger">
-              <div class="detail-row">
-                <strong>Staking</strong>
-                <span>Resting</span>
-              </div>
-              <div class="detail-row">
-                <strong>Holder</strong>
-                <span>0xABCD...EF12</span>
-              </div>
-              <div class="detail-row">
-                <strong>Sale</strong>
-                <span>0.29Ξ · 2d</span>
-              </div>
-              <div class="detail-row">
-                <strong>Rarity</strong>
-                <span>Top 25%</span>
-              </div>
-            </div>
-            <div class="chip-row">
-              <span class="chip">Glow Visor</span>
-              <span class="chip">Lotus Cape</span>
-              <span class="chip">+8% Boost</span>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <article class="template-card">
-        <header>
-          <h2>Template H</h2>
-          <span>Panel Split</span>
-        </header>
-        <div class="card-preview preview-h">
-          <div class="card-media">
-            <img src="/frog/222.png" alt="Frog #222">
-            <a class="etherscan-btn" href="#">Etherscan</a>
-          </div>
-          <div class="card-body">
-            <div class="title-row">
-              <h3>Frog #222</h3>
-              <span>Quest Ready</span>
-            </div>
-            <div class="split-panel">
-              <section>
-                <strong>Status</strong>
-                <p>Staked · Level 4</p>
-              </section>
-              <section>
-                <strong>Holder</strong>
-                <p>0xCA11...A11A</p>
-              </section>
-              <section>
-                <strong>Sale</strong>
-                <p>0.31Ξ · 12h</p>
-              </section>
-              <section>
-                <strong>Rarity</strong>
-                <p>#1,104</p>
-              </section>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <article class="template-card">
-        <header>
-          <h2>Template I</h2>
-          <span>Timeline Focus</span>
-        </header>
-        <div class="card-preview preview-i">
-          <div class="card-media">
-            <img src="/frog/555.png" alt="Frog #555">
-            <a class="etherscan-btn" href="#">Etherscan</a>
-          </div>
-          <div class="card-body">
-            <div class="title-row">
-              <h3>Frog #555</h3>
-              <span>Journey Log</span>
-            </div>
-            <div class="status-bar">
-              <strong>Staking</strong>
-              <span>Active · Boost +12%</span>
-            </div>
-            <ul class="timeline">
-              <li><strong>Holder</strong> 0xF155...5555</li>
-              <li><strong>Sale</strong> 0.48Ξ · 3h ago</li>
-              <li><strong>Rarity</strong> Top 9%</li>
-            </ul>
-          </div>
-        </div>
-      </article>
-
-      <article class="template-card">
-        <header>
-          <h2>Template J</h2>
-          <span>Compact Columns</span>
-        </header>
-        <div class="card-preview preview-j">
-          <div class="card-media">
-            <img src="/frog/880.png" alt="Frog #880">
-            <a class="etherscan-btn" href="#">Etherscan</a>
-          </div>
-          <div class="card-body">
-            <div class="title-row">
-              <h3>Frog #880</h3>
-              <span>On Deck</span>
-            </div>
-            <div class="info-columns">
-              <div class="detail-row">
-                <strong>Staking</strong>
-                <span>Queued</span>
-              </div>
-              <div class="detail-row">
-                <strong>Holder</strong>
-                <span>0xC0DE...1010</span>
-              </div>
-              <div class="detail-row">
+              <div class="timeline-entry">
                 <strong>Recent Sale</strong>
-                <span>0.24Ξ</span>
+                0.88Ξ · 2023-07-12
               </div>
-              <div class="detail-row">
+              <div class="timeline-entry">
                 <strong>Rarity</strong>
-                <span>#2,240</span>
+                #98 / 7777
               </div>
             </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="template-card">
+        <header>
+          <h2>Template 5</h2>
+          <span>Reward Focus</span>
+        </header>
+        <div class="frog-card">
+          <div class="frog-card__top">
+            <div class="frog-card__media">
+              <img src="/frog/256.png" alt="Frog #256">
+              <a href="#">Etherscan</a>
+            </div>
+            <div class="frog-card__headline">
+              <div class="frog-card__title">
+                <h3>Frog #256</h3>
+                <span class="frog-card__subtitle">Sold 5h ago · 0.29Ξ</span>
+              </div>
+              <div class="trait-stack">
+                <span class="trait">Stealth Cape</span>
+                <span class="trait">Night Goggles</span>
+              </div>
+            </div>
+          </div>
+          <div class="frog-card__details">
+            <div class="stat-grid">
+              <div class="stat-card">
+                <span class="label">Rewards</span>
+                <span class="value">482 $FLY</span>
+              </div>
+              <div class="stat-card">
+                <span class="label">Staking Level</span>
+                <span class="value">4</span>
+              </div>
+            </div>
+            <div class="divider"></div>
+            <div class="info-row">
+              <span class="label">Holder</span>
+              <span class="value">0xDEED...BEEF</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Rarity</span>
+              <span class="value">Top 36%</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="template-card">
+        <header>
+          <h2>Template 6</h2>
+          <span>Dual Columns</span>
+        </header>
+        <div class="frog-card">
+          <div class="frog-card__top">
+            <div class="frog-card__media">
+              <img src="/frog/88.png" alt="Frog #88">
+              <a href="#">Etherscan</a>
+            </div>
+            <div class="frog-card__headline">
+              <div class="frog-card__title">
+                <h3>Frog #88</h3>
+                <span class="frog-card__subtitle">Rank #420 · Sold 1d</span>
+              </div>
+              <div class="trait-stack">
+                <span class="trait">Pixel Visor</span>
+                <span class="trait">Leaf Cape</span>
+                <span class="trait">Lilypad Base</span>
+              </div>
+            </div>
+          </div>
+          <div class="frog-card__details detail-grid-2">
+            <div class="info-panel">
+              <div class="info-row">
+                <span class="label">Staking</span>
+                <span class="value">Active · 33d</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Holder</span>
+                <span class="value">0xC0DE...F00D</span>
+              </div>
+            </div>
+            <div class="info-panel">
+              <div class="info-row">
+                <span class="label">Recent Sale</span>
+                <span class="value">0.31Ξ</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Rarity</span>
+                <span class="value">Top 22%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="template-card">
+        <header>
+          <h2>Template 7</h2>
+          <span>Badge Row</span>
+        </header>
+        <div class="frog-card">
+          <div class="frog-card__top">
+            <div class="frog-card__media">
+              <img src="/frog/999.png" alt="Frog #999">
+              <a href="#">Etherscan</a>
+            </div>
+            <div class="frog-card__headline">
+              <div class="frog-card__title">
+                <h3>Frog #999</h3>
+                <span class="frog-card__subtitle">Crown Holder · Sold 6h</span>
+              </div>
+              <div class="trait-stack">
+                <span class="trait">Frog King</span>
+                <span class="trait">Aura Bloom</span>
+                <span class="trait">Mythic Tongue</span>
+              </div>
+            </div>
+          </div>
+          <div class="frog-card__details">
+            <div class="badge-row">
+              <span class="badge">Staking · 120d</span>
+              <span class="badge">Owner 0xDA17...ABCD</span>
+              <span class="badge">Sale 1.42Ξ</span>
+              <span class="badge">Rarity #17</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="template-card">
+        <header>
+          <h2>Template 8</h2>
+          <span>Callout Summary</span>
+        </header>
+        <div class="frog-card">
+          <div class="frog-card__top">
+            <div class="frog-card__media">
+              <img src="/frog/2020.png" alt="Frog #2020">
+              <a href="#">Etherscan</a>
+            </div>
+            <div class="frog-card__headline">
+              <div class="frog-card__title">
+                <h3>Frog #2020</h3>
+                <span class="frog-card__subtitle">Sold 3d ago · 0.18Ξ</span>
+              </div>
+              <div class="trait-stack">
+                <span class="trait">Cyber Shades</span>
+                <span class="trait">Bubble Pipe</span>
+              </div>
+            </div>
+          </div>
+          <div class="frog-card__details">
+            <div class="callout">
+              <strong>Staking:</strong> Resting (Not staked)
+            </div>
+            <div class="info-row">
+              <span class="label">Holder</span>
+              <span class="value">0xF1IP...9000</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Recent Sale</span>
+              <span class="value">0.18Ξ / $540</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Rarity</span>
+              <span class="value">Top 58%</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="template-card">
+        <header>
+          <h2>Template 9</h2>
+          <span>Split Stats</span>
+        </header>
+        <div class="frog-card">
+          <div class="frog-card__top">
+            <div class="frog-card__media">
+              <img src="/frog/77.png" alt="Frog #77">
+              <a href="#">Etherscan</a>
+            </div>
+            <div class="frog-card__headline">
+              <div class="frog-card__title">
+                <h3>Frog #77</h3>
+                <span class="frog-card__subtitle">Mythic Bloom · Sold 8h</span>
+              </div>
+              <div class="trait-stack">
+                <span class="trait">Lotus Base</span>
+                <span class="trait">Holo Eyes</span>
+                <span class="trait">Rain Aura</span>
+              </div>
+            </div>
+          </div>
+          <div class="frog-card__details detail-grid-2">
+            <div class="info-row">
+              <span class="label">Staking</span>
+              <span class="value">Active · 66d</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Holder</span>
+              <span class="value">0x77AB...CDEF</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Recent Sale</span>
+              <span class="value">0.52Ξ</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Rarity</span>
+              <span class="value">Top 9%</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="template-card">
+        <header>
+          <h2>Template 10</h2>
+          <span>Compact Stack</span>
+        </header>
+        <div class="frog-card">
+          <div class="frog-card__top">
+            <div class="frog-card__media">
+              <img src="/frog/3141.png" alt="Frog #3141">
+            </div>
+            <div class="frog-card__headline">
+              <div class="frog-card__title">
+                <h3>Frog #3141</h3>
+                <span class="frog-card__subtitle">Sold 12h · 0.22Ξ</span>
+              </div>
+              <div class="trait-stack">
+                <span class="trait">Mystic Smoke</span>
+                <span class="trait">Mint Eyes</span>
+              </div>
+            </div>
+          </div>
+          <div class="frog-card__details">
+            <div class="info-row">
+              <span class="label">Staking Status</span>
+              <span class="value">Paused · 7d</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Current Holder</span>
+              <span class="value">0x3141...BEEF</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Recent Sale</span>
+              <span class="value">0.22Ξ / $620</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Rarity</span>
+              <span class="value">Top 44%</span>
+            </div>
+          </div>
+          <div class="frog-card__actions">
+            <a class="card-button" href="#">Etherscan</a>
+            <a class="card-button card-button--secondary" href="#">OpenSea</a>
           </div>
         </div>
       </article>
