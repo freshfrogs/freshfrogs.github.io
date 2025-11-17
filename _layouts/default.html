@@ -645,6 +645,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
     
+    <script>
+      window.ALCHEMY_API_KEY = {{ site.alchemy_api_key | default: '' | jsonify }};
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
@@ -665,7 +668,10 @@
       */
 
       //
-      function _0x4c8f(_0x537bb9,_0x5717b3){const _0x514c09=_0x514c();return _0x4c8f=function(_0x4c8fdb,_0x35dfe7){_0x4c8fdb=_0x4c8fdb-0x105;let _0x148042=_0x514c09[_0x4c8fdb];return _0x148042;},_0x4c8f(_0x537bb9,_0x5717b3);}function _0x514c(){const _0x40e000=['2259356QOnldH','2175464xLKhJr','17864384ktXQNC','767604KHzlFZ','2011625ZhSeNC','1124079ayylfy','application/json','GET','1b80881e422a49d393113ede33c81211','1MAYIBX','2352105WeQtuy'];_0x514c=function(){return _0x40e000;};return _0x514c();}const _0xa10661=_0x4c8f;(function(_0x1abeda,_0x2455f4){const _0x1fd961=_0x4c8f,_0x3248bb=_0x1abeda();while(!![]){try{const _0x55c792=-parseInt(_0x1fd961(0x10e))/0x1*(parseInt(_0x1fd961(0x106))/0x2)+-parseInt(_0x1fd961(0x10a))/0x3+parseInt(_0x1fd961(0x105))/0x4+-parseInt(_0x1fd961(0x10f))/0x5+parseInt(_0x1fd961(0x108))/0x6+-parseInt(_0x1fd961(0x109))/0x7+parseInt(_0x1fd961(0x107))/0x8;if(_0x55c792===_0x2455f4)break;else _0x3248bb['push'](_0x3248bb['shift']());}catch(_0x512bd3){_0x3248bb['push'](_0x3248bb['shift']());}}}(_0x514c,0xac440));const options={'method':_0xa10661(0x10c),'headers':{'Accept':_0xa10661(0x10b),'X-API-KEY':_0xa10661(0x10d)}};
+      const ALCHEMY_API_KEY = window.ALCHEMY_API_KEY || 'demo';
+      const ALCHEMY_BASE_URL = 'https://eth-mainnet.g.alchemy.com/nft/v2/' + ALCHEMY_API_KEY;
+      const TRAIT_DATA_URL = 'https://freshfrogs.github.io/assets/data/traits.json';
+      let traitDataPromise;
       //
 
       // User Variables
@@ -674,7 +680,7 @@
 
       // Function Variables
 
-      var mint_id, opensea_failed;
+      var mint_id, alchemy_failed;
       var mint_price = 0.01;
       var mint_quantity = 1;
 
@@ -695,7 +701,7 @@
 
         COLLECTION = collection = new web3.eth.Contract(COLLECTION_ABI, CONTRACT_ADDRESS);
 
-        fetch_opensea_data();
+        fetch_alchemy_data();
 
         try { // Connect
 
@@ -721,7 +727,7 @@
           contract_id = await f0.api.nextId().call();
           mint_id = contract_id = parseInt(contract_id);
 
-          if (opensea_failed){
+          if (alchemy_failed){
 
             display_token(contract_id);
             console.log('Nex token_id : ' + contract_id);
@@ -805,6 +811,31 @@
         document.getElementById("pre").innerHTML = output
       }
 
+      function load_trait_data() {
+        if (traits_list) {
+          return Promise.resolve(traits_list);
+        }
+        if (!traitDataPromise) {
+          traitDataPromise = fetch(TRAIT_DATA_URL)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error('Failed to load trait data');
+              }
+              return response.json();
+            })
+            .then((traits) => {
+              traits_list = traits;
+              return traits;
+            })
+            .catch((error) => {
+              console.error('Trait data unavailable', error);
+              traits_list = {};
+              return traits_list;
+            });
+        }
+        return traitDataPromise;
+      }
+
       function truncateAddress(address) {
         if (!address) {
           return "";
@@ -816,48 +847,29 @@
       }
 
       /*
-        Fetch OpenSea collection data
+        Fetch collection data via Alchemy
       */
 
-      function fetch_opensea_data() {
+      function fetch_alchemy_data() {
 
-        // Collection variables
-        // Trait list and rarities
+        load_trait_data();
 
-        fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
-        .then(collection => collection.json())
-        .then(collection => {
+        fetch(ALCHEMY_BASE_URL + '/getContractMetadata/?contractAddress=' + CONTRACT_ADDRESS)
+        .then((metadata) => metadata.json())
+        .then((metadata) => {
 
-          var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
-
-          traits_list = traits;
-
-        })
-        .catch(e => {
-
-            console.log('Error: Could not talk to Opensea. (1)');
-            console.error('Error : ' + e.message)
-      
-        });
-        
-        // Pull next available token ID prior to web3 connection
-        //
-
-        fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=12&include_orders=false', options)
-        .then((assets) => assets.json())
-        .then((assets) => {
-
-          var { assets } = assets
-          var contract_id = mint_id = parseInt(assets[0].name.replace('Frog #', '')) + 1;
+          var contractMetadata = metadata.contractMetadata || {};
+          var totalSupply = parseInt(contractMetadata.totalSupply || 0);
+          var contract_id = mint_id = totalSupply + 1;
 
           display_token(contract_id);
-          console.log('Nex token_id : ' + contract_id);
+          console.log('Next token_id : ' + contract_id);
 
         })
         .catch(e => {
 
-          opensea_failed = true;
-          console.log('Error: Could not talk to Opensea. (2)');
+          alchemy_failed = true;
+          console.log('Error: Could not talk to Alchemy.');
           console.error('Error : ' + e.message)
 
         });
