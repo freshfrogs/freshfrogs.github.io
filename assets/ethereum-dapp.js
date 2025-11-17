@@ -416,7 +416,6 @@ async function render_token_sales(contract, sales) {
                 '<div class="sales-card__body">'
                     +'<div class="sales-card__title-row">'
                         +'<b style="color: white; font-size: 1.1em;">Frog #'+tokenId+'</b>'
-                        +(subtitle ? '<span>'+sanitize(subtitle)+'</span>' : '')
                     +'</div>'
                     +'<div class="sales-card__details">'+detailRows.join('')+'</div>'
                     +badgeMarkup+
