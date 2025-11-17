@@ -1,410 +1,165 @@
 <!DOCTYPE html>
-<style>
-  html {
-    background: cornflowerblue;
-    /*
-    background-image: url("https://freshfrogs.github.io/source/background.png");
-    */
-  }
-  body {
-    font: inherit !important;
-    font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
-  }
-  section {
-    font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
-    font-size: auto;
-    color: #1a202c !important;
-    background-color: white;
-    text-align: center;
-    border-radius: 7px;
-    padding: 0px !important;
-    overflow: hidden;
-    font-size: small !important;
-    width: 80% !important;
-    margin: 1%;
-    margin-left: auto !important;
-    margin-right: auto !important;
-  }
-  img {
-    max-width: 100%;
-  }
-  #myProgress {
-    width: 75%;
-    background: white;
-    margin: 5%;
-    margin-left: auto;
-    margin-right: auto;
-    border: 1px solid teal;
-    border-radius: 2px;
-    overflow: hidden;
-    height: 4px;
-  }
-  #myBar {
-    width: 1%;
-    height: 5px;
-    background-color: teal;
-    border-radius: 1px;
-  }
-  header {
-    overflow: hidden;
-    background-color: transparent;
-    text-align: center;
-    border-radius: 5px;
-    width: auto !important;
-    font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
-    font-size: auto !important;
-    margin-bottom: 16px !important;
-    color: #19282F;
-    padding-bottom: 0px !important;
-    padding-left: 14px;
-    padding-right: 14px;
-  }
-  .wrapper {
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .bodyb {
-    background-color: transparent;
-    margin-left: auto;
-    margin-right: auto;
-    padding-top: 8px;
-    margin-top: auto;
-  }
-  .pointer {
-    cursor: pointer;
-  }
-  .properties {
-    display: inline-block;
-    border-top-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-  }
-  .display_token {
-    display: inline-block;
-    background-color: transparent;
-    padding: 0px;
-    color: #333 !important;
-    border-radius: 5px;
-    overflow: hidden;
-    width: auto;
-    margin: 1%;
-    margin-bottom: 8px;
-    font-size: small;
-    transition: all .2s;
-    border: 1px solid black;
-    overflow: hidden;
-    box-shadow: 2px 2px darkslategray;
-  }
-  .display_token_cont {
-    display: inline-block;
-    margin: 0px;
-    border-radius: 5px;
-    background-color: transparent;
-  }
-  .display_token_img_cont {
-    border-radius: 5px;
-    width: 128px;
-    height: 128px;
-    overflow: hidden;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .display_token_img_cont:hover .attribute_overlay {
-    -ms-transform: scale(1.25); /* IE 9 */
-    -webkit-transform: scale(1.25); /* Safari 3-8 */
-    transform: scale(1.25);
-  }
-  .renderLeft {
-    width: auto;
-    background: transparent;
-    color: #333;
-    margin: auto;
-    padding: 0px;
-    min-width: 168px;
-    border: none;
-    border-bottom: 1px solid gray;
-  }
-  .renderRight {
-    border-radius: 0px;
-    background: white;
-    display: flex;
-    color: #1a202c;
-    padding: 16px;
-    width: auto;
-    height: auto;
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px;
-  }
-  .attribute_overlay {
-    transition: all .2s;
-    display: block;
-    image-rendering: pixelated;
-    overflow: hidden;
-    position: absolute;
-    width: 128px;
-    height: 128px;
-    cursor: pointer;
-  }
-  .trait_overlay {
-    transition: all .2s;
-    display: block;
-    image-rendering: pixelated;
-    overflow: hidden;
-    position: absolute;
-    width: 128px;
-    height: 128px;
-    cursor: pointer;
-  }
-  .parentPanel {
-    width: 70% !important;
-    height: auto !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    float: none;
-    padding: 1% !important;
-    border: none;
-    min-width: 333px;
-    background-color: transparent;
-    color: white;
-  }
-  .outputPanel {
-    color: white;
-    border: 1px solid black;
-    height: 100px;
-    width: 70%;
-    margin-left: auto;
-    margin-right: auto;
-    border-radius: 5px;
-    box-shadow: 2px 2px darkslategray;
-  }
-  .connectButton{
-    margin: 4px;
-    padding: 10px;
-    background: white;
-    border: 1px solid black;
-    border-radius: 5px;
-    min-width: auto;
-    height: auto;
-    vertical-align: middle;
-    font-size: inherit;
-    cursor: pointer;
-    box-shadow: 2px 2px darkslategray;
-    font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
-  }
-  .connectButton:hover{
-    box-shadow: 2px 2px lightsalmon;
-  }
-  .stake_button {
-    margin: 2px;
-    background: teal;
-    border: none;
-    border-radius: 5px;
-    font-weight: bold;
-    width: 80%;
-    height: 25px;
-    color: white;
-    vertical-align: middle;
-    font-size: small;
-    padding: 0px !important;
-    cursor: pointer;
-    font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
-  }
-  .stake_button:hover{
-    background-color: transparent;
-    border: 1px solid teal;
-    color: teal;
-  }
-  .unstake_button {
-    margin: 2px;
-    background: tomato;
-    border: none;
-    border-radius: 5px;
-    font-weight: bold;
-    width: 80%;
-    height: 25px;
-    color: white;
-    vertical-align: middle;
-    font-size: small;
-    padding: 0px !important;
-    cursor: pointer;
-    font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
-  }
-  .unstake_button:hover{
-    background-color: transparent;
-    border: 1px solid tomato;
-    color: tomato;
-  }
-  .logoHeader {
-    margin: auto;
-    width: 80%;
-    padding: 5%;
-    padding-bottom: 2%;
-    color: white;
-    text-shadow:
-    -1px -1px 0 #000,
-    1px -1px 0 #000,
-    -1px 1px 0 #000,
-    1px 1px 0 #000;
-    font-size: initial;
-    font-weight: bolder;
-    background: url('https://freshfrogs.github.io/source/1500x500.png');
-    border-radius: 5px;
-    border: 1px solid black;
-    box-shadow: 2px 2px darkslategray;
-    font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
-  }
-  .bottomPanel {
-    margin: auto;
-    width: auto;
-    padding: 0px;
-    padding-top: 0px;
-  }
-  .clogo {
-    width: 128px;
-    height: auto;
-    border-radius: 100%;
-    margin: 12px;
-  }
-  .disconnectedStatus {
-    background: red;
-    width: 14px;
-    height: 14px;
-    border-radius: 100%;
-    margin: 0px;
-    margin-right: 2;
-    display: inherit;
-    margin-right: 6px;
-    margin-bottom: -3px;
-  }
-  .connectedStatus {
-    background: green;
-    width: 14px;
-    height: 14px;
-    border-radius: 100%;
-    margin: 0px;
-    margin-right: 2;
-    display: inherit;
-    margin-right: 6px;
-    margin-bottom: -3px;
-  }
-  .pendingStatus {
-    background: orange;
-    width: 14px;
-    height: 14px;
-    border-radius: 100%;
-    margin: 0px;
-    margin-right: 2;
-    display: inherit;
-    margin-right: 6px;
-    margin-bottom: -3px;
-  }
-  .ui_terminal {
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
-    background: transparent;
-    color: white;
-    border-radius: 5px;
-  }
-  .recentsalesheading {
-    color: white;
-    margin-left: auto;
-    margin-right: auto;
-    font-size: large;
-    width: fit-content;
-  }
-  .buttonBar {
-    margin: 1%;
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
-  }
-  .headerPanel {
-    padding: 2%;
-    font-weight: normal;
-    font-size: 14px;
-    text-shadow: none;
-    color: black;
-    background-color: white;
-    border-radius: 5px;
-    border: 1px solid black;
-    width: 70%;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-</style>
-<html lang="{{ site.lang | default: "en-US" }}">
-  <title>freshfrogs.io</title>
+<html lang="en">
   <head>
 
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>FreshFrogs NFT Collection</title>
+      <link rel="stylesheet" href="https://freshfrogs.github.io/assets/css_final.css" type="text/css">
+      <meta property="og:image" content={https://freshfrogs.github.io/assets/uisnip.png} />
+      <meta name="twitter:image" content={https://freshfrogs.github.io/assets/uisnip.png} />
+      <link rel="shortcut icon" type="image/x-icon" href="assets/blackWhite.png">
 
-    <!--[if lt IE 9]>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <![endif]-->
-    
-    <script src="https://freshfrogs.github.io/source/controller_abi.js"></script>
-    <script src="https://freshfrogs.github.io/source/collection_abi.js"></script>
-    <script src="https://freshfrogs.github.io/source/ethereum-dapp.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
-    <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+      <script src="https://freshfrogs.github.io/assets/rarityrankings.js"></script>
+      <script src="https://freshfrogs.github.io/assets/controller_abi.js"></script>
+      <script src="https://freshfrogs.github.io/assets/collection_abi.js"></script>
+      <script src="https://freshfrogs.github.io/assets/ethereum-dapp.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+      <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
+      <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+      <script>
 
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
-    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
 
-      // <-- [Google Analytics]
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-6PB0WKB4SH');
-      // -- >
-
-      document.addEventListener("DOMContentLoaded", async () => {
-
-        await build_random_logo();
-        await fetch_token_sales(COLLECTION_ADDRESS, '15');
-
-        var intervalId = window.setInterval(async function(){ await build_random_logo() }, 6500);
-        document.getElementById('randomLogo').onclick = async function (e) { clearInterval(intervalId); }
-        document.getElementById('connectButton').onclick = async function (e) { await initiate_web3_connection(); }
-
-        async function build_random_logo() {
-          document.getElementById('randomLogo').innerHTML = ''
-          random_token = Math.floor(Math.random() * 4040) + 1;
-          let metadata = await (await fetch(SOURCE_PATH+'/frog/json/'+random_token+'.json')).json();
-          for (let i = 0; i < metadata.attributes.length; i++) {
-            let attribute = metadata.attributes[i]
-            build_trait(attribute.trait_type, attribute.value, 'randomLogo');
+          document.getElementById('icons_container').innerHTML = '';
+          for (let i = 0; i < 9; i++) {
+            random_token = Math.floor(Math.random() * 4040) + 1;
+            random_tokenImg = document.createElement('img')
+            random_tokenImg.src = SOURCE_PATH+'/frog/'+random_token+'.png'
+            document.getElementById('icons_container').appendChild(random_tokenImg);
           }
-          var random_token_image = SOURCE_PATH+'/frog/'+random_token+'.png'
-          document.getElementById('randomLogo').style.backgroundImage = "url("+random_token_image+")";
+
+          await fetch_collection_stats();
+          await fetch_staking_stats();
+          await fetch_token_sales(COLLECTION_ADDRESS, 150);
+          document.getElementById('connectButton').onclick = async function (e) { await initiate_web3_connection(); }
+
+        mint_quantity = 1;
+
+        document.getElementById('mintButton').onclick = async function (e) {
+
+            net_mint_cost = 0.01 * mint_quantity
+            console.log('Minting '+mint_quantity+' Frog(s) @ 0.01Ξ ['+net_mint_cost+']')
+            let mint_txn = await mint(mint_quantity, user_invite);
+            alert(mint_txn);
+
         }
-      })
-    </script>
-    
+
+        document.getElementById('mintDown').onclick = async function (e) {
+            if (mint_quantity >= 2) {
+                mint_quantity = mint_quantity - 1;
+                net_mint_cost = 0.01 * mint_quantity
+                document.getElementById('mintButton').innerHTML = '🐸 Mint <u>'+mint_quantity+'</u> Frog(s)'
+
+                document.getElementById('mint_status_total').innerHTML = mint_quantity+' FROG(s) @ 0.01Ξ';
+                document.getElementById('mint_status_cost').innerHTML = net_mint_cost+'Ξ + gas fee';
+            }
+        }
+
+        document.getElementById('mintUp').onclick = async function (e) {
+            if (mint_quantity <= 8) {
+                mint_quantity = mint_quantity + 1;
+                net_mint_cost = 0.01 * mint_quantity
+                document.getElementById('mintButton').innerHTML = '🐸 Mint <u>'+mint_quantity+'</u> Frog(s)'
+
+                document.getElementById('mint_status_total').innerHTML = mint_quantity+' FROG(s) @ 0.01Ξ';
+                document.getElementById('mint_status_cost').innerHTML = net_mint_cost+'Ξ + gas fee';
+            }
+        }
+
+        });
+        
+      </script>
+
   </head>
-  <body class="bodyb">
-    <section id="parentPanel" class="parentPanel">
-      <div id="logoHeader" class="logoHeader">
-        <div id="randomLogo" class="display_token_img_cont" style="border: 1px solid darkslategray"><img id="frog-logo" src="https://freshfrogs.github.io/source/blackWhite.png"></div>
-        <h1 style="font-size: x-large; font-weight: 900;">FreshFrogsNFT</h1>
-        <p class="headerPanel">
-          A collection of 4,040 randomly generated frogs on the Ethereum blockchain, that are each unique with thousands of different combinations!
-          Stake and earn rewards, level up, unlock custom trait animations and more! All secondary sales are entitled to a <b>5%</b> royalty.<br>
+  <body>
+    <div class="container">
+      <div class="top-section">
+        <div style="padding-right: 3%;">
+          <i><h1 class="front_title">freshfrogs.github.io</h1></i>
+          <p style="color: white;">
+            <b style="color: darkseagreen;">FreshFrogsNFT</b><br>
+            A collection of 4,040 randomly generated frogs on the Ethereum blockchain, that are each unique with thousands of different combinations!
+            Stake and earn rewards, level up, unlock custom trait animations and more! All secondary sales are entitled to a <b>5%</b> royalty.<br>
+            <br>
+            Smart contracts are verified on etherscan. Feel free to interact with them directly: 
+            <a href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank">NFT Smart Contract</a>
+            <a href="https://etherscan.io/address/0xcb1ee125cff4051a10a55a09b10613876c4ef199" target="_blank">Live Staking Contract</a><br>
+          </p>
           <br>
-          Smart contracts are verified on etherscan. Feel free to interact with them directly:<br>
-          <a href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank">NFT Smart Contract</a> <symbol style="font-size: x-large">&#8626;        </symbol><a href="https://etherscan.io/address/0xcb1ee125cff4051a10a55a09b10613876c4ef199" target="_blank">Live Staking Contract</a> <symbol style="font-size: x-large">&#8626;</symbol>
-        </p>
-        <div id="console" class="bottomPanel">
-          <div id="outputPanel" style="color: white;"></div>
-          <br>
-        </div> 
+          <button id="connectButton" class="connectButton" style="background: lightcoral; color: white;">Connect to Web3</button>
+          <a href="https://github.com/freshfrogs/freshfrogs.github.io" target="_blank"><button id="githubButton" class="connectButton" style="background: lightsteelblue; color: black;">View on Github</button></a>
+          <a href="https://opensea.io/collection/fresh-frogs" target="_blank"><button id="raribleButton" class="connectButton" style="background: rgb(0, 134, 255); color: white;">Shop on Opensea</button></a>
+          <a href="https://freshfrogs.github.io/wallet/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍃 My Holdings</button></a>
+          <br><br>
+          <p class="terminal_op">
+            <b>Connected:</b>
+            <text id="connected_status" style="color: salmon;">False</text><br>
+            <b>Network: </b><text id="address_network">Ethereum Main</text><br>
+            <b>Total Supply: </b><text id="totalSupply">-- / 4040</text><br>
+            <b>Total Collectors: </b><text id="totalCollectors">--</text><br>
+            <!-- <b>Owned Tokens: </b> <text id="address_owned_tokens">--</text><br> -->
+            <b>Staked Tokens: </b><text id="total_staked_tokens">--</text><br>
+            <!-- <b>Unclaimed Rewards: </b><text id="address_unclaimed_rewards">--</text> -->
+          </p>
+        </div>
+        <div id="icons_container" class="image-grid">
+          <img src="https://freshfrogs.github.io/frog/500.png">
+          <img src="https://freshfrogs.github.io/frog/1011.png">
+          <img src="https://freshfrogs.github.io/frog/1010.png">
+          <img src="https://freshfrogs.github.io/frog/103.png">
+          <img src="https://freshfrogs.github.io/frog/105.png">
+          <img src="https://freshfrogs.github.io/frog/1065.png">
+          <img src="https://freshfrogs.github.io/frog/512.png">
+          <img src="https://freshfrogs.github.io/frog/102.png">
+          <img src="https://freshfrogs.github.io/frog/2099.png">
+        </div>
       </div>
-      <div id="buttonBar" class="buttonBar"><button id="connectButton" class="connectButton"><div id="connectStatus" class="disconnectedStatus"></div> Connect to Web3</button><a href="https://github.com/freshfrogs/freshfrogs.github.io" target="_blank"><button id="githubButton" class="connectButton">🔎 View on Github</button></a><a href="https://rarible.com/fresh-frogs" target="_blank"><button id="raribleButton" class="connectButton">🛒 Rarible Marketplace</button></a></div>
+      <div class="bottom-sections">
+          <div class="bottom-section">
+            <p style="color: white;">
+              <b style="color: darkseagreen;">🍃 Minting Information</b><br>
+              Mint your own unique FreshFrogs NFT today and join the exclusive collection of one-of-a-kind digital frogs!<br>
+              <br>
+              <b style="color: darkseagreen;">📃 Ethereum Smart Contract</b><br>
+              ERC-721 powered by Factoria, verified and stored on IPFS ✔️
+            </p>
+            <br>
+            <button id="mintDown" class="connectButton" style="background: steelblue; color: white; margin: 0px;">
+              <span>&#8722;</span>
+            </button>
+            <button id="mintButton" class="connectButton" onclick=" "style="color: white; background: steelblue; margin-left: 0px; margin-right: 0px;">🐸 Mint <u>1</u> Frog(s)</button>
+            <button id="mintUp" class="connectButton" style="background: steelblue; color: white; margin: 0px;">
+              <span>&#43;</span>
+            </button>
+            <a href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><button class="connectButton" style="background: lightsteelblue; color: black;">View Etherscan</button></a>
+            <!-- <button class="connectButton" onclick="redeem_free_mint()" style="background: teal; color: white;">🎁 1 FREE Mint</button> -->
+            <br><br>
+            <p class="terminal_op" id="mint_terminal">
+              <b>Status: </b><text id="mint_status" style="color: salmon;">Please connect an ethereum wallet!</text><br>
+              <b>Remaining: </b><text id="remainingSupply">--</text><br>
+              <b>Mint Summary: </b><text id="mint_status_total">1 FROG(s) @ 0.01Ξ</text><br>
+              <b>Totaling: </b><text id="mint_status_cost">0.01Ξ + gas fee</text>
+            </p>
+          </div>
+          <div class="bottom-section">
+            <p style="color: white;">
+              <b style="color: darkseagreen;">📃 FreshFrogsNFT Staking</b><br>
+              Stake your FROG(s) to earn exclusive rewards and unlock special benefits, while helping to grow the community and increase the value of your collection!<br>
+              <br>
+              <b style="color: darkseagreen;">✍️ Sign Contract Approval</b><br>
+              To start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.<br>
+              <br>
+              <b style="color: darkseagreen;">🍀 The Pond</b><br>
+              View all the Frogs staked by the community! Explore, track, and discover rare frogs while unlocking potential rewards!
+            </p>
+            <br>
+            <button id="stakeButton" class="connectButton" onclick="initiate_setApprovalForAll();" style="color: white; background: lightseagreen;">🌱 Stake & Earn!</button>
+            <a href="https://freshfrogs.github.io/pond/"><button class="connectButton" style="background: teal; color: white;" id="holdingsButton" >🍀 The Pond</button></a>
+          </div>
+      </div>
+      <section id="frogs" class="image-gallery">
     </section>
-    <section id="frogs" style="width: 80% !important; background: transparent; border: none !important;"></section>
+    </div>
   </body>
 </html>

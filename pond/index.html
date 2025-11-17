@@ -30,11 +30,8 @@
           await fetch_collection_stats();
           await fetch_staking_stats();
           await initiate_web3_connection().then(async () => {
-            await fetch_staked_tokens().then(async () => {
-              await fetch_held_tokens();
-            })
+            await fetch_held_tokens(CONTROLLER_ADDRESS);
           })
-
           document.getElementById('connectButton').onclick = async function (e) { await initiate_web3_connection(); }
 
         mint_quantity = 1;
