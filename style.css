@@ -36,9 +36,13 @@ body {
   margin-right: auto;
 }
 .desc_cont {
-  width: 75%;
-  margin-left: auto;
-  margin-right: auto;
+    width: 75%;
+    margin: 16px;
+    margin-left: auto;
+    margin-right: auto;
+    background: cornflowerblue;
+    padding: 8px;
+    box-shadow: 4px 4px darkslateblue;
 }
 .pointer {
   
