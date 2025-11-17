@@ -794,7 +794,7 @@
 
           })
 
-        } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a class="pointer" href="https://freshfrogs.io/"><b id="connected">🔌 Connect Wallet</b></a>'); }
+        } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a class="pointer" href="https://freshfrogs.github.io/"><b id="connected">🔌 Connect Wallet</b></a>'); }
 
       })
 
@@ -902,20 +902,20 @@
         
         //newAttribute.style.cursor = "pointer"
         if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
-          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"2.gif"
+          newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+"2.gif"
         //} else if (attribute === "tongueFly") { 
-        //  newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
+        //  newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+".gif"
         } else if (attribute === "cyan_tongueFly") { 
-          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
+          newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+".gif"
         } else if (attribute === "morphAnimation") {
-          newAttribute.src = "https://freshfrogs.io/the-pond/Frog/loadMorph.gif"
+          newAttribute.src = "https://freshfrogs.github.io/the-pond/Frog/loadMorph.gif"
         } else if (attribute === "shadesAnimation") {
-          newAttribute.src = "https://freshfrogs.io/the-pond/Eyes/shadesAnimation.gif"
+          newAttribute.src = "https://freshfrogs.github.io/the-pond/Eyes/shadesAnimation.gif"
         } else if (attribute.includes("croaking2")) {
           console.log('! '+trait+' / '+attribute)
-          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".gif"
+          newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+".gif"
         } else {
-          newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png"
+          newAttribute.src = "https://freshfrogs.github.io/the-pond/"+trait+"/"+attribute+".png"
         }
         newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
@@ -924,7 +924,7 @@
       // Display Frog
       async function display_token(token){
 
-          token_img = 'https://freshfrogs.io/frog/'+token+'.png'
+          token_img = 'https://freshfrogs.github.io/frog/'+token+'.png'
           token_name = 'Frog #'+token
 
           document.getElementById('thisheader').style.backgroundImage = 'url('+token_img+')';
@@ -945,7 +945,7 @@
           
           try {
 
-            var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
+            var metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+token+".json")).json();
           
             for (var i = 0; i < metadata.attributes.length; i++) {
               var data = metadata.attributes[i];
@@ -971,7 +971,7 @@
             <div class="bigContainer">
               <div id="frogContainer3" class="containerMint">
                 <div id="frogContainer4" class="imgWrapperMint">
-                  <img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/FLY.gif"/>
+                  <img id="previewImg" class="frogImgMint" src="https://freshfrogs.github.io/assets/frogs/FLY.gif"/>
                 </div>
               </div>
             </div>
@@ -987,9 +987,9 @@
             <h2 style="color: white !important;"><b>FreshFrogsNFT</b></h2>
             <p style="padding: 10%; padding-top: 0%; padding-bottom: 0%;">Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
             opensea.io/collection/fresh-frogs<a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank"><b id="connected">Shop on OpenSea ⛵</b></a>
-            <hr class="hr2">already own a Frog?<a class="pointer" href="https://freshfrogs.io/the-pond"><b>Stake and Earn Rewards! 🐸</b></a>
+            <hr class="hr2">already own a Frog?<a class="pointer" href="https://freshfrogs.github.io/the-pond"><b>Stake and Earn Rewards! 🐸</b></a>
             <br>
-            <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a class="pointer" href="https://freshfrogs.io/"><b id="connected">Connect Wallet 🔌</b></a></div>
+            <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a class="pointer" href="https://freshfrogs.github.io/"><b id="connected">Connect Wallet 🔌</b></a></div>
           </div>
           <br>
           <div id="thePad" class="thePad"></div>
