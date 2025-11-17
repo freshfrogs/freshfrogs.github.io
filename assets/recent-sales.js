@@ -87,7 +87,10 @@ function applySalesCardLayout(elementId) {
 
   const imageContainer = cardElement.querySelector('.index-card-img-cont');
   const textColumn = cardElement.querySelector('.index-card-text');
-  if (!imageContainer || !textColumn) { return; }
+  const body = textColumn ? textColumn.querySelector('.sales-card__body') : null;
+  const titleRow = body ? body.querySelector('.sales-card__title-row') : null;
+  const details = body ? body.querySelector('.sales-card__details') : null;
+  if (!imageContainer || !textColumn || !body || !titleRow || !details) { return; }
 
   const mediaColumn = document.createElement('div');
   mediaColumn.className = 'sales-card__media';
@@ -98,7 +101,12 @@ function applySalesCardLayout(elementId) {
     mediaColumn.appendChild(buttonBox);
   }
 
-  cardElement.insertBefore(mediaColumn, textColumn);
+  const topRow = document.createElement('div');
+  topRow.className = 'sales-card__top';
+  topRow.appendChild(mediaColumn);
+  topRow.appendChild(titleRow);
+
+  body.insertBefore(topRow, details);
 }
 
 async function getFrogStakingSnapshot(tokenId) {
@@ -225,6 +233,7 @@ async function render_token_sales(contract, sales) {
       const holderAddress = staking.holder || sale.buyerAddress;
       const holderLabel = holderAddress ? truncateAddress(holderAddress) : 'Unknown';
       const saleRowValue = price.date ? price.display+' · '+price.date : price.display;
+      const saleBadge = price.date ? 'Sold '+price.date : '';
 
       const rarityId = parseInt(tokenId, 10);
       const rarityRank = Number.isFinite(rarityId) ? findRankingById(rarityId) : null;
@@ -245,7 +254,7 @@ async function render_token_sales(contract, sales) {
               +'<h3>Frog #'+tokenId+'</h3>'
               +traitMarkup
             +'</div>'
-            +(staking.since ? '<span>'+escapeHtml(staking.since)+'</span>' : '')
+            +(saleBadge ? '<span>'+escapeHtml(saleBadge)+'</span>' : '')
           +'</div>'
           +'<div class="sales-card__details">'
             +infoRow('Staking Status', wrapValue(stakingLabel)+'<span id="'+tokenId+'_frogType" style="display:none;"></span>')

@@ -25,21 +25,11 @@
 }
 
 .index-card.sales-card {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-  flex: 1 1 420px;
+  display: block;
   max-width: 500px;
-  width: auto;
+  width: 100%;
   padding: 14px;
   vertical-align: top;
-}
-
-@media (max-width: 1000px) {
-  .index-card.sales-card {
-    flex: 1 1 100%;
-    max-width: 100%;
-  }
 }
 
 .index-card.sales-card .trait_list {
@@ -59,7 +49,7 @@
 .sales-card__media {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   width: 128px;
   flex-shrink: 0;
@@ -86,11 +76,24 @@
   width: 100%;
 }
 
-.index-card.sales-card .sales-card__title-row {
+.index-card.sales-card .sales-card__top {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .index-card.sales-card .sales-card__top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.index-card.sales-card .sales-card__title-row {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
   padding-bottom: 8px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -111,6 +114,7 @@
 .index-card.sales-card .sales-card__title-row span {
   color: #8ff3db;
   font-size: 0.95em;
+  align-self: flex-end;
 }
 
 .index-card.sales-card .sales-card__traits {
@@ -131,6 +135,8 @@
   flex-direction: column;
   gap: 10px;
   width: 100%;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .index-card.sales-card .card_info_row {
