@@ -32,18 +32,16 @@ function feeToEth(fee) {
 }
 
 function infoRow(label, valueMarkup) {
-  return '<div class="card_info_row">'
-    +'<text class="card_text">'+escapeHtml(label)+'</text>'
-    +valueMarkup
+  return '<div class="info-row">'
+    +'<span class="label">'+escapeHtml(label)+'</span>'
+    +'<span class="value">'+valueMarkup+'</span>'
     +'</div>';
 }
 
 function wrapValue(value, id) {
-  const safeValue = escapeHtml(value);
-  if (id) {
-    return '<text id="'+id+'" class="card_bold">'+safeValue+'</text>';
-  }
-  return '<text class="card_bold">'+safeValue+'</text>';
+  const safeValue = escapeHtml(value === undefined || value === null ? '--' : value);
+  const idAttr = id ? ' id="'+id+'"' : '';
+  return '<span class="value-text"'+idAttr+'>'+safeValue+'</span>';
 }
 
 function trackSaleVolumes(ethValue, usdValue, isMint) {
@@ -86,23 +84,23 @@ function applySalesCardLayout(elementId) {
   cardElement.classList.add('sales-card');
 
   const imageContainer = cardElement.querySelector('.index-card-img-cont');
-  const textColumn = cardElement.querySelector('.index-card-text');
-  const body = textColumn ? textColumn.querySelector('.sales-card__body') : null;
-  const titleRow = body ? body.querySelector('.sales-card__title-row') : null;
-  const details = body ? body.querySelector('.sales-card__details') : null;
-  if (!imageContainer || !textColumn || !body || !titleRow || !details) { return; }
-  if (body.querySelector('.sales-card__top')) { return; }
+  const frogCard = cardElement.querySelector('.frog-card');
+  const topRow = frogCard ? frogCard.querySelector('.frog-card__top') : null;
+  if (!imageContainer || !frogCard || !topRow) { return; }
 
-  const mediaColumn = document.createElement('div');
-  mediaColumn.className = 'sales-card__media';
-  mediaColumn.appendChild(imageContainer);
+  let mediaColumn = topRow.querySelector('.frog-card__media');
+  if (!mediaColumn) {
+    mediaColumn = document.createElement('div');
+    mediaColumn.className = 'frog-card__media';
+    topRow.insertBefore(mediaColumn, topRow.firstChild);
+  }
 
-  const topRow = document.createElement('div');
-  topRow.className = 'sales-card__top';
-  topRow.appendChild(mediaColumn);
-  topRow.appendChild(titleRow);
+  if (!mediaColumn.contains(imageContainer)) {
+    mediaColumn.appendChild(imageContainer);
+  }
 
-  body.insertBefore(topRow, details);
+  const traitList = cardElement.querySelector('.trait_list');
+  if (traitList) { traitList.style.display = 'none'; }
 }
 
 async function getFrogStakingSnapshot(tokenId) {
@@ -237,34 +235,33 @@ async function render_token_sales(contract, sales) {
 
       const traits = await fetchTokenTraits(tokenId);
       const traitMarkup = traits.length
-        ? '<ul class="sales-card__traits">'
-            +traits.slice(0, 4).map((trait) => '<li>'+escapeHtml(trait)+'</li>').join('')
-          +'</ul>'
+        ? '<div class="trait-stack">'
+            +traits.slice(0, 4).map((trait) => '<span class="trait">'+escapeHtml(trait)+'</span>').join('')
+          +'</div>'
         : '';
 
       const elementId = tokenId+':'+(sale.blockTimestamp || sale.transactionHash || Date.now());
       const html_elements =
-        '<div class="sales-card__body">'
-          +'<div class="sales-card__title-row">'
-            +'<div class="sales-card__title-block">'
-              +'<h3>Frog #'+tokenId+'</h3>'
-              +(subtitle ? '<p class="sales-card__subtitle">'+escapeHtml(subtitle)+'</p>' : '')
+        '<div class="frog-card">'
+          +'<div class="frog-card__top">'
+            +'<div class="frog-card__media"></div>'
+            +'<div class="frog-card__headline">'
+              +'<div class="frog-card__title">'
+                +'<h3>Frog #'+tokenId+'</h3>'
+                +(subtitle ? '<span class="frog-card__subtitle">'+escapeHtml(subtitle)+'</span>' : '')
+              +'</div>'
               +traitMarkup
             +'</div>'
           +'</div>'
-          +'<div class="sales-card__details">'
+          +'<div class="frog-card__details">'
             +infoRow('Staking Status', wrapValue(stakingLabel)+'<span id="'+tokenId+'_frogType" style="display:none;"></span>')
             +infoRow('Current Holder', wrapValue(holderLabel))
             +infoRow(isMint ? 'Minted' : 'Recent Sale', wrapValue(saleRowValue))
             +infoRow('Rarity', wrapValue(rarityLabel, 'rarityRanking_'+tokenId))
           +'</div>'
-          +'<div class="card_buttonbox sales-card__actions">'
-            +'<a href="https://etherscan.io/nft/'+targetContract+'/'+tokenId+'" target="_blank" rel="noopener">'
-              +'<button class="etherscan_button card-button">Etherscan</button>'
-            +'</a>'
-            +'<a href="https://opensea.io/assets/ethereum/'+targetContract+'/'+tokenId+'" target="_blank" rel="noopener">'
-              +'<button class="opensea_button card-button card-button--secondary">OpenSea</button>'
-            +'</a>'
+          +'<div class="frog-card__actions">'
+            +'<a class="card-button" href="https://etherscan.io/nft/'+targetContract+'/'+tokenId+'" target="_blank" rel="noopener">Etherscan</a>'
+            +'<a class="card-button card-button--secondary" href="https://opensea.io/assets/ethereum/'+targetContract+'/'+tokenId+'" target="_blank" rel="noopener">OpenSea</a>'
           +'</div>'
         +'</div>';
 

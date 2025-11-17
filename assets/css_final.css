@@ -32,13 +32,12 @@
   vertical-align: top;
 }
 
-.index-card.sales-card .trait_list {
-  display: none;
+.index-card.sales-card .index-card-text {
+  padding: 0;
 }
 
-.index-card.sales-card .trait_list strong {
-  display: inline-block;
-  font-size: 1.2em;
+.index-card.sales-card .trait_list {
+  display: none;
 }
 
 .index-card.sales-card .properties {
@@ -46,180 +45,142 @@
   padding: 0;
 }
 
-.sales-card__media {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  width: 128px;
-  flex-shrink: 0;
-}
-
 .index-card.sales-card .index-card-img-cont {
   margin: 0;
+  width: 128px;
+  height: 128px;
   box-shadow: none;
+  border: 1px solid black;
+  border-radius: 5px;
 }
 
-.index-card.sales-card .sales-card__media .card_buttonbox {
-  display: none;
-}
-
-.index-card.sales-card .sales-card__body {
+.index-card.sales-card .frog-card {
+  border: 1px solid black;
+  border-radius: 5px;
+  background: #1a2625;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  width: 100%;
+  gap: 14px;
 }
 
-.index-card.sales-card .sales-card__top {
+.index-card.sales-card .frog-card__top {
   display: flex;
-  align-items: flex-start;
   gap: 16px;
+  align-items: flex-start;
 }
 
-@media (max-width: 600px) {
-  .index-card.sales-card .sales-card__top {
+@media (max-width: 640px) {
+  .index-card.sales-card .frog-card__top {
     flex-direction: column;
-    align-items: flex-start;
   }
 }
 
-.index-card.sales-card .sales-card__title-row {
+.index-card.sales-card .frog-card__media {
+  width: 128px;
+  flex-shrink: 0;
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.index-card.sales-card .frog-card__headline {
   flex: 1;
-  flex-direction: column;
-  gap: 8px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.index-card.sales-card .sales-card__title-block {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
 }
 
-.index-card.sales-card .sales-card__title-row h3 {
+.index-card.sales-card .frog-card__title h3 {
   margin: 0;
-  font-size: 1.25em;
+  font-size: 1.35rem;
   color: white;
-  text-align: left;
 }
 
-.index-card.sales-card .sales-card__subtitle {
-  margin: 0;
+.index-card.sales-card .frog-card__subtitle {
   color: #8fb8ab;
-  font-size: 0.95em;
+  font-size: 0.95rem;
 }
 
-.index-card.sales-card .sales-card__traits {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  color: #cfeee4;
-  font-size: 0.9em;
-  line-height: 1.2;
-}
-
-.index-card.sales-card .sales-card__traits li + li {
-  margin-top: 2px;
-}
-
-.index-card.sales-card .sales-card__details {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-  padding-top: 6px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.index-card.sales-card .sales-card__actions {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  margin-top: 10px;
-  padding-top: 12px;
-}
-
-.index-card.sales-card .card_info_row {
-  width: 100%;
-  float: none;
-  margin: 0;
-  padding: 0;
-  border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 0;
-  background: transparent;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.index-card.sales-card .card_info_row:last-child {
-  border-bottom: none;
-}
-
-.index-card.sales-card .card_info_row .card_text {
-  display: block;
-  margin-bottom: 0;
-}
-
-.index-card.sales-card .card_info_row .card_bold {
-  display: block;
-}
-
-@media (min-width: 560px) {
-  .index-card.sales-card .card_info_row {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: baseline;
-  }
-
-  .index-card.sales-card .card_info_row .card_bold {
-    text-align: right;
-  }
-}
-
-.index-card.sales-card .card_buttonbox {
-  width: 100%;
-  display: flex;
-  gap: 10px;
-  justify-content: flex-start;
-  margin: 0;
-}
-
-.index-card.sales-card .card_buttonbox a {
-  flex: 1;
-  text-decoration: none;
-}
-
-.index-card.sales-card .card_buttonbox button {
-  width: 100%;
-  margin: 0 !important;
-  box-shadow: none;
-}
-
-.index-card.sales-card .infobox_left,
-.index-card.sales-card .infobox_right {
-  margin: 0;
-  width: 100%;
-  float: none;
-  text-align: left;
-}
-
-.index-card.sales-card .sales-card__badge-stack {
+.index-card.sales-card .trait-stack {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-.index-card.sales-card .sales-card__badge {
-  border: 1px solid rgba(126, 247, 207, 0.4);
-  border-radius: 5px;
-  padding: 2px 8px;
-  font-size: 0.85em;
-  background: rgba(126, 247, 207, 0.12);
+.index-card.sales-card .trait {
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(135, 248, 214, 0.4);
+  background: rgba(135, 248, 214, 0.12);
+  font-size: 0.8rem;
   color: #e5fff6;
-  text-transform: capitalize;
+}
+
+.index-card.sales-card .frog-card__details {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.index-card.sales-card .info-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.95rem;
+}
+
+.index-card.sales-card .info-row .label {
+  color: #72d6bb;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+}
+
+.index-card.sales-card .info-row .value {
+  color: #f4fff8;
+  font-weight: 600;
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.index-card.sales-card .info-row .value-text {
+  color: inherit;
+}
+
+.index-card.sales-card .frog-card__actions {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.index-card.sales-card .card-button {
+  flex: 1;
+  text-align: center;
+  text-decoration: none;
+  border: 1px solid black;
+  border-radius: 5px;
+  background: white;
+  color: #0a2c2a;
+  font-weight: 700;
+  padding: 6px 0;
+  font-family: inherit;
+  box-shadow: none;
+}
+
+.index-card.sales-card .card-button--secondary {
+  background: transparent;
+  color: #e5fff6;
+  border-color: rgba(150, 247, 216, 0.6);
+}
+
+.index-card.sales-card .infobox_left,
+.index-card.sales-card .infobox_right {
+  display: none;
 }
 
 /*.index-card:hover {
@@ -249,8 +210,8 @@
     text-align: center;
   }
 
-  .index-card.sales-card .sales-card__details {
-    flex-direction: column;
+  .index-card.sales-card .frog-card__details {
+    grid-template-columns: 1fr;
   }
 
   .index-card img {
