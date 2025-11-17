@@ -358,7 +358,7 @@ async function render_token_sales(contract, sales) {
             let stakingStatus = 'Not Staked';
             try {
                 var stakedOwner = await stakerAddress(tokenId);
-                if (stakedOwner && stakedOwner !== false) {
+                if (stakedOwner !== false) {
                     holderAddress = stakedOwner;
                     stakingStatus = 'Staked';
                 }
