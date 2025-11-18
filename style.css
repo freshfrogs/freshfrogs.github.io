@@ -46,6 +46,7 @@ height: 128px;
     background: cornflowerblue;
     padding: 32px;
     box-shadow: 4px 4px darkslateblue;
+    border: 1px solid darkslateblue;
 }
 .pointer {
   
@@ -91,6 +92,7 @@ hr {
     height: 90%;
     max-width: 200px;
     margin: 8px;
+    border: 1px solid darkslateblue;
 }
 .sale_card_title {
     float: left;
