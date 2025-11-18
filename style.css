@@ -86,3 +86,19 @@ hr {
     width: 128px;
     image-rendering: pixelated;
 }
+.recent_sale_properties {
+    border-top: 1px solid white;
+    border-left: 1px solid white;
+    height: 100px;
+    border-top-left-radius: 5px;
+    padding: 8px;
+    margin: 8px;
+}
+.recent_sale_traits {
+
+}
+.recent_sale_properties_title {
+    float: left;
+    display: inline-block;
+    margin: 8px;
+}
