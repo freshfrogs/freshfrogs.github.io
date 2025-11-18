@@ -62,6 +62,7 @@ hr {
 .frog_img {
   height: 128px;
   width: 128px;
+  image-rendering: pixelated;
 }
 .recent_sale_card {
     display: inline-block;
@@ -81,4 +82,7 @@ hr {
 .recent_sale_img {
     border-radius: 100%;
     border: 1px solid darkslateblue;
+    height: 128px;
+    width: 128px;
+    image-rendering: pixelated;
 }
