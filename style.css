@@ -1,7 +1,9 @@
 * {
     box-sizing: border-box;
 }
-
+img {
+    image-rendering: pixelated;
+}
 body {
     font-family: monospace;
     background-color: #7cc1ff;
