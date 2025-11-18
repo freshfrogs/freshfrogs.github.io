@@ -1,14 +1,14 @@
 // assets/site.js
 
 // ------------------------
-// Config
+// Config (namespaced to avoid collisions)
 // ------------------------
-const COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
-const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
-const ALCHEMY_API_KEY   = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
-const OPENSEA_API_KEY   = '48ffee972fc245fa965ecfe902b02ab4'; // reserved for later
+const FF_COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
+const FF_CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
+const FF_ALCHEMY_API_KEY    = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
+const FF_OPENSEA_API_KEY    = '48ffee972fc245fa965ecfe902b02ab4'; // reserved for later
 
-const ALCHEMY_NFT_BASE  = `https://eth-mainnet.g.alchemy.com/nft/v3/${ALCHEMY_API_KEY}`;
+const FF_ALCHEMY_NFT_BASE   = `https://eth-mainnet.g.alchemy.com/nft/v3/${FF_ALCHEMY_API_KEY}`;
 
 // ------------------------
 // Public entrypoint
@@ -42,7 +42,7 @@ async function loadRecentSales() {
         continue;
       }
 
-      // Try to use any attached metadata, otherwise fetch via getNFTMetadata
+      // Use metadata if present; otherwise fetch it
       let metadata = sale.metadata || sale.tokenMetadata;
       if (!metadata) {
         metadata = await fetchFrogMetadata(tokenId);
@@ -88,7 +88,7 @@ function createFrogCard({
 }) {
   const frogName = `Frog #${tokenId}`;
 
-  const rankRaw   = typeof rarityMap !== 'undefined' ? rarityMap[tokenId] : null;
+  const rankRaw    = typeof rarityMap !== 'undefined' ? rarityMap[tokenId] : null;
   const rarityRank = rankRaw !== undefined && rankRaw !== null ? Number(rankRaw) : null;
   const rarityTier = rarityRank ? getRarityTier(rarityRank) : null;
 
@@ -97,7 +97,7 @@ function createFrogCard({
     ? `rarity_badge ${rarityTier.className}`
     : 'rarity_badge rarity_unknown';
 
-  const imageUrl  = `https://freshfrogs.github.io/frog/${tokenId}.png`;
+  const imageUrl   = `https://freshfrogs.github.io/frog/${tokenId}.png`;
   const traitsHtml = buildTraitsHtml(metadata);
 
   const card = document.createElement('div');
@@ -159,12 +159,12 @@ function buildTraitsHtml(metadata) {
 // ------------------------
 async function fetchRecentSales(limit = 24) {
   const params = new URLSearchParams({
-    contractAddress: COLLECTION_ADDRESS,
+    contractAddress: FF_COLLECTION_ADDRESS,
     order: 'desc',
     limit: String(limit)
   });
 
-  const url = `${ALCHEMY_NFT_BASE}/getNFTSales?${params.toString()}`;
+  const url = `${FF_ALCHEMY_NFT_BASE}/getNFTSales?${params.toString()}`;
 
   const response = await fetch(url);
   if (!response.ok) {
@@ -180,11 +180,11 @@ async function fetchRecentSales(limit = 24) {
 async function fetchFrogMetadata(tokenId) {
   try {
     const params = new URLSearchParams({
-      contractAddress: COLLECTION_ADDRESS,
+      contractAddress: FF_COLLECTION_ADDRESS,
       tokenId: String(tokenId)
     });
 
-    const url      = `${ALCHEMY_NFT_BASE}/getNFTMetadata?${params.toString()}`;
+    const url      = `${FF_ALCHEMY_NFT_BASE}/getNFTMetadata?${params.toString()}`;
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -192,11 +192,11 @@ async function fetchFrogMetadata(tokenId) {
     }
 
     const json = await response.json();
-    // Prefer raw.metadata (standard Alchemy shape), fall back to top-level fields
+    // Prefer raw.metadata (Alchemy shape), fall back to top-level
     const meta = (json.raw && json.raw.metadata) || {
       name: json.name,
       description: json.description,
-      attributes: []
+      attributes: json.attributes || []
     };
 
     return meta || {};
@@ -221,8 +221,11 @@ function formatOwnerAddress(address) {
 }
 
 function formatPrice(sale) {
+  if (!sale) return '--';
+
+  // Alchemy getNFTSales v3 shape includes sellerFee / protocolFee / royaltyFee
   const fee =
-    sale && (sale.sellerFee || sale.protocolFee || sale.royaltyFee);
+    sale.sellerFee || sale.protocolFee || sale.royaltyFee || sale.price;
 
   if (!fee || !fee.amount) {
     return '--';
