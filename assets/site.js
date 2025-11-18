@@ -6,13 +6,16 @@
   const metadataCache = new Map();
   const priceCache = new Map();
   const stakingDetailsCache = new Map();
-  const STAKING_DAYS_PER_LEVEL = 41.7;
+  const browserProvider = detectBrowserProvider();
+  const isBrowserWalletProvider = Boolean(browserProvider);
   const web3ProviderUrl = `https://eth-mainnet.g.alchemy.com/v2/${API_KEY}`;
-  const web3 = initWeb3();
+  const web3 = initWeb3(browserProvider);
   const stakingContract = initStakingContract(web3);
   const collectionContract = initCollectionContract(web3);
+  let stakingProviderWarningShown = false;
 
   document.addEventListener('DOMContentLoaded', () => {
+    setupWalletConnector();
     if (document.getElementById('recent-sales')) {
       loadRecentSales();
     }
@@ -20,6 +23,34 @@
       loadWalletFrogs();
     }
   });
+
+  function setupWalletConnector() {
+    const connectLink = document.getElementById('connect-wallet-link');
+    if (!connectLink) {
+      return;
+    }
+
+    connectLink.addEventListener('click', async (event) => {
+      event.preventDefault();
+      if (!browserProvider || typeof browserProvider.request !== 'function') {
+        alert('A Web3 wallet (like MetaMask) is required to connect.');
+        return;
+      }
+
+      try {
+        const accounts = await browserProvider.request({ method: 'eth_requestAccounts' });
+        const primaryAccount = Array.isArray(accounts) ? accounts[0] : null;
+
+        if (isValidWalletAddress(primaryAccount)) {
+          const normalized = primaryAccount.toLowerCase();
+          const targetUrl = `${window.location.origin}/${normalized}`;
+          window.location.href = targetUrl;
+        }
+      } catch (error) {
+        console.warn('Wallet connection was not completed', error);
+      }
+    });
+  }
 
   function buildRarityMap(rankings) {
     return rankings.reduce((acc, frog) => {
@@ -32,13 +63,23 @@
     }, {});
   }
 
-  function initWeb3() {
+  function detectBrowserProvider() {
+    if (typeof window !== 'undefined' && window.ethereum) {
+      return window.ethereum;
+    }
+    return null;
+  }
+
+  function initWeb3(preferredProvider) {
     if (typeof Web3 === 'undefined') {
       console.warn('Web3 unavailable. Staked frogs will be hidden.');
       return null;
     }
 
     try {
+      if (preferredProvider) {
+        return new Web3(preferredProvider);
+      }
       const provider = new Web3.providers.HttpProvider(web3ProviderUrl);
       return new Web3(provider);
     } catch (error) {
@@ -570,79 +611,44 @@
       return stakingDetailsCache.get(tokenId);
     }
 
-    let details = await fetchStakingDetailsFromController(tokenId);
-
-    if (!details) {
-      details = await fetchStakingDetailsFromEvents(tokenId);
-    }
-
+    const details = await deriveStakingDetails(tokenId);
     stakingDetailsCache.set(tokenId, details);
     return details;
   }
 
-  async function fetchStakingDetailsFromController(tokenId) {
-    const stakingValuesFn = typeof window !== 'undefined' ? window.stakingValues : null;
-
-    if (typeof stakingValuesFn !== 'function') {
+  async function deriveStakingDetails(tokenId) {
+    const stakedDate = await timeStaked(tokenId);
+    if (!stakedDate) {
       return null;
     }
 
-    try {
-      const values = await stakingValuesFn(tokenId);
-      if (!Array.isArray(values) || values.length < 5) {
-        return null;
-      }
+    const now = Date.now();
+    const stakedMs = now - stakedDate.getTime();
+    const stakedHours = Math.max(0, Math.floor(stakedMs / (1000 * 60 * 60)));
+    const levelInt = Math.floor(stakedHours / 1000) + 1;
+    const hoursIntoCurrentLevel = stakedHours % 1000;
+    const progress = Math.max(0, Math.min(100, (hoursIntoCurrentLevel / 1000) * 100));
+    const daysToNextLevel = Math.max(0, Math.round(((levelInt * 1000) - stakedHours) / 24));
 
-      const [, levelText, nextLevelDays, rewardsEarned, stakedDate] = values;
-      const rawDaysToNextLevel = sanitizeNumber(nextLevelDays);
-      const daysToNextLevel = typeof rawDaysToNextLevel === 'number' ? Math.max(0, Math.round(rawDaysToNextLevel)) : 0;
-      const progress = computeStakingProgress(rawDaysToNextLevel);
-
-      return {
-        level: levelText || 'I',
-        progress,
-        daysToNextLevel,
-        rewardsEarned: typeof rewardsEarned === 'string' ? rewardsEarned : String(rewardsEarned || ''),
-        stakedDate: typeof stakedDate === 'string' ? stakedDate : ''
-      };
-    } catch (error) {
-      console.warn(`Unable to load staking values for token ${tokenId}`, error);
-      return null;
-    }
-  }
-
-  async function fetchStakingDetailsFromEvents(tokenId) {
-    if (!web3 || !collectionContract) {
-      return null;
-    }
-
-    try {
-      const stakedDate = await timeStaked(tokenId);
-      if (!stakedDate) {
-        return null;
-      }
-      const now = Date.now();
-      const stakedMs = now - stakedDate.getTime();
-      const stakedHours = Math.floor(stakedMs / (1000 * 60 * 60));
-      const levelInt = Math.floor(stakedHours / 1000) + 1;
-      const hoursIntoCurrentLevel = stakedHours % 1000;
-      const progress = Math.max(0, Math.min(100, (hoursIntoCurrentLevel / 1000) * 100));
-      const daysToNextLevel = Math.max(0, Math.round(((levelInt * 1000) - stakedHours) / 24));
-      return {
-        level: romanize(levelInt),
-        progress,
-        daysToNextLevel,
-        rewardsEarned: (stakedHours / 1000).toFixed(3),
-        stakedDate: formatShortDate(stakedDate)
-      };
-    } catch (error) {
-      console.warn(`Unable to compute staking details for token ${tokenId}`, error);
-      return null;
-    }
+    return {
+      level: romanize(levelInt),
+      progress,
+      daysToNextLevel,
+      rewardsEarned: (stakedHours / 1000).toFixed(3),
+      stakedDate: formatShortDate(stakedDate)
+    };
   }
 
   async function timeStaked(tokenId) {
     if (!collectionContract) {
+      return null;
+    }
+
+    if (!isBrowserWalletProvider) {
+      if (!stakingProviderWarningShown) {
+        console.warn('Connect your wallet on the homepage to load staking progress.');
+        stakingProviderWarningShown = true;
+      }
       return null;
     }
 
@@ -688,19 +694,6 @@
         ${meta ? `<div class="staking_progress_meta">${meta}</div>` : ''}
       </div>
     `;
-  }
-
-  function computeStakingProgress(daysRemaining) {
-    if (daysRemaining === null) {
-      return 0;
-    }
-    const clamped = Math.max(0, Math.min(STAKING_DAYS_PER_LEVEL, daysRemaining));
-    return Math.round(((STAKING_DAYS_PER_LEVEL - clamped) / STAKING_DAYS_PER_LEVEL) * 100);
-  }
-
-  function sanitizeNumber(value) {
-    const num = Number(value);
-    return Number.isFinite(num) ? num : null;
   }
 
   function formatShortDate(date) {
