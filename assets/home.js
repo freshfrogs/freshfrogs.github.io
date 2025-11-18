@@ -1,51 +1,82 @@
 // assets/home.js
-// Homepage + wallet view + staked frogs, using the same card layout.
+// - Homepage: Recent sales
+// - Wallet view: /0x... (owned + staked frogs)
+// Uses the same card layout for everything.
 
 (function () {
+  'use strict';
+
   const API_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
   const CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
   const MAX_TRAITS = 3;
 
-  // Optional: set a default mint price fallback (in WEI) for frogs with no sales
-  // Example: 0.025 ETH => "25000000000000000"
+  // If you want a global mint price fallback, put the WEI amount here (string).
+  // Example: 0.01 ETH => "10000000000000000"
   const DEFAULT_MINT_PRICE_WEI = '';
 
+  // Build rarity map once from the rankings script
   const rarityMap = buildRarityMap(window.freshfrogs_rarity_rankings || []);
   const metadataCache = new Map();
 
-  // Decide: homepage vs wallet view
-  document.addEventListener('DOMContentLoaded', () => {
-    const ownerFromPath = getOwnerAddressFromPath();
-    if (ownerFromPath) {
-      loadWalletFrogs(ownerFromPath);
+  document.addEventListener('DOMContentLoaded', init);
+
+  function init() {
+    const walletAddress = findWalletAddressInUrl();
+
+    if (walletAddress) {
+      loadWalletFrogs(walletAddress);
     } else {
       loadRecentSales();
     }
-  });
-
-  // ---------------- ROUTING ----------------
-
-  function getOwnerAddressFromPath() {
-    const path = window.location.pathname || '/';
-    // matches "/0xabc123...def456" or "/0xabc.../"
-    const match = path.match(/^\/(0x[a-fA-F0-9]{40})\/?$/);
-    return match ? match[1] : null;
   }
 
-  // ---------------- RARITY MAP ----------------
+  // ------------------------------------------------------------
+  // URL / routing helpers
+  // ------------------------------------------------------------
+
+  // Works for:
+  // - https://freshfrogs.github.io/0xabc...
+  // - 404.html?path=/0xabc...
+  // - Any URL containing a 0x + 40 hex chars
+  function findWalletAddressInUrl() {
+    const match = window.location.href.match(/0x[a-fA-F0-9]{40}/);
+    return match ? match[0] : null;
+  }
+
+  // ------------------------------------------------------------
+  // Rarity map
+  // ------------------------------------------------------------
 
   function buildRarityMap(rankings) {
-    return rankings.reduce((acc, frog) => {
-      if (frog && typeof frog.id !== 'undefined') {
-        const frogId = Number(frog.id);
-        const rankingValue = frog.ranking || frog.rank;
-        acc[frogId] = typeof rankingValue !== 'undefined' ? rankingValue : 'N/A';
+    const map = {};
+
+    rankings.forEach((frog) => {
+      if (!frog) return;
+
+      // Try multiple possible key names just in case
+      const id =
+        frog.id ??
+        frog.tokenId ??
+        frog.token_id ??
+        frog.frogId ??
+        frog.frog_id;
+
+      const rank = frog.ranking ?? frog.rank ?? frog.position;
+
+      if (id != null && rank != null) {
+        const frogId = Number(id);
+        if (!Number.isNaN(frogId)) {
+          map[frogId] = Number(rank);
+        }
       }
-      return acc;
-    }, {});
+    });
+
+    return map;
   }
 
-  // ================= SHARED CARD BUILDER =================
+  // ------------------------------------------------------------
+  // Shared card builder
+  // ------------------------------------------------------------
 
   function createFrogCard(options) {
     const {
@@ -82,6 +113,7 @@
 
     const card = document.createElement('div');
     card.className = 'recent_sale_card';
+    card.dataset.tokenId = String(tokenId);
     card.innerHTML = `
       <strong class="sale_card_title">${ownerLabel}</strong><strong class="sale_card_price">${priceLabel}</strong>
       <div style="clear: both;"></div>
@@ -99,7 +131,9 @@
     return card;
   }
 
-  // ================= RECENT SALES (HOMEPAGE) =================
+  // ------------------------------------------------------------
+  // HOMEPAGE: Recent sales
+  // ------------------------------------------------------------
 
   async function loadRecentSales() {
     const container = document.getElementById('recent-sales');
@@ -113,9 +147,7 @@
         return;
       }
 
-      if (statusEl) {
-        statusEl.remove();
-      }
+      if (statusEl) statusEl.remove();
 
       for (const sale of sales) {
         const card = await buildSaleCard(sale);
@@ -169,9 +201,7 @@
         (sale.token && sale.token.tokenId)
     );
 
-    if (!tokenId) {
-      return null;
-    }
+    if (!tokenId) return null;
 
     const metadata =
       sale.metadata ||
@@ -207,14 +237,16 @@
     });
   }
 
-  // ================= WALLET VIEW (INCLUDING STAKED) =================
+  // ------------------------------------------------------------
+  // WALLET VIEW: Owned + Staked
+  // ------------------------------------------------------------
 
   async function loadWalletFrogs(ownerAddress) {
     const container = document.getElementById('recent-sales');
     const statusEl = document.getElementById('recent-sales-status');
 
     if (statusEl) {
-      statusEl.textContent = `Loading frogs owned by ${formatOwnerAddress(
+      statusEl.textContent = `Loading frogs for ${formatOwnerAddress(
         ownerAddress
       )}...`;
     }
@@ -225,11 +257,40 @@
         fetchStakedTokensForOwner(ownerAddress)
       ]);
 
-      const totalCount =
-        ((ownedNfts && ownedNfts.length) || 0) +
-        ((stakedInfos && stakedInfos.length) || 0);
+      // Deduplicate and merge here
+      const frogsById = new Map();
 
-      if (!totalCount) {
+      // 1) Owned NFTs (direct owner = wallet)
+      for (const nft of ownedNfts) {
+        const tokenId = normalizeTokenId(
+          nft.tokenId || (nft.id && nft.id.tokenId)
+        );
+        if (!tokenId) continue;
+
+        const existing = frogsById.get(tokenId) || {};
+        frogsById.set(tokenId, {
+          ...existing,
+          tokenId,
+          fromOwned: true,
+          metadata: nft.rawMetadata || nft.metadata || existing.metadata || null
+        });
+      }
+
+      // 2) Staked NFTs (owned via staking contract, but stakerAddress == wallet)
+      for (const info of stakedInfos) {
+        const tokenId = info.tokenId;
+        if (!tokenId) continue;
+
+        const existing = frogsById.get(tokenId) || {};
+        frogsById.set(tokenId, {
+          ...existing,
+          tokenId,
+          isStaked: true,
+          stakeProgressPercent: info.progressPercent
+        });
+      }
+
+      if (!frogsById.size) {
         if (statusEl) {
           statusEl.textContent = `No Fresh Frogs found for ${formatOwnerAddress(
             ownerAddress
@@ -238,34 +299,12 @@
         return;
       }
 
-      if (statusEl) {
-        statusEl.remove();
-      }
+      if (statusEl) statusEl.remove();
 
-      const rendered = new Set();
-      const stakedMap = new Map();
-      stakedInfos.forEach((info) => {
-        stakedMap.set(info.tokenId, info);
-      });
-
-      // 1) Owned NFTs from Alchemy
-      for (const nft of ownedNfts) {
-        const card = await buildWalletCardFromNft(nft, ownerAddress, stakedMap);
-        if (card) {
-          container.appendChild(card);
-          const tokenIdStr = card.dataset.tokenId;
-          if (tokenIdStr) rendered.add(Number(tokenIdStr));
-        }
-      }
-
-      // 2) Extra staked frogs (held in controller contract, not in wallet)
-      for (const stakeInfo of stakedInfos) {
-        if (rendered.has(stakeInfo.tokenId)) continue;
-        const card = await buildStakedOnlyWalletCard(stakeInfo, ownerAddress);
-        if (card) {
-          container.appendChild(card);
-          rendered.add(stakeInfo.tokenId);
-        }
+      // Build a card once per token
+      for (const frog of frogsById.values()) {
+        const card = await buildWalletCard(ownerAddress, frog);
+        if (card) container.appendChild(card);
       }
     } catch (error) {
       console.error('Unable to load wallet frogs', error);
@@ -325,14 +364,11 @@
 
     const payload = await response.json();
     const sales = payload.nftSales || [];
-    if (!sales.length) {
-      return null;
-    }
+    if (!sales.length) return null;
     return sales[0];
   }
 
-  // ---- staking integration, based on your old function ----
-
+  // Staking integration (needs ethereum-dapp.js to expose these)
   async function fetchStakedTokensForOwner(wallet) {
     const results = [];
     const getStakedTokensFn = window.getStakedTokens;
@@ -368,7 +404,9 @@
         let progressPercent = null;
         try {
           const nextLvl = Number(stakedValues[2]);
-          progressPercent = ((41.7 - nextLvl) / 41.7) * 100;
+          if (Number.isFinite(nextLvl)) {
+            progressPercent = ((41.7 - nextLvl) / 41.7) * 100;
+          }
         } catch (e) {
           progressPercent = null;
         }
@@ -393,23 +431,20 @@
     return results;
   }
 
-  async function buildWalletCardFromNft(nft, ownerAddress, stakedMap) {
-    const tokenId = normalizeTokenId(
-      nft.tokenId || (nft.id && nft.id.tokenId)
-    );
+  async function buildWalletCard(ownerAddress, frog) {
+    const tokenId = frog.tokenId;
     if (!tokenId) return null;
 
-    const metadata =
-      nft.rawMetadata ||
-      nft.metadata ||
-      (await fetchFrogMetadata(tokenId));
+    let metadata = frog.metadata || null;
+    if (!metadata) {
+      metadata = await fetchFrogMetadata(tokenId);
+    }
 
     const frogName =
       metadata && metadata.name ? metadata.name : `Frog #${tokenId}`;
-
     const ownerLabel = formatOwnerAddress(ownerAddress);
 
-    // price: last sale → mint fallback → blank
+    // Price: last sale → mint fallback → blank
     let priceLabel = '';
     try {
       const lastSale = await fetchLastSaleForToken(tokenId);
@@ -420,11 +455,7 @@
         priceLabel = mintFormatted ? `${mintFormatted} ETH` : '';
       }
     } catch (e) {
-      console.warn(
-        'Failed to fetch last sale for wallet frog',
-        tokenId,
-        e
-      );
+      console.warn('Failed to fetch last sale for token', tokenId, e);
     }
     if (priceLabel === 'Unknown') {
       priceLabel = '';
@@ -438,10 +469,11 @@
     const imageUrl = `https://freshfrogs.github.io/frog/${tokenId}.png`;
     const traitsHtml = buildTraitsHtml(metadata);
 
-    const stakeInfo = stakedMap.get(tokenId);
-    const stakeProgressPercent = stakeInfo ? stakeInfo.progressPercent : null;
+    const stakeProgressPercent = frog.isStaked
+      ? frog.stakeProgressPercent
+      : null;
 
-    const card = createFrogCard({
+    return createFrogCard({
       ownerLabel,
       priceLabel,
       frogName,
@@ -451,64 +483,11 @@
       traitsHtml,
       stakeProgressPercent
     });
-
-    card.dataset.tokenId = String(tokenId);
-    return card;
   }
 
-  async function buildStakedOnlyWalletCard(stakeInfo, ownerAddress) {
-    const tokenId = stakeInfo.tokenId;
-    const metadata = await fetchFrogMetadata(tokenId);
-
-    const frogName =
-      metadata && metadata.name ? metadata.name : `Frog #${tokenId}`;
-
-    const ownerLabel = formatOwnerAddress(ownerAddress);
-
-    let priceLabel = '';
-    try {
-      const lastSale = await fetchLastSaleForToken(tokenId);
-      if (lastSale) {
-        priceLabel = formatPrice(lastSale);
-      } else if (DEFAULT_MINT_PRICE_WEI) {
-        const mintFormatted = formatTokenValue(DEFAULT_MINT_PRICE_WEI, 18);
-        priceLabel = mintFormatted ? `${mintFormatted} ETH` : '';
-      }
-    } catch (e) {
-      console.warn(
-        'Failed to fetch last sale for staked-only frog',
-        tokenId,
-        e
-      );
-    }
-    if (priceLabel === 'Unknown') {
-      priceLabel = '';
-    }
-
-    const rarityRank =
-      typeof rarityMap[tokenId] !== 'undefined'
-        ? Number(rarityMap[tokenId])
-        : null;
-
-    const imageUrl = `https://freshfrogs.github.io/frog/${tokenId}.png`;
-    const traitsHtml = buildTraitsHtml(metadata);
-
-    const card = createFrogCard({
-      ownerLabel,
-      priceLabel,
-      frogName,
-      tokenId,
-      rarityRank,
-      imageUrl,
-      traitsHtml,
-      stakeProgressPercent: stakeInfo.progressPercent
-    });
-
-    card.dataset.tokenId = String(tokenId);
-    return card;
-  }
-
-  // ================= SHARED HELPERS (from your original script) =================
+  // ------------------------------------------------------------
+  // Shared helpers
+  // ------------------------------------------------------------
 
   async function fetchFrogMetadata(tokenId) {
     if (metadataCache.has(tokenId)) {
@@ -536,7 +515,8 @@
     const traits = [];
     if (metadata && Array.isArray(metadata.attributes)) {
       const frogTrait = metadata.attributes.find(
-        (attr) => attr.trait_type === 'Frog' || attr.trait_type === 'SpecialFrog'
+        (attr) =>
+          attr.trait_type === 'Frog' || attr.trait_type === 'SpecialFrog'
       );
       if (frogTrait) {
         traits.push(`Frog: ${frogTrait.value}`);
@@ -581,9 +561,11 @@
     }
     if (typeof value === 'string') {
       if (value.startsWith('0x')) {
-        return parseInt(value, 16);
+        const parsed = parseInt(value, 16);
+        return Number.isNaN(parsed) ? null : parsed;
       }
-      return parseInt(value, 10);
+      const parsed = parseInt(value, 10);
+      return Number.isNaN(parsed) ? null : parsed;
     }
     return null;
   }
