@@ -44,6 +44,9 @@ height: 128px;
   margin-left: auto;
   margin-right: auto;
 }
+.wallet_invalid {
+  color: #ffe1e1;
+}
 .desc_title {
     color: inherit;
 }
