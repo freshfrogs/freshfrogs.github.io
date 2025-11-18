@@ -9,17 +9,21 @@
   const metadataCache = new Map();
   const priceCache = new Map();
   const stakingDetailsCache = new Map();
-  const browserProvider = detectBrowserProvider();
-  const isBrowserWalletProvider = Boolean(browserProvider);
   const web3ProviderUrl = `https://eth-mainnet.g.alchemy.com/v2/${API_KEY}`;
-  const web3 = initWeb3(browserProvider);
-  const stakingContract = initStakingContract(web3);
-  const collectionContract = initCollectionContract(web3);
+  let browserProvider = detectBrowserProvider();
+  let isBrowserWalletProvider = Boolean(browserProvider);
+  let web3 = initWeb3(browserProvider);
+  let stakingContract = initStakingContract(web3);
+  let collectionContract = initCollectionContract(web3);
   let stakingProviderWarningShown = false;
+  let providerEventsBound = false;
+  let walletViewsRefreshScheduled = false;
+  let dashboardWalletPrompted = false;
 
   document.addEventListener('DOMContentLoaded', () => {
     setupWalletConnector();
     setupFrogActionHandler();
+    monitorBrowserProvider();
     if (document.getElementById('recent-sales')) {
       loadRecentSales();
     }
@@ -41,16 +45,18 @@
 
     connectLink.addEventListener('click', async (event) => {
       event.preventDefault();
-      if (!browserProvider || typeof browserProvider.request !== 'function') {
+      const provider = getBrowserProvider();
+      if (!provider || typeof provider.request !== 'function') {
         alert('A Web3 wallet (like MetaMask) is required to connect.');
         return;
       }
 
       try {
-        const accounts = await browserProvider.request({ method: 'eth_requestAccounts' });
+        const accounts = await provider.request({ method: 'eth_requestAccounts' });
         const primaryAccount = Array.isArray(accounts) ? accounts[0] : null;
 
         if (isValidWalletAddress(primaryAccount)) {
+          dashboardWalletPrompted = true;
           const normalized = primaryAccount.toLowerCase();
           const targetUrl = deriveWalletRedirect(normalized);
           window.location.href = targetUrl;
@@ -86,6 +92,116 @@
       return window.ethereum;
     }
     return null;
+  }
+
+  function getBrowserProvider() {
+    if (browserProvider && typeof browserProvider.request === 'function') {
+      return browserProvider;
+    }
+    const detected = detectBrowserProvider();
+    if (detected) {
+      handleBrowserProviderDetected(detected);
+    }
+    return browserProvider;
+  }
+
+  function handleBrowserProviderDetected(provider) {
+    if (!provider) {
+      return;
+    }
+    browserProvider = provider;
+    isBrowserWalletProvider = true;
+    refreshContractsWithProvider(provider);
+    bindProviderEvents(provider);
+    if (document.readyState !== 'loading') {
+      scheduleWalletViewsRefresh();
+    }
+  }
+
+  function monitorBrowserProvider() {
+    const provider = getBrowserProvider();
+    if (provider) {
+      if (!providerEventsBound) {
+        handleBrowserProviderDetected(provider);
+      }
+      return;
+    }
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const handleInitialization = () => {
+      const detected = getBrowserProvider();
+      if (detected) {
+        scheduleWalletViewsRefresh();
+      }
+    };
+
+    window.addEventListener('ethereum#initialized', handleInitialization, { once: true });
+    setTimeout(handleInitialization, 1500);
+  }
+
+  function refreshContractsWithProvider(provider) {
+    web3 = initWeb3(provider || null);
+    stakingContract = initStakingContract(web3);
+    collectionContract = initCollectionContract(web3);
+  }
+
+  function bindProviderEvents(provider) {
+    if (!provider || providerEventsBound || typeof provider.on !== 'function') {
+      return;
+    }
+    providerEventsBound = true;
+    provider.on('connect', handleProviderConnect);
+    provider.on('disconnect', handleProviderDisconnect);
+    provider.on('accountsChanged', handleAccountsChanged);
+  }
+
+  function handleProviderConnect() {
+    isBrowserWalletProvider = true;
+    dashboardWalletPrompted = false;
+    scheduleWalletViewsRefresh();
+  }
+
+  function handleProviderDisconnect() {
+    browserProvider = null;
+    isBrowserWalletProvider = false;
+    providerEventsBound = false;
+    dashboardWalletPrompted = false;
+    refreshContractsWithProvider(null);
+    scheduleWalletViewsRefresh();
+    monitorBrowserProvider();
+  }
+
+  function handleAccountsChanged() {
+    dashboardWalletPrompted = false;
+    scheduleWalletViewsRefresh();
+  }
+
+  function scheduleWalletViewsRefresh() {
+    if (walletViewsRefreshScheduled) {
+      return;
+    }
+    walletViewsRefreshScheduled = true;
+    setTimeout(() => {
+      walletViewsRefreshScheduled = false;
+      if (document.getElementById('wallet-frogs')) {
+        clearWalletFrogsContent();
+        loadWalletFrogs();
+      }
+      if (document.getElementById('wallet-dashboard')) {
+        loadWalletDashboard();
+      }
+    }, 100);
+  }
+
+  function clearWalletFrogsContent() {
+    const container = document.getElementById('wallet-frogs');
+    if (!container) {
+      return;
+    }
+    const cards = container.querySelectorAll('.frog_card');
+    cards.forEach((card) => card.remove());
   }
 
   function initWeb3(preferredProvider) {
@@ -223,6 +339,7 @@
     const container = document.getElementById('wallet-frogs');
     const statusEl = document.getElementById('wallet-frogs-status');
     const walletLabelEl = document.getElementById('wallet-address');
+    clearWalletFrogsContent();
     let walletAddress = detectWalletAddress();
     const providerWallet = await detectProviderWallet();
 
@@ -350,7 +467,8 @@
       }
     }
 
-    if (!walletAddress && shouldPromptForDashboardWallet()) {
+    if (!walletAddress && shouldPromptForDashboardWallet() && !dashboardWalletPrompted) {
+      dashboardWalletPrompted = true;
       try {
         walletAddress = await requestProviderWallet();
       } catch (error) {
@@ -582,12 +700,13 @@
   }
 
   async function detectProviderWallet() {
-    if (!browserProvider || typeof browserProvider.request !== 'function') {
+    const provider = getBrowserProvider();
+    if (!provider || typeof provider.request !== 'function') {
       return null;
     }
 
     try {
-      const accounts = await browserProvider.request({ method: 'eth_accounts' });
+      const accounts = await provider.request({ method: 'eth_accounts' });
       if (Array.isArray(accounts) && accounts.length) {
         const candidate = accounts[0];
         if (isValidWalletAddress(candidate)) {
@@ -602,15 +721,17 @@
   }
 
   function shouldPromptForDashboardWallet() {
-    return Boolean(document.getElementById('wallet-dashboard')) && !!browserProvider && typeof browserProvider.request === 'function';
+    const provider = getBrowserProvider();
+    return Boolean(document.getElementById('wallet-dashboard')) && !!provider && typeof provider.request === 'function';
   }
 
   async function requestProviderWallet() {
-    if (!browserProvider || typeof browserProvider.request !== 'function') {
+    const provider = getBrowserProvider();
+    if (!provider || typeof provider.request !== 'function') {
       return null;
     }
 
-    const accounts = await browserProvider.request({ method: 'eth_requestAccounts' });
+    const accounts = await provider.request({ method: 'eth_requestAccounts' });
     if (Array.isArray(accounts) && accounts.length) {
       const candidate = accounts[0];
       if (isValidWalletAddress(candidate)) {
@@ -1231,7 +1352,8 @@
   }
 
   async function stakeFrog(tokenId) {
-    if (!stakingContract || !collectionContract || !browserProvider) {
+    const provider = getBrowserProvider();
+    if (!stakingContract || !collectionContract || !provider) {
       alert('A connected Web3 wallet is required to stake frogs.');
       return;
     }
@@ -1272,7 +1394,8 @@
   }
 
   async function unstakeFrog(tokenId) {
-    if (!stakingContract || !browserProvider) {
+    const provider = getBrowserProvider();
+    if (!stakingContract || !provider) {
       alert('A connected Web3 wallet is required to unstake frogs.');
       return;
     }
@@ -1297,7 +1420,8 @@
   }
 
   async function transferFrog(tokenId) {
-    if (!collectionContract || !browserProvider) {
+    const provider = getBrowserProvider();
+    if (!collectionContract || !provider) {
       alert('A connected Web3 wallet is required to transfer frogs.');
       return;
     }
@@ -1335,11 +1459,12 @@
   }
 
   async function requireWalletAccount() {
-    if (!browserProvider || typeof browserProvider.request !== 'function') {
+    const provider = getBrowserProvider();
+    if (!provider || typeof provider.request !== 'function') {
       throw new Error('Wallet provider unavailable');
     }
 
-    const accounts = await browserProvider.request({ method: 'eth_requestAccounts' });
+    const accounts = await provider.request({ method: 'eth_requestAccounts' });
     const candidate = Array.isArray(accounts) && accounts.length ? accounts[0] : null;
     if (!isValidWalletAddress(candidate)) {
       throw new Error('Wallet account unavailable');
