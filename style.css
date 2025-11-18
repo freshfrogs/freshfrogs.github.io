@@ -96,7 +96,8 @@ hr {
 }
 .sale_card_title {
     float: left;
-  margin-left: 4px
+    margin-left: 4px;
+    text-shadow: 2px 2px darkslateblue;
 }
 .sale_card_price {
     float: right;
