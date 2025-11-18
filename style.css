@@ -75,9 +75,11 @@ hr {
 }
 .sale_card_title {
     float: left;
+  margin-left: 4px
 }
 .sale_card_price {
     float: right;
+  margin-right: 4px
 }
 .recent_sale_img {
     border-radius: 100%;
@@ -101,4 +103,7 @@ hr {
     float: left;
     display: inline-block;
     margin: 8px;
+}
+.frog_img_cont {
+  margin: 16px;
 }
