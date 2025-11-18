@@ -194,10 +194,14 @@
       const stakedTokens = await App.contracts.controller.getStakedTokens(ownerAddress);
       return stakedTokens
         .map((token) => {
-          const tokenId = App.normalizeTokenId(token.tokenId || token.tokenId?.toString());
-          return tokenId != null
+          const rawTokenId = token && token.tokenId != null ? token.tokenId : token;
+          const normalized =
+            rawTokenId && typeof rawTokenId.toString === 'function'
+              ? App.normalizeTokenId(rawTokenId.toString())
+              : App.normalizeTokenId(rawTokenId);
+          return normalized != null
             ? {
-                tokenId,
+                tokenId: normalized,
                 metadata: null,
                 isStaked: true
               }
