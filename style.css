@@ -1,13 +1,13 @@
 body {
-    font-family: monospace;
+font-family: monospace;
     background-color: wheat;
-    background: url("https://freshfrogs.github.io/assets/background.png");
-    color: #333;
-    display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    min-height: 100vh; /* Ensure the body takes full height */
-    padding: 20px; /* Added padding around the content */
+    background: url(https://freshfrogs.github.io/assets/background.png);
+    color: white;
+    display: inline-block;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
 }
 .main_panel {
     background-color: #7cc1ff;
@@ -70,7 +70,7 @@ hr {
     justify-content: center;
     gap: 16px;
     margin: 16px auto;
-    width: 100%;
+    width: 80%;
 }
 
 .recent_sales_status {
@@ -131,6 +131,7 @@ hr {
     border-top-left-radius: 5px;
     padding: 8px;
     margin: 8px;
+    min-height: 70px;
 }
 .recent_sale_traits {
 
@@ -141,7 +142,11 @@ hr {
     margin: 8px;
 }
 .frog_img_cont {
-  margin: 16px;
+    margin: 16px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 128PX;
+    height: 128px;
 }
 .recent_sale_properties p {
   margin: 2px;
