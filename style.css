@@ -17,6 +17,8 @@ font-family: monospace;
     text-align: center;
     padding: 32px;
     color: white;
+    margin-left: auto;
+    margin-right: auto;
 }
 .display_img {
   height: 128px;
