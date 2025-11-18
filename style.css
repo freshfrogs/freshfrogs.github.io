@@ -148,8 +148,17 @@ hr {
     width: 128px;
     height: 128px;
     overflow: hidden;
+  border-radius: 100%;
+      box-shadow: 2px 2px darkslateblue;
 }
 .recent_sale_properties p {
   margin: 2px;
   text-align: left;
+}
+.fly {
+  width: 128px;
+  height: 128px;
+  border-radius: 100%;
+  border: 1px solid darkslateblue;
+    box-shadow: 2px 2px darkslateblue;
 }
