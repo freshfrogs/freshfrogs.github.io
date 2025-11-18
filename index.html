@@ -14,72 +14,170 @@
       <script src="https://unpkg.com/f0js/dist/f0.js"></script>
   </head>
   <body data-connect-destination="wallet">
-    <div class="user_panel" id="wallet-dashboard">
-      <strong class="sale_card_title"></strong><strong class="sale_card_price"></strong>
-      <div style="clear: both;"></div>
-      <div class="frog_img_cont">
-        <img src="https://freshfrogs.github.io/assets/blackWhite.png" class="recent_sale_img" id="dashboard-avatar" alt="Wallet Avatar" >
-      </div>
-      <div class="recent_sale_traits">
-        <div class="user_panel_title">
-          <strong id="dashboard-username" class="sale_card_title">Connect Ethereum Wallet</strong>
-          <strong class="user_panel_address" id="dashboard-wallet">--</strong>
-        </div>
-        <div class="user_panel_prop" id="dashboard-badges">
-          <div class="dashboard_badge">
-            <span class="dashboard_badge_icon">🐸</span>
-            <div>
-              <span class="dashboard_badge_title">Collection</span>
-              <span class="dashboard_badge_desc"><span id="stat-owned">--</span> frogs discovered</span>
-            </div>
-          </div>
-          <div class="dashboard_badge">
-            <span class="dashboard_badge_icon">🌿</span>
-            <div>
-              <span class="dashboard_badge_title">Staking</span>
-              <span class="dashboard_badge_desc"><span id="stat-staked">--</span> frogs earning Flyz</span>
-            </div>
-          </div>
-          <div class="dashboard_badge">
-            <span class="dashboard_badge_icon">💰</span>
-            <div>
-              <span class="dashboard_badge_title">Rewards</span>
-              <span class="dashboard_badge_desc">
-                <span id="stat-rewards-available">--</span> Flyz ready •
-                <span id="stat-rewards-earned">--</span> total earned
-              </span>
-            </div>
-          </div>
-          <div class="dashboard_badge">
-            <span class="dashboard_badge_icon">⭐</span>
-            <div>
-              <span class="dashboard_badge_title">Status</span>
-              <span class="dashboard_badge_desc">
-                Current rank: <span id="dashboard-role">New Explorer</span>
-              </span>
-            </div>
+    <div class="page_shell">
+      <!-- HEADER -->
+      <header class="site_header">
+        <div class="site_logo_block">
+          <img src="https://freshfrogs.github.io/assets/blackWhite.png"
+               alt="Fresh Frogs Logo"
+               class="site_logo">
+          <div class="site_title_group">
+            <h1 class="site_title">Fresh Frogs NFT</h1>
+            <p class="site_tagline">4,040 pixel frogs hopping around Ethereum 🐸</p>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="main_panel">
-      <div class="desc_cont">
-        <img src="https://freshfrogs.github.io/assets/FLY.gif" class="fly"/>
-        <h2>freshfrogs.github.io</h2>
-        <p class="title_desc">
-          Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more
-        </p>
-        opensea.io/collection/fresh-frogs
-        <br>
-        <a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop on OpenSea ⛵</a>
-        <hr>
-        already own a Frog? <a class="pointer" href="https://freshfrogs.io/the-pond">Stake and Earn Rewards! 🐸</a>
-        <br>
-        Waiting to Connect Web3 <a class="pointer" href="#" id="connect-wallet-link">Connect Wallet 🔌</a>
-      </div>
-    </div>
-    <div class="recent_sales" id="recent-sales">
-      <p id="recent-sales-status" class="recent_sales_status">Loading recent sales...</p>
+        <div class="site_header_actions">
+          <a href="#" id="connect-wallet-link" class="primary_button pointer">
+            Connect Wallet 🔌
+          </a>
+        </div>
+      </header>
+
+      <!-- HERO: COLLECTION INFO + WALLET DASHBOARD -->
+      <main class="page_main">
+        <section class="hero_layout">
+          <!-- LEFT: collection description -->
+          <div class="hero_column hero_column--main">
+            <div class="desc_cont">
+              <div class="desc_header">
+                <img src="https://freshfrogs.github.io/assets/FLY.gif" class="fly" alt="Fly animation"/>
+                <div>
+                  <h2 class="desc_title">freshfrogs.github.io</h2>
+                  <p class="desc_subtitle">Generative pixel frog collection on Ethereum</p>
+                </div>
+              </div>
+
+              <p class="title_desc">
+                Fresh Frogs NFT is a collection of <strong>4,040</strong> randomly generated frogs —
+                each one unique with thousands of possible color combinations, traits, accessories, and more.
+              </p>
+
+              <div class="hero_links">
+                <div class="hero_link_row">
+                  <span class="hero_link_label">Marketplace</span>
+                  <a class="primary_button pointer"
+                     href="https://opensea.io/collection/fresh-frogs"
+                     target="_blank">
+                    Shop on OpenSea ⛵
+                  </a>
+                </div>
+
+                <div class="hero_link_row">
+                  <span class="hero_link_label">The Pond</span>
+                  <a class="secondary_button pointer"
+                     href="https://freshfrogs.io/the-pond"
+                     target="_blank">
+                    Stake &amp; Earn Flyz 🐸
+                  </a>
+                </div>
+              </div>
+
+              <hr>
+
+              <p class="hero_footer_text">
+                Already own a frog? Jump into the pond to start earning Flyz.  
+                <br>
+                Waiting to connect Web3? You can always
+                <span class="inline_connect_hint">connect your wallet from the top-right when you’re ready.</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- RIGHT: wallet dashboard -->
+          <aside class="hero_column hero_column--wallet">
+            <div class="user_panel" id="wallet-dashboard">
+              <div class="user_panel_header">
+                <div class="user_panel_title_row">
+                  <span class="user_panel_label">Wallet Dashboard</span>
+                  <span class="user_panel_status" id="wallet-status-label">Disconnected</span>
+                </div>
+              </div>
+
+              <div class="user_panel_body">
+                <div class="dashboard_profile">
+                  <div class="dashboard_avatar_ring">
+                    <img src="https://freshfrogs.github.io/assets/blackWhite.png"
+                         class="dashboard_avatar recent_sale_img"
+                         id="dashboard-avatar"
+                         alt="Wallet Avatar">
+                  </div>
+                  <div class="dashboard_identity">
+                    <strong id="dashboard-username" class="dashboard_username">
+                      Connect Ethereum Wallet
+                    </strong>
+                    <span class="dashboard_wallet_label user_panel_address" id="dashboard-wallet">--</span>
+
+                    <div class="dashboard_role_chip">
+                      <span>⭐</span>
+                      <span>Rank:</span>
+                      <span id="dashboard-role">New Explorer</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="user_panel_prop" id="dashboard-badges">
+                  <div class="dashboard_badges_row">
+                    <div class="dashboard_badge">
+                      <span class="dashboard_badge_icon">🐸</span>
+                      <div>
+                        <span class="dashboard_badge_title">Collection</span>
+                        <span class="dashboard_badge_desc">
+                          <span id="stat-owned">--</span> frogs discovered
+                        </span>
+                      </div>
+                    </div>
+                    <div class="dashboard_badge">
+                      <span class="dashboard_badge_icon">🌿</span>
+                      <div>
+                        <span class="dashboard_badge_title">Staking</span>
+                        <span class="dashboard_badge_desc">
+                          <span id="stat-staked">--</span> frogs earning Flyz
+                        </span>
+                      </div>
+                    </div>
+                    <div class="dashboard_badge">
+                      <span class="dashboard_badge_icon">💰</span>
+                      <div>
+                        <span class="dashboard_badge_title">Rewards</span>
+                        <span class="dashboard_badge_desc">
+                          <span id="stat-rewards-available">--</span> Flyz ready •
+                          <span id="stat-rewards-earned">--</span> total earned
+                        </span>
+                      </div>
+                    </div>
+                    <div class="dashboard_badge">
+                      <span class="dashboard_badge_icon">📊</span>
+                      <div>
+                        <span class="dashboard_badge_title">Status</span>
+                        <span class="dashboard_badge_desc">
+                          On-chain frog explorer
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <p class="dashboard_status dashboard_status_hint">
+                  Connect your wallet to see your frogs, staking progress, and Flyz rewards here.
+                </p>
+              </div>
+            </div>
+          </aside>
+        </section>
+
+        <!-- RECENT SALES -->
+        <section class="recent_section">
+          <div class="recent_section_header">
+            <h3 class="recent_section_title">Recent Swamp Sales</h3>
+            <p class="recent_section_subtitle">
+              Live activity from the Fresh Frogs collection
+            </p>
+          </div>
+
+          <p id="recent-sales-status" class="recent_sales_status">Loading recent sales...</p>
+          <div class="recent_sales" id="recent-sales"></div>
+        </section>
+      </main>
     </div>
     <script src="assets/site.js"></script>
   </body>
