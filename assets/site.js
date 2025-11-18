@@ -36,8 +36,10 @@ async function loadRecentSales() {
     if (statusEl) statusEl.textContent = '';
 
     for (const sale of sales) {
-      const tokenId = parseInt(sale.tokenId, 10);
-      if (Number.isNaN(tokenId)) {
+      const rawTokenId = sale.tokenId;
+      const tokenId = parseInt(rawTokenId, 10);
+
+      if (!rawTokenId || Number.isNaN(tokenId)) {
         console.warn('Skipping sale with invalid tokenId', sale);
         continue;
       }
@@ -55,6 +57,7 @@ async function loadRecentSales() {
 
       const card = createFrogCard({
         tokenId,
+        rarityKey: rawTokenId,
         metadata,
         headerLeft: ownerDisplay,
         headerRight: priceDisplay
@@ -80,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ------------------------
 function createFrogCard({
   tokenId,
+  rarityKey,
   metadata,
   headerLeft,
   headerRight,
@@ -88,10 +92,35 @@ function createFrogCard({
 }) {
   const frogName = `Frog #${tokenId}`;
 
-  const rankRaw    = typeof rarityMap !== 'undefined' ? rarityMap[tokenId] : null;
-  const rarityRank = rankRaw !== undefined && rankRaw !== null ? Number(rankRaw) : null;
-  const rarityTier = rarityRank ? getRarityTier(rarityRank) : null;
+  // ---- RARITY LOOKUP (more flexible) ----
+  let rarityRank = null;
 
+  try {
+    if (typeof window !== 'undefined' && window.rarityMap) {
+      const map = window.rarityMap;
+
+      // Try a few possible key shapes
+      const k1 = rarityKey;               // raw tokenId from API (string)
+      const k2 = String(rarityKey);       // explicit string
+      const k3 = tokenId;                 // numeric ID
+      const k4 = String(tokenId);         // string numeric
+      const k5 = `Frog #${tokenId}`;      // in case your map keys use the full label
+
+      const rankRaw =
+        map[k1] ?? map[k2] ?? map[k3] ?? map[k4] ?? map[k5];
+
+      if (rankRaw !== undefined && rankRaw !== null && rankRaw !== '') {
+        const n = Number(rankRaw);
+        if (!Number.isNaN(n) && n > 0) {
+          rarityRank = n;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('Error while reading rarityMap', e);
+  }
+
+  const rarityTier = rarityRank ? getRarityTier(rarityRank) : null;
   const rarityText  = rarityTier ? rarityTier.label : 'Rarity Unknown';
   const rarityClass = rarityTier
     ? `rarity_badge ${rarityTier.className}`
@@ -223,7 +252,7 @@ function formatOwnerAddress(address) {
 function formatPrice(sale) {
   if (!sale) return '--';
 
-  // Alchemy getNFTSales v3 shape includes sellerFee / protocolFee / royaltyFee
+  // Alchemy getNFTSales v3 shape includes sellerFee / protocolFee / royaltyFee / price
   const fee =
     sale.sellerFee || sale.protocolFee || sale.royaltyFee || sale.price;
 
