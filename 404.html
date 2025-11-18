@@ -15,100 +15,26 @@
   </head>
   <body>
     <div class="main_panel">
-      <!-- Top info panel (same look as site) -->
       <div class="desc_cont">
         <img src="https://freshfrogs.github.io/assets/FLY.gif" class="fly"/>
         <h2>FreshFrogs Wallet Viewer</h2>
-
         <p class="title_desc">
-          Paste a wallet address directly after <strong>freshfrogs.github.io/</strong> to view frogs owned and staked by that wallet.
-        </p>
-        <p class="title_desc">
-          Example: <strong>freshfrogs.github.io/0x0000000000000000000000000000000000000000</strong>
+          Paste a wallet address directly after freshfrogs.github.io/ to view frogs owned and staked by that wallet.
         </p>
         <p class="title_desc">
-          Currently viewing:
-          <span id="wallet-address" class="wallet_invalid">No wallet detected</span>
+          Example: freshfrogs.github.io/0x0000000000000000000000000000000000000000
         </p>
-
-        <hr>
-
-        <!-- Wallet dashboard header using existing header styles -->
-        <div class="recent_sale_header">
-          <span class="sale_card_title">Wallet Dashboard</span>
-        </div>
-
-        <!-- Wallet dashboard cards (reuse frog card styles) -->
-        <div class="recent_sales" id="wallet-dashboard">
-          <!-- Frogs Owned -->
-          <div class="recent_sale_card">
-            <div class="recent_sale_header">
-              <span class="sale_card_title">Frogs Owned</span>
-            </div>
-            <div class="recent_sale_properties">
-              <p>Total Owned: <span id="wallet-owned-count">0</span></p>
-            </div>
-          </div>
-
-          <!-- Frogs Staked -->
-          <div class="recent_sale_card">
-            <div class="recent_sale_header">
-              <span class="sale_card_title">Frogs Staked</span>
-            </div>
-            <div class="recent_sale_properties">
-              <p>Total Staked: <span id="wallet-staked-count">0</span></p>
-            </div>
-          </div>
-
-          <!-- Total Rewards Earned -->
-          <div class="recent_sale_card">
-            <div class="recent_sale_header">
-              <span class="sale_card_title">Total Rewards</span>
-            </div>
-            <div class="recent_sale_properties">
-              <p>
-                Earned: <span id="wallet-rewards-total">0</span> FLYZ
-              </p>
-            </div>
-          </div>
-
-          <!-- Rewards Available -->
-          <div class="recent_sale_card">
-            <div class="recent_sale_header">
-              <span class="sale_card_title">Rewards Available</span>
-            </div>
-            <div class="recent_sale_properties">
-              <p>
-                Claimable: <span id="wallet-rewards-claimable">0</span> FLYZ
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Dashboard actions (you can hook these up in JS) -->
         <p class="title_desc">
-          <a class="pointer" id="wallet-view-owned-btn">View Owned Frogs 🐸</a>
-          &nbsp;•&nbsp;
-          <a class="pointer" id="wallet-view-staked-btn">View Staked Frogs</a>
-          &nbsp;•&nbsp;
-          <a class="pointer" id="wallet-claim-rewards-btn">Claim Rewards</a>
+          Currently viewing: <span id="wallet-address" class="wallet_invalid">No wallet detected</span>
         </p>
-
-        <p class="title_desc">
-          <a class="pointer" href="https://freshfrogs.io/the-pond" target="_blank">Stake your frogs 🐸</a>
-          <br>
-          <a class="pointer" href="https://freshfrogs.io/" target="_blank">Return to homepage ↩️</a>
-        </p>
-      </div>
-
-      <!-- Wallet frogs list (same card grid as recent sales) -->
-      <div class="recent_sales" id="wallet-frogs">
-        <p id="wallet-frogs-status" class="recent_sales_status">
-          Waiting for wallet address...
-        </p>
+        <a class="pointer" href="https://freshfrogs.io/the-pond" target="_blank">Stake your frogs 🐸</a>
+        <br>
+        <a class="pointer" href="https://freshfrogs.io/" target="_blank">Return to homepage ↩️</a>
       </div>
     </div>
-
+    <div class="recent_sales" id="wallet-frogs">
+      <p id="wallet-frogs-status" class="recent_sales_status">Waiting for wallet address...</p>
+    </div>
     <script src="assets/site.js"></script>
   </body>
 </html>
