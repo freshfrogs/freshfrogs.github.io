@@ -44,6 +44,9 @@ height: 128px;
   margin-left: auto;
   margin-right: auto;
 }
+.wallet_invalid {
+  color: #ffe1e1;
+}
 .desc_title {
     color: inherit;
 }
@@ -144,6 +147,41 @@ hr {
     margin: 8px;
   min-height: 70px;
 }
+.staking_footer {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
+}
+.staking_level {
+  font-weight: bold;
+  margin-bottom: 4px;
+  text-shadow: 2px 2px darkslateblue;
+}
+.staking_progress_bar {
+  width: 100%;
+  height: 8px;
+  border: 1px solid darkslateblue;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.15);
+  box-shadow: inset 1px 1px rgba(0, 0, 0, 0.25);
+}
+.staking_progress_fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ffd5, #00ffa2);
+}
+.staking_progress_label {
+  font-size: 0.8em;
+  margin-top: 4px;
+  display: block;
+  text-align: left;
+}
+.staking_progress_meta {
+  font-size: 0.75em;
+  margin-top: 2px;
+  text-align: left;
+  opacity: 0.9;
+}
 .recent_sale_traits {
 
 }
@@ -206,5 +244,69 @@ hr {
     .fly {
         width: min(128px, 60vw);
         height: min(128px, 60vw);
-    }
+  }
+}
+.dashboard_panel {
+  width: 90%;
+  max-width: 960px;
+  background: rgba(27, 105, 190, 0.95);
+  border: 1px solid darkslateblue;
+  box-shadow: 4px 4px darkslateblue;
+  padding: 24px;
+  margin: 16px auto 48px;
+}
+.dashboard_profile {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.dashboard_avatar {
+  width: 72px;
+  height: 72px;
+  border: 2px solid white;
+  border-radius: 16px;
+  object-fit: cover;
+  background: #000;
+}
+.dashboard_identity {
+  text-align: left;
+}
+.dashboard_wallet_label {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.9em;
+  text-transform: lowercase;
+}
+.dashboard_stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+.dashboard_stat_card {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 12px;
+  text-align: center;
+  box-shadow: inset 2px 2px rgba(0, 0, 0, 0.2);
+}
+.dashboard_stat_label {
+  font-size: 0.9em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.85;
+}
+.dashboard_stat_value {
+  display: block;
+  margin-top: 6px;
+  font-size: 1.8em;
+  text-shadow: 2px 2px darkslateblue;
+}
+.dashboard_status {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 0.95em;
+}
+.dashboard_status_success {
+  color: #c6ffd8;
 }

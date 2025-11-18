@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-      <title>FreshFrogs NFT Collection</title>
+      <title>FreshFrogs Dashboard</title>
       <meta name="viewport" content="width=device-width, initial-scale=1">
-      <link rel="stylesheet" href="style.css" type="text/css">
+      <link rel="stylesheet" href="../style.css" type="text/css">
       <link rel="shortcut icon" type="image/x-icon" href="https://freshfrogs.github.io/assets/blackWhite.png">
       <script src="https://freshfrogs.github.io/assets/rarityrankings.js"></script>
       <script src="https://freshfrogs.github.io/assets/controller_abi.js"></script>
@@ -30,9 +30,36 @@
         Waiting to Connect Web3 <a class="pointer" href="#" id="connect-wallet-link">Connect Wallet 🔌</a>
       </div>
     </div>
-    <div class="recent_sales" id="recent-sales">
-      <p id="recent-sales-status" class="recent_sales_status">Loading recent sales...</p>
+
+    <div class="dashboard_panel" id="wallet-dashboard">
+      <div class="dashboard_profile">
+        <img src="../assets/blackWhite.png" alt="OpenSea profile" class="dashboard_avatar" id="dashboard-avatar" loading="lazy">
+        <div class="dashboard_identity">
+          <strong id="dashboard-username">Wallet required</strong>
+          <span id="dashboard-wallet" class="dashboard_wallet_label wallet_invalid">Connect your wallet to load stats</span>
+        </div>
+      </div>
+      <div class="dashboard_stats">
+        <div class="dashboard_stat_card">
+          <span class="dashboard_stat_label">Frogs Owned</span>
+          <strong class="dashboard_stat_value" id="stat-owned">--</strong>
+        </div>
+        <div class="dashboard_stat_card">
+          <span class="dashboard_stat_label">Frogs Staked</span>
+          <strong class="dashboard_stat_value" id="stat-staked">--</strong>
+        </div>
+        <div class="dashboard_stat_card">
+          <span class="dashboard_stat_label">Rewards Earned</span>
+          <strong class="dashboard_stat_value" id="stat-rewards-earned">--</strong>
+        </div>
+        <div class="dashboard_stat_card">
+          <span class="dashboard_stat_label">Rewards Available</span>
+          <strong class="dashboard_stat_value" id="stat-rewards-available">--</strong>
+        </div>
+      </div>
+      <p class="dashboard_status" id="dashboard-status">Add your wallet address to the URL (freshfrogs.github.io/dashboard/0xabc...) or connect above to view your dashboard.</p>
     </div>
-    <script src="assets/site.js"></script>
+
+    <script src="../assets/site.js"></script>
   </body>
 </html>
