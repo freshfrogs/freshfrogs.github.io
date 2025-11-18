@@ -511,7 +511,7 @@
         fetchStakerSnapshot(normalizedWallet)
       ]);
 
-      const profileImage = profile && profile.imageUrl ? profile.imageUrl : getDefaultProfileImage();
+      const profileImage = (profile && profile.imageUrl) || DEFAULT_PROFILE_IMAGE;
       const profileName = profile && profile.username ? profile.username : fallbackName;
       const ownedCount = ownedTokens ? ownedTokens.length : 0;
       const stakedCount = stakedTokens ? stakedTokens.length : 0;
@@ -666,8 +666,12 @@
   }
 
   async function buildWalletCard(token, walletLabel) {
-    const metadata = token.metadata || (await fetchFrogMetadata(token.tokenId));
-    const headerRight = typeof token.priceLabel !== 'undefined' ? token.priceLabel : await derivePriceLabel(token.tokenId);
+    const metadataPromise = token.metadata ? Promise.resolve(token.metadata) : fetchFrogMetadata(token.tokenId);
+    const pricePromise =
+      typeof token.priceLabel !== 'undefined'
+        ? Promise.resolve(token.priceLabel)
+        : fetchTokenPriceInfo(token.tokenId).then((info) => (info ? info.label : ''));
+    const [metadata, headerRight] = await Promise.all([metadataPromise, pricePromise]);
     const footerHtml = token.isStaked && token.stakingDetails ? buildStakingFooter(token.stakingDetails) : '';
     const actionHtml = token.actionContext ? buildActionButtons(token.actionContext) : '';
     return createFrogCard({
@@ -681,46 +685,29 @@
   }
 
   function detectWalletAddress() {
-    const pathSegments = window.location.pathname
+    const segments = window.location.pathname
       .split('/')
       .map((segment) => segment.trim())
       .filter(Boolean);
-    const primarySegment = pathSegments.length && !/404\.html$/i.test(pathSegments[pathSegments.length - 1])
-      ? pathSegments[pathSegments.length - 1]
-      : pathSegments[0];
-    const directCandidate = primarySegment && primarySegment !== '404.html' ? primarySegment : '';
-    const searchParams = new URLSearchParams(window.location.search);
-    const queryCandidate = searchParams.get('wallet');
-    const candidate = directCandidate || queryCandidate || '';
+    const queryCandidate = new URLSearchParams(window.location.search).get('wallet');
+    const lastSegment = segments[segments.length - 1];
+    const pathCandidate = lastSegment && !/404\.html$/i.test(lastSegment) ? lastSegment : segments[0];
+    const candidates = [pathCandidate, queryCandidate].filter((value) => value && value !== '404.html');
 
-    if (isValidWalletAddress(candidate)) {
-      return candidate;
-    }
-    if (isValidWalletAddress(queryCandidate)) {
-      return queryCandidate;
+    for (const candidate of candidates) {
+      if (isValidWalletAddress(candidate)) {
+        return candidate;
+      }
     }
     return null;
   }
 
   async function detectProviderWallet() {
-    const provider = getBrowserProvider();
-    if (!provider || typeof provider.request !== 'function') {
-      return null;
-    }
-
-    try {
-      const accounts = await provider.request({ method: 'eth_accounts' });
-      if (Array.isArray(accounts) && accounts.length) {
-        const candidate = accounts[0];
-        if (isValidWalletAddress(candidate)) {
-          return candidate;
-        }
-      }
-      return null;
-    } catch (error) {
-      console.warn('Unable to detect wallet from provider', error);
-      return null;
-    }
+    const [wallet] = await requestProviderAccounts('eth_accounts', {
+      suppressErrors: true,
+      logLabel: 'Unable to detect wallet from provider'
+    });
+    return wallet || null;
   }
 
   function shouldPromptForDashboardWallet() {
@@ -729,19 +716,32 @@
   }
 
   async function requestProviderWallet() {
+    const [wallet] = await requestProviderAccounts('eth_requestAccounts');
+    return wallet || null;
+  }
+
+  async function requestProviderAccounts(method, { suppressErrors = false, logLabel } = {}) {
     const provider = getBrowserProvider();
     if (!provider || typeof provider.request !== 'function') {
-      return null;
+      if (suppressErrors) {
+        return [];
+      }
+      throw new Error('Wallet provider unavailable');
     }
 
-    const accounts = await provider.request({ method: 'eth_requestAccounts' });
-    if (Array.isArray(accounts) && accounts.length) {
-      const candidate = accounts[0];
-      if (isValidWalletAddress(candidate)) {
-        return candidate;
+    try {
+      const accounts = await provider.request({ method });
+      if (!Array.isArray(accounts)) {
+        return [];
       }
+      return accounts.filter((account) => isValidWalletAddress(account));
+    } catch (error) {
+      if (!suppressErrors) {
+        throw error;
+      }
+      console.warn(logLabel || `Unable to fetch accounts via ${method}`, error);
+      return [];
     }
-    return null;
   }
 
   function isValidWalletAddress(value) {
@@ -885,29 +885,17 @@
   }
 
   function buildTraitsHtml(metadata) {
-    const traits = [];
-    const MAX_TRAITS = 3;
-
-    if (metadata && Array.isArray(metadata.attributes)) {
-      const frogTrait = metadata.attributes.find(
-        (attr) => attr.trait_type === 'Frog' || attr.trait_type === 'SpecialFrog'
-      );
-      if (frogTrait) {
-        traits.push(`Frog: ${frogTrait.value}`);
-      }
-
-      metadata.attributes
+    const attributes = Array.isArray(metadata && metadata.attributes) ? metadata.attributes : [];
+    const frogTrait = attributes.find((attr) => attr.trait_type === 'Frog' || attr.trait_type === 'SpecialFrog');
+    const traitText = [
+      frogTrait ? `Frog: ${frogTrait.value}` : null,
+      ...attributes
         .filter((attr) => attr !== frogTrait)
-        .slice(0, MAX_TRAITS - traits.length)
-        .forEach((attr) => {
-          traits.push(`${attr.trait_type}: ${attr.value}`);
-        });
-    }
+        .slice(0, 2)
+        .map((attr) => `${attr.trait_type}: ${attr.value}`)
+    ].filter(Boolean);
 
-    if (!traits.length) {
-      traits.push('Metadata unavailable');
-    }
-
+    const traits = traitText.length ? traitText : ['Metadata unavailable'];
     return traits.map((trait) => `<p>${trait}</p>`).join('');
   }
 
@@ -1081,10 +1069,6 @@
     return null;
   }
 
-  function getDefaultProfileImage() {
-    return DEFAULT_PROFILE_IMAGE;
-  }
-
   function formatFlyzValue(value) {
     if (typeof value !== 'number' || Number.isNaN(value)) {
       return '--';
@@ -1135,16 +1119,16 @@
     }
 
     try {
-      const numericValue = rawValue.toString().startsWith('0x') ? BigInt(rawValue) : BigInt(rawValue);
-      const divisor = BigInt(10) ** BigInt(decimals);
+      const numericValue = BigInt(rawValue);
+      const divisor = 10n ** BigInt(decimals);
       const whole = numericValue / divisor;
       const fraction = numericValue % divisor;
       if (fraction === 0n) {
         return whole.toString();
       }
-      const fractionStr = fraction.toString().padStart(decimals, '0').slice(0, 3);
-      const cleanedFraction = fractionStr.replace(/0+$/, '');
-      return cleanedFraction ? `${whole.toString()}.${cleanedFraction}` : whole.toString();
+      const fractionStr = fraction.toString().padStart(decimals, '0').replace(/0+$/, '');
+      const shortFraction = fractionStr.slice(0, 3);
+      return shortFraction ? `${whole.toString()}.${shortFraction}` : whole.toString();
     } catch (error) {
       const numeric = Number(rawValue) / Math.pow(10, decimals);
       if (!isFinite(numeric)) {
@@ -1173,11 +1157,6 @@
     const info = normalizedLabel ? { label: normalizedLabel, source } : null;
     priceCache.set(tokenId, info);
     return info;
-  }
-
-  async function derivePriceLabel(tokenId) {
-    const info = await fetchTokenPriceInfo(tokenId);
-    return info ? info.label : '';
   }
 
   async function fetchTokenSaleHistory(tokenId, order) {
@@ -1462,17 +1441,11 @@
   }
 
   async function requireWalletAccount() {
-    const provider = getBrowserProvider();
-    if (!provider || typeof provider.request !== 'function') {
-      throw new Error('Wallet provider unavailable');
-    }
-
-    const accounts = await provider.request({ method: 'eth_requestAccounts' });
-    const candidate = Array.isArray(accounts) && accounts.length ? accounts[0] : null;
-    if (!isValidWalletAddress(candidate)) {
+    const wallet = await requestProviderWallet();
+    if (!wallet) {
       throw new Error('Wallet account unavailable');
     }
-    return candidate;
+    return wallet;
   }
 
   function formatShortDate(date) {
