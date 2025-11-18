@@ -5,15 +5,14 @@
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <link rel="stylesheet" href="style.css" type="text/css">
       <link rel="shortcut icon" type="image/x-icon" href="https://freshfrogs.github.io/assets/blackWhite.png">
-      <script src="https://freshfrogs.github.io/assets/rarityrankings.js"></script>
-      <script src="https://freshfrogs.github.io/assets/controller_abi.js"></script>
-      <script src="https://freshfrogs.github.io/assets/collection_abi.js"></script>
-      <script src="https://freshfrogs.github.io/assets/ethereum-dapp.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
-      <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
-      <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+      <script defer src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+      <script defer src="assets/rarityrankings.js"></script>
+      <script defer src="assets/collection_abi.js"></script>
+      <script defer src="assets/controller_abi.js"></script>
+      <script defer src="assets/ethereum-dapp.js"></script>
+      <script defer src="assets/js/frogs.app.js"></script>
   </head>
-  <body>
+  <body data-page="home">
     <div class="main_panel">
       <div class="desc_cont">
         <img src="https://freshfrogs.github.io/assets/FLY.gif" class="fly"/>
@@ -33,7 +32,6 @@
     <div class="recent_sales" id="recent-sales">
       <p id="recent-sales-status" class="recent_sales_status">Loading recent sales...</p>
     </div>
-    <script src="assets/home.js"></script>
   </body>
 </html>
 
