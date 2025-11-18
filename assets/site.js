@@ -4,8 +4,13 @@
   const STAKING_CONTRACT_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
   const rarityMap = buildRarityMap(window.freshfrogs_rarity_rankings || []);
   const metadataCache = new Map();
+  const priceCache = new Map();
+  const stakingDetailsCache = new Map();
+  const STAKING_DAYS_PER_LEVEL = 41.7;
   const web3ProviderUrl = `https://eth-mainnet.g.alchemy.com/v2/${API_KEY}`;
-  const stakingContract = initStakingContract();
+  const web3 = initWeb3();
+  const stakingContract = initStakingContract(web3);
+  const collectionContract = initCollectionContract(web3);
 
   document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('recent-sales')) {
@@ -27,18 +32,44 @@
     }, {});
   }
 
-  function initStakingContract() {
-    if (typeof Web3 === 'undefined' || typeof CONTROLLER_ABI === 'undefined') {
-      console.warn('Web3 or controller ABI unavailable. Staked frogs will be hidden.');
+  function initWeb3() {
+    if (typeof Web3 === 'undefined') {
+      console.warn('Web3 unavailable. Staked frogs will be hidden.');
       return null;
     }
 
     try {
       const provider = new Web3.providers.HttpProvider(web3ProviderUrl);
-      const web3 = new Web3(provider);
-      return new web3.eth.Contract(CONTROLLER_ABI, STAKING_CONTRACT_ADDRESS);
+      return new Web3(provider);
+    } catch (error) {
+      console.warn('Unable to initialize Web3', error);
+      return null;
+    }
+  }
+
+  function initStakingContract(web3Instance) {
+    if (!web3Instance || typeof CONTROLLER_ABI === 'undefined') {
+      console.warn('Staking contract ABI unavailable. Staked frogs will be hidden.');
+      return null;
+    }
+
+    try {
+      return new web3Instance.eth.Contract(CONTROLLER_ABI, STAKING_CONTRACT_ADDRESS);
     } catch (error) {
       console.warn('Unable to initialize staking contract', error);
+      return null;
+    }
+  }
+
+  function initCollectionContract(web3Instance) {
+    if (!web3Instance || typeof COLLECTION_ABI === 'undefined') {
+      return null;
+    }
+
+    try {
+      return new web3Instance.eth.Contract(COLLECTION_ABI, CONTRACT_ADDRESS);
+    } catch (error) {
+      console.warn('Unable to initialize collection contract', error);
       return null;
     }
   }
@@ -167,23 +198,40 @@
           continue;
         }
         seenTokenIds.add(tokenId);
-        const card = await buildWalletCard({
-          tokenId,
-          metadata: token.metadata,
-          headerRight: 'Owned'
-        }, walletLabel);
+        const priceInfo = await fetchTokenPriceInfo(tokenId);
+        const card = await buildWalletCard(
+          {
+            tokenId,
+            metadata: token.metadata,
+            priceLabel: priceInfo ? priceInfo.label : ''
+          },
+          walletLabel
+        );
         if (card) {
           container.appendChild(card);
           hasCards = true;
         }
       }
 
-      for (const tokenId of stakedTokenIds) {
+      for (const stakedToken of stakedTokenIds) {
+        const tokenId = stakedToken.tokenId;
         if (!tokenId || seenTokenIds.has(tokenId)) {
           continue;
         }
         seenTokenIds.add(tokenId);
-        const card = await buildWalletCard({ tokenId, headerRight: 'Staked' }, walletLabel);
+        const [priceInfo, stakingDetails] = await Promise.all([
+          fetchTokenPriceInfo(tokenId),
+          fetchStakingDetails(tokenId)
+        ]);
+        const card = await buildWalletCard(
+          {
+            tokenId,
+            priceLabel: priceInfo ? priceInfo.label : '',
+            isStaked: true,
+            stakingDetails
+          },
+          walletLabel
+        );
         if (card) {
           container.appendChild(card);
           hasCards = true;
@@ -207,11 +255,14 @@
 
   async function buildWalletCard(token, walletLabel) {
     const metadata = token.metadata || (await fetchFrogMetadata(token.tokenId));
+    const headerRight = typeof token.priceLabel !== 'undefined' ? token.priceLabel : await derivePriceLabel(token.tokenId);
+    const footerHtml = token.isStaked && token.stakingDetails ? buildStakingFooter(token.stakingDetails) : '';
     return createFrogCard({
       tokenId: token.tokenId,
       metadata,
       headerLeft: walletLabel,
-      headerRight: token.headerRight
+      headerRight,
+      footerHtml
     });
   }
 
@@ -283,8 +334,11 @@
     try {
       const tokens = await stakingContract.methods.getStakedTokens(walletAddress).call();
       return tokens
-        .map((token) => normalizeTokenId(token.tokenId))
-        .filter((tokenId) => typeof tokenId === 'number' && !Number.isNaN(tokenId));
+        .map((token) => ({
+          tokenId: normalizeTokenId(token.tokenId),
+          staker: token.staker
+        }))
+        .filter((token) => typeof token.tokenId === 'number' && !Number.isNaN(token.tokenId));
     } catch (error) {
       console.warn('Unable to fetch staked frogs', error);
       return [];
@@ -311,7 +365,7 @@
     }
   }
 
-  function createFrogCard({ tokenId, metadata, headerLeft, headerRight }) {
+  function createFrogCard({ tokenId, metadata, headerLeft, headerRight, footerHtml }) {
     const frogName = metadata && metadata.name ? metadata.name : `Frog #${tokenId}`;
     const rarityRank = typeof rarityMap[tokenId] !== 'undefined' ? Number(rarityMap[tokenId]) : null;
     const rarityTier = rarityRank ? getRarityTier(rarityRank) : null;
@@ -333,6 +387,7 @@
         <div class="recent_sale_properties">
           ${traitsHtml}
         </div>
+        ${footerHtml || ''}
       </div>
     `;
 
@@ -449,5 +504,243 @@
       }
       return numeric.toFixed(3);
     }
+  }
+
+  async function fetchTokenPriceInfo(tokenId) {
+    if (priceCache.has(tokenId)) {
+      return priceCache.get(tokenId);
+    }
+
+    const sale = await fetchTokenSaleHistory(tokenId, 'desc');
+    let label = sale ? formatPrice(sale) : '';
+    let source = 'sale';
+
+    if (!label || label === 'Unknown') {
+      const mintSale = await fetchTokenSaleHistory(tokenId, 'asc');
+      label = mintSale ? formatPrice(mintSale) : '';
+      source = 'mint';
+    }
+
+    const normalizedLabel = label && label !== 'Unknown' ? label : '';
+    const info = normalizedLabel ? { label: normalizedLabel, source } : null;
+    priceCache.set(tokenId, info);
+    return info;
+  }
+
+  async function derivePriceLabel(tokenId) {
+    const info = await fetchTokenPriceInfo(tokenId);
+    return info ? info.label : '';
+  }
+
+  async function fetchTokenSaleHistory(tokenId, order) {
+    const attempts = [tokenId.toString(), `0x${tokenId.toString(16)}`];
+    for (const tokenParam of attempts) {
+      const sale = await requestTokenSale(tokenParam, order);
+      if (sale) {
+        return sale;
+      }
+    }
+    return null;
+  }
+
+  async function requestTokenSale(tokenIdValue, order) {
+    try {
+      const endpoint = `https://eth-mainnet.g.alchemy.com/nft/v3/${API_KEY}/getNFTSales`;
+      const params = new URLSearchParams({
+        contractAddress: CONTRACT_ADDRESS,
+        tokenId: tokenIdValue,
+        limit: '1',
+        order: order || 'desc',
+        withMetadata: 'false'
+      });
+      const response = await fetch(`${endpoint}?${params.toString()}`);
+      if (!response.ok) {
+        return null;
+      }
+      const payload = await response.json();
+      return Array.isArray(payload.nftSales) && payload.nftSales.length ? payload.nftSales[0] : null;
+    } catch (error) {
+      console.warn(`Unable to fetch sale history for token ${tokenIdValue}`, error);
+      return null;
+    }
+  }
+
+  async function fetchStakingDetails(tokenId) {
+    if (stakingDetailsCache.has(tokenId)) {
+      return stakingDetailsCache.get(tokenId);
+    }
+
+    let details = await fetchStakingDetailsFromController(tokenId);
+
+    if (!details) {
+      details = await fetchStakingDetailsFromEvents(tokenId);
+    }
+
+    stakingDetailsCache.set(tokenId, details);
+    return details;
+  }
+
+  async function fetchStakingDetailsFromController(tokenId) {
+    const stakingValuesFn = typeof window !== 'undefined' ? window.stakingValues : null;
+
+    if (typeof stakingValuesFn !== 'function') {
+      return null;
+    }
+
+    try {
+      const values = await stakingValuesFn(tokenId);
+      if (!Array.isArray(values) || values.length < 5) {
+        return null;
+      }
+
+      const [, levelText, nextLevelDays, rewardsEarned, stakedDate] = values;
+      const rawDaysToNextLevel = sanitizeNumber(nextLevelDays);
+      const daysToNextLevel = typeof rawDaysToNextLevel === 'number' ? Math.max(0, Math.round(rawDaysToNextLevel)) : 0;
+      const progress = computeStakingProgress(rawDaysToNextLevel);
+
+      return {
+        level: levelText || 'I',
+        progress,
+        daysToNextLevel,
+        rewardsEarned: typeof rewardsEarned === 'string' ? rewardsEarned : String(rewardsEarned || ''),
+        stakedDate: typeof stakedDate === 'string' ? stakedDate : ''
+      };
+    } catch (error) {
+      console.warn(`Unable to load staking values for token ${tokenId}`, error);
+      return null;
+    }
+  }
+
+  async function fetchStakingDetailsFromEvents(tokenId) {
+    if (!web3 || !collectionContract) {
+      return null;
+    }
+
+    try {
+      const stakedDate = await timeStaked(tokenId);
+      if (!stakedDate) {
+        return null;
+      }
+      const now = Date.now();
+      const stakedMs = now - stakedDate.getTime();
+      const stakedHours = Math.floor(stakedMs / (1000 * 60 * 60));
+      const levelInt = Math.floor(stakedHours / 1000) + 1;
+      const hoursIntoCurrentLevel = stakedHours % 1000;
+      const progress = Math.max(0, Math.min(100, (hoursIntoCurrentLevel / 1000) * 100));
+      const daysToNextLevel = Math.max(0, Math.round(((levelInt * 1000) - stakedHours) / 24));
+      return {
+        level: romanize(levelInt),
+        progress,
+        daysToNextLevel,
+        rewardsEarned: (stakedHours / 1000).toFixed(3),
+        stakedDate: formatShortDate(stakedDate)
+      };
+    } catch (error) {
+      console.warn(`Unable to compute staking details for token ${tokenId}`, error);
+      return null;
+    }
+  }
+
+  async function timeStaked(tokenId) {
+    if (!collectionContract) {
+      return null;
+    }
+
+    try {
+      const events = await collectionContract.getPastEvents('Transfer', {
+        filter: { to: STAKING_CONTRACT_ADDRESS, tokenId: tokenId.toString() },
+        fromBlock: 0,
+        toBlock: 'latest'
+      });
+
+      if (!events.length) {
+        return null;
+      }
+
+      const latestEvent = events[events.length - 1];
+      const block = await web3.eth.getBlock(latestEvent.blockNumber);
+      if (!block || !block.timestamp) {
+        return null;
+      }
+      return new Date(block.timestamp * 1000);
+    } catch (error) {
+      console.warn(`Unable to determine stake time for token ${tokenId}`, error);
+      return null;
+    }
+  }
+
+  function buildStakingFooter(details) {
+    if (!details) {
+      return '';
+    }
+
+    const stakedDate = details.stakedDate ? `Staked ${details.stakedDate}` : '';
+    const rewards = details.rewardsEarned ? `${details.rewardsEarned} Flyz earned` : '';
+    const meta = [stakedDate, rewards].filter(Boolean).join(' • ');
+
+    return `
+      <div class="staking_footer">
+        <div class="staking_level">Staking Level ${details.level}</div>
+        <div class="staking_progress_bar">
+          <div class="staking_progress_fill" style="width: ${details.progress}%;"></div>
+        </div>
+        <div class="staking_progress_label">Next level in ${details.daysToNextLevel} days</div>
+        ${meta ? `<div class="staking_progress_meta">${meta}</div>` : ''}
+      </div>
+    `;
+  }
+
+  function computeStakingProgress(daysRemaining) {
+    if (daysRemaining === null) {
+      return 0;
+    }
+    const clamped = Math.max(0, Math.min(STAKING_DAYS_PER_LEVEL, daysRemaining));
+    return Math.round(((STAKING_DAYS_PER_LEVEL - clamped) / STAKING_DAYS_PER_LEVEL) * 100);
+  }
+
+  function sanitizeNumber(value) {
+    const num = Number(value);
+    return Number.isFinite(num) ? num : null;
+  }
+
+  function formatShortDate(date) {
+    if (!(date instanceof Date)) {
+      return '';
+    }
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const yy = String(date.getFullYear()).slice(-2);
+    return `${mm}/${dd}/${yy}`;
+  }
+
+  function romanize(num) {
+    if (!Number.isFinite(num) || num <= 0) {
+      return 'I';
+    }
+    const lookup = {
+      M: 1000,
+      CM: 900,
+      D: 500,
+      CD: 400,
+      C: 100,
+      XC: 90,
+      L: 50,
+      XL: 40,
+      X: 10,
+      IX: 9,
+      V: 5,
+      IV: 4,
+      I: 1
+    };
+    let remaining = Math.floor(num);
+    let roman = '';
+    Object.keys(lookup).forEach((key) => {
+      const value = lookup[key];
+      while (remaining >= value) {
+        roman += key;
+        remaining -= value;
+      }
+    });
+    return roman || 'I';
   }
 })();

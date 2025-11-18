@@ -176,6 +176,12 @@ hr {
   display: block;
   text-align: left;
 }
+.staking_progress_meta {
+  font-size: 0.75em;
+  margin-top: 2px;
+  text-align: left;
+  opacity: 0.9;
+}
 .recent_sale_traits {
 
 }
