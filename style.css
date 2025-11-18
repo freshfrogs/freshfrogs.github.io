@@ -88,6 +88,31 @@ hr {
     padding: 0 8px 32px;
 }
 
+.wallet_layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    width: 100%;
+    max-width: 1184px;
+    margin: 16px auto;
+    padding: 0 8px 32px;
+}
+
+.wallet_dashboard_column {
+    flex: 0 0 360px;
+    position: sticky;
+    top: 20px;
+}
+
+.wallet_dashboard_column .user_panel {
+    width: 100%;
+    max-width: none;
+}
+
+.wallet_frogs_column {
+    flex: 1 1 auto;
+}
+
 .recent_sales_status {
     width: 100%;
     text-align: center;
@@ -303,6 +328,13 @@ hr {
   .dashboard_header_badge {
     width: 100%;
     text-align: left;
+  }
+  .wallet_layout {
+    flex-direction: column;
+  }
+  .wallet_dashboard_column {
+    position: static;
+    width: 100%;
   }
 }
 .dashboard_panel {
