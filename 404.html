@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-      <title>FreshFrogs NFT Collection</title>
+      <title>FreshFrogs Wallet Viewer</title>
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <link rel="stylesheet" href="style.css" type="text/css">
       <link rel="shortcut icon" type="image/x-icon" href="https://freshfrogs.github.io/assets/blackWhite.png">
@@ -17,21 +17,23 @@
     <div class="main_panel">
       <div class="desc_cont">
         <img src="https://freshfrogs.github.io/assets/FLY.gif" class="fly"/>
-        <h2>freshfrogs.github.io</h2>
+        <h2>FreshFrogs Wallet Viewer</h2>
         <p class="title_desc">
-          Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more
+          Paste a wallet address directly after freshfrogs.github.io/ to view frogs owned and staked by that wallet.
         </p>
-        opensea.io/collection/fresh-frogs
+        <p class="title_desc">
+          Example: freshfrogs.github.io/0x0000000000000000000000000000000000000000
+        </p>
+        <p class="title_desc">
+          Currently viewing: <span id="wallet-address" class="wallet_invalid">No wallet detected</span>
+        </p>
+        <a class="pointer" href="https://freshfrogs.io/the-pond" target="_blank">Stake your frogs 🐸</a>
         <br>
-        <a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop on OpenSea ⛵</a>
-        <hr>
-        already own a Frog? <a class="pointer" href="https://freshfrogs.io/the-pond">Stake and Earn Rewards! 🐸</a>
-        <br>
-        Waiting to Connect Web3 <a class="pointer" href="#" id="connect-wallet-link">Connect Wallet 🔌</a>
+        <a class="pointer" href="https://freshfrogs.io/" target="_blank">Return to homepage ↩️</a>
       </div>
     </div>
-    <div class="recent_sales" id="recent-sales">
-      <p id="recent-sales-status" class="recent_sales_status">Loading recent sales...</p>
+    <div class="recent_sales" id="wallet-frogs">
+      <p id="wallet-frogs-status" class="recent_sales_status">Waiting for wallet address...</p>
     </div>
     <script src="assets/site.js"></script>
   </body>
