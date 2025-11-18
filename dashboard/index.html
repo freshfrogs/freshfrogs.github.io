@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <title>FreshFrogs Dashboard</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" href="../style.css" type="text/css">
+      <link rel="shortcut icon" type="image/x-icon" href="https://freshfrogs.github.io/assets/blackWhite.png">
+      <script src="https://freshfrogs.github.io/assets/rarityrankings.js"></script>
+      <script src="https://freshfrogs.github.io/assets/controller_abi.js"></script>
+      <script src="https://freshfrogs.github.io/assets/collection_abi.js"></script>
+      <script src="https://freshfrogs.github.io/assets/ethereum-dapp.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+      <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
+      <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+  </head>
+  <body>
+    <div class="main_panel">
+      <div class="desc_cont">
+        <img src="https://freshfrogs.github.io/assets/FLY.gif" class="fly"/>
+        <h2>freshfrogs.github.io</h2>
+        <p class="title_desc">
+          Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more
+        </p>
+        opensea.io/collection/fresh-frogs
+        <br>
+        <a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop on OpenSea ⛵</a>
+        <hr>
+        already own a Frog? <a class="pointer" href="https://freshfrogs.io/the-pond">Stake and Earn Rewards! 🐸</a>
+        <br>
+        Waiting to Connect Web3 <a class="pointer" href="#" id="connect-wallet-link">Connect Wallet 🔌</a>
+      </div>
+    </div>
+
+    <div class="dashboard_panel" id="wallet-dashboard">
+      <div class="dashboard_profile">
+        <img src="../assets/blackWhite.png" alt="OpenSea profile" class="dashboard_avatar" id="dashboard-avatar" loading="lazy">
+        <div class="dashboard_identity">
+          <strong id="dashboard-username">Wallet required</strong>
+          <span id="dashboard-wallet" class="dashboard_wallet_label wallet_invalid">Connect your wallet to load stats</span>
+        </div>
+      </div>
+      <div class="dashboard_stats">
+        <div class="dashboard_stat_card">
+          <span class="dashboard_stat_label">Frogs Owned</span>
+          <strong class="dashboard_stat_value" id="stat-owned">--</strong>
+        </div>
+        <div class="dashboard_stat_card">
+          <span class="dashboard_stat_label">Frogs Staked</span>
+          <strong class="dashboard_stat_value" id="stat-staked">--</strong>
+        </div>
+        <div class="dashboard_stat_card">
+          <span class="dashboard_stat_label">Rewards Earned</span>
+          <strong class="dashboard_stat_value" id="stat-rewards-earned">--</strong>
+        </div>
+        <div class="dashboard_stat_card">
+          <span class="dashboard_stat_label">Rewards Available</span>
+          <strong class="dashboard_stat_value" id="stat-rewards-available">--</strong>
+        </div>
+      </div>
+      <p class="dashboard_status" id="dashboard-status">Add your wallet address to the URL (freshfrogs.github.io/dashboard/0xabc...) or connect above to view your dashboard.</p>
+    </div>
+
+    <script src="../assets/site.js"></script>
+  </body>
+</html>

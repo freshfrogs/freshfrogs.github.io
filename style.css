@@ -244,5 +244,69 @@ hr {
     .fly {
         width: min(128px, 60vw);
         height: min(128px, 60vw);
-    }
+  }
+}
+.dashboard_panel {
+  width: 90%;
+  max-width: 960px;
+  background: rgba(27, 105, 190, 0.95);
+  border: 1px solid darkslateblue;
+  box-shadow: 4px 4px darkslateblue;
+  padding: 24px;
+  margin: 16px auto 48px;
+}
+.dashboard_profile {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.dashboard_avatar {
+  width: 72px;
+  height: 72px;
+  border: 2px solid white;
+  border-radius: 16px;
+  object-fit: cover;
+  background: #000;
+}
+.dashboard_identity {
+  text-align: left;
+}
+.dashboard_wallet_label {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.9em;
+  text-transform: lowercase;
+}
+.dashboard_stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+.dashboard_stat_card {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 12px;
+  text-align: center;
+  box-shadow: inset 2px 2px rgba(0, 0, 0, 0.2);
+}
+.dashboard_stat_label {
+  font-size: 0.9em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.85;
+}
+.dashboard_stat_value {
+  display: block;
+  margin-top: 6px;
+  font-size: 1.8em;
+  text-shadow: 2px 2px darkslateblue;
+}
+.dashboard_status {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 0.95em;
+}
+.dashboard_status_success {
+  color: #c6ffd8;
 }
