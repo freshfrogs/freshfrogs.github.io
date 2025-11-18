@@ -102,6 +102,7 @@ hr {
 }
 .rarity_badge {
   text-transform: uppercase;
+  text-shadow: 2px 2px darkslateblue;
 }
 .rarity_legendary {
   color: #ffe66d;
