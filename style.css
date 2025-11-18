@@ -72,3 +72,13 @@ hr {
     height: 90%;
     max-width: 200px;
 }
+.sale_card_title {
+    float: left;
+}
+.sale_card_price {
+    float: right;
+}
+.recent_sale_img {
+    border-radius: 100%;
+    border: 1px solid darkslateblue;
+}
