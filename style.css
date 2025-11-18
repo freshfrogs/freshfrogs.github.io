@@ -1,13 +1,13 @@
 body {
-font-family: monospace;
+    font-family: monospace;
     background-color: wheat;
-    background: url(https://freshfrogs.github.io/assets/background.png);
-    color: white;
-    display: inline-block;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
+    background: url("https://freshfrogs.github.io/assets/background.png");
+    color: #333;
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    min-height: 100vh; /* Ensure the body takes full height */
+    padding: 20px; /* Added padding around the content */
 }
 .main_panel {
     background-color: #7cc1ff;
@@ -17,8 +17,6 @@ font-family: monospace;
     text-align: center;
     padding: 32px;
     color: white;
-    margin-left: auto;
-    margin-right: auto;
 }
 .display_img {
   height: 128px;
@@ -72,7 +70,7 @@ hr {
     justify-content: center;
     gap: 16px;
     margin: 16px auto;
-    width: 80%;
+    width: 100%;
 }
 
 .recent_sales_status {
@@ -104,20 +102,19 @@ hr {
   text-transform: uppercase;
 }
 .rarity_legendary {
-  color: rgb(255, 138, 0);
+  color: #ffe66d;
 }
 .rarity_epic {
-  color: rgb(211, 88, 255);
+  color: #ff9bff;
 }
 .rarity_rare {
-  color: rgb(0, 163, 255);
+  color: #80fff4;
 }
 .rarity_common {
-  color: white;
+  color: #f8fbff;
 }
 .rarity_unknown {
-  color: white;
-  opacity: 0.8;
+  color: #d9e6ff;
 }
 .recent_sale_img {
     border-radius: 100%;
@@ -133,7 +130,6 @@ hr {
     border-top-left-radius: 5px;
     padding: 8px;
     margin: 8px;
-    min-height: 70px;
 }
 .recent_sale_traits {
 
@@ -144,11 +140,7 @@ hr {
     margin: 8px;
 }
 .frog_img_cont {
-    margin: 16px;
-    margin-left: auto;
-    margin-right: auto;
-    width: 128PX;
-    height: 128px;
+  margin: 16px;
 }
 .recent_sale_properties p {
   margin: 2px;
