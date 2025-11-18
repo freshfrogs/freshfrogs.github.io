@@ -6,33 +6,59 @@
 (function () {
   'use strict';
 
-  const API_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ'; // you already have this
+  const API_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
   const CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
-  const MAX_TRAITS = 4;
+  const MAX_TRAITS = 5;
 
-  // NEW: staking contract + RPC
+  // NEW: staking contract config
   const STAKING_CONTRACT_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
   const ALCHEMY_RPC_URL = `https://eth-mainnet.g.alchemy.com/v2/${API_KEY}`;
+
+  // NEW: minimal ABI (only what we use)
+  const STAKING_ABI = [
+    {
+      inputs: [{ internalType: 'uint256', name: 'tokenId', type: 'uint256' }],
+      name: 'stakerAddress',
+      outputs: [{ internalType: 'address', name: '', type: 'address' }],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [{ internalType: 'uint256', name: 'tokenId', type: 'uint256' }],
+      name: 'stakingValues',
+      outputs: [
+        { internalType: 'uint256', name: 'stakedTime', type: 'uint256' },
+        { internalType: 'uint256', name: 'level', type: 'uint256' },
+        { internalType: 'uint256', name: 'nextLevel', type: 'uint256' },
+        { internalType: 'uint256', name: 'rewards', type: 'uint256' },
+        { internalType: 'uint256', name: 'extra', type: 'uint256' }
+      ],
+      stateMutability: 'view',
+      type: 'function'
+    }
+  ];
 
   let stakingWeb3 = null;
   let stakingContract = null;
 
   function getStakingContract() {
-    // Need Web3 and controller_abi loaded from <head>
-    if (typeof Web3 === 'undefined' || typeof window.controller_abi === 'undefined') {
-      console.warn('[WalletView] Web3 or controller_abi not available; cannot load staked frogs.');
+    // Only require Web3 now – no more controller_abi dependency
+    if (typeof Web3 === 'undefined') {
+      console.warn('[WalletView] Web3 not available; cannot load staked frogs.');
       return null;
     }
 
     if (!stakingWeb3) {
       stakingWeb3 = new Web3(new Web3.providers.HttpProvider(ALCHEMY_RPC_URL));
     }
+
     if (!stakingContract) {
       stakingContract = new stakingWeb3.eth.Contract(
-        window.controller_abi,
+        STAKING_ABI,
         STAKING_CONTRACT_ADDRESS
       );
     }
+
     return stakingContract;
   }
 
@@ -452,7 +478,7 @@
           continue;
         }
 
-        // 3) Convert stakingValues → progressPercent (same formula as your old code)
+        // 3) Convert stakingValues → progressPercent (same formula as old code)
         for (let i = 0; i < tokenIdsForWallet.length; i++) {
           const tokenId = tokenIdsForWallet[i];
           const stakedValues = stakingValuesList[i];
@@ -484,7 +510,6 @@
 
     return results;
   }
-
 
   async function buildWalletCard(ownerAddress, frog) {
     const tokenId = frog.tokenId;
