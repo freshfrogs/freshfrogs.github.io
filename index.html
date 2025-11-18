@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
       <title>FreshFrogs NFT Collection</title>
       <link rel="stylesheet" href="style.css" type="text/css">
       <link rel="shortcut icon" type="image/x-icon" href="https://freshfrogs.github.io/assets/blackWhite.png">
@@ -13,9 +14,13 @@
       <script src="https://unpkg.com/f0js/dist/f0.js"></script>
   </head>
   <body>
-    <div class="main_panel">
+    <main class="main_panel">
+      <div id="display_cont" class="display_frogs">
+        <img src="https://freshfrogs.github.io/frog/1205.png" class="display_img">
+        <img src="https://freshfrogs.github.io/frog/1206.png" class="display_img">
+        <img src="https://freshfrogs.github.io/frog/1207.png" class="display_img">
+      </div>
       <div class="desc_cont">
-        <img src="https://freshfrogs.github.io/assets/FLY.gif" class="fly"/>
         <h2>freshfrogs.github.io</h2>
         <p class="title_desc">
           Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more
@@ -28,10 +33,45 @@
         <br>
         Waiting to Connect Web3 <a class="pointer" href="https://freshfrogs.io/">Connect Wallet 🔌</a>
       </div>
-    </div>
-    <div class="recent_sales" id="recent-sales">
-      <p id="recent-sales-status" class="recent_sales_status">Loading recent sales...</p>
-    </div>
+      <div class="desc_cont">
+        <p class="title_desc">
+          <b class="desc_title">📃 FreshFrogsNFT Staking</b><br>
+          Stake your FROG(s) to earn exclusive rewards and unlock special benefits, while helping to grow the community and increase the value of your collection!
+          <br>
+          <br>
+          <b class="desc_title">✍️ Sign Contract Approval</b>
+          <br>
+          To start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.
+          <br>
+          <br>
+          <b class="desc_title">🍀 The Pond</b>
+          <br>
+          View all the Frogs staked by the community! Explore, track, and discover rare frogs while unlocking potential rewards!
+        </p>
+      </div>
+      <div class="desc_cont">
+        <p class="title_desc">
+          <b class="desc_title">🍃 Minting Information</b><br>
+          Mint your own unique FreshFrogs NFT today and join the exclusive collection of one-of-a-kind digital frogs!<br>
+          <br>
+          <b class="desc_title">📃 Ethereum Smart Contract</b><br>
+          ERC-721 powered by Factoria, verified and stored on IPFS ✔️
+        </p>
+        <br>
+        <div class="mint_controls" role="group" aria-label="Mint quantity controls">
+          <button id="mintDown" class="connectButton" aria-label="Decrease mint quantity">
+            <span>&#8722;</span>
+          </button>
+          <button id="mintButton" class="connectButton connectButton_primary" onclick=" ">🐸 Mint <u>1</u> Frog(s)</button>
+          <button id="mintUp" class="connectButton" aria-label="Increase mint quantity">
+            <span>&#43;</span>
+          </button>
+        </div>
+      </div>
+      <div class="recent_sales" id="recent-sales">
+        <p id="recent-sales-status" class="recent_sales_status">Loading recent sales...</p>
+      </div>
+    </main>
     <script>
       (function () {
         const API_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
@@ -134,18 +174,24 @@
           const rarityText = rarityTier ? rarityTier.label : 'Rarity Unknown';
           const rarityClass = rarityTier ? `rarity_badge ${rarityTier.className}` : 'rarity_badge rarity_unknown';
           const imageUrl = `https://freshfrogs.github.io/frog/${tokenId}.png`;
+          const nftLink = buildNftLink(tokenId);
           const traitsHtml = buildTraitsHtml(metadata);
 
           const card = document.createElement('div');
           card.className = 'recent_sale_card';
           card.innerHTML = `
-            <strong class="sale_card_title">${owner}</strong><strong class="sale_card_price">${price}</strong>
-            <div style="clear: both;"></div>
+            <div class="sale_card_header">
+              <a class="sale_card_owner_link" href="${nftLink}" target="_blank" rel="noopener noreferrer">${owner}</a>
+              <span class="sale_card_price">${price}</span>
+            </div>
             <div class="frog_img_cont">
               <img src="${imageUrl}" class="recent_sale_img" alt="Frog #${tokenId}" loading="lazy" />
             </div>
             <div class="recent_sale_traits">
-              <strong class="sale_card_title">${frogName}</strong><strong class="sale_card_price ${rarityClass}">${rarityText}</strong><br>
+              <div class="sale_card_meta">
+                <strong class="sale_card_title">${frogName}</strong>
+                <span class="${rarityClass}">${rarityText}</span>
+              </div>
               <div class="recent_sale_properties">
                 ${traitsHtml}
               </div>
@@ -217,6 +263,10 @@
           }
 
           return { label: 'Common', className: 'rarity_common' };
+        }
+
+        function buildNftLink(tokenId) {
+          return `https://etherscan.io/nft/${CONTRACT_ADDRESS}/${tokenId}`;
         }
 
         function normalizeTokenId(value) {
