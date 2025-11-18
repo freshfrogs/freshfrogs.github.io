@@ -7,8 +7,8 @@
 
 const FF_CONFIG = {
   // TODO: put your actual contract addresses here
-  nftContractAddress: "0xYOUR_FROG_NFT_CONTRACT",        // e.g. FreshFrogs NFT
-  stakingContractAddress: "0xYOUR_STAKING_OR_CONTROLLER", // e.g. FreshFrogs Controller
+  nftContractAddress: "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b",        // e.g. FreshFrogs NFT
+  stakingContractAddress: "0xCB1ee125CFf4051a10a55a09B10613876C4Ef199", // e.g. FreshFrogs Controller
 
   // Where frog images live: https://freshfrogs.github.io/frog/{id}.png by default
   imageBaseUrl: "https://freshfrogs.github.io/frog/",
