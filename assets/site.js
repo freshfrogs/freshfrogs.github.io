@@ -68,11 +68,14 @@
   }
 
   function deriveWalletRedirect(walletAddress) {
-    const hasDashboard = Boolean(document.getElementById('wallet-dashboard'));
-    if (hasDashboard) {
+    const destination =
+      (document.body && document.body.dataset && document.body.dataset.connectDestination) || 'wallet';
+
+    if (destination === 'dashboard') {
       const params = new URLSearchParams({ wallet: walletAddress });
       return `${window.location.origin}/dashboard/?${params.toString()}`;
     }
+
     return `${window.location.origin}/${walletAddress}`;
   }
 

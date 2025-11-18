@@ -88,6 +88,22 @@ hr {
     padding: 0 8px 32px;
 }
 
+.wallet_page {
+    width: 100%;
+}
+
+.wallet_intro_card {
+    width: 100%;
+    max-width: 1184px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.wallet_address_label {
+    font-size: 1.1em;
+    letter-spacing: 0.5px;
+}
+
 .wallet_layout {
     display: flex;
     align-items: flex-start;
@@ -111,6 +127,10 @@ hr {
 
 .wallet_frogs_column {
     flex: 1 1 auto;
+}
+
+.wallet_frogs_grid {
+    max-width: none;
 }
 
 .recent_sales_status {
