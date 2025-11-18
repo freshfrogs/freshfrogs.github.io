@@ -25,7 +25,7 @@ async function loadRecentSales() {
   if (statusEl) statusEl.textContent = 'Loading recent sales...';
 
   try {
-    const sales = await fetchRecentSales(24); // latest 24 sales
+    const sales = await fetchRecentSales(200); // latest 24 sales
 
     if (!sales.length) {
       if (statusEl) statusEl.textContent = 'No recent sales found.';
