@@ -1,6 +1,6 @@
 (function () {
   const API_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
-  const OPENSEA_API_KEY = '';
+  const OPENSEA_API_KEY = '48ffee972fc245fa965ecfe902b02ab4';
   const DEFAULT_PROFILE_IMAGE = '/assets/blackWhite.png';
   const CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
   const STAKING_CONTRACT_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
