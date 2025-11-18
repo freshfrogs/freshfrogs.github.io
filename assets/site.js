@@ -350,10 +350,18 @@
       }
     }
 
+    if (!walletAddress && shouldPromptForDashboardWallet()) {
+      try {
+        walletAddress = await requestProviderWallet();
+      } catch (error) {
+        console.warn('User dismissed wallet connection request', error);
+      }
+    }
+
     if (!walletAddress) {
       walletLabelEl.textContent = 'No wallet detected';
       walletLabelEl.classList.add('wallet_invalid');
-      statusEl.textContent = 'Connect your wallet above or add an address to the URL to load your dashboard.';
+      statusEl.textContent = 'Connect your wallet above to load your dashboard.';
       ownedEl.textContent = '--';
       stakedEl.textContent = '--';
       rewardsEarnedEl.textContent = '--';
@@ -591,6 +599,25 @@
       console.warn('Unable to detect wallet from provider', error);
       return null;
     }
+  }
+
+  function shouldPromptForDashboardWallet() {
+    return Boolean(document.getElementById('wallet-dashboard')) && !!browserProvider && typeof browserProvider.request === 'function';
+  }
+
+  async function requestProviderWallet() {
+    if (!browserProvider || typeof browserProvider.request !== 'function') {
+      return null;
+    }
+
+    const accounts = await browserProvider.request({ method: 'eth_requestAccounts' });
+    if (Array.isArray(accounts) && accounts.length) {
+      const candidate = accounts[0];
+      if (isValidWalletAddress(candidate)) {
+        return candidate;
+      }
+    }
+    return null;
   }
 
   function isValidWalletAddress(value) {
