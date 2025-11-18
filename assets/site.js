@@ -250,8 +250,12 @@
     if (!wallet) {
       return false;
     }
-    const attributes = nft.rawMetadata?.attributes || nft.metadata?.attributes || [];
-    const staker = attributes.find((attr) => /owner|staker/i.test(attr?.trait_type || attr?.type || ''));
+    const attributeList = nft.rawMetadata?.attributes || nft.metadata?.attributes || [];
+    const attributes = Array.isArray(attributeList) ? attributeList : [];
+    const staker = attributes.find((attr) => {
+      const label = (attr && (attr.trait_type || attr.type || '')) || '';
+      return /owner|staker/i.test(label);
+    });
     if (staker && typeof staker.value === 'string') {
       return staker.value.toLowerCase() === wallet.toLowerCase();
     }
@@ -279,7 +283,7 @@
     const ownedCount = owned.length;
     const stakedCount = staked.length;
     const available = formatFlyz(rewards.available);
-    the earned = formatFlyz(rewards.earned);
+    const earned = formatFlyz(rewards.earned);
     if (stats.owned) stats.owned.textContent = ownedCount.toString();
     if (stats.staked) stats.staked.textContent = stakedCount.toString();
     if (stats.available) stats.available.textContent = available;
