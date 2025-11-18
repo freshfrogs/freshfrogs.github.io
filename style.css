@@ -91,7 +91,7 @@ hr {
 .recent_sale_properties {
     border-top: 1px solid white;
     border-left: 1px solid white;
-    height: 100px;
+    height: auto;
     border-top-left-radius: 5px;
     padding: 8px;
     margin: 8px;
@@ -106,4 +106,8 @@ hr {
 }
 .frog_img_cont {
   margin: 16px;
+}
+.recent_sale_properties p {
+  margin: 2px;
+  text-align: left;
 }
