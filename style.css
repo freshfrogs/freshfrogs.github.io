@@ -1,92 +1,55 @@
-* {
-    box-sizing: border-box;
-}
-
-:root {
-    --panel-bg: #7cc1ff;
-    --card-bg: #6da7f2;
-    --card-shadow: 0 16px 40px rgba(30, 64, 107, 0.45);
-    --card-radius: 18px;
-}
-
 body {
     font-family: monospace;
-    background: url("https://freshfrogs.github.io/assets/background.png");
-    background-size: cover;
-    background-position: center;
-    color: #333;
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    padding: clamp(16px, 4vw, 48px);
-    font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.05rem);
-    line-height: 1.6;
-}
-
-img {
-    max-width: 100%;
-}
-
-.main_panel {
-    background-color: var(--panel-bg);
-    width: min(100%, 1100px);
-    text-align: center;
-    padding: clamp(24px, 3vw, 48px);
+    background-color: #7cc1ff;
     color: white;
-    border-radius: 22px;
-    box-shadow: var(--card-shadow);
-    margin: clamp(24px, 6vw, 56px) auto;
-    display: flex;
-    flex-direction: column;
+    display: inline-block;
+    justify-content: center;
     align-items: center;
-    gap: clamp(12px, 2vw, 20px);
+    min-height: 100vh;
+    padding: 20px;
+}
+.main_panel {
+    background-color: transparent;
+    width: 90%;
+    height: 90%;
+    max-width: 800px;
+    text-align: center;
+    padding: 32px;
+    color: white;
+  margin-left: auto;
+  margin-right: auto;
 }
 .display_img {
-  height: clamp(96px, 18vw, 128px);
-  width: clamp(96px, 18vw, 128px);
-  box-shadow: 4px 4px cornflowerblue;
-  margin: 4px;
-  }
+height: 128px;
+    width: 128px;
+    margin: 2px;
+    border: 1px solid darkslateblue;
+}
 .display_cont {
   margin-left: auto;
   margin-right: auto;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: clamp(6px, 2vw, 12px);
-  }
+  padding: 16px;
+}
 .title_desc {
-  width: 100%;
+  width: 90%;
   margin-left: auto;
   margin-right: auto;
-  max-width: 640px;
 }
 .desc_title {
     color: inherit;
 }
 .desc_cont {
-    width: 100%;
-    max-width: 760px;
-    margin: 12px auto 0;
+    width: 90%;
+    margin: 16px;
+    margin-left: auto;
+    margin-right: auto;
     background: cornflowerblue;
-    padding: clamp(16px, 2vw, 24px);
+    padding: 32px;
     box-shadow: 4px 4px darkslateblue;
-    border-radius: 14px;
-    text-align: left;
-    line-height: 1.5;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-.desc_cont p {
-    margin: 0;
+    border: 1px solid darkslateblue;
 }
 .pointer {
-    color: white;
-    font-weight: 600;
-    text-decoration: underline;
+  
 }
 hr {
     width: 75%;
@@ -105,12 +68,12 @@ hr {
   image-rendering: pixelated;
 }
 .recent_sales {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: clamp(16px, 3vw, 28px);
-    margin: 24px auto 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin: 16px auto;
     width: 100%;
-    padding: 8px 0;
 }
 
 .recent_sales_status {
@@ -121,34 +84,28 @@ hr {
 }
 
 .recent_sale_card {
-    display: flex;
-    flex-direction: column;
-    background: var(--card-bg);
-    padding: 18px;
+    display: inline-block;
+    background: cornflowerblue;
+    padding: 8px;
     box-shadow: 4px 4px darkslateblue;
-    border-radius: var(--card-radius);
-    gap: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    min-height: 100%;
+    width: 90%;
+    height: 90%;
+    max-width: 200px;
+    margin: 8px;
+    border: 1px solid darkslateblue;
 }
 .sale_card_title {
-    margin: 0;
+    float: left;
+    margin-left: 4px;
+    text-shadow: 2px 2px darkslateblue;
 }
 .sale_card_price {
-    font-weight: 700;
-}
-
-.sale_card_header,
-.sale_card_meta {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    flex-direction: column;
+    float: right;
+  margin-right: 4px
 }
 .rarity_badge {
   text-transform: uppercase;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  text-shadow: 2px 2px darkslateblue;
 }
 .rarity_legendary {
   color: #ffe66d;
@@ -166,25 +123,21 @@ hr {
   color: #d9e6ff;
 }
 .recent_sale_img {
-    border-radius: 18px;
-    border: 1px solid darkslateblue;
-    height: clamp(120px, 38vw, 164px);
-    width: clamp(120px, 38vw, 164px);
+    height: 128px;
+    width: 128px;
     image-rendering: pixelated;
 }
 .recent_sale_properties {
-    border: 1px solid rgba(255, 255, 255, 0.45);
-    border-radius: 10px;
-    padding: 10px 12px;
-    margin: 8px 0 0;
-    background: rgba(255, 255, 255, 0.05);
-    min-height: 84px;
+    border-top: 1px solid white;
+    border-left: 1px solid white;
+    height: auto;
+    border-top-left-radius: 5px;
+    padding: 8px;
+    margin: 8px;
+  min-height: 70px;
 }
 .recent_sale_traits {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  text-align: left;
+
 }
 .recent_sale_properties_title {
     float: left;
@@ -192,121 +145,24 @@ hr {
     margin: 8px;
 }
 .frog_img_cont {
-  margin: 16px auto 8px;
-  display: flex;
-  justify-content: center;
+    margin: 16px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid darkslateblue;
+    width: 128px;
+    height: 128px;
+    overflow: hidden;
+  border-radius: 100%;
+      box-shadow: 2px 2px darkslateblue;
 }
 .recent_sale_properties p {
-  margin: 4px 0;
+  margin: 2px;
   text-align: left;
-  font-size: 0.95rem;
 }
-
-.sale_card_owner_link {
-  color: inherit;
-  text-decoration: none;
-  border-bottom: 1px dotted rgba(255,255,255,0.7);
-  font-weight: 600;
-  word-break: break-word;
-  letter-spacing: 0.03em;
-}
-
-.sale_card_owner_link:hover,
-.sale_card_owner_link:focus {
-  text-decoration: none;
-  border-bottom-color: white;
-}
-
-.mint_controls {
-  display: inline-grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  margin-top: 8px;
-}
-
-.connectButton {
-  font-family: inherit;
-  background: steelblue;
-  color: white;
-  border: 2px solid rgba(255,255,255,0.65);
-  border-radius: 12px;
-  padding: 10px 16px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: transform 0.15s ease, border-color 0.15s ease;
-}
-
-.connectButton_primary {
-  font-weight: 700;
-  min-width: 160px;
-}
-
-.connectButton:hover,
-.connectButton:focus {
-  border-color: white;
-}
-
-.connectButton:active {
-  transform: scale(0.97);
-}
-
-@media (min-width: 640px) {
-  .sale_card_header,
-  .sale_card_meta {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-}
-
-@media (max-width: 600px) {
-  body {
-    padding: 12px;
-  }
-
-  .main_panel {
-    padding: 20px;
-    margin: 16px auto;
-    border-radius: 14px;
-  }
-
-  .display_img {
-    height: 96px;
-    width: 96px;
-  }
-
-  .desc_cont {
-    padding: 16px;
-  }
-
-  .mint_controls {
-    gap: 8px;
-  }
-}
-
-@media (max-width: 520px) {
-  .mint_controls {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .connectButton {
-    width: 100%;
-    text-align: center;
-  }
-
-  #mintButton {
-    grid-column: span 3;
-  }
-}
-
-@media (max-width: 420px) {
-  .recent_sale_card {
-    padding: 16px;
-  }
-
-  .sale_card_owner_link {
-    font-size: 0.9rem;
-  }
+.fly {
+  width: 128px;
+  height: 128px;
+  border-radius: 100%;
+  border: 1px solid darkslateblue;
+    box-shadow: 2px 2px darkslateblue;
 }
