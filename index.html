@@ -170,8 +170,8 @@
           const rarityRank = typeof rarityMap[tokenId] !== 'undefined' ? Number(rarityMap[tokenId]) : null;
           const rarityPercentage = rarityRank ? calculateRarityPercentage(rarityRank) : null;
           const rarityTier = rarityRank ? getRarityTier(rarityRank) : null;
-          const rarityText = rarityPercentage && rarityTier
-            ? `${rarityTier.label} ${rarityPercentage}%`
+          const rarityText = rarityPercentage
+            ? `Rarity ${rarityPercentage}%`
             : 'Rarity Unavailable';
           const rarityClass = rarityTier ? `rarity_badge ${rarityTier.className}` : 'rarity_badge rarity_unknown';
           const imageUrl = `https://freshfrogs.github.io/frog/${tokenId}.png`;
@@ -244,7 +244,7 @@
 
         function calculateRarityPercentage(rank) {
           const percentage = (rank / TOTAL_SUPPLY) * 100;
-          return percentage.toFixed(2);
+          return Math.round(percentage);
         }
 
         function getRarityTier(rank) {
