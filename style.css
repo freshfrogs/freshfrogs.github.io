@@ -307,12 +307,12 @@ hr {
 }
 .dashboard_panel {
   width: min(1024px, 95%);
-  background: linear-gradient(145deg, #0b2d63, #1d7fd6);
-  border: 2px solid rgba(8, 36, 82, 0.9);
-  border-radius: 32px;
-  box-shadow: 0 24px 40px rgba(8, 32, 69, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  padding: 32px;
-  margin: 24px auto 72px;
+    margin: 16px auto;
+    background: cornflowerblue;
+    padding: 32px;
+    box-shadow: 4px 4px darkslateblue;
+    border: 1px solid darkslateblue;
+    font-size: 1.1em
 }
 .dashboard_header {
   display: flex;
@@ -320,6 +320,7 @@ hr {
   gap: 32px;
   flex-wrap: wrap;
   align-items: center;
+  
 }
 .dashboard_profile {
   display: flex;
@@ -327,20 +328,19 @@ hr {
   gap: 20px;
 }
 .dashboard_avatar_ring {
-  width: 96px;
-  height: 96px;
-  padding: 4px;
-  border-radius: 28px;
-  background: linear-gradient(135deg, #ffe66d, #ff9bff);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+width: 128px;
+    height: 128px;
+    padding: 0px;
+    border-radius: 100%;
+    overflow: hidden;
 }
 .dashboard_avatar {
-  width: 100%;
-  height: 100%;
-  border-radius: 24px;
-  border: 2px solid rgba(6, 26, 62, 0.85);
-  object-fit: cover;
-  background: #000;
+    width: 100%;
+    height: 100%;
+    border-radius: 24px;
+    border: 2px solid rgba(6, 26, 62, 0.85);
+    object-fit: cover;
+    background: #000;
 }
 .dashboard_identity {
   text-align: left;
@@ -466,32 +466,31 @@ hr {
   margin: 28px 0 8px;
 }
 .dashboard_badge {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 12px 16px;
-  background: rgba(0, 0, 0, 0.2);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 1px 8px;
+    background: darksalmon;
+    border: 0px solid white;
+    box-shadow: 4px 4px darkslateblue;
+    font-size: 0.9em;
+    margin: 8px;
 }
 .dashboard_badge_icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4em;
+width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1em;
 }
 .dashboard_badge_title {
   font-weight: bold;
   display: block;
 }
 .dashboard_badge_desc {
-  font-size: 0.85em;
-  opacity: 0.85;
 }
 .dashboard_status {
   margin-top: 24px;
@@ -504,4 +503,37 @@ hr {
 }
 .dashboard_status_success {
   color: #c6ffd8;
+}
+.user_panel {
+      display: inline-block;
+    background: cornflowerblue;
+    padding: 8px;
+    box-shadow: 4px 4px darkslateblue;
+    width: 100%;
+    max-width: 364px;
+    margin: 0 auto;
+    border: 1px solid darkslateblue;
+}
+.user_panel_prop {
+  border-top: 0px solid white;
+    border-left: 0px solid white;
+    height: auto;
+    border-top-left-radius: 0px;
+    padding: 8px;
+    margin: 8px;
+    min-height: 70px;
+}
+.user_panel_title {
+  width: 90%;
+    margin-right: auto;
+    margin-left: auto;
+    border: 1px solid white;
+    font-size: 1.1em;
+    display: flow-root;
+    padding: 8px;
+    border-radius: 5px;
+}
+.user_panel_address {
+      float: right;
+  margin-right: 4px
 }
