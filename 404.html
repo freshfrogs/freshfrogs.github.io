@@ -13,83 +13,84 @@
       <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
       <script src="https://unpkg.com/f0js/dist/f0.js"></script>
   </head>
-  <body data-connect-destination="wallet">
-    <main class="wallet_page">
-      <div class="desc_cont wallet_intro_card">
-        <img src="https://freshfrogs.github.io/assets/FLY.gif" class="fly" alt="FreshFrogs fly" />
-        <h2>freshfrogs.github.io wallet explorer</h2>
+  <body>
+    <div class="main_panel">
+      <div class="desc_cont">
+        <img src="https://freshfrogs.github.io/assets/FLY.gif" class="fly"/>
+        <h2>FreshFrogs Wallet Viewer</h2>
         <p class="title_desc">
-          Paste any wallet after the domain (freshfrogs.github.io/0xABC...) to instantly load every owned and staked frog.
+          Paste a wallet address directly after freshfrogs.github.io/ to view frogs owned and staked by that wallet.
         </p>
         <p class="title_desc">
-          Already here? <a class="pointer" href="#" id="connect-wallet-link">Connect wallet 🔌</a> to detect your address automatically and jump to your personal frog URL.
+          Example: freshfrogs.github.io/0x0000000000000000000000000000000000000000
         </p>
         <p class="title_desc">
-          Viewing wallet: <strong id="wallet-address" class="wallet_address_label wallet_invalid">--</strong>
+          Currently viewing: <span id="wallet-address" class="wallet_invalid">No wallet detected</span>
         </p>
+        <a class="pointer" href="https://freshfrogs.io/the-pond" target="_blank">Stake your frogs 🐸</a>
+        <br>
+        <a class="pointer" href="https://freshfrogs.io/" target="_blank">Return to homepage ↩️</a>
       </div>
-      <div class="wallet_layout">
-        <div class="wallet_frogs_column">
-          <div id="wallet-frogs" class="recent_sales wallet_frogs_grid">
-            <p id="wallet-frogs-status" class="recent_sales_status">
-              Add a wallet address to the URL (freshfrogs.github.io/0xabc...) to see owned and staked frogs.
-            </p>
+    </div>
+    <div class="wallet_layout">
+      <div class="wallet_dashboard_column">
+        <div class="user_panel" id="wallet-dashboard">
+          <strong class="sale_card_title"></strong><strong class="sale_card_price"></strong>
+          <div style="clear: both;"></div>
+          <div class="frog_img_cont">
+            <img src="https://freshfrogs.github.io/assets/blackWhite.png" class="recent_sale_img" id="dashboard-avatar" alt="Wallet Avatar" >
+          </div>
+          <div class="recent_sale_traits">
+            <div class="user_panel_title">
+              <strong id="dashboard-username" class="sale_card_title">Connect Ethereum Wallet</strong>
+              <strong class="user_panel_address" id="dashboard-wallet">--</strong>
+            </div>
+            <div class="user_panel_prop" id="dashboard-badges">
+              <div class="dashboard_badge">
+                <span class="dashboard_badge_icon">🐸</span>
+                <div>
+                  <span class="dashboard_badge_title">Collection</span>
+                  <span class="dashboard_badge_desc"><span id="stat-owned">--</span> frogs discovered</span>
+                </div>
+              </div>
+              <div class="dashboard_badge">
+                <span class="dashboard_badge_icon">🌿</span>
+                <div>
+                  <span class="dashboard_badge_title">Staking</span>
+                  <span class="dashboard_badge_desc"><span id="stat-staked">--</span> frogs earning Flyz</span>
+                </div>
+              </div>
+              <div class="dashboard_badge">
+                <span class="dashboard_badge_icon">💰</span>
+                <div>
+                  <span class="dashboard_badge_title">Rewards</span>
+                  <span class="dashboard_badge_desc">
+                    <span id="stat-rewards-available">--</span> Flyz ready •
+                    <span id="stat-rewards-earned">--</span> total earned
+                  </span>
+                </div>
+              </div>
+              <div class="dashboard_badge">
+                <span class="dashboard_badge_icon">⭐</span>
+                <div>
+                  <span class="dashboard_badge_title">Status</span>
+                  <span class="dashboard_badge_desc">
+                    Current rank: <span id="dashboard-role">New Explorer</span>
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <aside class="wallet_dashboard_column">
-          <div class="user_panel" id="wallet-dashboard">
-            <strong class="sale_card_title"></strong><strong class="sale_card_price"></strong>
-            <div style="clear: both;"></div>
-            <div class="frog_img_cont">
-              <img src="https://freshfrogs.github.io/assets/blackWhite.png" class="recent_sale_img" id="dashboard-avatar" alt="Wallet Avatar">
-            </div>
-            <div class="recent_sale_traits">
-              <div class="user_panel_title">
-                <strong id="dashboard-username" class="sale_card_title">Connect Ethereum Wallet</strong>
-                <strong class="user_panel_address" id="dashboard-wallet">--</strong>
-              </div>
-              <div class="user_panel_prop" id="dashboard-badges">
-                <div class="dashboard_badge">
-                  <span class="dashboard_badge_icon">🐸</span>
-                  <div>
-                    <span class="dashboard_badge_title">Collection</span>
-                    <span class="dashboard_badge_desc"><span id="stat-owned">--</span> frogs discovered</span>
-                  </div>
-                </div>
-                <div class="dashboard_badge">
-                  <span class="dashboard_badge_icon">🌿</span>
-                  <div>
-                    <span class="dashboard_badge_title">Staking</span>
-                    <span class="dashboard_badge_desc"><span id="stat-staked">--</span> frogs earning Flyz</span>
-                  </div>
-                </div>
-                <div class="dashboard_badge">
-                  <span class="dashboard_badge_icon">💰</span>
-                  <div>
-                    <span class="dashboard_badge_title">Rewards</span>
-                    <span class="dashboard_badge_desc">
-                      <span id="stat-rewards-available">--</span> Flyz ready •
-                      <span id="stat-rewards-earned">--</span> total earned
-                    </span>
-                  </div>
-                </div>
-                <div class="dashboard_badge">
-                  <span class="dashboard_badge_icon">⭐</span>
-                  <div>
-                    <span class="dashboard_badge_title">Status</span>
-                    <span class="dashboard_badge_desc">
-                      Current rank: <span id="dashboard-role">New Explorer</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <span id="stat-rewards-available-inline" style="display: none;">--</span>
-          <p id="dashboard-status" class="dashboard_status">Connect your wallet to load your dashboard.</p>
-        </aside>
+        <span id="stat-rewards-available-inline" style="display: none;">--</span>
+        <p id="dashboard-status" class="dashboard_status">Connect your wallet to load your dashboard.</p>
       </div>
-    </main>
+      <div class="wallet_frogs_column">
+        <div class="recent_sales" id="wallet-frogs">
+          <p id="wallet-frogs-status" class="recent_sales_status">Waiting for wallet address...</p>
+        </div>
+      </div>
+    </div>
     <script src="assets/site.js"></script>
   </body>
 </html>
