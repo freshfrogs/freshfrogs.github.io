@@ -10,6 +10,9 @@ const FF_OPENSEA_API_KEY    = '48ffee972fc245fa965ecfe902b02ab4'; // reserved fo
 
 const FF_ALCHEMY_NFT_BASE   = `https://eth-mainnet.g.alchemy.com/nft/v3/${FF_ALCHEMY_API_KEY}`;
 
+// cache for rarity source once we find it
+let FF_RARITY_SOURCE = null;
+
 // ------------------------
 // Public entrypoint
 // ------------------------
@@ -25,7 +28,7 @@ async function loadRecentSales() {
   if (statusEl) statusEl.textContent = 'Loading recent sales...';
 
   try {
-    const sales = await fetchRecentSales(200); // latest 24 sales
+    const sales = await fetchRecentSales(24); // latest 24 sales
 
     if (!sales.length) {
       if (statusEl) statusEl.textContent = 'No recent sales found.';
@@ -37,7 +40,7 @@ async function loadRecentSales() {
 
     for (const sale of sales) {
       const rawTokenId = sale.tokenId;
-      const tokenId = parseInt(rawTokenId, 10);
+      const tokenId    = parseInt(rawTokenId, 10);
 
       if (!rawTokenId || Number.isNaN(tokenId)) {
         console.warn('Skipping sale with invalid tokenId', sale);
@@ -79,6 +82,79 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ------------------------
+// Rarity discovery helpers
+// ------------------------
+function resolveRaritySource() {
+  if (FF_RARITY_SOURCE) return FF_RARITY_SOURCE;
+  if (typeof window === 'undefined') return null;
+
+  // likely names
+  const candidateNames = [
+    'rarityMap',
+    'rarityRankings',
+    'rarityRanks',
+    'rarity',
+    'frogRarity',
+    'frogRarities'
+  ];
+
+  for (const name of candidateNames) {
+    if (window[name] && (Array.isArray(window[name]) || typeof window[name] === 'object')) {
+      FF_RARITY_SOURCE = { name, map: window[name] };
+      console.log('[FreshFrogs] Using rarity source:', name);
+      return FF_RARITY_SOURCE;
+    }
+  }
+
+  // fallback: scan window for a big object/array that *might* be rankings
+  for (const key in window) {
+    if (!Object.prototype.hasOwnProperty.call(window, key)) continue;
+    if (!/rarity/i.test(key)) continue;
+
+    const val = window[key];
+    if (val && (Array.isArray(val) || typeof val === 'object')) {
+      FF_RARITY_SOURCE = { name: key, map: val };
+      console.log('[FreshFrogs] Using fallback rarity source:', key);
+      return FF_RARITY_SOURCE;
+    }
+  }
+
+  console.warn('[FreshFrogs] No rarity source found on window');
+  return null;
+}
+
+function resolveRarityRank(tokenId, rarityKey) {
+  const source = resolveRaritySource();
+  if (!source || !source.map) return null;
+
+  const map = source.map;
+  let rankRaw = null;
+
+  // If it's an array, try index-based lookup
+  if (Array.isArray(map)) {
+    // some files might be 0-based, some 1-based
+    rankRaw = map[tokenId] ?? map[tokenId - 1];
+  } else if (typeof map === 'object') {
+    // Try a bunch of key shapes
+    const k1 = rarityKey;               // raw tokenId from API (string)
+    const k2 = String(rarityKey);       // explicit string
+    const k3 = tokenId;                 // numeric ID
+    const k4 = String(tokenId);         // "123"
+    const k5 = `Frog #${tokenId}`;      // "Frog #123"
+
+    rankRaw =
+      map[k1] ?? map[k2] ?? map[k3] ?? map[k4] ?? map[k5];
+  }
+
+  if (rankRaw === undefined || rankRaw === null || rankRaw === '') return null;
+
+  const n = Number(rankRaw);
+  if (Number.isNaN(n) || n <= 0) return null;
+
+  return n;
+}
+
+// ------------------------
 // Card + rarity helpers
 // ------------------------
 function createFrogCard({
@@ -92,35 +168,9 @@ function createFrogCard({
 }) {
   const frogName = `Frog #${tokenId}`;
 
-  // ---- RARITY LOOKUP (more flexible) ----
-  let rarityRank = null;
-
-  try {
-    if (typeof window !== 'undefined' && window.rarityMap) {
-      const map = window.rarityMap;
-
-      // Try a few possible key shapes
-      const k1 = rarityKey;               // raw tokenId from API (string)
-      const k2 = String(rarityKey);       // explicit string
-      const k3 = tokenId;                 // numeric ID
-      const k4 = String(tokenId);         // string numeric
-      const k5 = `Frog #${tokenId}`;      // in case your map keys use the full label
-
-      const rankRaw =
-        map[k1] ?? map[k2] ?? map[k3] ?? map[k4] ?? map[k5];
-
-      if (rankRaw !== undefined && rankRaw !== null && rankRaw !== '') {
-        const n = Number(rankRaw);
-        if (!Number.isNaN(n) && n > 0) {
-          rarityRank = n;
-        }
-      }
-    }
-  } catch (e) {
-    console.warn('Error while reading rarityMap', e);
-  }
-
+  const rarityRank = resolveRarityRank(tokenId, rarityKey);
   const rarityTier = rarityRank ? getRarityTier(rarityRank) : null;
+
   const rarityText  = rarityTier ? rarityTier.label : 'Rarity Unknown';
   const rarityClass = rarityTier
     ? `rarity_badge ${rarityTier.className}`
@@ -240,13 +290,13 @@ async function fetchFrogMetadata(tokenId) {
 // ------------------------
 function formatOwnerAddress(address) {
   if (!address || typeof address !== 'string') {
-    return 'Unknown';
+    return 'Buyer: Unknown';
   }
   const short =
     address.length > 10
       ? `${address.slice(0, 6)}...${address.slice(-4)}`
       : address;
-  return `${short}`;
+  return `Buyer: ${short}`;
 }
 
 function formatPrice(sale) {
