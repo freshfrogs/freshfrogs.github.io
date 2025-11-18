@@ -20,10 +20,10 @@ body {
   margin-right: auto;
 }
 .display_img {
-  height: 128px;
-  width: 128px;
-  box-shadow: 4px 4px cornflowerblue;
-  margin: 2px;
+height: 128px;
+    width: 128px;
+    margin: 2px;
+    border: 1px solid darkslateblue;
 }
 .display_cont {
   margin-left: auto;
@@ -148,7 +148,6 @@ hr {
     width: 128px;
     height: 128px;
     overflow: hidden;
-    border-radius: 100%;
 }
 .recent_sale_properties p {
   margin: 2px;
