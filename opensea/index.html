@@ -30,8 +30,9 @@
     <script>
       const CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b'.toLowerCase();
       const COLLECTION_SLUG = 'fresh-frogs';
-      const OPENSEA_API_KEY = '48ffee972fc245fa965ecfe902b02ab4';
+      const OPENSEA_API_KEY = '';
       const EVENTS_ENDPOINT = 'https://api.opensea.io/api/v2/events';
+      const LEGACY_EVENTS_ENDPOINT = 'https://api.opensea.io/api/v1/events';
       const FALLBACK_IMAGE_BASE = 'https://freshfrogs.github.io/frog/';
       const rarityMap = buildRarityMap(window.freshfrogs_rarity_rankings || []);
       const browserProvider = typeof window !== 'undefined' ? window.ethereum : null;
@@ -68,34 +69,79 @@
         } catch (error) {
           console.error('Unable to load OpenSea sales', error);
           if (statusEl) {
-            statusEl.textContent = 'Unable to load OpenSea sales.';
+            statusEl.textContent = error && error.status === 401
+              ? 'Add your OpenSea API key in opensea/index.html to load recent sales.'
+              : 'Unable to load OpenSea sales.';
           }
         }
       }
 
       async function fetchOpenSeaSales() {
-        const params = new URLSearchParams({
-          collection_slug: COLLECTION_SLUG,
-          event_type: 'sale',
-          limit: '20'
-        });
+        const attempts = [
+          {
+            endpoint: EVENTS_ENDPOINT,
+            params: {
+              collection_slug: COLLECTION_SLUG,
+              event_type: 'sale',
+              limit: '20',
+              chain: 'ethereum'
+            }
+          },
+          {
+            endpoint: LEGACY_EVENTS_ENDPOINT,
+            params: {
+              collection_slug: COLLECTION_SLUG,
+              event_type: 'successful',
+              only_opensea: 'false',
+              limit: '20'
+            }
+          }
+        ];
 
+        let lastError = null;
+
+        for (const attempt of attempts) {
+          try {
+            const events = await requestOpenSeaEvents(attempt.endpoint, attempt.params);
+            if (events.length) {
+              return events;
+            }
+          } catch (error) {
+            lastError = error;
+            console.warn('OpenSea event request failed', error);
+          }
+        }
+
+        if (lastError) {
+          throw lastError;
+        }
+
+        return [];
+      }
+
+      async function requestOpenSeaEvents(endpoint, params) {
+        const query = new URLSearchParams(params || {});
+        const response = await fetch(`${endpoint}?${query.toString()}`, { headers: getOpenSeaHeaders() });
+
+        if (!response.ok) {
+          const error = new Error(`OpenSea events request failed (${response.status})`);
+          error.status = response.status;
+          throw error;
+        }
+
+        const payload = await response.json();
+        const events = payload.asset_events || payload.events || payload.sales || [];
+        return events
+          .map((event) => normalizeEvent(event))
+          .filter(Boolean);
+      }
+
+      function getOpenSeaHeaders() {
         const headers = { Accept: 'application/json' };
         if (OPENSEA_API_KEY) {
           headers['X-API-KEY'] = OPENSEA_API_KEY;
         }
-
-        const response = await fetch(`${EVENTS_ENDPOINT}?${params.toString()}`, { headers });
-
-        if (!response.ok) {
-          throw new Error(`OpenSea events request failed (${response.status})`);
-        }
-
-        const payload = await response.json();
-        const events = payload.asset_events || payload.events || [];
-        return events
-          .map((event) => normalizeEvent(event))
-          .filter(Boolean);
+        return headers;
       }
 
       function normalizeEvent(event) {

@@ -1,5 +1,7 @@
 (function () {
   const API_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
+  const OPENSEA_API_KEY = '';
+  const DEFAULT_PROFILE_IMAGE = '/assets/blackWhite.png';
   const CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
   const STAKING_CONTRACT_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
   const rarityMap = buildRarityMap(window.freshfrogs_rarity_rankings || []);
@@ -22,6 +24,9 @@
     if (document.getElementById('wallet-frogs')) {
       loadWalletFrogs();
     }
+    if (document.getElementById('wallet-dashboard')) {
+      loadWalletDashboard();
+    }
   });
 
   function setupWalletConnector() {
@@ -43,13 +48,22 @@
 
         if (isValidWalletAddress(primaryAccount)) {
           const normalized = primaryAccount.toLowerCase();
-          const targetUrl = `${window.location.origin}/${normalized}`;
+          const targetUrl = deriveWalletRedirect(normalized);
           window.location.href = targetUrl;
         }
       } catch (error) {
         console.warn('Wallet connection was not completed', error);
       }
     });
+  }
+
+  function deriveWalletRedirect(walletAddress) {
+    const hasDashboard = Boolean(document.getElementById('wallet-dashboard'));
+    if (hasDashboard) {
+      const params = new URLSearchParams({ wallet: walletAddress });
+      return `${window.location.origin}/dashboard/?${params.toString()}`;
+    }
+    return `${window.location.origin}/${walletAddress}`;
   }
 
   function buildRarityMap(rankings) {
@@ -205,7 +219,14 @@
     const container = document.getElementById('wallet-frogs');
     const statusEl = document.getElementById('wallet-frogs-status');
     const walletLabelEl = document.getElementById('wallet-address');
-    const walletAddress = detectWalletAddress();
+    let walletAddress = detectWalletAddress();
+
+    if (!walletAddress) {
+      const providerWallet = await detectProviderWallet();
+      if (providerWallet) {
+        walletAddress = providerWallet;
+      }
+    }
 
     if (walletLabelEl) {
       walletLabelEl.textContent = walletAddress || 'No wallet detected';
@@ -294,6 +315,216 @@
     }
   }
 
+  async function loadWalletDashboard() {
+    const usernameEl = document.getElementById('dashboard-username');
+    const walletLabelEl = document.getElementById('dashboard-wallet');
+    const avatarEl = document.getElementById('dashboard-avatar');
+    const statusEl = document.getElementById('dashboard-status');
+    const ownedEl = document.getElementById('stat-owned');
+    const stakedEl = document.getElementById('stat-staked');
+    const rewardsEarnedEl = document.getElementById('stat-rewards-earned');
+    const rewardsAvailableEl = document.getElementById('stat-rewards-available');
+    const rewardsAvailableInlineEl = document.getElementById('stat-rewards-available-inline');
+
+    if (!usernameEl || !walletLabelEl || !avatarEl || !statusEl || !ownedEl || !stakedEl || !rewardsEarnedEl || !rewardsAvailableEl) {
+      return;
+    }
+
+    let walletAddress = detectWalletAddress();
+
+    if (!walletAddress) {
+      const providerWallet = await detectProviderWallet();
+      if (providerWallet) {
+        walletAddress = providerWallet;
+      }
+    }
+
+    if (!walletAddress) {
+      walletLabelEl.textContent = 'No wallet detected';
+      walletLabelEl.classList.add('wallet_invalid');
+      statusEl.textContent = 'Connect your wallet above or add an address to the URL to load your dashboard.';
+      ownedEl.textContent = '--';
+      stakedEl.textContent = '--';
+      rewardsEarnedEl.textContent = '--';
+      rewardsAvailableEl.textContent = '--';
+      if (rewardsAvailableInlineEl) {
+        rewardsAvailableInlineEl.textContent = '--';
+      }
+      updateDashboardVisuals({ totalFrogs: 0, stakedCount: 0, rewardsEarned: null, rewardsAvailable: null });
+      return;
+    }
+
+    const normalizedWallet = walletAddress.toLowerCase();
+    walletLabelEl.textContent = normalizedWallet;
+    walletLabelEl.classList.remove('wallet_invalid');
+    const fallbackName = formatOwnerAddress(normalizedWallet);
+    usernameEl.textContent = fallbackName;
+    statusEl.textContent = 'Loading dashboard...';
+    statusEl.classList.remove('dashboard_status_success');
+
+    try {
+      const [profile, ownedTokens, stakedTokens, rewardsAvailable, stakerSnapshot] = await Promise.all([
+        fetchOpenSeaProfile(normalizedWallet),
+        fetchOwnedFrogs(normalizedWallet),
+        fetchStakedFrogs(normalizedWallet),
+        fetchAvailableRewards(normalizedWallet),
+        fetchStakerSnapshot(normalizedWallet)
+      ]);
+
+      const profileImage = profile && profile.imageUrl ? profile.imageUrl : getDefaultProfileImage();
+      const profileName = profile && profile.username ? profile.username : fallbackName;
+      const ownedCount = ownedTokens ? ownedTokens.length : 0;
+      const stakedCount = stakedTokens ? stakedTokens.length : 0;
+      const totalFrogs = ownedCount + stakedCount;
+      const rewardsEarnedNumber = stakerSnapshot && typeof stakerSnapshot.unclaimedRewards === 'number'
+        ? stakerSnapshot.unclaimedRewards
+        : null;
+      const rewardsAvailableNumber = typeof rewardsAvailable === 'number' ? rewardsAvailable : null;
+
+      avatarEl.src = profileImage;
+      usernameEl.textContent = profileName;
+
+      ownedEl.textContent = ownedCount;
+      stakedEl.textContent = stakedCount;
+
+      const formattedEarned = formatFlyzValue(rewardsEarnedNumber);
+      const formattedAvailable = formatFlyzValue(rewardsAvailableNumber);
+      rewardsEarnedEl.textContent = formattedEarned;
+      rewardsAvailableEl.textContent = formattedAvailable;
+      if (rewardsAvailableInlineEl) {
+        rewardsAvailableInlineEl.textContent = formattedAvailable;
+      }
+
+      updateDashboardVisuals({
+        totalFrogs,
+        stakedCount,
+        rewardsEarned: rewardsEarnedNumber,
+        rewardsAvailable: rewardsAvailableNumber
+      });
+
+      statusEl.textContent = 'Dashboard updated with your latest stats.';
+      statusEl.classList.add('dashboard_status_success');
+    } catch (error) {
+      console.error('Unable to load dashboard data', error);
+      statusEl.textContent = 'Unable to load dashboard data. Please refresh and make sure your wallet is connected.';
+      updateDashboardVisuals({ totalFrogs: 0, stakedCount: 0, rewardsEarned: null, rewardsAvailable: null });
+    }
+  }
+
+  function updateDashboardVisuals(metrics) {
+    const totalFrogs = Number.isFinite(metrics.totalFrogs) ? metrics.totalFrogs : 0;
+    const stakedCount = Number.isFinite(metrics.stakedCount) ? metrics.stakedCount : 0;
+    const rewardsEarned = Number.isFinite(metrics.rewardsEarned) ? metrics.rewardsEarned : null;
+    const rewardsAvailable = Number.isFinite(metrics.rewardsAvailable) ? metrics.rewardsAvailable : null;
+    const progressPercent = totalFrogs > 0 ? Math.min(100, Math.round((stakedCount / totalFrogs) * 100)) : 0;
+    const roleLabel = deriveDashboardRole(totalFrogs, stakedCount);
+
+    const roleEl = document.getElementById('dashboard-role');
+    if (roleEl) {
+      roleEl.textContent = roleLabel;
+    }
+
+    const badgesEl = document.getElementById('dashboard-badges');
+    if (badgesEl) {
+      badgesEl.innerHTML = buildDashboardBadges(totalFrogs, stakedCount, rewardsEarned, rewardsAvailable, roleLabel);
+    }
+
+    const progressFillEl = document.getElementById('dashboard-progress-fill');
+    if (progressFillEl) {
+      progressFillEl.style.width = `${progressPercent}%`;
+      progressFillEl.setAttribute('aria-valuenow', progressPercent.toString());
+    }
+
+    const progressLabelEl = document.getElementById('dashboard-progress-label');
+    if (progressLabelEl) {
+      progressLabelEl.textContent = totalFrogs
+        ? `${stakedCount} of ${totalFrogs} frogs are staking`
+        : 'Connect your wallet to start staking.';
+    }
+
+    const progressValueEl = document.getElementById('dashboard-progress-value');
+    if (progressValueEl) {
+      progressValueEl.textContent = `${progressPercent}%`;
+    }
+  }
+
+  function deriveDashboardRole(totalFrogs, stakedCount) {
+    const total = Number.isFinite(totalFrogs) ? totalFrogs : 0;
+    const staked = Number.isFinite(stakedCount) ? stakedCount : 0;
+
+    if (staked >= 25) {
+      return 'Pond Guardian';
+    }
+    if (staked >= 10) {
+      return 'Flyz Farmer';
+    }
+    if (staked >= 5) {
+      return 'Tadpole Trainer';
+    }
+    if (total >= 5) {
+      return 'Frog Wrangler';
+    }
+    if (total >= 1) {
+      return 'Frog Keeper';
+    }
+    return 'New Explorer';
+  }
+
+  function buildDashboardBadges(totalFrogs, stakedCount, rewardsEarned, rewardsAvailable, roleLabel) {
+    const normalizedTotal = Number.isFinite(totalFrogs) ? totalFrogs : 0;
+    const normalizedStaked = Number.isFinite(stakedCount) ? stakedCount : 0;
+    const idleFrogs = Math.max(0, normalizedTotal - normalizedStaked);
+    const hasRewards = (typeof rewardsAvailable === 'number' && rewardsAvailable > 0) || (typeof rewardsEarned === 'number' && rewardsEarned > 0);
+    const earnedDesc = describeFlyzValue(rewardsEarned, 'No Flyz earned yet');
+    const availableDesc = describeFlyzValue(rewardsAvailable, 'No Flyz available');
+    const rewardDesc = hasRewards ? `${availableDesc} ready • ${earnedDesc} total` : 'Stake frogs to earn Flyz';
+    const role = roleLabel || deriveDashboardRole(normalizedTotal, normalizedStaked);
+
+    const badges = [
+      {
+        icon: '🐸',
+        title: 'Collection',
+        desc: normalizedTotal ? `${normalizedTotal} frogs discovered` : 'No frogs detected yet'
+      },
+      {
+        icon: '🌿',
+        title: 'Staking',
+        desc: normalizedStaked ? `${normalizedStaked} frogs earning Flyz` : 'Stake frogs to boost Flyz'
+      },
+      {
+        icon: '💰',
+        title: 'Rewards',
+        desc: rewardDesc
+      },
+      {
+        icon: '⭐',
+        title: 'Status',
+        desc: idleFrogs ? `${idleFrogs} frogs idle • ${role}` : role
+      }
+    ];
+
+    return badges
+      .map(
+        (badge) => `
+        <div class="dashboard_badge">
+          <span class="dashboard_badge_icon">${badge.icon}</span>
+          <div>
+            <span class="dashboard_badge_title">${badge.title}</span>
+            <span class="dashboard_badge_desc">${badge.desc}</span>
+          </div>
+        </div>
+      `
+      )
+      .join('');
+  }
+
+  function describeFlyzValue(value, fallbackText) {
+    if (typeof value === 'number' && value > 0) {
+      return `${value.toFixed(2)} Flyz`;
+    }
+    return fallbackText || '0 Flyz';
+  }
+
   async function buildWalletCard(token, walletLabel) {
     const metadata = token.metadata || (await fetchFrogMetadata(token.tokenId));
     const headerRight = typeof token.priceLabel !== 'undefined' ? token.priceLabel : await derivePriceLabel(token.tokenId);
@@ -327,6 +558,26 @@
       return queryCandidate;
     }
     return null;
+  }
+
+  async function detectProviderWallet() {
+    if (!browserProvider || typeof browserProvider.request !== 'function') {
+      return null;
+    }
+
+    try {
+      const accounts = await browserProvider.request({ method: 'eth_accounts' });
+      if (Array.isArray(accounts) && accounts.length) {
+        const candidate = accounts[0];
+        if (isValidWalletAddress(candidate)) {
+          return candidate;
+        }
+      }
+      return null;
+    } catch (error) {
+      console.warn('Unable to detect wallet from provider', error);
+      return null;
+    }
   }
 
   function isValidWalletAddress(value) {
@@ -383,6 +634,39 @@
     } catch (error) {
       console.warn('Unable to fetch staked frogs', error);
       return [];
+    }
+  }
+
+  async function fetchAvailableRewards(walletAddress) {
+    if (!stakingContract || !walletAddress) {
+      return null;
+    }
+
+    try {
+      const rawRewards = await stakingContract.methods.availableRewards(walletAddress).call();
+      return weiToFloat(rawRewards);
+    } catch (error) {
+      console.warn('Unable to fetch available rewards', error);
+      return null;
+    }
+  }
+
+  async function fetchStakerSnapshot(walletAddress) {
+    if (!stakingContract || !walletAddress || typeof stakingContract.methods.stakers !== 'function') {
+      return null;
+    }
+
+    try {
+      const snapshot = await stakingContract.methods.stakers(walletAddress).call();
+      const unclaimed = snapshot && (snapshot.unclaimedRewards || snapshot[2] || '0');
+      const amountStaked = snapshot && (snapshot.amountStaked || snapshot[0] || '0');
+      return {
+        amountStaked: Number(amountStaked) || 0,
+        unclaimedRewards: weiToFloat(unclaimed)
+      };
+    } catch (error) {
+      console.warn('Unable to fetch staker snapshot', error);
+      return null;
     }
   }
 
@@ -504,6 +788,85 @@
     const normalized = address.startsWith('0x') ? address : `0x${address}`;
     const shortened = `${normalized.slice(0, 6)}..${normalized.slice(-4)}`;
     return shortened.toLowerCase();
+  }
+
+  async function fetchOpenSeaProfile(walletAddress) {
+    if (!walletAddress) {
+      return null;
+    }
+
+    const endpoint = `https://api.opensea.io/api/v2/accounts/${walletAddress}`;
+    const headers = { Accept: 'application/json' };
+    if (OPENSEA_API_KEY) {
+      headers['X-API-KEY'] = OPENSEA_API_KEY;
+    }
+
+    try {
+      const response = await fetch(endpoint, { headers });
+      if (!response.ok) {
+        throw new Error('OpenSea profile request failed');
+      }
+      const payload = await response.json();
+      const account = payload && (payload.account || payload.data || payload);
+      const profile = account && (account.profile || account);
+      let username = null;
+      if (profile && profile.username) {
+        username = profile.username;
+      } else if (profile && profile.display_name) {
+        username = profile.display_name;
+      } else if (profile && profile.user && profile.user.username) {
+        username = profile.user.username;
+      }
+      let imageUrl = null;
+      if (profile && profile.profile_image_url) {
+        imageUrl = profile.profile_image_url;
+      } else if (profile && profile.image_url) {
+        imageUrl = profile.image_url;
+      } else if (profile && profile.avatar) {
+        imageUrl = profile.avatar;
+      } else if (account && account.profile_img_url) {
+        imageUrl = account.profile_img_url;
+      }
+      return {
+        username: username ? username : null,
+        imageUrl: imageUrl ? imageUrl : null
+      };
+    } catch (error) {
+      console.warn('Unable to load OpenSea profile', error);
+      return null;
+    }
+  }
+
+  function getDefaultProfileImage() {
+    return DEFAULT_PROFILE_IMAGE;
+  }
+
+  function formatFlyzValue(value) {
+    if (typeof value !== 'number' || Number.isNaN(value)) {
+      return '--';
+    }
+    return `${value.toFixed(2)} Flyz`;
+  }
+
+  function weiToFloat(value) {
+    if (value === null || typeof value === 'undefined') {
+      return 0;
+    }
+    try {
+      const stringValue = typeof value === 'string' ? value : value.toString();
+      if (web3 && web3.utils && typeof web3.utils.fromWei === 'function') {
+        const formatted = web3.utils.fromWei(stringValue, 'ether');
+        return Number.parseFloat(formatted);
+      }
+      const bigValue = BigInt(stringValue);
+      const divisor = 10n ** 18n;
+      const whole = Number(bigValue / divisor);
+      const fraction = Number(bigValue % divisor) / 1e18;
+      return whole + fraction;
+    } catch (error) {
+      console.warn('Unable to convert wei value', error);
+      return 0;
+    }
   }
 
   function formatPrice(sale) {
