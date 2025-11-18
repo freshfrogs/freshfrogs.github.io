@@ -65,24 +65,239 @@
           <span>&#43;</span>
         </button>
       </div>
-      <div class="recent_sales">
-        <div class="recent_sale_card">
-            <strong class="sale_card_title">Frog #1</strong><strong class="sale_card_price">0.1 ETH</strong>
-            <div class="frog_img_cont">
-                <img src="https://freshfrogs.github.io/frog/1.png" class="recent_sale_img"/>
-            </div>
-            <div class="recent_sale_traits">
-                <strong class="sale_card_title">Properties</strong><strong class="sale_card_price">0x000..123</strong><br>
-                <div class="recent_sale_properties">
-                  <p>Frog: cyanTreeFrog</p>
-                  <p>Trait: sand</p>
-                  <p>Mouth: smokingPipe</p>
-                  <br>
-                  <p>Overall Rarity: #1234</p>
-                </div>
-            </div>
-        </div>
+      <div class="recent_sales" id="recent-sales">
+        <p id="recent-sales-status" class="recent_sales_status">Loading recent sales...</p>
       </div>
     </div>
+    <script>
+      (function () {
+        const API_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
+        const CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
+        const MAX_TRAITS = 3;
+        const rarityMap = buildRarityMap(window.freshfrogs_rarity_rankings || []);
+        const metadataCache = new Map();
+
+        document.addEventListener('DOMContentLoaded', loadRecentSales);
+
+        function buildRarityMap(rankings) {
+          return rankings.reduce((acc, frog) => {
+            if (frog && typeof frog.id !== 'undefined') {
+              const frogId = Number(frog.id);
+              const rankingValue = frog.ranking || frog.rank;
+              acc[frogId] = typeof rankingValue !== 'undefined' ? rankingValue : 'N/A';
+            }
+            return acc;
+          }, {});
+        }
+
+        async function loadRecentSales() {
+          const container = document.getElementById('recent-sales');
+          const statusEl = document.getElementById('recent-sales-status');
+
+          try {
+            const sales = await fetchRecentSales();
+
+            if (!sales.length) {
+              statusEl.textContent = 'No recent sales found.';
+              return;
+            }
+
+            if (statusEl) {
+              statusEl.remove();
+            }
+
+            for (const sale of sales) {
+              const card = await buildSaleCard(sale);
+              if (card) {
+                container.appendChild(card);
+              }
+            }
+          } catch (error) {
+            console.error('Unable to load recent sales', error);
+            if (statusEl) {
+              statusEl.textContent = 'Unable to load recent sales.';
+            }
+          }
+        }
+
+        async function fetchRecentSales() {
+          const endpoint = `https://eth-mainnet.g.alchemy.com/nft/v3/${API_KEY}/getNFTSales`;
+          const sales = [];
+          let pageKey;
+
+          do {
+            const params = new URLSearchParams({
+              contractAddress: CONTRACT_ADDRESS,
+              order: 'desc',
+              withMetadata: 'true'
+            });
+
+            if (pageKey) {
+              params.append('pageKey', pageKey);
+            }
+
+            const response = await fetch(`${endpoint}?${params.toString()}`);
+
+            if (!response.ok) {
+              throw new Error('Alchemy NFT sales request failed');
+            }
+
+            const payload = await response.json();
+            sales.push(...(payload.nftSales || []));
+            pageKey = payload.pageKey;
+          } while (pageKey);
+
+          return sales;
+        }
+
+        async function buildSaleCard(sale) {
+          const tokenId = normalizeTokenId(
+            sale.tokenId ||
+              sale.tokenIdDecimal ||
+              (sale.nft && sale.nft.tokenId) ||
+              (sale.token && sale.token.tokenId)
+          );
+
+          if (!tokenId) {
+            return null;
+          }
+
+          const metadata = sale.metadata || sale.tokenMetadata || (await fetchFrogMetadata(tokenId));
+          const frogName = (metadata && metadata.name) ? metadata.name : `Frog #${tokenId}`;
+          const owner = formatOwnerAddress(sale.buyerAddress || sale.to || sale.ownerAddress);
+          const price = formatPrice(sale);
+          const rarity = typeof rarityMap[tokenId] !== 'undefined' ? `#${rarityMap[tokenId]}` : 'Unavailable';
+          const imageUrl = `https://freshfrogs.github.io/frog/${tokenId}.png`;
+          const traitsHtml = buildTraitsHtml(metadata, rarity);
+
+          const card = document.createElement('div');
+          card.className = 'recent_sale_card';
+          card.innerHTML = `
+            <strong class="sale_card_title">${owner}</strong><strong class="sale_card_price">${price}</strong>
+            <div style="clear: both;"></div>
+            <div class="frog_img_cont">
+              <img src="${imageUrl}" class="recent_sale_img" alt="Frog #${tokenId}" loading="lazy" />
+            </div>
+            <div class="recent_sale_traits">
+              <strong class="sale_card_title">${frogName}</strong><strong class="sale_card_price">Rarity ${rarity}</strong><br>
+              <div class="recent_sale_properties">
+                ${traitsHtml}
+              </div>
+            </div>
+          `;
+
+          return card;
+        }
+
+        async function fetchFrogMetadata(tokenId) {
+          if (metadataCache.has(tokenId)) {
+            return metadataCache.get(tokenId);
+          }
+
+          try {
+            const response = await fetch(`https://freshfrogs.github.io/frog/json/${tokenId}.json`);
+            if (!response.ok) {
+              throw new Error('Metadata fetch failed');
+            }
+            const data = await response.json();
+            metadataCache.set(tokenId, data);
+            return data;
+          } catch (error) {
+            console.warn(`Metadata unavailable for Frog #${tokenId}`, error);
+            metadataCache.set(tokenId, null);
+            return null;
+          }
+        }
+
+        function buildTraitsHtml(metadata, rarity) {
+          const traits = [];
+          if (metadata && Array.isArray(metadata.attributes)) {
+            const frogTrait = metadata.attributes.find(
+              (attr) => attr.trait_type === 'Frog' || attr.trait_type === 'SpecialFrog'
+            );
+            if (frogTrait) {
+              traits.push(`Frog: ${frogTrait.value}`);
+            }
+
+            metadata.attributes
+              .filter((attr) => attr !== frogTrait)
+              .slice(0, MAX_TRAITS - traits.length)
+              .forEach((attr) => {
+                traits.push(`${attr.trait_type}: ${attr.value}`);
+              });
+          }
+
+          if (!traits.length) {
+            traits.push('Metadata unavailable');
+          }
+
+          const traitParagraphs = traits.map((trait) => `<p>${trait}</p>`).join('');
+          return `${traitParagraphs}<br><p>Overall Rarity: ${rarity}</p>`;
+        }
+
+        function normalizeTokenId(value) {
+          if (typeof value === 'number') {
+            return value;
+          }
+          if (typeof value === 'string') {
+            if (value.startsWith('0x')) {
+              return parseInt(value, 16);
+            }
+            return parseInt(value, 10);
+          }
+          return null;
+        }
+
+        function formatOwnerAddress(address) {
+          if (!address) {
+            return 'Unknown';
+          }
+          const normalized = address.startsWith('0x') ? address : `0x${address}`;
+          const shortened = `${normalized.slice(0, 6)}..${normalized.slice(-4)}`;
+          return shortened.toLowerCase();
+        }
+
+        function formatPrice(sale) {
+          const sources = [sale.price, sale.salePrice, sale.sellerFee, sale.protocolFee];
+          const priceSource = sources.find((source) => source && (source.value || source.amount));
+
+          if (!priceSource) {
+            return 'Unknown';
+          }
+
+          const rawValue = priceSource.value || priceSource.amount;
+          const decimals = priceSource.decimals || (priceSource.currency && priceSource.currency.decimals) || 18;
+          const symbol = (priceSource.currency && priceSource.currency.symbol) || priceSource.symbol || 'ETH';
+          const formattedValue = formatTokenValue(rawValue, decimals);
+
+          return formattedValue ? `${formattedValue} ${symbol}` : 'Unknown';
+        }
+
+        function formatTokenValue(rawValue, decimals) {
+          if (!rawValue && rawValue !== 0) {
+            return null;
+          }
+
+          try {
+            const numericValue = rawValue.toString().startsWith('0x') ? BigInt(rawValue) : BigInt(rawValue);
+            const divisor = BigInt(10) ** BigInt(decimals);
+            const whole = numericValue / divisor;
+            const fraction = numericValue % divisor;
+            if (fraction === 0n) {
+              return whole.toString();
+            }
+            const fractionStr = fraction.toString().padStart(decimals, '0').slice(0, 3);
+            const cleanedFraction = fractionStr.replace(/0+$/, '');
+            return cleanedFraction ? `${whole.toString()}.${cleanedFraction}` : whole.toString();
+          } catch (error) {
+            const numeric = Number(rawValue) / Math.pow(10, decimals);
+            if (!isFinite(numeric)) {
+              return null;
+            }
+            return numeric.toFixed(3);
+          }
+        }
+      })();
+    </script>
   </body>
 </html>
