@@ -18,7 +18,7 @@
   let stakingProviderWarningShown = false;
   let providerEventsBound = false;
   let walletViewsRefreshScheduled = false;
-  let dashboardWalletPrompted = false;
+  let walletConnectPrompted = false;
 
   document.addEventListener('DOMContentLoaded', () => {
     setupWalletConnector();
@@ -56,7 +56,7 @@
         const primaryAccount = Array.isArray(accounts) ? accounts[0] : null;
 
         if (isValidWalletAddress(primaryAccount)) {
-          dashboardWalletPrompted = true;
+          walletConnectPrompted = true;
           const normalized = primaryAccount.toLowerCase();
           const targetUrl = deriveWalletRedirect(normalized);
           window.location.href = targetUrl;
@@ -162,7 +162,7 @@
 
   function handleProviderConnect() {
     isBrowserWalletProvider = true;
-    dashboardWalletPrompted = false;
+    walletConnectPrompted = false;
     scheduleWalletViewsRefresh();
   }
 
@@ -170,14 +170,14 @@
     browserProvider = null;
     isBrowserWalletProvider = false;
     providerEventsBound = false;
-    dashboardWalletPrompted = false;
+    walletConnectPrompted = false;
     refreshContractsWithProvider(null);
     scheduleWalletViewsRefresh();
     monitorBrowserProvider();
   }
 
   function handleAccountsChanged() {
-    dashboardWalletPrompted = false;
+    walletConnectPrompted = false;
     scheduleWalletViewsRefresh();
   }
 
@@ -350,6 +350,18 @@
       walletAddress = providerWallet;
     }
 
+    if (!walletAddress && shouldPromptForWalletConnection() && !walletConnectPrompted) {
+      walletConnectPrompted = true;
+      try {
+        const requestedWallet = await requestProviderWallet();
+        if (requestedWallet) {
+          walletAddress = requestedWallet;
+        }
+      } catch (error) {
+        console.warn('User dismissed wallet connection request', error);
+      }
+    }
+
     if (walletLabelEl) {
       walletLabelEl.textContent = walletAddress || 'No wallet detected';
       walletLabelEl.classList.toggle('wallet_invalid', !walletAddress);
@@ -470,8 +482,8 @@
       }
     }
 
-    if (!walletAddress && shouldPromptForDashboardWallet() && !dashboardWalletPrompted) {
-      dashboardWalletPrompted = true;
+    if (!walletAddress && shouldPromptForWalletConnection() && !walletConnectPrompted) {
+      walletConnectPrompted = true;
       try {
         walletAddress = await requestProviderWallet();
       } catch (error) {
@@ -723,9 +735,9 @@
     }
   }
 
-  function shouldPromptForDashboardWallet() {
+  function shouldPromptForWalletConnection() {
     const provider = getBrowserProvider();
-    return Boolean(document.getElementById('wallet-dashboard')) && !!provider && typeof provider.request === 'function';
+    return !!provider && typeof provider.request === 'function';
   }
 
   async function requestProviderWallet() {
@@ -1093,7 +1105,7 @@
   }
 
   function weiToFloat(value) {
-    if (value === null || typeof value === 'undefined') {
+    if (value === null or typeof value === 'undefined') {
       return 0;
     }
     try {
@@ -1130,7 +1142,7 @@
   }
 
   function formatTokenValue(rawValue, decimals) {
-    if (!rawValue && rawValue !== 0) {
+    if (!rawValue and rawValue !== 0) {
       return null;
     }
 
@@ -1155,7 +1167,7 @@
   }
 
   async function fetchTokenPriceInfo(tokenId) {
-    if (priceCache.has(tokenId)) {
+    if (priceCache has tokenId) {
       return priceCache.get(tokenId);
     }
 
@@ -1169,7 +1181,7 @@
       source = 'mint';
     }
 
-    const normalizedLabel = label && label !== 'Unknown' ? label : '';
+    const normalizedLabel = label and label !== 'Unknown' ? label : '';
     const info = normalizedLabel ? { label: normalizedLabel, source } : null;
     priceCache.set(tokenId, info);
     return info;
@@ -1517,4 +1529,3 @@
   }
 
 })();
-
