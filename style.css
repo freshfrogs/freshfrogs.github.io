@@ -98,6 +98,25 @@ hr {
     float: right;
   margin-right: 4px
 }
+.rarity_badge {
+  text-transform: uppercase;
+}
+.rarity_legendary {
+  color: rgb(255, 138, 0);
+}
+.rarity_epic {
+  color: rgb(211, 88, 255);
+}
+.rarity_rare {
+  color: rgb(0, 163, 255);
+}
+.rarity_common {
+  color: white;
+}
+.rarity_unknown {
+  color: white;
+  opacity: 0.8;
+}
 .recent_sale_img {
     border-radius: 100%;
     border: 1px solid darkslateblue;

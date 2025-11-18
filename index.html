@@ -14,12 +14,12 @@
   </head>
   <body>
     <div class="main_panel">
+      <div id="display_cont" class="display_frogs">
+        <img src="https://freshfrogs.github.io/frog/1205.png" class="display_img">
+        <img src="https://freshfrogs.github.io/frog/1206.png" class="display_img">
+        <img src="https://freshfrogs.github.io/frog/1207.png" class="display_img">
+      </div>
       <div class="desc_cont">
-        <div id="display_cont" class="display_frogs">
-          <img src="https://freshfrogs.github.io/frog/1205.png" class="display_img">
-          <img src="https://freshfrogs.github.io/frog/1206.png" class="display_img">
-          <img src="https://freshfrogs.github.io/frog/1207.png" class="display_img">
-        </div>
         <h2>freshfrogs.github.io</h2>
         <p class="title_desc">
           Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more
@@ -32,6 +32,39 @@
         <br>
         Waiting to Connect Web3 <a class="pointer" href="https://freshfrogs.io/">Connect Wallet 🔌</a>
       </div>
+      <div class="desc_cont">
+        <p class="title_desc">
+          <b class="desc_title">📃 FreshFrogsNFT Staking</b><br>
+          Stake your FROG(s) to earn exclusive rewards and unlock special benefits, while helping to grow the community and increase the value of your collection!
+          <br>
+          <br>
+          <b class="desc_title">✍️ Sign Contract Approval</b>
+          <br>
+          To start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.
+          <br>
+          <br>
+          <b class="desc_title">🍀 The Pond</b>
+          <br>
+          View all the Frogs staked by the community! Explore, track, and discover rare frogs while unlocking potential rewards!
+        </p>
+      </div>
+      <div class="desc_cont">
+        <p class="title_desc">
+          <b class="desc_title">🍃 Minting Information</b><br>
+          Mint your own unique FreshFrogs NFT today and join the exclusive collection of one-of-a-kind digital frogs!<br>
+          <br>
+          <b class="desc_title">📃 Ethereum Smart Contract</b><br>
+          ERC-721 powered by Factoria, verified and stored on IPFS ✔️
+        </p>
+        <br>
+        <button id="mintDown" class="connectButton" style="background: steelblue; color: white; margin: 0px;">
+          <span>&#8722;</span>
+        </button>
+        <button id="mintButton" class="connectButton" onclick=" "style="color: white; background: steelblue; margin-left: 0px; margin-right: 0px;">🐸 Mint <u>1</u> Frog(s)</button>
+        <button id="mintUp" class="connectButton" style="background: steelblue; color: white; margin: 0px;">
+          <span>&#43;</span>
+        </button>
+      </div>
       <div class="recent_sales" id="recent-sales">
         <p id="recent-sales-status" class="recent_sales_status">Loading recent sales...</p>
       </div>
@@ -41,6 +74,7 @@
         const API_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
         const CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
         const MAX_TRAITS = 3;
+        const TOTAL_SUPPLY = 4040;
         const rarityMap = buildRarityMap(window.freshfrogs_rarity_rankings || []);
         const metadataCache = new Map();
 
@@ -133,9 +167,15 @@
           const frogName = (metadata && metadata.name) ? metadata.name : `Frog #${tokenId}`;
           const owner = formatOwnerAddress(sale.buyerAddress || sale.to || sale.ownerAddress);
           const price = formatPrice(sale);
-          const rarity = typeof rarityMap[tokenId] !== 'undefined' ? `#${rarityMap[tokenId]}` : 'Unavailable';
+          const rarityRank = typeof rarityMap[tokenId] !== 'undefined' ? Number(rarityMap[tokenId]) : null;
+          const rarityPercentage = rarityRank ? calculateRarityPercentage(rarityRank) : null;
+          const rarityTier = rarityRank ? getRarityTier(rarityRank) : null;
+          const rarityText = rarityPercentage && rarityTier
+            ? `${rarityTier.label} ${rarityPercentage}%`
+            : 'Rarity Unavailable';
+          const rarityClass = rarityTier ? `rarity_badge ${rarityTier.className}` : 'rarity_badge rarity_unknown';
           const imageUrl = `https://freshfrogs.github.io/frog/${tokenId}.png`;
-          const traitsHtml = buildTraitsHtml(metadata, rarity);
+          const traitsHtml = buildTraitsHtml(metadata);
 
           const card = document.createElement('div');
           card.className = 'recent_sale_card';
@@ -146,7 +186,7 @@
               <img src="${imageUrl}" class="recent_sale_img" alt="Frog #${tokenId}" loading="lazy" />
             </div>
             <div class="recent_sale_traits">
-              <strong class="sale_card_title">${frogName}</strong><strong class="sale_card_price">Rarity ${rarity}</strong><br>
+              <strong class="sale_card_title">${frogName}</strong><strong class="sale_card_price ${rarityClass}">${rarityText}</strong><br>
               <div class="recent_sale_properties">
                 ${traitsHtml}
               </div>
@@ -176,7 +216,7 @@
           }
         }
 
-        function buildTraitsHtml(metadata, rarity) {
+        function buildTraitsHtml(metadata) {
           const traits = [];
           if (metadata && Array.isArray(metadata.attributes)) {
             const frogTrait = metadata.attributes.find(
@@ -199,7 +239,30 @@
           }
 
           const traitParagraphs = traits.map((trait) => `<p>${trait}</p>`).join('');
-          return `${traitParagraphs}<br><p>Overall Rarity: ${rarity}</p>`;
+          return traitParagraphs;
+        }
+
+        function calculateRarityPercentage(rank) {
+          const percentage = (rank / TOTAL_SUPPLY) * 100;
+          return percentage.toFixed(2);
+        }
+
+        function getRarityTier(rank) {
+          if (!rank) {
+            return null;
+          }
+
+          if (rank <= 41) {
+            return { label: 'Legendary', className: 'rarity_legendary' };
+          }
+          if (rank <= 404) {
+            return { label: 'Epic', className: 'rarity_epic' };
+          }
+          if (rank <= 1010) {
+            return { label: 'Rare', className: 'rarity_rare' };
+          }
+
+          return { label: 'Common', className: 'rarity_common' };
         }
 
         function normalizeTokenId(value) {
