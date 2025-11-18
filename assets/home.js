@@ -6,9 +6,36 @@
 (function () {
   'use strict';
 
-  const API_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
+  const API_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ'; // you already have this
   const CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
-  const MAX_TRAITS = 3;
+  const MAX_TRAITS = 4;
+
+  // NEW: staking contract + RPC
+  const STAKING_CONTRACT_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
+  const ALCHEMY_RPC_URL = `https://eth-mainnet.g.alchemy.com/v2/${API_KEY}`;
+
+  let stakingWeb3 = null;
+  let stakingContract = null;
+
+  function getStakingContract() {
+    // Need Web3 and controller_abi loaded from <head>
+    if (typeof Web3 === 'undefined' || typeof window.controller_abi === 'undefined') {
+      console.warn('[WalletView] Web3 or controller_abi not available; cannot load staked frogs.');
+      return null;
+    }
+
+    if (!stakingWeb3) {
+      stakingWeb3 = new Web3(new Web3.providers.HttpProvider(ALCHEMY_RPC_URL));
+    }
+    if (!stakingContract) {
+      stakingContract = new stakingWeb3.eth.Contract(
+        window.controller_abi,
+        STAKING_CONTRACT_ADDRESS
+      );
+    }
+    return stakingContract;
+  }
+
 
   // If you want a global mint price fallback, put the WEI amount here (string).
   // Example: 0.01 ETH => "10000000000000000"
@@ -371,65 +398,93 @@
   // Staking integration (needs ethereum-dapp.js to expose these)
   async function fetchStakedTokensForOwner(wallet) {
     const results = [];
-    const getStakedTokensFn = window.getStakedTokens;
-    const stakingValuesFn = window.stakingValues;
-    const stakerAddressFn = window.stakerAddress;
-
-    if (!getStakedTokensFn || !stakingValuesFn || !stakerAddressFn) {
-      console.warn(
-        '[WalletView] Staking functions not available; skipping staked frogs.'
-      );
+    const contract = getStakingContract();
+    if (!contract) {
       return results;
     }
 
+    const normalizedWallet = wallet.toLowerCase();
+
+    // There are 4,040 frogs; we’ll scan token IDs 1..4040
+    const MAX_TOKEN_ID = 4040;
+    const BATCH_SIZE = 80; // tune this up or down if you want
+
     try {
-      const tokens = await getStakedTokensFn(wallet);
-      if (!Array.isArray(tokens)) return results;
+      for (let start = 1; start <= MAX_TOKEN_ID; start += BATCH_SIZE) {
+        const end = Math.min(MAX_TOKEN_ID, start + BATCH_SIZE - 1);
 
-      for (const token of tokens) {
-        const tokenIdRaw = token.tokenId || token.token_id || token;
-        const tokenId = normalizeTokenId(tokenIdRaw);
-        if (!tokenId) continue;
+        // 1) batch call stakerAddress for this slice of IDs
+        const ownerCalls = [];
+        for (let tokenId = start; tokenId <= end; tokenId++) {
+          ownerCalls.push(contract.methods.stakerAddress(tokenId).call());
+        }
 
-        const ownerOnChain = await stakerAddressFn(tokenId);
-        if (
-          !ownerOnChain ||
-          ownerOnChain.toLowerCase() !== wallet.toLowerCase()
-        ) {
+        let owners;
+        try {
+          owners = await Promise.all(ownerCalls);
+        } catch (batchErr) {
+          console.error('[WalletView] Error in stakerAddress batch', batchErr);
+          continue; // skip this batch, keep going
+        }
+
+        // 2) For the IDs where stakerAddress == wallet, fetch stakingValues
+        const stakingCalls = [];
+        const tokenIdsForWallet = [];
+
+        for (let i = 0; i < owners.length; i++) {
+          const tokenId = start + i;
+          const ownerOnChain = (owners[i] || '').toLowerCase();
+          if (ownerOnChain === normalizedWallet) {
+            tokenIdsForWallet.push(tokenId);
+            stakingCalls.push(contract.methods.stakingValues(tokenId).call());
+          }
+        }
+
+        if (!stakingCalls.length) {
           continue;
         }
 
-        const stakedValues = await stakingValuesFn(tokenId);
-        // Original logic: progress = ((41.7 - staked_values[2]) / 41.7) * 100
-        let progressPercent = null;
+        let stakingValuesList;
         try {
-          const nextLvl = Number(stakedValues[2]);
-          if (Number.isFinite(nextLvl)) {
-            progressPercent = ((41.7 - nextLvl) / 41.7) * 100;
+          stakingValuesList = await Promise.all(stakingCalls);
+        } catch (stakeErr) {
+          console.error('[WalletView] Error in stakingValues batch', stakeErr);
+          continue;
+        }
+
+        // 3) Convert stakingValues → progressPercent (same formula as your old code)
+        for (let i = 0; i < tokenIdsForWallet.length; i++) {
+          const tokenId = tokenIdsForWallet[i];
+          const stakedValues = stakingValuesList[i];
+
+          let progressPercent = null;
+          try {
+            // original: progress = ((41.7 - staked_values[2]) / 41.7) * 100
+            const nextLvl = Number(stakedValues[2]);
+            if (Number.isFinite(nextLvl)) {
+              progressPercent = ((41.7 - nextLvl) / 41.7) * 100;
+            }
+          } catch (e) {
+            progressPercent = null;
           }
-        } catch (e) {
-          progressPercent = null;
-        }
 
-        if (typeof progressPercent === 'number' && !isFinite(progressPercent)) {
-          progressPercent = null;
-        }
+          if (typeof progressPercent === 'number' && !isFinite(progressPercent)) {
+            progressPercent = null;
+          }
 
-        results.push({
-          tokenId,
-          progressPercent
-        });
+          results.push({
+            tokenId,
+            progressPercent
+          });
+        }
       }
     } catch (err) {
-      console.error(
-        '[WalletView] Error fetching staked tokens for wallet',
-        wallet,
-        err
-      );
+      console.error('[WalletView] Error fetching staked tokens for wallet', wallet, err);
     }
 
     return results;
   }
+
 
   async function buildWalletCard(ownerAddress, frog) {
     const tokenId = frog.tokenId;
