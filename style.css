@@ -64,5 +64,11 @@ hr {
   width: 128px;
 }
 .recent_sale_card {
-  display: inline-block;
+    display: inline-block;
+    background: cornflowerblue;
+    padding: 8px;
+    box-shadow: 4px 4px darkslateblue;
+    width: 90%;
+    height: 90%;
+    max-width: 200px;
 }
