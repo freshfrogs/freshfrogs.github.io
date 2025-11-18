@@ -6,6 +6,12 @@ This ethereum dapp allows users to [connect](https://freshfrogs.github.io), mint
 ### Fresh Frogs NFT
 A collection of 4,040 randomly generated Frogs living on the Ethereum Blockchain! The collection is randomly generated, with each Frog being individually unique! There are a total of 30 different Frog types, and 60 traits! Resulting in 2.8 million total possible combinations!
 
+### Live pages
+* `/` – homepage that highlights the latest Fresh Frogs sales pulled directly from the collection contract.
+* `/404.html` – wallet viewer. Append a wallet address to the site URL (for example `freshfrogs.github.io/0xabc...`) to render every frog owned or staked by that account.
+* `/opensea/` – OpenSea-powered homepage variant that loads the most recent marketplace sales once you provide an API key inside `opensea/index.html`.
+* `/dashboard/` – wallet dashboard that surfaces the connected wallet’s frog counts, staking status, Flyz rewards, and OpenSea avatar/username.
+
 Deployed following the ERC-721 standard, stored on IPFS, and verified on [etherscan.io](https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b) :white_check_mark:
 
 ### Collection (ERC-721 Standard):
