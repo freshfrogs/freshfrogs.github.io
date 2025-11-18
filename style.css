@@ -33,6 +33,9 @@ body {
   margin-left: auto;
   margin-right: auto;
 }
+.desc_title {
+    color: inherit;
+}
 .desc_cont {
     width: 90%;
     margin: 16px;
