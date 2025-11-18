@@ -10,7 +10,7 @@ body {
     padding: 20px; /* Added padding around the content */
 }
 .main_panel {
-    background-color: #7cc1ff;
+    background-color: transparent;
     width: 90%;
     height: 90%;
     max-width: 800px;
@@ -29,7 +29,7 @@ body {
   margin-right: auto;
 }
 .title_desc {
-  width: 90%;
+  width: 80%;
   margin-left: auto;
   margin-right: auto;
 }
@@ -43,7 +43,7 @@ body {
     margin-right: auto;
     background: cornflowerblue;
     padding: 16px;
-    box-shadow: 4px 4px darkslateblue;
+    box-shadow: 4px 4px lightseagreen;
 }
 .pointer {
   
