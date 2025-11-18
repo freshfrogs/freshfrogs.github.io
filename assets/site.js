@@ -4,6 +4,7 @@
   const DEFAULT_PROFILE_IMAGE = '/assets/blackWhite.png';
   const CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
   const STAKING_CONTRACT_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
+  const STAKING_CONTRACT_LOWER = STAKING_CONTRACT_ADDRESS.toLowerCase();
   const rarityMap = buildRarityMap(window.freshfrogs_rarity_rankings || []);
   const metadataCache = new Map();
   const priceCache = new Map();
@@ -18,6 +19,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     setupWalletConnector();
+    setupFrogActionHandler();
     if (document.getElementById('recent-sales')) {
       loadRecentSales();
     }
@@ -28,6 +30,8 @@
       loadWalletDashboard();
     }
   });
+
+  let frogActionHandlerInitialized = false;
 
   function setupWalletConnector() {
     const connectLink = document.getElementById('connect-wallet-link');
@@ -220,12 +224,10 @@
     const statusEl = document.getElementById('wallet-frogs-status');
     const walletLabelEl = document.getElementById('wallet-address');
     let walletAddress = detectWalletAddress();
+    const providerWallet = await detectProviderWallet();
 
-    if (!walletAddress) {
-      const providerWallet = await detectProviderWallet();
-      if (providerWallet) {
-        walletAddress = providerWallet;
-      }
+    if (!walletAddress && providerWallet) {
+      walletAddress = providerWallet;
     }
 
     if (walletLabelEl) {
@@ -250,7 +252,10 @@
         fetchStakedFrogs(walletAddress)
       ]);
 
+      const normalizedWallet = walletAddress.toLowerCase();
+      const normalizedProvider = providerWallet ? providerWallet.toLowerCase() : null;
       const walletLabel = formatOwnerAddress(walletAddress);
+      const canManage = normalizedProvider && normalizedProvider === normalizedWallet;
       const seenTokenIds = new Set();
       let hasCards = false;
 
@@ -265,7 +270,10 @@
           {
             tokenId,
             metadata: token.metadata,
-            priceLabel: priceInfo ? priceInfo.label : ''
+            priceLabel: priceInfo ? priceInfo.label : '',
+            actionContext: canManage
+              ? { tokenId, isStaked: false, canManage: true }
+              : null
           },
           walletLabel
         );
@@ -290,7 +298,10 @@
             tokenId,
             priceLabel: priceInfo ? priceInfo.label : '',
             isStaked: true,
-            stakingDetails
+            stakingDetails,
+            actionContext: canManage
+              ? { tokenId, isStaked: true, canManage: true }
+              : null
           },
           walletLabel
         );
@@ -529,12 +540,14 @@
     const metadata = token.metadata || (await fetchFrogMetadata(token.tokenId));
     const headerRight = typeof token.priceLabel !== 'undefined' ? token.priceLabel : await derivePriceLabel(token.tokenId);
     const footerHtml = token.isStaked && token.stakingDetails ? buildStakingFooter(token.stakingDetails) : '';
+    const actionHtml = token.actionContext ? buildActionButtons(token.actionContext) : '';
     return createFrogCard({
       tokenId: token.tokenId,
       metadata,
       headerLeft: walletLabel,
       headerRight,
-      footerHtml
+      footerHtml,
+      actionHtml
     });
   }
 
@@ -690,7 +703,7 @@
     }
   }
 
-  function createFrogCard({ tokenId, metadata, headerLeft, headerRight, footerHtml }) {
+  function createFrogCard({ tokenId, metadata, headerLeft, headerRight, footerHtml, actionHtml }) {
     const frogName = metadata && metadata.name ? metadata.name : `Frog #${tokenId}`;
     const rarityRank = typeof rarityMap[tokenId] !== 'undefined' ? Number(rarityMap[tokenId]) : null;
     const rarityTier = rarityRank ? getRarityTier(rarityRank) : null;
@@ -713,6 +726,7 @@
           ${traitsHtml}
         </div>
         ${footerHtml || ''}
+        ${actionHtml || ''}
       </div>
     `;
 
@@ -744,6 +758,43 @@
     }
 
     return traits.map((trait) => `<p>${trait}</p>`).join('');
+  }
+
+  function buildActionButtons(context) {
+    if (!context || !context.canManage || !context.tokenId) {
+      return '';
+    }
+
+    const containerClass = context.isStaked
+      ? 'frog_card_actions frog_card_actions--staked'
+      : 'frog_card_actions frog_card_actions--owned';
+
+    const actions = context.isStaked
+      ? [
+          { key: 'unstake', label: 'Unstake', className: 'frog_action_button--unstake' }
+        ]
+      : [
+          { key: 'stake', label: 'Stake', className: 'frog_action_button--stake' },
+          { key: 'transfer', label: 'Transfer', className: 'frog_action_button--transfer' },
+          { key: 'list', label: 'Listing', className: 'frog_action_button--list' }
+        ];
+
+    const buttons = actions
+      .map(
+        (action) => `
+        <button
+          class="frog_action_button ${action.className}"
+          data-frog-action="${action.key}"
+          data-token-id="${context.tokenId}"
+          type="button"
+        >
+          ${action.label}
+        </button>
+      `
+      )
+      .join('');
+
+    return `<div class="${containerClass}">${buttons}</div>`;
   }
 
   function getRarityTier(rank) {
@@ -795,46 +846,88 @@
       return null;
     }
 
-    const endpoint = `https://api.opensea.io/api/v2/accounts/${walletAddress}`;
+    const normalizedWallet = walletAddress.toLowerCase();
     const headers = { Accept: 'application/json' };
     if (OPENSEA_API_KEY) {
       headers['X-API-KEY'] = OPENSEA_API_KEY;
     }
 
-    try {
-      const response = await fetch(endpoint, { headers });
-      if (!response.ok) {
-        throw new Error('OpenSea profile request failed');
+    const endpoints = [
+      `https://api.opensea.io/api/v2/accounts/ethereum/${normalizedWallet}`,
+      `https://api.opensea.io/api/v2/accounts/${normalizedWallet}`
+    ];
+
+    for (const endpoint of endpoints) {
+      try {
+        const response = await fetch(endpoint, { headers });
+        if (response.status === 404) {
+          continue;
+        }
+        if (!response.ok) {
+          throw new Error('OpenSea profile request failed');
+        }
+        const payload = await response.json();
+        const account = payload && (payload.account || payload.data || payload);
+        const profile = account && (account.profile || account.user || account);
+        const username = deriveOpenSeaUsername(profile);
+        const imageUrl = deriveOpenSeaImage(profile, account);
+        return {
+          username: username ? username : null,
+          imageUrl: imageUrl ? imageUrl : null
+        };
+      } catch (error) {
+        console.warn('OpenSea profile lookup failed via', endpoint, error);
       }
-      const payload = await response.json();
-      const account = payload && (payload.account || payload.data || payload);
-      const profile = account && (account.profile || account);
-      let username = null;
-      if (profile && profile.username) {
-        username = profile.username;
-      } else if (profile && profile.display_name) {
-        username = profile.display_name;
-      } else if (profile && profile.user && profile.user.username) {
-        username = profile.user.username;
-      }
-      let imageUrl = null;
-      if (profile && profile.profile_image_url) {
-        imageUrl = profile.profile_image_url;
-      } else if (profile && profile.image_url) {
-        imageUrl = profile.image_url;
-      } else if (profile && profile.avatar) {
-        imageUrl = profile.avatar;
-      } else if (account && account.profile_img_url) {
-        imageUrl = account.profile_img_url;
-      }
-      return {
-        username: username ? username : null,
-        imageUrl: imageUrl ? imageUrl : null
-      };
-    } catch (error) {
-      console.warn('Unable to load OpenSea profile', error);
+    }
+
+    return null;
+  }
+
+  function deriveOpenSeaUsername(profile) {
+    if (!profile) {
       return null;
     }
+    if (profile.username) {
+      return profile.username;
+    }
+    if (profile.display_name) {
+      return profile.display_name;
+    }
+    if (profile.user && profile.user.username) {
+      return profile.user.username;
+    }
+    if (profile.metadata && profile.metadata.username) {
+      return profile.metadata.username;
+    }
+    return null;
+  }
+
+  function deriveOpenSeaImage(profile, fallback) {
+    if (profile) {
+      if (profile.profile_image_url) {
+        return profile.profile_image_url;
+      }
+      if (profile.profile_img_url) {
+        return profile.profile_img_url;
+      }
+      if (profile.image_url) {
+        return profile.image_url;
+      }
+      if (profile.avatar) {
+        return profile.avatar;
+      }
+      if (profile.metadata && profile.metadata.profile_image_url) {
+        return profile.metadata.profile_image_url;
+      }
+    }
+
+    if (fallback && fallback.profile_image_url) {
+      return fallback.profile_image_url;
+    }
+    if (fallback && fallback.profile_img_url) {
+      return fallback.profile_img_url;
+    }
+    return null;
   }
 
   function getDefaultProfileImage() {
@@ -1053,10 +1146,178 @@
         <div class="staking_progress_bar">
           <div class="staking_progress_fill" style="width: ${details.progress}%;"></div>
         </div>
-        <div class="staking_progress_label">Next level in ${details.daysToNextLevel} days</div>
+        <div class="staking_progress_label">Next level in ${typeof details.daysToNextLevel === 'number' ? details.daysToNextLevel : '?'} days</div>
         ${meta ? `<div class="staking_progress_meta">${meta}</div>` : ''}
       </div>
     `;
+  }
+
+  function setupFrogActionHandler() {
+    if (frogActionHandlerInitialized) {
+      return;
+    }
+    document.addEventListener('click', handleFrogActionClick);
+    frogActionHandlerInitialized = true;
+  }
+
+  function handleFrogActionClick(event) {
+    const actionButton = event.target.closest('[data-frog-action]');
+    if (!actionButton) {
+      return;
+    }
+    event.preventDefault();
+    const action = actionButton.getAttribute('data-frog-action');
+    const tokenIdValue = actionButton.getAttribute('data-token-id');
+    const tokenId = Number(tokenIdValue);
+    if (!action || !Number.isInteger(tokenId) || tokenId <= 0) {
+      return;
+    }
+    handleFrogAction(action, tokenId);
+  }
+
+  async function handleFrogAction(action, tokenId) {
+    try {
+      switch (action) {
+        case 'stake':
+          await stakeFrog(tokenId);
+          break;
+        case 'unstake':
+          await unstakeFrog(tokenId);
+          break;
+        case 'transfer':
+          await transferFrog(tokenId);
+          break;
+        case 'list':
+          openListingOnOpenSea(tokenId);
+          break;
+        default:
+          break;
+      }
+    } catch (error) {
+      if (error && error.code === 4001) {
+        console.warn('User rejected the transaction request');
+        return;
+      }
+      alert('Unable to complete this action. Please try again.');
+      console.warn('Unable to process frog action', action, error);
+    }
+  }
+
+  async function stakeFrog(tokenId) {
+    if (!stakingContract || !collectionContract || !browserProvider) {
+      alert('A connected Web3 wallet is required to stake frogs.');
+      return;
+    }
+
+    const wallet = await requireWalletAccount();
+    const normalizedWallet = wallet.toLowerCase();
+
+    const owner = await collectionContract.methods.ownerOf(tokenId).call();
+    const normalizedOwner = owner.toLowerCase();
+
+    if (normalizedOwner === STAKING_CONTRACT_LOWER) {
+      alert(`Frog #${tokenId} is already staked.`);
+      return;
+    }
+
+    if (normalizedOwner !== normalizedWallet) {
+      alert('You must own this frog before staking it.');
+      return;
+    }
+
+    const approved = await collectionContract.methods
+      .isApprovedForAll(normalizedWallet, STAKING_CONTRACT_ADDRESS)
+      .call({ from: normalizedWallet });
+
+    if (!approved) {
+      const shouldApprove = confirm('Approve the staking contract to manage your frogs? This is required before staking.');
+      if (!shouldApprove) {
+        alert('Approval is required before staking.');
+        return;
+      }
+      await collectionContract.methods
+        .setApprovalForAll(STAKING_CONTRACT_ADDRESS, true)
+        .send({ from: normalizedWallet });
+    }
+
+    await stakingContract.methods.stake(tokenId).send({ from: normalizedWallet });
+    alert(`Stake transaction submitted for Frog #${tokenId}. Check your wallet for status.`);
+  }
+
+  async function unstakeFrog(tokenId) {
+    if (!stakingContract || !browserProvider) {
+      alert('A connected Web3 wallet is required to unstake frogs.');
+      return;
+    }
+
+    const wallet = await requireWalletAccount();
+    const normalizedWallet = wallet.toLowerCase();
+
+    let staker = null;
+    try {
+      staker = await stakingContract.methods.stakerAddress(tokenId).call();
+    } catch (error) {
+      console.warn('Unable to determine staker address', error);
+    }
+
+    if (!staker || staker.toLowerCase() !== normalizedWallet) {
+      alert('This frog is not currently staked by your wallet.');
+      return;
+    }
+
+    await stakingContract.methods.withdraw(tokenId).send({ from: normalizedWallet });
+    alert(`Withdrawal transaction submitted for Frog #${tokenId}. Check your wallet for status.`);
+  }
+
+  async function transferFrog(tokenId) {
+    if (!collectionContract || !browserProvider) {
+      alert('A connected Web3 wallet is required to transfer frogs.');
+      return;
+    }
+
+    const wallet = await requireWalletAccount();
+    const normalizedWallet = wallet.toLowerCase();
+    const owner = await collectionContract.methods.ownerOf(tokenId).call();
+
+    if (owner.toLowerCase() !== normalizedWallet) {
+      alert('You must own this frog before transferring it.');
+      return;
+    }
+
+    const destination = prompt(`Enter the wallet address to receive Frog #${tokenId}:`);
+    if (!destination) {
+      alert('Transfer cancelled.');
+      return;
+    }
+
+    const trimmedDestination = destination.trim();
+    if (!isValidWalletAddress(trimmedDestination)) {
+      alert('Transfer cancelled: invalid wallet address.');
+      return;
+    }
+
+    await collectionContract.methods
+      .safeTransferFrom(normalizedWallet, trimmedDestination, tokenId)
+      .send({ from: normalizedWallet });
+    alert(`Transfer transaction submitted for Frog #${tokenId}.`);
+  }
+
+  function openListingOnOpenSea(tokenId) {
+    const url = `https://opensea.io/assets/ethereum/${CONTRACT_ADDRESS}/${tokenId}/sell`;
+    window.open(url, '_blank', 'noopener');
+  }
+
+  async function requireWalletAccount() {
+    if (!browserProvider || typeof browserProvider.request !== 'function') {
+      throw new Error('Wallet provider unavailable');
+    }
+
+    const accounts = await browserProvider.request({ method: 'eth_requestAccounts' });
+    const candidate = Array.isArray(accounts) && accounts.length ? accounts[0] : null;
+    if (!isValidWalletAddress(candidate)) {
+      throw new Error('Wallet account unavailable');
+    }
+    return candidate;
   }
 
   function formatShortDate(date) {

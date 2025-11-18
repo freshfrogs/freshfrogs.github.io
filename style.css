@@ -78,12 +78,13 @@ hr {
   image-rendering: pixelated;
 }
 .recent_sales {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     justify-content: center;
     gap: 16px;
     margin: 16px auto;
     width: 100%;
+    max-width: 1184px;
     padding: 0 8px 32px;
 }
 
@@ -99,10 +100,9 @@ hr {
     background: cornflowerblue;
     padding: 8px;
     box-shadow: 4px 4px darkslateblue;
-    width: 90%;
-    height: 90%;
+    width: 100%;
     max-width: 224px;
-    margin: 8px;
+    margin: 0 auto;
     border: 1px solid darkslateblue;
 }
 .sale_card_title {
@@ -146,6 +146,50 @@ hr {
     padding: 8px;
     margin: 8px;
   min-height: 70px;
+}
+.frog_card_actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px;
+}
+.frog_card_actions--owned .frog_action_button {
+  flex: 1 1 calc(33% - 6px);
+}
+.frog_card_actions--staked .frog_action_button {
+  flex: 1 1 100%;
+}
+.frog_action_button {
+  border: 1px solid darkslateblue;
+  background: rgba(0, 0, 0, 0.2);
+  color: white;
+  font-family: inherit;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 6px 8px;
+  cursor: pointer;
+  box-shadow: 2px 2px darkslateblue;
+  border-radius: 10px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.frog_action_button:hover,
+.frog_action_button:focus {
+  outline: none;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px darkslateblue;
+}
+.frog_action_button--stake {
+  background: linear-gradient(135deg, #00c851, #00e1b0);
+}
+.frog_action_button--unstake {
+  background: linear-gradient(135deg, #00c9ff, #17e9a5);
+}
+.frog_action_button--transfer {
+  background: linear-gradient(135deg, #a55eea, #7d3c98);
+}
+.frog_action_button--list {
+  background: linear-gradient(135deg, #ff9966, #ff5e62);
 }
 .staking_footer {
   margin-top: 8px;
@@ -239,11 +283,15 @@ hr {
         max-width: 100%;
     }
 
-    .frog_img_cont,
-    .recent_sale_img,
-    .fly {
-        width: min(128px, 60vw);
-        height: min(128px, 60vw);
+  .frog_img_cont,
+  .recent_sale_img,
+  .fly {
+      width: min(128px, 60vw);
+      height: min(128px, 60vw);
+  }
+  .frog_card_actions--owned .frog_action_button,
+  .frog_card_actions--staked .frog_action_button {
+    flex: 1 1 100%;
   }
   .dashboard_panel {
     padding: 24px;
