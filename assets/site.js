@@ -240,13 +240,13 @@ async function fetchFrogMetadata(tokenId) {
 // ------------------------
 function formatOwnerAddress(address) {
   if (!address || typeof address !== 'string') {
-    return 'Buyer: Unknown';
+    return 'Unknown';
   }
   const short =
     address.length > 10
       ? `${address.slice(0, 6)}...${address.slice(-4)}`
       : address;
-  return `Buyer: ${short}`;
+  return `${short}`;
 }
 
 function formatPrice(sale) {
