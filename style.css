@@ -64,6 +64,22 @@ hr {
   width: 128px;
   image-rendering: pixelated;
 }
+.recent_sales {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin: 16px auto;
+    width: 100%;
+}
+
+.recent_sales_status {
+    width: 100%;
+    text-align: center;
+    color: white;
+    margin: 8px 0;
+}
+
 .recent_sale_card {
     display: inline-block;
     background: cornflowerblue;
@@ -72,6 +88,7 @@ hr {
     width: 90%;
     height: 90%;
     max-width: 200px;
+    margin: 8px;
 }
 .sale_card_title {
     float: left;
@@ -80,6 +97,25 @@ hr {
 .sale_card_price {
     float: right;
   margin-right: 4px
+}
+.rarity_badge {
+  text-transform: uppercase;
+}
+.rarity_legendary {
+  color: rgb(255, 138, 0);
+}
+.rarity_epic {
+  color: rgb(211, 88, 255);
+}
+.rarity_rare {
+  color: rgb(0, 163, 255);
+}
+.rarity_common {
+  color: white;
+}
+.rarity_unknown {
+  color: white;
+  opacity: 0.8;
 }
 .recent_sale_img {
     border-radius: 100%;
