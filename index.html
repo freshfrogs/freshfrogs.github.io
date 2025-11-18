@@ -73,7 +73,6 @@
       (function () {
         const API_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
         const CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
-        const MAX_SALES = 4;
         const MAX_TRAITS = 3;
         const rarityMap = buildRarityMap(window.freshfrogs_rarity_rankings || []);
         const metadataCache = new Map();
@@ -123,21 +122,32 @@
 
         async function fetchRecentSales() {
           const endpoint = `https://eth-mainnet.g.alchemy.com/nft/v3/${API_KEY}/getNFTSales`;
-          const params = new URLSearchParams({
-            contractAddress: CONTRACT_ADDRESS,
-            limit: MAX_SALES.toString(),
-            order: 'desc',
-            withMetadata: 'true'
-          });
+          const sales = [];
+          let pageKey;
 
-          const response = await fetch(`${endpoint}?${params.toString()}`);
+          do {
+            const params = new URLSearchParams({
+              contractAddress: CONTRACT_ADDRESS,
+              order: 'desc',
+              withMetadata: 'true'
+            });
 
-          if (!response.ok) {
-            throw new Error('Alchemy NFT sales request failed');
-          }
+            if (pageKey) {
+              params.append('pageKey', pageKey);
+            }
 
-          const payload = await response.json();
-          return payload.nftSales || [];
+            const response = await fetch(`${endpoint}?${params.toString()}`);
+
+            if (!response.ok) {
+              throw new Error('Alchemy NFT sales request failed');
+            }
+
+            const payload = await response.json();
+            sales.push(...(payload.nftSales || []));
+            pageKey = payload.pageKey;
+          } while (pageKey);
+
+          return sales;
         }
 
         async function buildSaleCard(sale) {
@@ -163,13 +173,13 @@
           const card = document.createElement('div');
           card.className = 'recent_sale_card';
           card.innerHTML = `
-            <strong class="sale_card_title">${frogName}</strong><strong class="sale_card_price">${price}</strong>
+            <strong class="sale_card_title">${owner}</strong><strong class="sale_card_price">${price}</strong>
             <div style="clear: both;"></div>
             <div class="frog_img_cont">
               <img src="${imageUrl}" class="recent_sale_img" alt="Frog #${tokenId}" loading="lazy" />
             </div>
             <div class="recent_sale_traits">
-              <strong class="sale_card_title">Properties</strong><strong class="sale_card_price">${owner}</strong><br>
+              <strong class="sale_card_title">${frogName}</strong><strong class="sale_card_price">Rarity ${rarity}</strong><br>
               <div class="recent_sale_properties">
                 ${traitsHtml}
               </div>
