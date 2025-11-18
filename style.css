@@ -1,12 +1,19 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: monospace;
     background-color: #7cc1ff;
     color: white;
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     padding: 20px;
+    margin: 0;
+    overflow-x: hidden;
 }
 .main_panel {
     background-color: transparent;
@@ -40,9 +47,7 @@ height: 128px;
 }
 .desc_cont {
     width: 90%;
-    margin: 16px;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 16px auto;
     background: cornflowerblue;
     padding: 32px;
     box-shadow: 4px 4px darkslateblue;
@@ -74,6 +79,7 @@ hr {
     gap: 16px;
     margin: 16px auto;
     width: 100%;
+    padding: 0 8px 32px;
 }
 
 .recent_sales_status {
@@ -165,4 +171,38 @@ hr {
   border-radius: 100%;
   border: 1px solid darkslateblue;
     box-shadow: 2px 2px darkslateblue;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 16px 12px;
+    }
+
+    .main_panel {
+        width: 100%;
+    }
+
+    .desc_cont {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .title_desc {
+        width: 100%;
+    }
+
+    .recent_sales {
+        gap: 12px;
+    }
+
+    .recent_sale_card {
+        max-width: 100%;
+    }
+
+    .frog_img_cont,
+    .recent_sale_img,
+    .fly {
+        width: min(128px, 60vw);
+        height: min(128px, 60vw);
+    }
 }
