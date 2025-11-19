@@ -282,7 +282,7 @@ hr {
 
 .recent_sales {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(232px, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));  /* 4 cards per row */
     justify-content: center;
     gap: 24px;
     margin: 0 auto;
@@ -654,8 +654,16 @@ hr {
     }
 }
 
+/* Responsive adjustments for recent mints grid */
+@media (max-width: 1000px) {
+    .recent_sales {
+        grid-template-columns: repeat(2, minmax(0, 1fr));  /* 2 per row on tablet */
+    }
+}
+
 @media (max-width: 600px) {
     .recent_sales {
+        grid-template-columns: 1fr;  /* 1 per row on mobile */
         gap: 12px;
     }
 
