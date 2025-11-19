@@ -452,14 +452,15 @@ hr {
 /* DASHBOARD / WALLET PANEL */
 
 .user_panel {
-    background: cornflowerblue;
+background: antiquewhite;
     padding: 16px 16px 14px;
     box-shadow: 4px 4px darkslateblue;
     width: 100%;
     max-width: 364px;
     margin: 0;
     border: 1px solid darkslateblue;
-    height: 100%;  /* fill hero column */
+    height: 100%;
+    color: #333;
 }
 
 .user_panel_header {
@@ -467,17 +468,15 @@ hr {
 }
 
 .user_panel_title_row {
-    display: flex;
+display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
+    font-size: 1.1em;
+    border-bottom: 1px solid #333;
 }
 
 .user_panel_label {
-    opacity: 0.9;
 }
 
 .user_panel_status {
@@ -489,8 +488,7 @@ hr {
 }
 
 .user_panel_body {
-    border-top: 1px solid rgba(255, 255, 255, 0.4);
-    padding-top: 10px;
+    padding-top: 0px;
 }
 
 .user_panel_prop {
@@ -498,8 +496,6 @@ hr {
     border-left: 0;
     height: auto;
     border-top-left-radius: 0;
-    padding: 8px 0 0;
-    margin: 8px 0 0;
     min-height: 70px;
 }
 
@@ -567,10 +563,11 @@ hr {
     align-items: center;
     gap: 8px;
     padding: 6px 8px;
-    background: darksalmon;
+    background: whitesmoke;
     border: 0;
-    box-shadow: 3px 3px darkslateblue;
-    font-size: 0.85em;
+    border: 1px solid darkmagenta;
+    font-size: 1.0em;
+    color: darkmagenta;
 }
 .dashboard_badge_icon {
     width: 32px;
