@@ -137,35 +137,36 @@ function parseTokenId(raw) {
 function getRarityRank(tokenId) {
   if (typeof window === 'undefined') return null;
 
-  // Most likely exports from rarityrankings.js – adjust here if your file uses a different name
-  const map =
-    window.rarityMap ||
-    window.rarityRankings ||
-    null;
-
+  const map = window.freshfrogs_rarity_rankings;
   if (!map) {
-    // First load only; avoid spamming logs
     if (!getRarityRank._warned) {
-      console.warn('[FreshFrogs] No rarity map found (expected window.rarityMap or window.rarityRankings)');
+      console.warn('[FreshFrogs] freshfrogs_rarity_rankings not found on window');
       getRarityRank._warned = true;
     }
     return null;
   }
 
   let rankRaw;
+
   if (Array.isArray(map)) {
-    // If it's an array, try tokenId and tokenId-1 (depending on indexing)
+    // if rankings are in an array, try both tokenId and tokenId-1 (0- vs 1-based)
     rankRaw = map[tokenId] ?? map[tokenId - 1];
-  } else {
-    rankRaw = map[tokenId] ?? map[String(tokenId)];
+  } else if (typeof map === 'object') {
+    // if rankings are in an object, try a few key shapes
+    rankRaw =
+      map[tokenId] ??
+      map[String(tokenId)] ??
+      map[`Frog #${tokenId}`];
   }
 
   if (rankRaw === undefined || rankRaw === null || rankRaw === '') return null;
 
   const n = Number(rankRaw);
   if (!Number.isFinite(n) || n <= 0) return null;
+
   return n;
 }
+
 
 // ------------------------
 // Card rendering
