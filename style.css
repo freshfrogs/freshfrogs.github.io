@@ -757,3 +757,57 @@ hr {
         width: 100%;
     }
 }
+/* --- Layout tightening overrides --- */
+
+body {
+  padding: 0;               /* remove big global padding */
+  align-items: stretch;      /* let content span full width */
+}
+
+/* Outer shell around everything (header + hero + recent sales) */
+.page_shell {
+  width: 100%;
+  max-width: 1184px;
+  margin: 0 auto;
+  padding: 12px 16px 20px;   /* small consistent gutters */
+}
+
+/* Make hero + wallet panel sit tighter under header */
+.hero_section {
+  margin-top: 8px;          /* small gap instead of big one */
+}
+
+.hero_layout {
+  margin-top: 0;
+  margin-bottom: 8px;
+  gap: 16px;                /* a little breathing room between cards */
+  align-items: stretch;     /* both columns equal height on desktop */
+}
+
+/* Ensure both hero cards stretch vertically and feel flush */
+.hero_column--main .desc_cont,
+.hero_column--wallet .user_panel {
+  height: 100%;
+}
+
+/* Reduce gap above recent sales */
+.recent_section {
+  margin-top: 8px;
+}
+
+/* Mobile tweaks: keep everything full-width and stacked nicely */
+@media (max-width: 768px) {
+  .page_shell {
+    padding: 8px 10px 16px;
+  }
+
+  .hero_layout {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .hero_column--main,
+  .hero_column--wallet {
+    width: 100%;
+  }
+}
