@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
   loadRecentActivity();
 });
 
+// ------------------------
+// Recent activity loader
+// ------------------------
 async function loadRecentActivity() {
   const container = document.getElementById('recent-sales');
   const statusEl  = document.getElementById('recent-sales-status');
@@ -82,20 +85,21 @@ async function loadRecentActivity() {
         metadata = await fetchFrogMetadata(tokenId);
       }
 
-      // address + price
+      // address + header right
       let ownerAddress;
       let headerRight;
 
       if (FF_ACTIVITY_MODE === 'mints') {
         ownerAddress = item.to;
-        headerRight  = formatMintAge(item); // may be "--" if metadata not present
+        // Show age or mint price (you can swap formatMintAge/formatMintPrice if preferred)
+        headerRight  = formatMintAge(item); 
       } else {
         ownerAddress =
           item.buyerAddress || item.to || item.ownerAddress || item.sellerAddress;
         headerRight  = formatSalePrice(item);
       }
 
-      const headerLeft = truncateAddress(ownerAddress); // <–– no "Buyer:" text
+      const headerLeft = truncateAddress(ownerAddress); // no "Buyer:" text
 
       const card = createFrogCard({
         tokenId,
@@ -108,12 +112,10 @@ async function loadRecentActivity() {
     }
   } catch (err) {
     console.error('Unable to load recent activity', err);
-    if (statusEl) {
-      statusEl.textContent =
-        FF_ACTIVITY_MODE === 'mints'
-          ? 'Unable to load recent mints right now.'
-          : 'Unable to load recent sales right now.';
-    }
+    const status = FF_ACTIVITY_MODE === 'mints'
+      ? 'Unable to load recent mints right now.'
+      : 'Unable to load recent sales right now.';
+    if (statusEl) statusEl.textContent = status;
   }
 }
 
@@ -449,3 +451,269 @@ function hasUsableMetadata(metadata) {
     : [];
   return attributes.length > 0;
 }
+
+
+// ===================================================
+// Wallet connect + dashboard (integrated, no dupes)
+// ===================================================
+
+let ffWeb3 = null;
+let ffCurrentAccount = null;
+
+// DOM helpers
+function ffSetText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function ffSetAvatar(id, url) {
+  const el = document.getElementById(id);
+  if (el && url) {
+    el.src = url;
+  }
+}
+
+function ffUpdateWalletBasicUI(address) {
+  ffSetText('wallet-status-label', 'Connected');
+  ffSetText('dashboard-wallet', truncateAddress(address));
+}
+
+// Apply everything to the wallet dashboard
+function ffApplyDashboardUpdates(address, ownedCount, stakingStats, profile) {
+  // Basic
+  ffUpdateWalletBasicUI(address);
+
+  // Owned frogs
+  if (typeof ownedCount === 'number') {
+    ffSetText('stat-owned', ownedCount.toString());
+  }
+
+  // Staking + rewards
+  if (stakingStats) {
+    if (typeof stakingStats.staked === 'number') {
+      ffSetText('stat-staked', stakingStats.staked.toString());
+    }
+
+    if (stakingStats.rewardsAvailable != null) {
+      ffSetText('stat-rewards-available', stakingStats.rewardsAvailable.toString());
+    }
+
+    if (stakingStats.rewardsEarned != null) {
+      ffSetText('stat-rewards-earned', stakingStats.rewardsEarned.toString());
+    }
+  }
+
+  // OpenSea profile
+  if (profile) {
+    if (profile.username) {
+      ffSetText('dashboard-username', profile.username);
+    }
+    if (profile.avatarUrl) {
+      ffSetAvatar('dashboard-avatar', profile.avatarUrl);
+    }
+  }
+}
+
+// ---- ALCHEMY: owned frog count ----
+async function ffFetchOwnedFrogCount(address) {
+  if (!FF_ALCHEMY_NFT_BASE) {
+    console.warn('Alchemy NFT base URL missing; owned frog count disabled.');
+    return null;
+  }
+
+  const url = `${FF_ALCHEMY_NFT_BASE}/getNFTsForOwner?owner=${address}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    console.warn('Alchemy getNFTsForOwner failed:', res.status);
+    return null;
+  }
+
+  const data = await res.json();
+  const all = Array.isArray(data.ownedNfts) ? data.ownedNfts : [];
+  const target = FF_COLLECTION_ADDRESS.toLowerCase();
+
+  const frogs = all.filter((nft) => {
+    const addr = nft.contract && nft.contract.address;
+    return addr && addr.toLowerCase() === target;
+  });
+
+  return frogs.length;
+}
+
+// ---- STAKING: staked frogs + rewards ----
+// Uses CONTROLLER_ABI from controller_abi.js
+async function ffTryContractCall(contract, names, args = []) {
+  if (!contract || !contract.methods) return null;
+  for (const name of names) {
+    if (contract.methods[name]) {
+      try {
+        return await contract.methods[name](...args).call();
+      } catch (err) {
+        console.warn(`Call to ${name} failed:`, err);
+      }
+    }
+  }
+  return null;
+}
+
+async function ffFetchStakingStats(address) {
+  if (!ffWeb3 || typeof CONTROLLER_ABI === 'undefined') {
+    console.warn('Web3 or CONTROLLER_ABI missing; staking stats disabled.');
+    return null;
+  }
+
+  const contract = new ffWeb3.eth.Contract(CONTROLLER_ABI, FF_CONTROLLER_ADDRESS);
+
+  // 🔧 These method names are guesses – adjust to your actual contract
+  const stakedRaw = await ffTryContractCall(contract, [
+    'getStakedTokens',
+    'getUserStakedTokens',
+    'stakedTokensOf'
+  ], [address]);
+
+  const rewardsAvailableRaw = await ffTryContractCall(contract, [
+    'getRewardsAvailable',
+    'rewardsAvailable',
+    'pendingRewards'
+  ], [address]);
+
+  const rewardsEarnedRaw = await ffTryContractCall(contract, [
+    'getTotalRewardsEarned',
+    'rewardsEarned',
+    'claimedRewards'
+  ], [address]);
+
+  const stats = {
+    staked: null,
+    rewardsAvailable: null,
+    rewardsEarned: null
+  };
+
+  if (Array.isArray(stakedRaw)) {
+    stats.staked = stakedRaw.length;
+  } else if (stakedRaw != null && !isNaN(stakedRaw)) {
+    stats.staked = Number(stakedRaw);
+  }
+
+  if (rewardsAvailableRaw != null) {
+    stats.rewardsAvailable = rewardsAvailableRaw;
+  }
+
+  if (rewardsEarnedRaw != null) {
+    stats.rewardsEarned = rewardsEarnedRaw;
+  }
+
+  return stats;
+}
+
+// ---- OpenSea profile: username + avatar ----
+async function ffFetchOpenSeaProfile(address) {
+  if (!FF_OPENSEA_API_KEY) {
+    console.warn('OpenSea API key missing; profile fetch disabled.');
+    return null;
+  }
+
+  const url = `https://api.opensea.io/api/v2/accounts/${address}`;
+  const res = await fetch(url, {
+    headers: {
+      'Accept': 'application/json',
+      'X-API-KEY': FF_OPENSEA_API_KEY
+    }
+  });
+
+  if (!res.ok) {
+    console.warn('OpenSea profile request failed:', res.status);
+    return null;
+  }
+
+  const data = await res.json();
+  console.log('OpenSea profile data:', data);
+
+  const username =
+    data.username ||
+    (data.account && data.account.username) ||
+    (data.account && data.account.address) ||
+    null;
+
+  const avatarUrl =
+    data.profile_image_url ||
+    data.profileImageUrl ||
+    (data.account && data.account.profile_image_url) ||
+    (data.account && data.account.image_url) ||
+    null;
+
+  return { username, avatarUrl };
+}
+
+// ---- CONNECT FUNCTION (main entry) ----
+async function connectWallet() {
+  if (!window.ethereum) {
+    alert('No Ethereum wallet detected. Please install MetaMask or a compatible wallet.');
+    return;
+  }
+
+  try {
+    const accounts = await window.ethereum.request({
+      method: 'eth_requestAccounts'
+    });
+
+    if (!accounts || !accounts.length) return;
+
+    const address = accounts[0];
+    ffCurrentAccount = address;
+
+    if (!ffWeb3) {
+      ffWeb3 = new Web3(window.ethereum);
+    }
+
+    // Update basic status immediately
+    ffUpdateWalletBasicUI(address);
+
+    // Fetch all stats in parallel
+    const [ownedCount, stakingStats, profile] = await Promise.all([
+      ffFetchOwnedFrogCount(address).catch((err) => {
+        console.warn('Owned frogs fetch failed:', err);
+        return null;
+      }),
+      ffFetchStakingStats(address).catch((err) => {
+        console.warn('Staking stats fetch failed:', err);
+        return null;
+      }),
+      ffFetchOpenSeaProfile(address).catch((err) => {
+        console.warn('OpenSea profile fetch failed:', err);
+        return null;
+      })
+    ]);
+
+    ffApplyDashboardUpdates(address, ownedCount, stakingStats, profile);
+  } catch (err) {
+    console.error('Wallet connection failed:', err);
+    alert('Failed to connect wallet. Check your wallet and try again.');
+  }
+}
+
+// Expose globally so HTML can call onclick="connectWallet()"
+window.connectWallet = connectWallet;
+
+// Init wallet bindings
+document.addEventListener('DOMContentLoaded', async () => {
+  if (window.ethereum && window.Web3 && !ffWeb3) {
+    ffWeb3 = new Web3(window.ethereum);
+
+    // Try to detect already-connected account
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+      if (accounts && accounts[0]) {
+        ffCurrentAccount = accounts[0];
+        ffUpdateWalletBasicUI(ffCurrentAccount);
+      }
+    } catch (err) {
+      console.warn('eth_accounts request failed:', err);
+    }
+  }
+
+  const btn = document.getElementById('connect-wallet-button');
+  if (btn) {
+    btn.addEventListener('click', connectWallet);
+  }
+});
