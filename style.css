@@ -147,18 +147,18 @@ body {
 }
 .desc_subtitle {
     font-size: 0.85rem;
-    opacity: 0.9;
     margin: 4px 0 0;
 }
 .desc_cont {
-    width: 100%;
+width: 100%;
     margin: 0;
-    background: cornflowerblue;
-    padding: 20px 20px 18px;
+    background: antiquewhite;
+    padding: 32px;
     box-shadow: 4px 4px darkslateblue;
     border: 1px solid darkslateblue;
     text-align: left;
-    height: 100%;  /* fill hero column */
+    height: 100%;
+    color: #333;
 }
 
 .desc_header {
@@ -477,6 +477,7 @@ hr {
 }
 
 .user_panel_label {
+  font-size: 1.1em;
 }
 
 .user_panel_status {
