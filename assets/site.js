@@ -422,11 +422,11 @@ function formatMintAge(transfer) {
   if (!Number.isFinite(diffSeconds) || diffSeconds < 0) return '--';
 
   if (diffSeconds < 86400) {
-    return '<1d';
+    return '<1d ago';
   }
 
   const diffDays = Math.floor(diffSeconds / 86400);
-  return `${diffDays}d`;
+  return `${diffDays}d ago`;
 }
 
 function formatActivityAge(blockTimestamp) {
