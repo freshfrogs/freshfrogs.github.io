@@ -11,25 +11,31 @@ const FF_OPENSEA_API_KEY    = '48ffee972fc245fa965ecfe902b02ab4'; // reserved fo
 const FF_ALCHEMY_NFT_BASE   = `https://eth-mainnet.g.alchemy.com/nft/v3/${FF_ALCHEMY_API_KEY}`;
 const FF_ALCHEMY_CORE_BASE  = `https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY_API_KEY}`;
 
-// 'sales' = use getNFTSales
-// 'mints' = use alchemy_getAssetTransfers (ERC721 mints)
-const FF_ACTIVITY_MODE      = 'mints'; // change to 'mints' if you want recent mints instead
+// 'sales' = recent sales (getNFTSales)
+// 'mints' = recent mints (alchemy_getAssetTransfers)
+const FF_ACTIVITY_MODE      = 'sales'; // change to 'mints' if you want mints instead
 
 // ------------------------
-// Public entrypoint
+// Entry
 // ------------------------
+document.addEventListener('DOMContentLoaded', () => {
+  loadRecentActivity();
+});
+
 async function loadRecentActivity() {
   const container = document.getElementById('recent-sales');
   const statusEl  = document.getElementById('recent-sales-status');
 
   if (!container) {
-    console.warn('loadRecentActivity: #recent-sales container not found');
+    console.warn('loadRecentActivity: #recent-sales not found');
     return;
   }
 
   if (statusEl) {
     statusEl.textContent =
-      FF_ACTIVITY_MODE === 'mints' ? 'Loading recent mints...' : 'Loading recent sales...';
+      FF_ACTIVITY_MODE === 'mints'
+        ? 'Loading recent mints...'
+        : 'Loading recent sales...';
   }
 
   try {
@@ -51,9 +57,13 @@ async function loadRecentActivity() {
     if (statusEl) statusEl.textContent = '';
 
     for (const item of items) {
-      // tokenId can be hex string ("0x3c7") or decimal string ("967")
+      // tokenId shapes:
+      //  - sales: item.tokenId (often hex like "0x3c7")
+      //  - mints: item.erc721TokenId or tokenId (also hex)
       const rawTokenId =
-        FF_ACTIVITY_MODE === 'mints' ? (item.erc721TokenId || item.tokenId) : item.tokenId;
+        FF_ACTIVITY_MODE === 'mints'
+          ? (item.erc721TokenId || item.tokenId)
+          : item.tokenId;
 
       if (!rawTokenId) {
         console.warn('Skipping item with missing tokenId', item);
@@ -66,32 +76,31 @@ async function loadRecentActivity() {
         continue;
       }
 
-      // Use metadata if present; otherwise fetch it
+      // metadata
       let metadata = item.metadata || item.tokenMetadata;
       if (!metadata) {
         metadata = await fetchFrogMetadata(tokenId);
       }
 
+      // address + price
       let ownerAddress;
       let headerRight;
 
       if (FF_ACTIVITY_MODE === 'mints') {
-        // Transfers API shape
         ownerAddress = item.to;
-        headerRight  = formatMintPrice(item);
+        headerRight  = formatMintPrice(item); // may be "--" if value not present
       } else {
-        // getNFTSales shape
         ownerAddress =
           item.buyerAddress || item.to || item.ownerAddress || item.sellerAddress;
         headerRight  = formatSalePrice(item);
       }
 
-      const ownerDisplay = formatOwnerAddress(ownerAddress);
+      const headerLeft = truncateAddress(ownerAddress); // <–– no "Buyer:" text
 
       const card = createFrogCard({
         tokenId,
         metadata,
-        headerLeft: ownerDisplay,
+        headerLeft,
         headerRight
       });
 
@@ -108,24 +117,19 @@ async function loadRecentActivity() {
   }
 }
 
-// Run on page load
-document.addEventListener('DOMContentLoaded', () => {
-  loadRecentActivity();
-});
-
 // ------------------------
-// Token + rarity helpers
+// Token / rarity helpers
 // ------------------------
 function parseTokenId(raw) {
-  if (typeof raw !== 'string') {
-    raw = String(raw);
-  }
-  // Hex from API (e.g. "0x3c7")
+  if (raw == null) return null;
+  if (typeof raw !== 'string') raw = String(raw);
+
+  // Hex: "0x3c7"
   if (raw.startsWith('0x') || raw.startsWith('0X')) {
     const n = parseInt(raw, 16);
     return Number.isFinite(n) && n > 0 ? n : null;
   }
-  // Decimal string
+
   const n = parseInt(raw, 10);
   return Number.isFinite(n) && n > 0 ? n : null;
 }
@@ -133,14 +137,29 @@ function parseTokenId(raw) {
 function getRarityRank(tokenId) {
   if (typeof window === 'undefined') return null;
 
+  // Most likely exports from rarityrankings.js – adjust here if your file uses a different name
   const map =
     window.rarityMap ||
     window.rarityRankings ||
     null;
 
-  if (!map) return null;
+  if (!map) {
+    // First load only; avoid spamming logs
+    if (!getRarityRank._warned) {
+      console.warn('[FreshFrogs] No rarity map found (expected window.rarityMap or window.rarityRankings)');
+      getRarityRank._warned = true;
+    }
+    return null;
+  }
 
-  const rankRaw = map[tokenId] ?? map[String(tokenId)];
+  let rankRaw;
+  if (Array.isArray(map)) {
+    // If it's an array, try tokenId and tokenId-1 (depending on indexing)
+    rankRaw = map[tokenId] ?? map[tokenId - 1];
+  } else {
+    rankRaw = map[tokenId] ?? map[String(tokenId)];
+  }
+
   if (rankRaw === undefined || rankRaw === null || rankRaw === '') return null;
 
   const n = Number(rankRaw);
@@ -159,7 +178,7 @@ function createFrogCard({
   footerHtml,
   actionHtml
 }) {
-  const frogName  = `Frog #${tokenId}`;
+  const frogName   = `Frog #${tokenId}`;
   const rarityRank = getRarityRank(tokenId);
   const rarityTier = rarityRank ? getRarityTier(rarityRank) : null;
 
@@ -273,9 +292,10 @@ async function fetchRecentMints(limit = 24) {
   }
 
   const payload = await response.json();
-  const transfers = payload.result && Array.isArray(payload.result.transfers)
-    ? payload.result.transfers
-    : [];
+  const transfers =
+    payload.result && Array.isArray(payload.result.transfers)
+      ? payload.result.transfers
+      : [];
 
   return transfers;
 }
@@ -311,15 +331,10 @@ async function fetchFrogMetadata(tokenId) {
 // ------------------------
 // Formatting helpers
 // ------------------------
-function formatOwnerAddress(address) {
-  if (!address || typeof address !== 'string') {
-    return 'Buyer: Unknown';
-  }
-  const short =
-    address.length > 10
-      ? `${address.slice(0, 6)}...${address.slice(-4)}`
-      : address;
-  return `Buyer: ${short}`;
+function truncateAddress(address) {
+  if (!address || typeof address !== 'string') return '--';
+  if (address.length <= 10) return address;
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
 function formatSalePrice(sale) {
@@ -353,21 +368,15 @@ function formatSalePrice(sale) {
   return `${rounded} ${fee.symbol || 'ETH'}`;
 }
 
-// Best-effort mint price: often this will be 0 or missing because
-// the NFT transfer itself doesn’t store the paid ETH value.
+// Best-effort mint price – many mints will not have a non-zero value here
 function formatMintPrice(transfer) {
   if (!transfer) return '--';
 
-  // try rawContract.value if present
   const raw = transfer.rawContract && transfer.rawContract.value;
-  if (!raw) {
-    return '--';
-  }
+  if (!raw) return '--';
 
   const valueNum = parseInt(raw, 16);
-  if (!Number.isFinite(valueNum) || valueNum <= 0) {
-    return '--';
-  }
+  if (!Number.isFinite(valueNum) || valueNum <= 0) return '--';
 
   const eth = valueNum / 1e18;
   const rounded =

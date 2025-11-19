@@ -4,6 +4,9 @@
 img {
     image-rendering: pixelated;
 }
+
+/* PAGE + BODY */
+
 body {
     font-family: monospace;
     background-color: #7cc1ff;
@@ -13,25 +16,24 @@ body {
     justify-content: flex-start;
     align-items: stretch;
     min-height: 100vh;
-    padding: 20px;
+    padding: 0;               /* no big outer padding */
     margin: 0;
     overflow-x: hidden;
 }
-
-/* PAGE SHELL / LAYOUT */
 
 .page_shell {
     width: 100%;
     max-width: 1184px;
     margin: 0 auto;
+    padding: 12px 16px 24px;  /* consistent gutters */
 }
 
 /* HEADER */
 
 .site_header {
     width: 100%;
-    padding: 16px 20px;
-    margin-bottom: 16px;
+    padding: 12px 16px;
+    margin: 0 0 10px;
     background: rgba(33, 121, 230, 0.95);
     border: 1px solid darkslateblue;
     box-shadow: 4px 4px darkslateblue;
@@ -77,7 +79,7 @@ body {
     gap: 8px;
 }
 
-/* MAIN AREA */
+/* MAIN */
 
 .page_main {
     width: 100%;
@@ -86,11 +88,11 @@ body {
 /* HERO LAYOUT */
 
 .hero_layout {
-    display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1.5fr);
-    gap: 20px;
-    align-items: flex-start;
-    margin-bottom: 24px;
+    display: flex;
+    align-items: stretch;  /* make both columns same height */
+    justify-content: space-between;
+    gap: 16px;
+    margin: 0 0 12px;
 }
 
 .hero_column {
@@ -98,11 +100,11 @@ body {
 }
 
 .hero_column--main {
-    /* left column */
+    flex: 2;
 }
 
 .hero_column--wallet {
-    /* right column */
+    flex: 1.5;
 }
 
 /* DESCRIPTION CARD */
@@ -149,12 +151,13 @@ body {
 }
 .desc_cont {
     width: 100%;
-    margin: 0 auto;
+    margin: 0;
     background: cornflowerblue;
-    padding: 24px 24px 20px;
+    padding: 20px 20px 18px;
     box-shadow: 4px 4px darkslateblue;
     border: 1px solid darkslateblue;
     text-align: left;
+    height: 100%;  /* fill hero column */
 }
 
 .desc_header {
@@ -169,7 +172,7 @@ body {
     color: white;
 }
 
-/* BUTTON STYLES (used for CTA links) */
+/* BUTTONS */
 
 .primary_button,
 .secondary_button {
@@ -236,32 +239,22 @@ hr {
     margin-bottom: 16px;
 }
 
-/* RECENT SALES CARDS */
-
-.recent_sale_header {
-    text-align: left;
-    margin: 8px;
-    height: 16px;
-}
-.frog_img {
-    height: 128px;
-    width: 128px;
-    image-rendering: pixelated;
-}
+/* RECENT SECTION */
 
 .recent_section {
     width: 100%;
     background: rgba(26, 107, 211, 0.7);
     border: 1px solid darkslateblue;
     box-shadow: 4px 4px darkslateblue;
-    padding: 20px 16px 24px;
+    padding: 16px 14px 20px;
+    margin-top: 0;
 }
 
 .recent_section_header {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     text-align: left;
     padding: 0 4px;
 }
@@ -277,6 +270,8 @@ hr {
     font-size: 0.85rem;
     opacity: 0.9;
 }
+
+/* RECENT SALES GRID + CARDS */
 
 .recent_sales_status {
     width: 100%;
@@ -315,6 +310,42 @@ hr {
     float: right;
     margin-right: 4px;
 }
+
+.recent_sale_header {
+    text-align: left;
+    margin: 8px;
+    height: 16px;
+}
+
+.frog_img {
+    height: 128px;
+    width: 128px;
+    image-rendering: pixelated;
+}
+
+.recent_sale_img {
+    height: 128px;
+    width: 128px;
+    image-rendering: pixelated;
+}
+
+.recent_sale_properties {
+    border-top: 1px solid white;
+    border-left: 1px solid white;
+    height: auto;
+    border-top-left-radius: 5px;
+    padding: 8px;
+    margin: 8px;
+    min-height: 70px;
+}
+.recent_sale_properties p {
+    margin: 2px;
+    text-align: left;
+}
+.recent_sale_traits {}
+
+/* RARITY BADGES */
+
 .rarity_badge {
     text-transform: uppercase;
     text-shadow: 2px 2px darkslateblue;
@@ -334,29 +365,8 @@ hr {
 .rarity_unknown {
     color: #d9e6ff;
 }
-.recent_sale_img {
-    height: 128px;
-    width: 128px;
-    image-rendering: pixelated;
-}
-.recent_sale_properties {
-    border-top: 1px solid white;
-    border-left: 1px solid white;
-    height: auto;
-    border-top-left-radius: 5px;
-    padding: 8px;
-    margin: 8px;
-    min-height: 70px;
-}
-.recent_sale_properties p {
-    margin: 2px;
-    text-align: left;
-}
-.recent_sale_traits {
-    /* kept for compatibility if needed */
-}
 
-/* FROG CARD ACTIONS (wallet page / others) */
+/* FROG ACTION BUTTONS (wallet pages) */
 
 .frog_card_actions {
   display: flex;
@@ -438,64 +448,7 @@ hr {
   opacity: 0.9;
 }
 
-/* WALLET LAYOUT (other pages kept intact) */
-
-.wallet_page {
-    width: 100%;
-}
-
-.wallet_intro_card {
-    width: 100%;
-    max-width: 1184px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.wallet_address_label {
-    font-size: 1.1em;
-    letter-spacing: 0.5px;
-}
-
-.wallet_layout {
-    display: flex;
-    align-items: flex-start;
-    gap: 24px;
-    width: 100%;
-    max-width: 1184px;
-    margin: 16px auto;
-    padding: 0 8px 32px;
-}
-
-.wallet_dashboard_column {
-    flex: 0 0 360px;
-    position: sticky;
-    top: 20px;
-}
-
-.wallet_dashboard_column .user_panel {
-    width: 100%;
-    max-width: none;
-}
-
-.wallet_frogs_column {
-    flex: 1 1 auto;
-}
-
-.wallet_frogs_grid {
-    max-width: none;
-}
-
-/* DASHBOARD PANEL + USER PANEL */
-
-.dashboard_panel {
-    width: min(1024px, 95%);
-    margin: 16px auto;
-    background: cornflowerblue;
-    padding: 32px;
-    box-shadow: 4px 4px darkslateblue;
-    border: 1px solid darkslateblue;
-    font-size: 1.1em;
-}
+/* DASHBOARD / WALLET PANEL */
 
 .user_panel {
     background: cornflowerblue;
@@ -503,8 +456,9 @@ hr {
     box-shadow: 4px 4px darkslateblue;
     width: 100%;
     max-width: 364px;
-    margin: 0 auto;
+    margin: 0;
     border: 1px solid darkslateblue;
+    height: 100%;  /* fill hero column */
 }
 
 .user_panel_header {
@@ -548,22 +502,13 @@ hr {
     min-height: 70px;
 }
 
-/* DASHBOARD CONTENT */
-
-.dashboard_header {
-    display: flex;
-    justify-content: space-between;
-    gap: 32px;
-    flex-wrap: wrap;
-    align-items: center;
-}
+/* Dashboard internals reused from your original CSS */
 
 .dashboard_profile {
     display: flex;
     align-items: center;
     gap: 16px;
 }
-
 .dashboard_avatar_ring {
     width: 96px;
     height: 96px;
@@ -573,7 +518,6 @@ hr {
     border: 1px solid darkslateblue;
     box-shadow: 2px 2px darkslateblue;
 }
-
 .dashboard_avatar {
     width: 100%;
     height: 100%;
@@ -582,18 +526,15 @@ hr {
     object-fit: cover;
     background: #000;
 }
-
 .dashboard_identity {
     text-align: left;
 }
-
 .dashboard_username {
     display: block;
     font-size: 1.05rem;
     margin-bottom: 4px;
     text-shadow: 1px 1px darkslateblue;
 }
-
 .dashboard_role_chip {
     margin-top: 6px;
     display: inline-flex;
@@ -607,7 +548,6 @@ hr {
     letter-spacing: 1px;
     color: #dff5ff;
 }
-
 .dashboard_wallet_label {
     display: block;
     margin-top: 2px;
@@ -615,14 +555,12 @@ hr {
     text-transform: lowercase;
     opacity: 0.9;
 }
-
 .dashboard_badges_row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 10px;
     margin: 10px 0 4px;
 }
-
 .dashboard_badge {
     display: flex;
     align-items: center;
@@ -633,7 +571,6 @@ hr {
     box-shadow: 3px 3px darkslateblue;
     font-size: 0.85em;
 }
-
 .dashboard_badge_icon {
     width: 32px;
     height: 32px;
@@ -644,16 +581,13 @@ hr {
     justify-content: center;
     font-size: 1.1em;
 }
-
 .dashboard_badge_title {
     font-weight: bold;
     display: block;
 }
-
 .dashboard_badge_desc {
     font-size: 0.85em;
 }
-
 .dashboard_status {
     margin-top: 10px;
     text-align: center;
@@ -664,18 +598,10 @@ hr {
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.dashboard_status_success {
-    color: #c6ffd8;
-}
-
-.dashboard_status_hint {
-    color: #f8fbff;
-}
-
-/* FROG IMAGE CONTAINERS */
+/* FROG IMAGE CONTAINERS + FLY */
 
 .frog_img_cont {
-    margin: 24px auto;
+    margin: 12px auto 10px;
     border: 1px solid darkslateblue;
     width: 128px;
     height: 128px;
@@ -683,8 +609,6 @@ hr {
     border-radius: 100%;
     box-shadow: 2px 2px darkslateblue;
 }
-
-/* FLY IMAGE */
 
 .fly {
     width: 64px;
@@ -694,11 +618,11 @@ hr {
     box-shadow: 2px 2px darkslateblue;
 }
 
-/* RESPONSIVE */
+/* MOBILE */
 
 @media (max-width: 900px) {
-    body {
-        padding: 16px 12px;
+    .page_shell {
+        padding: 8px 10px 16px;
     }
 
     .site_header {
@@ -712,15 +636,14 @@ hr {
     }
 
     .hero_layout {
-        grid-template-columns: 1fr;
+        flex-direction: column;
+        gap: 12px;
     }
 
+    .hero_column--main,
     .hero_column--wallet {
-        order: -1;
-    }
-
-    .desc_cont {
-        padding: 20px;
+        width: 100%;
+        flex: 1 1 auto;
     }
 
     .hero_link_row {
@@ -747,67 +670,4 @@ hr {
         width: 80px;
         height: 80px;
     }
-
-    .wallet_layout {
-        flex-direction: column;
-    }
-
-    .wallet_dashboard_column {
-        position: static;
-        width: 100%;
-    }
-}
-/* --- Layout tightening overrides --- */
-
-body {
-  padding: 0;               /* remove big global padding */
-  align-items: stretch;      /* let content span full width */
-}
-
-/* Outer shell around everything (header + hero + recent sales) */
-.page_shell {
-  width: 100%;
-  max-width: 1184px;
-  margin: 0 auto;
-  padding: 12px 16px 20px;   /* small consistent gutters */
-}
-
-/* Make hero + wallet panel sit tighter under header */
-.hero_section {
-  margin-top: 8px;          /* small gap instead of big one */
-}
-
-.hero_layout {
-  margin-top: 0;
-  margin-bottom: 8px;
-  gap: 16px;                /* a little breathing room between cards */
-  align-items: stretch;     /* both columns equal height on desktop */
-}
-
-/* Ensure both hero cards stretch vertically and feel flush */
-.hero_column--main .desc_cont,
-.hero_column--wallet .user_panel {
-  height: 100%;
-}
-
-/* Reduce gap above recent sales */
-.recent_section {
-  margin-top: 8px;
-}
-
-/* Mobile tweaks: keep everything full-width and stacked nicely */
-@media (max-width: 768px) {
-  .page_shell {
-    padding: 8px 10px 16px;
-  }
-
-  .hero_layout {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .hero_column--main,
-  .hero_column--wallet {
-    width: 100%;
-  }
 }
