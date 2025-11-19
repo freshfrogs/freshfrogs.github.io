@@ -247,8 +247,8 @@ hr {
 .recent_section {
     width: 100%;
     max-width: 960px;
-    padding: 16px 0 0;
-    margin: 16px 0 0;
+    padding: 16px 14px 20px;
+    margin: 0 auto;   /* center the whole block under hero */
 }
 
 .recent_section_header {
@@ -302,6 +302,7 @@ hr {
     margin: 8px auto;
     border: 1px solid darkslateblue;
 }
+
 
 .sale_card_title {
     float: left;
@@ -616,12 +617,12 @@ hr {
 }
 
 .fly {
-    width: 64px;
-    height: 64px;
-    border-radius: 100%;
-    border: 1px solid darkslateblue;
-    box-shadow: 2px 2px darkslateblue;
+width: 128px;
+    height: 128px;
+    border: 0px solid darkslateblue;
+    box-shadow: 4px 4px darkslateblue;
 }
+
 
 /* MOBILE */
 

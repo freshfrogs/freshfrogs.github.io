@@ -19,7 +19,7 @@
       <!-- HERO: COLLECTION INFO (LEFT) + USER DASHBOARD (RIGHT) -->
       <main class="page_main">
         <section class="hero_layout">
-          <!-- LEFT: collection description + recent mints -->
+          <!-- LEFT: collection description -->
           <div class="hero_column hero_column--main">
             <div class="desc_cont">
               <div class="desc_header">
@@ -75,16 +75,6 @@
                 View all the Frogs staked by the community! Explore, track, and discover rare frogs while unlocking potential rewards!
               </p>
             </div>
-
-            <!-- RECENT MINTS / SALES UNDER DESCRIPTION (LEFT COLUMN) -->
-            <section class="recent_section">
-              <div class="recent_section_header">
-                <h3 class="recent_section_title">Recent Mints</h3>
-              </div>
-
-              <p id="recent-sales-status" class="recent_sales_status">Loading recent mints...</p>
-              <div class="recent_sales" id="recent-sales"></div>
-            </section>
           </div>
 
           <!-- RIGHT: USER DASHBOARD PANEL (STICKY) -->
@@ -151,6 +141,16 @@
               </div>
             </div>
           </aside>
+        </section>
+
+        <!-- RECENT MINTS / SALES: FULL-WIDTH UNDER HERO -->
+        <section class="recent_section">
+          <div class="recent_section_header">
+            <h3 class="recent_section_title">Recent Mints</h3>
+          </div>
+
+          <p id="recent-sales-status" class="recent_sales_status">Loading recent mints...</p>
+          <div class="recent_sales" id="recent-sales"></div>
         </section>
       </main>
     </div>
