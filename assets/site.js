@@ -77,8 +77,8 @@ async function loadRecentActivity() {
       }
 
       // metadata
-      let metadata = item.metadata || item.tokenMetadata;
-      if (!metadata) {
+      let metadata = normalizeMetadata(item.metadata || item.tokenMetadata);
+      if (!hasUsableMetadata(metadata)) {
         metadata = await fetchFrogMetadata(tokenId);
       }
 
@@ -330,26 +330,15 @@ async function fetchRecentMints(limit = 24) {
 
 async function fetchFrogMetadata(tokenId) {
   try {
-    const params = new URLSearchParams({
-      contractAddress: FF_COLLECTION_ADDRESS,
-      tokenId: String(tokenId)
-    });
-
-    const url      = `${FF_ALCHEMY_NFT_BASE}/getNFTMetadata?${params.toString()}`;
-    const response = await fetch(url);
+    const url      = `https://freshfrogs.github.io/frog/json/${tokenId}.json`;
+    const response = await fetch(url, { cache: 'force-cache' });
 
     if (!response.ok) {
       throw new Error(`Metadata request failed: ${response.status}`);
     }
 
     const json = await response.json();
-    const meta = (json.raw && json.raw.metadata) || {
-      name: json.name,
-      description: json.description,
-      attributes: json.attributes || []
-    };
-
-    return meta || {};
+    return normalizeMetadata(json) || {};
   } catch (err) {
     console.error(`Failed to fetch metadata for token ${tokenId}`, err);
     return {};
@@ -430,21 +419,33 @@ function formatMintAge(transfer) {
   const diffSeconds = Math.floor((Date.now() - mintedAt.getTime()) / 1000);
   if (!Number.isFinite(diffSeconds) || diffSeconds < 0) return '--';
 
-  const units = [
-    { label: 'y', seconds: 31536000 },
-    { label: 'w', seconds: 604800 },
-    { label: 'd', seconds: 86400 },
-    { label: 'h', seconds: 3600 },
-    { label: 'm', seconds: 60 },
-    { label: 's', seconds: 1 }
-  ];
+  if (diffSeconds < 86400) {
+    return '<1d';
+  }
 
-  for (const unit of units) {
-    if (diffSeconds >= unit.seconds) {
-      const value = Math.floor(diffSeconds / unit.seconds);
-      return `${value}${unit.label}`;
+  const diffDays = Math.floor(diffSeconds / 86400);
+  return `${diffDays}d`;
+}
+
+function normalizeMetadata(metadata) {
+  if (!metadata) return null;
+  if (typeof metadata === 'string') {
+    try {
+      const parsed = JSON.parse(metadata);
+      return typeof parsed === 'object' ? parsed : null;
+    } catch {
+      return null;
     }
   }
 
-  return '0s';
+  if (typeof metadata === 'object') return metadata;
+  return null;
+}
+
+function hasUsableMetadata(metadata) {
+  if (!metadata || typeof metadata !== 'object') return false;
+  const attributes = Array.isArray(metadata.attributes)
+    ? metadata.attributes
+    : [];
+  return attributes.length > 0;
 }
