@@ -89,11 +89,11 @@ body {
 
 .hero_layout {
     display: flex;
-    align-items: stretch;  /* make both columns same height */
-    justify-content: center; /* keep hero main + wallet together */
+    align-items: stretch;      /* make both columns same height */
+    justify-content: center;   /* keep hero main + wallet together */
     gap: 16px;
-    margin: 0 auto 12px;   /* center the hero block */
-    max-width: 960px;      /* keep hero content centered and not full-bleed */
+    margin: 8vh auto 12px;     /* push down from top + center horizontally */
+    max-width: 960px;          /* keep hero content centered and not full-bleed */
 }
 
 .hero_column {
@@ -287,7 +287,7 @@ hr {
     gap: 24px;
     margin: 0 auto;
     width: 100%;
-    max-width: 1184px;
+    max-width: 960px;        /* align grid width with hero + section */
     padding: 0;
 }
 
@@ -449,10 +449,10 @@ hr {
   opacity: 0.9;
 }
 
-/* DASHBOARD / WALLET PANEL */
+/* DASHBOARD / ACTIVITY PANEL */
 
 .user_panel {
-background: antiquewhite;
+    background: antiquewhite;
     padding: 16px 16px 14px;
     box-shadow: 4px 4px darkslateblue;
     width: 100%;
@@ -468,7 +468,7 @@ background: antiquewhite;
 }
 
 .user_panel_title_row {
-display: flex;
+    display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
@@ -564,7 +564,6 @@ display: flex;
     gap: 8px;
     padding: 6px 8px;
     background: whitesmoke;
-    border: 0;
     border: 1px solid darkmagenta;
     font-size: 1.0em;
     color: darkmagenta;
@@ -636,7 +635,8 @@ display: flex;
     .hero_layout {
         flex-direction: column;
         gap: 12px;
-        max-width: 100%; /* let it be full width on small screens */
+        max-width: 100%;       /* let it be full width on small screens */
+        margin: 4vh auto 12px; /* still keep a bit of vertical spacing */
     }
 
     .hero_column--main,
