@@ -19,11 +19,12 @@ const FF_ACTIVITY_MODE      = 'mints'; // change to 'sales' if you want sales in
 // Entry
 // ------------------------
 document.addEventListener('DOMContentLoaded', () => {
-  loadRecentActivity();
+  loadRecentActivity();      // bottom "Recent Mints"
+  loadCollectionActivity();  // right-hand "Collection Activity" panel
 });
 
 // ------------------------
-// Recent activity loader
+// Recent activity (grid of frog cards)
 // ------------------------
 async function loadRecentActivity() {
   const container = document.getElementById('recent-sales');
@@ -91,8 +92,8 @@ async function loadRecentActivity() {
 
       if (FF_ACTIVITY_MODE === 'mints') {
         ownerAddress = item.to;
-        // Show age or mint price (you can swap formatMintAge/formatMintPrice if preferred)
-        headerRight  = formatMintAge(item); 
+        // You can swap formatMintAge/formatMintPrice if preferred
+        headerRight  = formatMintAge(item);
       } else {
         ownerAddress =
           item.buyerAddress || item.to || item.ownerAddress || item.sellerAddress;
@@ -196,9 +197,8 @@ function buildRarityLookup(rankings) {
   return lookup;
 }
 
-
 // ------------------------
-// Card rendering
+// Card rendering (recent mints grid)
 // ------------------------
 function createFrogCard({
   tokenId,
@@ -429,6 +429,27 @@ function formatMintAge(transfer) {
   return `${diffDays}d`;
 }
 
+function formatActivityAge(blockTimestamp) {
+  if (!blockTimestamp) return '';
+  const d = new Date(blockTimestamp);
+  if (Number.isNaN(d.getTime())) return '';
+
+  const diffSeconds = Math.floor((Date.now() - d.getTime()) / 1000);
+  if (!Number.isFinite(diffSeconds) || diffSeconds < 0) return '';
+
+  if (diffSeconds < 60) return 'just now';
+  if (diffSeconds < 3600) {
+    const m = Math.floor(diffSeconds / 60);
+    return `${m}m`;
+  }
+  if (diffSeconds < 86400) {
+    const h = Math.floor(diffSeconds / 3600);
+    return `${h}h`;
+  }
+  const days = Math.floor(diffSeconds / 86400);
+  return `${days}d`;
+}
+
 function normalizeMetadata(metadata) {
   if (!metadata) return null;
   if (typeof metadata === 'string') {
@@ -452,9 +473,222 @@ function hasUsableMetadata(metadata) {
   return attributes.length > 0;
 }
 
+// ===================================================
+// Collection Activity panel (right side)
+// ===================================================
+
+// Fetch general ERC-721 transfers for the collection
+async function ffFetchCollectionTransfers(limit = 40) {
+  const body = {
+    jsonrpc: '2.0',
+    id: 1,
+    method: 'alchemy_getAssetTransfers',
+    params: [
+      {
+        contractAddresses: [FF_COLLECTION_ADDRESS],
+        category: ['erc721'],
+        order: 'desc',
+        maxCount: '0x' + limit.toString(16),
+        withMetadata: true,
+        excludeZeroValue: false
+      }
+    ]
+  };
+
+  const response = await fetch(FF_ALCHEMY_CORE_BASE, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Alchemy collection transfers request failed: ${response.status}`);
+  }
+
+  const payload = await response.json();
+  const transfers =
+    payload.result && Array.isArray(payload.result.transfers)
+      ? payload.result.transfers
+      : [];
+
+  return transfers;
+}
+
+// Classify transfer type based on from/to/tx + staking contract
+function ffClassifyActivityType(transfer, saleMatch) {
+  if (saleMatch) return 'sale';
+
+  const zeroAddr = '0x0000000000000000000000000000000000000000';
+  const controller = FF_CONTROLLER_ADDRESS.toLowerCase();
+
+  const from = (transfer.from || '').toLowerCase();
+  const to   = (transfer.to   || '').toLowerCase();
+
+  if (from === zeroAddr && to !== zeroAddr) return 'mint';
+  if (to === zeroAddr && from !== zeroAddr) return 'burn';
+  if (to === controller) return 'stake';
+  if (from === controller) return 'unstake';
+
+  return 'transfer';
+}
+
+function ffActivityEmoji(type) {
+  switch (type) {
+    case 'mint':     return '🍃';
+    case 'stake':    return '🌿';
+    case 'unstake':  return '🪣';
+    case 'sale':     return '💸';
+    case 'burn':     return '🔥';
+    case 'transfer': return '📦';
+    default:         return '📌';
+  }
+}
+
+function ffActivityLabel(type) {
+  switch (type) {
+    case 'mint':     return 'Mint';
+    case 'stake':    return 'Staked';
+    case 'unstake':  return 'Unstaked';
+    case 'sale':     return 'Sale';
+    case 'burn':     return 'Burn';
+    case 'transfer': return 'Transfer';
+    default:         return 'Event';
+  }
+}
+
+// Build a list of normalized activity events from transfers + sales
+function ffBuildCollectionActivityEvents(transfers, sales) {
+  const events = [];
+  const saleByHash = new Map();
+
+  if (Array.isArray(sales)) {
+    for (const sale of sales) {
+      const h = (sale.txHash || sale.transactionHash || '').toLowerCase();
+      if (h) saleByHash.set(h, sale);
+    }
+  }
+
+  for (const t of transfers || []) {
+    const rawTokenId = t.erc721TokenId || t.tokenId;
+    const tokenId    = parseTokenId(rawTokenId);
+    const hash       = (t.hash || t.txHash || t.transactionHash || '').toLowerCase();
+    const saleMatch  = hash ? saleByHash.get(hash) : null;
+
+    const type = ffClassifyActivityType(t, saleMatch);
+
+    let salePrice = null;
+    if (saleMatch) {
+      salePrice = formatSalePrice(saleMatch);
+    }
+
+    events.push({
+      type,
+      tokenId,
+      from: t.from,
+      to: t.to,
+      txHash: hash,
+      blockTimestamp:
+        (t.metadata && t.metadata.blockTimestamp) ||
+        t.blockTimestamp ||
+        null,
+      salePrice
+    });
+  }
+
+  return events;
+}
+
+// Render into the Collection Activity panel using your dashboard_badge layout
+function ffRenderCollectionActivity(events) {
+  const panel = document.getElementById('dashboard-badges');
+  if (!panel) return;
+
+  const row = panel.querySelector('.dashboard_badges_row');
+  if (!row) return;
+
+  // Clear placeholder badges
+  row.innerHTML = '';
+
+  if (!events || !events.length) {
+    const empty = document.createElement('div');
+    empty.className = 'dashboard_badge';
+    empty.innerHTML = `
+      <span class="dashboard_badge_icon">📭</span>
+      <div>
+        <span class="dashboard_badge_title">No recent activity</span>
+        <span class="dashboard_badge_desc">
+          Frogs are chilling in the pond.
+        </span>
+      </div>
+    `;
+    row.appendChild(empty);
+    return;
+  }
+
+  const maxEvents = 8;
+  for (const evt of events.slice(0, maxEvents)) {
+    const emoji  = ffActivityEmoji(evt.type);
+    const label  = ffActivityLabel(evt.type);
+    const frogId = evt.tokenId != null ? `Frog #${evt.tokenId}` : 'Frog';
+    const age    = formatActivityAge(evt.blockTimestamp);
+
+    let descCore = '';
+    if (evt.type === 'sale') {
+      descCore = `${evt.salePrice || '--'} • ${truncateAddress(evt.from)} → ${truncateAddress(evt.to)}`;
+    } else if (evt.type === 'mint') {
+      descCore = `Minted to ${truncateAddress(evt.to)}`;
+    } else if (evt.type === 'stake') {
+      descCore = `Staked by ${truncateAddress(evt.from)}`;
+    } else if (evt.type === 'unstake') {
+      descCore = `Unstaked to ${truncateAddress(evt.to)}`;
+    } else if (evt.type === 'burn') {
+      descCore = `Burned from ${truncateAddress(evt.from)}`;
+    } else {
+      descCore = `${truncateAddress(evt.from)} → ${truncateAddress(evt.to)}`;
+    }
+
+    const agePart = age ? ` • ${age}` : '';
+    const desc = `${label}: ${descCore}${agePart}`;
+
+    const badge = document.createElement('div');
+    badge.className = 'dashboard_badge';
+    badge.innerHTML = `
+      <span class="dashboard_badge_icon">${emoji}</span>
+      <div>
+        <span class="dashboard_badge_title">${frogId}</span>
+        <span class="dashboard_badge_desc">
+          ${desc}
+        </span>
+      </div>
+    `;
+    row.appendChild(badge);
+  }
+}
+
+// Main loader for Collection Activity panel
+async function loadCollectionActivity() {
+  try {
+    const [transfers, sales] = await Promise.all([
+      ffFetchCollectionTransfers(40).catch((err) => {
+        console.warn('Collection transfers fetch failed:', err);
+        return [];
+      }),
+      fetchRecentSales(20).catch((err) => {
+        console.warn('Sales fetch for activity failed:', err);
+        return [];
+      })
+    ]);
+
+    const events = ffBuildCollectionActivityEvents(transfers, sales);
+    ffRenderCollectionActivity(events);
+  } catch (err) {
+    console.error('Unable to load collection activity', err);
+  }
+}
 
 // ===================================================
 // Wallet connect + dashboard (integrated, no dupes)
+// (Still present in case you reuse a wallet panel)
 // ===================================================
 
 let ffWeb3 = null;
@@ -695,7 +929,7 @@ async function connectWallet() {
 // Expose globally so HTML can call onclick="connectWallet()"
 window.connectWallet = connectWallet;
 
-// Init wallet bindings
+// Init wallet bindings (if you later add a dedicated button)
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.ethereum && window.Web3 && !ffWeb3) {
     ffWeb3 = new Web3(window.ethereum);
