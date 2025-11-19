@@ -294,24 +294,26 @@ hr {
 
 .recent_sale_card {
     display: inline-block;
-    background: cornflowerblue;
+    background: antiquewhite;
     padding: 8px;
     box-shadow: 4px 4px darkslateblue;
     width: 100%;
     max-width: 248px;
+    color: #333;
     margin: 8px auto;
-    border: 1px solid darkslateblue;
+    border: 0px solid darkslateblue;
 }
 
 
 .sale_card_title {
     float: left;
     margin-left: 4px;
-    text-shadow: 2px 2px darkslateblue;
+    font-weight: normal;
 }
 .sale_card_price {
     float: right;
     margin-right: 4px;
+    font-weight: normal;
 }
 
 .recent_sale_header {
@@ -607,13 +609,12 @@ hr {
 /* FROG IMAGE CONTAINERS + FLY */
 
 .frog_img_cont {
-    margin: 24px auto;
-    border: 1px solid darkslateblue;
+    margin: 32px auto;
+    border: 0px solid darkslateblue;
     width: 128px;
     height: 128px;
     overflow: hidden;
-    border-radius: 100%;
-    box-shadow: 2px 2px darkslateblue;
+    box-shadow: 4px 4px darkslateblue;
 }
 
 .fly {
