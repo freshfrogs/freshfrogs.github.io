@@ -565,9 +565,9 @@ hr {
     gap: 8px;
     padding: 6px 8px;
     background: whitesmoke;
-    border: 1px solid darkmagenta;
+    border: 1px solid #333;
     font-size: 1.0em;
-    color: darkmagenta;
+    color: darkcyan;
 }
 .dashboard_badge_icon {
     width: 32px;
@@ -582,6 +582,7 @@ hr {
 .dashboard_badge_title {
     font-weight: bold;
     display: block;
+    color: #333;
 }
 .dashboard_badge_desc {
     font-size: 0.85em;
