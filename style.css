@@ -28,7 +28,7 @@ body {
     padding: 12px 16px 24px;
 }
 
-/* HEADER (not used on this page but kept for consistency) */
+/* HEADER (kept for consistency) */
 
 .site_header {
     width: 100%;
@@ -89,7 +89,7 @@ body {
 
 .hero_layout {
     display: flex;
-    align-items: flex-start;
+    align-items: stretch;
     justify-content: center;
     gap: 16px;
     margin: 8vh auto 12px;   /* push down from top + center horizontally */
@@ -105,9 +105,7 @@ body {
 }
 
 .hero_column--wallet {
-    flex: 1.2;
-    display: flex;
-    align-items: flex-start;
+    flex: 1.5;
 }
 
 /* DESCRIPTION CARD */
@@ -175,7 +173,7 @@ body {
     color: white;
 }
 
-/* BUTTONS (generic pill buttons, used for connect/mint) */
+/* BUTTONS (generic pill buttons) */
 
 .primary_button,
 .secondary_button {
@@ -242,13 +240,13 @@ hr {
     margin-bottom: 16px;
 }
 
-/* RECENT SECTION (now lives under LEFT column) */
+/* RECENT SECTION (used for Owned / Staked / Recent Mints) */
 
 .recent_section {
     width: 100%;
     max-width: 960px;
     padding: 16px 14px 20px;
-    margin: 0 auto;   /* center the whole block under hero */
+    margin: 0 auto;
 }
 
 .recent_section_header {
@@ -272,7 +270,7 @@ hr {
     opacity: 0.9;
 }
 
-/* RECENT SALES GRID + CARDS */
+/* RECENT SALES GRID + CARDS (reused for owned/staked) */
 
 .recent_sales_status {
     width: 100%;
@@ -294,26 +292,23 @@ hr {
 
 .recent_sale_card {
     display: inline-block;
-    background: antiquewhite;
+    background: cornflowerblue;
     padding: 8px;
     box-shadow: 4px 4px darkslateblue;
     width: 100%;
     max-width: 248px;
-    color: #333;
     margin: 8px auto;
     border: 1px solid darkslateblue;
 }
 
-
 .sale_card_title {
     float: left;
     margin-left: 4px;
-    font-weight: normal;
+    text-shadow: 2px 2px darkslateblue;
 }
 .sale_card_price {
     float: right;
     margin-right: 4px;
-    font-weight: normal;
 }
 
 .recent_sale_header {
@@ -335,10 +330,10 @@ hr {
 }
 
 .recent_sale_properties {
-    border-top: 1px solid #333;
-    border-left: 1px solid #333;
+    border-top: 1px solid white;
+    border-left: 1px solid white;
     height: auto;
-    border-top-left-radius: 0px;
+    border-top-left-radius: 5px;
     padding: 8px;
     margin: 8px;
     min-height: 70px;
@@ -352,11 +347,8 @@ hr {
 /* RARITY BADGES */
 
 .rarity_badge {
-   text-transform: uppercase;
+    text-transform: uppercase;
     text-shadow: 2px 2px darkslateblue;
-    background: slategrey;
-    padding: 4px;
-
 }
 .rarity_legendary {
     color: #ffe66d;
@@ -374,7 +366,7 @@ hr {
     color: #d9e6ff;
 }
 
-/* FROG ACTION BUTTONS (wallet pages) */
+/* FROG ACTION BUTTONS (wallet pages, not used yet here) */
 
 .frog_card_actions {
   display: flex;
@@ -456,7 +448,7 @@ hr {
   opacity: 0.9;
 }
 
-/* DASHBOARD / USER PANEL */
+/* DASHBOARD PANEL */
 
 .user_panel {
     background: antiquewhite;
@@ -466,10 +458,11 @@ hr {
     max-width: 364px;
     margin: 0;
     border: 1px solid darkslateblue;
-    height: auto;
+    height: 100%;
     color: #333;
 }
 
+/* sticky on the right so it "glides" while scrolling */
 .user_panel--dashboard {
     position: sticky;
     top: 16px;
@@ -612,31 +605,22 @@ hr {
 /* FROG IMAGE CONTAINERS + FLY */
 
 .frog_img_cont {
-    margin: 32px auto;
+    margin: 24px auto;
     border: 1px solid darkslateblue;
     width: 128px;
     height: 128px;
     overflow: hidden;
-    box-shadow: 4px 4px darkslateblue;
-}
-.connectButton {
-      color: white;
-    background: steelblue;
-    margin-left: 0px;
-    margin-right: 0px;
-    padding: 8px;
-    border: 1px solid black;
-    font-size: 1.0em;
-    box-shadow: 2px 2px slategray;
-    font-family: inherit;
-}
-.fly {
-width: 128px;
-    height: 128px;
-    border: 0px solid darkslateblue;
-    box-shadow: 4px 4px darkslateblue;
+    border-radius: 100%;
+    box-shadow: 2px 2px darkslateblue;
 }
 
+.fly {
+    width: 64px;
+    height: 64px;
+    border-radius: 100%;
+    border: 1px solid darkslateblue;
+    box-shadow: 2px 2px darkslateblue;
+}
 
 /* MOBILE */
 
@@ -668,18 +652,17 @@ width: 128px;
         flex: 1 1 auto;
     }
 
-    .user_panel--dashboard {
-        position: static;
-        margin-top: 8px;
-    }
-
     .hero_link_row {
         flex-direction: column;
         align-items: flex-start;
     }
+
+    .user_panel--dashboard {
+        position: static; /* no sticky on narrow screens */
+    }
 }
 
-/* Responsive adjustments for recent mints grid */
+/* Responsive adjustments for cards */
 @media (max-width: 1000px) {
     .recent_sales {
         grid-template-columns: repeat(2, minmax(0, 1fr));
