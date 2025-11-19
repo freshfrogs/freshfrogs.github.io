@@ -90,9 +90,10 @@ body {
 .hero_layout {
     display: flex;
     align-items: stretch;  /* make both columns same height */
-    justify-content: space-between;
+    justify-content: center; /* keep hero main + wallet together */
     gap: 16px;
-    margin: 0 0 12px;
+    margin: 0 auto 12px;   /* center the hero block */
+    max-width: 960px;      /* keep hero content centered and not full-bleed */
 }
 
 .hero_column {
@@ -244,8 +245,9 @@ hr {
 
 .recent_section {
     width: 100%;
+    max-width: 960px;       /* match hero width so it's all centered */
     padding: 16px 14px 20px;
-    margin-top: 0;
+    margin: 0 auto;         /* center recent section */
 }
 
 .recent_section_header {
@@ -637,6 +639,7 @@ hr {
     .hero_layout {
         flex-direction: column;
         gap: 12px;
+        max-width: 100%; /* let it be full width on small screens */
     }
 
     .hero_column--main,
