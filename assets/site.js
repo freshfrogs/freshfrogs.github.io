@@ -13,7 +13,7 @@ const FF_ALCHEMY_CORE_BASE  = `https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY
 
 // 'sales' = recent sales (getNFTSales)
 // 'mints' = recent mints (alchemy_getAssetTransfers)
-const FF_ACTIVITY_MODE      = 'mints'; // change to 'mints' if you want mints instead
+const FF_ACTIVITY_MODE      = 'mints'; // change to 'sales' if you want sales instead
 
 // ------------------------
 // Entry
@@ -77,8 +77,8 @@ async function loadRecentActivity() {
       }
 
       // metadata
-      let metadata = item.metadata || item.tokenMetadata;
-      if (!metadata) {
+      let metadata = normalizeMetadata(item.metadata || item.tokenMetadata);
+      if (!hasUsableMetadata(metadata)) {
         metadata = await fetchFrogMetadata(tokenId);
       }
 
@@ -88,7 +88,7 @@ async function loadRecentActivity() {
 
       if (FF_ACTIVITY_MODE === 'mints') {
         ownerAddress = item.to;
-        headerRight  = formatMintPrice(item); // may be "--" if value not present
+        headerRight  = formatMintAge(item); // may be "--" if metadata not present
       } else {
         ownerAddress =
           item.buyerAddress || item.to || item.ownerAddress || item.sellerAddress;
@@ -149,8 +149,13 @@ function getRarityRank(tokenId) {
   let rankRaw;
 
   if (Array.isArray(map)) {
-    // if rankings are in an array, try both tokenId and tokenId-1 (0- vs 1-based)
-    rankRaw = map[tokenId] ?? map[tokenId - 1];
+    const lookup = buildRarityLookup(map);
+    rankRaw = lookup[tokenId];
+
+    if (rankRaw === undefined) {
+      // Fallback to index-based lookup for legacy shapes
+      rankRaw = map[tokenId] ?? map[tokenId - 1];
+    }
   } else if (typeof map === 'object') {
     // if rankings are in an object, try a few key shapes
     rankRaw =
@@ -165,6 +170,28 @@ function getRarityRank(tokenId) {
   if (!Number.isFinite(n) || n <= 0) return null;
 
   return n;
+}
+
+function buildRarityLookup(rankings) {
+  if (!Array.isArray(rankings)) return {};
+
+  if (buildRarityLookup._cache && buildRarityLookup._cache.source === rankings) {
+    return buildRarityLookup._cache.lookup;
+  }
+
+  const lookup = rankings.reduce((acc, frog) => {
+    if (frog && typeof frog.id !== 'undefined') {
+      const frogId = Number(frog.id);
+      const rankingValue = frog.ranking ?? frog.rank;
+      if (Number.isFinite(frogId) && rankingValue !== undefined) {
+        acc[frogId] = rankingValue;
+      }
+    }
+    return acc;
+  }, {});
+
+  buildRarityLookup._cache = { source: rankings, lookup };
+  return lookup;
 }
 
 
@@ -277,7 +304,7 @@ async function fetchRecentMints(limit = 24) {
         category: ['erc721'],
         order: 'desc',
         maxCount: '0x' + limit.toString(16),
-        withMetadata: false
+        withMetadata: true
       }
     ]
   };
@@ -303,26 +330,15 @@ async function fetchRecentMints(limit = 24) {
 
 async function fetchFrogMetadata(tokenId) {
   try {
-    const params = new URLSearchParams({
-      contractAddress: FF_COLLECTION_ADDRESS,
-      tokenId: String(tokenId)
-    });
-
-    const url      = `${FF_ALCHEMY_NFT_BASE}/getNFTMetadata?${params.toString()}`;
-    const response = await fetch(url);
+    const url      = `https://freshfrogs.github.io/frog/json/${tokenId}.json`;
+    const response = await fetch(url, { cache: 'force-cache' });
 
     if (!response.ok) {
       throw new Error(`Metadata request failed: ${response.status}`);
     }
 
     const json = await response.json();
-    const meta = (json.raw && json.raw.metadata) || {
-      name: json.name,
-      description: json.description,
-      attributes: json.attributes || []
-    };
-
-    return meta || {};
+    return normalizeMetadata(json) || {};
   } catch (err) {
     console.error(`Failed to fetch metadata for token ${tokenId}`, err);
     return {};
@@ -386,4 +402,50 @@ function formatMintPrice(transfer) {
       : eth.toFixed(4).replace(/\.?0+$/, '');
 
   return `${rounded} ETH`;
+}
+
+function formatMintAge(transfer) {
+  if (!transfer) return '--';
+
+  const timestamp =
+    (transfer.metadata && transfer.metadata.blockTimestamp) ||
+    transfer.blockTimestamp;
+
+  if (!timestamp) return '--';
+
+  const mintedAt = new Date(timestamp);
+  if (Number.isNaN(mintedAt.getTime())) return '--';
+
+  const diffSeconds = Math.floor((Date.now() - mintedAt.getTime()) / 1000);
+  if (!Number.isFinite(diffSeconds) || diffSeconds < 0) return '--';
+
+  if (diffSeconds < 86400) {
+    return '<1d';
+  }
+
+  const diffDays = Math.floor(diffSeconds / 86400);
+  return `${diffDays}d`;
+}
+
+function normalizeMetadata(metadata) {
+  if (!metadata) return null;
+  if (typeof metadata === 'string') {
+    try {
+      const parsed = JSON.parse(metadata);
+      return typeof parsed === 'object' ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+
+  if (typeof metadata === 'object') return metadata;
+  return null;
+}
+
+function hasUsableMetadata(metadata) {
+  if (!metadata || typeof metadata !== 'object') return false;
+  const attributes = Array.isArray(metadata.attributes)
+    ? metadata.attributes
+    : [];
+  return attributes.length > 0;
 }
