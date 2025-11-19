@@ -13,7 +13,7 @@ const FF_ALCHEMY_CORE_BASE  = `https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY
 
 // 'sales' = recent sales (getNFTSales)
 // 'mints' = recent mints (alchemy_getAssetTransfers)
-const FF_ACTIVITY_MODE      = 'mints'; // change to 'sales' if you want sales instead
+const FF_ACTIVITY_MODE      = 'mints'; // bottom grid mode
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -22,7 +22,7 @@ const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 // ------------------------
 document.addEventListener('DOMContentLoaded', () => {
   loadRecentActivity();      // bottom frog cards
-  loadCollectionActivity();  // right-side Collection Activity panel
+  loadCollectionActivity();  // Collection Activity panel inside main card
 });
 
 // ------------------------
@@ -63,9 +63,6 @@ async function loadRecentActivity() {
     if (statusEl) statusEl.textContent = '';
 
     for (const item of items) {
-      // tokenId shapes:
-      //  - sales: item.tokenId (often hex like "0x3c7")
-      //  - mints: item.erc721TokenId or tokenId (also hex)
       const rawTokenId =
         FF_ACTIVITY_MODE === 'mints'
           ? (item.erc721TokenId || item.tokenId)
@@ -94,7 +91,7 @@ async function loadRecentActivity() {
 
       if (FF_ACTIVITY_MODE === 'mints') {
         ownerAddress = item.to;
-        // Use age since mint, with "ago" suffix (<1d ago, 3d ago, etc.)
+        // Age since mint: "<1d ago", "3d ago", etc.
         headerRight  = formatMintAge(item);
       } else {
         ownerAddress =
@@ -162,7 +159,6 @@ function getRarityRank(tokenId) {
       rankRaw = map[tokenId] ?? map[tokenId - 1];
     }
   } else if (typeof map === 'object') {
-    // if rankings are in an object, try a few key shapes
     rankRaw =
       map[tokenId] ??
       map[String(tokenId)] ??
@@ -408,7 +404,7 @@ function formatMintPrice(transfer) {
   return `${rounded} ETH`;
 }
 
-// Generic age formatter used for both mints and activity feed
+// Generic age formatter with "ago"
 function ffFormatAgeFromTimestamp(timestamp) {
   if (!timestamp) return '--';
 
@@ -418,11 +414,21 @@ function ffFormatAgeFromTimestamp(timestamp) {
   const diffSeconds = Math.floor((Date.now() - d.getTime()) / 1000);
   if (!Number.isFinite(diffSeconds) || diffSeconds < 0) return '--';
 
-  if (diffSeconds < 86400) {
-    return '<1d ago';
+  if (diffSeconds < 60) {
+    return `${diffSeconds}s ago`;
   }
 
-  const diffDays = Math.floor(diffSeconds / 86400);
+  const minutes = Math.floor(diffSeconds / 60);
+  if (minutes < 60) {
+    return `${minutes}m ago`;
+  }
+
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) {
+    return `${hours}h ago`;
+  }
+
+  const diffDays = Math.floor(hours / 24);
   return `${diffDays}d ago`;
 }
 
@@ -461,49 +467,13 @@ function hasUsableMetadata(metadata) {
 }
 
 // ===================================================
-// Collection Activity panel (right column)
-// Shows mint / transfer / stake / unstake / sale
+// Collection Activity panel (inside main panel)
+// Only mints + sales, with sale price and "ago"
 // ===================================================
 
-// Fetch transfers for the collection, including:
-// - mints (from ZERO_ADDRESS)
-// - transfers
-// - staking (to/from controller address)
-async function ffFetchTransferActivity(limit = 40) {
-  const body = {
-    jsonrpc: '2.0',
-    id: 1,
-    method: 'alchemy_getAssetTransfers',
-    params: [
-      {
-        contractAddresses: [FF_COLLECTION_ADDRESS],
-        category: ['erc721'],
-        order: 'desc',
-        maxCount: '0x' + limit.toString(16),
-        withMetadata: true
-      }
-    ]
-  };
-
-  const res = await fetch(FF_ALCHEMY_CORE_BASE, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-
-  if (!res.ok) {
-    console.warn('ffFetchTransferActivity failed:', res.status);
-    return [];
-  }
-
-  const data = await res.json();
-  const transfers =
-    data.result && Array.isArray(data.result.transfers)
-      ? data.result.transfers
-      : [];
-
-  const controller = FF_CONTROLLER_ADDRESS.toLowerCase();
-
+// Build mint events from the same transfers used for the grid
+async function ffFetchRecentMintsForActivity(limit = 40) {
+  const transfers = await fetchRecentMints(limit);
   const events = [];
 
   for (const t of transfers) {
@@ -511,27 +481,18 @@ async function ffFetchTransferActivity(limit = 40) {
     const tokenId    = parseTokenId(rawTokenId);
     if (!tokenId) continue;
 
-    const from = t.from || t.fromAddress;
-    const to   = t.to   || t.toAddress;
-
-    const ts = (t.metadata && t.metadata.blockTimestamp) || t.blockTimestamp;
-    const timestampMs = new Date(ts).getTime();
-
-    let type = 'transfer';
-
-    if (from && from.toLowerCase() === ZERO_ADDRESS.toLowerCase()) {
-      type = 'mint';
-    } else if (to && to.toLowerCase() === controller) {
-      type = 'stake';
-    } else if (from && from.toLowerCase() === controller) {
-      type = 'unstake';
-    }
+    const to = t.to || t.toAddress;
+    const ts =
+      (t.metadata && t.metadata.blockTimestamp) ||
+      t.blockTimestamp;
+    const timestampMs = ts ? new Date(ts).getTime() : 0;
 
     events.push({
-      type,
+      type: 'mint',
       tokenId,
-      from,
+      from: null,
       to,
+      price: null,
       timestamp: timestampMs,
       txHash: t.hash || t.txHash || t.transactionHash || null
     });
@@ -544,26 +505,31 @@ async function ffFetchTransferActivity(limit = 40) {
 function ffNormalizeSaleEvents(sales) {
   if (!Array.isArray(sales)) return [];
 
-  return sales.map((sale) => {
-    const rawTokenId = sale.tokenId;
-    const tokenId    = parseTokenId(rawTokenId);
+  return sales
+    .map((sale) => {
+      const rawTokenId = sale.tokenId;
+      const tokenId    = parseTokenId(rawTokenId);
+      if (!tokenId) return null;
 
-    const from = sale.sellerAddress || sale.seller || null;
-    const to   = sale.buyerAddress  || sale.buyer  || sale.taker || null;
+      const from = sale.sellerAddress || sale.seller || null;
+      const to   = sale.buyerAddress  || sale.buyer  || sale.taker || null;
 
-    const ts = sale.blockTimestamp || sale.timestamp;
-    const timestampMs = ts ? new Date(ts).getTime() : 0;
+      const ts = sale.blockTimestamp || sale.timestamp || sale.eventTimestamp;
+      const timestampMs = ts
+        ? (typeof ts === 'number' ? ts * 1000 : new Date(ts).getTime())
+        : 0;
 
-    return {
-      type:  'sale',
-      tokenId,
-      from,
-      to,
-      price: formatSalePrice(sale),
-      timestamp: timestampMs,
-      txHash: sale.transactionHash || sale.txHash || null
-    };
-  }).filter(e => e.tokenId != null);
+      return {
+        type:  'sale',
+        tokenId,
+        from,
+        to,
+        price: formatSalePrice(sale),
+        timestamp: timestampMs,
+        txHash: sale.transactionHash || sale.txHash || null
+      };
+    })
+    .filter(e => e && e.timestamp);
 }
 
 // Build one badge row for the activity panel
@@ -571,27 +537,8 @@ function createActivityBadge(ev) {
   const container = document.createElement('div');
   container.className = 'dashboard_badge';
 
-  const emoji = (() => {
-    switch (ev.type) {
-      case 'mint':    return '🐣';
-      case 'stake':   return '🌿';
-      case 'unstake': return '🍀';
-      case 'sale':    return '💰';
-      case 'transfer':
-      default:        return '🔁';
-    }
-  })();
-
-  const label = (() => {
-    switch (ev.type) {
-      case 'mint':    return 'Mint';
-      case 'stake':   return 'Stake';
-      case 'unstake': return 'Unstake';
-      case 'sale':    return 'Sale';
-      case 'transfer':
-      default:        return 'Transfer';
-    }
-  })();
+  const emoji = ev.type === 'mint' ? '✨' : '💰';
+  const label = ev.type === 'mint' ? 'Mint' : 'Sale';
 
   const frogLabel = ev.tokenId ? `Frog #${ev.tokenId}` : 'Collection';
   const ageLabel  = ffFormatAgeFromTimestamp(ev.timestamp);
@@ -602,16 +549,10 @@ function createActivityBadge(ev) {
   let descText = '';
 
   if (ev.type === 'mint') {
-    descText = `${label} • ${toShort} • ${ageLabel}`;
-  } else if (ev.type === 'sale') {
+    descText = `${label} • Minted to ${toShort} • ${ageLabel}`;
+  } else {
     const pricePart = ev.price && ev.price !== '--' ? `${ev.price} • ` : '';
     descText = `${label} • ${pricePart}${fromShort} → ${toShort} • ${ageLabel}`;
-  } else if (ev.type === 'stake') {
-    descText = `${label} • ${fromShort} → Pond • ${ageLabel}`;
-  } else if (ev.type === 'unstake') {
-    descText = `${label} • Pond → ${toShort} • ${ageLabel}`;
-  } else {
-    descText = `${label} • ${fromShort} → ${toShort} • ${ageLabel}`;
   }
 
   const txUrl = ev.txHash
@@ -642,20 +583,18 @@ async function loadCollectionActivity() {
   }
 
   try {
-    const [transferEvents, salesRaw] = await Promise.all([
-      ffFetchTransferActivity(40),
-      fetchRecentSales(20).catch(() => [])
+    const [mintEvents, salesRaw] = await Promise.all([
+      ffFetchRecentMintsForActivity(40),
+      fetchRecentSales(40).catch(() => [])
     ]);
 
     const saleEvents = ffNormalizeSaleEvents(salesRaw);
 
-    let allEvents = [...transferEvents, ...saleEvents];
+    let allEvents = [...mintEvents, ...saleEvents];
 
-    // Sort by newest first
     allEvents = allEvents
       .filter(e => e.timestamp && Number.isFinite(e.timestamp))
-      .sort((a, b) => b.timestamp - a.timestamp)
-      .slice(0, 9); // show top 9 (3x3 grid feel)
+      .sort((a, b) => b.timestamp - a.timestamp);
 
     row.innerHTML = '';
 
@@ -673,6 +612,7 @@ async function loadCollectionActivity() {
       return;
     }
 
+    // Render many; CSS limits visible height to ~5 rows, scroll for more
     for (const ev of allEvents) {
       row.appendChild(createActivityBadge(ev));
     }
@@ -682,8 +622,7 @@ async function loadCollectionActivity() {
 }
 
 // ===================================================
-// Wallet connect + dashboard (integrated, no dupes)
-// (still here so your Connect Wallet button works)
+// Wallet connect + dashboard (still here so Connect Wallet works)
 // ===================================================
 
 let ffWeb3 = null;
@@ -770,7 +709,6 @@ async function ffFetchOwnedFrogCount(address) {
 }
 
 // ---- STAKING: staked frogs + rewards ----
-// Uses CONTROLLER_ABI from controller_abi.js
 async function ffTryContractCall(contract, names, args = []) {
   if (!contract || !contract.methods) return null;
   for (const name of names) {
@@ -924,7 +862,7 @@ async function connectWallet() {
 // Expose globally so HTML can call onclick="connectWallet()"
 window.connectWallet = connectWallet;
 
-// Init wallet bindings
+// Init wallet bindings (for any future connect button by id)
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.ethereum && window.Web3 && !ffWeb3) {
     ffWeb3 = new Web3(window.ethereum);

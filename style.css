@@ -16,7 +16,7 @@ body {
     justify-content: flex-start;
     align-items: stretch;
     min-height: 100vh;
-    padding: 0;               /* no big outer padding */
+    padding: 0;
     margin: 0;
     overflow-x: hidden;
 }
@@ -25,10 +25,10 @@ body {
     width: 100%;
     max-width: 1184px;
     margin: 0 auto;
-    padding: 12px 16px 24px;  /* consistent gutters */
+    padding: 12px 16px 24px;
 }
 
-/* HEADER */
+/* HEADER (not used on this page but kept for consistency) */
 
 .site_header {
     width: 100%;
@@ -89,11 +89,11 @@ body {
 
 .hero_layout {
     display: flex;
-    align-items: stretch;      /* make both columns same height */
-    justify-content: center;   /* keep hero main + wallet together */
+    align-items: stretch;
+    justify-content: center;
     gap: 16px;
-    margin: 8vh auto 12px;     /* push down from top + center horizontally */
-    max-width: 960px;          /* keep hero content centered and not full-bleed */
+    margin: 8vh auto 12px;   /* push down from top + center horizontally */
+    max-width: 960px;
 }
 
 .hero_column {
@@ -150,7 +150,7 @@ body {
     margin: 4px 0 0;
 }
 .desc_cont {
-width: 100%;
+    width: 100%;
     margin: 0;
     background: antiquewhite;
     padding: 32px;
@@ -173,7 +173,7 @@ width: 100%;
     color: white;
 }
 
-/* BUTTONS */
+/* BUTTONS (generic pill buttons, used for connect/mint) */
 
 .primary_button,
 .secondary_button {
@@ -240,14 +240,13 @@ hr {
     margin-bottom: 16px;
 }
 
-
 /* RECENT SECTION */
 
 .recent_section {
     width: 100%;
-    max-width: 960px;       /* match hero width so it's all centered */
+    max-width: 960px;
     padding: 16px 14px 20px;
-    margin: 0 auto;         /* center recent section */
+    margin: 0 auto;
 }
 
 .recent_section_header {
@@ -282,12 +281,12 @@ hr {
 
 .recent_sales {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));  /* 4 cards per row */
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     justify-content: center;
     gap: 24px;
     margin: 0 auto;
     width: 100%;
-    max-width: 960px;        /* align grid width with hero + section */
+    max-width: 960px;
     padding: 0;
 }
 
@@ -500,7 +499,19 @@ hr {
     min-height: 70px;
 }
 
-/* Dashboard internals reused from your original CSS */
+/* Make Collection Activity panel fill main column width */
+.hero_column--main .user_panel {
+    max-width: 100%;
+    margin-top: 16px;
+}
+
+/* Limit visible activity rows (~5) and allow scrolling for more */
+.collection_activity_list {
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+/* Dashboard internals */
 
 .dashboard_profile {
     display: flex;
@@ -637,8 +648,8 @@ hr {
     .hero_layout {
         flex-direction: column;
         gap: 12px;
-        max-width: 100%;       /* let it be full width on small screens */
-        margin: 4vh auto 12px; /* still keep a bit of vertical spacing */
+        max-width: 100%;
+        margin: 4vh auto 12px;
     }
 
     .hero_column--main,
@@ -656,13 +667,13 @@ hr {
 /* Responsive adjustments for recent mints grid */
 @media (max-width: 1000px) {
     .recent_sales {
-        grid-template-columns: repeat(2, minmax(0, 1fr));  /* 2 per row on tablet */
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 600px) {
     .recent_sales {
-        grid-template-columns: 1fr;  /* 1 per row on mobile */
+        grid-template-columns: 1fr;
         gap: 12px;
     }
 

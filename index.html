@@ -16,10 +16,10 @@
   <body data-connect-destination="wallet">
     <div class="page_shell">
 
-      <!-- HERO: COLLECTION INFO + WALLET DASHBOARD -->
+      <!-- HERO: COLLECTION INFO + (now inline) COLLECTION ACTIVITY -->
       <main class="page_main">
         <section class="hero_layout">
-          <!-- LEFT: collection description -->
+          <!-- LEFT: collection description + collection activity -->
           <div class="hero_column hero_column--main">
             <div class="desc_cont">
               <div class="desc_header">
@@ -29,12 +29,15 @@
                   <p class="desc_subtitle">0xBE4Bef8735107db540De269FF82c7dE9ef68C51b</p>
                 </div>
               </div>
+
               <p class="title_desc">
                 Smart contracts are verified on etherscan. Feel free to interact with them directly: 
                 <a href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank">NFT Smart Contract</a>
                 <a href="https://etherscan.io/address/0xcb1ee125cff4051a10a55a09b10613876c4ef199" target="_blank">Live Staking Contract</a><br>
               </p>
+
               <hr>
+
               <p>
                 <b>🍃 Minting Information</b><br>
                 Mint your own unique FreshFrogs NFT today and join the exclusive collection of one-of-a-kind digital frogs!<br>
@@ -42,19 +45,25 @@
                 <b>📃 Ethereum Smart Contract</b><br>
                 ERC-721 powered by Factoria, verified and stored on IPFS ✔️
               </p>
+
               <button id="mintDown" class="connectButton" style="background: steelblue; color: white; margin: 0px;">
-              <span>&#8722;</span>
+                <span>&#8722;</span>
               </button>
-              <button id="mintButton" class="connectButton" onclick=" "style="color: white; background: steelblue; margin-left: 0px; margin-right: 0px;">🐸 Mint <u>1</u> Frog(s)</button>
+              <button id="mintButton" class="connectButton" onclick="" style="color: white; background: steelblue; margin-left: 0px; margin-right: 0px;">🐸 Mint <u>1</u> Frog(s)</button>
               <button id="mintUp" class="connectButton" style="background: steelblue; color: white; margin: 0px;">
                 <span>&#43;</span>
               </button>
               <button class="connectButton" onclick="connectWallet()">
                 Connect Wallet
               </button>
-              <a href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><button class="connectButton" style="background: lightsteelblue; color: black;">View Etherscan</button></a>
+              <a href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank">
+                <button class="connectButton" style="background: lightsteelblue; color: black;">View Etherscan</button>
+              </a>
+
               <!-- <button class="connectButton" onclick="redeem_free_mint()" style="background: teal; color: white;">🎁 1 FREE Mint</button> -->
+
               <hr>
+
               <p>
                 <b>📃 FreshFrogsNFT Staking</b><br>
                 Stake your FROG(s) to earn exclusive rewards and unlock special benefits, while helping to grow the community and increase the value of your collection!<br>
@@ -65,66 +74,72 @@
                 <b>🍀 The Pond</b><br>
                 View all the Frogs staked by the community! Explore, track, and discover rare frogs while unlocking potential rewards!
               </p>
-            </div>
-          </div>
 
-          <!-- RIGHT: wallet dashboard -->
-          <aside class="hero_column hero_column--wallet">
-            <div class="user_panel" id="wallet-dashboard">
-              <div class="user_panel_header">
-                <div class="user_panel_title_row">
-                  <span class="user_panel_label">Collection Activity</span>
+              <!-- COLLECTION ACTIVITY PANEL (inside main panel) -->
+              <div class="user_panel" id="wallet-dashboard">
+                <div class="user_panel_header">
+                  <div class="user_panel_title_row">
+                    <span class="user_panel_label">Collection Activity</span>
+                  </div>
                 </div>
-              </div>
 
-              <div class="user_panel_body">
-                <div class="user_panel_prop" id="dashboard-badges">
-                  <div class="dashboard_badges_row">
-                    <div class="dashboard_badge">
-                      <span class="dashboard_badge_icon">🐸</span>
-                      <div>
-                        <span class="dashboard_badge_title">Frog #123</span>
-                        <span class="dashboard_badge_desc">
-                          <span id="stat-owned">Transfer</span> 0x000..1234 -> 0x000..5432
-                        </span>
+                <div class="user_panel_body">
+                  <div class="user_panel_prop collection_activity_list" id="dashboard-badges">
+                    <div class="dashboard_badges_row">
+                      <!-- JS will replace these sample badges -->
+                      <div class="dashboard_badge">
+                        <span class="dashboard_badge_icon">🐸</span>
+                        <div>
+                          <span class="dashboard_badge_title">Frog #123</span>
+                          <span class="dashboard_badge_desc">
+                            Minted to 0x000…1234 • 1d ago
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <div class="dashboard_badge">
-                      <span class="dashboard_badge_icon">💰</span>
-                      <div>
-                        <span class="dashboard_badge_title">Frog #22</span>
-                        <span class="dashboard_badge_desc">
-                          <span id="stat-rewards-available">Stake</span> 0x000..4124
-                        </span>
+                      <div class="dashboard_badge">
+                        <span class="dashboard_badge_icon">💰</span>
+                        <div>
+                          <span class="dashboard_badge_title">Frog #22</span>
+                          <span class="dashboard_badge_desc">
+                            Sold to 0x000…4124 for 0.05 ETH • 3d ago
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <div class="dashboard_badge">
-                      <span class="dashboard_badge_icon">📊</span>
-                      <div>
-                        <span class="dashboard_badge_title">Status</span>
-                        <span class="dashboard_badge_desc">
-                          On-chain frog explorer
-                        </span>
+                      <div class="dashboard_badge">
+                        <span class="dashboard_badge_icon">📊</span>
+                        <div>
+                          <span class="dashboard_badge_title">Status</span>
+                          <span class="dashboard_badge_desc">
+                            On-chain frog explorer
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
+
               </div>
+              <!-- /Collection Activity -->
             </div>
+          </div>
+
+          <!-- RIGHT: empty for now (can later hold sticky user dashboard) -->
+          <aside class="hero_column hero_column--wallet">
           </aside>
         </section>
 
-        <!-- RECENT SALES -->
+        <!-- RECENT MINTS GRID -->
         <section class="recent_section">
           <div class="recent_section_header">
             <h3 class="recent_section_title">Recent Mints</h3>
           </div>
 
-          <p id="recent-sales-status" class="recent_sales_status">Loading recent sales...</p>
+          <p id="recent-sales-status" class="recent_sales_status">Loading recent mints...</p>
           <div class="recent_sales" id="recent-sales"></div>
         </section>
       </main>
     </div>
+
     <script src="https://freshfrogs.github.io/assets/site.js"></script>
   </body>
 </html>
