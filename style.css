@@ -239,13 +239,11 @@ hr {
     margin-bottom: 16px;
 }
 
+
 /* RECENT SECTION */
 
 .recent_section {
     width: 100%;
-    background: rgba(26, 107, 211, 0.7);
-    border: 1px solid darkslateblue;
-    box-shadow: 4px 4px darkslateblue;
     padding: 16px 14px 20px;
     margin-top: 0;
 }
@@ -282,9 +280,9 @@ hr {
 
 .recent_sales {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(232px, 1fr));
     justify-content: center;
-    gap: 16px;
+    gap: 24px;
     margin: 0 auto;
     width: 100%;
     max-width: 1184px;
@@ -297,10 +295,11 @@ hr {
     padding: 8px;
     box-shadow: 4px 4px darkslateblue;
     width: 100%;
-    max-width: 224px;
-    margin: 0 auto;
+    max-width: 248px;
+    margin: 8px auto;
     border: 1px solid darkslateblue;
 }
+
 .sale_card_title {
     float: left;
     margin-left: 4px;
@@ -601,7 +600,7 @@ hr {
 /* FROG IMAGE CONTAINERS + FLY */
 
 .frog_img_cont {
-    margin: 12px auto 10px;
+    margin: 24px auto;
     border: 1px solid darkslateblue;
     width: 128px;
     height: 128px;

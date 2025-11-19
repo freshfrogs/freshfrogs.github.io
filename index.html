@@ -15,23 +15,6 @@
   </head>
   <body data-connect-destination="wallet">
     <div class="page_shell">
-      <!-- HEADER -->
-      <header class="site_header">
-        <div class="site_logo_block">
-          <img src="https://freshfrogs.github.io/assets/blackWhite.png"
-               alt="Fresh Frogs Logo"
-               class="site_logo">
-          <div class="site_title_group">
-            <h1 class="site_title">Fresh Frogs NFT</h1>
-            <p class="site_tagline">4,040 pixel frogs hopping around Ethereum 🐸</p>
-          </div>
-        </div>
-        <div class="site_header_actions">
-          <a href="#" id="connect-wallet-link" class="primary_button pointer">
-            Connect Wallet 🔌
-          </a>
-        </div>
-      </header>
 
       <!-- HERO: COLLECTION INFO + WALLET DASHBOARD -->
       <main class="page_main">
@@ -43,43 +26,31 @@
                 <img src="https://freshfrogs.github.io/assets/FLY.gif" class="fly" alt="Fly animation"/>
                 <div>
                   <h2 class="desc_title">freshfrogs.github.io</h2>
-                  <p class="desc_subtitle">Generative pixel frog collection on Ethereum</p>
+                  <p class="desc_subtitle">0xBE4Bef8735107db540De269FF82c7dE9ef68C51b</p>
                 </div>
               </div>
-
               <p class="title_desc">
-                Fresh Frogs NFT is a collection of <strong>4,040</strong> randomly generated frogs —
-                each one unique with thousands of possible color combinations, traits, accessories, and more.
+                Smart contracts are verified on etherscan. Feel free to interact with them directly: 
+                <a href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank">NFT Smart Contract</a>
+                <a href="https://etherscan.io/address/0xcb1ee125cff4051a10a55a09b10613876c4ef199" target="_blank">Live Staking Contract</a><br>
               </p>
-
-              <div class="hero_links">
-                <div class="hero_link_row">
-                  <span class="hero_link_label">Marketplace</span>
-                  <a class="primary_button pointer"
-                     href="https://opensea.io/collection/fresh-frogs"
-                     target="_blank">
-                    Shop on OpenSea ⛵
-                  </a>
-                </div>
-
-                <div class="hero_link_row">
-                  <span class="hero_link_label">The Pond</span>
-                  <a class="secondary_button pointer"
-                     href="https://freshfrogs.io/the-pond"
-                     target="_blank">
-                    Stake &amp; Earn Flyz 🐸
-                  </a>
-                </div>
-              </div>
-
-              <hr>
-
-              <p class="hero_footer_text">
-                Already own a frog? Jump into the pond to start earning Flyz.  
+              <p style="color: white;">
+                <b style="color: white;">🍃 Minting Information</b><br>
+                Mint your own unique FreshFrogs NFT today and join the exclusive collection of one-of-a-kind digital frogs!<br>
                 <br>
-                Waiting to connect Web3? You can always
-                <span class="inline_connect_hint">connect your wallet from the top-right when you’re ready.</span>
+                <b style="color: white;">📃 Ethereum Smart Contract</b><br>
+                ERC-721 powered by Factoria, verified and stored on IPFS ✔️
               </p>
+              <button id="mintDown" class="connectButton" style="background: steelblue; color: white; margin: 0px;">
+              <span>&#8722;</span>
+              </button>
+              <button id="mintButton" class="connectButton" onclick=" "style="color: white; background: steelblue; margin-left: 0px; margin-right: 0px;">🐸 Mint <u>1</u> Frog(s)</button>
+              <button id="mintUp" class="connectButton" style="background: steelblue; color: white; margin: 0px;">
+                <span>&#43;</span>
+              </button>
+              <a href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank"><button class="connectButton" style="background: lightsteelblue; color: black;">View Etherscan</button></a>
+              <!-- <button class="connectButton" onclick="redeem_free_mint()" style="background: teal; color: white;">🎁 1 FREE Mint</button> -->
+              <br><br>
             </div>
           </div>
 
@@ -168,10 +139,7 @@
         <!-- RECENT SALES -->
         <section class="recent_section">
           <div class="recent_section_header">
-            <h3 class="recent_section_title">Recent Swamp Sales</h3>
-            <p class="recent_section_subtitle">
-              Live activity from the Fresh Frogs collection
-            </p>
+            <h3 class="recent_section_title">Recent Mints</h3>
           </div>
 
           <p id="recent-sales-status" class="recent_sales_status">Loading recent sales...</p>
@@ -179,6 +147,6 @@
         </section>
       </main>
     </div>
-    <script src="assets/site.js"></script>
+    <script src="https://freshfrogs.github.io/assets/site.js"></script>
   </body>
 </html>
