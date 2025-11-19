@@ -89,7 +89,7 @@ body {
 
 .hero_layout {
     display: flex;
-    align-items: stretch;
+    align-items: flex-start;
     justify-content: center;
     gap: 16px;
     margin: 8vh auto 12px;   /* push down from top + center horizontally */
@@ -105,7 +105,9 @@ body {
 }
 
 .hero_column--wallet {
-    flex: 1.5;
+    flex: 1.2;
+    display: flex;
+    align-items: flex-start;
 }
 
 /* DESCRIPTION CARD */
@@ -240,13 +242,13 @@ hr {
     margin-bottom: 16px;
 }
 
-/* RECENT SECTION */
+/* RECENT SECTION (now lives under LEFT column) */
 
 .recent_section {
     width: 100%;
     max-width: 960px;
-    padding: 16px 14px 20px;
-    margin: 0 auto;
+    padding: 16px 0 0;
+    margin: 16px 0 0;
 }
 
 .recent_section_header {
@@ -448,7 +450,7 @@ hr {
   opacity: 0.9;
 }
 
-/* DASHBOARD / ACTIVITY PANEL */
+/* DASHBOARD / USER PANEL */
 
 .user_panel {
     background: antiquewhite;
@@ -458,8 +460,13 @@ hr {
     max-width: 364px;
     margin: 0;
     border: 1px solid darkslateblue;
-    height: 100%;
+    height: auto;
     color: #333;
+}
+
+.user_panel--dashboard {
+    position: sticky;
+    top: 16px;
 }
 
 .user_panel_header {
@@ -497,18 +504,6 @@ hr {
     height: auto;
     border-top-left-radius: 0;
     min-height: 70px;
-}
-
-/* Make Collection Activity panel fill main column width */
-.hero_column--main .user_panel {
-    max-width: 100%;
-    margin-top: 16px;
-}
-
-/* Limit visible activity rows (~5) and allow scrolling for more */
-.collection_activity_list {
-    max-height: 260px;
-    overflow-y: auto;
 }
 
 /* Dashboard internals */
@@ -656,6 +651,11 @@ hr {
     .hero_column--wallet {
         width: 100%;
         flex: 1 1 auto;
+    }
+
+    .user_panel--dashboard {
+        position: static;
+        margin-top: 8px;
     }
 
     .hero_link_row {
