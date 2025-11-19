@@ -13,7 +13,7 @@ const FF_ALCHEMY_CORE_BASE  = `https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY
 
 // 'sales' = use getNFTSales
 // 'mints' = use alchemy_getAssetTransfers (ERC721 mints)
-const FF_ACTIVITY_MODE      = 'sales'; // change to 'mints' if you want recent mints instead
+const FF_ACTIVITY_MODE      = 'mints'; // change to 'mints' if you want recent mints instead
 
 // ------------------------
 // Public entrypoint
