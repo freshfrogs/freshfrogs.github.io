@@ -239,12 +239,12 @@ padding: 0.55rem 1.2rem;
   font-size: 1rem;
   margin-top: 0;
   margin-bottom: 0.4rem;
-  color: darkslateblue;
+  color: lightgreen;
 }
 
 .panel p {
   margin: 0;
-  color: lightseagreen;
+  color: white;
   font-size: 0.9rem;
 }
 
@@ -366,13 +366,14 @@ padding: 0.55rem 1.2rem;
 
 .recent_sale_card {
     display: inline-block;
-    background: cornflowerblue;
+    background: rgba(15, 23, 42, 0.96);
     padding: 8px;
-    box-shadow: 4px 4px darkslateblue;
+    box-shadow: 2px 2px darkslateblue;
     width: 100%;
+    border-radius: 5px;
     max-width: 248px;
     margin: 8px auto;
-    border: 1px solid darkslateblue;
+    border: 0px solid darkslateblue;
 }
 
 .sale_card_title {
@@ -404,13 +405,14 @@ padding: 0.55rem 1.2rem;
 }
 
 .recent_sale_properties {
-    border-top: 1px solid white;
+border-top: 1px solid white;
     border-left: 1px solid white;
     height: auto;
     border-top-left-radius: 5px;
     padding: 8px;
     margin: 8px;
     min-height: 70px;
+    color: lightseagreen;
 }
 .recent_sale_properties p {
     margin: 2px;
@@ -419,11 +421,10 @@ padding: 0.55rem 1.2rem;
 .recent_sale_traits {}
 
 .frog_img_cont {
-    margin: 24px auto;
-    border: 1px solid darkslateblue;
+margin: 24px auto;
     width: 128px;
     height: 128px;
     overflow: hidden;
-    border-radius: 100%;
+    border-radius: 5px;
     box-shadow: 2px 2px darkslateblue;
 }
