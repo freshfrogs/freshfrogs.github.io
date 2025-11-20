@@ -263,7 +263,7 @@ padding: 0.55rem 1.2rem;
 .panel p {
   margin: 0;
   color: white;
-  font-size: 0.9rem;
+  font-size: 1.0em;
 }
 
 /* CARD ROW (OPTIONAL) */
@@ -412,6 +412,7 @@ padding: 0.55rem 1.2rem;
 .sale_card_title {
     float: left;
     margin-left: 4px;
+  color: lightgreen;
 }
 .sale_card_price {
     float: right;
@@ -692,8 +693,8 @@ margin: 24px auto;
 }
 
 .stake-meta-subrow {
-  font-size: 0.7rem;
-  color: #9ca3af;
+    font-size: 1.0em;
+    color: white;
 }
 
 .stake-level-label {
