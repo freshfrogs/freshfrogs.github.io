@@ -768,32 +768,31 @@ async function ffDecorateStakedFrogCard(tokenId) {
 
     const [stakedDays, stakedLevel, daysToNext, flyzEarned, stakedDate] = values;
 
-    const lvlEl     = document.getElementById(`stake-level-${tokenId}`);
-    const rewardsEl = document.getElementById(`stake-rewards-${tokenId}`);
-    const dateEl    = document.getElementById(`stake-date-${tokenId}`);
-    const nextEl    = document.getElementById(`stake-next-${tokenId}`);
-    const barEl     = document.getElementById(`stake-progress-bar-${tokenId}`);
-    const labelEl   = document.getElementById(`stake-progress-label-${tokenId}`);
+    // Always show numeric level, even if stakingValues() returns roman numerals
+    const levelNum = ffRomanToArabic(stakedLevel) ?? stakedLevel;
 
-    if (lvlEl)     lvlEl.textContent     = `Lvl. ${stakedLevel}`;  // <- Lvl. X
-    if (rewardsEl) rewardsEl.textContent = `${flyzEarned} FLYZ earned`;
-    if (dateEl)    dateEl.textContent    = `Staked: ${stakedDate}`;
-    if (nextEl)    nextEl.textContent    = `Next level in ~${daysToNext} days`;
+    const lvlEl   = document.getElementById(`stake-level-${tokenId}`);
+    const dateEl  = document.getElementById(`stake-date-${tokenId}`);
+    const nextEl  = document.getElementById(`stake-next-${tokenId}`);
+    const barEl   = document.getElementById(`stake-progress-bar-${tokenId}`);
 
-    const MAX_DAYS = 41.7;
-    const remaining = Math.max(0, Math.min(MAX_DAYS, Number(daysToNext)));
-    const pct = Math.max(0, Math.min(100, ((MAX_DAYS - remaining) / MAX_DAYS) * 100));
+    if (lvlEl)  lvlEl.textContent  = `Lvl. ${levelNum}`;
+    if (dateEl) dateEl.textContent = `Staked: ${stakedDate}`;
+    if (nextEl) nextEl.textContent = `Next level in ~${daysToNext} days`;
+
+    // Keep the bar itself, but no percentage text anywhere
+    const MAX_DAYS   = 41.7;
+    const remaining  = Math.max(0, Math.min(MAX_DAYS, Number(daysToNext)));
+    const pct        = Math.max(0, Math.min(100, ((MAX_DAYS - remaining) / MAX_DAYS) * 100));
 
     if (barEl) {
       barEl.style.width = `${pct}%`;
-    }
-    if (labelEl) {
-      labelEl.textContent = `${Math.round(pct)}% to next level`;
     }
   } catch (err) {
     console.warn(`ffDecorateStakedFrogCard failed for token ${tokenId}`, err);
   }
 }
+
 
 // ---- Card actions: Stake / Unstake / Transfer ----
 
