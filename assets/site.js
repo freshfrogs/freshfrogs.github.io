@@ -529,7 +529,7 @@ async function ffBuildLayeredFrogImage(tokenId, containerId, metadata, card) {
 
   container.style.backgroundImage    = `url(${baseUrl})`;
   container.style.backgroundRepeat   = 'no-repeat';
-  container.style.backgroundSize     = '220% 220%';
+  container.style.backgroundSize     = '1000%';
   container.style.backgroundPosition = 'bottom right';
 
   // Use given metadata if possible; otherwise fetch it
