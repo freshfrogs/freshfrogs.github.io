@@ -24,11 +24,11 @@ let FF_CURRENT_VIEW         = 'activity';
 
 let FF_RARITY_SORTED        = null;
 let FF_RARITY_RENDERED      = 0;
-const FF_RARITY_PAGE_SIZE   = 24;
+const FF_RARITY_PAGE_SIZE   = 10;
 
 let FF_POND_TOKEN_IDS       = null;
 let FF_POND_RENDERED        = 0;
-const FF_POND_PAGE_SIZE     = 36;
+const FF_POND_PAGE_SIZE     = 10;
 
 // Caches
 const FF_OWNER_CACHE        = new Map(); // tokenId -> owner address
@@ -1231,20 +1231,119 @@ async function renderOwnedAndStakedFrogs(address) {
   }
 }
 
+async function loadPond(reset = false) {
+  const grid     = document.getElementById('pond-grid');
+  const statusEl = document.getElementById('pond-status');
+  if (!grid) return;
 
-// ===================================================
-// Pond (community staked frogs via controller owner)
-// ===================================================
-async function ffFetchPondTokenIdsViaAlchemy() {
-  if (!FF_ALCHEMY_NFT_BASE) return [];
+  if (reset || !Array.isArray(FF_POND_TOKEN_IDS)) {
+    if (statusEl) statusEl.textContent = 'Loading the Pond...';
+    grid.innerHTML = '';
+    FF_POND_TOKEN_IDS = await ffFetchPondTokenIdsViaAlchemy();
+    FF_POND_OFFSET    = 0;
+  }
 
+  const ids = FF_POND_TOKEN_IDS || [];
+  if (!ids.length) {
+    if (statusEl) statusEl.textContent = 'No frogs are currently staked in the pond.';
+    return;
+  }
+
+  if (statusEl) statusEl.textContent = '';
+
+  const slice = ids.slice(FF_POND_OFFSET, FF_POND_OFFSET + FF_POND_PAGE_SIZE);
+  FF_POND_OFFSET += slice.length;
+
+  for (const tokenId of slice) {
+    const metadata = await fetchFrogMetadata(tokenId);
+
+    // Try to show actual staker; fall back to controller address
+    let ownerLabel = truncateAddress(FF_CONTROLLER_ADDRESS);
+    if (typeof stakerAddress === 'function') {
+      try {
+        const addr = await stakerAddress(tokenId);
+        if (addr && addr !== ZERO_ADDRESS) {
+          ownerLabel = truncateAddress(addr);
+        }
+      } catch (err) {
+        console.warn('stakerAddress() failed for pond token', tokenId, err);
+      }
+    }
+
+    // Same staking footer markup as your wallet "Staked Frogs" cards
+    const footerHtml = `
+      <div class="stake-meta">
+        <div class="stake-meta-row">
+          <span id="stake-level-${tokenId}" class="stake-level-label">Staked Lvl. —</span>
+        </div>
+        <div class="stake-meta-row stake-meta-subrow">
+          <span id="stake-date-${tokenId}">Staked: —</span>
+          <span id="stake-next-${tokenId}"></span>
+        </div>
+        <div class="stake-progress">
+          <div id="stake-progress-bar-${tokenId}" class="stake-progress-bar"></div>
+        </div>
+      </div>
+    `;
+
+    const actionHtml = `
+      <div class="recent_sale_links">
+        <a
+          class="sale_link_btn opensea"
+          href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          OpenSea
+        </a>
+        <a
+          class="sale_link_btn etherscan"
+          href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Etherscan
+        </a>
+      </div>
+    `;
+
+    const card = createFrogCard({
+      tokenId,
+      metadata,
+      headerLeft: ownerLabel,  // ✅ owner / staker top-left
+      headerRight: '',         // we’ll fill sale price below
+      footerHtml,
+      actionHtml
+    });
+
+    grid.appendChild(card);
+
+    // Fill staking stats into the footer
+    ffDecorateStakedFrogCard(tokenId);
+
+    // Fill last sale price in top-right if we can find it
+    try {
+      const price = await ffFetchLastSalePrice(tokenId);
+      if (price) {
+        const priceEl = card.querySelector('.sale_card_price');
+        if (priceEl) priceEl.textContent = price;
+      }
+    } catch (err) {
+      console.warn('Pond: last sale lookup failed for', tokenId, err);
+    }
+  }
+}
+
+
+// Get all FreshFrogs held by the controller address via Alchemy
+async function ffFetchPondTokenIdsViaAlchemy(limit = 400) {
   const owner  = FF_CONTROLLER_ADDRESS;
   const target = FF_COLLECTION_ADDRESS.toLowerCase();
-  const tokenIds = [];
-  let pageKey = null;
+  const ids    = [];
+  let pageKey  = null;
 
   try {
-    do {
+    for (;;) {
       const params = new URLSearchParams({
         owner,
         withMetadata: 'false',
@@ -1254,128 +1353,34 @@ async function ffFetchPondTokenIdsViaAlchemy() {
 
       const url = `${FF_ALCHEMY_NFT_BASE}/getNFTsForOwner?${params.toString()}`;
       const res = await fetch(url);
+
       if (!res.ok) {
-        console.warn('Alchemy getNFTsForOwner (pond) failed:', res.status);
-        break;
+        throw new Error(`getNFTsForOwner failed: ${res.status}`);
       }
 
-      const data = await res.json();
-      const nfts = Array.isArray(data.ownedNfts) ? data.ownedNfts : [];
+      const data  = await res.json();
+      const owned = Array.isArray(data.ownedNfts) ? data.ownedNfts : [];
 
-      for (const nft of nfts) {
+      for (const nft of owned) {
         const addr = nft.contract && nft.contract.address;
         if (!addr || addr.toLowerCase() !== target) continue;
 
-        const rawTokenId = nft.tokenId || (nft.id && nft.id.tokenId);
-        const tid = parseTokenId(rawTokenId);
-        if (tid != null) tokenIds.push(tid);
+        const rawId   = nft.tokenId || (nft.id && nft.id.tokenId);
+        const tokenId = parseTokenId(rawId);
+        if (tokenId != null && !ids.includes(tokenId)) {
+          ids.push(tokenId);
+        }
       }
 
+      if (!data.pageKey || ids.length >= limit) break;
       pageKey = data.pageKey;
-    } while (pageKey && tokenIds.length < 4040);
-  } catch (err) {
-    console.warn('ffFetchPondTokenIdsViaAlchemy error:', err);
-  }
-
-  return Array.from(new Set(tokenIds)).sort((a, b) => a - b);
-}
-
-async function loadPond() {
-  const container = document.getElementById('pond-grid');
-  const statusEl  = document.getElementById('pond-status');
-  if (!container) return;
-
-  try {
-    if (!FF_POND_TOKEN_IDS) {
-      if (statusEl) statusEl.textContent = 'Loading staked Frogs...';
-      container.innerHTML = '';
-      FF_POND_RENDERED    = 0;
-
-      // Use Alchemy to get all frogs owned by the controller address
-      FF_POND_TOKEN_IDS = await ffFetchPondTokenIdsViaAlchemy();
-    }
-
-    const ids = FF_POND_TOKEN_IDS || [];
-    if (!ids.length) {
-      if (statusEl) statusEl.textContent = 'No Frogs are currently staked in the Pond.';
-      const moreBtn = document.getElementById('load-more-pond');
-      if (moreBtn) moreBtn.disabled = true;
-      return;
-    }
-
-    if (statusEl) statusEl.textContent = '';
-
-    const start = FF_POND_RENDERED;
-    const end   = Math.min(ids.length, start + FF_POND_PAGE_SIZE);
-
-    if (start >= end) {
-      if (statusEl) statusEl.textContent = 'All staked Frogs are loaded.';
-      const moreBtn = document.getElementById('load-more-pond');
-      if (moreBtn) {
-        moreBtn.disabled   = true;
-        moreBtn.textContent = 'All loaded';
-      }
-      return;
-    }
-
-    const slice = ids.slice(start, end);
-    for (const tokenId of slice) {
-      const metadata = await fetchFrogMetadata(tokenId);
-
-      const footerHtml = ffStakeMetaHtml(tokenId);
-
-      const actionHtml = `
-        <div class="recent_sale_links">
-          <a
-            class="sale_link_btn opensea"
-            href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            OpenSea
-          </a>
-          <a
-            class="sale_link_btn etherscan"
-            href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Etherscan
-          </a>
-        </div>
-      `;
-
-      const card = createFrogCard({
-        tokenId,
-        metadata,
-        headerLeft: truncateAddress(FF_CONTROLLER_ADDRESS), // owner is controller
-        headerRight: '',
-        footerHtml,
-        actionHtml
-      });
-
-      container.appendChild(card);
-
-      ffDecorateStakedFrogCard(tokenId);
-      ffEnsureCardHasSalePrice(card, tokenId);
-    }
-
-    FF_POND_RENDERED = end;
-
-    const moreBtn = document.getElementById('load-more-pond');
-    if (moreBtn) {
-      if (FF_POND_RENDERED >= ids.length) {
-        moreBtn.disabled   = true;
-        moreBtn.textContent = 'All loaded';
-      } else {
-        moreBtn.disabled   = false;
-        moreBtn.textContent = 'Load More';
-      }
     }
   } catch (err) {
-    console.error('loadPond failed:', err);
-    if (statusEl) statusEl.textContent = 'Unable to load the Pond right now.';
+    console.error('ffFetchPondTokenIdsViaAlchemy failed', err);
   }
+
+  // Low → high
+  return ids.sort((a, b) => a - b);
 }
 
 
