@@ -451,6 +451,8 @@ border-top: 1px solid white;
 .recent_sale_properties p {
     margin: 2px;
     text-align: left;
+    color: white;
+    font-size: 1.0em;
 }
 .recent_sale_traits {}
 
