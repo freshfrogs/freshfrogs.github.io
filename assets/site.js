@@ -174,7 +174,7 @@ async function ffAnnotateSaleWithStaking(card, tokenId) {
     const wrapper = document.createElement('div');
     wrapper.className = 'staking-sale-stats';
     wrapper.innerHTML = `
-      <div><strong>Lvl. ${levelNum}</strong> • ${Math.round(flyzEarned)} FLYZ earned</div>
+      <div><strong>Staked Lvl. ${levelNum}</strong> • ${Math.round(flyzEarned)} FLYZ earned</div>
       <div>Staked ${stakedDays}d ago • Since ${stakedDate}</div>
     `;
 
