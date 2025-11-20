@@ -337,9 +337,6 @@ function createFrogCard({
       />
     </div>
 
-    <!-- ACTION BUTTONS: now directly under the image -->
-    ${actionHtml || ''}
-
     <!-- Traits / text area -->
     <div class="recent_sale_traits">
       <strong class="sale_card_title">${frogName}</strong>
@@ -348,6 +345,7 @@ function createFrogCard({
         ${traitsHtml}
       </div>
       ${footerHtml || ''}
+      ${actionHtml || ''}
     </div>
   `;
 
