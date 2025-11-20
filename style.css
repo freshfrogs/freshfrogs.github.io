@@ -36,8 +36,10 @@ a {
     justify-content: space-between;
     gap: 1.5rem;
     padding: 1.25rem 0 0.75rem;
+    position: sticky;
     top: 0;
     z-index: 20;
+    backdrop-filter: blur(14px);
     color: white;
 }
 
@@ -120,14 +122,15 @@ padding: 0.55rem 1.2rem;
 }
 
 .hero-title {
-    line-height: 1.1;
-    text-shadow: 2px 2px darkslateblue;
+  font-size: clamp(2.1rem, 3vw, 2.8rem);
+  line-height: 1.1;
+  text-shadow: 2px 2px darkslateblue;
 }
 
 .hero-subtitle {
   color: inherit;
   max-width: 36rem;
-  font-size: 1.1em;
+  font-size: 0.98rem;
 }
 
 .hero-actions {
@@ -186,16 +189,15 @@ padding: 0.55rem 1.2rem;
 
 .btn.primary {
 padding: 0.55rem 1.2rem;
-    border-radius: 0px;
+    border-radius: 5px;
     border: none;
     color: #022c22;
     font-weight: 600;
     font-size: 0.85rem;
     cursor: pointer;
     white-space: nowrap;
-    background: lightblue;
-    color: darkslateblue;
-    box-shadow: 2px 2px darkslateblue;
+    background: royalblue;
+    color: white;
 }
 
 .btn.secondary {
@@ -244,11 +246,11 @@ padding: 0.55rem 1.2rem;
 
 
 .panel {
-    background: lightseagreen;
+    background: rgba(15, 23, 42, 0.96);
     border: 0px solid white;
     padding: 1.2rem 1.3rem 1.3rem;
-    box-shadow: 2px 2px darkslateblue;
-    border-radius: 0px;
+    box-shadow: 4px 4px darkslateblue;
+    border-radius: 5px;
 }
 
 .panel h2 {
@@ -367,11 +369,8 @@ padding: 0.55rem 1.2rem;
   }
 }
 .fly {
-  width: 128px;
-  height: 128px;
-  margin: 8px;
-  box-shadow: 2px 2px darkslateblue;
-  image-rendering: pixelated;
+  width: 256px;
+  height: 256px;
 }
 .recent_sales {
   display: grid;
@@ -400,21 +399,21 @@ padding: 0.55rem 1.2rem;
 
 
 .recent_sale_card {
-     display: inline-block;
-    background: lightseagreen;
+    display: inline-block;
+    background: rgba(15, 23, 42, 0.96);
     padding: 8px;
     box-shadow: 2px 2px darkslateblue;
     width: 100%;
-    border-radius: 0px;
+    border-radius: 5px;
     max-width: 248px;
     margin: 8px auto;
+    border: 0px solid darkslateblue;
 }
 
 .sale_card_title {
     float: left;
     margin-left: 4px;
   color: lightgreen;
-  text-shadow: 2px 2px darkslateblue;
 }
 .sale_card_price {
     float: right;
@@ -440,13 +439,14 @@ padding: 0.55rem 1.2rem;
 }
 
 .recent_sale_properties {
-    border-top: 1px solid white;
+border-top: 1px solid white;
+    border-left: 1px solid white;
+    height: auto;
+    border-top-left-radius: 5px;
     padding: 8px;
     margin: 8px;
     min-height: 70px;
     color: lightseagreen;
-    margin-bottom: 0px;
-    font-size: 0.9em;
 }
 .recent_sale_properties p {
     margin: 2px;
@@ -457,60 +457,14 @@ padding: 0.55rem 1.2rem;
 .recent_sale_traits {}
 
 .frog_img_cont {
-  margin: 24px auto;
-  width: 128px;
-  height: 128px;
-  overflow: hidden;
-  border-radius: 0px;
-  box-shadow: 2px 2px darkslateblue;
-  position: relative;         /* needed for layered trait overlays */
+margin: 24px auto;
+    width: 128px;
+    height: 128px;
+    overflow: hidden;
+    border-radius: 5px;
+    box-shadow: 2px 2px darkslateblue;
+    position: relative;
 }
-/* Layered frog overlays (used by build_trait from ethereum-dapp.js) */
-.trait_overlay,
-.attribute_overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 128px;
-  height: 128px;
-  image-rendering: pixelated;
-}
-/* Single "Actions" button + dropdown on owned frog cards */
-
-.frog-actions {
-  margin: 8px;
-}
-
-.frog-actions .actions-toggle {
-  width: 100%;
-}
-
-.actions-menu {
-  margin-top: 6px;
-  padding: 4px;
-  border-radius: 4px;
-  border: 1px solid rgba(148, 163, 184, 0.8);
-  background: rgba(15, 23, 42, 0.98);
-  display: none;
-}
-
-.actions-menu-item {
-  display: block;
-  width: 100%;
-  text-align: left;
-  font-size: 0.75rem;
-  padding: 4px 6px;
-  border: none;
-  background: transparent;
-  color: #e5e7eb;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.actions-menu-item:hover {
-  background: rgba(30, 64, 175, 0.7);
-}
-
 /* WALLET SIDEBAR / DASHBOARD */
 
 .sidebar .wallet-summary {
@@ -528,22 +482,22 @@ padding: 0.55rem 1.2rem;
 }
 
 .wallet-avatar {
-    width: 64px;
-    height: 64px;
-    border-radius: 999px;
-    object-fit: cover;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid lightgreen;
+  object-fit: cover;
 }
 
 .wallet-username {
-    font-weight: bold;
-    color: white;
-    text-shadow: 2px 2px darkslateblue;
-    font-size: 1.1em;
+  font-weight: bold;
+  color: lightgreen;
+  font-size: 0.9rem;
 }
 
 .wallet-address {
-    font-size: 0.8em;
-    color: white;
+  font-size: 0.78rem;
+  color: #a5b4fc;
 }
 
 .wallet-status-row {
@@ -565,23 +519,23 @@ padding: 0.55rem 1.2rem;
 }
 
 .wallet-stat {
-    background: antiquewhite;
-    padding: 0.35rem 0.45rem;
-    border-radius: 0px;
-    color: #333;
+  background: rgba(15, 23, 42, 0.9);
+  padding: 0.35rem 0.45rem;
+  border-radius: 4px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
 }
 
 .wallet-stat .stat-label {
-    display: block;
-    font-size: 0.8rem;
-    color: #333;
+  display: block;
+  font-size: 0.72rem;
+  color: #9ca3af;
 }
 
 .wallet-stat .stat-value {
-display: block;
-    font-size: 1.1em;
-    font-weight: bold;
-    color: #333;
+  display: block;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #e5e7eb;
 }
 
 .wallet-connect-btn {
@@ -592,7 +546,6 @@ display: block;
 /* RARITY BADGES */
 
 .rarity_badge {
-  text-shadow: 2px 2px darkslateblue;
 }
 
 .rarity_legendary {
@@ -622,16 +575,15 @@ display: block;
 
 .recent_sale_links {
   display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  margin: 8px;
-  margin-top: 10px;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
 }
 
 .sale_link_btn {
-  flex: 1 1 0;
+  flex: 1 1 48%;
   text-align: center;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   padding: 4px 6px;
   border-radius: 4px;
   text-decoration: none;
@@ -667,11 +619,11 @@ display: block;
 }
 
 .dashboard-main .dashboard-section {
-    background: lightseagreen;
+    background: rgba(15, 23, 42, 0.96);
     border: 0px solid white;
     padding: 1.2rem 1.3rem 1.3rem;
-    box-shadow: 2px 2px darkslateblue;
-    border-radius: 0px;
+    box-shadow: 4px 4px darkslateblue;
+    border-radius: 5px;
 }
 
 .dashboard-main .dashboard-sidebar {
@@ -731,8 +683,9 @@ display: block;
 
 .stake-meta {
   margin: 8px;
-  margin-top: 0px;
-  padding-top: 0px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(148, 163, 184, 0.5);
   font-size: 0.75rem;
   color: #e5e7eb;
 }
@@ -744,17 +697,13 @@ display: block;
 }
 
 .stake-meta-subrow {
-font-size: 0.9em;
-    border-top: 1px solid white;
-    padding: 8px;
+    font-size: 1.0em;
     color: white;
-    margin-top: 8px;
 }
 
 .stake-level-label {
   font-weight: 600;
-  color: #fbbf24;
-  text-shadow: 2px 2px darkslateblue;
+  color: lightgreen;
 }
 
 .stake-rewards-label {
@@ -765,9 +714,9 @@ font-size: 0.9em;
 .stake-progress {
   position: relative;
   width: 100%;
-  height: 8px;
+  height: 6px;
   border-radius: 999px;
-  background: white;
+  background: rgba(15, 23, 42, 0.8);
   overflow: hidden;
   margin-top: 2px;
 }
@@ -779,7 +728,7 @@ font-size: 0.9em;
   bottom: 0;
   width: 0%;
   border-radius: inherit;
-  background: #fbbf24;
+  background: linear-gradient(to right, #22c55e, #a855f7);
   transition: width 260ms ease-out;
 }
 
@@ -798,22 +747,21 @@ font-size: 0.9em;
 }
 
 .recent_sale_links .sale_link_btn {
-    flex: 1 1 48%;
-    text-align: center;
-    font-size: 0.72rem;
-    padding: 4px 6px;
-    border-radius: 0px;
-    border: 1px solid lightcoral;
-    background: lightcoral;
-    color: #e5e7eb;
-    cursor: pointer;
-    text-decoration: none;
-    font-weight: 600;
-    transition: background 160ms 
-ease-out, transform 120ms 
-ease-out, border-color 160ms 
-ease-out;
-    box-shadow: 2px 2px darkslateblue;
+  flex: 1 1 48%;
+  text-align: center;
+  font-size: 0.72rem;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(148, 163, 184, 0.9);
+  background: rgba(15, 23, 42, 0.95);
+  color: #e5e7eb;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 600;
+  transition:
+    background 160ms ease-out,
+    transform 120ms ease-out,
+    border-color 160ms ease-out;
 }
 
 .recent_sale_links .sale_link_btn:hover {
@@ -823,13 +771,10 @@ ease-out;
 
 .sale_link_btn.opensea {
   border-color: #2081e2;
-  background-color: #2081e2;
 }
 
 .sale_link_btn.etherscan {
-    border-color: antiquewhite;
-    background: antiquewhite;
-    color: #333;
+  border-color: #10b981;
 }
 
 .staking-sale-note {
@@ -846,64 +791,50 @@ ease-out;
 .staking-sale-stats strong {
   color: white;
 }
-/* Layered frog container uses the original PNG as a zoomed/offset background */
-.frog_img_cont {
-  position: relative;
-  margin: 24px auto;
-  width: 128px;
-  height: 128px;
-  overflow: hidden;
-  border-radius: 5px;
-  box-shadow: 2px 2px darkslateblue;
 
-  /* base background; JS will override with the correct frog image */
-  background-color: #020617;
-  background-repeat: no-repeat;
-  background-size: 220% 220%;
-  background-position: bottom right;  /* only show background color area */
-}
+/* LAYERED TRAIT IMAGES + HOVER EFFECTS */
 
-/* Attribute layers (built by build_trait) */
 .trait_overlay,
 .attribute_overlay {
   position: absolute;
-  left: 0;
   top: 0;
+  left: 0;
   width: 128px;
   height: 128px;
   image-rendering: pixelated;
   pointer-events: auto;
   transition:
     transform 160ms ease-out,
-    box-shadow 160ms ease-out,
-    filter 160ms ease-out;
+    filter 160ms ease-out,
+    box-shadow 160ms ease-out;
 }
 
-/* Default hover on the layer itself */
-.trait_overlay:hover,
-.attribute_overlay:hover {
-  transform: translateY(-3px) scale(1.08);
-  box-shadow: 0 0 8px rgba(125, 211, 252, 0.7);
-  filter: brightness(1.1);
-  z-index: 5;
-}
-
-/* Trait list text in the card */
-.frog-attr-text {
-  cursor: default;
-  transition: color 160ms ease-out, text-shadow 160ms ease-out;
-}
-
-/* Highlighted state (from JS, when text/layer is hovered) */
-.frog-attr-text.is-highlighted {
-  color: #7dd3fc; /* light blue */
-  text-shadow: 0 0 4px rgba(125, 211, 252, 0.7);
+/* When an attribute is "popped" on hover */
+.trait_overlay.is-popped,
+.attribute_overlay.is-popped {
+  transform: translateY(-3px) scale(1.04);
+  filter: drop-shadow(0 0 6px rgba(125, 211, 252, 0.9));
+  z-index: 2;
 }
 
 .trait_overlay.is-highlighted,
 .attribute_overlay.is-highlighted {
-  transform: translateY(-3px) scale(1.08);
-  box-shadow: 0 0 8px rgba(125, 211, 252, 0.7);
-  filter: brightness(1.1);
-  z-index: 5;
+  transform: translateY(-3px) scale(1.04);
+  filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
+  z-index: 2;
+}
+
+/* Trait text inside the properties list */
+.frog-attr-text {
+  display: block;
+  cursor: pointer;
+  color: #e5e7eb;
+  transition:
+    color 140ms ease-out,
+    text-shadow 140ms ease-out;
+}
+
+.frog-attr-text.is-highlighted {
+  color: #7dd3fc;
+  text-shadow: 0 0 4px rgba(56, 189, 248, 0.9);
 }
