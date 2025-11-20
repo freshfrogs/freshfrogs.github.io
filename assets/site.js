@@ -1532,8 +1532,6 @@ function ffGetRarityRankingEntries() {
   return [];
 }
 
-let FF_RARITY_LIMIT = 50;
-
 async function ffLoadRarityGrid() {
   const container = document.getElementById('rarity-grid');
   const statusEl  = document.getElementById('rarity-status');
