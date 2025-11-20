@@ -427,7 +427,7 @@ async function ffBuildLayeredFrogImage(tokenId, containerId) {
     const baseUrl = `https://freshfrogs.github.io/frog/${tokenId}.png`;
     container.style.backgroundImage    = `url("${baseUrl}")`;
     container.style.backgroundRepeat   = 'no-repeat';
-    container.style.backgroundSize     = '220%';       // zoom in
+    container.style.backgroundSize     = '1000%';       // zoom in
     container.style.backgroundPosition = 'bottom right'; // only show the color block
 
     container.innerHTML = ''; // clear any previous content
