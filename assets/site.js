@@ -282,34 +282,29 @@ async function loadRecentActivity() {
 // Attach full stake-meta block to a card *only if* frog is staked
 async function ffAttachStakeMetaIfStaked(card, tokenId) {
   if (!card) return;
-  // Need ethereum-dapp helpers + controller
   if (typeof stakingValues !== 'function' || typeof stakerAddress !== 'function') {
     return;
   }
-  if (!ffEnsureController()) return;
 
-  // Avoid duplicating stake-meta if we somehow call twice
+  ffEnsureController();
+
+  // avoid duplicating the block
   if (card.querySelector(`#stake-level-${tokenId}`)) return;
 
   try {
     const addr = await stakerAddress(tokenId);
-    if (!addr) {
-      // Not staked, nothing to show
-      return;
-    }
+    if (!addr) return; // not staked
 
     const traitsBlock = card.querySelector('.recent_sale_traits');
     if (!traitsBlock) return;
 
-    // Insert the same stake-meta block used for wallet staked frogs
     traitsBlock.insertAdjacentHTML('beforeend', ffStakeMetaHtml(tokenId));
-
-    // Fill in level, date, next level, progress bar
     ffDecorateStakedFrogCard(tokenId);
   } catch (err) {
     console.warn('ffAttachStakeMetaIfStaked failed for token', tokenId, err);
   }
 }
+
 
 
 // ===================================================
@@ -543,10 +538,12 @@ function createFrogCard({
   card.dataset.imgContainerId = imgContainerId;
 
   card.innerHTML = `
+    <!-- TOP ROW: OWNER / CONTEXT -->
     <strong class="sale_card_title">${headerLeft || ''}</strong>
     <strong class="sale_card_price">${headerRight || ''}</strong>
     <div style="clear: both;"></div>
 
+    <!-- IMAGE -->
     <div id="${imgContainerId}" class="frog_img_cont">
       <img
         src="https://freshfrogs.github.io/frog/${tokenId}.png"
@@ -556,14 +553,15 @@ function createFrogCard({
       />
     </div>
 
+    <!-- BOTTOM: NAME + RARITY + TRAITS + STAKING + ACTIONS -->
     <div class="recent_sale_traits">
       <strong class="sale_card_title">${frogName}</strong>
       <strong class="sale_card_price ${rarityClass}">${rarityText}</strong><br>
       <div class="recent_sale_properties">
         ${traitsHtml}
       </div>
-      ${footerHtml || ''}
-      ${actionHtml || ''}
+      ${footerHtml || ''}   <!-- stake-meta goes here if staked -->
+      ${actionHtml || ''}   <!-- buttons like Stake / OS / Etherscan -->
     </div>
   `;
 
@@ -1259,7 +1257,7 @@ async function ffDecorateStakedFrogCard(tokenId) {
     return;
   }
 
-  if (!ffEnsureController()) return;
+  ffEnsureController(); // make sure read-only controller is set up
 
   try {
     const values = await stakingValues(tokenId);
@@ -1288,7 +1286,6 @@ async function ffDecorateStakedFrogCard(tokenId) {
     console.warn(`ffDecorateStakedFrogCard failed for token ${tokenId}`, err);
   }
 }
-
 
 // ===================================================
 // Card actions: Stake / Unstake / Transfer
