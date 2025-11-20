@@ -417,46 +417,57 @@ function ffWireTraitHover(card) {
 
 // Build layered frog image using /frog/json/<id>.json + build_trait()
 // Always uses GitHub metadata so trait order is exactly as stored there.
+// Build the layered frog using metadata from /frog/json/ and build_trait()
 async function ffBuildLayeredFrogImage(tokenId, containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  // Clear any previous content
-  container.innerHTML = '';
-
   try {
-    // Always pull metadata from GitHub JSON
-    const metadata = await fetchFrogMetadata(tokenId);
-    const attrs = Array.isArray(metadata.attributes) ? metadata.attributes : [];
+    // Use the original frog PNG as a background color swatch
+    const baseUrl = `https://freshfrogs.github.io/frog/${tokenId}.png`;
+    container.style.backgroundImage    = `url("${baseUrl}")`;
+    container.style.backgroundRepeat   = 'no-repeat';
+    container.style.backgroundSize     = '220%';       // zoom in
+    container.style.backgroundPosition = 'bottom right'; // only show the color block
 
-    if (!attrs.length || typeof build_trait !== 'function') {
-      // Fallback: just show static PNG if something goes wrong
+    container.innerHTML = ''; // clear any previous content
+
+    // Fall back to simple base image if SOURCE_PATH or build_trait not available
+    if (typeof SOURCE_PATH === 'undefined' || typeof build_trait !== 'function') {
       const img = document.createElement('img');
-      img.src = `https://freshfrogs.github.io/frog/${tokenId}.png`;
+      img.src = baseUrl;
+      img.alt = `Frog #${tokenId}`;
       img.className = 'recent_sale_img';
       img.loading = 'lazy';
-      img.alt = `Frog #${tokenId}`;
       container.appendChild(img);
       return;
     }
 
-    // Layer all attributes in the order they appear in metadata
-    for (const attr of attrs) {
+    // Fetch metadata from GitHub (in the order it is written)
+    const metadataUrl = `${SOURCE_PATH}/frog/json/${tokenId}.json`;
+    const metadata = await (await fetch(metadataUrl)).json();
+    const attrs = Array.isArray(metadata.attributes) ? metadata.attributes : [];
+
+    // Layer each attribute in the order defined in metadata
+    for (let i = 0; i < attrs.length; i++) {
+      const attr = attrs[i];
       if (!attr || !attr.trait_type || !attr.value) continue;
       build_trait(attr.trait_type, attr.value, containerId);
     }
   } catch (err) {
-    console.error('ffBuildLayeredFrogImage failed for token', tokenId, err);
+    console.warn('ffBuildLayeredFrogImage error for token', tokenId, err);
 
-    // Last-resort fallback PNG
+    // Hard fallback: simple PNG if anything blows up
+    container.innerHTML = '';
     const img = document.createElement('img');
     img.src = `https://freshfrogs.github.io/frog/${tokenId}.png`;
+    img.alt = `Frog #${tokenId}`;
     img.className = 'recent_sale_img';
     img.loading = 'lazy';
-    img.alt = `Frog #${tokenId}`;
     container.appendChild(img);
   }
 }
+
 
 function getRarityTier(rank) {
   if (!rank) return null;
