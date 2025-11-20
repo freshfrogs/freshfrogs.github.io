@@ -135,14 +135,18 @@ async function loadRecentActivity() {
         metadata,
         headerLeft,
         headerRight,
-        footerHtml,
-        actionHtml
+        actionHtml     // show OpenSea / Etherscan on recent sales
       });
-
-      ffAnnotateSaleWithStaking(card, tokenId); // still toggle-controlled
 
       container.appendChild(card);
 
+      // Optional staking stats on recent-sales cards
+      ffAnnotateSaleWithStaking(card, tokenId);
+
+      // Build layered frog image
+      if (card.dataset.imgContainerId) {
+        ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
+      }
 
     }
   } catch (err) {
@@ -286,6 +290,7 @@ function buildRarityLookup(rankings) {
   return lookup;
 }
 
+
 // ------------------------
 // Card rendering (shared for all grids)
 // ------------------------
@@ -306,21 +311,22 @@ function createFrogCard({
     ? `rarity_badge ${rarityTier.className}`
     : 'rarity_badge rarity_unknown';
 
-  const imageUrl   = `https://freshfrogs.github.io/frog/${tokenId}.png`;
   const traitsHtml = buildTraitsHtml(metadata);
+
+  // Unique container ID for layered image (using build_trait)
+  const imgContainerId = `frog-layer-${tokenId}-${Math.random()
+    .toString(36)
+    .slice(2, 8)}`;
 
   const card = document.createElement('div');
   card.className = 'recent_sale_card';
+  card.dataset.imgContainerId = imgContainerId;
+
   card.innerHTML = `
       <strong class="sale_card_title">${headerLeft || ''}</strong>
       <strong class="sale_card_price">${headerRight || ''}</strong>
       <div style="clear: both;"></div>
-      <div class="frog_img_cont">
-        <img src="${imageUrl}"
-             class="recent_sale_img"
-             alt="Frog #${tokenId}"
-             loading="lazy" />
-      </div>
+      <div class="frog_img_cont" id="${imgContainerId}"></div>
       <div class="recent_sale_traits">
         <strong class="sale_card_title">${frogName}</strong>
         <strong class="sale_card_price ${rarityClass}">${rarityText}</strong><br>
@@ -332,6 +338,49 @@ function createFrogCard({
       </div>
     `;
   return card;
+}
+
+// Build layered frog image using /frog/json/<id>.json + build_trait()
+// Always uses GitHub metadata so trait order is exactly as stored there.
+async function ffBuildLayeredFrogImage(tokenId, containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  // Clear any previous content
+  container.innerHTML = '';
+
+  try {
+    // Always pull metadata from GitHub JSON
+    const metadata = await fetchFrogMetadata(tokenId);
+    const attrs = Array.isArray(metadata.attributes) ? metadata.attributes : [];
+
+    if (!attrs.length || typeof build_trait !== 'function') {
+      // Fallback: just show static PNG if something goes wrong
+      const img = document.createElement('img');
+      img.src = `https://freshfrogs.github.io/frog/${tokenId}.png`;
+      img.className = 'recent_sale_img';
+      img.loading = 'lazy';
+      img.alt = `Frog #${tokenId}`;
+      container.appendChild(img);
+      return;
+    }
+
+    // Layer all attributes in the order they appear in metadata
+    for (const attr of attrs) {
+      if (!attr || !attr.trait_type || !attr.value) continue;
+      build_trait(attr.trait_type, attr.value, containerId);
+    }
+  } catch (err) {
+    console.error('ffBuildLayeredFrogImage failed for token', tokenId, err);
+
+    // Last-resort fallback PNG
+    const img = document.createElement('img');
+    img.src = `https://freshfrogs.github.io/frog/${tokenId}.png`;
+    img.className = 'recent_sale_img';
+    img.loading = 'lazy';
+    img.alt = `Frog #${tokenId}`;
+    container.appendChild(img);
+  }
 }
 
 function getRarityTier(rank) {
@@ -663,35 +712,55 @@ async function renderOwnedAndStakedFrogs(address) {
           metadata = await fetchFrogMetadata(tokenId);
         }
 
-        // Owned frogs: Stake + Transfer + external links
-        const actionHtml = `
-          <div class="recent_sale_links">
-            <button class="sale_link_btn" onclick="ffStakeFrog(${tokenId})">
-              Stake
-            </button>
-            <button class="sale_link_btn" onclick="ffTransferFrog(${tokenId})">
-              Transfer
-            </button>
-          </div>
-          <div class="recent_sale_links">
-            <a
-              class="sale_link_btn opensea"
-              href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              OpenSea
-            </a>
-            <a
-              class="sale_link_btn etherscan"
-              href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Etherscan
-            </a>
-          </div>
-        `;
+        // Owned frogs: single "Actions" button with dropdown menu
+        const actionsMenuId = `frog-actions-${tokenId}-${Math.random()
+          .toString(36)
+          .slice(2, 8)}`;
+
+          const actionHtml = `
+            <div class="frog-actions">
+              <button
+                type="button"
+                class="sale_link_btn actions-toggle"
+                onclick="ffToggleActionsMenu('${actionsMenuId}')"
+              >
+                Actions ▾
+              </button>
+              <div id="${actionsMenuId}" class="actions-menu">
+                <button
+                  type="button"
+                  class="actions-menu-item"
+                  onclick="ffStakeFrog(${tokenId})"
+                >
+                  Stake
+                </button>
+                <button
+                  type="button"
+                  class="actions-menu-item"
+                  onclick="ffTransferFrog(${tokenId})"
+                >
+                  Transfer
+                </button>
+                <a
+                  class="actions-menu-item"
+                  href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View on OpenSea
+                </a>
+                <a
+                  class="actions-menu-item"
+                  href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View on Etherscan
+                </a>
+              </div>
+            </div>
+          `;
+
 
         const card = createFrogCard({
           tokenId,
@@ -702,6 +771,11 @@ async function renderOwnedAndStakedFrogs(address) {
         });
 
         ownedGrid.appendChild(card);
+
+        if (card.dataset.imgContainerId) {
+          ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
+        }
+
       }
     }
 
@@ -751,8 +825,13 @@ async function renderOwnedAndStakedFrogs(address) {
 
         stakedGrid.appendChild(card);
 
+        if (card.dataset.imgContainerId) {
+          ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
+        }
+
         // Fill staking info (Lvl., rewards, progress)
         ffDecorateStakedFrogCard(tokenId);
+
       }
     }
   } catch (err) {
@@ -869,6 +948,24 @@ async function ffTransferFrog(tokenId) {
     alert('Transfer transaction failed. Check console for details.');
   }
 }
+
+function ffToggleActionsMenu(id) {
+  const menu = document.getElementById(id);
+  if (!menu) return;
+
+  const isShown = menu.style.display === 'block';
+
+  // Close other open action menus
+  const allMenus = document.querySelectorAll('.actions-menu');
+  allMenus.forEach((m) => {
+    if (m.id !== id) m.style.display = 'none';
+  });
+
+  menu.style.display = isShown ? 'none' : 'block';
+}
+
+window.ffToggleActionsMenu = ffToggleActionsMenu;
+
 
 // expose for onclick="" handlers
 window.ffStakeFrog    = ffStakeFrog;

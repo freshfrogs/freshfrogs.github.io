@@ -457,13 +457,60 @@ padding: 0.55rem 1.2rem;
 .recent_sale_traits {}
 
 .frog_img_cont {
-margin: 24px auto;
-    width: 128px;
-    height: 128px;
-    overflow: hidden;
-    border-radius: 0px;
-    box-shadow: 2px 2px darkslateblue;
+  margin: 24px auto;
+  width: 128px;
+  height: 128px;
+  overflow: hidden;
+  border-radius: 0px;
+  box-shadow: 2px 2px darkslateblue;
+  position: relative;         /* needed for layered trait overlays */
 }
+/* Layered frog overlays (used by build_trait from ethereum-dapp.js) */
+.trait_overlay,
+.attribute_overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 128px;
+  height: 128px;
+  image-rendering: pixelated;
+}
+/* Single "Actions" button + dropdown on owned frog cards */
+
+.frog-actions {
+  margin: 8px;
+}
+
+.frog-actions .actions-toggle {
+  width: 100%;
+}
+
+.actions-menu {
+  margin-top: 6px;
+  padding: 4px;
+  border-radius: 4px;
+  border: 1px solid rgba(148, 163, 184, 0.8);
+  background: rgba(15, 23, 42, 0.98);
+  display: none;
+}
+
+.actions-menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-size: 0.75rem;
+  padding: 4px 6px;
+  border: none;
+  background: transparent;
+  color: #e5e7eb;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.actions-menu-item:hover {
+  background: rgba(30, 64, 175, 0.7);
+}
+
 /* WALLET SIDEBAR / DASHBOARD */
 
 .sidebar .wallet-summary {
