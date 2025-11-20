@@ -7,16 +7,12 @@ const FF_COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const FF_CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 const FF_ALCHEMY_API_KEY    = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
 const FF_OPENSEA_API_KEY    = '48ffee972fc245fa965ecfe902b02ab4'; // optional
-
 const FF_ALCHEMY_NFT_BASE   = `https://eth-mainnet.g.alchemy.com/nft/v3/${FF_ALCHEMY_API_KEY}`;
 const FF_ALCHEMY_CORE_BASE  = `https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY_API_KEY}`;
-
 const FF_ACTIVITY_MODE      = 'sales'; // 'mints' or 'sales' for the bottom grid
-
 const FF_SHOW_STAKING_STATS_ON_SALES = false;
-
 const ZERO_ADDRESS          = '0x0000000000000000000000000000000000000000';
-
+let FF_RECENT_LIMIT = 6;
 
 // ------------------------
 // Entry
@@ -110,7 +106,7 @@ async function loadRecentActivity() {
       }
 
       const headerLeft = truncateAddress(ownerAddress);
-      
+
       const footerHtml = '';
 
       const actionHtml = `
