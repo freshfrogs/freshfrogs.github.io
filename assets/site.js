@@ -515,43 +515,6 @@ function buildTraitsHtml(metadata) {
   return lines.join('');
 }
 
-async function ffBuildLayeredFrogImage(tokenId, containerId, metadata, card) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-
-  // Clear anything inside (like a placeholder)
-  container.innerHTML = '';
-
-  // Base PNG as background, zoomed and offset so only background color shows
-  const baseUrl = (typeof SOURCE_PATH !== 'undefined'
-    ? `${SOURCE_PATH}/frog/${tokenId}.png`
-    : `https://freshfrogs.github.io/frog/${tokenId}.png`);
-
-  container.style.backgroundImage    = `url(${baseUrl})`;
-  container.style.backgroundRepeat   = 'no-repeat';
-  container.style.backgroundSize     = '1000%';
-  container.style.backgroundPosition = 'bottom right';
-
-  // Use given metadata if possible; otherwise fetch it
-  let meta = metadata;
-  if (!meta || !Array.isArray(meta.attributes)) {
-    meta = await fetchFrogMetadata(tokenId);
-  }
-  const attrs = Array.isArray(meta.attributes) ? meta.attributes : [];
-
-  // Layer all attributes in the order they appear in metadata
-  for (const attr of attrs) {
-    if (!attr || !attr.trait_type || attr.value == null) continue;
-    build_trait(attr.trait_type, attr.value, containerId);
-  }
-
-  // Wire hover link between trait text and overlays
-  if (card && attrs.length) {
-    ffWireTraitHover(card);
-  }
-}
-
-
 // ------------------------
 // Activity fetchers (mints/sales)
 // ------------------------
