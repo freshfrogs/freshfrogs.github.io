@@ -461,7 +461,7 @@ margin: 24px auto;
     width: 128px;
     height: 128px;
     overflow: hidden;
-    border-radius: 5px;
+    border-radius: 0px;
     box-shadow: 2px 2px darkslateblue;
 }
 /* WALLET SIDEBAR / DASHBOARD */
