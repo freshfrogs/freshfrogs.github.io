@@ -10,17 +10,29 @@
   <div class="page">
     <!-- HEADER -->
     <header class="site-header">
-      <nav class="nav" id="main-nav">
-        <a href="index.html">Home</a>
+      <nav class="nav">
+        <!-- Views controlled by JS -->
         <a href="#" data-view="collection">Collection</a>
         <a href="#" data-view="rarity">Rarity</a>
         <a href="#" data-view="pond">Pond</a>
-
-        <!-- Wallet address link will be injected here after connect -->
-        <span id="nav-wallet-address"></span>
+        <!-- Wallet tab appears after connect, shows shortened address -->
+        <a
+          href="#"
+          data-view="wallet"
+          id="wallet-nav-link"
+          style="display:none;"
+        ></a>
       </nav>
-    </header>
 
+      <!-- Connect button in top-right -->
+      <button
+        class="btn primary wallet-connect-btn"
+        id="connect-wallet-button"
+        type="button"
+      >
+        Connect Wallet
+      </button>
+    </header>
 
     <!-- DASHBOARD HERO -->
     <section class="hero">
@@ -33,27 +45,36 @@
         </div>
         <h1 class="hero-title">freshfrogs.github.io</h1>
         <p class="hero-subtitle">
-            A collection of 4,040 randomly generated frogs on the Ethereum blockchain, that are each unique with thousands of different combinations!
-            Stake and earn rewards, level up, unlock custom trait animations and more! All secondary sales are entitled to a <b>5%</b> royalty.
+          A collection of 4,040 randomly generated frogs on the Ethereum blockchain, that are each unique with thousands of different combinations!
+          Stake and earn rewards, level up, unlock custom trait animations and more! All secondary sales are entitled to a <b>5%</b> royalty.
         </p>
         <div class="hero-actions">
-          <div class="hero-actions">
-            <button class="btn primary" id="hero-view-collection">
-              View Collection
-            </button>
-            <button class="btn secondary" id="hero-connect-wallet" onclick="connectWallet()">
-              Connect Wallet
-            </button>
-          </div>
+          <button
+            class="btn primary"
+            type="button"
+            id="hero-view-collection-button"
+          >
+            View Collection
+          </button>
+          <button
+            class="btn secondary"
+            type="button"
+            id="hero-connect-wallet-button"
+          >
+            Connect Wallet
+          </button>
         </div>
       </div>
     </section>
 
     <!-- MAIN DASHBOARD LAYOUT -->
-    <main class="dashboard-main" id="frog-layout" style="display:none;">
-      <!-- LEFT COLUMN -->
-
-      <section class="panel dashboard-section" id="recent-activity-panel" style="background: transparent; box-shadow: none; padding: 0;">
+    <main class="dashboard-main">
+      <!-- Recent Activity (sales / mints) -->
+      <section
+        class="panel dashboard-section"
+        id="recent-activity-panel"
+        style="background: transparent; box-shadow: none; padding: 0;"
+      >
         <h2>Recent Activity</h2>
         <p class="dashboard-note" id="recent-sales-status">
           Loading recent sales...
@@ -61,20 +82,20 @@
 
         <div class="recent_sales" id="recent-sales"></div>
 
-          <!-- NEW: load more for sales / mints -->
-          <button id="load-more-activity" class="btn secondary" type="button">
-            Load More
-          </button>
-          
-
+        <button id="load-more-activity" class="btn secondary" type="button">
+          Load More
+        </button>
       </section>
 
-      <section class="panel dashboard-section"
-              id="rarity-panel"
-              style="display:none; background: transparent; box-shadow: none; padding: 0;">
+      <!-- Rarity Rankings -->
+      <section
+        class="panel dashboard-section"
+        id="rarity-panel"
+        style="display:none; background: transparent; box-shadow: none; padding: 0;"
+      >
         <h2>Rarity Rankings</h2>
         <p class="dashboard-note" id="rarity-status">
-          Top ranked Frogs across the collection.
+          Top ranked Frogs across the collection (lower rank = rarer).
         </p>
 
         <div id="rarity-grid" class="recent_sales"></div>
@@ -84,9 +105,12 @@
         </button>
       </section>
 
-      <section class="panel dashboard-section"
-              id="pond-panel"
-              style="display:none; background: transparent; box-shadow: none; padding: 0;">
+      <!-- Pond (all staked by community) -->
+      <section
+        class="panel dashboard-section"
+        id="pond-panel"
+        style="display:none; background: transparent; box-shadow: none; padding: 0;"
+      >
         <h2>The Pond</h2>
         <p class="dashboard-note" id="pond-status">
           All Frogs currently staked by the community.
@@ -99,28 +123,33 @@
         </button>
       </section>
 
-      <!-- Owned Frogs (hidden until wallet connects) -->
-      <section class="panel dashboard-section" id="owned-panel" style="display:none; background: transparent; box-shadow: none; padding: 0px;">
+      <!-- Owned Frogs (shown in wallet view) -->
+      <section
+        class="panel dashboard-section"
+        id="owned-panel"
+        style="display:none; background: transparent; box-shadow: none; padding: 0px;"
+      >
         <h2>Owned Frogs</h2>
         <p class="dashboard-note" id="owned-frogs-status">
           These are Frogs currently held in your wallet.
         </p>
 
-        <div id="owned-frogs-grid" class="nft-grid">
-        </div>
+        <div id="owned-frogs-grid" class="nft-grid"></div>
       </section>
 
-      <!-- Staked Frogs (hidden until wallet connects) -->
-      <section class="panel dashboard-section" id="staked-panel" style="display:none; background: transparent; box-shadow: none; padding: 0px;">
+      <!-- Staked Frogs (shown in wallet view, below owned) -->
+      <section
+        class="panel dashboard-section"
+        id="staked-panel"
+        style="display:none; background: transparent; box-shadow: none; padding: 0px;"
+      >
         <h2>Staked Frogs</h2>
         <p class="dashboard-note" id="staked-frogs-status">
           These Frogs are staked in the FreshFrogs controller.
         </p>
 
-        <div id="staked-frogs-grid" class="nft-grid">
-        </div>
+        <div id="staked-frogs-grid" class="nft-grid"></div>
       </section>
-
     </main>
 
     <!-- FOOTER -->
