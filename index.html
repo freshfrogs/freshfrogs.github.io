@@ -16,7 +16,7 @@
         <a href="#">Rarity</a>
         <a href="#">Wallet</a>
       </nav>
-      <button class="cta-btn">Connect Wallet</button>
+      <button class="cta-btn" id="connect-wallet-button">Connect Wallet</button>
     </header>
 
     <!-- HERO -->
@@ -59,8 +59,50 @@
       </section>
 
       <aside class="panel sidebar">
-        <h2>Sidebar Panel</h2>
-        <p>Placeholder user dashboard: wallet summary, rewards, profile info, etc.</p>
+        <h2>User Dashboard</h2>
+
+        <div class="wallet-summary">
+          <div class="wallet-header">
+            <img
+              id="dashboard-avatar"
+              class="wallet-avatar"
+              src="https://freshfrogs.github.io/assets/blackWhite.png"
+              alt="Profile avatar"
+            />
+            <div>
+              <div id="dashboard-username" class="wallet-username">Not connected</div>
+              <div id="dashboard-wallet" class="wallet-address">Wallet: —</div>
+            </div>
+          </div>
+
+          <div class="wallet-status-row">
+            <span>Status</span>
+            <span id="wallet-status-label">Disconnected</span>
+          </div>
+
+          <div class="wallet-stats-grid">
+            <div class="wallet-stat">
+              <span class="stat-label">Owned Frogs</span>
+              <span id="stat-owned" class="stat-value">0</span>
+            </div>
+            <div class="wallet-stat">
+              <span class="stat-label">Staked Frogs</span>
+              <span id="stat-staked" class="stat-value">0</span>
+            </div>
+            <div class="wallet-stat">
+              <span class="stat-label">Rewards Available</span>
+              <span id="stat-rewards-available" class="stat-value">0</span>
+            </div>
+            <div class="wallet-stat">
+              <span class="stat-label">Rewards Earned</span>
+              <span id="stat-rewards-earned" class="stat-value">0</span>
+            </div>
+          </div>
+
+          <button class="btn primary wallet-connect-btn" onclick="connectWallet()">
+            Connect Wallet
+          </button>
+        </div>
       </aside>
     </main>
 
@@ -76,6 +118,13 @@
       </span>
     </footer>
   </div>
+  <!-- Web3 for wallet / staking functions -->
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+  <!-- Rarity rankings (must load before site.js) -->
+  <script src="https://freshfrogs.github.io/assets/rarityrankings.js"></script>
+
+  <!-- Main site logic (recent activity, wallet, dashboard, etc.) -->
   <script src="https://freshfrogs.github.io/assets/site.js"></script>
 </body>
 </html>

@@ -428,3 +428,113 @@ margin: 24px auto;
     border-radius: 5px;
     box-shadow: 2px 2px darkslateblue;
 }
+/* WALLET SIDEBAR / DASHBOARD */
+
+.sidebar .wallet-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+}
+
+.wallet-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.2rem;
+}
+
+.wallet-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid lightgreen;
+  object-fit: cover;
+}
+
+.wallet-username {
+  font-weight: bold;
+  color: lightgreen;
+  font-size: 0.9rem;
+}
+
+.wallet-address {
+  font-size: 0.78rem;
+  color: #a5b4fc;
+}
+
+.wallet-status-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #e5e7eb;
+}
+
+.wallet-status-row span:last-child {
+  font-weight: bold;
+  color: lightgreen;
+}
+
+.wallet-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem 0.6rem;
+}
+
+.wallet-stat {
+  background: rgba(15, 23, 42, 0.9);
+  padding: 0.35rem 0.45rem;
+  border-radius: 4px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+}
+
+.wallet-stat .stat-label {
+  display: block;
+  font-size: 0.72rem;
+  color: #9ca3af;
+}
+
+.wallet-stat .stat-value {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #e5e7eb;
+}
+
+.wallet-connect-btn {
+  margin-top: 0.4rem;
+  width: 100%;
+}
+
+/* RARITY BADGES */
+
+.rarity_badge {
+  padding: 0.1rem 0.35rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  border: 1px solid #4b5563;
+}
+
+.rarity_legendary {
+  border-color: gold;
+  color: gold;
+}
+
+.rarity_epic {
+  border-color: #a855f7;
+  color: #c4b5fd;
+}
+
+.rarity_rare {
+  border-color: #22d3ee;
+  color: #a5f3fc;
+}
+
+.rarity_common {
+  border-color: #9ca3af;
+  color: #e5e7eb;
+}
+
+.rarity_unknown {
+  opacity: 0.7;
+}

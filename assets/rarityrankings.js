@@ -24493,3 +24493,7 @@ var rarity_trait_rankings = {
         }
     ]
     
+// Make sure the rankings are available on window for site.js
+if (typeof window !== 'undefined' && typeof freshfrogs_rarity_rankings !== 'undefined') {
+  window.freshfrogs_rarity_rankings = freshfrogs_rarity_rankings;
+}
