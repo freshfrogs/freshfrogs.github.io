@@ -48,8 +48,8 @@ async function loadRecentActivity() {
   try {
     const items =
       FF_ACTIVITY_MODE === 'mints'
-        ? await fetchRecentMints(24)
-        : await fetchRecentSales(24);
+        ? await fetchRecentMints(6)
+        : await fetchRecentSales(6);
 
     if (!items.length) {
       if (statusEl) {
@@ -126,16 +126,15 @@ async function loadRecentActivity() {
         tokenId,
         metadata,
         headerLeft,
-        headerRight
+        headerRight,
+        footerHtml,
+        actionHtml
       });
 
+      // Optional staking stats hook (currently disabled via FF_SHOW_STAKING_STATS_ON_SALES)
       ffAnnotateSaleWithStaking(card, tokenId);
 
       container.appendChild(card);
-
-
-      // If this frog is currently staked, annotate the card
-      ffAnnotateSaleWithStaking(card, tokenId);
 
     }
   } catch (err) {
@@ -362,7 +361,7 @@ function buildTraitsHtml(metadata) {
 async function fetchRecentSales(limit = 24) {
   const params = new URLSearchParams({
     contractAddress: FF_COLLECTION_ADDRESS,
-    order: 'desc',
+    order: 'asc',
     limit: String(limit)
   });
 
@@ -1134,55 +1133,19 @@ async function connectWallet() {
 window.connectWallet = connectWallet;
 
 // Init wallet on page load (already-connected accounts)
-async function ffInitWalletOnLoad() {
-  if (window.ethereum && window.Web3 && !ffWeb3) {
-    ffWeb3 = new Web3(window.ethereum);
-    window.web3 = ffWeb3;
-
-    try {
-      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-      if (accounts && accounts[0]) {
-        ffCurrentAccount = accounts[0];
-        window.user_address = ffCurrentAccount;
-
-        try {
-          if (typeof COLLECTION_ABI !== 'undefined') {
-            window.collection = new ffWeb3.eth.Contract(
-              COLLECTION_ABI,
-              FF_COLLECTION_ADDRESS
-            );
-          }
-          if (typeof CONTROLLER_ABI !== 'undefined') {
-            window.controller = new ffWeb3.eth.Contract(
-              CONTROLLER_ABI,
-              FF_CONTROLLER_ADDRESS
-            );
-          }
-        } catch (err) {
-          console.warn('Failed to init legacy contracts on load', err);
-        }
-
-        ffUpdateWalletBasicUI(ffCurrentAccount);
-
-        const [ownedCount, stakingStats, profile] = await Promise.all([
-          ffFetchOwnedFrogCount(ffCurrentAccount).catch(() => null),
-          ffFetchStakingStats(ffCurrentAccount).catch(() => null),
-          ffFetchOpenSeaProfile(ffCurrentAccount).catch(() => null)
-        ]);
-
-        ffApplyDashboardUpdates(ffCurrentAccount, ownedCount, stakingStats, profile);
-        await renderOwnedAndStakedFrogs(ffCurrentAccount);
-      }
-    } catch (err) {
-      console.warn('eth_accounts request failed:', err);
-    }
-  }
-
+function ffInitWalletOnLoad() {
+  // Do NOT auto-connect wallet; just wire up the button and show disconnected state
   const btn = document.getElementById('connect-wallet-button');
   if (btn) {
     btn.addEventListener('click', connectWallet);
   }
+
+  // Basic disconnected UI
+  ffSetText('wallet-status-label', 'Disconnected');
+  ffSetText('dashboard-wallet', 'Wallet: —');
+  ffSetText('dashboard-username', 'Not connected');
 }
+
 
 // Convert roman numerals from stakingValues() into normal numbers
 function ffRomanToArabic(roman) {
