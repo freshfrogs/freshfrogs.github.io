@@ -1780,12 +1780,25 @@ function truncateAddress(address) {
 
 */
 function build_trait(trait_type, attribute, location) {
-    newAttribute = document.createElement("img");
-    if (trait_type == 'Trait' || trait_type == 'Frog' || trait_type == 'SpecialFrog') { newAttribute.className = "trait_overlay"; } 
-    else { newAttribute.className = "attribute_overlay"; }
-    if (location == 'randomLogo') { newAttribute.style.width = '128px'; newAttribute.style.height = '128px';}
-    newAttribute.src = SOURCE_PATH+"/frog/build_files/"+trait_type+"/"+attribute+".png";
-    
+    const newAttribute = document.createElement("img");
+
+    if (trait_type == 'Trait' || trait_type == 'Frog' || trait_type == 'SpecialFrog') {
+        newAttribute.className = "trait_overlay";
+    } else {
+        newAttribute.className = "attribute_overlay";
+    }
+
+    if (location == 'randomLogo') {
+        newAttribute.style.width  = '128px';
+        newAttribute.style.height = '128px';
+    }
+
+    newAttribute.src = SOURCE_PATH + "/frog/build_files/" + trait_type + "/" + attribute + ".png";
+
+    // --- NEW: tag the layer so we can match it to text ---
+    newAttribute.dataset.traitType  = trait_type;
+    newAttribute.dataset.traitValue = attribute;
+
     /*
     if (animate) {
         for (y = 0; y < animated.length; y++) {
@@ -1796,6 +1809,6 @@ function build_trait(trait_type, attribute, location) {
         }
     }
     */
-    
+
     document.getElementById(location).appendChild(newAttribute);
 }

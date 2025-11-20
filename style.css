@@ -846,3 +846,64 @@ ease-out;
 .staking-sale-stats strong {
   color: white;
 }
+/* Layered frog container uses the original PNG as a zoomed/offset background */
+.frog_img_cont {
+  position: relative;
+  margin: 24px auto;
+  width: 128px;
+  height: 128px;
+  overflow: hidden;
+  border-radius: 5px;
+  box-shadow: 2px 2px darkslateblue;
+
+  /* base background; JS will override with the correct frog image */
+  background-color: #020617;
+  background-repeat: no-repeat;
+  background-size: 220% 220%;
+  background-position: bottom right;  /* only show background color area */
+}
+
+/* Attribute layers (built by build_trait) */
+.trait_overlay,
+.attribute_overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 128px;
+  height: 128px;
+  image-rendering: pixelated;
+  pointer-events: auto;
+  transition:
+    transform 160ms ease-out,
+    box-shadow 160ms ease-out,
+    filter 160ms ease-out;
+}
+
+/* Default hover on the layer itself */
+.trait_overlay:hover,
+.attribute_overlay:hover {
+  transform: translateY(-3px) scale(1.08);
+  box-shadow: 0 0 8px rgba(125, 211, 252, 0.7);
+  filter: brightness(1.1);
+  z-index: 5;
+}
+
+/* Trait list text in the card */
+.frog-attr-text {
+  cursor: default;
+  transition: color 160ms ease-out, text-shadow 160ms ease-out;
+}
+
+/* Highlighted state (from JS, when text/layer is hovered) */
+.frog-attr-text.is-highlighted {
+  color: #7dd3fc; /* light blue */
+  text-shadow: 0 0 4px rgba(125, 211, 252, 0.7);
+}
+
+.trait_overlay.is-highlighted,
+.attribute_overlay.is-highlighted {
+  transform: translateY(-3px) scale(1.08);
+  box-shadow: 0 0 8px rgba(125, 211, 252, 0.7);
+  filter: brightness(1.1);
+  z-index: 5;
+}

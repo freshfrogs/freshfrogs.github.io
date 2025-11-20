@@ -313,20 +313,18 @@ function createFrogCard({
 
   const traitsHtml = buildTraitsHtml(metadata);
 
-  // Unique container ID for layered image (using build_trait)
-  const imgContainerId = `frog-layer-${tokenId}-${Math.random()
-    .toString(36)
-    .slice(2, 8)}`;
+  // Unique container ID for this frog's layered image
+  const containerId = `frog-layer-${tokenId}-${Math.random().toString(36).slice(2)}`;
 
   const card = document.createElement('div');
   card.className = 'recent_sale_card';
-  card.dataset.imgContainerId = imgContainerId;
-
   card.innerHTML = `
       <strong class="sale_card_title">${headerLeft || ''}</strong>
       <strong class="sale_card_price">${headerRight || ''}</strong>
       <div style="clear: both;"></div>
-      <div class="frog_img_cont" id="${imgContainerId}"></div>
+
+      <div class="frog_img_cont" id="${containerId}"></div>
+
       <div class="recent_sale_traits">
         <strong class="sale_card_title">${frogName}</strong>
         <strong class="sale_card_price ${rarityClass}">${rarityText}</strong><br>
@@ -337,8 +335,65 @@ function createFrogCard({
         ${actionHtml || ''}
       </div>
     `;
+
+  // Build layered frog art + wire hover behavior
+  ffBuildLayeredFrogImage(tokenId, containerId, metadata, card);
+
   return card;
 }
+
+function ffWireTraitHover(card) {
+  if (!card) return;
+
+  const textNodes = card.querySelectorAll('.frog-attr-text');
+  const overlayNodes = card.querySelectorAll('.trait_overlay, .attribute_overlay');
+
+  if (!textNodes.length || !overlayNodes.length) return;
+
+  function key(type, value) {
+    return `${String(type || '').toLowerCase()}::${String(value || '').toLowerCase()}`;
+  }
+
+  // Map each (type, value) -> overlay elements
+  const overlaysByKey = new Map();
+  overlayNodes.forEach((img) => {
+    const t = img.dataset.traitType;
+    const v = img.dataset.traitValue;
+    if (!t || v == null) return;
+    const k = key(t, v);
+    if (!overlaysByKey.has(k)) overlaysByKey.set(k, []);
+    overlaysByKey.get(k).push(img);
+  });
+
+  function setHighlight(k, on) {
+    const overlays = overlaysByKey.get(k) || [];
+    const texts = Array.from(textNodes).filter((p) => {
+      const t = p.dataset.traitType;
+      const v = p.dataset.traitValue;
+      return key(t, v) === k;
+    });
+
+    overlays.forEach((el) => el.classList.toggle('is-highlighted', on));
+    texts.forEach((el) => el.classList.toggle('is-highlighted', on));
+  }
+
+  // Hovering text highlights matching layers
+  textNodes.forEach((p) => {
+    const k = key(p.dataset.traitType, p.dataset.traitValue);
+    if (!k) return;
+    p.addEventListener('mouseenter', () => setHighlight(k, true));
+    p.addEventListener('mouseleave', () => setHighlight(k, false));
+  });
+
+  // Hovering a layer highlights matching text
+  overlayNodes.forEach((img) => {
+    const k = key(img.dataset.traitType, img.dataset.traitValue);
+    if (!k) return;
+    img.addEventListener('mouseenter', () => setHighlight(k, true));
+    img.addEventListener('mouseleave', () => setHighlight(k, false));
+  });
+}
+
 
 // Build layered frog image using /frog/json/<id>.json + build_trait()
 // Always uses GitHub metadata so trait order is exactly as stored there.
@@ -391,26 +446,80 @@ function getRarityTier(rank) {
   return { label: 'Common', className: 'rarity_common' };
 }
 
+function ffEscapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+
 function buildTraitsHtml(metadata) {
   const attributes = Array.isArray(metadata && metadata.attributes)
     ? metadata.attributes
     : [];
 
-  const frogTrait = attributes.find(
-    (attr) => attr.trait_type === 'Frog' || attr.trait_type === 'SpecialFrog'
-  );
+  if (!attributes.length) {
+    return '<p class="frog-attr-text">Metadata unavailable</p>';
+  }
 
-  const traitText = [
-    frogTrait ? `Frog: ${frogTrait.value}` : null,
-    ...attributes
-      .filter((attr) => attr !== frogTrait)
-      .slice(0, 2)
-      .map((attr) => `${attr.trait_type}: ${attr.value}`)
-  ].filter(Boolean);
+  const lines = attributes.map((attr) => {
+    if (!attr || !attr.trait_type) return '';
+    const type  = String(attr.trait_type);
+    const value = attr.value != null ? String(attr.value) : '';
 
-  const traits = traitText.length ? traitText : ['Metadata unavailable'];
-  return traits.map((trait) => `<p>${trait}</p>`).join('');
+    return `
+      <p
+        class="frog-attr-text"
+        data-trait-type="${ffEscapeHtml(type)}"
+        data-trait-value="${ffEscapeHtml(value)}"
+      >
+        ${ffEscapeHtml(type)}: ${ffEscapeHtml(value)}
+      </p>
+    `;
+  }).filter(Boolean);
+
+  return lines.join('');
 }
+
+async function ffBuildLayeredFrogImage(tokenId, containerId, metadata, card) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  // Clear anything inside (like a placeholder)
+  container.innerHTML = '';
+
+  // Base PNG as background, zoomed and offset so only background color shows
+  const baseUrl = (typeof SOURCE_PATH !== 'undefined'
+    ? `${SOURCE_PATH}/frog/${tokenId}.png`
+    : `https://freshfrogs.github.io/frog/${tokenId}.png`);
+
+  container.style.backgroundImage    = `url(${baseUrl})`;
+  container.style.backgroundRepeat   = 'no-repeat';
+  container.style.backgroundSize     = '220% 220%';
+  container.style.backgroundPosition = 'bottom right';
+
+  // Use given metadata if possible; otherwise fetch it
+  let meta = metadata;
+  if (!meta || !Array.isArray(meta.attributes)) {
+    meta = await fetchFrogMetadata(tokenId);
+  }
+  const attrs = Array.isArray(meta.attributes) ? meta.attributes : [];
+
+  // Layer all attributes in the order they appear in metadata
+  for (const attr of attrs) {
+    if (!attr || !attr.trait_type || attr.value == null) continue;
+    build_trait(attr.trait_type, attr.value, containerId);
+  }
+
+  // Wire hover link between trait text and overlays
+  if (card && attrs.length) {
+    ffWireTraitHover(card);
+  }
+}
+
 
 // ------------------------
 // Activity fetchers (mints/sales)
