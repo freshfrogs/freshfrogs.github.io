@@ -36,10 +36,8 @@ a {
     justify-content: space-between;
     gap: 1.5rem;
     padding: 1.25rem 0 0.75rem;
-    position: sticky;
     top: 0;
     z-index: 20;
-    backdrop-filter: blur(14px);
     color: white;
 }
 
