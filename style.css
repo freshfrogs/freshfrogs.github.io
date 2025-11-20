@@ -701,7 +701,7 @@ margin: 24px auto;
 
 .stake-level-label {
   font-weight: 600;
-  color: lightgreen;
+  color: #fbbf24;
 }
 
 .stake-rewards-label {
@@ -726,7 +726,7 @@ margin: 24px auto;
   bottom: 0;
   width: 0%;
   border-radius: inherit;
-  background: linear-gradient(to right, #22c55e, #a855f7);
+  background: #fbbf24;
   transition: width 260ms ease-out;
 }
 
