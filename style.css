@@ -671,3 +671,61 @@ margin: 24px auto;
     grid-template-columns: minmax(0, 1fr);
   }
 }
+/* STAKING LEVEL + PROGRESS (dashboard cards) */
+
+.stake-meta {
+  margin: 8px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(148, 163, 184, 0.5);
+  font-size: 0.75rem;
+  color: #e5e7eb;
+}
+
+.stake-meta-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.stake-meta-subrow {
+  font-size: 0.7rem;
+  color: #9ca3af;
+}
+
+.stake-level-label {
+  font-weight: 600;
+  color: lightgreen;
+}
+
+.stake-rewards-label {
+  font-weight: 500;
+  color: #fbbf24;
+}
+
+.stake-progress {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.8);
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.stake-progress-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0%;
+  border-radius: inherit;
+  background: linear-gradient(to right, #22c55e, #a855f7);
+  transition: width 260ms ease-out;
+}
+
+.stake-progress-label {
+  margin-top: 3px;
+  font-size: 0.7rem;
+  color: #9ca3af;
+}

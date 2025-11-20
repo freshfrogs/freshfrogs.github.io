@@ -551,11 +551,33 @@ async function renderOwnedAndStakedFrogs(address) {
           metadata = await fetchFrogMetadata(tokenId);
         }
 
+        const actionHtml = `
+          <div class="recent_sale_links">
+            <a
+              class="sale_link_btn opensea"
+              href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              OpenSea
+            </a>
+            <a
+              class="sale_link_btn etherscan"
+              href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Etherscan
+            </a>
+          </div>
+        `;
+
         const card = createFrogCard({
           tokenId,
           metadata,
           headerLeft: truncateAddress(address),
-          headerRight: 'Owned'
+          headerRight: 'Owned',
+          actionHtml
         });
 
         ownedGrid.appendChild(card);
@@ -573,16 +595,62 @@ async function renderOwnedAndStakedFrogs(address) {
       for (const tokenId of stakedIds) {
         let metadata = await fetchFrogMetadata(tokenId);
 
+        const footerHtml = `
+          <div class="stake-meta">
+            <div class="stake-meta-row">
+              <span id="stake-level-${tokenId}" class="stake-level-label">Level —</span>
+              <span id="stake-rewards-${tokenId}" class="stake-rewards-label">Rewards —</span>
+            </div>
+            <div class="stake-meta-row stake-meta-subrow">
+              <span id="stake-date-${tokenId}">Staked: —</span>
+              <span id="stake-next-${tokenId}"></span>
+            </div>
+            <div class="stake-progress">
+              <div id="stake-progress-bar-${tokenId}" class="stake-progress-bar"></div>
+            </div>
+            <div id="stake-progress-label-${tokenId}" class="stake-progress-label">
+              Progress to next level
+            </div>
+          </div>
+        `;
+
+        const actionHtml = `
+          <div class="recent_sale_links">
+            <a
+              class="sale_link_btn opensea"
+              href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              OpenSea
+            </a>
+            <a
+              class="sale_link_btn etherscan"
+              href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Etherscan
+            </a>
+          </div>
+        `;
+
         const card = createFrogCard({
           tokenId,
           metadata,
-          headerLeft: 'Pond',
-          headerRight: 'Staked'
+          headerLeft: truncateAddress(address || ffCurrentAccount) || 'Pond',
+          headerRight: 'Staked',
+          footerHtml,
+          actionHtml
         });
 
         stakedGrid.appendChild(card);
+
+        // Fill in level, rewards & progress bar using the old stakingValues()
+        ffDecorateStakedFrogCard(tokenId);
       }
     }
+
   } catch (err) {
     console.error('renderOwnedAndStakedFrogs failed:', err);
     if (ownedStatus)  ownedStatus.textContent  = 'Unable to load owned frogs.';
