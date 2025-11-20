@@ -658,6 +658,49 @@ async function renderOwnedAndStakedFrogs(address) {
   }
 }
 
+// Use legacy staking helpers from ethereum-dapp.js to decorate staked cards
+async function ffDecorateStakedFrogCard(tokenId) {
+  // stakingValues() comes from ethereum-dapp.js
+  if (typeof stakingValues !== 'function') {
+    console.warn('stakingValues() not available; skipping staking details');
+    return;
+  }
+
+  try {
+    const values = await stakingValues(tokenId);
+    if (!values || values.length < 5) return;
+
+    const [stakedDays, stakedLevel, daysToNext, flyzEarned, stakedDate] = values;
+
+    const lvlEl     = document.getElementById(`stake-level-${tokenId}`);
+    const rewardsEl = document.getElementById(`stake-rewards-${tokenId}`);
+    const dateEl    = document.getElementById(`stake-date-${tokenId}`);
+    const nextEl    = document.getElementById(`stake-next-${tokenId}`);
+    const barEl     = document.getElementById(`stake-progress-bar-${tokenId}`);
+    const labelEl   = document.getElementById(`stake-progress-label-${tokenId}`);
+
+    if (lvlEl)     lvlEl.textContent     = `Level ${stakedLevel}`;
+    if (rewardsEl) rewardsEl.textContent = `${flyzEarned} FLYZ earned`;
+    if (dateEl)    dateEl.textContent    = `Staked: ${stakedDate}`;
+    if (nextEl)    nextEl.textContent    = `Next level in ~${daysToNext} days`;
+
+    // Same idea as old progress = ((41.7 - next) / 41.7) * 100
+    const MAX_DAYS = 41.7;
+    const remaining = Math.max(0, Math.min(MAX_DAYS, Number(daysToNext)));
+    const pct = Math.max(0, Math.min(100, ((MAX_DAYS - remaining) / MAX_DAYS) * 100));
+
+    if (barEl) {
+      barEl.style.width = `${pct}%`;
+    }
+    if (labelEl) {
+      labelEl.textContent = `${Math.round(pct)}% to next level`;
+    }
+  } catch (err) {
+    console.warn(`ffDecorateStakedFrogCard failed for token ${tokenId}`, err);
+  }
+}
+
+
 // ===================================================
 // Wallet connect + dashboard
 // ===================================================
@@ -844,7 +887,6 @@ async function ffFetchOpenSeaProfile(address) {
   return { username, avatarUrl };
 }
 
-// ---- CONNECT FUNCTION ----
 async function connectWallet() {
   if (!window.ethereum) {
     alert('No Ethereum wallet detected. Please install MetaMask or a compatible wallet.');
@@ -863,6 +905,27 @@ async function connectWallet() {
 
     if (!ffWeb3) {
       ffWeb3 = new Web3(window.ethereum);
+    }
+
+    // Expose Web3 + contracts for legacy staking helpers (ethereum-dapp.js)
+    window.web3 = ffWeb3;
+    window.user_address = address;
+
+    try {
+      if (typeof COLLECTION_ABI !== 'undefined') {
+        window.collection = new ffWeb3.eth.Contract(
+          COLLECTION_ABI,
+          FF_COLLECTION_ADDRESS
+        );
+      }
+      if (typeof CONTROLLER_ABI !== 'undefined') {
+        window.controller = new ffWeb3.eth.Contract(
+          CONTROLLER_ABI,
+          FF_CONTROLLER_ADDRESS
+        );
+      }
+    } catch (err) {
+      console.warn('Failed to init legacy contracts', err);
     }
 
     ffUpdateWalletBasicUI(address);
@@ -892,6 +955,7 @@ async function connectWallet() {
   }
 }
 
+
 // Make connectWallet callable from HTML onclick
 window.connectWallet = connectWallet;
 
@@ -899,14 +963,33 @@ window.connectWallet = connectWallet;
 async function ffInitWalletOnLoad() {
   if (window.ethereum && window.Web3 && !ffWeb3) {
     ffWeb3 = new Web3(window.ethereum);
+    window.web3 = ffWeb3;
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_accounts' });
       if (accounts && accounts[0]) {
         ffCurrentAccount = accounts[0];
+        window.user_address = ffCurrentAccount;
+
+        try {
+          if (typeof COLLECTION_ABI !== 'undefined') {
+            window.collection = new ffWeb3.eth.Contract(
+              COLLECTION_ABI,
+              FF_COLLECTION_ADDRESS
+            );
+          }
+          if (typeof CONTROLLER_ABI !== 'undefined') {
+            window.controller = new ffWeb3.eth.Contract(
+              CONTROLLER_ABI,
+              FF_CONTROLLER_ADDRESS
+            );
+          }
+        } catch (err) {
+          console.warn('Failed to init legacy contracts on load', err);
+        }
+
         ffUpdateWalletBasicUI(ffCurrentAccount);
 
-        // Preload stats + frogs if wallet already connected
         const [ownedCount, stakingStats, profile] = await Promise.all([
           ffFetchOwnedFrogCount(ffCurrentAccount).catch(() => null),
           ffFetchStakingStats(ffCurrentAccount).catch(() => null),
@@ -921,9 +1004,9 @@ async function ffInitWalletOnLoad() {
     }
   }
 
-  // optional: if you ever add a button with id="connect-wallet-button"
   const btn = document.getElementById('connect-wallet-button');
   if (btn) {
     btn.addEventListener('click', connectWallet);
   }
 }
+
