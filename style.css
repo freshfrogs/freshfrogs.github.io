@@ -379,7 +379,6 @@ padding: 0.55rem 1.2rem;
 .sale_card_title {
     float: left;
     margin-left: 4px;
-    text-shadow: 2px 2px darkslateblue;
 }
 .sale_card_price {
     float: right;
@@ -509,10 +508,6 @@ margin: 24px auto;
 /* RARITY BADGES */
 
 .rarity_badge {
-  padding: 0.1rem 0.35rem;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  border: 1px solid #4b5563;
 }
 
 .rarity_legendary {
