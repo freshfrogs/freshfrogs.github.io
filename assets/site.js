@@ -708,12 +708,10 @@ async function renderOwnedAndStakedFrogs(address) {
       for (const tokenId of stakedIds) {
         let metadata = await fetchFrogMetadata(tokenId);
 
-        // Staking footer: Lvl., rewards, date, progress bar
         const footerHtml = `
           <div class="stake-meta">
             <div class="stake-meta-row">
               <span id="stake-level-${tokenId}" class="stake-level-label">Lvl. —</span>
-              <span id="stake-rewards-${tokenId}" class="stake-rewards-label">Rewards —</span>
             </div>
             <div class="stake-meta-row stake-meta-subrow">
               <span id="stake-date-${tokenId}">Staked: —</span>
@@ -721,9 +719,6 @@ async function renderOwnedAndStakedFrogs(address) {
             </div>
             <div class="stake-progress">
               <div id="stake-progress-bar-${tokenId}" class="stake-progress-bar"></div>
-            </div>
-            <div id="stake-progress-label-${tokenId}" class="stake-progress-label">
-              Progress to next level
             </div>
           </div>
         `;
