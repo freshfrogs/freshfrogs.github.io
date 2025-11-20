@@ -26,11 +26,17 @@ let ffCurrentView   = null;
 // Entry
 // ------------------------
 document.addEventListener('DOMContentLoaded', () => {
-  ffInitWalletOnLoad();   // disconnected UI, wire connect button
-  ffInitNavViews();       // hook up Collection / Rarity / Wallet / Pond tabs
+  ffInitWalletOnLoad();
+  ffInitNavViews();
 
-  // Default view: recent sales
-  ffSetView('sales');
+  // Hero "View Collection" -> show recent mints
+  const viewBtn = document.getElementById('hero-view-collection');
+  if (viewBtn) {
+    viewBtn.addEventListener('click', () => {
+      ffSetView('collection');
+      ffScrollToFrogs();
+    });
+  }
 
   const loadMoreActivityBtn = document.getElementById('load-more-activity');
   if (loadMoreActivityBtn) {
@@ -60,23 +66,43 @@ document.addEventListener('DOMContentLoaded', () => {
 // ------------------------
 // View switching (tabs)
 // ------------------------
+// ------------------------
+// View switching helpers
+// ------------------------
+function ffShowFrogLayout() {
+  const layout = document.getElementById('frog-layout');
+  if (layout) {
+    layout.style.display = 'block';
+  }
+}
+
+function ffScrollToFrogs() {
+  const layout = document.getElementById('frog-layout');
+  if (!layout) return;
+
+  const rect = layout.getBoundingClientRect();
+  const top = window.scrollY + rect.top - 80;
+  window.scrollTo({ top, behavior: 'smooth' });
+}
+
 function ffInitNavViews() {
   const tabs = document.querySelectorAll('.nav a[data-view]');
   tabs.forEach((tab) => {
     tab.addEventListener('click', (evt) => {
       evt.preventDefault();
       const view = tab.dataset.view;
-      if (view) {
-        ffSetView(view);
-      }
+      if (!view) return;
+      ffSetView(view);
+      ffScrollToFrogs();
     });
   });
 }
 
 function ffSetView(view) {
   ffCurrentView = view;
+  ffShowFrogLayout();
 
-  // Highlight active tab
+  // highlight active nav tab
   const tabs = document.querySelectorAll('.nav a[data-view]');
   tabs.forEach((tab) => {
     tab.classList.toggle('active', tab.dataset.view === view);
@@ -87,39 +113,40 @@ function ffSetView(view) {
   const stakedPanel   = document.getElementById('staked-panel');
   const rarityPanel   = document.getElementById('rarity-panel');
   const pondPanel     = document.getElementById('pond-panel');
+  const activityTitle = document.getElementById('activity-title');
 
   if (activityPanel) {
-    // sales (default) and collection (mints) both use the activity grid
-    activityPanel.style.display =
-      view === 'sales' || view === 'collection' ? '' : 'none';
+    const showActivity = view === 'collection' || view === 'sales';
+    activityPanel.style.display = showActivity ? '' : 'none';
   }
+  if (activityTitle) {
+    activityTitle.textContent =
+      view === 'collection' ? 'Recent Mints' : 'Recent Activity';
+  }
+
   if (ownedPanel)  ownedPanel.style.display  = view === 'wallet' ? '' : 'none';
   if (stakedPanel) stakedPanel.style.display = view === 'wallet' ? '' : 'none';
   if (rarityPanel) rarityPanel.style.display = view === 'rarity' ? '' : 'none';
   if (pondPanel)   pondPanel.style.display   = view === 'pond' ? '' : 'none';
 
-  // Kick off loaders based on view
-  if (view === 'sales') {
-    FF_ACTIVITY_MODE = 'sales';
-    loadRecentActivity();
-  } else if (view === 'collection') {
+  // kick off data loaders
+  if (view === 'collection') {
     FF_ACTIVITY_MODE = 'mints';
+    loadRecentActivity();
+  } else if (view === 'sales') {
+    FF_ACTIVITY_MODE = 'sales';
     loadRecentActivity();
   } else if (view === 'rarity') {
     ffLoadRarityGrid();
   } else if (view === 'wallet') {
     if (ffCurrentAccount) {
       renderOwnedAndStakedFrogs(ffCurrentAccount);
-    } else {
-      const ownedStatus = document.getElementById('owned-frogs-status');
-      if (ownedStatus) {
-        ownedStatus.textContent = 'Connect your wallet to view your frogs.';
-      }
     }
   } else if (view === 'pond') {
     ffLoadPondGrid();
   }
 }
+
 
 
 // ------------------------
@@ -1298,11 +1325,25 @@ function ffUpdateWalletBasicUI(address) {
   ffSetText('wallet-status-label', 'Connected');
   ffSetText('dashboard-wallet', `Wallet: ${short}`);
 
-  const headerBtn = document.getElementById('connect-wallet-button');
-  if (headerBtn) {
-    headerBtn.textContent = short;
+  // Inject wallet address into nav after Pond
+  const navSpan = document.getElementById('nav-wallet-address');
+  if (navSpan) {
+    let link = navSpan.querySelector('a[data-view="wallet"]');
+    if (!link) {
+      link = document.createElement('a');
+      link.href = '#';
+      link.dataset.view = 'wallet';
+      link.addEventListener('click', (evt) => {
+        evt.preventDefault();
+        ffSetView('wallet');
+        ffScrollToFrogs();
+      });
+      navSpan.appendChild(link);
+    }
+    link.textContent = short;
   }
 }
+
 
 // Apply everything to the wallet dashboard
 function ffApplyDashboardUpdates(address, ownedCount, stakingStats, profile) {
@@ -1660,6 +1701,10 @@ async function connectWallet() {
 
     // 🐸 Render owned & staked frogs in the grids
     await renderOwnedAndStakedFrogs(address);
+        // Show the wallet view by default after connecting
+    ffSetView('wallet');
+    ffScrollToFrogs();
+
   } catch (err) {
     console.error('Wallet connection failed:', err);
     alert('Failed to connect wallet. Check your wallet and try again.');
@@ -1672,16 +1717,11 @@ window.connectWallet = connectWallet;
 
 // Init wallet on page load (already-connected accounts)
 function ffInitWalletOnLoad() {
-  const btn = document.getElementById('connect-wallet-button');
-  if (btn) {
-    btn.textContent = 'Connect Wallet';
-    btn.addEventListener('click', connectWallet);
-  }
-
   ffSetText('wallet-status-label', 'Disconnected');
   ffSetText('dashboard-wallet', 'Wallet: —');
   ffSetText('dashboard-username', 'Not connected');
 }
+
 
 
 // Convert roman numerals from stakingValues() into normal numbers
