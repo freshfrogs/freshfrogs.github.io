@@ -244,7 +244,7 @@ padding: 0.55rem 1.2rem;
 
 
 .panel {
-    background: rgba(15, 23, 42, 0.96);
+    background: lightseagreen;
     border: 0px solid white;
     padding: 1.2rem 1.3rem 1.3rem;
     box-shadow: 4px 4px darkslateblue;
@@ -617,7 +617,7 @@ margin: 24px auto;
 }
 
 .dashboard-main .dashboard-section {
-    background: rgba(15, 23, 42, 0.96);
+    background: lightseagreen;
     border: 0px solid white;
     padding: 1.2rem 1.3rem 1.3rem;
     box-shadow: 4px 4px darkslateblue;
@@ -681,7 +681,7 @@ margin: 24px auto;
 
 .stake-meta {
   margin: 8px;
-  margin-top: 6px;
+  margin-top: 0px;
   padding-top: 6px;
   font-size: 0.75rem;
   color: #e5e7eb;
