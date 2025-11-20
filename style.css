@@ -1,4 +1,5 @@
 /* BASIC RESET */
+
 *,
 *::before,
 *::after {
@@ -17,6 +18,7 @@ a {
 }
 
 /* PAGE WRAPPER */
+
 .page {
   min-height: 100vh;
   max-width: 1120px;
@@ -27,15 +29,24 @@ a {
 }
 
 /* HEADER */
+
 .site-header {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   gap: 1.5rem;
   padding: 1.25rem 0 0.75rem;
   top: 0;
   z-index: 20;
   color: white;
+}
+
+.logo {
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  padding: 0.35rem 0.75rem;
 }
 
 .nav {
@@ -71,19 +82,6 @@ a {
   width: 80%;
 }
 
-/* nav active state for view tabs */
-.nav a[data-view] {
-  cursor: pointer;
-}
-
-.nav a.active {
-  color: darkcyan;
-}
-
-.nav a.active::after {
-  width: 80%;
-}
-
 .cta-btn {
   padding: 0.55rem 1.2rem;
   border-radius: 5px;
@@ -102,6 +100,7 @@ a {
 }
 
 /* HERO – TEMPLATE 4 (CENTERED) */
+
 .hero {
   max-width: 720px;
   margin: 2.4rem auto 1.8rem;
@@ -145,7 +144,32 @@ a {
   justify-content: center;
 }
 
+.hero-placeholder {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 18px;
+  background: radial-gradient(
+      circle at top left,
+      rgba(74, 222, 128, 0.18),
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at bottom right,
+      rgba(56, 189, 248, 0.18),
+      transparent 55%
+    ),
+    #020617;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
 /* BUTTONS */
+
 .btn {
   border-radius: 999px;
   padding: 0.65rem 1.4rem;
@@ -162,14 +186,15 @@ a {
 
 .btn.primary {
   padding: 0.55rem 1.2rem;
-  border-radius: 0;
+  border-radius: 0px;
   border: none;
-  color: darkslateblue;
+  color: #022c22;
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
   white-space: nowrap;
   background: lightblue;
+  color: darkslateblue;
   box-shadow: 2px 2px darkslateblue;
 }
 
@@ -177,64 +202,146 @@ a {
   padding: 0.55rem 1.2rem;
   border-radius: 5px;
   border: none;
-  color: white;
+  color: #022c22;
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
   white-space: nowrap;
   background: lightcoral;
+  color: white;
 }
 
 .btn:hover {
   transform: translateY(-1px);
 }
 
-/* DASHBOARD PAGE LAYOUT */
+/* MAIN – DASHBOARD LAYOUT */
+/* Single column layout: all panels full-width, stacked vertically */
+
 .dashboard-main {
-  display: block; /* single column so cards can use full width */
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
   padding: 0.6rem 0 1.6rem;
   max-width: 1120px;
   margin: 0 auto;
 }
 
-.dashboard-main .dashboard-section {
+.panel {
   background: lightseagreen;
-  border: 0 solid white;
+  border: 0px solid white;
   padding: 1.2rem 1.3rem 1.3rem;
   box-shadow: 2px 2px darkslateblue;
-  border-radius: 0;
+  border-radius: 0px;
 }
 
-/* hide sidebar panel visually; we keep it for stats IDs */
-.dashboard-main .dashboard-sidebar {
-  display: none;
+.panel h2 {
+  font-size: 1rem;
+  margin-top: 0;
+  margin-bottom: 0.4rem;
+  color: white;
+  text-shadow: 2px 2px darkslateblue;
 }
 
-.dashboard-note {
-  font-size: 0.78rem;
+.panel p {
+  margin: 0;
+  color: white;
+  font-size: 1em;
+}
+
+/* FOOTER */
+
+.site-footer {
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.8rem;
   color: #9ca3af;
-  margin-bottom: 0.6rem;
 }
 
-/* UNIFIED FROG GRID (collection, rarity, pond, wallet) */
+.footer-links {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.footer-links a {
+  color: #9ca3af;
+  text-decoration: none;
+}
+
+/* RESPONSIVE HEADER + HERO */
+
+@media (max-width: 768px) {
+  .site-header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.9rem;
+  }
+
+  .nav {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .hero {
+    margin-top: 1.8rem;
+    padding: 1.8rem 1.4rem 1.8rem;
+  }
+
+  .hero-placeholder {
+    max-width: 100%;
+  }
+}
+
+/* FROG IMAGES */
+
+.fly {
+  width: 128px;
+  height: 128px;
+  margin: 8px;
+  box-shadow: 2px 2px darkslateblue;
+  image-rendering: pixelated;
+}
+
+/* SHARED GRID LAYOUT FOR ALL FROG LISTS
+   (recent sales, mints, pond, owned, staked, rarity) */
+
 .recent_sales,
 .nft-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(248px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
-  margin: 0 auto 2rem;
   width: 100%;
+  margin: 0 auto 2rem;
 }
 
-/* Frog cards (same everywhere) */
+@media (max-width: 960px) {
+  .recent_sales,
+  .nft-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .recent_sales,
+  .nft-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* FROG CARD (used everywhere: owned, staked, sales, mints, pond, rarity) */
+
 .recent_sale_card {
   display: block;
   background: lightseagreen;
   padding: 8px;
   box-shadow: 2px 2px darkslateblue;
-  border-radius: 0;
   width: 100%;
-  max-width: none;
+  border-radius: 0px;
   margin: 8px 0;
 }
 
@@ -256,7 +363,6 @@ a {
   height: 16px;
 }
 
-/* Frog image & overlays */
 .frog_img {
   height: 128px;
   width: 128px;
@@ -269,7 +375,28 @@ a {
   image-rendering: pixelated;
 }
 
-/* Layered frog container uses original PNG as background swatch */
+.recent_sale_properties {
+  border-top: 1px solid white;
+  padding: 8px;
+  margin: 8px;
+  min-height: 70px;
+  color: lightseagreen;
+  margin-bottom: 0px;
+  font-size: 0.9em;
+}
+
+.recent_sale_properties p {
+  margin: 2px;
+  text-align: left;
+  color: white;
+  font-size: 1em;
+}
+
+.recent_sale_traits {
+}
+
+/* Layered frog container (used by ethereum-dapp.js helpers) */
+
 .frog_img_cont {
   position: relative;
   margin: 24px auto;
@@ -278,11 +405,14 @@ a {
   overflow: hidden;
   border-radius: 5px;
   box-shadow: 2px 2px darkslateblue;
+
   background-color: #020617;
   background-repeat: no-repeat;
-  background-size: 1000%;
+  background-size: 220% 220%;
   background-position: bottom right;
 }
+
+/* Attribute layers (built by build_trait) */
 
 .trait_overlay,
 .attribute_overlay {
@@ -307,23 +437,7 @@ a {
   z-index: 5;
 }
 
-/* Trait text */
-.recent_sale_properties {
-  border-top: 1px solid white;
-  padding: 8px;
-  margin: 8px;
-  min-height: 70px;
-  color: lightseagreen;
-  margin-bottom: 0;
-  font-size: 0.9em;
-}
-
-.recent_sale_properties p {
-  margin: 2px;
-  text-align: left;
-  color: white;
-  font-size: 1em;
-}
+/* Trait list text in the card */
 
 .frog-attr-text {
   cursor: default;
@@ -343,137 +457,8 @@ a {
   z-index: 5;
 }
 
-/* RARITY BADGES */
-.rarity_badge {
-  text-shadow: 2px 2px darkslateblue;
-}
+/* WALLET SIDEBAR / DASHBOARD (legacy IDs safe even if not shown) */
 
-.rarity_legendary {
-  border-color: gold;
-  color: gold;
-}
-
-.rarity_epic {
-  border-color: #a855f7;
-  color: #c4b5fd;
-}
-
-.rarity_rare {
-  border-color: #22d3ee;
-  color: #a5f3fc;
-}
-
-.rarity_common {
-  border-color: #9ca3af;
-  color: #e5e7eb;
-}
-
-.rarity_unknown {
-  opacity: 0.7;
-}
-
-/* Card footer buttons (stake/links/etc) */
-.recent_sale_links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-  margin-left: 8px;
-  margin-right: 8px;
-}
-
-.recent_sale_links .sale_link_btn {
-  flex: 1 1 48%;
-  text-align: center;
-  font-size: 0.72rem;
-  padding: 4px 6px;
-  border-radius: 0;
-  border: 1px solid lightcoral;
-  background: lightcoral;
-  color: #e5e7eb;
-  cursor: pointer;
-  text-decoration: none;
-  font-weight: 600;
-  transition:
-    background 160ms ease-out,
-    transform 120ms ease-out,
-    border-color 160ms ease-out;
-  box-shadow: 2px 2px darkslateblue;
-}
-
-.recent_sale_links .sale_link_btn:hover {
-  transform: translateY(-1px);
-  background: rgba(30, 64, 175, 0.85);
-}
-
-.sale_link_btn.opensea {
-  border-color: #2081e2;
-  background-color: #2081e2;
-}
-
-.sale_link_btn.etherscan {
-  border-color: antiquewhite;
-  background: antiquewhite;
-  color: #333;
-}
-
-/* Staking meta footer */
-.stake-meta {
-  margin: 8px;
-  margin-top: 0;
-  padding-top: 0;
-  font-size: 0.75rem;
-  color: #e5e7eb;
-}
-
-.stake-meta-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 4px;
-}
-
-.stake-meta-subrow {
-  font-size: 0.9em;
-  border-top: 1px solid white;
-  padding: 8px;
-  color: white;
-  margin-top: 8px;
-}
-
-.stake-level-label {
-  font-weight: 600;
-  color: #fbbf24;
-  text-shadow: 2px 2px darkslateblue;
-}
-
-.stake-progress {
-  position: relative;
-  width: 100%;
-  height: 8px;
-  border-radius: 999px;
-  background: white;
-  overflow: hidden;
-  margin-top: 2px;
-}
-
-.stake-progress-bar {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 0%;
-  border-radius: inherit;
-  background: #fbbf24;
-  transition: width 260ms ease-out;
-}
-
-.staking-sale-note {
-  margin-top: 4px;
-  font-size: 0.7rem;
-  color: #9ca3af;
-}
-
-/* SIDEBAR / DASHBOARD STATS (optional) */
 .sidebar .wallet-summary {
   display: flex;
   flex-direction: column;
@@ -507,6 +492,18 @@ a {
   color: white;
 }
 
+.wallet-status-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #e5e7eb;
+}
+
+.wallet-status-row span:last-child {
+  font-weight: bold;
+  color: lightgreen;
+}
+
 .wallet-stats-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -516,7 +513,7 @@ a {
 .wallet-stat {
   background: antiquewhite;
   padding: 0.35rem 0.45rem;
-  border-radius: 0;
+  border-radius: 0px;
   color: #333;
 }
 
@@ -533,53 +530,188 @@ a {
   color: #333;
 }
 
-/* OTHER SMALL BITS */
-.fly {
-  width: 128px;
-  height: 128px;
-  margin: 8px;
-  box-shadow: 2px 2px darkslateblue;
-  image-rendering: pixelated;
+.wallet-connect-btn {
+  margin-top: 0.4rem;
+  width: auto;
 }
 
-/* FOOTER */
-.site-footer {
-  padding-top: 0.8rem;
-  border-top: 1px solid rgba(148, 163, 184, 0.3);
+/* RARITY BADGES */
+
+.rarity_badge {
+  text-shadow: 2px 2px darkslateblue;
+}
+
+.rarity_legendary {
+  border-color: gold;
+  color: gold;
+}
+
+.rarity_epic {
+  border-color: #a855f7;
+  color: #c4b5fd;
+}
+
+.rarity_rare {
+  border-color: #22d3ee;
+  color: #a5f3fc;
+}
+
+.rarity_common {
+  border-color: #9ca3af;
+  color: #e5e7eb;
+}
+
+.rarity_unknown {
+  opacity: 0.7;
+}
+
+/* RECENT SALE / FROG CARD LINK BUTTONS (used for all frog cards) */
+
+.recent_sale_links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px;
+  margin-top: 10px;
+}
+
+.sale_link_btn {
+  flex: 1 1 48%;
+  text-align: center;
+  font-size: 0.72rem;
+  padding: 4px 6px;
+  border-radius: 0px;
+  border: 1px solid lightcoral;
+  background: lightcoral;
+  color: #e5e7eb;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 600;
+  transition:
+    background 160ms ease-out,
+    transform 120ms ease-out,
+    border-color 160ms ease-out;
+  box-shadow: 2px 2px darkslateblue;
+}
+
+.sale_link_btn:hover {
+  transform: translateY(-1px);
+  background: rgba(30, 64, 175, 0.85);
+}
+
+.sale_link_btn.opensea {
+  border-color: #2081e2;
+  background-color: #2081e2;
+}
+
+.sale_link_btn.etherscan {
+  border-color: antiquewhite;
+  background: antiquewhite;
+  color: #333;
+}
+
+.staking-sale-note {
+  margin-top: 4px;
+  font-size: 0.7rem;
+  color: #9ca3af;
+}
+
+.staking-sale-stats {
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: #e0f2fe;
+}
+
+.staking-sale-stats strong {
+  color: white;
+}
+
+/* STAKING LEVEL + PROGRESS (dashboard cards) */
+
+.stake-meta {
+  margin: 8px;
+  margin-top: 0px;
+  padding-top: 0px;
+  font-size: 0.75rem;
+  color: #e5e7eb;
+}
+
+.stake-meta-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 0.8rem;
+  margin-bottom: 4px;
+}
+
+.stake-meta-subrow {
+  font-size: 0.9em;
+  border-top: 1px solid white;
+  padding: 8px;
+  color: white;
+  margin-top: 8px;
+}
+
+.stake-level-label {
+  font-weight: 600;
+  color: #fbbf24;
+  text-shadow: 2px 2px darkslateblue;
+}
+
+.stake-rewards-label {
+  font-weight: 500;
+  color: #fbbf24;
+}
+
+.stake-progress {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: white;
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.stake-progress-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0%;
+  border-radius: inherit;
+  background: #fbbf24;
+  transition: width 260ms ease-out;
+}
+
+.stake-progress-label {
+  margin-top: 3px;
+  font-size: 0.7rem;
   color: #9ca3af;
 }
 
-.footer-links {
-  display: flex;
-  gap: 0.8rem;
-}
+/* DASHBOARD NOTE */
 
-.footer-links a {
+.dashboard-note {
+  font-size: 0.78rem;
   color: #9ca3af;
-  text-decoration: none;
+  margin-bottom: 0.6rem;
 }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .site-header {
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 0.9rem;
-  }
+/* Reuse recent_sale_card style for owned / staked NFTs */
 
-  .nav {
-    flex: 1 1 100%;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-  }
+.nft-grid .recent_sale_card {
+  width: 100%;
+}
 
-  .hero {
-    margin-top: 1.8rem;
-    padding: 1.8rem 1.4rem 1.8rem;
-  }
+/* HEADER NAV: active state for view tabs */
+
+.nav a[data-view] {
+  cursor: pointer;
+}
+
+.nav a.active {
+  color: darkcyan;
+}
+
+.nav a.active::after {
+  width: 80%;
 }
