@@ -95,14 +95,43 @@ async function loadRecentActivity() {
 
       const headerLeft = truncateAddress(ownerAddress);
 
+      const footerHtml = ''; // traits already handled inside createFrogCard
+
+      const actionHtml = `
+        <div class="recent_sale_links">
+          <a
+            class="sale_link_btn opensea"
+            href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            OpenSea
+          </a>
+          <a
+            class="sale_link_btn etherscan"
+            href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Etherscan
+          </a>
+        </div>
+      `;
+
       const card = createFrogCard({
         tokenId,
         metadata,
         headerLeft,
-        headerRight
+        headerRight,
+        footerHtml,
+        actionHtml
       });
 
       container.appendChild(card);
+
+      // If this frog is currently staked, annotate the card
+      ffAnnotateSaleWithStaking(card, tokenId);
+
     }
   } catch (err) {
     console.error('Unable to load recent activity', err);
@@ -113,22 +142,53 @@ async function loadRecentActivity() {
   }
 }
 
+// For recent sales/mints: show a small note if the frog is currently staked
+async function ffAnnotateSaleWithStaking(card, tokenId) {
+  if (typeof stakerAddress !== 'function' || typeof stakingValues !== 'function') {
+    return;
+  }
+
+  try {
+    const owner = await stakerAddress(tokenId);
+    if (!owner) return; // not staked
+
+    const values = await stakingValues(tokenId);
+    const level = values && values[1]; // roman numeral
+
+    const props = card.querySelector('.recent_sale_properties');
+    if (!props) return;
+
+    const note = document.createElement('p');
+    note.className = 'staking-sale-note';
+    note.textContent = level
+      ? `Currently staked (Lvl. ${level})`
+      : 'Currently staked';
+
+    props.appendChild(note);
+  } catch (err) {
+    console.warn('ffAnnotateSaleWithStaking failed for token', tokenId, err);
+  }
+}
+
+
+// ------------------------
+// Token / rarity helpers
+// ------------------------
 // ------------------------
 // Token / rarity helpers
 // ------------------------
 function parseTokenId(raw) {
   if (raw == null) return null;
 
-  // Handle numbers directly
+  // Direct number
   if (typeof raw === 'number') {
     if (!Number.isFinite(raw)) return null;
     const n = Math.floor(raw);
-    // Collection is 1–4040, so anything wildly bigger is clearly wrong
-    if (n < 0 || n > 10000) return null;
+    if (n < 0 || n > 10000) return null; // collection is 1–4040
     return n;
   }
 
-  // Handle bigint
+  // BigInt
   if (typeof raw === 'bigint') {
     if (raw < 0n || raw > 10000n) return null;
     return Number(raw);
@@ -136,21 +196,20 @@ function parseTokenId(raw) {
 
   let s = String(raw).trim();
 
-  if (s.startsWith('0x') || s.startsWith('0X')) {
-    const n = parseInt(s, 16);
-    if (!Number.isFinite(n)) return null;
-    if (n < 0 || n > 10000) return null;
-    return n;
-  }
-
   // Kill scientific notation like "1.37e+48"
   if (/e\+/i.test(s)) return null;
 
+  if (s.startsWith('0x') || s.startsWith('0X')) {
+    const n = parseInt(s, 16);
+    if (!Number.isFinite(n) || n < 0 || n > 10000) return null;
+    return n;
+  }
+
   const n = parseInt(s, 10);
-  if (!Number.isFinite(n)) return null;
-  if (n < 0 || n > 10000) return null;
+  if (!Number.isFinite(n) || n < 0 || n > 10000) return null;
   return n;
 }
+
 
 function getRarityRank(tokenId) {
   if (typeof window === 'undefined') return null;
@@ -498,8 +557,8 @@ async function ffFetchOwnedFrogs(address) {
   return frogs;
 }
 
-// Prefer legacy getStakedTokens() helper (from ethereum-dapp.js) so we decode
-// the struct the same way the old site did.
+// Prefer legacy getStakedTokens() helper (from ethereum-dapp.js) so
+// we decode the struct the same way the old site did.
 async function ffFetchStakedTokenIds(address) {
   // 1) Try legacy helper first
   if (typeof getStakedTokens === 'function') {
@@ -536,12 +595,11 @@ async function ffFetchStakedTokenIds(address) {
 
   const contract = new ffWeb3.eth.Contract(CONTROLLER_ABI, FF_CONTROLLER_ADDRESS);
 
-  const stakedRaw = await ffTryContractCall(contract, [
-    'getStakedTokensOf',
-    'getStakedTokens',
-    'getUserStakedTokens',
-    'stakedTokensOf'
-  ], [address]);
+  const stakedRaw = await ffTryContractCall(
+    contract,
+    ['getStakedTokensOf', 'getStakedTokens', 'getUserStakedTokens', 'stakedTokensOf'],
+    [address]
+  );
 
   if (!stakedRaw) return [];
 
@@ -572,12 +630,11 @@ async function ffFetchStakedTokenIds(address) {
   return result;
 }
 
-
 // Render owned + staked frogs into their grids
 async function renderOwnedAndStakedFrogs(address) {
   const ownedGrid   = document.getElementById('owned-frogs-grid');
   const ownedStatus = document.getElementById('owned-frogs-status');
-  const stakedGrid   = document.getElementById('staked-frogs-grid');
+  const stakedGrid  = document.getElementById('staked-frogs-grid');
   const stakedStatus = document.getElementById('staked-frogs-status');
 
   if (ownedGrid)  ownedGrid.innerHTML = '';
@@ -615,7 +672,16 @@ async function renderOwnedAndStakedFrogs(address) {
           metadata = await fetchFrogMetadata(tokenId);
         }
 
+        // Owned frogs: Stake + Transfer + external links
         const actionHtml = `
+          <div class="recent_sale_links">
+            <button class="sale_link_btn" onclick="ffStakeFrog(${tokenId})">
+              Stake
+            </button>
+            <button class="sale_link_btn" onclick="ffTransferFrog(${tokenId})">
+              Transfer
+            </button>
+          </div>
           <div class="recent_sale_links">
             <a
               class="sale_link_btn opensea"
@@ -659,10 +725,11 @@ async function renderOwnedAndStakedFrogs(address) {
       for (const tokenId of stakedIds) {
         let metadata = await fetchFrogMetadata(tokenId);
 
+        // Staking footer: Lvl., rewards, date, progress bar
         const footerHtml = `
           <div class="stake-meta">
             <div class="stake-meta-row">
-              <span id="stake-level-${tokenId}" class="stake-level-label">Level —</span>
+              <span id="stake-level-${tokenId}" class="stake-level-label">Lvl. —</span>
               <span id="stake-rewards-${tokenId}" class="stake-rewards-label">Rewards —</span>
             </div>
             <div class="stake-meta-row stake-meta-subrow">
@@ -678,24 +745,12 @@ async function renderOwnedAndStakedFrogs(address) {
           </div>
         `;
 
+        // Staked frogs: ONLY Unstake button
         const actionHtml = `
           <div class="recent_sale_links">
-            <a
-              class="sale_link_btn opensea"
-              href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              OpenSea
-            </a>
-            <a
-              class="sale_link_btn etherscan"
-              href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Etherscan
-            </a>
+            <button class="sale_link_btn" onclick="ffUnstakeFrog(${tokenId})">
+              Unstake
+            </button>
           </div>
         `;
 
@@ -710,11 +765,10 @@ async function renderOwnedAndStakedFrogs(address) {
 
         stakedGrid.appendChild(card);
 
-        // Fill in level, rewards & progress bar using the old stakingValues()
+        // Fill staking info (Lvl., rewards, progress)
         ffDecorateStakedFrogCard(tokenId);
       }
     }
-
   } catch (err) {
     console.error('renderOwnedAndStakedFrogs failed:', err);
     if (ownedStatus)  ownedStatus.textContent  = 'Unable to load owned frogs.';
@@ -722,9 +776,9 @@ async function renderOwnedAndStakedFrogs(address) {
   }
 }
 
-// Use legacy staking helpers from ethereum-dapp.js to decorate staked cards
+
+// Use stakingValues() + stakerAddress() from ethereum-dapp.js
 async function ffDecorateStakedFrogCard(tokenId) {
-  // stakingValues() comes from ethereum-dapp.js
   if (typeof stakingValues !== 'function') {
     console.warn('stakingValues() not available; skipping staking details');
     return;
@@ -743,12 +797,11 @@ async function ffDecorateStakedFrogCard(tokenId) {
     const barEl     = document.getElementById(`stake-progress-bar-${tokenId}`);
     const labelEl   = document.getElementById(`stake-progress-label-${tokenId}`);
 
-    if (lvlEl)     lvlEl.textContent     = `Level ${stakedLevel}`;
+    if (lvlEl)     lvlEl.textContent     = `Lvl. ${stakedLevel}`;  // <- Lvl. X
     if (rewardsEl) rewardsEl.textContent = `${flyzEarned} FLYZ earned`;
     if (dateEl)    dateEl.textContent    = `Staked: ${stakedDate}`;
     if (nextEl)    nextEl.textContent    = `Next level in ~${daysToNext} days`;
 
-    // Same idea as old progress = ((41.7 - next) / 41.7) * 100
     const MAX_DAYS = 41.7;
     const remaining = Math.max(0, Math.min(MAX_DAYS, Number(daysToNext)));
     const pct = Math.max(0, Math.min(100, ((MAX_DAYS - remaining) / MAX_DAYS) * 100));
@@ -763,6 +816,79 @@ async function ffDecorateStakedFrogCard(tokenId) {
     console.warn(`ffDecorateStakedFrogCard failed for token ${tokenId}`, err);
   }
 }
+
+// ---- Card actions: Stake / Unstake / Transfer ----
+
+async function ffStakeFrog(tokenId) {
+  tokenId = parseTokenId(tokenId);
+  if (tokenId == null) return;
+
+  try {
+    if (typeof initiate_stake === 'function') {
+      // Use legacy helper if available
+      return await initiate_stake(tokenId);
+    }
+
+    if (!window.collection || !ffCurrentAccount) {
+      alert('Staking not available: contract or wallet not initialised.');
+      return;
+    }
+
+    await collection.methods.stake(tokenId).send({ from: ffCurrentAccount });
+  } catch (err) {
+    console.error('Stake failed', err);
+    alert('Stake transaction failed. Check console for details.');
+  }
+}
+
+async function ffUnstakeFrog(tokenId) {
+  tokenId = parseTokenId(tokenId);
+  if (tokenId == null) return;
+
+  try {
+    if (typeof initiate_withdraw === 'function') {
+      // Legacy helper
+      return await initiate_withdraw(tokenId);
+    }
+
+    if (!window.controller || !ffCurrentAccount) {
+      alert('Unstake not available: contract or wallet not initialised.');
+      return;
+    }
+
+    await controller.methods.unstake(tokenId).send({ from: ffCurrentAccount });
+  } catch (err) {
+    console.error('Unstake failed', err);
+    alert('Unstake transaction failed. Check console for details.');
+  }
+}
+
+async function ffTransferFrog(tokenId) {
+  tokenId = parseTokenId(tokenId);
+  if (tokenId == null) return;
+
+  if (!window.collection || !ffCurrentAccount) {
+    alert('Transfer not available: contract or wallet not initialised.');
+    return;
+  }
+
+  const to = window.prompt('Send this Frog to which address?');
+  if (!to) return;
+
+  try {
+    await collection.methods
+      .safeTransferFrom(ffCurrentAccount, to, tokenId)
+      .send({ from: ffCurrentAccount });
+  } catch (err) {
+    console.error('Transfer failed', err);
+    alert('Transfer transaction failed. Check console for details.');
+  }
+}
+
+// expose for onclick="" handlers
+window.ffStakeFrog    = ffStakeFrog;
+window.ffUnstakeFrog  = ffUnstakeFrog;
+window.ffTransferFrog = ffTransferFrog;
 
 
 // ===================================================

@@ -734,3 +734,48 @@ margin: 24px auto;
   font-size: 0.7rem;
   color: #9ca3af;
 }
+/* ==== Frog card action buttons (Stake / Transfer / Links) ==== */
+
+.recent_sale_links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.recent_sale_links .sale_link_btn {
+  flex: 1 1 48%;
+  text-align: center;
+  font-size: 0.72rem;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(148, 163, 184, 0.9);
+  background: rgba(15, 23, 42, 0.95);
+  color: #e5e7eb;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 600;
+  transition:
+    background 160ms ease-out,
+    transform 120ms ease-out,
+    border-color 160ms ease-out;
+}
+
+.recent_sale_links .sale_link_btn:hover {
+  transform: translateY(-1px);
+  background: rgba(30, 64, 175, 0.85);
+}
+
+.sale_link_btn.opensea {
+  border-color: #2081e2;
+}
+
+.sale_link_btn.etherscan {
+  border-color: #10b981;
+}
+
+.staking-sale-note {
+  margin-top: 4px;
+  font-size: 0.7rem;
+  color: #9ca3af;
+}
