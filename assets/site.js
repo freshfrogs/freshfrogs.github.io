@@ -150,7 +150,7 @@ async function loadRecentActivity() {
 // Optional: annotate a recent-sale card with staking stats
 async function ffAnnotateSaleWithStaking(card, tokenId) {
   // If toggle is off, do nothing
-  if (!FF_SHOW_STAKING_STATS_ON_SALES) return;
+  if (!FF_SHOW_STAKING_STATS_ON_SALES) { return };
 
   // Need legacy helpers loaded from ethereum-dapp.js
   if (typeof stakingValues !== 'function') {
