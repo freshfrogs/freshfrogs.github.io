@@ -194,8 +194,8 @@ padding: 0.55rem 1.2rem;
     font-size: 0.85rem;
     cursor: pointer;
     white-space: nowrap;
-    background: royalblue;
-    color: white;
+    background: lightblue;
+    color: darkslateblue;
 }
 
 .btn.secondary {
@@ -478,22 +478,22 @@ margin: 24px auto;
 }
 
 .wallet-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  border: 1px solid lightgreen;
-  object-fit: cover;
+    width: 64px;
+    height: 64px;
+    border-radius: 999px;
+    object-fit: cover;
 }
 
 .wallet-username {
-  font-weight: bold;
-  color: lightgreen;
-  font-size: 0.9rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px darkslateblue;
+    font-size: 1.1em;
 }
 
 .wallet-address {
-  font-size: 0.78rem;
-  color: #a5b4fc;
+    font-size: 0.8em;
+    color: white;
 }
 
 .wallet-status-row {
@@ -515,23 +515,23 @@ margin: 24px auto;
 }
 
 .wallet-stat {
-  background: rgba(15, 23, 42, 0.9);
-  padding: 0.35rem 0.45rem;
-  border-radius: 4px;
-  border: 1px solid rgba(148, 163, 184, 0.5);
+    background: antiquewhite;
+    padding: 0.35rem 0.45rem;
+    border-radius: 4px;
+    color: #333;
 }
 
 .wallet-stat .stat-label {
-  display: block;
-  font-size: 0.72rem;
-  color: #9ca3af;
+    display: block;
+    font-size: 0.8rem;
+    color: #333;
 }
 
 .wallet-stat .stat-value {
-  display: block;
-  font-size: 0.9rem;
-  font-weight: bold;
-  color: #e5e7eb;
+display: block;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #333;
 }
 
 .wallet-connect-btn {
