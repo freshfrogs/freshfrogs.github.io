@@ -367,8 +367,11 @@ padding: 0.55rem 1.2rem;
   }
 }
 .fly {
-  width: 256px;
-  height: 256px;
+  width: 128px;
+  height: 128px;
+  margin: 8px;
+  box-shadow: 2px 2px darkslateblue;
+  image-rendering: pixelated;
 }
 .recent_sales {
   display: grid;
