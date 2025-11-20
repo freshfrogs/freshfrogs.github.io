@@ -22,9 +22,18 @@ const ZERO_ADDRESS          = '0x0000000000000000000000000000000000000000';
 // Entry
 // ------------------------
 document.addEventListener('DOMContentLoaded', () => {
-  loadRecentActivity();   // bottom recent cards
-  ffInitWalletOnLoad();   // auto-detect wallet + wire buttons
+  loadRecentActivity();   // initial batch
+  ffInitWalletOnLoad();   // just sets UI to disconnected, no auto-connect
+
+  const loadMoreBtn = document.getElementById('load-more-sales');
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', () => {
+      FF_RECENT_LIMIT += 6;      // next batch size
+      loadRecentActivity();      // reload grid with more items
+    });
+  }
 });
+
 
 // ------------------------
 // Recent activity loader (bottom grid)
@@ -48,8 +57,8 @@ async function loadRecentActivity() {
   try {
     const items =
       FF_ACTIVITY_MODE === 'mints'
-        ? await fetchRecentMints(6)
-        : await fetchRecentSales(6);
+        ? await fetchRecentMints(FF_RECENT_LIMIT)
+        : await fetchRecentSales(FF_RECENT_LIMIT);
 
     if (!items.length) {
       if (statusEl) {
@@ -62,6 +71,9 @@ async function loadRecentActivity() {
     }
 
     if (statusEl) statusEl.textContent = '';
+
+    // Rebuild the grid from scratch each time so "Load more" just shows more rows
+    container.innerHTML = '';
 
     for (const item of items) {
       const rawTokenId =
@@ -98,8 +110,8 @@ async function loadRecentActivity() {
       }
 
       const headerLeft = truncateAddress(ownerAddress);
-
-      const footerHtml = ''; // traits already handled inside createFrogCard
+      
+      const footerHtml = '';
 
       const actionHtml = `
         <div class="recent_sale_links">
@@ -131,10 +143,10 @@ async function loadRecentActivity() {
         actionHtml
       });
 
-      // Optional staking stats hook (currently disabled via FF_SHOW_STAKING_STATS_ON_SALES)
-      ffAnnotateSaleWithStaking(card, tokenId);
+      ffAnnotateSaleWithStaking(card, tokenId); // still toggle-controlled
 
       container.appendChild(card);
+
 
     }
   } catch (err) {
