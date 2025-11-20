@@ -12,10 +12,21 @@
     <header class="site-header">
       <nav class="nav">
         <a href="index.html">Home</a>
-        <a href="collection.html">Collection</a>
-        <a href="rarity.html">Rarity</a>
-        <a href="wallet.html">Wallet</a>
+        <!-- Views controlled by JS -->
+        <a href="#" data-view="collection">Collection</a>
+        <a href="#" data-view="rarity">Rarity</a>
+        <a href="#" data-view="wallet">Wallet</a>
+        <a href="#" data-view="pond">Pond</a>
       </nav>
+
+      <!-- Connect button in top-right -->
+      <button
+        class="btn primary wallet-connect-btn"
+        id="connect-wallet-button"
+        type="button"
+      >
+        Connect Wallet
+      </button>
     </header>
 
     <!-- DASHBOARD HERO -->
@@ -43,46 +54,21 @@
     <main class="dashboard-main">
       <!-- LEFT COLUMN -->
 
-      <!-- Minting / Staking explainer that used to be on the homepage -->
-      <section class="panel dashboard-section">
-        <h2>🍃 Minting Information</h2>
-        <p>
-          Mint your own unique FreshFrogs NFT today and join the exclusive collection
-          of one-of-a-kind digital frogs!
-        </p>
-        <br /><br />
-
-        <h2>📃 Ethereum Smart Contract</h2>
-        <p>ERC-721 powered by Factoria, verified and stored on IPFS ✔️</p>
-      </section>
-      <section class="panel dashboard-section">
-        <h2>📃 FreshFrogsNFT Staking</h2>
-        <p>
-          Stake your FROG(s) to earn exclusive rewards and unlock special benefits,
-          while helping to grow the community and increase the value of your collection!
-        </p>
-        <br /><br />
-        <h2>✍️ Sign Contract Approval</h2>
-        <p>
-          To start staking you must first give the staking contract permission to
-          access your Frogs. This is a one time transaction that requires a gas fee.
-        </p>
-        <br /><br />
-        <h2>🍀 The Pond</h2>
-        <p>
-          View all the Frogs staked by the community! Explore, track, and discover
-          rare frogs while unlocking potential rewards!
-        </p>
-      </section>
-
-      <!-- Recent sales / activity panel (shown by default) -->
-      <section class="panel dashboard-section" id="recent-activity-panel" style="background: transparent; box-shadow: none; padding: 0px;">
+      <section class="panel dashboard-section"
+              id="recent-activity-panel"
+              style="background: transparent; box-shadow: none; padding: 0;">
         <h2>Recent Activity</h2>
         <p class="dashboard-note" id="recent-sales-status">
-          Loading recent mints...
+          Loading recent sales...
         </p>
+
         <div class="recent_sales" id="recent-sales"></div>
+
+        <button id="load-more-activity" class="btn secondary" type="button">
+          Load More
+        </button>
       </section>
+
 
       <!-- Owned Frogs (hidden until wallet connects) -->
       <section class="panel dashboard-section" id="owned-panel" style="display:none; background: transparent; box-shadow: none; padding: 0px;">

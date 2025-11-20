@@ -907,3 +907,15 @@ ease-out;
   filter: brightness(1.1);
   z-index: 5;
 }
+/* Header nav: active state for view tabs */
+.nav a[data-view] {
+  cursor: pointer;
+}
+
+.nav a.active {
+  color: darkcyan;
+}
+
+.nav a.active::after {
+  width: 80%;
+}
