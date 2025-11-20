@@ -857,50 +857,35 @@ async function renderOwnedAndStakedFrogs(address) {
           .toString(36)
           .slice(2, 8)}`;
 
-          const actionHtml = `
-            <div class="frog-actions">
-              <button
-                type="button"
-                class="sale_link_btn actions-toggle"
-                onclick="ffToggleActionsMenu('${actionsMenuId}')"
-              >
-                Actions ▾
-              </button>
-              <div id="${actionsMenuId}" class="actions-menu">
-                <button
-                  type="button"
-                  class="actions-menu-item"
-                  onclick="ffStakeFrog(${tokenId})"
-                >
-                  Stake
-                </button>
-                <button
-                  type="button"
-                  class="actions-menu-item"
-                  onclick="ffTransferFrog(${tokenId})"
-                >
-                  Transfer
-                </button>
-                <a
-                  class="actions-menu-item"
-                  href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View on OpenSea
-                </a>
-                <a
-                  class="actions-menu-item"
-                  href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View on Etherscan
-                </a>
-              </div>
-            </div>
-          `;
-
+        // Owned frogs: Stake + Transfer + external links
+        const actionHtml = `
+          <div class="recent_sale_links">
+            <button class="sale_link_btn" onclick="ffStakeFrog(${tokenId})">
+              Stake
+            </button>
+            <button class="sale_link_btn" onclick="ffTransferFrog(${tokenId})">
+              Transfer
+            </button>
+          </div>
+          <div class="recent_sale_links">
+            <a
+              class="sale_link_btn opensea"
+              href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              OpenSea
+            </a>
+            <a
+              class="sale_link_btn etherscan"
+              href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Etherscan
+            </a>
+          </div>
+        `;
 
         const card = createFrogCard({
           tokenId,
@@ -945,12 +930,30 @@ async function renderOwnedAndStakedFrogs(address) {
           </div>
         `;
 
-        // Staked frogs: ONLY Unstake button
+        // Staked frogs: Unstake + external links
         const actionHtml = `
           <div class="recent_sale_links">
             <button class="sale_link_btn" onclick="ffUnstakeFrog(${tokenId})">
               Unstake
             </button>
+          </div>
+          <div class="recent_sale_links">
+            <a
+              class="sale_link_btn opensea"
+              href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              OpenSea
+            </a>
+            <a
+              class="sale_link_btn etherscan"
+              href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Etherscan
+            </a>
           </div>
         `;
 
