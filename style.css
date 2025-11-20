@@ -257,7 +257,8 @@ padding: 0.55rem 1.2rem;
   font-size: 1rem;
   margin-top: 0;
   margin-bottom: 0.4rem;
-  color: lightgreen;
+  color: white;
+  text-shadow: 2px 2px darkslateblue;
 }
 
 .panel p {
