@@ -219,13 +219,31 @@ padding: 0.55rem 1.2rem;
 
 /* MAIN – STACKED PANELS */
 
+/* MAIN – TWO COLUMN LAYOUT (LEFT CONTENT + RIGHT DASHBOARD) */
 .layout-main {
   display: grid;
   gap: 1.2rem;
   padding: 0.6rem 0 1.6rem;
-  max-width: 780px;
+  max-width: 1120px;              /* use full page width */
   margin: 0 auto;
+  grid-template-columns: minmax(0, 3fr) minmax(260px, 1.4fr);
+  align-items: flex-start;
 }
+
+/* Left column panels (minting + staking info) */
+.layout-main > .panel:not(.sidebar) {
+  grid-column: 1 / 2;
+}
+
+/* Right column sidebar (User Dashboard) */
+.layout-main > .panel.sidebar {
+  grid-column: 2 / 3;
+  grid-row: 1 / span 3;           /* run alongside both panels */
+  position: sticky;
+  top: 4.5rem;                    /* sits under the sticky header */
+  align-self: flex-start;
+}
+
 
 .panel {
     background: rgba(15, 23, 42, 0.96);
@@ -354,15 +372,30 @@ padding: 0.55rem 1.2rem;
   height: 256px;
 }
 .recent_sales {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    justify-content: center;
-    gap: 24px;
-    margin: 0 auto;
-    width: 100%;
-    max-width: 960px;
-    padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)); /* max 3 frogs per row */
+  gap: 24px;
+  margin: 0 auto 2rem 0;           /* align with left column, little bottom space */
+  width: 100%;
+  max-width: 780px;                /* match main panel width */
+  padding: 0;
 }
+
+/* Responsive: collapse to 2 or 1 columns on smaller screens */
+@media (max-width: 960px) {
+  .recent_sales {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 100%;
+    margin: 0 auto 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .recent_sales {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 
 .recent_sale_card {
     display: inline-block;
@@ -532,4 +565,109 @@ margin: 24px auto;
 
 .rarity_unknown {
   opacity: 0.7;
+}
+/* RECENT SALE – LINK BUTTONS */
+
+.recent_sale_links {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 8px;
+  margin-top: 10px;
+}
+
+.sale_link_btn {
+  flex: 1 1 0;
+  text-align: center;
+  font-size: 0.74rem;
+  padding: 4px 6px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+  border: 1px solid rgba(148, 163, 184, 0.8);
+  background: rgba(15, 23, 42, 0.9);
+  color: #e5e7eb;
+  cursor: pointer;
+}
+
+.sale_link_btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.sale_link_btn.opensea {
+  border-color: #2081e2;
+}
+
+.sale_link_btn.etherscan {
+  border-color: #10b981;
+}
+/* DASHBOARD PAGE LAYOUT */
+
+.dashboard-main {
+  display: grid;
+  gap: 1.2rem;
+  padding: 0.6rem 0 1.6rem;
+  max-width: 1120px;
+  margin: 0 auto;
+  grid-template-columns: minmax(0, 3fr) minmax(260px, 1.4fr);
+  align-items: flex-start;
+}
+
+.dashboard-main .dashboard-section {
+  grid-column: 1 / 2;
+}
+
+.dashboard-main .dashboard-sidebar {
+  grid-column: 2 / 3;
+  grid-row: 1 / span 3;
+  position: sticky;
+  top: 4.5rem;
+  align-self: flex-start;
+}
+
+.dashboard-note {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  margin-bottom: 0.6rem;
+}
+
+.nft-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 0.4rem;
+}
+
+.dashboard-empty {
+  grid-column: 1 / -1;
+  font-size: 0.8rem;
+  color: #9ca3af;
+  padding: 0.4rem 0;
+}
+
+/* Reuse recent_sale_card style for owned / staked NFTs */
+.nft-grid .recent_sale_card {
+  max-width: none;
+  width: 100%;
+}
+
+@media (max-width: 960px) {
+  .dashboard-main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dashboard-main .dashboard-sidebar {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    position: static;
+  }
+  .nft-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .nft-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
