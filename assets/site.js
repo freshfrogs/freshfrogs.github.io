@@ -313,34 +313,54 @@ function createFrogCard({
 
   const traitsHtml = buildTraitsHtml(metadata);
 
-  // Unique container ID for this frog's layered image
-  const containerId = `frog-layer-${tokenId}-${Math.random().toString(36).slice(2)}`;
+  // Unique container id for layering into this card
+  const imgContainerId = `frog-img-${tokenId}-${Math.random().toString(16).slice(2)}`;
 
   const card = document.createElement('div');
   card.className = 'recent_sale_card';
+  card.dataset.tokenId = tokenId;
+  card.dataset.imgContainerId = imgContainerId;
+
   card.innerHTML = `
-      <strong class="sale_card_title">${headerLeft || ''}</strong>
-      <strong class="sale_card_price">${headerRight || ''}</strong>
-      <div style="clear: both;"></div>
+    <strong class="sale_card_title">${headerLeft || ''}</strong>
+    <strong class="sale_card_price">${headerRight || ''}</strong>
+    <div style="clear: both;"></div>
 
-      <div class="frog_img_cont" id="${containerId}"></div>
+    <!-- Frog image / layered attributes container -->
+    <div id="${imgContainerId}" class="frog_img_cont">
+      <!-- base image is set from JS; this <img> is a safety fallback -->
+      <img
+        src="https://freshfrogs.github.io/frog/${tokenId}.png"
+        class="recent_sale_img"
+        alt="Frog #${tokenId}"
+        loading="lazy"
+      />
+    </div>
 
-      <div class="recent_sale_traits">
-        <strong class="sale_card_title">${frogName}</strong>
-        <strong class="sale_card_price ${rarityClass}">${rarityText}</strong><br>
-        <div class="recent_sale_properties">
-          ${traitsHtml}
-        </div>
-        ${footerHtml || ''}
-        ${actionHtml || ''}
+    <!-- ACTION BUTTONS: now directly under the image -->
+    ${actionHtml || ''}
+
+    <!-- Traits / text area -->
+    <div class="recent_sale_traits">
+      <strong class="sale_card_title">${frogName}</strong>
+      <strong class="sale_card_price ${rarityClass}">${rarityText}</strong><br>
+      <div class="recent_sale_properties">
+        ${traitsHtml}
       </div>
-    `;
+      ${footerHtml || ''}
+    </div>
+  `;
 
-  // Build layered frog art + wire hover behavior
-  ffBuildLayeredFrogImage(tokenId, containerId, metadata, card);
+  // Build layered frog image (background + trait layers) if helper is available
+  if (typeof ffBuildLayeredFrogImage === 'function') {
+    ffBuildLayeredFrogImage(tokenId, imgContainerId).catch((err) => {
+      console.warn('ffBuildLayeredFrogImage failed for token', tokenId, err);
+    });
+  }
 
   return card;
 }
+
 
 function ffWireTraitHover(card) {
   if (!card) return;
