@@ -394,9 +394,8 @@ a {
   width: 128px;
   height: 128px;
   overflow: hidden;
-  border-radius: 5px;
+  border-radius: 0px;
   box-shadow: 2px 2px darkslateblue;
-
   background-color: #020617;
   background-repeat: no-repeat;
   background-size: 220% 220%;
@@ -694,7 +693,7 @@ a {
   background: lightseagreen;
   padding: 8px;
   box-shadow: 2px 2px darkslateblue;
-  max-width: 260px;      /* 🔹 cap width so cards aren't too fat */
+  max-width: 240px;      /* 🔹 cap width so cards aren't too fat */
   width: 100%;
   border-radius: 0px;
   margin: 8px auto;      /* 🔹 center inside grid cell */
