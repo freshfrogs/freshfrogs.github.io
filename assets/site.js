@@ -1146,7 +1146,6 @@ function ffInitWalletOnLoad() {
   ffSetText('dashboard-username', 'Not connected');
 }
 
-
 // Convert roman numerals from stakingValues() into normal numbers
 function ffRomanToArabic(roman) {
   if (!roman) return null;
