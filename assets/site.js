@@ -12,7 +12,7 @@ const FF_ALCHEMY_CORE_BASE  = `https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY
 const FF_ACTIVITY_MODE      = 'sales'; // 'mints' or 'sales' for the bottom grid
 const FF_SHOW_STAKING_STATS_ON_SALES = true;
 const ZERO_ADDRESS          = '0x0000000000000000000000000000000000000000';
-let FF_RECENT_LIMIT = 6;
+let FF_RECENT_LIMIT = 100;
 
 // ------------------------
 // Entry
