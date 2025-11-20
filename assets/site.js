@@ -9,16 +9,17 @@ const FF_ALCHEMY_API_KEY    = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
 const FF_OPENSEA_API_KEY    = '48ffee972fc245fa965ecfe902b02ab4'; // optional
 const FF_ALCHEMY_NFT_BASE   = `https://eth-mainnet.g.alchemy.com/nft/v3/${FF_ALCHEMY_API_KEY}`;
 const FF_ALCHEMY_CORE_BASE  = `https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY_API_KEY}`;
-let FF_ACTIVITY_MODE      = 'sales'; // 'mints' or 'sales' for the bottom grid
-const FF_SHOW_STAKING_STATS_ON_SALES = true; // show staking info everywhere we can
+let FF_ACTIVITY_MODE      = 'sales'; // 'sales' or 'mints'
+const FF_SHOW_STAKING_STATS_ON_SALES = true; // show staking stats wherever possible
+const ZERO_ADDRESS          = '0x0000000000000000000000000000000000000000';
 
-// 50 at a time for all grids with Load More
+// how many frogs we show per "page"
 let FF_RECENT_LIMIT = 50; // sales / mints
-let FF_RARITY_LIMIT = 50; // rarity rankings
-let FF_POND_LIMIT   = 50; // pond (all staked frogs)
+let FF_RARITY_LIMIT = 50; // rarity
+let FF_POND_LIMIT   = 50; // pond
 
-// current top-level view: 'sales' | 'collection' | 'rarity' | 'wallet' | 'pond'
-let ffCurrentView = 'sales';
+// current view: 'collection' | 'rarity' | 'pond' | 'wallet' | null
+let ffCurrentView   = null;
 
 
 // ------------------------

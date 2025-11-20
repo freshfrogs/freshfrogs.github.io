@@ -375,20 +375,19 @@ padding: 0.55rem 1.2rem;
 }
 .recent_sales {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr)); /* max 3 frogs per row */
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 24px;
-  margin: 0 auto 2rem 0;           /* align with left column, little bottom space */
+  margin: 0 auto 2rem;
   width: 100%;
-  max-width: 780px;                /* match main panel width */
+  max-width: 100%;
   padding: 0;
 }
 
-/* Responsive: collapse to 2 or 1 columns on smaller screens */
+/* Responsive tweaks are basically handled by auto-fit now,
+   but you can keep these or remove them; they’re harmless. */
 @media (max-width: 960px) {
   .recent_sales {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    max-width: 100%;
-    margin: 0 auto 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   }
 }
 
@@ -398,17 +397,16 @@ padding: 0.55rem 1.2rem;
   }
 }
 
-
 .recent_sale_card {
-     display: inline-block;
-    background: lightseagreen;
-    padding: 8px;
-    box-shadow: 2px 2px darkslateblue;
-    width: 100%;
-    border-radius: 0px;
-    max-width: 248px;
-    margin: 8px auto;
+  display: block;
+  background: lightseagreen;
+  padding: 8px;
+  box-shadow: 2px 2px darkslateblue;
+  width: 100%;
+  border-radius: 0px;
+  margin: 8px 0;
 }
+
 
 .sale_card_title {
     float: left;
@@ -657,14 +655,15 @@ display: block;
 /* DASHBOARD PAGE LAYOUT */
 
 .dashboard-main {
-  display: grid;
-  gap: 1.2rem;
+  display: block; /* single column layout so frogs can use full width */
   padding: 0.6rem 0 1.6rem;
   max-width: 1120px;
   margin: 0 auto;
-  grid-template-columns: minmax(0, 3fr) minmax(260px, 1.4fr);
-  align-items: flex-start;
 }
+.dashboard-main .dashboard-sidebar {
+  display: none;
+}
+
 
 .dashboard-main .dashboard-section {
     background: lightseagreen;
