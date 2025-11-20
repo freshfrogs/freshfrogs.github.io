@@ -7,25 +7,29 @@ const FF_COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const FF_CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 const FF_ALCHEMY_API_KEY    = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
 const FF_OPENSEA_API_KEY    = '48ffee972fc245fa965ecfe902b02ab4'; // optional
-
 const FF_ALCHEMY_NFT_BASE   = `https://eth-mainnet.g.alchemy.com/nft/v3/${FF_ALCHEMY_API_KEY}`;
 const FF_ALCHEMY_CORE_BASE  = `https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY_API_KEY}`;
-
-const FF_ACTIVITY_MODE      = 'mints'; // 'mints' or 'sales' for the bottom grid
-
-// Toggle: annotate recent sales with staking stats
+const FF_ACTIVITY_MODE      = 'sales'; // 'mints' or 'sales' for the bottom grid
 const FF_SHOW_STAKING_STATS_ON_SALES = false;
-
 const ZERO_ADDRESS          = '0x0000000000000000000000000000000000000000';
-
+let FF_RECENT_LIMIT = 6;
 
 // ------------------------
 // Entry
 // ------------------------
 document.addEventListener('DOMContentLoaded', () => {
-  loadRecentActivity();   // bottom recent cards
-  ffInitWalletOnLoad();   // auto-detect wallet + wire buttons
+  loadRecentActivity();   // initial batch
+  ffInitWalletOnLoad();   // just sets UI to disconnected, no auto-connect
+
+  const loadMoreBtn = document.getElementById('load-more-sales');
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', () => {
+      FF_RECENT_LIMIT += 6;      // next batch size
+      loadRecentActivity();      // reload grid with more items
+    });
+  }
 });
+
 
 // ------------------------
 // Recent activity loader (bottom grid)
@@ -49,8 +53,8 @@ async function loadRecentActivity() {
   try {
     const items =
       FF_ACTIVITY_MODE === 'mints'
-        ? await fetchRecentMints(6)
-        : await fetchRecentSales(6);
+        ? await fetchRecentMints(FF_RECENT_LIMIT)
+        : await fetchRecentSales(FF_RECENT_LIMIT);
 
     if (!items.length) {
       if (statusEl) {
@@ -63,6 +67,9 @@ async function loadRecentActivity() {
     }
 
     if (statusEl) statusEl.textContent = '';
+
+    // Rebuild the grid from scratch each time so "Load more" just shows more rows
+    container.innerHTML = '';
 
     for (const item of items) {
       const rawTokenId =
@@ -100,6 +107,8 @@ async function loadRecentActivity() {
 
       const headerLeft = truncateAddress(ownerAddress);
 
+      const footerHtml = '';
+
       const actionHtml = `
         <div class="recent_sale_links">
           <a
@@ -126,13 +135,19 @@ async function loadRecentActivity() {
         metadata,
         headerLeft,
         headerRight,
-        actionHtml
+        actionHtml     // show OpenSea / Etherscan on recent sales
       });
 
-      // Optional: if enabled, annotate sale cards with staking stats
+      container.appendChild(card);
+
+      // Optional staking stats on recent-sales cards
       ffAnnotateSaleWithStaking(card, tokenId);
 
-      container.appendChild(card);
+      // Build layered frog image
+      if (card.dataset.imgContainerId) {
+        ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
+      }
+
     }
   } catch (err) {
     console.error('Unable to load recent activity', err);
@@ -146,7 +161,7 @@ async function loadRecentActivity() {
 // Optional: annotate a recent-sale card with staking stats
 async function ffAnnotateSaleWithStaking(card, tokenId) {
   // If toggle is off, do nothing
-  if (!FF_SHOW_STAKING_STATS_ON_SALES) { return; }
+  if (!FF_SHOW_STAKING_STATS_ON_SALES) { return };
 
   // Need legacy helpers loaded from ethereum-dapp.js
   if (typeof stakingValues !== 'function') {
@@ -171,7 +186,7 @@ async function ffAnnotateSaleWithStaking(card, tokenId) {
     const wrapper = document.createElement('div');
     wrapper.className = 'staking-sale-stats';
     wrapper.innerHTML = `
-      <div><strong>Lvl. ${levelNum}</strong></div>
+      <div><strong>Staked Lvl. ${levelNum}</strong> • ${Math.round(flyzEarned)} FLYZ earned</div>
       <div>Staked ${stakedDays}d ago • Since ${stakedDate}</div>
     `;
 
@@ -183,6 +198,9 @@ async function ffAnnotateSaleWithStaking(card, tokenId) {
 
 
 
+// ------------------------
+// Token / rarity helpers
+// ------------------------
 // ------------------------
 // Token / rarity helpers
 // ------------------------
@@ -272,6 +290,7 @@ function buildRarityLookup(rankings) {
   return lookup;
 }
 
+
 // ------------------------
 // Card rendering (shared for all grids)
 // ------------------------
@@ -294,34 +313,161 @@ function createFrogCard({
 
   const traitsHtml = buildTraitsHtml(metadata);
 
+  // Unique container id for layering into this card
+  const imgContainerId = `frog-img-${tokenId}-${Math.random().toString(16).slice(2)}`;
+
   const card = document.createElement('div');
   card.className = 'recent_sale_card';
-  const containerId = `frog-img-${tokenId}-${Math.random().toString(16).slice(2)}`;
+  card.dataset.tokenId = tokenId;
+  card.dataset.imgContainerId = imgContainerId;
 
   card.innerHTML = `
-      <strong class="sale_card_title">${headerLeft || ''}</strong>
-      <strong class="sale_card_price">${headerRight || ''}</strong>
-      <div style="clear: both;"></div>
+    <strong class="sale_card_title">${headerLeft || ''}</strong>
+    <strong class="sale_card_price">${headerRight || ''}</strong>
+    <div style="clear: both;"></div>
 
-      <div class="frog_img_cont" id="${containerId}"></div>
+    <!-- Frog image / layered attributes container -->
+    <div id="${imgContainerId}" class="frog_img_cont">
+      <!-- base image is set from JS; this <img> is a safety fallback -->
+      <img
+        src="https://freshfrogs.github.io/frog/${tokenId}.png"
+        class="recent_sale_img"
+        alt="Frog #${tokenId}"
+        loading="lazy"
+      />
+    </div>
 
-      ${actionHtml || ''}
+    <!-- ACTION BUTTONS: now directly under the image -->
+    ${actionHtml || ''}
 
-      <div class="recent_sale_traits">
-        <strong class="sale_card_title">${frogName}</strong>
-        <strong class="sale_card_price ${rarityClass}">${rarityText}</strong><br>
-        <div class="recent_sale_properties">
-          ${traitsHtml}
-        </div>
-        ${footerHtml || ''}
+    <!-- Traits / text area -->
+    <div class="recent_sale_traits">
+      <strong class="sale_card_title">${frogName}</strong>
+      <strong class="sale_card_price ${rarityClass}">${rarityText}</strong><br>
+      <div class="recent_sale_properties">
+        ${traitsHtml}
       </div>
-    `;
+      ${footerHtml || ''}
+    </div>
+  `;
 
-  // Build layered frog art + enable hover linking of traits <-> overlays
-  ffBuildLayeredFrogImage(tokenId, containerId, metadata, card);
+  // Build layered frog image (background + trait layers) if helper is available
+  if (typeof ffBuildLayeredFrogImage === 'function') {
+    ffBuildLayeredFrogImage(tokenId, imgContainerId).catch((err) => {
+      console.warn('ffBuildLayeredFrogImage failed for token', tokenId, err);
+    });
+  }
 
   return card;
 }
+
+
+function ffWireTraitHover(card) {
+  if (!card) return;
+
+  const textNodes = card.querySelectorAll('.frog-attr-text');
+  const overlayNodes = card.querySelectorAll('.trait_overlay, .attribute_overlay');
+
+  if (!textNodes.length || !overlayNodes.length) return;
+
+  function key(type, value) {
+    return `${String(type || '').toLowerCase()}::${String(value || '').toLowerCase()}`;
+  }
+
+  // Map each (type, value) -> overlay elements
+  const overlaysByKey = new Map();
+  overlayNodes.forEach((img) => {
+    const t = img.dataset.traitType;
+    const v = img.dataset.traitValue;
+    if (!t || v == null) return;
+    const k = key(t, v);
+    if (!overlaysByKey.has(k)) overlaysByKey.set(k, []);
+    overlaysByKey.get(k).push(img);
+  });
+
+  function setHighlight(k, on) {
+    const overlays = overlaysByKey.get(k) || [];
+    const texts = Array.from(textNodes).filter((p) => {
+      const t = p.dataset.traitType;
+      const v = p.dataset.traitValue;
+      return key(t, v) === k;
+    });
+
+    overlays.forEach((el) => el.classList.toggle('is-highlighted', on));
+    texts.forEach((el) => el.classList.toggle('is-highlighted', on));
+  }
+
+  // Hovering text highlights matching layers
+  textNodes.forEach((p) => {
+    const k = key(p.dataset.traitType, p.dataset.traitValue);
+    if (!k) return;
+    p.addEventListener('mouseenter', () => setHighlight(k, true));
+    p.addEventListener('mouseleave', () => setHighlight(k, false));
+  });
+
+  // Hovering a layer highlights matching text
+  overlayNodes.forEach((img) => {
+    const k = key(img.dataset.traitType, img.dataset.traitValue);
+    if (!k) return;
+    img.addEventListener('mouseenter', () => setHighlight(k, true));
+    img.addEventListener('mouseleave', () => setHighlight(k, false));
+  });
+}
+
+
+// Build layered frog image using /frog/json/<id>.json + build_trait()
+// Always uses GitHub metadata so trait order is exactly as stored there.
+// Build the layered frog using metadata from /frog/json/ and build_trait()
+async function ffBuildLayeredFrogImage(tokenId, containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  try {
+    // Use the original frog PNG as a background color swatch
+    const baseUrl = `https://freshfrogs.github.io/frog/${tokenId}.png`;
+    container.style.backgroundImage    = `url("${baseUrl}")`;
+    container.style.backgroundRepeat   = 'no-repeat';
+    container.style.backgroundSize     = '220%';       // zoom in
+    container.style.backgroundPosition = 'bottom right'; // only show the color block
+
+    container.innerHTML = ''; // clear any previous content
+
+    // Fall back to simple base image if SOURCE_PATH or build_trait not available
+    if (typeof SOURCE_PATH === 'undefined' || typeof build_trait !== 'function') {
+      const img = document.createElement('img');
+      img.src = baseUrl;
+      img.alt = `Frog #${tokenId}`;
+      img.className = 'recent_sale_img';
+      img.loading = 'lazy';
+      container.appendChild(img);
+      return;
+    }
+
+    // Fetch metadata from GitHub (in the order it is written)
+    const metadataUrl = `${SOURCE_PATH}/frog/json/${tokenId}.json`;
+    const metadata = await (await fetch(metadataUrl)).json();
+    const attrs = Array.isArray(metadata.attributes) ? metadata.attributes : [];
+
+    // Layer each attribute in the order defined in metadata
+    for (let i = 0; i < attrs.length; i++) {
+      const attr = attrs[i];
+      if (!attr || !attr.trait_type || !attr.value) continue;
+      build_trait(attr.trait_type, attr.value, containerId);
+    }
+  } catch (err) {
+    console.warn('ffBuildLayeredFrogImage error for token', tokenId, err);
+
+    // Hard fallback: simple PNG if anything blows up
+    container.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = `https://freshfrogs.github.io/frog/${tokenId}.png`;
+    img.alt = `Frog #${tokenId}`;
+    img.className = 'recent_sale_img';
+    img.loading = 'lazy';
+    container.appendChild(img);
+  }
+}
+
 
 function getRarityTier(rank) {
   if (!rank) return null;
@@ -331,176 +477,80 @@ function getRarityTier(rank) {
   return { label: 'Common', className: 'rarity_common' };
 }
 
+function ffEscapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+
 function buildTraitsHtml(metadata) {
   const attributes = Array.isArray(metadata && metadata.attributes)
     ? metadata.attributes
     : [];
 
-  const frogTrait = attributes.find(
-    (attr) => attr.trait_type === 'Frog' || attr.trait_type === 'SpecialFrog'
-  );
+  if (!attributes.length) {
+    return '<p class="frog-attr-text">Metadata unavailable</p>';
+  }
 
-  const traitText = [
-    frogTrait ? `Frog: ${frogTrait.value}` : null,
-    ...attributes
-      .filter((attr) => attr !== frogTrait)
-      .slice(0, 2)
-      .map((attr) => `${attr.trait_type}: ${attr.value}`)
-  ].filter(Boolean);
+  const lines = attributes.map((attr) => {
+    if (!attr || !attr.trait_type) return '';
+    const type  = String(attr.trait_type);
+    const value = attr.value != null ? String(attr.value) : '';
 
-  const traits = traitText.length ? traitText : ['Metadata unavailable'];
+    return `
+      <p
+        class="frog-attr-text"
+        data-trait-type="${ffEscapeHtml(type)}"
+        data-trait-value="${ffEscapeHtml(value)}"
+      >
+        ${ffEscapeHtml(type)}: ${ffEscapeHtml(value)}
+      </p>
+    `;
+  }).filter(Boolean);
 
-  return traits
-    .map((trait, index) => {
-      const [label, value] = trait.split(':').map((s) => s.trim());
-      const traitType = label.replace('Frog', 'Frog');
-      const traitValue = value;
-
-      return `
-        <p
-          class="frog-attr-text"
-          data-trait-type="${traitType}"
-          data-trait-value="${traitValue}"
-        >
-          ${label}: ${value}
-        </p>
-      `;
-    })
-    .join('');
+  return lines.join('');
 }
 
-// ------------------------
-// Layered frog builder + hover wiring
-// ------------------------
 async function ffBuildLayeredFrogImage(tokenId, containerId, metadata, card) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  // Use original frog PNG as the background, but zoomed and shoved down-right
-  // so we mostly see just the solid background color.
-  const baseUrl = `https://freshfrogs.github.io/frog/${tokenId}.png`;
-  container.style.backgroundImage    = `url(${baseUrl})`;
-  container.style.backgroundRepeat   = 'no-repeat';
-  container.style.backgroundSize     = '320% 320%';
-  container.style.backgroundPosition = 'bottom right';
-
-  // Clear any existing children (just in case)
+  // Clear anything inside (like a placeholder)
   container.innerHTML = '';
 
-  // Pull full metadata from GitHub (authoritative)
+  // Base PNG as background, zoomed and offset so only background color shows
+  const baseUrl = (typeof SOURCE_PATH !== 'undefined'
+    ? `${SOURCE_PATH}/frog/${tokenId}.png`
+    : `https://freshfrogs.github.io/frog/${tokenId}.png`);
+
+  container.style.backgroundImage    = `url(${baseUrl})`;
+  container.style.backgroundRepeat   = 'no-repeat';
+  container.style.backgroundSize     = '220% 220%';
+  container.style.backgroundPosition = 'bottom right';
+
+  // Use given metadata if possible; otherwise fetch it
   let meta = metadata;
-  if (!hasUsableMetadata(meta)) {
+  if (!meta || !Array.isArray(meta.attributes)) {
     meta = await fetchFrogMetadata(tokenId);
   }
-  const attributes = Array.isArray(meta && meta.attributes)
-    ? meta.attributes
-    : [];
+  const attrs = Array.isArray(meta.attributes) ? meta.attributes : [];
 
-  // Layer attributes in the order they appear in metadata
-  for (const attr of attributes) {
-    const traitType  = attr.trait_type;
-    const traitValue = attr.value;
-    if (!traitType || traitValue == null) continue;
-
-    const img = document.createElement('img');
-
-    // Match legacy layering rules
-    if (traitType === 'Trait' || traitType === 'Frog' || traitType === 'SpecialFrog') {
-      img.className = 'trait_overlay';
-    } else {
-      img.className = 'attribute_overlay';
-    }
-
-    img.dataset.traitType  = traitType;
-    img.dataset.traitValue = traitValue;
-
-    img.src = `https://freshfrogs.github.io/frog/build_files/${traitType}/${traitValue}.png`;
-    img.alt = `${traitType}: ${traitValue}`;
-    container.appendChild(img);
+  // Layer all attributes in the order they appear in metadata
+  for (const attr of attrs) {
+    if (!attr || !attr.trait_type || attr.value == null) continue;
+    build_trait(attr.trait_type, attr.value, containerId);
   }
 
-  // Wire hover between text + overlays
-  ffWireTraitHover(card);
-}
-
-// Link up .frog-attr-text <-> layered images
-function ffWireTraitHover(card) {
-  if (!card) return;
-
-  // Text nodes in properties block
-  const textNodes = Array.from(
-    card.querySelectorAll('.recent_sale_properties .frog-attr-text')
-  );
-
-  // All layered images for this card
-  const overlayNodes = Array.from(
-    card.querySelectorAll('.frog_img_cont .trait_overlay, .frog_img_cont .attribute_overlay')
-  );
-
-  if (!textNodes.length || !overlayNodes.length) return;
-
-  const key = (t, v) => `${String(t || '').toLowerCase()}::${String(v || '')}`;
-
-  // Map: trait key -> overlays (skip base frog / specialfrog)
-  const overlaysByKey = new Map();
-  overlayNodes.forEach((img) => {
-    const tRaw = img.dataset.traitType;
-    const v = img.dataset.traitValue;
-    if (!tRaw || v == null) return;
-    const t = String(tRaw).toLowerCase();
-    // Do not hover-highlight the base frog layer itself
-    if (t === 'frog' || t === 'specialfrog') return;
-    const k = key(t, v);
-    if (!overlaysByKey.has(k)) overlaysByKey.set(k, []);
-    overlaysByKey.get(k).push(img);
-  });
-
-  // Map: trait key -> text nodes
-  const textByKey = new Map();
-  textNodes.forEach((p) => {
-    const t = p.dataset.traitType;
-    const v = p.dataset.traitValue;
-    if (!t || v == null) return;
-    const k = key(t, v);
-    if (!textByKey.has(k)) textByKey.set(k, []);
-    textByKey.get(k).push(p);
-  });
-
-  // Helper: apply/remove highlight on both text + overlays
-  function setHighlight(traitKey, shouldHighlight) {
-    const overlays = overlaysByKey.get(traitKey) || [];
-    const texts    = textByKey.get(traitKey)   || [];
-
-    overlays.forEach((img) => {
-      img.classList.toggle('is-popped', shouldHighlight);
-      img.classList.toggle('is-highlighted', shouldHighlight);
-    });
-
-    texts.forEach((p) => {
-      p.classList.toggle('is-highlighted', shouldHighlight);
-    });
+  // Wire hover link between trait text and overlays
+  if (card && attrs.length) {
+    ffWireTraitHover(card);
   }
-
-  // Hovering text highlights overlays
-  textNodes.forEach((p) => {
-    const t = p.dataset.traitType;
-    const v = p.dataset.traitValue;
-    if (!t || v == null) return;
-    const k = key(t, v);
-    p.addEventListener('mouseenter', () => setHighlight(k, true));
-    p.addEventListener('mouseleave', () => setHighlight(k, false));
-  });
-
-  // Hovering a layer highlights matching text (except base frog / special frog)
-  overlayNodes.forEach((img) => {
-    const t = String(img.dataset.traitType || '').toLowerCase();
-    if (t === 'frog' || t === 'specialfrog') return;
-    const k = key(t, img.dataset.traitValue);
-    if (!k) return;
-    img.addEventListener('mouseenter', () => setHighlight(k, true));
-    img.addEventListener('mouseleave', () => setHighlight(k, false));
-  });
 }
+
 
 // ------------------------
 // Activity fetchers (mints/sales)
@@ -508,7 +558,7 @@ function ffWireTraitHover(card) {
 async function fetchRecentSales(limit = 24) {
   const params = new URLSearchParams({
     contractAddress: FF_COLLECTION_ADDRESS,
-    order: 'desc',
+    order: 'asc',
     limit: String(limit)
   });
 
@@ -764,7 +814,7 @@ async function renderOwnedAndStakedFrogs(address) {
   const stakedGrid   = document.getElementById('staked-frogs-grid');
   const stakedStatus = document.getElementById('staked-frogs-status');
 
-  // On dashboard page, swap out "recent sales" and show owned/staked instead
+  // NEW: on dashboard page, swap out "recent sales" and show owned/staked instead
   const recentPanel = document.getElementById('recent-activity-panel');
   const ownedPanel  = document.getElementById('owned-panel');
   const stakedPanel = document.getElementById('staked-panel');
@@ -801,6 +851,11 @@ async function renderOwnedAndStakedFrogs(address) {
         if (!hasUsableMetadata(metadata)) {
           metadata = await fetchFrogMetadata(tokenId);
         }
+
+        // Owned frogs: single "Actions" button with dropdown menu
+        const actionsMenuId = `frog-actions-${tokenId}-${Math.random()
+          .toString(36)
+          .slice(2, 8)}`;
 
         // Owned frogs: Stake + Transfer + external links
         const actionHtml = `
@@ -841,6 +896,11 @@ async function renderOwnedAndStakedFrogs(address) {
         });
 
         ownedGrid.appendChild(card);
+
+        if (card.dataset.imgContainerId) {
+          ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
+        }
+
       }
     }
 
@@ -855,11 +915,10 @@ async function renderOwnedAndStakedFrogs(address) {
       for (const tokenId of stakedIds) {
         let metadata = await fetchFrogMetadata(tokenId);
 
-        // Staking footer: Lvl., date, progress bar
         const footerHtml = `
           <div class="stake-meta">
             <div class="stake-meta-row">
-              <span id="stake-level-${tokenId}" class="stake-level-label">Lvl. —</span>
+              <span id="stake-level-${tokenId}" class="stake-level-label">Staked Lvl. —</span>
             </div>
             <div class="stake-meta-row stake-meta-subrow">
               <span id="stake-date-${tokenId}">Staked: —</span>
@@ -909,8 +968,13 @@ async function renderOwnedAndStakedFrogs(address) {
 
         stakedGrid.appendChild(card);
 
-        // Fill staking info (Lvl., progress)
+        if (card.dataset.imgContainerId) {
+          ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
+        }
+
+        // Fill staking info (Lvl., rewards, progress)
         ffDecorateStakedFrogCard(tokenId);
+
       }
     }
   } catch (err) {
@@ -934,18 +998,22 @@ async function ffDecorateStakedFrogCard(tokenId) {
 
     const [stakedDays, stakedLevel, daysToNext, flyzEarned, stakedDate] = values;
 
+    // Always show numeric level, even if stakingValues() returns roman numerals
+    const levelNum = ffRomanToArabic(stakedLevel) ?? stakedLevel;
+
     const lvlEl   = document.getElementById(`stake-level-${tokenId}`);
     const dateEl  = document.getElementById(`stake-date-${tokenId}`);
     const nextEl  = document.getElementById(`stake-next-${tokenId}`);
     const barEl   = document.getElementById(`stake-progress-bar-${tokenId}`);
 
-    if (lvlEl)   lvlEl.textContent   = `Lvl. ${ffRomanToArabic(stakedLevel) ?? stakedLevel}`;
-    if (dateEl)  dateEl.textContent  = `Staked: ${stakedDate}`;
-    if (nextEl)  nextEl.textContent  = `Next level in ~${daysToNext} days`;
+    if (lvlEl)  lvlEl.textContent  = `Staked Lvl. ${levelNum}`;
+    if (dateEl) dateEl.textContent = `Staked: ${stakedDate}`;
+    if (nextEl) nextEl.textContent = `Next level in ~${daysToNext} days`;
 
-    const MAX_DAYS = 41.7;
-    const remaining = Math.max(0, Math.min(MAX_DAYS, Number(daysToNext)));
-    const pct = Math.max(0, Math.min(100, ((MAX_DAYS - remaining) / MAX_DAYS) * 100));
+    // Keep the bar itself, but no percentage text anywhere
+    const MAX_DAYS   = 41.7;
+    const remaining  = Math.max(0, Math.min(MAX_DAYS, Number(daysToNext)));
+    const pct        = Math.max(0, Math.min(100, ((MAX_DAYS - remaining) / MAX_DAYS) * 100));
 
     if (barEl) {
       barEl.style.width = `${pct}%`;
@@ -954,6 +1022,7 @@ async function ffDecorateStakedFrogCard(tokenId) {
     console.warn(`ffDecorateStakedFrogCard failed for token ${tokenId}`, err);
   }
 }
+
 
 // ---- Card actions: Stake / Unstake / Transfer ----
 
@@ -1022,6 +1091,24 @@ async function ffTransferFrog(tokenId) {
     alert('Transfer transaction failed. Check console for details.');
   }
 }
+
+function ffToggleActionsMenu(id) {
+  const menu = document.getElementById(id);
+  if (!menu) return;
+
+  const isShown = menu.style.display === 'block';
+
+  // Close other open action menus
+  const allMenus = document.querySelectorAll('.actions-menu');
+  allMenus.forEach((m) => {
+    if (m.id !== id) m.style.display = 'none';
+  });
+
+  menu.style.display = isShown ? 'none' : 'block';
+}
+
+window.ffToggleActionsMenu = ffToggleActionsMenu;
+
 
 // expose for onclick="" handlers
 window.ffStakeFrog    = ffStakeFrog;
@@ -1275,7 +1362,7 @@ async function connectWallet() {
 
     ffApplyDashboardUpdates(address, ownedCount, stakingStats, profile);
 
-    // Render owned & staked frogs in the grids
+    // 🐸 Render owned & staked frogs in the grids
     await renderOwnedAndStakedFrogs(address);
   } catch (err) {
     console.error('Wallet connection failed:', err);
@@ -1288,54 +1375,17 @@ async function connectWallet() {
 window.connectWallet = connectWallet;
 
 // Init wallet on page load (already-connected accounts)
-async function ffInitWalletOnLoad() {
-  if (window.ethereum && window.Web3 && !ffWeb3) {
-    ffWeb3 = new Web3(window.ethereum);
-    window.web3 = ffWeb3;
-
-    try {
-      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-      if (accounts && accounts[0]) {
-        ffCurrentAccount = accounts[0];
-        window.user_address = ffCurrentAccount;
-
-        try {
-          if (typeof COLLECTION_ABI !== 'undefined') {
-            window.collection = new ffWeb3.eth.Contract(
-              COLLECTION_ABI,
-              FF_COLLECTION_ADDRESS
-            );
-          }
-          if (typeof CONTROLLER_ABI !== 'undefined') {
-            window.controller = new ffWeb3.eth.Contract(
-              CONTROLLER_ABI,
-              FF_CONTROLLER_ADDRESS
-            );
-          }
-        } catch (err) {
-          console.warn('Failed to init legacy contracts on load', err);
-        }
-
-        ffUpdateWalletBasicUI(ffCurrentAccount);
-
-        const [ownedCount, stakingStats, profile] = await Promise.all([
-          ffFetchOwnedFrogCount(ffCurrentAccount).catch(() => null),
-          ffFetchStakingStats(ffCurrentAccount).catch(() => null),
-          ffFetchOpenSeaProfile(ffCurrentAccount).catch(() => null)
-        ]);
-
-        ffApplyDashboardUpdates(ffCurrentAccount, ownedCount, stakingStats, profile);
-        await renderOwnedAndStakedFrogs(ffCurrentAccount);
-      }
-    } catch (err) {
-      console.warn('eth_accounts request failed:', err);
-    }
-  }
-
+function ffInitWalletOnLoad() {
+  // Do NOT auto-connect wallet; just wire up the button and show disconnected state
   const btn = document.getElementById('connect-wallet-button');
   if (btn) {
     btn.addEventListener('click', connectWallet);
   }
+
+  // Basic disconnected UI
+  ffSetText('wallet-status-label', 'Disconnected');
+  ffSetText('dashboard-wallet', 'Wallet: —');
+  ffSetText('dashboard-username', 'Not connected');
 }
 
 // Convert roman numerals from stakingValues() into normal numbers
