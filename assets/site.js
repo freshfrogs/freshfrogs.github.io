@@ -118,15 +118,38 @@ async function loadRecentActivity() {
 // ------------------------
 function parseTokenId(raw) {
   if (raw == null) return null;
-  if (typeof raw !== 'string') raw = String(raw);
 
-  if (raw.startsWith('0x') || raw.startsWith('0X')) {
-    const n = parseInt(raw, 16);
-    return Number.isFinite(n) && n >= 0 ? n : null;
+  // Handle numbers directly
+  if (typeof raw === 'number') {
+    if (!Number.isFinite(raw)) return null;
+    const n = Math.floor(raw);
+    // Collection is 1–4040, so anything wildly bigger is clearly wrong
+    if (n < 0 || n > 10000) return null;
+    return n;
   }
 
-  const n = parseInt(raw, 10);
-  return Number.isFinite(n) && n >= 0 ? n : null;
+  // Handle bigint
+  if (typeof raw === 'bigint') {
+    if (raw < 0n || raw > 10000n) return null;
+    return Number(raw);
+  }
+
+  let s = String(raw).trim();
+
+  if (s.startsWith('0x') || s.startsWith('0X')) {
+    const n = parseInt(s, 16);
+    if (!Number.isFinite(n)) return null;
+    if (n < 0 || n > 10000) return null;
+    return n;
+  }
+
+  // Kill scientific notation like "1.37e+48"
+  if (/e\+/i.test(s)) return null;
+
+  const n = parseInt(s, 10);
+  if (!Number.isFinite(n)) return null;
+  if (n < 0 || n > 10000) return null;
+  return n;
 }
 
 function getRarityRank(tokenId) {
@@ -475,8 +498,37 @@ async function ffFetchOwnedFrogs(address) {
   return frogs;
 }
 
-// Get token IDs staked by this address (method names are best guesses)
+// Prefer legacy getStakedTokens() helper (from ethereum-dapp.js) so we decode
+// the struct the same way the old site did.
 async function ffFetchStakedTokenIds(address) {
+  // 1) Try legacy helper first
+  if (typeof getStakedTokens === 'function') {
+    try {
+      const tokens = await getStakedTokens(address);
+      if (Array.isArray(tokens)) {
+        const ids = [];
+        for (const t of tokens) {
+          if (!t) continue;
+
+          // common shapes: { tokenId: '123' } or ['123', createdAt, ...]
+          let rawId;
+          if (typeof t === 'object') {
+            rawId = t.tokenId ?? t.id ?? t[0];
+          } else {
+            rawId = t;
+          }
+
+          const id = parseTokenId(rawId);
+          if (id != null) ids.push(id);
+        }
+        if (ids.length) return ids;
+      }
+    } catch (err) {
+      console.warn('Legacy getStakedTokens() failed; falling back to direct call', err);
+    }
+  }
+
+  // 2) Fallback: direct contract call
   if (!ffWeb3 || typeof CONTROLLER_ABI === 'undefined') {
     console.warn('Web3 or CONTROLLER_ABI missing; staked frogs fetch disabled.');
     return [];
@@ -493,21 +545,33 @@ async function ffFetchStakedTokenIds(address) {
 
   if (!stakedRaw) return [];
 
-  // Expect array-like of IDs
   const result = [];
   if (Array.isArray(stakedRaw)) {
     for (const v of stakedRaw) {
-      const id = parseTokenId(v);
+      if (!v) continue;
+
+      let rawId;
+      if (typeof v === 'object') {
+        rawId = v.tokenId ?? v.id ?? v[0] ?? v.value ?? v;
+      } else {
+        rawId = v;
+      }
+
+      const id = parseTokenId(rawId);
       if (id != null) result.push(id);
     }
   } else {
-    // If it's a single numeric value, not ideal but include it
-    const id = parseTokenId(stakedRaw);
+    const rawId =
+      typeof stakedRaw === 'object' && stakedRaw !== null
+        ? (stakedRaw.tokenId ?? stakedRaw.id ?? stakedRaw[0] ?? stakedRaw)
+        : stakedRaw;
+    const id = parseTokenId(rawId);
     if (id != null) result.push(id);
   }
 
   return result;
 }
+
 
 // Render owned + staked frogs into their grids
 async function renderOwnedAndStakedFrogs(address) {
