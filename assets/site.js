@@ -711,7 +711,7 @@ async function renderOwnedAndStakedFrogs(address) {
         const footerHtml = `
           <div class="stake-meta">
             <div class="stake-meta-row">
-              <span id="stake-level-${tokenId}" class="stake-level-label">Lvl. —</span>
+              <span id="stake-level-${tokenId}" class="stake-level-label">Staked Lvl. —</span>
             </div>
             <div class="stake-meta-row stake-meta-subrow">
               <span id="stake-date-${tokenId}">Staked: —</span>
@@ -776,7 +776,7 @@ async function ffDecorateStakedFrogCard(tokenId) {
     const nextEl  = document.getElementById(`stake-next-${tokenId}`);
     const barEl   = document.getElementById(`stake-progress-bar-${tokenId}`);
 
-    if (lvlEl)  lvlEl.textContent  = `Lvl. ${levelNum}`;
+    if (lvlEl)  lvlEl.textContent  = `Staked Lvl. ${levelNum}`;
     if (dateEl) dateEl.textContent = `Staked: ${stakedDate}`;
     if (nextEl) nextEl.textContent = `Next level in ~${daysToNext} days`;
 
