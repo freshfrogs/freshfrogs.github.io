@@ -11,7 +11,7 @@ const FF_OPENSEA_API_KEY    = '48ffee972fc245fa965ecfe902b02ab4'; // optional
 const FF_ALCHEMY_NFT_BASE   = `https://eth-mainnet.g.alchemy.com/nft/v3/${FF_ALCHEMY_API_KEY}`;
 const FF_ALCHEMY_CORE_BASE  = `https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY_API_KEY}`;
 
-const FF_ACTIVITY_MODE      = 'mints'; // 'mints' or 'sales' for the bottom grid
+const FF_ACTIVITY_MODE      = 'sales'; // 'mints' or 'sales' for the bottom grid
 const ZERO_ADDRESS          = '0x0000000000000000000000000000000000000000';
 
 // ------------------------
