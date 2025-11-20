@@ -2,24 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Fresh Layouts – Template</title>
+  <title>FreshFrogs – Wallet Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../style.css" />
 </head>
 <body class="layout-4">
   <div class="page">
     <!-- HEADER -->
     <header class="site-header">
       <nav class="nav">
-        <a href="#">Home</a>
-        <a href="#">Collection</a>
-        <a href="#">Rarity</a>
-        <a href="#">Wallet</a>
+        <a href="index.html">Home</a>
+        <a href="collection.html">Collection</a>
+        <a href="rarity.html">Rarity</a>
+        <a href="wallet.html">Wallet</a>
       </nav>
       <button class="cta-btn" id="connect-wallet-button">Connect Wallet</button>
     </header>
 
-    <!-- HERO -->
+    <!-- DASHBOARD HERO -->
     <section class="hero">
       <div class="hero-main">
         <div class="hero-media">
@@ -37,28 +37,75 @@
       </div>
     </section>
 
-    <!-- MAIN PANELS -->
-    <main class="layout-main">
-      <section class="panel primary">
+    <!-- MAIN DASHBOARD LAYOUT -->
+    <main class="dashboard-main">
+      <!-- LEFT COLUMN -->
+
+      <!-- Minting / Staking explainer that used to be on the homepage -->
+      <section class="panel dashboard-section">
         <h2>🍃 Minting Information</h2>
-        <p>Mint your own unique FreshFrogs NFT today and join the exclusive collection of one-of-a-kind digital frogs!</p>
-        <br><br>
+        <p>
+          Mint your own unique FreshFrogs NFT today and join the exclusive collection
+          of one-of-a-kind digital frogs!
+        </p>
+        <br /><br />
+
         <h2>📃 Ethereum Smart Contract</h2>
         <p>ERC-721 powered by Factoria, verified and stored on IPFS ✔️</p>
       </section>
-
-      <section class="panel secondary">
+      <section class="panel dashboard-section">
         <h2>📃 FreshFrogsNFT Staking</h2>
-        <p>Stake your FROG(s) to earn exclusive rewards and unlock special benefits, while helping to grow the community and increase the value of your collection!</p>
-        <br><br>
+        <p>
+          Stake your FROG(s) to earn exclusive rewards and unlock special benefits,
+          while helping to grow the community and increase the value of your collection!
+        </p>
+        <br /><br />
         <h2>✍️ Sign Contract Approval</h2>
-        <p>To start staking you must first give the staking contract permission to access your Frogs. This is a one time transaction that requires a gas fee.</p>
-        <br><br>
+        <p>
+          To start staking you must first give the staking contract permission to
+          access your Frogs. This is a one time transaction that requires a gas fee.
+        </p>
+        <br /><br />
         <h2>🍀 The Pond</h2>
-        <p>View all the Frogs staked by the community! Explore, track, and discover rare frogs while unlocking potential rewards!<p>
+        <p>
+          View all the Frogs staked by the community! Explore, track, and discover
+          rare frogs while unlocking potential rewards!
+        </p>
       </section>
 
-      <aside class="panel sidebar">
+      <!-- Recent sales / activity panel (shown by default) -->
+      <section class="panel dashboard-section" id="recent-activity-panel">
+        <h2>Recent Activity</h2>
+        <p class="dashboard-note" id="recent-sales-status">
+          Loading recent mints...
+        </p>
+        <div class="recent_sales" id="recent-sales"></div>
+      </section>
+
+      <!-- Owned Frogs (hidden until wallet connects) -->
+      <section class="panel dashboard-section" id="owned-panel" style="display:none; background: transparent; box-shadow: none;">
+        <h2>Owned Frogs</h2>
+        <p class="dashboard-note" id="owned-frogs-status">
+          These are Frogs currently held in your wallet.
+        </p>
+
+        <div id="owned-frogs-grid" class="nft-grid">
+        </div>
+      </section>
+
+      <!-- Staked Frogs (hidden until wallet connects) -->
+      <section class="panel dashboard-section" id="staked-panel" style="display:none; background: transparent; box-shadow: none;">
+        <h2>Staked Frogs</h2>
+        <p class="dashboard-note" id="staked-frogs-status">
+          These Frogs are staked in the FreshFrogs controller.
+        </p>
+
+        <div id="staked-frogs-grid" class="nft-grid">
+        </div>
+      </section>
+
+      <!-- RIGHT: USER SUMMARY -->
+      <aside class="panel sidebar dashboard-sidebar">
         <h2>User Dashboard</h2>
 
         <div class="wallet-summary">
@@ -106,16 +153,6 @@
       </aside>
     </main>
 
-    <!-- CARD ROW (NFT CARDS, WHATEVER) -->
-    <div class="recent_sales" id="recent-sales"></div>
-    <section class="panel dashboard-section">
-      <h2>Recent Sales</h2>
-      <p class="dashboard-note">Recent sales on secondary marketplaces like <a href="https://opensea.io/collection/fresh-frogs" target="_blank">opensea</a></p>
-
-      <div id="recent-sales" class="nft-grid">
-      </div>
-    </section>
-
     <!-- FOOTER -->
     <footer class="site-footer">
       <span class="footer-links">
@@ -125,6 +162,7 @@
       </span>
     </footer>
   </div>
+
   <!-- Web3 for wallet / staking functions -->
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 
@@ -140,4 +178,3 @@
   <script src="https://freshfrogs.github.io/assets/site.js"></script>
 </body>
 </html>
-

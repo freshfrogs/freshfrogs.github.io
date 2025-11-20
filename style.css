@@ -619,10 +619,11 @@ margin: 24px auto;
 }
 
 .dashboard-main .dashboard-section {
-    grid-column: 1 / 2;
-    background: transparent;
-    border: none;
-    box-shadow: none;
+    background: rgba(15, 23, 42, 0.96);
+    border: 0px solid white;
+    padding: 1.2rem 1.3rem 1.3rem;
+    box-shadow: 4px 4px darkslateblue;
+    border-radius: 5px;
 }
 
 .dashboard-main .dashboard-sidebar {
