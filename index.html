@@ -54,9 +54,7 @@
     <main class="dashboard-main">
       <!-- LEFT COLUMN -->
 
-      <section class="panel dashboard-section"
-              id="recent-activity-panel"
-              style="background: transparent; box-shadow: none; padding: 0;">
+      <section class="panel dashboard-section" id="recent-activity-panel" style="background: transparent; box-shadow: none; padding: 0;">
         <h2>Recent Activity</h2>
         <p class="dashboard-note" id="recent-sales-status">
           Loading recent sales...
@@ -69,6 +67,33 @@
         </button>
       </section>
 
+      <section class="panel dashboard-section" id="rarity-panel" style="display:none; background: transparent; box-shadow: none; padding: 0;">
+        <h2>Rarity Rankings</h2>
+        <p class="dashboard-note" id="rarity-status">
+          Top ranked Frogs across the collection (lower rank = rarer).
+        </p>
+
+        <div id="rarity-grid" class="recent_sales"></div>
+
+        <button id="load-more-rarity" class="btn secondary" type="button">
+          Load More
+        </button>
+      </section>
+
+      <section class="panel dashboard-section"
+              id="pond-panel"
+              style="display:none; background: transparent; box-shadow: none; padding: 0;">
+        <h2>The Pond</h2>
+        <p class="dashboard-note" id="pond-status">
+          All Frogs currently staked by the community.
+        </p>
+
+        <div id="pond-grid" class="recent_sales"></div>
+
+        <button id="load-more-pond" class="btn secondary" type="button">
+          Load More
+        </button>
+      </section>
 
       <!-- Owned Frogs (hidden until wallet connects) -->
       <section class="panel dashboard-section" id="owned-panel" style="display:none; background: transparent; box-shadow: none; padding: 0px;">
@@ -92,47 +117,6 @@
         </div>
       </section>
 
-      <!-- RIGHT: USER SUMMARY -->
-      <aside class="panel sidebar dashboard-sidebar">
-
-        <div class="wallet-summary">
-          <div class="wallet-header">
-            <img
-              id="dashboard-avatar"
-              class="wallet-avatar"
-              src="https://freshfrogs.github.io/assets/blackWhite.png"
-              alt="Profile avatar"
-            />
-            <div>
-              <div id="dashboard-username" class="wallet-username">Not connected</div>
-              <div id="dashboard-wallet" class="wallet-address">Wallet: —</div>
-            </div>
-          </div>
-
-          <div class="wallet-stats-grid">
-            <div class="wallet-stat">
-              <span class="stat-label">Owned Frogs</span>
-              <span id="stat-owned" class="stat-value">0</span>
-            </div>
-            <div class="wallet-stat">
-              <span class="stat-label">Staked Frogs</span>
-              <span id="stat-staked" class="stat-value">0</span>
-            </div>
-            <div class="wallet-stat">
-              <span class="stat-label">Rewards Available</span>
-              <span id="stat-rewards-available" class="stat-value">0</span>
-            </div>
-            <div class="wallet-stat">
-              <span class="stat-label">Rewards Earned</span>
-              <span id="stat-rewards-earned" class="stat-value">0</span>
-            </div>
-          </div>
-
-          <button class="btn primary wallet-connect-btn" onclick="connectWallet()">
-            Connect Wallet
-          </button>
-        </div>
-      </aside>
     </main>
 
     <!-- FOOTER -->
