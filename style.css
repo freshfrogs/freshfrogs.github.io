@@ -685,7 +685,7 @@ display: block;
 .stake-meta {
   margin: 8px;
   margin-top: 0px;
-  padding-top: 6px;
+  padding-top: 0px;
   font-size: 0.75rem;
   color: #e5e7eb;
 }
