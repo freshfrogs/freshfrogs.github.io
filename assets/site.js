@@ -142,8 +142,10 @@ async function loadRecentActivity() {
   }
 }
 
-// For recent sales/mints: show a small note if the frog is currently staked
+// Replace the old function with THIS:
+
 async function ffAnnotateSaleWithStaking(card, tokenId) {
+  // Need these helpers from ethereum-dapp.js
   if (typeof stakerAddress !== 'function' || typeof stakingValues !== 'function') {
     return;
   }
@@ -152,19 +154,44 @@ async function ffAnnotateSaleWithStaking(card, tokenId) {
     const owner = await stakerAddress(tokenId);
     if (!owner) return; // not staked
 
-    const values = await stakingValues(tokenId);
-    const level = values && values[1]; // roman numeral
-
+    // --- Tiny note under properties (same as before) ---
     const props = card.querySelector('.recent_sale_properties');
-    if (!props) return;
+    if (props) {
+      const note = document.createElement('p');
+      note.className = 'staking-sale-note';
+      note.textContent = `Currently staked`;
+      props.appendChild(note);
+    }
 
-    const note = document.createElement('p');
-    note.className = 'staking-sale-note';
-    note.textContent = level
-      ? `Currently staked (Lvl. ${level})`
-      : 'Currently staked';
+    // --- Add full staking footer (Lvl., rewards, progress) if not already present ---
+    const existingLevel = card.querySelector(`#stake-level-${tokenId}`);
+    if (!existingLevel) {
+      const footer = document.createElement('div');
+      footer.className = 'stake-meta';
+      footer.innerHTML = `
+        <div class="stake-meta-row">
+          <span id="stake-level-${tokenId}" class="stake-level-label">Lvl. —</span>
+          <span id="stake-rewards-${tokenId}" class="stake-rewards-label">Rewards —</span>
+        </div>
+        <div class="stake-meta-row stake-meta-subrow">
+          <span id="stake-date-${tokenId}">Staked: —</span>
+          <span id="stake-next-${tokenId}"></span>
+        </div>
+        <div class="stake-progress">
+          <div id="stake-progress-bar-${tokenId}" class="stake-progress-bar"></div>
+        </div>
+        <div id="stake-progress-label-${tokenId}" class="stake-progress-label">
+          Progress to next level
+        </div>
+      `;
 
-    props.appendChild(note);
+      // Attach footer near bottom of card body
+      const body = card.querySelector('.nft-card-body') || card;
+      body.appendChild(footer);
+    }
+
+    // Fill in Lvl., rewards, date, and progress bar exactly like the staked grid
+    ffDecorateStakedFrogCard(tokenId);
   } catch (err) {
     console.warn('ffAnnotateSaleWithStaking failed for token', tokenId, err);
   }
