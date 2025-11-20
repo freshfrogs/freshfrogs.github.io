@@ -57,6 +57,71 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ------------------------
+// View switching (tabs)
+// ------------------------
+function ffInitNavViews() {
+  const tabs = document.querySelectorAll('.nav a[data-view]');
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', (evt) => {
+      evt.preventDefault();
+      const view = tab.dataset.view;
+      if (view) {
+        ffSetView(view);
+      }
+    });
+  });
+}
+
+function ffSetView(view) {
+  ffCurrentView = view;
+
+  // Highlight active tab
+  const tabs = document.querySelectorAll('.nav a[data-view]');
+  tabs.forEach((tab) => {
+    tab.classList.toggle('active', tab.dataset.view === view);
+  });
+
+  const activityPanel = document.getElementById('recent-activity-panel');
+  const ownedPanel    = document.getElementById('owned-panel');
+  const stakedPanel   = document.getElementById('staked-panel');
+  const rarityPanel   = document.getElementById('rarity-panel');
+  const pondPanel     = document.getElementById('pond-panel');
+
+  if (activityPanel) {
+    // sales (default) and collection (mints) both use the activity grid
+    activityPanel.style.display =
+      view === 'sales' || view === 'collection' ? '' : 'none';
+  }
+  if (ownedPanel)  ownedPanel.style.display  = view === 'wallet' ? '' : 'none';
+  if (stakedPanel) stakedPanel.style.display = view === 'wallet' ? '' : 'none';
+  if (rarityPanel) rarityPanel.style.display = view === 'rarity' ? '' : 'none';
+  if (pondPanel)   pondPanel.style.display   = view === 'pond' ? '' : 'none';
+
+  // Kick off loaders based on view
+  if (view === 'sales') {
+    FF_ACTIVITY_MODE = 'sales';
+    loadRecentActivity();
+  } else if (view === 'collection') {
+    FF_ACTIVITY_MODE = 'mints';
+    loadRecentActivity();
+  } else if (view === 'rarity') {
+    ffLoadRarityGrid();
+  } else if (view === 'wallet') {
+    if (ffCurrentAccount) {
+      renderOwnedAndStakedFrogs(ffCurrentAccount);
+    } else {
+      const ownedStatus = document.getElementById('owned-frogs-status');
+      if (ownedStatus) {
+        ownedStatus.textContent = 'Connect your wallet to view your frogs.';
+      }
+    }
+  } else if (view === 'pond') {
+    ffLoadPondGrid();
+  }
+}
+
+
+// ------------------------
 // Recent activity loader (bottom grid)
 // ------------------------
 async function loadRecentActivity() {
