@@ -763,6 +763,7 @@ font-size: 0.9em;
 ease-out, transform 120ms 
 ease-out, border-color 160ms 
 ease-out;
+    box-shadow: 2px 2px darkslateblue;
 }
 
 .recent_sale_links .sale_link_btn:hover {
@@ -772,10 +773,13 @@ ease-out;
 
 .sale_link_btn.opensea {
   border-color: #2081e2;
+  background-color: #2081e2;
 }
 
 .sale_link_btn.etherscan {
-  border-color: #10b981;
+    border-color: antiquewhite;
+    background: antiquewhite;
+    color: #333;
 }
 
 .staking-sale-note {
