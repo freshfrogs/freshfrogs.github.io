@@ -11,8 +11,12 @@ const FF_OPENSEA_API_KEY    = '48ffee972fc245fa965ecfe902b02ab4'; // optional
 const FF_ALCHEMY_NFT_BASE   = `https://eth-mainnet.g.alchemy.com/nft/v3/${FF_ALCHEMY_API_KEY}`;
 const FF_ALCHEMY_CORE_BASE  = `https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY_API_KEY}`;
 
-const FF_ACTIVITY_MODE      = 'sales'; // 'mints' or 'sales' for the bottom grid
+const FF_ACTIVITY_MODE      = 'mints'; // 'mints' or 'sales' for the bottom grid
+
+const FF_SHOW_STAKING_STATS_ON_SALES = false;
+
 const ZERO_ADDRESS          = '0x0000000000000000000000000000000000000000';
+
 
 // ------------------------
 // Entry
@@ -122,12 +126,13 @@ async function loadRecentActivity() {
         tokenId,
         metadata,
         headerLeft,
-        headerRight,
-        footerHtml,
-        actionHtml
+        headerRight
       });
 
+      ffAnnotateSaleWithStaking(card, tokenId);
+
       container.appendChild(card);
+
 
       // If this frog is currently staked, annotate the card
       ffAnnotateSaleWithStaking(card, tokenId);
@@ -142,60 +147,44 @@ async function loadRecentActivity() {
   }
 }
 
-// Replace the old function with THIS:
-
+// Optional: annotate a recent-sale card with staking stats
 async function ffAnnotateSaleWithStaking(card, tokenId) {
-  // Need these helpers from ethereum-dapp.js
-  if (typeof stakerAddress !== 'function' || typeof stakingValues !== 'function') {
+  // If toggle is off, do nothing
+  if (!FF_SHOW_STAKING_STATS_ON_SALES) return;
+
+  // Need legacy helpers loaded from ethereum-dapp.js
+  if (typeof stakingValues !== 'function') {
+    console.warn('stakingValues() not available; skipping staking stats for sales.');
     return;
   }
 
   try {
-    const owner = await stakerAddress(tokenId);
-    if (!owner) return; // not staked
+    const values = await stakingValues(tokenId);
+    if (!Array.isArray(values) || values.length < 5) return;
 
-    // --- Tiny note under properties (same as before) ---
-    const props = card.querySelector('.recent_sale_properties');
-    if (props) {
-      const note = document.createElement('p');
-      note.className = 'staking-sale-note';
-      note.textContent = `Currently staked`;
-      props.appendChild(note);
-    }
+    const [stakedDays, rawLevel, daysToNext, flyzEarned, stakedDate] = values;
 
-    // --- Add full staking footer (Lvl., rewards, progress) if not already present ---
-    const existingLevel = card.querySelector(`#stake-level-${tokenId}`);
-    if (!existingLevel) {
-      const footer = document.createElement('div');
-      footer.className = 'stake-meta';
-      footer.innerHTML = `
-        <div class="stake-meta-row">
-          <span id="stake-level-${tokenId}" class="stake-level-label">Lvl. —</span>
-          <span id="stake-rewards-${tokenId}" class="stake-rewards-label">Rewards —</span>
-        </div>
-        <div class="stake-meta-row stake-meta-subrow">
-          <span id="stake-date-${tokenId}">Staked: —</span>
-          <span id="stake-next-${tokenId}"></span>
-        </div>
-        <div class="stake-progress">
-          <div id="stake-progress-bar-${tokenId}" class="stake-progress-bar"></div>
-        </div>
-        <div id="stake-progress-label-${tokenId}" class="stake-progress-label">
-          Progress to next level
-        </div>
-      `;
+    // Convert roman to normal number if needed
+    const levelNum = ffRomanToArabic(rawLevel) ?? rawLevel;
 
-      // Attach footer near bottom of card body
-      const body = card.querySelector('.nft-card-body') || card;
-      body.appendChild(footer);
-    }
+    const propsBlock =
+      card.querySelector('.recent_sale_properties') ||
+      card.querySelector('.recent_sale_traits') ||
+      card;
 
-    // Fill in Lvl., rewards, date, and progress bar exactly like the staked grid
-    ffDecorateStakedFrogCard(tokenId);
+    const wrapper = document.createElement('div');
+    wrapper.className = 'staking-sale-stats';
+    wrapper.innerHTML = `
+      <div><strong>Lvl. ${levelNum}</strong> • ${Math.round(flyzEarned)} FLYZ earned</div>
+      <div>Staked ${stakedDays}d ago • Since ${stakedDate}</div>
+    `;
+
+    propsBlock.appendChild(wrapper);
   } catch (err) {
     console.warn('ffAnnotateSaleWithStaking failed for token', tokenId, err);
   }
 }
+
 
 
 // ------------------------
@@ -207,33 +196,27 @@ async function ffAnnotateSaleWithStaking(card, tokenId) {
 function parseTokenId(raw) {
   if (raw == null) return null;
 
-  // Direct number
-  if (typeof raw === 'number') {
-    if (!Number.isFinite(raw)) return null;
-    const n = Math.floor(raw);
-    if (n < 0 || n > 10000) return null; // collection is 1–4040
-    return n;
-  }
-
-  // BigInt
-  if (typeof raw === 'bigint') {
-    if (raw < 0n || raw > 10000n) return null;
-    return Number(raw);
+  // unwrap common object shapes
+  if (typeof raw === 'object' && raw.tokenId != null) {
+    raw = raw.tokenId;
   }
 
   let s = String(raw).trim();
 
-  // Kill scientific notation like "1.37e+48"
-  if (/e\+/i.test(s)) return null;
-
-  if (s.startsWith('0x') || s.startsWith('0X')) {
+  // Hex tokenId (e.g. "0x1234")
+  if (/^0x[0-9a-fA-F]+$/.test(s)) {
     const n = parseInt(s, 16);
-    if (!Number.isFinite(n) || n < 0 || n > 10000) return null;
-    return n;
+    return Number.isFinite(n) && n >= 0 && n <= 10000 ? n : null;
+  }
+
+  // Drop scientific notation / crazy big values
+  if (/e\+/i.test(s)) {
+    return null;
   }
 
   const n = parseInt(s, 10);
   if (!Number.isFinite(n) || n < 0 || n > 10000) return null;
+
   return n;
 }
 
@@ -587,34 +570,6 @@ async function ffFetchOwnedFrogs(address) {
 // Prefer legacy getStakedTokens() helper (from ethereum-dapp.js) so
 // we decode the struct the same way the old site did.
 async function ffFetchStakedTokenIds(address) {
-  // 1) Try legacy helper first
-  if (typeof getStakedTokens === 'function') {
-    try {
-      const tokens = await getStakedTokens(address);
-      if (Array.isArray(tokens)) {
-        const ids = [];
-        for (const t of tokens) {
-          if (!t) continue;
-
-          // common shapes: { tokenId: '123' } or ['123', createdAt, ...]
-          let rawId;
-          if (typeof t === 'object') {
-            rawId = t.tokenId ?? t.id ?? t[0];
-          } else {
-            rawId = t;
-          }
-
-          const id = parseTokenId(rawId);
-          if (id != null) ids.push(id);
-        }
-        if (ids.length) return ids;
-      }
-    } catch (err) {
-      console.warn('Legacy getStakedTokens() failed; falling back to direct call', err);
-    }
-  }
-
-  // 2) Fallback: direct contract call
   if (!ffWeb3 || typeof CONTROLLER_ABI === 'undefined') {
     console.warn('Web3 or CONTROLLER_ABI missing; staked frogs fetch disabled.');
     return [];
@@ -622,53 +577,55 @@ async function ffFetchStakedTokenIds(address) {
 
   const contract = new ffWeb3.eth.Contract(CONTROLLER_ABI, FF_CONTROLLER_ADDRESS);
 
-  const stakedRaw = await ffTryContractCall(
-    contract,
-    ['getStakedTokensOf', 'getStakedTokens', 'getUserStakedTokens', 'stakedTokensOf'],
-    [address]
-  );
+  const stakedRaw = await ffTryContractCall(contract, [
+    'getStakedTokensOf',
+    'getStakedTokens',
+    'getUserStakedTokens',
+    'stakedTokensOf'
+  ], [address]);
 
   if (!stakedRaw) return [];
 
   const result = [];
+
+  // Array of ids or structs
   if (Array.isArray(stakedRaw)) {
     for (const v of stakedRaw) {
-      if (!v) continue;
+      let candidate = v;
 
-      let rawId;
-      if (typeof v === 'object') {
-        rawId = v.tokenId ?? v.id ?? v[0] ?? v.value ?? v;
-      } else {
-        rawId = v;
+      // If contract returns struct { tokenId, ... }
+      if (candidate && typeof candidate === 'object' && 'tokenId' in candidate) {
+        candidate = candidate.tokenId;
       }
 
-      const id = parseTokenId(rawId);
+      const id = parseTokenId(candidate);
       if (id != null) result.push(id);
     }
   } else {
-    const rawId =
-      typeof stakedRaw === 'object' && stakedRaw !== null
-        ? (stakedRaw.tokenId ?? stakedRaw.id ?? stakedRaw[0] ?? stakedRaw)
-        : stakedRaw;
-    const id = parseTokenId(rawId);
+    // Single value case
+    const id = parseTokenId(stakedRaw);
     if (id != null) result.push(id);
   }
 
   return result;
 }
 
+
 // Render owned + staked frogs into their grids
 async function renderOwnedAndStakedFrogs(address) {
   const ownedGrid   = document.getElementById('owned-frogs-grid');
   const ownedStatus = document.getElementById('owned-frogs-status');
-  const stakedGrid  = document.getElementById('staked-frogs-grid');
+  const stakedGrid   = document.getElementById('staked-frogs-grid');
   const stakedStatus = document.getElementById('staked-frogs-status');
 
-  if (ownedGrid)  ownedGrid.innerHTML = '';
-  if (stakedGrid) stakedGrid.innerHTML = '';
+  // NEW: on dashboard page, swap out "recent sales" and show owned/staked instead
+  const recentPanel = document.getElementById('recent-activity-panel');
+  const ownedPanel  = document.getElementById('owned-panel');
+  const stakedPanel = document.getElementById('staked-panel');
 
-  if (ownedStatus)  ownedStatus.textContent  = 'Loading owned frogs...';
-  if (stakedStatus) stakedStatus.textContent = 'Loading staked frogs...';
+  if (recentPanel) recentPanel.style.display = 'none';
+  if (ownedPanel)  ownedPanel.style.display  = '';
+  if (stakedPanel) stakedPanel.style.display = '';
 
   try {
     const [ownedNfts, stakedIds] = await Promise.all([
@@ -1227,3 +1184,24 @@ async function ffInitWalletOnLoad() {
   }
 }
 
+// Convert roman numerals from stakingValues() into normal numbers
+function ffRomanToArabic(roman) {
+  if (!roman) return null;
+  roman = String(roman).toUpperCase();
+
+  const map = { I:1, V:5, X:10, L:50, C:100, D:500, M:1000 };
+  let total = 0;
+  let prev = 0;
+
+  for (let i = roman.length - 1; i >= 0; i--) {
+    const val = map[roman[i]] || 0;
+    if (val < prev) {
+      total -= val;
+    } else {
+      total += val;
+      prev = val;
+    }
+  }
+
+  return total || null;
+}

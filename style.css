@@ -781,3 +781,12 @@ margin: 24px auto;
   font-size: 0.7rem;
   color: #9ca3af;
 }
+.staking-sale-stats {
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: #e0f2fe;
+}
+
+.staking-sale-stats strong {
+  color: white;
+}
