@@ -213,43 +213,25 @@ function createFrogCard({
   const card = document.createElement('div');
   card.className = 'recent_sale_card';
   card.innerHTML = `
-    <div class="recent_sale_header">
-      <span class="sale_card_title">Frog #${tokenId}</span>
-      <span class="sale_card_price">${priceEth} ETH</span>
-    </div>
-
-    <div class="frog_img_cont">
-      <img class="recent_sale_img" src="${imageUrl}" alt="Frog #${tokenId}" />
-    </div>
-
-    <div class="recent_sale_properties">
-      <p>Rarity:
-        <span class="rarity_badge ${rarityClass}">${rarityLabel}</span>
-      </p>
-      <p>Buyer: ${shortBuyer}</p>
-      <p>Seller: ${shortSeller}</p>
-    </div>
-
-    <div class="recent_sale_links">
-      <a
-        class="sale_link_btn opensea"
-        href="https://opensea.io/assets/ethereum/${COLLECTION_ADDRESS}/${tokenId}"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        OpenSea
-      </a>
-      <a
-        class="sale_link_btn etherscan"
-        href="https://etherscan.io/tx/${sale.transaction}"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Etherscan
-      </a>
-    </div>
-  `;
-
+      <strong class="sale_card_title">${headerLeft || ''}</strong>
+      <strong class="sale_card_price">${headerRight || ''}</strong>
+      <div style="clear: both;"></div>
+      <div class="frog_img_cont">
+        <img src="${imageUrl}"
+             class="recent_sale_img"
+             alt="Frog #${tokenId}"
+             loading="lazy" />
+      </div>
+      <div class="recent_sale_traits">
+        <strong class="sale_card_title">${frogName}</strong>
+        <strong class="sale_card_price ${rarityClass}">${rarityText}</strong><br>
+        <div class="recent_sale_properties">
+          ${traitsHtml}
+        </div>
+        ${footerHtml || ''}
+        ${actionHtml || ''}
+      </div>
+    `;
   return card;
 }
 
