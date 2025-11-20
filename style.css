@@ -397,21 +397,21 @@ padding: 0.55rem 1.2rem;
 
 
 .recent_sale_card {
-    display: inline-block;
-    background: rgba(15, 23, 42, 0.96);
+     display: inline-block;
+    background: lightseagreen;
     padding: 8px;
     box-shadow: 2px 2px darkslateblue;
     width: 100%;
     border-radius: 5px;
     max-width: 248px;
     margin: 8px auto;
-    border: 0px solid darkslateblue;
 }
 
 .sale_card_title {
     float: left;
     margin-left: 4px;
   color: lightgreen;
+  text-shadow: 2px 2px darkslateblue;
 }
 .sale_card_price {
     float: right;
@@ -437,14 +437,13 @@ padding: 0.55rem 1.2rem;
 }
 
 .recent_sale_properties {
-border-top: 1px solid white;
-    border-left: 1px solid white;
-    height: auto;
-    border-top-left-radius: 5px;
+    border-top: 1px solid white;
     padding: 8px;
     margin: 8px;
     min-height: 70px;
     color: lightseagreen;
+    margin-bottom: 0px;
+    font-size: 0.9em;
 }
 .recent_sale_properties p {
     margin: 2px;
@@ -543,6 +542,7 @@ margin: 24px auto;
 /* RARITY BADGES */
 
 .rarity_badge {
+  text-shadow: 2px 2px darkslateblue;
 }
 
 .rarity_legendary {
@@ -683,7 +683,6 @@ margin: 24px auto;
   margin: 8px;
   margin-top: 6px;
   padding-top: 6px;
-  border-top: 1px solid rgba(148, 163, 184, 0.5);
   font-size: 0.75rem;
   color: #e5e7eb;
 }
@@ -695,13 +694,17 @@ margin: 24px auto;
 }
 
 .stake-meta-subrow {
-    font-size: 1.0em;
+font-size: 0.9em;
+    border-top: 1px solid white;
+    padding: 8px;
     color: white;
+    margin-top: 8px;
 }
 
 .stake-level-label {
   font-weight: 600;
   color: #fbbf24;
+  text-shadow: 2px 2px darkslateblue;
 }
 
 .stake-rewards-label {
