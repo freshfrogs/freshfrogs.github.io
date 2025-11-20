@@ -1,5 +1,4 @@
 /* BASIC RESET */
-
 *,
 *::before,
 *::after {
@@ -18,7 +17,6 @@ a {
 }
 
 /* PAGE WRAPPER */
-
 .page {
   min-height: 100vh;
   max-width: 1120px;
@@ -29,24 +27,15 @@ a {
 }
 
 /* HEADER */
-
 .site-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 1.5rem;
   padding: 1.25rem 0 0.75rem;
   top: 0;
   z-index: 20;
   color: white;
-}
-
-.logo {
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  padding: 0.35rem 0.75rem;
 }
 
 .nav {
@@ -82,6 +71,19 @@ a {
   width: 80%;
 }
 
+/* nav active state for view tabs */
+.nav a[data-view] {
+  cursor: pointer;
+}
+
+.nav a.active {
+  color: darkcyan;
+}
+
+.nav a.active::after {
+  width: 80%;
+}
+
 .cta-btn {
   padding: 0.55rem 1.2rem;
   border-radius: 5px;
@@ -100,7 +102,6 @@ a {
 }
 
 /* HERO – TEMPLATE 4 (CENTERED) */
-
 .hero {
   max-width: 720px;
   margin: 2.4rem auto 1.8rem;
@@ -144,32 +145,7 @@ a {
   justify-content: center;
 }
 
-.hero-placeholder {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  border-radius: 18px;
-  background: radial-gradient(
-      circle at top left,
-      rgba(74, 222, 128, 0.18),
-      transparent 55%
-    ),
-    radial-gradient(
-      circle at bottom right,
-      rgba(56, 189, 248, 0.18),
-      transparent 55%
-    ),
-    #020617;
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.65);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.85rem;
-  color: #9ca3af;
-}
-
 /* BUTTONS */
-
 .btn {
   border-radius: 999px;
   padding: 0.65rem 1.4rem;
@@ -186,15 +162,14 @@ a {
 
 .btn.primary {
   padding: 0.55rem 1.2rem;
-  border-radius: 0px;
+  border-radius: 0;
   border: none;
-  color: #022c22;
+  color: darkslateblue;
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
   white-space: nowrap;
   background: lightblue;
-  color: darkslateblue;
   box-shadow: 2px 2px darkslateblue;
 }
 
@@ -202,204 +177,65 @@ a {
   padding: 0.55rem 1.2rem;
   border-radius: 5px;
   border: none;
-  color: #022c22;
+  color: white;
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
   white-space: nowrap;
   background: lightcoral;
-  color: white;
 }
 
 .btn:hover {
   transform: translateY(-1px);
 }
 
-/* MAIN – TWO COLUMN LAYOUT (legacy, not used on this page) */
-
-.layout-main {
-  display: grid;
-  gap: 1.2rem;
+/* DASHBOARD PAGE LAYOUT */
+.dashboard-main {
+  display: block; /* single column so cards can use full width */
   padding: 0.6rem 0 1.6rem;
   max-width: 1120px;
   margin: 0 auto;
-  grid-template-columns: minmax(0, 3fr) minmax(260px, 1.4fr);
-  align-items: flex-start;
 }
 
-/* Left column panels (minting + staking info) */
-.layout-main > .panel:not(.sidebar) {
-  grid-column: 1 / 2;
-}
-
-/* Right column sidebar (User Dashboard) */
-.layout-main > .panel.sidebar {
-  grid-column: 2 / 3;
-  grid-row: 1 / span 3;
-  position: sticky;
-  top: 4.5rem;
-  align-self: flex-start;
-}
-
-.panel {
+.dashboard-main .dashboard-section {
   background: lightseagreen;
-  border: 0px solid white;
+  border: 0 solid white;
   padding: 1.2rem 1.3rem 1.3rem;
   box-shadow: 2px 2px darkslateblue;
-  border-radius: 0px;
+  border-radius: 0;
 }
 
-.panel h2 {
-  font-size: 1rem;
-  margin-top: 0;
-  margin-bottom: 0.4rem;
-  color: white;
-  text-shadow: 2px 2px darkslateblue;
+/* hide sidebar panel visually; we keep it for stats IDs */
+.dashboard-main .dashboard-sidebar {
+  display: none;
 }
 
-.panel p {
-  margin: 0;
-  color: white;
-  font-size: 1em;
+.dashboard-note {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  margin-bottom: 0.6rem;
 }
 
-/* CARD ROW (OPTIONAL) */
-
-.card-row {
-  max-width: 920px;
-  margin: 0.4rem auto 2rem;
+/* UNIFIED FROG GRID (collection, rarity, pond, wallet) */
+.recent_sales,
+.nft-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-}
-
-.card {
-  background: rgba(15, 23, 42, 0.94);
-  border-radius: 14px;
-  border: 1px solid rgba(148, 163, 184, 0.6);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.6);
-}
-
-.card-media {
-  aspect-ratio: 1 / 1;
-  background: radial-gradient(
-      circle at top,
-      rgba(74, 222, 128, 0.3),
-      transparent 55%
-    ),
-    #020617;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  color: #9ca3af;
-}
-
-.card-body {
-  padding: 0.8rem 0.9rem 1rem;
-}
-
-.card-body h3 {
-  margin: 0 0 0.3rem;
-  font-size: 0.98rem;
-}
-
-.card-body p {
-  margin: 0;
-  font-size: 0.85rem;
-  color: #9ca3af;
-}
-
-/* FOOTER */
-
-.site-footer {
-  padding-top: 0.8rem;
-  border-top: 1px solid rgba(148, 163, 184, 0.3);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 0.8rem;
-  color: #9ca3af;
-}
-
-.footer-links {
-  display: flex;
-  gap: 0.8rem;
-}
-
-.footer-links a {
-  color: #9ca3af;
-  text-decoration: none;
-}
-
-/* RESPONSIVE (header + hero) */
-
-@media (max-width: 768px) {
-  .site-header {
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 0.9rem;
-  }
-
-  .nav {
-    flex: 1 1 100%;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .hero {
-    margin-top: 1.8rem;
-    padding: 1.8rem 1.4rem 1.8rem;
-  }
-
-  .hero-placeholder {
-    max-width: 100%;
-  }
-
-  .layout-main {
-    padding: 0.4rem 0 1.4rem;
-  }
-}
-
-.fly {
-  width: 128px;
-  height: 128px;
-  margin: 8px;
-  box-shadow: 2px 2px darkslateblue;
-  image-rendering: pixelated;
-}
-
-/* RECENT SALES / MINTS GRID (full-width) */
-
-.recent_sales {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(248px, 1fr));
+  gap: 18px;
   margin: 0 auto 2rem;
   width: 100%;
-  max-width: 100%;
-  padding: 0;
 }
 
-@media (max-width: 640px) {
-  .recent_sales {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
+/* Frog cards (same everywhere) */
 .recent_sale_card {
-  display: inline-block;
+  display: block;
   background: lightseagreen;
   padding: 8px;
   box-shadow: 2px 2px darkslateblue;
+  border-radius: 0;
   width: 100%;
-  border-radius: 0px;
-  max-width: 248px;
-  margin: 8px auto;
+  max-width: none;
+  margin: 8px 0;
 }
 
 .sale_card_title {
@@ -420,6 +256,7 @@ a {
   height: 16px;
 }
 
+/* Frog image & overlays */
 .frog_img {
   height: 128px;
   width: 128px;
@@ -432,13 +269,52 @@ a {
   image-rendering: pixelated;
 }
 
+/* Layered frog container uses original PNG as background swatch */
+.frog_img_cont {
+  position: relative;
+  margin: 24px auto;
+  width: 128px;
+  height: 128px;
+  overflow: hidden;
+  border-radius: 5px;
+  box-shadow: 2px 2px darkslateblue;
+  background-color: #020617;
+  background-repeat: no-repeat;
+  background-size: 1000%;
+  background-position: bottom right;
+}
+
+.trait_overlay,
+.attribute_overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 128px;
+  height: 128px;
+  image-rendering: pixelated;
+  pointer-events: auto;
+  transition:
+    transform 160ms ease-out,
+    box-shadow 160ms ease-out,
+    filter 160ms ease-out;
+}
+
+.trait_overlay:hover,
+.attribute_overlay:hover {
+  transform: translateY(-3px) scale(1.08);
+  box-shadow: 0 0 8px rgba(125, 211, 252, 0.7);
+  filter: brightness(1.1);
+  z-index: 5;
+}
+
+/* Trait text */
 .recent_sale_properties {
   border-top: 1px solid white;
   padding: 8px;
   margin: 8px;
   min-height: 70px;
   color: lightseagreen;
-  margin-bottom: 0px;
+  margin-bottom: 0;
   font-size: 0.9em;
 }
 
@@ -449,70 +325,155 @@ a {
   font-size: 1em;
 }
 
-.recent_sale_traits {
+.frog-attr-text {
+  cursor: default;
+  transition: color 160ms ease-out, text-shadow 160ms ease-out;
 }
 
-/* Base frog image container (simple) */
-
-.frog_img_cont {
-  margin: 24px auto;
-  width: 128px;
-  height: 128px;
-  overflow: hidden;
-  border-radius: 0px;
-  box-shadow: 2px 2px darkslateblue;
-  position: relative;
+.frog-attr-text.is-highlighted {
+  color: #7dd3fc;
+  text-shadow: 0 0 4px rgba(125, 211, 252, 0.7);
 }
 
-/* Layered frog overlays (used by build_trait from ethereum-dapp.js) */
-.trait_overlay,
-.attribute_overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 128px;
-  height: 128px;
-  image-rendering: pixelated;
+.trait_overlay.is-highlighted,
+.attribute_overlay.is-highlighted {
+  transform: translateY(-3px) scale(1.08);
+  box-shadow: 0 0 8px rgba(125, 211, 252, 0.7);
+  filter: brightness(1.1);
+  z-index: 5;
 }
 
-/* Single "Actions" button + dropdown on owned frog cards */
-
-.frog-actions {
-  margin: 8px;
+/* RARITY BADGES */
+.rarity_badge {
+  text-shadow: 2px 2px darkslateblue;
 }
 
-.frog-actions .actions-toggle {
-  width: 100%;
+.rarity_legendary {
+  border-color: gold;
+  color: gold;
 }
 
-.actions-menu {
-  margin-top: 6px;
-  padding: 4px;
-  border-radius: 4px;
-  border: 1px solid rgba(148, 163, 184, 0.8);
-  background: rgba(15, 23, 42, 0.98);
-  display: none;
+.rarity_epic {
+  border-color: #a855f7;
+  color: #c4b5fd;
 }
 
-.actions-menu-item {
-  display: block;
-  width: 100%;
-  text-align: left;
-  font-size: 0.75rem;
+.rarity_rare {
+  border-color: #22d3ee;
+  color: #a5f3fc;
+}
+
+.rarity_common {
+  border-color: #9ca3af;
+  color: #e5e7eb;
+}
+
+.rarity_unknown {
+  opacity: 0.7;
+}
+
+/* Card footer buttons (stake/links/etc) */
+.recent_sale_links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+.recent_sale_links .sale_link_btn {
+  flex: 1 1 48%;
+  text-align: center;
+  font-size: 0.72rem;
   padding: 4px 6px;
-  border: none;
-  background: transparent;
+  border-radius: 0;
+  border: 1px solid lightcoral;
+  background: lightcoral;
   color: #e5e7eb;
   cursor: pointer;
   text-decoration: none;
+  font-weight: 600;
+  transition:
+    background 160ms ease-out,
+    transform 120ms ease-out,
+    border-color 160ms ease-out;
+  box-shadow: 2px 2px darkslateblue;
 }
 
-.actions-menu-item:hover {
-  background: rgba(30, 64, 175, 0.7);
+.recent_sale_links .sale_link_btn:hover {
+  transform: translateY(-1px);
+  background: rgba(30, 64, 175, 0.85);
 }
 
-/* WALLET SIDEBAR / DASHBOARD (legacy styles, safe to keep) */
+.sale_link_btn.opensea {
+  border-color: #2081e2;
+  background-color: #2081e2;
+}
 
+.sale_link_btn.etherscan {
+  border-color: antiquewhite;
+  background: antiquewhite;
+  color: #333;
+}
+
+/* Staking meta footer */
+.stake-meta {
+  margin: 8px;
+  margin-top: 0;
+  padding-top: 0;
+  font-size: 0.75rem;
+  color: #e5e7eb;
+}
+
+.stake-meta-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.stake-meta-subrow {
+  font-size: 0.9em;
+  border-top: 1px solid white;
+  padding: 8px;
+  color: white;
+  margin-top: 8px;
+}
+
+.stake-level-label {
+  font-weight: 600;
+  color: #fbbf24;
+  text-shadow: 2px 2px darkslateblue;
+}
+
+.stake-progress {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: white;
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.stake-progress-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0%;
+  border-radius: inherit;
+  background: #fbbf24;
+  transition: width 260ms ease-out;
+}
+
+.staking-sale-note {
+  margin-top: 4px;
+  font-size: 0.7rem;
+  color: #9ca3af;
+}
+
+/* SIDEBAR / DASHBOARD STATS (optional) */
 .sidebar .wallet-summary {
   display: flex;
   flex-direction: column;
@@ -546,18 +507,6 @@ a {
   color: white;
 }
 
-.wallet-status-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8rem;
-  color: #e5e7eb;
-}
-
-.wallet-status-row span:last-child {
-  font-weight: bold;
-  color: lightgreen;
-}
-
 .wallet-stats-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -567,7 +516,7 @@ a {
 .wallet-stat {
   background: antiquewhite;
   padding: 0.35rem 0.45rem;
-  border-radius: 0px;
+  border-radius: 0;
   color: #333;
 }
 
@@ -584,346 +533,53 @@ a {
   color: #333;
 }
 
-.wallet-connect-btn {
-  margin-top: 0.4rem;
-  width: 100%;
+/* OTHER SMALL BITS */
+.fly {
+  width: 128px;
+  height: 128px;
+  margin: 8px;
+  box-shadow: 2px 2px darkslateblue;
+  image-rendering: pixelated;
 }
 
-/* RARITY BADGES */
-
-.rarity_badge {
-  text-shadow: 2px 2px darkslateblue;
-}
-
-.rarity_legendary {
-  border-color: gold;
-  color: gold;
-}
-
-.rarity_epic {
-  border-color: #a855f7;
-  color: #c4b5fd;
-}
-
-.rarity_rare {
-  border-color: #22d3ee;
-  color: #a5f3fc;
-}
-
-.rarity_common {
-  border-color: #9ca3af;
-  color: #e5e7eb;
-}
-
-.rarity_unknown {
-  opacity: 0.7;
-}
-
-/* RECENT SALE – LINK BUTTONS */
-
-.recent_sale_links {
+/* FOOTER */
+.site-footer {
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.3);
   display: flex;
   justify-content: space-between;
-  gap: 8px;
-  margin: 8px;
-  margin-top: 10px;
-}
-
-.sale_link_btn {
-  flex: 1 1 0;
-  text-align: center;
-  font-size: 0.74rem;
-  padding: 4px 6px;
-  border-radius: 4px;
-  text-decoration: none;
-  font-weight: 600;
-  border: 1px solid rgba(148, 163, 184, 0.8);
-  background: rgba(15, 23, 42, 0.9);
-  color: #e5e7eb;
-  cursor: pointer;
-}
-
-.sale_link_btn:hover {
-  filter: brightness(1.08);
-  transform: translateY(-1px);
-}
-
-.sale_link_btn.opensea {
-  border-color: #2081e2;
-}
-
-.sale_link_btn.etherscan {
-  border-color: #10b981;
-}
-
-/* DASHBOARD PAGE LAYOUT – single column */
-
-.dashboard-main {
-  /* Single column stack – each panel full width */
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-  padding: 0.6rem 0 1.6rem;
-  max-width: 1120px;
-  margin: 0 auto;
-}
-
-.dashboard-main .dashboard-section {
-  background: lightseagreen;
-  border: 0px solid white;
-  padding: 1.2rem 1.3rem 1.3rem;
-  box-shadow: 2px 2px darkslateblue;
-  border-radius: 0px;
-}
-
-.dashboard-main .dashboard-sidebar {
-  grid-column: 2 / 3;
-  grid-row: 1 / span 3;
-  position: sticky;
-  top: 4.5rem;
-  align-self: flex-start;
-}
-
-.dashboard-note {
-  font-size: 0.78rem;
-  color: #9ca3af;
-  margin-bottom: 0.6rem;
-}
-
-/* OWNED / STAKED GRID – full width */
-
-.nft-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 18px;
-  margin-top: 0.4rem;
-}
-
-.dashboard-empty {
-  grid-column: 1 / -1;
+  align-items: center;
+  gap: 0.75rem;
   font-size: 0.8rem;
   color: #9ca3af;
-  padding: 0.4rem 0;
 }
 
-/* Reuse recent_sale_card style for owned / staked NFTs */
-.nft-grid .recent_sale_card {
-  max-width: none;
-  width: 100%;
-}
-
-@media (max-width: 960px) {
-  .dashboard-main {
-    padding: 0.4rem 0 1.4rem;
-  }
-
-  .nft-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 640px) {
-  .nft-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-/* STAKING LEVEL + PROGRESS (dashboard cards) */
-
-.stake-meta {
-  margin: 8px;
-  margin-top: 0px;
-  padding-top: 0px;
-  font-size: 0.75rem;
-  color: #e5e7eb;
-}
-
-.stake-meta-row {
+.footer-links {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 4px;
+  gap: 0.8rem;
 }
 
-.stake-meta-subrow {
-  font-size: 0.9em;
-  border-top: 1px solid white;
-  padding: 8px;
-  color: white;
-  margin-top: 8px;
-}
-
-.stake-level-label {
-  font-weight: 600;
-  color: #fbbf24;
-  text-shadow: 2px 2px darkslateblue;
-}
-
-.stake-rewards-label {
-  font-weight: 500;
-  color: #fbbf24;
-}
-
-.stake-progress {
-  position: relative;
-  width: 100%;
-  height: 8px;
-  border-radius: 999px;
-  background: white;
-  overflow: hidden;
-  margin-top: 2px;
-}
-
-.stake-progress-bar {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 0%;
-  border-radius: inherit;
-  background: #fbbf24;
-  transition: width 260ms ease-out;
-}
-
-.stake-progress-label {
-  margin-top: 3px;
-  font-size: 0.7rem;
+.footer-links a {
   color: #9ca3af;
-}
-
-/* ==== Frog card action buttons (Stake / Transfer / Links) ==== */
-
-.recent_sale_links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.recent_sale_links .sale_link_btn {
-  flex: 1 1 48%;
-  text-align: center;
-  font-size: 0.72rem;
-  padding: 4px 6px;
-  border-radius: 0px;
-  border: 1px solid lightcoral;
-  background: lightcoral;
-  color: #e5e7eb;
-  cursor: pointer;
   text-decoration: none;
-  font-weight: 600;
-  transition:
-    background 160ms ease-out,
-    transform 120ms ease-out,
-    border-color 160ms ease-out;
-  box-shadow: 2px 2px darkslateblue;
 }
 
-.recent_sale_links .sale_link_btn:hover {
-  transform: translateY(-1px);
-  background: rgba(30, 64, 175, 0.85);
-}
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .site-header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.9rem;
+  }
 
-.sale_link_btn.opensea {
-  border-color: #2081e2;
-  background-color: #2081e2;
-}
+  .nav {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
 
-.sale_link_btn.etherscan {
-  border-color: antiquewhite;
-  background: antiquewhite;
-  color: #333;
-}
-
-.staking-sale-note {
-  margin-top: 4px;
-  font-size: 0.7rem;
-  color: #9ca3af;
-}
-
-.staking-sale-stats {
-  margin-top: 4px;
-  font-size: 0.75rem;
-  color: #e0f2fe;
-}
-
-.staking-sale-stats strong {
-  color: white;
-}
-
-/* Layered frog container uses the original PNG as a zoomed/offset background */
-.frog_img_cont {
-  position: relative;
-  margin: 24px auto;
-  width: 128px;
-  height: 128px;
-  overflow: hidden;
-  border-radius: 5px;
-  box-shadow: 2px 2px darkslateblue;
-
-  /* base background; JS will override with the correct frog image */
-  background-color: #020617;
-  background-repeat: no-repeat;
-  background-size: 220% 220%;
-  background-position: bottom right; /* only show background color area */
-}
-
-/* Attribute layers (built by build_trait) */
-.trait_overlay,
-.attribute_overlay {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 128px;
-  height: 128px;
-  image-rendering: pixelated;
-  pointer-events: auto;
-  transition:
-    transform 160ms ease-out,
-    box-shadow 160ms ease-out,
-    filter 160ms ease-out;
-}
-
-/* Default hover on the layer itself */
-.trait_overlay:hover,
-.attribute_overlay:hover {
-  transform: translateY(-3px) scale(1.08);
-  box-shadow: 0 0 8px rgba(125, 211, 252, 0.7);
-  filter: brightness(1.1);
-  z-index: 5;
-}
-
-/* Trait list text in the card */
-.frog-attr-text {
-  cursor: default;
-  transition:
-    color 160ms ease-out,
-    text-shadow 160ms ease-out;
-}
-
-/* Highlighted state (from JS, when text/layer is hovered) */
-.frog-attr-text.is-highlighted {
-  color: #7dd3fc; /* light blue */
-  text-shadow: 0 0 4px rgba(125, 211, 252, 0.7);
-}
-
-.trait_overlay.is-highlighted,
-.attribute_overlay.is-highlighted {
-  transform: translateY(-3px) scale(1.08);
-  box-shadow: 0 0 8px rgba(125, 211, 252, 0.7);
-  filter: brightness(1.1);
-  z-index: 5;
-}
-
-/* Header nav: active state for view tabs */
-
-.nav a[data-view] {
-  cursor: pointer;
-}
-
-.nav a.active {
-  color: darkcyan;
-}
-
-.nav a.active::after {
-  width: 80%;
+  .hero {
+    margin-top: 1.8rem;
+    padding: 1.8rem 1.4rem 1.8rem;
+  }
 }
