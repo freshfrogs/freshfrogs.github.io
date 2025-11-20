@@ -120,15 +120,14 @@ padding: 0.55rem 1.2rem;
 }
 
 .hero-title {
-  font-size: clamp(2.1rem, 3vw, 2.8rem);
-  line-height: 1.1;
-  text-shadow: 2px 2px darkslateblue;
+    line-height: 1.1;
+    text-shadow: 2px 2px darkslateblue;
 }
 
 .hero-subtitle {
   color: inherit;
   max-width: 36rem;
-  font-size: 0.98rem;
+  font-size: 1.1em;
 }
 
 .hero-actions {
@@ -187,7 +186,7 @@ padding: 0.55rem 1.2rem;
 
 .btn.primary {
 padding: 0.55rem 1.2rem;
-    border-radius: 5px;
+    border-radius: 0px;
     border: none;
     color: #022c22;
     font-weight: 600;
@@ -196,6 +195,7 @@ padding: 0.55rem 1.2rem;
     white-space: nowrap;
     background: lightblue;
     color: darkslateblue;
+    box-shadow: 2px 2px darkslateblue;
 }
 
 .btn.secondary {
@@ -247,8 +247,8 @@ padding: 0.55rem 1.2rem;
     background: lightseagreen;
     border: 0px solid white;
     padding: 1.2rem 1.3rem 1.3rem;
-    box-shadow: 4px 4px darkslateblue;
-    border-radius: 5px;
+    box-shadow: 2px 2px darkslateblue;
+    border-radius: 0px;
 }
 
 .panel h2 {
@@ -517,7 +517,7 @@ margin: 24px auto;
 .wallet-stat {
     background: antiquewhite;
     padding: 0.35rem 0.45rem;
-    border-radius: 4px;
+    border-radius: 0px;
     color: #333;
 }
 
@@ -620,8 +620,8 @@ display: block;
     background: lightseagreen;
     border: 0px solid white;
     padding: 1.2rem 1.3rem 1.3rem;
-    box-shadow: 4px 4px darkslateblue;
-    border-radius: 5px;
+    box-shadow: 2px 2px darkslateblue;
+    border-radius: 0px;
 }
 
 .dashboard-main .dashboard-sidebar {
