@@ -1732,3 +1732,229 @@ function ffRomanToArabic(roman) {
 
   return total || null;
 }
+// ===================================================
+//  STAKING STATS FIX (drop-in patch)
+//  - Kills old ffAttachStakeMetaIfStaked that used ffWeb3
+//  - Uses read-only Web3 via Alchemy
+//  - Applies correct staking stats to all frog cards
+// ===================================================
+
+// 1) Override the old helper so it no longer touches ffWeb3 / ffEnsureWeb3.
+//    loadRecentActivity will call THIS version instead of the old one.
+async function ffAttachStakeMetaIfStaked(card, tokenId) {
+  // We now attach staking metadata via the observer below.
+  // Keep this as a no-op so it never throws.
+  return;
+}
+
+// 2) Read-only Web3 + contracts using your Alchemy key
+let ffReadWeb3 = null;
+let ffReadCollection = null;
+let ffReadController = null;
+
+async function ffEnsureReadContracts() {
+  if (ffReadWeb3 && ffReadCollection && ffReadController) {
+    return {
+      web3: ffReadWeb3,
+      collection: ffReadCollection,
+      controller: ffReadController
+    };
+  }
+
+  if (typeof Web3 === 'undefined') {
+    console.warn('[FreshFrogs] Web3.js not found; staking stats disabled.');
+    return {};
+  }
+
+  // Read-only provider – no wallet needed
+  ffReadWeb3 = new Web3(`https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY_API_KEY}`);
+
+  if (typeof COLLECTION_ABI === 'undefined' || typeof CONTROLLER_ABI === 'undefined') {
+    console.warn('[FreshFrogs] ABIs missing; staking stats disabled.');
+    return { web3: ffReadWeb3 };
+  }
+
+  ffReadCollection = new ffReadWeb3.eth.Contract(COLLECTION_ABI, FF_COLLECTION_ADDRESS);
+  ffReadController = new ffReadWeb3.eth.Contract(CONTROLLER_ABI, FF_CONTROLLER_ADDRESS);
+
+  return {
+    web3: ffReadWeb3,
+    collection: ffReadCollection,
+    controller: ffReadController
+  };
+}
+
+// 3) New staking values helper (replaces the old ethereum-dapp.js math)
+async function ffGetStakingValues(tokenId) {
+  const { web3, collection, controller } = await ffEnsureReadContracts();
+  if (!web3 || !collection || !controller) return null;
+
+  tokenId = parseTokenId(tokenId);
+  if (tokenId == null) return null;
+
+  // Check if it is actually staked
+  let staker;
+  try {
+    staker = await controller.methods.stakerAddress(tokenId).call();
+  } catch (err) {
+    console.warn('[FreshFrogs] stakerAddress call failed for token', tokenId, err);
+    return null;
+  }
+
+  if (!staker || staker === ZERO_ADDRESS) {
+    return null; // not staked
+  }
+
+  // Find the most recent Transfer TO the controller for this token
+  let events;
+  try {
+    events = await collection.getPastEvents('Transfer', {
+      filter: { to: FF_CONTROLLER_ADDRESS, tokenId: String(tokenId) },
+      fromBlock: 0,
+      toBlock: 'latest'
+    });
+  } catch (err) {
+    console.warn('[FreshFrogs] getPastEvents(Transfer) failed for token', tokenId, err);
+    return null;
+  }
+
+  if (!events || !events.length) {
+    return null;
+  }
+
+  const lastEvt = events[events.length - 1];
+  const block = await web3.eth.getBlock(lastEvt.blockNumber);
+  if (!block || !block.timestamp) return null;
+
+  const stakedDate = new Date(Number(block.timestamp) * 1000);
+
+  // ---- Match the old ethereum-dapp staking math ----
+  const now = Date.now();
+  const stakedHours = Math.floor((now - stakedDate.getTime()) / (1000 * 60 * 60)); // hours
+
+  const levelInt       = Math.floor(stakedHours / 1000) + 1;        // 1000h per level, starting at 1
+  const stakedTimeDays = Math.floor(stakedHours / 24);              // total days staked
+  const stakedNext     = Math.round(((levelInt * 1000) - stakedHours) / 24); // days to next level
+  const stakedEarned   = (stakedHours / 1000).toFixed(3);           // FLYZ earned
+
+  const mm = String(stakedDate.getMonth() + 1).padStart(2, '0');
+  const dd = String(stakedDate.getDate()).padStart(2, '0');
+  const yy = String(stakedDate.getFullYear()).slice(-2);
+  const formattedDate = `${mm}/${dd}/${yy}`;
+
+  return {
+    stakedTimeDays,
+    levelInt,
+    stakedNext,
+    stakedEarned,
+    formattedDate
+  };
+}
+
+// 4) Insert staking block into a card so it matches the wallet "staked frogs" style
+function ffInsertStakeMetaIntoCard(card, info) {
+  // Remove any previous staking block from this card
+  card.querySelectorAll('.stake-meta, .staking-sale-stats').forEach((el) => el.remove());
+
+  if (!info) {
+    // Not staked; nothing extra to show
+    return;
+  }
+
+  const { stakedTimeDays, levelInt, stakedNext, stakedEarned, formattedDate } = info;
+
+  const propsBlock =
+    card.querySelector('.recent_sale_properties') ||
+    card.querySelector('.recent_sale_traits') ||
+    card;
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'stake-meta';
+
+  // Same basic layout as wallet staked frogs: level, dates, progress bar
+  const MAX_DAYS   = 41.7;
+  const remaining  = Math.max(0, Math.min(MAX_DAYS, Number(stakedNext)));
+  const pct        = Math.max(0, Math.min(100, ((MAX_DAYS - remaining) / MAX_DAYS) * 100));
+
+  wrapper.innerHTML = `
+    <div class="stake-meta-row">
+      <span class="stake-level-label">Staked Lvl. ${levelInt}</span>
+    </div>
+    <div class="stake-meta-row stake-meta-subrow">
+      <span>Staked: ${formattedDate} (${stakedTimeDays}d)</span>
+      <span>Next level in ~${stakedNext} days</span>
+    </div>
+    <div class="stake-progress">
+      <div class="stake-progress-bar" style="width:${pct}%;"></div>
+    </div>
+  `;
+
+  propsBlock.appendChild(wrapper);
+}
+
+// 5) Patch staking info on any frog cards that appear, using a MutationObserver
+async function ffPatchCardStaking(card) {
+  if (!card || !(card instanceof HTMLElement)) return;
+  if (card.dataset.stakePatched === '1') return;
+
+  const tokenId = parseTokenId(card.dataset.tokenId);
+  if (tokenId == null) return;
+
+  try {
+    const info = await ffGetStakingValues(tokenId);
+    ffInsertStakeMetaIntoCard(card, info);
+    card.dataset.stakePatched = '1';
+  } catch (err) {
+    console.warn('[FreshFrogs] ffPatchCardStaking failed for token', tokenId, err);
+  }
+}
+
+function ffSetupStakingObserver() {
+  if (typeof MutationObserver === 'undefined') return;
+
+  const targets = [
+    document.getElementById('recent-sales'),
+    document.getElementById('rarity-grid'),
+    document.getElementById('pond-grid'),
+    document.getElementById('owned-frogs-grid'),
+    document.getElementById('staked-frogs-grid')
+  ].filter(Boolean);
+
+  const observer = new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      m.addedNodes &&
+        m.addedNodes.forEach((node) => {
+          if (!(node instanceof HTMLElement)) return;
+          if (node.classList.contains('recent_sale_card')) {
+            ffPatchCardStaking(node);
+          } else if (node.querySelectorAll) {
+            node.querySelectorAll('.recent_sale_card').forEach(ffPatchCardStaking);
+          }
+        });
+    }
+  });
+
+  // Observe each grid and also patch any cards that are already there
+  targets.forEach((t) => {
+    observer.observe(t, { childList: true, subtree: true });
+    t.querySelectorAll('.recent_sale_card').forEach(ffPatchCardStaking);
+  });
+}
+
+// Run the observer once the DOM is ready
+document.addEventListener('DOMContentLoaded', ffSetupStakingObserver);
+
+// Also expose the new staking helper globally so legacy code can use it if needed
+window.stakingValues = async function (tokenId) {
+  const info = await ffGetStakingValues(tokenId);
+  if (!info) return [0, 0, 0, 0, ''];
+  // Match old return signature: [timeDays, level(roman/int), nextDays, flyz, dateStr]
+  // We return numeric level here; your card code already converts to display text.
+  return [
+    info.stakedTimeDays,
+    info.levelInt,
+    info.stakedNext,
+    info.stakedEarned,
+    info.formattedDate
+  ];
+};
