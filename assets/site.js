@@ -21,6 +21,13 @@ let FF_RECENT_LIMIT  = 24;
 // Toggle to show staking stats on non-wallet cards
 const FF_SHOW_STAKING_STATS_ON_CARDS = true;
 
+// Rarity paging
+let FF_RARITY_INDEX = 0;
+const FF_RARITY_BATCH = 24;
+
+// Pond paging
+let FF_POND_PAGE_KEY = null;
+
 // ------------------------
 // Global wallet state
 // ------------------------
@@ -35,8 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ffWireHeroButtons();
 
   // Default view: Collection (recent sales)
-  ffShowView('collection');
-  loadRecentActivity();
+  ffShowView('collection'); // this calls loadRecentActivity()
 
   ffInitWalletOnLoad();
 
@@ -45,13 +51,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('load-more-sales');
 
   if (loadMoreBtn) {
-    loadMoreBtn.addEventListener('click', () => {
+    loadMoreBtn.addEventListener('click', async () => {
+      const prevY = window.scrollY;
       FF_RECENT_LIMIT += 6;
-      if (FF_ACTIVITY_MODE === 'mints') {
-        loadRecentActivity();
-      } else {
-        loadRecentActivity();
-      }
+      await loadRecentActivity();
+      window.scrollTo(0, prevY);
     });
   }
 
@@ -228,7 +232,7 @@ async function loadRecentActivity() {
 
       container.appendChild(card);
 
-      // Staking stats (only if actually staked & wallet/web3 helpers available)
+      // Staking stats on recent sales / mints if frog is staked
       ffAttachStakeMetaIfStaked(card, tokenId);
 
       if (card.dataset.imgContainerId) {
@@ -244,7 +248,7 @@ async function loadRecentActivity() {
   }
 }
 
-// Attach staking block to any card (recent sales/mints, pond, rarity, etc.)
+// Attach staking block to any card (recent, pond, rarity, etc.)
 // Uses ethereum-dapp.js helpers: stakerAddress() + stakingValues()
 async function ffAttachStakeMetaIfStaked(card, tokenId) {
   if (!FF_SHOW_STAKING_STATS_ON_CARDS) return;
@@ -345,11 +349,7 @@ function getRarityRank(tokenId) {
 
   if (Array.isArray(map)) {
     const lookup = buildRarityLookup(map);
-    rankRaw = lookup[tokenId];
-
-    if (rankRaw === undefined) {
-      rankRaw = map[tokenId] ?? map[tokenId - 1];
-    }
+    rankRaw = lookup[tokenId]; // no weird fallback
   } else if (typeof map === 'object') {
     rankRaw =
       map[tokenId] ??
@@ -431,7 +431,7 @@ function createFrogCard({
     </div>
 
     <div class="recent_sale_traits">
-      <strong class="sale_card_title">Frog #${tokenId}</strong>
+      <strong class="sale_card_title">${frogName}</strong>
       <strong class="sale_card_price ${rarityClass}">${rarityText}</strong><br>
       <div class="recent_sale_properties">
         ${traitsHtml}
@@ -439,7 +439,7 @@ function createFrogCard({
       ${footerHtml || ''}
       ${actionHtml || ''}
     </div>
-  `;
+  """
 
   if (typeof ffBuildLayeredFrogImage === 'function') {
     ffBuildLayeredFrogImage(tokenId, imgContainerId).catch((err) => {
@@ -541,12 +541,28 @@ function buildTraitsHtml(metadata) {
 }
 
 // ------------------------
-// Activity fetchers (mints/sales)
+// Activity fetchers / dedupe
 // ------------------------
+function dedupeByTokenId(items, idExtractor) {
+  const seen = new Set();
+  const out  = [];
+
+  for (const item of items) {
+    const rawId   = idExtractor(item);
+    const tokenId = parseTokenId(rawId);
+    if (tokenId == null) continue;
+    if (seen.has(tokenId)) continue;
+    seen.add(tokenId);
+    out.push(item);
+  }
+
+  return out;
+}
+
 async function fetchRecentSales(limit = 24) {
   const params = new URLSearchParams({
     contractAddress: FF_COLLECTION_ADDRESS,
-    order: 'asc',
+    order: 'desc', // newest first
     limit: String(limit)
   });
 
@@ -557,7 +573,12 @@ async function fetchRecentSales(limit = 24) {
   }
 
   const payload = await response.json();
-  return Array.isArray(payload.nftSales) ? payload.nftSales : [];
+  let sales = Array.isArray(payload.nftSales) ? payload.nftSales : [];
+
+  // Remove duplicates by tokenId
+  sales = dedupeByTokenId(sales, (sale) => sale.tokenId);
+
+  return sales;
 }
 
 async function fetchRecentMints(limit = 24) {
@@ -588,10 +609,16 @@ async function fetchRecentMints(limit = 24) {
   }
 
   const payload = await response.json();
-  const transfers =
+  let transfers =
     payload.result && Array.isArray(payload.result.transfers)
       ? payload.result.transfers
       : [];
+
+  // Remove duplicates by tokenId
+  transfers = dedupeByTokenId(
+    transfers,
+    (t) => t.erc721TokenId || t.tokenId
+  );
 
   return transfers;
 }
@@ -724,31 +751,44 @@ function hasUsableMetadata(metadata) {
 // ===================================================
 // Rarity panel
 // ===================================================
-let FF_RARITY_OFFSET = 1;    // starting frog id
-let FF_RARITY_BATCH  = 24;
-
 function ffEnsureRarityLoaded() {
   const grid = document.getElementById('rarity-grid');
   if (!grid) return;
   if (!grid.children.length) {
-    FF_RARITY_OFFSET = 1;
+    FF_RARITY_INDEX = 0;
     ffLoadMoreRarity();
   }
 }
 
 async function ffLoadMoreRarity() {
-  const grid = document.getElementById('rarity-grid');
+  const grid   = document.getElementById('rarity-grid');
   const status = document.getElementById('rarity-status');
   if (!grid) return;
 
-  try {
-    const start = FF_RARITY_OFFSET;
-    const end   = Math.min(4040, start + FF_RARITY_BATCH - 1);
+  const rankings = window.freshfrogs_rarity_rankings;
+  if (!Array.isArray(rankings) || !rankings.length) {
+    if (status) status.textContent = 'Rarity rankings data not loaded.';
+    return;
+  }
 
-    for (let tokenId = start; tokenId <= end; tokenId++) {
+  const slice = rankings.slice(FF_RARITY_INDEX, FF_RARITY_INDEX + FF_RARITY_BATCH);
+  if (!slice.length) {
+    if (status) status.textContent = 'All frogs loaded.';
+    return;
+  }
+
+  try {
+    for (const entry of slice) {
+      const rawId = entry.id ?? entry.tokenId ?? entry.frogId;
+      const tokenId = parseTokenId(rawId);
+      if (tokenId == null) continue;
+
+      const rank = entry.ranking ?? entry.rank ?? entry.position ?? getRarityRank(tokenId);
+
       const metadata = await fetchFrogMetadata(tokenId);
-      const headerLeft  = ''; // (owner lookups would require extra Alchemy calls; skip for now)
-      const headerRight = ''; // latest sale price would also require extra calls
+
+      const headerLeft  = ''; // owner lookup skipped for now (too heavy for full 4,040 list)
+      const headerRight = rank ? `Rank #${rank}` : '';
 
       const card = createFrogCard({
         tokenId,
@@ -787,9 +827,10 @@ async function ffLoadMoreRarity() {
       }
     }
 
-    FF_RARITY_OFFSET = end + 1;
+    FF_RARITY_INDEX += slice.length;
+
     if (status) {
-      status.textContent = FF_RARITY_OFFSET > 4040
+      status.textContent = FF_RARITY_INDEX >= rankings.length
         ? 'All frogs loaded.'
         : 'Top ranked Frogs across the collection (lower rank = rarer).';
     }
@@ -802,8 +843,6 @@ async function ffLoadMoreRarity() {
 // ===================================================
 // Pond panel (frogs owned by controller)
 // ===================================================
-let FF_POND_PAGE_KEY = null;
-
 async function ffFetchPondFrogs(limit = 24, pageKey = null) {
   const params = new URLSearchParams({
     owner: FF_CONTROLLER_ADDRESS,
@@ -862,6 +901,9 @@ async function ffLoadMorePond() {
       let metadata = normalizeMetadata(
         nft.rawMetadata || nft.metadata || nft.tokenMetadata
       );
+      if (!hasUsableMetadata(metadata)) {
+        metadata = {};
+      }
 
       const card = createFrogCard({
         tokenId,
@@ -902,9 +944,7 @@ async function ffLoadMorePond() {
 
     FF_POND_PAGE_KEY = pageKey;
     if (status) {
-      status.textContent = pageKey
-        ? 'All Frogs currently staked by the community.'
-        : 'All Frogs currently staked by the community.';
+      status.textContent = 'All Frogs currently staked by the community.';
     }
   } catch (err) {
     console.error('ffLoadMorePond failed', err);
@@ -1133,7 +1173,7 @@ async function renderOwnedAndStakedFrogs(address) {
   }
 }
 
-// Use stakingValues() + stakerAddress() from ethereum-dapp.js
+// Use stakingValues() from ethereum-dapp.js to decorate wallet-staked cards
 async function ffDecorateStakedFrogCard(tokenId) {
   if (typeof stakingValues !== 'function') {
     console.warn('stakingValues() not available; skipping staking details');
