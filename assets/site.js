@@ -12,6 +12,16 @@ const FF_OPENSEA_API_KEY    = '48ffee972fc245fa965ecfe902b02ab4'; // optional
 const FF_ALCHEMY_NFT_BASE   = `https://eth-mainnet.g.alchemy.com/nft/v3/${FF_ALCHEMY_API_KEY}`;
 const FF_ALCHEMY_CORE_BASE  = `https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY_API_KEY}`;
 
+// 🔹 Which provider to use for *recent sales only*
+//   'alchemy' → use Alchemy getNFTSales
+//   'opensea' → use OpenSea Get Events (by collection)
+const FF_SALES_SOURCE = 'opensea'; // 'opensea' or 'alchemy'
+
+// 🔹 OpenSea collection slug for Fresh Frogs
+//     e.g. if your URL is https://opensea.io/collection/fresh-frogs
+//     then slug = 'fresh-frogs'
+const FF_OPENSEA_COLLECTION_SLUG = 'fresh-frogs'; // <-- update if needed
+
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 // Activity mode (sales vs mints) for "Collection" panel
@@ -28,17 +38,31 @@ const FF_RARITY_BATCH = 24;
 // Pond paging
 let FF_POND_PAGE_KEY = null;
 
-// Cache of last sale prices: tokenId -> priceText (e.g. "0.042 ETH")
-const FF_LAST_SALE_BY_TOKEN = {};
-
 // ------------------------
-// Global wallet / web3 state
+// Global wallet state
 // ------------------------
 let ffWeb3 = null;
 let ffCurrentAccount = null;
 
 // Queue of cards that need staking decoration once contracts/helpers are ready
 const FF_PENDING_STAKE_CARDS = [];
+
+// Simple cache of last-known sale data keyed by tokenId (number)
+const FF_SALE_PRICE_CACHE = new Map();
+
+// Helper: are we in the 404 wallet-viewer route (freshfrogs.github.io/{address})?
+function ffIsWalletViewer() {
+  if (typeof window === 'undefined') return false;
+  try {
+    const raw = window.location.pathname || '';
+    const trimmed = raw.replace(/^\/+|\/+$/g, '');
+    if (!trimmed) return false;
+    const first = trimmed.split('/')[0];
+    return /^0x[a-fA-F0-9]{40}$/.test(first);
+  } catch {
+    return false;
+  }
+}
 
 // ------------------------
 // Entry
@@ -47,13 +71,10 @@ document.addEventListener('DOMContentLoaded', () => {
   ffInitNav();
   ffWireHeroButtons();
 
-  ffInitWalletOnLoad();
-
-  // Spin up read-only staking contracts + backfill stake meta on all cards
-  ffBootStakeMetaWatcher();
-
   // Default view: Collection (recent sales)
   ffShowView('collection'); // this calls loadRecentActivity()
+
+  ffInitWalletOnLoad();
 
   const loadMoreBtn =
     document.getElementById('load-more-activity') ||
@@ -190,6 +211,11 @@ async function loadRecentActivity() {
       const tokenId = parseTokenId(rawTokenId);
       if (!tokenId) continue;
 
+      // Cache sale data for later use in wallet / 404 views
+      if (FF_ACTIVITY_MODE === 'sales') {
+        ffRegisterSaleInCache(tokenId, item);
+      }
+
       let metadata = normalizeMetadata(item.metadata || item.tokenMetadata);
       if (!hasUsableMetadata(metadata)) {
         metadata = await fetchFrogMetadata(tokenId);
@@ -200,20 +226,14 @@ async function loadRecentActivity() {
 
       if (FF_ACTIVITY_MODE === 'mints') {
         ownerAddress = item.to;
-        headerRight  = formatMintAge(item);
+        headerRight  = formatMintPrice(item);
       } else {
         ownerAddress =
           item.buyerAddress || item.to || item.ownerAddress || item.sellerAddress;
-        const priceText = formatSalePrice(item);
-        headerRight = priceText;
-
-        // 🔹 Cache last sale price for this token
-        if (priceText) {
-          FF_LAST_SALE_BY_TOKEN[tokenId] = priceText;
-        }
+        headerRight  = formatSalePrice(item);
       }
 
-      const headerLeft = ownerAddress ? truncateAddress(ownerAddress) : '';
+      const headerLeft = truncateAddress(ownerAddress);
 
       const actionHtml = `
         <div class="recent_sale_links">
@@ -234,7 +254,7 @@ async function loadRecentActivity() {
             Etherscan
           </a>
         </div>
-     `;
+      `;
 
       const card = createFrogCard({
         tokenId,
@@ -242,8 +262,7 @@ async function loadRecentActivity() {
         headerLeft,
         headerRight,
         footerHtml: '',
-        actionHtml,
-        ownerAddress
+        actionHtml
       });
 
       container.appendChild(card);
@@ -265,12 +284,7 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
   if (!FF_SHOW_STAKING_STATS_ON_CARDS) return;
   if (!card) return;
 
-  try {
-    await ffEnsureReadContracts();
-  } catch (e) {
-    console.warn('ffAttachStakeMetaIfStaked: ffEnsureReadContracts failed', e);
-  }
-
+  // If staking helpers or controller aren't ready yet, queue for later
   if (
     typeof window.stakerAddress !== 'function' ||
     typeof window.stakingValues !== 'function' ||
@@ -282,19 +296,22 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
 
   try {
     const staker = await stakerAddress(tokenId);
+    // Not staked or explicitly zero-address → no staking block
     if (!staker || staker === ZERO_ADDRESS) return;
 
     const values = await stakingValues(tokenId);
     if (!Array.isArray(values) || values.length < 5) return;
 
-    const [stakedDays, rawLevel, daysToNext] = values;
+    const [stakedDays, rawLevel, daysToNext, flyzEarned, stakedDate] = values;
 
+    // Convert roman numerals if needed (e.g., "XII" -> 12)
     const levelNum = ffRomanToArabic(rawLevel) ?? rawLevel;
 
     const MAX_DAYS  = 41.7;
     const remaining = Math.max(0, Math.min(MAX_DAYS, Number(daysToNext)));
     const pct       = Math.max(0, Math.min(100, ((MAX_DAYS - remaining) / MAX_DAYS) * 100));
 
+    // Find the traits block, then attach staking *after* it, not inside
     const propsBlock =
       card.querySelector('.recent_sale_properties') ||
       card.querySelector('.recent_sale_traits') ||
@@ -302,6 +319,7 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
 
     const parent = propsBlock.parentElement || card;
 
+    // Remove any previous staking block so we don't double-render
     parent.querySelectorAll('.stake-meta, .staking-sale-stats').forEach((el) => el.remove());
 
     const wrapper = document.createElement('div');
@@ -311,13 +329,14 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
         <span class="stake-level-label">Staked Lvl. ${levelNum}</span>
       </div>
       <div class="stake-meta-row stake-meta-subrow">
-        <span>Staked: ${stakedDays}d</span>
+        <span>Staked: ${stakedDate} (${stakedDays}d)</span>
       </div>
       <div class="stake-progress">
         <div class="stake-progress-bar" style="width:${pct}%;"></div>
       </div>
     `;
 
+    // Insert staking block right after the traits, but before any action buttons
     const firstAction = parent.querySelector('.recent_sale_links');
     if (firstAction) {
       parent.insertBefore(wrapper, firstAction);
@@ -329,6 +348,7 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
   }
 }
 
+// Process any cards that were queued before staking helpers were ready
 function ffProcessPendingStakeMeta() {
   if (
     typeof window.stakerAddress !== 'function' ||
@@ -344,6 +364,27 @@ function ffProcessPendingStakeMeta() {
   }
 }
 
+// Make sure *all* existing frog cards get staking info once things are ready
+function ffRefreshStakeMetaForAllCards() {
+  if (
+    typeof window.stakerAddress !== 'function' ||
+    typeof window.stakingValues !== 'function' ||
+    !window.controller
+  ) {
+    return;
+  }
+
+  const cards = document.querySelectorAll('.recent_sale_card');
+  cards.forEach((card) => {
+    const raw = card.dataset.tokenId;
+    const tokenId = parseTokenId(raw);
+    if (tokenId != null) {
+      ffAttachStakeMetaIfStaked(card, tokenId);
+    }
+  });
+}
+
+// Refresh staking info on all already-rendered frog cards
 async function ffRefreshAllStakeMeta() {
   if (!FF_SHOW_STAKING_STATS_ON_CARDS) return;
 
@@ -352,41 +393,9 @@ async function ffRefreshAllStakeMeta() {
     const rawId = card.dataset.tokenId;
     const tokenId = parseTokenId(rawId);
     if (tokenId == null) continue;
+
     ffAttachStakeMetaIfStaked(card, tokenId);
   }
-}
-
-function ffRefreshStakeMetaForAllCards() {
-  ffRefreshAllStakeMeta();
-}
-
-function ffBootStakeMetaWatcher() {
-  let attempts = 0;
-  const maxAttempts = 5;
-
-  const tick = async () => {
-    attempts += 1;
-
-    const ok = await ffEnsureReadContracts().catch(() => false);
-
-    if (
-      ok &&
-      typeof window.stakerAddress === 'function' &&
-      typeof window.stakingValues === 'function'
-    ) {
-      ffProcessPendingStakeMeta();
-      ffRefreshAllStakeMeta();
-      return;
-    }
-
-    if (attempts < maxAttempts) {
-      setTimeout(tick, 1500);
-    } else {
-      console.warn('[FreshFrogs] staking helpers not ready after retries; some stake badges may be missing.');
-    }
-  };
-
-  tick();
 }
 
 // ------------------------
@@ -471,32 +480,6 @@ function buildRarityLookup(rankings) {
 }
 
 // ------------------------
-// Owner label helper
-// ------------------------
-function truncateAddress(address) {
-  if (!address || typeof address !== 'string') return '--';
-  if (address.length <= 10) return address;
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
-}
-
-// Build clickable owner label for the top-left of the frog card
-function ffBuildOwnerLabel(ownerAddress, fallbackText) {
-  if (!ownerAddress) {
-    return fallbackText || '';
-  }
-
-  const addr = String(ownerAddress);
-  return `
-    <a
-      href="https://freshfrogs.github.io/${addr}"
-      class="frog-owner-link"
-    >
-      ${truncateAddress(addr)}
-    </a>
-  `;
-}
-
-// ------------------------
 // Card rendering (shared for all grids)
 // ------------------------
 function createFrogCard({
@@ -505,8 +488,7 @@ function createFrogCard({
   headerLeft,
   headerRight,
   footerHtml,
-  actionHtml,
-  ownerAddress
+  actionHtml
 }) {
   const frogName   = `Frog #${tokenId}`;
   const rarityRank = getRarityRank(tokenId);
@@ -527,9 +509,7 @@ function createFrogCard({
   card.dataset.imgContainerId = imgContainerId;
 
   card.innerHTML = `
-    <strong class="sale_card_title">
-      ${ffBuildOwnerLabel(ownerAddress, headerLeft)}
-    </strong>
+    <strong class="sale_card_title">${headerLeft || ''}</strong>
     <strong class="sale_card_price">${headerRight || ''}</strong>
     <div style="clear: both;"></div>
 
@@ -562,6 +542,7 @@ function createFrogCard({
   return card;
 }
 
+// Build layered frog image (uses metadata from /frog/json and build_trait from ethereum-dapp.js)
 async function ffBuildLayeredFrogImage(tokenId, containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -670,10 +651,26 @@ function dedupeByTokenId(items, idExtractor) {
   return out;
 }
 
+// 🔹 Unified fetchRecentSales with optional OpenSea backend
 async function fetchRecentSales(limit = 24) {
+  if (FF_SALES_SOURCE === 'opensea') {
+    try {
+      return await fetchRecentSalesFromOpenSea(limit);
+    } catch (err) {
+      console.warn('[FreshFrogs] OpenSea sales fetch failed, falling back to Alchemy', err);
+      return await fetchRecentSalesFromAlchemy(limit);
+    }
+  }
+
+  // Default: Alchemy
+  return await fetchRecentSalesFromAlchemy(limit);
+}
+
+// Original Alchemy implementation split out so we can call it directly
+async function fetchRecentSalesFromAlchemy(limit = 24) {
   const params = new URLSearchParams({
     contractAddress: FF_COLLECTION_ADDRESS,
-    order: 'desc',
+    order: 'desc', // newest first
     limit: String(limit)
   });
 
@@ -686,9 +683,87 @@ async function fetchRecentSales(limit = 24) {
   const payload = await response.json();
   let sales = Array.isArray(payload.nftSales) ? payload.nftSales : [];
 
+  // Remove duplicates by tokenId
   sales = dedupeByTokenId(sales, (sale) => sale.tokenId);
 
   return sales;
+}
+
+// New: OpenSea-based recent sales (Get Events by collection)
+async function fetchRecentSalesFromOpenSea(limit = 24) {
+  if (!FF_OPENSEA_API_KEY || !FF_OPENSEA_COLLECTION_SLUG) {
+    console.warn('[FreshFrogs] OpenSea config missing; falling back to Alchemy sales.');
+    return await fetchRecentSalesFromAlchemy(limit);
+  }
+
+  const params = new URLSearchParams({
+    event_type: 'sale',
+    limit: String(Math.min(Math.max(limit, 1), 50)), // OpenSea max 50
+    chain: 'ethereum'
+  });
+
+  const url = `https://api.opensea.io/api/v2/events/collection/${encodeURIComponent(
+    FF_OPENSEA_COLLECTION_SLUG
+  )}?${params.toString()}`;
+
+  const res = await fetch(url, {
+    headers: {
+      'Accept': 'application/json',
+      'X-API-KEY': FF_OPENSEA_API_KEY
+    }
+  });
+
+  if (!res.ok) {
+    throw new Error(`OpenSea events request failed: ${res.status}`);
+  }
+
+  const data = await res.json();
+  // Depending on OpenSea tooling, this may be `asset_events` or `events`
+  const rawEvents = Array.isArray(data.asset_events)
+    ? data.asset_events
+    : Array.isArray(data.events)
+    ? data.events
+    : [];
+
+  // De-dupe by NFT identifier
+  const deduped = dedupeByTokenId(
+    rawEvents,
+    (evt) => {
+      const nft = evt.nft || evt.asset || {};
+      return nft.identifier || nft.token_id || evt.nft_identifier;
+    }
+  );
+
+  // Normalize into the pseudo-"sale" shape expected by loadRecentActivity / formatSalePrice
+  const mapped = deduped.map((evt) => {
+    const nft = evt.nft || evt.asset || {};
+    const tokenId = nft.identifier || nft.token_id || evt.nft_identifier;
+
+    const payment = evt.payment_token || {};
+    const closing = evt.closing_price || evt.price || evt.total_price || null;
+
+    const buyer  = evt.to_address || (evt.taker && evt.taker.address) || null;
+    const seller = evt.from_address || (evt.maker && evt.maker.address) || null;
+
+    const priceObj = closing
+      ? {
+          amount: String(closing),
+          decimals:
+            typeof payment.decimals === 'number' ? payment.decimals : 18,
+          symbol: payment.symbol || 'ETH'
+        }
+      : null;
+
+    return {
+      tokenId,
+      metadata: null, // we'll fall back to on-chain metadata
+      buyerAddress: buyer,
+      sellerAddress: seller,
+      price: priceObj
+    };
+  });
+
+  return mapped;
 }
 
 async function fetchRecentMints(limit = 24) {
@@ -724,6 +799,7 @@ async function fetchRecentMints(limit = 24) {
       ? payload.result.transfers
       : [];
 
+  // Remove duplicates by tokenId
   transfers = dedupeByTokenId(
     transfers,
     (t) => t.erc721TokenId || t.tokenId
@@ -750,8 +826,14 @@ async function fetchFrogMetadata(tokenId) {
 }
 
 // ------------------------
-// Formatting helpers
+// Formatting + sale cache helpers
 // ------------------------
+function truncateAddress(address) {
+  if (!address || typeof address !== 'string') return '--';
+  if (address.length <= 10) return address;
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
 function formatSalePrice(sale) {
   if (!sale) return '--';
 
@@ -851,6 +933,25 @@ function hasUsableMetadata(metadata) {
   return attributes.length > 0;
 }
 
+// 🔹 Sale cache helpers
+function ffRegisterSaleInCache(tokenId, sale) {
+  const id = parseTokenId(tokenId);
+  if (id == null || !sale) return;
+  FF_SALE_PRICE_CACHE.set(id, sale);
+}
+
+function ffGetCachedSale(tokenId) {
+  const id = parseTokenId(tokenId);
+  if (id == null) return null;
+  return FF_SALE_PRICE_CACHE.get(id) || null;
+}
+
+function ffGetCachedSalePrice(tokenId) {
+  const sale = ffGetCachedSale(tokenId);
+  if (!sale) return null;
+  return formatSalePrice(sale);
+}
+
 // ===================================================
 // Rarity panel
 // ===================================================
@@ -860,38 +961,6 @@ function ffEnsureRarityLoaded() {
   if (!grid.children.length) {
     FF_RARITY_INDEX = 0;
     ffLoadMoreRarity();
-  }
-}
-
-// Resolve the "true" frog owner for rarity (staker or ownerOf)
-async function ffResolveFrogOwner(tokenId) {
-  const ok = await ffEnsureReadContracts().catch((err) => {
-    console.warn('ffResolveFrogOwner: ffEnsureReadContracts failed', err);
-    return false;
-  });
-  if (!ok) return null;
-
-  if (typeof stakerAddress === 'function' && window.controller) {
-    try {
-      const staker = await stakerAddress(tokenId);
-      if (staker && staker !== ZERO_ADDRESS) {
-        return staker;
-      }
-    } catch (err) {
-      console.warn('ffResolveFrogOwner: stakerAddress failed for token', tokenId, err);
-    }
-  }
-
-  if (!window.collection || !window.collection.methods || !window.collection.methods.ownerOf) {
-    return null;
-  }
-
-  try {
-    const owner = await window.collection.methods.ownerOf(tokenId).call();
-    return owner || null;
-  } catch (err) {
-    console.warn('ffResolveFrogOwner: ownerOf failed for token', tokenId, err);
-    return null;
   }
 }
 
@@ -920,12 +989,9 @@ async function ffLoadMoreRarity() {
 
       const rank = entry.ranking ?? entry.rank ?? entry.position ?? getRarityRank(tokenId);
 
-      const [metadata, ownerAddress] = await Promise.all([
-        fetchFrogMetadata(tokenId),
-        ffResolveFrogOwner(tokenId).catch(() => null)
-      ]);
+      const metadata = await fetchFrogMetadata(tokenId);
 
-      const headerLeft  = ownerAddress ? truncateAddress(ownerAddress) : '';
+      const headerLeft  = ''; // owner lookup skipped for now (too heavy for full 4,040 list)
       const headerRight = rank ? `Rank #${rank}` : '';
 
       const card = createFrogCard({
@@ -953,8 +1019,7 @@ async function ffLoadMoreRarity() {
               Etherscan
             </a>
           </div>
-        `,
-        ownerAddress
+        `
       });
 
       grid.appendChild(card);
@@ -976,7 +1041,7 @@ async function ffLoadMoreRarity() {
 }
 
 // ===================================================
-// Pond panel
+// Pond panel (frogs owned by controller = staked by community)
 // ===================================================
 async function ffFetchPondFrogs(limit = 24, pageKey = null) {
   const params = new URLSearchParams({
@@ -1019,8 +1084,17 @@ function ffEnsurePondLoaded() {
 // Set owner label (top-left) on a pond card using stakerAddress(tokenId)
 async function ffDecoratePondOwner(card, tokenId) {
   try {
-    const ok = await ffEnsureReadContracts();
-    if (!ok || typeof stakerAddress !== 'function') return;
+    if (typeof ffEnsureReadContracts === 'function') {
+      const ok = await ffEnsureReadContracts();
+      if (!ok) return;
+    } else {
+      if (!ffWeb3 || !window.controller) return;
+    }
+
+    if (typeof stakerAddress !== 'function') {
+      console.warn('stakerAddress() helper not available; cannot show pond owner.');
+      return;
+    }
 
     const staker = await stakerAddress(tokenId);
     if (!staker || staker === ZERO_ADDRESS) return;
@@ -1028,7 +1102,7 @@ async function ffDecoratePondOwner(card, tokenId) {
     const titleEls = card.querySelectorAll('.sale_card_title');
     const ownerEl = titleEls[0];
     if (ownerEl) {
-      ownerEl.innerHTML = ffBuildOwnerLabel(staker, '');
+      ownerEl.textContent = truncateAddress(staker);
     }
   } catch (err) {
     console.warn('ffDecoratePondOwner failed for token', tokenId, err);
@@ -1085,8 +1159,7 @@ async function ffLoadMorePond() {
               Etherscan
             </a>
           </div>
-        `,
-        ownerAddress: null
+        `
       });
 
       grid.appendChild(card);
@@ -1095,10 +1168,7 @@ async function ffLoadMorePond() {
         ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
       }
 
-      if (typeof ffAttachStakeMetaIfStaked === 'function') {
-        ffAttachStakeMetaIfStaked(card, tokenId);
-      }
-
+      ffAttachStakeMetaIfStaked(card, tokenId);
       ffDecoratePondOwner(card, tokenId);
     }
 
@@ -1114,7 +1184,7 @@ async function ffLoadMorePond() {
 }
 
 // ===================================================
-// Owned / Staked frogs (wallet view, also used by 404 viewer)
+// Owned / Staked frogs (wallet view)
 // ===================================================
 async function ffFetchOwnedFrogs(address) {
   if (!FF_ALCHEMY_NFT_BASE) return [];
@@ -1174,14 +1244,13 @@ async function ffFetchStakedTokenIds(address) {
   return result;
 }
 
-// options.readOnly === true is used by 404 wallet viewer
-async function renderOwnedAndStakedFrogs(address, options = {}) {
-  const readOnly = !!options.readOnly;
-
+async function renderOwnedAndStakedFrogs(address) {
   const ownedGrid   = document.getElementById('owned-frogs-grid');
   const ownedStatus = document.getElementById('owned-frogs-status');
   const stakedGrid   = document.getElementById('staked-frogs-grid');
   const stakedStatus = document.getElementById('staked-frogs-status');
+
+  const readOnly = ffIsWalletViewer(); // 404 wallet viewer → no stake/transfer buttons
 
   try {
     const [ownedNfts, stakedIds] = await Promise.all([
@@ -1213,32 +1282,32 @@ async function renderOwnedAndStakedFrogs(address, options = {}) {
           metadata = await fetchFrogMetadata(tokenId);
         }
 
-        // 🔹 Use cached last sale price if available
-        const salePriceText = FF_LAST_SALE_BY_TOKEN[tokenId];
-        const headerRight   = salePriceText || 'Owned';
+        const saleText = ffGetCachedSalePrice(tokenId);
+        const headerRight = saleText || 'Owned';
 
-        const actionHtml = readOnly
-          ? `
-            <div class="recent_sale_links">
-              <a
-                class="sale_link_btn opensea"
-                href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                OpenSea
-              </a>
-              <a
-                class="sale_link_btn etherscan"
-                href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Etherscan
-              </a>
-            </div>
-          `
-          : `
+        let actionHtml = `
+          <div class="recent_sale_links">
+            <a
+              class="sale_link_btn opensea"
+              href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              OpenSea
+            </a>
+            <a
+              class="sale_link_btn etherscan"
+              href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Etherscan
+            </a>
+          </div>
+        `;
+
+        if (!readOnly) {
+          actionHtml = `
             <div class="recent_sale_links">
               <button class="sale_link_btn" onclick="ffStakeFrog(${tokenId})">
                 Stake
@@ -1247,25 +1316,9 @@ async function renderOwnedAndStakedFrogs(address, options = {}) {
                 Transfer
               </button>
             </div>
-            <div class="recent_sale_links">
-              <a
-                class="sale_link_btn opensea"
-                href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                OpenSea
-              </a>
-              <a
-                class="sale_link_btn etherscan"
-                href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Etherscan
-              </a>
-            </div>
+            ${actionHtml}
           `;
+        }
 
         const card = createFrogCard({
           tokenId,
@@ -1273,8 +1326,7 @@ async function renderOwnedAndStakedFrogs(address, options = {}) {
           headerLeft: truncateAddress(address),
           headerRight,
           footerHtml: '',
-          actionHtml,
-          ownerAddress: readOnly ? null : address
+          actionHtml
         });
 
         ownedGrid.appendChild(card);
@@ -1290,15 +1342,11 @@ async function renderOwnedAndStakedFrogs(address, options = {}) {
     if (stakedGrid) stakedGrid.innerHTML = '';
 
     if (stakedGrid && stakedIds.length) {
-      for (const tokenIdRaw of stakedIds) {
-        const tokenId = parseTokenId(tokenIdRaw);
-        if (tokenId == null) continue;
-
+      for (const tokenId of stakedIds) {
         let metadata = await fetchFrogMetadata(tokenId);
 
-        // 🔹 Use cached last sale price if available
-        const salePriceText = FF_LAST_SALE_BY_TOKEN[tokenId];
-        const headerRight   = salePriceText || 'Staked';
+        const saleText = ffGetCachedSalePrice(tokenId);
+        const headerRight = saleText || 'Staked';
 
         const footerHtml = `
           <div class="stake-meta">
@@ -1315,63 +1363,45 @@ async function renderOwnedAndStakedFrogs(address, options = {}) {
           </div>
         `;
 
-        const actionHtml = readOnly
-          ? `
-            <div class="recent_sale_links">
-              <a
-                class="sale_link_btn opensea"
-                href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                OpenSea
-              </a>
-              <a
-                class="sale_link_btn etherscan"
-                href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Etherscan
-              </a>
-            </div>
-          `
-          : `
+        let actionHtml = `
+          <div class="recent_sale_links">
+            <a
+              class="sale_link_btn opensea"
+              href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              OpenSea
+            </a>
+            <a
+              class="sale_link_btn etherscan"
+              href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Etherscan
+            </a>
+          </div>
+        `;
+
+        if (!readOnly) {
+          actionHtml = `
             <div class="recent_sale_links">
               <button class="sale_link_btn" onclick="ffUnstakeFrog(${tokenId})">
                 Unstake
               </button>
             </div>
-            <div class="recent_sale_links">
-              <a
-                class="sale_link_btn opensea"
-                href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                OpenSea
-              </a>
-              <a
-                class="sale_link_btn etherscan"
-                href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Etherscan
-              </a>
-            </div>
+            ${actionHtml}
           `;
-
-        const ownerLabelAddress = address || ffCurrentAccount;
+        }
 
         const card = createFrogCard({
           tokenId,
           metadata,
-          headerLeft: truncateAddress(ownerLabelAddress) || 'Pond',
+          headerLeft: truncateAddress(address || ffCurrentAccount) || 'Pond',
           headerRight,
           footerHtml,
-          actionHtml,
-          ownerAddress: readOnly ? null : ownerLabelAddress
+          actionHtml
         });
 
         stakedGrid.appendChild(card);
@@ -1386,7 +1416,7 @@ async function renderOwnedAndStakedFrogs(address, options = {}) {
   }
 }
 
-// Decorate wallet-staked cards with richer staking info
+// Use stakingValues() from ethereum-dapp.js to decorate wallet-staked cards
 async function ffDecorateStakedFrogCard(tokenId) {
   const ok = await ffEnsureReadContracts();
   if (!ok || typeof stakingValues !== 'function') {
@@ -1518,7 +1548,10 @@ function ffUpdateWalletBasicUI(address) {
 }
 
 function ffApplyDashboardUpdates(address, ownedCount, stakingStats, profile) {
-  ffUpdateWalletBasicUI(address);
+  // On the 404 wallet viewer, don't hijack the nav / header state
+  if (!ffIsWalletViewer()) {
+    ffUpdateWalletBasicUI(address);
+  }
 
   if (typeof ownedCount === 'number') {
     ffSetText('stat-owned', ownedCount.toString());
@@ -1819,3 +1852,11 @@ function ffRomanToArabic(roman) {
 
   return total || null;
 }
+
+// HEADER NAV: active state for view tabs
+document.addEventListener('DOMContentLoaded', () => {
+  const links = document.querySelectorAll('.nav a[data-view]');
+  links.forEach((link) => {
+    link.style.cursor = 'pointer';
+  });
+});
