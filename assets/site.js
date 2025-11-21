@@ -17,7 +17,7 @@ const FF_RECENT_SALES_SOURCE = 'opensea';
 
 // If using OpenSea as recent sales source, set your collection slug here.
 // Example: 'fresh-frogs' (whatever your OpenSea collection slug is)
-const FF_OPENSEA_COLLECTION_SLUG = ''; // <-- FILL THIS IN
+const FF_OPENSEA_COLLECTION_SLUG = 'fresh-frogs'; // <-- FILL THIS IN
 
 const FF_ALCHEMY_NFT_BASE   = `https://eth-mainnet.g.alchemy.com/nft/v3/${FF_ALCHEMY_API_KEY}`;
 const FF_ALCHEMY_CORE_BASE  = `https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY_API_KEY}`;
