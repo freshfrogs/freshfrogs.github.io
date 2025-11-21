@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="shortcut icon" type="image/x-icon" href="https://freshfrogs.github.io/assets/blackWhite.png">
 
-  <!-- same global scripts as the rest of your site -->
+  <!-- same global scripts you use elsewhere -->
   <script src="assets/rarityrankings.js"></script>
   <script src="assets/controller_abi.js"></script>
   <script src="assets/collection_abi.js"></script>
@@ -15,7 +15,7 @@
   <script src="assets/site.js"></script>
 
   <style>
-    /* Only layout glue. Visuals come from your existing CSS. */
+    /* only layout glue; visuals come from your existing CSS */
     .content-wide { max-width: 1250px; margin: 0 auto; }
 
     .morph-page {
@@ -124,8 +124,8 @@
 
 <body class="layout-4">
 
-  <!-- If your site auto-builds header/nav in site.js, this will already match.
-       If it doesn’t, your CSS still styles topbar/brand if those classes exist. -->
+  <!-- If your header/nav is injected by site.js, this will match.
+       Otherwise this still uses your site's topbar classes. -->
   <header class="topbar">
     <div class="topbar-left brand">
       <a href="index.html" class="brand">
@@ -199,6 +199,4 @@
     </section>
   </main>
 
-  <script src="assets/morph.js"></script>
-</body>
-</html>
+  <script src=

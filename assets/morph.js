@@ -1,15 +1,16 @@
-/* assets/morph.js — Metamorph Lab (site-matching + canvas preview) */
+/* assets/morph.js — Metamorph Lab
+   - renders 20 random frogs using your native FrogCards (if exposed)
+   - click 2 frogs -> metamorph preview
+   - composites PNG layers from: SOURCE_PATH/frog/build_files/
+*/
 
 const MAX_SUPPLY = 4040;
+
+// keep your existing SOURCE_PATH if already set
 window.SOURCE_PATH = window.SOURCE_PATH || "https://freshfrogs.github.io/assets";
 
-// Try multiple trait bases so preview doesn't "mess up" if path differs.
-const TRAIT_BASES = [
-  `${SOURCE_PATH}/traits`,
-  `${SOURCE_PATH}/trait`,
-  `${SOURCE_PATH}/layers`,
-  `${SOURCE_PATH}/frog/traits`,
-];
+// ✅ YOUR REAL LAYER LOCATION
+const BUILD_BASE = `${SOURCE_PATH}/frog/build_files`;
 
 // DOM
 const gridEl     = document.getElementById("morph-grid");
@@ -49,10 +50,9 @@ async function fetchMetadata(id){
 }
 
 // ------------------------
-// Use your real FrogCards if exposed
+// Native FrogCards if available
 // ------------------------
 function renderFrogCardNative(id){
-  // common names you've used before (safe checks)
   const factories = [
     window.createFrogCard,
     window.renderFrogCard,
@@ -65,7 +65,7 @@ function renderFrogCardNative(id){
     return card;
   }
 
-  // fallback card (still uses your .frog-card styling)
+  // fallback card (still matches your CSS)
   const card = document.createElement("div");
   card.className = "frog-card panel";
   card.innerHTML = `
@@ -98,6 +98,7 @@ function renderGrid(){
   ids.forEach(id => {
     const card = renderFrogCardNative(id);
     attachSelect(card, id);
+
     currentCards.push(card);
     gridEl.appendChild(card);
   });
@@ -139,7 +140,7 @@ function syncUI(){
 }
 
 // ------------------------
-// Preview rendering (CANVAS COMPOSITE)
+// Preview (canvas composite from build_files)
 // ------------------------
 function clearPreview(){
   previewEl.innerHTML = `<div class="preview-hint">Select two frogs to preview</div>`;
@@ -152,7 +153,7 @@ function showFallback(alphaId, bravoId){
       <img src="${frogImgUrl(bravoId)}" alt="Bravo">
     </div>
     <div class="tiny-muted" style="margin-top:6px; text-align:center;">
-      (Trait layers not found — showing base frogs)
+      (Could not load build_files layers — showing base frogs)
     </div>
   `;
 }
@@ -167,18 +168,15 @@ function loadImg(url){
   });
 }
 
-async function resolveTraitUrl(traitType, traitValue){
+async function resolveTraitLayer(traitType, traitValue){
+  const safeType  = String(traitType).replace(/^\/+/, "");
   const safeValue = String(traitValue).replace(/^\/+/, "");
-  for (const base of TRAIT_BASES){
-    const url = `${base}/${traitType}/${safeValue}.png`;
-    const test = await loadImg(url);
-    if (test) return { url, img: test };
-  }
-  return null;
+  const url = `${BUILD_BASE}/${safeType}/${safeValue}.png`;
+  const img = await loadImg(url);
+  return img ? { url, img } : null;
 }
 
 async function renderComposite(layers){
-  // Find first valid layer to size canvas
   const first = layers.find(l => l && l.img);
   if (!first) return false;
 
@@ -201,7 +199,7 @@ async function renderComposite(layers){
 }
 
 // ------------------------
-// Metamorph logic (your rules)
+// Metamorph logic (your rules, unchanged)
 // ------------------------
 async function metamorph_build(token_a, token_b){
   clearPreview();
@@ -247,10 +245,9 @@ async function metamorph_build(token_a, token_b){
   metadata_c.Mouth     = metadata_a.Mouth     || metadata_b.Mouth     || "";
 
   const out = { attributes: [] };
-
-  // Build ordered trait list (same order as old build_trait)
   const traitQueue = [];
 
+  // same order as old build_trait stacking
   if (metadata_c.Frog !== "") {
     out.attributes.push({trait_type:"Frog", value:metadata_c.Frog});
     traitQueue.push(["Frog", metadata_c.Frog]);
@@ -286,11 +283,10 @@ async function metamorph_build(token_a, token_b){
 
   jsonEl.textContent = JSON.stringify(out.attributes, null, 2);
 
-  // Resolve + load layers
+  // load layers from build_files and composite
   const resolvedLayers = [];
   for (const [type, val] of traitQueue){
-    const layer = await resolveTraitUrl(type, val);
-    resolvedLayers.push(layer);
+    resolvedLayers.push(await resolveTraitLayer(type, val));
   }
 
   const ok = await renderComposite(resolvedLayers);
