@@ -219,7 +219,7 @@ async function loadRecentActivity() {
             Etherscan
           </a>
         </div>
-      `;
+     `;
 
       const card = createFrogCard({
         tokenId,
@@ -234,10 +234,6 @@ async function loadRecentActivity() {
 
       // Staking stats on recent sales / mints if frog is staked
       ffAttachStakeMetaIfStaked(card, tokenId);
-
-      if (card.dataset.imgContainerId) {
-        ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
-      }
     }
   } catch (err) {
     console.error('Unable to load recent activity', err);
@@ -249,21 +245,25 @@ async function loadRecentActivity() {
 }
 
 // Attach staking block to any card (recent, pond, rarity, etc.)
-// Attach staking block to any card (recent, pond, rarity, etc.)
 // Uses ethereum-dapp.js helpers: stakerAddress() + stakingValues()
-// Only runs once wallet + controller are initialised.
+// This relies on your wallet provider (no direct Alchemy core calls here).
 async function ffAttachStakeMetaIfStaked(card, tokenId) {
   if (!FF_SHOW_STAKING_STATS_ON_CARDS) return;
   if (!card) return;
 
-  // Require wallet/web3 + controller + helper functions
-  if (!ffWeb3 || !window.controller || typeof stakerAddress !== 'function' || typeof stakingValues !== 'function') {
-    // Wallet not connected yet OR staking helpers not available → skip quietly
+  // Need staking helpers from ethereum-dapp.js
+  if (typeof stakingValues !== 'function' || typeof stakerAddress !== 'function') {
+    return;
+  }
+
+  // Need a controller instance (either from ethereum-dapp.js or connectWallet)
+  if (typeof controller === 'undefined' || !controller) {
     return;
   }
 
   try {
     const staker = await stakerAddress(tokenId);
+
     // Not staked or explicitly zero-address → no staking block
     if (!staker || staker === ZERO_ADDRESS) return;
 
@@ -306,6 +306,21 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
     propsBlock.appendChild(wrapper);
   } catch (err) {
     console.warn('ffAttachStakeMetaIfStaked failed for token', tokenId, err);
+  }
+}
+
+// Refresh staking info on all already-rendered frog cards
+async function ffRefreshAllStakeMeta() {
+  if (!FF_SHOW_STAKING_STATS_ON_CARDS) return;
+
+  const cards = document.querySelectorAll('.recent_sale_card');
+  for (const card of cards) {
+    const rawId = card.dataset.tokenId;
+    const tokenId = parseTokenId(rawId);
+    if (tokenId == null) continue;
+
+    // Fire and forget; no need to await every single one serially
+    ffAttachStakeMetaIfStaked(card, tokenId);
   }
 }
 
@@ -824,10 +839,6 @@ async function ffLoadMoreRarity() {
       grid.appendChild(card);
 
       ffAttachStakeMetaIfStaked(card, tokenId);
-
-      if (card.dataset.imgContainerId) {
-        ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
-      }
     }
 
     FF_RARITY_INDEX += slice.length;
@@ -896,16 +907,16 @@ async function ffLoadMorePond() {
       return;
     }
 
-    frogs.forEach((nft) => {
+    for (const nft of frogs) {
       const rawTokenId = nft.tokenId || (nft.id && nft.id.tokenId);
       const tokenId = parseTokenId(rawTokenId);
-      if (tokenId == null) return;
+      if (tokenId == null) continue;
 
       let metadata = normalizeMetadata(
         nft.rawMetadata || nft.metadata || nft.tokenMetadata
       );
       if (!hasUsableMetadata(metadata)) {
-        metadata = {};
+        metadata = await fetchFrogMetadata(tokenId);
       }
 
       const card = createFrogCard({
@@ -939,11 +950,7 @@ async function ffLoadMorePond() {
       grid.appendChild(card);
 
       ffAttachStakeMetaIfStaked(card, tokenId);
-
-      if (card.dataset.imgContainerId) {
-        ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
-      }
-    });
+    }
 
     FF_POND_PAGE_KEY = pageKey;
     if (status) {
@@ -1091,10 +1098,6 @@ async function renderOwnedAndStakedFrogs(address) {
         });
 
         ownedGrid.appendChild(card);
-
-        if (card.dataset.imgContainerId) {
-          ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
-        }
       }
     }
 
@@ -1162,10 +1165,6 @@ async function renderOwnedAndStakedFrogs(address) {
 
         stakedGrid.appendChild(card);
 
-        if (card.dataset.imgContainerId) {
-          ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
-        }
-
         ffDecorateStakedFrogCard(tokenId);
       }
     }
@@ -1177,10 +1176,9 @@ async function renderOwnedAndStakedFrogs(address) {
 }
 
 // Use stakingValues() from ethereum-dapp.js to decorate wallet-staked cards
-// Use stakingValues() from ethereum-dapp.js to decorate wallet-staked cards
 async function ffDecorateStakedFrogCard(tokenId) {
-  // Require wallet/web3 + controller + helper function
-  if (!ffWeb3 || !window.controller || typeof stakingValues !== 'function') {
+  // Require controller + helper function
+  if (typeof controller === 'undefined' || !controller || typeof stakingValues !== 'function') {
     console.warn('stakingValues/controller not ready; skipping staking details for token', tokenId);
     return;
   }
@@ -1198,7 +1196,7 @@ async function ffDecorateStakedFrogCard(tokenId) {
     const barEl  = document.getElementById(`stake-progress-bar-${tokenId}`);
 
     if (lvlEl)  lvlEl.textContent  = `Staked Lvl. ${levelNum}`;
-    if (dateEl) dateEl.textContent = `Staked: ${stakedDate}`;
+    if (dateEl) dateEl.textContent = `Staked: ${stakedDate} (${stakedDays}d)`;
     if (nextEl) nextEl.textContent = `Next level in ~${daysToNext} days`;
 
     const MAX_DAYS  = 41.7;
@@ -1498,6 +1496,7 @@ async function connectWallet() {
         );
       }
       if (typeof CONTROLLER_ABI !== 'undefined') {
+        // This populates the same global `controller` that ethereum-dapp.js expects
         window.controller = new ffWeb3.eth.Contract(
           CONTROLLER_ABI,
           FF_CONTROLLER_ADDRESS
@@ -1527,6 +1526,9 @@ async function connectWallet() {
     ffApplyDashboardUpdates(address, ownedCount, stakingStats, profile);
 
     renderOwnedAndStakedFrogs(address);
+
+    // Update any already-rendered frog cards (recent, rarity, pond) with staking info
+    ffRefreshAllStakeMeta();
 
     ffShowView('wallet');
   } catch (err) {
