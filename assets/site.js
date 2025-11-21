@@ -1240,13 +1240,13 @@ async function ffFetchStakedTokenIds(address) {
 async function renderOwnedAndStakedFrogs(address) {
   const ownedGrid   = document.getElementById('owned-frogs-grid');
   const ownedStatus = document.getElementById('owned-frogs-status');
-  const stakedGrid   = document.getElementById('staked-frogs-grid');
+  const stakedGrid  = document.getElementById('staked-frogs-grid');
   const stakedStatus = document.getElementById('staked-frogs-status');
 
   const readOnly = ffIsWalletViewer(); // 404 wallet viewer → no stake/transfer buttons
 
   try {
-    const [ownedNfts, stakedIds] = await Promise.all([
+    const [ownedNfts, stakedIdsRaw] = await Promise.all([
       ffFetchOwnedFrogs(address),
       ffFetchStakedTokenIds(address).catch((err) => {
         console.warn('ffFetchStakedTokenIds failed:', err);
@@ -1254,7 +1254,18 @@ async function renderOwnedAndStakedFrogs(address) {
       })
     ]);
 
+    // 🔹 De-dupe staked IDs (contract may return duplicates / structs)
+    const uniqueStakedIds = Array.from(
+      new Set(
+        stakedIdsRaw
+          .map((id) => parseTokenId(id))
+          .filter((id) => id != null)
+      )
+    );
+
+    // ----------------------
     // Owned
+    // ----------------------
     if (ownedStatus) {
       ownedStatus.textContent = ownedNfts.length
         ? ''
@@ -1275,7 +1286,7 @@ async function renderOwnedAndStakedFrogs(address) {
           metadata = await fetchFrogMetadata(tokenId);
         }
 
-        const saleText = ffGetCachedSalePrice(tokenId);
+        const saleText   = ffGetCachedSalePrice(tokenId);
         const headerRight = saleText || 'Owned';
 
         let actionHtml = `
@@ -1326,19 +1337,21 @@ async function renderOwnedAndStakedFrogs(address) {
       }
     }
 
+    // ----------------------
     // Staked
+    // ----------------------
     if (stakedStatus) {
-      stakedStatus.textContent = stakedIds.length
+      stakedStatus.textContent = uniqueStakedIds.length
         ? ''
         : 'No staked frogs found for this wallet.';
     }
     if (stakedGrid) stakedGrid.innerHTML = '';
 
-    if (stakedGrid && stakedIds.length) {
-      for (const tokenId of stakedIds) {
+    if (stakedGrid && uniqueStakedIds.length) {
+      for (const tokenId of uniqueStakedIds) {
         let metadata = await fetchFrogMetadata(tokenId);
 
-        const saleText = ffGetCachedSalePrice(tokenId);
+        const saleText    = ffGetCachedSalePrice(tokenId);
         const headerRight = saleText || 'Staked';
 
         const footerHtml = `
@@ -1408,6 +1421,7 @@ async function renderOwnedAndStakedFrogs(address) {
     if (stakedStatus) stakedStatus.textContent = 'Unable to load staked frogs.';
   }
 }
+
 
 // Use stakingValues() from ethereum-dapp.js to decorate wallet-staked cards
 async function ffDecorateStakedFrogCard(tokenId) {
