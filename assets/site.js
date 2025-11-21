@@ -574,11 +574,14 @@ function createFrogCard({ tokenId, metadata, headerLeft, headerRight, footerHtml
 }
 
 function createMorphedFrogCard({ metadata, ownerAddress }) {
-  const name =
-    metadata?.name ||
-    (metadata?.frogA != null && metadata?.frogB != null
-      ? `Morphed Frog (${metadata.frogA} + ${metadata.frogB})`
-      : "Morphed Frog");
+const frogA = parseTokenId(metadata?.frogA ?? metadata?.tokenA ?? null);
+const frogB = parseTokenId(metadata?.frogB ?? metadata?.tokenB ?? null);
+
+const name =
+  (frogA != null && frogB != null)
+    ? `Frog #${frogA} / #${frogB}`
+    : (metadata?.name || "Morphed Frog");
+
 
   // normalize traits if needed
   if (!metadata.attributes && Array.isArray(metadata.traits)) {
