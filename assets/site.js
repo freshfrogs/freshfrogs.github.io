@@ -580,7 +580,7 @@ function createMorphedFrogCard({ metadata, ownerAddress }) {
       ? `Morphed Frog (${metadata.frogA} + ${metadata.frogB})`
       : "Morphed Frog");
 
-  // ensure traits render in the text section
+  // normalize traits if needed
   if (!metadata.attributes && Array.isArray(metadata.traits)) {
     metadata.attributes = metadata.traits;
   }
@@ -588,7 +588,7 @@ function createMorphedFrogCard({ metadata, ownerAddress }) {
   const traitsHtml = buildTraitsHtml(metadata);
   const imgContainerId = `morph-img-${Math.random().toString(16).slice(2)}`;
 
-  // base token for background (Parent A)
+  // Parent A background base
   const baseTokenId = parseTokenId(metadata?.frogA ?? metadata?.tokenA ?? null);
 
   const card = document.createElement("div");
@@ -596,12 +596,25 @@ function createMorphedFrogCard({ metadata, ownerAddress }) {
   card.dataset.imgContainerId = imgContainerId;
   if (baseTokenId != null) card.dataset.morphBaseTokenId = baseTokenId;
 
+  // Fallback image so it's never blank even if layering is late
+  const fallbackImg =
+    metadata?.image ||
+    metadata?.image_url ||
+    "https://freshfrogs.github.io/assets/blackWhite.png";
+
   card.innerHTML = `
     <strong class="sale_card_title">--</strong>
     <strong class="sale_card_price">Morphed</strong>
     <div style="clear: both;"></div>
 
-    <div id="${imgContainerId}" class="frog_img_cont"></div>
+    <div id="${imgContainerId}" class="frog_img_cont">
+      <img
+        src="${fallbackImg}"
+        class="recent_sale_img"
+        alt="${ffEscapeHtml(name)}"
+        loading="lazy"
+      />
+    </div>
 
     <div class="recent_sale_traits">
       <strong class="sale_card_title">
@@ -616,8 +629,8 @@ function createMorphedFrogCard({ metadata, ownerAddress }) {
 
   if (ownerAddress) ffSetOwnerLabel(card, ownerAddress);
 
-  // Build layered image from saved metadata
-  ffBuildLayeredMorphedImage(metadata, imgContainerId, baseTokenId);
+  // IMPORTANT: don't build here yet (card not in DOM)
+  // We'll build after append in the wallet render.
 
   return card;
 }
