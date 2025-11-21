@@ -324,7 +324,7 @@
 })();
 // TESTING ONLY — does NOT call the Worker yet.
 // Builds the payload you *will* send and logs it.
-function SaveFrogMorph({
+function saveCurrentMorph({
   address,
   frogA,
   frogB,
