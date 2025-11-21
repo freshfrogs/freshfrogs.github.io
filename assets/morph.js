@@ -1,22 +1,24 @@
-/* assets/morph.js */
+/* assets/morph.js — Metamorph Lab (site-matching + canvas preview) */
 
-// ------------------------
-// Config
-// ------------------------
 const MAX_SUPPLY = 4040;
 window.SOURCE_PATH = window.SOURCE_PATH || "https://freshfrogs.github.io/assets";
 
-// If your trait PNGs are elsewhere, change this.
-const TRAIT_BASE = `${SOURCE_PATH}/traits`;
+// Try multiple trait bases so preview doesn't "mess up" if path differs.
+const TRAIT_BASES = [
+  `${SOURCE_PATH}/traits`,
+  `${SOURCE_PATH}/trait`,
+  `${SOURCE_PATH}/layers`,
+  `${SOURCE_PATH}/frog/traits`,
+];
 
 // DOM
-const gridEl    = document.getElementById("morph-grid");
-const slotAEl   = document.getElementById("slot-a");
-const slotBEl   = document.getElementById("slot-b");
-const slotATxt  = document.getElementById("slot-a-text");
-const slotBTxt  = document.getElementById("slot-b-text");
-const previewEl = document.getElementById("morph-preview");
-const jsonEl    = document.getElementById("morph-json");
+const gridEl     = document.getElementById("morph-grid");
+const slotAEl    = document.getElementById("slot-a");
+const slotBEl    = document.getElementById("slot-b");
+const slotATxt   = document.getElementById("slot-a-text");
+const slotBTxt   = document.getElementById("slot-b-text");
+const previewEl  = document.getElementById("morph-preview");
+const jsonEl     = document.getElementById("morph-json");
 
 const morphBtn   = document.getElementById("morph-btn");
 const shuffleBtn = document.getElementById("shuffle-btn");
@@ -33,7 +35,7 @@ const randInt = (min, max) => Math.floor(Math.random()*(max-min+1))+min;
 
 function pickUnique(count, min, max){
   const s = new Set();
-  while(s.size < count) s.add(randInt(min,max));
+  while (s.size < count) s.add(randInt(min, max));
   return [...s];
 }
 
@@ -47,27 +49,25 @@ async function fetchMetadata(id){
 }
 
 // ------------------------
-// FrogCard rendering (auto-reuse your site renderer if present)
+// Use your real FrogCards if exposed
 // ------------------------
-function renderFrogCardForMorph(id){
-  // If your site exposes a FrogCard factory/renderer, use it.
-  if (typeof window.renderFrogCard === "function") {
-    return window.renderFrogCard({ tokenId:id, isMorph:true });
-  }
-  if (typeof window.createFrogCard === "function") {
-    return window.createFrogCard({ tokenId:id, isMorph:true });
-  }
-  if (typeof window.displayFrogCard === "function") {
-    // Some sites render by side effect; fallback to wrapper.
-    const wrap = document.createElement("div");
-    window.displayFrogCard(id, wrap);
-    return wrap.firstElementChild || wrap;
+function renderFrogCardNative(id){
+  // common names you've used before (safe checks)
+  const factories = [
+    window.createFrogCard,
+    window.renderFrogCard,
+    window.makeFrogCard,
+    window.FF_createFrogCard,
+  ].filter(fn => typeof fn === "function");
+
+  if (factories.length){
+    const card = factories[0](id);
+    return card;
   }
 
-  // Fallback minimal card that still matches your CSS
+  // fallback card (still uses your .frog-card styling)
   const card = document.createElement("div");
   card.className = "frog-card panel";
-  card.dataset.tokenId = id;
   card.innerHTML = `
     <div class="frog-card-inner">
       <div class="frog-thumb">
@@ -82,9 +82,9 @@ function renderFrogCardForMorph(id){
   return card;
 }
 
-function attachSelectHandler(card, id){
+function attachSelect(card, id){
   card.dataset.tokenId = id;
-  card.addEventListener("click", () => onSelectCard(id, card));
+  card.addEventListener("click", () => onSelect(id));
 }
 
 // ------------------------
@@ -95,32 +95,30 @@ function renderGrid(){
   currentCards = [];
 
   const ids = pickUnique(20, 1, MAX_SUPPLY);
-
   ids.forEach(id => {
-    const card = renderFrogCardForMorph(id);
-    attachSelectHandler(card, id);
-
+    const card = renderFrogCardNative(id);
+    attachSelect(card, id);
     currentCards.push(card);
     gridEl.appendChild(card);
   });
 
-  syncSelectionUI();
+  syncUI();
 }
 
 // ------------------------
 // Selection
 // ------------------------
-function onSelectCard(id){
+function onSelect(id){
   if (selectedA === id) selectedA = null;
   else if (selectedB === id) selectedB = null;
   else if (selectedA == null) selectedA = id;
   else if (selectedB == null) selectedB = id;
   else selectedA = id; // replace alpha if full
 
-  syncSelectionUI();
+  syncUI();
 }
 
-function syncSelectionUI(){
+function syncUI(){
   currentCards.forEach(c => {
     const id = Number(c.dataset.tokenId);
     c.classList.toggle("morph-selected", id === selectedA || id === selectedB);
@@ -130,59 +128,96 @@ function syncSelectionUI(){
   slotBTxt.textContent = selectedB ? `Frog #${selectedB}` : "None selected";
 
   slotAEl.innerHTML = selectedA
-    ? `<img src="${frogImgUrl(selectedA)}" alt="Alpha"><div style="margin-top:6px;">Alpha – #${selectedA}</div>`
+    ? `<img src="${frogImgUrl(selectedA)}" alt="Alpha"><div>Alpha – #${selectedA}</div>`
     : `<div><div style="opacity:.7;">Alpha</div><div>None selected</div></div>`;
 
   slotBEl.innerHTML = selectedB
-    ? `<img src="${frogImgUrl(selectedB)}" alt="Bravo"><div style="margin-top:6px;">Bravo – #${selectedB}</div>`
+    ? `<img src="${frogImgUrl(selectedB)}" alt="Bravo"><div>Bravo – #${selectedB}</div>`
     : `<div><div style="opacity:.7;">Bravo</div><div>None selected</div></div>`;
 
   morphBtn.disabled = !(selectedA && selectedB);
 }
 
 // ------------------------
-// Preview layering (FIXED)
-// old version used background-image; now stacked <img> layers.
+// Preview rendering (CANVAS COMPOSITE)
 // ------------------------
-function clearPreviewLayers(){
-  previewEl.innerHTML = `<div class="hint">Pick two frogs to preview</div>`;
+function clearPreview(){
+  previewEl.innerHTML = `<div class="preview-hint">Select two frogs to preview</div>`;
 }
 
-function traitLayerUrl(traitType, traitValue){
+function showFallback(alphaId, bravoId){
+  previewEl.innerHTML = `
+    <div class="preview-fallback">
+      <img src="${frogImgUrl(alphaId)}" alt="Alpha">
+      <img src="${frogImgUrl(bravoId)}" alt="Bravo">
+    </div>
+    <div class="tiny-muted" style="margin-top:6px; text-align:center;">
+      (Trait layers not found — showing base frogs)
+    </div>
+  `;
+}
+
+function loadImg(url){
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+}
+
+async function resolveTraitUrl(traitType, traitValue){
   const safeValue = String(traitValue).replace(/^\/+/, "");
-  return `${TRAIT_BASE}/${traitType}/${safeValue}.png`;
+  for (const base of TRAIT_BASES){
+    const url = `${base}/${traitType}/${safeValue}.png`;
+    const test = await loadImg(url);
+    if (test) return { url, img: test };
+  }
+  return null;
 }
 
-function build_trait(traitType, traitValue){
-  const url = traitLayerUrl(traitType, traitValue);
+async function renderComposite(layers){
+  // Find first valid layer to size canvas
+  const first = layers.find(l => l && l.img);
+  if (!first) return false;
 
-  const img = document.createElement("img");
-  img.className = "layer-img";
-  img.src = url;
-  img.alt = `${traitType}: ${traitValue}`;
-  previewEl.appendChild(img);
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width  = first.img.width  || 512;
+  canvas.height = first.img.height || 512;
+
+  for (const layer of layers){
+    if (layer && layer.img){
+      ctx.drawImage(layer.img, 0, 0, canvas.width, canvas.height);
+    }
+  }
+
+  previewEl.innerHTML = "";
+  canvas.className = "preview-canvas";
+  previewEl.appendChild(canvas);
+  return true;
 }
 
 // ------------------------
-// Metamorph logic (same as yours)
+// Metamorph logic (your rules)
 // ------------------------
 async function metamorph_build(token_a, token_b){
-  console.log(`Morphing #${token_a} + #${token_b}`);
-
-  clearPreviewLayers();
+  clearPreview();
   jsonEl.textContent = "";
 
   const metadata_a = { Frog:"", SpecialFrog:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
   const metadata_b = { Frog:"", SpecialFrog:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
   const metadata_c = { Frog:"", SpecialFrog:"", Subset:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
 
-  const metadata_a_raw = await fetchMetadata(token_a);
-  metadata_a_raw.attributes.forEach(attr => metadata_a[attr.trait_type] = attr.value);
+  const aRaw = await fetchMetadata(token_a);
+  aRaw.attributes.forEach(attr => metadata_a[attr.trait_type] = attr.value);
 
-  const metadata_b_raw = await fetchMetadata(token_b);
-  metadata_b_raw.attributes.forEach(attr => metadata_b[attr.trait_type] = attr.value);
+  const bRaw = await fetchMetadata(token_b);
+  bRaw.attributes.forEach(attr => metadata_b[attr.trait_type] = attr.value);
 
-  // Special Frogs
+  // Special frogs
   if (metadata_a.SpecialFrog !== "" || metadata_b.SpecialFrog !== "") {
     if (metadata_a.SpecialFrog !== "" && metadata_b.SpecialFrog !== "") {
       metadata_b.SpecialFrog = `${metadata_a.SpecialFrog}/SpecialFrog/${metadata_b.SpecialFrog}`;
@@ -213,41 +248,54 @@ async function metamorph_build(token_a, token_b){
 
   const out = { attributes: [] };
 
-  // order matters for layers
+  // Build ordered trait list (same order as old build_trait)
+  const traitQueue = [];
+
   if (metadata_c.Frog !== "") {
     out.attributes.push({trait_type:"Frog", value:metadata_c.Frog});
-    build_trait("Frog", metadata_c.Frog);
+    traitQueue.push(["Frog", metadata_c.Frog]);
   } else if (metadata_c.SpecialFrog !== "") {
     out.attributes.push({trait_type:"SpecialFrog", value:metadata_c.SpecialFrog});
-    build_trait("SpecialFrog", metadata_c.SpecialFrog);
+    traitQueue.push(["SpecialFrog", metadata_c.SpecialFrog]);
   }
 
   if (metadata_c.Subset !== "") {
     out.attributes.push({trait_type:"Subset", value:metadata_c.Subset});
-    build_trait("Frog/subset", metadata_c.Subset);
+    traitQueue.push(["Frog/subset", metadata_c.Subset]);
   }
   if (metadata_c.Trait !== "") {
     out.attributes.push({trait_type:"Trait", value:metadata_c.Trait});
-    build_trait("Trait", metadata_c.Trait);
+    traitQueue.push(["Trait", metadata_c.Trait]);
   }
   if (metadata_c.Accessory !== "") {
     out.attributes.push({trait_type:"Accessory", value:metadata_c.Accessory});
-    build_trait("Accessory", metadata_c.Accessory);
+    traitQueue.push(["Accessory", metadata_c.Accessory]);
   }
   if (metadata_c.Eyes !== "") {
     out.attributes.push({trait_type:"Eyes", value:metadata_c.Eyes});
-    build_trait("Eyes", metadata_c.Eyes);
+    traitQueue.push(["Eyes", metadata_c.Eyes]);
   }
   if (metadata_c.Hat !== "") {
     out.attributes.push({trait_type:"Hat", value:metadata_c.Hat});
-    build_trait("Hat", metadata_c.Hat);
+    traitQueue.push(["Hat", metadata_c.Hat]);
   }
   if (metadata_c.Mouth !== "") {
     out.attributes.push({trait_type:"Mouth", value:metadata_c.Mouth});
-    build_trait("Mouth", metadata_c.Mouth);
+    traitQueue.push(["Mouth", metadata_c.Mouth]);
   }
 
   jsonEl.textContent = JSON.stringify(out.attributes, null, 2);
+
+  // Resolve + load layers
+  const resolvedLayers = [];
+  for (const [type, val] of traitQueue){
+    const layer = await resolveTraitUrl(type, val);
+    resolvedLayers.push(layer);
+  }
+
+  const ok = await renderComposite(resolvedLayers);
+  if (!ok) showFallback(token_a, token_b);
+
   return out;
 }
 
@@ -257,19 +305,23 @@ window.metamorph_build = metamorph_build;
 // Buttons
 // ------------------------
 morphBtn.addEventListener("click", async () => {
-  if(!selectedA || !selectedB) return;
+  if (!selectedA || !selectedB) return;
   await metamorph_build(selectedA, selectedB);
 });
 
 shuffleBtn.addEventListener("click", () => {
-  selectedA = null; selectedB = null;
+  selectedA = null;
+  selectedB = null;
   renderGrid();
+  clearPreview();
+  jsonEl.textContent = "";
 });
 
 clearBtn.addEventListener("click", () => {
-  selectedA = null; selectedB = null;
-  syncSelectionUI();
-  clearPreviewLayers();
+  selectedA = null;
+  selectedB = null;
+  syncUI();
+  clearPreview();
   jsonEl.textContent = "";
 });
 

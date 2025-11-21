@@ -2,13 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>FreshFrogs – Metamorph</title>
+  <title>FreshFrogs – Metamorph Lab</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
-
   <link rel="shortcut icon" type="image/x-icon" href="https://freshfrogs.github.io/assets/blackWhite.png">
 
-  <!-- keep your normal global scripts exactly like index.html -->
+  <!-- same global scripts as the rest of your site -->
   <script src="assets/rarityrankings.js"></script>
   <script src="assets/controller_abi.js"></script>
   <script src="assets/collection_abi.js"></script>
@@ -16,124 +15,159 @@
   <script src="assets/site.js"></script>
 
   <style>
-    /* Only page-specific layout; uses your existing .panel/.frog-card styling */
-    .morph-wrap {
+    /* Only layout glue. Visuals come from your existing CSS. */
+    .content-wide { max-width: 1250px; margin: 0 auto; }
+
+    .morph-page {
       display: grid;
-      grid-template-columns: 360px 1fr;
+      grid-template-columns: 380px 1fr;
       gap: 12px;
       align-items: start;
-      margin-top: 8px;
     }
-    @media (max-width: 1000px){
-      .morph-wrap { grid-template-columns: 1fr; }
+    @media (max-width: 1000px) {
+      .morph-page { grid-template-columns: 1fr; }
     }
 
-    .morph-panel { position: sticky; top: 10px; }
+    .morph-panel {
+      position: sticky;
+      top: 12px;
+      padding: 10px;
+      border-radius: 12px;
+    }
 
-    .morph-slot-row{
+    .morph-slots {
       display: grid;
-      grid-template-columns: 1fr 38px 1fr;
+      grid-template-columns: 1fr 36px 1fr;
       gap: 8px;
       align-items: center;
+      margin-top: 8px;
     }
-    .morph-slot{
-      min-height: 140px;
-      display:grid;
-      place-items:center;
-      text-align:center;
+    .slot {
+      min-height: 150px;
       border-radius: 12px;
+      display: grid;
+      place-items: center;
+      text-align: center;
       padding: 8px;
     }
-    .morph-slot img{
-      width: 96px; height: 96px; image-rendering: pixelated;
+    .slot img {
+      width: 100px;
+      height: 100px;
+      image-rendering: pixelated;
+      display:block;
+      margin: 0 auto 6px;
     }
 
-    .morph-actions{ display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
-
-    /* Preview uses absolute stacked <img> layers */
-    .morph-preview{
-      width:100%;
-      min-height:240px;
-      border-radius:12px;
-      padding:8px;
-      position:relative;
-      overflow:hidden;
-      display:grid;
-      place-items:center;
+    .morph-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
     }
-    .morph-preview .layer-img{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      object-fit:contain;
-      image-rendering:pixelated;
-      pointer-events:none;
-    }
-    .morph-preview .hint{ opacity:.6; position:relative; z-index:2; }
 
-    .morph-selected{
-      outline:3px solid currentColor;
-      outline-offset:2px;
+    .preview-box {
+      margin-top: 10px;
+      border-radius: 12px;
+      padding: 8px;
+      min-height: 260px;
+      position: relative;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .preview-canvas {
+      width: 100%;
+      height: auto;
+      image-rendering: pixelated;
+    }
+    .preview-fallback {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      width: 100%;
+    }
+    .preview-fallback img {
+      width: 100%;
+      image-rendering: pixelated;
+      border-radius: 8px;
+    }
+    .preview-hint { opacity: .65; }
+
+    .morph-selected {
+      outline: 3px solid currentColor;
+      outline-offset: 2px;
       transform: translateY(-1px);
     }
 
-    /* Grid follows your cards */
-    .morph-grid{
-      display:grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap:10px;
+    .morph-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+      gap: 10px;
+      margin-top: 6px;
     }
 
-    #morph-json{
-      white-space:pre-wrap;
+    #morph-json {
+      white-space: pre-wrap;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
-      font-size:12px; line-height:1.35;
-      padding:8px; border-radius:8px;
-      max-height:240px; overflow:auto;
-      margin-top:8px;
+      font-size: 12px;
+      line-height: 1.35;
+      padding: 8px;
+      border-radius: 8px;
+      max-height: 240px;
+      overflow: auto;
+      margin-top: 6px;
     }
+
+    .tiny-muted { opacity:.7; font-size:12px; }
   </style>
 </head>
 
 <body class="layout-4">
 
-  <!-- =========================================================
-       PASTE YOUR EXACT index.html HEADER / HERO / TOPBAR HERE
-       (everything above the main content wrapper)
-       ========================================================= -->
-  <!-- paste-start -->
-  <!-- paste-end -->
+  <!-- If your site auto-builds header/nav in site.js, this will already match.
+       If it doesn’t, your CSS still styles topbar/brand if those classes exist. -->
+  <header class="topbar">
+    <div class="topbar-left brand">
+      <a href="index.html" class="brand">
+        <img src="assets/blackWhite.png" alt="FreshFrogs" style="width:28px;height:28px;image-rendering:pixelated;">
+        <span>FreshFrogs</span>
+      </a>
+    </div>
+    <nav class="topbar-right">
+      <a href="collection.html">Collection</a>
+      <a href="rarity.html">Rarity</a>
+      <a href="pond.html">Pond</a>
+      <a href="morph.html" class="active">Metamorph</a>
+    </nav>
+  </header>
 
-  <!-- MAIN CONTENT WRAPPER
-       If your index.html wraps content in something like
-       <main class="page-wrap"> ... keep that same wrapper.
-  -->
-  <main class="page-wrap" style="padding: 10px;">
-
-    <section class="panel" style="padding:10px;">
-      <h2 style="margin:0;">Metamorph Lab</h2>
-      <div style="opacity:.75; margin-top:4px;">
-        Select two frogs to fuse traits and preview the result.
+  <main class="page-wrap content-wide" style="padding: 10px;">
+    <section class="panel" style="padding: 10px;">
+      <div style="display:flex;align-items:end;justify-content:space-between;gap:10px;">
+        <div>
+          <h2 style="margin:0;">Metamorph Lab</h2>
+          <div class="tiny-muted">Pick two frogs. Traits fuse into a new preview.</div>
+        </div>
+        <div class="tiny-muted">Token(A) + Token(B) → Token(C)</div>
       </div>
 
-      <div class="morph-wrap">
+      <div class="morph-page" style="margin-top:10px;">
 
-        <!-- LEFT: MORPH PANEL -->
-        <div class="panel morph-panel" style="padding:10px;">
-          <div class="morph-slot-row">
-            <div id="slot-a" class="panel morph-slot">
+        <!-- LEFT: panel -->
+        <aside class="panel morph-panel">
+          <div class="morph-slots">
+            <div id="slot-a" class="panel slot">
               <div>
-                <div style="opacity:.7;">Alpha</div>
+                <div class="tiny-muted">Alpha</div>
                 <div id="slot-a-text">None selected</div>
               </div>
             </div>
 
-            <div style="text-align:center;font-weight:700;">+</div>
+            <div style="text-align:center;font-weight:800;">+</div>
 
-            <div id="slot-b" class="panel morph-slot">
+            <div id="slot-b" class="panel slot">
               <div>
-                <div style="opacity:.7;">Bravo</div>
+                <div class="tiny-muted">Bravo</div>
                 <div id="slot-b-text">None selected</div>
               </div>
             </div>
@@ -146,19 +180,20 @@
           </div>
 
           <h3 style="margin:12px 0 6px;">Preview</h3>
-          <div id="morph-preview" class="panel morph-preview">
-            <div class="hint">Pick two frogs to preview</div>
+          <div id="morph-preview" class="panel preview-box">
+            <div class="preview-hint">Select two frogs to preview</div>
           </div>
 
           <h3 style="margin:12px 0 6px;">Morph JSON</h3>
           <div id="morph-json" class="panel"></div>
-        </div>
+        </aside>
 
-        <!-- RIGHT: GRID -->
-        <div>
-          <h3 style="margin:0 0 8px;">Random Frogs</h3>
+        <!-- RIGHT: grid -->
+        <section>
+          <h3 style="margin:0;">Random Frogs</h3>
+          <div class="tiny-muted">Click two cards to fuse.</div>
           <div id="morph-grid" class="morph-grid"></div>
-        </div>
+        </section>
 
       </div>
     </section>
