@@ -29,10 +29,11 @@ const FF_RARITY_BATCH = 24;
 let FF_POND_PAGE_KEY = null;
 
 // ------------------------
-// Global wallet state
+// Global wallet / web3 state
 // ------------------------
 let ffWeb3 = null;
 let ffCurrentAccount = null;
+
 // Queue of cards that need staking decoration once contracts/helpers are ready
 const FF_PENDING_STAKE_CARDS = [];
 
@@ -203,7 +204,7 @@ async function loadRecentActivity() {
         headerRight  = formatSalePrice(item);
       }
 
-      const headerLeft = truncateAddress(ownerAddress);
+      const headerLeft = ownerAddress ? truncateAddress(ownerAddress) : '';
 
       const actionHtml = `
         <div class="recent_sale_links">
@@ -309,7 +310,7 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
         <span class="stake-level-label">Staked Lvl. ${levelNum}</span>
       </div>
       <div class="stake-meta-row stake-meta-subrow">
-        <span>Staked: ${stakedDate}</span>
+        <span>Staked: ${stakedDate} (${stakedDays}d)</span>
       </div>
       <div class="stake-progress">
         <div class="stake-progress-bar" style="width:${pct}%;"></div>
@@ -340,7 +341,6 @@ function ffProcessPendingStakeMeta() {
 
   const pending = FF_PENDING_STAKE_CARDS.splice(0, FF_PENDING_STAKE_CARDS.length);
   for (const { card, tokenId } of pending) {
-    // Fire and forget – errors are already handled inside ffAttachStakeMetaIfStaked
     ffAttachStakeMetaIfStaked(card, tokenId);
   }
 }
@@ -354,8 +354,6 @@ async function ffRefreshAllStakeMeta() {
     const rawId = card.dataset.tokenId;
     const tokenId = parseTokenId(rawId);
     if (tokenId == null) continue;
-
-    // Fire and forget; no need to await every single one serially
     ffAttachStakeMetaIfStaked(card, tokenId);
   }
 }
@@ -383,7 +381,7 @@ function ffBootStakeMetaWatcher() {
     ) {
       // First flush anything that was queued while helpers were missing
       ffProcessPendingStakeMeta();
-      // Then re-scan all cards so nothing slips through (e.g. first pond card)
+      // Then re-scan all cards so nothing slips through
       ffRefreshAllStakeMeta();
       return;
     }
@@ -441,7 +439,7 @@ function getRarityRank(tokenId) {
 
   if (Array.isArray(map)) {
     const lookup = buildRarityLookup(map);
-    rankRaw = lookup[tokenId]; // no weird fallback
+    rankRaw = lookup[tokenId];
   } else if (typeof map === 'object') {
     rankRaw =
       map[tokenId] ??
@@ -477,6 +475,32 @@ function buildRarityLookup(rankings) {
 
   buildRarityLookup._cache = { source: rankings, lookup };
   return lookup;
+}
+
+// ------------------------
+// Owner label helper
+// ------------------------
+function truncateAddress(address) {
+  if (!address || typeof address !== 'string') return '--';
+  if (address.length <= 10) return address;
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
+// Build clickable owner label for the top-left of the frog card
+function ffBuildOwnerLabel(ownerAddress, fallbackText) {
+  if (!ownerAddress) {
+    return fallbackText || '';
+  }
+
+  const addr = String(ownerAddress);
+  return `
+    <a
+      href="https://freshfrogs.github.io/${addr}"
+      class="frog-owner-link"
+    >
+      ${truncateAddress(addr)}
+    </a>
+  `;
 }
 
 // ------------------------
@@ -657,7 +681,7 @@ function dedupeByTokenId(items, idExtractor) {
 async function fetchRecentSales(limit = 24) {
   const params = new URLSearchParams({
     contractAddress: FF_COLLECTION_ADDRESS,
-    order: 'desc', // newest first
+    order: 'desc',
     limit: String(limit)
   });
 
@@ -670,7 +694,6 @@ async function fetchRecentSales(limit = 24) {
   const payload = await response.json();
   let sales = Array.isArray(payload.nftSales) ? payload.nftSales : [];
 
-  // Remove duplicates by tokenId
   sales = dedupeByTokenId(sales, (sale) => sale.tokenId);
 
   return sales;
@@ -709,7 +732,6 @@ async function fetchRecentMints(limit = 24) {
       ? payload.result.transfers
       : [];
 
-  // Remove duplicates by tokenId
   transfers = dedupeByTokenId(
     transfers,
     (t) => t.erc721TokenId || t.tokenId
@@ -738,67 +760,6 @@ async function fetchFrogMetadata(tokenId) {
 // ------------------------
 // Formatting helpers
 // ------------------------
-function truncateAddress(address) {
-  if (!address || typeof address !== 'string') return '--';
-  if (address.length <= 10) return address;
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
-}
-
-// Build clickable owner label for the top-left of the frog card
-function ffBuildOwnerLabel(ownerAddress, fallbackText) {
-  if (!ownerAddress) {
-    return fallbackText || '';
-  }
-
-  const addr = String(ownerAddress);
-  return `
-    <a
-      href="https://freshfrogs.github.io/${addr}"
-      class="frog-owner-link"
-    >
-      ${truncateAddress(addr)}
-    </a>
-  `;
-}
-
-// Resolve the "true" frog owner:
-// - If staked: use stakerAddress(tokenId) from the staking contract
-// - Otherwise: fall back to collection.ownerOf(tokenId)
-async function ffResolveFrogOwner(tokenId) {
-  // Make sure we have read-only contracts ready
-  const ok = await ffEnsureReadContracts().catch((err) => {
-    console.warn('ffResolveFrogOwner: ffEnsureReadContracts failed', err);
-    return false;
-  });
-  if (!ok) return null;
-
-  // 1) Prefer the staking contract (true owner while staked)
-  if (typeof stakerAddress === 'function' && window.controller) {
-    try {
-      const staker = await stakerAddress(tokenId);
-      if (staker && staker !== ZERO_ADDRESS) {
-        return staker;
-      }
-    } catch (err) {
-      console.warn('ffResolveFrogOwner: stakerAddress failed for token', tokenId, err);
-    }
-  }
-
-  // 2) Fallback to ERC-721 ownerOf
-  if (!window.collection || !window.collection.methods || !window.collection.methods.ownerOf) {
-    return null;
-  }
-
-  try {
-    const owner = await window.collection.methods.ownerOf(tokenId).call();
-    return owner || null;
-  } catch (err) {
-    console.warn('ffResolveFrogOwner: ownerOf failed for token', tokenId, err);
-    return null;
-  }
-}
-
-
 function formatSalePrice(sale) {
   if (!sale) return '--';
 
@@ -910,6 +871,40 @@ function ffEnsureRarityLoaded() {
   }
 }
 
+// Resolve the "true" frog owner for rarity (staker or ownerOf)
+async function ffResolveFrogOwner(tokenId) {
+  const ok = await ffEnsureReadContracts().catch((err) => {
+    console.warn('ffResolveFrogOwner: ffEnsureReadContracts failed', err);
+    return false;
+  });
+  if (!ok) return null;
+
+  // 1) Prefer the staking contract (true owner while staked)
+  if (typeof stakerAddress === 'function' && window.controller) {
+    try {
+      const staker = await stakerAddress(tokenId);
+      if (staker && staker !== ZERO_ADDRESS) {
+        return staker;
+      }
+    } catch (err) {
+      console.warn('ffResolveFrogOwner: stakerAddress failed for token', tokenId, err);
+    }
+  }
+
+  // 2) Fallback to ERC-721 ownerOf
+  if (!window.collection || !window.collection.methods || !window.collection.methods.ownerOf) {
+    return null;
+  }
+
+  try {
+    const owner = await window.collection.methods.ownerOf(tokenId).call();
+    return owner || null;
+  } catch (err) {
+    console.warn('ffResolveFrogOwner: ownerOf failed for token', tokenId, err);
+    return null;
+  }
+}
+
 async function ffLoadMoreRarity() {
   const grid   = document.getElementById('rarity-grid');
   const status = document.getElementById('rarity-status');
@@ -935,7 +930,6 @@ async function ffLoadMoreRarity() {
 
       const rank = entry.ranking ?? entry.rank ?? entry.position ?? getRarityRank(tokenId);
 
-      // Fetch metadata + owner in parallel to keep things snappy
       const [metadata, ownerAddress] = await Promise.all([
         fetchFrogMetadata(tokenId),
         ffResolveFrogOwner(tokenId).catch(() => null)
@@ -978,6 +972,13 @@ async function ffLoadMoreRarity() {
       ffAttachStakeMetaIfStaked(card, tokenId);
     }
 
+    FF_RARITY_INDEX += slice.length;
+
+    if (status) {
+      status.textContent = FF_RARITY_INDEX >= rankings.length
+        ? 'All frogs loaded.'
+        : 'Top ranked Frogs across the collection (lower rank = rarer).';
+    }
   } catch (err) {
     console.error('ffLoadMoreRarity failed', err);
     if (status) status.textContent = 'Unable to load rarity rankings.';
@@ -1026,7 +1027,6 @@ function ffEnsurePondLoaded() {
 }
 
 // Set owner label (top-left) on a pond card using stakerAddress(tokenId)
-// Set owner label (top-left) on a pond card using stakerAddress(tokenId)
 async function ffDecoratePondOwner(card, tokenId) {
   try {
     const ok = await ffEnsureReadContracts();
@@ -1044,7 +1044,6 @@ async function ffDecoratePondOwner(card, tokenId) {
     console.warn('ffDecoratePondOwner failed for token', tokenId, err);
   }
 }
-
 
 async function ffLoadMorePond() {
   const grid = document.getElementById('pond-grid');
@@ -1071,13 +1070,10 @@ async function ffLoadMorePond() {
         metadata = await fetchFrogMetadata(tokenId);
       }
 
-      // Header:
-      //   - Left: actual owner (filled by ffDecoratePondOwner)
-      //   - Right: "Staked" (same as wallet view)
       const card = createFrogCard({
         tokenId,
         metadata,
-        headerLeft: '',           // will be set to owner later
+        headerLeft: '',
         headerRight: 'Staked',
         footerHtml: '',
         actionHtml: `
@@ -1099,22 +1095,20 @@ async function ffLoadMorePond() {
               Etherscan
             </a>
           </div>
-        `
+        `,
+        ownerAddress: null
       });
 
       grid.appendChild(card);
 
-      // Layered frog image (same as everywhere else)
       if (card.dataset.imgContainerId) {
         ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
       }
 
-      // Attach staking stats block (same layout/classes as other cards)
       if (typeof ffAttachStakeMetaIfStaked === 'function') {
         ffAttachStakeMetaIfStaked(card, tokenId);
       }
 
-      // Set the owner label (top-left) from the staking contract
       ffDecoratePondOwner(card, tokenId);
     }
 
@@ -1129,9 +1123,8 @@ async function ffLoadMorePond() {
   }
 }
 
-
 // ===================================================
-// Owned / Staked frogs (wallet view)
+// Owned / Staked frogs (wallet view, also used by 404 viewer)
 // ===================================================
 async function ffFetchOwnedFrogs(address) {
   if (!FF_ALCHEMY_NFT_BASE) return [];
@@ -1191,8 +1184,10 @@ async function ffFetchStakedTokenIds(address) {
   return result;
 }
 
+// options.readOnly === true is used by 404 wallet viewer (no stake/unstake/transfer, no clickable owner link)
 async function renderOwnedAndStakedFrogs(address, options = {}) {
   const readOnly = !!options.readOnly;
+
   const ownedGrid   = document.getElementById('owned-frogs-grid');
   const ownedStatus = document.getElementById('owned-frogs-status');
   const stakedGrid   = document.getElementById('staked-frogs-grid');
@@ -1228,7 +1223,6 @@ async function renderOwnedAndStakedFrogs(address, options = {}) {
           metadata = await fetchFrogMetadata(tokenId);
         }
 
-        // Read-only mode (404 wallet viewer): NO stake/transfer buttons
         const actionHtml = readOnly
           ? `
             <div class="recent_sale_links">
@@ -1286,8 +1280,6 @@ async function renderOwnedAndStakedFrogs(address, options = {}) {
           headerRight: 'Owned',
           footerHtml: '',
           actionHtml,
-          // In read-only mode we DON'T pass ownerAddress,
-          // so the top-left stays plain text (no clickable change)
           ownerAddress: readOnly ? null : address
         });
 
@@ -1378,7 +1370,6 @@ async function renderOwnedAndStakedFrogs(address, options = {}) {
           headerRight: 'Staked',
           footerHtml,
           actionHtml,
-          // Again: in read-only mode, don't wire the clickable owner link
           ownerAddress: readOnly ? null : ownerLabelAddress
         });
 
@@ -1396,7 +1387,6 @@ async function renderOwnedAndStakedFrogs(address, options = {}) {
 
 // Use stakingValues() from ethereum-dapp.js to decorate wallet-staked cards
 async function ffDecorateStakedFrogCard(tokenId) {
-  // Ensure read-only contracts & helpers are ready
   const ok = await ffEnsureReadContracts();
   if (!ok || typeof stakingValues !== 'function') {
     console.warn('stakingValues/controller not ready; skipping staking details for token', tokenId);
@@ -1430,8 +1420,6 @@ async function ffDecorateStakedFrogCard(tokenId) {
     console.warn(`ffDecorateStakedFrogCard failed for token ${tokenId}`, err);
   }
 }
-
-
 
 // ---- Card actions: Stake / Unstake / Transfer ----
 async function ffStakeFrog(tokenId) {
@@ -1600,18 +1588,15 @@ async function ffTryContractCall(contract, names, args = []) {
 
 // Ensure ffWeb3 + contracts exist for read-only staking calls
 async function ffEnsureReadContracts() {
-  // If controller already exists and staking helpers are present, we're good
   if (window.controller && typeof stakingValues === 'function' && typeof stakerAddress === 'function') {
     return true;
   }
 
   try {
-    // Prefer the user's wallet provider when available
     if (!ffWeb3) {
       if (window.ethereum) {
         ffWeb3 = new Web3(window.ethereum);
       } else if (typeof Web3 !== 'undefined') {
-        // Optional: fallback RPC for read-only access when no wallet is present.
         ffWeb3 = new Web3(`https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY_API_KEY}`);
       }
       if (!ffWeb3) {
@@ -1621,7 +1606,6 @@ async function ffEnsureReadContracts() {
       window.web3 = ffWeb3;
     }
 
-    // Initialise contracts if ABIs are present
     if (!window.collection && typeof COLLECTION_ABI !== 'undefined') {
       window.collection = new ffWeb3.eth.Contract(COLLECTION_ABI, FF_COLLECTION_ADDRESS);
     }
@@ -1760,7 +1744,6 @@ async function connectWallet() {
         );
       }
       if (typeof CONTROLLER_ABI !== 'undefined') {
-        // This populates the same global `controller` that ethereum-dapp.js expects
         window.controller = new ffWeb3.eth.Contract(
           CONTROLLER_ABI,
           FF_CONTROLLER_ADDRESS
@@ -1791,7 +1774,6 @@ async function connectWallet() {
 
     renderOwnedAndStakedFrogs(address);
 
-    // Now that controller + staking helpers are ready, decorate all existing cards
     ffProcessPendingStakeMeta();
     ffRefreshStakeMetaForAllCards();
 
