@@ -33,6 +33,8 @@ let FF_POND_PAGE_KEY = null;
 // ------------------------
 let ffWeb3 = null;
 let ffCurrentAccount = null;
+// Queue of cards that need staking decoration once contracts/helpers are ready
+const FF_PENDING_STAKE_CARDS = [];
 
 // ------------------------
 // Entry
@@ -246,14 +248,18 @@ async function loadRecentActivity() {
 
 // Attach staking block to any card (recent, pond, rarity, etc.)
 // Uses ethereum-dapp.js helpers: stakerAddress() + stakingValues()
-// Only runs once wallet + controller are initialised.
+// If staking infra isn't ready yet, we queue the card and decorate later.
 async function ffAttachStakeMetaIfStaked(card, tokenId) {
   if (!FF_SHOW_STAKING_STATS_ON_CARDS) return;
   if (!card) return;
 
-  // Require wallet/web3 + controller + helper functions
-  if (!ffWeb3 || !window.controller || typeof stakerAddress !== 'function' || typeof stakingValues !== 'function') {
-    // Wallet not connected yet OR staking helpers not available → skip quietly
+  // If staking helpers or controller aren't ready yet, queue for later
+  if (
+    typeof window.stakerAddress !== 'function' ||
+    typeof window.stakingValues !== 'function' ||
+    !window.controller
+  ) {
+    FF_PENDING_STAKE_CARDS.push({ card, tokenId });
     return;
   }
 
@@ -292,7 +298,7 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
         <span class="stake-level-label">Staked Lvl. ${levelNum}</span>
       </div>
       <div class="stake-meta-row stake-meta-subrow">
-        <span>Staked: ${stakedDate}</span>
+        <span>Staked: ${stakedDate} (${stakedDays}d)</span>
       </div>
       <div class="stake-progress">
         <div class="stake-progress-bar" style="width:${pct}%;"></div>
@@ -311,7 +317,42 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
   }
 }
 
+// Process any cards that were queued before staking helpers were ready
+function ffProcessPendingStakeMeta() {
+  if (
+    typeof window.stakerAddress !== 'function' ||
+    typeof window.stakingValues !== 'function' ||
+    !window.controller
+  ) {
+    return;
+  }
 
+  const pending = FF_PENDING_STAKE_CARDS.splice(0, FF_PENDING_STAKE_CARDS.length);
+  for (const { card, tokenId } of pending) {
+    // Fire and forget – errors are already handled inside ffAttachStakeMetaIfStaked
+    ffAttachStakeMetaIfStaked(card, tokenId);
+  }
+}
+
+// Make sure *all* existing frog cards get staking info once things are ready
+function ffRefreshStakeMetaForAllCards() {
+  if (
+    typeof window.stakerAddress !== 'function' ||
+    typeof window.stakingValues !== 'function' ||
+    !window.controller
+  ) {
+    return;
+  }
+
+  const cards = document.querySelectorAll('.recent_sale_card');
+  cards.forEach((card) => {
+    const raw = card.dataset.tokenId;
+    const tokenId = parseTokenId(raw);
+    if (tokenId != null) {
+      ffAttachStakeMetaIfStaked(card, tokenId);
+    }
+  });
+}
 
 // Refresh staking info on all already-rendered frog cards
 async function ffRefreshAllStakeMeta() {
@@ -1625,10 +1666,12 @@ async function connectWallet() {
 
     renderOwnedAndStakedFrogs(address);
 
-    // Update any already-rendered frog cards (recent, rarity, pond) with staking info
-    ffRefreshAllStakeMeta();
+    // Now that controller + staking helpers are ready, decorate all existing cards
+    ffProcessPendingStakeMeta();
+    ffRefreshStakeMetaForAllCards();
 
     ffShowView('wallet');
+
   } catch (err) {
     console.error('Wallet connection failed:', err);
     alert('Failed to connect wallet. Check your wallet and try again.');
