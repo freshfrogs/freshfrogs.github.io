@@ -246,14 +246,14 @@ async function loadRecentActivity() {
 
 // Attach staking block to any card (recent, pond, rarity, etc.)
 // Uses ethereum-dapp.js helpers: stakerAddress() + stakingValues()
+// Only runs once wallet + controller are initialised.
 async function ffAttachStakeMetaIfStaked(card, tokenId) {
   if (!FF_SHOW_STAKING_STATS_ON_CARDS) return;
   if (!card) return;
 
-  // Make sure we have web3 + controller initialised for read-only calls
-  const ok = await ffEnsureReadContracts();
-  if (!ok || typeof stakerAddress !== 'function' || typeof stakingValues !== 'function') {
-    // Staking helpers not available → skip quietly
+  // Require wallet/web3 + controller + helper functions
+  if (!ffWeb3 || !window.controller || typeof stakerAddress !== 'function' || typeof stakingValues !== 'function') {
+    // Wallet not connected yet OR staking helpers not available → skip quietly
     return;
   }
 
@@ -267,20 +267,23 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
 
     const [stakedDays, rawLevel, daysToNext, flyzEarned, stakedDate] = values;
 
+    // Convert roman numerals if needed (e.g., "XII" -> 12)
     const levelNum = ffRomanToArabic(rawLevel) ?? rawLevel;
 
     const MAX_DAYS  = 41.7;
     const remaining = Math.max(0, Math.min(MAX_DAYS, Number(daysToNext)));
     const pct       = Math.max(0, Math.min(100, ((MAX_DAYS - remaining) / MAX_DAYS) * 100));
 
-    // Where to inject the staking block (same place across all card types)
+    // Find the traits block, then attach staking *after* it, not inside
     const propsBlock =
       card.querySelector('.recent_sale_properties') ||
       card.querySelector('.recent_sale_traits') ||
       card;
 
+    const parent = propsBlock.parentElement || card;
+
     // Remove any previous staking block so we don't double-render
-    propsBlock.querySelectorAll('.stake-meta, .staking-sale-stats').forEach((el) => el.remove());
+    parent.querySelectorAll('.stake-meta, .staking-sale-stats').forEach((el) => el.remove());
 
     const wrapper = document.createElement('div');
     wrapper.className = 'stake-meta';
@@ -290,18 +293,24 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
       </div>
       <div class="stake-meta-row stake-meta-subrow">
         <span>Staked: ${stakedDate} (${stakedDays}d)</span>
-        <span>Next level in ~${daysToNext} days</span>
       </div>
       <div class="stake-progress">
         <div class="stake-progress-bar" style="width:${pct}%;"></div>
       </div>
     `;
 
-    propsBlock.appendChild(wrapper);
+    // Insert staking block right after the traits, but before any action buttons
+    const firstAction = parent.querySelector('.recent_sale_links');
+    if (firstAction) {
+      parent.insertBefore(wrapper, firstAction);
+    } else {
+      parent.appendChild(wrapper);
+    }
   } catch (err) {
     console.warn('ffAttachStakeMetaIfStaked failed for token', tokenId, err);
   }
 }
+
 
 
 // Refresh staking info on all already-rendered frog cards
@@ -850,7 +859,7 @@ async function ffLoadMoreRarity() {
 }
 
 // ===================================================
-// Pond panel (frogs owned by controller)
+// Pond panel (frogs owned by controller = staked by community)
 // ===================================================
 async function ffFetchPondFrogs(limit = 24, pageKey = null) {
   const params = new URLSearchParams({
@@ -881,11 +890,43 @@ function ffEnsurePondLoaded() {
   const grid = document.getElementById('pond-grid');
   const status = document.getElementById('pond-status');
   if (!grid) return;
+
   if (!grid.children.length) {
     FF_POND_PAGE_KEY = null;
     ffLoadMorePond();
   } else if (status) {
     status.textContent = 'All Frogs currently staked by the community.';
+  }
+}
+
+// Set owner label (top-left) on a pond card using stakerAddress(tokenId)
+async function ffDecoratePondOwner(card, tokenId) {
+  try {
+    // Prefer helper if present
+    if (typeof ffEnsureReadContracts === 'function') {
+      const ok = await ffEnsureReadContracts();
+      if (!ok) return;
+    } else {
+      // Fallback: require controller already initialised (e.g. via wallet connect)
+      if (!ffWeb3 || !window.controller) return;
+    }
+
+    if (typeof stakerAddress !== 'function') {
+      console.warn('stakerAddress() helper not available; cannot show pond owner.');
+      return;
+    }
+
+    const staker = await stakerAddress(tokenId);
+    if (!staker || staker === ZERO_ADDRESS) return;
+
+    // First .sale_card_title in the card is the top-left header
+    const titleEls = card.querySelectorAll('.sale_card_title');
+    const ownerEl = titleEls[0];
+    if (ownerEl) {
+      ownerEl.textContent = truncateAddress(staker);
+    }
+  } catch (err) {
+    console.warn('ffDecoratePondOwner failed for token', tokenId, err);
   }
 }
 
@@ -914,10 +955,13 @@ async function ffLoadMorePond() {
         metadata = await fetchFrogMetadata(tokenId);
       }
 
+      // Header:
+      //   - Left: actual owner (filled by ffDecoratePondOwner)
+      //   - Right: "Staked" (same as wallet view)
       const card = createFrogCard({
         tokenId,
         metadata,
-        headerLeft: 'Pond',
+        headerLeft: '',           // will be set to owner later
         headerRight: 'Staked',
         footerHtml: '',
         actionHtml: `
@@ -944,10 +988,22 @@ async function ffLoadMorePond() {
 
       grid.appendChild(card);
 
-      ffAttachStakeMetaIfStaked(card, tokenId);
+      // Layered frog image (same as everywhere else)
+      if (card.dataset.imgContainerId) {
+        ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
+      }
+
+      // Attach staking stats block (same layout/classes as other cards)
+      if (typeof ffAttachStakeMetaIfStaked === 'function') {
+        ffAttachStakeMetaIfStaked(card, tokenId);
+      }
+
+      // Set the owner label (top-left) from the staking contract
+      ffDecoratePondOwner(card, tokenId);
     }
 
-    FF_POND_PAGE_KEY = pageKey;
+    FF_POND_PAGE_KEY = pageKey || null;
+
     if (status) {
       status.textContent = 'All Frogs currently staked by the community.';
     }
@@ -956,6 +1012,7 @@ async function ffLoadMorePond() {
     if (status) status.textContent = 'Unable to load pond frogs.';
   }
 }
+
 
 // ===================================================
 // Owned / Staked frogs (wallet view)
@@ -1193,7 +1250,7 @@ async function ffDecorateStakedFrogCard(tokenId) {
 
     if (lvlEl)  lvlEl.textContent  = `Staked Lvl. ${levelNum}`;
     if (dateEl) dateEl.textContent = `Staked: ${stakedDate} (${stakedDays}d)`;
-    if (nextEl) nextEl.textContent = `Next level in ~${daysToNext} days`;
+    if (nextEl) nextEl.textContent = ``;
 
     const MAX_DAYS  = 41.7;
     const remaining = Math.max(0, Math.min(MAX_DAYS, Number(daysToNext)));
