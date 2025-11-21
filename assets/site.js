@@ -196,7 +196,6 @@ function ffShowView(view) {
   } else if (view === 'pond') {
     ffEnsurePondLoaded();
   } else if (view === 'wallet' && ffCurrentAccount) {
-    // Guard: only render once per address unless grids are empty
     const ownedGrid = document.getElementById('owned-frogs-grid');
     const stakedGrid = document.getElementById('staked-frogs-grid');
     const gridsEmpty =
@@ -264,19 +263,21 @@ async function loadRecentActivity() {
         metadata = await fetchFrogMetadata(tokenId);
       }
 
-      let ownerAddress;
-      let headerRight;
+      let ownerAddress = null;
+      let headerRight = '--';
 
       if (FF_ACTIVITY_MODE === 'mints') {
-        ownerAddress = item.to || item.receiver || item.buyerAddress;
+        ownerAddress = item.to || item.receiver || item.buyerAddress || item.ownerAddress || null;
         headerRight  = formatMintAge(item);
       } else {
+        // Prefer buyer; fallback to seller; then any known from/to
         ownerAddress =
           item.buyerAddress ||
           item.to ||
           item.ownerAddress ||
           item.sellerAddress ||
-          item.from;
+          item.from ||
+          null;
 
         headerRight = item.priceText || formatSalePrice(item);
 
@@ -315,7 +316,7 @@ async function loadRecentActivity() {
       const card = createFrogCard({
         tokenId,
         metadata,
-        headerLeft: '--', // will be set async w/ OpenSea username
+        headerLeft: '--',  // always visible baseline
         headerRight,
         footerHtml: '',
         actionHtml
@@ -323,14 +324,17 @@ async function loadRecentActivity() {
 
       container.appendChild(card);
 
+      // Set top-left owner label (username async)
       if (ownerAddress) {
         ffSetOwnerLabel(card, ownerAddress);
       }
 
+      // Layered images everywhere
       if (card.dataset.imgContainerId) {
         ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
       }
 
+      // Staking meta
       ffAttachStakeMetaIfStaked(card, tokenId);
     }
   } catch (err) {
@@ -671,6 +675,23 @@ function dedupeByTokenId(items, idExtractor) {
   return out;
 }
 
+function ffPickAddress(...candidates) {
+  for (const c of candidates) {
+    if (!c) continue;
+    if (typeof c === 'string' && /^0x[a-fA-F0-9]{40}$/.test(c)) return c;
+    if (typeof c === 'object') {
+      const addr =
+        c.address ||
+        c.walletAddress ||
+        c.wallet_address ||
+        c.user?.address ||
+        c.account?.address;
+      if (addr && /^0x[a-fA-F0-9]{40}$/.test(addr)) return addr;
+    }
+  }
+  return null;
+}
+
 async function fetchRecentSalesOpenSea(limit = 24) {
   const url =
     `https://api.opensea.io/api/v2/events/collection/${FF_OPENSEA_COLLECTION_SLUG}` +
@@ -683,13 +704,39 @@ async function fetchRecentSalesOpenSea(limit = 24) {
   if (!res.ok) throw new Error(`OpenSea events request failed: ${res.status}`);
 
   const data = await res.json();
-  const events = data.asset_events || data.events || data.collection_events || [];
+  const events =
+    data.asset_events ||
+    data.events ||
+    data.collection_events ||
+    [];
+
   const simplified = [];
 
   for (const e of events) {
     const nft = e.nft || e.asset || {};
     const tokenId = parseTokenId(nft.identifier || nft.token_id || e.tokenId);
     if (tokenId == null) continue;
+
+    // BIG address fallback net
+    const buyerAddress = ffPickAddress(
+      e.buyer,
+      e.taker,
+      e.to_account,
+      e.toAccount,
+      e.to,
+      e.buyer_address,
+      e.winner_account
+    );
+
+    const sellerAddress = ffPickAddress(
+      e.seller,
+      e.maker,
+      e.from_account,
+      e.fromAccount,
+      e.from,
+      e.seller_address,
+      e.loser_account
+    );
 
     const paymentToken = e.payment_token || e.payment?.payment_token || {};
     const decimals = paymentToken.decimals != null ? Number(paymentToken.decimals) : 18;
@@ -700,6 +747,7 @@ async function fetchRecentSalesOpenSea(limit = 24) {
       e.payment?.quantity ||
       e.sale_price?.amount ||
       e.total_price ||
+      e.totalPrice ||
       null;
 
     try {
@@ -718,8 +766,8 @@ async function fetchRecentSalesOpenSea(limit = 24) {
 
     simplified.push({
       tokenId,
-      buyerAddress: e.buyer?.address || e.to_account?.address || e.to_address || null,
-      sellerAddress: e.seller?.address || e.from_account?.address || e.from_address || null,
+      buyerAddress,
+      sellerAddress,
       priceText,
       eventTimestamp: e.event_timestamp || e.created_date || null,
       metadata: nft.metadata || nft.raw_metadata || null
@@ -1085,7 +1133,6 @@ async function ffFetchOwnedFrogs(address) {
   const all = Array.isArray(data.ownedNfts) ? data.ownedNfts : [];
   const target = FF_COLLECTION_ADDRESS.toLowerCase();
 
-  // Filter collection + dedupe by tokenId
   const seen = new Set();
   const frogs = [];
   for (const nft of all) {
@@ -1110,7 +1157,6 @@ async function ffFetchStakedTokenIds(address) {
 
   const result = [];
   const seen = new Set();
-
   const addId = (v) => {
     const id = parseTokenId(v?.tokenId ?? v);
     if (id != null && !seen.has(id)) { seen.add(id); result.push(id); }
@@ -1482,9 +1528,7 @@ async function connectWallet() {
 
     ffApplyDashboardUpdates(address, ownedCount, stakingStats, profile);
 
-    // ONLY change view — ffShowView handles rendering with guards
     ffShowView('wallet');
-
     ffInitReadContractsOnLoad();
   } catch (err) {
     console.error('Wallet connection failed:', err);
