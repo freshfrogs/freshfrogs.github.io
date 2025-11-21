@@ -77,22 +77,6 @@
             return;
         }
 
-        try {
-            if (statusEl) statusEl.textContent = `Saving morph #${tokenA} / #${tokenB}…`;
-            await saveCurrentMorph(
-            address,
-            tokenA,
-            tokenB,
-            newTraits,
-            previewUrl,
-            null, // value optional
-            null  // signature optional
-            );
-            if (statusEl) statusEl.textContent = `Saved morph for #${tokenA} / #${tokenB}`;
-        } catch (e) {
-            console.error('saveCurrentMorph failed:', e);
-            if (statusEl) statusEl.textContent = 'Save failed — check console.';
-        }
     }
 
   window.FrogMorph = FrogMorph;
