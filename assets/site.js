@@ -246,24 +246,19 @@ async function loadRecentActivity() {
 
 // Attach staking block to any card (recent, pond, rarity, etc.)
 // Uses ethereum-dapp.js helpers: stakerAddress() + stakingValues()
-// This relies on your wallet provider (no direct Alchemy core calls here).
 async function ffAttachStakeMetaIfStaked(card, tokenId) {
   if (!FF_SHOW_STAKING_STATS_ON_CARDS) return;
   if (!card) return;
 
-  // Need staking helpers from ethereum-dapp.js
-  if (typeof stakingValues !== 'function' || typeof stakerAddress !== 'function') {
-    return;
-  }
-
-  // Need a controller instance (either from ethereum-dapp.js or connectWallet)
-  if (typeof controller === 'undefined' || !controller) {
+  // Make sure we have web3 + controller initialised for read-only calls
+  const ok = await ffEnsureReadContracts();
+  if (!ok || typeof stakerAddress !== 'function' || typeof stakingValues !== 'function') {
+    // Staking helpers not available → skip quietly
     return;
   }
 
   try {
     const staker = await stakerAddress(tokenId);
-
     // Not staked or explicitly zero-address → no staking block
     if (!staker || staker === ZERO_ADDRESS) return;
 
@@ -272,14 +267,13 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
 
     const [stakedDays, rawLevel, daysToNext, flyzEarned, stakedDate] = values;
 
-    // Convert roman numerals if needed (e.g., "XII" -> 12)
     const levelNum = ffRomanToArabic(rawLevel) ?? rawLevel;
 
     const MAX_DAYS  = 41.7;
     const remaining = Math.max(0, Math.min(MAX_DAYS, Number(daysToNext)));
     const pct       = Math.max(0, Math.min(100, ((MAX_DAYS - remaining) / MAX_DAYS) * 100));
 
-    // Where to inject the staking block
+    // Where to inject the staking block (same place across all card types)
     const propsBlock =
       card.querySelector('.recent_sale_properties') ||
       card.querySelector('.recent_sale_traits') ||
@@ -308,6 +302,7 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
     console.warn('ffAttachStakeMetaIfStaked failed for token', tokenId, err);
   }
 }
+
 
 // Refresh staking info on all already-rendered frog cards
 async function ffRefreshAllStakeMeta() {
@@ -1177,8 +1172,9 @@ async function renderOwnedAndStakedFrogs(address) {
 
 // Use stakingValues() from ethereum-dapp.js to decorate wallet-staked cards
 async function ffDecorateStakedFrogCard(tokenId) {
-  // Require controller + helper function
-  if (typeof controller === 'undefined' || !controller || typeof stakingValues !== 'function') {
+  // Ensure read-only contracts & helpers are ready
+  const ok = await ffEnsureReadContracts();
+  if (!ok || typeof stakingValues !== 'function') {
     console.warn('stakingValues/controller not ready; skipping staking details for token', tokenId);
     return;
   }
@@ -1210,6 +1206,7 @@ async function ffDecorateStakedFrogCard(tokenId) {
     console.warn(`ffDecorateStakedFrogCard failed for token ${tokenId}`, err);
   }
 }
+
 
 
 // ---- Card actions: Stake / Unstake / Transfer ----
@@ -1375,6 +1372,50 @@ async function ffTryContractCall(contract, names, args = []) {
     }
   }
   return null;
+}
+
+// Ensure ffWeb3 + contracts exist for read-only staking calls
+async function ffEnsureReadContracts() {
+  // If controller already exists and staking helpers are present, we're good
+  if (window.controller && typeof stakingValues === 'function' && typeof stakerAddress === 'function') {
+    return true;
+  }
+
+  try {
+    // Prefer the user's wallet provider when available
+    if (!ffWeb3) {
+      if (window.ethereum) {
+        ffWeb3 = new Web3(window.ethereum);
+      } else if (typeof Web3 !== 'undefined') {
+        // Optional: fallback RPC for read-only access when no wallet is present.
+        // If you REALLY don't want to use Alchemy here, you can delete this branch.
+        ffWeb3 = new Web3(`https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY_API_KEY}`);
+      }
+      if (!ffWeb3) {
+        console.warn('ffEnsureReadContracts: no provider available for read-only calls.');
+        return false;
+      }
+      window.web3 = ffWeb3;
+    }
+
+    // Initialise contracts if ABIs are present
+    if (!window.collection && typeof COLLECTION_ABI !== 'undefined') {
+      window.collection = new ffWeb3.eth.Contract(COLLECTION_ABI, FF_COLLECTION_ADDRESS);
+    }
+    if (!window.controller && typeof CONTROLLER_ABI !== 'undefined') {
+      window.controller = new ffWeb3.eth.Contract(CONTROLLER_ABI, FF_CONTROLLER_ADDRESS);
+    }
+
+    if (!window.controller) {
+      console.warn('ffEnsureReadContracts: controller contract not initialised.');
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.warn('ffEnsureReadContracts failed:', err);
+    return false;
+  }
 }
 
 async function ffFetchStakingStats(address) {
