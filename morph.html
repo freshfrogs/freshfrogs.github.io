@@ -2,139 +2,125 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>FreshFrogs – Metamorph Lab</title>
+  <title>FreshFrogs – Morph Lab</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
-  <link rel="shortcut icon" type="image/x-icon" href="https://freshfrogs.github.io/assets/blackWhite.png">
-
-  <style>
-    /* Only morph-page-specific layout. Does not touch main site. */
-    .morph-root { max-width: 1250px; margin: 0 auto; padding: 10px; }
-    .morph-page {
-      display:grid;
-      grid-template-columns: 380px 1fr;
-      gap:12px;
-      align-items:start;
-    }
-    @media (max-width: 1000px){ .morph-page{ grid-template-columns:1fr; } }
-
-    .morph-slots{
-      display:grid;
-      grid-template-columns:1fr 36px 1fr;
-      gap:8px;
-      align-items:center;
-      margin-top:8px;
-    }
-    .slot{
-      min-height:150px;
-      display:grid;
-      place-items:center;
-      text-align:center;
-      padding:8px;
-      border-radius:12px;
-    }
-    .slot img{ width:100px;height:100px;image-rendering:pixelated;display:block; }
-
-    .morph-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
-
-    .morph-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
-      gap:10px;
-      margin-top:6px;
-    }
-
-    .morph-selected{
-      outline:3px solid currentColor;
-      outline-offset:2px;
-      transform: translateY(-1px);
-    }
-
-    .preview-box{
-      margin-top:10px;
-      min-height:260px;
-      display:grid;
-      place-items:center;
-      border-radius:12px;
-      padding:8px;
-      overflow:hidden;
-    }
-    .preview-canvas{ width:100%; height:auto; image-rendering:pixelated; }
-    .preview-fallback{ display:grid; grid-template-columns:1fr 1fr; gap:6px; width:100%; }
-    .preview-fallback img{ width:100%; border-radius:8px; image-rendering:pixelated; }
-
-    #morph-json{
-      white-space:pre-wrap;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
-      font-size:12px; line-height:1.35;
-      padding:8px; border-radius:8px;
-      max-height:240px; overflow:auto; margin-top:6px;
-    }
-    .tiny-muted{ opacity:.7; font-size:12px; }
-  </style>
+  <link rel="stylesheet" href="./style.css" />
 </head>
 
 <body class="layout-4">
-  <div class="morph-root">
-    <section class="panel">
-      <div style="display:flex;align-items:end;justify-content:space-between;gap:10px;">
-        <div>
-          <h2 style="margin:0;">Metamorph Lab</h2>
-          <div class="tiny-muted">Pick two frogs. Traits fuse into a new preview.</div>
+  <div class="page">
+    <!-- HEADER -->
+    <header class="site-header">
+      <nav class="nav">
+        <!-- Views controlled by JS -->
+        <a href="index.html" data-view="collection">Collection</a>
+        <a href="index.html" data-view="rarity">Rarity</a>
+        <a href="index.html" data-view="pond">Pond</a>
+
+        <!-- NEW Morph tab -->
+        <a href="morph.html" data-view="morph" class="active">Morph</a>
+
+        <!-- Wallet tab appears AFTER connect, shows shortened address -->
+        <a
+          href="index.html"
+          data-view="wallet"
+          id="wallet-nav-link"
+          style="display: none;"
+        ></a>
+      </nav>
+
+      <!-- 🔹 Top-right connect button removed (matches index) -->
+    </header>
+
+    <!-- DASHBOARD HERO (copied 1:1 from your index) -->
+    <section class="hero">
+      <div class="hero-main">
+        <div class="hero-media">
+          <img src="https://freshfrogs.github.io/frog/16.png" class="fly" />
+          <img src="https://freshfrogs.github.io/frog/3753.png" class="fly" />
+          <img src="https://freshfrogs.github.io/frog/467.png" class="fly" />
+          <img src="https://freshfrogs.github.io/frog/594.png" class="fly" />
         </div>
-        <div class="tiny-muted">Token(A) + Token(B) → Token(C)</div>
-      </div>
-
-      <div class="morph-page" style="margin-top:10px;">
-
-        <!-- LEFT -->
-        <aside class="panel">
-          <div class="morph-slots">
-            <div id="slot-a" class="panel slot">
-              <div>
-                <div class="tiny-muted">Alpha</div>
-                <div id="slot-a-text">None selected</div>
-              </div>
-            </div>
-
-            <div style="text-align:center;font-weight:800;">+</div>
-
-            <div id="slot-b" class="panel slot">
-              <div>
-                <div class="tiny-muted">Bravo</div>
-                <div id="slot-b-text">None selected</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="morph-actions">
-            <button id="morph-btn" class="btn primary" disabled>Morph</button>
-            <button id="shuffle-btn" class="btn">Shuffle 20</button>
-            <button id="clear-btn" class="btn">Clear</button>
-          </div>
-
-          <h3 style="margin:12px 0 6px;">Preview</h3>
-          <div id="morph-preview" class="panel preview-box">
-            <div class="tiny-muted">Select two frogs to preview</div>
-          </div>
-
-          <h3 style="margin:12px 0 6px;">Morph JSON</h3>
-          <div id="morph-json" class="panel"></div>
-        </aside>
-
-        <!-- RIGHT -->
-        <section>
-          <h3 style="margin:0;">Random Frogs</h3>
-          <div class="tiny-muted">Click two cards to fuse.</div>
-
-          <!-- uses same card class names as site.js -->
-          <div id="morph-grid" class="morph-grid"></div>
-        </section>
-
+        <h1 class="hero-title">freshfrogs.github.io</h1>
+        <p class="hero-subtitle">
+          A collection of 4,040 randomly generated frogs on the Ethereum
+          blockchain, that are each unique with thousands of different
+          combinations!
+          Stake and earn rewards, level up, unlock custom trait animations and
+          more! All secondary sales are entitled to a <b>5%</b> royalty.
+        </p>
+        <div class="hero-actions">
+          <button class="btn primary" id="hero-view-collection-btn">
+            View Collection
+          </button>
+          <!-- 🔹 This is now the ONLY connect button -->
+          <button class="btn secondary" id="hero-connect-wallet-btn">
+            Connect Wallet
+          </button>
+        </div>
       </div>
     </section>
+
+    <!-- MAIN DASHBOARD LAYOUT -->
+    <main class="dashboard-main">
+      <!-- MORPH PANEL (same panel structure & styling style as your other views) -->
+      <section
+        class="panel dashboard-section"
+        id="morph-panel"
+        style="background: transparent; box-shadow: none; padding: 0;"
+      >
+        <h2>Morph Lab</h2>
+        <p class="dashboard-note" id="morph-status">
+          Pick two Frogs to preview a metamorph. This does not mint — it only builds the combo preview + JSON.
+        </p>
+
+        <div class="morph-row">
+          <div class="morph-col">
+            <label class="morph-label">Parent A Token ID</label>
+            <input id="morph-a-input" class="morph-input" type="number" min="1" max="4040" placeholder="e.g. 12" />
+          </div>
+
+          <div class="morph-col">
+            <label class="morph-label">Parent B Token ID</label>
+            <input id="morph-b-input" class="morph-input" type="number" min="1" max="4040" placeholder="e.g. 987" />
+          </div>
+
+          <div class="morph-col morph-actions">
+            <button id="morph-run-btn" class="btn primary" type="button">Preview Morph</button>
+            <button id="morph-clear-btn" class="btn secondary" type="button">Clear</button>
+          </div>
+        </div>
+
+        <div class="morph-preview-wrap">
+          <div id="morph-preview" class="frog_img_cont"></div>
+          <pre id="morph-json" class="morph-json">// morphed attributes will appear here</pre>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <span class="footer-links" style="color: white;">
+        <a href="#">freshfrogs.github.io</a>
+      </span>
+    </footer>
   </div>
 
-  <script src="assets/morph.js"></script>
+  <!-- Web3 for wallet / staking functions -->
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+  <!-- ABIs + legacy staking helpers (used for staking level / progress) -->
+  <script src="https://freshfrogs.github.io/assets/collection_abi.js"></script>
+  <script src="https://freshfrogs.github.io/assets/controller_abi.js"></script>
+  <script src="https://freshfrogs.github.io/assets/ethereum-dapp.js"></script>
+
+  <!-- Rarity rankings (must load before site.js) -->
+  <script src="https://freshfrogs.github.io/assets/rarityrankings.js"></script>
+
+  <!-- Main site logic (recent activity, wallet, dashboard, etc.) -->
+  <script src="https://freshfrogs.github.io/assets/site.js"></script>
+
+  <!-- Morph logic -->
+  <script src="./assets/morph.js"></script>
 </body>
 </html>
